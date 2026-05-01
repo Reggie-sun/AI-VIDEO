@@ -1,0 +1,95 @@
+from pathlib import Path
+
+import pytest
+
+from ai_video.config import load_project, load_shots
+from ai_video.errors import AiVideoError, ErrorCode
+
+
+def write_example_files(tmp_path: Path) -> tuple[Path, Path]:
+    refs = tmp_path / "refs"
+    refs.mkdir()
+    (refs / "hero.png").write_bytes(b"fake-png")
+    workflow_dir = tmp_path / "workflows"
+    workflow_dir.mkdir()
+    (workflow_dir / "template.json").write_text(
+        '{"3":{"class_type":"KSampler","inputs":{"seed":1}},'
+        '"6":{"class_type":"CLIPTextEncode","inputs":{"text":""}},'
+        '"7":{"class_type":"CLIPTextEncode","inputs":{"text":""}},'
+        '"12":{"class_type":"LoadImage","inputs":{"image":""}},'
+        '"20":{"class_type":"LoadImage","inputs":{"image":""}},'
+        '"25":{"class_type":"IPAdapter","inputs":{"weight":0.8}},'
+        '"42":{"class_type":"VHS_VideoCombine","inputs":{"filename_prefix":""}}}',
+        encoding="utf-8",
+    )
+    (workflow_dir / "binding.yaml").write_text(
+        "positive_prompt:\n  path: ['6', inputs, text]\n"
+        "negative_prompt:\n  path: ['7', inputs, text]\n"
+        "seed:\n  path: ['3', inputs, seed]\n"
+        "init_image:\n  path: ['12', inputs, image]\n"
+        "output_prefix:\n  path: ['42', inputs, filename_prefix]\n"
+        "character_refs:\n"
+        "  - character: hero\n"
+        "    image_path: ['20', inputs, image]\n"
+        "    weight_path: ['25', inputs, weight]\n"
+        "clip_output:\n  node: '42'\n  kind: gifs\n  extensions: ['.mp4']\n  select: first\n",
+        encoding="utf-8",
+    )
+    project = tmp_path / "project.yaml"
+    project.write_text(
+        "project_name: demo\n"
+        "comfy:\n  base_url: http://127.0.0.1:8188\n"
+        "workflow:\n  template: workflows/template.json\n  binding: workflows/binding.yaml\n"
+        "output:\n  root: runs\n  min_free_gb: 0\n"
+        "defaults:\n  width: 512\n  height: 512\n  fps: 16\n  clip_seconds: 2\n  seed: 100\n"
+        "characters:\n"
+        "  - id: hero\n"
+        "    name: Hero\n"
+        "    description: same person, same outfit\n"
+        "    reference_images: [refs/hero.png]\n"
+        "    ipadapter:\n      weight: 0.8\n",
+        encoding="utf-8",
+    )
+    shots = tmp_path / "shots.yaml"
+    shots.write_text(
+        "shots:\n"
+        "  - id: shot_001\n    prompt: hero enters room\n    characters: [hero]\n"
+        "  - id: shot_002\n    prompt: hero looks at camera\n    characters: [hero]\n",
+        encoding="utf-8",
+    )
+    return project, shots
+
+
+def test_load_project_resolves_paths_and_local_url(tmp_path):
+    project_path, _ = write_example_files(tmp_path)
+    project = load_project(project_path)
+    assert project.project_name == "demo"
+    assert project.workflow.template == tmp_path / "workflows/template.json"
+    assert project.workflow.binding == tmp_path / "workflows/binding.yaml"
+    assert project.output.root == tmp_path / "runs"
+    assert project.characters[0].reference_images == [tmp_path / "refs/hero.png"]
+
+
+def test_non_local_comfy_url_requires_opt_in(tmp_path):
+    project_path, _ = write_example_files(tmp_path)
+    text = project_path.read_text(encoding="utf-8").replace(
+        "http://127.0.0.1:8188", "https://example.com"
+    )
+    project_path.write_text(text, encoding="utf-8")
+    with pytest.raises(AiVideoError) as exc:
+        load_project(project_path)
+    assert exc.value.code is ErrorCode.CONFIG_INVALID
+    assert "non-local" in exc.value.user_message
+
+
+def test_load_shots_rejects_unknown_character(tmp_path):
+    project_path, shots_path = write_example_files(tmp_path)
+    project = load_project(project_path)
+    shots_path.write_text(
+        "shots:\n  - id: shot_001\n    prompt: missing\n    characters: [villain]\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(AiVideoError) as exc:
+        load_shots(shots_path, project)
+    assert exc.value.code is ErrorCode.CONFIG_INVALID
+    assert "villain" in exc.value.user_message

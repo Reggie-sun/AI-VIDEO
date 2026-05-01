@@ -1,0 +1,13 @@
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+*.egg-info/
+runs/*
+!runs/.gitkeep
+*.mp4
+*.webm
+*.mov
+*.png

@@ -1,0 +1,26 @@
+project_name: wan22-demo
+
+comfy:
+  base_url: http://127.0.0.1:8188
+
+workflow:
+  template: ../workflows/templates/wan22_i2v_api.json
+  binding: ../workflows/bindings/wan22_i2v_binding.yaml
+
+output:
+  root: ../runs
+  min_free_gb: 0
+
+defaults:
+  width: 832
+  height: 480
+  fps: 16
+  clip_seconds: 5
+  seed: 100
+  negative_prompt: ""
+  style_prompt: cinematic, consistent character, stable outfit
+  max_attempts: 2
+  poll_interval_seconds: 2
+  job_timeout_seconds: 1800
+
+characters: []

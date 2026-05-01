@@ -1,0 +1,10 @@
+shots:
+  - id: shot_001
+    prompt: hero enters a quiet studio, medium shot
+    characters: [hero]
+  - id: shot_002
+    prompt: hero turns toward the camera, same outfit and lighting
+    characters: [hero]
+  - id: shot_003
+    prompt: hero walks toward a doorway, camera follows smoothly
+    characters: [hero]

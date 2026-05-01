@@ -1,0 +1,16 @@
+positive_prompt:
+  path: ["549", "inputs", "text"]
+negative_prompt:
+  path: ["548", "inputs", "negative_prompt"]
+seed:
+  path: ["561", "inputs", "value"]
+init_image:
+  path: ["521", "inputs", "image"]
+output_prefix:
+  path: ["30", "inputs", "filename_prefix"]
+character_refs: []
+clip_output:
+  node: "30"
+  kind: gifs
+  extensions: [".mp4"]
+  select: first

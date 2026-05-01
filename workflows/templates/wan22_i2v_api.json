@@ -1,0 +1,181 @@
+{
+  "549": {
+    "class_type": "Textbox",
+    "inputs": {
+      "text": ""
+    },
+    "_meta": {"title": "Prompt"}
+  },
+  "521": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "api_test_image.png"
+    },
+    "_meta": {"title": "StartImage"}
+  },
+  "565": {
+    "class_type": "WanVideoLoraSelectMulti",
+    "inputs": {
+      "lora_0": "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+      "strength_0": 1,
+      "lora_1": "none",
+      "strength_1": 1,
+      "lora_2": "none",
+      "strength_2": 1,
+      "lora_3": "none",
+      "strength_3": 1,
+      "lora_4": "none",
+      "strength_4": 1,
+      "low_mem_load": false,
+      "merge_loras": false
+    },
+    "_meta": {"title": "High Noise LoRA"}
+  },
+  "559": {
+    "class_type": "WanVideoModelLoader",
+    "inputs": {
+      "model": "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "base_precision": "bf16",
+      "quantization": "fp8_e4m3fn_scaled",
+      "load_device": "offload_device",
+      "attention_mode": "sdpa",
+      "lora": ["565", 0],
+      "block_swap_args": ["550", 0],
+      "compile_args": ["552", 0]
+    },
+    "_meta": {"title": "Model Loader"}
+  },
+  "559c": {
+    "class_type": "LoadWanVideoT5TextEncoder",
+    "inputs": {
+      "model_name": "models_t5_umt5-xxl-enc-bf16.pth",
+      "precision": "bf16",
+      "load_device": "offload_device"
+    },
+    "_meta": {"title": "T5 Text Encoder Loader"}
+  },
+  "559d": {
+    "class_type": "WanVideoVAELoader",
+    "inputs": {
+      "model_name": "wan_2.1_vae.safetensors",
+      "precision": "bf16"
+    },
+    "_meta": {"title": "VAE Loader"}
+  },
+  "548": {
+    "class_type": "WanVideoTextEncode",
+    "inputs": {
+      "positive_prompt": ["549", 0],
+      "negative_prompt": "",
+      "t5": ["559c", 0],
+      "force_offload": true,
+      "use_disk_cache": true,
+      "device": "gpu"
+    },
+    "_meta": {"title": "WanVideoTextEncode"}
+  },
+  "546": {
+    "class_type": "CRT_QuantizeAndCropImage",
+    "inputs": {
+      "image": ["521", 0],
+      "max_side_length": 576
+    },
+    "_meta": {"title": "Desired Resolution"}
+  },
+  "514": {
+    "class_type": "WanVideoImageToVideoEncode",
+    "inputs": {
+      "vae": ["559d", 0],
+      "start_image": ["546", 0],
+      "width": 832,
+      "height": 480,
+      "num_frames": 93,
+      "noise_aug_strength": 0.03,
+      "start_latent_strength": 1,
+      "end_latent_strength": 1,
+      "force_offload": true,
+      "fun_or_fl2v_model": false,
+      "tiled_vae": false,
+      "augment_empty_frames": 0
+    },
+    "_meta": {"title": "WanVideoImageToVideoEncode"}
+  },
+  "561": {
+    "class_type": "PrimitiveInt",
+    "inputs": {
+      "value": 0
+    },
+    "_meta": {"title": "Seed"}
+  },
+  "562": {
+    "class_type": "WanVideoSampler",
+    "inputs": {
+      "model": ["559", 0],
+      "image_embeds": ["514", 0],
+      "text_embeds": ["548", 0],
+      "steps": 8,
+      "cfg": 1.0,
+      "shift": 3.0,
+      "seed": ["561", 0],
+      "force_offload": true,
+      "scheduler": "euler",
+      "riflex_freq_index": 0
+    },
+    "_meta": {"title": "WanVideoSampler"}
+  },
+  "28": {
+    "class_type": "WanVideoDecode",
+    "inputs": {
+      "vae": ["559d", 0],
+      "samples": ["562", 0],
+      "enable_vae_tiling": false,
+      "tile_x": 512,
+      "tile_y": 512,
+      "tile_stride_x": 256,
+      "tile_stride_y": 256,
+      "normalization": "default"
+    },
+    "_meta": {"title": "WanVideoDecode"}
+  },
+  "30": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": ["28", 0],
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "WAN 2.2 I2V",
+      "format": "video/h264-mp4",
+      "pingpong": false,
+      "save_output": true
+    },
+    "_meta": {"title": "VHS_VideoCombine"}
+  },
+  "550": {
+    "class_type": "WanVideoBlockSwap",
+    "inputs": {
+      "blocks_to_swap": 15,
+      "offload_img_emb": false,
+      "offload_txt_emb": false,
+      "use_non_blocking": true,
+      "vace_blocks_to_swap": 0,
+      "prefetch_blocks": 0,
+      "block_swap_debug": false
+    },
+    "_meta": {"title": "WanVideoBlockSwap"}
+  },
+  "552": {
+    "class_type": "WanVideoTorchCompileSettings",
+    "inputs": {
+      "backend": "inductor",
+      "fullgraph": false,
+      "mode": "default",
+      "dynamic": false,
+      "dynamo_cache_size_limit": 64,
+      "compile_transformer_blocks_only": true,
+      "dynamo_recompile_limit": 128,
+      "force_parameter_static_shapes": false,
+      "allow_unmerged_lora_compile": false
+    },
+    "_meta": {"title": "WanVideoTorchCompileSettings"}
+  }
+}

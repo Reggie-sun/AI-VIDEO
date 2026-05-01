@@ -1,0 +1,7 @@
+shots:
+  - id: shot_001
+    prompt: a person walks into frame and looks toward the camera
+  - id: shot_002
+    prompt: the person takes one more step forward and turns slightly left
+  - id: shot_003
+    prompt: the person pauses and the camera settles on the face

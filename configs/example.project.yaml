@@ -1,0 +1,33 @@
+project_name: demo
+
+comfy:
+  base_url: http://127.0.0.1:8188
+
+workflow:
+  template: ../workflows/templates/example_i2v_api.json
+  binding: ../workflows/bindings/example_i2v_binding.yaml
+
+output:
+  root: ../runs
+  min_free_gb: 0
+
+defaults:
+  width: 512
+  height: 512
+  fps: 16
+  clip_seconds: 2
+  seed: 100
+  negative_prompt: blur, inconsistent face, extra limbs
+  style_prompt: cinematic, consistent character, stable outfit
+  max_attempts: 2
+  poll_interval_seconds: 2
+  job_timeout_seconds: 1800
+
+characters:
+  - id: hero
+    name: Hero
+    description: same face, same outfit, same hairstyle
+    reference_images:
+      - refs/hero.png
+    ipadapter:
+      weight: 0.8

@@ -1,0 +1,19 @@
+positive_prompt:
+  path: ["6", "inputs", "text"]
+negative_prompt:
+  path: ["7", "inputs", "text"]
+seed:
+  path: ["3", "inputs", "seed"]
+init_image:
+  path: ["12", "inputs", "image"]
+output_prefix:
+  path: ["42", "inputs", "filename_prefix"]
+character_refs:
+  - character: hero
+    image_path: ["20", "inputs", "image"]
+    weight_path: ["25", "inputs", "weight"]
+clip_output:
+  node: "42"
+  kind: gifs
+  extensions: [".mp4", ".webm", ".mov"]
+  select: first
