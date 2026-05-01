@@ -82,6 +82,26 @@ def test_non_local_comfy_url_requires_opt_in(tmp_path):
     assert "non-local" in exc.value.user_message
 
 
+def test_resolved_paths_are_clean_absolute(tmp_path):
+    project_path, _ = write_example_files(tmp_path)
+    # Simulate running from a subdirectory: load through a path containing ..
+    # so that base_dir (project_path.parent) includes ".." segments.
+    sub_dir = tmp_path / "subdir"
+    sub_dir.mkdir()
+    project = load_project(sub_dir / ".." / "project.yaml")
+    # All resolved paths should be absolute and contain no ../
+    for char in project.characters:
+        for img in char.reference_images:
+            assert img.is_absolute(), f"Character image path is not absolute: {img}"
+            assert ".." not in str(img), f"Character image path contains ..: {img}"
+    assert project.workflow.template.is_absolute()
+    assert ".." not in str(project.workflow.template)
+    assert project.workflow.binding.is_absolute()
+    assert ".." not in str(project.workflow.binding)
+    assert project.output.root.is_absolute()
+    assert ".." not in str(project.output.root)
+
+
 def test_load_shots_rejects_unknown_character(tmp_path):
     project_path, shots_path = write_example_files(tmp_path)
     project = load_project(project_path)

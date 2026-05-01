@@ -36,7 +36,9 @@ def is_local_url(url: str) -> bool:
 def _resolve_path(base_dir: Path, path: Path | None) -> Path | None:
     if path is None:
         return None
-    return path if path.is_absolute() else base_dir / path
+    if path.is_absolute():
+        return path.resolve()
+    return (base_dir / path).resolve()
 
 
 def resolve_project_paths(project: ProjectConfig, base_dir: Path) -> ProjectConfig:
