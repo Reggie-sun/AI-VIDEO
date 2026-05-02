@@ -37,12 +37,20 @@ class PipelineRunner:
         self.comfy = comfy or ComfyClient(project.comfy.base_url)
         self.ffmpeg = ffmpeg or ffmpeg_tools
 
-    def run(self, run_id: str | None = None) -> RunManifest:
+    def run(self, run_id: str | None = None, *, project_config_path: Path | None = None, shot_list_path: Path | None = None) -> RunManifest:
         ensure_min_free_space(self.project.output.root, self.project.output.min_free_gb)
         actual_run_id = run_id or f"run-{_now_id()}-{uuid4().hex[:8]}"
         run_root = self.project.output.root / actual_run_id
         manifest_path = run_root / "manifest.json"
         manifest = RunManifest(run_id=actual_run_id, status="running")
+        manifest.project_config_path = str(project_config_path) if project_config_path else None
+        manifest.shot_list_path = str(shot_list_path) if shot_list_path else None
+        if project_config_path and Path(project_config_path).exists():
+            manifest.project_config_hash = sha256_file(project_config_path)
+        if self.project.workflow.template.exists():
+            manifest.workflow_template_hash = sha256_file(self.project.workflow.template)
+        if self.project.workflow.binding.exists():
+            manifest.workflow_binding_hash = sha256_file(self.project.workflow.binding)
         atomic_write_manifest(manifest_path, manifest)
 
         characters = {character.id: character for character in self.project.characters}

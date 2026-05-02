@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ai_video.errors import ErrorCode, retryable_error
+from ai_video.manifest import load_manifest
 from ai_video.pipeline import PipelineRunner
 
 
@@ -39,6 +40,36 @@ def test_three_shot_chain_passes_last_frames(example_project_and_shots):
     assert manifest.status == "succeeded"
     assert len(manifest.shots) == 3
     assert manifest.final_output is not None
+
+
+def test_manifest_populates_final_output_and_config_hashes(example_project_and_shots, example_project_files):
+    project, shots, binding, template = example_project_and_shots
+    project_path, shots_path = example_project_files
+    runner = PipelineRunner(project, shots, binding, template, comfy=FakeComfy(), ffmpeg=FakeFfmpeg())
+    manifest = runner.run(
+        run_id="run-hash-test",
+        project_config_path=project_path,
+        shot_list_path=shots_path,
+    )
+    # Verify in-memory manifest
+    assert manifest.status == "succeeded"
+    assert manifest.final_output is not None
+    assert manifest.final_output.endswith("final.mp4")
+    assert manifest.project_config_hash is not None
+    assert manifest.workflow_template_hash is not None
+    assert manifest.workflow_binding_hash is not None
+    assert manifest.project_config_path == str(project_path)
+    assert manifest.shot_list_path == str(shots_path)
+    # Verify manifest persisted on disk
+    manifest_path = project.output.root / "run-hash-test" / "manifest.json"
+    disk_manifest = load_manifest(manifest_path)
+    assert disk_manifest.final_output is not None
+    assert disk_manifest.final_output.endswith("final.mp4")
+    assert disk_manifest.project_config_hash == manifest.project_config_hash
+    assert disk_manifest.workflow_template_hash == manifest.workflow_template_hash
+    assert disk_manifest.workflow_binding_hash == manifest.workflow_binding_hash
+    assert disk_manifest.project_config_path == str(project_path)
+    assert disk_manifest.shot_list_path == str(shots_path)
 
 
 def test_retry_reuses_shot_after_retryable_failure(example_project_and_shots):

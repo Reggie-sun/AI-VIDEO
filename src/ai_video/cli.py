@@ -45,7 +45,11 @@ def _cmd_validate(args: argparse.Namespace) -> int:
 
 def _cmd_run(args: argparse.Namespace) -> int:
     project, shots, binding, template = _load_binding_and_template(args.project, args.shots)
-    manifest = PipelineRunner(project, shots, binding, template).run(run_id=args.run_id)
+    manifest = PipelineRunner(project, shots, binding, template).run(
+        run_id=args.run_id,
+        project_config_path=Path(args.project),
+        shot_list_path=Path(args.shots),
+    )
     print(f"Run succeeded: {manifest.final_output}")
     return 0
 
