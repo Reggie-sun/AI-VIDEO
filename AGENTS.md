@@ -141,6 +141,8 @@ Agent 必须维护当前产品承诺：
 - 在更新 `final_output` 这类终态 run 状态后，不要绕过 manifest 的原子写入。
 - 在测试里不要通过裸 YAML/JSON 解析去加载 workflow 模板，如果生产路径是 `load_workflow_template()`。
 - 在本仓库做视频分析时，默认使用项目本地的 `video-analysis` MCP；`videoscan` 仅作为可选的全局辅助工具用于元数据或不带 AI 分析的抽帧，不要把它当作主分析通道。
+- 对绑定了 `init_image` 的 workflow，不要让首镜头静默回退到模板里的占位图；首镜头必须显式提供 `shot.init_image`，或由上游 shot 提供 chain frame，`validate` 也必须能拦住这类错误。
+- 做 I2V 质量迭代时，先检查“起始图构图是否支持目标动作”；不要拿“人物已居中站定”的起始图去追求“从画面左侧走入”这类需要明显重新构图的镜头，否则应先换 `init_image` 再调 prompt 或 sampler。
 
 ## Completion Standard
 

@@ -1,6 +1,6 @@
 shots:
   - id: shot_001
-    init_image: ../assets/wan22_quick_init.png
+    init_image: ../assets/wan22_quick_init_left.png
     clip_seconds: 3
     fps: 20
-    prompt: a person walks into frame and looks toward the camera, cinematic lighting
+    prompt: a woman already standing on the left side of the frame takes one clear half-step diagonally forward toward the center and slightly toward the camera, shifts her weight naturally, turns her shoulders, lifts her chin, and meets the lens with a calm confident expression, gentle breathing, soft hair sway, continuous natural motion, static camera, warm cinematic indoor lighting
