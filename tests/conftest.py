@@ -5,6 +5,7 @@ import yaml
 
 from ai_video.config import load_project, load_shots, load_yaml
 from ai_video.models import WorkflowBinding
+from ai_video.workflow_loader import load_workflow_template
 
 
 @pytest.fixture
@@ -68,5 +69,5 @@ def example_project_and_shots(example_project_files):
     project = load_project(project_path)
     shots = load_shots(shots_path, project)
     binding = WorkflowBinding.model_validate(load_yaml(project.workflow.binding))
-    template = yaml.safe_load(project.workflow.template.read_text(encoding="utf-8"))
+    template = load_workflow_template(project.workflow.template)
     return project, shots, binding, template
