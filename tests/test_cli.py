@@ -64,7 +64,8 @@ def test_validate_accepts_ui_workflow_template(tmp_path, capsys):
         "shots:\n"
         "  - id: shot_001\n"
         "    prompt: hero enters room\n"
-        "    characters: [hero]\n",
+        "    characters: [hero]\n"
+        "    init_image: refs/hero.png\n",
         encoding="utf-8",
     )
 
@@ -73,3 +74,51 @@ def test_validate_accepts_ui_workflow_template(tmp_path, capsys):
 
     assert code == 0
     assert "valid" in captured.out.lower()
+
+
+def test_validate_rejects_placeholder_init_image_without_first_shot_input(tmp_path, capsys):
+    workflow_dir = tmp_path / "workflows"
+    workflow_dir.mkdir()
+    (workflow_dir / "template.json").write_text(
+        '{"3":{"class_type":"KSampler","inputs":{"seed":1}},'
+        '"6":{"class_type":"CLIPTextEncode","inputs":{"text":""}},'
+        '"7":{"class_type":"CLIPTextEncode","inputs":{"text":""}},'
+        '"12":{"class_type":"LoadImage","inputs":{"image":"api_test_image.png"}},'
+        '"42":{"class_type":"VHS_VideoCombine","inputs":{"filename_prefix":""}}}',
+        encoding="utf-8",
+    )
+    (workflow_dir / "binding.yaml").write_text(
+        "positive_prompt:\n  path: ['6', inputs, text]\n"
+        "negative_prompt:\n  path: ['7', inputs, text]\n"
+        "seed:\n  path: ['3', inputs, seed]\n"
+        "init_image:\n  path: ['12', inputs, image]\n"
+        "output_prefix:\n  path: ['42', inputs, filename_prefix]\n"
+        "character_refs: []\n"
+        "clip_output:\n  node: '42'\n  kind: gifs\n  extensions: ['.mp4']\n  select: first\n",
+        encoding="utf-8",
+    )
+
+    project = tmp_path / "project.yaml"
+    project.write_text(
+        "project_name: demo\n"
+        "comfy:\n  base_url: http://127.0.0.1:8188\n"
+        "workflow:\n"
+        "  template: workflows/template.json\n"
+        "  binding: workflows/binding.yaml\n"
+        "output:\n  root: runs\n  min_free_gb: 0\n"
+        "defaults:\n  seed: 100\n",
+        encoding="utf-8",
+    )
+    shots = tmp_path / "shots.yaml"
+    shots.write_text(
+        "shots:\n"
+        "  - id: shot_001\n"
+        "    prompt: hero enters room\n",
+        encoding="utf-8",
+    )
+
+    code = main(["validate", "--project", str(project), "--shots", str(shots)])
+    captured = capsys.readouterr()
+
+    assert code == 1
+    assert "requires init_image" in captured.err

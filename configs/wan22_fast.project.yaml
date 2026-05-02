@@ -1,4 +1,4 @@
-project_name: wan22-demo
+project_name: wan22-fast-demo
 comfy:
   base_url: http://127.0.0.1:8188
 workflow:
@@ -10,8 +10,8 @@ output:
 defaults:
   width: 1024
   height: 576
-  fps: 24
-  clip_seconds: 5
+  fps: 20
+  clip_seconds: 3
   seed: 100
   negative_prompt: Bright tones, overexposed, static, blurred details, subtitles,
     worst quality, low quality, JPEG compression residue, ugly, deformed, disfigured,
@@ -19,7 +19,7 @@ defaults:
     body shape changing, inconsistent appearance
   style_prompt: cinematic, consistent character appearance, stable outfit throughout,
     natural motion, coherent lighting, professional color grading, no morphing
-  max_attempts: 2
+  max_attempts: 1
   poll_interval_seconds: 2
-  job_timeout_seconds: 1800
+  job_timeout_seconds: 900
 characters: []

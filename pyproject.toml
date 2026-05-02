@@ -17,9 +17,16 @@ dependencies = [
 dev = [
   "pytest>=8.0",
 ]
+mcp = [
+  "mcp>=1.20",
+  "pydantic-settings>=2.0",
+  "openai-whisper>=20231117",
+  "Pillow>=10.0",
+]
 
 [project.scripts]
 ai-video = "ai_video.cli:main"
+video-analysis-mcp = "ai_video_mcp.server:mcp"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -49,6 +49,44 @@ def test_poll_completed_history_collects_status():
     assert result.history["outputs"]["42"]["gifs"][0]["filename"] == "clip.mp4"
 
 
+def test_poll_error_history_wins_over_empty_outputs():
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/queue":
+            return httpx.Response(200, json={"queue_running": [], "queue_pending": []})
+        if request.url.path == "/history/prompt-oom":
+            return httpx.Response(
+                200,
+                json={
+                    "prompt-oom": {
+                        "outputs": {},
+                        "status": {
+                            "status_str": "error",
+                            "messages": [
+                                [
+                                    "execution_error",
+                                    {
+                                        "exception_message": "Allocation on device",
+                                        "exception_type": "torch.OutOfMemoryError",
+                                    },
+                                ]
+                            ],
+                        },
+                    }
+                },
+            )
+        return httpx.Response(404)
+
+    client = ComfyClient(
+        "http://127.0.0.1:8188",
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    result = client.poll_job("prompt-oom", poll_interval_seconds=0, timeout_seconds=1)
+    assert result.status is JobStatus.FAILED
+    assert result.error is not None
+    assert result.error.code is ErrorCode.COMFY_JOB_FAILED
+    assert "OutOfMemoryError" in (result.error.technical_detail or "")
+
+
 def test_collect_output_downloads_view(tmp_path):
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path == "/view":

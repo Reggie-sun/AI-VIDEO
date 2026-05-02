@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "video-analysis": {
+      "command": "/home/reggie/miniconda3/bin/python3",
+      "args": ["-m", "ai_video_mcp"],
+      "cwd": "/home/reggie/vscode_folder/AI-VIDEO",
+      "env": {
+        "PYTHONPATH": "/home/reggie/vscode_folder/AI-VIDEO/src"
+      }
+    }
+  }
+}

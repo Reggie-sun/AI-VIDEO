@@ -1,3 +1,6 @@
 shots:
   - id: shot_001
+    init_image: ../assets/wan22_quick_init.png
+    clip_seconds: 3
+    fps: 20
     prompt: a person walks into frame and looks toward the camera, cinematic lighting

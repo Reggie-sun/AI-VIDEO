@@ -140,6 +140,7 @@ Agent 必须维护当前产品承诺：
 - 不要把带有 `..` 片段的相对产物路径写进 manifest 或已解析配置状态。
 - 在更新 `final_output` 这类终态 run 状态后，不要绕过 manifest 的原子写入。
 - 在测试里不要通过裸 YAML/JSON 解析去加载 workflow 模板，如果生产路径是 `load_workflow_template()`。
+- 在本仓库做视频分析时，默认使用项目本地的 `video-analysis` MCP；`videoscan` 仅作为可选的全局辅助工具用于元数据或不带 AI 分析的抽帧，不要把它当作主分析通道。
 
 ## Completion Standard
 

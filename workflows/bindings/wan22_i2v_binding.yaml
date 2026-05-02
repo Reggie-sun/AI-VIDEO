@@ -6,6 +6,16 @@ seed:
   path: ["561", "inputs", "value"]
 init_image:
   path: ["521", "inputs", "image"]
+resolution:
+  paths:
+    - ["543", "inputs", "Xi"]
+    - ["543", "inputs", "Xf"]
+frame_count:
+  paths:
+    - ["523", "inputs", "Xi"]
+    - ["523", "inputs", "Xf"]
+frame_rate:
+  path: ["30", "inputs", "frame_rate"]
 output_prefix:
   path: ["30", "inputs", "filename_prefix"]
 character_refs: []

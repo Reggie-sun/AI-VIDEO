@@ -18,6 +18,12 @@ Requirements:
 - Local ComfyUI already running
 - `ffmpeg` and `ffprobe` on PATH
 
+## Development MCP
+
+Project-local MCP configuration exposes `video-analysis` as the default video inspection server for this repository.
+
+If you also have a global `videoscan` MCP installed, treat it as optional helper tooling for metadata lookup or raw frame extraction only. For repo work here, use `video-analysis` for probing, scene detection, frame extraction, transcription, review, optimization planning, safe auto-application of config edits, and comprehensive analysis.
+
 ## Validate Example Files
 
 ```bash
@@ -31,6 +37,14 @@ There is also a real Wan 2.2 example wired from a ComfyUI UI-graph export:
 ```bash
 ai-video validate --project configs/wan22.project.yaml --shots configs/wan22.shots.yaml
 ```
+
+For faster iteration while tuning prompts, bindings, or workflow parameters, use the quick preset:
+
+```bash
+ai-video validate --project configs/wan22_fast.project.yaml --shots configs/wan22_quick.shots.yaml
+```
+
+The Wan 2.2 image-to-video presets expect the first shot to provide an `init_image`. Match that image's aspect ratio to your target output to avoid portrait clips being normalized into a landscape delivery.
 
 ## Workflow JSON
 
@@ -47,6 +61,12 @@ When the ComfyUI graph changes, update the matching binding file under `workflow
 
 ```bash
 ai-video run --project configs/example.project.yaml --shots configs/example.shots.yaml
+```
+
+For quick Wan 2.2 verification runs that finish much faster than the full 3-shot preset:
+
+```bash
+ai-video run --project configs/wan22_fast.project.yaml --shots configs/wan22_quick.shots.yaml --run-id quick-verify
 ```
 
 Generated artifacts are written under `runs/<run_id>/`:

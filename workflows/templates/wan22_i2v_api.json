@@ -203,7 +203,7 @@
       "end_latent_strength": 1,
       "force_offload": true,
       "fun_or_fl2v_model": false,
-      "tiled_vae": false,
+      "tiled_vae": true,
       "augment_empty_frames": 0
     },
     "_meta": {"title": "WanVideoImageToVideoEncode"}
@@ -211,7 +211,7 @@
   "491": {
     "class_type": "WanVideoSigmaToStep",
     "inputs": {
-      "sigma_threshold": 0.9
+      "sigma": 0.9
     },
     "_meta": {"title": "WanVideoSigmaToStep"}
   },
@@ -262,11 +262,11 @@
     "inputs": {
       "vae": ["38", 0],
       "samples": ["392", 1],
-      "enable_vae_tiling": false,
-      "tile_x": 512,
-      "tile_y": 512,
-      "tile_stride_x": 256,
-      "tile_stride_y": 256,
+      "enable_vae_tiling": true,
+      "tile_x": 256,
+      "tile_y": 256,
+      "tile_stride_x": 128,
+      "tile_stride_y": 128,
       "normalization": "default"
     },
     "_meta": {"title": "WanVideoDecode"}

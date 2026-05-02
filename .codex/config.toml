@@ -1,0 +1,13 @@
+[features]
+default_mode_request_user_input = true
+enable_fanout = true
+multi_agent = true
+multi_agent_v2 = true
+
+[mcp_servers.video-analysis]
+command = "/home/reggie/miniconda3/bin/python3"
+args = ["-m", "ai_video_mcp"]
+cwd = "/home/reggie/vscode_folder/AI-VIDEO"
+
+[mcp_servers.video-analysis.env]
+PYTHONPATH = "/home/reggie/vscode_folder/AI-VIDEO/src"

@@ -23,6 +23,7 @@ def _load_binding_and_template(project_path: str | Path, shots_path: str | Path)
         character_image_names = {
             character.id: f"{character.id}.png" for character in project.characters
         }
+        chain_image_name = shots[0].init_image.name if shots[0].init_image is not None else None
         render_workflow(
             template=template,
             binding=binding,
@@ -30,7 +31,7 @@ def _load_binding_and_template(project_path: str | Path, shots_path: str | Path)
             defaults=project.defaults,
             characters=characters,
             shot_index=0,
-            chain_image_name="chain.png",
+            chain_image_name=chain_image_name,
             character_image_names=character_image_names,
             output_prefix="validate/output",
         )

@@ -111,9 +111,8 @@ class ComfyClient:
         while time.monotonic() <= deadline:
             history = self._get_history(prompt_id)
             if history is not None:
-                if "outputs" in history:
-                    return JobResult(JobStatus.COMPLETED, prompt_id, history=history)
-                if "status" in history and history["status"].get("status_str") == "error":
+                status = history.get("status")
+                if isinstance(status, dict) and status.get("status_str") == "error":
                     error = AiVideoError(
                         code=ErrorCode.COMFY_JOB_FAILED,
                         user_message="ComfyUI generation failed.",
@@ -121,6 +120,8 @@ class ComfyClient:
                         retryable=True,
                     )
                     return JobResult(JobStatus.FAILED, prompt_id, history=history, error=error)
+                if history.get("outputs"):
+                    return JobResult(JobStatus.COMPLETED, prompt_id, history=history)
 
             queued = self._is_in_queue(prompt_id)
             if queued:

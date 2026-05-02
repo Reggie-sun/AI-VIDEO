@@ -88,6 +88,29 @@ def _set_path(root: Any, path: list[str | int], value: Any, field_name: str) -> 
         )
 
 
+def _binding_paths(binding: JsonPathBinding, field_name: str) -> list[list[str | int]]:
+    paths = binding.all_paths()
+    if not paths:
+        raise _fail(ErrorCode.BINDING_INVALID, f"Binding path for {field_name} is empty.")
+    return paths
+
+
+def _set_binding_value(root: Any, binding: JsonPathBinding, value: Any, field_name: str) -> None:
+    for path in _binding_paths(binding, field_name):
+        _set_path(root, path, value, field_name)
+
+
+def _default_init_image_values(template: dict[str, Any], binding: WorkflowBinding) -> list[str]:
+    if binding.init_image is None:
+        return []
+    values: list[str] = []
+    for path in _binding_paths(binding.init_image, "init_image"):
+        value = _get_path(template, path, "init_image")
+        if isinstance(value, str) and value.strip():
+            values.append(value.strip())
+    return values
+
+
 def derive_seed(default_seed: int, shot_seed: int | None, shot_index: int) -> int:
     return shot_seed if shot_seed is not None else default_seed + shot_index
 
@@ -114,14 +137,28 @@ def compose_prompt(
 
 
 def _validate_binding_paths(template: dict[str, Any], binding: WorkflowBinding) -> None:
-    _get_path(template, binding.positive_prompt.path, "positive_prompt")
+    for path in _binding_paths(binding.positive_prompt, "positive_prompt"):
+        _get_path(template, path, "positive_prompt")
     if binding.negative_prompt is not None:
-        _get_path(template, binding.negative_prompt.path, "negative_prompt")
-    _get_path(template, binding.seed.path, "seed")
+        for path in _binding_paths(binding.negative_prompt, "negative_prompt"):
+            _get_path(template, path, "negative_prompt")
+    for path in _binding_paths(binding.seed, "seed"):
+        _get_path(template, path, "seed")
     if binding.init_image is not None:
-        _get_path(template, binding.init_image.path, "init_image")
+        for path in _binding_paths(binding.init_image, "init_image"):
+            _get_path(template, path, "init_image")
+    if binding.resolution is not None:
+        for path in _binding_paths(binding.resolution, "resolution"):
+            _get_path(template, path, "resolution")
+    if binding.frame_count is not None:
+        for path in _binding_paths(binding.frame_count, "frame_count"):
+            _get_path(template, path, "frame_count")
+    if binding.frame_rate is not None:
+        for path in _binding_paths(binding.frame_rate, "frame_rate"):
+            _get_path(template, path, "frame_rate")
     if binding.output_prefix is not None:
-        _get_path(template, binding.output_prefix.path, "output_prefix")
+        for path in _binding_paths(binding.output_prefix, "output_prefix"):
+            _get_path(template, path, "output_prefix")
     for ref in binding.character_refs:
         _get_path(template, ref.image_path, f"character_refs.{ref.character}.image")
         if ref.weight_path is not None:
@@ -145,15 +182,36 @@ def render_workflow(
     workflow = deepcopy(template)
     positive, negative = compose_prompt(defaults, shot, characters)
     seed = derive_seed(defaults.seed, shot.seed, shot_index)
+    width = shot.width or defaults.width
+    height = shot.height or defaults.height
+    fps = shot.fps or defaults.fps
+    clip_seconds = shot.clip_seconds or defaults.clip_seconds
+    resolution = max(width, height)
+    frame_count = max(1, fps * clip_seconds + 1)
 
-    _set_path(workflow, binding.positive_prompt.path, positive, "positive_prompt")
+    if binding.init_image is not None and chain_image_name is None:
+        default_values = _default_init_image_values(template, binding)
+        if default_values:
+            raise _fail(
+                ErrorCode.CONFIG_INVALID,
+                f"Shot {shot.id} requires init_image or an upstream chain frame.",
+                f"Template init_image would fall back to: {', '.join(default_values)}",
+            )
+
+    _set_binding_value(workflow, binding.positive_prompt, positive, "positive_prompt")
     if binding.negative_prompt is not None:
-        _set_path(workflow, binding.negative_prompt.path, negative, "negative_prompt")
-    _set_path(workflow, binding.seed.path, seed, "seed")
+        _set_binding_value(workflow, binding.negative_prompt, negative, "negative_prompt")
+    _set_binding_value(workflow, binding.seed, seed, "seed")
     if binding.init_image is not None and chain_image_name is not None:
-        _set_path(workflow, binding.init_image.path, chain_image_name, "init_image")
+        _set_binding_value(workflow, binding.init_image, chain_image_name, "init_image")
+    if binding.resolution is not None:
+        _set_binding_value(workflow, binding.resolution, resolution, "resolution")
+    if binding.frame_count is not None:
+        _set_binding_value(workflow, binding.frame_count, frame_count, "frame_count")
+    if binding.frame_rate is not None:
+        _set_binding_value(workflow, binding.frame_rate, fps, "frame_rate")
     if binding.output_prefix is not None:
-        _set_path(workflow, binding.output_prefix.path, output_prefix, "output_prefix")
+        _set_binding_value(workflow, binding.output_prefix, output_prefix, "output_prefix")
 
     for ref in binding.character_refs:
         image_name = character_image_names.get(ref.character)

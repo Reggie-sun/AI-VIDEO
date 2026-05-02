@@ -1,3 +1,5 @@
+import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -71,3 +73,79 @@ def example_project_and_shots(example_project_files):
     binding = WorkflowBinding.model_validate(load_yaml(project.workflow.binding))
     template = load_workflow_template(project.workflow.template)
     return project, shots, binding, template
+
+
+# --- MCP server test fixtures ---
+
+def _ffmpeg_available() -> bool:
+    return shutil.which("ffmpeg") is not None and shutil.which("ffprobe") is not None
+
+
+@pytest.fixture
+def mcp_config():
+    from ai_video_mcp.config import ServerConfig
+    return ServerConfig()
+
+
+@pytest.fixture
+def mcp_cache():
+    from ai_video_mcp.cache import AnalysisCache
+    return AnalysisCache(max_size=10, ttl_seconds=60)
+
+
+@pytest.fixture
+def tiny_video(tmp_path: Path) -> Path:
+    video = tmp_path / "test_video.mp4"
+    subprocess.run(
+        [
+            "ffmpeg", "-y",
+            "-f", "lavfi", "-i", "testsrc=duration=3:size=320x240:rate=10",
+            "-f", "lavfi", "-i", "sine=frequency=440:duration=3",
+            "-pix_fmt", "yuv420p",
+            "-c:v", "libx264", "-c:a", "aac",
+            str(video),
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return video
+
+
+@pytest.fixture
+def no_audio_video(tmp_path: Path) -> Path:
+    video = tmp_path / "no_audio.mp4"
+    subprocess.run(
+        [
+            "ffmpeg", "-y",
+            "-f", "lavfi", "-i", "testsrc=duration=3:size=320x240:rate=10",
+            "-pix_fmt", "yuv420p",
+            "-c:v", "libx264", "-an",
+            str(video),
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return video
+
+
+@pytest.fixture
+def static_video(tmp_path: Path) -> Path:
+    video = tmp_path / "static.mp4"
+    subprocess.run(
+        [
+            "ffmpeg", "-y",
+            "-f", "lavfi", "-i", "color=c=black:size=320x240:rate=10:duration=4",
+            "-pix_fmt", "yuv420p",
+            "-c:v", "libx264", "-an",
+            str(video),
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return video
+
+
+skip_no_ffmpeg = pytest.mark.skipif(not _ffmpeg_available(), reason="ffmpeg not available")

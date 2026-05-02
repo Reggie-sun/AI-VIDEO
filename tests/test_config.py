@@ -113,3 +113,27 @@ def test_load_shots_rejects_unknown_character(tmp_path):
         load_shots(shots_path, project)
     assert exc.value.code is ErrorCode.CONFIG_INVALID
     assert "villain" in exc.value.user_message
+
+
+def test_repo_wan22_fast_project_loads_with_local_paths():
+    repo_root = Path(__file__).resolve().parents[1]
+    project = load_project(repo_root / "configs/wan22_fast.project.yaml")
+
+    assert project.project_name == "wan22-fast-demo"
+    assert project.workflow.template == repo_root / "workflows/templates/wan22_i2v_api.json"
+    assert project.workflow.binding == repo_root / "workflows/bindings/wan22_i2v_binding.yaml"
+    assert project.output.root == repo_root / "runs"
+    assert project.defaults.fps == 20
+    assert project.defaults.clip_seconds == 3
+    assert project.defaults.max_attempts == 1
+
+
+def test_repo_wan22_quick_shots_override_runtime():
+    repo_root = Path(__file__).resolve().parents[1]
+    project = load_project(repo_root / "configs/wan22.project.yaml")
+    shots = load_shots(repo_root / "configs/wan22_quick.shots.yaml", project)
+
+    assert len(shots) == 1
+    assert shots[0].init_image == repo_root / "assets/wan22_quick_init.png"
+    assert shots[0].clip_seconds == 3
+    assert shots[0].fps == 20

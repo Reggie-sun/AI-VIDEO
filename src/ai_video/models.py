@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 JsonPath = list[str | int]
@@ -89,7 +89,21 @@ class ShotList(BaseModel):
 
 
 class JsonPathBinding(BaseModel):
-    path: JsonPath
+    path: JsonPath | None = None
+    paths: list[JsonPath] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _require_at_least_one_path(self) -> "JsonPathBinding":
+        if self.path is None and not self.paths:
+            raise ValueError("JsonPathBinding requires path or paths")
+        return self
+
+    def all_paths(self) -> list[JsonPath]:
+        resolved: list[JsonPath] = []
+        if self.path is not None:
+            resolved.append(self.path)
+        resolved.extend(self.paths)
+        return resolved
 
 
 class CharacterRefBinding(BaseModel):
@@ -110,6 +124,9 @@ class WorkflowBinding(BaseModel):
     negative_prompt: JsonPathBinding | None = None
     seed: JsonPathBinding
     init_image: JsonPathBinding | None = None
+    resolution: JsonPathBinding | None = None
+    frame_count: JsonPathBinding | None = None
+    frame_rate: JsonPathBinding | None = None
     output_prefix: JsonPathBinding | None = None
     character_refs: list[CharacterRefBinding] = Field(default_factory=list)
     clip_output: ClipOutputBinding
