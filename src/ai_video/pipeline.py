@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence
 from uuid import uuid4
 
 from ai_video.comfy_client import ComfyClient, JobStatus
@@ -29,6 +29,7 @@ class PipelineRunner:
         *,
         comfy: Any | None = None,
         ffmpeg: Any | None = None,
+        progress_callback: Callable[[str], None] | None = None,
     ) -> None:
         self.project = project
         self.shots = list(shots)
@@ -36,6 +37,7 @@ class PipelineRunner:
         self.template = template
         self.comfy = comfy or ComfyClient(project.comfy.base_url)
         self.ffmpeg = ffmpeg or ffmpeg_tools
+        self.progress = progress_callback or (lambda msg: None)
 
     def run(self, run_id: str | None = None, *, project_config_path: Path | None = None, shot_list_path: Path | None = None) -> RunManifest:
         ensure_min_free_space(self.project.output.root, self.project.output.min_free_gb)
@@ -52,6 +54,7 @@ class PipelineRunner:
         if self.project.workflow.binding.exists():
             manifest.workflow_binding_hash = sha256_file(self.project.workflow.binding)
         atomic_write_manifest(manifest_path, manifest)
+        self.progress(f"Starting run {actual_run_id} with {len(self.shots)} shots")
 
         characters = {character.id: character for character in self.project.characters}
         character_image_names = self._prepare_character_images()
@@ -59,6 +62,7 @@ class PipelineRunner:
         previous_frame_hash: str | None = None
 
         for index, shot in enumerate(self.shots):
+            self.progress(f"Shot {shot.id} ({index + 1}/{len(self.shots)}): starting")
             record, previous_frame = self._run_shot(
                 run_root=run_root,
                 actual_run_id=actual_run_id,
@@ -94,6 +98,7 @@ class PipelineRunner:
         manifest.final_output = str(final_output)
         manifest.status = "succeeded"
         atomic_write_manifest(manifest_path, manifest)
+        self.progress(f"Final video: {final_output}")
         return manifest
 
     def resume(self, manifest_path: Path) -> RunManifest:
