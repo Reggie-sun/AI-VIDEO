@@ -56,7 +56,17 @@ def _cmd_run(args: argparse.Namespace) -> int:
 
 def _cmd_resume(args: argparse.Namespace) -> int:
     manifest_path = Path(args.manifest)
-    print(f"Resume requested for {manifest_path}.")
+    from ai_video.manifest import load_manifest
+    manifest = load_manifest(manifest_path)
+    if not manifest.project_config_path or not manifest.shot_list_path:
+        print("Cannot resume: manifest does not contain project config path.", file=sys.stderr)
+        return 1
+    project, shots, binding, template = _load_binding_and_template(
+        manifest.project_config_path, manifest.shot_list_path
+    )
+    runner = PipelineRunner(project, shots, binding, template, progress_callback=print)
+    result = runner.resume(manifest_path)
+    print(f"Resume completed: {result.final_output}")
     return 0
 
 
