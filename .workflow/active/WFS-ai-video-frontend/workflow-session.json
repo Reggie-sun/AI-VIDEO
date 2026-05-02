@@ -1,0 +1,59 @@
+{
+  "session_id": "WFS-ai-video-frontend",
+  "type": "brainstorming",
+  "topic": "为 AI-VIDEO 项目规划前端方案",
+  "selected_roles": ["system-architect", "ux-expert", "ui-designer"],
+  "phase_completed": "synthesis_completed",
+  "timestamp": "2026-05-02T00:00:00Z",
+  "count_parameter": 3,
+  "style_skill_package": null,
+  "terminology": [
+    {"term": "Shot", "definition": "视频链中一个镜头单元，对应一次 ComfyUI 生成", "aliases": ["镜头", "shot"], "category": "core"},
+    {"term": "Shot List", "definition": "有序镜头清单，定义完整视频生成流程", "aliases": ["分镜表", "shots.yaml"], "category": "core"},
+    {"term": "Run", "definition": "一次完整的视频生成执行，包含多个 shot 的执行记录", "aliases": ["运行", "执行"], "category": "core"},
+    {"term": "Manifest", "definition": "Run 的元数据记录，追踪每个 shot 的状态和产物", "aliases": ["manifest.json"], "category": "technical"},
+    {"term": "Workflow JSON", "definition": "ComfyUI 可执行的节点图描述", "aliases": ["workflow", "API prompt"], "category": "technical"},
+    {"term": "Binding", "definition": "Shot 配置字段到 Workflow JSON 节点 ID 的映射规则", "aliases": ["binding.yaml"], "category": "technical"},
+    {"term": "Pipeline Runner", "definition": "编排 shot 顺序执行、帧传递、拼接的核心引擎", "aliases": ["pipeline"], "category": "technical"},
+    {"term": "Frame Relay", "definition": "前一 shot 的 last_frame 传递给下一 shot 的机制", "aliases": ["帧接力"], "category": "core"}
+  ],
+  "non_goals": [
+    {"item": "多用户/权限系统", "rationale": "MVP 只做本地单用户，多用户和权限管理后续考虑"}
+  ],
+  "feature_list": [
+    {"id": "F-001", "name": "api-server", "description": "FastAPI 后端 API 层，包装现有 CLI 模块为 REST + SSE 端点", "related_roles": ["system-architect"], "priority": "High"},
+    {"id": "F-002", "name": "project-wizard", "description": "向导式项目创建/配置流程，引导非技术用户设定项目参数", "related_roles": ["ux-expert", "ui-designer"], "priority": "High"},
+    {"id": "F-003", "name": "shot-card-editor", "description": "卡片式 Shot List 编辑器，支持拖拽排序、参数编辑、提示词输入", "related_roles": ["ux-expert", "ui-designer"], "priority": "High"},
+    {"id": "F-004", "name": "generation-monitor", "description": "管道节点视图展示生成进度，shot 级状态上报，SSE 实时推送", "related_roles": ["system-architect", "ux-expert"], "priority": "High"},
+    {"id": "F-005", "name": "result-gallery", "description": "视频和帧预览画廊，支持 clip/last_frame/final 浏览和下载", "related_roles": ["ui-designer", "ux-expert"], "priority": "Medium"},
+    {"id": "F-006", "name": "run-history", "description": "历史 runs 浏览，基于 manifest.json 展示执行记录和产物", "related_roles": ["ux-expert"], "priority": "Medium"},
+    {"id": "F-007", "name": "param-tuner", "description": "参数调优面板，实时验证、workflow JSON 预览、一键重跑", "related_roles": ["system-architect", "ux-expert"], "priority": "Medium"}
+  ],
+  "phases": {
+    "BRAINSTORM": {
+      "status": "synthesis_completed",
+      "completed_at": "2026-05-02T12:00:00Z",
+      "participating_roles": ["system-architect", "ux-expert", "ui-designer"],
+      "synthesis_results": {
+        "enhancements_applied": ["EP-001", "EP-002", "EP-003", "EP-004", "EP-005", "EP-006", "EP-007", "EP-008"],
+        "questions_asked": 2,
+        "categories_clarified": ["Architecture", "Terminology"],
+        "complexity_score": 5,
+        "review_triggered": true,
+        "review_fixes": 7,
+        "review_flags": 2
+      },
+      "feature_spec_results": {
+        "feature_mode": true,
+        "features_generated": ["F-001", "F-002", "F-003", "F-004", "F-005", "F-006", "F-007"],
+        "feature_index_path": ".brainstorming/feature-index.json",
+        "feature_specs_dir": ".brainstorming/feature-specs/"
+      },
+      "quality_metrics": {
+        "user_intent_alignment": "validated",
+        "ambiguity_resolution": "complete",
+        "terminology_consistency": "enforced"
+      }
+    }
+  }
+}

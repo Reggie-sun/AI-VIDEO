@@ -1,7 +1,7 @@
 shots:
   - id: shot_001
-    prompt: a person walks into frame and looks toward the camera
+    prompt: a person walks slowly into the frame from the left side, their hair gently swaying, they turn their head and look directly at the camera with a calm expression, static camera, warm indoor lighting
   - id: shot_002
-    prompt: the person takes one more step forward and turns slightly left
+    prompt: the person takes one small step forward and turns slightly to the left, their hands at their sides, subtle body movement, static camera, same warm lighting
   - id: shot_003
-    prompt: the person pauses and the camera settles on the face
+    prompt: the person pauses and stands still, the camera holds on their face showing a thoughtful expression, gentle breathing motion, static camera, same warm lighting

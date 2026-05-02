@@ -1,0 +1,490 @@
+{
+  "metadata": {
+    "task_description": "为 AI-VIDEO 项目规划前端方案。AI-VIDEO 是纯本地 Python CLI，通过 YAML 配置驱动 ComfyUI 生成视频链。核心流程：读取配置 → 渲染 workflow JSON → 提交 ComfyUI → 提取帧 → ffmpeg 拼接。需要前端来改善：shot list 可视化编辑、生成结果预览、长时间生成监控、历史 runs 浏览、参数调优体验。",
+    "timestamp": "2026-05-01T21:35:00Z",
+    "keywords": ["frontend", "web-ui", "shot-list-editor", "run-monitor", "video-preview", "ComfyUI", "YAML-config", "manifest", "pipeline", "api-server"],
+    "complexity": "high",
+    "session_id": "WFS-ai-video-frontend"
+  },
+  "project_context": {
+    "architecture_patterns": [
+      "CLI-only Python application (no existing web layer)",
+      "YAML-driven configuration with Pydantic v2 validation",
+      "Manifest-driven pipeline (RunManifest as state machine)",
+      "Binding-driven workflow rendering (WorkflowBinding maps JSON paths)",
+      "Sequential shot chaining via last-frame extraction",
+      "Dependency injection in PipelineRunner (comfy/ffmpeg as injected deps)"
+    ],
+    "coding_conventions": {
+      "naming": {
+        "modules": "snake_case Python modules",
+        "classes": "PascalCase (Pydantic models, dataclasses)",
+        "functions": "snake_case",
+        "config_files": "kebab-case YAML (e.g., example.project.yaml)"
+      },
+      "error_handling": {
+        "pattern": "typed AiVideoError with ErrorCode enum, retryable flag, user_message + technical_detail",
+        "error_codes": "12 distinct ErrorCode values covering config, workflow, ComfyUI, ffmpeg, manifest, disk"
+      },
+      "data_models": "Pydantic v2 BaseModel for all config/manifest models",
+      "async_patterns": "synchronous only currently (httpx.Client, not AsyncClient)",
+      "testing": "pytest with mocked dependencies (httpx.MockTransport, FakeComfy, FakeFfmpeg)"
+    },
+    "tech_stack": {
+      "language": "python",
+      "version": "3.11+",
+      "frameworks": [],
+      "libraries": [
+        "httpx>=0.27 (HTTP client for ComfyUI API)",
+        "pydantic>=2.7 (data models and validation)",
+        "PyYAML>=6.0 (config loading)"
+      ],
+      "build_system": "setuptools with pyproject.toml, local editable install",
+      "test_framework": "pytest>=8.0",
+      "external_tools": [
+        "ComfyUI local server (http://127.0.0.1:8188)",
+        "ffmpeg/ffprobe (subprocess calls)"
+      ]
+    },
+    "current_limitations": [
+      "No web server or API layer exists",
+      "No WebSocket support (polling only for ComfyUI job status)",
+      "No concurrent shot execution (sequential pipeline)",
+      "No authentication or multi-user support",
+      "Synchronous I/O throughout (blocking poll loops)",
+      "No existing frontend code, assets, or build tooling",
+      "Config editing requires manual YAML editing",
+      "Run monitoring requires checking CLI output or manifest.json files manually"
+    ]
+  },
+  "assets": {
+    "documentation": [
+      {
+        "path": "README.md",
+        "scope": "project-overview",
+        "contains": ["setup instructions", "CLI commands", "artifact layout", "workflow JSON strategy"],
+        "relevance_score": 0.90
+      },
+      {
+        "path": "docs/superpowers/specs/2026-04-30-local-long-video-system-design.md",
+        "scope": "architecture",
+        "contains": ["full system design", "data models", "module boundaries", "failure strategy", "shot state machine", "polling design"],
+        "relevance_score": 0.95
+      },
+      {
+        "path": "docs/superpowers/plans/2026-05-01-local-long-video-mvp.md",
+        "scope": "implementation-plan",
+        "contains": ["task breakdown", "file structure", "test strategy", "completion criteria"],
+        "relevance_score": 0.85
+      },
+      {
+        "path": "TODOS.md",
+        "scope": "backlog",
+        "contains": ["WebSocket progress listener (P2)", "asset manager extraction (P3)", "old-run cleanup (P3)"],
+        "relevance_score": 0.70
+      }
+    ],
+    "source_code": [
+      {
+        "path": "src/ai_video/models.py",
+        "role": "data-models",
+        "dependencies": ["pydantic"],
+        "exports": [
+          "ComfyConfig", "WorkflowConfig", "OutputConfig", "DefaultsConfig",
+          "IPAdapterConfig", "FutureLoraConfig", "CharacterProfile",
+          "ProjectConfig", "ShotSpec", "ShotList", "JsonPathBinding",
+          "CharacterRefBinding", "ClipOutputBinding", "WorkflowBinding",
+          "ClipArtifact", "JsonPath"
+        ],
+        "relevance_score": 0.99,
+        "notes": "All Pydantic models that a frontend API must expose and validate. Key models for UI: ProjectConfig (project settings), ShotSpec/ShotList (shot editor), CharacterProfile (character management), WorkflowBinding (binding visualization)"
+      },
+      {
+        "path": "src/ai_video/comfy_client.py",
+        "role": "comfyui-api-client",
+        "dependencies": ["httpx", "errors"],
+        "exports": ["ComfyClient", "JobStatus", "JobResult"],
+        "relevance_score": 0.98,
+        "notes": "ComfyUI HTTP API surface that frontend needs to understand or proxy: /system_stats, /upload/image, /prompt, /queue, /history/{prompt_id}, /view, /free. JobStatus enum is critical for monitoring UI."
+      },
+      {
+        "path": "src/ai_video/pipeline.py",
+        "role": "orchestrator",
+        "dependencies": ["comfy_client", "config", "manifest", "models", "workflow_renderer", "ffmpeg_tools"],
+        "exports": ["PipelineRunner"],
+        "relevance_score": 0.97,
+        "notes": "Core orchestration logic. run() and resume() are the main entry points. Frontend needs to trigger these and monitor progress. Currently synchronous and blocking."
+      },
+      {
+        "path": "src/ai_video/workflow_renderer.py",
+        "role": "workflow-builder",
+        "dependencies": ["models", "errors"],
+        "exports": ["RenderedWorkflow", "validate_api_workflow", "render_workflow", "compose_prompt", "collect_clip_artifact", "derive_seed"],
+        "relevance_score": 0.92,
+        "notes": "Pure function for rendering workflow JSON. Frontend could use preview/validation of workflow before submission."
+      },
+      {
+        "path": "src/ai_video/manifest.py",
+        "role": "state-store",
+        "dependencies": ["pydantic", "config", "errors"],
+        "exports": ["AttemptRecord", "ShotRecord", "RunManifest", "atomic_write_manifest", "load_manifest", "successful_shot_is_valid", "mark_downstream_stale"],
+        "relevance_score": 0.96,
+        "notes": "Run state persistence. Frontend run browser needs to read manifests. ShotRecord/RunManifest are the primary data structures for monitoring UI."
+      },
+      {
+        "path": "src/ai_video/config.py",
+        "role": "config-loader",
+        "dependencies": ["yaml", "pydantic", "errors", "models"],
+        "exports": ["load_yaml", "load_project", "load_shots", "resolve_project_paths", "sha256_file", "ensure_min_free_space", "is_local_url"],
+        "relevance_score": 0.93,
+        "notes": "YAML loading and validation. Frontend needs equivalent functionality for config editor. Path resolution logic is important."
+      },
+      {
+        "path": "src/ai_video/cli.py",
+        "role": "cli-entry",
+        "dependencies": ["config", "errors", "models", "pipeline", "workflow_loader", "workflow_renderer"],
+        "exports": ["main", "build_parser"],
+        "relevance_score": 0.88,
+        "notes": "Current user-facing entry point. Frontend will replace or supplement CLI commands. validate/run/resume commands map to frontend actions."
+      },
+      {
+        "path": "src/ai_video/workflow_loader.py",
+        "role": "template-loader",
+        "dependencies": ["errors"],
+        "exports": ["load_workflow_template", "UiWorkflowConverter"],
+        "relevance_score": 0.82,
+        "notes": "Loads and converts workflow JSON templates. UI workflow converter is useful for preview in frontend."
+      },
+      {
+        "path": "src/ai_video/ffmpeg_tools.py",
+        "role": "media-tools",
+        "dependencies": ["errors"],
+        "exports": ["ffmpeg_available", "probe_clip", "validate_clip", "extract_last_frame", "normalize_clip", "stitch_clips", "concat_list_text"],
+        "relevance_score": 0.78,
+        "notes": "ffmpeg subprocess calls. Frontend preview needs to understand clip metadata from probe_clip(). Stitching triggers are frontend actions."
+      },
+      {
+        "path": "src/ai_video/errors.py",
+        "role": "error-model",
+        "dependencies": [],
+        "exports": ["ErrorCode", "AiVideoError", "config_error", "retryable_error"],
+        "relevance_score": 0.85,
+        "notes": "Error model that frontend must present to users. ErrorCode enum maps to UI error states. retryable flag determines UI retry options."
+      }
+    ],
+    "config": [
+      {
+        "path": "pyproject.toml",
+        "relevance_score": 0.80,
+        "notes": "No web dependencies exist. Frontend will need new dependencies (FastAPI/Flask for API server, or separate JS frontend build)"
+      },
+      {
+        "path": "configs/example.project.yaml",
+        "relevance_score": 0.90,
+        "notes": "Example project config structure that UI editor must support"
+      },
+      {
+        "path": "configs/example.shots.yaml",
+        "relevance_score": 0.90,
+        "notes": "Example shot list structure that UI editor must support"
+      },
+      {
+        "path": "configs/wan22.project.yaml",
+        "relevance_score": 0.88,
+        "notes": "Real Wan 2.2 project config (no characters, higher resolution)"
+      },
+      {
+        "path": "configs/wan22.shots.yaml",
+        "relevance_score": 0.85,
+        "notes": "Multi-shot config with character references"
+      },
+      {
+        "path": "configs/wan22_quick.shots.yaml",
+        "relevance_score": 0.75,
+        "notes": "Single-shot quick test config"
+      },
+      {
+        "path": "workflows/bindings/example_i2v_binding.yaml",
+        "relevance_score": 0.88,
+        "notes": "Binding structure with character_refs. Frontend binding editor must understand JsonPath bindings."
+      },
+      {
+        "path": "workflows/bindings/wan22_i2v_binding.yaml",
+        "relevance_score": 0.85,
+        "notes": "Simpler binding without character_refs"
+      }
+    ],
+    "tests": [
+      {
+        "path": "tests/test_cli.py",
+        "relevance_score": 0.70
+      },
+      {
+        "path": "tests/test_comfy_client.py",
+        "relevance_score": 0.75
+      },
+      {
+        "path": "tests/test_config.py",
+        "relevance_score": 0.72
+      },
+      {
+        "path": "tests/test_errors.py",
+        "relevance_score": 0.60
+      },
+      {
+        "path": "tests/test_ffmpeg_tools.py",
+        "relevance_score": 0.55
+      },
+      {
+        "path": "tests/test_manifest.py",
+        "relevance_score": 0.68
+      },
+      {
+        "path": "tests/test_pipeline.py",
+        "relevance_score": 0.72
+      },
+      {
+        "path": "tests/test_workflow_renderer.py",
+        "relevance_score": 0.70
+      },
+      {
+        "path": "tests/test_workflow_loader.py",
+        "relevance_score": 0.65
+      }
+    ],
+    "run_artifacts": [
+      {
+        "path": "runs/first-real-run/manifest.json",
+        "relevance_score": 0.95,
+        "notes": "Real completed run manifest with 3 shots, status tracking, artifact hashes. Template for frontend run browser."
+      },
+      {
+        "path": "runs/run-20260501-071758-595d8a69/manifest.json",
+        "relevance_score": 0.80,
+        "notes": "Empty/stuck run manifest. Frontend must handle incomplete runs gracefully."
+      }
+    ]
+  },
+  "dependencies": {
+    "internal": [
+      {
+        "from": "cli.py",
+        "to": "pipeline.py",
+        "type": "orchestration-entry"
+      },
+      {
+        "from": "cli.py",
+        "to": "config.py",
+        "type": "config-loading"
+      },
+      {
+        "from": "cli.py",
+        "to": "workflow_loader.py",
+        "type": "template-loading"
+      },
+      {
+        "from": "cli.py",
+        "to": "workflow_renderer.py",
+        "type": "validation-rendering"
+      },
+      {
+        "from": "pipeline.py",
+        "to": "comfy_client.py",
+        "type": "comfyui-communication"
+      },
+      {
+        "from": "pipeline.py",
+        "to": "manifest.py",
+        "type": "state-persistence"
+      },
+      {
+        "from": "pipeline.py",
+        "to": "workflow_renderer.py",
+        "type": "workflow-rendering"
+      },
+      {
+        "from": "pipeline.py",
+        "to": "ffmpeg_tools.py",
+        "type": "media-processing"
+      },
+      {
+        "from": "pipeline.py",
+        "to": "config.py",
+        "type": "config-validation"
+      },
+      {
+        "from": "workflow_renderer.py",
+        "to": "models.py",
+        "type": "data-models"
+      },
+      {
+        "from": "manifest.py",
+        "to": "config.py",
+        "type": "hash-utilities"
+      },
+      {
+        "from": "config.py",
+        "to": "models.py",
+        "type": "pydantic-validation"
+      },
+      {
+        "from": "comfy_client.py",
+        "to": "errors.py",
+        "type": "typed-errors"
+      }
+    ],
+    "external": [
+      {
+        "package": "httpx",
+        "version": ">=0.27",
+        "usage": "HTTP client for ComfyUI REST API (synchronous Client, not AsyncClient)"
+      },
+      {
+        "package": "pydantic",
+        "version": ">=2.7",
+        "usage": "Data models, validation, serialization for all config and manifest structures"
+      },
+      {
+        "package": "PyYAML",
+        "version": ">=6.0",
+        "usage": "Loading project config and shot list YAML files"
+      },
+      {
+        "package": "pytest",
+        "version": ">=8.0",
+        "usage": "Test framework (dev dependency only)"
+      }
+    ],
+    "comfyui_api_endpoints": [
+      {
+        "method": "GET",
+        "path": "/system_stats",
+        "usage": "Check ComfyUI server availability",
+        "frontend_relevance": "health check indicator"
+      },
+      {
+        "method": "POST",
+        "path": "/upload/image",
+        "usage": "Upload reference/chain images to ComfyUI",
+        "frontend_relevance": "image upload progress UI"
+      },
+      {
+        "method": "POST",
+        "path": "/prompt",
+        "usage": "Submit rendered workflow JSON for execution",
+        "frontend_relevance": "shot submission trigger"
+      },
+      {
+        "method": "GET",
+        "path": "/queue",
+        "usage": "Check queue status for running/pending jobs",
+        "frontend_relevance": "queue position display"
+      },
+      {
+        "method": "GET",
+        "path": "/history/{prompt_id}",
+        "usage": "Get job execution history and outputs",
+        "frontend_relevance": "job completion detection, output metadata"
+      },
+      {
+        "method": "GET",
+        "path": "/view",
+        "usage": "Download generated artifacts (video clips, images)",
+        "frontend_relevance": "video/image preview in browser"
+      },
+      {
+        "method": "POST",
+        "path": "/free",
+        "usage": "Free ComfyUI memory (OOM recovery)",
+        "frontend_relevance": "manual memory cleanup button"
+      }
+    ]
+  },
+  "conflict_detection": {
+    "risk_level": "high",
+    "risk_factors": {
+      "existing_implementations": [
+        "src/ai_video/cli.py",
+        "src/ai_video/pipeline.py",
+        "src/ai_video/comfy_client.py",
+        "src/ai_video/manifest.py",
+        "src/ai_video/config.py"
+      ],
+      "api_changes": true,
+      "architecture_changes": true,
+      "data_model_changes": false,
+      "breaking_changes": [
+        "Adding an API server layer requires new async patterns (current code is synchronous)",
+        "Pipeline.run() is blocking; frontend needs non-blocking execution",
+        "ComfyClient uses synchronous httpx.Client; WebSocket/async support needed for live monitoring",
+        "No existing CORS/authentication; adding web server introduces security surface",
+        "Config editing currently file-based; web editor needs write-back with validation"
+      ]
+    },
+    "affected_modules": [
+      "pipeline (needs async/background execution)",
+      "comfy_client (needs WebSocket or SSE for live progress)",
+      "manifest (needs concurrent-safe reads from web server)",
+      "config (needs write-back capability for editor)",
+      "cli (may need to coexist with web server entry point)"
+    ],
+    "mitigation_strategy": "Incremental layering: add a thin API server (FastAPI) that wraps existing sync code with run-in-executor, preserving CLI as primary interface. WebSocket progress via ComfyUI's native WS as Phase 2 after basic API works. Config editor uses read-validate-write pattern against existing Pydantic models rather than replacing them.",
+    "integration_points": [
+      {
+        "point": "PipelineRunner.run()",
+        "description": "Must be made non-blocking for web server. Options: asyncio.to_thread, background task queue, or refactor to async.",
+        "severity": "critical"
+      },
+      {
+        "point": "ComfyClient.poll_job()",
+        "description": "Blocking poll loop with time.sleep(). Frontend needs SSE or WebSocket stream of progress events.",
+        "severity": "critical"
+      },
+      {
+        "point": "RunManifest persistence",
+        "description": "atomic_write_manifest uses file replace. Web server must handle concurrent reads during writes.",
+        "severity": "medium"
+      },
+      {
+        "point": "load_project/load_shots",
+        "description": "Read-only currently. Frontend editor needs save functionality with Pydantic re-validation.",
+        "severity": "medium"
+      },
+      {
+        "point": "runs/ directory scanning",
+        "description": "No index of runs. Frontend run browser needs efficient manifest discovery across runs/.",
+        "severity": "low"
+      }
+    ]
+  },
+  "frontend_requirements_analysis": {
+    "shot_list_editor": {
+      "data_models_needed": ["ShotSpec", "ShotList", "CharacterProfile", "DefaultsConfig"],
+      "api_operations": ["CRUD shots", "reorder shots", "validate shot list", "save/load YAML"],
+      "current_gap": "Manual YAML editing only; no validation UI; no visual ordering"
+    },
+    "generation_monitoring": {
+      "data_models_needed": ["RunManifest", "ShotRecord", "AttemptRecord", "JobStatus"],
+      "api_operations": ["start run", "poll manifest status", "watch shot progress", "cancel run"],
+      "current_gap": "Blocking CLI output only; no real-time progress; no cancel support; ComfyUI WebSocket not yet integrated",
+      "comfyui_websocket_potential": "ComfyUI natively supports WebSocket at ws://host/ws?clientId=... for execution_start, progress, executing, execution_cached, execution_error events"
+    },
+    "result_preview": {
+      "data_models_needed": ["ShotRecord", "ClipArtifact", "ClipOutputBinding"],
+      "api_operations": ["list run artifacts", "stream video/image files", "download artifacts"],
+      "current_gap": "Must browse filesystem manually; no in-browser video playback; last_frame.png not easily accessible",
+      "file_serving_needs": "runs/<run_id>/shots/<shot_id>/clip.mp4, last_frame.png, normalized/*.mp4, final/final.mp4"
+    },
+    "run_history": {
+      "data_models_needed": ["RunManifest"],
+      "api_operations": ["list runs", "get run manifest", "delete run", "resume run"],
+      "current_gap": "No run index; must scan runs/ directory; no run comparison; no cleanup UI",
+      "manifest_location_pattern": "runs/<run_id>/manifest.json"
+    },
+    "parameter_tuning": {
+      "data_models_needed": ["ProjectConfig", "DefaultsConfig", "WorkflowBinding", "ShotSpec"],
+      "api_operations": ["get/set project config", "get/set defaults", "validate workflow binding", "preview rendered workflow"],
+      "current_gap": "Edit YAML → validate → run cycle is slow; no instant feedback on parameter changes; no workflow JSON preview"
+    }
+  }
+}
