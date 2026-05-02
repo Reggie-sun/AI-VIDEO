@@ -9,7 +9,7 @@ from uuid import uuid4
 from ai_video.comfy_client import ComfyClient, JobStatus
 from ai_video.config import ensure_min_free_space, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.manifest import RunManifest, ShotRecord, atomic_write_manifest, load_manifest
+from ai_video.manifest import RunManifest, ShotRecord, atomic_write_manifest, load_manifest, successful_shot_is_valid
 from ai_video.models import ProjectConfig, ShotSpec, WorkflowBinding
 from ai_video import ffmpeg_tools
 from ai_video.workflow_renderer import collect_clip_artifact, render_workflow
@@ -99,8 +99,74 @@ class PipelineRunner:
     def resume(self, manifest_path: Path) -> RunManifest:
         manifest = load_manifest(manifest_path)
         if manifest.status == "succeeded":
-            return manifest
-        return self.run(run_id=manifest.run_id)
+            all_valid = all(successful_shot_is_valid(r) for r in manifest.shots)
+            if all_valid:
+                return manifest
+
+        run_root = manifest_path.parent
+        characters = {character.id: character for character in self.project.characters}
+        character_image_names = self._prepare_character_images()
+        previous_frame: Path | None = None
+        previous_frame_hash: str | None = None
+
+        for index, shot in enumerate(self.shots):
+            existing = None
+            for record in manifest.shots:
+                if record.shot_id == shot.id:
+                    existing = record
+                    break
+
+            if existing and existing.status == "succeeded" and successful_shot_is_valid(existing):
+                last_frame_path = Path(existing.last_frame_path) if existing.last_frame_path else None
+                if last_frame_path and not last_frame_path.exists():
+                    clip_path = Path(existing.clip_path)
+                    if clip_path.exists():
+                        self.ffmpeg.extract_last_frame(clip_path, last_frame_path)
+                        existing.last_frame_hash = sha256_file(last_frame_path)
+                        atomic_write_manifest(manifest_path, manifest)
+                previous_frame = last_frame_path
+                previous_frame_hash = existing.last_frame_hash
+                continue
+
+            record, previous_frame = self._run_shot(
+                run_root=run_root,
+                actual_run_id=manifest.run_id,
+                shot=shot,
+                shot_index=index,
+                characters=characters,
+                character_image_names=character_image_names,
+                previous_frame=previous_frame,
+                previous_frame_hash=previous_frame_hash,
+            )
+            if existing:
+                idx = manifest.shots.index(existing)
+                manifest.shots[idx] = record
+            else:
+                manifest.shots.append(record)
+            previous_frame_hash = record.last_frame_hash
+            atomic_write_manifest(manifest_path, manifest)
+
+        normalized_paths = []
+        for shot_record in manifest.shots:
+            source = Path(shot_record.clip_path or "")
+            target = run_root / "normalized" / f"{shot_record.shot_id}.mp4"
+            self.ffmpeg.normalize_clip(
+                source, target,
+                width=self.project.defaults.width,
+                height=self.project.defaults.height,
+                fps=self.project.defaults.fps,
+                encoder="libx264",
+            )
+            shot_record.normalized_clip_path = str(target)
+            shot_record.normalized_clip_hash = sha256_file(target)
+            normalized_paths.append(target)
+
+        final_output = run_root / "final" / "final.mp4"
+        self.ffmpeg.stitch_clips(normalized_paths, final_output)
+        manifest.final_output = str(final_output)
+        manifest.status = "succeeded"
+        atomic_write_manifest(manifest_path, manifest)
+        return manifest
 
     def _prepare_character_images(self) -> dict[str, str]:
         names = {}

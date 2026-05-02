@@ -132,3 +132,32 @@ def test_shot_records_track_failed_attempts(example_project_and_shots):
     assert record.attempts[0].status == "failed"
     assert record.attempts[1].status == "failed"
     assert record.attempts[2].status == "succeeded"
+
+
+def test_resume_skips_completed_shots(example_project_and_shots):
+    project, shots, binding, template = example_project_and_shots
+    runner = PipelineRunner(project, shots, binding, template, comfy=FakeComfy(), ffmpeg=FakeFfmpeg())
+    manifest = runner.run(run_id="run-resume-skip")
+    assert manifest.status == "succeeded"
+
+    fake_comfy = FakeComfy()
+    runner2 = PipelineRunner(project, shots, binding, template, comfy=fake_comfy, ffmpeg=FakeFfmpeg())
+    resumed = runner2.resume(project.output.root / "run-resume-skip" / "manifest.json")
+    assert resumed.status == "succeeded"
+    assert len(fake_comfy.submitted) == 0
+
+
+def test_resume_reruns_failed_shot(example_project_and_shots):
+    project, shots, binding, template = example_project_and_shots
+    runner = PipelineRunner(project, shots, binding, template, comfy=FakeComfy(), ffmpeg=FakeFfmpeg())
+    manifest = runner.run(run_id="run-fail-resume")
+    # Corrupt shot_002's clip to invalidate it
+    shot_002_clip = project.output.root / "run-fail-resume" / "shots" / "shot_002" / "clip.mp4"
+    if shot_002_clip.exists():
+        shot_002_clip.write_bytes(b"corrupted")
+
+    fake_comfy = FakeComfy()
+    runner2 = PipelineRunner(project, shots, binding, template, comfy=fake_comfy, ffmpeg=FakeFfmpeg())
+    resumed = runner2.resume(project.output.root / "run-fail-resume" / "manifest.json")
+    assert resumed.status == "succeeded"
+    assert len(fake_comfy.submitted) >= 1
