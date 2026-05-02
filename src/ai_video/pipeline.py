@@ -121,11 +121,15 @@ class PipelineRunner:
         previous_frame: Path | None,
         previous_frame_hash: str | None,
     ) -> tuple[ShotRecord, Path]:
+        from ai_video.manifest import AttemptRecord, _now
         last_error: AiVideoError | None = None
         max_attempts = max(1, self.project.defaults.max_attempts)
+        started_at = _now()
+        attempts: list[AttemptRecord] = []
         for attempt in range(1, max_attempts + 1):
+            attempt_record = AttemptRecord(attempt=attempt, status="running")
             try:
-                return self._run_shot_attempt(
+                record, last_frame = self._run_shot_attempt(
                     run_root=run_root,
                     actual_run_id=actual_run_id,
                     shot=shot,
@@ -136,7 +140,16 @@ class PipelineRunner:
                     previous_frame=previous_frame,
                     previous_frame_hash=previous_frame_hash,
                 )
+                attempt_record.status = "succeeded"
+                attempt_record.comfy_prompt_id = record.comfy_prompt_id
+                attempts.append(attempt_record)
+                record.started_at = started_at
+                record.attempts = attempts
+                return record, last_frame
             except AiVideoError as exc:
+                attempt_record.status = "failed"
+                attempt_record.error = {"code": exc.code.value, "message": exc.user_message}
+                attempts.append(attempt_record)
                 last_error = exc
                 if isinstance(self.comfy, ComfyClient) and "memory" in (exc.technical_detail or "").lower():
                     self.comfy.free_memory()

@@ -93,3 +93,42 @@ def test_retry_reuses_shot_after_retryable_failure(example_project_and_shots):
     assert manifest.status == "succeeded"
     assert comfy.calls == 2
     assert manifest.shots[0].active_attempt == 2
+
+
+def test_shot_records_populate_started_at_and_attempts(example_project_and_shots):
+    project, shots, binding, template = example_project_and_shots
+    runner = PipelineRunner(project, shots, binding, template, comfy=FakeComfy(), ffmpeg=FakeFfmpeg())
+    manifest = runner.run(run_id="run-attempts")
+    for shot_record in manifest.shots:
+        assert shot_record.started_at is not None
+        assert len(shot_record.attempts) == 1
+        assert shot_record.attempts[0].attempt == 1
+        assert shot_record.attempts[0].status == "succeeded"
+        assert shot_record.attempts[0].comfy_prompt_id == "prompt-id"
+
+
+def test_shot_records_track_failed_attempts(example_project_and_shots):
+    project, shots, binding, template = example_project_and_shots
+    project.defaults.max_attempts = 3
+
+    class TwoFailComfy(FakeComfy):
+        def __init__(self):
+            super().__init__()
+            self.calls = 0
+
+        def submit_and_collect_clip(self, workflow, output_path: Path) -> str:
+            self.calls += 1
+            if self.calls <= 2:
+                raise retryable_error(ErrorCode.COMFY_JOB_FAILED, "temporary failure")
+            return super().submit_and_collect_clip(workflow, output_path)
+
+    comfy = TwoFailComfy()
+    runner = PipelineRunner(project, shots[:1], binding, template, comfy=comfy, ffmpeg=FakeFfmpeg())
+    manifest = runner.run(run_id="run-failed-attempts")
+    assert manifest.status == "succeeded"
+    record = manifest.shots[0]
+    assert record.started_at is not None
+    assert len(record.attempts) == 3
+    assert record.attempts[0].status == "failed"
+    assert record.attempts[1].status == "failed"
+    assert record.attempts[2].status == "succeeded"

@@ -52,6 +52,8 @@ class ShotRecord(BaseModel):
         last_frame_path: Path,
         chain_input_hash: str | None,
         character_ref_hashes: dict[str, str],
+        started_at: str | None = None,
+        attempts: list[AttemptRecord] | None = None,
     ) -> "ShotRecord":
         return cls(
             shot_id=shot_id,
@@ -63,7 +65,9 @@ class ShotRecord(BaseModel):
             last_frame_hash=sha256_file(last_frame_path),
             chain_input_hash=chain_input_hash,
             character_ref_hashes=character_ref_hashes,
+            started_at=started_at,
             completed_at=_now(),
+            attempts=attempts or [],
         )
 
 
