@@ -146,20 +146,42 @@ def stitch_clips(normalized_clips: Sequence[str | Path], output_path: str | Path
         handle.write(concat_list_text(normalized_clips))
         list_path = Path(handle.name)
     try:
-        run_command(
-            [
-                "ffmpeg",
-                "-y",
-                "-f",
-                "concat",
-                "-safe",
-                "0",
-                "-i",
-                str(list_path),
-                "-c",
-                "copy",
-                str(output),
-            ]
-        )
+        try:
+            run_command(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-f",
+                    "concat",
+                    "-safe",
+                    "0",
+                    "-i",
+                    str(list_path),
+                    "-c",
+                    "copy",
+                    str(output),
+                ]
+            )
+        except AiVideoError:
+            if output.exists():
+                output.unlink()
+            run_command(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-f",
+                    "concat",
+                    "-safe",
+                    "0",
+                    "-i",
+                    str(list_path),
+                    "-c:v",
+                    "libx264",
+                    "-pix_fmt",
+                    "yuv420p",
+                    "-an",
+                    str(output),
+                ]
+            )
     finally:
         list_path.unlink(missing_ok=True)
