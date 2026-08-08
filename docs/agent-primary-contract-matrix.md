@@ -8,12 +8,13 @@
 
 | Contract Area | 中文说明 |
 | --- | --- |
-| Product Scope | 纯本地、Python CLI、本地 ComfyUI 编排、不得隐式依赖托管服务。 |
+| Product Scope | 当前 `0.1.x` runtime 是纯本地 Python CLI + 本地 ComfyUI；v0.2 是 local-first、provider-agnostic 的分阶段目标，未落地的 slice 不属于当前行为。 |
 | Truth Source | 用户请求 > 代码/测试/运行时证据 > 仓库契约 > plans/specs > `.workflow/` 草稿记录。 |
 | Change Style | 小步、可测试、低漂移，并保持模块边界稳定。 |
 | Error Model | 跨模块统一使用 `AiVideoError` 与 `ErrorCode`。 |
 | Dependency Policy | 除非有明确理由且获得请求，否则不新增运行时依赖。 |
-| Output Policy | 保持 `runs/<run_id>/` 下可预测、稳定的产物目录结构。 |
+| Output Policy | Legacy run 保持当前 flat `runs/<run_id>/` layout；v2 layout 只能由显式 v2 config 和已批准的 Manifest v2 slice 创建。 |
+| Version Gate | v0.2 P0-P9 每个 slice 必须有独立 plan、实施授权、验收、rollback 和对应 contract/docs/tests 更新。 |
 
 ## Contract Matrix
 
@@ -75,6 +76,15 @@ Agent 不得悄悄侵蚀本地优先承诺。
 - ComfyUI 的后台进程管理器，
 - 遥测或外部状态同步，
 - 把前端或 API server 变成 CLI 的隐式前置条件。
+
+### v0.2 Planning Gate
+
+- 当前 code/tests 仍是 runtime truth；spec 和 plan 不能覆盖未实现行为。
+- P1/P2 不得改变 Legacy CLI、Manifest v1 或 flat artifact layout。
+- P3 之前不得接入真实异步付费 Provider。
+- P6 完成前不得真实提交云任务。
+- P7 Seedance、P8 Semantic Evaluation 和 P9 Audio 必须分别规划和验收。
+- 新 CLI、Manifest schema、artifact layout、远程行为、Audio 或 dependency 仍命中下方 Change Escalation Matrix。
 
 ## Change Escalation Matrix
 
