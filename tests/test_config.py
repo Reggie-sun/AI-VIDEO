@@ -134,6 +134,6 @@ def test_repo_wan22_quick_shots_override_runtime():
     shots = load_shots(repo_root / "configs/wan22_quick.shots.yaml", project)
 
     assert len(shots) == 1
-    assert shots[0].init_image == repo_root / "assets/wan22_quick_init.png"
+    assert shots[0].init_image == repo_root / "assets/wan22_quick_init_left.png"
     assert shots[0].clip_seconds == 3
     assert shots[0].fps == 20
