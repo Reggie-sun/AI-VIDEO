@@ -2,8 +2,10 @@ from pathlib import Path
 
 import pytest
 
+from ai_video.config import sha256_file
 from ai_video.errors import AiVideoError, ErrorCode, retryable_error
 from ai_video.manifest import load_manifest
+from ai_video.models import JsonPathBinding
 from ai_video.pipeline import PipelineRunner
 
 
@@ -22,11 +24,15 @@ class FakeComfy:
 
 
 class FakeFfmpeg:
+    def __init__(self):
+        self.normalize_calls = []
+
     def extract_last_frame(self, clip: Path, frame: Path) -> None:
         frame.parent.mkdir(parents=True, exist_ok=True)
         frame.write_bytes(frame.name.encode())
 
     def normalize_clip(self, source: Path, target: Path, **kwargs) -> None:
+        self.normalize_calls.append((source, target, kwargs))
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(source.read_bytes())
 
@@ -72,6 +78,62 @@ def test_manifest_populates_final_output_and_config_hashes(example_project_and_s
     assert disk_manifest.workflow_binding_hash == manifest.workflow_binding_hash
     assert disk_manifest.project_config_path == str(project_path)
     assert disk_manifest.shot_list_path == str(shots_path)
+
+
+def test_shot_fps_overrides_generation_but_not_delivery_normalization(
+    example_project_and_shots,
+):
+    project, shots, binding, template = example_project_and_shots
+    project.defaults.fps = 16
+    shots[0].fps = 20
+    template["45"] = {"class_type": "VHS_VideoCombine", "inputs": {"frame_rate": 0}}
+    binding.frame_rate = JsonPathBinding(path=["45", "inputs", "frame_rate"])
+
+    initial_comfy = FakeComfy()
+    initial_ffmpeg = FakeFfmpeg()
+    runner = PipelineRunner(
+        project,
+        shots[:1],
+        binding,
+        template,
+        comfy=initial_comfy,
+        ffmpeg=initial_ffmpeg,
+    )
+    manifest = runner.run(run_id="run-shot-fps")
+    manifest_path = project.output.root / "run-shot-fps" / "manifest.json"
+    expected_clip = project.output.root / "run-shot-fps" / "shots" / "shot_001" / "clip.mp4"
+    expected_normalized = project.output.root / "run-shot-fps" / "normalized" / "shot_001.mp4"
+    persisted_after_run = load_manifest(manifest_path)
+
+    assert initial_comfy.submitted[0]["45"]["inputs"]["frame_rate"] == 20
+    assert [
+        (source, target, kwargs["fps"])
+        for source, target, kwargs in initial_ffmpeg.normalize_calls
+    ] == [(expected_clip, expected_normalized, 16)]
+    assert persisted_after_run.shots[0].normalized_clip_path == str(expected_normalized)
+    assert persisted_after_run.shots[0].normalized_clip_hash == sha256_file(expected_normalized)
+
+    Path(manifest.shots[0].clip_path).write_bytes(b"corrupted")
+    resumed_comfy = FakeComfy()
+    resumed_ffmpeg = FakeFfmpeg()
+    resumed = PipelineRunner(
+        project,
+        shots[:1],
+        binding,
+        template,
+        comfy=resumed_comfy,
+        ffmpeg=resumed_ffmpeg,
+    )
+    resumed.resume(manifest_path)
+    persisted_after_resume = load_manifest(manifest_path)
+
+    assert resumed_comfy.submitted[0]["45"]["inputs"]["frame_rate"] == 20
+    assert [
+        (source, target, kwargs["fps"])
+        for source, target, kwargs in resumed_ffmpeg.normalize_calls
+    ] == [(expected_clip, expected_normalized, 16)]
+    assert persisted_after_resume.shots[0].normalized_clip_path == str(expected_normalized)
+    assert persisted_after_resume.shots[0].normalized_clip_hash == sha256_file(expected_normalized)
 
 
 def test_retry_reuses_shot_after_retryable_failure(example_project_and_shots):

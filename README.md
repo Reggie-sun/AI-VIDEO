@@ -11,6 +11,7 @@ The currently implemented runtime is the pure-local `0.1.x` CLI described in thi
 - Current evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - Target contract: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - First gate plan: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p0-contract-baseline.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p0-contract-baseline.md)
+- Runtime truth fix plan: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
 Until a later slice is implemented and documented, the public commands remain `validate`, `run`, and `resume`; generation remains local ComfyUI; Manifest v1 and the current artifact layout remain active.
 
@@ -87,7 +88,11 @@ Generated artifacts are written under `runs/<run_id>/`:
 - `normalized/<shot_id>.mp4`
 - `final/final.mp4`
 
-The MVP keeps rendered workflow snapshots and the Attempt history attached to a Shot that eventually succeeds. A terminally failed Shot does not yet persist its complete Attempt history; that gap is assigned to the v0.2 P1 plan. Delete old `runs/<run_id>` directories manually when you no longer need them.
+The runtime persists rendered workflow snapshots and every Shot Attempt history, including a terminal failure, before the original failure escapes. A later resume appends to that history. Delete old `runs/<run_id>` directories manually when you no longer need them.
+
+## FPS Semantics
+
+`defaults.fps` is both the generation fallback and the fixed delivery-normalization FPS. A Shot-level `fps` overrides only source workflow generation; it does not change normalization. This compatibility behavior adds no config or Manifest schema fields.
 
 ## Resume
 
@@ -95,7 +100,7 @@ The MVP keeps rendered workflow snapshots and the Attempt history attached to a 
 ai-video resume --manifest runs/<run_id>/manifest.json
 ```
 
-Resume currently reloads the existing Manifest and validates the persisted clip and last-frame hashes before deciding whether to skip a successful Shot. `chain_input_hash` and character-reference hashes are recorded but are not yet part of validity, and downstream stale propagation is not wired into the real resume path. Until the P1 fix lands, an upstream rerun can therefore leave a downstream Shot incorrectly skippable when that Shot's own checked hashes still match.
+Resume reloads the existing Manifest and validates each successful Shot's persisted clip and last-frame hashes before deciding whether to skip it. For a Shot actually bound to the previous frame, resume also compares the persisted direct-upstream frame hash: a changed hash stales only its direct consumer, then propagates edge-by-edge when a new output changes the next upstream hash. An identical regenerated frame does not stale its consumer, and an explicit Shot `init_image` stops this previous-frame dependency. Character-reference hashes are recorded but are not validity inputs in P1.
 
 ## Real ComfyUI Smoke Test
 

@@ -184,10 +184,10 @@ def render_workflow(
     seed = derive_seed(defaults.seed, shot.seed, shot_index)
     width = shot.width or defaults.width
     height = shot.height or defaults.height
-    fps = shot.fps or defaults.fps
+    generation_fps = shot.fps or defaults.fps
     clip_seconds = shot.clip_seconds or defaults.clip_seconds
     resolution = max(width, height)
-    frame_count = max(1, fps * clip_seconds + 1)
+    frame_count = max(1, generation_fps * clip_seconds + 1)
 
     if binding.init_image is not None and chain_image_name is None:
         default_values = _default_init_image_values(template, binding)
@@ -209,7 +209,7 @@ def render_workflow(
     if binding.frame_count is not None:
         _set_binding_value(workflow, binding.frame_count, frame_count, "frame_count")
     if binding.frame_rate is not None:
-        _set_binding_value(workflow, binding.frame_rate, fps, "frame_rate")
+        _set_binding_value(workflow, binding.frame_rate, generation_fps, "frame_rate")
     if binding.output_prefix is not None:
         _set_binding_value(workflow, binding.output_prefix, output_prefix, "output_prefix")
 

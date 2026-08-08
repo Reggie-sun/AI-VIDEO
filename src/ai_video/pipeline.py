@@ -88,21 +88,7 @@ class PipelineRunner:
             previous_frame_hash = record.last_frame_hash
             atomic_write_manifest(manifest_path, manifest)
 
-        normalized_paths = []
-        for shot_record in manifest.shots:
-            source = Path(shot_record.clip_path or "")
-            target = run_root / "normalized" / f"{shot_record.shot_id}.mp4"
-            self.ffmpeg.normalize_clip(
-                source,
-                target,
-                width=self.project.defaults.width,
-                height=self.project.defaults.height,
-                fps=self.project.defaults.fps,
-                encoder="libx264",
-            )
-            shot_record.normalized_clip_path = str(target)
-            shot_record.normalized_clip_hash = sha256_file(target)
-            normalized_paths.append(target)
+        normalized_paths = self._normalize_shots(manifest, run_root)
 
         final_output = run_root / "final" / "final.mp4"
         self.ffmpeg.stitch_clips(normalized_paths, final_output)
@@ -173,20 +159,7 @@ class PipelineRunner:
                     manifest.updated_at = stale_manifest.updated_at
             atomic_write_manifest(manifest_path, manifest)
 
-        normalized_paths = []
-        for shot_record in manifest.shots:
-            source = Path(shot_record.clip_path or "")
-            target = run_root / "normalized" / f"{shot_record.shot_id}.mp4"
-            self.ffmpeg.normalize_clip(
-                source, target,
-                width=self.project.defaults.width,
-                height=self.project.defaults.height,
-                fps=self.project.defaults.fps,
-                encoder="libx264",
-            )
-            shot_record.normalized_clip_path = str(target)
-            shot_record.normalized_clip_hash = sha256_file(target)
-            normalized_paths.append(target)
+        normalized_paths = self._normalize_shots(manifest, run_root)
 
         final_output = run_root / "final" / "final.mp4"
         self.ffmpeg.stitch_clips(normalized_paths, final_output)
@@ -194,6 +167,25 @@ class PipelineRunner:
         manifest.status = "succeeded"
         atomic_write_manifest(manifest_path, manifest)
         return manifest
+
+    def _normalize_shots(self, manifest: RunManifest, run_root: Path) -> list[Path]:
+        delivery_fps = self.project.defaults.fps
+        normalized_paths = []
+        for shot_record in manifest.shots:
+            source = Path(shot_record.clip_path or "")
+            target = run_root / "normalized" / f"{shot_record.shot_id}.mp4"
+            self.ffmpeg.normalize_clip(
+                source,
+                target,
+                width=self.project.defaults.width,
+                height=self.project.defaults.height,
+                fps=delivery_fps,
+                encoder="libx264",
+            )
+            shot_record.normalized_clip_path = str(target)
+            shot_record.normalized_clip_hash = sha256_file(target)
+            normalized_paths.append(target)
+        return normalized_paths
 
     def _prepare_character_images(self) -> dict[str, str]:
         names = {}
