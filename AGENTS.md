@@ -13,6 +13,14 @@ Agent 必须维护当前产品承诺：
 - `runs/<run_id>/` 下可预测、稳定的产物目录结构。
 - 对 config、workflow 渲染、pipeline 状态、resume、ffmpeg 行为、CLI 行为保持较强测试覆盖。
 
+## Versioned Product Boundary
+
+- 当前已实现的 `0.1.x` / legacy runtime 仍是纯本地 Python CLI，只支持本地 ComfyUI、三个公共命令和当前 flat artifact layout。
+- `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 是已批准的分阶段 planning target，不是已实现行为，也不是一次性实施授权。
+- v0.2 的 P0-P9 每个 slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。
+- 某个 slice 落地前，与该 slice 冲突的当前契约继续有效；不得通过只改文档把 proposed behavior 描述成 runtime truth。
+- Local Wan + ComfyUI 始终保持默认路径。任何远程 Provider 都必须在后续独立 slice 中满足 explicit opt-in、Budget Guard、Cloud Egress 和 crash-safe persistence gate。
+
 ## Agent Communication
 
 - 除非用户明确要求其他语言，否则面向用户的回复默认使用中文。
@@ -42,9 +50,9 @@ Agent 必须维护当前产品承诺：
 
 ## Stable Product Contract
 
-- 默认保持产品为纯本地形态。除非用户明确要求，否则不要引入云端视频 API、托管服务或把远程 ComfyUI 设为默认。
-- 公共 CLI 面保持为 `ai-video validate`、`ai-video run`、`ai-video resume`。
-- `validate` 必须保持无副作用。
+- 当前 legacy runtime 保持纯本地形态；v0.2 远程 Provider 只有在对应 slice 获批并完成安全前置后才允许以 opt-in 方式加入，且永不成为默认 fallback。
+- 当前公共 CLI 面保持为 `ai-video validate`、`ai-video run`、`ai-video resume`；任何 v0.2 新命令必须在独立 plan 中同步 CLI tests、README 和退出码契约。
+- `validate` 必须保持无副作用；默认不得联网、上传素材、创建 run 目录或触发付费调用。
 - `run` 必须创建 run 目录，按顺序执行 shots，并产出 manifest 与相关产物。
 - `resume` 必须基于已持久化的 manifest 状态运行，而不是重新启动一个新 run。
 - run manifest 是 pipeline 状态的持久化真相源，必须原子写入。
@@ -128,6 +136,7 @@ Agent 必须维护当前产品承诺：
 - 修改 `runs/` 下的 manifest schema 或产物目录结构。
 - 把本地优先策略改成默认允许远程主机。
 - 引入前端、API server、队列管理、音频，或其他 MVP 规范中明确排除的子系统。
+- 执行 v0.2 P1-P9 任一 slice，或把 spec 中的 proposed contract 写成当前行为。
 
 ## Session Continuity
 
