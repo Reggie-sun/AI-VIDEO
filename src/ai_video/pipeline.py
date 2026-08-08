@@ -16,6 +16,7 @@ from ai_video.manifest import (
     _now,
     atomic_write_manifest,
     load_manifest,
+    mark_shots_stale,
     successful_shot_is_valid,
 )
 from ai_video.models import ProjectConfig, ShotSpec, WorkflowBinding
@@ -113,10 +114,10 @@ class PipelineRunner:
 
     def resume(self, manifest_path: Path) -> RunManifest:
         manifest = load_manifest(manifest_path)
-        if manifest.status == "succeeded":
-            all_valid = all(successful_shot_is_valid(r) for r in manifest.shots)
-            if all_valid:
-                return manifest
+        if manifest.status == "succeeded" and self._all_resume_shots_current(manifest):
+            return manifest
+        manifest.status = "running"
+        atomic_write_manifest(manifest_path, manifest)
 
         run_root = manifest_path.parent
         characters = {character.id: character for character in self.project.characters}
@@ -127,7 +128,12 @@ class PipelineRunner:
         for index, shot in enumerate(self.shots):
             existing = self._find_shot_record(manifest, shot.id)
 
-            if existing and existing.status == "succeeded" and successful_shot_is_valid(existing):
+            if existing and self._shot_is_current(
+                existing,
+                shot,
+                previous_frame,
+                previous_frame_hash,
+            ):
                 last_frame_path = Path(existing.last_frame_path) if existing.last_frame_path else None
                 if last_frame_path and not last_frame_path.exists():
                     clip_path = Path(existing.clip_path)
@@ -139,6 +145,7 @@ class PipelineRunner:
                 previous_frame_hash = existing.last_frame_hash
                 continue
 
+            old_last_frame_hash = existing.last_frame_hash if existing else None
             record, previous_frame = self._run_shot(
                 manifest=manifest,
                 manifest_path=manifest_path,
@@ -153,6 +160,17 @@ class PipelineRunner:
             )
             self._upsert_shot_record(manifest, record)
             previous_frame_hash = record.last_frame_hash
+            if old_last_frame_hash != record.last_frame_hash and index + 1 < len(self.shots):
+                next_shot = self.shots[index + 1]
+                next_record = self._find_shot_record(manifest, next_shot.id)
+                if (
+                    next_record is not None
+                    and self._uses_previous_frame(next_shot, previous_frame)
+                    and next_record.chain_input_hash != record.last_frame_hash
+                ):
+                    stale_manifest = mark_shots_stale(manifest, {next_shot.id})
+                    manifest.shots = stale_manifest.shots
+                    manifest.updated_at = stale_manifest.updated_at
             atomic_write_manifest(manifest_path, manifest)
 
         normalized_paths = []
@@ -195,6 +213,52 @@ class PipelineRunner:
             manifest.shots.append(record)
             return
         manifest.shots[manifest.shots.index(existing)] = record
+
+    def _uses_previous_frame(self, shot: ShotSpec, previous_frame: Path | None) -> bool:
+        return (
+            self.binding.init_image is not None
+            and shot.init_image is None
+            and previous_frame is not None
+        )
+
+    def _effective_chain_input_hash(
+        self,
+        shot: ShotSpec,
+        previous_frame: Path | None,
+        previous_frame_hash: str | None,
+    ) -> str | None:
+        if self._uses_previous_frame(shot, previous_frame):
+            return previous_frame_hash
+        return None
+
+    def _shot_is_current(
+        self,
+        record: ShotRecord,
+        shot: ShotSpec,
+        previous_frame: Path | None,
+        previous_frame_hash: str | None,
+    ) -> bool:
+        if not successful_shot_is_valid(record):
+            return False
+        if not self._uses_previous_frame(shot, previous_frame):
+            return True
+        return record.chain_input_hash == previous_frame_hash
+
+    def _all_resume_shots_current(self, manifest: RunManifest) -> bool:
+        previous_frame: Path | None = None
+        previous_frame_hash: str | None = None
+        for shot in self.shots:
+            record = self._find_shot_record(manifest, shot.id)
+            if record is None or not self._shot_is_current(
+                record,
+                shot,
+                previous_frame,
+                previous_frame_hash,
+            ):
+                return False
+            previous_frame = Path(record.last_frame_path) if record.last_frame_path else None
+            previous_frame_hash = record.last_frame_hash
+        return True
 
     @staticmethod
     def _error_record(exc: BaseException) -> dict[str, str]:
@@ -337,7 +401,11 @@ class PipelineRunner:
             seed=rendered.seed,
             clip_path=clip_path,
             last_frame_path=last_frame_path,
-            chain_input_hash=previous_frame_hash,
+            chain_input_hash=self._effective_chain_input_hash(
+                shot,
+                previous_frame,
+                previous_frame_hash,
+            ),
             character_ref_hashes=self._character_ref_hashes(shot),
         )
         record.active_attempt = attempt

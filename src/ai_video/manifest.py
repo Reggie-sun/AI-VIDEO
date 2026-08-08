@@ -149,13 +149,11 @@ def successful_shot_is_valid(record: ShotRecord) -> bool:
     )
 
 
-def mark_downstream_stale(manifest: RunManifest, starting_after_shot_id: str) -> RunManifest:
-    found = False
-    updated = []
-    for shot in manifest.shots:
-        if found and shot.status == "succeeded":
-            shot = shot.model_copy(update={"status": "stale"})
-        if shot.shot_id == starting_after_shot_id:
-            found = True
-        updated.append(shot)
+def mark_shots_stale(manifest: RunManifest, shot_ids: set[str]) -> RunManifest:
+    updated = [
+        shot.model_copy(update={"status": "stale"})
+        if shot.shot_id in shot_ids and shot.status == "succeeded"
+        else shot
+        for shot in manifest.shots
+    ]
     return manifest.model_copy(update={"shots": updated, "updated_at": _now()})
