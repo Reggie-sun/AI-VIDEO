@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from ai_video.errors import ErrorCode, retryable_error
+import pytest
+
+from ai_video.errors import AiVideoError, ErrorCode, retryable_error
 from ai_video.manifest import load_manifest
 from ai_video.pipeline import PipelineRunner
 
@@ -132,6 +134,169 @@ def test_shot_records_track_failed_attempts(example_project_and_shots):
     assert record.attempts[0].status == "failed"
     assert record.attempts[1].status == "failed"
     assert record.attempts[2].status == "succeeded"
+
+
+def test_terminal_failure_persists_all_attempts_before_run_raises(example_project_and_shots):
+    project, shots, binding, template = example_project_and_shots
+    project.defaults.max_attempts = 2
+
+    class AlwaysFailComfy(FakeComfy):
+        def __init__(self):
+            super().__init__()
+            self.errors = []
+
+        def submit_and_collect_clip(self, workflow, output_path: Path) -> str:
+            error = retryable_error(ErrorCode.COMFY_JOB_FAILED, "temporary failure")
+            self.errors.append(error)
+            raise error
+
+    comfy = AlwaysFailComfy()
+    runner = PipelineRunner(
+        project,
+        shots[:1],
+        binding,
+        template,
+        comfy=comfy,
+        ffmpeg=FakeFfmpeg(),
+    )
+    manifest_path = project.output.root / "run-terminal-failure" / "manifest.json"
+
+    with pytest.raises(AiVideoError) as exc_info:
+        runner.run(run_id="run-terminal-failure")
+
+    assert exc_info.value is comfy.errors[-1]
+    persisted = load_manifest(manifest_path)
+    assert persisted.status == "failed"
+    assert len(persisted.shots) == 1
+    failed = persisted.shots[0]
+    assert failed.status == "failed"
+    assert [item.attempt for item in failed.attempts] == [1, 2]
+    assert [item.status for item in failed.attempts] == ["failed", "failed"]
+    assert failed.active_attempt == 2
+    assert failed.completed_at is not None
+    assert failed.error == {
+        "code": ErrorCode.COMFY_JOB_FAILED.value,
+        "message": "temporary failure",
+    }
+
+
+def test_unexpected_terminal_failure_is_sanitized_and_persisted(example_project_and_shots):
+    project, shots, binding, template = example_project_and_shots
+    project.defaults.max_attempts = 1
+
+    class UnexpectedFailComfy(FakeComfy):
+        def submit_and_collect_clip(self, workflow, output_path: Path) -> str:
+            raise RuntimeError("secret transport detail")
+
+    runner = PipelineRunner(
+        project,
+        shots[:1],
+        binding,
+        template,
+        comfy=UnexpectedFailComfy(),
+        ffmpeg=FakeFfmpeg(),
+    )
+    manifest_path = project.output.root / "run-unexpected-failure" / "manifest.json"
+
+    with pytest.raises(RuntimeError, match="secret transport detail"):
+        runner.run(run_id="run-unexpected-failure")
+
+    persisted = load_manifest(manifest_path)
+    failed = persisted.shots[0]
+    assert failed.status == "failed"
+    assert failed.attempts[0].error == {
+        "code": "unexpected_error",
+        "message": "Unexpected internal error",
+    }
+    assert "secret transport detail" not in manifest_path.read_text(encoding="utf-8")
+
+
+def test_resume_terminal_failure_appends_history_and_preserves_artifacts(
+    example_project_and_shots,
+):
+    project, shots, binding, template = example_project_and_shots
+    project.defaults.max_attempts = 1
+    initial = PipelineRunner(
+        project,
+        shots[:1],
+        binding,
+        template,
+        comfy=FakeComfy(),
+        ffmpeg=FakeFfmpeg(),
+    )
+    initial.run(run_id="run-resume-terminal")
+    manifest_path = project.output.root / "run-resume-terminal" / "manifest.json"
+    before = load_manifest(manifest_path).shots[0]
+    Path(before.clip_path).write_bytes(b"corrupted")
+
+    class ResumeFailComfy(FakeComfy):
+        def submit_and_collect_clip(self, workflow, output_path: Path) -> str:
+            raise retryable_error(ErrorCode.COMFY_JOB_FAILED, "resume failure")
+
+    resumed = PipelineRunner(
+        project,
+        shots[:1],
+        binding,
+        template,
+        comfy=ResumeFailComfy(),
+        ffmpeg=FakeFfmpeg(),
+    )
+
+    with pytest.raises(AiVideoError):
+        resumed.resume(manifest_path)
+
+    after = load_manifest(manifest_path)
+    failed = after.shots[0]
+    assert after.status == "failed"
+    assert failed.status == "failed"
+    assert [item.attempt for item in failed.attempts] == [1, 2]
+    assert [item.status for item in failed.attempts] == ["succeeded", "failed"]
+    assert failed.clip_path == before.clip_path
+    assert failed.clip_hash == before.clip_hash
+    assert failed.last_frame_path == before.last_frame_path
+    assert failed.last_frame_hash == before.last_frame_hash
+    assert failed.comfy_prompt_id is None
+    assert failed.rendered_workflow_path is None
+    assert failed.rendered_workflow_hash is None
+
+
+def test_resume_success_keeps_prior_terminal_failure_history(example_project_and_shots):
+    project, shots, binding, template = example_project_and_shots
+    project.defaults.max_attempts = 2
+
+    class AlwaysFailComfy(FakeComfy):
+        def submit_and_collect_clip(self, workflow, output_path: Path) -> str:
+            raise retryable_error(ErrorCode.COMFY_JOB_FAILED, "temporary failure")
+
+    manifest_path = project.output.root / "run-terminal-resume-success" / "manifest.json"
+    failed_runner = PipelineRunner(
+        project,
+        shots[:1],
+        binding,
+        template,
+        comfy=AlwaysFailComfy(),
+        ffmpeg=FakeFfmpeg(),
+    )
+    with pytest.raises(AiVideoError):
+        failed_runner.run(run_id="run-terminal-resume-success")
+
+    resumed_runner = PipelineRunner(
+        project,
+        shots[:1],
+        binding,
+        template,
+        comfy=FakeComfy(),
+        ffmpeg=FakeFfmpeg(),
+    )
+    resumed_runner.resume(manifest_path)
+
+    persisted = load_manifest(manifest_path)
+    record = persisted.shots[0]
+    assert persisted.status == "succeeded"
+    assert [item.attempt for item in record.attempts] == [1, 2, 3]
+    assert [item.status for item in record.attempts] == ["failed", "failed", "succeeded"]
+    assert record.active_attempt == 3
+    assert (manifest_path.parent / "shots" / "shot_001" / "attempt_3" / "workflow.json").exists()
 
 
 def test_resume_skips_completed_shots(example_project_and_shots):

@@ -70,6 +70,31 @@ class ShotRecord(BaseModel):
             attempts=attempts or [],
         )
 
+    @classmethod
+    def failed(
+        cls,
+        *,
+        shot_id: str,
+        attempts: list[AttemptRecord],
+        error: dict,
+        started_at: str,
+        previous: "ShotRecord | None" = None,
+    ) -> "ShotRecord":
+        updates = {
+            "status": "failed",
+            "attempts": attempts,
+            "active_attempt": attempts[-1].attempt,
+            "rendered_workflow_path": None,
+            "rendered_workflow_hash": None,
+            "comfy_prompt_id": None,
+            "started_at": started_at,
+            "completed_at": _now(),
+            "error": error,
+        }
+        if previous is None:
+            return cls(shot_id=shot_id, **updates)
+        return previous.model_copy(update=updates)
+
 
 class RunManifest(BaseModel):
     run_id: str

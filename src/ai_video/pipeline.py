@@ -9,7 +9,15 @@ from uuid import uuid4
 from ai_video.comfy_client import ComfyClient, JobStatus
 from ai_video.config import ensure_min_free_space, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.manifest import RunManifest, ShotRecord, atomic_write_manifest, load_manifest, successful_shot_is_valid
+from ai_video.manifest import (
+    AttemptRecord,
+    RunManifest,
+    ShotRecord,
+    _now,
+    atomic_write_manifest,
+    load_manifest,
+    successful_shot_is_valid,
+)
 from ai_video.models import ProjectConfig, ShotSpec, WorkflowBinding
 from ai_video import ffmpeg_tools
 from ai_video.workflow_renderer import collect_clip_artifact, render_workflow
@@ -64,6 +72,8 @@ class PipelineRunner:
         for index, shot in enumerate(self.shots):
             self.progress(f"Shot {shot.id} ({index + 1}/{len(self.shots)}): starting")
             record, previous_frame = self._run_shot(
+                manifest=manifest,
+                manifest_path=manifest_path,
                 run_root=run_root,
                 actual_run_id=actual_run_id,
                 shot=shot,
@@ -73,7 +83,7 @@ class PipelineRunner:
                 previous_frame=previous_frame,
                 previous_frame_hash=previous_frame_hash,
             )
-            manifest.shots.append(record)
+            self._upsert_shot_record(manifest, record)
             previous_frame_hash = record.last_frame_hash
             atomic_write_manifest(manifest_path, manifest)
 
@@ -115,11 +125,7 @@ class PipelineRunner:
         previous_frame_hash: str | None = None
 
         for index, shot in enumerate(self.shots):
-            existing = None
-            for record in manifest.shots:
-                if record.shot_id == shot.id:
-                    existing = record
-                    break
+            existing = self._find_shot_record(manifest, shot.id)
 
             if existing and existing.status == "succeeded" and successful_shot_is_valid(existing):
                 last_frame_path = Path(existing.last_frame_path) if existing.last_frame_path else None
@@ -134,6 +140,8 @@ class PipelineRunner:
                 continue
 
             record, previous_frame = self._run_shot(
+                manifest=manifest,
+                manifest_path=manifest_path,
                 run_root=run_root,
                 actual_run_id=manifest.run_id,
                 shot=shot,
@@ -143,11 +151,7 @@ class PipelineRunner:
                 previous_frame=previous_frame,
                 previous_frame_hash=previous_frame_hash,
             )
-            if existing:
-                idx = manifest.shots.index(existing)
-                manifest.shots[idx] = record
-            else:
-                manifest.shots.append(record)
+            self._upsert_shot_record(manifest, record)
             previous_frame_hash = record.last_frame_hash
             atomic_write_manifest(manifest_path, manifest)
 
@@ -180,9 +184,50 @@ class PipelineRunner:
                 names[character.id] = self.comfy.prepare_image(character.reference_images[0])
         return names
 
+    @staticmethod
+    def _find_shot_record(manifest: RunManifest, shot_id: str) -> ShotRecord | None:
+        return next((record for record in manifest.shots if record.shot_id == shot_id), None)
+
+    @staticmethod
+    def _upsert_shot_record(manifest: RunManifest, record: ShotRecord) -> None:
+        existing = PipelineRunner._find_shot_record(manifest, record.shot_id)
+        if existing is None:
+            manifest.shots.append(record)
+            return
+        manifest.shots[manifest.shots.index(existing)] = record
+
+    @staticmethod
+    def _error_record(exc: BaseException) -> dict[str, str]:
+        if isinstance(exc, AiVideoError):
+            return {"code": exc.code.value, "message": exc.user_message}
+        return {"code": "unexpected_error", "message": "Unexpected internal error"}
+
+    def _persist_terminal_failure(
+        self,
+        *,
+        manifest: RunManifest,
+        manifest_path: Path,
+        shot: ShotSpec,
+        attempts: list[AttemptRecord],
+        started_at: str,
+        exc: BaseException,
+    ) -> None:
+        failed = ShotRecord.failed(
+            shot_id=shot.id,
+            attempts=attempts,
+            error=self._error_record(exc),
+            started_at=started_at,
+            previous=self._find_shot_record(manifest, shot.id),
+        )
+        self._upsert_shot_record(manifest, failed)
+        manifest.status = "failed"
+        atomic_write_manifest(manifest_path, manifest)
+
     def _run_shot(
         self,
         *,
+        manifest: RunManifest,
+        manifest_path: Path,
         run_root: Path,
         actual_run_id: str,
         shot: ShotSpec,
@@ -192,12 +237,13 @@ class PipelineRunner:
         previous_frame: Path | None,
         previous_frame_hash: str | None,
     ) -> tuple[ShotRecord, Path]:
-        from ai_video.manifest import AttemptRecord, _now
-        last_error: AiVideoError | None = None
         max_attempts = max(1, self.project.defaults.max_attempts)
         started_at = _now()
-        attempts: list[AttemptRecord] = []
-        for attempt in range(1, max_attempts + 1):
+        previous_record = self._find_shot_record(manifest, shot.id)
+        attempts = list(previous_record.attempts) if previous_record else []
+        attempt_offset = max((item.attempt for item in attempts), default=0)
+        for retry_index in range(1, max_attempts + 1):
+            attempt = attempt_offset + retry_index
             attempt_record = AttemptRecord(attempt=attempt, status="running")
             try:
                 record, last_frame = self._run_shot_attempt(
@@ -211,26 +257,45 @@ class PipelineRunner:
                     previous_frame=previous_frame,
                     previous_frame_hash=previous_frame_hash,
                 )
-                attempt_record.status = "succeeded"
-                attempt_record.comfy_prompt_id = record.comfy_prompt_id
-                attempts.append(attempt_record)
-                record.started_at = started_at
-                record.attempts = attempts
-                return record, last_frame
             except AiVideoError as exc:
                 attempt_record.status = "failed"
-                attempt_record.error = {"code": exc.code.value, "message": exc.user_message}
+                attempt_record.error = self._error_record(exc)
                 attempts.append(attempt_record)
-                last_error = exc
                 if isinstance(self.comfy, ComfyClient) and "memory" in (exc.technical_detail or "").lower():
                     self.comfy.free_memory()
-                if not exc.retryable or attempt == max_attempts:
-                    raise
-        raise last_error or AiVideoError(
-            code=ErrorCode.COMFY_JOB_FAILED,
-            user_message=f"Shot failed: {shot.id}",
-            retryable=True,
-        )
+                if exc.retryable and retry_index < max_attempts:
+                    continue
+                self._persist_terminal_failure(
+                    manifest=manifest,
+                    manifest_path=manifest_path,
+                    shot=shot,
+                    attempts=attempts,
+                    started_at=started_at,
+                    exc=exc,
+                )
+                raise
+            except Exception as exc:
+                attempt_record.status = "failed"
+                attempt_record.error = self._error_record(exc)
+                attempts.append(attempt_record)
+                self._persist_terminal_failure(
+                    manifest=manifest,
+                    manifest_path=manifest_path,
+                    shot=shot,
+                    attempts=attempts,
+                    started_at=started_at,
+                    exc=exc,
+                )
+                raise
+
+            attempt_record.status = "succeeded"
+            attempt_record.comfy_prompt_id = record.comfy_prompt_id
+            attempts.append(attempt_record)
+            record.started_at = started_at
+            record.attempts = attempts
+            return record, last_frame
+
+        raise AssertionError("Shot retry loop exhausted without returning or raising")
 
     def _run_shot_attempt(
         self,
