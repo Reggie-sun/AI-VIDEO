@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -14,11 +16,34 @@ from ai_video.production import (
     prepare_project_registry_commit,
 )
 from ai_video.production.hashing import seal_artifact
+from ai_video.production.composition import timeline_fingerprint
+from ai_video.production.hyperframes import (
+    HyperFramesRenderResult,
+    VerifiedRenderOutput,
+    materialize_hyperframes_source,
+    prepare_durable_render_artifacts,
+)
 from ai_video.production.models import (
+    DeliveryProfile,
+    FixedTransform,
+    MeasuredRenderMetadata,
     ProductionManifest,
     ProductionProject,
+    RendererCheckReceipt,
+    RendererIdentity,
+    RendererKind,
+    RendererSelectionReceipt,
+    ResolvedTimeline,
+    ResolvedVisualSpan,
+    SourceReference,
+    StateCommitAttempt,
+    StateCommitStatus,
     canonical_project_snapshot_path,
     canonical_registry_snapshot_path,
+)
+from ai_video.production.state_commit import (
+    ActivateRenderStateRequest,
+    BeginRenderAttemptRequest,
 )
 from production_project_factory import (
     load_revision_two_models,
@@ -71,6 +96,148 @@ def _corrupt_active_project(root: Path, project_data: dict[str, object]) -> None
         }
     )
     _write_manifest(root, manifest.model_copy(update={"active_project": pointer}))
+
+
+def _tree_snapshot(root: Path) -> dict[Path, tuple[bytes, int]]:
+    return {
+        path.relative_to(root): (path.read_bytes(), path.stat().st_mtime_ns)
+        for path in root.rglob("*")
+        if path.is_file()
+    }
+
+
+def _activate_fake_render(root: Path, attempt_id: str = "reader-render"):
+    write_production_project(root)
+    before = _manifest(root)
+    png = (
+        Path(__file__).parent
+        / "fixtures/hyperframes/silent_image/source/assets/"
+        "1ac67c3a1c909b3356cf6ff490c0f88b8a30ef4c28ca579657f6007146abe71c.png"
+    ).read_bytes()
+    digest = hashlib.sha256(png).hexdigest()
+    source_path = root / "reader-input/red.png"
+    source_path.parent.mkdir(parents=True)
+    source_path.write_bytes(png)
+    provisional = ResolvedTimeline(
+        artifact_id="timeline-reader",
+        revision=1,
+        content_hash="0" * 64,
+        creation_receipt_id="resolve-reader",
+        source_provenance=(
+            SourceReference(kind="derived", reference="reader-fixture"),
+        ),
+        timeline_id="timeline-reader-r1",
+        composition_spec_id="composition-reader",
+        composition_spec_revision=1,
+        composition_spec_hash="1" * 64,
+        delivery_profile=DeliveryProfile(width=1280, height=720, fps=24),
+        sample_rate=48_000,
+        renderer=RendererIdentity(
+            kind=RendererKind.HYPERFRAMES, version="0.7.103"
+        ),
+        visual_spans=(
+            ResolvedVisualSpan(
+                layer_id="layer-reader",
+                shot_id="shot-1",
+                asset_role="hero_still",
+                asset_id="reader-red",
+                asset_sha256=digest,
+                asset_mime_type="image/png",
+                materialized_path=Path(f"assets/{digest}.png"),
+                start_frame=0,
+                duration_frames=10,
+                start_sample=0,
+                duration_samples=20_000,
+                trim_start_frame=0,
+                trim_duration_frames=None,
+                transform=FixedTransform(),
+                opacity_milli=1000,
+                z_index=0,
+                incoming_transition=None,
+            ),
+        ),
+        total_frames=10,
+        total_samples=20_000,
+        composition_fingerprint="0" * 64,
+    )
+    timeline = seal_artifact(
+        provisional.model_copy(
+            update={"composition_fingerprint": timeline_fingerprint(provisional)}
+        )
+    )
+    selection = RendererSelectionReceipt(
+        receipt_id=f"selection-{attempt_id}",
+        attempt_id=attempt_id,
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=before.active_project,
+        current_registry=before.active_registry,
+    )
+    materialized = materialize_hyperframes_source(
+        timeline,
+        asset_sources={"reader-red": source_path},
+        allowed_asset_root=root,
+        staging_root=root / "reader-source",
+        allowed_staging_parent=root,
+    )
+    checks = tuple(
+        RendererCheckReceipt(
+            command=command,
+            tool_version="0.7.103",
+            exit_code=0,
+            stdout_sha256="0" * 64,
+            stderr_sha256="0" * 64,
+            error_count=0,
+            warning_count=0,
+        )
+        for command in ("lint", "check")
+    )
+    output = b"fake-mp4"
+    result = HyperFramesRenderResult(
+        materialized=materialized,
+        checks=checks,  # type: ignore[arg-type]
+        output=VerifiedRenderOutput(
+            untrusted_staged_path=root / "unused-staged.mp4",
+            verification_snapshot_path=root / "unused-verified.mp4",
+            verified_bytes=output,
+            output_sha256=hashlib.sha256(output).hexdigest(),
+            output_size_bytes=len(output),
+            measured=MeasuredRenderMetadata(
+                width=1280,
+                height=720,
+                fps_num=24,
+                fps_den=1,
+                duration_frames=10,
+                codec_name="h264",
+            ),
+            decoded_frame_fingerprint="2" * 64,
+        ),
+    )
+    committer = ProductionStateCommitter(root)
+    begun = committer.begin_render_attempt(
+        BeginRenderAttemptRequest(before.manifest_revision, None, selection)
+    )
+    durable = prepare_durable_render_artifacts(
+        result,
+        timeline=timeline,
+        renderer_selection=selection,
+        current_project=begun.active_project,
+        current_registry=begun.active_registry,
+    )
+    request = ActivateRenderStateRequest(
+        attempt_id=attempt_id,
+        expected_manifest_revision=begun.manifest_revision,
+        current_project=begun.active_project,
+        current_registry=begun.active_registry,
+        base_render_state=None,
+        renderer_selection=selection,
+        artifacts=durable.artifacts,
+        next_render_state=durable.next_render_state,
+    )
+    activated = committer.activate_render_state(request)
+    return activated, durable, request
 
 
 def test_load_production_project_returns_verified_bundle(tmp_path):
@@ -396,3 +563,153 @@ def test_loader_requires_canonical_project_entrypoint_name(tmp_path):
 def test_legacy_project_loader_remains_unchanged():
     project = load_project("configs/wan22_fast.project.yaml")
     assert project.project_name == "wan22-fast-demo"
+
+
+def test_reader_loads_20_historical_custom_operation_without_rewrite(tmp_path):
+    project_path = write_production_project(tmp_path)
+    manifest = _manifest(tmp_path)
+    historical = StateCommitAttempt(
+        attempt_id="historical-custom",
+        operation="historical_custom_operation",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=manifest.manifest_revision,
+        base_project=manifest.active_project,
+        base_registry=manifest.active_registry,
+        candidate_artifacts_hash="0" * 64,
+        started_at="2026-01-01T00:00:00+00:00",
+        finished_at="2026-01-01T00:00:01+00:00",
+    )
+    _write_manifest(
+        tmp_path,
+        manifest.model_copy(update={"attempts": (historical,)}),
+    )
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(project_path)
+
+    assert loaded.manifest.schema_version == "2.0"
+    assert loaded.manifest.attempts[-1].operation == "historical_custom_operation"
+    assert loaded.render_state is None
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_loads_21_with_none_render_state_without_rewrite(tmp_path):
+    project_path = write_production_project(tmp_path)
+    _write_manifest(
+        tmp_path,
+        _manifest(tmp_path).model_copy(update={"schema_version": "2.1"}),
+    )
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(project_path)
+
+    assert loaded.manifest.schema_version == "2.1"
+    assert loaded.render_state is None
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_verifies_selected_render_graph_exactly_without_rewrite(tmp_path):
+    _, durable, _ = _activate_fake_render(tmp_path)
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(tmp_path / "project.yaml")
+
+    assert loaded.render_state == durable.state
+    assert loaded.manifest.active_render_state == durable.next_render_state
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_rejects_tampered_selected_render_output_without_fallback(tmp_path):
+    _, durable, _ = _activate_fake_render(tmp_path)
+    (tmp_path / durable.state.output.path).write_bytes(b"tampered")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_reader_rejects_mixed_selected_render_pointer_identity(tmp_path):
+    _, durable, _ = _activate_fake_render(tmp_path)
+    manifest = _manifest(tmp_path)
+    mixed = durable.next_render_state.model_copy(
+        update={"revision": durable.next_render_state.revision + 1}
+    )
+    _write_manifest(tmp_path, manifest.model_copy(update={"active_render_state": mixed}))
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def _render_graph_path(durable, label: str) -> Path:
+    state = durable.state
+    return {
+        "state": durable.next_render_state.path,
+        "timeline": state.timeline.path,
+        "index": state.source_bundle.index.path,
+        "asset": state.source_bundle.assets[0].path,
+        "source_receipt": state.source_receipt.path,
+        "render_receipt": state.render_receipt.path,
+        "output": state.output.path,
+    }[label]
+
+
+@pytest.mark.parametrize(
+    "label",
+    [
+        "state",
+        "timeline",
+        "index",
+        "asset",
+        "source_receipt",
+        "render_receipt",
+        "output",
+    ],
+)
+@pytest.mark.parametrize("outside", [False, True])
+def test_reader_rejects_every_render_artifact_symlink(
+    tmp_path, label, outside
+):
+    _, durable, _ = _activate_fake_render(tmp_path)
+    target = tmp_path / _render_graph_path(durable, label)
+    payload = target.read_bytes()
+    target.unlink()
+    backing = (
+        tmp_path.parent / f"{tmp_path.name}-{label}-outside.bin"
+        if outside
+        else tmp_path / f"contained-{label}.bin"
+    )
+    backing.write_bytes(payload)
+    target.symlink_to(backing)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_reader_rejects_render_artifact_inode_swap_between_stat_and_open(
+    tmp_path, monkeypatch
+):
+    _, durable, _ = _activate_fake_render(tmp_path)
+    target = tmp_path / durable.state.output.path
+    payload = target.read_bytes()
+    original_open = os.open
+    swapped = False
+
+    def swap_then_open(path, flags, *args, **kwargs):
+        nonlocal swapped
+        if path == target.name and kwargs.get("dir_fd") is not None and not swapped:
+            swapped = True
+            target.rename(target.with_name("detached-output.mp4"))
+            target.write_bytes(payload)
+        return original_open(path, flags, *args, **kwargs)
+
+    monkeypatch.setattr(os, "open", swap_then_open)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID

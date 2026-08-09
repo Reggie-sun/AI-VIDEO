@@ -284,10 +284,16 @@ def load_verified_render_state(
     ):
         raise _invalid("Active render source index identity is invalid.")
     mime_by_path: dict[Path, str] = {}
+    pointer_by_path = {item.path: item for item in bundle.assets}
     for binding in source.asset_bindings:
         previous = mime_by_path.get(binding.materialized_path)
         if previous is not None and previous != binding.asset_mime_type:
             raise _invalid("Active render source binding MIME types conflict.")
+        pointer = pointer_by_path.get(binding.materialized_path)
+        if pointer is None or binding.asset_sha256 != pointer.file_sha256:
+            raise _invalid(
+                "Active render source binding hash does not match its bundle pointer."
+            )
         mime_by_path[binding.materialized_path] = binding.asset_mime_type
     asset_paths = tuple(item.path for item in bundle.assets)
     if len(asset_paths) != len(set(asset_paths)):

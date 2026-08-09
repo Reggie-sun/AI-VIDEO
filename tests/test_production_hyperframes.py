@@ -30,6 +30,7 @@ from ai_video.production.hyperframes import (
     _parse_source_document,
     _render_with_hyperframes,
     _renderer_tool_root,
+    _sealed_json_bytes,
     _seconds,
     _validate_local_relative_url,
     audit_hyperframes_source,
@@ -41,7 +42,9 @@ from ai_video.production.models import (
     FixedTransform,
     RendererIdentity,
     RendererKind,
+    RendererSourceReceipt,
     RendererSelectionReceipt,
+    RenderReceipt,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
     ResolvedTimeline,
@@ -50,13 +53,18 @@ from ai_video.production.models import (
     TransitionKind,
     TransitionSpec,
 )
-from ai_video.production.paths import _copy_held_fd_to_regular_file_nofollow
+from ai_video.production.paths import (
+    _copy_held_fd_to_regular_file_nofollow,
+    canonical_render_state_path,
+    canonical_renderer_source_receipt_path,
+)
 from ai_video.production.state_commit import PreparedArtifact
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
     CommitPhase,
     ProductionStateCommitter,
+    StateCommitRequest,
     prepare_project_registry_commit,
 )
 from ai_video.production.project import load_production_project
@@ -1721,6 +1729,63 @@ def test_live_committed_fixture_render_state_lifecycle(tmp_path):
     unshare = Path(unshare_name).resolve(strict=True)
     bash = Path(bash_name).resolve(strict=True)
     assert evidence_root.is_dir()
+    ffprobe_name = shutil.which("ffprobe")
+    ffmpeg_name = shutil.which("ffmpeg")
+    assert ffprobe_name is not None
+    assert ffmpeg_name is not None
+    ffprobe = Path(ffprobe_name).resolve(strict=True)
+    ffmpeg = Path(ffmpeg_name).resolve(strict=True)
+
+    def probe_output(path: Path) -> dict[str, object]:
+        completed = subprocess.run(
+            [
+                str(ffprobe),
+                "-v",
+                "error",
+                "-show_streams",
+                "-of",
+                "json",
+                str(path),
+            ],
+            shell=False,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            text=True,
+            timeout=120,
+        )
+        assert completed.returncode == 0, completed.stderr
+        return json.loads(completed.stdout)
+
+    def center_pixel(path: Path, frame: int) -> tuple[int, int, int]:
+        completed = subprocess.run(
+            [
+                str(ffmpeg),
+                "-v",
+                "error",
+                "-i",
+                str(path),
+                "-vf",
+                f"select=eq(n\\,{frame}),crop=1:1:160:90,format=rgb24",
+                "-frames:v",
+                "1",
+                "-f",
+                "rawvideo",
+                "-",
+            ],
+            shell=False,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+            timeout=120,
+        )
+        assert completed.returncode == 0, completed.stderr.decode(
+            "utf-8", errors="replace"
+        )
+        assert len(completed.stdout) == 3
+        return tuple(completed.stdout)  # type: ignore[return-value]
 
     timeline = make_resolved_timeline()
     cases: list[
@@ -1729,6 +1794,7 @@ def test_live_committed_fixture_render_state_lifecycle(tmp_path):
             ProductionStateCommitter,
             BeginRenderAttemptRequest,
             dict[str, Path],
+            Path,
         ]
     ] = []
     expected_argv: list[list[str]] = []
@@ -1771,16 +1837,27 @@ def test_live_committed_fixture_render_state_lifecycle(tmp_path):
                 ],
             ]
         )
-        cases.append((root, committer, request, make_asset_sources(root, timeline)))
+        cases.append(
+            (
+                root,
+                committer,
+                request,
+                make_asset_sources(root, timeline),
+                paths.verification_snapshot_path,
+            )
+        )
 
     expected_path = evidence_root / "expected-argv.json"
     expected_path.write_text(
-        json.dumps(expected_argv, sort_keys=True, separators=(",", ":")) + "\n",
+        json.dumps(
+            {"argv": expected_argv}, sort_keys=True, separators=(",", ":")
+        )
+        + "\n",
         encoding="utf-8",
     )
 
-    outputs: list[bytes] = []
-    for root, committer, request, asset_sources in cases:
+    decoded_fingerprints: list[str] = []
+    for root, committer, request, asset_sources, verification_snapshot in cases:
         activated = production.render_with_hyperframes(
             committer=committer,
             begin_request=request,
@@ -1796,15 +1873,263 @@ def test_live_committed_fixture_render_state_lifecycle(tmp_path):
         assert activated.active_render_state is not None
         assert activated.attempts[-1].status is StateCommitStatus.SUCCEEDED
         loaded = load_production_project(root / "project.yaml")
-        assert loaded.render_state is not None
-        assert loaded.render_state.timeline == timeline
-        assert loaded.render_state.active_project == activated.active_project
-        assert loaded.render_state.active_registry == activated.active_registry
-        output_path = root / loaded.render_state.output.path
-        outputs.append(output_path.read_bytes())
+        state = loaded.render_state
+        assert state is not None
+        assert state.timeline.revision == timeline.revision
+        assert state.timeline.content_hash == timeline.content_hash
+        assert state.project == activated.active_project
+        assert state.registry == activated.active_registry
+        assert state.renderer_selection == request.renderer_selection
+        assert state.timeline_fingerprint == timeline.composition_fingerprint
+        assert state.source_bundle_sha256 == state.source_bundle.bundle_sha256
+        assert state.asset_hashes == tuple(
+            item.file_sha256 for item in state.source_bundle.assets
+        )
+
+        source = RendererSourceReceipt.model_validate_json(
+            (root / state.source_receipt.path).read_bytes()
+        )
+        render = RenderReceipt.model_validate_json(
+            (root / state.render_receipt.path).read_bytes()
+        )
+        assert source.attempt_id == request.renderer_selection.attempt_id
+        assert render.attempt_id == request.renderer_selection.attempt_id
+        assert source.timeline_fingerprint == state.timeline_fingerprint
+        assert render.timeline_fingerprint == state.timeline_fingerprint
+        assert source.source_bundle == state.source_bundle
+        assert render.source_bundle_sha256 == state.source_bundle_sha256
+        assert render.asset_hashes == state.asset_hashes
+        receipt_text = json.dumps(
+            [source.model_dump(mode="json"), render.model_dump(mode="json")],
+            sort_keys=True,
+        )
+        assert "state/render/attempts/" not in receipt_text
+        assert str(root) not in receipt_text
+
+        assert (root / state.source_bundle.index.path).read_bytes() == (
+            FIXTURE_ROOT / "source/index.html"
+        ).read_bytes()
+        for asset in state.source_bundle.assets:
+            assert (root / asset.path).read_bytes() == (
+                FIXTURE_ROOT / f"source/assets/{asset.path.name}"
+            ).read_bytes()
+
+        output_path = root / state.output.path
+        output_bytes = output_path.read_bytes()
+        assert hashlib.sha256(output_bytes).hexdigest() == state.output.file_sha256
+        assert output_bytes == verification_snapshot.read_bytes()
+        probe = probe_output(output_path)
+        streams = probe["streams"]
+        assert isinstance(streams, list)
+        video = [item for item in streams if item["codec_type"] == "video"]
+        audio = [item for item in streams if item["codec_type"] == "audio"]
+        assert len(video) == 1
+        assert audio == []
+        assert int(video[0]["nb_frames"]) == 10
+        assert render.measured.duration_frames == 10
+        frame_four = center_pixel(output_path, 4)
+        frame_five = center_pixel(output_path, 5)
+        assert frame_four[0] > frame_four[1] and frame_four[0] > frame_four[2]
+        assert frame_five[2] > frame_five[0] and frame_five[2] > frame_five[1]
+        assert frame_four != frame_five
+        decoded_fingerprints.append(render.decoded_frame_fingerprint)
 
     assert len(expected_argv) == 10
-    assert outputs[0] == outputs[1]
+    assert decoded_fingerprints[0] == decoded_fingerprints[1]
+
+
+def _prepared_activation_request(
+    tmp_path: Path, attempt_id: str, *, versioned_pair: bool = False
+):
+    before, timeline, begin_request, browser, ip_path = _replay_inputs(
+        tmp_path, attempt_id
+    )
+    committer = ProductionStateCommitter(tmp_path)
+    if versioned_pair:
+        project, registry = project_factory.load_revision_two_models(tmp_path)
+        before = committer.commit(
+            prepare_project_registry_commit(
+                manifest=before,
+                project=project,
+                registry=registry,
+                attempt_id=f"{attempt_id}-project-r2",
+            )
+        )
+        selection = begin_request.renderer_selection.model_copy(
+            update={
+                "current_project": before.active_project,
+                "current_registry": before.active_registry,
+            }
+        )
+        begin_request = BeginRenderAttemptRequest(
+            before.manifest_revision, None, selection
+        )
+    begun = committer.begin_render_attempt(begin_request)
+    paths = committer.render_attempt_paths(attempt_id)
+    paths.attempt_root.mkdir(parents=True, mode=0o700)
+    result = _adapter(tmp_path / "activation-tools", FakeRunner()).render(
+        HyperFramesRenderAttempt(
+            attempt_id=attempt_id,
+            selection=begin_request.renderer_selection,
+            timeline=timeline,
+            asset_sources=make_asset_sources(tmp_path, timeline),
+            allowed_asset_root=tmp_path,
+            staging_root=paths.source_root,
+            allowed_staging_parent=paths.attempt_root,
+            output_path=paths.staged_output_path,
+            verification_snapshot_path=paths.verification_snapshot_path,
+        )
+    )
+    durable = prepare_durable_render_artifacts(
+        result,
+        timeline=timeline,
+        renderer_selection=begin_request.renderer_selection,
+        current_project=begun.active_project,
+        current_registry=begun.active_registry,
+    )
+    request = ActivateRenderStateRequest(
+        attempt_id=attempt_id,
+        expected_manifest_revision=begun.manifest_revision,
+        current_project=begun.active_project,
+        current_registry=begun.active_registry,
+        base_render_state=None,
+        renderer_selection=begin_request.renderer_selection,
+        artifacts=durable.artifacts,
+        next_render_state=durable.next_render_state,
+    )
+    return before, committer, request
+
+
+def test_activation_duplicate_artifacts_terminalizes_owned_r1_as_r2(tmp_path):
+    before, committer, request = _prepared_activation_request(
+        tmp_path, "duplicate-artifacts"
+    )
+    duplicate = request.artifacts[0]
+    invalid = ActivateRenderStateRequest(
+        **{
+            **request.__dict__,
+            "artifacts": (duplicate, duplicate, *request.artifacts[1:]),
+        }
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        committer.activate_render_state(invalid)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    terminal = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert terminal.manifest_revision == before.manifest_revision + 2
+    assert terminal.active_render_state is None
+    attempt = terminal.attempts[-1]
+    assert attempt.status is StateCommitStatus.FAILED
+    assert attempt.render_phase == "activate"
+    assert attempt.candidate_render_state == request.next_render_state
+    assert attempt.candidate_artifacts_hash != hashlib.sha256(b"[]").hexdigest()
+
+
+def _with_mismatched_binding_hash(
+    request: ActivateRenderStateRequest,
+) -> ActivateRenderStateRequest:
+    artifacts = {item.relative_path: item for item in request.artifacts}
+    state = production.RenderStateSnapshot.model_validate_json(
+        artifacts[request.next_render_state.path].payload
+    )
+    source = RendererSourceReceipt.model_validate_json(
+        artifacts[state.source_receipt.path].payload
+    )
+    binding = source.asset_bindings[0]
+    bad_source = seal_artifact(
+        source.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "asset_bindings": (
+                    binding.model_copy(update={"asset_sha256": "f" * 64}),
+                    *source.asset_bindings[1:],
+                ),
+            }
+        )
+    )
+    source_payload = _sealed_json_bytes(bad_source)
+    source_pointer = production.RenderArtifactPointer(
+        path=canonical_renderer_source_receipt_path(bad_source.content_hash),
+        revision=bad_source.revision,
+        content_hash=bad_source.content_hash,
+        file_sha256=hashlib.sha256(source_payload).hexdigest(),
+    )
+    bad_state = seal_artifact(
+        state.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "source_receipt": source_pointer,
+            }
+        )
+    )
+    state_payload = _sealed_json_bytes(bad_state)
+    state_pointer = production.RenderStateSnapshotPointer(
+        path=canonical_render_state_path(bad_state.content_hash),
+        revision=bad_state.revision,
+        content_hash=bad_state.content_hash,
+        file_sha256=hashlib.sha256(state_payload).hexdigest(),
+    )
+    del artifacts[state.source_receipt.path]
+    del artifacts[request.next_render_state.path]
+    for path, payload in (
+        (source_pointer.path, source_payload),
+        (state_pointer.path, state_payload),
+    ):
+        artifacts[path] = PreparedArtifact(
+            path, payload, hashlib.sha256(payload).hexdigest()
+        )
+    return ActivateRenderStateRequest(
+        **{
+            **request.__dict__,
+            "artifacts": tuple(artifacts[path] for path in sorted(artifacts)),
+            "next_render_state": state_pointer,
+        }
+    )
+
+
+def test_activation_explicitly_rejects_binding_hash_not_matching_bundle_pointer(
+    tmp_path,
+):
+    _, committer, request = _prepared_activation_request(
+        tmp_path, "binding-hash-activation"
+    )
+    invalid = _with_mismatched_binding_hash(request)
+
+    with pytest.raises(AiVideoError, match="binding"):
+        committer._validate_render_artifacts(invalid)
+
+
+def test_reader_explicitly_rejects_binding_hash_without_source_audit_dependency(
+    tmp_path, monkeypatch
+):
+    import ai_video.production.hyperframes as hyperframes
+
+    before, _, request = _prepared_activation_request(
+        tmp_path, "binding-hash-reader"
+    )
+    invalid = _with_mismatched_binding_hash(request)
+    for artifact in invalid.artifacts:
+        path = tmp_path / artifact.relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(artifact.payload)
+    manifest = before.model_copy(
+        update={
+            "schema_version": "2.1",
+            "manifest_revision": before.manifest_revision + 1,
+            "active_render_state": invalid.next_render_state,
+        }
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    monkeypatch.setattr(hyperframes, "audit_hyperframes_source", lambda *a, **k: None)
+
+    with pytest.raises(AiVideoError, match="binding"):
+        load_production_project(tmp_path / "project.yaml")
+
 
 def test_activate_render_state_commits_r1_r2_r3_and_exact_replay(tmp_path):
     project_factory.write_production_project(tmp_path)
@@ -1884,6 +2209,79 @@ def test_activate_render_state_commits_r1_r2_r3_and_exact_replay(tmp_path):
     )
     assert switched.active_render_state is None
     assert all((tmp_path / path).read_bytes() == data for path, data in render_bytes.items())
+
+
+def _same_pair_request(
+    root: Path, manifest: ProductionManifest, attempt_id: str
+) -> StateCommitRequest:
+    artifacts = tuple(
+        PreparedArtifact(path, payload, hashlib.sha256(payload).hexdigest())
+        for path in sorted(
+            (manifest.active_project.path, manifest.active_registry.path)
+        )
+        for payload in ((root / path).read_bytes(),)
+    )
+    return StateCommitRequest(
+        attempt_id=attempt_id,
+        operation="same_pair_probe",
+        expected_manifest_revision=manifest.manifest_revision,
+        artifacts=artifacts,
+        next_project=manifest.active_project,
+        next_registry=manifest.active_registry,
+    )
+
+
+def test_same_pair_commit_retains_only_fully_verified_render_state(tmp_path):
+    _, committer, activation = _prepared_activation_request(
+        tmp_path, "same-pair-retain", versioned_pair=True
+    )
+    activated = committer.activate_render_state(activation)
+
+    retained = committer.commit(
+        _same_pair_request(tmp_path, activated, "same-pair-ok")
+    )
+
+    assert retained.active_render_state == activated.active_render_state
+
+
+def test_same_pair_commit_rejects_tampered_render_without_manifest_mutation(tmp_path):
+    _, committer, activation = _prepared_activation_request(
+        tmp_path, "same-pair-tamper", versioned_pair=True
+    )
+    activated = committer.activate_render_state(activation)
+    manifest_path = tmp_path / "state/manifest.json"
+    manifest_bytes = manifest_path.read_bytes()
+    output_path = tmp_path / activation.next_render_state.path
+    state = production.RenderStateSnapshot.model_validate_json(output_path.read_bytes())
+    (tmp_path / state.output.path).write_bytes(b"tampered-output")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        committer.commit(
+            _same_pair_request(tmp_path, activated, "same-pair-reject")
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert manifest_path.read_bytes() == manifest_bytes
+
+
+def test_succeeded_activation_replay_reopens_graph_and_rejects_tamper(tmp_path):
+    _, committer, activation = _prepared_activation_request(
+        tmp_path, "succeeded-replay-tamper"
+    )
+    activated = committer.activate_render_state(activation)
+    manifest_path = tmp_path / "state/manifest.json"
+    manifest_bytes = manifest_path.read_bytes()
+    state = production.RenderStateSnapshot.model_validate_json(
+        (tmp_path / activation.next_render_state.path).read_bytes()
+    )
+    (tmp_path / state.output.path).write_bytes(b"tampered-output")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        committer.activate_render_state(activation)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_COMMIT_FAILED
+    assert manifest_path.read_bytes() == manifest_bytes
+    assert activated.active_render_state == activation.next_render_state
 
 
 def test_orchestrator_persists_selection_before_runner_and_activates_once(tmp_path):
@@ -1988,6 +2386,479 @@ def test_orchestrator_records_wrong_version_as_terminal_source_failure(tmp_path)
     )
     assert failed.attempts[-1].status is StateCommitStatus.FAILED
     assert failed.attempts[-1].render_phase == "source"
+
+
+def _replay_inputs(tmp_path: Path, attempt_id: str):
+    project_factory.write_production_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    timeline = make_resolved_timeline()
+    selection = RendererSelectionReceipt(
+        receipt_id=f"selection-{attempt_id}",
+        attempt_id=attempt_id,
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=before.active_project,
+        current_registry=before.active_registry,
+    )
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    browser = _write_executable(tools / "chrome")
+    ip_path = _write_executable(tools / "ip")
+    return (
+        before,
+        timeline,
+        BeginRenderAttemptRequest(before.manifest_revision, None, selection),
+        browser,
+        ip_path,
+    )
+
+
+def _fake_probe(fd: int) -> dict[str, object]:
+    del fd
+    return {
+        "streams": [
+            {
+                "codec_type": "video",
+                "width": 320,
+                "height": 180,
+                "r_frame_rate": "24/1",
+                "nb_frames": "10",
+                "codec_name": "h264",
+            }
+        ]
+    }
+
+
+def _fake_decoded_frames(fd: int) -> str:
+    return hashlib.sha256(os.pread(fd, os.fstat(fd).st_size, 0)).hexdigest()
+
+
+def _call_fake_render(
+    tmp_path: Path,
+    *,
+    request: BeginRenderAttemptRequest,
+    timeline: ResolvedTimeline,
+    browser: Path,
+    ip_path: Path,
+    runner_factory,
+    committer: ProductionStateCommitter | None = None,
+):
+    return _render_with_hyperframes(
+        committer=committer or ProductionStateCommitter(tmp_path),
+        begin_request=request,
+        timeline=timeline,
+        asset_sources=make_asset_sources(tmp_path, timeline),
+        allowed_asset_root=tmp_path,
+        runner_factory=runner_factory,
+        browser_path=browser,
+        ip_path=ip_path,
+        expected_version="0.7.103",
+        probe=_fake_probe,
+        decoded_frames=_fake_decoded_frames,
+    )
+
+
+def test_orchestrator_success_replay_returns_without_runner_or_artifact_rewrite(
+    tmp_path,
+):
+    before, timeline, request, browser, ip_path = _replay_inputs(
+        tmp_path, "success-replay"
+    )
+    first = _call_fake_render(
+        tmp_path,
+        request=request,
+        timeline=timeline,
+        browser=browser,
+        ip_path=ip_path,
+        runner_factory=FakeRunner,
+    )
+    manifest_path = tmp_path / "state/manifest.json"
+    before_manifest_bytes = manifest_path.read_bytes()
+    durable = {
+        path: (path.read_bytes(), path.stat().st_mtime_ns)
+        for path in (tmp_path / "state/render").rglob("*")
+        if path.is_file() and "attempts" not in path.parts
+    }
+    runner_calls = 0
+
+    def forbidden_runner():
+        nonlocal runner_calls
+        runner_calls += 1
+        raise AssertionError("success replay must not construct a runner")
+
+    replay = _call_fake_render(
+        tmp_path,
+        request=request,
+        timeline=timeline,
+        browser=browser,
+        ip_path=ip_path,
+        runner_factory=forbidden_runner,
+    )
+
+    assert replay == first
+    assert replay.manifest_revision == before.manifest_revision + 3
+    assert manifest_path.read_bytes() == before_manifest_bytes
+    assert runner_calls == 0
+    assert {
+        path: (path.read_bytes(), path.stat().st_mtime_ns) for path in durable
+    } == durable
+
+
+def test_orchestrator_failed_replay_returns_terminal_without_runner(tmp_path):
+    before, timeline, request, browser, ip_path = _replay_inputs(
+        tmp_path, "failed-replay"
+    )
+    with pytest.raises(AiVideoError):
+        _call_fake_render(
+            tmp_path,
+            request=request,
+            timeline=timeline,
+            browser=browser,
+            ip_path=ip_path,
+            runner_factory=lambda: FakeRunner(version="0.7.102"),
+        )
+    failed_bytes = (tmp_path / "state/manifest.json").read_bytes()
+    runner_calls = 0
+
+    def forbidden_runner():
+        nonlocal runner_calls
+        runner_calls += 1
+        raise AssertionError("failed replay must not construct a runner")
+
+    replay = _call_fake_render(
+        tmp_path,
+        request=request,
+        timeline=timeline,
+        browser=browser,
+        ip_path=ip_path,
+        runner_factory=forbidden_runner,
+    )
+
+    assert replay.manifest_revision == before.manifest_revision + 2
+    assert replay.attempts[-1].status is StateCommitStatus.FAILED
+    assert (tmp_path / "state/manifest.json").read_bytes() == failed_bytes
+    assert runner_calls == 0
+
+
+def test_orchestrator_old_failed_attempt_is_not_replayed_after_later_state_change(
+    tmp_path,
+):
+    _, timeline, failed_request, browser, ip_path = _replay_inputs(
+        tmp_path, "old-failed-replay"
+    )
+    with pytest.raises(AiVideoError):
+        _call_fake_render(
+            tmp_path,
+            request=failed_request,
+            timeline=timeline,
+            browser=browser,
+            ip_path=ip_path,
+            runner_factory=lambda: FakeRunner(version="0.7.102"),
+        )
+    current = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    later_selection = failed_request.renderer_selection.model_copy(
+        update={
+            "receipt_id": "selection-later-success",
+            "attempt_id": "later-success",
+            "current_project": current.active_project,
+            "current_registry": current.active_registry,
+        }
+    )
+    later_request = BeginRenderAttemptRequest(
+        current.manifest_revision, None, later_selection
+    )
+    _call_fake_render(
+        tmp_path,
+        request=later_request,
+        timeline=timeline,
+        browser=browser,
+        ip_path=ip_path,
+        runner_factory=FakeRunner,
+    )
+    runner_calls = 0
+
+    def forbidden_runner():
+        nonlocal runner_calls
+        runner_calls += 1
+        raise AssertionError("historical replay must not construct a runner")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        _call_fake_render(
+            tmp_path,
+            request=failed_request,
+            timeline=timeline,
+            browser=browser,
+            ip_path=ip_path,
+            runner_factory=forbidden_runner,
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert runner_calls == 0
+
+
+def test_orchestrator_unresolved_selection_replay_fails_closed_without_runner(
+    tmp_path,
+):
+    before, timeline, request, browser, ip_path = _replay_inputs(
+        tmp_path, "unresolved-selection"
+    )
+    committer = ProductionStateCommitter(tmp_path)
+    begun = committer.begin_render_attempt(request)
+    runner_calls = 0
+
+    def forbidden_runner():
+        nonlocal runner_calls
+        runner_calls += 1
+        raise AssertionError("unresolved replay must not construct a runner")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        _call_fake_render(
+            tmp_path,
+            request=request,
+            timeline=timeline,
+            browser=browser,
+            ip_path=ip_path,
+            runner_factory=forbidden_runner,
+            committer=committer,
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    unchanged = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert unchanged == begun
+    assert unchanged.manifest_revision == before.manifest_revision + 1
+    assert unchanged.attempts[-1].status is StateCommitStatus.RUNNING
+    assert runner_calls == 0
+
+
+def test_orchestrator_candidate_replay_finalizes_without_rerendering_scratch(
+    tmp_path,
+):
+    before, timeline, request, browser, ip_path = _replay_inputs(
+        tmp_path, "candidate-replay"
+    )
+    committer = ProductionStateCommitter(
+        tmp_path,
+        crash_injector=_RaiseRenderPhaseOnce(
+            CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_REPLACE,
+            KeyboardInterrupt,
+        ),
+    )
+    with pytest.raises(KeyboardInterrupt):
+        _call_fake_render(
+            tmp_path,
+            request=request,
+            timeline=timeline,
+            browser=browser,
+            ip_path=ip_path,
+            runner_factory=FakeRunner,
+            committer=committer,
+        )
+    candidate = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert candidate.manifest_revision == before.manifest_revision + 2
+    assert candidate.attempts[-1].candidate_render_state is not None
+    scratch = {
+        path: (path.read_bytes(), path.stat().st_mtime_ns)
+        for path in (tmp_path / "state/render/attempts").rglob("*")
+        if path.is_file()
+    }
+    runner_calls = 0
+
+    def forbidden_runner():
+        nonlocal runner_calls
+        runner_calls += 1
+        raise AssertionError("candidate replay must not construct a runner")
+
+    replay = _call_fake_render(
+        tmp_path,
+        request=request,
+        timeline=timeline,
+        browser=browser,
+        ip_path=ip_path,
+        runner_factory=forbidden_runner,
+    )
+
+    assert replay.manifest_revision == before.manifest_revision + 3
+    assert replay.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    assert runner_calls == 0
+    assert {
+        path: (path.read_bytes(), path.stat().st_mtime_ns) for path in scratch
+    } == scratch
+
+
+def test_orchestrator_candidate_replay_rejects_tampered_durable_graph(
+    tmp_path,
+):
+    _, timeline, request, browser, ip_path = _replay_inputs(
+        tmp_path, "candidate-replay-tamper"
+    )
+    crashing = ProductionStateCommitter(
+        tmp_path,
+        crash_injector=_RaiseRenderPhaseOnce(
+            CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_REPLACE,
+            KeyboardInterrupt,
+        ),
+    )
+    with pytest.raises(KeyboardInterrupt):
+        _call_fake_render(
+            tmp_path,
+            request=request,
+            timeline=timeline,
+            browser=browser,
+            ip_path=ip_path,
+            runner_factory=FakeRunner,
+            committer=crashing,
+        )
+    candidate_path = tmp_path / "state/manifest.json"
+    candidate_bytes = candidate_path.read_bytes()
+    candidate = ProductionManifest.model_validate_json(candidate_bytes)
+    pointer = candidate.attempts[-1].candidate_render_state
+    assert pointer is not None
+    state = production.RenderStateSnapshot.model_validate_json(
+        (tmp_path / pointer.path).read_bytes()
+    )
+    (tmp_path / state.output.path).write_bytes(b"tampered-output")
+    runner_calls = 0
+
+    def forbidden_runner():
+        nonlocal runner_calls
+        runner_calls += 1
+        raise AssertionError("tampered replay must not construct a runner")
+
+    with pytest.raises(AiVideoError):
+        _call_fake_render(
+            tmp_path,
+            request=request,
+            timeline=timeline,
+            browser=browser,
+            ip_path=ip_path,
+            runner_factory=forbidden_runner,
+        )
+
+    assert candidate_path.read_bytes() == candidate_bytes
+    assert runner_calls == 0
+
+
+def test_orchestrator_records_plain_version_exception_as_source_failure(tmp_path):
+    before, timeline, request, browser, ip_path = _replay_inputs(
+        tmp_path, "version-exception"
+    )
+
+    class VersionExceptionRunner(FakeRunner):
+        def version(self, *, env):
+            del env
+            raise RuntimeError("version probe failed")
+
+    with pytest.raises(RuntimeError, match="version probe"):
+        _call_fake_render(
+            tmp_path,
+            request=request,
+            timeline=timeline,
+            browser=browser,
+            ip_path=ip_path,
+            runner_factory=VersionExceptionRunner,
+        )
+
+    failed = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert failed.manifest_revision == before.manifest_revision + 2
+    assert failed.attempts[-1].status is StateCommitStatus.FAILED
+    assert failed.attempts[-1].render_phase == "source"
+
+
+@pytest.mark.parametrize("phase", ["source", "lint", "check", "render", "verify"])
+def test_orchestrator_records_every_ordinary_phase_and_never_leaves_running(
+    tmp_path, phase
+):
+    before, timeline, request, browser, ip_path = _replay_inputs(
+        tmp_path, f"ordinary-{phase}"
+    )
+    runner_factory = (
+        (lambda: (_ for _ in ()).throw(OSError("source construction failed")))
+        if phase == "source"
+        else (lambda: FakeRunner(fail_at=phase))
+    )
+    probe = (
+        (lambda fd: (_ for _ in ()).throw(RuntimeError("verify failed")))
+        if phase == "verify"
+        else _fake_probe
+    )
+
+    with pytest.raises(Exception):
+        _render_with_hyperframes(
+            committer=ProductionStateCommitter(tmp_path),
+            begin_request=request,
+            timeline=timeline,
+            asset_sources=make_asset_sources(tmp_path, timeline),
+            allowed_asset_root=tmp_path,
+            runner_factory=runner_factory,
+            browser_path=browser,
+            ip_path=ip_path,
+            expected_version="0.7.103",
+            probe=probe,
+            decoded_frames=_fake_decoded_frames,
+        )
+
+    failed = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert failed.manifest_revision == before.manifest_revision + 2
+    assert failed.attempts[-1].status is StateCommitStatus.FAILED
+    assert failed.attempts[-1].render_phase == phase
+    assert not any(
+        item.status is StateCommitStatus.RUNNING for item in failed.attempts
+    )
+
+
+def test_orchestrator_does_not_retry_outer_failure_after_activation_owns_it(
+    tmp_path,
+):
+    _, timeline, request, browser, ip_path = _replay_inputs(
+        tmp_path, "activation-no-outer-retry"
+    )
+    committer = ProductionStateCommitter(
+        tmp_path,
+        crash_injector=_RaiseRenderPhaseOnce(
+            CommitPhase.BEFORE_RENDER_CANDIDATE_MANIFEST_SERIALIZATION
+        ),
+    )
+    record_calls = 0
+    original_record = committer.record_render_failure
+
+    def tracked_record(failure):
+        nonlocal record_calls
+        record_calls += 1
+        return original_record(failure)
+
+    committer.record_render_failure = tracked_record  # type: ignore[method-assign]
+
+    with pytest.raises(AiVideoError):
+        _call_fake_render(
+            tmp_path,
+            request=request,
+            timeline=timeline,
+            browser=browser,
+            ip_path=ip_path,
+            runner_factory=FakeRunner,
+            committer=committer,
+        )
+
+    terminal = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert terminal.attempts[-1].status is StateCommitStatus.FAILED
+    assert terminal.attempts[-1].render_phase == "activate"
+    assert record_calls == 0
 
 
 class _RaiseRenderPhaseOnce:
@@ -2133,6 +3004,103 @@ def test_activation_final_post_replace_ambiguity_is_outcome_unknown(tmp_path, ph
     assert manifest.manifest_revision == before.manifest_revision + 3
     assert manifest.attempts[-1].status is StateCommitStatus.SUCCEEDED
     assert manifest.active_render_state is not None
+
+
+@pytest.mark.parametrize("authoritative", ["r1", "r2"])
+def test_candidate_ambiguity_accepts_only_exact_r1_or_r2_identity(
+    tmp_path, authoritative
+):
+    before, committer, request = _prepared_activation_request(
+        tmp_path, f"candidate-exact-{authoritative}"
+    )
+    original = committer._write_render_manifest_atomic
+
+    def ambiguous(manifest, *, candidate, on_replace):
+        if candidate and authoritative == "r1":
+            raise OSError("ambiguous before candidate replace")
+        original(manifest, candidate=candidate, on_replace=on_replace)
+        if candidate:
+            raise OSError("ambiguous after candidate replace")
+
+    committer._write_render_manifest_atomic = ambiguous  # type: ignore[method-assign]
+
+    with pytest.raises(AiVideoError) as exc_info:
+        committer.activate_render_state(request)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_COMMIT_FAILED
+    terminal = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    expected_revision = before.manifest_revision + (2 if authoritative == "r1" else 3)
+    assert terminal.manifest_revision == expected_revision
+    assert terminal.attempts[-1].status is StateCommitStatus.FAILED
+
+
+def test_candidate_ambiguity_tampered_r2_is_outcome_unknown_without_overwrite(
+    tmp_path,
+):
+    _, committer, request = _prepared_activation_request(
+        tmp_path, "candidate-tampered-r2"
+    )
+    original = committer._write_render_manifest_atomic
+
+    def tamper_then_raise(manifest, *, candidate, on_replace):
+        original(manifest, candidate=candidate, on_replace=on_replace)
+        if candidate:
+            path = tmp_path / "state/manifest.json"
+            current = ProductionManifest.model_validate_json(path.read_text())
+            attempt = current.attempts[-1].model_copy(
+                update={"candidate_artifacts_hash": "f" * 64}
+            )
+            tampered = current.model_copy(
+                update={"attempts": (*current.attempts[:-1], attempt)}
+            )
+            path.write_text(tampered.model_dump_json(indent=2), encoding="utf-8")
+            raise OSError("candidate identity changed")
+
+    committer._write_render_manifest_atomic = tamper_then_raise  # type: ignore[method-assign]
+
+    with pytest.raises(AiVideoError) as exc_info:
+        committer.activate_render_state(request)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    authoritative = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert authoritative.attempts[-1].status is StateCommitStatus.RUNNING
+    assert authoritative.attempts[-1].candidate_artifacts_hash == "f" * 64
+
+
+def test_candidate_ambiguity_mixed_r2_fails_closed_without_terminal_overwrite(
+    tmp_path,
+):
+    _, committer, request = _prepared_activation_request(
+        tmp_path, "candidate-mixed-r2"
+    )
+    original = committer._write_render_manifest_atomic
+
+    def mix_then_raise(manifest, *, candidate, on_replace):
+        original(manifest, candidate=candidate, on_replace=on_replace)
+        if candidate:
+            path = tmp_path / "state/manifest.json"
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["active_render_state"] = request.next_render_state.model_dump(
+                mode="json"
+            )
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            raise OSError("candidate active identity mixed")
+
+    committer._write_render_manifest_atomic = mix_then_raise  # type: ignore[method-assign]
+
+    with pytest.raises(AiVideoError) as exc_info:
+        committer.activate_render_state(request)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    raw = json.loads((tmp_path / "state/manifest.json").read_text(encoding="utf-8"))
+    assert raw["active_render_state"] == request.next_render_state.model_dump(
+        mode="json"
+    )
+    assert raw["attempts"][-1]["status"] == StateCommitStatus.RUNNING.value
 
 
 def test_recovery_resolves_candidate_prepared_render_by_exact_old_triple_and_preserves_orphans(

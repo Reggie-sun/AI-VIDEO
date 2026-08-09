@@ -253,6 +253,13 @@ def _candidate_artifacts_hash(artifacts: tuple[PreparedArtifact, ...]) -> str:
     pairs = [(item.relative_path.as_posix(), item.file_sha256) for item in artifacts]
     if len({path for path, _ in pairs}) != len(pairs):
         raise _state_invalid("Production state request contains duplicate artifact paths.")
+    return _candidate_artifacts_evidence_hash(artifacts)
+
+
+def _candidate_artifacts_evidence_hash(
+    artifacts: tuple[PreparedArtifact, ...],
+) -> str:
+    pairs = [(item.relative_path.as_posix(), item.file_sha256) for item in artifacts]
     payload = json.dumps(sorted(pairs), separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()
 
@@ -477,6 +484,12 @@ class ProductionStateCommitter:
     def begin_render_attempt(
         self, request: BeginRenderAttemptRequest
     ) -> ProductionManifest:
+        manifest, _ = self._begin_render_attempt_with_status(request)
+        return manifest
+
+    def _begin_render_attempt_with_status(
+        self, request: BeginRenderAttemptRequest
+    ) -> tuple[ProductionManifest, bool]:
         with self._exclusive_lock():
             manifest = self._read_manifest()
             selection = request.renderer_selection
@@ -490,7 +503,7 @@ class ProductionStateCommitter:
             if existing is not None:
                 if not self._same_render_begin(existing, request):
                     raise _state_invalid("Render attempt ID was already used by another request.")
-                return manifest
+                return manifest, False
             if manifest.manifest_revision != request.expected_manifest_revision:
                 raise _state_invalid("Production Manifest revision is stale.")
 
@@ -526,7 +539,103 @@ class ProductionStateCommitter:
                 },
             )
             self._write_manifest_atomic(begun)
-            return self._read_manifest()
+            return self._read_manifest(), True
+
+    def _replay_render_attempt(
+        self,
+        request: BeginRenderAttemptRequest,
+        manifest: ProductionManifest,
+    ) -> ProductionManifest:
+        attempt = next(
+            (
+                item
+                for item in manifest.attempts
+                if item.attempt_id == request.renderer_selection.attempt_id
+            ),
+            None,
+        )
+        if attempt is None or not self._same_render_begin(attempt, request):
+            raise _state_invalid("Render replay does not match its persisted attempt.")
+        if not manifest.attempts or manifest.attempts[-1] != attempt:
+            raise _state_invalid("Render replay attempt is no longer terminal state.")
+        if attempt.status is StateCommitStatus.FAILED:
+            if manifest.active_render_state != attempt.base_render_state:
+                raise _state_invalid("Failed render replay base state changed.")
+            return manifest
+        if attempt.status is StateCommitStatus.SUCCEEDED or (
+            attempt.status is StateCommitStatus.RUNNING
+            and attempt.candidate_render_state is not None
+            and attempt.render_phase == "activate"
+        ):
+            activation = self._reconstruct_render_activation_request(
+                manifest, attempt
+            )
+            return self.activate_render_state(activation)
+        raise _state_invalid(
+            "Render replay requires explicit recovery before execution can continue."
+        )
+
+    def _reconstruct_render_activation_request(
+        self,
+        manifest: ProductionManifest,
+        attempt: StateCommitAttempt,
+    ) -> ActivateRenderStateRequest:
+        pointer = attempt.candidate_render_state
+        if (
+            pointer is None
+            or attempt.candidate_project != attempt.base_project
+            or attempt.candidate_registry != attempt.base_registry
+        ):
+            raise _state_invalid("Render replay candidate identity is incomplete.")
+        if attempt.status is StateCommitStatus.SUCCEEDED:
+            if manifest.active_render_state != pointer:
+                raise _state_invalid("Succeeded render replay is not the active state.")
+        elif manifest.active_render_state != attempt.base_render_state:
+            raise _state_invalid("Candidate render replay no longer has its base state.")
+        state = load_verified_render_state(
+            self._project_root,
+            pointer,
+            project=attempt.base_project,
+            registry=attempt.base_registry,
+        )
+        paths = {
+            state.timeline.path,
+            state.source_bundle.index.path,
+            *(item.path for item in state.source_bundle.assets),
+            state.source_receipt.path,
+            state.render_receipt.path,
+            state.output.path,
+            pointer.path,
+        }
+        artifacts = tuple(
+            PreparedArtifact(
+                relative_path=path,
+                payload=snapshot.data,
+                file_sha256=snapshot.file_sha256,
+            )
+            for path in sorted(paths)
+            for snapshot in (
+                _read_regular_file_nofollow(
+                    self._project_root / path,
+                    contained_by=self._project_root,
+                ),
+            )
+        )
+        if _candidate_artifacts_hash(artifacts) != attempt.candidate_artifacts_hash:
+            raise _state_invalid("Render replay artifact identity is invalid.")
+        selection = attempt.renderer_selection
+        if selection is None:  # pragma: no cover - enforced by StateCommitAttempt
+            raise _state_invalid("Render replay selection identity is missing.")
+        return ActivateRenderStateRequest(
+            attempt_id=attempt.attempt_id,
+            expected_manifest_revision=attempt.base_manifest_revision + 1,
+            current_project=attempt.base_project,
+            current_registry=attempt.base_registry,
+            base_render_state=attempt.base_render_state,
+            renderer_selection=selection,
+            artifacts=artifacts,
+            next_render_state=pointer,
+        )
 
     def record_render_failure(
         self, request: RecordRenderFailureRequest
@@ -608,7 +717,7 @@ class ProductionStateCommitter:
         final_replaced = False
         with self._exclusive_lock():
             manifest = self._read_manifest()
-            candidate_hash = _candidate_artifacts_hash(request.artifacts)
+            candidate_hash = _candidate_artifacts_evidence_hash(request.artifacts)
             existing = next(
                 (item for item in manifest.attempts if item.attempt_id == request.attempt_id),
                 None,
@@ -618,7 +727,7 @@ class ProductionStateCommitter:
             ):
                 raise _state_invalid("Render activation does not match its begun attempt.")
             if existing.status is StateCommitStatus.SUCCEEDED:
-                self._validate_render_artifacts(request)
+                self._verify_durable_render_graph(request)
                 if (
                     manifest.active_project != request.current_project
                     or manifest.active_registry != request.current_registry
@@ -670,6 +779,7 @@ class ProductionStateCommitter:
             )
             candidate_manifest: ProductionManifest | None = None
             try:
+                _candidate_artifacts_hash(request.artifacts)
                 state = self._validate_render_artifacts(request)
                 if (
                     state.project != manifest.active_project
@@ -678,18 +788,19 @@ class ProductionStateCommitter:
                     raise _state_invalid(
                         "Render activation artifact provenance changed."
                     )
-                for artifact in request.artifacts:
-                    self._write_render_immutable_artifact(
-                        artifact, attempt_id=request.attempt_id
-                    )
-                    snapshot = _read_regular_file_nofollow(
-                        self._project_root / artifact.relative_path,
-                        contained_by=self._project_root,
-                    )
-                    if snapshot.file_sha256 != artifact.file_sha256:
-                        raise _state_commit_failed(
-                            "Immutable render artifact verification failed."
+                if existing.candidate_render_state is None:
+                    for artifact in request.artifacts:
+                        self._write_render_immutable_artifact(
+                            artifact, attempt_id=request.attempt_id
                         )
+                        snapshot = _read_regular_file_nofollow(
+                            self._project_root / artifact.relative_path,
+                            contained_by=self._project_root,
+                        )
+                        if snapshot.file_sha256 != artifact.file_sha256:
+                            raise _state_commit_failed(
+                                "Immutable render artifact verification failed."
+                            )
                 self._verify_durable_render_graph(request)
 
                 if existing.candidate_render_state is None:
@@ -1197,10 +1308,16 @@ class ProductionStateCommitter:
         if len(index.payload) != bundle.index.size_bytes:
             raise _state_invalid("Render source index size is invalid.")
         binding_mime: dict[Path, str] = {}
+        pointer_by_path = {item.path: item for item in bundle.assets}
         for binding in source.asset_bindings:
             previous = binding_mime.get(binding.materialized_path)
             if previous is not None and previous != binding.asset_mime_type:
                 raise _state_invalid("Render source binding MIME types conflict.")
+            pointer = pointer_by_path.get(binding.materialized_path)
+            if pointer is None or binding.asset_sha256 != pointer.file_sha256:
+                raise _state_invalid(
+                    "Render source binding hash does not match its bundle pointer."
+                )
             binding_mime[binding.materialized_path] = binding.asset_mime_type
         if set(binding_mime) != {item.path for item in bundle.assets}:
             raise _state_invalid("Render source bindings do not match bundle assets.")

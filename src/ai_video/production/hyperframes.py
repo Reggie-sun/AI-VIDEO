@@ -886,7 +886,9 @@ def _render_with_hyperframes(
     probe: Callable[[int], dict] | None = None,
     decoded_frames: Callable[[int], str] | None = None,
 ) -> ProductionManifest:
-    manifest = committer.begin_render_attempt(begin_request)
+    manifest, fresh = committer._begin_render_attempt_with_status(begin_request)
+    if not fresh:
+        return committer._replay_render_attempt(begin_request, manifest)
     try:
         selection = begin_request.renderer_selection
         paths = committer.render_attempt_paths(selection.attempt_id)
