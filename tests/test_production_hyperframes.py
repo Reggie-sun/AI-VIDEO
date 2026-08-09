@@ -1768,7 +1768,7 @@ def test_live_committed_fixture_render_state_lifecycle(tmp_path):
                 "-i",
                 str(path),
                 "-vf",
-                f"select=eq(n\\,{frame}),crop=1:1:160:90,format=rgb24",
+                    f"select=eq(n\\,{frame}),format=rgb24,crop=1:1:160:90",
                 "-frames:v",
                 "1",
                 "-f",
