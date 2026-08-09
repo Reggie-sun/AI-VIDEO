@@ -345,7 +345,7 @@ Do not rely on HyperFrames auto-download. Every live non-help/non-version `docto
 
 This is the Renderer Gate and must pass **before Task 1 edits**. It uses a disposable hand-authored two-PNG CUT composition, not the future Task 3 committed fixture. First verify `unshare --user --map-root-user --net --pid --fork --mount-proc`, `ip`, `strace`, `setsid`, `curl`, `ffprobe`, `ffmpeg`, `sha256sum` and process-group cleanup are available; otherwise stop. The exact published `0.7.103` source/CLI help must confirm `doctor` exists before invoking it.
 
-Create a fresh `P3_GATE_DIR=$(mktemp -d)` outside the repository, decode the two reviewed `320x180` solid red/blue PNG literals from the verified CSS CUT spike, verify both PNGs, and hand-author a non-terminating-duration `10`-frame source at `24fps` with a CUT at frame `5`. The final serialized animation duration is `0.416666667s`. Its internal capture-safe boundary is serialized as `44.999999964%`, which maps to `0.18749999999999999988s`: strictly after frame `4` capture time and before frame `5` capture time. The root carries boolean `data-no-timeline`: in exact HyperFrames `0.7.103` this skips timeline polling, while the runtime still discovers and seeks local CSS `@keyframes` through `document.getAnimations()`. Therefore this gate uses deterministic CSS animations with duplicated capture-safe boundary keyframes; it is neither an empty/fake P3 timeline nor a one-shot static substitute. Record all input hashes before the namespace:
+Create a fresh `P3_GATE_DIR=$(mktemp -d)` outside the repository, decode the two reviewed `320x180` solid red/blue PNG literals from the verified CSS CUT spike, verify both PNGs, and hand-author a non-terminating-duration `10`-frame source at `24fps` with a CUT at frame `5`. The final serialized animation duration is `0.416666667s`. Its internal capture-safe boundary is serialized as `44.999999964%`, which maps to `0.18749999999999999988s`: strictly after frame `4` capture time and before frame `5` capture time. The root alone carries `data-start="0"` plus the final `data-duration`; animated `.clip` elements omit runtime-sensitive `data-start`/`data-duration` while retaining exact frame/sample metadata. The root also carries boolean `data-no-timeline`: in exact HyperFrames `0.7.103` this skips timeline polling, while the runtime still discovers and seeks local CSS `@keyframes` through `document.getAnimations()`. Therefore this gate uses deterministic CSS animations with duplicated capture-safe boundary keyframes; it is neither an empty/fake P3 timeline nor a one-shot static substitute. Record all input hashes before the namespace:
 
 ```bash
 set -euo pipefail
@@ -368,8 +368,8 @@ printf '%s\n' \
   '@keyframes p3-blue{0%,44.999999964%{opacity:0}44.999999964%,100%{opacity:1}}' \
   '</style></head>' \
   '<body><div id="stage" data-no-timeline data-composition-id="p3-gate" data-timeline-fingerprint="0000000000000000000000000000000000000000000000000000000000000000" data-width="320" data-height="180" data-fps="24" data-start="0" data-duration="0.416666667">' \
-  '<div class="clip clip-red" data-shot-id="red-shot" data-start-frame="0" data-duration-frames="5" data-transition-kind="cut" data-transition-frames="0"><img src="assets/red.png" alt=""></div>' \
-  '<div class="clip clip-blue" data-shot-id="blue-shot" data-start-frame="5" data-duration-frames="5" data-transition-kind="cut" data-transition-frames="0"><img src="assets/blue.png" alt=""></div>' \
+  '<div class="clip clip-red" data-shot-id="red-shot" data-start-frame="0" data-duration-frames="5" data-start-sample="0" data-duration-samples="10000" data-transition-kind="cut" data-transition-frames="0"><img src="assets/red.png" alt=""></div>' \
+  '<div class="clip clip-blue" data-shot-id="blue-shot" data-start-frame="5" data-duration-frames="5" data-start-sample="10000" data-duration-samples="10000" data-transition-kind="cut" data-transition-frames="0"><img src="assets/blue.png" alt=""></div>' \
   '</div></body></html>' >"$P3_GATE_SOURCE/index.html"
 for raster in red blue; do
   test "$(od -An -tx1 -N8 "$P3_GATE_SOURCE/assets/$raster.png" | tr -d ' \n')" = "89504e470d0a1a0a"
@@ -379,9 +379,42 @@ test "$(sha256sum "$P3_GATE_SOURCE/assets/red.png" | cut -d' ' -f1)" = "1ac67c3a
 test "$(sha256sum "$P3_GATE_SOURCE/assets/blue.png" | cut -d' ' -f1)" = "a99284a70ff9a9ab8aec0eed52c3b9bf7a243628820814d0e6bca45445ce2e3f"
 sha256sum "$P3_GATE_SOURCE/index.html" "$P3_GATE_SOURCE/assets/red.png" \
   "$P3_GATE_SOURCE/assets/blue.png" >"$P3_GATE_EVIDENCE/input.before.sha256"
-python - <<'PY'
+python - "$P3_GATE_SOURCE/index.html" <<'PY'
 from decimal import Decimal
+from html.parser import HTMLParser
+from pathlib import Path
 import math
+import sys
+
+
+class SourceShapeParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.stage = None
+        self.clips = []
+
+    def handle_starttag(self, tag, attrs) -> None:
+        attributes = dict(attrs)
+        if tag == "div" and attributes.get("id") == "stage":
+            self.stage = attributes
+        if tag == "div" and "clip" in attributes.get("class", "").split():
+            self.clips.append(attributes)
+
+
+shape = SourceShapeParser()
+shape.feed(Path(sys.argv[1]).read_text(encoding="utf-8"))
+assert shape.stage is not None
+assert shape.stage["data-start"] == "0"
+assert shape.stage["data-duration"] == "0.416666667"
+assert len(shape.clips) == 2
+assert all("data-start" not in attrs and "data-duration" not in attrs for attrs in shape.clips)
+assert [
+    tuple(attrs[key] for key in (
+        "data-start-frame", "data-duration-frames",
+        "data-start-sample", "data-duration-samples",
+    ))
+    for attrs in shape.clips
+] == [("0", "5", "0", "10000"), ("5", "5", "10000", "10000")]
 
 duration = Decimal("0.416666667")
 offset = Decimal("44.999999964")
@@ -1339,6 +1372,20 @@ def test_source_is_materialized_only_from_timeline_and_bound_assets(tmp_path):
     ).file_sha256
     html = result.index_path.read_text(encoding="utf-8")
     assert '<div id="stage" data-no-timeline ' in html
+    parsed = _parse_source_document(html)
+    assert parsed.stage_attributes["data-start"] == "0"
+    assert parsed.stage_attributes["data-duration"] == _seconds(
+        timeline.total_frames,
+        timeline.delivery_profile.fps,
+    )
+    assert len(parsed.clip_attributes) == len(timeline.visual_spans)
+    for attributes, span in zip(parsed.clip_attributes, timeline.visual_spans, strict=True):
+        assert "data-start" not in attributes
+        assert "data-duration" not in attributes
+        assert attributes["data-start-frame"] == str(span.start_frame)
+        assert attributes["data-duration-frames"] == str(span.duration_frames)
+        assert attributes["data-start-sample"] == str(span.start_sample)
+        assert attributes["data-duration-samples"] == str(span.duration_samples)
     assert html.index('data-shot-id="shot-2"') < html.index('data-shot-id="shot-1"')
     assert 'data-asset-id="image-hero-1"' in html
     assert html.count('animation-duration:') == len(timeline.visual_spans)
@@ -1476,6 +1523,26 @@ def test_audit_parses_every_media_url_and_requires_exact_declared_set(tmp_path):
 
 
 @pytest.mark.parametrize(
+    "runtime_time_attribute",
+    ['data-start="0.208333333"', 'data-duration="0.208333333"'],
+)
+def test_source_audit_rejects_clip_local_second_offsets(tmp_path, runtime_time_attribute):
+    timeline = make_resolved_timeline()
+    source = write_source(
+        tmp_path,
+        timeline=timeline,
+        extra_clip_attribute=runtime_time_attribute,
+    )
+    with pytest.raises(AiVideoError) as exc:
+        audit_hyperframes_source(
+            source,
+            expected_assets=(),
+            expected_timeline=timeline,
+        )
+    assert exc.value.code is ErrorCode.RENDERER_SOURCE_INVALID
+
+
+@pytest.mark.parametrize(
     "forbidden",
     ["https://", "http://", "//cdn.", "fetch(", "XMLHttpRequest", "WebSocket(",
      "Math.random(", "Date.now(", "new Date(", "performance.now("],
@@ -1492,7 +1559,7 @@ def test_source_audit_rejects_network_and_wall_clock_inputs(tmp_path, forbidden)
     assert exc.value.code is ErrorCode.RENDERER_SOURCE_INVALID
 ```
 
-Also assert source audit rejects absolute paths, `..`, URI schemes, protocol-relative URLs, `data:`/`blob:`, `srcset` extras, CSS `url()`/`@import`, external or inline script, external stylesheet/font, undeclared/missing files, symlink assets, asset hash mismatch, MIME/magic/extension mismatch, SVG/HTML/CSS payloads, missing composition/timeline identity, missing/non-boolean `data-no-timeline`, and a source asset binding not present in the timeline. CSS audit must reject missing/extra/duplicate animation names, a layer bound to another animation, non-total/mismatched final serialized duration, timing/fill/play-state drift, missing/extra/reordered keyframe stops, a non-duplicated capture-safe CUT boundary, a Decimal mapped time or exact HyperFrames `quantizeTimeToFrame -> milliseconds -> animation.currentTime` IEEE-double progress that is not strictly between adjacent captures, non-finite/collapsed intermediates, or any opacity differing from exact hidden `0`/target `opacity_milli`. Assertions inspect the parsed DOM, CSS URL set, animation declarations and keyframe AST, not substring presence alone. `data-no-timeline` specifically selects CSS-animation-driven static-raster composition while P3's non-empty integer `ResolvedTimeline` remains the sole Shot order/timing owner; no JS, GSAP, runtime clock or network is allowed.
+Also assert source audit rejects absolute paths, `..`, URI schemes, protocol-relative URLs, `data:`/`blob:`, `srcset` extras, CSS `url()`/`@import`, external or inline script, external stylesheet/font, undeclared/missing files, symlink assets, asset hash mismatch, MIME/magic/extension mismatch, SVG/HTML/CSS payloads, missing composition/timeline identity, missing/non-boolean `data-no-timeline`, any animated `.clip` carrying runtime-sensitive `data-start` or `data-duration`, mismatched clip frame/sample metadata, and a source asset binding not present in the timeline. The root must retain exact `data-start="0"` and the one final serialized `data-duration`. CSS audit must reject missing/extra/duplicate animation names, a layer bound to another animation, non-total/mismatched final serialized duration, timing/fill/play-state drift, missing/extra/reordered keyframe stops, a non-duplicated capture-safe CUT boundary, a Decimal mapped time or exact HyperFrames `quantizeTimeToFrame -> milliseconds -> animation.currentTime` IEEE-double progress that is not strictly between adjacent captures, non-finite/collapsed intermediates, or any opacity differing from exact hidden `0`/target `opacity_milli`. Assertions inspect the parsed DOM, root/clip attributes, CSS URL set, animation declarations and keyframe AST, not substring presence alone. `data-no-timeline` specifically selects CSS-animation-driven static-raster composition while P3's non-empty integer `ResolvedTimeline` remains the sole Shot order/timing owner; no JS, GSAP, runtime clock or network is allowed.
 
 - [ ] **Step 2: Run source RED**
 
@@ -1620,8 +1687,6 @@ def materialize_hyperframes_source(
                         f' data-asset-id="{escape(span.asset_id)}"'
                         f' data-asset-role="{escape(span.asset_role)}"'
                         f' data-asset-sha256="{span.asset_sha256}"'
-                        f' data-start="{_seconds(span.start_frame, fps)}"'
-                        f' data-duration="{_seconds(span.duration_frames, fps)}"'
                         f' data-start-frame="{span.start_frame}"'
                         f' data-duration-frames="{span.duration_frames}"'
                         f' data-start-sample="{span.start_sample}"'
@@ -1705,6 +1770,32 @@ def audit_hyperframes_source(
     parsed = _parse_source_document(source)  # stdlib HTMLParser + explicit CSS url()/@import scanner
     if not parsed.no_timeline or not parsed.composition_id or not parsed.timeline_fingerprint:
         raise _source_invalid("HyperFrames source is missing composition identity.")
+    expected_duration = _seconds(
+        expected_timeline.total_frames,
+        expected_timeline.delivery_profile.fps,
+    )
+    if (
+        parsed.stage_attributes.get("data-start") != "0"
+        or parsed.stage_attributes.get("data-duration") != expected_duration
+    ):
+        raise _source_invalid("HyperFrames root timing does not match the full timeline.")
+    if len(parsed.clip_attributes) != len(expected_timeline.visual_spans):
+        raise _source_invalid("HyperFrames clips do not match the integer timeline.")
+    for attributes, span in zip(
+        parsed.clip_attributes,
+        expected_timeline.visual_spans,
+        strict=True,
+    ):
+        if "data-start" in attributes or "data-duration" in attributes:
+            raise _source_invalid("HyperFrames clips must not carry local second offsets.")
+        expected_metadata = {
+            "data-start-frame": str(span.start_frame),
+            "data-duration-frames": str(span.duration_frames),
+            "data-start-sample": str(span.start_sample),
+            "data-duration-samples": str(span.duration_samples),
+        }
+        if any(attributes.get(key) != value for key, value in expected_metadata.items()):
+            raise _source_invalid("HyperFrames clip frame/sample metadata does not match the timeline.")
     expected_animations = _expected_animation_model(expected_timeline)
     if parsed.animations != expected_animations:
         raise _source_invalid("CSS animations/keyframes do not match integer timeline intervals.")
@@ -1879,7 +1970,7 @@ def _css_transform(transform: FixedTransform) -> str:
     )
 ```
 
-Import `Mapping`, `dataclass`, `Decimal`, `ROUND_HALF_EVEN`, `hashlib`, `math`, `escape` from `html`, `HTMLParser`, `urlsplit`, `re`, the shared no-follow read/create/list primitives, and the named production models. `_capture_safe_boundary_percent()` uses the **final serialized** duration string and places every internal frame boundary `k` at target time `(k - 0.5) / fps`, quantized to a canonical 12-decimal CSS percentage; `0`/`total_frames` remain exact `0%`/`100%`. It first requires the emitted Decimal mapped time to remain strictly between adjacent capture times. It then mirrors the full HyperFrames `0.7.103` seek path exactly. For each adjacent frame index it computes `raw_seconds_f=frame_index/fps`, `quantized_seconds_f=math.floor(raw_seconds_f*fps + 1e-9)/fps`, `time_ms_f=quantized_seconds_f*1000.0`, and `progress_f=time_ms_f/(float(serialized_duration)*1000.0)`; CSS offset progress is `float(rendered)/100.0`. This order is anchored in installed published source: `dist/cli.js:58585-58590` defines `quantizeTimeToFrame`, the render `seekToFrame` applies it at `:68053`, and the CSS adapter derives milliseconds then assigns `animation.currentTime` at `:147444-147469`. Every raw-seconds, frame-position, quantized-seconds, milliseconds and progress intermediate must be finite, duration milliseconds positive, and adjacent quantized progress non-collapsed with `previous_progress_f < offset_progress_f < current_progress_f`; failure is typed `RENDERER_SOURCE_INVALID` before render. No wall clock enters CSS. Every layer has one full-timeline-duration paused `step-end` animation and a full-hash-derived unique name. Duplicate capture-safe start/end offsets make the target opacity visible at captures `[start_frame,end_frame)`: the state transition occurs strictly between adjacent captures, and duplicate declarations still make the later target/hidden value win at the boundary itself. First, middle, last and full-duration cases use the same helper, including non-terminating duration/ratio tests such as `10` frames at `24fps`; the prior `99_998_442_844_803` and `571_645_132_898_494` collapses plus quantized-seek counterexamples `233_828_343_456_133` and `5_474_664_941_385_873` must all typed-fail. `_parse_source_document()` must enumerate every URL-bearing `src`, `href`, `poster`, `srcset`, inline-style `url()` and style-block `url()`/`@import`; it does not accept a substring-only audit. It must also require one boolean `data-no-timeline` attribute on the root `#stage` element—present with no value, not `data-no-timeline="false"` or another fake value—and reconstruct the exact expected animation/keyframe model from the integer timeline/bindings using the same final serialized duration and full HyperFrames quantized millisecond-seek guard. `_validated_raster_suffix()` validates magic bytes, exact MIME and suffix for PNG/JPEG/WebP from the no-follow snapshot before and after copy. `_source_bundle_sha256()` hashes stable JSON of the exact ordered `(relative_path, file_sha256)` set including `index.html`, using only same-FD snapshots. `_list_regular_files_nofollow()` rejects symlink entries/directories instead of traversing them. After Task 4 introduces `RendererAttemptError`, `_source_invalid()` returns a non-retryable instance with `code=ErrorCode.RENDERER_SOURCE_INVALID` and `phase="source"`.
+Import `Mapping`, `dataclass`, `Decimal`, `ROUND_HALF_EVEN`, `hashlib`, `math`, `escape` from `html`, `HTMLParser`, `urlsplit`, `re`, the shared no-follow read/create/list primitives, and the named production models. `_capture_safe_boundary_percent()` uses the **final serialized** duration string and places every internal frame boundary `k` at target time `(k - 0.5) / fps`, quantized to a canonical 12-decimal CSS percentage; `0`/`total_frames` remain exact `0%`/`100%`. It first requires the emitted Decimal mapped time to remain strictly between adjacent capture times. It then mirrors the full HyperFrames `0.7.103` seek path exactly. For each adjacent frame index it computes `raw_seconds_f=frame_index/fps`, `quantized_seconds_f=math.floor(raw_seconds_f*fps + 1e-9)/fps`, `time_ms_f=quantized_seconds_f*1000.0`, and `progress_f=time_ms_f/(float(serialized_duration)*1000.0)`; CSS offset progress is `float(rendered)/100.0`. This order is anchored in installed published source: `dist/cli.js:58585-58590` defines `quantizeTimeToFrame`, the render `seekToFrame` applies it at `:68053`, and the CSS adapter derives milliseconds then assigns `animation.currentTime` at `:147444-147469`. Every raw-seconds, frame-position, quantized-seconds, milliseconds and progress intermediate must be finite, duration milliseconds positive, and adjacent quantized progress non-collapsed with `previous_progress_f < offset_progress_f < current_progress_f`; failure is typed `RENDERER_SOURCE_INVALID` before render. No wall clock enters CSS. Every layer has one full-timeline-duration paused `step-end` animation and a full-hash-derived unique name. Animated `.clip` elements must not carry `data-start` or `data-duration`: HyperFrames `resolveStartSeconds` subtracts element-local `data-start` before assigning CSS animation time, which would shift P3's global full-duration keyframes and break later Shot visibility. Root `#stage` remains the sole runtime timing carrier with exact `data-start="0"` and final `data-duration`; clips retain only exact integer `data-start-frame`, `data-duration-frames`, `data-start-sample` and `data-duration-samples` P3 metadata. Duplicate capture-safe start/end offsets make the target opacity visible at captures `[start_frame,end_frame)`: the state transition occurs strictly between adjacent captures, and duplicate declarations still make the later target/hidden value win at the boundary itself. First, middle, last and full-duration cases use the same helper, including non-terminating duration/ratio tests such as `10` frames at `24fps`; the prior `99_998_442_844_803` and `571_645_132_898_494` collapses plus quantized-seek counterexamples `233_828_343_456_133` and `5_474_664_941_385_873` must all typed-fail. `_parse_source_document()` must enumerate every URL-bearing `src`, `href`, `poster`, `srcset`, inline-style `url()` and style-block `url()`/`@import`, plus exact root and ordered clip attributes; it does not accept a substring-only audit. It must also require one boolean `data-no-timeline` attribute on the root `#stage` element—present with no value, not `data-no-timeline="false"` or another fake value—and reconstruct the exact expected animation/keyframe model from the integer timeline/bindings using the same final serialized duration and full HyperFrames quantized millisecond-seek guard. `_validated_raster_suffix()` validates magic bytes, exact MIME and suffix for PNG/JPEG/WebP from the no-follow snapshot before and after copy. `_source_bundle_sha256()` hashes stable JSON of the exact ordered `(relative_path, file_sha256)` set including `index.html`, using only same-FD snapshots. `_list_regular_files_nofollow()` rejects symlink entries/directories instead of traversing them. After Task 4 introduces `RendererAttemptError`, `_source_invalid()` returns a non-retryable instance with `code=ErrorCode.RENDERER_SOURCE_INVALID` and `phase="source"`.
 
 These seekable CSS animations are only the HyperFrames transport for deterministic layer visibility/CUT semantics already owned by `ResolvedTimeline`; they do not authorize creative motion, easing, interpolation, JS/GSAP or any new `motion_directives` behavior.
 
@@ -1887,7 +1978,7 @@ Materialization rules:
 
 - Task 3 is pure and has no dependency on the not-yet-created Task 5 `RenderAttemptPaths`. Its caller supplies both a new `staging_root` and an existing `allowed_staging_parent`; `_validate_new_contained_root()` rejects symlink/escape/existing targets and validates every planned child target **before** any mkdir/copy. Task 5 later adds the canonical integration call with `render_attempt_paths()`.
 - Copy each timeline asset to `assets/<full-asset-sha256>.<png|jpg|webp>` after verifying registry SHA-256 plus magic/MIME/extension; raw `asset_id` never contributes to a filesystem path. Do not accept SVG, HTML, CSS or any other payload.
-- Generate `index.html` in exact `timeline.visual_spans` order. Serialize the total animation/root duration exactly once with `_seconds(total_frames, fps)`; derive every internal CSS boundary from that final string with `_capture_safe_boundary_percent()`. Per-layer data attributes may still serialize integer-derived seconds with the same stable formatter, but must not become CSS timing truth.
+- Generate `index.html` in exact `timeline.visual_spans` order. Serialize the total animation/root duration exactly once with `_seconds(total_frames, fps)`; derive every internal CSS boundary from that final string with `_capture_safe_boundary_percent()`. Only root `#stage` serializes runtime seconds (`data-start="0"`, final `data-duration`). Animated `.clip` elements must omit `data-start` and `data-duration` entirely so HyperFrames cannot apply element-local time subtraction; they retain exact integer frame/sample metadata only.
 - Embed timeline fingerprint, renderer version and asset ID/role/hash as data attributes. Trim is not serialized because only `0`/`None` is accepted. Apply fixed transform, `transform-origin: 0 0` and z-order as deterministic inline CSS; apply exact target opacity only through the audited per-layer CSS keyframes so hidden intervals are always `0`. Source snapshot tests assert the exact CSS and the decoded-frame integration proof exercises non-default transform/opacity/z-order across a real CUT. Do not claim or serialize motion directives.
 - Use only local HTML/CSS/HyperFrames runtime features proven by the live spike. Do not reference CDN GSAP, Google Fonts, remote media, `.env`, current time or randomness.
 - Write source once into the caller-supplied staging root, hash it, run `audit_hyperframes_source()`, and return the result. No source rewrite is allowed after hashing.
@@ -1896,7 +1987,7 @@ Keep these as straight-line materialization/audit functions; no template discove
 
 - [ ] **Step 4: Seal the deterministic fixture**
 
-Commit a human-readable non-empty two-shot CUT `timeline.json` using `10` total frames at `24fps` with the CUT at frame `5`, its exact expected CSS-animation-driven `index.html` with root boolean `data-no-timeline`, and the reviewed red/blue local PNGs named by their full hashes. The unit test must regenerate source under its caller-supplied contained `tmp_path`, assert exact text/hash equality, assert final duration `0.416666667s`, exact duplicated capture-safe boundary `44.999999964%`, Decimal mapped-time and exact `quantizeTimeToFrame -> milliseconds -> currentTime` IEEE-double progress inequalities around frame `5`, and both PNG magic/MIME/hash. Fixture files contain only local relative raster assets and no generated binary output.
+Commit a human-readable non-empty two-shot CUT `timeline.json` using `10` total frames at `24fps` with the CUT at frame `5`, its exact expected CSS-animation-driven `index.html` with root boolean `data-no-timeline`, root-only `data-start="0"`/final `data-duration`, no `.clip` `data-start`/`data-duration`, exact clip frame/sample metadata, and the reviewed red/blue local PNGs named by their full hashes. The unit test must regenerate source under its caller-supplied contained `tmp_path`, assert exact text/hash/source-shape equality, assert final duration `0.416666667s`, exact duplicated capture-safe boundary `44.999999964%`, Decimal mapped-time and exact `quantizeTimeToFrame -> milliseconds -> currentTime` IEEE-double progress inequalities around frame `5`, and both PNG magic/MIME/hash. Fixture files contain only local relative raster assets and no generated binary output.
 
 - [ ] **Step 5: Run GREEN and commit**
 
@@ -2929,7 +3020,7 @@ Expected: selection durably fixes timeline/project/registry provenance before an
 
 - [ ] **Step 1: Confirm Task 0 gate evidence still matches the lock**
 
-Verify the recorded Task 0 compatibility proof names exact `hyperframes@0.7.103`, the accepted browser executable/revision, boolean `data-no-timeline` plus capture-safe CSS CUT keyframes, successful version, zero-exit parsed JSON doctor/lint/check, preview/two renders using the `--json` dispatcher sentinel, the non-terminating `10@24` duration with frame-4/frame-5 CUT samples and total frame count `10`, source hashes, full `strace -s 65535 -v` process/network/sendmmsg audit, ffprobe metadata and equal framemd5. Preview/render stdout remains `.log` evidence, not assumed JSON. Recheck `package-lock.json` integrity and browser `--version`. This is a drift check; the Renderer Gate was already required before Task 1 and must not be deferred here.
+Verify the recorded Task 0 compatibility proof names exact `hyperframes@0.7.103`, the accepted browser executable/revision, boolean `data-no-timeline`, root-only runtime timing, clip-only integer frame/sample metadata and capture-safe CSS CUT keyframes, successful version, zero-exit parsed JSON doctor/lint/check, preview/two renders using the `--json` dispatcher sentinel, the non-terminating `10@24` duration with frame-4/frame-5 CUT samples and total frame count `10`, source hashes, full `strace -s 65535 -v` process/network/sendmmsg audit, ffprobe metadata and equal framemd5. Preview/render stdout remains `.log` evidence, not assumed JSON. Recheck `package-lock.json` integrity and browser `--version`. This is a drift check; the Renderer Gate was already required before Task 1 and must not be deferred here.
 
 - [ ] **Step 2: Run the committed-fixture production integration proof**
 
@@ -3050,7 +3141,7 @@ assert_loopback_only(lines)
 PY
 ```
 
-The test copies the committed visually distinct red/blue PNG fixture into two independent disposable projects, builds the same real two-`STATIC_IMAGE`/CUT-only `10`-frame timeline at `24fps` with the CUT at frame `5`, and invokes public `render_with_hyperframes()` once per project. Each call constructs its own private isolated runner and completes `begin_render_attempt -> version -> doctor --json -> source -> lint --json -> check --json -> render --json -> held-FD verify -> activate_render_state`; the trace audit requires exactly two version/doctor/lint/check/render executable argv shapes. Both materializations carry root boolean `data-no-timeline`, final duration `0.416666667s` and exact capture-safe CSS animations. Each output must have measured frame count `10`; representative center pixels at frame `4` must be red-dominant, frame `5` blue-dominant, and the samples must differ, proving `[start,end)` CUT ownership for a non-terminating duration/ratio. A constant render or permanently visible top layer fails, and the two independent outputs must have equal framemd5. For both projects the test also asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, full decoded-frame evidence, no audio, exact durable output bytes equal the held verification-snapshot bytes, scratch paths absent from receipts, and unchanged Legacy state. Unit tests already assert every non-version runner argv contains `--json`, exact subprocess `/proc/self/fd` argv/`pass_fds` plus namespace argv; this harness hashes committed source inputs before/after and parses full `-s 65535 -v` process/network traces including every `sendmmsg` destination with the same exact fail-closed rule from Task 0. `127.0.0.53`, pointer-only/ellipsis output, unsupported families, a mixed loopback+external `sendmmsg`, any undecodable sockaddr and any other external attempt fail closed. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
+The test copies the committed visually distinct red/blue PNG fixture into two independent disposable projects, builds the same real two-`STATIC_IMAGE`/CUT-only `10`-frame timeline at `24fps` with the CUT at frame `5`, and invokes public `render_with_hyperframes()` once per project. Each call constructs its own private isolated runner and completes `begin_render_attempt -> version -> doctor --json -> source -> lint --json -> check --json -> render --json -> held-FD verify -> activate_render_state`; the trace audit requires exactly two version/doctor/lint/check/render executable argv shapes. Both materializations carry root boolean `data-no-timeline`, root-only `data-start="0"`/final `data-duration="0.416666667"`, no animated `.clip` `data-start`/`data-duration`, exact clip frame/sample metadata and exact capture-safe CSS animations. Each output must have measured frame count `10`; representative center pixels at frame `4` must be red-dominant, frame `5` blue-dominant, and the samples must differ, proving `[start,end)` CUT ownership for a non-terminating duration/ratio. A constant render or permanently visible top layer fails, and the two independent outputs must have equal framemd5. For both projects the test also asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, full decoded-frame evidence, no audio, exact durable output bytes equal the held verification-snapshot bytes, scratch paths absent from receipts, and unchanged Legacy state. Unit tests already assert every non-version runner argv contains `--json`, exact subprocess `/proc/self/fd` argv/`pass_fds` plus namespace argv; this harness hashes committed source inputs before/after and parses full `-s 65535 -v` process/network traces including every `sendmmsg` destination with the same exact fail-closed rule from Task 0. `127.0.0.53`, pointer-only/ellipsis output, unsupported families, a mixed loopback+external `sendmmsg`, any undecodable sockaddr and any other external attempt fail closed. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
 
 The live test is selected only by the command above and fail-closes unless `P3_LIVE_RENDERER=1`, exact binary/browser and namespace tracing are present. Default tests exercise the same lifecycle with a fake runner and no Node/Chrome/network; the opt-in test may be deselected by default, not silently reported as a passing live proof.
 
@@ -3194,6 +3285,8 @@ Verify activation_request consumes the sealed durable result, not scratch render
 and its sorted artifacts/next pointer exactly match that durable N+6 identity.
 Verify HyperFrames source comes only from timeline/assets and is parsed/hash/lint/check audited.
 Verify CSS-animation-driven raster source has root boolean data-no-timeline while ResolvedTimeline remains non-empty;
+verify root alone carries data-start=0/final data-duration, animated clips omit runtime-sensitive data-start/data-duration,
+and their exact integer frame/sample metadata matches ResolvedTimeline;
 verify every layer has one deterministic full-duration paused step-end CSS animation; every internal boundary
 uses the final serialized duration to map strictly between adjacent Decimal capture times and the exact HyperFrames
 quantizeTimeToFrame-to-milliseconds/currentTime IEEE-double progress values, duplicated capture-safe keyframes implement [start_frame,end_frame),
@@ -3271,7 +3364,7 @@ P3 is accepted only when:
 2. `CompositionSpec` captures explicit edit intent without filesystem discovery;
 3. `ResolvedTimeline` is the only order/timing/layer truth and contains integer frame/sample boundaries;
 4. only `STATIC_IMAGE`, zero-duration `CUT`, local PNG/JPEG/WebP, default-only trim and no motion directives are accepted; exact `(asset_role, asset_id)`, MIME/hash, inline transform/origin/z-order, CSS-keyframed target opacity, delivery profile, renderer kind/version and deterministic composition fingerprint are persisted;
-5. identical resolved inputs produce identical timeline/source hashes and frame-equivalent output under the pinned tool/runtime; deterministic CSS animation names and one final serialized total duration feed capture-safe duplicate keyframes whose internal boundary maps strictly between `(k-1)/fps` and `k/fps` in Decimal time and between the corresponding exact HyperFrames `quantizeTimeToFrame -> milliseconds -> currentTime` IEEE-double progress values, making every layer visible at captures `[start_frame,end_frame)`. Non-finite/collapsed intermediates typed-fail; first/middle/last non-terminating cases, both prior counterexamples and both quantized-seek counterexamples are unit-tested, and two visually distinct shots at `10` frames/`24fps` prove frame `4` belongs to shot 1 while frame `5` belongs to shot 2 at the CUT;
+5. identical resolved inputs produce identical timeline/source hashes and frame-equivalent output under the pinned tool/runtime; root alone carries `data-start="0"` and the final `data-duration`, animated `.clip` elements omit runtime-sensitive `data-start`/`data-duration` while retaining exact integer frame/sample metadata, and deterministic CSS animation names plus one final serialized total duration feed capture-safe duplicate keyframes whose internal boundary maps strictly between `(k-1)/fps` and `k/fps` in Decimal time and between the corresponding exact HyperFrames `quantizeTimeToFrame -> milliseconds -> currentTime` IEEE-double progress values, making every layer visible at captures `[start_frame,end_frame)`. Non-finite/collapsed intermediates typed-fail; first/middle/last non-terminating cases, both prior counterexamples and both quantized-seek counterexamples are unit-tested, and two visually distinct shots at `10` frames/`24fps` prove frame `4` belongs to shot 1 while frame `5` belongs to shot 2 at the CUT;
 6. no byte-identical MP4 claim is made without a separately proven encoder/container contract;
 7. every materialized target is contained before creation, filename derives only from full asset hash plus allowlisted lowercase raster suffix, and one lstat/openat `O_NOFOLLOW` traversal owner backs source/scratch/durable/reader bytes; `O_EXCL|O_NOFOLLOW` applies to agent-owned materialization and verification files, not HyperFrames-created staged output. The staged output is securely held and streamed into one `O_RDWR` exclusive verification snapshot whose creation FD is retained without pathname reopen; hash/size, exact durable bytes, ffprobe metadata and framemd5 all come from that FD via `/proc/self/fd/<fd>`, `shell=False` and exact `pass_fds`, while contained/external symlink, immediate post-copy-yield swap and later staged/snapshot pathname-swap tests fail closed or remain byte-consistent;
 8. parsed HTML/CSS media URLs exactly equal declared relative raster sources; source contains no SVG/HTML/CSS asset payload, wall-clock randomness, implicit network fetch, remote/absolute/parent/scheme/data/blob URL or untracked file;
