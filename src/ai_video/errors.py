@@ -18,6 +18,8 @@ class ErrorCode(str, Enum):
     OUTPUT_INVALID = "output_invalid"
     FFMPEG_FAILED = "ffmpeg_failed"
     MANIFEST_INVALID = "manifest_invalid"
+    PRODUCTION_PROJECT_INVALID = "production_project_invalid"
+    ASSET_REGISTRY_INVALID = "asset_registry_invalid"
     DISK_SPACE_LOW = "disk_space_low"
 
 
