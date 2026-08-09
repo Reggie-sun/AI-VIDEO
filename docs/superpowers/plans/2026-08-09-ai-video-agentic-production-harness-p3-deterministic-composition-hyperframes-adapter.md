@@ -345,7 +345,7 @@ Do not rely on HyperFrames auto-download. Every live non-help/non-version `docto
 
 This is the Renderer Gate and must pass **before Task 1 edits**. It uses a disposable hand-authored two-PNG CUT composition, not the future Task 3 committed fixture. First verify `unshare --user --map-root-user --net --pid --fork --mount-proc`, `ip`, `strace`, `setsid`, `curl`, `ffprobe`, `ffmpeg`, `sha256sum` and process-group cleanup are available; otherwise stop. The exact published `0.7.103` source/CLI help must confirm `doctor` exists before invoking it.
 
-Create a fresh `P3_GATE_DIR=$(mktemp -d)` outside the repository, decode the two reviewed `320x180` solid red/blue PNG literals from the verified CSS CUT spike, verify both PNGs, and hand-author a `2s`/`24fps`/`48`-frame source with a CUT at frame `24`. The root carries boolean `data-no-timeline`: in exact HyperFrames `0.7.103` this skips timeline polling, while the runtime still discovers and seeks local CSS `@keyframes` through `document.getAnimations()`. Therefore this gate uses deterministic CSS animations with duplicate `50%` boundary keyframes; it is neither an empty/fake P3 timeline nor a one-shot static substitute. Record all input hashes before the namespace:
+Create a fresh `P3_GATE_DIR=$(mktemp -d)` outside the repository, decode the two reviewed `320x180` solid red/blue PNG literals from the verified CSS CUT spike, verify both PNGs, and hand-author a non-terminating-duration `10`-frame source at `24fps` with a CUT at frame `5`. The final serialized animation duration is `0.416666667s`. Its internal capture-safe boundary is serialized as `44.999999964%`, which maps to `0.18749999999999999988s`: strictly after frame `4` capture time and before frame `5` capture time. The root carries boolean `data-no-timeline`: in exact HyperFrames `0.7.103` this skips timeline polling, while the runtime still discovers and seeks local CSS `@keyframes` through `document.getAnimations()`. Therefore this gate uses deterministic CSS animations with duplicated capture-safe boundary keyframes; it is neither an empty/fake P3 timeline nor a one-shot static substitute. Record all input hashes before the namespace:
 
 ```bash
 set -euo pipefail
@@ -361,15 +361,15 @@ printf '%s\n' \
   '<!doctype html>' \
   '<html><head><meta charset="utf-8"><style>' \
   'html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}' \
-  '.clip{position:absolute;inset:0;animation-duration:2s;animation-fill-mode:both;animation-play-state:paused;animation-timing-function:step-end}' \
+  '.clip{position:absolute;inset:0;animation-duration:0.416666667s;animation-fill-mode:both;animation-play-state:paused;animation-timing-function:step-end}' \
   '.clip img{width:100%;height:100%;object-fit:cover}' \
   '.clip-red{animation-name:p3-red}.clip-blue{animation-name:p3-blue}' \
-  '@keyframes p3-red{0%,50%{opacity:1}50%,100%{opacity:0}}' \
-  '@keyframes p3-blue{0%,50%{opacity:0}50%,100%{opacity:1}}' \
+  '@keyframes p3-red{0%,44.999999964%{opacity:1}44.999999964%,100%{opacity:0}}' \
+  '@keyframes p3-blue{0%,44.999999964%{opacity:0}44.999999964%,100%{opacity:1}}' \
   '</style></head>' \
-  '<body><div id="stage" data-no-timeline data-composition-id="p3-gate" data-timeline-fingerprint="0000000000000000000000000000000000000000000000000000000000000000" data-width="320" data-height="180" data-fps="24" data-start="0" data-duration="2">' \
-  '<div class="clip clip-red" data-shot-id="red-shot" data-start-frame="0" data-duration-frames="24" data-transition-kind="cut" data-transition-frames="0"><img src="assets/red.png" alt=""></div>' \
-  '<div class="clip clip-blue" data-shot-id="blue-shot" data-start-frame="24" data-duration-frames="24" data-transition-kind="cut" data-transition-frames="0"><img src="assets/blue.png" alt=""></div>' \
+  '<body><div id="stage" data-no-timeline data-composition-id="p3-gate" data-timeline-fingerprint="0000000000000000000000000000000000000000000000000000000000000000" data-width="320" data-height="180" data-fps="24" data-start="0" data-duration="0.416666667">' \
+  '<div class="clip clip-red" data-shot-id="red-shot" data-start-frame="0" data-duration-frames="5" data-transition-kind="cut" data-transition-frames="0"><img src="assets/red.png" alt=""></div>' \
+  '<div class="clip clip-blue" data-shot-id="blue-shot" data-start-frame="5" data-duration-frames="5" data-transition-kind="cut" data-transition-frames="0"><img src="assets/blue.png" alt=""></div>' \
   '</div></body></html>' >"$P3_GATE_SOURCE/index.html"
 for raster in red blue; do
   test "$(od -An -tx1 -N8 "$P3_GATE_SOURCE/assets/$raster.png" | tr -d ' \n')" = "89504e470d0a1a0a"
@@ -379,6 +379,16 @@ test "$(sha256sum "$P3_GATE_SOURCE/assets/red.png" | cut -d' ' -f1)" = "1ac67c3a
 test "$(sha256sum "$P3_GATE_SOURCE/assets/blue.png" | cut -d' ' -f1)" = "a99284a70ff9a9ab8aec0eed52c3b9bf7a243628820814d0e6bca45445ce2e3f"
 sha256sum "$P3_GATE_SOURCE/index.html" "$P3_GATE_SOURCE/assets/red.png" \
   "$P3_GATE_SOURCE/assets/blue.png" >"$P3_GATE_EVIDENCE/input.before.sha256"
+python - <<'PY'
+from decimal import Decimal
+
+duration = Decimal("0.416666667")
+offset = Decimal("44.999999964")
+mapped = offset * duration / Decimal(100)
+assert Decimal(4) / Decimal(24) < mapped < Decimal(5) / Decimal(24)
+assert Decimal(str(float(offset))) * Decimal(str(float(duration))) / Decimal(100) > Decimal(4) / Decimal(24)
+assert Decimal(str(float(offset))) * Decimal(str(float(duration))) / Decimal(100) < Decimal(5) / Decimal(24)
+PY
 ```
 
 Run version/doctor/lint/check/render through the exact per-command namespace argv contract later implemented by `_NetworkIsolatedHyperFramesRunner`: every invocation creates a fresh namespace and uses the fixed `exec "$@"` wrapper, with no host fallback. Except for version, every invocation must include root `--json`; otherwise HyperFrames `0.7.103` root dispatch may start npm/GitHub update checks even when `HYPERFRAMES_NO_UPDATE_CHECK=1`. Substitute only already verified absolute paths. Preview uses the same outer wrapper to exec a companion in-namespace supervisor because readiness curl and cleanup must share its loopback; preview remains Renderer-Gate-only and is never part of the production runner surface. Every trace includes both process and network syscalls so descendants and attempted egress remain visible.
@@ -400,7 +410,7 @@ export HYPERFRAMES_BROWSER_PATH="$P3_HYPERFRAMES_BROWSER_PATH"
 p3_isolated_exec() {
   trace_prefix=$1
   shift
-  strace -ff -e trace=network,process -o "$trace_prefix" \
+  strace -ff -s 65535 -v -e trace=network,process -o "$trace_prefix" \
     "$P3_UNSHARE" --user --map-root-user --net --pid --fork --mount-proc \
     "$P3_BASH" -ceu '"$P3_IP_PATH" link set lo up; exec "$@"' \
     p3-hyperframes "$@"
@@ -416,7 +426,7 @@ p3_isolated_exec "$P3_GATE_EVIDENCE/lint.net" \
 p3_isolated_exec "$P3_GATE_EVIDENCE/check.net" \
   "$P3_BINARY" check "$P3_GATE_SOURCE" --json >"$P3_GATE_EVIDENCE/check.json"
 
-if strace -ff -e trace=network,process -o "$P3_GATE_EVIDENCE/preview.net" \
+if strace -ff -s 65535 -v -e trace=network,process -o "$P3_GATE_EVIDENCE/preview.net" \
     "$P3_UNSHARE" --user --map-root-user --net --pid --fork --mount-proc \
     "$P3_BASH" -ceu '"$P3_IP_PATH" link set lo up; exec "$@"' \
     p3-hyperframes-preview-supervisor \
@@ -455,7 +465,7 @@ test -s "$P3_GATE_EVIDENCE/render-1.mp4"
 test -s "$P3_GATE_EVIDENCE/render-2.mp4"
 ```
 
-Afterward, hash the original `index.html` and PNG again and compare to their recorded pre-run hashes. Parse every `*.net*` process/network trace and fail if a `connect`/`sendto`/`sendmsg`/`sendmmsg` destination uses `AF_INET`/`AF_INET6` without exact loopback encoding `sin_addr=inet_addr("127.0.0.1")` or `inet_pton(AF_INET6, "::1", ...)`; `AF_UNIX` is allowed and ignored. Matching is structural/exact, never a loose `127.0.0.1` substring whitelist: `127.0.0.53` DNS and every other address remain forbidden, including failed attempts. Each command trace must also contain process-exec evidence so an untraced descendant cannot satisfy the gate:
+Afterward, hash the original `index.html` and PNG again and compare to their recorded pre-run hashes. Every trace is captured with `-s 65535 -v`; an abbreviated argv, opaque/truncated sockaddr or `...` therefore fails rather than weakening proof. Parse every `*.net*` process/network trace and fail if a `connect`/`sendto`/`sendmsg`/`sendmmsg` destination uses `AF_INET`/`AF_INET6` without exact loopback encoding `sin_addr=inet_addr("127.0.0.1")` or `inet_pton(AF_INET6, "::1", ...)`; a fully decoded `AF_UNIX` is allowed. Explicit non-abbreviated `NULL`/`msg_name=NULL` without a destination may be ignored for send calls because the earlier `connect` remains in the same complete trace. Matching is structural/exact, never a loose `127.0.0.1` substring whitelist: `127.0.0.53` DNS and every other address remain forbidden, including failed attempts. Each command trace must also contain exact process-exec evidence so an untraced descendant cannot satisfy the gate:
 
 ```bash
 set -euo pipefail
@@ -468,30 +478,66 @@ import json, re, sys
 
 
 def assert_loopback_only(lines: list[str]) -> None:
-    network_call = re.compile(r"\b(?:connect|sendto|sendmsg|sendmmsg)\(")
+    network_call = re.compile(r"\b(connect|sendto|sendmsg|sendmmsg)\(")
     for line in lines:
-        if not network_call.search(line):
+        match = network_call.search(line)
+        if not match:
             continue
+        call = match.group(1)
+        if "..." in line or "msg_name=0x" in line:
+            raise AssertionError(f"abbreviated or opaque network destination: {line}")
+        families = re.findall(r"sa_family=(AF_[A-Z0-9_]+)", line)
+        if any(family not in {"AF_INET", "AF_INET6", "AF_UNIX"} for family in families):
+            raise AssertionError(f"unsupported network family: {line}")
         ipv4_families = len(re.findall(r"sa_family=AF_INET(?!6)", line))
         ipv6_families = len(re.findall(r"sa_family=AF_INET6", line))
+        unix_families = len(re.findall(r"sa_family=AF_UNIX", line))
         ipv4_addresses = re.findall(r'sin_addr=inet_addr\("([^"]+)"\)', line)
         ipv6_addresses = re.findall(r'inet_pton\(AF_INET6, "([^"]+)"', line)
-        if ipv4_families != len(ipv4_addresses) or ipv6_families != len(ipv6_addresses):
+        ipv4_ports = re.findall(r"sin_port=htons\([0-9]+\)", line)
+        ipv6_ports = re.findall(r"sin6_port=htons\([0-9]+\)", line)
+        unix_addresses = re.findall(r'sa_family=AF_UNIX,\s*sun_path=(?:@?"[^"]*"|NULL)', line)
+        if (
+            ipv4_families != len(ipv4_addresses) or ipv4_families != len(ipv4_ports)
+            or ipv6_families != len(ipv6_addresses) or ipv6_families != len(ipv6_ports)
+            or unix_families != len(unix_addresses)
+            or len(families) != ipv4_families + ipv6_families + unix_families
+        ):
             raise AssertionError(f"undecodable network destination: {line}")
         if any(address != "127.0.0.1" for address in ipv4_addresses):
             raise AssertionError(f"external IPv4 attempt: {line}")
         if any(address != "::1" for address in ipv6_addresses):
             raise AssertionError(f"external IPv6 attempt: {line}")
+        if call == "connect" and len(families) != 1:
+            raise AssertionError(f"connect destination is not explicitly decoded: {line}")
+        if call != "connect" and not families:
+            null_destination = (
+                call == "sendto" and re.search(r",\s*NULL,\s*0\)\s*=", line) is not None
+                or call == "sendmsg" and line.count("msg_name=NULL") == 1
+                or call == "sendmmsg"
+                and line.count("msg_hdr={") > 0
+                and line.count("msg_hdr={") == line.count("msg_name=NULL")
+            )
+            if not null_destination:
+                raise AssertionError(f"send destination is not explicitly decoded: {line}")
 
 
 assert_loopback_only([
-    'connect(3, {sa_family=AF_INET, sin_addr=inet_addr("127.0.0.1")}, 16)',
-    'sendto(3, "x", 1, 0, {sa_family=AF_INET6, inet_pton(AF_INET6, "::1", &sin6_addr)}, 28)',
+    'connect(3, {sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}, 16) = 0',
+    'sendto(3, "x", 1, 0, {sa_family=AF_INET6, sin6_port=htons(3017), inet_pton(AF_INET6, "::1", &sin6_addr)}, 28) = 1',
+    'connect(3, {sa_family=AF_UNIX, sun_path="/tmp/p3.sock"}, 110) = 0',
+    'sendto(3, "x", 1, 0, NULL, 0) = 1',
+    'sendmsg(3, {msg_name=NULL, msg_namelen=0}, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name=NULL}}, {msg_hdr={msg_name=NULL}}], 2, 0) = 2',
 ])
 for forbidden in (
-    'connect(3, {sa_family=AF_INET, sin_addr=inet_addr("127.0.0.53")}, 16)',
-    'sendto(3, "x", 1, 0, {sa_family=AF_INET}, 16)',
-    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_addr=inet_addr("127.0.0.1")}}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_addr=inet_addr("8.8.8.8")}}}], 2, 0)',
+    'connect(3, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0',
+    'sendto(3, "x", 1, 0, {sa_family=AF_INET}, 16) = 1',
+    'connect(3, 0x7ffddeadbeef, 16) = -1 EFAULT',
+    'sendmsg(3, {msg_name=0x7ffddeadbeef, msg_namelen=16}, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}}}, ...], 2, 0) = 2',
+    'connect(3, {sa_family=AF_NETLINK}, 12) = 0',
+    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("8.8.8.8")}}}], 2, 0) = 2',
 ):
     try:
         assert_loopback_only([forbidden])
@@ -553,7 +599,7 @@ for name in sys.argv[1:]:
     stream = video[0]
     assert (int(stream["width"]), int(stream["height"])) == (320, 180)
     assert stream["r_frame_rate"] == "24/1"
-    assert int(stream["nb_frames"]) == 48
+    assert int(stream["nb_frames"]) == 10
 PY
 sample_rgb() {
   frame=$1
@@ -561,20 +607,20 @@ sample_rgb() {
     -vf "select=eq(n\\,$frame),crop=2:2:159:89,scale=1:1,format=rgb24" \
     -frames:v 1 -f rawvideo - | od -An -tu1
 }
-read -r R23 G23 B23 < <(sample_rgb 23)
-read -r R24 G24 B24 < <(sample_rgb 24)
-printf 'frame23=%s,%s,%s\nframe24=%s,%s,%s\n' \
-  "$R23" "$G23" "$B23" "$R24" "$G24" "$B24" \
+read -r R4 G4 B4 < <(sample_rgb 4)
+read -r R5 G5 B5 < <(sample_rgb 5)
+printf 'frame4=%s,%s,%s\nframe5=%s,%s,%s\n' \
+  "$R4" "$G4" "$B4" "$R5" "$G5" "$B5" \
   >"$P3_GATE_EVIDENCE/cut-boundary-rgb.txt"
-test "$R23,$G23,$B23" != "$R24,$G24,$B24"
-(( R23 >= 240 && G23 <= 32 && B23 <= 32 ))
-(( B24 >= 240 && R24 <= 32 && G24 <= 32 ))
+test "$R4,$G4,$B4" != "$R5,$G5,$B5"
+(( R4 >= 240 && G4 <= 32 && B4 <= 32 ))
+(( B5 >= 240 && R5 <= 32 && G5 <= 32 ))
 ffmpeg -v error -i "$P3_GATE_EVIDENCE/render-1.mp4" -map 0:v:0 -f framemd5 "$P3_GATE_EVIDENCE/render-1.framemd5"
 ffmpeg -v error -i "$P3_GATE_EVIDENCE/render-2.mp4" -map 0:v:0 -f framemd5 "$P3_GATE_EVIDENCE/render-2.framemd5"
 diff -u "$P3_GATE_EVIDENCE/render-1.framemd5" "$P3_GATE_EVIDENCE/render-2.framemd5"
 ```
 
-Record browser/Node/FFmpeg versions, boolean `data-no-timeline` CSS CUT source hashes, exact non-version `--json` argv, parsed required doctor checks, per-command process/network traces, frame-23 red/frame-24 blue boundary RGB and keep the disposable directory as gate evidence. Any source mutation, any external attempt (including DNS `127.0.0.53`), missing/exact-argv process trace, doctor/check incompatibility, preview leak, metadata mismatch, constant/top-layer-only output, wrong CUT boundary or render-to-render framemd5 mismatch stops before Task 1; do not weaken the gate or substitute another renderer.
+Record browser/Node/FFmpeg versions, boolean `data-no-timeline` CSS CUT source hashes, exact non-version `--json` argv, parsed required doctor checks, full `-s 65535 -v` per-command process/network traces, total frame count `10`, frame-4 red/frame-5 blue boundary RGB and equal repeat-render framemd5, and keep the disposable directory as gate evidence. Any source mutation, abbreviated/opaque trace, any external attempt (including DNS `127.0.0.53`), missing/exact-argv process trace, doctor/check incompatibility, preview leak, metadata mismatch, constant/top-layer-only output, wrong CUT boundary or render-to-render framemd5 mismatch stops before Task 1; do not weaken the gate or substitute another renderer.
 
 - [ ] **Step 7: Ignore only local install/scratch output**
 
@@ -1307,10 +1353,35 @@ def test_static_source_root_uses_boolean_data_no_timeline_contract(tmp_path): ..
 
 
 @pytest.mark.parametrize("placement", ["first", "middle", "last"])
-def test_css_keyframes_make_each_layer_visible_only_on_half_open_frame_interval(tmp_path, placement): ...
+def test_capture_safe_keyframes_cover_first_middle_last_nonterminating_intervals(tmp_path, placement): ...
 
 
-def test_css_cut_duplicate_boundary_offset_hides_previous_and_shows_next_layer(tmp_path): ...
+def test_capture_safe_cut_10_frames_at_24fps_maps_between_frame_4_and_5(tmp_path):
+    duration = _seconds(10, 24)
+    offset = _capture_safe_boundary_percent(
+        5,
+        total_frames=10,
+        fps=24,
+        serialized_duration=duration,
+    )
+    assert duration == "0.416666667"
+    assert offset == "44.999999964%"
+    mapped = Decimal(offset.removesuffix("%")) * Decimal(duration) / Decimal(100)
+    assert Decimal(4) / Decimal(24) < mapped < Decimal(5) / Decimal(24)
+
+
+def test_capture_safe_boundary_roundtrip_guard_fails_closed():
+    with pytest.raises(AiVideoError) as exc:
+        _capture_safe_boundary_percent(
+            5,
+            total_frames=10,
+            fps=24,
+            serialized_duration="1000000000000000000000000000000",
+        )
+    assert exc.value.code is ErrorCode.RENDERER_SOURCE_INVALID
+
+
+def test_css_cut_duplicate_capture_safe_boundary_hides_previous_and_shows_next_layer(tmp_path): ...
 
 
 def test_multiple_same_shot_layers_share_interval_but_keep_exact_target_opacity_and_z_order(tmp_path): ...
@@ -1339,7 +1410,7 @@ def test_source_audit_rejects_network_and_wall_clock_inputs(tmp_path, forbidden)
     assert exc.value.code is ErrorCode.RENDERER_SOURCE_INVALID
 ```
 
-Also assert source audit rejects absolute paths, `..`, URI schemes, protocol-relative URLs, `data:`/`blob:`, `srcset` extras, CSS `url()`/`@import`, external or inline script, external stylesheet/font, undeclared/missing files, symlink assets, asset hash mismatch, MIME/magic/extension mismatch, SVG/HTML/CSS payloads, missing composition/timeline identity, missing/non-boolean `data-no-timeline`, and a source asset binding not present in the timeline. CSS audit must reject missing/extra/duplicate animation names, a layer bound to another animation, non-total/mismatched duration, timing/fill/play-state drift, missing/extra/reordered keyframe stops, a non-duplicated CUT boundary, or any opacity differing from exact hidden `0`/target `opacity_milli`. Assertions inspect the parsed DOM, CSS URL set, animation declarations and keyframe AST, not substring presence alone. `data-no-timeline` specifically selects CSS-animation-driven static-raster composition while P3's non-empty integer `ResolvedTimeline` remains the sole Shot order/timing owner; no JS, GSAP, runtime clock or network is allowed.
+Also assert source audit rejects absolute paths, `..`, URI schemes, protocol-relative URLs, `data:`/`blob:`, `srcset` extras, CSS `url()`/`@import`, external or inline script, external stylesheet/font, undeclared/missing files, symlink assets, asset hash mismatch, MIME/magic/extension mismatch, SVG/HTML/CSS payloads, missing composition/timeline identity, missing/non-boolean `data-no-timeline`, and a source asset binding not present in the timeline. CSS audit must reject missing/extra/duplicate animation names, a layer bound to another animation, non-total/mismatched final serialized duration, timing/fill/play-state drift, missing/extra/reordered keyframe stops, a non-duplicated capture-safe CUT boundary, a Decimal or browser-double round-trip that does not map strictly between adjacent capture times, or any opacity differing from exact hidden `0`/target `opacity_milli`. Assertions inspect the parsed DOM, CSS URL set, animation declarations and keyframe AST, not substring presence alone. `data-no-timeline` specifically selects CSS-animation-driven static-raster composition while P3's non-empty integer `ResolvedTimeline` remains the sole Shot order/timing owner; no JS, GSAP, runtime clock or network is allowed.
 
 - [ ] **Step 2: Run source RED**
 
@@ -1431,6 +1502,7 @@ def materialize_hyperframes_source(
         )
 
     fps = timeline.delivery_profile.fps
+    serialized_duration = _seconds(timeline.total_frames, fps)
     clips: list[str] = []
     animation_rules: list[str] = []
     keyframe_rules: list[str] = []
@@ -1438,11 +1510,10 @@ def materialize_hyperframes_source(
         transform = _css_transform(span.transform)
         opacity = _decimal_milli(span.opacity_milli)
         animation_name = _css_animation_name(span.layer_id)
-        total_duration = _seconds(timeline.total_frames, fps)
         animation_rules.append(
             (
                 f".{animation_name}{{animation-name:{animation_name};"
-                f"animation-duration:{total_duration}s;animation-fill-mode:both;"
+                f"animation-duration:{serialized_duration}s;animation-fill-mode:both;"
                 "animation-play-state:paused;animation-timing-function:step-end}"
             )
         )
@@ -1452,6 +1523,8 @@ def materialize_hyperframes_source(
                 start_frame=span.start_frame,
                 end_frame=span.start_frame + span.duration_frames,
                 total_frames=timeline.total_frames,
+                fps=fps,
+                serialized_duration=serialized_duration,
                 target_opacity=opacity,
             )
         )
@@ -1503,7 +1576,7 @@ def materialize_hyperframes_source(
                 f'<div id="stage" data-no-timeline data-composition-id="{escape(timeline.timeline_id)}"'
                 f' data-timeline-fingerprint="{timeline.composition_fingerprint}"'
                 f' data-renderer-version="{escape(timeline.renderer.version)}"'
-                f' data-start="0" data-duration="{_seconds(timeline.total_frames, fps)}"'
+                f' data-start="0" data-duration="{serialized_duration}"'
                 f' data-width="{timeline.delivery_profile.width}"'
                 f' data-height="{timeline.delivery_profile.height}"'
                 f' data-fps="{fps}">'
@@ -1585,16 +1658,40 @@ def _seconds(frame_count: int, fps: int) -> str:
     return rendered.rstrip("0").rstrip(".") or "0"
 
 
-def _frame_percent(frame: int, total_frames: int) -> str:
+def _capture_safe_boundary_percent(
+    frame: int,
+    *,
+    total_frames: int,
+    fps: int,
+    serialized_duration: str,
+) -> str:
     if frame == 0:
         return "0%"
     if frame == total_frames:
         return "100%"
-    value = (Decimal(frame) * Decimal(100) / Decimal(total_frames)).quantize(
+    if not 0 < frame < total_frames:
+        raise _source_invalid("CSS boundary frame is outside the timeline.")
+    duration_decimal = Decimal(serialized_duration)
+    previous_time = Decimal(frame - 1) / Decimal(fps)
+    current_time = Decimal(frame) / Decimal(fps)
+    target_time = (Decimal(frame) - Decimal("0.5")) / Decimal(fps)
+    value = (target_time * Decimal(100) / duration_decimal).quantize(
         Decimal("0.000000000001"),
         rounding=ROUND_HALF_EVEN,
     )
-    return f'{format(value, "f").rstrip("0").rstrip(".")}%'
+    rendered = format(value, "f").rstrip("0").rstrip(".")
+    mapped_decimal = Decimal(rendered) * duration_decimal / Decimal(100)
+    mapped_double = (
+        Decimal(str(float(rendered)))
+        * Decimal(str(float(serialized_duration)))
+        / Decimal(100)
+    )
+    if not (
+        previous_time < mapped_decimal < current_time
+        and previous_time < mapped_double < current_time
+    ):
+        raise _source_invalid("Serialized CSS boundary is not capture-frame safe.")
+    return f"{rendered}%"
 
 
 def _css_animation_name(layer_id: str) -> str:
@@ -1607,10 +1704,22 @@ def _css_visibility_keyframes(
     start_frame: int,
     end_frame: int,
     total_frames: int,
+    fps: int,
+    serialized_duration: str,
     target_opacity: str,
 ) -> str:
-    start = _frame_percent(start_frame, total_frames)
-    end = _frame_percent(end_frame, total_frames)
+    start = _capture_safe_boundary_percent(
+        start_frame,
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
+    end = _capture_safe_boundary_percent(
+        end_frame,
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
     if start_frame == 0 and end_frame == total_frames:
         body = f"0%,100%{{opacity:{target_opacity}}}"
     elif start_frame == 0:
@@ -1643,7 +1752,7 @@ def _css_transform(transform: FixedTransform) -> str:
     )
 ```
 
-Import `Mapping`, `dataclass`, `Decimal`, `ROUND_HALF_EVEN`, `hashlib`, `escape` from `html`, `HTMLParser`, `urlsplit`, `re`, the shared no-follow read/create/list primitives, and the named production models. `_frame_percent()` derives its canonical 12-decimal percentage only from integer `frame/total_frames` with `Decimal`, special-casing exact `0%`/`100%`; no float or wall clock enters CSS. Every layer has one full-timeline-duration paused `step-end` animation and a full-hash-derived unique name. Duplicate exact start/end offsets make the target opacity visible on `[start_frame,end_frame)`: at a start boundary the later target declaration wins, and at an end/CUT boundary the later hidden declaration wins. First, middle, last and full-duration cases use the same helper. `_parse_source_document()` must enumerate every URL-bearing `src`, `href`, `poster`, `srcset`, inline-style `url()` and style-block `url()`/`@import`; it does not accept a substring-only audit. It must also require one boolean `data-no-timeline` attribute on the root `#stage` element—present with no value, not `data-no-timeline="false"` or another fake value—and reconstruct the exact expected animation/keyframe model from the integer timeline/bindings. `_validated_raster_suffix()` validates magic bytes, exact MIME and suffix for PNG/JPEG/WebP from the no-follow snapshot before and after copy. `_source_bundle_sha256()` hashes stable JSON of the exact ordered `(relative_path, file_sha256)` set including `index.html`, using only same-FD snapshots. `_list_regular_files_nofollow()` rejects symlink entries/directories instead of traversing them. After Task 4 introduces `RendererAttemptError`, `_source_invalid()` returns a non-retryable instance with `code=ErrorCode.RENDERER_SOURCE_INVALID` and `phase="source"`.
+Import `Mapping`, `dataclass`, `Decimal`, `ROUND_HALF_EVEN`, `hashlib`, `escape` from `html`, `HTMLParser`, `urlsplit`, `re`, the shared no-follow read/create/list primitives, and the named production models. `_capture_safe_boundary_percent()` uses the **final serialized** duration string and places every internal frame boundary `k` at target time `(k - 0.5) / fps`, quantized to a canonical 12-decimal CSS percentage; `0`/`total_frames` remain exact `0%`/`100%`. It then reparses the emitted percentage and duration through both `Decimal` and browser-like double round trips and requires `(k-1)/fps < mapped_time < k/fps`; failure is typed `RENDERER_SOURCE_INVALID` before render. No wall clock enters CSS. Every layer has one full-timeline-duration paused `step-end` animation and a full-hash-derived unique name. Duplicate capture-safe start/end offsets make the target opacity visible at captures `[start_frame,end_frame)`: the state transition occurs strictly between adjacent captures, and duplicate declarations still make the later target/hidden value win at the boundary itself. First, middle, last and full-duration cases use the same helper, including non-terminating duration/ratio tests such as `10` frames at `24fps`. `_parse_source_document()` must enumerate every URL-bearing `src`, `href`, `poster`, `srcset`, inline-style `url()` and style-block `url()`/`@import`; it does not accept a substring-only audit. It must also require one boolean `data-no-timeline` attribute on the root `#stage` element—present with no value, not `data-no-timeline="false"` or another fake value—and reconstruct the exact expected animation/keyframe model from the integer timeline/bindings using the same final serialized duration and round-trip guard. `_validated_raster_suffix()` validates magic bytes, exact MIME and suffix for PNG/JPEG/WebP from the no-follow snapshot before and after copy. `_source_bundle_sha256()` hashes stable JSON of the exact ordered `(relative_path, file_sha256)` set including `index.html`, using only same-FD snapshots. `_list_regular_files_nofollow()` rejects symlink entries/directories instead of traversing them. After Task 4 introduces `RendererAttemptError`, `_source_invalid()` returns a non-retryable instance with `code=ErrorCode.RENDERER_SOURCE_INVALID` and `phase="source"`.
 
 These seekable CSS animations are only the HyperFrames transport for deterministic layer visibility/CUT semantics already owned by `ResolvedTimeline`; they do not authorize creative motion, easing, interpolation, JS/GSAP or any new `motion_directives` behavior.
 
@@ -1651,7 +1760,7 @@ Materialization rules:
 
 - Task 3 is pure and has no dependency on the not-yet-created Task 5 `RenderAttemptPaths`. Its caller supplies both a new `staging_root` and an existing `allowed_staging_parent`; `_validate_new_contained_root()` rejects symlink/escape/existing targets and validates every planned child target **before** any mkdir/copy. Task 5 later adds the canonical integration call with `render_attempt_paths()`.
 - Copy each timeline asset to `assets/<full-asset-sha256>.<png|jpg|webp>` after verifying registry SHA-256 plus magic/MIME/extension; raw `asset_id` never contributes to a filesystem path. Do not accept SVG, HTML, CSS or any other payload.
-- Generate `index.html` in exact `timeline.visual_spans` order. Convert frame boundaries to decimal seconds only at source materialization with `Decimal(frame) / Decimal(fps)` and a stable string formatter.
+- Generate `index.html` in exact `timeline.visual_spans` order. Serialize the total animation/root duration exactly once with `_seconds(total_frames, fps)`; derive every internal CSS boundary from that final string with `_capture_safe_boundary_percent()`. Per-layer data attributes may still serialize integer-derived seconds with the same stable formatter, but must not become CSS timing truth.
 - Embed timeline fingerprint, renderer version and asset ID/role/hash as data attributes. Trim is not serialized because only `0`/`None` is accepted. Apply fixed transform, `transform-origin: 0 0` and z-order as deterministic inline CSS; apply exact target opacity only through the audited per-layer CSS keyframes so hidden intervals are always `0`. Source snapshot tests assert the exact CSS and the decoded-frame integration proof exercises non-default transform/opacity/z-order across a real CUT. Do not claim or serialize motion directives.
 - Use only local HTML/CSS/HyperFrames runtime features proven by the live spike. Do not reference CDN GSAP, Google Fonts, remote media, `.env`, current time or randomness.
 - Write source once into the caller-supplied staging root, hash it, run `audit_hyperframes_source()`, and return the result. No source rewrite is allowed after hashing.
@@ -1660,7 +1769,7 @@ Keep these as straight-line materialization/audit functions; no template discove
 
 - [ ] **Step 4: Seal the deterministic fixture**
 
-Commit a human-readable non-empty two-shot CUT `timeline.json`, its exact expected CSS-animation-driven `index.html` with root boolean `data-no-timeline`, and the reviewed red/blue local PNGs named by their full hashes. The unit test must regenerate source under its caller-supplied contained `tmp_path`, assert exact text/hash equality, assert exact frame-24 duplicate boundary rules and validate both PNG magic/MIME/hash. Fixture files contain only local relative raster assets and no generated binary output.
+Commit a human-readable non-empty two-shot CUT `timeline.json` using `10` total frames at `24fps` with the CUT at frame `5`, its exact expected CSS-animation-driven `index.html` with root boolean `data-no-timeline`, and the reviewed red/blue local PNGs named by their full hashes. The unit test must regenerate source under its caller-supplied contained `tmp_path`, assert exact text/hash equality, assert final duration `0.416666667s`, exact duplicated capture-safe boundary `44.999999964%`, Decimal/double mapped-time inequalities around frame `5`, and both PNG magic/MIME/hash. Fixture files contain only local relative raster assets and no generated binary output.
 
 - [ ] **Step 5: Run GREEN and commit**
 
@@ -1917,7 +2026,7 @@ def _controlled_env(browser_path: Path) -> dict[str, str]:
     return env
 ```
 
-The private `_NetworkIsolatedHyperFramesRunner` constructor validates the lock-resolved project-local `node_modules/.bin/hyperframes` target/integrity, exact no-follow browser and absolute executable `unshare`, `ip`, `bash` paths with `lstat`; npm's expected `.bin` link is accepted only when its target is the exact lock-owned package executable under this `node_modules`, while source/scratch/durable artifact symlinks remain categorically forbidden. Its controlled env fixes `P3_IP_PATH` for the literal wrapper and `HYPERFRAMES_BROWSER_PATH` for HyperFrames. It runs a harmless namespace capability probe through the same argv form; missing user/net/PID namespace, loopback setup, executable or permission maps to non-retryable `RENDERER_UNAVAILABLE`. Every production `version`, `doctor --json`, `lint ... --json`, `check ... --json` and `render ... --json` call creates a new Linux user+network+PID namespace, brings up loopback, then uses the fixed `exec "$@"` wrapper. `_namespace_argv()` fails closed if any non-help/non-version command omits root `--json`, because env flags alone do not stop the `0.7.103` root dispatcher update checks. Renderer arguments are positional argv after sentinel `$0`; none is interpolated into shell text. There is no direct-host subprocess path, retry or fallback. Timeout, bounded capture and redaction apply at this concrete boundary. Live integration traces the runner with `trace=network,process`, including `sendmmsg`, and exact-loopback-only parsing; a single external attempt fails the proof.
+The private `_NetworkIsolatedHyperFramesRunner` constructor validates the lock-resolved project-local `node_modules/.bin/hyperframes` target/integrity, exact no-follow browser and absolute executable `unshare`, `ip`, `bash` paths with `lstat`; npm's expected `.bin` link is accepted only when its target is the exact lock-owned package executable under this `node_modules`, while source/scratch/durable artifact symlinks remain categorically forbidden. Its controlled env fixes `P3_IP_PATH` for the literal wrapper and `HYPERFRAMES_BROWSER_PATH` for HyperFrames. It runs a harmless namespace capability probe through the same argv form; missing user/net/PID namespace, loopback setup, executable or permission maps to non-retryable `RENDERER_UNAVAILABLE`. Every production `version`, `doctor --json`, `lint ... --json`, `check ... --json` and `render ... --json` call creates a new Linux user+network+PID namespace, brings up loopback, then uses the fixed `exec "$@"` wrapper. `_namespace_argv()` fails closed if any non-help/non-version command omits root `--json`, because env flags alone do not stop the `0.7.103` root dispatcher update checks. Renderer arguments are positional argv after sentinel `$0`; none is interpolated into shell text. There is no direct-host subprocess path, retry or fallback. Timeout, bounded capture and redaction apply at this concrete boundary. Live integration observes the runner with full `strace -s 65535 -v -e trace=network,process`, including every `sendmmsg` destination; abbreviated, opaque, unsupported or external destinations fail the proof.
 
 Task 4 implements the private production runner plus the module-internal adapter seam, lint/check evidence and scratch-output verification. Runner injection exists only at that internal test seam. Task 5 knows canonical durable paths and therefore is the only stage that seals `RendererSourceReceipt`/`RenderReceipt`; Task 4 must not put scratch paths into semantic receipts. Task 5 also adds the named `render_with_hyperframes()` orchestration after the real lifecycle request/API types exist; do not create a temporary alias or duplicate request model here.
 
@@ -2693,11 +2802,11 @@ Expected: selection durably fixes timeline/project/registry provenance before an
 
 - [ ] **Step 1: Confirm Task 0 gate evidence still matches the lock**
 
-Verify the recorded Task 0 compatibility proof names exact `hyperframes@0.7.103`, the accepted browser executable/revision, boolean `data-no-timeline` plus CSS CUT keyframes, successful version, zero-exit parsed JSON doctor/lint/check, preview/two renders using the `--json` dispatcher sentinel, frame-23/frame-24 CUT samples, source hashes, process/network/sendmmsg trace audit, ffprobe metadata and equal framemd5. Preview/render stdout remains `.log` evidence, not assumed JSON. Recheck `package-lock.json` integrity and browser `--version`. This is a drift check; the Renderer Gate was already required before Task 1 and must not be deferred here.
+Verify the recorded Task 0 compatibility proof names exact `hyperframes@0.7.103`, the accepted browser executable/revision, boolean `data-no-timeline` plus capture-safe CSS CUT keyframes, successful version, zero-exit parsed JSON doctor/lint/check, preview/two renders using the `--json` dispatcher sentinel, the non-terminating `10@24` duration with frame-4/frame-5 CUT samples and total frame count `10`, source hashes, full `strace -s 65535 -v` process/network/sendmmsg audit, ffprobe metadata and equal framemd5. Preview/render stdout remains `.log` evidence, not assumed JSON. Recheck `package-lock.json` integrity and browser `--version`. This is a drift check; the Renderer Gate was already required before Task 1 and must not be deferred here.
 
 - [ ] **Step 2: Run the committed-fixture production integration proof**
 
-Run the opt-in `test_live_committed_fixture_render_state_lifecycle` added in Task 5. Do not wrap pytest in an outer namespace: the public API must prove that its private production runner creates a fresh namespace for every HyperFrames command. Wrap pytest with `strace -ff` only to observe the runner and all descendants:
+Run the opt-in `test_live_committed_fixture_render_state_lifecycle` added in Task 5. Do not wrap pytest in an outer namespace: the public API must prove that its private production runner creates a fresh namespace for every HyperFrames command. Wrap pytest only with observational `strace -ff -s 65535 -v` so every runner descendant, full argv and every decoded sockaddr remain auditable:
 
 ```bash
 set -euo pipefail
@@ -2707,7 +2816,7 @@ P3_BINARY="$PWD/node_modules/.bin/hyperframes"
 test -x "$P3_BINARY"
 P3_INTEGRATION_EVIDENCE=$(mktemp -d)
 export P3_INTEGRATION_EVIDENCE
-if strace -ff -e trace=network,process -o "$P3_INTEGRATION_EVIDENCE/integration.net" \
+if strace -ff -s 65535 -v -e trace=network,process -o "$P3_INTEGRATION_EVIDENCE/integration.net" \
     python -m pytest tests/test_production_hyperframes.py -q \
     -k test_live_committed_fixture_render_state_lifecycle; then
   P3_PYTEST_STATUS=0
@@ -2722,30 +2831,66 @@ import json, re, sys
 
 
 def assert_loopback_only(lines: list[str]) -> None:
-    network_call = re.compile(r"\b(?:connect|sendto|sendmsg|sendmmsg)\(")
+    network_call = re.compile(r"\b(connect|sendto|sendmsg|sendmmsg)\(")
     for line in lines:
-        if not network_call.search(line):
+        match = network_call.search(line)
+        if not match:
             continue
+        call = match.group(1)
+        if "..." in line or "msg_name=0x" in line:
+            raise AssertionError(f"abbreviated or opaque network destination: {line}")
+        families = re.findall(r"sa_family=(AF_[A-Z0-9_]+)", line)
+        if any(family not in {"AF_INET", "AF_INET6", "AF_UNIX"} for family in families):
+            raise AssertionError(f"unsupported network family: {line}")
         ipv4_families = len(re.findall(r"sa_family=AF_INET(?!6)", line))
         ipv6_families = len(re.findall(r"sa_family=AF_INET6", line))
+        unix_families = len(re.findall(r"sa_family=AF_UNIX", line))
         ipv4_addresses = re.findall(r'sin_addr=inet_addr\("([^"]+)"\)', line)
         ipv6_addresses = re.findall(r'inet_pton\(AF_INET6, "([^"]+)"', line)
-        if ipv4_families != len(ipv4_addresses) or ipv6_families != len(ipv6_addresses):
+        ipv4_ports = re.findall(r"sin_port=htons\([0-9]+\)", line)
+        ipv6_ports = re.findall(r"sin6_port=htons\([0-9]+\)", line)
+        unix_addresses = re.findall(r'sa_family=AF_UNIX,\s*sun_path=(?:@?"[^"]*"|NULL)', line)
+        if (
+            ipv4_families != len(ipv4_addresses) or ipv4_families != len(ipv4_ports)
+            or ipv6_families != len(ipv6_addresses) or ipv6_families != len(ipv6_ports)
+            or unix_families != len(unix_addresses)
+            or len(families) != ipv4_families + ipv6_families + unix_families
+        ):
             raise AssertionError(f"undecodable network destination: {line}")
         if any(address != "127.0.0.1" for address in ipv4_addresses):
             raise AssertionError(f"external IPv4 attempt: {line}")
         if any(address != "::1" for address in ipv6_addresses):
             raise AssertionError(f"external IPv6 attempt: {line}")
+        if call == "connect" and len(families) != 1:
+            raise AssertionError(f"connect destination is not explicitly decoded: {line}")
+        if call != "connect" and not families:
+            null_destination = (
+                call == "sendto" and re.search(r",\s*NULL,\s*0\)\s*=", line) is not None
+                or call == "sendmsg" and line.count("msg_name=NULL") == 1
+                or call == "sendmmsg"
+                and line.count("msg_hdr={") > 0
+                and line.count("msg_hdr={") == line.count("msg_name=NULL")
+            )
+            if not null_destination:
+                raise AssertionError(f"send destination is not explicitly decoded: {line}")
 
 
 assert_loopback_only([
-    'connect(3, {sa_family=AF_INET, sin_addr=inet_addr("127.0.0.1")}, 16)',
-    'sendto(3, "x", 1, 0, {sa_family=AF_INET6, inet_pton(AF_INET6, "::1", &sin6_addr)}, 28)',
+    'connect(3, {sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}, 16) = 0',
+    'sendto(3, "x", 1, 0, {sa_family=AF_INET6, sin6_port=htons(3017), inet_pton(AF_INET6, "::1", &sin6_addr)}, 28) = 1',
+    'connect(3, {sa_family=AF_UNIX, sun_path="/tmp/p3.sock"}, 110) = 0',
+    'sendto(3, "x", 1, 0, NULL, 0) = 1',
+    'sendmsg(3, {msg_name=NULL, msg_namelen=0}, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name=NULL}}, {msg_hdr={msg_name=NULL}}], 2, 0) = 2',
 ])
 for forbidden in (
-    'connect(3, {sa_family=AF_INET, sin_addr=inet_addr("127.0.0.53")}, 16)',
-    'sendto(3, "x", 1, 0, {sa_family=AF_INET}, 16)',
-    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_addr=inet_addr("127.0.0.1")}}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_addr=inet_addr("8.8.8.8")}}}], 2, 0)',
+    'connect(3, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0',
+    'sendto(3, "x", 1, 0, {sa_family=AF_INET}, 16) = 1',
+    'connect(3, 0x7ffddeadbeef, 16) = -1 EFAULT',
+    'sendmsg(3, {msg_name=0x7ffddeadbeef, msg_namelen=16}, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}}}, ...], 2, 0) = 2',
+    'connect(3, {sa_family=AF_NETLINK}, 12) = 0',
+    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("8.8.8.8")}}}], 2, 0) = 2',
 ):
     try:
         assert_loopback_only([forbidden])
@@ -2759,23 +2904,26 @@ assert traces
 lines = [line for path in traces for line in path.read_text(errors="replace").splitlines()]
 binary = sys.argv[2]
 exec_pattern = re.compile(rf'execve\({re.escape(json.dumps(binary))}, (\[.*?\]), ')
+synthetic_exec = f'execve({json.dumps(binary)}, {json.dumps([binary, "doctor", "--json"])}, 0x7ffd) = 0'
+synthetic_match = exec_pattern.search(synthetic_exec)
+assert synthetic_match and json.loads(synthetic_match.group(1)) == [binary, "doctor", "--json"]
 executed_argv = [json.loads(match.group(1)) for line in lines if (match := exec_pattern.search(line))]
-assert [binary, "--version"] in executed_argv
-assert [binary, "doctor", "--json"] in executed_argv
+assert executed_argv.count([binary, "--version"]) == 2
+assert executed_argv.count([binary, "doctor", "--json"]) == 2
 for command in ("lint", "check"):
     matches = [argv for argv in executed_argv if len(argv) == 4 and argv[:2] == [binary, command]]
-    assert len(matches) == 1 and matches[0][-1] == "--json", command
+    assert len(matches) == 2 and all(argv[-1] == "--json" for argv in matches), command
 render_matches = [
     argv for argv in executed_argv
     if len(argv) == 6 and argv[:2] == [binary, "render"] and argv[3] == "-o"
 ]
-assert len(render_matches) == 1 and render_matches[0][-1] == "--json"
+assert len(render_matches) == 2 and all(argv[-1] == "--json" for argv in render_matches)
 assert all(argv == [binary, "--version"] or "--json" in argv for argv in executed_argv)
 assert_loopback_only(lines)
 PY
 ```
 
-The test copies the committed visually distinct red/blue PNG fixture into a disposable project, builds a real two-`STATIC_IMAGE`/CUT-only `48`-frame timeline with the CUT at frame `24`, materializes root boolean `data-no-timeline` plus exact CSS animations, calls public `render_with_hyperframes()` (which constructs the private isolated runner) once, and completes `begin_render_attempt -> version -> doctor --json -> source -> lint --json -> check --json -> render --json -> held-FD verify -> activate_render_state`. It decodes representative center pixels from held verification output: frame `23` must be red-dominant, frame `24` blue-dominant, and the samples must differ, proving `[start,end)` CUT ownership; a constant render or permanently visible top layer fails. It also asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, full decoded-frame evidence, no audio, exact durable output bytes equal the held verification-snapshot bytes, scratch paths absent from receipts, and unchanged Legacy state. Unit tests already assert every non-version runner argv contains `--json`, exact subprocess `/proc/self/fd` argv/`pass_fds` plus namespace argv; this harness hashes committed source inputs before/after and parses process/network traces including `sendmmsg` with the same exact loopback-only rule from Task 0. `127.0.0.53`, a mixed loopback+external `sendmmsg`, an undecodable sockaddr and any other external attempt fail closed. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
+The test copies the committed visually distinct red/blue PNG fixture into two independent disposable projects, builds the same real two-`STATIC_IMAGE`/CUT-only `10`-frame timeline at `24fps` with the CUT at frame `5`, and invokes public `render_with_hyperframes()` once per project. Each call constructs its own private isolated runner and completes `begin_render_attempt -> version -> doctor --json -> source -> lint --json -> check --json -> render --json -> held-FD verify -> activate_render_state`; the trace audit requires exactly two version/doctor/lint/check/render executable argv shapes. Both materializations carry root boolean `data-no-timeline`, final duration `0.416666667s` and exact capture-safe CSS animations. Each output must have measured frame count `10`; representative center pixels at frame `4` must be red-dominant, frame `5` blue-dominant, and the samples must differ, proving `[start,end)` CUT ownership for a non-terminating duration/ratio. A constant render or permanently visible top layer fails, and the two independent outputs must have equal framemd5. For both projects the test also asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, full decoded-frame evidence, no audio, exact durable output bytes equal the held verification-snapshot bytes, scratch paths absent from receipts, and unchanged Legacy state. Unit tests already assert every non-version runner argv contains `--json`, exact subprocess `/proc/self/fd` argv/`pass_fds` plus namespace argv; this harness hashes committed source inputs before/after and parses full `-s 65535 -v` process/network traces including every `sendmmsg` destination with the same exact fail-closed rule from Task 0. `127.0.0.53`, pointer-only/ellipsis output, unsupported families, a mixed loopback+external `sendmmsg`, any undecodable sockaddr and any other external attempt fail closed. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
 
 The live test is selected only by the command above and fail-closes unless `P3_LIVE_RENDERER=1`, exact binary/browser and namespace tracing are present. Default tests exercise the same lifecycle with a fake runner and no Node/Chrome/network; the opt-in test may be deselected by default, not silently reported as a passing live proof.
 
@@ -2829,7 +2977,7 @@ Expected: changed files match the exact map; runtime calls use the pinned local 
 
 - [ ] **Step 7: Record the proof bundle**
 
-Record exact dependency/browser versions, static-source `data-no-timeline`, every non-version `--json` argv, named doctor JSON checks, exact-loopback process/network/sendmmsg trace evidence, lint/check JSON hashes, preview cleanup assertion, both output measurements/frame fingerprints, focused/Legacy/full pytest results and scope diff. Task 7 may use only this completed proof to write runtime truth.
+Record exact dependency/browser versions, static-source `data-no-timeline`, final duration and capture-safe boundary math, every non-version `--json` argv, named doctor JSON checks, full `-s 65535 -v` fail-closed sockaddr/sendmmsg trace evidence, lint/check JSON hashes, preview cleanup assertion, both output measurements/frame fingerprints, focused/Legacy/full pytest results and scope diff. Task 7 may use only this completed proof to write runtime truth.
 
 ### Task 7: Synchronize Verified Documentation
 
@@ -2919,9 +3067,10 @@ Verify activation_request consumes the sealed durable result, not scratch render
 and its sorted artifacts/next pointer exactly match that durable N+6 identity.
 Verify HyperFrames source comes only from timeline/assets and is parsed/hash/lint/check audited.
 Verify CSS-animation-driven raster source has root boolean data-no-timeline while ResolvedTimeline remains non-empty;
-verify every layer has one deterministic full-duration paused step-end CSS animation, integer-derived
-duplicate boundary keyframes implement [start_frame,end_frame), exact target opacity/z-order remains,
-and parsed audit rejects missing/extra/mismatched animation names, durations, bindings or keyframes;
+verify every layer has one deterministic full-duration paused step-end CSS animation; every internal boundary
+uses the final serialized duration to map strictly between adjacent capture times after Decimal and browser-double
+round trips, duplicated capture-safe keyframes implement [start_frame,end_frame), exact target opacity/z-order remains,
+and parsed audit rejects missing/extra/mismatched animation names, durations, bindings, keyframes or unsafe round trips;
 verify exact 0.7.103 version and zero-exit doctor --json named Node.js/FFmpeg/FFprobe/Chrome checks
 run with controlled validated browser env, without requiring top-level ok or optional Whisper/TTS/BGM.
 Verify public render_with_hyperframes alone constructs the private namespace runner;
@@ -2931,10 +3080,12 @@ and package-root exports omit adapter, runner and scratch result types.
 Verify staged-output/snapshot FD swaps and probe/ffprobe/framemd5/plain errors map to non-retryable RENDER_FAILED verify;
 FFMPEG_FAILED never crosses the P3 public boundary.
 Verify one attempt selects exactly one renderer and no Remotion/fallback/double render exists.
-Verify Task 0 gate precedes Task 1 and two-raster frame 23/24 evidence proves the CUT instead of
-constant/top-layer output while both renders have equal framemd5; process+network traces cover connect/sendto/sendmsg/sendmmsg,
-accept only exact inet_addr("127.0.0.1")/inet_pton(AF_INET6,"::1") destinations, explicitly reject
-127.0.0.53 and every external attempt, and preview cleanup leaves no descendant.
+Verify Task 0 gate precedes Task 1 and the non-terminating 10@24 two-raster frame 4/5 evidence plus
+total frame count 10 proves the CUT instead of constant/top-layer output while both renders have equal framemd5;
+full `strace -s 65535 -v` process+network traces cover connect/sendto/sendmsg/sendmmsg, accept only fully decoded
+AF_UNIX, exact inet_addr("127.0.0.1")/inet_pton(AF_INET6,"::1"), or explicit non-abbreviated no-destination NULL;
+explicitly reject pointer-only/ellipsis/unsupported families, 127.0.0.53 and every external attempt,
+and preview cleanup leaves no descendant.
 Verify Task 6 separately proves committed-fixture lifecycle integration.
 Verify rollback keeps 2.1 reader/recovery, disables new entrypoints and never downgrades/deletes.
 Verify docs match Task 0/Task 6 evidence and frame-equivalent proof is not byte-identical claim.
@@ -2992,16 +3143,16 @@ P3 is accepted only when:
 2. `CompositionSpec` captures explicit edit intent without filesystem discovery;
 3. `ResolvedTimeline` is the only order/timing/layer truth and contains integer frame/sample boundaries;
 4. only `STATIC_IMAGE`, zero-duration `CUT`, local PNG/JPEG/WebP, default-only trim and no motion directives are accepted; exact `(asset_role, asset_id)`, MIME/hash, inline transform/origin/z-order, CSS-keyframed target opacity, delivery profile, renderer kind/version and deterministic composition fingerprint are persisted;
-5. identical resolved inputs produce identical timeline/source hashes and frame-equivalent output under the pinned tool/runtime; deterministic CSS animation names, total durations and integer-derived duplicate boundary keyframes make every layer visible exactly on `[start_frame,end_frame)`, and two visually distinct shots prove frame `23` belongs to shot 1 while frame `24` belongs to shot 2 at the CUT;
+5. identical resolved inputs produce identical timeline/source hashes and frame-equivalent output under the pinned tool/runtime; deterministic CSS animation names and one final serialized total duration feed capture-safe duplicate keyframes whose internal boundary maps strictly between `(k-1)/fps` and `k/fps` after Decimal and browser-double round trips, making every layer visible at captures `[start_frame,end_frame)`. First/middle/last non-terminating cases are unit-tested, and two visually distinct shots at `10` frames/`24fps` prove frame `4` belongs to shot 1 while frame `5` belongs to shot 2 at the CUT;
 6. no byte-identical MP4 claim is made without a separately proven encoder/container contract;
 7. every materialized target is contained before creation, filename derives only from full asset hash plus allowlisted lowercase raster suffix, and one lstat/openat `O_NOFOLLOW` traversal owner backs source/scratch/durable/reader bytes; `O_EXCL|O_NOFOLLOW` applies to agent-owned materialization and verification files, not HyperFrames-created staged output. The staged output is securely held and streamed into one `O_RDWR` exclusive verification snapshot whose creation FD is retained without pathname reopen; hash/size, exact durable bytes, ffprobe metadata and framemd5 all come from that FD via `/proc/self/fd/<fd>`, `shell=False` and exact `pass_fds`, while contained/external symlink, immediate post-copy-yield swap and later staged/snapshot pathname-swap tests fail closed or remain byte-consistent;
 8. parsed HTML/CSS media URLs exactly equal declared relative raster sources; source contains no SVG/HTML/CSS asset payload, wall-clock randomness, implicit network fetch, remote/absolute/parent/scheme/data/blob URL or untracked file;
 9. each attempt has one authoritative selection identity and one HyperFrames execution path; `BeginRenderAttemptRequest` does not duplicate timeline/project/registry fields;
 10. Remotion is neither installed nor implemented and no double-render/fallback exists;
 11. one immutable `RenderStateSnapshot` fixes exact active project/registry, selection/timeline fingerprint, canonical durable source HTML/raster bundle, source/render receipts and final canonical output pointers; `RenderReceipt` names the final durable output path but its hash/size/metadata/frame evidence and the output `PreparedArtifact` bytes all originate from the single held verification-snapshot FD; one Manifest pointer activates it and no scratch path is semantic;
-12. Task 0 exact 0.7.103 version/`doctor --json`/`lint --json`/`check --json`/`preview --json`/two `render --json` compatibility gate passes before Task 1 using the same namespace wrapper contract and a two-raster root boolean `data-no-timeline` CSS CUT source; frame `23` is red-dominant, frame `24` blue-dominant/distinct and render-to-render framemd5 matches. Doctor requires zero exit plus exactly named Node.js/FFmpeg/FFprobe/Chrome checks with `ok:true`, without requiring top-level ok or optional Whisper/TTS/BGM success. Runtime selection is durable before any executable call; only private `_NetworkIsolatedHyperFramesRunner` runs tools, every non-help/non-version argv contains root `--json`, each process gets a fresh user/net/PID namespace + fixed `exec "$@"`/`shell=False`, controlled env injects the validated browser path, missing capability has no host fallback, outer orchestration records every ordinary availability/source/lint/check/render/verify exception only before activation method entry, and `FFMPEG_FAILED` never leaks across P3;
+12. Task 0 exact 0.7.103 version/`doctor --json`/`lint --json`/`check --json`/`preview --json`/two `render --json` compatibility gate passes before Task 1 using the same namespace wrapper contract and a two-raster root boolean `data-no-timeline` CSS CUT source at `10` frames/`24fps`; output count is `10`, frame `4` is red-dominant, frame `5` blue-dominant/distinct and render-to-render framemd5 matches. Doctor requires zero exit plus exactly named Node.js/FFmpeg/FFprobe/Chrome checks with `ok:true`, without requiring top-level ok or optional Whisper/TTS/BGM success. Runtime selection is durable before any executable call; only private `_NetworkIsolatedHyperFramesRunner` runs tools, every non-help/non-version argv contains root `--json`, each process gets a fresh user/net/PID namespace + fixed `exec "$@"`/`shell=False`, controlled env injects the validated browser path, missing capability has no host fallback, outer orchestration records every ordinary availability/source/lint/check/render/verify exception only before activation method entry, and `FFMPEG_FAILED` never leaks across P3;
 13. `activation_request()` consumes the sealed durable `N+6` result, never scratch result; `activate_render_state()` owns all four windows: candidate pre-replace ordinary failure is terminal R+2 with exact candidate/hash; candidate ambiguity reopens only exact R+1/R+2 or returns outcome unknown; authoritative R+2 pre-final ordinary failure is terminal R+3; final replace/post-replace ambiguity remains outcome unknown. All terminal paths preserve base active/project/registry state, successful revisions remain `R+1/R+2/R+3`, and exact replay/recovery leaves no conclusively ordinary running residue;
-14. complete timeline/source-bundle/receipt/state/output orphans are preserved and reported; default tests are fake/no-network. Task 0 and Task 6 process+network traces cover `connect`/`sendto`/`sendmsg`/`sendmmsg`, allow only exact `inet_addr("127.0.0.1")` or `inet_pton(AF_INET6, "::1")`, reject `127.0.0.53` and all external attempts fail-closed; the pre-edit gate also proves retrying preview cleanup, and Task 6 separately proves committed-fixture lifecycle integration;
+14. complete timeline/source-bundle/receipt/state/output orphans are preserved and reported; default tests are fake/no-network. Task 0 and Task 6 use full `strace -s 65535 -v` process+network traces covering `connect`/`sendto`/`sendmsg`/`sendmmsg`; they allow only fully decoded AF_UNIX, exact `inet_addr("127.0.0.1")`/`inet_pton(AF_INET6, "::1")`, or explicit non-abbreviated no-destination NULL send calls, and reject pointer-only/ellipsis/unsupported/undecodable sockaddr, `127.0.0.53` and all external attempts fail-closed. The pre-edit gate also proves retrying preview cleanup, and Task 6 separately proves committed-fixture lifecycle integration;
 15. no Audio/Caption, P5 graph, Provider/cloud/paid API, new CLI or Legacy schema/layout enters the diff;
 16. focused P3/P2A, Legacy regression and full default suites pass;
 17. forward rollback keeps 2.1 read/recovery and disables new entrypoints without downgrade or artifact deletion; docs are written only after live/focused/Legacy/full proof, then final independent review has no blocker.
