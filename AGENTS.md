@@ -4,7 +4,7 @@
 
 ## Purpose
 
-当前已实现产品是一个 local-first Python CLI，用于围绕默认本地、显式 opt-in 非本地的 ComfyUI 服务编排长视频生成流程。v0.2 的规划目标是由 Codex 驱动、以 durable project state 为核心的 AI Video / AI Comic Production Harness。
+当前仓库有两条已实现、边界不同的产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2 提供的 read-only Production Project Core Python API。后续目标是由 Codex 驱动、以 durable project state 为核心的 AI Video / AI Comic Production Harness，但未实施的 slice 仍只是规划。
 
 Agent 必须维护当前产品承诺：
 
@@ -12,13 +12,15 @@ Agent 必须维护当前产品承诺：
 - 以 manifest 为核心的执行与恢复机制。
 - `runs/<run_id>/` 下可预测、稳定的产物目录结构。
 - 对 config、workflow 渲染、pipeline 状态、resume、ffmpeg 行为、CLI 行为保持较强测试覆盖。
+- P2 的 strict schema、content hash、path containment、Shot strategy/reference 和 Asset Registry snapshot 验证保持 read-only、no-network，并与 Legacy loader 隔离。
 
 ## Versioned Product Boundary
 
 - 当前已实现的 `0.1.x` / legacy runtime 仍是 local-first Python CLI，默认只连接本地 ComfyUI；非本地 ComfyUI 必须显式设置 `allow_non_local: true`。公共命令仍只有三个，产物仍使用当前 flat artifact layout。
+- 当前已实现的 P2 Production Project Core 通过 `ai_video.production.load_production_project()` 暴露，只读取并验证显式物化的 v2 project、creative artifacts、Manifest-selected revision 和 Asset Registry snapshot；它不写入、不激活、不增加 CLI。
 - `docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md` 是新的 v0.2 planning target；它不是已实现行为，也不是一次性实施授权。
 - `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 已被 supersede，只保留为 provider-centric 历史设计与可复用安全契约来源。
-- v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0 文档迁移与本地 P1 legacy stabilization 的状态见 roadmap；不得据此推断 P2+ 已实现。
+- v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0、P1、P2 的当前状态见 runtime baseline 与 roadmap；P2A/P3 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。
 - 某个 slice 落地前，与该 slice 冲突的当前契约继续有效；不得通过只改文档把 proposed behavior 描述成 runtime truth。
 - Local Wan + ComfyUI 始终保持 legacy default，并在新 domain 中作为 optional `generated_video` asset capability 保留。任何远程 Provider 都必须在后续独立 slice 中满足 explicit opt-in、Budget Guard、Cloud Egress 和 crash-safe persistence gate。
 
@@ -33,9 +35,12 @@ Agent 必须维护当前产品承诺：
 1. 用户请求。
 2. 本 `AGENTS.md`。
 3. [`docs/agent-primary-contract-matrix.md`](/home/reggie/vscode_folder/AI-VIDEO/docs/agent-primary-contract-matrix.md)。
-4. `README.md` 与直接相关的 spec / plan 文档。
-5. 相关源码文件及其对应测试。
-6. `.workflow/` 下的草稿或 brainstorming 产物，仅作为可选上下文。
+4. [`docs/v0.2-runtime-baseline.md`](/home/reggie/vscode_folder/AI-VIDEO/docs/v0.2-runtime-baseline.md)，确认当前已实现行为。
+5. [`docs/v0.2-agentic-production-roadmap.md`](/home/reggie/vscode_folder/AI-VIDEO/docs/v0.2-agentic-production-roadmap.md)，确认 phase 状态与 gate。
+6. `README.md`、active spec 和当前 slice 的 plan。
+7. 相关源码文件及其对应测试。
+8. `.agent/bug-memory/` 下与当前回归直接相关的记录，仅作为案例证据。
+9. `.workflow/` 下的草稿或 brainstorming 产物，仅作为可选上下文。
 
 ## Conflict Resolution
 
@@ -51,7 +56,7 @@ Agent 必须维护当前产品承诺：
 
 ## Stable Product Contract
 
-- 当前 legacy runtime 保持 local-first/default-local；v0.2 远程 Provider 只有在对应 slice 获批并完成安全前置后才允许以 opt-in 方式加入，且永不成为默认 fallback。
+- Legacy runtime 保持 local-first/default-local；v0.2 远程 Provider 只有在对应 slice 获批并完成安全前置后才允许以 opt-in 方式加入，且永不成为默认 fallback。
 - v0.2 的顶层 Agent 是 Codex；仓库不得另造通用 Agent runtime。仓库未来只拥有 durable production contract、asset/provenance state、dependency/invalidation、render adapter 和 QA/repair receipts。
 - v0.2 基础 Production Path 必须在没有 Video Provider 时仍能用 image、motion graphics、voice、captions 和 deterministic composition 产出完整视频；`generated_video` 只是 Shot 的可选 visual strategy。
 - 当前公共 CLI 面保持为 `ai-video validate`、`ai-video run`、`ai-video resume`；任何 v0.2 新命令必须在独立 plan 中同步 CLI tests、README 和退出码契约。
@@ -63,6 +68,9 @@ Agent 必须维护当前产品承诺：
 - 写入配置解析结果和 manifest 记录的路径必须是干净的绝对路径。
 - Legacy mode 保持“上一镜头最后一帧可喂给下一镜头”的链式生成模型；未来 v0.2 dependency graph 不得退化为顺序式 blanket stale。
 - 保持项目对 workflow 的通用性，依赖 template + binding，而不是在 CLI 或 pipeline 中写死节点 ID。
+- P2 Production Project Core 是当前 runtime truth：只读加载 strict v2 schemas、验证 semantic hashes、project-root containment、六种 Shot `visual_strategy`、concrete references 和 exact Asset Registry revision。
+- P2 不拥有 writer、activation、lifecycle mutation、desired fingerprint、renderer 或 Provider。任何 v2 project/registry snapshot 写入和 active pointer 切换必须先通过独立 P2A commit protocol 的授权、实现与 crash-injection 验收。
+- P3 planning artifact 只定义未来 Composition/HyperFrames adapter 边界；在 P2A 和 Renderer Gate 完成且用户再次授权前，不得安装或执行 renderer runtime。
 
 ## Module Boundaries
 
@@ -74,8 +82,15 @@ Agent 必须维护当前产品承诺：
 - `src/ai_video/pipeline.py`：负责 shot 顺序执行、重试、链式传递、resume 决策与进度回调。
 - `src/ai_video/manifest.py`：负责 manifest 持久化、哈希和 stale/validity 辅助逻辑。
 - `src/ai_video/ffmpeg_tools.py`：负责 clip 校验、抽帧、标准化与拼接。
+- `src/ai_video/production/models.py`：负责 strict v2 schemas、envelopes 和 cross-field model invariants。
+- `src/ai_video/production/hashing.py`：负责 canonical semantic hash、artifact sealing 和 hash verification。
+- `src/ai_video/production/paths.py`：负责 project-root containment、symlink 防逃逸和 v2 path resolution。
+- `src/ai_video/production/validation.py`：负责 Shot visual strategy、reference 和 project-level static validation。
+- `src/ai_video/production/registry.py`：负责 read-only Asset Registry snapshot、revision、entry bytes 和 containment verification。
+- `src/ai_video/production/project.py`：负责 v2 bundle loading、Manifest-selected project revision 和 registry selection verification。
+- `src/ai_video/production/__init__.py`：只暴露 P2 public imports，不承载实现逻辑。
 
-不要随意把职责跨模块搬运。优先做局部、小范围、低漂移的修复。
+P2 production modules 均不得写入或激活 state；future P2A 的 writer/commit protocol 必须有单一 owner，不得把 mutation 分散到 reader、registry 或 Legacy manifest/pipeline。不要随意把职责跨模块搬运。优先做局部、小范围、低漂移的修复。
 
 ## Coding Standards
 
@@ -127,6 +142,8 @@ Agent 必须维护当前产品承诺：
 - CLI 行为：`tests/test_cli.py`
 - Comfy 传输行为：`tests/test_comfy_client.py`
 - ffmpeg 行为：`tests/test_ffmpeg_tools.py`
+- P2 schema、hash、path、strategy、registry 或 loader：`tests/test_production_models.py`、`tests/test_production_validation.py`、`tests/test_production_registry.py`、`tests/test_production_project.py`
+- P2 与 Legacy Config/CLI isolation：在上述 P2 tests 之外加跑 `tests/test_config.py`、`tests/test_cli.py`
 
 如果一次改动跨越多个表面，就运行所有对应测试文件。
 
@@ -139,11 +156,12 @@ Agent 必须维护当前产品承诺：
 - 修改 `runs/` 下的 manifest schema 或产物目录结构。
 - 把本地优先策略改成默认允许远程主机。
 - 引入前端、API server、队列管理、音频，或其他 MVP 规范中明确排除的子系统。
-- 执行 v0.2 P2-P9 任一 runtime slice，或把 spec 中的 proposed contract 写成当前行为。P1 只允许在其现有 Legacy scope 内做独立 bugfix/release handling，不得借此扩展新 product domain。
+- 执行 v0.2 P2A-P9 任一 runtime slice，或把 plan/spec 中的 proposed contract 写成当前行为。P2 read-only core 已实现，但任何 v2 writer、activation、schema/layout mutation 都必须先有 P2A 实施授权和 crash-safety tests；P3 还必须完成 Renderer Gate。P1 只允许在其 Legacy scope 内做独立 bugfix/release handling，不得借此扩展新 product domain。
 
 ## Session Continuity
 
 - 如果未来会话中存在 `.agent/context/session-handoff.md`，应在阅读本文件后、开始实质代码工作前读取它。
+- 涉及已有回归类时，先查 `.agent/bug-memory/` 下直接相关记录；bug-memory 是案例证据，不覆盖 code、tests、spec 或本文件。
 - handoff 或 `.workflow/` 记录只作为上下文，绝不能覆盖真实代码、测试或用户明确指令。
 
 ## Repository-Specific Don't Repeat This
@@ -153,8 +171,6 @@ Agent 必须维护当前产品承诺：
 - 在更新 `final_output` 这类终态 run 状态后，不要绕过 manifest 的原子写入。
 - 在测试里不要通过裸 YAML/JSON 解析去加载 workflow 模板，如果生产路径是 `load_workflow_template()`。
 - 在本仓库做视频分析时，默认使用项目本地的 `video-analysis` MCP；`videoscan` 仅作为可选的全局辅助工具用于元数据或不带 AI 分析的抽帧，不要把它当作主分析通道。
-- 对绑定了 `init_image` 的 workflow，不要让首镜头静默回退到模板里的占位图；首镜头必须显式提供 `shot.init_image`，或由上游 shot 提供 chain frame，`validate` 也必须能拦住这类错误。
-- 做 I2V 质量迭代时，先检查“起始图构图是否支持目标动作”；不要拿“人物已居中站定”的起始图去追求“从画面左侧走入”这类需要明显重新构图的镜头，否则应先换 `init_image` 再调 prompt 或 sampler。
 
 ## Completion Standard
 
