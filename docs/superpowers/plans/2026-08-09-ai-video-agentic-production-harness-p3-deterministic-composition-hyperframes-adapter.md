@@ -6,7 +6,7 @@
 
 **Architecture:** `src/ai_video/production/models.py` 继续拥有 v2 schema，新的 `composition.py` 只负责从显式 Shot/asset bindings 解析整数 frame/sample boundaries 和 composition fingerprint，新的 `hyperframes.py` 只把已解析 timeline materialize 成受审计的 local source 并通过单一 HyperFrames CLI 执行。所有 durable write、active pointer switch、failed/succeeded attempt commit 都必须委托 accepted P2A canonical state committer；P3 不新建第二套 Manifest、timeline、renderer control plane，也不触碰 Legacy runtime。
 
-**Tech Stack:** Python 3.11+、Pydantic v2、`Decimal`、`hashlib`、现有 `AiVideoError`/`ErrorCode`、现有 `probe_clip()`、pytest fake runner、exact `hyperframes@0.7.103`、Node.js `>=22`、FFmpeg 和经 Renderer Gate 验证的 exact Chromium revision。默认 CI 不调用 Node、Chrome、network 或真实 render。
+**Tech Stack:** Python 3.11+、Pydantic v2、`Decimal`、`hashlib`、现有 `AiVideoError`/`ErrorCode`、private held-FD ffprobe/framemd5 adapters、pytest fake runner、exact `hyperframes@0.7.103`、Node.js `>=22`、FFmpeg 和经 Renderer Gate 验证的 exact Chromium revision。默认 CI 不调用 Node、Chrome、network 或真实 render。
 
 ---
 
@@ -113,13 +113,13 @@ Primary sources：
 | render attempt lifecycle | `ProductionStateCommitter.begin_render_attempt()` / `record_render_failure()` / `activate_render_state()` | `record_render_failure()` 只拥有外层尚未调用 activation 的 R+1 ordinary failure；`activate_render_state()` 从方法调用入口起独占 candidate transition、final activation 与它们的 failure/ambiguity ownership。它们不是 `commit()` alias wrapper；不得增加第二 writer 或 Manifest |
 | timeline/source/render activation | immutable `RenderStateSnapshot` selected by `ProductionManifest.active_render_state` | Manifest 只额外切换这一个 render pointer；snapshot 固定 exact timeline/source receipt/render receipt/output identities |
 | render scratch allocation | pure validated `ProductionStateCommitter.render_attempt_paths()` | 只返回 `state/render/attempts/<safe-attempt-id>/` 内的 attempt-owned source/output staging path，不创建目录、不切指针 |
-| measured render evidence | `RenderReceipt` built from output hash + `probe_clip()` | console text 不是 final status |
+| measured render evidence | `RenderReceipt` built only from one held no-follow verification-snapshot FD | external-tool pathname、console text 和 pathname reopen 都不是 final status；hash/size/ffprobe/framemd5/durable bytes 必须同源 |
 
 ## Old Path Decisions
 
 - 不修改或复用 `src/ai_video/workflow_renderer.py` 作为 composition renderer；它继续只拥有 Legacy Comfy workflow template/binding pure render。
 - 不修改 `src/ai_video/pipeline.py` 作为 v2 timeline owner；Legacy ordered Shot chaining 保持原状。
-- 不把 `src/ai_video/ffmpeg_tools.py::stitch_clips()` 当作 canonical renderer；P3 只复用 `probe_clip()` 验证 HyperFrames output。
+- 不把 `src/ai_video/ffmpeg_tools.py::stitch_clips()` 当作 canonical renderer；P3 复用其严格 metadata/error policy，但以 private `/proc/self/fd/<fd>` adapters 验证 HyperFrames output，不把不可信 scratch pathname 交给 probe。
 - 不修改 `src/ai_video/manifest.py` 或 Legacy `RunManifest`。
 - 不让 `ProductionProject.renderer_policy.default_preference` 静默选择未实现 adapter；requested/default 为 `remotion` 时必须 typed-fail。
 - 不在 HyperFrames failure 后调用 Remotion、ffmpeg stitch 或任何 alternate final-render path。
@@ -937,9 +937,18 @@ class NoFollowFile:
 
 
 def _read_regular_file_nofollow(path: Path, *, contained_by: Path) -> NoFollowFile: ...
+
+
+def _copy_held_fd_to_regular_file_nofollow(
+    source_fd: int,
+    destination: Path,
+    *,
+    contained_by: Path,
+    mode: int = 0o600,
+) -> None: ...
 ```
 
-It performs lexical absolute containment first, `lstat()` on the root and every existing component, rejects every artifact-path symlink even when it remains contained, opens/traverses beneath the root using directory FDs and `os.open(..., O_RDONLY | O_NOFOLLOW, dir_fd=...)`, requires `stat.S_ISREG(os.fstat(fd).st_mode)`, and reads/hash/magic-checks from that same FD. It compares final `lstat`/`fstat` device+inode and fails if a swap is observed. It never `resolve()`s and then reopens a pathname. `_create_directory_nofollow()` uses a validated parent dir FD plus `mkdirat`/no-follow reopen. `_create_regular_file_nofollow()` is the paired scratch/durable file primitive: validated parent directory FD, `O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW`, write bytes already returned by the read helper, file fsync, same-FD hash/size verification, then directory fsync. No P3 code uses `Path.mkdir()`, `shutil.copyfile()` or `sha256_file()` for these artifact surfaces.
+It performs lexical absolute containment first, `lstat()` on the root and every existing component, rejects every artifact-path symlink even when it remains contained, opens/traverses beneath the root using directory FDs and `os.open(..., O_RDONLY | O_NOFOLLOW, dir_fd=...)`, requires `stat.S_ISREG(os.fstat(fd).st_mode)`, and reads/hash/magic-checks from that same FD. It compares final `lstat`/`fstat` device+inode and fails if a swap is observed. It never `resolve()`s and then reopens a pathname. Implement the traversal once as a held-FD context primitive (for example `_open_regular_file_nofollow()`); `_read_regular_file_nofollow()` consumes that held FD for ordinary byte reads rather than duplicating path validation. `_create_directory_nofollow()` uses a validated parent dir FD plus `mkdirat`/no-follow reopen and supports explicit mode `0o700` for attempt directories. `_create_regular_file_nofollow()` and `_copy_held_fd_to_regular_file_nofollow()` are the paired **agent-owned materialization/verification/durable** primitives: validated parent directory FD, `O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW`, write supplied bytes or stream from the already-held source FD, file fsync, same-FD hash/size verification, then directory fsync. The copy helper seeks the held source FD to zero, streams to EOF without consulting its pathname, restores the source offset, and never reopens the source. These `O_EXCL` creation claims apply only to agent-owned materialized files and the verification snapshot; HyperFrames itself creates `staged_output`, so that external-tool output is untrusted and is never claimed to have been created through this primitive. No P3 code uses `Path.mkdir()`, `shutil.copyfile()` or `sha256_file()` for these artifact surfaces.
 
 No function may add float seconds across Shots.
 
@@ -1482,10 +1491,10 @@ def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
     assert {call.env["HYPERFRAMES_BROWSER_PATH"] for call in runner.calls} == {
         str(validated_browser_path)
     }
-    assert result.output.output_sha256 == _read_regular_file_nofollow(
-        result.output.scratch_path,
-        contained_by=result.output.scratch_path.parent.parent,
-    ).file_sha256
+    assert result.output.output_sha256 == hashlib.sha256(
+        result.output.verified_bytes
+    ).hexdigest()
+    assert result.output.output_size_bytes == len(result.output.verified_bytes)
 
 
 def test_adapter_rejects_remotion_without_fallback(tmp_path):
@@ -1520,13 +1529,25 @@ def test_production_runner_has_no_host_network_fallback_when_namespace_is_unavai
 def test_production_runner_injects_exact_browser_env_timeout_and_redacts_output(tmp_path): ...
 
 
+def test_output_verification_ffprobe_uses_exact_proc_fd_argv_and_pass_fds(tmp_path): ...
+
+
+def test_output_verification_framemd5_uses_exact_proc_fd_argv_and_pass_fds(tmp_path): ...
+
+
+def test_staged_output_path_swap_between_hash_probe_and_framemd5_cannot_change_evidence(tmp_path): ...
+
+
+def test_verification_snapshot_path_swap_between_hash_probe_and_framemd5_never_mixes_bytes(tmp_path): ...
+
+
 ```
 
 Also cover wrong tool version/failed doctor, malformed JSON, lint errors, check errors, warnings policy, missing/empty output, output hash mismatch, measured width/height/FPS/frame-count mismatch, unexpected audio stream, timeout, stderr truncation/redaction, no source mutation after lint, and only one selected renderer.
 
-Add output-path tests proving a sibling/absolute/`..`/symlink-escape output is rejected before mkdir/render. The adapter validates the exact scratch output and parent beneath `allowed_staging_parent`, then explicitly creates that validated parent; it never attempts to express the output relative to the source root.
+Add output-path tests proving a sibling/absolute/`..`/symlink-escape output is rejected before mkdir/render. The adapter validates the exact staged-output and verification-snapshot names directly beneath `allowed_staging_parent`, verifies that attempt directory is still no-follow mode `0o700`, then explicitly uses only those paths; it never attempts to express either output relative to the source root. HyperFrames creates the staged output itself, so tests must not assert it was opened with `O_EXCL`; only agent-owned source materialization and verification-snapshot creation receive that guarantee.
 
-Add verify-boundary tests where injected `probe_clip()`, `decoded_frame_sha256()`, ffprobe parsing or framemd5 parsing raises plain exceptions, `AiVideoError(code=FFMPEG_FAILED)` or another `AiVideoError`. Every case must emerge as non-retryable `RendererAttemptError(code=RENDER_FAILED, phase="verify")`; no `FFMPEG_FAILED` crosses the P3 public boundary, and lifecycle orchestration records phase `verify`.
+Add verify-boundary tests where injected FD-based probe/decoded-frame helpers, ffprobe parsing or framemd5 parsing raise plain exceptions, `AiVideoError(code=FFMPEG_FAILED)` or another `AiVideoError`. Every case must emerge as non-retryable `RendererAttemptError(code=RENDER_FAILED, phase="verify")`; no `FFMPEG_FAILED` crosses the P3 public boundary, and lifecycle orchestration records phase `verify`. Assert exact `subprocess.run()` argv contains `/proc/self/fd/<passed-fd>`, `shell=False`, and exactly `pass_fds=(passed_fd,)`. Race tests swap the original staged-output pathname after its secure open and swap the verification-snapshot pathname between hash, ffprobe and framemd5 hooks; output hash, measured metadata, frame fingerprint and durable bytes must all remain from the held verification FD or the operation typed-fails before evidence is accepted, never mixing old/new pathname contents.
 
 - [ ] **Step 2: Run adapter RED**
 
@@ -1607,11 +1628,14 @@ class HyperFramesRenderAttempt:
     staging_root: Path
     allowed_staging_parent: Path
     output_path: Path
+    verification_snapshot_path: Path
 
 
 @dataclass(frozen=True)
 class VerifiedRenderOutput:
-    scratch_path: Path
+    untrusted_staged_path: Path
+    verification_snapshot_path: Path
+    verified_bytes: bytes
     output_sha256: str
     output_size_bytes: int
     measured: MeasuredRenderMetadata
@@ -1680,8 +1704,8 @@ class HyperFramesAdapter:
         runner: RendererRunner,
         expected_version: str,
         *,
-        probe: Callable[[Path], dict] = probe_clip,
-        decoded_frames: Callable[[Path], str] = decoded_frame_sha256,
+        probe: Callable[[int], dict] = probe_clip_fd,
+        decoded_frames: Callable[[int], str] = decoded_frame_sha256_fd,
         browser_path: Path,
     ) -> None:
         self._runner = runner
@@ -1736,6 +1760,11 @@ class HyperFramesAdapter:
             raise _renderer_unavailable("P3 render attempt must select only hyperframes.")
         if attempt.timeline.renderer.kind is not RendererKind.HYPERFRAMES:
             raise _renderer_unavailable("ResolvedTimeline does not select hyperframes.")
+        _validate_directory_nofollow(
+            attempt.allowed_staging_parent,
+            contained_by=attempt.allowed_staging_parent.parent,
+            expected_mode=0o700,
+        )
         if self._runner.version(env=dict(self._env)) != self._expected_version:
             raise _renderer_unavailable("Installed HyperFrames version does not match the pin.")
         doctor = self._runner.doctor(env=dict(self._env))
@@ -1757,6 +1786,13 @@ class HyperFramesAdapter:
             allowed_parent=attempt.allowed_staging_parent,
             suffix=".mp4",
         )
+        verification_snapshot = _validate_new_contained_output(
+            attempt.verification_snapshot_path,
+            allowed_parent=attempt.allowed_staging_parent,
+            suffix=".mp4",
+        )
+        if verification_snapshot.parent != attempt.allowed_staging_parent:
+            raise _render_failed("Verification snapshot must be directly inside the attempt directory.")
         _create_directory_nofollow(
             staged_output.parent,
             contained_by=attempt.allowed_staging_parent,
@@ -1770,30 +1806,59 @@ class HyperFramesAdapter:
         )
         if command_result.returncode != 0:
             raise _render_error("render", command_result)
-        _verify_materialized_unchanged(materialized)
         try:
-            output_snapshot = _read_regular_file_nofollow(
+            # Open immediately after render returns: HyperFrames created this untrusted pathname.
+            with _open_regular_file_nofollow(
                 staged_output,
                 contained_by=attempt.allowed_staging_parent,
-            )
-            if output_snapshot.size_bytes == 0:
-                raise _render_failed("HyperFrames output is missing or empty.")
-            output_size = output_snapshot.size_bytes
-            output_sha256 = output_snapshot.file_sha256
-            measured = _measured_metadata(self._probe(staged_output))
-            _validate_measured_timeline(measured, attempt.timeline)
-            decoded = self._decoded_frames(staged_output)
-            return HyperFramesRenderResult(
-                materialized=materialized,
-                checks=(lint_receipt, check_receipt),
-                output=VerifiedRenderOutput(
-                    scratch_path=staged_output,
-                    output_sha256=output_sha256,
-                    output_size_bytes=output_size,
-                    measured=measured,
-                    decoded_frame_fingerprint=decoded,
-                ),
-            )
+            ) as staged_fd:
+                staged_before = os.fstat(staged_fd)
+                if staged_before.st_size == 0:
+                    raise _render_failed("HyperFrames output is missing or empty.")
+                _copy_held_fd_to_regular_file_nofollow(
+                    staged_fd,
+                    destination=verification_snapshot,
+                    contained_by=attempt.allowed_staging_parent,
+                    mode=0o600,
+                )
+                staged_after = os.fstat(staged_fd)
+                _require_same_regular_file(staged_before, staged_after)
+            _verify_materialized_unchanged(materialized)
+
+            # Reopen the agent-owned snapshot exactly once, then never use its pathname for evidence.
+            with _open_regular_file_nofollow(
+                verification_snapshot,
+                contained_by=attempt.allowed_staging_parent,
+            ) as verification_fd:
+                verification_before = os.fstat(verification_fd)
+                verified_bytes = _read_all_from_held_fd(verification_fd)
+                output_size = len(verified_bytes)
+                if output_size != verification_before.st_size:
+                    raise _render_failed("Verification snapshot size does not match held bytes.")
+                output_sha256 = hashlib.sha256(verified_bytes).hexdigest()
+                measured = _measured_metadata(self._probe(verification_fd))
+                _validate_measured_timeline(measured, attempt.timeline)
+                decoded = self._decoded_frames(verification_fd)
+                # PreparedArtifact consumes these exact bytes; no pathname reopen is allowed.
+                durable_bytes = _read_all_from_held_fd(verification_fd)
+                if durable_bytes != verified_bytes:
+                    raise _render_failed("Verification snapshot bytes changed while held open.")
+                verification_after = os.fstat(verification_fd)
+                _require_same_regular_file(verification_before, verification_after)
+
+                return HyperFramesRenderResult(
+                    materialized=materialized,
+                    checks=(lint_receipt, check_receipt),
+                    output=VerifiedRenderOutput(
+                        untrusted_staged_path=staged_output,
+                        verification_snapshot_path=verification_snapshot,
+                        verified_bytes=durable_bytes,
+                        output_sha256=output_sha256,
+                        output_size_bytes=output_size,
+                        measured=measured,
+                        decoded_frame_fingerprint=decoded,
+                    ),
+                )
         except Exception as exc:
             raise _verify_failed(exc) from exc
 
@@ -1842,13 +1907,70 @@ def _verify_materialized_unchanged(value: MaterializedHyperFramesSource) -> None
     audit_hyperframes_source(value.index_path, expected_assets=value.asset_bindings)
 
 
-def decoded_frame_sha256(path: Path) -> str:
-    result = run_command(
-        [
-            "ffmpeg", "-v", "error", "-i", str(path),
+def _read_all_from_held_fd(held_fd: int) -> bytes:
+    os.lseek(held_fd, 0, os.SEEK_SET)
+    chunks: list[bytes] = []
+    while chunk := os.read(held_fd, 1024 * 1024):
+        chunks.append(chunk)
+    os.lseek(held_fd, 0, os.SEEK_SET)
+    return b"".join(chunks)
+
+
+@contextmanager
+def _dup_held_fd_at_start(held_fd: int) -> Iterator[int]:
+    duplicate = os.dup(held_fd)
+    try:
+        os.lseek(duplicate, 0, os.SEEK_SET)
+        yield duplicate
+    finally:
+        os.close(duplicate)
+
+
+def _require_same_regular_file(before: os.stat_result, after: os.stat_result) -> None:
+    identity = lambda value: (value.st_dev, value.st_ino, value.st_size)
+    if not stat.S_ISREG(before.st_mode) or not stat.S_ISREG(after.st_mode):
+        raise _render_failed("Output evidence is not a regular file.")
+    if identity(before) != identity(after):
+        raise _render_failed("Output identity changed during verification.")
+
+
+def probe_clip_fd(held_fd: int) -> dict:
+    with _dup_held_fd_at_start(held_fd) as probe_fd:
+        argv = [
+            "ffprobe", "-v", "error", "-show_streams", "-show_format",
+            "-of", "json", f"/proc/self/fd/{probe_fd}",
+        ]
+        result = subprocess.run(
+            argv,
+            shell=False,
+            pass_fds=(probe_fd,),
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+    if result.returncode != 0:
+        raise _render_failed(_redact(result.stderr))
+    return json.loads(result.stdout)
+
+
+def decoded_frame_sha256_fd(held_fd: int) -> str:
+    with _dup_held_fd_at_start(held_fd) as frame_fd:
+        argv = [
+            "ffmpeg", "-v", "error", "-i", f"/proc/self/fd/{frame_fd}",
             "-map", "0:v:0", "-f", "framemd5", "-",
         ]
-    )
+        result = subprocess.run(
+            argv,
+            shell=False,
+            pass_fds=(frame_fd,),
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=1800,
+        )
+    if result.returncode != 0:
+        raise _render_failed(_redact(result.stderr))
     rows = [
         line.strip()
         for line in result.stdout.replace("\r\n", "\n").splitlines()
@@ -1893,11 +2015,11 @@ def _validate_measured_timeline(
         raise _render_failed("Render frame count does not match ResolvedTimeline.")
 ```
 
-`decoded_frame_sha256()` must run existing `ffmpeg_tools.run_command()` with `ffmpeg -v error -i <output> -map 0:v:0 -f framemd5 -`, remove comment/header lines, normalize line endings and SHA-256 the ordered per-frame checksum rows. This is decoded-frame evidence; it is distinct from `output_sha256` and must not include container metadata. `_measured_metadata()` must parse the first video stream's `width`, `height`, rational frame rate, `nb_frames` and `codec_name`; missing/ambiguous values are typed `RENDER_FAILED`, not guessed from filename or duration text.
+`probe_clip_fd()` and `decoded_frame_sha256_fd()` adapt the existing ffprobe/framemd5 parsing policy to held descriptors; they do not call the existing pathname-based helper. Each duplicates the already-held verification FD at offset zero, uses only `/proc/self/fd/<dup-fd>` in exact subprocess argv, sets `shell=False` and `pass_fds=(dup_fd,)`, applies bounded capture/redaction/timeouts, and closes the duplicate afterward. `decoded_frame_sha256_fd()` removes comment/header lines, normalizes line endings and SHA-256s the ordered per-frame checksum rows. This is decoded-frame evidence; it is distinct from `output_sha256` and must not include container metadata. `_measured_metadata()` must parse the first video stream's `width`, `height`, rational frame rate, `nb_frames` and `codec_name`; missing/ambiguous values are typed `RENDER_FAILED`, not guessed from filename or duration text.
 
-The method must verify exact tool version and successful `doctor` after selection has been durably begun, parse the pinned JSON schema, require zero errors, record warning counts, rehash source/assets between phases, validate output with `probe_clip()`, and calculate output/decoded-frame hashes. The verify boundary catches every `AiVideoError` including `FFMPEG_FAILED` plus plain probe/framemd5/parse exceptions and exposes only non-retryable `RendererAttemptError(RENDER_FAILED, phase="verify")`. It never includes timestamps or scratch paths in timeline/source/decoded-frame identity. Task 5 builds canonical durable receipts and supplies the real committer/crash/replay tests.
+The method must verify exact tool version and successful `doctor` after selection has been durably begun, parse the pinned JSON schema, require zero errors, record warning counts, rehash source/assets between phases, and then bind every output fact to one agent-owned verification snapshot FD. HyperFrames-created `staged_output` is untrusted external-tool scratch: open it with `lstat` + `O_RDONLY|O_NOFOLLOW` + regular-file `fstat`; stream bytes from that held source FD into a new `0o600` snapshot inside the already validated `0o700` attempt directory using `O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW`, followed by file and parent-directory fsync. The snapshot is reopened exactly once with `O_RDONLY|O_NOFOLLOW` and held across byte hashing, size, ffprobe, framemd5 and extraction of the exact bytes later supplied to the durable `PreparedArtifact`. Compare device/inode/size by `fstat` before/after source copy and before/after all snapshot evidence. A pathname swap either leaves evidence consistently bound to the held FD or typed-fails during the no-follow open; no stage can mix identities. The verify boundary catches every `AiVideoError` including `FFMPEG_FAILED` plus plain probe/framemd5/parse exceptions and exposes only non-retryable `RendererAttemptError(RENDER_FAILED, phase="verify")`. It never includes timestamps or scratch paths in timeline/source/decoded-frame identity. Task 5 builds canonical durable receipts and supplies the real committer/crash/replay tests.
 
-Import `Callable`, `Mapping`, `Protocol`, `Literal`, `cast`, `hashlib`, `json`, `os`, `re`, `subprocess`, the shared no-follow primitives, existing `probe_clip()`/`run_command()` and the named P3 models. `_source_invalid()` must return `RendererAttemptError(phase="source")`; `_render_failed()` must return `RendererAttemptError(phase="verify")`; `_renderer_unavailable()` returns non-retryable `AiVideoError(RENDERER_UNAVAILABLE)`. Public orchestration persists begin before constructing/probing the isolated runner; no helper may start a host fallback command.
+Import `contextmanager`, `Callable`, `Iterator`, `Mapping`, `Protocol`, `Literal`, `cast`, `hashlib`, `json`, `os`, `re`, `stat`, `subprocess`, the shared held-FD/no-follow primitives and the named P3 models. Do not alter `ffmpeg_tools.py`; the private FD adapters reproduce its strict parsing/error policy while adding exact argv/`pass_fds` ownership. `_source_invalid()` must return `RendererAttemptError(phase="source")`; `_render_failed()` must return `RendererAttemptError(phase="verify")`; `_renderer_unavailable()` returns non-retryable `AiVideoError(RENDERER_UNAVAILABLE)`. Public orchestration persists begin before constructing/probing the isolated runner; no helper may start a host fallback command.
 
 Do not add preview to automated adapter flow. Preview belongs only to the explicit live spike gate because it starts a server/browser and is not necessary for deterministic batch execution.
 
@@ -1972,13 +2094,14 @@ class RenderAttemptPaths:
     attempt_root: Path
     source_root: Path
     staged_output_path: Path
+    verification_snapshot_path: Path
 
 
 def render_attempt_paths(self, attempt_id: str) -> RenderAttemptPaths:
     ...
 ```
 
-This method is pure: it validates a conservative safe attempt ID, resolves clean absolute project-root-contained paths corresponding to `state/render/attempts/<attempt-id>/`, and performs no mkdir/write/delete. The persisted identities remain canonical project-relative paths; the adapter creates only the exact validated attempt-owned directories it consumes.
+This method is pure: it validates a conservative safe attempt ID, resolves clean absolute project-root-contained paths corresponding to `state/render/attempts/<attempt-id>/`, and returns distinct fixed names for HyperFrames-owned `staged_output_path` and agent-owned `verification_snapshot_path`; it performs no mkdir/write/delete. The persisted identities remain canonical project-relative paths; orchestration creates `attempt_root` with mode `0o700`, and the adapter creates only the exact validated attempt-owned source/output files it consumes. The external renderer may create only `staged_output_path`; the agent creates the verification snapshot itself with mode `0o600` and exclusive no-follow semantics.
 
 Use the same immutable path validators and the single `_read_regular_file_nofollow()` primitive in `project.py` and `state_commit.py`: when a 2.1 Manifest has `active_render_state`, open the exact state snapshot, timeline/source receipt/render receipt JSON, canonical source index and every bound raster, plus output without following any symlink; verify canonical path, same-FD file SHA-256, source bundle hash, raster MIME/magic/suffix, semantic revision/content hash, output size, exact project/registry provenance and every cross identity. Candidate promotion/reopen and recovery use the same primitive. Return the verified render state as optional read-only data on `LoadedProductionProject`; do not scan, activate, recover or mutate.
 
@@ -2023,9 +2146,9 @@ class ActivateRenderStateRequest:
     next_render_state: RenderStateSnapshotPointer
 ```
 
-The request identity is the complete tuple of authoritative `renderer_selection` (including attempt ID, exact timeline fingerprint and active project/registry pointers), expected revision, base render pointer, sorted `(relative_path, file_sha256)` variable artifact set and next pointer. `BeginRenderAttemptRequest` does not duplicate selection identity; the committer compares selection pointers/fingerprint directly with the live Manifest and resolved timeline, and `RenderStateSnapshot` later fixes the same provenance. `BeginRenderAttemptRequest.expected_manifest_revision=R`; its fresh write yields R+1. An outer `RecordRenderFailureRequest` is valid only before activation is called, against authoritative begun R+1, and yields terminal R+2 with no candidate. `ActivateRenderStateRequest.expected_manifest_revision=R+1` transfers sole ownership at method entry: candidate-transition ordinary failure may terminalize directly from R+1 to R+2 with exact candidate/hash; successful candidate preparation yields authoritative R+2; final success or activation-owned failure then yields R+3 internally. The outer layer never constructs a failure request after that call. Begin/success exact replay returns the already-persisted corresponding Manifest state only when selection, base pointer and every stage identity match; any mismatch is `PRODUCTION_STATE_INVALID`. Pre-activation failure replay is idempotent only when phase/code/message and all provenance/base identities match. Requests reject stale `expected_manifest_revision` except an exact recognized replay for the same owner/stage.
+`BeginRenderAttemptRequest` identity is exactly authoritative `renderer_selection` (including attempt ID, exact timeline fingerprint and active project/registry pointers), expected revision and base render pointer; it does not duplicate selection identity or carry separate `current_project/current_registry` fields. The committer compares selection pointers/fingerprint directly with the live Manifest and resolved timeline, and `RenderStateSnapshot` later fixes the same provenance. Failure identity additionally includes the explicit `current_project/current_registry`, phase/code/message; activation identity additionally includes explicit `current_project/current_registry`, the sorted `(relative_path, file_sha256)` artifact set and exact next pointer. `BeginRenderAttemptRequest.expected_manifest_revision=R`; its fresh write yields R+1. An outer `RecordRenderFailureRequest` is valid only before activation is called, against authoritative begun R+1, and yields terminal R+2 with no candidate. `ActivateRenderStateRequest.expected_manifest_revision=R+1` transfers sole ownership at method entry: candidate-transition ordinary failure may terminalize directly from R+1 to R+2 with exact candidate/hash; successful candidate preparation yields authoritative R+2; final success or activation-owned failure then yields R+3 internally. The outer layer never constructs a failure request after that call. Begin/success exact replay returns the already-persisted corresponding Manifest state only when selection, base pointer and every stage identity match; any mismatch is `PRODUCTION_STATE_INVALID`. Pre-activation failure replay is idempotent only when phase/code/message and all provenance/base identities match. Requests reject stale `expected_manifest_revision` except an exact recognized replay for the same owner/stage.
 
-For every render request, `current_project/current_registry` must equal the live Manifest pair. Persisted render attempts set `base_project == candidate_project == current_project` and `base_registry == candidate_registry == current_registry`; validators reject any project/registry change or any mixed project-registry/render operation.
+For every failure or activation request, `current_project/current_registry` must equal both the live Manifest pair and the authoritative pair embedded in `renderer_selection`. For begin, that pair comes only from `renderer_selection`. Persisted render attempts set base/candidate project and registry to that authoritative unchanged pair; validators reject any project/registry change or any mixed project-registry/render operation.
 
 - [ ] **Step 4: Implement begin and typed failure persistence**
 
@@ -2055,6 +2178,7 @@ try:
     _create_directory_nofollow(
         paths.attempt_root,
         contained_by=committer.project_root,
+        mode=0o700,
     )
     runner = _NetworkIsolatedHyperFramesRunner(
         project_root=committer.project_root,
@@ -2089,7 +2213,7 @@ return committer.activate_render_state(activation)
 
 Every ordinary exception after successful begin but before the call to `activate_render_state()`, including missing namespace/tool capability, isolated-runner or controlled-env/browser-path construction, plain `RENDERER_UNAVAILABLE` from version/wrong pin/doctor, `OSError` during scratch/source materialization, and typed lint/check/render/verify errors, is normalized into `RecordRenderFailureRequest` before re-raise. Version/doctor/availability/materialization use `phase="source"`. There is no host-network fallback. The outer function never catches `activate_render_state()` merely to call `record_render_failure()`; activation owns candidate serialization through final ambiguity from method entry, even while R+1 is still authoritative. Process-level interruption/crash and `PRODUCTION_STATE_OUTCOME_UNKNOWN` remain explicit-recovery paths. If pre-activation failure persistence itself fails, raise the state persistence error with the original exception attached as a note. No conclusively ordinary post-begin path may leave the attempt `running`.
 
-`prepare_durable_render_artifacts()` is pure construction plus sealing: it does not write. It computes `state/render/sources/<bundle-sha>/...` paths and `state/render/outputs/<output-sha>.mp4`, then creates `RendererSourceReceipt`, `RenderReceipt` and `RenderStateSnapshot` whose paths are those final canonical destinations. It must never call `relative_to()` between scratch source/output siblings or persist an attempt scratch path. Add focused order/persistence tests:
+`prepare_durable_render_artifacts()` is pure construction plus sealing: it does not write. It computes `state/render/sources/<bundle-sha>/...` paths and `state/render/outputs/<output-sha>.mp4`, then creates `RendererSourceReceipt`, `RenderReceipt` and `RenderStateSnapshot` whose paths are those final canonical destinations. The output `PreparedArtifact.data` must be exactly `result.output.verified_bytes`, already derived from the held verification FD; this function must not reopen `untrusted_staged_path` or `verification_snapshot_path`. `RenderReceipt.output_path` records only the computed final canonical durable output path, while its hash, size, measured metadata and decoded-frame fingerprint all originate from that same verification snapshot FD. It must never call `relative_to()` between scratch source/output siblings or persist an attempt scratch path. Add focused order/persistence tests:
 
 ```python
 def test_orchestrator_persists_selection_before_version_or_executable_call(tmp_path): ...
@@ -2103,6 +2227,8 @@ def test_orchestrator_records_every_ordinary_phase_and_never_leaves_running(tmp_
 def test_orchestrator_does_not_retry_record_failure_after_activation_takes_ownership(tmp_path): ...
 
 def test_activation_request_exactly_matches_sealed_durable_n_plus_6_set_and_state_pointer(tmp_path): ...
+
+def test_durable_output_prepared_artifact_uses_exact_verified_fd_bytes_without_path_reopen(tmp_path): ...
 
 def test_package_root_exports_render_with_hyperframes_but_omits_adapter_runner_and_scratch_types(): ...
 
@@ -2122,7 +2248,7 @@ For `N` unique bound raster assets, the orchestration layer passes exactly `N + 
 3. exactly `N` actual bound raster files at `state/render/sources/<bundle_sha256>/assets/<full-asset-sha256>.<png|jpg|webp>`;
 4. one sealed `RendererSourceReceipt` JSON at `state/render/source-receipts/<source.content_hash>.json` pointing to that exact bundle/root/index/raster set;
 5. one sealed `RenderReceipt` JSON at `state/render/render-receipts/<render.content_hash>.json` whose `output_path` is the final canonical durable path;
-6. one verified output file at `state/render/outputs/<output_sha256>.mp4`;
+6. one verified output file at `state/render/outputs/<output_sha256>.mp4`, whose `PreparedArtifact.data` is exactly the bytes extracted from the held verification-snapshot FD;
 7. one sealed `RenderStateSnapshot` JSON at `state/render/states/<state.content_hash>.json` fixing active project/registry, timeline, source bundle/receipt, render receipt and output pointers.
 
 The count is `1 + 1 + N + 1 + 1 + 1 + 1 = N + 6`; no fixed-count shortcut remains. Duplicate assets in multiple spans produce one raster artifact but remain explicitly referenced by each binding. `activate_render_state()` parses/reseals the four JSON artifacts, audits/re-hashes the HTML and every raster, recomputes the exact bundle hash, rehashes/reopens every promoted file, verifies output size/hash, validates the snapshot project/registry and cross references, and requires `next_render_state` to point exactly at the state artifact. Extra, missing, duplicate or noncanonical artifacts fail. The immutable writer uses file temp -> file fsync -> promote-without-overwrite -> parent-directory fsync -> reopen verify for every artifact/output; it explicitly creates each already-validated canonical parent before opening a temp file.
@@ -2328,7 +2454,7 @@ if rg -n 'connect\(|sendto\(|sendmsg\(' "$P3_INTEGRATION_EVIDENCE"/integration.n
 fi
 ```
 
-The test copies the committed PNG fixture into a disposable project, builds a real `STATIC_IMAGE`/cut-only timeline with a non-default deterministic transform/opacity/z-order, calls public `render_with_hyperframes()` (which constructs the private isolated runner) once, and completes `begin_render_attempt -> version -> doctor -> source -> lint -> check -> render -> verify -> activate_render_state`. It asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, decoded-frame evidence, no audio, scratch paths absent from receipts, and unchanged Legacy state. Unit tests already assert exact subprocess argv; this harness hashes committed source inputs before/after and parses all trace files with the same “any non-loopback AF_INET/AF_INET6 destination fails” rule from Task 0. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
+The test copies the committed PNG fixture into a disposable project, builds a real `STATIC_IMAGE`/cut-only timeline with a non-default deterministic transform/opacity/z-order, calls public `render_with_hyperframes()` (which constructs the private isolated runner) once, and completes `begin_render_attempt -> version -> doctor -> source -> lint -> check -> render -> held-FD verify -> activate_render_state`. It asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, decoded-frame evidence, no audio, exact durable output bytes equal the held verification-snapshot bytes, scratch paths absent from receipts, and unchanged Legacy state. Unit tests already assert exact subprocess `/proc/self/fd` argv/`pass_fds` plus namespace argv; this harness hashes committed source inputs before/after and parses all trace files with the same “any non-loopback AF_INET/AF_INET6 destination fails” rule from Task 0. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
 
 The live test is selected only by the command above and fail-closes unless `P3_LIVE_RENDERER=1`, exact binary/browser and namespace tracing are present. Default tests exercise the same lifecycle with a fake runner and no Node/Chrome/network; the opt-in test may be deselected by default, not silently reported as a passing live proof.
 
@@ -2450,8 +2576,12 @@ Verify integer frame/sample boundaries, exact Shot asset role/ID/MIME/hash, reje
 actually-applied inline CSS transform/origin/opacity/z-order, delivery profile and fingerprint.
 Verify no raw asset ID enters a path, every target is contained before mkdir/copy,
 magic/MIME/suffix and parsed HTML/CSS URLs enforce the exact declared raster set.
-Verify one lstat/openat O_NOFOLLOW helper owns all artifact reads/reopens, scratch writes
-use O_EXCL/O_NOFOLLOW, contained/external symlinks and inode-swap attempts fail closed.
+Verify one lstat/openat O_NOFOLLOW helper owns all artifact reads/reopens; agent-owned
+materialization/verification writes use O_EXCL/O_NOFOLLOW, but HyperFrames-created staged_output
+is explicitly untrusted and receives no agent-O_EXCL claim. Verify staged_output is securely held,
+stream-copied to one exclusive snapshot, and all hash/size/durable bytes plus ffprobe/framemd5
+come from that same held snapshot FD with exact /proc/self/fd argv, shell=False and pass_fds.
+Verify contained/external symlinks plus staged/snapshot pathname and inode swaps never mix evidence.
 Verify selection fixes timeline fingerprint and active project/registry before execution.
 Verify RenderStateSnapshot repeats that provenance and exact replay rejects any mismatch.
 Verify changed project/registry commit atomically clears active render state, same-pair
@@ -2470,7 +2600,7 @@ Verify exact 0.7.103 version and doctor run with controlled validated browser en
 Verify public render_with_hyperframes alone constructs the private namespace runner;
 every tool argv has exact unshare flags/fixed exec "$@", shell=False and no host fallback,
 and package-root exports omit adapter, runner and scratch result types.
-Verify probe/ffprobe/framemd5/plain errors map to non-retryable RENDER_FAILED verify;
+Verify staged-output/snapshot FD swaps and probe/ffprobe/framemd5/plain errors map to non-retryable RENDER_FAILED verify;
 FFMPEG_FAILED never crosses the P3 public boundary.
 Verify one attempt selects exactly one renderer and no Remotion/fallback/double render exists.
 Verify Task 0 gate precedes Task 1, traces reject every non-loopback AF_INET/AF_INET6
@@ -2502,7 +2632,7 @@ Failure handling:
 - missing `unshare`/user-net-PID namespace/loopback/bash/ip capability is non-retryable `RENDERER_UNAVAILABLE`, persisted as source failure after begin; no tool runs on the host network as fallback;
 - lint failure: stop before `check`/render and persist the exact typed failed phase through `record_render_failure()`;
 - check failure: stop before render and persist the exact typed failed phase through `record_render_failure()`;
-- render/timeout/output verification failure: persist the typed phase and leave `active_render_state` old/`None`; probe/ffprobe/framemd5/parse errors, including underlying `FFMPEG_FAILED`, cross the P3 boundary only as non-retryable `RENDER_FAILED` phase `verify`;
+- render/timeout/output verification failure: persist the typed phase and leave `active_render_state` old/`None`; the external staged-output pathname is never trusted after its secure open, the exclusive verification snapshot is never reopened by pathname after its one secure read-open, and any identity/size change, probe/ffprobe/framemd5/parse error (including underlying `FFMPEG_FAILED`) crosses the P3 boundary only as non-retryable `RENDER_FAILED` phase `verify`;
 - a normal P2A project/registry commit that changes either pointer clears `active_render_state` atomically and preserves the former timeline/source bundle/receipts/output/state as orphan evidence; same-pair commit retains it only after exact provenance verification;
 - before `activate_render_state()` is called, outer `render_with_hyperframes()` owns exactly one `record_render_failure()` write from R+1; after method entry it never catches activation to retry failure persistence;
 - activation-owned candidate serialization/temp-open-write/file-fsync/pre-replace ordinary failure becomes terminal R+2 failed with exact candidate/hash and base active/project/registry state;
@@ -2534,11 +2664,11 @@ P3 is accepted only when:
 4. only `STATIC_IMAGE`, zero-duration `CUT`, local PNG/JPEG/WebP, default-only trim and no motion directives are accepted; exact `(asset_role, asset_id)`, MIME/hash, actually-applied inline CSS transform/origin/opacity/z-order, delivery profile, renderer kind/version and deterministic composition fingerprint are persisted;
 5. identical resolved inputs produce identical timeline/source hashes and frame-equivalent output under the pinned tool/runtime;
 6. no byte-identical MP4 claim is made without a separately proven encoder/container contract;
-7. every materialized target is contained before creation, filename derives only from full asset hash plus allowlisted lowercase raster suffix, and one lstat/openat `O_NOFOLLOW` helper owns source/scratch/durable/reader bytes; `O_EXCL|O_NOFOLLOW` writes, contained/external symlink tests and inode-swap tests fail closed;
+7. every materialized target is contained before creation, filename derives only from full asset hash plus allowlisted lowercase raster suffix, and one lstat/openat `O_NOFOLLOW` traversal owner backs source/scratch/durable/reader bytes; `O_EXCL|O_NOFOLLOW` applies to agent-owned materialization and verification files, not HyperFrames-created staged output. The staged output is securely held and streamed into one exclusive verification snapshot; hash/size, exact durable bytes, ffprobe metadata and framemd5 all come from its held FD via `/proc/self/fd/<fd>`, `shell=False` and exact `pass_fds`, while contained/external symlink and both staged/snapshot pathname-swap tests fail closed or remain byte-consistent;
 8. parsed HTML/CSS media URLs exactly equal declared relative raster sources; source contains no SVG/HTML/CSS asset payload, wall-clock randomness, implicit network fetch, remote/absolute/parent/scheme/data/blob URL or untracked file;
 9. each attempt has one authoritative selection identity and one HyperFrames execution path; `BeginRenderAttemptRequest` does not duplicate timeline/project/registry fields;
 10. Remotion is neither installed nor implemented and no double-render/fallback exists;
-11. one immutable `RenderStateSnapshot` fixes exact active project/registry, selection/timeline fingerprint, canonical durable source HTML/raster bundle, source/render receipts and final canonical output pointers; one Manifest pointer activates it and no scratch path is semantic;
+11. one immutable `RenderStateSnapshot` fixes exact active project/registry, selection/timeline fingerprint, canonical durable source HTML/raster bundle, source/render receipts and final canonical output pointers; `RenderReceipt` names the final durable output path but its hash/size/metadata/frame evidence and the output `PreparedArtifact` bytes all originate from the single held verification-snapshot FD; one Manifest pointer activates it and no scratch path is semantic;
 12. Task 0 exact 0.7.103 version/doctor/lint/check/preview/two-render compatibility gate passes before Task 1 using the same namespace wrapper contract; runtime selection is durable before any executable call, only private `_NetworkIsolatedHyperFramesRunner` runs tools with fresh user/net/PID namespace + fixed `exec "$@"`/`shell=False`, controlled env injects the validated browser path, missing capability has no host fallback, outer orchestration records every ordinary availability/source/lint/check/render/verify exception only before activation method entry, and `FFMPEG_FAILED` never leaks across P3;
 13. `activation_request()` consumes the sealed durable `N+6` result, never scratch result; `activate_render_state()` owns all four windows: candidate pre-replace ordinary failure is terminal R+2 with exact candidate/hash; candidate ambiguity reopens only exact R+1/R+2 or returns outcome unknown; authoritative R+2 pre-final ordinary failure is terminal R+3; final replace/post-replace ambiguity remains outcome unknown. All terminal paths preserve base active/project/registry state, successful revisions remain `R+1/R+2/R+3`, and exact replay/recovery leaves no conclusively ordinary running residue;
 14. complete timeline/source-bundle/receipt/state/output orphans are preserved and reported; default tests are fake/no-network, the pre-edit Task 0 gate uses the pinned browser with OS-level external-egress denial/observation plus retrying preview cleanup proof, and Task 6 separately proves the committed fixture/lifecycle integration;
