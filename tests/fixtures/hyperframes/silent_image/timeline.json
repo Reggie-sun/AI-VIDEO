@@ -1,0 +1,89 @@
+{
+  "artifact_id": "timeline-main",
+  "schema_version": "2.0",
+  "revision": 1,
+  "content_hash": "316241468c8befb2f7d221e629215b71e092593505e15520cfcaf875802561d4",
+  "creation_receipt_id": "resolve-composition-main",
+  "source_provenance": [
+    {
+      "kind": "derived",
+      "reference": "composition-main",
+      "content_hash": null
+    }
+  ],
+  "timeline_id": "timeline-main-r1",
+  "composition_spec_id": "composition-main",
+  "composition_spec_revision": 1,
+  "composition_spec_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+  "delivery_profile": {
+    "width": 320,
+    "height": 180,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "renderer": {
+    "kind": "hyperframes",
+    "version": "0.7.103"
+  },
+  "visual_spans": [
+    {
+      "layer_id": "layer-red",
+      "shot_id": "shot-1",
+      "asset_role": "still",
+      "asset_id": "image-red",
+      "asset_sha256": "1ac67c3a1c909b3356cf6ff490c0f88b8a30ef4c28ca579657f6007146abe71c",
+      "asset_mime_type": "image/png",
+      "materialized_path": "assets/1ac67c3a1c909b3356cf6ff490c0f88b8a30ef4c28ca579657f6007146abe71c.png",
+      "start_frame": 0,
+      "duration_frames": 5,
+      "start_sample": 0,
+      "duration_samples": 10000,
+      "trim_start_frame": 0,
+      "trim_duration_frames": null,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 1,
+      "incoming_transition": null
+    },
+    {
+      "layer_id": "layer-blue",
+      "shot_id": "shot-2",
+      "asset_role": "still",
+      "asset_id": "image-blue",
+      "asset_sha256": "a99284a70ff9a9ab8aec0eed52c3b9bf7a243628820814d0e6bca45445ce2e3f",
+      "asset_mime_type": "image/png",
+      "materialized_path": "assets/a99284a70ff9a9ab8aec0eed52c3b9bf7a243628820814d0e6bca45445ce2e3f.png",
+      "start_frame": 5,
+      "duration_frames": 5,
+      "start_sample": 10000,
+      "duration_samples": 10000,
+      "trim_start_frame": 0,
+      "trim_duration_frames": null,
+      "transform": {
+        "translate_x_px": 3,
+        "translate_y_px": 4,
+        "scale_x_milli": 900,
+        "scale_y_milli": 800,
+        "rotation_millidegrees": 1250
+      },
+      "opacity_milli": 750,
+      "z_index": 2,
+      "incoming_transition": {
+        "from_shot_id": "shot-1",
+        "to_shot_id": "shot-2",
+        "kind": "cut",
+        "duration_frames": 0
+      }
+    }
+  ],
+  "total_frames": 10,
+  "total_samples": 20000,
+  "composition_fingerprint": "36ad9152e555881e05a1e879466e1da4ca7526b1cd88d0d477b8db12b3b069d5"
+}

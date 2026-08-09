@@ -65,6 +65,52 @@ def _contained_relative(path: Path, contained_by: Path) -> tuple[Path, Path, Pat
     return path, root, relative
 
 
+def _validate_new_contained_root(
+    root: Path,
+    *,
+    allowed_parent: Path,
+) -> Path:
+    root, parent, relative = _contained_relative(root, allowed_parent)
+    if not relative.parts:
+        raise ValueError("P3 staging root must be below its allowed parent.")
+    with _open_directory_nofollow(root.parent, contained_by=parent):
+        try:
+            os.lstat(root)
+        except FileNotFoundError:
+            return root
+    raise ValueError(f"P3 staging root must not already exist: {root}")
+
+
+def _validate_contained_target(
+    root: Path,
+    relative: Path,
+    *,
+    before_creation: bool,
+) -> Path:
+    root = Path(root)
+    relative = Path(relative)
+    if relative.is_absolute() or ".." in relative.parts or relative == Path("."):
+        raise ValueError("P3 target must be a clean relative file path.")
+    target, _, target_relative = _contained_relative(root / relative, root)
+    if not target_relative.parts:
+        raise ValueError("P3 target cannot be the source root.")
+    if root.exists():
+        with _open_directory_nofollow(target.parent, contained_by=root):
+            exists = False
+            try:
+                os.lstat(target)
+                exists = True
+            except FileNotFoundError:
+                pass
+            if before_creation and exists:
+                raise ValueError(f"P3 target already exists: {target}")
+            if not before_creation and not exists:
+                raise ValueError(f"P3 target does not exist: {target}")
+    elif not before_creation:
+        raise ValueError(f"P3 source root does not exist: {root}")
+    return target
+
+
 def _directory_flags() -> int:
     return os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
 
