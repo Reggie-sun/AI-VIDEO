@@ -5,7 +5,7 @@ from typing import TypeVar
 
 from pydantic import BaseModel, ValidationError
 
-from ai_video.config import load_yaml
+from ai_video.config import load_yaml, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
@@ -15,6 +15,8 @@ from ai_video.production.models import (
     ProductionBrief,
     ProductionManifest,
     ProductionProject,
+    ProjectSnapshotPointer,
+    RegistrySnapshotPointer,
     Scene,
     Shot,
     Story,
@@ -88,6 +90,64 @@ def _load_referenced_artifact(
     return model
 
 
+def _resolve_candidate_project_path(root: Path, project_path: Path) -> Path:
+    if project_path == Path("project.yaml"):
+        return _resolve_input(root, project_path)
+    if not (
+        len(project_path.parts) > 2 and project_path.parts[:2] == ("state", "projects")
+    ):
+        raise _invalid("Candidate project snapshot path is not allowed.")
+    return _resolve_input(
+        root,
+        project_path,
+        allowed_root=root / "state/projects",
+    )
+
+
+def _resolve_candidate_registry_path(root: Path, registry_path: Path) -> Path:
+    return _resolve_input(root, registry_path, allowed_root=root / "assets")
+
+
+def _verify_snapshot_file_hash(path: Path, expected: str, label: str) -> None:
+    try:
+        actual = sha256_file(path)
+    except OSError as exc:
+        raise _invalid(f"Could not verify {label} snapshot file hash: {path}", str(exc)) from exc
+    if actual != expected:
+        raise _invalid(f"{label.capitalize()} snapshot file hash does not match Manifest.")
+
+
+def _verify_manifest_snapshot_identity(
+    bundle: LoadedProductionProject,
+    project_pointer: ProjectSnapshotPointer,
+    registry_pointer: RegistrySnapshotPointer,
+) -> None:
+    if bundle.project.revision != project_pointer.revision:
+        raise _invalid("Manifest project revision does not match selected project snapshot.")
+    if bundle.project.content_hash != project_pointer.content_hash:
+        raise _invalid("Manifest project content hash does not match selected project snapshot.")
+    if bundle.registry.revision_id != registry_pointer.revision_id:
+        raise _invalid("Manifest registry revision does not match selected registry snapshot.")
+    if bundle.registry.content_hash != registry_pointer.content_hash:
+        raise _invalid("Manifest registry content hash does not match selected registry snapshot.")
+
+
+def _validate_canonical_entrypoint(root: Path, supplied_path: Path) -> None:
+    if supplied_path.is_symlink():
+        raise _invalid("Production project entry point must not be a symlink.")
+    if not supplied_path.exists():
+        raise _invalid("Production project entry point must exist.")
+    if not supplied_path.is_file():
+        raise _invalid("Production project entry point must be a regular file.")
+    try:
+        resolved_entrypoint = supplied_path.resolve(strict=True)
+        resolved_entrypoint.relative_to(root)
+    except (OSError, RuntimeError, ValueError) as exc:
+        raise _invalid("Production project entry point must be contained by its root.", str(exc)) from exc
+    if resolved_entrypoint != root / "project.yaml":
+        raise _invalid("Production project entry point must resolve to root project.yaml.")
+
+
 def _build_loaded_project(
     root: Path,
     manifest: ProductionManifest,
@@ -129,21 +189,8 @@ def load_production_project_candidate(
         raise _invalid("Production project root must be a directory.")
     project_path = Path(project_path)
     registry_path = Path(registry_path)
-    if project_path == Path("project.yaml"):
-        resolved_project_path = _resolve_input(resolved_root, project_path)
-    else:
-        if not (
-            len(project_path.parts) > 2 and project_path.parts[:2] == ("state", "projects")
-        ):
-            raise _invalid("Candidate project snapshot path is not allowed.")
-        resolved_project_path = _resolve_input(
-            resolved_root,
-            project_path,
-            allowed_root=resolved_root / "state/projects",
-        )
-    resolved_registry_path = _resolve_input(
-        resolved_root, registry_path, allowed_root=resolved_root / "assets"
-    )
+    resolved_project_path = _resolve_candidate_project_path(resolved_root, project_path)
+    resolved_registry_path = _resolve_candidate_registry_path(resolved_root, registry_path)
     project = _load_yaml_artifact(resolved_project_path, ProductionProject)
     if manifest.project_id != project.project_id:
         raise _invalid("Production manifest project_id does not match project.")
@@ -160,10 +207,10 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     if supplied_path.name != "project.yaml":
         raise _invalid("Production project entry point must be named project.yaml.")
     try:
-        root = supplied_path.parent.resolve()
+        root = supplied_path.parent.resolve(strict=True)
     except (OSError, RuntimeError) as exc:
         raise _invalid("Production project root could not be resolved safely.", str(exc)) from exc
-    project_path = _resolve_input(root, Path("project.yaml"))
+    _validate_canonical_entrypoint(root, supplied_path)
     manifest = _load_json_model(
         _resolve_input(
             root,
@@ -172,13 +219,21 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         ),
         ProductionManifest,
     )
-    project = _load_yaml_artifact(project_path, ProductionProject)
-    if manifest.project_id != project.project_id:
-        raise _invalid("Production manifest project_id does not match project.")
-    if manifest.active_project_revision != project.revision:
-        raise _invalid("Production manifest active project revision does not match project.")
-    if manifest.active_project_content_hash != project.content_hash:
-        raise _invalid("Production manifest active project content hash does not match project.")
-
-    registry_path = Path(f"assets/registry.{manifest.active_registry_revision}.json")
-    return _build_loaded_project(root, manifest, project, registry_path)
+    project_path = _resolve_candidate_project_path(root, manifest.active_project.path)
+    registry_path = _resolve_candidate_registry_path(root, manifest.active_registry.path)
+    _verify_snapshot_file_hash(
+        project_path, manifest.active_project.file_sha256, "project"
+    )
+    _verify_snapshot_file_hash(
+        registry_path, manifest.active_registry.file_sha256, "registry"
+    )
+    bundle = load_production_project_candidate(
+        root,
+        manifest,
+        manifest.active_project.path,
+        manifest.active_registry.path,
+    )
+    _verify_manifest_snapshot_identity(
+        bundle, manifest.active_project, manifest.active_registry
+    )
+    return bundle

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 
 import pytest
 
@@ -22,6 +23,8 @@ from ai_video.production.models import (
     ProductionManifest,
     ProductionProject,
     ProjectArtifactRefs,
+    ProjectSnapshotPointer,
+    RegistrySnapshotPointer,
     RendererPolicy,
     Scene,
     Shot,
@@ -618,9 +621,19 @@ def make_bundle() -> LoadedProductionProject:
     )
     manifest = ProductionManifest(
         project_id="project-1",
-        active_project_revision=1,
-        active_project_content_hash=HASH,
-        active_registry_revision=HASH,
+        manifest_revision=1,
+        active_project=ProjectSnapshotPointer(
+            path=Path("project.yaml"),
+            revision=1,
+            content_hash=HASH,
+            file_sha256=HASH,
+        ),
+        active_registry=RegistrySnapshotPointer(
+            path=Path("assets/registry.json"),
+            revision_id=HASH,
+            content_hash=HASH,
+            file_sha256=HASH,
+        ),
     )
     return LoadedProductionProject(
         root="/tmp/project",
