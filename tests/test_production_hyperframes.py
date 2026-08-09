@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import math
 import os
+import shutil
 import subprocess
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_EVEN
 from pathlib import Path
 
 import pytest
+import ai_video.production as production
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.composition import timeline_fingerprint
@@ -25,10 +28,13 @@ from ai_video.production.hyperframes import (
     _controlled_env,
     _css_visibility_keyframes,
     _parse_source_document,
+    _render_with_hyperframes,
+    _renderer_tool_root,
     _seconds,
     _validate_local_relative_url,
     audit_hyperframes_source,
     materialize_hyperframes_source,
+    prepare_durable_render_artifacts,
 )
 from ai_video.production.models import (
     DeliveryProfile,
@@ -45,6 +51,17 @@ from ai_video.production.models import (
     TransitionSpec,
 )
 from ai_video.production.paths import _copy_held_fd_to_regular_file_nofollow
+from ai_video.production.state_commit import PreparedArtifact
+from ai_video.production.state_commit import (
+    ActivateRenderStateRequest,
+    BeginRenderAttemptRequest,
+    CommitPhase,
+    ProductionStateCommitter,
+    prepare_project_registry_commit,
+)
+from ai_video.production.project import load_production_project
+from ai_video.production.models import ProductionManifest, StateCommitStatus
+import production_project_factory as project_factory
 
 
 FIXTURE_ROOT = Path(__file__).parent / "fixtures/hyperframes/silent_image"
@@ -1509,3 +1526,690 @@ def test_renderer_failure_stderr_is_bounded_and_redacted(tmp_path):
         _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
     assert "private" not in (caught.value.technical_detail or "")
     assert "[REDACTED]" in (caught.value.technical_detail or "")
+
+
+def test_prepare_durable_render_artifacts_builds_exact_n_plus_6_set_from_verified_bytes(
+    tmp_path,
+):
+    attempt = make_render_attempt(tmp_path)
+    result = _adapter(tmp_path, FakeRunner()).render(attempt)
+    attempt.verification_snapshot_path.write_bytes(b"untrusted-replacement")
+
+    durable = prepare_durable_render_artifacts(
+        result,
+        timeline=attempt.timeline,
+        renderer_selection=attempt.selection,
+        current_project=attempt.selection.current_project,
+        current_registry=attempt.selection.current_registry,
+    )
+
+    assert len(durable.artifacts) == 8
+    assert all(isinstance(item, PreparedArtifact) for item in durable.artifacts)
+    assert tuple(item.relative_path for item in durable.artifacts) == tuple(
+        sorted(item.relative_path for item in durable.artifacts)
+    )
+    output = next(
+        item
+        for item in durable.artifacts
+        if item.relative_path.parts[:3] == ("state", "render", "outputs")
+    )
+    assert output.payload == b"fake-mp4"
+    assert output.file_sha256 == hashlib.sha256(b"fake-mp4").hexdigest()
+    assert durable.next_render_state.path in {
+        item.relative_path for item in durable.artifacts
+    }
+
+
+def test_package_root_exports_lifecycle_and_only_durable_renderer_execution_api():
+    required = {
+        "BeginRenderAttemptRequest",
+        "RecordRenderFailureRequest",
+        "ActivateRenderStateRequest",
+        "RenderAttemptPaths",
+        "RenderArtifactPointer",
+        "RenderSourceFilePointer",
+        "RenderSourceBundlePointer",
+        "RenderOutputPointer",
+        "RenderStateSnapshot",
+        "RenderStateSnapshotPointer",
+        "ProductionStateCommitter",
+        "render_with_hyperframes",
+    }
+    forbidden = {
+        "HyperFramesAdapter",
+        "RendererRunner",
+        "_NetworkIsolatedHyperFramesRunner",
+        "HyperFramesRenderAttempt",
+        "HyperFramesRenderResult",
+        "VerifiedRenderFile",
+    }
+    assert required <= set(production.__all__)
+    assert forbidden.isdisjoint(production.__all__)
+    parameters = inspect.signature(production.render_with_hyperframes).parameters
+    assert "runner" not in parameters
+    assert "adapter" not in parameters
+
+
+def test_renderer_tool_root_is_separate_from_production_root_and_fails_closed(
+    tmp_path,
+):
+    production_root = tmp_path / "production"
+    tool_root = tmp_path / "renderer-tool"
+    binary = tool_root / "node_modules/.bin/hyperframes"
+
+    assert production_root != tool_root
+    assert _renderer_tool_root(binary) == tool_root
+
+    malformed = (
+        tmp_path / "renderer-tool/node_modules/hyperframes/bin/hyperframes.mjs"
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        _renderer_tool_root(malformed)
+    assert exc_info.value.code is ErrorCode.RENDERER_UNAVAILABLE
+
+    with pytest.raises(AiVideoError) as exc_info:
+        _renderer_tool_root(Path("node_modules/.bin/hyperframes"))
+    assert exc_info.value.code is ErrorCode.RENDERER_UNAVAILABLE
+
+
+def test_public_renderer_constructs_runner_from_binary_tool_root(
+    tmp_path, monkeypatch
+):
+    import ai_video.production.hyperframes as hyperframes
+
+    production_root = tmp_path / "production"
+    production_root.mkdir()
+    tool_root = tmp_path / "renderer-tool"
+    binary = tool_root / "node_modules/.bin/hyperframes"
+    captured: dict[str, object] = {}
+    sentinel = object()
+
+    def fake_runner(**kwargs):
+        captured.update(kwargs)
+        return object()
+
+    def fake_orchestration(**kwargs):
+        kwargs["runner_factory"]()
+        return sentinel
+
+    monkeypatch.setattr(hyperframes, "_NetworkIsolatedHyperFramesRunner", fake_runner)
+    monkeypatch.setattr(hyperframes, "_render_with_hyperframes", fake_orchestration)
+    executable = tmp_path / "placeholder-executable"
+
+    result = production.render_with_hyperframes(
+        committer=ProductionStateCommitter(production_root),
+        begin_request=object(),  # type: ignore[arg-type]
+        timeline=object(),  # type: ignore[arg-type]
+        asset_sources={},
+        allowed_asset_root=production_root,
+        binary_path=binary,
+        browser_path=executable,
+        unshare_path=executable,
+        ip_path=executable,
+        bash_path=executable,
+    )
+
+    assert result is sentinel
+    assert captured["project_root"] == tool_root
+    assert captured["project_root"] != production_root
+    assert captured["binary"] == binary
+
+
+def test_public_renderer_wrong_binary_structure_is_terminal_source_failure(tmp_path):
+    project_factory.write_production_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    timeline = make_resolved_timeline()
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-invalid-tool-root",
+        attempt_id="invalid-tool-root",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=before.active_project,
+        current_registry=before.active_registry,
+    )
+    executable = tmp_path / "placeholder-executable"
+
+    with pytest.raises(AiVideoError) as exc_info:
+        production.render_with_hyperframes(
+            committer=ProductionStateCommitter(tmp_path),
+            begin_request=BeginRenderAttemptRequest(
+                before.manifest_revision, None, selection
+            ),
+            timeline=timeline,
+            asset_sources=make_asset_sources(tmp_path, timeline),
+            allowed_asset_root=tmp_path,
+            binary_path=tmp_path / "renderer-tool/hyperframes",
+            browser_path=executable,
+            unshare_path=executable,
+            ip_path=executable,
+            bash_path=executable,
+        )
+
+    assert exc_info.value.code is ErrorCode.RENDERER_UNAVAILABLE
+    failed = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert failed.manifest_revision == before.manifest_revision + 2
+    assert failed.attempts[-1].status is StateCommitStatus.FAILED
+    assert failed.attempts[-1].render_phase == "source"
+
+
+@pytest.mark.skipif(
+    os.environ.get("P3_LIVE_RENDERER") != "1",
+    reason="requires the explicit Task 6 live renderer gate",
+)
+def test_live_committed_fixture_render_state_lifecycle(tmp_path):
+    def required_absolute_env(name: str) -> Path:
+        value = os.environ.get(name)
+        assert value, f"{name} is required when P3_LIVE_RENDERER=1"
+        path = Path(value)
+        assert path.is_absolute(), f"{name} must be absolute"
+        return path
+
+    binary = required_absolute_env("P3_BINARY")
+    evidence_root = required_absolute_env("P3_INTEGRATION_EVIDENCE")
+    browser = required_absolute_env("HYPERFRAMES_BROWSER_PATH")
+    ip_path = required_absolute_env("P3_IP_PATH")
+    unshare_name = shutil.which("unshare")
+    bash_name = shutil.which("bash")
+    assert unshare_name is not None
+    assert bash_name is not None
+    unshare = Path(unshare_name).resolve(strict=True)
+    bash = Path(bash_name).resolve(strict=True)
+    assert evidence_root.is_dir()
+
+    timeline = make_resolved_timeline()
+    cases: list[
+        tuple[
+            Path,
+            ProductionStateCommitter,
+            BeginRenderAttemptRequest,
+            dict[str, Path],
+        ]
+    ] = []
+    expected_argv: list[list[str]] = []
+    for ordinal in (1, 2):
+        root = tmp_path / f"production-{ordinal}"
+        project_factory.write_production_project(root)
+        manifest = ProductionManifest.model_validate_json(
+            (root / "state/manifest.json").read_text(encoding="utf-8")
+        )
+        selection = RendererSelectionReceipt(
+            receipt_id=f"selection-live-{ordinal}",
+            attempt_id=f"live-render-{ordinal}",
+            requested_kind=RendererKind.HYPERFRAMES,
+            selected_kinds=(RendererKind.HYPERFRAMES,),
+            renderer_version="0.7.103",
+            timeline_fingerprint=timeline.composition_fingerprint,
+            current_project=manifest.active_project,
+            current_registry=manifest.active_registry,
+        )
+        committer = ProductionStateCommitter(root)
+        request = BeginRenderAttemptRequest(
+            manifest.manifest_revision, None, selection
+        )
+        paths = committer.render_attempt_paths(selection.attempt_id)
+        binary_text = str(binary)
+        source_text = str(paths.source_root)
+        expected_argv.extend(
+            [
+                [binary_text, "--version"],
+                [binary_text, "doctor", "--json"],
+                [binary_text, "lint", source_text, "--json"],
+                [binary_text, "check", source_text, "--json"],
+                [
+                    binary_text,
+                    "render",
+                    source_text,
+                    "-o",
+                    str(paths.staged_output_path),
+                    "--json",
+                ],
+            ]
+        )
+        cases.append((root, committer, request, make_asset_sources(root, timeline)))
+
+    expected_path = evidence_root / "expected-argv.json"
+    expected_path.write_text(
+        json.dumps(expected_argv, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+
+    outputs: list[bytes] = []
+    for root, committer, request, asset_sources in cases:
+        activated = production.render_with_hyperframes(
+            committer=committer,
+            begin_request=request,
+            timeline=timeline,
+            asset_sources=asset_sources,
+            allowed_asset_root=root,
+            binary_path=binary,
+            browser_path=browser,
+            unshare_path=unshare,
+            ip_path=ip_path,
+            bash_path=bash,
+        )
+        assert activated.active_render_state is not None
+        assert activated.attempts[-1].status is StateCommitStatus.SUCCEEDED
+        loaded = load_production_project(root / "project.yaml")
+        assert loaded.render_state is not None
+        assert loaded.render_state.timeline == timeline
+        assert loaded.render_state.active_project == activated.active_project
+        assert loaded.render_state.active_registry == activated.active_registry
+        output_path = root / loaded.render_state.output.path
+        outputs.append(output_path.read_bytes())
+
+    assert len(expected_argv) == 10
+    assert outputs[0] == outputs[1]
+
+def test_activate_render_state_commits_r1_r2_r3_and_exact_replay(tmp_path):
+    project_factory.write_production_project(tmp_path)
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    timeline = make_resolved_timeline()
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-render-1",
+        attempt_id="render-1",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=manifest.active_project,
+        current_registry=manifest.active_registry,
+    )
+    committer = ProductionStateCommitter(tmp_path)
+    begun = committer.begin_render_attempt(
+        BeginRenderAttemptRequest(manifest.manifest_revision, None, selection)
+    )
+    paths = committer.render_attempt_paths(selection.attempt_id)
+    paths.attempt_root.mkdir(parents=True, mode=0o700)
+    attempt = HyperFramesRenderAttempt(
+        attempt_id=selection.attempt_id,
+        selection=selection,
+        timeline=timeline,
+        asset_sources=make_asset_sources(tmp_path, timeline),
+        allowed_asset_root=tmp_path,
+        staging_root=paths.source_root,
+        allowed_staging_parent=paths.attempt_root,
+        output_path=paths.staged_output_path,
+        verification_snapshot_path=paths.verification_snapshot_path,
+    )
+    result = _adapter(tmp_path / "tools", FakeRunner()).render(attempt)
+    durable = prepare_durable_render_artifacts(
+        result,
+        timeline=timeline,
+        renderer_selection=selection,
+        current_project=begun.active_project,
+        current_registry=begun.active_registry,
+    )
+    request = ActivateRenderStateRequest(
+        attempt_id=selection.attempt_id,
+        expected_manifest_revision=begun.manifest_revision,
+        current_project=begun.active_project,
+        current_registry=begun.active_registry,
+        base_render_state=None,
+        renderer_selection=selection,
+        artifacts=durable.artifacts,
+        next_render_state=durable.next_render_state,
+    )
+
+    activated = committer.activate_render_state(request)
+    replay = committer.activate_render_state(request)
+
+    assert activated == replay
+    assert activated.manifest_revision == manifest.manifest_revision + 3
+    assert activated.active_render_state == durable.next_render_state
+    assert activated.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    assert all((tmp_path / item.relative_path).read_bytes() == item.payload for item in durable.artifacts)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.render_state == durable.state
+
+    render_bytes = {
+        item.relative_path: (tmp_path / item.relative_path).read_bytes()
+        for item in durable.artifacts
+    }
+    next_project, next_registry = project_factory.load_revision_two_models(tmp_path)
+    switched = committer.commit(
+        prepare_project_registry_commit(
+            manifest=activated,
+            project=next_project,
+            registry=next_registry,
+            attempt_id="project-revision-2-after-render",
+        )
+    )
+    assert switched.active_render_state is None
+    assert all((tmp_path / path).read_bytes() == data for path, data in render_bytes.items())
+
+
+def test_orchestrator_persists_selection_before_runner_and_activates_once(tmp_path):
+    project_factory.write_production_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    timeline = make_resolved_timeline()
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-orchestrated",
+        attempt_id="orchestrated-1",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=before.active_project,
+        current_registry=before.active_registry,
+    )
+    runner = FakeRunner()
+    observed: list[str] = []
+    real_version = runner.version
+
+    def version(*, env):
+        manifest = ProductionManifest.model_validate_json(
+            (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+        )
+        assert manifest.attempts[-1].status is StateCommitStatus.RUNNING
+        observed.append("version")
+        return real_version(env=env)
+
+    runner.version = version  # type: ignore[method-assign]
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    browser = _write_executable(tools / "chrome")
+    ip_path = _write_executable(tools / "ip")
+    result = _render_with_hyperframes(
+        committer=ProductionStateCommitter(tmp_path),
+        begin_request=BeginRenderAttemptRequest(before.manifest_revision, None, selection),
+        timeline=timeline,
+        asset_sources=make_asset_sources(tmp_path, timeline),
+        allowed_asset_root=tmp_path,
+        runner_factory=lambda: runner,
+        browser_path=browser,
+        ip_path=ip_path,
+        expected_version="0.7.103",
+        probe=lambda fd: {
+            "streams": [
+                {
+                    "codec_type": "video",
+                    "width": 320,
+                    "height": 180,
+                    "r_frame_rate": "24/1",
+                    "nb_frames": "10",
+                    "codec_name": "h264",
+                }
+            ]
+        },
+        decoded_frames=lambda fd: hashlib.sha256(
+            os.pread(fd, os.fstat(fd).st_size, 0)
+        ).hexdigest(),
+    )
+    assert observed == ["version"]
+    assert result.active_render_state is not None
+    assert result.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+def test_orchestrator_records_wrong_version_as_terminal_source_failure(tmp_path):
+    project_factory.write_production_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    timeline = make_resolved_timeline()
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-version-failure",
+        attempt_id="version-failure",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=before.active_project,
+        current_registry=before.active_registry,
+    )
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    browser = _write_executable(tools / "chrome")
+    ip_path = _write_executable(tools / "ip")
+    with pytest.raises(AiVideoError) as caught:
+        _render_with_hyperframes(
+            committer=ProductionStateCommitter(tmp_path),
+            begin_request=BeginRenderAttemptRequest(before.manifest_revision, None, selection),
+            timeline=timeline,
+            asset_sources=make_asset_sources(tmp_path, timeline),
+            allowed_asset_root=tmp_path,
+            runner_factory=lambda: FakeRunner(version="0.7.102"),
+            browser_path=browser,
+            ip_path=ip_path,
+            expected_version="0.7.103",
+        )
+    assert caught.value.code is ErrorCode.RENDERER_UNAVAILABLE
+    failed = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert failed.attempts[-1].status is StateCommitStatus.FAILED
+    assert failed.attempts[-1].render_phase == "source"
+
+
+class _RaiseRenderPhaseOnce:
+    def __init__(
+        self, phase: CommitPhase, exception_type: type[BaseException] = OSError
+    ) -> None:
+        self.phase = phase
+        self.exception_type = exception_type
+        self.raised = False
+
+    def checkpoint(self, phase: CommitPhase) -> None:
+        if phase is self.phase and not self.raised:
+            self.raised = True
+            raise self.exception_type(f"injected {phase.value}")
+
+
+def _run_injected_activation(tmp_path: Path, phase: CommitPhase):
+    project_factory.write_production_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    timeline = make_resolved_timeline()
+    selection = RendererSelectionReceipt(
+        receipt_id=f"selection-{phase.value}",
+        attempt_id=f"attempt-{phase.value}",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=before.active_project,
+        current_registry=before.active_registry,
+    )
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    browser = _write_executable(tools / "chrome")
+    ip_path = _write_executable(tools / "ip")
+    committer = ProductionStateCommitter(
+        tmp_path, crash_injector=_RaiseRenderPhaseOnce(phase)
+    )
+    with pytest.raises(AiVideoError) as caught:
+        _render_with_hyperframes(
+            committer=committer,
+            begin_request=BeginRenderAttemptRequest(before.manifest_revision, None, selection),
+            timeline=timeline,
+            asset_sources=make_asset_sources(tmp_path, timeline),
+            allowed_asset_root=tmp_path,
+            runner_factory=lambda: FakeRunner(),
+            browser_path=browser,
+            ip_path=ip_path,
+            expected_version="0.7.103",
+            probe=lambda fd: {
+                "streams": [
+                    {
+                        "codec_type": "video",
+                        "width": 320,
+                        "height": 180,
+                        "r_frame_rate": "24/1",
+                        "nb_frames": "10",
+                        "codec_name": "h264",
+                    }
+                ]
+            },
+            decoded_frames=lambda fd: hashlib.sha256(
+                os.pread(fd, os.fstat(fd).st_size, 0)
+            ).hexdigest(),
+        )
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    return before, caught.value, manifest
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [
+        CommitPhase.BEFORE_RENDER_CANDIDATE_MANIFEST_SERIALIZATION,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_TEMP_OPEN,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_FILE_FSYNC,
+        CommitPhase.BEFORE_RENDER_CANDIDATE_MANIFEST_REPLACE,
+    ],
+)
+def test_activation_candidate_pre_replace_ordinary_failure_is_terminal_r2(
+    tmp_path, phase
+):
+    before, error, manifest = _run_injected_activation(tmp_path, phase)
+    assert error.code is ErrorCode.PRODUCTION_STATE_COMMIT_FAILED
+    assert manifest.manifest_revision == before.manifest_revision + 2
+    attempt = manifest.attempts[-1]
+    assert attempt.status is StateCommitStatus.FAILED
+    assert attempt.render_phase == "activate"
+    assert attempt.candidate_render_state is not None
+    assert manifest.active_render_state is None
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_DIRECTORY_FSYNC,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_VERIFICATION,
+    ],
+)
+def test_activation_candidate_post_replace_ordinary_failure_is_terminal_r3(
+    tmp_path, phase
+):
+    before, error, manifest = _run_injected_activation(tmp_path, phase)
+    assert error.code is ErrorCode.PRODUCTION_STATE_COMMIT_FAILED
+    assert manifest.manifest_revision == before.manifest_revision + 3
+    assert manifest.attempts[-1].status is StateCommitStatus.FAILED
+    assert manifest.attempts[-1].candidate_render_state is not None
+    assert manifest.active_render_state is None
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_FILE_FSYNC,
+        CommitPhase.BEFORE_RENDER_FINAL_MANIFEST_REPLACE,
+    ],
+)
+def test_activation_final_pre_replace_ordinary_failure_is_terminal_r3(
+    tmp_path, phase
+):
+    before, error, manifest = _run_injected_activation(tmp_path, phase)
+    assert error.code is ErrorCode.PRODUCTION_STATE_COMMIT_FAILED
+    assert manifest.manifest_revision == before.manifest_revision + 3
+    assert manifest.attempts[-1].status is StateCommitStatus.FAILED
+    assert manifest.active_render_state is None
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_DIRECTORY_FSYNC,
+    ],
+)
+def test_activation_final_post_replace_ambiguity_is_outcome_unknown(tmp_path, phase):
+    before, error, manifest = _run_injected_activation(tmp_path, phase)
+    assert error.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert manifest.manifest_revision == before.manifest_revision + 3
+    assert manifest.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    assert manifest.active_render_state is not None
+
+
+def test_recovery_resolves_candidate_prepared_render_by_exact_old_triple_and_preserves_orphans(
+    tmp_path,
+):
+    project_factory.write_production_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    timeline = make_resolved_timeline()
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-candidate-crash",
+        attempt_id="candidate-crash",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=before.active_project,
+        current_registry=before.active_registry,
+    )
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    browser = _write_executable(tools / "chrome")
+    ip_path = _write_executable(tools / "ip")
+    committer = ProductionStateCommitter(
+        tmp_path,
+        crash_injector=_RaiseRenderPhaseOnce(
+            CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_REPLACE,
+            KeyboardInterrupt,
+        ),
+    )
+    with pytest.raises(KeyboardInterrupt):
+        _render_with_hyperframes(
+            committer=committer,
+            begin_request=BeginRenderAttemptRequest(before.manifest_revision, None, selection),
+            timeline=timeline,
+            asset_sources=make_asset_sources(tmp_path, timeline),
+            allowed_asset_root=tmp_path,
+            runner_factory=lambda: FakeRunner(),
+            browser_path=browser,
+            ip_path=ip_path,
+            expected_version="0.7.103",
+            probe=lambda fd: {
+                "streams": [
+                    {
+                        "codec_type": "video",
+                        "width": 320,
+                        "height": 180,
+                        "r_frame_rate": "24/1",
+                        "nb_frames": "10",
+                        "codec_name": "h264",
+                    }
+                ]
+            },
+            decoded_frames=lambda fd: hashlib.sha256(
+                os.pread(fd, os.fstat(fd).st_size, 0)
+            ).hexdigest(),
+        )
+    candidate = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    pointer = candidate.attempts[-1].candidate_render_state
+    assert pointer is not None
+    assert candidate.active_render_state is None
+    assert candidate.attempts[-1].status is StateCommitStatus.RUNNING
+
+    report = committer.recover()
+    recovered = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+    assert recovered.active_render_state is None
+    assert any(
+        item.path == pointer.path and item.disposition.value == "orphan_preserved"
+        for item in report.items
+    )
+    assert not any(
+        path.is_file()
+        for path in committer.render_attempt_paths(selection.attempt_id).attempt_root.rglob("*")
+    )

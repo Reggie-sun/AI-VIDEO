@@ -901,5 +901,6 @@ class LoadedProductionProject(StrictModel):
     shots: tuple[Shot, ...]
     registry: AssetRegistrySnapshot
     asset_paths: dict[str, Path]
+    render_state: RenderStateSnapshot | None = None
 
     _freeze_asset_paths = field_validator("asset_paths")(_immutable_mapping)

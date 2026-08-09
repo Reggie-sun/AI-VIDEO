@@ -17,11 +17,14 @@ from ai_video.production.models import (
     RegistrySnapshotPointer,
     StateCommitAttempt,
     StateCommitStatus,
+    RendererKind,
+    RendererSelectionReceipt,
 )
 from ai_video.production.project import load_production_project_candidate
 from ai_video.production.registry import registry_semantic_sha256
 import ai_video.production.state_commit as state_commit
 from ai_video.production.state_commit import (
+    BeginRenderAttemptRequest,
     CommitPhase,
     ProductionStateCommitter,
     _owned_temp_name,
@@ -53,6 +56,35 @@ def _write_manifest(root: Path, manifest: ProductionManifest) -> None:
 def committed_project(tmp_path: Path) -> Path:
     project_factory.write_production_project(tmp_path)
     return tmp_path
+
+
+def test_recovery_marks_begun_render_without_candidate_interrupted(
+    committed_project: Path,
+) -> None:
+    before = _read_manifest(committed_project)
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-interrupted-render",
+        attempt_id="interrupted-render",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint="a" * 64,
+        current_project=before.active_project,
+        current_registry=before.active_registry,
+    )
+    writer = ProductionStateCommitter(committed_project)
+    begun = writer.begin_render_attempt(
+        BeginRenderAttemptRequest(before.manifest_revision, None, selection)
+    )
+
+    report = writer.recover()
+    recovered = _read_manifest(committed_project)
+
+    assert report.manifest_revision_after == begun.manifest_revision + 1
+    assert recovered.active_project == before.active_project
+    assert recovered.active_registry == before.active_registry
+    assert recovered.active_render_state is None
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
 
 
 def _assert_active_bundle(root: Path, manifest: ProductionManifest) -> None:
@@ -144,6 +176,7 @@ def _selected_incomplete_with_project_temp(
             CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
         })
         for phase in CommitPhase
+        if not phase.value.startswith(("before_render_", "after_render_"))
         for occurrence in (
             (1, 2)
             if phase in {
@@ -189,6 +222,140 @@ def test_restart_after_process_crash_has_one_valid_active_state(
     repeated = _recover(committed_project)
     assert repeated.manifest_revision_before == repeated.manifest_revision_after
     assert _read_manifest(committed_project) == after
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [
+        CommitPhase.BEFORE_RENDER_CANDIDATE_MANIFEST_SERIALIZATION,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_TEMP_OPEN,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_FILE_FSYNC,
+        CommitPhase.BEFORE_RENDER_CANDIDATE_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_DIRECTORY_FSYNC,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_VERIFICATION,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_FILE_FSYNC,
+        CommitPhase.BEFORE_RENDER_FINAL_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_DIRECTORY_FSYNC,
+    ],
+)
+def test_render_process_crash_recovers_only_exact_old_or_new_triple(
+    committed_project: Path, phase: CommitPhase
+) -> None:
+    before = _read_manifest(committed_project)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            phase.value,
+            "1",
+            "render",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+
+    report = _recover(committed_project)
+    recovered = _read_manifest(committed_project)
+    assert (recovered.active_project, recovered.active_registry) == (
+        before.active_project,
+        before.active_registry,
+    )
+    final_replaced = phase in {
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_DIRECTORY_FSYNC,
+    }
+    if final_replaced:
+        assert recovered.active_render_state is not None
+        assert recovered.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    else:
+        assert recovered.active_render_state is None
+        assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+        assert any(
+            item.disposition is RecoveryDisposition.ORPHAN_PRESERVED
+            and item.path.parts[:3] == ("state", "render", "states")
+            for item in report.items
+        )
+    assert not any(
+        item.status in {StateCommitStatus.RUNNING, StateCommitStatus.OUTCOME_UNKNOWN}
+        for item in recovered.attempts
+    )
+
+
+@pytest.mark.parametrize(
+    ("phase", "occurrence"),
+    [
+        (phase, occurrence)
+        for phase in (
+            CommitPhase.AFTER_ARTIFACT_TEMP_WRITE,
+            CommitPhase.AFTER_ARTIFACT_FILE_FSYNC,
+            CommitPhase.AFTER_ARTIFACT_PROMOTION,
+            CommitPhase.AFTER_ARTIFACT_DIRECTORY_FSYNC,
+            CommitPhase.AFTER_ARTIFACT_VERIFICATION,
+        )
+        for occurrence in range(1, 9)
+    ],
+)
+def test_render_process_crash_at_each_n_plus_6_artifact_checkpoint_is_recoverable(
+    committed_project: Path, phase: CommitPhase, occurrence: int
+) -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            phase.value,
+            str(occurrence),
+            "render",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+    _recover(committed_project)
+    recovered = _read_manifest(committed_project)
+    assert recovered.active_render_state is None
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+    assert not list((committed_project / "state/render").rglob(".p2a-*.tmp"))
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [
+        CommitPhase.AFTER_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_MANIFEST_FILE_FSYNC,
+        CommitPhase.AFTER_MANIFEST_REPLACE,
+        CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
+    ],
+)
+def test_render_begin_manifest_process_crash_is_explicitly_recoverable(
+    committed_project: Path, phase: CommitPhase
+) -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            phase.value,
+            "1",
+            "render",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+    _recover(committed_project)
+    recovered = _read_manifest(committed_project)
+    assert recovered.active_render_state is None
+    assert not any(
+        item.status in {StateCommitStatus.RUNNING, StateCommitStatus.OUTCOME_UNKNOWN}
+        for item in recovered.attempts
+    )
 
 
 @pytest.mark.parametrize(
@@ -1005,9 +1172,10 @@ def test_recovery_descriptor_cleanup_preserves_process_exception_and_closes_all_
             raise process_error()
 
         monkeypatch.setattr(state_commit.os, "listdir", interrupt_listdir)
-        invoke = lambda: committer._recovery_namespace_entries(
-            committed_project / "state/projects", re.compile(r".*")
-        )
+        def invoke():
+            return committer._recovery_namespace_entries(
+                committed_project / "state/projects", re.compile(r".*")
+            )
     elif operation == "digest":
         def interrupt_read(_descriptor: int, _size: int) -> bytes:
             nonlocal process_started
@@ -1015,9 +1183,11 @@ def test_recovery_descriptor_cleanup_preserves_process_exception_and_closes_all_
             raise process_error()
 
         monkeypatch.setattr(state_commit.os, "read", interrupt_read)
-        invoke = lambda: committer._recovery_file_digest(
-            committed_project / _read_manifest(committed_project).active_project.path
-        )
+        def invoke():
+            return committer._recovery_file_digest(
+                committed_project
+                / _read_manifest(committed_project).active_project.path
+            )
     else:
         temporary = committed_project / "state/.p2a-manifest.tmp"
         temporary.write_bytes(b"partial manifest")
@@ -1028,7 +1198,8 @@ def test_recovery_descriptor_cleanup_preserves_process_exception_and_closes_all_
             raise process_error()
 
         monkeypatch.setattr(state_commit.os, "unlink", interrupt_unlink)
-        invoke = lambda: committer._unlink_recovery_file(temporary, temporary.stat())
+        def invoke():
+            return committer._unlink_recovery_file(temporary, temporary.stat())
 
     with pytest.raises(process_error) as exc:
         invoke()

@@ -22,7 +22,7 @@ from ai_video.production.composition import (
     _validated_raster_suffix,
     timeline_fingerprint,
 )
-from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.hashing import seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
     FixedTransform,
     MeasuredRenderMetadata,
@@ -30,8 +30,20 @@ from ai_video.production.models import (
     RendererCheckReceipt,
     RendererKind,
     RendererSelectionReceipt,
+    RendererSourceReceipt,
+    RenderArtifactPointer,
+    RenderOutputPointer,
+    RenderReceipt,
+    RenderSourceBundlePointer,
+    RenderSourceFilePointer,
+    RenderStateSnapshot,
+    RenderStateSnapshotPointer,
+    ProductionManifest,
+    ProjectSnapshotPointer,
+    RegistrySnapshotPointer,
     ResolvedTimeline,
     ResolvedVisualSpan,
+    SourceReference,
 )
 from ai_video.production.paths import (
     NoFollowFile,
@@ -45,6 +57,23 @@ from ai_video.production.paths import (
     _validate_directory_nofollow,
     _validate_new_contained_output,
     _validate_new_contained_root,
+    canonical_render_output_path,
+    canonical_render_attempt_root,
+    canonical_render_receipt_path,
+    canonical_render_source_asset_path,
+    canonical_render_source_index_path,
+    canonical_render_source_root,
+    canonical_render_state_path,
+    canonical_render_timeline_path,
+    canonical_renderer_source_receipt_path,
+)
+from ai_video.production.state_commit import (
+    ActivateRenderStateRequest,
+    BeginRenderAttemptRequest,
+    PreparedArtifact,
+    ProductionStateCommitter,
+    RecordRenderFailureRequest,
+    RenderAttemptPaths,
 )
 
 
@@ -811,6 +840,381 @@ class HyperFramesRenderResult:
     materialized: MaterializedHyperFramesSource
     checks: tuple[RendererCheckReceipt, RendererCheckReceipt]
     output: VerifiedRenderOutput
+
+
+@dataclass(frozen=True)
+class DurableRenderArtifacts:
+    artifacts: tuple[PreparedArtifact, ...]
+    next_render_state: RenderStateSnapshotPointer
+    state: RenderStateSnapshot
+
+
+def _validate_render_attempt_paths(
+    paths: RenderAttemptPaths,
+    *,
+    project_root: Path,
+    attempt_id: str,
+) -> None:
+    expected_root = project_root / canonical_render_attempt_root(attempt_id)
+    if paths != RenderAttemptPaths(
+        attempt_root=expected_root,
+        source_root=expected_root / "source",
+        staged_output_path=expected_root / "output/render.mp4",
+        verification_snapshot_path=expected_root / "verified.mp4",
+    ):
+        raise _source_invalid("Render attempt paths are not canonical.")
+
+
+def _failure_phase(exc: BaseException) -> Literal[
+    "source", "lint", "check", "render", "verify"
+]:
+    value = getattr(exc, "phase", "source")
+    return value if value in {"source", "lint", "check", "render", "verify"} else "source"
+
+
+def _render_with_hyperframes(
+    *,
+    committer: ProductionStateCommitter,
+    begin_request: BeginRenderAttemptRequest,
+    timeline: ResolvedTimeline,
+    asset_sources: Mapping[str, Path],
+    allowed_asset_root: Path,
+    runner_factory: Callable[[], RendererRunner],
+    browser_path: Path,
+    ip_path: Path,
+    expected_version: str,
+    probe: Callable[[int], dict] | None = None,
+    decoded_frames: Callable[[int], str] | None = None,
+) -> ProductionManifest:
+    manifest = committer.begin_render_attempt(begin_request)
+    try:
+        selection = begin_request.renderer_selection
+        paths = committer.render_attempt_paths(selection.attempt_id)
+        _validate_render_attempt_paths(
+            paths,
+            project_root=committer.project_root,
+            attempt_id=selection.attempt_id,
+        )
+        committer._ensure_render_attempt_namespace()
+        _create_directory_nofollow(
+            paths.attempt_root,
+            contained_by=committer.project_root,
+            mode=0o700,
+        )
+        adapter = HyperFramesAdapter(
+            runner=runner_factory(),
+            expected_version=expected_version,
+            browser_path=browser_path,
+            ip_path=ip_path,
+            probe=probe or probe_clip_fd,
+            decoded_frames=decoded_frames or decoded_frame_sha256_fd,
+        )
+        result = adapter.render(
+            HyperFramesRenderAttempt(
+                attempt_id=selection.attempt_id,
+                selection=selection,
+                timeline=timeline,
+                asset_sources=asset_sources,
+                allowed_asset_root=allowed_asset_root,
+                staging_root=paths.source_root,
+                allowed_staging_parent=paths.attempt_root,
+                output_path=paths.staged_output_path,
+                verification_snapshot_path=paths.verification_snapshot_path,
+            )
+        )
+        durable = prepare_durable_render_artifacts(
+            result,
+            timeline=timeline,
+            renderer_selection=selection,
+            current_project=manifest.active_project,
+            current_registry=manifest.active_registry,
+        )
+    except Exception as exc:
+        code = exc.code.value if isinstance(exc, AiVideoError) else ErrorCode.RENDER_FAILED.value
+        message = (
+            exc.user_message
+            if isinstance(exc, AiVideoError)
+            else str(exc) or "Render attempt failed."
+        )
+        failure = RecordRenderFailureRequest(
+            attempt_id=begin_request.renderer_selection.attempt_id,
+            expected_manifest_revision=manifest.manifest_revision,
+            current_project=manifest.active_project,
+            current_registry=manifest.active_registry,
+            base_render_state=begin_request.base_render_state,
+            renderer_selection=begin_request.renderer_selection,
+            phase=_failure_phase(exc),
+            error_code=code,
+            error_message=message,
+        )
+        try:
+            committer.record_render_failure(failure)
+        except Exception as state_exc:
+            state_exc.add_note(f"Original render failure: {exc}")
+            raise state_exc from exc
+        raise
+    activation = ActivateRenderStateRequest(
+        attempt_id=begin_request.renderer_selection.attempt_id,
+        expected_manifest_revision=manifest.manifest_revision,
+        current_project=manifest.active_project,
+        current_registry=manifest.active_registry,
+        base_render_state=begin_request.base_render_state,
+        renderer_selection=begin_request.renderer_selection,
+        artifacts=durable.artifacts,
+        next_render_state=durable.next_render_state,
+    )
+    return committer.activate_render_state(activation)
+
+
+def _renderer_tool_root(binary_path: Path) -> Path:
+    binary = Path(binary_path)
+    if not binary.is_absolute() or ".." in binary.parts:
+        raise _renderer_unavailable(
+            "HyperFrames binary path must be absolute and canonical."
+        )
+    tool_root = binary.parent.parent.parent
+    expected = tool_root / "node_modules/.bin/hyperframes"
+    if tool_root == Path(binary.anchor) or binary != expected:
+        raise _renderer_unavailable(
+            "HyperFrames binary must use <tool-root>/node_modules/.bin/hyperframes."
+        )
+    return tool_root
+
+
+def render_with_hyperframes(
+    *,
+    committer: ProductionStateCommitter,
+    begin_request: BeginRenderAttemptRequest,
+    timeline: ResolvedTimeline,
+    asset_sources: Mapping[str, Path],
+    allowed_asset_root: Path,
+    binary_path: Path,
+    browser_path: Path,
+    unshare_path: Path,
+    ip_path: Path,
+    bash_path: Path,
+    expected_version: str = "0.7.103",
+) -> ProductionManifest:
+    """Run the sole production HyperFrames path and durably activate its result."""
+    return _render_with_hyperframes(
+        committer=committer,
+        begin_request=begin_request,
+        timeline=timeline,
+        asset_sources=asset_sources,
+        allowed_asset_root=allowed_asset_root,
+        runner_factory=lambda: _NetworkIsolatedHyperFramesRunner(
+            project_root=_renderer_tool_root(binary_path),
+            binary=binary_path,
+            browser_path=browser_path,
+            unshare_path=unshare_path,
+            ip_path=ip_path,
+            bash_path=bash_path,
+        ),
+        browser_path=browser_path,
+        ip_path=ip_path,
+        expected_version=expected_version,
+    )
+
+
+def _sealed_json_bytes(model: object) -> bytes:
+    payload = json.dumps(
+        model.model_dump(mode="json"),  # type: ignore[attr-defined]
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return (payload + "\n").encode("utf-8")
+
+
+def _prepared(path: Path, payload: bytes) -> PreparedArtifact:
+    return PreparedArtifact(path, payload, hashlib.sha256(payload).hexdigest())
+
+
+def prepare_durable_render_artifacts(
+    result: HyperFramesRenderResult,
+    *,
+    timeline: ResolvedTimeline,
+    renderer_selection: RendererSelectionReceipt,
+    current_project: ProjectSnapshotPointer,
+    current_registry: RegistrySnapshotPointer,
+) -> DurableRenderArtifacts:
+    """Seal the exact render graph without writing durable state."""
+    materialized = result.materialized
+    if (
+        materialized.timeline != timeline
+        or renderer_selection.attempt_id == ""
+        or renderer_selection.timeline_fingerprint != timeline.composition_fingerprint
+        or renderer_selection.current_project != current_project
+        or renderer_selection.current_registry != current_registry
+    ):
+        raise _source_invalid("Durable render provenance does not match the attempt.")
+
+    index_snapshot = _read_regular_file_nofollow(
+        materialized.index_path, contained_by=materialized.root
+    )
+    if index_snapshot.file_sha256 != materialized.source_sha256:
+        raise _source_invalid("Durable source index changed after render.")
+    source_root = canonical_render_source_root(materialized.bundle_sha256)
+    index_path = canonical_render_source_index_path(materialized.bundle_sha256)
+    index_pointer = RenderSourceFilePointer(
+        path=index_path,
+        file_sha256=index_snapshot.file_sha256,
+        size_bytes=index_snapshot.size_bytes,
+    )
+
+    asset_payloads: dict[Path, bytes] = {}
+    asset_pointers: dict[Path, RenderSourceFilePointer] = {}
+    durable_bindings: list[RendererAssetBinding] = []
+    for binding in materialized.asset_bindings:
+        snapshot = _read_regular_file_nofollow(
+            materialized.root / binding.materialized_path,
+            contained_by=materialized.root,
+        )
+        suffix = _validated_raster_suffix(
+            snapshot,
+            suffix=binding.materialized_path.suffix,
+            mime_type=binding.asset_mime_type,
+        )
+        if snapshot.file_sha256 != binding.asset_sha256:
+            raise _source_invalid("Durable source asset changed after render.")
+        durable_path = canonical_render_source_asset_path(
+            materialized.bundle_sha256, binding.asset_sha256, suffix
+        )
+        previous = asset_payloads.get(durable_path)
+        if previous is not None and previous != snapshot.data:
+            raise _source_invalid("Durable source asset path has conflicting bytes.")
+        asset_payloads[durable_path] = snapshot.data
+        asset_pointers[durable_path] = RenderSourceFilePointer(
+            path=durable_path,
+            file_sha256=snapshot.file_sha256,
+            size_bytes=snapshot.size_bytes,
+        )
+        durable_bindings.append(
+            binding.model_copy(update={"materialized_path": durable_path})
+        )
+
+    source_bundle = RenderSourceBundlePointer(
+        root_path=source_root,
+        bundle_sha256=materialized.bundle_sha256,
+        index=index_pointer,
+        assets=tuple(asset_pointers[path] for path in sorted(asset_pointers)),
+    )
+    provenance = (
+        SourceReference(
+            kind="derived",
+            reference=f"render-attempt:{renderer_selection.attempt_id}",
+        ),
+    )
+    renderer = timeline.renderer
+    source_receipt = seal_artifact(
+        RendererSourceReceipt(
+            artifact_id=f"renderer-source-{renderer_selection.attempt_id}",
+            revision=1,
+            content_hash="0" * 64,
+            creation_receipt_id=renderer_selection.receipt_id,
+            source_provenance=provenance,
+            attempt_id=renderer_selection.attempt_id,
+            renderer=renderer,
+            timeline_fingerprint=timeline.composition_fingerprint,
+            source_bundle=source_bundle,
+            source_sha256=materialized.source_sha256,
+            asset_bindings=tuple(durable_bindings),
+            checks=result.checks,
+        )
+    )
+    output_path = canonical_render_output_path(result.output.output_sha256)
+    render_receipt = seal_artifact(
+        RenderReceipt(
+            artifact_id=f"render-receipt-{renderer_selection.attempt_id}",
+            revision=1,
+            content_hash="0" * 64,
+            creation_receipt_id=renderer_selection.receipt_id,
+            source_provenance=provenance,
+            attempt_id=renderer_selection.attempt_id,
+            renderer=renderer,
+            timeline_fingerprint=timeline.composition_fingerprint,
+            source_sha256=materialized.source_sha256,
+            source_bundle_sha256=materialized.bundle_sha256,
+            asset_hashes=tuple(item.file_sha256 for item in source_bundle.assets),
+            output_path=output_path,
+            output_sha256=result.output.output_sha256,
+            output_size_bytes=result.output.output_size_bytes,
+            measured=result.output.measured,
+            decoded_frame_fingerprint=result.output.decoded_frame_fingerprint,
+        )
+    )
+
+    timeline_payload = _sealed_json_bytes(timeline)
+    source_payload = _sealed_json_bytes(source_receipt)
+    render_payload = _sealed_json_bytes(render_receipt)
+    timeline_pointer = RenderArtifactPointer(
+        path=canonical_render_timeline_path(timeline.content_hash),
+        revision=timeline.revision,
+        content_hash=timeline.content_hash,
+        file_sha256=hashlib.sha256(timeline_payload).hexdigest(),
+    )
+    source_pointer = RenderArtifactPointer(
+        path=canonical_renderer_source_receipt_path(source_receipt.content_hash),
+        revision=source_receipt.revision,
+        content_hash=source_receipt.content_hash,
+        file_sha256=hashlib.sha256(source_payload).hexdigest(),
+    )
+    render_pointer = RenderArtifactPointer(
+        path=canonical_render_receipt_path(render_receipt.content_hash),
+        revision=render_receipt.revision,
+        content_hash=render_receipt.content_hash,
+        file_sha256=hashlib.sha256(render_payload).hexdigest(),
+    )
+    state = seal_artifact(
+        RenderStateSnapshot(
+            artifact_id=f"render-state-{renderer_selection.attempt_id}",
+            revision=1,
+            content_hash="0" * 64,
+            creation_receipt_id=renderer_selection.receipt_id,
+            source_provenance=provenance,
+            attempt_id=renderer_selection.attempt_id,
+            project=current_project,
+            registry=current_registry,
+            renderer_selection=renderer_selection,
+            renderer=renderer,
+            timeline_fingerprint=timeline.composition_fingerprint,
+            source_sha256=materialized.source_sha256,
+            source_bundle_sha256=materialized.bundle_sha256,
+            asset_hashes=tuple(item.file_sha256 for item in source_bundle.assets),
+            timeline=timeline_pointer,
+            source_bundle=source_bundle,
+            source_receipt=source_pointer,
+            render_receipt=render_pointer,
+            output=RenderOutputPointer(
+                path=output_path,
+                file_sha256=result.output.output_sha256,
+                size_bytes=result.output.output_size_bytes,
+            ),
+        )
+    )
+    state_payload = _sealed_json_bytes(state)
+    state_pointer = RenderStateSnapshotPointer(
+        path=canonical_render_state_path(state.content_hash),
+        revision=state.revision,
+        content_hash=state.content_hash,
+        file_sha256=hashlib.sha256(state_payload).hexdigest(),
+    )
+    artifacts = [
+        _prepared(timeline_pointer.path, timeline_payload),
+        _prepared(index_path, index_snapshot.data),
+        *(_prepared(path, asset_payloads[path]) for path in sorted(asset_payloads)),
+        _prepared(source_pointer.path, source_payload),
+        _prepared(render_pointer.path, render_payload),
+        _prepared(output_path, result.output.verified_bytes),
+        _prepared(state_pointer.path, state_payload),
+    ]
+    if artifacts[-2].file_sha256 != result.output.output_sha256:
+        raise _render_failed("Verified render bytes do not match their held-FD hash.")
+    return DurableRenderArtifacts(
+        artifacts=tuple(sorted(artifacts, key=lambda item: item.relative_path.as_posix())),
+        next_render_state=state_pointer,
+        state=state,
+    )
 
 
 OFFLINE_ENV = {

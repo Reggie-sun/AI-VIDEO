@@ -2,11 +2,78 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import stat
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
+
+
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_ATTEMPT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$")
+
+
+def _require_sha256(value: str, label: str) -> str:
+    if not _SHA256_RE.fullmatch(value):
+        raise ValueError(f"{label} must be a full lowercase SHA-256 value.")
+    return value
+
+
+def _require_attempt_id(value: str) -> str:
+    if not _ATTEMPT_ID_RE.fullmatch(value):
+        raise ValueError("Render attempt ID is unsafe.")
+    return value
+
+
+def canonical_render_timeline_path(content_hash: str) -> Path:
+    return Path(f"state/render/timelines/{_require_sha256(content_hash, 'timeline hash')}.json")
+
+
+def canonical_render_source_root(bundle_sha256: str) -> Path:
+    return Path(f"state/render/sources/{_require_sha256(bundle_sha256, 'bundle hash')}")
+
+
+def canonical_render_source_index_path(bundle_sha256: str) -> Path:
+    return canonical_render_source_root(bundle_sha256) / "index.html"
+
+
+def canonical_render_source_asset_path(
+    bundle_sha256: str, asset_sha256: str, suffix: str
+) -> Path:
+    if suffix not in {".png", ".jpg", ".webp"}:
+        raise ValueError("Render source asset suffix is unsupported.")
+    return (
+        canonical_render_source_root(bundle_sha256)
+        / "assets"
+        / f"{_require_sha256(asset_sha256, 'asset hash')}{suffix}"
+    )
+
+
+def canonical_renderer_source_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/render/source-receipts/{_require_sha256(content_hash, 'source receipt hash')}.json"
+    )
+
+
+def canonical_render_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/render/render-receipts/{_require_sha256(content_hash, 'render receipt hash')}.json"
+    )
+
+
+def canonical_render_state_path(content_hash: str) -> Path:
+    return Path(f"state/render/states/{_require_sha256(content_hash, 'render state hash')}.json")
+
+
+def canonical_render_output_path(file_sha256: str, suffix: str = ".mp4") -> Path:
+    if suffix != ".mp4":
+        raise ValueError("Render output suffix must be .mp4.")
+    return Path(f"state/render/outputs/{_require_sha256(file_sha256, 'output hash')}{suffix}")
+
+
+def canonical_render_attempt_root(attempt_id: str) -> Path:
+    return Path(f"state/render/attempts/{_require_attempt_id(attempt_id)}")
 
 
 def resolve_contained_path(

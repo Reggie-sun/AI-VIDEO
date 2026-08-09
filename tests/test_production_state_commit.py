@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -11,10 +10,11 @@ import yaml
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
-    AssetRegistrySnapshot,
     ProductionProject,
     ProductionManifest,
     ProjectSnapshotPointer,
+    RendererKind,
+    RendererSelectionReceipt,
     RegistrySnapshotPointer,
     Shot,
     StateCommitStatus,
@@ -23,15 +23,30 @@ from ai_video.production.project import load_production_project_candidate
 from ai_video.production.registry import load_asset_registry
 import ai_video.production.state_commit as state_commit
 from ai_video.production.state_commit import (
+    ActivateRenderStateRequest,
+    BeginRenderAttemptRequest,
     CommitPhase,
     NoopCrashInjector,
     PreparedArtifact,
     ProductionStateCommitter,
+    RecordRenderFailureRequest,
+    RenderAttemptPaths,
     StateCommitRequest,
     _NativeFileOps,
     _canonical_json_bytes,
     _canonical_yaml_bytes,
     _owned_temp_name,
+)
+from ai_video.production.paths import (
+    canonical_render_attempt_root,
+    canonical_render_output_path,
+    canonical_render_receipt_path,
+    canonical_render_source_asset_path,
+    canonical_render_source_index_path,
+    canonical_render_source_root,
+    canonical_render_state_path,
+    canonical_render_timeline_path,
+    canonical_renderer_source_receipt_path,
 )
 import production_project_factory as project_factory
 
@@ -368,8 +383,148 @@ def test_commit_contract_types_are_frozen_and_expose_all_phases() -> None:
         CommitPhase.AFTER_MANIFEST_FILE_FSYNC,
         CommitPhase.AFTER_MANIFEST_REPLACE,
         CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
+        CommitPhase.BEFORE_RENDER_CANDIDATE_MANIFEST_SERIALIZATION,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_TEMP_OPEN,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_FILE_FSYNC,
+        CommitPhase.BEFORE_RENDER_CANDIDATE_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_DIRECTORY_FSYNC,
+        CommitPhase.AFTER_RENDER_CANDIDATE_MANIFEST_VERIFICATION,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_FILE_FSYNC,
+        CommitPhase.BEFORE_RENDER_FINAL_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_DIRECTORY_FSYNC,
     )
     assert NoopCrashInjector().checkpoint(CommitPhase.AFTER_ATTEMPT_STARTED) is None
+
+
+def test_render_path_contract_uses_full_hashes_and_safe_attempt_ids(tmp_path: Path) -> None:
+    digest = "a" * 64
+    assert canonical_render_timeline_path(digest) == Path(
+        f"state/render/timelines/{digest}.json"
+    )
+    assert canonical_render_source_root(digest) == Path(
+        f"state/render/sources/{digest}"
+    )
+    assert canonical_render_source_index_path(digest) == Path(
+        f"state/render/sources/{digest}/index.html"
+    )
+    assert canonical_render_source_asset_path(digest, digest, ".png") == Path(
+        f"state/render/sources/{digest}/assets/{digest}.png"
+    )
+    assert canonical_renderer_source_receipt_path(digest) == Path(
+        f"state/render/source-receipts/{digest}.json"
+    )
+    assert canonical_render_receipt_path(digest) == Path(
+        f"state/render/render-receipts/{digest}.json"
+    )
+    assert canonical_render_state_path(digest) == Path(
+        f"state/render/states/{digest}.json"
+    )
+    assert canonical_render_output_path(digest) == Path(
+        f"state/render/outputs/{digest}.mp4"
+    )
+    assert canonical_render_attempt_root("attempt-1") == Path(
+        "state/render/attempts/attempt-1"
+    )
+
+    (tmp_path / "state").mkdir()
+    paths = ProductionStateCommitter(tmp_path).render_attempt_paths("attempt-1")
+    assert isinstance(paths, RenderAttemptPaths)
+    assert paths.attempt_root == tmp_path.resolve() / "state/render/attempts/attempt-1"
+    assert paths.source_root == paths.attempt_root / "source"
+    assert paths.staged_output_path == paths.attempt_root / "output/render.mp4"
+    assert paths.verification_snapshot_path == paths.attempt_root / "verified.mp4"
+    assert not paths.attempt_root.exists()
+
+    for unsafe in ("", ".", "..", "a/b", r"a\\b", "/absolute"):
+        with pytest.raises(AiVideoError):
+            ProductionStateCommitter(tmp_path).render_attempt_paths(unsafe)
+
+
+def test_render_lifecycle_request_dataclasses_are_frozen() -> None:
+    assert BeginRenderAttemptRequest.__dataclass_params__.frozen is True
+    assert RecordRenderFailureRequest.__dataclass_params__.frozen is True
+    assert ActivateRenderStateRequest.__dataclass_params__.frozen is True
+
+
+def _render_selection(
+    manifest: ProductionManifest, *, attempt_id: str = "render-1"
+) -> RendererSelectionReceipt:
+    return RendererSelectionReceipt(
+        receipt_id=f"selection-{attempt_id}",
+        attempt_id=attempt_id,
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint="a" * 64,
+        current_project=manifest.active_project,
+        current_registry=manifest.active_registry,
+    )
+
+
+def test_begin_render_attempt_migrates_20_and_exact_replay_is_idempotent(
+    committed_project: Path,
+) -> None:
+    before = read_manifest(committed_project)
+    request = BeginRenderAttemptRequest(
+        expected_manifest_revision=before.manifest_revision,
+        base_render_state=None,
+        renderer_selection=_render_selection(before),
+    )
+    committer = ProductionStateCommitter(committed_project)
+
+    begun = committer.begin_render_attempt(request)
+    replay = committer.begin_render_attempt(request)
+
+    assert begun == replay
+    assert begun.schema_version == "2.1"
+    assert begun.manifest_revision == before.manifest_revision + 1
+    attempt = begun.attempts[-1]
+    assert (attempt.operation, attempt.status, attempt.render_phase) == (
+        "render_state",
+        StateCommitStatus.RUNNING,
+        "selection",
+    )
+    assert begun.active_render_state is None
+
+
+def test_record_render_failure_is_terminal_r2_and_exact_replay_is_idempotent(
+    committed_project: Path,
+) -> None:
+    committer = ProductionStateCommitter(committed_project)
+    before = read_manifest(committed_project)
+    selection = _render_selection(before)
+    begun = committer.begin_render_attempt(
+        BeginRenderAttemptRequest(before.manifest_revision, None, selection)
+    )
+    request = RecordRenderFailureRequest(
+        attempt_id=selection.attempt_id,
+        expected_manifest_revision=begun.manifest_revision,
+        current_project=begun.active_project,
+        current_registry=begun.active_registry,
+        base_render_state=None,
+        renderer_selection=selection,
+        phase="render",
+        error_code=ErrorCode.RENDER_FAILED.value,
+        error_message="token=secret failed",
+    )
+
+    failed = committer.record_render_failure(request)
+    replay = committer.record_render_failure(request)
+
+    assert failed == replay
+    assert failed.manifest_revision == before.manifest_revision + 2
+    attempt = failed.attempts[-1]
+    assert (attempt.status, attempt.render_phase) == (
+        StateCommitStatus.FAILED,
+        "render",
+    )
+    assert "secret" not in (attempt.error_message or "")
+    assert failed.active_project == before.active_project
+    assert failed.active_registry == before.active_registry
 
 
 def test_atomic_manifest_write_orders_file_and_directory_durability(tmp_path: Path) -> None:

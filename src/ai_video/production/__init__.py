@@ -32,18 +32,25 @@ from ai_video.production.models import (
     VisualStrategy,
 )
 from ai_video.production.project import load_production_project
+from ai_video.production.hyperframes import render_with_hyperframes
 from ai_video.production.state_commit import (
+    ActivateRenderStateRequest,
+    BeginRenderAttemptRequest,
     PreparedArtifact,
     ProductionStateCommitter,
+    RecordRenderFailureRequest,
+    RenderAttemptPaths,
     StateCommitRequest,
     prepare_project_registry_commit,
     recover_production_state,
 )
 
 __all__ = [
+    "ActivateRenderStateRequest",
     "ArtifactReference",
     "AssetRecord",
     "AssetRegistrySnapshot",
+    "BeginRenderAttemptRequest",
     "Character",
     "CompositionSpec",
     "LoadedProductionProject",
@@ -56,8 +63,10 @@ __all__ = [
     "RecoveryDisposition",
     "RecoveryItem",
     "RecoveryReport",
+    "RecordRenderFailureRequest",
     "RegistrySnapshotPointer",
     "RenderArtifactPointer",
+    "RenderAttemptPaths",
     "RenderOutputPointer",
     "RenderReceipt",
     "RendererSelectionReceipt",
@@ -78,4 +87,5 @@ __all__ = [
     "load_production_project",
     "prepare_project_registry_commit",
     "recover_production_state",
+    "render_with_hyperframes",
 ]
