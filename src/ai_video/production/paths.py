@@ -81,6 +81,57 @@ def _validate_new_contained_root(
     raise ValueError(f"P3 staging root must not already exist: {root}")
 
 
+def _validate_directory_nofollow(
+    directory: Path,
+    *,
+    contained_by: Path,
+    expected_mode: int | None = None,
+) -> Path:
+    directory, root, relative = _contained_relative(directory, contained_by)
+    if not relative.parts:
+        raise ValueError("P3 validated directory must be below its containment root.")
+    with _open_directory_nofollow(directory, contained_by=root) as descriptor:
+        opened = os.fstat(descriptor)
+        if expected_mode is not None and stat.S_IMODE(opened.st_mode) != expected_mode:
+            raise ValueError(
+                f"P3 directory mode must be {expected_mode:#o}: {directory}"
+            )
+    return directory
+
+
+def _validate_new_contained_output(
+    path: Path,
+    *,
+    allowed_parent: Path,
+    suffix: str,
+) -> Path:
+    path, parent, relative = _contained_relative(path, allowed_parent)
+    if not relative.parts or path.suffix != suffix:
+        raise ValueError(f"P3 output must be a contained {suffix} file: {path}")
+    if len(relative.parts) > 2:
+        raise ValueError(
+            "P3 output may be directly below one attempt-owned directory only."
+        )
+    target_parent = path.parent
+    if target_parent == parent:
+        with _open_directory_nofollow(parent, contained_by=parent):
+            pass
+    else:
+        if target_parent.parent != parent:
+            raise ValueError("P3 output parent is not attempt-owned.")
+        try:
+            os.lstat(target_parent)
+        except FileNotFoundError:
+            pass
+        else:
+            _validate_directory_nofollow(target_parent, contained_by=parent)
+    try:
+        os.lstat(path)
+    except FileNotFoundError:
+        return path
+    raise ValueError(f"P3 output must not already exist: {path}")
+
+
 def _validate_contained_target(
     root: Path,
     relative: Path,

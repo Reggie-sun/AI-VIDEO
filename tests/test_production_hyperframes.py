@@ -4,6 +4,8 @@ import hashlib
 import json
 import math
 import os
+import subprocess
+from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_EVEN
 from pathlib import Path
 
@@ -13,7 +15,14 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.composition import timeline_fingerprint
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.hyperframes import (
+    OFFLINE_ENV,
+    HyperFramesAdapter,
+    HyperFramesRenderAttempt,
+    RendererAttemptError,
+    RendererCommandResult,
+    _NetworkIsolatedHyperFramesRunner,
     _capture_safe_boundary_percent,
+    _controlled_env,
     _css_visibility_keyframes,
     _parse_source_document,
     _seconds,
@@ -26,6 +35,9 @@ from ai_video.production.models import (
     FixedTransform,
     RendererIdentity,
     RendererKind,
+    RendererSelectionReceipt,
+    ProjectSnapshotPointer,
+    RegistrySnapshotPointer,
     ResolvedTimeline,
     ResolvedVisualSpan,
     SourceReference,
@@ -765,3 +777,713 @@ def test_committed_fixture_matches_exact_materialized_source_and_hashes(tmp_path
         fixture = FIXTURE_ROOT / f"source/assets/{digest}.png"
         assert fixture.read_bytes() == payload
         assert payload.startswith(b"\x89PNG\r\n\x1a\n")
+
+
+@dataclass(frozen=True)
+class _FakeCall:
+    command: str
+    args: tuple[str, ...]
+    cwd: Path | None
+    env: dict[str, str]
+
+
+def _doctor_json() -> dict[str, object]:
+    return {
+        "ok": False,
+        "checks": [
+            {"name": "Node.js", "ok": True},
+            {"name": "FFmpeg", "ok": True},
+            {"name": "FFprobe", "ok": True},
+            {"name": "Chrome", "ok": True},
+            {"name": "Whisper", "ok": False},
+        ],
+    }
+
+
+def _check_json() -> dict[str, object]:
+    payload: dict[str, object] = {"ok": True}
+    for section in ("lint", "runtime", "layout", "motion", "contrast"):
+        payload[section] = {"errorCount": 0, "warningCount": 0}
+    return payload
+
+
+class FakeRunner:
+    def __init__(
+        self,
+        *,
+        version: str = "0.7.103",
+        fail_at: str | None = None,
+        doctor_payload: object | None = None,
+        lint_payload: object | None = None,
+        check_payload: object | None = None,
+        mutate_after: str | None = None,
+    ) -> None:
+        self.tool_version = version
+        self.fail_at = fail_at
+        self.doctor_payload = doctor_payload or _doctor_json()
+        self.lint_payload = lint_payload or {"errorCount": 0, "warningCount": 1}
+        self.check_payload = check_payload or _check_json()
+        self.mutate_after = mutate_after
+        self.calls: list[_FakeCall] = []
+
+    def version(self, *, env: dict[str, str]) -> str:
+        self.calls.append(_FakeCall("version", (), None, dict(env)))
+        return self.tool_version
+
+    def doctor(self, *, env: dict[str, str]) -> RendererCommandResult:
+        self.calls.append(_FakeCall("doctor", (), None, dict(env)))
+        return RendererCommandResult(
+            returncode=int(self.fail_at == "doctor"),
+            stdout=json.dumps(self.doctor_payload),
+            stderr="token=private" if self.fail_at == "doctor" else "",
+        )
+
+    def run(self, command, args, *, cwd, env, timeout_seconds):
+        del timeout_seconds
+        self.calls.append(_FakeCall(command, args, cwd, dict(env)))
+        if self.mutate_after == command:
+            (cwd / "index.html").write_text("changed", encoding="utf-8")
+        if command == "render" and self.fail_at != "render":
+            output = Path(args[args.index("-o") + 1])
+            output.write_bytes(b"fake-mp4")
+        payload = self.lint_payload if command == "lint" else self.check_payload
+        return RendererCommandResult(
+            returncode=int(self.fail_at == command),
+            stdout="" if command == "render" else json.dumps(payload),
+            stderr="authorization=private" if self.fail_at == command else "",
+        )
+
+
+def _write_executable(path: Path) -> Path:
+    path.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    path.chmod(0o700)
+    return path
+
+
+def _selection(timeline, kind=RendererKind.HYPERFRAMES):
+    zero, one = "0" * 64, "1" * 64
+    return RendererSelectionReceipt(
+        receipt_id="selection-1",
+        attempt_id="attempt-1",
+        requested_kind=kind,
+        selected_kinds=(kind,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=ProjectSnapshotPointer(
+            path=Path("project.yaml"), revision=1, content_hash=zero, file_sha256=one
+        ),
+        current_registry=RegistrySnapshotPointer(
+            path=Path(f"assets/registry.{zero}.json"),
+            revision_id=zero,
+            content_hash=zero,
+            file_sha256=one,
+        ),
+    )
+
+
+def make_render_attempt(tmp_path, renderer_kind=RendererKind.HYPERFRAMES):
+    timeline = make_resolved_timeline()
+    root = tmp_path / "attempt"
+    root.mkdir(mode=0o700)
+    return HyperFramesRenderAttempt(
+        attempt_id="attempt-1",
+        selection=_selection(timeline, renderer_kind),
+        timeline=timeline,
+        asset_sources=make_asset_sources(tmp_path, timeline),
+        allowed_asset_root=tmp_path,
+        staging_root=root / "source",
+        allowed_staging_parent=root,
+        output_path=root / "output/render.mp4",
+        verification_snapshot_path=root / "verified.mp4",
+    )
+
+
+def _adapter(tmp_path, runner, **overrides):
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    browser = _write_executable(tmp_path / "chrome")
+    ip_path = _write_executable(tmp_path / "ip")
+    kwargs = {
+        "probe": lambda fd: {
+            "streams": [
+                {
+                    "codec_type": "video",
+                    "width": 320,
+                    "height": 180,
+                    "r_frame_rate": "24/1",
+                    "nb_frames": "10",
+                    "codec_name": "h264",
+                }
+            ]
+        },
+        "decoded_frames": lambda fd: hashlib.sha256(
+            os.pread(fd, os.fstat(fd).st_size, 0)
+        ).hexdigest(),
+    }
+    kwargs.update(overrides)
+    return HyperFramesAdapter(
+        runner=runner,
+        expected_version="0.7.103",
+        browser_path=browser,
+        ip_path=ip_path,
+        **kwargs,
+    )
+
+
+def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
+    runner = FakeRunner()
+    result = _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
+    assert [call.command for call in runner.calls] == [
+        "version",
+        "doctor",
+        "lint",
+        "check",
+        "render",
+    ]
+    assert all(call.env["HYPERFRAMES_NO_UPDATE_CHECK"] == "1" for call in runner.calls)
+    assert all(call.env["P3_IP_PATH"] == str(tmp_path / "ip") for call in runner.calls)
+    assert (
+        result.output.output_sha256
+        == hashlib.sha256(result.output.verified_bytes).hexdigest()
+    )
+    assert result.output.output_size_bytes == len(result.output.verified_bytes)
+
+
+def test_adapter_rejects_remotion_without_fallback(tmp_path):
+    runner = FakeRunner()
+    with pytest.raises(AiVideoError) as caught:
+        _adapter(tmp_path, runner).render(
+            make_render_attempt(tmp_path, RendererKind.REMOTION)
+        )
+    assert caught.value.code is ErrorCode.RENDERER_UNAVAILABLE
+    assert runner.calls == []
+
+
+@pytest.mark.parametrize("failed_phase", ["lint", "check", "render"])
+def test_adapter_reports_typed_phase_failure_without_next_command(
+    tmp_path, failed_phase
+):
+    runner = FakeRunner(fail_at=failed_phase)
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
+    assert caught.value.phase == failed_phase
+    assert caught.value.retryable is False
+    assert runner.calls[-1].command == failed_phase
+
+
+@pytest.mark.parametrize("required", ["Node.js", "FFmpeg", "FFprobe", "Chrome"])
+def test_doctor_json_requires_each_named_runtime_check_ok(tmp_path, required):
+    payload = _doctor_json()
+    payload["checks"] = [item for item in payload["checks"] if item["name"] != required]
+    runner = FakeRunner(doctor_payload=payload)
+    with pytest.raises(AiVideoError) as caught:
+        _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
+    assert caught.value.code is ErrorCode.RENDERER_UNAVAILABLE
+    assert [item.command for item in runner.calls] == ["version", "doctor"]
+
+
+def test_doctor_ignores_top_level_and_optional_failure(tmp_path):
+    _adapter(tmp_path, FakeRunner()).render(make_render_attempt(tmp_path))
+
+
+@pytest.mark.parametrize(
+    ("command", "payload"),
+    [
+        ("lint", {"errorCount": True, "warningCount": 0}),
+        ("lint", {"errorCount": "0", "warningCount": 0}),
+        ("check", {"ok": 1}),
+    ],
+)
+def test_lint_check_json_requires_exact_integer_and_boolean_types(
+    tmp_path, command, payload
+):
+    runner = FakeRunner(
+        lint_payload=payload if command == "lint" else None,
+        check_payload=payload if command == "check" else None,
+    )
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
+    assert (caught.value.code, caught.value.phase) == (
+        ErrorCode.RENDERER_SOURCE_INVALID,
+        command,
+    )
+
+
+def test_source_mutation_after_lint_fails_closed(tmp_path):
+    runner = FakeRunner(mutate_after="lint")
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
+    assert (caught.value.code, caught.value.phase) == (
+        ErrorCode.RENDERER_SOURCE_INVALID,
+        "source",
+    )
+
+
+def test_controlled_env_is_exact_and_includes_validated_paths(tmp_path, monkeypatch):
+    monkeypatch.setenv("PATH", "/safe/bin")
+    monkeypatch.setenv("TMPDIR", "/safe/tmp")
+    monkeypatch.setenv("HTTPS_PROXY", "http://must-not-leak")
+    browser = _write_executable(tmp_path / "chrome")
+    ip_path = _write_executable(tmp_path / "ip")
+    assert _controlled_env(browser, ip_path) == {
+        "PATH": "/safe/bin",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/safe/tmp",
+        **OFFLINE_ENV,
+        "HYPERFRAMES_BROWSER_PATH": str(browser),
+        "P3_IP_PATH": str(ip_path),
+    }
+
+
+@pytest.mark.parametrize("bad_kind", ["relative", "symlink", "nonexec"])
+def test_controlled_env_rejects_invalid_ip_before_invocation(tmp_path, bad_kind):
+    browser = _write_executable(tmp_path / "chrome")
+    target = tmp_path / "ip-real"
+    target.write_text("x", encoding="utf-8")
+    if bad_kind == "relative":
+        ip_path = Path("ip")
+    elif bad_kind == "symlink":
+        target.chmod(0o700)
+        ip_path = tmp_path / "ip"
+        ip_path.symlink_to(target)
+    else:
+        ip_path = target
+    with pytest.raises(AiVideoError) as caught:
+        _controlled_env(browser, ip_path)
+    assert caught.value.code is ErrorCode.RENDERER_UNAVAILABLE
+
+
+@pytest.mark.parametrize(
+    "failure", [RuntimeError("probe"), AiVideoError(ErrorCode.FFMPEG_FAILED, "ffmpeg")]
+)
+def test_verify_boundary_normalizes_probe_failures(tmp_path, failure):
+    def fail(_fd):
+        raise failure
+
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, FakeRunner(), probe=fail).render(
+            make_render_attempt(tmp_path)
+        )
+    assert (caught.value.code, caught.value.phase, caught.value.retryable) == (
+        ErrorCode.RENDER_FAILED,
+        "verify",
+        False,
+    )
+
+
+def test_production_runner_builds_exact_unshare_argv_and_fixed_exec_wrapper(tmp_path):
+    runner = object.__new__(_NetworkIsolatedHyperFramesRunner)
+    runner._unshare = Path("/usr/bin/unshare")
+    runner._bash = Path("/usr/bin/bash")
+    runner._binary = tmp_path / "node_modules/.bin/hyperframes"
+    assert runner._namespace_argv("lint", "/source", "--json") == [
+        "/usr/bin/unshare",
+        "--user",
+        "--map-root-user",
+        "--net",
+        "--pid",
+        "--fork",
+        "--mount-proc",
+        "/usr/bin/bash",
+        "-ceu",
+        '"$P3_IP_PATH" link set lo up; exec "$@"',
+        "p3-hyperframes",
+        str(runner._binary),
+        "lint",
+        "/source",
+        "--json",
+    ]
+    with pytest.raises(ValueError, match="requires --json"):
+        runner._namespace_argv("render", "/source")
+
+
+def test_production_runner_subprocess_is_closed_and_bounded(tmp_path, monkeypatch):
+    runner = object.__new__(_NetworkIsolatedHyperFramesRunner)
+    runner._unshare = Path("/usr/bin/unshare")
+    runner._bash = Path("/usr/bin/bash")
+    runner._binary = tmp_path / "node_modules/.bin/hyperframes"
+    runner._project_root = tmp_path
+    runner._env = {"P3_IP_PATH": "/usr/bin/ip"}
+    observed = {}
+
+    def fake_run(argv, **kwargs):
+        observed.update(kwargs)
+        return subprocess.CompletedProcess(argv, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    runner._invoke("--version", timeout_seconds=5)
+    assert observed["stdin"] is subprocess.DEVNULL
+    assert observed["stdout"] is subprocess.PIPE
+    assert observed["stderr"] is subprocess.PIPE
+    assert observed["close_fds"] is True
+    assert observed["shell"] is False
+
+
+def test_adapter_uses_exact_lint_check_render_argv_and_static_root(tmp_path):
+    runner = FakeRunner()
+    attempt = make_render_attempt(tmp_path)
+    _adapter(tmp_path, runner).render(attempt)
+    lint, check, render = runner.calls[2:]
+    assert lint.args == (str(attempt.staging_root), "--json")
+    assert check.args == (str(attempt.staging_root), "--json")
+    assert render.args == (
+        str(attempt.staging_root),
+        "-o",
+        str(attempt.output_path),
+        "--json",
+    )
+    parsed = _parse_source_document((attempt.staging_root / "index.html").read_text())
+    assert parsed.stage_attributes["data-no-timeline"] is None
+
+
+@pytest.mark.parametrize(
+    ("version", "doctor_payload", "fail_at"),
+    [
+        ("0.7.104", None, None),
+        ("0.7.103", {"checks": "not-a-list"}, None),
+        ("0.7.103", None, "doctor"),
+    ],
+)
+def test_version_and_doctor_fail_before_materialization(
+    tmp_path, version, doctor_payload, fail_at
+):
+    runner = FakeRunner(version=version, doctor_payload=doctor_payload, fail_at=fail_at)
+    with pytest.raises(AiVideoError) as caught:
+        _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
+    assert caught.value.code is ErrorCode.RENDERER_UNAVAILABLE
+    assert not (tmp_path / "attempt/source").exists()
+
+
+def test_check_warnings_are_recorded_but_errors_fail(tmp_path):
+    warning = _check_json()
+    warning["layout"] = {"errorCount": 0, "warningCount": 2}
+    result = _adapter(tmp_path, FakeRunner(check_payload=warning)).render(
+        make_render_attempt(tmp_path)
+    )
+    assert result.checks[1].warning_count == 2
+
+    error = _check_json()
+    error["motion"] = {"errorCount": 1, "warningCount": 0}
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path / "second", FakeRunner(check_payload=error)).render(
+            make_render_attempt(tmp_path / "second")
+        )
+    assert (caught.value.code, caught.value.phase) == (
+        ErrorCode.RENDERER_SOURCE_INVALID,
+        "check",
+    )
+
+
+@pytest.mark.parametrize(
+    "bad_path",
+    [
+        lambda root: root.parent / "sibling.mp4",
+        lambda root: Path("/tmp/p3-external.mp4"),
+        lambda root: root / "../escape.mp4",
+        lambda root: root / "nested/deeper/render.mp4",
+    ],
+)
+def test_output_escape_is_rejected_before_materialization_or_render(tmp_path, bad_path):
+    from dataclasses import replace
+
+    runner = FakeRunner()
+    attempt = make_render_attempt(tmp_path)
+    attempt = replace(attempt, output_path=bad_path(attempt.allowed_staging_parent))
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, runner).render(attempt)
+    assert (caught.value.code, caught.value.phase) == (
+        ErrorCode.RENDER_FAILED,
+        "verify",
+    )
+    assert runner.calls == []
+    assert not attempt.staging_root.exists()
+
+
+def test_output_symlink_is_rejected_before_render(tmp_path):
+    runner = FakeRunner()
+    attempt = make_render_attempt(tmp_path)
+    attempt.output_path.parent.mkdir(mode=0o700)
+    backing = tmp_path / "backing.mp4"
+    backing.write_bytes(b"backing")
+    attempt.output_path.symlink_to(backing)
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, runner).render(attempt)
+    assert caught.value.phase == "verify"
+    assert runner.calls == []
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("width", 321),
+        ("height", 181),
+        ("r_frame_rate", "25/1"),
+        ("nb_frames", "11"),
+    ],
+)
+def test_measured_output_must_match_timeline(tmp_path, field, value):
+    def probe(_fd):
+        stream = {
+            "codec_type": "video",
+            "width": 320,
+            "height": 180,
+            "r_frame_rate": "24/1",
+            "nb_frames": "10",
+            "codec_name": "h264",
+        }
+        stream[field] = value
+        return {"streams": [stream]}
+
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, FakeRunner(), probe=probe).render(
+            make_render_attempt(tmp_path)
+        )
+    assert (caught.value.code, caught.value.phase) == (
+        ErrorCode.RENDER_FAILED,
+        "verify",
+    )
+
+
+def test_measured_output_rejects_audio_stream(tmp_path):
+    def probe(_fd):
+        return {
+            "streams": [
+                {
+                    "codec_type": "video",
+                    "width": 320,
+                    "height": 180,
+                    "r_frame_rate": "24/1",
+                    "nb_frames": "10",
+                    "codec_name": "h264",
+                },
+                {"codec_type": "audio"},
+            ]
+        }
+
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, FakeRunner(), probe=probe).render(
+            make_render_attempt(tmp_path)
+        )
+    assert caught.value.phase == "verify"
+
+
+def test_empty_or_missing_output_is_typed_verify_failure(tmp_path):
+    runner = FakeRunner()
+    runner.run = lambda command, args, **kwargs: RendererCommandResult(
+        0,
+        json.dumps(runner.lint_payload if command == "lint" else runner.check_payload)
+        if command != "render"
+        else "",
+        "",
+    )
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
+    assert (caught.value.code, caught.value.phase) == (
+        ErrorCode.RENDER_FAILED,
+        "verify",
+    )
+
+
+def test_ffprobe_and_framemd5_use_exact_held_fd_argv(tmp_path, monkeypatch):
+    import ai_video.production.hyperframes as hyperframes
+
+    media = tmp_path / "media.mp4"
+    media.write_bytes(b"media")
+    descriptor = os.open(media, os.O_RDONLY)
+    calls = []
+
+    def fake_run(argv, **kwargs):
+        calls.append((argv, kwargs))
+        if argv[0] == "ffprobe":
+            stdout = json.dumps({"streams": []})
+        else:
+            stdout = "# header\n0, 0, 0, 1, deadbeef\n"
+        return subprocess.CompletedProcess(argv, 0, stdout=stdout, stderr="")
+
+    monkeypatch.setattr(hyperframes.subprocess, "run", fake_run)
+    try:
+        probe_result = hyperframes.probe_clip_fd(descriptor)
+        assert probe_result == {"streams": []}
+        assert len(hyperframes.decoded_frame_sha256_fd(descriptor)) == 64
+    finally:
+        os.close(descriptor)
+    for argv, kwargs in calls:
+        passed = kwargs["pass_fds"]
+        assert len(passed) == 1
+        assert f"/proc/self/fd/{passed[0]}" in argv
+        assert kwargs["shell"] is False
+        assert kwargs["close_fds"] is True
+
+
+def test_staged_path_swap_after_secure_open_cannot_change_evidence(tmp_path):
+    attempt = make_render_attempt(tmp_path)
+
+    def probe(fd):
+        attempt.output_path.unlink()
+        attempt.output_path.write_bytes(b"replacement")
+        assert os.pread(fd, os.fstat(fd).st_size, 0) == b"fake-mp4"
+        return {
+            "streams": [
+                {
+                    "codec_type": "video",
+                    "width": 320,
+                    "height": 180,
+                    "r_frame_rate": "24/1",
+                    "nb_frames": "10",
+                    "codec_name": "h264",
+                }
+            ]
+        }
+
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, FakeRunner(), probe=probe).render(attempt)
+    assert (caught.value.code, caught.value.phase) == (
+        ErrorCode.RENDER_FAILED,
+        "verify",
+    )
+    assert attempt.output_path.read_bytes() == b"replacement"
+
+
+def test_verification_path_swaps_never_mix_held_fd_evidence(tmp_path):
+    attempt = make_render_attempt(tmp_path)
+
+    def swap(path: Path, payload: bytes) -> None:
+        detached = path.with_name(f"detached-{len(payload)}.mp4")
+        if path.exists():
+            path.rename(detached)
+        path.write_bytes(payload)
+
+    def probe(fd):
+        swap(attempt.verification_snapshot_path, b"probe-replacement")
+        assert os.pread(fd, os.fstat(fd).st_size, 0) == b"fake-mp4"
+        return {
+            "streams": [
+                {
+                    "codec_type": "video",
+                    "width": 320,
+                    "height": 180,
+                    "r_frame_rate": "24/1",
+                    "nb_frames": "10",
+                    "codec_name": "h264",
+                }
+            ]
+        }
+
+    def decoded(fd):
+        swap(attempt.verification_snapshot_path, b"decoded-replacement")
+        return hashlib.sha256(os.pread(fd, os.fstat(fd).st_size, 0)).hexdigest()
+
+    result = _adapter(
+        tmp_path, FakeRunner(), probe=probe, decoded_frames=decoded
+    ).render(attempt)
+    assert result.output.verified_bytes == b"fake-mp4"
+    assert result.output.output_sha256 == hashlib.sha256(b"fake-mp4").hexdigest()
+
+
+def test_verification_path_swap_immediately_after_copy_yield_uses_created_fd(
+    tmp_path, monkeypatch
+):
+    from contextlib import contextmanager
+    import ai_video.production.hyperframes as hyperframes
+
+    attempt = make_render_attempt(tmp_path)
+    real_copy = hyperframes._copy_held_fd_to_regular_file_nofollow
+
+    @contextmanager
+    def copy_then_swap(*args, **kwargs):
+        with real_copy(*args, **kwargs) as verification:
+            verification.path.rename(verification.path.with_name("detached.mp4"))
+            verification.path.write_bytes(b"replacement")
+            yield verification
+
+    monkeypatch.setattr(
+        hyperframes, "_copy_held_fd_to_regular_file_nofollow", copy_then_swap
+    )
+    result = _adapter(tmp_path, FakeRunner()).render(attempt)
+    assert result.output.verified_bytes == b"fake-mp4"
+    assert attempt.verification_snapshot_path.read_bytes() == b"replacement"
+
+
+def test_namespace_capability_failure_has_no_host_fallback(tmp_path, monkeypatch):
+    runner = object.__new__(_NetworkIsolatedHyperFramesRunner)
+    runner._unshare = Path("/usr/bin/unshare")
+    runner._bash = Path("/usr/bin/bash")
+    runner._project_root = tmp_path
+    runner._env = {"P3_IP_PATH": "/usr/bin/ip"}
+    calls = []
+
+    def unavailable(argv, **kwargs):
+        calls.append((argv, kwargs))
+        return subprocess.CompletedProcess(argv, 1, stdout="", stderr="denied")
+
+    monkeypatch.setattr(subprocess, "run", unavailable)
+    with pytest.raises(AiVideoError) as caught:
+        runner._probe_namespace()
+    assert caught.value.code is ErrorCode.RENDERER_UNAVAILABLE
+    assert len(calls) == 1
+    assert calls[0][0][0] == "/usr/bin/unshare"
+
+
+def test_production_runner_accepts_only_lock_owned_binary_and_validated_tools(
+    tmp_path, monkeypatch
+):
+    project_root = Path(__file__).parents[1]
+    browser = _write_executable(tmp_path / "chrome")
+    ip_path = _write_executable(tmp_path / "ip")
+    unshare = _write_executable(tmp_path / "unshare")
+    bash = _write_executable(tmp_path / "bash")
+    monkeypatch.setattr(
+        _NetworkIsolatedHyperFramesRunner, "_probe_namespace", lambda self: None
+    )
+    runner = _NetworkIsolatedHyperFramesRunner(
+        project_root=project_root,
+        binary=project_root / "node_modules/.bin/hyperframes",
+        browser_path=browser,
+        ip_path=ip_path,
+        unshare_path=unshare,
+        bash_path=bash,
+    )
+    assert runner._binary == project_root / "node_modules/.bin/hyperframes"
+    with pytest.raises(AiVideoError) as caught:
+        _NetworkIsolatedHyperFramesRunner(
+            project_root=project_root,
+            binary=project_root / "node_modules/hyperframes/bin/hyperframes.mjs",
+            browser_path=browser,
+            ip_path=ip_path,
+            unshare_path=unshare,
+            bash_path=bash,
+        )
+    assert caught.value.code is ErrorCode.RENDERER_UNAVAILABLE
+
+
+def test_runner_timeout_is_typed_and_redacted(tmp_path, monkeypatch):
+    runner = object.__new__(_NetworkIsolatedHyperFramesRunner)
+    runner._unshare = Path("/usr/bin/unshare")
+    runner._bash = Path("/usr/bin/bash")
+    runner._binary = tmp_path / "node_modules/.bin/hyperframes"
+    runner._project_root = tmp_path
+    runner._env = {"P3_IP_PATH": "/usr/bin/ip"}
+
+    def timeout(*args, **kwargs):
+        raise subprocess.TimeoutExpired(
+            args[0], kwargs["timeout"], stderr="token=hidden"
+        )
+
+    monkeypatch.setattr(subprocess, "run", timeout)
+    with pytest.raises(RendererAttemptError) as caught:
+        runner._invoke(
+            "render", "/source", "-o", "/output.mp4", "--json", timeout_seconds=1
+        )
+    assert (caught.value.code, caught.value.phase) == (
+        ErrorCode.RENDER_FAILED,
+        "render",
+    )
+    assert "hidden" not in (caught.value.technical_detail or "")
+
+
+def test_renderer_failure_stderr_is_bounded_and_redacted(tmp_path):
+    runner = FakeRunner(fail_at="render")
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
+    assert "private" not in (caught.value.technical_detail or "")
+    assert "[REDACTED]" in (caught.value.technical_detail or "")
