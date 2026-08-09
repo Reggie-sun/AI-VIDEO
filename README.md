@@ -6,18 +6,19 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-The public runtime remains the local-first `0.1.x` CLI described in this README. The first v0.2 core slice is now available as an importable, read-only Python API: it loads strict `ProductionProject` and creative artifacts, validates concrete Shot-to-Asset bindings and verifies a content-addressed local Asset Registry snapshot. It does not write or activate projects, add a public command, or make HyperFrames, Remotion, ElevenLabs, Captions, Audio, dependency graphs or Providers available.
+The public runtime remains the local-first `0.1.x` CLI described in this README. P2 is available as an importable, read-only Python API: it loads strict `ProductionProject` and creative artifacts, validates concrete Shot-to-Asset bindings and verifies a content-addressed local Asset Registry snapshot. P2A separately implements the v2 project/registry commit and explicit recovery protocol on its feature branch; it adds no public command and does not make HyperFrames, Remotion, ElevenLabs, Captions, Audio, dependency graphs or Providers available.
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
 - Phase dependency map: [`docs/v0.2-agentic-production-roadmap.md`](docs/v0.2-agentic-production-roadmap.md)
 - Product reframe plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p0-product-reframe.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p0-product-reframe.md)
 - Accepted P2 core plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p2-production-project-core.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p2-production-project-core.md)
+- P2A state commit plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p2a-production-state-commit.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p2a-production-state-commit.md)
 - Planning-only P3 composition plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p3-deterministic-composition-hyperframes-adapter.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p3-deterministic-composition-hyperframes-adapter.md)
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-The public commands remain `validate`, `run`, and `resume`; generation remains ComfyUI-only and default-local; Manifest v1 and the current artifact layout remain active. The independently reviewed P2 implementation is accepted and present on local `main`; `origin/main` does not contain it, and push, release or GitHub publication is not implied.
+The public commands remain `validate`, `run`, and `resume`; generation remains ComfyUI-only and default-local; Manifest v1 and the current artifact layout remain active. P2 is accepted and present on local `main`. P2A is implemented and independently slice-reviewed on `feat/p2a-production-state-commit`, but is not merged, pushed, released, or published; final whole-branch review follows this documentation checkpoint.
 
 ## Setup
 
@@ -43,9 +44,17 @@ from ai_video.production import load_production_project
 project = load_production_project("projects/example/project.yaml")
 ```
 
-The path above is illustrative; this repository does not bundle that example project. The loader is read-only and no-network. It verifies the Manifest-selected project revision and content hash, sealed creative artifact references, six Shot `visual_strategy` contracts, concrete asset IDs/types, local file size/SHA-256, registry revision/filename/hash and project-root containment.
+The path above is illustrative; this repository does not bundle that example project. The loader is read-only and no-network. It uses `project.yaml` as the stable validated entrypoint, then verifies the Production Manifest-selected project and registry snapshot paths, semantic identities and exact file hashes. It also validates sealed creative artifact references, six Shot `visual_strategy` contracts, concrete asset IDs/types, local file size/SHA-256 and project-root containment. The root `project.yaml` is not the active snapshot bytes truth once P2A state exists.
 
-P2 does not create directories, update a Manifest, activate a registry revision or prove append-only/cross-file crash safety. Those write semantics require the separately planned P2A commit protocol. There is no v2 CLI, renderer, Audio/Caption domain, dependency graph, QA/repair flow or Provider integration yet.
+P2 itself does not create directories, update a Manifest or activate a registry revision. P2A owns those v2 state changes; it remains separate from the P2 reader. There is no v2 CLI, renderer, Audio/Caption domain, dependency graph, QA/repair flow or Provider integration yet.
+
+## Production State Commit Protocol (P2A)
+
+P2A is an importable Python API, not a CLI surface. `ProductionManifest` is the sole lifecycle record; its `active_project` and `active_registry` pointers record exact relative paths, semantic revision/content hashes and file SHA-256 hashes. `ProductionStateCommitter` in `ai_video.production.state_commit` is the sole v2 writer and recovery owner.
+
+On POSIX, a commit uses a same-filesystem `state/commit.lock`, writes and file-fsyncs immutable snapshot temps, promotes them without overwrite, parent-directory-fsyncs, then reopens and verifies them. Durable `ProductionManifest` writes also record running and failed attempt lifecycle; the one atomic replacement that switches active pointers is the single logical commit point. Recovery is explicit through `recover_production_state()`; normal P2 loading never silently repairs state. It accepts only an exact old pair or exact new pair, marks interrupted attempts without guessing activation, cleans only bounded non-succeeded owned temporary files, and preserves/reports complete orphan snapshots rather than activating or deleting them. These guarantees are deliberately narrower than byte-identical, all-platform, zero-data-loss or power-loss-safe claims.
+
+The P2A implementation file map is `src/ai_video/production/models.py`, `src/ai_video/production/project.py`, `src/ai_video/production/state_commit.py`, `src/ai_video/production/__init__.py`, `tests/production_project_factory.py`, `tests/test_production_models.py`, `tests/test_production_project.py`, `tests/test_production_validation.py`, `tests/test_production_state_commit.py`, `tests/test_production_state_recovery.py`, and `tests/helpers/p2a_crash_worker.py`.
 
 ## Development MCP
 
