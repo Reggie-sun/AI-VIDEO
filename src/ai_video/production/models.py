@@ -478,6 +478,12 @@ class RendererSelectionReceipt(StrictModel):
     current_project: ProjectSnapshotPointer
     current_registry: RegistrySnapshotPointer
 
+    @model_validator(mode="after")
+    def _selected_renderer_matches_request(self) -> "RendererSelectionReceipt":
+        if self.selected_kinds != (self.requested_kind,):
+            raise ValueError("selected renderer must match the requested renderer")
+        return self
+
 
 class RendererCheckReceipt(StrictModel):
     command: Literal["lint", "check"]
@@ -751,6 +757,8 @@ class StateCommitAttempt(StrictModel):
         if self.operation == "render_state":
             if self.renderer_selection is None:
                 raise ValueError("render_state attempts require renderer selection")
+            if self.attempt_id != self.renderer_selection.attempt_id:
+                raise ValueError("render_state attempt identity does not match selection")
             if (
                 self.base_project != self.renderer_selection.current_project
                 or self.base_registry != self.renderer_selection.current_registry
@@ -766,6 +774,19 @@ class StateCommitAttempt(StrictModel):
                 raise ValueError(
                     "render_state candidate registry identity does not match"
                 )
+            candidate_bundle = (
+                self.candidate_render_state,
+                self.candidate_project,
+                self.candidate_registry,
+            )
+            if any(item is not None for item in candidate_bundle) and not all(
+                item is not None for item in candidate_bundle
+            ):
+                raise ValueError("render_state candidate bundle must be all-or-none")
+            if all(item is not None for item in candidate_bundle) and (
+                self.render_phase != "activate"
+            ):
+                raise ValueError("render_state candidate bundle requires activate phase")
         return self
 
     @model_serializer(mode="wrap")
@@ -833,6 +854,19 @@ class ProductionManifest(StrictModel):
                 item.operation == "render_state" for item in self.attempts
             ):
                 raise ValueError("Production Manifest 2.0 cannot contain render state")
+        for attempt in self.attempts:
+            if (
+                attempt.operation == "render_state"
+                and attempt.status is StateCommitStatus.RUNNING
+                and (
+                    attempt.base_project != self.active_project
+                    or attempt.base_registry != self.active_registry
+                    or attempt.base_render_state != self.active_render_state
+                )
+            ):
+                raise ValueError(
+                    "running render_state attempt base must match active identity"
+                )
         return self
 
     @model_serializer(mode="wrap")

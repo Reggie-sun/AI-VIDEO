@@ -74,6 +74,35 @@ def make_registry_pointer() -> RegistrySnapshotPointer:
     )
 
 
+def make_canonical_project_pointer(
+    *, content_hash: str = ZERO_HASH, file_sha256: str = ONE_HASH
+) -> ProjectSnapshotPointer:
+    return ProjectSnapshotPointer(
+        path=Path(f"state/projects/project.1.{content_hash}.yaml"),
+        revision=1,
+        content_hash=content_hash,
+        file_sha256=file_sha256,
+    )
+
+
+def make_alternate_registry_pointer() -> RegistrySnapshotPointer:
+    return RegistrySnapshotPointer(
+        path=Path(f"assets/registry.{TWO_HASH}.json"),
+        revision_id=TWO_HASH,
+        content_hash=TWO_HASH,
+        file_sha256=THREE_HASH,
+    )
+
+
+def make_render_state_pointer(content_hash: str = THREE_HASH) -> RenderStateSnapshotPointer:
+    return RenderStateSnapshotPointer(
+        path=Path(f"state/render/states/{content_hash}.json"),
+        revision=1,
+        content_hash=content_hash,
+        file_sha256=ZERO_HASH,
+    )
+
+
 def make_state_manifest(**overrides: object) -> ProductionManifest:
     data: dict[str, object] = {
         "project_id": "comic-demo",
@@ -310,6 +339,192 @@ def test_renderer_selection_allows_one_selected_renderer():
             current_project=make_project_pointer(),
             current_registry=make_registry_pointer(),
         )
+
+
+def test_renderer_selection_rejects_a_selected_renderer_other_than_requested():
+    data = make_renderer_selection().model_dump(mode="python")
+    data["requested_kind"] = "remotion"
+
+    with pytest.raises(ValidationError, match="requested"):
+        RendererSelectionReceipt.model_validate(data)
+
+
+def test_render_attempt_requires_selection_attempt_id_to_match():
+    selection = make_renderer_selection().model_copy(
+        update={"attempt_id": "attempt-other"}
+    )
+
+    with pytest.raises(ValidationError, match="attempt identity"):
+        StateCommitAttempt(
+            attempt_id="attempt-1",
+            operation="render_state",
+            status=StateCommitStatus.RUNNING,
+            base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            renderer_selection=selection,
+            started_at="2026-08-09T00:00:00+00:00",
+        )
+
+
+@pytest.mark.parametrize(
+    "candidate_fields",
+    [
+        {"candidate_render_state": make_render_state_pointer()},
+        {"candidate_project": make_canonical_project_pointer()},
+        {"candidate_registry": make_registry_pointer()},
+        {
+            "candidate_render_state": make_render_state_pointer(),
+            "candidate_project": make_canonical_project_pointer(),
+        },
+        {
+            "candidate_render_state": make_render_state_pointer(),
+            "candidate_registry": make_registry_pointer(),
+        },
+        {
+            "candidate_project": make_canonical_project_pointer(),
+            "candidate_registry": make_registry_pointer(),
+        },
+    ],
+)
+def test_render_attempt_rejects_partial_candidate_bundle(candidate_fields):
+    with pytest.raises(ValidationError, match="candidate bundle"):
+        StateCommitAttempt(
+            attempt_id="attempt-1",
+            operation="render_state",
+            status=StateCommitStatus.RUNNING,
+            base_manifest_revision=1,
+            base_project=make_canonical_project_pointer(),
+            base_registry=make_registry_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            renderer_selection=make_renderer_selection().model_copy(
+                update={"current_project": make_canonical_project_pointer()}
+            ),
+            started_at="2026-08-09T00:00:00+00:00",
+            **candidate_fields,
+        )
+
+
+def test_render_attempt_candidate_bundle_requires_activate_phase():
+    with pytest.raises(ValidationError, match="activate"):
+        StateCommitAttempt(
+            attempt_id="attempt-1",
+            operation="render_state",
+            status=StateCommitStatus.RUNNING,
+            base_manifest_revision=1,
+            base_project=make_canonical_project_pointer(),
+            base_registry=make_registry_pointer(),
+            candidate_project=make_canonical_project_pointer(),
+            candidate_registry=make_registry_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            candidate_render_state=make_render_state_pointer(),
+            renderer_selection=make_renderer_selection().model_copy(
+                update={"current_project": make_canonical_project_pointer()}
+            ),
+            render_phase="render",
+            started_at="2026-08-09T00:00:00+00:00",
+        )
+
+
+def test_render_attempt_accepts_complete_activate_candidate_bundle():
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="render_state",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_canonical_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_project=make_canonical_project_pointer(),
+        candidate_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        candidate_render_state=make_render_state_pointer(),
+        renderer_selection=make_renderer_selection().model_copy(
+            update={"current_project": make_canonical_project_pointer()}
+        ),
+        render_phase="activate",
+        started_at="2026-08-09T00:00:00+00:00",
+    )
+
+    assert attempt.candidate_render_state == make_render_state_pointer()
+
+
+@pytest.mark.parametrize("mismatch", ["project", "registry", "render_state"])
+def test_manifest_running_render_attempt_requires_current_base_identity(mismatch):
+    active_render = make_render_state_pointer()
+    base_project = make_project_pointer()
+    base_registry = make_registry_pointer()
+    base_render = active_render
+    if mismatch == "project":
+        base_project = make_canonical_project_pointer(
+            content_hash=TWO_HASH, file_sha256=THREE_HASH
+        )
+    elif mismatch == "registry":
+        base_registry = make_alternate_registry_pointer()
+    else:
+        base_render = make_render_state_pointer(FOUR_HASH)
+    selection = make_renderer_selection().model_copy(
+        update={
+            "current_project": base_project,
+            "current_registry": base_registry,
+        }
+    )
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="render_state",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=base_project,
+        base_registry=base_registry,
+        base_render_state=base_render,
+        candidate_artifacts_hash=ZERO_HASH,
+        renderer_selection=selection,
+        render_phase="selection",
+        started_at="2026-08-09T00:00:00+00:00",
+    )
+
+    with pytest.raises(ValidationError, match="active identity"):
+        make_state_manifest(
+            schema_version="2.1",
+            active_render_state=active_render,
+            attempts=(attempt,),
+        )
+
+
+def test_manifest_allows_historical_terminal_render_attempt_from_an_old_base():
+    old_project = make_canonical_project_pointer(
+        content_hash=TWO_HASH, file_sha256=THREE_HASH
+    )
+    old_registry = make_alternate_registry_pointer()
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="render_state",
+        status=StateCommitStatus.FAILED,
+        base_manifest_revision=1,
+        base_project=old_project,
+        base_registry=old_registry,
+        base_render_state=make_render_state_pointer(FOUR_HASH),
+        candidate_artifacts_hash=ZERO_HASH,
+        renderer_selection=make_renderer_selection().model_copy(
+            update={
+                "current_project": old_project,
+                "current_registry": old_registry,
+            }
+        ),
+        render_phase="selection",
+        started_at="2026-08-09T00:00:00+00:00",
+        finished_at="2026-08-09T00:00:01+00:00",
+        error_code="renderer_unavailable",
+        error_message="safe",
+    )
+
+    manifest = make_state_manifest(
+        schema_version="2.1",
+        active_render_state=make_render_state_pointer(),
+        attempts=(attempt,),
+    )
+
+    assert manifest.attempts == (attempt,)
 
 
 def test_manifest_20_rejects_render_state_and_render_attempts():
