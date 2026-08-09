@@ -11,3 +11,5 @@ runs/*
 *.webm
 *.mov
 *.png
+node_modules/
+.hyperframes/
