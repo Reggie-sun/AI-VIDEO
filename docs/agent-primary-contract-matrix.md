@@ -14,7 +14,7 @@
 | Error Model | 跨模块统一使用 `AiVideoError` 与 `ErrorCode`。 |
 | Dependency Policy | 除非有明确理由且获得请求，否则不新增运行时依赖。 |
 | Output Policy | Legacy run 保持当前 flat `runs/<run_id>/` layout；v2 layout 只能由显式 v2 config 和已批准的 Manifest v2 slice 创建。 |
-| Version Gate | P0 product reframe 已完成文档迁移；P1 与 independently accepted P2 已在 local `main`，但尚未进入 `origin/main`；P2A 已在 `feat/p2a-production-state-commit` 实现并 independently slice-reviewed，尚未 merge/release，final whole-branch review pending；P3+ 每个 slice 仍必须有独立 plan、实施授权、验收、rollback 和对应 contract/docs/tests 更新。 |
+| Version Gate | P0 product reframe 已完成文档迁移；P1 与 independently accepted P2 已在 local `main`，但尚未进入 `origin/main`；P2A 已在 `feat/p2a-production-state-commit` independently accepted，尚未 merge、push 或 release；P3+ 每个 slice 仍必须有独立 plan、实施授权、验收、rollback 和对应 contract/docs/tests 更新。 |
 | Agent Boundary | Codex 是 Production Agent；仓库提供 durable state、validation、provenance、dependency、render 和 QA harness，不实现第二套通用 Agent runtime。 |
 | Renderer Ownership | AI-VIDEO 的 resolved timeline/composition contract 是时间线真相源；默认 renderer target 是 HyperFrames。Remotion 只能作为显式选择的 optional adapter，不能与 HyperFrames 串联重复 render。 |
 
@@ -87,7 +87,7 @@ Agent 不得悄悄侵蚀本地优先承诺。
 - P0 只迁移 product/contract 文档；不得把 spec 写成 runtime truth。
 - 本地 P1 只稳定 Legacy runtime，未引入新 product domain；其 plan 作为 historical stabilization record 保留。
 - P2 已建立 ProductionProject、Assets、Shot visual strategy 的 read-only durable contract；它不拥有 writer、renderer 或云服务。
-- P2A 已在 feature branch 实现并 independently slice-reviewed：唯一 writer/recovery owner 写 immutable v2 snapshots，并通过 nested active pointers and one Manifest replace activate exact pair。它不改变 P2 reader 的只读语义或 Legacy Manifest v1/layout，且尚未 merge/release。
+- P2A 已在 feature branch independently accepted：唯一 writer/recovery owner 写 immutable v2 snapshots，并通过 nested active pointers and one Manifest replace activate exact pair。它不改变 P2 reader 的只读语义或 Legacy Manifest v1/layout，且尚未 merge、push 或 release。
 - P3 planning artifact 只定义一个 canonical renderer adapter 的未来边界；P2A prerequisite 已满足，但 Renderer Gate、dependency-install authorization、API reconciliation 和新的显式用户授权完成前不得实施，也不得建立两条并行 canonical render path。
 - P4 才允许在独立 plan 中引入 Audio/Caption production domain；任何付费调用仍需显式 opt-in。
 - P5 dependency graph 完成前，不得宣称支持跨 asset 的 selective rebuild。
