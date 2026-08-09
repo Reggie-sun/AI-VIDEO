@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 from collections.abc import Iterable
+import math
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
@@ -59,20 +60,39 @@ def _has_type(bound: dict[str, AssetRecord], asset_type: AssetType) -> bool:
     return any(asset.asset_type is asset_type for asset in bound.values())
 
 
+def _validate_deterministic_motion(shot: Shot) -> None:
+    for directive in shot.motion_directives:
+        has_finite_number = any(
+            isinstance(value, (int, float))
+            and not isinstance(value, bool)
+            and math.isfinite(value)
+            for value in directive.parameters.values()
+        )
+        if not has_finite_number:
+            raise _invalid(
+                f"Shot {shot.shot_id} motion_directives require at least one "
+                "deterministic numeric parameter per directive."
+            )
+
+
 def validate_shot_strategy(
     shot: Shot,
     assets_by_id: dict[str, AssetRecord],
 ) -> None:
     roles, bound = _bound_assets(shot, assets_by_id)
-    if shot.visual_strategy is VisualStrategy.STATIC_IMAGE and not _has_type(
-        bound, AssetType.IMAGE
-    ):
-        raise _invalid(f"Shot {shot.shot_id} static_image requires an image role.")
+    if shot.visual_strategy is VisualStrategy.STATIC_IMAGE:
+        if not _has_type(bound, AssetType.IMAGE):
+            raise _invalid(f"Shot {shot.shot_id} static_image requires an image role.")
+        if shot.motion_directives:
+            raise _invalid(
+                f"Shot {shot.shot_id} static_image must not define motion_directives."
+            )
     if shot.visual_strategy is VisualStrategy.IMAGE_MOTION:
         if not _has_type(bound, AssetType.IMAGE):
             raise _invalid(f"Shot {shot.shot_id} image_motion requires an image role.")
         if not shot.motion_directives:
             raise _invalid(f"Shot {shot.shot_id} image_motion requires motion_directives.")
+        _validate_deterministic_motion(shot)
     if shot.visual_strategy is VisualStrategy.MOTION_GRAPHICS:
         if not any(
             _has_type(bound, asset_type)
@@ -86,6 +106,7 @@ def validate_shot_strategy(
             raise _invalid(
                 f"Shot {shot.shot_id} motion_graphics requires motion_directives."
             )
+        _validate_deterministic_motion(shot)
     if shot.visual_strategy is VisualStrategy.GENERATED_VIDEO:
         generated_videos = [
             asset
@@ -129,6 +150,12 @@ def validate_shot_strategy(
                     f"Shot {shot.shot_id} hybrid source {layer.asset_id} is not bound "
                     f"to role {layer.asset_role}."
                 )
+        missing_layers = sorted(set(bound) - {layer.asset_id for layer in shot.hybrid_layers})
+        if missing_layers:
+            raise _invalid(
+                f"Shot {shot.shot_id} hybrid is missing layers for bound source assets: "
+                f"{', '.join(missing_layers)}"
+            )
 
 
 def _unique(values: Iterable[str], label: str) -> set[str]:
@@ -149,6 +176,7 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
     asset_ids = _unique([item.asset_id for item in bundle.registry.assets], "asset_id")
     artifact_ids = _unique(
         [
+            bundle.project.artifact_id,
             bundle.brief.artifact_id,
             bundle.story.artifact_id,
             bundle.storyboard.artifact_id,

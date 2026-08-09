@@ -4,7 +4,25 @@ from enum import Enum
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+
+class _ImmutableDict(dict):
+    def _reject_mutation(self, *args: object, **kwargs: object) -> None:
+        raise TypeError("Production model mappings are immutable.")
+
+    __setitem__ = _reject_mutation
+    __delitem__ = _reject_mutation
+    clear = _reject_mutation
+    pop = _reject_mutation
+    popitem = _reject_mutation
+    setdefault = _reject_mutation
+    update = _reject_mutation
+    __ior__ = _reject_mutation
+
+
+def _immutable_mapping(value: dict) -> _ImmutableDict:
+    return _ImmutableDict(value)
 
 
 class StrictModel(BaseModel):
@@ -61,6 +79,8 @@ class DurationPolicy(StrictModel):
 class CompositionDirective(StrictModel):
     kind: Literal["fit", "position", "crop", "text", "transition_hint"]
     parameters: dict[str, float | int | str | bool] = Field(default_factory=dict)
+
+    _freeze_parameters = field_validator("parameters")(_immutable_mapping)
 
 
 class RendererPolicy(StrictModel):
@@ -184,6 +204,8 @@ class MotionDirective(StrictModel):
     ]
     parameters: dict[str, float | int | str] = Field(min_length=1)
 
+    _freeze_parameters = field_validator("parameters")(_immutable_mapping)
+
 
 class HybridLayer(StrictModel):
     role: str
@@ -289,3 +311,5 @@ class LoadedProductionProject(StrictModel):
     shots: tuple[Shot, ...]
     registry: AssetRegistrySnapshot
     asset_paths: dict[str, Path]
+
+    _freeze_asset_paths = field_validator("asset_paths")(_immutable_mapping)

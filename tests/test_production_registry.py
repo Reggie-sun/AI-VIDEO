@@ -174,6 +174,18 @@ def test_asset_symlink_cannot_escape_asset_root(tmp_path):
         load(path, root)
 
 
+def test_asset_symlink_loop_returns_typed_registry_error(tmp_path):
+    path = write_registry(tmp_path)
+    asset = tmp_path / "assets/files/hero.png"
+    loop = asset.with_name("loop.png")
+    asset.unlink()
+    asset.symlink_to(loop.name)
+    loop.symlink_to(asset.name)
+    with pytest.raises(AiVideoError) as exc:
+        load(path, tmp_path)
+    assert exc.value.code is ErrorCode.ASSET_REGISTRY_INVALID
+
+
 def test_internal_asset_symlink_resolves_inside_asset_root(tmp_path):
     target = tmp_path / "assets/files/target.png"
     target.parent.mkdir(parents=True)

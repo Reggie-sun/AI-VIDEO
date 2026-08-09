@@ -3,7 +3,9 @@ from pydantic import ValidationError
 
 from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
+    CompositionDirective,
     DurationPolicy,
+    MotionDirective,
     RendererPolicy,
     SourceReference,
     Story,
@@ -56,6 +58,18 @@ def test_domain_models_are_frozen():
     story = make_story()
     with pytest.raises(ValidationError, match="Instance is frozen"):
         story.logline = "不允许就地修改"
+
+
+@pytest.mark.parametrize(
+    "directive",
+    [
+        CompositionDirective(kind="fit", parameters={"mode": "cover"}),
+        MotionDirective(kind="pan", parameters={"x": 1}),
+    ],
+)
+def test_parameter_mappings_are_immutable(directive):
+    with pytest.raises(TypeError, match="immutable"):
+        directive.parameters["changed"] = 1
 
 
 def test_fixed_duration_requires_seconds():

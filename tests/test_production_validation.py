@@ -114,7 +114,10 @@ def make_shot(strategy: VisualStrategy, **updates: object) -> Shot:
                     make_role("card", "card.json", AssetType.COMPOSITION_SOURCE),
                 ),
                 motion_directives=(
-                    MotionDirective(kind="animate", parameters={"property": "opacity"}),
+                    MotionDirective(
+                        kind="animate",
+                        parameters={"property": "opacity", "duration_seconds": 1},
+                    ),
                 ),
             ),
             {"card.json": make_asset("card.json", AssetType.COMPOSITION_SOURCE)},
@@ -242,6 +245,28 @@ def test_strategy_rejects_invalid_bound_inputs(
     assert message in exc.value.user_message
 
 
+def test_static_image_rejects_continuous_motion_directives():
+    shot = make_shot(
+        VisualStrategy.STATIC_IMAGE,
+        required_asset_roles=(make_role("hero", "hero.png", AssetType.IMAGE),),
+        motion_directives=(MotionDirective(kind="pan", parameters={"x": 12}),),
+    )
+    with pytest.raises(AiVideoError, match="must not define motion_directives"):
+        validate_shot_strategy(shot, {"hero.png": make_asset("hero.png", AssetType.IMAGE)})
+
+
+def test_motion_strategy_rejects_directive_without_numeric_parameters():
+    shot = make_shot(
+        VisualStrategy.IMAGE_MOTION,
+        required_asset_roles=(make_role("hero", "hero.png", AssetType.IMAGE),),
+        motion_directives=(
+            MotionDirective(kind="pan", parameters={"instruction": "more dynamic"}),
+        ),
+    )
+    with pytest.raises(AiVideoError, match="deterministic numeric parameter"):
+        validate_shot_strategy(shot, {"hero.png": make_asset("hero.png", AssetType.IMAGE)})
+
+
 def test_hybrid_requires_every_layer_source_to_be_bound():
     shot = make_shot(
         VisualStrategy.HYBRID,
@@ -269,6 +294,38 @@ def test_hybrid_requires_every_layer_source_to_be_bound():
         "background.png": make_asset("background.png", AssetType.IMAGE),
     }
     with pytest.raises(AiVideoError, match="other.png"):
+        validate_shot_strategy(shot, assets)
+
+
+def test_hybrid_requires_every_bound_source_to_have_a_layer():
+    shot = make_shot(
+        VisualStrategy.HYBRID,
+        required_asset_roles=(
+            make_role("hero", "hero.png", AssetType.IMAGE),
+            make_role("background", "background.png", AssetType.IMAGE),
+            make_role("overlay", "overlay.png", AssetType.IMAGE),
+        ),
+        hybrid_layers=(
+            HybridLayer(
+                role="background",
+                asset_role="background",
+                asset_id="background.png",
+                z_index=0,
+            ),
+            HybridLayer(
+                role="hero",
+                asset_role="hero",
+                asset_id="hero.png",
+                z_index=1,
+            ),
+        ),
+    )
+    assets = {
+        "hero.png": make_asset("hero.png", AssetType.IMAGE),
+        "background.png": make_asset("background.png", AssetType.IMAGE),
+        "overlay.png": make_asset("overlay.png", AssetType.IMAGE),
+    }
+    with pytest.raises(AiVideoError, match="missing layers.*overlay.png"):
         validate_shot_strategy(shot, assets)
 
 
@@ -633,6 +690,62 @@ def test_project_references_accept_complete_graph():
             ),
             "unknown input",
         ),
+        (
+            lambda bundle: bundle.model_copy(
+                update={"scenes": bundle.scenes + (bundle.scenes[0],)}
+            ),
+            "duplicate scene_id",
+        ),
+        (
+            lambda bundle: bundle.model_copy(
+                update={"shots": bundle.shots + (bundle.shots[0],)}
+            ),
+            "duplicate shot_id",
+        ),
+        (
+            lambda bundle: bundle.model_copy(
+                update={
+                    "storyboard": bundle.storyboard.model_copy(
+                        update={"beats": bundle.storyboard.beats + (bundle.storyboard.beats[0],)}
+                    )
+                }
+            ),
+            "duplicate beat_id",
+        ),
+        (
+            lambda bundle: bundle.model_copy(
+                update={
+                    "characters": (
+                        bundle.characters[0].model_copy(
+                            update={"reference_asset_ids": ("missing.png",)}
+                        ),
+                    )
+                }
+            ),
+            "unknown asset",
+        ),
+        (
+            lambda bundle: bundle.model_copy(
+                update={
+                    "scenes": (
+                        bundle.scenes[0].model_copy(
+                            update={"visual_reference_asset_ids": ("missing.png",)}
+                        ),
+                    )
+                }
+            ),
+            "unknown references",
+        ),
+        (
+            lambda bundle: bundle.model_copy(
+                update={
+                    "project": bundle.project.model_copy(
+                        update={"artifact_id": bundle.brief.artifact_id}
+                    )
+                }
+            ),
+            "duplicate artifact_id",
+        ),
     ],
 )
 def test_project_references_reject_invalid_graph(
@@ -656,3 +769,9 @@ def test_storyboard_beat_scene_must_match_shot_scene():
     )
     with pytest.raises(AiVideoError, match="scene does not match"):
         validate_project_references(changed)
+
+
+def test_loaded_bundle_asset_paths_are_immutable():
+    bundle = make_bundle()
+    with pytest.raises(TypeError, match="immutable"):
+        bundle.asset_paths["hero.png"] = bundle.root / "other.png"

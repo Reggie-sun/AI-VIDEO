@@ -172,6 +172,18 @@ def test_manifest_symlink_cannot_escape_state_root(tmp_path):
         load_production_project(project_path)
 
 
+def test_manifest_symlink_loop_returns_typed_project_error(tmp_path):
+    project_path = write_production_project(tmp_path)
+    manifest = tmp_path / "state/manifest.json"
+    loop = manifest.with_name("manifest-loop.json")
+    manifest.unlink()
+    manifest.symlink_to(loop.name)
+    loop.symlink_to(manifest.name)
+    with pytest.raises(AiVideoError) as exc:
+        load_production_project(project_path)
+    assert exc.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
 def test_load_uses_only_active_registry_revision(tmp_path):
     project_path = write_production_project(tmp_path)
     decoy = tmp_path / f"assets/registry.{'1' * 64}.json"
