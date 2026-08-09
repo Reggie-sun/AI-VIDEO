@@ -20,6 +20,12 @@ class ErrorCode(str, Enum):
     MANIFEST_INVALID = "manifest_invalid"
     PRODUCTION_PROJECT_INVALID = "production_project_invalid"
     ASSET_REGISTRY_INVALID = "asset_registry_invalid"
+    PRODUCTION_STATE_INVALID = "production_state_invalid"
+    PRODUCTION_STATE_BUSY = "production_state_busy"
+    PRODUCTION_STATE_COMMIT_FAILED = "production_state_commit_failed"
+    PRODUCTION_STATE_RECOVERY_FAILED = "production_state_recovery_failed"
+    PRODUCTION_STATE_OUTCOME_UNKNOWN = "production_state_outcome_unknown"
+    PRODUCTION_STATE_UNSUPPORTED = "production_state_unsupported"
     DISK_SPACE_LOW = "disk_space_low"
 
 

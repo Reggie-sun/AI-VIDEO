@@ -30,6 +30,14 @@ class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
 
+def _require_clean_relative_file_path(value: Path, label: str) -> Path:
+    if value.is_absolute() or ".." in value.parts or value == Path("."):
+        raise ValueError(
+            f"{label} path must be clean and project-relative file path"
+        )
+    return value
+
+
 class SourceReference(StrictModel):
     kind: Literal["user_input", "imported", "derived"]
     reference: str
@@ -293,12 +301,122 @@ class AssetRegistrySnapshot(StrictModel):
     assets: tuple[AssetRecord, ...]
 
 
+class ProjectSnapshotPointer(StrictModel):
+    path: Path
+    revision: int = Field(ge=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("path")
+    @classmethod
+    def _require_clean_relative_path(cls, value: Path) -> Path:
+        return _require_clean_relative_file_path(value, "snapshot")
+
+
+class RegistrySnapshotPointer(StrictModel):
+    path: Path
+    revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("path")
+    @classmethod
+    def _require_clean_relative_path(cls, value: Path) -> Path:
+        return _require_clean_relative_file_path(value, "snapshot")
+
+    @model_validator(mode="after")
+    def _revision_matches_content_hash(self) -> "RegistrySnapshotPointer":
+        if self.revision_id != self.content_hash:
+            raise ValueError("registry revision_id must match content_hash")
+        return self
+
+
+class StateCommitStatus(str, Enum):
+    RUNNING = "running"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+    INTERRUPTED = "interrupted"
+    OUTCOME_UNKNOWN = "outcome_unknown"
+
+
+class StateCommitAttempt(StrictModel):
+    attempt_id: str = Field(min_length=1)
+    operation: str = Field(min_length=1)
+    status: StateCommitStatus
+    base_manifest_revision: int = Field(ge=1)
+    candidate_project: ProjectSnapshotPointer | None = None
+    candidate_registry: RegistrySnapshotPointer | None = None
+    started_at: str
+    finished_at: str | None = None
+    error_code: str | None = None
+    error_message: str | None = None
+
+    @model_validator(mode="after")
+    def _validate_terminal_error(self) -> "StateCommitAttempt":
+        if self.status is StateCommitStatus.RUNNING and any(
+            value is not None
+            for value in (self.finished_at, self.error_code, self.error_message)
+        ):
+            raise ValueError("running state commit attempts cannot contain terminal fields")
+        if self.status is StateCommitStatus.SUCCEEDED:
+            if self.finished_at is None:
+                raise ValueError("succeeded state commit attempts require finished_at")
+            if self.error_code is not None or self.error_message is not None:
+                raise ValueError("succeeded state commit attempts cannot contain error fields")
+        terminal_error = self.status in {
+            StateCommitStatus.FAILED,
+            StateCommitStatus.INTERRUPTED,
+            StateCommitStatus.OUTCOME_UNKNOWN,
+        }
+        if terminal_error and (not self.error_code or not self.error_message):
+            raise ValueError("terminal state commit attempts require typed error fields")
+        return self
+
+
+class RecoveryDisposition(str, Enum):
+    ACTIVE = "active"
+    PARTIAL_REMOVED = "partial_removed"
+    ORPHAN_PRESERVED = "orphan_preserved"
+    INTERRUPTED_RECORDED = "interrupted_recorded"
+
+
+class RecoveryItem(StrictModel):
+    path: Path
+    disposition: RecoveryDisposition
+    sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("path")
+    @classmethod
+    def _require_clean_relative_path(cls, value: Path) -> Path:
+        return _require_clean_relative_file_path(value, "recovery item")
+
+
+class RecoveryReport(StrictModel):
+    manifest_revision_before: int = Field(ge=1)
+    manifest_revision_after: int = Field(ge=1)
+    items: tuple[RecoveryItem, ...]
+
+    @model_validator(mode="after")
+    def _require_non_decreasing_manifest_revision(self) -> "RecoveryReport":
+        if self.manifest_revision_after < self.manifest_revision_before:
+            raise ValueError("recovery manifest revision cannot decrease")
+        return self
+
+
 class ProductionManifest(StrictModel):
     schema_version: Literal["2.0"] = "2.0"
     project_id: str
-    active_project_revision: int = Field(ge=1)
-    active_project_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    active_registry_revision: str = Field(pattern=r"^[0-9a-f]{64}$")
+    manifest_revision: int = Field(ge=1)
+    active_project: ProjectSnapshotPointer
+    active_registry: RegistrySnapshotPointer
+    attempts: tuple[StateCommitAttempt, ...] = ()
+
+    @model_validator(mode="after")
+    def _validate_unique_attempt_ids(self) -> "ProductionManifest":
+        attempt_ids = [item.attempt_id for item in self.attempts]
+        if len(attempt_ids) != len(set(attempt_ids)):
+            raise ValueError("Production Manifest attempt IDs must be unique")
+        return self
 
 
 class ProductionProject(VersionedArtifact):
