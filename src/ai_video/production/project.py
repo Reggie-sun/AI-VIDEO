@@ -92,7 +92,10 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     supplied_path = Path(path)
     if supplied_path.name != "project.yaml":
         raise _invalid("Production project entry point must be named project.yaml.")
-    root = supplied_path.parent.resolve()
+    try:
+        root = supplied_path.parent.resolve()
+    except (OSError, RuntimeError) as exc:
+        raise _invalid("Production project root could not be resolved safely.", str(exc)) from exc
     project_path = _resolve_input(root, Path("project.yaml"))
     manifest = _load_json_model(
         _resolve_input(

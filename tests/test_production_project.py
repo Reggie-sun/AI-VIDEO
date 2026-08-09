@@ -240,6 +240,16 @@ def test_loader_requires_canonical_project_entrypoint_name(tmp_path):
         load_production_project(project_path.with_name("other.yaml"))
 
 
+def test_project_root_symlink_loop_returns_typed_project_error(tmp_path):
+    first = tmp_path / "first"
+    second = tmp_path / "second"
+    first.symlink_to(second.name)
+    second.symlink_to(first.name)
+    with pytest.raises(AiVideoError) as exc:
+        load_production_project(first / "project.yaml")
+    assert exc.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
 def test_legacy_project_loader_remains_unchanged():
     project = load_project("configs/wan22_fast.project.yaml")
     assert project.project_name == "wan22-fast-demo"

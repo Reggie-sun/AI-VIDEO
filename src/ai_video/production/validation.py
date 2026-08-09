@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import math
 from collections import Counter
 from collections.abc import Iterable
-import math
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
@@ -60,18 +60,31 @@ def _has_type(bound: dict[str, AssetRecord], asset_type: AssetType) -> bool:
     return any(asset.asset_type is asset_type for asset in bound.values())
 
 
+_MOTION_NUMERIC_PARAMETERS = {
+    "pan": ("x", "y"),
+    "zoom": ("scale",),
+    "parallax": ("depth", "offset"),
+    "reveal": ("duration_seconds", "progress"),
+    "layered": ("duration_seconds", "offset"),
+    "animate": ("duration_seconds",),
+    "particles": ("count",),
+    "transition": ("duration_seconds",),
+}
+
+
 def _validate_deterministic_motion(shot: Shot) -> None:
     for directive in shot.motion_directives:
-        has_finite_number = any(
-            isinstance(value, (int, float))
-            and not isinstance(value, bool)
-            and math.isfinite(value)
-            for value in directive.parameters.values()
+        parameter_names = _MOTION_NUMERIC_PARAMETERS[directive.kind]
+        has_required_number = any(
+            isinstance(directive.parameters.get(name), (int, float))
+            and not isinstance(directive.parameters.get(name), bool)
+            and math.isfinite(directive.parameters[name])
+            for name in parameter_names
         )
-        if not has_finite_number:
+        if not has_required_number:
             raise _invalid(
-                f"Shot {shot.shot_id} motion_directives require at least one "
-                "deterministic numeric parameter per directive."
+                f"Shot {shot.shot_id} {directive.kind} motion directive requires a "
+                f"deterministic numeric parameter named {' or '.join(parameter_names)}."
             )
 
 
@@ -150,11 +163,22 @@ def validate_shot_strategy(
                     f"Shot {shot.shot_id} hybrid source {layer.asset_id} is not bound "
                     f"to role {layer.asset_role}."
                 )
-        missing_layers = sorted(set(bound) - {layer.asset_id for layer in shot.hybrid_layers})
-        if missing_layers:
+        required_layer_bindings = {
+            (role.role, asset_id)
+            for role in roles.values()
+            for asset_id in role.asset_ids
+        }
+        actual_layer_bindings = {
+            (layer.asset_role, layer.asset_id) for layer in shot.hybrid_layers
+        }
+        missing_layer_bindings = sorted(required_layer_bindings - actual_layer_bindings)
+        if missing_layer_bindings:
+            formatted = ", ".join(
+                f"{role}={asset_id}" for role, asset_id in missing_layer_bindings
+            )
             raise _invalid(
-                f"Shot {shot.shot_id} hybrid is missing layers for bound source assets: "
-                f"{', '.join(missing_layers)}"
+                f"Shot {shot.shot_id} hybrid is missing layers for bound sources: "
+                f"{formatted}"
             )
 
 

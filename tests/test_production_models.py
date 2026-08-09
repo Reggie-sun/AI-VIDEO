@@ -72,6 +72,12 @@ def test_parameter_mappings_are_immutable(directive):
         directive.parameters["changed"] = 1
 
 
+def test_default_parameter_mapping_is_immutable():
+    directive = CompositionDirective(kind="fit")
+    with pytest.raises(TypeError, match="immutable"):
+        directive.parameters["mode"] = "cover"
+
+
 def test_fixed_duration_requires_seconds():
     with pytest.raises(ValidationError, match="requires seconds"):
         DurationPolicy(mode="fixed")

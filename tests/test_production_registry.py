@@ -217,3 +217,13 @@ def test_registry_rejects_absolute_registry_path(tmp_path):
     with pytest.raises(AiVideoError) as exc:
         load_asset_registry(path, tmp_path, tmp_path / "assets/files")
     assert exc.value.code is ErrorCode.ASSET_REGISTRY_INVALID
+
+
+def test_project_root_symlink_loop_returns_typed_registry_error(tmp_path):
+    first = tmp_path / "first"
+    second = tmp_path / "second"
+    first.symlink_to(second.name)
+    second.symlink_to(first.name)
+    with pytest.raises(AiVideoError) as exc:
+        load_asset_registry("assets/registry.json", first, first / "assets/files")
+    assert exc.value.code is ErrorCode.ASSET_REGISTRY_INVALID

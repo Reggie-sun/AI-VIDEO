@@ -78,7 +78,9 @@ class DurationPolicy(StrictModel):
 
 class CompositionDirective(StrictModel):
     kind: Literal["fit", "position", "crop", "text", "transition_hint"]
-    parameters: dict[str, float | int | str | bool] = Field(default_factory=dict)
+    parameters: dict[str, float | int | str | bool] = Field(
+        default_factory=_ImmutableDict
+    )
 
     _freeze_parameters = field_validator("parameters")(_immutable_mapping)
 

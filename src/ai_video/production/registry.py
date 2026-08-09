@@ -56,8 +56,8 @@ def load_asset_registry(
     project_root: str | Path,
     asset_root: str | Path,
 ) -> tuple[AssetRegistrySnapshot, dict[str, Path]]:
-    root = Path(project_root).resolve()
     try:
+        root = Path(project_root).resolve()
         registry_path = resolve_contained_path(
             root,
             Path(path),
@@ -65,7 +65,7 @@ def load_asset_registry(
         )
         resolved_asset_root = Path(asset_root).resolve()
         resolved_asset_root.relative_to(root)
-    except ValueError as exc:
+    except (OSError, RuntimeError, ValueError) as exc:
         raise _invalid("Asset registry path configuration is unsafe.", str(exc)) from exc
     try:
         registry = AssetRegistrySnapshot.model_validate_json(

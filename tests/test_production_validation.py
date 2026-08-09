@@ -267,6 +267,21 @@ def test_motion_strategy_rejects_directive_without_numeric_parameters():
         validate_shot_strategy(shot, {"hero.png": make_asset("hero.png", AssetType.IMAGE)})
 
 
+def test_motion_strategy_rejects_unrelated_numeric_parameter():
+    shot = make_shot(
+        VisualStrategy.IMAGE_MOTION,
+        required_asset_roles=(make_role("hero", "hero.png", AssetType.IMAGE),),
+        motion_directives=(
+            MotionDirective(
+                kind="pan",
+                parameters={"instruction": "more dynamic", "duration_seconds": 1},
+            ),
+        ),
+    )
+    with pytest.raises(AiVideoError, match="pan.*x or y"):
+        validate_shot_strategy(shot, {"hero.png": make_asset("hero.png", AssetType.IMAGE)})
+
+
 def test_hybrid_requires_every_layer_source_to_be_bound():
     shot = make_shot(
         VisualStrategy.HYBRID,
@@ -327,6 +342,39 @@ def test_hybrid_requires_every_bound_source_to_have_a_layer():
     }
     with pytest.raises(AiVideoError, match="missing layers.*overlay.png"):
         validate_shot_strategy(shot, assets)
+
+
+def test_hybrid_requires_each_role_when_roles_share_an_asset():
+    shot = make_shot(
+        VisualStrategy.HYBRID,
+        required_asset_roles=(
+            make_role("hero", "hero.png", AssetType.IMAGE),
+            make_role("overlay", "hero.png", AssetType.IMAGE),
+            make_role("background", "background.png", AssetType.IMAGE),
+        ),
+        hybrid_layers=(
+            HybridLayer(
+                role="background",
+                asset_role="background",
+                asset_id="background.png",
+                z_index=0,
+            ),
+            HybridLayer(
+                role="hero",
+                asset_role="hero",
+                asset_id="hero.png",
+                z_index=1,
+            ),
+        ),
+    )
+    with pytest.raises(AiVideoError, match="overlay.*hero.png"):
+        validate_shot_strategy(
+            shot,
+            {
+                "hero.png": make_asset("hero.png", AssetType.IMAGE),
+                "background.png": make_asset("background.png", AssetType.IMAGE),
+            },
+        )
 
 
 @pytest.mark.parametrize(
