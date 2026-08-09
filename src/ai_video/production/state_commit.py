@@ -1,0 +1,527 @@
+from __future__ import annotations
+
+import errno
+import hashlib
+import json
+import os
+import re
+from contextlib import contextmanager
+from dataclasses import dataclass
+from enum import Enum
+from pathlib import Path
+from typing import BinaryIO, Iterator, Protocol
+
+import yaml
+from pydantic import BaseModel
+
+from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.models import (
+    ProductionManifest,
+    ProjectSnapshotPointer,
+    RegistrySnapshotPointer,
+)
+
+try:
+    import fcntl
+except ImportError:  # pragma: no cover - exercised through platform injection
+    fcntl = None  # type: ignore[assignment]
+
+
+@dataclass(frozen=True)
+class PreparedArtifact:
+    relative_path: Path
+    payload: bytes
+    file_sha256: str
+
+
+@dataclass(frozen=True)
+class StateCommitRequest:
+    attempt_id: str
+    operation: str
+    expected_manifest_revision: int
+    artifacts: tuple[PreparedArtifact, ...]
+    next_project: ProjectSnapshotPointer
+    next_registry: RegistrySnapshotPointer
+
+
+class CommitPhase(str, Enum):
+    AFTER_ATTEMPT_STARTED = "after_attempt_started"
+    AFTER_ARTIFACT_TEMP_WRITE = "after_artifact_temp_write"
+    AFTER_ARTIFACT_FILE_FSYNC = "after_artifact_file_fsync"
+    AFTER_ARTIFACT_PROMOTION = "after_artifact_promotion"
+    AFTER_ARTIFACT_DIRECTORY_FSYNC = "after_artifact_directory_fsync"
+    AFTER_ARTIFACT_VERIFICATION = "after_artifact_verification"
+    AFTER_MANIFEST_TEMP_WRITE = "after_manifest_temp_write"
+    AFTER_MANIFEST_FILE_FSYNC = "after_manifest_file_fsync"
+    AFTER_MANIFEST_REPLACE = "after_manifest_replace"
+    AFTER_MANIFEST_DIRECTORY_FSYNC = "after_manifest_directory_fsync"
+
+
+class CrashInjector(Protocol):
+    def checkpoint(self, phase: CommitPhase) -> None: ...
+
+
+class NoopCrashInjector:
+    def checkpoint(self, phase: CommitPhase) -> None:
+        return None
+
+
+_RESERVED_TARGETS = {
+    Path("state/manifest.json"),
+    Path("state/commit.lock"),
+}
+_TEMP_ATTEMPT_LABEL_LIMIT = 24
+_TEMP_FINAL_LABEL_LIMIT = 180
+_TEMP_DIGEST_LENGTH = 12
+
+
+def _owned_temp_name(attempt_id: str, final_path: Path) -> str:
+    attempt_label = re.sub(r"[^A-Za-z0-9_-]", "_", attempt_id) or "attempt"
+    attempt_label = attempt_label[:_TEMP_ATTEMPT_LABEL_LIMIT]
+    attempt_digest = hashlib.sha256(attempt_id.encode("utf-8")).hexdigest()[
+        :_TEMP_DIGEST_LENGTH
+    ]
+    original_final_name = final_path.name
+    final_label = re.sub(r"[^A-Za-z0-9._-]", "_", original_final_name) or "artifact"
+    if len(final_label) > _TEMP_FINAL_LABEL_LIMIT:
+        final_digest = hashlib.sha256(original_final_name.encode("utf-8")).hexdigest()[
+            :_TEMP_DIGEST_LENGTH
+        ]
+        final_label = (
+            final_label[: _TEMP_FINAL_LABEL_LIMIT - _TEMP_DIGEST_LENGTH - 1]
+            + "-"
+            + final_digest
+        )
+    return f".p2a-{attempt_label}-{attempt_digest}-{final_label}.tmp"
+
+
+def _canonical_json_bytes(model: BaseModel) -> bytes:
+    payload = json.dumps(
+        model.model_dump(mode="json"),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return (payload + "\n").encode("utf-8")
+
+
+def _canonical_yaml_bytes(model: BaseModel) -> bytes:
+    payload = yaml.safe_dump(
+        model.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    )
+    return payload.encode("utf-8")
+
+
+def _state_invalid(message: str, detail: str | None = None) -> AiVideoError:
+    return AiVideoError(
+        code=ErrorCode.PRODUCTION_STATE_INVALID,
+        user_message=message,
+        technical_detail=detail,
+        retryable=False,
+    )
+
+
+def _state_commit_failed(message: str, detail: str | None = None) -> AiVideoError:
+    return AiVideoError(
+        code=ErrorCode.PRODUCTION_STATE_COMMIT_FAILED,
+        user_message=message,
+        technical_detail=detail,
+        retryable=False,
+    )
+
+
+def _state_unsupported(message: str, detail: str | None = None) -> AiVideoError:
+    return AiVideoError(
+        code=ErrorCode.PRODUCTION_STATE_UNSUPPORTED,
+        user_message=message,
+        technical_detail=detail,
+        retryable=False,
+    )
+
+
+class _FileOps(Protocol):
+    def mkdir(self, path: Path) -> bool: ...
+
+    def open_exclusive(self, path: Path) -> BinaryIO: ...
+
+    def fsync_file(self, handle: BinaryIO, path: Path) -> None: ...
+
+    def replace(self, source: Path, destination: Path) -> None: ...
+
+    def fsync_directory(self, path: Path) -> None: ...
+
+    def stat(self, path: Path) -> os.stat_result: ...
+
+    def link(self, source: Path, destination: Path) -> None: ...
+
+    def sha256_file(self, path: Path) -> str: ...
+
+    def unlink(self, path: Path, *, missing_ok: bool = False) -> None: ...
+
+
+class _NativeFileOps:
+    def mkdir(self, path: Path) -> bool:
+        try:
+            path.mkdir()
+        except FileExistsError:
+            return False
+        return True
+
+    def open_exclusive(self, path: Path) -> BinaryIO:
+        return path.open("xb")
+
+    def fsync_file(self, handle: BinaryIO, path: Path) -> None:
+        os.fsync(handle.fileno())
+
+    def replace(self, source: Path, destination: Path) -> None:
+        os.replace(source, destination)
+
+    def fsync_directory(self, path: Path) -> None:
+        flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+        descriptor = os.open(path, flags)
+        try:
+            os.fsync(descriptor)
+        finally:
+            os.close(descriptor)
+
+    def stat(self, path: Path) -> os.stat_result:
+        return path.stat()
+
+    def link(self, source: Path, destination: Path) -> None:
+        os.link(source, destination)
+
+    def sha256_file(self, path: Path) -> str:
+        digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+
+    def unlink(self, path: Path, *, missing_ok: bool = False) -> None:
+        path.unlink(missing_ok=missing_ok)
+
+
+class ProductionStateCommitter:
+    """POSIX-only low-level persistence primitives for the P2A state owner.
+
+    This class deliberately does not select snapshots or mutate a complete commit
+    transaction. Those orchestration responsibilities begin in Task 3.
+    """
+
+    def __init__(
+        self,
+        project_root: str | Path,
+        *,
+        file_ops: _FileOps | None = None,
+        crash_injector: CrashInjector | None = None,
+    ) -> None:
+        try:
+            self._project_root = Path(project_root).resolve(strict=True)
+        except (OSError, RuntimeError) as exc:
+            raise _state_invalid("Production state root is unsafe.", str(exc)) from exc
+        if not self._project_root.is_dir():
+            raise _state_invalid("Production state root must be a directory.")
+        self._ops = file_ops or _NativeFileOps()
+        self._crash_injector = crash_injector or NoopCrashInjector()
+
+    def prepare_artifact(
+        self,
+        attempt_id: str,
+        relative_path: str | Path,
+        payload: bytes,
+    ) -> PreparedArtifact:
+        if not attempt_id:
+            raise _state_invalid("State commit attempt ID must not be empty.")
+        if not isinstance(payload, bytes):
+            raise _state_invalid("Production artifact payload must be bytes.")
+        clean_path = self._validate_artifact_path(Path(relative_path))
+        return PreparedArtifact(
+            relative_path=clean_path,
+            payload=payload,
+            file_sha256=hashlib.sha256(payload).hexdigest(),
+        )
+
+    @contextmanager
+    def _exclusive_lock(self) -> Iterator[BinaryIO]:
+        if fcntl is None:
+            raise _state_unsupported("Production state commits require POSIX fcntl locking.")
+        state_dir = self._state_directory()
+        lock_path = state_dir / "commit.lock"
+        self._reject_symlink(lock_path)
+        try:
+            handle = lock_path.open("a+b")
+        except OSError as exc:
+            raise _state_commit_failed("Could not open production state commit lock.", str(exc)) from exc
+        acquired = False
+        primary: BaseException | None = None
+        try:
+            try:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError as exc:
+                primary = AiVideoError(
+                    code=ErrorCode.PRODUCTION_STATE_BUSY,
+                    user_message="Production state commit is already in progress.",
+                    technical_detail=str(exc),
+                    retryable=False,
+                )
+                raise primary from exc
+            except OSError as exc:
+                if exc.errno in {errno.EACCES, errno.EAGAIN}:
+                    primary = AiVideoError(
+                        code=ErrorCode.PRODUCTION_STATE_BUSY,
+                        user_message="Production state commit is already in progress.",
+                        technical_detail=str(exc),
+                        retryable=False,
+                    )
+                    raise primary from exc
+                primary = _state_unsupported("POSIX state locking is unavailable.", str(exc))
+                raise primary from exc
+            acquired = True
+            try:
+                yield handle
+            except BaseException as exc:
+                primary = exc
+                raise
+        finally:
+            cleanup_errors: list[BaseException] = []
+            if acquired:
+                try:
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+                except BaseException as exc:
+                    cleanup_errors.append(exc)
+            try:
+                handle.close()
+            except BaseException as exc:
+                cleanup_errors.append(exc)
+            if primary is not None:
+                for cleanup_error in cleanup_errors:
+                    primary.add_note(f"Production state lock cleanup failed: {cleanup_error}")
+            elif cleanup_errors:
+                raise _state_commit_failed(
+                    "Production state lock cleanup failed.",
+                    "; ".join(str(item) for item in cleanup_errors),
+                ) from cleanup_errors[0]
+
+    def _write_manifest_atomic(self, manifest: ProductionManifest) -> Path:
+        final_path = self._state_directory() / "manifest.json"
+        self._write_mutable_atomic(
+            final_path,
+            _canonical_json_bytes(manifest),
+            temp_name=".p2a-manifest.tmp",
+            phases=(
+                CommitPhase.AFTER_MANIFEST_TEMP_WRITE,
+                CommitPhase.AFTER_MANIFEST_FILE_FSYNC,
+                CommitPhase.AFTER_MANIFEST_REPLACE,
+                CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
+            ),
+        )
+        return final_path
+
+    def _write_mutable_atomic(
+        self,
+        final_path: Path,
+        payload: bytes,
+        *,
+        temp_name: str,
+        phases: tuple[CommitPhase, CommitPhase, CommitPhase, CommitPhase] | None = None,
+    ) -> None:
+        final_path = self._validate_final_path(final_path)
+        if Path(temp_name).name != temp_name or not temp_name:
+            raise _state_invalid("Production state temporary filename is unsafe.")
+        temp_path = final_path.parent / temp_name
+        if temp_path.parent != final_path.parent:
+            raise _state_invalid("Production state temporary path must share final parent.")
+        primary: BaseException | None = None
+        try:
+            with self._ops.open_exclusive(temp_path) as handle:
+                handle.write(payload)
+                if phases:
+                    self._crash_injector.checkpoint(phases[0])
+                handle.flush()
+                self._ops.fsync_file(handle, temp_path)
+                if phases:
+                    self._crash_injector.checkpoint(phases[1])
+            self._validate_final_path(final_path)
+            self._ops.replace(temp_path, final_path)
+            if phases:
+                self._crash_injector.checkpoint(phases[2])
+            self._ops.fsync_directory(final_path.parent)
+            if phases:
+                self._crash_injector.checkpoint(phases[3])
+        except AiVideoError as exc:
+            primary = exc
+            raise
+        except BaseException as exc:
+            primary = _state_commit_failed(
+                "Could not write production state atomically.", str(exc)
+            )
+            raise primary from exc
+        finally:
+            if primary is not None:
+                try:
+                    self._validate_cleanup_temp_path(temp_path)
+                    self._ops.unlink(temp_path, missing_ok=True)
+                except BaseException as cleanup_error:
+                    primary.add_note(
+                        f"Production state temporary cleanup failed: {cleanup_error}"
+                    )
+
+    def _write_immutable_artifact(
+        self, artifact: PreparedArtifact, *, attempt_id: str
+    ) -> Path:
+        expected_sha256 = hashlib.sha256(artifact.payload).hexdigest()
+        if artifact.file_sha256 != expected_sha256:
+            raise _state_invalid("Prepared artifact hash does not match its payload.")
+        final_path = self._validate_artifact_path(artifact.relative_path)
+        final_path = self._project_root / final_path
+        self._ensure_parent_directory(final_path.parent)
+        temp_path = final_path.parent / _owned_temp_name(attempt_id, final_path)
+        primary: BaseException | None = None
+        try:
+            with self._ops.open_exclusive(temp_path) as handle:
+                handle.write(artifact.payload)
+                self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_TEMP_WRITE)
+                handle.flush()
+                self._ops.fsync_file(handle, temp_path)
+                self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_FILE_FSYNC)
+            self._validate_final_path(final_path)
+            self._require_same_filesystem(temp_path, final_path.parent)
+            self._validate_final_path(final_path)
+            try:
+                self._ops.link(temp_path, final_path)
+            except FileExistsError:
+                if self._ops.sha256_file(final_path) != expected_sha256:
+                    raise _state_commit_failed(
+                        "Immutable snapshot path already has different bytes."
+                    )
+            self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_PROMOTION)
+            self._ops.fsync_directory(final_path.parent)
+            self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_DIRECTORY_FSYNC)
+            if self._ops.sha256_file(final_path) != expected_sha256:
+                raise _state_commit_failed("Immutable snapshot verification failed.")
+            self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_VERIFICATION)
+            return final_path
+        except AiVideoError as exc:
+            primary = exc
+            raise
+        except BaseException as exc:
+            primary = _state_commit_failed(
+                "Could not promote immutable production artifact.", str(exc)
+            )
+            raise primary from exc
+        finally:
+            try:
+                self._validate_cleanup_temp_path(temp_path)
+                self._ops.unlink(temp_path, missing_ok=True)
+            except BaseException as cleanup_error:
+                if primary is not None:
+                    primary.add_note(
+                        f"Immutable temporary cleanup failed: {cleanup_error}"
+                    )
+                else:
+                    raise _state_commit_failed(
+                        "Could not clean immutable production temporary file.",
+                        str(cleanup_error),
+                    ) from cleanup_error
+
+    def _state_directory(self) -> Path:
+        state_dir = self._project_root / "state"
+        self._ensure_directory_chain(state_dir)
+        return state_dir
+
+    def _validate_artifact_path(self, relative_path: Path) -> Path:
+        if (
+            relative_path == Path(".")
+            or relative_path.is_absolute()
+            or ".." in relative_path.parts
+            or relative_path in _RESERVED_TARGETS
+            or relative_path.parts[0] in {"runs", ".workflow"}
+        ):
+            raise _state_invalid("Production artifact target path is unsafe.")
+        self._validate_relative_components(relative_path)
+        return relative_path
+
+    def _validate_final_path(self, final_path: Path) -> Path:
+        try:
+            relative_path = final_path.relative_to(self._project_root)
+        except ValueError as exc:
+            raise _state_invalid("Production state final path escapes project root.") from exc
+        self._validate_relative_components(relative_path)
+        self._ensure_parent_directory(final_path.parent)
+        return final_path
+
+    def _validate_cleanup_temp_path(self, temp_path: Path) -> None:
+        try:
+            relative_path = temp_path.relative_to(self._project_root)
+        except ValueError as exc:
+            raise _state_invalid("Production state temporary path escapes project root.") from exc
+        self._validate_relative_components(relative_path)
+
+    def _validate_relative_components(self, relative_path: Path) -> None:
+        current = self._project_root
+        for component in relative_path.parts:
+            current = current / component
+            self._reject_symlink(current)
+        try:
+            (self._project_root / relative_path).resolve(strict=False).relative_to(
+                self._project_root
+            )
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise _state_invalid("Production artifact target escapes project root.", str(exc)) from exc
+
+    def _ensure_parent_directory(self, parent: Path) -> None:
+        self._ensure_directory_chain(parent)
+
+    def _ensure_directory_chain(self, directory: Path) -> None:
+        self._validate_final_parent(directory)
+        relative_directory = directory.relative_to(self._project_root)
+        current = self._project_root
+        for component in relative_directory.parts:
+            current = current / component
+            self._reject_symlink(current)
+            if not current.exists():
+                try:
+                    self._ops.mkdir(current)
+                except OSError as exc:
+                    raise _state_commit_failed(
+                        "Could not create production artifact directory.", str(exc)
+                    ) from exc
+                self._reject_symlink(current)
+            if not current.is_dir():
+                raise _state_invalid("Production state path must be a directory.", str(current))
+            try:
+                self._ops.fsync_directory(current.parent)
+            except OSError as exc:
+                raise _state_commit_failed(
+                    "Could not persist production artifact directory.", str(exc)
+                ) from exc
+
+    def _validate_final_parent(self, parent: Path) -> None:
+        try:
+            relative_parent = parent.relative_to(self._project_root)
+        except ValueError as exc:
+            raise _state_invalid("Production artifact parent escapes project root.") from exc
+        if relative_parent == Path("."):
+            return
+        self._validate_relative_components(relative_parent)
+
+    @staticmethod
+    def _reject_symlink(path: Path) -> None:
+        try:
+            if path.is_symlink():
+                raise _state_invalid("Production state path cannot contain a symlink.", str(path))
+        except OSError as exc:
+            raise _state_invalid("Production state path could not be inspected.", str(exc)) from exc
+
+    def _require_same_filesystem(self, temp_path: Path, final_parent: Path) -> None:
+        try:
+            if self._ops.stat(temp_path).st_dev != self._ops.stat(final_parent).st_dev:
+                raise _state_unsupported(
+                    "Production immutable promotion requires one POSIX filesystem."
+                )
+        except AiVideoError:
+            raise
+        except OSError as exc:
+            raise _state_commit_failed("Could not verify production artifact filesystem.", str(exc)) from exc
