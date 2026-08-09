@@ -725,7 +725,7 @@ class StateCommitAttempt(StrictModel):
                 self.candidate_project.path,
                 self.candidate_project.revision,
                 self.candidate_project.content_hash,
-                allow_entrypoint=False,
+                allow_entrypoint=self.operation == "render_state",
             )
         if self.status is StateCommitStatus.RUNNING and any(
             value is not None

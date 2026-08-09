@@ -449,6 +449,42 @@ def test_render_attempt_accepts_complete_activate_candidate_bundle():
     assert attempt.candidate_render_state == make_render_state_pointer()
 
 
+def test_render_attempt_accepts_active_project_entrypoint_as_unchanged_candidate():
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="render_state",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_project=make_project_pointer(),
+        candidate_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        candidate_render_state=make_render_state_pointer(),
+        renderer_selection=make_renderer_selection(),
+        render_phase="activate",
+        started_at="2026-08-09T00:00:00+00:00",
+    )
+
+    assert attempt.candidate_project.path == Path("project.yaml")
+
+
+def test_non_render_attempt_still_rejects_project_entrypoint_candidate():
+    with pytest.raises(ValidationError, match="canonical project snapshot path"):
+        StateCommitAttempt(
+            attempt_id="attempt-1",
+            operation="commit_project_registry",
+            status=StateCommitStatus.RUNNING,
+            base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
+            candidate_project=make_project_pointer(),
+            candidate_registry=make_registry_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            started_at="2026-08-09T00:00:00+00:00",
+        )
+
+
 @pytest.mark.parametrize("mismatch", ["project", "registry", "render_state"])
 def test_manifest_running_render_attempt_requires_current_base_identity(mismatch):
     active_render = make_render_state_pointer()
