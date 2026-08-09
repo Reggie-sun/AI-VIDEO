@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from enum import Enum
 from pathlib import Path
 from typing import Literal
@@ -209,7 +210,7 @@ class MotionDirective(StrictModel):
     @field_validator("parameters", mode="before")
     @classmethod
     def _reject_boolean_parameters(cls, value: object) -> object:
-        if isinstance(value, dict) and any(
+        if isinstance(value, Mapping) and any(
             isinstance(item, bool) for item in value.values()
         ):
             raise ValueError("motion parameters cannot use boolean numeric values")

@@ -1,3 +1,5 @@
+from collections import UserDict
+
 import pytest
 from pydantic import ValidationError
 
@@ -81,6 +83,11 @@ def test_default_parameter_mapping_is_immutable():
 def test_motion_parameters_reject_boolean_as_numeric_value():
     with pytest.raises(ValidationError, match="boolean"):
         MotionDirective(kind="pan", parameters={"x": True})
+
+
+def test_motion_parameters_reject_boolean_from_generic_mapping():
+    with pytest.raises(ValidationError, match="boolean"):
+        MotionDirective(kind="pan", parameters=UserDict({"x": True}))
 
 
 def test_fixed_duration_requires_seconds():
