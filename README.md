@@ -6,7 +6,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-The public runtime remains the local-first `0.1.x` CLI described in this README. P2 is available as an importable, read-only Python API: it loads strict `ProductionProject` and creative artifacts, validates concrete Shot-to-Asset bindings and verifies a content-addressed local Asset Registry snapshot. P2A separately implements the v2 project/registry commit and explicit recovery protocol on its feature branch; it adds no public command and does not make HyperFrames, Remotion, ElevenLabs, Captions, Audio, dependency graphs or Providers available.
+The public runtime remains the local-first `0.1.x` CLI described in this README. P2 is available as an importable, read-only Python API: it loads strict `ProductionProject` and creative artifacts, validates concrete Shot-to-Asset bindings and verifies a content-addressed local Asset Registry snapshot. P2A separately implements the accepted v2 project/registry commit and explicit recovery protocol on local `main`; it adds no public command and does not make HyperFrames, Remotion, ElevenLabs, Captions, Audio, dependency graphs or Providers available.
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
@@ -18,7 +18,7 @@ The public runtime remains the local-first `0.1.x` CLI described in this README.
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-The public commands remain `validate`, `run`, and `resume`; generation remains ComfyUI-only and default-local; Manifest v1 and the current artifact layout remain active. P2 is accepted and present on local `main`. P2A is independently accepted on `feat/p2a-production-state-commit`, but is not merged, pushed, released, or published.
+The public commands remain `validate`, `run`, and `resume`; generation remains ComfyUI-only and default-local; Manifest v1 and the current artifact layout remain active. P2 and independently accepted P2A are present on local `main`, but are not pushed, released, or published.
 
 ## Setup
 
