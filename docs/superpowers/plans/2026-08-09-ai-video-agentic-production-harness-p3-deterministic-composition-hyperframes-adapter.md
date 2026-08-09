@@ -110,7 +110,7 @@ Primary sources：
 | renderer source | `hyperframes.py::materialize_hyperframes_source()` output + `RendererSourceReceipt` | source 必须完全由 timeline/assets materialize，不能 scan filesystem 决策 |
 | render execution | `HyperFramesAdapter` | 一个 attempt 只能调用一个 renderer，禁止 fallback 或 double render |
 | durable project/registry transaction | `state_commit.py::ProductionStateCommitter.commit(StateCommitRequest)` | 现有 P2A project/registry pair、request 与 replay 语义保持不变；P3 render operation 不借用或改写该 pair |
-| render attempt lifecycle | `ProductionStateCommitter.begin_render_attempt()` / `record_render_failure()` / `activate_render_state()` | 它们是 P3 真实 lifecycle API，不是 `commit()` alias wrapper；不得增加第二 writer 或 Manifest |
+| render attempt lifecycle | `ProductionStateCommitter.begin_render_attempt()` / `record_render_failure()` / `activate_render_state()` | `record_render_failure()` 只拥有 R+1 begun、candidate-prepared 之前的 ordinary failure；`activate_render_state()` 从 R+2 candidate-prepared durable authority 开始独占 final activation/failure ownership。它们不是 `commit()` alias wrapper；不得增加第二 writer 或 Manifest |
 | timeline/source/render activation | immutable `RenderStateSnapshot` selected by `ProductionManifest.active_render_state` | Manifest 只额外切换这一个 render pointer；snapshot 固定 exact timeline/source receipt/render receipt/output identities |
 | render scratch allocation | pure validated `ProductionStateCommitter.render_attempt_paths()` | 只返回 `state/render/attempts/<safe-attempt-id>/` 内的 attempt-owned source/output staging path，不创建目录、不切指针 |
 | measured render evidence | `RenderReceipt` built from output hash + `probe_clip()` | console text 不是 final status |
@@ -1625,7 +1625,7 @@ class ActivateRenderStateRequest:
     next_render_state: RenderStateSnapshotPointer
 ```
 
-The request identity is the complete tuple of attempt ID, expected/base identities, selection, sorted `(relative_path, file_sha256)` artifact set and next pointer. Begin/success exact replay returns the already-persisted corresponding Manifest state; reuse of an attempt ID with any differing identity is `PRODUCTION_STATE_INVALID`. Failure replay is idempotent only when phase/code/message and all base identities match. Requests reject stale `expected_manifest_revision` except an exact recognized replay.
+The request identity is the complete tuple of attempt ID, expected/base identities, selection, sorted `(relative_path, file_sha256)` artifact set and next pointer. `BeginRenderAttemptRequest.expected_manifest_revision=R`; its fresh write yields R+1. An outer `RecordRenderFailureRequest` is valid only against the authoritative begun revision R+1 and yields terminal R+2; if the attempt is already candidate-prepared at R+2, the request is stale and must be rejected because activation owns that stage. `ActivateRenderStateRequest.expected_manifest_revision=R+1` transfers ownership to `activate_render_state()`; its candidate-prepared and final/failed transitions use authoritative R+2 internally without constructing a stale external failure request. Begin/success exact replay returns the already-persisted corresponding Manifest state; reuse of an attempt ID with any differing identity is `PRODUCTION_STATE_INVALID`. Pre-candidate failure replay is idempotent only when phase/code/message and all base identities match. Requests reject stale `expected_manifest_revision` except an exact recognized replay for the same owner/stage.
 
 For every render request, `current_project/current_registry` must equal the live Manifest pair. Persisted render attempts set `base_project == candidate_project == current_project` and `base_registry == candidate_registry == current_registry`; validators reject any project/registry change or any mixed project-registry/render operation.
 
@@ -1640,7 +1640,7 @@ def record_render_failure(self, request: RecordRenderFailureRequest) -> Producti
 
 Both run under `state/commit.lock` and use the existing atomic Manifest writer. `begin_render_attempt()` validates selection contains exactly HyperFrames `0.7.103`, writes a running `StateCommitAttempt(render_phase="selection")`, and on the first render write migrates Manifest 2.0 -> 2.1 in that same replace. This durable write must finish before version/lint/check/render. It never switches `active_render_state`.
 
-`record_render_failure()` requires the matching begun or candidate-prepared attempt, persists `failed`, exact typed phase/code/redacted bounded message and finished time, and leaves `active_render_state` plus project/registry pointers unchanged. If candidate-prepared, retain its exact candidate pointer/hash for orphan reporting. Source materialization and installed-version/renderer-availability failures use phase `source`; lint, check, render and output verification use their named phases. All flow through this method; if the failure record itself cannot be durably written, surface the state error without claiming the render failure was recorded.
+`record_render_failure()` requires the exact R+1 matching begun attempt with no candidate. It persists terminal R+2 `failed`, exact typed phase/code/redacted bounded message and finished time, and leaves `active_render_state` plus project/registry pointers unchanged. It rejects a candidate-prepared R+2 attempt; post-candidate failure persistence belongs only to `activate_render_state()`. Source materialization and installed-version/renderer-availability failures use phase `source`; lint, check, render and output verification use their named phases before activation begins. If failure persistence itself fails, surface the state error without claiming the render failure was recorded.
 
 - [ ] **Step 5: Integrate one lifecycle-owned HyperFrames orchestration path**
 
@@ -1658,17 +1658,17 @@ try:
         raise _renderer_unavailable("Installed HyperFrames version does not match the pin.")
     # materialize source, then advance phase before lint/check/render/verify
     result = adapter.render(...)
-    return committer.activate_render_state(activation_request(result))
 except Exception as exc:
-    if isinstance(exc, AiVideoError) and exc.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN:
-        raise
     committer.record_render_failure(
         failure_request_from(exc, phase=phase, manifest=manifest)
     )
     raise
+activation = activation_request(result, expected_manifest_revision=manifest.manifest_revision)
+# Deliberately outside the outer failure handler: activate_render_state owns R+2 onward.
+return committer.activate_render_state(activation)
 ```
 
-Every ordinary exception after successful begin, including a plain `RENDERER_UNAVAILABLE` from `runner.version()`/wrong pin, `OSError` during source materialization, and typed lint/check/render/verify errors, is normalized into `RecordRenderFailureRequest` before re-raise. Version/availability/materialization use `phase="source"`. Only process-level interruption/crash and `PRODUCTION_STATE_OUTCOME_UNKNOWN` bypass ordinary failure recording; the latter may leave an exact begun/candidate-prepared attempt running only as a deliberate recovery state and requires explicit recovery before further work. If failure persistence itself fails, raise the state persistence error with the original exception attached as a note. No ordinary post-begin path may leave the attempt `running`.
+Every ordinary exception after successful begin but before the call to `activate_render_state()`, including a plain `RENDERER_UNAVAILABLE` from `runner.version()`/wrong pin, `OSError` during source materialization, and typed lint/check/render/verify errors, is normalized into `RecordRenderFailureRequest` before re-raise. Version/availability/materialization use `phase="source"`. The outer function never catches `activate_render_state()` merely to call `record_render_failure()`; once activation durably writes R+2, R+1 is stale and only activation may write terminal failure. Process-level interruption/crash and `PRODUCTION_STATE_OUTCOME_UNKNOWN` remain explicit-recovery paths. If pre-candidate failure persistence itself fails, raise the state persistence error with the original exception attached as a note. No ordinary post-begin path may leave the attempt `running`.
 
 Add focused order/persistence tests:
 
@@ -1680,9 +1680,11 @@ def test_orchestrator_records_post_begin_availability_as_source_failure(tmp_path
 
 @pytest.mark.parametrize("phase", ["source", "lint", "check", "render", "verify"])
 def test_orchestrator_records_every_ordinary_phase_and_never_leaves_running(tmp_path, phase): ...
+
+def test_orchestrator_does_not_retry_record_failure_after_activation_takes_ownership(tmp_path): ...
 ```
 
-Assert event order begins with `begin_render_attempt`, success ends in `activate_render_state`, failure ends in `record_render_failure`, failed Manifest status is terminal, active/project/registry pointers are unchanged, and no alternate renderer runs.
+Assert event order begins with `begin_render_attempt`. Pre-candidate failure ends in one `record_render_failure`; success ends in `activate_render_state`. If activation reports an internally persisted terminal failure or `PRODUCTION_STATE_OUTCOME_UNKNOWN`, `record_render_failure` is not called, so no stale R+1 retry occurs. Failed Manifest status is terminal, active/project/registry pointers are unchanged, and no alternate renderer runs.
 
 - [ ] **Step 6: Prepare and validate the exact success artifact set**
 
@@ -1709,7 +1711,11 @@ It requires the exact running attempt and unchanged project/registry pair. Activ
 1. **candidate-prepared transition:** atomically replace a running Manifest attempt containing `candidate_render_state=next_render_state`, the exact sorted five-artifact `candidate_artifacts_hash` and `render_phase="activate"`; keep `active_render_state=base_render_state` and keep project/registry byte-for-byte unchanged. The candidate-prepared Manifest itself must complete temp write -> file fsync -> replace -> parent-directory fsync -> reopen/identity verification before final activation begins.
 2. **final succeeded transition:** atomically replace one Manifest with `active_render_state=next_render_state` and the same project/registry pointers, then mark the exact attempt `succeeded`. Only this second replace is the active render commit point.
 
-If the base Manifest revision is `R`, a fresh success has exactly `R+1` after `begin_render_attempt()`, `R+2` after candidate preparation and `R+3` after the final pointer switch. An ordinary typed failure before candidate preparation writes one terminal Manifest at the next revision; a failure after candidate preparation writes one terminal failed Manifest while leaving the base pointer active and retaining candidate identity for orphan reporting.
+After candidate preparation is durably authoritative at R+2, `activate_render_state()` owns every remaining transition under the same `state/commit.lock`. It must internally catch every ordinary/non-`PRODUCTION_STATE_OUTCOME_UNKNOWN` exception before the final active-pointer `os.replace`, including final succeeded-Manifest serialization, temp open/write, file fsync and the last pre-replace checkpoint. It removes only its exact owned final-Manifest temp if present, then atomically writes a terminal R+3 `FAILED` Manifest derived from authoritative R+2: retain `candidate_render_state` and the five-artifact aggregate hash, keep `active_render_state=base_render_state`, keep project/registry unchanged, set `render_phase="activate"`, typed error code/redacted bounded message and finished time. Reopen and verify that terminal Manifest before re-raising the original typed activation error. The outer orchestrator must not call `record_render_failure()` for this error.
+
+Once the final active-pointer `os.replace` has been attempted/completed, any replace, parent-directory-fsync, reopen or post-replace ambiguity becomes `PRODUCTION_STATE_OUTCOME_UNKNOWN`; `activate_render_state()` must not overwrite it with `FAILED`. Explicit recovery compares the exact old/new triples and resolves it.
+
+If the base Manifest revision is `R`, a fresh success has exactly `R+1` after `begin_render_attempt()`, `R+2` after candidate preparation and `R+3` after the final pointer switch. A pre-candidate ordinary failure written by `record_render_failure()` is terminal R+2. A post-candidate pre-replace ordinary failure written internally by `activate_render_state()` is terminal R+3 with base active pointer and retained candidate/hash. If that internal terminal-failure write itself cannot become authoritative, raise `PRODUCTION_STATE_OUTCOME_UNKNOWN` and require recovery; never attempt an outer stale R+1 failure write.
 
 Exact replay behavior:
 
@@ -1717,6 +1723,7 @@ Exact replay behavior:
 - exact activation replay from begun state revalidates/promotes the same immutable set, writes candidate-prepared once, then final once;
 - exact activation replay from candidate-prepared state revalidates the five artifacts and performs only the final switch;
 - exact activation replay after succeeded state returns the active Manifest without artifact rewrite or revision increment;
+- exact replay after an internally terminal failed R+3 returns that failed Manifest and does not retry activation; an outer R+1 `RecordRenderFailureRequest` is stale and rejected;
 - a stale expected revision is accepted only for one of those exact identities; any attempt-ID/request/artifact/pointer mismatch is rejected.
 
 Before the final `os.replace`, old/`None` render state stays active; after it, candidate is active. Candidate-prepared replace/directory-fsync ambiguity is resolved by reopening the Manifest and matching the exact attempt/candidate/hash while the active pointer remains base. Final replace ambiguity becomes `outcome_unknown` and is resolved only by explicit recovery.
@@ -1729,9 +1736,14 @@ AFTER_RENDER_CANDIDATE_MANIFEST_FILE_FSYNC
 AFTER_RENDER_CANDIDATE_MANIFEST_REPLACE
 AFTER_RENDER_CANDIDATE_MANIFEST_DIRECTORY_FSYNC
 AFTER_RENDER_CANDIDATE_MANIFEST_VERIFICATION
+AFTER_RENDER_FINAL_MANIFEST_TEMP_WRITE
+AFTER_RENDER_FINAL_MANIFEST_FILE_FSYNC
+BEFORE_RENDER_FINAL_MANIFEST_REPLACE
+AFTER_RENDER_FINAL_MANIFEST_REPLACE
+AFTER_RENDER_FINAL_MANIFEST_DIRECTORY_FSYNC
 ```
 
-Keep the existing final Manifest checkpoints for the succeeded pointer switch. Do not reuse one checkpoint name for both transitions.
+Keep existing P2A generic Manifest checkpoints unchanged for project/registry compatibility, but use these render-specific checkpoints for candidate/final transitions. Do not reuse one checkpoint name across candidate preparation, final activation or terminal-failure persistence.
 
 - [ ] **Step 8: Extend explicit recovery and orphan reporting**
 
@@ -1756,7 +1768,32 @@ candidate-prepared Manifest temp / file fsync / replace / directory fsync / reop
 final Manifest temp / file fsync / replace / directory fsync
 ```
 
-For every pre-final-replace crash assert old/`None` pointer remains active and project/registry unchanged. Candidate-prepared temp/fsync crashes recover as begun unless the exact replacement is readable; replace/directory-fsync ambiguity must reopen and accept only the exact candidate/hash identity. Recovery performs bounded temp cleanup and preserves/reports every complete orphan. For final replace/directory-fsync ambiguity assert explicit recovery resolves only by exact old/new render pointer plus unchanged pair. Assert revisions `R+1/R+2/R+3`, replay from each stage, replay after recovered success and conflicting attempt-ID rejection.
+Separately add one-shot ordinary exception injection tests inside `activate_render_state()`:
+
+```python
+@pytest.mark.parametrize(
+    "phase",
+    [
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_FILE_FSYNC,
+        CommitPhase.BEFORE_RENDER_FINAL_MANIFEST_REPLACE,
+    ],
+)
+def test_activation_ordinary_pre_replace_failure_is_internally_terminal_failed(phase): ...
+
+@pytest.mark.parametrize(
+    "phase",
+    [
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_REPLACE,
+        CommitPhase.AFTER_RENDER_FINAL_MANIFEST_DIRECTORY_FSYNC,
+    ],
+)
+def test_activation_post_replace_ambiguity_remains_outcome_unknown(phase): ...
+```
+
+For each ordinary pre-replace case assert authoritative revision R+3, terminal `FAILED`, `render_phase="activate"`, typed/redacted error, base `active_render_state`, unchanged project/registry, retained candidate pointer/five-artifact hash, no running attempt, and rejection of a stale outer R+1 failure request. Assert the failure writer cleans only its owned final temp and is not reinjected by the one-shot injector. For after-replace/directory-fsync ambiguity assert `PRODUCTION_STATE_OUTCOME_UNKNOWN`, no FAILED overwrite, then explicit recovery resolves only by exact old/new triple.
+
+For every process-level pre-final-replace crash assert old/`None` pointer remains active and project/registry unchanged. Candidate-prepared temp/fsync crashes recover as begun unless the exact replacement is readable; replace/directory-fsync ambiguity must reopen and accept only the exact candidate/hash identity. Recovery performs bounded temp cleanup and preserves/reports every complete orphan. For final replace/directory-fsync ambiguity assert explicit recovery resolves only by exact old/new render pointer plus unchanged pair. Assert revisions `R+1/R+2/R+3`, replay from each stage, replay after recovered success and conflicting attempt-ID rejection.
 
 - [ ] **Step 10: Export the stable lifecycle surface explicitly**
 
@@ -1795,7 +1832,7 @@ git add src/ai_video/production/paths.py src/ai_video/production/project.py \
 git commit -m "feat: commit production render state"
 ```
 
-Expected: selection is durable before any executable call; every ordinary post-begin availability/source/lint/check/render/verify failure is typed and durable; candidate-prepared state is durable before the final pointer switch; `R+1/R+2/R+3` revisions and replay are deterministic; crash recovery preserves complete orphans; 2.0 historical/custom operation loading and existing P2A `commit(StateCommitRequest)` behavior remain unchanged and green.
+Expected: selection is durable before any executable call; outer orchestration durably records every ordinary pre-candidate availability/source/lint/check/render/verify failure; `activate_render_state()` alone converts ordinary R+2-to-pre-replace failure into terminal R+3 while retaining candidate/hash and rejects stale outer failure; post-replace ambiguity remains outcome unknown; success `R+1/R+2/R+3` revisions and replay are deterministic; crash recovery preserves complete orphans; 2.0 historical/custom operation loading and existing P2A `commit(StateCommitRequest)` behavior remain unchanged and green.
 
 ### Task 6: Run Live Spike and Regression Proof
 
@@ -1969,7 +2006,7 @@ Only after every Task 6 spike/focused/Legacy/full/scope check passes, document:
 - `ResolvedTimeline` as only order/timing truth;
 - exact pinned tool/browser versions and one-renderer-per-attempt rule;
 - source hash/lint/check and render receipt fields;
-- Manifest 2.0/2.1 compatibility, candidate-prepared transition, one active render-state pointer, canonical immutable layout and P2A-owned begin/failure/activation/recovery behavior;
+- Manifest 2.0/2.1 compatibility, candidate-prepared transition, pre-candidate outer failure versus post-candidate activation-owned failure, one active render-state pointer, canonical immutable layout and P2A-owned recovery behavior;
 - fake/no-network CI versus the explicitly authorized, egress-contained live spike;
 - P4/P5/P6/P7/P8 remain unimplemented.
 
@@ -2014,6 +2051,8 @@ Verify integer frame/sample boundaries, exact asset IDs/hashes, trim, transform,
 opacity, z-order, transitions, delivery profile, renderer identity and fingerprint.
 Verify selection persists before execution and all ordinary post-begin failures persist.
 Verify candidate-prepared state is durable before the final single-pointer switch.
+Verify outer orchestration never writes stale failure after activation takes R+2 ownership.
+Verify activation internally terminals ordinary pre-replace failure but preserves outcome unknown after replace ambiguity.
 Verify exact replay/recovery and P2A 2.0 custom-operation compatibility.
 Verify HyperFrames source comes only from timeline/assets and is hash/lint/check audited.
 Verify one attempt selects exactly one renderer and no Remotion/fallback/double render exists.
@@ -2043,9 +2082,10 @@ Failure handling:
 - lint failure: stop before `check`/render and persist the exact typed failed phase through `record_render_failure()`;
 - check failure: stop before render and persist the exact typed failed phase through `record_render_failure()`;
 - render/timeout/output verification failure: persist the typed phase and leave `active_render_state` old/`None`;
-- candidate-prepared Manifest persists the exact candidate/hash while leaving active/project/registry pointers unchanged; an ordinary failure after preparation becomes terminal failed and retains candidate identity for orphan reporting;
+- before candidate preparation, outer `render_with_hyperframes()` owns exactly one `record_render_failure()` write from R+1; after R+2 candidate preparation it never catches activation merely to retry that stale request;
+- candidate-prepared Manifest persists the exact candidate/hash while leaving active/project/registry pointers unchanged; `activate_render_state()` internally converts every ordinary final-temp/file-fsync/pre-replace failure into terminal R+3 failed with candidate identity retained;
 - crash before final Manifest replace: explicit P2A recovery distinguishes begun from candidate-prepared, owns bounded temp cleanup, preserves/reports complete immutable orphans and keeps the old render pointer;
-- crash after final Manifest replace: recovery validates the candidate render pointer plus unchanged project/registry pair and reads exact manifest-selected snapshot/artifact/output hashes, not console or Agent memory;
+- final replace/directory-fsync/post-replace ambiguity is `PRODUCTION_STATE_OUTCOME_UNKNOWN`, never overwritten by failed; recovery validates the candidate render pointer plus unchanged project/registry pair and reads exact manifest-selected snapshot/artifact/output hashes, not console or Agent memory;
 - renderer mismatch/unavailable: fail explicitly; no HyperFrames-to-Remotion or Remotion-to-HyperFrames retry.
 
 Rollback is commit-based and must preserve user project artifacts:
@@ -2077,8 +2117,8 @@ P3 is accepted only when:
 9. each attempt has one renderer selection and one HyperFrames execution path;
 10. Remotion is neither installed nor implemented and no double-render/fallback exists;
 11. one immutable `RenderStateSnapshot` contains exact selection and timeline/source/render/output pointers, cross-validates all identities, and one Manifest pointer activates it;
-12. selection is durable before any executable call; every ordinary post-begin availability/source/lint/check/render/verify exception is durably recorded without leaving a running attempt or switching the active pointer;
-13. candidate-prepared state/hash is durably reopened before final activation; `R+1/R+2/R+3` success revisions, exact stage replay and outcome-unknown recovery use exact old/new render pointer plus unchanged project/registry pair;
+12. selection is durable before any executable call; outer orchestration records every ordinary pre-candidate availability/source/lint/check/render/verify exception exactly once, then never submits a stale R+1 failure after activation takes ownership;
+13. candidate-prepared state/hash is durably reopened at R+2; `activate_render_state()` internally writes terminal R+3 failed for ordinary final-temp/file-fsync/pre-replace failure while preserving base active pointer/candidate/hash, but final replace/directory-fsync ambiguity remains outcome unknown; successful `R+1/R+2/R+3` revisions, exact replay and recovery use unchanged project/registry pair;
 14. complete orphan artifacts/output are preserved and reported; default tests are fake/no-network and the authorized real spike uses the pinned browser with OS-level external-egress denial/observation plus process-group/descendant cleanup proof;
 15. no Audio/Caption, P5 graph, Provider/cloud/paid API, new CLI or Legacy schema/layout enters the diff;
 16. focused P3/P2A, Legacy regression and full default suites pass;
