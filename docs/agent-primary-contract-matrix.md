@@ -14,9 +14,9 @@
 | Error Model | 跨模块统一使用 `AiVideoError` 与 `ErrorCode`。 |
 | Dependency Policy | 除非有明确理由且获得请求，否则不新增运行时依赖。 |
 | Output Policy | Legacy run 保持当前 flat `runs/<run_id>/` layout；v2 layout 只能由显式 v2 config 和已批准的 Manifest v2 slice 创建。 |
-| Version Gate | P0 product reframe 已完成文档迁移；P1、independently accepted P2 与 independently accepted P2A 已在 local `main`，但尚未进入 `origin/main` 或 release；P3+ 每个 slice 仍必须有独立 plan、实施授权、验收、rollback 和对应 contract/docs/tests 更新。 |
+| Version Gate | P0 文档、P1、P2 与 P2A 已完成各自本地阶段；P3 已在当前 feature branch 实现并通过独立审查/live proof，但尚未 integration/push/release。P4+ 每个 slice 仍必须有独立 plan、授权、验收、rollback 和 contract/docs/tests 更新。 |
 | Agent Boundary | Codex 是 Production Agent；仓库提供 durable state、validation、provenance、dependency、render 和 QA harness，不实现第二套通用 Agent runtime。 |
-| Renderer Ownership | AI-VIDEO 的 resolved timeline/composition contract 是时间线真相源；默认 renderer target 是 HyperFrames。Remotion 只能作为显式选择的 optional adapter，不能与 HyperFrames 串联重复 render。 |
+| Renderer Ownership | P3 `ResolvedTimeline` 是唯一 frame/sample ordering 与 timing 真相源；当前唯一实现的 renderer 是 pinned local HyperFrames。Remotion 仍未实现并必须 fail closed；不得 fallback、串联或 double render。 |
 
 ## Contract Matrix
 
@@ -34,6 +34,7 @@
 | Output Layout | `README.md`、`src/ai_video/pipeline.py`、manifest 相关测试 | runs 必须写入 `runs/<run_id>/`，包含 manifest、shot 产物、normalized clips 和 final output。路径必须足够稳定，便于 resume 和排查工具使用。 | 增加额外元数据或调试产物，但不能破坏现有预期文件。 | `pytest tests/test_pipeline.py tests/test_manifest.py -v` |
 | v2 Production Project Core | `src/ai_video/production/**`、`tests/test_production_*.py` | P2 只读加载 Manifest-selected project/registry exact revision；creative/asset refs 必须 content-addressed 且留在固定 project roots。不拥有 writer、lifecycle 或 desired fingerprint。 | 收紧 schema、strategy、reference、hash 或 containment validation，保持 no-network 和 Legacy isolation。 | `pytest tests/test_production_models.py tests/test_production_validation.py tests/test_production_registry.py tests/test_production_project.py tests/test_config.py tests/test_cli.py -q` |
 | P2A Production State Commit | `src/ai_video/production/models.py`、`src/ai_video/production/project.py`、`src/ai_video/production/state_commit.py`、`tests/test_production_state_commit.py`、`tests/test_production_state_recovery.py` | `ProductionManifest` 是唯一 lifecycle owner；nested project/registry pointer 必须固定 exact path、semantic identity 和 file hash。`ProductionStateCommitter` 是唯一 writer/recovery owner；POSIX same-filesystem `state/commit.lock` 下 snapshot temp 必须 file-fsync、promote-without-overwrite、parent-directory-fsync 并 reopen verify。running/failed lifecycle 也会 durable Manifest write；仅 final active-pointer replace 是 single logical commit point。恢复必须显式，只接受 exact old/new pair；bounded owned temp 可清理，complete orphan 只能 preserve/report。P2 reader 仍只读，root `project.yaml` 是 stable validated entrypoint 而非 active bytes truth。 | 补强 P2A integrity/recovery validation，不能增加第二 writer/control plane、auto-recovery、CLI 或改变 Legacy Manifest/layout。 | `pytest tests/test_production_models.py tests/test_production_validation.py tests/test_production_registry.py tests/test_production_project.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
+| P3 Deterministic Composition + HyperFrames | `src/ai_video/production/composition.py`、`src/ai_video/production/hyperframes.py`、P2/P2A render-state extensions、`tests/test_production_composition.py`、`tests/test_production_hyperframes.py` | 只接受 local raster `STATIC_IMAGE` + zero-duration `CUT`；`ResolvedTimeline` 是唯一时序真相。只运行 exact `hyperframes@0.7.103`，每个 tool process fresh user/net/PID namespace、controlled env、非 version root `--json`、无 fallback。Selection 必须先 durable；source/lint/check/render/held-FD verify 后，P2A writer 才能通过 R+2 candidate 与 R+3 final replace 切换一个 `active_render_state`。Manifest 2.0/2.1 reader兼容；pair change blanket invalidation；recovery按 exact triple，完整 orphan只 preserve/report。 | 收紧 composition/source/receipt/path/replay/recovery validation；不能导出低层 runner/adapter、增加 Remotion、Audio/Caption、selective rebuild、CLI 或远程行为。 | `python -m pytest tests/test_production_models.py tests/test_production_project.py tests/test_production_composition.py tests/test_production_hyperframes.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
 
 ## Cross-Cutting Contracts
 
@@ -88,7 +89,7 @@ Agent 不得悄悄侵蚀本地优先承诺。
 - 本地 P1 只稳定 Legacy runtime，未引入新 product domain；其 plan 作为 historical stabilization record 保留。
 - P2 已建立 ProductionProject、Assets、Shot visual strategy 的 read-only durable contract；它不拥有 writer、renderer 或云服务。
 - P2A 已 independently accepted 并合并到 local `main`：唯一 writer/recovery owner 写 immutable v2 snapshots，并通过 nested active pointers and one Manifest replace activate exact pair。它不改变 P2 reader 的只读语义或 Legacy Manifest v1/layout，且尚未 push 或 release。
-- P3 planning artifact 只定义一个 canonical renderer adapter 的未来边界；P2A prerequisite 已满足，但 Renderer Gate、dependency-install authorization、API reconciliation 和新的显式用户授权完成前不得实施，也不得建立两条并行 canonical render path。
+- P3 已在当前 feature branch 实现并完成独立 review、committed-fixture render 与 fail-closed trace proof；尚未 integration/push/release。当前只允许一个 pinned local HyperFrames path，Remotion 与其它 renderer 必须拒绝。
 - P4 才允许在独立 plan 中引入 Audio/Caption production domain；任何付费调用仍需显式 opt-in。
 - P5 dependency graph 完成前，不得宣称支持跨 asset 的 selective rebuild。
 - P6 strategy-aware QA/repair 完成前，不得让当前 `static_visuals` heuristic 自动否决合法的 `static_image` / `image_motion` Shot。
