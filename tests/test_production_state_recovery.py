@@ -156,6 +156,66 @@ def test_restart_after_process_crash_has_one_valid_active_state(
     assert _read_manifest(committed_project) == after
 
 
+@pytest.mark.parametrize(
+    "unresolved_status", [StateCommitStatus.RUNNING, StateCommitStatus.OUTCOME_UNKNOWN]
+)
+def test_new_attempt_is_blocked_until_real_crash_is_explicitly_recovered(
+    committed_project: Path, unresolved_status: StateCommitStatus
+) -> None:
+    before = _read_manifest(committed_project)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            CommitPhase.AFTER_ATTEMPT_STARTED.value,
+            "1",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+
+    assert result.returncode == 91
+    manifest_path = committed_project / "state/manifest.json"
+    unresolved = _read_manifest(committed_project)
+    assert unresolved.attempts[-1].status is StateCommitStatus.RUNNING
+    if unresolved_status is StateCommitStatus.OUTCOME_UNKNOWN:
+        unknown_attempt = StateCommitAttempt.model_validate(
+            {
+                **unresolved.attempts[-1].model_dump(mode="python"),
+                "status": StateCommitStatus.OUTCOME_UNKNOWN,
+                "error_code": ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN.value,
+                "error_message": "injected unknown outcome",
+            }
+        )
+        unresolved = ProductionManifest.model_validate(
+            {
+                **unresolved.model_dump(mode="python"),
+                "attempts": unresolved.attempts[:-1] + (unknown_attempt,),
+            }
+        )
+        _write_manifest(committed_project, unresolved)
+    unresolved_bytes = manifest_path.read_bytes()
+    assert unresolved.attempts[-1].status is unresolved_status
+    second_request = project_factory.make_revision_two_request(
+        committed_project, attempt_id="different-attempt"
+    )
+
+    with pytest.raises(AiVideoError) as exc:
+        ProductionStateCommitter(committed_project).commit(second_request)
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert "recovery" in exc.value.user_message.lower()
+    assert manifest_path.read_bytes() == unresolved_bytes
+
+    report = _recover(committed_project)
+    recovered = _read_manifest(committed_project)
+    assert report.manifest_revision_after == unresolved.manifest_revision + 1
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+    assert recovered.active_project == before.active_project
+    assert recovered.active_registry == before.active_registry
+
+
 def test_recovery_refuses_active_project_pointer_identity_tamper(
     committed_project: Path,
 ) -> None:
@@ -482,9 +542,11 @@ def test_recovery_marks_selected_incomplete_attempt_succeeded(
     request = project_factory.make_revision_two_request(committed_project)
     ProductionStateCommitter(committed_project).commit(request)
     succeeded_manifest = _read_manifest(committed_project)
+    succeeded_attempt = succeeded_manifest.attempts[-1]
     running = StateCommitAttempt.model_validate(
         {
-            **succeeded_manifest.attempts[-1].model_dump(mode="python"),
+            **succeeded_attempt.model_dump(mode="python"),
+            "attempt_id": f"selected-{status.value}",
             "status": status,
             "finished_at": None,
             "error_code": (
@@ -498,10 +560,24 @@ def test_recovery_marks_selected_incomplete_attempt_succeeded(
     unknown_manifest = ProductionManifest.model_validate(
         {
             **succeeded_manifest.model_dump(mode="python"),
-            "attempts": (running,),
+            "attempts": (succeeded_attempt, running),
         }
     )
     _write_manifest(committed_project, unknown_manifest)
+    owned_temps = []
+    for pointer in (request.next_project, request.next_registry):
+        final_path = committed_project / pointer.path
+        owned = final_path.parent / _owned_temp_name(running.attempt_id, final_path)
+        owned.write_bytes(b"selected incomplete residue")
+        owned_temps.append(owned)
+    succeeded_temp = (
+        committed_project / request.next_project.path
+    ).parent / _owned_temp_name(
+        succeeded_attempt.attempt_id, committed_project / request.next_project.path
+    )
+    succeeded_temp.write_bytes(b"pre-existing succeeded temp")
+    unrelated = committed_project / "assets/.user-file.tmp"
+    unrelated.write_bytes(b"untracked user temp")
 
     report = _recover(committed_project)
     repaired = _read_manifest(committed_project)
@@ -512,6 +588,15 @@ def test_recovery_marks_selected_incomplete_attempt_succeeded(
     assert repaired.active_registry == request.next_registry
     _assert_active_bundle(committed_project, repaired)
     assert report.manifest_revision_after == repaired.manifest_revision
+    for owned in owned_temps:
+        assert not owned.exists()
+        assert any(
+            item.path == owned.relative_to(committed_project)
+            and item.disposition is RecoveryDisposition.PARTIAL_REMOVED
+            for item in report.items
+        )
+    assert succeeded_temp.read_bytes() == b"pre-existing succeeded temp"
+    assert unrelated.read_bytes() == b"untracked user temp"
 
 
 def test_recovery_refuses_missing_active_registry_snapshot(committed_project: Path) -> None:

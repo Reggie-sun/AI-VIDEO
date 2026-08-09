@@ -439,6 +439,7 @@ class ProductionStateCommitter:
             manifest = self._read_manifest()
             revision_before = manifest.manifest_revision
             items = list(self._active_recovery_items(manifest))
+            attempts_before_recovery = list(manifest.attempts)
             attempts, changed, interrupted_items = self._recover_attempts(manifest)
 
             items.extend(self._remove_fixed_manifest_temp())
@@ -452,7 +453,7 @@ class ProductionStateCommitter:
                 )
                 self._write_manifest_atomic(manifest)
             items.extend(interrupted_items)
-            items.extend(self._remove_owned_attempt_temps(attempts))
+            items.extend(self._remove_owned_attempt_temps(attempts_before_recovery))
             items.extend(self._preserved_orphan_items(manifest, attempts))
             return RecoveryReport(
                 manifest_revision_before=revision_before,
@@ -877,6 +878,22 @@ class ProductionStateCommitter:
                 if existing.status is StateCommitStatus.SUCCEEDED:
                     return manifest
                 raise _state_invalid("Production state commit attempt ID was already used.")
+            unresolved = next(
+                (
+                    item
+                    for item in manifest.attempts
+                    if item.status
+                    in {
+                        StateCommitStatus.RUNNING,
+                        StateCommitStatus.OUTCOME_UNKNOWN,
+                    }
+                ),
+                None,
+            )
+            if unresolved is not None:
+                raise _state_invalid(
+                    "Production state has an unresolved attempt; explicit recovery is required."
+                )
             if manifest.manifest_revision != request.expected_manifest_revision:
                 raise _state_invalid("Production Manifest revision is stale.")
 
