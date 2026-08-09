@@ -5,7 +5,15 @@ from enum import Enum
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 
 
 class _ImmutableDict(dict):
@@ -374,6 +382,306 @@ class RegistrySnapshotPointer(StrictModel):
         return self
 
 
+class RendererKind(str, Enum):
+    HYPERFRAMES = "hyperframes"
+    REMOTION = "remotion"
+
+
+class TransitionKind(str, Enum):
+    CUT = "cut"
+    CROSSFADE = "crossfade"
+
+
+class FixedTransform(StrictModel):
+    translate_x_px: int = 0
+    translate_y_px: int = 0
+    scale_x_milli: int = Field(default=1000, gt=0)
+    scale_y_milli: int = Field(default=1000, gt=0)
+    rotation_millidegrees: int = 0
+
+
+class CompositionLayerSpec(StrictModel):
+    layer_id: str = Field(min_length=1)
+    shot_id: str = Field(min_length=1)
+    asset_role: str = Field(min_length=1)
+    asset_id: str = Field(min_length=1)
+    trim_start_frame: int = Field(default=0, ge=0)
+    trim_duration_frames: int | None = Field(default=None, gt=0)
+    transform: FixedTransform = Field(default_factory=FixedTransform)
+    opacity_milli: int = Field(default=1000, ge=0, le=1000)
+    z_index: int = 0
+
+
+class TransitionSpec(StrictModel):
+    from_shot_id: str
+    to_shot_id: str
+    kind: TransitionKind
+    duration_frames: int = Field(ge=0)
+
+
+class CompositionSpec(VersionedArtifact):
+    composition_id: str
+    shot_ids: tuple[str, ...] = Field(min_length=1)
+    layers: tuple[CompositionLayerSpec, ...] = Field(min_length=1)
+    transitions: tuple[TransitionSpec, ...] = ()
+    delivery_profile: DeliveryProfile
+    sample_rate: int = Field(default=48_000, gt=0)
+    requested_renderer: RendererKind = RendererKind.HYPERFRAMES
+
+
+class RendererIdentity(StrictModel):
+    kind: RendererKind
+    version: str = Field(min_length=1)
+
+
+class ResolvedVisualSpan(StrictModel):
+    layer_id: str
+    shot_id: str
+    asset_role: str
+    asset_id: str
+    asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    asset_mime_type: Literal["image/png", "image/jpeg", "image/webp"]
+    materialized_path: Path
+    start_frame: int = Field(ge=0)
+    duration_frames: int = Field(gt=0)
+    start_sample: int = Field(ge=0)
+    duration_samples: int = Field(ge=0)
+    trim_start_frame: int = Field(ge=0)
+    trim_duration_frames: int | None = Field(default=None, gt=0)
+    transform: FixedTransform
+    opacity_milli: int = Field(ge=0, le=1000)
+    z_index: int
+    incoming_transition: TransitionSpec | None = None
+
+
+class ResolvedTimeline(VersionedArtifact):
+    timeline_id: str
+    composition_spec_id: str
+    composition_spec_revision: int = Field(ge=1)
+    composition_spec_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    delivery_profile: DeliveryProfile
+    sample_rate: int = Field(gt=0)
+    renderer: RendererIdentity
+    visual_spans: tuple[ResolvedVisualSpan, ...] = Field(min_length=1)
+    total_frames: int = Field(gt=0)
+    total_samples: int = Field(ge=0)
+    composition_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class RendererSelectionReceipt(StrictModel):
+    receipt_id: str
+    attempt_id: str
+    requested_kind: RendererKind
+    selected_kinds: tuple[RendererKind, ...] = Field(min_length=1, max_length=1)
+    renderer_version: str
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    current_project: ProjectSnapshotPointer
+    current_registry: RegistrySnapshotPointer
+
+
+class RendererCheckReceipt(StrictModel):
+    command: Literal["lint", "check"]
+    tool_version: str
+    exit_code: int
+    stdout_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    stderr_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    error_count: int = Field(ge=0)
+    warning_count: int = Field(ge=0)
+
+
+class RendererAssetBinding(StrictModel):
+    asset_id: str
+    asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    asset_mime_type: Literal["image/png", "image/jpeg", "image/webp"]
+    materialized_path: Path
+
+
+class RenderSourceFilePointer(StrictModel):
+    path: Path
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    size_bytes: int = Field(gt=0)
+
+    @field_validator("path")
+    @classmethod
+    def _require_clean_relative_path(cls, value: Path) -> Path:
+        return _require_clean_relative_file_path(value, "render source")
+
+
+class RenderSourceBundlePointer(StrictModel):
+    root_path: Path
+    bundle_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    index: RenderSourceFilePointer
+    assets: tuple[RenderSourceFilePointer, ...] = Field(min_length=1)
+
+    @field_validator("root_path")
+    @classmethod
+    def _require_clean_relative_root(cls, value: Path) -> Path:
+        return _require_clean_relative_file_path(value, "render source bundle")
+
+    @model_validator(mode="after")
+    def _validate_bundle_paths(self) -> "RenderSourceBundlePointer":
+        expected_root = Path(f"state/render/sources/{self.bundle_sha256}")
+        if self.root_path != expected_root:
+            raise ValueError("render source bundle root path must be canonical")
+        if self.index.path != expected_root / "index.html":
+            raise ValueError("render source bundle index path must be canonical")
+        for asset in self.assets:
+            if asset.path.parent != expected_root / "assets":
+                raise ValueError("render source bundle asset path must be canonical")
+            if asset.path.stem != asset.file_sha256 or asset.path.suffix not in {
+                ".png",
+                ".jpg",
+                ".webp",
+            }:
+                raise ValueError("render source bundle asset path must match its hash")
+        return self
+
+
+class RendererSourceReceipt(VersionedArtifact):
+    attempt_id: str
+    renderer: RendererIdentity
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_bundle: RenderSourceBundlePointer
+    source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    asset_bindings: tuple[RendererAssetBinding, ...] = Field(min_length=1)
+    checks: tuple[RendererCheckReceipt, RendererCheckReceipt]
+
+    @model_validator(mode="after")
+    def _validate_source_identity(self) -> "RendererSourceReceipt":
+        if self.source_sha256 != self.source_bundle.index.file_sha256:
+            raise ValueError("renderer source identity does not match its index")
+        if tuple(item.command for item in self.checks) != ("lint", "check"):
+            raise ValueError("renderer source checks must contain lint then check")
+        if any(item.tool_version != self.renderer.version for item in self.checks):
+            raise ValueError("renderer source check identity does not match renderer")
+        return self
+
+
+class MeasuredRenderMetadata(StrictModel):
+    width: int = Field(gt=0)
+    height: int = Field(gt=0)
+    fps_num: int = Field(gt=0)
+    fps_den: int = Field(gt=0)
+    duration_frames: int = Field(gt=0)
+    codec_name: str
+
+
+def _require_canonical_render_output_path(value: Path, file_sha256: str) -> Path:
+    value = _require_clean_relative_file_path(value, "render output")
+    if value != Path(f"state/render/outputs/{file_sha256}.mp4"):
+        raise ValueError("render output path must be the canonical durable output path")
+    return value
+
+
+class RenderReceipt(VersionedArtifact):
+    attempt_id: str
+    renderer: RendererIdentity
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_bundle_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    asset_hashes: tuple[str, ...] = Field(min_length=1)
+    output_path: Path
+    output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    output_size_bytes: int = Field(gt=0)
+    measured: MeasuredRenderMetadata
+    decoded_frame_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("asset_hashes")
+    @classmethod
+    def _validate_asset_hashes(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        if any(
+            len(item) != 64 or any(char not in "0123456789abcdef" for char in item)
+            for item in value
+        ):
+            raise ValueError("render asset hashes must be lowercase SHA-256 values")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_output_path(self) -> "RenderReceipt":
+        _require_canonical_render_output_path(self.output_path, self.output_sha256)
+        return self
+
+
+class RenderArtifactPointer(StrictModel):
+    path: Path
+    revision: int = Field(ge=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "RenderArtifactPointer":
+        value = _require_clean_relative_file_path(self.path, "render artifact")
+        canonical_paths = {
+            Path(f"state/render/timelines/{self.content_hash}.json"),
+            Path(f"state/render/source-receipts/{self.content_hash}.json"),
+            Path(f"state/render/render-receipts/{self.content_hash}.json"),
+        }
+        if value not in canonical_paths:
+            raise ValueError("render artifact path must be canonical")
+        return self
+
+
+class RenderOutputPointer(StrictModel):
+    path: Path
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    size_bytes: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "RenderOutputPointer":
+        _require_canonical_render_output_path(self.path, self.file_sha256)
+        return self
+
+
+class RenderStateSnapshot(VersionedArtifact):
+    attempt_id: str = Field(min_length=1)
+    project: ProjectSnapshotPointer
+    registry: RegistrySnapshotPointer
+    renderer_selection: RendererSelectionReceipt
+    renderer: RendererIdentity
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_bundle_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    asset_hashes: tuple[str, ...] = Field(min_length=1)
+    timeline: RenderArtifactPointer
+    source_bundle: RenderSourceBundlePointer
+    source_receipt: RenderArtifactPointer
+    render_receipt: RenderArtifactPointer
+    output: RenderOutputPointer
+
+    @model_validator(mode="after")
+    def _validate_embedded_identity(self) -> "RenderStateSnapshot":
+        selection = self.renderer_selection
+        identities_match = (
+            self.attempt_id == selection.attempt_id
+            and self.project == selection.current_project
+            and self.registry == selection.current_registry
+            and self.timeline_fingerprint == selection.timeline_fingerprint
+            and self.renderer.kind == selection.selected_kinds[0]
+            and self.renderer.version == selection.renderer_version
+            and self.source_sha256 == self.source_bundle.index.file_sha256
+            and self.source_bundle_sha256 == self.source_bundle.bundle_sha256
+            and self.asset_hashes
+            == tuple(item.file_sha256 for item in self.source_bundle.assets)
+        )
+        if not identities_match:
+            raise ValueError("render state embedded identity does not match")
+        return self
+
+
+class RenderStateSnapshotPointer(StrictModel):
+    path: Path
+    revision: int = Field(ge=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "RenderStateSnapshotPointer":
+        value = _require_clean_relative_file_path(self.path, "render state")
+        if value != Path(f"state/render/states/{self.content_hash}.json"):
+            raise ValueError("render state path must be canonical")
+        return self
+
+
 class StateCommitStatus(str, Enum):
     RUNNING = "running"
     SUCCEEDED = "succeeded"
@@ -392,6 +700,13 @@ class StateCommitAttempt(StrictModel):
     candidate_project: ProjectSnapshotPointer | None = None
     candidate_registry: RegistrySnapshotPointer | None = None
     candidate_artifacts_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    base_render_state: RenderStateSnapshotPointer | None = None
+    candidate_render_state: RenderStateSnapshotPointer | None = None
+    renderer_selection: RendererSelectionReceipt | None = None
+    render_phase: (
+        Literal["selection", "source", "lint", "check", "render", "verify", "activate"]
+        | None
+    ) = None
     started_at: str
     finished_at: str | None = None
     error_code: str | None = None
@@ -423,7 +738,50 @@ class StateCommitAttempt(StrictModel):
         }
         if terminal_error and (not self.error_code or not self.error_message):
             raise ValueError("terminal state commit attempts require typed error fields")
+        render_fields = (
+            self.base_render_state,
+            self.candidate_render_state,
+            self.renderer_selection,
+            self.render_phase,
+        )
+        if self.operation != "render_state" and any(
+            value is not None for value in render_fields
+        ):
+            raise ValueError("non-render operations cannot contain render fields")
+        if self.operation == "render_state":
+            if self.renderer_selection is None:
+                raise ValueError("render_state attempts require renderer selection")
+            if (
+                self.base_project != self.renderer_selection.current_project
+                or self.base_registry != self.renderer_selection.current_registry
+            ):
+                raise ValueError(
+                    "render_state attempt identity does not match selection"
+                )
+            if self.candidate_project not in (None, self.base_project):
+                raise ValueError(
+                    "render_state candidate project identity does not match"
+                )
+            if self.candidate_registry not in (None, self.base_registry):
+                raise ValueError(
+                    "render_state candidate registry identity does not match"
+                )
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_without_unused_render_fields(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.operation != "render_state":
+            for field in (
+                "base_render_state",
+                "candidate_render_state",
+                "renderer_selection",
+                "render_phase",
+            ):
+                data.pop(field, None)
+        return data
 
 
 class RecoveryDisposition(str, Enum):
@@ -457,11 +815,12 @@ class RecoveryReport(StrictModel):
 
 
 class ProductionManifest(StrictModel):
-    schema_version: Literal["2.0"] = "2.0"
+    schema_version: Literal["2.0", "2.1"] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
     active_project: ProjectSnapshotPointer
     active_registry: RegistrySnapshotPointer
+    active_render_state: RenderStateSnapshotPointer | None = None
     attempts: tuple[StateCommitAttempt, ...] = ()
 
     @model_validator(mode="after")
@@ -469,7 +828,21 @@ class ProductionManifest(StrictModel):
         attempt_ids = [item.attempt_id for item in self.attempts]
         if len(attempt_ids) != len(set(attempt_ids)):
             raise ValueError("Production Manifest attempt IDs must be unique")
+        if self.schema_version == "2.0":
+            if self.active_render_state is not None or any(
+                item.operation == "render_state" for item in self.attempts
+            ):
+                raise ValueError("Production Manifest 2.0 cannot contain render state")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_schema(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.schema_version == "2.0" and self.active_render_state is None:
+            data.pop("active_render_state", None)
+        return data
 
 
 class ProductionProject(VersionedArtifact):

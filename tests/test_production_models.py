@@ -4,11 +4,16 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+import ai_video.production as production
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
+    CompositionLayerSpec,
+    CompositionSpec,
     CompositionDirective,
+    DeliveryProfile,
     DurationPolicy,
+    MeasuredRenderMetadata,
     MotionDirective,
     ProductionManifest,
     ProjectSnapshotPointer,
@@ -16,7 +21,21 @@ from ai_video.production.models import (
     RecoveryItem,
     RecoveryReport,
     RegistrySnapshotPointer,
+    RenderArtifactPointer,
+    RenderOutputPointer,
+    RenderReceipt,
+    RendererAssetBinding,
+    RendererCheckReceipt,
+    RendererIdentity,
     RendererPolicy,
+    RendererSelectionReceipt,
+    RendererSourceReceipt,
+    RenderSourceBundlePointer,
+    RenderSourceFilePointer,
+    RenderStateSnapshot,
+    RenderStateSnapshotPointer,
+    ResolvedTimeline,
+    ResolvedVisualSpan,
     SourceReference,
     StateCommitAttempt,
     StateCommitStatus,
@@ -27,6 +46,14 @@ from ai_video.production.models import (
 
 ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
+TWO_HASH = "2" * 64
+THREE_HASH = "3" * 64
+FOUR_HASH = "4" * 64
+FIVE_HASH = "5" * 64
+SIX_HASH = "6" * 64
+SEVEN_HASH = "7" * 64
+EIGHT_HASH = "8" * 64
+NINE_HASH = "9" * 64
 
 
 def make_project_pointer() -> ProjectSnapshotPointer:
@@ -56,6 +83,434 @@ def make_state_manifest(**overrides: object) -> ProductionManifest:
     }
     data.update(overrides)
     return ProductionManifest(**data)
+
+
+def versioned_fields(artifact_id: str, content_hash: str) -> dict[str, object]:
+    return {
+        "artifact_id": artifact_id,
+        "revision": 1,
+        "content_hash": content_hash,
+        "creation_receipt_id": f"receipt-{artifact_id}",
+        "source_provenance": (
+            SourceReference(kind="derived", reference="p3-test-fixture"),
+        ),
+    }
+
+
+def make_renderer_selection() -> RendererSelectionReceipt:
+    return RendererSelectionReceipt(
+        receipt_id="select-1",
+        attempt_id="attempt-1",
+        requested_kind="hyperframes",
+        selected_kinds=("hyperframes",),
+        renderer_version="0.7.103",
+        timeline_fingerprint=FOUR_HASH,
+        current_project=make_project_pointer(),
+        current_registry=make_registry_pointer(),
+    )
+
+
+def make_resolved_timeline() -> ResolvedTimeline:
+    return ResolvedTimeline(
+        **versioned_fields("timeline-1", TWO_HASH),
+        timeline_id="timeline-1",
+        composition_spec_id="composition-1",
+        composition_spec_revision=1,
+        composition_spec_hash=THREE_HASH,
+        delivery_profile=DeliveryProfile(width=320, height=180, fps=24),
+        sample_rate=48_000,
+        renderer=RendererIdentity(kind="hyperframes", version="0.7.103"),
+        visual_spans=(
+            ResolvedVisualSpan(
+                layer_id="layer-1",
+                shot_id="shot-1",
+                asset_role="primary_image",
+                asset_id="asset-1",
+                asset_sha256=FIVE_HASH,
+                asset_mime_type="image/png",
+                materialized_path=Path(f"assets/files/{FIVE_HASH}.png"),
+                start_frame=0,
+                duration_frames=48,
+                start_sample=0,
+                duration_samples=96_000,
+                trim_start_frame=0,
+                transform={},
+                opacity_milli=1000,
+                z_index=0,
+            ),
+        ),
+        total_frames=48,
+        total_samples=96_000,
+        composition_fingerprint=FOUR_HASH,
+    )
+
+
+def make_source_bundle() -> RenderSourceBundlePointer:
+    root = Path(f"state/render/sources/{SIX_HASH}")
+    return RenderSourceBundlePointer(
+        root_path=root,
+        bundle_sha256=SIX_HASH,
+        index=RenderSourceFilePointer(
+            path=root / "index.html",
+            file_sha256=SEVEN_HASH,
+            size_bytes=100,
+        ),
+        assets=(
+            RenderSourceFilePointer(
+                path=root / "assets" / f"{FIVE_HASH}.png",
+                file_sha256=FIVE_HASH,
+                size_bytes=10,
+            ),
+        ),
+    )
+
+
+def make_source_receipt() -> RendererSourceReceipt:
+    return RendererSourceReceipt(
+        **versioned_fields("source-receipt-1", EIGHT_HASH),
+        attempt_id="attempt-1",
+        renderer=RendererIdentity(kind="hyperframes", version="0.7.103"),
+        timeline_fingerprint=FOUR_HASH,
+        source_bundle=make_source_bundle(),
+        source_sha256=SEVEN_HASH,
+        asset_bindings=(
+            RendererAssetBinding(
+                asset_id="asset-1",
+                asset_sha256=FIVE_HASH,
+                asset_mime_type="image/png",
+                materialized_path=Path(
+                    f"state/render/sources/{SIX_HASH}/assets/{FIVE_HASH}.png"
+                ),
+            ),
+        ),
+        checks=(
+            RendererCheckReceipt(
+                command="lint",
+                tool_version="0.7.103",
+                exit_code=0,
+                stdout_sha256=ZERO_HASH,
+                stderr_sha256=ZERO_HASH,
+                error_count=0,
+                warning_count=0,
+            ),
+            RendererCheckReceipt(
+                command="check",
+                tool_version="0.7.103",
+                exit_code=0,
+                stdout_sha256=ZERO_HASH,
+                stderr_sha256=ZERO_HASH,
+                error_count=0,
+                warning_count=0,
+            ),
+        ),
+    )
+
+
+def make_render_receipt() -> RenderReceipt:
+    return RenderReceipt(
+        **versioned_fields("render-receipt-1", NINE_HASH),
+        attempt_id="attempt-1",
+        renderer=RendererIdentity(kind="hyperframes", version="0.7.103"),
+        timeline_fingerprint=FOUR_HASH,
+        source_sha256=SEVEN_HASH,
+        source_bundle_sha256=SIX_HASH,
+        asset_hashes=(FIVE_HASH,),
+        output_path=Path(f"state/render/outputs/{ONE_HASH}.mp4"),
+        output_sha256=ONE_HASH,
+        output_size_bytes=200,
+        measured=MeasuredRenderMetadata(
+            width=320,
+            height=180,
+            fps_num=24,
+            fps_den=1,
+            duration_frames=48,
+            codec_name="h264",
+        ),
+        decoded_frame_fingerprint=TWO_HASH,
+    )
+
+
+def make_render_state_snapshot() -> RenderStateSnapshot:
+    return RenderStateSnapshot(
+        **versioned_fields("render-state-1", THREE_HASH),
+        attempt_id="attempt-1",
+        project=make_project_pointer(),
+        registry=make_registry_pointer(),
+        renderer_selection=make_renderer_selection(),
+        renderer=RendererIdentity(kind="hyperframes", version="0.7.103"),
+        timeline_fingerprint=FOUR_HASH,
+        source_sha256=SEVEN_HASH,
+        source_bundle_sha256=SIX_HASH,
+        asset_hashes=(FIVE_HASH,),
+        timeline=RenderArtifactPointer(
+            path=Path(f"state/render/timelines/{TWO_HASH}.json"),
+            revision=1,
+            content_hash=TWO_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        source_bundle=make_source_bundle(),
+        source_receipt=RenderArtifactPointer(
+            path=Path(f"state/render/source-receipts/{EIGHT_HASH}.json"),
+            revision=1,
+            content_hash=EIGHT_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        render_receipt=RenderArtifactPointer(
+            path=Path(f"state/render/render-receipts/{NINE_HASH}.json"),
+            revision=1,
+            content_hash=NINE_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        output=RenderOutputPointer(
+            path=Path(f"state/render/outputs/{ONE_HASH}.mp4"),
+            file_sha256=ONE_HASH,
+            size_bytes=200,
+        ),
+    )
+
+
+def test_resolved_timeline_requires_integer_boundaries():
+    timeline = make_resolved_timeline()
+
+    assert timeline.visual_spans[0].start_frame == 0
+    assert timeline.visual_spans[0].duration_frames == 48
+    assert timeline.visual_spans[0].start_sample == 0
+    assert timeline.visual_spans[0].duration_samples == 96_000
+
+    data = timeline.model_dump(mode="json")
+    data["visual_spans"][0]["start_frame"] = 0.5
+    with pytest.raises(ValidationError):
+        ResolvedTimeline.model_validate(data)
+
+
+def test_render_receipt_rejects_unknown_fields():
+    data = make_render_receipt().model_dump(mode="json")
+    data["renderer_fallback"] = "remotion"
+
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        RenderReceipt.model_validate(data)
+
+
+def test_renderer_source_receipt_fixes_index_and_check_identity():
+    receipt = make_source_receipt()
+
+    assert receipt.source_sha256 == receipt.source_bundle.index.file_sha256
+    assert tuple(item.command for item in receipt.checks) == ("lint", "check")
+
+
+def test_renderer_selection_allows_one_selected_renderer():
+    with pytest.raises(ValidationError):
+        RendererSelectionReceipt(
+            receipt_id="select-1",
+            attempt_id="attempt-1",
+            requested_kind="hyperframes",
+            selected_kinds=("hyperframes", "remotion"),
+            renderer_version="0.7.103",
+            timeline_fingerprint=FOUR_HASH,
+            current_project=make_project_pointer(),
+            current_registry=make_registry_pointer(),
+        )
+
+
+def test_manifest_20_rejects_render_state_and_render_attempts():
+    render_pointer = RenderStateSnapshotPointer(
+        path=Path(f"state/render/states/{THREE_HASH}.json"),
+        revision=1,
+        content_hash=THREE_HASH,
+        file_sha256=ZERO_HASH,
+    )
+    with pytest.raises(ValidationError, match="2.0"):
+        make_state_manifest(active_render_state=render_pointer)
+
+    render_attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="render_state",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        started_at="2026-08-09T00:00:00+00:00",
+        renderer_selection=make_renderer_selection(),
+    )
+    with pytest.raises(ValidationError, match="2.0"):
+        make_state_manifest(attempts=(render_attempt,))
+
+
+def test_manifest_20_preserves_historical_custom_nonempty_operation_without_rewrite():
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-custom",
+        operation="historical_custom_commit",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        started_at="2026-08-09T00:00:00+00:00",
+    )
+
+    manifest = make_state_manifest(attempts=(attempt,))
+
+    assert manifest.schema_version == "2.0"
+    assert manifest.attempts[0].operation == "historical_custom_commit"
+    assert manifest.model_dump(mode="json")["attempts"][0]["operation"] == (
+        "historical_custom_commit"
+    )
+    assert "active_render_state" not in manifest.model_dump(mode="json")
+    assert not {
+        "base_render_state",
+        "candidate_render_state",
+        "renderer_selection",
+        "render_phase",
+    }.intersection(manifest.model_dump(mode="json")["attempts"][0])
+
+
+def test_manifest_21_accepts_none_or_one_render_state_pointer():
+    empty = make_state_manifest(schema_version="2.1", active_render_state=None)
+    pointer = RenderStateSnapshotPointer(
+        path=Path(f"state/render/states/{THREE_HASH}.json"),
+        revision=1,
+        content_hash=THREE_HASH,
+        file_sha256=ZERO_HASH,
+    )
+    active = make_state_manifest(schema_version="2.1", active_render_state=pointer)
+
+    assert empty.active_render_state is None
+    assert active.active_render_state == pointer
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement"),
+    [
+        ("attempt_id", "attempt-other"),
+        (
+            "renderer",
+            RendererIdentity(kind="hyperframes", version="0.7.102"),
+        ),
+        ("timeline_fingerprint", ZERO_HASH),
+        ("source_sha256", ZERO_HASH),
+        ("source_bundle_sha256", ZERO_HASH),
+        ("asset_hashes", (ZERO_HASH,)),
+        (
+            "output",
+            {
+                "path": Path(f"state/render/outputs/{ONE_HASH}.mp4"),
+                "file_sha256": ZERO_HASH,
+                "size_bytes": 200,
+            },
+        ),
+    ],
+)
+def test_render_state_snapshot_rejects_mixed_attempt_renderer_timeline_source_asset_or_output_identity(
+    field, replacement
+):
+    data = make_render_state_snapshot().model_dump(mode="python")
+    data[field] = replacement
+
+    with pytest.raises(ValidationError, match="identity|canonical"):
+        RenderStateSnapshot.model_validate(data)
+
+
+@pytest.mark.parametrize("field", ["asset_role", "asset_id"])
+def test_composition_layer_requires_exact_declared_asset_role_and_id(field):
+    data = {
+        "layer_id": "layer-1",
+        "shot_id": "shot-1",
+        "asset_role": "primary_image",
+        "asset_id": "asset-1",
+    }
+    data[field] = ""
+
+    with pytest.raises(ValidationError):
+        CompositionLayerSpec.model_validate(data)
+
+    layer = CompositionLayerSpec.model_validate(
+        {
+            "layer_id": "layer-1",
+            "shot_id": "shot-1",
+            "asset_role": "primary_image",
+            "asset_id": "asset-1",
+        }
+    )
+    spec = CompositionSpec(
+        **versioned_fields("composition-1", THREE_HASH),
+        composition_id="composition-1",
+        shot_ids=("shot-1",),
+        layers=(layer,),
+        delivery_profile=DeliveryProfile(width=320, height=180, fps=24),
+    )
+    assert (spec.layers[0].asset_role, spec.layers[0].asset_id) == (
+        "primary_image",
+        "asset-1",
+    )
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        Path("state/render/outputs/render.mp4"),
+        Path(f"state/render/outputs/{ZERO_HASH}.mov"),
+        Path(f"state/render/outputs/{ZERO_HASH[:32]}.mp4"),
+        Path(f"state/render/outputs/{TWO_HASH}.mp4"),
+    ],
+)
+def test_render_receipt_requires_canonical_durable_output_path(path):
+    data = make_render_receipt().model_dump(mode="python")
+    data["output_path"] = path
+
+    with pytest.raises(ValidationError, match="canonical"):
+        RenderReceipt.model_validate(data)
+
+
+@pytest.mark.parametrize("field", ["project", "registry"])
+def test_render_state_snapshot_fixes_project_registry_and_source_bundle_provenance(
+    field,
+):
+    data = make_render_state_snapshot().model_dump(mode="python")
+    if field == "project":
+        data[field] = make_project_pointer().model_copy(
+            update={"file_sha256": TWO_HASH}
+        )
+    else:
+        data[field] = make_registry_pointer().model_copy(
+            update={"file_sha256": TWO_HASH}
+        )
+
+    with pytest.raises(ValidationError, match="identity"):
+        RenderStateSnapshot.model_validate(data)
+
+
+def test_render_models_are_frozen_and_forbid_extra_fields():
+    state = make_render_state_snapshot()
+    with pytest.raises(ValidationError, match="Instance is frozen"):
+        state.attempt_id = "attempt-other"  # type: ignore[misc]
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        RenderStateSnapshot.model_validate(
+            {**state.model_dump(mode="python"), "unexpected": True}
+        )
+
+
+def test_package_exports_only_the_stable_p3_schema_surface():
+    stable_p3_exports = {
+        "CompositionSpec",
+        "ResolvedTimeline",
+        "RendererSelectionReceipt",
+        "RendererSourceReceipt",
+        "RenderReceipt",
+        "RenderArtifactPointer",
+        "RenderSourceFilePointer",
+        "RenderSourceBundlePointer",
+        "RenderOutputPointer",
+        "RenderStateSnapshot",
+        "RenderStateSnapshotPointer",
+    }
+
+    assert stable_p3_exports <= set(production.__all__)
+    assert {
+        "HyperFramesAdapter",
+        "RendererRunner",
+        "VerifiedRenderFile",
+    }.isdisjoint(production.__all__)
 
 
 def test_production_manifest_has_one_project_and_registry_pointer_owner():
@@ -97,6 +552,20 @@ def test_production_manifest_has_one_project_and_registry_pointer_owner():
 )
 def test_production_state_error_codes_are_non_retryable_by_default(code, name, value):
     assert code.name == name
+    assert code.value == value
+    assert AiVideoError(code=code, user_message="safe").retryable is False
+
+
+@pytest.mark.parametrize(
+    ("code", "value"),
+    [
+        (ErrorCode.COMPOSITION_INVALID, "composition_invalid"),
+        (ErrorCode.RENDERER_UNAVAILABLE, "renderer_unavailable"),
+        (ErrorCode.RENDERER_SOURCE_INVALID, "renderer_source_invalid"),
+        (ErrorCode.RENDER_FAILED, "render_failed"),
+    ],
+)
+def test_p3_error_codes_are_typed_and_non_retryable_by_default(code, value):
     assert code.value == value
     assert AiVideoError(code=code, user_message="safe").retryable is False
 

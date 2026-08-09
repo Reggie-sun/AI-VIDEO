@@ -26,6 +26,10 @@ class ErrorCode(str, Enum):
     PRODUCTION_STATE_RECOVERY_FAILED = "production_state_recovery_failed"
     PRODUCTION_STATE_OUTCOME_UNKNOWN = "production_state_outcome_unknown"
     PRODUCTION_STATE_UNSUPPORTED = "production_state_unsupported"
+    COMPOSITION_INVALID = "composition_invalid"
+    RENDERER_UNAVAILABLE = "renderer_unavailable"
+    RENDERER_SOURCE_INVALID = "renderer_source_invalid"
+    RENDER_FAILED = "render_failed"
     DISK_SPACE_LOW = "disk_space_low"
 
 
