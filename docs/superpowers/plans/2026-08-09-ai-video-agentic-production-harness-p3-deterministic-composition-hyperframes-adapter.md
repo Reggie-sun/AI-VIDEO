@@ -71,7 +71,7 @@ P3 runtime implementation 的三个前置/gate 均已在 2026-08-09 获得本 pl
 | Local FFmpeg | PATH 存在 `/home/reggie/miniconda3/bin/ffmpeg` | 只证明 binary 存在；codec、Chrome 和 render parity 未验证 |
 | Local Chrome/cache | system Chrome `149.0.7827.53` 和 Puppeteer Chrome for Testing `146.0.7680.153` 存在；没有 HyperFrames-managed browser cache | published `0.7.103` source pins Chrome Headless Shell `152.0.7928.2`；当前本机证据不满足 pinned-browser parity，不能据此运行 live spike |
 | CLI surface | exact published source 注册 `doctor`、`lint`、`check`、deprecated `inspect`、`preview` 和 `render`；official `0.7.103` static source uses boolean root `data-no-timeline` and root dispatcher recognizes `--json` | automated adapter 使用 `doctor --json`、`lint ... --json`、`check ... --json`、`render ... --json`；gate preview 也必须 `--json`。Doctor/lint/check JSON 被解析；preview/render 的 flag 是 dispatcher sentinel，不承诺 stdout 为 JSON。`data-no-timeline` 选择 CSS-animation-driven composition，不是 empty/fake timeline |
-| Offline/network behavior | `HYPERFRAMES_NO_TELEMETRY=1`/`DO_NOT_TRACK=1` 可禁 telemetry，`HYPERFRAMES_NO_AUTO_INSTALL=1` 可禁 package background installer，但 `HYPERFRAMES_NO_UPDATE_CHECK=1` 不会阻止 root dispatcher 的 npm/GitHub update checks；只有 root `--json` path 跳过该 background block。browser manager 仍可 auto-download Chrome，Linux ARM64 路径还可尝试 `apt-get` | 除 `--help`/`--version` 外，每次 HyperFrames invocation 都必须显式带 `--json`，且 live/production trace 仍 fail-closed 拒绝任何 external attempt。不得把 env 声称为 offline-safe；browser 必须预安装并显式指定 |
+| Offline/network behavior | `HYPERFRAMES_NO_TELEMETRY=1`/`DO_NOT_TRACK=1` 可禁 telemetry，`HYPERFRAMES_NO_AUTO_INSTALL=1` 可禁 package background installer，但 `HYPERFRAMES_NO_UPDATE_CHECK=1` 不会阻止 root dispatcher 的 npm/GitHub update checks；只有 root `--json` path 跳过该 background block。browser manager 仍可 auto-download Chrome，Linux ARM64 路径还可尝试 `apt-get`。Pinned Chrome `152.0.7928.2` 即使带 `--disable-background-networking` 仍会由 `HostResolverManager` 发起固定 IPv6 reachability route probe：同一 trace 中先建立 `AF_INET6/SOCK_DGRAM/IPPROTO_IP` socket，再对 `2001:4860:4860::8888:443` 调用无 payload 的 UDP `connect()`；fresh net namespace 中必须同步得到 `ENETUNREACH` | 除 `--help`/`--version` 外，每次 HyperFrames invocation 都必须显式带 `--json`。不得把 env 声称为 offline-safe；browser 必须预安装并显式指定。live/production trace 只可接受同 FD、同 trace、每个 browser-bearing command 至多一次、exact target 且 exact `ENETUNREACH` 的已阻断 Chromium route probe；成功、`EINPROGRESS`、其他 errno/地址/端口/socket type 或任何外部 send 仍 fail-closed |
 
 Primary sources：
 
@@ -85,6 +85,7 @@ Primary sources：
 - [HyperFrames telemetry opt-out](https://github.com/heygen-com/hyperframes/blob/adb13ce125a3ed1d71919ce98c7306ad18ce6677/packages/cli/src/commands/telemetry.ts)
 - [HyperFrames update-check behavior](https://github.com/heygen-com/hyperframes/blob/adb13ce125a3ed1d71919ce98c7306ad18ce6677/packages/cli/src/utils/updateCheck.ts)
 - [HyperFrames browser resolution and download behavior](https://github.com/heygen-com/hyperframes/blob/adb13ce125a3ed1d71919ce98c7306ad18ce6677/packages/cli/src/browser/manager.ts)
+- [Chromium HostResolver IPv6 reachability probe](https://chromium.googlesource.com/chromium/src/+/HEAD/net/dns/host_resolver_manager.cc)
 
 不得把 cached skill 中的 `--docker` 描述升级为本项目的 byte-identical guarantee。P3 只要求在相同 `ResolvedTimeline`、renderer source、asset hashes 和 pinned tool/runtime 下得到 frame-equivalent output；container metadata/encoder behavior 没有独立契约时，不承诺 byte-identical MP4。
 
@@ -433,26 +434,34 @@ assert previous_progress_f < offset_progress_f < current_progress_f
 PY
 ```
 
-Run version/doctor/lint/check/render through the exact per-command namespace argv contract later implemented by `_NetworkIsolatedHyperFramesRunner`: every invocation creates a fresh namespace and uses the fixed `exec "$@"` wrapper, with no host fallback. Except for version, every invocation must include root `--json`; otherwise HyperFrames `0.7.103` root dispatch may start npm/GitHub update checks even when `HYPERFRAMES_NO_UPDATE_CHECK=1`. Substitute only already verified absolute paths. Preview uses the same outer wrapper to exec a companion in-namespace supervisor because readiness curl and cleanup must share its loopback; preview remains Renderer-Gate-only and is never part of the production runner surface. Every trace includes both process and network syscalls so descendants and attempted egress remain visible.
+Run version/doctor/lint/check/render through the exact per-command namespace argv contract later implemented by `_NetworkIsolatedHyperFramesRunner`: every invocation creates a fresh namespace and uses the fixed `exec "$@"` wrapper, with no host fallback. Except for version, every invocation must include root `--json`; otherwise HyperFrames `0.7.103` root dispatch may start npm/GitHub update checks even when `HYPERFRAMES_NO_UPDATE_CHECK=1`. Substitute only already verified absolute paths. Preview uses the same outer wrapper to exec a companion in-namespace supervisor because readiness curl and cleanup must share its loopback; preview remains Renderer-Gate-only and is never part of the production runner surface. Every traced command starts through `env -i` with the same explicit safe-variable set as production `_controlled_env()`; inheriting the host environment would both invalidate parity and copy unrelated credentials into `execve` evidence. Every trace includes both process and network syscalls so descendants and attempted egress remain visible.
 
 ```bash
 set -euo pipefail
 P3_UNSHARE=$(command -v unshare)
-P3_IP_PATH=$(command -v ip)
+P3_IP_PATH=$(readlink -f "$(command -v ip)")
 P3_BASH=$(command -v bash)
+P3_ENV=$(command -v env)
+P3_STRACE=$(command -v strace)
+P3_PYTHON=$(command -v python)
 P3_BINARY="$PWD/node_modules/.bin/hyperframes"
-test -x "$P3_UNSHARE" && test -x "$P3_IP_PATH" && test -x "$P3_BASH"
+test -x "$P3_UNSHARE" && test -x "$P3_IP_PATH" && test ! -L "$P3_IP_PATH" && test -x "$P3_BASH"
+test -x "$P3_ENV" && test -x "$P3_STRACE" && test -x "$P3_PYTHON"
 test -x "$P3_BINARY" && test -x "$P3_HYPERFRAMES_BROWSER_PATH"
 test ! -L "$P3_HYPERFRAMES_BROWSER_PATH"
-export P3_GATE_DIR P3_GATE_SOURCE P3_GATE_EVIDENCE P3_HYPERFRAMES_BROWSER_PATH P3_IP_PATH
-export CI=1 HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1
-export HYPERFRAMES_NO_UPDATE_CHECK=1 HYPERFRAMES_NO_AUTO_INSTALL=1
-export HYPERFRAMES_BROWSER_PATH="$P3_HYPERFRAMES_BROWSER_PATH"
+P3_SAFE_PATH=$PATH
+P3_SAFE_TMPDIR=${TMPDIR:-/tmp}
+P3_CLOSE_FDS_CODE='import os,stat,sys; fd=os.open(os.devnull,os.O_RDONLY); os.dup2(fd,0); fd > 2 and os.close(fd); os.closerange(3,os.sysconf("SC_OPEN_MAX")); assert all(not stat.S_ISSOCK(os.fstat(i).st_mode) for i in (0,1,2)); os.execv(sys.argv[1],sys.argv[1:])'
 
 p3_isolated_exec() {
   trace_prefix=$1
   shift
-  strace -ff -s 65535 -v -e trace=network,process -o "$trace_prefix" \
+  "$P3_ENV" -i PATH="$P3_SAFE_PATH" LANG=C.UTF-8 LC_ALL=C.UTF-8 \
+    TMPDIR="$P3_SAFE_TMPDIR" CI=1 HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1 \
+    HYPERFRAMES_NO_UPDATE_CHECK=1 HYPERFRAMES_NO_AUTO_INSTALL=1 \
+    HYPERFRAMES_BROWSER_PATH="$P3_HYPERFRAMES_BROWSER_PATH" P3_IP_PATH="$P3_IP_PATH" \
+    "$P3_STRACE" -ff --decode-pids=pidns -s 65535 -v -e trace=network,process -o "$trace_prefix" \
+    "$P3_PYTHON" -c "$P3_CLOSE_FDS_CODE" \
     "$P3_UNSHARE" --user --map-root-user --net --pid --fork --mount-proc \
     "$P3_BASH" -ceu '"$P3_IP_PATH" link set lo up; exec "$@"' \
     p3-hyperframes "$@"
@@ -468,7 +477,12 @@ p3_isolated_exec "$P3_GATE_EVIDENCE/lint.net" \
 p3_isolated_exec "$P3_GATE_EVIDENCE/check.net" \
   "$P3_BINARY" check "$P3_GATE_SOURCE" --json >"$P3_GATE_EVIDENCE/check.json"
 
-if strace -ff -s 65535 -v -e trace=network,process -o "$P3_GATE_EVIDENCE/preview.net" \
+if "$P3_ENV" -i PATH="$P3_SAFE_PATH" LANG=C.UTF-8 LC_ALL=C.UTF-8 \
+    TMPDIR="$P3_SAFE_TMPDIR" CI=1 HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1 \
+    HYPERFRAMES_NO_UPDATE_CHECK=1 HYPERFRAMES_NO_AUTO_INSTALL=1 \
+    HYPERFRAMES_BROWSER_PATH="$P3_HYPERFRAMES_BROWSER_PATH" P3_IP_PATH="$P3_IP_PATH" \
+    "$P3_STRACE" -ff --decode-pids=pidns -s 65535 -v -e trace=network,process -o "$P3_GATE_EVIDENCE/preview.net" \
+    "$P3_PYTHON" -c "$P3_CLOSE_FDS_CODE" \
     "$P3_UNSHARE" --user --map-root-user --net --pid --fork --mount-proc \
     "$P3_BASH" -ceu '"$P3_IP_PATH" link set lo up; exec "$@"' \
     p3-hyperframes-preview-supervisor \
@@ -507,90 +521,182 @@ test -s "$P3_GATE_EVIDENCE/render-1.mp4"
 test -s "$P3_GATE_EVIDENCE/render-2.mp4"
 ```
 
-Afterward, hash the original `index.html` and PNG again and compare to their recorded pre-run hashes. Every trace is captured with `-s 65535 -v`; an abbreviated argv, opaque/truncated sockaddr or `...` therefore fails rather than weakening proof. Parse every `*.net*` process/network trace and fail if a `connect`/`sendto`/`sendmsg`/`sendmmsg` destination uses `AF_INET`/`AF_INET6` without exact loopback encoding `sin_addr=inet_addr("127.0.0.1")` or `inet_pton(AF_INET6, "::1", ...)`; a fully decoded `AF_UNIX` is allowed. Explicit non-abbreviated `NULL`/`msg_name=NULL` without a destination may be ignored for send calls because the earlier `connect` remains in the same complete trace. Matching is structural/exact, never a loose `127.0.0.1` substring whitelist: `127.0.0.53` DNS and every other address remain forbidden, including failed attempts. Each command trace must also contain exact process-exec evidence so an untraced descendant cannot satisfy the gate:
+Afterward, hash the original `index.html` and PNG again and compare to their recorded pre-run hashes. Every trace is captured with `--decode-pids=pidns -s 65535 -v`; argv or destination structure that is abbreviated, opaque or undecodable fails rather than weakening proof. Payload text and `iovec` bytes may themselves contain literal `...` or be display-truncated only when the destination is independently complete: `sendto` must expose its final sockaddr/length, `sendmsg` its leading `msg_name`/`msg_namelen`, and `sendmmsg` every `msg_hdr` destination with count equal to `vlen`. Before the first namespace exec, the traced bootstrap replaces stdin with `/dev/null`, closes every non-standard inherited FD, and fail-closes unless fd `0`/`1`/`2` are all non-sockets; production uses `stdin=subprocess.DEVNULL`, new stdout/stderr pipes and `close_fds=True`. Therefore an explicit `NULL`/`msg_name=NULL` zero-length send cannot use an inherited connected peer: any nonlocal connected peer would require a destination-establishing syscall after tracing began, and all such calls are audited. Parse every `*.net*` process/network trace separately. `AF_INET`/`AF_INET6` destinations require exact loopback encoding `sin_addr=inet_addr("127.0.0.1")` or `inet_pton(AF_INET6, "::1", ...)`; fully decoded `AF_UNIX` is allowed; `AF_NETLINK` is allowed only as exact kernel-unicast `{nl_pid=0,nl_groups=0}` with length `12`. The sole non-loopback exception is Chromium's no-payload IPv6 route probe: the same trace and FD must first show exact `socket(AF_INET6, SOCK_DGRAM, IPPROTO_IP)`, the destination must be exactly `2001:4860:4860::8888:443` length `28`, the result exactly synchronous `ENETUNREACH`, and each browser-bearing trace may contain it at most once. Matching is structural/exact, never a loose address substring whitelist: `127.0.0.53`, any probe success/`EINPROGRESS`/other error, any other address/port/socket, and every external send remain forbidden. Each command trace must also contain exact process-exec evidence so an untraced descendant cannot satisfy the gate:
 
 ```bash
 set -euo pipefail
 sha256sum "$P3_GATE_SOURCE/index.html" "$P3_GATE_SOURCE/assets/red.png" \
   "$P3_GATE_SOURCE/assets/blue.png" >"$P3_GATE_EVIDENCE/input.after.sha256"
 diff -u "$P3_GATE_EVIDENCE/input.before.sha256" "$P3_GATE_EVIDENCE/input.after.sha256"
-python - "$P3_GATE_EVIDENCE" "$P3_BINARY" "$P3_GATE_SOURCE" <<'PY'
+python - "$P3_GATE_EVIDENCE" "$P3_BINARY" "$P3_GATE_SOURCE" \
+  "$P3_PYTHON" "$P3_CLOSE_FDS_CODE" <<'PY'
 from pathlib import Path
 import json, re, sys
 
 
-def assert_loopback_only(lines: list[str]) -> None:
-    network_call = re.compile(r"\b(connect|sendto|sendmsg|sendmmsg)\(")
+SOCKET = re.compile(
+    r"^socket\((AF_[A-Z0-9_]+),\s*([^,]+),\s*([^)]+)\)\s*=\s*([0-9]+)$"
+)
+NETWORK_CALL = re.compile(r"^\s*(connect|sendto|sendmsg|sendmmsg)\(")
+CONNECT = re.compile(
+    r"^connect\(([0-9]+),\s*(\{[^{}]*\}|0x[0-9a-fA-F]+|NULL|\.\.\.),\s*"
+    r"([0-9]+)\)\s*=\s*(.+)$"
+)
+SENDTO = re.compile(
+    r"^sendto\(([0-9]+),.*?,\s*(\{[^{}]*\}|0x[0-9a-fA-F]+|NULL|\.\.\.),\s*"
+    r"([0-9]+)\)\s*=\s*(.+)$"
+)
+SENDMSG = re.compile(
+    r"^sendmsg\(([0-9]+),\s*\{msg_name=(\{[^{}]*\}|0x[0-9a-fA-F]+|NULL|\.\.\.),\s*"
+    r"msg_namelen=([0-9]+)(?=,|\})"
+)
+SENDMMSG_TAIL = re.compile(r"\],\s*([0-9]+),\s*[^)]*\)\s*=\s*.+$")
+MSG_HDR = re.compile(
+    r"msg_hdr=\{msg_name=(\{[^{}]*\}|0x[0-9a-fA-F]+|NULL|\.\.\.),\s*"
+    r"msg_namelen=([0-9]+)(?=,|\})"
+)
+IPV4 = re.compile(
+    r'^\{sa_family=AF_INET,\s*sin_port=htons\(([0-9]+)\),\s*'
+    r'sin_addr=inet_addr\("([^"]+)"\)\}$'
+)
+IPV6 = re.compile(
+    r'^\{sa_family=AF_INET6,\s*sin6_port=htons\(([0-9]+)\)'
+    r'(?:,\s*sin6_flowinfo=htonl\([0-9]+\))?,\s*'
+    r'inet_pton\(AF_INET6,\s*"([^"]+)",\s*&sin6_addr\)'
+    r'(?:,\s*sin6_scope_id=[0-9]+)?\}$'
+)
+UNIX = re.compile(r'^\{sa_family=AF_UNIX,\s*sun_path=(?:@?"[^"]*"|NULL)\}$')
+NETLINK = re.compile(
+    r"^\{sa_family=AF_NETLINK,\s*nl_pid=(0),\s*nl_groups=(00000000)\}$"
+)
+
+
+def decode_destination(sockaddr: str, length: str) -> tuple[object, ...]:
+    if sockaddr == "NULL":
+        if length != "0":
+            raise AssertionError(f"NULL destination has nonzero length: {length}")
+        return ("null",)
+    if sockaddr.startswith("0x") or sockaddr == "...":
+        raise AssertionError(f"opaque network destination: {sockaddr}")
+    if match := IPV4.fullmatch(sockaddr):
+        if length != "16":
+            raise AssertionError(f"invalid IPv4 sockaddr length: {length}")
+        return ("ipv4", match.group(2), int(match.group(1)))
+    if match := IPV6.fullmatch(sockaddr):
+        if length != "28":
+            raise AssertionError(f"invalid IPv6 sockaddr length: {length}")
+        return ("ipv6", match.group(2), int(match.group(1)))
+    if UNIX.fullmatch(sockaddr):
+        if not length.isdigit() or not 1 <= int(length) <= 110:
+            raise AssertionError(f"invalid AF_UNIX sockaddr length: {length}")
+        return ("unix",)
+    if NETLINK.fullmatch(sockaddr):
+        if length != "12":
+            raise AssertionError(f"invalid AF_NETLINK sockaddr length: {length}")
+        return ("netlink-kernel",)
+    raise AssertionError(f"unsupported or undecodable network destination: {sockaddr}")
+
+
+def assert_offline_only(lines: list[str]) -> int:
+    sockets: dict[str, tuple[str, str, str]] = {}
+    blocked_probe_count = 0
     for line in lines:
-        match = network_call.search(line)
-        if not match:
+        if match := SOCKET.fullmatch(line):
+            sockets[match.group(4)] = match.groups()[:3]
             continue
-        call = match.group(1)
-        if "..." in line or "msg_name=0x" in line:
-            raise AssertionError(f"abbreviated or opaque network destination: {line}")
-        families = re.findall(r"sa_family=(AF_[A-Z0-9_]+)", line)
-        if any(family not in {"AF_INET", "AF_INET6", "AF_UNIX"} for family in families):
-            raise AssertionError(f"unsupported network family: {line}")
-        ipv4_families = len(re.findall(r"sa_family=AF_INET(?!6)", line))
-        ipv6_families = len(re.findall(r"sa_family=AF_INET6", line))
-        unix_families = len(re.findall(r"sa_family=AF_UNIX", line))
-        ipv4_addresses = re.findall(r'sin_addr=inet_addr\("([^"]+)"\)', line)
-        ipv6_addresses = re.findall(r'inet_pton\(AF_INET6, "([^"]+)"', line)
-        ipv4_ports = re.findall(r"sin_port=htons\([0-9]+\)", line)
-        ipv6_ports = re.findall(r"sin6_port=htons\([0-9]+\)", line)
-        unix_addresses = re.findall(r'sa_family=AF_UNIX,\s*sun_path=(?:@?"[^"]*"|NULL)', line)
-        if (
-            ipv4_families != len(ipv4_addresses) or ipv4_families != len(ipv4_ports)
-            or ipv6_families != len(ipv6_addresses) or ipv6_families != len(ipv6_ports)
-            or unix_families != len(unix_addresses)
-            or len(families) != ipv4_families + ipv6_families + unix_families
-        ):
-            raise AssertionError(f"undecodable network destination: {line}")
-        if any(address != "127.0.0.1" for address in ipv4_addresses):
-            raise AssertionError(f"external IPv4 attempt: {line}")
-        if any(address != "::1" for address in ipv6_addresses):
-            raise AssertionError(f"external IPv6 attempt: {line}")
-        if call == "connect" and len(families) != 1:
-            raise AssertionError(f"connect destination is not explicitly decoded: {line}")
-        if call != "connect" and not families:
-            null_destination = (
-                call == "sendto" and re.search(r",\s*NULL,\s*0\)\s*=", line) is not None
-                or call == "sendmsg" and line.count("msg_name=NULL") == 1
-                or call == "sendmmsg"
-                and line.count("msg_hdr={") > 0
-                and line.count("msg_hdr={") == line.count("msg_name=NULL")
-            )
-            if not null_destination:
-                raise AssertionError(f"send destination is not explicitly decoded: {line}")
+        call_match = NETWORK_CALL.match(line)
+        if not call_match:
+            continue
+        call = call_match.group(1)
+        if call == "connect":
+            match = CONNECT.fullmatch(line)
+            if not match:
+                raise AssertionError(f"undecodable connect destination: {line}")
+            fd, sockaddr, length, result = match.groups()
+            destination = decode_destination(sockaddr, length)
+            if destination[0] == "ipv4" and destination[1] != "127.0.0.1":
+                raise AssertionError(f"external IPv4 attempt: {line}")
+            if destination[0] == "ipv6" and destination[1] != "::1":
+                exact_blocked_probe = (
+                    destination == ("ipv6", "2001:4860:4860::8888", 443)
+                    and sockets.get(fd) == ("AF_INET6", "SOCK_DGRAM", "IPPROTO_IP")
+                    and result == "-1 ENETUNREACH (Network is unreachable)"
+                )
+                if not exact_blocked_probe:
+                    raise AssertionError(f"external IPv6 attempt: {line}")
+                blocked_probe_count += 1
+            if destination[0] not in {
+                "ipv4", "ipv6", "unix", "netlink-kernel"
+            }:
+                raise AssertionError(f"connect has no explicit destination: {line}")
+            continue
+        if call == "sendto":
+            match = SENDTO.fullmatch(line)
+            if not match:
+                raise AssertionError(f"undecodable sendto destination: {line}")
+            _, sockaddr, length, _ = match.groups()
+            destinations = [decode_destination(sockaddr, length)]
+        elif call == "sendmsg":
+            match = SENDMSG.match(line)
+            if not match:
+                raise AssertionError(f"undecodable sendmsg destination: {line}")
+            _, sockaddr, length = match.groups()
+            destinations = [decode_destination(sockaddr, length)]
+        else:
+            tail = SENDMMSG_TAIL.search(line)
+            if not tail:
+                raise AssertionError(f"undecodable sendmmsg vector: {line}")
+            headers = MSG_HDR.findall(line)
+            if len(headers) != int(tail.group(1)):
+                raise AssertionError(f"abbreviated sendmmsg vector: {line}")
+            destinations = [decode_destination(*header) for header in headers]
+        for destination in destinations:
+            if destination[0] == "ipv4" and destination[1] != "127.0.0.1":
+                raise AssertionError(f"external IPv4 send attempt: {line}")
+            if destination[0] == "ipv6" and destination[1] != "::1":
+                raise AssertionError(f"external IPv6 send attempt: {line}")
+    return blocked_probe_count
 
 
-assert_loopback_only([
+assert assert_offline_only([
     'connect(3, {sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}, 16) = 0',
+    'sendto(3, "payload ...", 11, 0, NULL, 0) = 11',
     'sendto(3, "x", 1, 0, {sa_family=AF_INET6, sin6_port=htons(3017), inet_pton(AF_INET6, "::1", &sin6_addr)}, 28) = 1',
     'connect(3, {sa_family=AF_UNIX, sun_path="/tmp/p3.sock"}, 110) = 0',
-    'sendto(3, "x", 1, 0, NULL, 0) = 1',
     'sendmsg(3, {msg_name=NULL, msg_namelen=0}, 0) = 1',
-    'sendmmsg(3, [{msg_hdr={msg_name=NULL}}, {msg_hdr={msg_name=NULL}}], 2, 0) = 2',
-])
+    'sendto(3, "x", 1, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 1',
+    'sendmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12}, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name=NULL, msg_namelen=0}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}, msg_namelen=16}}], 2, 0) = 2',
+]) == 0
+assert assert_offline_only([
+    'socket(AF_INET6, SOCK_DGRAM, IPPROTO_IP) = 7',
+    'connect(7, {sa_family=AF_INET6, sin6_port=htons(443), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "2001:4860:4860::8888", &sin6_addr), sin6_scope_id=0}, 28) = -1 ENETUNREACH (Network is unreachable)',
+]) == 1
 for forbidden in (
     'connect(3, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0',
     'sendto(3, "x", 1, 0, {sa_family=AF_INET}, 16) = 1',
-    'connect(3, 0x7ffddeadbeef, 16) = -1 EFAULT',
+    'connect(3, 0x7ffddeadbeef, 16) = -1 EFAULT (Bad address)',
     'sendmsg(3, {msg_name=0x7ffddeadbeef, msg_namelen=16}, 0) = 1',
-    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}}}, ...], 2, 0) = 2',
-    'connect(3, {sa_family=AF_NETLINK}, 12) = 0',
-    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("8.8.8.8")}}}], 2, 0) = 2',
+    'sendto(3, "x", 1, 0, {sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, 12) = 1',
+    'sendmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000001}, msg_namelen=12}, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name=NULL, msg_namelen=0}}, ...], 2, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}, msg_namelen=16}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("8.8.8.8")}, msg_namelen=16}}], 2, 0) = 2',
+    'connect(7, {sa_family=AF_INET6, sin6_port=htons(443), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "2001:4860:4860::8888", &sin6_addr), sin6_scope_id=0}, 28) = -1 ENETUNREACH (Network is unreachable)',
+    'socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP) = 7\nconnect(7, {sa_family=AF_INET6, sin6_port=htons(443), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "2001:4860:4860::8888", &sin6_addr), sin6_scope_id=0}, 28) = -1 ENETUNREACH (Network is unreachable)',
+    'socket(AF_INET6, SOCK_DGRAM, IPPROTO_IP) = 7\nconnect(7, {sa_family=AF_INET6, sin6_port=htons(443), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "2001:4860:4860::8888", &sin6_addr), sin6_scope_id=0}, 28) = 0',
 ):
     try:
-        assert_loopback_only([forbidden])
+        assert_offline_only(forbidden.splitlines())
     except AssertionError:
         pass
     else:
-        raise AssertionError(f"synthetic external case was accepted: {forbidden}")
+        raise AssertionError(f"synthetic forbidden case was accepted: {forbidden}")
 
 evidence = Path(sys.argv[1])
 binary = sys.argv[2]
 source = sys.argv[3]
+bootstrap_python = sys.argv[4]
+close_fds_code = sys.argv[5]
 expected_argv = {
     "version": [binary, "--version"],
     "doctor": [binary, "doctor", "--json"],
@@ -600,14 +706,35 @@ expected_argv = {
     "render-1": [binary, "render", source, "-o", str(evidence / "render-1.mp4"), "--json"],
     "render-2": [binary, "render", source, "-o", str(evidence / "render-2.mp4"), "--json"],
 }
+exec_pattern = re.compile(rf'execve\({re.escape(json.dumps(binary))}, (\[.*?\]), ')
+bootstrap_pattern = re.compile(
+    rf'execve\({re.escape(json.dumps(bootstrap_python))}, (\[.*?\]), '
+)
 for prefix in ("version", "doctor", "lint", "check", "preview", "render-1", "render-2"):
     traces = sorted(evidence.glob(f"{prefix}.net*"))
     assert traces, f"missing strace output for {prefix}"
     lines = [line for path in traces for line in path.read_text(errors="replace").splitlines()]
-    exact_exec = f'execve("{binary}", {json.dumps(expected_argv[prefix])}'
-    assert any(exact_exec in line for line in lines), \
-        f"missing exact HyperFrames exec argv for {prefix}: {expected_argv[prefix]}"
-    assert_loopback_only(lines)
+    executed_argv = [
+        json.loads(match.group(1))
+        for line in lines
+        if (match := exec_pattern.search(line))
+    ]
+    assert executed_argv == [expected_argv[prefix]], \
+        f"unexpected HyperFrames exec argv multiset for {prefix}: {executed_argv}"
+    bootstrap_argv = [
+        json.loads(match.group(1))
+        for line in lines
+        if (match := bootstrap_pattern.search(line))
+    ]
+    assert len(bootstrap_argv) == 1
+    assert bootstrap_argv[0][:3] == [bootstrap_python, "-c", close_fds_code]
+    expected_blocked_probes = 1 if prefix in {"check", "render-1", "render-2"} else 0
+    blocked_probes = sum(
+        assert_offline_only(path.read_text(errors="replace").splitlines())
+        for path in traces
+    )
+    assert blocked_probes == expected_blocked_probes, \
+        f"unexpected Chromium IPv6 route-probe count for {prefix}: {blocked_probes}"
 PY
 python - "$P3_GATE_EVIDENCE/doctor.json" "$P3_GATE_EVIDENCE/lint.json" "$P3_GATE_EVIDENCE/check.json" <<'PY'
 import json, sys
@@ -662,7 +789,7 @@ ffmpeg -v error -i "$P3_GATE_EVIDENCE/render-2.mp4" -map 0:v:0 -f framemd5 "$P3_
 diff -u "$P3_GATE_EVIDENCE/render-1.framemd5" "$P3_GATE_EVIDENCE/render-2.framemd5"
 ```
 
-Record browser/Node/FFmpeg versions, boolean `data-no-timeline` CSS CUT source hashes, exact non-version `--json` argv, parsed required doctor checks, full `-s 65535 -v` per-command process/network traces, total frame count `10`, frame-4 red/frame-5 blue boundary RGB and equal repeat-render framemd5, and keep the disposable directory as gate evidence. Any source mutation, abbreviated/opaque trace, any external attempt (including DNS `127.0.0.53`), missing/exact-argv process trace, doctor/check incompatibility, preview leak, metadata mismatch, constant/top-layer-only output, wrong CUT boundary or render-to-render framemd5 mismatch stops before Task 1; do not weaken the gate or substitute another renderer.
+Record browser/Node/FFmpeg versions, boolean `data-no-timeline` CSS CUT source hashes, exact non-version `--json` argv, parsed required doctor checks, sanitized `env -i` plus full `-s 65535 -v` per-command process/network traces, the exact blocked Chromium UDP route probe, total frame count `10`, frame-4 red/frame-5 blue boundary RGB and equal repeat-render framemd5, and keep the disposable directory as gate evidence. Any source mutation, abbreviated/opaque destination or argv, unexpected host-environment inheritance, any unapproved external destination/send (including DNS `127.0.0.53`), a missing/mismatched/extra/successful Chromium route probe, missing exact-argv process trace, doctor/check incompatibility, preview leak, metadata mismatch, constant/top-layer-only output, wrong CUT boundary or render-to-render framemd5 mismatch stops before Task 1; do not weaken the gate or substitute another renderer.
 
 - [ ] **Step 7: Ignore only local install/scratch output**
 
@@ -2016,6 +2143,7 @@ Exercise runner injection only through the module-internal adapter seam; default
 ```python
 def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
     validated_browser_path = write_fake_browser_executable(tmp_path)
+    validated_ip_path = write_fake_ip_executable(tmp_path)
     runner = FakeRunner(
         version="0.7.103",
         results={"lint": clean_lint_json(), "check": clean_check_json(), "render": ""},
@@ -2024,6 +2152,7 @@ def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
         runner=runner,
         expected_version="0.7.103",
         browser_path=validated_browser_path,
+        ip_path=validated_ip_path,
     ).render(
         attempt=make_render_attempt(tmp_path),
     )
@@ -2031,6 +2160,9 @@ def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
     assert {call.env["HYPERFRAMES_NO_UPDATE_CHECK"] for call in runner.calls} == {"1"}
     assert {call.env["HYPERFRAMES_BROWSER_PATH"] for call in runner.calls} == {
         str(validated_browser_path)
+    }
+    assert {call.env["P3_IP_PATH"] for call in runner.calls} == {
+        str(validated_ip_path)
     }
     assert result.output.output_sha256 == hashlib.sha256(
         result.output.verified_bytes
@@ -2042,7 +2174,9 @@ def test_adapter_rejects_remotion_without_fallback(tmp_path):
     runner = FakeRunner()
     with pytest.raises(AiVideoError) as exc:
         HyperFramesAdapter(
-            runner, "0.7.103", browser_path=write_fake_browser_executable(tmp_path)
+            runner, "0.7.103",
+            browser_path=write_fake_browser_executable(tmp_path),
+            ip_path=write_fake_ip_executable(tmp_path),
         ).render(
             attempt=make_render_attempt(tmp_path, renderer_kind="remotion")
         )
@@ -2055,7 +2189,9 @@ def test_adapter_reports_typed_phase_failure_without_next_command(tmp_path, fail
     runner = FakeRunner(fail_at=failed_phase)
     with pytest.raises(RendererAttemptError) as exc:
         HyperFramesAdapter(
-            runner, "0.7.103", browser_path=write_fake_browser_executable(tmp_path)
+            runner, "0.7.103",
+            browser_path=write_fake_browser_executable(tmp_path),
+            ip_path=write_fake_ip_executable(tmp_path),
         ).render(make_render_attempt(tmp_path))
     assert exc.value.phase == failed_phase
     assert all(call.command != "render" for call in runner.calls) if failed_phase != "render" else True
@@ -2086,6 +2222,12 @@ def test_production_runner_has_no_host_network_fallback_when_namespace_is_unavai
 def test_production_runner_injects_exact_browser_env_timeout_and_redacts_output(tmp_path): ...
 
 
+def test_controlled_env_is_exact_and_includes_validated_ip_path(tmp_path): ...
+
+
+def test_production_runner_closes_inherited_fds(tmp_path): ...
+
+
 def test_output_verification_ffprobe_uses_exact_proc_fd_argv_and_pass_fds(tmp_path): ...
 
 
@@ -2103,7 +2245,7 @@ def test_verification_snapshot_path_swap_between_hash_probe_and_framemd5_never_m
 
 ```
 
-Also cover wrong tool version, nonzero doctor status with otherwise valid-looking JSON, malformed/missing doctor checks, a required doctor check with `ok != true`, malformed lint/check JSON, lint errors, check errors, warnings policy, missing/empty output, output hash mismatch, measured width/height/FPS/frame-count mismatch, unexpected audio stream, timeout, stderr truncation/redaction, no source mutation after lint, and only one selected renderer. Doctor acceptance requires `returncode == 0` and named `Node.js`/`FFmpeg`/`FFprobe`/`Chrome` entries each present exactly once with JSON boolean `ok: true`; do not require top-level `ok`, because optional Whisper/TTS/BGM checks may fail. Assert every production HyperFrames argv except `--version`/`--help` contains root `--json`, including doctor and render, and assert the exact source observed before lint carries boolean `data-no-timeline`.
+Also cover wrong tool version, nonzero doctor status with otherwise valid-looking JSON, malformed/missing doctor checks, a required doctor check with `ok != true`, malformed lint/check JSON, lint errors, check errors, warnings policy, missing/empty output, output hash mismatch, measured width/height/FPS/frame-count mismatch, unexpected audio stream, timeout, stderr truncation/redaction, no source mutation after lint, and only one selected renderer. Doctor acceptance requires `returncode == 0` and named `Node.js`/`FFmpeg`/`FFprobe`/`Chrome` entries each present exactly once with JSON boolean `ok: true`; do not require top-level `ok`, because optional Whisper/TTS/BGM checks may fail. Assert `_controlled_env()` contains exactly fixed `PATH`/`LANG`/`LC_ALL`/`TMPDIR`, `OFFLINE_ENV`, validated `HYPERFRAMES_BROWSER_PATH` and validated `P3_IP_PATH`, with no proxy/credential/host extras; production discovery resolves the host `ip` command once to a canonical non-symlink executable path matching Task 0/6, while directly supplied invalid/symlink/non-executable IP paths fail before invocation. Assert real `subprocess.run()` uses `stdin=subprocess.DEVNULL`, `stdout=subprocess.PIPE`, `stderr=subprocess.PIPE` and `close_fds=True`. Assert every production HyperFrames argv except `--version`/`--help` contains root `--json`, including doctor and render, and assert the exact source observed before lint carries boolean `data-no-timeline`.
 
 Add output-path tests proving a sibling/absolute/`..`/symlink-escape output is rejected before mkdir/render. The adapter validates the exact staged-output and verification-snapshot names directly beneath `allowed_staging_parent`, verifies that attempt directory is still no-follow mode `0o700`, then explicitly uses only those paths; it never attempts to express either output relative to the source root. HyperFrames creates the staged output itself, so tests must not assert it was opened with `O_EXCL`; only agent-owned source materialization and verification-snapshot creation receive that guarantee.
 
@@ -2173,8 +2315,11 @@ class _NetworkIsolatedHyperFramesRunner:
             cwd=self._project_root,
             env=dict(self._env),
             shell=False,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            close_fds=True,
             check=False,
-            capture_output=True,
             text=True,
             timeout=timeout_seconds,
         )
@@ -2225,28 +2370,28 @@ OFFLINE_ENV = {
 }
 
 
-def _controlled_env(browser_path: Path) -> dict[str, str]:
-    if not browser_path.is_absolute():
-        raise _renderer_unavailable("Pinned HyperFrames browser path must be absolute.")
-    snapshot = _read_regular_file_nofollow(
-        browser_path,
-        contained_by=browser_path.parent,
-    )
-    if snapshot.mode & 0o111 == 0:
-        raise _renderer_unavailable("Pinned HyperFrames browser is not executable.")
+def _controlled_env(browser_path: Path, ip_path: Path) -> dict[str, str]:
+    for label, path in (("browser", browser_path), ("ip", ip_path)):
+        if not path.is_absolute():
+            raise _renderer_unavailable(f"Pinned HyperFrames {label} path must be absolute.")
+        snapshot = _read_regular_file_nofollow(path, contained_by=path.parent)
+        if snapshot.mode & 0o111 == 0:
+            raise _renderer_unavailable(f"Pinned HyperFrames {label} path is not executable.")
     env = {
-        key: os.environ[key]
-        for key in ("PATH", "LANG", "LC_ALL", "TMPDIR")
-        if key in os.environ
+        "PATH": os.environ.get("PATH", os.defpath),
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": os.environ.get("TMPDIR", "/tmp"),
     }
     env.update(OFFLINE_ENV)
     env["HYPERFRAMES_BROWSER_PATH"] = str(browser_path)
+    env["P3_IP_PATH"] = str(ip_path)
     return env
 ```
 
-The private `_NetworkIsolatedHyperFramesRunner` constructor validates the lock-resolved project-local `node_modules/.bin/hyperframes` target/integrity, exact no-follow browser and absolute executable `unshare`, `ip`, `bash` paths with `lstat`; npm's expected `.bin` link is accepted only when its target is the exact lock-owned package executable under this `node_modules`, while source/scratch/durable artifact symlinks remain categorically forbidden. Its controlled env fixes `P3_IP_PATH` for the literal wrapper and `HYPERFRAMES_BROWSER_PATH` for HyperFrames. It runs a harmless namespace capability probe through the same argv form; missing user/net/PID namespace, loopback setup, executable or permission maps to non-retryable `RENDERER_UNAVAILABLE`. Every production `version`, `doctor --json`, `lint ... --json`, `check ... --json` and `render ... --json` call creates a new Linux user+network+PID namespace, brings up loopback, then uses the fixed `exec "$@"` wrapper. `_namespace_argv()` fails closed if any non-help/non-version command omits root `--json`, because env flags alone do not stop the `0.7.103` root dispatcher update checks. Renderer arguments are positional argv after sentinel `$0`; none is interpolated into shell text. There is no direct-host subprocess path, retry or fallback. Timeout, bounded capture and redaction apply at this concrete boundary. Live integration observes the runner with full `strace -s 65535 -v -e trace=network,process`, including every `sendmmsg` destination; abbreviated, opaque, unsupported or external destinations fail the proof.
+The private `_NetworkIsolatedHyperFramesRunner` constructor validates the lock-resolved project-local `node_modules/.bin/hyperframes` target/integrity, exact no-follow browser and absolute executable `unshare`, canonical non-symlink `ip`, and `bash` paths with `lstat`; npm's expected `.bin` link is accepted only when its target is the exact lock-owned package executable under this `node_modules`, while source/scratch/durable artifact symlinks remain categorically forbidden. Both the runner and internal adapter receive the same validated browser/IP paths and assign the result of the single canonical `_controlled_env(browser_path, ip_path)`; `_require_exact_controlled_env()` compares those identical mappings. Its controlled env contains only the explicit safe-variable allowlist, fixes `P3_IP_PATH` for the literal wrapper and `HYPERFRAMES_BROWSER_PATH` for HyperFrames, and never inherits proxy, credential or unrelated host variables. It runs a harmless namespace capability probe through the same argv form; missing user/net/PID namespace, loopback setup, executable or permission maps to non-retryable `RENDERER_UNAVAILABLE`. Every production `version`, `doctor --json`, `lint ... --json`, `check ... --json` and `render ... --json` call creates a new Linux user+network+PID namespace, brings up loopback, then uses the fixed `exec "$@"` wrapper. `_namespace_argv()` fails closed if any non-help/non-version command omits root `--json`, because env flags alone do not stop the `0.7.103` root dispatcher update checks. Renderer arguments are positional argv after sentinel `$0`; none is interpolated into shell text. `subprocess.run(..., stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)` prevents inherited connected sockets on every standard and non-standard FD. There is no direct-host subprocess path, retry or fallback. Timeout, bounded capture and redaction apply at this concrete boundary. Live integration observes the runner with full `strace --decode-pids=pidns -s 65535 -v -e trace=network,process`, including every `sendmmsg` destination; it admits only the structurally decoded local/kernel destinations and exact synchronously blocked Chromium UDP reachability probe from Task 0, while opaque/unsupported destinations, external sends and every other/successful external connect fail the proof.
 
-Task 4 implements the private production runner plus the module-internal adapter seam, lint/check evidence and scratch-output verification. Runner injection exists only at that internal test seam. Task 5 knows canonical durable paths and therefore is the only stage that seals `RendererSourceReceipt`/`RenderReceipt`; Task 4 must not put scratch paths into semantic receipts. Task 5 also adds the named `render_with_hyperframes()` orchestration after the real lifecycle request/API types exist; do not create a temporary alias or duplicate request model here.
+Production discovery canonicalizes the located host `ip` executable once (equivalent to Task 0/6 `readlink -f`) before passing it into the no-follow validator; a caller-provided symlink is never silently accepted. Task 4 implements the private production runner plus the module-internal adapter seam, lint/check evidence and scratch-output verification. Runner injection exists only at that internal test seam. Task 5 knows canonical durable paths and therefore is the only stage that seals `RendererSourceReceipt`/`RenderReceipt`; Task 4 must not put scratch paths into semantic receipts. Task 5 also adds the named `render_with_hyperframes()` orchestration after the real lifecycle request/API types exist; do not create a temporary alias or duplicate request model here.
 
 `OFFLINE_ENV` 是必要但不充分的 process policy：它不阻止 npm update fetch 或 browser download。默认 unit tests 只使用 fake runner；real runner/live spike 还必须在 OS-level egress denial/observability 下运行，并用经 Renderer Gate 验收的 `HYPERFRAMES_BROWSER_PATH` 显式指向预先安装的 browser。
 
@@ -2274,12 +2419,13 @@ class HyperFramesAdapter:
         probe: Callable[[int], dict] = probe_clip_fd,
         decoded_frames: Callable[[int], str] = decoded_frame_sha256_fd,
         browser_path: Path,
+        ip_path: Path,
     ) -> None:
         self._runner = runner
         self._expected_version = expected_version
         self._probe = probe
         self._decoded_frames = decoded_frames
-        self._env = _controlled_env(browser_path)
+        self._env = _controlled_env(browser_path, ip_path)
 
     def _check(
         self,
@@ -2778,6 +2924,7 @@ try:
         runner=runner,
         expected_version=expected_version,
         browser_path=validated_browser_path,
+        ip_path=validated_ip_path,
     )
     # Adapter verifies version/doctor under controlled env, then source/lint/check/render/verify.
     result = adapter.render(...)
@@ -2823,7 +2970,7 @@ def test_public_render_with_hyperframes_has_no_runner_or_adapter_injection_param
 def test_live_committed_fixture_render_state_lifecycle(tmp_path): ...  # opt-in Task 6 only
 ```
 
-Assert event order begins with `begin_render_attempt`. Pre-candidate failure ends in one `record_render_failure`; success ends in `activate_render_state`. Assert `activation_request(durable, ...)` carries exactly the sealed durable result's sorted `N + 6` `PreparedArtifact`s and exact `RenderStateSnapshotPointer`; it must not accept the scratch `HyperFramesRenderResult`. If activation reports an internally persisted terminal failure or `PRODUCTION_STATE_OUTCOME_UNKNOWN`, `record_render_failure` is not called, so no stale R+1 retry occurs. Failed Manifest status is terminal, active/project/registry pointers are unchanged, and no alternate renderer runs. The live test is marked/guarded so only the explicit Task 6 command selects it; default fake tests do not claim live proof.
+Assert event order begins with `begin_render_attempt`. Pre-candidate failure ends in one `record_render_failure`; success ends in `activate_render_state`. Assert `activation_request(durable, ...)` carries exactly the sealed durable result's sorted `N + 6` `PreparedArtifact`s and exact `RenderStateSnapshotPointer`; it must not accept the scratch `HyperFramesRenderResult`. If activation reports an internally persisted terminal failure or `PRODUCTION_STATE_OUTCOME_UNKNOWN`, `record_render_failure` is not called, so no stale R+1 retry occurs. Failed Manifest status is terminal, active/project/registry pointers are unchanged, and no alternate renderer runs. The live test is marked/guarded so only the explicit Task 6 command selects it; default fake tests do not claim live proof. When and only when `P3_LIVE_RENDERER=1`, it requires absolute `P3_BINARY` and `P3_INTEGRATION_EVIDENCE`, records the exact ten expected HyperFrames argv arrays—two each for version/doctor/lint/check/render with the actual two staging/output paths—in `expected-argv.json` under that evidence directory before invocation, and hashes that manifest after the calls so Task 6 can require complete multiset equality rather than infer dynamic paths.
 
 - [ ] **Step 6: Prepare and validate the variable exact success artifact set**
 
@@ -3020,22 +3167,36 @@ Expected: selection durably fixes timeline/project/registry provenance before an
 
 - [ ] **Step 1: Confirm Task 0 gate evidence still matches the lock**
 
-Verify the recorded Task 0 compatibility proof names exact `hyperframes@0.7.103`, the accepted browser executable/revision, boolean `data-no-timeline`, root-only runtime timing, clip-only integer frame/sample metadata and capture-safe CSS CUT keyframes, successful version, zero-exit parsed JSON doctor/lint/check, preview/two renders using the `--json` dispatcher sentinel, the non-terminating `10@24` duration with frame-4/frame-5 CUT samples and total frame count `10`, source hashes, full `strace -s 65535 -v` process/network/sendmmsg audit, ffprobe metadata and equal framemd5. Preview/render stdout remains `.log` evidence, not assumed JSON. Recheck `package-lock.json` integrity and browser `--version`. This is a drift check; the Renderer Gate was already required before Task 1 and must not be deferred here.
+Verify the recorded Task 0 compatibility proof names exact `hyperframes@0.7.103`, the accepted browser executable/revision, boolean `data-no-timeline`, root-only runtime timing, clip-only integer frame/sample metadata and capture-safe CSS CUT keyframes, successful version, zero-exit parsed JSON doctor/lint/check, preview/two renders using the `--json` dispatcher sentinel, the non-terminating `10@24` duration with frame-4/frame-5 CUT samples and total frame count `10`, source hashes, full `strace --decode-pids=pidns -s 65535 -v` process/network/sendmmsg audit, ffprobe metadata and equal framemd5. Preview/render stdout remains `.log` evidence, not assumed JSON. Recheck `package-lock.json` integrity and browser `--version`. This is a drift check; the Renderer Gate was already required before Task 1 and must not be deferred here.
 
 - [ ] **Step 2: Run the committed-fixture production integration proof**
 
-Run the opt-in `test_live_committed_fixture_render_state_lifecycle` added in Task 5. Do not wrap pytest in an outer namespace: the public API must prove that its private production runner creates a fresh namespace for every HyperFrames command. Wrap pytest only with observational `strace -ff -s 65535 -v` so every runner descendant, full argv and every decoded sockaddr remain auditable:
+Run the opt-in `test_live_committed_fixture_render_state_lifecycle` added in Task 5. Do not wrap pytest in an outer namespace: the public API must prove that its private production runner creates a fresh namespace for every HyperFrames command. Wrap pytest only with observational `strace -ff --decode-pids=pidns -s 65535 -v` so every runner descendant, full argv, namespace-visible/outer PID mapping and every decoded sockaddr remain auditable:
 
 ```bash
 set -euo pipefail
-export P3_LIVE_RENDERER=1
-export HYPERFRAMES_BROWSER_PATH="$P3_HYPERFRAMES_BROWSER_PATH"
+P3_ENV=$(command -v env)
+P3_STRACE=$(command -v strace)
+P3_PYTHON=$(command -v python)
+P3_IP_PATH=$(readlink -f "$(command -v ip)")
 P3_BINARY="$PWD/node_modules/.bin/hyperframes"
-test -x "$P3_BINARY"
+test -x "$P3_ENV" && test -x "$P3_STRACE"
+test -x "$P3_PYTHON" && test -x "$P3_BINARY"
+test -x "$P3_IP_PATH" && test ! -L "$P3_IP_PATH"
+P3_SAFE_PATH=$PATH
+P3_SAFE_TMPDIR=${TMPDIR:-/tmp}
+P3_CLOSE_FDS_CODE='import os,stat,sys; fd=os.open(os.devnull,os.O_RDONLY); os.dup2(fd,0); fd > 2 and os.close(fd); os.closerange(3,os.sysconf("SC_OPEN_MAX")); assert all(not stat.S_ISSOCK(os.fstat(i).st_mode) for i in (0,1,2)); os.execv(sys.argv[1],sys.argv[1:])'
 P3_INTEGRATION_EVIDENCE=$(mktemp -d)
-export P3_INTEGRATION_EVIDENCE
-if strace -ff -s 65535 -v -e trace=network,process -o "$P3_INTEGRATION_EVIDENCE/integration.net" \
-    python -m pytest tests/test_production_hyperframes.py -q \
+if "$P3_ENV" -i PATH="$P3_SAFE_PATH" LANG=C.UTF-8 LC_ALL=C.UTF-8 \
+    TMPDIR="$P3_SAFE_TMPDIR" P3_LIVE_RENDERER=1 \
+    P3_INTEGRATION_EVIDENCE="$P3_INTEGRATION_EVIDENCE" \
+    P3_BINARY="$P3_BINARY" \
+    HYPERFRAMES_BROWSER_PATH="$P3_HYPERFRAMES_BROWSER_PATH" \
+    P3_IP_PATH="$P3_IP_PATH" \
+    "$P3_STRACE" -ff --decode-pids=pidns -s 65535 -v -e trace=network,process \
+    -o "$P3_INTEGRATION_EVIDENCE/integration.net" \
+    "$P3_PYTHON" -c "$P3_CLOSE_FDS_CODE" \
+    "$P3_PYTHON" -m pytest tests/test_production_hyperframes.py -q \
     -k test_live_committed_fixture_render_state_lifecycle; then
   P3_PYTEST_STATUS=0
 else
@@ -3043,105 +3204,282 @@ else
 fi
 printf '%s\n' "$P3_PYTEST_STATUS" >"$P3_INTEGRATION_EVIDENCE/pytest.status"
 test "$P3_PYTEST_STATUS" -eq 0
-python - "$P3_INTEGRATION_EVIDENCE" "$P3_BINARY" <<'PY'
+test -s "$P3_INTEGRATION_EVIDENCE/expected-argv.json"
+sha256sum "$P3_INTEGRATION_EVIDENCE/expected-argv.json" \
+  >"$P3_INTEGRATION_EVIDENCE/expected-argv.sha256"
+python - "$P3_INTEGRATION_EVIDENCE" "$P3_BINARY" \
+  "$P3_PYTHON" "$P3_CLOSE_FDS_CODE" <<'PY'
+from collections import Counter
 from pathlib import Path
 import json, re, sys
 
 
-def assert_loopback_only(lines: list[str]) -> None:
-    network_call = re.compile(r"\b(connect|sendto|sendmsg|sendmmsg)\(")
+SOCKET = re.compile(
+    r"^socket\((AF_[A-Z0-9_]+),\s*([^,]+),\s*([^)]+)\)\s*=\s*([0-9]+)$"
+)
+NETWORK_CALL = re.compile(r"^\s*(connect|sendto|sendmsg|sendmmsg)\(")
+CONNECT = re.compile(
+    r"^connect\(([0-9]+),\s*(\{[^{}]*\}|0x[0-9a-fA-F]+|NULL|\.\.\.),\s*"
+    r"([0-9]+)\)\s*=\s*(.+)$"
+)
+SENDTO = re.compile(
+    r"^sendto\(([0-9]+),.*?,\s*(\{[^{}]*\}|0x[0-9a-fA-F]+|NULL|\.\.\.),\s*"
+    r"([0-9]+)\)\s*=\s*(.+)$"
+)
+SENDMSG = re.compile(
+    r"^sendmsg\(([0-9]+),\s*\{msg_name=(\{[^{}]*\}|0x[0-9a-fA-F]+|NULL|\.\.\.),\s*"
+    r"msg_namelen=([0-9]+)(?=,|\})"
+)
+SENDMMSG_TAIL = re.compile(r"\],\s*([0-9]+),\s*[^)]*\)\s*=\s*.+$")
+MSG_HDR = re.compile(
+    r"msg_hdr=\{msg_name=(\{[^{}]*\}|0x[0-9a-fA-F]+|NULL|\.\.\.),\s*"
+    r"msg_namelen=([0-9]+)(?=,|\})"
+)
+IPV4 = re.compile(
+    r'^\{sa_family=AF_INET,\s*sin_port=htons\(([0-9]+)\),\s*'
+    r'sin_addr=inet_addr\("([^"]+)"\)\}$'
+)
+IPV6 = re.compile(
+    r'^\{sa_family=AF_INET6,\s*sin6_port=htons\(([0-9]+)\)'
+    r'(?:,\s*sin6_flowinfo=htonl\([0-9]+\))?,\s*'
+    r'inet_pton\(AF_INET6,\s*"([^"]+)",\s*&sin6_addr\)'
+    r'(?:,\s*sin6_scope_id=[0-9]+)?\}$'
+)
+UNIX = re.compile(r'^\{sa_family=AF_UNIX,\s*sun_path=(?:@?"[^"]*"|NULL)\}$')
+NETLINK = re.compile(
+    r"^\{sa_family=AF_NETLINK,\s*nl_pid=(0),\s*nl_groups=(00000000)\}$"
+)
+
+
+def decode_destination(sockaddr: str, length: str) -> tuple[object, ...]:
+    if sockaddr == "NULL":
+        if length != "0":
+            raise AssertionError(f"NULL destination has nonzero length: {length}")
+        return ("null",)
+    if sockaddr.startswith("0x") or sockaddr == "...":
+        raise AssertionError(f"opaque network destination: {sockaddr}")
+    if match := IPV4.fullmatch(sockaddr):
+        if length != "16":
+            raise AssertionError(f"invalid IPv4 sockaddr length: {length}")
+        return ("ipv4", match.group(2), int(match.group(1)))
+    if match := IPV6.fullmatch(sockaddr):
+        if length != "28":
+            raise AssertionError(f"invalid IPv6 sockaddr length: {length}")
+        return ("ipv6", match.group(2), int(match.group(1)))
+    if UNIX.fullmatch(sockaddr):
+        if not length.isdigit() or not 1 <= int(length) <= 110:
+            raise AssertionError(f"invalid AF_UNIX sockaddr length: {length}")
+        return ("unix",)
+    if NETLINK.fullmatch(sockaddr):
+        if length != "12":
+            raise AssertionError(f"invalid AF_NETLINK sockaddr length: {length}")
+        return ("netlink-kernel",)
+    raise AssertionError(f"unsupported or undecodable network destination: {sockaddr}")
+
+
+def assert_offline_only(lines: list[str]) -> int:
+    sockets: dict[str, tuple[str, str, str]] = {}
+    blocked_probe_count = 0
     for line in lines:
-        match = network_call.search(line)
-        if not match:
+        if match := SOCKET.fullmatch(line):
+            sockets[match.group(4)] = match.groups()[:3]
             continue
-        call = match.group(1)
-        if "..." in line or "msg_name=0x" in line:
-            raise AssertionError(f"abbreviated or opaque network destination: {line}")
-        families = re.findall(r"sa_family=(AF_[A-Z0-9_]+)", line)
-        if any(family not in {"AF_INET", "AF_INET6", "AF_UNIX"} for family in families):
-            raise AssertionError(f"unsupported network family: {line}")
-        ipv4_families = len(re.findall(r"sa_family=AF_INET(?!6)", line))
-        ipv6_families = len(re.findall(r"sa_family=AF_INET6", line))
-        unix_families = len(re.findall(r"sa_family=AF_UNIX", line))
-        ipv4_addresses = re.findall(r'sin_addr=inet_addr\("([^"]+)"\)', line)
-        ipv6_addresses = re.findall(r'inet_pton\(AF_INET6, "([^"]+)"', line)
-        ipv4_ports = re.findall(r"sin_port=htons\([0-9]+\)", line)
-        ipv6_ports = re.findall(r"sin6_port=htons\([0-9]+\)", line)
-        unix_addresses = re.findall(r'sa_family=AF_UNIX,\s*sun_path=(?:@?"[^"]*"|NULL)', line)
-        if (
-            ipv4_families != len(ipv4_addresses) or ipv4_families != len(ipv4_ports)
-            or ipv6_families != len(ipv6_addresses) or ipv6_families != len(ipv6_ports)
-            or unix_families != len(unix_addresses)
-            or len(families) != ipv4_families + ipv6_families + unix_families
-        ):
-            raise AssertionError(f"undecodable network destination: {line}")
-        if any(address != "127.0.0.1" for address in ipv4_addresses):
-            raise AssertionError(f"external IPv4 attempt: {line}")
-        if any(address != "::1" for address in ipv6_addresses):
-            raise AssertionError(f"external IPv6 attempt: {line}")
-        if call == "connect" and len(families) != 1:
-            raise AssertionError(f"connect destination is not explicitly decoded: {line}")
-        if call != "connect" and not families:
-            null_destination = (
-                call == "sendto" and re.search(r",\s*NULL,\s*0\)\s*=", line) is not None
-                or call == "sendmsg" and line.count("msg_name=NULL") == 1
-                or call == "sendmmsg"
-                and line.count("msg_hdr={") > 0
-                and line.count("msg_hdr={") == line.count("msg_name=NULL")
-            )
-            if not null_destination:
-                raise AssertionError(f"send destination is not explicitly decoded: {line}")
+        call_match = NETWORK_CALL.match(line)
+        if not call_match:
+            continue
+        call = call_match.group(1)
+        if call == "connect":
+            match = CONNECT.fullmatch(line)
+            if not match:
+                raise AssertionError(f"undecodable connect destination: {line}")
+            fd, sockaddr, length, result = match.groups()
+            destination = decode_destination(sockaddr, length)
+            if destination[0] == "ipv4" and destination[1] != "127.0.0.1":
+                raise AssertionError(f"external IPv4 attempt: {line}")
+            if destination[0] == "ipv6" and destination[1] != "::1":
+                exact_blocked_probe = (
+                    destination == ("ipv6", "2001:4860:4860::8888", 443)
+                    and sockets.get(fd) == ("AF_INET6", "SOCK_DGRAM", "IPPROTO_IP")
+                    and result == "-1 ENETUNREACH (Network is unreachable)"
+                )
+                if not exact_blocked_probe:
+                    raise AssertionError(f"external IPv6 attempt: {line}")
+                blocked_probe_count += 1
+            if destination[0] not in {
+                "ipv4", "ipv6", "unix", "netlink-kernel"
+            }:
+                raise AssertionError(f"connect has no explicit destination: {line}")
+            continue
+        if call == "sendto":
+            match = SENDTO.fullmatch(line)
+            if not match:
+                raise AssertionError(f"undecodable sendto destination: {line}")
+            _, sockaddr, length, _ = match.groups()
+            destinations = [decode_destination(sockaddr, length)]
+        elif call == "sendmsg":
+            match = SENDMSG.match(line)
+            if not match:
+                raise AssertionError(f"undecodable sendmsg destination: {line}")
+            _, sockaddr, length = match.groups()
+            destinations = [decode_destination(sockaddr, length)]
+        else:
+            tail = SENDMMSG_TAIL.search(line)
+            if not tail:
+                raise AssertionError(f"undecodable sendmmsg vector: {line}")
+            headers = MSG_HDR.findall(line)
+            if len(headers) != int(tail.group(1)):
+                raise AssertionError(f"abbreviated sendmmsg vector: {line}")
+            destinations = [decode_destination(*header) for header in headers]
+        for destination in destinations:
+            if destination[0] == "ipv4" and destination[1] != "127.0.0.1":
+                raise AssertionError(f"external IPv4 send attempt: {line}")
+            if destination[0] == "ipv6" and destination[1] != "::1":
+                raise AssertionError(f"external IPv6 send attempt: {line}")
+    return blocked_probe_count
 
 
-assert_loopback_only([
+assert assert_offline_only([
     'connect(3, {sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}, 16) = 0',
+    'sendto(3, "payload ...", 11, 0, NULL, 0) = 11',
     'sendto(3, "x", 1, 0, {sa_family=AF_INET6, sin6_port=htons(3017), inet_pton(AF_INET6, "::1", &sin6_addr)}, 28) = 1',
     'connect(3, {sa_family=AF_UNIX, sun_path="/tmp/p3.sock"}, 110) = 0',
-    'sendto(3, "x", 1, 0, NULL, 0) = 1',
     'sendmsg(3, {msg_name=NULL, msg_namelen=0}, 0) = 1',
-    'sendmmsg(3, [{msg_hdr={msg_name=NULL}}, {msg_hdr={msg_name=NULL}}], 2, 0) = 2',
-])
+    'sendto(3, "x", 1, 0, {sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, 12) = 1',
+    'sendmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000}, msg_namelen=12}, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name=NULL, msg_namelen=0}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}, msg_namelen=16}}], 2, 0) = 2',
+]) == 0
+assert assert_offline_only([
+    'socket(AF_INET6, SOCK_DGRAM, IPPROTO_IP) = 7',
+    'connect(7, {sa_family=AF_INET6, sin6_port=htons(443), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "2001:4860:4860::8888", &sin6_addr), sin6_scope_id=0}, 28) = -1 ENETUNREACH (Network is unreachable)',
+]) == 1
 for forbidden in (
     'connect(3, {sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("127.0.0.53")}, 16) = 0',
     'sendto(3, "x", 1, 0, {sa_family=AF_INET}, 16) = 1',
-    'connect(3, 0x7ffddeadbeef, 16) = -1 EFAULT',
+    'connect(3, 0x7ffddeadbeef, 16) = -1 EFAULT (Bad address)',
     'sendmsg(3, {msg_name=0x7ffddeadbeef, msg_namelen=16}, 0) = 1',
-    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}}}, ...], 2, 0) = 2',
-    'connect(3, {sa_family=AF_NETLINK}, 12) = 0',
-    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("8.8.8.8")}}}], 2, 0) = 2',
+    'sendto(3, "x", 1, 0, {sa_family=AF_NETLINK, nl_pid=1, nl_groups=00000000}, 12) = 1',
+    'sendmsg(3, {msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000001}, msg_namelen=12}, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name=NULL, msg_namelen=0}}, ...], 2, 0) = 1',
+    'sendmmsg(3, [{msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(3017), sin_addr=inet_addr("127.0.0.1")}, msg_namelen=16}}, {msg_hdr={msg_name={sa_family=AF_INET, sin_port=htons(53), sin_addr=inet_addr("8.8.8.8")}, msg_namelen=16}}], 2, 0) = 2',
+    'connect(7, {sa_family=AF_INET6, sin6_port=htons(443), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "2001:4860:4860::8888", &sin6_addr), sin6_scope_id=0}, 28) = -1 ENETUNREACH (Network is unreachable)',
+    'socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP) = 7\nconnect(7, {sa_family=AF_INET6, sin6_port=htons(443), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "2001:4860:4860::8888", &sin6_addr), sin6_scope_id=0}, 28) = -1 ENETUNREACH (Network is unreachable)',
+    'socket(AF_INET6, SOCK_DGRAM, IPPROTO_IP) = 7\nconnect(7, {sa_family=AF_INET6, sin6_port=htons(443), sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "2001:4860:4860::8888", &sin6_addr), sin6_scope_id=0}, 28) = 0',
 ):
     try:
-        assert_loopback_only([forbidden])
+        assert_offline_only(forbidden.splitlines())
     except AssertionError:
         pass
     else:
-        raise AssertionError(f"synthetic external case was accepted: {forbidden}")
+        raise AssertionError(f"synthetic forbidden case was accepted: {forbidden}")
 
 traces = sorted(Path(sys.argv[1]).glob("integration.net*"))
 assert traces
-lines = [line for path in traces for line in path.read_text(errors="replace").splitlines()]
+trace_lines = {
+    int(path.name.rsplit(".", 1)[1]): path.read_text(errors="replace").splitlines()
+    for path in traces
+}
+lines = [line for process_lines in trace_lines.values() for line in process_lines]
 binary = sys.argv[2]
+bootstrap_python = sys.argv[3]
+close_fds_code = sys.argv[4]
 exec_pattern = re.compile(rf'execve\({re.escape(json.dumps(binary))}, (\[.*?\]), ')
+bootstrap_pattern = re.compile(
+    rf'execve\({re.escape(json.dumps(bootstrap_python))}, (\[.*?\]), '
+)
 synthetic_exec = f'execve({json.dumps(binary)}, {json.dumps([binary, "doctor", "--json"])}, 0x7ffd) = 0'
 synthetic_match = exec_pattern.search(synthetic_exec)
 assert synthetic_match and json.loads(synthetic_match.group(1)) == [binary, "doctor", "--json"]
-executed_argv = [json.loads(match.group(1)) for line in lines if (match := exec_pattern.search(line))]
-assert executed_argv.count([binary, "--version"]) == 2
-assert executed_argv.count([binary, "doctor", "--json"]) == 2
-for command in ("lint", "check"):
-    matches = [argv for argv in executed_argv if len(argv) == 4 and argv[:2] == [binary, command]]
-    assert len(matches) == 2 and all(argv[-1] == "--json" for argv in matches), command
-render_matches = [
-    argv for argv in executed_argv
-    if len(argv) == 6 and argv[:2] == [binary, "render"] and argv[3] == "-o"
+bootstrap_execs = [
+    json.loads(match.group(1))
+    for line in lines
+    if (match := bootstrap_pattern.search(line))
 ]
-assert len(render_matches) == 2 and all(argv[-1] == "--json" for argv in render_matches)
-assert all(argv == [binary, "--version"] or "--json" in argv for argv in executed_argv)
-assert_loopback_only(lines)
+pytest_argv = [
+    bootstrap_python, "-m", "pytest", "tests/test_production_hyperframes.py",
+    "-q", "-k", "test_live_committed_fixture_render_state_lifecycle",
+]
+assert bootstrap_execs == [[
+    bootstrap_python, "-c", close_fds_code, *pytest_argv,
+], pytest_argv]
+expected_payload = json.loads((Path(sys.argv[1]) / "expected-argv.json").read_text())
+assert set(expected_payload) == {"argv"}
+expected_argv = expected_payload["argv"]
+assert isinstance(expected_argv, list) and len(expected_argv) == 10
+assert all(isinstance(argv, list) and argv and argv[0] == binary for argv in expected_argv)
+assert Counter(argv[1] for argv in expected_argv) == Counter({
+    "--version": 2, "doctor": 2, "lint": 2, "check": 2, "render": 2,
+})
+for argv in expected_argv:
+    if argv[1] == "--version":
+        assert argv == [binary, "--version"]
+    elif argv[1] == "doctor":
+        assert argv == [binary, "doctor", "--json"]
+    elif argv[1] in {"lint", "check"}:
+        assert len(argv) == 4 and argv[3] == "--json"
+        assert Path(argv[2]).is_absolute()
+    else:
+        assert len(argv) == 6 and argv[3] == "-o" and argv[5] == "--json"
+        assert Path(argv[2]).is_absolute() and Path(argv[4]).is_absolute()
+source_sets = {
+    command: {argv[2] for argv in expected_argv if argv[1] == command}
+    for command in ("lint", "check", "render")
+}
+assert len(source_sets["lint"]) == 2
+assert source_sets["lint"] == source_sets["check"] == source_sets["render"]
+render_outputs = {argv[4] for argv in expected_argv if argv[1] == "render"}
+assert len(render_outputs) == 2 and not render_outputs & source_sets["render"]
+executed_by_pid = {
+    pid: [json.loads(match.group(1)) for line in process_lines if (match := exec_pattern.search(line))]
+    for pid, process_lines in trace_lines.items()
+}
+executed_argv = [argv for process_argv in executed_by_pid.values() for argv in process_argv]
+assert Counter(map(tuple, executed_argv)) == Counter(map(tuple, expected_argv)), \
+    f"unexpected HyperFrames exec argv multiset: {executed_argv}"
+
+child_pattern = re.compile(
+    r"\b(?:clone|clone3|fork|vfork)\(.*\)\s*=\s*([0-9]+)"
+    r"(?:\s*/\*\s*([0-9]+)\s+in strace's PID NS\s*\*/)?$"
+)
+parents: dict[int, int] = {}
+for parent_pid, process_lines in trace_lines.items():
+    for line in process_lines:
+        if match := child_pattern.search(line):
+            child_pid = int(match.group(2) or match.group(1))
+            if child_pid in trace_lines:
+                assert child_pid not in parents or parents[child_pid] == parent_pid
+                parents[child_pid] = parent_pid
+
+
+def owning_hyperframes_argv(pid: int) -> tuple[str, ...]:
+    visited: set[int] = set()
+    while pid not in visited:
+        visited.add(pid)
+        process_argv = executed_by_pid.get(pid, [])
+        if process_argv:
+            assert len(process_argv) == 1
+            return tuple(process_argv[0])
+        if pid not in parents:
+            break
+        pid = parents[pid]
+    raise AssertionError(f"blocked Chromium probe has no HyperFrames exec ancestor: {visited}")
+
+
+actual_probe_owners: Counter[tuple[str, ...]] = Counter()
+for pid, process_lines in trace_lines.items():
+    blocked_probes = assert_offline_only(process_lines)
+    if blocked_probes:
+        actual_probe_owners[owning_hyperframes_argv(pid)] += blocked_probes
+expected_probe_owners = Counter(
+    tuple(argv)
+    for argv in expected_argv
+    if len(argv) > 1 and argv[1] in {"check", "render"}
+)
+assert actual_probe_owners == expected_probe_owners, \
+    f"unexpected Chromium probe ownership: {actual_probe_owners}"
 PY
 ```
 
-The test copies the committed visually distinct red/blue PNG fixture into two independent disposable projects, builds the same real two-`STATIC_IMAGE`/CUT-only `10`-frame timeline at `24fps` with the CUT at frame `5`, and invokes public `render_with_hyperframes()` once per project. Each call constructs its own private isolated runner and completes `begin_render_attempt -> version -> doctor --json -> source -> lint --json -> check --json -> render --json -> held-FD verify -> activate_render_state`; the trace audit requires exactly two version/doctor/lint/check/render executable argv shapes. Both materializations carry root boolean `data-no-timeline`, root-only `data-start="0"`/final `data-duration="0.416666667"`, no animated `.clip` `data-start`/`data-duration`, exact clip frame/sample metadata and exact capture-safe CSS animations. Each output must have measured frame count `10`; representative center pixels at frame `4` must be red-dominant, frame `5` blue-dominant, and the samples must differ, proving `[start,end)` CUT ownership for a non-terminating duration/ratio. A constant render or permanently visible top layer fails, and the two independent outputs must have equal framemd5. For both projects the test also asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, full decoded-frame evidence, no audio, exact durable output bytes equal the held verification-snapshot bytes, scratch paths absent from receipts, and unchanged Legacy state. Unit tests already assert every non-version runner argv contains `--json`, exact subprocess `/proc/self/fd` argv/`pass_fds` plus namespace argv; this harness hashes committed source inputs before/after and parses full `-s 65535 -v` process/network traces including every `sendmmsg` destination with the same exact fail-closed rule from Task 0. `127.0.0.53`, pointer-only/ellipsis output, unsupported families, a mixed loopback+external `sendmmsg`, any undecodable sockaddr and any other external attempt fail closed. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
+The test copies the committed visually distinct red/blue PNG fixture into two independent disposable projects, builds the same real two-`STATIC_IMAGE`/CUT-only `10`-frame timeline at `24fps` with the CUT at frame `5`, and invokes public `render_with_hyperframes()` once per project. Each call constructs its own private isolated runner and completes `begin_render_attempt -> version -> doctor --json -> source -> lint --json -> check --json -> render --json -> held-FD verify -> activate_render_state`; the expected-argv manifest plus trace audit requires complete multiset equality for exactly two version/doctor/lint/check/render executable argv arrays, including the real dynamic staging/output paths, and rejects every extra invocation. Both materializations carry root boolean `data-no-timeline`, root-only `data-start="0"`/final `data-duration="0.416666667"`, no animated `.clip` `data-start`/`data-duration`, exact clip frame/sample metadata and exact capture-safe CSS animations. Each output must have measured frame count `10`; representative center pixels at frame `4` must be red-dominant, frame `5` blue-dominant, and the samples must differ, proving `[start,end)` CUT ownership for a non-terminating duration/ratio. A constant render or permanently visible top layer fails, and the two independent outputs must have equal framemd5. For both projects the test also asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, full decoded-frame evidence, no audio, exact durable output bytes equal the held verification-snapshot bytes, scratch paths absent from receipts, and unchanged Legacy state. Unit tests already assert every non-version runner argv contains `--json`, exact subprocess `/proc/self/fd` argv/`pass_fds` plus namespace argv; this harness starts pytest with a sanitized `env -i` bootstrap that fixes stdin to `/dev/null`, closes non-standard FDs and rejects any socket on fd `0`/`1`/`2`, hashes committed source inputs before/after and parses full `--decode-pids=pidns -s 65535 -v` process/network traces including every `sendmmsg` destination with the same exact fail-closed rule from Task 0. It parses `--decode-pids=pidns` outer-PID annotations while reconstructing `clone`/`clone3`/`fork`/`vfork` parentage and requires each of the two exact `check` and two exact `render` argv owners to have exactly one structurally verified, synchronously `ENETUNREACH` Chromium UDP route probe, while version/doctor/lint own none. `127.0.0.53`, pointer/opaque destinations, abbreviated message vectors, unsupported families, non-kernel/multicast Netlink, a mixed loopback+external `sendmmsg`, any undecodable sockaddr, any external send, and any other/successful external connect fail closed. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
 
 The live test is selected only by the command above and fail-closes unless `P3_LIVE_RENDERER=1`, exact binary/browser and namespace tracing are present. Default tests exercise the same lifecycle with a fake runner and no Node/Chrome/network; the opt-in test may be deselected by default, not silently reported as a passing live proof.
 
@@ -3303,9 +3641,11 @@ FFMPEG_FAILED never crosses the P3 public boundary.
 Verify one attempt selects exactly one renderer and no Remotion/fallback/double render exists.
 Verify Task 0 gate precedes Task 1 and the non-terminating 10@24 two-raster frame 4/5 evidence plus
 total frame count 10 proves the CUT instead of constant/top-layer output while both renders have equal framemd5;
-full `strace -s 65535 -v` process+network traces cover connect/sendto/sendmsg/sendmmsg, accept only fully decoded
-AF_UNIX, exact inet_addr("127.0.0.1")/inet_pton(AF_INET6,"::1"), or explicit non-abbreviated no-destination NULL;
-explicitly reject pointer-only/ellipsis/unsupported families, 127.0.0.53 and every external attempt,
+full `strace --decode-pids=pidns -s 65535 -v` process+network traces cover connect/sendto/sendmsg/sendmmsg, accept only fully decoded
+AF_UNIX, exact kernel-unicast AF_NETLINK, exact inet_addr("127.0.0.1")/inet_pton(AF_INET6,"::1"),
+explicit zero-length no-destination NULL, or the same-FD exact Chromium UDP route probe synchronously blocked by ENETUNREACH;
+explicitly reject pointer/opaque destinations, abbreviated message vectors, unsupported families, 127.0.0.53,
+non-kernel/multicast Netlink, any external send, and every other/successful external connect,
 and preview cleanup leaves no descendant.
 Verify Task 6 separately proves committed-fixture lifecycle integration.
 Verify rollback keeps 2.1 reader/recovery, disables new entrypoints and never downgrades/deletes.
@@ -3371,9 +3711,9 @@ P3 is accepted only when:
 9. each attempt has one authoritative selection identity and one HyperFrames execution path; `BeginRenderAttemptRequest` does not duplicate timeline/project/registry fields;
 10. Remotion is neither installed nor implemented and no double-render/fallback exists;
 11. one immutable `RenderStateSnapshot` fixes exact active project/registry, selection/timeline fingerprint, canonical durable source HTML/raster bundle, source/render receipts and final canonical output pointers; `RenderReceipt` names the final durable output path but its hash/size/metadata/frame evidence and the output `PreparedArtifact` bytes all originate from the single held verification-snapshot FD; one Manifest pointer activates it and no scratch path is semantic;
-12. Task 0 exact 0.7.103 version/`doctor --json`/`lint --json`/`check --json`/`preview --json`/two `render --json` compatibility gate passes before Task 1 using the same namespace wrapper contract and a two-raster root boolean `data-no-timeline` CSS CUT source at `10` frames/`24fps`; output count is `10`, frame `4` is red-dominant, frame `5` blue-dominant/distinct and render-to-render framemd5 matches. Doctor requires zero exit plus exactly named Node.js/FFmpeg/FFprobe/Chrome checks with `ok:true`, without requiring top-level ok or optional Whisper/TTS/BGM success. Runtime selection is durable before any executable call; only private `_NetworkIsolatedHyperFramesRunner` runs tools, every non-help/non-version argv contains root `--json`, each process gets a fresh user/net/PID namespace + fixed `exec "$@"`/`shell=False`, controlled env injects the validated browser path, missing capability has no host fallback, outer orchestration records every ordinary availability/source/lint/check/render/verify exception only before activation method entry, and `FFMPEG_FAILED` never leaks across P3;
+12. Task 0 exact 0.7.103 version/`doctor --json`/`lint --json`/`check --json`/`preview --json`/two `render --json` compatibility gate passes before Task 1 using the same namespace wrapper contract and a two-raster root boolean `data-no-timeline` CSS CUT source at `10` frames/`24fps`; output count is `10`, frame `4` is red-dominant, frame `5` blue-dominant/distinct and render-to-render framemd5 matches. Doctor requires zero exit plus exactly named Node.js/FFmpeg/FFprobe/Chrome checks with `ok:true`, without requiring top-level ok or optional Whisper/TTS/BGM success. Runtime selection is durable before any executable call; only private `_NetworkIsolatedHyperFramesRunner` runs tools, every command's complete HyperFrames exec argv multiset is exact and every non-help/non-version argv contains root `--json`, each process gets a fresh user/net/PID namespace + fixed `exec "$@"`/`shell=False`/`close_fds=True`, the single canonical controlled env injects validated browser/IP paths and no host extras, missing capability has no host fallback, outer orchestration records every ordinary availability/source/lint/check/render/verify exception only before activation method entry, and `FFMPEG_FAILED` never leaks across P3;
 13. `activation_request()` consumes the sealed durable `N+6` result, never scratch result; `activate_render_state()` owns all four windows: candidate pre-replace ordinary failure is terminal R+2 with exact candidate/hash; candidate ambiguity reopens only exact R+1/R+2 or returns outcome unknown; authoritative R+2 pre-final ordinary failure is terminal R+3; final replace/post-replace ambiguity remains outcome unknown. All terminal paths preserve base active/project/registry state, successful revisions remain `R+1/R+2/R+3`, and exact replay/recovery leaves no conclusively ordinary running residue;
-14. complete timeline/source-bundle/receipt/state/output orphans are preserved and reported; default tests are fake/no-network. Task 0 and Task 6 use full `strace -s 65535 -v` process+network traces covering `connect`/`sendto`/`sendmsg`/`sendmmsg`; they allow only fully decoded AF_UNIX, exact `inet_addr("127.0.0.1")`/`inet_pton(AF_INET6, "::1")`, or explicit non-abbreviated no-destination NULL send calls, and reject pointer-only/ellipsis/unsupported/undecodable sockaddr, `127.0.0.53` and all external attempts fail-closed. The pre-edit gate also proves retrying preview cleanup, and Task 6 separately proves committed-fixture lifecycle integration;
+14. complete timeline/source-bundle/receipt/state/output orphans are preserved and reported; default tests are fake/no-network. Task 0 and Task 6 start under sanitized `env -i`, fix stdin to `/dev/null`, close all non-standard inherited FDs and reject sockets on fd `0`/`1`/`2` before the traced namespace/pytest path, and use full `strace --decode-pids=pidns -s 65535 -v` process+network traces covering `connect`/`sendto`/`sendmsg`/`sendmmsg`; they allow only fully decoded AF_UNIX, exact kernel-unicast AF_NETLINK, exact `inet_addr("127.0.0.1")`/`inet_pton(AF_INET6, "::1")`, explicit zero-length no-destination NULL sends that cannot establish a peer, or the same-trace/same-FD exact Chromium UDP IPv6 reachability probe synchronously blocked by `ENETUNREACH`. They reject pointer/opaque destinations, abbreviated message vectors, unsupported/undecodable sockaddr, non-kernel/multicast Netlink, `127.0.0.53`, any external send and every other/successful external connect fail-closed. Task 0 requires one exact argv per trace prefix; Task 6 independently validates exact command counts/shapes/source-output relationships before requiring expected-argv multiset equality and PID-namespace-aware process-lineage ownership of one blocked probe per check/render and none per version/doctor/lint. The pre-edit gate also proves retrying preview cleanup, and Task 6 separately proves committed-fixture lifecycle integration;
 15. no Audio/Caption, P5 graph, Provider/cloud/paid API, new CLI or Legacy schema/layout enters the diff;
 16. focused P3/P2A, Legacy regression and full default suites pass;
 17. forward rollback keeps 2.1 read/recovery and disables new entrypoints without downgrade or artifact deletion; docs are written only after live/focused/Legacy/full proof, then final independent review has no blocker.
