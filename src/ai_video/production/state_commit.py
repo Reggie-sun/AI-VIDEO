@@ -443,6 +443,7 @@ class ProductionStateCommitter:
             attempts, changed, interrupted_items = self._recover_attempts(manifest)
 
             items.extend(self._remove_fixed_manifest_temp())
+            items.extend(self._remove_owned_attempt_temps(attempts_before_recovery))
             if changed:
                 manifest = _validated_transition(
                     manifest,
@@ -453,7 +454,6 @@ class ProductionStateCommitter:
                 )
                 self._write_manifest_atomic(manifest)
             items.extend(interrupted_items)
-            items.extend(self._remove_owned_attempt_temps(attempts_before_recovery))
             items.extend(self._preserved_orphan_items(manifest, attempts))
             return RecoveryReport(
                 manifest_revision_before=revision_before,

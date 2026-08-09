@@ -101,6 +101,41 @@ def _failed_attempt(root: Path, attempt_id: str) -> tuple[ProductionManifest, ob
     return with_attempt, request
 
 
+def _selected_incomplete_with_project_temp(
+    root: Path, status: StateCommitStatus
+) -> tuple[ProductionManifest, Path]:
+    request = project_factory.make_revision_two_request(root)
+    ProductionStateCommitter(root).commit(request)
+    succeeded_manifest = _read_manifest(root)
+    incomplete = StateCommitAttempt.model_validate(
+        {
+            **succeeded_manifest.attempts[-1].model_dump(mode="python"),
+            "status": status,
+            "finished_at": None,
+            "error_code": (
+                ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN.value
+                if status is StateCommitStatus.OUTCOME_UNKNOWN
+                else None
+            ),
+            "error_message": (
+                "injected unknown outcome"
+                if status is StateCommitStatus.OUTCOME_UNKNOWN
+                else None
+            ),
+        }
+    )
+    unresolved_manifest = ProductionManifest.model_validate(
+        {
+            **succeeded_manifest.model_dump(mode="python"),
+            "attempts": (incomplete,),
+        }
+    )
+    _write_manifest(root, unresolved_manifest)
+    final_path = root / request.next_project.path
+    owned = final_path.parent / _owned_temp_name(incomplete.attempt_id, final_path)
+    return unresolved_manifest, owned
+
+
 @pytest.mark.parametrize(
     ("phase", "occurrence", "selects_candidate"),
     tuple(
@@ -597,6 +632,78 @@ def test_recovery_marks_selected_incomplete_attempt_succeeded(
         )
     assert succeeded_temp.read_bytes() == b"pre-existing succeeded temp"
     assert unrelated.read_bytes() == b"untracked user temp"
+
+
+def test_selected_incomplete_cleanup_failure_keeps_attempt_retryable(
+    committed_project: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    unresolved_manifest, owned = _selected_incomplete_with_project_temp(
+        committed_project, StateCommitStatus.OUTCOME_UNKNOWN
+    )
+    manifest_path = committed_project / "state/manifest.json"
+    unresolved_bytes = manifest_path.read_bytes()
+    owned.write_bytes(b"retryable residue")
+    committer = ProductionStateCommitter(committed_project)
+    remove_recovery_temp = committer._remove_recovery_temp
+
+    def fail_owned_cleanup(path: Path):
+        if path == owned:
+            raise OSError("injected owned temp cleanup failure")
+        return remove_recovery_temp(path)
+
+    monkeypatch.setattr(committer, "_remove_recovery_temp", fail_owned_cleanup)
+
+    with pytest.raises(AiVideoError) as exc:
+        committer.recover()
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert manifest_path.read_bytes() == unresolved_bytes
+    assert owned.read_bytes() == b"retryable residue"
+
+    monkeypatch.setattr(committer, "_remove_recovery_temp", remove_recovery_temp)
+    report = committer.recover()
+    repaired = _read_manifest(committed_project)
+
+    assert repaired.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    assert not owned.exists()
+    assert any(
+        item.path == owned.relative_to(committed_project)
+        and item.disposition is RecoveryDisposition.PARTIAL_REMOVED
+        for item in report.items
+    )
+
+
+def test_selected_incomplete_manifest_write_failure_retries_after_cleanup(
+    committed_project: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    unresolved_manifest, owned = _selected_incomplete_with_project_temp(
+        committed_project, StateCommitStatus.RUNNING
+    )
+    manifest_path = committed_project / "state/manifest.json"
+    unresolved_bytes = manifest_path.read_bytes()
+    owned.write_bytes(b"cleaned before manifest retry")
+    committer = ProductionStateCommitter(committed_project)
+    write_manifest_atomic = committer._write_manifest_atomic
+
+    def fail_repaired_manifest(*args: object, **kwargs: object) -> None:
+        assert not owned.exists()
+        raise OSError("injected repaired Manifest write failure")
+
+    monkeypatch.setattr(committer, "_write_manifest_atomic", fail_repaired_manifest)
+
+    with pytest.raises(AiVideoError) as exc:
+        committer.recover()
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert manifest_path.read_bytes() == unresolved_bytes
+    assert not owned.exists()
+
+    monkeypatch.setattr(committer, "_write_manifest_atomic", write_manifest_atomic)
+    report = committer.recover()
+    repaired = _read_manifest(committed_project)
+
+    assert repaired.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    assert report.manifest_revision_after == unresolved_manifest.manifest_revision + 1
 
 
 def test_recovery_refuses_missing_active_registry_snapshot(committed_project: Path) -> None:
