@@ -110,6 +110,7 @@ P2 reader、registry 和 validation modules 均不得写入或激活 state；P2A
 
 ## Change Rules
 
+- 本仓库单人、单 writer 开发默认直接在 `main` 工作。除非用户明确要求，否则不要创建 feature branch 或 `worktree`；不要仅因为存在可保留且与任务不冲突的 dirty 修改、改动多个文件、使用 plan/spec 或 skill 而增加 Git 隔离。
 - 编辑前先研究现有源码和测试，匹配当前命名、imports 和数据流。
 - 改动要增量化、范围收敛。
 - 除非用户明确批准或任务明确要求，否则不要新增运行时依赖。
