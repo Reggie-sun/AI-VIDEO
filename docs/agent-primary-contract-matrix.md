@@ -32,6 +32,7 @@
 | ffmpeg Boundary | `src/ai_video/ffmpeg_tools.py`、`tests/test_ffmpeg_tools.py` | ffmpeg helper 负责 probe、校验、抽帧、标准化与最终拼接。当 stream copy 不可用时，拼接必须具备兜底能力。 | 优化 fallback 行为、标准化参数或命令构造，同时保持输出兼容。 | `pytest tests/test_ffmpeg_tools.py -v` |
 | Test Fixtures & Realism | `tests/conftest.py`、所有测试 | 在可行时，测试夹具应复用生产加载路径。编排测试优先使用 fake。除非用户明确要求，否则真实 ComfyUI 只是可选项。 | 扩展 fixtures、增加 e2e 风格 fake 测试、提高真实性但不引入网络依赖。 | 如果 fixture 改动较广，运行受影响测试文件外加 `pytest -v`。 |
 | Output Layout | `README.md`、`src/ai_video/pipeline.py`、manifest 相关测试 | runs 必须写入 `runs/<run_id>/`，包含 manifest、shot 产物、normalized clips 和 final output。路径必须足够稳定，便于 resume 和排查工具使用。 | 增加额外元数据或调试产物，但不能破坏现有预期文件。 | `pytest tests/test_pipeline.py tests/test_manifest.py -v` |
+| v2 Production Project Core | `src/ai_video/production/**`、`tests/test_production_*.py` | P2 只读加载 Manifest-selected project/registry exact revision；creative/asset refs 必须 content-addressed 且留在固定 project roots。不拥有 writer、lifecycle 或 desired fingerprint。 | 收紧 schema、strategy、reference、hash 或 containment validation，保持 no-network 和 Legacy isolation。 | `pytest tests/test_production_models.py tests/test_production_validation.py tests/test_production_registry.py tests/test_production_project.py tests/test_config.py tests/test_cli.py -q` |
 
 ## Cross-Cutting Contracts
 

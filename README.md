@@ -6,7 +6,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-The currently implemented runtime is the local-first `0.1.x` CLI described in this README. The v0.2 product direction is now an Agent-first AI Video / AI Comic Production Harness: Codex drives production decisions while the repository owns durable project state, asset provenance, dependency tracking, deterministic composition, rendering, and QA/repair receipts. That direction is planning-only; it does not make HyperFrames, Remotion, ElevenLabs, Captions, Audio, or a new project schema available today.
+The public runtime remains the local-first `0.1.x` CLI described in this README. The first v0.2 core slice is now available as an importable, read-only Python API: it loads strict `ProductionProject` and creative artifacts, validates concrete Shot-to-Asset bindings and verifies a content-addressed local Asset Registry snapshot. It does not write or activate projects, add a public command, or make HyperFrames, Remotion, ElevenLabs, Captions, Audio, dependency graphs or Providers available.
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
@@ -15,7 +15,7 @@ The currently implemented runtime is the local-first `0.1.x` CLI described in th
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-Until a later slice is implemented and documented, the public commands remain `validate`, `run`, and `resume`; generation remains ComfyUI-only and default-local; Manifest v1 and the current artifact layout remain active. The four Legacy P1 fixes are present on local `main`, but this checkout is ahead of `origin/main`, so their GitHub publication is not implied.
+The public commands remain `validate`, `run`, and `resume`; generation remains ComfyUI-only and default-local; Manifest v1 and the current artifact layout remain active. The P2 implementation is present on this local feature branch, but merge, push, release or GitHub publication is not implied.
 
 ## Setup
 
@@ -30,6 +30,20 @@ Requirements:
 - Python 3.11+
 - Local ComfyUI already running
 - `ffmpeg` and `ffprobe` on PATH
+
+## Production Project Core Python API
+
+P2 exposes a Python loading API for an explicitly materialized v2 project:
+
+```python
+from ai_video.production import load_production_project
+
+project = load_production_project("projects/example/project.yaml")
+```
+
+The path above is illustrative; this repository does not bundle that example project. The loader is read-only and no-network. It verifies the Manifest-selected project revision and content hash, sealed creative artifact references, six Shot `visual_strategy` contracts, concrete asset IDs/types, local file size/SHA-256, registry revision/filename/hash and project-root containment.
+
+P2 does not create directories, update a Manifest, activate a registry revision or prove append-only/cross-file crash safety. Those write semantics require the separately planned P2A commit protocol. There is no v2 CLI, renderer, Audio/Caption domain, dependency graph, QA/repair flow or Provider integration yet.
 
 ## Development MCP
 
