@@ -745,6 +745,7 @@ def test_package_exports_only_the_stable_p3_schema_surface():
     stable_p3_exports = {
         "CompositionSpec",
         "ResolvedTimeline",
+        "resolve_composition",
         "RendererSelectionReceipt",
         "RendererSourceReceipt",
         "RenderReceipt",
@@ -757,6 +758,7 @@ def test_package_exports_only_the_stable_p3_schema_surface():
     }
 
     assert stable_p3_exports <= set(production.__all__)
+    assert callable(production.resolve_composition)
     assert {
         "HyperFramesAdapter",
         "RendererRunner",
