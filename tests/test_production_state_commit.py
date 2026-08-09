@@ -1,17 +1,27 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.hashing import seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
+    AssetRegistrySnapshot,
+    ProductionProject,
     ProductionManifest,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
+    Shot,
+    StateCommitStatus,
 )
+from ai_video.production.project import load_production_project_candidate
+from ai_video.production.registry import load_asset_registry
+import ai_video.production.state_commit as state_commit
 from ai_video.production.state_commit import (
     CommitPhase,
     NoopCrashInjector,
@@ -23,6 +33,7 @@ from ai_video.production.state_commit import (
     _canonical_yaml_bytes,
     _owned_temp_name,
 )
+import production_project_factory as project_factory
 
 
 ZERO_HASH = "0" * 64
@@ -192,7 +203,9 @@ class _FakeFcntl:
     LOCK_NB = 2
     LOCK_UN = 8
 
-    def __init__(self, *, busy: bool = False, unlock_error: bool = False) -> None:
+    def __init__(
+        self, *, busy: bool = False, unlock_error: BaseException | bool = False
+    ) -> None:
         self.busy = busy
         self.unlock_error = unlock_error
         self.calls: list[int] = []
@@ -202,11 +215,13 @@ class _FakeFcntl:
         if operation == self.LOCK_EX | self.LOCK_NB and self.busy:
             raise BlockingIOError("injected busy lock")
         if operation == self.LOCK_UN and self.unlock_error:
+            if isinstance(self.unlock_error, BaseException):
+                raise self.unlock_error
             raise OSError("injected unlock failure")
 
 
 class _FakeLockHandle:
-    def __init__(self, *, close_error: bool = False) -> None:
+    def __init__(self, *, close_error: BaseException | bool = False) -> None:
         self.close_error = close_error
         self.closed = False
 
@@ -216,6 +231,8 @@ class _FakeLockHandle:
     def close(self) -> None:
         self.closed = True
         if self.close_error:
+            if isinstance(self.close_error, BaseException):
+                raise self.close_error
             raise OSError("injected close failure")
 
 
@@ -247,6 +264,44 @@ class _SwapArtifactParentAfterFileFsync:
             (self.outside / temp_path.name).write_bytes(b"external artifact temp")
 
 
+class RaisingCrashInjector:
+    def __init__(self, phase: CommitPhase) -> None:
+        self.phase = phase
+
+    def checkpoint(self, phase: CommitPhase) -> None:
+        if phase is self.phase:
+            raise OSError(f"injected failure at {phase.value}")
+
+
+class RaisingOnOccurrence:
+    def __init__(self, phase: CommitPhase, occurrence: int) -> None:
+        self.phase = phase
+        self.occurrence = occurrence
+        self.count = 0
+
+    def checkpoint(self, phase: CommitPhase) -> None:
+        if phase is self.phase:
+            self.count += 1
+            if self.count == self.occurrence:
+                raise OSError(f"injected failure at {phase.value}")
+
+
+class ProcessInterruptInjector:
+    def __init__(
+        self, phase: CommitPhase, occurrence: int, exception_type: type[BaseException]
+    ) -> None:
+        self.phase = phase
+        self.occurrence = occurrence
+        self.exception_type = exception_type
+        self.count = 0
+
+    def checkpoint(self, phase: CommitPhase) -> None:
+        if phase is self.phase:
+            self.count += 1
+            if self.count == self.occurrence:
+                raise self.exception_type()
+
+
 def make_manifest() -> ProductionManifest:
     return ProductionManifest(
         project_id="comic-demo",
@@ -270,6 +325,22 @@ def make_committer(
     tmp_path: Path, ops: object | None = None, injector: object | None = None
 ) -> ProductionStateCommitter:
     return ProductionStateCommitter(tmp_path, file_ops=ops, crash_injector=injector)
+
+
+def read_manifest(root: Path) -> ProductionManifest:
+    return ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_text(encoding="utf-8")
+    )
+
+
+@pytest.fixture
+def committed_project(tmp_path: Path) -> Path:
+    project_factory.write_production_project(tmp_path)
+    return tmp_path
+
+
+def revision_two_request(root: Path, *, attempt_id: str = "attempt-revision-2") -> StateCommitRequest:
+    return project_factory.make_revision_two_request(root, attempt_id=attempt_id)
 
 
 def test_commit_contract_types_are_frozen_and_expose_all_phases() -> None:
@@ -554,6 +625,58 @@ def test_lock_cleanup_failure_after_success_is_typed(tmp_path: Path, monkeypatch
     assert "lock cleanup" in exc.value.user_message.lower()
 
 
+def test_lock_cleanup_process_exception_overrides_successful_body(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import ai_video.production.state_commit as state_commit_module
+
+    fake_fcntl = _FakeFcntl(unlock_error=KeyboardInterrupt())
+    handle = _FakeLockHandle(close_error=True)
+    monkeypatch.setattr(state_commit_module, "fcntl", fake_fcntl)
+    monkeypatch.setattr(Path, "open", lambda *_args, **_kwargs: handle)
+
+    with pytest.raises(KeyboardInterrupt) as exc:
+        with make_committer(tmp_path)._exclusive_lock():
+            pass
+
+    assert any("close" in note for note in exc.value.__notes__)
+
+
+def test_lock_cleanup_process_exception_overrides_ordinary_body_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import ai_video.production.state_commit as state_commit_module
+
+    fake_fcntl = _FakeFcntl(unlock_error=SystemExit())
+    handle = _FakeLockHandle(close_error=True)
+    monkeypatch.setattr(state_commit_module, "fcntl", fake_fcntl)
+    monkeypatch.setattr(Path, "open", lambda *_args, **_kwargs: handle)
+
+    with pytest.raises(SystemExit) as exc:
+        with make_committer(tmp_path)._exclusive_lock():
+            raise OSError("body failure")
+
+    assert any("body failure" in note for note in exc.value.__notes__)
+    assert any("close" in note for note in exc.value.__notes__)
+
+
+def test_lock_preserves_process_body_exception_when_cleanup_is_ordinary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import ai_video.production.state_commit as state_commit_module
+
+    fake_fcntl = _FakeFcntl(unlock_error=True)
+    handle = _FakeLockHandle(close_error=True)
+    monkeypatch.setattr(state_commit_module, "fcntl", fake_fcntl)
+    monkeypatch.setattr(Path, "open", lambda *_args, **_kwargs: handle)
+
+    with pytest.raises(KeyboardInterrupt) as exc:
+        with make_committer(tmp_path)._exclusive_lock():
+            raise KeyboardInterrupt()
+
+    assert any("unlock" in note or "close" in note for note in exc.value.__notes__)
+
+
 def test_immutable_promotion_is_idempotent_and_does_not_overwrite(tmp_path: Path) -> None:
     final_path = tmp_path / "creative/brief.yaml"
     final_path.parent.mkdir()
@@ -757,6 +880,65 @@ def test_immutable_cleanup_failure_keeps_primary_error_and_adds_note(
     assert final_path.read_bytes() == b"existing"
 
 
+@pytest.mark.parametrize("exception_type", [KeyboardInterrupt, SystemExit])
+def test_mutable_cleanup_process_exception_overrides_ordinary_primary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, exception_type: type[BaseException]
+) -> None:
+    writer = make_committer(
+        tmp_path, injector=RaisingCrashInjector(CommitPhase.AFTER_MANIFEST_FILE_FSYNC)
+    )
+
+    def interrupting_unlink(
+        _self: object, _path: Path, *, missing_ok: bool = False
+    ) -> None:
+        raise exception_type()
+
+    monkeypatch.setattr(state_commit._NativeFileOps, "unlink", interrupting_unlink)
+    with pytest.raises(exception_type) as exc:
+        writer._write_manifest_atomic(make_manifest())
+
+    assert any("Could not write production state atomically" in note for note in exc.value.__notes__)
+
+
+@pytest.mark.parametrize("exception_type", [KeyboardInterrupt, SystemExit])
+def test_immutable_cleanup_process_exception_overrides_ordinary_primary(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, exception_type: type[BaseException]
+) -> None:
+    final_path = tmp_path / "creative/brief.yaml"
+    final_path.parent.mkdir()
+    final_path.write_bytes(b"existing")
+    writer = make_committer(tmp_path)
+    artifact = writer.prepare_artifact("attempt-1", Path("creative/brief.yaml"), b"different")
+
+    def interrupting_unlink(
+        _self: object, _path: Path, *, missing_ok: bool = False
+    ) -> None:
+        raise exception_type()
+
+    monkeypatch.setattr(state_commit._NativeFileOps, "unlink", interrupting_unlink)
+    with pytest.raises(exception_type) as exc:
+        writer._write_immutable_artifact(artifact, attempt_id="attempt-1")
+
+    assert any("already has different bytes" in note for note in exc.value.__notes__)
+
+
+@pytest.mark.parametrize("exception_type", [KeyboardInterrupt, SystemExit])
+def test_immutable_success_cleanup_process_exception_propagates(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, exception_type: type[BaseException]
+) -> None:
+    writer = make_committer(tmp_path)
+    artifact = writer.prepare_artifact("attempt-1", Path("creative/brief.yaml"), b"same")
+
+    def interrupting_unlink(
+        _self: object, _path: Path, *, missing_ok: bool = False
+    ) -> None:
+        raise exception_type()
+
+    monkeypatch.setattr(state_commit._NativeFileOps, "unlink", interrupting_unlink)
+    with pytest.raises(exception_type):
+        writer._write_immutable_artifact(artifact, attempt_id="attempt-1")
+
+
 def test_mutable_atomic_write_uses_exclusive_temp_and_durable_replace(tmp_path: Path) -> None:
     final_path = tmp_path / "state/manifest.json"
     final_path.parent.mkdir()
@@ -767,3 +949,650 @@ def test_mutable_atomic_write_uses_exclusive_temp_and_durable_replace(tmp_path: 
 
     writer._write_mutable_atomic(final_path, b"second", temp_name=".p2a-manifest.tmp")
     assert final_path.read_bytes() == b"second"
+
+
+def test_prepare_project_registry_commit_builds_exact_canonical_candidates(
+    committed_project: Path,
+) -> None:
+    request = revision_two_request(committed_project)
+
+    assert request.artifacts == tuple(sorted(request.artifacts, key=lambda item: item.relative_path))
+    project, registry = project_factory.load_revision_two_models(committed_project)
+    project_artifact = next(
+        artifact for artifact in request.artifacts if artifact.relative_path.suffix == ".yaml"
+    )
+    registry_artifact = next(
+        artifact for artifact in request.artifacts if artifact.relative_path.suffix == ".json"
+    )
+    assert project_artifact.relative_path == Path(
+        f"state/projects/project.{project.revision}.{project.content_hash}.yaml"
+    )
+    assert registry_artifact.relative_path == Path(
+        f"assets/registry.{registry.revision_id}.json"
+    )
+    assert project_artifact.payload == _canonical_yaml_bytes(project)
+    assert registry_artifact.payload == _canonical_json_bytes(registry)
+    assert project_artifact.file_sha256 == hashlib.sha256(project_artifact.payload).hexdigest()
+    assert registry_artifact.file_sha256 == hashlib.sha256(registry_artifact.payload).hexdigest()
+
+
+@pytest.mark.parametrize(
+    "field, value",
+    [
+        ("project_id", "other-project"),
+        ("content_hash", ZERO_HASH),
+    ],
+)
+def test_prepare_project_registry_commit_rejects_invalid_project_candidate(
+    committed_project: Path, field: str, value: str
+) -> None:
+    manifest = read_manifest(committed_project)
+    project, registry = project_factory.load_revision_two_models(committed_project)
+    with pytest.raises(AiVideoError) as exc:
+        state_commit.prepare_project_registry_commit(
+            manifest=manifest,
+            project=project.model_copy(update={field: value}),
+            registry=registry,
+            attempt_id="invalid-project",
+        )
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_prepare_project_registry_commit_rejects_invalid_registry_and_reused_revision(
+    committed_project: Path,
+) -> None:
+    manifest = read_manifest(committed_project)
+    project, registry = project_factory.load_revision_two_models(committed_project)
+    invalid_registry = registry.model_copy(update={"content_hash": ZERO_HASH})
+    with pytest.raises(AiVideoError) as registry_error:
+        state_commit.prepare_project_registry_commit(
+            manifest=manifest,
+            project=project,
+            registry=invalid_registry,
+            attempt_id="invalid-registry",
+        )
+    assert registry_error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+    different_same_revision = seal_artifact(
+        project.model_copy(update={"revision": 1, "title": "Different v1", "content_hash": ZERO_HASH})
+    )
+    with pytest.raises(AiVideoError) as reuse_error:
+        state_commit.prepare_project_registry_commit(
+            manifest=manifest,
+            project=different_same_revision,
+            registry=registry,
+            attempt_id="reused-revision",
+        )
+    assert reuse_error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+    backward = project.model_copy(update={"revision": 0})
+    with pytest.raises(AiVideoError) as backward_error:
+        state_commit.prepare_project_registry_commit(
+            manifest=manifest,
+            project=backward,
+            registry=registry,
+            attempt_id="backward-revision",
+        )
+    assert backward_error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_prepare_project_registry_commit_allows_identical_initial_snapshot_migration(
+    committed_project: Path,
+) -> None:
+    manifest = read_manifest(committed_project)
+    project, registry = project_factory.load_initial_models(committed_project)
+
+    request = state_commit.prepare_project_registry_commit(
+        manifest=manifest,
+        project=project,
+        registry=registry,
+        attempt_id="migrate-v1",
+    )
+
+    assert request.next_project.revision == manifest.active_project.revision
+    assert request.next_project.content_hash == manifest.active_project.content_hash
+
+
+def test_commit_rejects_stale_manifest_revision_under_lock(committed_project: Path) -> None:
+    request = revision_two_request(committed_project)
+    stale = StateCommitRequest(
+        attempt_id=request.attempt_id,
+        operation=request.operation,
+        expected_manifest_revision=request.expected_manifest_revision - 1,
+        artifacts=request.artifacts,
+        next_project=request.next_project,
+        next_registry=request.next_registry,
+    )
+
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(committed_project).commit(stale)
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_commit_persists_running_attempt_before_artifacts_and_keeps_pointers(
+    committed_project: Path,
+) -> None:
+    before = read_manifest(committed_project)
+    request = revision_two_request(committed_project)
+    committer = make_committer(
+        committed_project, injector=RaisingCrashInjector(CommitPhase.AFTER_ATTEMPT_STARTED)
+    )
+
+    with pytest.raises(AiVideoError):
+        committer.commit(request)
+
+    after = read_manifest(committed_project)
+    assert after.manifest_revision == before.manifest_revision + 2
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.attempts[-1].status is StateCommitStatus.FAILED
+    assert after.attempts[-1].candidate_artifacts_hash == state_commit._candidate_artifacts_hash(
+        revision_two_request(committed_project).artifacts
+    )
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [
+        CommitPhase.AFTER_ATTEMPT_STARTED,
+        CommitPhase.AFTER_ARTIFACT_TEMP_WRITE,
+        CommitPhase.AFTER_ARTIFACT_FILE_FSYNC,
+        CommitPhase.AFTER_ARTIFACT_PROMOTION,
+        CommitPhase.AFTER_ARTIFACT_DIRECTORY_FSYNC,
+        CommitPhase.AFTER_ARTIFACT_VERIFICATION,
+    ],
+)
+def test_failure_before_manifest_replace_preserves_old_active_pointers(
+    committed_project: Path, phase: CommitPhase
+) -> None:
+    before = read_manifest(committed_project)
+    with pytest.raises(AiVideoError):
+        make_committer(
+            committed_project, injector=RaisingCrashInjector(phase)
+        ).commit(revision_two_request(committed_project))
+    after = read_manifest(committed_project)
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.attempts[-1].status is StateCommitStatus.FAILED
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [CommitPhase.AFTER_MANIFEST_TEMP_WRITE, CommitPhase.AFTER_MANIFEST_FILE_FSYNC],
+)
+def test_running_persistence_failure_preserves_original_manifest(
+    committed_project: Path, phase: CommitPhase
+) -> None:
+    before_bytes = (committed_project / "state/manifest.json").read_bytes()
+    with pytest.raises(AiVideoError):
+        make_committer(
+            committed_project, injector=RaisingCrashInjector(phase)
+        ).commit(revision_two_request(committed_project))
+    assert (committed_project / "state/manifest.json").read_bytes() == before_bytes
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [CommitPhase.AFTER_MANIFEST_TEMP_WRITE, CommitPhase.AFTER_MANIFEST_FILE_FSYNC],
+)
+def test_final_manifest_pre_replace_failure_keeps_old_pointers_and_records_failed_attempt(
+    committed_project: Path, phase: CommitPhase
+) -> None:
+    before = read_manifest(committed_project)
+    request = revision_two_request(committed_project)
+    with pytest.raises(AiVideoError):
+        make_committer(
+            committed_project, injector=RaisingOnOccurrence(phase, occurrence=2)
+        ).commit(request)
+    after = read_manifest(committed_project)
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.attempts[-1].status is StateCommitStatus.FAILED
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [CommitPhase.AFTER_MANIFEST_REPLACE, CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC],
+)
+def test_failure_after_final_manifest_replace_has_unknown_outcome(
+    committed_project: Path, phase: CommitPhase
+) -> None:
+    request = revision_two_request(committed_project)
+    injector = RaisingOnOccurrence(phase, occurrence=2)
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(committed_project, injector=injector).commit(request)
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    after = read_manifest(committed_project)
+    assert after.active_project == request.next_project
+    assert after.active_registry == request.next_registry
+    assert after.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+def test_failed_attempt_persistence_keeps_original_failure_and_adds_note(
+    committed_project: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    committer = make_committer(
+        committed_project,
+        injector=RaisingCrashInjector(CommitPhase.AFTER_ARTIFACT_TEMP_WRITE),
+    )
+    original_write = committer._write_manifest_atomic
+    calls = 0
+
+    def fail_failed_attempt(manifest: ProductionManifest, **kwargs: object) -> Path:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise OSError("failed-attempt persistence unavailable")
+        return original_write(manifest, **kwargs)
+
+    monkeypatch.setattr(committer, "_write_manifest_atomic", fail_failed_attempt)
+    with pytest.raises(AiVideoError) as exc:
+        committer.commit(revision_two_request(committed_project))
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_COMMIT_FAILED
+    assert any("failed production state attempt" in note.lower() for note in exc.value.__notes__)
+
+
+def test_commit_rejects_symlink_escaped_future_artifact_parent(
+    committed_project: Path, tmp_path: Path
+) -> None:
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (committed_project / "composition").symlink_to(outside, target_is_directory=True)
+    request = revision_two_request(committed_project)
+    future = PreparedArtifact(
+        Path("composition/source.future.json"), b"future", hashlib.sha256(b"future").hexdigest()
+    )
+    unsafe = StateCommitRequest(
+        attempt_id=request.attempt_id,
+        operation=request.operation,
+        expected_manifest_revision=request.expected_manifest_revision,
+        artifacts=request.artifacts + (future,),
+        next_project=request.next_project,
+        next_registry=request.next_registry,
+    )
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(committed_project).commit(unsafe)
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_commit_never_calls_legacy_manifest_writer(
+    committed_project: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import ai_video.manifest as legacy_manifest
+
+    def forbidden(*_: object, **__: object) -> None:
+        raise AssertionError("P2A must not call the Legacy manifest writer")
+
+    monkeypatch.setattr(legacy_manifest, "atomic_write_manifest", forbidden)
+    make_committer(committed_project).commit(revision_two_request(committed_project))
+
+
+def test_success_promotes_domain_verified_artifacts_and_switches_both_pointers(
+    committed_project: Path,
+) -> None:
+    before = read_manifest(committed_project)
+    request = revision_two_request(committed_project)
+    result = make_committer(committed_project).commit(request)
+    after = read_manifest(committed_project)
+
+    assert after == result
+    assert after.manifest_revision == before.manifest_revision + 2
+    assert after.active_project == request.next_project
+    assert after.active_registry == request.next_registry
+    assert after.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    project_payload = yaml.safe_load(
+        (committed_project / after.active_project.path).read_text(encoding="utf-8")
+    )
+    assert verify_artifact_hash(ProductionProject.model_validate(project_payload))
+    registry, _ = load_asset_registry(
+        after.active_registry.path, committed_project, committed_project / "assets/files"
+    )
+    assert registry.revision_id == after.active_registry.revision_id
+
+
+def test_identical_replay_is_deterministic_and_conflicting_attempt_is_rejected(
+    committed_project: Path,
+) -> None:
+    request = revision_two_request(committed_project)
+    first = make_committer(committed_project).commit(request)
+    second = make_committer(committed_project).commit(request)
+    assert second == first
+    assert len(second.attempts) == 1
+
+    conflicting = StateCommitRequest(
+        attempt_id=request.attempt_id,
+        operation=request.operation,
+        expected_manifest_revision=second.manifest_revision,
+        artifacts=request.artifacts,
+        next_project=request.next_project,
+        next_registry=RegistrySnapshotPointer(
+            path=request.next_registry.path,
+            revision_id=request.next_registry.revision_id,
+            content_hash=request.next_registry.content_hash,
+            file_sha256=ONE_HASH,
+        ),
+    )
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(committed_project).commit(conflicting)
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_commit_carries_future_artifact_without_granting_new_pointer_ownership(
+    committed_project: Path,
+) -> None:
+    request = revision_two_request(committed_project)
+    future = PreparedArtifact(
+        Path("composition/source.future.json"), b'{"future":true}\n', hashlib.sha256(b'{"future":true}\n').hexdigest()
+    )
+    request = StateCommitRequest(
+        attempt_id=request.attempt_id,
+        operation=request.operation,
+        expected_manifest_revision=request.expected_manifest_revision,
+        artifacts=request.artifacts + (future,),
+        next_project=request.next_project,
+        next_registry=request.next_registry,
+    )
+
+    result = make_committer(committed_project).commit(request)
+    assert (committed_project / future.relative_path).read_bytes() == future.payload
+    assert result.active_project == request.next_project
+    assert result.active_registry == request.next_registry
+    assert not hasattr(result, "active_composition")
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        Path("state/manifest.json"),
+        Path("state/commit.lock"),
+        Path("runs/run-1/manifest.json"),
+        Path("../outside"),
+        Path("/tmp/outside"),
+    ],
+)
+def test_commit_rejects_unsafe_future_artifact_targets(
+    committed_project: Path, relative_path: Path
+) -> None:
+    request = revision_two_request(committed_project)
+    future = PreparedArtifact(relative_path, b"future", hashlib.sha256(b"future").hexdigest())
+    unsafe = StateCommitRequest(
+        attempt_id=request.attempt_id,
+        operation=request.operation,
+        expected_manifest_revision=request.expected_manifest_revision,
+        artifacts=request.artifacts + (future,),
+        next_project=request.next_project,
+        next_registry=request.next_registry,
+    )
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(committed_project).commit(unsafe)
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+@pytest.mark.parametrize(
+    "phase",
+    [CommitPhase.AFTER_MANIFEST_REPLACE, CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC],
+)
+def test_running_manifest_post_replace_failure_records_failed_attempt(
+    committed_project: Path, phase: CommitPhase
+) -> None:
+    before = read_manifest(committed_project)
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(
+            committed_project, injector=RaisingOnOccurrence(phase, occurrence=1)
+        ).commit(revision_two_request(committed_project))
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_COMMIT_FAILED
+    after = read_manifest(committed_project)
+    assert after.manifest_revision == before.manifest_revision + 2
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.attempts[-1].status is StateCommitStatus.FAILED
+
+
+@pytest.mark.parametrize("exception_type", [KeyboardInterrupt, SystemExit])
+def test_failed_attempt_persistence_process_exception_overrides_commit_failure(
+    committed_project: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    exception_type: type[BaseException],
+) -> None:
+    writer = make_committer(
+        committed_project, injector=RaisingCrashInjector(CommitPhase.AFTER_ATTEMPT_STARTED)
+    )
+    original_write = writer._write_manifest_atomic
+
+    def interrupt_failed_manifest(
+        manifest: ProductionManifest, *, on_replace: object = None
+    ) -> Path:
+        if manifest.attempts[-1].status is StateCommitStatus.FAILED:
+            raise exception_type()
+        return original_write(manifest, on_replace=on_replace)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(writer, "_write_manifest_atomic", interrupt_failed_manifest)
+    with pytest.raises(exception_type) as exc:
+        writer.commit(revision_two_request(committed_project))
+
+    assert any("injected failure" in note for note in exc.value.__notes__)
+
+
+def test_final_manifest_lock_cleanup_failure_has_unknown_outcome(
+    committed_project: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import ai_video.production.state_commit as state_commit_module
+
+    fake_fcntl = _FakeFcntl(unlock_error=True)
+    monkeypatch.setattr(state_commit_module, "fcntl", fake_fcntl)
+    request = revision_two_request(committed_project)
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(committed_project).commit(request)
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    after = read_manifest(committed_project)
+    assert after.active_project == request.next_project
+    assert after.active_registry == request.next_registry
+    assert after.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+def test_final_manifest_process_lock_cleanup_preserves_exception_type_and_note(
+    committed_project: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_fcntl = _FakeFcntl(unlock_error=KeyboardInterrupt())
+    monkeypatch.setattr(state_commit, "fcntl", fake_fcntl)
+    request = revision_two_request(committed_project)
+
+    with pytest.raises(KeyboardInterrupt) as exc:
+        make_committer(committed_project).commit(request)
+
+    assert any("outcome may be committed" in note.lower() for note in exc.value.__notes__)
+    after = read_manifest(committed_project)
+    assert after.active_project == request.next_project
+    assert after.active_registry == request.next_registry
+    assert after.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+def _with_generic_artifact(request: StateCommitRequest, payload: bytes) -> StateCommitRequest:
+    future = PreparedArtifact(
+        Path("composition/source.future.json"), payload, hashlib.sha256(payload).hexdigest()
+    )
+    return StateCommitRequest(
+        attempt_id=request.attempt_id,
+        operation=request.operation,
+        expected_manifest_revision=request.expected_manifest_revision,
+        artifacts=request.artifacts + (future,),
+        next_project=request.next_project,
+        next_registry=request.next_registry,
+    )
+
+
+def test_replay_rejects_added_removed_or_changed_generic_artifact(
+    committed_project: Path,
+) -> None:
+    base = revision_two_request(committed_project)
+    original = _with_generic_artifact(base, b'{"future":true}\n')
+    first = make_committer(committed_project).commit(original)
+    assert make_committer(committed_project).commit(original) == first
+    assert first.attempts[-1].candidate_artifacts_hash == state_commit._candidate_artifacts_hash(
+        original.artifacts
+    )
+
+    added = StateCommitRequest(
+        attempt_id=base.attempt_id,
+        operation=base.operation,
+        expected_manifest_revision=first.manifest_revision,
+        artifacts=original.artifacts
+        + (PreparedArtifact(Path("composition/extra.json"), b"extra", hashlib.sha256(b"extra").hexdigest()),),
+        next_project=base.next_project,
+        next_registry=base.next_registry,
+    )
+    changed = _with_generic_artifact(base, b'{"future":false}\n')
+    removed = base
+    for candidate in (added, changed, removed):
+        with pytest.raises(AiVideoError) as exc:
+            make_committer(committed_project).commit(candidate)
+        assert exc.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_candidate_with_missing_creative_reference_fails_before_pointer_replace(
+    committed_project: Path,
+) -> None:
+    manifest = read_manifest(committed_project)
+    project, registry = project_factory.load_revision_two_models(committed_project)
+    broken_refs = project.artifacts.model_copy(
+        update={"story": project.artifacts.story.model_copy(update={"path": "creative/missing.yaml"})}
+    )
+    broken_project = seal_artifact(
+        project.model_copy(update={"artifacts": broken_refs, "content_hash": ZERO_HASH})
+    )
+    request = state_commit.prepare_project_registry_commit(
+        manifest=manifest,
+        project=broken_project,
+        registry=registry,
+        attempt_id="missing-creative-reference",
+    )
+
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(committed_project).commit(request)
+
+    assert exc.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    after = read_manifest(committed_project)
+    assert after.active_project == manifest.active_project
+    assert after.active_registry == manifest.active_registry
+    assert after.attempts[-1].status is StateCommitStatus.FAILED
+
+
+def test_candidate_strategy_reference_validation_is_run_before_pointer_replace(
+    committed_project: Path,
+) -> None:
+    manifest = read_manifest(committed_project)
+    project, registry = project_factory.load_revision_two_models(committed_project)
+    original_shot = Shot.model_validate(
+        yaml.safe_load((committed_project / "creative/shots/shot-1.yaml").read_text())
+    )
+    invalid_shot = seal_artifact(
+        original_shot.model_copy(update={"character_ids": ("missing-character",), "content_hash": ZERO_HASH})
+    )
+    invalid_path = committed_project / "creative/shots/invalid-reference.yaml"
+    project_factory._write_yaml(invalid_path, invalid_shot)
+    refs = project.artifacts.model_copy(
+        update={"shots": (project.artifacts.shots[0].model_copy(
+            update={"path": invalid_path.relative_to(committed_project), "content_hash": invalid_shot.content_hash}
+        ),)}
+    )
+    invalid_project = seal_artifact(
+        project.model_copy(update={"artifacts": refs, "content_hash": ZERO_HASH})
+    )
+    request = state_commit.prepare_project_registry_commit(
+        manifest=manifest,
+        project=invalid_project,
+        registry=registry,
+        attempt_id="invalid-shot-reference",
+    )
+
+    with pytest.raises(AiVideoError, match="unknown character"):
+        make_committer(committed_project).commit(request)
+    after = read_manifest(committed_project)
+    assert after.active_project == manifest.active_project
+    assert after.attempts[-1].status is StateCommitStatus.FAILED
+
+
+def test_candidate_loader_allows_only_root_special_case_or_contained_versioned_snapshot(
+    committed_project: Path,
+) -> None:
+    manifest = read_manifest(committed_project)
+    legacy = load_production_project_candidate(
+        committed_project,
+        manifest,
+        Path("project.yaml"),
+        manifest.active_registry.path,
+    )
+    assert legacy.project.revision == manifest.active_project.revision
+
+    request = revision_two_request(committed_project)
+    committed = make_committer(committed_project).commit(request)
+    versioned = load_production_project_candidate(
+        committed_project,
+        committed,
+        committed.active_project.path,
+        committed.active_registry.path,
+    )
+    assert versioned.project.content_hash == committed.active_project.content_hash
+
+
+def test_candidate_loader_rejects_versioned_path_symlink_to_root_project(
+    committed_project: Path,
+) -> None:
+    manifest = read_manifest(committed_project)
+    linked_project = committed_project / "state/projects/link.yaml"
+    linked_project.parent.mkdir(parents=True, exist_ok=True)
+    linked_project.symlink_to(committed_project / "project.yaml")
+
+    with pytest.raises(AiVideoError) as exc:
+        load_production_project_candidate(
+            committed_project,
+            manifest,
+            Path("state/projects/link.yaml"),
+            manifest.active_registry.path,
+        )
+
+    assert exc.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+@pytest.mark.parametrize("exception_type", [KeyboardInterrupt, SystemExit])
+def test_process_interrupt_before_final_replace_propagates_and_leaves_running_attempt(
+    committed_project: Path, exception_type: type[BaseException]
+) -> None:
+    before = read_manifest(committed_project)
+    with pytest.raises(exception_type):
+        make_committer(
+            committed_project,
+            injector=ProcessInterruptInjector(
+                CommitPhase.AFTER_ATTEMPT_STARTED, 1, exception_type
+            ),
+        ).commit(revision_two_request(committed_project))
+
+    after = read_manifest(committed_project)
+    assert after.manifest_revision == before.manifest_revision + 1
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.attempts[-1].status is StateCommitStatus.RUNNING
+
+
+def test_keyboard_interrupt_after_final_replace_propagates_with_outcome_note(
+    committed_project: Path,
+) -> None:
+    request = revision_two_request(committed_project)
+    with pytest.raises(KeyboardInterrupt) as exc:
+        make_committer(
+            committed_project,
+            injector=ProcessInterruptInjector(
+                CommitPhase.AFTER_MANIFEST_REPLACE, 2, KeyboardInterrupt
+            ),
+        ).commit(request)
+
+    assert any("outcome may be committed" in note.lower() for note in exc.value.__notes__)
+    after = read_manifest(committed_project)
+    assert after.active_project == request.next_project
+    assert after.active_registry == request.next_registry
+    assert after.attempts[-1].status is StateCommitStatus.SUCCEEDED

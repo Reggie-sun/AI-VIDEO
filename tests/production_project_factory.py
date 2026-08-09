@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import yaml
@@ -19,8 +20,10 @@ from ai_video.production.models import (
     ProductionBrief,
     ProductionManifest,
     ProductionProject,
+    ProjectSnapshotPointer,
     ProjectArtifactRefs,
     RendererPolicy,
+    RegistrySnapshotPointer,
     Scene,
     Shot,
     SourceReference,
@@ -205,23 +208,84 @@ def write_production_project(root: Path) -> Path:
             artifacts=refs,
         )
     )
-    manifest = ProductionManifest(
-        project_id=project.project_id,
-        active_project_revision=project.revision,
-        active_project_content_hash=project.content_hash,
-        active_registry_revision=registry.revision_id,
-    )
-
     _write_yaml(root / "creative/brief.yaml", brief)
     _write_yaml(root / "creative/story.yaml", story)
     _write_yaml(root / "creative/characters/hero.yaml", character)
     _write_yaml(root / "creative/scenes/room.yaml", scene)
     _write_yaml(root / "creative/storyboard.yaml", storyboard)
     _write_yaml(root / "creative/shots/shot-1.yaml", shot)
-    _write_yaml(root / "project.yaml", project)
+    project_path = root / "project.yaml"
+    _write_yaml(project_path, project)
     registry_path = root / f"assets/registry.{registry.revision_id}.json"
-    registry_path.write_text(registry.model_dump_json(indent=2), encoding="utf-8")
+    registry_payload = (
+        json.dumps(
+            registry.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    registry_path.write_bytes(registry_payload)
+    manifest = ProductionManifest(
+        project_id=project.project_id,
+        manifest_revision=1,
+        active_project=ProjectSnapshotPointer(
+            path=Path("project.yaml"),
+            revision=project.revision,
+            content_hash=project.content_hash,
+            file_sha256=sha256_file(project_path),
+        ),
+        active_registry=RegistrySnapshotPointer(
+            path=registry_path.relative_to(root),
+            revision_id=registry.revision_id,
+            content_hash=registry.content_hash,
+            file_sha256=sha256_file(registry_path),
+        ),
+    )
     manifest_path = root / "state/manifest.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
-    return root / "project.yaml"
+    return project_path
+
+
+def load_initial_models(root: Path) -> tuple[ProductionProject, AssetRegistrySnapshot]:
+    project = ProductionProject.model_validate(
+        yaml.safe_load((root / "project.yaml").read_text(encoding="utf-8"))
+    )
+    manifest = ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (root / manifest.active_registry.path).read_text(encoding="utf-8")
+    )
+    return project, registry
+
+
+def load_revision_two_models(root: Path) -> tuple[ProductionProject, AssetRegistrySnapshot]:
+    project, registry = load_initial_models(root)
+    revision_two = seal_artifact(
+        project.model_copy(
+            update={
+                "revision": 2,
+                "content_hash": ZERO_HASH,
+                "title": "Comic Demo Revision 2",
+            }
+        )
+    )
+    return revision_two, registry
+
+
+def make_revision_two_request(root: Path, *, attempt_id: str = "attempt-revision-2") -> object:
+    from ai_video.production.state_commit import prepare_project_registry_commit
+
+    manifest = ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    project, registry = load_revision_two_models(root)
+    return prepare_project_registry_commit(
+        manifest=manifest,
+        project=project,
+        registry=registry,
+        attempt_id=attempt_id,
+    )

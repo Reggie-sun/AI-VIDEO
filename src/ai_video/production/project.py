@@ -88,6 +88,73 @@ def _load_referenced_artifact(
     return model
 
 
+def _build_loaded_project(
+    root: Path,
+    manifest: ProductionManifest,
+    project: ProductionProject,
+    registry_path: Path,
+) -> LoadedProductionProject:
+    asset_root = _resolve_input(root, project.asset_root, allowed_root=root / "assets")
+    registry, asset_paths = load_asset_registry(registry_path, root, asset_root)
+    refs = project.artifacts
+    bundle = LoadedProductionProject(
+        root=root,
+        project=project,
+        manifest=manifest,
+        brief=_load_referenced_artifact(root, refs.brief, ProductionBrief),
+        story=_load_referenced_artifact(root, refs.story, Story),
+        characters=tuple(_load_referenced_artifact(root, item, Character) for item in refs.characters),
+        scenes=tuple(_load_referenced_artifact(root, item, Scene) for item in refs.scenes),
+        storyboard=_load_referenced_artifact(root, refs.storyboard, Storyboard),
+        shots=tuple(_load_referenced_artifact(root, item, Shot) for item in refs.shots),
+        registry=registry,
+        asset_paths=asset_paths,
+    )
+    validate_project_references(bundle)
+    return bundle
+
+
+def load_production_project_candidate(
+    root: str | Path,
+    manifest: ProductionManifest,
+    project_path: Path,
+    registry_path: Path,
+) -> LoadedProductionProject:
+    """Read and validate explicit P2A candidate snapshots without activating them."""
+    try:
+        resolved_root = Path(root).resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise _invalid("Production project root could not be resolved safely.", str(exc)) from exc
+    if not resolved_root.is_dir():
+        raise _invalid("Production project root must be a directory.")
+    project_path = Path(project_path)
+    registry_path = Path(registry_path)
+    if project_path == Path("project.yaml"):
+        resolved_project_path = _resolve_input(resolved_root, project_path)
+    else:
+        if not (
+            len(project_path.parts) > 2 and project_path.parts[:2] == ("state", "projects")
+        ):
+            raise _invalid("Candidate project snapshot path is not allowed.")
+        resolved_project_path = _resolve_input(
+            resolved_root,
+            project_path,
+            allowed_root=resolved_root / "state/projects",
+        )
+    resolved_registry_path = _resolve_input(
+        resolved_root, registry_path, allowed_root=resolved_root / "assets"
+    )
+    project = _load_yaml_artifact(resolved_project_path, ProductionProject)
+    if manifest.project_id != project.project_id:
+        raise _invalid("Production manifest project_id does not match project.")
+    return _build_loaded_project(
+        resolved_root,
+        manifest,
+        project,
+        resolved_registry_path.relative_to(resolved_root),
+    )
+
+
 def load_production_project(path: str | Path) -> LoadedProductionProject:
     supplied_path = Path(path)
     if supplied_path.name != "project.yaml":
@@ -114,23 +181,4 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         raise _invalid("Production manifest active project content hash does not match project.")
 
     registry_path = Path(f"assets/registry.{manifest.active_registry_revision}.json")
-    asset_root = _resolve_input(root, project.asset_root, allowed_root=root / "assets")
-    registry, asset_paths = load_asset_registry(registry_path, root, asset_root)
-    refs = project.artifacts
-    bundle = LoadedProductionProject(
-        root=root,
-        project=project,
-        manifest=manifest,
-        brief=_load_referenced_artifact(root, refs.brief, ProductionBrief),
-        story=_load_referenced_artifact(root, refs.story, Story),
-        characters=tuple(
-            _load_referenced_artifact(root, item, Character) for item in refs.characters
-        ),
-        scenes=tuple(_load_referenced_artifact(root, item, Scene) for item in refs.scenes),
-        storyboard=_load_referenced_artifact(root, refs.storyboard, Storyboard),
-        shots=tuple(_load_referenced_artifact(root, item, Shot) for item in refs.shots),
-        registry=registry,
-        asset_paths=asset_paths,
-    )
-    validate_project_references(bundle)
-    return bundle
+    return _build_loaded_project(root, manifest, project, registry_path)

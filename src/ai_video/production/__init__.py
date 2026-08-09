@@ -21,6 +21,12 @@ from ai_video.production.models import (
     VisualStrategy,
 )
 from ai_video.production.project import load_production_project
+from ai_video.production.state_commit import (
+    PreparedArtifact,
+    ProductionStateCommitter,
+    StateCommitRequest,
+    prepare_project_registry_commit,
+)
 
 __all__ = [
     "ArtifactReference",
@@ -30,8 +36,10 @@ __all__ = [
     "LoadedProductionProject",
     "ProductionBrief",
     "ProductionManifest",
+    "ProductionStateCommitter",
     "ProductionProject",
     "ProjectSnapshotPointer",
+    "PreparedArtifact",
     "RecoveryDisposition",
     "RecoveryItem",
     "RecoveryReport",
@@ -39,9 +47,11 @@ __all__ = [
     "Scene",
     "Shot",
     "StateCommitAttempt",
+    "StateCommitRequest",
     "StateCommitStatus",
     "Story",
     "Storyboard",
     "VisualStrategy",
     "load_production_project",
+    "prepare_project_registry_commit",
 ]

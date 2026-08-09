@@ -164,6 +164,7 @@ def test_state_attempt_rejects_unknown_fallback_pointer():
                 "operation": "commit_project_registry",
                 "status": "running",
                 "base_manifest_revision": 1,
+                "candidate_artifacts_hash": ZERO_HASH,
                 "started_at": "2026-08-09T00:00:00+00:00",
                 "fallback_manifest": "state/manifest.backup.json",
             }
@@ -185,6 +186,7 @@ def test_terminal_state_attempts_require_sanitized_typed_error_fields(status):
             operation="commit_project_registry",
             status=status,
             base_manifest_revision=1,
+            candidate_artifacts_hash=ZERO_HASH,
             started_at="2026-08-09T00:00:00+00:00",
             finished_at="2026-08-09T00:00:01+00:00",
         )
@@ -197,6 +199,7 @@ def test_succeeded_state_attempt_requires_finished_at():
             operation="commit_project_registry",
             status=StateCommitStatus.SUCCEEDED,
             base_manifest_revision=1,
+            candidate_artifacts_hash=ZERO_HASH,
             started_at="2026-08-09T00:00:00+00:00",
         )
 
@@ -207,6 +210,7 @@ def test_production_manifest_rejects_duplicate_attempt_ids():
         operation="commit_project_registry",
         status=StateCommitStatus.RUNNING,
         base_manifest_revision=1,
+        candidate_artifacts_hash=ZERO_HASH,
         started_at="2026-08-09T00:00:00+00:00",
     )
     with pytest.raises(ValidationError, match="attempt IDs must be unique"):
@@ -287,6 +291,7 @@ def test_running_state_attempt_rejects_terminal_fields(contradictory_fields):
             operation="commit_project_registry",
             status=StateCommitStatus.RUNNING,
             base_manifest_revision=1,
+            candidate_artifacts_hash=ZERO_HASH,
             started_at="2026-08-09T00:00:00+00:00",
             **contradictory_fields,
         )
@@ -299,10 +304,36 @@ def test_succeeded_state_attempt_rejects_error_fields():
             operation="commit_project_registry",
             status=StateCommitStatus.SUCCEEDED,
             base_manifest_revision=1,
+            candidate_artifacts_hash=ZERO_HASH,
             started_at="2026-08-09T00:00:00+00:00",
             finished_at="2026-08-09T00:00:01+00:00",
             error_code="production_state_commit_failed",
             error_message="safe",
+        )
+
+
+def test_state_attempt_requires_immutable_canonical_artifact_set_hash():
+    artifact_hash = "a" * 64
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-artifacts",
+        operation="commit_project_registry",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        candidate_artifacts_hash=artifact_hash,
+        started_at="2026-08-09T00:00:00+00:00",
+    )
+
+    assert attempt.candidate_artifacts_hash == artifact_hash
+    with pytest.raises(ValidationError, match="Instance is frozen"):
+        attempt.candidate_artifacts_hash = "b" * 64  # type: ignore[misc]
+    with pytest.raises(ValidationError):
+        StateCommitAttempt(
+            attempt_id="invalid-artifacts",
+            operation="commit_project_registry",
+            status=StateCommitStatus.RUNNING,
+            base_manifest_revision=1,
+            candidate_artifacts_hash="INVALID",
+            started_at="2026-08-09T00:00:00+00:00",
         )
 
 

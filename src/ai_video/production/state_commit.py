@@ -7,19 +7,27 @@ import os
 import re
 from contextlib import contextmanager
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import BinaryIO, Iterator, Protocol
+from typing import BinaryIO, Callable, Iterator, Protocol
 
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
+    AssetRegistrySnapshot,
     ProductionManifest,
+    ProductionProject,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
+    StateCommitAttempt,
+    StateCommitStatus,
 )
+from ai_video.production.project import load_production_project_candidate
+from ai_video.production.registry import registry_semantic_sha256
 
 try:
     import fcntl
@@ -78,19 +86,13 @@ _TEMP_DIGEST_LENGTH = 12
 def _owned_temp_name(attempt_id: str, final_path: Path) -> str:
     attempt_label = re.sub(r"[^A-Za-z0-9_-]", "_", attempt_id) or "attempt"
     attempt_label = attempt_label[:_TEMP_ATTEMPT_LABEL_LIMIT]
-    attempt_digest = hashlib.sha256(attempt_id.encode("utf-8")).hexdigest()[
-        :_TEMP_DIGEST_LENGTH
-    ]
+    attempt_digest = hashlib.sha256(attempt_id.encode("utf-8")).hexdigest()[:_TEMP_DIGEST_LENGTH]
     original_final_name = final_path.name
     final_label = re.sub(r"[^A-Za-z0-9._-]", "_", original_final_name) or "artifact"
     if len(final_label) > _TEMP_FINAL_LABEL_LIMIT:
-        final_digest = hashlib.sha256(original_final_name.encode("utf-8")).hexdigest()[
-            :_TEMP_DIGEST_LENGTH
-        ]
-        final_label = (
-            final_label[: _TEMP_FINAL_LABEL_LIMIT - _TEMP_DIGEST_LENGTH - 1]
-            + "-"
-            + final_digest
+        final_digest = hashlib.sha256(original_final_name.encode("utf-8")).hexdigest()[:_TEMP_DIGEST_LENGTH]
+        final_label = "{}-{}".format(
+            final_label[: _TEMP_FINAL_LABEL_LIMIT - _TEMP_DIGEST_LENGTH - 1], final_digest
         )
     return f".p2a-{attempt_label}-{attempt_digest}-{final_label}.tmp"
 
@@ -115,49 +117,148 @@ def _canonical_yaml_bytes(model: BaseModel) -> bytes:
 
 
 def _state_invalid(message: str, detail: str | None = None) -> AiVideoError:
-    return AiVideoError(
-        code=ErrorCode.PRODUCTION_STATE_INVALID,
-        user_message=message,
-        technical_detail=detail,
-        retryable=False,
-    )
+    return _state_error(ErrorCode.PRODUCTION_STATE_INVALID, message, detail)
 
 
 def _state_commit_failed(message: str, detail: str | None = None) -> AiVideoError:
+    return _state_error(ErrorCode.PRODUCTION_STATE_COMMIT_FAILED, message, detail)
+
+
+def _state_unsupported(message: str, detail: str | None = None) -> AiVideoError:
+    return _state_error(ErrorCode.PRODUCTION_STATE_UNSUPPORTED, message, detail)
+
+
+def _state_error(code: ErrorCode, message: str, detail: str | None) -> AiVideoError:
     return AiVideoError(
-        code=ErrorCode.PRODUCTION_STATE_COMMIT_FAILED,
+        code=code,
         user_message=message,
         technical_detail=detail,
         retryable=False,
     )
+def _timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat()
+def _as_state_error(exc: BaseException) -> AiVideoError:
+    if isinstance(exc, AiVideoError):
+        return exc
+    return _state_commit_failed("Production state commit failed.", str(exc))
+def _candidate_artifacts_hash(artifacts: tuple[PreparedArtifact, ...]) -> str:
+    pairs = [(item.relative_path.as_posix(), item.file_sha256) for item in artifacts]
+    if len({path for path, _ in pairs}) != len(pairs):
+        raise _state_invalid("Production state request contains duplicate artifact paths.")
+    payload = json.dumps(sorted(pairs), separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+def _outcome_unknown(exc: BaseException) -> AiVideoError:
+    if isinstance(exc, AiVideoError) and exc.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN:
+        return exc
+    primary = _as_state_error(exc)
+    unknown = AiVideoError(ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN, "Production state commit outcome is unknown after Manifest replacement.", primary.technical_detail or str(primary))
+    unknown.add_note(f"Original commit failure: {primary}")
+    return unknown
 
 
-def _state_unsupported(message: str, detail: str | None = None) -> AiVideoError:
-    return AiVideoError(
-        code=ErrorCode.PRODUCTION_STATE_UNSUPPORTED,
-        user_message=message,
-        technical_detail=detail,
-        retryable=False,
+def _is_process_exception(exc: BaseException) -> bool:
+    return not isinstance(exc, Exception)
+
+
+def _handle_cleanup_errors(
+    primary: BaseException | None,
+    cleanup_errors: list[BaseException],
+    *,
+    label: str,
+    no_primary_message: str,
+) -> None:
+    process_error = next((item for item in cleanup_errors if _is_process_exception(item)), None)
+    if process_error is not None:
+        if primary is not None:
+            process_error.add_note(f"{label} interrupted after prior failure: {primary}")
+        for cleanup_error in cleanup_errors:
+            if cleanup_error is not process_error:
+                process_error.add_note(f"{label} also failed: {cleanup_error}")
+        raise process_error
+    if primary is not None:
+        for cleanup_error in cleanup_errors:
+            primary.add_note(f"{label} failed: {cleanup_error}")
+    elif cleanup_errors:
+        raise _state_commit_failed(
+            no_primary_message, "; ".join(str(item) for item in cleanup_errors)
+        ) from cleanup_errors[0]
+
+
+def _validated_transition(model: ProductionManifest | StateCommitAttempt, update: dict[str, object]) -> ProductionManifest | StateCommitAttempt:
+    return type(model).model_validate({**model.model_dump(mode="python"), **update})
+
+
+def prepare_project_registry_commit(
+    *,
+    manifest: ProductionManifest,
+    project: ProductionProject,
+    registry: AssetRegistrySnapshot,
+    attempt_id: str,
+) -> StateCommitRequest:
+    """Build the immutable snapshots selected by one P2A manifest transition."""
+    if project.project_id != manifest.project_id:
+        raise _state_invalid("Project ID does not match Production Manifest.")
+    if not verify_artifact_hash(project):
+        raise _state_invalid("Project semantic content hash is invalid.")
+    registry_hash = registry_semantic_sha256(registry)
+    if (
+        registry.revision_id != registry.content_hash
+        or registry.content_hash != registry_hash
+    ):
+        raise _state_invalid("Registry revision and semantic content hash are invalid.")
+    if project.revision < manifest.active_project.revision:
+        raise _state_invalid("Project revision cannot move backwards.")
+    if (
+        project.revision == manifest.active_project.revision
+        and project.content_hash != manifest.active_project.content_hash
+    ):
+        raise _state_invalid("A project revision cannot be reused with different content.")
+
+    project_payload = _canonical_yaml_bytes(project)
+    registry_payload = _canonical_json_bytes(registry)
+    project_path = Path(
+        f"state/projects/project.{project.revision}.{project.content_hash}.yaml"
+    )
+    registry_path = Path(f"assets/registry.{registry.revision_id}.json")
+    project_file_hash = hashlib.sha256(project_payload).hexdigest()
+    registry_file_hash = hashlib.sha256(registry_payload).hexdigest()
+    return StateCommitRequest(
+        attempt_id=attempt_id,
+        operation="commit_project_registry",
+        expected_manifest_revision=manifest.manifest_revision,
+        artifacts=tuple(
+            sorted(
+                (
+                    PreparedArtifact(project_path, project_payload, project_file_hash),
+                    PreparedArtifact(registry_path, registry_payload, registry_file_hash),
+                ),
+                key=lambda artifact: artifact.relative_path.as_posix(),
+            )
+        ),
+        next_project=ProjectSnapshotPointer(
+            path=project_path,
+            revision=project.revision,
+            content_hash=project.content_hash,
+            file_sha256=project_file_hash,
+        ),
+        next_registry=RegistrySnapshotPointer(
+            path=registry_path,
+            revision_id=registry.revision_id,
+            content_hash=registry.content_hash,
+            file_sha256=registry_file_hash,
+        ),
     )
 
 
 class _FileOps(Protocol):
     def mkdir(self, path: Path) -> bool: ...
-
     def open_exclusive(self, path: Path) -> BinaryIO: ...
-
     def fsync_file(self, handle: BinaryIO, path: Path) -> None: ...
-
     def replace(self, source: Path, destination: Path) -> None: ...
-
     def fsync_directory(self, path: Path) -> None: ...
-
     def stat(self, path: Path) -> os.stat_result: ...
-
     def link(self, source: Path, destination: Path) -> None: ...
-
     def sha256_file(self, path: Path) -> str: ...
-
     def unlink(self, path: Path, *, missing_ok: bool = False) -> None: ...
 
 
@@ -168,16 +269,12 @@ class _NativeFileOps:
         except FileExistsError:
             return False
         return True
-
     def open_exclusive(self, path: Path) -> BinaryIO:
         return path.open("xb")
-
     def fsync_file(self, handle: BinaryIO, path: Path) -> None:
         os.fsync(handle.fileno())
-
     def replace(self, source: Path, destination: Path) -> None:
         os.replace(source, destination)
-
     def fsync_directory(self, path: Path) -> None:
         flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
         descriptor = os.open(path, flags)
@@ -185,30 +282,22 @@ class _NativeFileOps:
             os.fsync(descriptor)
         finally:
             os.close(descriptor)
-
     def stat(self, path: Path) -> os.stat_result:
         return path.stat()
-
     def link(self, source: Path, destination: Path) -> None:
         os.link(source, destination)
-
     def sha256_file(self, path: Path) -> str:
         digest = hashlib.sha256()
         with path.open("rb") as handle:
             for chunk in iter(lambda: handle.read(1024 * 1024), b""):
                 digest.update(chunk)
         return digest.hexdigest()
-
     def unlink(self, path: Path, *, missing_ok: bool = False) -> None:
         path.unlink(missing_ok=missing_ok)
 
 
 class ProductionStateCommitter:
-    """POSIX-only low-level persistence primitives for the P2A state owner.
-
-    This class deliberately does not select snapshots or mutate a complete commit
-    transaction. Those orchestration responsibilities begin in Task 3.
-    """
+    """Single owner for durable POSIX P2A state commits."""
 
     def __init__(
         self,
@@ -295,16 +384,183 @@ class ProductionStateCommitter:
                 handle.close()
             except BaseException as exc:
                 cleanup_errors.append(exc)
-            if primary is not None:
-                for cleanup_error in cleanup_errors:
-                    primary.add_note(f"Production state lock cleanup failed: {cleanup_error}")
-            elif cleanup_errors:
-                raise _state_commit_failed(
-                    "Production state lock cleanup failed.",
-                    "; ".join(str(item) for item in cleanup_errors),
-                ) from cleanup_errors[0]
+            _handle_cleanup_errors(
+                primary,
+                cleanup_errors,
+                label="Production state lock cleanup",
+                no_primary_message="Production state lock cleanup failed.",
+            )
 
-    def _write_manifest_atomic(self, manifest: ProductionManifest) -> Path:
+    def commit(self, request: StateCommitRequest) -> ProductionManifest:
+        """Durably select a project and registry in one Manifest transition."""
+        final_manifest_replaced = [False]
+        try:
+            return self._commit_locked(request, final_manifest_replaced)
+        except Exception as exc:
+            if final_manifest_replaced[0]:
+                raise _outcome_unknown(exc) from exc
+            raise
+        except BaseException as exc:
+            if final_manifest_replaced[0]:
+                exc.add_note("Production state outcome may be committed or unknown.")
+            raise
+
+    def _commit_locked(
+        self, request: StateCommitRequest, final_manifest_replaced: list[bool]
+    ) -> ProductionManifest:
+        running_replaced = False
+        running_attempt: StateCommitAttempt | None = None
+        with self._exclusive_lock():
+            self._validate_request(request)
+            candidate_artifacts_hash = _candidate_artifacts_hash(request.artifacts)
+            manifest = self._read_manifest()
+            existing = next((item for item in manifest.attempts if item.attempt_id == request.attempt_id), None)
+            if existing is not None:
+                self._validate_replay(existing, request, candidate_artifacts_hash)
+                if existing.status is StateCommitStatus.SUCCEEDED:
+                    return manifest
+                raise _state_invalid("Production state commit attempt ID was already used.")
+            if manifest.manifest_revision != request.expected_manifest_revision:
+                raise _state_invalid("Production Manifest revision is stale.")
+
+            running_attempt = StateCommitAttempt(
+                attempt_id=request.attempt_id,
+                operation=request.operation,
+                status=StateCommitStatus.RUNNING,
+                base_manifest_revision=manifest.manifest_revision,
+                candidate_project=request.next_project,
+                candidate_registry=request.next_registry,
+                candidate_artifacts_hash=candidate_artifacts_hash,
+                started_at=_timestamp(),
+            )
+            running_manifest = _validated_transition(manifest, {"manifest_revision": manifest.manifest_revision + 1, "attempts": manifest.attempts + (running_attempt,)})
+            try:
+                def mark_running_replaced() -> None:
+                    nonlocal running_replaced
+                    running_replaced = True
+
+                self._write_manifest_atomic(running_manifest, on_replace=mark_running_replaced)
+                self._crash_injector.checkpoint(CommitPhase.AFTER_ATTEMPT_STARTED)
+                for artifact in sorted(request.artifacts, key=lambda item: item.relative_path.as_posix()):
+                    self._write_immutable_artifact(artifact, attempt_id=request.attempt_id)
+                self._verify_committed_candidates(request)
+                succeeded_attempt = _validated_transition(running_attempt, {"status": StateCommitStatus.SUCCEEDED, "finished_at": _timestamp()})
+                final_manifest = _validated_transition(
+                    manifest,
+                    {"manifest_revision": manifest.manifest_revision + 2, "active_project": request.next_project, "active_registry": request.next_registry, "attempts": manifest.attempts + (succeeded_attempt,)},
+                )
+
+                def mark_manifest_replaced() -> None:
+                    final_manifest_replaced[0] = True
+
+                self._write_manifest_atomic(final_manifest, on_replace=mark_manifest_replaced)
+                return self._read_manifest()
+            except Exception as exc:
+                primary = _as_state_error(exc)
+                if final_manifest_replaced[0]:
+                    raise
+                if not running_replaced or running_attempt is None:
+                    raise primary from exc
+                failed_attempt = _validated_transition(
+                    running_attempt,
+                    {"status": StateCommitStatus.FAILED, "finished_at": _timestamp(), "error_code": primary.code.value, "error_message": primary.user_message},
+                )
+                failed_manifest = _validated_transition(
+                    manifest,
+                    {"manifest_revision": manifest.manifest_revision + 2, "attempts": manifest.attempts + (failed_attempt,)},
+                )
+                try:
+                    self._write_manifest_atomic(failed_manifest)
+                except BaseException as persist_error:
+                    if _is_process_exception(persist_error):
+                        persist_error.add_note(
+                            "Failed production state attempt persistence interrupted after: "
+                            f"{primary} ({exc})"
+                        )
+                        raise
+                    primary.add_note(
+                        f"Could not persist failed production state attempt: {persist_error}"
+                    )
+                raise primary from exc
+
+    def _read_manifest(self) -> ProductionManifest:
+        manifest_path = self._state_directory() / "manifest.json"
+        self._reject_symlink(manifest_path)
+        try:
+            return ProductionManifest.model_validate_json(
+                manifest_path.read_text(encoding="utf-8")
+            )
+        except (OSError, ValidationError, ValueError) as exc:
+            raise _state_invalid("Could not read Production Manifest.", str(exc)) from exc
+
+    def _validate_request(self, request: StateCommitRequest) -> None:
+        if not request.attempt_id or not request.operation:
+            raise _state_invalid("Production state commit request is incomplete.")
+        if request.expected_manifest_revision < 1:
+            raise _state_invalid("Production state expected Manifest revision is invalid.")
+        artifacts: dict[Path, PreparedArtifact] = {}
+        for artifact in request.artifacts:
+            clean_path = self._validate_artifact_path(artifact.relative_path)
+            if clean_path in artifacts:
+                raise _state_invalid("Production state request contains duplicate artifact paths.")
+            if hashlib.sha256(artifact.payload).hexdigest() != artifact.file_sha256:
+                raise _state_invalid("Prepared artifact hash does not match its payload.")
+            artifacts[clean_path] = artifact
+        self._require_pointer_artifact(
+            request.next_project.path, request.next_project.file_sha256, artifacts
+        )
+        self._require_pointer_artifact(
+            request.next_registry.path, request.next_registry.file_sha256, artifacts
+        )
+
+    @staticmethod
+    def _require_pointer_artifact(
+        path: Path, file_sha256: str, artifacts: dict[Path, PreparedArtifact]
+    ) -> None:
+        artifact = artifacts.get(path)
+        if artifact is None or artifact.file_sha256 != file_sha256:
+            raise _state_invalid("Production snapshot pointer does not match a prepared artifact.")
+
+    @staticmethod
+    def _validate_replay(
+        existing: StateCommitAttempt,
+        request: StateCommitRequest,
+        candidate_artifacts_hash: str,
+    ) -> None:
+        if (
+            existing.operation != request.operation
+            or existing.candidate_project != request.next_project
+            or existing.candidate_registry != request.next_registry
+            or existing.candidate_artifacts_hash != candidate_artifacts_hash
+        ):
+            raise _state_invalid(
+                "Production state commit attempt ID has different candidate snapshots."
+            )
+
+    def _verify_committed_candidates(self, request: StateCommitRequest) -> None:
+        bundle = load_production_project_candidate(
+            self._project_root,
+            self._read_manifest(),
+            request.next_project.path,
+            request.next_registry.path,
+        )
+        project = bundle.project
+        registry = bundle.registry
+        if (
+            project.project_id != self._read_manifest().project_id
+            or project.revision != request.next_project.revision
+            or project.content_hash != request.next_project.content_hash
+        ):
+            raise _state_commit_failed("Committed project snapshot verification failed.")
+        if (
+            registry.revision_id != request.next_registry.revision_id
+            or registry.content_hash != request.next_registry.content_hash
+        ):
+            raise _state_commit_failed("Committed registry snapshot verification failed.")
+
+    def _write_manifest_atomic(
+        self, manifest: ProductionManifest, *, on_replace: Callable[[], None] | None = None
+    ) -> Path:
         final_path = self._state_directory() / "manifest.json"
         self._write_mutable_atomic(
             final_path,
@@ -316,6 +572,7 @@ class ProductionStateCommitter:
                 CommitPhase.AFTER_MANIFEST_REPLACE,
                 CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
             ),
+            on_replace=on_replace,
         )
         return final_path
 
@@ -326,6 +583,7 @@ class ProductionStateCommitter:
         *,
         temp_name: str,
         phases: tuple[CommitPhase, CommitPhase, CommitPhase, CommitPhase] | None = None,
+        on_replace: Callable[[], None] | None = None,
     ) -> None:
         final_path = self._validate_final_path(final_path)
         if Path(temp_name).name != temp_name or not temp_name:
@@ -345,6 +603,8 @@ class ProductionStateCommitter:
                     self._crash_injector.checkpoint(phases[1])
             self._validate_final_path(final_path)
             self._ops.replace(temp_path, final_path)
+            if on_replace is not None:
+                on_replace()
             if phases:
                 self._crash_injector.checkpoint(phases[2])
             self._ops.fsync_directory(final_path.parent)
@@ -354,19 +614,27 @@ class ProductionStateCommitter:
             primary = exc
             raise
         except BaseException as exc:
+            if not isinstance(exc, Exception):
+                primary = exc
+                raise
             primary = _state_commit_failed(
                 "Could not write production state atomically.", str(exc)
             )
             raise primary from exc
         finally:
             if primary is not None:
+                cleanup_errors: list[BaseException] = []
                 try:
                     self._validate_cleanup_temp_path(temp_path)
                     self._ops.unlink(temp_path, missing_ok=True)
                 except BaseException as cleanup_error:
-                    primary.add_note(
-                        f"Production state temporary cleanup failed: {cleanup_error}"
-                    )
+                    cleanup_errors.append(cleanup_error)
+                _handle_cleanup_errors(
+                    primary,
+                    cleanup_errors,
+                    label="Production state temporary cleanup",
+                    no_primary_message="Could not clean production state temporary file.",
+                )
 
     def _write_immutable_artifact(
         self, artifact: PreparedArtifact, *, attempt_id: str
@@ -407,24 +675,26 @@ class ProductionStateCommitter:
             primary = exc
             raise
         except BaseException as exc:
+            if not isinstance(exc, Exception):
+                primary = exc
+                raise
             primary = _state_commit_failed(
                 "Could not promote immutable production artifact.", str(exc)
             )
             raise primary from exc
         finally:
+            cleanup_errors: list[BaseException] = []
             try:
                 self._validate_cleanup_temp_path(temp_path)
                 self._ops.unlink(temp_path, missing_ok=True)
             except BaseException as cleanup_error:
-                if primary is not None:
-                    primary.add_note(
-                        f"Immutable temporary cleanup failed: {cleanup_error}"
-                    )
-                else:
-                    raise _state_commit_failed(
-                        "Could not clean immutable production temporary file.",
-                        str(cleanup_error),
-                    ) from cleanup_error
+                cleanup_errors.append(cleanup_error)
+            _handle_cleanup_errors(
+                primary,
+                cleanup_errors,
+                label="Immutable temporary cleanup",
+                no_primary_message="Could not clean immutable production temporary file.",
+            )
 
     def _state_directory(self) -> Path:
         state_dir = self._project_root / "state"
