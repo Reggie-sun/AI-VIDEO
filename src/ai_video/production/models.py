@@ -206,6 +206,15 @@ class MotionDirective(StrictModel):
     ]
     parameters: dict[str, float | int | str] = Field(min_length=1)
 
+    @field_validator("parameters", mode="before")
+    @classmethod
+    def _reject_boolean_parameters(cls, value: object) -> object:
+        if isinstance(value, dict) and any(
+            isinstance(item, bool) for item in value.values()
+        ):
+            raise ValueError("motion parameters cannot use boolean numeric values")
+        return value
+
     _freeze_parameters = field_validator("parameters")(_immutable_mapping)
 
 

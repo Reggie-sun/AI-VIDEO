@@ -78,6 +78,11 @@ def test_default_parameter_mapping_is_immutable():
         directive.parameters["mode"] = "cover"
 
 
+def test_motion_parameters_reject_boolean_as_numeric_value():
+    with pytest.raises(ValidationError, match="boolean"):
+        MotionDirective(kind="pan", parameters={"x": True})
+
+
 def test_fixed_duration_requires_seconds():
     with pytest.raises(ValidationError, match="requires seconds"):
         DurationPolicy(mode="fixed")
