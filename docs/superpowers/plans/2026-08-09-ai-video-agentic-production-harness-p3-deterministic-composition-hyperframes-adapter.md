@@ -220,13 +220,14 @@ Do not modify:
 | Task | RED Focus | Owner | Commit |
 | --- | --- | --- | --- |
 | 0 | accepted P2A fact check + authorized pinned Renderer Gate | prerequisites/dependency/browser lock | `build: pin hyperframes renderer tool` |
-| 1 | strict composition/timeline/receipt/render-state schema + 2.0/2.1 read compatibility | `models.py` + `project.py` | `feat: add composition and render contracts` |
+| 1 | strict composition/timeline/receipt/render-state schema + 2.0/2.1 model compatibility | `models.py` | `feat: add composition and render contracts` |
 | 2 | exact frame/sample resolution and fingerprint | `composition.py` | `feat: resolve deterministic production timelines` |
 | 3 | timeline-only source materialization into validated attempt paths | `hyperframes.py` source layer | `feat: materialize audited hyperframes sources` |
 | 4 | fake lint/check/render and typed receipts | `HyperFramesAdapter` orchestration boundary | `feat: add hyperframes renderer adapter` |
-| 5 | begin/failure/atomic render-state activation/replay/crash recovery | `ProductionStateCommitter` + P2A tests | `feat: commit production render state` |
-| 6 | docs and verified runtime truth | docs | `docs: document p3 composition runtime` |
-| 7 | live spike, regression and independent review | verification | no commit unless correction is required |
+| 5 | 2.0/2.1 read + orchestration + begin/failure/candidate-prepared/final activation/replay/recovery | `project.py` + `hyperframes.py` + `ProductionStateCommitter` + P2A tests | `feat: commit production render state` |
+| 6 | authorized live spike + focused/P2A/Legacy/full regression proof | verification | no commit unless correction is required |
+| 7 | docs from completed verification evidence | docs | `docs: document p3 composition runtime` |
+| 8 | final independent review + branch truth | review/verification | no commit unless correction is required |
 
 ### Task 0: Pass P2A and Renderer Gates
 
@@ -392,6 +393,9 @@ def test_renderer_selection_allows_one_selected_renderer():
 
 
 def test_manifest_20_rejects_render_state_and_render_attempts(): ...
+
+
+def test_manifest_20_preserves_historical_custom_nonempty_operation_without_rewrite(): ...
 
 
 def test_manifest_21_accepts_none_or_one_render_state_pointer(): ...
@@ -613,7 +617,7 @@ Extend `ProductionManifest` and `StateCommitAttempt`:
 ```python
 class StateCommitAttempt(StrictModel):
     # existing P2A fields remain
-    operation: Literal["commit_project_registry", "render_state"]
+    operation: str = Field(min_length=1)
     base_render_state: RenderStateSnapshotPointer | None = None
     candidate_render_state: RenderStateSnapshotPointer | None = None
     renderer_selection: RendererSelectionReceipt | None = None
@@ -626,13 +630,13 @@ class ProductionManifest(StrictModel):
     active_render_state: RenderStateSnapshotPointer | None = None
 ```
 
-For `operation="commit_project_registry"`, all render fields are `None` and existing candidate project/registry semantics remain exact. For `operation="render_state"`, `base_project == candidate_project == manifest.active_project` and `base_registry == candidate_registry == manifest.active_registry`; `base_render_state` is the pointer observed at begin and `candidate_render_state` is present only for activation/outcome recovery. At begin/failure `candidate_artifacts_hash` is the canonical SHA-256 of the empty prepared-artifact set; activation replaces it with the exact sorted five-artifact identity hash. Reject mixed operation fields. A 2.0 Manifest rejects any render field/attempt; a 2.1 Manifest allows no active render yet. Do not rewrite immutable P2/P2A snapshots during migration.
+Preserve P2A compatibility: persisted `StateCommitAttempt.operation` remains the historical non-empty `str`, not a new `Literal`. Existing `commit(StateCommitRequest)` keeps accepting/persisting its already accepted non-empty operation values and must load a valid 2.0 Manifest containing a historical/custom operation unchanged. Only the new P3 lifecycle methods write and require exact `operation="render_state"`; attempts with that operation must satisfy `base_project == candidate_project == manifest.active_project` and `base_registry == candidate_registry == manifest.active_registry`. `base_render_state` is the pointer observed at begin and `candidate_render_state` appears only after candidate preparation. At begin and failure before candidate preparation, `candidate_artifacts_hash` is the canonical SHA-256 of the empty prepared-artifact set; candidate preparation replaces it with the exact sorted five-artifact identity hash, which any later terminal failure retains. Reject render fields on any non-render operation and reject mixed candidate state. A 2.0 Manifest rejects render fields/`render_state` attempts but continues accepting historical non-render operation strings; a 2.1 Manifest allows no active render yet. Reading does not rewrite either version or immutable P2/P2A snapshots.
 
 Receipt timestamps are intentionally absent from semantic fingerprints. If P2A adds lifecycle timestamps, they remain Manifest/receipt-envelope metadata and are excluded from `composition_fingerprint`.
 
-- [ ] **Step 5: Export only stable P3 contracts**
+- [ ] **Step 5: Export only stable P3 schema contracts**
 
-Export `CompositionSpec`, `ResolvedTimeline`, `RendererSelectionReceipt`, `RendererSourceReceipt` and `RenderReceipt` from `production/__init__.py`. Do not export a runtime command or writer.
+Export these stable schema types from `production/__init__.py`: `CompositionSpec`, `ResolvedTimeline`, `RendererSelectionReceipt`, `RendererSourceReceipt`, `RenderReceipt`, `RenderArtifactPointer`, `RenderOutputPointer`, `RenderStateSnapshot` and `RenderStateSnapshotPointer`. Task 5 later adds the stable lifecycle request/path exports. Keep validators, canonical serialization helpers, path constructors and cross-validation helpers module-private; do not export a second writer or CLI command.
 
 - [ ] **Step 6: Run GREEN and commit**
 
@@ -1189,14 +1193,6 @@ def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
     assert result.render.renderer.kind is RendererKind.HYPERFRAMES
 
 
-def test_orchestrator_persists_selection_before_version_or_executable_call(tmp_path):
-    events = EventLogCommitterAndRunner(tmp_path)
-    render_with_hyperframes(make_request(events), committer=events, runner=events)
-    assert events.names.index("begin_render_attempt") < events.names.index("version")
-    assert events.names.index("begin_render_attempt") < events.names.index("lint")
-    assert events.names[-1] == "activate_render_state"
-
-
 def test_adapter_rejects_remotion_without_fallback(tmp_path):
     runner = FakeRunner()
     with pytest.raises(AiVideoError) as exc:
@@ -1214,15 +1210,6 @@ def test_adapter_reports_typed_phase_failure_without_next_command(tmp_path, fail
         HyperFramesAdapter(runner, "0.7.103").render(make_render_attempt(tmp_path))
     assert exc.value.phase == failed_phase
     assert all(call.command != "render" for call in runner.calls) if failed_phase != "render" else True
-
-
-@pytest.mark.parametrize("failed_phase", ["source", "lint", "check", "render", "verify"])
-def test_orchestrator_records_typed_failure_without_pointer_switch(tmp_path, failed_phase):
-    events = EventLogCommitterAndRunner(tmp_path, fail_at=failed_phase)
-    with pytest.raises(RendererAttemptError):
-        render_with_hyperframes(make_request(events), committer=events, runner=events)
-    assert events.failure.phase == failed_phase
-    assert "activate_render_state" not in events.names
 ```
 
 Also cover wrong tool version, malformed JSON, lint errors, check errors, warnings policy, missing/empty output, output hash mismatch, measured width/height/FPS/duration mismatch, timeout, stderr truncation/redaction, no source mutation after lint, and only one selected renderer.
@@ -1291,15 +1278,7 @@ OFFLINE_ENV = {
 }
 ```
 
-Add one named orchestration function `render_with_hyperframes()` in `hyperframes.py`. It must:
-
-1. call `ProductionStateCommitter.begin_render_attempt()` with the exact selection and current project/registry/render identities before `runner.version()` or any executable call;
-2. obtain `render_attempt_paths()` and use only its source/output staging paths;
-3. call `HyperFramesAdapter.render()` once, with no alternate renderer;
-4. translate `source`/`lint`/`check`/`render`/`verify` failures into `record_render_failure()` before re-raising the typed error;
-5. build the immutable prepared timeline/source/render/state/output artifact set and call `activate_render_state()` only after receipts and output have been rehashed and validated.
-
-The orchestrator does not write the Manifest or canonical files itself; it delegates all durable operations to `ProductionStateCommitter`.
+Task 4 implements only the injected renderer executor and typed receipt construction. Task 5 adds the named `render_with_hyperframes()` orchestration after the real lifecycle request/API types exist; do not create a temporary alias or duplicate request model here.
 
 `OFFLINE_ENV` 是必要但不充分的 process policy：它不阻止 npm update fetch 或 browser download。默认 unit tests 只使用 fake runner；real runner/live spike 还必须在 OS-level egress denial/observability 下运行，并用经 Renderer Gate 验收的 `HYPERFRAMES_BROWSER_PATH` 显式指向预先安装的 browser。
 
@@ -1551,10 +1530,12 @@ Expected: fake/no-network tests pass; process call list proves one renderer and 
 - Modify: `src/ai_video/production/paths.py`
 - Modify: `src/ai_video/production/project.py`
 - Modify: `src/ai_video/production/state_commit.py`
+- Modify: `src/ai_video/production/hyperframes.py`
 - Modify: `src/ai_video/production/__init__.py`
 - Modify: `tests/test_production_project.py`
 - Modify: `tests/test_production_state_commit.py`
 - Modify: `tests/test_production_state_recovery.py`
+- Modify: `tests/test_production_hyperframes.py`
 - Modify: `tests/helpers/p2a_crash_worker.py`
 
 - [ ] **Step 1: Write RED path, migration and read-only loader cases**
@@ -1565,6 +1546,7 @@ Add P2 read-only tests:
 
 ```python
 def test_reader_loads_20_without_render_state_and_does_not_rewrite(tmp_path): ...
+def test_reader_loads_20_historical_custom_operation_without_rewrite(tmp_path): ...
 def test_reader_loads_21_with_none_render_state(tmp_path): ...
 def test_reader_verifies_21_selected_render_state_and_all_exact_artifacts(tmp_path): ...
 def test_reader_rejects_tampered_or_mixed_render_state_without_fallback(tmp_path): ...
@@ -1658,9 +1640,51 @@ def record_render_failure(self, request: RecordRenderFailureRequest) -> Producti
 
 Both run under `state/commit.lock` and use the existing atomic Manifest writer. `begin_render_attempt()` validates selection contains exactly HyperFrames `0.7.103`, writes a running `StateCommitAttempt(render_phase="selection")`, and on the first render write migrates Manifest 2.0 -> 2.1 in that same replace. This durable write must finish before version/lint/check/render. It never switches `active_render_state`.
 
-`record_render_failure()` requires the matching begun attempt, persists `failed`, exact typed phase/code/redacted bounded message and finished time, and leaves `active_render_state` plus project/registry pointers unchanged. Source materialization and installed-version/renderer-availability failures use phase `source`; lint, check, render and output verification use their named phases. All flow through this method; if the failure record itself cannot be durably written, surface the state error without claiming the render failure was recorded.
+`record_render_failure()` requires the matching begun or candidate-prepared attempt, persists `failed`, exact typed phase/code/redacted bounded message and finished time, and leaves `active_render_state` plus project/registry pointers unchanged. If candidate-prepared, retain its exact candidate pointer/hash for orphan reporting. Source materialization and installed-version/renderer-availability failures use phase `source`; lint, check, render and output verification use their named phases. All flow through this method; if the failure record itself cannot be durably written, surface the state error without claiming the render failure was recorded.
 
-- [ ] **Step 5: Prepare and validate the exact success artifact set**
+- [ ] **Step 5: Integrate one lifecycle-owned HyperFrames orchestration path**
+
+Now add `hyperframes.py::render_with_hyperframes()` using the real Task 5 request types. It calls `begin_render_attempt()` before `runner.version()` or source materialization, obtains `render_attempt_paths()`, calls `HyperFramesAdapter.render()` once, builds the five exact prepared artifacts and calls `activate_render_state()` only after verify.
+
+Use one explicit post-begin exception boundary:
+
+```python
+manifest = committer.begin_render_attempt(begin_request)
+phase = "source"
+try:
+    paths = committer.render_attempt_paths(begin_request.attempt_id)
+    version = runner.version()
+    if version != expected_version:
+        raise _renderer_unavailable("Installed HyperFrames version does not match the pin.")
+    # materialize source, then advance phase before lint/check/render/verify
+    result = adapter.render(...)
+    return committer.activate_render_state(activation_request(result))
+except Exception as exc:
+    if isinstance(exc, AiVideoError) and exc.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN:
+        raise
+    committer.record_render_failure(
+        failure_request_from(exc, phase=phase, manifest=manifest)
+    )
+    raise
+```
+
+Every ordinary exception after successful begin, including a plain `RENDERER_UNAVAILABLE` from `runner.version()`/wrong pin, `OSError` during source materialization, and typed lint/check/render/verify errors, is normalized into `RecordRenderFailureRequest` before re-raise. Version/availability/materialization use `phase="source"`. Only process-level interruption/crash and `PRODUCTION_STATE_OUTCOME_UNKNOWN` bypass ordinary failure recording; the latter may leave an exact begun/candidate-prepared attempt running only as a deliberate recovery state and requires explicit recovery before further work. If failure persistence itself fails, raise the state persistence error with the original exception attached as a note. No ordinary post-begin path may leave the attempt `running`.
+
+Add focused order/persistence tests:
+
+```python
+def test_orchestrator_persists_selection_before_version_or_executable_call(tmp_path): ...
+
+@pytest.mark.parametrize("failure", ["version_exception", "wrong_version", "source_exception"])
+def test_orchestrator_records_post_begin_availability_as_source_failure(tmp_path, failure): ...
+
+@pytest.mark.parametrize("phase", ["source", "lint", "check", "render", "verify"])
+def test_orchestrator_records_every_ordinary_phase_and_never_leaves_running(tmp_path, phase): ...
+```
+
+Assert event order begins with `begin_render_attempt`, success ends in `activate_render_state`, failure ends in `record_render_failure`, failed Manifest status is terminal, active/project/registry pointers are unchanged, and no alternate renderer runs.
+
+- [ ] **Step 6: Prepare and validate the exact success artifact set**
 
 The orchestration layer must pass exactly five `PreparedArtifact`s, sorted by canonical relative path:
 
@@ -1672,7 +1696,7 @@ The orchestration layer must pass exactly five `PreparedArtifact`s, sorted by ca
 
 `activate_render_state()` parses/reseals the four JSON artifacts, rehashes all bytes, reopens promoted files, verifies the output size/hash, validates the snapshot cross references and requires `next_render_state` to point exactly at the fifth artifact. Extra, missing, duplicate or noncanonical artifacts fail. The immutable writer uses file temp -> file fsync -> promote-without-overwrite -> parent-directory fsync -> reopen verify for every artifact/output.
 
-- [ ] **Step 6: Atomically activate one render-state pointer**
+- [ ] **Step 7: Durably prepare the candidate, then atomically activate one pointer**
 
 Add:
 
@@ -1680,9 +1704,36 @@ Add:
 def activate_render_state(self, request: ActivateRenderStateRequest) -> ProductionManifest: ...
 ```
 
-It requires the exact running attempt and unchanged project/registry pair. After all immutable promotions verify, create `candidate_render_state=next_render_state`, set `render_phase="activate"`, then atomically replace one Manifest whose only active-state change is `active_render_state=next_render_state`; project/registry pointers are byte-for-byte equal to the base pair. Mark the attempt succeeded in that final Manifest. Before `os.replace`, old/`None` render state stays active; after replace, candidate is active. Exact success replay returns the active Manifest without rewriting artifacts or incrementing revision; attempt ID conflict is rejected.
+It requires the exact running attempt and unchanged project/registry pair. Activation has two separate durable Manifest transitions after all five immutable artifacts verify:
 
-- [ ] **Step 7: Extend explicit recovery and orphan reporting**
+1. **candidate-prepared transition:** atomically replace a running Manifest attempt containing `candidate_render_state=next_render_state`, the exact sorted five-artifact `candidate_artifacts_hash` and `render_phase="activate"`; keep `active_render_state=base_render_state` and keep project/registry byte-for-byte unchanged. The candidate-prepared Manifest itself must complete temp write -> file fsync -> replace -> parent-directory fsync -> reopen/identity verification before final activation begins.
+2. **final succeeded transition:** atomically replace one Manifest with `active_render_state=next_render_state` and the same project/registry pointers, then mark the exact attempt `succeeded`. Only this second replace is the active render commit point.
+
+If the base Manifest revision is `R`, a fresh success has exactly `R+1` after `begin_render_attempt()`, `R+2` after candidate preparation and `R+3` after the final pointer switch. An ordinary typed failure before candidate preparation writes one terminal Manifest at the next revision; a failure after candidate preparation writes one terminal failed Manifest while leaving the base pointer active and retaining candidate identity for orphan reporting.
+
+Exact replay behavior:
+
+- exact begin replay returns the current matching attempt at begun, candidate-prepared, failed or succeeded stage without revision increment;
+- exact activation replay from begun state revalidates/promotes the same immutable set, writes candidate-prepared once, then final once;
+- exact activation replay from candidate-prepared state revalidates the five artifacts and performs only the final switch;
+- exact activation replay after succeeded state returns the active Manifest without artifact rewrite or revision increment;
+- a stale expected revision is accepted only for one of those exact identities; any attempt-ID/request/artifact/pointer mismatch is rejected.
+
+Before the final `os.replace`, old/`None` render state stays active; after it, candidate is active. Candidate-prepared replace/directory-fsync ambiguity is resolved by reopening the Manifest and matching the exact attempt/candidate/hash while the active pointer remains base. Final replace ambiguity becomes `outcome_unknown` and is resolved only by explicit recovery.
+
+Extend `CommitPhase` with render-specific checkpoints:
+
+```python
+AFTER_RENDER_CANDIDATE_MANIFEST_TEMP_WRITE
+AFTER_RENDER_CANDIDATE_MANIFEST_FILE_FSYNC
+AFTER_RENDER_CANDIDATE_MANIFEST_REPLACE
+AFTER_RENDER_CANDIDATE_MANIFEST_DIRECTORY_FSYNC
+AFTER_RENDER_CANDIDATE_MANIFEST_VERIFICATION
+```
+
+Keep the existing final Manifest checkpoints for the succeeded pointer switch. Do not reuse one checkpoint name for both transitions.
+
+- [ ] **Step 8: Extend explicit recovery and orphan reporting**
 
 For running/outcome-unknown render attempts compare this exact triple:
 
@@ -1690,24 +1741,42 @@ For running/outcome-unknown render attempts compare this exact triple:
 (active_project, active_registry, active_render_state)
 ```
 
-Valid old state is `(base_project, base_registry, base_render_state)`; valid new state is `(candidate_project, candidate_registry, candidate_render_state)`, where project/registry members are unchanged. Old means interrupted/no activation; new means succeeded. Any changed project/registry member, render pointer outside old/new, tampered pointer/file/snapshot, incomplete candidate or mixed state fails recovery rather than guessing.
+Valid old state is `(base_project, base_registry, base_render_state)`; valid new state is `(candidate_project, candidate_registry, candidate_render_state)`, where project/registry members are unchanged. A begun attempt with no candidate and old active state is interrupted before preparation. A candidate-prepared attempt with old active state is interrupted before activation and its exact complete artifacts are preserved/reported. New active state means succeeded. Any changed project/registry member, render pointer outside old/new, tampered pointer/file/snapshot, candidate hash mismatch, incomplete candidate or mixed state fails recovery rather than guessing.
 
 Cleanup is bounded to fixed Manifest temp, owned immutable temps and scratch/temp files below `state/render/attempts/<safe-id>/` for non-succeeded attempts. Never delete an active or user output. Preserve and report complete orphan immutable timelines, source receipts, render receipts, render states and outputs; do not activate or GC them. Succeeded attempt scratch is not auto-deleted by recovery unless a separately verified cleanup marker owns it.
 
-- [ ] **Step 8: Add crash injection coverage**
+- [ ] **Step 9: Add crash injection coverage**
 
 Extend `tests/helpers/p2a_crash_worker.py` and recovery tests with process-level crashes at:
 
 ```text
 begin attempt Manifest temp / fsync / replace / directory fsync
 each artifact or output temp / file fsync / promote / directory fsync / reopen verify
-candidate verification before final Manifest
+candidate-prepared Manifest temp / file fsync / replace / directory fsync / reopen verify
 final Manifest temp / file fsync / replace / directory fsync
 ```
 
-For every pre-final-replace crash assert old/`None` pointer remains active, project/registry unchanged, bounded temp cleanup and complete orphan preservation/reporting. For final replace/directory-fsync ambiguity assert explicit recovery resolves only by exact old/new render pointer plus unchanged pair. Include replay after recovered success and conflicting attempt-ID rejection.
+For every pre-final-replace crash assert old/`None` pointer remains active and project/registry unchanged. Candidate-prepared temp/fsync crashes recover as begun unless the exact replacement is readable; replace/directory-fsync ambiguity must reopen and accept only the exact candidate/hash identity. Recovery performs bounded temp cleanup and preserves/reports every complete orphan. For final replace/directory-fsync ambiguity assert explicit recovery resolves only by exact old/new render pointer plus unchanged pair. Assert revisions `R+1/R+2/R+3`, replay from each stage, replay after recovered success and conflicting attempt-ID rejection.
 
-- [ ] **Step 9: Run focused GREEN and commit**
+- [ ] **Step 10: Export the stable lifecycle surface explicitly**
+
+Export from `production/__init__.py`:
+
+```text
+BeginRenderAttemptRequest
+RecordRenderFailureRequest
+ActivateRenderStateRequest
+RenderAttemptPaths
+RenderArtifactPointer
+RenderOutputPointer
+RenderStateSnapshot
+RenderStateSnapshotPointer
+ProductionStateCommitter
+```
+
+The public methods are `ProductionStateCommitter.begin_render_attempt()`、`record_render_failure()`、`activate_render_state()` and `render_attempt_paths()`. Keep `_candidate_artifacts_hash`, Manifest transition builders, `CommitPhase`, crash injectors, native file ops, canonical render path constructors/validators, recovery scanners and serialization/cross-validation helpers private to their modules. `hyperframes.py` may export `HyperFramesAdapter` and `render_with_hyperframes()` only after their API tests pass; injected runner protocols/results, materialization structs and redaction/command helpers remain module-private.
+
+- [ ] **Step 11: Run focused GREEN and commit**
 
 ```bash
 python -m pytest \
@@ -1718,65 +1787,17 @@ python -m pytest \
   tests/test_production_state_commit.py \
   tests/test_production_state_recovery.py -q
 git add src/ai_video/production/paths.py src/ai_video/production/project.py \
-  src/ai_video/production/state_commit.py src/ai_video/production/__init__.py \
+  src/ai_video/production/state_commit.py src/ai_video/production/hyperframes.py \
+  src/ai_video/production/__init__.py \
   tests/test_production_project.py tests/test_production_state_commit.py \
-  tests/test_production_state_recovery.py tests/helpers/p2a_crash_worker.py
+  tests/test_production_state_recovery.py tests/test_production_hyperframes.py \
+  tests/helpers/p2a_crash_worker.py
 git commit -m "feat: commit production render state"
 ```
 
-Expected: selection is durable before any executable call; source/lint/check/render/verify failures are typed and durable; activation/replay is atomic and deterministic; crash recovery preserves complete orphans; existing P2A `commit(StateCommitRequest)` tests remain unchanged and green.
+Expected: selection is durable before any executable call; every ordinary post-begin availability/source/lint/check/render/verify failure is typed and durable; candidate-prepared state is durable before the final pointer switch; `R+1/R+2/R+3` revisions and replay are deterministic; crash recovery preserves complete orphans; 2.0 historical/custom operation loading and existing P2A `commit(StateCommitRequest)` behavior remain unchanged and green.
 
-### Task 6: Synchronize Verified Documentation
-
-**Files:**
-- Modify: `README.md`
-- Modify: `docs/v0.2-runtime-baseline.md`
-- Modify: `docs/v0.2-agentic-production-roadmap.md`
-- Modify: `docs/agent-primary-contract-matrix.md`
-
-- [ ] **Step 1: Document only verified P3 behavior**
-
-After focused, live spike and regression gates pass, document:
-
-- importable `CompositionSpec`/`resolve_composition()`/HyperFrames adapter API;
-- accepted strategies in this slice and explicit blocked strategies;
-- `ResolvedTimeline` as only order/timing truth;
-- exact pinned tool version and one-renderer-per-attempt rule;
-- source hash/lint/check and render receipt fields;
-- Manifest 2.0/2.1 compatibility, one active render-state pointer, canonical immutable layout and P2A-owned begin/failure/activation/recovery behavior;
-- fake/no-network CI versus the explicitly authorized, egress-contained live spike;
-- P4/P5/P6/P7/P8 remain unimplemented.
-
-Do not claim byte-identical MP4, cloud readiness, Audio/Caption support, selective rebuild, new CLI or Legacy migration.
-
-- [ ] **Step 2: Add focused contract validation**
-
-Add to the contract matrix:
-
-```bash
-python -m pytest \
-  tests/test_production_models.py \
-  tests/test_production_project.py \
-  tests/test_production_composition.py \
-  tests/test_production_hyperframes.py \
-  tests/test_production_state_commit.py \
-  tests/test_production_state_recovery.py -q
-```
-
-- [ ] **Step 3: Scan claims and commit**
-
-```bash
-rg -n "P3|CompositionSpec|ResolvedTimeline|HyperFrames|Remotion|byte-identical|Audio|Caption|P5|Provider" \
-  README.md docs/v0.2-runtime-baseline.md docs/v0.2-agentic-production-roadmap.md \
-  docs/agent-primary-contract-matrix.md
-git add README.md docs/v0.2-runtime-baseline.md \
-  docs/v0.2-agentic-production-roadmap.md docs/agent-primary-contract-matrix.md
-git commit -m "docs: document p3 composition runtime"
-```
-
-Expected: P3 text describes only tested local behavior; every future capability remains planned/not implemented.
-
-### Task 7: Run Live Spike, Regressions and Independent Review
+### Task 6: Run Live Spike and Regression Proof
 
 **Files:**
 - Verify: all P3/P2A-owned files
@@ -1803,11 +1824,12 @@ export HYPERFRAMES_BROWSER_PATH="$P3_HYPERFRAMES_BROWSER_PATH"
 
 These variables do not themselves prove offline execution: `HYPERFRAMES_NO_UPDATE_CHECK` does not stop the registry fetch and `HYPERFRAMES_NO_AUTO_INSTALL` does not stop browser download. The spike harness must independently deny/observe external egress and fail if the CLI attempts network or installation.
 
-Run the entire lint/check/preview/curl/render block in one Linux network namespace created with `unshare --user --map-root-user --net`; inside it run `ip link set lo up` so only loopback exists. Wrap HyperFrames/Chrome processes with `strace -ff -e trace=network` into the disposable spike directory and retain the trace as evidence of attempted sockets. If unprivileged network namespaces, `ip`, or `strace` are unavailable, stop: do not fall back to env vars alone or run the live spike on the host network.
+Run the entire lint/check/preview/curl/render block in one Linux namespace created with `unshare --user --map-root-user --net --pid --fork --mount-proc`; inside it run `ip link set lo up` so only loopback exists and `ps` sees only namespace-owned processes. Wrap HyperFrames/Chrome processes with `strace -ff -e trace=network` into the disposable spike directory and retain the trace as evidence of attempted sockets. If unprivileged user/network/PID namespaces, proc mounting, `ip`, `setsid`, `ps` or `strace` are unavailable, stop: do not fall back to env vars alone or run the live spike on the host network.
 
-Run the exact pinned binary against the committed silent-image fixture copied into a disposable staging directory. The shown body must execute inside that one namespace (including preview and `curl`), with `strace` applied to every HyperFrames command:
+Run the exact pinned binary against the committed silent-image fixture copied into a disposable staging directory. The shown body must execute inside that one namespace (including preview and `curl`), with `strace` applied to every HyperFrames command. Start preview in its own namespace-scoped process group and install a trap before launch:
 
 ```bash
+set -euo pipefail
 P3_SPIKE_DIR=$(mktemp -d)
 cp -R tests/fixtures/hyperframes/silent_image/. "$P3_SPIKE_DIR/"
 strace -ff -e trace=network -o "$P3_SPIKE_DIR/version.net" \
@@ -1818,13 +1840,43 @@ strace -ff -e trace=network -o "$P3_SPIKE_DIR/lint.net" \
   ./node_modules/.bin/hyperframes lint "$P3_SPIKE_DIR" --json
 strace -ff -e trace=network -o "$P3_SPIKE_DIR/check.net" \
   ./node_modules/.bin/hyperframes check "$P3_SPIKE_DIR" --json
-strace -ff -e trace=network -o "$P3_SPIKE_DIR/preview.net" \
+
+P3_PREVIEW_PID=""
+P3_PREVIEW_PGID=""
+cleanup_p3_preview() {
+  if test -n "$P3_PREVIEW_PGID"; then
+    case "$P3_PREVIEW_PGID" in
+      *[!0-9]*|0|1) return 1 ;;
+    esac
+    if test "$P3_PREVIEW_PGID" != "$P3_PREVIEW_PID"; then
+      return 1
+    fi
+    kill -TERM -- "-$P3_PREVIEW_PGID" 2>/dev/null || true
+    for _ in {1..50}; do
+      kill -0 -- "-$P3_PREVIEW_PGID" 2>/dev/null || break
+      sleep 0.1
+    done
+    if kill -0 -- "-$P3_PREVIEW_PGID" 2>/dev/null; then
+      kill -KILL -- "-$P3_PREVIEW_PGID"
+    fi
+    wait "$P3_PREVIEW_PID" 2>/dev/null || true
+    ! kill -0 -- "-$P3_PREVIEW_PGID" 2>/dev/null
+  fi
+}
+trap 'cleanup_p3_preview' EXIT
+trap 'cleanup_p3_preview; exit 130' INT
+trap 'cleanup_p3_preview; exit 143' TERM
+setsid strace -ff -e trace=network -o "$P3_SPIKE_DIR/preview.net" \
   ./node_modules/.bin/hyperframes preview "$P3_SPIKE_DIR" --port 3017 \
   >"$P3_SPIKE_DIR/preview.log" 2>&1 &
 P3_PREVIEW_PID=$!
+P3_PREVIEW_PGID=$(ps -o pgid= -p "$P3_PREVIEW_PID" | tr -d ' ')
+test "$P3_PREVIEW_PGID" = "$P3_PREVIEW_PID"
 curl --fail --silent --show-error http://127.0.0.1:3017/ >/dev/null
-kill "$P3_PREVIEW_PID"
-wait "$P3_PREVIEW_PID" || true
+cleanup_p3_preview
+P3_PREVIEW_PID=""
+P3_PREVIEW_PGID=""
+! ps -eo comm= | rg -q '^(node|chrome|chromium|chrome-headless)'
 strace -ff -e trace=network -o "$P3_SPIKE_DIR/render.net" \
   ./node_modules/.bin/hyperframes render "$P3_SPIKE_DIR" \
   -o "$P3_SPIKE_DIR/render.mp4"
@@ -1838,7 +1890,7 @@ Expected:
 - exact version `0.7.103`;
 - doctor reports usable Node/FFmpeg/Chromium;
 - lint/check return machine-readable zero-error evidence;
-- preview serves the fixture locally and is stopped cleanly after one manual/browser smoke;
+- preview serves the fixture locally; trap cleanup terminates/waits the validated whole process group, escalates only that group if necessary, and proves no preview/Chrome descendant remains before render;
 - render creates a non-empty local MP4 with measured width/height/FPS/frame duration matching `ResolvedTimeline`;
 - source/asset hashes do not change;
 - no registry/update/install/browser-download/cloud/telemetry egress is attempted or launched;
@@ -1896,7 +1948,61 @@ rg -n "npx|@latest|remotion|fetch\(|XMLHttpRequest|WebSocket|Math\.random|Date\.
 
 Expected: changed files match the exact map; runtime calls use the pinned local binary; forbidden source/runtime behaviors appear only in negative tests or explicit denial text.
 
-- [ ] **Step 7: Obtain independent review**
+- [ ] **Step 7: Record the proof bundle**
+
+Record exact dependency/browser versions, namespace/trace evidence, lint/check JSON hashes, preview cleanup assertion, both output measurements/frame fingerprints, focused/Legacy/full pytest results and scope diff. Task 7 may use only this completed proof to write runtime truth.
+
+### Task 7: Synchronize Verified Documentation
+
+**Files:**
+- Modify: `README.md`
+- Modify: `docs/v0.2-runtime-baseline.md`
+- Modify: `docs/v0.2-agentic-production-roadmap.md`
+- Modify: `docs/agent-primary-contract-matrix.md`
+
+- [ ] **Step 1: Document only verified P3 behavior**
+
+Only after every Task 6 spike/focused/Legacy/full/scope check passes, document:
+
+- importable `CompositionSpec`/`resolve_composition()`/HyperFrames adapter and stable lifecycle API;
+- accepted strategies in this slice and explicit blocked strategies;
+- `ResolvedTimeline` as only order/timing truth;
+- exact pinned tool/browser versions and one-renderer-per-attempt rule;
+- source hash/lint/check and render receipt fields;
+- Manifest 2.0/2.1 compatibility, candidate-prepared transition, one active render-state pointer, canonical immutable layout and P2A-owned begin/failure/activation/recovery behavior;
+- fake/no-network CI versus the explicitly authorized, egress-contained live spike;
+- P4/P5/P6/P7/P8 remain unimplemented.
+
+Do not claim byte-identical MP4, cloud readiness, Audio/Caption support, selective rebuild, new CLI or Legacy migration.
+
+- [ ] **Step 2: Add the completed focused command to the contract matrix**
+
+```bash
+python -m pytest \
+  tests/test_production_models.py \
+  tests/test_production_project.py \
+  tests/test_production_composition.py \
+  tests/test_production_hyperframes.py \
+  tests/test_production_state_commit.py \
+  tests/test_production_state_recovery.py -q
+```
+
+- [ ] **Step 3: Scan claims and commit**
+
+```bash
+rg -n "P3|CompositionSpec|ResolvedTimeline|HyperFrames|Remotion|byte-identical|Audio|Caption|P5|Provider" \
+  README.md docs/v0.2-runtime-baseline.md docs/v0.2-agentic-production-roadmap.md \
+  docs/agent-primary-contract-matrix.md
+git add README.md docs/v0.2-runtime-baseline.md \
+  docs/v0.2-agentic-production-roadmap.md docs/agent-primary-contract-matrix.md
+git commit -m "docs: document p3 composition runtime"
+```
+
+Expected: docs use the completed Task 6 evidence and describe only tested local behavior; every future capability remains planned/not implemented.
+
+### Task 8: Obtain Final Independent Review and Record Branch Truth
+
+- [ ] **Step 1: Obtain independent review after docs**
 
 Review brief:
 
@@ -1906,16 +2012,19 @@ Verify P3 started from accepted P2A and did not add a second writer/Manifest.
 Verify CompositionSpec is edit intent and ResolvedTimeline is the only order/timing owner.
 Verify integer frame/sample boundaries, exact asset IDs/hashes, trim, transform,
 opacity, z-order, transitions, delivery profile, renderer identity and fingerprint.
+Verify selection persists before execution and all ordinary post-begin failures persist.
+Verify candidate-prepared state is durable before the final single-pointer switch.
+Verify exact replay/recovery and P2A 2.0 custom-operation compatibility.
 Verify HyperFrames source comes only from timeline/assets and is hash/lint/check audited.
 Verify one attempt selects exactly one renderer and no Remotion/fallback/double render exists.
-Verify fake/no-network defaults, typed phase failures, atomic commit ordering and rollback.
-Verify frame-equivalent evidence is not misreported as byte-identical output.
+Verify fake/no-network defaults, preview process-group cleanup, atomic ordering and rollback.
+Verify docs match Task 6 evidence and frame-equivalent proof is not byte-identical claim.
 Verify Legacy CLI/Manifest/layout and P4/P5/P2A/Provider boundaries remain unchanged.
 ```
 
-Required exit verdict: `accept` or `accept with concerns` with no blocking issue. The parent must inspect important claims, final diff and commands directly.
+Required exit verdict: `accept` or `accept with concerns` with no blocking issue. The parent must inspect important claims, final diff and commands directly. Any review fix must rerun its affected Task 6 proof and rescan Task 7 docs before acceptance.
 
-- [ ] **Step 8: Record final branch truth**
+- [ ] **Step 2: Record final branch truth**
 
 ```bash
 git status --short --branch
@@ -1930,11 +2039,12 @@ Expected: clean task branch/worktree and explicit local-vs-origin state. Do not 
 Failure handling:
 
 - schema/resolution failure before `begin_render_attempt()`: no external command and no state commit;
-- selection is persisted by `begin_render_attempt()` before version/source/lint/check/render; source failure is therefore a typed durable failed attempt, while pre-begin schema/resolution failure performs no state write;
+- selection is persisted by `begin_render_attempt()` before version/source/lint/check/render; wrong version, plain `RENDERER_UNAVAILABLE` and source exceptions are normalized to phase `source`, durably failed, then re-raised;
 - lint failure: stop before `check`/render and persist the exact typed failed phase through `record_render_failure()`;
 - check failure: stop before render and persist the exact typed failed phase through `record_render_failure()`;
 - render/timeout/output verification failure: persist the typed phase and leave `active_render_state` old/`None`;
-- crash before final Manifest replace: explicit P2A recovery owns bounded temp cleanup, preserves/reports complete immutable orphans and keeps the old render pointer;
+- candidate-prepared Manifest persists the exact candidate/hash while leaving active/project/registry pointers unchanged; an ordinary failure after preparation becomes terminal failed and retains candidate identity for orphan reporting;
+- crash before final Manifest replace: explicit P2A recovery distinguishes begun from candidate-prepared, owns bounded temp cleanup, preserves/reports complete immutable orphans and keeps the old render pointer;
 - crash after final Manifest replace: recovery validates the candidate render pointer plus unchanged project/registry pair and reads exact manifest-selected snapshot/artifact/output hashes, not console or Agent memory;
 - renderer mismatch/unavailable: fail explicitly; no HyperFrames-to-Remotion or Remotion-to-HyperFrames retry.
 
@@ -1956,7 +2066,7 @@ Do not delete `projects/**`, accepted P2A snapshots, receipts or user renders du
 
 P3 is accepted only when:
 
-1. accepted P2A exists; `ProductionStateCommitter` remains the only durable write/pointer-switch/recovery owner, existing project/registry commit behavior is unchanged, and Manifest 2.0/2.1 read compatibility is proven;
+1. accepted P2A exists; `ProductionStateCommitter` remains the only durable write/pointer-switch/recovery owner, existing project/registry commit and non-empty operation compatibility are unchanged, and Manifest 2.0/2.1 read compatibility is proven without rewrite;
 2. `CompositionSpec` captures explicit edit intent without filesystem discovery;
 3. `ResolvedTimeline` is the only order/timing/layer truth and contains integer frame/sample boundaries;
 4. asset ID/hash, trim, transform, opacity, z-order, transition, delivery profile, renderer kind/version and deterministic composition fingerprint are persisted in the contract;
@@ -1967,12 +2077,12 @@ P3 is accepted only when:
 9. each attempt has one renderer selection and one HyperFrames execution path;
 10. Remotion is neither installed nor implemented and no double-render/fallback exists;
 11. one immutable `RenderStateSnapshot` contains exact selection and timeline/source/render/output pointers, cross-validates all identities, and one Manifest pointer activates it;
-12. selection is durable before any executable call; source/lint/check/render/verify failures are typed and durable without active-pointer switch;
-13. success activation/replay and outcome-unknown recovery use exact old/new render pointer plus unchanged project/registry pair; complete orphan artifacts/output are preserved and reported;
-14. default tests are fake/no-network and the authorized real spike uses the pinned browser with OS-level external-egress denial/observation;
+12. selection is durable before any executable call; every ordinary post-begin availability/source/lint/check/render/verify exception is durably recorded without leaving a running attempt or switching the active pointer;
+13. candidate-prepared state/hash is durably reopened before final activation; `R+1/R+2/R+3` success revisions, exact stage replay and outcome-unknown recovery use exact old/new render pointer plus unchanged project/registry pair;
+14. complete orphan artifacts/output are preserved and reported; default tests are fake/no-network and the authorized real spike uses the pinned browser with OS-level external-egress denial/observation plus process-group/descendant cleanup proof;
 15. no Audio/Caption, P5 graph, Provider/cloud/paid API, new CLI or Legacy schema/layout enters the diff;
 16. focused P3/P2A, Legacy regression and full default suites pass;
-17. docs describe only verified behavior and independent review has no blocker.
+17. docs are written only after live/focused/Legacy/full proof, then final independent review has no blocker.
 
 ## Plan-Time Known Blockers
 
@@ -1983,4 +2093,4 @@ P3 is accepted only when:
 
 ## Execution Authorization Boundary
 
-The user explicitly authorized P3 runtime execution on 2026-08-09 with: (a) one versioned `RenderStateSnapshot` selected by `ProductionManifest.active_render_state`; and (b) the full Renderer Gate, including exact `hyperframes@0.7.103`, necessary matching Chromium installation and an OS-egress-contained live lint/check/preview/render spike. Implementation must follow Tasks 0-7 and stop on verification failure or scope conflict. The authorization does not allow `npx` runtime resolution, another HyperFrames version/integrity, Remotion, Audio/Caption, P5+, Provider/cloud/paid API, new CLI, Legacy schema/layout changes, arbitrary network during the spike, push, merge or release.
+The user explicitly authorized P3 runtime execution on 2026-08-09 with: (a) one versioned `RenderStateSnapshot` selected by `ProductionManifest.active_render_state`; and (b) the full Renderer Gate, including exact `hyperframes@0.7.103`, necessary matching Chromium installation and an OS-egress-contained live lint/check/preview/render spike. Implementation must follow Tasks 0-8 and stop on verification failure or scope conflict. The authorization does not allow `npx` runtime resolution, another HyperFrames version/integrity, Remotion, Audio/Caption, P5+, Provider/cloud/paid API, new CLI, Legacy schema/layout changes, arbitrary network during the spike, push, merge or release.
