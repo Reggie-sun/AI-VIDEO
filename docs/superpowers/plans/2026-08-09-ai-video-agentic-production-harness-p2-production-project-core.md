@@ -119,7 +119,7 @@ Do not modify `src/ai_video/{cli,config,models,manifest,pipeline,workflow_loader
 - Modify: `src/ai_video/errors.py`
 - Test: `tests/test_production_models.py`
 
-- [ ] **Step 1: Write failing schema and hash tests**
+- [x] **Step 1: Write failing schema and hash tests**
 
 Create `tests/test_production_models.py`:
 
@@ -165,7 +165,7 @@ def test_domain_models_reject_unknown_fields():
         Story.model_validate(data)
 ~~~
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 ~~~bash
 python -m pytest tests/test_production_models.py -q
@@ -173,7 +173,7 @@ python -m pytest tests/test_production_models.py -q
 
 Expected: collection fails because `ai_video.production` does not exist.
 
-- [ ] **Step 3: Add typed error codes**
+- [x] **Step 3: Add typed error codes**
 
 Add to `ErrorCode`:
 
@@ -182,7 +182,7 @@ Add to `ErrorCode`:
     ASSET_REGISTRY_INVALID = "asset_registry_invalid"
 ~~~
 
-- [ ] **Step 4: Implement semantic hashing**
+- [x] **Step 4: Implement semantic hashing**
 
 Create `src/ai_video/production/hashing.py`:
 
@@ -223,7 +223,7 @@ def verify_artifact_hash(artifact: BaseModel) -> bool:
     return isinstance(expected, str) and len(expected) == 64 and expected == canonical_sha256(artifact)
 ~~~
 
-- [ ] **Step 5: Implement the model contract**
+- [x] **Step 5: Implement the model contract**
 
 Create `src/ai_video/production/models.py` with:
 
@@ -521,7 +521,7 @@ class LoadedProductionProject(StrictModel):
 
 Every field listed above must be concrete; no provider request, timeline, lifecycle or renderer execution model belongs in this file. Keep the file under 800 lines.
 
-- [ ] **Step 6: Export model entry points**
+- [x] **Step 6: Export model entry points**
 
 Create `src/ai_video/production/__init__.py`:
 
@@ -561,7 +561,7 @@ __all__ = [
 
 Do not export a loader before Task 4.
 
-- [ ] **Step 7: Verify and commit**
+- [x] **Step 7: Verify and commit**
 
 ~~~bash
 python -m pytest tests/test_production_models.py tests/test_errors.py -q
@@ -581,7 +581,7 @@ Expected: tests exit `0` and commit contains only listed files.
 - Create: `src/ai_video/production/validation.py`
 - Test: `tests/test_production_validation.py`
 
-- [ ] **Step 1: Write RED tests**
+- [x] **Step 1: Write RED tests**
 
 Cover one positive case for each strategy and negative cases for:
 
@@ -638,7 +638,7 @@ Storyboard beat, Shot and artifact IDs; unknown Character/Scene asset references
 unknown Shot asset IDs; wrong bound asset type/source kind; `motion_graphics` without an
 animation directive; `hybrid` missing a concrete source; and Storyboard beat/Shot scene mismatch.
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 ~~~bash
 python -m pytest tests/test_production_validation.py -q
@@ -646,7 +646,7 @@ python -m pytest tests/test_production_validation.py -q
 
 Expected: collection fails because `validation.py` does not exist.
 
-- [ ] **Step 3: Implement the single validator**
+- [x] **Step 3: Implement the single validator**
 
 Create `validation.py` with:
 
@@ -849,7 +849,7 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
 Import `Counter` and the referenced models. Do not mutate models, calculate dependency edges or
 define a desired fingerprint; P5 owns that projection.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ~~~bash
 python -m pytest tests/test_production_models.py tests/test_production_validation.py -q
@@ -864,7 +864,7 @@ git commit -m "feat: validate production shot strategies"
 - Create: `src/ai_video/production/registry.py`
 - Test: `tests/test_production_registry.py`
 
-- [ ] **Step 1: Write registry RED tests**
+- [x] **Step 1: Write registry RED tests**
 
 Use one local `assets/files/hero.png` and assert:
 
@@ -897,13 +897,13 @@ Also cover duplicate `asset_id`, registry filename/revision mismatch, semantic h
 missing file, wrong size, wrong file SHA-256, registry-file symlink escape, asset-file
 symlink escape, an internal symlink that remains inside `asset_root`, and unsafe `asset_root`.
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 ~~~bash
 python -m pytest tests/test_production_registry.py -q
 ~~~
 
-- [ ] **Step 3: Implement registry verification**
+- [x] **Step 3: Implement registry verification**
 
 Create `paths.py` with the single project-containment owner:
 
@@ -1017,7 +1017,7 @@ Import `sha256_file` from `ai_video.config`, `ValidationError` from Pydantic,
 mutate the frozen snapshot, scan, write or activate registry state. This verifies one
 content-addressed snapshot; it does not prove append-only history or cross-file crash safety.
 
-- [ ] **Step 4: Verify and commit**
+- [x] **Step 4: Verify and commit**
 
 ~~~bash
 python -m pytest tests/test_production_registry.py -q
@@ -1034,7 +1034,7 @@ git commit -m "feat: add immutable asset registry validation"
 - Create: `tests/test_production_project.py`
 - Modify: `src/ai_video/production/__init__.py`
 
-- [ ] **Step 1: Create the production-path fixture factory**
+- [x] **Step 1: Create the production-path fixture factory**
 
 Create `tests/production_project_factory.py` with `write_production_project(root: Path) -> Path`. It must:
 
@@ -1061,7 +1061,7 @@ ProductionManifest: active project revision 1 + exact project content hash + exa
 
 The registry factory must call `registry_semantic_sha256()`, which excludes both self-referential `content_hash` and `revision_id` fields, set `revision_id == content_hash` and use the same value in its filename and Production Manifest.
 
-- [ ] **Step 2: Write end-to-end RED tests**
+- [x] **Step 2: Write end-to-end RED tests**
 
 Create `tests/test_production_project.py`:
 
@@ -1140,7 +1140,7 @@ Also test:
 - unknown creative cross-reference fails;
 - the loader creates no directories and does not change input mtimes.
 
-- [ ] **Step 3: Run RED**
+- [x] **Step 3: Run RED**
 
 ~~~bash
 python -m pytest tests/test_production_project.py -q
@@ -1148,7 +1148,7 @@ python -m pytest tests/test_production_project.py -q
 
 Expected: collection fails because `load_production_project` is not exported.
 
-- [ ] **Step 4: Implement clean input loading**
+- [x] **Step 4: Implement clean input loading**
 
 Create `src/ai_video/production/project.py`:
 
@@ -1291,7 +1291,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
 
 Do not catch and reclassify `ASSET_REGISTRY_INVALID`; callers must see which contract failed.
 
-- [ ] **Step 5: Export the loader**
+- [x] **Step 5: Export the loader**
 
 Add to `src/ai_video/production/__init__.py`:
 
@@ -1301,7 +1301,7 @@ from ai_video.production.project import load_production_project
 __all__.append("load_production_project")
 ~~~
 
-- [ ] **Step 6: Verify P2 and Legacy isolation**
+- [x] **Step 6: Verify P2 and Legacy isolation**
 
 ~~~bash
 python -m pytest \
@@ -1315,7 +1315,7 @@ python -m pytest \
 
 Expected: exit `0`; v2 loads only through the new API and Legacy CLI remains exactly `validate`/`run`/`resume`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ~~~bash
 git add src/ai_video/production/__init__.py \
@@ -1333,7 +1333,7 @@ git commit -m "feat: load validated production projects"
 - Modify: `docs/v0.2-agentic-production-roadmap.md`
 - Modify: `docs/agent-primary-contract-matrix.md`
 
-- [ ] **Step 1: Document only the narrow public API**
+- [x] **Step 1: Document only the narrow public API**
 
 After Task 1-4 tests pass, add a README subsection with:
 
@@ -1348,7 +1348,7 @@ content-addressed local registry verification, but no writer/activation transact
 history proof, cross-file crash safety, public command, renderer, Audio/Caption, dependency graph
 or Provider. Do not claim a bundled example exists.
 
-- [ ] **Step 2: Update baseline and roadmap from evidence**
+- [x] **Step 2: Update baseline and roadmap from evidence**
 
 In `docs/v0.2-runtime-baseline.md`:
 
@@ -1363,7 +1363,7 @@ In `docs/v0.2-agentic-production-roadmap.md`:
   not runtime implementation before P2A;
 - retain renderer, paid-provider and Base AI Comic gates.
 
-- [ ] **Step 3: Add focused contract checks**
+- [x] **Step 3: Add focused contract checks**
 
 Add to `docs/agent-primary-contract-matrix.md`:
 
@@ -1377,7 +1377,7 @@ python -m pytest \
   tests/test_cli.py -q
 ~~~
 
-- [ ] **Step 4: Scan claims and commit**
+- [x] **Step 4: Scan claims and commit**
 
 ~~~bash
 rg -n "P2|ProductionProject|Asset Registry|HyperFrames|Remotion|Audio|dependency graph|Provider" \
@@ -1396,7 +1396,7 @@ Expected: P2A and every P3+ capability remain explicitly planned/not implemented
 - Verify: every P2-owned file
 - Verify unchanged: Legacy runtime, CLI, dependencies and generated paths
 
-- [ ] **Step 1: Run P2 tests**
+- [x] **Step 1: Run P2 tests**
 
 ~~~bash
 python -m pytest \
@@ -1408,7 +1408,7 @@ python -m pytest \
 
 Expected: exit `0` with no skipped P2 test.
 
-- [ ] **Step 2: Run Legacy contract regressions**
+- [x] **Step 2: Run Legacy contract regressions**
 
 ~~~bash
 python -m pytest \
@@ -1419,7 +1419,7 @@ python -m pytest \
 
 Expected: exit `0`; public commands, Manifest v1, current config/workflow loading, resume and flat layout remain unchanged.
 
-- [ ] **Step 3: Run the full no-network suite**
+- [x] **Step 3: Run the full no-network suite**
 
 ~~~bash
 python -m pytest -q
@@ -1427,7 +1427,7 @@ python -m pytest -q
 
 Expected: exit `0`. The existing optional Whisper skip may remain; no new P2 skip is allowed.
 
-- [ ] **Step 4: Verify scope**
+- [x] **Step 4: Verify scope**
 
 ~~~bash
 git diff --check
@@ -1440,7 +1440,7 @@ rg -n "hyperframes|remotion|elevenlabs|captions|httpx|requests" \
 
 Expected: only the file map changed; no `pyproject.toml`, Legacy manifest/pipeline/CLI or `runs/**` change; no external integration import/network call. If `main` advanced after the feature branch was created, use the exact base commit recorded at the Integration Base Gate instead of the current merge-base.
 
-- [ ] **Step 5: Obtain independent review**
+- [x] **Step 5: Obtain independent review**
 
 Review brief:
 
@@ -1457,7 +1457,7 @@ Reject activation/crash-safety claims, renderer/provider/dependency graph/Legacy
 
 Required verdict: `accept` or `accept with concerns` with no blocking issue. The parent verifies every blocking claim directly.
 
-- [ ] **Step 6: Record branch truth**
+- [x] **Step 6: Record branch truth**
 
 ~~~bash
 git status --short --branch

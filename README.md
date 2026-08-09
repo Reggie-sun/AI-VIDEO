@@ -15,7 +15,7 @@ The public runtime remains the local-first `0.1.x` CLI described in this README.
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-The public commands remain `validate`, `run`, and `resume`; generation remains ComfyUI-only and default-local; Manifest v1 and the current artifact layout remain active. The P2 implementation is present on this local feature branch, but merge, push, release or GitHub publication is not implied.
+The public commands remain `validate`, `run`, and `resume`; generation remains ComfyUI-only and default-local; Manifest v1 and the current artifact layout remain active. The independently reviewed P2 implementation is accepted on this local feature branch, but merge, push, release or GitHub publication is not implied.
 
 ## Setup
 

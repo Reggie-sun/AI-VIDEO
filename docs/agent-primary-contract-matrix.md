@@ -14,7 +14,7 @@
 | Error Model | 跨模块统一使用 `AiVideoError` 与 `ErrorCode`。 |
 | Dependency Policy | 除非有明确理由且获得请求，否则不新增运行时依赖。 |
 | Output Policy | Legacy run 保持当前 flat `runs/<run_id>/` layout；v2 layout 只能由显式 v2 config 和已批准的 Manifest v2 slice 创建。 |
-| Version Gate | P0 product reframe 已完成文档迁移，本地 P1 legacy stabilization 已实现但尚未进入 `origin/main`；P2+ 每个 slice 必须有独立 plan、实施授权、验收、rollback 和对应 contract/docs/tests 更新。 |
+| Version Gate | P0 product reframe 已完成文档迁移，本地 P1 legacy stabilization 已实现但尚未进入 `origin/main`；P2 已在 local feature branch 独立验收但尚未集成；P2A+ 每个 slice 必须有独立 plan、实施授权、验收、rollback 和对应 contract/docs/tests 更新。 |
 | Agent Boundary | Codex 是 Production Agent；仓库提供 durable state、validation、provenance、dependency、render 和 QA harness，不实现第二套通用 Agent runtime。 |
 | Renderer Ownership | AI-VIDEO 的 resolved timeline/composition contract 是时间线真相源；默认 renderer target 是 HyperFrames。Remotion 只能作为显式选择的 optional adapter，不能与 HyperFrames 串联重复 render。 |
 
