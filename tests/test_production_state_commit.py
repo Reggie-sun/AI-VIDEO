@@ -1053,6 +1053,101 @@ def test_prepare_project_registry_commit_allows_identical_initial_snapshot_migra
     assert request.next_project.content_hash == manifest.active_project.content_hash
 
 
+@pytest.mark.parametrize("pointer_kind", ["project", "registry"])
+def test_commit_rejects_model_constructed_noncanonical_snapshot_pointer_before_mutation(
+    committed_project: Path, pointer_kind: str
+) -> None:
+    before = (committed_project / "state/manifest.json").read_bytes()
+    request = revision_two_request(committed_project)
+    project_artifact = next(
+        artifact for artifact in request.artifacts if artifact.relative_path.suffix == ".yaml"
+    )
+    registry_artifact = next(
+        artifact for artifact in request.artifacts if artifact.relative_path.suffix == ".json"
+    )
+    if pointer_kind == "project":
+        replacement = PreparedArtifact(
+            relative_path=Path("state/projects/arbitrary.yaml"),
+            payload=project_artifact.payload,
+            file_sha256=project_artifact.file_sha256,
+        )
+        unsafe = StateCommitRequest(
+            attempt_id=request.attempt_id,
+            operation=request.operation,
+            expected_manifest_revision=request.expected_manifest_revision,
+            artifacts=(replacement, registry_artifact),
+            next_project=ProjectSnapshotPointer.model_construct(
+                **{
+                    **request.next_project.model_dump(mode="python"),
+                    "path": replacement.relative_path,
+                }
+            ),
+            next_registry=request.next_registry,
+        )
+    else:
+        replacement = PreparedArtifact(
+            relative_path=Path("assets/arbitrary.json"),
+            payload=registry_artifact.payload,
+            file_sha256=registry_artifact.file_sha256,
+        )
+        unsafe = StateCommitRequest(
+            attempt_id=request.attempt_id,
+            operation=request.operation,
+            expected_manifest_revision=request.expected_manifest_revision,
+            artifacts=(project_artifact, replacement),
+            next_project=request.next_project,
+            next_registry=RegistrySnapshotPointer.model_construct(
+                **{
+                    **request.next_registry.model_dump(mode="python"),
+                    "path": replacement.relative_path,
+                }
+            ),
+        )
+
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(committed_project).commit(unsafe)
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert (committed_project / "state/manifest.json").read_bytes() == before
+    assert not (committed_project / replacement.relative_path).exists()
+
+
+def test_commit_rejects_root_project_entrypoint_as_candidate_before_mutation(
+    committed_project: Path,
+) -> None:
+    before = (committed_project / "state/manifest.json").read_bytes()
+    root_project_before = (committed_project / "project.yaml").read_bytes()
+    request = revision_two_request(committed_project)
+    project_artifact = next(
+        artifact for artifact in request.artifacts if artifact.relative_path.suffix == ".yaml"
+    )
+    root_artifact = PreparedArtifact(
+        relative_path=Path("project.yaml"),
+        payload=project_artifact.payload,
+        file_sha256=project_artifact.file_sha256,
+    )
+    unsafe = StateCommitRequest(
+        attempt_id=request.attempt_id,
+        operation=request.operation,
+        expected_manifest_revision=request.expected_manifest_revision,
+        artifacts=tuple(
+            root_artifact if artifact is project_artifact else artifact
+            for artifact in request.artifacts
+        ),
+        next_project=request.next_project.model_copy(
+            update={"path": root_artifact.relative_path}
+        ),
+        next_registry=request.next_registry,
+    )
+
+    with pytest.raises(AiVideoError) as exc:
+        make_committer(committed_project).commit(unsafe)
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert (committed_project / "state/manifest.json").read_bytes() == before
+    assert (committed_project / "project.yaml").read_bytes() == root_project_before
+
+
 def test_commit_rejects_stale_manifest_revision_under_lock(committed_project: Path) -> None:
     request = revision_two_request(committed_project)
     stale = StateCommitRequest(

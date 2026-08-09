@@ -629,7 +629,7 @@ def make_bundle() -> LoadedProductionProject:
             file_sha256=HASH,
         ),
         active_registry=RegistrySnapshotPointer(
-            path=Path("assets/registry.json"),
+            path=Path(f"assets/registry.{HASH}.json"),
             revision_id=HASH,
             content_hash=HASH,
             file_sha256=HASH,

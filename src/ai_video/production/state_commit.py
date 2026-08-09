@@ -30,6 +30,10 @@ from ai_video.production.models import (
     RegistrySnapshotPointer,
     StateCommitAttempt,
     StateCommitStatus,
+    canonical_project_snapshot_path,
+    canonical_registry_snapshot_path,
+    require_canonical_project_snapshot_path,
+    require_canonical_registry_snapshot_path,
 )
 from ai_video.production.project import load_production_project_candidate
 from ai_video.production.registry import registry_semantic_sha256
@@ -225,10 +229,10 @@ def prepare_project_registry_commit(
 
     project_payload = _canonical_yaml_bytes(project)
     registry_payload = _canonical_json_bytes(registry)
-    project_path = Path(
-        f"state/projects/project.{project.revision}.{project.content_hash}.yaml"
+    project_path = canonical_project_snapshot_path(
+        project.revision, project.content_hash
     )
-    registry_path = Path(f"assets/registry.{registry.revision_id}.json")
+    registry_path = canonical_registry_snapshot_path(registry.revision_id)
     project_file_hash = hashlib.sha256(project_payload).hexdigest()
     registry_file_hash = hashlib.sha256(registry_payload).hexdigest()
     return StateCommitRequest(
@@ -832,18 +836,29 @@ class ProductionStateCommitter:
             raise _state_invalid("Production recovery registry snapshot pointer is invalid.")
 
     def _validate_recovery_project_pointer(self, pointer: ProjectSnapshotPointer) -> Path:
-        path = pointer.path
-        if path != Path("project.yaml") and not (
-            len(path.parts) == 3 and path.parts[:2] == ("state", "projects")
-        ):
-            raise _state_invalid("Production recovery project snapshot path is unsafe.")
+        try:
+            path = require_canonical_project_snapshot_path(
+                pointer.path,
+                pointer.revision,
+                pointer.content_hash,
+                allow_entrypoint=True,
+            )
+        except ValueError as exc:
+            raise _state_invalid(
+                "Production recovery project snapshot path is unsafe.", str(exc)
+            ) from exc
         self._validate_relative_components(path)
         return self._project_root / path
 
     def _validate_recovery_registry_pointer(self, pointer: RegistrySnapshotPointer) -> Path:
-        path = pointer.path
-        if len(path.parts) != 2 or path.parts[0] != "assets":
-            raise _state_invalid("Production recovery registry snapshot path is unsafe.")
+        try:
+            path = require_canonical_registry_snapshot_path(
+                pointer.path, pointer.revision_id
+            )
+        except ValueError as exc:
+            raise _state_invalid(
+                "Production recovery registry snapshot path is unsafe.", str(exc)
+            ) from exc
         self._validate_relative_components(path)
         return self._project_root / path
 
@@ -942,6 +957,21 @@ class ProductionStateCommitter:
             raise _state_invalid("Production state commit request is incomplete.")
         if request.expected_manifest_revision < 1:
             raise _state_invalid("Production state expected Manifest revision is invalid.")
+        try:
+            require_canonical_project_snapshot_path(
+                request.next_project.path,
+                request.next_project.revision,
+                request.next_project.content_hash,
+                allow_entrypoint=False,
+            )
+            require_canonical_registry_snapshot_path(
+                request.next_registry.path, request.next_registry.revision_id
+            )
+        except ValueError as exc:
+            raise _state_invalid(
+                "Production state commit request uses a noncanonical snapshot path.",
+                str(exc),
+            ) from exc
         artifacts: dict[Path, PreparedArtifact] = {}
         for artifact in request.artifacts:
             clean_path = self._validate_artifact_path(artifact.relative_path)

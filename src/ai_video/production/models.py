@@ -38,6 +38,38 @@ def _require_clean_relative_file_path(value: Path, label: str) -> Path:
     return value
 
 
+def canonical_project_snapshot_path(revision: int, content_hash: str) -> Path:
+    return Path(f"state/projects/project.{revision}.{content_hash}.yaml")
+
+
+def canonical_registry_snapshot_path(revision_id: str) -> Path:
+    return Path(f"assets/registry.{revision_id}.json")
+
+
+def require_canonical_project_snapshot_path(
+    value: Path,
+    revision: int,
+    content_hash: str,
+    *,
+    allow_entrypoint: bool,
+) -> Path:
+    value = _require_clean_relative_file_path(value, "snapshot")
+    if allow_entrypoint and value == Path("project.yaml"):
+        return value
+    if value != canonical_project_snapshot_path(revision, content_hash):
+        raise ValueError("snapshot path must be the canonical project snapshot path")
+    return value
+
+
+def require_canonical_registry_snapshot_path(
+    value: Path, revision_id: str
+) -> Path:
+    value = _require_clean_relative_file_path(value, "snapshot")
+    if value != canonical_registry_snapshot_path(revision_id):
+        raise ValueError("snapshot path must be the canonical registry snapshot path")
+    return value
+
+
 class SourceReference(StrictModel):
     kind: Literal["user_input", "imported", "derived"]
     reference: str
@@ -312,6 +344,16 @@ class ProjectSnapshotPointer(StrictModel):
     def _require_clean_relative_path(cls, value: Path) -> Path:
         return _require_clean_relative_file_path(value, "snapshot")
 
+    @model_validator(mode="after")
+    def _path_matches_identity(self) -> "ProjectSnapshotPointer":
+        require_canonical_project_snapshot_path(
+            self.path,
+            self.revision,
+            self.content_hash,
+            allow_entrypoint=True,
+        )
+        return self
+
 
 class RegistrySnapshotPointer(StrictModel):
     path: Path
@@ -328,6 +370,7 @@ class RegistrySnapshotPointer(StrictModel):
     def _revision_matches_content_hash(self) -> "RegistrySnapshotPointer":
         if self.revision_id != self.content_hash:
             raise ValueError("registry revision_id must match content_hash")
+        require_canonical_registry_snapshot_path(self.path, self.revision_id)
         return self
 
 
@@ -356,6 +399,13 @@ class StateCommitAttempt(StrictModel):
 
     @model_validator(mode="after")
     def _validate_terminal_error(self) -> "StateCommitAttempt":
+        if self.candidate_project is not None:
+            require_canonical_project_snapshot_path(
+                self.candidate_project.path,
+                self.candidate_project.revision,
+                self.candidate_project.content_hash,
+                allow_entrypoint=False,
+            )
         if self.status is StateCommitStatus.RUNNING and any(
             value is not None
             for value in (self.finished_at, self.error_code, self.error_message)

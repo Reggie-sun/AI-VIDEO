@@ -14,7 +14,12 @@ from ai_video.production import (
     prepare_project_registry_commit,
 )
 from ai_video.production.hashing import seal_artifact
-from ai_video.production.models import ProductionManifest, ProductionProject
+from ai_video.production.models import (
+    ProductionManifest,
+    ProductionProject,
+    canonical_project_snapshot_path,
+    canonical_registry_snapshot_path,
+)
 from production_project_factory import (
     load_revision_two_models,
     write_production_project,
@@ -183,10 +188,20 @@ def test_load_rejects_active_project_pointer_identity_mismatch(
 ):
     project_path = write_production_project(tmp_path)
     _commit_revision_two(tmp_path)
-    active_project = _manifest(tmp_path).active_project.model_copy(update={field: value})
+    manifest = _manifest(tmp_path)
+    active_project = manifest.active_project.model_copy(update={field: value})
+    active_project = active_project.model_copy(
+        update={
+            "path": canonical_project_snapshot_path(
+                active_project.revision, active_project.content_hash
+            )
+        }
+    )
+    target = tmp_path / active_project.path
+    target.write_bytes((tmp_path / manifest.active_project.path).read_bytes())
     _write_manifest(
         tmp_path,
-        _manifest(tmp_path).model_copy(update={"active_project": active_project}),
+        manifest.model_copy(update={"active_project": active_project}),
     )
 
     with pytest.raises(AiVideoError, match=message):
@@ -212,13 +227,20 @@ def test_load_rejects_active_registry_identity_mismatch_without_fallback(tmp_pat
     project_path = write_production_project(tmp_path)
     manifest = _manifest(tmp_path)
     active_registry = manifest.active_registry.model_copy(
-        update={"revision_id": "f" * 64, "content_hash": "f" * 64}
+        update={
+            "path": canonical_registry_snapshot_path("f" * 64),
+            "revision_id": "f" * 64,
+            "content_hash": "f" * 64,
+        }
+    )
+    (tmp_path / active_registry.path).write_bytes(
+        (tmp_path / manifest.active_registry.path).read_bytes()
     )
     _write_manifest(
         tmp_path, manifest.model_copy(update={"active_registry": active_registry})
     )
 
-    with pytest.raises(AiVideoError, match="registry (revision|content hash)"):
+    with pytest.raises(AiVideoError, match="filename does not match revision_id"):
         load_production_project(project_path)
 
 
@@ -270,18 +292,39 @@ def test_load_rejects_unsafe_active_project_pointer_before_read(tmp_path, path):
         load_production_project(project_path)
 
 
+@pytest.mark.parametrize(
+    ("pointer_name", "path"),
+    [
+        ("active_project", "state/projects/arbitrary.yaml"),
+        ("active_registry", "assets/arbitrary.json"),
+    ],
+)
+def test_load_rejects_noncanonical_manifest_snapshot_pointer(
+    tmp_path, pointer_name, path
+):
+    project_path = write_production_project(tmp_path)
+    manifest_path = tmp_path / "state/manifest.json"
+    manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    source_path = tmp_path / manifest_data[pointer_name]["path"]
+    target_path = tmp_path / path
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    target_path.write_bytes(source_path.read_bytes())
+    manifest_data[pointer_name]["path"] = path
+    manifest_path.write_text(json.dumps(manifest_data), encoding="utf-8")
+
+    with pytest.raises(AiVideoError, match="Could not load production state"):
+        load_production_project(project_path)
+
+
 def test_load_rejects_active_project_symlink_escape(tmp_path):
     project_path = write_production_project(tmp_path)
-    outside = tmp_path.parent / "outside-project.yaml"
-    outside.write_text(project_path.read_text(encoding="utf-8"), encoding="utf-8")
-    target = tmp_path / "state/projects/escape.yaml"
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.symlink_to(outside)
+    _commit_revision_two(tmp_path)
     manifest = _manifest(tmp_path)
-    pointer = manifest.active_project.model_copy(
-        update={"path": Path("state/projects/escape.yaml"), "file_sha256": sha256_file(outside)}
-    )
-    _write_manifest(tmp_path, manifest.model_copy(update={"active_project": pointer}))
+    outside = tmp_path.parent / "outside-project.yaml"
+    target = tmp_path / manifest.active_project.path
+    outside.write_bytes(target.read_bytes())
+    target.unlink()
+    target.symlink_to(outside)
 
     with pytest.raises(AiVideoError, match="contained"):
         load_production_project(project_path)

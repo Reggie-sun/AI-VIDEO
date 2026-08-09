@@ -146,6 +146,40 @@ def test_registry_snapshot_pointer_requires_revision_to_match_content_hash():
         )
 
 
+@pytest.mark.parametrize(
+    "path",
+    [
+        Path("state/projects/arbitrary.yaml"),
+        Path(f"state/projects/project.2.{ONE_HASH}.yaml"),
+    ],
+)
+def test_project_snapshot_pointer_requires_entrypoint_or_identity_path(path):
+    with pytest.raises(ValidationError, match="canonical project snapshot path"):
+        ProjectSnapshotPointer(
+            path=path,
+            revision=2,
+            content_hash=ZERO_HASH,
+            file_sha256=ONE_HASH,
+        )
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        Path("assets/registry.json"),
+        Path(f"assets/registry.{ONE_HASH}.json"),
+    ],
+)
+def test_registry_snapshot_pointer_requires_identity_path(path):
+    with pytest.raises(ValidationError, match="canonical registry snapshot path"):
+        RegistrySnapshotPointer(
+            path=path,
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            file_sha256=ONE_HASH,
+        )
+
+
 def test_p2a_models_are_frozen_and_forbid_extra_fields():
     pointer = make_project_pointer()
     with pytest.raises(ValidationError, match="Instance is frozen"):

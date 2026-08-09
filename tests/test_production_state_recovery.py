@@ -178,15 +178,37 @@ def test_recovery_refuses_active_registry_pointer_identity_tamper(
     committed_project: Path,
 ) -> None:
     before = _read_manifest(committed_project)
-    tampered = before.active_registry.model_copy(
-        update={"revision_id": "f" * 64, "content_hash": "f" * 64}
+    manifest_path = committed_project / "state/manifest.json"
+    manifest_data = before.model_dump(mode="json")
+    manifest_data["active_registry"].update(
+        {"revision_id": "f" * 64, "content_hash": "f" * 64}
     )
-    _write_manifest(
-        committed_project,
-        ProductionManifest.model_validate(
-            {**before.model_dump(mode="python"), "active_registry": tampered}
-        ),
-    )
+    manifest_path.write_text(json.dumps(manifest_data), encoding="utf-8")
+
+    with pytest.raises(AiVideoError) as exc:
+        _recover(committed_project)
+
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+
+
+@pytest.mark.parametrize(
+    ("pointer_name", "path"),
+    [
+        ("active_project", "state/projects/arbitrary.yaml"),
+        ("active_registry", "assets/arbitrary.json"),
+    ],
+)
+def test_recovery_refuses_noncanonical_manifest_snapshot_pointer(
+    committed_project: Path, pointer_name: str, path: str
+) -> None:
+    manifest_path = committed_project / "state/manifest.json"
+    manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    source_path = committed_project / manifest_data[pointer_name]["path"]
+    target_path = committed_project / path
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    target_path.write_bytes(source_path.read_bytes())
+    manifest_data[pointer_name]["path"] = path
+    manifest_path.write_text(json.dumps(manifest_data), encoding="utf-8")
 
     with pytest.raises(AiVideoError) as exc:
         _recover(committed_project)
