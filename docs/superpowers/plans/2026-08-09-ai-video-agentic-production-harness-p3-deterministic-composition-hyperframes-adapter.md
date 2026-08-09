@@ -1452,7 +1452,7 @@ def test_capture_safe_boundary_hyperframes_quantized_seek_counterexamples_fail_c
         rounding=ROUND_HALF_EVEN,
     )
     assert duration == expected_duration
-    assert format(offset, "f") == expected_offset
+    assert format(offset, "f").rstrip("0").rstrip(".") == expected_offset
     with pytest.raises(AiVideoError) as exc:
         _capture_safe_boundary_percent(
             frame,
