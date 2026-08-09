@@ -108,7 +108,7 @@ Primary sources：
 | deterministic composition fingerprint | `composition.py::timeline_fingerprint()` | receipt 只引用 fingerprint，不重新计算另一种 desired hash |
 | renderer selection | one immutable `RendererSelectionReceipt` per attempt | `RendererPolicy.default_preference` 只是 policy input，不是 mutable attempt state |
 | renderer source | `hyperframes.py::materialize_hyperframes_source()` output + durable source bundle + `RendererSourceReceipt` | source 必须完全由 timeline/assets materialize；scratch 不进入 semantic identity，canonical HTML/raster bytes 必须随 render state 持久化，不能 scan filesystem 决策 |
-| render execution | `HyperFramesAdapter` | 一个 attempt 只能调用一个 renderer，禁止 fallback 或 double render |
+| render execution | public `render_with_hyperframes()` + private `_NetworkIsolatedHyperFramesRunner` | `HyperFramesAdapter` 仅为 module-internal/test phase seam；每个 tool process 必须 fresh namespace，package caller 不能注入 runner、host fallback、alternate renderer 或 double render |
 | durable project/registry transaction | `state_commit.py::ProductionStateCommitter.commit(StateCommitRequest)` | 现有 P2A request/replay owner 保持；2.1 pair 改变时同一 commit blanket-clear `active_render_state`，same-pair 仅在完整 provenance 验证后保留；P3 render operation 不借用或改写该 pair |
 | render attempt lifecycle | `ProductionStateCommitter.begin_render_attempt()` / `record_render_failure()` / `activate_render_state()` | `record_render_failure()` 只拥有外层尚未调用 activation 的 R+1 ordinary failure；`activate_render_state()` 从方法调用入口起独占 candidate transition、final activation 与它们的 failure/ambiguity ownership。它们不是 `commit()` alias wrapper；不得增加第二 writer 或 Manifest |
 | timeline/source/render activation | immutable `RenderStateSnapshot` selected by `ProductionManifest.active_render_state` | Manifest 只额外切换这一个 render pointer；snapshot 固定 exact timeline/source receipt/render receipt/output identities |
@@ -139,8 +139,8 @@ Primary sources：
 
 P3 contract 必须显式包含：
 
-- `CompositionSpec`: ordered `shot_ids`、exact `(asset_role, asset_id)` bindings、visual layer/edit intent、trim、fixed-point transform、fixed-point opacity、z-order、cut transition、delivery profile 和 requested renderer。
-- `ResolvedTimeline`: width/height/FPS/codec profile、sample rate、integer `start_frame`/`duration_frames`、integer `start_sample`/`duration_samples`、asset ID/hash/materialized path、trim、transform、opacity、z-order、transition、total frames/samples、renderer kind/version 和 `composition_fingerprint`。
+- `CompositionSpec`: ordered `shot_ids`、exact `(asset_role, asset_id)` bindings、visual layer/edit intent、fixed-point transform、fixed-point opacity、z-order、cut transition、delivery profile 和 requested renderer。既有 trim fields 在本 slice 只允许 `trim_start_frame=0`/`trim_duration_frames=None`，非默认值 typed-fail。
+- `ResolvedTimeline`: width/height/FPS/codec profile、sample rate、integer `start_frame`/`duration_frames`、integer `start_sample`/`duration_samples`、asset ID/hash/materialized path、default-only trim fields、transform、opacity、z-order、transition、total frames/samples、renderer kind/version 和 `composition_fingerprint`。
 - duration resolution: P3 silent fixture 只接受 `DurationPolicy.mode == "fixed"`；使用 `Decimal(str(seconds))`，`ROUND_CEILING` 到整数 frame，绝不使用 binary float 累加。
 - sample boundaries: `start_sample = floor(start_frame * sample_rate / fps)`，`end_sample = floor(end_frame * sample_rate / fps)`，duration 是两者之差。P3 只建立 timebase，不创建 audio track。
 - transition resolution: 本 slice 只接受 `cut` 且 `duration_frames == 0`；`crossfade` 和任何 overlap 均以 `COMPOSITION_INVALID` 拒绝。
@@ -155,7 +155,7 @@ P3 contract 必须显式包含：
 - `RenderStateSnapshotPointer` 含 `path`、`revision`、`content_hash`、`file_sha256`；canonical path 是 `state/render/states/<full-content-hash>.json`，禁止 alias、`current` symlink 和 truncated hash filename。
 - `RenderArtifactPointer` 含 `path`、`revision`、`content_hash`、`file_sha256`，用于 exact `ResolvedTimeline`、`RendererSourceReceipt` 和 `RenderReceipt`。`RenderOutputPointer` 含 exact `path`、`file_sha256`、`size_bytes`。
 - immutable sealed `RenderStateSnapshot(VersionedArtifact)` 含 `attempt_id`、render 所依据的 exact active project/registry pointers、exact `RendererSelectionReceipt`、duplicated renderer/timeline/source-bundle/asset identities、`timeline`、`source_bundle`、`source_receipt`、`render_receipt`、`output`。model validator 校验 embedded selection，reader/committer 加载 exact pointers 后 cross-validate 同一 attempt ID、project/registry、renderer kind/version、timeline fingerprint、source-bundle/index hash、ordered asset hashes 和 output path/hash/size；任一 mixed/tampered identity 失败。
-- `RendererSelectionReceipt` 与 `BeginRenderAttemptRequest` 都固定 `timeline_fingerprint`、当前 active project pointer 和当前 active registry pointer；exact replay 必须逐项相同，不能只靠 attempt ID/renderer name。
+- `RendererSelectionReceipt` 是 attempt ID、`timeline_fingerprint`、当前 active project pointer 和当前 active registry pointer 的唯一 authoritative identity source；`BeginRenderAttemptRequest` 只增加 expected revision、base render pointer 并引用该 selection，不重复这些字段。Exact replay 必须逐项相同，不能只靠 renderer name。
 - 对 2.1 Manifest，既有 `commit(StateCommitRequest)` 若切换 project 或 registry pointer，必须在同一次 atomic Manifest replace 中将 `active_render_state` 清为 `None`；这是 P3 的 blanket render invalidation，不是 P5 graph。旧 immutable render/source/output artifacts 保留为 orphan evidence。若 pair 完全相同，只有在重新验证当前 render snapshot 与其 project/registry provenance 仍一致后才可保留 pointer，否则 typed-fail，不得猜测或静默清理。
 
 ### Canonical Durable Layout
@@ -225,9 +225,9 @@ Do not modify:
 | --- | --- | --- | --- |
 | 0 | accepted P2A fact check + exact dependency/browser install + disposable compatibility spike before runtime edits | prerequisites/Renderer Gate | `build: pin hyperframes renderer tool` |
 | 1 | strict composition/timeline/receipt/render-state schema + 2.0/2.1 model compatibility | `models.py` | `feat: add composition and render contracts` |
-| 2 | exact frame/sample resolution and fingerprint | `composition.py` | `feat: resolve deterministic production timelines` |
+| 2 | exact frame/sample resolution, fingerprint and shared no-follow file reads | `composition.py` + `paths.py` | `feat: resolve deterministic production timelines` |
 | 3 | pure caller-supplied contained source materialization + raster/URL audit | `hyperframes.py` source layer | `feat: materialize audited hyperframes sources` |
-| 4 | fake lint/check/render and typed receipts | `HyperFramesAdapter` orchestration boundary | `feat: add hyperframes renderer adapter` |
+| 4 | fake lint/check/render, exact namespace argv and typed receipts | private runner + module-internal `HyperFramesAdapter` boundary | `feat: add hyperframes renderer adapter` |
 | 5 | canonical attempt paths + durable source bundle/output + provenance/invalidation + orchestration/activation/replay/recovery | `project.py` + `hyperframes.py` + `ProductionStateCommitter` + P2A tests | `feat: commit production render state` |
 | 6 | committed-fixture integration proof + focused/P2A/Legacy/full regression proof (not the prerequisite gate) | verification | no commit unless correction is required |
 | 7 | docs from completed verification evidence | docs | `docs: document p3 composition runtime` |
@@ -364,66 +364,70 @@ test "$(file --brief --mime-type "$P3_GATE_SOURCE/assets/gate.png")" = "image/pn
 sha256sum "$P3_GATE_SOURCE/index.html" "$P3_GATE_SOURCE/assets/gate.png" >"$P3_GATE_EVIDENCE/input.before.sha256"
 ```
 
-Run this body inside one isolated namespace. Substitute only the already verified absolute `P3_HYPERFRAMES_BROWSER_PATH`; the binary and browser must already be installed, and the namespace has loopback only. Every HyperFrames command is traced. Preview readiness uses a bounded retry loop and the trap owns the exact process group:
+Run version/doctor/lint/check/render through the exact per-command namespace argv contract later implemented by `_NetworkIsolatedHyperFramesRunner`: every invocation creates a fresh namespace and uses the fixed `exec "$@"` wrapper, with no host fallback. Substitute only already verified absolute paths. Preview uses the same outer wrapper to exec a companion in-namespace supervisor because readiness curl and cleanup must share its loopback; preview remains Renderer-Gate-only and is never part of the production runner surface.
 
 ```bash
-export P3_GATE_DIR P3_GATE_SOURCE P3_GATE_EVIDENCE P3_HYPERFRAMES_BROWSER_PATH
-unshare --user --map-root-user --net --pid --fork --mount-proc bash -euo pipefail <<'P3_GATE'
-ip link set lo up
+P3_UNSHARE=$(command -v unshare)
+P3_IP_PATH=$(command -v ip)
+P3_BASH=$(command -v bash)
+P3_BINARY="$PWD/node_modules/.bin/hyperframes"
+test -x "$P3_UNSHARE" && test -x "$P3_IP_PATH" && test -x "$P3_BASH"
+test -x "$P3_BINARY" && test -x "$P3_HYPERFRAMES_BROWSER_PATH"
+test ! -L "$P3_HYPERFRAMES_BROWSER_PATH"
+export P3_GATE_DIR P3_GATE_SOURCE P3_GATE_EVIDENCE P3_HYPERFRAMES_BROWSER_PATH P3_IP_PATH
 export CI=1 HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1
 export HYPERFRAMES_NO_UPDATE_CHECK=1 HYPERFRAMES_NO_AUTO_INSTALL=1
 export HYPERFRAMES_BROWSER_PATH="$P3_HYPERFRAMES_BROWSER_PATH"
-test -x "$HYPERFRAMES_BROWSER_PATH"
 
-preview_pid=
-cleanup_preview() {
-  if test -n "${preview_pid:-}" && kill -0 "$preview_pid" 2>/dev/null; then
-    kill -TERM -- "-$preview_pid" 2>/dev/null || true
-    for _ in 1 2 3 4 5; do
-      kill -0 "$preview_pid" 2>/dev/null || break
-      sleep 1
-    done
-    kill -KILL -- "-$preview_pid" 2>/dev/null || true
-    wait "$preview_pid" 2>/dev/null || true
-  fi
+p3_isolated_exec() {
+  trace_prefix=$1
+  shift
+  strace -ff -e trace=network -o "$trace_prefix" \
+    "$P3_UNSHARE" --user --map-root-user --net --pid --fork --mount-proc \
+    "$P3_BASH" -ceu '"$P3_IP_PATH" link set lo up; exec "$@"' \
+    p3-hyperframes "$@"
 }
-trap cleanup_preview EXIT INT TERM
 
-strace -ff -e trace=network -o "$P3_GATE_EVIDENCE/version.net" \
-  ./node_modules/.bin/hyperframes --version 2>&1 | tee "$P3_GATE_EVIDENCE/version.txt"
+p3_isolated_exec "$P3_GATE_EVIDENCE/version.net" \
+  "$P3_BINARY" --version 2>&1 | tee "$P3_GATE_EVIDENCE/version.txt"
 test "$(tail -n1 "$P3_GATE_EVIDENCE/version.txt")" = "0.7.103"
-strace -ff -e trace=network -o "$P3_GATE_EVIDENCE/doctor.net" \
-  ./node_modules/.bin/hyperframes doctor 2>&1 | tee "$P3_GATE_EVIDENCE/doctor.txt"
+p3_isolated_exec "$P3_GATE_EVIDENCE/doctor.net" \
+  "$P3_BINARY" doctor 2>&1 | tee "$P3_GATE_EVIDENCE/doctor.txt"
 rg -qi 'chrom(e|ium)|browser' "$P3_GATE_EVIDENCE/doctor.txt"
-strace -ff -e trace=network -o "$P3_GATE_EVIDENCE/lint.net" \
-  ./node_modules/.bin/hyperframes lint "$P3_GATE_SOURCE" --json >"$P3_GATE_EVIDENCE/lint.json"
-strace -ff -e trace=network -o "$P3_GATE_EVIDENCE/check.net" \
-  ./node_modules/.bin/hyperframes check "$P3_GATE_SOURCE" --json >"$P3_GATE_EVIDENCE/check.json"
+p3_isolated_exec "$P3_GATE_EVIDENCE/lint.net" \
+  "$P3_BINARY" lint "$P3_GATE_SOURCE" --json >"$P3_GATE_EVIDENCE/lint.json"
+p3_isolated_exec "$P3_GATE_EVIDENCE/check.net" \
+  "$P3_BINARY" check "$P3_GATE_SOURCE" --json >"$P3_GATE_EVIDENCE/check.json"
 
-setsid strace -ff -e trace=network -o "$P3_GATE_EVIDENCE/preview.net" \
-  ./node_modules/.bin/hyperframes preview "$P3_GATE_SOURCE" --port 3017 \
-  >"$P3_GATE_EVIDENCE/preview.log" 2>&1 &
-preview_pid=$!
-ready=0
-for _ in 1 2 3 4 5 6 7 8 9 10; do
-  if curl --fail --silent --show-error http://127.0.0.1:3017/ >/dev/null; then
-    ready=1
-    break
-  fi
-  sleep 1
-done
-test "$ready" -eq 1
-cleanup_preview
-preview_pid=
-! ps -eo args= | rg '[h]yperframes preview|[c]hrome-headless-shell' >/dev/null
+strace -ff -e trace=network -o "$P3_GATE_EVIDENCE/preview.net" \
+  "$P3_UNSHARE" --user --map-root-user --net --pid --fork --mount-proc \
+  "$P3_BASH" -ceu '"$P3_IP_PATH" link set lo up; exec "$@"' \
+  p3-hyperframes-preview-supervisor \
+  "$P3_BASH" -ceu '
+    preview_pid=
+    cleanup() {
+      test -z "${preview_pid:-}" && return 0
+      kill -TERM -- "-$preview_pid" 2>/dev/null || true
+      for _ in 1 2 3 4 5; do kill -0 "$preview_pid" 2>/dev/null || break; sleep 1; done
+      kill -KILL -- "-$preview_pid" 2>/dev/null || true
+      wait "$preview_pid" 2>/dev/null || true
+    }
+    trap cleanup EXIT INT TERM
+    setsid "$1" preview "$2" --port 3017 >"$3" 2>&1 & preview_pid=$!
+    ready=0
+    for _ in 1 2 3 4 5 6 7 8 9 10; do curl -fsS http://127.0.0.1:3017/ >/dev/null && ready=1 && break; sleep 1; done
+    test "$ready" -eq 1
+    cleanup
+    preview_pid=
+    ! ps -eo args= | grep -E "[h]yperframes preview|[c]hrome-headless-shell"
+  ' p3-preview "$P3_BINARY" "$P3_GATE_SOURCE" "$P3_GATE_EVIDENCE/preview.log"
 
-strace -ff -e trace=network -o "$P3_GATE_EVIDENCE/render-1.net" \
-  ./node_modules/.bin/hyperframes render "$P3_GATE_SOURCE" -o "$P3_GATE_EVIDENCE/render-1.mp4"
-strace -ff -e trace=network -o "$P3_GATE_EVIDENCE/render-2.net" \
-  ./node_modules/.bin/hyperframes render "$P3_GATE_SOURCE" -o "$P3_GATE_EVIDENCE/render-2.mp4"
+p3_isolated_exec "$P3_GATE_EVIDENCE/render-1.net" \
+  "$P3_BINARY" render "$P3_GATE_SOURCE" -o "$P3_GATE_EVIDENCE/render-1.mp4"
+p3_isolated_exec "$P3_GATE_EVIDENCE/render-2.net" \
+  "$P3_BINARY" render "$P3_GATE_SOURCE" -o "$P3_GATE_EVIDENCE/render-2.mp4"
 test -s "$P3_GATE_EVIDENCE/render-1.mp4"
 test -s "$P3_GATE_EVIDENCE/render-2.mp4"
-P3_GATE
 ```
 
 Afterward, hash the original `index.html` and PNG again and compare to their recorded pre-run hashes. Parse every `*.net*` trace and fail if a `connect`/`sendto`/`sendmsg` destination uses `AF_INET`/`AF_INET6` without exact loopback `127.0.0.1` or `::1`; `AF_UNIX` is allowed and ignored. Do not treat a failed network syscall as safe merely because it failed:
@@ -824,6 +828,7 @@ Expected: all listed tests pass; existing P2 models remain strict/frozen and no 
 
 **Files:**
 - Create: `src/ai_video/production/composition.py`
+- Modify: `src/ai_video/production/paths.py`
 - Create: `tests/test_production_composition.py`
 - Modify: `tests/production_project_factory.py`
 
@@ -868,7 +873,7 @@ def test_same_resolved_inputs_have_same_fingerprint_after_mtime_change(tmp_path)
     assert second.composition_fingerprint == first.composition_fingerprint
 ```
 
-Also add negative tests for duplicate/missing Shot IDs, missing/unregistered asset, wrong asset hash, asset path outside loaded registry mapping, non-fixed duration, duplicate layer ID, layer/Shot mismatch, undeclared `asset_role`, asset ID not bound to that exact Shot role, role rejecting `AssetType.IMAGE`, non-raster MIME/magic/extension mismatch, any `motion_directives`, any non-`STATIC_IMAGE` strategy (`IMAGE_MOTION`, `MOTION_GRAPHICS`, `GENERATED_VIDEO`, `EXISTING_VIDEO`/source video, `HYBRID`), crossfade/nonzero transition duration, duplicate z-order within a Shot, unsupported `remotion`, and empty timeline. Every slice-boundary rejection uses `COMPOSITION_INVALID`.
+Also add negative tests for duplicate/missing Shot IDs, missing/unregistered asset, wrong asset hash, asset path outside loaded registry mapping, non-fixed duration, any non-default `trim_start_frame` or non-`None` `trim_duration_frames`, duplicate layer ID, layer/Shot mismatch, undeclared `asset_role`, asset ID not bound to that exact Shot role, role rejecting `AssetType.IMAGE`, non-raster MIME/magic/extension mismatch, any `motion_directives`, any non-`STATIC_IMAGE` strategy (`IMAGE_MOTION`, `MOTION_GRAPHICS`, `GENERATED_VIDEO`, `EXISTING_VIDEO`/source video, `HYBRID`), crossfade/nonzero transition duration, duplicate z-order within a Shot, unsupported `remotion`, and empty timeline. Every slice-boundary rejection uses `COMPOSITION_INVALID`.
 
 - [ ] **Step 2: Run resolver RED**
 
@@ -901,12 +906,14 @@ def _sample_at_frame(frame: int, *, fps: int, sample_rate: int) -> int:
     )
 
 
-def _validated_raster_suffix(path: Path, *, mime_type: str) -> str:
-    if path.is_symlink() or not path.is_file():
-        raise _invalid("P3 raster asset must be one regular local file.")
-    with path.open("rb") as handle:
-        head = handle.read(16)
-    suffix = path.suffix.lower()
+def _validated_raster_suffix(
+    snapshot: NoFollowFile,
+    *,
+    suffix: str,
+    mime_type: str,
+) -> str:
+    head = snapshot.data[:16]
+    suffix = suffix.lower()
     if mime_type == "image/png" and suffix == ".png" and head.startswith(b"\x89PNG\r\n\x1a\n"):
         return ".png"
     if mime_type == "image/jpeg" and suffix in {".jpg", ".jpeg"} and head.startswith(b"\xff\xd8\xff"):
@@ -915,6 +922,24 @@ def _validated_raster_suffix(path: Path, *, mime_type: str) -> str:
         return ".webp"
     raise _invalid("P3 asset MIME, magic bytes and raster suffix do not agree.")
 ```
+
+Add the one shared internal read primitive in `production/paths.py` and use it everywhere P3 reads source, scratch or durable bytes:
+
+```python
+@dataclass(frozen=True)
+class NoFollowFile:
+    data: bytes
+    file_sha256: str
+    size_bytes: int
+    mode: int
+    device: int
+    inode: int
+
+
+def _read_regular_file_nofollow(path: Path, *, contained_by: Path) -> NoFollowFile: ...
+```
+
+It performs lexical absolute containment first, `lstat()` on the root and every existing component, rejects every artifact-path symlink even when it remains contained, opens/traverses beneath the root using directory FDs and `os.open(..., O_RDONLY | O_NOFOLLOW, dir_fd=...)`, requires `stat.S_ISREG(os.fstat(fd).st_mode)`, and reads/hash/magic-checks from that same FD. It compares final `lstat`/`fstat` device+inode and fails if a swap is observed. It never `resolve()`s and then reopens a pathname. `_create_directory_nofollow()` uses a validated parent dir FD plus `mkdirat`/no-follow reopen. `_create_regular_file_nofollow()` is the paired scratch/durable file primitive: validated parent directory FD, `O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW`, write bytes already returned by the read helper, file fsync, same-FD hash/size verification, then directory fsync. No P3 code uses `Path.mkdir()`, `shutil.copyfile()` or `sha256_file()` for these artifact surfaces.
 
 No function may add float seconds across Shots.
 
@@ -1002,6 +1027,8 @@ def resolve_composition(
             sample_rate=spec.sample_rate,
         )
         for layer in sorted(shot_layers, key=lambda item: (item.z_index, item.layer_id)):
+            if layer.trim_start_frame != 0 or layer.trim_duration_frames is not None:
+                raise _invalid("P3 static raster layers do not implement trim.")
             asset = assets_by_id.get(layer.asset_id)
             source_path = project.asset_paths.get(layer.asset_id)
             if asset is None or source_path is None:
@@ -1014,9 +1041,17 @@ def resolve_composition(
                 )
             if AssetType.IMAGE not in role.allowed_asset_types or asset.asset_type is not AssetType.IMAGE:
                 raise _invalid(f"Layer {layer.layer_id} must bind a registry image asset.")
-            if sha256_file(source_path) != asset.sha256:
+            source_snapshot = _read_regular_file_nofollow(
+                source_path,
+                contained_by=project.root,
+            )
+            if source_snapshot.file_sha256 != asset.sha256:
                 raise _invalid(f"Asset hash changed before timeline resolution: {asset.asset_id}.")
-            suffix = _validated_raster_suffix(source_path, mime_type=asset.mime_type)
+            suffix = _validated_raster_suffix(
+                source_snapshot,
+                suffix=source_path.suffix,
+                mime_type=asset.mime_type,
+            )
             logical_path = Path("assets") / f"{asset.sha256}{suffix}"
             spans.append(
                 ResolvedVisualSpan(
@@ -1077,7 +1112,7 @@ def resolve_composition(
 1. require `spec.requested_renderer is RendererKind.HYPERFRAMES` and `hyperframes` is allowed by `project.project.renderer_policy`;
 2. build `shots_by_id` and `assets_by_id` from the already loaded bundle without scanning directories;
 3. validate each ordered `shot_id` appears exactly once and each layer binds the declared Shot plus one exact registry asset/path/hash;
-4. accept only fixed-duration `STATIC_IMAGE` Shots with no motion directives and local registry PNG/JPEG/WebP bytes; reject `image_motion`, `motion_graphics`, `generated_video`, `existing_video`/source video and `hybrid` with `COMPOSITION_INVALID` rather than silently degrading;
+4. accept only fixed-duration `STATIC_IMAGE` Shots with no motion directives, default-only trim (`0`/`None`) and local registry PNG/JPEG/WebP bytes; reject non-default trim, `image_motion`, `motion_graphics`, `generated_video`, `existing_video`/source video and `hybrid` with `COMPOSITION_INVALID` rather than silently degrading;
 5. require each layer's `(asset_role, asset_id)` to match one exact `Shot.required_asset_roles` binding and its registry image record; construct `assets/<full-asset-sha256>.<canonical-lowercase-suffix>` without using raw `asset_id` in any path;
 6. compute integer frame/sample boundaries and only zero-duration cuts;
 7. sort only same-Shot layers by explicit `(z_index, layer_id)` after rejecting conflicting duplicate z-order; never sort Shots by ID or path;
@@ -1091,7 +1126,8 @@ Keep this as the single resolver; do not add a second resolver or renderer-speci
 
 ```bash
 python -m pytest tests/test_production_models.py tests/test_production_composition.py -q
-git add src/ai_video/production/composition.py tests/test_production_composition.py \
+git add src/ai_video/production/composition.py src/ai_video/production/paths.py \
+  tests/test_production_composition.py \
   tests/production_project_factory.py
 git commit -m "feat: resolve deterministic production timelines"
 ```
@@ -1115,10 +1151,14 @@ def test_source_is_materialized_only_from_timeline_and_bound_assets(tmp_path):
     result = materialize_hyperframes_source(
         timeline,
         asset_sources=make_asset_sources(tmp_path, timeline),
+        allowed_asset_root=tmp_path,
         staging_root=tmp_path / "staging",
         allowed_staging_parent=tmp_path,
     )
-    assert result.source_sha256 == sha256_file(result.index_path)
+    assert result.source_sha256 == _read_regular_file_nofollow(
+        result.index_path,
+        contained_by=result.root,
+    ).file_sha256
     html = result.index_path.read_text(encoding="utf-8")
     assert html.index('data-shot-id="shot-2"') < html.index('data-shot-id="shot-1"')
     assert 'data-asset-id="image-hero-1"' in html
@@ -1126,6 +1166,13 @@ def test_source_is_materialized_only_from_timeline_and_bound_assets(tmp_path):
 
 
 def test_materializer_validates_target_containment_before_any_mkdir_or_copy(tmp_path): ...
+
+
+@pytest.mark.parametrize("location", ["contained", "external"])
+def test_materializer_rejects_asset_symlink_without_following_it(tmp_path, location): ...
+
+
+def test_nofollow_reader_detects_inode_swap_between_lstat_and_open(tmp_path): ...
 
 
 def test_source_snapshot_applies_transform_origin_opacity_and_z_index_exactly(tmp_path): ...
@@ -1175,6 +1222,7 @@ def materialize_hyperframes_source(
     timeline: ResolvedTimeline,
     *,
     asset_sources: Mapping[str, Path],
+    allowed_asset_root: Path,
     staging_root: Path,
     allowed_staging_parent: Path,
 ) -> MaterializedHyperFramesSource:
@@ -1187,28 +1235,46 @@ def materialize_hyperframes_source(
     )
 
     bindings_by_id: dict[str, RendererAssetBinding] = {}
-    planned: list[tuple[ResolvedVisualSpan, Path, Path]] = []
+    planned_asset_ids: set[str] = set()
+    planned: list[tuple[ResolvedVisualSpan, NoFollowFile, Path]] = []
     for span in timeline.visual_spans:
-        if span.asset_id in bindings_by_id:
+        if span.asset_id in planned_asset_ids:
             continue
+        planned_asset_ids.add(span.asset_id)
         source = asset_sources[span.asset_id]
-        suffix = _validated_raster_suffix(source, mime_type=span.asset_mime_type)
-        if not source.is_file() or source.is_symlink() or sha256_file(source) != span.asset_sha256:
+        source_snapshot = _read_regular_file_nofollow(
+            source,
+            contained_by=allowed_asset_root,
+        )
+        suffix = _validated_raster_suffix(
+            source_snapshot,
+            suffix=source.suffix,
+            mime_type=span.asset_mime_type,
+        )
+        if source_snapshot.file_sha256 != span.asset_sha256:
             raise _source_invalid(f"Asset bytes do not match timeline: {span.asset_id}.")
         relative = Path("assets") / f"{span.asset_sha256}{suffix}"
         if relative != span.materialized_path:
             raise _source_invalid("Timeline materialized path is not canonical for asset hash.")
         target = _validate_contained_target(root, relative, before_creation=True)
-        planned.append((span, source, target))
+        planned.append((span, source_snapshot, target))
 
     # No mkdir/copy occurs until every root and target has passed containment validation.
-    root.mkdir(parents=False, exist_ok=False)
+    _create_directory_nofollow(root, contained_by=allowed_staging_parent)
     assets_root = root / "assets"
-    assets_root.mkdir()
-    for span, source, target in planned:
-        shutil.copyfile(source, target)
-        suffix = _validated_raster_suffix(target, mime_type=span.asset_mime_type)
-        if suffix != target.suffix or sha256_file(target) != span.asset_sha256:
+    _create_directory_nofollow(assets_root, contained_by=root)
+    for span, source_snapshot, target in planned:
+        target_snapshot = _create_regular_file_nofollow(
+            target,
+            data=source_snapshot.data,
+            contained_by=root,
+        )
+        suffix = _validated_raster_suffix(
+            target_snapshot,
+            suffix=target.suffix,
+            mime_type=span.asset_mime_type,
+        )
+        if suffix != target.suffix or target_snapshot.file_sha256 != span.asset_sha256:
             raise _source_invalid(f"Copied asset hash mismatch: {span.asset_id}.")
         bindings_by_id[span.asset_id] = RendererAssetBinding(
             asset_id=span.asset_id,
@@ -1242,8 +1308,6 @@ def materialize_hyperframes_source(
                     ),
                     (
                         f'  <img src="{span.materialized_path.as_posix()}"'
-                        f' data-trim-start-frame="{span.trim_start_frame}"'
-                        f' data-trim-duration-frames="{span.trim_duration_frames or 0}"'
                         f' style="transform:{escape(transform)};transform-origin:0 0" alt="" />'
                     ),
                     "</div>",
@@ -1282,14 +1346,18 @@ def materialize_hyperframes_source(
         ]
     )
     index_path = _validate_contained_target(root, Path("index.html"), before_creation=True)
-    index_path.write_text(source, encoding="utf-8", newline="\n")
+    index_snapshot = _create_regular_file_nofollow(
+        index_path,
+        data=source.encode("utf-8"),
+        contained_by=root,
+    )
     bindings = tuple(bindings_by_id[key] for key in sorted(bindings_by_id))
     audit_hyperframes_source(index_path, expected_assets=bindings)
     bundle_sha256 = _source_bundle_sha256(index_path, bindings)
     return MaterializedHyperFramesSource(
         root=root,
         index_path=index_path,
-        source_sha256=sha256_file(index_path),
+        source_sha256=index_snapshot.file_sha256,
         bundle_sha256=bundle_sha256,
         asset_bindings=bindings,
     )
@@ -1300,7 +1368,9 @@ def audit_hyperframes_source(
     *,
     expected_assets: tuple[RendererAssetBinding, ...],
 ) -> None:
-    source = index_path.read_text(encoding="utf-8")
+    source_root = index_path.parent
+    index_snapshot = _read_regular_file_nofollow(index_path, contained_by=source_root)
+    source = index_snapshot.data.decode("utf-8", errors="strict")
     parsed = _parse_source_document(source)  # stdlib HTMLParser + explicit CSS url()/@import scanner
     if not parsed.composition_id or not parsed.timeline_fingerprint:
         raise _source_invalid("HyperFrames source is missing composition identity.")
@@ -1315,20 +1385,17 @@ def audit_hyperframes_source(
         relative = binding.materialized_path
         if relative.is_absolute() or ".." in relative.parts:
             raise _source_invalid(f"Unsafe materialized asset path: {relative}")
-        resolved = (index_path.parent / relative).resolve()
-        try:
-            resolved.relative_to(index_path.parent.resolve())
-        except ValueError as exc:
-            raise _source_invalid(f"Asset escapes staging root: {relative}") from exc
-        if not resolved.is_file() or sha256_file(resolved) != binding.asset_sha256:
+        target = _validate_contained_target(source_root, relative, before_creation=False)
+        target_snapshot = _read_regular_file_nofollow(target, contained_by=source_root)
+        if target_snapshot.file_sha256 != binding.asset_sha256:
             raise _source_invalid(f"Untracked or changed source asset: {binding.asset_id}")
-        _validated_raster_suffix(resolved, mime_type=binding.asset_mime_type)
+        _validated_raster_suffix(
+            target_snapshot,
+            suffix=target.suffix,
+            mime_type=binding.asset_mime_type,
+        )
     expected_files = {Path("index.html"), *(item.materialized_path for item in expected_assets)}
-    actual_files = {
-        item.relative_to(index_path.parent)
-        for item in index_path.parent.rglob("*")
-        if item.is_file()
-    }
+    actual_files = _list_regular_files_nofollow(source_root)
     if actual_files != expected_files:
         raise _source_invalid("HyperFrames staging contains an untracked file.")
 
@@ -1356,14 +1423,14 @@ def _css_transform(transform: FixedTransform) -> str:
     )
 ```
 
-Import `Mapping`, `dataclass`, `Decimal`, `escape` from `html`, `HTMLParser`, `urlsplit`, `re`, `shutil`, the existing `sha256_file()`, and the named production models. `_parse_source_document()` must enumerate every URL-bearing `src`, `href`, `poster`, `srcset`, inline-style `url()` and style-block `url()`/`@import`; it does not accept a substring-only audit. `_validated_raster_suffix()` validates magic bytes, exact MIME and suffix for PNG/JPEG/WebP before and after copy. `_source_bundle_sha256()` hashes stable JSON of the exact ordered `(relative_path, file_sha256)` set including `index.html`. After Task 4 introduces `RendererAttemptError`, `_source_invalid()` returns a non-retryable instance with `code=ErrorCode.RENDERER_SOURCE_INVALID` and `phase="source"`.
+Import `Mapping`, `dataclass`, `Decimal`, `escape` from `html`, `HTMLParser`, `urlsplit`, `re`, the shared no-follow read/create/list primitives, and the named production models. `_parse_source_document()` must enumerate every URL-bearing `src`, `href`, `poster`, `srcset`, inline-style `url()` and style-block `url()`/`@import`; it does not accept a substring-only audit. `_validated_raster_suffix()` validates magic bytes, exact MIME and suffix for PNG/JPEG/WebP from the no-follow snapshot before and after copy. `_source_bundle_sha256()` hashes stable JSON of the exact ordered `(relative_path, file_sha256)` set including `index.html`, using only same-FD snapshots. `_list_regular_files_nofollow()` rejects symlink entries/directories instead of traversing them. After Task 4 introduces `RendererAttemptError`, `_source_invalid()` returns a non-retryable instance with `code=ErrorCode.RENDERER_SOURCE_INVALID` and `phase="source"`.
 
 Materialization rules:
 
 - Task 3 is pure and has no dependency on the not-yet-created Task 5 `RenderAttemptPaths`. Its caller supplies both a new `staging_root` and an existing `allowed_staging_parent`; `_validate_new_contained_root()` rejects symlink/escape/existing targets and validates every planned child target **before** any mkdir/copy. Task 5 later adds the canonical integration call with `render_attempt_paths()`.
 - Copy each timeline asset to `assets/<full-asset-sha256>.<png|jpg|webp>` after verifying registry SHA-256 plus magic/MIME/extension; raw `asset_id` never contributes to a filesystem path. Do not accept SVG, HTML, CSS or any other payload.
 - Generate `index.html` in exact `timeline.visual_spans` order. Convert frame boundaries to decimal seconds only at source materialization with `Decimal(frame) / Decimal(fps)` and a stable string formatter.
-- Embed timeline fingerprint, renderer version, asset ID/role/hash and trim as data attributes. Apply fixed transform, `transform-origin: 0 0`, opacity and z-order as deterministic inline CSS used by the rendered DOM; source snapshot tests assert the exact CSS and the decoded-frame integration proof exercises a non-default transform/opacity/z-order case. Do not claim or serialize motion directives.
+- Embed timeline fingerprint, renderer version and asset ID/role/hash as data attributes. Trim is not serialized because only `0`/`None` is accepted. Apply fixed transform, `transform-origin: 0 0`, opacity and z-order as deterministic inline CSS used by the rendered DOM; source snapshot tests assert the exact CSS and the decoded-frame integration proof exercises a non-default transform/opacity/z-order case. Do not claim or serialize motion directives.
 - Use only local HTML/CSS/HyperFrames runtime features proven by the live spike. Do not reference CDN GSAP, Google Fonts, remote media, `.env`, current time or randomness.
 - Write source once into the caller-supplied staging root, hash it, run `audit_hyperframes_source()`, and return the result. No source rewrite is allowed after hashing.
 
@@ -1390,12 +1457,11 @@ Expected: fixture/source hash tests pass without Node, Chrome or network.
 
 **Files:**
 - Modify: `src/ai_video/production/hyperframes.py`
-- Modify: `src/ai_video/production/__init__.py`
 - Test: `tests/test_production_hyperframes.py`
 
 - [ ] **Step 1: Write fake-runner RED tests**
 
-Use an injected runner; default tests must never execute the real binary:
+Exercise runner injection only through the module-internal adapter seam; default tests must never execute the real binary:
 
 ```python
 def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
@@ -1416,7 +1482,10 @@ def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
     assert {call.env["HYPERFRAMES_BROWSER_PATH"] for call in runner.calls} == {
         str(validated_browser_path)
     }
-    assert result.output.output_sha256 == sha256_file(result.output.scratch_path)
+    assert result.output.output_sha256 == _read_regular_file_nofollow(
+        result.output.scratch_path,
+        contained_by=result.output.scratch_path.parent.parent,
+    ).file_sha256
 
 
 def test_adapter_rejects_remotion_without_fallback(tmp_path):
@@ -1440,6 +1509,17 @@ def test_adapter_reports_typed_phase_failure_without_next_command(tmp_path, fail
         ).render(make_render_attempt(tmp_path))
     assert exc.value.phase == failed_phase
     assert all(call.command != "render" for call in runner.calls) if failed_phase != "render" else True
+
+
+def test_production_runner_builds_exact_unshare_argv_and_fixed_exec_wrapper(tmp_path): ...
+
+
+def test_production_runner_has_no_host_network_fallback_when_namespace_is_unavailable(tmp_path): ...
+
+
+def test_production_runner_injects_exact_browser_env_timeout_and_redacts_output(tmp_path): ...
+
+
 ```
 
 Also cover wrong tool version/failed doctor, malformed JSON, lint errors, check errors, warnings policy, missing/empty output, output hash mismatch, measured width/height/FPS/frame-count mismatch, unexpected audio stream, timeout, stderr truncation/redaction, no source mutation after lint, and only one selected renderer.
@@ -1456,7 +1536,7 @@ python -m pytest tests/test_production_hyperframes.py -q -k 'adapter or receipt 
 
 Expected: tests fail because runner/adapter/verified-output construction is not implemented.
 
-- [ ] **Step 3: Implement the injected executable boundary**
+- [ ] **Step 3: Implement the private production runner and internal adapter seam**
 
 ```python
 @dataclass
@@ -1490,12 +1570,40 @@ class RendererRunner(Protocol):
         pass
 
 
+class _NetworkIsolatedHyperFramesRunner:
+    """Sole production runner; low-level tests inject RendererRunner fakes."""
+
+    _WRAPPER = '"$P3_IP_PATH" link set lo up; exec "$@"'
+
+    def _namespace_argv(self, *renderer_argv: str) -> list[str]:
+        return [
+            str(self._unshare),
+            "--user", "--map-root-user", "--net", "--pid", "--fork", "--mount-proc",
+            str(self._bash), "-ceu", self._WRAPPER, "p3-hyperframes",
+            str(self._binary), *renderer_argv,
+        ]
+
+    def _invoke(self, *renderer_argv: str, timeout_seconds: int) -> RendererCommandResult:
+        completed = subprocess.run(
+            self._namespace_argv(*renderer_argv),
+            cwd=self._project_root,
+            env=dict(self._env),
+            shell=False,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+        )
+        return _bounded_redacted_result(completed)
+
+
 @dataclass(frozen=True)
 class HyperFramesRenderAttempt:
     attempt_id: str
     selection: RendererSelectionReceipt
     timeline: ResolvedTimeline
     asset_sources: Mapping[str, Path]
+    allowed_asset_root: Path
     staging_root: Path
     allowed_staging_parent: Path
     output_path: Path
@@ -1510,6 +1618,7 @@ class VerifiedRenderOutput:
     decoded_frame_fingerprint: str
 
 
+@dataclass(frozen=True)
 class HyperFramesRenderResult:
     materialized: MaterializedHyperFramesSource
     checks: tuple[RendererCheckReceipt, RendererCheckReceipt]
@@ -1526,8 +1635,13 @@ OFFLINE_ENV = {
 
 
 def _controlled_env(browser_path: Path) -> dict[str, str]:
-    resolved = browser_path.resolve(strict=True)
-    if not resolved.is_file() or not os.access(resolved, os.X_OK):
+    if not browser_path.is_absolute():
+        raise _renderer_unavailable("Pinned HyperFrames browser path must be absolute.")
+    snapshot = _read_regular_file_nofollow(
+        browser_path,
+        contained_by=browser_path.parent,
+    )
+    if snapshot.mode & 0o111 == 0:
         raise _renderer_unavailable("Pinned HyperFrames browser is not executable.")
     env = {
         key: os.environ[key]
@@ -1535,15 +1649,17 @@ def _controlled_env(browser_path: Path) -> dict[str, str]:
         if key in os.environ
     }
     env.update(OFFLINE_ENV)
-    env["HYPERFRAMES_BROWSER_PATH"] = str(resolved)
+    env["HYPERFRAMES_BROWSER_PATH"] = str(browser_path)
     return env
 ```
 
-Task 4 implements only the injected renderer executor, lint/check evidence and scratch-output verification. Task 5 knows canonical durable paths and therefore is the only stage that seals `RendererSourceReceipt`/`RenderReceipt`; Task 4 must not put scratch paths into semantic receipts. Task 5 also adds the named `render_with_hyperframes()` orchestration after the real lifecycle request/API types exist; do not create a temporary alias or duplicate request model here.
+The private `_NetworkIsolatedHyperFramesRunner` constructor validates the lock-resolved project-local `node_modules/.bin/hyperframes` target/integrity, exact no-follow browser and absolute executable `unshare`, `ip`, `bash` paths with `lstat`; npm's expected `.bin` link is accepted only when its target is the exact lock-owned package executable under this `node_modules`, while source/scratch/durable artifact symlinks remain categorically forbidden. Its controlled env fixes `P3_IP_PATH` for the literal wrapper and `HYPERFRAMES_BROWSER_PATH` for HyperFrames. It runs a harmless namespace capability probe through the same argv form; missing user/net/PID namespace, loopback setup, executable or permission maps to non-retryable `RENDERER_UNAVAILABLE`. Every production `version`, `doctor`, `lint`, `check` and `render` call creates a new Linux user+network+PID namespace, brings up loopback, then uses the fixed `exec "$@"` wrapper. Renderer arguments are positional argv after sentinel `$0`; none is interpolated into shell text. There is no direct-host subprocess path, retry or fallback. Timeout, bounded capture and redaction apply at this concrete boundary.
+
+Task 4 implements the private production runner plus the module-internal adapter seam, lint/check evidence and scratch-output verification. Runner injection exists only at that internal test seam. Task 5 knows canonical durable paths and therefore is the only stage that seals `RendererSourceReceipt`/`RenderReceipt`; Task 4 must not put scratch paths into semantic receipts. Task 5 also adds the named `render_with_hyperframes()` orchestration after the real lifecycle request/API types exist; do not create a temporary alias or duplicate request model here.
 
 `OFFLINE_ENV` 是必要但不充分的 process policy：它不阻止 npm update fetch 或 browser download。默认 unit tests 只使用 fake runner；real runner/live spike 还必须在 OS-level egress denial/observability 下运行，并用经 Renderer Gate 验收的 `HYPERFRAMES_BROWSER_PATH` 显式指向预先安装的 browser。
 
-The production runner must call only the approved local binary path `node_modules/.bin/hyperframes`, pass argv as a list without `shell=True`, enforce timeout, capture bounded stdout/stderr, redact secrets and never invoke `npx`, `upgrade`, `browser`, `cloud`, `lambda`, `tts` or `transcribe`. Its constructor receives the Task 0 verified browser executable. `_controlled_env()` copies only an explicit allowlist such as `PATH`, locale and task temp variables from the parent, overlays `OFFLINE_ENV`, and always injects the resolved validated absolute `HYPERFRAMES_BROWSER_PATH`; caller-supplied env cannot remove or override it. `version()` must equal `0.7.103`, then `doctor` must succeed under that same controlled env before lint/check/render.
+`_NetworkIsolatedHyperFramesRunner` is the only production runner constructed by public `render_with_hyperframes()`. It calls only the approved local binary, never `npx`, `upgrade`, `browser`, `cloud`, `lambda`, `tts` or `transcribe`. `HyperFramesAdapter` and `RendererRunner` remain low-level internal/test seams; production callers cannot inject a host runner through the stable API. Exact version `0.7.103` and `doctor` must succeed through the isolated runner before lint/check/render.
 
 - [ ] **Step 4: Implement strict phase parsing and receipts**
 
@@ -1628,6 +1744,7 @@ class HyperFramesAdapter:
         materialized = materialize_hyperframes_source(
             attempt.timeline,
             asset_sources=attempt.asset_sources,
+            allowed_asset_root=attempt.allowed_asset_root,
             staging_root=attempt.staging_root,
             allowed_staging_parent=attempt.allowed_staging_parent,
         )
@@ -1640,7 +1757,10 @@ class HyperFramesAdapter:
             allowed_parent=attempt.allowed_staging_parent,
             suffix=".mp4",
         )
-        staged_output.parent.mkdir(parents=True, exist_ok=True)
+        _create_directory_nofollow(
+            staged_output.parent,
+            contained_by=attempt.allowed_staging_parent,
+        )
         command_result = self._runner.run(
             "render",
             (str(materialized.root), "-o", str(staged_output)),
@@ -1652,10 +1772,14 @@ class HyperFramesAdapter:
             raise _render_error("render", command_result)
         _verify_materialized_unchanged(materialized)
         try:
-            if not staged_output.is_file() or staged_output.stat().st_size == 0:
+            output_snapshot = _read_regular_file_nofollow(
+                staged_output,
+                contained_by=attempt.allowed_staging_parent,
+            )
+            if output_snapshot.size_bytes == 0:
                 raise _render_failed("HyperFrames output is missing or empty.")
-            output_size = staged_output.stat().st_size
-            output_sha256 = sha256_file(staged_output)
+            output_size = output_snapshot.size_bytes
+            output_sha256 = output_snapshot.file_sha256
             measured = _measured_metadata(self._probe(staged_output))
             _validate_measured_timeline(measured, attempt.timeline)
             decoded = self._decoded_frames(staged_output)
@@ -1712,7 +1836,8 @@ def _verify_failed(exc: Exception) -> RendererAttemptError:
 
 
 def _verify_materialized_unchanged(value: MaterializedHyperFramesSource) -> None:
-    if sha256_file(value.index_path) != value.source_sha256:
+    snapshot = _read_regular_file_nofollow(value.index_path, contained_by=value.root)
+    if snapshot.file_sha256 != value.source_sha256:
         raise _source_invalid("HyperFrames source changed after hashing.")
     audit_hyperframes_source(value.index_path, expected_assets=value.asset_bindings)
 
@@ -1772,7 +1897,7 @@ def _validate_measured_timeline(
 
 The method must verify exact tool version and successful `doctor` after selection has been durably begun, parse the pinned JSON schema, require zero errors, record warning counts, rehash source/assets between phases, validate output with `probe_clip()`, and calculate output/decoded-frame hashes. The verify boundary catches every `AiVideoError` including `FFMPEG_FAILED` plus plain probe/framemd5/parse exceptions and exposes only non-retryable `RendererAttemptError(RENDER_FAILED, phase="verify")`. It never includes timestamps or scratch paths in timeline/source/decoded-frame identity. Task 5 builds canonical durable receipts and supplies the real committer/crash/replay tests.
 
-Import `Callable`, `Mapping`, `Protocol`, `Literal`, `cast`, `hashlib`, `json`, `re`, existing `probe_clip()`/`run_command()` and the named P3 models. `_source_invalid()` must return `RendererAttemptError(phase="source")`; `_render_failed()` must return `RendererAttemptError(phase="verify")`; `_renderer_unavailable()` returns a non-retryable `AiVideoError` with `code=RENDERER_UNAVAILABLE` before any executable work. No helper may start a fallback command.
+Import `Callable`, `Mapping`, `Protocol`, `Literal`, `cast`, `hashlib`, `json`, `os`, `re`, `subprocess`, the shared no-follow primitives, existing `probe_clip()`/`run_command()` and the named P3 models. `_source_invalid()` must return `RendererAttemptError(phase="source")`; `_render_failed()` must return `RendererAttemptError(phase="verify")`; `_renderer_unavailable()` returns non-retryable `AiVideoError(RENDERER_UNAVAILABLE)`. Public orchestration persists begin before constructing/probing the isolated runner; no helper may start a host fallback command.
 
 Do not add preview to automated adapter flow. Preview belongs only to the explicit live spike gate because it starts a server/browser and is not necessary for deterministic batch execution.
 
@@ -1780,8 +1905,7 @@ Do not add preview to automated adapter flow. Preview belongs only to the explic
 
 ```bash
 python -m pytest tests/test_production_hyperframes.py -q
-git add src/ai_video/production/hyperframes.py src/ai_video/production/__init__.py \
-  tests/test_production_hyperframes.py
+git add src/ai_video/production/hyperframes.py tests/test_production_hyperframes.py
 git commit -m "feat: add hyperframes renderer adapter"
 ```
 
@@ -1818,6 +1942,8 @@ def test_reader_rejects_tampered_or_mixed_render_state_without_fallback(tmp_path
 def test_commit_changed_project_or_registry_clears_active_render_state_atomically(tmp_path): ...
 def test_commit_same_pair_retains_only_fully_verified_render_state(tmp_path): ...
 def test_commit_invalidation_preserves_previous_render_and_source_bytes_as_orphans(tmp_path): ...
+def test_reader_rejects_contained_and_external_symlinks_for_every_render_artifact(tmp_path): ...
+def test_reader_nofollow_reopen_detects_inode_swap_without_accepting_replacement(tmp_path): ...
 ```
 
 `load_production_project()` must preserve bytes and mtimes for both versions. A 2.0 Manifest remains valid until the first render lifecycle write; no eager migration.
@@ -1854,7 +1980,7 @@ def render_attempt_paths(self, attempt_id: str) -> RenderAttemptPaths:
 
 This method is pure: it validates a conservative safe attempt ID, resolves clean absolute project-root-contained paths corresponding to `state/render/attempts/<attempt-id>/`, and performs no mkdir/write/delete. The persisted identities remain canonical project-relative paths; the adapter creates only the exact validated attempt-owned directories it consumes.
 
-Use the same immutable path validators in `project.py`: when a 2.1 Manifest has `active_render_state`, load that exact state snapshot, its timeline/source receipt/render receipt JSON, canonical source index and every bound raster, plus output; verify canonical path, file SHA-256, source bundle hash, raster MIME/magic/suffix, semantic revision/content hash, output size, exact project/registry provenance and every cross identity. Return the verified render state as optional read-only data on `LoadedProductionProject`; do not scan, activate, recover or mutate.
+Use the same immutable path validators and the single `_read_regular_file_nofollow()` primitive in `project.py` and `state_commit.py`: when a 2.1 Manifest has `active_render_state`, open the exact state snapshot, timeline/source receipt/render receipt JSON, canonical source index and every bound raster, plus output without following any symlink; verify canonical path, same-FD file SHA-256, source bundle hash, raster MIME/magic/suffix, semantic revision/content hash, output size, exact project/registry provenance and every cross identity. Candidate promotion/reopen and recovery use the same primitive. Return the verified render state as optional read-only data on `LoadedProductionProject`; do not scan, activate, recover or mutate.
 
 Add the Task 3/Task 5 integration test: `render_attempt_paths()` returns validated attempt/source/output paths; orchestration rechecks containment, creates exactly `paths.attempt_root`, then `materialize_hyperframes_source(..., staging_root=paths.source_root, allowed_staging_parent=paths.attempt_root)` succeeds without any alternate path API. The adapter separately validates and creates the exact output parent. This is the first task that may claim canonical attempt paths exist.
 
@@ -1867,14 +1993,8 @@ Add frozen dataclasses/models in `state_commit.py`:
 ```python
 @dataclass(frozen=True)
 class BeginRenderAttemptRequest:
-    attempt_id: str
     expected_manifest_revision: int
-    current_project: ProjectSnapshotPointer
-    current_registry: RegistrySnapshotPointer
     base_render_state: RenderStateSnapshotPointer | None
-    timeline_fingerprint: str
-    active_project: ProjectSnapshotPointer
-    active_registry: RegistrySnapshotPointer
     renderer_selection: RendererSelectionReceipt
 
 
@@ -1903,7 +2023,7 @@ class ActivateRenderStateRequest:
     next_render_state: RenderStateSnapshotPointer
 ```
 
-The request identity is the complete tuple of attempt ID, expected/base identities, exact timeline fingerprint, active project/registry pointers, selection, sorted `(relative_path, file_sha256)` variable artifact set and next pointer. `BeginRenderAttemptRequest.timeline_fingerprint/active_project/active_registry` must exactly duplicate `renderer_selection` and the live Manifest pair; `RenderStateSnapshot` later fixes the same three provenance identities. `BeginRenderAttemptRequest.expected_manifest_revision=R`; its fresh write yields R+1. An outer `RecordRenderFailureRequest` is valid only before activation is called, against authoritative begun R+1, and yields terminal R+2 with no candidate. `ActivateRenderStateRequest.expected_manifest_revision=R+1` transfers sole ownership at method entry: candidate-transition ordinary failure may terminalize directly from R+1 to R+2 with exact candidate/hash; successful candidate preparation yields authoritative R+2; final success or activation-owned failure then yields R+3 internally. The outer layer never constructs a failure request after that call. Begin/success exact replay returns the already-persisted corresponding Manifest state only when attempt ID, timeline fingerprint, active project, active registry, selection and every stage identity match; any mismatch is `PRODUCTION_STATE_INVALID`. Pre-activation failure replay is idempotent only when phase/code/message and all provenance/base identities match. Requests reject stale `expected_manifest_revision` except an exact recognized replay for the same owner/stage.
+The request identity is the complete tuple of authoritative `renderer_selection` (including attempt ID, exact timeline fingerprint and active project/registry pointers), expected revision, base render pointer, sorted `(relative_path, file_sha256)` variable artifact set and next pointer. `BeginRenderAttemptRequest` does not duplicate selection identity; the committer compares selection pointers/fingerprint directly with the live Manifest and resolved timeline, and `RenderStateSnapshot` later fixes the same provenance. `BeginRenderAttemptRequest.expected_manifest_revision=R`; its fresh write yields R+1. An outer `RecordRenderFailureRequest` is valid only before activation is called, against authoritative begun R+1, and yields terminal R+2 with no candidate. `ActivateRenderStateRequest.expected_manifest_revision=R+1` transfers sole ownership at method entry: candidate-transition ordinary failure may terminalize directly from R+1 to R+2 with exact candidate/hash; successful candidate preparation yields authoritative R+2; final success or activation-owned failure then yields R+3 internally. The outer layer never constructs a failure request after that call. Begin/success exact replay returns the already-persisted corresponding Manifest state only when selection, base pointer and every stage identity match; any mismatch is `PRODUCTION_STATE_INVALID`. Pre-activation failure replay is idempotent only when phase/code/message and all provenance/base identities match. Requests reject stale `expected_manifest_revision` except an exact recognized replay for the same owner/stage.
 
 For every render request, `current_project/current_registry` must equal the live Manifest pair. Persisted render attempts set `base_project == candidate_project == current_project` and `base_registry == candidate_registry == current_registry`; validators reject any project/registry change or any mixed project-registry/render operation.
 
@@ -1922,7 +2042,7 @@ Both run under `state/commit.lock` and use the existing atomic Manifest writer. 
 
 - [ ] **Step 5: Integrate one lifecycle-owned HyperFrames orchestration path**
 
-Now add `hyperframes.py::render_with_hyperframes()` using the real Task 5 request/path types. It calls `begin_render_attempt()` before `runner.version()`/`doctor()` or source materialization, obtains `render_attempt_paths()`, calls `HyperFramesAdapter.render()` once, derives canonical durable source-bundle/output paths from full hashes, seals receipts/snapshot with exact project/registry provenance, builds the variable exact prepared-artifact set and calls `activate_render_state()` only after verify.
+Now add `hyperframes.py::render_with_hyperframes()` using the real Task 5 request/path types. It exposes no runner/adapter injection parameter. It calls `begin_render_attempt()` first, then inside the post-begin failure boundary constructs the sole private `_NetworkIsolatedHyperFramesRunner`, obtains `render_attempt_paths()`, calls the internal `HyperFramesAdapter.render()` once, derives canonical durable source-bundle/output paths from full hashes, seals receipts/snapshot with exact project/registry provenance, builds the variable exact prepared-artifact set and calls `activate_render_state()` only after verify. Tests may exercise a private helper with a fake `RendererRunner`; package callers cannot bypass isolation.
 
 Use one explicit post-begin exception boundary:
 
@@ -1930,9 +2050,20 @@ Use one explicit post-begin exception boundary:
 manifest = committer.begin_render_attempt(begin_request)
 phase = "source"
 try:
-    paths = committer.render_attempt_paths(begin_request.attempt_id)
+    paths = committer.render_attempt_paths(begin_request.renderer_selection.attempt_id)
     validate_render_attempt_paths(paths)
-    paths.attempt_root.mkdir(parents=True, exist_ok=False)
+    _create_directory_nofollow(
+        paths.attempt_root,
+        contained_by=committer.project_root,
+    )
+    runner = _NetworkIsolatedHyperFramesRunner(
+        project_root=committer.project_root,
+        binary_path=validated_binary_path,
+        browser_path=validated_browser_path,
+        unshare_path=validated_unshare_path,
+        ip_path=validated_ip_path,
+        bash_path=validated_bash_path,
+    )
     adapter = HyperFramesAdapter(
         runner=runner,
         expected_version=expected_version,
@@ -1951,12 +2082,12 @@ except Exception as exc:
         failure_request_from(exc, phase=phase, manifest=manifest)
     )
     raise
-activation = activation_request(result, expected_manifest_revision=manifest.manifest_revision)
+activation = activation_request(durable, expected_manifest_revision=manifest.manifest_revision)
 # Deliberately outside the outer handler: activation owns every candidate/final window from entry.
 return committer.activate_render_state(activation)
 ```
 
-Every ordinary exception after successful begin but before the call to `activate_render_state()`, including adapter controlled-env/browser-path construction, plain `RENDERER_UNAVAILABLE` from `runner.version()`/wrong pin/doctor, `OSError` during scratch/source materialization, and typed lint/check/render/verify errors, is normalized into `RecordRenderFailureRequest` before re-raise. Version/doctor/availability/materialization use `phase="source"`. The outer function never catches `activate_render_state()` merely to call `record_render_failure()`; activation owns candidate serialization through final ambiguity from method entry, even while R+1 is still authoritative. Process-level interruption/crash and `PRODUCTION_STATE_OUTCOME_UNKNOWN` remain explicit-recovery paths. If pre-activation failure persistence itself fails, raise the state persistence error with the original exception attached as a note. No conclusively ordinary post-begin path may leave the attempt `running`.
+Every ordinary exception after successful begin but before the call to `activate_render_state()`, including missing namespace/tool capability, isolated-runner or controlled-env/browser-path construction, plain `RENDERER_UNAVAILABLE` from version/wrong pin/doctor, `OSError` during scratch/source materialization, and typed lint/check/render/verify errors, is normalized into `RecordRenderFailureRequest` before re-raise. Version/doctor/availability/materialization use `phase="source"`. There is no host-network fallback. The outer function never catches `activate_render_state()` merely to call `record_render_failure()`; activation owns candidate serialization through final ambiguity from method entry, even while R+1 is still authoritative. Process-level interruption/crash and `PRODUCTION_STATE_OUTCOME_UNKNOWN` remain explicit-recovery paths. If pre-activation failure persistence itself fails, raise the state persistence error with the original exception attached as a note. No conclusively ordinary post-begin path may leave the attempt `running`.
 
 `prepare_durable_render_artifacts()` is pure construction plus sealing: it does not write. It computes `state/render/sources/<bundle-sha>/...` paths and `state/render/outputs/<output-sha>.mp4`, then creates `RendererSourceReceipt`, `RenderReceipt` and `RenderStateSnapshot` whose paths are those final canonical destinations. It must never call `relative_to()` between scratch source/output siblings or persist an attempt scratch path. Add focused order/persistence tests:
 
@@ -1971,10 +2102,16 @@ def test_orchestrator_records_every_ordinary_phase_and_never_leaves_running(tmp_
 
 def test_orchestrator_does_not_retry_record_failure_after_activation_takes_ownership(tmp_path): ...
 
+def test_activation_request_exactly_matches_sealed_durable_n_plus_6_set_and_state_pointer(tmp_path): ...
+
+def test_package_root_exports_render_with_hyperframes_but_omits_adapter_runner_and_scratch_types(): ...
+
+def test_public_render_with_hyperframes_has_no_runner_or_adapter_injection_parameter(): ...
+
 def test_live_committed_fixture_render_state_lifecycle(tmp_path): ...  # opt-in Task 6 only
 ```
 
-Assert event order begins with `begin_render_attempt`. Pre-candidate failure ends in one `record_render_failure`; success ends in `activate_render_state`. If activation reports an internally persisted terminal failure or `PRODUCTION_STATE_OUTCOME_UNKNOWN`, `record_render_failure` is not called, so no stale R+1 retry occurs. Failed Manifest status is terminal, active/project/registry pointers are unchanged, and no alternate renderer runs. The live test is marked/guarded so only the explicit Task 6 command selects it; default fake tests do not claim live proof.
+Assert event order begins with `begin_render_attempt`. Pre-candidate failure ends in one `record_render_failure`; success ends in `activate_render_state`. Assert `activation_request(durable, ...)` carries exactly the sealed durable result's sorted `N + 6` `PreparedArtifact`s and exact `RenderStateSnapshotPointer`; it must not accept the scratch `HyperFramesRenderResult`. If activation reports an internally persisted terminal failure or `PRODUCTION_STATE_OUTCOME_UNKNOWN`, `record_render_failure` is not called, so no stale R+1 retry occurs. Failed Manifest status is terminal, active/project/registry pointers are unchanged, and no alternate renderer runs. The live test is marked/guarded so only the explicit Task 6 command selects it; default fake tests do not claim live proof.
 
 - [ ] **Step 6: Prepare and validate the variable exact success artifact set**
 
@@ -2137,9 +2274,10 @@ RenderOutputPointer
 RenderStateSnapshot
 RenderStateSnapshotPointer
 ProductionStateCommitter
+render_with_hyperframes
 ```
 
-The public methods are `ProductionStateCommitter.begin_render_attempt()`、`record_render_failure()`、`activate_render_state()` and `render_attempt_paths()`. Keep `_candidate_artifacts_hash`, Manifest transition builders, `CommitPhase`, crash injectors, native file ops, canonical render path constructors/validators, recovery scanners and serialization/cross-validation helpers private to their modules. `hyperframes.py` may export `HyperFramesAdapter` and `render_with_hyperframes()` only after their API tests pass; injected runner protocols/results, materialization structs and redaction/command helpers remain module-private.
+The state lifecycle methods remain `ProductionStateCommitter.begin_render_attempt()`、`record_render_failure()`、`activate_render_state()` and `render_attempt_paths()`, with their request/path models as stable data contracts. The only stable P3 renderer-execution API exported from the package root is durable `render_with_hyperframes()`. Do **not** export `HyperFramesAdapter`, `RendererRunner`, `_NetworkIsolatedHyperFramesRunner`, `HyperFramesRenderAttempt` or `HyperFramesRenderResult`; they are module-internal/test boundaries and cannot be used to bypass network isolation. Keep `_candidate_artifacts_hash`, Manifest transition builders, `CommitPhase`, crash injectors, native file ops, canonical render path constructors/validators, recovery scanners and serialization/cross-validation helpers private to their modules.
 
 - [ ] **Step 11: Run focused GREEN and commit**
 
@@ -2174,27 +2312,23 @@ Verify the recorded Task 0 compatibility proof names exact `hyperframes@0.7.103`
 
 - [ ] **Step 2: Run the committed-fixture production integration proof**
 
-Run the opt-in `test_live_committed_fixture_render_state_lifecycle` added in Task 5 inside the same Task 0 `unshare` + loopback-only + `strace -ff -e trace=network` boundary:
+Run the opt-in `test_live_committed_fixture_render_state_lifecycle` added in Task 5. Do not wrap pytest in an outer namespace: the public API must prove that its private production runner creates a fresh namespace for every HyperFrames command. Wrap pytest with `strace -ff` only to observe the runner and all descendants:
 
 ```bash
 export P3_LIVE_RENDERER=1
 export HYPERFRAMES_BROWSER_PATH="$P3_HYPERFRAMES_BROWSER_PATH"
 P3_INTEGRATION_EVIDENCE=$(mktemp -d)
 export P3_INTEGRATION_EVIDENCE
-unshare --user --map-root-user --net --pid --fork --mount-proc \
-  bash -euo pipefail -c '
-    ip link set lo up
-    strace -ff -e trace=network -o "$P3_INTEGRATION_EVIDENCE/integration.net" \
-      python -m pytest tests/test_production_hyperframes.py -q \
-      -k test_live_committed_fixture_render_state_lifecycle
-  '
+strace -ff -e trace=network -o "$P3_INTEGRATION_EVIDENCE/integration.net" \
+  python -m pytest tests/test_production_hyperframes.py -q \
+  -k test_live_committed_fixture_render_state_lifecycle
 if rg -n 'connect\(|sendto\(|sendmsg\(' "$P3_INTEGRATION_EVIDENCE"/integration.net* \
   | rg 'AF_INET6?' | rg -v '127\.0\.0\.1|\[::1\]|inet_pton\(AF_INET6, "::1"'; then
   exit 1
 fi
 ```
 
-The test copies the committed PNG fixture into a disposable project, builds a real `STATIC_IMAGE`/cut-only timeline with a non-default deterministic transform/opacity/z-order, runs the concrete controlled-env adapter once, and completes `begin_render_attempt -> version -> doctor -> source -> lint -> check -> render -> verify -> activate_render_state`. It asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, decoded-frame evidence, no audio, scratch paths absent from receipts, and unchanged Legacy state. The harness hashes committed source inputs before/after and parses all trace files with the same “any non-loopback AF_INET/AF_INET6 destination fails” rule from Task 0. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
+The test copies the committed PNG fixture into a disposable project, builds a real `STATIC_IMAGE`/cut-only timeline with a non-default deterministic transform/opacity/z-order, calls public `render_with_hyperframes()` (which constructs the private isolated runner) once, and completes `begin_render_attempt -> version -> doctor -> source -> lint -> check -> render -> verify -> activate_render_state`. It asserts final `active_render_state`, exact project/registry/timeline provenance, canonical durable source HTML/raster bundle and hashes, source/render receipts, canonical output path/hash, decoded-frame evidence, no audio, scratch paths absent from receipts, and unchanged Legacy state. Unit tests already assert exact subprocess argv; this harness hashes committed source inputs before/after and parses all trace files with the same “any non-loopback AF_INET/AF_INET6 destination fails” rule from Task 0. It is an integration/regression proof, not a late compatibility gate or a substitute for the pre-Task-1 hand-authored spike.
 
 The live test is selected only by the command above and fail-closes unless `P3_LIVE_RENDERER=1`, exact binary/browser and namespace tracing are present. Default tests exercise the same lifecycle with a fake runner and no Node/Chrome/network; the opt-in test may be deselected by default, not silently reported as a passing live proof.
 
@@ -2262,7 +2396,7 @@ Record exact dependency/browser versions, namespace/trace evidence, lint/check J
 
 Only after the pre-edit Task 0 compatibility gate and every Task 6 committed-fixture/focused/Legacy/full/scope check pass, document:
 
-- importable `CompositionSpec`/`resolve_composition()`/HyperFrames adapter and stable lifecycle API;
+- importable `CompositionSpec`/`resolve_composition()`/durable `render_with_hyperframes()` and stable lifecycle data API; low-level adapter/runner remain unexported;
 - only accepted `STATIC_IMAGE` + zero-duration `CUT` + local PNG/JPEG/WebP semantics, with all other visual strategies, crossfade and motion directives explicitly blocked;
 - `ResolvedTimeline` as only order/timing truth;
 - exact pinned tool/browser versions and one-renderer-per-attempt rule;
@@ -2312,10 +2446,12 @@ Verify P3 started from accepted P2A and did not add a second writer/Manifest.
 Verify CompositionSpec is edit intent and ResolvedTimeline is the only order/timing owner.
 Verify only STATIC_IMAGE, zero-duration CUT and local PNG/JPEG/WebP are accepted;
 all motion/video/hybrid strategies, crossfade and motion directives typed-fail.
-Verify integer frame/sample boundaries, exact Shot asset role/ID/MIME/hash, trim,
+Verify integer frame/sample boundaries, exact Shot asset role/ID/MIME/hash, rejection of non-default trim,
 actually-applied inline CSS transform/origin/opacity/z-order, delivery profile and fingerprint.
 Verify no raw asset ID enters a path, every target is contained before mkdir/copy,
 magic/MIME/suffix and parsed HTML/CSS URLs enforce the exact declared raster set.
+Verify one lstat/openat O_NOFOLLOW helper owns all artifact reads/reopens, scratch writes
+use O_EXCL/O_NOFOLLOW, contained/external symlinks and inode-swap attempts fail closed.
 Verify selection fixes timeline fingerprint and active project/registry before execution.
 Verify RenderStateSnapshot repeats that provenance and exact replay rejects any mismatch.
 Verify changed project/registry commit atomically clears active render state, same-pair
@@ -2327,8 +2463,13 @@ Verify conclusive ordinary cases terminalize with exact R+2/R+3 candidate eviden
 Verify exact replay/recovery and P2A 2.0 custom-operation compatibility.
 Verify canonical durable source HTML/raster bytes and final output path are in the variable
 N+6 artifact set; no scratch path enters source/render receipts or snapshot identity.
+Verify activation_request consumes the sealed durable result, not scratch render result,
+and its sorted artifacts/next pointer exactly match that durable N+6 identity.
 Verify HyperFrames source comes only from timeline/assets and is parsed/hash/lint/check audited.
 Verify exact 0.7.103 version and doctor run with controlled validated browser env.
+Verify public render_with_hyperframes alone constructs the private namespace runner;
+every tool argv has exact unshare flags/fixed exec "$@", shell=False and no host fallback,
+and package-root exports omit adapter, runner and scratch result types.
 Verify probe/ffprobe/framemd5/plain errors map to non-retryable RENDER_FAILED verify;
 FFMPEG_FAILED never crosses the P3 public boundary.
 Verify one attempt selects exactly one renderer and no Remotion/fallback/double render exists.
@@ -2358,6 +2499,7 @@ Failure handling:
 
 - schema/resolution failure before `begin_render_attempt()`: no external command and no state commit;
 - selection with exact timeline/project/registry provenance is persisted by `begin_render_attempt()` before version/doctor/source/lint/check/render; wrong version, failed doctor, plain `RENDERER_UNAVAILABLE` and source exceptions are normalized to phase `source`, durably failed, then re-raised;
+- missing `unshare`/user-net-PID namespace/loopback/bash/ip capability is non-retryable `RENDERER_UNAVAILABLE`, persisted as source failure after begin; no tool runs on the host network as fallback;
 - lint failure: stop before `check`/render and persist the exact typed failed phase through `record_render_failure()`;
 - check failure: stop before render and persist the exact typed failed phase through `record_render_failure()`;
 - render/timeout/output verification failure: persist the typed phase and leave `active_render_state` old/`None`; probe/ffprobe/framemd5/parse errors, including underlying `FFMPEG_FAILED`, cross the P3 boundary only as non-retryable `RENDER_FAILED` phase `verify`;
@@ -2389,16 +2531,16 @@ P3 is accepted only when:
 1. accepted P2A exists; `ProductionStateCommitter` remains the only durable write/pointer-switch/recovery owner, historical non-empty operation compatibility remains, Manifest 2.0/2.1 read compatibility is proven without rewrite, and project/registry pair changes atomically clear `active_render_state` while preserving orphan bytes;
 2. `CompositionSpec` captures explicit edit intent without filesystem discovery;
 3. `ResolvedTimeline` is the only order/timing/layer truth and contains integer frame/sample boundaries;
-4. only `STATIC_IMAGE`, zero-duration `CUT`, local PNG/JPEG/WebP and no motion directives are accepted; exact `(asset_role, asset_id)`, MIME/hash, trim, actually-applied inline CSS transform/origin/opacity/z-order, delivery profile, renderer kind/version and deterministic composition fingerprint are persisted;
+4. only `STATIC_IMAGE`, zero-duration `CUT`, local PNG/JPEG/WebP, default-only trim and no motion directives are accepted; exact `(asset_role, asset_id)`, MIME/hash, actually-applied inline CSS transform/origin/opacity/z-order, delivery profile, renderer kind/version and deterministic composition fingerprint are persisted;
 5. identical resolved inputs produce identical timeline/source hashes and frame-equivalent output under the pinned tool/runtime;
 6. no byte-identical MP4 claim is made without a separately proven encoder/container contract;
-7. every materialized target is contained before mkdir/copy, filename derives only from full asset hash plus allowlisted lowercase raster suffix, and magic/MIME/extension are audited before and after copy;
+7. every materialized target is contained before creation, filename derives only from full asset hash plus allowlisted lowercase raster suffix, and one lstat/openat `O_NOFOLLOW` helper owns source/scratch/durable/reader bytes; `O_EXCL|O_NOFOLLOW` writes, contained/external symlink tests and inode-swap tests fail closed;
 8. parsed HTML/CSS media URLs exactly equal declared relative raster sources; source contains no SVG/HTML/CSS asset payload, wall-clock randomness, implicit network fetch, remote/absolute/parent/scheme/data/blob URL or untracked file;
-9. each attempt has one renderer selection and one HyperFrames execution path;
+9. each attempt has one authoritative selection identity and one HyperFrames execution path; `BeginRenderAttemptRequest` does not duplicate timeline/project/registry fields;
 10. Remotion is neither installed nor implemented and no double-render/fallback exists;
 11. one immutable `RenderStateSnapshot` fixes exact active project/registry, selection/timeline fingerprint, canonical durable source HTML/raster bundle, source/render receipts and final canonical output pointers; one Manifest pointer activates it and no scratch path is semantic;
-12. Task 0 exact 0.7.103 version/doctor/lint/check/preview/two-render compatibility gate passes before Task 1; runtime selection is durable before any executable call, controlled env injects the validated browser path, outer orchestration records every ordinary availability/source/lint/check/render/verify exception only before activation method entry, and `FFMPEG_FAILED` never leaks across P3;
-13. `activate_render_state()` owns all four windows: candidate pre-replace ordinary failure is terminal R+2 with exact candidate/hash; candidate ambiguity reopens only exact R+1/R+2 or returns outcome unknown; authoritative R+2 pre-final ordinary failure is terminal R+3; final replace/post-replace ambiguity remains outcome unknown. All terminal paths preserve base active/project/registry state, successful revisions remain `R+1/R+2/R+3`, and exact replay/recovery leaves no conclusively ordinary running residue;
+12. Task 0 exact 0.7.103 version/doctor/lint/check/preview/two-render compatibility gate passes before Task 1 using the same namespace wrapper contract; runtime selection is durable before any executable call, only private `_NetworkIsolatedHyperFramesRunner` runs tools with fresh user/net/PID namespace + fixed `exec "$@"`/`shell=False`, controlled env injects the validated browser path, missing capability has no host fallback, outer orchestration records every ordinary availability/source/lint/check/render/verify exception only before activation method entry, and `FFMPEG_FAILED` never leaks across P3;
+13. `activation_request()` consumes the sealed durable `N+6` result, never scratch result; `activate_render_state()` owns all four windows: candidate pre-replace ordinary failure is terminal R+2 with exact candidate/hash; candidate ambiguity reopens only exact R+1/R+2 or returns outcome unknown; authoritative R+2 pre-final ordinary failure is terminal R+3; final replace/post-replace ambiguity remains outcome unknown. All terminal paths preserve base active/project/registry state, successful revisions remain `R+1/R+2/R+3`, and exact replay/recovery leaves no conclusively ordinary running residue;
 14. complete timeline/source-bundle/receipt/state/output orphans are preserved and reported; default tests are fake/no-network, the pre-edit Task 0 gate uses the pinned browser with OS-level external-egress denial/observation plus retrying preview cleanup proof, and Task 6 separately proves the committed fixture/lifecycle integration;
 15. no Audio/Caption, P5 graph, Provider/cloud/paid API, new CLI or Legacy schema/layout enters the diff;
 16. focused P3/P2A, Legacy regression and full default suites pass;
