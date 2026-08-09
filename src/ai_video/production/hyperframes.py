@@ -218,7 +218,8 @@ def _parse_declarations(body: str) -> tuple[tuple[str, str], ...]:
 def _parse_css_model(styles: list[str]) -> tuple[object, ...]:
     model: list[object] = []
     for css in styles:
-        css = re.sub(r"@import[^;]*;", "", css, flags=re.IGNORECASE)
+        if re.search(r"(?i)(?<![-\w])@import\b", css):
+            raise _source_invalid("CSS imports are not allowed in HyperFrames source.")
         for header, body in _split_css_rules(css):
             if header.lower().startswith("@keyframes "):
                 name = header.split(maxsplit=1)[1]
@@ -475,7 +476,7 @@ def _render_source(timeline: ResolvedTimeline) -> str:
 
 
 def _validate_local_relative_url(url: str) -> None:
-    if not url or "\\" in url:
+    if not url or "%" in url or "\x00" in url or "\\" in url:
         raise _source_invalid("HyperFrames source contains an invalid local URL.")
     parsed = urlsplit(url)
     path = Path(parsed.path)
@@ -493,13 +494,28 @@ def _validate_local_relative_url(url: str) -> None:
 
 
 def _source_bundle_sha256(
-    index_path: Path, bindings: tuple[RendererAssetBinding, ...]
+    index_path: Path,
+    bindings: tuple[RendererAssetBinding, ...],
+    *,
+    expected_index_sha256: str,
 ) -> str:
     root = index_path.parent
     paths = {Path("index.html"), *(item.materialized_path for item in bindings)}
+    if _list_regular_files_nofollow(root) != paths:
+        raise _source_invalid("HyperFrames bundle file set changed after audit.")
+    expected_hashes = {Path("index.html"): expected_index_sha256}
+    for binding in bindings:
+        previous = expected_hashes.get(binding.materialized_path)
+        if previous is not None and previous != binding.asset_sha256:
+            raise _source_invalid("HyperFrames bundle has conflicting asset hashes.")
+        expected_hashes[binding.materialized_path] = binding.asset_sha256
     entries = []
     for relative in sorted(paths, key=lambda item: item.as_posix()):
         snapshot = _read_regular_file_nofollow(root / relative, contained_by=root)
+        if snapshot.file_sha256 != expected_hashes[relative]:
+            raise _source_invalid(
+                f"HyperFrames bundle file changed after audit: {relative}."
+            )
         entries.append((relative.as_posix(), snapshot.file_sha256))
     payload = json.dumps(entries, ensure_ascii=True, separators=(",", ":")).encode()
     return hashlib.sha256(payload).hexdigest()
@@ -616,8 +632,29 @@ def _materialize_hyperframes_source(
     index_path = _validate_contained_target(
         root, Path("index.html"), before_creation=True
     )
-    snapshots_by_id: dict[str, NoFollowFile] = {}
+    bindings_by_id: dict[str, RendererAssetBinding] = {}
     targets_by_id: dict[str, Path] = {}
+    for span in timeline.visual_spans:
+        expected = RendererAssetBinding(
+            asset_id=span.asset_id,
+            asset_sha256=span.asset_sha256,
+            asset_mime_type=span.asset_mime_type,
+            materialized_path=span.materialized_path,
+        )
+        previous = bindings_by_id.get(span.asset_id)
+        if previous is not None and previous != expected:
+            raise _source_invalid(f"Asset binding changed within timeline: {span.asset_id}.")
+        bindings_by_id[span.asset_id] = expected
+        targets_by_id[span.asset_id] = _validate_contained_target(
+            root, span.materialized_path, before_creation=True
+        )
+    bindings = tuple(bindings_by_id[key] for key in sorted(bindings_by_id))
+    source_text = _render_source(timeline)
+    parsed_source = _parse_source_document(source_text)
+    for url in parsed_source.all_urls:
+        _validate_local_relative_url(url)
+
+    snapshots_by_id: dict[str, NoFollowFile] = {}
     unique_targets: dict[Path, tuple[ResolvedVisualSpan, NoFollowFile]] = {}
     for span in timeline.visual_spans:
         if span.asset_id in snapshots_by_id:
@@ -636,7 +673,7 @@ def _materialize_hyperframes_source(
         relative = Path("assets") / f"{span.asset_sha256}{suffix}"
         if relative != span.materialized_path:
             raise _source_invalid("Timeline materialized path is not canonical.")
-        target = _validate_contained_target(root, relative, before_creation=True)
+        target = targets_by_id[span.asset_id]
         existing = unique_targets.get(target)
         if existing is not None and existing[1].data != source_snapshot.data:
             raise _source_invalid("Canonical asset target has conflicting bytes.")
@@ -655,31 +692,23 @@ def _materialize_hyperframes_source(
         )
         if suffix != target.suffix or copied.file_sha256 != span.asset_sha256:
             raise _source_invalid(f"Copied asset hash mismatch: {span.asset_id}.")
-    bindings_by_id: dict[str, RendererAssetBinding] = {}
-    for span in timeline.visual_spans:
-        binding = bindings_by_id.get(span.asset_id)
-        expected = RendererAssetBinding(
-            asset_id=span.asset_id,
-            asset_sha256=span.asset_sha256,
-            asset_mime_type=span.asset_mime_type,
-            materialized_path=targets_by_id[span.asset_id].relative_to(root),
-        )
-        if binding is not None and binding != expected:
-            raise _source_invalid(f"Asset binding changed within timeline: {span.asset_id}.")
-        bindings_by_id[span.asset_id] = expected
-    source = _render_source(timeline).encode("utf-8")
+    source = source_text.encode("utf-8")
     index_snapshot = _create_regular_file_nofollow(
         index_path, data=source, contained_by=root
     )
-    bindings = tuple(bindings_by_id[key] for key in sorted(bindings_by_id))
     audit_hyperframes_source(
         index_path, expected_assets=bindings, expected_timeline=timeline
+    )
+    bundle_sha256 = _source_bundle_sha256(
+        index_path,
+        bindings,
+        expected_index_sha256=index_snapshot.file_sha256,
     )
     return MaterializedHyperFramesSource(
         root=root,
         index_path=index_path,
         source_sha256=index_snapshot.file_sha256,
-        bundle_sha256=_source_bundle_sha256(index_path, bindings),
+        bundle_sha256=bundle_sha256,
         asset_bindings=bindings,
         timeline=timeline,
     )

@@ -17,6 +17,7 @@ from ai_video.production.hyperframes import (
     _css_visibility_keyframes,
     _parse_source_document,
     _seconds,
+    _validate_local_relative_url,
     audit_hyperframes_source,
     materialize_hyperframes_source,
 )
@@ -260,6 +261,61 @@ def test_materializer_rejects_unsealed_timeline_and_existing_staging_before_writ
         )
     )
     assert list((tmp_path / "staging").iterdir()) == []
+
+
+def test_conflicting_repeated_asset_id_is_rejected_before_staging_exists(tmp_path):
+    timeline = make_resolved_timeline()
+    conflicting = timeline.visual_spans[1].model_copy(
+        update={"asset_id": timeline.visual_spans[0].asset_id}
+    )
+    timeline = _reseal_timeline(
+        timeline,
+        visual_spans=(timeline.visual_spans[0], conflicting),
+    )
+    inputs = tmp_path / "inputs"
+    inputs.mkdir()
+    red = inputs / "red.png"
+    red.write_bytes(RED_PNG)
+    _assert_source_invalid(
+        lambda: materialize_hyperframes_source(
+            timeline,
+            asset_sources={"image-red": red},
+            allowed_asset_root=tmp_path,
+            staging_root=tmp_path / "staging",
+            allowed_staging_parent=tmp_path,
+        )
+    )
+    assert not (tmp_path / "staging").exists()
+
+
+def test_quantized_seek_failure_is_rejected_before_staging_exists(tmp_path):
+    total_frames = 99_998_442_844_803
+    frame = 99_998_442_844_801
+    timeline = make_resolved_timeline()
+    span = timeline.visual_spans[0].model_copy(
+        update={"start_frame": frame, "duration_frames": 1}
+    )
+    timeline = _reseal_timeline(
+        timeline,
+        delivery_profile=timeline.delivery_profile.model_copy(update={"fps": 23}),
+        visual_spans=(span,),
+        total_frames=total_frames,
+        total_samples=0,
+    )
+    inputs = tmp_path / "inputs"
+    inputs.mkdir()
+    red = inputs / "red.png"
+    red.write_bytes(RED_PNG)
+    _assert_source_invalid(
+        lambda: materialize_hyperframes_source(
+            timeline,
+            asset_sources={"image-red": red},
+            allowed_asset_root=tmp_path,
+            staging_root=tmp_path / "staging",
+            allowed_staging_parent=tmp_path,
+        )
+    )
+    assert not (tmp_path / "staging").exists()
 
 
 def test_materializer_maps_raster_validation_failure_to_renderer_source_invalid(
@@ -535,7 +591,7 @@ def test_source_audit_rejects_network_and_wall_clock_inputs(tmp_path, forbidden)
 def test_parser_enumerates_every_url_bearing_surface():
     parsed = _parse_source_document(
         """<!doctype html><html><head><style>
-        .a{background:url('style.png')}@import "import.css";
+        .a{background:url('style.png')}
         </style></head><body><div id="stage" data-no-timeline>
         <img class="clip" src="src.png" srcset="one.png 1x, two.png 2x"
              poster="poster.png" style="background:url(inline.png)">
@@ -556,7 +612,37 @@ def test_parser_enumerates_every_url_bearing_surface():
         "href.png",
         "style.png",
     }
-    assert parsed.css_imports == ("import.css",)
+    assert parsed.css_imports == ()
+
+
+def test_source_audit_rejects_spaced_quoted_css_import(tmp_path):
+    result = _materialize(tmp_path)
+    source = result.index_path.read_text(encoding="utf-8").replace(
+        "<style>", '<style>@import "../../secret file.css";'
+    )
+    result.index_path.write_text(source, encoding="utf-8")
+    _assert_source_invalid(
+        lambda: audit_hyperframes_source(
+            result.index_path,
+            expected_assets=result.asset_bindings,
+            expected_timeline=result.timeline,
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "assets/%2e%2e/secret.png",
+        "assets/%2Fsecret.png",
+        "assets/%5csecret.png",
+        "assets/%252e%252e/secret.png",
+        "assets/image.png%00.css",
+        "assets/image\x00.png",
+    ],
+)
+def test_local_url_validation_rejects_encoded_or_nul_noncanonical_forms(url):
+    _assert_source_invalid(lambda: _validate_local_relative_url(url))
 
 
 def test_source_audit_rejects_declared_binding_not_present_in_timeline(tmp_path):
@@ -648,6 +734,25 @@ def test_bundle_hash_covers_exact_ordered_file_set(tmp_path):
         json.dumps(entries, ensure_ascii=True, separators=(",", ":")).encode()
     ).hexdigest()
     assert result.bundle_sha256 == expected
+
+
+def test_index_replacement_between_audit_and_bundle_hash_fails_closed(
+    tmp_path, monkeypatch
+):
+    import ai_video.production.hyperframes as hyperframes
+
+    real_audit = hyperframes.audit_hyperframes_source
+
+    def audit_then_replace(index_path, **kwargs):
+        real_audit(index_path, **kwargs)
+        path = Path(index_path)
+        path.write_text(
+            path.read_text(encoding="utf-8") + "<!-- replaced after audit -->\n",
+            encoding="utf-8",
+        )
+
+    monkeypatch.setattr(hyperframes, "audit_hyperframes_source", audit_then_replace)
+    _assert_source_invalid(lambda: _materialize(tmp_path))
 
 
 def test_committed_fixture_matches_exact_materialized_source_and_hashes(tmp_path):
