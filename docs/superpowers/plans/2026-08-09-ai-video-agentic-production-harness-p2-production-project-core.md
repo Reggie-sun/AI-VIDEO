@@ -10,7 +10,7 @@
 
 ---
 
-Status: Proposed implementation plan. Writing or approving this document does not authorize P2 runtime implementation.
+Status: Approved for implementation by the user's explicit execution request and blocker-resolution choice on 2026-08-09.
 
 ## Scope and Authorization
 
@@ -20,9 +20,9 @@ P2 只实现：
 - `ProductionBrief`、`Story`、`Character`、`Scene`、`Storyboard`、`Shot`；
 - 六种 `visual_strategy` 及 strategy-specific static validation；
 - deterministic semantic content hash；
-- immutable `AssetRecord` / `AssetRegistrySnapshot`；
+- frozen `AssetRecord` / `AssetRegistrySnapshot` 的 read-only content-addressed verification；
 - 最小只读 `ProductionManifest` active revision pointer；
-- project-relative clean path resolution、artifact hash/file hash 和 cross-reference validation；
+- Manifest-owned active project content hash/revision、project-relative containment、artifact hash/file hash 和 concrete Shot-to-Asset cross-reference validation；
 - importable Python loading API 和 no-network tests。
 
 P2 明确不实现：
@@ -32,7 +32,7 @@ P2 明确不实现：
 - 修改 `runs/<run_id>/` layout；
 - artifact generation、renderer、timeline、Audio、Caption、QA/repair；
 - dependency graph、fresh/stale、desired/applied state、selective rebuild；
-- registry activation/write transaction、GC 或 migration tool；
+- registry activation/write transaction、append-only cross-revision enforcement、GC 或 migration tool；首个写入/激活 v2 snapshot 的后续 slice 必须实现 atomic commit protocol 和 crash-injection tests；
 - plugin、SDK、新 dependency、paid/remote Provider 或 network call。
 
 P2 runtime work requires separate explicit user authorization after this plan is accepted.
@@ -68,20 +68,21 @@ Do not branch from current `origin/main` without explicitly carrying `abe029c`, 
 | Contract | P2 Owner | Old Path Decision |
 | --- | --- | --- |
 | v2 schema | `src/ai_video/production/models.py` | Do not add v2 fields to Legacy `models.py` |
-| semantic hash | `src/ai_video/production/hashing.py` | Reuse `config.sha256_file()` for file bytes |
+| envelope hash | `src/ai_video/production/hashing.py` | Reuse `config.sha256_file()` for file bytes; P5 owns desired fingerprint projection |
+| safe input path | `src/ai_video/production/paths.py` | No permissive reuse of Legacy absolute-path resolution |
 | strategy/reference rules | `src/ai_video/production/validation.py` | Do not reuse ordered-shot or QA heuristics |
 | registry validation | `src/ai_video/production/registry.py` | No discovery, lifecycle or provider calls |
 | bundle loader | `src/ai_video/production/project.py` | Do not branch Legacy `load_project()` |
-| active revision | minimal v2 `ProductionManifest` | Do not modify Manifest v1; P5 extends v2 state |
+| active revision | minimal v2 `ProductionManifest` with project revision/hash and registry revision | Do not modify Manifest v1; P5 extends v2 lifecycle state |
 | public API | `src/ai_video/production/__init__.py` | No P2 public CLI |
 
-`Shot.desired_fingerprint` is derived, not persisted inside immutable Shot content. P2 uses `content_hash` as revision identity; P5 may persist a desired fingerprint in Production Manifest. This avoids a second lifecycle owner.
+P2 不定义 `Shot.desired_fingerprint`。`content_hash` 封印完整 immutable artifact envelope，包括 revision、receipt 和 provenance；P5 另行定义排除 envelope/lifecycle metadata 的 desired fingerprint projection，并只在 Production Manifest 中持久化 desired/applied state。
 
 ## File Map
 
 Create:
 
-- `src/ai_video/production/{__init__,models,hashing,validation,registry,project}.py`
+- `src/ai_video/production/{__init__,models,hashing,paths,validation,registry,project}.py`
 - `tests/production_project_factory.py`
 - `tests/test_production_models.py`
 - `tests/test_production_validation.py`
@@ -237,7 +238,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
 
 class SourceReference(StrictModel):
@@ -252,7 +253,7 @@ class VersionedArtifact(StrictModel):
     revision: int = Field(ge=1)
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     creation_receipt_id: str = Field(min_length=1)
-    source_provenance: list[SourceReference] = Field(min_length=1)
+    source_provenance: tuple[SourceReference, ...] = Field(min_length=1)
 
 
 class ProductionProject(VersionedArtifact):
@@ -269,8 +270,8 @@ class Story(VersionedArtifact):
     language: str
     logline: str
     synopsis: str
-    beats: list[StoryBeat] = Field(min_length=1)
-    source_references: list[str] = Field(default_factory=list)
+    beats: tuple[StoryBeat, ...] = Field(min_length=1)
+    source_references: tuple[str, ...] = ()
 
 
 class Character(VersionedArtifact):
@@ -278,10 +279,10 @@ class Character(VersionedArtifact):
     name: str
     identity: str
     appearance_bible: str
-    wardrobe: list[str] = Field(default_factory=list)
+    wardrobe: tuple[str, ...] = ()
     voice_profile: VoiceProfile | None = None
-    reference_asset_ids: list[str] = Field(default_factory=list)
-    allowed_variations: list[str] = Field(default_factory=list)
+    reference_asset_ids: tuple[str, ...] = ()
+    allowed_variations: tuple[str, ...] = ()
 
 
 class Scene(VersionedArtifact):
@@ -289,13 +290,13 @@ class Scene(VersionedArtifact):
     location: str
     time: str
     mood: str
-    participant_ids: list[str] = Field(default_factory=list)
-    continuity_constraints: list[str] = Field(default_factory=list)
-    visual_reference_asset_ids: list[str] = Field(default_factory=list)
+    participant_ids: tuple[str, ...] = ()
+    continuity_constraints: tuple[str, ...] = ()
+    visual_reference_asset_ids: tuple[str, ...] = ()
 
 
 class Storyboard(VersionedArtifact):
-    beats: list[StoryboardBeat] = Field(min_length=1)
+    beats: tuple[StoryboardBeat, ...] = Field(min_length=1)
 
 
 class Shot(VersionedArtifact):
@@ -306,14 +307,14 @@ class Shot(VersionedArtifact):
     dialogue: str = ""
     narration: str = ""
     duration_policy: DurationPolicy
-    character_ids: list[str] = Field(default_factory=list)
-    continuity_constraints: list[str] = Field(default_factory=list)
+    character_ids: tuple[str, ...] = ()
+    continuity_constraints: tuple[str, ...] = ()
     visual_strategy: VisualStrategy
-    required_asset_roles: list[AssetRoleRequirement] = Field(default_factory=list)
-    motion_directives: list[MotionDirective] = Field(default_factory=list)
+    required_asset_roles: tuple[AssetRoleRequirement, ...] = ()
+    motion_directives: tuple[MotionDirective, ...] = ()
     generated_video_rationale: str | None = None
-    hybrid_layers: list[HybridLayer] = Field(default_factory=list)
-    composition_directives: list[CompositionDirective] = Field(default_factory=list)
+    hybrid_layers: tuple[HybridLayer, ...] = ()
+    composition_directives: tuple[CompositionDirective, ...] = ()
     review_policy: ReviewPolicy = Field(default_factory=ReviewPolicy)
 ~~~
 
@@ -358,7 +359,7 @@ class CompositionDirective(StrictModel):
 
 
 class RendererPolicy(StrictModel):
-    allowed: list[Literal["hyperframes", "remotion"]] = Field(
+    allowed: tuple[Literal["hyperframes", "remotion"], ...] = Field(
         default_factory=lambda: ["hyperframes"]
     )
     default_preference: Literal["hyperframes", "remotion"] = "hyperframes"
@@ -370,14 +371,20 @@ class RendererPolicy(StrictModel):
         return self
 
 
+class ArtifactReference(StrictModel):
+    artifact_id: str = Field(min_length=1)
+    revision: int = Field(ge=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    path: Path
+
+
 class ProjectArtifactRefs(StrictModel):
-    brief: Path
-    story: Path
-    characters: list[Path]
-    scenes: list[Path]
-    storyboard: Path
-    shots: list[Path]
-    state_manifest: Path = Path("state/manifest.json")
+    brief: ArtifactReference
+    story: ArtifactReference
+    characters: tuple[ArtifactReference, ...]
+    scenes: tuple[ArtifactReference, ...]
+    storyboard: ArtifactReference
+    shots: tuple[ArtifactReference, ...]
 
 
 class ProductionBrief(VersionedArtifact):
@@ -397,7 +404,7 @@ class StoryBeat(StrictModel):
 class StoryboardBeat(StrictModel):
     beat_id: str
     scene_id: str
-    shot_ids: list[str] = Field(min_length=1)
+    shot_ids: tuple[str, ...] = Field(min_length=1)
     narrative_intent: str
 
 
@@ -424,22 +431,26 @@ class AssetType(str, Enum):
 
 class AssetRoleRequirement(StrictModel):
     role: str
-    allowed_asset_types: list[AssetType] = Field(min_length=1)
+    asset_ids: tuple[str, ...] = Field(min_length=1)
+    allowed_asset_types: tuple[AssetType, ...] = Field(min_length=1)
 
 
 class MotionDirective(StrictModel):
-    kind: Literal["pan", "zoom", "parallax", "reveal", "layered"]
+    kind: Literal[
+        "pan", "zoom", "parallax", "reveal", "layered", "animate", "particles", "transition"
+    ]
     parameters: dict[str, float | int | str] = Field(min_length=1)
 
 
 class HybridLayer(StrictModel):
     role: str
     asset_role: str
+    asset_id: str
     z_index: int
 
 
 class ReviewPolicy(StrictModel):
-    required_checks: list[str] = Field(default_factory=list)
+    required_checks: tuple[str, ...] = ()
 
 
 class AssetSourceKind(str, Enum):
@@ -471,7 +482,7 @@ class AssetRecord(StrictModel):
     height: int | None = Field(default=None, gt=0)
     source_kind: AssetSourceKind
     tool: ToolIdentity
-    input_artifact_ids: list[str] = Field(default_factory=list)
+    input_artifact_ids: tuple[str, ...] = ()
     input_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     creation_receipt_id: str
     usage_license: str
@@ -483,13 +494,14 @@ class AssetRegistrySnapshot(StrictModel):
     schema_version: Literal["2.0"] = "2.0"
     revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    assets: list[AssetRecord]
+    assets: tuple[AssetRecord, ...]
 
 
 class ProductionManifest(StrictModel):
     schema_version: Literal["2.0"] = "2.0"
     project_id: str
     active_project_revision: int = Field(ge=1)
+    active_project_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     active_registry_revision: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
@@ -499,10 +511,10 @@ class LoadedProductionProject(StrictModel):
     manifest: ProductionManifest
     brief: ProductionBrief
     story: Story
-    characters: list[Character]
-    scenes: list[Scene]
+    characters: tuple[Character, ...]
+    scenes: tuple[Scene, ...]
     storyboard: Storyboard
-    shots: list[Shot]
+    shots: tuple[Shot, ...]
     registry: AssetRegistrySnapshot
     asset_paths: dict[str, Path]
 ~~~
@@ -515,6 +527,7 @@ Create `src/ai_video/production/__init__.py`:
 
 ~~~python
 from ai_video.production.models import (
+    ArtifactReference,
     AssetRecord,
     AssetRegistrySnapshot,
     Character,
@@ -530,6 +543,7 @@ from ai_video.production.models import (
 )
 
 __all__ = [
+    "ArtifactReference",
     "AssetRecord",
     "AssetRegistrySnapshot",
     "Character",
@@ -576,11 +590,15 @@ def test_image_motion_requires_deterministic_motion(make_shot):
     shot = make_shot(
         VisualStrategy.IMAGE_MOTION,
         required_asset_roles=[
-            AssetRoleRequirement(role="hero", allowed_asset_types=[AssetType.IMAGE])
+            AssetRoleRequirement(
+                role="hero",
+                asset_ids=["image-hero-1"],
+                allowed_asset_types=[AssetType.IMAGE],
+            )
         ],
     )
     with pytest.raises(AiVideoError) as exc:
-        validate_shot_strategy(shot)
+        validate_shot_strategy(shot, asset_records())
     assert exc.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
     assert "motion_directives" in exc.value.user_message
 
@@ -589,19 +607,36 @@ def test_hybrid_requires_declared_layers(make_shot):
     shot = make_shot(
         VisualStrategy.HYBRID,
         required_asset_roles=[
-            AssetRoleRequirement(role="background", allowed_asset_types=[AssetType.IMAGE])
+            AssetRoleRequirement(
+                role="background",
+                asset_ids=["image-background-1"],
+                allowed_asset_types=[AssetType.IMAGE],
+            )
         ],
         hybrid_layers=[
-            HybridLayer(role="hero", asset_role="missing", z_index=1),
-            HybridLayer(role="background", asset_role="background", z_index=0),
+            HybridLayer(
+                role="hero",
+                asset_role="missing",
+                asset_id="image-hero-1",
+                z_index=1,
+            ),
+            HybridLayer(
+                role="background",
+                asset_role="background",
+                asset_id="image-background-1",
+                z_index=0,
+            ),
         ],
     )
     with pytest.raises(AiVideoError) as exc:
-        validate_shot_strategy(shot)
+        validate_shot_strategy(shot, asset_records())
     assert "missing" in exc.value.user_message
 ~~~
 
-Also test unknown/duplicate Character, Scene, Storyboard beat and Shot IDs, and unknown Character/Scene asset references.
+Also test one positive case for every strategy plus unknown/duplicate Character, Scene,
+Storyboard beat, Shot and artifact IDs; unknown Character/Scene asset references; unbound or
+unknown Shot asset IDs; wrong bound asset type/source kind; `motion_graphics` without an
+animation directive; `hybrid` missing a concrete source; and Storyboard beat/Shot scene mismatch.
 
 - [ ] **Step 2: Run RED**
 
@@ -624,52 +659,108 @@ def _invalid(message: str) -> AiVideoError:
     )
 
 
-def _has_type(shot: Shot, asset_type: AssetType) -> bool:
-    return any(asset_type in role.allowed_asset_types for role in shot.required_asset_roles)
-
-
-def validate_shot_strategy(shot: Shot) -> None:
-    roles = {item.role for item in shot.required_asset_roles}
-    if len(roles) != len(shot.required_asset_roles):
+def _role_bindings(shot: Shot) -> dict[str, AssetRoleRequirement]:
+    roles = [item.role for item in shot.required_asset_roles]
+    if len(roles) != len(set(roles)):
         raise _invalid(f"Shot {shot.shot_id} has duplicate required asset roles.")
+    for item in shot.required_asset_roles:
+        if len(item.asset_ids) != len(set(item.asset_ids)):
+            raise _invalid(f"Shot {shot.shot_id} role {item.role} has duplicate asset IDs.")
+    return {item.role: item for item in shot.required_asset_roles}
+
+
+def _bound_assets(
+    shot: Shot,
+    assets_by_id: dict[str, AssetRecord],
+) -> tuple[dict[str, AssetRoleRequirement], dict[str, AssetRecord]]:
+    roles = _role_bindings(shot)
+    bound: dict[str, AssetRecord] = {}
+    for role in roles.values():
+        for asset_id in role.asset_ids:
+            asset = assets_by_id.get(asset_id)
+            if asset is None:
+                raise _invalid(
+                    f"Shot {shot.shot_id} role {role.role} references unknown asset {asset_id}."
+                )
+            if asset.asset_type not in role.allowed_asset_types:
+                raise _invalid(
+                    f"Shot {shot.shot_id} role {role.role} rejects asset type "
+                    f"{asset.asset_type.value}."
+                )
+            bound[asset_id] = asset
+    return roles, bound
+
+
+def _has_type(bound: dict[str, AssetRecord], asset_type: AssetType) -> bool:
+    return any(asset.asset_type is asset_type for asset in bound.values())
+
+
+def validate_shot_strategy(
+    shot: Shot,
+    assets_by_id: dict[str, AssetRecord],
+) -> None:
+    roles, bound = _bound_assets(shot, assets_by_id)
     if shot.visual_strategy is VisualStrategy.STATIC_IMAGE and not _has_type(
-        shot, AssetType.IMAGE
+        bound, AssetType.IMAGE
     ):
         raise _invalid(f"Shot {shot.shot_id} static_image requires an image role.")
     if shot.visual_strategy is VisualStrategy.IMAGE_MOTION:
-        if not _has_type(shot, AssetType.IMAGE):
+        if not _has_type(bound, AssetType.IMAGE):
             raise _invalid(f"Shot {shot.shot_id} image_motion requires an image role.")
         if not shot.motion_directives:
             raise _invalid(f"Shot {shot.shot_id} image_motion requires motion_directives.")
-    if shot.visual_strategy is VisualStrategy.MOTION_GRAPHICS and not any(
-        _has_type(shot, item)
-        for item in (AssetType.IMAGE, AssetType.COMPOSITION_SOURCE)
-    ):
-        raise _invalid(
-            f"Shot {shot.shot_id} motion_graphics requires an image or composition_source role."
-        )
+    if shot.visual_strategy is VisualStrategy.MOTION_GRAPHICS:
+        if not any(
+            _has_type(bound, item)
+            for item in (AssetType.IMAGE, AssetType.COMPOSITION_SOURCE)
+        ):
+            raise _invalid(
+                f"Shot {shot.shot_id} motion_graphics requires an image or "
+                "composition_source role."
+            )
+        if not shot.motion_directives:
+            raise _invalid(
+                f"Shot {shot.shot_id} motion_graphics requires motion_directives."
+            )
     if shot.visual_strategy is VisualStrategy.GENERATED_VIDEO:
-        if not _has_type(shot, AssetType.VIDEO):
+        generated_videos = [
+            asset
+            for asset in bound.values()
+            if asset.asset_type is AssetType.VIDEO
+            and asset.source_kind is AssetSourceKind.GENERATED
+        ]
+        if not generated_videos:
             raise _invalid(f"Shot {shot.shot_id} generated_video requires a video role.")
         if not shot.generated_video_rationale or not shot.generated_video_rationale.strip():
             raise _invalid(f"Shot {shot.shot_id} generated_video requires a rationale.")
-    if shot.visual_strategy is VisualStrategy.EXISTING_VIDEO and not _has_type(
-        shot, AssetType.VIDEO
-    ):
-        raise _invalid(f"Shot {shot.shot_id} existing_video requires a video role.")
+    if shot.visual_strategy is VisualStrategy.EXISTING_VIDEO:
+        imported_videos = [
+            asset
+            for asset in bound.values()
+            if asset.asset_type is AssetType.VIDEO
+            and asset.source_kind is AssetSourceKind.IMPORTED
+        ]
+        if not imported_videos:
+            raise _invalid(f"Shot {shot.shot_id} existing_video requires an imported video role.")
     if shot.visual_strategy is VisualStrategy.HYBRID:
         if len(shot.hybrid_layers) < 2:
             raise _invalid(f"Shot {shot.shot_id} hybrid requires at least two layers.")
         layer_roles = [layer.role for layer in shot.hybrid_layers]
         if len(layer_roles) != len(set(layer_roles)):
             raise _invalid(f"Shot {shot.shot_id} hybrid layer roles must be unique.")
-        if len({layer.asset_role for layer in shot.hybrid_layers}) < 2:
-            raise _invalid(f"Shot {shot.shot_id} hybrid requires two asset roles.")
-        missing = sorted({layer.asset_role for layer in shot.hybrid_layers} - roles)
-        if missing:
-            raise _invalid(
-                f"Shot {shot.shot_id} hybrid references undeclared role(s): {', '.join(missing)}"
-            )
+        if len({layer.asset_id for layer in shot.hybrid_layers}) < 2:
+            raise _invalid(f"Shot {shot.shot_id} hybrid requires two source assets.")
+        for layer in shot.hybrid_layers:
+            role = roles.get(layer.asset_role)
+            if role is None:
+                raise _invalid(
+                    f"Shot {shot.shot_id} hybrid references undeclared role {layer.asset_role}."
+                )
+            if layer.asset_id not in role.asset_ids:
+                raise _invalid(
+                    f"Shot {shot.shot_id} hybrid source {layer.asset_id} is not bound "
+                    f"to role {layer.asset_role}."
+                )
 
 
 def _unique(values: list[str], label: str) -> set[str]:
@@ -687,14 +778,14 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
     shot_ids = _unique([item.shot_id for item in bundle.shots], "shot_id")
     beat_ids = _unique([item.beat_id for item in bundle.storyboard.beats], "beat_id")
     asset_ids = _unique([item.asset_id for item in bundle.registry.assets], "asset_id")
-    artifact_ids = {
+    artifact_ids = _unique([
         bundle.brief.artifact_id,
         bundle.story.artifact_id,
         bundle.storyboard.artifact_id,
         *(item.artifact_id for item in bundle.characters),
         *(item.artifact_id for item in bundle.scenes),
         *(item.artifact_id for item in bundle.shots),
-    }
+    ], "artifact_id")
     known_inputs = artifact_ids | asset_ids
     for asset in bundle.registry.assets:
         missing_inputs = sorted(set(asset.input_artifact_ids) - known_inputs)
@@ -729,6 +820,11 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
             if shot_id in storyboard_membership:
                 raise _invalid(f"Shot {shot_id} appears in multiple storyboard beats.")
             storyboard_membership[shot_id] = beat.beat_id
+            shot = next(item for item in bundle.shots if item.shot_id == shot_id)
+            if shot.scene_id != beat.scene_id:
+                raise _invalid(
+                    f"Storyboard beat {beat.beat_id} scene does not match Shot {shot_id}."
+                )
     for shot in bundle.shots:
         if shot.scene_id not in scene_ids:
             raise _invalid(f"Shot {shot.shot_id} references unknown scene {shot.scene_id}.")
@@ -744,14 +840,14 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
                 f"Shot {shot.shot_id} references unknown character(s): "
                 f"{', '.join(missing_characters)}"
             )
-        validate_shot_strategy(shot)
-
-
-def shot_desired_fingerprint(shot: Shot) -> str:
-    return canonical_sha256(shot)
+        validate_shot_strategy(
+            shot,
+            {item.asset_id: item for item in bundle.registry.assets},
+        )
 ~~~
 
-Import `Counter` and the referenced models/helpers. Do not mutate models or calculate dependency edges.
+Import `Counter` and the referenced models. Do not mutate models, calculate dependency edges or
+define a desired fingerprint; P5 owns that projection.
 
 - [ ] **Step 4: Verify and commit**
 
@@ -764,6 +860,7 @@ git commit -m "feat: validate production shot strategies"
 ### Task 3: Add Immutable Asset Registry Validation
 
 **Files:**
+- Create: `src/ai_video/production/paths.py`
 - Create: `src/ai_video/production/registry.py`
 - Test: `tests/test_production_registry.py`
 
@@ -774,7 +871,11 @@ Use one local `assets/files/hero.png` and assert:
 ~~~python
 def test_registry_loads_verified_local_asset(tmp_path):
     path = write_registry(tmp_path)
-    snapshot, asset_paths = load_asset_registry(path, tmp_path)
+    snapshot, asset_paths = load_asset_registry(
+        path.relative_to(tmp_path),
+        tmp_path,
+        tmp_path / "assets/files",
+    )
     assert snapshot.assets[0].asset_id == "image-hero-1"
     assert not snapshot.assets[0].artifact_path.is_absolute()
     assert asset_paths["image-hero-1"].is_absolute()
@@ -784,11 +885,17 @@ def test_registry_loads_verified_local_asset(tmp_path):
 def test_registry_rejects_unsafe_paths(tmp_path, stored):
     path = write_registry(tmp_path, artifact_path=stored)
     with pytest.raises(AiVideoError) as exc:
-        load_asset_registry(path, tmp_path)
+        load_asset_registry(
+            path.relative_to(tmp_path),
+            tmp_path,
+            tmp_path / "assets/files",
+        )
     assert exc.value.code is ErrorCode.ASSET_REGISTRY_INVALID
 ~~~
 
-Also cover duplicate `asset_id`, registry filename/revision mismatch, semantic hash mismatch, missing file, wrong size and wrong file SHA-256.
+Also cover duplicate `asset_id`, registry filename/revision mismatch, semantic hash mismatch,
+missing file, wrong size, wrong file SHA-256, registry-file symlink escape, asset-file
+symlink escape, an internal symlink that remains inside `asset_root`, and unsafe `asset_root`.
 
 - [ ] **Step 2: Run RED**
 
@@ -798,6 +905,37 @@ python -m pytest tests/test_production_registry.py -q
 
 - [ ] **Step 3: Implement registry verification**
 
+Create `paths.py` with the single project-containment owner:
+
+~~~python
+from __future__ import annotations
+
+from pathlib import Path
+
+
+def resolve_contained_path(
+    project_root: Path,
+    stored: Path,
+    *,
+    allowed_root: Path | None = None,
+) -> Path:
+    if stored.is_absolute() or ".." in stored.parts:
+        raise ValueError(f"Path must be clean and project-relative: {stored}")
+    root = project_root.resolve()
+    boundary = (allowed_root or root).resolve()
+    try:
+        boundary.relative_to(root)
+    except ValueError as exc:
+        raise ValueError(f"Allowed root escapes project root: {boundary}") from exc
+    resolved = (root / stored).resolve()
+    try:
+        resolved.relative_to(boundary)
+    except ValueError as exc:
+        raise ValueError(f"Path escapes allowed root: {stored}") from exc
+    return resolved
+~~~
+
+Internal symlinks are allowed only when their resolved target remains inside `allowed_root`.
 Create `registry.py` with:
 
 ~~~python
@@ -810,17 +948,6 @@ def _invalid(message: str, detail: str | None = None) -> AiVideoError:
     )
 
 
-def _resolve_asset_path(root: Path, stored: Path) -> Path:
-    if stored.is_absolute() or ".." in stored.parts:
-        raise _invalid(f"Asset path must be clean and project-relative: {stored}")
-    resolved = (root / stored).resolve()
-    try:
-        resolved.relative_to(root.resolve())
-    except ValueError as exc:
-        raise _invalid(f"Asset path escapes project root: {stored}") from exc
-    return resolved
-
-
 def registry_semantic_sha256(registry: AssetRegistrySnapshot) -> str:
     payload = registry.model_dump(
         mode="json",
@@ -829,8 +956,15 @@ def registry_semantic_sha256(registry: AssetRegistrySnapshot) -> str:
     return canonical_sha256(payload)
 
 
-def _verify_asset(record: AssetRecord, root: Path) -> Path:
-    resolved = _resolve_asset_path(root, record.artifact_path)
+def _verify_asset(record: AssetRecord, root: Path, asset_root: Path) -> Path:
+    try:
+        resolved = resolve_contained_path(
+            root,
+            record.artifact_path,
+            allowed_root=asset_root,
+        )
+    except ValueError as exc:
+        raise _invalid(f"Asset path is unsafe: {record.asset_id}", str(exc)) from exc
     if not resolved.is_file():
         raise _invalid(f"Asset file does not exist: {record.asset_id}", str(resolved))
     if resolved.stat().st_size != record.size_bytes:
@@ -843,8 +977,19 @@ def _verify_asset(record: AssetRecord, root: Path) -> Path:
 def load_asset_registry(
     path: str | Path,
     project_root: str | Path,
+    asset_root: str | Path,
 ) -> tuple[AssetRegistrySnapshot, dict[str, Path]]:
-    registry_path = Path(path)
+    root = Path(project_root).resolve()
+    try:
+        registry_path = resolve_contained_path(
+            root,
+            Path(path),
+            allowed_root=root / "assets",
+        )
+        resolved_asset_root = Path(asset_root).resolve()
+        resolved_asset_root.relative_to(root)
+    except ValueError as exc:
+        raise _invalid("Asset registry path configuration is unsafe.", str(exc)) from exc
     try:
         registry = AssetRegistrySnapshot.model_validate_json(
             registry_path.read_text(encoding="utf-8")
@@ -861,19 +1006,23 @@ def load_asset_registry(
     if registry_path.name != f"registry.{registry.revision_id}.json":
         raise _invalid("Asset registry filename does not match revision_id.")
     asset_paths = {
-        item.asset_id: _verify_asset(item, Path(project_root))
+        item.asset_id: _verify_asset(item, root, resolved_asset_root)
         for item in registry.assets
     }
     return registry, asset_paths
 ~~~
 
-Import `sha256_file` from `ai_video.config`, `ValidationError` from Pydantic and the named production models/helpers. Never mutate the immutable snapshot, scan, write or activate registry state.
+Import `sha256_file` from `ai_video.config`, `ValidationError` from Pydantic,
+`resolve_contained_path` from `paths.py` and the named production models/helpers. Never
+mutate the frozen snapshot, scan, write or activate registry state. This verifies one
+content-addressed snapshot; it does not prove append-only history or cross-file crash safety.
 
 - [ ] **Step 4: Verify and commit**
 
 ~~~bash
 python -m pytest tests/test_production_registry.py -q
-git add src/ai_video/production/registry.py tests/test_production_registry.py
+git add src/ai_video/production/paths.py \
+  src/ai_video/production/registry.py tests/test_production_registry.py
 git commit -m "feat: add immutable asset registry validation"
 ~~~
 
@@ -891,9 +1040,12 @@ Create `tests/production_project_factory.py` with `write_production_project(root
 
 1. instantiate every artifact through the Task 1 Pydantic models;
 2. call `seal_artifact()` before YAML serialization;
-3. create `project.yaml`, `creative/*.yaml`, `state/manifest.json`, `assets/files/hero.png` and one `assets/registry.<revision>.json`;
-4. serialize YAML with `yaml.safe_dump(model.model_dump(mode="json"), sort_keys=False, allow_unicode=True)`;
-5. return only the `project.yaml` path so all tests use the production loader.
+3. create an `ArtifactReference` from each sealed creative artifact's exact ID, revision,
+   content hash and path before sealing `ProductionProject`;
+4. create `project.yaml`, `creative/*.yaml`, `state/manifest.json`, `assets/files/hero.png` and one `assets/registry.<revision>.json`;
+5. set `ProductionManifest.active_project_content_hash` to the sealed project's exact hash;
+6. serialize YAML with `yaml.safe_dump(model.model_dump(mode="json"), sort_keys=False, allow_unicode=True)`;
+7. return only the `project.yaml` path so all tests use the production loader.
 
 The exact minimal graph is:
 
@@ -904,7 +1056,7 @@ Scene: room (participant hero)
 Storyboard beat: beat-1
 Shot: shot-1, static_image, role hero_still
 Asset: image-hero-1
-ProductionManifest: active project revision 1 + exact registry revision
+ProductionManifest: active project revision 1 + exact project content hash + exact registry revision
 ~~~
 
 The registry factory must call `registry_semantic_sha256()`, which excludes both self-referential `content_hash` and `revision_id` fields, set `revision_id == content_hash` and use the same value in its filename and Production Manifest.
@@ -922,6 +1074,8 @@ import yaml
 from ai_video.config import load_project
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production import load_production_project
+from ai_video.production.hashing import seal_artifact
+from ai_video.production.models import ProductionProject
 from production_project_factory import write_production_project
 
 
@@ -945,6 +1099,20 @@ def test_load_rejects_manifest_project_mismatch(tmp_path):
     assert exc.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
 
 
+def test_load_rejects_same_revision_with_unselected_content_hash(tmp_path):
+    project_path = write_production_project(tmp_path)
+    data = yaml.safe_load(project_path.read_text(encoding="utf-8"))
+    data["title"] = "A different sealed project"
+    replacement = seal_artifact(ProductionProject.model_validate(data))
+    project_path.write_text(
+        yaml.safe_dump(replacement.model_dump(mode="json"), allow_unicode=True),
+        encoding="utf-8",
+    )
+    with pytest.raises(AiVideoError) as exc:
+        load_production_project(project_path)
+    assert "active project content hash" in exc.value.user_message
+
+
 def test_load_rejects_tampered_creative_hash(tmp_path):
     project_path = write_production_project(tmp_path)
     story_path = tmp_path / "creative/story.yaml"
@@ -965,6 +1133,8 @@ Also test:
 
 - creative path with `..` and absolute paths are rejected before read;
 - active project revision mismatch;
+- same integer project revision with a different valid sealed content hash;
+- creative artifact ID/revision/content-hash mismatch against its `ArtifactReference`;
 - only `assets/registry.<active_registry_revision>.json` is loaded;
 - typed registry errors are not flattened into project errors;
 - unknown creative cross-reference fails;
@@ -994,6 +1164,7 @@ from ai_video.config import load_yaml
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
+    ArtifactReference,
     Character,
     LoadedProductionProject,
     ProductionBrief,
@@ -1005,6 +1176,7 @@ from ai_video.production.models import (
     Storyboard,
 )
 from ai_video.production.registry import load_asset_registry
+from ai_video.production.paths import resolve_contained_path
 from ai_video.production.validation import validate_project_references
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
@@ -1019,15 +1191,19 @@ def _invalid(message: str, detail: str | None = None) -> AiVideoError:
     )
 
 
-def _resolve_input(root: Path, stored: Path) -> Path:
-    if stored.is_absolute() or ".." in stored.parts:
-        raise _invalid(f"Production artifact path must be clean and project-relative: {stored}")
-    resolved = (root / stored).resolve()
+def _resolve_input(
+    root: Path,
+    stored: Path,
+    *,
+    allowed_root: Path | None = None,
+) -> Path:
     try:
-        resolved.relative_to(root.resolve())
+        return resolve_contained_path(root, stored, allowed_root=allowed_root)
     except ValueError as exc:
-        raise _invalid(f"Production artifact path escapes project root: {stored}") from exc
-    return resolved
+        raise _invalid(
+            f"Production artifact path must be clean and contained: {stored}",
+            str(exc),
+        ) from exc
 
 
 def _load_yaml_model(path: Path, model_type: type[ModelT]) -> ModelT:
@@ -1045,47 +1221,65 @@ def _load_json_model(path: Path, model_type: type[ModelT]) -> ModelT:
         return model_type.model_validate_json(path.read_text(encoding="utf-8"))
     except (OSError, ValidationError, ValueError) as exc:
         raise _invalid(f"Could not load production state: {path}", str(exc)) from exc
+
+
+def _load_referenced_artifact(
+    root: Path,
+    reference: ArtifactReference,
+    model_type: type[ModelT],
+) -> ModelT:
+    model = _load_yaml_model(_resolve_input(root, reference.path), model_type)
+    actual = (model.artifact_id, model.revision, model.content_hash)
+    expected = (reference.artifact_id, reference.revision, reference.content_hash)
+    if actual != expected:
+        raise _invalid(
+            f"Production artifact does not match its project reference: {reference.path}"
+        )
+    return model
 ~~~
 
 Implement the loader:
 
 ~~~python
 def load_production_project(path: str | Path) -> LoadedProductionProject:
-    project_path = Path(path).resolve()
-    root = project_path.parent
-    project = _load_yaml_model(project_path, ProductionProject)
+    supplied_path = Path(path)
+    if supplied_path.name != "project.yaml":
+        raise _invalid("Production project entry point must be named project.yaml.")
+    root = supplied_path.parent.resolve()
+    project_path = _resolve_input(root, Path("project.yaml"))
     manifest = _load_json_model(
-        _resolve_input(root, project.artifacts.state_manifest),
+        _resolve_input(root, Path("state/manifest.json")),
         ProductionManifest,
     )
+    project = _load_yaml_model(project_path, ProductionProject)
     if manifest.project_id != project.project_id:
         raise _invalid("Production manifest project_id does not match project.")
     if manifest.active_project_revision != project.revision:
         raise _invalid("Production manifest active project revision does not match project.")
+    if manifest.active_project_content_hash != project.content_hash:
+        raise _invalid("Production manifest active project content hash does not match project.")
 
-    registry_path = root / f"assets/registry.{manifest.active_registry_revision}.json"
-    registry, asset_paths = load_asset_registry(registry_path, root)
+    registry_path = Path(f"assets/registry.{manifest.active_registry_revision}.json")
+    asset_root = _resolve_input(root, project.asset_root)
+    registry, asset_paths = load_asset_registry(registry_path, root, asset_root)
     refs = project.artifacts
     bundle = LoadedProductionProject(
         root=root,
         project=project,
         manifest=manifest,
-        brief=_load_yaml_model(_resolve_input(root, refs.brief), ProductionBrief),
-        story=_load_yaml_model(_resolve_input(root, refs.story), Story),
+        brief=_load_referenced_artifact(root, refs.brief, ProductionBrief),
+        story=_load_referenced_artifact(root, refs.story, Story),
         characters=[
-            _load_yaml_model(_resolve_input(root, item), Character)
+            _load_referenced_artifact(root, item, Character)
             for item in refs.characters
         ],
         scenes=[
-            _load_yaml_model(_resolve_input(root, item), Scene)
+            _load_referenced_artifact(root, item, Scene)
             for item in refs.scenes
         ],
-        storyboard=_load_yaml_model(
-            _resolve_input(root, refs.storyboard),
-            Storyboard,
-        ),
+        storyboard=_load_referenced_artifact(root, refs.storyboard, Storyboard),
         shots=[
-            _load_yaml_model(_resolve_input(root, item), Shot)
+            _load_referenced_artifact(root, item, Shot)
             for item in refs.shots
         ],
         registry=registry,
@@ -1149,20 +1343,24 @@ from ai_video.production import load_production_project
 project = load_production_project("projects/example/project.yaml")
 ~~~
 
-State explicitly that P2 provides importable schemas/static validation and immutable local registry verification, but no public command, renderer, Audio/Caption, dependency graph or Provider. Do not claim a bundled example exists.
+State explicitly that P2 provides importable schemas/static validation and read-only
+content-addressed local registry verification, but no writer/activation transaction, append-only
+history proof, cross-file crash safety, public command, renderer, Audio/Caption, dependency graph
+or Provider. Do not claim a bundled example exists.
 
 - [ ] **Step 2: Update baseline and roadmap from evidence**
 
 In `docs/v0.2-runtime-baseline.md`:
 
 - move only verified P2 models, loader, strategy validation and registry verification to implemented;
-- retain P3-P9 and all Legacy resume/final/audio/QA debt as planned/debt;
+- retain P2A-P9 and all Legacy resume/final/audio/QA debt as planned/debt;
 - record focused and full test commands.
 
 In `docs/v0.2-agentic-production-roadmap.md`:
 
 - mark P2 implemented only after every exit gate passes;
-- mark P3/P4/P7 eligible for separate planning, not implemented;
+- mark P2A as the mandatory write/activation gate and P3/P4/P7 eligible for separate planning but
+  not runtime implementation before P2A;
 - retain renderer, paid-provider and Base AI Comic gates.
 
 - [ ] **Step 3: Add focused contract checks**
@@ -1190,7 +1388,7 @@ git add README.md docs/v0.2-runtime-baseline.md \
 git commit -m "docs: document production project core"
 ~~~
 
-Expected: every P3+ capability remains explicitly planned/not implemented.
+Expected: P2A and every P3+ capability remain explicitly planned/not implemented.
 
 ### Task 6: Run Exit Gates and Independent Review
 
@@ -1249,10 +1447,12 @@ Review brief:
 ~~~text
 Verify P2 against active spec sections 9-11, 15-16 and 20-23.
 Check ProductionManifest is the only active revision pointer.
-Check Asset Registry is immutable and owns no lifecycle.
-Check Shot desired fingerprint is derived rather than mutable state.
+Check it binds the exact project revision and content hash before creative inputs load.
+Check Asset Registry is frozen/read-only and owns no lifecycle or activation writer.
+Check Shot roles bind concrete registry assets and P2 defines no desired fingerprint.
 Check all six strategies, traversal, tampering and cross-reference tests.
-Reject renderer/provider/dependency graph/Legacy runtime scope leak.
+Check registry/project/creative/asset symlink containment and fixed-root policy.
+Reject activation/crash-safety claims, renderer/provider/dependency graph/Legacy runtime scope leak.
 ~~~
 
 Required verdict: `accept` or `accept with concerns` with no blocking issue. The parent verifies every blocking claim directly.
@@ -1276,10 +1476,10 @@ P2 is complete only when:
 3. Semantic hash is deterministic and detects content mutation.
 4. All six visual strategies have positive and negative tests.
 5. Character, Scene, Storyboard and Shot cross-references are verified.
-6. Registry rejects duplicate IDs, traversal, wrong revision filename/hash, missing file, wrong size and wrong file hash.
+6. Registry rejects duplicate IDs, traversal/symlink escape, wrong revision filename/hash, missing file, wrong size and wrong file hash.
 7. Runtime-resolved asset paths are clean absolute paths inside project root.
-8. Minimal `ProductionManifest` is the only active project/registry revision pointer.
-9. P2 persists no mutable freshness, lifecycle or desired/applied fingerprint.
+8. Minimal `ProductionManifest` is the only active project revision/content-hash and registry revision pointer.
+9. P2 persists no mutable freshness, lifecycle or desired/applied fingerprint and defines no Shot desired-fingerprint projection.
 10. No renderer, Audio/Caption, dependency graph, Provider or network behavior exists.
 11. Public CLI remains `validate`, `run` and `resume`.
 12. Manifest v1 and `runs/<run_id>/` layout are unchanged.
@@ -1303,8 +1503,11 @@ Do not delete user-created `projects/**`; after rollback they are unsupported in
 
 ## Next Plan Boundary
 
-After P2 acceptance, these may be planned independently:
+After P2 acceptance, P2A must be planned and implemented before any write-capable v2 slice.
+P3/P4/P7 design plans may proceed independently, but their runtime implementation must retain the
+P2A gate:
 
+- `P2A Production State Commit Protocol Implementation Plan`;
 - `P3 Deterministic Composition and HyperFrames Adapter Implementation Plan`;
 - `P4 Voice and Captions Implementation Plan`;
 - `P7 Image Asset Generation Implementation Plan`.

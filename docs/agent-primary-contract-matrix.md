@@ -85,6 +85,7 @@ Agent 不得悄悄侵蚀本地优先承诺。
 - P0 只迁移 product/contract 文档；不得把 spec 写成 runtime truth。
 - 本地 P1 只稳定 Legacy runtime，未引入新 product domain；其 plan 作为 historical stabilization record 保留。
 - P2 先建立 ProductionProject、Assets、Shot visual strategy 的 durable contract；不得同时接入真实 renderer 或云服务。
+- P2 只做 read-only content-addressed validation；任何 v2 project/registry 写入或激活必须先通过独立 P2A atomic commit/crash-injection gate。
 - P3 才允许在独立 plan 中接入一个 canonical renderer adapter；不得同时实现两条并行 canonical render path。
 - P4 才允许在独立 plan 中引入 Audio/Caption production domain；任何付费调用仍需显式 opt-in。
 - P5 dependency graph 完成前，不得宣称支持跨 asset 的 selective rebuild。

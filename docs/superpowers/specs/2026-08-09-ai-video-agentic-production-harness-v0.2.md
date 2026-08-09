@@ -364,7 +364,7 @@ Provider-specific prompt、model、seed 或 workflow binding 属于 Asset Genera
 - creation receipt ID；失败的 generation/import attempt 记录在 Manifest lifecycle/attempt records，不伪造 AssetRecord；
 - usage/license/egress metadata；
 - cost receipt ID；
-- immutable registry revision ID。
+- 所属 immutable registry snapshot 的 revision ID；record 不重复保存会导致自引用 hash 的 revision 字段。
 
 允许 asset types：
 
@@ -518,7 +518,7 @@ Manifest 必须回答：
 - in-flight external job handle 在 submit 后立即 crash-safe 持久化；
 - multi-artifact commit 的 power-loss strategy 必须由独立 plan 明确，不能只依赖进程内 rollback。
 
-Asset Registry 和 Dependency Graph 都是 immutable、content-addressed/versioned snapshots：Registry 只保存 identity/provenance，Graph 只保存 typed edges 和 fingerprint contribution，不保存 mutable freshness/status。更新顺序是：写 temporary snapshot -> flush/fsync -> atomic rename -> 验证 snapshot hash -> 最后通过 `atomic_write_manifest()` 切换 active revision pointer 和 lifecycle state。Manifest atomic replace 是 transaction commit point；crash 后未被 Manifest 引用的完整 snapshot 是 orphan，可由显式 GC 回收，partial temporary file 永远不参与 resume。P2/P5 的 implementation plan 必须为该顺序提供 crash-injection tests；在此之前不得宣称跨文件 crash safety 已实现。
+Asset Registry 和 Dependency Graph 都是 immutable、content-addressed/versioned snapshots：Registry 只保存 identity/provenance，Graph 只保存 typed edges 和 fingerprint contribution，不保存 mutable freshness/status。更新顺序是：写 temporary snapshot -> flush/fsync -> atomic rename -> 验证 snapshot hash -> 最后通过 atomic Production Manifest write 切换 active revision pointer 和 lifecycle state。Manifest atomic replace 是 transaction commit point；crash 后未被 Manifest 引用的完整 snapshot 是 orphan，可由显式 GC 回收，partial temporary file 永远不参与 resume。P2 只实现 read-only snapshot/pointer verification，不宣称 append-only activation 或跨文件 crash safety；首个写入或激活 v2 registry/graph snapshot 的后续 slice 必须实现上述 commit protocol 和 crash-injection tests。
 
 # 16. Dependency and Invalidation
 
@@ -687,7 +687,8 @@ OpenMontage 证明了 agent-first pipeline、canonical artifacts、renderer sele
 | --- | --- | --- |
 | P0 Product Reframe and Contract Migration | 新 product/spec、current audit、roadmap、contract pointers 和 supersession provenance | Docs only; completed by this reframe task |
 | P1 Legacy Runtime Stabilization | terminal persistence、direct dependency、FPS contract、artifact rollback | Implemented on local `main`; release/integration still separate |
-| P2 Production Project Core | ProductionProject、creative artifacts、Asset Registry、Shot visual strategy、validation | No renderer、Audio provider or cloud |
+| P2 Production Project Core | ProductionProject、creative artifacts、read-only content-addressed Asset Registry verification、Shot visual strategy、validation | No writer/activation、renderer、Audio provider or cloud |
+| P2A Production State Commit Protocol | atomic v2 project/registry snapshot commit、Manifest pointer switch、orphan/partial recovery contract | Required before any write-capable v2 asset/composition slice; crash-injection tests mandatory |
 | P3 Deterministic Composition and HyperFrames Adapter | CompositionSpec、ResolvedTimeline、HyperFrames source/render receipts、single-renderer gate | No Remotion adapter unless separately approved |
 | P4 Voice and Captions | Audio domain、Voice Provider contract、ElevenLabs opt-in candidate、alignment、CaptionTrack | Paid calls gated; no video Provider |
 | P5 Dependency Graph and Selective Rebuild | fingerprints、edges、desired/applied state、precise invalidation | Migrates cross-domain rebuild truth |
