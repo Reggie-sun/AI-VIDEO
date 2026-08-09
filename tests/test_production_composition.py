@@ -358,6 +358,7 @@ def test_nofollow_primitives_create_list_read_and_hold_verification_fd(tmp_path)
             root / "verified.bin",
             contained_by=root,
         ) as verified:
+            assert os.lseek(source_fd, 0, os.SEEK_CUR) == 3
             assert os.read(verified.fd, 32) == b"source-bytes"
             verified_fd = verified.fd
         assert os.lseek(source_fd, 0, os.SEEK_CUR) == 3
@@ -377,4 +378,83 @@ def test_nofollow_list_rejects_symlink_entries(tmp_path):
     (root / "target").write_bytes(b"target")
     (root / "link").symlink_to(root / "target")
     with pytest.raises(ValueError, match="symlink"):
+        _list_regular_files_nofollow(root)
+
+
+def test_nofollow_read_rejects_parent_directory_replacement(tmp_path, monkeypatch):
+    root = tmp_path / "source"
+    parent = root / "nested"
+    parent.mkdir(parents=True)
+    source = parent / "asset.bin"
+    source.write_bytes(b"original")
+    real_read = os.read
+    replaced = False
+
+    def replace_parent_then_read(descriptor: int, size: int) -> bytes:
+        nonlocal replaced
+        if not replaced:
+            replaced = True
+            parent.rename(root / "detached")
+            parent.mkdir()
+            (parent / "asset.bin").write_bytes(b"replacement")
+        return real_read(descriptor, size)
+
+    monkeypatch.setattr(os, "read", replace_parent_then_read)
+    with pytest.raises(ValueError, match="directory changed"):
+        _read_regular_file_nofollow(source, contained_by=root)
+
+
+def test_nofollow_read_rejects_symlink_directory_and_fifo(tmp_path):
+    root = tmp_path / "source"
+    root.mkdir()
+    target = root / "target.bin"
+    target.write_bytes(b"target")
+    symlink = root / "link.bin"
+    symlink.symlink_to(target)
+    directory = root / "directory"
+    directory.mkdir()
+    fifo = root / "pipe"
+    os.mkfifo(fifo)
+
+    for rejected in (symlink, directory, fifo):
+        with pytest.raises(ValueError, match="non-symlink regular file"):
+            _read_regular_file_nofollow(rejected, contained_by=root)
+
+
+def test_nofollow_create_rejects_existing_destination(tmp_path):
+    root = tmp_path / "bundle"
+    root.mkdir()
+    destination = root / "existing.bin"
+    destination.write_bytes(b"existing")
+    with pytest.raises(FileExistsError):
+        _create_regular_file_nofollow(
+            destination,
+            data=b"replacement",
+            contained_by=root,
+        )
+    assert destination.read_bytes() == b"existing"
+
+
+def test_nofollow_list_rejects_recursive_child_directory_replacement(
+    tmp_path, monkeypatch
+):
+    root = tmp_path / "source"
+    child = root / "child"
+    child.mkdir(parents=True)
+    (child / "original.bin").write_bytes(b"original")
+    real_listdir = os.listdir
+    list_calls = 0
+
+    def replace_child_after_listing(descriptor: int) -> list[str]:
+        nonlocal list_calls
+        entries = real_listdir(descriptor)
+        list_calls += 1
+        if list_calls == 2:
+            child.rename(root / "detached")
+            child.mkdir()
+            (child / "replacement.bin").write_bytes(b"replacement")
+        return entries
+
+    monkeypatch.setattr(os, "listdir", replace_child_after_listing)
+    with pytest.raises(ValueError, match="source directory changed"):
         _list_regular_files_nofollow(root)

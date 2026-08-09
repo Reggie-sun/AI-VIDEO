@@ -73,6 +73,35 @@ def _same_file(left: os.stat_result, right: os.stat_result) -> bool:
     return (left.st_dev, left.st_ino) == (right.st_dev, right.st_ino)
 
 
+def _revalidate_held_directory_chain(
+    directory: Path,
+    *,
+    root: Path,
+    relative: Path,
+    descriptors: list[int],
+) -> None:
+    root_lstat = os.lstat(root)
+    if (
+        stat.S_ISLNK(root_lstat.st_mode)
+        or not stat.S_ISDIR(root_lstat.st_mode)
+        or not _same_file(root_lstat, os.fstat(descriptors[0]))
+    ):
+        raise ValueError(f"P3 containment root changed during traversal: {root}")
+    for index, component in enumerate(relative.parts, start=1):
+        current = os.stat(
+            component,
+            dir_fd=descriptors[index - 1],
+            follow_symlinks=False,
+        )
+        held = os.fstat(descriptors[index])
+        if (
+            stat.S_ISLNK(current.st_mode)
+            or not stat.S_ISDIR(current.st_mode)
+            or not _same_file(current, held)
+        ):
+            raise ValueError(f"P3 directory changed during traversal: {directory}")
+
+
 @contextmanager
 def _open_directory_nofollow(
     directory: Path,
@@ -81,6 +110,7 @@ def _open_directory_nofollow(
 ) -> Iterator[int]:
     directory, root, relative = _contained_relative(directory, contained_by)
     descriptors: list[int] = []
+    traversal_complete = False
     try:
         root_lstat = os.lstat(root)
         if stat.S_ISLNK(root_lstat.st_mode) or not stat.S_ISDIR(root_lstat.st_mode):
@@ -104,10 +134,28 @@ def _open_directory_nofollow(
             descriptors.append(descriptor)
             if not _same_file(component_lstat, os.fstat(descriptor)):
                 raise ValueError(f"P3 directory changed during traversal: {directory}")
+        traversal_complete = True
         yield descriptors[-1]
     finally:
+        revalidation_error: BaseException | None = None
+        if traversal_complete:
+            try:
+                _revalidate_held_directory_chain(
+                    directory,
+                    root=root,
+                    relative=relative,
+                    descriptors=descriptors,
+                )
+            except BaseException as exc:
+                revalidation_error = exc
         for descriptor in reversed(descriptors):
-            os.close(descriptor)
+            try:
+                os.close(descriptor)
+            except BaseException as exc:
+                if revalidation_error is None:
+                    revalidation_error = exc
+        if revalidation_error is not None:
+            raise revalidation_error
 
 
 @contextmanager
@@ -291,6 +339,7 @@ def _copy_held_fd_to_regular_file_nofollow(
                 )
             os.fsync(parent_descriptor)
             os.lseek(descriptor, 0, os.SEEK_SET)
+            os.lseek(source_fd, source_offset, os.SEEK_SET)
             yield VerifiedRenderFile(
                 path=destination,
                 fd=descriptor,
@@ -326,6 +375,11 @@ def _list_regular_files_nofollow(root: Path) -> set[Path]:
                         f"P3 source directory changed during traversal: {entry_relative}"
                     )
                 visit(child, entry_relative)
+                current = os.stat(name, dir_fd=descriptor, follow_symlinks=False)
+                if not _same_file(current, os.fstat(child)):
+                    raise ValueError(
+                        f"P3 source directory changed during traversal: {entry_relative}"
+                    )
             finally:
                 os.close(child)
 
