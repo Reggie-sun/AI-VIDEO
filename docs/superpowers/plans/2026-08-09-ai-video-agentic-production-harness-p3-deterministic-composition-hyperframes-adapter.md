@@ -381,6 +381,7 @@ sha256sum "$P3_GATE_SOURCE/index.html" "$P3_GATE_SOURCE/assets/red.png" \
   "$P3_GATE_SOURCE/assets/blue.png" >"$P3_GATE_EVIDENCE/input.before.sha256"
 python - <<'PY'
 from decimal import Decimal
+import math
 
 duration = Decimal("0.416666667")
 offset = Decimal("44.999999964")
@@ -389,8 +390,12 @@ assert Decimal(4) / Decimal(24) < mapped < Decimal(5) / Decimal(24)
 duration_f = float(duration)
 duration_ms_f = duration_f * 1000.0
 offset_progress_f = float(offset) / 100.0
-previous_progress_f = ((4 / 24) * 1000.0) / duration_ms_f
-current_progress_f = ((5 / 24) * 1000.0) / duration_ms_f
+previous_raw_seconds_f = 4 / 24
+current_raw_seconds_f = 5 / 24
+previous_quantized_seconds_f = math.floor(previous_raw_seconds_f * 24 + 1e-9) / 24
+current_quantized_seconds_f = math.floor(current_raw_seconds_f * 24 + 1e-9) / 24
+previous_progress_f = (previous_quantized_seconds_f * 1000.0) / duration_ms_f
+current_progress_f = (current_quantized_seconds_f * 1000.0) / duration_ms_f
 assert previous_progress_f < offset_progress_f < current_progress_f
 PY
 ```
@@ -1374,10 +1379,14 @@ def test_capture_safe_cut_10_frames_at_24fps_maps_between_frame_4_and_5(tmp_path
     assert Decimal(4) / Decimal(24) < mapped < Decimal(5) / Decimal(24)
     duration_f = float(duration)
     duration_ms_f = duration_f * 1000.0
+    previous_raw_seconds_f = 4 / 24
+    current_raw_seconds_f = 5 / 24
+    previous_quantized_seconds_f = math.floor(previous_raw_seconds_f * 24 + 1e-9) / 24
+    current_quantized_seconds_f = math.floor(current_raw_seconds_f * 24 + 1e-9) / 24
     assert (
-        ((4 / 24) * 1000.0) / duration_ms_f
+        (previous_quantized_seconds_f * 1000.0) / duration_ms_f
         < float(offset.removesuffix("%")) / 100.0
-        < ((5 / 24) * 1000.0) / duration_ms_f
+        < (current_quantized_seconds_f * 1000.0) / duration_ms_f
     )
 
 
@@ -1403,18 +1412,47 @@ def test_capture_safe_boundary_prior_seconds_order_counterexample_still_fails_cl
     assert exc.value.code is ErrorCode.RENDERER_SOURCE_INVALID
 
 
-def test_capture_safe_boundary_hyperframes_millisecond_order_counterexample_fails_closed():
-    total_frames = 571_645_132_898_494
-    fps = 102
-    frame = 238_889_121_248_512
+@pytest.mark.parametrize(
+    ("total_frames", "fps", "frame", "expected_duration", "expected_offset"),
+    [
+        (
+            571_645_132_898_494,
+            102,
+            238_889_121_248_512,
+            "5604364048024.450980392",
+            "41.789758628266",
+        ),
+        (
+            233_828_343_456_133,
+            115,
+            129_039_679_542_247,
+            "2033289943096.808695652",
+            "55.18564500563",
+        ),
+        (
+            5_474_664_941_385_873,
+            178,
+            1_884_030_073_746_253,
+            "30756544614527.376404494",
+            "34.413614237903",
+        ),
+    ],
+)
+def test_capture_safe_boundary_hyperframes_quantized_seek_counterexamples_fail_closed(
+    total_frames,
+    fps,
+    frame,
+    expected_duration,
+    expected_offset,
+):
     duration = _seconds(total_frames, fps)
     target = (Decimal(frame) - Decimal("0.5")) / Decimal(fps)
     offset = (target * Decimal(100) / Decimal(duration)).quantize(
         Decimal("0.000000000001"),
         rounding=ROUND_HALF_EVEN,
     )
-    assert duration == "5604364048024.450980392"
-    assert format(offset, "f") == "41.789758628266"
+    assert duration == expected_duration
+    assert format(offset, "f") == expected_offset
     with pytest.raises(AiVideoError) as exc:
         _capture_safe_boundary_percent(
             frame,
@@ -1454,7 +1492,7 @@ def test_source_audit_rejects_network_and_wall_clock_inputs(tmp_path, forbidden)
     assert exc.value.code is ErrorCode.RENDERER_SOURCE_INVALID
 ```
 
-Also assert source audit rejects absolute paths, `..`, URI schemes, protocol-relative URLs, `data:`/`blob:`, `srcset` extras, CSS `url()`/`@import`, external or inline script, external stylesheet/font, undeclared/missing files, symlink assets, asset hash mismatch, MIME/magic/extension mismatch, SVG/HTML/CSS payloads, missing composition/timeline identity, missing/non-boolean `data-no-timeline`, and a source asset binding not present in the timeline. CSS audit must reject missing/extra/duplicate animation names, a layer bound to another animation, non-total/mismatched final serialized duration, timing/fill/play-state drift, missing/extra/reordered keyframe stops, a non-duplicated capture-safe CUT boundary, a Decimal mapped time or exact HyperFrames seconds-to-milliseconds/currentTime IEEE-double progress that is not strictly between adjacent captures, non-finite/collapsed intermediates, or any opacity differing from exact hidden `0`/target `opacity_milli`. Assertions inspect the parsed DOM, CSS URL set, animation declarations and keyframe AST, not substring presence alone. `data-no-timeline` specifically selects CSS-animation-driven static-raster composition while P3's non-empty integer `ResolvedTimeline` remains the sole Shot order/timing owner; no JS, GSAP, runtime clock or network is allowed.
+Also assert source audit rejects absolute paths, `..`, URI schemes, protocol-relative URLs, `data:`/`blob:`, `srcset` extras, CSS `url()`/`@import`, external or inline script, external stylesheet/font, undeclared/missing files, symlink assets, asset hash mismatch, MIME/magic/extension mismatch, SVG/HTML/CSS payloads, missing composition/timeline identity, missing/non-boolean `data-no-timeline`, and a source asset binding not present in the timeline. CSS audit must reject missing/extra/duplicate animation names, a layer bound to another animation, non-total/mismatched final serialized duration, timing/fill/play-state drift, missing/extra/reordered keyframe stops, a non-duplicated capture-safe CUT boundary, a Decimal mapped time or exact HyperFrames `quantizeTimeToFrame -> milliseconds -> animation.currentTime` IEEE-double progress that is not strictly between adjacent captures, non-finite/collapsed intermediates, or any opacity differing from exact hidden `0`/target `opacity_milli`. Assertions inspect the parsed DOM, CSS URL set, animation declarations and keyframe AST, not substring presence alone. `data-no-timeline` specifically selects CSS-animation-driven static-raster composition while P3's non-empty integer `ResolvedTimeline` remains the sole Shot order/timing owner; no JS, GSAP, runtime clock or network is allowed.
 
 - [ ] **Step 2: Run source RED**
 
@@ -1730,10 +1768,10 @@ def _capture_safe_boundary_percent(
     duration_f = float(serialized_duration)
     duration_ms_f = duration_f * 1000.0
     offset_progress_f = float(rendered) / 100.0
-    previous_seconds_f = (frame - 1) / fps
-    current_seconds_f = frame / fps
-    previous_ms_f = previous_seconds_f * 1000.0
-    current_ms_f = current_seconds_f * 1000.0
+    previous_raw_seconds_f = (frame - 1) / fps
+    current_raw_seconds_f = frame / fps
+    previous_frame_position_f = previous_raw_seconds_f * fps + 1e-9
+    current_frame_position_f = current_raw_seconds_f * fps + 1e-9
     if not (
         duration_ms_f > 0.0
         and all(
@@ -1742,14 +1780,28 @@ def _capture_safe_boundary_percent(
                 duration_f,
                 duration_ms_f,
                 offset_progress_f,
-                previous_seconds_f,
-                current_seconds_f,
-                previous_ms_f,
-                current_ms_f,
+                previous_raw_seconds_f,
+                current_raw_seconds_f,
+                previous_frame_position_f,
+                current_frame_position_f,
             )
         )
     ):
         raise _source_invalid("Serialized CSS millisecond seek values are not finite and positive.")
+    previous_quantized_seconds_f = math.floor(previous_frame_position_f) / fps
+    current_quantized_seconds_f = math.floor(current_frame_position_f) / fps
+    previous_ms_f = previous_quantized_seconds_f * 1000.0
+    current_ms_f = current_quantized_seconds_f * 1000.0
+    if not all(
+        math.isfinite(value)
+        for value in (
+            previous_quantized_seconds_f,
+            current_quantized_seconds_f,
+            previous_ms_f,
+            current_ms_f,
+        )
+    ):
+        raise _source_invalid("Quantized CSS seek values are not finite.")
     previous_progress_f = previous_ms_f / duration_ms_f
     current_progress_f = current_ms_f / duration_ms_f
     if not (
@@ -1827,7 +1879,7 @@ def _css_transform(transform: FixedTransform) -> str:
     )
 ```
 
-Import `Mapping`, `dataclass`, `Decimal`, `ROUND_HALF_EVEN`, `hashlib`, `math`, `escape` from `html`, `HTMLParser`, `urlsplit`, `re`, the shared no-follow read/create/list primitives, and the named production models. `_capture_safe_boundary_percent()` uses the **final serialized** duration string and places every internal frame boundary `k` at target time `(k - 0.5) / fps`, quantized to a canonical 12-decimal CSS percentage; `0`/`total_frames` remain exact `0%`/`100%`. It first requires the emitted Decimal mapped time to remain strictly between adjacent capture times. It then mirrors HyperFrames `0.7.103` CSS adapter evaluation order exactly: `duration_f=float(serialized_duration)`; `duration_ms_f=duration_f*1000.0`; `previous_ms_f=((k-1)/fps)*1000.0`; `current_ms_f=(k/fps)*1000.0`; `previous_progress_f=previous_ms_f/duration_ms_f`; `current_progress_f=current_ms_f/duration_ms_f`; and `offset_progress_f=float(rendered)/100.0`. Every seconds-, milliseconds-, and progress-domain intermediate must be finite, `duration_ms_f` positive, and progress non-collapsed with `previous_progress_f < offset_progress_f < current_progress_f`; failure is typed `RENDERER_SOURCE_INVALID` before render. No wall clock enters CSS. Every layer has one full-timeline-duration paused `step-end` animation and a full-hash-derived unique name. Duplicate capture-safe start/end offsets make the target opacity visible at captures `[start_frame,end_frame)`: the state transition occurs strictly between adjacent captures, and duplicate declarations still make the later target/hidden value win at the boundary itself. First, middle, last and full-duration cases use the same helper, including non-terminating duration/ratio tests such as `10` frames at `24fps`; both the prior `99_998_442_844_803`-frame collapse and the runtime-order-only `571_645_132_898_494`-frame counterexample must typed-fail. `_parse_source_document()` must enumerate every URL-bearing `src`, `href`, `poster`, `srcset`, inline-style `url()` and style-block `url()`/`@import`; it does not accept a substring-only audit. It must also require one boolean `data-no-timeline` attribute on the root `#stage` element—present with no value, not `data-no-timeline="false"` or another fake value—and reconstruct the exact expected animation/keyframe model from the integer timeline/bindings using the same final serialized duration and exact HyperFrames millisecond-seek guard. `_validated_raster_suffix()` validates magic bytes, exact MIME and suffix for PNG/JPEG/WebP from the no-follow snapshot before and after copy. `_source_bundle_sha256()` hashes stable JSON of the exact ordered `(relative_path, file_sha256)` set including `index.html`, using only same-FD snapshots. `_list_regular_files_nofollow()` rejects symlink entries/directories instead of traversing them. After Task 4 introduces `RendererAttemptError`, `_source_invalid()` returns a non-retryable instance with `code=ErrorCode.RENDERER_SOURCE_INVALID` and `phase="source"`.
+Import `Mapping`, `dataclass`, `Decimal`, `ROUND_HALF_EVEN`, `hashlib`, `math`, `escape` from `html`, `HTMLParser`, `urlsplit`, `re`, the shared no-follow read/create/list primitives, and the named production models. `_capture_safe_boundary_percent()` uses the **final serialized** duration string and places every internal frame boundary `k` at target time `(k - 0.5) / fps`, quantized to a canonical 12-decimal CSS percentage; `0`/`total_frames` remain exact `0%`/`100%`. It first requires the emitted Decimal mapped time to remain strictly between adjacent capture times. It then mirrors the full HyperFrames `0.7.103` seek path exactly. For each adjacent frame index it computes `raw_seconds_f=frame_index/fps`, `quantized_seconds_f=math.floor(raw_seconds_f*fps + 1e-9)/fps`, `time_ms_f=quantized_seconds_f*1000.0`, and `progress_f=time_ms_f/(float(serialized_duration)*1000.0)`; CSS offset progress is `float(rendered)/100.0`. This order is anchored in installed published source: `dist/cli.js:58585-58590` defines `quantizeTimeToFrame`, the render `seekToFrame` applies it at `:68053`, and the CSS adapter derives milliseconds then assigns `animation.currentTime` at `:147444-147469`. Every raw-seconds, frame-position, quantized-seconds, milliseconds and progress intermediate must be finite, duration milliseconds positive, and adjacent quantized progress non-collapsed with `previous_progress_f < offset_progress_f < current_progress_f`; failure is typed `RENDERER_SOURCE_INVALID` before render. No wall clock enters CSS. Every layer has one full-timeline-duration paused `step-end` animation and a full-hash-derived unique name. Duplicate capture-safe start/end offsets make the target opacity visible at captures `[start_frame,end_frame)`: the state transition occurs strictly between adjacent captures, and duplicate declarations still make the later target/hidden value win at the boundary itself. First, middle, last and full-duration cases use the same helper, including non-terminating duration/ratio tests such as `10` frames at `24fps`; the prior `99_998_442_844_803` and `571_645_132_898_494` collapses plus quantized-seek counterexamples `233_828_343_456_133` and `5_474_664_941_385_873` must all typed-fail. `_parse_source_document()` must enumerate every URL-bearing `src`, `href`, `poster`, `srcset`, inline-style `url()` and style-block `url()`/`@import`; it does not accept a substring-only audit. It must also require one boolean `data-no-timeline` attribute on the root `#stage` element—present with no value, not `data-no-timeline="false"` or another fake value—and reconstruct the exact expected animation/keyframe model from the integer timeline/bindings using the same final serialized duration and full HyperFrames quantized millisecond-seek guard. `_validated_raster_suffix()` validates magic bytes, exact MIME and suffix for PNG/JPEG/WebP from the no-follow snapshot before and after copy. `_source_bundle_sha256()` hashes stable JSON of the exact ordered `(relative_path, file_sha256)` set including `index.html`, using only same-FD snapshots. `_list_regular_files_nofollow()` rejects symlink entries/directories instead of traversing them. After Task 4 introduces `RendererAttemptError`, `_source_invalid()` returns a non-retryable instance with `code=ErrorCode.RENDERER_SOURCE_INVALID` and `phase="source"`.
 
 These seekable CSS animations are only the HyperFrames transport for deterministic layer visibility/CUT semantics already owned by `ResolvedTimeline`; they do not authorize creative motion, easing, interpolation, JS/GSAP or any new `motion_directives` behavior.
 
@@ -1844,7 +1896,7 @@ Keep these as straight-line materialization/audit functions; no template discove
 
 - [ ] **Step 4: Seal the deterministic fixture**
 
-Commit a human-readable non-empty two-shot CUT `timeline.json` using `10` total frames at `24fps` with the CUT at frame `5`, its exact expected CSS-animation-driven `index.html` with root boolean `data-no-timeline`, and the reviewed red/blue local PNGs named by their full hashes. The unit test must regenerate source under its caller-supplied contained `tmp_path`, assert exact text/hash equality, assert final duration `0.416666667s`, exact duplicated capture-safe boundary `44.999999964%`, Decimal mapped-time and exact seconds-to-milliseconds/currentTime IEEE-double progress inequalities around frame `5`, and both PNG magic/MIME/hash. Fixture files contain only local relative raster assets and no generated binary output.
+Commit a human-readable non-empty two-shot CUT `timeline.json` using `10` total frames at `24fps` with the CUT at frame `5`, its exact expected CSS-animation-driven `index.html` with root boolean `data-no-timeline`, and the reviewed red/blue local PNGs named by their full hashes. The unit test must regenerate source under its caller-supplied contained `tmp_path`, assert exact text/hash equality, assert final duration `0.416666667s`, exact duplicated capture-safe boundary `44.999999964%`, Decimal mapped-time and exact `quantizeTimeToFrame -> milliseconds -> currentTime` IEEE-double progress inequalities around frame `5`, and both PNG magic/MIME/hash. Fixture files contain only local relative raster assets and no generated binary output.
 
 - [ ] **Step 5: Run GREEN and commit**
 
@@ -3144,7 +3196,7 @@ Verify HyperFrames source comes only from timeline/assets and is parsed/hash/lin
 Verify CSS-animation-driven raster source has root boolean data-no-timeline while ResolvedTimeline remains non-empty;
 verify every layer has one deterministic full-duration paused step-end CSS animation; every internal boundary
 uses the final serialized duration to map strictly between adjacent Decimal capture times and the exact HyperFrames
-seconds-to-milliseconds/currentTime IEEE-double progress values, duplicated capture-safe keyframes implement [start_frame,end_frame),
+quantizeTimeToFrame-to-milliseconds/currentTime IEEE-double progress values, duplicated capture-safe keyframes implement [start_frame,end_frame),
 exact target opacity/z-order remains, and parsed audit rejects missing/extra/mismatched animation names, durations,
 bindings, keyframes, non-finite/collapsed intermediates or unsafe progress;
 verify exact 0.7.103 version and zero-exit doctor --json named Node.js/FFmpeg/FFprobe/Chrome checks
@@ -3219,7 +3271,7 @@ P3 is accepted only when:
 2. `CompositionSpec` captures explicit edit intent without filesystem discovery;
 3. `ResolvedTimeline` is the only order/timing/layer truth and contains integer frame/sample boundaries;
 4. only `STATIC_IMAGE`, zero-duration `CUT`, local PNG/JPEG/WebP, default-only trim and no motion directives are accepted; exact `(asset_role, asset_id)`, MIME/hash, inline transform/origin/z-order, CSS-keyframed target opacity, delivery profile, renderer kind/version and deterministic composition fingerprint are persisted;
-5. identical resolved inputs produce identical timeline/source hashes and frame-equivalent output under the pinned tool/runtime; deterministic CSS animation names and one final serialized total duration feed capture-safe duplicate keyframes whose internal boundary maps strictly between `(k-1)/fps` and `k/fps` in Decimal time and between the corresponding exact HyperFrames seconds-to-milliseconds/currentTime IEEE-double progress values, making every layer visible at captures `[start_frame,end_frame)`. Non-finite/collapsed intermediates typed-fail; first/middle/last non-terminating cases, the prior collapse counterexample and the runtime-ms-order-only collapse counterexample are unit-tested, and two visually distinct shots at `10` frames/`24fps` prove frame `4` belongs to shot 1 while frame `5` belongs to shot 2 at the CUT;
+5. identical resolved inputs produce identical timeline/source hashes and frame-equivalent output under the pinned tool/runtime; deterministic CSS animation names and one final serialized total duration feed capture-safe duplicate keyframes whose internal boundary maps strictly between `(k-1)/fps` and `k/fps` in Decimal time and between the corresponding exact HyperFrames `quantizeTimeToFrame -> milliseconds -> currentTime` IEEE-double progress values, making every layer visible at captures `[start_frame,end_frame)`. Non-finite/collapsed intermediates typed-fail; first/middle/last non-terminating cases, both prior counterexamples and both quantized-seek counterexamples are unit-tested, and two visually distinct shots at `10` frames/`24fps` prove frame `4` belongs to shot 1 while frame `5` belongs to shot 2 at the CUT;
 6. no byte-identical MP4 claim is made without a separately proven encoder/container contract;
 7. every materialized target is contained before creation, filename derives only from full asset hash plus allowlisted lowercase raster suffix, and one lstat/openat `O_NOFOLLOW` traversal owner backs source/scratch/durable/reader bytes; `O_EXCL|O_NOFOLLOW` applies to agent-owned materialization and verification files, not HyperFrames-created staged output. The staged output is securely held and streamed into one `O_RDWR` exclusive verification snapshot whose creation FD is retained without pathname reopen; hash/size, exact durable bytes, ffprobe metadata and framemd5 all come from that FD via `/proc/self/fd/<fd>`, `shell=False` and exact `pass_fds`, while contained/external symlink, immediate post-copy-yield swap and later staged/snapshot pathname-swap tests fail closed or remain byte-consistent;
 8. parsed HTML/CSS media URLs exactly equal declared relative raster sources; source contains no SVG/HTML/CSS asset payload, wall-clock randomness, implicit network fetch, remote/absolute/parent/scheme/data/blob URL or untracked file;
