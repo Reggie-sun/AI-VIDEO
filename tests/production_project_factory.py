@@ -15,6 +15,8 @@ from ai_video.production.models import (
     AssetSourceKind,
     AssetType,
     Character,
+    CompositionLayerSpec,
+    CompositionSpec,
     DeliveryProfile,
     DurationPolicy,
     ProductionBrief,
@@ -22,6 +24,7 @@ from ai_video.production.models import (
     ProductionProject,
     ProjectSnapshotPointer,
     ProjectArtifactRefs,
+    RendererKind,
     RendererPolicy,
     RegistrySnapshotPointer,
     Scene,
@@ -32,8 +35,11 @@ from ai_video.production.models import (
     Storyboard,
     StoryboardBeat,
     ToolIdentity,
+    TransitionKind,
+    TransitionSpec,
     VisualStrategy,
 )
+from ai_video.production.project import load_production_project
 from ai_video.production.registry import registry_semantic_sha256
 
 ZERO_HASH = "0" * 64
@@ -247,6 +253,222 @@ def write_production_project(root: Path) -> Path:
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
     return project_path
+
+
+def write_and_load_two_shot_project(
+    root: Path,
+    *,
+    filenames: tuple[str, str] = ("shot-1.png", "shot-2.png"),
+    seconds: tuple[float, float] = (2.0, 2.0),
+    fps: int = 24,
+):
+    """Build a valid two-Shot raster project through the public P2 loader."""
+    write_production_project(root)
+    project, registry = load_initial_models(root)
+
+    character = Character.model_validate(
+        yaml.safe_load((root / "creative/characters/hero.yaml").read_text(encoding="utf-8"))
+    )
+    character = seal_artifact(
+        character.model_copy(
+            update={
+                "content_hash": ZERO_HASH,
+                "reference_asset_ids": ("image-shot-1",),
+            }
+        )
+    )
+    scene = Scene.model_validate(
+        yaml.safe_load((root / "creative/scenes/room.yaml").read_text(encoding="utf-8"))
+    )
+    scene = seal_artifact(
+        scene.model_copy(
+            update={
+                "content_hash": ZERO_HASH,
+                "visual_reference_asset_ids": ("image-shot-1",),
+            }
+        )
+    )
+    base_shot = Shot.model_validate(
+        yaml.safe_load((root / "creative/shots/shot-1.yaml").read_text(encoding="utf-8"))
+    )
+    shots = tuple(
+        seal_artifact(
+            base_shot.model_copy(
+                update={
+                    "artifact_id": f"shot-artifact-{index}",
+                    "content_hash": ZERO_HASH,
+                    "creation_receipt_id": f"receipt-shot-{index}",
+                    "shot_id": f"shot-{index}",
+                    "duration_policy": DurationPolicy(
+                        mode="fixed", seconds=seconds[index - 1]
+                    ),
+                    "required_asset_roles": (
+                        AssetRoleRequirement(
+                            role="still",
+                            asset_ids=(f"image-shot-{index}",),
+                            allowed_asset_types=(AssetType.IMAGE,),
+                        ),
+                    ),
+                }
+            )
+        )
+        for index in (1, 2)
+    )
+    storyboard = Storyboard.model_validate(
+        yaml.safe_load((root / "creative/storyboard.yaml").read_text(encoding="utf-8"))
+    )
+    storyboard = seal_artifact(
+        storyboard.model_copy(
+            update={
+                "content_hash": ZERO_HASH,
+                "beats": (
+                    storyboard.beats[0].model_copy(
+                        update={"shot_ids": ("shot-1", "shot-2")}
+                    ),
+                ),
+            }
+        )
+    )
+
+    assets: list[AssetRecord] = []
+    for index, filename in enumerate(filenames, start=1):
+        if Path(filename).name != filename:
+            raise ValueError("composition fixture filenames must be basenames")
+        asset_path = root / "assets/files" / filename
+        payload = b"\x89PNG\r\n\x1a\n" + f"fixture-raster-{index}".encode()
+        asset_path.write_bytes(payload)
+        assets.append(
+            registry.assets[0].model_copy(
+                update={
+                    "asset_id": f"image-shot-{index}",
+                    "artifact_path": asset_path.relative_to(root),
+                    "sha256": sha256_file(asset_path),
+                    "size_bytes": len(payload),
+                    "mime_type": "image/png",
+                    "input_artifact_ids": (character.artifact_id,),
+                    "input_fingerprint": character.content_hash,
+                    "creation_receipt_id": f"receipt-image-shot-{index}",
+                }
+            )
+        )
+    registry = AssetRegistrySnapshot(
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=tuple(assets),
+    )
+    registry_hash = registry_semantic_sha256(registry)
+    registry = registry.model_copy(
+        update={"revision_id": registry_hash, "content_hash": registry_hash}
+    )
+
+    refs = project.artifacts.model_copy(
+        update={
+            "characters": (_ref(character, "creative/characters/hero.yaml"),),
+            "scenes": (_ref(scene, "creative/scenes/room.yaml"),),
+            "storyboard": _ref(storyboard, "creative/storyboard.yaml"),
+            "shots": tuple(
+                _ref(shot, f"creative/shots/shot-{index}.yaml")
+                for index, shot in enumerate(shots, start=1)
+            ),
+        }
+    )
+    project = seal_artifact(
+        project.model_copy(
+            update={
+                "content_hash": ZERO_HASH,
+                "delivery_profile": project.delivery_profile.model_copy(
+                    update={"fps": fps}
+                ),
+                "artifacts": refs,
+            }
+        )
+    )
+
+    _write_yaml(root / "creative/characters/hero.yaml", character)
+    _write_yaml(root / "creative/scenes/room.yaml", scene)
+    _write_yaml(root / "creative/storyboard.yaml", storyboard)
+    for index, shot in enumerate(shots, start=1):
+        _write_yaml(root / f"creative/shots/shot-{index}.yaml", shot)
+    project_path = root / "project.yaml"
+    _write_yaml(project_path, project)
+    registry_path = root / f"assets/registry.{registry.revision_id}.json"
+    registry_path.write_text(
+        json.dumps(
+            registry.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    manifest = ProductionManifest(
+        project_id=project.project_id,
+        manifest_revision=1,
+        active_project=ProjectSnapshotPointer(
+            path=Path("project.yaml"),
+            revision=project.revision,
+            content_hash=project.content_hash,
+            file_sha256=sha256_file(project_path),
+        ),
+        active_registry=RegistrySnapshotPointer(
+            path=registry_path.relative_to(root),
+            revision_id=registry.revision_id,
+            content_hash=registry.content_hash,
+            file_sha256=sha256_file(registry_path),
+        ),
+    )
+    (root / "state/manifest.json").write_text(
+        manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    return load_production_project(project_path)
+
+
+def make_composition_spec(
+    *,
+    shot_ids: tuple[str, ...] = ("shot-1", "shot-2"),
+    sample_rate: int = 48_000,
+) -> CompositionSpec:
+    transitions = tuple(
+        TransitionSpec(
+            from_shot_id=source,
+            to_shot_id=target,
+            kind=TransitionKind.CUT,
+            duration_frames=0,
+        )
+        for source, target in zip(shot_ids, shot_ids[1:])
+    )
+    return seal_artifact(
+        CompositionSpec(
+            artifact_id="composition-main",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="receipt-composition-1",
+            source_provenance=(
+                SourceReference(kind="user_input", reference="composition-input-1"),
+            ),
+            composition_id="main",
+            shot_ids=shot_ids,
+            layers=tuple(
+                CompositionLayerSpec(
+                    layer_id=f"layer-{shot_id}",
+                    shot_id=shot_id,
+                    asset_role="still",
+                    asset_id=f"image-{shot_id}",
+                )
+                for shot_id in shot_ids
+            ),
+            transitions=transitions,
+            delivery_profile=DeliveryProfile(width=1280, height=720, fps=24),
+            sample_rate=sample_rate,
+            requested_renderer=RendererKind.HYPERFRAMES,
+        )
+    )
+
+
+def make_loaded_project_and_spec(root: Path):
+    loaded = write_and_load_two_shot_project(root)
+    return loaded, make_composition_spec()
 
 
 def load_initial_models(root: Path) -> tuple[ProductionProject, AssetRegistrySnapshot]:
