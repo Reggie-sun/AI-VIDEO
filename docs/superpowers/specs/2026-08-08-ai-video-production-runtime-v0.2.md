@@ -1,12 +1,16 @@
 # AI-VIDEO v0.2 — Production Runtime Specification
 
-Status: Approved for phased planning; implementation requires separate per-slice authorization.
+Status: Superseded on 2026-08-09 after local P1 legacy-runtime stabilization; retained as a historical provider-centric design and safety-contract source.
 Target Repository: `Reggie-sun/AI-VIDEO`
 Target Version: `0.2.0`
-Document Role: 后续 implementation plan 的上位规格，不是实现授权，也不是单次实施计划。
+Document Role: 历史规格。不得再作为 v0.2 主线 implementation authority；仍可复用其 paid Provider、Budget Guard、Cloud Egress、Take/Attempt 和 crash-safety 设计。
 P0 Baseline: `docs/v0.2-runtime-baseline.md`
 P0 Plan: `docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p0-contract-baseline.md`
-Primary Goal: 在保留本地 Wan + ComfyUI 工作流的前提下，将当前单 Provider、单 Take、last-frame 链式生成 CLI 演进为 local-first、provider-agnostic、可审计、可恢复的视频生产运行时。
+Primary Goal: Historical — 在保留本地 Wan + ComfyUI 工作流的前提下，将当前单 Provider、单 Take、last-frame 链式生成 CLI 演进为 local-first、provider-agnostic、可审计、可恢复的视频生产运行时。
+
+Successor Spec: `docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`
+
+Supersession Note: 本文件第 3 节的 current-state gaps 是 2026-08-08 P0 快照。terminal failed Attempt persistence、direct last-frame dependency invalidation、Legacy FPS semantics 和 artifact promotion rollback 已在本地 `main` 的四个 P1 commits 中实现；Provider abstraction、Manifest v2、Take、Timeline v2、Audio、Budget Guard、Human Review、Semantic Evaluation 和 Seedance 仍未实现。
 
 ---
 

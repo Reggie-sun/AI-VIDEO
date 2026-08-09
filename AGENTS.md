@@ -4,7 +4,7 @@
 
 ## Purpose
 
-本仓库是一个纯本地的 Python CLI，用于围绕本地 ComfyUI 服务编排长视频生成流程。
+当前已实现产品是一个 local-first Python CLI，用于围绕默认本地、显式 opt-in 非本地的 ComfyUI 服务编排长视频生成流程。v0.2 的规划目标是由 Codex 驱动、以 durable project state 为核心的 AI Video / AI Comic Production Harness。
 
 Agent 必须维护当前产品承诺：
 
@@ -15,11 +15,12 @@ Agent 必须维护当前产品承诺：
 
 ## Versioned Product Boundary
 
-- 当前已实现的 `0.1.x` / legacy runtime 仍是纯本地 Python CLI，只支持本地 ComfyUI、三个公共命令和当前 flat artifact layout。
-- `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 是已批准的分阶段 planning target，不是已实现行为，也不是一次性实施授权。
-- v0.2 的 P0-P9 每个 slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。
+- 当前已实现的 `0.1.x` / legacy runtime 仍是 local-first Python CLI，默认只连接本地 ComfyUI；非本地 ComfyUI 必须显式设置 `allow_non_local: true`。公共命令仍只有三个，产物仍使用当前 flat artifact layout。
+- `docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md` 是新的 v0.2 planning target；它不是已实现行为，也不是一次性实施授权。
+- `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 已被 supersede，只保留为 provider-centric 历史设计与可复用安全契约来源。
+- v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0 文档迁移与本地 P1 legacy stabilization 的状态见 roadmap；不得据此推断 P2+ 已实现。
 - 某个 slice 落地前，与该 slice 冲突的当前契约继续有效；不得通过只改文档把 proposed behavior 描述成 runtime truth。
-- Local Wan + ComfyUI 始终保持默认路径。任何远程 Provider 都必须在后续独立 slice 中满足 explicit opt-in、Budget Guard、Cloud Egress 和 crash-safe persistence gate。
+- Local Wan + ComfyUI 始终保持 legacy default，并在新 domain 中作为 optional `generated_video` asset capability 保留。任何远程 Provider 都必须在后续独立 slice 中满足 explicit opt-in、Budget Guard、Cloud Egress 和 crash-safe persistence gate。
 
 ## Agent Communication
 
@@ -50,7 +51,9 @@ Agent 必须维护当前产品承诺：
 
 ## Stable Product Contract
 
-- 当前 legacy runtime 保持纯本地形态；v0.2 远程 Provider 只有在对应 slice 获批并完成安全前置后才允许以 opt-in 方式加入，且永不成为默认 fallback。
+- 当前 legacy runtime 保持 local-first/default-local；v0.2 远程 Provider 只有在对应 slice 获批并完成安全前置后才允许以 opt-in 方式加入，且永不成为默认 fallback。
+- v0.2 的顶层 Agent 是 Codex；仓库不得另造通用 Agent runtime。仓库未来只拥有 durable production contract、asset/provenance state、dependency/invalidation、render adapter 和 QA/repair receipts。
+- v0.2 基础 Production Path 必须在没有 Video Provider 时仍能用 image、motion graphics、voice、captions 和 deterministic composition 产出完整视频；`generated_video` 只是 Shot 的可选 visual strategy。
 - 当前公共 CLI 面保持为 `ai-video validate`、`ai-video run`、`ai-video resume`；任何 v0.2 新命令必须在独立 plan 中同步 CLI tests、README 和退出码契约。
 - `validate` 必须保持无副作用；默认不得联网、上传素材、创建 run 目录或触发付费调用。
 - `run` 必须创建 run 目录，按顺序执行 shots，并产出 manifest 与相关产物。
@@ -58,7 +61,7 @@ Agent 必须维护当前产品承诺：
 - run manifest 是 pipeline 状态的持久化真相源，必须原子写入。
 - 除非用户要求迁移，否则保持 `README.md` 中描述的产物目录结构不变。
 - 写入配置解析结果和 manifest 记录的路径必须是干净的绝对路径。
-- 保持“上一镜头最后一帧可喂给下一镜头”的链式生成模型。
+- Legacy mode 保持“上一镜头最后一帧可喂给下一镜头”的链式生成模型；未来 v0.2 dependency graph 不得退化为顺序式 blanket stale。
 - 保持项目对 workflow 的通用性，依赖 template + binding，而不是在 CLI 或 pipeline 中写死节点 ID。
 
 ## Module Boundaries
@@ -136,7 +139,7 @@ Agent 必须维护当前产品承诺：
 - 修改 `runs/` 下的 manifest schema 或产物目录结构。
 - 把本地优先策略改成默认允许远程主机。
 - 引入前端、API server、队列管理、音频，或其他 MVP 规范中明确排除的子系统。
-- 执行 v0.2 P1-P9 任一 slice，或把 spec 中的 proposed contract 写成当前行为。
+- 执行 v0.2 P2-P9 任一 runtime slice，或把 spec 中的 proposed contract 写成当前行为。P1 只允许在其现有 Legacy scope 内做独立 bugfix/release handling，不得借此扩展新 product domain。
 
 ## Session Continuity
 

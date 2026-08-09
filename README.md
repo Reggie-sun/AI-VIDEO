@@ -1,19 +1,21 @@
 # AI-VIDEO
 
-Pure-local Python CLI for orchestrating long-video generation through a local ComfyUI server.
+Local-first Python CLI for orchestrating long-video generation through default-local ComfyUI. Non-local ComfyUI requires explicit opt-in.
 
 The MVP reads a project config and shot list, renders ComfyUI workflow JSON per shot, submits each shot locally, extracts the last frame, passes that frame into the next shot, and stitches normalized clips with ffmpeg.
 
 ## Roadmap Status
 
-The currently implemented runtime is the pure-local `0.1.x` CLI described in this README. The proposed v0.2 direction is a local-first, provider-agnostic production runtime, but it is delivered through separately approved P0-P9 slices; the specification does not make those features available today.
+The currently implemented runtime is the local-first `0.1.x` CLI described in this README. The v0.2 product direction is now an Agent-first AI Video / AI Comic Production Harness: Codex drives production decisions while the repository owns durable project state, asset provenance, dependency tracking, deterministic composition, rendering, and QA/repair receipts. That direction is planning-only; it does not make HyperFrames, Remotion, ElevenLabs, Captions, Audio, or a new project schema available today.
 
-- Current evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
-- Target contract: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
-- First gate plan: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p0-contract-baseline.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p0-contract-baseline.md)
-- Runtime truth fix plan: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
+- Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
+- New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
+- Phase dependency map: [`docs/v0.2-agentic-production-roadmap.md`](docs/v0.2-agentic-production-roadmap.md)
+- Product reframe plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p0-product-reframe.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p0-product-reframe.md)
+- Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
+- Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-Until a later slice is implemented and documented, the public commands remain `validate`, `run`, and `resume`; generation remains local ComfyUI; Manifest v1 and the current artifact layout remain active.
+Until a later slice is implemented and documented, the public commands remain `validate`, `run`, and `resume`; generation remains ComfyUI-only and default-local; Manifest v1 and the current artifact layout remain active. The four Legacy P1 fixes are present on local `main`, but this checkout is ahead of `origin/main`, so their GitHub publication is not implied.
 
 ## Setup
 

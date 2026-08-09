@@ -8,13 +8,15 @@
 
 | Contract Area | 中文说明 |
 | --- | --- |
-| Product Scope | 当前 `0.1.x` runtime 是纯本地 Python CLI + 本地 ComfyUI；v0.2 是 local-first、provider-agnostic 的分阶段目标，未落地的 slice 不属于当前行为。 |
+| Product Scope | 当前 `0.1.x` runtime 是 local-first Python CLI + default-local ComfyUI；v0.2 是 Agent-first AI Video / AI Comic Production Harness 的分阶段目标，未落地的 slice 不属于当前行为。 |
 | Truth Source | 用户请求 > 代码/测试/运行时证据 > 仓库契约 > plans/specs > `.workflow/` 草稿记录。 |
 | Change Style | 小步、可测试、低漂移，并保持模块边界稳定。 |
 | Error Model | 跨模块统一使用 `AiVideoError` 与 `ErrorCode`。 |
 | Dependency Policy | 除非有明确理由且获得请求，否则不新增运行时依赖。 |
 | Output Policy | Legacy run 保持当前 flat `runs/<run_id>/` layout；v2 layout 只能由显式 v2 config 和已批准的 Manifest v2 slice 创建。 |
-| Version Gate | v0.2 P0-P9 每个 slice 必须有独立 plan、实施授权、验收、rollback 和对应 contract/docs/tests 更新。 |
+| Version Gate | P0 product reframe 已完成文档迁移，本地 P1 legacy stabilization 已实现但尚未进入 `origin/main`；P2+ 每个 slice 必须有独立 plan、实施授权、验收、rollback 和对应 contract/docs/tests 更新。 |
+| Agent Boundary | Codex 是 Production Agent；仓库提供 durable state、validation、provenance、dependency、render 和 QA harness，不实现第二套通用 Agent runtime。 |
+| Renderer Ownership | AI-VIDEO 的 resolved timeline/composition contract 是时间线真相源；默认 renderer target 是 HyperFrames。Remotion 只能作为显式选择的 optional adapter，不能与 HyperFrames 串联重复 render。 |
 
 ## Contract Matrix
 
@@ -65,7 +67,7 @@ pytest tests/test_manifest.py tests/test_pipeline.py tests/test_resume_e2e.py -v
 pytest tests/test_manifest.py tests/test_pipeline.py -v
 ```
 
-### Local-Only Contract
+### Local-First Contract
 
 Agent 不得悄悄侵蚀本地优先承诺。
 
@@ -80,10 +82,14 @@ Agent 不得悄悄侵蚀本地优先承诺。
 ### v0.2 Planning Gate
 
 - 当前 code/tests 仍是 runtime truth；spec 和 plan 不能覆盖未实现行为。
-- P1/P2 不得改变 Legacy CLI、Manifest v1 或 flat artifact layout。
-- P3 之前不得接入真实异步付费 Provider。
-- P6 完成前不得真实提交云任务。
-- P7 Seedance、P8 Semantic Evaluation 和 P9 Audio 必须分别规划和验收。
+- P0 只迁移 product/contract 文档；不得把 spec 写成 runtime truth。
+- 本地 P1 只稳定 Legacy runtime，未引入新 product domain；其 plan 作为 historical stabilization record 保留。
+- P2 先建立 ProductionProject、Assets、Shot visual strategy 的 durable contract；不得同时接入真实 renderer 或云服务。
+- P3 才允许在独立 plan 中接入一个 canonical renderer adapter；不得同时实现两条并行 canonical render path。
+- P4 才允许在独立 plan 中引入 Audio/Caption production domain；任何付费调用仍需显式 opt-in。
+- P5 dependency graph 完成前，不得宣称支持跨 asset 的 selective rebuild。
+- P6 strategy-aware QA/repair 完成前，不得让当前 `static_visuals` heuristic 自动否决合法的 `static_image` / `image_motion` Shot。
+- P8 之前不得接入真实 generated-video cloud Provider；任何 paid Provider submit 仍受 Budget Guard、Cloud Egress 和 crash-safe persistence gate。
 - 新 CLI、Manifest schema、artifact layout、远程行为、Audio 或 dependency 仍命中下方 Change Escalation Matrix。
 
 ## Change Escalation Matrix

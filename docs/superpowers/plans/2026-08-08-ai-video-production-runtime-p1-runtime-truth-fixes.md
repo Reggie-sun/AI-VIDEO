@@ -1,5 +1,7 @@
 # AI-VIDEO Production Runtime P1 Runtime Truth Fixes Implementation Plan
 
+Status: Implemented on local `main` in commits `abe029c`, `aad2687`, `ed938f2`, and `6eb895a`; retained as a reusable Legacy stabilization record. Local `main` is ahead of `origin/main`, so GitHub release/integration is not implied.
+
 > **For agentic workers:** 实施本 plan 时，REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans。按 Task 顺序执行，并使用 checkbox (`- [ ]`) 跟踪进度。
 
 **Goal:** 在不改变 Legacy CLI、Manifest v1 schema、flat artifact layout 和纯本地 ComfyUI 路径的前提下，修复 terminal failed Attempt 持久化、真实 last-frame dependency 的 resume stale propagation，并固化 source-generation FPS 与 delivery-normalization FPS 的 Legacy 兼容语义。
@@ -12,9 +14,11 @@
 
 ## Implementation Authority
 
-本文件只是 P1 implementation plan，**不授权实施**。开始修改 `src/`、`tests/` 或 `README.md` 前，必须获得用户对本 P1 plan 的单独明确批准。
+Historical note: 本文件最初只是一份 plan，实施前需要独立授权。该授权后的实现现已存在于本地 `main`；本文件不再授权追加 scope，也不拥有新的 Agent-first v0.2 主线。任何进一步 runtime 改动都必须进入新 roadmap 的独立 slice。
 
-P1 允许的未来实施路径仅限：
+下方 checkbox 和 future-tense step 保留原始 test/implementation design，不再代表 current completion status；current status 以顶部 commits、代码和 tests 为准。
+
+P1 当时获批的实施路径仅限：
 
 - `src/ai_video/manifest.py`
 - `src/ai_video/pipeline.py`
