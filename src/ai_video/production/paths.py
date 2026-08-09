@@ -411,6 +411,7 @@ def _copy_held_fd_to_regular_file_nofollow(
                 mode,
                 dir_fd=parent_descriptor,
             )
+            os.fchmod(descriptor, mode)
             os.lseek(source_fd, 0, os.SEEK_SET)
             copied = 0
             while chunk := os.read(source_fd, 1024 * 1024):
@@ -430,6 +431,7 @@ def _copy_held_fd_to_regular_file_nofollow(
                 not stat.S_ISREG(created.st_mode)
                 or not _same_file(created, current)
                 or created.st_size != copied
+                or stat.S_IMODE(created.st_mode) != mode
             ):
                 raise ValueError(
                     f"P3 verification copy failed same-file validation: {destination}"

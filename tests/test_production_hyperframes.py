@@ -44,6 +44,7 @@ from ai_video.production.models import (
     TransitionKind,
     TransitionSpec,
 )
+from ai_video.production.paths import _copy_held_fd_to_regular_file_nofollow
 
 
 FIXTURE_ROOT = Path(__file__).parent / "fixtures/hyperframes/silent_image"
@@ -1402,6 +1403,27 @@ def test_verification_path_swap_immediately_after_copy_yield_uses_created_fd(
     result = _adapter(tmp_path, FakeRunner()).render(attempt)
     assert result.output.verified_bytes == b"fake-mp4"
     assert attempt.verification_snapshot_path.read_bytes() == b"replacement"
+
+
+def test_verification_snapshot_is_exact_0600_despite_process_umask(tmp_path):
+    source = tmp_path / "source.mp4"
+    destination = tmp_path / "verified.mp4"
+    source.write_bytes(b"fake-mp4")
+
+    source_fd = os.open(source, os.O_RDONLY)
+    previous_umask = os.umask(0o777)
+    try:
+        with _copy_held_fd_to_regular_file_nofollow(
+            source_fd,
+            destination,
+            contained_by=tmp_path,
+            mode=0o600,
+        ) as verification:
+            assert os.stat(verification.fd).st_mode & 0o777 == 0o600
+        assert destination.stat().st_mode & 0o777 == 0o600
+    finally:
+        os.umask(previous_umask)
+        os.close(source_fd)
 
 
 def test_namespace_capability_failure_has_no_host_fallback(tmp_path, monkeypatch):
