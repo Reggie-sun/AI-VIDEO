@@ -556,8 +556,6 @@ class ProductionStateCommitter:
         )
         if attempt is None or not self._same_render_begin(attempt, request):
             raise _state_invalid("Render replay does not match its persisted attempt.")
-        if not manifest.attempts or manifest.attempts[-1] != attempt:
-            raise _state_invalid("Render replay attempt is no longer terminal state.")
         if attempt.status is StateCommitStatus.FAILED:
             if manifest.active_render_state != attempt.base_render_state:
                 raise _state_invalid("Failed render replay base state changed.")
@@ -882,7 +880,10 @@ class ProductionStateCommitter:
                 if final_replaced:
                     raise _outcome_unknown(exc) from exc
                 primary = _as_state_error(exc)
-                authoritative = self._read_manifest()
+                try:
+                    authoritative = self._read_manifest()
+                except Exception as reopen_error:
+                    raise _outcome_unknown(reopen_error) from reopen_error
                 current_attempt = next(
                     (
                         item

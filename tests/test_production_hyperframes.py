@@ -64,6 +64,7 @@ from ai_video.production.state_commit import (
     BeginRenderAttemptRequest,
     CommitPhase,
     ProductionStateCommitter,
+    RecordRenderFailureRequest,
     StateCommitRequest,
     prepare_project_registry_commit,
 )
@@ -2244,6 +2245,96 @@ def test_same_pair_commit_retains_only_fully_verified_render_state(tmp_path):
     assert retained.active_render_state == activated.active_render_state
 
 
+def test_success_replay_after_same_pair_commit_returns_current_manifest_without_runner(
+    tmp_path,
+):
+    _, committer, activation = _prepared_activation_request(
+        tmp_path, "success-before-same-pair", versioned_pair=True
+    )
+    activated = committer.activate_render_state(activation)
+    retained = committer.commit(
+        _same_pair_request(tmp_path, activated, "same-pair-after-success")
+    )
+    begin_request = BeginRenderAttemptRequest(
+        activation.expected_manifest_revision - 1,
+        activation.base_render_state,
+        activation.renderer_selection,
+    )
+    manifest_path = tmp_path / "state/manifest.json"
+    manifest_bytes = manifest_path.read_bytes()
+    runner_calls = 0
+
+    def forbidden_runner():
+        nonlocal runner_calls
+        runner_calls += 1
+        raise AssertionError("historical success replay must not construct a runner")
+
+    replay = _call_fake_render(
+        tmp_path,
+        request=begin_request,
+        timeline=make_resolved_timeline(),
+        browser=tmp_path / "tools/chrome",
+        ip_path=tmp_path / "tools/ip",
+        runner_factory=forbidden_runner,
+        committer=committer,
+    )
+
+    assert replay == retained
+    assert replay.active_render_state == activated.active_render_state
+    assert replay.manifest_revision == retained.manifest_revision
+    assert manifest_path.read_bytes() == manifest_bytes
+    assert runner_calls == 0
+
+
+def test_failed_replay_after_same_pair_commit_returns_current_base_manifest(
+    tmp_path,
+):
+    _, committer, activation = _prepared_activation_request(
+        tmp_path, "failed-before-same-pair", versioned_pair=True
+    )
+    failed = committer.record_render_failure(
+        RecordRenderFailureRequest(
+            attempt_id=activation.attempt_id,
+            expected_manifest_revision=activation.expected_manifest_revision,
+            current_project=activation.current_project,
+            current_registry=activation.current_registry,
+            base_render_state=activation.base_render_state,
+            renderer_selection=activation.renderer_selection,
+            phase="render",
+            error_code=ErrorCode.RENDER_FAILED.value,
+            error_message="expected render failure",
+        )
+    )
+    retained = committer.commit(
+        _same_pair_request(tmp_path, failed, "same-pair-after-failure")
+    )
+    begin_request = BeginRenderAttemptRequest(
+        activation.expected_manifest_revision - 1,
+        activation.base_render_state,
+        activation.renderer_selection,
+    )
+    runner_calls = 0
+
+    def forbidden_runner():
+        nonlocal runner_calls
+        runner_calls += 1
+        raise AssertionError("historical failure replay must not construct a runner")
+
+    replay = _call_fake_render(
+        tmp_path,
+        request=begin_request,
+        timeline=make_resolved_timeline(),
+        browser=tmp_path / "tools/chrome",
+        ip_path=tmp_path / "tools/ip",
+        runner_factory=forbidden_runner,
+        committer=committer,
+    )
+
+    assert replay == retained
+    assert replay.active_render_state is None
+    assert runner_calls == 0
+
+
 def test_same_pair_commit_rejects_tampered_render_without_manifest_mutation(tmp_path):
     _, committer, activation = _prepared_activation_request(
         tmp_path, "same-pair-tamper", versioned_pair=True
@@ -3095,12 +3186,35 @@ def test_candidate_ambiguity_mixed_r2_fails_closed_without_terminal_overwrite(
     with pytest.raises(AiVideoError) as exc_info:
         committer.activate_render_state(request)
 
-    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
     raw = json.loads((tmp_path / "state/manifest.json").read_text(encoding="utf-8"))
     assert raw["active_render_state"] == request.next_render_state.model_dump(
         mode="json"
     )
     assert raw["attempts"][-1]["status"] == StateCommitStatus.RUNNING.value
+
+
+def test_final_ambiguity_malformed_authoritative_manifest_is_outcome_unknown(
+    tmp_path,
+):
+    _, committer, request = _prepared_activation_request(
+        tmp_path, "final-malformed-manifest"
+    )
+    original = committer._write_render_manifest_atomic
+
+    def corrupt_final_then_raise(manifest, *, candidate, on_replace):
+        original(manifest, candidate=candidate, on_replace=on_replace)
+        if not candidate:
+            (tmp_path / "state/manifest.json").write_text("{", encoding="utf-8")
+            raise OSError("final authoritative manifest became unreadable")
+
+    committer._write_render_manifest_atomic = corrupt_final_then_raise  # type: ignore[method-assign]
+
+    with pytest.raises(AiVideoError) as exc_info:
+        committer.activate_render_state(request)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert (tmp_path / "state/manifest.json").read_text(encoding="utf-8") == "{"
 
 
 def test_recovery_resolves_candidate_prepared_render_by_exact_old_triple_and_preserves_orphans(
