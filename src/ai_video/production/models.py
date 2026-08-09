@@ -344,6 +344,8 @@ class StateCommitAttempt(StrictModel):
     operation: str = Field(min_length=1)
     status: StateCommitStatus
     base_manifest_revision: int = Field(ge=1)
+    base_project: ProjectSnapshotPointer
+    base_registry: RegistrySnapshotPointer
     candidate_project: ProjectSnapshotPointer | None = None
     candidate_registry: RegistrySnapshotPointer | None = None
     candidate_artifacts_hash: str = Field(pattern=r"^[0-9a-f]{64}$")

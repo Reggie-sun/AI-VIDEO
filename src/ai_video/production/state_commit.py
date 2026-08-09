@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import re
+import stat
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -19,9 +20,13 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     AssetRegistrySnapshot,
+    LoadedProductionProject,
     ProductionManifest,
     ProductionProject,
     ProjectSnapshotPointer,
+    RecoveryDisposition,
+    RecoveryItem,
+    RecoveryReport,
     RegistrySnapshotPointer,
     StateCommitAttempt,
     StateCommitStatus,
@@ -122,6 +127,10 @@ def _state_invalid(message: str, detail: str | None = None) -> AiVideoError:
 
 def _state_commit_failed(message: str, detail: str | None = None) -> AiVideoError:
     return _state_error(ErrorCode.PRODUCTION_STATE_COMMIT_FAILED, message, detail)
+
+
+def _state_recovery_failed(message: str, detail: str | None = None) -> AiVideoError:
+    return _state_error(ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED, message, detail)
 
 
 def _state_unsupported(message: str, detail: str | None = None) -> AiVideoError:
@@ -405,6 +414,439 @@ class ProductionStateCommitter:
                 exc.add_note("Production state outcome may be committed or unknown.")
             raise
 
+    def recover(self) -> RecoveryReport:
+        """Repair interrupted P2A attempts without selecting unreferenced snapshots."""
+        try:
+            return self._recover_locked()
+        except AiVideoError as exc:
+            if exc.code in {
+                ErrorCode.PRODUCTION_STATE_BUSY,
+                ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED,
+            }:
+                raise
+            raise _state_recovery_failed(
+                "Could not recover production state.", exc.technical_detail or str(exc)
+            ) from exc
+        except Exception as exc:
+            raise _state_recovery_failed("Could not recover production state.", str(exc)) from exc
+
+    def _recover_locked(self) -> RecoveryReport:
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            revision_before = manifest.manifest_revision
+            items = list(self._active_recovery_items(manifest))
+            attempts, changed, interrupted_items = self._recover_attempts(manifest)
+
+            items.extend(self._remove_fixed_manifest_temp())
+            if changed:
+                manifest = _validated_transition(
+                    manifest,
+                    {
+                        "manifest_revision": manifest.manifest_revision + 1,
+                        "attempts": tuple(attempts),
+                    },
+                )
+                self._write_manifest_atomic(manifest)
+            items.extend(interrupted_items)
+            items.extend(self._remove_owned_attempt_temps(attempts))
+            items.extend(self._preserved_orphan_items(manifest, attempts))
+            return RecoveryReport(
+                manifest_revision_before=revision_before,
+                manifest_revision_after=manifest.manifest_revision,
+                items=tuple(items),
+            )
+
+    def _active_recovery_items(self, manifest: ProductionManifest) -> tuple[RecoveryItem, ...]:
+        project_path = self._validate_recovery_project_pointer(manifest.active_project)
+        registry_path = self._validate_recovery_registry_pointer(manifest.active_registry)
+        project_hash = self._require_recovery_file_hash(
+            project_path, manifest.active_project.file_sha256
+        )
+        registry_hash = self._require_recovery_file_hash(
+            registry_path, manifest.active_registry.file_sha256
+        )
+        bundle = load_production_project_candidate(
+            self._project_root,
+            manifest,
+            manifest.active_project.path,
+            manifest.active_registry.path,
+        )
+        self._require_loaded_pointer_identity(
+            bundle, manifest.active_project, manifest.active_registry
+        )
+        self._require_recovery_file_hash(project_path, manifest.active_project.file_sha256)
+        self._require_recovery_file_hash(registry_path, manifest.active_registry.file_sha256)
+        return (
+            RecoveryItem(
+                path=manifest.active_project.path,
+                disposition=RecoveryDisposition.ACTIVE,
+                sha256=project_hash,
+            ),
+            RecoveryItem(
+                path=manifest.active_registry.path,
+                disposition=RecoveryDisposition.ACTIVE,
+                sha256=registry_hash,
+            ),
+        )
+
+    def _recover_attempts(
+        self, manifest: ProductionManifest
+    ) -> tuple[list[StateCommitAttempt], bool, list[RecoveryItem]]:
+        repaired: list[StateCommitAttempt] = []
+        items: list[RecoveryItem] = []
+        changed = False
+        for attempt in manifest.attempts:
+            if attempt.status not in {
+                StateCommitStatus.RUNNING,
+                StateCommitStatus.OUTCOME_UNKNOWN,
+            }:
+                repaired.append(attempt)
+                continue
+            if attempt.candidate_project is None or attempt.candidate_registry is None:
+                raise _state_invalid("Incomplete production state attempt has no candidate snapshots.")
+            self._validate_recovery_project_pointer(attempt.candidate_project)
+            self._validate_recovery_registry_pointer(attempt.candidate_registry)
+            self._validate_recovery_project_pointer(attempt.base_project)
+            self._validate_recovery_registry_pointer(attempt.base_registry)
+            active_pair = (manifest.active_project, manifest.active_registry)
+            candidate_pair = (attempt.candidate_project, attempt.candidate_registry)
+            base_pair = (attempt.base_project, attempt.base_registry)
+            if active_pair == candidate_pair:
+                replacement = _validated_transition(
+                    attempt,
+                    {
+                        "status": StateCommitStatus.SUCCEEDED,
+                        "finished_at": _timestamp(),
+                        "error_code": None,
+                        "error_message": None,
+                    },
+                )
+            elif active_pair != base_pair:
+                raise _state_invalid(
+                    "Production Manifest selects a mixed interrupted state commit pair."
+                )
+            else:
+                replacement = _validated_transition(
+                    attempt,
+                    {
+                        "status": StateCommitStatus.INTERRUPTED,
+                        "finished_at": _timestamp(),
+                        "error_code": ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN.value,
+                        "error_message": "Production state attempt was interrupted before selecting its candidate snapshots.",
+                    },
+                )
+                items.append(
+                    RecoveryItem(
+                        path=attempt.candidate_project.path,
+                        disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
+                    )
+                )
+            repaired.append(replacement)
+            changed = True
+        return repaired, changed, items
+
+    def _remove_fixed_manifest_temp(self) -> tuple[RecoveryItem, ...]:
+        return self._remove_recovery_temp(self._state_directory() / ".p2a-manifest.tmp")
+
+    def _remove_owned_attempt_temps(
+        self, attempts: list[StateCommitAttempt]
+    ) -> tuple[RecoveryItem, ...]:
+        items: list[RecoveryItem] = []
+        paths: set[Path] = set()
+        for attempt in attempts:
+            if attempt.status is StateCommitStatus.SUCCEEDED:
+                continue
+            if attempt.candidate_project is not None:
+                project_path = self._validate_recovery_project_pointer(attempt.candidate_project)
+                paths.add(project_path.parent / _owned_temp_name(attempt.attempt_id, project_path))
+            if attempt.candidate_registry is not None:
+                registry_path = self._validate_recovery_registry_pointer(attempt.candidate_registry)
+                paths.add(registry_path.parent / _owned_temp_name(attempt.attempt_id, registry_path))
+        for path in sorted(paths):
+            items.extend(self._remove_recovery_temp(path))
+        return tuple(items)
+
+    def _remove_recovery_temp(self, path: Path) -> tuple[RecoveryItem, ...]:
+        self._validate_cleanup_temp_path(path)
+        try:
+            digest, file_stat = self._recovery_file_digest(path)
+            self._unlink_recovery_file(path, file_stat)
+        except FileNotFoundError:
+            return ()
+        except OSError as exc:
+            raise _state_commit_failed("Could not remove production recovery temporary file.", str(exc)) from exc
+        return (
+            RecoveryItem(
+                path=path.relative_to(self._project_root),
+                disposition=RecoveryDisposition.PARTIAL_REMOVED,
+                sha256=digest,
+            ),
+        )
+
+    def _preserved_orphan_items(
+        self, manifest: ProductionManifest, attempts: list[StateCommitAttempt]
+    ) -> tuple[RecoveryItem, ...]:
+        items: dict[Path, RecoveryItem] = {}
+        for item in self._attempt_orphan_pair_items(manifest, attempts):
+            items[item.path] = item
+        for item in self._project_orphan_items(manifest):
+            items.setdefault(item.path, item)
+        for item in self._registry_orphan_items(manifest):
+            items.setdefault(item.path, item)
+        return tuple(items[path] for path in sorted(items))
+
+    def _attempt_orphan_pair_items(
+        self, manifest: ProductionManifest, attempts: list[StateCommitAttempt]
+    ) -> tuple[RecoveryItem, ...]:
+        items: list[RecoveryItem] = []
+        seen_pairs: set[tuple[ProjectSnapshotPointer, RegistrySnapshotPointer]] = set()
+        for attempt in attempts:
+            if attempt.status is StateCommitStatus.SUCCEEDED:
+                continue
+            if attempt.candidate_project is None or attempt.candidate_registry is None:
+                continue
+            pair = (attempt.candidate_project, attempt.candidate_registry)
+            if pair in seen_pairs or pair == (manifest.active_project, manifest.active_registry):
+                continue
+            seen_pairs.add(pair)
+            try:
+                project_path = self._validate_recovery_project_pointer(pair[0])
+                registry_path = self._validate_recovery_registry_pointer(pair[1])
+                project_hash = self._require_recovery_file_hash(
+                    project_path, pair[0].file_sha256
+                )
+                registry_hash = self._require_recovery_file_hash(
+                    registry_path, pair[1].file_sha256
+                )
+                bundle = load_production_project_candidate(
+                    self._project_root, manifest, pair[0].path, pair[1].path
+                )
+                self._require_loaded_pointer_identity(bundle, pair[0], pair[1])
+                self._require_recovery_file_hash(project_path, pair[0].file_sha256)
+                self._require_recovery_file_hash(registry_path, pair[1].file_sha256)
+            except (AiVideoError, OSError):
+                continue
+            for path, digest in ((pair[0].path, project_hash), (pair[1].path, registry_hash)):
+                if path in {manifest.active_project.path, manifest.active_registry.path}:
+                    continue
+                items.append(
+                    RecoveryItem(
+                        path=path,
+                        disposition=RecoveryDisposition.ORPHAN_PRESERVED,
+                        sha256=digest,
+                    )
+                )
+        return tuple(items)
+
+    def _project_orphan_items(self, manifest: ProductionManifest) -> tuple[RecoveryItem, ...]:
+        directory = self._project_root / "state/projects"
+        pattern = re.compile(r"^project\.(?P<revision>[1-9][0-9]*)\.(?P<hash>[0-9a-f]{64})\.yaml$")
+        items: list[RecoveryItem] = []
+        for path, match in self._recovery_namespace_entries(directory, pattern):
+            relative = path.relative_to(self._project_root)
+            if relative == manifest.active_project.path:
+                continue
+            try:
+                pointer = ProjectSnapshotPointer(
+                    path=relative,
+                    revision=int(match.group("revision")),
+                    content_hash=match.group("hash"),
+                    file_sha256=self._recovery_file_digest(path)[0],
+                )
+                bundle = load_production_project_candidate(
+                    self._project_root,
+                    manifest,
+                    pointer.path,
+                    manifest.active_registry.path,
+                )
+                self._require_loaded_pointer_identity(
+                    bundle, pointer, manifest.active_registry
+                )
+                self._require_recovery_file_hash(path, pointer.file_sha256)
+            except (AiVideoError, OSError):
+                continue
+            items.append(
+                RecoveryItem(
+                    path=relative,
+                    disposition=RecoveryDisposition.ORPHAN_PRESERVED,
+                    sha256=pointer.file_sha256,
+                )
+            )
+        return tuple(items)
+
+    def _registry_orphan_items(self, manifest: ProductionManifest) -> tuple[RecoveryItem, ...]:
+        directory = self._project_root / "assets"
+        pattern = re.compile(r"^registry\.(?P<hash>[0-9a-f]{64})\.json$")
+        items: list[RecoveryItem] = []
+        for path, match in self._recovery_namespace_entries(directory, pattern):
+            relative = path.relative_to(self._project_root)
+            if relative == manifest.active_registry.path:
+                continue
+            try:
+                pointer = RegistrySnapshotPointer(
+                    path=relative,
+                    revision_id=match.group("hash"),
+                    content_hash=match.group("hash"),
+                    file_sha256=self._recovery_file_digest(path)[0],
+                )
+                bundle = load_production_project_candidate(
+                    self._project_root,
+                    manifest,
+                    manifest.active_project.path,
+                    pointer.path,
+                )
+                self._require_loaded_pointer_identity(
+                    bundle, manifest.active_project, pointer
+                )
+                self._require_recovery_file_hash(path, pointer.file_sha256)
+            except (AiVideoError, OSError):
+                continue
+            items.append(
+                RecoveryItem(
+                    path=relative,
+                    disposition=RecoveryDisposition.ORPHAN_PRESERVED,
+                    sha256=pointer.file_sha256,
+                )
+            )
+        return tuple(items)
+
+    def _recovery_namespace_entries(
+        self, directory: Path, pattern: re.Pattern[str]
+    ) -> tuple[tuple[Path, re.Match[str]], ...]:
+        entries: list[tuple[Path, re.Match[str]]] = []
+        try:
+            with self._recovery_directory_descriptor(directory) as descriptor:
+                for name in os.listdir(descriptor):
+                    match = pattern.fullmatch(name)
+                    if match is not None:
+                        entries.append((directory / name, match))
+        except FileNotFoundError:
+            return ()
+        except OSError as exc:
+            raise _state_invalid("Production recovery namespace could not be inspected.", str(exc)) from exc
+        return tuple(sorted(entries, key=lambda item: item[0].name))
+
+    @contextmanager
+    def _recovery_directory_descriptor(self, directory: Path) -> Iterator[int]:
+        relative = directory.relative_to(self._project_root)
+        self._validate_relative_components(relative)
+        flags = os.O_RDONLY | getattr(os, "O_DIRECTORY", 0) | getattr(os, "O_NOFOLLOW", 0)
+        descriptors: list[int] = []
+        primary: BaseException | None = None
+        try:
+            descriptors.append(os.open(self._project_root, flags))
+            for component in relative.parts:
+                descriptors.append(os.open(component, flags, dir_fd=descriptors[-1]))
+            if not stat.S_ISDIR(os.fstat(descriptors[-1]).st_mode):
+                raise _state_invalid("Production recovery namespace must be a directory.", str(directory))
+            yield descriptors[-1]
+        except BaseException as exc:
+            primary = exc
+            raise
+        finally:
+            self._close_recovery_descriptors(primary, descriptors)
+
+    @contextmanager
+    def _recovery_file_descriptor(
+        self, parent_descriptor: int, name: str
+    ) -> Iterator[int]:
+        descriptor: int | None = None
+        primary: BaseException | None = None
+        try:
+            descriptor = os.open(
+                name,
+                os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0),
+                dir_fd=parent_descriptor,
+            )
+            yield descriptor
+        except BaseException as exc:
+            primary = exc
+            raise
+        finally:
+            self._close_recovery_descriptors(primary, (descriptor,))
+
+    @staticmethod
+    def _close_recovery_descriptors(
+        primary: BaseException | None, descriptors: tuple[int | None, ...] | list[int]
+    ) -> None:
+        cleanup_errors: list[BaseException] = []
+        for descriptor in reversed(descriptors):
+            if descriptor is None:
+                continue
+            try:
+                os.close(descriptor)
+            except BaseException as cleanup_error:
+                cleanup_errors.append(cleanup_error)
+        _handle_cleanup_errors(
+            primary,
+            cleanup_errors,
+            label="Production recovery descriptor cleanup",
+            no_primary_message="Could not close production recovery file descriptors.",
+        )
+
+    def _recovery_file_digest(self, path: Path) -> tuple[str, os.stat_result]:
+        self._validate_cleanup_temp_path(path)
+        with self._recovery_directory_descriptor(path.parent) as parent_descriptor:
+            with self._recovery_file_descriptor(parent_descriptor, path.name) as file_descriptor:
+                file_stat = os.fstat(file_descriptor)
+                if not stat.S_ISREG(file_stat.st_mode):
+                    raise _state_invalid("Production recovery path must be a regular file.", str(path))
+                digest = hashlib.sha256()
+                while chunk := os.read(file_descriptor, 1024 * 1024):
+                    digest.update(chunk)
+                current = os.stat(path.name, dir_fd=parent_descriptor, follow_symlinks=False)
+                if (current.st_dev, current.st_ino) != (file_stat.st_dev, file_stat.st_ino):
+                    raise _state_invalid("Production recovery path changed during inspection.", str(path))
+                return digest.hexdigest(), file_stat
+
+    def _unlink_recovery_file(self, path: Path, expected: os.stat_result) -> None:
+        with self._recovery_directory_descriptor(path.parent) as parent_descriptor:
+            current = os.stat(path.name, dir_fd=parent_descriptor, follow_symlinks=False)
+            if (current.st_dev, current.st_ino) != (expected.st_dev, expected.st_ino):
+                raise _state_invalid("Production recovery path changed before cleanup.", str(path))
+            os.unlink(path.name, dir_fd=parent_descriptor)
+
+    def _require_recovery_file_hash(self, path: Path, expected_hash: str) -> str:
+        actual_hash, _ = self._recovery_file_digest(path)
+        if actual_hash != expected_hash:
+            raise _state_invalid("Production recovery snapshot hash is invalid.", str(path))
+        return actual_hash
+
+    @staticmethod
+    def _require_loaded_pointer_identity(
+        bundle: LoadedProductionProject,
+        project_pointer: ProjectSnapshotPointer,
+        registry_pointer: RegistrySnapshotPointer,
+    ) -> None:
+        project = bundle.project
+        registry = bundle.registry
+        if (
+            project.revision != project_pointer.revision
+            or project.content_hash != project_pointer.content_hash
+        ):
+            raise _state_invalid("Production recovery project snapshot pointer is invalid.")
+        if (
+            registry.revision_id != registry_pointer.revision_id
+            or registry.content_hash != registry_pointer.content_hash
+        ):
+            raise _state_invalid("Production recovery registry snapshot pointer is invalid.")
+
+    def _validate_recovery_project_pointer(self, pointer: ProjectSnapshotPointer) -> Path:
+        path = pointer.path
+        if path != Path("project.yaml") and not (
+            len(path.parts) == 3 and path.parts[:2] == ("state", "projects")
+        ):
+            raise _state_invalid("Production recovery project snapshot path is unsafe.")
+        self._validate_relative_components(path)
+        return self._project_root / path
+
+    def _validate_recovery_registry_pointer(self, pointer: RegistrySnapshotPointer) -> Path:
+        path = pointer.path
+        if len(path.parts) != 2 or path.parts[0] != "assets":
+            raise _state_invalid("Production recovery registry snapshot path is unsafe.")
+        self._validate_relative_components(path)
+        return self._project_root / path
+
     def _commit_locked(
         self, request: StateCommitRequest, final_manifest_replaced: list[bool]
     ) -> ProductionManifest:
@@ -428,6 +870,8 @@ class ProductionStateCommitter:
                 operation=request.operation,
                 status=StateCommitStatus.RUNNING,
                 base_manifest_revision=manifest.manifest_revision,
+                base_project=manifest.active_project,
+                base_registry=manifest.active_registry,
                 candidate_project=request.next_project,
                 candidate_registry=request.next_registry,
                 candidate_artifacts_hash=candidate_artifacts_hash,
@@ -795,3 +1239,18 @@ class ProductionStateCommitter:
             raise
         except OSError as exc:
             raise _state_commit_failed("Could not verify production artifact filesystem.", str(exc)) from exc
+
+
+def recover_production_state(project_root: str | Path) -> RecoveryReport:
+    """Explicitly recover P2A state after an interrupted process."""
+    try:
+        return ProductionStateCommitter(project_root).recover()
+    except AiVideoError as exc:
+        if exc.code in {
+            ErrorCode.PRODUCTION_STATE_BUSY,
+            ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED,
+        }:
+            raise
+        raise _state_recovery_failed(
+            "Could not recover production state.", exc.technical_detail or str(exc)
+        ) from exc

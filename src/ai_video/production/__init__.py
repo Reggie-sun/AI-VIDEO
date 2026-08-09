@@ -26,6 +26,7 @@ from ai_video.production.state_commit import (
     ProductionStateCommitter,
     StateCommitRequest,
     prepare_project_registry_commit,
+    recover_production_state,
 )
 
 __all__ = [
@@ -54,4 +55,5 @@ __all__ = [
     "VisualStrategy",
     "load_production_project",
     "prepare_project_registry_commit",
+    "recover_production_state",
 ]

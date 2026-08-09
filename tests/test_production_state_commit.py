@@ -1087,6 +1087,8 @@ def test_commit_persists_running_attempt_before_artifacts_and_keeps_pointers(
     assert after.active_project == before.active_project
     assert after.active_registry == before.active_registry
     assert after.attempts[-1].status is StateCommitStatus.FAILED
+    assert after.attempts[-1].base_project == before.active_project
+    assert after.attempts[-1].base_registry == before.active_registry
     assert after.attempts[-1].candidate_artifacts_hash == state_commit._candidate_artifacts_hash(
         revision_two_request(committed_project).artifacts
     )

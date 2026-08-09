@@ -164,9 +164,54 @@ def test_state_attempt_rejects_unknown_fallback_pointer():
                 "operation": "commit_project_registry",
                 "status": "running",
                 "base_manifest_revision": 1,
+                "base_project": make_project_pointer().model_dump(mode="python"),
+                "base_registry": make_registry_pointer().model_dump(mode="python"),
                 "candidate_artifacts_hash": ZERO_HASH,
                 "started_at": "2026-08-09T00:00:00+00:00",
                 "fallback_manifest": "state/manifest.backup.json",
+            }
+        )
+
+
+def test_state_attempt_requires_base_snapshot_pair():
+    with pytest.raises(ValidationError, match="base_project"):
+        StateCommitAttempt(
+            attempt_id="attempt-1",
+            operation="commit_project_registry",
+            status=StateCommitStatus.RUNNING,
+            base_manifest_revision=1,
+            candidate_artifacts_hash=ZERO_HASH,
+            started_at="2026-08-09T00:00:00+00:00",
+        )
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="commit_project_registry",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        started_at="2026-08-09T00:00:00+00:00",
+    )
+    with pytest.raises(ValidationError, match="Instance is frozen"):
+        attempt.base_project = make_project_pointer()  # type: ignore[misc]
+
+
+def test_state_attempt_base_snapshot_pointers_must_be_clean():
+    with pytest.raises(ValidationError, match="clean and project-relative"):
+        StateCommitAttempt.model_validate(
+            {
+                "attempt_id": "attempt-1",
+                "operation": "commit_project_registry",
+                "status": "running",
+                "base_manifest_revision": 1,
+                "base_project": {
+                    **make_project_pointer().model_dump(mode="json"),
+                    "path": "state/../project.yaml",
+                },
+                "base_registry": make_registry_pointer().model_dump(mode="json"),
+                "candidate_artifacts_hash": ZERO_HASH,
+                "started_at": "2026-08-09T00:00:00+00:00",
             }
         )
 
@@ -186,6 +231,8 @@ def test_terminal_state_attempts_require_sanitized_typed_error_fields(status):
             operation="commit_project_registry",
             status=status,
             base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
             candidate_artifacts_hash=ZERO_HASH,
             started_at="2026-08-09T00:00:00+00:00",
             finished_at="2026-08-09T00:00:01+00:00",
@@ -199,6 +246,8 @@ def test_succeeded_state_attempt_requires_finished_at():
             operation="commit_project_registry",
             status=StateCommitStatus.SUCCEEDED,
             base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
             candidate_artifacts_hash=ZERO_HASH,
             started_at="2026-08-09T00:00:00+00:00",
         )
@@ -210,6 +259,8 @@ def test_production_manifest_rejects_duplicate_attempt_ids():
         operation="commit_project_registry",
         status=StateCommitStatus.RUNNING,
         base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
         candidate_artifacts_hash=ZERO_HASH,
         started_at="2026-08-09T00:00:00+00:00",
     )
@@ -291,6 +342,8 @@ def test_running_state_attempt_rejects_terminal_fields(contradictory_fields):
             operation="commit_project_registry",
             status=StateCommitStatus.RUNNING,
             base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
             candidate_artifacts_hash=ZERO_HASH,
             started_at="2026-08-09T00:00:00+00:00",
             **contradictory_fields,
@@ -304,6 +357,8 @@ def test_succeeded_state_attempt_rejects_error_fields():
             operation="commit_project_registry",
             status=StateCommitStatus.SUCCEEDED,
             base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
             candidate_artifacts_hash=ZERO_HASH,
             started_at="2026-08-09T00:00:00+00:00",
             finished_at="2026-08-09T00:00:01+00:00",
@@ -319,6 +374,8 @@ def test_state_attempt_requires_immutable_canonical_artifact_set_hash():
         operation="commit_project_registry",
         status=StateCommitStatus.RUNNING,
         base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
         candidate_artifacts_hash=artifact_hash,
         started_at="2026-08-09T00:00:00+00:00",
     )
@@ -332,6 +389,8 @@ def test_state_attempt_requires_immutable_canonical_artifact_set_hash():
             operation="commit_project_registry",
             status=StateCommitStatus.RUNNING,
             base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
             candidate_artifacts_hash="INVALID",
             started_at="2026-08-09T00:00:00+00:00",
         )
