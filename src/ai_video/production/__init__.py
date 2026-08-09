@@ -13,6 +13,7 @@ from ai_video.production.models import (
     Storyboard,
     VisualStrategy,
 )
+from ai_video.production.project import load_production_project
 
 __all__ = [
     "ArtifactReference",
@@ -28,4 +29,5 @@ __all__ = [
     "Story",
     "Storyboard",
     "VisualStrategy",
+    "load_production_project",
 ]
