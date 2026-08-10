@@ -11,12 +11,14 @@ import subprocess
 import wave
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_EVEN
+from io import BytesIO
 from pathlib import Path
 
 import pytest
 import ai_video.production as production
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.captions import caption_timing_fingerprint
 from ai_video.production.composition import resolve_composition, timeline_fingerprint
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.hyperframes import (
@@ -43,6 +45,7 @@ from ai_video.production.models import (
     DeliveryProfile,
     FixedTransform,
     AudioKind,
+    CaptionTrack,
     MeasuredAudioRenderMetadata,
     RendererIdentity,
     RendererKind,
@@ -278,6 +281,160 @@ def test_p4_source_materializes_exact_audio_caption_and_style_bindings(tmp_path)
     assert "data-caption-track-id" in source
     assert "http://" not in source and "https://" not in source
     assert "Remotion" not in source and "Captions.ai" not in source
+
+
+def test_p4_canonical_caption_text_may_contain_urls_and_code_like_terms(tmp_path):
+    _, _, timeline, sources = _p4_resolved_inputs(tmp_path)
+    caption_id = timeline.caption_cues[0].caption_asset_id
+    caption_path = sources[caption_id]
+    track = CaptionTrack.model_validate_json(caption_path.read_bytes())
+    texts = (
+        "Visit https://example.com and call fetch(",
+        "Date.now( is caption text, not executable code",
+    )
+    provisional = track.model_copy(
+        update={
+            "content_hash": "0" * 64,
+            "transcript_hash": hashlib.sha256(" ".join(texts).encode()).hexdigest(),
+            "timing_fingerprint": "0" * 64,
+            "segments": tuple(
+                segment.model_copy(update={"text": text})
+                for segment, text in zip(track.segments, texts, strict=True)
+            ),
+        }
+    )
+    provisional = provisional.model_copy(
+        update={"timing_fingerprint": caption_timing_fingerprint(provisional)}
+    )
+    track = CaptionTrack.model_validate(
+        seal_artifact(provisional).model_dump(mode="python")
+    )
+    caption_bytes = json.dumps(
+        track.model_dump(mode="json"),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    caption_path.write_bytes(caption_bytes)
+    caption_sha256 = hashlib.sha256(caption_bytes).hexdigest()
+    timeline = _reseal_timeline(
+        timeline,
+        caption_cues=tuple(
+            cue.model_copy(
+                update={
+                    "caption_asset_sha256": caption_sha256,
+                    "caption_timing_fingerprint": track.timing_fingerprint,
+                    "text": text,
+                }
+            )
+            for cue, text in zip(timeline.caption_cues, texts, strict=True)
+        ),
+    )
+
+    result = materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "caption-text-source",
+        allowed_staging_parent=tmp_path,
+    )
+
+    html = result.index_path.read_text(encoding="utf-8")
+    assert all(text in html for text in texts)
+    assert _parse_source_document(html).forbidden_text is False
+
+
+def _materialize_single_gain_fixture(
+    tmp_path, *, gain_millidb: int, sample: int, name: str
+):
+    payload_buffer = BytesIO()
+    with wave.open(payload_buffer, "wb") as output:
+        output.setnchannels(1)
+        output.setsampwidth(2)
+        output.setframerate(24)
+        output.writeframes(struct.pack("<h", sample))
+    payload = payload_buffer.getvalue()
+    audio_path = tmp_path / f"{name}.wav"
+    audio_path.write_bytes(payload)
+    base = make_resolved_timeline()
+    timeline = _reseal_timeline(
+        base,
+        schema_version="2.1",
+        sample_rate=24,
+        total_samples=1,
+        audio_spans=(
+            ResolvedAudioSpan(
+                track_id="gain",
+                audio_kind=AudioKind.BGM,
+                asset_id="gain-audio",
+                asset_sha256=hashlib.sha256(payload).hexdigest(),
+                start_sample=0,
+                duration_samples=1,
+                source_start_sample=0,
+                source_duration_samples=1,
+                gain_millidb=gain_millidb,
+                fade_in_samples=0,
+                fade_out_samples=0,
+            ),
+        ),
+    )
+    sources = make_asset_sources(tmp_path / name, timeline)
+    sources["gain-audio"] = audio_path
+    return materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / f"{name}-source",
+        allowed_staging_parent=tmp_path,
+    )
+
+
+@pytest.mark.parametrize(
+    ("gain_millidb", "sample", "expected"),
+    [
+        (-96_000, 32_767, 1),
+        (24_000, 1_000, 15_849),
+        (1, 10_000, 10_001),
+    ],
+)
+def test_p4_gain_boundaries_and_half_even_conversion_are_deterministic(
+    tmp_path, gain_millidb, sample, expected
+):
+    first = _materialize_single_gain_fixture(
+        tmp_path, gain_millidb=gain_millidb, sample=sample, name="first"
+    )
+    second = _materialize_single_gain_fixture(
+        tmp_path, gain_millidb=gain_millidb, sample=sample, name="second"
+    )
+    assert (
+        first.audio_bindings[0].asset_sha256
+        == second.audio_bindings[0].asset_sha256
+    )
+    with wave.open(
+        str(first.root / first.audio_bindings[0].materialized_path), "rb"
+    ) as mixed:
+        assert struct.unpack("<2h", mixed.readframes(1)) == (expected, expected)
+
+
+@pytest.mark.parametrize("gain_millidb", [-10**9, 10**9])
+def test_p4_gain_outside_adapter_range_is_typed_before_staging_write(
+    tmp_path, gain_millidb
+):
+    name = f"rejected-{gain_millidb}"
+    staging = tmp_path / f"{name}-source"
+
+    error = _assert_source_invalid(
+        lambda: _materialize_single_gain_fixture(
+            tmp_path,
+            gain_millidb=gain_millidb,
+            sample=1_000,
+            name=name,
+        )
+    )
+
+    assert error.retryable is False
+    assert "-96000..24000" in (error.technical_detail or error.user_message)
+    assert not staging.exists()
 
 
 @pytest.mark.parametrize(
@@ -865,13 +1022,25 @@ def test_source_audit_rejects_structural_url_timing_and_animation_drift(
 
 
 @pytest.mark.parametrize(
-    "forbidden",
-    ["http://", "//cdn.invalid", "fetch(", "XMLHttpRequest", "WebSocket(", "Math.random(", "Date.now(", "new Date(", "performance.now("],
+    "injection",
+    [
+        '<a href="http://example.invalid">remote</a>',
+        '<img src="//cdn.invalid/remote.png">',
+        '<script>fetch("/remote")</script>',
+        '<script>new XMLHttpRequest()</script>',
+        '<script>new WebSocket("ws://example.invalid")</script>',
+        '<script>Math.random()</script>',
+        '<script>Date.now()</script>',
+        '<script>new Date()</script>',
+        '<script>performance.now()</script>',
+        '<div onload="fetch(&quot;/remote&quot;)"></div>',
+        '<style>.evil{width:expression(fetch("/remote"))}</style>',
+    ],
 )
-def test_source_audit_rejects_network_and_wall_clock_inputs(tmp_path, forbidden):
+def test_source_audit_rejects_network_and_executable_contexts(tmp_path, injection):
     result = _materialize(tmp_path)
     source = result.index_path.read_text(encoding="utf-8").replace(
-        "</body>", f"<!-- {forbidden} --></body>"
+        "</body>", f"{injection}</body>"
     )
     result.index_path.write_text(source, encoding="utf-8")
     _assert_source_invalid(
@@ -2509,7 +2678,9 @@ def test_p4_production_renderer_gate_renders_resolved_audio_and_captions(
     assert source.schema_version == "2.1"
     assert source.audio_bindings and source.caption_bindings
     assert render.schema_version == "2.1" and render.measured.audio is not None
-    assert render.decoded_audio_fingerprint is not None
+    assert render.decoded_audio_fingerprint == (
+        "47edbfaeec35832e86120b65e2a8c311baa755aa40df04e7be4b9411c627dae5"
+    )
     assert "ffmpeg=" in render.measured.audio.measurement_method
     assert "ffprobe=" in render.measured.audio.measurement_method
     evidence(

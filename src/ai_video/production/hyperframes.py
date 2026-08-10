@@ -13,7 +13,13 @@ from io import BytesIO
 from collections.abc import Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
-from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_EVEN
+from decimal import (
+    Decimal,
+    DecimalException,
+    ROUND_FLOOR,
+    ROUND_HALF_EVEN,
+    localcontext,
+)
 from html import escape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -93,17 +99,9 @@ _URL_PATTERN = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.IGNORECASE)
 _IMPORT_PATTERN = re.compile(
     r"@import\s+(?:url\(\s*)?(['\"]?)([^'\"\s;)]+)\1", re.IGNORECASE
 )
-_FORBIDDEN_TEXT = (
-    "http://",
-    "https://",
-    "//cdn.",
-    "fetch(",
-    "XMLHttpRequest",
-    "WebSocket(",
-    "Math.random(",
-    "Date.now(",
-    "new Date(",
-    "performance.now(",
+_CSS_EXECUTABLE_PATTERN = re.compile(
+    r"(?i)(?:\bexpression\s*\(|(?:^|[;{])\s*behavior\s*:|"
+    r"(?:^|[;{])\s*-moz-binding\s*:)"
 )
 
 
@@ -311,6 +309,12 @@ def _parse_source_document(source: str) -> _ParsedSourceDocument:
         imports.extend(match[1] for match in _IMPORT_PATTERN.findall(style))
         parser.all_urls.update(match[1] for match in _URL_PATTERN.findall(style))
     lowered = source.lower()
+    forbidden_runtime_context = any(
+        bool(urlsplit(value.strip()).scheme)
+        or bool(urlsplit(value.strip()).netloc)
+        or value.strip().startswith("//")
+        for value in parser.all_urls
+    ) or any(_CSS_EXECUTABLE_PATTERN.search(style) for style in parser.styles)
     return _ParsedSourceDocument(
         stage_attributes=parser.stage_attributes[0],
         clip_attributes=tuple(parser.clip_attributes),
@@ -324,7 +328,10 @@ def _parse_source_document(source: str) -> _ParsedSourceDocument:
             parser.external_styles_or_fonts or "@font-face" in lowered
         ),
         has_event_handler=parser.has_event_handler,
-        forbidden_text=any(token.lower() in lowered for token in _FORBIDDEN_TEXT),
+        # Caption/data text is inert and remains part of the exact document model.
+        # Only URL-bearing or executable CSS contexts are classified here; script
+        # tags and event handlers are tracked independently by the parser.
+        forbidden_text=forbidden_runtime_context,
     )
 
 
@@ -469,18 +476,31 @@ def _sample_seconds(samples: int, sample_rate: int) -> str:
     return rendered.rstrip("0").rstrip(".") or "0"
 
 
-def _gain_volume(gain_millidb: int) -> str:
-    value = Decimal(str(math.pow(10.0, gain_millidb / 20_000.0)))
-    rendered = format(value.quantize(Decimal("0.000000001")), "f")
-    return rendered.rstrip("0").rstrip(".") or "0"
-
-
 _MIX_SCALE = 1_000_000
+_MIN_GAIN_MILLIDB = -96_000
+_MAX_GAIN_MILLIDB = 24_000
 
 
 def _fixed_gain(gain_millidb: int) -> int:
-    value = Decimal(str(math.pow(10.0, gain_millidb / 20_000.0)))
-    return int((value * _MIX_SCALE).to_integral_value(rounding=ROUND_HALF_EVEN))
+    """Convert the adapter-supported -96..+24 dB range to fixed-point gain."""
+
+    if not _MIN_GAIN_MILLIDB <= gain_millidb <= _MAX_GAIN_MILLIDB:
+        raise _source_invalid(
+            "Audio gain is outside the P4 renderer adapter range.",
+            f"supported gain_millidb range is {_MIN_GAIN_MILLIDB}..{_MAX_GAIN_MILLIDB}",
+        )
+    try:
+        with localcontext() as context:
+            context.prec = 50
+            context.rounding = ROUND_HALF_EVEN
+            exponent = Decimal(gain_millidb) / Decimal(20_000)
+            scaled = (Decimal(10) ** exponent) * Decimal(_MIX_SCALE)
+            return int(scaled.to_integral_value(rounding=ROUND_HALF_EVEN))
+    except (DecimalException, OverflowError, ValueError) as exc:
+        raise _source_invalid(
+            "Audio gain could not be converted deterministically.",
+            f"supported gain_millidb range is {_MIN_GAIN_MILLIDB}..{_MAX_GAIN_MILLIDB}",
+        ) from exc
 
 
 def _multiply_fixed(left: int, right: int) -> int:
