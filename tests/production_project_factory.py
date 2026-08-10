@@ -63,7 +63,11 @@ def _ref(model: object, path: str) -> ArtifactReference:
     )
 
 
-def write_production_project(root: Path) -> Path:
+def write_production_project(
+    root: Path,
+    *,
+    extra_assets: tuple[AssetRecord, ...] = (),
+) -> Path:
     provenance = (SourceReference(kind="user_input", reference="brief-input-1"),)
     brief = seal_artifact(
         ProductionBrief(
@@ -181,10 +185,19 @@ def write_production_project(root: Path) -> Path:
         creation_receipt_id="receipt-image-hero-1",
         usage_license="test-only",
     )
+    registry_schema_version = (
+        "2.1"
+        if any(
+            item.audio_metadata is not None or item.caption_metadata is not None
+            for item in extra_assets
+        )
+        else "2.0"
+    )
     registry = AssetRegistrySnapshot(
+        schema_version=registry_schema_version,
         revision_id=ZERO_HASH,
         content_hash=ZERO_HASH,
-        assets=(asset,),
+        assets=(asset, *extra_assets),
     )
     registry_hash = registry_semantic_sha256(registry)
     registry = registry.model_copy(

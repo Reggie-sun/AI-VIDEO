@@ -76,6 +76,25 @@ def canonical_render_attempt_root(attempt_id: str) -> Path:
     return Path(f"state/render/attempts/{_require_attempt_id(attempt_id)}")
 
 
+def canonical_voice_attempt_root(project_root: Path, attempt_id: str) -> Path:
+    project_root = Path(project_root)
+    if not project_root.is_absolute() or ".." in project_root.parts:
+        raise ValueError("Voice project root must be a clean absolute path.")
+    return project_root / "state/voice/attempts" / _require_attempt_id(attempt_id)
+
+
+def canonical_voice_audio_candidate_path(project_root: Path, attempt_id: str) -> Path:
+    """Return the single audio staging path owned by a voice attempt."""
+
+    return canonical_voice_attempt_root(project_root, attempt_id) / "candidate.wav"
+
+
+def canonical_audio_asset_path(file_sha256: str) -> Path:
+    return Path(
+        f"assets/audio/{_require_sha256(file_sha256, 'audio file hash')}.wav"
+    )
+
+
 def resolve_contained_path(
     project_root: Path,
     stored: Path,
@@ -450,6 +469,72 @@ def _create_regular_file_nofollow(
             )
         finally:
             os.close(descriptor)
+
+
+def _materialize_immutable_regular_file_nofollow(
+    path: Path,
+    *,
+    data: bytes,
+    contained_by: Path,
+    mode: int = 0o600,
+) -> NoFollowFile:
+    """Atomically publish immutable bytes without following any path symlink."""
+
+    path, root, relative = _contained_relative(path, contained_by)
+    if not relative.parts:
+        raise ValueError("Immutable file cannot be the containment root.")
+    digest = hashlib.sha256(data).hexdigest()
+    temporary = path.with_name(f".{path.name}.tmp-{digest}")
+
+    try:
+        created = _create_regular_file_nofollow(
+            temporary,
+            data=data,
+            contained_by=root,
+            mode=mode,
+        )
+    except FileExistsError:
+        created = _read_regular_file_nofollow(temporary, contained_by=root)
+        if created.file_sha256 != digest or created.data != data:
+            raise ValueError("Immutable temporary path has conflicting bytes.")
+
+    primary: BaseException | None = None
+    try:
+        with _open_directory_nofollow(path.parent, contained_by=root) as parent_fd:
+            try:
+                os.link(
+                    temporary.name,
+                    path.name,
+                    src_dir_fd=parent_fd,
+                    dst_dir_fd=parent_fd,
+                    follow_symlinks=False,
+                )
+            except FileExistsError:
+                existing = _read_regular_file_nofollow(path, contained_by=root)
+                if existing.file_sha256 != digest or existing.data != data:
+                    raise ValueError("Immutable target already has conflicting bytes.")
+            os.fsync(parent_fd)
+    except BaseException as exc:
+        primary = exc
+        raise
+    finally:
+        cleanup_error: BaseException | None = None
+        try:
+            with _open_directory_nofollow(path.parent, contained_by=root) as parent_fd:
+                try:
+                    os.unlink(temporary.name, dir_fd=parent_fd)
+                except FileNotFoundError:
+                    pass
+                os.fsync(parent_fd)
+        except BaseException as exc:
+            cleanup_error = exc
+        if primary is None and cleanup_error is not None:
+            raise cleanup_error
+
+    snapshot = _read_regular_file_nofollow(path, contained_by=root)
+    if snapshot.file_sha256 != digest or snapshot.data != data:
+        raise ValueError("Immutable target failed reopen verification.")
+    return snapshot
 
 
 @contextmanager
