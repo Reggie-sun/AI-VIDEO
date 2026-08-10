@@ -6,7 +6,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-The public CLI remains the local-first `0.1.x` surface described in this README. P2 is an importable, read-only Python API for strict Production Projects and content-addressed local assets. P2A owns v2 state commit and explicit recovery. The current P3 feature branch additionally implements the authorized deterministic composition and local HyperFrames render-state slice as a Python API; it adds no CLI command, remote Provider, Audio/Caption domain or dependency graph.
+公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3 deterministic composition 与 local HyperFrames rendering 已在 local `main` 验收；当前 feature branch 另包含已验收的 P4 Voice and Captions Python API。P4 不增加 CLI command、dependency graph、第二 renderer 或默认 remote Provider behavior。
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
@@ -15,10 +15,11 @@ The public CLI remains the local-first `0.1.x` surface described in this README.
 - Accepted P2 core plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p2-production-project-core.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p2-production-project-core.md)
 - Accepted P2A state commit plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p2a-production-state-commit-protocol.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p2a-production-state-commit-protocol.md)
 - Verified P3 composition plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p3-deterministic-composition-hyperframes-adapter.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p3-deterministic-composition-hyperframes-adapter.md)
+- Accepted P4 voice/caption plan: [`docs/superpowers/plans/2026-08-10-ai-video-agentic-production-harness-p4-voice-and-captions.md`](docs/superpowers/plans/2026-08-10-ai-video-agentic-production-harness-p4-voice-and-captions.md)
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-The public commands remain `validate`, `run`, and `resume`; Legacy generation remains ComfyUI-only and default-local, and Manifest v1 plus the flat Legacy artifact layout remain active. P2 and P2A are present on local `main`; P3 is verified on this feature branch only. None of these local commits has been pushed, released or published.
+公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P2/P2A 和 P3 已在 local `main`（`3296b713` 是 P3 fast-forward merge 结果）；P4 只在当前 feature branch 验收。这些 local changes 均未 push、release 或 publish。
 
 ## Setup
 
@@ -44,9 +45,9 @@ from ai_video.production import load_production_project
 project = load_production_project("projects/example/project.yaml")
 ```
 
-The path above is illustrative; this repository does not bundle that example project. The loader is read-only and no-network. It uses `project.yaml` as the stable validated entrypoint, then verifies the Production Manifest-selected project and registry snapshot paths, semantic identities and exact file hashes. It also validates sealed creative artifact references, six Shot `visual_strategy` contracts, concrete asset IDs/types, local file size/SHA-256 and project-root containment. For Manifest 2.1 it additionally verifies the selected P3 timeline/source/receipt/output/render-state graph without scanning, repairing or rewriting it. The root `project.yaml` is not the active snapshot bytes truth once P2A state exists.
+上面的路径仅为示意；仓库不包含该 example project。Loader 保持 read-only 和 no-network。它以 `project.yaml` 为 stable validated entrypoint，然后验证 Production Manifest 选中的 project/registry snapshot path、semantic identity 和 exact file hash；也验证 sealed creative artifact reference、六种 Shot `visual_strategy` contract、concrete asset ID/type、local file size/SHA-256 与 project-root containment。对 Manifest 2.1/2.2，它还会验证选中的 P3/P4 timeline、audio/caption provenance、source/receipt/output 与 render-state graph，但不会 scan、repair 或 rewrite。P2A state 存在后，root `project.yaml` 不是 active snapshot bytes truth。
 
-P2 itself does not create directories, update a Manifest or activate a registry revision. P2A owns all v2 state changes and remains separate from the reader. There is no v2 CLI, Audio/Caption domain, dependency graph, QA/repair flow, Remotion adapter or remote Provider integration.
+P2 本身不创建目录、不更新 Manifest，也不激活 registry revision。P2A 拥有全部 v2 state changes，并与 reader 保持分离。当前没有 v2 CLI、dependency graph、QA/repair flow、Remotion/Captions.ai adapter、Video Provider 或 cloud fallback。
 
 ## Production State Commit Protocol (P2A)
 
@@ -64,7 +65,17 @@ The renderer is exactly project-pinned `hyperframes@0.7.103` with the verified C
 
 `ProductionStateCommitter` remains the sole writer. It durably records selection before any executable call, owns source/output receipts and the canonical immutable `state/render/**` layout, and switches the single `active_render_state` pointer only after held-FD output verification. Manifest 2.0 remains readable; the first render lifecycle write migrates to 2.1. Changing the active project/registry pair clears the render pointer without deleting immutable evidence. Recovery compares the exact project/registry/render triple and preserves complete orphans.
 
-Default tests use fake runners and no network. The explicit committed-fixture proof rendered the same two-image `10`-frame `24fps` CUT timeline twice, verified frame 4 red and frame 5 blue, no audio, equal decoded-frame fingerprints, exact command lineage and fail-closed network traces. This is frame-equivalence evidence, not a byte-identical MP4 guarantee. P3 does not add Audio, Captions, selective rebuild, a new CLI or any cloud behavior.
+默认 P3 tests 使用 fake runner 且不联网。Explicit committed-fixture proof 将同一个 two-image `10`-frame `24fps` CUT timeline 渲染两次，验证 frame 4 为红色、frame 5 为蓝色、无 audio、decoded-frame fingerprint 相同、command lineage 精确且 network trace fail closed。这是 frame-equivalence evidence，不保证 MP4 byte-identical。P3 本身不增加 selective rebuild、新 CLI 或 cloud behavior；P4 扩展同一个 renderer contract，而不是增加另一个 renderer。
+
+## Voice and Captions (P4)
+
+P4 将 `dialogue`、`narration`、`ambience`、`sfx` 和 `bgm` 建模为 first-class audio kinds。Local import 与 immutable `VoiceGenerationRequest` flow 绑定 source、speaker/voice、language、script hash、duration、sample rate、channels、loudness、timing、gain/fade/ducking 和 provenance。Provider-neutral `VoiceAssetProvider` contract 要求先完成 deterministic budget/egress preview 与 authorization，P2A 才写 R+1 request 和 R+2 submit intent；只有 committer-issued one-use permit 能跨越 transport boundary。Materialized audio 经 probe、hash，并随 alignment、cost、policy/retention 与 provenance evidence 注册后，才进入 R+3 candidate preparation 与 R+4 activation。
+
+`CaptionTrack` 是 script/transcript identity、segments、optional words、half-open timing、speaker、segmentation policy、confidence/provider、style reference 与 timing fingerprint 的 canonical structured source，不会变成 burned-in pixel state。P4 用 audio spans 和 caption cues 扩展 `CompositionSpec` 与既有 `ResolvedTimeline`；该 timeline 继续是唯一 order/frame/sample/timing owner。Selected HyperFrames renderer 拥有 caption layout/drawing 和 deterministic audio mixing/muxing。
+
+`ProductionStateCommitter` 仍是唯一 v2 writer 和 recovery owner。成功的 P4 lifecycle write 使用 Manifest 2.2 与 Registry 2.1，Composition/ResolvedTimeline 则保持 forward-compatible 2.1 extensions。R+1/R+2/R+3/R+4 crash windows、`outcome_unknown`、explicit recovery、rollback 与 idempotent replay 都 fail closed：replay 不再次调用 provider 或 renderer，也不存在 schema downgrade 或 automatic recovery。
+
+默认 acceptance 使用 deterministic local fixtures、fake providers/transports 且不联网。`ai_video.production.elevenlabs` 是 thin explicit-opt-in candidate，并且有意不从 package root 导出。P4 acceptance 未进行 ElevenLabs live call、secret 读取、SDK installation，也未使用免费或付费 quota。Live call 即使使用免费额度，也需要单独授权，并重新通过 budget、egress、secret-redaction 与 crash-safe persistence gates。P4 只为未来 P5 暴露 fingerprints 和 dependency inputs；不实现 dependency graph 或 selective rebuild。
 
 ## Development MCP
 
