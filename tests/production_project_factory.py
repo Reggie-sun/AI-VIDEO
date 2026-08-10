@@ -5,6 +5,7 @@ import io
 import json
 import struct
 import threading
+from datetime import date
 import wave
 from pathlib import Path
 
@@ -37,6 +38,7 @@ from ai_video.production.models import (
     CompositionSpec,
     DeliveryProfile,
     DurationPolicy,
+    EgressMetadata,
     ProductionBrief,
     ProductionManifest,
     ProductionProject,
@@ -59,8 +61,178 @@ from ai_video.production.models import (
 )
 from ai_video.production.project import load_production_project
 from ai_video.production.registry import registry_semantic_sha256
+from ai_video.production.paths import canonical_audio_asset_path
 
 ZERO_HASH = "0" * 64
+
+
+def make_voice_request(root: Path, *, attempt_id: str = "voice-attempt-1"):
+    from ai_video.production.audio import VoiceGenerationRequest, VoiceProviderParameters
+
+    manifest = ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    return VoiceGenerationRequest.create(
+        request_id=f"request-{attempt_id}",
+        attempt_id=attempt_id,
+        provider_kind="fake",
+        model_id="fixture-model",
+        audio_kind=AudioKind.DIALOGUE,
+        script_text="Exact script",
+        speaker_id="speaker-1",
+        voice_id="voice-1",
+        language="en",
+        output_container="wav",
+        output_codec="pcm_s16le",
+        output_sample_rate_hz=48_000,
+        output_channels=1,
+        provider_parameters=VoiceProviderParameters(stability_milli=500),
+        base_project=manifest.active_project,
+        base_registry=manifest.active_registry,
+        input_artifact_ids=("shot-1",),
+        input_fingerprint="1" * 64,
+        pricing_snapshot_id="fixture-pricing",
+        budget_reservation_receipt_id="budget-1",
+        egress_authorization_receipt_id="egress-1",
+    )
+
+
+def make_voice_preview_and_authorization(request):
+    from ai_video.production.audio import (
+        VoiceCallAuthorization,
+        VoicePricingSnapshot,
+        build_voice_generation_preview,
+    )
+
+    pricing = VoicePricingSnapshot(
+        snapshot_id=request.pricing_snapshot_id,
+        effective_date=date(2026, 8, 10),
+        currency="USD",
+        pricing_unit="character",
+        unit_price_microunits=1,
+        minimum_billable_units=1,
+    )
+    preview = build_voice_generation_preview(
+        request,
+        pricing=pricing,
+        destination="https://api.fixture.invalid",
+        credential_reference_kind="environment",
+        timing_supported=True,
+        output_supported=True,
+    )
+    authorization = VoiceCallAuthorization.create(
+        request_fingerprint=request.voice_request_fingerprint,
+        preview_fingerprint=preview.preview_fingerprint,
+        pricing_snapshot_id=request.pricing_snapshot_id,
+        budget_reservation_receipt_id=request.budget_reservation_receipt_id,
+        egress_authorization_receipt_id=request.egress_authorization_receipt_id,
+        destination=preview.destination,
+        payload_categories=preview.payload_categories,
+        cost_ceiling_microunits=preview.estimated_cost_upper_bound_microunits,
+        provider_enabled=True,
+    )
+    return preview, authorization
+
+
+def make_voice_activation_request(
+    root: Path,
+    request,
+    authorization,
+    *,
+    expected_manifest_revision: int,
+):
+    from ai_video.production.state_commit import PreparedArtifact, prepare_audio_registry_commit
+
+    project, current = load_initial_models(root)
+    payload = (Path(__file__).parent / "fixtures/voice_captions/dialogue-mono-48000.wav").read_bytes()
+    digest = hashlib.sha256(payload).hexdigest()
+    with wave.open(io.BytesIO(payload), "rb") as handle:
+        duration_samples = handle.getnframes()
+    audio_id = f"voice-{request.attempt_id}"
+    record = AssetRecord(
+        asset_id=audio_id,
+        asset_type=AssetType.VOICE,
+        artifact_path=canonical_audio_asset_path(digest),
+        sha256=digest,
+        size_bytes=len(payload),
+        mime_type="audio/wav",
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fake-provider", version="1"),
+        input_artifact_ids=request.input_artifact_ids,
+        input_fingerprint=request.input_fingerprint,
+        creation_receipt_id=f"creation-{request.attempt_id}",
+        usage_license="fixture-only",
+        egress=EgressMetadata(
+            remote=True,
+            destination=authorization.destination,
+            authorization_receipt_id=request.egress_authorization_receipt_id,
+            request_fingerprint=request.voice_request_fingerprint,
+            payload_fingerprint=request.script_hash,
+            retention_mode="zero_retention",
+            provider_policy_snapshot_id="fixture-policy",
+        ),
+        cost_receipt_id=f"cost-{request.attempt_id}",
+        audio_metadata=AudioAssetMetadata(
+            audio_kind=request.audio_kind,
+            source=AudioSource(
+                kind=AssetSourceKind.GENERATED,
+                provider_or_tool=ToolIdentity(name="fake-provider", version="1"),
+                input_artifact_ids=request.input_artifact_ids,
+                input_fingerprint=request.input_fingerprint,
+            ),
+            speaker_id=request.speaker_id,
+            voice_id=request.voice_id,
+            language=request.language,
+            script_hash=request.script_hash,
+            duration_samples=duration_samples,
+            sample_rate_hz=request.output_sample_rate_hz,
+            channels=request.output_channels,
+            channel_layout=AudioChannelLayout.MONO,
+            codec_name="pcm_s16le",
+            loudness=AudioLoudnessMetadata(),
+            provenance_receipt_id=f"provenance-{request.attempt_id}",
+            alignment_receipt_id=f"alignment-{request.attempt_id}",
+        ),
+    )
+    candidate = AssetRegistrySnapshot(
+        schema_version="2.1",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=current.assets + (record,),
+    )
+    revision = registry_semantic_sha256(candidate)
+    candidate = candidate.model_copy(
+        update={"revision_id": revision, "content_hash": revision}
+    )
+    artifact = PreparedArtifact(
+        relative_path=record.artifact_path,
+        payload=payload,
+        file_sha256=digest,
+    )
+    manifest = ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    commit = prepare_audio_registry_commit(
+        manifest=manifest.model_copy(update={"manifest_revision": expected_manifest_revision}),
+        project=project,
+        base_registry=current,
+        registry=candidate,
+        attempt_id=request.attempt_id,
+        artifacts=(artifact,),
+        active_project_artifact=PreparedArtifact(
+            relative_path=manifest.active_project.path,
+            payload=(root / manifest.active_project.path).read_bytes(),
+            file_sha256=manifest.active_project.file_sha256,
+        ),
+    )
+    return commit.__class__(
+        attempt_id=commit.attempt_id,
+        operation="voice_generation",
+        expected_manifest_revision=expected_manifest_revision,
+        artifacts=commit.artifacts,
+        next_project=commit.next_project,
+        next_registry=commit.next_registry,
+    ), (audio_id,)
 
 
 class _TestVoiceSubmitPermit:

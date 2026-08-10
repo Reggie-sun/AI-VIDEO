@@ -99,6 +99,26 @@ def canonical_voice_audio_candidate_path(project_root: Path, attempt_id: str) ->
     return canonical_voice_attempt_root(project_root, attempt_id) / "candidate.wav"
 
 
+def canonical_voice_attempt_artifact_path(
+    project_root: Path, attempt_id: str, name: str
+) -> Path:
+    """Return one fixed lifecycle artifact path under an owned voice attempt."""
+
+    allowed = {
+        "request.json",
+        "preview.json",
+        "authorization.json",
+        "submit-intent.json",
+        "alignment.json",
+        "cost.json",
+        "provenance.json",
+        "outcome.json",
+    }
+    if name not in allowed:
+        raise ValueError("Voice attempt artifact name is not canonical.")
+    return canonical_voice_attempt_root(project_root, attempt_id) / name
+
+
 def canonical_audio_asset_path(file_sha256: str) -> Path:
     return Path(
         f"assets/audio/{_require_sha256(file_sha256, 'audio file hash')}.wav"

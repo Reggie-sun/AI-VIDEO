@@ -21,7 +21,12 @@ from ai_video.production.state_commit import (  # noqa: E402
     ProductionStateCommitter,
 )
 from ai_video.production.hyperframes import _render_with_hyperframes  # noqa: E402
-from production_project_factory import make_revision_two_request  # noqa: E402
+from production_project_factory import (  # noqa: E402
+    make_revision_two_request,
+    make_voice_activation_request,
+    make_voice_preview_and_authorization,
+    make_voice_request,
+)
 from test_production_hyperframes import (  # noqa: E402
     FakeRunner,
     make_asset_sources,
@@ -100,6 +105,52 @@ def main() -> int:
                 os.pread(fd, os.fstat(fd).st_size, 0)
             ).hexdigest(),
         )
+        return 0
+    if len(sys.argv) > 4 and sys.argv[4] == "voice":
+        request = make_voice_request(root, attempt_id="voice-process-crash")
+        preview, authorization = make_voice_preview_and_authorization(request)
+        injector = ExitInjector(phase, occurrence)
+        if phase is CommitPhase.AFTER_VOICE_PROVIDER_RESULT:
+            class _Provider:
+                def preview(self, candidate):
+                    return preview
+
+                def generate(self, candidate, candidate_authorization, permit):
+                    binding = {
+                        "attempt_id": candidate.attempt_id,
+                        "request_fingerprint": candidate.voice_request_fingerprint,
+                        "authorization_fingerprint": candidate_authorization.authorization_fingerprint,
+                        "destination": candidate_authorization.destination,
+                        "budget_reservation_receipt_id": candidate_authorization.budget_reservation_receipt_id,
+                        "egress_authorization_receipt_id": candidate_authorization.egress_authorization_receipt_id,
+                    }
+                    if not permit._consume_voice_submit_permit(**binding):
+                        raise AssertionError("voice worker permit was not consumable")
+                    return object()
+
+            def prepare(*_args):
+                activation, audio_ids = make_voice_activation_request(
+                    root, request, authorization, expected_manifest_revision=3
+                )
+                return activation, audio_ids, ()
+
+            ProductionStateCommitter(
+                root,
+                crash_injector=injector,
+                voice_candidate_preparer=prepare,
+            ).generate_voice_asset(request, _Provider(), authorization)
+            return 0
+        writer = ProductionStateCommitter(root, crash_injector=injector)
+        writer.begin_voice_generation(request, preview, authorization)
+        writer.record_voice_submit_intent(request, preview, authorization)
+        if phase in {
+            CommitPhase.AFTER_VOICE_CANDIDATE_MANIFEST,
+            CommitPhase.AFTER_VOICE_FINAL_MANIFEST_REPLACE,
+        }:
+            activation, audio_ids = make_voice_activation_request(
+                root, request, authorization, expected_manifest_revision=3
+            )
+            writer.activate_voice_assets(activation, audio_asset_ids=audio_ids)
         return 0
     request = make_revision_two_request(root)
     ProductionStateCommitter(

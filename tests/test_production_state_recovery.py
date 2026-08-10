@@ -52,6 +52,106 @@ def _write_manifest(root: Path, manifest: ProductionManifest) -> None:
     )
 
 
+def test_recovery_marks_r1_voice_interrupted_without_submit(
+    committed_project: Path,
+) -> None:
+    request = project_factory.make_voice_request(committed_project)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(committed_project)
+    writer.begin_voice_generation(request, preview, authorization)
+
+    report = writer.recover()
+    recovered = _read_manifest(committed_project)
+
+    assert report.manifest_revision_after == 3
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+    assert recovered.attempts[-1].voice_phase == "request"
+
+
+def test_recovery_marks_r2_voice_outcome_unknown_and_never_remints(
+    committed_project: Path,
+) -> None:
+    request = project_factory.make_voice_request(committed_project)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(committed_project)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+
+    writer.recover()
+    recovered = _read_manifest(committed_project)
+
+    assert recovered.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert recovered.attempts[-1].voice_phase == "submit_intent"
+    with pytest.raises(AiVideoError):
+        writer.record_voice_submit_intent(request, preview, authorization)
+
+
+def test_recovery_preserves_r3_voice_candidate_for_explicit_activation(
+    committed_project: Path,
+) -> None:
+    class _CrashAfterCandidate:
+        def checkpoint(self, phase: CommitPhase) -> None:
+            if phase is CommitPhase.AFTER_VOICE_CANDIDATE_MANIFEST:
+                raise RuntimeError("fixture crash after R+3")
+
+    request = project_factory.make_voice_request(committed_project)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(committed_project)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        committed_project, request, authorization, expected_manifest_revision=3
+    )
+    crashing = ProductionStateCommitter(
+        committed_project, crash_injector=_CrashAfterCandidate()
+    )
+    with pytest.raises(RuntimeError, match=r"R\+3"):
+        crashing.activate_voice_assets(activation, audio_asset_ids=audio_ids)
+
+    crashing.recover()
+    recovered = _read_manifest(committed_project)
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+    assert recovered.attempts[-1].voice_phase == "candidate"
+    activated = ProductionStateCommitter(committed_project).activate_voice_assets(
+        activation, audio_asset_ids=audio_ids
+    )
+    assert activated.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+@pytest.mark.parametrize(
+    ("phase", "expected_status"),
+    (
+        (CommitPhase.BEFORE_VOICE_SUBMIT_INTENT, StateCommitStatus.INTERRUPTED),
+        (CommitPhase.AFTER_VOICE_SUBMIT_INTENT, StateCommitStatus.OUTCOME_UNKNOWN),
+        (CommitPhase.AFTER_VOICE_PROVIDER_RESULT, StateCommitStatus.OUTCOME_UNKNOWN),
+        (CommitPhase.AFTER_VOICE_CANDIDATE_MANIFEST, StateCommitStatus.INTERRUPTED),
+        (CommitPhase.AFTER_VOICE_FINAL_MANIFEST_REPLACE, StateCommitStatus.SUCCEEDED),
+    ),
+)
+def test_voice_process_crash_recovery_never_blind_resubmits(
+    committed_project: Path,
+    phase: CommitPhase,
+    expected_status: StateCommitStatus,
+) -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            phase.value,
+            "1",
+            "voice",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+
+    ProductionStateCommitter(committed_project).recover()
+    recovered = _read_manifest(committed_project)
+    assert recovered.attempts[-1].status is expected_status
+
+
 @pytest.fixture
 def committed_project(tmp_path: Path) -> Path:
     project_factory.write_production_project(tmp_path)
@@ -176,7 +276,9 @@ def _selected_incomplete_with_project_temp(
             CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
         })
         for phase in CommitPhase
-        if not phase.value.startswith(("before_render_", "after_render_"))
+        if not phase.value.startswith(
+            ("before_render_", "after_render_", "before_voice_", "after_voice_")
+        )
         for occurrence in (
             (1, 2)
             if phase in {
