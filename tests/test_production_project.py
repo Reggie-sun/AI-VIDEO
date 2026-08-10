@@ -367,7 +367,6 @@ def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None
         VoiceCostReceipt,
         VoiceGenerationPreview,
         VoiceProvenanceReceipt,
-        VoiceProviderResult,
     )
 
     paths = ProductionStateCommitter(root).voice_attempt_paths(request.attempt_id)
@@ -385,6 +384,12 @@ def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None
     result_authorization_fingerprint = authorization.authorization_fingerprint
     if mutation == "pricing_snapshot":
         cost = cost.model_copy(update={"pricing_snapshot_id": "wrong-pricing"})
+    elif mutation == "cost_currency":
+        cost = cost.model_copy(update={"currency": "EUR"})
+    elif mutation == "measured_units":
+        cost = cost.model_copy(
+            update={"measured_billable_units": preview.billable_units_upper_bound + 1}
+        )
     elif mutation == "estimated_cost":
         cost = cost.model_copy(
             update={
@@ -414,6 +419,18 @@ def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None
         result_preview_fingerprint = "d" * 64
     elif mutation == "authorization_fingerprint":
         result_authorization_fingerprint = "c" * 64
+    elif mutation == "output_sample_rate":
+        provenance = provenance.model_copy(
+            update={"output_sample_rate_hz": request.output_sample_rate_hz + 1}
+        )
+    elif mutation == "output_channels":
+        provenance = provenance.model_copy(
+            update={"output_channels": 2 if request.output_channels == 1 else 1}
+        )
+    elif mutation == "output_container":
+        provenance = provenance.model_copy(update={"output_container": "mp3"})
+    elif mutation == "output_codec":
+        provenance = provenance.model_copy(update={"output_codec": "mp3"})
     else:
         field, value = {
             "provider_kind": ("provider_kind", "wrong-provider"),
@@ -451,24 +468,6 @@ def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None
         "authorization_fingerprint": result_authorization_fingerprint,
     }
     result_fingerprint = canonical_sha256(fingerprint_payload)
-    VoiceProviderResult(
-        request_id=result_request_id,
-        request_fingerprint=result_request_fingerprint,
-        audio_bytes=(root / audio_record.artifact_path).read_bytes(),
-        audio_sha256=audio_record.sha256,
-        content_type=audio_record.mime_type,
-        provider_request_id=outcome["provider_request_id"],
-        provider_trace_id=outcome["provider_trace_id"],
-        alignment_receipt_bytes=alignment,
-        alignment_receipt_sha256=hashlib.sha256(alignment).hexdigest(),
-        cost_receipt=cost,
-        provenance_receipt=provenance,
-        terminal_status="succeeded",
-        preview_fingerprint=result_preview_fingerprint,
-        authorization_fingerprint=result_authorization_fingerprint,
-        result_fingerprint=result_fingerprint,
-    )
-
     def canonical_model_bytes(model) -> bytes:
         return (
             json.dumps(
@@ -940,12 +939,18 @@ def test_reader_rejects_generated_voice_resealed_as_local_egress(tmp_path):
     "mutation",
     [
         "pricing_snapshot",
+        "cost_currency",
+        "measured_units",
         "estimated_cost",
         "reported_cost_ceiling",
         "result_request_id",
         "result_request_fingerprint",
         "preview_fingerprint",
         "authorization_fingerprint",
+        "output_sample_rate",
+        "output_channels",
+        "output_container",
+        "output_codec",
         "provider_kind",
         "model_id",
         "voice_id",
