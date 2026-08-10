@@ -128,6 +128,7 @@ class NoFollowFile:
     mode: int
     device: int
     inode: int
+    link_count: int
 
 
 @dataclass(frozen=True)
@@ -396,6 +397,7 @@ def _read_regular_file_nofollow(path: Path, *, contained_by: Path) -> NoFollowFi
             mode=final.st_mode,
             device=final.st_dev,
             inode=final.st_ino,
+            link_count=final.st_nlink,
         )
 
 
@@ -456,6 +458,7 @@ def _create_regular_file_nofollow(
                 not stat.S_ISREG(created.st_mode)
                 or not _same_file(created, current)
                 or created.st_size != len(data)
+                or created.st_nlink != 1
             ):
                 raise ValueError(f"P3 created file failed validation: {path}")
             os.fsync(parent_descriptor)
@@ -466,6 +469,7 @@ def _create_regular_file_nofollow(
                 mode=created.st_mode,
                 device=created.st_dev,
                 inode=created.st_ino,
+                link_count=created.st_nlink,
             )
         finally:
             os.close(descriptor)
@@ -495,8 +499,12 @@ def _materialize_immutable_regular_file_nofollow(
         )
     except FileExistsError:
         created = _read_regular_file_nofollow(temporary, contained_by=root)
-        if created.file_sha256 != digest or created.data != data:
-            raise ValueError("Immutable temporary path has conflicting bytes.")
+        if (
+            created.file_sha256 != digest
+            or created.data != data
+            or created.link_count != 1
+        ):
+            raise ValueError("Immutable temporary path is conflicting or hard-linked.")
 
     primary: BaseException | None = None
     try:
@@ -511,8 +519,14 @@ def _materialize_immutable_regular_file_nofollow(
                 )
             except FileExistsError:
                 existing = _read_regular_file_nofollow(path, contained_by=root)
-                if existing.file_sha256 != digest or existing.data != data:
-                    raise ValueError("Immutable target already has conflicting bytes.")
+                if (
+                    existing.file_sha256 != digest
+                    or existing.data != data
+                    or existing.link_count != 1
+                ):
+                    raise ValueError(
+                        "Immutable target is conflicting or hard-linked."
+                    )
             os.fsync(parent_fd)
     except BaseException as exc:
         primary = exc
@@ -532,7 +546,11 @@ def _materialize_immutable_regular_file_nofollow(
             raise cleanup_error
 
     snapshot = _read_regular_file_nofollow(path, contained_by=root)
-    if snapshot.file_sha256 != digest or snapshot.data != data:
+    if (
+        snapshot.file_sha256 != digest
+        or snapshot.data != data
+        or snapshot.link_count != 1
+    ):
         raise ValueError("Immutable target failed reopen verification.")
     return snapshot
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import fcntl
 import json
 import os
 import shutil
@@ -245,6 +246,68 @@ def test_materialization_is_idempotent_for_same_bytes_and_conflicts_otherwise(tm
     assert candidate.read_bytes() == AMBIENCE.read_bytes()
 
 
+def test_same_byte_target_hardlink_is_rejected_before_replay(tmp_path):
+    project_root = tmp_path / "project"
+    attempt_root = project_root / "state/voice/attempts/attempt-hardlink-target"
+    attempt_root.mkdir(parents=True)
+    candidate = canonical_voice_audio_candidate_path(
+        project_root, "attempt-hardlink-target"
+    )
+    candidate.write_bytes(AMBIENCE.read_bytes())
+    external_alias = tmp_path / "external-target-alias.wav"
+    os.link(candidate, external_alias)
+    assert candidate.stat().st_nlink == 2
+
+    with pytest.raises(AiVideoError) as caught:
+        materialize_audio_candidate(
+            AMBIENCE.read_bytes(),
+            candidate_path=candidate,
+            project_root=project_root,
+            attempt_id="attempt-hardlink-target",
+        )
+
+    assert caught.value.code is ErrorCode.AUDIO_ASSET_INVALID
+    assert candidate.stat().st_nlink == 2
+    candidate.unlink()
+    accepted = materialize_audio_candidate(
+        AMBIENCE.read_bytes(),
+        candidate_path=candidate,
+        project_root=project_root,
+        attempt_id="attempt-hardlink-target",
+    )
+    external_alias.write_bytes(DIALOGUE.read_bytes())
+    assert accepted.link_count == 1
+    assert candidate.read_bytes() == AMBIENCE.read_bytes()
+
+
+def test_preexisting_candidate_temp_hardlink_is_rejected(tmp_path):
+    project_root = tmp_path / "project"
+    attempt_root = project_root / "state/voice/attempts/attempt-hardlink-temp"
+    attempt_root.mkdir(parents=True)
+    payload = AMBIENCE.read_bytes()
+    candidate = canonical_voice_audio_candidate_path(
+        project_root, "attempt-hardlink-temp"
+    )
+    digest = hashlib.sha256(payload).hexdigest()
+    temporary = attempt_root / f".candidate.wav.tmp-{digest}"
+    temporary.write_bytes(payload)
+    external_alias = tmp_path / "external-temp-alias.wav"
+    os.link(temporary, external_alias)
+
+    with pytest.raises(AiVideoError) as caught:
+        materialize_audio_candidate(
+            payload,
+            candidate_path=candidate,
+            project_root=project_root,
+            attempt_id="attempt-hardlink-temp",
+        )
+
+    assert caught.value.code is ErrorCode.AUDIO_ASSET_INVALID
+    assert not candidate.exists()
+    assert temporary.stat().st_nlink == 2
+    assert external_alias.read_bytes() == payload
+
+
 def test_probe_freezes_samples_channels_pcm_hash_and_loudness():
     with AMBIENCE.open("rb") as source:
         probe = probe_audio_candidate(
@@ -380,6 +443,51 @@ def test_probe_binds_tool_reads_to_held_fd_during_path_replacement(tmp_path):
     assert hashlib.sha256(source_path.read_bytes()).hexdigest() != probe.file_sha256
 
 
+def test_probe_uses_private_snapshot_against_mutation_restore(tmp_path):
+    source_path = tmp_path / "source.wav"
+    dialogue_bytes = DIALOGUE.read_bytes()
+    ambience_bytes = AMBIENCE.read_bytes()
+    assert len(dialogue_bytes) == len(ambience_bytes)
+    source_path.write_bytes(dialogue_bytes)
+    original_stat = source_path.stat()
+    calls = 0
+    tool_snapshot_stats: list[os.stat_result] = []
+    tool_snapshot_access_modes: list[int] = []
+
+    def mutation_restore_runner(argv, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            source_path.write_bytes(ambience_bytes)
+        held_path = next(item for item in argv if item.startswith("/proc/self/fd/"))
+        snapshot_fd = int(Path(held_path).name)
+        tool_snapshot_stats.append(os.fstat(snapshot_fd))
+        tool_snapshot_access_modes.append(fcntl.fcntl(snapshot_fd, fcntl.F_GETFL))
+        result = subprocess.run(argv, **kwargs)
+        if calls == 3:
+            source_path.write_bytes(dialogue_bytes)
+        return result
+
+    with source_path.open("rb") as source:
+        probe = probe_audio_candidate(
+            source.fileno(),
+            mime_type="audio/wav",
+            toolchain=_toolchain(),
+            runner=mutation_restore_runner,
+        )
+
+    assert calls == 3
+    assert probe.file_sha256 == hashlib.sha256(dialogue_bytes).hexdigest()
+    assert probe.decoded_pcm_sha256 == (
+        "eeaaf0bf8c11cf327ac65f7e8f7279757cefd11513a3137e35ee769426e1a329"
+    )
+    assert (probe.duration_samples, probe.channels) == (96_000, 1)
+    assert all(item.st_ino != original_stat.st_ino for item in tool_snapshot_stats)
+    assert all(item.st_nlink == 0 for item in tool_snapshot_stats)
+    assert all((mode & os.O_ACCMODE) == os.O_RDONLY for mode in tool_snapshot_access_modes)
+    assert source_path.read_bytes() == dialogue_bytes
+
+
 def test_content_fingerprint_is_independent_of_machine_inode(tmp_path):
     copy = tmp_path / "ambience-copy.wav"
     copy.write_bytes(AMBIENCE.read_bytes())
@@ -401,6 +509,23 @@ def test_content_fingerprint_is_independent_of_machine_inode(tmp_path):
         right_probe.file_inode,
     )
     assert left_probe.content_fingerprint == right_probe.content_fingerprint
+
+
+@pytest.mark.parametrize(
+    ("ffmpeg_name", "ffprobe_name"),
+    [("ffprobe", "ffmpeg"), ("forged", "ffprobe"), ("ffmpeg", "forged")],
+)
+def test_audio_toolchain_rejects_swapped_or_forged_identity_names(
+    ffmpeg_name, ffprobe_name
+):
+    toolchain = _toolchain()
+    with pytest.raises(ValidationError, match="identity name"):
+        AudioProbeToolchain(
+            ffmpeg_path=toolchain.ffmpeg_path,
+            ffprobe_path=toolchain.ffprobe_path,
+            ffmpeg=ToolIdentity(name=ffmpeg_name, version="test-pinned"),
+            ffprobe=ToolIdentity(name=ffprobe_name, version="test-pinned"),
+        )
 
 
 @pytest.mark.parametrize(

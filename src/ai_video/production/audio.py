@@ -6,8 +6,10 @@ import os
 import re
 import stat
 import subprocess
+import tempfile
 import unicodedata
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_EVEN
 from pathlib import Path
@@ -194,6 +196,14 @@ class AudioProbeToolchain(StrictModel):
             raise ValueError("audio tool path must be executable")
         return value
 
+    @model_validator(mode="after")
+    def _require_exact_tool_identity_names(self) -> "AudioProbeToolchain":
+        if self.ffmpeg.name != "ffmpeg" or self.ffprobe.name != "ffprobe":
+            raise ValueError(
+                "audio tool identity names must be exactly ffmpeg and ffprobe"
+            )
+        return self
+
 
 class ClaimedAudioMetadata(StrictModel):
     codec_name: str = Field(min_length=1)
@@ -317,6 +327,53 @@ def _read_held_fd(held_fd: int) -> tuple[bytes, os.stat_result]:
     return payload, after
 
 
+@contextmanager
+def _private_audio_snapshot(payload: bytes) -> Iterator[int]:
+    """Yield a read-only, unlinked snapshot FD with no writable path alias."""
+
+    writable = None
+    read_only_fd: int | None = None
+    try:
+        writable = tempfile.TemporaryFile(mode="w+b")
+        writable.write(payload)
+        writable.flush()
+        os.fsync(writable.fileno())
+        written = os.fstat(writable.fileno())
+        if (
+            not stat.S_ISREG(written.st_mode)
+            or written.st_size != len(payload)
+            or written.st_nlink != 0
+        ):
+            raise _probe_failed("Private audio snapshot is not an unlinked regular file.")
+        os.fchmod(writable.fileno(), 0o400)
+        read_only_fd = os.open(
+            f"/proc/self/fd/{writable.fileno()}",
+            os.O_RDONLY | getattr(os, "O_CLOEXEC", 0),
+        )
+        opened = os.fstat(read_only_fd)
+        if (
+            (opened.st_dev, opened.st_ino, opened.st_size)
+            != (written.st_dev, written.st_ino, written.st_size)
+            or opened.st_nlink != 0
+        ):
+            raise _probe_failed("Private audio snapshot identity changed during sealing.")
+        writable.close()
+        writable = None
+        snapshot_payload, snapshot_stat = _read_held_fd(read_only_fd)
+        if snapshot_payload != payload or snapshot_stat.st_nlink != 0:
+            raise _probe_failed("Private audio snapshot bytes failed verification.")
+        yield read_only_fd
+    except AiVideoError:
+        raise
+    except OSError as exc:
+        raise _probe_failed("Private audio snapshot could not be created.", str(exc)) from exc
+    finally:
+        if read_only_fd is not None:
+            os.close(read_only_fd)
+        if writable is not None:
+            writable.close()
+
+
 def _run_fd_tool(
     runner: _Runner,
     argv: list[str],
@@ -344,16 +401,6 @@ def _run_fd_tool(
         raise _probe_failed("Audio probe tool could not run.", type(exc).__name__) from exc
     finally:
         os.close(duplicate)
-
-
-def _require_unchanged_fd(held_fd: int, expected: os.stat_result) -> None:
-    current = os.fstat(held_fd)
-    if (current.st_dev, current.st_ino, current.st_size) != (
-        expected.st_dev,
-        expected.st_ino,
-        expected.st_size,
-    ):
-        raise _audio_invalid("Audio source FD changed during probe.")
 
 
 def _measure_loudness(
@@ -398,22 +445,22 @@ def _measure_loudness(
     )
 
 
-def probe_audio_candidate(
-    held_fd: int,
-    *,
-    mime_type: str,
-    toolchain: AudioProbeToolchain,
-    claimed_metadata: ClaimedAudioMetadata | None = None,
-    measure_loudness: bool = True,
-    runner: _Runner = subprocess.run,
-) -> AudioProbeResult:
-    if mime_type not in _ALLOWED_MIME_TYPES:
-        raise _audio_invalid("Audio MIME type is not an accepted WAV type.")
-    payload, held_stat = _read_held_fd(held_fd)
-    if not payload:
-        raise _audio_invalid("Audio source is empty.")
-    file_sha256 = hashlib.sha256(payload).hexdigest()
+@dataclass(frozen=True)
+class _SnapshotProbeEvidence:
+    codec_name: str
+    sample_rate_hz: int
+    channels: int
+    decoded_pcm: bytes
+    loudness: AudioLoudnessMetadata
 
+
+def _probe_snapshot_fd(
+    snapshot_fd: int,
+    *,
+    toolchain: AudioProbeToolchain,
+    measure_loudness: bool,
+    runner: _Runner,
+) -> _SnapshotProbeEvidence:
     probed = _run_fd_tool(
         runner,
         [
@@ -426,10 +473,9 @@ def probe_audio_candidate(
             "json",
             "/proc/self/fd/{fd}",
         ],
-        held_fd,
+        snapshot_fd,
         text=True,
     )
-    _require_unchanged_fd(held_fd, held_stat)
     if probed.returncode != 0:
         raise _probe_failed("ffprobe rejected the audio candidate.")
     try:
@@ -474,30 +520,68 @@ def probe_audio_candidate(
             "s16le",
             "-",
         ],
-        held_fd,
+        snapshot_fd,
         text=False,
     )
-    _require_unchanged_fd(held_fd, held_stat)
     if decoded.returncode != 0:
         raise _probe_failed("Audio PCM decode failed.")
     bytes_per_frame = channels * 2
     if not decoded.stdout or len(decoded.stdout) % bytes_per_frame:
         raise _probe_failed("Decoded PCM length is invalid.")
-    duration_samples = len(decoded.stdout) // bytes_per_frame
-    layout = AudioChannelLayout.MONO if channels == 1 else AudioChannelLayout.STEREO
 
     if measure_loudness:
-        loudness = _measure_loudness(held_fd, toolchain=toolchain, runner=runner)
-        _require_unchanged_fd(held_fd, held_stat)
+        loudness = _measure_loudness(
+            snapshot_fd, toolchain=toolchain, runner=runner
+        )
     else:
         loudness = AudioLoudnessMetadata(
             integrated_lufs_milli=None,
             true_peak_dbfs_milli=None,
             measurement_standard=None,
         )
+    return _SnapshotProbeEvidence(
+        codec_name=codec_name,
+        sample_rate_hz=sample_rate_hz,
+        channels=channels,
+        decoded_pcm=decoded.stdout,
+        loudness=loudness,
+    )
+
+
+def probe_audio_candidate(
+    held_fd: int,
+    *,
+    mime_type: str,
+    toolchain: AudioProbeToolchain,
+    claimed_metadata: ClaimedAudioMetadata | None = None,
+    measure_loudness: bool = True,
+    runner: _Runner = subprocess.run,
+) -> AudioProbeResult:
+    if mime_type not in _ALLOWED_MIME_TYPES:
+        raise _audio_invalid("Audio MIME type is not an accepted WAV type.")
+    payload, held_stat = _read_held_fd(held_fd)
+    if not payload:
+        raise _audio_invalid("Audio source is empty.")
+    file_sha256 = hashlib.sha256(payload).hexdigest()
+
+    with _private_audio_snapshot(payload) as snapshot_fd:
+        evidence = _probe_snapshot_fd(
+            snapshot_fd,
+            toolchain=toolchain,
+            measure_loudness=measure_loudness,
+            runner=runner,
+        )
+    codec_name = evidence.codec_name
+    sample_rate_hz = evidence.sample_rate_hz
+    channels = evidence.channels
+    decoded_pcm = evidence.decoded_pcm
+    loudness = evidence.loudness
+    duration_samples = len(decoded_pcm) // (channels * 2)
+    layout = AudioChannelLayout.MONO if channels == 1 else AudioChannelLayout.STEREO
     final_payload, final_stat = _read_held_fd(held_fd)
     if (
-        hashlib.sha256(final_payload).hexdigest() != file_sha256
+        final_payload != payload
+        or hashlib.sha256(final_payload).hexdigest() != file_sha256
         or (final_stat.st_dev, final_stat.st_ino, final_stat.st_size)
         != (held_stat.st_dev, held_stat.st_ino, held_stat.st_size)
     ):
@@ -519,7 +603,7 @@ def probe_audio_candidate(
         "sample_rate_hz": sample_rate_hz,
         "channels": channels,
         "channel_layout": layout.value,
-        "decoded_pcm_sha256": hashlib.sha256(decoded.stdout).hexdigest(),
+        "decoded_pcm_sha256": hashlib.sha256(decoded_pcm).hexdigest(),
         "loudness": loudness.model_dump(mode="json"),
         "loudness_receipt_id": loudness_receipt_id,
         "ffmpeg": toolchain.ffmpeg.model_dump(mode="json"),
