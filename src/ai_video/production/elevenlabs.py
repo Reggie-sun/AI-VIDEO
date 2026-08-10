@@ -33,6 +33,7 @@ MAX_AUDIO_BYTES = 1024 * 1024
 _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 _MAX_ALIGNMENT_CHARACTERS = 100_000
 _SANITIZED_RESPONSE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
+_SANITIZED_POLICY_DECISION = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
 
 
 @dataclass(frozen=True)
@@ -64,8 +65,28 @@ class ElevenLabsProviderPolicy:
     license_policy_decision: str
 
     def __post_init__(self) -> None:
-        if not self.license_policy_decision:
-            raise ValueError("license_policy_decision is required")
+        if any(
+            type(value) is not bool
+            for value in (
+                self.provider_enabled,
+                self.enable_logging,
+                self.zero_retention_entitled,
+            )
+        ):
+            raise ValueError("ElevenLabs policy flags must be exact booleans")
+        if (
+            type(self.credential_reference_kind) is not str
+            or self.credential_reference_kind not in {"environment", "secret_store"}
+        ):
+            raise ValueError("ElevenLabs credential reference kind is invalid")
+        if (
+            type(self.license_policy_decision) is not str
+            or _SANITIZED_POLICY_DECISION.fullmatch(
+                self.license_policy_decision
+            )
+            is None
+        ):
+            raise ValueError("ElevenLabs license policy decision is invalid")
 
 
 @dataclass(frozen=True)
@@ -131,6 +152,8 @@ def _permit_binding(
 
 
 def _permit_is_valid(permit: object, binding: dict[str, str]) -> bool:
+    # Task 5 deliberately recognizes only a private structural seam. Task 8 must
+    # replace this with the nominal committer-issued R+2 permit identity.
     validator = getattr(permit, "_validate_voice_submit_permit", None)
     if not callable(validator):
         return False
@@ -531,15 +554,20 @@ class ElevenLabsVoiceProvider:
             body=body,
             _consume=_permit_consumer(permit, binding),
         )
+        transport_failed = False
         try:
             response = self._transport.request(transport_request)
-        except AiVideoError:
-            raise
-        except Exception as exc:
-            raise _error(
-                ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN,
-                "ElevenLabs submit outcome is unknown.",
-            ) from exc
+        except Exception:
+            transport_failed = True
+        if transport_failed:
+            raise AiVideoError(
+                code=ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN,
+                user_message="ElevenLabs submit outcome is unknown.",
+                technical_detail=(
+                    "Injected ElevenLabs transport failed after permit consumption."
+                ),
+                retryable=False,
+            )
         if response.status_code < 200 or response.status_code >= 300:
             raise _error(
                 ErrorCode.VOICE_PROVIDER_FAILED,

@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 import ai_video.production as production_root
+import ai_video.production.elevenlabs as elevenlabs_module
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.audio import (
     VoiceCallAuthorization,
@@ -337,6 +338,57 @@ def test_http_and_timeout_fail_once_without_retry_or_secret(response, transport_
     assert "TOP-SECRET-DUMMY" not in repr(caught.value)
 
 
+def test_transport_typed_error_is_rewrapped_without_untrusted_metadata_or_retry():
+    untrusted = AiVideoError(
+        code=ErrorCode.VOICE_PROVIDER_FAILED,
+        user_message="TOP-SECRET-DUMMY user",
+        technical_detail="TOP-SECRET-DUMMY technical",
+        retryable=True,
+        cause=RuntimeError("TOP-SECRET-DUMMY cause"),
+    )
+    transport = _FakeTransport(error=untrusted)
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+
+    with pytest.raises(AiVideoError) as caught:
+        _generate(provider, request, authorization)
+
+    assert caught.value is not untrusted
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
+    assert caught.value.technical_detail == (
+        "Injected ElevenLabs transport failed after permit consumption."
+    )
+    assert caught.value.cause is None
+    assert caught.value.retryable is False
+    assert caught.value.__context__ is None
+    assert transport.invocations == 1
+    assert len(transport.calls) == 1
+    assert "TOP-SECRET-DUMMY" not in str(caught.value)
+    assert "TOP-SECRET-DUMMY" not in repr(caught.value)
+
+
+def test_http_error_ignores_untrusted_body_and_headers():
+    response = ElevenLabsTransportResponse(
+        status_code=500,
+        headers={"x-secret": "TOP-SECRET-DUMMY header"},
+        body=b"TOP-SECRET-DUMMY body",
+    )
+    transport = _FakeTransport(response)
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+
+    with pytest.raises(AiVideoError) as caught:
+        _generate(provider, request, authorization)
+
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+    assert caught.value.technical_detail is None
+    assert caught.value.cause is None
+    assert "TOP-SECRET-DUMMY" not in str(caught.value)
+    assert "TOP-SECRET-DUMMY" not in repr(caught.value)
+
+
 @pytest.mark.parametrize(
     "headers",
     [
@@ -465,6 +517,33 @@ def test_provider_disabled_is_zero_transport_and_root_exports_no_adapter():
     assert not hasattr(production_root, "ElevenLabsTransport")
     assert production_root.VoiceGenerationRequest is VoiceGenerationRequest
     assert production_root.VoiceProviderResult.__name__ == "VoiceProviderResult"
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"provider_enabled": "true"},
+        {"enable_logging": 1},
+        {"zero_retention_entitled": "false"},
+        {"credential_reference_kind": "vault"},
+        {"license_policy_decision": ""},
+        {"license_policy_decision": "  "},
+        {"license_policy_decision": "unsafe policy\nvalue"},
+        {"license_policy_decision": "x" * 129},
+    ],
+)
+def test_policy_rejects_coercion_and_malformed_values_before_transport(override):
+    transport = _FakeTransport(_response())
+    with pytest.raises(ValueError):
+        _policy(**override)
+    assert transport.invocations == 0
+    assert transport.calls == []
+
+
+def test_structural_permit_is_explicitly_test_only_until_task8_nominal_identity():
+    assert make_test_voice_submit_permit.__module__ == "tests.production_project_factory"
+    assert not hasattr(elevenlabs_module, "make_voice_submit_permit")
+    assert not hasattr(elevenlabs_module, "DurableVoiceSubmitPermit")
 
 
 def test_forced_alignment_fixture_is_strict_and_preserves_loss_without_confidence():
