@@ -4,7 +4,6 @@ import hashlib
 import io
 import json
 import struct
-import threading
 from datetime import date
 import wave
 from pathlib import Path
@@ -401,56 +400,6 @@ def make_voice_activation_request(
     )
     assert commit.expected_manifest_revision == expected_manifest_revision
     return commit, audio_ids
-
-
-class _TestVoiceSubmitPermit:
-    """Test-tree-only stand-in for Task 8's process-local R+2 permit."""
-
-    def __init__(self, binding: dict[str, str], *, phase: str, consumed: bool) -> None:
-        self._binding = binding
-        self._phase = phase
-        self._consumed = consumed
-        self._lock = threading.Lock()
-
-    def _validate_voice_submit_permit(self, **binding: str) -> bool:
-        return (
-            self._phase == "r+2"
-            and not self._consumed
-            and binding == self._binding
-        )
-
-    def _consume_voice_submit_permit(self, **binding: str) -> bool:
-        with self._lock:
-            if not self._validate_voice_submit_permit(**binding):
-                return False
-            self._consumed = True
-            return True
-
-
-def make_test_voice_submit_permit(
-    request: object,
-    authorization: object,
-    *,
-    phase: str = "r+2",
-    consumed: bool = False,
-    **binding_overrides: str,
-) -> object:
-    """Mint only a test permit; production intentionally has no equivalent seam."""
-
-    binding = {
-        "attempt_id": request.attempt_id,
-        "request_fingerprint": request.voice_request_fingerprint,
-        "authorization_fingerprint": authorization.authorization_fingerprint,
-        "destination": authorization.destination,
-        "budget_reservation_receipt_id": (
-            authorization.budget_reservation_receipt_id
-        ),
-        "egress_authorization_receipt_id": (
-            authorization.egress_authorization_receipt_id
-        ),
-    }
-    binding.update(binding_overrides)
-    return _TestVoiceSubmitPermit(binding, phase=phase, consumed=consumed)
 
 
 def _write_yaml(path: Path, model: object) -> None:

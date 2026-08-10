@@ -27,6 +27,7 @@ from ai_video.production.audio import (
     validate_voice_call_authorization,
 )
 from ai_video.production.models import ToolIdentity
+from ai_video.production.state_commit import _DurableVoiceSubmitPermit
 
 
 _ORIGIN = "https://api.elevenlabs.io"
@@ -145,6 +146,15 @@ def _error(
     )
 
 
+def _post_submit_outcome_unknown() -> AiVideoError:
+    return AiVideoError(
+        code=ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN,
+        user_message="ElevenLabs submit outcome is unknown.",
+        technical_detail=None,
+        retryable=False,
+    )
+
+
 def _permit_binding(
     request: VoiceGenerationRequest,
     authorization: VoiceCallAuthorization,
@@ -164,23 +174,19 @@ def _permit_binding(
 
 
 def _permit_is_valid(permit: object, binding: dict[str, str]) -> bool:
-    # Task 5 deliberately recognizes only a private structural seam. Task 8 must
-    # replace this with the nominal committer-issued R+2 permit identity.
-    validator = getattr(permit, "_validate_voice_submit_permit", None)
-    if not callable(validator):
+    if type(permit) is not _DurableVoiceSubmitPermit:
         return False
     try:
-        return validator(**binding) is True
+        return permit._validate_voice_submit_permit(**binding) is True
     except Exception:
         return False
 
 
 def _consume_permit(permit: object, binding: dict[str, str]) -> bool:
-    consumer = getattr(permit, "_consume_voice_submit_permit", None)
-    if not callable(consumer):
+    if type(permit) is not _DurableVoiceSubmitPermit:
         return False
     try:
-        return consumer(**binding) is True
+        return permit._consume_voice_submit_permit(**binding) is True
     except Exception:
         return False
 
@@ -673,76 +679,89 @@ class ElevenLabsVoiceProvider:
                 ),
                 retryable=False,
             )
-        response = _validate_transport_response(response)
+        response_invalid = False
+        try:
+            response = _validate_transport_response(response)
+        except Exception:
+            response_invalid = True
+        if response_invalid:
+            raise _post_submit_outcome_unknown()
         if response.status_code < 200 or response.status_code >= 300:
             raise _error(
                 ErrorCode.VOICE_PROVIDER_FAILED,
                 f"ElevenLabs request failed with HTTP {response.status_code}.",
             )
-        raw_audio, alignment_receipt = _parse_timing_response(
-            response.body, request.script_text
-        )
-        measured_units, provider_request_id, provider_trace_id = _parse_headers(
-            response.headers
-        )
-        audio_bytes = _pcm_to_wav(
-            raw_audio,
-            sample_rate=request.output_sample_rate_hz,
-            channels=request.output_channels,
-        )
-        cost_receipt = VoiceCostReceipt(
-            currency=preview.currency,
-            pricing_unit=preview.pricing_unit,
-            measured_billable_units=measured_units,
-            estimated_cost_upper_bound_microunits=(
-                preview.estimated_cost_upper_bound_microunits
-            ),
-            provider_reported_cost_microunits=None,
-            pricing_snapshot_id=preview.pricing_snapshot_id,
-            request_id=request.request_id,
-            provider_request_id=provider_request_id,
-        )
-        provenance_receipt = VoiceProvenanceReceipt(
-            request_id=request.request_id,
-            provider_kind=request.provider_kind,
-            model_id=request.model_id,
-            voice_id=request.voice_id,
-            language=request.language,
-            request_fingerprint=request.voice_request_fingerprint,
-            script_hash=request.script_hash,
-            output_container=request.output_container,
-            output_codec=request.output_codec,
-            output_sample_rate_hz=request.output_sample_rate_hz,
-            output_channels=request.output_channels,
-            alignment_mode="character",
-            adapter=ToolIdentity(
-                name="elevenlabs-rest-adapter",
-                version="2026-08-10",
-            ),
-            egress_authorization_receipt_id=(
-                authorization.egress_authorization_receipt_id
-            ),
-            license_policy_decision=self._policy.license_policy_decision,
-            policy_receipt_id=self._policy.policy_receipt_id,
-            retention_mode=(
-                "provider_standard"
-                if self._policy.enable_logging
-                else "zero_retention"
-            ),
-            provider_request_id=provider_request_id,
-            provider_trace_id=provider_trace_id,
-        )
-        return VoiceProviderResult.create(
-            request=request,
-            preview=preview,
-            authorization=authorization,
-            pricing=self._pricing,
-            audio_bytes=audio_bytes,
-            content_type="audio/wav",
-            provider_request_id=provider_request_id,
-            provider_trace_id=provider_trace_id,
-            alignment_receipt_bytes=alignment_receipt,
-            cost_receipt=cost_receipt,
-            provenance_receipt=provenance_receipt,
-            terminal_status="succeeded",
-        )
+        response_parse_failed = False
+        try:
+            raw_audio, alignment_receipt = _parse_timing_response(
+                response.body, request.script_text
+            )
+            measured_units, provider_request_id, provider_trace_id = _parse_headers(
+                response.headers
+            )
+            audio_bytes = _pcm_to_wav(
+                raw_audio,
+                sample_rate=request.output_sample_rate_hz,
+                channels=request.output_channels,
+            )
+            cost_receipt = VoiceCostReceipt(
+                currency=preview.currency,
+                pricing_unit=preview.pricing_unit,
+                measured_billable_units=measured_units,
+                estimated_cost_upper_bound_microunits=(
+                    preview.estimated_cost_upper_bound_microunits
+                ),
+                provider_reported_cost_microunits=None,
+                pricing_snapshot_id=preview.pricing_snapshot_id,
+                request_id=request.request_id,
+                provider_request_id=provider_request_id,
+            )
+            provenance_receipt = VoiceProvenanceReceipt(
+                request_id=request.request_id,
+                provider_kind=request.provider_kind,
+                model_id=request.model_id,
+                voice_id=request.voice_id,
+                language=request.language,
+                request_fingerprint=request.voice_request_fingerprint,
+                script_hash=request.script_hash,
+                output_container=request.output_container,
+                output_codec=request.output_codec,
+                output_sample_rate_hz=request.output_sample_rate_hz,
+                output_channels=request.output_channels,
+                alignment_mode="character",
+                adapter=ToolIdentity(
+                    name="elevenlabs-rest-adapter",
+                    version="2026-08-10",
+                ),
+                egress_authorization_receipt_id=(
+                    authorization.egress_authorization_receipt_id
+                ),
+                license_policy_decision=self._policy.license_policy_decision,
+                policy_receipt_id=self._policy.policy_receipt_id,
+                retention_mode=(
+                    "provider_standard"
+                    if self._policy.enable_logging
+                    else "zero_retention"
+                ),
+                provider_request_id=provider_request_id,
+                provider_trace_id=provider_trace_id,
+            )
+            result = VoiceProviderResult.create(
+                request=request,
+                preview=preview,
+                authorization=authorization,
+                pricing=self._pricing,
+                audio_bytes=audio_bytes,
+                content_type="audio/wav",
+                provider_request_id=provider_request_id,
+                provider_trace_id=provider_trace_id,
+                alignment_receipt_bytes=alignment_receipt,
+                cost_receipt=cost_receipt,
+                provenance_receipt=provenance_receipt,
+                terminal_status="succeeded",
+            )
+        except Exception:
+            response_parse_failed = True
+        if response_parse_failed:
+            raise _post_submit_outcome_unknown()
+        return result

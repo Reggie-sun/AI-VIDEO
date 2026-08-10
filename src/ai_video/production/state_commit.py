@@ -32,6 +32,7 @@ from ai_video.production.audio import (
 from ai_video.production.captions import (
     CaptionImportRequest,
     PreparedCaptionImport,
+    _canonical_track_bytes,
     caption_timing_fingerprint,
 )
 from ai_video.production.hashing import verify_artifact_hash
@@ -43,6 +44,7 @@ from ai_video.production.models import (
     AudioAssetMetadata,
     AudioSource,
     CaptionAssetMetadata,
+    CaptionTrack,
     EgressMetadata,
     LoadedProductionProject,
     ProductionManifest,
@@ -375,6 +377,21 @@ def _redact_render_error_message(value: str) -> str:
         r"\1\2[REDACTED]",
         bounded,
     )
+
+
+def _stable_voice_terminal_message(
+    status: StateCommitStatus,
+    phase: str,
+) -> str:
+    if status is StateCommitStatus.FAILED:
+        if phase == "provider_call":
+            return "Voice provider rejected the submitted request."
+        return "Voice generation failed before its provider outcome became ambiguous."
+    if phase == "materialize":
+        return "Voice result could not be durably activated; explicit recovery is required."
+    return "Voice provider outcome is unknown; blind retry is forbidden."
+
+
 def _as_state_error(exc: BaseException) -> AiVideoError:
     if isinstance(exc, AiVideoError):
         return exc
@@ -1082,14 +1099,14 @@ class ProductionStateCommitter:
             attempt = next(
                 (item for item in manifest.attempts if item.attempt_id == attempt_id), None
             )
-            redacted = _redact_render_error_message(error_message)
+            stable_message = _stable_voice_terminal_message(status, phase)
             if attempt is None or attempt.operation != "voice_generation":
                 raise _state_invalid("Voice terminal transition has no matching attempt.")
             if attempt.status is status:
                 if (
                     attempt.voice_phase == phase
                     and attempt.error_code == error_code
-                    and attempt.error_message == redacted
+                    and attempt.error_message == stable_message
                 ):
                     return manifest
                 raise _state_invalid("Voice terminal replay does not match durable state.")
@@ -1102,7 +1119,7 @@ class ProductionStateCommitter:
                     "voice_phase": phase,
                     "finished_at": _timestamp(),
                     "error_code": error_code,
-                    "error_message": redacted,
+                    "error_message": stable_message,
                 },
             )
             terminal = _validated_transition(
@@ -1638,6 +1655,8 @@ class ProductionStateCommitter:
         audio_asset_ids: tuple[str, ...],
         caption_asset_ids: tuple[str, ...],
     ) -> str | None:
+        if len(set(caption_asset_ids)) != len(caption_asset_ids):
+            raise _state_invalid("Voice candidate graph contains duplicate caption asset IDs.")
         paths = self.voice_attempt_paths(commit.attempt_id)
         artifacts = {item.relative_path: item for item in commit.artifacts}
         evidence_paths = {
@@ -1753,6 +1772,85 @@ class ProductionStateCommitter:
             != f"alignment-{outcome.get('alignment_receipt_sha256')}"
         ):
             raise _state_invalid("Voice candidate result, policy, or registry identity is inconsistent.")
+        caption_records = tuple(
+            item for item in new_records if item.asset_id in caption_asset_ids
+        )
+        if len(caption_records) != len(caption_asset_ids):
+            raise _state_invalid("Voice candidate caption registry identity is inconsistent.")
+        expected_alignment_id = f"alignment-{outcome.get('alignment_receipt_sha256')}"
+        expected_caption_receipt = f"caption-result-{expected_result_fingerprint}"
+        for caption_record in caption_records:
+            caption_artifact = artifacts.get(caption_record.artifact_path)
+            caption_metadata = caption_record.caption_metadata
+            if caption_artifact is None or caption_metadata is None:
+                raise _state_invalid("Voice candidate caption artifact is missing.")
+            try:
+                track = CaptionTrack.model_validate_json(caption_artifact.payload)
+            except (ValidationError, ValueError) as exc:
+                raise _state_invalid("Voice candidate caption track is malformed.", str(exc)) from exc
+            word_count = sum(len(segment.words or ()) for segment in track.segments)
+            metadata_identity = (
+                caption_metadata.caption_track_id,
+                caption_metadata.language,
+                caption_metadata.source_audio_asset_id,
+                caption_metadata.source_audio_sha256,
+                caption_metadata.script_hash,
+                caption_metadata.transcript_hash,
+                caption_metadata.segment_count,
+                caption_metadata.word_count,
+                caption_metadata.segmentation_policy_id,
+                caption_metadata.segmentation_policy_version,
+                caption_metadata.alignment_receipt_id,
+                caption_metadata.timing_fingerprint,
+                caption_metadata.style_reference_id,
+            )
+            track_identity = (
+                track.caption_track_id,
+                track.language,
+                track.source_audio_asset_id,
+                track.source_audio_sha256,
+                track.script_hash,
+                track.transcript_hash,
+                len(track.segments),
+                word_count,
+                track.segmentation_policy.policy_id,
+                track.segmentation_policy.policy_version,
+                track.alignment_receipt_id,
+                track.timing_fingerprint,
+                track.style_reference_id,
+            )
+            if (
+                caption_artifact.payload != _canonical_track_bytes(track)
+                or not verify_artifact_hash(track)
+                or track.timing_fingerprint != caption_timing_fingerprint(track)
+                or metadata_identity != track_identity
+                or track.source_audio_asset_id != audio_record.asset_id
+                or track.source_audio_sha256 != audio_record.sha256
+                or track.source_sample_rate_hz != metadata.sample_rate_hz
+                or track.script_hash != voice_request.script_hash
+                or track.transcript_hash != voice_request.script_hash
+                or track.alignment_receipt_id != expected_alignment_id
+                or track.alignment_receipt_id != metadata.alignment_receipt_id
+                or track.creation_receipt_id != expected_caption_receipt
+                or caption_record.creation_receipt_id != track.creation_receipt_id
+                or caption_record.input_artifact_ids != (audio_record.asset_id,)
+                or caption_record.input_fingerprint != audio_record.sha256
+            ):
+                raise _state_invalid("Voice candidate caption identity is inconsistent.")
+            if caption_metadata.style_reference_id is None:
+                if caption_metadata.style_content_hash is not None:
+                    raise _state_invalid("Voice candidate caption style identity is inconsistent.")
+            else:
+                style_hash = caption_metadata.style_content_hash
+                style_path = Path(f"assets/styles/{style_hash}.json")
+                style_artifact = artifacts.get(style_path)
+                if (
+                    style_hash is None
+                    or style_artifact is None
+                    or style_artifact.file_sha256 != style_hash
+                    or hashlib.sha256(style_artifact.payload).hexdigest() != style_hash
+                ):
+                    raise _state_invalid("Voice candidate caption style identity is inconsistent.")
         declared_paths = {item.artifact_path for item in new_records}
         declared_paths.update(
             Path(f"assets/styles/{item.caption_metadata.style_content_hash}.json")

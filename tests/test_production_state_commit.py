@@ -25,6 +25,7 @@ from ai_video.production.models import (
 )
 from ai_video.production.project import load_production_project_candidate
 from ai_video.production.registry import load_asset_registry
+from ai_video.production.registry import registry_semantic_sha256
 import ai_video.production.state_commit as state_commit
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
@@ -492,6 +493,124 @@ def test_generated_voice_caption_rejects_unbound_identity_before_write(
     assert (tmp_path / "state/manifest.json").read_bytes() == before
 
 
+def test_voice_activation_rejects_forged_caption_registry_graph_before_write(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        tmp_path,
+        request,
+        authorization,
+        expected_manifest_revision=3,
+        include_caption=True,
+    )
+    caption_ids = (f"caption-{request.attempt_id}",)
+    registry_artifact = next(
+        item
+        for item in activation.artifacts
+        if item.relative_path == activation.next_registry.path
+    )
+    registry = AssetRegistrySnapshot.model_validate_json(registry_artifact.payload)
+    forged_assets = []
+    for record in registry.assets:
+        if record.asset_id not in caption_ids:
+            forged_assets.append(record)
+            continue
+        assert record.caption_metadata is not None
+        forged_assets.append(
+            record.model_copy(
+                update={
+                    "caption_metadata": record.caption_metadata.model_copy(
+                        update={"script_hash": "f" * 64}
+                    )
+                }
+            )
+        )
+    forged_registry = registry.model_copy(
+        update={
+            "revision_id": ZERO_HASH,
+            "content_hash": ZERO_HASH,
+            "assets": tuple(forged_assets),
+        }
+    )
+    revision_id = registry_semantic_sha256(forged_registry)
+    forged_registry = forged_registry.model_copy(
+        update={"revision_id": revision_id, "content_hash": revision_id}
+    )
+    forged_payload = _canonical_json_bytes(forged_registry)
+    forged_path = Path(f"assets/registry.{revision_id}.json")
+    forged_pointer = RegistrySnapshotPointer(
+        path=forged_path,
+        revision_id=revision_id,
+        content_hash=revision_id,
+        file_sha256=hashlib.sha256(forged_payload).hexdigest(),
+    )
+    forged_artifacts = tuple(
+        PreparedArtifact(
+            relative_path=forged_path,
+            payload=forged_payload,
+            file_sha256=forged_pointer.file_sha256,
+        )
+        if item.relative_path == activation.next_registry.path
+        else item
+        for item in activation.artifacts
+    )
+    forged = StateCommitRequest(
+        attempt_id=activation.attempt_id,
+        operation=activation.operation,
+        expected_manifest_revision=activation.expected_manifest_revision,
+        artifacts=forged_artifacts,
+        next_project=activation.next_project,
+        next_registry=forged_pointer,
+    )
+    before = (tmp_path / "state/manifest.json").read_bytes()
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.activate_voice_assets(
+            forged,
+            audio_asset_ids=audio_ids,
+            caption_asset_ids=caption_ids,
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert (tmp_path / "state/manifest.json").read_bytes() == before
+
+
+def test_voice_activation_rejects_duplicate_caption_ids_before_write(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        tmp_path,
+        request,
+        authorization,
+        expected_manifest_revision=3,
+        include_caption=True,
+    )
+    caption_id = f"caption-{request.attempt_id}"
+    before = (tmp_path / "state/manifest.json").read_bytes()
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.activate_voice_assets(
+            activation,
+            audio_asset_ids=audio_ids,
+            caption_asset_ids=(caption_id, caption_id),
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert (tmp_path / "state/manifest.json").read_bytes() == before
+
+
 @pytest.mark.parametrize(
     ("retention_mode", "policy_receipt_id"),
     (("provider_standard", "fixture-policy-receipt"), ("zero_retention", "zrm-policy-receipt")),
@@ -777,6 +896,102 @@ def test_generate_voice_asset_rejects_untyped_provider_result_before_preparer(
     assert prepared_calls == 0
     assert after.active_registry == before.active_registry
     assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+
+
+@pytest.mark.parametrize("failure_stage", ("provider", "preparer"))
+def test_generate_voice_asset_does_not_persist_provider_or_preparer_exception_payload(
+    tmp_path: Path, failure_stage: str
+) -> None:
+    secret_payload = "TOP-SECRET raw provider response Exact script"
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+
+    class _Provider:
+        def preview(self, candidate):
+            return preview
+
+        def generate(self, candidate, candidate_authorization, permit):
+            binding = {
+                "attempt_id": candidate.attempt_id,
+                "request_fingerprint": candidate.voice_request_fingerprint,
+                "authorization_fingerprint": candidate_authorization.authorization_fingerprint,
+                "destination": candidate_authorization.destination,
+                "budget_reservation_receipt_id": candidate_authorization.budget_reservation_receipt_id,
+                "egress_authorization_receipt_id": candidate_authorization.egress_authorization_receipt_id,
+            }
+            assert permit._consume_voice_submit_permit(**binding)
+            if failure_stage == "provider":
+                raise RuntimeError(secret_payload)
+            return project_factory.make_voice_provider_result(
+                request, preview, authorization
+            )
+
+    def _prepare(*_args):
+        raise RuntimeError(secret_payload)
+
+    writer = ProductionStateCommitter(
+        tmp_path,
+        voice_candidate_preparer=_prepare if failure_stage == "preparer" else None,
+    )
+    with pytest.raises(RuntimeError, match="TOP-SECRET"):
+        writer.generate_voice_asset(request, _Provider(), authorization)
+
+    manifest_bytes = (tmp_path / "state/manifest.json").read_bytes()
+    manifest = ProductionManifest.model_validate_json(manifest_bytes)
+    attempt = manifest.attempts[-1]
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.error_message in {
+        "Voice provider outcome is unknown; blind retry is forbidden.",
+        "Voice result could not be durably activated; explicit recovery is required.",
+    }
+    assert secret_payload.encode() not in manifest_bytes
+    assert request.script_text.encode() not in manifest_bytes
+
+
+def test_malformed_post_submit_response_persists_outcome_unknown(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+
+    class _MalformedResponseProvider:
+        def preview(self, candidate):
+            return preview
+
+        def generate(self, candidate, candidate_authorization, permit):
+            binding = {
+                "attempt_id": candidate.attempt_id,
+                "request_fingerprint": candidate.voice_request_fingerprint,
+                "authorization_fingerprint": candidate_authorization.authorization_fingerprint,
+                "destination": candidate_authorization.destination,
+                "budget_reservation_receipt_id": candidate_authorization.budget_reservation_receipt_id,
+                "egress_authorization_receipt_id": candidate_authorization.egress_authorization_receipt_id,
+            }
+            assert permit._consume_voice_submit_permit(**binding)
+            raise AiVideoError(
+                code=ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN,
+                user_message="malformed response TOP-SECRET",
+                technical_detail=None,
+                retryable=False,
+            )
+
+    writer = ProductionStateCommitter(tmp_path)
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.generate_voice_asset(
+            request, _MalformedResponseProvider(), authorization
+        )
+
+    manifest_bytes = (tmp_path / "state/manifest.json").read_bytes()
+    attempt = ProductionManifest.model_validate_json(manifest_bytes).attempts[-1]
+    assert exc_info.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.error_code == ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN.value
+    assert attempt.error_message == (
+        "Voice provider outcome is unknown; blind retry is forbidden."
+    )
+    assert b"TOP-SECRET" not in manifest_bytes
 
 
 def test_generate_voice_asset_rejects_preparer_supplied_activation_capability(

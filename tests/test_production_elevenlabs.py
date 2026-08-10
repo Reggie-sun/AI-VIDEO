@@ -6,6 +6,7 @@ import socket
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 
@@ -28,10 +29,12 @@ from ai_video.production.elevenlabs import (
 )
 from ai_video.production.models import (
     AudioKind,
+    ProductionManifest,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
 )
-from tests.production_project_factory import make_test_voice_submit_permit
+from ai_video.production.state_commit import ProductionStateCommitter
+from tests import production_project_factory as project_factory
 
 
 FIXTURE_ROOT = Path(__file__).parent / "fixtures/voice_captions"
@@ -185,10 +188,31 @@ def _authorization(provider, request):
     )
 
 
+def _issue_real_permit(root: Path, provider, request, authorization):
+    project_factory.write_production_project(root)
+    manifest_path = root / "state/manifest.json"
+    manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes())
+    manifest = manifest.model_copy(
+        update={
+            "active_project": request.base_project,
+            "active_registry": request.base_registry,
+        }
+    )
+    manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
+    writer = ProductionStateCommitter(root)
+    preview = provider.preview(request)
+    writer.begin_voice_generation(request, preview, authorization)
+    return writer.record_voice_submit_intent(request, preview, authorization)
+
+
 def _generate(provider, request, authorization, *, permit=None):
-    if permit is None:
-        permit = make_test_voice_submit_permit(request, authorization)
-    return provider.generate(request, authorization, permit)
+    if permit is not None:
+        return provider.generate(request, authorization, permit)
+    with TemporaryDirectory(prefix="ai-video-elevenlabs-permit-") as temporary:
+        real_permit = _issue_real_permit(
+            Path(temporary), provider, request, authorization
+        )
+        return provider.generate(request, authorization, real_permit)
 
 
 def test_compatibility_metadata_is_dated_and_sdk_is_reference_only():
@@ -306,10 +330,10 @@ def test_malformed_or_partial_response_is_typed_and_secret_redacted(payload, mat
     request = _request()
     authorization = _authorization(provider, request)
 
-    with pytest.raises(AiVideoError, match=match) as caught:
+    with pytest.raises(AiVideoError) as caught:
         _generate(provider, request, authorization)
 
-    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
     assert transport.invocations == 1
     assert len(transport.calls) == 1
     assert "TOP-SECRET-DUMMY" not in str(caught.value)
@@ -327,9 +351,10 @@ def test_audio_base64_decode_is_bounded_before_decode():
     request = _request()
     authorization = _authorization(provider, request)
 
-    with pytest.raises(AiVideoError, match="audio limit"):
+    with pytest.raises(AiVideoError) as caught:
         _generate(provider, request, authorization)
 
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
     assert len(transport.calls) == 1
 
 
@@ -431,47 +456,51 @@ def test_missing_or_unsanitized_response_metadata_is_typed_and_redacted(headers)
     with pytest.raises(AiVideoError) as caught:
         _generate(provider, request, authorization)
 
-    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
     assert "TOP-SECRET-DUMMY" not in str(caught.value)
     assert "TOP-SECRET-DUMMY" not in repr(caught.value)
 
 
 @pytest.mark.parametrize(
-    "permit",
-    [
-        None,
-        "r+1",
-        "stale-request",
-        "mismatched-authorization",
-        "mismatched-destination",
-        "consumed",
-    ],
+    "permit_kind", ["none", "forged", "stale", "mismatched", "consumed"]
 )
-def test_invalid_permits_are_rejected_before_transport(permit):
+def test_invalid_permits_are_rejected_before_transport(tmp_path, permit_kind):
     transport = _FakeTransport(_response())
     provider = _provider(transport)
     request = _request()
     authorization = _authorization(provider, request)
-    if permit is None:
+    if permit_kind == "none":
         candidate = None
-    elif permit == "r+1":
-        candidate = make_test_voice_submit_permit(request, authorization, phase="r+1")
-    elif permit == "stale-request":
-        candidate = make_test_voice_submit_permit(
-            request, authorization, request_fingerprint=ZERO_HASH
-        )
-    elif permit == "mismatched-authorization":
-        candidate = make_test_voice_submit_permit(
-            request, authorization, authorization_fingerprint=ZERO_HASH
-        )
-    elif permit == "mismatched-destination":
-        candidate = make_test_voice_submit_permit(
-            request, authorization, destination="https://other.invalid"
+    elif permit_kind == "forged":
+        class _ForgedStructuralPermit:
+            def _validate_voice_submit_permit(self, **_binding):
+                return True
+
+            def _consume_voice_submit_permit(self, **_binding):
+                return True
+
+        candidate = _ForgedStructuralPermit()
+    elif permit_kind == "mismatched":
+        other_request = _request(voice_id="different-voice")
+        other_authorization = _authorization(provider, other_request)
+        candidate = _issue_real_permit(
+            tmp_path / permit_kind,
+            provider,
+            other_request,
+            other_authorization,
         )
     else:
-        candidate = make_test_voice_submit_permit(
-            request, authorization, consumed=True
+        candidate = _issue_real_permit(
+            tmp_path / permit_kind, provider, request, authorization
         )
+        if permit_kind == "stale":
+            ProductionStateCommitter(tmp_path / permit_kind).record_voice_outcome_unknown(
+                request.attempt_id, phase="submit_intent"
+            )
+        else:
+            provider.generate(request, authorization, candidate)
+            transport.invocations = 0
+            transport.calls.clear()
 
     with pytest.raises(AiVideoError) as caught:
         provider.generate(request, authorization, candidate)
@@ -481,12 +510,12 @@ def test_invalid_permits_are_rejected_before_transport(permit):
     assert transport.calls == []
 
 
-def test_permit_is_one_use_and_second_submit_is_zero_transport_calls():
+def test_permit_is_one_use_and_second_submit_is_zero_transport_calls(tmp_path):
     first_transport = _FakeTransport(_response())
     provider = _provider(first_transport)
     request = _request()
     authorization = _authorization(provider, request)
-    permit = make_test_voice_submit_permit(request, authorization)
+    permit = _issue_real_permit(tmp_path, provider, request, authorization)
     result = provider.generate(request, authorization, permit)
     assert result.provenance_receipt.policy_receipt_id == "fixture-policy-receipt-1"
     assert result.provenance_receipt.retention_mode == "provider_standard"
@@ -562,18 +591,28 @@ def test_policy_rejects_coercion_and_malformed_values_before_transport(override)
     assert transport.calls == []
 
 
-def test_structural_permit_is_explicitly_test_only_until_task8_nominal_identity():
-    assert make_test_voice_submit_permit.__module__ == "tests.production_project_factory"
+def test_adapter_accepts_only_private_committer_issued_nominal_permit(tmp_path):
     assert not hasattr(elevenlabs_module, "make_voice_submit_permit")
     assert not hasattr(elevenlabs_module, "DurableVoiceSubmitPermit")
+    assert not hasattr(production_root, "DurableVoiceSubmitPermit")
+
+    transport = _FakeTransport(_response())
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+    permit = _issue_real_permit(tmp_path, provider, request, authorization)
+
+    provider.generate(request, authorization, permit)
+
+    assert transport.invocations == 1
 
 
-def test_adapter_consumes_permit_without_trusting_transport_and_blocks_replay():
+def test_adapter_consumes_permit_without_trusting_transport_and_blocks_replay(tmp_path):
     transport = _IgnoringPermitTransport(_response())
     provider = _provider(transport)
     request = _request()
     authorization = _authorization(provider, request)
-    permit = make_test_voice_submit_permit(request, authorization)
+    permit = _issue_real_permit(tmp_path, provider, request, authorization)
 
     provider.generate(request, authorization, permit)
     with pytest.raises(AiVideoError):
@@ -583,12 +622,12 @@ def test_adapter_consumes_permit_without_trusting_transport_and_blocks_replay():
     assert len(transport.calls) == 1
 
 
-def test_adapter_atomic_consume_allows_exactly_one_transport_call_in_race():
+def test_adapter_atomic_consume_allows_exactly_one_transport_call_in_race(tmp_path):
     transport = _IgnoringPermitTransport(_response())
     provider = _provider(transport)
     request = _request()
     authorization = _authorization(provider, request)
-    permit = make_test_voice_submit_permit(request, authorization)
+    permit = _issue_real_permit(tmp_path, provider, request, authorization)
 
     def submit():
         try:
@@ -646,7 +685,7 @@ def test_transport_response_types_and_json_numeric_tokens_are_bounded(response):
     authorization = _authorization(provider, request)
     with pytest.raises(AiVideoError) as caught:
         _generate(provider, request, authorization)
-    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
     assert caught.value.cause is None
     assert caught.value.__cause__ is None
     assert caught.value.__context__ is None
@@ -670,7 +709,7 @@ def test_character_cost_requires_bounded_canonical_decimal(character_cost):
     authorization = _authorization(provider, request)
     with pytest.raises(AiVideoError) as caught:
         _generate(provider, request, authorization)
-    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
 
 
 def test_malformed_json_error_graph_does_not_retain_provider_body():
@@ -717,7 +756,26 @@ def test_malformed_json_error_graph_does_not_retain_provider_body():
     assert caught.value.__context__ is None
 
 
-def test_machine_policy_denial_is_zero_call_and_does_not_consume_permit():
+def test_malformed_post_submit_response_is_outcome_unknown():
+    transport = _FakeTransport(
+        ElevenLabsTransportResponse(
+            status_code=200,
+            headers={"character-cost": "5", "request-id": "request-1"},
+            body=b'{"audio_base64":"partial"',
+        )
+    )
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+
+    with pytest.raises(AiVideoError) as caught:
+        _generate(provider, request, authorization)
+
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN
+    assert transport.invocations == 1
+
+
+def test_machine_policy_denial_is_zero_call_and_does_not_consume_permit(tmp_path):
     denied = ElevenLabsProviderPolicy(
         provider_enabled=True,
         enable_logging=True,
@@ -733,7 +791,7 @@ def test_machine_policy_denial_is_zero_call_and_does_not_consume_permit():
     denied_provider = _provider(transport, policy=denied)
     request = _request()
     authorization = _authorization(denied_provider, request)
-    permit = make_test_voice_submit_permit(request, authorization)
+    permit = _issue_real_permit(tmp_path, denied_provider, request, authorization)
     with pytest.raises(AiVideoError):
         denied_provider.generate(request, authorization, permit)
     assert transport.invocations == 0
