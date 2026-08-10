@@ -5,7 +5,9 @@ import fcntl
 import json
 import os
 import shutil
+import socket
 import subprocess
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -16,11 +18,20 @@ from ai_video.production.audio import (
     AudioImportRequest,
     AudioProbeToolchain,
     ClaimedAudioMetadata,
+    VoiceAssetProvider,
+    VoiceCallAuthorization,
+    VoiceCostReceipt,
     VoiceGenerationRequest,
+    VoiceGenerationPreview,
+    VoicePricingSnapshot,
+    VoiceProviderResult,
     VoiceProviderParameters,
+    VoiceProvenanceReceipt,
     audio_content_fingerprint,
+    build_voice_generation_preview,
     materialize_audio_candidate,
     probe_audio_candidate,
+    validate_voice_call_authorization,
 )
 from ai_video.production.models import (
     AssetSourceKind,
@@ -39,6 +50,157 @@ DIALOGUE = FIXTURE_ROOT / "dialogue-mono-48000.wav"
 AMBIENCE = FIXTURE_ROOT / "ambience-stereo-48000.wav"
 ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
+
+
+def _voice_request(**overrides) -> VoiceGenerationRequest:
+    values = {
+        "request_id": "request-1",
+        "attempt_id": "attempt-1",
+        "provider_kind": "fake",
+        "model_id": "model-1",
+        "audio_kind": AudioKind.DIALOGUE,
+        "script_text": "Exact script",
+        "speaker_id": "speaker-1",
+        "voice_id": "voice-1",
+        "language": "en",
+        "output_container": "wav",
+        "output_codec": "pcm_s16le",
+        "output_sample_rate_hz": 48_000,
+        "output_channels": 1,
+        "provider_parameters": VoiceProviderParameters(stability_milli=500),
+        "base_project": ProjectSnapshotPointer(
+            path=Path(f"state/projects/project.1.{ZERO_HASH}.yaml"),
+            revision=1,
+            content_hash=ZERO_HASH,
+            file_sha256=ONE_HASH,
+        ),
+        "base_registry": RegistrySnapshotPointer(
+            path=Path(f"assets/registry.{ONE_HASH}.json"),
+            revision_id=ONE_HASH,
+            content_hash=ONE_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        "input_artifact_ids": ("shot-1",),
+        "input_fingerprint": ONE_HASH,
+        "pricing_snapshot_id": "pricing-2026-08-10",
+        "budget_reservation_receipt_id": "budget-1",
+        "egress_authorization_receipt_id": "egress-1",
+    }
+    values.update(overrides)
+    return VoiceGenerationRequest.create(**values)
+
+
+def _pricing() -> VoicePricingSnapshot:
+    return VoicePricingSnapshot(
+        snapshot_id="pricing-2026-08-10",
+        effective_date=date(2026, 8, 10),
+        currency="USD",
+        pricing_unit="character",
+        unit_price_microunits=37,
+        minimum_billable_units=20,
+    )
+
+
+def _preview(request: VoiceGenerationRequest) -> VoiceGenerationPreview:
+    return build_voice_generation_preview(
+        request,
+        pricing=_pricing(),
+        destination="https://api.fixture.invalid",
+        credential_reference_kind="environment",
+        timing_supported=True,
+        output_supported=True,
+    )
+
+
+def _authorization(
+    request: VoiceGenerationRequest,
+    preview: VoiceGenerationPreview,
+    **overrides,
+) -> VoiceCallAuthorization:
+    values = {
+        "request_fingerprint": request.voice_request_fingerprint,
+        "preview_fingerprint": preview.preview_fingerprint,
+        "pricing_snapshot_id": request.pricing_snapshot_id,
+        "budget_reservation_receipt_id": request.budget_reservation_receipt_id,
+        "egress_authorization_receipt_id": request.egress_authorization_receipt_id,
+        "destination": preview.destination,
+        "payload_categories": preview.payload_categories,
+        "cost_ceiling_microunits": preview.estimated_cost_upper_bound_microunits,
+        "provider_enabled": True,
+    }
+    values.update(overrides)
+    return VoiceCallAuthorization(**values)
+
+
+class _FakeVoiceProvider:
+    def __init__(self, fixture_bytes: bytes) -> None:
+        self.fixture_bytes = fixture_bytes
+        self.generate_calls = 0
+
+    def preview(self, request: VoiceGenerationRequest) -> VoiceGenerationPreview:
+        return _preview(request)
+
+    def generate(self, request, authorization, permit) -> VoiceProviderResult:
+        preview = self.preview(request)
+        validate_voice_call_authorization(request, preview, authorization)
+        if permit is not _FAKE_DURABLE_PERMIT:
+            raise AssertionError("fake provider requires the test-only permit sentinel")
+        self.generate_calls += 1
+        alignment_bytes = json.dumps(
+            {
+                "characters": list(request.script_text),
+                "character_start_times_seconds": [0] * len(request.script_text),
+                "character_end_times_seconds": [1] * len(request.script_text),
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+        cost = VoiceCostReceipt(
+            currency=preview.currency,
+            pricing_unit=preview.pricing_unit,
+            measured_billable_units=preview.billable_units_upper_bound,
+            estimated_cost_upper_bound_microunits=(
+                preview.estimated_cost_upper_bound_microunits
+            ),
+            provider_reported_cost_microunits=None,
+            pricing_snapshot_id=preview.pricing_snapshot_id,
+            request_id=request.request_id,
+            provider_request_id="provider-request-1",
+        )
+        provenance = VoiceProvenanceReceipt(
+            provider_kind=request.provider_kind,
+            model_id=request.model_id,
+            voice_id=request.voice_id,
+            language=request.language,
+            request_fingerprint=request.voice_request_fingerprint,
+            script_hash=request.script_hash,
+            output_container=request.output_container,
+            output_codec=request.output_codec,
+            output_sample_rate_hz=request.output_sample_rate_hz,
+            output_channels=request.output_channels,
+            alignment_mode="character",
+            adapter=ToolIdentity(name="fixture-provider", version="1"),
+            egress_authorization_receipt_id=(
+                request.egress_authorization_receipt_id
+            ),
+            license_policy_decision="fixture-only",
+            provider_request_id="provider-request-1",
+            provider_trace_id="provider-trace-1",
+        )
+        return VoiceProviderResult.create(
+            request=request,
+            audio_bytes=self.fixture_bytes,
+            content_type="audio/wav",
+            provider_request_id="provider-request-1",
+            provider_trace_id="provider-trace-1",
+            alignment_receipt_bytes=alignment_bytes,
+            cost_receipt=cost,
+            provenance_receipt=provenance,
+            terminal_status="succeeded",
+        )
+
+
+_FAKE_DURABLE_PERMIT = object()
 
 
 def _toolchain() -> AudioProbeToolchain:
@@ -90,39 +252,7 @@ def test_fixture_identities_are_frozen():
 
 
 def test_voice_generation_request_is_immutable_and_self_sealing():
-    request = VoiceGenerationRequest.create(
-        request_id="request-1",
-        attempt_id="attempt-1",
-        provider_kind="fake",
-        model_id="model-1",
-        audio_kind=AudioKind.DIALOGUE,
-        script_text="Exact script",
-        speaker_id="speaker-1",
-        voice_id="voice-1",
-        language="en",
-        output_container="wav",
-        output_codec="pcm_s16le",
-        output_sample_rate_hz=48_000,
-        output_channels=1,
-        provider_parameters=VoiceProviderParameters(stability_milli=500),
-        base_project=ProjectSnapshotPointer(
-            path=Path(f"state/projects/project.1.{ZERO_HASH}.yaml"),
-            revision=1,
-            content_hash=ZERO_HASH,
-            file_sha256=ONE_HASH,
-        ),
-        base_registry=RegistrySnapshotPointer(
-            path=Path(f"assets/registry.{ONE_HASH}.json"),
-            revision_id=ONE_HASH,
-            content_hash=ONE_HASH,
-            file_sha256=ZERO_HASH,
-        ),
-        input_artifact_ids=("shot-1",),
-        input_fingerprint=ONE_HASH,
-        pricing_snapshot_id="pricing-1",
-        budget_reservation_receipt_id="budget-1",
-        egress_authorization_receipt_id="egress-1",
-    )
+    request = _voice_request()
     assert request.script_hash == hashlib.sha256(b"Exact script").hexdigest()
     assert len(request.provider_parameters_hash) == 64
     assert len(request.voice_request_fingerprint) == 64
@@ -134,6 +264,132 @@ def test_voice_generation_request_is_immutable_and_self_sealing():
         VoiceGenerationRequest.model_validate(
             {**request.model_dump(mode="python"), "script_hash": ZERO_HASH}
         )
+
+
+@pytest.mark.parametrize("audio_kind", [AudioKind.AMBIENCE, AudioKind.SFX, AudioKind.BGM])
+def test_voice_generation_request_accepts_only_dialogue_and_narration(audio_kind):
+    with pytest.raises(ValidationError, match="dialogue or narration"):
+        _voice_request(audio_kind=audio_kind)
+    assert _voice_request(audio_kind=AudioKind.NARRATION).audio_kind is AudioKind.NARRATION
+
+
+def test_preview_is_pure_no_network_and_uses_dated_conservative_pricing(monkeypatch):
+    network_calls = []
+
+    def reject_network(*args, **kwargs):
+        network_calls.append((args, kwargs))
+        raise AssertionError("network access is forbidden")
+
+    monkeypatch.setattr(socket, "create_connection", reject_network)
+    monkeypatch.setattr(socket.socket, "connect", reject_network)
+    request = _voice_request(script_text="é voice")
+    provider: VoiceAssetProvider = _FakeVoiceProvider(DIALOGUE.read_bytes())
+
+    preview = provider.preview(request)
+
+    assert network_calls == []
+    assert provider.generate_calls == 0
+    assert preview.pricing_effective_date == date(2026, 8, 10)
+    assert preview.pricing_snapshot_id == request.pricing_snapshot_id
+    assert preview.script_characters == len(request.script_text)
+    assert preview.script_utf8_bytes == len(request.script_text.encode("utf-8"))
+    assert preview.billable_units_upper_bound == 20
+    assert preview.estimated_cost_upper_bound_microunits == 20 * 37
+    assert preview.estimated_cost_upper_bound_microunits >= (
+        preview.script_characters * 37
+    )
+    assert preview.payload_categories == (
+        "script_text",
+        "voice_identity",
+        "voice_settings",
+        "output_settings",
+    )
+    assert preview.destination == "https://api.fixture.invalid"
+    assert preview.method == "POST"
+    assert preview.remote is True
+    assert preview.paid_call_required is True
+
+
+@pytest.mark.parametrize(
+    ("override", "error_code"),
+    [
+        ({"request_fingerprint": ZERO_HASH}, ErrorCode.VOICE_REQUEST_INVALID),
+        ({"preview_fingerprint": ZERO_HASH}, ErrorCode.VOICE_REQUEST_INVALID),
+        ({"pricing_snapshot_id": "stale"}, ErrorCode.VOICE_BUDGET_REJECTED),
+        ({"budget_reservation_receipt_id": "wrong"}, ErrorCode.VOICE_BUDGET_REJECTED),
+        ({"egress_authorization_receipt_id": "wrong"}, ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED),
+        ({"destination": "https://other.invalid"}, ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED),
+        ({"payload_categories": ("script_text",)}, ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED),
+        ({"cost_ceiling_microunits": 1}, ErrorCode.VOICE_BUDGET_REJECTED),
+    ],
+)
+def test_authorization_mismatch_fails_before_provider_call(override, error_code):
+    request = _voice_request()
+    provider = _FakeVoiceProvider(DIALOGUE.read_bytes())
+    preview = provider.preview(request)
+    authorization = _authorization(request, preview, **override)
+
+    with pytest.raises(AiVideoError) as caught:
+        provider.generate(request, authorization, _FAKE_DURABLE_PERMIT)
+
+    assert caught.value.code is error_code
+    assert provider.generate_calls == 0
+
+
+def test_authorization_and_result_reject_secrets_and_raw_headers():
+    request = _voice_request()
+    preview = _preview(request)
+    authorization_data = _authorization(request, preview).model_dump(mode="python")
+    with pytest.raises(ValidationError):
+        VoiceCallAuthorization.model_validate(
+            {**authorization_data, "api_key": "super-secret"}
+        )
+    assert "secret" not in repr(authorization_data).lower()
+
+    provider = _FakeVoiceProvider(DIALOGUE.read_bytes())
+    result = provider.generate(
+        request, _authorization(request, preview), _FAKE_DURABLE_PERMIT
+    )
+    with pytest.raises(ValidationError):
+        VoiceProviderResult.model_validate(
+            {**result.model_dump(mode="python"), "response_headers": {"x": "secret"}}
+        )
+    assert "super-secret" not in repr(result.model_dump(mode="python"))
+
+
+def test_fake_provider_returns_deterministic_sealed_receipts_without_state_write(
+    tmp_path,
+):
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text("unchanged", encoding="utf-8")
+    request = _voice_request()
+    provider = _FakeVoiceProvider(DIALOGUE.read_bytes())
+    preview = provider.preview(request)
+    assert provider.generate_calls == 0
+
+    first = provider.generate(
+        request, _authorization(request, preview), _FAKE_DURABLE_PERMIT
+    )
+    second_provider = _FakeVoiceProvider(DIALOGUE.read_bytes())
+    second = second_provider.generate(
+        request, _authorization(request, preview), _FAKE_DURABLE_PERMIT
+    )
+
+    assert provider.generate_calls == 1
+    assert second_provider.generate_calls == 1
+    assert first == second
+    assert first.audio_bytes == DIALOGUE.read_bytes()
+    assert first.audio_sha256 == hashlib.sha256(DIALOGUE.read_bytes()).hexdigest()
+    assert hashlib.sha256(first.alignment_receipt_bytes).hexdigest() == (
+        first.alignment_receipt_sha256
+    )
+    assert first.cost_receipt.provider_reported_cost_microunits is None
+    assert first.provenance_receipt.request_fingerprint == (
+        request.voice_request_fingerprint
+    )
+    assert first.provider_request_id == "provider-request-1"
+    assert manifest.read_text(encoding="utf-8") == "unchanged"
+    assert list(tmp_path.iterdir()) == [manifest]
 
 
 def test_candidate_path_is_exact_contained_and_rejects_symlink(tmp_path):

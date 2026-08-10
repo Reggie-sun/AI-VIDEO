@@ -11,9 +11,11 @@ import unicodedata
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
+from datetime import date
 from decimal import Decimal, ROUND_HALF_EVEN
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal, Protocol
+from urllib.parse import urlsplit
 
 from pydantic import Field, field_validator, model_validator
 
@@ -42,7 +44,17 @@ from ai_video.production.paths import (
 
 
 _ALLOWED_MIME_TYPES = {"audio/wav", "audio/x-wav"}
+_VOICE_PAYLOAD_CATEGORIES = (
+    "script_text",
+    "voice_identity",
+    "voice_settings",
+    "output_settings",
+)
+_SANITIZED_PROVIDER_ID = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
 _Runner = Callable[..., subprocess.CompletedProcess]
+
+if TYPE_CHECKING:
+    from ai_video.production.state_commit import DurableVoiceSubmitPermit
 
 
 def _audio_invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -61,6 +73,50 @@ def _probe_failed(message: str, detail: str | None = None) -> AiVideoError:
         technical_detail=detail,
         retryable=False,
     )
+
+
+def _voice_error(
+    code: ErrorCode, message: str, detail: str | None = None
+) -> AiVideoError:
+    return AiVideoError(
+        code=code,
+        user_message=message,
+        technical_detail=detail,
+        retryable=False,
+    )
+
+
+def _canonical_https_origin(value: str) -> str:
+    try:
+        parsed = urlsplit(value)
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError("voice egress destination must be a canonical HTTPS origin") from exc
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname is None
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.path
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ValueError("voice egress destination must be a canonical HTTPS origin")
+    host = parsed.hostname.lower()
+    if ":" in host:
+        host = f"[{host}]"
+    canonical = f"https://{host}"
+    if port is not None and port != 443:
+        canonical = f"{canonical}:{port}"
+    if value != canonical:
+        raise ValueError("voice egress destination must be a canonical HTTPS origin")
+    return value
+
+
+def _sanitized_provider_identifier(value: str | None) -> str | None:
+    if value is not None and _SANITIZED_PROVIDER_ID.fullmatch(value) is None:
+        raise ValueError("provider identifier must be sanitized")
+    return value
 
 
 class VoiceProviderParameters(StrictModel):
@@ -175,6 +231,342 @@ class VoiceGenerationRequest(StrictModel):
             cls._fingerprint_payload(serializable)
         )
         return cls.model_validate(data)
+
+
+class VoicePricingSnapshot(StrictModel):
+    snapshot_id: str = Field(min_length=1)
+    effective_date: date
+    currency: str = Field(pattern=r"^[A-Z]{3}$")
+    pricing_unit: Literal["character"]
+    unit_price_microunits: int = Field(strict=True, ge=0)
+    minimum_billable_units: int = Field(strict=True, ge=0)
+
+
+class VoiceGenerationPreview(StrictModel):
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    pricing_snapshot_id: str = Field(min_length=1)
+    pricing_effective_date: date
+    currency: str = Field(pattern=r"^[A-Z]{3}$")
+    pricing_unit: Literal["character"]
+    billable_units_upper_bound: int = Field(strict=True, gt=0)
+    estimated_cost_upper_bound_microunits: int = Field(strict=True, ge=0)
+    destination: str = Field(min_length=1)
+    method: Literal["POST"]
+    payload_categories: tuple[
+        Literal[
+            "script_text",
+            "voice_identity",
+            "voice_settings",
+            "output_settings",
+        ],
+        ...,
+    ] = Field(min_length=1)
+    script_utf8_bytes: int = Field(strict=True, gt=0)
+    script_characters: int = Field(strict=True, gt=0)
+    credential_reference_kind: Literal["environment", "secret_store"]
+    paid_call_required: bool = Field(strict=True)
+    remote: Literal[True]
+    policy_decision: Literal["explicit_opt_in_required"]
+    timing_supported: bool = Field(strict=True)
+    output_supported: bool = Field(strict=True)
+    preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("destination")
+    @classmethod
+    def _validate_destination(cls, value: str) -> str:
+        return _canonical_https_origin(value)
+
+    @model_validator(mode="after")
+    def _validate_sealed_preview(self) -> "VoiceGenerationPreview":
+        data = self.model_dump(mode="json", exclude={"preview_fingerprint"})
+        if canonical_sha256(data) != self.preview_fingerprint:
+            raise ValueError("preview_fingerprint does not match preview")
+        return self
+
+
+class VoiceCallAuthorization(StrictModel):
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    pricing_snapshot_id: str = Field(min_length=1)
+    budget_reservation_receipt_id: str = Field(min_length=1)
+    egress_authorization_receipt_id: str = Field(min_length=1)
+    destination: str = Field(min_length=1)
+    payload_categories: tuple[
+        Literal[
+            "script_text",
+            "voice_identity",
+            "voice_settings",
+            "output_settings",
+        ],
+        ...,
+    ] = Field(min_length=1)
+    cost_ceiling_microunits: int = Field(strict=True, ge=0)
+    provider_enabled: Literal[True]
+
+    @field_validator("destination")
+    @classmethod
+    def _validate_destination(cls, value: str) -> str:
+        return _canonical_https_origin(value)
+
+
+class VoiceCostReceipt(StrictModel):
+    currency: str = Field(pattern=r"^[A-Z]{3}$")
+    pricing_unit: Literal["character"]
+    measured_billable_units: int = Field(strict=True, gt=0)
+    estimated_cost_upper_bound_microunits: int = Field(strict=True, ge=0)
+    provider_reported_cost_microunits: int | None = Field(
+        default=None, strict=True, ge=0
+    )
+    pricing_snapshot_id: str = Field(min_length=1)
+    request_id: str = Field(min_length=1)
+    provider_request_id: str | None = None
+
+    @field_validator("provider_request_id")
+    @classmethod
+    def _validate_provider_request_id(cls, value: str | None) -> str | None:
+        return _sanitized_provider_identifier(value)
+
+
+class VoiceProvenanceReceipt(StrictModel):
+    provider_kind: str = Field(min_length=1)
+    model_id: str = Field(min_length=1)
+    voice_id: str = Field(min_length=1)
+    language: str = Field(min_length=1)
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    script_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    output_container: Literal["wav"]
+    output_codec: Literal["pcm_s16le"]
+    output_sample_rate_hz: int = Field(strict=True, gt=0)
+    output_channels: Literal[1, 2]
+    alignment_mode: Literal["character", "word", "none"]
+    adapter: ToolIdentity
+    egress_authorization_receipt_id: str = Field(min_length=1)
+    license_policy_decision: str = Field(min_length=1)
+    provider_request_id: str | None = None
+    provider_trace_id: str | None = None
+
+    @field_validator("provider_request_id", "provider_trace_id")
+    @classmethod
+    def _validate_provider_identifier(cls, value: str | None) -> str | None:
+        return _sanitized_provider_identifier(value)
+
+
+class VoiceProviderResult(StrictModel):
+    request_id: str = Field(min_length=1)
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    audio_bytes: bytes = Field(min_length=1)
+    audio_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    content_type: Literal["audio/wav", "audio/x-wav"]
+    provider_request_id: str | None = None
+    provider_trace_id: str | None = None
+    alignment_receipt_bytes: bytes = Field(min_length=1)
+    alignment_receipt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    cost_receipt: VoiceCostReceipt
+    provenance_receipt: VoiceProvenanceReceipt
+    terminal_status: Literal["succeeded"]
+    result_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @staticmethod
+    def _fingerprint_payload(data: dict[str, object]) -> dict[str, object]:
+        return {
+            key: data[key]
+            for key in (
+                "request_id",
+                "request_fingerprint",
+                "audio_sha256",
+                "content_type",
+                "provider_request_id",
+                "provider_trace_id",
+                "alignment_receipt_sha256",
+                "cost_receipt",
+                "provenance_receipt",
+                "terminal_status",
+            )
+        }
+
+    @field_validator("provider_request_id", "provider_trace_id")
+    @classmethod
+    def _validate_provider_identifier(cls, value: str | None) -> str | None:
+        return _sanitized_provider_identifier(value)
+
+    @model_validator(mode="after")
+    def _validate_sealed_result(self) -> "VoiceProviderResult":
+        if hashlib.sha256(self.audio_bytes).hexdigest() != self.audio_sha256:
+            raise ValueError("audio_sha256 does not match provider audio bytes")
+        if (
+            hashlib.sha256(self.alignment_receipt_bytes).hexdigest()
+            != self.alignment_receipt_sha256
+        ):
+            raise ValueError("alignment receipt hash does not match bytes")
+        if self.cost_receipt.request_id != self.request_id:
+            raise ValueError("cost receipt request identity does not match result")
+        if (
+            self.provenance_receipt.request_fingerprint
+            != self.request_fingerprint
+        ):
+            raise ValueError("provenance request identity does not match result")
+        if self.cost_receipt.provider_request_id != self.provider_request_id:
+            raise ValueError("cost provider request identity does not match result")
+        if (
+            self.provenance_receipt.provider_request_id != self.provider_request_id
+            or self.provenance_receipt.provider_trace_id != self.provider_trace_id
+        ):
+            raise ValueError("provenance provider identity does not match result")
+        data = self.model_dump(
+            mode="python",
+            exclude={
+                "audio_bytes",
+                "alignment_receipt_bytes",
+                "result_fingerprint",
+            },
+        )
+        if canonical_sha256(self._fingerprint_payload(data)) != self.result_fingerprint:
+            raise ValueError("result_fingerprint does not match provider result")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        request: VoiceGenerationRequest,
+        audio_bytes: bytes,
+        content_type: Literal["audio/wav", "audio/x-wav"],
+        provider_request_id: str | None,
+        provider_trace_id: str | None,
+        alignment_receipt_bytes: bytes,
+        cost_receipt: VoiceCostReceipt,
+        provenance_receipt: VoiceProvenanceReceipt,
+        terminal_status: Literal["succeeded"],
+    ) -> "VoiceProviderResult":
+        data: dict[str, object] = {
+            "request_id": request.request_id,
+            "request_fingerprint": request.voice_request_fingerprint,
+            "audio_bytes": audio_bytes,
+            "audio_sha256": hashlib.sha256(audio_bytes).hexdigest(),
+            "content_type": content_type,
+            "provider_request_id": provider_request_id,
+            "provider_trace_id": provider_trace_id,
+            "alignment_receipt_bytes": alignment_receipt_bytes,
+            "alignment_receipt_sha256": hashlib.sha256(
+                alignment_receipt_bytes
+            ).hexdigest(),
+            "cost_receipt": cost_receipt,
+            "provenance_receipt": provenance_receipt,
+            "terminal_status": terminal_status,
+        }
+        serializable = {
+            key: value.model_dump(mode="json") if isinstance(value, StrictModel) else value
+            for key, value in data.items()
+            if key not in {"audio_bytes", "alignment_receipt_bytes"}
+        }
+        data["result_fingerprint"] = canonical_sha256(
+            cls._fingerprint_payload(serializable)
+        )
+        return cls.model_validate(data)
+
+
+class VoiceAssetProvider(Protocol):
+    def preview(self, request: VoiceGenerationRequest) -> VoiceGenerationPreview: ...
+
+    def generate(
+        self,
+        request: VoiceGenerationRequest,
+        authorization: VoiceCallAuthorization,
+        permit: "DurableVoiceSubmitPermit",
+    ) -> VoiceProviderResult: ...
+
+
+def build_voice_generation_preview(
+    request: VoiceGenerationRequest,
+    *,
+    pricing: VoicePricingSnapshot,
+    destination: str,
+    credential_reference_kind: Literal["environment", "secret_store"],
+    timing_supported: bool,
+    output_supported: bool,
+) -> VoiceGenerationPreview:
+    """Build a deterministic no-I/O preview; callers still need durable authorization."""
+
+    if pricing.snapshot_id != request.pricing_snapshot_id:
+        raise _voice_error(
+            ErrorCode.VOICE_BUDGET_REJECTED,
+            "Voice pricing snapshot does not match the immutable request.",
+        )
+    script_characters = len(request.script_text)
+    billable_units = max(script_characters, pricing.minimum_billable_units)
+    data: dict[str, object] = {
+        "request_fingerprint": request.voice_request_fingerprint,
+        "pricing_snapshot_id": pricing.snapshot_id,
+        "pricing_effective_date": pricing.effective_date,
+        "currency": pricing.currency,
+        "pricing_unit": pricing.pricing_unit,
+        "billable_units_upper_bound": billable_units,
+        "estimated_cost_upper_bound_microunits": (
+            billable_units * pricing.unit_price_microunits
+        ),
+        "destination": destination,
+        "method": "POST",
+        "payload_categories": _VOICE_PAYLOAD_CATEGORIES,
+        "script_utf8_bytes": len(request.script_text.encode("utf-8")),
+        "script_characters": script_characters,
+        "credential_reference_kind": credential_reference_kind,
+        "paid_call_required": True,
+        "remote": True,
+        "policy_decision": "explicit_opt_in_required",
+        "timing_supported": timing_supported,
+        "output_supported": output_supported,
+    }
+    fingerprint_data = {
+        key: value.isoformat() if isinstance(value, date) else value
+        for key, value in data.items()
+    }
+    data["preview_fingerprint"] = canonical_sha256(fingerprint_data)
+    return VoiceGenerationPreview.model_validate(data)
+
+
+def validate_voice_call_authorization(
+    request: VoiceGenerationRequest,
+    preview: VoiceGenerationPreview,
+    authorization: VoiceCallAuthorization,
+) -> None:
+    """Fail closed before a provider transport receives an external-effect call."""
+
+    if (
+        preview.request_fingerprint != request.voice_request_fingerprint
+        or authorization.request_fingerprint != request.voice_request_fingerprint
+        or authorization.preview_fingerprint != preview.preview_fingerprint
+    ):
+        raise _voice_error(
+            ErrorCode.VOICE_REQUEST_INVALID,
+            "Voice authorization does not match the immutable request and preview.",
+        )
+    if (
+        preview.pricing_snapshot_id != request.pricing_snapshot_id
+        or authorization.pricing_snapshot_id != request.pricing_snapshot_id
+        or authorization.budget_reservation_receipt_id
+        != request.budget_reservation_receipt_id
+        or authorization.cost_ceiling_microunits
+        < preview.estimated_cost_upper_bound_microunits
+    ):
+        raise _voice_error(
+            ErrorCode.VOICE_BUDGET_REJECTED,
+            "Voice generation budget authorization is missing, stale, or insufficient.",
+        )
+    if (
+        authorization.egress_authorization_receipt_id
+        != request.egress_authorization_receipt_id
+        or authorization.destination != preview.destination
+        or authorization.payload_categories != preview.payload_categories
+    ):
+        raise _voice_error(
+            ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED,
+            "Voice generation egress authorization does not match the preview.",
+        )
+    if not preview.timing_supported or not preview.output_supported:
+        raise _voice_error(
+            ErrorCode.VOICE_REQUEST_INVALID,
+            "Voice provider does not support the requested output and timing contract.",
+        )
 
 
 class AudioProbeToolchain(StrictModel):
