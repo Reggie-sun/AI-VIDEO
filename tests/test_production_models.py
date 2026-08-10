@@ -592,6 +592,27 @@ def test_registry_20_preserves_generic_records_and_rejects_p4_fields():
         )
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("request_fingerprint", None),
+        ("payload_fingerprint", None),
+        ("retention_mode", None),
+        ("provider_policy_snapshot_id", None),
+    ],
+)
+def test_registry_20_rejects_explicit_p4_egress_keys_even_when_null(field, value):
+    legacy = AssetRegistrySnapshot(
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(make_asset_record(),),
+    ).model_dump(mode="python")
+    legacy["assets"][0]["egress"][field] = value
+
+    with pytest.raises(ValidationError, match="explicit P4 egress"):
+        AssetRegistrySnapshot.model_validate(legacy)
+
+
 def test_egress_metadata_has_strict_local_and_remote_variants():
     local = make_asset_record(audio_metadata=make_audio_metadata())
     assert local.egress.remote is False

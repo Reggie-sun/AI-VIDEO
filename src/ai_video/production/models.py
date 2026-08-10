@@ -564,6 +564,17 @@ class AssetRegistrySnapshot(StrictModel):
                 raise ValueError(
                     "Asset Registry 2.0 cannot contain explicit P4 fields"
                 )
+            if isinstance(asset, Mapping):
+                egress = asset.get("egress")
+                if isinstance(egress, Mapping) and {
+                    "request_fingerprint",
+                    "payload_fingerprint",
+                    "retention_mode",
+                    "provider_policy_snapshot_id",
+                }.intersection(egress):
+                    raise ValueError(
+                        "Asset Registry 2.0 cannot contain explicit P4 egress fields"
+                    )
         return value
 
     @model_validator(mode="after")
