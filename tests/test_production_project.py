@@ -31,6 +31,7 @@ from ai_video.production.hyperframes import (
 )
 from ai_video.production.models import (
     AssetRegistrySnapshot,
+    AssetSourceKind,
     DeliveryProfile,
     FixedTransform,
     AudioChannelLayout,
@@ -82,7 +83,9 @@ def _write_manifest(root: Path, manifest: ProductionManifest) -> None:
     )
 
 
-def _commit_revision_two(root: Path, *, attempt_id: str = "loader-revision-two") -> ProductionProject:
+def _commit_revision_two(
+    root: Path, *, attempt_id: str = "loader-revision-two"
+) -> ProductionProject:
     manifest = _manifest(root)
     project, registry = load_revision_two_models(root)
     ProductionStateCommitter(root).commit(
@@ -169,8 +172,7 @@ def _activate_fake_render(
         write_production_project(root)
         before = _manifest(root)
     png = (
-        Path(__file__).parent
-        / "fixtures/hyperframes/silent_image/source/assets/"
+        Path(__file__).parent / "fixtures/hyperframes/silent_image/source/assets/"
         "1ac67c3a1c909b3356cf6ff490c0f88b8a30ef4c28ca579657f6007146abe71c.png"
     ).read_bytes()
     digest = hashlib.sha256(png).hexdigest()
@@ -191,9 +193,7 @@ def _activate_fake_render(
         composition_spec_hash="1" * 64,
         delivery_profile=DeliveryProfile(width=1280, height=720, fps=24),
         sample_rate=48_000,
-        renderer=RendererIdentity(
-            kind=RendererKind.HYPERFRAMES, version="0.7.103"
-        ),
+        renderer=RendererIdentity(kind=RendererKind.HYPERFRAMES, version="0.7.103"),
         visual_spans=(
             ResolvedVisualSpan(
                 layer_id="layer-reader",
@@ -319,7 +319,14 @@ def _activate_fake_render(
 
 def _activate_fake_voice(root: Path, *, include_caption: bool = True):
     project_path = write_production_project(root)
-    request = make_voice_request(root, attempt_id="reader-voice")
+    request, committed, audio_ids, caption_ids = _append_fake_voice(
+        root, attempt_id="reader-voice", include_caption=include_caption
+    )
+    return project_path, request, committed, audio_ids, caption_ids
+
+
+def _append_fake_voice(root: Path, *, attempt_id: str, include_caption: bool = True):
+    request = make_voice_request(root, attempt_id=attempt_id)
     preview, authorization = make_voice_preview_and_authorization(request)
     writer = ProductionStateCommitter(root)
     writer.begin_voice_generation(request, preview, authorization)
@@ -328,7 +335,7 @@ def _activate_fake_voice(root: Path, *, include_caption: bool = True):
         root,
         request,
         authorization,
-        expected_manifest_revision=3,
+        expected_manifest_revision=_manifest(root).manifest_revision,
         include_caption=include_caption,
     )
     caption_ids = (f"caption-{request.attempt_id}",) if include_caption else ()
@@ -337,7 +344,7 @@ def _activate_fake_voice(root: Path, *, include_caption: bool = True):
         audio_asset_ids=audio_ids,
         caption_asset_ids=caption_ids,
     )
-    return project_path, request, committed, audio_ids, caption_ids
+    return request, committed, audio_ids, caption_ids
 
 
 def _select_resealed_registry(root: Path, registry: AssetRegistrySnapshot) -> None:
@@ -361,6 +368,85 @@ def _select_resealed_registry(root: Path, registry: AssetRegistrySnapshot) -> No
     _write_manifest(root, manifest.model_copy(update={"active_registry": pointer}))
 
 
+def _rebind_voice_candidate_to_selected_graph(root: Path, attempt_id: str) -> None:
+    manifest = _manifest(root)
+    attempt = next(item for item in manifest.attempts if item.attempt_id == attempt_id)
+    candidate_pointer = manifest.active_registry
+    base = AssetRegistrySnapshot.model_validate_json(
+        (root / attempt.base_registry.path).read_bytes()
+    )
+    candidate = AssetRegistrySnapshot.model_validate_json(
+        (root / candidate_pointer.path).read_bytes()
+    )
+    pairs = [
+        (
+            attempt.base_project.path.as_posix(),
+            sha256_file(root / attempt.base_project.path),
+        ),
+        (candidate_pointer.path.as_posix(), candidate_pointer.file_sha256),
+    ]
+    for record in candidate.assets[len(base.assets) :]:
+        pairs.append(
+            (record.artifact_path.as_posix(), sha256_file(root / record.artifact_path))
+        )
+        if record.caption_metadata is not None:
+            style_hash = record.caption_metadata.style_content_hash
+            if style_hash is not None:
+                style_path = Path(f"assets/styles/{style_hash}.json")
+                pairs.append((style_path.as_posix(), sha256_file(root / style_path)))
+    paths = ProductionStateCommitter(root).voice_attempt_paths(attempt_id)
+    for evidence in (
+        paths.request_path,
+        paths.preview_path,
+        paths.authorization_path,
+        paths.submit_intent_path,
+        paths.alignment_path,
+        paths.cost_path,
+        paths.provenance_path,
+        paths.outcome_path,
+    ):
+        pairs.append((evidence.relative_to(root).as_posix(), sha256_file(evidence)))
+    candidate_hash = hashlib.sha256(
+        json.dumps(sorted(pairs), separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    changed_attempt = attempt.model_copy(
+        update={
+            "candidate_registry": candidate_pointer,
+            "candidate_artifacts_hash": candidate_hash,
+        }
+    )
+    _write_manifest(
+        root,
+        manifest.model_copy(
+            update={
+                "attempts": tuple(
+                    changed_attempt if item.attempt_id == attempt_id else item
+                    for item in manifest.attempts
+                )
+            }
+        ),
+    )
+
+
+def _replace_selected_voice_asset(root: Path, attempt_id: str, replacement) -> None:
+    manifest = _manifest(root)
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (root / manifest.active_registry.path).read_bytes()
+    )
+    _select_resealed_registry(
+        root,
+        registry.model_copy(
+            update={
+                "assets": tuple(
+                    replacement if item.asset_id == replacement.asset_id else item
+                    for item in registry.assets
+                )
+            }
+        ),
+    )
+    _rebind_voice_candidate_to_selected_graph(root, attempt_id)
+
+
 def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None:
     from ai_video.production.audio import (
         VoiceCallAuthorization,
@@ -370,7 +456,9 @@ def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None
     )
 
     paths = ProductionStateCommitter(root).voice_attempt_paths(request.attempt_id)
-    preview = VoiceGenerationPreview.model_validate_json(paths.preview_path.read_bytes())
+    preview = VoiceGenerationPreview.model_validate_json(
+        paths.preview_path.read_bytes()
+    )
     authorization = VoiceCallAuthorization.model_validate_json(
         paths.authorization_path.read_bytes()
     )
@@ -450,7 +538,9 @@ def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None
         (root / manifest.active_registry.path).read_bytes()
     )
     audio_record = next(
-        item for item in registry.assets if item.asset_id == f"voice-{request.attempt_id}"
+        item
+        for item in registry.assets
+        if item.asset_id == f"voice-{request.attempt_id}"
     )
     outcome = json.loads(paths.outcome_path.read_bytes())
     fingerprint_payload = {
@@ -468,6 +558,7 @@ def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None
         "authorization_fingerprint": result_authorization_fingerprint,
     }
     result_fingerprint = canonical_sha256(fingerprint_payload)
+
     def canonical_model_bytes(model) -> bytes:
         return (
             json.dumps(
@@ -489,9 +580,9 @@ def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None
     outcome["authorization_fingerprint"] = result_authorization_fingerprint
     outcome["result_fingerprint"] = result_fingerprint
     paths.outcome_path.write_bytes(
-        (
-            json.dumps(outcome, sort_keys=True, separators=(",", ":")) + "\n"
-        ).encode("utf-8")
+        (json.dumps(outcome, sort_keys=True, separators=(",", ":")) + "\n").encode(
+            "utf-8"
+        )
     )
     assert audio_record.audio_metadata is not None
     changed = audio_record.model_copy(
@@ -518,6 +609,7 @@ def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None
             }
         ),
     )
+    _rebind_voice_candidate_to_selected_graph(root, request.attempt_id)
 
 
 def test_load_production_project_returns_verified_bundle(tmp_path):
@@ -704,7 +796,9 @@ def test_load_rejects_tampered_active_registry_without_root_fallback(tmp_path):
     assert exc.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
 
 
-@pytest.mark.parametrize("stored", ["../story.yaml", "/tmp/story.yaml", "other/story.yaml"])
+@pytest.mark.parametrize(
+    "stored", ["../story.yaml", "/tmp/story.yaml", "other/story.yaml"]
+)
 def test_load_rejects_unsafe_creative_reference_path(tmp_path, stored):
     project_path = write_production_project(tmp_path)
     project_data = yaml.safe_load(project_path.read_text(encoding="utf-8"))
@@ -726,14 +820,16 @@ def test_load_rejects_unsafe_asset_root(tmp_path, asset_root):
         load_production_project(project_path)
 
 
-@pytest.mark.parametrize(
-    "path", [Path("../outside.yaml"), Path("/tmp/outside.yaml")]
-)
+@pytest.mark.parametrize("path", [Path("../outside.yaml"), Path("/tmp/outside.yaml")])
 def test_load_rejects_unsafe_active_project_pointer_before_read(tmp_path, path):
     project_path = write_production_project(tmp_path)
-    manifest_data = json.loads((tmp_path / "state/manifest.json").read_text(encoding="utf-8"))
+    manifest_data = json.loads(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
     manifest_data["active_project"]["path"] = str(path)
-    (tmp_path / "state/manifest.json").write_text(json.dumps(manifest_data), encoding="utf-8")
+    (tmp_path / "state/manifest.json").write_text(
+        json.dumps(manifest_data), encoding="utf-8"
+    )
 
     with pytest.raises(AiVideoError, match="Could not load production state"):
         load_production_project(project_path)
@@ -820,7 +916,9 @@ def test_loader_creates_no_directories_preserves_inputs_and_does_not_recover(tmp
         for path in tmp_path.rglob("*")
         if path.is_file()
     }
-    directories_before = {path.relative_to(tmp_path) for path in tmp_path.rglob("*") if path.is_dir()}
+    directories_before = {
+        path.relative_to(tmp_path) for path in tmp_path.rglob("*") if path.is_dir()
+    }
 
     load_production_project(project_path)
 
@@ -829,7 +927,9 @@ def test_loader_creates_no_directories_preserves_inputs_and_does_not_recover(tmp
         for path in tmp_path.rglob("*")
         if path.is_file()
     }
-    directories_after = {path.relative_to(tmp_path) for path in tmp_path.rglob("*") if path.is_dir()}
+    directories_after = {
+        path.relative_to(tmp_path) for path in tmp_path.rglob("*") if path.is_dir()
+    }
     assert files_after == files_before
     assert directories_after == directories_before
 
@@ -907,7 +1007,11 @@ def test_reader_reopens_exact_generated_voice_graph_without_writes_or_network(
     assert {item.asset_id for item in loaded.registry.assets}.issuperset(
         {*audio_ids, *caption_ids}
     )
-    attempt = next(item for item in loaded.manifest.attempts if item.attempt_id == request.attempt_id)
+    attempt = next(
+        item
+        for item in loaded.manifest.attempts
+        if item.attempt_id == request.attempt_id
+    )
     assert attempt.voice_phase == "activate"
     assert _tree_snapshot(tmp_path) == before
 
@@ -930,6 +1034,7 @@ def test_reader_rejects_generated_voice_resealed_as_local_egress(tmp_path):
     _select_resealed_registry(
         tmp_path, registry.model_copy(update={"assets": changed_assets})
     )
+    _rebind_voice_candidate_to_selected_graph(tmp_path, request.attempt_id)
 
     with pytest.raises(AiVideoError, match="remote egress evidence"):
         load_production_project(project_path)
@@ -995,6 +1100,209 @@ def test_reader_rejects_tampered_selected_voice_evidence_without_recovery(
     assert (tmp_path / "state/manifest.json").read_bytes() == manifest_before
 
 
+def test_reader_rejects_selected_registry_that_removes_succeeded_voice_candidate(
+    tmp_path,
+):
+    project_path, request, _, _, _ = _activate_fake_voice(
+        tmp_path, include_caption=False
+    )
+    attempt = next(
+        item
+        for item in _manifest(tmp_path).attempts
+        if item.attempt_id == request.attempt_id
+    )
+    base = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / attempt.base_registry.path).read_bytes()
+    )
+    _select_resealed_registry(tmp_path, base)
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(project_path)
+
+
+@pytest.mark.parametrize("mutation", ["delete", "mutate"])
+def test_reader_reopens_succeeded_voice_base_registry(tmp_path, mutation):
+    project_path, request, _, _, _ = _activate_fake_voice(
+        tmp_path, include_caption=False
+    )
+    attempt = next(
+        item
+        for item in _manifest(tmp_path).attempts
+        if item.attempt_id == request.attempt_id
+    )
+    base_path = tmp_path / attempt.base_registry.path
+    if mutation == "delete":
+        base_path.unlink()
+    else:
+        base_path.write_bytes(b"x" * base_path.stat().st_size)
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(project_path)
+
+
+def test_reader_rejects_selected_registry_with_changed_voice_base_prefix(tmp_path):
+    project_path, _, _, _, _ = _activate_fake_voice(tmp_path, include_caption=False)
+    manifest = _manifest(tmp_path)
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / manifest.active_registry.path).read_bytes()
+    )
+    first = registry.assets[0].model_copy(update={"usage_license": "changed"})
+    _select_resealed_registry(
+        tmp_path,
+        registry.model_copy(update={"assets": (first, *registry.assets[1:])}),
+    )
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(project_path)
+
+
+def test_reader_rejects_tampered_voice_candidate_artifact_graph(tmp_path):
+    project_path, request, _, _, _ = _activate_fake_voice(
+        tmp_path, include_caption=False
+    )
+    manifest = _manifest(tmp_path)
+    attempts = tuple(
+        item.model_copy(update={"candidate_artifacts_hash": "f" * 64})
+        if item.attempt_id == request.attempt_id
+        else item
+        for item in manifest.attempts
+    )
+    _write_manifest(tmp_path, manifest.model_copy(update={"attempts": attempts}))
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(project_path)
+
+
+def test_reader_accepts_two_append_only_voice_candidates_without_writes(tmp_path):
+    project_path = write_production_project(tmp_path)
+    first, _, first_audio, first_captions = _append_fake_voice(
+        tmp_path, attempt_id="reader-voice-1", include_caption=True
+    )
+    second, _, second_audio, second_captions = _append_fake_voice(
+        tmp_path, attempt_id="reader-voice-2", include_caption=False
+    )
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(project_path)
+
+    assert {item.asset_id for item in loaded.registry.assets}.issuperset(
+        {*first_audio, *first_captions, *second_audio, *second_captions}
+    )
+    assert {
+        item.attempt_id
+        for item in loaded.manifest.attempts
+        if item.operation == "voice_generation"
+    } == {first.attempt_id, second.attempt_id}
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_rejects_voice_candidate_id_claimed_by_two_attempts(tmp_path):
+    project_path = write_production_project(tmp_path)
+    first, _, first_audio, _ = _append_fake_voice(
+        tmp_path, attempt_id="reader-voice-1", include_caption=False
+    )
+    second, _, _, _ = _append_fake_voice(
+        tmp_path, attempt_id="reader-voice-2", include_caption=False
+    )
+    manifest = _manifest(tmp_path)
+    attempts = tuple(
+        item.model_copy(update={"candidate_audio_asset_ids": first_audio})
+        if item.attempt_id == second.attempt_id
+        else item
+        for item in manifest.attempts
+    )
+    _write_manifest(tmp_path, manifest.model_copy(update={"attempts": attempts}))
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(project_path)
+
+    assert first.attempt_id != second.attempt_id
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "audio_metadata_source_kind",
+        "audio_asset_inputs",
+        "caption_source_kind",
+        "caption_transcript",
+    ],
+)
+def test_reader_rejects_resealed_voice_asset_semantic_contradictions(
+    tmp_path, mutation
+):
+    project_path, request, _, audio_ids, caption_ids = _activate_fake_voice(tmp_path)
+    manifest = _manifest(tmp_path)
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / manifest.active_registry.path).read_bytes()
+    )
+    audio = next(item for item in registry.assets if item.asset_id == audio_ids[0])
+    caption = next(item for item in registry.assets if item.asset_id == caption_ids[0])
+    if mutation == "audio_metadata_source_kind":
+        assert audio.audio_metadata is not None
+        replacement = audio.model_copy(
+            update={
+                "audio_metadata": audio.audio_metadata.model_copy(
+                    update={
+                        "source": audio.audio_metadata.source.model_copy(
+                            update={"kind": AssetSourceKind.IMPORTED}
+                        )
+                    }
+                )
+            }
+        )
+    elif mutation == "audio_asset_inputs":
+        replacement = audio.model_copy(
+            update={
+                "input_artifact_ids": ("story-main",),
+                "input_fingerprint": "f" * 64,
+            }
+        )
+    elif mutation == "caption_source_kind":
+        replacement = caption.model_copy(
+            update={"source_kind": AssetSourceKind.GENERATED}
+        )
+    else:
+        track = CaptionTrack.model_validate_json(
+            (tmp_path / caption.artifact_path).read_bytes()
+        )
+        changed = track.model_copy(
+            update={
+                "transcript_hash": "f" * 64,
+                "timing_fingerprint": "0" * 64,
+                "content_hash": "0" * 64,
+            }
+        )
+        changed = changed.model_copy(
+            update={"timing_fingerprint": caption_timing_fingerprint(changed)}
+        )
+        changed = CaptionTrack.model_validate(
+            seal_artifact(changed).model_dump(mode="python")
+        )
+        payload = _canonical_track_bytes(changed)
+        digest = hashlib.sha256(payload).hexdigest()
+        artifact_path = Path(f"assets/captions/{digest}.json")
+        (tmp_path / artifact_path).write_bytes(payload)
+        assert caption.caption_metadata is not None
+        replacement = caption.model_copy(
+            update={
+                "artifact_path": artifact_path,
+                "sha256": digest,
+                "size_bytes": len(payload),
+                "caption_metadata": caption.caption_metadata.model_copy(
+                    update={
+                        "transcript_hash": changed.transcript_hash,
+                        "timing_fingerprint": changed.timing_fingerprint,
+                    }
+                ),
+            }
+        )
+    _replace_selected_voice_asset(tmp_path, request.attempt_id, replacement)
+
+    with pytest.raises(AiVideoError, match="voice evidence graph"):
+        load_production_project(project_path)
+
+
 def test_reader_verifies_selected_render_graph_exactly_without_rewrite(tmp_path):
     _, durable, _ = _activate_fake_render(tmp_path)
     before = _tree_snapshot(tmp_path)
@@ -1014,9 +1322,7 @@ def test_reader_verifies_p4_audio_caption_and_style_binding_set_without_rewrite(
 
     loaded = load_production_project(tmp_path / "project.yaml")
     source = json.loads((tmp_path / durable.state.source_receipt.path).read_bytes())
-    bundle_paths = {
-        item.path.as_posix() for item in durable.state.source_bundle.assets
-    }
+    bundle_paths = {item.path.as_posix() for item in durable.state.source_bundle.assets}
     binding_paths = {
         *(item["materialized_path"] for item in source["asset_bindings"]),
         *(item["materialized_path"] for item in source["audio_bindings"]),
@@ -1129,7 +1435,9 @@ def test_reader_rejects_mixed_selected_render_pointer_identity(tmp_path):
     mixed = durable.next_render_state.model_copy(
         update={"revision": durable.next_render_state.revision + 1}
     )
-    _write_manifest(tmp_path, manifest.model_copy(update={"active_render_state": mixed}))
+    _write_manifest(
+        tmp_path, manifest.model_copy(update={"active_render_state": mixed})
+    )
 
     with pytest.raises(AiVideoError) as exc_info:
         load_production_project(tmp_path / "project.yaml")
@@ -1163,9 +1471,7 @@ def _render_graph_path(durable, label: str) -> Path:
     ],
 )
 @pytest.mark.parametrize("outside", [False, True])
-def test_reader_rejects_every_render_artifact_symlink(
-    tmp_path, label, outside
-):
+def test_reader_rejects_every_render_artifact_symlink(tmp_path, label, outside):
     _, durable, _ = _activate_fake_render(tmp_path)
     target = tmp_path / _render_graph_path(durable, label)
     payload = target.read_bytes()

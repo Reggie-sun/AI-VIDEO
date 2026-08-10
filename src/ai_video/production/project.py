@@ -8,6 +8,7 @@ from typing import TypeVar
 import wave
 
 from pydantic import BaseModel, ValidationError
+import yaml
 
 from ai_video.config import load_yaml, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
@@ -27,6 +28,7 @@ from ai_video.production.captions import (
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     ArtifactReference,
+    AssetRegistrySnapshot,
     AssetSourceKind,
     AssetType,
     CaptionTrack,
@@ -67,7 +69,7 @@ from ai_video.production.paths import (
     canonical_voice_attempt_artifact_path,
     resolve_contained_path,
 )
-from ai_video.production.registry import load_asset_registry
+from ai_video.production.registry import load_asset_registry, registry_semantic_sha256
 from ai_video.production.validation import validate_project_references
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
@@ -155,9 +157,13 @@ def _verify_snapshot_file_hash(path: Path, expected: str, label: str) -> None:
     try:
         actual = sha256_file(path)
     except OSError as exc:
-        raise _invalid(f"Could not verify {label} snapshot file hash: {path}", str(exc)) from exc
+        raise _invalid(
+            f"Could not verify {label} snapshot file hash: {path}", str(exc)
+        ) from exc
     if actual != expected:
-        raise _invalid(f"{label.capitalize()} snapshot file hash does not match Manifest.")
+        raise _invalid(
+            f"{label.capitalize()} snapshot file hash does not match Manifest."
+        )
 
 
 def _verify_manifest_snapshot_identity(
@@ -166,13 +172,21 @@ def _verify_manifest_snapshot_identity(
     registry_pointer: RegistrySnapshotPointer,
 ) -> None:
     if bundle.project.revision != project_pointer.revision:
-        raise _invalid("Manifest project revision does not match selected project snapshot.")
+        raise _invalid(
+            "Manifest project revision does not match selected project snapshot."
+        )
     if bundle.project.content_hash != project_pointer.content_hash:
-        raise _invalid("Manifest project content hash does not match selected project snapshot.")
+        raise _invalid(
+            "Manifest project content hash does not match selected project snapshot."
+        )
     if bundle.registry.revision_id != registry_pointer.revision_id:
-        raise _invalid("Manifest registry revision does not match selected registry snapshot.")
+        raise _invalid(
+            "Manifest registry revision does not match selected registry snapshot."
+        )
     if bundle.registry.content_hash != registry_pointer.content_hash:
-        raise _invalid("Manifest registry content hash does not match selected registry snapshot.")
+        raise _invalid(
+            "Manifest registry content hash does not match selected registry snapshot."
+        )
 
 
 def _canonical_model_bytes(model: BaseModel) -> bytes:
@@ -220,36 +234,180 @@ def _read_voice_json(
     return value, snapshot.data
 
 
+def _read_voice_registry_pointer(
+    root: Path, pointer: RegistrySnapshotPointer, label: str
+) -> AssetRegistrySnapshot:
+    snapshot = _read_regular_file_nofollow(root / pointer.path, contained_by=root)
+    if snapshot.file_sha256 != pointer.file_sha256:
+        raise ValueError(f"{label} registry file hash mismatch")
+    registry = AssetRegistrySnapshot.model_validate_json(snapshot.data)
+    if (
+        registry.revision_id != pointer.revision_id
+        or registry.content_hash != pointer.content_hash
+        or registry_semantic_sha256(registry) != pointer.content_hash
+    ):
+        raise ValueError(f"{label} registry identity mismatch")
+    return registry
+
+
+def _verify_voice_candidate_history(
+    bundle: LoadedProductionProject,
+    attempts: tuple[StateCommitAttempt, ...],
+) -> dict[str, StateCommitAttempt]:
+    claimed: dict[str, StateCommitAttempt] = {}
+    current_assets = bundle.registry.assets
+    for attempt in attempts:
+        if attempt.candidate_registry is None or attempt.candidate_project not in (
+            None,
+            attempt.base_project,
+        ):
+            raise ValueError("voice attempt candidate pointers are incomplete")
+        project_snapshot = _read_regular_file_nofollow(
+            bundle.root / attempt.base_project.path, contained_by=bundle.root
+        )
+        if project_snapshot.file_sha256 != attempt.base_project.file_sha256:
+            raise ValueError("voice base project file hash mismatch")
+        try:
+            project = ProductionProject.model_validate(
+                yaml.safe_load(project_snapshot.data.decode("utf-8"))
+            )
+        except (UnicodeDecodeError, ValidationError, ValueError, yaml.YAMLError) as exc:
+            raise ValueError("voice base project is invalid") from exc
+        if (
+            project.revision != attempt.base_project.revision
+            or project.content_hash != attempt.base_project.content_hash
+            or not verify_artifact_hash(project)
+        ):
+            raise ValueError("voice base project identity mismatch")
+        base = _read_voice_registry_pointer(bundle.root, attempt.base_registry, "base")
+        candidate = _read_voice_registry_pointer(
+            bundle.root, attempt.candidate_registry, "candidate"
+        )
+        if (
+            candidate.schema_version != "2.1"
+            or candidate.assets[: len(base.assets)] != base.assets
+        ):
+            raise ValueError(
+                "voice candidate registry does not preserve its base prefix"
+            )
+        suffix = candidate.assets[len(base.assets) :]
+        expected_ids = tuple(
+            sorted(
+                (
+                    *attempt.candidate_audio_asset_ids,
+                    *attempt.candidate_caption_asset_ids,
+                )
+            )
+        )
+        if (
+            tuple(item.asset_id for item in suffix) != expected_ids
+            or current_assets[: len(candidate.assets)] != candidate.assets
+        ):
+            raise ValueError(
+                "selected registry does not retain exact voice candidate history"
+            )
+        pairs: list[tuple[str, str]] = [
+            (attempt.base_project.path.as_posix(), project_snapshot.file_sha256),
+            (
+                attempt.candidate_registry.path.as_posix(),
+                attempt.candidate_registry.file_sha256,
+            ),
+        ]
+        for record in suffix:
+            if record.asset_id in claimed:
+                raise ValueError(
+                    "voice candidate asset ID is claimed by multiple attempts"
+                )
+            claimed[record.asset_id] = attempt
+            artifact = _read_regular_file_nofollow(
+                bundle.root / record.artifact_path, contained_by=bundle.root
+            )
+            if (
+                artifact.file_sha256 != record.sha256
+                or artifact.size_bytes != record.size_bytes
+            ):
+                raise ValueError("voice candidate asset bytes do not match registry")
+            pairs.append((record.artifact_path.as_posix(), artifact.file_sha256))
+            metadata = record.caption_metadata
+            if metadata is not None and metadata.style_content_hash is not None:
+                style_path = Path(f"assets/styles/{metadata.style_content_hash}.json")
+                style = _read_regular_file_nofollow(
+                    bundle.root / style_path, contained_by=bundle.root
+                )
+                if style.file_sha256 != metadata.style_content_hash:
+                    raise ValueError("voice candidate caption style hash mismatch")
+                pairs.append((style_path.as_posix(), style.file_sha256))
+        for name in (
+            "request.json",
+            "preview.json",
+            "authorization.json",
+            "submit-intent.json",
+            "alignment.json",
+            "cost.json",
+            "provenance.json",
+            "outcome.json",
+        ):
+            evidence_path = canonical_voice_attempt_artifact_path(
+                bundle.root, attempt.attempt_id, name
+            )
+            evidence = _read_regular_file_nofollow(
+                evidence_path, contained_by=bundle.root
+            )
+            pairs.append(
+                (
+                    evidence_path.relative_to(bundle.root).as_posix(),
+                    evidence.file_sha256,
+                )
+            )
+        if len({path for path, _ in pairs}) != len(pairs):
+            raise ValueError("voice candidate evidence contains duplicate paths")
+        payload = json.dumps(sorted(pairs), separators=(",", ":")).encode("utf-8")
+        if hashlib.sha256(payload).hexdigest() != attempt.candidate_artifacts_hash:
+            raise ValueError("voice candidate artifact evidence hash mismatch")
+    return claimed
+
+
 def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
-    generated_voice_assets = tuple(
-        asset
+    attempts = tuple(
+        attempt
+        for attempt in bundle.manifest.attempts
+        if attempt.operation == "voice_generation"
+        and attempt.status is StateCommitStatus.SUCCEEDED
+        and attempt.voice_phase == "activate"
+    )
+    try:
+        attempts_by_asset = _verify_voice_candidate_history(bundle, attempts)
+    except (OSError, ValidationError, ValueError) as exc:
+        raise _invalid(
+            "Active P4 voice candidate history is invalid.", str(exc)
+        ) from exc
+    assets_by_id = {asset.asset_id: asset for asset in bundle.registry.assets}
+    generated_voice_ids = {
+        asset.asset_id
         for asset in bundle.registry.assets
         if asset.asset_type is AssetType.VOICE
         and asset.source_kind is AssetSourceKind.GENERATED
-    )
-    if not generated_voice_assets:
-        return
-    attempts_by_asset: dict[str, StateCommitAttempt] = {}
-    for attempt in bundle.manifest.attempts:
-        if (
-            attempt.operation == "voice_generation"
-            and attempt.status is StateCommitStatus.SUCCEEDED
-            and attempt.voice_phase == "activate"
-        ):
-            for asset_id in (
-                *attempt.candidate_audio_asset_ids,
-                *attempt.candidate_caption_asset_ids,
-            ):
-                if asset_id in attempts_by_asset:
-                    raise _invalid("Active P4 voice asset is claimed by multiple attempts.")
-                attempts_by_asset[asset_id] = attempt
-    assets_by_id = {asset.asset_id: asset for asset in bundle.registry.assets}
-    for asset in generated_voice_assets:
+    }
+    claimed_audio_ids = {
+        asset_id
+        for attempt in attempts
+        for asset_id in attempt.candidate_audio_asset_ids
+    }
+    if generated_voice_ids != claimed_audio_ids:
+        raise _invalid("Active generated voice assets do not match succeeded attempts.")
+    for attempt in attempts:
+        if len(attempt.candidate_audio_asset_ids) != 1:
+            raise _invalid(
+                "Each succeeded voice attempt must select exactly one audio asset."
+            )
+        audio_id = attempt.candidate_audio_asset_ids[0]
+        asset = assets_by_id[audio_id]
+        if attempts_by_asset.get(audio_id) != attempt:
+            raise _invalid("Active generated voice asset claim is invalid.")
         if not asset.egress.remote:
-            raise _invalid("Active generated voice asset requires remote egress evidence.")
-        attempt = attempts_by_asset.get(asset.asset_id)
-        if attempt is None:
-            raise _invalid("Active generated voice asset has no succeeded Manifest attempt.")
+            raise _invalid(
+                "Active generated voice asset requires remote egress evidence."
+            )
         try:
             request, _ = _read_voice_model(
                 bundle.root, attempt.attempt_id, "request.json", VoiceGenerationRequest
@@ -299,7 +457,9 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                 audio_snapshot.file_sha256 != asset.sha256
                 or audio_snapshot.size_bytes != asset.size_bytes
             ):
-                raise ValueError("voice audio identity changed after registry verification")
+                raise ValueError(
+                    "voice audio identity changed after registry verification"
+                )
             result = VoiceProviderResult(
                 request_id=request.request_id,
                 request_fingerprint=request.voice_request_fingerprint,
@@ -332,7 +492,9 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                 terminal_status=result.terminal_status,
             )
             if result != expected_result:
-                raise ValueError("durable voice result is not the canonical expected result")
+                raise ValueError(
+                    "durable voice result is not the canonical expected result"
+                )
             metadata = asset.audio_metadata
             if metadata is None or attempt.voice_request is None:
                 raise ValueError("voice metadata is missing")
@@ -378,6 +540,14 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                 for item in attempt.candidate_caption_asset_ids
                 if item in assets_by_id
             )
+            caption_tracks: dict[str, CaptionTrack] = {}
+            for caption in caption_assets:
+                caption_snapshot = _read_regular_file_nofollow(
+                    bundle.root / caption.artifact_path, contained_by=bundle.root
+                )
+                caption_tracks[caption.asset_id] = CaptionTrack.model_validate_json(
+                    caption_snapshot.data
+                )
             if (
                 request.attempt_id != attempt.attempt_id
                 or request.base_project != attempt.base_project
@@ -389,14 +559,16 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                 or asset.artifact_path != canonical_audio_asset_path(asset.sha256)
                 or asset.creation_receipt_id
                 != f"voice-result-{result.result_fingerprint}"
+                or asset.source_kind is not AssetSourceKind.GENERATED
                 or asset.tool != provenance.adapter
                 or asset.usage_license != provenance.license_policy_decision
+                or asset.input_artifact_ids != request.input_artifact_ids
+                or asset.input_fingerprint != request.input_fingerprint
                 or asset.cost_receipt_id
                 != f"cost-{hashlib.sha256(cost_bytes).hexdigest()}"
                 or metadata.provenance_receipt_id
                 != f"provenance-{hashlib.sha256(provenance_bytes).hexdigest()}"
-                or metadata.alignment_receipt_id
-                != f"alignment-{alignment.file_sha256}"
+                or metadata.alignment_receipt_id != f"alignment-{alignment.file_sha256}"
                 or metadata.audio_kind != request.audio_kind
                 or metadata.speaker_id != request.speaker_id
                 or metadata.voice_id != request.voice_id
@@ -404,14 +576,15 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                 or metadata.script_hash != request.script_hash
                 or metadata.sample_rate_hz != request.output_sample_rate_hz
                 or metadata.channels != request.output_channels
+                or metadata.source.kind is not AssetSourceKind.GENERATED
+                or metadata.source.provider_or_tool != asset.tool
                 or metadata.source.provider_or_tool != provenance.adapter
                 or metadata.source.input_artifact_ids != request.input_artifact_ids
                 or metadata.source.input_fingerprint != request.input_fingerprint
                 or asset.egress.destination != authorization.destination
                 or asset.egress.authorization_receipt_id
                 != request.egress_authorization_receipt_id
-                or asset.egress.request_fingerprint
-                != request.voice_request_fingerprint
+                or asset.egress.request_fingerprint != request.voice_request_fingerprint
                 or asset.egress.payload_fingerprint != request.script_hash
                 or asset.egress.retention_mode != provenance.retention_mode
                 or asset.egress.provider_policy_snapshot_id
@@ -419,22 +592,53 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                 or len(caption_assets) != len(attempt.candidate_caption_asset_ids)
                 or any(
                     caption.caption_metadata is None
+                    or caption.source_kind is not AssetSourceKind.DERIVED
+                    or caption.tool != provenance.adapter
+                    or caption.usage_license != provenance.license_policy_decision
                     or caption.creation_receipt_id
                     != f"caption-result-{result.result_fingerprint}"
+                    or caption.input_artifact_ids != (asset.asset_id,)
+                    or caption.input_fingerprint != asset.sha256
                     or caption.caption_metadata.source_audio_asset_id != asset.asset_id
                     or caption.caption_metadata.source_audio_sha256 != asset.sha256
                     or caption.artifact_path
                     != Path(f"assets/captions/{caption.sha256}.json")
                     or caption.caption_metadata.script_hash != request.script_hash
+                    or caption.caption_metadata.transcript_hash != request.script_hash
                     or caption.caption_metadata.alignment_receipt_id
+                    != metadata.alignment_receipt_id
+                    or caption_tracks[caption.asset_id].script_hash
+                    != request.script_hash
+                    or caption_tracks[caption.asset_id].transcript_hash
+                    != request.script_hash
+                    or caption_tracks[caption.asset_id].source_audio_asset_id
+                    != asset.asset_id
+                    or caption_tracks[caption.asset_id].source_audio_sha256
+                    != asset.sha256
+                    or caption_tracks[caption.asset_id].source_sample_rate_hz
+                    != metadata.sample_rate_hz
+                    or caption_tracks[caption.asset_id].alignment_provider
+                    != request.provider_kind
+                    or caption_tracks[caption.asset_id].alignment_model
+                    != request.model_id
+                    or caption_tracks[caption.asset_id].alignment_receipt_id
                     != metadata.alignment_receipt_id
                     for caption in caption_assets
                 )
             ):
                 raise ValueError("voice evidence identity mismatch")
-        except (AiVideoError, OSError, ValidationError, ValueError, KeyError, TypeError) as exc:
+        except (
+            AiVideoError,
+            OSError,
+            ValidationError,
+            ValueError,
+            KeyError,
+            TypeError,
+        ) as exc:
             detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
-            raise _invalid("Active P4 voice evidence graph is invalid.", detail) from exc
+            raise _invalid(
+                "Active P4 voice evidence graph is invalid.", detail
+            ) from exc
 
 
 def _bundle_hash(state: RenderStateSnapshot) -> str:
@@ -449,25 +653,31 @@ def _bundle_hash(state: RenderStateSnapshot) -> str:
             for item in bundle.assets
         ),
     ]
-    payload = json.dumps(sorted(entries), ensure_ascii=True, separators=(",", ":")).encode()
+    payload = json.dumps(
+        sorted(entries), ensure_ascii=True, separators=(",", ":")
+    ).encode()
     return hashlib.sha256(payload).hexdigest()
 
 
 def _raster_matches(payload: bytes, suffix: str, mime_type: str) -> bool:
     return (
-        suffix == ".png"
-        and mime_type == "image/png"
-        and payload.startswith(b"\x89PNG\r\n\x1a\n")
-    ) or (
-        suffix == ".jpg"
-        and mime_type == "image/jpeg"
-        and payload.startswith(b"\xff\xd8\xff")
-    ) or (
-        suffix == ".webp"
-        and mime_type == "image/webp"
-        and len(payload) >= 12
-        and payload[:4] == b"RIFF"
-        and payload[8:12] == b"WEBP"
+        (
+            suffix == ".png"
+            and mime_type == "image/png"
+            and payload.startswith(b"\x89PNG\r\n\x1a\n")
+        )
+        or (
+            suffix == ".jpg"
+            and mime_type == "image/jpeg"
+            and payload.startswith(b"\xff\xd8\xff")
+        )
+        or (
+            suffix == ".webp"
+            and mime_type == "image/webp"
+            and len(payload) >= 12
+            and payload[:4] == b"RIFF"
+            and payload[8:12] == b"WEBP"
+        )
     )
 
 
@@ -511,7 +721,9 @@ def _validate_source_timeline_bindings(
     expected_track_ids = tuple(item.track_id for item in timeline.audio_spans)
     if expected_track_ids:
         if len(source.audio_bindings) != 1:
-            raise ValueError("P4 render source requires exactly one mixed audio binding")
+            raise ValueError(
+                "P4 render source requires exactly one mixed audio binding"
+            )
         audio = source.audio_bindings[0]
         if (
             audio.asset_mime_type != "audio/wav"
@@ -520,12 +732,16 @@ def _validate_source_timeline_bindings(
             or audio.duration_samples != timeline.total_samples
             or audio.resolved_track_ids != expected_track_ids
         ):
-            raise ValueError("P4 mixed audio binding does not match the resolved timeline")
+            raise ValueError(
+                "P4 mixed audio binding does not match the resolved timeline"
+            )
     elif source.audio_bindings:
         raise ValueError("silent timeline cannot declare a renderer audio binding")
 
     expected_caption_tracks = {item.caption_track_id for item in timeline.caption_cues}
-    actual_caption_tracks = tuple(item.caption_track_id for item in source.caption_bindings)
+    actual_caption_tracks = tuple(
+        item.caption_track_id for item in source.caption_bindings
+    )
     if len(actual_caption_tracks) != len(set(actual_caption_tracks)):
         raise ValueError("renderer caption track bindings must be unique")
     if set(actual_caption_tracks) != expected_caption_tracks:
@@ -548,7 +764,9 @@ def _validate_source_timeline_bindings(
             != {(binding.style_reference_id, binding.style_content_hash)}
         ):
             raise ValueError("renderer caption binding does not match resolved cues")
-    if (timeline.audio_spans or timeline.caption_cues) and source.schema_version != "2.1":
+    if (
+        timeline.audio_spans or timeline.caption_cues
+    ) and source.schema_version != "2.1":
         raise ValueError("P4 timeline requires RendererSourceReceipt 2.1")
 
 
@@ -632,7 +850,9 @@ def _read_render_model(
             raise ValueError("file hash mismatch")
         model = model_type.model_validate_json(snapshot.data)
     except (OSError, ValidationError, ValueError) as exc:
-        raise _invalid(f"Could not verify active {label}: {relative}", str(exc)) from exc
+        raise _invalid(
+            f"Could not verify active {label}: {relative}", str(exc)
+        ) from exc
     return model, snapshot.data
 
 
@@ -711,7 +931,9 @@ def load_verified_render_state(
             root / bundle.index.path, contained_by=root
         )
     except (OSError, ValueError) as exc:
-        raise _invalid("Could not verify active render source index.", str(exc)) from exc
+        raise _invalid(
+            "Could not verify active render source index.", str(exc)
+        ) from exc
     if (
         index_snapshot.file_sha256 != bundle.index.file_sha256
         or index_snapshot.size_bytes != bundle.index.size_bytes
@@ -744,7 +966,9 @@ def load_verified_render_state(
                 raise ValueError("noncanonical asset path")
             snapshot = _read_regular_file_nofollow(root / asset.path, contained_by=root)
         except (OSError, ValueError) as exc:
-            raise _invalid("Could not verify active render source asset.", str(exc)) from exc
+            raise _invalid(
+                "Could not verify active render source asset.", str(exc)
+            ) from exc
         if (
             snapshot.file_sha256 != asset.file_sha256
             or snapshot.size_bytes != asset.size_bytes
@@ -855,9 +1079,13 @@ def _validate_canonical_entrypoint(root: Path, supplied_path: Path) -> None:
         resolved_entrypoint = supplied_path.resolve(strict=True)
         resolved_entrypoint.relative_to(root)
     except (OSError, RuntimeError, ValueError) as exc:
-        raise _invalid("Production project entry point must be contained by its root.", str(exc)) from exc
+        raise _invalid(
+            "Production project entry point must be contained by its root.", str(exc)
+        ) from exc
     if resolved_entrypoint != root / "project.yaml":
-        raise _invalid("Production project entry point must resolve to root project.yaml.")
+        raise _invalid(
+            "Production project entry point must resolve to root project.yaml."
+        )
 
 
 def _build_loaded_project(
@@ -875,8 +1103,12 @@ def _build_loaded_project(
         manifest=manifest,
         brief=_load_referenced_artifact(root, refs.brief, ProductionBrief),
         story=_load_referenced_artifact(root, refs.story, Story),
-        characters=tuple(_load_referenced_artifact(root, item, Character) for item in refs.characters),
-        scenes=tuple(_load_referenced_artifact(root, item, Scene) for item in refs.scenes),
+        characters=tuple(
+            _load_referenced_artifact(root, item, Character) for item in refs.characters
+        ),
+        scenes=tuple(
+            _load_referenced_artifact(root, item, Scene) for item in refs.scenes
+        ),
         storyboard=_load_referenced_artifact(root, refs.storyboard, Storyboard),
         shots=tuple(_load_referenced_artifact(root, item, Shot) for item in refs.shots),
         registry=registry,
@@ -896,13 +1128,17 @@ def load_production_project_candidate(
     try:
         resolved_root = Path(root).resolve(strict=True)
     except (OSError, RuntimeError) as exc:
-        raise _invalid("Production project root could not be resolved safely.", str(exc)) from exc
+        raise _invalid(
+            "Production project root could not be resolved safely.", str(exc)
+        ) from exc
     if not resolved_root.is_dir():
         raise _invalid("Production project root must be a directory.")
     project_path = Path(project_path)
     registry_path = Path(registry_path)
     resolved_project_path = _resolve_candidate_project_path(resolved_root, project_path)
-    resolved_registry_path = _resolve_candidate_registry_path(resolved_root, registry_path)
+    resolved_registry_path = _resolve_candidate_registry_path(
+        resolved_root, registry_path
+    )
     project = _load_yaml_artifact(resolved_project_path, ProductionProject)
     if manifest.project_id != project.project_id:
         raise _invalid("Production manifest project_id does not match project.")
@@ -921,7 +1157,9 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     try:
         root = supplied_path.parent.resolve(strict=True)
     except (OSError, RuntimeError) as exc:
-        raise _invalid("Production project root could not be resolved safely.", str(exc)) from exc
+        raise _invalid(
+            "Production project root could not be resolved safely.", str(exc)
+        ) from exc
     _validate_canonical_entrypoint(root, supplied_path)
     manifest = _load_json_model(
         _resolve_input(
@@ -932,7 +1170,9 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         ProductionManifest,
     )
     project_path = _resolve_candidate_project_path(root, manifest.active_project.path)
-    registry_path = _resolve_candidate_registry_path(root, manifest.active_registry.path)
+    registry_path = _resolve_candidate_registry_path(
+        root, manifest.active_registry.path
+    )
     _verify_snapshot_file_hash(
         project_path, manifest.active_project.file_sha256, "project"
     )
