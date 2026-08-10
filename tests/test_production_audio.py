@@ -91,15 +91,17 @@ def _voice_request(**overrides) -> VoiceGenerationRequest:
     return VoiceGenerationRequest.create(**values)
 
 
-def _pricing() -> VoicePricingSnapshot:
-    return VoicePricingSnapshot(
-        snapshot_id="pricing-2026-08-10",
-        effective_date=date(2026, 8, 10),
-        currency="USD",
-        pricing_unit="character",
-        unit_price_microunits=37,
-        minimum_billable_units=20,
-    )
+def _pricing(**overrides) -> VoicePricingSnapshot:
+    values = {
+        "snapshot_id": "pricing-2026-08-10",
+        "effective_date": date(2026, 8, 10),
+        "currency": "USD",
+        "pricing_unit": "character",
+        "unit_price_microunits": 37,
+        "minimum_billable_units": 20,
+    }
+    values.update(overrides)
+    return VoicePricingSnapshot(**values)
 
 
 def _preview(request: VoiceGenerationRequest) -> VoiceGenerationPreview:
@@ -130,7 +132,7 @@ def _authorization(
         "provider_enabled": True,
     }
     values.update(overrides)
-    return VoiceCallAuthorization(**values)
+    return VoiceCallAuthorization.create(**values)
 
 
 class _FakeVoiceProvider:
@@ -143,7 +145,9 @@ class _FakeVoiceProvider:
 
     def generate(self, request, authorization, permit) -> VoiceProviderResult:
         preview = self.preview(request)
-        validate_voice_call_authorization(request, preview, authorization)
+        validate_voice_call_authorization(
+            request, preview, authorization, pricing=_pricing()
+        )
         if permit is not _FAKE_DURABLE_PERMIT:
             raise AssertionError("fake provider requires the test-only permit sentinel")
         self.generate_calls += 1
@@ -191,9 +195,9 @@ class _FakeVoiceProvider:
         )
         return VoiceProviderResult.create(
             request=request,
-            expected_egress_authorization_receipt_id=(
-                authorization.egress_authorization_receipt_id
-            ),
+            preview=preview,
+            authorization=authorization,
+            pricing=_pricing(),
             audio_bytes=self.fixture_bytes,
             content_type="audio/wav",
             provider_request_id="provider-request-1",
@@ -313,6 +317,100 @@ def test_preview_is_pure_no_network_and_uses_dated_conservative_pricing(monkeypa
     assert preview.method == "POST"
     assert preview.remote is True
     assert preview.paid_call_required is True
+    assert preview.unit_price_microunits == 37
+    assert preview.minimum_billable_units == 20
+
+
+@pytest.mark.parametrize(
+    "payload_categories",
+    [
+        ("script_text",),
+        (
+            "script_text",
+            "voice_identity",
+            "voice_settings",
+            "output_settings",
+            "script_text",
+        ),
+        (
+            "voice_identity",
+            "script_text",
+            "voice_settings",
+            "output_settings",
+        ),
+    ],
+)
+def test_preview_requires_exact_ordered_egress_payload_categories(payload_categories):
+    request = _voice_request()
+    preview = _preview(request)
+    data = preview.model_dump(mode="json")
+    data["payload_categories"] = payload_categories
+    data["preview_fingerprint"] = production_audio.canonical_sha256(
+        {key: value for key, value in data.items() if key != "preview_fingerprint"}
+    )
+
+    with pytest.raises(ValidationError, match="payload categories"):
+        VoiceGenerationPreview.model_validate(data)
+
+    authorization = _authorization(request, preview)
+    authorization_data = authorization.model_dump(mode="json")
+    authorization_data["payload_categories"] = payload_categories
+    authorization_data["authorization_fingerprint"] = (
+        production_audio.canonical_sha256(
+            {
+                key: value
+                for key, value in authorization_data.items()
+                if key != "authorization_fingerprint"
+            }
+        )
+    )
+    with pytest.raises(ValidationError, match="payload categories"):
+        VoiceCallAuthorization.model_validate(authorization_data)
+
+
+def test_preview_locks_nfc_unicode_codepoint_and_utf8_byte_counting():
+    request = _voice_request(script_text="é🙂")
+    pricing = _pricing(minimum_billable_units=0)
+    preview = build_voice_generation_preview(
+        request,
+        pricing=pricing,
+        destination="https://api.fixture.invalid",
+        credential_reference_kind="environment",
+        timing_supported=True,
+        output_supported=True,
+    )
+
+    assert preview.script_characters == 2
+    assert preview.script_utf8_bytes == 6
+    assert preview.billable_units_upper_bound == 2
+    assert preview.estimated_cost_upper_bound_microunits == 74
+
+
+def test_authorization_recomputes_preview_and_rejects_forged_underestimate():
+    request = _voice_request(script_text="twenty one characters!")
+    preview = _preview(request)
+    forged = preview.model_copy(
+        update={
+            "script_utf8_bytes": 1,
+            "script_characters": 1,
+            "billable_units_upper_bound": 1,
+            "estimated_cost_upper_bound_microunits": 1,
+        }
+    )
+    forged_data = forged.model_dump(mode="json", exclude={"preview_fingerprint"})
+    forged = forged.model_copy(
+        update={
+            "preview_fingerprint": production_audio.canonical_sha256(forged_data)
+        }
+    )
+    authorization = _authorization(request, forged, cost_ceiling_microunits=1)
+
+    with pytest.raises(AiVideoError) as caught:
+        validate_voice_call_authorization(
+            request, forged, authorization, pricing=_pricing()
+        )
+
+    assert caught.value.code is ErrorCode.VOICE_REQUEST_INVALID
 
 
 @pytest.mark.parametrize(
@@ -324,7 +422,6 @@ def test_preview_is_pure_no_network_and_uses_dated_conservative_pricing(monkeypa
         ({"budget_reservation_receipt_id": "wrong"}, ErrorCode.VOICE_BUDGET_REJECTED),
         ({"egress_authorization_receipt_id": "wrong"}, ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED),
         ({"destination": "https://other.invalid"}, ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED),
-        ({"payload_categories": ("script_text",)}, ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED),
         ({"cost_ceiling_microunits": 1}, ErrorCode.VOICE_BUDGET_REJECTED),
     ],
 )
@@ -345,20 +442,38 @@ def test_authorization_and_result_reject_secrets_and_raw_headers():
     request = _voice_request()
     preview = _preview(request)
     authorization_data = _authorization(request, preview).model_dump(mode="python")
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError) as authorization_error:
         VoiceCallAuthorization.model_validate(
             {**authorization_data, "api_key": "super-secret"}
         )
+    assert "super-secret" not in str(authorization_error.value)
+    assert "super-secret" not in repr(authorization_error.value)
+    with pytest.raises(ValidationError) as parameters_error:
+        VoiceProviderParameters.model_validate({"api_key": "super-secret"})
+    assert "super-secret" not in str(parameters_error.value)
+    assert "super-secret" not in repr(parameters_error.value)
     assert "secret" not in repr(authorization_data).lower()
+
+    mismatched = _authorization(
+        request, preview, egress_authorization_receipt_id="super-secret"
+    )
+    with pytest.raises(AiVideoError) as public_error:
+        validate_voice_call_authorization(
+            request, preview, mismatched, pricing=_pricing()
+        )
+    assert "super-secret" not in str(public_error.value)
+    assert "super-secret" not in repr(public_error.value)
 
     provider = _FakeVoiceProvider(DIALOGUE.read_bytes())
     result = provider.generate(
         request, _authorization(request, preview), _FAKE_DURABLE_PERMIT
     )
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValidationError) as result_error:
         VoiceProviderResult.model_validate(
             {**result.model_dump(mode="python"), "response_headers": {"x": "secret"}}
         )
+    assert "secret" not in str(result_error.value)
+    assert "secret" not in repr(result_error.value)
     assert "super-secret" not in repr(result.model_dump(mode="python"))
 
 
@@ -400,9 +515,14 @@ def test_fake_provider_returns_deterministic_sealed_receipts_without_state_write
 @pytest.mark.parametrize(
     ("receipt_kind", "field", "wrong_value"),
     [
+        ("cost", "currency", "EUR"),
+        ("cost", "pricing_unit", "word"),
         ("cost", "pricing_snapshot_id", "pricing-wrong"),
         ("cost", "request_id", "request-wrong"),
         ("cost", "provider_request_id", "provider-request-wrong"),
+        ("cost", "measured_billable_units", 1_000_000),
+        ("cost", "estimated_cost_upper_bound_microunits", 1),
+        ("cost", "provider_reported_cost_microunits", 10_000),
         ("provenance", "request_id", "request-wrong"),
         ("provenance", "provider_kind", "provider-wrong"),
         ("provenance", "model_id", "model-wrong"),
@@ -424,9 +544,8 @@ def test_provider_result_rejects_request_contradicting_receipts_before_fingerpri
     request = _voice_request()
     provider = _FakeVoiceProvider(DIALOGUE.read_bytes())
     preview = provider.preview(request)
-    valid = provider.generate(
-        request, _authorization(request, preview), _FAKE_DURABLE_PERMIT
-    )
+    authorization = _authorization(request, preview)
+    valid = provider.generate(request, authorization, _FAKE_DURABLE_PERMIT)
     cost = valid.cost_receipt
     provenance = valid.provenance_receipt
     if receipt_kind == "cost":
@@ -440,13 +559,13 @@ def test_provider_result_rejects_request_contradicting_receipts_before_fingerpri
         fingerprint_calls.append((args, kwargs))
         raise AssertionError("contradicting receipts reached result fingerprinting")
 
-    monkeypatch.setattr(production_audio, "canonical_sha256", reject_fingerprint)
+    monkeypatch.setattr(production_audio, "_result_fingerprint", reject_fingerprint)
     with pytest.raises(AiVideoError) as caught:
         VoiceProviderResult.create(
             request=request,
-            expected_egress_authorization_receipt_id=(
-                request.egress_authorization_receipt_id
-            ),
+            preview=preview,
+            authorization=authorization,
+            pricing=_pricing(),
             audio_bytes=valid.audio_bytes,
             content_type=valid.content_type,
             provider_request_id=valid.provider_request_id,
@@ -461,26 +580,32 @@ def test_provider_result_rejects_request_contradicting_receipts_before_fingerpri
     assert fingerprint_calls == []
 
 
-def test_provider_result_rejects_mismatched_expected_egress_before_fingerprint(
+def test_provider_result_rejects_mismatched_authorization_before_fingerprint(
     monkeypatch,
 ):
     request = _voice_request()
     provider = _FakeVoiceProvider(DIALOGUE.read_bytes())
     preview = provider.preview(request)
-    valid = provider.generate(
-        request, _authorization(request, preview), _FAKE_DURABLE_PERMIT
-    )
+    authorization = _authorization(request, preview)
+    valid = provider.generate(request, authorization, _FAKE_DURABLE_PERMIT)
     fingerprint_calls = []
 
     def reject_fingerprint(*args, **kwargs):
         fingerprint_calls.append((args, kwargs))
         raise AssertionError("mismatched authorization reached result fingerprinting")
 
-    monkeypatch.setattr(production_audio, "canonical_sha256", reject_fingerprint)
+    monkeypatch.setattr(production_audio, "_result_fingerprint", reject_fingerprint)
+    authorization_data = authorization.model_dump(
+        mode="python", exclude={"authorization_fingerprint"}
+    )
+    authorization_data["egress_authorization_receipt_id"] = "egress-wrong"
+    wrong_authorization = VoiceCallAuthorization.create(**authorization_data)
     with pytest.raises(AiVideoError) as caught:
         VoiceProviderResult.create(
             request=request,
-            expected_egress_authorization_receipt_id="egress-wrong",
+            preview=preview,
+            authorization=wrong_authorization,
+            pricing=_pricing(),
             audio_bytes=valid.audio_bytes,
             content_type=valid.content_type,
             provider_request_id=valid.provider_request_id,
@@ -491,8 +616,20 @@ def test_provider_result_rejects_mismatched_expected_egress_before_fingerprint(
             terminal_status="succeeded",
         )
 
-    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+    assert caught.value.code is ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED
     assert fingerprint_calls == []
+
+
+def test_provider_result_binds_preview_and_authorization_fingerprints():
+    request = _voice_request()
+    preview = _preview(request)
+    authorization = _authorization(request, preview)
+    result = _FakeVoiceProvider(DIALOGUE.read_bytes()).generate(
+        request, authorization, _FAKE_DURABLE_PERMIT
+    )
+
+    assert result.preview_fingerprint == preview.preview_fingerprint
+    assert result.authorization_fingerprint == authorization.authorization_fingerprint
 
 
 def test_candidate_path_is_exact_contained_and_rejects_symlink(tmp_path):

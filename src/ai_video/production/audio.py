@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Protocol
 from urllib.parse import urlsplit
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
@@ -119,7 +119,19 @@ def _sanitized_provider_identifier(value: str | None) -> str | None:
     return value
 
 
-class VoiceProviderParameters(StrictModel):
+def _result_fingerprint(payload: dict[str, object]) -> str:
+    return canonical_sha256(payload)
+
+
+class _VoiceStrictModel(StrictModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        hide_input_in_errors=True,
+    )
+
+
+class VoiceProviderParameters(_VoiceStrictModel):
     stability_milli: int | None = Field(default=None, strict=True, ge=0, le=1000)
     similarity_boost_milli: int | None = Field(
         default=None, strict=True, ge=0, le=1000
@@ -129,7 +141,7 @@ class VoiceProviderParameters(StrictModel):
     speed_milli: int | None = Field(default=None, strict=True, ge=700, le=1200)
 
 
-class VoiceGenerationRequest(StrictModel):
+class VoiceGenerationRequest(_VoiceStrictModel):
     request_id: str = Field(min_length=1)
     attempt_id: str = Field(min_length=1)
     provider_kind: str = Field(min_length=1)
@@ -233,7 +245,7 @@ class VoiceGenerationRequest(StrictModel):
         return cls.model_validate(data)
 
 
-class VoicePricingSnapshot(StrictModel):
+class VoicePricingSnapshot(_VoiceStrictModel):
     snapshot_id: str = Field(min_length=1)
     effective_date: date
     currency: str = Field(pattern=r"^[A-Z]{3}$")
@@ -242,12 +254,14 @@ class VoicePricingSnapshot(StrictModel):
     minimum_billable_units: int = Field(strict=True, ge=0)
 
 
-class VoiceGenerationPreview(StrictModel):
+class VoiceGenerationPreview(_VoiceStrictModel):
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     pricing_snapshot_id: str = Field(min_length=1)
     pricing_effective_date: date
     currency: str = Field(pattern=r"^[A-Z]{3}$")
     pricing_unit: Literal["character"]
+    unit_price_microunits: int = Field(strict=True, ge=0)
+    minimum_billable_units: int = Field(strict=True, ge=0)
     billable_units_upper_bound: int = Field(strict=True, gt=0)
     estimated_cost_upper_bound_microunits: int = Field(strict=True, ge=0)
     destination: str = Field(min_length=1)
@@ -278,13 +292,23 @@ class VoiceGenerationPreview(StrictModel):
 
     @model_validator(mode="after")
     def _validate_sealed_preview(self) -> "VoiceGenerationPreview":
+        if self.payload_categories != _VOICE_PAYLOAD_CATEGORIES:
+            raise ValueError("voice preview payload categories must be exact and ordered")
+        if self.billable_units_upper_bound != max(
+            self.script_characters, self.minimum_billable_units
+        ):
+            raise ValueError("voice preview billable units are not conservative")
+        if self.estimated_cost_upper_bound_microunits != (
+            self.billable_units_upper_bound * self.unit_price_microunits
+        ):
+            raise ValueError("voice preview estimated cost is inconsistent")
         data = self.model_dump(mode="json", exclude={"preview_fingerprint"})
         if canonical_sha256(data) != self.preview_fingerprint:
             raise ValueError("preview_fingerprint does not match preview")
         return self
 
 
-class VoiceCallAuthorization(StrictModel):
+class VoiceCallAuthorization(_VoiceStrictModel):
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     pricing_snapshot_id: str = Field(min_length=1)
@@ -302,14 +326,32 @@ class VoiceCallAuthorization(StrictModel):
     ] = Field(min_length=1)
     cost_ceiling_microunits: int = Field(strict=True, ge=0)
     provider_enabled: Literal[True]
+    authorization_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @field_validator("destination")
     @classmethod
     def _validate_destination(cls, value: str) -> str:
         return _canonical_https_origin(value)
 
+    @model_validator(mode="after")
+    def _validate_sealed_authorization(self) -> "VoiceCallAuthorization":
+        if self.payload_categories != _VOICE_PAYLOAD_CATEGORIES:
+            raise ValueError(
+                "voice authorization payload categories must be exact and ordered"
+            )
+        data = self.model_dump(mode="json", exclude={"authorization_fingerprint"})
+        if canonical_sha256(data) != self.authorization_fingerprint:
+            raise ValueError("authorization_fingerprint does not match authorization")
+        return self
 
-class VoiceCostReceipt(StrictModel):
+    @classmethod
+    def create(cls, **values: object) -> "VoiceCallAuthorization":
+        data = dict(values)
+        data["authorization_fingerprint"] = canonical_sha256(data)
+        return cls.model_validate(data)
+
+
+class VoiceCostReceipt(_VoiceStrictModel):
     currency: str = Field(pattern=r"^[A-Z]{3}$")
     pricing_unit: Literal["character"]
     measured_billable_units: int = Field(strict=True, gt=0)
@@ -327,7 +369,7 @@ class VoiceCostReceipt(StrictModel):
         return _sanitized_provider_identifier(value)
 
 
-class VoiceProvenanceReceipt(StrictModel):
+class VoiceProvenanceReceipt(_VoiceStrictModel):
     request_id: str = Field(min_length=1)
     provider_kind: str = Field(min_length=1)
     model_id: str = Field(min_length=1)
@@ -352,7 +394,7 @@ class VoiceProvenanceReceipt(StrictModel):
         return _sanitized_provider_identifier(value)
 
 
-class VoiceProviderResult(StrictModel):
+class VoiceProviderResult(_VoiceStrictModel):
     request_id: str = Field(min_length=1)
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     audio_bytes: bytes = Field(min_length=1)
@@ -365,6 +407,8 @@ class VoiceProviderResult(StrictModel):
     cost_receipt: VoiceCostReceipt
     provenance_receipt: VoiceProvenanceReceipt
     terminal_status: Literal["succeeded"]
+    preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    authorization_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     result_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @staticmethod
@@ -382,6 +426,8 @@ class VoiceProviderResult(StrictModel):
                 "cost_receipt",
                 "provenance_receipt",
                 "terminal_status",
+                "preview_fingerprint",
+                "authorization_fingerprint",
             )
         }
 
@@ -422,7 +468,7 @@ class VoiceProviderResult(StrictModel):
                 "result_fingerprint",
             },
         )
-        if canonical_sha256(self._fingerprint_payload(data)) != self.result_fingerprint:
+        if _result_fingerprint(self._fingerprint_payload(data)) != self.result_fingerprint:
             raise ValueError("result_fingerprint does not match provider result")
         return self
 
@@ -431,7 +477,9 @@ class VoiceProviderResult(StrictModel):
         cls,
         *,
         request: VoiceGenerationRequest,
-        expected_egress_authorization_receipt_id: str,
+        preview: VoiceGenerationPreview,
+        authorization: VoiceCallAuthorization,
+        pricing: VoicePricingSnapshot,
         audio_bytes: bytes,
         content_type: Literal["audio/wav", "audio/x-wav"],
         provider_request_id: str | None,
@@ -441,12 +489,22 @@ class VoiceProviderResult(StrictModel):
         provenance_receipt: VoiceProvenanceReceipt,
         terminal_status: Literal["succeeded"],
     ) -> "VoiceProviderResult":
+        validate_voice_call_authorization(
+            request,
+            preview,
+            authorization,
+            pricing=pricing,
+        )
         cost_identity = (
+            cost_receipt.currency,
+            cost_receipt.pricing_unit,
             cost_receipt.pricing_snapshot_id,
             cost_receipt.request_id,
             cost_receipt.provider_request_id,
         )
         expected_cost_identity = (
+            preview.currency,
+            preview.pricing_unit,
             request.pricing_snapshot_id,
             request.request_id,
             provider_request_id,
@@ -479,15 +537,22 @@ class VoiceProviderResult(StrictModel):
             request.output_codec,
             request.output_sample_rate_hz,
             request.output_channels,
-            expected_egress_authorization_receipt_id,
+            authorization.egress_authorization_receipt_id,
             provider_request_id,
             provider_trace_id,
         )
         if (
-            expected_egress_authorization_receipt_id
-            != request.egress_authorization_receipt_id
-            or cost_identity != expected_cost_identity
+            cost_identity != expected_cost_identity
             or provenance_identity != expected_provenance_identity
+            or cost_receipt.measured_billable_units
+            > preview.billable_units_upper_bound
+            or cost_receipt.estimated_cost_upper_bound_microunits
+            != preview.estimated_cost_upper_bound_microunits
+            or (
+                cost_receipt.provider_reported_cost_microunits is not None
+                and cost_receipt.provider_reported_cost_microunits
+                > authorization.cost_ceiling_microunits
+            )
         ):
             raise _voice_error(
                 ErrorCode.VOICE_PROVIDER_FAILED,
@@ -508,13 +573,15 @@ class VoiceProviderResult(StrictModel):
             "cost_receipt": cost_receipt,
             "provenance_receipt": provenance_receipt,
             "terminal_status": terminal_status,
+            "preview_fingerprint": preview.preview_fingerprint,
+            "authorization_fingerprint": authorization.authorization_fingerprint,
         }
         serializable = {
             key: value.model_dump(mode="json") if isinstance(value, StrictModel) else value
             for key, value in data.items()
             if key not in {"audio_bytes", "alignment_receipt_bytes"}
         }
-        data["result_fingerprint"] = canonical_sha256(
+        data["result_fingerprint"] = _result_fingerprint(
             cls._fingerprint_payload(serializable)
         )
         return cls.model_validate(data)
@@ -555,6 +622,8 @@ def build_voice_generation_preview(
         "pricing_effective_date": pricing.effective_date,
         "currency": pricing.currency,
         "pricing_unit": pricing.pricing_unit,
+        "unit_price_microunits": pricing.unit_price_microunits,
+        "minimum_billable_units": pricing.minimum_billable_units,
         "billable_units_upper_bound": billable_units,
         "estimated_cost_upper_bound_microunits": (
             billable_units * pricing.unit_price_microunits
@@ -583,11 +652,33 @@ def validate_voice_call_authorization(
     request: VoiceGenerationRequest,
     preview: VoiceGenerationPreview,
     authorization: VoiceCallAuthorization,
+    *,
+    pricing: VoicePricingSnapshot,
 ) -> None:
     """Fail closed before a provider transport receives an external-effect call."""
 
+    expected_preview = build_voice_generation_preview(
+        request,
+        pricing=pricing,
+        destination=preview.destination,
+        credential_reference_kind=preview.credential_reference_kind,
+        timing_supported=preview.timing_supported,
+        output_supported=preview.output_supported,
+    )
+    if preview != expected_preview:
+        raise _voice_error(
+            ErrorCode.VOICE_REQUEST_INVALID,
+            "Voice preview does not match the immutable request and pricing snapshot.",
+        )
+    expected_authorization_fingerprint = canonical_sha256(
+        authorization.model_dump(
+            mode="json", exclude={"authorization_fingerprint"}
+        )
+    )
     if (
-        preview.request_fingerprint != request.voice_request_fingerprint
+        authorization.authorization_fingerprint
+        != expected_authorization_fingerprint
+        or preview.request_fingerprint != request.voice_request_fingerprint
         or authorization.request_fingerprint != request.voice_request_fingerprint
         or authorization.preview_fingerprint != preview.preview_fingerprint
     ):
