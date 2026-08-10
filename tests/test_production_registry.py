@@ -7,11 +7,14 @@ import pytest
 
 from ai_video.config import sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.captions import _canonical_track_bytes
+from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import (
     AssetRecord,
     AssetRegistrySnapshot,
     AssetSourceKind,
     AssetType,
+    CaptionTrack,
     ToolIdentity,
 )
 from ai_video.production.registry import load_asset_registry, registry_semantic_sha256
@@ -162,6 +165,42 @@ def test_registry_21_verifies_caption_bytes_metadata_and_style(tmp_path, mismatc
     path = write_snapshot(tmp_path, registry)
 
     with pytest.raises(AiVideoError, match="caption"):
+        load(path, tmp_path)
+
+
+def test_registry_21_recomputes_caption_timing_fingerprint(tmp_path):
+    loaded, _ = make_p4_composition_fixture(tmp_path)
+    caption = next(item for item in loaded.registry.assets if item.caption_metadata is not None)
+    assert caption.caption_metadata is not None
+    caption_path = tmp_path / caption.artifact_path
+    track = CaptionTrack.model_validate_json(caption_path.read_bytes())
+    forged = seal_artifact(
+        track.model_copy(
+            update={"content_hash": ZERO_HASH, "timing_fingerprint": ONE_HASH}
+        )
+    )
+    payload = _canonical_track_bytes(forged)
+    caption_path.write_bytes(payload)
+    changed = caption.model_copy(
+        update={
+            "sha256": sha256_file(caption_path),
+            "size_bytes": len(payload),
+            "caption_metadata": caption.caption_metadata.model_copy(
+                update={"timing_fingerprint": ONE_HASH}
+            ),
+        }
+    )
+    registry = loaded.registry.model_copy(
+        update={
+            "assets": tuple(
+                changed if item.asset_id == changed.asset_id else item
+                for item in loaded.registry.assets
+            )
+        }
+    )
+    path = write_snapshot(tmp_path, registry)
+
+    with pytest.raises(AiVideoError, match="timing fingerprint"):
         load(path, tmp_path)
 
 

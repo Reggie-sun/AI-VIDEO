@@ -221,15 +221,46 @@ def _read_voice_json(
     return value, snapshot.data
 
 
+def _voice_result_matches_durable_gate(
+    request: VoiceGenerationRequest,
+    preview: VoiceGenerationPreview,
+    authorization: VoiceCallAuthorization,
+    result: VoiceProviderResult,
+) -> bool:
+    """Mirror the committer's pure R+3 semantic checks without write authority."""
+
+    return not (
+        result.request_id != request.request_id
+        or result.request_fingerprint != request.voice_request_fingerprint
+        or result.preview_fingerprint != preview.preview_fingerprint
+        or result.authorization_fingerprint != authorization.authorization_fingerprint
+        or result.content_type not in {"audio/wav", "audio/x-wav"}
+        or result.cost_receipt.pricing_snapshot_id != request.pricing_snapshot_id
+        or result.cost_receipt.estimated_cost_upper_bound_microunits
+        != preview.estimated_cost_upper_bound_microunits
+        or (
+            result.cost_receipt.provider_reported_cost_microunits is not None
+            and result.cost_receipt.provider_reported_cost_microunits
+            > authorization.cost_ceiling_microunits
+        )
+        or result.provenance_receipt.provider_kind != request.provider_kind
+        or result.provenance_receipt.model_id != request.model_id
+        or result.provenance_receipt.voice_id != request.voice_id
+        or result.provenance_receipt.language != request.language
+        or result.provenance_receipt.script_hash != request.script_hash
+        or result.provenance_receipt.egress_authorization_receipt_id
+        != request.egress_authorization_receipt_id
+    )
+
+
 def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
-    remote_voice_assets = tuple(
+    generated_voice_assets = tuple(
         asset
         for asset in bundle.registry.assets
         if asset.asset_type is AssetType.VOICE
         and asset.source_kind is AssetSourceKind.GENERATED
-        and asset.egress.remote
     )
-    if not remote_voice_assets:
+    if not generated_voice_assets:
         return
     attempts_by_asset: dict[str, StateCommitAttempt] = {}
     for attempt in bundle.manifest.attempts:
@@ -246,7 +277,9 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                     raise _invalid("Active P4 voice asset is claimed by multiple attempts.")
                 attempts_by_asset[asset_id] = attempt
     assets_by_id = {asset.asset_id: asset for asset in bundle.registry.assets}
-    for asset in remote_voice_assets:
+    for asset in generated_voice_assets:
+        if not asset.egress.remote:
+            raise _invalid("Active generated voice asset requires remote egress evidence.")
         attempt = attempts_by_asset.get(asset.asset_id)
         if attempt is None:
             raise _invalid("Active generated voice asset has no succeeded Manifest attempt.")
@@ -322,6 +355,12 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                 authorization_fingerprint=authorization.authorization_fingerprint,
                 result_fingerprint=outcome.get("result_fingerprint"),
             )
+            if not _voice_result_matches_durable_gate(
+                request, preview, authorization, result
+            ):
+                raise ValueError(
+                    "voice result contradicts request, preview, or authorization"
+                )
             metadata = asset.audio_metadata
             if metadata is None or attempt.voice_request is None:
                 raise ValueError("voice metadata is missing")

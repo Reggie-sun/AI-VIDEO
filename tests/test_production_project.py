@@ -21,6 +21,7 @@ from ai_video.production import (
     prepare_project_registry_commit,
 )
 from ai_video.production.hashing import seal_artifact
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production.composition import resolve_composition, timeline_fingerprint
 from ai_video.production.hyperframes import (
     HyperFramesRenderResult,
@@ -29,14 +30,17 @@ from ai_video.production.hyperframes import (
     prepare_durable_render_artifacts,
 )
 from ai_video.production.models import (
+    AssetRegistrySnapshot,
     DeliveryProfile,
     FixedTransform,
     AudioChannelLayout,
     CaptionTrack,
     MeasuredAudioRenderMetadata,
     MeasuredRenderMetadata,
+    EgressMetadata,
     ProductionManifest,
     ProductionProject,
+    RegistrySnapshotPointer,
     RendererCheckReceipt,
     RendererIdentity,
     RendererKind,
@@ -50,6 +54,7 @@ from ai_video.production.models import (
     canonical_project_snapshot_path,
     canonical_registry_snapshot_path,
 )
+from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
@@ -333,6 +338,187 @@ def _activate_fake_voice(root: Path, *, include_caption: bool = True):
         caption_asset_ids=caption_ids,
     )
     return project_path, request, committed, audio_ids, caption_ids
+
+
+def _select_resealed_registry(root: Path, registry: AssetRegistrySnapshot) -> None:
+    provisional = registry.model_copy(
+        update={"revision_id": "0" * 64, "content_hash": "0" * 64}
+    )
+    digest = registry_semantic_sha256(provisional)
+    sealed = provisional.model_copy(
+        update={"revision_id": digest, "content_hash": digest}
+    )
+    payload = sealed.model_dump_json(indent=2).encode("utf-8")
+    path = canonical_registry_snapshot_path(digest)
+    (root / path).write_bytes(payload)
+    pointer = RegistrySnapshotPointer(
+        path=path,
+        revision_id=digest,
+        content_hash=digest,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    manifest = _manifest(root)
+    _write_manifest(root, manifest.model_copy(update={"active_registry": pointer}))
+
+
+def _rewrite_voice_semantic_evidence(root: Path, request, mutation: str) -> None:
+    from ai_video.production.audio import (
+        VoiceCallAuthorization,
+        VoiceCostReceipt,
+        VoiceGenerationPreview,
+        VoiceProvenanceReceipt,
+        VoiceProviderResult,
+    )
+
+    paths = ProductionStateCommitter(root).voice_attempt_paths(request.attempt_id)
+    preview = VoiceGenerationPreview.model_validate_json(paths.preview_path.read_bytes())
+    authorization = VoiceCallAuthorization.model_validate_json(
+        paths.authorization_path.read_bytes()
+    )
+    cost = VoiceCostReceipt.model_validate_json(paths.cost_path.read_bytes())
+    provenance = VoiceProvenanceReceipt.model_validate_json(
+        paths.provenance_path.read_bytes()
+    )
+    result_request_id = request.request_id
+    result_request_fingerprint = request.voice_request_fingerprint
+    result_preview_fingerprint = preview.preview_fingerprint
+    result_authorization_fingerprint = authorization.authorization_fingerprint
+    if mutation == "pricing_snapshot":
+        cost = cost.model_copy(update={"pricing_snapshot_id": "wrong-pricing"})
+    elif mutation == "estimated_cost":
+        cost = cost.model_copy(
+            update={
+                "estimated_cost_upper_bound_microunits": (
+                    cost.estimated_cost_upper_bound_microunits + 1
+                )
+            }
+        )
+    elif mutation == "reported_cost_ceiling":
+        cost = cost.model_copy(
+            update={
+                "provider_reported_cost_microunits": (
+                    authorization.cost_ceiling_microunits + 1
+                )
+            }
+        )
+    elif mutation == "result_request_id":
+        result_request_id = "wrong-request"
+        cost = cost.model_copy(update={"request_id": result_request_id})
+        provenance = provenance.model_copy(update={"request_id": result_request_id})
+    elif mutation == "result_request_fingerprint":
+        result_request_fingerprint = "e" * 64
+        provenance = provenance.model_copy(
+            update={"request_fingerprint": result_request_fingerprint}
+        )
+    elif mutation == "preview_fingerprint":
+        result_preview_fingerprint = "d" * 64
+    elif mutation == "authorization_fingerprint":
+        result_authorization_fingerprint = "c" * 64
+    else:
+        field, value = {
+            "provider_kind": ("provider_kind", "wrong-provider"),
+            "model_id": ("model_id", "wrong-model"),
+            "voice_id": ("voice_id", "wrong-voice"),
+            "language": ("language", "fr"),
+            "script_hash": ("script_hash", "f" * 64),
+            "egress_authorization": (
+                "egress_authorization_receipt_id",
+                "wrong-egress",
+            ),
+        }[mutation]
+        provenance = provenance.model_copy(update={field: value})
+    alignment = paths.alignment_path.read_bytes()
+    manifest = _manifest(root)
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (root / manifest.active_registry.path).read_bytes()
+    )
+    audio_record = next(
+        item for item in registry.assets if item.asset_id == f"voice-{request.attempt_id}"
+    )
+    outcome = json.loads(paths.outcome_path.read_bytes())
+    fingerprint_payload = {
+        "request_id": result_request_id,
+        "request_fingerprint": result_request_fingerprint,
+        "audio_sha256": audio_record.sha256,
+        "content_type": audio_record.mime_type,
+        "provider_request_id": outcome["provider_request_id"],
+        "provider_trace_id": outcome["provider_trace_id"],
+        "alignment_receipt_sha256": hashlib.sha256(alignment).hexdigest(),
+        "cost_receipt": cost.model_dump(mode="python"),
+        "provenance_receipt": provenance.model_dump(mode="python"),
+        "terminal_status": "succeeded",
+        "preview_fingerprint": result_preview_fingerprint,
+        "authorization_fingerprint": result_authorization_fingerprint,
+    }
+    result_fingerprint = canonical_sha256(fingerprint_payload)
+    VoiceProviderResult(
+        request_id=result_request_id,
+        request_fingerprint=result_request_fingerprint,
+        audio_bytes=(root / audio_record.artifact_path).read_bytes(),
+        audio_sha256=audio_record.sha256,
+        content_type=audio_record.mime_type,
+        provider_request_id=outcome["provider_request_id"],
+        provider_trace_id=outcome["provider_trace_id"],
+        alignment_receipt_bytes=alignment,
+        alignment_receipt_sha256=hashlib.sha256(alignment).hexdigest(),
+        cost_receipt=cost,
+        provenance_receipt=provenance,
+        terminal_status="succeeded",
+        preview_fingerprint=result_preview_fingerprint,
+        authorization_fingerprint=result_authorization_fingerprint,
+        result_fingerprint=result_fingerprint,
+    )
+
+    def canonical_model_bytes(model) -> bytes:
+        return (
+            json.dumps(
+                model.model_dump(mode="json"),
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
+        ).encode("utf-8")
+
+    cost_bytes = canonical_model_bytes(cost)
+    provenance_bytes = canonical_model_bytes(provenance)
+    paths.cost_path.write_bytes(cost_bytes)
+    paths.provenance_path.write_bytes(provenance_bytes)
+    outcome["request_id"] = result_request_id
+    outcome["request_fingerprint"] = result_request_fingerprint
+    outcome["preview_fingerprint"] = result_preview_fingerprint
+    outcome["authorization_fingerprint"] = result_authorization_fingerprint
+    outcome["result_fingerprint"] = result_fingerprint
+    paths.outcome_path.write_bytes(
+        (
+            json.dumps(outcome, sort_keys=True, separators=(",", ":")) + "\n"
+        ).encode("utf-8")
+    )
+    assert audio_record.audio_metadata is not None
+    changed = audio_record.model_copy(
+        update={
+            "creation_receipt_id": f"voice-result-{result_fingerprint}",
+            "cost_receipt_id": f"cost-{hashlib.sha256(cost_bytes).hexdigest()}",
+            "audio_metadata": audio_record.audio_metadata.model_copy(
+                update={
+                    "provenance_receipt_id": (
+                        f"provenance-{hashlib.sha256(provenance_bytes).hexdigest()}"
+                    )
+                }
+            ),
+        }
+    )
+    _select_resealed_registry(
+        root,
+        registry.model_copy(
+            update={
+                "assets": tuple(
+                    changed if item.asset_id == changed.asset_id else item
+                    for item in registry.assets
+                )
+            }
+        ),
+    )
 
 
 def test_load_production_project_returns_verified_bundle(tmp_path):
@@ -725,6 +911,59 @@ def test_reader_reopens_exact_generated_voice_graph_without_writes_or_network(
     attempt = next(item for item in loaded.manifest.attempts if item.attempt_id == request.attempt_id)
     assert attempt.voice_phase == "activate"
     assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_rejects_generated_voice_resealed_as_local_egress(tmp_path):
+    project_path, request, _, _, _ = _activate_fake_voice(
+        tmp_path, include_caption=False
+    )
+    manifest = _manifest(tmp_path)
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / manifest.active_registry.path).read_bytes()
+    )
+    audio_id = f"voice-{request.attempt_id}"
+    changed_assets = tuple(
+        item.model_copy(update={"egress": EgressMetadata()})
+        if item.asset_id == audio_id
+        else item
+        for item in registry.assets
+    )
+    _select_resealed_registry(
+        tmp_path, registry.model_copy(update={"assets": changed_assets})
+    )
+
+    with pytest.raises(AiVideoError, match="remote egress evidence"):
+        load_production_project(project_path)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "pricing_snapshot",
+        "estimated_cost",
+        "reported_cost_ceiling",
+        "result_request_id",
+        "result_request_fingerprint",
+        "preview_fingerprint",
+        "authorization_fingerprint",
+        "provider_kind",
+        "model_id",
+        "voice_id",
+        "language",
+        "script_hash",
+        "egress_authorization",
+    ],
+)
+def test_reader_rejects_resealed_voice_receipt_semantic_contradictions(
+    tmp_path, mutation
+):
+    project_path, request, _, _, _ = _activate_fake_voice(
+        tmp_path, include_caption=False
+    )
+    _rewrite_voice_semantic_evidence(tmp_path, request, mutation)
+
+    with pytest.raises(AiVideoError, match="voice evidence graph"):
+        load_production_project(project_path)
 
 
 @pytest.mark.parametrize("artifact", ["provenance", "cost", "alignment"])

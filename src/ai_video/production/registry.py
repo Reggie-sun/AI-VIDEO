@@ -9,7 +9,7 @@ import wave
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.captions import _canonical_track_bytes
+from ai_video.production.captions import _canonical_track_bytes, caption_timing_fingerprint
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import (
     AssetRecord,
@@ -144,6 +144,8 @@ def _verify_caption_asset(record: AssetRecord, payload: bytes, root: Path) -> No
         or expected_metadata != actual_metadata
     ):
         raise _invalid(f"Asset caption metadata does not match bytes: {record.asset_id}")
+    if track.timing_fingerprint != caption_timing_fingerprint(track):
+        raise _invalid(f"Asset caption timing fingerprint is invalid: {record.asset_id}")
     if metadata.style_content_hash is None:
         return
     style_relative = Path(f"assets/styles/{metadata.style_content_hash}.json")
