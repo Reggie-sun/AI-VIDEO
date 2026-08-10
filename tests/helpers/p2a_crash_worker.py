@@ -22,6 +22,7 @@ from ai_video.production.state_commit import (  # noqa: E402
 )
 from ai_video.production.hyperframes import _render_with_hyperframes  # noqa: E402
 from production_project_factory import (  # noqa: E402
+    make_audio_import_upgrade_request,
     make_revision_two_request,
     make_voice_activation_request,
     make_voice_preview_and_authorization,
@@ -146,11 +147,21 @@ def main() -> int:
         if phase in {
             CommitPhase.AFTER_VOICE_CANDIDATE_MANIFEST,
             CommitPhase.AFTER_VOICE_FINAL_MANIFEST_REPLACE,
+            CommitPhase.AFTER_MANIFEST_REPLACE,
+            CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
         }:
             activation, audio_ids = make_voice_activation_request(
                 root, request, authorization, expected_manifest_revision=3
             )
             writer.activate_voice_assets(activation, audio_asset_ids=audio_ids)
+        return 0
+    if len(sys.argv) > 4 and sys.argv[4] == "audio_import":
+        request = make_audio_import_upgrade_request(
+            root, attempt_id="audio-import-process-crash"
+        )
+        ProductionStateCommitter(
+            root, crash_injector=ExitInjector(phase, occurrence)
+        ).commit(request)
         return 0
     request = make_revision_two_request(root)
     ProductionStateCommitter(

@@ -118,6 +118,55 @@ def test_recovery_preserves_r3_voice_candidate_for_explicit_activation(
     assert activated.attempts[-1].status is StateCommitStatus.SUCCEEDED
 
 
+@pytest.mark.parametrize("tamper_target", ("outcome", "audio", "registry"))
+def test_recovery_rejects_tampered_r3_voice_graph_without_activation(
+    committed_project: Path,
+    tamper_target: str,
+) -> None:
+    class _CrashAfterCandidate:
+        def checkpoint(self, phase: CommitPhase) -> None:
+            if phase is CommitPhase.AFTER_VOICE_CANDIDATE_MANIFEST:
+                raise RuntimeError("fixture crash after R+3")
+
+    before = _read_manifest(committed_project)
+    request = project_factory.make_voice_request(committed_project)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(committed_project)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        committed_project, request, authorization, expected_manifest_revision=3
+    )
+    crashing = ProductionStateCommitter(
+        committed_project, crash_injector=_CrashAfterCandidate()
+    )
+    with pytest.raises(RuntimeError, match=r"R\+3"):
+        crashing.activate_voice_assets(activation, audio_asset_ids=audio_ids)
+    candidate = _read_manifest(committed_project)
+    if tamper_target == "outcome":
+        target = crashing.voice_attempt_paths(request.attempt_id).outcome_path
+    elif tamper_target == "audio":
+        registry = AssetRegistrySnapshot.model_validate_json(
+            (committed_project / candidate.attempts[-1].candidate_registry.path).read_bytes()
+        )
+        target = committed_project / next(
+            item.artifact_path for item in registry.assets if item.asset_id == audio_ids[0]
+        )
+    else:
+        target = committed_project / candidate.attempts[-1].candidate_registry.path
+    target.write_bytes(b"tampered")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(committed_project).recover()
+
+    after = _read_manifest(committed_project)
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.attempts[-1].status is StateCommitStatus.RUNNING
+    assert after.attempts[-1].voice_phase == "candidate"
+
+
 @pytest.mark.parametrize(
     ("phase", "expected_status"),
     (
@@ -150,6 +199,139 @@ def test_voice_process_crash_recovery_never_blind_resubmits(
     ProductionStateCommitter(committed_project).recover()
     recovered = _read_manifest(committed_project)
     assert recovered.attempts[-1].status is expected_status
+
+
+@pytest.mark.parametrize(
+    "phase",
+    (CommitPhase.AFTER_MANIFEST_REPLACE, CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC),
+)
+@pytest.mark.parametrize(
+    ("occurrence", "expected_status"),
+    (
+        (1, StateCommitStatus.INTERRUPTED),
+        (2, StateCommitStatus.OUTCOME_UNKNOWN),
+        (3, StateCommitStatus.INTERRUPTED),
+        (4, StateCommitStatus.SUCCEEDED),
+    ),
+)
+def test_voice_manifest_durability_occurrences_recover_without_transport_replay(
+    committed_project: Path,
+    phase: CommitPhase,
+    occurrence: int,
+    expected_status: StateCommitStatus,
+) -> None:
+    before = _read_manifest(committed_project)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            phase.value,
+            str(occurrence),
+            "voice",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+
+    report = ProductionStateCommitter(committed_project).recover()
+    recovered = _read_manifest(committed_project)
+    attempt = recovered.attempts[-1]
+    assert attempt.status is expected_status
+    assert attempt.provider_request_id in {None, "fixture-provider-request"}
+    if occurrence < 4:
+        assert recovered.active_project == before.active_project
+        assert recovered.active_registry == before.active_registry
+    else:
+        assert recovered.active_registry != before.active_registry
+    assert all(item.path != Path("runs") for item in report.items)
+
+
+@pytest.mark.parametrize(
+    "phase",
+    (
+        CommitPhase.AFTER_ARTIFACT_TEMP_WRITE,
+        CommitPhase.AFTER_ARTIFACT_FILE_FSYNC,
+        CommitPhase.AFTER_ARTIFACT_PROMOTION,
+        CommitPhase.AFTER_ARTIFACT_DIRECTORY_FSYNC,
+        CommitPhase.AFTER_ARTIFACT_VERIFICATION,
+    ),
+)
+def test_audio_import_artifact_crash_never_selects_partial_registry(
+    committed_project: Path,
+    phase: CommitPhase,
+) -> None:
+    before = _read_manifest(committed_project)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            phase.value,
+            "1",
+            "audio_import",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+
+    report = ProductionStateCommitter(committed_project).recover()
+    recovered = _read_manifest(committed_project)
+    assert recovered.schema_version == "2.2"
+    assert recovered.active_project == before.active_project
+    assert recovered.active_registry == before.active_registry
+    assert recovered.active_render_state == before.active_render_state
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+    assert report.manifest_revision_after > report.manifest_revision_before
+
+
+@pytest.mark.parametrize(
+    "phase",
+    (
+        CommitPhase.AFTER_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_MANIFEST_FILE_FSYNC,
+        CommitPhase.AFTER_MANIFEST_REPLACE,
+        CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
+    ),
+)
+@pytest.mark.parametrize("occurrence", (1, 2))
+def test_audio_import_manifest_crash_has_exact_old_or_new_pair(
+    committed_project: Path,
+    phase: CommitPhase,
+    occurrence: int,
+) -> None:
+    before = _read_manifest(committed_project)
+    expected_registry = project_factory.make_audio_import_upgrade_request(
+        committed_project, attempt_id="comparison"
+    ).next_registry
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            phase.value,
+            str(occurrence),
+            "audio_import",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+
+    ProductionStateCommitter(committed_project).recover()
+    recovered = _read_manifest(committed_project)
+    assert recovered.active_project == before.active_project
+    assert recovered.active_registry in (before.active_registry, expected_registry)
+    assert recovered.active_render_state is None
+    if recovered.active_registry == before.active_registry:
+        assert not recovered.attempts or recovered.attempts[-1].status in {
+            StateCommitStatus.INTERRUPTED,
+            StateCommitStatus.FAILED,
+        }
+    else:
+        assert recovered.attempts[-1].status is StateCommitStatus.SUCCEEDED
 
 
 @pytest.fixture

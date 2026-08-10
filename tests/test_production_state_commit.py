@@ -17,6 +17,7 @@ from ai_video.production.models import (
     RendererKind,
     RendererSelectionReceipt,
     RegistrySnapshotPointer,
+    RenderStateSnapshotPointer,
     Shot,
     StateCommitStatus,
 )
@@ -125,6 +126,50 @@ def test_voice_submit_permit_becomes_invalid_when_r2_manifest_changes(
     assert not permit._consume_voice_submit_permit(**binding)
 
 
+def test_voice_submit_permit_becomes_invalid_when_submit_intent_is_deleted(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_voice_generation(request, preview, authorization)
+    permit = writer.record_voice_submit_intent(request, preview, authorization)
+    writer.voice_attempt_paths(request.attempt_id).submit_intent_path.unlink()
+    binding = {
+        "attempt_id": request.attempt_id,
+        "request_fingerprint": request.voice_request_fingerprint,
+        "authorization_fingerprint": authorization.authorization_fingerprint,
+        "destination": authorization.destination,
+        "budget_reservation_receipt_id": authorization.budget_reservation_receipt_id,
+        "egress_authorization_receipt_id": authorization.egress_authorization_receipt_id,
+    }
+
+    assert not permit._validate_voice_submit_permit(**binding)
+    assert not permit._consume_voice_submit_permit(**binding)
+
+
+def test_voice_submit_intent_rejects_replaced_r1_evidence_before_permit(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(tmp_path)
+    r1 = writer.begin_voice_generation(request, preview, authorization)
+    writer.voice_attempt_paths(request.attempt_id).preview_path.write_bytes(b"{}")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.record_voice_submit_intent(request, preview, authorization)
+
+    after = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert after == r1
+    assert after.attempts[-1].voice_phase == "request"
+
+
 def test_voice_attempt_paths_are_exact_and_contained(tmp_path: Path) -> None:
     project_factory.write_production_project(tmp_path)
     paths = ProductionStateCommitter(tmp_path).voice_attempt_paths("voice-attempt")
@@ -161,12 +206,189 @@ def test_prepare_audio_registry_commit_is_pure_and_uses_existing_writer(
         registry=p4_registry,
         attempt_id="audio-import-1",
         artifacts=(),
+        active_project_artifact=PreparedArtifact(
+            manifest.active_project.path,
+            (tmp_path / manifest.active_project.path).read_bytes(),
+            manifest.active_project.file_sha256,
+        ),
     )
 
     after = set(path.relative_to(tmp_path) for path in tmp_path.rglob("*"))
     assert request.operation == "audio_import"
     assert request.next_project.content_hash == manifest.active_project.content_hash
     assert before == after
+
+
+def test_prepare_audio_registry_commit_rejects_mutated_base_record(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    project, registry = project_factory.load_initial_models(tmp_path)
+    forged = registry.assets[0].model_copy(update={"usage_license": "forged"})
+    candidate = AssetRegistrySnapshot(
+        schema_version="2.1",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(forged, *registry.assets[1:]),
+    )
+    revision = state_commit.registry_semantic_sha256(candidate)
+    candidate = candidate.model_copy(
+        update={"revision_id": revision, "content_hash": revision}
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        state_commit.prepare_audio_registry_commit(
+            manifest=manifest,
+            project=project,
+            base_registry=registry,
+            registry=candidate,
+            attempt_id="audio-import-forged-base",
+            artifacts=(),
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+@pytest.mark.parametrize(
+    "asset_id",
+    ("voice-dialogue", "bgm-theme", "sfx-hit", "caption-asset-1"),
+)
+def test_prepare_audio_registry_commit_accepts_each_p4_asset_type_including_caption_only(
+    tmp_path: Path,
+    asset_id: str,
+) -> None:
+    loaded, _ = project_factory.make_p4_composition_fixture(tmp_path)
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    project, base_registry = project_factory.load_initial_models(tmp_path)
+    record = next(item for item in loaded.registry.assets if item.asset_id == asset_id)
+    candidate = AssetRegistrySnapshot(
+        schema_version="2.1",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=base_registry.assets + (record,),
+    )
+    revision = state_commit.registry_semantic_sha256(candidate)
+    candidate = candidate.model_copy(
+        update={"revision_id": revision, "content_hash": revision}
+    )
+    artifact_paths = [record.artifact_path]
+    if (
+        record.caption_metadata is not None
+        and record.caption_metadata.style_content_hash is not None
+    ):
+        artifact_paths.append(
+            Path(
+                f"assets/styles/{record.caption_metadata.style_content_hash}.json"
+            )
+        )
+    artifacts = tuple(
+        PreparedArtifact(path, payload, hashlib.sha256(payload).hexdigest())
+        for path in artifact_paths
+        for payload in ((tmp_path / path).read_bytes(),)
+    )
+
+    request = state_commit.prepare_audio_registry_commit(
+        manifest=manifest,
+        project=project,
+        base_registry=base_registry,
+        registry=candidate,
+        attempt_id=f"audio-import-{asset_id}",
+        artifacts=artifacts,
+        active_project_artifact=PreparedArtifact(
+            manifest.active_project.path,
+            (tmp_path / manifest.active_project.path).read_bytes(),
+            manifest.active_project.file_sha256,
+        ),
+    )
+
+    registry_artifact = next(
+        item for item in request.artifacts if item.relative_path == request.next_registry.path
+    )
+    reopened = AssetRegistrySnapshot.model_validate_json(registry_artifact.payload)
+    assert reopened.assets[len(base_registry.assets) :] == (record,)
+
+
+def test_audio_import_upgrades_manifest_and_registry_without_downgrade(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    project, registry = project_factory.load_initial_models(tmp_path)
+    upgraded_registry = AssetRegistrySnapshot(
+        schema_version="2.1",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=registry.assets,
+    )
+    revision = state_commit.registry_semantic_sha256(upgraded_registry)
+    upgraded_registry = upgraded_registry.model_copy(
+        update={"revision_id": revision, "content_hash": revision}
+    )
+    request = state_commit.prepare_audio_registry_commit(
+        manifest=manifest,
+        project=project,
+        base_registry=registry,
+        registry=upgraded_registry,
+        attempt_id="audio-import-version-upgrade",
+        artifacts=(),
+        active_project_artifact=PreparedArtifact(
+            manifest.active_project.path,
+            (tmp_path / manifest.active_project.path).read_bytes(),
+            manifest.active_project.file_sha256,
+        ),
+    )
+
+    committed = ProductionStateCommitter(tmp_path).commit(request)
+
+    assert committed.schema_version == "2.2"
+    assert committed.active_project == manifest.active_project
+    active_registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / committed.active_registry.path).read_bytes()
+    )
+    assert active_registry.schema_version == "2.1"
+    assert committed.attempts[-1].operation == "audio_import"
+    assert committed.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+def test_audio_import_preserves_22_render_state_when_active_pair_is_unchanged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    first = ProductionStateCommitter(tmp_path).commit(
+        project_factory.make_audio_import_upgrade_request(tmp_path)
+    )
+    render_pointer = RenderStateSnapshotPointer(
+        path=Path(f"state/render/states/{'a' * 64}.json"),
+        revision=1,
+        content_hash="a" * 64,
+        file_sha256="b" * 64,
+    )
+    with_render = first.model_copy(update={"active_render_state": render_pointer})
+    (tmp_path / "state/manifest.json").write_text(
+        with_render.model_dump_json(indent=2), encoding="utf-8"
+    )
+    request = project_factory.make_audio_import_upgrade_request(
+        tmp_path, attempt_id="audio-import-same-pair"
+    )
+    monkeypatch.setattr(
+        state_commit,
+        "load_verified_render_state",
+        lambda *_args, **_kwargs: object(),
+    )
+
+    committed = ProductionStateCommitter(tmp_path).commit(request)
+
+    assert committed.schema_version == "2.2"
+    assert committed.active_project == first.active_project
+    assert committed.active_registry == first.active_registry
+    assert committed.active_render_state == render_pointer
 
 
 def test_voice_r3_r4_activation_selects_exact_registry_and_clears_render(
@@ -240,7 +462,9 @@ def test_generate_voice_asset_is_only_transport_path_and_calls_provider_once(
                 "egress_authorization_receipt_id": candidate_authorization.egress_authorization_receipt_id,
             }
             assert permit._consume_voice_submit_permit(**binding)
-            return SimpleNamespace(provider_request_id="fixture-provider-request")
+            return project_factory.make_voice_provider_result(
+                request, preview, authorization
+            )
 
     def _prepare(candidate, candidate_preview, candidate_authorization, result, paths):
         assert candidate == request
@@ -251,8 +475,48 @@ def test_generate_voice_asset_is_only_transport_path_and_calls_provider_once(
         activation, audio_ids = project_factory.make_voice_activation_request(
             tmp_path, request, authorization, expected_manifest_revision=3
         )
+        registry_artifact = next(
+            item
+            for item in activation.artifacts
+            if item.relative_path == activation.next_registry.path
+        )
+        registry = AssetRegistrySnapshot.model_validate_json(registry_artifact.payload)
+        record = next(item for item in registry.assets if item.asset_id == audio_ids[0])
+        audio_artifact = next(
+            item for item in activation.artifacts if item.relative_path == record.artifact_path
+        )
+        from ai_video.production.audio import AudioProbeResult, PreparedAudioImport
+        from ai_video.production.state_commit import PreparedVoiceCandidate
+
+        metadata = record.audio_metadata
+        assert metadata is not None
+        probe = AudioProbeResult(
+            mime_type="audio/wav",
+            container_name="wav",
+            file_sha256=record.sha256,
+            size_bytes=record.size_bytes,
+            file_device=0,
+            file_inode=0,
+            codec_name="pcm_s16le",
+            duration_samples=metadata.duration_samples,
+            sample_rate_hz=metadata.sample_rate_hz,
+            channels=metadata.channels,
+            channel_layout=metadata.channel_layout,
+            decoded_pcm_sha256=record.sha256,
+            loudness=metadata.loudness,
+            loudness_receipt_id=record.sha256,
+            ffmpeg=record.tool.model_copy(update={"name": "ffmpeg"}),
+            ffprobe=record.tool.model_copy(update={"name": "ffprobe"}),
+            content_fingerprint=record.sha256,
+        )
         prepared["called"] = True
-        return activation, audio_ids, ()
+        return PreparedVoiceCandidate(
+            audio=PreparedAudioImport(
+                payload=audio_artifact.payload,
+                probe=probe,
+                asset_record=record,
+            )
+        )
 
     provider = _Provider()
     writer = ProductionStateCommitter(
@@ -264,6 +528,99 @@ def test_generate_voice_asset_is_only_transport_path_and_calls_provider_once(
     assert provider.calls == 1
     assert prepared == {"called": True}
     assert manifest.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+def test_generate_voice_asset_rejects_untyped_provider_result_before_preparer(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    prepared_calls = 0
+
+    class _Provider:
+        def preview(self, candidate):
+            return preview
+
+        def generate(self, candidate, candidate_authorization, permit):
+            binding = {
+                "attempt_id": candidate.attempt_id,
+                "request_fingerprint": candidate.voice_request_fingerprint,
+                "authorization_fingerprint": candidate_authorization.authorization_fingerprint,
+                "destination": candidate_authorization.destination,
+                "budget_reservation_receipt_id": candidate_authorization.budget_reservation_receipt_id,
+                "egress_authorization_receipt_id": candidate_authorization.egress_authorization_receipt_id,
+            }
+            assert permit._consume_voice_submit_permit(**binding)
+            return SimpleNamespace(provider_request_id="forged")
+
+    def _prepare(*_args):
+        nonlocal prepared_calls
+        prepared_calls += 1
+        raise AssertionError("untyped result reached candidate preparer")
+
+    writer = ProductionStateCommitter(tmp_path, voice_candidate_preparer=_prepare)
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.generate_voice_asset(request, _Provider(), authorization)
+
+    after = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert prepared_calls == 0
+    assert after.active_registry == before.active_registry
+    assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+
+
+def test_generate_voice_asset_rejects_preparer_supplied_activation_capability(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+
+    class _Provider:
+        def preview(self, candidate):
+            return preview
+
+        def generate(self, candidate, candidate_authorization, permit):
+            binding = {
+                "attempt_id": candidate.attempt_id,
+                "request_fingerprint": candidate.voice_request_fingerprint,
+                "authorization_fingerprint": candidate_authorization.authorization_fingerprint,
+                "destination": candidate_authorization.destination,
+                "budget_reservation_receipt_id": candidate_authorization.budget_reservation_receipt_id,
+                "egress_authorization_receipt_id": candidate_authorization.egress_authorization_receipt_id,
+            }
+            assert permit._consume_voice_submit_permit(**binding)
+            return project_factory.make_voice_provider_result(
+                request, preview, authorization
+            )
+
+    def _forged_prepare(*_args):
+        activation, audio_ids = project_factory.make_voice_activation_request(
+            tmp_path, request, authorization, expected_manifest_revision=3
+        )
+        return activation, audio_ids, ()
+
+    writer = ProductionStateCommitter(
+        tmp_path, voice_candidate_preparer=_forged_prepare
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.generate_voice_asset(request, _Provider(), authorization)
+
+    after = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert after.active_registry == before.active_registry
+    assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
 
 
 class _RecordingHandle:

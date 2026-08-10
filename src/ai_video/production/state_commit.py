@@ -12,23 +12,33 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import BinaryIO, Callable, Iterator, Literal, Protocol
+from typing import TYPE_CHECKING, BinaryIO, Callable, Iterator, Literal, Protocol
 
 import yaml
 from pydantic import BaseModel, ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.audio import (
+    PreparedAudioImport,
     VoiceAssetProvider,
     VoiceCallAuthorization,
     VoiceGenerationPreview,
     VoiceGenerationRequest,
     VoiceProviderResult,
+    VoiceCostReceipt,
+    VoiceProvenanceReceipt,
 )
+from ai_video.production.captions import CaptionImportRequest, PreparedCaptionImport
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     AssetType,
+    AssetRecord,
     AssetRegistrySnapshot,
+    AssetSourceKind,
+    AudioAssetMetadata,
+    AudioSource,
+    CaptionAssetMetadata,
+    EgressMetadata,
     LoadedProductionProject,
     ProductionManifest,
     ProductionProject,
@@ -68,6 +78,7 @@ from ai_video.production.paths import (
     canonical_voice_attempt_artifact_path,
     canonical_voice_attempt_root,
     canonical_voice_audio_candidate_path,
+    canonical_audio_asset_path,
 )
 from ai_video.production.project import (
     _render_source_binding_map,
@@ -163,8 +174,21 @@ VoiceCandidatePreparer = Callable[
         VoiceProviderResult,
         VoiceAttemptPaths,
     ],
-    tuple[StateCommitRequest, tuple[str, ...], tuple[str, ...]],
+    "PreparedVoiceCandidate",
 ]
+
+
+@dataclass(frozen=True)
+class PreparedVoiceCandidate:
+    """Narrow local-only output; it carries no registry/write/activation authority."""
+
+    audio: PreparedAudioImport
+    caption: PreparedCaptionImport | None = None
+    caption_asset_record: AssetRecord | None = None
+
+    def __post_init__(self) -> None:
+        if (self.caption is None) != (self.caption_asset_record is None):
+            raise ValueError("Prepared voice caption bytes and AssetRecord must be all-or-none.")
 
 
 class CommitPhase(str, Enum):
@@ -217,7 +241,7 @@ _TEMP_DIGEST_LENGTH = 12
 _VOICE_PERMIT_TOKEN = object()
 
 
-class DurableVoiceSubmitPermit:
+class _DurableVoiceSubmitPermit:
     """Process-local one-use proof that the exact R+2 intent is durable."""
 
     __slots__ = (
@@ -236,10 +260,10 @@ class DurableVoiceSubmitPermit:
         binding: dict[str, str],
         manifest_revision: int,
         manifest_file_sha256: str,
-        durability_validator: Callable[[int, str, str], bool],
+        durability_validator: Callable[[], bool],
     ) -> None:
         if token is not _VOICE_PERMIT_TOKEN:
-            raise TypeError("DurableVoiceSubmitPermit is minted only by ProductionStateCommitter.")
+            raise TypeError("Voice submit permits are minted only by ProductionStateCommitter.")
         self._binding = dict(binding)
         self._manifest_revision = manifest_revision
         self._manifest_file_sha256 = manifest_file_sha256
@@ -251,11 +275,7 @@ class DurableVoiceSubmitPermit:
         return (
             not self._consumed
             and binding == self._binding
-            and self._durability_validator(
-                self._manifest_revision,
-                self._manifest_file_sha256,
-                self._binding["attempt_id"],
-            )
+            and self._durability_validator()
         )
 
     def _consume_voice_submit_permit(self, **binding: str) -> bool:
@@ -266,7 +286,11 @@ class DurableVoiceSubmitPermit:
             return True
 
     def __reduce__(self) -> object:
-        raise TypeError("DurableVoiceSubmitPermit cannot be serialized.")
+        raise TypeError("Voice submit permits cannot be serialized.")
+
+
+if TYPE_CHECKING:
+    DurableVoiceSubmitPermit = _DurableVoiceSubmitPermit
 
 
 def _owned_temp_name(attempt_id: str, final_path: Path) -> str:
@@ -494,16 +518,62 @@ def prepare_audio_registry_commit(
 ) -> StateCommitRequest:
     """Purely build one exact audio/caption registry commit for the P2A writer."""
 
+    if (
+        project.project_id != manifest.project_id
+        or project.revision != manifest.active_project.revision
+        or project.content_hash != manifest.active_project.content_hash
+        or not verify_artifact_hash(project)
+    ):
+        raise _state_invalid("Audio registry project does not match the active Manifest snapshot.")
+    if active_project_artifact is None:
+        raise _state_invalid("Audio registry commit requires exact active project bytes.")
+    project_payload = active_project_artifact.payload
+    project_file_hash = hashlib.sha256(project_payload).hexdigest()
+    try:
+        parsed_project = ProductionProject.model_validate(yaml.safe_load(project_payload))
+    except (ValidationError, ValueError, yaml.YAMLError) as exc:
+        raise _state_invalid("Audio registry active project bytes are invalid.", str(exc)) from exc
+    if parsed_project != project or project_file_hash != manifest.active_project.file_sha256:
+        raise _state_invalid("Audio registry project bytes do not match the active Manifest snapshot.")
+    if (
+        base_registry.revision_id != manifest.active_registry.revision_id
+        or base_registry.content_hash != manifest.active_registry.content_hash
+        or registry_semantic_sha256(base_registry) != base_registry.content_hash
+        or hashlib.sha256(_canonical_json_bytes(base_registry)).hexdigest()
+        != manifest.active_registry.file_sha256
+    ):
+        raise _state_invalid("Audio registry base does not match the active Manifest snapshot.")
     if registry.schema_version != "2.1":
         raise _state_invalid("Audio registry commits require Asset Registry 2.1.")
-    base_ids = {item.asset_id for item in base_registry.assets}
+    if registry.assets[: len(base_registry.assets)] != base_registry.assets:
+        raise _state_invalid("Audio registry candidate must preserve every base record exactly.")
+    new_records = registry.assets[len(base_registry.assets) :]
+    if tuple(item.asset_id for item in new_records) != tuple(
+        sorted(item.asset_id for item in new_records)
+    ):
+        raise _state_invalid("Audio registry new records must use canonical asset-id order.")
+    if any(
+        item.asset_type
+        not in {AssetType.VOICE, AssetType.MUSIC, AssetType.SFX, AssetType.CAPTION}
+        for item in new_records
+    ):
+        raise _state_invalid("Audio registry commits may only add P4 audio or caption assets.")
     candidate_ids = [item.asset_id for item in registry.assets]
     if len(candidate_ids) != len(set(candidate_ids)):
         raise _state_invalid("Audio registry candidate contains duplicate asset IDs.")
     prepared_by_path = {item.relative_path: item for item in artifacts}
-    for record in registry.assets:
-        if record.asset_id in base_ids:
-            continue
+    expected_paths = {item.artifact_path for item in new_records}
+    expected_paths.update(
+        Path(f"assets/styles/{item.caption_metadata.style_content_hash}.json")
+        for item in new_records
+        if item.caption_metadata is not None
+        and item.caption_metadata.style_content_hash is not None
+    )
+    if set(prepared_by_path) != expected_paths or len(prepared_by_path) != len(artifacts):
+        raise _state_invalid(
+            "Audio registry candidate does not contain the exact declared new artifact set."
+        )
+    for record in new_records:
         artifact = prepared_by_path.get(record.artifact_path)
         if (
             artifact is None
@@ -514,41 +584,31 @@ def prepare_audio_registry_commit(
                 "Audio registry candidate does not contain the exact new asset artifact set."
             )
 
+    project_artifact = active_project_artifact
     if (
-        active_project_artifact is not None
-        and active_project_artifact.relative_path == manifest.active_project.path
-        and active_project_artifact.file_sha256 == manifest.active_project.file_sha256
-        and hashlib.sha256(active_project_artifact.payload).hexdigest()
-        == active_project_artifact.file_sha256
+        project_artifact.relative_path != manifest.active_project.path
+        or project_artifact.payload != project_payload
+        or project_artifact.file_sha256 != project_file_hash
     ):
-        registry_hash = registry_semantic_sha256(registry)
-        if registry.revision_id != registry_hash or registry.content_hash != registry_hash:
-            raise _state_invalid("Audio registry semantic hash is invalid.")
-        registry_payload = _canonical_json_bytes(registry)
-        registry_path = canonical_registry_snapshot_path(registry.revision_id)
-        registry_artifact = PreparedArtifact(
-            registry_path,
-            registry_payload,
-            hashlib.sha256(registry_payload).hexdigest(),
-        )
-        next_project = manifest.active_project
-        next_registry = RegistrySnapshotPointer(
-            path=registry_path,
-            revision_id=registry.revision_id,
-            content_hash=registry.content_hash,
-            file_sha256=registry_artifact.file_sha256,
-        )
-        base_artifacts = (active_project_artifact, registry_artifact)
-    else:
-        base = prepare_project_registry_commit(
-            manifest=manifest,
-            project=project,
-            registry=registry,
-            attempt_id=attempt_id,
-        )
-        next_project = base.next_project
-        next_registry = base.next_registry
-        base_artifacts = base.artifacts
+        raise _state_invalid("Audio registry active project artifact is not exact.")
+    registry_hash = registry_semantic_sha256(registry)
+    if registry.revision_id != registry_hash or registry.content_hash != registry_hash:
+        raise _state_invalid("Audio registry semantic hash is invalid.")
+    registry_payload = _canonical_json_bytes(registry)
+    registry_path = canonical_registry_snapshot_path(registry.revision_id)
+    registry_artifact = PreparedArtifact(
+        registry_path,
+        registry_payload,
+        hashlib.sha256(registry_payload).hexdigest(),
+    )
+    next_project = manifest.active_project
+    next_registry = RegistrySnapshotPointer(
+        path=registry_path,
+        revision_id=registry.revision_id,
+        content_hash=registry.content_hash,
+        file_sha256=registry_artifact.file_sha256,
+    )
+    base_artifacts = (project_artifact, registry_artifact)
     combined = base_artifacts + artifacts
     paths = [item.relative_path for item in combined]
     if len(paths) != len(set(paths)):
@@ -685,6 +745,14 @@ class ProductionStateCommitter:
             != request.budget_reservation_receipt_id
             or authorization.egress_authorization_receipt_id
             != request.egress_authorization_receipt_id
+            or preview.pricing_snapshot_id != request.pricing_snapshot_id
+            or authorization.pricing_snapshot_id != request.pricing_snapshot_id
+            or authorization.payload_categories != preview.payload_categories
+            or authorization.cost_ceiling_microunits
+            < preview.estimated_cost_upper_bound_microunits
+            or not preview.timing_supported
+            or not preview.output_supported
+            or not authorization.provider_enabled
         ):
             raise _state_invalid(
                 "Voice preview or authorization does not match the immutable request."
@@ -749,6 +817,14 @@ class ProductionStateCommitter:
                     and existing.voice_phase == "request"
                     and existing.status is StateCommitStatus.RUNNING
                 ):
+                    reopened = self._reopen_voice_evidence(
+                        request.attempt_id, include_intent=False
+                    )
+                    if reopened != evidence or (
+                        _candidate_artifacts_hash(reopened)
+                        != existing.candidate_artifacts_hash
+                    ):
+                        raise _state_invalid("Voice R+1 replay evidence is not exact.")
                     return manifest
                 raise _state_invalid("Voice attempt ID was already used by another request.")
             if (
@@ -793,7 +869,7 @@ class ProductionStateCommitter:
         request: VoiceGenerationRequest,
         preview: VoiceGenerationPreview,
         authorization: VoiceCallAuthorization,
-    ) -> DurableVoiceSubmitPermit:
+    ) -> _DurableVoiceSubmitPermit:
         """Persist R+2, reopen it, and mint exactly one process-local permit."""
 
         receipt = self._voice_receipt(request, preview, authorization)
@@ -835,8 +911,35 @@ class ProductionStateCommitter:
             artifact = self._voice_prepared_artifact(
                 request.attempt_id, paths.submit_intent_path, intent_payload
             )
+            r1_artifacts = self._reopen_voice_evidence(request.attempt_id, include_intent=False)
+            expected_r1 = (
+                self._voice_prepared_artifact(
+                    request.attempt_id, paths.request_path, _canonical_json_bytes(request)
+                ),
+                self._voice_prepared_artifact(
+                    request.attempt_id, paths.preview_path, _canonical_json_bytes(preview)
+                ),
+                self._voice_prepared_artifact(
+                    request.attempt_id,
+                    paths.authorization_path,
+                    _canonical_json_bytes(authorization),
+                ),
+            )
+            if (
+                r1_artifacts != expected_r1
+                or _candidate_artifacts_hash(r1_artifacts)
+                != attempt.candidate_artifacts_hash
+            ):
+                raise _state_invalid("Voice R+1 evidence changed before submit intent.")
             self._write_immutable_artifact(artifact, attempt_id=request.attempt_id)
-            r2_attempt = _validated_transition(attempt, {"voice_phase": "submit_intent"})
+            aggregate = _candidate_artifacts_hash((*r1_artifacts, artifact))
+            r2_attempt = _validated_transition(
+                attempt,
+                {
+                    "voice_phase": "submit_intent",
+                    "candidate_artifacts_hash": aggregate,
+                },
+            )
             r2 = _validated_transition(
                 manifest,
                 {
@@ -852,8 +955,20 @@ class ProductionStateCommitter:
             reopened_attempt = next(
                 item for item in reopened.attempts if item.attempt_id == request.attempt_id
             )
-            if reopened_attempt.voice_phase != "submit_intent":
+            if (
+                reopened_attempt.voice_phase != "submit_intent"
+                or reopened_attempt.candidate_artifacts_hash != aggregate
+            ):
                 raise _state_commit_failed("Voice submit intent reopen verification failed.")
+            intent_snapshot = _read_regular_file_nofollow(
+                paths.submit_intent_path,
+                contained_by=self._project_root,
+            )
+            if (
+                intent_snapshot.data != intent_payload
+                or intent_snapshot.file_sha256 != artifact.file_sha256
+            ):
+                raise _state_commit_failed("Voice submit intent exact-byte verification failed.")
             manifest_snapshot = _read_regular_file_nofollow(
                 self._project_root / "state/manifest.json",
                 contained_by=self._project_root,
@@ -867,16 +982,48 @@ class ProductionStateCommitter:
                 "budget_reservation_receipt_id": authorization.budget_reservation_receipt_id,
                 "egress_authorization_receipt_id": authorization.egress_authorization_receipt_id,
             }
-            return DurableVoiceSubmitPermit(
+            return _DurableVoiceSubmitPermit(
                 _VOICE_PERMIT_TOKEN,
                 binding=binding,
                 manifest_revision=reopened.manifest_revision,
                 manifest_file_sha256=manifest_snapshot.file_sha256,
-                durability_validator=self._voice_submit_intent_is_current,
+                durability_validator=lambda: self._voice_submit_intent_is_current(
+                    reopened.manifest_revision,
+                    manifest_snapshot.file_sha256,
+                    request.attempt_id,
+                    aggregate,
+                    artifact.file_sha256,
+                    intent_payload,
+                ),
             )
 
+    def _reopen_voice_evidence(
+        self, attempt_id: str, *, include_intent: bool
+    ) -> tuple[PreparedArtifact, ...]:
+        paths = self.voice_attempt_paths(attempt_id)
+        selected = [paths.request_path, paths.preview_path, paths.authorization_path]
+        if include_intent:
+            selected.append(paths.submit_intent_path)
+        artifacts = []
+        for path in selected:
+            snapshot = _read_regular_file_nofollow(path, contained_by=self._project_root)
+            artifacts.append(
+                PreparedArtifact(
+                    relative_path=path.relative_to(self._project_root),
+                    payload=snapshot.data,
+                    file_sha256=snapshot.file_sha256,
+                )
+            )
+        return tuple(artifacts)
+
     def _voice_submit_intent_is_current(
-        self, manifest_revision: int, manifest_file_sha256: str, attempt_id: str
+        self,
+        manifest_revision: int,
+        manifest_file_sha256: str,
+        attempt_id: str,
+        aggregate_hash: str,
+        intent_sha256: str,
+        intent_payload: bytes,
     ) -> bool:
         try:
             snapshot = _read_regular_file_nofollow(
@@ -886,6 +1033,7 @@ class ProductionStateCommitter:
             if snapshot.file_sha256 != manifest_file_sha256:
                 return False
             manifest = ProductionManifest.model_validate_json(snapshot.data)
+            evidence = self._reopen_voice_evidence(attempt_id, include_intent=True)
         except (AiVideoError, OSError, ValidationError, ValueError):
             return False
         attempt = next(
@@ -897,6 +1045,10 @@ class ProductionStateCommitter:
             and attempt.operation == "voice_generation"
             and attempt.status is StateCommitStatus.RUNNING
             and attempt.voice_phase == "submit_intent"
+            and attempt.candidate_artifacts_hash == aggregate_hash
+            and _candidate_artifacts_hash(evidence) == aggregate_hash
+            and evidence[-1].file_sha256 == intent_sha256
+            and evidence[-1].payload == intent_payload
         )
 
     def _record_voice_terminal(
@@ -996,6 +1148,294 @@ class ProductionStateCommitter:
             error_message=error_message,
         )
 
+    @staticmethod
+    def _validate_voice_provider_result(
+        request: VoiceGenerationRequest,
+        preview: VoiceGenerationPreview,
+        authorization: VoiceCallAuthorization,
+        result: VoiceProviderResult,
+    ) -> None:
+        if not isinstance(result, VoiceProviderResult):
+            raise _state_invalid("Voice provider returned an untyped result.")
+        if (
+            result.request_id != request.request_id
+            or result.request_fingerprint != request.voice_request_fingerprint
+            or result.preview_fingerprint != preview.preview_fingerprint
+            or result.authorization_fingerprint
+            != authorization.authorization_fingerprint
+            or result.content_type not in {"audio/wav", "audio/x-wav"}
+            or result.cost_receipt.pricing_snapshot_id
+            != request.pricing_snapshot_id
+            or result.cost_receipt.estimated_cost_upper_bound_microunits
+            != preview.estimated_cost_upper_bound_microunits
+            or (
+                result.cost_receipt.provider_reported_cost_microunits is not None
+                and result.cost_receipt.provider_reported_cost_microunits
+                > authorization.cost_ceiling_microunits
+            )
+            or result.provenance_receipt.provider_kind != request.provider_kind
+            or result.provenance_receipt.model_id != request.model_id
+            or result.provenance_receipt.voice_id != request.voice_id
+            or result.provenance_receipt.language != request.language
+            or result.provenance_receipt.script_hash != request.script_hash
+            or result.provenance_receipt.egress_authorization_receipt_id
+            != request.egress_authorization_receipt_id
+        ):
+            raise _state_invalid(
+                "Voice provider result contradicts request, preview, authorization, or receipts."
+            )
+
+    def _prepare_voice_activation_request(
+        self,
+        request: VoiceGenerationRequest,
+        preview: VoiceGenerationPreview,
+        authorization: VoiceCallAuthorization,
+        result: VoiceProviderResult,
+        prepared: PreparedVoiceCandidate,
+    ) -> tuple[StateCommitRequest, tuple[str, ...], tuple[str, ...]]:
+        self._validate_voice_provider_result(request, preview, authorization, result)
+        if not isinstance(prepared, PreparedVoiceCandidate) or not isinstance(
+            prepared.audio, PreparedAudioImport
+        ):
+            raise _state_invalid("Voice candidate preparer returned an unsafe capability.")
+        audio = prepared.audio
+        probe = audio.probe
+        if (
+            audio.payload != result.audio_bytes
+            or probe.file_sha256 != result.audio_sha256
+            or probe.size_bytes != len(result.audio_bytes)
+            or probe.mime_type != result.content_type
+            or probe.codec_name != request.output_codec
+            or probe.sample_rate_hz != request.output_sample_rate_hz
+            or probe.channels != request.output_channels
+        ):
+            raise _state_invalid("Prepared voice audio does not match the exact provider result.")
+
+        paths = self.voice_attempt_paths(request.attempt_id)
+        provenance_bytes = _canonical_json_bytes(result.provenance_receipt)
+        cost_bytes = _canonical_json_bytes(result.cost_receipt)
+        provenance_hash = hashlib.sha256(provenance_bytes).hexdigest()
+        cost_hash = hashlib.sha256(cost_bytes).hexdigest()
+        alignment_hash = result.alignment_receipt_sha256
+        audio_id = f"voice-{request.attempt_id}"
+        audio_record = AssetRecord(
+            asset_id=audio_id,
+            asset_type=AssetType.VOICE,
+            artifact_path=canonical_audio_asset_path(result.audio_sha256),
+            sha256=result.audio_sha256,
+            size_bytes=len(result.audio_bytes),
+            mime_type=result.content_type,
+            source_kind=AssetSourceKind.GENERATED,
+            tool=result.provenance_receipt.adapter,
+            input_artifact_ids=request.input_artifact_ids,
+            input_fingerprint=request.input_fingerprint,
+            creation_receipt_id=f"voice-result-{result.result_fingerprint}",
+            usage_license=result.provenance_receipt.license_policy_decision,
+            egress=EgressMetadata(
+                remote=True,
+                destination=authorization.destination,
+                authorization_receipt_id=request.egress_authorization_receipt_id,
+                request_fingerprint=request.voice_request_fingerprint,
+                payload_fingerprint=request.script_hash,
+                retention_mode="provider_standard",
+                provider_policy_snapshot_id=(
+                    result.provenance_receipt.license_policy_decision
+                ),
+            ),
+            cost_receipt_id=f"cost-{cost_hash}",
+            audio_metadata=AudioAssetMetadata(
+                audio_kind=request.audio_kind,
+                source=AudioSource(
+                    kind=AssetSourceKind.GENERATED,
+                    provider_or_tool=result.provenance_receipt.adapter,
+                    input_artifact_ids=request.input_artifact_ids,
+                    input_fingerprint=request.input_fingerprint,
+                ),
+                speaker_id=request.speaker_id,
+                voice_id=request.voice_id,
+                language=request.language,
+                script_hash=request.script_hash,
+                duration_samples=probe.duration_samples,
+                sample_rate_hz=probe.sample_rate_hz,
+                channels=probe.channels,
+                channel_layout=probe.channel_layout,
+                codec_name=probe.codec_name,
+                loudness=probe.loudness,
+                provenance_receipt_id=f"provenance-{provenance_hash}",
+                alignment_receipt_id=f"alignment-{alignment_hash}",
+            ),
+        )
+        asset_artifacts = [
+            PreparedArtifact(audio_record.artifact_path, audio.payload, result.audio_sha256)
+        ]
+        new_records = [audio_record]
+        caption_ids: tuple[str, ...] = ()
+        if prepared.caption is not None:
+            assert prepared.caption_asset_record is not None
+            caption = prepared.caption
+            supplied = prepared.caption_asset_record
+            caption_id = f"caption-{request.attempt_id}"
+            try:
+                CaptionImportRequest(
+                    caption_track=caption.caption_track,
+                    track_bytes=caption.track_bytes,
+                    track_sha256=caption.track_sha256,
+                    style_reference=caption.style_reference,
+                    style_bytes=caption.style_bytes,
+                    style_sha256=caption.style_sha256,
+                )
+            except ValidationError as exc:
+                raise _state_invalid("Prepared caption bytes are not canonical.", str(exc)) from exc
+            track = caption.caption_track
+            expected_caption_record = AssetRecord(
+                asset_id=caption_id,
+                asset_type=AssetType.CAPTION,
+                artifact_path=Path(f"assets/captions/{caption.track_sha256}.json"),
+                sha256=caption.track_sha256,
+                size_bytes=len(caption.track_bytes),
+                mime_type="application/json",
+                source_kind=AssetSourceKind.DERIVED,
+                tool=result.provenance_receipt.adapter,
+                input_artifact_ids=(audio_id,),
+                input_fingerprint=result.audio_sha256,
+                creation_receipt_id=track.creation_receipt_id,
+                usage_license=result.provenance_receipt.license_policy_decision,
+                caption_metadata=CaptionAssetMetadata(
+                    caption_track_id=track.caption_track_id,
+                    language=track.language,
+                    source_audio_asset_id=audio_id,
+                    source_audio_sha256=result.audio_sha256,
+                    script_hash=track.script_hash,
+                    transcript_hash=track.transcript_hash,
+                    segment_count=len(track.segments),
+                    word_count=sum(len(item.words or ()) for item in track.segments),
+                    segmentation_policy_id=track.segmentation_policy.policy_id,
+                    segmentation_policy_version=track.segmentation_policy.policy_version,
+                    alignment_receipt_id=track.alignment_receipt_id,
+                    timing_fingerprint=track.timing_fingerprint,
+                    style_reference_id=(
+                        caption.style_reference.artifact_id
+                        if caption.style_reference is not None
+                        else None
+                    ),
+                    style_content_hash=(
+                        caption.style_reference.content_hash
+                        if caption.style_reference is not None
+                        else None
+                    ),
+                ),
+            )
+            if (
+                supplied != expected_caption_record
+                or track.source_audio_asset_id != audio_id
+                or track.source_audio_sha256 != result.audio_sha256
+                or track.script_hash != request.script_hash
+            ):
+                raise _state_invalid("Prepared caption identity does not match generated voice.")
+            new_records.append(supplied)
+            asset_artifacts.append(
+                PreparedArtifact(supplied.artifact_path, caption.track_bytes, caption.track_sha256)
+            )
+            if caption.style_reference is not None:
+                assert caption.style_bytes is not None and caption.style_sha256 is not None
+                asset_artifacts.append(
+                    PreparedArtifact(
+                        caption.style_reference.path,
+                        caption.style_bytes,
+                        caption.style_sha256,
+                    )
+                )
+            caption_ids = (caption_id,)
+
+        manifest = self._read_manifest()
+        project_snapshot = _read_regular_file_nofollow(
+            self._project_root / request.base_project.path,
+            contained_by=self._project_root,
+        )
+        registry_snapshot = _read_regular_file_nofollow(
+            self._project_root / request.base_registry.path,
+            contained_by=self._project_root,
+        )
+        try:
+            project = ProductionProject.model_validate(yaml.safe_load(project_snapshot.data))
+            base_registry = AssetRegistrySnapshot.model_validate_json(registry_snapshot.data)
+        except (ValidationError, ValueError, yaml.YAMLError) as exc:
+            raise _state_invalid("Voice base project or registry could not be reopened.", str(exc)) from exc
+        ordered_new = tuple(sorted(new_records, key=lambda item: item.asset_id))
+        registry = AssetRegistrySnapshot(
+            schema_version="2.1",
+            revision_id="0" * 64,
+            content_hash="0" * 64,
+            assets=base_registry.assets + ordered_new,
+        )
+        registry_hash = registry_semantic_sha256(registry)
+        registry = registry.model_copy(
+            update={"revision_id": registry_hash, "content_hash": registry_hash}
+        )
+        base_commit = prepare_audio_registry_commit(
+            manifest=manifest,
+            project=project,
+            base_registry=base_registry,
+            registry=registry,
+            attempt_id=request.attempt_id,
+            artifacts=tuple(asset_artifacts),
+            active_project_artifact=PreparedArtifact(
+                request.base_project.path, project_snapshot.data, project_snapshot.file_sha256
+            ),
+        )
+        outcome_payload = (
+            json.dumps(
+                {
+                    "request_id": result.request_id,
+                    "request_fingerprint": result.request_fingerprint,
+                    "preview_fingerprint": result.preview_fingerprint,
+                    "authorization_fingerprint": result.authorization_fingerprint,
+                    "result_fingerprint": result.result_fingerprint,
+                    "provider_request_id": result.provider_request_id,
+                    "provider_trace_id": result.provider_trace_id,
+                    "audio_sha256": result.audio_sha256,
+                    "alignment_receipt_sha256": result.alignment_receipt_sha256,
+                    "terminal_status": result.terminal_status,
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
+        ).encode()
+        evidence = (
+            *self._reopen_voice_evidence(request.attempt_id, include_intent=True),
+            PreparedArtifact(
+                paths.alignment_path.relative_to(self._project_root),
+                result.alignment_receipt_bytes,
+                alignment_hash,
+            ),
+            PreparedArtifact(
+                paths.cost_path.relative_to(self._project_root), cost_bytes, cost_hash
+            ),
+            PreparedArtifact(
+                paths.provenance_path.relative_to(self._project_root),
+                provenance_bytes,
+                provenance_hash,
+            ),
+            PreparedArtifact(
+                paths.outcome_path.relative_to(self._project_root),
+                outcome_payload,
+                hashlib.sha256(outcome_payload).hexdigest(),
+            ),
+        )
+        by_path = {
+            item.relative_path: item for item in (*base_commit.artifacts, *evidence)
+        }
+        commit = StateCommitRequest(
+            attempt_id=request.attempt_id,
+            operation="voice_generation",
+            expected_manifest_revision=manifest.manifest_revision,
+            artifacts=tuple(sorted(by_path.values(), key=lambda item: item.relative_path.as_posix())),
+            next_project=base_commit.next_project,
+            next_registry=base_commit.next_registry,
+        )
+        return commit, (audio_id,), caption_ids
+
     def activate_voice_assets(
         self,
         request: StateCommitRequest,
@@ -1044,6 +1484,13 @@ class ProductionStateCommitter:
             )
             if attempt is None or attempt.operation != "voice_generation":
                 raise _state_invalid("Voice activation has no matching attempt.")
+            provider_request_id = self._validate_voice_activation_graph(
+                request,
+                attempt,
+                candidate_registry,
+                audio_asset_ids,
+                caption_asset_ids,
+            )
             if attempt.status is StateCommitStatus.SUCCEEDED:
                 if (
                     manifest.active_registry == request.next_registry
@@ -1092,6 +1539,7 @@ class ProductionStateCommitter:
                         "candidate_artifacts_hash": candidate_hash,
                         "candidate_audio_asset_ids": audio_asset_ids,
                         "candidate_caption_asset_ids": caption_asset_ids,
+                        "provider_request_id": provider_request_id,
                         "voice_phase": "candidate",
                     },
                 )
@@ -1154,6 +1602,107 @@ class ProductionStateCommitter:
                     raise _outcome_unknown(exc) from exc
                 raise
 
+    def _validate_voice_activation_graph(
+        self,
+        commit: StateCommitRequest,
+        attempt: StateCommitAttempt,
+        candidate_registry: AssetRegistrySnapshot,
+        audio_asset_ids: tuple[str, ...],
+        caption_asset_ids: tuple[str, ...],
+    ) -> str | None:
+        paths = self.voice_attempt_paths(commit.attempt_id)
+        artifacts = {item.relative_path: item for item in commit.artifacts}
+        evidence_paths = {
+            path.relative_to(self._project_root)
+            for path in (
+                paths.request_path,
+                paths.preview_path,
+                paths.authorization_path,
+                paths.submit_intent_path,
+                paths.alignment_path,
+                paths.cost_path,
+                paths.provenance_path,
+                paths.outcome_path,
+            )
+        }
+        if not evidence_paths.issubset(artifacts):
+            raise _state_invalid("Voice candidate graph is missing durable lifecycle evidence.")
+        try:
+            voice_request = VoiceGenerationRequest.model_validate_json(
+                artifacts[paths.request_path.relative_to(self._project_root)].payload
+            )
+            preview = VoiceGenerationPreview.model_validate_json(
+                artifacts[paths.preview_path.relative_to(self._project_root)].payload
+            )
+            authorization = VoiceCallAuthorization.model_validate_json(
+                artifacts[paths.authorization_path.relative_to(self._project_root)].payload
+            )
+            cost = VoiceCostReceipt.model_validate_json(
+                artifacts[paths.cost_path.relative_to(self._project_root)].payload
+            )
+            provenance = VoiceProvenanceReceipt.model_validate_json(
+                artifacts[paths.provenance_path.relative_to(self._project_root)].payload
+            )
+            outcome = json.loads(
+                artifacts[paths.outcome_path.relative_to(self._project_root)].payload
+            )
+        except (ValidationError, ValueError, json.JSONDecodeError) as exc:
+            raise _state_invalid("Voice candidate evidence is malformed.", str(exc)) from exc
+        receipt = self._voice_receipt(voice_request, preview, authorization)
+        if (
+            receipt != attempt.voice_request
+            or voice_request.base_project != attempt.base_project
+            or voice_request.base_registry != attempt.base_registry
+            or outcome.get("request_id") != voice_request.request_id
+            or outcome.get("request_fingerprint") != voice_request.voice_request_fingerprint
+            or outcome.get("preview_fingerprint") != preview.preview_fingerprint
+            or outcome.get("authorization_fingerprint")
+            != authorization.authorization_fingerprint
+            or outcome.get("provider_request_id") != cost.provider_request_id
+            or outcome.get("provider_request_id") != provenance.provider_request_id
+            or outcome.get("provider_trace_id") != provenance.provider_trace_id
+            or outcome.get("terminal_status") != "succeeded"
+            or outcome.get("alignment_receipt_sha256")
+            != artifacts[paths.alignment_path.relative_to(self._project_root)].file_sha256
+        ):
+            raise _state_invalid("Voice candidate evidence identity is inconsistent.")
+        base_snapshot = _read_regular_file_nofollow(
+            self._project_root / attempt.base_registry.path,
+            contained_by=self._project_root,
+        )
+        try:
+            base_registry = AssetRegistrySnapshot.model_validate_json(base_snapshot.data)
+        except (ValidationError, ValueError) as exc:
+            raise _state_invalid("Voice candidate base registry is invalid.", str(exc)) from exc
+        if candidate_registry.assets[: len(base_registry.assets)] != base_registry.assets:
+            raise _state_invalid("Voice candidate registry mutated or deleted base assets.")
+        new_records = candidate_registry.assets[len(base_registry.assets) :]
+        expected_ids = set(audio_asset_ids) | set(caption_asset_ids)
+        if {item.asset_id for item in new_records} != expected_ids:
+            raise _state_invalid("Voice candidate registry contains extra or missing assets.")
+        declared_paths = {item.artifact_path for item in new_records}
+        declared_paths.update(
+            Path(f"assets/styles/{item.caption_metadata.style_content_hash}.json")
+            for item in new_records
+            if item.caption_metadata is not None
+            and item.caption_metadata.style_content_hash is not None
+        )
+        exact_paths = evidence_paths | declared_paths | {
+            commit.next_project.path,
+            commit.next_registry.path,
+        }
+        if set(artifacts) != exact_paths:
+            raise _state_invalid("Voice candidate graph contains extra or missing artifacts.")
+        for record in new_records:
+            artifact = artifacts.get(record.artifact_path)
+            if (
+                artifact is None
+                or artifact.file_sha256 != record.sha256
+                or len(artifact.payload) != record.size_bytes
+            ):
+                raise _state_invalid("Voice candidate registry bytes are inconsistent.")
+        return outcome.get("provider_request_id")
+
     def generate_voice_asset(
         self,
         request: VoiceGenerationRequest,
@@ -1192,6 +1741,15 @@ class ProductionStateCommitter:
             )
             raise
         self._crash_injector.checkpoint(CommitPhase.AFTER_VOICE_PROVIDER_RESULT)
+        try:
+            self._validate_voice_provider_result(request, preview, authorization, result)
+        except Exception as exc:
+            self.record_voice_outcome_unknown(
+                request.attempt_id,
+                phase="provider_call",
+                error_message=f"Voice provider returned contradictory durable evidence: {exc}",
+            )
+            raise
         if self._voice_candidate_preparer is None:
             self.record_voice_outcome_unknown(
                 request.attempt_id,
@@ -1202,12 +1760,15 @@ class ProductionStateCommitter:
                 "Voice candidate preparation requires an injected local deterministic materializer."
             )
         try:
-            commit_request, audio_ids, caption_ids = self._voice_candidate_preparer(
+            prepared = self._voice_candidate_preparer(
                 request,
                 preview,
                 authorization,
                 result,
                 self.voice_attempt_paths(request.attempt_id),
+            )
+            commit_request, audio_ids, caption_ids = self._prepare_voice_activation_request(
+                request, preview, authorization, result, prepared
             )
             return self.activate_voice_assets(
                 commit_request,
@@ -2488,6 +3049,27 @@ class ProductionStateCommitter:
                     candidate_project = attempt.candidate_project or attempt.base_project
                     self._validate_recovery_project_pointer(candidate_project)
                     self._validate_recovery_registry_pointer(attempt.candidate_registry)
+                    replay = self._reconstruct_voice_activation_request(attempt)
+                    replay_registry_artifact = next(
+                        item
+                        for item in replay.artifacts
+                        if item.relative_path == replay.next_registry.path
+                    )
+                    replay_registry = AssetRegistrySnapshot.model_validate_json(
+                        replay_registry_artifact.payload
+                    )
+                    self._validate_voice_activation_graph(
+                        replay,
+                        attempt,
+                        replay_registry,
+                        attempt.candidate_audio_asset_ids,
+                        attempt.candidate_caption_asset_ids,
+                    )
+                    if (
+                        _candidate_artifacts_hash(replay.artifacts)
+                        != attempt.candidate_artifacts_hash
+                    ):
+                        raise _state_invalid("Voice recovery candidate graph hash is invalid.")
                     candidate_pair = (
                         candidate_project,
                         attempt.candidate_registry,
@@ -2630,6 +3212,51 @@ class ProductionStateCommitter:
                 repaired.append(replacement)
                 changed = True
                 continue
+            if attempt.operation == "audio_import":
+                if (
+                    attempt.candidate_project is not None
+                    or attempt.candidate_registry is None
+                ):
+                    raise _state_invalid("Interrupted audio import identity is incomplete.")
+                self._validate_recovery_project_pointer(attempt.base_project)
+                self._validate_recovery_registry_pointer(attempt.base_registry)
+                self._validate_recovery_registry_pointer(attempt.candidate_registry)
+                active_pair = (manifest.active_project, manifest.active_registry)
+                base_pair = (attempt.base_project, attempt.base_registry)
+                candidate_pair = (attempt.base_project, attempt.candidate_registry)
+                if active_pair == candidate_pair:
+                    replacement = _validated_transition(
+                        attempt,
+                        {
+                            "status": StateCommitStatus.SUCCEEDED,
+                            "finished_at": _timestamp(),
+                            "error_code": None,
+                            "error_message": None,
+                        },
+                    )
+                elif active_pair == base_pair:
+                    replacement = _validated_transition(
+                        attempt,
+                        {
+                            "status": StateCommitStatus.INTERRUPTED,
+                            "finished_at": _timestamp(),
+                            "error_code": ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN.value,
+                            "error_message": "Audio import was interrupted before registry activation.",
+                        },
+                    )
+                    items.append(
+                        RecoveryItem(
+                            path=attempt.candidate_registry.path,
+                            disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
+                        )
+                    )
+                else:
+                    raise _state_invalid(
+                        "Production Manifest selects a mixed interrupted audio import pair."
+                    )
+                repaired.append(replacement)
+                changed = True
+                continue
             if attempt.candidate_project is None or attempt.candidate_registry is None:
                 raise _state_invalid("Incomplete production state attempt has no candidate snapshots.")
             self._validate_recovery_project_pointer(attempt.candidate_project)
@@ -2701,6 +3328,69 @@ class ProductionStateCommitter:
         ):
             items.extend(self._remove_recovery_temp(self._state_directory() / name))
         return tuple(items)
+
+    def _reconstruct_voice_activation_request(
+        self, attempt: StateCommitAttempt
+    ) -> StateCommitRequest:
+        if attempt.candidate_registry is None:
+            raise _state_invalid("Voice candidate registry identity is missing.")
+        registry_snapshot = _read_regular_file_nofollow(
+            self._project_root / attempt.candidate_registry.path,
+            contained_by=self._project_root,
+        )
+        try:
+            registry = AssetRegistrySnapshot.model_validate_json(registry_snapshot.data)
+        except (ValidationError, ValueError) as exc:
+            raise _state_invalid("Voice candidate registry could not be reopened.", str(exc)) from exc
+        candidate_ids = set(attempt.candidate_audio_asset_ids) | set(
+            attempt.candidate_caption_asset_ids
+        )
+        by_id = {item.asset_id: item for item in registry.assets}
+        if not candidate_ids or not candidate_ids.issubset(by_id):
+            raise _state_invalid("Voice candidate asset identities are incomplete.")
+        paths = self.voice_attempt_paths(attempt.attempt_id)
+        relative_paths = {
+            attempt.base_project.path,
+            attempt.candidate_registry.path,
+            *(by_id[item].artifact_path for item in candidate_ids),
+            *(
+                path.relative_to(self._project_root)
+                for path in (
+                    paths.request_path,
+                    paths.preview_path,
+                    paths.authorization_path,
+                    paths.submit_intent_path,
+                    paths.alignment_path,
+                    paths.cost_path,
+                    paths.provenance_path,
+                    paths.outcome_path,
+                )
+            ),
+        }
+        relative_paths.update(
+            Path(f"assets/styles/{by_id[item].caption_metadata.style_content_hash}.json")
+            for item in candidate_ids
+            if by_id[item].caption_metadata is not None
+            and by_id[item].caption_metadata.style_content_hash is not None
+        )
+        artifacts = tuple(
+            PreparedArtifact(path, snapshot.data, snapshot.file_sha256)
+            for path in sorted(relative_paths, key=Path.as_posix)
+            for snapshot in (
+                _read_regular_file_nofollow(
+                    self._project_root / path,
+                    contained_by=self._project_root,
+                ),
+            )
+        )
+        return StateCommitRequest(
+            attempt_id=attempt.attempt_id,
+            operation="voice_generation",
+            expected_manifest_revision=attempt.base_manifest_revision + 2,
+            artifacts=artifacts,
+            next_project=attempt.base_project,
+            next_registry=attempt.candidate_registry,
+        )
 
     def _remove_owned_attempt_temps(
         self, attempts: list[StateCommitAttempt]
@@ -3199,12 +3889,23 @@ class ProductionStateCommitter:
                 base_manifest_revision=manifest.manifest_revision,
                 base_project=manifest.active_project,
                 base_registry=manifest.active_registry,
-                candidate_project=request.next_project,
+                candidate_project=(
+                    None if request.operation == "audio_import" else request.next_project
+                ),
                 candidate_registry=request.next_registry,
                 candidate_artifacts_hash=candidate_artifacts_hash,
                 started_at=_timestamp(),
             )
-            running_manifest = _validated_transition(manifest, {"manifest_revision": manifest.manifest_revision + 1, "attempts": manifest.attempts + (running_attempt,)})
+            running_manifest = _validated_transition(
+                manifest,
+                {
+                    "schema_version": (
+                        "2.2" if request.operation == "audio_import" else manifest.schema_version
+                    ),
+                    "manifest_revision": manifest.manifest_revision + 1,
+                    "attempts": manifest.attempts + (running_attempt,),
+                },
+            )
             try:
                 def mark_running_replaced() -> None:
                     nonlocal running_replaced
@@ -3218,7 +3919,16 @@ class ProductionStateCommitter:
                 succeeded_attempt = _validated_transition(running_attempt, {"status": StateCommitStatus.SUCCEEDED, "finished_at": _timestamp()})
                 final_manifest = _validated_transition(
                     manifest,
-                    {"manifest_revision": manifest.manifest_revision + 2, "active_project": request.next_project, "active_registry": request.next_registry, "active_render_state": retained_render_state, "attempts": manifest.attempts + (succeeded_attempt,)},
+                    {
+                        "schema_version": (
+                            "2.2" if request.operation == "audio_import" else manifest.schema_version
+                        ),
+                        "manifest_revision": manifest.manifest_revision + 2,
+                        "active_project": request.next_project,
+                        "active_registry": request.next_registry,
+                        "active_render_state": retained_render_state,
+                        "attempts": manifest.attempts + (succeeded_attempt,),
+                    },
                 )
 
                 def mark_manifest_replaced() -> None:
@@ -3238,7 +3948,13 @@ class ProductionStateCommitter:
                 )
                 failed_manifest = _validated_transition(
                     manifest,
-                    {"manifest_revision": manifest.manifest_revision + 2, "attempts": manifest.attempts + (failed_attempt,)},
+                    {
+                        "schema_version": (
+                            "2.2" if request.operation == "audio_import" else manifest.schema_version
+                        ),
+                        "manifest_revision": manifest.manifest_revision + 2,
+                        "attempts": manifest.attempts + (failed_attempt,),
+                    },
                 )
                 try:
                     self._write_manifest_atomic(failed_manifest)
@@ -3315,7 +4031,14 @@ class ProductionStateCommitter:
     ) -> None:
         if (
             existing.operation != request.operation
-            or existing.candidate_project != request.next_project
+            or not (
+                existing.candidate_project == request.next_project
+                or (
+                    request.operation == "audio_import"
+                    and existing.candidate_project is None
+                    and request.next_project == existing.base_project
+                )
+            )
             or existing.candidate_registry != request.next_registry
             or existing.candidate_artifacts_hash != candidate_artifacts_hash
         ):
