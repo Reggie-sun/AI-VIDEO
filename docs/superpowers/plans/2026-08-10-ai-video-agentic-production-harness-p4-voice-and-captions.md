@@ -631,7 +631,7 @@ ElevenLabs只作为`VoiceAssetProvider`的一个显式opt-in candidate，不能�
 | Authentication | REST使用`xi-api-key`；official guidance支持scope restriction、credit quota与IP allowlisting | secret只通过call-time secret reference进入transport，不持久化值/header；budget不是仅靠provider account limit |
 | TTS timing | `POST /v1/text-to-speech/:voice_id/with-timestamps`返回base64 audio和character-level `alignment`/`normalized_alignment` start/end arrays | thin adapter严格验证parallel arrays并转成source samples；不把character timing冒充word confidence |
 | Forced alignment | official multipart endpoint接受audio+text并返回character/word timing及loss，不提供speaker diarization contract | 可作为explicit alignment mode；loss原样进receipt，speaker仍来自project identity或`None` |
-| SDK | official Python SDK repository是MIT；official releases页面在核对时latest为`v2.58.0` | version只进入dated compatibility receipt；不安装、不新增package dependency、不把MIT SDK license混同service/output rights |
+| SDK | official Python SDK repository是MIT；official releases页面在核对时latest为`v2.62.0` | version只进入dated compatibility receipt；不安装、不新增package dependency、不把MIT SDK license混同service/output rights |
 | Response evidence | official API introduction说明response可带`character-cost`、`request-id`、`x-trace-id`等headers | 只持久化sanitized IDs与typed usage/cost evidence；raw headers/body不落盘 |
 | Pricing | official API pricing page按model/plan和每1K characters等units计价；2026-08-10页面展示Flash/Turbo约`$0.05/1K characters`、Multilingual约`$0.10/1K characters`，且可随plan变化 | 这些值只作为dated planning evidence，不硬编码；live preview必须刷新并签署pricing snapshot，unknown price fail closed |
 | Commercial rights | official billing/terms区分free non-commercial/attribution与paid-plan commercial rights，仍受policy限制 | 每次live authorization记录actual account plan/use/license decision；不能由SDK license推断output commercial rights |
