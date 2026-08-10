@@ -5,7 +5,7 @@ import json
 import unicodedata
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation, ROUND_HALF_EVEN
+from decimal import Decimal, DecimalException, ROUND_HALF_EVEN
 from typing import Literal
 
 from pydantic import Field, model_validator
@@ -21,6 +21,12 @@ from ai_video.production.models import (
     SourceReference,
     StrictModel,
 )
+
+
+_MAX_SOURCE_SAMPLE = (1 << 63) - 1
+_MAX_DECIMAL_INPUT_LENGTH = 128
+_MAX_DECIMAL_ADJUSTED_MAGNITUDE = 96
+_MAX_RECEIPT_DECIMAL_MAGNITUDE = Decimal("1e12")
 
 
 def _alignment_invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -92,26 +98,74 @@ class NormalizedAlignment(StrictModel):
         return self
 
 
+def _bounded_decimal(
+    value: object,
+    label: str,
+    *,
+    maximum_magnitude: Decimal,
+) -> Decimal:
+    if isinstance(value, bool):
+        raise _alignment_invalid(f"{label} must be a finite bounded decimal number.")
+    try:
+        token = str(value)
+        if len(token) > _MAX_DECIMAL_INPUT_LENGTH:
+            raise ValueError("decimal token is too long")
+        decimal = Decimal(token)
+        if (
+            not decimal.is_finite()
+            or abs(decimal.adjusted()) > _MAX_DECIMAL_ADJUSTED_MAGNITUDE
+            or abs(decimal) > maximum_magnitude
+        ):
+            raise ValueError("decimal magnitude is out of bounds")
+        return decimal
+    except (DecimalException, OverflowError, ValueError) as exc:
+        raise _alignment_invalid(
+            f"{label} must be a finite bounded decimal number."
+        ) from exc
+
+
+def _maximum_timing_seconds(sample_rate_hz: int, duration_samples: int) -> Decimal:
+    if (
+        isinstance(sample_rate_hz, bool)
+        or not isinstance(sample_rate_hz, int)
+        or sample_rate_hz <= 0
+        or isinstance(duration_samples, bool)
+        or not isinstance(duration_samples, int)
+        or duration_samples <= 0
+        or duration_samples > _MAX_SOURCE_SAMPLE
+    ):
+        raise _alignment_invalid("Caption source sample bounds are invalid.")
+    return Decimal(_MAX_SOURCE_SAMPLE) / Decimal(sample_rate_hz)
+
+
 def seconds_to_source_sample(value: object, sample_rate_hz: int) -> int:
     if (
-        isinstance(value, bool)
-        or isinstance(sample_rate_hz, bool)
+        isinstance(sample_rate_hz, bool)
         or not isinstance(sample_rate_hz, int)
+        or sample_rate_hz <= 0
     ):
-        raise _alignment_invalid("Caption timing value or sample rate is invalid.")
-    if sample_rate_hz <= 0:
         raise _alignment_invalid("Caption source sample rate must be positive.")
+    maximum_seconds = Decimal(_MAX_SOURCE_SAMPLE) / Decimal(sample_rate_hz)
     try:
-        seconds = Decimal(str(value))
-    except (InvalidOperation, ValueError) as exc:
-        raise _alignment_invalid("Caption timing value is not a decimal number.") from exc
-    if not seconds.is_finite() or seconds < 0:
-        raise _alignment_invalid("Caption timing value must be finite and non-negative.")
-    return int(
-        (seconds * Decimal(sample_rate_hz)).to_integral_value(
+        seconds = _bounded_decimal(
+            value,
+            "Caption timing value",
+            maximum_magnitude=maximum_seconds,
+        )
+        if seconds < 0:
+            raise ValueError("negative timing")
+        samples = (seconds * Decimal(sample_rate_hz)).to_integral_value(
             rounding=ROUND_HALF_EVEN
         )
-    )
+        if samples > _MAX_SOURCE_SAMPLE:
+            raise ValueError("sample bound exceeded")
+        return int(samples)
+    except AiVideoError:
+        raise
+    except (DecimalException, OverflowError, ValueError) as exc:
+        raise _alignment_invalid(
+            "Caption timing value must be finite, non-negative, and bounded."
+        ) from exc
 
 
 def _canonical_receipt_bytes(payload: object) -> bytes:
@@ -135,16 +189,33 @@ def _require_sequence(value: object, label: str) -> Sequence[object]:
     return value
 
 
-def _normalized_decimal(value: object, label: str) -> str:
-    if isinstance(value, bool):
-        raise _alignment_invalid(f"{label} must be a finite decimal number.")
+def _normalized_decimal(
+    value: object,
+    label: str,
+    *,
+    maximum_magnitude: Decimal = _MAX_RECEIPT_DECIMAL_MAGNITUDE,
+) -> str:
     try:
-        decimal = Decimal(str(value))
-    except (InvalidOperation, ValueError) as exc:
-        raise _alignment_invalid(f"{label} must be a finite decimal number.") from exc
-    if not decimal.is_finite():
-        raise _alignment_invalid(f"{label} must be a finite decimal number.")
-    return format(decimal, "f")
+        decimal = _bounded_decimal(
+            value,
+            label,
+            maximum_magnitude=maximum_magnitude,
+        )
+        return format(decimal, "f")
+    except AiVideoError:
+        raise
+    except (DecimalException, OverflowError, ValueError) as exc:
+        raise _alignment_invalid(f"{label} cannot be normalized safely.") from exc
+
+
+def _contains_unsupported_grapheme_extension(value: str) -> bool:
+    return any(
+        character == "\u200d"
+        or "\ufe00" <= character <= "\ufe0f"
+        or "\U000e0100" <= character <= "\U000e01ef"
+        or "\U0001f3fb" <= character <= "\U0001f3ff"
+        for character in value
+    )
 
 
 def _make_alignment(
@@ -254,16 +325,34 @@ def normalize_character_alignment(
     ends = _require_sequence(
         payload["character_end_times_seconds"], "character ends"
     )
+    maximum_seconds = _maximum_timing_seconds(sample_rate_hz, duration_samples)
+    for character in characters:
+        if isinstance(character, str) and _contains_unsupported_grapheme_extension(
+            character
+        ):
+            raise _alignment_invalid(
+                "Character alignment contains an unsupported grapheme extension."
+            )
     receipt = {
         "characters": [
             unicodedata.normalize("NFC", item) if isinstance(item, str) else item
             for item in characters
         ],
         "character_start_times_seconds": [
-            _normalized_decimal(item, "character start") for item in starts
+            _normalized_decimal(
+                item,
+                "character start",
+                maximum_magnitude=maximum_seconds,
+            )
+            for item in starts
         ],
         "character_end_times_seconds": [
-            _normalized_decimal(item, "character end") for item in ends
+            _normalized_decimal(
+                item,
+                "character end",
+                maximum_magnitude=maximum_seconds,
+            )
+            for item in ends
         ],
     }
     return _make_alignment(
@@ -292,6 +381,7 @@ def normalize_word_alignment(
             "Word alignment must contain only the official forced-alignment fields."
         )
     raw_words = _require_sequence(payload["words"], "words")
+    maximum_seconds = _maximum_timing_seconds(sample_rate_hz, duration_samples)
     texts: list[object] = []
     starts: list[object] = []
     ends: list[object] = []
@@ -311,8 +401,12 @@ def normalize_word_alignment(
                 if isinstance(word["text"], str)
                 else word["text"]
             ),
-            "start": _normalized_decimal(word["start"], "word start"),
-            "end": _normalized_decimal(word["end"], "word end"),
+            "start": _normalized_decimal(
+                word["start"], "word start", maximum_magnitude=maximum_seconds
+            ),
+            "end": _normalized_decimal(
+                word["end"], "word end", maximum_magnitude=maximum_seconds
+            ),
         }
         if "loss" in word:
             receipt_word["loss"] = _normalized_decimal(word["loss"], "word loss")
@@ -333,9 +427,15 @@ def normalize_word_alignment(
                         else character["text"]
                     ),
                     "start": _normalized_decimal(
-                        character["start"], "character start"
+                        character["start"],
+                        "character start",
+                        maximum_magnitude=maximum_seconds,
                     ),
-                    "end": _normalized_decimal(character["end"], "character end"),
+                    "end": _normalized_decimal(
+                        character["end"],
+                        "character end",
+                        maximum_magnitude=maximum_seconds,
+                    ),
                 }
             )
     if "loss" in payload:

@@ -117,6 +117,24 @@ def test_seconds_to_samples_rejects_bool_sample_rate(sample_rate):
         seconds_to_source_sample("0.1", sample_rate)
 
 
+def test_extreme_decimal_exponents_fail_closed_in_conversion_and_receipt_path():
+    with pytest.raises(AiVideoError) as caught:
+        seconds_to_source_sample("1e1000000", 48_000)
+    assert caught.value.code is ErrorCode.CAPTION_ALIGNMENT_INVALID
+
+    with pytest.raises(AiVideoError) as caught:
+        normalize_character_alignment(
+            {
+                "characters": ["a"],
+                "character_start_times_seconds": ["1e1000000"],
+                "character_end_times_seconds": ["1e1000000"],
+            },
+            sample_rate_hz=48_000,
+            duration_samples=48_000,
+        )
+    assert caught.value.code is ErrorCode.CAPTION_ALIGNMENT_INVALID
+
+
 def test_normalizer_rejects_bool_sample_rate_and_duration():
     payload = {
         "characters": ["a"],
@@ -190,6 +208,30 @@ def test_character_alignment_rejects_leading_or_ambiguous_combining_marks():
             sample_rate_hz=48_000,
             duration_samples=48_000,
         )
+
+
+@pytest.mark.parametrize(
+    "characters",
+    [
+        ["\U0001f469", "\u200d", "\U0001f4bb"],
+        ["x", "\ufe0f"],
+        ["\U0001f44d", "\U0001f3fb"],
+    ],
+)
+def test_character_alignment_rejects_unsupported_grapheme_extensions(characters):
+    starts = [index / 10 for index in range(len(characters))]
+    ends = [(index + 1) / 10 for index in range(len(characters))]
+    with pytest.raises(AiVideoError) as caught:
+        normalize_character_alignment(
+            {
+                "characters": characters,
+                "character_start_times_seconds": starts,
+                "character_end_times_seconds": ends,
+            },
+            sample_rate_hz=48_000,
+            duration_samples=48_000,
+        )
+    assert caught.value.code is ErrorCode.CAPTION_ALIGNMENT_INVALID
 
 
 def test_character_alignment_rejects_parallel_array_mismatch():
