@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from decimal import Decimal
 from enum import Enum
 from pathlib import Path
+from types import MappingProxyType
 from typing import Literal
+from urllib.parse import urlsplit
 
 from pydantic import (
     BaseModel,
@@ -308,10 +311,178 @@ class ToolIdentity(StrictModel):
     version: str
 
 
+class AudioKind(str, Enum):
+    DIALOGUE = "dialogue"
+    NARRATION = "narration"
+    AMBIENCE = "ambience"
+    SFX = "sfx"
+    BGM = "bgm"
+
+
+AUDIO_KIND_TO_ASSET_TYPE: Mapping[AudioKind, AssetType] = MappingProxyType(
+    {
+        AudioKind.DIALOGUE: AssetType.VOICE,
+        AudioKind.NARRATION: AssetType.VOICE,
+        AudioKind.AMBIENCE: AssetType.SFX,
+        AudioKind.SFX: AssetType.SFX,
+        AudioKind.BGM: AssetType.MUSIC,
+    }
+)
+
+
+class AudioChannelLayout(str, Enum):
+    MONO = "mono"
+    STEREO = "stereo"
+
+
+class AudioSource(StrictModel):
+    kind: AssetSourceKind
+    provider_or_tool: ToolIdentity
+    input_artifact_ids: tuple[str, ...] = ()
+    input_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    original_reference: str | None = None
+
+
+class AudioLoudnessMetadata(StrictModel):
+    integrated_lufs_milli: int | None = Field(default=None, strict=True)
+    true_peak_dbfs_milli: int | None = Field(default=None, strict=True)
+    measurement_standard: Literal["ebu_r128"] | None = None
+
+    @model_validator(mode="after")
+    def _require_consistent_measurement(self) -> "AudioLoudnessMetadata":
+        measured = (
+            self.integrated_lufs_milli is not None
+            or self.true_peak_dbfs_milli is not None
+        )
+        if measured != (self.measurement_standard is not None):
+            raise ValueError("loudness values and measurement standard must agree")
+        return self
+
+
+class AudioAssetMetadata(StrictModel):
+    audio_kind: AudioKind
+    source: AudioSource
+    speaker_id: str | None = None
+    voice_id: str | None = None
+    language: str | None = None
+    script_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    duration_samples: int = Field(strict=True, gt=0)
+    sample_rate_hz: int = Field(strict=True, gt=0)
+    channels: Literal[1, 2]
+    channel_layout: AudioChannelLayout
+    codec_name: str = Field(min_length=1)
+    loudness: AudioLoudnessMetadata
+    provenance_receipt_id: str = Field(min_length=1)
+    alignment_receipt_id: str | None = None
+
+    @model_validator(mode="after")
+    def _validate_audio_identity(self) -> "AudioAssetMetadata":
+        if (self.channels, self.channel_layout) not in {
+            (1, AudioChannelLayout.MONO),
+            (2, AudioChannelLayout.STEREO),
+        }:
+            raise ValueError("audio channels and channel layout must agree")
+        speech = self.audio_kind in {AudioKind.DIALOGUE, AudioKind.NARRATION}
+        if speech and (not self.language or self.script_hash is None):
+            raise ValueError("speech audio requires language and script_hash")
+        if not speech and any(
+            value is not None
+            for value in (
+                self.speaker_id,
+                self.voice_id,
+                self.language,
+                self.script_hash,
+                self.alignment_receipt_id,
+            )
+        ):
+            raise ValueError("non-speech audio cannot contain voice identity")
+        return self
+
+
+class CaptionAssetMetadata(StrictModel):
+    caption_track_id: str = Field(min_length=1)
+    language: str = Field(min_length=1)
+    source_audio_asset_id: str = Field(min_length=1)
+    source_audio_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    script_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    transcript_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    segment_count: int = Field(strict=True, ge=0)
+    word_count: int = Field(strict=True, ge=0)
+    segmentation_policy_id: str = Field(min_length=1)
+    segmentation_policy_version: str = Field(min_length=1)
+    alignment_receipt_id: str = Field(min_length=1)
+    timing_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    style_reference_id: str | None = None
+    style_content_hash: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+
+    @model_validator(mode="after")
+    def _validate_style_identity(self) -> "CaptionAssetMetadata":
+        if (self.style_reference_id is None) != (self.style_content_hash is None):
+            raise ValueError("caption style identity must be all-or-none")
+        return self
+
+
 class EgressMetadata(StrictModel):
-    remote: Literal[False] = False
-    destination: None = None
-    authorization_receipt_id: None = None
+    remote: bool = Field(default=False, strict=True)
+    destination: str | None = None
+    authorization_receipt_id: str | None = None
+    request_fingerprint: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    payload_fingerprint: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    retention_mode: Literal["provider_standard", "zero_retention"] | None = None
+    provider_policy_snapshot_id: str | None = None
+
+    @model_validator(mode="after")
+    def _validate_variant(self) -> "EgressMetadata":
+        remote_fields = (
+            self.destination,
+            self.authorization_receipt_id,
+            self.request_fingerprint,
+            self.payload_fingerprint,
+            self.retention_mode,
+            self.provider_policy_snapshot_id,
+        )
+        if not self.remote:
+            if any(value is not None for value in remote_fields):
+                raise ValueError("local egress metadata cannot contain remote fields")
+            return self
+        if any(value is None for value in remote_fields):
+            raise ValueError("remote egress metadata requires complete authorization")
+        assert self.destination is not None
+        parsed = urlsplit(self.destination)
+        canonical_origin = (
+            parsed.scheme == "https"
+            and bool(parsed.hostname)
+            and parsed.username is None
+            and parsed.password is None
+            and parsed.path == ""
+            and not parsed.query
+            and not parsed.fragment
+            and self.destination == f"https://{parsed.netloc}"
+        )
+        if not canonical_origin:
+            raise ValueError("remote destination must be a canonical HTTPS origin")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_local_variant(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if not self.remote:
+            for field in (
+                "request_fingerprint",
+                "payload_fingerprint",
+                "retention_mode",
+                "provider_policy_snapshot_id",
+            ):
+                data.pop(field, None)
+        return data
 
 
 class AssetRecord(StrictModel):
@@ -332,13 +503,77 @@ class AssetRecord(StrictModel):
     usage_license: str
     egress: EgressMetadata = Field(default_factory=EgressMetadata)
     cost_receipt_id: str | None = None
+    audio_metadata: AudioAssetMetadata | None = None
+    caption_metadata: CaptionAssetMetadata | None = None
+
+    @model_validator(mode="after")
+    def _validate_p4_metadata(self) -> "AssetRecord":
+        audio_types = {AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}
+        if self.audio_metadata is not None:
+            if self.asset_type not in audio_types:
+                raise ValueError("non-audio assets cannot contain audio metadata")
+            if AUDIO_KIND_TO_ASSET_TYPE[self.audio_metadata.audio_kind] != self.asset_type:
+                raise ValueError("audio kind does not match registry asset type")
+            if self.duration_seconds is not None:
+                measured_seconds = Decimal(self.audio_metadata.duration_samples) / Decimal(
+                    self.audio_metadata.sample_rate_hz
+                )
+                display_seconds = Decimal(str(self.duration_seconds))
+                tolerance = Decimal(1) / Decimal(self.audio_metadata.sample_rate_hz)
+                if abs(measured_seconds - display_seconds) > tolerance:
+                    raise ValueError("duration_seconds does not match measured samples")
+        if self.caption_metadata is not None and self.asset_type is not AssetType.CAPTION:
+            raise ValueError("non-caption assets cannot contain caption metadata")
+        if self.asset_type is AssetType.CAPTION and self.audio_metadata is not None:
+            raise ValueError("caption assets cannot contain audio metadata")
+        if self.egress.remote and not (
+            self.asset_type is AssetType.VOICE
+            and self.source_kind is AssetSourceKind.GENERATED
+        ):
+            raise ValueError("remote egress is restricted to generated voice assets")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_metadata(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.audio_metadata is None:
+            data.pop("audio_metadata", None)
+        if self.caption_metadata is None:
+            data.pop("caption_metadata", None)
+        return data
 
 
 class AssetRegistrySnapshot(StrictModel):
-    schema_version: Literal["2.0"] = "2.0"
+    schema_version: Literal["2.0", "2.1"] = "2.0"
     revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     assets: tuple[AssetRecord, ...]
+
+    @model_validator(mode="after")
+    def _validate_versioned_metadata(self) -> "AssetRegistrySnapshot":
+        if self.schema_version == "2.0":
+            if any(
+                asset.audio_metadata is not None
+                or asset.caption_metadata is not None
+                or asset.egress.remote
+                for asset in self.assets
+            ):
+                raise ValueError("Asset Registry 2.0 cannot contain P4 metadata")
+            return self
+        for asset in self.assets:
+            if asset.asset_type in {AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}:
+                if asset.audio_metadata is None:
+                    raise ValueError("Asset Registry 2.1 audio assets require audio metadata")
+            elif asset.audio_metadata is not None:
+                raise ValueError("non-audio assets cannot contain audio metadata")
+            if asset.asset_type is AssetType.CAPTION:
+                if asset.caption_metadata is None:
+                    raise ValueError("Asset Registry 2.1 caption assets require caption metadata")
+            elif asset.caption_metadata is not None:
+                raise ValueError("non-caption assets cannot contain caption metadata")
+        return self
 
 
 class ProjectSnapshotPointer(StrictModel):
@@ -400,6 +635,148 @@ class FixedTransform(StrictModel):
     rotation_millidegrees: int = 0
 
 
+class DuckingSpec(StrictModel):
+    sidechain_track_ids: tuple[str, ...] = Field(min_length=1)
+    attenuation_millidb: int = Field(strict=True, lt=0)
+    attack_samples: int = Field(strict=True, ge=0)
+    release_samples: int = Field(strict=True, ge=0)
+
+
+class AudioTrackSpec(StrictModel):
+    track_id: str = Field(min_length=1)
+    audio_kind: AudioKind
+    asset_id: str = Field(min_length=1)
+    shot_id: str | None = None
+    start_sample: int | None = Field(default=None, strict=True, ge=0)
+    trim_start_sample: int = Field(default=0, strict=True, ge=0)
+    trim_duration_samples: int | None = Field(default=None, strict=True, gt=0)
+    gain_millidb: int = Field(default=0, strict=True)
+    fade_in_samples: int = Field(default=0, strict=True, ge=0)
+    fade_out_samples: int = Field(default=0, strict=True, ge=0)
+    ducking: DuckingSpec | None = None
+
+    @model_validator(mode="after")
+    def _validate_placement_and_ducking(self) -> "AudioTrackSpec":
+        if self.audio_kind in {AudioKind.DIALOGUE, AudioKind.NARRATION} and (
+            self.shot_id is None
+        ):
+            raise ValueError("dialogue and narration tracks require shot_id")
+        if self.shot_id is None and self.start_sample is None:
+            raise ValueError("global audio tracks require explicit start_sample")
+        if self.ducking is not None and self.track_id in self.ducking.sidechain_track_ids:
+            raise ValueError("audio track cannot duck itself")
+        if (
+            self.trim_duration_samples is not None
+            and self.fade_in_samples + self.fade_out_samples
+            > self.trim_duration_samples
+        ):
+            raise ValueError("audio fades cannot exceed trimmed duration")
+        return self
+
+
+class CaptionWord(StrictModel):
+    text: str = Field(min_length=1)
+    start_sample: int = Field(strict=True, ge=0)
+    end_sample: int = Field(strict=True, gt=0)
+    speaker_id: str | None = None
+    confidence_milli: int | None = Field(default=None, strict=True, ge=0, le=1000)
+
+    @model_validator(mode="after")
+    def _validate_bounds(self) -> "CaptionWord":
+        if self.end_sample <= self.start_sample:
+            raise ValueError("caption word end must follow start")
+        return self
+
+
+class CaptionSegment(StrictModel):
+    segment_id: str = Field(min_length=1)
+    text: str = Field(min_length=1)
+    start_sample: int = Field(strict=True, ge=0)
+    end_sample: int = Field(strict=True, gt=0)
+    speaker_id: str | None = None
+    words: tuple[CaptionWord, ...] | None = None
+    confidence_milli: int | None = Field(default=None, strict=True, ge=0, le=1000)
+
+    @model_validator(mode="after")
+    def _validate_bounds_and_words(self) -> "CaptionSegment":
+        if self.end_sample <= self.start_sample:
+            raise ValueError("caption segment end must follow start")
+        if self.words is None:
+            return self
+        previous_end = self.start_sample
+        for word in self.words:
+            if (
+                word.start_sample < self.start_sample
+                or word.end_sample > self.end_sample
+            ):
+                raise ValueError("caption words must be contained in their segment")
+            if word.start_sample < previous_end:
+                raise ValueError("caption words must be monotonic")
+            previous_end = word.end_sample
+        return self
+
+
+class CaptionSegmentationPolicy(StrictModel):
+    policy_id: str = Field(min_length=1)
+    policy_version: str = Field(min_length=1)
+    max_characters: int = Field(strict=True, gt=0)
+    max_lines: int = Field(strict=True, gt=0)
+    break_strategy: Literal["provider_segments", "sentence", "word_window"]
+
+
+class CaptionTrack(VersionedArtifact):
+    schema_version: Literal["2.1"] = "2.1"
+    caption_track_id: str = Field(min_length=1)
+    language: str = Field(min_length=1)
+    script_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    transcript_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_audio_asset_id: str = Field(min_length=1)
+    source_audio_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_sample_rate_hz: int = Field(strict=True, gt=0)
+    segments: tuple[CaptionSegment, ...]
+    segmentation_policy: CaptionSegmentationPolicy
+    alignment_provider: str = Field(min_length=1)
+    alignment_model: str | None = None
+    alignment_receipt_id: str = Field(min_length=1)
+    style_reference_id: str | None = None
+    timing_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_segment_order(self) -> "CaptionTrack":
+        previous_end = 0
+        segment_ids: set[str] = set()
+        for segment in self.segments:
+            if segment.segment_id in segment_ids:
+                raise ValueError("caption segment IDs must be unique")
+            segment_ids.add(segment.segment_id)
+            if segment.start_sample < previous_end:
+                raise ValueError("caption segments must be monotonic")
+            previous_end = segment.end_sample
+        return self
+
+
+class CaptionStyleReference(StrictModel):
+    artifact_id: str = Field(min_length=1)
+    revision: int = Field(ge=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    path: Path
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "CaptionStyleReference":
+        value = _require_clean_relative_file_path(self.path, "caption style")
+        if value != Path(f"assets/styles/{self.content_hash}.json"):
+            raise ValueError("caption style path must be canonical")
+        return self
+
+
+class CaptionTrackBinding(StrictModel):
+    binding_id: str = Field(min_length=1)
+    caption_asset_id: str = Field(min_length=1)
+    source_audio_track_id: str = Field(min_length=1)
+    shot_id: str | None = None
+    style_reference: CaptionStyleReference | None = None
+
+
 class CompositionLayerSpec(StrictModel):
     layer_id: str = Field(min_length=1)
     shot_id: str = Field(min_length=1)
@@ -420,6 +797,7 @@ class TransitionSpec(StrictModel):
 
 
 class CompositionSpec(VersionedArtifact):
+    schema_version: Literal["2.0", "2.1"] = "2.0"
     composition_id: str
     shot_ids: tuple[str, ...] = Field(min_length=1)
     layers: tuple[CompositionLayerSpec, ...] = Field(min_length=1)
@@ -427,6 +805,30 @@ class CompositionSpec(VersionedArtifact):
     delivery_profile: DeliveryProfile
     sample_rate: int = Field(default=48_000, gt=0)
     requested_renderer: RendererKind = RendererKind.HYPERFRAMES
+    audio_tracks: tuple[AudioTrackSpec, ...] = ()
+    caption_tracks: tuple[CaptionTrackBinding, ...] = ()
+
+    @model_validator(mode="after")
+    def _validate_versioned_tracks(self) -> "CompositionSpec":
+        if self.schema_version == "2.0" and (self.audio_tracks or self.caption_tracks):
+            raise ValueError("CompositionSpec 2.0 cannot contain P4 tracks")
+        audio_ids = tuple(item.track_id for item in self.audio_tracks)
+        caption_ids = tuple(item.binding_id for item in self.caption_tracks)
+        if len(audio_ids) != len(set(audio_ids)):
+            raise ValueError("audio track IDs must be unique")
+        if len(caption_ids) != len(set(caption_ids)):
+            raise ValueError("caption binding IDs must be unique")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_tracks(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.schema_version == "2.0":
+            data.pop("audio_tracks", None)
+            data.pop("caption_tracks", None)
+        return data
 
 
 class RendererIdentity(StrictModel):
@@ -454,7 +856,66 @@ class ResolvedVisualSpan(StrictModel):
     incoming_transition: TransitionSpec | None = None
 
 
+class ResolvedDuckingSpec(StrictModel):
+    sidechain_track_ids: tuple[str, ...] = Field(min_length=1)
+    attenuation_millidb: int = Field(strict=True, lt=0)
+    attack_samples: int = Field(strict=True, ge=0)
+    release_samples: int = Field(strict=True, ge=0)
+
+
+class ResolvedAudioSpan(StrictModel):
+    track_id: str = Field(min_length=1)
+    audio_kind: AudioKind
+    asset_id: str = Field(min_length=1)
+    asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    start_sample: int = Field(strict=True, ge=0)
+    duration_samples: int = Field(strict=True, gt=0)
+    source_start_sample: int = Field(strict=True, ge=0)
+    source_duration_samples: int = Field(strict=True, gt=0)
+    gain_millidb: int = Field(strict=True)
+    fade_in_samples: int = Field(strict=True, ge=0)
+    fade_out_samples: int = Field(strict=True, ge=0)
+    ducking: ResolvedDuckingSpec | None = None
+
+    @model_validator(mode="after")
+    def _validate_fades(self) -> "ResolvedAudioSpan":
+        if self.fade_in_samples + self.fade_out_samples > self.duration_samples:
+            raise ValueError("resolved audio fades cannot exceed duration")
+        if self.ducking is not None and self.track_id in self.ducking.sidechain_track_ids:
+            raise ValueError("resolved audio track cannot duck itself")
+        return self
+
+
+class ResolvedCaptionCue(StrictModel):
+    caption_asset_id: str = Field(min_length=1)
+    caption_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    caption_track_id: str = Field(min_length=1)
+    caption_timing_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    segment_id: str = Field(min_length=1)
+    text: str = Field(min_length=1)
+    speaker_id: str | None = None
+    start_sample: int = Field(strict=True, ge=0)
+    end_sample: int = Field(strict=True, gt=0)
+    start_frame: int = Field(strict=True, ge=0)
+    end_frame_exclusive: int = Field(strict=True, gt=0)
+    style_reference_id: str | None = None
+    style_content_hash: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+
+    @model_validator(mode="after")
+    def _validate_cue_bounds_and_style(self) -> "ResolvedCaptionCue":
+        if self.end_sample <= self.start_sample:
+            raise ValueError("resolved caption sample end must follow start")
+        if self.end_frame_exclusive <= self.start_frame:
+            raise ValueError("resolved caption frame end must follow start")
+        if (self.style_reference_id is None) != (self.style_content_hash is None):
+            raise ValueError("resolved caption style identity must be all-or-none")
+        return self
+
+
 class ResolvedTimeline(VersionedArtifact):
+    schema_version: Literal["2.0", "2.1"] = "2.0"
     timeline_id: str
     composition_spec_id: str
     composition_spec_revision: int = Field(ge=1)
@@ -463,9 +924,39 @@ class ResolvedTimeline(VersionedArtifact):
     sample_rate: int = Field(gt=0)
     renderer: RendererIdentity
     visual_spans: tuple[ResolvedVisualSpan, ...] = Field(min_length=1)
+    audio_spans: tuple[ResolvedAudioSpan, ...] = ()
+    caption_cues: tuple[ResolvedCaptionCue, ...] = ()
     total_frames: int = Field(gt=0)
     total_samples: int = Field(ge=0)
     composition_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_versioned_resolved_tracks(self) -> "ResolvedTimeline":
+        if self.schema_version == "2.0" and (self.audio_spans or self.caption_cues):
+            raise ValueError("ResolvedTimeline 2.0 cannot contain P4 timing fields")
+        if any(
+            item.start_sample + item.duration_samples > self.total_samples
+            for item in self.audio_spans
+        ):
+            raise ValueError("resolved audio span exceeds timeline")
+        previous_end = 0
+        for cue in self.caption_cues:
+            if cue.start_sample < previous_end:
+                raise ValueError("resolved caption cues must be monotonic")
+            if cue.end_sample > self.total_samples or cue.end_frame_exclusive > self.total_frames:
+                raise ValueError("resolved caption cue exceeds timeline")
+            previous_end = cue.end_sample
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_timing(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.schema_version == "2.0":
+            data.pop("audio_spans", None)
+            data.pop("caption_cues", None)
+        return data
 
 
 class RendererSelectionReceipt(StrictModel):
@@ -502,6 +993,48 @@ class RendererAssetBinding(StrictModel):
     materialized_path: Path
 
 
+class RendererAudioBinding(StrictModel):
+    asset_id: str = Field(min_length=1)
+    asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    asset_mime_type: Literal[
+        "audio/wav",
+        "audio/mpeg",
+        "audio/mp4",
+        "audio/aac",
+        "audio/flac",
+    ]
+    materialized_path: Path
+    sample_rate_hz: int = Field(strict=True, gt=0)
+    channels: Literal[1, 2]
+    duration_samples: int = Field(strict=True, gt=0)
+    resolved_track_ids: tuple[str, ...] = Field(min_length=1)
+
+
+class RendererCaptionBinding(StrictModel):
+    caption_track_id: str = Field(min_length=1)
+    caption_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    materialized_path: Path
+    style_reference_id: str | None = None
+    style_content_hash: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    style_materialized_path: Path | None = None
+    resolved_cue_ids: tuple[str, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _validate_style_identity(self) -> "RendererCaptionBinding":
+        style_values = (
+            self.style_reference_id,
+            self.style_content_hash,
+            self.style_materialized_path,
+        )
+        if any(value is None for value in style_values) and any(
+            value is not None for value in style_values
+        ):
+            raise ValueError("renderer caption style identity must be all-or-none")
+        return self
+
+
 class RenderSourceFilePointer(StrictModel):
     path: Path
     file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -531,6 +1064,7 @@ class RenderSourceBundlePointer(StrictModel):
             raise ValueError("render source bundle root path must be canonical")
         if self.index.path != expected_root / "index.html":
             raise ValueError("render source bundle index path must be canonical")
+        asset_paths: set[Path] = set()
         for asset in self.assets:
             if asset.path.parent != expected_root / "assets":
                 raise ValueError("render source bundle asset path must be canonical")
@@ -538,18 +1072,30 @@ class RenderSourceBundlePointer(StrictModel):
                 ".png",
                 ".jpg",
                 ".webp",
+                ".wav",
+                ".mp3",
+                ".m4a",
+                ".aac",
+                ".flac",
+                ".json",
             }:
                 raise ValueError("render source bundle asset path must match its hash")
+            if asset.path in asset_paths:
+                raise ValueError("render source bundle asset paths must be unique")
+            asset_paths.add(asset.path)
         return self
 
 
 class RendererSourceReceipt(VersionedArtifact):
+    schema_version: Literal["2.0", "2.1"] = "2.0"
     attempt_id: str
     renderer: RendererIdentity
     timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_bundle: RenderSourceBundlePointer
     source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     asset_bindings: tuple[RendererAssetBinding, ...] = Field(min_length=1)
+    audio_bindings: tuple[RendererAudioBinding, ...] = ()
+    caption_bindings: tuple[RendererCaptionBinding, ...] = ()
     checks: tuple[RendererCheckReceipt, RendererCheckReceipt]
 
     @model_validator(mode="after")
@@ -560,6 +1106,52 @@ class RendererSourceReceipt(VersionedArtifact):
             raise ValueError("renderer source checks must contain lint then check")
         if any(item.tool_version != self.renderer.version for item in self.checks):
             raise ValueError("renderer source check identity does not match renderer")
+        if self.schema_version == "2.0" and (
+            self.audio_bindings or self.caption_bindings
+        ):
+            raise ValueError("RendererSourceReceipt 2.0 cannot contain P4 bindings")
+        bound_paths = {item.materialized_path for item in self.asset_bindings}
+        bound_paths.update(item.materialized_path for item in self.audio_bindings)
+        for item in self.caption_bindings:
+            bound_paths.add(item.materialized_path)
+            if item.style_materialized_path is not None:
+                bound_paths.add(item.style_materialized_path)
+        bundle_paths = {item.path for item in self.source_bundle.assets}
+        if bound_paths != bundle_paths:
+            raise ValueError("renderer source bindings must match exact bundle assets")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_bindings(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.schema_version == "2.0":
+            data.pop("audio_bindings", None)
+            data.pop("caption_bindings", None)
+        return data
+
+
+class MeasuredAudioRenderMetadata(StrictModel):
+    stream_count: int = Field(strict=True, ge=0)
+    codec_name: str = Field(min_length=1)
+    sample_rate_hz: int = Field(strict=True, gt=0)
+    channels: Literal[1, 2]
+    channel_layout: AudioChannelLayout
+    decoded_samples: int = Field(strict=True, ge=0)
+    encoder_priming_samples: int = Field(strict=True, ge=0)
+    encoder_padding_samples: int = Field(strict=True, ge=0)
+    measurement_method: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _validate_stream_layout(self) -> "MeasuredAudioRenderMetadata":
+        if self.stream_count != 1:
+            raise ValueError("P4 measured audio requires exactly one stream")
+        if (self.channels, self.channel_layout) not in {
+            (1, AudioChannelLayout.MONO),
+            (2, AudioChannelLayout.STEREO),
+        }:
+            raise ValueError("measured audio channels and layout must agree")
         return self
 
 
@@ -570,6 +1162,7 @@ class MeasuredRenderMetadata(StrictModel):
     fps_den: int = Field(gt=0)
     duration_frames: int = Field(gt=0)
     codec_name: str
+    audio: MeasuredAudioRenderMetadata | None = None
 
 
 def _require_canonical_render_output_path(value: Path, file_sha256: str) -> Path:
@@ -580,6 +1173,7 @@ def _require_canonical_render_output_path(value: Path, file_sha256: str) -> Path
 
 
 class RenderReceipt(VersionedArtifact):
+    schema_version: Literal["2.0", "2.1"] = "2.0"
     attempt_id: str
     renderer: RendererIdentity
     timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -591,6 +1185,9 @@ class RenderReceipt(VersionedArtifact):
     output_size_bytes: int = Field(gt=0)
     measured: MeasuredRenderMetadata
     decoded_frame_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    decoded_audio_fingerprint: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
 
     @field_validator("asset_hashes")
     @classmethod
@@ -605,7 +1202,28 @@ class RenderReceipt(VersionedArtifact):
     @model_validator(mode="after")
     def _validate_output_path(self) -> "RenderReceipt":
         _require_canonical_render_output_path(self.output_path, self.output_sha256)
+        if self.schema_version == "2.0" and (
+            self.measured.audio is not None
+            or self.decoded_audio_fingerprint is not None
+        ):
+            raise ValueError("RenderReceipt 2.0 cannot contain P4 audio evidence")
+        if (self.measured.audio is None) != (
+            self.decoded_audio_fingerprint is None
+        ):
+            raise ValueError("measured audio and decoded audio fingerprint must agree")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_audio(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.schema_version == "2.0":
+            data.pop("decoded_audio_fingerprint", None)
+            measured = data.get("measured")
+            if isinstance(measured, dict):
+                measured.pop("audio", None)
+        return data
 
 
 class RenderArtifactPointer(StrictModel):
@@ -696,6 +1314,38 @@ class StateCommitStatus(str, Enum):
     OUTCOME_UNKNOWN = "outcome_unknown"
 
 
+class VoiceRequestReceipt(StrictModel):
+    request_id: str = Field(min_length=1)
+    attempt_id: str = Field(min_length=1)
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    script_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    provider_kind: str = Field(min_length=1)
+    model_id: str = Field(min_length=1)
+    voice_id: str = Field(min_length=1)
+    language: str = Field(min_length=1)
+    pricing_snapshot_id: str = Field(min_length=1)
+    budget_reservation_receipt_id: str = Field(min_length=1)
+    egress_authorization_receipt_id: str = Field(min_length=1)
+    destination: str = Field(min_length=1)
+
+    @field_validator("destination")
+    @classmethod
+    def _require_canonical_https_origin(cls, value: str) -> str:
+        parsed = urlsplit(value)
+        if not (
+            parsed.scheme == "https"
+            and bool(parsed.hostname)
+            and parsed.username is None
+            and parsed.password is None
+            and parsed.path == ""
+            and not parsed.query
+            and not parsed.fragment
+            and value == f"https://{parsed.netloc}"
+        ):
+            raise ValueError("voice destination must be a canonical HTTPS origin")
+        return value
+
+
 class StateCommitAttempt(StrictModel):
     attempt_id: str = Field(min_length=1)
     operation: str = Field(min_length=1)
@@ -713,6 +1363,23 @@ class StateCommitAttempt(StrictModel):
         Literal["selection", "source", "lint", "check", "render", "verify", "activate"]
         | None
     ) = None
+    voice_request: VoiceRequestReceipt | None = None
+    voice_phase: (
+        Literal[
+            "request",
+            "submit_intent",
+            "provider_call",
+            "materialize",
+            "probe",
+            "align",
+            "candidate",
+            "activate",
+        ]
+        | None
+    ) = None
+    provider_request_id: str | None = None
+    candidate_audio_asset_ids: tuple[str, ...] = ()
+    candidate_caption_asset_ids: tuple[str, ...] = ()
     started_at: str
     finished_at: str | None = None
     error_code: str | None = None
@@ -787,6 +1454,32 @@ class StateCommitAttempt(StrictModel):
                 self.render_phase != "activate"
             ):
                 raise ValueError("render_state candidate bundle requires activate phase")
+        voice_fields_present = any(
+            value is not None
+            for value in (
+                self.voice_request,
+                self.voice_phase,
+                self.provider_request_id,
+            )
+        ) or bool(self.candidate_audio_asset_ids or self.candidate_caption_asset_ids)
+        if self.operation != "voice_generation" and voice_fields_present:
+            raise ValueError("non-voice operations cannot contain voice fields")
+        if self.operation == "voice_generation":
+            if self.voice_request is None or self.voice_phase is None:
+                raise ValueError("voice_generation attempts require voice request and phase")
+            if self.voice_request.attempt_id != self.attempt_id:
+                raise ValueError("voice attempt identity does not match request")
+            if self.candidate_project not in (None, self.base_project):
+                raise ValueError("voice candidate project identity does not match")
+            if self.voice_phase in {"candidate", "activate"}:
+                if self.candidate_registry is None or not self.candidate_audio_asset_ids:
+                    raise ValueError("voice candidate phase requires candidate audio bundle")
+            elif (
+                self.candidate_registry is not None
+                or self.candidate_audio_asset_ids
+                or self.candidate_caption_asset_ids
+            ):
+                raise ValueError("voice candidate bundle requires candidate phase")
         return self
 
     @model_serializer(mode="wrap")
@@ -800,6 +1493,15 @@ class StateCommitAttempt(StrictModel):
                 "candidate_render_state",
                 "renderer_selection",
                 "render_phase",
+            ):
+                data.pop(field, None)
+        if self.operation != "voice_generation":
+            for field in (
+                "voice_request",
+                "voice_phase",
+                "provider_request_id",
+                "candidate_audio_asset_ids",
+                "candidate_caption_asset_ids",
             ):
                 data.pop(field, None)
         return data
@@ -836,7 +1538,7 @@ class RecoveryReport(StrictModel):
 
 
 class ProductionManifest(StrictModel):
-    schema_version: Literal["2.0", "2.1"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2"] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
     active_project: ProjectSnapshotPointer
@@ -854,6 +1556,12 @@ class ProductionManifest(StrictModel):
                 item.operation == "render_state" for item in self.attempts
             ):
                 raise ValueError("Production Manifest 2.0 cannot contain render state")
+        if self.schema_version in {"2.0", "2.1"} and any(
+            item.operation == "voice_generation" for item in self.attempts
+        ):
+            raise ValueError(
+                f"Production Manifest {self.schema_version} cannot contain voice attempts"
+            )
         for attempt in self.attempts:
             if (
                 attempt.operation == "render_state"

@@ -8,12 +8,31 @@ import ai_video.production as production
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
+    AUDIO_KIND_TO_ASSET_TYPE,
+    AssetRecord,
+    AssetRegistrySnapshot,
+    AssetSourceKind,
+    AssetType,
+    AudioAssetMetadata,
+    AudioChannelLayout,
+    AudioKind,
+    AudioLoudnessMetadata,
+    AudioSource,
+    AudioTrackSpec,
+    CaptionAssetMetadata,
+    CaptionSegment,
+    CaptionSegmentationPolicy,
+    CaptionStyleReference,
+    CaptionTrack,
+    CaptionTrackBinding,
+    CaptionWord,
     CompositionLayerSpec,
     CompositionSpec,
     CompositionDirective,
     DeliveryProfile,
     DurationPolicy,
     MeasuredRenderMetadata,
+    MeasuredAudioRenderMetadata,
     MotionDirective,
     ProductionManifest,
     ProjectSnapshotPointer,
@@ -24,6 +43,8 @@ from ai_video.production.models import (
     RenderArtifactPointer,
     RenderOutputPointer,
     RenderReceipt,
+    RendererAudioBinding,
+    RendererCaptionBinding,
     RendererAssetBinding,
     RendererCheckReceipt,
     RendererIdentity,
@@ -35,12 +56,15 @@ from ai_video.production.models import (
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
     ResolvedTimeline,
+    ResolvedDuckingSpec,
     ResolvedVisualSpan,
     SourceReference,
     StateCommitAttempt,
     StateCommitStatus,
     Story,
     StoryBeat,
+    ToolIdentity,
+    VoiceRequestReceipt,
 )
 
 
@@ -54,6 +78,154 @@ SIX_HASH = "6" * 64
 SEVEN_HASH = "7" * 64
 EIGHT_HASH = "8" * 64
 NINE_HASH = "9" * 64
+
+
+def make_audio_source() -> AudioSource:
+    return AudioSource(
+        kind="generated",
+        provider_or_tool=ToolIdentity(name="fake-voice", version="1.0"),
+        input_artifact_ids=("script-1",),
+        input_fingerprint=ONE_HASH,
+        original_reference="fixture://dialogue-1",
+    )
+
+
+def make_audio_metadata(kind: AudioKind = AudioKind.DIALOGUE) -> AudioAssetMetadata:
+    speech = kind in {AudioKind.DIALOGUE, AudioKind.NARRATION}
+    return AudioAssetMetadata(
+        audio_kind=kind,
+        source=make_audio_source(),
+        speaker_id="speaker-1" if kind is AudioKind.DIALOGUE else None,
+        voice_id="voice-1" if speech else None,
+        language="en" if speech else None,
+        script_hash=TWO_HASH if speech else None,
+        duration_samples=96_000,
+        sample_rate_hz=48_000,
+        channels=1,
+        channel_layout=AudioChannelLayout.MONO,
+        codec_name="pcm_s16le",
+        loudness=AudioLoudnessMetadata(
+            integrated_lufs_milli=-23_000,
+            true_peak_dbfs_milli=-1_000,
+            measurement_standard="ebu_r128",
+        ),
+        provenance_receipt_id="provenance-1",
+        alignment_receipt_id="alignment-1" if speech else None,
+    )
+
+
+def make_asset_record(
+    *,
+    asset_type: AssetType = AssetType.VOICE,
+    audio_metadata: AudioAssetMetadata | None = None,
+    caption_metadata: CaptionAssetMetadata | None = None,
+    remote: bool = False,
+) -> AssetRecord:
+    egress: dict[str, object]
+    if remote:
+        egress = {
+            "remote": True,
+            "destination": "https://api.elevenlabs.io",
+            "authorization_receipt_id": "egress-1",
+            "request_fingerprint": THREE_HASH,
+            "payload_fingerprint": FOUR_HASH,
+            "retention_mode": "provider_standard",
+            "provider_policy_snapshot_id": "policy-2026-08-10",
+        }
+    else:
+        egress = {
+            "remote": False,
+            "destination": None,
+            "authorization_receipt_id": None,
+        }
+    return AssetRecord(
+        asset_id="asset-1",
+        asset_type=asset_type,
+        artifact_path=Path(f"assets/files/{FIVE_HASH}.wav"),
+        sha256=FIVE_HASH,
+        size_bytes=64,
+        mime_type="audio/wav" if asset_type is not AssetType.CAPTION else "application/json",
+        duration_seconds=2.0 if asset_type is not AssetType.CAPTION else None,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture", version="1"),
+        input_fingerprint=SIX_HASH,
+        creation_receipt_id="creation-1",
+        usage_license="fixture-only",
+        egress=egress,
+        audio_metadata=audio_metadata,
+        caption_metadata=caption_metadata,
+    )
+
+
+def make_caption_track(*, style_reference_id: str | None = "style-1") -> CaptionTrack:
+    return CaptionTrack(
+        **versioned_fields("caption-track-1", SEVEN_HASH),
+        schema_version="2.1",
+        caption_track_id="caption-track-1",
+        language="en",
+        script_hash=TWO_HASH,
+        transcript_hash=THREE_HASH,
+        source_audio_asset_id="asset-1",
+        source_audio_sha256=FIVE_HASH,
+        source_sample_rate_hz=48_000,
+        segments=(
+            CaptionSegment(
+                segment_id="segment-1",
+                text="Hello world",
+                start_sample=0,
+                end_sample=48_000,
+                speaker_id="speaker-1",
+                words=(
+                    CaptionWord(
+                        text="Hello",
+                        start_sample=0,
+                        end_sample=20_000,
+                        speaker_id="speaker-1",
+                        confidence_milli=990,
+                    ),
+                    CaptionWord(
+                        text="world",
+                        start_sample=22_000,
+                        end_sample=48_000,
+                        speaker_id="speaker-1",
+                        confidence_milli=None,
+                    ),
+                ),
+                confidence_milli=980,
+            ),
+        ),
+        segmentation_policy=CaptionSegmentationPolicy(
+            policy_id="sentence-v1",
+            policy_version="1",
+            max_characters=42,
+            max_lines=2,
+            break_strategy="sentence",
+        ),
+        alignment_provider="fake",
+        alignment_model=None,
+        alignment_receipt_id="alignment-1",
+        style_reference_id=style_reference_id,
+        timing_fingerprint=EIGHT_HASH,
+    )
+
+
+def make_caption_metadata(*, with_style: bool = True) -> CaptionAssetMetadata:
+    return CaptionAssetMetadata(
+        caption_track_id="caption-track-1",
+        language="en",
+        source_audio_asset_id="asset-1",
+        source_audio_sha256=FIVE_HASH,
+        script_hash=TWO_HASH,
+        transcript_hash=THREE_HASH,
+        segment_count=1,
+        word_count=2,
+        segmentation_policy_id="sentence-v1",
+        segmentation_policy_version="1",
+        alignment_receipt_id="alignment-1",
+        timing_fingerprint=EIGHT_HASH,
+        style_reference_id="style-1" if with_style else None,
+        style_content_hash=NINE_HASH if with_style else None,
+    )
 
 
 def make_project_pointer() -> ProjectSnapshotPointer:
@@ -296,6 +468,436 @@ def make_render_state_snapshot() -> RenderStateSnapshot:
             size_bytes=200,
         ),
     )
+
+
+def test_p4_audio_kinds_have_exact_registry_mapping():
+    assert {item.value for item in AudioKind} == {
+        "dialogue",
+        "narration",
+        "ambience",
+        "sfx",
+        "bgm",
+    }
+    assert AUDIO_KIND_TO_ASSET_TYPE == {
+        AudioKind.DIALOGUE: AssetType.VOICE,
+        AudioKind.NARRATION: AssetType.VOICE,
+        AudioKind.AMBIENCE: AssetType.SFX,
+        AudioKind.SFX: AssetType.SFX,
+        AudioKind.BGM: AssetType.MUSIC,
+    }
+    assert "audio" not in {item.value for item in AssetType}
+
+
+def test_audio_metadata_uses_measured_integer_samples_and_fixed_point_loudness():
+    metadata = make_audio_metadata()
+    assert metadata.duration_samples == 96_000
+    assert metadata.loudness.integrated_lufs_milli == -23_000
+
+    data = metadata.model_dump(mode="python")
+    data["duration_samples"] = 1.5
+    with pytest.raises(ValidationError):
+        AudioAssetMetadata.model_validate(data)
+
+    data = metadata.model_dump(mode="python")
+    data["channels"] = 2
+    with pytest.raises(ValidationError, match="layout"):
+        AudioAssetMetadata.model_validate(data)
+
+    data = metadata.model_dump(mode="python")
+    data["loudness"] = {
+        "integrated_lufs_milli": -23.5,
+        "true_peak_dbfs_milli": None,
+        "measurement_standard": "ebu_r128",
+    }
+    with pytest.raises(ValidationError):
+        AudioAssetMetadata.model_validate(data)
+
+
+@pytest.mark.parametrize("kind", [AudioKind.DIALOGUE, AudioKind.NARRATION])
+def test_speech_audio_requires_language_and_script_hash(kind):
+    data = make_audio_metadata(kind).model_dump(mode="python")
+    data["language"] = None
+    with pytest.raises(ValidationError, match="language.*script_hash"):
+        AudioAssetMetadata.model_validate(data)
+
+    data = make_audio_metadata(kind).model_dump(mode="python")
+    data["script_hash"] = None
+    with pytest.raises(ValidationError, match="language.*script_hash"):
+        AudioAssetMetadata.model_validate(data)
+
+
+@pytest.mark.parametrize("kind", [AudioKind.AMBIENCE, AudioKind.SFX, AudioKind.BGM])
+def test_non_speech_audio_rejects_voice_identity(kind):
+    data = make_audio_metadata(kind).model_dump(mode="python")
+    data["voice_id"] = "voice-forbidden"
+    with pytest.raises(ValidationError, match="voice identity"):
+        AudioAssetMetadata.model_validate(data)
+
+
+def test_registry_21_requires_exact_audio_or_caption_metadata():
+    voice = make_asset_record(audio_metadata=make_audio_metadata())
+    registry = AssetRegistrySnapshot(
+        schema_version="2.1",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(voice,),
+    )
+    assert registry.assets[0].audio_metadata == make_audio_metadata()
+
+    with pytest.raises(ValidationError, match="audio metadata"):
+        AssetRegistrySnapshot(
+            schema_version="2.1",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=(make_asset_record(),),
+        )
+
+    caption = make_asset_record(
+        asset_type=AssetType.CAPTION,
+        caption_metadata=make_caption_metadata(),
+    )
+    assert AssetRegistrySnapshot(
+        schema_version="2.1",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(caption,),
+    ).assets == (caption,)
+
+    with pytest.raises(ValidationError, match="non-audio"):
+        make_asset_record(
+            asset_type=AssetType.IMAGE,
+            audio_metadata=make_audio_metadata(),
+        )
+
+
+def test_registry_20_preserves_generic_records_and_rejects_p4_fields():
+    legacy = make_asset_record()
+    registry = AssetRegistrySnapshot(
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(legacy,),
+    )
+    dumped = registry.model_dump(mode="json")
+    assert dumped["schema_version"] == "2.0"
+    assert "audio_metadata" not in dumped["assets"][0]
+    assert "caption_metadata" not in dumped["assets"][0]
+
+    with pytest.raises(ValidationError, match="2.0"):
+        AssetRegistrySnapshot(
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=(make_asset_record(audio_metadata=make_audio_metadata()),),
+        )
+
+
+def test_egress_metadata_has_strict_local_and_remote_variants():
+    local = make_asset_record(audio_metadata=make_audio_metadata())
+    assert local.egress.remote is False
+    assert local.model_dump(mode="json")["egress"] == {
+        "remote": False,
+        "destination": None,
+        "authorization_receipt_id": None,
+    }
+
+    remote = make_asset_record(
+        audio_metadata=make_audio_metadata(),
+        remote=True,
+    )
+    assert remote.egress.destination == "https://api.elevenlabs.io"
+
+    data = remote.model_dump(mode="python")
+    data["egress"]["destination"] = "https://api.elevenlabs.io/v1/tts"
+    with pytest.raises(ValidationError, match="HTTPS origin"):
+        AssetRecord.model_validate(data)
+
+    data = local.model_dump(mode="python")
+    data["egress"]["destination"] = "https://api.elevenlabs.io"
+    with pytest.raises(ValidationError, match="local egress"):
+        AssetRecord.model_validate(data)
+
+
+def test_caption_track_enforces_monotonic_segments_and_word_containment():
+    track = make_caption_track()
+    assert track.segments[0].words is not None
+
+    data = track.model_dump(mode="python")
+    data["segments"] = (
+        data["segments"][0],
+        {
+            **data["segments"][0],
+            "segment_id": "segment-2",
+            "start_sample": 47_999,
+            "end_sample": 60_000,
+            "words": None,
+        },
+    )
+    with pytest.raises(ValidationError, match="monotonic"):
+        CaptionTrack.model_validate(data)
+
+    data = track.model_dump(mode="python")
+    data["segments"][0]["words"][0]["end_sample"] = 48_001
+    with pytest.raises(ValidationError, match="contained"):
+        CaptionTrack.model_validate(data)
+
+
+def test_caption_style_identity_is_all_or_none_and_path_is_canonical():
+    metadata = make_caption_metadata()
+    assert metadata.style_reference_id == "style-1"
+    data = metadata.model_dump(mode="python")
+    data["style_content_hash"] = None
+    with pytest.raises(ValidationError, match="style identity"):
+        CaptionAssetMetadata.model_validate(data)
+
+    style = CaptionStyleReference(
+        artifact_id="style-1",
+        revision=1,
+        content_hash=NINE_HASH,
+        path=Path(f"assets/styles/{NINE_HASH}.json"),
+    )
+    binding = CaptionTrackBinding(
+        binding_id="caption-binding-1",
+        caption_asset_id="caption-asset-1",
+        source_audio_track_id="dialogue-track-1",
+        shot_id="shot-1",
+        style_reference=style,
+    )
+    assert binding.style_reference == style
+    assert make_caption_track(style_reference_id=None).timing_fingerprint == (
+        make_caption_track(style_reference_id="style-1").timing_fingerprint
+    )
+
+    with pytest.raises(ValidationError, match="canonical"):
+        CaptionStyleReference(
+            artifact_id="style-1",
+            revision=1,
+            content_hash=NINE_HASH,
+            path=Path("styles/default.json"),
+        )
+
+
+def test_audio_track_and_resolved_ducking_use_integer_sample_policy():
+    track = AudioTrackSpec(
+        track_id="bgm-track-1",
+        audio_kind="bgm",
+        asset_id="music-1",
+        shot_id=None,
+        start_sample=0,
+        trim_start_sample=0,
+        trim_duration_samples=96_000,
+        gain_millidb=-3_000,
+        fade_in_samples=4_800,
+        fade_out_samples=4_800,
+        ducking=None,
+    )
+    assert track.start_sample == 0
+    ducking = ResolvedDuckingSpec(
+        sidechain_track_ids=("dialogue-track-1",),
+        attenuation_millidb=-9_000,
+        attack_samples=480,
+        release_samples=4_800,
+    )
+    assert ducking.attack_samples == 480
+
+    data = track.model_dump(mode="python")
+    data["fade_in_samples"] = 1.5
+    with pytest.raises(ValidationError):
+        AudioTrackSpec.model_validate(data)
+
+
+def test_composition_and_timeline_versions_reject_p4_fields_in_20_and_omit_defaults():
+    layer = CompositionLayerSpec(
+        layer_id="layer-1",
+        shot_id="shot-1",
+        asset_role="primary_image",
+        asset_id="asset-1",
+    )
+    spec = CompositionSpec(
+        **versioned_fields("composition-1", THREE_HASH),
+        composition_id="composition-1",
+        shot_ids=("shot-1",),
+        layers=(layer,),
+        delivery_profile=DeliveryProfile(width=320, height=180, fps=24),
+    )
+    assert "audio_tracks" not in spec.model_dump(mode="json")
+    assert "caption_tracks" not in spec.model_dump(mode="json")
+
+    data = spec.model_dump(mode="python")
+    data["audio_tracks"] = (
+        AudioTrackSpec(
+            track_id="dialogue-track-1",
+            audio_kind="dialogue",
+            asset_id="voice-1",
+            shot_id="shot-1",
+            start_sample=None,
+            trim_start_sample=0,
+            trim_duration_samples=None,
+            gain_millidb=0,
+            fade_in_samples=0,
+            fade_out_samples=0,
+            ducking=None,
+        ),
+    )
+    with pytest.raises(ValidationError, match="2.0"):
+        CompositionSpec.model_validate(data)
+
+    timeline = make_resolved_timeline()
+    assert canonical_sha256(timeline.model_dump(mode="json")) == (
+        "20c7ad8c70f327dd1547b649d697fbaa3312fb93f215c75c237c5958c5c039f8"
+    )
+    assert "audio_spans" not in timeline.model_dump(mode="json")
+    assert "caption_cues" not in timeline.model_dump(mode="json")
+
+
+def test_render_schema_21_seals_structured_audio_caption_and_measured_evidence():
+    audio_binding = RendererAudioBinding(
+        asset_id="voice-1",
+        asset_sha256=ONE_HASH,
+        asset_mime_type="audio/wav",
+        materialized_path=Path(f"state/render/sources/{SIX_HASH}/assets/{ONE_HASH}.wav"),
+        sample_rate_hz=48_000,
+        channels=1,
+        duration_samples=96_000,
+        resolved_track_ids=("dialogue-track-1",),
+    )
+    caption_binding = RendererCaptionBinding(
+        caption_track_id="caption-track-1",
+        caption_asset_sha256=TWO_HASH,
+        materialized_path=Path(f"state/render/sources/{SIX_HASH}/assets/{TWO_HASH}.json"),
+        style_reference_id="style-1",
+        style_content_hash=THREE_HASH,
+        style_materialized_path=Path(f"state/render/sources/{SIX_HASH}/assets/{THREE_HASH}.json"),
+        resolved_cue_ids=("segment-1",),
+    )
+    assert audio_binding.duration_samples == 96_000
+    assert caption_binding.resolved_cue_ids == ("segment-1",)
+
+    measured_audio = MeasuredAudioRenderMetadata(
+        stream_count=1,
+        codec_name="aac",
+        sample_rate_hz=48_000,
+        channels=1,
+        channel_layout="mono",
+        decoded_samples=96_000,
+        encoder_priming_samples=1024,
+        encoder_padding_samples=128,
+        measurement_method="ffprobe+decoded_pcm_sha256",
+    )
+    receipt_data = make_render_receipt().model_dump(mode="python")
+    receipt_data["schema_version"] = "2.1"
+    receipt_data["measured"]["audio"] = measured_audio
+    receipt_data["decoded_audio_fingerprint"] = FOUR_HASH
+    receipt = RenderReceipt.model_validate(receipt_data)
+    assert receipt.measured.audio == measured_audio
+
+    old_dump = make_render_receipt().model_dump(mode="json")
+    assert "decoded_audio_fingerprint" not in old_dump
+    assert "audio" not in old_dump["measured"]
+
+    bad = receipt.model_dump(mode="python")
+    bad["schema_version"] = "2.0"
+    with pytest.raises(ValidationError, match="2.0"):
+        RenderReceipt.model_validate(bad)
+
+
+def test_source_bundle_accepts_only_hash_named_p4_suffixes_and_exact_bindings():
+    root = Path(f"state/render/sources/{SIX_HASH}")
+    bundle = RenderSourceBundlePointer(
+        root_path=root,
+        bundle_sha256=SIX_HASH,
+        index=RenderSourceFilePointer(
+            path=root / "index.html", file_sha256=SEVEN_HASH, size_bytes=100
+        ),
+        assets=(
+            RenderSourceFilePointer(
+                path=root / "assets" / f"{ONE_HASH}.wav",
+                file_sha256=ONE_HASH,
+                size_bytes=64,
+            ),
+            RenderSourceFilePointer(
+                path=root / "assets" / f"{TWO_HASH}.json",
+                file_sha256=TWO_HASH,
+                size_bytes=64,
+            ),
+        ),
+    )
+    assert len(bundle.assets) == 2
+
+    data = bundle.model_dump(mode="python")
+    data["assets"][0]["path"] = root / "assets" / f"{ONE_HASH}.exe"
+    with pytest.raises(ValidationError, match="hash"):
+        RenderSourceBundlePointer.model_validate(data)
+
+
+def test_voice_attempt_fields_are_manifest_22_only_and_serializer_compatible():
+    request = VoiceRequestReceipt(
+        request_id="request-1",
+        attempt_id="attempt-voice-1",
+        request_fingerprint=ONE_HASH,
+        script_hash=TWO_HASH,
+        provider_kind="fake",
+        model_id="fake-v1",
+        voice_id="voice-1",
+        language="en",
+        pricing_snapshot_id="pricing-1",
+        budget_reservation_receipt_id="budget-1",
+        egress_authorization_receipt_id="egress-1",
+        destination="https://api.elevenlabs.io",
+    )
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-voice-1",
+        operation="voice_generation",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        voice_request=request,
+        voice_phase="request",
+        started_at="2026-08-10T00:00:00+00:00",
+    )
+    manifest = make_state_manifest(schema_version="2.2", attempts=(attempt,))
+    assert manifest.attempts[0].voice_request == request
+
+    with pytest.raises(ValidationError, match="2.1"):
+        make_state_manifest(schema_version="2.1", attempts=(attempt,))
+
+    old_attempt = StateCommitAttempt(
+        attempt_id="attempt-custom",
+        operation="historical_custom_commit",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        started_at="2026-08-10T00:00:00+00:00",
+    )
+    assert not {
+        "voice_request",
+        "voice_phase",
+        "provider_request_id",
+        "candidate_audio_asset_ids",
+        "candidate_caption_asset_ids",
+    }.intersection(old_attempt.model_dump(mode="json"))
+
+
+@pytest.mark.parametrize(
+    ("code", "value"),
+    [
+        (ErrorCode.AUDIO_ASSET_INVALID, "audio_asset_invalid"),
+        (ErrorCode.AUDIO_PROBE_FAILED, "audio_probe_failed"),
+        (ErrorCode.AUDIO_TIMELINE_INVALID, "audio_timeline_invalid"),
+        (ErrorCode.CAPTION_ALIGNMENT_INVALID, "caption_alignment_invalid"),
+        (ErrorCode.CAPTION_TRACK_INVALID, "caption_track_invalid"),
+        (ErrorCode.VOICE_REQUEST_INVALID, "voice_request_invalid"),
+        (ErrorCode.VOICE_BUDGET_REJECTED, "voice_budget_rejected"),
+        (ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED, "voice_egress_not_authorized"),
+        (ErrorCode.VOICE_PROVIDER_FAILED, "voice_provider_failed"),
+        (ErrorCode.VOICE_PROVIDER_OUTCOME_UNKNOWN, "voice_provider_outcome_unknown"),
+    ],
+)
+def test_p4_error_codes_are_typed_and_non_retryable_by_default(code, value):
+    assert code.value == value
+    assert AiVideoError(code=code, user_message="safe").retryable is False
 
 
 def test_resolved_timeline_requires_integer_boundaries():

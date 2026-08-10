@@ -30,6 +30,16 @@ class ErrorCode(str, Enum):
     RENDERER_UNAVAILABLE = "renderer_unavailable"
     RENDERER_SOURCE_INVALID = "renderer_source_invalid"
     RENDER_FAILED = "render_failed"
+    AUDIO_ASSET_INVALID = "audio_asset_invalid"
+    AUDIO_PROBE_FAILED = "audio_probe_failed"
+    AUDIO_TIMELINE_INVALID = "audio_timeline_invalid"
+    CAPTION_ALIGNMENT_INVALID = "caption_alignment_invalid"
+    CAPTION_TRACK_INVALID = "caption_track_invalid"
+    VOICE_REQUEST_INVALID = "voice_request_invalid"
+    VOICE_BUDGET_REJECTED = "voice_budget_rejected"
+    VOICE_EGRESS_NOT_AUTHORIZED = "voice_egress_not_authorized"
+    VOICE_PROVIDER_FAILED = "voice_provider_failed"
+    VOICE_PROVIDER_OUTCOME_UNKNOWN = "voice_provider_outcome_unknown"
     DISK_SPACE_LOW = "disk_space_low"
 
 
