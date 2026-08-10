@@ -48,6 +48,7 @@ from ai_video.production.models import (
     ResolvedTimeline,
     Scene,
     Shot,
+    SourceReference,
     Story,
     Storyboard,
     StateCommitAttempt,
@@ -609,6 +610,15 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                     != metadata.alignment_receipt_id
                     or caption_tracks[caption.asset_id].script_hash
                     != request.script_hash
+                    or caption_tracks[caption.asset_id].creation_receipt_id
+                    != caption.creation_receipt_id
+                    or caption_tracks[caption.asset_id].source_provenance
+                    != (
+                        SourceReference(
+                            kind="derived",
+                            reference=(f"alignment-{result.alignment_receipt_sha256}"),
+                        ),
+                    )
                     or caption_tracks[caption.asset_id].transcript_hash
                     != request.script_hash
                     or caption_tracks[caption.asset_id].source_audio_asset_id

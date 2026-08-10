@@ -1226,6 +1226,8 @@ def test_reader_rejects_voice_candidate_id_claimed_by_two_attempts(tmp_path):
         "audio_asset_inputs",
         "caption_source_kind",
         "caption_transcript",
+        "caption_track_creation_receipt",
+        "caption_track_source_provenance",
     ],
 )
 def test_reader_rejects_resealed_voice_asset_semantic_contradictions(
@@ -1266,9 +1268,22 @@ def test_reader_rejects_resealed_voice_asset_semantic_contradictions(
         track = CaptionTrack.model_validate_json(
             (tmp_path / caption.artifact_path).read_bytes()
         )
+        track_updates = {
+            "caption_transcript": {"transcript_hash": "f" * 64},
+            "caption_track_creation_receipt": {
+                "creation_receipt_id": "caption-result-forged"
+            },
+            "caption_track_source_provenance": {
+                "source_provenance": (
+                    SourceReference(
+                        kind="derived", reference="alignment-forged-receipt"
+                    ),
+                )
+            },
+        }[mutation]
         changed = track.model_copy(
             update={
-                "transcript_hash": "f" * 64,
+                **track_updates,
                 "timing_fingerprint": "0" * 64,
                 "content_hash": "0" * 64,
             }
