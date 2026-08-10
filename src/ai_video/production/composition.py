@@ -7,11 +7,13 @@ from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.captions import (
+    _canonical_track_bytes,
     caption_style_fingerprint,
     caption_timing_fingerprint,
 )
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
+    AUDIO_KIND_PRIORITY,
     AUDIO_KIND_TO_ASSET_TYPE,
     AssetRecord,
     AssetType,
@@ -372,7 +374,15 @@ def _resolve_audio_spans(
             )
         )
     return tuple(
-        sorted(spans, key=lambda item: (item.start_sample, item.track_id, item.asset_id))
+        sorted(
+            spans,
+            key=lambda item: (
+                AUDIO_KIND_PRIORITY[item.audio_kind],
+                item.track_id,
+                item.start_sample,
+                item.asset_id,
+            ),
+        )
     )
 
 
@@ -385,6 +395,10 @@ def _load_caption_track(
         raise _caption_invalid(
             f"Caption binding {binding.binding_id} requires a typed caption asset."
         )
+    if asset.mime_type != "application/json":
+        raise _caption_invalid(
+            f"Caption asset {asset.asset_id} must use application/json."
+        )
     snapshot = _verified_registry_asset(project, asset, invalid=_caption_invalid)
     try:
         track = CaptionTrack.model_validate_json(snapshot.data)
@@ -392,6 +406,10 @@ def _load_caption_track(
         raise _caption_invalid(
             f"Caption asset {asset.asset_id} is not a canonical CaptionTrack.", str(exc)
         ) from exc
+    if snapshot.data != _canonical_track_bytes(track):
+        raise _caption_invalid(
+            f"Caption asset {asset.asset_id} bytes are not canonical."
+        )
     metadata = asset.caption_metadata
     word_count = sum(len(segment.words or ()) for segment in track.segments)
     metadata_identity = (
@@ -474,7 +492,7 @@ def _resolve_caption_cues(
 ) -> tuple[ResolvedCaptionCue, ...]:
     assets = {item.asset_id: item for item in project.registry.assets}
     spans = {item.track_id: item for item in audio_spans}
-    cues: list[tuple[str, ResolvedCaptionCue]] = []
+    cues: list[ResolvedCaptionCue] = []
     for binding in spec.caption_tracks:
         asset = assets.get(binding.caption_asset_id)
         if asset is None:
@@ -537,34 +555,32 @@ def _resolve_caption_cues(
                     f"Caption segment {segment.segment_id} exceeds the resolved timeline."
                 )
             cues.append(
-                (
-                    binding.binding_id,
-                    ResolvedCaptionCue(
-                        caption_asset_id=asset.asset_id,
-                        caption_asset_sha256=asset.sha256,
-                        caption_track_id=track.caption_track_id,
-                        caption_timing_fingerprint=track.timing_fingerprint,
-                        segment_id=segment.segment_id,
-                        text=segment.text,
-                        speaker_id=segment.speaker_id,
-                        start_sample=start_sample,
-                        end_sample=end_sample,
-                        start_frame=start_frame,
-                        end_frame_exclusive=end_frame,
-                        style_reference_id=style.artifact_id,
-                        style_content_hash=style.content_hash,
-                    ),
+                ResolvedCaptionCue(
+                    caption_asset_id=asset.asset_id,
+                    caption_asset_sha256=asset.sha256,
+                    caption_track_id=track.caption_track_id,
+                    caption_timing_fingerprint=track.timing_fingerprint,
+                    segment_id=segment.segment_id,
+                    text=segment.text,
+                    speaker_id=segment.speaker_id,
+                    start_sample=start_sample,
+                    end_sample=end_sample,
+                    start_frame=start_frame,
+                    end_frame_exclusive=end_frame,
+                    style_reference_id=style.artifact_id,
+                    style_content_hash=style.content_hash,
                 )
             )
     cues.sort(
-        key=lambda item: (
-            item[1].start_sample,
-            item[1].end_sample,
-            item[0],
-            item[1].segment_id,
+        key=lambda cue: (
+            cue.start_sample,
+            cue.end_sample,
+            cue.caption_track_id,
+            cue.segment_id,
+            cue.caption_asset_id,
         )
     )
-    return tuple(item[1] for item in cues)
+    return tuple(cues)
 
 
 def _resolve_composition(

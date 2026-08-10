@@ -57,6 +57,7 @@ from ai_video.production.models import (
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
     ResolvedTimeline,
+    ResolvedCaptionCue,
     ResolvedDuckingSpec,
     ResolvedAudioSpan,
     ResolvedVisualSpan,
@@ -954,6 +955,45 @@ def test_resolved_timeline_requires_canonical_unique_audio_span_order():
         ResolvedTimeline.model_validate(base)
 
     base["audio_spans"] = (span_a, span_a)
+    with pytest.raises(ValidationError, match="unique"):
+        ResolvedTimeline.model_validate(base)
+
+
+def test_resolved_timeline_accepts_overlapping_cues_but_requires_canonical_unique_order():
+    cue_a = ResolvedCaptionCue(
+        caption_asset_id="caption-a",
+        caption_asset_sha256=ONE_HASH,
+        caption_track_id="caption-track-a",
+        caption_timing_fingerprint=TWO_HASH,
+        segment_id="segment-1",
+        text="A",
+        start_sample=1_000,
+        end_sample=20_000,
+        start_frame=0,
+        end_frame_exclusive=10,
+        style_reference_id="style-1",
+        style_content_hash=THREE_HASH,
+    )
+    cue_b = cue_a.model_copy(
+        update={
+            "caption_asset_id": "caption-b",
+            "caption_asset_sha256": FOUR_HASH,
+            "caption_track_id": "caption-track-b",
+            "caption_timing_fingerprint": FIVE_HASH,
+            "text": "B",
+        }
+    )
+    base = make_resolved_timeline().model_dump(mode="python")
+    base["schema_version"] = "2.1"
+    base["caption_cues"] = (cue_a, cue_b)
+    timeline = ResolvedTimeline.model_validate(base)
+    assert timeline.caption_cues == (cue_a, cue_b)
+
+    base["caption_cues"] = (cue_b, cue_a)
+    with pytest.raises(ValidationError, match="canonical"):
+        ResolvedTimeline.model_validate(base)
+
+    base["caption_cues"] = (cue_a, cue_a)
     with pytest.raises(ValidationError, match="unique"):
         ResolvedTimeline.model_validate(base)
 

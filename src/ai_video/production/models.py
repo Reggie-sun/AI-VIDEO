@@ -349,6 +349,11 @@ class AudioKind(str, Enum):
     BGM = "bgm"
 
 
+AUDIO_KIND_PRIORITY: Mapping[AudioKind, int] = MappingProxyType(
+    {kind: priority for priority, kind in enumerate(AudioKind)}
+)
+
+
 AUDIO_KIND_TO_ASSET_TYPE: Mapping[AudioKind, AssetType] = MappingProxyType(
     {
         AudioKind.DIALOGUE: AssetType.VOICE,
@@ -1067,18 +1072,45 @@ class ResolvedTimeline(VersionedArtifact):
         canonical_audio_order = tuple(
             sorted(
                 self.audio_spans,
-                key=lambda item: (item.start_sample, item.track_id, item.asset_id),
+                key=lambda item: (
+                    AUDIO_KIND_PRIORITY[item.audio_kind],
+                    item.track_id,
+                    item.start_sample,
+                    item.asset_id,
+                ),
             )
         )
         if self.audio_spans != canonical_audio_order:
-            raise ValueError("resolved audio spans must use canonical monotonic order")
-        previous_end = 0
+            raise ValueError("resolved audio spans must use canonical mix order")
+        cue_identities = tuple(
+            (
+                cue.caption_asset_id,
+                cue.caption_track_id,
+                cue.segment_id,
+                cue.start_sample,
+                cue.end_sample,
+            )
+            for cue in self.caption_cues
+        )
+        if len(cue_identities) != len(set(cue_identities)):
+            raise ValueError("resolved caption cue identities must be unique")
         for cue in self.caption_cues:
-            if cue.start_sample < previous_end:
-                raise ValueError("resolved caption cues must be monotonic")
             if cue.end_sample > self.total_samples or cue.end_frame_exclusive > self.total_frames:
                 raise ValueError("resolved caption cue exceeds timeline")
-            previous_end = cue.end_sample
+        canonical_caption_order = tuple(
+            sorted(
+                self.caption_cues,
+                key=lambda cue: (
+                    cue.start_sample,
+                    cue.end_sample,
+                    cue.caption_track_id,
+                    cue.segment_id,
+                    cue.caption_asset_id,
+                ),
+            )
+        )
+        if self.caption_cues != canonical_caption_order:
+            raise ValueError("resolved caption cues must use canonical order")
         return self
 
     @model_serializer(mode="wrap")

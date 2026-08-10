@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 from pathlib import Path
 
 import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.captions import CaptionImportRequest, caption_timing_fingerprint
 from ai_video.production.composition import resolve_composition
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import (
@@ -14,6 +16,8 @@ from ai_video.production.models import (
     AudioTrackSpec,
     AssetRoleRequirement,
     AssetType,
+    CaptionTrack,
+    CaptionTrackBinding,
     CompositionLayerSpec,
     CompositionSpec,
     DurationPolicy,
@@ -68,6 +72,84 @@ def _replace_asset(project, index: int, **changes):
     )
 
 
+def _with_overlapping_caption_binding(root, loaded, spec):
+    source_asset = loaded.registry.assets[-1]
+    source_path = loaded.asset_paths[source_asset.asset_id]
+    track = CaptionTrack.model_validate_json(source_path.read_bytes())
+    segments = tuple(
+        segment.model_copy(update={"segment_id": f"second-{segment.segment_id}"})
+        for segment in track.segments
+    )
+    second_track = track.model_copy(
+        update={
+            "artifact_id": "caption-artifact-2",
+            "content_hash": "0" * 64,
+            "creation_receipt_id": "receipt-caption-2",
+            "caption_track_id": "caption-track-2",
+            "segments": segments,
+            "timing_fingerprint": "0" * 64,
+        }
+    )
+    second_track = second_track.model_copy(
+        update={"timing_fingerprint": caption_timing_fingerprint(second_track)}
+    )
+    second_track = CaptionTrack.model_validate(
+        seal_artifact(second_track).model_dump(mode="python")
+    )
+    style = spec.caption_tracks[0].style_reference
+    assert style is not None
+    style_bytes = (root / style.path).read_bytes()
+    imported = CaptionImportRequest.create(
+        caption_track=second_track,
+        style_reference=style,
+        style_bytes=style_bytes,
+    )
+    second_path = root / "assets/files/caption-track-2.json"
+    second_path.write_bytes(imported.track_bytes)
+    metadata = source_asset.caption_metadata
+    assert metadata is not None
+    second_asset = source_asset.model_copy(
+        update={
+            "asset_id": "caption-asset-2",
+            "artifact_path": second_path.relative_to(root),
+            "sha256": hashlib.sha256(imported.track_bytes).hexdigest(),
+            "size_bytes": len(imported.track_bytes),
+            "creation_receipt_id": "receipt-caption-asset-2",
+            "caption_metadata": metadata.model_copy(
+                update={
+                    "caption_track_id": second_track.caption_track_id,
+                    "timing_fingerprint": second_track.timing_fingerprint,
+                }
+            ),
+        }
+    )
+    assets = (*loaded.registry.assets, second_asset)
+    paths = dict(loaded.asset_paths)
+    paths[second_asset.asset_id] = second_path
+    loaded = loaded.model_copy(
+        update={
+            "registry": loaded.registry.model_copy(update={"assets": assets}),
+            "asset_paths": paths,
+        }
+    )
+    second_binding = CaptionTrackBinding(
+        binding_id="captions-dialogue-2",
+        caption_asset_id=second_asset.asset_id,
+        source_audio_track_id="dialogue",
+        shot_id="shot-1",
+        style_reference=style,
+    )
+    spec = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "caption_tracks": (*spec.caption_tracks, second_binding),
+            }
+        )
+    )
+    return loaded, spec
+
+
 def test_resolver_uses_explicit_shot_order_not_filename_or_mtime(tmp_path):
     loaded = write_and_load_two_shot_project(
         tmp_path, filenames=("z.png", "a.png")
@@ -107,11 +189,11 @@ def test_p4_resolves_all_audio_kinds_and_captions_in_one_timeline(tmp_path):
     assert timeline.schema_version == "2.1"
     assert {span.audio_kind for span in timeline.audio_spans} == set(AudioKind)
     assert [(span.track_id, span.start_sample) for span in timeline.audio_spans] == [
-        ("ambience", 0),
-        ("bgm", 0),
         ("dialogue", 0),
         ("narration", 96_000),
+        ("ambience", 0),
         ("sfx", 100_000),
+        ("bgm", 0),
     ]
     bgm = next(span for span in timeline.audio_spans if span.track_id == "bgm")
     assert (bgm.gain_millidb, bgm.fade_in_samples, bgm.fade_out_samples) == (
@@ -142,6 +224,30 @@ def test_p4_resolution_is_independent_of_audio_and_caption_input_order(tmp_path)
     )
     second = resolve_composition(loaded, reordered, "0.7.103")
     assert second.audio_spans == first.audio_spans
+    assert second.caption_cues == first.caption_cues
+    assert second.composition_fingerprint == first.composition_fingerprint
+
+
+def test_overlapping_caption_tracks_are_canonical_and_input_order_independent(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    loaded, spec = _with_overlapping_caption_binding(tmp_path, loaded, spec)
+    first = resolve_composition(loaded, spec, "0.7.103")
+    assert len(first.caption_cues) == 4
+    assert first.caption_cues[0].start_sample == first.caption_cues[1].start_sample
+    assert [cue.caption_track_id for cue in first.caption_cues[:2]] == [
+        "caption-track-1",
+        "caption-track-2",
+    ]
+
+    reversed_spec = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "caption_tracks": tuple(reversed(spec.caption_tracks)),
+            }
+        )
+    )
+    second = resolve_composition(loaded, reversed_spec, "0.7.103")
     assert second.caption_cues == first.caption_cues
     assert second.composition_fingerprint == first.composition_fingerprint
 
@@ -460,6 +566,34 @@ def test_caption_binding_rejects_unknown_type_hash_source_and_style_mismatch(tmp
         ),
         ErrorCode.CAPTION_TRACK_INVALID,
     )
+
+
+@pytest.mark.parametrize("mutation", ["mime", "pretty", "reordered", "malformed"])
+def test_caption_asset_requires_json_mime_and_exact_canonical_bytes(tmp_path, mutation):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    caption = loaded.registry.assets[-1]
+    path = loaded.asset_paths[caption.asset_id]
+    if mutation == "mime":
+        loaded = _replace_asset(loaded, -1, mime_type="text/plain")
+    else:
+        original = path.read_bytes()
+        parsed = json.loads(original)
+        if mutation == "pretty":
+            payload = json.dumps(parsed, indent=2).encode("utf-8")
+        elif mutation == "reordered":
+            payload = json.dumps(
+                dict(reversed(tuple(parsed.items()))), separators=(",", ":")
+            ).encode("utf-8")
+        else:
+            payload = b"{malformed"
+        path.write_bytes(payload)
+        loaded = _replace_asset(
+            loaded,
+            -1,
+            sha256=hashlib.sha256(payload).hexdigest(),
+            size_bytes=len(payload),
+        )
+    _assert_error(loaded, spec, ErrorCode.CAPTION_TRACK_INVALID)
 
 
 def test_caption_style_changes_composition_not_timing_fingerprint(tmp_path):
