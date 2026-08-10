@@ -1,0 +1,865 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import shutil
+import socket
+from dataclasses import dataclass
+from pathlib import Path
+
+import pytest
+
+from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.audio import (
+    AudioImportRequest,
+    AudioProbeToolchain,
+    ClaimedAudioMetadata,
+    PreparedAudioImport,
+    VoiceGenerationRequest,
+    VoiceGenerationPreview,
+    VoicePricingSnapshot,
+    VoiceProviderResult,
+    materialize_audio_candidate,
+    probe_audio_candidate,
+)
+from ai_video.production.captions import (
+    CaptionImportRequest,
+    normalize_character_alignment,
+    segment_caption_track,
+)
+from ai_video.production.composition import resolve_composition
+from ai_video.production.hashing import seal_artifact
+from ai_video.production.hyperframes import (
+    RendererCommandResult,
+    _render_with_hyperframes,
+)
+from ai_video.production.models import (
+    AssetRecord,
+    AssetRegistrySnapshot,
+    AssetSourceKind,
+    AssetType,
+    AudioKind,
+    AudioSource,
+    AudioTrackSpec,
+    CaptionAssetMetadata,
+    CaptionSegmentationPolicy,
+    CaptionStyleReference,
+    CaptionTrackBinding,
+    EgressMetadata,
+    ProductionManifest,
+    RendererKind,
+    RendererSelectionReceipt,
+    RendererSourceReceipt,
+    RenderReceipt,
+    ResolvedTimeline,
+    SourceReference,
+    StateCommitStatus,
+    ToolIdentity,
+)
+from ai_video.production.project import load_production_project
+from ai_video.production.registry import registry_semantic_sha256
+from ai_video.production.state_commit import (
+    BeginRenderAttemptRequest,
+    PreparedArtifact,
+    PreparedVoiceCandidate,
+    ProductionStateCommitter,
+    prepare_audio_registry_commit,
+    recover_production_state,
+)
+
+import production_project_factory as project_factory
+
+
+FIXTURE_ROOT = Path(__file__).parent / "fixtures/voice_captions"
+DIALOGUE = FIXTURE_ROOT / "dialogue-mono-48000.wav"
+AMBIENCE = FIXTURE_ROOT / "ambience-stereo-48000.wav"
+ZERO_HASH = "0" * 64
+DECODED_AUDIO_HASH = hashlib.sha256(b"deterministic-p4-decoded-audio").hexdigest()
+
+
+def _manifest(root: Path) -> ProductionManifest:
+    return ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_bytes()
+    )
+
+
+def _toolchain() -> AudioProbeToolchain:
+    ffmpeg = shutil.which("ffmpeg")
+    ffprobe = shutil.which("ffprobe")
+    if ffmpeg is None or ffprobe is None:
+        pytest.skip("P4 deterministic audio acceptance requires ffmpeg and ffprobe")
+    return AudioProbeToolchain(
+        ffmpeg_path=Path(ffmpeg).resolve(strict=True),
+        ffprobe_path=Path(ffprobe).resolve(strict=True),
+        ffmpeg=ToolIdentity(name="ffmpeg", version="fixture-system"),
+        ffprobe=ToolIdentity(name="ffprobe", version="fixture-system"),
+    )
+
+
+def _permit_binding(request, authorization) -> dict[str, str]:
+    return {
+        "attempt_id": request.attempt_id,
+        "request_fingerprint": request.voice_request_fingerprint,
+        "authorization_fingerprint": authorization.authorization_fingerprint,
+        "destination": authorization.destination,
+        "budget_reservation_receipt_id": (authorization.budget_reservation_receipt_id),
+        "egress_authorization_receipt_id": (
+            authorization.egress_authorization_receipt_id
+        ),
+    }
+
+
+def _sanitized_alignment(script: str, duration_samples: int) -> bytes:
+    step_samples = duration_samples // (len(script) + 1)
+    payload = {
+        "characters": list(script),
+        "character_start_times_seconds": [
+            str(index * step_samples / 48_000) for index in range(len(script))
+        ],
+        "character_end_times_seconds": [
+            str((index + 1) * step_samples / 48_000) for index in range(len(script))
+        ],
+    }
+    return normalize_character_alignment(
+        payload,
+        sample_rate_hz=48_000,
+        duration_samples=duration_samples,
+        speaker_id="speaker-1",
+    ).receipt_bytes
+
+
+class _FakeDialogueProvider:
+    def __init__(
+        self, root: Path, preview: VoiceGenerationPreview, authorization
+    ) -> None:
+        self.root = root
+        self.expected_preview = preview
+        self.authorization = authorization
+        self.preview_calls = 0
+        self.generate_calls = 0
+
+    def preview(self, request: VoiceGenerationRequest) -> VoiceGenerationPreview:
+        self.preview_calls += 1
+        return self.expected_preview
+
+    def generate(self, request, authorization, permit) -> VoiceProviderResult:
+        assert authorization == self.authorization
+        current = _manifest(self.root)
+        attempt = next(
+            item for item in current.attempts if item.attempt_id == request.attempt_id
+        )
+        assert attempt.voice_phase == "submit_intent"
+        assert current.manifest_revision == 3
+        paths = ProductionStateCommitter(self.root).voice_attempt_paths(
+            request.attempt_id
+        )
+        assert paths.request_path.is_file()
+        assert paths.preview_path.is_file()
+        assert paths.authorization_path.is_file()
+        assert paths.submit_intent_path.is_file()
+        assert permit._consume_voice_submit_permit(
+            **_permit_binding(request, authorization)
+        )
+        self.generate_calls += 1
+        base = project_factory.make_voice_provider_result(
+            request,
+            self.expected_preview,
+            authorization,
+            audio_bytes=DIALOGUE.read_bytes(),
+        )
+        alignment = _sanitized_alignment(request.script_text, 96_000)
+        return VoiceProviderResult.create(
+            request=request,
+            preview=self.expected_preview,
+            authorization=authorization,
+            pricing=VoicePricingSnapshot(
+                snapshot_id=base.cost_receipt.pricing_snapshot_id,
+                effective_date=self.expected_preview.pricing_effective_date,
+                currency=self.expected_preview.currency,
+                pricing_unit=self.expected_preview.pricing_unit,
+                unit_price_microunits=self.expected_preview.unit_price_microunits,
+                minimum_billable_units=self.expected_preview.minimum_billable_units,
+            ),
+            audio_bytes=DIALOGUE.read_bytes(),
+            content_type="audio/wav",
+            provider_request_id=base.provider_request_id,
+            provider_trace_id=base.provider_trace_id,
+            alignment_receipt_bytes=alignment,
+            cost_receipt=base.cost_receipt,
+            provenance_receipt=base.provenance_receipt,
+            terminal_status="succeeded",
+        )
+
+
+def _voice_candidate_preparer(root: Path, toolchain: AudioProbeToolchain):
+    def prepare(request, preview, authorization, result, paths):
+        del preview
+        snapshot = materialize_audio_candidate(
+            result.audio_bytes,
+            candidate_path=paths.audio_candidate_path,
+            project_root=root,
+            attempt_id=request.attempt_id,
+        )
+        assert snapshot.data == result.audio_bytes
+        with paths.audio_candidate_path.open("rb") as source:
+            probe = probe_audio_candidate(
+                source.fileno(),
+                mime_type=result.content_type,
+                toolchain=toolchain,
+                claimed_metadata=ClaimedAudioMetadata(
+                    codec_name=request.output_codec,
+                    duration_samples=96_000,
+                    sample_rate_hz=request.output_sample_rate_hz,
+                    channels=request.output_channels,
+                ),
+                measure_loudness=False,
+            )
+        provenance_bytes = (
+            json.dumps(
+                result.provenance_receipt.model_dump(mode="json"),
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
+        ).encode()
+        cost_bytes = (
+            json.dumps(
+                result.cost_receipt.model_dump(mode="json"),
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
+        ).encode()
+        audio_id = f"voice-{request.attempt_id}"
+        audio_record = AssetRecord(
+            asset_id=audio_id,
+            asset_type=AssetType.VOICE,
+            artifact_path=Path(f"assets/audio/{result.audio_sha256}.wav"),
+            sha256=result.audio_sha256,
+            size_bytes=len(result.audio_bytes),
+            mime_type=result.content_type,
+            source_kind=AssetSourceKind.GENERATED,
+            tool=result.provenance_receipt.adapter,
+            input_artifact_ids=request.input_artifact_ids,
+            input_fingerprint=request.input_fingerprint,
+            creation_receipt_id=f"voice-result-{result.result_fingerprint}",
+            usage_license=result.provenance_receipt.license_policy_decision,
+            egress=EgressMetadata(
+                remote=True,
+                destination=authorization.destination,
+                authorization_receipt_id=request.egress_authorization_receipt_id,
+                request_fingerprint=request.voice_request_fingerprint,
+                payload_fingerprint=request.script_hash,
+                retention_mode=result.provenance_receipt.retention_mode,
+                provider_policy_snapshot_id=result.provenance_receipt.policy_receipt_id,
+            ),
+            cost_receipt_id=f"cost-{hashlib.sha256(cost_bytes).hexdigest()}",
+            audio_metadata={
+                "audio_kind": request.audio_kind,
+                "source": {
+                    "kind": "generated",
+                    "provider_or_tool": result.provenance_receipt.adapter,
+                    "input_artifact_ids": request.input_artifact_ids,
+                    "input_fingerprint": request.input_fingerprint,
+                },
+                "speaker_id": request.speaker_id,
+                "voice_id": request.voice_id,
+                "language": request.language,
+                "script_hash": request.script_hash,
+                "duration_samples": probe.duration_samples,
+                "sample_rate_hz": probe.sample_rate_hz,
+                "channels": probe.channels,
+                "channel_layout": probe.channel_layout,
+                "codec_name": probe.codec_name,
+                "loudness": probe.loudness,
+                "provenance_receipt_id": (
+                    f"provenance-{hashlib.sha256(provenance_bytes).hexdigest()}"
+                ),
+                "alignment_receipt_id": (
+                    f"alignment-{result.alignment_receipt_sha256}"
+                ),
+            },
+        )
+
+        alignment = normalize_character_alignment(
+            json.loads(result.alignment_receipt_bytes),
+            sample_rate_hz=probe.sample_rate_hz,
+            duration_samples=probe.duration_samples,
+            speaker_id=request.speaker_id,
+        )
+        style_bytes = b'{"font_family":"Fixture Sans","schema_version":"1"}'
+        style_hash = hashlib.sha256(style_bytes).hexdigest()
+        style = CaptionStyleReference(
+            artifact_id="caption-style-e2e",
+            revision=1,
+            content_hash=style_hash,
+            path=Path(f"assets/styles/{style_hash}.json"),
+        )
+        track = segment_caption_track(
+            alignment,
+            artifact_id=f"caption-track-{request.attempt_id}",
+            revision=1,
+            creation_receipt_id=f"caption-result-{result.result_fingerprint}",
+            source_provenance=(
+                SourceReference(
+                    kind="derived",
+                    reference=f"alignment-{result.alignment_receipt_sha256}",
+                ),
+            ),
+            caption_track_id=f"caption-track-{request.attempt_id}",
+            language=request.language,
+            script_text=request.script_text,
+            transcript_text=request.script_text,
+            source_audio_asset_id=audio_id,
+            source_audio_sha256=result.audio_sha256,
+            source_sample_rate_hz=probe.sample_rate_hz,
+            source_duration_samples=probe.duration_samples,
+            segmentation_policy=CaptionSegmentationPolicy(
+                policy_id="e2e-sentence",
+                policy_version="1",
+                max_characters=80,
+                max_lines=2,
+                break_strategy="sentence",
+            ),
+            alignment_provider=request.provider_kind,
+            alignment_model=request.model_id,
+            alignment_receipt_id=f"alignment-{result.alignment_receipt_sha256}",
+            style_reference_id=style.artifact_id,
+        )
+        caption = CaptionImportRequest.create(
+            caption_track=track,
+            style_reference=style,
+            style_bytes=style_bytes,
+        ).prepare()
+        caption_record = AssetRecord(
+            asset_id=f"caption-{request.attempt_id}",
+            asset_type=AssetType.CAPTION,
+            artifact_path=Path(f"assets/captions/{caption.track_sha256}.json"),
+            sha256=caption.track_sha256,
+            size_bytes=len(caption.track_bytes),
+            mime_type="application/json",
+            source_kind=AssetSourceKind.DERIVED,
+            tool=result.provenance_receipt.adapter,
+            input_artifact_ids=(audio_id,),
+            input_fingerprint=result.audio_sha256,
+            creation_receipt_id=track.creation_receipt_id,
+            usage_license=result.provenance_receipt.license_policy_decision,
+            caption_metadata=CaptionAssetMetadata(
+                caption_track_id=track.caption_track_id,
+                language=track.language,
+                source_audio_asset_id=audio_id,
+                source_audio_sha256=result.audio_sha256,
+                script_hash=track.script_hash,
+                transcript_hash=track.transcript_hash,
+                segment_count=len(track.segments),
+                word_count=0,
+                segmentation_policy_id=track.segmentation_policy.policy_id,
+                segmentation_policy_version=track.segmentation_policy.policy_version,
+                alignment_receipt_id=track.alignment_receipt_id,
+                timing_fingerprint=track.timing_fingerprint,
+                style_reference_id=style.artifact_id,
+                style_content_hash=style.content_hash,
+            ),
+        )
+        return PreparedVoiceCandidate(
+            audio=PreparedAudioImport(
+                payload=result.audio_bytes,
+                probe=probe,
+                asset_record=audio_record,
+            ),
+            caption=caption,
+            caption_asset_record=caption_record,
+        )
+
+    return prepare
+
+
+def _import_local_mix_assets(
+    root: Path, toolchain: AudioProbeToolchain
+) -> ProductionManifest:
+    loaded = load_production_project(root / "project.yaml")
+    prepared = []
+    for asset_id, kind in (
+        ("ambience-room", AudioKind.AMBIENCE),
+        ("bgm-theme", AudioKind.BGM),
+        ("sfx-hit", AudioKind.SFX),
+    ):
+        source = AudioSource(
+            kind=AssetSourceKind.IMPORTED,
+            provider_or_tool=ToolIdentity(name="fixture-import", version="1"),
+            input_fingerprint=hashlib.sha256(asset_id.encode()).hexdigest(),
+            original_reference=f"fixture:{asset_id}",
+        )
+        request = AudioImportRequest(
+            asset_id=asset_id,
+            audio_kind=kind,
+            mime_type="audio/wav",
+            source=source,
+            provenance_receipt_id=f"provenance-{asset_id}",
+            creation_receipt_id=f"creation-{asset_id}",
+            usage_license="fixture-only",
+        )
+        with AMBIENCE.open("rb") as handle:
+            prepared.append(
+                request.prepare(
+                    handle.fileno(), toolchain=toolchain, measure_loudness=False
+                )
+            )
+    records = tuple(
+        sorted((item.asset_record for item in prepared), key=lambda item: item.asset_id)
+    )
+    candidate = AssetRegistrySnapshot(
+        schema_version="2.1",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=loaded.registry.assets + records,
+    )
+    revision = registry_semantic_sha256(candidate)
+    candidate = candidate.model_copy(
+        update={"revision_id": revision, "content_hash": revision}
+    )
+    artifact_by_path = {
+        item.asset_record.artifact_path: PreparedArtifact(
+            item.asset_record.artifact_path,
+            item.payload,
+            item.asset_record.sha256,
+        )
+        for item in prepared
+    }
+    manifest = loaded.manifest
+    request = prepare_audio_registry_commit(
+        manifest=manifest,
+        project=loaded.project,
+        base_registry=loaded.registry,
+        registry=candidate,
+        attempt_id="import-local-mix",
+        artifacts=tuple(artifact_by_path.values()),
+        active_project_artifact=PreparedArtifact(
+            manifest.active_project.path,
+            (root / manifest.active_project.path).read_bytes(),
+            manifest.active_project.file_sha256,
+        ),
+    )
+    return ProductionStateCommitter(root).commit(request)
+
+
+@dataclass(frozen=True)
+class _RenderCall:
+    command: str
+
+
+class _FakeHyperFramesRunner:
+    def __init__(self) -> None:
+        self.calls: list[_RenderCall] = []
+
+    def version(self, *, env) -> str:
+        assert env["HYPERFRAMES_NO_TELEMETRY"] == "1"
+        self.calls.append(_RenderCall("version"))
+        return "0.7.103"
+
+    def doctor(self, *, env) -> RendererCommandResult:
+        assert env["HYPERFRAMES_NO_TELEMETRY"] == "1"
+        self.calls.append(_RenderCall("doctor"))
+        return RendererCommandResult(
+            returncode=0,
+            stdout=json.dumps(
+                {
+                    "ok": False,
+                    "checks": [
+                        {"name": "Node.js", "ok": True},
+                        {"name": "FFmpeg", "ok": True},
+                        {"name": "FFprobe", "ok": True},
+                        {"name": "Chrome", "ok": True},
+                        {"name": "Whisper", "ok": False},
+                    ],
+                }
+            ),
+            stderr="",
+        )
+
+    def run(self, command, args, *, cwd, env, timeout_seconds) -> RendererCommandResult:
+        del timeout_seconds
+        assert env["HYPERFRAMES_NO_TELEMETRY"] == "1"
+        self.calls.append(_RenderCall(command))
+        if command == "render":
+            Path(args[args.index("-o") + 1]).write_bytes(b"deterministic-fake-mp4")
+            return RendererCommandResult(returncode=0, stdout="", stderr="")
+        if command == "lint":
+            payload = {"errorCount": 0, "warningCount": 0}
+        else:
+            payload = {"ok": True}
+            for section in ("lint", "runtime", "layout", "motion", "contrast"):
+                payload[section] = {"errorCount": 0, "warningCount": 0}
+        return RendererCommandResult(
+            returncode=0, stdout=json.dumps(payload), stderr=""
+        )
+
+
+def _executable(path: Path) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    path.chmod(0o700)
+    return path.resolve(strict=True)
+
+
+def _render_probe(timeline) -> dict[str, object]:
+    return {
+        "streams": [
+            {
+                "codec_type": "video",
+                "width": timeline.delivery_profile.width,
+                "height": timeline.delivery_profile.height,
+                "r_frame_rate": f"{timeline.delivery_profile.fps}/1",
+                "nb_frames": str(timeline.total_frames),
+                "codec_name": "h264",
+            },
+            {
+                "codec_type": "audio",
+                "index": 1,
+                "codec_name": "aac",
+                "sample_rate": str(timeline.sample_rate),
+                "channels": 2,
+                "channel_layout": "stereo",
+            },
+        ],
+        "packets": [
+            {
+                "stream_index": 1,
+                "pts": "-1024",
+                "duration": "1024",
+                "side_data_list": [
+                    {
+                        "side_data_type": "Skip Samples",
+                        "skip_samples": 1024,
+                        "discard_padding": 0,
+                    }
+                ],
+            },
+            {"stream_index": 1, "pts": str(timeline.total_samples), "duration": "1024"},
+        ],
+    }
+
+
+def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    network_calls: list[object] = []
+    secret_lookups: list[object] = []
+
+    def reject_network(*args, **kwargs):
+        network_calls.append((args, kwargs))
+        raise AssertionError("P4 default acceptance must not use a socket")
+
+    def reject_secret(*args, **kwargs):
+        secret_lookups.append((args, kwargs))
+        raise AssertionError("P4 default acceptance must not read environment secrets")
+
+    environ_type = type(os.environ)
+    original_environ_getitem = environ_type.__getitem__
+
+    def guard_secret_environ(environ, key):
+        if "ELEVENLABS" in str(key).upper() or "API_KEY" in str(key).upper():
+            return reject_secret(key)
+        return original_environ_getitem(environ, key)
+
+    monkeypatch.setattr(socket, "create_connection", reject_network)
+    monkeypatch.setattr(socket.socket, "connect", reject_network)
+    monkeypatch.setattr(os, "getenv", reject_secret)
+    monkeypatch.setattr(environ_type, "__getitem__", guard_secret_environ)
+
+    project_factory.write_and_load_two_shot_project(tmp_path)
+    toolchain = _toolchain()
+    request = project_factory.make_voice_request(tmp_path, attempt_id="voice-e2e")
+    preview, authorization = project_factory.make_voice_preview_and_authorization(
+        request
+    )
+    provider = _FakeDialogueProvider(tmp_path, preview, authorization)
+    committer = ProductionStateCommitter(
+        tmp_path,
+        voice_candidate_preparer=_voice_candidate_preparer(tmp_path, toolchain),
+    )
+
+    voice_manifest = committer.generate_voice_asset(request, provider, authorization)
+    assert provider.generate_calls == 1
+    assert voice_manifest.attempts[-1].voice_phase == "activate"
+    assert voice_manifest.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    imported_manifest = _import_local_mix_assets(tmp_path, toolchain)
+    assert imported_manifest.active_project == voice_manifest.active_project
+
+    loaded = load_production_project(tmp_path / "project.yaml")
+    generated_audio = next(
+        item for item in loaded.registry.assets if item.asset_id == "voice-voice-e2e"
+    )
+    generated_caption = next(
+        item for item in loaded.registry.assets if item.asset_id == "caption-voice-e2e"
+    )
+    assert generated_audio.egress is not None
+    assert generated_audio.cost_receipt_id is not None
+    assert generated_caption.caption_metadata is not None
+    track = json.loads(loaded.asset_paths[generated_caption.asset_id].read_bytes())
+    style_hash = generated_caption.caption_metadata.style_content_hash
+    assert style_hash is not None
+    style = CaptionStyleReference(
+        artifact_id=generated_caption.caption_metadata.style_reference_id,
+        revision=1,
+        content_hash=style_hash,
+        path=Path(f"assets/styles/{style_hash}.json"),
+    )
+    spec = project_factory.make_composition_spec().model_copy(
+        update={
+            "schema_version": "2.1",
+            "content_hash": ZERO_HASH,
+            "audio_tracks": (
+                AudioTrackSpec(
+                    track_id="dialogue",
+                    audio_kind=AudioKind.DIALOGUE,
+                    asset_id=generated_audio.asset_id,
+                    shot_id="shot-1",
+                ),
+                AudioTrackSpec(
+                    track_id="ambience",
+                    audio_kind=AudioKind.AMBIENCE,
+                    asset_id="ambience-room",
+                    start_sample=0,
+                    fade_in_samples=480,
+                ),
+                AudioTrackSpec(
+                    track_id="sfx",
+                    audio_kind=AudioKind.SFX,
+                    asset_id="sfx-hit",
+                    shot_id="shot-2",
+                ),
+                AudioTrackSpec(
+                    track_id="bgm",
+                    audio_kind=AudioKind.BGM,
+                    asset_id="bgm-theme",
+                    start_sample=0,
+                    gain_millidb=-6_000,
+                    fade_in_samples=480,
+                    fade_out_samples=480,
+                    ducking={
+                        "sidechain_track_ids": ("dialogue",),
+                        "attenuation_millidb": -12_000,
+                        "attack_samples": 240,
+                        "release_samples": 480,
+                    },
+                ),
+            ),
+            "caption_tracks": (
+                CaptionTrackBinding(
+                    binding_id="dialogue-captions",
+                    caption_asset_id=generated_caption.asset_id,
+                    source_audio_track_id="dialogue",
+                    shot_id="shot-1",
+                    style_reference=style,
+                ),
+            ),
+        }
+    )
+    timeline = resolve_composition(
+        loaded, seal_artifact(spec), renderer_version="0.7.103"
+    )
+    assert timeline.schema_version == "2.1"
+    assert {span.audio_kind for span in timeline.audio_spans} == {
+        AudioKind.DIALOGUE,
+        AudioKind.AMBIENCE,
+        AudioKind.SFX,
+        AudioKind.BGM,
+    }
+    assert timeline.total_samples == 192_000
+    assert (
+        next(
+            span for span in timeline.audio_spans if span.track_id == "sfx"
+        ).start_sample
+        == 96_000
+    )
+    assert [cue.start_sample for cue in timeline.caption_cues] == [
+        segment["start_sample"] for segment in track["segments"]
+    ]
+    assert all(
+        cue.end_frame_exclusive <= timeline.total_frames
+        for cue in timeline.caption_cues
+    )
+
+    sources = {
+        span.asset_id: loaded.asset_paths[span.asset_id]
+        for span in timeline.visual_spans
+    }
+    sources.update(
+        {
+            span.asset_id: loaded.asset_paths[span.asset_id]
+            for span in timeline.audio_spans
+        }
+    )
+    sources.update(
+        {
+            cue.caption_asset_id: loaded.asset_paths[cue.caption_asset_id]
+            for cue in timeline.caption_cues
+        }
+    )
+    sources[style.artifact_id] = tmp_path / style.path
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-p4-e2e",
+        attempt_id="render-p4-e2e",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=loaded.manifest.active_project,
+        current_registry=loaded.manifest.active_registry,
+    )
+    begin = BeginRenderAttemptRequest(
+        loaded.manifest.manifest_revision,
+        loaded.manifest.active_render_state,
+        selection,
+    )
+    runner = _FakeHyperFramesRunner()
+    browser = _executable(tmp_path / "tools/chrome")
+    ip_path = _executable(tmp_path / "tools/ip")
+    runner_factories = 0
+
+    def runner_factory():
+        nonlocal runner_factories
+        runner_factories += 1
+        return runner
+
+    rendered = _render_with_hyperframes(
+        committer=committer,
+        begin_request=begin,
+        timeline=timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        runner_factory=runner_factory,
+        browser_path=browser,
+        ip_path=ip_path,
+        expected_version="0.7.103",
+        probe=lambda _fd: _render_probe(timeline),
+        decoded_frames=lambda _fd: hashlib.sha256(b"deterministic-frames").hexdigest(),
+        decoded_audio=lambda _fd, rate, channels: (
+            timeline.total_samples,
+            DECODED_AUDIO_HASH,
+        ),
+    )
+    assert rendered.active_render_state is not None
+    assert runner_factories == 1
+    assert [item.command for item in runner.calls] == [
+        "version",
+        "doctor",
+        "lint",
+        "check",
+        "render",
+    ]
+
+    reopened = load_production_project(tmp_path / "project.yaml")
+    assert reopened.render_state is not None
+    assert (
+        reopened.render_state.timeline_fingerprint == timeline.composition_fingerprint
+    )
+    source_receipt = RendererSourceReceipt.model_validate_json(
+        (tmp_path / reopened.render_state.source_receipt.path).read_bytes()
+    )
+    render_receipt = RenderReceipt.model_validate_json(
+        (tmp_path / reopened.render_state.render_receipt.path).read_bytes()
+    )
+    assert len(source_receipt.audio_bindings) == 1
+    assert source_receipt.audio_bindings[0].resolved_track_ids == tuple(
+        span.track_id for span in timeline.audio_spans
+    )
+    durable_timeline = ResolvedTimeline.model_validate_json(
+        (tmp_path / reopened.render_state.timeline.path).read_bytes()
+    )
+    assert tuple(
+        (item.start_sample, item.end_sample) for item in durable_timeline.caption_cues
+    ) == tuple((item.start_sample, item.end_sample) for item in timeline.caption_cues)
+    assert source_receipt.caption_bindings[0].resolved_cue_ids == tuple(
+        cue.segment_id for cue in timeline.caption_cues
+    )
+    assert render_receipt.measured.audio is not None
+    assert render_receipt.measured.audio.decoded_samples == timeline.total_samples
+    assert render_receipt.decoded_audio_fingerprint == DECODED_AUDIO_HASH
+    assert selection.selected_kinds == (RendererKind.HYPERFRAMES,)
+    assert list(tmp_path.rglob("manifest.json")) == [tmp_path / "state/manifest.json"]
+
+    calls_before_replay = (provider.generate_calls, len(runner.calls), runner_factories)
+    with pytest.raises(AiVideoError) as replay_error:
+        committer.generate_voice_asset(request, provider, authorization)
+    assert replay_error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    replayed = _render_with_hyperframes(
+        committer=committer,
+        begin_request=begin,
+        timeline=timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        runner_factory=runner_factory,
+        browser_path=browser,
+        ip_path=ip_path,
+        expected_version="0.7.103",
+        probe=lambda _fd: _render_probe(timeline),
+        decoded_frames=lambda _fd: "f" * 64,
+        decoded_audio=lambda _fd, _rate, _channels: (1, "f" * 64),
+    )
+    assert replayed == rendered
+    assert (
+        provider.generate_calls,
+        len(runner.calls),
+        runner_factories,
+    ) == calls_before_replay
+    assert network_calls == []
+    assert secret_lookups == []
+
+
+def test_p4_timeout_after_submit_intent_recovers_without_resubmit(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    before = _manifest(tmp_path)
+    request = project_factory.make_voice_request(
+        tmp_path, attempt_id="voice-timeout-e2e"
+    )
+    preview, authorization = project_factory.make_voice_preview_and_authorization(
+        request
+    )
+
+    class _TimeoutProvider:
+        calls = 0
+
+        def preview(self, candidate):
+            assert candidate == request
+            return preview
+
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_voice_submit_permit(
+                **_permit_binding(candidate, candidate_authorization)
+            )
+            self.calls += 1
+            raise TimeoutError("fixture submit timeout")
+
+    provider = _TimeoutProvider()
+    writer = ProductionStateCommitter(tmp_path)
+    with pytest.raises(TimeoutError, match="fixture submit timeout"):
+        writer.generate_voice_asset(request, provider, authorization)
+
+    unknown = _manifest(tmp_path)
+    attempt = unknown.attempts[-1]
+    assert provider.calls == 1
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.voice_phase == "provider_call"
+    assert unknown.active_project == before.active_project
+    assert unknown.active_registry == before.active_registry
+    assert unknown.active_render_state == before.active_render_state
+    paths = writer.voice_attempt_paths(request.attempt_id)
+    assert paths.request_path.is_file()
+    assert paths.preview_path.is_file()
+    assert paths.authorization_path.is_file()
+    assert paths.submit_intent_path.is_file()
+
+    report = recover_production_state(tmp_path)
+    recovered = _manifest(tmp_path)
+    assert report.manifest_revision_after == recovered.manifest_revision
+    assert provider.calls == 1
+    assert recovered.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert recovered.active_project == before.active_project
+    assert recovered.active_registry == before.active_registry
+    assert recovered.active_render_state == before.active_render_state
+    assert paths.submit_intent_path.read_bytes()
