@@ -20,6 +20,7 @@ from ai_video.production.models import (
     AudioKind,
     AudioTrackSpec,
     CaptionAssetMetadata,
+    CaptionStyleReference,
     CaptionStyleBindingContract,
     CaptionTrack,
     CaptionTrackBinding,
@@ -406,6 +407,17 @@ def _caption_style_binding_is_valid(
     return True
 
 
+def _caption_style_bytes_are_valid(
+    style: CaptionStyleReference,
+    data: bytes,
+) -> bool:
+    try:
+        caption_style_fingerprint(style, data)
+    except (AiVideoError, UnicodeError):
+        return False
+    return True
+
+
 def _load_caption_track(
     project: LoadedProductionProject,
     binding: CaptionTrackBinding,
@@ -489,7 +501,11 @@ def _load_caption_track(
         raise _caption_invalid(
             f"Caption binding {binding.binding_id} style bytes changed."
         )
-    caption_style_fingerprint(style, style_snapshot.data)
+    if not _caption_style_bytes_are_valid(style, style_snapshot.data):
+        raise _caption_invalid(
+            "Caption style bytes are invalid.",
+            "caption_style_bytes_validation_failed",
+        )
     if not track.segments:
         raise _caption_invalid(f"Caption binding {binding.binding_id} is empty.")
     return track

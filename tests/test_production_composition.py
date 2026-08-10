@@ -72,6 +72,11 @@ def _error_diagnostic_text(error: BaseException) -> str:
         collect(getattr(current, "cause", None))
         collect(current.__cause__)
         collect(current.__context__)
+        for value in vars(current).values():
+            if isinstance(value, BaseException):
+                collect(value)
+            else:
+                values.append(repr(value))
 
     collect(error)
     return "\n".join(values)
@@ -673,6 +678,46 @@ def test_caption_schema_and_style_validation_redact_raw_secret_inputs(tmp_path):
     )
     style_error = _assert_error(loaded, secret_spec, ErrorCode.CAPTION_TRACK_INVALID)
     assert secret not in _error_diagnostic_text(style_error)
+
+
+def test_caption_style_decode_failure_redacts_raw_bytes_and_exception_graph(tmp_path):
+    marker = "TOP_SECRET_STYLE_123"
+    style_bytes = b"TOP_SECRET_STYLE_123\xff"
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    binding = spec.caption_tracks[0]
+    assert binding.style_reference is not None
+    style_hash = hashlib.sha256(style_bytes).hexdigest()
+    style_path = tmp_path / "assets/styles" / f"{style_hash}.json"
+    style_path.write_bytes(style_bytes)
+    style = binding.style_reference.model_copy(
+        update={
+            "content_hash": style_hash,
+            "path": style_path.relative_to(tmp_path),
+        }
+    )
+    caption = loaded.registry.assets[-1]
+    assert caption.caption_metadata is not None
+    loaded = _replace_asset(
+        loaded,
+        -1,
+        caption_metadata=caption.caption_metadata.model_copy(
+            update={"style_content_hash": style_hash}
+        ),
+    )
+    spec = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "caption_tracks": (
+                    binding.model_copy(update={"style_reference": style}),
+                ),
+            }
+        )
+    )
+    error = _assert_error(loaded, spec, ErrorCode.CAPTION_TRACK_INVALID)
+    diagnostics = _error_diagnostic_text(error)
+    assert marker not in diagnostics
+    assert repr(style_bytes) not in diagnostics
 
 
 def test_caption_style_changes_composition_not_timing_fingerprint(tmp_path):
