@@ -1,0 +1,10 @@
+{
+  "characters": [
+    {"text": "H", "start": 0, "end": 0.1},
+    {"text": "i", "start": 0.1, "end": 0.2}
+  ],
+  "words": [
+    {"text": "Hi", "start": 0, "end": 0.2, "loss": 0.125}
+  ],
+  "loss": 0.125
+}
