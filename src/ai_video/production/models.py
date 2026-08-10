@@ -368,7 +368,7 @@ class AudioAssetMetadata(StrictModel):
     script_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     duration_samples: int = Field(strict=True, gt=0)
     sample_rate_hz: int = Field(strict=True, gt=0)
-    channels: Literal[1, 2]
+    channels: int = Field(strict=True, ge=1, le=2)
     channel_layout: AudioChannelLayout
     codec_name: str = Field(min_length=1)
     loudness: AudioLoudnessMetadata
@@ -550,6 +550,21 @@ class AssetRegistrySnapshot(StrictModel):
     revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     assets: tuple[AssetRecord, ...]
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p4_fields_in_20(cls, value: object) -> object:
+        if not isinstance(value, Mapping) or value.get("schema_version", "2.0") != "2.0":
+            return value
+        for asset in value.get("assets", ()):
+            if isinstance(asset, Mapping) and {
+                "audio_metadata",
+                "caption_metadata",
+            }.intersection(asset):
+                raise ValueError(
+                    "Asset Registry 2.0 cannot contain explicit P4 fields"
+                )
+        return value
 
     @model_validator(mode="after")
     def _validate_versioned_metadata(self) -> "AssetRegistrySnapshot":
@@ -777,6 +792,42 @@ class CaptionTrackBinding(StrictModel):
     style_reference: CaptionStyleReference | None = None
 
 
+class CaptionStyleBindingContract(StrictModel):
+    caption_track: CaptionTrack
+    caption_metadata: CaptionAssetMetadata
+    binding: CaptionTrackBinding
+
+    @model_validator(mode="after")
+    def _validate_three_way_style_identity(self) -> "CaptionStyleBindingContract":
+        if self.caption_track.caption_track_id != self.caption_metadata.caption_track_id:
+            raise ValueError("caption track and metadata identity must match")
+        track_style_id = self.caption_track.style_reference_id
+        metadata_style_id = self.caption_metadata.style_reference_id
+        metadata_style_hash = self.caption_metadata.style_content_hash
+        binding_style = self.binding.style_reference
+        if all(
+            value is None
+            for value in (
+                track_style_id,
+                metadata_style_id,
+                metadata_style_hash,
+                binding_style,
+            )
+        ):
+            return self
+        if (
+            track_style_id is None
+            or metadata_style_id is None
+            or metadata_style_hash is None
+            or binding_style is None
+            or track_style_id != metadata_style_id
+            or track_style_id != binding_style.artifact_id
+            or metadata_style_hash != binding_style.content_hash
+        ):
+            raise ValueError("caption style three-way identity must match exactly")
+        return self
+
+
 class CompositionLayerSpec(StrictModel):
     layer_id: str = Field(min_length=1)
     shot_id: str = Field(min_length=1)
@@ -807,6 +858,17 @@ class CompositionSpec(VersionedArtifact):
     requested_renderer: RendererKind = RendererKind.HYPERFRAMES
     audio_tracks: tuple[AudioTrackSpec, ...] = ()
     caption_tracks: tuple[CaptionTrackBinding, ...] = ()
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p4_fields_in_20(cls, value: object) -> object:
+        if (
+            isinstance(value, Mapping)
+            and value.get("schema_version", "2.0") == "2.0"
+            and {"audio_tracks", "caption_tracks"}.intersection(value)
+        ):
+            raise ValueError("CompositionSpec 2.0 cannot contain explicit P4 fields")
+        return value
 
     @model_validator(mode="after")
     def _validate_versioned_tracks(self) -> "CompositionSpec":
@@ -930,6 +992,17 @@ class ResolvedTimeline(VersionedArtifact):
     total_samples: int = Field(ge=0)
     composition_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p4_fields_in_20(cls, value: object) -> object:
+        if (
+            isinstance(value, Mapping)
+            and value.get("schema_version", "2.0") == "2.0"
+            and {"audio_spans", "caption_cues"}.intersection(value)
+        ):
+            raise ValueError("ResolvedTimeline 2.0 cannot contain explicit P4 fields")
+        return value
+
     @model_validator(mode="after")
     def _validate_versioned_resolved_tracks(self) -> "ResolvedTimeline":
         if self.schema_version == "2.0" and (self.audio_spans or self.caption_cues):
@@ -939,6 +1012,29 @@ class ResolvedTimeline(VersionedArtifact):
             for item in self.audio_spans
         ):
             raise ValueError("resolved audio span exceeds timeline")
+        track_ids = tuple(item.track_id for item in self.audio_spans)
+        span_identities = tuple(
+            (
+                item.asset_id,
+                item.start_sample,
+                item.duration_samples,
+                item.source_start_sample,
+                item.source_duration_samples,
+            )
+            for item in self.audio_spans
+        )
+        if len(track_ids) != len(set(track_ids)) or len(span_identities) != len(
+            set(span_identities)
+        ):
+            raise ValueError("resolved audio span identities must be unique")
+        canonical_audio_order = tuple(
+            sorted(
+                self.audio_spans,
+                key=lambda item: (item.start_sample, item.track_id, item.asset_id),
+            )
+        )
+        if self.audio_spans != canonical_audio_order:
+            raise ValueError("resolved audio spans must use canonical monotonic order")
         previous_end = 0
         for cue in self.caption_cues:
             if cue.start_sample < previous_end:
@@ -1005,9 +1101,25 @@ class RendererAudioBinding(StrictModel):
     ]
     materialized_path: Path
     sample_rate_hz: int = Field(strict=True, gt=0)
-    channels: Literal[1, 2]
+    channels: int = Field(strict=True, ge=1, le=2)
     duration_samples: int = Field(strict=True, gt=0)
     resolved_track_ids: tuple[str, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _validate_materialized_identity(self) -> "RendererAudioBinding":
+        suffix_by_mime = {
+            "audio/wav": ".wav",
+            "audio/mpeg": ".mp3",
+            "audio/mp4": ".m4a",
+            "audio/aac": ".aac",
+            "audio/flac": ".flac",
+        }
+        if (
+            self.materialized_path.stem != self.asset_sha256
+            or self.materialized_path.suffix != suffix_by_mime[self.asset_mime_type]
+        ):
+            raise ValueError("renderer audio MIME requires exact hash suffix mapping")
+        return self
 
 
 class RendererCaptionBinding(StrictModel):
@@ -1032,6 +1144,18 @@ class RendererCaptionBinding(StrictModel):
             value is not None for value in style_values
         ):
             raise ValueError("renderer caption style identity must be all-or-none")
+        if (
+            self.materialized_path.stem != self.caption_asset_sha256
+            or self.materialized_path.suffix != ".json"
+        ):
+            raise ValueError("renderer caption binding must point to hash-named JSON")
+        if self.style_materialized_path is not None:
+            assert self.style_content_hash is not None
+            if (
+                self.style_materialized_path.stem != self.style_content_hash
+                or self.style_materialized_path.suffix != ".json"
+            ):
+                raise ValueError("renderer caption style must point to hash-named JSON")
         return self
 
 
@@ -1098,6 +1222,19 @@ class RendererSourceReceipt(VersionedArtifact):
     caption_bindings: tuple[RendererCaptionBinding, ...] = ()
     checks: tuple[RendererCheckReceipt, RendererCheckReceipt]
 
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p4_fields_in_20(cls, value: object) -> object:
+        if (
+            isinstance(value, Mapping)
+            and value.get("schema_version", "2.0") == "2.0"
+            and {"audio_bindings", "caption_bindings"}.intersection(value)
+        ):
+            raise ValueError(
+                "RendererSourceReceipt 2.0 cannot contain explicit P4 fields"
+            )
+        return value
+
     @model_validator(mode="after")
     def _validate_source_identity(self) -> "RendererSourceReceipt":
         if self.source_sha256 != self.source_bundle.index.file_sha256:
@@ -1136,7 +1273,7 @@ class MeasuredAudioRenderMetadata(StrictModel):
     stream_count: int = Field(strict=True, ge=0)
     codec_name: str = Field(min_length=1)
     sample_rate_hz: int = Field(strict=True, gt=0)
-    channels: Literal[1, 2]
+    channels: int = Field(strict=True, ge=1, le=2)
     channel_layout: AudioChannelLayout
     decoded_samples: int = Field(strict=True, ge=0)
     encoder_priming_samples: int = Field(strict=True, ge=0)
@@ -1188,6 +1325,18 @@ class RenderReceipt(VersionedArtifact):
     decoded_audio_fingerprint: str | None = Field(
         default=None, pattern=r"^[0-9a-f]{64}$"
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p4_fields_in_20(cls, value: object) -> object:
+        if not isinstance(value, Mapping) or value.get("schema_version", "2.0") != "2.0":
+            return value
+        measured = value.get("measured")
+        if "decoded_audio_fingerprint" in value or (
+            isinstance(measured, Mapping) and "audio" in measured
+        ):
+            raise ValueError("RenderReceipt 2.0 cannot contain explicit P4 fields")
+        return value
 
     @field_validator("asset_hashes")
     @classmethod
@@ -1469,6 +1618,39 @@ class StateCommitAttempt(StrictModel):
                 raise ValueError("voice_generation attempts require voice request and phase")
             if self.voice_request.attempt_id != self.attempt_id:
                 raise ValueError("voice attempt identity does not match request")
+            all_voice_phases = {
+                "request",
+                "submit_intent",
+                "provider_call",
+                "materialize",
+                "probe",
+                "align",
+                "candidate",
+                "activate",
+            }
+            allowed_terminal_phases = {
+                StateCommitStatus.RUNNING: all_voice_phases,
+                StateCommitStatus.SUCCEEDED: {"activate"},
+                StateCommitStatus.FAILED: all_voice_phases,
+                StateCommitStatus.INTERRUPTED: {
+                    "request",
+                    "materialize",
+                    "probe",
+                    "align",
+                    "candidate",
+                },
+                StateCommitStatus.OUTCOME_UNKNOWN: {
+                    "submit_intent",
+                    "provider_call",
+                    "materialize",
+                    "probe",
+                    "align",
+                    "candidate",
+                    "activate",
+                },
+            }
+            if self.voice_phase not in allowed_terminal_phases[self.status]:
+                raise ValueError("voice attempt status and phase are inconsistent")
             if self.candidate_project not in (None, self.base_project):
                 raise ValueError("voice candidate project identity does not match")
             if self.voice_phase in {"candidate", "activate"}:
@@ -1545,6 +1727,28 @@ class ProductionManifest(StrictModel):
     active_registry: RegistrySnapshotPointer
     active_render_state: RenderStateSnapshotPointer | None = None
     attempts: tuple[StateCommitAttempt, ...] = ()
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_voice_fields_in_old_versions(cls, value: object) -> object:
+        if (
+            not isinstance(value, Mapping)
+            or value.get("schema_version", "2.0") == "2.2"
+        ):
+            return value
+        for attempt in value.get("attempts", ()):
+            if isinstance(attempt, Mapping) and {
+                "voice_request",
+                "voice_phase",
+                "provider_request_id",
+                "candidate_audio_asset_ids",
+                "candidate_caption_asset_ids",
+            }.intersection(attempt):
+                raise ValueError(
+                    f"Production Manifest {value.get('schema_version', '2.0')} "
+                    "cannot contain explicit P4 voice fields"
+                )
+        return value
 
     @model_validator(mode="after")
     def _validate_unique_attempt_ids(self) -> "ProductionManifest":

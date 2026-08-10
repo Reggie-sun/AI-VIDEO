@@ -23,6 +23,7 @@ from ai_video.production.models import (
     CaptionSegment,
     CaptionSegmentationPolicy,
     CaptionStyleReference,
+    CaptionStyleBindingContract,
     CaptionTrack,
     CaptionTrackBinding,
     CaptionWord,
@@ -57,6 +58,7 @@ from ai_video.production.models import (
     RenderStateSnapshotPointer,
     ResolvedTimeline,
     ResolvedDuckingSpec,
+    ResolvedAudioSpan,
     ResolvedVisualSpan,
     SourceReference,
     StateCommitAttempt,
@@ -675,6 +677,53 @@ def test_caption_style_identity_is_all_or_none_and_path_is_canonical():
         )
 
 
+def test_caption_style_binding_contract_requires_three_way_exact_identity():
+    track = make_caption_track()
+    metadata = make_caption_metadata()
+    style = CaptionStyleReference(
+        artifact_id="style-1",
+        revision=1,
+        content_hash=NINE_HASH,
+        path=Path(f"assets/styles/{NINE_HASH}.json"),
+    )
+    binding = CaptionTrackBinding(
+        binding_id="caption-binding-1",
+        caption_asset_id="caption-asset-1",
+        source_audio_track_id="dialogue-track-1",
+        shot_id="shot-1",
+        style_reference=style,
+    )
+    contract = CaptionStyleBindingContract(
+        caption_track=track,
+        caption_metadata=metadata,
+        binding=binding,
+    )
+    assert contract.binding.style_reference == style
+
+    with pytest.raises(ValidationError, match="three-way"):
+        CaptionStyleBindingContract(
+            caption_track=track.model_copy(update={"style_reference_id": "style-other"}),
+            caption_metadata=metadata,
+            binding=binding,
+        )
+
+    with pytest.raises(ValidationError, match="three-way"):
+        CaptionStyleBindingContract(
+            caption_track=track,
+            caption_metadata=metadata.model_copy(
+                update={"style_content_hash": EIGHT_HASH}
+            ),
+            binding=binding,
+        )
+
+    with pytest.raises(ValidationError, match="three-way"):
+        CaptionStyleBindingContract(
+            caption_track=make_caption_track(style_reference_id=None),
+            caption_metadata=make_caption_metadata(with_style=False),
+            binding=binding,
+        )
+
+
 def test_audio_track_and_resolved_ducking_use_integer_sample_policy():
     track = AudioTrackSpec(
         track_id="bgm-track-1",
@@ -747,6 +796,54 @@ def test_composition_and_timeline_versions_reject_p4_fields_in_20_and_omit_defau
     assert "audio_spans" not in timeline.model_dump(mode="json")
     assert "caption_cues" not in timeline.model_dump(mode="json")
 
+    explicit_empty_spec = spec.model_dump(mode="python")
+    explicit_empty_spec["audio_tracks"] = ()
+    with pytest.raises(ValidationError, match="explicit P4"):
+        CompositionSpec.model_validate(explicit_empty_spec)
+
+    explicit_empty_timeline = timeline.model_dump(mode="python")
+    explicit_empty_timeline["caption_cues"] = ()
+    with pytest.raises(ValidationError, match="explicit P4"):
+        ResolvedTimeline.model_validate(explicit_empty_timeline)
+
+
+def test_resolved_timeline_requires_canonical_unique_audio_span_order():
+    span_a = ResolvedAudioSpan(
+        track_id="a-track",
+        audio_kind="dialogue",
+        asset_id="voice-a",
+        asset_sha256=ONE_HASH,
+        start_sample=0,
+        duration_samples=48_000,
+        source_start_sample=0,
+        source_duration_samples=48_000,
+        gain_millidb=0,
+        fade_in_samples=0,
+        fade_out_samples=0,
+        ducking=None,
+    )
+    span_b = span_a.model_copy(
+        update={
+            "track_id": "b-track",
+            "asset_id": "voice-b",
+            "asset_sha256": TWO_HASH,
+            "start_sample": 48_000,
+        }
+    )
+    base = make_resolved_timeline().model_dump(mode="python")
+    base["schema_version"] = "2.1"
+    base["audio_spans"] = (span_a, span_b)
+    timeline = ResolvedTimeline.model_validate(base)
+    assert tuple(item.track_id for item in timeline.audio_spans) == ("a-track", "b-track")
+
+    base["audio_spans"] = (span_b, span_a)
+    with pytest.raises(ValidationError, match="canonical"):
+        ResolvedTimeline.model_validate(base)
+
+    base["audio_spans"] = (span_a, span_a)
+    with pytest.raises(ValidationError, match="unique"):
+        ResolvedTimeline.model_validate(base)
+
 
 def test_render_schema_21_seals_structured_audio_caption_and_measured_evidence():
     audio_binding = RendererAudioBinding(
@@ -798,6 +895,57 @@ def test_render_schema_21_seals_structured_audio_caption_and_measured_evidence()
     with pytest.raises(ValidationError, match="2.0"):
         RenderReceipt.model_validate(bad)
 
+    explicit_old = make_render_receipt().model_dump(mode="python")
+    explicit_old["decoded_audio_fingerprint"] = None
+    with pytest.raises(ValidationError, match="explicit P4"):
+        RenderReceipt.model_validate(explicit_old)
+
+
+def test_renderer_bindings_require_mime_hash_and_exact_suffix_mapping():
+    audio = {
+        "asset_id": "voice-1",
+        "asset_sha256": ONE_HASH,
+        "asset_mime_type": "audio/wav",
+        "materialized_path": Path(
+            f"state/render/sources/{SIX_HASH}/assets/{ONE_HASH}.json"
+        ),
+        "sample_rate_hz": 48_000,
+        "channels": 1,
+        "duration_samples": 96_000,
+        "resolved_track_ids": ("dialogue-track-1",),
+    }
+    with pytest.raises(ValidationError, match="suffix"):
+        RendererAudioBinding.model_validate(audio)
+
+    caption = {
+        "caption_track_id": "caption-track-1",
+        "caption_asset_sha256": TWO_HASH,
+        "materialized_path": Path(
+            f"state/render/sources/{SIX_HASH}/assets/{TWO_HASH}.wav"
+        ),
+        "style_reference_id": None,
+        "style_content_hash": None,
+        "style_materialized_path": None,
+        "resolved_cue_ids": ("segment-1",),
+    }
+    with pytest.raises(ValidationError, match="JSON"):
+        RendererCaptionBinding.model_validate(caption)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("channels", True),
+        ("sample_rate_hz", True),
+        ("duration_samples", True),
+    ],
+)
+def test_audio_measured_integer_fields_reject_bool(field, value):
+    data = make_audio_metadata().model_dump(mode="python")
+    data[field] = value
+    with pytest.raises(ValidationError):
+        AudioAssetMetadata.model_validate(data)
+
 
 def test_source_bundle_accepts_only_hash_named_p4_suffixes_and_exact_bindings():
     root = Path(f"state/render/sources/{SIX_HASH}")
@@ -826,6 +974,20 @@ def test_source_bundle_accepts_only_hash_named_p4_suffixes_and_exact_bindings():
     data["assets"][0]["path"] = root / "assets" / f"{ONE_HASH}.exe"
     with pytest.raises(ValidationError, match="hash"):
         RenderSourceBundlePointer.model_validate(data)
+
+    explicit_old_receipt = make_source_receipt().model_dump(mode="python")
+    explicit_old_receipt["audio_bindings"] = ()
+    with pytest.raises(ValidationError, match="explicit P4"):
+        RendererSourceReceipt.model_validate(explicit_old_receipt)
+
+
+def test_old_silent_source_and_render_receipt_hashes_are_unchanged():
+    assert canonical_sha256(make_source_receipt().model_dump(mode="json")) == (
+        "ff00cc8d68a86d6bf4a289de2c1a0496dce6204561f25a9aafe633e0ccc6d788"
+    )
+    assert canonical_sha256(make_render_receipt().model_dump(mode="json")) == (
+        "24ff05848dbe2046e15c7bd6b4474d093a8ff17f2d2a4ee34f100ecd17ca3199"
+    )
 
 
 def test_voice_attempt_fields_are_manifest_22_only_and_serializer_compatible():
@@ -878,6 +1040,51 @@ def test_voice_attempt_fields_are_manifest_22_only_and_serializer_compatible():
         "candidate_audio_asset_ids",
         "candidate_caption_asset_ids",
     }.intersection(old_attempt.model_dump(mode="json"))
+
+
+@pytest.mark.parametrize(
+    ("status", "phase"),
+    [
+        (StateCommitStatus.SUCCEEDED, "request"),
+        (StateCommitStatus.OUTCOME_UNKNOWN, "request"),
+        (StateCommitStatus.INTERRUPTED, "submit_intent"),
+        (StateCommitStatus.INTERRUPTED, "provider_call"),
+    ],
+)
+def test_voice_attempt_terminal_status_requires_plan_consistent_phase(status, phase):
+    data = make_state_manifest(schema_version="2.2").model_dump(mode="python")
+    request = VoiceRequestReceipt(
+        request_id="request-1",
+        attempt_id="attempt-voice-1",
+        request_fingerprint=ONE_HASH,
+        script_hash=TWO_HASH,
+        provider_kind="fake",
+        model_id="fake-v1",
+        voice_id="voice-1",
+        language="en",
+        pricing_snapshot_id="pricing-1",
+        budget_reservation_receipt_id="budget-1",
+        egress_authorization_receipt_id="egress-1",
+        destination="https://api.elevenlabs.io",
+    )
+    attempt = {
+        "attempt_id": "attempt-voice-1",
+        "operation": "voice_generation",
+        "status": status,
+        "base_manifest_revision": 1,
+        "base_project": make_project_pointer(),
+        "base_registry": make_registry_pointer(),
+        "candidate_artifacts_hash": ZERO_HASH,
+        "voice_request": request,
+        "voice_phase": phase,
+        "started_at": "2026-08-10T00:00:00+00:00",
+        "finished_at": "2026-08-10T00:00:01+00:00",
+        "error_code": None if status is StateCommitStatus.SUCCEEDED else "typed",
+        "error_message": None if status is StateCommitStatus.SUCCEEDED else "safe",
+    }
+    data["attempts"] = (attempt,)
+    with pytest.raises(ValidationError, match="phase"):
+        ProductionManifest.model_validate(data)
 
 
 @pytest.mark.parametrize(
