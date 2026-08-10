@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from decimal import Decimal, ROUND_CEILING, ROUND_FLOOR
+from decimal import Decimal, ROUND_CEILING
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -19,6 +19,7 @@ from ai_video.production.models import (
     AssetType,
     AudioKind,
     AudioTrackSpec,
+    CaptionAssetMetadata,
     CaptionStyleBindingContract,
     CaptionTrack,
     CaptionTrackBinding,
@@ -79,11 +80,7 @@ def _frames_for_fixed_seconds(seconds: float, fps: int) -> int:
 
 
 def _sample_at_frame(frame: int, *, fps: int, sample_rate: int) -> int:
-    return int(
-        (Decimal(frame) * Decimal(sample_rate) / Decimal(fps)).to_integral_value(
-            rounding=ROUND_FLOOR
-        )
-    )
+    return frame * sample_rate // fps
 
 
 def _floor_frame_at_sample(sample: int, *, fps: int, sample_rate: int) -> int:
@@ -386,6 +383,29 @@ def _resolve_audio_spans(
     )
 
 
+def _parse_caption_track(data: bytes) -> CaptionTrack | None:
+    try:
+        return CaptionTrack.model_validate_json(data)
+    except ValidationError:
+        return None
+
+
+def _caption_style_binding_is_valid(
+    track: CaptionTrack,
+    metadata: CaptionAssetMetadata,
+    binding: CaptionTrackBinding,
+) -> bool:
+    try:
+        CaptionStyleBindingContract(
+            caption_track=track,
+            caption_metadata=metadata,
+            binding=binding,
+        )
+    except ValidationError:
+        return False
+    return True
+
+
 def _load_caption_track(
     project: LoadedProductionProject,
     binding: CaptionTrackBinding,
@@ -400,12 +420,12 @@ def _load_caption_track(
             f"Caption asset {asset.asset_id} must use application/json."
         )
     snapshot = _verified_registry_asset(project, asset, invalid=_caption_invalid)
-    try:
-        track = CaptionTrack.model_validate_json(snapshot.data)
-    except ValidationError as exc:
+    track = _parse_caption_track(snapshot.data)
+    if track is None:
         raise _caption_invalid(
-            f"Caption asset {asset.asset_id} is not a canonical CaptionTrack.", str(exc)
-        ) from exc
+            "Caption asset is not a canonical CaptionTrack.",
+            "caption_schema_validation_failed",
+        )
     if snapshot.data != _canonical_track_bytes(track):
         raise _caption_invalid(
             f"Caption asset {asset.asset_id} bytes are not canonical."
@@ -448,17 +468,11 @@ def _load_caption_track(
         raise _caption_invalid(
             f"Caption asset {asset.asset_id} identity or timing fingerprint does not match."
         )
-    try:
-        CaptionStyleBindingContract(
-            caption_track=track,
-            caption_metadata=metadata,
-            binding=binding,
-        )
-    except ValidationError as exc:
+    if not _caption_style_binding_is_valid(track, metadata, binding):
         raise _caption_invalid(
-            f"Caption binding {binding.binding_id} style identity does not match.",
-            str(exc),
-        ) from exc
+            "Caption style identity does not match.",
+            "caption_style_identity_validation_failed",
+        )
     style = binding.style_reference
     if style is None:
         raise _caption_invalid(f"Caption binding {binding.binding_id} requires style.")

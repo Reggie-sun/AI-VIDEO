@@ -9,7 +9,7 @@ import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.captions import CaptionImportRequest, caption_timing_fingerprint
-from ai_video.production.composition import resolve_composition
+from ai_video.production.composition import _sample_at_frame, resolve_composition
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import (
     AudioKind,
@@ -56,6 +56,25 @@ def _assert_error(project, spec, code: ErrorCode) -> AiVideoError:
     assert caught.value.code is code
     assert caught.value.retryable is False
     return caught.value
+
+
+def _error_diagnostic_text(error: BaseException) -> str:
+    seen: set[int] = set()
+    values: list[str] = []
+
+    def collect(current: BaseException | None) -> None:
+        if current is None or id(current) in seen:
+            return
+        seen.add(id(current))
+        values.extend((str(current), repr(current)))
+        values.append(str(getattr(current, "technical_detail", None)))
+        values.append(str(getattr(current, "user_message", None)))
+        collect(getattr(current, "cause", None))
+        collect(current.__cause__)
+        collect(current.__context__)
+
+    collect(error)
+    return "\n".join(values)
 
 
 def _replace_shot(project, index: int, **changes):
@@ -180,6 +199,21 @@ def test_cut_keeps_integer_frame_and_sample_boundaries(tmp_path):
     assert timeline.visual_spans[1].start_sample == 96_000
     assert timeline.total_frames == 96
     assert timeline.total_samples == 192_000
+
+
+@pytest.mark.parametrize(
+    ("frame", "fps", "sample_rate", "expected"),
+    [
+        (0, 24, 48_000, 0),
+        (1, 24, 48_000, 2_000),
+        (25, 24, 48_000, 50_000),
+        (10**28 + 1, 24, 48_000, (10**28 + 1) * 2_000),
+    ],
+)
+def test_sample_at_frame_uses_exact_integer_rational_floor(
+    frame, fps, sample_rate, expected
+):
+    assert _sample_at_frame(frame, fps=fps, sample_rate=sample_rate) == expected
 
 
 def test_p4_resolves_all_audio_kinds_and_captions_in_one_timeline(tmp_path):
@@ -568,7 +602,9 @@ def test_caption_binding_rejects_unknown_type_hash_source_and_style_mismatch(tmp
     )
 
 
-@pytest.mark.parametrize("mutation", ["mime", "pretty", "reordered", "malformed"])
+@pytest.mark.parametrize(
+    "mutation", ["mime", "pretty", "reordered", "malformed", "nfd"]
+)
 def test_caption_asset_requires_json_mime_and_exact_canonical_bytes(tmp_path, mutation):
     loaded, spec = make_p4_composition_fixture(tmp_path)
     caption = loaded.registry.assets[-1]
@@ -584,8 +620,13 @@ def test_caption_asset_requires_json_mime_and_exact_canonical_bytes(tmp_path, mu
             payload = json.dumps(
                 dict(reversed(tuple(parsed.items()))), separators=(",", ":")
             ).encode("utf-8")
-        else:
+        elif mutation == "malformed":
             payload = b"{malformed"
+        else:
+            parsed["segments"][0]["text"] = "Cafe\u0301"
+            payload = json.dumps(parsed, separators=(",", ":"), sort_keys=True).encode(
+                "utf-8"
+            )
         path.write_bytes(payload)
         loaded = _replace_asset(
             loaded,
@@ -594,6 +635,44 @@ def test_caption_asset_requires_json_mime_and_exact_canonical_bytes(tmp_path, mu
             size_bytes=len(payload),
         )
     _assert_error(loaded, spec, ErrorCode.CAPTION_TRACK_INVALID)
+
+
+def test_caption_schema_and_style_validation_redact_raw_secret_inputs(tmp_path):
+    secret = "TOP_SECRET_DIALOGUE"
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    caption = loaded.registry.assets[-1]
+    path = loaded.asset_paths[caption.asset_id]
+    payload = json.loads(path.read_bytes())
+    payload["segments"][0]["start_sample"] = secret
+    encoded = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    path.write_bytes(encoded)
+    malformed_loaded = _replace_asset(
+        loaded,
+        -1,
+        sha256=hashlib.sha256(encoded).hexdigest(),
+        size_bytes=len(encoded),
+    )
+    malformed_error = _assert_error(
+        malformed_loaded, spec, ErrorCode.CAPTION_TRACK_INVALID
+    )
+    assert secret not in _error_diagnostic_text(malformed_error)
+
+    loaded, spec = make_p4_composition_fixture(tmp_path / "style")
+    binding = spec.caption_tracks[0]
+    assert binding.style_reference is not None
+    secret_style = binding.style_reference.model_copy(update={"artifact_id": secret})
+    secret_spec = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "caption_tracks": (
+                    binding.model_copy(update={"style_reference": secret_style}),
+                ),
+            }
+        )
+    )
+    style_error = _assert_error(loaded, secret_spec, ErrorCode.CAPTION_TRACK_INVALID)
+    assert secret not in _error_diagnostic_text(style_error)
 
 
 def test_caption_style_changes_composition_not_timing_fingerprint(tmp_path):

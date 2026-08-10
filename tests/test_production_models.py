@@ -714,6 +714,23 @@ def test_caption_track_enforces_monotonic_segments_and_word_containment():
         CaptionTrack.model_validate(data)
 
 
+@pytest.mark.parametrize(
+    "model",
+    [
+        lambda: CaptionWord(text="Cafe\u0301", start_sample=0, end_sample=1),
+        lambda: CaptionSegment(
+            segment_id="segment-nfd",
+            text="Cafe\u0301",
+            start_sample=0,
+            end_sample=1,
+        ),
+    ],
+)
+def test_caption_text_identity_requires_nfc(model):
+    with pytest.raises(ValidationError, match="NFC"):
+        model()
+
+
 def test_caption_style_identity_is_all_or_none_and_path_is_canonical():
     metadata = make_caption_metadata()
     assert metadata.style_reference_id == "style-1"

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import unicodedata
 from collections.abc import Mapping
 from decimal import Decimal
 from enum import Enum
@@ -736,6 +737,13 @@ class CaptionWord(StrictModel):
     speaker_id: str | None = None
     confidence_milli: int | None = Field(default=None, strict=True, ge=0, le=1000)
 
+    @field_validator("text")
+    @classmethod
+    def _require_nfc_text(cls, value: str) -> str:
+        if not unicodedata.is_normalized("NFC", value):
+            raise ValueError("caption word text must use NFC normalization")
+        return value
+
     @model_validator(mode="after")
     def _validate_bounds(self) -> "CaptionWord":
         if self.end_sample <= self.start_sample:
@@ -751,6 +759,13 @@ class CaptionSegment(StrictModel):
     speaker_id: str | None = None
     words: tuple[CaptionWord, ...] | None = None
     confidence_milli: int | None = Field(default=None, strict=True, ge=0, le=1000)
+
+    @field_validator("text")
+    @classmethod
+    def _require_nfc_text(cls, value: str) -> str:
+        if not unicodedata.is_normalized("NFC", value):
+            raise ValueError("caption segment text must use NFC normalization")
+        return value
 
     @model_validator(mode="after")
     def _validate_bounds_and_words(self) -> "CaptionSegment":

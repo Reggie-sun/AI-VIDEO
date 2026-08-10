@@ -511,6 +511,16 @@ def test_policy_version_changes_timing_fingerprint_but_style_does_not():
     assert plain.timing_fingerprint == caption_timing_fingerprint(plain)
     assert styled.timing_fingerprint == plain.timing_fingerprint
     assert revised.timing_fingerprint != plain.timing_fingerprint
+    assert plain.segments[0].text == "Caf\u00e9."
+
+
+def test_caption_import_request_rejects_nfd_sealed_text_identity():
+    track = _track(style_reference_id=None)
+    request = CaptionImportRequest.create(caption_track=track)
+    payload = request.model_dump(mode="python")
+    payload["caption_track"]["segments"][0]["text"] = "Cafe\u0301"
+    with pytest.raises(ValidationError, match="NFC"):
+        CaptionImportRequest.model_validate(payload)
 
 
 def test_caption_style_fingerprint_covers_reference_and_consumed_schema():
