@@ -1499,6 +1499,48 @@ def test_begin_render_attempt_migrates_20_and_exact_replay_is_idempotent(
     assert begun.active_render_state is None
 
 
+def test_begin_render_attempt_preserves_22_manifest_with_succeeded_voice(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path, attempt_id="voice-before-render")
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    committer = ProductionStateCommitter(tmp_path)
+    committer.begin_voice_generation(request, preview, authorization)
+    committer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        tmp_path,
+        request,
+        authorization,
+        expected_manifest_revision=3,
+        include_caption=True,
+    )
+    voice_manifest = committer.activate_voice_assets(
+        activation,
+        audio_asset_ids=audio_ids,
+        caption_asset_ids=("caption-voice-before-render",),
+    )
+    assert voice_manifest.schema_version == "2.2"
+    assert voice_manifest.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+    begun = committer.begin_render_attempt(
+        BeginRenderAttemptRequest(
+            voice_manifest.manifest_revision,
+            voice_manifest.active_render_state,
+            _render_selection(voice_manifest, attempt_id="render-after-voice"),
+        )
+    )
+
+    assert begun.schema_version == "2.2"
+    assert begun.attempts[-2].operation == "voice_generation"
+    assert begun.attempts[-2].candidate_audio_asset_ids == audio_ids
+    assert begun.attempts[-2].candidate_caption_asset_ids == (
+        "caption-voice-before-render",
+    )
+    assert begun.attempts[-1].operation == "render_state"
+    assert begun.attempts[-1].status is StateCommitStatus.RUNNING
+
+
 def test_record_render_failure_is_terminal_r2_and_exact_replay_is_idempotent(
     committed_project: Path,
 ) -> None:

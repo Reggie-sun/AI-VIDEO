@@ -2057,7 +2057,11 @@ class ProductionStateCommitter:
             begun = _validated_transition(
                 manifest,
                 {
-                    "schema_version": "2.1",
+                    "schema_version": (
+                        "2.1"
+                        if manifest.schema_version == "2.0"
+                        else manifest.schema_version
+                    ),
                     "manifest_revision": manifest.manifest_revision + 1,
                     "attempts": manifest.attempts + (attempt,),
                 },
