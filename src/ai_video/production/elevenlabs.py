@@ -723,6 +723,12 @@ class ElevenLabsVoiceProvider:
                 authorization.egress_authorization_receipt_id
             ),
             license_policy_decision=self._policy.license_policy_decision,
+            policy_receipt_id=self._policy.policy_receipt_id,
+            retention_mode=(
+                "provider_standard"
+                if self._policy.enable_logging
+                else "zero_retention"
+            ),
             provider_request_id=provider_request_id,
             provider_trace_id=provider_trace_id,
         )

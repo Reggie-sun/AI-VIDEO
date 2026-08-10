@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 import yaml
+from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import seal_artifact, verify_artifact_hash
@@ -165,7 +167,8 @@ def test_voice_submit_intent_rejects_replaced_r1_evidence_before_permit(
     after = ProductionManifest.model_validate_json(
         (tmp_path / "state/manifest.json").read_bytes()
     )
-    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    if isinstance(exc_info.value, AiVideoError):
+        assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
     assert after == r1
     assert after.attempts[-1].voice_phase == "request"
 
@@ -415,6 +418,157 @@ def test_voice_r3_r4_activation_selects_exact_registry_and_clears_render(
     assert writer.activate_voice_assets(activation, audio_asset_ids=audio_ids) == r4
 
 
+def test_generated_voice_caption_is_exactly_bound_and_activated(tmp_path: Path) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        tmp_path,
+        request,
+        authorization,
+        expected_manifest_revision=3,
+        include_caption=True,
+    )
+    caption_ids = (f"caption-{request.attempt_id}",)
+
+    committed = writer.activate_voice_assets(
+        activation,
+        audio_asset_ids=audio_ids,
+        caption_asset_ids=caption_ids,
+    )
+
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / committed.active_registry.path).read_bytes()
+    )
+    audio = next(item for item in registry.assets if item.asset_id == audio_ids[0])
+    caption = next(item for item in registry.assets if item.asset_id == caption_ids[0])
+    assert audio.egress.retention_mode == "provider_standard"
+    assert audio.egress.provider_policy_snapshot_id == "fixture-policy-receipt"
+    assert caption.caption_metadata is not None
+    assert caption.caption_metadata.alignment_receipt_id == (
+        audio.audio_metadata.alignment_receipt_id
+    )
+
+
+@pytest.mark.parametrize(
+    ("caption_updates", "corrupt_timing"),
+    (
+        ({"source_audio_asset_id": "wrong-audio"}, False),
+        ({"source_audio_sha256": "f" * 64}, False),
+        ({"script_hash": "f" * 64}, False),
+        ({"transcript_hash": "f" * 64}, False),
+        ({"alignment_receipt_id": "alignment-forged"}, False),
+        ({"creation_receipt_id": "caption-receipt-forged"}, False),
+        ({}, True),
+    ),
+)
+def test_generated_voice_caption_rejects_unbound_identity_before_write(
+    tmp_path: Path,
+    caption_updates: dict[str, object],
+    corrupt_timing: bool,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    before = (tmp_path / "state/manifest.json").read_bytes()
+    request = project_factory.make_voice_request(tmp_path)
+    _, authorization = project_factory.make_voice_preview_and_authorization(request)
+
+    expected_error = (AiVideoError, ValidationError) if corrupt_timing else AiVideoError
+    with pytest.raises(expected_error) as exc_info:
+        project_factory.make_voice_activation_request(
+            tmp_path,
+            request,
+            authorization,
+            expected_manifest_revision=3,
+            include_caption=True,
+            caption_updates=caption_updates,
+            corrupt_caption_timing=corrupt_timing,
+        )
+
+    if isinstance(exc_info.value, AiVideoError):
+        assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert (tmp_path / "state/manifest.json").read_bytes() == before
+
+
+@pytest.mark.parametrize(
+    ("retention_mode", "policy_receipt_id"),
+    (("provider_standard", "fixture-policy-receipt"), ("zero_retention", "zrm-policy-receipt")),
+)
+def test_voice_registry_persists_actual_policy_and_retention(
+    tmp_path: Path, retention_mode: str, policy_receipt_id: str
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        tmp_path,
+        request,
+        authorization,
+        expected_manifest_revision=3,
+        retention_mode=retention_mode,
+        policy_receipt_id=policy_receipt_id,
+    )
+    committed = writer.activate_voice_assets(activation, audio_asset_ids=audio_ids)
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / committed.active_registry.path).read_bytes()
+    )
+    record = next(item for item in registry.assets if item.asset_id == audio_ids[0])
+    assert record.egress.retention_mode == retention_mode
+    assert record.egress.provider_policy_snapshot_id == policy_receipt_id
+
+
+@pytest.mark.parametrize("field", ("policy_receipt_id", "retention_mode"))
+def test_voice_activation_rejects_forged_provider_policy_evidence_zero_activation(
+    tmp_path: Path, field: str
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        tmp_path, request, authorization, expected_manifest_revision=3
+    )
+    provenance_path = writer.voice_attempt_paths(request.attempt_id).provenance_path.relative_to(
+        tmp_path
+    )
+    artifacts = []
+    for artifact in activation.artifacts:
+        if artifact.relative_path != provenance_path:
+            artifacts.append(artifact)
+            continue
+        payload = json.loads(artifact.payload)
+        payload[field] = (
+            "forged-policy-receipt" if field == "policy_receipt_id" else "zero_retention"
+        )
+        encoded = (json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n").encode()
+        artifacts.append(
+            PreparedArtifact(provenance_path, encoded, hashlib.sha256(encoded).hexdigest())
+        )
+    forged = StateCommitRequest(
+        attempt_id=activation.attempt_id,
+        operation=activation.operation,
+        expected_manifest_revision=activation.expected_manifest_revision,
+        artifacts=tuple(artifacts),
+        next_project=activation.next_project,
+        next_registry=activation.next_registry,
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.activate_voice_assets(forged, audio_asset_ids=audio_ids)
+
+    after = ProductionManifest.model_validate_json((tmp_path / "state/manifest.json").read_bytes())
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert after.active_registry == request.base_registry
+    assert after.attempts[-1].voice_phase == "submit_intent"
+
+
 def test_voice_activation_rejects_asset_id_not_in_exact_candidate_registry(
     tmp_path: Path,
 ) -> None:
@@ -434,6 +588,56 @@ def test_voice_activation_rejects_asset_id_not_in_exact_candidate_registry(
         )
 
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+@pytest.mark.parametrize("replay_state", ("candidate", "succeeded"))
+def test_voice_replay_reconstructs_current_durable_graph_before_activation(
+    tmp_path: Path, replay_state: str
+) -> None:
+    class _CrashAfterCandidate:
+        def checkpoint(self, phase: CommitPhase) -> None:
+            if phase is CommitPhase.AFTER_VOICE_CANDIDATE_MANIFEST:
+                raise RuntimeError("stop at durable candidate")
+
+    project_factory.write_production_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        tmp_path, request, authorization, expected_manifest_revision=3
+    )
+    if replay_state == "candidate":
+        with pytest.raises(RuntimeError, match="durable candidate"):
+            ProductionStateCommitter(
+                tmp_path, crash_injector=_CrashAfterCandidate()
+            ).activate_voice_assets(activation, audio_asset_ids=audio_ids)
+    else:
+        writer.activate_voice_assets(activation, audio_asset_ids=audio_ids)
+    writer.voice_attempt_paths(request.attempt_id).outcome_path.write_bytes(b"tampered")
+    manifest_before_replay = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).activate_voice_assets(
+            activation, audio_asset_ids=audio_ids
+        )
+
+    after = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert after == manifest_before_replay
+    if replay_state == "candidate":
+        assert (after.active_project, after.active_registry) == (
+            before.active_project,
+            before.active_registry,
+        )
 
 
 def test_generate_voice_asset_is_only_transport_path_and_calls_provider_once(

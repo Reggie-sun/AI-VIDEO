@@ -134,7 +134,15 @@ def make_voice_preview_and_authorization(request):
     return preview, authorization
 
 
-def make_voice_provider_result(request, preview, authorization, *, audio_bytes: bytes | None = None):
+def make_voice_provider_result(
+    request,
+    preview,
+    authorization,
+    *,
+    audio_bytes: bytes | None = None,
+    policy_receipt_id: str = "fixture-policy-receipt",
+    retention_mode: str = "provider_standard",
+):
     from ai_video.production.audio import (
         VoiceCostReceipt,
         VoicePricingSnapshot,
@@ -187,6 +195,8 @@ def make_voice_provider_result(request, preview, authorization, *, audio_bytes: 
         adapter=ToolIdentity(name="fake-provider", version="1"),
         egress_authorization_receipt_id=request.egress_authorization_receipt_id,
         license_policy_decision="fixture-only",
+        policy_receipt_id=policy_receipt_id,
+        retention_mode=retention_mode,
         provider_request_id=provider_request_id,
         provider_trace_id="fixture-provider-trace",
     )
@@ -212,6 +222,11 @@ def make_voice_activation_request(
     authorization,
     *,
     expected_manifest_revision: int,
+    include_caption: bool = False,
+    caption_updates: dict[str, object] | None = None,
+    corrupt_caption_timing: bool = False,
+    policy_receipt_id: str = "fixture-policy-receipt",
+    retention_mode: str = "provider_standard",
 ):
     from ai_video.production.audio import AudioProbeResult, PreparedAudioImport
     from ai_video.production.state_commit import (
@@ -270,7 +285,14 @@ def make_voice_activation_request(
         ),
     )
     preview, _ = make_voice_preview_and_authorization(request)
-    result = make_voice_provider_result(request, preview, authorization, audio_bytes=payload)
+    result = make_voice_provider_result(
+        request,
+        preview,
+        authorization,
+        audio_bytes=payload,
+        policy_receipt_id=policy_receipt_id,
+        retention_mode=retention_mode,
+    )
     probe = AudioProbeResult(
         mime_type="audio/wav",
         container_name="wav",
@@ -290,8 +312,89 @@ def make_voice_activation_request(
         ffprobe=ToolIdentity(name="ffprobe", version="fixture"),
         content_fingerprint=digest,
     )
+    prepared_caption = None
+    caption_record = None
+    if include_caption:
+        alignment_id = f"alignment-{result.alignment_receipt_sha256}"
+        track = CaptionTrack(
+            artifact_id=f"caption-track-{request.attempt_id}",
+            schema_version="2.1",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id=f"caption-result-{result.result_fingerprint}",
+            source_provenance=(
+                SourceReference(kind="derived", reference=alignment_id),
+            ),
+            caption_track_id=f"caption-track-{request.attempt_id}",
+            language=request.language,
+            script_hash=request.script_hash,
+            transcript_hash=request.script_hash,
+            source_audio_asset_id=audio_id,
+            source_audio_sha256=result.audio_sha256,
+            source_sample_rate_hz=request.output_sample_rate_hz,
+            segments=(
+                CaptionSegment(
+                    segment_id="segment-0001",
+                    text=request.script_text,
+                    start_sample=0,
+                    end_sample=duration_samples,
+                    speaker_id=request.speaker_id,
+                ),
+            ),
+            segmentation_policy=CaptionSegmentationPolicy(
+                policy_id="generated-fixture",
+                policy_version="1",
+                max_characters=80,
+                max_lines=2,
+                break_strategy="provider_segments",
+            ),
+            alignment_provider=request.provider_kind,
+            alignment_model=request.model_id,
+            alignment_receipt_id=alignment_id,
+            timing_fingerprint=ZERO_HASH,
+        )
+        if caption_updates:
+            track = track.model_copy(update=caption_updates)
+        track = track.model_copy(
+            update={"timing_fingerprint": caption_timing_fingerprint(track)}
+        )
+        if corrupt_caption_timing:
+            track = track.model_copy(update={"timing_fingerprint": "f" * 64})
+        track = CaptionTrack.model_validate(seal_artifact(track).model_dump(mode="python"))
+        prepared_caption = CaptionImportRequest.create(caption_track=track).prepare()
+        caption_id = f"caption-{request.attempt_id}"
+        caption_record = AssetRecord(
+            asset_id=caption_id,
+            asset_type=AssetType.CAPTION,
+            artifact_path=Path(f"assets/captions/{prepared_caption.track_sha256}.json"),
+            sha256=prepared_caption.track_sha256,
+            size_bytes=len(prepared_caption.track_bytes),
+            mime_type="application/json",
+            source_kind=AssetSourceKind.DERIVED,
+            tool=result.provenance_receipt.adapter,
+            input_artifact_ids=(audio_id,),
+            input_fingerprint=result.audio_sha256,
+            creation_receipt_id=track.creation_receipt_id,
+            usage_license=result.provenance_receipt.license_policy_decision,
+            caption_metadata=CaptionAssetMetadata(
+                caption_track_id=track.caption_track_id,
+                language=track.language,
+                source_audio_asset_id=audio_id,
+                source_audio_sha256=result.audio_sha256,
+                script_hash=track.script_hash,
+                transcript_hash=track.transcript_hash,
+                segment_count=1,
+                word_count=0,
+                segmentation_policy_id=track.segmentation_policy.policy_id,
+                segmentation_policy_version=track.segmentation_policy.policy_version,
+                alignment_receipt_id=track.alignment_receipt_id,
+                timing_fingerprint=track.timing_fingerprint,
+            ),
+        )
     prepared = PreparedVoiceCandidate(
-        audio=PreparedAudioImport(payload=payload, probe=probe, asset_record=record)
+        audio=PreparedAudioImport(payload=payload, probe=probe, asset_record=record),
+        caption=prepared_caption,
+        caption_asset_record=caption_record,
     )
     commit, audio_ids, _ = ProductionStateCommitter(root)._prepare_voice_activation_request(
         request, preview, authorization, result, prepared
@@ -1068,7 +1171,10 @@ def load_initial_models(root: Path) -> tuple[ProductionProject, AssetRegistrySna
 
 
 def make_audio_import_upgrade_request(
-    root: Path, *, attempt_id: str = "audio-import-version-upgrade"
+    root: Path,
+    *,
+    attempt_id: str = "audio-import-version-upgrade",
+    include_assets: bool = False,
 ):
     from ai_video.production.state_commit import (
         PreparedArtifact,
@@ -1079,11 +1185,158 @@ def make_audio_import_upgrade_request(
         (root / "state/manifest.json").read_bytes()
     )
     project, registry = load_initial_models(root)
+    if not include_assets:
+        upgraded = AssetRegistrySnapshot(
+            schema_version="2.1",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=registry.assets,
+        )
+        revision = registry_semantic_sha256(upgraded)
+        upgraded = upgraded.model_copy(
+            update={"revision_id": revision, "content_hash": revision}
+        )
+        return prepare_audio_registry_commit(
+            manifest=manifest,
+            project=project,
+            base_registry=registry,
+            registry=upgraded,
+            attempt_id=attempt_id,
+            artifacts=(),
+            active_project_artifact=PreparedArtifact(
+                manifest.active_project.path,
+                (root / manifest.active_project.path).read_bytes(),
+                manifest.active_project.file_sha256,
+            ),
+        )
+    audio_bytes = (
+        Path(__file__).parent / "fixtures/voice_captions/dialogue-mono-48000.wav"
+    ).read_bytes()
+    audio_hash = hashlib.sha256(audio_bytes).hexdigest()
+    with wave.open(io.BytesIO(audio_bytes), "rb") as handle:
+        duration_samples = handle.getnframes()
+    script_hash = hashlib.sha256(b"Exact import script").hexdigest()
+    audio_id = f"voice-{attempt_id}"
+    audio_record = AssetRecord(
+        asset_id=audio_id,
+        asset_type=AssetType.VOICE,
+        artifact_path=canonical_audio_asset_path(audio_hash),
+        sha256=audio_hash,
+        size_bytes=len(audio_bytes),
+        mime_type="audio/wav",
+        source_kind=AssetSourceKind.IMPORTED,
+        tool=ToolIdentity(name="fixture-import", version="1"),
+        input_fingerprint=audio_hash,
+        creation_receipt_id=f"audio-import-{attempt_id}",
+        usage_license="fixture-only",
+        audio_metadata=AudioAssetMetadata(
+            audio_kind=AudioKind.DIALOGUE,
+            source=AudioSource(
+                kind=AssetSourceKind.IMPORTED,
+                provider_or_tool=ToolIdentity(name="fixture-import", version="1"),
+                input_fingerprint=audio_hash,
+            ),
+            speaker_id="speaker-import",
+            voice_id="voice-import",
+            language="en",
+            script_hash=script_hash,
+            duration_samples=duration_samples,
+            sample_rate_hz=48_000,
+            channels=1,
+            channel_layout=AudioChannelLayout.MONO,
+            codec_name="pcm_s16le",
+            loudness=AudioLoudnessMetadata(),
+            provenance_receipt_id=f"provenance-{attempt_id}",
+            alignment_receipt_id=f"alignment-{attempt_id}",
+        ),
+    )
+    style_bytes = b'{"font_family":"Fixture Sans","schema_version":"1"}'
+    style_hash = hashlib.sha256(style_bytes).hexdigest()
+    style = CaptionStyleReference(
+        artifact_id=f"style-{attempt_id}",
+        revision=1,
+        content_hash=style_hash,
+        path=Path(f"assets/styles/{style_hash}.json"),
+    )
+    track = CaptionTrack(
+        artifact_id=f"caption-track-{attempt_id}",
+        schema_version="2.1",
+        revision=1,
+        content_hash=ZERO_HASH,
+        creation_receipt_id=f"caption-import-{attempt_id}",
+        source_provenance=(
+            SourceReference(kind="derived", reference=f"alignment-{attempt_id}"),
+        ),
+        caption_track_id=f"caption-track-{attempt_id}",
+        language="en",
+        script_hash=script_hash,
+        transcript_hash=script_hash,
+        source_audio_asset_id=audio_id,
+        source_audio_sha256=audio_hash,
+        source_sample_rate_hz=48_000,
+        segments=(
+            CaptionSegment(
+                segment_id="segment-0001",
+                text="Exact import script",
+                start_sample=0,
+                end_sample=duration_samples,
+                speaker_id="speaker-import",
+            ),
+        ),
+        segmentation_policy=CaptionSegmentationPolicy(
+            policy_id="fixture-import",
+            policy_version="1",
+            max_characters=80,
+            max_lines=2,
+            break_strategy="provider_segments",
+        ),
+        alignment_provider="fixture-import",
+        alignment_model="1",
+        alignment_receipt_id=f"alignment-{attempt_id}",
+        style_reference_id=style.artifact_id,
+        timing_fingerprint=ZERO_HASH,
+    )
+    track = track.model_copy(update={"timing_fingerprint": caption_timing_fingerprint(track)})
+    track = CaptionTrack.model_validate(seal_artifact(track).model_dump(mode="python"))
+    caption_import = CaptionImportRequest.create(
+        caption_track=track, style_reference=style, style_bytes=style_bytes
+    )
+    caption_record = AssetRecord(
+        asset_id=f"caption-{attempt_id}",
+        asset_type=AssetType.CAPTION,
+        artifact_path=Path(f"assets/captions/{caption_import.track_sha256}.json"),
+        sha256=caption_import.track_sha256,
+        size_bytes=len(caption_import.track_bytes),
+        mime_type="application/json",
+        source_kind=AssetSourceKind.DERIVED,
+        tool=ToolIdentity(name="fixture-import", version="1"),
+        input_artifact_ids=(audio_id,),
+        input_fingerprint=audio_hash,
+        creation_receipt_id=track.creation_receipt_id,
+        usage_license="fixture-only",
+        caption_metadata=CaptionAssetMetadata(
+            caption_track_id=track.caption_track_id,
+            language=track.language,
+            source_audio_asset_id=audio_id,
+            source_audio_sha256=audio_hash,
+            script_hash=script_hash,
+            transcript_hash=script_hash,
+            segment_count=1,
+            word_count=0,
+            segmentation_policy_id=track.segmentation_policy.policy_id,
+            segmentation_policy_version=track.segmentation_policy.policy_version,
+            alignment_receipt_id=track.alignment_receipt_id,
+            timing_fingerprint=track.timing_fingerprint,
+            style_reference_id=style.artifact_id,
+            style_content_hash=style.content_hash,
+        ),
+    )
     upgraded = AssetRegistrySnapshot(
         schema_version="2.1",
         revision_id=ZERO_HASH,
         content_hash=ZERO_HASH,
-        assets=registry.assets,
+        assets=registry.assets
+        + tuple(sorted((audio_record, caption_record), key=lambda item: item.asset_id)),
     )
     revision = registry_semantic_sha256(upgraded)
     upgraded = upgraded.model_copy(
@@ -1095,7 +1348,15 @@ def make_audio_import_upgrade_request(
         base_registry=registry,
         registry=upgraded,
         attempt_id=attempt_id,
-        artifacts=(),
+        artifacts=(
+            PreparedArtifact(audio_record.artifact_path, audio_bytes, audio_hash),
+            PreparedArtifact(
+                caption_record.artifact_path,
+                caption_import.track_bytes,
+                caption_import.track_sha256,
+            ),
+            PreparedArtifact(style.path, style_bytes, style_hash),
+        ),
         active_project_artifact=PreparedArtifact(
             manifest.active_project.path,
             (root / manifest.active_project.path).read_bytes(),

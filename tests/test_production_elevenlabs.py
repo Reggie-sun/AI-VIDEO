@@ -487,7 +487,9 @@ def test_permit_is_one_use_and_second_submit_is_zero_transport_calls():
     request = _request()
     authorization = _authorization(provider, request)
     permit = make_test_voice_submit_permit(request, authorization)
-    provider.generate(request, authorization, permit)
+    result = provider.generate(request, authorization, permit)
+    assert result.provenance_receipt.policy_receipt_id == "fixture-policy-receipt-1"
+    assert result.provenance_receipt.retention_mode == "provider_standard"
 
     second_transport = _FakeTransport(_response())
     second_provider = _provider(second_transport)
@@ -518,8 +520,10 @@ def test_zero_retention_entitlement_emits_explicit_false_query():
     )
     request = _request()
     authorization = _authorization(provider, request)
-    _generate(provider, request, authorization)
+    result = _generate(provider, request, authorization)
     assert dict(transport.calls[0].query)["enable_logging"] == "false"
+    assert result.provenance_receipt.policy_receipt_id == "fixture-policy-receipt-1"
+    assert result.provenance_receipt.retention_mode == "zero_retention"
 
 
 def test_provider_disabled_is_zero_transport_and_root_exports_no_adapter():

@@ -190,6 +190,8 @@ class _FakeVoiceProvider:
                 request.egress_authorization_receipt_id
             ),
             license_policy_decision="fixture-only",
+            policy_receipt_id="fixture-policy-receipt",
+            retention_mode="provider_standard",
             provider_request_id="provider-request-1",
             provider_trace_id="provider-trace-1",
         )

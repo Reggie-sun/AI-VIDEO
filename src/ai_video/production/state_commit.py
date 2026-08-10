@@ -27,8 +27,13 @@ from ai_video.production.audio import (
     VoiceProviderResult,
     VoiceCostReceipt,
     VoiceProvenanceReceipt,
+    _result_fingerprint,
 )
-from ai_video.production.captions import CaptionImportRequest, PreparedCaptionImport
+from ai_video.production.captions import (
+    CaptionImportRequest,
+    PreparedCaptionImport,
+    caption_timing_fingerprint,
+)
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     AssetType,
@@ -54,6 +59,7 @@ from ai_video.production.models import (
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
     ResolvedTimeline,
+    SourceReference,
     StateCommitAttempt,
     StateCommitStatus,
     VoiceRequestReceipt,
@@ -1237,10 +1243,8 @@ class ProductionStateCommitter:
                 authorization_receipt_id=request.egress_authorization_receipt_id,
                 request_fingerprint=request.voice_request_fingerprint,
                 payload_fingerprint=request.script_hash,
-                retention_mode="provider_standard",
-                provider_policy_snapshot_id=(
-                    result.provenance_receipt.license_policy_decision
-                ),
+                retention_mode=result.provenance_receipt.retention_mode,
+                provider_policy_snapshot_id=result.provenance_receipt.policy_receipt_id,
             ),
             cost_receipt_id=f"cost-{cost_hash}",
             audio_metadata=AudioAssetMetadata(
@@ -1330,6 +1334,21 @@ class ProductionStateCommitter:
                 or track.source_audio_asset_id != audio_id
                 or track.source_audio_sha256 != result.audio_sha256
                 or track.script_hash != request.script_hash
+                or track.transcript_hash != request.script_hash
+                or track.source_sample_rate_hz != request.output_sample_rate_hz
+                or track.language != request.language
+                or track.alignment_receipt_id
+                != f"alignment-{result.alignment_receipt_sha256}"
+                or track.creation_receipt_id
+                != f"caption-result-{result.result_fingerprint}"
+                or track.source_provenance
+                != (
+                    SourceReference(
+                        kind="derived",
+                        reference=f"alignment-{result.alignment_receipt_sha256}",
+                    ),
+                )
+                or track.timing_fingerprint != caption_timing_fingerprint(track)
             ):
                 raise _state_invalid("Prepared caption identity does not match generated voice.")
             new_records.append(supplied)
@@ -1395,6 +1414,9 @@ class ProductionStateCommitter:
                     "provider_trace_id": result.provider_trace_id,
                     "audio_sha256": result.audio_sha256,
                     "alignment_receipt_sha256": result.alignment_receipt_sha256,
+                    "content_type": result.content_type,
+                    "policy_receipt_id": result.provenance_receipt.policy_receipt_id,
+                    "retention_mode": result.provenance_receipt.retention_mode,
                     "terminal_status": result.terminal_status,
                 },
                 sort_keys=True,
@@ -1484,6 +1506,12 @@ class ProductionStateCommitter:
             )
             if attempt is None or attempt.operation != "voice_generation":
                 raise _state_invalid("Voice activation has no matching attempt.")
+            if attempt.status is StateCommitStatus.SUCCEEDED or attempt.voice_phase == "candidate":
+                durable_request = self._reconstruct_voice_activation_request(attempt)
+                if durable_request != request:
+                    raise _state_invalid(
+                        "Voice activation replay does not match the current durable candidate graph."
+                    )
             provider_request_id = self._validate_voice_activation_graph(
                 request,
                 attempt,
@@ -1680,6 +1708,51 @@ class ProductionStateCommitter:
         expected_ids = set(audio_asset_ids) | set(caption_asset_ids)
         if {item.asset_id for item in new_records} != expected_ids:
             raise _state_invalid("Voice candidate registry contains extra or missing assets.")
+        audio_records = tuple(
+            item for item in new_records if item.asset_id in audio_asset_ids
+        )
+        if len(audio_records) != 1:
+            raise _state_invalid("Voice candidate graph requires exactly one generated audio asset.")
+        audio_record = audio_records[0]
+        expected_result_fingerprint = _result_fingerprint(
+            {
+                "request_id": voice_request.request_id,
+                "request_fingerprint": voice_request.voice_request_fingerprint,
+                "audio_sha256": audio_record.sha256,
+                "content_type": outcome.get("content_type"),
+                "provider_request_id": outcome.get("provider_request_id"),
+                "provider_trace_id": outcome.get("provider_trace_id"),
+                "alignment_receipt_sha256": outcome.get(
+                    "alignment_receipt_sha256"
+                ),
+                "cost_receipt": cost.model_dump(mode="json"),
+                "provenance_receipt": provenance.model_dump(mode="json"),
+                "terminal_status": outcome.get("terminal_status"),
+                "preview_fingerprint": preview.preview_fingerprint,
+                "authorization_fingerprint": authorization.authorization_fingerprint,
+            }
+        )
+        metadata = audio_record.audio_metadata
+        if (
+            outcome.get("result_fingerprint") != expected_result_fingerprint
+            or outcome.get("audio_sha256") != audio_record.sha256
+            or outcome.get("content_type") != audio_record.mime_type
+            or outcome.get("policy_receipt_id") != provenance.policy_receipt_id
+            or outcome.get("retention_mode") != provenance.retention_mode
+            or audio_record.creation_receipt_id
+            != f"voice-result-{expected_result_fingerprint}"
+            or audio_record.cost_receipt_id
+            != f"cost-{hashlib.sha256(_canonical_json_bytes(cost)).hexdigest()}"
+            or audio_record.egress.retention_mode != provenance.retention_mode
+            or audio_record.egress.provider_policy_snapshot_id
+            != provenance.policy_receipt_id
+            or metadata is None
+            or metadata.provenance_receipt_id
+            != f"provenance-{hashlib.sha256(_canonical_json_bytes(provenance)).hexdigest()}"
+            or metadata.alignment_receipt_id
+            != f"alignment-{outcome.get('alignment_receipt_sha256')}"
+        ):
+            raise _state_invalid("Voice candidate result, policy, or registry identity is inconsistent.")
         declared_paths = {item.artifact_path for item in new_records}
         declared_paths.update(
             Path(f"assets/styles/{item.caption_metadata.style_content_hash}.json")
@@ -3445,6 +3518,21 @@ class ProductionStateCommitter:
                         "Render immutable temporary files could not be inspected.",
                         str(exc),
                     ) from exc
+            if attempt.operation == "audio_import":
+                try:
+                    for relative in _list_regular_files_nofollow(self._project_root):
+                        if (
+                            relative.name.startswith(
+                                _owned_temp_prefix(attempt.attempt_id)
+                            )
+                            and relative.name.endswith(".tmp")
+                        ):
+                            paths.add(self._project_root / relative)
+                except (OSError, ValueError) as exc:
+                    raise _state_invalid(
+                        "Audio import immutable temporary files could not be inspected.",
+                        str(exc),
+                    ) from exc
         for path in sorted(paths):
             items.extend(self._remove_recovery_temp(path))
         return tuple(items)
@@ -4047,6 +4135,49 @@ class ProductionStateCommitter:
             )
 
     def _verify_committed_candidates(self, request: StateCommitRequest) -> None:
+        if request.operation == "audio_import":
+            for artifact in request.artifacts:
+                snapshot = _read_regular_file_nofollow(
+                    self._project_root / artifact.relative_path,
+                    contained_by=self._project_root,
+                )
+                if snapshot.file_sha256 != artifact.file_sha256:
+                    raise _state_commit_failed(
+                        "Audio import candidate artifact reopen verification failed."
+                    )
+            project_snapshot = _read_regular_file_nofollow(
+                self._project_root / request.next_project.path,
+                contained_by=self._project_root,
+            )
+            registry_snapshot = _read_regular_file_nofollow(
+                self._project_root / request.next_registry.path,
+                contained_by=self._project_root,
+            )
+            try:
+                project = ProductionProject.model_validate(
+                    yaml.safe_load(project_snapshot.data)
+                )
+                registry = AssetRegistrySnapshot.model_validate_json(
+                    registry_snapshot.data
+                )
+            except (ValidationError, ValueError, yaml.YAMLError) as exc:
+                raise _state_commit_failed(
+                    "Audio import candidate snapshots could not be reopened.", str(exc)
+                ) from exc
+            if (
+                project.project_id != self._read_manifest().project_id
+                or project.revision != request.next_project.revision
+                or project.content_hash != request.next_project.content_hash
+                or project_snapshot.file_sha256 != request.next_project.file_sha256
+                or registry.revision_id != request.next_registry.revision_id
+                or registry.content_hash != request.next_registry.content_hash
+                or registry_semantic_sha256(registry) != registry.content_hash
+                or registry_snapshot.file_sha256 != request.next_registry.file_sha256
+            ):
+                raise _state_commit_failed(
+                    "Audio import candidate snapshot identity is invalid."
+                )
+            return
         bundle = load_production_project_candidate(
             self._project_root,
             self._read_manifest(),

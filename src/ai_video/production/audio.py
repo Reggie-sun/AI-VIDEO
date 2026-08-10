@@ -385,10 +385,12 @@ class VoiceProvenanceReceipt(_VoiceStrictModel):
     adapter: ToolIdentity
     egress_authorization_receipt_id: str = Field(min_length=1)
     license_policy_decision: str = Field(min_length=1)
+    policy_receipt_id: str = Field(min_length=1)
+    retention_mode: Literal["provider_standard", "zero_retention"]
     provider_request_id: str | None = None
     provider_trace_id: str | None = None
 
-    @field_validator("provider_request_id", "provider_trace_id")
+    @field_validator("provider_request_id", "provider_trace_id", "policy_receipt_id")
     @classmethod
     def _validate_provider_identifier(cls, value: str | None) -> str | None:
         return _sanitized_provider_identifier(value)

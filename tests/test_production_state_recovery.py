@@ -118,7 +118,10 @@ def test_recovery_preserves_r3_voice_candidate_for_explicit_activation(
     assert activated.attempts[-1].status is StateCommitStatus.SUCCEEDED
 
 
-@pytest.mark.parametrize("tamper_target", ("outcome", "audio", "registry"))
+@pytest.mark.parametrize(
+    "tamper_target",
+    ("outcome", "audio", "caption", "alignment", "cost", "provenance", "registry"),
+)
 def test_recovery_rejects_tampered_r3_voice_graph_without_activation(
     committed_project: Path,
     tamper_target: str,
@@ -135,13 +138,22 @@ def test_recovery_rejects_tampered_r3_voice_graph_without_activation(
     writer.begin_voice_generation(request, preview, authorization)
     writer.record_voice_submit_intent(request, preview, authorization)
     activation, audio_ids = project_factory.make_voice_activation_request(
-        committed_project, request, authorization, expected_manifest_revision=3
+        committed_project,
+        request,
+        authorization,
+        expected_manifest_revision=3,
+        include_caption=True,
     )
+    caption_ids = (f"caption-{request.attempt_id}",)
     crashing = ProductionStateCommitter(
         committed_project, crash_injector=_CrashAfterCandidate()
     )
     with pytest.raises(RuntimeError, match=r"R\+3"):
-        crashing.activate_voice_assets(activation, audio_asset_ids=audio_ids)
+        crashing.activate_voice_assets(
+            activation,
+            audio_asset_ids=audio_ids,
+            caption_asset_ids=caption_ids,
+        )
     candidate = _read_manifest(committed_project)
     if tamper_target == "outcome":
         target = crashing.voice_attempt_paths(request.attempt_id).outcome_path
@@ -152,6 +164,20 @@ def test_recovery_rejects_tampered_r3_voice_graph_without_activation(
         target = committed_project / next(
             item.artifact_path for item in registry.assets if item.asset_id == audio_ids[0]
         )
+    elif tamper_target == "caption":
+        registry = AssetRegistrySnapshot.model_validate_json(
+            (committed_project / candidate.attempts[-1].candidate_registry.path).read_bytes()
+        )
+        target = committed_project / next(
+            item.artifact_path for item in registry.assets if item.asset_id == caption_ids[0]
+        )
+    elif tamper_target in {"alignment", "cost", "provenance"}:
+        paths = crashing.voice_attempt_paths(request.attempt_id)
+        target = {
+            "alignment": paths.alignment_path,
+            "cost": paths.cost_path,
+            "provenance": paths.provenance_path,
+        }[tamper_target]
     else:
         target = committed_project / candidate.attempts[-1].candidate_registry.path
     target.write_bytes(b"tampered")
@@ -263,6 +289,11 @@ def test_audio_import_artifact_crash_never_selects_partial_registry(
     phase: CommitPhase,
 ) -> None:
     before = _read_manifest(committed_project)
+    request = project_factory.make_audio_import_upgrade_request(
+        committed_project,
+        attempt_id="audio-import-process-crash",
+        include_assets=True,
+    )
     result = subprocess.run(
         [
             sys.executable,
@@ -285,6 +316,11 @@ def test_audio_import_artifact_crash_never_selects_partial_registry(
     assert recovered.active_render_state == before.active_render_state
     assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
     assert report.manifest_revision_after > report.manifest_revision_before
+    for artifact in request.artifacts:
+        path = committed_project / artifact.relative_path
+        if path.exists():
+            assert path.read_bytes() == artifact.payload
+    assert not tuple(committed_project.rglob("*.p2a-*.tmp"))
 
 
 @pytest.mark.parametrize(
@@ -303,9 +339,12 @@ def test_audio_import_manifest_crash_has_exact_old_or_new_pair(
     occurrence: int,
 ) -> None:
     before = _read_manifest(committed_project)
-    expected_registry = project_factory.make_audio_import_upgrade_request(
-        committed_project, attempt_id="comparison"
-    ).next_registry
+    expected_request = project_factory.make_audio_import_upgrade_request(
+        committed_project,
+        attempt_id="audio-import-process-crash",
+        include_assets=True,
+    )
+    expected_registry = expected_request.next_registry
     result = subprocess.run(
         [
             sys.executable,
@@ -326,12 +365,20 @@ def test_audio_import_manifest_crash_has_exact_old_or_new_pair(
     assert recovered.active_registry in (before.active_registry, expected_registry)
     assert recovered.active_render_state is None
     if recovered.active_registry == before.active_registry:
+        assert recovered.schema_version in {before.schema_version, "2.2"}
         assert not recovered.attempts or recovered.attempts[-1].status in {
             StateCommitStatus.INTERRUPTED,
             StateCommitStatus.FAILED,
         }
     else:
+        assert recovered.schema_version == "2.2"
         assert recovered.attempts[-1].status is StateCommitStatus.SUCCEEDED
+        active_registry = AssetRegistrySnapshot.model_validate_json(
+            (committed_project / recovered.active_registry.path).read_bytes()
+        )
+        assert active_registry.schema_version == "2.1"
+        for artifact in expected_request.artifacts:
+            assert (committed_project / artifact.relative_path).read_bytes() == artifact.payload
 
 
 @pytest.fixture

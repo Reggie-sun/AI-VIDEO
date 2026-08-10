@@ -157,7 +157,7 @@ def main() -> int:
         return 0
     if len(sys.argv) > 4 and sys.argv[4] == "audio_import":
         request = make_audio_import_upgrade_request(
-            root, attempt_id="audio-import-process-crash"
+            root, attempt_id="audio-import-process-crash", include_assets=True
         )
         ProductionStateCommitter(
             root, crash_injector=ExitInjector(phase, occurrence)
