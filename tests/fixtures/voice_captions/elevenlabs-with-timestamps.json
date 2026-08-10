@@ -1,5 +1,5 @@
 {
-  "audio_base64": "Zml4dHVyZQ==",
+  "audio_base64": "AAAAAA==",
   "alignment": {
     "characters": ["C", "a", "f", "e", "\u0301", "."],
     "character_start_times_seconds": [0, 0.1, 0.2, 0.3, 0.4, 0.5],

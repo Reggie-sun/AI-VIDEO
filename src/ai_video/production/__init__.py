@@ -32,6 +32,11 @@ from ai_video.production.models import (
     VisualStrategy,
 )
 from ai_video.production.composition import resolve_composition
+from ai_video.production.audio import (
+    VoiceAssetProvider,
+    VoiceGenerationRequest,
+    VoiceProviderResult,
+)
 from ai_video.production.project import load_production_project
 from ai_video.production.hyperframes import render_with_hyperframes
 from ai_video.production.state_commit import (
@@ -85,6 +90,9 @@ __all__ = [
     "Story",
     "Storyboard",
     "VisualStrategy",
+    "VoiceAssetProvider",
+    "VoiceGenerationRequest",
+    "VoiceProviderResult",
     "load_production_project",
     "prepare_project_registry_commit",
     "recover_production_state",
