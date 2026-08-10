@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import json
 import socket
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from pathlib import Path
 
@@ -52,11 +53,23 @@ class _FakeTransport:
 
     def request(self, request):
         self.invocations += 1
-        if not request.consume_permit():
-            raise AssertionError("permit was not atomically consumable at boundary")
         self.calls.append(request)
         if self.error is not None:
             raise self.error
+        return self.response
+
+
+class _IgnoringPermitTransport:
+    """Malicious raw transport that never participates in permit security."""
+
+    def __init__(self, response) -> None:
+        self.response = response
+        self.invocations = 0
+        self.calls = []
+
+    def request(self, request):
+        self.invocations += 1
+        self.calls.append(request)
         return self.response
 
 
@@ -120,6 +133,10 @@ def _policy(**overrides) -> ElevenLabsProviderPolicy:
         "zero_retention_entitled": False,
         "credential_reference_kind": "secret_store",
         "license_policy_decision": "test-noncommercial-attributed",
+        "license_allowed": True,
+        "use_policy_allowed": True,
+        "voice_authorization_verified": True,
+        "policy_receipt_id": "fixture-policy-receipt-1",
     }
     values.update(overrides)
     return ElevenLabsProviderPolicy(**values)
@@ -201,6 +218,7 @@ def test_valid_submit_maps_exact_request_and_receipts_without_real_network(monke
     assert transport.invocations == 1
     assert len(transport.calls) == 1
     sent = transport.calls[0]
+    assert not hasattr(sent, "consume_permit")
     assert sent.method == "POST"
     assert sent.url == (
         "https://api.elevenlabs.io/v1/text-to-speech/voice%2Fone/with-timestamps"
@@ -544,6 +562,219 @@ def test_structural_permit_is_explicitly_test_only_until_task8_nominal_identity(
     assert make_test_voice_submit_permit.__module__ == "tests.production_project_factory"
     assert not hasattr(elevenlabs_module, "make_voice_submit_permit")
     assert not hasattr(elevenlabs_module, "DurableVoiceSubmitPermit")
+
+
+def test_adapter_consumes_permit_without_trusting_transport_and_blocks_replay():
+    transport = _IgnoringPermitTransport(_response())
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+    permit = make_test_voice_submit_permit(request, authorization)
+
+    provider.generate(request, authorization, permit)
+    with pytest.raises(AiVideoError):
+        provider.generate(request, authorization, permit)
+
+    assert transport.invocations == 1
+    assert len(transport.calls) == 1
+
+
+def test_adapter_atomic_consume_allows_exactly_one_transport_call_in_race():
+    transport = _IgnoringPermitTransport(_response())
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+    permit = make_test_voice_submit_permit(request, authorization)
+
+    def submit():
+        try:
+            provider.generate(request, authorization, permit)
+            return "succeeded"
+        except AiVideoError as exc:
+            return exc.code
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        outcomes = list(executor.map(lambda _: submit(), range(2)))
+
+    assert outcomes.count("succeeded") == 1
+    assert outcomes.count(ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED) == 1
+    assert transport.invocations == 1
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        ElevenLabsTransportResponse(status_code="200", headers={}, body=b"{}"),
+        ElevenLabsTransportResponse(status_code=True, headers={}, body=b"{}"),
+        ElevenLabsTransportResponse(status_code=99, headers={}, body=b"{}"),
+        ElevenLabsTransportResponse(status_code=600, headers={}, body=b"{}"),
+        ElevenLabsTransportResponse(status_code=200, headers={1: "x"}, body=b"{}"),
+        ElevenLabsTransportResponse(
+            status_code=200,
+            headers={f"x-{index}": "x" for index in range(65)},
+            body=b"{}",
+        ),
+        ElevenLabsTransportResponse(
+            status_code=200,
+            headers={"x-long": "x" * 1025},
+            body=b"{}",
+        ),
+        ElevenLabsTransportResponse(status_code=200, headers={}, body="{}"),
+        ElevenLabsTransportResponse(
+            status_code=200,
+            headers={},
+            body=b"x" * (2 * 1024 * 1024 + 1),
+        ),
+        ElevenLabsTransportResponse(
+            status_code=200,
+            headers={"character-cost": "5", "request-id": "request-1"},
+            body=b'{"audio_base64":"AAAA","alignment":{"characters":[1e999999]},'
+            b'"normalized_alignment":{},"padding":'
+            + (b"9" * 5000)
+            + b"}",
+        ),
+    ],
+)
+def test_transport_response_types_and_json_numeric_tokens_are_bounded(response):
+    transport = _FakeTransport(response)
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+    with pytest.raises(AiVideoError) as caught:
+        _generate(provider, request, authorization)
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+    assert caught.value.cause is None
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+
+
+@pytest.mark.parametrize(
+    "character_cost",
+    [" 5", "+5", "05", "9" * 1000],
+)
+def test_character_cost_requires_bounded_canonical_decimal(character_cost):
+    transport = _FakeTransport(
+        _response(
+            headers={
+                "character-cost": character_cost,
+                "request-id": "provider-request-1",
+            }
+        )
+    )
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+    with pytest.raises(AiVideoError) as caught:
+        _generate(provider, request, authorization)
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+
+
+def test_malformed_json_error_graph_does_not_retain_provider_body():
+    secret = "TOP-SECRET-DUMMY-JSON-BODY"
+    transport = _FakeTransport(
+        ElevenLabsTransportResponse(
+            status_code=200,
+            headers={"character-cost": "5", "request-id": "request-1"},
+            body=f'{{"audio_base64":"{secret}"'.encode(),
+        )
+    )
+    provider = _provider(transport)
+    request = _request()
+    authorization = _authorization(provider, request)
+    with pytest.raises(AiVideoError) as caught:
+        _generate(provider, request, authorization)
+
+    graph = []
+    pending = [caught.value]
+    seen = set()
+    while pending:
+        error = pending.pop()
+        if id(error) in seen:
+            continue
+        seen.add(id(error))
+        graph.extend(
+            str(value)
+            for value in (
+                error,
+                repr(error),
+                getattr(error, "user_message", None),
+                getattr(error, "technical_detail", None),
+                getattr(error, "doc", None),
+            )
+            if value is not None
+        )
+        pending.extend(
+            value
+            for value in (error.__cause__, error.__context__)
+            if isinstance(value, BaseException)
+        )
+    assert secret not in "\n".join(graph)
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+
+
+def test_machine_policy_denial_is_zero_call_and_does_not_consume_permit():
+    denied = ElevenLabsProviderPolicy(
+        provider_enabled=True,
+        enable_logging=True,
+        zero_retention_entitled=False,
+        credential_reference_kind="secret_store",
+        license_policy_decision="fixture-policy-allowed",
+        license_allowed=False,
+        use_policy_allowed=True,
+        voice_authorization_verified=True,
+        policy_receipt_id="policy-receipt-1",
+    )
+    transport = _IgnoringPermitTransport(_response())
+    denied_provider = _provider(transport, policy=denied)
+    request = _request()
+    authorization = _authorization(denied_provider, request)
+    permit = make_test_voice_submit_permit(request, authorization)
+    with pytest.raises(AiVideoError):
+        denied_provider.generate(request, authorization, permit)
+    assert transport.invocations == 0
+
+    allowed = ElevenLabsProviderPolicy(
+        provider_enabled=True,
+        enable_logging=True,
+        zero_retention_entitled=False,
+        credential_reference_kind="secret_store",
+        license_policy_decision="fixture-policy-allowed",
+        license_allowed=True,
+        use_policy_allowed=True,
+        voice_authorization_verified=True,
+        policy_receipt_id="policy-receipt-1",
+    )
+    _provider(transport, policy=allowed).generate(request, authorization, permit)
+    assert transport.invocations == 1
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"license_allowed": "true"},
+        {"use_policy_allowed": 1},
+        {"voice_authorization_verified": "yes"},
+        {"policy_receipt_id": ""},
+        {"policy_receipt_id": "unsafe receipt\nvalue"},
+        {"policy_receipt_id": "x" * 129},
+    ],
+)
+def test_machine_policy_fields_reject_coercion_and_malformed_receipts(override):
+    values = {
+        "provider_enabled": True,
+        "enable_logging": True,
+        "zero_retention_entitled": False,
+        "credential_reference_kind": "secret_store",
+        "license_policy_decision": "fixture-policy-allowed",
+        "license_allowed": True,
+        "use_policy_allowed": True,
+        "voice_authorization_verified": True,
+        "policy_receipt_id": "policy-receipt-1",
+    }
+    values.update(override)
+    with pytest.raises(ValueError):
+        ElevenLabsProviderPolicy(**values)
 
 
 def test_forced_alignment_fixture_is_strict_and_preserves_loss_without_confidence():

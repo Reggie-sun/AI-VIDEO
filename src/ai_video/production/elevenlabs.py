@@ -7,10 +7,11 @@ import json
 import math
 import re
 import wave
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal, InvalidOperation
-from typing import Callable, Literal, Mapping, Protocol
+from typing import Literal, Protocol
 from urllib.parse import quote
 
 from ai_video.errors import AiVideoError, ErrorCode
@@ -34,6 +35,11 @@ _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 _MAX_ALIGNMENT_CHARACTERS = 100_000
 _SANITIZED_RESPONSE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
 _SANITIZED_POLICY_DECISION = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
+_HTTP_HEADER_NAME = re.compile(r"^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,128}$")
+_CANONICAL_CHARACTER_COST = re.compile(r"^[1-9][0-9]{0,9}$")
+_MAX_RESPONSE_HEADERS = 64
+_MAX_HEADER_VALUE_LENGTH = 1024
+_MAX_ALIGNMENT_SECONDS = Decimal(86_400)
 
 
 @dataclass(frozen=True)
@@ -63,6 +69,10 @@ class ElevenLabsProviderPolicy:
     zero_retention_entitled: bool
     credential_reference_kind: Literal["environment", "secret_store"]
     license_policy_decision: str
+    license_allowed: bool
+    use_policy_allowed: bool
+    voice_authorization_verified: bool
+    policy_receipt_id: str
 
     def __post_init__(self) -> None:
         if any(
@@ -71,6 +81,9 @@ class ElevenLabsProviderPolicy:
                 self.provider_enabled,
                 self.enable_logging,
                 self.zero_retention_entitled,
+                self.license_allowed,
+                self.use_policy_allowed,
+                self.voice_authorization_verified,
             )
         ):
             raise ValueError("ElevenLabs policy flags must be exact booleans")
@@ -87,6 +100,11 @@ class ElevenLabsProviderPolicy:
             is None
         ):
             raise ValueError("ElevenLabs license policy decision is invalid")
+        if (
+            type(self.policy_receipt_id) is not str
+            or _SANITIZED_POLICY_DECISION.fullmatch(self.policy_receipt_id) is None
+        ):
+            raise ValueError("ElevenLabs policy receipt identity is invalid")
 
 
 @dataclass(frozen=True)
@@ -103,16 +121,10 @@ class ElevenLabsTransportRequest:
     query: tuple[tuple[str, str], ...]
     headers: Mapping[str, object] = field(repr=False)
     body: bytes = field(repr=False)
-    _consume: Callable[[], bool] = field(repr=False, compare=False)
-
-    def consume_permit(self) -> bool:
-        """Called exactly at the injected transport's external-effect boundary."""
-
-        return self._consume()
 
 
 class ElevenLabsTransport(Protocol):
-    """Injected transport; implementations must consume before external I/O."""
+    """Injected raw transport; permit security remains adapter-owned."""
 
     def request(
         self, request: ElevenLabsTransportRequest
@@ -163,19 +175,14 @@ def _permit_is_valid(permit: object, binding: dict[str, str]) -> bool:
         return False
 
 
-def _permit_consumer(
-    permit: object, binding: dict[str, str]
-) -> Callable[[], bool]:
-    def consume() -> bool:
-        consumer = getattr(permit, "_consume_voice_submit_permit", None)
-        if not callable(consumer):
-            return False
-        try:
-            return consumer(**binding) is True
-        except Exception:
-            return False
-
-    return consume
+def _consume_permit(permit: object, binding: dict[str, str]) -> bool:
+    consumer = getattr(permit, "_consume_voice_submit_permit", None)
+    if not callable(consumer):
+        return False
+    try:
+        return consumer(**binding) is True
+    except Exception:
+        return False
 
 
 def _voice_settings(request: VoiceGenerationRequest) -> dict[str, object]:
@@ -206,13 +213,17 @@ def _decode_audio(value: object) -> bytes:
             ErrorCode.VOICE_PROVIDER_FAILED,
             "ElevenLabs response exceeds the audio limit.",
         )
+    decode_failed = False
     try:
         decoded = base64.b64decode(value, validate=True)
-    except (ValueError, binascii.Error) as exc:
+    except (ValueError, binascii.Error):
+        decode_failed = True
+        decoded = b""
+    if decode_failed:
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
             "ElevenLabs response contains malformed base64 audio.",
-        ) from exc
+        )
     if not decoded or len(decoded) > MAX_AUDIO_BYTES:
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
@@ -222,7 +233,7 @@ def _decode_audio(value: object) -> bytes:
 
 
 def _decimal_string(value: object, *, field_name: str) -> str:
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
+    if isinstance(value, bool) or not isinstance(value, (int, float, Decimal)):
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
             f"ElevenLabs {field_name} is malformed.",
@@ -232,14 +243,18 @@ def _decimal_string(value: object, *, field_name: str) -> str:
             ErrorCode.VOICE_PROVIDER_FAILED,
             f"ElevenLabs {field_name} is malformed.",
         )
+    decimal_failed = False
     try:
         number = Decimal(str(value))
-    except InvalidOperation as exc:
+    except InvalidOperation:
+        decimal_failed = True
+        number = Decimal(0)
+    if decimal_failed:
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
             f"ElevenLabs {field_name} is malformed.",
-        ) from exc
-    if number < 0:
+        )
+    if not number.is_finite() or number < 0 or number > _MAX_ALIGNMENT_SECONDS:
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
             f"ElevenLabs {field_name} is malformed.",
@@ -303,19 +318,56 @@ def _parse_character_alignment(value: object, *, name: str) -> dict[str, object]
     }
 
 
+class _UntrustedJsonNumber(ValueError):
+    pass
+
+
+def _bounded_json_int(token: str) -> int:
+    if len(token) > 20:
+        raise _UntrustedJsonNumber
+    return int(token)
+
+
+def _bounded_json_decimal(token: str) -> Decimal:
+    if len(token) > 64:
+        raise _UntrustedJsonNumber
+    value = Decimal(token)
+    if not value.is_finite() or abs(value) > _MAX_ALIGNMENT_SECONDS:
+        raise _UntrustedJsonNumber
+    return value
+
+
+def _reject_json_constant(_token: str) -> None:
+    raise _UntrustedJsonNumber
+
+
+def _parse_json_object(body: bytes, *, surface: str) -> object:
+    parse_failed = False
+    try:
+        payload = json.loads(
+            body,
+            parse_int=_bounded_json_int,
+            parse_float=_bounded_json_decimal,
+            parse_constant=_reject_json_constant,
+        )
+    except Exception:
+        parse_failed = True
+        payload = None
+    if parse_failed:
+        raise _error(
+            ErrorCode.VOICE_PROVIDER_FAILED,
+            f"ElevenLabs {surface} JSON is malformed.",
+        )
+    return payload
+
+
 def _parse_timing_response(body: bytes, script_text: str) -> tuple[bytes, bytes]:
     if not body or len(body) > _MAX_RESPONSE_BYTES:
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
             "ElevenLabs response exceeds the response limit.",
         )
-    try:
-        payload = json.loads(body)
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise _error(
-            ErrorCode.VOICE_PROVIDER_FAILED,
-            "ElevenLabs response JSON is malformed.",
-        ) from exc
+    payload = _parse_json_object(body, surface="response")
     if not isinstance(payload, dict) or set(payload) != {
         "audio_base64",
         "alignment",
@@ -344,6 +396,48 @@ def _parse_timing_response(body: bytes, script_text: str) -> tuple[bytes, bytes]
     return audio, receipt
 
 
+def _validate_transport_response(response: object) -> ElevenLabsTransportResponse:
+    if type(response) is not ElevenLabsTransportResponse:
+        raise _error(
+            ErrorCode.VOICE_PROVIDER_FAILED,
+            "ElevenLabs transport response type is invalid.",
+        )
+    if (
+        type(response.status_code) is not int
+        or response.status_code < 100
+        or response.status_code > 599
+    ):
+        raise _error(
+            ErrorCode.VOICE_PROVIDER_FAILED,
+            "ElevenLabs response status is invalid.",
+        )
+    if type(response.headers) is not dict or len(response.headers) > (
+        _MAX_RESPONSE_HEADERS
+    ):
+        raise _error(
+            ErrorCode.VOICE_PROVIDER_FAILED,
+            "ElevenLabs response headers are invalid.",
+        )
+    for name, value in response.headers.items():
+        if (
+            type(name) is not str
+            or _HTTP_HEADER_NAME.fullmatch(name) is None
+            or type(value) is not str
+            or not value.isascii()
+            or len(value) > _MAX_HEADER_VALUE_LENGTH
+        ):
+            raise _error(
+                ErrorCode.VOICE_PROVIDER_FAILED,
+                "ElevenLabs response headers are invalid.",
+            )
+    if type(response.body) is not bytes or len(response.body) > _MAX_RESPONSE_BYTES:
+        raise _error(
+            ErrorCode.VOICE_PROVIDER_FAILED,
+            "ElevenLabs response body is invalid.",
+        )
+    return response
+
+
 def _parse_headers(headers: Mapping[str, str]) -> tuple[int, str, str | None]:
     normalized: dict[str, str] = {}
     for name, value in headers.items():
@@ -354,14 +448,18 @@ def _parse_headers(headers: Mapping[str, str]) -> tuple[int, str, str | None]:
                 "ElevenLabs response metadata is malformed.",
             )
         normalized[key] = value
-    try:
-        character_cost = int(normalized["character-cost"])
-        request_id = normalized["request-id"]
-    except (KeyError, ValueError) as exc:
+    character_cost_text = normalized.get("character-cost")
+    request_id = normalized.get("request-id")
+    if (
+        character_cost_text is None
+        or _CANONICAL_CHARACTER_COST.fullmatch(character_cost_text) is None
+        or request_id is None
+    ):
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
             "ElevenLabs response metadata is incomplete.",
-        ) from exc
+        )
+    character_cost = int(character_cost_text)
     trace_id = normalized.get("x-trace-id")
     if (
         character_cost <= 0
@@ -401,13 +499,7 @@ def parse_forced_alignment_response(body: bytes) -> bytes:
             ErrorCode.VOICE_PROVIDER_FAILED,
             "ElevenLabs forced-alignment response exceeds the response limit.",
         )
-    try:
-        payload = json.loads(body)
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise _error(
-            ErrorCode.VOICE_PROVIDER_FAILED,
-            "ElevenLabs forced-alignment JSON is malformed.",
-        ) from exc
+    payload = _parse_json_object(body, surface="forced-alignment response")
     if not isinstance(payload, dict) or set(payload) != {"characters", "words", "loss"}:
         raise _error(
             ErrorCode.VOICE_PROVIDER_FAILED,
@@ -519,6 +611,15 @@ class ElevenLabsVoiceProvider:
                 ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED,
                 "ElevenLabs zero-retention entitlement is required.",
             )
+        if not (
+            self._policy.license_allowed
+            and self._policy.use_policy_allowed
+            and self._policy.voice_authorization_verified
+        ):
+            raise _error(
+                ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED,
+                "ElevenLabs machine policy authorization is incomplete.",
+            )
         binding = _permit_binding(request, authorization)
         if not _permit_is_valid(permit, binding):
             raise _error(
@@ -552,9 +653,13 @@ class ElevenLabsVoiceProvider:
                 "xi-api-key": self._api_key,
             },
             body=body,
-            _consume=_permit_consumer(permit, binding),
         )
         transport_failed = False
+        if not _consume_permit(permit, binding):
+            raise _error(
+                ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED,
+                "A current one-use durable voice submit permit is required.",
+            )
         try:
             response = self._transport.request(transport_request)
         except Exception:
@@ -568,6 +673,7 @@ class ElevenLabsVoiceProvider:
                 ),
                 retryable=False,
             )
+        response = _validate_transport_response(response)
         if response.status_code < 200 or response.status_code >= 300:
             raise _error(
                 ErrorCode.VOICE_PROVIDER_FAILED,
