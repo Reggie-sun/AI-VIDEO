@@ -184,6 +184,38 @@ def test_candidate_path_is_exact_contained_and_rejects_symlink(tmp_path):
     assert protected.read_bytes() == b"protected"
 
 
+@pytest.mark.parametrize("symlink_component", ["state", "voice", "attempts"])
+def test_candidate_rejects_symlink_in_parent_chain(tmp_path, symlink_component):
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    components = ("state", "voice", "attempts")
+    link_index = components.index(symlink_component)
+    link_parent = project_root.joinpath(*components[:link_index])
+    link_parent.mkdir(parents=True, exist_ok=True)
+    outside_root = tmp_path / f"outside-{symlink_component}"
+    outside_attempt = outside_root.joinpath(
+        *components[link_index + 1 :], "attempt-parent-link"
+    )
+    outside_attempt.mkdir(parents=True)
+    (link_parent / symlink_component).symlink_to(
+        outside_root, target_is_directory=True
+    )
+    candidate = canonical_voice_audio_candidate_path(
+        project_root, "attempt-parent-link"
+    )
+
+    with pytest.raises(AiVideoError) as caught:
+        materialize_audio_candidate(
+            DIALOGUE.read_bytes(),
+            candidate_path=candidate,
+            project_root=project_root,
+            attempt_id="attempt-parent-link",
+        )
+
+    assert caught.value.code is ErrorCode.AUDIO_ASSET_INVALID
+    assert not (outside_attempt / "candidate.wav").exists()
+
+
 def test_materialization_is_idempotent_for_same_bytes_and_conflicts_otherwise(tmp_path):
     attempt_root = tmp_path / "state/voice/attempts/attempt-replay"
     attempt_root.mkdir(parents=True)

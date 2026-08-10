@@ -36,7 +36,6 @@ from ai_video.production.paths import (
     _materialize_immutable_regular_file_nofollow,
     canonical_audio_asset_path,
     canonical_voice_audio_candidate_path,
-    canonical_voice_attempt_root,
 )
 
 
@@ -571,14 +570,13 @@ def materialize_audio_candidate(
     if not isinstance(payload, bytes) or not payload:
         raise _audio_invalid("Audio candidate payload must be non-empty bytes.")
     try:
-        attempt_root = canonical_voice_attempt_root(project_root, attempt_id)
         expected = canonical_voice_audio_candidate_path(project_root, attempt_id)
         if candidate_path != expected:
             raise ValueError("Audio candidate is not the exact attempt-owned path.")
         return _materialize_immutable_regular_file_nofollow(
             candidate_path,
             data=payload,
-            contained_by=attempt_root,
+            contained_by=project_root,
         )
     except (OSError, ValueError) as exc:
         raise _audio_invalid("Could not materialize exact attempt-owned audio candidate.", str(exc)) from exc
