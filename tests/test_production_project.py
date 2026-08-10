@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import socket
 
 import pytest
 import yaml
@@ -57,6 +58,9 @@ from ai_video.production.project import _render_source_payload_matches
 from production_project_factory import (
     load_revision_two_models,
     make_p4_composition_fixture,
+    make_voice_activation_request,
+    make_voice_preview_and_authorization,
+    make_voice_request,
     write_production_project,
 )
 
@@ -306,6 +310,29 @@ def _activate_fake_render(
     )
     activated = committer.activate_render_state(request)
     return activated, durable, request
+
+
+def _activate_fake_voice(root: Path, *, include_caption: bool = True):
+    project_path = write_production_project(root)
+    request = make_voice_request(root, attempt_id="reader-voice")
+    preview, authorization = make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(root)
+    writer.begin_voice_generation(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = make_voice_activation_request(
+        root,
+        request,
+        authorization,
+        expected_manifest_revision=3,
+        include_caption=include_caption,
+    )
+    caption_ids = (f"caption-{request.attempt_id}",) if include_caption else ()
+    committed = writer.activate_voice_assets(
+        activation,
+        audio_asset_ids=audio_ids,
+        caption_asset_ids=caption_ids,
+    )
+    return project_path, request, committed, audio_ids, caption_ids
 
 
 def test_load_production_project_returns_verified_bundle(tmp_path):
@@ -674,6 +701,54 @@ def test_reader_loads_21_with_none_render_state_without_rewrite(tmp_path):
     assert loaded.manifest.schema_version == "2.1"
     assert loaded.render_state is None
     assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_reopens_exact_generated_voice_graph_without_writes_or_network(
+    tmp_path, monkeypatch
+):
+    project_path, request, committed, audio_ids, caption_ids = _activate_fake_voice(
+        tmp_path
+    )
+    before = _tree_snapshot(tmp_path)
+
+    def reject_network(*_args, **_kwargs):
+        raise AssertionError("read-only project load attempted network access")
+
+    monkeypatch.setattr(socket, "create_connection", reject_network)
+    loaded = load_production_project(project_path)
+
+    assert loaded.manifest.active_registry == committed.active_registry
+    assert loaded.manifest.active_render_state is None
+    assert {item.asset_id for item in loaded.registry.assets}.issuperset(
+        {*audio_ids, *caption_ids}
+    )
+    attempt = next(item for item in loaded.manifest.attempts if item.attempt_id == request.attempt_id)
+    assert attempt.voice_phase == "activate"
+    assert _tree_snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize("artifact", ["provenance", "cost", "alignment"])
+def test_reader_rejects_tampered_selected_voice_evidence_without_recovery(
+    tmp_path, artifact
+):
+    project_path, request, _, _, _ = _activate_fake_voice(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    paths = writer.voice_attempt_paths(request.attempt_id)
+    selected = {
+        "provenance": paths.provenance_path,
+        "cost": paths.cost_path,
+        "alignment": paths.alignment_path,
+    }
+    target = selected[artifact]
+    payload = target.read_bytes()
+    target.write_bytes(b"x" * len(payload))
+    manifest_before = (tmp_path / "state/manifest.json").read_bytes()
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(project_path)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert (tmp_path / "state/manifest.json").read_bytes() == manifest_before
 
 
 def test_reader_verifies_selected_render_graph_exactly_without_rewrite(tmp_path):

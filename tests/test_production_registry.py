@@ -15,6 +15,7 @@ from ai_video.production.models import (
     ToolIdentity,
 )
 from ai_video.production.registry import load_asset_registry, registry_semantic_sha256
+from production_project_factory import make_p4_composition_fixture
 
 ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
@@ -81,6 +82,19 @@ def load(path: Path, root: Path):
     return load_asset_registry(path.relative_to(root), root, root / "assets/files")
 
 
+def write_snapshot(root: Path, snapshot: AssetRegistrySnapshot) -> Path:
+    provisional = snapshot.model_copy(
+        update={"revision_id": ZERO_HASH, "content_hash": ZERO_HASH}
+    )
+    digest = registry_semantic_sha256(provisional)
+    sealed = provisional.model_copy(
+        update={"revision_id": digest, "content_hash": digest}
+    )
+    path = root / f"assets/registry.{digest}.json"
+    path.write_text(sealed.model_dump_json(indent=2), encoding="utf-8")
+    return path
+
+
 def test_registry_loads_verified_local_asset(tmp_path):
     path = write_registry(tmp_path)
     snapshot, asset_paths = load(path, tmp_path)
@@ -88,6 +102,67 @@ def test_registry_loads_verified_local_asset(tmp_path):
     assert not snapshot.assets[0].artifact_path.is_absolute()
     assert asset_paths["image-hero-1"].is_absolute()
     assert asset_paths["image-hero-1"].is_relative_to(tmp_path.resolve())
+
+
+def test_registry_21_verifies_audio_probe_against_typed_metadata(tmp_path):
+    loaded, _ = make_p4_composition_fixture(tmp_path)
+    audio = next(item for item in loaded.registry.assets if item.audio_metadata is not None)
+    assert audio.audio_metadata is not None
+    changed = audio.model_copy(
+        update={
+            "audio_metadata": audio.audio_metadata.model_copy(
+                update={"duration_samples": audio.audio_metadata.duration_samples + 1}
+            ),
+            "duration_seconds": None,
+        }
+    )
+    registry = loaded.registry.model_copy(
+        update={
+            "assets": tuple(
+                changed if item.asset_id == changed.asset_id else item
+                for item in loaded.registry.assets
+            )
+        }
+    )
+    path = write_snapshot(tmp_path, registry)
+
+    with pytest.raises(AiVideoError, match="audio metadata"):
+        load(path, tmp_path)
+
+
+@pytest.mark.parametrize("mismatch", ["track", "style"])
+def test_registry_21_verifies_caption_bytes_metadata_and_style(tmp_path, mismatch):
+    loaded, _ = make_p4_composition_fixture(tmp_path)
+    caption = next(item for item in loaded.registry.assets if item.caption_metadata is not None)
+    assert caption.caption_metadata is not None
+    if mismatch == "track":
+        changed = caption.model_copy(
+            update={
+                "caption_metadata": caption.caption_metadata.model_copy(
+                    update={"caption_track_id": "other-track"}
+                )
+            }
+        )
+        registry = loaded.registry.model_copy(
+            update={
+                "assets": tuple(
+                    changed if item.asset_id == changed.asset_id else item
+                    for item in loaded.registry.assets
+                )
+            }
+        )
+    else:
+        style_path = (
+            tmp_path
+            / "assets/styles"
+            / f"{caption.caption_metadata.style_content_hash}.json"
+        )
+        style_path.write_bytes(b'{"schema_version":"different"}')
+        registry = loaded.registry
+    path = write_snapshot(tmp_path, registry)
+
+    with pytest.raises(AiVideoError, match="caption"):
+        load(path, tmp_path)
 
 
 @pytest.mark.parametrize("stored", ["/tmp/outside.png", "../outside.png"])

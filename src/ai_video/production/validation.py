@@ -210,7 +210,7 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
         ],
         "artifact_id",
     )
-    known_inputs = artifact_ids | asset_ids
+    known_inputs = artifact_ids | asset_ids | character_ids | scene_ids | shot_ids | beat_ids
     assets_by_id = {item.asset_id: item for item in bundle.registry.assets}
     shots_by_id = {item.shot_id: item for item in bundle.shots}
 
@@ -221,6 +221,28 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
                 f"Asset {asset.asset_id} references unknown input(s): "
                 f"{', '.join(missing_inputs)}"
             )
+        metadata = asset.caption_metadata
+        if metadata is None:
+            continue
+        source = assets_by_id.get(metadata.source_audio_asset_id)
+        if source is None:
+            raise _invalid(
+                f"Caption asset {asset.asset_id} references unknown source audio."
+            )
+        if source.asset_type not in {AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}:
+            raise _invalid(f"Caption asset {asset.asset_id} source audio type is invalid.")
+        source_metadata = source.audio_metadata
+        if source_metadata is None:
+            raise _invalid(f"Caption asset {asset.asset_id} source audio metadata is missing.")
+        if source.sha256 != metadata.source_audio_sha256:
+            raise _invalid(f"Caption asset {asset.asset_id} source audio hash is invalid.")
+        if source_metadata.script_hash != metadata.script_hash:
+            raise _invalid(f"Caption asset {asset.asset_id} script hash is invalid.")
+        if (
+            asset.input_artifact_ids != (source.asset_id,)
+            or asset.input_fingerprint != source.sha256
+        ):
+            raise _invalid(f"Caption asset {asset.asset_id} source linkage is invalid.")
 
     for scene in bundle.scenes:
         missing_characters = sorted(set(scene.participant_ids) - character_ids)

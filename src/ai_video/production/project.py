@@ -11,6 +11,16 @@ from pydantic import BaseModel, ValidationError
 
 from ai_video.config import load_yaml, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.audio import (
+    VoiceCallAuthorization,
+    VoiceCostReceipt,
+    VoiceGenerationPreview,
+    VoiceGenerationRequest,
+    VoicePricingSnapshot,
+    VoiceProvenanceReceipt,
+    VoiceProviderResult,
+    validate_voice_call_authorization,
+)
 from ai_video.production.captions import (
     _canonical_track_bytes,
     validate_caption_track_timeline_binding,
@@ -18,6 +28,8 @@ from ai_video.production.captions import (
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     ArtifactReference,
+    AssetSourceKind,
+    AssetType,
     CaptionTrack,
     Character,
     LoadedProductionProject,
@@ -37,10 +49,14 @@ from ai_video.production.models import (
     Shot,
     Story,
     Storyboard,
+    StateCommitAttempt,
+    StateCommitStatus,
+    VoiceRequestReceipt,
     VersionedArtifact,
 )
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
+    canonical_audio_asset_path,
     canonical_render_output_path,
     canonical_render_receipt_path,
     canonical_render_source_asset_path,
@@ -49,6 +65,7 @@ from ai_video.production.paths import (
     canonical_render_state_path,
     canonical_render_timeline_path,
     canonical_renderer_source_receipt_path,
+    canonical_voice_attempt_artifact_path,
     resolve_contained_path,
 )
 from ai_video.production.registry import load_asset_registry
@@ -157,6 +174,256 @@ def _verify_manifest_snapshot_identity(
         raise _invalid("Manifest registry revision does not match selected registry snapshot.")
     if bundle.registry.content_hash != registry_pointer.content_hash:
         raise _invalid("Manifest registry content hash does not match selected registry snapshot.")
+
+
+def _canonical_model_bytes(model: BaseModel) -> bytes:
+    payload = json.dumps(
+        model.model_dump(mode="json"),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return (payload + "\n").encode("utf-8")
+
+
+def _read_voice_model(
+    root: Path,
+    attempt_id: str,
+    name: str,
+    model_type: type[ModelT],
+) -> tuple[ModelT, bytes]:
+    snapshot = _read_regular_file_nofollow(
+        canonical_voice_attempt_artifact_path(root, attempt_id, name),
+        contained_by=root,
+    )
+    model = model_type.model_validate_json(snapshot.data)
+    if snapshot.data != _canonical_model_bytes(model):
+        raise ValueError(f"{name} is not canonical")
+    return model, snapshot.data
+
+
+def _read_voice_json(
+    root: Path, attempt_id: str, name: str
+) -> tuple[dict[str, object], bytes]:
+    snapshot = _read_regular_file_nofollow(
+        canonical_voice_attempt_artifact_path(root, attempt_id, name),
+        contained_by=root,
+    )
+    value = json.loads(snapshot.data)
+    if not isinstance(value, dict):
+        raise ValueError(f"{name} must contain an object")
+    canonical = (
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        + "\n"
+    ).encode("utf-8")
+    if snapshot.data != canonical:
+        raise ValueError(f"{name} is not canonical")
+    return value, snapshot.data
+
+
+def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
+    remote_voice_assets = tuple(
+        asset
+        for asset in bundle.registry.assets
+        if asset.asset_type is AssetType.VOICE
+        and asset.source_kind is AssetSourceKind.GENERATED
+        and asset.egress.remote
+    )
+    if not remote_voice_assets:
+        return
+    attempts_by_asset: dict[str, StateCommitAttempt] = {}
+    for attempt in bundle.manifest.attempts:
+        if (
+            attempt.operation == "voice_generation"
+            and attempt.status is StateCommitStatus.SUCCEEDED
+            and attempt.voice_phase == "activate"
+        ):
+            for asset_id in (
+                *attempt.candidate_audio_asset_ids,
+                *attempt.candidate_caption_asset_ids,
+            ):
+                if asset_id in attempts_by_asset:
+                    raise _invalid("Active P4 voice asset is claimed by multiple attempts.")
+                attempts_by_asset[asset_id] = attempt
+    assets_by_id = {asset.asset_id: asset for asset in bundle.registry.assets}
+    for asset in remote_voice_assets:
+        attempt = attempts_by_asset.get(asset.asset_id)
+        if attempt is None:
+            raise _invalid("Active generated voice asset has no succeeded Manifest attempt.")
+        try:
+            request, _ = _read_voice_model(
+                bundle.root, attempt.attempt_id, "request.json", VoiceGenerationRequest
+            )
+            preview, _ = _read_voice_model(
+                bundle.root, attempt.attempt_id, "preview.json", VoiceGenerationPreview
+            )
+            authorization, _ = _read_voice_model(
+                bundle.root,
+                attempt.attempt_id,
+                "authorization.json",
+                VoiceCallAuthorization,
+            )
+            cost, cost_bytes = _read_voice_model(
+                bundle.root, attempt.attempt_id, "cost.json", VoiceCostReceipt
+            )
+            provenance, provenance_bytes = _read_voice_model(
+                bundle.root,
+                attempt.attempt_id,
+                "provenance.json",
+                VoiceProvenanceReceipt,
+            )
+            intent, _ = _read_voice_json(
+                bundle.root, attempt.attempt_id, "submit-intent.json"
+            )
+            outcome, _ = _read_voice_json(
+                bundle.root, attempt.attempt_id, "outcome.json"
+            )
+            alignment = _read_regular_file_nofollow(
+                canonical_voice_attempt_artifact_path(
+                    bundle.root, attempt.attempt_id, "alignment.json"
+                ),
+                contained_by=bundle.root,
+            )
+            validate_voice_call_authorization(
+                request,
+                preview,
+                authorization,
+                pricing=VoicePricingSnapshot(
+                    snapshot_id=preview.pricing_snapshot_id,
+                    effective_date=preview.pricing_effective_date,
+                    currency=preview.currency,
+                    pricing_unit=preview.pricing_unit,
+                    unit_price_microunits=preview.unit_price_microunits,
+                    minimum_billable_units=preview.minimum_billable_units,
+                ),
+            )
+            audio_snapshot = _read_regular_file_nofollow(
+                bundle.root / asset.artifact_path, contained_by=bundle.root
+            )
+            if (
+                audio_snapshot.file_sha256 != asset.sha256
+                or audio_snapshot.size_bytes != asset.size_bytes
+            ):
+                raise ValueError("voice audio identity changed after registry verification")
+            result = VoiceProviderResult(
+                request_id=request.request_id,
+                request_fingerprint=request.voice_request_fingerprint,
+                audio_bytes=audio_snapshot.data,
+                audio_sha256=asset.sha256,
+                content_type=asset.mime_type,
+                provider_request_id=outcome.get("provider_request_id"),
+                provider_trace_id=outcome.get("provider_trace_id"),
+                alignment_receipt_bytes=alignment.data,
+                alignment_receipt_sha256=alignment.file_sha256,
+                cost_receipt=cost,
+                provenance_receipt=provenance,
+                terminal_status=outcome.get("terminal_status"),
+                preview_fingerprint=preview.preview_fingerprint,
+                authorization_fingerprint=authorization.authorization_fingerprint,
+                result_fingerprint=outcome.get("result_fingerprint"),
+            )
+            metadata = asset.audio_metadata
+            if metadata is None or attempt.voice_request is None:
+                raise ValueError("voice metadata is missing")
+            expected_request_receipt = VoiceRequestReceipt(
+                request_id=request.request_id,
+                attempt_id=request.attempt_id,
+                request_fingerprint=request.voice_request_fingerprint,
+                script_hash=request.script_hash,
+                provider_kind=request.provider_kind,
+                model_id=request.model_id,
+                voice_id=request.voice_id,
+                language=request.language,
+                pricing_snapshot_id=request.pricing_snapshot_id,
+                budget_reservation_receipt_id=request.budget_reservation_receipt_id,
+                egress_authorization_receipt_id=request.egress_authorization_receipt_id,
+                destination=authorization.destination,
+            )
+            expected_intent = {
+                "attempt_id": request.attempt_id,
+                "request_fingerprint": request.voice_request_fingerprint,
+                "authorization_fingerprint": authorization.authorization_fingerprint,
+                "destination": authorization.destination,
+                "budget_reservation_receipt_id": authorization.budget_reservation_receipt_id,
+                "egress_authorization_receipt_id": authorization.egress_authorization_receipt_id,
+            }
+            expected_outcome = {
+                "request_id": result.request_id,
+                "request_fingerprint": result.request_fingerprint,
+                "preview_fingerprint": result.preview_fingerprint,
+                "authorization_fingerprint": result.authorization_fingerprint,
+                "result_fingerprint": result.result_fingerprint,
+                "provider_request_id": result.provider_request_id,
+                "provider_trace_id": result.provider_trace_id,
+                "audio_sha256": result.audio_sha256,
+                "alignment_receipt_sha256": result.alignment_receipt_sha256,
+                "content_type": result.content_type,
+                "policy_receipt_id": provenance.policy_receipt_id,
+                "retention_mode": provenance.retention_mode,
+                "terminal_status": result.terminal_status,
+            }
+            caption_assets = tuple(
+                assets_by_id[item]
+                for item in attempt.candidate_caption_asset_ids
+                if item in assets_by_id
+            )
+            if (
+                request.attempt_id != attempt.attempt_id
+                or request.base_project != attempt.base_project
+                or request.base_registry != attempt.base_registry
+                or attempt.voice_request != expected_request_receipt
+                or intent != expected_intent
+                or outcome != expected_outcome
+                or asset.asset_id not in attempt.candidate_audio_asset_ids
+                or asset.artifact_path != canonical_audio_asset_path(asset.sha256)
+                or asset.creation_receipt_id
+                != f"voice-result-{result.result_fingerprint}"
+                or asset.tool != provenance.adapter
+                or asset.usage_license != provenance.license_policy_decision
+                or asset.cost_receipt_id
+                != f"cost-{hashlib.sha256(cost_bytes).hexdigest()}"
+                or metadata.provenance_receipt_id
+                != f"provenance-{hashlib.sha256(provenance_bytes).hexdigest()}"
+                or metadata.alignment_receipt_id
+                != f"alignment-{alignment.file_sha256}"
+                or metadata.audio_kind != request.audio_kind
+                or metadata.speaker_id != request.speaker_id
+                or metadata.voice_id != request.voice_id
+                or metadata.language != request.language
+                or metadata.script_hash != request.script_hash
+                or metadata.sample_rate_hz != request.output_sample_rate_hz
+                or metadata.channels != request.output_channels
+                or metadata.source.provider_or_tool != provenance.adapter
+                or metadata.source.input_artifact_ids != request.input_artifact_ids
+                or metadata.source.input_fingerprint != request.input_fingerprint
+                or asset.egress.destination != authorization.destination
+                or asset.egress.authorization_receipt_id
+                != request.egress_authorization_receipt_id
+                or asset.egress.request_fingerprint
+                != request.voice_request_fingerprint
+                or asset.egress.payload_fingerprint != request.script_hash
+                or asset.egress.retention_mode != provenance.retention_mode
+                or asset.egress.provider_policy_snapshot_id
+                != provenance.policy_receipt_id
+                or len(caption_assets) != len(attempt.candidate_caption_asset_ids)
+                or any(
+                    caption.caption_metadata is None
+                    or caption.creation_receipt_id
+                    != f"caption-result-{result.result_fingerprint}"
+                    or caption.caption_metadata.source_audio_asset_id != asset.asset_id
+                    or caption.caption_metadata.source_audio_sha256 != asset.sha256
+                    or caption.artifact_path
+                    != Path(f"assets/captions/{caption.sha256}.json")
+                    or caption.caption_metadata.script_hash != request.script_hash
+                    or caption.caption_metadata.alignment_receipt_id
+                    != metadata.alignment_receipt_id
+                    for caption in caption_assets
+                )
+            ):
+                raise ValueError("voice evidence identity mismatch")
+        except (AiVideoError, OSError, ValidationError, ValueError, KeyError, TypeError) as exc:
+            detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
+            raise _invalid("Active P4 voice evidence graph is invalid.", detail) from exc
 
 
 def _bundle_hash(state: RenderStateSnapshot) -> str:
@@ -670,6 +937,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     _verify_manifest_snapshot_identity(
         bundle, manifest.active_project, manifest.active_registry
     )
+    _verify_active_voice_evidence(bundle)
     if manifest.active_render_state is not None:
         render_state = load_verified_render_state(
             root,

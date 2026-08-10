@@ -37,6 +37,7 @@ from ai_video.production.models import (
     VisualStrategy,
 )
 from ai_video.production.validation import validate_project_references, validate_shot_strategy
+from production_project_factory import make_p4_composition_fixture
 
 HASH = "0" * 64
 PROVENANCE = (SourceReference(kind="user_input", reference="brief-1"),)
@@ -652,6 +653,54 @@ def make_bundle() -> LoadedProductionProject:
 
 def test_project_references_accept_complete_graph():
     validate_project_references(make_bundle())
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        ("unknown", "unknown source audio"),
+        ("wrong_type", "source audio type"),
+        ("hash", "source audio hash"),
+        ("script", "script hash"),
+    ],
+)
+def test_project_references_reject_caption_source_identity_drift(
+    tmp_path, mutation, message
+):
+    bundle, _ = make_p4_composition_fixture(tmp_path)
+    caption = next(item for item in bundle.registry.assets if item.caption_metadata is not None)
+    metadata = caption.caption_metadata
+    assert metadata is not None
+    assets = list(bundle.registry.assets)
+    if mutation == "unknown":
+        metadata = metadata.model_copy(update={"source_audio_asset_id": "missing-audio"})
+    elif mutation == "wrong_type":
+        source_index = next(
+            index
+            for index, item in enumerate(assets)
+            if item.asset_id == metadata.source_audio_asset_id
+        )
+        assets[source_index] = assets[source_index].model_copy(
+            update={"asset_type": AssetType.IMAGE, "audio_metadata": None}
+        )
+    elif mutation == "hash":
+        metadata = metadata.model_copy(update={"source_audio_sha256": "f" * 64})
+    elif mutation == "script":
+        metadata = metadata.model_copy(update={"script_hash": "f" * 64})
+    assets = [
+        item.model_copy(update={"caption_metadata": metadata})
+        if item.asset_id == caption.asset_id
+        else item
+        for item in assets
+    ]
+    changed = bundle.model_copy(
+        update={
+            "registry": bundle.registry.model_copy(update={"assets": tuple(assets)})
+        }
+    )
+
+    with pytest.raises(AiVideoError, match=message):
+        validate_project_references(changed)
 
 
 @pytest.mark.parametrize(
