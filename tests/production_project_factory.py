@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-import json
 import hashlib
+import io
+import json
+import struct
 import threading
+import wave
 from pathlib import Path
 
 import yaml
@@ -558,13 +561,19 @@ def _make_audio_asset(
     sample_rate_hz: int = 48_000,
 ) -> tuple[AssetRecord, Path]:
     path = root / "assets/files" / f"{asset_id}.wav"
-    payload = b"RIFF" + asset_id.encode("utf-8")
-    path.write_bytes(payload)
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as output:
+        output.setnchannels(1)
+        output.setsampwidth(2)
+        output.setframerate(sample_rate_hz)
+        fixture_sample = 600 + sum(asset_id.encode("utf-8")) % 1_200
+        output.writeframes(struct.pack("<h", fixture_sample) * duration_samples)
+    path.write_bytes(buffer.getvalue())
     speech = audio_kind in {AudioKind.DIALOGUE, AudioKind.NARRATION}
     source = AudioSource(
         kind=AssetSourceKind.IMPORTED,
         provider_or_tool=ToolIdentity(name="fixture", version="1"),
-        input_artifact_ids=("script-1",) if speech else (),
+        input_artifact_ids=("story-main",) if speech else (),
         input_fingerprint=hashlib.sha256(asset_id.encode("utf-8")).hexdigest(),
         original_reference=f"fixture://{asset_id}",
     )

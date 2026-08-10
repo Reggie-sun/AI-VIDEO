@@ -6,6 +6,7 @@ import json
 import math
 import os
 import shutil
+import struct
 import subprocess
 import wave
 from dataclasses import dataclass
@@ -16,7 +17,7 @@ import pytest
 import ai_video.production as production
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.composition import timeline_fingerprint
+from ai_video.production.composition import resolve_composition, timeline_fingerprint
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.hyperframes import (
     OFFLINE_ENV,
@@ -41,6 +42,8 @@ from ai_video.production.hyperframes import (
 from ai_video.production.models import (
     DeliveryProfile,
     FixedTransform,
+    AudioKind,
+    MeasuredAudioRenderMetadata,
     RendererIdentity,
     RendererKind,
     RendererSourceReceipt,
@@ -49,6 +52,8 @@ from ai_video.production.models import (
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
     ResolvedTimeline,
+    ResolvedAudioSpan,
+    ResolvedDuckingSpec,
     ResolvedVisualSpan,
     SourceReference,
     TransitionKind,
@@ -220,6 +225,180 @@ def _materialize(tmp_path: Path, timeline: ResolvedTimeline | None = None):
         staging_root=tmp_path / "staging",
         allowed_staging_parent=tmp_path,
     )
+
+
+def _p4_resolved_inputs(tmp_path: Path):
+    loaded, spec = project_factory.make_p4_composition_fixture(tmp_path)
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+    style = spec.caption_tracks[0].style_reference
+    assert style is not None
+    sources = {
+        span.asset_id: loaded.asset_paths[span.asset_id]
+        for span in timeline.visual_spans
+    }
+    sources.update(
+        {
+            span.asset_id: loaded.asset_paths[span.asset_id]
+            for span in timeline.audio_spans
+        }
+    )
+    sources.update(
+        {
+            cue.caption_asset_id: loaded.asset_paths[cue.caption_asset_id]
+            for cue in timeline.caption_cues
+        }
+    )
+    sources[style.artifact_id] = tmp_path / style.path
+    return loaded, spec, timeline, sources
+
+
+def test_p4_source_materializes_exact_audio_caption_and_style_bindings(tmp_path):
+    _, _, timeline, sources = _p4_resolved_inputs(tmp_path)
+    result = materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "staging-p4",
+        allowed_staging_parent=tmp_path,
+    )
+
+    assert len(result.audio_bindings) == 1
+    assert result.audio_bindings[0].asset_id == (
+        f"p4-mix-{timeline.composition_fingerprint}"
+    )
+    assert result.audio_bindings[0].resolved_track_ids == tuple(
+        span.track_id for span in timeline.audio_spans
+    )
+    assert {item.caption_track_id for item in result.caption_bindings} == {
+        cue.caption_track_id for cue in timeline.caption_cues
+    }
+    source = result.index_path.read_text(encoding="utf-8")
+    assert "<audio" in source
+    assert source.count("<audio") == 1 and 'data-volume="1"' in source
+    assert "data-caption-track-id" in source
+    assert "http://" not in source and "https://" not in source
+    assert "Remotion" not in source and "Captions.ai" not in source
+
+
+def test_p4_premix_applies_sample_exact_fade_duck_release_and_saturation(tmp_path):
+    def wav_bytes(samples: tuple[int, ...]) -> bytes:
+        from io import BytesIO
+
+        buffer = BytesIO()
+        with wave.open(buffer, "wb") as output:
+            output.setnchannels(1)
+            output.setsampwidth(2)
+            output.setframerate(24)
+            output.writeframes(struct.pack(f"<{len(samples)}h", *samples))
+        return buffer.getvalue()
+
+    silence = wav_bytes((0,) * 4)
+    tone = wav_bytes((10_000,) * 10)
+    side_path = tmp_path / "side.wav"
+    bgm_path = tmp_path / "bgm.wav"
+    side_path.write_bytes(silence)
+    bgm_path.write_bytes(tone)
+    side_hash = hashlib.sha256(silence).hexdigest()
+    bgm_hash = hashlib.sha256(tone).hexdigest()
+    base = make_resolved_timeline()
+    timeline = _reseal_timeline(
+        base,
+        schema_version="2.1",
+        sample_rate=24,
+        total_samples=10,
+        audio_spans=(
+            ResolvedAudioSpan(
+                track_id="side",
+                audio_kind=AudioKind.DIALOGUE,
+                asset_id="side-audio",
+                asset_sha256=side_hash,
+                start_sample=2,
+                duration_samples=4,
+                source_start_sample=0,
+                source_duration_samples=4,
+                gain_millidb=0,
+                fade_in_samples=0,
+                fade_out_samples=0,
+            ),
+            ResolvedAudioSpan(
+                track_id="music",
+                audio_kind=AudioKind.BGM,
+                asset_id="bgm-audio",
+                asset_sha256=bgm_hash,
+                start_sample=0,
+                duration_samples=10,
+                source_start_sample=0,
+                source_duration_samples=10,
+                gain_millidb=0,
+                fade_in_samples=2,
+                fade_out_samples=2,
+                ducking=ResolvedDuckingSpec(
+                    sidechain_track_ids=("side",),
+                    attenuation_millidb=-6_020,
+                    attack_samples=2,
+                    release_samples=2,
+                ),
+            ),
+        ),
+    )
+    sources = make_asset_sources(tmp_path, timeline)
+    sources.update({"side-audio": side_path, "bgm-audio": bgm_path})
+    result = materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "mix-source",
+        allowed_staging_parent=tmp_path,
+    )
+    mixed_path = result.root / result.audio_bindings[0].materialized_path
+    with wave.open(str(mixed_path), "rb") as mixed:
+        values = struct.unpack("<20h", mixed.readframes(10))
+    left = values[0::2]
+    right = values[1::2]
+
+    assert left == right
+    assert left == (5_000, 10_000, 7_500, 5_000, 5_000, 5_000, 7_500, 10_000, 10_000, 5_000)
+
+    hot = wav_bytes((30_000,) * 10)
+    hot_path = tmp_path / "hot.wav"
+    hot_path.write_bytes(hot)
+    hot_hash = hashlib.sha256(hot).hexdigest()
+    saturated = _reseal_timeline(
+        timeline,
+        audio_spans=tuple(
+            span.model_copy(
+                update={
+                    "asset_id": f"hot-{index}",
+                    "asset_sha256": hot_hash,
+                    "fade_in_samples": 0,
+                    "fade_out_samples": 0,
+                    "ducking": None,
+                    "start_sample": 0,
+                    "duration_samples": 10,
+                    "source_duration_samples": 10,
+                }
+            )
+            for index, span in enumerate(timeline.audio_spans)
+        ),
+    )
+    saturated_sources = make_asset_sources(tmp_path / "saturated", saturated)
+    saturated_sources.update({"hot-0": hot_path, "hot-1": hot_path})
+    saturated_result = materialize_hyperframes_source(
+        saturated,
+        asset_sources=saturated_sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "saturated-source",
+        allowed_staging_parent=tmp_path,
+    )
+    with wave.open(
+        str(
+            saturated_result.root
+            / saturated_result.audio_bindings[0].materialized_path
+        ),
+        "rb",
+    ) as mixed:
+        saturated_values = struct.unpack("<20h", mixed.readframes(10))
+    assert set(saturated_values) == {32_767}
 
 
 def _assert_source_invalid(call) -> AiVideoError:
@@ -955,6 +1134,80 @@ def _adapter(tmp_path, runner, **overrides):
         ip_path=ip_path,
         **kwargs,
     )
+
+
+def test_p4_audio_output_requires_one_exact_measured_stream(tmp_path):
+    _, _, timeline, sources = _p4_resolved_inputs(tmp_path)
+    root = tmp_path / "attempt-p4"
+    root.mkdir(mode=0o700)
+    attempt = HyperFramesRenderAttempt(
+        attempt_id="attempt-1",
+        selection=_selection(timeline),
+        timeline=timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=root / "source",
+        allowed_staging_parent=root,
+        output_path=root / "output/render.mp4",
+        verification_snapshot_path=root / "verified.mp4",
+    )
+    probe = {
+        "streams": [
+            {
+                "codec_type": "video",
+                "width": 1280,
+                "height": 720,
+                "r_frame_rate": "24/1",
+                "nb_frames": str(timeline.total_frames),
+                "codec_name": "h264",
+            },
+            {
+                "codec_type": "audio",
+                "index": 1,
+                "codec_name": "aac",
+                "sample_rate": "48000",
+                "channels": 2,
+                "channel_layout": "stereo",
+            },
+        ],
+        "packets": [
+            {
+                "stream_index": 1,
+                "pts": "-1024",
+                "duration": "1024",
+                "side_data_list": [
+                    {
+                        "side_data_type": "Skip Samples",
+                        "skip_samples": 1024,
+                        "discard_padding": 0,
+                    }
+                ],
+            },
+            {"stream_index": 1, "pts": "191488", "duration": "768"},
+        ],
+    }
+    result = _adapter(
+        tmp_path / "tools-p4",
+        FakeRunner(),
+        probe=lambda _fd: probe,
+        decoded_audio=lambda _fd, _rate, _channels: (
+            timeline.total_samples + 256,
+            "a" * 64,
+        ),
+    ).render(attempt)
+
+    assert result.output.measured.audio == MeasuredAudioRenderMetadata(
+        stream_count=1,
+        codec_name="aac",
+        sample_rate_hz=48_000,
+        channels=2,
+        channel_layout="stereo",
+        decoded_samples=timeline.total_samples + 256,
+        encoder_priming_samples=1_024,
+        encoder_padding_samples=256,
+        measurement_method="held-fd ffprobe packets plus pcm_s16le decode",
+    )
+    assert result.output.decoded_audio_fingerprint == "a" * 64
 
 
 def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
@@ -1892,6 +2145,227 @@ def test_p4_raw_renderer_capability_gate_accepts_local_audio_and_frame_caption(
         {
             "caption_active_half_open": [15, 45],
             "pixels_rgb": {str(frame): list(rgb) for frame, rgb in pixels.items()},
+            "held_fd": True,
+        },
+    )
+
+
+@pytest.mark.skipif(
+    os.environ.get("AI_VIDEO_P4_RENDERER_GATE") != "1",
+    reason="requires the explicit P4 production audio/caption renderer gate",
+)
+def test_p4_production_renderer_gate_renders_resolved_audio_and_captions(
+    tmp_path,
+):
+    def required_path(
+        name: str, *, directory: bool = False, lock_symlink: bool = False
+    ) -> Path:
+        value = os.environ.get(name)
+        assert value, f"{name} is required when AI_VIDEO_P4_RENDERER_GATE=1"
+        path = Path(value)
+        assert path.is_absolute() and ".." not in path.parts
+        resolved = path.resolve(strict=True)
+        if directory:
+            assert resolved == path and path.is_dir() and not path.is_symlink()
+        elif lock_symlink:
+            assert path.is_symlink() and os.access(path, os.X_OK)
+        else:
+            assert resolved == path and not path.is_symlink() and os.access(path, os.X_OK)
+        return path
+
+    def evidence(name: str, payload: object) -> None:
+        (evidence_root / name).write_text(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+
+    binary = required_path("P4_BINARY", lock_symlink=True)
+    browser = required_path("P4_BROWSER_PATH")
+    unshare = required_path("P4_UNSHARE_PATH")
+    ip_path = required_path("P4_IP_PATH")
+    bash = required_path("P4_BASH_PATH")
+    ffmpeg = required_path("P4_FFMPEG_PATH")
+    ffprobe = required_path("P4_FFPROBE_PATH")
+    evidence_root = required_path("P4_RENDERER_EVIDENCE", directory=True)
+
+    loaded, spec = project_factory.make_p4_composition_fixture(tmp_path)
+    spec = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "shot_ids": ("shot-1",),
+                "layers": (spec.layers[0],),
+                "transitions": (),
+                "audio_tracks": (spec.audio_tracks[0],),
+            }
+        )
+    )
+    committer = ProductionStateCommitter(tmp_path)
+    committed = committer.commit(
+        prepare_project_registry_commit(
+            manifest=loaded.manifest,
+            project=loaded.project,
+            registry=loaded.registry,
+            attempt_id="p4-renderer-registry",
+        )
+    )
+    reloaded = load_production_project(tmp_path / "project.yaml")
+    timeline = production.resolve_composition(
+        reloaded, spec, renderer_version="0.7.103"
+    )
+    assert timeline.schema_version == "2.1"
+    assert timeline.total_frames == 48 and timeline.total_samples == 96_000
+    assert len(timeline.audio_spans) == 1 and len(timeline.caption_cues) == 2
+    style = spec.caption_tracks[0].style_reference
+    assert style is not None
+    sources = {
+        span.asset_id: reloaded.asset_paths[span.asset_id]
+        for span in timeline.visual_spans
+    }
+    sources.update(
+        {
+            span.asset_id: reloaded.asset_paths[span.asset_id]
+            for span in timeline.audio_spans
+        }
+    )
+    sources.update(
+        {
+            cue.caption_asset_id: reloaded.asset_paths[cue.caption_asset_id]
+            for cue in timeline.caption_cues
+        }
+    )
+    sources[style.artifact_id] = tmp_path / style.path
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-p4-production",
+        attempt_id="p4-production-render",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=committed.active_project,
+        current_registry=committed.active_registry,
+    )
+    begin = BeginRenderAttemptRequest(
+        committed.manifest_revision, None, selection
+    )
+    paths = committer.render_attempt_paths(selection.attempt_id)
+    expected = [
+        [str(binary), "--version"],
+        [str(binary), "doctor", "--json"],
+        [str(binary), "lint", str(paths.source_root), "--json"],
+        [str(binary), "check", str(paths.source_root), "--json"],
+        [
+            str(binary),
+            "render",
+            str(paths.source_root),
+            "-o",
+            str(paths.staged_output_path),
+            "--json",
+        ],
+    ]
+    evidence(
+        "expected-argv.json",
+        {"renderer_version": "0.7.103", "argv": expected},
+    )
+    network_argv = [
+        str(unshare), "--user", "--map-root-user", "--net", "--pid", "--fork",
+        "--mount-proc", str(bash), "-ceu",
+        '"$P3_IP_PATH" link set lo up; "$P3_IP_PATH" -json addr show',
+        "p4-production-network-audit",
+    ]
+    network = subprocess.run(
+        network_argv,
+        cwd=_renderer_tool_root(binary),
+        env=_controlled_env(browser, ip_path),
+        shell=False,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        close_fds=True,
+        check=False,
+        text=True,
+        timeout=30,
+    )
+    assert network.returncode == 0, network.stderr
+    interfaces = json.loads(network.stdout)
+    assert [item["ifname"] for item in interfaces] == ["lo"]
+    evidence("network-audit.json", {"interfaces": interfaces, "isolated": True})
+
+    activated = production.render_with_hyperframes(
+        committer=committer,
+        begin_request=begin,
+        timeline=timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        binary_path=binary,
+        browser_path=browser,
+        unshare_path=unshare,
+        ip_path=ip_path,
+        bash_path=bash,
+        ffmpeg_path=ffmpeg,
+        ffprobe_path=ffprobe,
+    )
+    assert activated.active_render_state is not None
+    graph = load_production_project(tmp_path / "project.yaml")
+    assert graph.render_state is not None
+    render = RenderReceipt.model_validate_json(
+        (tmp_path / graph.render_state.render_receipt.path).read_bytes()
+    )
+    source = RendererSourceReceipt.model_validate_json(
+        (tmp_path / graph.render_state.source_receipt.path).read_bytes()
+    )
+    assert source.schema_version == "2.1"
+    assert source.audio_bindings and source.caption_bindings
+    assert render.schema_version == "2.1" and render.measured.audio is not None
+    assert render.decoded_audio_fingerprint is not None
+    assert "ffmpeg=" in render.measured.audio.measurement_method
+    assert "ffprobe=" in render.measured.audio.measurement_method
+    evidence(
+        "audio-measurement.json",
+        {
+            **render.measured.audio.model_dump(mode="json"),
+            "decoded_pcm_sha256": render.decoded_audio_fingerprint,
+            "held_fd": True,
+        },
+    )
+
+    output = tmp_path / graph.render_state.output.path
+    descriptor = os.open(output, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+    pixels: dict[int, tuple[int, int, int]] = {}
+    try:
+        held = f"/proc/self/fd/{descriptor}"
+        for frame in (0, 23, 24):
+            pixel = subprocess.run(
+                [
+                    str(ffmpeg), "-v", "error", "-i", held,
+                    "-vf", f"select=eq(n\\,{frame}),format=rgb24,crop=1:1:64:650",
+                    "-frames:v", "1", "-f", "rawvideo", "-",
+                ],
+                shell=False,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                close_fds=True,
+                pass_fds=(descriptor,),
+                check=False,
+                timeout=120,
+            )
+            assert pixel.returncode == 0, pixel.stderr.decode(errors="replace")
+            assert len(pixel.stdout) == 3
+            pixels[frame] = tuple(pixel.stdout)  # type: ignore[assignment]
+    finally:
+        os.close(descriptor)
+    assert pixels[0][1] > 180 and pixels[0][2] > 180
+    assert pixels[23][1] > 180 and pixels[23][2] > 180
+    assert pixels[24][1] < 80 and pixels[24][2] < 80
+    evidence(
+        "caption-frames.json",
+        {
+            "resolved_half_open_frames": [
+                [cue.start_frame, cue.end_frame_exclusive]
+                for cue in timeline.caption_cues
+            ],
+            "pixels_rgb": {str(key): list(value) for key, value in pixels.items()},
             "held_fd": True,
         },
     )

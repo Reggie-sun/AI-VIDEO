@@ -6,7 +6,10 @@ import math
 import os
 import re
 import stat
+import struct
 import subprocess
+import wave
+from io import BytesIO
 from collections.abc import Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -25,8 +28,13 @@ from ai_video.production.composition import (
 from ai_video.production.hashing import seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
     FixedTransform,
+    AudioChannelLayout,
+    CaptionTrack,
+    MeasuredAudioRenderMetadata,
     MeasuredRenderMetadata,
     RendererAssetBinding,
+    RendererAudioBinding,
+    RendererCaptionBinding,
     RendererCheckReceipt,
     RendererKind,
     RendererSelectionReceipt,
@@ -118,6 +126,8 @@ class MaterializedHyperFramesSource:
     bundle_sha256: str
     asset_bindings: tuple[RendererAssetBinding, ...]
     timeline: ResolvedTimeline
+    audio_bindings: tuple[RendererAudioBinding, ...] = ()
+    caption_bindings: tuple[RendererCaptionBinding, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -441,10 +451,176 @@ def _css_transform(transform: FixedTransform) -> str:
     )
 
 
-def _render_source(timeline: ResolvedTimeline) -> str:
+def _sample_seconds(samples: int, sample_rate: int) -> str:
+    value = Decimal(samples) / Decimal(sample_rate)
+    rendered = format(value.quantize(Decimal("0.000000001")), "f")
+    return rendered.rstrip("0").rstrip(".") or "0"
+
+
+def _gain_volume(gain_millidb: int) -> str:
+    value = Decimal(str(math.pow(10.0, gain_millidb / 20_000.0)))
+    rendered = format(value.quantize(Decimal("0.000000001")), "f")
+    return rendered.rstrip("0").rstrip(".") or "0"
+
+
+_MIX_SCALE = 1_000_000
+
+
+def _fixed_gain(gain_millidb: int) -> int:
+    value = Decimal(str(math.pow(10.0, gain_millidb / 20_000.0)))
+    return int((value * _MIX_SCALE).to_integral_value(rounding=ROUND_HALF_EVEN))
+
+
+def _multiply_fixed(left: int, right: int) -> int:
+    product = left * right
+    return (product + _MIX_SCALE // 2) // _MIX_SCALE
+
+
+def _scale_pcm(sample: int, scale: int) -> int:
+    product = sample * scale
+    if product >= 0:
+        return (product + _MIX_SCALE // 2) // _MIX_SCALE
+    return -((-product + _MIX_SCALE // 2) // _MIX_SCALE)
+
+
+def _linear_scale(start: int, end: int, ordinal: int, length: int) -> int:
+    if length <= 0:
+        return end
+    return start + ((end - start) * ordinal + length // 2) // length
+
+
+def _ducking_scale(
+    sample: int,
+    *,
+    intervals: tuple[tuple[int, int], ...],
+    attenuation: int,
+    attack: int,
+    release: int,
+) -> int:
+    result = _MIX_SCALE
+    for start, end in intervals:
+        if start <= sample < end:
+            if attack and sample - start < attack:
+                candidate = _linear_scale(
+                    _MIX_SCALE, attenuation, sample - start + 1, attack
+                )
+            else:
+                candidate = attenuation
+            result = min(result, candidate)
+        elif release and end <= sample < end + release:
+            candidate = _linear_scale(
+                attenuation, _MIX_SCALE, sample - end + 1, release
+            )
+            result = min(result, candidate)
+    return result
+
+
+def _decoded_pcm16(snapshot: NoFollowFile) -> tuple[int, int, tuple[tuple[int, int], ...]]:
+    sample_rate, channels, frames = _validated_wav(snapshot)
+    with wave.open(BytesIO(snapshot.data), "rb") as source:
+        payload = source.readframes(frames)
+    values = struct.unpack(f"<{frames * channels}h", payload)
+    if channels == 1:
+        stereo = tuple((value, value) for value in values)
+    else:
+        stereo = tuple(zip(values[0::2], values[1::2], strict=True))
+    return sample_rate, frames, stereo
+
+
+def _mix_resolved_audio(
+    timeline: ResolvedTimeline,
+    *,
+    audio_snapshots: Mapping[str, NoFollowFile],
+) -> bytes:
+    decoded: dict[str, tuple[tuple[int, int], ...]] = {}
+    for asset_id, snapshot in audio_snapshots.items():
+        sample_rate, _, samples = _decoded_pcm16(snapshot)
+        if sample_rate != timeline.sample_rate:
+            raise _source_invalid("Audio source sample rate does not match timeline.")
+        decoded[asset_id] = samples
+    by_track = {item.track_id: item for item in timeline.audio_spans}
+    output = [[0, 0] for _ in range(timeline.total_samples)]
+    for span in timeline.audio_spans:
+        source = decoded[span.asset_id]
+        source_end = span.source_start_sample + span.source_duration_samples
+        if source_end > len(source) or span.duration_samples != span.source_duration_samples:
+            raise _source_invalid("P4 pre-mix requires exact source-duration placement.")
+        gain = _fixed_gain(span.gain_millidb)
+        duck_intervals: tuple[tuple[int, int], ...] = ()
+        attenuation = _MIX_SCALE
+        attack = release = 0
+        if span.ducking is not None:
+            duck_intervals = tuple(
+                (
+                    by_track[track_id].start_sample,
+                    by_track[track_id].start_sample
+                    + by_track[track_id].duration_samples,
+                )
+                for track_id in span.ducking.sidechain_track_ids
+            )
+            attenuation = _fixed_gain(span.ducking.attenuation_millidb)
+            attack = span.ducking.attack_samples
+            release = span.ducking.release_samples
+        for offset in range(span.duration_samples):
+            envelope = _MIX_SCALE
+            if span.fade_in_samples and offset < span.fade_in_samples:
+                envelope = min(
+                    envelope,
+                    _linear_scale(0, _MIX_SCALE, offset + 1, span.fade_in_samples),
+                )
+            remaining = span.duration_samples - offset
+            if span.fade_out_samples and remaining <= span.fade_out_samples:
+                envelope = min(
+                    envelope,
+                    _linear_scale(0, _MIX_SCALE, remaining, span.fade_out_samples),
+                )
+            if span.ducking is not None:
+                envelope = _multiply_fixed(
+                    envelope,
+                    _ducking_scale(
+                        span.start_sample + offset,
+                        intervals=duck_intervals,
+                        attenuation=attenuation,
+                        attack=attack,
+                        release=release,
+                    ),
+                )
+            scale = _multiply_fixed(gain, envelope)
+            left, right = source[span.source_start_sample + offset]
+            target = output[span.start_sample + offset]
+            target[0] += _scale_pcm(left, scale)
+            target[1] += _scale_pcm(right, scale)
+    pcm = bytearray()
+    for left, right in output:
+        pcm.extend(
+            struct.pack(
+                "<hh",
+                max(-32768, min(32767, left)),
+                max(-32768, min(32767, right)),
+            )
+        )
+    buffer = BytesIO()
+    with wave.open(buffer, "wb") as mixed:
+        mixed.setnchannels(2)
+        mixed.setsampwidth(2)
+        mixed.setframerate(timeline.sample_rate)
+        mixed.writeframes(bytes(pcm))
+    return buffer.getvalue()
+
+
+def _stable_dom_id(prefix: str, identity: str) -> str:
+    return f"{prefix}-{hashlib.sha256(identity.encode('utf-8')).hexdigest()}"
+
+
+def _render_source(
+    timeline: ResolvedTimeline,
+    mixed_audio: RendererAudioBinding | None = None,
+) -> str:
     fps = timeline.delivery_profile.fps
     duration = _seconds(timeline.total_frames, fps)
     clips: list[str] = []
+    audio_elements: list[str] = []
+    caption_elements: list[str] = []
     animations: list[str] = []
     keyframes: list[str] = []
     for span in timeline.visual_spans:
@@ -490,6 +666,37 @@ def _render_source(timeline: ResolvedTimeline) -> str:
                 ]
             )
         )
+    if mixed_audio is not None:
+        audio_elements.append(
+            (
+                f'<audio id="{_stable_dom_id("p4-audio-mix", timeline.composition_fingerprint)}"'
+                f' class="clip" src="{mixed_audio.materialized_path.as_posix()}"'
+                f' data-mix-asset-id="{escape(mixed_audio.asset_id)}"'
+                f' data-mix-sha256="{mixed_audio.asset_sha256}"'
+                f' data-resolved-track-ids="{escape(",".join(mixed_audio.resolved_track_ids))}"'
+                ' data-start="0"'
+                f' data-duration="{_sample_seconds(timeline.total_samples, timeline.sample_rate)}"'
+                ' data-media-start="0" data-track-index="10000" data-volume="1"></audio>'
+            )
+        )
+    for track_index, cue in enumerate(timeline.caption_cues, start=20_000):
+        caption_elements.append(
+            (
+                f'<div id="{_stable_dom_id("p4-caption", cue.caption_track_id + ":" + cue.segment_id)}" class="clip caption" data-layout-allow-caption-zone'
+                f' data-caption-track-id="{escape(cue.caption_track_id)}"'
+                f' data-caption-asset-id="{escape(cue.caption_asset_id)}"'
+                f' data-caption-asset-sha256="{cue.caption_asset_sha256}"'
+                f' data-caption-timing-fingerprint="{cue.caption_timing_fingerprint}"'
+                f' data-segment-id="{escape(cue.segment_id)}"'
+                f' data-style-reference-id="{escape(cue.style_reference_id or "")}"'
+                f' data-style-content-hash="{cue.style_content_hash or ""}"'
+                f' data-start-sample="{cue.start_sample}" data-end-sample="{cue.end_sample}"'
+                f' data-start-frame="{cue.start_frame}" data-end-frame-exclusive="{cue.end_frame_exclusive}"'
+                f' data-start="{_seconds(cue.start_frame, fps)}"'
+                f' data-duration="{_seconds(cue.end_frame_exclusive - cue.start_frame, fps)}"'
+                f' data-track-index="{track_index}">{escape(cue.text)}</div>'
+            )
+        )
     return "\n".join(
         [
             "<!doctype html>",
@@ -501,6 +708,13 @@ def _render_source(timeline: ResolvedTimeline) -> str:
             "    #stage{position:relative;overflow:hidden}",
             "    .clip{position:absolute;inset:0}",
             "    .clip img{width:100%;height:100%;object-fit:cover}",
+            *(
+                (
+                    "    .caption{position:absolute;left:5%;right:5%;bottom:8%;padding:10px;background:#00ffff;color:#000;text-align:center;font:700 24px/1.25 sans-serif}",
+                )
+                if timeline.caption_cues
+                else ()
+            ),
             *(f"    {rule}" for rule in animations),
             *(f"    {rule}" for rule in keyframes),
             "  </style>",
@@ -515,6 +729,8 @@ def _render_source(timeline: ResolvedTimeline) -> str:
                 f' data-height="{timeline.delivery_profile.height}" data-fps="{fps}">'
             ),
             *clips,
+            *caption_elements,
+            *audio_elements,
             "</div>",
             "</body>",
             "</html>",
@@ -541,22 +757,55 @@ def _validate_local_relative_url(url: str) -> None:
         raise _source_invalid(f"HyperFrames source URL is not contained: {url}")
 
 
+def _validated_wav(snapshot: NoFollowFile) -> tuple[int, int, int]:
+    try:
+        with wave.open(BytesIO(snapshot.data), "rb") as source:
+            if source.getsampwidth() != 2 or source.getcomptype() != "NONE":
+                raise ValueError("only PCM16 WAV is accepted by the P4 renderer")
+            channels = source.getnchannels()
+            if channels not in {1, 2}:
+                raise ValueError("P4 audio must be mono or stereo")
+            return source.getframerate(), channels, source.getnframes()
+    except (EOFError, wave.Error, ValueError) as exc:
+        raise _source_invalid("Renderer audio source is not canonical PCM16 WAV.", str(exc)) from exc
+
+
+def _all_materialized_bindings(
+    visual: tuple[RendererAssetBinding, ...],
+    audio: tuple[RendererAudioBinding, ...],
+    captions: tuple[RendererCaptionBinding, ...],
+) -> tuple[tuple[Path, str], ...]:
+    values = [(item.materialized_path, item.asset_sha256) for item in visual]
+    values.extend((item.materialized_path, item.asset_sha256) for item in audio)
+    for item in captions:
+        values.append((item.materialized_path, item.caption_asset_sha256))
+        if item.style_materialized_path is not None:
+            assert item.style_content_hash is not None
+            values.append((item.style_materialized_path, item.style_content_hash))
+    return tuple(values)
+
+
 def _source_bundle_sha256(
     index_path: Path,
     bindings: tuple[RendererAssetBinding, ...],
     *,
     expected_index_sha256: str,
+    audio_bindings: tuple[RendererAudioBinding, ...] = (),
+    caption_bindings: tuple[RendererCaptionBinding, ...] = (),
 ) -> str:
     root = index_path.parent
-    paths = {Path("index.html"), *(item.materialized_path for item in bindings)}
+    materialized = _all_materialized_bindings(
+        bindings, audio_bindings, caption_bindings
+    )
+    paths = {Path("index.html"), *(path for path, _ in materialized)}
     if _list_regular_files_nofollow(root) != paths:
         raise _source_invalid("HyperFrames bundle file set changed after audit.")
     expected_hashes = {Path("index.html"): expected_index_sha256}
-    for binding in bindings:
-        previous = expected_hashes.get(binding.materialized_path)
-        if previous is not None and previous != binding.asset_sha256:
+    for path, digest in materialized:
+        previous = expected_hashes.get(path)
+        if previous is not None and previous != digest:
             raise _source_invalid("HyperFrames bundle has conflicting asset hashes.")
-        expected_hashes[binding.materialized_path] = binding.asset_sha256
+        expected_hashes[path] = digest
     entries = []
     for relative in sorted(paths, key=lambda item: item.as_posix()):
         snapshot = _read_regular_file_nofollow(root / relative, contained_by=root)
@@ -581,6 +830,8 @@ def _audit_hyperframes_source(
     *,
     expected_assets: tuple[RendererAssetBinding, ...],
     expected_timeline: ResolvedTimeline,
+    expected_audio: tuple[RendererAudioBinding, ...] = (),
+    expected_captions: tuple[RendererCaptionBinding, ...] = (),
 ) -> None:
     _validate_timeline(expected_timeline)
     timeline_bindings: dict[str, RendererAssetBinding] = {}
@@ -603,7 +854,12 @@ def _audit_hyperframes_source(
     snapshot = _read_regular_file_nofollow(index_path, contained_by=source_root)
     source = snapshot.data.decode("utf-8", errors="strict")
     parsed = _parse_source_document(source)
-    expected = _parse_source_document(_render_source(expected_timeline))
+    expected = _parse_source_document(
+        _render_source(
+            expected_timeline,
+            expected_audio[0] if expected_audio else None,
+        )
+    )
     if (
         parsed.document_model != expected.document_model
         or parsed.css_model != expected.css_model
@@ -622,8 +878,9 @@ def _audit_hyperframes_source(
     ):
         raise _source_invalid("HyperFrames source contains a runtime or external input.")
     expected_urls = {item.materialized_path.as_posix() for item in expected_assets}
+    expected_urls.update(item.materialized_path.as_posix() for item in expected_audio)
     if parsed.media_urls != expected_urls or parsed.all_urls != expected_urls:
-        raise _source_invalid("Source URLs do not exactly match declared raster bindings.")
+        raise _source_invalid("Source URLs do not exactly match declared media bindings.")
     for url in parsed.all_urls:
         _validate_local_relative_url(url)
     for binding in expected_assets:
@@ -637,7 +894,54 @@ def _audit_hyperframes_source(
             suffix=target.suffix,
             mime_type=binding.asset_mime_type,
         )
-    expected_files = {Path("index.html"), *(item.materialized_path for item in expected_assets)}
+    for binding in expected_audio:
+        target = _validate_contained_target(
+            source_root, binding.materialized_path, before_creation=False
+        )
+        target_snapshot = _read_regular_file_nofollow(target, contained_by=source_root)
+        if target_snapshot.file_sha256 != binding.asset_sha256:
+            raise _source_invalid(f"Changed audio source asset: {binding.asset_id}.")
+        sample_rate, channels, duration = _validated_wav(target_snapshot)
+        if (
+            sample_rate != binding.sample_rate_hz
+            or channels != binding.channels
+            or duration != binding.duration_samples
+        ):
+            raise _source_invalid("Measured renderer audio binding changed.")
+    for binding in expected_captions:
+        caption_path = _validate_contained_target(
+            source_root, binding.materialized_path, before_creation=False
+        )
+        caption_snapshot = _read_regular_file_nofollow(
+            caption_path, contained_by=source_root
+        )
+        if caption_snapshot.file_sha256 != binding.caption_asset_sha256:
+            raise _source_invalid("Changed structured caption asset.")
+        try:
+            track = CaptionTrack.model_validate_json(caption_snapshot.data)
+        except ValueError as exc:
+            raise _source_invalid("Structured caption asset is invalid.", str(exc)) from exc
+        if track.caption_track_id != binding.caption_track_id:
+            raise _source_invalid("Structured caption identity changed.")
+        if binding.style_materialized_path is not None:
+            style_path = _validate_contained_target(
+                source_root, binding.style_materialized_path, before_creation=False
+            )
+            style_snapshot = _read_regular_file_nofollow(
+                style_path, contained_by=source_root
+            )
+            if style_snapshot.file_sha256 != binding.style_content_hash:
+                raise _source_invalid("Caption style bytes changed.")
+            try:
+                style_value = json.loads(style_snapshot.data)
+            except (UnicodeError, json.JSONDecodeError) as exc:
+                raise _source_invalid("Caption style JSON is invalid.", str(exc)) from exc
+            if not isinstance(style_value, dict):
+                raise _source_invalid("Caption style JSON must be an object.")
+    materialized = _all_materialized_bindings(
+        expected_assets, expected_audio, expected_captions
+    )
+    expected_files = {Path("index.html"), *(path for path, _ in materialized)}
     if _list_regular_files_nofollow(source_root) != expected_files:
         raise _source_invalid("HyperFrames staging contains an undeclared file.")
 
@@ -647,12 +951,16 @@ def audit_hyperframes_source(
     *,
     expected_assets: tuple[RendererAssetBinding, ...],
     expected_timeline: ResolvedTimeline,
+    expected_audio: tuple[RendererAudioBinding, ...] = (),
+    expected_captions: tuple[RendererCaptionBinding, ...] = (),
 ) -> None:
     try:
         _audit_hyperframes_source(
             index_path,
             expected_assets=expected_assets,
             expected_timeline=expected_timeline,
+            expected_audio=expected_audio,
+            expected_captions=expected_captions,
         )
     except AiVideoError as exc:
         if exc.code is ErrorCode.RENDERER_SOURCE_INVALID:
@@ -671,7 +979,15 @@ def _materialize_hyperframes_source(
     allowed_staging_parent: Path,
 ) -> MaterializedHyperFramesSource:
     _validate_timeline(timeline)
-    expected_ids = {item.asset_id for item in timeline.visual_spans}
+    visual_ids = {item.asset_id for item in timeline.visual_spans}
+    audio_ids = {item.asset_id for item in timeline.audio_spans}
+    caption_ids = {item.caption_asset_id for item in timeline.caption_cues}
+    style_ids = {
+        item.style_reference_id
+        for item in timeline.caption_cues
+        if item.style_reference_id is not None
+    }
+    expected_ids = visual_ids | audio_ids | caption_ids | style_ids
     if set(asset_sources) != expected_ids:
         raise _source_invalid("Asset sources must exactly match timeline asset IDs.")
     root = _validate_new_contained_root(
@@ -697,13 +1013,129 @@ def _materialize_hyperframes_source(
             root, span.materialized_path, before_creation=True
         )
     bindings = tuple(bindings_by_id[key] for key in sorted(bindings_by_id))
-    source_text = _render_source(timeline)
+
+    audio_snapshots: dict[str, NoFollowFile] = {}
+    for asset_id in sorted(audio_ids):
+        spans = tuple(item for item in timeline.audio_spans if item.asset_id == asset_id)
+        digest = spans[0].asset_sha256
+        if any(item.asset_sha256 != digest for item in spans):
+            raise _source_invalid("Timeline contains conflicting audio asset hashes.")
+        source = Path(asset_sources[asset_id])
+        snapshot = _read_regular_file_nofollow(source, contained_by=allowed_asset_root)
+        if source.suffix.lower() != ".wav" or snapshot.file_sha256 != digest:
+            raise _source_invalid("Audio source type or hash does not match timeline.")
+        sample_rate, channels, duration_samples = _validated_wav(snapshot)
+        if sample_rate != timeline.sample_rate or any(
+            item.source_start_sample + item.source_duration_samples > duration_samples
+            for item in spans
+        ):
+            raise _source_invalid("Audio source measurements do not match timeline.")
+        audio_snapshots[asset_id] = snapshot
+    audio_bindings: tuple[RendererAudioBinding, ...] = ()
+    mixed_audio_bytes: bytes | None = None
+    mixed_audio_target: Path | None = None
+    if timeline.audio_spans:
+        mixed_audio_bytes = _mix_resolved_audio(
+            timeline, audio_snapshots=audio_snapshots
+        )
+        mixed_audio_hash = hashlib.sha256(mixed_audio_bytes).hexdigest()
+        mixed_relative = Path("assets") / f"{mixed_audio_hash}.wav"
+        mixed_audio_target = _validate_contained_target(
+            root, mixed_relative, before_creation=True
+        )
+        audio_bindings = (
+            RendererAudioBinding(
+                asset_id=f"p4-mix-{timeline.composition_fingerprint}",
+                asset_sha256=mixed_audio_hash,
+                asset_mime_type="audio/wav",
+                materialized_path=mixed_relative,
+                sample_rate_hz=timeline.sample_rate,
+                channels=2,
+                duration_samples=timeline.total_samples,
+                resolved_track_ids=tuple(item.track_id for item in timeline.audio_spans),
+            ),
+        )
+
+    caption_bindings_list: list[RendererCaptionBinding] = []
+    for caption_id in sorted(caption_ids):
+        cues = tuple(
+            item for item in timeline.caption_cues if item.caption_asset_id == caption_id
+        )
+        digest = cues[0].caption_asset_sha256
+        if any(item.caption_asset_sha256 != digest for item in cues):
+            raise _source_invalid("Timeline contains conflicting caption hashes.")
+        caption_source = Path(asset_sources[caption_id])
+        caption_snapshot = _read_regular_file_nofollow(
+            caption_source, contained_by=allowed_asset_root
+        )
+        if caption_source.suffix.lower() != ".json" or caption_snapshot.file_sha256 != digest:
+            raise _source_invalid("Caption source type or hash does not match timeline.")
+        try:
+            track = CaptionTrack.model_validate_json(caption_snapshot.data)
+        except ValueError as exc:
+            raise _source_invalid("Structured caption source is invalid.", str(exc)) from exc
+        if not verify_artifact_hash(track):
+            raise _source_invalid("Structured caption content hash is invalid.")
+        track_ids = {item.caption_track_id for item in cues}
+        if track_ids != {track.caption_track_id}:
+            raise _source_invalid("Caption track identity does not match timeline.")
+        by_segment = {item.segment_id: item for item in track.segments}
+        if any(
+            cue.segment_id not in by_segment
+            or cue.text != by_segment[cue.segment_id].text
+            or cue.caption_timing_fingerprint != track.timing_fingerprint
+            for cue in cues
+        ):
+            raise _source_invalid("Caption cues do not match structured caption truth.")
+        caption_relative = Path("assets") / f"{digest}.json"
+        targets_by_id[caption_id] = _validate_contained_target(
+            root, caption_relative, before_creation=True
+        )
+        style_identity = {
+            (item.style_reference_id, item.style_content_hash) for item in cues
+        }
+        if len(style_identity) != 1:
+            raise _source_invalid("Caption cues contain conflicting style identity.")
+        style_id, style_hash = next(iter(style_identity))
+        if style_id is None or style_hash is None:
+            raise _source_invalid("Bound captions require an exact style reference.")
+        style_source = Path(asset_sources[style_id])
+        style_snapshot = _read_regular_file_nofollow(
+            style_source, contained_by=allowed_asset_root
+        )
+        if style_source.suffix.lower() != ".json" or style_snapshot.file_sha256 != style_hash:
+            raise _source_invalid("Caption style type or hash does not match timeline.")
+        try:
+            style_value = json.loads(style_snapshot.data)
+        except (UnicodeError, json.JSONDecodeError) as exc:
+            raise _source_invalid("Caption style JSON is invalid.", str(exc)) from exc
+        if not isinstance(style_value, dict):
+            raise _source_invalid("Caption style JSON must be an object.")
+        style_relative = Path("assets") / f"{style_hash}.json"
+        targets_by_id[style_id] = _validate_contained_target(
+            root, style_relative, before_creation=True
+        )
+        caption_bindings_list.append(
+            RendererCaptionBinding(
+                caption_track_id=track.caption_track_id,
+                caption_asset_sha256=digest,
+                materialized_path=caption_relative,
+                style_reference_id=style_id,
+                style_content_hash=style_hash,
+                style_materialized_path=style_relative,
+                resolved_cue_ids=tuple(item.segment_id for item in cues),
+            )
+        )
+    caption_bindings = tuple(caption_bindings_list)
+    source_text = _render_source(
+        timeline, audio_bindings[0] if audio_bindings else None
+    )
     parsed_source = _parse_source_document(source_text)
     for url in parsed_source.all_urls:
         _validate_local_relative_url(url)
 
     snapshots_by_id: dict[str, NoFollowFile] = {}
-    unique_targets: dict[Path, tuple[ResolvedVisualSpan, NoFollowFile]] = {}
+    unique_targets: dict[Path, bytes] = {}
     for span in timeline.visual_spans:
         if span.asset_id in snapshots_by_id:
             continue
@@ -723,34 +1155,50 @@ def _materialize_hyperframes_source(
             raise _source_invalid("Timeline materialized path is not canonical.")
         target = targets_by_id[span.asset_id]
         existing = unique_targets.get(target)
-        if existing is not None and existing[1].data != source_snapshot.data:
+        if existing is not None and existing != source_snapshot.data:
             raise _source_invalid("Canonical asset target has conflicting bytes.")
-        unique_targets[target] = (span, source_snapshot)
+        unique_targets[target] = source_snapshot.data
         snapshots_by_id[span.asset_id] = source_snapshot
         targets_by_id[span.asset_id] = target
 
+    for source_id in sorted(expected_ids - visual_ids - audio_ids):
+        source = Path(asset_sources[source_id])
+        source_snapshot = _read_regular_file_nofollow(
+            source, contained_by=allowed_asset_root
+        )
+        target = targets_by_id[source_id]
+        existing = unique_targets.get(target)
+        if existing is not None and existing != source_snapshot.data:
+            raise _source_invalid("Canonical source target has conflicting bytes.")
+        unique_targets[target] = source_snapshot.data
+    if mixed_audio_target is not None and mixed_audio_bytes is not None:
+        unique_targets[mixed_audio_target] = mixed_audio_bytes
+
     _create_directory_nofollow(root, contained_by=allowed_staging_parent)
     _create_directory_nofollow(root / "assets", contained_by=root)
-    for target, (span, source_snapshot) in unique_targets.items():
+    for target, payload in unique_targets.items():
         copied = _create_regular_file_nofollow(
-            target, data=source_snapshot.data, contained_by=root
+            target, data=payload, contained_by=root
         )
-        suffix = _validated_raster_suffix(
-            copied, suffix=target.suffix, mime_type=span.asset_mime_type
-        )
-        if suffix != target.suffix or copied.file_sha256 != span.asset_sha256:
-            raise _source_invalid(f"Copied asset hash mismatch: {span.asset_id}.")
+        if copied.file_sha256 != target.stem:
+            raise _source_invalid("Copied source hash does not match canonical path.")
     source = source_text.encode("utf-8")
     index_snapshot = _create_regular_file_nofollow(
         index_path, data=source, contained_by=root
     )
     audit_hyperframes_source(
-        index_path, expected_assets=bindings, expected_timeline=timeline
+        index_path,
+        expected_assets=bindings,
+        expected_timeline=timeline,
+        expected_audio=audio_bindings,
+        expected_captions=caption_bindings,
     )
     bundle_sha256 = _source_bundle_sha256(
         index_path,
         bindings,
         expected_index_sha256=index_snapshot.file_sha256,
+        audio_bindings=audio_bindings,
+        caption_bindings=caption_bindings,
     )
     return MaterializedHyperFramesSource(
         root=root,
@@ -759,6 +1207,8 @@ def _materialize_hyperframes_source(
         bundle_sha256=bundle_sha256,
         asset_bindings=bindings,
         timeline=timeline,
+        audio_bindings=audio_bindings,
+        caption_bindings=caption_bindings,
     )
 
 
@@ -833,6 +1283,7 @@ class VerifiedRenderOutput:
     output_size_bytes: int
     measured: MeasuredRenderMetadata
     decoded_frame_fingerprint: str
+    decoded_audio_fingerprint: str | None = None
 
 
 @dataclass(frozen=True)
@@ -885,6 +1336,8 @@ def _render_with_hyperframes(
     expected_version: str,
     probe: Callable[[int], dict] | None = None,
     decoded_frames: Callable[[int], str] | None = None,
+    decoded_audio: Callable[[int, int, int], tuple[int, str]] | None = None,
+    audio_measurement_method: str = "held-fd ffprobe packets plus pcm_s16le decode",
 ) -> ProductionManifest:
     manifest, fresh = committer._begin_render_attempt_with_status(begin_request)
     if not fresh:
@@ -910,6 +1363,8 @@ def _render_with_hyperframes(
             ip_path=ip_path,
             probe=probe or probe_clip_fd,
             decoded_frames=decoded_frames or decoded_frame_sha256_fd,
+            decoded_audio=decoded_audio or decoded_audio_sha256_fd,
+            audio_measurement_method=audio_measurement_method,
         )
         result = adapter.render(
             HyperFramesRenderAttempt(
@@ -995,9 +1450,30 @@ def render_with_hyperframes(
     unshare_path: Path,
     ip_path: Path,
     bash_path: Path,
+    ffmpeg_path: Path | None = None,
+    ffprobe_path: Path | None = None,
     expected_version: str = "0.7.103",
 ) -> ProductionManifest:
     """Run the sole production HyperFrames path and durably activate its result."""
+    probe = None
+    decoded_audio = None
+    measurement_method = "held-fd ffprobe packets plus pcm_s16le decode"
+    if getattr(timeline, "audio_spans", ()):
+        if ffmpeg_path is None or ffprobe_path is None:
+            raise _renderer_unavailable(
+                "P4 audio render requires explicit ffmpeg and ffprobe paths."
+            )
+        ffmpeg = _validated_executable(ffmpeg_path, "ffmpeg")
+        ffprobe = _validated_executable(ffprobe_path, "ffprobe")
+        probe = lambda fd: probe_clip_fd_with_executable(fd, ffprobe)
+        decoded_audio = lambda fd, rate, channels: decoded_audio_sha256_fd_with_executable(
+            fd, rate, channels, ffmpeg
+        )
+        measurement_method = (
+            "held-fd ffprobe packets plus pcm_s16le decode;"
+            f"ffprobe={ffprobe}:{hashlib.sha256(ffprobe.read_bytes()).hexdigest()};"
+            f"ffmpeg={ffmpeg}:{hashlib.sha256(ffmpeg.read_bytes()).hexdigest()}"
+        )
     return _render_with_hyperframes(
         committer=committer,
         begin_request=begin_request,
@@ -1015,6 +1491,9 @@ def render_with_hyperframes(
         browser_path=browser_path,
         ip_path=ip_path,
         expected_version=expected_version,
+        probe=probe,
+        decoded_audio=decoded_audio,
+        audio_measurement_method=measurement_method,
     )
 
 
@@ -1067,6 +1546,8 @@ def prepare_durable_render_artifacts(
     asset_payloads: dict[Path, bytes] = {}
     asset_pointers: dict[Path, RenderSourceFilePointer] = {}
     durable_bindings: list[RendererAssetBinding] = []
+    durable_audio_bindings: list[RendererAudioBinding] = []
+    durable_caption_bindings: list[RendererCaptionBinding] = []
     for binding in materialized.asset_bindings:
         snapshot = _read_regular_file_nofollow(
             materialized.root / binding.materialized_path,
@@ -1095,6 +1576,45 @@ def prepare_durable_render_artifacts(
             binding.model_copy(update={"materialized_path": durable_path})
         )
 
+    def add_nonvisual(path: Path, expected_hash: str) -> Path:
+        snapshot = _read_regular_file_nofollow(
+            materialized.root / path, contained_by=materialized.root
+        )
+        if snapshot.file_sha256 != expected_hash:
+            raise _source_invalid("Durable P4 source asset changed after render.")
+        durable_path = canonical_render_source_asset_path(
+            materialized.bundle_sha256, expected_hash, path.suffix
+        )
+        previous = asset_payloads.get(durable_path)
+        if previous is not None and previous != snapshot.data:
+            raise _source_invalid("Durable P4 source path has conflicting bytes.")
+        asset_payloads[durable_path] = snapshot.data
+        asset_pointers[durable_path] = RenderSourceFilePointer(
+            path=durable_path,
+            file_sha256=snapshot.file_sha256,
+            size_bytes=snapshot.size_bytes,
+        )
+        return durable_path
+
+    for binding in materialized.audio_bindings:
+        durable_path = add_nonvisual(
+            binding.materialized_path, binding.asset_sha256
+        )
+        durable_audio_bindings.append(
+            binding.model_copy(update={"materialized_path": durable_path})
+        )
+    for binding in materialized.caption_bindings:
+        caption_path = add_nonvisual(
+            binding.materialized_path, binding.caption_asset_sha256
+        )
+        update: dict[str, object] = {"materialized_path": caption_path}
+        if binding.style_materialized_path is not None:
+            assert binding.style_content_hash is not None
+            update["style_materialized_path"] = add_nonvisual(
+                binding.style_materialized_path, binding.style_content_hash
+            )
+        durable_caption_bindings.append(binding.model_copy(update=update))
+
     source_bundle = RenderSourceBundlePointer(
         root_path=source_root,
         bundle_sha256=materialized.bundle_sha256,
@@ -1108,6 +1628,13 @@ def prepare_durable_render_artifacts(
         ),
     )
     renderer = timeline.renderer
+    p4_source_fields: dict[str, object] = {}
+    if materialized.audio_bindings or materialized.caption_bindings:
+        p4_source_fields = {
+            "schema_version": "2.1",
+            "audio_bindings": tuple(durable_audio_bindings),
+            "caption_bindings": tuple(durable_caption_bindings),
+        }
     source_receipt = seal_artifact(
         RendererSourceReceipt(
             artifact_id=f"renderer-source-{renderer_selection.attempt_id}",
@@ -1122,9 +1649,16 @@ def prepare_durable_render_artifacts(
             source_sha256=materialized.source_sha256,
             asset_bindings=tuple(durable_bindings),
             checks=result.checks,
+            **p4_source_fields,
         )
     )
     output_path = canonical_render_output_path(result.output.output_sha256)
+    p4_render_fields: dict[str, object] = {}
+    if timeline.audio_spans:
+        p4_render_fields = {
+            "schema_version": "2.1",
+            "decoded_audio_fingerprint": result.output.decoded_audio_fingerprint,
+        }
     render_receipt = seal_artifact(
         RenderReceipt(
             artifact_id=f"render-receipt-{renderer_selection.attempt_id}",
@@ -1143,6 +1677,7 @@ def prepare_durable_render_artifacts(
             output_size_bytes=result.output.output_size_bytes,
             measured=result.output.measured,
             decoded_frame_fingerprint=result.output.decoded_frame_fingerprint,
+            **p4_render_fields,
         )
     )
 
@@ -1588,12 +2123,16 @@ def _verify_materialized_unchanged(value: MaterializedHyperFramesSource) -> None
         value.index_path,
         expected_assets=value.asset_bindings,
         expected_timeline=value.timeline,
+        expected_audio=value.audio_bindings,
+        expected_captions=value.caption_bindings,
     )
     if (
         _source_bundle_sha256(
             value.index_path,
             value.asset_bindings,
             expected_index_sha256=value.source_sha256,
+            audio_bindings=value.audio_bindings,
+            caption_bindings=value.caption_bindings,
         )
         != value.bundle_sha256
     ):
@@ -1631,13 +2170,18 @@ def _require_same_regular_file(before: os.stat_result, after: os.stat_result) ->
 
 
 def probe_clip_fd(held_fd: int) -> dict:
+    return probe_clip_fd_with_executable(held_fd, Path("ffprobe"))
+
+
+def probe_clip_fd_with_executable(held_fd: int, executable: Path) -> dict:
     with _dup_held_fd_at_start(held_fd) as probe_fd:
         result = subprocess.run(
             [
-                "ffprobe",
+                str(executable),
                 "-v",
                 "error",
                 "-show_streams",
+                "-show_packets",
                 "-show_format",
                 "-of",
                 "json",
@@ -1695,19 +2239,122 @@ def decoded_frame_sha256_fd(held_fd: int) -> str:
     return _text_sha256("\n".join(rows) + "\n")
 
 
-def _measured_metadata(probe: dict) -> MeasuredRenderMetadata:
+def decoded_audio_sha256_fd(
+    held_fd: int, sample_rate: int, channels: int
+) -> tuple[int, str]:
+    return decoded_audio_sha256_fd_with_executable(
+        held_fd, sample_rate, channels, Path("ffmpeg")
+    )
+
+
+def decoded_audio_sha256_fd_with_executable(
+    held_fd: int, sample_rate: int, channels: int, executable: Path
+) -> tuple[int, str]:
+    with _dup_held_fd_at_start(held_fd) as audio_fd:
+        result = subprocess.run(
+            [
+                str(executable),
+                "-v",
+                "error",
+                "-i",
+                f"/proc/self/fd/{audio_fd}",
+                "-map",
+                "0:a:0",
+                "-acodec",
+                "pcm_s16le",
+                "-ar",
+                str(sample_rate),
+                "-ac",
+                str(channels),
+                "-f",
+                "s16le",
+                "-",
+            ],
+            shell=False,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            close_fds=True,
+            pass_fds=(audio_fd,),
+            check=False,
+            timeout=1800,
+        )
+    if result.returncode != 0:
+        raise _render_failed("PCM audio decode failed.", _redact(result.stderr.decode(errors="replace")))
+    frame_size = channels * 2
+    if not result.stdout or len(result.stdout) % frame_size:
+        raise _render_failed("Decoded PCM audio has an invalid sample count.")
+    return len(result.stdout) // frame_size, hashlib.sha256(result.stdout).hexdigest()
+
+
+def _json_int(value: object, label: str) -> int:
+    if isinstance(value, bool):
+        raise ValueError(f"{label} must be an integer")
+    parsed = int(str(value))
+    if parsed < 0:
+        raise ValueError(f"{label} must be non-negative")
+    return parsed
+
+
+def _measured_metadata(
+    probe: dict,
+    *,
+    decoded_audio_samples: int | None = None,
+    audio_measurement_method: str = "held-fd ffprobe packets plus pcm_s16le decode",
+) -> MeasuredRenderMetadata:
     try:
         all_streams = probe["streams"]
         if not isinstance(all_streams, list):
             raise TypeError("streams must be a list")
         video = [item for item in all_streams if item.get("codec_type") == "video"]
         audio = [item for item in all_streams if item.get("codec_type") == "audio"]
-        if len(video) != 1 or audio:
-            raise ValueError(
-                "render must contain exactly one video stream and no audio"
-            )
+        if len(video) != 1 or len(audio) > 1:
+            raise ValueError("render must contain one video and at most one audio stream")
         stream = video[0]
         fps_num_text, fps_den_text = str(stream["r_frame_rate"]).split("/", 1)
+        measured_audio = None
+        if audio:
+            if decoded_audio_samples is None:
+                raise ValueError("decoded audio evidence is required")
+            audio_stream = audio[0]
+            packets = probe.get("packets")
+            if not isinstance(packets, list):
+                raise TypeError("audio packets must be a list")
+            audio_packets = [
+                item
+                for item in packets
+                if _json_int(item.get("stream_index"), "stream_index")
+                == _json_int(audio_stream["index"], "audio index")
+            ]
+            if not audio_packets:
+                raise ValueError("audio packet evidence is required")
+            side_data = audio_packets[0].get("side_data_list", ())
+            if not isinstance(side_data, list):
+                raise TypeError("audio side data must be a list")
+            skip = [
+                item
+                for item in side_data
+                if isinstance(item, dict)
+                and item.get("side_data_type") == "Skip Samples"
+            ]
+            if len(skip) != 1:
+                raise ValueError("exact AAC priming evidence is required")
+            priming = _json_int(skip[0].get("skip_samples"), "skip_samples")
+            last_duration = _json_int(audio_packets[-1]["duration"], "last duration")
+            if last_duration > 1024:
+                raise ValueError("AAC packet duration exceeds the locked frame size")
+            padding = 1024 - last_duration
+            measured_audio = MeasuredAudioRenderMetadata(
+                stream_count=1,
+                codec_name=str(audio_stream["codec_name"]),
+                sample_rate_hz=_json_int(audio_stream["sample_rate"], "sample_rate"),
+                channels=_json_int(audio_stream["channels"], "channels"),
+                channel_layout=AudioChannelLayout(str(audio_stream["channel_layout"])),
+                decoded_samples=decoded_audio_samples,
+                encoder_priming_samples=priming,
+                encoder_padding_samples=padding,
+                measurement_method=audio_measurement_method,
+            )
         return MeasuredRenderMetadata(
             width=_exact_json_count(stream["width"], "width"),
             height=_exact_json_count(stream["height"], "height"),
@@ -1715,6 +2362,7 @@ def _measured_metadata(probe: dict) -> MeasuredRenderMetadata:
             fps_den=int(fps_den_text),
             duration_frames=int(stream["nb_frames"]),
             codec_name=str(stream["codec_name"]),
+            audio=measured_audio,
         )
     except (KeyError, TypeError, ValueError) as exc:
         raise _render_failed(
@@ -1732,6 +2380,22 @@ def _validate_measured_timeline(
         raise _render_failed("Render FPS does not match ResolvedTimeline.")
     if measured.duration_frames != timeline.total_frames:
         raise _render_failed("Render frame count does not match ResolvedTimeline.")
+    if not timeline.audio_spans:
+        if measured.audio is not None:
+            raise _render_failed("Silent ResolvedTimeline produced unexpected audio.")
+        return
+    audio = measured.audio
+    if audio is None:
+        raise _render_failed("Audio ResolvedTimeline produced no audio stream.")
+    if (
+        audio.codec_name != "aac"
+        or audio.sample_rate_hz != timeline.sample_rate
+        or audio.channels != 2
+        or audio.channel_layout is not AudioChannelLayout.STEREO
+        or audio.encoder_priming_samples != 1024
+        or audio.decoded_samples != timeline.total_samples + audio.encoder_padding_samples
+    ):
+        raise _render_failed("Measured audio does not match ResolvedTimeline delivery contract.")
 
 
 class HyperFramesAdapter:
@@ -1742,6 +2406,10 @@ class HyperFramesAdapter:
         *,
         probe: Callable[[int], dict] = probe_clip_fd,
         decoded_frames: Callable[[int], str] = decoded_frame_sha256_fd,
+        decoded_audio: Callable[
+            [int, int, int], tuple[int, str]
+        ] = decoded_audio_sha256_fd,
+        audio_measurement_method: str = "held-fd ffprobe packets plus pcm_s16le decode",
         browser_path: Path,
         ip_path: Path,
     ) -> None:
@@ -1753,6 +2421,8 @@ class HyperFramesAdapter:
         self._expected_version = expected_version
         self._probe = probe
         self._decoded_frames = decoded_frames
+        self._decoded_audio = decoded_audio
+        self._audio_measurement_method = audio_measurement_method
         self._env = _controlled_env(browser_path, ip_path)
 
     def _check(
@@ -1926,7 +2596,23 @@ class HyperFramesAdapter:
                             "Verification snapshot size does not match held bytes."
                         )
                     output_sha256 = hashlib.sha256(verified_bytes).hexdigest()
-                    measured = _measured_metadata(self._probe(fd))
+                    probe = self._probe(fd)
+                    decoded_audio_fingerprint = None
+                    decoded_audio_samples = None
+                    streams = probe.get("streams") if isinstance(probe, dict) else None
+                    if isinstance(streams, list) and any(
+                        item.get("codec_type") == "audio"
+                        for item in streams
+                        if isinstance(item, dict)
+                    ):
+                        decoded_audio_samples, decoded_audio_fingerprint = (
+                            self._decoded_audio(fd, attempt.timeline.sample_rate, 2)
+                        )
+                    measured = _measured_metadata(
+                        probe,
+                        decoded_audio_samples=decoded_audio_samples,
+                        audio_measurement_method=self._audio_measurement_method,
+                    )
                     _validate_measured_timeline(measured, attempt.timeline)
                     decoded = self._decoded_frames(fd)
                     durable_bytes = _read_all_from_held_fd(fd)
@@ -1946,6 +2632,7 @@ class HyperFramesAdapter:
                             output_size_bytes=len(durable_bytes),
                             measured=measured,
                             decoded_frame_fingerprint=decoded,
+                            decoded_audio_fingerprint=decoded_audio_fingerprint,
                         ),
                     )
         except Exception as exc:
