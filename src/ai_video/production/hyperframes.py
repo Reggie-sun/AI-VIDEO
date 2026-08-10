@@ -13,7 +13,7 @@ from io import BytesIO
 from collections.abc import Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
-from decimal import Decimal, ROUND_HALF_EVEN
+from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_EVEN
 from html import escape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -21,6 +21,10 @@ from typing import Callable, Iterator, Literal, Protocol, cast
 from urllib.parse import urlsplit
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.captions import (
+    _canonical_track_bytes,
+    validate_caption_track_timeline_binding,
+)
 from ai_video.production.composition import (
     _validated_raster_suffix,
     timeline_fingerprint,
@@ -327,6 +331,14 @@ def _parse_source_document(source: str) -> _ParsedSourceDocument:
 def _seconds(frame_count: int, fps: int) -> str:
     value = Decimal(frame_count) / Decimal(fps)
     rendered = format(value.quantize(Decimal("0.000000001")), "f")
+    return rendered.rstrip("0").rstrip(".") or "0"
+
+
+def _clip_start_seconds(frame: int, fps: int) -> str:
+    value = Decimal(frame) / Decimal(fps)
+    rendered = format(
+        value.quantize(Decimal("0.000000001"), rounding=ROUND_FLOOR), "f"
+    )
     return rendered.rstrip("0").rstrip(".") or "0"
 
 
@@ -692,7 +704,7 @@ def _render_source(
                 f' data-style-content-hash="{cue.style_content_hash or ""}"'
                 f' data-start-sample="{cue.start_sample}" data-end-sample="{cue.end_sample}"'
                 f' data-start-frame="{cue.start_frame}" data-end-frame-exclusive="{cue.end_frame_exclusive}"'
-                f' data-start="{_seconds(cue.start_frame, fps)}"'
+                f' data-start="{_clip_start_seconds(cue.start_frame, fps)}"'
                 f' data-duration="{_seconds(cue.end_frame_exclusive - cue.start_frame, fps)}"'
                 f' data-track-index="{track_index}">{escape(cue.text)}</div>'
             )
@@ -921,8 +933,28 @@ def _audit_hyperframes_source(
             track = CaptionTrack.model_validate_json(caption_snapshot.data)
         except ValueError as exc:
             raise _source_invalid("Structured caption asset is invalid.", str(exc)) from exc
-        if track.caption_track_id != binding.caption_track_id:
-            raise _source_invalid("Structured caption identity changed.")
+        if caption_snapshot.data != _canonical_track_bytes(track):
+            raise _source_invalid("Structured caption bytes are not canonical.")
+        cues = tuple(
+            cue
+            for cue in expected_timeline.caption_cues
+            if cue.caption_track_id == binding.caption_track_id
+        )
+        try:
+            validate_caption_track_timeline_binding(
+                track,
+                caption_asset_sha256=binding.caption_asset_sha256,
+                cues=cues,
+                audio_spans=expected_timeline.audio_spans,
+                sample_rate_hz=expected_timeline.sample_rate,
+                fps=expected_timeline.delivery_profile.fps,
+                style_reference_id=binding.style_reference_id,
+                style_content_hash=binding.style_content_hash,
+            )
+        except ValueError as exc:
+            raise _source_invalid(
+                "Structured caption semantics changed.", str(exc)
+            ) from exc
         if binding.style_materialized_path is not None:
             style_path = _validate_contained_target(
                 source_root, binding.style_materialized_path, before_creation=False
@@ -1074,19 +1106,11 @@ def _materialize_hyperframes_source(
             track = CaptionTrack.model_validate_json(caption_snapshot.data)
         except ValueError as exc:
             raise _source_invalid("Structured caption source is invalid.", str(exc)) from exc
-        if not verify_artifact_hash(track):
-            raise _source_invalid("Structured caption content hash is invalid.")
-        track_ids = {item.caption_track_id for item in cues}
-        if track_ids != {track.caption_track_id}:
-            raise _source_invalid("Caption track identity does not match timeline.")
-        by_segment = {item.segment_id: item for item in track.segments}
-        if any(
-            cue.segment_id not in by_segment
-            or cue.text != by_segment[cue.segment_id].text
-            or cue.caption_timing_fingerprint != track.timing_fingerprint
-            for cue in cues
+        if (
+            caption_snapshot.data != _canonical_track_bytes(track)
+            or not verify_artifact_hash(track)
         ):
-            raise _source_invalid("Caption cues do not match structured caption truth.")
+            raise _source_invalid("Structured caption content hash is invalid.")
         caption_relative = Path("assets") / f"{digest}.json"
         targets_by_id[caption_id] = _validate_contained_target(
             root, caption_relative, before_creation=True
@@ -1099,6 +1123,21 @@ def _materialize_hyperframes_source(
         style_id, style_hash = next(iter(style_identity))
         if style_id is None or style_hash is None:
             raise _source_invalid("Bound captions require an exact style reference.")
+        try:
+            validate_caption_track_timeline_binding(
+                track,
+                caption_asset_sha256=digest,
+                cues=cues,
+                audio_spans=timeline.audio_spans,
+                sample_rate_hz=timeline.sample_rate,
+                fps=timeline.delivery_profile.fps,
+                style_reference_id=style_id,
+                style_content_hash=style_hash,
+            )
+        except ValueError as exc:
+            raise _source_invalid(
+                "Caption cues do not match structured caption truth.", str(exc)
+            ) from exc
         style_source = Path(asset_sources[style_id])
         style_snapshot = _read_regular_file_nofollow(
             style_source, contained_by=allowed_asset_root

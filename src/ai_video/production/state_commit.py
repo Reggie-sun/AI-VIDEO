@@ -1330,7 +1330,11 @@ class ProductionStateCommitter:
             )
             role, _, binding = binding_map[pointer.path]
             if len(artifact.payload) != pointer.size_bytes or not _render_source_payload_matches(
-                artifact.payload, suffix=suffix, role=role, binding=binding
+                artifact.payload,
+                suffix=suffix,
+                role=role,
+                binding=binding,
+                timeline=timeline,
             ):
                 raise _state_invalid("Render source asset type or bytes are invalid.")
 

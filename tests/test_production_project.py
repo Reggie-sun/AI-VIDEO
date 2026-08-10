@@ -10,6 +10,10 @@ import yaml
 
 from ai_video.config import load_project, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.captions import (
+    _canonical_track_bytes,
+    caption_timing_fingerprint,
+)
 from ai_video.production import (
     ProductionStateCommitter,
     load_production_project,
@@ -27,6 +31,7 @@ from ai_video.production.models import (
     DeliveryProfile,
     FixedTransform,
     AudioChannelLayout,
+    CaptionTrack,
     MeasuredAudioRenderMetadata,
     MeasuredRenderMetadata,
     ProductionManifest,
@@ -35,6 +40,7 @@ from ai_video.production.models import (
     RendererIdentity,
     RendererKind,
     RendererSelectionReceipt,
+    RendererSourceReceipt,
     ResolvedTimeline,
     ResolvedVisualSpan,
     SourceReference,
@@ -47,6 +53,7 @@ from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
 )
+from ai_video.production.project import _render_source_payload_matches
 from production_project_factory import (
     load_revision_two_models,
     make_p4_composition_fixture,
@@ -707,6 +714,62 @@ def test_reader_verifies_p4_audio_caption_and_style_binding_set_without_rewrite(
     assert bundle_paths == binding_paths
     assert len(source["audio_bindings"]) == 1
     assert len(source["caption_bindings"]) == 1
+    assert _tree_snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize("mutation", ["text", "timing"])
+def test_shared_project_state_verifier_rejects_resealed_caption_semantic_drift(
+    tmp_path, mutation
+):
+    _, durable, _ = _activate_fake_render(tmp_path, p4=True)
+    timeline = ResolvedTimeline.model_validate_json(
+        (tmp_path / durable.state.timeline.path).read_bytes()
+    )
+    source = RendererSourceReceipt.model_validate_json(
+        (tmp_path / durable.state.source_receipt.path).read_bytes()
+    )
+    binding = source.caption_bindings[0]
+    track = CaptionTrack.model_validate_json(
+        (tmp_path / binding.materialized_path).read_bytes()
+    )
+    segment = track.segments[0]
+    changed_segment = segment.model_copy(
+        update=(
+            {"text": "different"}
+            if mutation == "text"
+            else {"start_sample": segment.start_sample + 1}
+        )
+    )
+    changed = track.model_copy(
+        update={
+            "segments": (changed_segment, *track.segments[1:]),
+            "timing_fingerprint": "0" * 64,
+            "content_hash": "0" * 64,
+        }
+    )
+    changed = changed.model_copy(
+        update={"timing_fingerprint": caption_timing_fingerprint(changed)}
+    )
+    changed = CaptionTrack.model_validate(
+        seal_artifact(changed).model_dump(mode="python")
+    )
+    payload = _canonical_track_bytes(changed)
+    digest = hashlib.sha256(payload).hexdigest()
+    changed_binding = binding.model_copy(
+        update={
+            "caption_asset_sha256": digest,
+            "materialized_path": Path(f"assets/{digest}.json"),
+        }
+    )
+    before = _tree_snapshot(tmp_path)
+
+    assert not _render_source_payload_matches(
+        payload,
+        suffix=".json",
+        role="caption",
+        binding=changed_binding,
+        timeline=timeline,
+    )
     assert _tree_snapshot(tmp_path) == before
 
 

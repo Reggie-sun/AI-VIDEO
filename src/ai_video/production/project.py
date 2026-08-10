@@ -11,6 +11,10 @@ from pydantic import BaseModel, ValidationError
 
 from ai_video.config import load_yaml, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.captions import (
+    _canonical_track_bytes,
+    validate_caption_track_timeline_binding,
+)
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     ArtifactReference,
@@ -276,6 +280,7 @@ def _render_source_payload_matches(
     suffix: str,
     role: str,
     binding: object,
+    timeline: ResolvedTimeline,
 ) -> bool:
     if role == "visual":
         mime_type = getattr(binding, "asset_mime_type", "")
@@ -303,12 +308,27 @@ def _render_source_payload_matches(
             track = CaptionTrack.model_validate_json(payload)
         except (ValidationError, ValueError):
             return False
-        segment_ids = {item.segment_id for item in track.segments}
-        return (
-            verify_artifact_hash(track)
-            and track.caption_track_id == binding.caption_track_id
-            and set(binding.resolved_cue_ids).issubset(segment_ids)
+        if payload != _canonical_track_bytes(track):
+            return False
+        cues = tuple(
+            cue
+            for cue in timeline.caption_cues
+            if cue.caption_track_id == binding.caption_track_id
         )
+        try:
+            validate_caption_track_timeline_binding(
+                track,
+                caption_asset_sha256=binding.caption_asset_sha256,
+                cues=cues,
+                audio_spans=timeline.audio_spans,
+                sample_rate_hz=timeline.sample_rate,
+                fps=timeline.delivery_profile.fps,
+                style_reference_id=binding.style_reference_id,
+                style_content_hash=binding.style_content_hash,
+            )
+        except ValueError:
+            return False
+        return binding.resolved_cue_ids == tuple(cue.segment_id for cue in cues)
     if role == "caption_style":
         if not isinstance(binding, RendererCaptionBinding) or suffix != ".json":
             return False
@@ -455,6 +475,7 @@ def load_verified_render_state(
                 suffix=asset.path.suffix,
                 role=binding_map[asset.path][0],
                 binding=binding_map[asset.path][2],
+                timeline=timeline,
             )
         ):
             raise _invalid("Active render source asset identity is invalid.")

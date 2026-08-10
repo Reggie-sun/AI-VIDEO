@@ -620,7 +620,9 @@ def _make_audio_asset(
     )
 
 
-def make_p4_composition_fixture(root: Path):
+def make_p4_composition_fixture(
+    root: Path, *, second_caption_start_sample: int = 24_000
+):
     """Build deterministic P4 registry assets around the public P2-loaded project."""
     loaded = write_and_load_two_shot_project(root)
     audio_definitions = (
@@ -682,7 +684,7 @@ def make_p4_composition_fixture(root: Path):
             CaptionSegment(
                 segment_id="segment-2",
                 text="world",
-                start_sample=24_000,
+                start_sample=second_caption_start_sample,
                 end_sample=47_000,
                 speaker_id="speaker-1",
             ),

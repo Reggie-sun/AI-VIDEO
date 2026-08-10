@@ -17,10 +17,14 @@ from ai_video.production.captions import (
     normalize_word_alignment,
     seconds_to_source_sample,
     segment_caption_track,
+    validate_caption_track_timeline_binding,
 )
 from ai_video.production.models import (
+    AudioKind,
     CaptionSegmentationPolicy,
     CaptionStyleReference,
+    ResolvedAudioSpan,
+    ResolvedCaptionCue,
     SourceReference,
 )
 
@@ -568,4 +572,89 @@ def test_provider_free_caption_import_seals_bytes_without_active_state_write(tmp
     with pytest.raises(ValidationError, match="style"):
         CaptionImportRequest.model_validate(
             {**request.model_dump(mode="python"), "style_bytes": b"{}"}
+        )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "text",
+        "speaker",
+        "sample",
+        "frame",
+        "timing_fingerprint",
+        "missing_segment",
+        "extra_segment",
+        "audio_hash",
+        "audio_transform",
+        "style",
+    ],
+)
+def test_caption_timeline_binding_requires_exact_semantic_graph(mutation):
+    track = _track(style_reference_id="style-1")
+    caption_sha = "2" * 64
+    style_sha = "3" * 64
+    audio = ResolvedAudioSpan(
+        track_id="dialogue",
+        audio_kind=AudioKind.DIALOGUE,
+        asset_id=track.source_audio_asset_id,
+        asset_sha256=track.source_audio_sha256,
+        start_sample=2_000,
+        duration_samples=48_000,
+        source_start_sample=0,
+        source_duration_samples=48_000,
+        gain_millidb=0,
+        fade_in_samples=0,
+        fade_out_samples=0,
+    )
+    cues = tuple(
+        ResolvedCaptionCue(
+            caption_asset_id="caption-asset-1",
+            caption_asset_sha256=caption_sha,
+            caption_track_id=track.caption_track_id,
+            caption_timing_fingerprint=track.timing_fingerprint,
+            segment_id=segment.segment_id,
+            text=segment.text,
+            speaker_id=segment.speaker_id,
+            start_sample=audio.start_sample + segment.start_sample,
+            end_sample=audio.start_sample + segment.end_sample,
+            start_frame=(audio.start_sample + segment.start_sample) * 24 // 48_000,
+            end_frame_exclusive=(
+                (audio.start_sample + segment.end_sample) * 24 + 47_999
+            )
+            // 48_000,
+            style_reference_id="style-1",
+            style_content_hash=style_sha,
+        )
+        for segment in track.segments
+    )
+    if mutation == "audio_hash":
+        audio = audio.model_copy(update={"asset_sha256": "4" * 64})
+    elif mutation == "audio_transform":
+        audio = audio.model_copy(update={"start_sample": 2_001})
+    elif mutation == "missing_segment":
+        cues = cues[:-1]
+    elif mutation == "extra_segment":
+        cues = (*cues, cues[-1].model_copy(update={"segment_id": "extra"}))
+    else:
+        field, value = {
+            "text": ("text", "changed"),
+            "speaker": ("speaker_id", "changed"),
+            "sample": ("start_sample", cues[0].start_sample + 1),
+            "frame": ("start_frame", cues[0].start_frame + 1),
+            "timing_fingerprint": ("caption_timing_fingerprint", "4" * 64),
+            "style": ("style_content_hash", "4" * 64),
+        }[mutation]
+        cues = (cues[0].model_copy(update={field: value}), *cues[1:])
+
+    with pytest.raises(ValueError):
+        validate_caption_track_timeline_binding(
+            track,
+            caption_asset_sha256=caption_sha,
+            cues=cues,
+            audio_spans=(audio,),
+            sample_rate_hz=48_000,
+            fps=24,
+            style_reference_id="style-1",
+            style_content_hash=style_sha,
         )

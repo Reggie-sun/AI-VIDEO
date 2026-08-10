@@ -280,6 +280,82 @@ def test_p4_source_materializes_exact_audio_caption_and_style_bindings(tmp_path)
     assert "Remotion" not in source and "Captions.ai" not in source
 
 
+@pytest.mark.parametrize(
+    "mismatch",
+    [
+        "visual_hash",
+        "visual_type",
+        "audio_hash",
+        "audio_type",
+        "caption_hash",
+        "caption_type",
+        "style_hash",
+        "style_type",
+    ],
+)
+def test_p4_source_identity_mismatch_is_typed_before_staging_write(
+    tmp_path, mismatch
+):
+    _, spec, timeline, sources = _p4_resolved_inputs(tmp_path)
+    style = spec.caption_tracks[0].style_reference
+    assert style is not None
+    source_id = {
+        "visual": timeline.visual_spans[0].asset_id,
+        "audio": timeline.audio_spans[0].asset_id,
+        "caption": timeline.caption_cues[0].caption_asset_id,
+        "style": style.artifact_id,
+    }[mismatch.split("_", 1)[0]]
+    original = sources[source_id]
+    if mismatch.endswith("_hash"):
+        changed = tmp_path / f"changed-{original.name}"
+        changed.write_bytes(original.read_bytes() + b"changed")
+    else:
+        changed = tmp_path / f"changed-{original.stem}.bin"
+        changed.write_bytes(original.read_bytes())
+    sources[source_id] = changed
+    staging = tmp_path / "rejected-p4-source"
+
+    error = _assert_source_invalid(
+        lambda: materialize_hyperframes_source(
+            timeline,
+            asset_sources=sources,
+            allowed_asset_root=tmp_path,
+            staging_root=staging,
+            allowed_staging_parent=tmp_path,
+        )
+    )
+
+    assert error.retryable is False
+    assert not staging.exists()
+
+
+def test_p4_audit_rejects_renderer_local_caption_timing_drift(tmp_path):
+    _, _, timeline, sources = _p4_resolved_inputs(tmp_path)
+    materialized = materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "p4-source-drift",
+        allowed_staging_parent=tmp_path,
+    )
+    source = materialized.index_path.read_text(encoding="utf-8")
+    materialized.index_path.write_text(
+        source.replace('data-start-sample="1000"', 'data-start-sample="1001"', 1),
+        encoding="utf-8",
+    )
+
+    error = _assert_source_invalid(
+        lambda: audit_hyperframes_source(
+            materialized.index_path,
+            expected_assets=materialized.asset_bindings,
+            expected_timeline=timeline,
+            expected_audio=materialized.audio_bindings,
+            expected_captions=materialized.caption_bindings,
+        )
+    )
+    assert error.retryable is False
+
+
 def test_p4_premix_applies_sample_exact_fade_duck_release_and_saturation(tmp_path):
     def wav_bytes(samples: tuple[int, ...]) -> bytes:
         from io import BytesIO
@@ -1208,6 +1284,120 @@ def test_p4_audio_output_requires_one_exact_measured_stream(tmp_path):
         measurement_method="held-fd ffprobe packets plus pcm_s16le decode",
     )
     assert result.output.decoded_audio_fingerprint == "a" * 64
+
+
+@pytest.mark.parametrize(
+    "mismatch",
+    [
+        "missing_stream",
+        "extra_stream",
+        "sample_rate",
+        "channels",
+        "channel_layout",
+        "decoded_duration",
+        "priming",
+        "padding",
+        "decoded_samples",
+    ],
+)
+def test_p4_audio_measurement_mismatch_is_typed_without_fallback(
+    tmp_path, mismatch
+):
+    _, _, timeline, sources = _p4_resolved_inputs(tmp_path)
+    root = tmp_path / "attempt-p4-invalid-audio"
+    root.mkdir(mode=0o700)
+    selection = _selection(timeline)
+    attempt = HyperFramesRenderAttempt(
+        attempt_id=selection.attempt_id,
+        selection=selection,
+        timeline=timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=root / "source",
+        allowed_staging_parent=root,
+        output_path=root / "output/render.mp4",
+        verification_snapshot_path=root / "verified.mp4",
+    )
+    audio = {
+        "codec_type": "audio",
+        "index": 1,
+        "codec_name": "aac",
+        "sample_rate": "48000",
+        "channels": 2,
+        "channel_layout": "stereo",
+    }
+    probe = {
+        "streams": [
+            {
+                "codec_type": "video",
+                "width": 1280,
+                "height": 720,
+                "r_frame_rate": "24/1",
+                "nb_frames": str(timeline.total_frames),
+                "codec_name": "h264",
+            },
+            audio,
+        ],
+        "packets": [
+            {
+                "stream_index": 1,
+                "pts": "-1024",
+                "duration": "1024",
+                "side_data_list": [
+                    {
+                        "side_data_type": "Skip Samples",
+                        "skip_samples": 1024,
+                        "discard_padding": 0,
+                    }
+                ],
+            },
+            {"stream_index": 1, "pts": "191488", "duration": "768"},
+        ],
+    }
+    decoded_samples = timeline.total_samples + 256
+    if mismatch == "missing_stream":
+        probe["streams"] = probe["streams"][:1]
+    elif mismatch == "extra_stream":
+        probe["streams"].append({**audio, "index": 2})
+    elif mismatch == "sample_rate":
+        audio["sample_rate"] = "44100"
+    elif mismatch == "channels":
+        audio["channels"] = 1
+    elif mismatch == "channel_layout":
+        audio["channel_layout"] = "mono"
+    elif mismatch == "decoded_duration":
+        decoded_samples += 1
+    elif mismatch == "priming":
+        probe["packets"][0]["side_data_list"][0]["skip_samples"] = 0
+    elif mismatch == "padding":
+        probe["packets"][-1]["duration"] = "1024"
+    else:
+        decoded_samples = timeline.total_samples
+    runner = FakeRunner()
+
+    with pytest.raises(RendererAttemptError) as caught:
+        _adapter(
+            tmp_path / "tools-p4-invalid-audio",
+            runner,
+            probe=lambda _fd: probe,
+            decoded_audio=lambda _fd, _rate, _channels: (
+                decoded_samples,
+                "a" * 64,
+            ),
+        ).render(attempt)
+
+    assert (caught.value.code, caught.value.phase, caught.value.retryable) == (
+        ErrorCode.RENDER_FAILED,
+        "verify",
+        False,
+    )
+    assert [call.command for call in runner.calls] == [
+        "version",
+        "doctor",
+        "lint",
+        "check",
+        "render",
+    ]
 
 
 def test_adapter_runs_one_pinned_renderer_in_order(tmp_path):
@@ -2188,7 +2378,9 @@ def test_p4_production_renderer_gate_renders_resolved_audio_and_captions(
     ffprobe = required_path("P4_FFPROBE_PATH")
     evidence_root = required_path("P4_RENDERER_EVIDENCE", directory=True)
 
-    loaded, spec = project_factory.make_p4_composition_fixture(tmp_path)
+    loaded, spec = project_factory.make_p4_composition_fixture(
+        tmp_path, second_caption_start_sample=26_000
+    )
     spec = seal_artifact(
         spec.model_copy(
             update={
@@ -2331,10 +2523,16 @@ def test_p4_production_renderer_gate_renders_resolved_audio_and_captions(
 
     output = tmp_path / graph.render_state.output.path
     descriptor = os.open(output, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+    resolved_intervals = [
+        [cue.start_frame, cue.end_frame_exclusive]
+        for cue in timeline.caption_cues
+    ]
+    assert resolved_intervals == [[0, 12], [13, 24]]
+    sampled_frames = (0, 11, 12, 13, 23, 24)
     pixels: dict[int, tuple[int, int, int]] = {}
     try:
         held = f"/proc/self/fd/{descriptor}"
-        for frame in (0, 23, 24):
+        for frame in sampled_frames:
             pixel = subprocess.run(
                 [
                     str(ffmpeg), "-v", "error", "-i", held,
@@ -2355,16 +2553,34 @@ def test_p4_production_renderer_gate_renders_resolved_audio_and_captions(
             pixels[frame] = tuple(pixel.stdout)  # type: ignore[assignment]
     finally:
         os.close(descriptor)
-    assert pixels[0][1] > 180 and pixels[0][2] > 180
-    assert pixels[23][1] > 180 and pixels[23][2] > 180
-    assert pixels[24][1] < 80 and pixels[24][2] < 80
+    expected_presence = {
+        0: True,
+        11: True,
+        12: False,
+        13: True,
+        23: True,
+        24: False,
+    }
+    for frame, present in expected_presence.items():
+        cyan = pixels[frame][1] > 180 and pixels[frame][2] > 180
+        assert cyan is present
+    boundary_evidence = [
+        {"boundary": "cue-1-start", "frame": 0, "present": True},
+        {"boundary": "cue-1-end-before", "frame": 11, "present": True},
+        {"boundary": "cue-1-end", "frame": 12, "present": False},
+        {"boundary": "cue-2-start-before", "frame": 12, "present": False},
+        {"boundary": "cue-2-start", "frame": 13, "present": True},
+        {"boundary": "cue-2-end-before", "frame": 23, "present": True},
+        {"boundary": "cue-2-end", "frame": 24, "present": False},
+        {"boundary": "after-final", "frame": 24, "present": False},
+    ]
+    for item in boundary_evidence:
+        item["rgb"] = list(pixels[item["frame"]])
     evidence(
         "caption-frames.json",
         {
-            "resolved_half_open_frames": [
-                [cue.start_frame, cue.end_frame_exclusive]
-                for cue in timeline.caption_cues
-            ],
+            "resolved_half_open_frames": resolved_intervals,
+            "boundary_samples": boundary_evidence,
             "pixels_rgb": {str(key): list(value) for key, value in pixels.items()},
             "held_fd": True,
         },

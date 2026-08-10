@@ -18,6 +18,8 @@ from ai_video.production.models import (
     CaptionStyleReference,
     CaptionTrack,
     CaptionWord,
+    ResolvedAudioSpan,
+    ResolvedCaptionCue,
     SourceReference,
     StrictModel,
 )
@@ -547,6 +549,101 @@ def caption_timing_fingerprint(track: CaptionTrack) -> str:
             "alignment_receipt_id": track.alignment_receipt_id,
         }
     )
+
+
+def validate_caption_track_timeline_binding(
+    track: CaptionTrack,
+    *,
+    caption_asset_sha256: str,
+    cues: Sequence[ResolvedCaptionCue],
+    audio_spans: Sequence[ResolvedAudioSpan],
+    sample_rate_hz: int,
+    fps: int,
+    style_reference_id: str | None,
+    style_content_hash: str | None,
+) -> None:
+    """Exact-bind one canonical CaptionTrack to its resolved timing graph."""
+
+    if (
+        track.content_hash != canonical_sha256(track)
+        or track.timing_fingerprint != caption_timing_fingerprint(track)
+    ):
+        raise ValueError("caption track semantic identity is invalid")
+    if (
+        sample_rate_hz <= 0
+        or fps <= 0
+        or track.source_sample_rate_hz != sample_rate_hz
+    ):
+        raise ValueError("caption source sample rate does not match the timeline")
+    if (style_reference_id is None) != (style_content_hash is None):
+        raise ValueError("caption style identity must be all-or-none")
+    if track.style_reference_id != style_reference_id:
+        raise ValueError("caption track style identity does not match")
+    if not track.segments or len(cues) != len(track.segments):
+        raise ValueError("caption cues must exactly cover the track segments")
+    caption_asset_ids = {cue.caption_asset_id for cue in cues}
+    if len(caption_asset_ids) != 1:
+        raise ValueError("caption cues must bind exactly one caption asset")
+
+    matching_audio = tuple(
+        span
+        for span in audio_spans
+        if (
+            span.asset_id == track.source_audio_asset_id
+            and span.asset_sha256 == track.source_audio_sha256
+        )
+    )
+    if len(matching_audio) != 1:
+        raise ValueError("caption source audio transform is missing or underdetermined")
+    audio = matching_audio[0]
+    source_end = audio.source_start_sample + audio.source_duration_samples
+    if audio.duration_samples != audio.source_duration_samples:
+        raise ValueError("caption source audio transform must preserve sample duration")
+
+    for segment, cue in zip(track.segments, cues, strict=True):
+        if (
+            segment.start_sample < audio.source_start_sample
+            or segment.end_sample > source_end
+        ):
+            raise ValueError("caption segment falls outside the resolved audio transform")
+        start_sample = audio.start_sample + (
+            segment.start_sample - audio.source_start_sample
+        )
+        end_sample = audio.start_sample + (
+            segment.end_sample - audio.source_start_sample
+        )
+        start_frame = start_sample * fps // sample_rate_hz
+        end_frame = (end_sample * fps + sample_rate_hz - 1) // sample_rate_hz
+        expected = (
+            caption_asset_sha256,
+            track.caption_track_id,
+            track.timing_fingerprint,
+            segment.segment_id,
+            segment.text,
+            segment.speaker_id,
+            start_sample,
+            end_sample,
+            start_frame,
+            end_frame,
+            style_reference_id,
+            style_content_hash,
+        )
+        actual = (
+            cue.caption_asset_sha256,
+            cue.caption_track_id,
+            cue.caption_timing_fingerprint,
+            cue.segment_id,
+            cue.text,
+            cue.speaker_id,
+            cue.start_sample,
+            cue.end_sample,
+            cue.start_frame,
+            cue.end_frame_exclusive,
+            cue.style_reference_id,
+            cue.style_content_hash,
+        )
+        if actual != expected:
+            raise ValueError("caption cue does not exactly match the canonical track")
 
 
 def segment_caption_track(
