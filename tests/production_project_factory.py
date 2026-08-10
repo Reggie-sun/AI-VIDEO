@@ -1,20 +1,34 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import threading
 from pathlib import Path
 
 import yaml
 
 from ai_video.config import sha256_file
+from ai_video.production.captions import CaptionImportRequest, caption_timing_fingerprint
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import (
+    AudioAssetMetadata,
+    AudioChannelLayout,
+    AudioKind,
+    AudioLoudnessMetadata,
+    AudioSource,
+    AudioTrackSpec,
     ArtifactReference,
     AssetRecord,
     AssetRegistrySnapshot,
     AssetRoleRequirement,
     AssetSourceKind,
     AssetType,
+    CaptionAssetMetadata,
+    CaptionSegment,
+    CaptionSegmentationPolicy,
+    CaptionStyleReference,
+    CaptionTrack,
+    CaptionTrackBinding,
     Character,
     CompositionLayerSpec,
     CompositionSpec,
@@ -533,6 +547,263 @@ def make_composition_spec(
 def make_loaded_project_and_spec(root: Path):
     loaded = write_and_load_two_shot_project(root)
     return loaded, make_composition_spec()
+
+
+def _make_audio_asset(
+    root: Path,
+    *,
+    asset_id: str,
+    audio_kind: AudioKind,
+    duration_samples: int,
+    sample_rate_hz: int = 48_000,
+) -> tuple[AssetRecord, Path]:
+    path = root / "assets/files" / f"{asset_id}.wav"
+    payload = b"RIFF" + asset_id.encode("utf-8")
+    path.write_bytes(payload)
+    speech = audio_kind in {AudioKind.DIALOGUE, AudioKind.NARRATION}
+    source = AudioSource(
+        kind=AssetSourceKind.IMPORTED,
+        provider_or_tool=ToolIdentity(name="fixture", version="1"),
+        input_artifact_ids=("script-1",) if speech else (),
+        input_fingerprint=hashlib.sha256(asset_id.encode("utf-8")).hexdigest(),
+        original_reference=f"fixture://{asset_id}",
+    )
+    metadata = AudioAssetMetadata(
+        audio_kind=audio_kind,
+        source=source,
+        speaker_id="speaker-1" if speech else None,
+        language="en" if speech else None,
+        script_hash=(hashlib.sha256(b"fixture script").hexdigest() if speech else None),
+        duration_samples=duration_samples,
+        sample_rate_hz=sample_rate_hz,
+        channels=1,
+        channel_layout=AudioChannelLayout.MONO,
+        codec_name="pcm_s16le",
+        loudness=AudioLoudnessMetadata(),
+        provenance_receipt_id=f"receipt-{asset_id}",
+        alignment_receipt_id=f"alignment-{asset_id}" if speech else None,
+    )
+    asset_type = {
+        AudioKind.DIALOGUE: AssetType.VOICE,
+        AudioKind.NARRATION: AssetType.VOICE,
+        AudioKind.AMBIENCE: AssetType.SFX,
+        AudioKind.SFX: AssetType.SFX,
+        AudioKind.BGM: AssetType.MUSIC,
+    }[audio_kind]
+    return (
+        AssetRecord(
+            asset_id=asset_id,
+            asset_type=asset_type,
+            artifact_path=path.relative_to(root),
+            sha256=sha256_file(path),
+            size_bytes=path.stat().st_size,
+            mime_type="audio/wav",
+            duration_seconds=duration_samples / sample_rate_hz,
+            source_kind=AssetSourceKind.IMPORTED,
+            tool=ToolIdentity(name="fixture", version="1"),
+            input_artifact_ids=source.input_artifact_ids,
+            input_fingerprint=source.input_fingerprint,
+            creation_receipt_id=f"receipt-{asset_id}",
+            usage_license="test-only",
+            audio_metadata=metadata,
+        ),
+        path,
+    )
+
+
+def make_p4_composition_fixture(root: Path):
+    """Build deterministic P4 registry assets around the public P2-loaded project."""
+    loaded = write_and_load_two_shot_project(root)
+    audio_definitions = (
+        ("voice-dialogue", AudioKind.DIALOGUE, 96_000),
+        ("voice-narration", AudioKind.NARRATION, 48_000),
+        ("ambience-room", AudioKind.AMBIENCE, 192_000),
+        ("sfx-hit", AudioKind.SFX, 24_000),
+        ("bgm-theme", AudioKind.BGM, 192_000),
+    )
+    audio_assets: list[AssetRecord] = []
+    asset_paths = dict(loaded.asset_paths)
+    for asset_id, audio_kind, duration_samples in audio_definitions:
+        asset, path = _make_audio_asset(
+            root,
+            asset_id=asset_id,
+            audio_kind=audio_kind,
+            duration_samples=duration_samples,
+        )
+        audio_assets.append(asset)
+        asset_paths[asset_id] = path
+
+    style_bytes = b'{"font_family":"Fixture Sans","schema_version":"1"}'
+    style_hash = hashlib.sha256(style_bytes).hexdigest()
+    style_path = root / "assets/styles" / f"{style_hash}.json"
+    style_path.parent.mkdir(parents=True, exist_ok=True)
+    style_path.write_bytes(style_bytes)
+    style_reference = CaptionStyleReference(
+        artifact_id="caption-style-1",
+        revision=1,
+        content_hash=style_hash,
+        path=style_path.relative_to(root),
+    )
+    source_audio = audio_assets[0]
+    assert source_audio.audio_metadata is not None
+    track = CaptionTrack(
+        artifact_id="caption-artifact-1",
+        schema_version="2.1",
+        revision=1,
+        content_hash=ZERO_HASH,
+        creation_receipt_id="receipt-caption-1",
+        source_provenance=(
+            SourceReference(kind="derived", reference="alignment-dialogue"),
+        ),
+        caption_track_id="caption-track-1",
+        language="en",
+        script_hash=source_audio.audio_metadata.script_hash,
+        transcript_hash=hashlib.sha256(b"Hello world").hexdigest(),
+        source_audio_asset_id=source_audio.asset_id,
+        source_audio_sha256=source_audio.sha256,
+        source_sample_rate_hz=48_000,
+        segments=(
+            CaptionSegment(
+                segment_id="segment-1",
+                text="Hello",
+                start_sample=1_000,
+                end_sample=23_000,
+                speaker_id="speaker-1",
+            ),
+            CaptionSegment(
+                segment_id="segment-2",
+                text="world",
+                start_sample=24_000,
+                end_sample=47_000,
+                speaker_id="speaker-1",
+            ),
+        ),
+        segmentation_policy=CaptionSegmentationPolicy(
+            policy_id="fixture-segments",
+            policy_version="1",
+            max_characters=42,
+            max_lines=2,
+            break_strategy="provider_segments",
+        ),
+        alignment_provider="fixture",
+        alignment_model="fixture-v1",
+        alignment_receipt_id="alignment-dialogue",
+        style_reference_id=style_reference.artifact_id,
+        timing_fingerprint=ZERO_HASH,
+    )
+    track = track.model_copy(update={"timing_fingerprint": caption_timing_fingerprint(track)})
+    track = CaptionTrack.model_validate(seal_artifact(track).model_dump(mode="python"))
+    caption_import = CaptionImportRequest.create(
+        caption_track=track,
+        style_reference=style_reference,
+        style_bytes=style_bytes,
+    )
+    caption_path = root / "assets/files/caption-track-1.json"
+    caption_path.write_bytes(caption_import.track_bytes)
+    caption_asset = AssetRecord(
+        asset_id="caption-asset-1",
+        asset_type=AssetType.CAPTION,
+        artifact_path=caption_path.relative_to(root),
+        sha256=sha256_file(caption_path),
+        size_bytes=caption_path.stat().st_size,
+        mime_type="application/json",
+        source_kind=AssetSourceKind.DERIVED,
+        tool=ToolIdentity(name="fixture", version="1"),
+        input_artifact_ids=(source_audio.asset_id,),
+        input_fingerprint=source_audio.sha256,
+        creation_receipt_id="receipt-caption-asset-1",
+        usage_license="test-only",
+        caption_metadata=CaptionAssetMetadata(
+            caption_track_id=track.caption_track_id,
+            language=track.language,
+            source_audio_asset_id=track.source_audio_asset_id,
+            source_audio_sha256=track.source_audio_sha256,
+            script_hash=track.script_hash,
+            transcript_hash=track.transcript_hash,
+            segment_count=len(track.segments),
+            word_count=0,
+            segmentation_policy_id=track.segmentation_policy.policy_id,
+            segmentation_policy_version=track.segmentation_policy.policy_version,
+            alignment_receipt_id=track.alignment_receipt_id,
+            timing_fingerprint=track.timing_fingerprint,
+            style_reference_id=style_reference.artifact_id,
+            style_content_hash=style_reference.content_hash,
+        ),
+    )
+    asset_paths[caption_asset.asset_id] = caption_path
+    registry = AssetRegistrySnapshot(
+        schema_version="2.1",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(*loaded.registry.assets, *audio_assets, caption_asset),
+    )
+    registry_hash = registry_semantic_sha256(registry)
+    registry = registry.model_copy(
+        update={"revision_id": registry_hash, "content_hash": registry_hash}
+    )
+    loaded = loaded.model_copy(
+        update={"registry": registry, "asset_paths": asset_paths}
+    )
+    spec = make_composition_spec().model_copy(
+        update={
+            "schema_version": "2.1",
+            "content_hash": ZERO_HASH,
+            "audio_tracks": (
+                AudioTrackSpec(
+                    track_id="dialogue",
+                    audio_kind=AudioKind.DIALOGUE,
+                    asset_id="voice-dialogue",
+                    shot_id="shot-1",
+                ),
+                AudioTrackSpec(
+                    track_id="narration",
+                    audio_kind=AudioKind.NARRATION,
+                    asset_id="voice-narration",
+                    shot_id="shot-2",
+                ),
+                AudioTrackSpec(
+                    track_id="ambience",
+                    audio_kind=AudioKind.AMBIENCE,
+                    asset_id="ambience-room",
+                    start_sample=0,
+                    gain_millidb=-2_000,
+                    fade_in_samples=1_000,
+                ),
+                AudioTrackSpec(
+                    track_id="sfx",
+                    audio_kind=AudioKind.SFX,
+                    asset_id="sfx-hit",
+                    shot_id="shot-2",
+                    start_sample=100_000,
+                ),
+                AudioTrackSpec(
+                    track_id="bgm",
+                    audio_kind=AudioKind.BGM,
+                    asset_id="bgm-theme",
+                    start_sample=0,
+                    gain_millidb=-6_000,
+                    fade_in_samples=2_000,
+                    fade_out_samples=2_000,
+                    ducking={
+                        "sidechain_track_ids": ("dialogue", "narration"),
+                        "attenuation_millidb": -12_000,
+                        "attack_samples": 480,
+                        "release_samples": 960,
+                    },
+                ),
+            ),
+            "caption_tracks": (
+                CaptionTrackBinding(
+                    binding_id="captions-dialogue",
+                    caption_asset_id=caption_asset.asset_id,
+                    source_audio_track_id="dialogue",
+                    shot_id="shot-1",
+                    style_reference=style_reference,
+                ),
+            ),
+        }
+    )
+    return loaded, seal_artifact(spec)
 
 
 def load_initial_models(root: Path) -> tuple[ProductionProject, AssetRegistrySnapshot]:

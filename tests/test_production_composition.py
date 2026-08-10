@@ -8,12 +8,16 @@ import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.composition import resolve_composition
+from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import (
+    AudioKind,
+    AudioTrackSpec,
     AssetRoleRequirement,
     AssetType,
     CompositionLayerSpec,
     CompositionSpec,
     DurationPolicy,
+    DuckingSpec,
     MotionDirective,
     RendererKind,
     TransitionKind,
@@ -29,6 +33,7 @@ from ai_video.production.paths import (
 from production_project_factory import (
     make_composition_spec,
     make_loaded_project_and_spec,
+    make_p4_composition_fixture,
     write_and_load_two_shot_project,
 )
 
@@ -37,6 +42,14 @@ def _assert_invalid(project, spec) -> AiVideoError:
     with pytest.raises(AiVideoError) as caught:
         resolve_composition(project, spec, renderer_version="0.7.103")
     assert caught.value.code is ErrorCode.COMPOSITION_INVALID
+    assert caught.value.retryable is False
+    return caught.value
+
+
+def _assert_error(project, spec, code: ErrorCode) -> AiVideoError:
+    with pytest.raises(AiVideoError) as caught:
+        resolve_composition(project, spec, renderer_version="0.7.103")
+    assert caught.value.code is code
     assert caught.value.retryable is False
     return caught.value
 
@@ -85,6 +98,434 @@ def test_cut_keeps_integer_frame_and_sample_boundaries(tmp_path):
     assert timeline.visual_spans[1].start_sample == 96_000
     assert timeline.total_frames == 96
     assert timeline.total_samples == 192_000
+
+
+def test_p4_resolves_all_audio_kinds_and_captions_in_one_timeline(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    timeline = resolve_composition(loaded, spec, "0.7.103")
+
+    assert timeline.schema_version == "2.1"
+    assert {span.audio_kind for span in timeline.audio_spans} == set(AudioKind)
+    assert [(span.track_id, span.start_sample) for span in timeline.audio_spans] == [
+        ("ambience", 0),
+        ("bgm", 0),
+        ("dialogue", 0),
+        ("narration", 96_000),
+        ("sfx", 100_000),
+    ]
+    bgm = next(span for span in timeline.audio_spans if span.track_id == "bgm")
+    assert (bgm.gain_millidb, bgm.fade_in_samples, bgm.fade_out_samples) == (
+        -6_000,
+        2_000,
+        2_000,
+    )
+    assert bgm.ducking is not None
+    assert bgm.ducking.sidechain_track_ids == ("dialogue", "narration")
+    assert [
+        (cue.start_sample, cue.end_sample, cue.start_frame, cue.end_frame_exclusive)
+        for cue in timeline.caption_cues
+    ] == [(1_000, 23_000, 0, 12), (24_000, 47_000, 12, 24)]
+    assert timeline.caption_cues[0].style_reference_id == "caption-style-1"
+
+
+def test_p4_resolution_is_independent_of_audio_and_caption_input_order(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    first = resolve_composition(loaded, spec, "0.7.103")
+    reordered = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "audio_tracks": tuple(reversed(spec.audio_tracks)),
+                "caption_tracks": tuple(reversed(spec.caption_tracks)),
+            }
+        )
+    )
+    second = resolve_composition(loaded, reordered, "0.7.103")
+    assert second.audio_spans == first.audio_spans
+    assert second.caption_cues == first.caption_cues
+    assert second.composition_fingerprint == first.composition_fingerprint
+
+
+def test_p4_trim_gain_fade_and_short_audio_silence_pad_are_deterministic(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    dialogue = spec.audio_tracks[0].model_copy(
+        update={
+            "trim_start_sample": 2_000,
+            "trim_duration_samples": 40_000,
+            "gain_millidb": -1_500,
+            "fade_in_samples": 1_000,
+            "fade_out_samples": 2_000,
+        }
+    )
+    no_captions = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "audio_tracks": (dialogue,),
+                "caption_tracks": (),
+            }
+        )
+    )
+    timeline = resolve_composition(loaded, no_captions, "0.7.103")
+    assert timeline.total_samples == 192_000
+    span = timeline.audio_spans[0]
+    assert (
+        span.source_start_sample,
+        span.source_duration_samples,
+        span.duration_samples,
+        span.gain_millidb,
+        span.fade_in_samples,
+        span.fade_out_samples,
+    ) == (2_000, 40_000, 40_000, -1_500, 1_000, 2_000)
+
+    late_trimmed = dialogue.model_copy(
+        update={"start_sample": 150_000, "trim_duration_samples": 40_000}
+    )
+    trimmed_timeline = resolve_composition(
+        loaded,
+        seal_artifact(
+            spec.model_copy(
+                update={
+                    "content_hash": "0" * 64,
+                    "audio_tracks": (late_trimmed,),
+                    "caption_tracks": (),
+                }
+            )
+        ),
+        "0.7.103",
+    )
+    assert trimmed_timeline.audio_spans[0].start_sample == 150_000
+    assert trimmed_timeline.audio_spans[0].duration_samples == 40_000
+
+
+def test_p4_rejects_sample_rate_mismatch_and_untrimmed_overrun(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    mismatched = _replace_asset(
+        loaded,
+        2,
+        audio_metadata=loaded.registry.assets[2].audio_metadata.model_copy(
+            update={"sample_rate_hz": 44_100}
+        ),
+    )
+    _assert_error(mismatched, spec, ErrorCode.AUDIO_TIMELINE_INVALID)
+
+    overrun = spec.audio_tracks[0].model_copy(update={"start_sample": 150_000})
+    _assert_error(
+        loaded,
+        seal_artifact(
+            spec.model_copy(
+                update={
+                    "content_hash": "0" * 64,
+                    "audio_tracks": (overrun,),
+                    "caption_tracks": (),
+                }
+            )
+        ),
+        ErrorCode.AUDIO_TIMELINE_INVALID,
+    )
+
+
+def test_p4_rejects_unknown_wrong_type_wrong_hash_and_invalid_ducking(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    dialogue = spec.audio_tracks[0]
+    cases = (
+        dialogue.model_copy(update={"asset_id": "missing"}),
+        dialogue.model_copy(update={"asset_id": "image-shot-1"}),
+        dialogue.model_copy(update={"audio_kind": AudioKind.BGM}),
+    )
+    for track in cases:
+        _assert_error(
+            loaded,
+            seal_artifact(
+                spec.model_copy(
+                    update={
+                        "content_hash": "0" * 64,
+                        "audio_tracks": (track,),
+                        "caption_tracks": (),
+                    }
+                )
+            ),
+            ErrorCode.AUDIO_TIMELINE_INVALID,
+        )
+    _assert_error(
+        _replace_asset(loaded, 2, sha256="f" * 64),
+        spec,
+        ErrorCode.AUDIO_TIMELINE_INVALID,
+    )
+
+    bgm = spec.audio_tracks[-1].model_copy(
+        update={
+            "ducking": spec.audio_tracks[-1].ducking.model_copy(
+                update={"sidechain_track_ids": ("missing",)}
+            )
+        }
+    )
+    _assert_error(
+        loaded,
+        seal_artifact(
+            spec.model_copy(
+                update={
+                    "content_hash": "0" * 64,
+                    "audio_tracks": (bgm,),
+                    "caption_tracks": (),
+                }
+            )
+        ),
+        ErrorCode.AUDIO_TIMELINE_INVALID,
+    )
+
+    dialogue_ducks_bgm = dialogue.model_copy(
+        update={
+            "ducking": DuckingSpec(
+                sidechain_track_ids=("bgm",),
+                attenuation_millidb=-3_000,
+                attack_samples=0,
+                release_samples=0,
+            )
+        }
+    )
+    bgm_ducks_dialogue = spec.audio_tracks[-1].model_copy(
+        update={
+            "ducking": spec.audio_tracks[-1].ducking.model_copy(
+                update={"sidechain_track_ids": ("dialogue",)}
+            )
+        }
+    )
+    _assert_error(
+        loaded,
+        seal_artifact(
+            spec.model_copy(
+                update={
+                    "content_hash": "0" * 64,
+                    "audio_tracks": (dialogue_ducks_bgm, bgm_ducks_dialogue),
+                    "caption_tracks": (),
+                }
+            )
+        ),
+        ErrorCode.AUDIO_TIMELINE_INVALID,
+    )
+
+
+def test_voice_driven_uses_one_frame_snapped_speech_driver_and_bounds(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    loaded = _replace_shot(
+        loaded,
+        0,
+        duration_policy=DurationPolicy(
+            mode="voice_driven", minimum_seconds=1.0, maximum_seconds=2.0
+        ),
+    )
+    spec = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "audio_tracks": (spec.audio_tracks[0],),
+                "caption_tracks": (),
+            }
+        )
+    )
+    timeline = resolve_composition(loaded, spec, "0.7.103")
+    assert timeline.visual_spans[0].duration_frames == 48
+    assert timeline.visual_spans[1].start_sample == 96_000
+
+    two_drivers = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "audio_tracks": (
+                    spec.audio_tracks[0],
+                    spec.audio_tracks[0].model_copy(update={"track_id": "driver-2"}),
+                ),
+            }
+        )
+    )
+    _assert_error(loaded, two_drivers, ErrorCode.AUDIO_TIMELINE_INVALID)
+    too_short = _replace_shot(
+        loaded,
+        0,
+        duration_policy=DurationPolicy(mode="voice_driven", minimum_seconds=2.1),
+    )
+    _assert_error(too_short, spec, ErrorCode.AUDIO_TIMELINE_INVALID)
+
+
+def test_voice_driven_rejects_missing_unaligned_driver_and_content_driven(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    voice_shot = _replace_shot(
+        loaded,
+        0,
+        duration_policy=DurationPolicy(mode="voice_driven", minimum_seconds=1.0),
+    )
+    without_driver = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "audio_tracks": (),
+                "caption_tracks": (),
+            }
+        )
+    )
+    _assert_error(voice_shot, without_driver, ErrorCode.AUDIO_TIMELINE_INVALID)
+
+    metadata = loaded.registry.assets[2].audio_metadata.model_copy(
+        update={"duration_samples": 95_999}
+    )
+    unaligned = _replace_asset(
+        loaded,
+        2,
+        audio_metadata=metadata,
+        duration_seconds=95_999 / 48_000,
+    )
+    one_driver = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "audio_tracks": (spec.audio_tracks[0],),
+                "caption_tracks": (),
+            }
+        )
+    )
+    _assert_error(
+        _replace_shot(
+            unaligned,
+            0,
+            duration_policy=DurationPolicy(mode="voice_driven", minimum_seconds=1.0),
+        ),
+        one_driver,
+        ErrorCode.AUDIO_TIMELINE_INVALID,
+    )
+    content = _replace_shot(
+        loaded,
+        0,
+        duration_policy=DurationPolicy(mode="content_driven", minimum_seconds=1.0),
+    )
+    _assert_invalid(content, spec)
+
+
+def test_caption_binding_rejects_unknown_type_hash_source_and_style_mismatch(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    binding = spec.caption_tracks[0]
+    cases = (
+        binding.model_copy(update={"caption_asset_id": "missing"}),
+        binding.model_copy(update={"caption_asset_id": "image-shot-1"}),
+        binding.model_copy(update={"source_audio_track_id": "narration"}),
+    )
+    for candidate in cases:
+        _assert_error(
+            loaded,
+            seal_artifact(
+                spec.model_copy(
+                    update={"content_hash": "0" * 64, "caption_tracks": (candidate,)}
+                )
+            ),
+            ErrorCode.CAPTION_TRACK_INVALID,
+        )
+    _assert_error(
+        _replace_asset(loaded, -1, sha256="f" * 64),
+        spec,
+        ErrorCode.CAPTION_TRACK_INVALID,
+    )
+    assert binding.style_reference is not None
+    for wrong_style in (
+        binding.style_reference.model_copy(update={"content_hash": "f" * 64}),
+        binding.style_reference.model_copy(
+            update={"path": Path("assets/styles/missing.json")}
+        ),
+    ):
+        _assert_error(
+            loaded,
+            seal_artifact(
+                spec.model_copy(
+                    update={
+                        "content_hash": "0" * 64,
+                        "caption_tracks": (
+                            binding.model_copy(update={"style_reference": wrong_style}),
+                        ),
+                    }
+                )
+            ),
+            ErrorCode.CAPTION_TRACK_INVALID,
+        )
+    wrong_style = binding.style_reference.model_copy(update={"artifact_id": "wrong"})
+    _assert_error(
+        loaded,
+        seal_artifact(
+            spec.model_copy(
+                update={
+                    "content_hash": "0" * 64,
+                    "caption_tracks": (
+                        binding.model_copy(update={"style_reference": wrong_style}),
+                    ),
+                }
+            )
+        ),
+        ErrorCode.CAPTION_TRACK_INVALID,
+    )
+
+
+def test_caption_style_changes_composition_not_timing_fingerprint(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    first = resolve_composition(loaded, spec, "0.7.103")
+    binding = spec.caption_tracks[0]
+    original = binding.style_reference
+    assert original is not None
+    revised_bytes = b'{"font_family":"Different","schema_version":"1"}'
+    revised_hash = hashlib.sha256(revised_bytes).hexdigest()
+    revised_path = tmp_path / "assets/styles" / f"{revised_hash}.json"
+    revised_path.write_bytes(revised_bytes)
+    revised_style = original.model_copy(
+        update={"content_hash": revised_hash, "path": revised_path.relative_to(tmp_path)}
+    )
+    caption = loaded.registry.assets[-1]
+    revised_caption = caption.model_copy(
+        update={
+            "caption_metadata": caption.caption_metadata.model_copy(
+                update={"style_content_hash": revised_hash}
+            )
+        }
+    )
+    revised_loaded = _replace_asset(
+        loaded,
+        -1,
+        caption_metadata=revised_caption.caption_metadata,
+    )
+    revised_spec = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "caption_tracks": (
+                    binding.model_copy(update={"style_reference": revised_style}),
+                ),
+            }
+        )
+    )
+    second = resolve_composition(revised_loaded, revised_spec, "0.7.103")
+    assert (
+        second.caption_cues[0].caption_timing_fingerprint
+        == first.caption_cues[0].caption_timing_fingerprint
+    )
+    assert second.composition_fingerprint != first.composition_fingerprint
+
+
+def test_silent_20_serialization_and_fingerprint_stay_exact(tmp_path):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    timeline = resolve_composition(loaded, spec, "0.7.103")
+    payload = timeline.model_dump(mode="json")
+    assert timeline.schema_version == "2.0"
+    assert "audio_spans" not in payload
+    assert "caption_cues" not in payload
+    assert timeline.composition_fingerprint == (
+        "b77173e6cb88738003a390b2397c797776fc7019b113b491deabb3b30f26da7f"
+    )
+
+
+def test_composition_module_has_no_second_timeline_owner():
+    import ai_video.production.composition as composition
+
+    assert not any(
+        name.startswith("Resolved") and name.endswith("Timeline")
+        for name in vars(composition)
+        if name != "ResolvedTimeline"
+    )
 
 
 def test_same_resolved_inputs_have_same_fingerprint_after_mtime_change(tmp_path):

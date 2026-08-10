@@ -3,15 +3,31 @@ from __future__ import annotations
 from decimal import Decimal, ROUND_CEILING, ROUND_FLOOR
 from pathlib import Path
 
+from pydantic import ValidationError
+
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.captions import (
+    caption_style_fingerprint,
+    caption_timing_fingerprint,
+)
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
+    AUDIO_KIND_TO_ASSET_TYPE,
+    AssetRecord,
     AssetType,
+    AudioKind,
+    AudioTrackSpec,
+    CaptionStyleBindingContract,
+    CaptionTrack,
+    CaptionTrackBinding,
     CompositionLayerSpec,
     CompositionSpec,
     LoadedProductionProject,
     RendererIdentity,
     RendererKind,
+    ResolvedAudioSpan,
+    ResolvedCaptionCue,
+    ResolvedDuckingSpec,
     ResolvedTimeline,
     ResolvedVisualSpan,
     TransitionKind,
@@ -24,6 +40,24 @@ from ai_video.production.paths import NoFollowFile, _read_regular_file_nofollow
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
     return AiVideoError(
         code=ErrorCode.COMPOSITION_INVALID,
+        user_message=message,
+        technical_detail=detail,
+        retryable=False,
+    )
+
+
+def _audio_invalid(message: str, detail: str | None = None) -> AiVideoError:
+    return AiVideoError(
+        code=ErrorCode.AUDIO_TIMELINE_INVALID,
+        user_message=message,
+        technical_detail=detail,
+        retryable=False,
+    )
+
+
+def _caption_invalid(message: str, detail: str | None = None) -> AiVideoError:
+    return AiVideoError(
+        code=ErrorCode.CAPTION_TRACK_INVALID,
         user_message=message,
         technical_detail=detail,
         retryable=False,
@@ -48,6 +82,14 @@ def _sample_at_frame(frame: int, *, fps: int, sample_rate: int) -> int:
             rounding=ROUND_FLOOR
         )
     )
+
+
+def _floor_frame_at_sample(sample: int, *, fps: int, sample_rate: int) -> int:
+    return sample * fps // sample_rate
+
+
+def _ceil_frame_at_sample(sample: int, *, fps: int, sample_rate: int) -> int:
+    return (sample * fps + sample_rate - 1) // sample_rate
 
 
 def _validated_raster_suffix(
@@ -81,11 +123,448 @@ def _validated_raster_suffix(
 
 
 def timeline_fingerprint(timeline: ResolvedTimeline) -> str:
-    payload = timeline.model_dump(
-        mode="json",
-        exclude={"content_hash", "composition_fingerprint", "source_provenance"},
-    )
+    excluded = {"content_hash", "composition_fingerprint", "source_provenance"}
+    if timeline.schema_version == "2.1":
+        # P4 fingerprints resolved behavior, not authoring tuple order. The exact
+        # input artifact hash remains durable on the timeline itself.
+        excluded.update({"composition_spec_hash", "creation_receipt_id"})
+    payload = timeline.model_dump(mode="json", exclude=excluded)
     return canonical_sha256(payload)
+
+
+def _verified_registry_asset(
+    project: LoadedProductionProject,
+    asset: AssetRecord,
+    *,
+    invalid,
+):
+    source_path = project.asset_paths.get(asset.asset_id)
+    if source_path is None:
+        raise invalid(f"Asset {asset.asset_id} has no verified loaded path.")
+    if asset.artifact_path.is_absolute() or ".." in asset.artifact_path.parts:
+        raise invalid(f"Asset path is not clean: {asset.asset_id}.")
+    registered_path = project.root / asset.artifact_path
+    if Path(source_path) != registered_path:
+        raise invalid(
+            f"Loaded asset path does not match registry path: {asset.asset_id}."
+        )
+    try:
+        snapshot = _read_regular_file_nofollow(
+            registered_path,
+            contained_by=project.root,
+        )
+    except (OSError, ValueError) as exc:
+        raise invalid(f"Asset {asset.asset_id} could not be read safely.", str(exc)) from exc
+    if (
+        snapshot.file_sha256 != asset.sha256
+        or snapshot.size_bytes != asset.size_bytes
+    ):
+        raise invalid(f"Asset bytes changed before timeline resolution: {asset.asset_id}.")
+    return snapshot
+
+
+def _resolved_source_duration(
+    track: AudioTrackSpec,
+    asset: AssetRecord,
+    *,
+    sample_rate: int,
+) -> int:
+    metadata = asset.audio_metadata
+    if metadata is None:
+        raise _audio_invalid(f"Audio asset {asset.asset_id} has no P4 metadata.")
+    if metadata.sample_rate_hz != sample_rate:
+        raise _audio_invalid(
+            f"Audio asset {asset.asset_id} sample rate does not match composition."
+        )
+    if asset.asset_type is not AUDIO_KIND_TO_ASSET_TYPE[track.audio_kind]:
+        raise _audio_invalid(
+            f"Audio track {track.track_id} has the wrong registry asset type."
+        )
+    if metadata.audio_kind is not track.audio_kind:
+        raise _audio_invalid(
+            f"Audio track {track.track_id} kind does not match asset metadata."
+        )
+    if not asset.mime_type.startswith("audio/"):
+        raise _audio_invalid(f"Audio asset {asset.asset_id} has a non-audio MIME type.")
+    if track.trim_start_sample >= metadata.duration_samples:
+        raise _audio_invalid(f"Audio track {track.track_id} trim starts past its source.")
+    available = metadata.duration_samples - track.trim_start_sample
+    duration = track.trim_duration_samples or available
+    if duration > available:
+        raise _audio_invalid(f"Audio track {track.track_id} trim exceeds its source.")
+    if track.fade_in_samples + track.fade_out_samples > duration:
+        raise _audio_invalid(f"Audio track {track.track_id} fades exceed its duration.")
+    return duration
+
+
+def _load_audio_assets(
+    project: LoadedProductionProject,
+    spec: CompositionSpec,
+) -> dict[str, tuple[AudioTrackSpec, AssetRecord, int]]:
+    assets = {item.asset_id: item for item in project.registry.assets}
+    track_ids = [item.track_id for item in spec.audio_tracks]
+    if len(track_ids) != len(set(track_ids)):
+        raise _audio_invalid("Audio track IDs must be unique.")
+    known_track_ids = set(track_ids)
+    result: dict[str, tuple[AudioTrackSpec, AssetRecord, int]] = {}
+    for track in spec.audio_tracks:
+        asset = assets.get(track.asset_id)
+        if asset is None:
+            raise _audio_invalid(f"Audio track {track.track_id} has an unknown asset.")
+        duration = _resolved_source_duration(
+            track,
+            asset,
+            sample_rate=spec.sample_rate,
+        )
+        _verified_registry_asset(project, asset, invalid=_audio_invalid)
+        if track.ducking is not None:
+            sidechains = track.ducking.sidechain_track_ids
+            if (
+                track.track_id in sidechains
+                or len(sidechains) != len(set(sidechains))
+                or not set(sidechains).issubset(known_track_ids)
+            ):
+                raise _audio_invalid(
+                    f"Audio track {track.track_id} has invalid ducking sidechains."
+                )
+        result[track.track_id] = (track, asset, duration)
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(track_id: str) -> None:
+        if track_id in visiting:
+            raise _audio_invalid("Audio ducking sidechains must be acyclic.")
+        if track_id in visited:
+            return
+        visiting.add(track_id)
+        ducking = result[track_id][0].ducking
+        if ducking is not None:
+            for sidechain_id in ducking.sidechain_track_ids:
+                visit(sidechain_id)
+        visiting.remove(track_id)
+        visited.add(track_id)
+
+    for track_id in result:
+        visit(track_id)
+    return result
+
+
+def _voice_driven_frames(
+    shot_id: str,
+    duration_policy,
+    audio_assets: dict[str, tuple[AudioTrackSpec, AssetRecord, int]],
+    *,
+    fps: int,
+    sample_rate: int,
+) -> int:
+    drivers = [
+        item
+        for item in audio_assets.values()
+        if item[0].shot_id == shot_id
+        and item[0].audio_kind in {AudioKind.DIALOGUE, AudioKind.NARRATION}
+    ]
+    if len(drivers) != 1:
+        raise _audio_invalid(
+            f"Voice-driven Shot {shot_id} requires exactly one speech driver."
+        )
+    track, _asset, duration_samples = drivers[0]
+    if track.start_sample is not None:
+        raise _audio_invalid(
+            f"Voice-driven Shot {shot_id} driver must use shot-relative placement."
+        )
+    duration_seconds = Decimal(duration_samples) / Decimal(sample_rate)
+    if (
+        duration_policy.minimum_seconds is not None
+        and duration_seconds < Decimal(str(duration_policy.minimum_seconds))
+    ):
+        raise _audio_invalid(f"Voice-driven Shot {shot_id} is below its minimum duration.")
+    if (
+        duration_policy.maximum_seconds is not None
+        and duration_seconds > Decimal(str(duration_policy.maximum_seconds))
+    ):
+        raise _audio_invalid(f"Voice-driven Shot {shot_id} exceeds its maximum duration.")
+    frame_numerator = duration_samples * fps
+    if frame_numerator % sample_rate:
+        raise _audio_invalid(
+            f"Voice-driven Shot {shot_id} duration cannot snap exactly to a frame."
+        )
+    frames = frame_numerator // sample_rate
+    if frames <= 0:
+        raise _audio_invalid(
+            f"Voice-driven Shot {shot_id} must resolve to at least one frame."
+        )
+    return frames
+
+
+def _duration_frames_by_shot(
+    project: LoadedProductionProject,
+    spec: CompositionSpec,
+    audio_assets: dict[str, tuple[AudioTrackSpec, AssetRecord, int]],
+) -> dict[str, int]:
+    result: dict[str, int] = {}
+    for shot in project.shots:
+        if shot.shot_id not in spec.shot_ids:
+            continue
+        policy = shot.duration_policy
+        if policy.mode == "fixed" and policy.seconds is not None:
+            result[shot.shot_id] = _frames_for_fixed_seconds(
+                policy.seconds, spec.delivery_profile.fps
+            )
+        elif spec.schema_version == "2.0":
+            raise _invalid(f"Shot {shot.shot_id} requires a fixed duration in P3.")
+        elif policy.mode == "voice_driven":
+            result[shot.shot_id] = _voice_driven_frames(
+                shot.shot_id,
+                policy,
+                audio_assets,
+                fps=spec.delivery_profile.fps,
+                sample_rate=spec.sample_rate,
+            )
+        else:
+            raise _invalid(f"Shot {shot.shot_id} content_driven duration is unsupported.")
+    return result
+
+
+def _resolve_audio_spans(
+    spec: CompositionSpec,
+    audio_assets: dict[str, tuple[AudioTrackSpec, AssetRecord, int]],
+    *,
+    shot_start_samples: dict[str, int],
+    total_samples: int,
+) -> tuple[ResolvedAudioSpan, ...]:
+    spans: list[ResolvedAudioSpan] = []
+    for track, asset, duration in audio_assets.values():
+        if track.shot_id is not None and track.shot_id not in shot_start_samples:
+            raise _audio_invalid(
+                f"Audio track {track.track_id} references an unordered Shot."
+            )
+        start_sample = (
+            track.start_sample
+            if track.start_sample is not None
+            else shot_start_samples[track.shot_id]
+        )
+        if start_sample + duration > total_samples:
+            raise _audio_invalid(
+                f"Audio track {track.track_id} exceeds the fixed visual timeline."
+            )
+        ducking = None
+        if track.ducking is not None:
+            ducking = ResolvedDuckingSpec(
+                sidechain_track_ids=tuple(sorted(track.ducking.sidechain_track_ids)),
+                attenuation_millidb=track.ducking.attenuation_millidb,
+                attack_samples=track.ducking.attack_samples,
+                release_samples=track.ducking.release_samples,
+            )
+        spans.append(
+            ResolvedAudioSpan(
+                track_id=track.track_id,
+                audio_kind=track.audio_kind,
+                asset_id=asset.asset_id,
+                asset_sha256=asset.sha256,
+                start_sample=start_sample,
+                duration_samples=duration,
+                source_start_sample=track.trim_start_sample,
+                source_duration_samples=duration,
+                gain_millidb=track.gain_millidb,
+                fade_in_samples=track.fade_in_samples,
+                fade_out_samples=track.fade_out_samples,
+                ducking=ducking,
+            )
+        )
+    return tuple(
+        sorted(spans, key=lambda item: (item.start_sample, item.track_id, item.asset_id))
+    )
+
+
+def _load_caption_track(
+    project: LoadedProductionProject,
+    binding: CaptionTrackBinding,
+    asset: AssetRecord,
+) -> CaptionTrack:
+    if asset.asset_type is not AssetType.CAPTION or asset.caption_metadata is None:
+        raise _caption_invalid(
+            f"Caption binding {binding.binding_id} requires a typed caption asset."
+        )
+    snapshot = _verified_registry_asset(project, asset, invalid=_caption_invalid)
+    try:
+        track = CaptionTrack.model_validate_json(snapshot.data)
+    except ValidationError as exc:
+        raise _caption_invalid(
+            f"Caption asset {asset.asset_id} is not a canonical CaptionTrack.", str(exc)
+        ) from exc
+    metadata = asset.caption_metadata
+    word_count = sum(len(segment.words or ()) for segment in track.segments)
+    metadata_identity = (
+        metadata.caption_track_id,
+        metadata.language,
+        metadata.source_audio_asset_id,
+        metadata.source_audio_sha256,
+        metadata.script_hash,
+        metadata.transcript_hash,
+        metadata.segment_count,
+        metadata.word_count,
+        metadata.segmentation_policy_id,
+        metadata.segmentation_policy_version,
+        metadata.alignment_receipt_id,
+        metadata.timing_fingerprint,
+    )
+    track_identity = (
+        track.caption_track_id,
+        track.language,
+        track.source_audio_asset_id,
+        track.source_audio_sha256,
+        track.script_hash,
+        track.transcript_hash,
+        len(track.segments),
+        word_count,
+        track.segmentation_policy.policy_id,
+        track.segmentation_policy.policy_version,
+        track.alignment_receipt_id,
+        track.timing_fingerprint,
+    )
+    if (
+        track.content_hash != canonical_sha256(track)
+        or track.timing_fingerprint != caption_timing_fingerprint(track)
+        or metadata_identity != track_identity
+    ):
+        raise _caption_invalid(
+            f"Caption asset {asset.asset_id} identity or timing fingerprint does not match."
+        )
+    try:
+        CaptionStyleBindingContract(
+            caption_track=track,
+            caption_metadata=metadata,
+            binding=binding,
+        )
+    except ValidationError as exc:
+        raise _caption_invalid(
+            f"Caption binding {binding.binding_id} style identity does not match.",
+            str(exc),
+        ) from exc
+    style = binding.style_reference
+    if style is None:
+        raise _caption_invalid(f"Caption binding {binding.binding_id} requires style.")
+    try:
+        style_snapshot = _read_regular_file_nofollow(
+            project.root / style.path,
+            contained_by=project.root,
+        )
+    except (OSError, ValueError) as exc:
+        raise _caption_invalid(
+            f"Caption binding {binding.binding_id} style path is unsafe.", str(exc)
+        ) from exc
+    if style_snapshot.file_sha256 != style.content_hash:
+        raise _caption_invalid(
+            f"Caption binding {binding.binding_id} style bytes changed."
+        )
+    caption_style_fingerprint(style, style_snapshot.data)
+    if not track.segments:
+        raise _caption_invalid(f"Caption binding {binding.binding_id} is empty.")
+    return track
+
+
+def _resolve_caption_cues(
+    project: LoadedProductionProject,
+    spec: CompositionSpec,
+    audio_assets: dict[str, tuple[AudioTrackSpec, AssetRecord, int]],
+    audio_spans: tuple[ResolvedAudioSpan, ...],
+    *,
+    total_frames: int,
+    total_samples: int,
+) -> tuple[ResolvedCaptionCue, ...]:
+    assets = {item.asset_id: item for item in project.registry.assets}
+    spans = {item.track_id: item for item in audio_spans}
+    cues: list[tuple[str, ResolvedCaptionCue]] = []
+    for binding in spec.caption_tracks:
+        asset = assets.get(binding.caption_asset_id)
+        if asset is None:
+            raise _caption_invalid(
+                f"Caption binding {binding.binding_id} has an unknown asset."
+            )
+        track = _load_caption_track(project, binding, asset)
+        source = audio_assets.get(binding.source_audio_track_id)
+        span = spans.get(binding.source_audio_track_id)
+        if source is None or span is None:
+            raise _caption_invalid(
+                f"Caption binding {binding.binding_id} has an unknown source audio track."
+            )
+        source_spec, source_asset, _duration = source
+        if binding.shot_id is not None and binding.shot_id != source_spec.shot_id:
+            raise _caption_invalid(
+                f"Caption binding {binding.binding_id} Shot does not match source audio."
+            )
+        if (
+            track.source_sample_rate_hz != spec.sample_rate
+            or track.source_audio_asset_id != source_asset.asset_id
+            or track.source_audio_sha256 != source_asset.sha256
+        ):
+            raise _caption_invalid(
+                f"Caption binding {binding.binding_id} source audio identity does not match."
+            )
+        source_end = span.source_start_sample + span.source_duration_samples
+        style = binding.style_reference
+        assert style is not None
+        for segment in track.segments:
+            if (
+                segment.start_sample < span.source_start_sample
+                or segment.end_sample > source_end
+            ):
+                raise _caption_invalid(
+                    f"Caption segment {segment.segment_id} falls outside trimmed audio."
+                )
+            start_sample = span.start_sample + (
+                segment.start_sample - span.source_start_sample
+            )
+            end_sample = span.start_sample + (
+                segment.end_sample - span.source_start_sample
+            )
+            start_frame = _floor_frame_at_sample(
+                start_sample,
+                fps=spec.delivery_profile.fps,
+                sample_rate=spec.sample_rate,
+            )
+            end_frame = _ceil_frame_at_sample(
+                end_sample,
+                fps=spec.delivery_profile.fps,
+                sample_rate=spec.sample_rate,
+            )
+            if (
+                end_sample > total_samples
+                or start_frame >= end_frame
+                or end_frame > total_frames
+            ):
+                raise _caption_invalid(
+                    f"Caption segment {segment.segment_id} exceeds the resolved timeline."
+                )
+            cues.append(
+                (
+                    binding.binding_id,
+                    ResolvedCaptionCue(
+                        caption_asset_id=asset.asset_id,
+                        caption_asset_sha256=asset.sha256,
+                        caption_track_id=track.caption_track_id,
+                        caption_timing_fingerprint=track.timing_fingerprint,
+                        segment_id=segment.segment_id,
+                        text=segment.text,
+                        speaker_id=segment.speaker_id,
+                        start_sample=start_sample,
+                        end_sample=end_sample,
+                        start_frame=start_frame,
+                        end_frame_exclusive=end_frame,
+                        style_reference_id=style.artifact_id,
+                        style_content_hash=style.content_hash,
+                    ),
+                )
+            )
+    cues.sort(
+        key=lambda item: (
+            item[1].start_sample,
+            item[1].end_sample,
+            item[0],
+            item[1].segment_id,
+        )
+    )
+    return tuple(item[1] for item in cues)
 
 
 def _resolve_composition(
@@ -108,6 +587,9 @@ def _resolve_composition(
     layer_ids = [item.layer_id for item in spec.layers]
     if len(layer_ids) != len(set(layer_ids)):
         raise _invalid("CompositionSpec layer_id values must be unique.")
+
+    audio_assets = _load_audio_assets(project, spec)
+    duration_frames_by_shot = _duration_frames_by_shot(project, spec, audio_assets)
 
     shots_by_id = {item.shot_id: item for item in project.shots}
     assets_by_id = {item.asset_id: item for item in project.registry.assets}
@@ -142,11 +624,7 @@ def _resolve_composition(
             raise _invalid(f"Shot {shot_id} must use static_image in P3.")
         if shot.motion_directives:
             raise _invalid(f"Shot {shot_id} must not use motion_directives in P3.")
-        if shot.duration_policy.mode != "fixed" or shot.duration_policy.seconds is None:
-            raise _invalid(f"Shot {shot_id} requires a fixed duration in P3.")
-        duration_frames = _frames_for_fixed_seconds(
-            shot.duration_policy.seconds, spec.delivery_profile.fps
-        )
+        duration_frames = duration_frames_by_shot[shot_id]
         incoming = transition_by_target.get(shot_id)
         start_frame = cursor
         shot_layers = layers_by_shot[shot_id]
@@ -235,8 +713,33 @@ def _resolve_composition(
             )
         cursor = start_frame + duration_frames
 
-    provisional = ResolvedTimeline(
+    shot_start_samples = {
+        span.shot_id: span.start_sample
+        for span in spans
+    }
+    total_samples = _sample_at_frame(
+        cursor,
+        fps=spec.delivery_profile.fps,
+        sample_rate=spec.sample_rate,
+    )
+    audio_spans = _resolve_audio_spans(
+        spec,
+        audio_assets,
+        shot_start_samples=shot_start_samples,
+        total_samples=total_samples,
+    )
+    caption_cues = _resolve_caption_cues(
+        project,
+        spec,
+        audio_assets,
+        audio_spans,
+        total_frames=cursor,
+        total_samples=total_samples,
+    )
+
+    timeline_fields = dict(
         artifact_id=f"timeline-{spec.composition_id}",
+        schema_version=spec.schema_version,
         revision=spec.revision,
         content_hash="0" * 64,
         creation_receipt_id=f"resolve-{spec.content_hash}",
@@ -253,13 +756,12 @@ def _resolve_composition(
         ),
         visual_spans=tuple(spans),
         total_frames=cursor,
-        total_samples=_sample_at_frame(
-            cursor,
-            fps=spec.delivery_profile.fps,
-            sample_rate=spec.sample_rate,
-        ),
+        total_samples=total_samples,
         composition_fingerprint="0" * 64,
     )
+    if spec.schema_version == "2.1":
+        timeline_fields.update(audio_spans=audio_spans, caption_cues=caption_cues)
+    provisional = ResolvedTimeline(**timeline_fields)
     fingerprint = timeline_fingerprint(provisional)
     return seal_artifact(
         provisional.model_copy(update={"composition_fingerprint": fingerprint})
