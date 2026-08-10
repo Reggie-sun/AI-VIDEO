@@ -328,6 +328,7 @@ class VoiceCostReceipt(StrictModel):
 
 
 class VoiceProvenanceReceipt(StrictModel):
+    request_id: str = Field(min_length=1)
     provider_kind: str = Field(min_length=1)
     model_id: str = Field(min_length=1)
     voice_id: str = Field(min_length=1)
@@ -401,7 +402,8 @@ class VoiceProviderResult(StrictModel):
         if self.cost_receipt.request_id != self.request_id:
             raise ValueError("cost receipt request identity does not match result")
         if (
-            self.provenance_receipt.request_fingerprint
+            self.provenance_receipt.request_id != self.request_id
+            or self.provenance_receipt.request_fingerprint
             != self.request_fingerprint
         ):
             raise ValueError("provenance request identity does not match result")
@@ -429,6 +431,7 @@ class VoiceProviderResult(StrictModel):
         cls,
         *,
         request: VoiceGenerationRequest,
+        expected_egress_authorization_receipt_id: str,
         audio_bytes: bytes,
         content_type: Literal["audio/wav", "audio/x-wav"],
         provider_request_id: str | None,
@@ -438,6 +441,58 @@ class VoiceProviderResult(StrictModel):
         provenance_receipt: VoiceProvenanceReceipt,
         terminal_status: Literal["succeeded"],
     ) -> "VoiceProviderResult":
+        cost_identity = (
+            cost_receipt.pricing_snapshot_id,
+            cost_receipt.request_id,
+            cost_receipt.provider_request_id,
+        )
+        expected_cost_identity = (
+            request.pricing_snapshot_id,
+            request.request_id,
+            provider_request_id,
+        )
+        provenance_identity = (
+            provenance_receipt.request_id,
+            provenance_receipt.provider_kind,
+            provenance_receipt.model_id,
+            provenance_receipt.voice_id,
+            provenance_receipt.language,
+            provenance_receipt.request_fingerprint,
+            provenance_receipt.script_hash,
+            provenance_receipt.output_container,
+            provenance_receipt.output_codec,
+            provenance_receipt.output_sample_rate_hz,
+            provenance_receipt.output_channels,
+            provenance_receipt.egress_authorization_receipt_id,
+            provenance_receipt.provider_request_id,
+            provenance_receipt.provider_trace_id,
+        )
+        expected_provenance_identity = (
+            request.request_id,
+            request.provider_kind,
+            request.model_id,
+            request.voice_id,
+            request.language,
+            request.voice_request_fingerprint,
+            request.script_hash,
+            request.output_container,
+            request.output_codec,
+            request.output_sample_rate_hz,
+            request.output_channels,
+            expected_egress_authorization_receipt_id,
+            provider_request_id,
+            provider_trace_id,
+        )
+        if (
+            expected_egress_authorization_receipt_id
+            != request.egress_authorization_receipt_id
+            or cost_identity != expected_cost_identity
+            or provenance_identity != expected_provenance_identity
+        ):
+            raise _voice_error(
+                ErrorCode.VOICE_PROVIDER_FAILED,
+                "Voice provider receipts contradict the immutable request.",
+            )
         data: dict[str, object] = {
             "request_id": request.request_id,
             "request_fingerprint": request.voice_request_fingerprint,

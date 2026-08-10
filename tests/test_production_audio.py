@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+import ai_video.production.audio as production_audio
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.audio import (
     AudioImportRequest,
@@ -168,6 +169,7 @@ class _FakeVoiceProvider:
             provider_request_id="provider-request-1",
         )
         provenance = VoiceProvenanceReceipt(
+            request_id=request.request_id,
             provider_kind=request.provider_kind,
             model_id=request.model_id,
             voice_id=request.voice_id,
@@ -189,6 +191,9 @@ class _FakeVoiceProvider:
         )
         return VoiceProviderResult.create(
             request=request,
+            expected_egress_authorization_receipt_id=(
+                authorization.egress_authorization_receipt_id
+            ),
             audio_bytes=self.fixture_bytes,
             content_type="audio/wav",
             provider_request_id="provider-request-1",
@@ -390,6 +395,104 @@ def test_fake_provider_returns_deterministic_sealed_receipts_without_state_write
     assert first.provider_request_id == "provider-request-1"
     assert manifest.read_text(encoding="utf-8") == "unchanged"
     assert list(tmp_path.iterdir()) == [manifest]
+
+
+@pytest.mark.parametrize(
+    ("receipt_kind", "field", "wrong_value"),
+    [
+        ("cost", "pricing_snapshot_id", "pricing-wrong"),
+        ("cost", "request_id", "request-wrong"),
+        ("cost", "provider_request_id", "provider-request-wrong"),
+        ("provenance", "request_id", "request-wrong"),
+        ("provenance", "provider_kind", "provider-wrong"),
+        ("provenance", "model_id", "model-wrong"),
+        ("provenance", "voice_id", "voice-wrong"),
+        ("provenance", "language", "fr"),
+        ("provenance", "script_hash", ZERO_HASH),
+        ("provenance", "output_container", "mp3"),
+        ("provenance", "output_codec", "mp3"),
+        ("provenance", "output_sample_rate_hz", 44_100),
+        ("provenance", "output_channels", 2),
+        ("provenance", "egress_authorization_receipt_id", "egress-wrong"),
+        ("provenance", "provider_request_id", "provider-request-wrong"),
+        ("provenance", "provider_trace_id", "provider-trace-wrong"),
+    ],
+)
+def test_provider_result_rejects_request_contradicting_receipts_before_fingerprint(
+    monkeypatch, receipt_kind, field, wrong_value
+):
+    request = _voice_request()
+    provider = _FakeVoiceProvider(DIALOGUE.read_bytes())
+    preview = provider.preview(request)
+    valid = provider.generate(
+        request, _authorization(request, preview), _FAKE_DURABLE_PERMIT
+    )
+    cost = valid.cost_receipt
+    provenance = valid.provenance_receipt
+    if receipt_kind == "cost":
+        cost = cost.model_copy(update={field: wrong_value})
+    else:
+        provenance = provenance.model_copy(update={field: wrong_value})
+
+    fingerprint_calls = []
+
+    def reject_fingerprint(*args, **kwargs):
+        fingerprint_calls.append((args, kwargs))
+        raise AssertionError("contradicting receipts reached result fingerprinting")
+
+    monkeypatch.setattr(production_audio, "canonical_sha256", reject_fingerprint)
+    with pytest.raises(AiVideoError) as caught:
+        VoiceProviderResult.create(
+            request=request,
+            expected_egress_authorization_receipt_id=(
+                request.egress_authorization_receipt_id
+            ),
+            audio_bytes=valid.audio_bytes,
+            content_type=valid.content_type,
+            provider_request_id=valid.provider_request_id,
+            provider_trace_id=valid.provider_trace_id,
+            alignment_receipt_bytes=valid.alignment_receipt_bytes,
+            cost_receipt=cost,
+            provenance_receipt=provenance,
+            terminal_status="succeeded",
+        )
+
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+    assert fingerprint_calls == []
+
+
+def test_provider_result_rejects_mismatched_expected_egress_before_fingerprint(
+    monkeypatch,
+):
+    request = _voice_request()
+    provider = _FakeVoiceProvider(DIALOGUE.read_bytes())
+    preview = provider.preview(request)
+    valid = provider.generate(
+        request, _authorization(request, preview), _FAKE_DURABLE_PERMIT
+    )
+    fingerprint_calls = []
+
+    def reject_fingerprint(*args, **kwargs):
+        fingerprint_calls.append((args, kwargs))
+        raise AssertionError("mismatched authorization reached result fingerprinting")
+
+    monkeypatch.setattr(production_audio, "canonical_sha256", reject_fingerprint)
+    with pytest.raises(AiVideoError) as caught:
+        VoiceProviderResult.create(
+            request=request,
+            expected_egress_authorization_receipt_id="egress-wrong",
+            audio_bytes=valid.audio_bytes,
+            content_type=valid.content_type,
+            provider_request_id=valid.provider_request_id,
+            provider_trace_id=valid.provider_trace_id,
+            alignment_receipt_bytes=valid.alignment_receipt_bytes,
+            cost_receipt=valid.cost_receipt,
+            provenance_receipt=valid.provenance_receipt,
+            terminal_status="succeeded",
+        )
+
+    assert caught.value.code is ErrorCode.VOICE_PROVIDER_FAILED
+    assert fingerprint_calls == []
 
 
 def test_candidate_path_is_exact_contained_and_rejects_symlink(tmp_path):
