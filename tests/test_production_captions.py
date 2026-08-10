@@ -36,13 +36,19 @@ def _load_fixture(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _policy(*, version: str = "1") -> CaptionSegmentationPolicy:
+def _policy(
+    *,
+    version: str = "1",
+    strategy: str = "word_window",
+    max_characters: int = 42,
+    max_lines: int = 2,
+) -> CaptionSegmentationPolicy:
     return CaptionSegmentationPolicy(
-        policy_id="provider-segments",
+        policy_id=f"{strategy}-fixture",
         policy_version=version,
-        max_characters=42,
-        max_lines=2,
-        break_strategy="provider_segments",
+        max_characters=max_characters,
+        max_lines=max_lines,
+        break_strategy=strategy,
     )
 
 
@@ -105,6 +111,28 @@ def test_seconds_to_samples_rejects_invalid_values(value):
     assert caught.value.code is ErrorCode.CAPTION_ALIGNMENT_INVALID
 
 
+@pytest.mark.parametrize("sample_rate", [True, False])
+def test_seconds_to_samples_rejects_bool_sample_rate(sample_rate):
+    with pytest.raises(AiVideoError):
+        seconds_to_source_sample("0.1", sample_rate)
+
+
+def test_normalizer_rejects_bool_sample_rate_and_duration():
+    payload = {
+        "characters": ["a"],
+        "character_start_times_seconds": [0],
+        "character_end_times_seconds": [0.1],
+    }
+    with pytest.raises(AiVideoError):
+        normalize_character_alignment(
+            payload, sample_rate_hz=True, duration_samples=48_000
+        )
+    with pytest.raises(AiVideoError):
+        normalize_character_alignment(
+            payload, sample_rate_hz=48_000, duration_samples=True
+        )
+
+
 def test_character_alignment_normalizes_unicode_and_seals_sanitized_receipt():
     payload = _load_fixture(WITH_TIMESTAMPS)
     normalized = normalize_character_alignment(
@@ -123,6 +151,45 @@ def test_character_alignment_normalizes_unicode_and_seals_sanitized_receipt():
     )
     assert b"audio_base64" not in normalized.receipt_bytes
     assert b"xi-api-key" not in normalized.receipt_bytes
+
+
+def test_character_alignment_merges_cross_element_combining_marks():
+    normalized = normalize_character_alignment(
+        {
+            "characters": ["e", "\u0301"],
+            "character_start_times_seconds": [0, 0.1],
+            "character_end_times_seconds": [0.1, 0.2],
+        },
+        sample_rate_hz=48_000,
+        duration_samples=48_000,
+    )
+    assert len(normalized.units) == 1
+    assert normalized.units[0].text == "\u00e9"
+    assert normalized.units[0].start_sample == 0
+    assert normalized.units[0].end_sample == 9_600
+
+
+def test_character_alignment_rejects_leading_or_ambiguous_combining_marks():
+    with pytest.raises(AiVideoError, match="combining"):
+        normalize_character_alignment(
+            {
+                "characters": ["\u0301", "e"],
+                "character_start_times_seconds": [0, 0.1],
+                "character_end_times_seconds": [0.1, 0.2],
+            },
+            sample_rate_hz=48_000,
+            duration_samples=48_000,
+        )
+    with pytest.raises(AiVideoError, match="monotonic"):
+        normalize_character_alignment(
+            {
+                "characters": ["e", "\u0301"],
+                "character_start_times_seconds": [0, 0.05],
+                "character_end_times_seconds": [0.1, 0.2],
+            },
+            sample_rate_hz=48_000,
+            duration_samples=48_000,
+        )
 
 
 def test_character_alignment_rejects_parallel_array_mismatch():
@@ -238,6 +305,161 @@ def test_track_separates_script_transcript_and_optional_word_identity():
     assert word_track.segments[0].words[0].end_sample <= (
         word_track.segments[0].end_sample
     )
+
+
+def test_provider_segments_requires_and_preserves_explicit_boundaries():
+    alignment = normalize_character_alignment(
+        {
+            "characters": ["A", ".", "B", "."],
+            "character_start_times_seconds": [0, 0.1, 0.2, 0.3],
+            "character_end_times_seconds": [0.1, 0.2, 0.3, 0.4],
+        },
+        sample_rate_hz=48_000,
+        duration_samples=48_000,
+    )
+    kwargs = dict(
+        artifact_id="caption-provider",
+        revision=1,
+        creation_receipt_id="caption-create-provider",
+        source_provenance=(SourceReference(kind="derived", reference="provider"),),
+        caption_track_id="caption-provider",
+        language="en",
+        script_text="A.B.",
+        transcript_text="A.B.",
+        source_audio_asset_id="voice-asset-1",
+        source_audio_sha256=ONE_HASH,
+        source_sample_rate_hz=48_000,
+        source_duration_samples=48_000,
+        segmentation_policy=_policy(strategy="provider_segments"),
+        alignment_provider="fixture",
+        alignment_model=None,
+        alignment_receipt_id="provider",
+    )
+    with pytest.raises(AiVideoError, match="provider segment boundaries"):
+        segment_caption_track(alignment, **kwargs)
+
+    bounded = alignment.model_validate(
+        {
+            **alignment.model_dump(mode="python"),
+            "provider_segment_end_indices": (2, 4),
+        }
+    )
+    track = segment_caption_track(bounded, **kwargs)
+    assert [segment.text for segment in track.segments] == ["A.", "B."]
+    assert [segment.end_sample for segment in track.segments] == [9_600, 19_200]
+
+
+def test_sentence_policy_uses_locked_punctuation_and_enforces_limits():
+    alignment = normalize_character_alignment(
+        {
+            "characters": list("Hi. Go!"),
+            "character_start_times_seconds": [
+                0,
+                0.1,
+                0.2,
+                0.3,
+                0.4,
+                0.5,
+                0.6,
+            ],
+            "character_end_times_seconds": [
+                0.1,
+                0.2,
+                0.3,
+                0.4,
+                0.5,
+                0.6,
+                0.7,
+            ],
+        },
+        sample_rate_hz=48_000,
+        duration_samples=48_000,
+    )
+    common = dict(
+        artifact_id="caption-sentence",
+        revision=1,
+        creation_receipt_id="caption-create-sentence",
+        source_provenance=(SourceReference(kind="derived", reference="sentence"),),
+        caption_track_id="caption-sentence",
+        language="en",
+        script_text="Hi. Go!",
+        transcript_text="Hi. Go!",
+        source_audio_asset_id="voice-asset-1",
+        source_audio_sha256=ONE_HASH,
+        source_sample_rate_hz=48_000,
+        source_duration_samples=48_000,
+        alignment_provider="fixture",
+        alignment_model=None,
+        alignment_receipt_id="sentence",
+    )
+    track = segment_caption_track(
+        alignment,
+        segmentation_policy=_policy(
+            strategy="sentence", max_characters=4, max_lines=1
+        ),
+        **common,
+    )
+    assert [segment.text for segment in track.segments] == ["Hi.", " Go!"]
+
+    with pytest.raises(AiVideoError, match="limits"):
+        segment_caption_track(
+            alignment,
+            segmentation_policy=_policy(
+                strategy="sentence", max_characters=3, max_lines=1
+            ),
+            **common,
+        )
+
+
+def test_word_window_packs_units_and_rejects_unsatisfiable_limits():
+    payload = {
+        "words": [
+            {"text": "one", "start": 0, "end": 0.1},
+            {"text": "two", "start": 0.1, "end": 0.2},
+            {"text": "x", "start": 0.2, "end": 0.3},
+        ],
+        "loss": 0.2,
+    }
+    alignment = normalize_word_alignment(
+        payload,
+        sample_rate_hz=48_000,
+        duration_samples=48_000,
+    )
+    common = dict(
+        artifact_id="caption-window",
+        revision=1,
+        creation_receipt_id="caption-create-window",
+        source_provenance=(SourceReference(kind="derived", reference="window"),),
+        caption_track_id="caption-window",
+        language="en",
+        script_text="one two x",
+        transcript_text="one two x",
+        source_audio_asset_id="voice-asset-1",
+        source_audio_sha256=ONE_HASH,
+        source_sample_rate_hz=48_000,
+        source_duration_samples=48_000,
+        alignment_provider="fixture",
+        alignment_model=None,
+        alignment_receipt_id="window",
+    )
+    track = segment_caption_track(
+        alignment,
+        segmentation_policy=_policy(
+            strategy="word_window", max_characters=4, max_lines=2
+        ),
+        **common,
+    )
+    assert [segment.text for segment in track.segments] == ["one two", "x"]
+    assert [word.text for word in track.segments[0].words] == ["one", "two"]
+
+    with pytest.raises(AiVideoError, match="limits"):
+        segment_caption_track(
+            alignment,
+            segmentation_policy=_policy(
+                strategy="word_window", max_characters=2, max_lines=1
+            ),
+            **common,
+        )
 
 
 def test_policy_version_changes_timing_fingerprint_but_style_does_not():

@@ -60,6 +60,7 @@ class NormalizedAlignment(StrictModel):
     units: tuple[NormalizedAlignmentUnit, ...] = Field(min_length=1)
     sample_rate_hz: int = Field(strict=True, gt=0)
     duration_samples: int = Field(strict=True, gt=0)
+    provider_segment_end_indices: tuple[int, ...] | None = None
     receipt_bytes: bytes = Field(min_length=1)
     receipt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -74,11 +75,29 @@ class NormalizedAlignment(StrictModel):
             if unit.end_sample > self.duration_samples:
                 raise ValueError("normalized alignment exceeds source duration")
             previous_end = unit.end_sample
+        if self.provider_segment_end_indices is not None:
+            previous_index = 0
+            for end_index in self.provider_segment_end_indices:
+                if (
+                    isinstance(end_index, bool)
+                    or end_index <= previous_index
+                    or end_index > len(self.units)
+                ):
+                    raise ValueError(
+                        "provider segment boundaries must be strict end indices"
+                    )
+                previous_index = end_index
+            if previous_index != len(self.units):
+                raise ValueError("provider segment boundaries must cover every unit")
         return self
 
 
 def seconds_to_source_sample(value: object, sample_rate_hz: int) -> int:
-    if isinstance(value, bool) or not isinstance(sample_rate_hz, int):
+    if (
+        isinstance(value, bool)
+        or isinstance(sample_rate_hz, bool)
+        or not isinstance(sample_rate_hz, int)
+    ):
         raise _alignment_invalid("Caption timing value or sample rate is invalid.")
     if sample_rate_hz <= 0:
         raise _alignment_invalid("Caption source sample rate must be positive.")
@@ -139,7 +158,11 @@ def _make_alignment(
     speaker_id: str | None,
     receipt_payload: object,
 ) -> NormalizedAlignment:
-    if not isinstance(duration_samples, int) or duration_samples <= 0:
+    if (
+        isinstance(duration_samples, bool)
+        or not isinstance(duration_samples, int)
+        or duration_samples <= 0
+    ):
         raise _alignment_invalid("Caption source duration must be positive samples.")
     if len(texts) != len(starts) or len(texts) != len(ends):
         raise _alignment_invalid("Caption alignment parallel arrays must have equal length.")
@@ -167,6 +190,25 @@ def _make_alignment(
             raise _alignment_invalid(
                 "Caption alignment exceeds source duration.", f"unit_index={index}"
             )
+        if unit_kind == "character" and unicodedata.combining(raw_text[0]):
+            if any(not unicodedata.combining(character) for character in raw_text):
+                raise _alignment_invalid(
+                    "Caption combining-mark timing is ambiguous.",
+                    f"unit_index={index}",
+                )
+            if not units:
+                raise _alignment_invalid(
+                    "Caption alignment cannot start with an orphan combining mark."
+                )
+            previous = units[-1]
+            units[-1] = previous.model_copy(
+                update={
+                    "text": unicodedata.normalize("NFC", previous.text + raw_text),
+                    "end_sample": max(previous.end_sample, end),
+                }
+            )
+            previous_end = max(previous.end_sample, end)
+            continue
         units.append(
             NormalizedAlignmentUnit(
                 text=text,
@@ -316,6 +358,78 @@ def _alignment_text(alignment: NormalizedAlignment) -> str:
     return " ".join(unit.text for unit in alignment.units)
 
 
+def _group_text(
+    alignment: NormalizedAlignment,
+    units: Sequence[NormalizedAlignmentUnit],
+) -> str:
+    if alignment.unit_kind == "character":
+        return "".join(unit.text for unit in units)
+    return " ".join(unit.text for unit in units)
+
+
+def _segment_unit_groups(
+    alignment: NormalizedAlignment,
+    policy: CaptionSegmentationPolicy,
+) -> tuple[tuple[NormalizedAlignmentUnit, ...], ...]:
+    capacity = policy.max_characters * policy.max_lines
+
+    def checked_group(
+        units: Sequence[NormalizedAlignmentUnit],
+    ) -> tuple[NormalizedAlignmentUnit, ...]:
+        group = tuple(units)
+        if not group or len(_group_text(alignment, group)) > capacity:
+            raise _track_invalid(
+                "Caption segment cannot satisfy segmentation policy limits."
+            )
+        return group
+
+    if policy.break_strategy == "provider_segments":
+        boundaries = alignment.provider_segment_end_indices
+        if boundaries is None:
+            raise _track_invalid(
+                "Caption provider segment boundaries are required by policy."
+            )
+        groups: list[tuple[NormalizedAlignmentUnit, ...]] = []
+        start = 0
+        for end in boundaries:
+            groups.append(checked_group(alignment.units[start:end]))
+            start = end
+        return tuple(groups)
+
+    if policy.break_strategy == "sentence":
+        punctuation = frozenset(".!?。！？")
+        groups = []
+        start = 0
+        for index, unit in enumerate(alignment.units, start=1):
+            if unit.text[-1] in punctuation:
+                groups.append(checked_group(alignment.units[start:index]))
+                start = index
+        if start < len(alignment.units):
+            groups.append(checked_group(alignment.units[start:]))
+        return tuple(groups)
+
+    groups = []
+    current: list[NormalizedAlignmentUnit] = []
+    for unit in alignment.units:
+        candidate = (*current, unit)
+        if len(_group_text(alignment, candidate)) <= capacity:
+            current.append(unit)
+            continue
+        if not current:
+            raise _track_invalid(
+                "Caption segment cannot satisfy segmentation policy limits."
+            )
+        groups.append(tuple(current))
+        current = [unit]
+        if len(_group_text(alignment, current)) > capacity:
+            raise _track_invalid(
+                "Caption segment cannot satisfy segmentation policy limits."
+            )
+    if current:
+        groups.append(tuple(current))
+    return tuple(groups)
+
+
 def caption_timing_fingerprint(track: CaptionTrack) -> str:
     return canonical_sha256(
         {
@@ -368,31 +482,34 @@ def segment_caption_track(
     if _alignment_text(alignment) != normalized_transcript:
         raise _track_invalid("Caption transcript does not match normalized alignment text.")
 
-    start = alignment.units[0].start_sample
-    end = alignment.units[-1].end_sample
-    speakers = {item.speaker_id for item in alignment.units}
-    segment_speaker = next(iter(speakers)) if len(speakers) == 1 else None
-    words: tuple[CaptionWord, ...] | None = None
-    if alignment.unit_kind == "word":
-        words = tuple(
-            CaptionWord(
-                text=item.text,
-                start_sample=item.start_sample,
-                end_sample=item.end_sample,
-                speaker_id=item.speaker_id,
-                confidence_milli=item.confidence_milli,
+    unit_groups = _segment_unit_groups(alignment, segmentation_policy)
+    segments: list[CaptionSegment] = []
+    for index, group in enumerate(unit_groups, start=1):
+        speakers = {item.speaker_id for item in group}
+        segment_speaker = next(iter(speakers)) if len(speakers) == 1 else None
+        words: tuple[CaptionWord, ...] | None = None
+        if alignment.unit_kind == "word":
+            words = tuple(
+                CaptionWord(
+                    text=item.text,
+                    start_sample=item.start_sample,
+                    end_sample=item.end_sample,
+                    speaker_id=item.speaker_id,
+                    confidence_milli=item.confidence_milli,
+                )
+                for item in group
             )
-            for item in alignment.units
+        segments.append(
+            CaptionSegment(
+                segment_id=f"segment-{index:04d}",
+                text=_group_text(alignment, group),
+                start_sample=group[0].start_sample,
+                end_sample=group[-1].end_sample,
+                speaker_id=segment_speaker,
+                words=words,
+                confidence_milli=None,
+            )
         )
-    segment = CaptionSegment(
-        segment_id="segment-0001",
-        text=normalized_transcript,
-        start_sample=start,
-        end_sample=end,
-        speaker_id=segment_speaker,
-        words=words,
-        confidence_milli=None,
-    )
     track = CaptionTrack(
         artifact_id=artifact_id,
         schema_version="2.1",
@@ -409,7 +526,7 @@ def segment_caption_track(
         source_audio_asset_id=source_audio_asset_id,
         source_audio_sha256=source_audio_sha256,
         source_sample_rate_hz=source_sample_rate_hz,
-        segments=(segment,),
+        segments=tuple(segments),
         segmentation_policy=segmentation_policy,
         alignment_provider=alignment_provider,
         alignment_model=alignment_model,
