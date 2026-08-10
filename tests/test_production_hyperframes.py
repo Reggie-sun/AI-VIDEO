@@ -1568,8 +1568,10 @@ def test_p4_raw_renderer_capability_gate_accepts_local_audio_and_frame_caption(
     unshare = required_absolute_env("P4_UNSHARE_PATH")
     ip_path = required_absolute_env("P4_IP_PATH")
     bash = required_absolute_env("P4_BASH_PATH")
+    ffmpeg = required_absolute_env("P4_FFMPEG_PATH")
+    ffprobe = required_absolute_env("P4_FFPROBE_PATH")
     evidence_root = required_absolute_env("P4_RENDERER_EVIDENCE", directory=True)
-    for supplied in (browser, unshare, ip_path, bash):
+    for supplied in (browser, unshare, ip_path, bash, ffmpeg, ffprobe):
         assert supplied.resolve(strict=True) == supplied and not supplied.is_symlink()
 
     source_root = tmp_path / "raw-p4-source"
@@ -1721,11 +1723,27 @@ def test_p4_raw_renderer_capability_gate_accepts_local_audio_and_frame_caption(
     )
     assert render.returncode == 0, render.stderr
 
-    ffprobe_name = shutil.which("ffprobe")
-    ffmpeg_name = shutil.which("ffmpeg")
-    assert ffprobe_name is not None and ffmpeg_name is not None
-    ffprobe = Path(ffprobe_name).resolve(strict=True)
-    ffmpeg = Path(ffmpeg_name).resolve(strict=True)
+    tool_identities = {}
+    for name, executable in (("ffmpeg", ffmpeg), ("ffprobe", ffprobe)):
+        version = subprocess.run(
+            [str(executable), "-version"],
+            shell=False,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            close_fds=True,
+            check=False,
+            text=True,
+            timeout=30,
+        )
+        assert version.returncode == 0, version.stderr
+        first_line = version.stdout.splitlines()[0]
+        assert first_line.startswith(f"{name} version ")
+        tool_identities[name] = {
+            "path": str(executable),
+            "version": first_line,
+            "binary_sha256": hashlib.sha256(executable.read_bytes()).hexdigest(),
+        }
     descriptor = os.open(
         output_path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
     )
@@ -1813,6 +1831,10 @@ def test_p4_raw_renderer_capability_gate_accepts_local_audio_and_frame_caption(
         assert len(decoded.stdout) % 4 == 0
         decoded_samples = len(decoded.stdout) // 4
         assert decoded_samples == 96_256
+        decoded_pcm_sha256 = hashlib.sha256(decoded.stdout).hexdigest()
+        assert decoded_pcm_sha256 == (
+            "9b51623b8a2cfbd1f8e61c49c4fb6d95086067ac2e1209ad7bcc57122324f785"
+        )
         write_evidence(
             "audio-measurement.json",
             {
@@ -1823,7 +1845,8 @@ def test_p4_raw_renderer_capability_gate_accepts_local_audio_and_frame_caption(
                 "decoded_samples": decoded_samples,
                 "encoder_priming_samples": 1_024,
                 "encoder_padding_samples": 256,
-                "decoded_pcm_sha256": hashlib.sha256(decoded.stdout).hexdigest(),
+                "decoded_pcm_sha256": decoded_pcm_sha256,
+                "measurement_tools": tool_identities,
                 "held_fd": True,
             },
         )
