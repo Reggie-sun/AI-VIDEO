@@ -3,8 +3,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import socket
+import subprocess
+import wave
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -33,6 +36,9 @@ from ai_video.production.hashing import seal_artifact
 from ai_video.production.hyperframes import (
     RendererCommandResult,
     _render_with_hyperframes,
+    decoded_audio_sha256_fd_with_executable,
+    decoded_frame_sha256_fd,
+    probe_clip_fd_with_executable,
 )
 from ai_video.production.models import (
     AssetRecord,
@@ -75,7 +81,82 @@ FIXTURE_ROOT = Path(__file__).parent / "fixtures/voice_captions"
 DIALOGUE = FIXTURE_ROOT / "dialogue-mono-48000.wav"
 AMBIENCE = FIXTURE_ROOT / "ambience-stereo-48000.wav"
 ZERO_HASH = "0" * 64
-DECODED_AUDIO_HASH = hashlib.sha256(b"deterministic-p4-decoded-audio").hexdigest()
+MIXED_PCM_SHA256 = "592b598a4f1efe892556506364e8304730eb6573a0d58ee89ed1997f6e920b33"
+OUTPUT_DECODED_PCM_SHA256 = (
+    "7489b97d0668d8a283e37ae47eded722450e010a60030818f0c303d64141916f"
+)
+OUTPUT_DECODED_FRAMES_SHA256 = (
+    "5f25f0842e8658f71d6d9653264637592151f82b185fccc23d189efd7d18bcd5"
+)
+EXPECTED_AUDIO_SPANS = (
+    (
+        "dialogue",
+        "dialogue",
+        "voice-voice-e2e",
+        "f72a3208e25253873858b9f9161e0851e336eb5e97d717a01679df729c428a63",
+        0,
+        96_000,
+        0,
+        96_000,
+        0,
+        0,
+        0,
+        None,
+    ),
+    (
+        "ambience",
+        "ambience",
+        "ambience-room",
+        "e58b991cd53fb90d79f3482957a51a56bf56d8cfb6cbdf40152bd39ac9102dca",
+        0,
+        48_000,
+        0,
+        48_000,
+        0,
+        480,
+        0,
+        None,
+    ),
+    (
+        "sfx",
+        "sfx",
+        "sfx-hit",
+        "e58b991cd53fb90d79f3482957a51a56bf56d8cfb6cbdf40152bd39ac9102dca",
+        96_000,
+        48_000,
+        0,
+        48_000,
+        0,
+        0,
+        0,
+        None,
+    ),
+    (
+        "bgm",
+        "bgm",
+        "bgm-theme",
+        "e58b991cd53fb90d79f3482957a51a56bf56d8cfb6cbdf40152bd39ac9102dca",
+        0,
+        48_000,
+        0,
+        48_000,
+        -6_000,
+        480,
+        480,
+        (("dialogue",), -12_000, 240, 480),
+    ),
+)
+EXPECTED_CAPTION_CUES = (
+    (
+        "caption-voice-e2e",
+        "caption-track-voice-e2e",
+        "segment-0001",
+        0,
+        88_608,
+        0,
+        45,
+    ),
+)
 
 
 def _manifest(root: Path) -> ProductionManifest:
@@ -450,8 +531,11 @@ class _RenderCall:
 
 
 class _FakeHyperFramesRunner:
-    def __init__(self) -> None:
+    def __init__(self, ffmpeg_path: Path) -> None:
+        self.ffmpeg_path = ffmpeg_path
         self.calls: list[_RenderCall] = []
+        self.mixed_pcm_sha256: str | None = None
+        self.caption_frame_windows: tuple[tuple[int, int], ...] = ()
 
     def version(self, *, env) -> str:
         assert env["HYPERFRAMES_NO_TELEMETRY"] == "1"
@@ -479,12 +563,100 @@ class _FakeHyperFramesRunner:
         )
 
     def run(self, command, args, *, cwd, env, timeout_seconds) -> RendererCommandResult:
-        del timeout_seconds
         assert env["HYPERFRAMES_NO_TELEMETRY"] == "1"
         self.calls.append(_RenderCall(command))
         if command == "render":
-            Path(args[args.index("-o") + 1]).write_bytes(b"deterministic-fake-mp4")
-            return RendererCommandResult(returncode=0, stdout="", stderr="")
+            source = (cwd / "index.html").read_text(encoding="utf-8")
+            caption_elements = re.findall(
+                r'<div[^>]*class="clip caption"[^>]*>', source
+            )
+            self.caption_frame_windows = tuple(
+                (
+                    int(re.search(r'data-start-frame="(\d+)"', element).group(1)),
+                    int(
+                        re.search(r'data-end-frame-exclusive="(\d+)"', element).group(1)
+                    ),
+                )
+                for element in caption_elements
+            )
+            mixed_wavs = tuple((cwd / "assets").glob("*.wav"))
+            assert len(mixed_wavs) == 1
+            mixed_wav = mixed_wavs[0]
+            with wave.open(str(mixed_wav), "rb") as handle:
+                assert (
+                    handle.getnframes(),
+                    handle.getframerate(),
+                    handle.getnchannels(),
+                    handle.getsampwidth(),
+                ) == (192_000, 48_000, 2, 2)
+                self.mixed_pcm_sha256 = hashlib.sha256(
+                    handle.readframes(handle.getnframes())
+                ).hexdigest()
+            drawboxes = ",".join(
+                (
+                    "drawbox=x=64:y=600:w=1152:h=80:color=cyan:t=fill:"
+                    f"enable=gte(n\\,{start})*lt(n\\,{end})"
+                )
+                for start, end in self.caption_frame_windows
+            )
+            output = Path(args[args.index("-o") + 1])
+            completed = subprocess.run(
+                [
+                    str(self.ffmpeg_path),
+                    "-nostdin",
+                    "-v",
+                    "error",
+                    "-y",
+                    "-f",
+                    "lavfi",
+                    "-i",
+                    "color=c=black:s=1280x720:r=24:d=4",
+                    "-i",
+                    str(mixed_wav),
+                    "-vf",
+                    drawboxes,
+                    "-map",
+                    "0:v:0",
+                    "-map",
+                    "1:a:0",
+                    "-t",
+                    "4",
+                    "-c:v",
+                    "libx264",
+                    "-preset",
+                    "ultrafast",
+                    "-pix_fmt",
+                    "yuv420p",
+                    "-threads",
+                    "1",
+                    "-c:a",
+                    "aac",
+                    "-b:a",
+                    "192k",
+                    "-ar",
+                    "48000",
+                    "-ac",
+                    "2",
+                    "-map_metadata",
+                    "-1",
+                    "-movflags",
+                    "+faststart",
+                    str(output),
+                ],
+                shell=False,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                close_fds=True,
+                check=False,
+                timeout=timeout_seconds,
+                env=env,
+            )
+            return RendererCommandResult(
+                returncode=completed.returncode,
+                stdout=completed.stdout.decode(errors="replace"),
+                stderr=completed.stderr.decode(errors="replace"),
+            )
         if command == "lint":
             payload = {"errorCount": 0, "warningCount": 0}
         else:
@@ -503,42 +675,41 @@ def _executable(path: Path) -> Path:
     return path.resolve(strict=True)
 
 
-def _render_probe(timeline) -> dict[str, object]:
-    return {
-        "streams": [
-            {
-                "codec_type": "video",
-                "width": timeline.delivery_profile.width,
-                "height": timeline.delivery_profile.height,
-                "r_frame_rate": f"{timeline.delivery_profile.fps}/1",
-                "nb_frames": str(timeline.total_frames),
-                "codec_name": "h264",
-            },
-            {
-                "codec_type": "audio",
-                "index": 1,
-                "codec_name": "aac",
-                "sample_rate": str(timeline.sample_rate),
-                "channels": 2,
-                "channel_layout": "stereo",
-            },
-        ],
-        "packets": [
-            {
-                "stream_index": 1,
-                "pts": "-1024",
-                "duration": "1024",
-                "side_data_list": [
-                    {
-                        "side_data_type": "Skip Samples",
-                        "skip_samples": 1024,
-                        "discard_padding": 0,
-                    }
-                ],
-            },
-            {"stream_index": 1, "pts": str(timeline.total_samples), "duration": "1024"},
-        ],
-    }
+def _sample_rgb_frame(held_fd: int, frame: int, *, ffmpeg_path: Path) -> bytes:
+    duplicate = os.dup(held_fd)
+    try:
+        os.lseek(duplicate, 0, os.SEEK_SET)
+        completed = subprocess.run(
+            [
+                str(ffmpeg_path),
+                "-v",
+                "error",
+                "-i",
+                f"/proc/self/fd/{duplicate}",
+                "-vf",
+                f"select=eq(n\\,{frame}),crop=2:2:640:640",
+                "-frames:v",
+                "1",
+                "-pix_fmt",
+                "rgb24",
+                "-f",
+                "rawvideo",
+                "-",
+            ],
+            shell=False,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            close_fds=True,
+            pass_fds=(duplicate,),
+            check=False,
+            timeout=120,
+        )
+    finally:
+        os.close(duplicate)
+    assert completed.returncode == 0, completed.stderr.decode(errors="replace")
+    assert len(completed.stdout) == 12
+    return completed.stdout[:3]
 
 
 def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
@@ -565,8 +736,17 @@ def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
 
     monkeypatch.setattr(socket, "create_connection", reject_network)
     monkeypatch.setattr(socket.socket, "connect", reject_network)
+    monkeypatch.setattr(socket.socket, "connect_ex", reject_network)
     monkeypatch.setattr(os, "getenv", reject_secret)
     monkeypatch.setattr(environ_type, "__getitem__", guard_secret_environ)
+    original_environ_get = environ_type.get
+
+    def guard_secret_environ_get(environ, key, default=None):
+        if "ELEVENLABS" in str(key).upper() or "API_KEY" in str(key).upper():
+            return reject_secret(key)
+        return original_environ_get(environ, key, default)
+
+    monkeypatch.setattr(environ_type, "get", guard_secret_environ_get)
 
     project_factory.write_and_load_two_shot_project(tmp_path)
     toolchain = _toolchain()
@@ -661,26 +841,56 @@ def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
         loaded, seal_artifact(spec), renderer_version="0.7.103"
     )
     assert timeline.schema_version == "2.1"
-    assert {span.audio_kind for span in timeline.audio_spans} == {
-        AudioKind.DIALOGUE,
-        AudioKind.AMBIENCE,
-        AudioKind.SFX,
-        AudioKind.BGM,
-    }
-    assert timeline.total_samples == 192_000
     assert (
-        next(
-            span for span in timeline.audio_spans if span.track_id == "sfx"
-        ).start_sample
-        == 96_000
+        tuple(
+            (
+                span.track_id,
+                span.audio_kind.value,
+                span.asset_id,
+                span.asset_sha256,
+                span.start_sample,
+                span.duration_samples,
+                span.source_start_sample,
+                span.source_duration_samples,
+                span.gain_millidb,
+                span.fade_in_samples,
+                span.fade_out_samples,
+                (
+                    (
+                        span.ducking.sidechain_track_ids,
+                        span.ducking.attenuation_millidb,
+                        span.ducking.attack_samples,
+                        span.ducking.release_samples,
+                    )
+                    if span.ducking is not None
+                    else None
+                ),
+            )
+            for span in timeline.audio_spans
+        )
+        == EXPECTED_AUDIO_SPANS
     )
-    assert [cue.start_sample for cue in timeline.caption_cues] == [
-        segment["start_sample"] for segment in track["segments"]
-    ]
-    assert all(
-        cue.end_frame_exclusive <= timeline.total_frames
-        for cue in timeline.caption_cues
+    assert timeline.total_samples == 192_000
+    assert timeline.total_frames == 96
+    assert (
+        tuple(
+            (
+                cue.caption_asset_id,
+                cue.caption_track_id,
+                cue.segment_id,
+                cue.start_sample,
+                cue.end_sample,
+                cue.start_frame,
+                cue.end_frame_exclusive,
+            )
+            for cue in timeline.caption_cues
+        )
+        == EXPECTED_CAPTION_CUES
     )
+    assert tuple(
+        (segment["start_sample"], segment["end_sample"])
+        for segment in track["segments"]
+    ) == ((0, 88_608),)
 
     sources = {
         span.asset_id: loaded.asset_paths[span.asset_id]
@@ -714,7 +924,7 @@ def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
         loaded.manifest.active_render_state,
         selection,
     )
-    runner = _FakeHyperFramesRunner()
+    runner = _FakeHyperFramesRunner(toolchain.ffmpeg_path)
     browser = _executable(tmp_path / "tools/chrome")
     ip_path = _executable(tmp_path / "tools/ip")
     runner_factories = 0
@@ -734,11 +944,12 @@ def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
         browser_path=browser,
         ip_path=ip_path,
         expected_version="0.7.103",
-        probe=lambda _fd: _render_probe(timeline),
-        decoded_frames=lambda _fd: hashlib.sha256(b"deterministic-frames").hexdigest(),
-        decoded_audio=lambda _fd, rate, channels: (
-            timeline.total_samples,
-            DECODED_AUDIO_HASH,
+        probe=lambda fd: probe_clip_fd_with_executable(fd, toolchain.ffprobe_path),
+        decoded_frames=decoded_frame_sha256_fd,
+        decoded_audio=lambda fd, rate, channels: (
+            decoded_audio_sha256_fd_with_executable(
+                fd, rate, channels, toolchain.ffmpeg_path
+            )
         ),
     )
     assert rendered.active_render_state is not None
@@ -750,6 +961,8 @@ def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
         "check",
         "render",
     ]
+    assert runner.caption_frame_windows == ((0, 45),)
+    assert runner.mixed_pcm_sha256 == MIXED_PCM_SHA256
 
     reopened = load_production_project(tmp_path / "project.yaml")
     assert reopened.render_state is not None
@@ -776,8 +989,42 @@ def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
         cue.segment_id for cue in timeline.caption_cues
     )
     assert render_receipt.measured.audio is not None
-    assert render_receipt.measured.audio.decoded_samples == timeline.total_samples
-    assert render_receipt.decoded_audio_fingerprint == DECODED_AUDIO_HASH
+    assert (
+        render_receipt.measured.width,
+        render_receipt.measured.height,
+        render_receipt.measured.fps_num,
+        render_receipt.measured.fps_den,
+        render_receipt.measured.duration_frames,
+        render_receipt.measured.codec_name,
+    ) == (1280, 720, 24, 1, 96, "h264")
+    assert (
+        render_receipt.measured.audio.stream_count,
+        render_receipt.measured.audio.codec_name,
+        render_receipt.measured.audio.sample_rate_hz,
+        render_receipt.measured.audio.channels,
+        render_receipt.measured.audio.channel_layout.value,
+        render_receipt.measured.audio.decoded_samples,
+        render_receipt.measured.audio.encoder_priming_samples,
+        render_receipt.measured.audio.encoder_padding_samples,
+    ) == (1, "aac", 48_000, 2, "stereo", 192_512, 1_024, 512)
+    assert render_receipt.decoded_audio_fingerprint == OUTPUT_DECODED_PCM_SHA256
+    assert render_receipt.decoded_frame_fingerprint == OUTPUT_DECODED_FRAMES_SHA256
+    output_path = tmp_path / reopened.render_state.output.path
+    with output_path.open("rb") as output:
+        caption_present = _sample_rgb_frame(
+            output.fileno(), 44, ffmpeg_path=toolchain.ffmpeg_path
+        )
+        caption_absent = _sample_rgb_frame(
+            output.fileno(), 45, ffmpeg_path=toolchain.ffmpeg_path
+        )
+    assert caption_present[1] > 200 and caption_present[2] > 200
+    assert max(caption_absent) < 20
+    corrupt = tmp_path / "corrupt-render.mp4"
+    corrupt.write_bytes(b"not-an-mp4")
+    with corrupt.open("rb") as invalid:
+        with pytest.raises(AiVideoError) as corrupt_error:
+            probe_clip_fd_with_executable(invalid.fileno(), toolchain.ffprobe_path)
+    assert corrupt_error.value.code is ErrorCode.RENDER_FAILED
     assert selection.selected_kinds == (RendererKind.HYPERFRAMES,)
     assert list(tmp_path.rglob("manifest.json")) == [tmp_path / "state/manifest.json"]
 
@@ -795,9 +1042,13 @@ def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
         browser_path=browser,
         ip_path=ip_path,
         expected_version="0.7.103",
-        probe=lambda _fd: _render_probe(timeline),
-        decoded_frames=lambda _fd: "f" * 64,
-        decoded_audio=lambda _fd, _rate, _channels: (1, "f" * 64),
+        probe=lambda fd: probe_clip_fd_with_executable(fd, toolchain.ffprobe_path),
+        decoded_frames=decoded_frame_sha256_fd,
+        decoded_audio=lambda fd, rate, channels: (
+            decoded_audio_sha256_fd_with_executable(
+                fd, rate, channels, toolchain.ffmpeg_path
+            )
+        ),
     )
     assert replayed == rendered
     assert (
