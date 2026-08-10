@@ -57,6 +57,9 @@ from ai_video.production.paths import (
     canonical_renderer_source_receipt_path,
 )
 from ai_video.production.project import (
+    _render_source_binding_map,
+    _render_source_payload_matches,
+    _validate_source_timeline_bindings,
     load_production_project_candidate,
     load_verified_render_state,
 )
@@ -279,14 +282,6 @@ def _bundle_hash_from_pointers(bundle: RenderSourceBundlePointer) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def _valid_raster_bytes(payload: bytes, suffix: str, mime_type: str) -> bool:
-    if suffix == ".png" and mime_type == "image/png":
-        return payload.startswith(b"\x89PNG\r\n\x1a\n")
-    if suffix == ".jpg" and mime_type == "image/jpeg":
-        return payload.startswith(b"\xff\xd8\xff")
-    if suffix == ".webp" and mime_type == "image/webp":
-        return len(payload) >= 12 and payload[:4] == b"RIFF" and payload[8:12] == b"WEBP"
-    return False
 def _outcome_unknown(exc: BaseException) -> AiVideoError:
     if isinstance(exc, AiVideoError) and exc.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN:
         return exc
@@ -1308,19 +1303,21 @@ class ProductionStateCommitter:
         )
         if len(index.payload) != bundle.index.size_bytes:
             raise _state_invalid("Render source index size is invalid.")
-        binding_mime: dict[Path, str] = {}
+        try:
+            binding_map = _render_source_binding_map(source)
+            _validate_source_timeline_bindings(source, timeline)
+        except ValueError as exc:
+            raise _state_invalid("Render source bindings are invalid.", str(exc)) from exc
         pointer_by_path = {item.path: item for item in bundle.assets}
-        for binding in source.asset_bindings:
-            previous = binding_mime.get(binding.materialized_path)
-            if previous is not None and previous != binding.asset_mime_type:
-                raise _state_invalid("Render source binding MIME types conflict.")
-            pointer = pointer_by_path.get(binding.materialized_path)
-            if pointer is None or binding.asset_sha256 != pointer.file_sha256:
+        if len(pointer_by_path) != len(bundle.assets):
+            raise _state_invalid("Render source bundle contains duplicate asset paths.")
+        for path, (_, digest, _) in binding_map.items():
+            pointer = pointer_by_path.get(path)
+            if pointer is None or digest != pointer.file_sha256:
                 raise _state_invalid(
                     "Render source binding hash does not match its bundle pointer."
                 )
-            binding_mime[binding.materialized_path] = binding.asset_mime_type
-        if set(binding_mime) != {item.path for item in bundle.assets}:
+        if set(binding_map) != {item.path for item in bundle.assets}:
             raise _state_invalid("Render source bindings do not match bundle assets.")
         for pointer in bundle.assets:
             suffix = pointer.path.suffix
@@ -1331,10 +1328,11 @@ class ProductionStateCommitter:
             artifact = self._require_render_artifact(
                 artifacts, pointer.path, pointer.file_sha256
             )
-            if len(artifact.payload) != pointer.size_bytes or not _valid_raster_bytes(
-                artifact.payload, suffix, binding_mime[pointer.path]
+            role, _, binding = binding_map[pointer.path]
+            if len(artifact.payload) != pointer.size_bytes or not _render_source_payload_matches(
+                artifact.payload, suffix=suffix, role=role, binding=binding
             ):
-                raise _state_invalid("Render source asset MIME or bytes are invalid.")
+                raise _state_invalid("Render source asset type or bytes are invalid.")
 
         output = self._require_render_artifact(
             artifacts, state.output.path, state.output.file_sha256

@@ -16,7 +16,7 @@ from ai_video.production import (
     prepare_project_registry_commit,
 )
 from ai_video.production.hashing import seal_artifact
-from ai_video.production.composition import timeline_fingerprint
+from ai_video.production.composition import resolve_composition, timeline_fingerprint
 from ai_video.production.hyperframes import (
     HyperFramesRenderResult,
     VerifiedRenderOutput,
@@ -26,6 +26,8 @@ from ai_video.production.hyperframes import (
 from ai_video.production.models import (
     DeliveryProfile,
     FixedTransform,
+    AudioChannelLayout,
+    MeasuredAudioRenderMetadata,
     MeasuredRenderMetadata,
     ProductionManifest,
     ProductionProject,
@@ -47,6 +49,7 @@ from ai_video.production.state_commit import (
 )
 from production_project_factory import (
     load_revision_two_models,
+    make_p4_composition_fixture,
     write_production_project,
 )
 
@@ -106,9 +109,49 @@ def _tree_snapshot(root: Path) -> dict[Path, tuple[bytes, int]]:
     }
 
 
-def _activate_fake_render(root: Path, attempt_id: str = "reader-render"):
-    write_production_project(root)
-    before = _manifest(root)
+def _activate_fake_render(
+    root: Path, attempt_id: str = "reader-render", *, p4: bool = False
+):
+    if p4:
+        loaded, spec = make_p4_composition_fixture(root)
+        spec = seal_artifact(
+            spec.model_copy(
+                update={
+                    "content_hash": "0" * 64,
+                    "shot_ids": ("shot-1",),
+                    "layers": (spec.layers[0],),
+                    "transitions": (),
+                    "audio_tracks": (spec.audio_tracks[0],),
+                }
+            )
+        )
+        committed = ProductionStateCommitter(root).commit(
+            prepare_project_registry_commit(
+                manifest=loaded.manifest,
+                project=loaded.project,
+                registry=loaded.registry,
+                attempt_id="reader-p4-registry",
+            )
+        )
+        loaded = load_production_project(root / "project.yaml")
+        timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+        sources = {
+            item.asset_id: loaded.asset_paths[item.asset_id]
+            for item in (*timeline.visual_spans, *timeline.audio_spans)
+        }
+        sources.update(
+            {
+                item.caption_asset_id: loaded.asset_paths[item.caption_asset_id]
+                for item in timeline.caption_cues
+            }
+        )
+        style = spec.caption_tracks[0].style_reference
+        assert style is not None
+        sources[style.artifact_id] = root / style.path
+        before = committed
+    else:
+        write_production_project(root)
+        before = _manifest(root)
     png = (
         Path(__file__).parent
         / "fixtures/hyperframes/silent_image/source/assets/"
@@ -160,11 +203,13 @@ def _activate_fake_render(root: Path, attempt_id: str = "reader-render"):
         total_samples=20_000,
         composition_fingerprint="0" * 64,
     )
-    timeline = seal_artifact(
-        provisional.model_copy(
-            update={"composition_fingerprint": timeline_fingerprint(provisional)}
+    if not p4:
+        timeline = seal_artifact(
+            provisional.model_copy(
+                update={"composition_fingerprint": timeline_fingerprint(provisional)}
+            )
         )
-    )
+        sources = {"reader-red": source_path}
     selection = RendererSelectionReceipt(
         receipt_id=f"selection-{attempt_id}",
         attempt_id=attempt_id,
@@ -177,7 +222,7 @@ def _activate_fake_render(root: Path, attempt_id: str = "reader-render"):
     )
     materialized = materialize_hyperframes_source(
         timeline,
-        asset_sources={"reader-red": source_path},
+        asset_sources=sources,
         allowed_asset_root=root,
         staging_root=root / "reader-source",
         allowed_staging_parent=root,
@@ -205,14 +250,30 @@ def _activate_fake_render(root: Path, attempt_id: str = "reader-render"):
             output_sha256=hashlib.sha256(output).hexdigest(),
             output_size_bytes=len(output),
             measured=MeasuredRenderMetadata(
-                width=1280,
-                height=720,
-                fps_num=24,
+                width=timeline.delivery_profile.width,
+                height=timeline.delivery_profile.height,
+                fps_num=timeline.delivery_profile.fps,
                 fps_den=1,
-                duration_frames=10,
+                duration_frames=timeline.total_frames,
                 codec_name="h264",
+                audio=(
+                    MeasuredAudioRenderMetadata(
+                        stream_count=1,
+                        codec_name="aac",
+                        sample_rate_hz=timeline.sample_rate,
+                        channels=2,
+                        channel_layout=AudioChannelLayout.STEREO,
+                        decoded_samples=timeline.total_samples,
+                        encoder_priming_samples=0,
+                        encoder_padding_samples=0,
+                        measurement_method="fake-held-fd",
+                    )
+                    if p4
+                    else None
+                ),
             ),
             decoded_frame_fingerprint="2" * 64,
+            decoded_audio_fingerprint="3" * 64 if p4 else None,
         ),
     )
     committer = ProductionStateCommitter(root)
@@ -617,6 +678,57 @@ def test_reader_verifies_selected_render_graph_exactly_without_rewrite(tmp_path)
     assert loaded.render_state == durable.state
     assert loaded.manifest.active_render_state == durable.next_render_state
     assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_verifies_p4_audio_caption_and_style_binding_set_without_rewrite(
+    tmp_path,
+):
+    _, durable, _ = _activate_fake_render(tmp_path, p4=True)
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(tmp_path / "project.yaml")
+    source = json.loads((tmp_path / durable.state.source_receipt.path).read_bytes())
+    bundle_paths = {
+        item.path.as_posix() for item in durable.state.source_bundle.assets
+    }
+    binding_paths = {
+        *(item["materialized_path"] for item in source["asset_bindings"]),
+        *(item["materialized_path"] for item in source["audio_bindings"]),
+        *(item["materialized_path"] for item in source["caption_bindings"]),
+        *(
+            item["style_materialized_path"]
+            for item in source["caption_bindings"]
+            if item["style_materialized_path"] is not None
+        ),
+    }
+
+    assert loaded.render_state == durable.state
+    assert source["schema_version"] == "2.1"
+    assert bundle_paths == binding_paths
+    assert len(source["audio_bindings"]) == 1
+    assert len(source["caption_bindings"]) == 1
+    assert _tree_snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize("binding_kind", ["audio", "caption", "caption_style"])
+def test_reader_rejects_tampered_p4_bound_source_without_fallback(
+    tmp_path, binding_kind
+):
+    _, durable, _ = _activate_fake_render(tmp_path, p4=True)
+    source = json.loads((tmp_path / durable.state.source_receipt.path).read_bytes())
+    caption = source["caption_bindings"][0]
+    relative = {
+        "audio": source["audio_bindings"][0]["materialized_path"],
+        "caption": caption["materialized_path"],
+        "caption_style": caption["style_materialized_path"],
+    }[binding_kind]
+    target = tmp_path / relative
+    target.write_bytes(b"x" * target.stat().st_size)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
 
 
 def test_reader_rejects_tampered_selected_render_output_without_fallback(tmp_path):

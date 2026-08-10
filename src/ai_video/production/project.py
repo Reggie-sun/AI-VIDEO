@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import hashlib
+from io import BytesIO
 import json
 from pathlib import Path
 from typing import TypeVar
+import wave
 
 from pydantic import BaseModel, ValidationError
 
@@ -12,6 +14,7 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     ArtifactReference,
+    CaptionTrack,
     Character,
     LoadedProductionProject,
     ProductionBrief,
@@ -20,6 +23,8 @@ from ai_video.production.models import (
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
     RendererSourceReceipt,
+    RendererAudioBinding,
+    RendererCaptionBinding,
     RenderReceipt,
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
@@ -184,6 +189,137 @@ def _raster_matches(payload: bytes, suffix: str, mime_type: str) -> bool:
     )
 
 
+def _render_source_binding_map(
+    source: RendererSourceReceipt,
+) -> dict[Path, tuple[str, str, object]]:
+    """Map every declared source exactly once to its role and expected digest."""
+
+    bindings: dict[Path, tuple[str, str, object]] = {}
+
+    def add(path: Path, role: str, digest: str, binding: object) -> None:
+        if path in bindings:
+            raise ValueError("render source bindings contain a duplicate path")
+        bindings[path] = (role, digest, binding)
+
+    for binding in source.asset_bindings:
+        add(binding.materialized_path, "visual", binding.asset_sha256, binding)
+    for binding in source.audio_bindings:
+        add(binding.materialized_path, "audio", binding.asset_sha256, binding)
+    for binding in source.caption_bindings:
+        add(
+            binding.materialized_path,
+            "caption",
+            binding.caption_asset_sha256,
+            binding,
+        )
+        if binding.style_materialized_path is not None:
+            assert binding.style_content_hash is not None
+            add(
+                binding.style_materialized_path,
+                "caption_style",
+                binding.style_content_hash,
+                binding,
+            )
+    return bindings
+
+
+def _validate_source_timeline_bindings(
+    source: RendererSourceReceipt, timeline: ResolvedTimeline
+) -> None:
+    expected_track_ids = tuple(item.track_id for item in timeline.audio_spans)
+    if expected_track_ids:
+        if len(source.audio_bindings) != 1:
+            raise ValueError("P4 render source requires exactly one mixed audio binding")
+        audio = source.audio_bindings[0]
+        if (
+            audio.asset_mime_type != "audio/wav"
+            or audio.sample_rate_hz != timeline.sample_rate
+            or audio.channels != 2
+            or audio.duration_samples != timeline.total_samples
+            or audio.resolved_track_ids != expected_track_ids
+        ):
+            raise ValueError("P4 mixed audio binding does not match the resolved timeline")
+    elif source.audio_bindings:
+        raise ValueError("silent timeline cannot declare a renderer audio binding")
+
+    expected_caption_tracks = {item.caption_track_id for item in timeline.caption_cues}
+    actual_caption_tracks = tuple(item.caption_track_id for item in source.caption_bindings)
+    if len(actual_caption_tracks) != len(set(actual_caption_tracks)):
+        raise ValueError("renderer caption track bindings must be unique")
+    if set(actual_caption_tracks) != expected_caption_tracks:
+        raise ValueError("renderer caption bindings do not match the resolved timeline")
+    for binding in source.caption_bindings:
+        cues = tuple(
+            item
+            for item in timeline.caption_cues
+            if item.caption_track_id == binding.caption_track_id
+        )
+        style_identities = {
+            (item.style_reference_id, item.style_content_hash) for item in cues
+        }
+        if (
+            not cues
+            or {item.caption_asset_sha256 for item in cues}
+            != {binding.caption_asset_sha256}
+            or binding.resolved_cue_ids != tuple(item.segment_id for item in cues)
+            or style_identities
+            != {(binding.style_reference_id, binding.style_content_hash)}
+        ):
+            raise ValueError("renderer caption binding does not match resolved cues")
+    if (timeline.audio_spans or timeline.caption_cues) and source.schema_version != "2.1":
+        raise ValueError("P4 timeline requires RendererSourceReceipt 2.1")
+
+
+def _render_source_payload_matches(
+    payload: bytes,
+    *,
+    suffix: str,
+    role: str,
+    binding: object,
+) -> bool:
+    if role == "visual":
+        mime_type = getattr(binding, "asset_mime_type", "")
+        return _raster_matches(payload, suffix, mime_type)
+    if role == "audio":
+        if not isinstance(binding, RendererAudioBinding):
+            return False
+        if suffix != ".wav" or binding.asset_mime_type != "audio/wav":
+            return False
+        try:
+            with wave.open(BytesIO(payload), "rb") as source:
+                return (
+                    source.getsampwidth() == 2
+                    and source.getcomptype() == "NONE"
+                    and source.getframerate() == binding.sample_rate_hz
+                    and source.getnchannels() == binding.channels
+                    and source.getnframes() == binding.duration_samples
+                )
+        except (EOFError, wave.Error):
+            return False
+    if role == "caption":
+        if not isinstance(binding, RendererCaptionBinding) or suffix != ".json":
+            return False
+        try:
+            track = CaptionTrack.model_validate_json(payload)
+        except (ValidationError, ValueError):
+            return False
+        segment_ids = {item.segment_id for item in track.segments}
+        return (
+            verify_artifact_hash(track)
+            and track.caption_track_id == binding.caption_track_id
+            and set(binding.resolved_cue_ids).issubset(segment_ids)
+        )
+    if role == "caption_style":
+        if not isinstance(binding, RendererCaptionBinding) or suffix != ".json":
+            return False
+        try:
+            value = json.loads(payload)
+        except (UnicodeError, json.JSONDecodeError):
+            return False
+        return isinstance(value, dict)
+    return False
+
+
 def _read_render_model(
     root: Path,
     relative: Path,
@@ -283,22 +419,24 @@ def load_verified_render_state(
         or index_snapshot.size_bytes != bundle.index.size_bytes
     ):
         raise _invalid("Active render source index identity is invalid.")
-    mime_by_path: dict[Path, str] = {}
+    try:
+        binding_map = _render_source_binding_map(source)
+        _validate_source_timeline_bindings(source, timeline)
+    except ValueError as exc:
+        raise _invalid("Active render source bindings are invalid.", str(exc)) from exc
     pointer_by_path = {item.path: item for item in bundle.assets}
-    for binding in source.asset_bindings:
-        previous = mime_by_path.get(binding.materialized_path)
-        if previous is not None and previous != binding.asset_mime_type:
-            raise _invalid("Active render source binding MIME types conflict.")
-        pointer = pointer_by_path.get(binding.materialized_path)
-        if pointer is None or binding.asset_sha256 != pointer.file_sha256:
+    if len(pointer_by_path) != len(bundle.assets):
+        raise _invalid("Active render source bundle contains duplicate assets.")
+    for path, (_, digest, _) in binding_map.items():
+        pointer = pointer_by_path.get(path)
+        if pointer is None or digest != pointer.file_sha256:
             raise _invalid(
                 "Active render source binding hash does not match its bundle pointer."
             )
-        mime_by_path[binding.materialized_path] = binding.asset_mime_type
     asset_paths = tuple(item.path for item in bundle.assets)
     if len(asset_paths) != len(set(asset_paths)):
         raise _invalid("Active render source bundle contains duplicate assets.")
-    if set(mime_by_path) != set(asset_paths):
+    if set(binding_map) != set(asset_paths):
         raise _invalid("Active render source bindings are incomplete.")
     for asset in bundle.assets:
         try:
@@ -312,7 +450,12 @@ def load_verified_render_state(
         if (
             snapshot.file_sha256 != asset.file_sha256
             or snapshot.size_bytes != asset.size_bytes
-            or not _raster_matches(snapshot.data, asset.path.suffix, mime_by_path[asset.path])
+            or not _render_source_payload_matches(
+                snapshot.data,
+                suffix=asset.path.suffix,
+                role=binding_map[asset.path][0],
+                binding=binding_map[asset.path][2],
+            )
         ):
             raise _invalid("Active render source asset identity is invalid.")
     try:
@@ -328,10 +471,37 @@ def load_verified_render_state(
             )
             for item in source.asset_bindings
         )
+        relative_audio_bindings = tuple(
+            item.model_copy(
+                update={
+                    "materialized_path": item.materialized_path.relative_to(
+                        bundle.root_path
+                    )
+                }
+            )
+            for item in source.audio_bindings
+        )
+        relative_caption_bindings = tuple(
+            item.model_copy(
+                update={
+                    "materialized_path": item.materialized_path.relative_to(
+                        bundle.root_path
+                    ),
+                    "style_materialized_path": (
+                        item.style_materialized_path.relative_to(bundle.root_path)
+                        if item.style_materialized_path is not None
+                        else None
+                    ),
+                }
+            )
+            for item in source.caption_bindings
+        )
         audit_hyperframes_source(
             root / bundle.index.path,
             expected_assets=relative_bindings,
             expected_timeline=timeline,
+            expected_audio=relative_audio_bindings,
+            expected_captions=relative_caption_bindings,
         )
     except (AiVideoError, OSError, ValueError) as exc:
         detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)

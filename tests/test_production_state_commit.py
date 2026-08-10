@@ -414,6 +414,22 @@ def test_render_path_contract_uses_full_hashes_and_safe_attempt_ids(tmp_path: Pa
     assert canonical_render_source_asset_path(digest, digest, ".png") == Path(
         f"state/render/sources/{digest}/assets/{digest}.png"
     )
+    for suffix in (
+        ".jpg",
+        ".webp",
+        ".wav",
+        ".mp3",
+        ".m4a",
+        ".aac",
+        ".flac",
+        ".json",
+    ):
+        assert canonical_render_source_asset_path(digest, digest, suffix) == Path(
+            f"state/render/sources/{digest}/assets/{digest}{suffix}"
+        )
+    for suffix in (".jpeg", ".ogg", ".html", ".js", ""):
+        with pytest.raises(ValueError, match="unsupported"):
+            canonical_render_source_asset_path(digest, digest, suffix)
     assert canonical_renderer_source_receipt_path(digest) == Path(
         f"state/render/source-receipts/{digest}.json"
     )

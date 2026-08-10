@@ -41,7 +41,17 @@ def canonical_render_source_index_path(bundle_sha256: str) -> Path:
 def canonical_render_source_asset_path(
     bundle_sha256: str, asset_sha256: str, suffix: str
 ) -> Path:
-    if suffix not in {".png", ".jpg", ".webp"}:
+    if suffix not in {
+        ".png",
+        ".jpg",
+        ".webp",
+        ".wav",
+        ".mp3",
+        ".m4a",
+        ".aac",
+        ".flac",
+        ".json",
+    }:
         raise ValueError("Render source asset suffix is unsupported.")
     return (
         canonical_render_source_root(bundle_sha256)
