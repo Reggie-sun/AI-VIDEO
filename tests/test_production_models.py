@@ -528,6 +528,18 @@ def test_speech_audio_requires_language_and_script_hash(kind):
         AudioAssetMetadata.model_validate(data)
 
 
+def test_generated_speech_requires_voice_id_but_imported_speech_may_omit_it():
+    generated = make_audio_metadata().model_dump(mode="python")
+    generated["voice_id"] = None
+    with pytest.raises(ValidationError, match="generated speech.*voice_id"):
+        AudioAssetMetadata.model_validate(generated)
+
+    imported = make_audio_metadata().model_dump(mode="python")
+    imported["voice_id"] = None
+    imported["source"]["kind"] = "imported"
+    assert AudioAssetMetadata.model_validate(imported).voice_id is None
+
+
 @pytest.mark.parametrize("kind", [AudioKind.AMBIENCE, AudioKind.SFX, AudioKind.BGM])
 def test_non_speech_audio_rejects_voice_identity(kind):
     data = make_audio_metadata(kind).model_dump(mode="python")
@@ -637,6 +649,44 @@ def test_egress_metadata_has_strict_local_and_remote_variants():
     data["egress"]["destination"] = "https://api.elevenlabs.io"
     with pytest.raises(ValidationError, match="local egress"):
         AssetRecord.model_validate(data)
+
+
+@pytest.mark.parametrize(
+    "destination",
+    [
+        "https://api.elevenlabs.io:garbage",
+        "https://[::1]:bad",
+        "https://API.ELEVENLABS.IO",
+        "https://api.elevenlabs.io:443",
+    ],
+)
+def test_remote_egress_and_voice_receipt_share_canonical_https_origin_policy(
+    destination,
+):
+    remote = make_asset_record(
+        audio_metadata=make_audio_metadata(),
+        remote=True,
+    ).model_dump(mode="python")
+    remote["egress"]["destination"] = destination
+    with pytest.raises(ValidationError, match="canonical HTTPS origin"):
+        AssetRecord.model_validate(remote)
+
+    voice = {
+        "request_id": "request-1",
+        "attempt_id": "attempt-1",
+        "request_fingerprint": ONE_HASH,
+        "script_hash": TWO_HASH,
+        "provider_kind": "fake",
+        "model_id": "fake-v1",
+        "voice_id": "voice-1",
+        "language": "en",
+        "pricing_snapshot_id": "pricing-1",
+        "budget_reservation_receipt_id": "budget-1",
+        "egress_authorization_receipt_id": "egress-1",
+        "destination": destination,
+    }
+    with pytest.raises(ValidationError, match="canonical HTTPS origin"):
+        VoiceRequestReceipt.model_validate(voice)
 
 
 def test_caption_track_enforces_monotonic_segments_and_word_containment():
@@ -828,6 +878,48 @@ def test_composition_and_timeline_versions_reject_p4_fields_in_20_and_omit_defau
         ResolvedTimeline.model_validate(explicit_empty_timeline)
 
 
+def test_composition_21_rejects_bound_caption_without_style_reference():
+    layer = CompositionLayerSpec(
+        layer_id="layer-1",
+        shot_id="shot-1",
+        asset_role="primary_image",
+        asset_id="asset-1",
+    )
+    binding = CaptionTrackBinding(
+        binding_id="caption-binding-1",
+        caption_asset_id="caption-asset-1",
+        source_audio_track_id="dialogue-track-1",
+        shot_id="shot-1",
+        style_reference=None,
+    )
+    with pytest.raises(ValidationError, match="bound caption.*style"):
+        CompositionSpec(
+            **versioned_fields("composition-1", THREE_HASH),
+            schema_version="2.1",
+            composition_id="composition-1",
+            shot_ids=("shot-1",),
+            layers=(layer,),
+            delivery_profile=DeliveryProfile(width=320, height=180, fps=24),
+            caption_tracks=(binding,),
+        )
+
+    style = CaptionStyleReference(
+        artifact_id="style-1",
+        revision=1,
+        content_hash=NINE_HASH,
+        path=Path(f"assets/styles/{NINE_HASH}.json"),
+    )
+    assert CompositionSpec(
+        **versioned_fields("composition-1", THREE_HASH),
+        schema_version="2.1",
+        composition_id="composition-1",
+        shot_ids=("shot-1",),
+        layers=(layer,),
+        delivery_profile=DeliveryProfile(width=320, height=180, fps=24),
+        caption_tracks=(binding.model_copy(update={"style_reference": style}),),
+    ).caption_tracks[0].style_reference == style
+
+
 def test_resolved_timeline_requires_canonical_unique_audio_span_order():
     span_a = ResolvedAudioSpan(
         track_id="a-track",
@@ -950,6 +1042,20 @@ def test_renderer_bindings_require_mime_hash_and_exact_suffix_mapping():
         "resolved_cue_ids": ("segment-1",),
     }
     with pytest.raises(ValidationError, match="JSON"):
+        RendererCaptionBinding.model_validate(caption)
+
+    audio["materialized_path"] = Path(
+        f"state/render/sources/{SIX_HASH}/assets/{ONE_HASH}.wav"
+    )
+    audio["resolved_track_ids"] = ("dialogue-track-1", "dialogue-track-1")
+    with pytest.raises(ValidationError, match="unique"):
+        RendererAudioBinding.model_validate(audio)
+
+    caption["materialized_path"] = Path(
+        f"state/render/sources/{SIX_HASH}/assets/{TWO_HASH}.json"
+    )
+    caption["resolved_cue_ids"] = ("segment-1", "segment-1")
+    with pytest.raises(ValidationError, match="unique"):
         RendererCaptionBinding.model_validate(caption)
 
 

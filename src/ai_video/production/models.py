@@ -49,6 +49,36 @@ def _require_clean_relative_file_path(value: Path, label: str) -> Path:
     return value
 
 
+def _require_canonical_https_origin(value: str, label: str) -> str:
+    try:
+        parsed = urlsplit(value)
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError(f"{label} must be a canonical HTTPS origin") from exc
+    host = parsed.hostname
+    if host is None:
+        raise ValueError(f"{label} must be a canonical HTTPS origin")
+    host_token = f"[{host}]" if ":" in host else host
+    if port == 443:
+        raise ValueError(
+            f"{label} must be a canonical HTTPS origin and omit default port 443"
+        )
+    expected = f"https://{host_token}"
+    if port is not None:
+        expected = f"{expected}:{port}"
+    if not (
+        parsed.scheme == "https"
+        and parsed.username is None
+        and parsed.password is None
+        and parsed.path == ""
+        and not parsed.query
+        and not parsed.fragment
+        and value == expected
+    ):
+        raise ValueError(f"{label} must be a canonical HTTPS origin")
+    return value
+
+
 def canonical_project_snapshot_path(revision: int, content_hash: str) -> Path:
     return Path(f"state/projects/project.{revision}.{content_hash}.yaml")
 
@@ -385,6 +415,12 @@ class AudioAssetMetadata(StrictModel):
         speech = self.audio_kind in {AudioKind.DIALOGUE, AudioKind.NARRATION}
         if speech and (not self.language or self.script_hash is None):
             raise ValueError("speech audio requires language and script_hash")
+        if (
+            speech
+            and self.source.kind is AssetSourceKind.GENERATED
+            and not self.voice_id
+        ):
+            raise ValueError("generated speech audio requires non-empty voice_id")
         if not speech and any(
             value is not None
             for value in (
@@ -454,19 +490,7 @@ class EgressMetadata(StrictModel):
         if any(value is None for value in remote_fields):
             raise ValueError("remote egress metadata requires complete authorization")
         assert self.destination is not None
-        parsed = urlsplit(self.destination)
-        canonical_origin = (
-            parsed.scheme == "https"
-            and bool(parsed.hostname)
-            and parsed.username is None
-            and parsed.password is None
-            and parsed.path == ""
-            and not parsed.query
-            and not parsed.fragment
-            and self.destination == f"https://{parsed.netloc}"
-        )
-        if not canonical_origin:
-            raise ValueError("remote destination must be a canonical HTTPS origin")
+        _require_canonical_https_origin(self.destination, "remote destination")
         return self
 
     @model_serializer(mode="wrap")
@@ -891,6 +915,8 @@ class CompositionSpec(VersionedArtifact):
             raise ValueError("audio track IDs must be unique")
         if len(caption_ids) != len(set(caption_ids)):
             raise ValueError("caption binding IDs must be unique")
+        if any(item.style_reference is None for item in self.caption_tracks):
+            raise ValueError("bound caption tracks require a style reference")
         return self
 
     @model_serializer(mode="wrap")
@@ -1130,6 +1156,8 @@ class RendererAudioBinding(StrictModel):
             or self.materialized_path.suffix != suffix_by_mime[self.asset_mime_type]
         ):
             raise ValueError("renderer audio MIME requires exact hash suffix mapping")
+        if len(self.resolved_track_ids) != len(set(self.resolved_track_ids)):
+            raise ValueError("renderer audio resolved track IDs must be unique")
         return self
 
 
@@ -1167,6 +1195,8 @@ class RendererCaptionBinding(StrictModel):
                 or self.style_materialized_path.suffix != ".json"
             ):
                 raise ValueError("renderer caption style must point to hash-named JSON")
+        if len(self.resolved_cue_ids) != len(set(self.resolved_cue_ids)):
+            raise ValueError("renderer caption resolved cue IDs must be unique")
         return self
 
 
@@ -1491,19 +1521,7 @@ class VoiceRequestReceipt(StrictModel):
     @field_validator("destination")
     @classmethod
     def _require_canonical_https_origin(cls, value: str) -> str:
-        parsed = urlsplit(value)
-        if not (
-            parsed.scheme == "https"
-            and bool(parsed.hostname)
-            and parsed.username is None
-            and parsed.password is None
-            and parsed.path == ""
-            and not parsed.query
-            and not parsed.fragment
-            and value == f"https://{parsed.netloc}"
-        ):
-            raise ValueError("voice destination must be a canonical HTTPS origin")
-        return value
+        return _require_canonical_https_origin(value, "voice destination")
 
 
 class StateCommitAttempt(StrictModel):
