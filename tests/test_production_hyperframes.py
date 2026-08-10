@@ -7,6 +7,7 @@ import math
 import os
 import shutil
 import subprocess
+import wave
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_EVEN
 from pathlib import Path
@@ -1535,6 +1536,342 @@ def test_renderer_failure_stderr_is_bounded_and_redacted(tmp_path):
         _adapter(tmp_path, runner).render(make_render_attempt(tmp_path))
     assert "private" not in (caught.value.technical_detail or "")
     assert "[REDACTED]" in (caught.value.technical_detail or "")
+
+
+@pytest.mark.skipif(
+    os.environ.get("AI_VIDEO_P4_RENDERER_GATE") != "1",
+    reason="requires the explicit P4 raw audio/caption renderer gate",
+)
+def test_p4_raw_renderer_capability_gate_accepts_local_audio_and_frame_caption(
+    tmp_path,
+):
+    def required_absolute_env(name: str, *, directory: bool = False) -> Path:
+        value = os.environ.get(name)
+        assert value, f"{name} is required when AI_VIDEO_P4_RENDERER_GATE=1"
+        path = Path(value)
+        assert path.is_absolute() and ".." not in path.parts
+        resolved = path.resolve(strict=True)
+        if directory:
+            assert resolved == path and path.is_dir() and not path.is_symlink()
+        else:
+            assert os.access(path, os.X_OK)
+        return path
+
+    def write_evidence(name: str, payload: object) -> None:
+        (evidence_root / name).write_text(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+
+    binary = required_absolute_env("P4_BINARY")
+    browser = required_absolute_env("P4_BROWSER_PATH")
+    unshare = required_absolute_env("P4_UNSHARE_PATH")
+    ip_path = required_absolute_env("P4_IP_PATH")
+    bash = required_absolute_env("P4_BASH_PATH")
+    evidence_root = required_absolute_env("P4_RENDERER_EVIDENCE", directory=True)
+    for supplied in (browser, unshare, ip_path, bash):
+        assert supplied.resolve(strict=True) == supplied and not supplied.is_symlink()
+
+    source_root = tmp_path / "raw-p4-source"
+    assets = source_root / "assets"
+    assets.mkdir(parents=True)
+    image_path = assets / "background.png"
+    image_path.write_bytes(RED_PNG)
+    audio_fixture = (
+        Path(__file__).parent
+        / "fixtures/voice_captions/dialogue-mono-48000.wav"
+    )
+    assert hashlib.sha256(audio_fixture.read_bytes()).hexdigest() == (
+        "f72a3208e25253873858b9f9161e0851e336eb5e97d717a01679df729c428a63"
+    )
+    with wave.open(str(audio_fixture), "rb") as fixture_wave:
+        assert fixture_wave.getparams() == (
+            1,
+            2,
+            48_000,
+            96_000,
+            "NONE",
+            "not compressed",
+        )
+    audio_path = assets / "dialogue.wav"
+    audio_path.write_bytes(audio_fixture.read_bytes())
+    (source_root / "index.html").write_text(
+        """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <style>
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+    #stage{position:relative;overflow:hidden}
+    #background{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    #caption{position:absolute;left:0;right:0;top:120px;height:60px;background:#00ffff;color:#000;text-align:center;font:700 24px/60px sans-serif}
+  </style>
+</head>
+<body>
+<div id="stage" data-composition-id="p4-raw-gate" data-no-timeline data-start="0" data-duration="2" data-width="320" data-height="180" data-fps="30">
+  <img id="background" class="clip" src="assets/background.png" data-start="0" data-duration="2" data-track-index="0" alt="" />
+  <div id="caption" class="clip" data-start="0.5" data-duration="1" data-track-index="1" data-layout-allow-caption-zone>LOCAL CAPTION</div>
+  <audio id="dialogue" src="assets/dialogue.wav" data-start="0" data-duration="2" data-track-index="2" data-volume="1"></audio>
+</div>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+    output_path = tmp_path / "raw-p4-output.mp4"
+
+    runner = _NetworkIsolatedHyperFramesRunner(
+        project_root=_renderer_tool_root(binary),
+        binary=binary,
+        browser_path=browser,
+        ip_path=ip_path,
+        unshare_path=unshare,
+        bash_path=bash,
+    )
+    controlled_env = _controlled_env(browser, ip_path)
+    expected_argv = [
+        runner._namespace_argv("--version"),
+        runner._namespace_argv("doctor", "--json"),
+        runner._namespace_argv("lint", str(source_root), "--json"),
+        runner._namespace_argv("check", str(source_root), "--json"),
+        runner._namespace_argv(
+            "render", str(source_root), "-o", str(output_path), "--json"
+        ),
+    ]
+    write_evidence(
+        "expected-argv.json",
+        {
+            "argv": expected_argv,
+            "binary": str(binary),
+            "browser": str(browser),
+            "renderer_version": "0.7.103",
+        },
+    )
+
+    network_argv = [
+        str(unshare),
+        "--user",
+        "--map-root-user",
+        "--net",
+        "--pid",
+        "--fork",
+        "--mount-proc",
+        str(bash),
+        "-ceu",
+        '"$P3_IP_PATH" link set lo up; "$P3_IP_PATH" -json addr show',
+        "p4-network-audit",
+    ]
+    network = subprocess.run(
+        network_argv,
+        cwd=_renderer_tool_root(binary),
+        env=controlled_env,
+        shell=False,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        close_fds=True,
+        check=False,
+        text=True,
+        timeout=30,
+    )
+    assert network.returncode == 0, network.stderr
+    interfaces = json.loads(network.stdout)
+    assert isinstance(interfaces, list)
+    assert [item["ifname"] for item in interfaces] == ["lo"]
+    write_evidence(
+        "network-audit.json",
+        {"argv": network_argv, "interfaces": interfaces, "isolated": True},
+    )
+
+    assert runner.version(env=controlled_env) == "0.7.103"
+    doctor = runner.doctor(env=controlled_env)
+    assert doctor.returncode == 0, doctor.stderr
+    doctor_payload = json.loads(doctor.stdout)
+    doctor_checks = {
+        item["name"]: item["ok"] for item in doctor_payload["checks"]
+    }
+    assert all(
+        doctor_checks[name] is True
+        for name in ("Node.js", "FFmpeg", "FFprobe", "Chrome")
+    )
+    lint = runner.run(
+        "lint",
+        (str(source_root), "--json"),
+        cwd=source_root,
+        env=controlled_env,
+        timeout_seconds=120,
+    )
+    assert lint.returncode == 0, lint.stderr
+    assert json.loads(lint.stdout)["errorCount"] == 0
+    check = runner.run(
+        "check",
+        (str(source_root), "--json"),
+        cwd=source_root,
+        env=controlled_env,
+        timeout_seconds=180,
+    )
+    assert check.returncode == 0, check.stderr
+    assert json.loads(check.stdout)["ok"] is True
+    render = runner.run(
+        "render",
+        (str(source_root), "-o", str(output_path), "--json"),
+        cwd=source_root,
+        env=controlled_env,
+        timeout_seconds=300,
+    )
+    assert render.returncode == 0, render.stderr
+
+    ffprobe_name = shutil.which("ffprobe")
+    ffmpeg_name = shutil.which("ffmpeg")
+    assert ffprobe_name is not None and ffmpeg_name is not None
+    ffprobe = Path(ffprobe_name).resolve(strict=True)
+    ffmpeg = Path(ffmpeg_name).resolve(strict=True)
+    descriptor = os.open(
+        output_path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    )
+    try:
+        held_path = f"/proc/self/fd/{descriptor}"
+        probe = subprocess.run(
+            [
+                str(ffprobe),
+                "-v",
+                "error",
+                "-count_frames",
+                "-show_packets",
+                "-show_streams",
+                "-of",
+                "json",
+                held_path,
+            ],
+            shell=False,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            close_fds=True,
+            pass_fds=(descriptor,),
+            check=False,
+            text=True,
+            timeout=120,
+        )
+        assert probe.returncode == 0, probe.stderr
+        probe_payload = json.loads(probe.stdout)
+        streams = probe_payload["streams"]
+        video_streams = [item for item in streams if item["codec_type"] == "video"]
+        audio_streams = [item for item in streams if item["codec_type"] == "audio"]
+        assert len(video_streams) == 1 and len(audio_streams) == 1
+        video = video_streams[0]
+        audio = audio_streams[0]
+        assert video["codec_name"] == "h264"
+        assert int(video["nb_read_frames"]) == 60
+        assert audio["codec_name"] == "aac"
+        assert int(audio["sample_rate"]) == 48_000
+        assert int(audio["channels"]) == 2
+        assert audio["channel_layout"] == "stereo"
+        audio_packets = [
+            item
+            for item in probe_payload["packets"]
+            if int(item["stream_index"]) == int(audio["index"])
+        ]
+        assert int(audio_packets[0]["pts"]) == -1_024
+        assert int(audio_packets[0]["duration"]) == 1_024
+        priming = audio_packets[0]["side_data_list"][0]
+        assert priming["side_data_type"] == "Skip Samples"
+        assert int(priming["skip_samples"]) == 1_024
+        assert int(priming["discard_padding"]) == 0
+        assert int(audio_packets[-1]["pts"]) == 95_232
+        assert int(audio_packets[-1]["duration"]) == 768
+
+        decoded = subprocess.run(
+            [
+                str(ffmpeg),
+                "-v",
+                "error",
+                "-i",
+                held_path,
+                "-map",
+                "0:a:0",
+                "-acodec",
+                "pcm_s16le",
+                "-ar",
+                "48000",
+                "-ac",
+                "2",
+                "-f",
+                "s16le",
+                "-",
+            ],
+            shell=False,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            close_fds=True,
+            pass_fds=(descriptor,),
+            check=False,
+            timeout=120,
+        )
+        assert decoded.returncode == 0, decoded.stderr.decode(errors="replace")
+        assert len(decoded.stdout) % 4 == 0
+        decoded_samples = len(decoded.stdout) // 4
+        assert decoded_samples == 96_256
+        write_evidence(
+            "audio-measurement.json",
+            {
+                "codec": audio["codec_name"],
+                "channels": int(audio["channels"]),
+                "sample_rate": int(audio["sample_rate"]),
+                "source_samples": 96_000,
+                "decoded_samples": decoded_samples,
+                "encoder_priming_samples": 1_024,
+                "encoder_padding_samples": 256,
+                "decoded_pcm_sha256": hashlib.sha256(decoded.stdout).hexdigest(),
+                "held_fd": True,
+            },
+        )
+
+        pixels: dict[int, tuple[int, int, int]] = {}
+        for frame in (14, 15, 44, 45):
+            pixel = subprocess.run(
+                [
+                    str(ffmpeg),
+                    "-v",
+                    "error",
+                    "-i",
+                    held_path,
+                    "-vf",
+                    f"select=eq(n\\,{frame}),format=rgb24,crop=1:1:10:150",
+                    "-frames:v",
+                    "1",
+                    "-f",
+                    "rawvideo",
+                    "-",
+                ],
+                shell=False,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                close_fds=True,
+                pass_fds=(descriptor,),
+                check=False,
+                timeout=120,
+            )
+            assert pixel.returncode == 0, pixel.stderr.decode(errors="replace")
+            assert len(pixel.stdout) == 3
+            pixels[frame] = tuple(pixel.stdout)  # type: ignore[assignment]
+    finally:
+        os.close(descriptor)
+
+    assert pixels[14][0] > 180 and pixels[14][1] < 80 and pixels[14][2] < 80
+    assert pixels[15][0] < 80 and pixels[15][1] > 180 and pixels[15][2] > 180
+    assert pixels[44][0] < 80 and pixels[44][1] > 180 and pixels[44][2] > 180
+    assert pixels[45][0] > 180 and pixels[45][1] < 80 and pixels[45][2] < 80
+    write_evidence(
+        "caption-frames.json",
+        {
+            "caption_active_half_open": [15, 45],
+            "pixels_rgb": {str(frame): list(rgb) for frame, rgb in pixels.items()},
+            "held_fd": True,
+        },
+    )
 
 
 def test_prepare_durable_render_artifacts_builds_exact_n_plus_6_set_from_verified_bytes(
