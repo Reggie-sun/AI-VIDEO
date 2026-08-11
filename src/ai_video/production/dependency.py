@@ -874,7 +874,10 @@ def _render_execution_groups(
         DependencyNodeKind.RENDER,
     )
     render_domain = tuple(node for node in graph.nodes if node.kind in render_kinds)
-    if not render_domain:
+    if not any(
+        node.kind in {DependencyNodeKind.RENDERER_SOURCE, DependencyNodeKind.RENDER}
+        for node in render_domain
+    ):
         return {}
     by_kind = {
         kind: tuple(node for node in render_domain if node.kind is kind)
