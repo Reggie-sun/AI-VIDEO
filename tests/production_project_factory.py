@@ -11,7 +11,11 @@ from pathlib import Path
 import yaml
 
 from ai_video.config import sha256_file
-from ai_video.production.captions import CaptionImportRequest, caption_timing_fingerprint
+from ai_video.production.captions import (
+    CaptionImportRequest,
+    caption_style_fingerprint,
+    caption_timing_fingerprint,
+)
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import (
     AudioAssetMetadata,
@@ -44,6 +48,7 @@ from ai_video.production.models import (
     ProjectSnapshotPointer,
     ProjectArtifactRefs,
     RendererKind,
+    RendererIdentity,
     RendererPolicy,
     RegistrySnapshotPointer,
     Scene,
@@ -1104,6 +1109,63 @@ def make_p4_composition_fixture(
         }
     )
     return loaded, seal_artifact(spec)
+
+
+def make_p5_dependency_inputs(root: Path):
+    """Build verified deterministic P2/P3/P4 inputs for P5 graph tests."""
+
+    from ai_video.production.dependency import ProductionDependencyInputs
+
+    loaded, composition_spec = make_p4_composition_fixture(root)
+    registry_path = root / f"assets/registry.{loaded.registry.revision_id}.json"
+    registry_payload = (
+        json.dumps(
+            loaded.registry.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    registry_path.write_bytes(registry_payload)
+    registry_pointer = RegistrySnapshotPointer(
+        path=registry_path.relative_to(root),
+        revision_id=loaded.registry.revision_id,
+        content_hash=loaded.registry.content_hash,
+        file_sha256=hashlib.sha256(registry_payload).hexdigest(),
+    )
+    loaded = loaded.model_copy(
+        update={
+            "manifest": loaded.manifest.model_copy(
+                update={"active_registry": registry_pointer}
+            )
+        }
+    )
+    voice_request = make_voice_request(root)
+    style_reference = composition_spec.caption_tracks[0].style_reference
+    assert style_reference is not None
+    style_bytes = (root / style_reference.path).read_bytes()
+    return ProductionDependencyInputs(
+        project=loaded,
+        composition_spec=composition_spec,
+        renderer=RendererIdentity(kind=RendererKind.HYPERFRAMES, version="0.7.103"),
+        voice_requests=(voice_request,),
+        resolver_contract_fingerprint=hashlib.sha256(
+            b"resolve-composition-contract-v1"
+        ).hexdigest(),
+        source_materializer_contract_fingerprint=hashlib.sha256(
+            b"hyperframes-source-contract-v1"
+        ).hexdigest(),
+        render_contract_fingerprint=hashlib.sha256(
+            b"hyperframes-render-contract-v1"
+        ).hexdigest(),
+        caption_style_fingerprints=(
+            (
+                style_reference.artifact_id,
+                caption_style_fingerprint(style_reference, style_bytes),
+            ),
+        ),
+    )
 
 
 def load_initial_models(root: Path) -> tuple[ProductionProject, AssetRegistrySnapshot]:

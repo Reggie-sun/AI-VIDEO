@@ -9,17 +9,31 @@ filesystem writes, network access, and runtime side effects.
 
 from __future__ import annotations
 
+from dataclasses import replace
 import socket
 from pathlib import Path
-from types import MappingProxyType
+from types import MappingProxyType, SimpleNamespace
 from typing import Iterable
 
 import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production import dependency as dep_mod
+from ai_video.production.captions import caption_style_fingerprint
+from ai_video.production.audio import (
+    AudioKind,
+    VoiceGenerationRequest,
+    VoiceProviderParameters,
+)
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
+    AssetRecord,
+    AssetSourceKind,
+    AssetType,
+    AudioAssetMetadata,
+    AudioChannelLayout,
+    AudioLoudnessMetadata,
+    AudioSource,
     DependencyEdge,
     DependencyGraphSnapshot,
     DependencyLifecycle,
@@ -34,7 +48,19 @@ from ai_video.production.models import (
     RegistryDependencyEvidence,
     RegistrySnapshotPointer,
     RenderDependencyEvidence,
+    RendererSourceReceipt,
+    RenderReceipt,
+    RenderStateSnapshot,
     RenderStateSnapshotPointer,
+    ResolvedTimeline,
+    StateCommitAttempt,
+    StateCommitStatus,
+    ToolIdentity,
+    VoiceRequestReceipt,
+)
+from production_project_factory import (
+    make_p4_composition_fixture,
+    make_p5_dependency_inputs,
 )
 
 
@@ -1881,3 +1907,526 @@ def test_select_rebuild_nodes_rejects_wrong_desired_fingerprint():
         dep_mod.select_rebuild_nodes(forged)
 
     assert exc_info.value.code is ErrorCode.DEPENDENCY_RESOLUTION_INVALID
+
+
+# ---------------------------------------------------------------------------
+# Production P2/P3/P4 input mapping
+# ---------------------------------------------------------------------------
+
+
+def _production_node(graph, node_id):
+    return next(node for node in graph.nodes if node.node_id == node_id)
+
+
+def _production_contributions(graph, node_id):
+    return {
+        item.key: item.fingerprint
+        for item in _production_node(graph, node_id).contributions
+    }
+
+
+def _copy_voice_request(request, **updates):
+    excluded = {
+        "script_hash",
+        "provider_parameters_hash",
+        "voice_request_fingerprint",
+    }
+    data = {
+        field_name: getattr(request, field_name)
+        for field_name in type(request).model_fields
+        if field_name not in excluded
+    }
+    data.update(updates)
+    return type(request).create(**data)
+
+
+def test_production_graph_maps_p4_nodes_edges_without_timing_derivation(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+
+    graph = dep_mod.build_production_dependency_graph(inputs)
+
+    assert _production_node(graph, "creative:shot:shot-1:voice").semantic_role is DependencySemanticRole.VOICE
+    assert _production_node(graph, "asset:voice-dialogue").semantic_role is DependencySemanticRole.VOICE
+    assert _production_node(graph, "asset:caption-asset-1").semantic_role is DependencySemanticRole.CAPTION
+    assert _production_node(graph, "composition:main").kind is DependencyNodeKind.COMPOSITION_SPEC
+    assert _production_node(graph, "timeline:main").kind is DependencyNodeKind.RESOLVED_TIMELINE
+    assert "timeline.contract" in _production_contributions(graph, "timeline:main")
+    assert not hasattr(graph, "total_frames")
+    assert not hasattr(graph, "total_samples")
+    edge_index = {
+        (edge.source_node_id, edge.target_node_id, edge.reason)
+        for edge in graph.edges
+    }
+    assert (
+        "creative:shot:shot-1:voice",
+        "asset:voice-dialogue",
+        DependencyReason.GENERATION_INPUT,
+    ) in edge_index
+    assert (
+        "asset:voice-dialogue",
+        "asset:caption-asset-1",
+        DependencyReason.AUDIO_SOURCE,
+    ) in edge_index
+    assert (
+        "renderer-source:main",
+        "render:main",
+        DependencyReason.RENDER_EXECUTION,
+    ) in edge_index
+
+
+def test_voice_semantic_projection_excludes_authorization_and_budget_rotation(tmp_path):
+    request = make_p5_dependency_inputs(tmp_path).voice_requests[0]
+    rotated = _copy_voice_request(
+        request,
+        request_id="request-rotated",
+        attempt_id="attempt-rotated",
+        pricing_snapshot_id="pricing-rotated",
+        budget_reservation_receipt_id="budget-rotated",
+        egress_authorization_receipt_id="egress-rotated",
+    )
+
+    assert rotated.voice_request_fingerprint != request.voice_request_fingerprint
+    assert (
+        dep_mod.voice_semantic_projection_fingerprint(rotated)
+        == dep_mod.voice_semantic_projection_fingerprint(request)
+    )
+
+
+def test_voice_semantic_projection_changes_for_script_and_settings(tmp_path):
+    request = make_p5_dependency_inputs(tmp_path).voice_requests[0]
+    changed_script = _copy_voice_request(request, script_text="Changed exact script")
+    changed_settings = _copy_voice_request(
+        request,
+        provider_parameters=request.provider_parameters.model_copy(
+            update={"stability_milli": 700}
+        ),
+    )
+
+    baseline = dep_mod.voice_semantic_projection_fingerprint(request)
+    assert dep_mod.voice_semantic_projection_fingerprint(changed_script) != baseline
+    assert dep_mod.voice_semantic_projection_fingerprint(changed_settings) != baseline
+
+
+def test_voice_authorization_rotation_does_not_change_desired_graph(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    request = inputs.voice_requests[0]
+    rotated = _copy_voice_request(
+        request,
+        pricing_snapshot_id="pricing-rotated",
+        budget_reservation_receipt_id="budget-rotated",
+        egress_authorization_receipt_id="egress-rotated",
+    )
+
+    before = dep_mod.build_production_dependency_graph(inputs)
+    after = dep_mod.build_production_dependency_graph(
+        replace(inputs, voice_requests=(rotated,))
+    )
+
+    assert after == before
+
+
+def test_audio_mix_changes_downstream_without_changing_audio_asset_desired(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    before_graph = dep_mod.build_production_dependency_graph(inputs)
+    before = dep_mod.desired_fingerprints(before_graph)
+    tracks = tuple(
+        track.model_copy(update={"gain_millidb": track.gain_millidb - 1_000})
+        if track.track_id == "bgm"
+        else track
+        for track in inputs.composition_spec.audio_tracks
+    )
+    changed_inputs = replace(
+        inputs,
+        composition_spec=inputs.composition_spec.model_copy(
+            update={"audio_tracks": tracks}
+        ),
+    )
+    after = dep_mod.desired_fingerprints(
+        dep_mod.build_production_dependency_graph(changed_inputs)
+    )
+
+    assert after["asset:bgm-theme"] == before["asset:bgm-theme"]
+    for node_id in ("composition:main", "timeline:main", "renderer-source:main", "render:main"):
+        assert after[node_id] != before[node_id]
+
+
+def test_caption_style_and_timing_are_independent_contributions(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    graph = dep_mod.build_production_dependency_graph(inputs)
+    before = _production_contributions(graph, "asset:caption-asset-1")
+    after = _production_contributions(
+        dep_mod.build_production_dependency_graph(
+            replace(
+                inputs,
+                caption_style_fingerprints=(("caption-style-1", FOUR_HASH),),
+            )
+        ),
+        "asset:caption-asset-1",
+    )
+
+    assert after["caption.style"] != before["caption.style"]
+    assert after["caption.timing"] == before["caption.timing"]
+
+
+def test_caption_style_contribution_has_exact_p4_fingerprint_origin(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    binding = inputs.composition_spec.caption_tracks[0]
+    assert binding.style_reference is not None
+    style_bytes = (tmp_path / binding.style_reference.path).read_bytes()
+
+    graph = dep_mod.build_production_dependency_graph(inputs)
+
+    assert _production_contributions(
+        graph, "asset:caption-asset-1"
+    )["caption.style"] == caption_style_fingerprint(
+        binding.style_reference,
+        style_bytes,
+    )
+
+
+def test_caption_style_contribution_rejects_metadata_binding_identity_drift(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    caption_assets = tuple(
+        asset.model_copy(
+            update={
+                "caption_metadata": asset.caption_metadata.model_copy(
+                    update={"style_reference_id": "other-style"}
+                )
+            }
+        )
+        if asset.asset_id == "caption-asset-1"
+        else asset
+        for asset in inputs.project.registry.assets
+    )
+    changed_inputs = replace(
+        inputs,
+        project=inputs.project.model_copy(
+            update={
+                "registry": inputs.project.registry.model_copy(
+                    update={"assets": caption_assets}
+                )
+            }
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        dep_mod.build_production_dependency_graph(changed_inputs)
+
+    assert exc_info.value.code is ErrorCode.DEPENDENCY_GRAPH_INVALID
+
+
+def test_generated_image_record_uses_generic_future_extension_seam(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    assets = tuple(
+        asset.model_copy(
+            update={
+                "source_kind": AssetSourceKind.GENERATED,
+                "tool": ToolIdentity(name="future-local-fixture", version="1"),
+            }
+        )
+        if asset.asset_id == "image-shot-1"
+        else asset
+        for asset in inputs.project.registry.assets
+    )
+    changed_project = inputs.project.model_copy(
+        update={"registry": inputs.project.registry.model_copy(update={"assets": assets})}
+    )
+
+    graph = dep_mod.build_production_dependency_graph(
+        replace(inputs, project=changed_project)
+    )
+
+    assert any(
+        edge.source_node_id == "creative:shot:shot-1:visual"
+        and edge.target_node_id == "asset:image-shot-1"
+        and edge.reason is DependencyReason.GENERATION_INPUT
+        for edge in graph.edges
+    )
+    assert "image_provider" not in dep_mod.__all__
+    assert "submit_image" not in dep_mod.__all__
+
+
+def test_applied_evidence_bootstraps_precise_pre_render_frontier(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    graph = dep_mod.build_production_dependency_graph(inputs)
+
+    states = dep_mod.build_applied_dependency_evidence(inputs, applied=None)
+    resolution = dep_mod.resolve_dependency_state(graph, states)
+
+    assert resolution.ready_node_ids == ("asset:voice-dialogue",)
+    assert resolution.by_id["asset:voice-dialogue"].lifecycle is DependencyLifecycle.STALE
+    assert resolution.by_id["asset:caption-asset-1"].blocked_by == (
+        "asset:voice-dialogue",
+    )
+    assert resolution.by_id["composition:main"].blocked_by == (
+        "asset:caption-asset-1",
+        "asset:voice-dialogue",
+    )
+    assert resolution.by_id["timeline:main"].lifecycle is DependencyLifecycle.BLOCKED
+
+
+def test_production_builder_and_empty_applied_evidence_are_receipt_independent(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    graph = dep_mod.build_production_dependency_graph(inputs)
+
+    assert dep_mod.build_applied_dependency_evidence(inputs, None) == (
+        dep_mod.build_applied_dependency_evidence(
+            inputs, dep_mod.AppliedProductionEvidence()
+        )
+    )
+    assert dep_mod.build_production_dependency_graph(inputs) == graph
+
+
+def test_shot_dialogue_mutation_does_not_invalidate_visual_projection(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    before = dep_mod.desired_fingerprints(
+        dep_mod.build_production_dependency_graph(inputs)
+    )
+    shots = tuple(
+        shot.model_copy(update={"dialogue": "Changed dialogue"})
+        if shot.shot_id == "shot-1"
+        else shot
+        for shot in inputs.project.shots
+    )
+    changed_project = inputs.project.model_copy(update={"shots": shots})
+    after = dep_mod.desired_fingerprints(
+        dep_mod.build_production_dependency_graph(
+            replace(inputs, project=changed_project)
+        )
+    )
+
+    assert after["creative:shot:shot-1:voice"] != before["creative:shot:shot-1:voice"]
+    assert after["asset:voice-dialogue"] != before["asset:voice-dialogue"]
+    assert after["creative:shot:shot-1:visual"] == before["creative:shot:shot-1:visual"]
+    assert after["asset:image-shot-1"] == before["asset:image-shot-1"]
+
+
+def test_voice_activation_output_record_does_not_feed_back_into_desired(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    before = dep_mod.build_production_dependency_graph(inputs)
+    assets = tuple(
+        asset.model_copy(
+            update={
+                "source_kind": AssetSourceKind.GENERATED,
+                "tool": ToolIdentity(name="different-output-adapter", version="99"),
+                "sha256": FIVE_HASH,
+                "size_bytes": asset.size_bytes + 1,
+                "audio_metadata": asset.audio_metadata.model_copy(
+                    update={"duration_samples": asset.audio_metadata.duration_samples + 1}
+                ),
+            }
+        )
+        if asset.asset_id == "voice-dialogue"
+        else asset
+        for asset in inputs.project.registry.assets
+    )
+    changed_project = inputs.project.model_copy(
+        update={"registry": inputs.project.registry.model_copy(update={"assets": assets})}
+    )
+
+    after = dep_mod.build_production_dependency_graph(
+        replace(inputs, project=changed_project)
+    )
+
+    assert after == before
+
+
+def test_candidate_bundle_does_not_fabricate_active_applied_evidence(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    candidate = inputs.project.model_copy(
+        update={
+            "project": inputs.project.project.model_copy(
+                update={"content_hash": FIVE_HASH}
+            ),
+            "registry": inputs.project.registry.model_copy(
+                update={"revision_id": SIX_HASH, "content_hash": SIX_HASH}
+            ),
+        }
+    )
+    candidate_inputs = replace(inputs, project=candidate)
+
+    graph = dep_mod.build_production_dependency_graph(candidate_inputs)
+    states = dep_mod.build_applied_dependency_evidence(candidate_inputs, None)
+
+    assert graph.nodes
+    assert states == ()
+
+
+def _inputs_with_matching_voice_attempt(inputs):
+    request = inputs.voice_requests[0]
+    assets = tuple(
+        asset.model_copy(
+            update={
+                "source_kind": AssetSourceKind.GENERATED,
+                "audio_metadata": asset.audio_metadata.model_copy(
+                    update={
+                        "script_hash": request.script_hash,
+                        "voice_id": request.voice_id,
+                        "language": request.language,
+                        "sample_rate_hz": request.output_sample_rate_hz,
+                        "channels": request.output_channels,
+                        "source": asset.audio_metadata.source.model_copy(
+                            update={
+                                "input_artifact_ids": request.input_artifact_ids,
+                                "input_fingerprint": request.input_fingerprint,
+                            }
+                        ),
+                    }
+                ),
+            }
+        )
+        if asset.asset_id == "voice-dialogue"
+        else asset
+        for asset in inputs.project.registry.assets
+    )
+    receipt = VoiceRequestReceipt(
+        request_id=request.request_id,
+        attempt_id=request.attempt_id,
+        request_fingerprint=request.voice_request_fingerprint,
+        script_hash=request.script_hash,
+        provider_kind=request.provider_kind,
+        model_id=request.model_id,
+        voice_id=request.voice_id,
+        language=request.language,
+        pricing_snapshot_id=request.pricing_snapshot_id,
+        budget_reservation_receipt_id=request.budget_reservation_receipt_id,
+        egress_authorization_receipt_id=request.egress_authorization_receipt_id,
+        destination="https://api.fixture.invalid",
+    )
+    attempt = StateCommitAttempt(
+        attempt_id=request.attempt_id,
+        operation="voice_generation",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=inputs.project.manifest.manifest_revision,
+        base_project=inputs.project.manifest.active_project,
+        base_registry=inputs.project.manifest.active_registry,
+        candidate_registry=inputs.project.manifest.active_registry,
+        candidate_artifacts_hash=ZERO_HASH,
+        voice_request=receipt,
+        voice_phase="activate",
+        candidate_audio_asset_ids=("voice-dialogue",),
+        started_at="2026-08-11T00:00:00Z",
+        finished_at="2026-08-11T00:00:01Z",
+    )
+    project = inputs.project.model_copy(
+        update={
+            "registry": inputs.project.registry.model_copy(update={"assets": assets}),
+            "manifest": inputs.project.manifest.model_copy(
+                update={"attempts": (*inputs.project.manifest.attempts, attempt)}
+            ),
+        }
+    )
+    return replace(inputs, project=project)
+
+
+def test_voice_applied_evidence_requires_exact_durable_request_proof(tmp_path):
+    inputs = _inputs_with_matching_voice_attempt(make_p5_dependency_inputs(tmp_path))
+    exact_states = {
+        state.node_id: state
+        for state in dep_mod.build_applied_dependency_evidence(inputs, None)
+    }
+    request = inputs.voice_requests[0]
+    changed_request = _copy_voice_request(
+        request,
+        provider_parameters=request.provider_parameters.model_copy(
+            update={"stability_milli": 900}
+        ),
+    )
+    changed_states = {
+        state.node_id: state
+        for state in dep_mod.build_applied_dependency_evidence(
+            replace(inputs, voice_requests=(changed_request,)),
+            None,
+        )
+    }
+
+    assert "asset:voice-dialogue" in exact_states
+    assert "asset:voice-dialogue" not in changed_states
+
+
+def _inputs_with_render_evidence(inputs):
+    timeline_fingerprint = TWO_HASH
+    source_sha256 = THREE_HASH
+    bundle_sha256 = FOUR_HASH
+    output_sha256 = FIVE_HASH
+    source_bundle = SimpleNamespace(bundle_sha256=bundle_sha256)
+    timeline = ResolvedTimeline.model_construct(
+        composition_spec_id=inputs.composition_spec.artifact_id,
+        composition_spec_revision=inputs.composition_spec.revision,
+        composition_spec_hash=inputs.composition_spec.content_hash,
+        renderer=inputs.renderer,
+        composition_fingerprint=timeline_fingerprint,
+    )
+    state = RenderStateSnapshot.model_construct(
+        project=inputs.project.manifest.active_project,
+        registry=inputs.project.manifest.active_registry,
+        timeline_fingerprint=timeline_fingerprint,
+        source_sha256=source_sha256,
+        source_bundle=source_bundle,
+        source_bundle_sha256=bundle_sha256,
+        output=SimpleNamespace(file_sha256=output_sha256),
+    )
+    source = RendererSourceReceipt.model_construct(
+        timeline_fingerprint=timeline_fingerprint,
+        source_sha256=source_sha256,
+        source_bundle=source_bundle,
+    )
+    render = RenderReceipt.model_construct(
+        timeline_fingerprint=timeline_fingerprint,
+        source_sha256=source_sha256,
+        source_bundle_sha256=bundle_sha256,
+        output_sha256=output_sha256,
+    )
+    pointer = make_render_state_pointer()
+    project = inputs.project.model_copy(
+        update={
+            "manifest": inputs.project.manifest.model_copy(
+                update={"active_render_state": pointer}
+            ),
+            "render_state": state,
+        }
+    )
+    return (
+        replace(inputs, project=project),
+        dep_mod.AppliedProductionEvidence(
+            timeline=timeline,
+            source_receipt=source,
+            render_receipt=render,
+            render_state=state,
+        ),
+    )
+
+
+def test_non_empty_render_evidence_maps_only_to_applied_states(tmp_path):
+    inputs, applied = _inputs_with_render_evidence(make_p5_dependency_inputs(tmp_path))
+    graph = dep_mod.build_production_dependency_graph(inputs)
+
+    states = dep_mod.build_applied_dependency_evidence(inputs, applied)
+    by_id = {state.node_id: state for state in states}
+
+    for node_id in (
+        "composition:main",
+        "timeline:main",
+        "renderer-source:main",
+        "render:main",
+    ):
+        assert by_id[node_id].lifecycle is DependencyLifecycle.FRESH
+        assert isinstance(by_id[node_id].applied_evidence, RenderDependencyEvidence)
+    assert dep_mod.build_production_dependency_graph(inputs) == graph
+
+
+def test_tampered_render_evidence_is_rejected_without_changing_desired(tmp_path):
+    inputs, applied = _inputs_with_render_evidence(make_p5_dependency_inputs(tmp_path))
+    graph = dep_mod.build_production_dependency_graph(inputs)
+    tampered = replace(
+        applied,
+        source_receipt=applied.source_receipt.model_copy(
+            update={"timeline_fingerprint": SEVEN_HASH}
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        dep_mod.build_applied_dependency_evidence(inputs, tampered)
+
+    assert exc_info.value.code is ErrorCode.DEPENDENCY_RESOLUTION_INVALID
+    assert dep_mod.build_production_dependency_graph(inputs) == graph

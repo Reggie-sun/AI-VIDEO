@@ -31,6 +31,10 @@ from typing import Final
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
+    AssetRecord,
+    AssetSourceKind,
+    AssetType,
+    CompositionSpec,
     DependencyEdge,
     DependencyGraphSnapshot,
     DependencyLifecycle,
@@ -40,15 +44,31 @@ from ai_video.production.models import (
     DependencyReason,
     DependencySemanticRole,
     FingerprintContribution,
+    LoadedProductionProject,
+    ProjectDependencyEvidence,
+    RegistryDependencyEvidence,
+    RenderDependencyEvidence,
+    RendererIdentity,
+    RendererSourceReceipt,
+    RenderReceipt,
+    RenderStateSnapshot,
+    ResolvedTimeline,
+    Shot,
+    StateCommitStatus,
 )
+from ai_video.production.audio import VoiceGenerationRequest
 from ai_video.production.paths import canonical_dependency_graph_snapshot_path
 
 __all__ = [
     "DependencyResolution",
+    "AppliedProductionEvidence",
+    "ProductionDependencyInputs",
     "RenderExecutionUnit",
     "SelectiveRebuildDecision",
     "asset_node_id",
     "build_dependency_graph",
+    "build_applied_dependency_evidence",
+    "build_production_dependency_graph",
     "canonical_dependency_graph_snapshot_path",
     "composition_node_id",
     "creative_node_id",
@@ -60,6 +80,7 @@ __all__ = [
     "select_rebuild_nodes",
     "shot_projection_node_id",
     "timeline_node_id",
+    "voice_semantic_projection_fingerprint",
 ]
 
 
@@ -702,7 +723,9 @@ def resolve_dependency_state(
 
     incoming_for_topo: dict[str, list[str]] = {node_id: [] for node_id in active_ids}
     for edge in graph.edges:
-        incoming_for_topo[edge.target_node_id].append(edge.source_node_id)
+        predecessors = incoming_for_topo[edge.target_node_id]
+        if edge.source_node_id not in predecessors:
+            predecessors.append(edge.source_node_id)
     topo = _topological_order(sorted(active_ids), incoming_for_topo)
 
     new_states: dict[str, DependencyNodeState] = {}
@@ -946,7 +969,9 @@ def _validate_resolution(resolution: DependencyResolution) -> None:
 
     incoming: dict[str, list[str]] = {node_id: [] for node_id in active_ids}
     for edge in resolution.graph.edges:
-        incoming[edge.target_node_id].append(edge.source_node_id)
+        predecessors = incoming[edge.target_node_id]
+        if edge.source_node_id not in predecessors:
+            predecessors.append(edge.source_node_id)
     expected_desired = desired_fingerprints(resolution.graph)
     for node_id in active_ids:
         state = state_by_id[node_id]
@@ -994,6 +1019,748 @@ def _validate_resolution(resolution: DependencyResolution) -> None:
         raise _resolution_invalid("resolution ready frontier is inconsistent")
     if resolution.affected_node_ids != expected_affected:
         raise _resolution_invalid("resolution affected set is inconsistent")
+
+
+@dataclass(frozen=True)
+class ProductionDependencyInputs:
+    project: LoadedProductionProject
+    composition_spec: CompositionSpec
+    renderer: RendererIdentity
+    voice_requests: tuple[VoiceGenerationRequest, ...]
+    resolver_contract_fingerprint: str
+    source_materializer_contract_fingerprint: str
+    render_contract_fingerprint: str
+    caption_style_fingerprints: tuple[tuple[str, str], ...]
+
+
+@dataclass(frozen=True)
+class AppliedProductionEvidence:
+    timeline: ResolvedTimeline | None = None
+    source_receipt: RendererSourceReceipt | None = None
+    render_receipt: RenderReceipt | None = None
+    render_state: RenderStateSnapshot | None = None
+
+
+def voice_semantic_projection_fingerprint(request: VoiceGenerationRequest) -> str:
+    """Hash only immutable voice semantics, excluding authorization lifecycle."""
+
+    return canonical_sha256(
+        {
+            "schema": "ai-video-voice-semantic/1",
+            "provider_kind": request.provider_kind,
+            "model_id": request.model_id,
+            "audio_kind": request.audio_kind.value,
+            "script_hash": request.script_hash,
+            "speaker_id": request.speaker_id,
+            "voice_id": request.voice_id,
+            "language": request.language,
+            "output_container": request.output_container,
+            "output_codec": request.output_codec,
+            "output_sample_rate_hz": request.output_sample_rate_hz,
+            "output_channels": request.output_channels,
+            "provider_parameters": request.provider_parameters.model_dump(mode="json"),
+            "input_artifact_ids": request.input_artifact_ids,
+            "input_fingerprint": request.input_fingerprint,
+        }
+    )
+
+
+def _fp(schema: str, value: object) -> str:
+    return canonical_sha256({"schema": schema, "value": value})
+
+
+def _items(**values: str) -> tuple[FingerprintContribution, ...]:
+    return tuple(
+        FingerprintContribution(key=key, fingerprint=fingerprint)
+        for key, fingerprint in sorted(values.items())
+    )
+
+
+def _asset_role(asset: AssetRecord) -> DependencySemanticRole:
+    if asset.asset_type in {AssetType.IMAGE, AssetType.VIDEO}:
+        return DependencySemanticRole.VISUAL
+    if asset.asset_type is AssetType.VOICE:
+        return DependencySemanticRole.VOICE
+    if asset.asset_type in {AssetType.MUSIC, AssetType.SFX}:
+        return DependencySemanticRole.AUDIO
+    if asset.asset_type is AssetType.CAPTION:
+        return DependencySemanticRole.CAPTION
+    return DependencySemanticRole.NONE
+
+
+def _shot_projection_fingerprints(shot: Shot) -> dict[DependencySemanticRole, str]:
+    return {
+        DependencySemanticRole.VOICE: _fp(
+            "ai-video-shot-voice/1",
+            {
+                "dialogue": shot.dialogue,
+                "narration": shot.narration,
+                "duration_policy": shot.duration_policy.model_dump(mode="json"),
+            },
+        ),
+        DependencySemanticRole.VISUAL: _fp(
+            "ai-video-shot-visual/1",
+            {
+                "intent": shot.intent,
+                "character_ids": shot.character_ids,
+                "continuity_constraints": shot.continuity_constraints,
+                "visual_strategy": shot.visual_strategy.value,
+                "required_asset_roles": tuple(
+                    item.model_dump(mode="json") for item in shot.required_asset_roles
+                ),
+                "motion_directives": tuple(
+                    item.model_dump(mode="json") for item in shot.motion_directives
+                ),
+                "generated_video_rationale": shot.generated_video_rationale,
+                "hybrid_layers": tuple(
+                    item.model_dump(mode="json") for item in shot.hybrid_layers
+                ),
+            },
+        ),
+        DependencySemanticRole.COMPOSITION: _fp(
+            "ai-video-shot-composition/1",
+            {
+                "scene_id": shot.scene_id,
+                "storyboard_beat_id": shot.storyboard_beat_id,
+                "duration_policy": shot.duration_policy.model_dump(mode="json"),
+                "composition_directives": tuple(
+                    item.model_dump(mode="json")
+                    for item in shot.composition_directives
+                ),
+            },
+        ),
+    }
+
+
+def build_production_dependency_graph(
+    inputs: ProductionDependencyInputs,
+) -> DependencyGraphSnapshot:
+    """Map verified P2/P3/P4 inputs into a pure desired dependency DAG."""
+
+    project = inputs.project
+    spec = inputs.composition_spec
+    nodes: list[DependencyNode] = []
+    edges: list[DependencyEdge] = []
+    node_by_id: dict[str, DependencyNode] = {}
+
+    def add_node(node: DependencyNode) -> None:
+        if node.node_id in node_by_id:
+            raise _graph_invalid("production dependency node identity is ambiguous")
+        node_by_id[node.node_id] = node
+        nodes.append(node)
+
+    def add_edge(source_id: str, target_id: str, reason: DependencyReason, key: str, value: object) -> None:
+        edges.append(
+            DependencyEdge(
+                source_node_id=source_id,
+                target_node_id=target_id,
+                reason=reason,
+                contribution=FingerprintContribution(
+                    key=key,
+                    fingerprint=_fp(f"ai-video-edge-{key}/1", value),
+                ),
+            )
+        )
+
+    creative = (
+        ("brief", project.brief),
+        ("story", project.story),
+        *(("character", item) for item in project.characters),
+        *(("scene", item) for item in project.scenes),
+        ("storyboard", project.storyboard),
+    )
+    creative_ids: dict[tuple[str, str], str] = {}
+    for kind, artifact in creative:
+        node_id = creative_node_id(kind, artifact.artifact_id)
+        creative_ids[(kind, artifact.artifact_id)] = node_id
+        add_node(
+            DependencyNode(
+                node_id=node_id,
+                kind=DependencyNodeKind.CREATIVE_ARTIFACT,
+                semantic_role=DependencySemanticRole.NONE,
+                artifact_id=artifact.artifact_id,
+                artifact_revision=artifact.revision,
+                contributions=_items(**{f"{kind}.semantic": artifact.content_hash}),
+            )
+        )
+
+    add_edge(
+        creative_ids[("brief", project.brief.artifact_id)],
+        creative_ids[("story", project.story.artifact_id)],
+        DependencyReason.AUTHORING_INPUT,
+        "authoring.brief_story",
+        project.project.artifacts.brief.model_dump(mode="json"),
+    )
+    add_edge(
+        creative_ids[("story", project.story.artifact_id)],
+        creative_ids[("storyboard", project.storyboard.artifact_id)],
+        DependencyReason.AUTHORING_INPUT,
+        "authoring.story_storyboard",
+        project.project.artifacts.story.model_dump(mode="json"),
+    )
+
+    character_by_domain_id = {item.character_id: item for item in project.characters}
+    scene_by_domain_id = {item.scene_id: item for item in project.scenes}
+    storyboard_id = creative_ids[("storyboard", project.storyboard.artifact_id)]
+    shot_projection_ids: dict[tuple[str, DependencySemanticRole], str] = {}
+    for scene in project.scenes:
+        scene_node_id = creative_ids[("scene", scene.artifact_id)]
+        for participant_id in scene.participant_ids:
+            character = character_by_domain_id[participant_id]
+            add_edge(
+                creative_ids[("character", character.artifact_id)],
+                scene_node_id,
+                DependencyReason.AUTHORING_INPUT,
+                "authoring.character_scene",
+                {"character_id": participant_id, "scene_id": scene.scene_id},
+            )
+
+    for shot in project.shots:
+        projections = _shot_projection_fingerprints(shot)
+        for role, fingerprint in projections.items():
+            node_id = shot_projection_node_id(shot.shot_id, role.value)
+            shot_projection_ids[(shot.shot_id, role)] = node_id
+            add_node(
+                DependencyNode(
+                    node_id=node_id,
+                    kind=DependencyNodeKind.CREATIVE_ARTIFACT,
+                    semantic_role=role,
+                    artifact_id=shot.artifact_id,
+                    artifact_revision=shot.revision,
+                    contributions=_items(**{f"shot.{role.value}": fingerprint}),
+                )
+            )
+        scene = scene_by_domain_id[shot.scene_id]
+        add_edge(
+            creative_ids[("scene", scene.artifact_id)],
+            shot_projection_ids[(shot.shot_id, DependencySemanticRole.VISUAL)],
+            DependencyReason.AUTHORING_INPUT,
+            "authoring.scene_visual",
+            {"scene_id": shot.scene_id, "shot_id": shot.shot_id},
+        )
+        add_edge(
+            storyboard_id,
+            shot_projection_ids[(shot.shot_id, DependencySemanticRole.COMPOSITION)],
+            DependencyReason.AUTHORING_INPUT,
+            "authoring.storyboard_composition",
+            {"beat_id": shot.storyboard_beat_id, "shot_id": shot.shot_id},
+        )
+
+    requests_by_shot: dict[str, VoiceGenerationRequest] = {}
+    for request in inputs.voice_requests:
+        matching = [
+            shot.shot_id
+            for shot in project.shots
+            if shot.shot_id in request.input_artifact_ids
+            or shot.artifact_id in request.input_artifact_ids
+        ]
+        if len(matching) != 1 or matching[0] in requests_by_shot:
+            raise _graph_invalid("voice request must bind exactly one Shot projection")
+        requests_by_shot[matching[0]] = request
+
+    tracks_by_asset = {track.asset_id: track for track in spec.audio_tracks}
+    assets_by_id = {asset.asset_id: asset for asset in project.registry.assets}
+    caption_bindings_by_asset = {
+        binding.caption_asset_id: binding for binding in spec.caption_tracks
+    }
+    style_fingerprints = dict(inputs.caption_style_fingerprints)
+    if len(style_fingerprints) != len(inputs.caption_style_fingerprints):
+        raise _graph_invalid("caption style fingerprints must have unique reference IDs")
+    for asset in project.registry.assets:
+        role = _asset_role(asset)
+        track = tracks_by_asset.get(asset.asset_id)
+        request = (
+            requests_by_shot.get(track.shot_id)
+            if track is not None and track.shot_id is not None
+            else None
+        )
+        contribution_values: dict[str, str] = {
+            "asset.inputs": _fp(
+                "ai-video-asset-inputs/1",
+                {
+                    "input_artifact_ids": (
+                        request.input_artifact_ids
+                        if request is not None
+                        else asset.input_artifact_ids
+                    ),
+                    "input_fingerprint": (
+                        request.input_fingerprint
+                        if request is not None
+                        else asset.input_fingerprint
+                    ),
+                },
+            )
+        }
+        if role is DependencySemanticRole.VOICE and request is not None:
+            contribution_values["voice.semantic"] = voice_semantic_projection_fingerprint(request)
+        elif role is DependencySemanticRole.CAPTION and asset.caption_metadata is not None:
+            metadata = asset.caption_metadata
+            binding = caption_bindings_by_asset.get(asset.asset_id)
+            contribution_values["caption.timing"] = metadata.timing_fingerprint
+            if metadata.style_reference_id is None:
+                if binding is not None and binding.style_reference is not None:
+                    raise _graph_invalid(
+                        "caption metadata and CompositionSpec style identity must match"
+                    )
+                contribution_values["caption.style"] = _fp(
+                    "ai-video-caption-style-none/1", None
+                )
+            else:
+                style_reference = binding.style_reference if binding is not None else None
+                if (
+                    style_reference is None
+                    or style_reference.artifact_id != metadata.style_reference_id
+                    or style_reference.content_hash != metadata.style_content_hash
+                ):
+                    raise _graph_invalid(
+                        "caption metadata and CompositionSpec style identity must match"
+                    )
+                style_fingerprint = style_fingerprints.get(
+                    metadata.style_reference_id
+                )
+                if style_fingerprint is None:
+                    raise _graph_invalid(
+                        "caption style requires a verified P4 style fingerprint"
+                    )
+                contribution_values["caption.style"] = style_fingerprint
+        else:
+            contribution_values["asset.bytes"] = asset.sha256
+        if asset.audio_metadata is not None:
+            metadata = asset.audio_metadata
+            audio_contract = (
+                {
+                    "audio_kind": request.audio_kind.value,
+                    "script_hash": request.script_hash,
+                    "voice_id": request.voice_id,
+                    "language": request.language,
+                    "sample_rate_hz": request.output_sample_rate_hz,
+                    "channels": request.output_channels,
+                    "input_artifact_ids": request.input_artifact_ids,
+                    "input_fingerprint": request.input_fingerprint,
+                }
+                if request is not None
+                else {
+                    "audio_kind": metadata.audio_kind.value,
+                    "script_hash": metadata.script_hash,
+                    "voice_id": metadata.voice_id,
+                    "language": metadata.language,
+                    "duration_samples": metadata.duration_samples,
+                    "sample_rate_hz": metadata.sample_rate_hz,
+                    "channels": metadata.channels,
+                    "input_artifact_ids": metadata.source.input_artifact_ids,
+                    "input_fingerprint": metadata.source.input_fingerprint,
+                }
+            )
+            contribution_values["audio.contract"] = _fp(
+                "ai-video-audio-contract/1", audio_contract
+            )
+        add_node(
+            DependencyNode(
+                node_id=asset_node_id(asset.asset_id),
+                kind=DependencyNodeKind.ASSET,
+                semantic_role=role,
+                artifact_id=asset.asset_id,
+                artifact_revision=None,
+                contributions=tuple(
+                    FingerprintContribution(key=key, fingerprint=value)
+                    for key, value in sorted(contribution_values.items())
+                ),
+            )
+        )
+
+    for shot in project.shots:
+        for requirement in shot.required_asset_roles:
+            for asset_id in requirement.asset_ids:
+                asset = assets_by_id[asset_id]
+                if _asset_role(asset) is not DependencySemanticRole.VISUAL:
+                    continue
+                reason = (
+                    DependencyReason.GENERATION_INPUT
+                    if asset.source_kind is AssetSourceKind.GENERATED
+                    else DependencyReason.ASSET_BINDING
+                )
+                add_edge(
+                    shot_projection_ids[(shot.shot_id, DependencySemanticRole.VISUAL)],
+                    asset_node_id(asset_id),
+                    reason,
+                    "asset.visual_input",
+                    {"shot_id": shot.shot_id, "asset_id": asset_id},
+                )
+    for track in spec.audio_tracks:
+        asset = assets_by_id[track.asset_id]
+        if track.shot_id is not None and _asset_role(asset) is DependencySemanticRole.VOICE:
+            add_edge(
+                shot_projection_ids[(track.shot_id, DependencySemanticRole.VOICE)],
+                asset_node_id(asset.asset_id),
+                DependencyReason.GENERATION_INPUT,
+                "voice.request",
+                {
+                    "shot_id": track.shot_id,
+                    "semantic": (
+                        voice_semantic_projection_fingerprint(requests_by_shot[track.shot_id])
+                        if track.shot_id in requests_by_shot
+                        else asset.input_fingerprint
+                    ),
+                },
+            )
+
+    for asset in project.registry.assets:
+        if asset.caption_metadata is None:
+            continue
+        source_id = asset.caption_metadata.source_audio_asset_id
+        if source_id in assets_by_id:
+            add_edge(
+                asset_node_id(source_id),
+                asset_node_id(asset.asset_id),
+                DependencyReason.AUDIO_SOURCE,
+                "caption.audio_source",
+                {
+                    "source_audio_asset_id": source_id,
+                    "source_audio_sha256": asset.caption_metadata.source_audio_sha256,
+                },
+            )
+
+    composition_id = composition_node_id(spec.composition_id)
+    add_node(
+        DependencyNode(
+            node_id=composition_id,
+            kind=DependencyNodeKind.COMPOSITION_SPEC,
+            semantic_role=DependencySemanticRole.COMPOSITION,
+            artifact_id=spec.artifact_id,
+            artifact_revision=spec.revision,
+            contributions=_items(
+                **{
+                    "composition.caption": _fp(
+                        "ai-video-composition-caption/1",
+                        tuple(item.model_dump(mode="json") for item in spec.caption_tracks),
+                    ),
+                    "composition.content": spec.content_hash,
+                    "composition.delivery": _fp(
+                        "ai-video-composition-delivery/1",
+                        spec.delivery_profile.model_dump(mode="json"),
+                    ),
+                    "composition.mix": _fp(
+                        "ai-video-composition-mix/1",
+                        tuple(item.model_dump(mode="json") for item in spec.audio_tracks),
+                    ),
+                    "composition.renderer": _fp(
+                        "ai-video-composition-renderer/1",
+                        spec.requested_renderer.value,
+                    ),
+                }
+            ),
+        )
+    )
+    for shot_id in spec.shot_ids:
+        add_edge(
+            shot_projection_ids[(shot_id, DependencySemanticRole.COMPOSITION)],
+            composition_id,
+            DependencyReason.COMPOSITION_RESOLUTION,
+            "composition.shot",
+            shot_id,
+        )
+    used_asset_ids = {
+        *(layer.asset_id for layer in spec.layers),
+        *(track.asset_id for track in spec.audio_tracks),
+        *(binding.caption_asset_id for binding in spec.caption_tracks),
+    }
+    for asset_id in sorted(used_asset_ids):
+        asset = assets_by_id[asset_id]
+        role = _asset_role(asset)
+        reasons = {
+            DependencySemanticRole.VISUAL: (DependencyReason.ASSET_BINDING,),
+            DependencySemanticRole.VOICE: (DependencyReason.AUDIO_SOURCE,),
+            DependencySemanticRole.AUDIO: (DependencyReason.AUDIO_SOURCE,),
+            DependencySemanticRole.CAPTION: (
+                DependencyReason.ALIGNMENT_TIMING,
+                DependencyReason.CAPTION_STYLE,
+            ),
+        }.get(role, ())
+        for reason in reasons:
+            add_edge(
+                asset_node_id(asset_id),
+                composition_id,
+                reason,
+                f"composition.{reason.value}",
+                {"asset_id": asset_id, "reason": reason.value},
+            )
+
+    timeline_id = timeline_node_id(spec.composition_id)
+    source_id = renderer_source_node_id(spec.composition_id)
+    render_id = render_node_id(spec.composition_id)
+    add_node(
+        DependencyNode(
+            node_id=timeline_id,
+            kind=DependencyNodeKind.RESOLVED_TIMELINE,
+            semantic_role=DependencySemanticRole.TIMELINE,
+            artifact_id=spec.composition_id,
+            artifact_revision=None,
+            contributions=_items(
+                **{
+                    "renderer.identity": _fp(
+                        "ai-video-renderer-identity/1",
+                        inputs.renderer.model_dump(mode="json"),
+                    ),
+                    "timeline.contract": inputs.resolver_contract_fingerprint,
+                }
+            ),
+        )
+    )
+    add_node(
+        DependencyNode(
+            node_id=source_id,
+            kind=DependencyNodeKind.RENDERER_SOURCE,
+            semantic_role=DependencySemanticRole.RENDERER_SOURCE,
+            artifact_id=spec.composition_id,
+            artifact_revision=None,
+            contributions=_items(
+                **{
+                    "renderer.identity": _fp(
+                        "ai-video-renderer-identity/1",
+                        inputs.renderer.model_dump(mode="json"),
+                    ),
+                    "renderer.source.contract": inputs.source_materializer_contract_fingerprint,
+                }
+            ),
+        )
+    )
+    add_node(
+        DependencyNode(
+            node_id=render_id,
+            kind=DependencyNodeKind.RENDER,
+            semantic_role=DependencySemanticRole.RENDER,
+            artifact_id=spec.composition_id,
+            artifact_revision=None,
+            contributions=_items(
+                **{
+                    "render.contract": inputs.render_contract_fingerprint,
+                    "renderer.identity": _fp(
+                        "ai-video-renderer-identity/1",
+                        inputs.renderer.model_dump(mode="json"),
+                    ),
+                }
+            ),
+        )
+    )
+    add_edge(
+        composition_id,
+        timeline_id,
+        DependencyReason.COMPOSITION_RESOLUTION,
+        "timeline.composition",
+        spec.content_hash,
+    )
+    add_edge(
+        timeline_id,
+        source_id,
+        DependencyReason.TIMELINE_MATERIALIZATION,
+        "renderer.timeline",
+        inputs.resolver_contract_fingerprint,
+    )
+    for asset_id in sorted(used_asset_ids):
+        asset = assets_by_id[asset_id]
+        role = _asset_role(asset)
+        reasons = {
+            DependencySemanticRole.VISUAL: (DependencyReason.ASSET_BINDING,),
+            DependencySemanticRole.VOICE: (DependencyReason.ASSET_BINDING,),
+            DependencySemanticRole.AUDIO: (DependencyReason.ASSET_BINDING,),
+            DependencySemanticRole.CAPTION: (
+                DependencyReason.ALIGNMENT_TIMING,
+                DependencyReason.CAPTION_STYLE,
+            ),
+        }.get(role, ())
+        for reason in reasons:
+            add_edge(
+                asset_node_id(asset_id),
+                source_id,
+                reason,
+                f"renderer.{reason.value}",
+                {"asset_id": asset_id, "reason": reason.value},
+            )
+    add_edge(
+        source_id,
+        render_id,
+        DependencyReason.RENDER_EXECUTION,
+        "render.source",
+        inputs.source_materializer_contract_fingerprint,
+    )
+    add_edge(
+        timeline_id,
+        render_id,
+        DependencyReason.RENDER_EXECUTION,
+        "render.timeline",
+        inputs.resolver_contract_fingerprint,
+    )
+    return build_dependency_graph(nodes, edges)
+
+
+def build_applied_dependency_evidence(
+    inputs: ProductionDependencyInputs,
+    applied: AppliedProductionEvidence | None,
+) -> tuple[DependencyNodeState, ...]:
+    """Build verified applied states separately from desired graph inputs."""
+
+    graph = build_production_dependency_graph(inputs)
+    desired = desired_fingerprints(graph)
+    project = inputs.project
+    active_project_matches = (
+        project.manifest.active_project.revision == project.project.revision
+        and project.manifest.active_project.content_hash == project.project.content_hash
+    )
+    active_registry_matches = (
+        project.manifest.active_registry.revision_id == project.registry.revision_id
+        and project.manifest.active_registry.content_hash == project.registry.content_hash
+    )
+    request_by_shot: dict[str, VoiceGenerationRequest] = {}
+    for request in inputs.voice_requests:
+        for shot in project.shots:
+            if (
+                shot.shot_id in request.input_artifact_ids
+                or shot.artifact_id in request.input_artifact_ids
+            ):
+                request_by_shot[shot.shot_id] = request
+    track_by_asset = {
+        track.asset_id: track for track in inputs.composition_spec.audio_tracks
+    }
+    asset_by_id = {asset.asset_id: asset for asset in project.registry.assets}
+    states: list[DependencyNodeState] = []
+    for node in graph.nodes:
+        evidence = None
+        if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT and active_project_matches:
+            evidence = ProjectDependencyEvidence(
+                owner="project_snapshot",
+                pointer=project.manifest.active_project,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            )
+        elif node.kind is DependencyNodeKind.ASSET and active_registry_matches:
+            asset = asset_by_id[node.artifact_id]
+            track = track_by_asset.get(asset.asset_id)
+            request = (
+                request_by_shot.get(track.shot_id)
+                if track is not None and track.shot_id is not None
+                else None
+            )
+            metadata = asset.audio_metadata
+            if request is not None:
+                matching_attempts = tuple(
+                    attempt
+                    for attempt in project.manifest.attempts
+                    if attempt.status is StateCommitStatus.SUCCEEDED
+                    and attempt.voice_request is not None
+                    and asset.asset_id in attempt.candidate_audio_asset_ids
+                    and attempt.voice_request.request_fingerprint
+                    == request.voice_request_fingerprint
+                )
+                receipt = (
+                    matching_attempts[0].voice_request
+                    if len(matching_attempts) == 1
+                    else None
+                )
+                if (
+                    receipt is None
+                    or metadata is None
+                    or receipt.script_hash != request.script_hash
+                    or receipt.provider_kind != request.provider_kind
+                    or receipt.model_id != request.model_id
+                    or receipt.voice_id != request.voice_id
+                    or receipt.language != request.language
+                    or metadata.script_hash != request.script_hash
+                    or metadata.voice_id != request.voice_id
+                    or metadata.language != request.language
+                    or metadata.sample_rate_hz != request.output_sample_rate_hz
+                    or metadata.channels != request.output_channels
+                    or metadata.source.input_artifact_ids
+                    != request.input_artifact_ids
+                    or metadata.source.input_fingerprint != request.input_fingerprint
+                    or (
+                        asset.egress.remote
+                        and asset.egress.request_fingerprint
+                        != request.voice_request_fingerprint
+                    )
+                ):
+                    continue
+            evidence = RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=project.manifest.active_registry,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            )
+        if evidence is not None:
+            states.append(
+                DependencyNodeState(
+                    node_id=node.node_id,
+                    graph_revision_id=graph.revision_id,
+                    desired_fingerprint=desired[node.node_id],
+                    applied_fingerprint=desired[node.node_id],
+                    lifecycle=DependencyLifecycle.FRESH,
+                    applied_evidence=evidence,
+                )
+            )
+
+    if applied is None or applied.render_state is None:
+        return tuple(sorted(states, key=lambda state: state.node_id))
+    state = applied.render_state
+    pointer = project.manifest.active_render_state
+    if pointer is None or project.render_state != state:
+        raise _resolution_invalid("applied render state must be the verified active state")
+    if state.project != project.manifest.active_project or state.registry != project.manifest.active_registry:
+        raise _resolution_invalid("applied render state project or registry identity is stale")
+    render_evidence_ids: list[str] = []
+    if applied.timeline is not None:
+        timeline = applied.timeline
+        if (
+            timeline.composition_spec_id != inputs.composition_spec.artifact_id
+            or timeline.composition_spec_revision != inputs.composition_spec.revision
+            or timeline.composition_spec_hash != inputs.composition_spec.content_hash
+            or timeline.renderer != inputs.renderer
+            or state.timeline_fingerprint != timeline.composition_fingerprint
+        ):
+            raise _resolution_invalid("applied timeline does not match desired composition")
+        render_evidence_ids.extend(
+            [
+                composition_node_id(inputs.composition_spec.composition_id),
+                timeline_node_id(inputs.composition_spec.composition_id),
+            ]
+        )
+    if applied.source_receipt is not None:
+        source = applied.source_receipt
+        if (
+            applied.timeline is None
+            or source.timeline_fingerprint != state.timeline_fingerprint
+            or source.source_sha256 != state.source_sha256
+            or source.source_bundle != state.source_bundle
+        ):
+            raise _resolution_invalid("applied renderer source receipt does not match state")
+        render_evidence_ids.append(renderer_source_node_id(inputs.composition_spec.composition_id))
+    if applied.render_receipt is not None:
+        receipt = applied.render_receipt
+        if (
+            applied.source_receipt is None
+            or receipt.timeline_fingerprint != state.timeline_fingerprint
+            or receipt.source_sha256 != state.source_sha256
+            or receipt.source_bundle_sha256 != state.source_bundle_sha256
+            or receipt.output_sha256 != state.output.file_sha256
+        ):
+            raise _resolution_invalid("applied render receipt does not match state")
+        render_evidence_ids.append(render_node_id(inputs.composition_spec.composition_id))
+    for node_id in render_evidence_ids:
+        node = next(node for node in graph.nodes if node.node_id == node_id)
+        states.append(
+            DependencyNodeState(
+                node_id=node_id,
+                graph_revision_id=graph.revision_id,
+                desired_fingerprint=desired[node_id],
+                applied_fingerprint=desired[node_id],
+                lifecycle=DependencyLifecycle.FRESH,
+                applied_evidence=RenderDependencyEvidence(
+                    owner="render_state",
+                    pointer=pointer,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=desired[node_id],
+                ),
+            )
+        )
+    return tuple(sorted(states, key=lambda state: state.node_id))
 
 
 # Silence the unused-import linter for the re-export helper; the symbol is
