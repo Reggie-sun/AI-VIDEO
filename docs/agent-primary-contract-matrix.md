@@ -93,7 +93,7 @@ Agent 不得悄悄侵蚀本地优先承诺。
 - P2A 已 independently accepted 并合并到 local `main`：唯一 writer/recovery owner 写 immutable v2 snapshots，并通过 nested active pointers and one Manifest replace activate exact pair。它不改变 P2 reader 的只读语义或 Legacy Manifest v1/layout，且尚未 push 或 release。
 - P3 已于 `3296b713` fast-forward 合入 local `main` 并保留独立 review、committed-fixture render 与 fail-closed trace proof；local merge 尚未 push/release。当前只允许一个 pinned local HyperFrames path，Remotion 与其它 renderer 必须拒绝。
 - P4 已于 `f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward 合入 local `main`；merged-main full verification 为 `1094 passed, 4 skipped`，尚未 push/release。ElevenLabs 只有 thin explicit-opt-in adapter，未进行 live call、secret 读取或 quota 使用；runtime authorization 不等于 live-call authorization。
-- P5 已在当前 feature branch 实现 immutable graph、Manifest 2.3 lifecycle、precise resolver 与 explicit recovery，并以 deterministic mutation matrix 完成 focused acceptance；尚未 merge/push/release。P5 不授权 P6-P9，也不改变 Legacy CLI/Manifest/layout。
+- P5 已在当前 feature branch 实现 immutable graph、Manifest 2.3 lifecycle、precise resolver 与 explicit recovery，并以 deterministic mutation matrix 完成 acceptance；canonical `1256 passed, 3 skipped`、Legacy `58 passed`、full `1386 passed, 4 skipped`；尚未 merge/push/release。P5 不授权 P6-P9，也不改变 Legacy CLI/Manifest/layout。
 - P6 strategy-aware QA/repair 完成前，不得让当前 `static_visuals` heuristic 自动否决合法的 `static_image` / `image_motion` Shot。
 - P8 之前不得接入真实 generated-video cloud Provider；任何 paid Provider submit 仍受 Budget Guard、Cloud Egress 和 crash-safe persistence gate。
 - 新 CLI、Manifest schema、artifact layout、远程行为、Audio 或 dependency 仍命中下方 Change Escalation Matrix。
