@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -22,6 +23,7 @@ from ai_video.production.models import (
     RendererSelectionReceipt,
     RegistrySnapshotPointer,
     RegistryDependencyEvidence,
+    RecoveryDisposition,
     RenderStateSnapshotPointer,
     Shot,
     StateCommitStatus,
@@ -354,7 +356,6 @@ def test_audio_import_upgrades_manifest_and_registry_without_downgrade(
     )
 
     committed = ProductionStateCommitter(tmp_path).commit(request)
-
     assert committed.schema_version == "2.2"
     assert committed.active_project == manifest.active_project
     active_registry = AssetRegistrySnapshot.model_validate_json(
@@ -855,6 +856,174 @@ def test_generate_voice_asset_is_only_transport_path_and_calls_provider_once(
     assert provider.calls == 1
     assert prepared == {"called": True}
     assert manifest.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+def test_manifest_23_public_voice_requires_transition_preparer_before_provider(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    _, authorization = project_factory.make_voice_preview_and_authorization(request)
+
+    class _Provider:
+        def preview(self, _request):
+            raise AssertionError("2.3 preflight must reject before provider preview")
+
+        def generate(self, *_args):
+            raise AssertionError("2.3 preflight must reject before provider call")
+
+    before = (tmp_path / "state/manifest.json").read_bytes()
+    with pytest.raises(AiVideoError, match="transition preparer"):
+        ProductionStateCommitter(tmp_path).generate_voice_asset(
+            request, _Provider(), authorization
+        )
+    assert (tmp_path / "state/manifest.json").read_bytes() == before
+
+
+def test_manifest_23_public_voice_prepares_transition_after_local_candidate(
+    tmp_path: Path,
+) -> None:
+    from ai_video.production.audio import AudioProbeResult, PreparedAudioImport
+    from ai_video.production.state_commit import PreparedVoiceCandidate
+
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+
+    class _Provider:
+        calls = 0
+
+        def preview(self, candidate):
+            assert candidate == request
+            return preview
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_voice_submit_permit(
+                attempt_id=candidate.attempt_id,
+                request_fingerprint=candidate.voice_request_fingerprint,
+                authorization_fingerprint=(
+                    candidate_authorization.authorization_fingerprint
+                ),
+                destination=candidate_authorization.destination,
+                budget_reservation_receipt_id=(
+                    candidate_authorization.budget_reservation_receipt_id
+                ),
+                egress_authorization_receipt_id=(
+                    candidate_authorization.egress_authorization_receipt_id
+                ),
+            )
+            return project_factory.make_voice_provider_result(
+                request, preview, authorization
+            )
+
+    def prepare_candidate(*_args):
+        activation, audio_ids = project_factory.make_voice_activation_request(
+            tmp_path,
+            request,
+            authorization,
+            expected_manifest_revision=4,
+        )
+        registry_artifact = next(
+            item
+            for item in activation.artifacts
+            if item.relative_path == activation.next_registry.path
+        )
+        registry = AssetRegistrySnapshot.model_validate_json(registry_artifact.payload)
+        record = next(item for item in registry.assets if item.asset_id == audio_ids[0])
+        artifact = next(
+            item
+            for item in activation.artifacts
+            if item.relative_path == record.artifact_path
+        )
+        metadata = record.audio_metadata
+        assert metadata is not None
+        probe = AudioProbeResult(
+            mime_type="audio/wav",
+            container_name="wav",
+            file_sha256=record.sha256,
+            size_bytes=record.size_bytes,
+            file_device=0,
+            file_inode=0,
+            codec_name="pcm_s16le",
+            duration_samples=metadata.duration_samples,
+            sample_rate_hz=metadata.sample_rate_hz,
+            channels=metadata.channels,
+            channel_layout=metadata.channel_layout,
+            decoded_pcm_sha256=record.sha256,
+            loudness=metadata.loudness,
+            loudness_receipt_id=record.sha256,
+            ffmpeg=record.tool.model_copy(update={"name": "ffmpeg"}),
+            ffprobe=record.tool.model_copy(update={"name": "ffprobe"}),
+            content_fingerprint=record.sha256,
+        )
+        return PreparedVoiceCandidate(
+            audio=PreparedAudioImport(
+                payload=artifact.payload,
+                probe=probe,
+                asset_record=record,
+            )
+        )
+
+    provider = _Provider()
+    committer = ProductionStateCommitter(
+        tmp_path, voice_candidate_preparer=prepare_candidate
+    )
+    committed = committer.generate_voice_asset(
+        request,
+        provider,
+        authorization,
+        dependency_transition_preparer=lambda candidate: (
+            project_factory.attach_p5_dependency_transition(tmp_path, candidate)[0]
+        ),
+    )
+
+    assert provider.calls == 1
+    assert committed.schema_version == "2.3"
+    assert committed.active_dependency_graph is not None
+    assert committed.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+def test_public_voice_rechecks_manifest_23_preparer_inside_begin_lock(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+
+    class _Provider:
+        preview_calls = 0
+        generate_calls = 0
+
+        def preview(self, candidate):
+            self.preview_calls += 1
+            assert candidate == request
+            return preview
+
+        def generate(self, *_args):
+            self.generate_calls += 1
+            raise AssertionError("provider transport must remain gated")
+
+    provider = _Provider()
+    committer = ProductionStateCommitter(tmp_path)
+    begin_voice_generation = committer.begin_voice_generation
+
+    def migrate_then_begin(*args, **kwargs):
+        project_factory.make_manifest_23_project(tmp_path)
+        return begin_voice_generation(*args, **kwargs)
+
+    committer.begin_voice_generation = migrate_then_begin  # type: ignore[method-assign]
+
+    with pytest.raises(AiVideoError, match="dependency transition preparer"):
+        committer.generate_voice_asset(request, provider, authorization)
+
+    manifest = read_manifest(tmp_path)
+    assert provider.preview_calls == 1
+    assert provider.generate_calls == 0
+    assert manifest.schema_version == "2.3"
+    assert not manifest.attempts
 
 
 def test_generate_voice_asset_rejects_untyped_provider_result_before_preparer(
@@ -3092,6 +3261,202 @@ def test_record_dependency_node_failed_preserves_precise_frontier(
     failed_by_id = {state.node_id: state for state in failed.dependency_states}
     assert failed_by_id[stale.node_id].lifecycle is DependencyLifecycle.FAILED
     assert failed_by_id[stale.node_id].error_code == "fixture_failed"
+
+
+def test_manifest_23_project_registry_mutation_requires_transition_before_write(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    before = (tmp_path / "state/manifest.json").read_bytes()
+    request = project_factory.make_revision_two_request(
+        tmp_path, attempt_id="p5-missing-transition"
+    )
+
+    with pytest.raises(AiVideoError, match="requires a dependency graph transition"):
+        ProductionStateCommitter(tmp_path).commit(request)
+
+    assert (tmp_path / "state/manifest.json").read_bytes() == before
+    assert not any(
+        item.attempt_id == "p5-missing-transition"
+        for item in read_manifest(tmp_path).attempts
+    )
+
+
+def test_manifest_23_project_registry_mutation_atomically_selects_exact_graph(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    before = read_manifest(tmp_path)
+    request = project_factory.make_revision_two_request(
+        tmp_path, attempt_id="p5-project-transition"
+    )
+    request, _ = project_factory.attach_p5_dependency_transition(tmp_path, request)
+
+    committed = ProductionStateCommitter(tmp_path).commit(request)
+
+    transition = request.dependency_graph_transition
+    assert transition is not None
+    manifest_mtime = (tmp_path / "state/manifest.json").stat().st_mtime_ns
+    graph_mtime = (
+        tmp_path / transition.candidate_dependency_graph.path
+    ).stat().st_mtime_ns
+    replayed = ProductionStateCommitter(tmp_path).commit(request)
+    assert replayed == committed
+    assert committed.active_project == request.next_project
+    assert committed.active_registry == request.next_registry
+    assert committed.active_dependency_graph == transition.candidate_dependency_graph
+    assert committed.dependency_states == transition.candidate_dependency_states
+    assert committed.active_render_state == before.active_render_state
+    fresh_assets = {
+        state.node_id
+        for state in committed.dependency_states
+        if state.node_id.startswith("asset:")
+        and state.lifecycle is DependencyLifecycle.FRESH
+    }
+    assert fresh_assets
+    assert (tmp_path / "state/manifest.json").stat().st_mtime_ns == manifest_mtime
+    assert (
+        tmp_path / transition.candidate_dependency_graph.path
+    ).stat().st_mtime_ns == graph_mtime
+
+
+def test_manifest_23_audio_import_coactivates_registry_graph_and_states(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request = project_factory.make_audio_import_upgrade_request(
+        tmp_path, attempt_id="p5-audio-transition"
+    )
+    request, _ = project_factory.attach_p5_dependency_transition(tmp_path, request)
+
+    committed = ProductionStateCommitter(tmp_path).commit(request)
+
+    transition = request.dependency_graph_transition
+    assert transition is not None
+    assert committed.schema_version == "2.3"
+    assert committed.active_project == request.next_project
+    assert committed.active_registry == request.next_registry
+    assert committed.active_dependency_graph == transition.candidate_dependency_graph
+    assert committed.dependency_states == transition.candidate_dependency_states
+    assert committed.attempts[-1].candidate_project is None
+
+
+def test_manifest_23_project_transition_rejects_wrong_desired_before_write(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request = project_factory.make_revision_two_request(
+        tmp_path, attempt_id="p5-project-wrong-desired"
+    )
+    request, _ = project_factory.attach_p5_dependency_transition(tmp_path, request)
+    transition = request.dependency_graph_transition
+    assert transition is not None
+    selected = transition.candidate_dependency_states[0]
+    forged_state = selected.model_copy(update={"desired_fingerprint": "f" * 64})
+    forged_states = (forged_state, *transition.candidate_dependency_states[1:])
+    forged = transition.model_copy(
+        update={
+            "candidate_dependency_states": forged_states,
+            "candidate_dependency_states_hash": state_commit._dependency_states_hash(
+                forged_states
+            ),
+        }
+    )
+    request = replace(request, dependency_graph_transition=forged)
+    before = (tmp_path / "state/manifest.json").read_bytes()
+
+    with pytest.raises(AiVideoError, match="resolved lifecycle|transition claim"):
+        ProductionStateCommitter(tmp_path).commit(request)
+
+    assert (tmp_path / "state/manifest.json").read_bytes() == before
+
+
+def test_manifest_23_voice_activation_coactivates_registry_and_precise_graph(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request = project_factory.make_voice_request(tmp_path)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_voice_generation(
+        request,
+        preview,
+        authorization,
+        dependency_transition_preparer_available=True,
+    )
+    writer.record_voice_submit_intent(request, preview, authorization)
+    manifest = read_manifest(tmp_path)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        tmp_path,
+        request,
+        authorization,
+        expected_manifest_revision=manifest.manifest_revision,
+        include_caption=True,
+    )
+    activation, _ = project_factory.attach_p5_dependency_transition(
+        tmp_path, activation
+    )
+
+    committed = writer.activate_voice_assets(
+        activation,
+        audio_asset_ids=audio_ids,
+        caption_asset_ids=("caption-voice-attempt-1",),
+    )
+
+    transition = activation.dependency_graph_transition
+    assert transition is not None
+    assert committed.active_registry == activation.next_registry
+    assert committed.active_dependency_graph == transition.candidate_dependency_graph
+    assert committed.dependency_states == transition.candidate_dependency_states
+    by_id = {state.node_id: state for state in committed.dependency_states}
+    assert by_id["asset:image-shot-1"].lifecycle is DependencyLifecycle.FRESH
+    assert by_id["asset:bgm-theme"].lifecycle is DependencyLifecycle.FRESH
+
+    succeeded = committed.attempts[-1]
+    candidate_attempt = succeeded.model_copy(
+        update={
+            "status": StateCommitStatus.RUNNING,
+            "voice_phase": "candidate",
+            "finished_at": None,
+        }
+    )
+    candidate_manifest = manifest.model_copy(
+        update={
+            "manifest_revision": committed.manifest_revision - 1,
+            "attempts": tuple(
+                candidate_attempt if item.attempt_id == request.attempt_id else item
+                for item in manifest.attempts
+            ),
+        }
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        candidate_manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    assert transition.candidate_dependency_graph != manifest.active_dependency_graph
+    candidate_graph_path = tmp_path / transition.candidate_dependency_graph.path
+    candidate_graph_payload = candidate_graph_path.read_bytes()
+    candidate_graph_path.unlink()
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).recover()
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    candidate_graph_path.write_bytes(candidate_graph_payload)
+    report = ProductionStateCommitter(tmp_path).recover()
+    recovered = read_manifest(tmp_path)
+    assert report.manifest_revision_after == candidate_manifest.manifest_revision + 1
+    assert recovered.active_registry == manifest.active_registry
+    assert recovered.active_dependency_graph == manifest.active_dependency_graph
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+    assert any(
+        item.path == transition.candidate_dependency_graph.path
+        and item.disposition is RecoveryDisposition.INTERRUPTED_RECORDED
+        and item.sha256 == transition.candidate_dependency_graph.file_sha256
+        for item in report.items
+    )
 
 
 def test_record_dependency_node_failed_rejects_standalone_renderer_node(

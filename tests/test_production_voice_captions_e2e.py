@@ -440,6 +440,7 @@ def _voice_candidate_preparer(root: Path, toolchain: AudioProbeToolchain):
                 alignment_receipt_id=track.alignment_receipt_id,
                 timing_fingerprint=track.timing_fingerprint,
                 style_reference_id=style.artifact_id,
+                style_reference_revision=style.revision,
                 style_content_hash=style.content_hash,
             ),
         )

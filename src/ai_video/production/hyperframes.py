@@ -94,6 +94,10 @@ from ai_video.production.state_commit import (
     RenderAttemptPaths,
 )
 
+RenderDependencyTransitionPreparer = Callable[
+    [ActivateRenderStateRequest], ActivateRenderStateRequest
+]
+
 
 _URL_PATTERN = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.IGNORECASE)
 _IMPORT_PATTERN = re.compile(
@@ -1393,6 +1397,7 @@ def _render_with_hyperframes(
     browser_path: Path,
     ip_path: Path,
     expected_version: str,
+    dependency_transition_preparer: RenderDependencyTransitionPreparer | None = None,
     probe: Callable[[int], dict] | None = None,
     decoded_frames: Callable[[int], str] | None = None,
     decoded_audio: Callable[[int, int, int], tuple[int, str]] | None = None,
@@ -1402,6 +1407,15 @@ def _render_with_hyperframes(
     if not fresh:
         return committer._replay_render_attempt(begin_request, manifest)
     try:
+        if (
+            manifest.schema_version == "2.3"
+            and dependency_transition_preparer is None
+        ):
+            raise AiVideoError(
+                ErrorCode.PRODUCTION_STATE_INVALID,
+                "Manifest 2.3 render requires a dependency transition preparer.",
+                retryable=False,
+            )
         selection = begin_request.renderer_selection
         paths = committer.render_attempt_paths(selection.attempt_id)
         _validate_render_attempt_paths(
@@ -1479,6 +1493,51 @@ def _render_with_hyperframes(
         artifacts=durable.artifacts,
         next_render_state=durable.next_render_state,
     )
+    if manifest.schema_version == "2.3":
+        assert dependency_transition_preparer is not None
+        try:
+            prepared_activation = dependency_transition_preparer(activation)
+            if (
+                not isinstance(prepared_activation, ActivateRenderStateRequest)
+                or prepared_activation.attempt_id != activation.attempt_id
+                or prepared_activation.expected_manifest_revision
+                != activation.expected_manifest_revision
+                or prepared_activation.current_project != activation.current_project
+                or prepared_activation.current_registry != activation.current_registry
+                or prepared_activation.base_render_state != activation.base_render_state
+                or prepared_activation.renderer_selection != activation.renderer_selection
+                or prepared_activation.next_render_state != activation.next_render_state
+                or prepared_activation.dependency_graph_transition is None
+                or not set(activation.artifacts).issubset(
+                    prepared_activation.artifacts
+                )
+            ):
+                raise AiVideoError(
+                    ErrorCode.PRODUCTION_STATE_INVALID,
+                    "Render dependency transition preparer changed the owned candidate.",
+                    retryable=False,
+                )
+            activation = prepared_activation
+        except Exception as exc:
+            failure = RecordRenderFailureRequest(
+                attempt_id=activation.attempt_id,
+                expected_manifest_revision=manifest.manifest_revision,
+                current_project=manifest.active_project,
+                current_registry=manifest.active_registry,
+                base_render_state=activation.base_render_state,
+                renderer_selection=activation.renderer_selection,
+                phase="verify",
+                error_code=(
+                    exc.code.value
+                    if isinstance(exc, AiVideoError)
+                    else ErrorCode.PRODUCTION_STATE_INVALID.value
+                ),
+                error_message=(
+                    exc.user_message if isinstance(exc, AiVideoError) else str(exc)
+                ),
+            )
+            committer.record_render_failure(failure)
+            raise
     return committer.activate_render_state(activation)
 
 
@@ -1512,6 +1571,7 @@ def render_with_hyperframes(
     ffmpeg_path: Path | None = None,
     ffprobe_path: Path | None = None,
     expected_version: str = "0.7.103",
+    dependency_transition_preparer: RenderDependencyTransitionPreparer | None = None,
 ) -> ProductionManifest:
     """Run the sole production HyperFrames path and durably activate its result."""
     probe = None
@@ -1550,6 +1610,7 @@ def render_with_hyperframes(
         browser_path=browser_path,
         ip_path=ip_path,
         expected_version=expected_version,
+        dependency_transition_preparer=dependency_transition_preparer,
         probe=probe,
         decoded_audio=decoded_audio,
         audio_measurement_method=measurement_method,

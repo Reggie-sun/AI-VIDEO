@@ -6,6 +6,7 @@ import json
 import struct
 from datetime import date
 import wave
+from dataclasses import replace
 from pathlib import Path
 
 import yaml
@@ -393,6 +394,17 @@ def make_voice_activation_request(
                 segmentation_policy_version=track.segmentation_policy.policy_version,
                 alignment_receipt_id=track.alignment_receipt_id,
                 timing_fingerprint=track.timing_fingerprint,
+                style_reference_id=track.style_reference_id,
+                style_content_hash=(
+                    prepared_caption.style_reference.content_hash
+                    if prepared_caption.style_reference is not None
+                    else None
+                ),
+                style_reference_revision=(
+                    prepared_caption.style_reference.revision
+                    if prepared_caption.style_reference is not None
+                    else None
+                ),
             ),
         )
     prepared = PreparedVoiceCandidate(
@@ -1215,6 +1227,86 @@ def make_manifest_23_project(root: Path):
         manifest.model_dump_json(indent=2), encoding="utf-8"
     )
     return graph
+
+
+def attach_p5_dependency_transition(root: Path, request):
+    """Attach one exact candidate graph/state transition to a commit request."""
+
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.state_commit import (
+        PreparedArtifact,
+        prepare_dependency_graph_transition,
+    )
+
+    manifest_path = root / "state/manifest.json"
+    manifest_payload = manifest_path.read_bytes()
+    manifest = ProductionManifest.model_validate_json(manifest_payload)
+    project_artifact = next(
+        item for item in request.artifacts if item.relative_path == request.next_project.path
+    )
+    registry_artifact = next(
+        item for item in request.artifacts if item.relative_path == request.next_registry.path
+    )
+    project = ProductionProject.model_validate(yaml.safe_load(project_artifact.payload))
+    registry = AssetRegistrySnapshot.model_validate_json(registry_artifact.payload)
+    inputs = make_p5_dependency_inputs(root)
+    manifest_path.write_bytes(manifest_payload)
+    candidate_manifest = manifest.model_copy(
+        update={
+            "active_project": request.next_project,
+            "active_registry": request.next_registry,
+        }
+    )
+    candidate_bundle = inputs.project.model_copy(
+        update={
+            "manifest": candidate_manifest,
+            "project": project,
+            "registry": registry,
+            "dependency_graph": None,
+            "render_state": None,
+        }
+    )
+    candidate_inputs = replace(inputs, project=candidate_bundle)
+    graph = build_production_dependency_graph(candidate_inputs)
+    applied = build_applied_dependency_evidence(candidate_inputs, None)
+    states = resolve_dependency_state(graph, applied).states
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=request.expected_manifest_revision,
+        base_dependency_graph=manifest.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=states,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    graph_payload = (
+        json.dumps(
+            graph.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    graph_artifact = PreparedArtifact(
+        transition.candidate_dependency_graph.path,
+        graph_payload,
+        hashlib.sha256(graph_payload).hexdigest(),
+    )
+    artifacts = tuple(
+        sorted(
+            (*request.artifacts, graph_artifact),
+            key=lambda item: item.relative_path.as_posix(),
+        )
+    )
+    return replace(
+        request,
+        artifacts=artifacts,
+        dependency_graph_transition=transition,
+    ), graph
 
 
 def load_initial_models(root: Path) -> tuple[ProductionProject, AssetRegistrySnapshot]:

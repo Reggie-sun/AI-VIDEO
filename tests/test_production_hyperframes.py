@@ -9,7 +9,7 @@ import shutil
 import struct
 import subprocess
 import wave
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal, ROUND_HALF_EVEN
 from io import BytesIO
 from pathlib import Path
@@ -2853,12 +2853,16 @@ def test_public_renderer_constructs_runner_from_binary_tool_root(
     binary = tool_root / "node_modules/.bin/hyperframes"
     captured: dict[str, object] = {}
     sentinel = object()
+    transition_sentinel = object()
 
     def fake_runner(**kwargs):
         captured.update(kwargs)
         return object()
 
     def fake_orchestration(**kwargs):
+        captured["dependency_transition_preparer"] = kwargs[
+            "dependency_transition_preparer"
+        ]
         kwargs["runner_factory"]()
         return sentinel
 
@@ -2877,12 +2881,14 @@ def test_public_renderer_constructs_runner_from_binary_tool_root(
         unshare_path=executable,
         ip_path=executable,
         bash_path=executable,
+        dependency_transition_preparer=transition_sentinel,  # type: ignore[arg-type]
     )
 
     assert result is sentinel
     assert captured["project_root"] == tool_root
     assert captured["project_root"] != production_root
     assert captured["binary"] == binary
+    assert captured["dependency_transition_preparer"] is transition_sentinel
 
 
 def test_public_renderer_wrong_binary_structure_is_terminal_source_failure(tmp_path):
@@ -3220,6 +3226,356 @@ def _prepared_activation_request(
         next_render_state=durable.next_render_state,
     )
     return before, committer, request
+
+
+def test_manifest_23_render_activation_atomically_applies_source_and_render(
+    tmp_path: Path,
+) -> None:
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.models import (
+        DependencyLifecycle,
+        DependencyNodeKind,
+        DependencyNodeState,
+        ProjectDependencyEvidence,
+        RegistryDependencyEvidence,
+        RenderDependencyEvidence,
+    )
+    from ai_video.production.state_commit import prepare_dependency_graph_transition
+
+    _, timeline, _, browser, ip_path = _replay_inputs(tmp_path, "p5-render-atomic")
+    p5_inputs = project_factory.make_p5_dependency_inputs(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-p5-render-atomic",
+        attempt_id="p5-render-atomic",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=before.active_project,
+        current_registry=before.active_registry,
+    )
+    committer = ProductionStateCommitter(tmp_path)
+    begin_request = BeginRenderAttemptRequest(
+        before.manifest_revision, None, selection
+    )
+    assert before.active_dependency_graph is not None
+    candidate_bundle = p5_inputs.project.model_copy(
+        update={
+            "manifest": before,
+            "dependency_graph": None,
+            "render_state": None,
+        }
+    )
+    graph = build_production_dependency_graph(
+        replace(p5_inputs, project=candidate_bundle, voice_requests=())
+    )
+    desired = desired_fingerprints(graph)
+    captured: dict[str, object] = {}
+
+    def prepare_transition(
+        activation: ActivateRenderStateRequest,
+    ) -> ActivateRenderStateRequest:
+        states = []
+        for node in graph.nodes:
+            if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT:
+                evidence = ProjectDependencyEvidence(
+                    owner="project_snapshot",
+                    pointer=activation.current_project,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=desired[node.node_id],
+                )
+            elif node.kind is DependencyNodeKind.ASSET:
+                evidence = RegistryDependencyEvidence(
+                    owner="registry_snapshot",
+                    pointer=activation.current_registry,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=desired[node.node_id],
+                )
+            else:
+                evidence = RenderDependencyEvidence(
+                    owner="render_state",
+                    pointer=activation.next_render_state,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=desired[node.node_id],
+                )
+            states.append(
+                DependencyNodeState(
+                    node_id=node.node_id,
+                    graph_revision_id=graph.revision_id,
+                    desired_fingerprint=desired[node.node_id],
+                    applied_fingerprint=desired[node.node_id],
+                    lifecycle=DependencyLifecycle.FRESH,
+                    applied_evidence=evidence,
+                )
+            )
+        transition = prepare_dependency_graph_transition(
+            expected_manifest_revision=activation.expected_manifest_revision,
+            base_dependency_graph=before.active_dependency_graph,
+            candidate_graph=graph,
+            candidate_dependency_states=tuple(states),
+            expected_desired_fingerprints=desired,
+        )
+        graph_payload = _sealed_json_bytes(graph)
+        graph_artifact = PreparedArtifact(
+            transition.candidate_dependency_graph.path,
+            graph_payload,
+            hashlib.sha256(graph_payload).hexdigest(),
+        )
+        prepared = replace(
+            activation,
+            artifacts=tuple(
+                sorted(
+                    (*activation.artifacts, graph_artifact),
+                    key=lambda item: item.relative_path.as_posix(),
+                )
+            ),
+            dependency_graph_transition=transition,
+        )
+        captured["activation"] = prepared
+        captured["transition"] = transition
+        return prepared
+
+    runner_calls = 0
+
+    def runner_factory():
+        nonlocal runner_calls
+        runner_calls += 1
+        return FakeRunner()
+
+    activated = _render_with_hyperframes(
+        committer=committer,
+        begin_request=begin_request,
+        timeline=timeline,
+        asset_sources=make_asset_sources(tmp_path, timeline),
+        allowed_asset_root=tmp_path,
+        runner_factory=runner_factory,
+        browser_path=browser,
+        ip_path=ip_path,
+        expected_version="0.7.103",
+        dependency_transition_preparer=prepare_transition,
+        probe=lambda fd: {
+            "streams": [
+                {
+                    "codec_type": "video",
+                    "width": 320,
+                    "height": 180,
+                    "r_frame_rate": "24/1",
+                    "nb_frames": "10",
+                    "codec_name": "h264",
+                }
+            ]
+        },
+        decoded_frames=lambda fd: hashlib.sha256(
+            os.pread(fd, os.fstat(fd).st_size, 0)
+        ).hexdigest(),
+    )
+    activation = captured["activation"]
+    transition = captured["transition"]
+    assert isinstance(activation, ActivateRenderStateRequest)
+    artifact_mtimes = {
+        item.relative_path: (tmp_path / item.relative_path).stat().st_mtime_ns
+        for item in activation.artifacts
+    }
+    manifest_mtime = (tmp_path / "state/manifest.json").stat().st_mtime_ns
+    replayed = _render_with_hyperframes(
+        committer=committer,
+        begin_request=begin_request,
+        timeline=timeline,
+        asset_sources=make_asset_sources(tmp_path, timeline),
+        allowed_asset_root=tmp_path,
+        runner_factory=lambda: (_ for _ in ()).throw(
+            AssertionError("exact replay must not construct a runner")
+        ),
+        browser_path=browser,
+        ip_path=ip_path,
+        expected_version="0.7.103",
+    )
+
+    assert replayed == activated
+    assert runner_calls == 1
+    assert activated.active_render_state == activation.next_render_state
+    assert activated.active_dependency_graph == transition.candidate_dependency_graph
+    by_id = {state.node_id: state for state in activated.dependency_states}
+    render_unit = {
+        node.node_id
+        for node in graph.nodes
+        if node.kind in {DependencyNodeKind.RENDERER_SOURCE, DependencyNodeKind.RENDER}
+    }
+    assert render_unit
+    assert all(by_id[node_id].lifecycle is DependencyLifecycle.FRESH for node_id in render_unit)
+    assert (tmp_path / "state/manifest.json").stat().st_mtime_ns == manifest_mtime
+    assert {
+        path: (tmp_path / path).stat().st_mtime_ns for path in artifact_mtimes
+    } == artifact_mtimes
+
+    revision_request = project_factory.make_revision_two_request(
+        tmp_path, attempt_id="p5-after-render-project-r2"
+    )
+    provisional, candidate_graph = project_factory.attach_p5_dependency_transition(
+        tmp_path, revision_request
+    )
+    provisional_transition = provisional.dependency_graph_transition
+    assert provisional_transition is not None
+    candidate_by_id = {
+        state.node_id: state
+        for state in provisional_transition.candidate_dependency_states
+    }
+    applied_by_id = {state.node_id: state for state in activated.dependency_states}
+    previous = tuple(
+        sorted(
+            [
+                candidate_by_id[node.node_id]
+                if node.kind
+                in {DependencyNodeKind.CREATIVE_ARTIFACT, DependencyNodeKind.ASSET}
+                else applied_by_id.get(node.node_id, candidate_by_id[node.node_id])
+                for node in candidate_graph.nodes
+            ],
+            key=lambda state: state.node_id,
+        )
+    )
+    invalidated = resolve_dependency_state(candidate_graph, previous).states
+    precise_transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=revision_request.expected_manifest_revision,
+        base_dependency_graph=activated.active_dependency_graph,
+        candidate_graph=candidate_graph,
+        candidate_dependency_states=invalidated,
+        expected_desired_fingerprints=desired_fingerprints(candidate_graph),
+    )
+    switched = committer.commit(
+        replace(
+            provisional,
+            dependency_graph_transition=precise_transition,
+        )
+    )
+
+    switched_by_id = {state.node_id: state for state in switched.dependency_states}
+    retained_unit = {
+        node.node_id
+        for node in candidate_graph.nodes
+        if node.kind in {DependencyNodeKind.RENDERER_SOURCE, DependencyNodeKind.RENDER}
+    }
+    assert switched.active_render_state == activated.active_render_state
+    assert retained_unit
+    assert all(
+        switched_by_id[node_id].lifecycle
+        in {DependencyLifecycle.STALE, DependencyLifecycle.BLOCKED}
+        and isinstance(
+            switched_by_id[node_id].applied_evidence, RenderDependencyEvidence
+        )
+        and switched_by_id[node_id].applied_evidence.pointer
+        == activated.active_render_state
+        for node_id in retained_unit
+    )
+    historical_report = ProductionStateCommitter(tmp_path).recover()
+    historical_reopened = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert historical_reopened.active_render_state == activated.active_render_state
+    assert any(
+        item.path == activated.active_render_state.path
+        and item.disposition.value == "active"
+        for item in historical_report.items
+    )
+
+    succeeded_attempt = next(
+        item
+        for item in activated.attempts
+        if item.attempt_id == selection.attempt_id
+    )
+    interrupted_candidate = succeeded_attempt.model_copy(
+        update={
+            "status": StateCommitStatus.RUNNING,
+            "finished_at": None,
+        }
+    )
+    candidate_manifest = before.model_copy(
+        update={
+            "manifest_revision": before.manifest_revision + 2,
+            "attempts": (interrupted_candidate,),
+        }
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        candidate_manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    assert transition.candidate_dependency_graph != before.active_dependency_graph
+    candidate_graph_path = tmp_path / transition.candidate_dependency_graph.path
+    candidate_graph_payload = candidate_graph_path.read_bytes()
+    candidate_graph_path.write_bytes(candidate_graph_payload + b"tampered")
+    with pytest.raises(AiVideoError):
+        ProductionStateCommitter(tmp_path).recover()
+    candidate_graph_path.write_bytes(candidate_graph_payload)
+    report = ProductionStateCommitter(tmp_path).recover()
+    recovered = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert report.manifest_revision_after == candidate_manifest.manifest_revision + 1
+    assert recovered.active_render_state is None
+    assert recovered.active_dependency_graph == before.active_dependency_graph
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+    assert any(
+        item.path == transition.candidate_dependency_graph.path
+        and item.disposition.value == "interrupted_recorded"
+        and item.sha256 == transition.candidate_dependency_graph.file_sha256
+        for item in report.items
+    )
+
+
+def test_manifest_23_render_rejects_missing_preparer_before_runner(
+    tmp_path: Path,
+) -> None:
+    _, timeline, _, browser, ip_path = _replay_inputs(
+        tmp_path, "p5-render-missing-preparer"
+    )
+    project_factory.make_manifest_23_project(tmp_path)
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-p5-render-missing-preparer",
+        attempt_id="p5-render-missing-preparer",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=manifest.active_project,
+        current_registry=manifest.active_registry,
+    )
+    runner_calls = 0
+
+    def runner_factory():
+        nonlocal runner_calls
+        runner_calls += 1
+        return FakeRunner()
+
+    with pytest.raises(AiVideoError, match="transition preparer"):
+        _render_with_hyperframes(
+            committer=ProductionStateCommitter(tmp_path),
+            begin_request=BeginRenderAttemptRequest(
+                manifest.manifest_revision, None, selection
+            ),
+            timeline=timeline,
+            asset_sources=make_asset_sources(tmp_path, timeline),
+            allowed_asset_root=tmp_path,
+            runner_factory=runner_factory,
+            browser_path=browser,
+            ip_path=ip_path,
+            expected_version="0.7.103",
+        )
+
+    failed = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
+    )
+    assert runner_calls == 0
+    assert failed.attempts[-1].status is StateCommitStatus.FAILED
+    assert failed.attempts[-1].render_phase == "source"
 
 
 def test_activation_duplicate_artifacts_terminalizes_owned_r1_as_r2(tmp_path):

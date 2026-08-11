@@ -1851,7 +1851,7 @@ class ProductionManifest(StrictModel):
     def _reject_explicit_voice_fields_in_old_versions(cls, value: object) -> object:
         if (
             not isinstance(value, Mapping)
-            or value.get("schema_version", "2.0") == "2.2"
+            or value.get("schema_version", "2.0") in {"2.2", "2.3"}
         ):
             return value
         for attempt in value.get("attempts", ()):

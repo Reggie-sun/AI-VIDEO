@@ -100,6 +100,7 @@ from ai_video.production.paths import (
     canonical_dependency_graph_snapshot_path,
 )
 from ai_video.production.project import (
+    _load_exact_render_state,
     _render_source_binding_map,
     _render_source_payload_matches,
     _validate_source_timeline_bindings,
@@ -138,6 +139,7 @@ class StateCommitRequest:
     artifacts: tuple[PreparedArtifact, ...]
     next_project: ProjectSnapshotPointer
     next_registry: RegistrySnapshotPointer
+    dependency_graph_transition: DependencyGraphTransition | None = None
 
 
 @dataclass(frozen=True)
@@ -170,6 +172,7 @@ class ActivateRenderStateRequest:
     renderer_selection: RendererSelectionReceipt
     artifacts: tuple[PreparedArtifact, ...]
     next_render_state: RenderStateSnapshotPointer
+    dependency_graph_transition: DependencyGraphTransition | None = None
 
 
 @dataclass(frozen=True)
@@ -203,6 +206,9 @@ VoiceCandidatePreparer = Callable[
         VoiceAttemptPaths,
     ],
     "PreparedVoiceCandidate",
+]
+VoiceDependencyTransitionPreparer = Callable[
+    [StateCommitRequest], StateCommitRequest
 ]
 
 
@@ -892,6 +898,8 @@ class ProductionStateCommitter:
         request: VoiceGenerationRequest,
         preview: VoiceGenerationPreview,
         authorization: VoiceCallAuthorization,
+        *,
+        dependency_transition_preparer_available: bool = False,
     ) -> ProductionManifest:
         """Persist R+1 request, preview, and authorization evidence without transport."""
 
@@ -912,6 +920,13 @@ class ProductionStateCommitter:
         )
         with self._exclusive_lock():
             manifest = self._read_manifest()
+            if (
+                manifest.schema_version == "2.3"
+                and not dependency_transition_preparer_available
+            ):
+                raise _state_invalid(
+                    "Manifest 2.3 voice generation requires a dependency transition preparer."
+                )
             existing = next(
                 (item for item in manifest.attempts if item.attempt_id == request.attempt_id),
                 None,
@@ -964,7 +979,9 @@ class ProductionStateCommitter:
             r1 = _validated_transition(
                 manifest,
                 {
-                    "schema_version": "2.2",
+                    "schema_version": (
+                        "2.3" if manifest.schema_version == "2.3" else "2.2"
+                    ),
                     "manifest_revision": manifest.manifest_revision + 1,
                     "attempts": manifest.attempts + (attempt,),
                 },
@@ -1429,6 +1446,11 @@ class ProductionStateCommitter:
                         if caption.style_reference is not None
                         else None
                     ),
+                    style_reference_revision=(
+                        caption.style_reference.revision
+                        if caption.style_reference is not None
+                        else None
+                    ),
                 ),
             )
             if (
@@ -1571,6 +1593,7 @@ class ProductionStateCommitter:
 
         if request.operation != "voice_generation" or not audio_asset_ids:
             raise _state_invalid("Voice activation request is incomplete.")
+        self._validate_request(request)
         registry_artifact = next(
             (
                 item
@@ -1608,7 +1631,50 @@ class ProductionStateCommitter:
             )
             if attempt is None or attempt.operation != "voice_generation":
                 raise _state_invalid("Voice activation has no matching attempt.")
-            if attempt.status is StateCommitStatus.SUCCEEDED or attempt.voice_phase == "candidate":
+            graph_transition: DependencyGraphTransition | None = None
+            candidate_graph: DependencyGraphSnapshot | None = None
+            if attempt.status is StateCommitStatus.SUCCEEDED:
+                transition = request.dependency_graph_transition
+                if manifest.schema_version == "2.3":
+                    if transition is None or (
+                        attempt.base_dependency_graph != transition.base_dependency_graph
+                        or attempt.candidate_dependency_graph
+                        != transition.candidate_dependency_graph
+                        or attempt.candidate_dependency_states_hash
+                        != transition.candidate_dependency_states_hash
+                        or manifest.active_dependency_graph
+                        != transition.candidate_dependency_graph
+                        or manifest.dependency_states
+                        != transition.candidate_dependency_states
+                    ):
+                        raise _state_invalid(
+                            "Succeeded voice replay dependency transition does not match active state."
+                        )
+                    graph_transition = transition
+                    active_graph = self._reopen_dependency_graph(
+                        transition.candidate_dependency_graph
+                    )
+                    self._verify_dependency_candidate(
+                        manifest, active_graph, manifest.dependency_states
+                    )
+                elif transition is not None:
+                    raise _state_invalid(
+                        "Dependency graph transition requires Manifest 2.3."
+                    )
+            else:
+                graph_transition, candidate_graph = self._validate_dependency_transition(
+                    manifest,
+                    expected_manifest_revision=request.expected_manifest_revision,
+                    artifacts=request.artifacts,
+                    transition=request.dependency_graph_transition,
+                )
+            if (
+                manifest.schema_version != "2.3"
+                and (
+                    attempt.status is StateCommitStatus.SUCCEEDED
+                    or attempt.voice_phase == "candidate"
+                )
+            ):
                 durable_request = self._reconstruct_voice_activation_request(attempt)
                 if durable_request != request:
                     raise _state_invalid(
@@ -1639,6 +1705,17 @@ class ProductionStateCommitter:
                     or attempt.candidate_artifacts_hash != candidate_hash
                     or attempt.candidate_audio_asset_ids != audio_asset_ids
                     or attempt.candidate_caption_asset_ids != caption_asset_ids
+                    or (
+                        graph_transition is not None
+                        and (
+                            attempt.base_dependency_graph
+                            != graph_transition.base_dependency_graph
+                            or attempt.candidate_dependency_graph
+                            != graph_transition.candidate_dependency_graph
+                            or attempt.candidate_dependency_states_hash
+                            != graph_transition.candidate_dependency_states_hash
+                        )
+                    )
                 ):
                     raise _state_invalid("Voice candidate replay identity does not match.")
             else:
@@ -1653,7 +1730,6 @@ class ProductionStateCommitter:
                     or request.next_project != attempt.base_project
                 ):
                     raise _state_invalid("Voice activation base state or revision is stale.")
-                self._validate_request(request)
                 for artifact in sorted(
                     request.artifacts, key=lambda item: item.relative_path.as_posix()
                 ):
@@ -1661,6 +1737,14 @@ class ProductionStateCommitter:
                         artifact, attempt_id=request.attempt_id
                     )
                 self._verify_voice_committed_candidates(request)
+                if graph_transition is not None and candidate_graph is not None:
+                    self._verify_dependency_candidate(
+                        manifest,
+                        candidate_graph,
+                        graph_transition.candidate_dependency_states,
+                        project_pointer=request.next_project,
+                        registry_pointer=request.next_registry,
+                    )
                 candidate_attempt = _validated_transition(
                     attempt,
                     {
@@ -1671,6 +1755,21 @@ class ProductionStateCommitter:
                         "candidate_caption_asset_ids": caption_asset_ids,
                         "provider_request_id": provider_request_id,
                         "voice_phase": "candidate",
+                        "base_dependency_graph": (
+                            None
+                            if graph_transition is None
+                            else graph_transition.base_dependency_graph
+                        ),
+                        "candidate_dependency_graph": (
+                            None
+                            if graph_transition is None
+                            else graph_transition.candidate_dependency_graph
+                        ),
+                        "candidate_dependency_states_hash": (
+                            None
+                            if graph_transition is None
+                            else graph_transition.candidate_dependency_states_hash
+                        ),
                     },
                 )
                 candidate_manifest = _validated_transition(
@@ -1703,18 +1802,30 @@ class ProductionStateCommitter:
                     "error_message": None,
                 },
             )
+            final_update: dict[str, object] = {
+                "manifest_revision": manifest.manifest_revision + 1,
+                "active_project": request.next_project,
+                "active_registry": request.next_registry,
+                "active_render_state": (
+                    manifest.active_render_state
+                    if manifest.schema_version == "2.3"
+                    else None
+                ),
+                "attempts": tuple(
+                    succeeded if item.attempt_id == request.attempt_id else item
+                    for item in manifest.attempts
+                ),
+            }
+            if graph_transition is not None:
+                final_update.update(
+                    {
+                        "active_dependency_graph": graph_transition.candidate_dependency_graph,
+                        "dependency_states": graph_transition.candidate_dependency_states,
+                    }
+                )
             final = _validated_transition(
                 manifest,
-                {
-                    "manifest_revision": manifest.manifest_revision + 1,
-                    "active_project": request.next_project,
-                    "active_registry": request.next_registry,
-                    "active_render_state": None,
-                    "attempts": tuple(
-                        succeeded if item.attempt_id == request.attempt_id else item
-                        for item in manifest.attempts
-                    ),
-                },
+                final_update,
             )
 
             def mark_replaced() -> None:
@@ -1947,6 +2058,10 @@ class ProductionStateCommitter:
             commit.next_project.path,
             commit.next_registry.path,
         }
+        if commit.dependency_graph_transition is not None:
+            graph_path = commit.dependency_graph_transition.candidate_dependency_graph.path
+            if graph_path in artifacts:
+                exact_paths.add(graph_path)
         if set(artifacts) != exact_paths:
             raise _state_invalid("Voice candidate graph contains extra or missing artifacts.")
         for record in new_records:
@@ -1964,11 +2079,29 @@ class ProductionStateCommitter:
         request: VoiceGenerationRequest,
         provider: VoiceAssetProvider,
         authorization: VoiceCallAuthorization,
+        *,
+        dependency_transition_preparer: VoiceDependencyTransitionPreparer | None = None,
     ) -> ProductionManifest:
         """Only public path allowed to invoke one voice provider transport call."""
 
+        preflight_manifest = self._read_manifest()
+        if (
+            preflight_manifest.schema_version == "2.3"
+            and dependency_transition_preparer is None
+        ):
+            raise _state_invalid(
+                "Manifest 2.3 voice generation requires a dependency transition preparer."
+            )
+
         preview = provider.preview(request)
-        self.begin_voice_generation(request, preview, authorization)
+        self.begin_voice_generation(
+            request,
+            preview,
+            authorization,
+            dependency_transition_preparer_available=(
+                dependency_transition_preparer is not None
+            ),
+        )
         permit = self.record_voice_submit_intent(request, preview, authorization)
         try:
             result = provider.generate(request, authorization, permit)
@@ -2026,6 +2159,26 @@ class ProductionStateCommitter:
             commit_request, audio_ids, caption_ids = self._prepare_voice_activation_request(
                 request, preview, authorization, result, prepared
             )
+            if preflight_manifest.schema_version == "2.3":
+                assert dependency_transition_preparer is not None
+                prepared_request = dependency_transition_preparer(commit_request)
+                if (
+                    not isinstance(prepared_request, StateCommitRequest)
+                    or prepared_request.attempt_id != commit_request.attempt_id
+                    or prepared_request.operation != commit_request.operation
+                    or prepared_request.expected_manifest_revision
+                    != commit_request.expected_manifest_revision
+                    or prepared_request.next_project != commit_request.next_project
+                    or prepared_request.next_registry != commit_request.next_registry
+                    or prepared_request.dependency_graph_transition is None
+                    or not set(commit_request.artifacts).issubset(
+                        prepared_request.artifacts
+                    )
+                ):
+                    raise _state_invalid(
+                        "Voice dependency transition preparer changed the owned candidate."
+                    )
+                commit_request = prepared_request
             return self.activate_voice_assets(
                 commit_request,
                 audio_asset_ids=audio_ids,
@@ -2232,6 +2385,44 @@ class ProductionStateCommitter:
                 ),
             )
         )
+        transition = None
+        if attempt.candidate_dependency_graph is not None:
+            if (
+                attempt.base_dependency_graph is None
+                or attempt.candidate_dependency_states_hash is None
+                or manifest.active_dependency_graph
+                != attempt.candidate_dependency_graph
+                or _dependency_states_hash(manifest.dependency_states)
+                != attempt.candidate_dependency_states_hash
+            ):
+                raise _state_invalid(
+                    "Render replay dependency transition identity is incomplete."
+                )
+            transition = DependencyGraphTransition(
+                expected_manifest_revision=attempt.base_manifest_revision + 1,
+                base_dependency_graph=attempt.base_dependency_graph,
+                candidate_dependency_graph=attempt.candidate_dependency_graph,
+                candidate_dependency_states=manifest.dependency_states,
+                candidate_dependency_states_hash=attempt.candidate_dependency_states_hash,
+            )
+            if _candidate_artifacts_hash(artifacts) != attempt.candidate_artifacts_hash:
+                graph_snapshot = _read_regular_file_nofollow(
+                    self._project_root / attempt.candidate_dependency_graph.path,
+                    contained_by=self._project_root / "state",
+                )
+                artifacts = tuple(
+                    sorted(
+                        (
+                            *artifacts,
+                            PreparedArtifact(
+                                attempt.candidate_dependency_graph.path,
+                                graph_snapshot.data,
+                                graph_snapshot.file_sha256,
+                            ),
+                        ),
+                        key=lambda item: item.relative_path.as_posix(),
+                    )
+                )
         if _candidate_artifacts_hash(artifacts) != attempt.candidate_artifacts_hash:
             raise _state_invalid("Render replay artifact identity is invalid.")
         selection = attempt.renderer_selection
@@ -2246,6 +2437,7 @@ class ProductionStateCommitter:
             renderer_selection=selection,
             artifacts=artifacts,
             next_render_state=pointer,
+            dependency_graph_transition=transition,
         )
 
     def record_render_failure(
@@ -2337,7 +2529,36 @@ class ProductionStateCommitter:
                 existing, request, candidate_hash
             ):
                 raise _state_invalid("Render activation does not match its begun attempt.")
+            graph_transition: DependencyGraphTransition | None = None
+            candidate_graph: DependencyGraphSnapshot | None = None
             if existing.status is StateCommitStatus.SUCCEEDED:
+                transition = request.dependency_graph_transition
+                if manifest.schema_version == "2.3":
+                    if transition is None or (
+                        existing.base_dependency_graph
+                        != transition.base_dependency_graph
+                        or existing.candidate_dependency_graph
+                        != transition.candidate_dependency_graph
+                        or existing.candidate_dependency_states_hash
+                        != transition.candidate_dependency_states_hash
+                        or manifest.active_dependency_graph
+                        != transition.candidate_dependency_graph
+                        or manifest.dependency_states
+                        != transition.candidate_dependency_states
+                    ):
+                        raise _state_invalid(
+                            "Succeeded render replay dependency transition does not match active state."
+                        )
+                    active_graph = self._reopen_dependency_graph(
+                        transition.candidate_dependency_graph
+                    )
+                    self._verify_dependency_candidate(
+                        manifest, active_graph, manifest.dependency_states
+                    )
+                elif transition is not None:
+                    raise _state_invalid(
+                        "Dependency graph transition requires Manifest 2.3."
+                    )
                 self._verify_durable_render_graph(request)
                 if (
                     manifest.active_project != request.current_project
@@ -2348,6 +2569,12 @@ class ProductionStateCommitter:
                         "Succeeded render replay does not match active state."
                     )
                 return manifest
+            graph_transition, candidate_graph = self._validate_dependency_transition(
+                manifest,
+                expected_manifest_revision=request.expected_manifest_revision,
+                artifacts=request.artifacts,
+                transition=request.dependency_graph_transition,
+            )
             if existing.status is StateCommitStatus.FAILED:
                 self._validate_render_artifacts(request)
                 if (
@@ -2385,6 +2612,21 @@ class ProductionStateCommitter:
                         "candidate_render_state": request.next_render_state,
                         "candidate_artifacts_hash": candidate_hash,
                         "render_phase": "activate",
+                        "base_dependency_graph": (
+                            None
+                            if graph_transition is None
+                            else graph_transition.base_dependency_graph
+                        ),
+                        "candidate_dependency_graph": (
+                            None
+                            if graph_transition is None
+                            else graph_transition.candidate_dependency_graph
+                        ),
+                        "candidate_dependency_states_hash": (
+                            None
+                            if graph_transition is None
+                            else graph_transition.candidate_dependency_states_hash
+                        ),
                     },
                 )
             )
@@ -2401,9 +2643,18 @@ class ProductionStateCommitter:
                     )
                 if existing.candidate_render_state is None:
                     for artifact in request.artifacts:
-                        self._write_render_immutable_artifact(
-                            artifact, attempt_id=request.attempt_id
-                        )
+                        if (
+                            graph_transition is not None
+                            and artifact.relative_path
+                            == graph_transition.candidate_dependency_graph.path
+                        ):
+                            self._write_immutable_artifact(
+                                artifact, attempt_id=request.attempt_id
+                            )
+                        else:
+                            self._write_render_immutable_artifact(
+                                artifact, attempt_id=request.attempt_id
+                            )
                         snapshot = _read_regular_file_nofollow(
                             self._project_root / artifact.relative_path,
                             contained_by=self._project_root,
@@ -2413,6 +2664,12 @@ class ProductionStateCommitter:
                                 "Immutable render artifact verification failed."
                             )
                 self._verify_durable_render_graph(request)
+                if graph_transition is not None and candidate_graph is not None:
+                    self._verify_render_dependency_application(
+                        candidate_graph,
+                        graph_transition.candidate_dependency_states,
+                        request.next_render_state,
+                    )
 
                 if existing.candidate_render_state is None:
                     candidate_manifest = _validated_transition(
@@ -2462,16 +2719,36 @@ class ProductionStateCommitter:
                         "error_message": None,
                     },
                 )
+                if graph_transition is not None and candidate_graph is not None:
+                    verification_attempts = tuple(
+                        succeeded if item.attempt_id == request.attempt_id else item
+                        for item in manifest.attempts
+                    )
+                    self._verify_dependency_candidate(
+                        manifest,
+                        candidate_graph,
+                        graph_transition.candidate_dependency_states,
+                        render_pointer=request.next_render_state,
+                        attempts=verification_attempts,
+                    )
+                final_update: dict[str, object] = {
+                    "manifest_revision": manifest.manifest_revision + 1,
+                    "active_render_state": request.next_render_state,
+                    "attempts": tuple(
+                        succeeded if item.attempt_id == request.attempt_id else item
+                        for item in manifest.attempts
+                    ),
+                }
+                if graph_transition is not None:
+                    final_update.update(
+                        {
+                            "active_dependency_graph": graph_transition.candidate_dependency_graph,
+                            "dependency_states": graph_transition.candidate_dependency_states,
+                        }
+                    )
                 final_manifest = _validated_transition(
                     manifest,
-                    {
-                        "manifest_revision": manifest.manifest_revision + 1,
-                        "active_render_state": request.next_render_state,
-                        "attempts": tuple(
-                            succeeded if item.attempt_id == request.attempt_id else item
-                            for item in manifest.attempts
-                        ),
-                    },
+                    final_update,
                 )
 
                 def mark_final_replaced() -> None:
@@ -2794,13 +3071,63 @@ class ProductionStateCommitter:
             return False
         if attempt.candidate_render_state is None:
             return attempt.render_phase == "selection"
+        transition = request.dependency_graph_transition
         return (
             attempt.candidate_project == request.current_project
             and attempt.candidate_registry == request.current_registry
             and attempt.candidate_render_state == request.next_render_state
             and attempt.candidate_artifacts_hash == candidate_hash
             and attempt.render_phase == "activate"
+            and (
+                (
+                    transition is None
+                    and attempt.base_dependency_graph is None
+                    and attempt.candidate_dependency_graph is None
+                    and attempt.candidate_dependency_states_hash is None
+                )
+                or (
+                    transition is not None
+                    and attempt.base_dependency_graph
+                    == transition.base_dependency_graph
+                    and attempt.candidate_dependency_graph
+                    == transition.candidate_dependency_graph
+                    and attempt.candidate_dependency_states_hash
+                    == transition.candidate_dependency_states_hash
+                )
+            )
         )
+
+    @staticmethod
+    def _verify_render_dependency_application(
+        graph: DependencyGraphSnapshot,
+        states: tuple[DependencyNodeState, ...],
+        pointer: RenderStateSnapshotPointer,
+    ) -> None:
+        state_by_id = {state.node_id: state for state in states}
+        unit_nodes = tuple(
+            node
+            for node in graph.nodes
+            if node.kind
+            in {DependencyNodeKind.RENDERER_SOURCE, DependencyNodeKind.RENDER}
+        )
+        if not unit_nodes or not any(
+            node.kind is DependencyNodeKind.RENDER for node in unit_nodes
+        ):
+            raise _state_invalid("Render dependency graph has no atomic render unit.")
+        for node in unit_nodes:
+            state = state_by_id.get(node.node_id)
+            evidence = None if state is None else state.applied_evidence
+            if (
+                state is None
+                or state.lifecycle is not DependencyLifecycle.FRESH
+                or state.applied_fingerprint != state.desired_fingerprint
+                or not isinstance(evidence, RenderDependencyEvidence)
+                or evidence.pointer != pointer
+                or evidence.artifact_id != node.artifact_id
+            ):
+                raise _state_invalid(
+                    "Renderer source and render nodes must be atomically applied."
+                )
 
     @staticmethod
     def _same_render_begin(
@@ -2837,11 +3164,19 @@ class ProductionStateCommitter:
             raise _state_invalid("Render activation attempt identity is invalid.")
         if request.expected_manifest_revision < 2:
             raise _state_invalid("Render activation expected revision is invalid.")
-        paths = tuple(item.relative_path for item in request.artifacts)
+        graph_path = (
+            request.dependency_graph_transition.candidate_dependency_graph.path
+            if request.dependency_graph_transition is not None
+            else None
+        )
+        render_artifacts = tuple(
+            item for item in request.artifacts if item.relative_path != graph_path
+        )
+        paths = tuple(item.relative_path for item in render_artifacts)
         if paths != tuple(sorted(paths)):
             raise _state_invalid("Render activation artifacts must be canonically sorted.")
         artifacts: dict[Path, PreparedArtifact] = {}
-        for item in request.artifacts:
+        for item in render_artifacts:
             path = self._validate_artifact_path(item.relative_path)
             if path in artifacts:
                 raise _state_invalid("Render activation has duplicate artifact paths.")
@@ -3323,18 +3658,32 @@ class ProductionStateCommitter:
         manifest: ProductionManifest,
         graph: DependencyGraphSnapshot,
         states: tuple[DependencyNodeState, ...],
+        *,
+        project_pointer: ProjectSnapshotPointer | None = None,
+        registry_pointer: RegistrySnapshotPointer | None = None,
+        render_pointer: RenderStateSnapshotPointer | None = None,
+        attempts: tuple[StateCommitAttempt, ...] | None = None,
     ) -> None:
+        project_pointer = project_pointer or manifest.active_project
+        registry_pointer = registry_pointer or manifest.active_registry
         try:
             bundle = load_production_project_candidate(
                 self._project_root,
                 manifest,
-                manifest.active_project.path,
-                manifest.active_registry.path,
+                project_pointer.path,
+                registry_pointer.path,
             )
             candidate_manifest = ProductionManifest.model_validate(
                 {
                     **manifest.model_dump(mode="python"),
                     "schema_version": "2.3",
+                    "active_project": project_pointer,
+                    "active_registry": registry_pointer,
+                    "active_render_state": (
+                        manifest.active_render_state
+                        if render_pointer is None
+                        else render_pointer
+                    ),
                     "active_dependency_graph": DependencyGraphSnapshotPointer(
                         revision_id=graph.revision_id,
                         content_hash=graph.content_hash,
@@ -3342,6 +3691,7 @@ class ProductionStateCommitter:
                         file_sha256=hashlib.sha256(_canonical_json_bytes(graph)).hexdigest(),
                     ),
                     "dependency_states": states,
+                    "attempts": manifest.attempts if attempts is None else attempts,
                 }
             )
             candidate_bundle = bundle.model_copy(
@@ -3357,13 +3707,85 @@ class ProductionStateCommitter:
                 "Dependency graph candidate evidence is invalid.", detail
             ) from exc
 
+    def _validate_request_dependency_transition(
+        self,
+        manifest: ProductionManifest,
+        request: StateCommitRequest,
+    ) -> tuple[DependencyGraphTransition | None, DependencyGraphSnapshot | None]:
+        return self._validate_dependency_transition(
+            manifest,
+            expected_manifest_revision=request.expected_manifest_revision,
+            artifacts=request.artifacts,
+            transition=request.dependency_graph_transition,
+        )
+
+    def _validate_dependency_transition(
+        self,
+        manifest: ProductionManifest,
+        *,
+        expected_manifest_revision: int,
+        artifacts: tuple[PreparedArtifact, ...],
+        transition: DependencyGraphTransition | None,
+    ) -> tuple[DependencyGraphTransition | None, DependencyGraphSnapshot | None]:
+        if manifest.schema_version != "2.3":
+            if transition is not None:
+                raise _state_invalid(
+                    "Dependency graph transition requires Manifest 2.3."
+                )
+            return None, None
+        if transition is None:
+            raise _state_invalid(
+                "Manifest 2.3 mutation requires a dependency graph transition."
+            )
+        if (
+            transition.expected_manifest_revision != expected_manifest_revision
+            or transition.base_dependency_graph != manifest.active_dependency_graph
+        ):
+            raise _state_invalid("Dependency graph transition base identity is stale.")
+        artifact = next(
+            (
+                item
+                for item in artifacts
+                if item.relative_path == transition.candidate_dependency_graph.path
+            ),
+            None,
+        )
+        if artifact is None:
+            if transition.candidate_dependency_graph != manifest.active_dependency_graph:
+                raise _state_invalid("Candidate dependency graph artifact is missing.")
+            graph = self._reopen_dependency_graph(transition.candidate_dependency_graph)
+        else:
+            if artifact.file_sha256 != transition.candidate_dependency_graph.file_sha256:
+                raise _state_invalid("Candidate dependency graph file hash is stale.")
+            try:
+                graph = DependencyGraphSnapshot.model_validate_json(artifact.payload)
+            except (ValidationError, ValueError) as exc:
+                raise _state_invalid(
+                    "Candidate dependency graph artifact is invalid.", str(exc)
+                ) from exc
+        expected = prepare_dependency_graph_transition(
+            expected_manifest_revision=expected_manifest_revision,
+            base_dependency_graph=manifest.active_dependency_graph,
+            candidate_graph=graph,
+            candidate_dependency_states=transition.candidate_dependency_states,
+            expected_desired_fingerprints=desired_fingerprints(graph),
+        )
+        if expected != transition:
+            raise _state_invalid("Dependency graph transition claim is invalid.")
+        return transition, graph
+
     def _reopen_dependency_graph(
         self, pointer: DependencyGraphSnapshotPointer
     ) -> DependencyGraphSnapshot:
-        snapshot = _read_regular_file_nofollow(
-            self._project_root / pointer.path,
-            contained_by=self._project_root / "state",
-        )
+        try:
+            snapshot = _read_regular_file_nofollow(
+                self._project_root / pointer.path,
+                contained_by=self._project_root / "state",
+            )
+        except (OSError, ValueError) as exc:
+            raise _state_commit_failed(
+                "Dependency graph snapshot could not be reopened.", str(exc)
+            ) from exc
         try:
             graph = DependencyGraphSnapshot.model_validate_json(snapshot.data)
         except (ValidationError, ValueError) as exc:
@@ -3714,12 +4136,23 @@ class ProductionStateCommitter:
                 )
             )
         if manifest.active_render_state is not None:
-            state = load_verified_render_state(
-                self._project_root,
-                manifest.active_render_state,
-                project=manifest.active_project,
-                registry=manifest.active_registry,
-            )
+            if manifest.schema_version == "2.3":
+                bundle = load_production_project_candidate(
+                    self._project_root,
+                    manifest,
+                    manifest.active_project.path,
+                    manifest.active_registry.path,
+                )
+                state = _load_exact_render_state(
+                    bundle, manifest.active_render_state
+                )
+            else:
+                state = load_verified_render_state(
+                    self._project_root,
+                    manifest.active_render_state,
+                    project=manifest.active_project,
+                    registry=manifest.active_registry,
+                )
             items.extend(
                 self._render_graph_recovery_items(
                     state,
@@ -3728,6 +4161,80 @@ class ProductionStateCommitter:
                 )
             )
         return tuple(items)
+
+    def _recovery_dependency_outcome(
+        self,
+        manifest: ProductionManifest,
+        attempt: StateCommitAttempt,
+    ) -> Literal["legacy", "base", "candidate"]:
+        graph_fields = (
+            attempt.base_dependency_graph,
+            attempt.candidate_dependency_graph,
+            attempt.candidate_dependency_states_hash,
+        )
+        if all(item is None for item in graph_fields):
+            return "legacy"
+        if (
+            manifest.schema_version != "2.3"
+            or attempt.candidate_dependency_graph is None
+            or attempt.candidate_dependency_states_hash is None
+        ):
+            raise _state_invalid(
+                "Interrupted P5 attempt dependency identity is incomplete."
+            )
+        active_graph = manifest.active_dependency_graph
+        active_states_hash = _dependency_states_hash(manifest.dependency_states)
+        if (
+            active_graph == attempt.candidate_dependency_graph
+            and active_states_hash == attempt.candidate_dependency_states_hash
+        ):
+            graph = self._reopen_dependency_graph(
+                attempt.candidate_dependency_graph
+            )
+            self._verify_dependency_candidate(
+                manifest, graph, manifest.dependency_states
+            )
+            return "candidate"
+        if active_graph == attempt.base_dependency_graph:
+            self._reopen_dependency_graph(attempt.candidate_dependency_graph)
+            return "base"
+        raise _state_invalid(
+            "Production Manifest selects a mixed interrupted dependency graph."
+        )
+
+    @staticmethod
+    def _interrupted_dependency_graph_item(
+        manifest: ProductionManifest,
+        attempt: StateCommitAttempt,
+    ) -> RecoveryItem | None:
+        candidate = attempt.candidate_dependency_graph
+        if candidate is None or candidate == manifest.active_dependency_graph:
+            return None
+        return RecoveryItem(
+            path=candidate.path,
+            disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
+            sha256=candidate.file_sha256,
+        )
+
+    @staticmethod
+    def _candidate_hash_with_optional_graph(
+        artifacts: tuple[PreparedArtifact, ...],
+        attempt: StateCommitAttempt,
+    ) -> tuple[str, ...]:
+        hashes = [_candidate_artifacts_hash(artifacts)]
+        graph = attempt.candidate_dependency_graph
+        if graph is not None and all(
+            item.relative_path != graph.path for item in artifacts
+        ):
+            hashes.append(
+                _candidate_artifacts_hash(
+                    (
+                        *artifacts,
+                        PreparedArtifact(graph.path, b"", graph.file_sha256),
+                    )
+                )
+            )
+        return tuple(hashes)
 
     @staticmethod
     def _render_graph_recovery_items(
@@ -3850,6 +4357,9 @@ class ProductionStateCommitter:
                 changed = True
                 continue
             if attempt.operation == "voice_generation":
+                dependency_outcome = self._recovery_dependency_outcome(
+                    manifest, attempt
+                )
                 active_pair = (manifest.active_project, manifest.active_registry)
                 base_pair = (attempt.base_project, attempt.base_registry)
                 if attempt.voice_phase == "candidate":
@@ -3874,9 +4384,10 @@ class ProductionStateCommitter:
                         attempt.candidate_audio_asset_ids,
                         attempt.candidate_caption_asset_ids,
                     )
-                    if (
-                        _candidate_artifacts_hash(replay.artifacts)
-                        != attempt.candidate_artifacts_hash
+                    if attempt.candidate_artifacts_hash not in (
+                        self._candidate_hash_with_optional_graph(
+                            replay.artifacts, attempt
+                        )
                     ):
                         raise _state_invalid("Voice recovery candidate graph hash is invalid.")
                     candidate_pair = (
@@ -3884,6 +4395,10 @@ class ProductionStateCommitter:
                         attempt.candidate_registry,
                     )
                     if active_pair == candidate_pair:
+                        if dependency_outcome not in {"legacy", "candidate"}:
+                            raise _state_invalid(
+                                "Voice recovery selects a mixed candidate graph."
+                            )
                         replacement = _validated_transition(
                             attempt,
                             {
@@ -3895,6 +4410,10 @@ class ProductionStateCommitter:
                             },
                         )
                     elif active_pair == base_pair:
+                        if dependency_outcome not in {"legacy", "base"}:
+                            raise _state_invalid(
+                                "Voice recovery selects a mixed base graph."
+                            )
                         replacement = _validated_transition(
                             attempt,
                             {
@@ -3910,6 +4429,11 @@ class ProductionStateCommitter:
                                 disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
                             )
                         )
+                        dependency_item = self._interrupted_dependency_graph_item(
+                            manifest, attempt
+                        )
+                        if dependency_item is not None:
+                            items.append(dependency_item)
                     else:
                         raise _state_invalid(
                             "Production Manifest selects a mixed interrupted voice pair."
@@ -3941,6 +4465,9 @@ class ProductionStateCommitter:
                 changed = True
                 continue
             if attempt.operation == "render_state":
+                dependency_outcome = self._recovery_dependency_outcome(
+                    manifest, attempt
+                )
                 active_pair = (manifest.active_project, manifest.active_registry)
                 base_pair = (attempt.base_project, attempt.base_registry)
                 if active_pair != base_pair:
@@ -3979,16 +4506,28 @@ class ProductionStateCommitter:
                         project=attempt.base_project,
                         registry=attempt.base_registry,
                     )
-                    if (
+                    render_hashes = {
                         self._render_state_artifacts_hash(
                             state, attempt.candidate_render_state
                         )
-                        != attempt.candidate_artifacts_hash
-                    ):
+                    }
+                    if attempt.candidate_dependency_graph is not None:
+                        render_hashes.add(
+                            self._render_state_artifacts_hash(
+                                state,
+                                attempt.candidate_render_state,
+                                graph=attempt.candidate_dependency_graph,
+                            )
+                        )
+                    if attempt.candidate_artifacts_hash not in render_hashes:
                         raise _state_invalid(
                             "Interrupted render candidate artifact hash is invalid."
                         )
                     if manifest.active_render_state == attempt.candidate_render_state:
+                        if dependency_outcome not in {"legacy", "candidate"}:
+                            raise _state_invalid(
+                                "Render recovery selects a mixed candidate graph."
+                            )
                         replacement = _validated_transition(
                             attempt,
                             {
@@ -3999,6 +4538,10 @@ class ProductionStateCommitter:
                             },
                         )
                     elif manifest.active_render_state == attempt.base_render_state:
+                        if dependency_outcome not in {"legacy", "base"}:
+                            raise _state_invalid(
+                                "Render recovery selects a mixed base graph."
+                            )
                         replacement = _validated_transition(
                             attempt,
                             {
@@ -4014,6 +4557,11 @@ class ProductionStateCommitter:
                                 disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
                             )
                         )
+                        dependency_item = self._interrupted_dependency_graph_item(
+                            manifest, attempt
+                        )
+                        if dependency_item is not None:
+                            items.append(dependency_item)
                     else:
                         raise _state_invalid(
                             "Production Manifest selects a mixed interrupted render state."
@@ -4022,6 +4570,9 @@ class ProductionStateCommitter:
                 changed = True
                 continue
             if attempt.operation == "audio_import":
+                dependency_outcome = self._recovery_dependency_outcome(
+                    manifest, attempt
+                )
                 if (
                     attempt.candidate_project is not None
                     or attempt.candidate_registry is None
@@ -4034,6 +4585,10 @@ class ProductionStateCommitter:
                 base_pair = (attempt.base_project, attempt.base_registry)
                 candidate_pair = (attempt.base_project, attempt.candidate_registry)
                 if active_pair == candidate_pair:
+                    if dependency_outcome not in {"legacy", "candidate"}:
+                        raise _state_invalid(
+                            "Audio recovery selects a mixed candidate graph."
+                        )
                     replacement = _validated_transition(
                         attempt,
                         {
@@ -4044,6 +4599,10 @@ class ProductionStateCommitter:
                         },
                     )
                 elif active_pair == base_pair:
+                    if dependency_outcome not in {"legacy", "base"}:
+                        raise _state_invalid(
+                            "Audio recovery selects a mixed base graph."
+                        )
                     replacement = _validated_transition(
                         attempt,
                         {
@@ -4059,6 +4618,11 @@ class ProductionStateCommitter:
                             disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
                         )
                     )
+                    dependency_item = self._interrupted_dependency_graph_item(
+                        manifest, attempt
+                    )
+                    if dependency_item is not None:
+                        items.append(dependency_item)
                 else:
                     raise _state_invalid(
                         "Production Manifest selects a mixed interrupted audio import pair."
@@ -4075,7 +4639,14 @@ class ProductionStateCommitter:
             active_pair = (manifest.active_project, manifest.active_registry)
             candidate_pair = (attempt.candidate_project, attempt.candidate_registry)
             base_pair = (attempt.base_project, attempt.base_registry)
+            dependency_outcome = self._recovery_dependency_outcome(
+                manifest, attempt
+            )
             if active_pair == candidate_pair:
+                if dependency_outcome not in {"legacy", "candidate"}:
+                    raise _state_invalid(
+                        "State recovery selects a mixed candidate graph."
+                    )
                 replacement = _validated_transition(
                     attempt,
                     {
@@ -4090,6 +4661,10 @@ class ProductionStateCommitter:
                     "Production Manifest selects a mixed interrupted state commit pair."
                 )
             else:
+                if dependency_outcome not in {"legacy", "base"}:
+                    raise _state_invalid(
+                        "State recovery selects a mixed base graph."
+                    )
                 replacement = _validated_transition(
                     attempt,
                     {
@@ -4105,13 +4680,21 @@ class ProductionStateCommitter:
                         disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
                     )
                 )
+                dependency_item = self._interrupted_dependency_graph_item(
+                    manifest, attempt
+                )
+                if dependency_item is not None:
+                    items.append(dependency_item)
             repaired.append(replacement)
             changed = True
         return repaired, changed, items
 
     @staticmethod
     def _render_state_artifacts_hash(
-        state: RenderStateSnapshot, pointer: RenderStateSnapshotPointer
+        state: RenderStateSnapshot,
+        pointer: RenderStateSnapshotPointer,
+        *,
+        graph: DependencyGraphSnapshotPointer | None = None,
     ) -> str:
         pairs = [
             (state.timeline.path, state.timeline.file_sha256),
@@ -4122,6 +4705,8 @@ class ProductionStateCommitter:
             (state.output.path, state.output.file_sha256),
             (pointer.path, pointer.file_sha256),
         ]
+        if graph is not None:
+            pairs.append((graph.path, graph.file_sha256))
         artifacts = tuple(
             PreparedArtifact(path, b"", digest)
             for path, digest in sorted(pairs, key=lambda item: item[0].as_posix())
@@ -4665,8 +5250,30 @@ class ProductionStateCommitter:
             if existing is not None:
                 self._validate_replay(existing, request, candidate_artifacts_hash)
                 if existing.status is StateCommitStatus.SUCCEEDED:
+                    transition = request.dependency_graph_transition
+                    if transition is not None:
+                        if (
+                            manifest.active_project != request.next_project
+                            or manifest.active_registry != request.next_registry
+                            or manifest.active_dependency_graph
+                            != transition.candidate_dependency_graph
+                            or manifest.dependency_states
+                            != transition.candidate_dependency_states
+                        ):
+                            raise _state_invalid(
+                                "Succeeded P5 commit replay no longer matches active state."
+                            )
+                        graph = self._reopen_dependency_graph(
+                            transition.candidate_dependency_graph
+                        )
+                        self._verify_dependency_candidate(
+                            manifest, graph, manifest.dependency_states
+                        )
                     return manifest
                 raise _state_invalid("Production state commit attempt ID was already used.")
+            graph_transition, candidate_graph = self._validate_request_dependency_transition(
+                manifest, request
+            )
             unresolved = next(
                 (
                     item
@@ -4687,19 +5294,28 @@ class ProductionStateCommitter:
                 raise _state_invalid("Production Manifest revision is stale.")
 
             retained_render_state = manifest.active_render_state
-            if (
+            if manifest.schema_version != "2.3" and (
                 request.next_project != manifest.active_project
                 or request.next_registry != manifest.active_registry
             ):
                 retained_render_state = None
             elif retained_render_state is not None:
                 try:
-                    load_verified_render_state(
-                        self._project_root,
-                        retained_render_state,
-                        project=manifest.active_project,
-                        registry=manifest.active_registry,
-                    )
+                    if manifest.schema_version == "2.3":
+                        active_bundle = load_production_project_candidate(
+                            self._project_root,
+                            manifest,
+                            manifest.active_project.path,
+                            manifest.active_registry.path,
+                        )
+                        _load_exact_render_state(active_bundle, retained_render_state)
+                    else:
+                        load_verified_render_state(
+                            self._project_root,
+                            retained_render_state,
+                            project=manifest.active_project,
+                            registry=manifest.active_registry,
+                        )
                 except AiVideoError as exc:
                     raise _state_invalid(
                         "Active render state could not be retained safely.",
@@ -4718,13 +5334,29 @@ class ProductionStateCommitter:
                 ),
                 candidate_registry=request.next_registry,
                 candidate_artifacts_hash=candidate_artifacts_hash,
+                base_dependency_graph=(
+                    None if graph_transition is None else graph_transition.base_dependency_graph
+                ),
+                candidate_dependency_graph=(
+                    None
+                    if graph_transition is None
+                    else graph_transition.candidate_dependency_graph
+                ),
+                candidate_dependency_states_hash=(
+                    None
+                    if graph_transition is None
+                    else graph_transition.candidate_dependency_states_hash
+                ),
                 started_at=_timestamp(),
             )
             running_manifest = _validated_transition(
                 manifest,
                 {
                     "schema_version": (
-                        "2.2" if request.operation == "audio_import" else manifest.schema_version
+                        "2.2"
+                        if request.operation == "audio_import"
+                        and manifest.schema_version != "2.3"
+                        else manifest.schema_version
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,
                     "attempts": manifest.attempts + (running_attempt,),
@@ -4740,19 +5372,38 @@ class ProductionStateCommitter:
                 for artifact in sorted(request.artifacts, key=lambda item: item.relative_path.as_posix()):
                     self._write_immutable_artifact(artifact, attempt_id=request.attempt_id)
                 self._verify_committed_candidates(request)
+                if graph_transition is not None and candidate_graph is not None:
+                    self._verify_dependency_candidate(
+                        manifest,
+                        candidate_graph,
+                        graph_transition.candidate_dependency_states,
+                        project_pointer=request.next_project,
+                        registry_pointer=request.next_registry,
+                    )
                 succeeded_attempt = _validated_transition(running_attempt, {"status": StateCommitStatus.SUCCEEDED, "finished_at": _timestamp()})
+                final_update: dict[str, object] = {
+                    "schema_version": (
+                        "2.2"
+                        if request.operation == "audio_import"
+                        and manifest.schema_version != "2.3"
+                        else manifest.schema_version
+                    ),
+                    "manifest_revision": manifest.manifest_revision + 2,
+                    "active_project": request.next_project,
+                    "active_registry": request.next_registry,
+                    "active_render_state": retained_render_state,
+                    "attempts": manifest.attempts + (succeeded_attempt,),
+                }
+                if graph_transition is not None:
+                    final_update.update(
+                        {
+                            "active_dependency_graph": graph_transition.candidate_dependency_graph,
+                            "dependency_states": graph_transition.candidate_dependency_states,
+                        }
+                    )
                 final_manifest = _validated_transition(
                     manifest,
-                    {
-                        "schema_version": (
-                            "2.2" if request.operation == "audio_import" else manifest.schema_version
-                        ),
-                        "manifest_revision": manifest.manifest_revision + 2,
-                        "active_project": request.next_project,
-                        "active_registry": request.next_registry,
-                        "active_render_state": retained_render_state,
-                        "attempts": manifest.attempts + (succeeded_attempt,),
-                    },
+                    final_update,
                 )
 
                 def mark_manifest_replaced() -> None:
@@ -4774,7 +5425,10 @@ class ProductionStateCommitter:
                     manifest,
                     {
                         "schema_version": (
-                            "2.2" if request.operation == "audio_import" else manifest.schema_version
+                            "2.2"
+                            if request.operation == "audio_import"
+                            and manifest.schema_version != "2.3"
+                            else manifest.schema_version
                         ),
                         "manifest_revision": manifest.manifest_revision + 2,
                         "attempts": manifest.attempts + (failed_attempt,),
@@ -4865,6 +5519,25 @@ class ProductionStateCommitter:
             )
             or existing.candidate_registry != request.next_registry
             or existing.candidate_artifacts_hash != candidate_artifacts_hash
+            or (
+                request.dependency_graph_transition is None
+                and (
+                    existing.base_dependency_graph is not None
+                    or existing.candidate_dependency_graph is not None
+                    or existing.candidate_dependency_states_hash is not None
+                )
+            )
+            or (
+                request.dependency_graph_transition is not None
+                and (
+                    existing.base_dependency_graph
+                    != request.dependency_graph_transition.base_dependency_graph
+                    or existing.candidate_dependency_graph
+                    != request.dependency_graph_transition.candidate_dependency_graph
+                    or existing.candidate_dependency_states_hash
+                    != request.dependency_graph_transition.candidate_dependency_states_hash
+                )
+            )
         ):
             raise _state_invalid(
                 "Production state commit attempt ID has different candidate snapshots."
