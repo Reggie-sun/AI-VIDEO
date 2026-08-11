@@ -1442,6 +1442,7 @@ def _verify_dependency_render_evidence(
     if not {
         (composition.node_id, timeline_node.node_id),
         (timeline_node.node_id, source_node.node_id),
+        (timeline_node.node_id, render_node.node_id),
         (source_node.node_id, render_node.node_id),
     }.issubset(edge_pairs):
         raise _invalid("Fresh render evidence unit has an invalid dependency shape.")

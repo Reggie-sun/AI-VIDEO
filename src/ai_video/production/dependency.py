@@ -862,34 +862,55 @@ def _render_execution_groups(
     """Return each render node's complete durable HyperFrames unit.
 
     Production graphs materialize ``composition -> timeline -> source -> render``
-    through one final RenderStateSnapshot activation.  Keeping all available
-    render-domain ancestors in the unit prevents callers from fabricating an
-    intermediate fresh timeline without committer-owned durable evidence.
+    through one final RenderStateSnapshot activation. Rejecting partial or
+    ambiguous render-domain shapes prevents the public selector from returning
+    an execution unit that the sole committer cannot durably apply.
     """
 
-    node_by_id = {node.node_id: node for node in graph.nodes}
-    incoming: dict[str, list[str]] = {node_id: [] for node_id in node_by_id}
-    for edge in graph.edges:
-        incoming[edge.target_node_id].append(edge.source_node_id)
-
-    groups: dict[str, tuple[str, ...]] = {}
-    for render_id, source_id in _source_render_pairs(graph).items():
-        group_ids = {source_id, render_id}
-        timeline_ids = {
-            predecessor
-            for target in (source_id, render_id)
-            for predecessor in incoming[target]
-            if node_by_id[predecessor].kind is DependencyNodeKind.RESOLVED_TIMELINE
-        }
-        group_ids.update(timeline_ids)
-        group_ids.update(
-            predecessor
-            for timeline_id in timeline_ids
-            for predecessor in incoming[timeline_id]
-            if node_by_id[predecessor].kind is DependencyNodeKind.COMPOSITION_SPEC
+    render_kinds = (
+        DependencyNodeKind.COMPOSITION_SPEC,
+        DependencyNodeKind.RESOLVED_TIMELINE,
+        DependencyNodeKind.RENDERER_SOURCE,
+        DependencyNodeKind.RENDER,
+    )
+    render_domain = tuple(node for node in graph.nodes if node.kind in render_kinds)
+    if not render_domain:
+        return {}
+    by_kind = {
+        kind: tuple(node for node in render_domain if node.kind is kind)
+        for kind in render_kinds
+    }
+    if len(render_domain) != 4 or any(len(nodes) != 1 for nodes in by_kind.values()):
+        raise _resolution_invalid(
+            "Selective render execution requires one complete render-domain unit."
         )
-        groups[render_id] = tuple(sorted(group_ids))
-    return groups
+    composition = by_kind[DependencyNodeKind.COMPOSITION_SPEC][0]
+    timeline = by_kind[DependencyNodeKind.RESOLVED_TIMELINE][0]
+    source = by_kind[DependencyNodeKind.RENDERER_SOURCE][0]
+    render = by_kind[DependencyNodeKind.RENDER][0]
+    required_edges = {
+        (composition.node_id, timeline.node_id),
+        (timeline.node_id, source.node_id),
+        (timeline.node_id, render.node_id),
+        (source.node_id, render.node_id),
+    }
+    edge_pairs = {(edge.source_node_id, edge.target_node_id) for edge in graph.edges}
+    if not required_edges.issubset(edge_pairs):
+        raise _resolution_invalid(
+            "Selective render execution requires the complete durable edge shape."
+        )
+    return {
+        render.node_id: tuple(
+            sorted(
+                (
+                    composition.node_id,
+                    timeline.node_id,
+                    source.node_id,
+                    render.node_id,
+                )
+            )
+        )
+    }
 
 
 def select_rebuild_nodes(resolution: DependencyResolution) -> SelectiveRebuildDecision:

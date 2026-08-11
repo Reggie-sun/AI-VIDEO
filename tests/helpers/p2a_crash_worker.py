@@ -15,6 +15,7 @@ from ai_video.production.models import (  # noqa: E402
     RendererKind,
     RendererSelectionReceipt,
 )
+from ai_video.production.composition import resolve_composition  # noqa: E402
 from ai_video.production.state_commit import (  # noqa: E402
     BeginRenderAttemptRequest,
     CommitPhase,
@@ -26,6 +27,7 @@ from production_project_factory import (  # noqa: E402
     attach_p5_render_dependency_transition,
     make_audio_import_upgrade_request,
     make_manifest_23_project,
+    make_p5_dependency_inputs,
     make_p5_bootstrap_transition,
     make_revision_two_request,
     make_voice_activation_request,
@@ -118,10 +120,88 @@ def main() -> int:
                 (root / "state/manifest.json").read_bytes()
             ).schema_version != "2.3":
                 make_manifest_23_project(root)
-        manifest = ProductionManifest.model_validate_json(
-            (root / "state/manifest.json").read_text(encoding="utf-8")
-        )
-        timeline = make_resolved_timeline()
+        manifest_path = root / "state/manifest.json"
+        manifest_payload = manifest_path.read_bytes()
+        manifest = ProductionManifest.model_validate_json(manifest_payload)
+        if mode == "graph_render_activate":
+            inputs = make_p5_dependency_inputs(root)
+            manifest_path.write_bytes(manifest_payload)
+            timeline = resolve_composition(
+                inputs.project,
+                inputs.composition_spec,
+                renderer_version="0.7.103",
+            )
+            asset_sources = {
+                span.asset_id: inputs.project.asset_paths[span.asset_id]
+                for span in (*timeline.visual_spans, *timeline.audio_spans)
+            }
+            asset_sources.update(
+                {
+                    cue.caption_asset_id: inputs.project.asset_paths[
+                        cue.caption_asset_id
+                    ]
+                    for cue in timeline.caption_cues
+                }
+            )
+            style = inputs.composition_spec.caption_tracks[0].style_reference
+            if style is None:
+                raise AssertionError("P5 crash fixture requires a caption style.")
+            asset_sources[style.artifact_id] = root / style.path
+            probe = {
+                "streams": [
+                    {
+                        "codec_type": "video",
+                        "width": timeline.delivery_profile.width,
+                        "height": timeline.delivery_profile.height,
+                        "r_frame_rate": f"{timeline.delivery_profile.fps}/1",
+                        "nb_frames": str(timeline.total_frames),
+                        "codec_name": "h264",
+                    },
+                    {
+                        "codec_type": "audio",
+                        "index": 1,
+                        "codec_name": "aac",
+                        "sample_rate": str(timeline.sample_rate),
+                        "channels": 2,
+                        "channel_layout": "stereo",
+                    },
+                ],
+                "packets": [
+                    {
+                        "stream_index": 1,
+                        "pts": "-1024",
+                        "duration": "1024",
+                        "side_data_list": [
+                            {
+                                "side_data_type": "Skip Samples",
+                                "skip_samples": 1024,
+                                "discard_padding": 0,
+                            }
+                        ],
+                    },
+                    {"stream_index": 1, "pts": "0", "duration": "768"},
+                ],
+            }
+            decoded_audio = lambda _fd, _rate, _channels: (
+                timeline.total_samples + 256,
+                "a" * 64,
+            )
+        else:
+            timeline = make_resolved_timeline()
+            asset_sources = make_asset_sources(root, timeline)
+            probe = {
+                "streams": [
+                    {
+                        "codec_type": "video",
+                        "width": 320,
+                        "height": 180,
+                        "r_frame_rate": "24/1",
+                        "nb_frames": "10",
+                        "codec_name": "h264",
+                    }
+                ]
+            }
+            decoded_audio = None
         selection = RendererSelectionReceipt(
             receipt_id="selection-process-crash",
             attempt_id="render-process-crash",
@@ -147,7 +227,7 @@ def main() -> int:
                 manifest.manifest_revision, manifest.active_render_state, selection
             ),
             timeline=timeline,
-            asset_sources=make_asset_sources(root, timeline),
+            asset_sources=asset_sources,
             allowed_asset_root=root,
             runner_factory=lambda: FakeRunner(),
             browser_path=browser,
@@ -158,21 +238,11 @@ def main() -> int:
                 if mode == "graph_render_activate"
                 else None
             ),
-            probe=lambda fd: {
-                "streams": [
-                    {
-                        "codec_type": "video",
-                        "width": 320,
-                        "height": 180,
-                        "r_frame_rate": "24/1",
-                        "nb_frames": "10",
-                        "codec_name": "h264",
-                    }
-                ]
-            },
+            probe=lambda _fd: probe,
             decoded_frames=lambda fd: hashlib.sha256(
                 os.pread(fd, os.fstat(fd).st_size, 0)
             ).hexdigest(),
+            decoded_audio=decoded_audio,
         )
         return 0
     if mode == "voice":

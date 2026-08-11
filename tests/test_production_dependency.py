@@ -1772,6 +1772,33 @@ def test_select_rebuild_nodes_never_emits_unpaired_renderer_nodes():
     )
 
 
+def test_select_rebuild_nodes_rejects_partial_render_domain_graph():
+    nodes = tuple(
+        node
+        for node in _render_pipeline_graph().nodes
+        if node.kind
+        in {DependencyNodeKind.RENDERER_SOURCE, DependencyNodeKind.RENDER}
+    )
+    graph = dep_mod.build_dependency_graph(
+        nodes,
+        (
+            make_edge(
+                source_node_id="renderer-source:composition-1",
+                target_node_id="render:composition-1",
+                reason=DependencyReason.RENDER_EXECUTION,
+                key="renderer.source.contract",
+            ),
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        dep_mod.select_rebuild_nodes(
+            dep_mod.resolve_dependency_state(graph, previous=())
+        )
+
+    assert exc_info.value.code is ErrorCode.DEPENDENCY_RESOLUTION_INVALID
+
+
 def test_select_rebuild_nodes_does_not_auto_retry_failed_render_pair():
     graph = _render_pipeline_graph()
     desired = dep_mod.desired_fingerprints(graph)
