@@ -1274,6 +1274,30 @@ def build_production_dependency_graph(
             if track is not None and track.shot_id is not None
             else None
         )
+        if request is None and role is DependencySemanticRole.VOICE:
+            metadata = asset.audio_metadata
+            matching_requests = tuple(
+                candidate
+                for candidate in inputs.voice_requests
+                if metadata is not None
+                and asset.egress is not None
+                and asset.egress.request_fingerprint
+                == candidate.voice_request_fingerprint
+                and candidate.input_artifact_ids == asset.input_artifact_ids
+                and candidate.input_fingerprint == asset.input_fingerprint
+                and candidate.audio_kind is metadata.audio_kind
+                and candidate.script_hash == metadata.script_hash
+                and candidate.voice_id == metadata.voice_id
+                and candidate.language == metadata.language
+                and candidate.output_sample_rate_hz == metadata.sample_rate_hz
+                and candidate.output_channels == metadata.channels
+            )
+            if len(matching_requests) > 1:
+                raise _graph_invalid(
+                    "voice asset matches more than one VoiceGenerationRequest"
+                )
+            if matching_requests:
+                request = matching_requests[0]
         contribution_values: dict[str, str] = {
             "asset.inputs": _fp(
                 "ai-video-asset-inputs/1",

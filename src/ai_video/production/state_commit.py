@@ -232,6 +232,12 @@ class CommitPhase(str, Enum):
     AFTER_ARTIFACT_PROMOTION = "after_artifact_promotion"
     AFTER_ARTIFACT_DIRECTORY_FSYNC = "after_artifact_directory_fsync"
     AFTER_ARTIFACT_VERIFICATION = "after_artifact_verification"
+    AFTER_GRAPH_CANDIDATE_TEMP_WRITE = "after_graph_candidate_temp_write"
+    AFTER_GRAPH_CANDIDATE_FILE_FSYNC = "after_graph_candidate_file_fsync"
+    AFTER_GRAPH_CANDIDATE_PROMOTION = "after_graph_candidate_promotion"
+    AFTER_GRAPH_CANDIDATE_DIRECTORY_FSYNC = "after_graph_candidate_directory_fsync"
+    AFTER_GRAPH_CANDIDATE_VERIFICATION = "after_graph_candidate_verification"
+    AFTER_GRAPH_FINAL_MANIFEST_REPLACE = "after_graph_final_manifest_replace"
     AFTER_MANIFEST_TEMP_WRITE = "after_manifest_temp_write"
     AFTER_MANIFEST_FILE_FSYNC = "after_manifest_file_fsync"
     AFTER_MANIFEST_REPLACE = "after_manifest_replace"
@@ -263,6 +269,15 @@ class CrashInjector(Protocol):
 class NoopCrashInjector:
     def checkpoint(self, phase: CommitPhase) -> None:
         return None
+
+
+_GRAPH_ARTIFACT_PHASES = {
+    CommitPhase.AFTER_ARTIFACT_TEMP_WRITE: CommitPhase.AFTER_GRAPH_CANDIDATE_TEMP_WRITE,
+    CommitPhase.AFTER_ARTIFACT_FILE_FSYNC: CommitPhase.AFTER_GRAPH_CANDIDATE_FILE_FSYNC,
+    CommitPhase.AFTER_ARTIFACT_PROMOTION: CommitPhase.AFTER_GRAPH_CANDIDATE_PROMOTION,
+    CommitPhase.AFTER_ARTIFACT_DIRECTORY_FSYNC: CommitPhase.AFTER_GRAPH_CANDIDATE_DIRECTORY_FSYNC,
+    CommitPhase.AFTER_ARTIFACT_VERIFICATION: CommitPhase.AFTER_GRAPH_CANDIDATE_VERIFICATION,
+}
 
 
 _RESERVED_TARGETS = {
@@ -1734,17 +1749,15 @@ class ProductionStateCommitter:
                     request.artifacts, key=lambda item: item.relative_path.as_posix()
                 ):
                     self._write_immutable_artifact(
-                        artifact, attempt_id=request.attempt_id
+                        artifact,
+                        attempt_id=request.attempt_id,
+                        dependency_graph=(
+                            graph_transition is not None
+                            and artifact.relative_path
+                            == graph_transition.candidate_dependency_graph.path
+                        ),
                     )
                 self._verify_voice_committed_candidates(request)
-                if graph_transition is not None and candidate_graph is not None:
-                    self._verify_dependency_candidate(
-                        manifest,
-                        candidate_graph,
-                        graph_transition.candidate_dependency_states,
-                        project_pointer=request.next_project,
-                        registry_pointer=request.next_registry,
-                    )
                 candidate_attempt = _validated_transition(
                     attempt,
                     {
@@ -1772,6 +1785,31 @@ class ProductionStateCommitter:
                         ),
                     },
                 )
+                if graph_transition is not None and candidate_graph is not None:
+                    verification_attempt = _validated_transition(
+                        candidate_attempt,
+                        {
+                            "status": StateCommitStatus.SUCCEEDED,
+                            "voice_phase": "activate",
+                            "finished_at": _timestamp(),
+                            "error_code": None,
+                            "error_message": None,
+                        },
+                    )
+                    verification_attempts = tuple(
+                        verification_attempt
+                        if item.attempt_id == request.attempt_id
+                        else item
+                        for item in manifest.attempts
+                    )
+                    self._verify_dependency_candidate(
+                        manifest,
+                        candidate_graph,
+                        graph_transition.candidate_dependency_states,
+                        project_pointer=request.next_project,
+                        registry_pointer=request.next_registry,
+                        attempts=verification_attempts,
+                    )
                 candidate_manifest = _validated_transition(
                     manifest,
                     {
@@ -1831,6 +1869,10 @@ class ProductionStateCommitter:
             def mark_replaced() -> None:
                 nonlocal final_replaced
                 final_replaced = True
+                if graph_transition is not None:
+                    self._crash_injector.checkpoint(
+                        CommitPhase.AFTER_GRAPH_FINAL_MANIFEST_REPLACE
+                    )
 
             try:
                 self._write_manifest_atomic(final, on_replace=mark_replaced)
@@ -2649,7 +2691,9 @@ class ProductionStateCommitter:
                             == graph_transition.candidate_dependency_graph.path
                         ):
                             self._write_immutable_artifact(
-                                artifact, attempt_id=request.attempt_id
+                                artifact,
+                                attempt_id=request.attempt_id,
+                                dependency_graph=True,
                             )
                         else:
                             self._write_render_immutable_artifact(
@@ -2754,6 +2798,10 @@ class ProductionStateCommitter:
                 def mark_final_replaced() -> None:
                     nonlocal final_replaced
                     final_replaced = True
+                    if graph_transition is not None:
+                        self._crash_injector.checkpoint(
+                            CommitPhase.AFTER_GRAPH_FINAL_MANIFEST_REPLACE
+                        )
 
                 self._write_render_manifest_atomic(
                     final_manifest,
@@ -3597,7 +3645,11 @@ class ProductionStateCommitter:
 
                 self._write_manifest_atomic(running_manifest, on_replace=mark_running)
                 self._crash_injector.checkpoint(CommitPhase.AFTER_ATTEMPT_STARTED)
-                self._write_immutable_artifact(graph_artifact, attempt_id=attempt_id)
+                self._write_immutable_artifact(
+                    graph_artifact,
+                    attempt_id=attempt_id,
+                    dependency_graph=True,
+                )
                 self._reopen_dependency_graph(transition.candidate_dependency_graph)
                 succeeded = _validated_transition(
                     running,
@@ -3616,6 +3668,9 @@ class ProductionStateCommitter:
 
                 def mark_final() -> None:
                     final_replaced[0] = True
+                    self._crash_injector.checkpoint(
+                        CommitPhase.AFTER_GRAPH_FINAL_MANIFEST_REPLACE
+                    )
 
                 self._write_manifest_atomic(final, on_replace=mark_final)
                 reopened = self._read_manifest()
@@ -4196,25 +4251,87 @@ class ProductionStateCommitter:
             )
             return "candidate"
         if active_graph == attempt.base_dependency_graph:
-            self._reopen_dependency_graph(attempt.candidate_dependency_graph)
+            try:
+                self._reopen_dependency_graph(attempt.candidate_dependency_graph)
+            except AiVideoError:
+                candidate_absent = self._dependency_graph_candidate_is_absent(
+                    attempt
+                )
+                recoverable_absence = (
+                    attempt.operation in {"commit_project_registry", "audio_import"}
+                    and candidate_absent
+                )
+                if (
+                    not (
+                        candidate_absent
+                        and self._has_owned_dependency_graph_temp(attempt)
+                    )
+                    and not recoverable_absence
+                ):
+                    raise
             return "base"
         raise _state_invalid(
             "Production Manifest selects a mixed interrupted dependency graph."
         )
 
-    @staticmethod
     def _interrupted_dependency_graph_item(
+        self,
         manifest: ProductionManifest,
         attempt: StateCommitAttempt,
     ) -> RecoveryItem | None:
         candidate = attempt.candidate_dependency_graph
         if candidate is None or candidate == manifest.active_dependency_graph:
             return None
+        if self._dependency_graph_candidate_is_absent(attempt):
+            return None
+        self._reopen_dependency_graph(candidate)
         return RecoveryItem(
             path=candidate.path,
             disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
             sha256=candidate.file_sha256,
         )
+
+    def _has_owned_dependency_graph_temp(
+        self, attempt: StateCommitAttempt
+    ) -> bool:
+        candidate = attempt.candidate_dependency_graph
+        if candidate is None or attempt.status is not StateCommitStatus.RUNNING:
+            return False
+        expected_path = canonical_dependency_graph_snapshot_path(
+            candidate.revision_id
+        )
+        if candidate.path != expected_path:
+            raise _state_invalid(
+                "Interrupted dependency graph path is noncanonical."
+            )
+        final_path = self._project_root / expected_path
+        temp_path = final_path.parent / _owned_temp_name(
+            attempt.attempt_id, final_path
+        )
+        try:
+            self._recovery_file_digest(temp_path)
+        except FileNotFoundError:
+            return False
+        return True
+
+    def _dependency_graph_candidate_is_absent(
+        self, attempt: StateCommitAttempt
+    ) -> bool:
+        candidate = attempt.candidate_dependency_graph
+        if candidate is None or attempt.status is not StateCommitStatus.RUNNING:
+            return False
+        expected_path = canonical_dependency_graph_snapshot_path(
+            candidate.revision_id
+        )
+        if candidate.path != expected_path:
+            raise _state_invalid(
+                "Interrupted dependency graph path is noncanonical."
+            )
+        try:
+            self._recovery_file_digest(self._project_root / expected_path)
+        except FileNotFoundError:
+            return True
+        return False
 
     @staticmethod
     def _candidate_hash_with_optional_graph(
@@ -4328,8 +4445,18 @@ class ProductionStateCommitter:
                 elif active_graph == attempt.base_dependency_graph:
                     try:
                         graph = self._reopen_dependency_graph(candidate)
-                    except FileNotFoundError:
-                        graph = None
+                    except AiVideoError:
+                        if (
+                            self._dependency_graph_candidate_is_absent(attempt)
+                            and (
+                                self._has_owned_dependency_graph_temp(attempt)
+                                or attempt.operation
+                                == "bootstrap_dependency_graph"
+                            )
+                        ):
+                            graph = None
+                        else:
+                            raise
                     if graph is not None:
                         items.append(
                             RecoveryItem(
@@ -4794,12 +4921,42 @@ class ProductionStateCommitter:
         for attempt in attempts:
             if attempt.status is StateCommitStatus.SUCCEEDED:
                 continue
+            try:
+                for relative in _list_regular_files_nofollow(
+                    self._state_directory()
+                ):
+                    if (
+                        relative.name.startswith(
+                            _owned_temp_prefix(attempt.attempt_id)
+                        )
+                        and relative.name.endswith(".tmp")
+                    ):
+                        paths.add(self._state_directory() / relative)
+            except (OSError, ValueError) as exc:
+                raise _state_invalid(
+                    "Dependency graph temporary files could not be inspected.",
+                    str(exc),
+                ) from exc
             if attempt.candidate_project is not None:
                 project_path = self._validate_recovery_project_pointer(attempt.candidate_project)
                 paths.add(project_path.parent / _owned_temp_name(attempt.attempt_id, project_path))
             if attempt.candidate_registry is not None:
                 registry_path = self._validate_recovery_registry_pointer(attempt.candidate_registry)
                 paths.add(registry_path.parent / _owned_temp_name(attempt.attempt_id, registry_path))
+            if attempt.candidate_dependency_graph is not None:
+                graph_pointer = attempt.candidate_dependency_graph
+                expected_graph_path = canonical_dependency_graph_snapshot_path(
+                    graph_pointer.revision_id
+                )
+                if graph_pointer.path != expected_graph_path:
+                    raise _state_invalid(
+                        "Production recovery dependency graph path is unsafe."
+                    )
+                graph_path = self._project_root / expected_graph_path
+                paths.add(
+                    graph_path.parent
+                    / _owned_temp_name(attempt.attempt_id, graph_path)
+                )
             if (
                 attempt.operation == "render_state"
                 and attempt.candidate_render_state is not None
@@ -4910,9 +5067,62 @@ class ProductionStateCommitter:
             items.setdefault(item.path, item)
         for item in self._registry_orphan_items(manifest):
             items.setdefault(item.path, item)
+        interrupted_graph_paths = {
+            attempt.candidate_dependency_graph.path
+            for attempt in attempts
+            if attempt.status is not StateCommitStatus.SUCCEEDED
+            and attempt.candidate_dependency_graph is not None
+        }
+        for item in self._dependency_graph_orphan_items(manifest):
+            if item.path in interrupted_graph_paths:
+                continue
+            items.setdefault(item.path, item)
         for item in self._render_orphan_items(manifest):
             items.setdefault(item.path, item)
         return tuple(items[path] for path in sorted(items))
+
+    def _dependency_graph_orphan_items(
+        self, manifest: ProductionManifest
+    ) -> tuple[RecoveryItem, ...]:
+        directory = self._project_root / "state"
+        pattern = re.compile(
+            r"^dependency_graph\.(?P<revision>[0-9a-f]{64})\.json$"
+        )
+        items: list[RecoveryItem] = []
+        for path, match in self._recovery_namespace_entries(directory, pattern):
+            relative = path.relative_to(self._project_root)
+            if (
+                manifest.active_dependency_graph is not None
+                and relative == manifest.active_dependency_graph.path
+            ):
+                continue
+            try:
+                snapshot = _read_regular_file_nofollow(
+                    path, contained_by=self._project_root / "state"
+                )
+                graph = DependencyGraphSnapshot.model_validate_json(snapshot.data)
+                if (
+                    graph.revision_id != match.group("revision")
+                    or graph.content_hash != dependency_graph_semantic_sha256(graph)
+                ):
+                    continue
+                pointer = DependencyGraphSnapshotPointer(
+                    revision_id=graph.revision_id,
+                    content_hash=graph.content_hash,
+                    path=relative,
+                    file_sha256=snapshot.file_sha256,
+                )
+                self._reopen_dependency_graph(pointer)
+            except (AiVideoError, OSError, ValidationError, ValueError):
+                continue
+            items.append(
+                RecoveryItem(
+                    path=relative,
+                    disposition=RecoveryDisposition.ORPHAN_PRESERVED,
+                    sha256=snapshot.file_sha256,
+                )
+            )
+        return tuple(items)
 
     def _render_orphan_items(
         self, manifest: ProductionManifest
@@ -5370,7 +5580,15 @@ class ProductionStateCommitter:
                 self._write_manifest_atomic(running_manifest, on_replace=mark_running_replaced)
                 self._crash_injector.checkpoint(CommitPhase.AFTER_ATTEMPT_STARTED)
                 for artifact in sorted(request.artifacts, key=lambda item: item.relative_path.as_posix()):
-                    self._write_immutable_artifact(artifact, attempt_id=request.attempt_id)
+                    self._write_immutable_artifact(
+                        artifact,
+                        attempt_id=request.attempt_id,
+                        dependency_graph=(
+                            graph_transition is not None
+                            and artifact.relative_path
+                            == graph_transition.candidate_dependency_graph.path
+                        ),
+                    )
                 self._verify_committed_candidates(request)
                 if graph_transition is not None and candidate_graph is not None:
                     self._verify_dependency_candidate(
@@ -5408,6 +5626,10 @@ class ProductionStateCommitter:
 
                 def mark_manifest_replaced() -> None:
                     final_manifest_replaced[0] = True
+                    if graph_transition is not None:
+                        self._crash_injector.checkpoint(
+                            CommitPhase.AFTER_GRAPH_FINAL_MANIFEST_REPLACE
+                        )
 
                 self._write_manifest_atomic(final_manifest, on_replace=mark_manifest_replaced)
                 return self._read_manifest()
@@ -5685,8 +5907,19 @@ class ProductionStateCommitter:
                     no_primary_message="Could not clean production state temporary file.",
                 )
 
+    def _artifact_checkpoint(
+        self, phase: CommitPhase, dependency_graph: bool
+    ) -> None:
+        self._crash_injector.checkpoint(phase)
+        if dependency_graph:
+            self._crash_injector.checkpoint(_GRAPH_ARTIFACT_PHASES[phase])
+
     def _write_immutable_artifact(
-        self, artifact: PreparedArtifact, *, attempt_id: str
+        self,
+        artifact: PreparedArtifact,
+        *,
+        attempt_id: str,
+        dependency_graph: bool = False,
     ) -> Path:
         expected_sha256 = hashlib.sha256(artifact.payload).hexdigest()
         if artifact.file_sha256 != expected_sha256:
@@ -5699,10 +5932,14 @@ class ProductionStateCommitter:
         try:
             with self._ops.open_exclusive(temp_path) as handle:
                 handle.write(artifact.payload)
-                self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_TEMP_WRITE)
+                self._artifact_checkpoint(
+                    CommitPhase.AFTER_ARTIFACT_TEMP_WRITE, dependency_graph
+                )
                 handle.flush()
                 self._ops.fsync_file(handle, temp_path)
-                self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_FILE_FSYNC)
+                self._artifact_checkpoint(
+                    CommitPhase.AFTER_ARTIFACT_FILE_FSYNC, dependency_graph
+                )
             self._validate_final_path(final_path)
             self._require_same_filesystem(temp_path, final_path.parent)
             self._validate_final_path(final_path)
@@ -5713,12 +5950,18 @@ class ProductionStateCommitter:
                     raise _state_commit_failed(
                         "Immutable snapshot path already has different bytes."
                     )
-            self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_PROMOTION)
+            self._artifact_checkpoint(
+                CommitPhase.AFTER_ARTIFACT_PROMOTION, dependency_graph
+            )
             self._ops.fsync_directory(final_path.parent)
-            self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_DIRECTORY_FSYNC)
+            self._artifact_checkpoint(
+                CommitPhase.AFTER_ARTIFACT_DIRECTORY_FSYNC, dependency_graph
+            )
             if self._ops.sha256_file(final_path) != expected_sha256:
                 raise _state_commit_failed("Immutable snapshot verification failed.")
-            self._crash_injector.checkpoint(CommitPhase.AFTER_ARTIFACT_VERIFICATION)
+            self._artifact_checkpoint(
+                CommitPhase.AFTER_ARTIFACT_VERIFICATION, dependency_graph
+            )
             return final_path
         except AiVideoError as exc:
             primary = exc

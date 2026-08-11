@@ -1229,6 +1229,140 @@ def make_manifest_23_project(root: Path):
     return graph
 
 
+def make_p5_bootstrap_transition(root: Path):
+    """Build the exact deterministic transition from the current 2.x Manifest."""
+
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.state_commit import prepare_dependency_graph_transition
+
+    inputs = make_p5_dependency_inputs(root)
+    manifest_path = root / "state/manifest.json"
+    manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes()).model_copy(
+        update={"active_registry": inputs.project.manifest.active_registry}
+    )
+    manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
+    graph = build_production_dependency_graph(inputs)
+    states = resolve_dependency_state(
+        graph, build_applied_dependency_evidence(inputs, None)
+    ).states
+    desired = desired_fingerprints(graph)
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=manifest.manifest_revision,
+        base_dependency_graph=manifest.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=states,
+        expected_desired_fingerprints=desired,
+    )
+    return graph, transition, desired
+
+
+def attach_p5_render_dependency_transition(root: Path, activation):
+    """Bind one durable render candidate to an exact Manifest 2.3 graph."""
+
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        desired_fingerprints,
+    )
+    from ai_video.production.models import (
+        DependencyLifecycle,
+        DependencyNodeKind,
+        DependencyNodeState,
+        ProjectDependencyEvidence,
+        RegistryDependencyEvidence,
+        RenderDependencyEvidence,
+    )
+    from ai_video.production.state_commit import (
+        PreparedArtifact,
+        prepare_dependency_graph_transition,
+    )
+
+    manifest_path = root / "state/manifest.json"
+    manifest_payload = manifest_path.read_bytes()
+    manifest = ProductionManifest.model_validate_json(manifest_payload)
+    inputs = make_p5_dependency_inputs(root)
+    manifest_path.write_bytes(manifest_payload)
+    candidate_bundle = inputs.project.model_copy(
+        update={
+            "manifest": manifest,
+            "dependency_graph": None,
+            "render_state": None,
+        }
+    )
+    graph = build_production_dependency_graph(
+        replace(inputs, project=candidate_bundle, voice_requests=())
+    )
+    desired = desired_fingerprints(graph)
+    states: list[DependencyNodeState] = []
+    for node in graph.nodes:
+        if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT:
+            evidence = ProjectDependencyEvidence(
+                owner="project_snapshot",
+                pointer=activation.current_project,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            )
+        elif node.kind is DependencyNodeKind.ASSET:
+            evidence = RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=activation.current_registry,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            )
+        else:
+            evidence = RenderDependencyEvidence(
+                owner="render_state",
+                pointer=activation.next_render_state,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            )
+        states.append(
+            DependencyNodeState(
+                node_id=node.node_id,
+                graph_revision_id=graph.revision_id,
+                desired_fingerprint=desired[node.node_id],
+                applied_fingerprint=desired[node.node_id],
+                lifecycle=DependencyLifecycle.FRESH,
+                applied_evidence=evidence,
+            )
+        )
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=activation.expected_manifest_revision,
+        base_dependency_graph=manifest.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=tuple(states),
+        expected_desired_fingerprints=desired,
+    )
+    payload = (
+        json.dumps(
+            graph.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    graph_artifact = PreparedArtifact(
+        transition.candidate_dependency_graph.path,
+        payload,
+        hashlib.sha256(payload).hexdigest(),
+    )
+    return replace(
+        activation,
+        artifacts=tuple(
+            sorted(
+                (*activation.artifacts, graph_artifact),
+                key=lambda item: item.relative_path.as_posix(),
+            )
+        ),
+        dependency_graph_transition=transition,
+    )
+
+
 def attach_p5_dependency_transition(root: Path, request):
     """Attach one exact candidate graph/state transition to a commit request."""
 
@@ -1272,6 +1406,26 @@ def attach_p5_dependency_transition(root: Path, request):
         }
     )
     candidate_inputs = replace(inputs, project=candidate_bundle)
+    if request.operation == "voice_generation":
+        from ai_video.production.audio import VoiceGenerationRequest
+        from ai_video.production.state_commit import ProductionStateCommitter
+
+        voice_request_path = ProductionStateCommitter(root).voice_attempt_paths(
+            request.attempt_id
+        ).request_path
+        voice_request_artifact = next(
+            item
+            for item in request.artifacts
+            if item.relative_path == voice_request_path.relative_to(root)
+        )
+        candidate_inputs = replace(
+            candidate_inputs,
+            voice_requests=(
+                VoiceGenerationRequest.model_validate_json(
+                    voice_request_artifact.payload
+                ),
+            ),
+        )
     graph = build_production_dependency_graph(candidate_inputs)
     applied = build_applied_dependency_evidence(candidate_inputs, None)
     states = resolve_dependency_state(graph, applied).states

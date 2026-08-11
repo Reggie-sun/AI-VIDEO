@@ -22,7 +22,11 @@ from ai_video.production.state_commit import (  # noqa: E402
 )
 from ai_video.production.hyperframes import _render_with_hyperframes  # noqa: E402
 from production_project_factory import (  # noqa: E402
+    attach_p5_dependency_transition,
+    attach_p5_render_dependency_transition,
     make_audio_import_upgrade_request,
+    make_manifest_23_project,
+    make_p5_bootstrap_transition,
     make_revision_two_request,
     make_voice_activation_request,
     make_voice_preview_and_authorization,
@@ -54,7 +58,66 @@ def main() -> int:
     occurrence = int(sys.argv[3]) if len(sys.argv) > 3 else 1
     if occurrence < 1:
         raise ValueError("phase occurrence must be positive")
-    if len(sys.argv) > 4 and sys.argv[4] == "render":
+    mode = sys.argv[4] if len(sys.argv) > 4 else "project_commit"
+    if mode == "graph_bootstrap":
+        graph, transition, desired = make_p5_bootstrap_transition(root)
+        ProductionStateCommitter(
+            root, crash_injector=ExitInjector(phase, occurrence)
+        ).bootstrap_dependency_graph(
+            attempt_id="graph-bootstrap-process-crash",
+            graph=graph,
+            transition=transition,
+            expected_desired_fingerprints=desired,
+        )
+        return 0
+    if mode == "graph_project_commit":
+        if ProductionManifest.model_validate_json(
+            (root / "state/manifest.json").read_bytes()
+        ).schema_version != "2.3":
+            make_manifest_23_project(root)
+        request = make_revision_two_request(
+            root, attempt_id="graph-project-process-crash"
+        )
+        request, _ = attach_p5_dependency_transition(root, request)
+        ProductionStateCommitter(
+            root, crash_injector=ExitInjector(phase, occurrence)
+        ).commit(request)
+        return 0
+    if mode == "graph_voice_activate":
+        if ProductionManifest.model_validate_json(
+            (root / "state/manifest.json").read_bytes()
+        ).schema_version != "2.3":
+            make_manifest_23_project(root)
+        request = make_voice_request(root, attempt_id="graph-voice-process-crash")
+        preview, authorization = make_voice_preview_and_authorization(request)
+        writer = ProductionStateCommitter(
+            root, crash_injector=ExitInjector(phase, occurrence)
+        )
+        writer.begin_voice_generation(
+            request,
+            preview,
+            authorization,
+            dependency_transition_preparer_available=True,
+        )
+        writer.record_voice_submit_intent(request, preview, authorization)
+        manifest = ProductionManifest.model_validate_json(
+            (root / "state/manifest.json").read_text(encoding="utf-8")
+        )
+        activation, audio_ids = make_voice_activation_request(
+            root,
+            request,
+            authorization,
+            expected_manifest_revision=manifest.manifest_revision,
+        )
+        activation, _ = attach_p5_dependency_transition(root, activation)
+        writer.activate_voice_assets(activation, audio_asset_ids=audio_ids)
+        return 0
+    if mode in {"render", "graph_render_activate"}:
+        if mode == "graph_render_activate":
+            if ProductionManifest.model_validate_json(
+                (root / "state/manifest.json").read_bytes()
+            ).schema_version != "2.3":
+                make_manifest_23_project(root)
         manifest = ProductionManifest.model_validate_json(
             (root / "state/manifest.json").read_text(encoding="utf-8")
         )
@@ -90,6 +153,11 @@ def main() -> int:
             browser_path=browser,
             ip_path=ip_path,
             expected_version="0.7.103",
+            dependency_transition_preparer=(
+                (lambda activation: attach_p5_render_dependency_transition(root, activation))
+                if mode == "graph_render_activate"
+                else None
+            ),
             probe=lambda fd: {
                 "streams": [
                     {
@@ -107,7 +175,7 @@ def main() -> int:
             ).hexdigest(),
         )
         return 0
-    if len(sys.argv) > 4 and sys.argv[4] == "voice":
+    if mode == "voice":
         request = make_voice_request(root, attempt_id="voice-process-crash")
         preview, authorization = make_voice_preview_and_authorization(request)
         injector = ExitInjector(phase, occurrence)
@@ -155,7 +223,7 @@ def main() -> int:
             )
             writer.activate_voice_assets(activation, audio_asset_ids=audio_ids)
         return 0
-    if len(sys.argv) > 4 and sys.argv[4] == "audio_import":
+    if mode == "audio_import":
         request = make_audio_import_upgrade_request(
             root, attempt_id="audio-import-process-crash", include_assets=True
         )

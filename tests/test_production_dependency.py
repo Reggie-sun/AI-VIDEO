@@ -42,6 +42,7 @@ from ai_video.production.models import (
     DependencyNodeState,
     DependencyReason,
     DependencySemanticRole,
+    EgressMetadata,
     FingerprintContribution,
     ProjectDependencyEvidence,
     ProjectSnapshotPointer,
@@ -2023,6 +2024,75 @@ def test_voice_authorization_rotation_does_not_change_desired_graph(tmp_path):
     )
 
     assert after == before
+
+
+def test_unbound_voice_asset_fallback_requires_exact_request_fingerprint(
+    tmp_path,
+):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    request = inputs.voice_requests[0]
+    changed_request = _copy_voice_request(
+        request,
+        provider_parameters=request.provider_parameters.model_copy(
+            update={"stability_milli": 900}
+        ),
+    )
+    source_asset = next(
+        item for item in inputs.project.registry.assets
+        if item.asset_id == "voice-dialogue"
+    )
+    metadata = source_asset.audio_metadata
+    assert metadata is not None
+    unbound = source_asset.model_copy(
+        update={
+            "asset_id": "voice-unbound",
+            "source_kind": AssetSourceKind.GENERATED,
+            "input_artifact_ids": request.input_artifact_ids,
+            "input_fingerprint": request.input_fingerprint,
+            "creation_receipt_id": "voice-unbound-receipt",
+            "egress": EgressMetadata(
+                remote=True,
+                destination="https://api.fixture.invalid",
+                authorization_receipt_id="egress-original",
+                request_fingerprint=request.voice_request_fingerprint,
+                payload_fingerprint=request.script_hash,
+                retention_mode="zero_retention",
+                provider_policy_snapshot_id="fixture-policy",
+            ),
+            "audio_metadata": metadata.model_copy(
+                update={
+                    "script_hash": changed_request.script_hash,
+                    "voice_id": changed_request.voice_id,
+                    "language": changed_request.language,
+                    "sample_rate_hz": changed_request.output_sample_rate_hz,
+                    "channels": changed_request.output_channels,
+                    "source": metadata.source.model_copy(
+                        update={
+                            "input_artifact_ids": changed_request.input_artifact_ids,
+                            "input_fingerprint": changed_request.input_fingerprint,
+                        }
+                    ),
+                }
+            ),
+        }
+    )
+    project = inputs.project.model_copy(
+        update={
+            "registry": inputs.project.registry.model_copy(
+                update={
+                    "assets": (*inputs.project.registry.assets, unbound),
+                }
+            )
+        }
+    )
+
+    graph = dep_mod.build_production_dependency_graph(
+        replace(inputs, project=project, voice_requests=(changed_request,))
+    )
+
+    contributions = _production_contributions(graph, "asset:voice-unbound")
+    assert "voice.semantic" not in contributions
+    assert "asset.bytes" in contributions
 
 
 def test_audio_mix_changes_downstream_without_changing_audio_asset_desired(tmp_path):

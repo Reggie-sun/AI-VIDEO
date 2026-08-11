@@ -433,6 +433,292 @@ def _assert_active_bundle(root: Path, manifest: ProductionManifest) -> None:
     assert bundle.registry.content_hash == manifest.active_registry.content_hash
 
 
+def _active_p5_tuple(manifest: ProductionManifest):
+    return (
+        manifest.active_project,
+        manifest.active_registry,
+        manifest.active_render_state,
+        manifest.active_dependency_graph,
+        manifest.dependency_states,
+    )
+
+
+_GRAPH_CRASH_PHASES = (
+    CommitPhase.AFTER_GRAPH_CANDIDATE_TEMP_WRITE,
+    CommitPhase.AFTER_GRAPH_CANDIDATE_FILE_FSYNC,
+    CommitPhase.AFTER_GRAPH_CANDIDATE_PROMOTION,
+    CommitPhase.AFTER_GRAPH_CANDIDATE_DIRECTORY_FSYNC,
+    CommitPhase.AFTER_GRAPH_CANDIDATE_VERIFICATION,
+    CommitPhase.AFTER_GRAPH_FINAL_MANIFEST_REPLACE,
+)
+
+
+@pytest.mark.parametrize(
+    "mode",
+    (
+        "graph_bootstrap",
+        "graph_project_commit",
+        "graph_voice_activate",
+        "graph_render_activate",
+    ),
+)
+@pytest.mark.parametrize("phase", _GRAPH_CRASH_PHASES)
+def test_graph_activation_crash_recovers_only_exact_old_or_new_tuple(
+    committed_project: Path,
+    mode: str,
+    phase: CommitPhase,
+) -> None:
+    if mode == "graph_bootstrap":
+        project_factory.make_p5_bootstrap_transition(committed_project)
+    else:
+        project_factory.make_manifest_23_project(committed_project)
+    before = _read_manifest(committed_project)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            phase.value,
+            "1",
+            mode,
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+
+    report = _recover(committed_project)
+    recovered = _read_manifest(committed_project)
+    selects_candidate = phase is CommitPhase.AFTER_GRAPH_FINAL_MANIFEST_REPLACE
+    if selects_candidate:
+        assert _active_p5_tuple(recovered) != _active_p5_tuple(before)
+        assert recovered.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    else:
+        assert _active_p5_tuple(recovered) == _active_p5_tuple(before)
+        expected_status = (
+            StateCommitStatus.OUTCOME_UNKNOWN
+            if mode == "graph_voice_activate"
+            else StateCommitStatus.INTERRUPTED
+        )
+        assert recovered.attempts[-1].status is expected_status
+    assert recovered.schema_version == "2.3"
+    assert not any(item.status is StateCommitStatus.RUNNING for item in recovered.attempts)
+    if mode != "graph_voice_activate" or selects_candidate:
+        assert not any(
+            item.status is StateCommitStatus.OUTCOME_UNKNOWN
+            for item in recovered.attempts
+        )
+    assert not tuple(committed_project.rglob(".p2a-*.tmp"))
+    assert report.manifest_revision_after >= report.manifest_revision_before
+    graph_items = [
+        item
+        for item in report.items
+        if "dependency_graph" in item.path.as_posix()
+        and item.disposition is not RecoveryDisposition.ACTIVE
+    ]
+    if phase in {
+        CommitPhase.AFTER_GRAPH_CANDIDATE_TEMP_WRITE,
+        CommitPhase.AFTER_GRAPH_CANDIDATE_FILE_FSYNC,
+    }:
+        assert any(
+            item.disposition is RecoveryDisposition.PARTIAL_REMOVED
+            for item in graph_items
+        )
+        assert not any(
+            item.disposition is RecoveryDisposition.INTERRUPTED_RECORDED
+            for item in graph_items
+        )
+
+    repeated = _recover(committed_project)
+    assert repeated.manifest_revision_before == repeated.manifest_revision_after
+    assert _read_manifest(committed_project) == recovered
+
+
+@pytest.mark.parametrize(
+    "phase",
+    (
+        CommitPhase.AFTER_ARTIFACT_TEMP_WRITE,
+        CommitPhase.AFTER_ARTIFACT_FILE_FSYNC,
+    ),
+)
+@pytest.mark.parametrize("occurrence", (7, 8))
+def test_graph_voice_generic_artifact_crash_keeps_base_and_provider_unknown(
+    committed_project: Path,
+    phase: CommitPhase,
+    occurrence: int,
+) -> None:
+    project_factory.make_manifest_23_project(committed_project)
+    before = _read_manifest(committed_project)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            phase.value,
+            str(occurrence),
+            "graph_voice_activate",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+
+    report = _recover(committed_project)
+    recovered = _read_manifest(committed_project)
+    assert _active_p5_tuple(recovered) == _active_p5_tuple(before)
+    assert recovered.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+    graph_items = [
+        item
+        for item in report.items
+        if "dependency_graph" in item.path.as_posix()
+        and item.disposition is not RecoveryDisposition.ACTIVE
+    ]
+    assert not any(
+        item.disposition is RecoveryDisposition.INTERRUPTED_RECORDED
+        for item in graph_items
+    )
+    if occurrence == 8:
+        assert any(
+            item.disposition is RecoveryDisposition.PARTIAL_REMOVED
+            for item in graph_items
+        )
+    else:
+        assert not graph_items
+
+
+def test_recovery_preserves_complete_unselected_dependency_graph_only(
+    committed_project: Path,
+) -> None:
+    project_factory.make_manifest_23_project(committed_project)
+    before = _read_manifest(committed_project)
+    from ai_video.production.dependency import build_dependency_graph
+    from ai_video.production.models import DependencyGraphSnapshot
+
+    active_graph = DependencyGraphSnapshot.model_validate_json(
+        (committed_project / before.active_dependency_graph.path).read_bytes()
+    )
+    selected = active_graph.nodes[0]
+    selected_contribution = selected.contributions[0]
+    changed_contribution = selected_contribution.model_copy(
+        update={"fingerprint": "f" * 64}
+    )
+    changed_node = selected.model_copy(
+        update={
+            "contributions": (
+                changed_contribution,
+                *selected.contributions[1:],
+            )
+        }
+    )
+    graph = build_dependency_graph(
+        (changed_node, *active_graph.nodes[1:]), active_graph.edges
+    )
+    graph_payload = state_commit._canonical_json_bytes(graph)
+    graph_relative = state_commit.canonical_dependency_graph_snapshot_path(
+        graph.revision_id
+    )
+    graph_sha256 = hashlib.sha256(graph_payload).hexdigest()
+    graph_path = committed_project / graph_relative
+    graph_path.parent.mkdir(parents=True, exist_ok=True)
+    graph_path.write_bytes(graph_payload)
+    decoy = committed_project / "state/dependency_graph.latest.json"
+    decoy.write_bytes(graph_payload)
+    tampered = committed_project / f"state/dependency_graph.{'f' * 64}.json"
+    tampered.write_bytes(b"not-a-graph")
+
+    report = _recover(committed_project)
+    recovered = _read_manifest(committed_project)
+
+    assert graph_relative != before.active_dependency_graph.path
+    assert _active_p5_tuple(recovered) == _active_p5_tuple(before)
+    assert graph_path.read_bytes() == graph_payload
+    assert decoy.read_bytes() == graph_payload
+    assert tampered.read_bytes() == b"not-a-graph"
+    assert any(
+        item.path == graph_relative
+        and item.disposition is RecoveryDisposition.ORPHAN_PRESERVED
+        and item.sha256 == graph_sha256
+        for item in report.items
+    )
+    ignored = {
+        decoy.relative_to(committed_project),
+        tampered.relative_to(committed_project),
+    }
+    assert not any(item.path in ignored for item in report.items)
+
+
+def test_recovery_rejects_tampered_promoted_graph_even_with_owned_temp(
+    committed_project: Path,
+) -> None:
+    project_factory.make_manifest_23_project(committed_project)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(committed_project),
+            CommitPhase.AFTER_GRAPH_CANDIDATE_PROMOTION.value,
+            "1",
+            "graph_project_commit",
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+    interrupted = _read_manifest(committed_project)
+    attempt = interrupted.attempts[-1]
+    candidate = attempt.candidate_dependency_graph
+    assert candidate is not None
+    candidate_path = committed_project / candidate.path
+    owned_temp = candidate_path.parent / _owned_temp_name(
+        attempt.attempt_id, candidate_path
+    )
+    assert candidate_path.is_file()
+    assert owned_temp.is_file()
+    candidate_path.write_bytes(b"tampered-promoted-graph")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        _recover(committed_project)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert _read_manifest(committed_project) == interrupted
+    assert owned_temp.is_file()
+
+
+@pytest.mark.parametrize("schema_version", ("2.0", "2.1", "2.2"))
+def test_recovery_keeps_pre_p5_schema_forward_compatible(
+    committed_project: Path, schema_version: str
+) -> None:
+    manifest_path = committed_project / "state/manifest.json"
+    before = _read_manifest(committed_project).model_copy(
+        update={"schema_version": schema_version}
+    )
+    manifest_path.write_text(before.model_dump_json(indent=2), encoding="utf-8")
+
+    report = _recover(committed_project)
+
+    assert report.manifest_revision_before == report.manifest_revision_after
+    assert _read_manifest(committed_project) == before
+
+
+def test_manifest_23_reader_and_recovery_work_without_rebuild_execution(
+    committed_project: Path,
+) -> None:
+    project_factory.make_manifest_23_project(committed_project)
+    before = _read_manifest(committed_project)
+
+    loaded = project_factory.load_production_project(
+        committed_project / "project.yaml"
+    )
+    report = _recover(committed_project)
+
+    assert loaded.manifest == before
+    assert loaded.dependency_graph is not None
+    assert report.manifest_revision_before == report.manifest_revision_after
+    assert _read_manifest(committed_project) == before
+
+
 def _failed_attempt(root: Path, attempt_id: str) -> tuple[ProductionManifest, object]:
     manifest = _read_manifest(root)
     request = project_factory.make_revision_two_request(root, attempt_id=attempt_id)
@@ -504,10 +790,16 @@ def _selected_incomplete_with_project_temp(
             CommitPhase.AFTER_MANIFEST_REPLACE,
             CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
         })
-        for phase in CommitPhase
-        if not phase.value.startswith(
-            ("before_render_", "after_render_", "before_voice_", "after_voice_")
-        )
+            for phase in CommitPhase
+            if not phase.value.startswith(
+                (
+                    "before_render_",
+                    "after_render_",
+                    "before_voice_",
+                    "after_voice_",
+                    "after_graph_",
+                )
+            )
         for occurrence in (
             (1, 2)
             if phase in {

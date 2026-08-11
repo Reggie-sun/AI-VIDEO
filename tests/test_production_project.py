@@ -84,6 +84,7 @@ from ai_video.production.state_commit import (
 )
 from ai_video.production.project import _render_source_payload_matches
 from production_project_factory import (
+    attach_p5_dependency_transition,
     load_revision_two_models,
     make_manifest_23_project,
     make_p4_composition_fixture,
@@ -141,14 +142,15 @@ def _commit_revision_two(
 ) -> ProductionProject:
     manifest = _manifest(root)
     project, registry = load_revision_two_models(root)
-    ProductionStateCommitter(root).commit(
-        prepare_project_registry_commit(
-            manifest=manifest,
-            project=project,
-            registry=registry,
-            attempt_id=attempt_id,
-        )
+    request = prepare_project_registry_commit(
+        manifest=manifest,
+        project=project,
+        registry=registry,
+        attempt_id=attempt_id,
     )
+    if manifest.schema_version == "2.3":
+        request, _ = attach_p5_dependency_transition(root, request)
+    ProductionStateCommitter(root).commit(request)
     return project
 
 
