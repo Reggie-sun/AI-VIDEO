@@ -1181,6 +1181,243 @@ def make_p5_dependency_inputs(root: Path):
     )
 
 
+def make_p5_selective_rebuild_fixture(root: Path):
+    """Build the complete two-Shot offline fixture for the P5 mutation matrix."""
+
+    from types import SimpleNamespace
+
+    from ai_video.production.composition import resolve_composition
+    from ai_video.production.dependency import AppliedProductionEvidence
+    from ai_video.production.models import (
+        RenderReceipt,
+        RendererSourceReceipt,
+        RenderStateSnapshot,
+        RenderStateSnapshotPointer,
+    )
+
+    inputs = make_p5_dependency_inputs(root)
+    source_audio = next(
+        asset
+        for asset in inputs.project.registry.assets
+        if asset.asset_id == "voice-narration"
+    )
+    assert source_audio.audio_metadata is not None
+
+    style_bytes = b'{"font_family":"Fixture Serif","schema_version":"1"}'
+    style_hash = hashlib.sha256(style_bytes).hexdigest()
+    style_path = root / "assets/styles" / f"{style_hash}.json"
+    style_path.write_bytes(style_bytes)
+    style_reference = CaptionStyleReference(
+        artifact_id="caption-style-2",
+        revision=1,
+        content_hash=style_hash,
+        path=style_path.relative_to(root),
+    )
+    track = CaptionTrack(
+        artifact_id="caption-artifact-2",
+        schema_version="2.1",
+        revision=1,
+        content_hash=ZERO_HASH,
+        creation_receipt_id="receipt-caption-2",
+        source_provenance=(
+            SourceReference(kind="derived", reference="alignment-narration"),
+        ),
+        caption_track_id="caption-track-2",
+        language="en",
+        script_hash=source_audio.audio_metadata.script_hash,
+        transcript_hash=hashlib.sha256(b"Second shot").hexdigest(),
+        source_audio_asset_id=source_audio.asset_id,
+        source_audio_sha256=source_audio.sha256,
+        source_sample_rate_hz=48_000,
+        segments=(
+            CaptionSegment(
+                segment_id="segment-3",
+                text="Second",
+                start_sample=1_000,
+                end_sample=20_000,
+                speaker_id="speaker-1",
+            ),
+            CaptionSegment(
+                segment_id="segment-4",
+                text="shot",
+                start_sample=22_000,
+                end_sample=47_000,
+                speaker_id="speaker-1",
+            ),
+        ),
+        segmentation_policy=CaptionSegmentationPolicy(
+            policy_id="fixture-segments",
+            policy_version="1",
+            max_characters=42,
+            max_lines=2,
+            break_strategy="provider_segments",
+        ),
+        alignment_provider="fixture",
+        alignment_model="fixture-v1",
+        alignment_receipt_id="alignment-narration",
+        style_reference_id=style_reference.artifact_id,
+        timing_fingerprint=ZERO_HASH,
+    )
+    track = track.model_copy(
+        update={"timing_fingerprint": caption_timing_fingerprint(track)}
+    )
+    track = CaptionTrack.model_validate(seal_artifact(track).model_dump(mode="python"))
+    caption_import = CaptionImportRequest.create(
+        caption_track=track,
+        style_reference=style_reference,
+        style_bytes=style_bytes,
+    )
+    caption_path = root / "assets/files/caption-track-2.json"
+    caption_path.write_bytes(caption_import.track_bytes)
+    caption_asset = AssetRecord(
+        asset_id="caption-asset-2",
+        asset_type=AssetType.CAPTION,
+        artifact_path=caption_path.relative_to(root),
+        sha256=sha256_file(caption_path),
+        size_bytes=caption_path.stat().st_size,
+        mime_type="application/json",
+        source_kind=AssetSourceKind.DERIVED,
+        tool=ToolIdentity(name="fixture", version="1"),
+        input_artifact_ids=(source_audio.asset_id,),
+        input_fingerprint=source_audio.sha256,
+        creation_receipt_id="receipt-caption-asset-2",
+        usage_license="test-only",
+        caption_metadata=CaptionAssetMetadata(
+            caption_track_id=track.caption_track_id,
+            language=track.language,
+            source_audio_asset_id=track.source_audio_asset_id,
+            source_audio_sha256=track.source_audio_sha256,
+            script_hash=track.script_hash,
+            transcript_hash=track.transcript_hash,
+            segment_count=len(track.segments),
+            word_count=0,
+            segmentation_policy_id=track.segmentation_policy.policy_id,
+            segmentation_policy_version=track.segmentation_policy.policy_version,
+            alignment_receipt_id=track.alignment_receipt_id,
+            timing_fingerprint=track.timing_fingerprint,
+            style_reference_id=style_reference.artifact_id,
+            style_reference_revision=style_reference.revision,
+            style_content_hash=style_reference.content_hash,
+        ),
+    )
+    registry = inputs.project.registry.model_copy(
+        update={
+            "revision_id": ZERO_HASH,
+            "content_hash": ZERO_HASH,
+            "assets": (*inputs.project.registry.assets, caption_asset),
+        }
+    )
+    registry_hash = registry_semantic_sha256(registry)
+    registry = registry.model_copy(
+        update={"revision_id": registry_hash, "content_hash": registry_hash}
+    )
+    registry_payload = (
+        json.dumps(
+            registry.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    registry_path = root / f"assets/registry.{registry_hash}.json"
+    registry_path.write_bytes(registry_payload)
+    registry_pointer = RegistrySnapshotPointer(
+        path=registry_path.relative_to(root),
+        revision_id=registry_hash,
+        content_hash=registry_hash,
+        file_sha256=hashlib.sha256(registry_payload).hexdigest(),
+    )
+    project = inputs.project.model_copy(
+        update={
+            "manifest": inputs.project.manifest.model_copy(
+                update={"active_registry": registry_pointer}
+            ),
+            "registry": registry,
+            "asset_paths": {
+                **inputs.project.asset_paths,
+                caption_asset.asset_id: caption_path,
+            },
+        }
+    )
+    binding = CaptionTrackBinding(
+        binding_id="captions-narration",
+        caption_asset_id=caption_asset.asset_id,
+        source_audio_track_id="narration",
+        shot_id="shot-2",
+        style_reference=style_reference,
+    )
+    composition_spec = seal_artifact(
+        inputs.composition_spec.model_copy(
+            update={
+                "content_hash": ZERO_HASH,
+                "caption_tracks": (*inputs.composition_spec.caption_tracks, binding),
+            }
+        )
+    )
+    inputs = replace(
+        inputs,
+        project=project,
+        composition_spec=composition_spec,
+        caption_style_fingerprints=(
+            *inputs.caption_style_fingerprints,
+            (
+                style_reference.artifact_id,
+                caption_style_fingerprint(style_reference, style_bytes),
+            ),
+        ),
+    )
+
+    timeline = resolve_composition(project, composition_spec, "0.7.103")
+    source_sha256 = hashlib.sha256(b"p5-fixture-source").hexdigest()
+    bundle_sha256 = hashlib.sha256(b"p5-fixture-bundle").hexdigest()
+    output_sha256 = hashlib.sha256(b"p5-fixture-output").hexdigest()
+    source_bundle = SimpleNamespace(bundle_sha256=bundle_sha256)
+    render_state = RenderStateSnapshot.model_construct(
+        project=project.manifest.active_project,
+        registry=project.manifest.active_registry,
+        timeline_fingerprint=timeline.composition_fingerprint,
+        source_sha256=source_sha256,
+        source_bundle=source_bundle,
+        source_bundle_sha256=bundle_sha256,
+        output=SimpleNamespace(file_sha256=output_sha256),
+    )
+    source_receipt = RendererSourceReceipt.model_construct(
+        timeline_fingerprint=timeline.composition_fingerprint,
+        source_sha256=source_sha256,
+        source_bundle=source_bundle,
+    )
+    render_receipt = RenderReceipt.model_construct(
+        timeline_fingerprint=timeline.composition_fingerprint,
+        source_sha256=source_sha256,
+        source_bundle_sha256=bundle_sha256,
+        output_sha256=output_sha256,
+    )
+    render_pointer_hash = hashlib.sha256(b"p5-fixture-render-state").hexdigest()
+    render_pointer = RenderStateSnapshotPointer(
+        path=Path(f"state/render/states/{render_pointer_hash}.json"),
+        revision=1,
+        content_hash=render_pointer_hash,
+        file_sha256=hashlib.sha256(b"p5-fixture-render-state-file").hexdigest(),
+    )
+    render_project = project.model_copy(
+        update={
+            "manifest": project.manifest.model_copy(
+                update={"active_render_state": render_pointer}
+            ),
+            "render_state": render_state,
+        }
+    )
+    inputs = replace(inputs, project=render_project)
+    applied = AppliedProductionEvidence(
+        timeline=timeline,
+        source_receipt=source_receipt,
+        render_receipt=render_receipt,
+        render_state=render_state,
+    )
+    return inputs, applied
+
+
 def make_manifest_23_project(root: Path):
     """Materialize a deterministic pre-render Manifest 2.3 graph fixture."""
 

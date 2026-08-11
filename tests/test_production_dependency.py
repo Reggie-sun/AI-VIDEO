@@ -62,6 +62,7 @@ from ai_video.production.models import (
 from production_project_factory import (
     make_p4_composition_fixture,
     make_p5_dependency_inputs,
+    make_p5_selective_rebuild_fixture,
 )
 
 
@@ -1973,6 +1974,37 @@ def test_production_graph_maps_p4_nodes_edges_without_timing_derivation(tmp_path
         "render:main",
         DependencyReason.RENDER_EXECUTION,
     ) in edge_index
+
+
+def test_selective_rebuild_fixture_maps_two_caption_styles_and_render_evidence(
+    tmp_path,
+):
+    inputs, applied = make_p5_selective_rebuild_fixture(tmp_path)
+
+    graph = dep_mod.build_production_dependency_graph(inputs)
+    states = dep_mod.build_applied_dependency_evidence(inputs, applied)
+    state_ids = {state.node_id for state in states}
+
+    assert [
+        (binding.caption_asset_id, binding.shot_id)
+        for binding in inputs.composition_spec.caption_tracks
+    ] == [
+        ("caption-asset-1", "shot-1"),
+        ("caption-asset-2", "shot-2"),
+    ]
+    assert {style_id for style_id, _ in inputs.caption_style_fingerprints} == {
+        "caption-style-1",
+        "caption-style-2",
+    }
+    assert _production_node(
+        graph, "asset:caption-asset-2"
+    ).semantic_role is DependencySemanticRole.CAPTION
+    assert {
+        "composition:main",
+        "timeline:main",
+        "renderer-source:main",
+        "render:main",
+    }.issubset(state_ids)
 
 
 def test_voice_semantic_projection_excludes_authorization_and_budget_rotation(tmp_path):
