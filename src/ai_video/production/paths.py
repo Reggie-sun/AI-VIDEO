@@ -76,6 +76,12 @@ def canonical_render_state_path(content_hash: str) -> Path:
     return Path(f"state/render/states/{_require_sha256(content_hash, 'render state hash')}.json")
 
 
+def canonical_dependency_graph_snapshot_path(revision_id: str) -> Path:
+    return Path(
+        f"state/dependency_graph.{_require_sha256(revision_id, 'dependency graph revision')}.json"
+    )
+
+
 def canonical_render_output_path(file_sha256: str, suffix: str = ".mp4") -> Path:
     if suffix != ".mp4":
         raise ValueError("Render output suffix must be .mp4.")
