@@ -74,7 +74,7 @@ Agent 必须维护当前产品承诺：
 - P2 Production Project Core 是当前 runtime truth：只读加载 strict v2 schemas、验证 semantic hashes、project-root containment、六种 Shot `visual_strategy`、concrete references 和 exact Asset Registry revision。
 - P2 reader 不拥有 writer、activation、lifecycle mutation、desired fingerprint、renderer 或 Provider。已验收的 P2A `ProductionStateCommitter` 是 v2 project/registry/render/graph snapshot 写入、active pointer 切换与 explicit recovery 的唯一 owner。
 - P3/P4 `ResolvedTimeline` 是唯一 order/frame/sample/timing owner；P5只能把它作为opaque fingerprint input消费，不得在graph中推导或另造canonical timeline。
-- P5 immutable graph不得保存fresh/stale/failed/blocked/superseded等mutable state；Manifest 2.3是active graph、desired/applied fingerprints与lifecycle的唯一owner。Same-desired failure不得auto-retry，exact replay不得重复调用provider/renderer或推进state。
+- P5 immutable graph不得保存fresh/stale/failed/blocked/superseded等mutable state；Manifest 2.3是active graph、desired/applied fingerprints与lifecycle的唯一owner。Same-desired failure不得auto-retry，exact replay不得重复调用provider/renderer或推进state。Composition、ResolvedTimeline、renderer source与render只能由同一次final `RenderStateSnapshot` activation原子标记fresh，旧render evidence不得分别推进这些node。
 
 ## Module Boundaries
 

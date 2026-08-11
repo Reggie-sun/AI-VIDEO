@@ -3156,12 +3156,23 @@ class ProductionStateCommitter:
             node
             for node in graph.nodes
             if node.kind
-            in {DependencyNodeKind.RENDERER_SOURCE, DependencyNodeKind.RENDER}
+            in {
+                DependencyNodeKind.COMPOSITION_SPEC,
+                DependencyNodeKind.RESOLVED_TIMELINE,
+                DependencyNodeKind.RENDERER_SOURCE,
+                DependencyNodeKind.RENDER,
+            }
         )
-        if not unit_nodes or not any(
-            node.kind is DependencyNodeKind.RENDER for node in unit_nodes
-        ):
-            raise _state_invalid("Render dependency graph has no atomic render unit.")
+        required_kinds = {
+            DependencyNodeKind.COMPOSITION_SPEC,
+            DependencyNodeKind.RESOLVED_TIMELINE,
+            DependencyNodeKind.RENDERER_SOURCE,
+            DependencyNodeKind.RENDER,
+        }
+        if len(unit_nodes) != 4 or {node.kind for node in unit_nodes} != required_kinds:
+            raise _state_invalid(
+                "Render dependency graph has an incomplete atomic render unit."
+            )
         for node in unit_nodes:
             state = state_by_id.get(node.node_id)
             evidence = None if state is None else state.applied_evidence
@@ -3174,7 +3185,8 @@ class ProductionStateCommitter:
                 or evidence.artifact_id != node.artifact_id
             ):
                 raise _state_invalid(
-                    "Renderer source and render nodes must be atomically applied."
+                    "Composition, timeline, renderer source and render nodes must "
+                    "be atomically applied."
                 )
 
     @staticmethod
@@ -3898,7 +3910,9 @@ class ProductionStateCommitter:
                     or evidence.pointer != manifest.active_render_state
                 ):
                     raise _state_invalid("Dependency render evidence owner is invalid.")
-                _verify_dependency_render_evidence(bundle, evidence)
+                raise _state_invalid(
+                    "Render-domain dependency nodes require atomic render activation."
+                )
             else:  # pragma: no cover - Pydantic union is exhaustive
                 raise _state_invalid("Dependency applied evidence type is invalid.")
             if evidence.artifact_fingerprint != desired_fingerprint:
@@ -3909,13 +3923,6 @@ class ProductionStateCommitter:
                 raise _state_invalid("Fresh dependency evidence cannot be replaced.")
             if current.lifecycle is not DependencyLifecycle.STALE:
                 raise _state_invalid("Only a ready dependency node may be applied.")
-            if node.kind in {
-                DependencyNodeKind.RENDERER_SOURCE,
-                DependencyNodeKind.RENDER,
-            }:
-                raise _state_invalid(
-                    "Renderer source and render must be applied atomically."
-                )
             applied = current.model_copy(
                 update={
                     "applied_fingerprint": desired_fingerprint,

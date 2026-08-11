@@ -3228,7 +3228,7 @@ def _prepared_activation_request(
     return before, committer, request
 
 
-def test_manifest_23_render_activation_atomically_applies_source_and_render(
+def test_manifest_23_render_activation_atomically_applies_complete_render_unit(
     tmp_path: Path,
 ) -> None:
     from ai_video.production.dependency import (
@@ -3246,8 +3246,26 @@ def test_manifest_23_render_activation_atomically_applies_source_and_render(
     )
     from ai_video.production.state_commit import prepare_dependency_graph_transition
 
-    _, timeline, _, browser, ip_path = _replay_inputs(tmp_path, "p5-render-atomic")
+    _, _, _, browser, ip_path = _replay_inputs(tmp_path, "p5-render-atomic")
     p5_inputs = project_factory.make_p5_dependency_inputs(tmp_path)
+    timeline = resolve_composition(
+        p5_inputs.project,
+        p5_inputs.composition_spec,
+        renderer_version="0.7.103",
+    )
+    asset_sources = {
+        span.asset_id: p5_inputs.project.asset_paths[span.asset_id]
+        for span in (*timeline.visual_spans, *timeline.audio_spans)
+    }
+    asset_sources.update(
+        {
+            cue.caption_asset_id: p5_inputs.project.asset_paths[cue.caption_asset_id]
+            for cue in timeline.caption_cues
+        }
+    )
+    style = p5_inputs.composition_spec.caption_tracks[0].style_reference
+    assert style is not None
+    asset_sources[style.artifact_id] = tmp_path / style.path
     project_factory.make_manifest_23_project(tmp_path)
     before = ProductionManifest.model_validate_json(
         (tmp_path / "state/manifest.json").read_text(encoding="utf-8")
@@ -3354,7 +3372,7 @@ def test_manifest_23_render_activation_atomically_applies_source_and_render(
         committer=committer,
         begin_request=begin_request,
         timeline=timeline,
-        asset_sources=make_asset_sources(tmp_path, timeline),
+        asset_sources=asset_sources,
         allowed_asset_root=tmp_path,
         runner_factory=runner_factory,
         browser_path=browser,
@@ -3365,17 +3383,44 @@ def test_manifest_23_render_activation_atomically_applies_source_and_render(
             "streams": [
                 {
                     "codec_type": "video",
-                    "width": 320,
-                    "height": 180,
-                    "r_frame_rate": "24/1",
-                    "nb_frames": "10",
+                    "width": timeline.delivery_profile.width,
+                    "height": timeline.delivery_profile.height,
+                    "r_frame_rate": f"{timeline.delivery_profile.fps}/1",
+                    "nb_frames": str(timeline.total_frames),
                     "codec_name": "h264",
-                }
-            ]
+                },
+                {
+                    "codec_type": "audio",
+                    "index": 1,
+                    "codec_name": "aac",
+                    "sample_rate": str(timeline.sample_rate),
+                    "channels": 2,
+                    "channel_layout": "stereo",
+                },
+            ],
+            "packets": [
+                {
+                    "stream_index": 1,
+                    "pts": "-1024",
+                    "duration": "1024",
+                    "side_data_list": [
+                        {
+                            "side_data_type": "Skip Samples",
+                            "skip_samples": 1024,
+                            "discard_padding": 0,
+                        }
+                    ],
+                },
+                {"stream_index": 1, "pts": "0", "duration": "768"},
+            ],
         },
         decoded_frames=lambda fd: hashlib.sha256(
             os.pread(fd, os.fstat(fd).st_size, 0)
         ).hexdigest(),
+        decoded_audio=lambda _fd, _rate, _channels: (
+            timeline.total_samples + 256,
+            "a" * 64,
+        ),
     )
     activation = captured["activation"]
     transition = captured["transition"]
@@ -3389,7 +3434,7 @@ def test_manifest_23_render_activation_atomically_applies_source_and_render(
         committer=committer,
         begin_request=begin_request,
         timeline=timeline,
-        asset_sources=make_asset_sources(tmp_path, timeline),
+        asset_sources=asset_sources,
         allowed_asset_root=tmp_path,
         runner_factory=lambda: (_ for _ in ()).throw(
             AssertionError("exact replay must not construct a runner")
@@ -3407,7 +3452,13 @@ def test_manifest_23_render_activation_atomically_applies_source_and_render(
     render_unit = {
         node.node_id
         for node in graph.nodes
-        if node.kind in {DependencyNodeKind.RENDERER_SOURCE, DependencyNodeKind.RENDER}
+        if node.kind
+        in {
+            DependencyNodeKind.COMPOSITION_SPEC,
+            DependencyNodeKind.RESOLVED_TIMELINE,
+            DependencyNodeKind.RENDERER_SOURCE,
+            DependencyNodeKind.RENDER,
+        }
     }
     assert render_unit
     assert all(by_id[node_id].lifecycle is DependencyLifecycle.FRESH for node_id in render_unit)
@@ -3460,7 +3511,13 @@ def test_manifest_23_render_activation_atomically_applies_source_and_render(
     retained_unit = {
         node.node_id
         for node in candidate_graph.nodes
-        if node.kind in {DependencyNodeKind.RENDERER_SOURCE, DependencyNodeKind.RENDER}
+        if node.kind
+        in {
+            DependencyNodeKind.COMPOSITION_SPEC,
+            DependencyNodeKind.RESOLVED_TIMELINE,
+            DependencyNodeKind.RENDERER_SOURCE,
+            DependencyNodeKind.RENDER,
+        }
     }
     assert switched.active_render_state == activated.active_render_state
     assert retained_unit

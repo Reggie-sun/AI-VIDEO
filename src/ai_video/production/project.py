@@ -1404,8 +1404,77 @@ def _load_exact_render_state(
 def _verify_dependency_render_evidence(
     bundle: LoadedProductionProject,
     evidence: RenderDependencyEvidence,
+    *,
+    node: DependencyNode | None = None,
+    graph: DependencyGraphSnapshot | None = None,
+    require_current: bool = False,
 ) -> None:
-    _load_exact_render_state(bundle, evidence.pointer)
+    state = _load_exact_render_state(bundle, evidence.pointer)
+    if not require_current:
+        return
+    if node is None or graph is None:
+        raise _invalid("Current render dependency evidence requires its graph node.")
+    if (
+        state.project != bundle.manifest.active_project
+        or state.registry != bundle.manifest.active_registry
+    ):
+        raise _invalid("Fresh render evidence must use the active project/registry pair.")
+
+    render_domain = {
+        kind: tuple(item for item in graph.nodes if item.kind is kind)
+        for kind in (
+            DependencyNodeKind.COMPOSITION_SPEC,
+            DependencyNodeKind.RESOLVED_TIMELINE,
+            DependencyNodeKind.RENDERER_SOURCE,
+            DependencyNodeKind.RENDER,
+        )
+    }
+    if any(len(items) != 1 for items in render_domain.values()):
+        raise _invalid("Fresh render evidence requires one complete render-domain unit.")
+    unit = {items[0].node_id for items in render_domain.values()}
+    if node.node_id not in unit:
+        raise _invalid("Render evidence node is outside the active render-domain unit.")
+    composition = render_domain[DependencyNodeKind.COMPOSITION_SPEC][0]
+    timeline_node = render_domain[DependencyNodeKind.RESOLVED_TIMELINE][0]
+    source_node = render_domain[DependencyNodeKind.RENDERER_SOURCE][0]
+    render_node = render_domain[DependencyNodeKind.RENDER][0]
+    edge_pairs = {(edge.source_node_id, edge.target_node_id) for edge in graph.edges}
+    if not {
+        (composition.node_id, timeline_node.node_id),
+        (timeline_node.node_id, source_node.node_id),
+        (source_node.node_id, render_node.node_id),
+    }.issubset(edge_pairs):
+        raise _invalid("Fresh render evidence unit has an invalid dependency shape.")
+
+    timeline, _ = _read_render_model(
+        bundle.root,
+        state.timeline.path,
+        ResolvedTimeline,
+        expected_file_hash=state.timeline.file_sha256,
+        label="dependency render timeline",
+    )
+    composition_content = {
+        item.key: item.fingerprint for item in composition.contributions
+    }.get("composition.content")
+    if (
+        not verify_artifact_hash(timeline)
+        or timeline.composition_spec_id != composition.artifact_id
+        or timeline.composition_spec_revision != composition.artifact_revision
+        or timeline.composition_spec_hash != composition_content
+        or timeline.composition_fingerprint != state.timeline_fingerprint
+    ):
+        raise _invalid("Fresh render evidence does not match its CompositionSpec timeline.")
+    renderer_fingerprint = _fp(
+        "ai-video-renderer-identity/1",
+        state.renderer.model_dump(mode="json"),
+    )
+    for item in (timeline_node, source_node, render_node):
+        contributions = {
+            contribution.key: contribution.fingerprint
+            for contribution in item.contributions
+        }
+        if contributions.get("renderer.identity") != renderer_fingerprint:
+            raise _invalid("Fresh render evidence renderer identity is stale.")
 
 
 def _verify_manifest_dependency_states(
@@ -1452,7 +1521,32 @@ def _verify_manifest_dependency_states(
                 DependencyNodeKind.ASSET,
             }:
                 raise _invalid("Render evidence has an invalid dependency owner.")
-            _verify_dependency_render_evidence(bundle, evidence)
+            _verify_dependency_render_evidence(
+                bundle,
+                evidence,
+                node=node,
+                graph=graph,
+                require_current=state.lifecycle is DependencyLifecycle.FRESH,
+            )
+
+    render_domain_ids = {
+        node.node_id
+        for node in graph.nodes
+        if node.kind
+        in {
+            DependencyNodeKind.COMPOSITION_SPEC,
+            DependencyNodeKind.RESOLVED_TIMELINE,
+            DependencyNodeKind.RENDERER_SOURCE,
+            DependencyNodeKind.RENDER,
+        }
+    }
+    fresh_render_ids = {
+        node_id
+        for node_id in render_domain_ids
+        if state_by_id[node_id].lifecycle is DependencyLifecycle.FRESH
+    }
+    if fresh_render_ids and fresh_render_ids != render_domain_ids:
+        raise _invalid("Render-domain dependency nodes must become fresh atomically.")
 
     active_render_pointers = {
         state.applied_evidence.pointer

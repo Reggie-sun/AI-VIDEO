@@ -115,6 +115,19 @@ MUTATION_MATRIX_CASES = (
         (),
     ),
     (
+        "alignment_policy",
+        CAPTION_2_REBUILD,
+        frozenset(
+            {
+                "asset:caption-asset-1",
+                "asset:voice-dialogue",
+                "asset:voice-narration",
+                "asset:image-shot-2",
+            }
+        ),
+        ("asset:caption-asset-2",),
+    ),
+    (
         "caption_timing",
         CAPTION_2_REBUILD,
         frozenset(
@@ -267,6 +280,21 @@ def _mutate(inputs, mutation: str):
                 update={
                     "caption_metadata": asset.caption_metadata.model_copy(
                         update={"alignment_receipt_id": "alignment-narration-replayed"}
+                    )
+                }
+            ),
+        )
+    if mutation == "alignment_policy":
+        return _replace_registry_asset(
+            inputs,
+            "caption-asset-2",
+            lambda asset: asset.model_copy(
+                update={
+                    "caption_metadata": asset.caption_metadata.model_copy(
+                        update={
+                            "alignment_receipt_id": "alignment-narration-policy-v2",
+                            "timing_fingerprint": "9" * 64,
+                        }
                     )
                 }
             ),
@@ -478,9 +506,6 @@ def test_applying_each_ready_node_advances_only_the_precise_frontier(tmp_path):
         ("creative:shot:shot-1:voice",),
         ("asset:voice-dialogue",),
         ("asset:caption-asset-1",),
-        ("composition:main",),
-        ("timeline:main",),
-        ("renderer-source:main",),
     )
     node_by_id = {node.node_id: node for node in graph.nodes}
 
@@ -507,13 +532,18 @@ def test_applying_each_ready_node_advances_only_the_precise_frontier(tmp_path):
         resolution = dep_mod.resolve_dependency_state(graph, previous)
 
     decision = dep_mod.select_rebuild_nodes(resolution)
-    assert resolution.ready_node_ids == ("render:main",)
+    assert resolution.ready_node_ids == ("composition:main",)
     assert [
         (unit.kind, unit.node_ids) for unit in decision.execution_units
     ] == [
         (
             "render_with_hyperframes",
-            ("render:main", "renderer-source:main"),
+            (
+                "composition:main",
+                "render:main",
+                "renderer-source:main",
+                "timeline:main",
+            ),
         )
     ]
 

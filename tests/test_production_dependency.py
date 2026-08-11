@@ -1669,9 +1669,9 @@ def test_select_rebuild_nodes_groups_renderer_source_and_render_as_one_unit():
         graph, previous=(previous_composition, previous_timeline)
     )
     # renderer-source becomes stale/ready because no previous applied evidence;
-    # render is blocked because its source predecessor is stale. The atomic
-    # render_with_hyperframes unit still forms once the source is ready and
-    # the render's other (external) predecessors are fresh.
+    # render is blocked because its source predecessor is stale. The durable
+    # render unit includes composition and timeline even when they were fresh,
+    # because final activation re-proves all four nodes atomically.
     assert resolution.ready_node_ids == ("renderer-source:composition-1",)
     render_state = resolution.by_id["render:composition-1"]
     assert render_state.lifecycle is DependencyLifecycle.BLOCKED
@@ -1680,10 +1680,34 @@ def test_select_rebuild_nodes_groups_renderer_source_and_render_as_one_unit():
     assert unit_kinds == ("render_with_hyperframes",)
     render_unit = decision.execution_units[0]
     assert render_unit.node_ids == (
+        "composition:composition-1",
         "render:composition-1",
         "renderer-source:composition-1",
+        "timeline:composition-1",
     )
     assert render_unit.ready is True
+
+
+def test_select_rebuild_nodes_batches_composition_timeline_and_render_domain():
+    graph = _render_pipeline_graph()
+
+    resolution = dep_mod.resolve_dependency_state(graph, previous=())
+    decision = dep_mod.select_rebuild_nodes(resolution)
+
+    assert resolution.ready_node_ids == ("composition:composition-1",)
+    assert decision.execution_units == (
+        dep_mod.RenderExecutionUnit(
+            name="render_with_hyperframes",
+            kind="render_with_hyperframes",
+            node_ids=(
+                "composition:composition-1",
+                "render:composition-1",
+                "renderer-source:composition-1",
+                "timeline:composition-1",
+            ),
+            ready=True,
+        ),
+    )
 
 
 def test_select_rebuild_nodes_groups_fresh_source_and_stale_render_atomically():
@@ -1725,7 +1749,12 @@ def test_select_rebuild_nodes_groups_fresh_source_and_stale_render_atomically():
         dep_mod.RenderExecutionUnit(
             name="render_with_hyperframes",
             kind="render_with_hyperframes",
-            node_ids=("render:composition-1", "renderer-source:composition-1"),
+            node_ids=(
+                "composition:composition-1",
+                "render:composition-1",
+                "renderer-source:composition-1",
+                "timeline:composition-1",
+            ),
             ready=True,
         ),
     )
@@ -2515,6 +2544,21 @@ def test_non_empty_render_evidence_maps_only_to_applied_states(tmp_path):
         assert by_id[node_id].lifecycle is DependencyLifecycle.FRESH
         assert isinstance(by_id[node_id].applied_evidence, RenderDependencyEvidence)
     assert dep_mod.build_production_dependency_graph(inputs) == graph
+
+
+@pytest.mark.parametrize("missing", ["timeline", "source_receipt", "render_receipt"])
+def test_partial_render_evidence_cannot_create_fresh_intermediate_nodes(
+    tmp_path, missing
+):
+    inputs, applied = _inputs_with_render_evidence(make_p5_dependency_inputs(tmp_path))
+
+    with pytest.raises(AiVideoError) as exc_info:
+        dep_mod.build_applied_dependency_evidence(
+            inputs,
+            replace(applied, **{missing: None}),
+        )
+
+    assert exc_info.value.code is ErrorCode.DEPENDENCY_RESOLUTION_INVALID
 
 
 def test_tampered_render_evidence_is_rejected_without_changing_desired(tmp_path):

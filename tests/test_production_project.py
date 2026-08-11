@@ -81,6 +81,7 @@ from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
+    prepare_dependency_graph_transition,
 )
 from ai_video.production.project import _render_source_payload_matches
 from production_project_factory import (
@@ -1982,6 +1983,112 @@ def _historical_render_graph_states(render_pointer):
         for node, fingerprint in ((source, "a" * 64), (render, "b" * 64))
     )
     return graph, resolve_dependency_state(graph, previous).states
+
+
+def _composition_dependency_graph(content_hash: str):
+    node = DependencyNode(
+        node_id="composition:reader",
+        kind=DependencyNodeKind.COMPOSITION_SPEC,
+        semantic_role=DependencySemanticRole.COMPOSITION,
+        artifact_id="composition-reader",
+        artifact_revision=1,
+        contributions=(
+            FingerprintContribution(
+                key="composition.content",
+                fingerprint=content_hash,
+            ),
+        ),
+    )
+    return build_dependency_graph((node,), ())
+
+
+def test_manifest_23_reader_rejects_old_render_evidence_for_new_composition(
+    tmp_path,
+):
+    activated, _, _ = _activate_fake_render(tmp_path)
+    render_pointer = activated.active_render_state
+    assert render_pointer is not None
+    graph = _composition_dependency_graph("9" * 64)
+    desired = desired_fingerprints(graph)
+    node = graph.nodes[0]
+    state = DependencyNodeState(
+        node_id=node.node_id,
+        graph_revision_id=graph.revision_id,
+        desired_fingerprint=desired[node.node_id],
+        applied_fingerprint=desired[node.node_id],
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence=RenderDependencyEvidence(
+            owner="render_state",
+            pointer=render_pointer,
+            artifact_id=node.artifact_id,
+            artifact_fingerprint=desired[node.node_id],
+        ),
+    )
+    manifest = _select_manifest_23_graph(tmp_path, graph, (state,)).model_copy(
+        update={"active_render_state": render_pointer}
+    )
+    _write_manifest(tmp_path, manifest)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_node_applied_rejects_composition_render_evidence_outside_atomic_unit(
+    tmp_path,
+):
+    activated, _, _ = _activate_fake_render(tmp_path)
+    render_pointer = activated.active_render_state
+    assert render_pointer is not None
+    graph = _composition_dependency_graph("1" * 64)
+    desired = desired_fingerprints(graph)
+    node = graph.nodes[0]
+    stale = DependencyNodeState(
+        node_id=node.node_id,
+        graph_revision_id=graph.revision_id,
+        desired_fingerprint=desired[node.node_id],
+        applied_fingerprint="a" * 64,
+        lifecycle=DependencyLifecycle.STALE,
+        applied_evidence=RenderDependencyEvidence(
+            owner="render_state",
+            pointer=render_pointer,
+            artifact_id=node.artifact_id,
+            artifact_fingerprint="a" * 64,
+        ),
+    )
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=activated.manifest_revision,
+        base_dependency_graph=None,
+        candidate_graph=graph,
+        candidate_dependency_states=(stale,),
+        expected_desired_fingerprints=desired,
+    )
+    committer = ProductionStateCommitter(tmp_path)
+    committed = committer.bootstrap_dependency_graph(
+        attempt_id="reader-composition-bootstrap",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired,
+    )
+    evidence = RenderDependencyEvidence(
+        owner="render_state",
+        pointer=render_pointer,
+        artifact_id=node.artifact_id,
+        artifact_fingerprint=desired[node.node_id],
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        committer.record_dependency_node_applied(
+            expected_manifest_revision=committed.manifest_revision,
+            active_dependency_graph=committed.active_dependency_graph,
+            candidate_dependency_graph=committed.active_dependency_graph,
+            node_id=node.node_id,
+            desired_fingerprint=desired[node.node_id],
+            evidence=evidence,
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
 
 
 def _advance_active_project_and_registry(root: Path, attempt_id: str) -> None:

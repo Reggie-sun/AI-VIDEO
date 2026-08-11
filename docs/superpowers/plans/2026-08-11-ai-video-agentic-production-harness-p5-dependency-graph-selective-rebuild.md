@@ -312,7 +312,7 @@ Lifecycle rules：
 - graph revision改变且failed node desired改变时，旧failure不继承，新state按predecessor情况成为stale或blocked。
 - exact graph/state replay若计算结果与Manifest完全相同，返回当前Manifest，不增加revision，不写文件。
 
-`select_rebuild_nodes()`返回两个canonical sets：`affected_node_ids`包含本次transitive stale/blocked nodes；`ready_node_ids`只包含当前stale frontier。它还返回typed `execution_units`，把logical nodes映射回existing action owner：creative/asset/timeline按各自owner单独推进；`renderer_source + render`固定映射为一个`render_with_hyperframes` unit并atomic apply。它不自动包含same-desired failed nodes；显式retry必须由调用者另行授权并通过committer记录新attempt。
+`select_rebuild_nodes()`返回两个canonical sets：`affected_node_ids`包含本次transitive stale/blocked nodes；`ready_node_ids`只包含当前stale frontier。它还返回typed `execution_units`，把logical nodes映射回existing action owner：creative/asset按各自owner单独推进；composition、resolved timeline、renderer source与render固定映射为一个`render_with_hyperframes` durable unit并atomic apply。它不自动包含same-desired failed nodes；显式retry必须由调用者另行授权并通过committer记录新attempt。
 
 Manifest 2.3的`dependency_states`允许两类entry且`node_id`全局唯一：active graph中每个node恰好一个non-superseded state；不在active graph的retained state必须是`superseded`并保留其origin graph revision。若同一logical node ID后来重新进入active graph，committer用新的active state替换旧superseded entry；P5不保留同ID多代history，长期history/retention属于P9。
 
@@ -353,7 +353,7 @@ Applied evidence exact binding固定为：
 | renderer source | `RenderStateSnapshot.source_receipt` + source bundle pointers | reopen source receipt/bundle exact hashes/check evidence |
 | render | `RenderStateSnapshot.render_receipt` + output pointer | reopen receipt/output并验证decoded/measured evidence |
 
-`record_dependency_node_applied()`必须按node kind选择上述固定owner并在lock内reopen；caller不能自选arbitrary path或只提交hash。Current P3/P4没有独立active source pointer，所以P5不得伪造“source fresh、render未完成”的applied state：`renderer_source + render`是一个existing `render_with_hyperframes()` execution unit，只有final `RenderStateSnapshot` activation后两者才在同一个Manifest replace中一起applied。该unit只有在source node ready且除unit-internal render dependency外的所有external predecessors fresh时可执行；任何timeline/asset/caption predecessor blocked都必须拒绝。Bounded render action成功后committer批量apply两者，失败时source candidate仍是attempt evidence而非active/fresh state。
+`record_dependency_node_applied()`只允许project-owned creative与registry-owned asset node按固定owner在lock内reopen；caller不能自选arbitrary path或只提交hash。Current P3/P4没有独立active CompositionSpec、timeline或source pointer，所以P5不得用旧render pointer伪造其中任何一个node的fresh state：composition、resolved timeline、renderer source与render是一个existing `render_with_hyperframes()` durable execution unit，只有final `RenderStateSnapshot` activation后四者才在同一个Manifest replace中一起applied。该unit在任一内部node进入ready frontier且所有external predecessors fresh时可执行；任何asset/caption/creative predecessor blocked都必须拒绝。Bounded render action成功后committer批量apply四者，失败时source/timeline candidate仍是attempt evidence而非active/fresh state。
 
 ## Required Mutation Matrix
 
@@ -374,7 +374,7 @@ Applied evidence exact binding固定为：
 | renderer version | timeline、renderer source、render，因为current `ResolvedTimeline.renderer`明确进入timeline identity | creative state、source assets |
 | identical semantic input / mtime / tuple order only | none | every node |
 
-测试必须逐层证明blocked propagation：上游voice stale时caption/timeline/source/render blocked；voice applied后caption成为ready；caption applied后timeline成为ready；直到render fresh。不得一次性把所有下游标成可执行，也不得使用“从Shot N开始全stale”。
+测试必须逐层证明blocked propagation：上游voice stale时caption/composition/timeline/source/render blocked；voice applied后caption成为ready；caption applied后composition成为ready；此时只暴露一个包含composition/timeline/source/render的atomic execution unit，最终render activation后四者一起fresh。不得把仍有external blocked predecessor的unit标成可执行，也不得使用“从Shot N开始全stale”。
 
 ## Manifest Migration, Activation, and Recovery
 
@@ -888,7 +888,7 @@ voice R+4和audio import final replace必须同时选择candidate registry + gra
 
 - [ ] **Step 3: Write RED render activation tests**
 
-render success final replace同时切`active_render_state`、candidate graph，并批量更新renderer-source/render applied fingerprints；exact replay零runner/零artifact write。因为current owner没有独立active source pointer，单独把source标fresh必须拒绝；stale source或blocked timeline禁止render node标fresh。
+render success final replace同时切`active_render_state`、candidate graph，并批量更新composition/timeline/renderer-source/render applied fingerprints；exact replay零runner/零artifact write。因为current owner没有独立active composition/timeline/source pointer，单独把任一render-domain node标fresh必须拒绝；旧render pointer与caller-forged desired fingerprint也不得推进frontier。
 
 - [ ] **Step 4: Run RED**
 

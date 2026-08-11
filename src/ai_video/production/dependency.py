@@ -856,23 +856,56 @@ def _source_render_pairs(graph: DependencyGraphSnapshot) -> dict[str, str]:
     return pairs
 
 
+def _render_execution_groups(
+    graph: DependencyGraphSnapshot,
+) -> dict[str, tuple[str, ...]]:
+    """Return each render node's complete durable HyperFrames unit.
+
+    Production graphs materialize ``composition -> timeline -> source -> render``
+    through one final RenderStateSnapshot activation.  Keeping all available
+    render-domain ancestors in the unit prevents callers from fabricating an
+    intermediate fresh timeline without committer-owned durable evidence.
+    """
+
+    node_by_id = {node.node_id: node for node in graph.nodes}
+    incoming: dict[str, list[str]] = {node_id: [] for node_id in node_by_id}
+    for edge in graph.edges:
+        incoming[edge.target_node_id].append(edge.source_node_id)
+
+    groups: dict[str, tuple[str, ...]] = {}
+    for render_id, source_id in _source_render_pairs(graph).items():
+        group_ids = {source_id, render_id}
+        timeline_ids = {
+            predecessor
+            for target in (source_id, render_id)
+            for predecessor in incoming[target]
+            if node_by_id[predecessor].kind is DependencyNodeKind.RESOLVED_TIMELINE
+        }
+        group_ids.update(timeline_ids)
+        group_ids.update(
+            predecessor
+            for timeline_id in timeline_ids
+            for predecessor in incoming[timeline_id]
+            if node_by_id[predecessor].kind is DependencyNodeKind.COMPOSITION_SPEC
+        )
+        groups[render_id] = tuple(sorted(group_ids))
+    return groups
+
+
 def select_rebuild_nodes(resolution: DependencyResolution) -> SelectiveRebuildDecision:
     """Translate a :class:`DependencyResolution` into pure rebuild units.
 
     Atomic rule: a single :class:`RenderExecutionUnit` named
-    ``render_with_hyperframes`` covers one ``renderer_source`` node and
-    its matching ``render`` node. The unit forms when either node is in
-    the ready frontier *and* every *external* predecessor of the
-    render node (i.e. every predecessor other than the source itself) is
-    fresh. The render node may itself be ``blocked`` because its source
-    predecessor is stale; the unit still binds both nodes so the
-    renderer applies them atomically.
+    ``render_with_hyperframes`` covers the available composition, timeline,
+    renderer-source and render nodes that are durably proven by one final
+    RenderStateSnapshot activation. The unit forms when any member is in the
+    ready frontier and every predecessor outside the unit is fresh.
     """
 
     _validate_graph_structure(resolution.graph)
     _validate_resolution(resolution)
     graph = resolution.graph
-    pairs = _source_render_pairs(graph)
+    groups = _render_execution_groups(graph)
 
     ready_set = set(resolution.ready_node_ids)
     fresh_states: dict[str, DependencyNodeState] = {
@@ -881,41 +914,37 @@ def select_rebuild_nodes(resolution: DependencyResolution) -> SelectiveRebuildDe
         if state.lifecycle is DependencyLifecycle.FRESH
     }
 
-    incoming_for_render: dict[str, tuple[str, ...]] = {node_id: () for node_id in pairs}
-    raw_incoming: dict[str, list[str]] = {node_id: [] for node_id in pairs}
-    for edge in graph.edges:
-        if edge.target_node_id in raw_incoming:
-            raw_incoming[edge.target_node_id].append(edge.source_node_id)
-    for render_id in pairs:
-        incoming_for_render[render_id] = tuple(sorted(raw_incoming[render_id]))
-
-    handled: set[str] = {
-        node_id
-        for render_id, source_id in pairs.items()
-        for node_id in (source_id, render_id)
+    incoming: dict[str, list[str]] = {
+        node.node_id: [] for node in graph.nodes
     }
+    for edge in graph.edges:
+        incoming[edge.target_node_id].append(edge.source_node_id)
+
+    handled = {node_id for group in groups.values() for node_id in group}
     units: list[RenderExecutionUnit] = []
 
-    for render_id, source_id in sorted(pairs.items()):
-        if source_id not in ready_set and render_id not in ready_set:
+    for _, group_ids in sorted(groups.items()):
+        group_set = set(group_ids)
+        if ready_set.isdisjoint(group_set):
             continue
         if any(
             resolution.by_id[node_id].lifecycle is DependencyLifecycle.FAILED
-            for node_id in (source_id, render_id)
+            for node_id in group_ids
         ):
             continue
-        # The pair is executable atomically only when all of the render's
-        # external predecessors (everyone except the source) are fresh.
-        external_preds = [
-            pred_id for pred_id in incoming_for_render[render_id] if pred_id != source_id
-        ]
+        external_preds = {
+            predecessor
+            for node_id in group_ids
+            for predecessor in incoming[node_id]
+            if predecessor not in group_set
+        }
         if any(fresh_states.get(pred_id) is None for pred_id in external_preds):
             continue
         units.append(
             RenderExecutionUnit(
                 name="render_with_hyperframes",
                 kind="render_with_hyperframes",
-                node_ids=tuple(sorted([source_id, render_id])),
+                node_ids=group_ids,
                 ready=True,
             )
         )
@@ -1729,44 +1758,44 @@ def build_applied_dependency_evidence(
         raise _resolution_invalid("applied render state must be the verified active state")
     if state.project != project.manifest.active_project or state.registry != project.manifest.active_registry:
         raise _resolution_invalid("applied render state project or registry identity is stale")
-    render_evidence_ids: list[str] = []
-    if applied.timeline is not None:
-        timeline = applied.timeline
-        if (
-            timeline.composition_spec_id != inputs.composition_spec.artifact_id
-            or timeline.composition_spec_revision != inputs.composition_spec.revision
-            or timeline.composition_spec_hash != inputs.composition_spec.content_hash
-            or timeline.renderer != inputs.renderer
-            or state.timeline_fingerprint != timeline.composition_fingerprint
-        ):
-            raise _resolution_invalid("applied timeline does not match desired composition")
-        render_evidence_ids.extend(
-            [
-                composition_node_id(inputs.composition_spec.composition_id),
-                timeline_node_id(inputs.composition_spec.composition_id),
-            ]
+    if (
+        applied.timeline is None
+        or applied.source_receipt is None
+        or applied.render_receipt is None
+    ):
+        raise _resolution_invalid(
+            "applied render evidence must contain the complete atomic render unit"
         )
-    if applied.source_receipt is not None:
-        source = applied.source_receipt
-        if (
-            applied.timeline is None
-            or source.timeline_fingerprint != state.timeline_fingerprint
-            or source.source_sha256 != state.source_sha256
-            or source.source_bundle != state.source_bundle
-        ):
-            raise _resolution_invalid("applied renderer source receipt does not match state")
-        render_evidence_ids.append(renderer_source_node_id(inputs.composition_spec.composition_id))
-    if applied.render_receipt is not None:
-        receipt = applied.render_receipt
-        if (
-            applied.source_receipt is None
-            or receipt.timeline_fingerprint != state.timeline_fingerprint
-            or receipt.source_sha256 != state.source_sha256
-            or receipt.source_bundle_sha256 != state.source_bundle_sha256
-            or receipt.output_sha256 != state.output.file_sha256
-        ):
-            raise _resolution_invalid("applied render receipt does not match state")
-        render_evidence_ids.append(render_node_id(inputs.composition_spec.composition_id))
+    timeline = applied.timeline
+    if (
+        timeline.composition_spec_id != inputs.composition_spec.artifact_id
+        or timeline.composition_spec_revision != inputs.composition_spec.revision
+        or timeline.composition_spec_hash != inputs.composition_spec.content_hash
+        or timeline.renderer != inputs.renderer
+        or state.timeline_fingerprint != timeline.composition_fingerprint
+    ):
+        raise _resolution_invalid("applied timeline does not match desired composition")
+    source = applied.source_receipt
+    if (
+        source.timeline_fingerprint != state.timeline_fingerprint
+        or source.source_sha256 != state.source_sha256
+        or source.source_bundle != state.source_bundle
+    ):
+        raise _resolution_invalid("applied renderer source receipt does not match state")
+    receipt = applied.render_receipt
+    if (
+        receipt.timeline_fingerprint != state.timeline_fingerprint
+        or receipt.source_sha256 != state.source_sha256
+        or receipt.source_bundle_sha256 != state.source_bundle_sha256
+        or receipt.output_sha256 != state.output.file_sha256
+    ):
+        raise _resolution_invalid("applied render receipt does not match state")
+    render_evidence_ids = (
+        composition_node_id(inputs.composition_spec.composition_id),
+        timeline_node_id(inputs.composition_spec.composition_id),
+        renderer_source_node_id(inputs.composition_spec.composition_id),
+        render_node_id(inputs.composition_spec.composition_id),
+    )
     for node_id in render_evidence_ids:
         node = next(node for node in graph.nodes if node.node_id == node_id)
         states.append(
