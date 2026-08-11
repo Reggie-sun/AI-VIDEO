@@ -6,7 +6,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3 deterministic composition、local HyperFrames rendering 与 P4 Voice and Captions 已在 local `main` 验收；当前 feature branch 另包含 P5 immutable Dependency Graph、Manifest-owned lifecycle 与 selective rebuild Python API。P5 不增加 CLI command、第二 renderer 或默认 remote Provider behavior。
+公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3 deterministic composition、local HyperFrames rendering、P4 Voice and Captions 与 P5 immutable Dependency Graph、Manifest-owned lifecycle、selective rebuild Python API 已在 local `main` 验收。P5 不增加 CLI command、第二 renderer 或默认 remote Provider behavior。
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
@@ -20,7 +20,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P4 已随 `f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward 合入 local `main`，merged-main full verification 为 `1094 passed, 4 skipped`。P5 当前只在独立 feature branch 实现并完成 deterministic focused acceptance；这些 local changes 均未 push、release 或 publish。
+公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P4 已随 `f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward 合入 local `main`，当时 merged-main full verification 为 `1094 passed, 4 skipped`。P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main`，merged-main full verification 为 `1386 passed, 4 skipped`；这些 local changes 均未 push、release 或 publish。
 
 ## Setup
 

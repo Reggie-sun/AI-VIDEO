@@ -20,7 +20,7 @@ Agent 必须维护当前产品承诺：
 - 当前已实现的 P2 Production Project Core 通过 `ai_video.production.load_production_project()` 暴露，只读取并验证显式物化的 v2 project、creative artifacts、Manifest-selected revision 和 Asset Registry snapshot；它不写入、不激活、不增加 CLI。
 - 当前已实现并验收的 P2A Production State Commit Protocol 通过 `ai_video.production` Python API 暴露，拥有唯一 v2 writer/recovery owner、exact project/registry snapshot activation 和 explicit crash recovery；它不增加 CLI，也不改变 Legacy Manifest/layout。
 - 当前已实现的 P3/P4 通过同一个 `CompositionSpec` -> `ResolvedTimeline` -> pinned local HyperFrames path提供deterministic render、audio/voice/caption contracts；P4已于`f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward合入local `main`，尚未push/release。
-- 当前feature branch已实现P5：`DependencyGraphSnapshot`只保存immutable typed graph inputs，Manifest 2.3独占active graph与desired/applied/lifecycle，`ProductionStateCommitter`仍独占graph write/co-activation/recovery；P5不增加CLI、Provider、renderer或automatic recovery，且尚未merge/push/release。
+- P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main`：`DependencyGraphSnapshot`只保存immutable typed graph inputs，Manifest 2.3独占active graph与desired/applied/lifecycle，`ProductionStateCommitter`仍独占graph write/co-activation/recovery；P5不增加CLI、Provider、renderer或automatic recovery，且尚未push/release。
 - `docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md` 是新的 v0.2 planning target；它不是已实现行为，也不是一次性实施授权。
 - `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 已被 supersede，只保留为 provider-centric 历史设计与可复用安全契约来源。
 - v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0-P5 的当前状态见 runtime baseline 与 roadmap；P6+ 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。
