@@ -41,6 +41,8 @@ class ErrorCode(str, Enum):
     VOICE_PROVIDER_FAILED = "voice_provider_failed"
     VOICE_PROVIDER_OUTCOME_UNKNOWN = "voice_provider_outcome_unknown"
     DISK_SPACE_LOW = "disk_space_low"
+    DEPENDENCY_GRAPH_INVALID = "dependency_graph_invalid"
+    DEPENDENCY_RESOLUTION_INVALID = "dependency_resolution_invalid"
 
 
 @dataclass

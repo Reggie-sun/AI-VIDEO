@@ -6,7 +6,7 @@ from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
-from typing import Literal
+from typing import Annotated, Literal, Union
 from urllib.parse import urlsplit
 
 from pydantic import (
@@ -1605,6 +1605,11 @@ class StateCommitAttempt(StrictModel):
     provider_request_id: str | None = None
     candidate_audio_asset_ids: tuple[str, ...] = ()
     candidate_caption_asset_ids: tuple[str, ...] = ()
+    base_dependency_graph: DependencyGraphSnapshotPointer | None = None
+    candidate_dependency_graph: DependencyGraphSnapshotPointer | None = None
+    candidate_dependency_states_hash: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
     started_at: str
     finished_at: str | None = None
     error_code: str | None = None
@@ -1612,6 +1617,22 @@ class StateCommitAttempt(StrictModel):
 
     @model_validator(mode="after")
     def _validate_terminal_error(self) -> "StateCommitAttempt":
+        p5_graph_fields_present = any(
+            value is not None
+            for value in (
+                self.base_dependency_graph,
+                self.candidate_dependency_graph,
+                self.candidate_dependency_states_hash,
+            )
+        )
+        if (
+            p5_graph_fields_present
+            and self.operation not in _P5_AWARE_OPERATIONS
+        ):
+            raise ValueError(
+                "P5 graph fields are only allowed in P5-aware operations; "
+                f"got operation={self.operation!r}"
+            )
         if self.candidate_project is not None:
             require_canonical_project_snapshot_path(
                 self.candidate_project.path,
@@ -1762,6 +1783,13 @@ class StateCommitAttempt(StrictModel):
                 "candidate_caption_asset_ids",
             ):
                 data.pop(field, None)
+        for field in (
+            "base_dependency_graph",
+            "candidate_dependency_graph",
+            "candidate_dependency_states_hash",
+        ):
+            if data.get(field) is None:
+                data.pop(field, None)
         return data
 
 
@@ -1796,12 +1824,14 @@ class RecoveryReport(StrictModel):
 
 
 class ProductionManifest(StrictModel):
-    schema_version: Literal["2.0", "2.1", "2.2"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2", "2.3"] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
     active_project: ProjectSnapshotPointer
     active_registry: RegistrySnapshotPointer
     active_render_state: RenderStateSnapshotPointer | None = None
+    active_dependency_graph: DependencyGraphSnapshotPointer | None = None
+    dependency_states: tuple[DependencyNodeState, ...] = Field(default=())
     attempts: tuple[StateCommitAttempt, ...] = ()
 
     @model_validator(mode="before")
@@ -1823,6 +1853,36 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     f"Production Manifest {value.get('schema_version', '2.0')} "
                     "cannot contain explicit P4 voice fields"
+                )
+        return value
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p5_graph_fields_in_old_versions(
+        cls, value: object
+    ) -> object:
+        if not isinstance(value, Mapping):
+            return value
+        if value.get("schema_version", "2.0") == "2.3":
+            return value
+        manifest_version = value.get("schema_version", "2.0")
+        if {
+            "active_dependency_graph",
+            "dependency_states",
+        }.intersection(value):
+            raise ValueError(
+                f"Production Manifest {manifest_version} "
+                "cannot contain explicit P5 graph fields"
+            )
+        for attempt in value.get("attempts", ()):
+            if isinstance(attempt, Mapping) and {
+                "base_dependency_graph",
+                "candidate_dependency_graph",
+                "candidate_dependency_states_hash",
+            }.intersection(attempt):
+                raise ValueError(
+                    f"Production Manifest {manifest_version} "
+                    "cannot contain P5 graph attempt fields"
                 )
         return value
 
@@ -1855,7 +1915,40 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "running render_state attempt base must match active identity"
                 )
+        if self.schema_version == "2.3":
+            self._validate_manifest_23_graph_lifecycle()
+        else:
+            for attempt in self.attempts:
+                if (
+                    attempt.base_dependency_graph is not None
+                    or attempt.candidate_dependency_graph is not None
+                    or attempt.candidate_dependency_states_hash is not None
+                ):
+                    raise ValueError(
+                        f"Production Manifest {self.schema_version} "
+                        "cannot contain P5 graph attempt fields"
+                    )
         return self
+
+    def _validate_manifest_23_graph_lifecycle(self) -> None:
+        if self.dependency_states and self.active_dependency_graph is None:
+            raise ValueError(
+                "Manifest 2.3 with dependency_states requires "
+                "active_dependency_graph"
+            )
+        if self.active_dependency_graph is not None:
+            active_revision = self.active_dependency_graph.revision_id
+            for state in self.dependency_states:
+                if state.graph_revision_id != active_revision:
+                    raise ValueError(
+                        "dependency state graph_revision_id must match "
+                        "active graph revision_id"
+                    )
+        state_node_ids = [state.node_id for state in self.dependency_states]
+        if len(state_node_ids) != len(set(state_node_ids)):
+            raise ValueError(
+                "Production Manifest dependency state node IDs must be unique"
+            )
 
     @model_serializer(mode="wrap")
     def _serialize_compatible_schema(
@@ -1864,6 +1957,9 @@ class ProductionManifest(StrictModel):
         data = handler(self)
         if self.schema_version == "2.0" and self.active_render_state is None:
             data.pop("active_render_state", None)
+        if self.schema_version != "2.3" or self.active_dependency_graph is None:
+            data.pop("active_dependency_graph", None)
+            data.pop("dependency_states", None)
         return data
 
 
@@ -1890,5 +1986,346 @@ class LoadedProductionProject(StrictModel):
     registry: AssetRegistrySnapshot
     asset_paths: dict[str, Path]
     render_state: RenderStateSnapshot | None = None
+    dependency_graph: DependencyGraphSnapshot | None = None
 
     _freeze_asset_paths = field_validator("asset_paths")(_immutable_mapping)
+
+
+# ---------------------------------------------------------------------------
+# P5 Dependency Graph immutable input contracts
+#
+# Graph snapshots are pure, content-addressed resolver inputs. They MUST NOT
+# carry mutable desired/applied fingerprints, lifecycle status, timestamps or
+# active selection. Lifecycle ownership belongs to ``ProductionManifest`` 2.3
+# and ``StateCommitAttempt`` P5-aware fields; graph validation, DAG traversal,
+# topological order, semantic hashing and rebuild decisions are owned by
+# ``src/ai_video/production/dependency.py`` (Task 2, not implemented here).
+# ---------------------------------------------------------------------------
+
+
+_P5_AWARE_OPERATIONS: frozenset[str] = frozenset(
+    {
+        "bootstrap_dependency_graph",
+        "commit_project_registry",
+        "audio_import",
+        "voice_generation",
+        "render_state",
+    }
+)
+
+
+class DependencyNodeKind(str, Enum):
+    CREATIVE_ARTIFACT = "creative_artifact"
+    ASSET = "asset"
+    COMPOSITION_SPEC = "composition_spec"
+    RESOLVED_TIMELINE = "resolved_timeline"
+    RENDERER_SOURCE = "renderer_source"
+    RENDER = "render"
+
+
+class DependencySemanticRole(str, Enum):
+    NONE = "none"
+    VOICE = "voice"
+    VISUAL = "visual"
+    AUDIO = "audio"
+    CAPTION = "caption"
+    COMPOSITION = "composition"
+    TIMELINE = "timeline"
+    RENDERER_SOURCE = "renderer_source"
+    RENDER = "render"
+
+
+class DependencyReason(str, Enum):
+    AUTHORING_INPUT = "authoring_input"
+    GENERATION_INPUT = "generation_input"
+    ASSET_BINDING = "asset_binding"
+    AUDIO_SOURCE = "audio_source"
+    ALIGNMENT_TIMING = "alignment_timing"
+    CAPTION_STYLE = "caption_style"
+    COMPOSITION_RESOLUTION = "composition_resolution"
+    TIMELINE_MATERIALIZATION = "timeline_materialization"
+    RENDER_EXECUTION = "render_execution"
+
+
+class DependencyLifecycle(str, Enum):
+    FRESH = "fresh"
+    STALE = "stale"
+    FAILED = "failed"
+    BLOCKED = "blocked"
+    SUPERSEDED = "superseded"
+
+
+class FingerprintContribution(StrictModel):
+    key: str = Field(min_length=1)
+    fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+def _canonical_contributions(
+    contributions: tuple[FingerprintContribution, ...],
+) -> tuple[FingerprintContribution, ...]:
+    return tuple(sorted(contributions, key=lambda item: item.key))
+
+
+class DependencyNode(StrictModel):
+    node_id: str = Field(min_length=1)
+    kind: DependencyNodeKind
+    semantic_role: DependencySemanticRole
+    artifact_id: str = Field(min_length=1)
+    artifact_revision: int | None = Field(default=None, ge=1)
+    contributions: tuple[FingerprintContribution, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _canonical_contributions_unique_and_ordered(
+        self,
+    ) -> "DependencyNode":
+        keys = tuple(item.key for item in self.contributions)
+        if len(keys) != len(set(keys)):
+            raise ValueError("dependency node contribution keys must be unique")
+        canonical = _canonical_contributions(self.contributions)
+        if self.contributions != canonical:
+            raise ValueError(
+                "dependency node contributions must be ordered by key"
+            )
+        return self
+
+
+class DependencyEdge(StrictModel):
+    source_node_id: str = Field(min_length=1)
+    target_node_id: str = Field(min_length=1)
+    reason: DependencyReason
+    contribution: FingerprintContribution
+
+
+class DependencyGraphSnapshot(StrictModel):
+    schema_version: Literal["2.0"] = "2.0"
+    revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    nodes: tuple[DependencyNode, ...]
+    edges: tuple[DependencyEdge, ...]
+
+    @model_validator(mode="after")
+    def _canonical_graph_structure(self) -> "DependencyGraphSnapshot":
+        node_ids = tuple(node.node_id for node in self.nodes)
+        if len(node_ids) != len(set(node_ids)):
+            raise ValueError("dependency graph node IDs must be unique")
+        canonical_nodes = tuple(
+            sorted(self.nodes, key=lambda node: node.node_id)
+        )
+        if self.nodes != canonical_nodes:
+            raise ValueError(
+                "dependency graph nodes must be ordered by node_id"
+            )
+        edge_keys = tuple(
+            (
+                edge.target_node_id,
+                edge.source_node_id,
+                edge.reason.value,
+                edge.contribution.key,
+            )
+            for edge in self.edges
+        )
+        if len(edge_keys) != len(set(edge_keys)):
+            raise ValueError(
+                "dependency graph edges must be unique by "
+                "(target_node_id, source_node_id, reason, contribution.key)"
+            )
+        canonical_edges = tuple(
+            sorted(
+                self.edges,
+                key=lambda edge: (
+                    edge.target_node_id,
+                    edge.source_node_id,
+                    edge.reason.value,
+                    edge.contribution.key,
+                ),
+            )
+        )
+        if self.edges != canonical_edges:
+            raise ValueError(
+                "dependency graph edges must use canonical "
+                "(target, source, reason, key) order"
+            )
+        if self.revision_id != self.content_hash:
+            raise ValueError(
+                "dependency graph revision_id must equal content_hash"
+            )
+        return self
+
+
+class DependencyGraphSnapshotPointer(StrictModel):
+    revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    path: Path
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "DependencyGraphSnapshotPointer":
+        clean_path = _require_clean_relative_file_path(
+            self.path, "dependency graph"
+        )
+        if self.revision_id != self.content_hash:
+            raise ValueError(
+                "dependency graph pointer revision_id must match content_hash"
+            )
+        expected = Path(f"state/dependency_graph.{self.revision_id}.json")
+        if clean_path != expected:
+            raise ValueError(
+                "dependency graph pointer path must be canonical"
+            )
+        return self
+
+
+class ProjectDependencyEvidence(StrictModel):
+    owner: Literal["project_snapshot"]
+    pointer: ProjectSnapshotPointer
+    artifact_id: str = Field(min_length=1)
+    artifact_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class RegistryDependencyEvidence(StrictModel):
+    owner: Literal["registry_snapshot"]
+    pointer: RegistrySnapshotPointer
+    artifact_id: str = Field(min_length=1)
+    artifact_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class RenderDependencyEvidence(StrictModel):
+    owner: Literal["render_state"]
+    pointer: RenderStateSnapshotPointer
+    artifact_id: str = Field(min_length=1)
+    artifact_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+DependencyAppliedEvidence = Union[
+    ProjectDependencyEvidence,
+    RegistryDependencyEvidence,
+    RenderDependencyEvidence,
+]
+
+
+class DependencyNodeState(StrictModel):
+    node_id: str = Field(min_length=1)
+    graph_revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    desired_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    applied_fingerprint: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    lifecycle: DependencyLifecycle
+    applied_evidence: DependencyAppliedEvidence | None = Field(
+        default=None, discriminator="owner"
+    )
+    blocked_by: tuple[str, ...] = Field(default=())
+    error_code: str | None = None
+    error_message: str | None = None
+
+    @model_validator(mode="after")
+    def _canonical_blocked_by(self) -> "DependencyNodeState":
+        canonical = tuple(sorted(set(self.blocked_by)))
+        if self.blocked_by != canonical:
+            raise ValueError(
+                "dependency node blocked_by must be sorted and unique"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _validate_local_invariants(self) -> "DependencyNodeState":
+        applied_evidence = self.applied_evidence
+        if (
+            applied_evidence is not None
+            and applied_evidence.artifact_fingerprint != self.applied_fingerprint
+        ):
+            raise ValueError(
+                "applied evidence artifact_fingerprint must match "
+                "applied_fingerprint"
+            )
+        if self.lifecycle is DependencyLifecycle.FRESH:
+            if self.applied_fingerprint is None:
+                raise ValueError(
+                    "fresh lifecycle requires applied_fingerprint"
+                )
+            if self.applied_fingerprint != self.desired_fingerprint:
+                raise ValueError(
+                    "fresh lifecycle requires "
+                    "applied_fingerprint == desired_fingerprint"
+                )
+            if applied_evidence is None:
+                raise ValueError(
+                    "fresh lifecycle requires applied_evidence"
+                )
+            if self.blocked_by:
+                raise ValueError(
+                    "fresh lifecycle cannot have blocked_by"
+                )
+            if self.error_code is not None or self.error_message is not None:
+                raise ValueError(
+                    "fresh lifecycle cannot carry error fields"
+                )
+        elif self.lifecycle is DependencyLifecycle.STALE:
+            if self.error_code is not None or self.error_message is not None:
+                raise ValueError(
+                    "stale lifecycle cannot carry error fields"
+                )
+        elif self.lifecycle is DependencyLifecycle.FAILED:
+            if self.error_code is None or self.error_message is None:
+                raise ValueError(
+                    "failed lifecycle requires typed error fields"
+                )
+            if self.blocked_by:
+                raise ValueError(
+                    "failed lifecycle cannot have blocked_by"
+                )
+        elif self.lifecycle is DependencyLifecycle.BLOCKED:
+            if not self.blocked_by:
+                raise ValueError(
+                    "blocked lifecycle requires non-empty blocked_by"
+                )
+            if self.error_code is not None or self.error_message is not None:
+                raise ValueError(
+                    "blocked lifecycle cannot carry error fields"
+                )
+        elif self.lifecycle is DependencyLifecycle.SUPERSEDED:
+            if self.applied_fingerprint is None:
+                raise ValueError(
+                    "superseded lifecycle retains applied_fingerprint"
+                )
+            if self.error_code is not None or self.error_message is not None:
+                raise ValueError(
+                    "superseded lifecycle cannot carry error fields"
+                )
+        return self
+
+
+class DependencyGraphTransition(StrictModel):
+    expected_manifest_revision: int = Field(ge=1)
+    base_dependency_graph: DependencyGraphSnapshotPointer | None = None
+    candidate_dependency_graph: DependencyGraphSnapshotPointer
+    candidate_dependency_states: tuple[DependencyNodeState, ...] = Field(
+        default=()
+    )
+    candidate_dependency_states_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_states_match_candidate_graph(self) -> "DependencyGraphTransition":
+        active_revision = self.candidate_dependency_graph.revision_id
+        node_ids = tuple(state.node_id for state in self.candidate_dependency_states)
+        if len(node_ids) != len(set(node_ids)):
+            raise ValueError(
+                "transition candidate_dependency_states node IDs must be unique"
+            )
+        canonical_states = tuple(
+            sorted(self.candidate_dependency_states, key=lambda state: state.node_id)
+        )
+        if self.candidate_dependency_states != canonical_states:
+            raise ValueError(
+                "transition candidate_dependency_states must be ordered by node_id"
+            )
+        for state in self.candidate_dependency_states:
+            if state.graph_revision_id != active_revision:
+                raise ValueError(
+                    "transition candidate state graph_revision_id must match "
+                    "candidate_dependency_graph revision_id"
+                )
+        return self
+
+
+LoadedProductionProject.model_rebuild()

@@ -1,5 +1,6 @@
 from collections import UserDict
 from pathlib import Path
+from typing import get_args
 
 import pytest
 from pydantic import ValidationError
@@ -31,17 +32,32 @@ from ai_video.production.models import (
     CompositionSpec,
     CompositionDirective,
     DeliveryProfile,
+    DependencyEdge,
+    DependencyGraphSnapshot,
+    DependencyGraphSnapshotPointer,
+    DependencyGraphTransition,
+    DependencyLifecycle,
+    DependencyNode,
+    DependencyNodeKind,
+    DependencyNodeState,
+    DependencyReason,
+    DependencySemanticRole,
     DurationPolicy,
+    FingerprintContribution,
+    LoadedProductionProject,
     MeasuredRenderMetadata,
     MeasuredAudioRenderMetadata,
     MotionDirective,
     ProductionManifest,
+    ProjectDependencyEvidence,
     ProjectSnapshotPointer,
     RecoveryDisposition,
     RecoveryItem,
     RecoveryReport,
+    RegistryDependencyEvidence,
     RegistrySnapshotPointer,
     RenderArtifactPointer,
+    RenderDependencyEvidence,
     RenderOutputPointer,
     RenderReceipt,
     RendererAudioBinding,
@@ -2233,3 +2249,1168 @@ def test_duration_bounds_must_be_ordered():
 def test_renderer_default_must_be_allowed():
     with pytest.raises(ValidationError, match="must be present"):
         RendererPolicy(allowed=["remotion"], default_preference="hyperframes")
+
+
+# ---------------------------------------------------------------------------
+# P5 Dependency Graph and Manifest 2.3 strict/frozen schema tests
+# ---------------------------------------------------------------------------
+
+
+def make_dependency_node(
+    *,
+    node_id: str = "creative:story:story-1",
+    kind: DependencyNodeKind = DependencyNodeKind.CREATIVE_ARTIFACT,
+    semantic_role: DependencySemanticRole = DependencySemanticRole.NONE,
+    artifact_id: str = "story-1",
+    artifact_revision: int | None = 1,
+    contributions: tuple[FingerprintContribution, ...] = (
+        FingerprintContribution(key="story.body", fingerprint=ZERO_HASH),
+    ),
+) -> DependencyNode:
+    return DependencyNode(
+        node_id=node_id,
+        kind=kind,
+        semantic_role=semantic_role,
+        artifact_id=artifact_id,
+        artifact_revision=artifact_revision,
+        contributions=contributions,
+    )
+
+
+def make_dependency_graph_snapshot_pointer(
+    *,
+    revision_id: str = ZERO_HASH,
+    file_sha256: str = ONE_HASH,
+) -> DependencyGraphSnapshotPointer:
+    return DependencyGraphSnapshotPointer(
+        revision_id=revision_id,
+        content_hash=revision_id,
+        path=Path(f"state/dependency_graph.{revision_id}.json"),
+        file_sha256=file_sha256,
+    )
+
+
+def make_dependency_graph_snapshot() -> DependencyGraphSnapshot:
+    return DependencyGraphSnapshot(
+        schema_version="2.0",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        nodes=(
+            make_dependency_node(
+                node_id="creative:story:story-1",
+                kind=DependencyNodeKind.CREATIVE_ARTIFACT,
+                semantic_role=DependencySemanticRole.NONE,
+                artifact_id="story-1",
+            ),
+        ),
+        edges=(),
+    )
+
+
+def test_p5_error_codes_are_typed_and_non_retryable_by_default():
+    assert ErrorCode.DEPENDENCY_GRAPH_INVALID.value == "dependency_graph_invalid"
+    assert (
+        ErrorCode.DEPENDENCY_RESOLUTION_INVALID.value
+        == "dependency_resolution_invalid"
+    )
+    assert AiVideoError(
+        code=ErrorCode.DEPENDENCY_GRAPH_INVALID, user_message="safe"
+    ).retryable is False
+    assert AiVideoError(
+        code=ErrorCode.DEPENDENCY_RESOLUTION_INVALID, user_message="safe"
+    ).retryable is False
+
+
+def test_dependency_node_kind_enum_values_are_exact():
+    assert {item.value for item in DependencyNodeKind} == {
+        "creative_artifact",
+        "asset",
+        "composition_spec",
+        "resolved_timeline",
+        "renderer_source",
+        "render",
+    }
+
+
+def test_dependency_semantic_role_enum_values_are_exact():
+    assert {item.value for item in DependencySemanticRole} == {
+        "none",
+        "voice",
+        "visual",
+        "audio",
+        "caption",
+        "composition",
+        "timeline",
+        "renderer_source",
+        "render",
+    }
+
+
+def test_dependency_reason_enum_values_are_exact():
+    assert {item.value for item in DependencyReason} == {
+        "authoring_input",
+        "generation_input",
+        "asset_binding",
+        "audio_source",
+        "alignment_timing",
+        "caption_style",
+        "composition_resolution",
+        "timeline_materialization",
+        "render_execution",
+    }
+
+
+def test_dependency_lifecycle_enum_values_are_exact():
+    assert {item.value for item in DependencyLifecycle} == {
+        "fresh",
+        "stale",
+        "failed",
+        "blocked",
+        "superseded",
+    }
+
+
+def test_fingerprint_contribution_rejects_non_sha256_fingerprint():
+    with pytest.raises(ValidationError, match="pattern"):
+        FingerprintContribution(key="voice.request", fingerprint="not-hex")
+
+
+def test_fingerprint_contribution_rejects_lowercase_violation():
+    bad = FingerprintContribution(key="x", fingerprint=ZERO_HASH)
+    data = bad.model_dump(mode="python")
+    data["fingerprint"] = "Z" * 64
+    with pytest.raises(ValidationError):
+        FingerprintContribution.model_validate(data)
+
+
+def test_fingerprint_contribution_rejects_empty_key():
+    with pytest.raises(ValidationError):
+        FingerprintContribution(key="", fingerprint=ZERO_HASH)
+
+
+def test_fingerprint_contribution_rejects_unknown_fields():
+    bad = FingerprintContribution(key="k", fingerprint=ZERO_HASH)
+    data = bad.model_dump(mode="python")
+    data["unexpected"] = 1
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        FingerprintContribution.model_validate(data)
+
+
+def test_dependency_node_rejects_duplicate_contribution_keys():
+    with pytest.raises(ValidationError, match="unique"):
+        DependencyNode(
+            node_id="asset:voice-1",
+            kind=DependencyNodeKind.ASSET,
+            semantic_role=DependencySemanticRole.VOICE,
+            artifact_id="asset-1",
+            artifact_revision=1,
+            contributions=(
+                FingerprintContribution(key="voice.bytes", fingerprint=ZERO_HASH),
+                FingerprintContribution(key="voice.bytes", fingerprint=ONE_HASH),
+            ),
+        )
+
+
+def test_dependency_node_requires_canonical_contribution_order_by_key():
+    with pytest.raises(ValidationError, match="ordered"):
+        DependencyNode(
+            node_id="asset:voice-1",
+            kind=DependencyNodeKind.ASSET,
+            semantic_role=DependencySemanticRole.VOICE,
+            artifact_id="asset-1",
+            artifact_revision=1,
+            contributions=(
+                FingerprintContribution(key="voice.b", fingerprint=ZERO_HASH),
+                FingerprintContribution(key="voice.a", fingerprint=ONE_HASH),
+            ),
+        )
+
+
+def test_dependency_node_requires_non_empty_contributions():
+    with pytest.raises(ValidationError):
+        DependencyNode(
+            node_id="asset:voice-1",
+            kind=DependencyNodeKind.ASSET,
+            semantic_role=DependencySemanticRole.VOICE,
+            artifact_id="asset-1",
+            artifact_revision=1,
+            contributions=(),
+        )
+
+
+def test_dependency_node_rejects_zero_artifact_revision():
+    with pytest.raises(ValidationError):
+        DependencyNode(
+            node_id="asset:voice-1",
+            kind=DependencyNodeKind.ASSET,
+            semantic_role=DependencySemanticRole.VOICE,
+            artifact_id="asset-1",
+            artifact_revision=0,
+            contributions=(FingerprintContribution(key="k", fingerprint=ZERO_HASH),),
+        )
+
+
+def test_dependency_node_rejects_unknown_fields():
+    node = make_dependency_node()
+    data = node.model_dump(mode="python")
+    data["status"] = "fresh"
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        DependencyNode.model_validate(data)
+
+
+def test_dependency_edge_rejects_unknown_fields():
+    edge = DependencyEdge(
+        source_node_id="creative:shot:shot-1:voice",
+        target_node_id="asset:voice-1",
+        reason=DependencyReason.GENERATION_INPUT,
+        contribution=FingerprintContribution(
+            key="voice.semantic", fingerprint=ZERO_HASH
+        ),
+    )
+    data = edge.model_dump(mode="python")
+    data["extra"] = True
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        DependencyEdge.model_validate(data)
+
+
+def test_dependency_graph_snapshot_schema_version_must_be_two_point_zero():
+    with pytest.raises(ValidationError):
+        DependencyGraphSnapshot(
+            schema_version="2.1",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            nodes=(),
+            edges=(),
+        )
+
+
+def test_dependency_graph_snapshot_rejects_unknown_fields():
+    snapshot = make_dependency_graph_snapshot()
+    data = snapshot.model_dump(mode="python")
+    data["fresh"] = True
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        DependencyGraphSnapshot.model_validate(data)
+
+
+def test_dependency_graph_snapshot_has_no_mutable_status_or_lifecycle_fields():
+    snapshot = make_dependency_graph_snapshot()
+    dumped = snapshot.model_dump(mode="json")
+    assert set(dumped.keys()) == {
+        "schema_version",
+        "revision_id",
+        "content_hash",
+        "nodes",
+        "edges",
+    }
+    forbidden = {
+        "fresh",
+        "stale",
+        "failed",
+        "blocked",
+        "superseded",
+        "desired_fingerprint",
+        "applied_fingerprint",
+        "lifecycle",
+        "blocked_by",
+        "error_code",
+        "error_message",
+        "status",
+        "attempt_id",
+        "started_at",
+        "finished_at",
+    }
+    def nested_keys(value):
+        if isinstance(value, dict):
+            for key, nested in value.items():
+                yield key
+                yield from nested_keys(nested)
+        elif isinstance(value, list):
+            for nested in value:
+                yield from nested_keys(nested)
+
+    assert forbidden.isdisjoint(nested_keys(dumped))
+
+
+def test_dependency_graph_snapshot_rejects_duplicate_node_ids():
+    with pytest.raises(ValidationError, match="unique"):
+        DependencyGraphSnapshot(
+            schema_version="2.0",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            nodes=(
+                make_dependency_node(node_id="creative:story:story-1"),
+                make_dependency_node(node_id="creative:story:story-1"),
+            ),
+            edges=(),
+        )
+
+
+def test_dependency_graph_snapshot_requires_canonical_node_id_order():
+    with pytest.raises(ValidationError, match="ordered"):
+        DependencyGraphSnapshot(
+            schema_version="2.0",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            nodes=(
+                make_dependency_node(node_id="creative:story:story-2"),
+                make_dependency_node(node_id="creative:story:story-1"),
+            ),
+            edges=(),
+        )
+
+
+def test_dependency_graph_snapshot_rejects_duplicate_edge_identity():
+    with pytest.raises(ValidationError, match="unique"):
+        DependencyGraphSnapshot(
+            schema_version="2.0",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            nodes=(
+                make_dependency_node(
+                    node_id="asset:voice-1",
+                    kind=DependencyNodeKind.ASSET,
+                    semantic_role=DependencySemanticRole.VOICE,
+                    artifact_id="asset-1",
+                ),
+                make_dependency_node(node_id="creative:shot:shot-1:voice"),
+            ),
+            edges=(
+                DependencyEdge(
+                    source_node_id="creative:shot:shot-1:voice",
+                    target_node_id="asset:voice-1",
+                    reason=DependencyReason.GENERATION_INPUT,
+                    contribution=FingerprintContribution(
+                        key="voice.semantic", fingerprint=ZERO_HASH
+                    ),
+                ),
+                DependencyEdge(
+                    source_node_id="creative:shot:shot-1:voice",
+                    target_node_id="asset:voice-1",
+                    reason=DependencyReason.GENERATION_INPUT,
+                    contribution=FingerprintContribution(
+                        key="voice.semantic", fingerprint=ZERO_HASH
+                    ),
+                ),
+            ),
+        )
+
+
+def test_dependency_graph_snapshot_requires_canonical_edge_order():
+    with pytest.raises(ValidationError, match="canonical"):
+        DependencyGraphSnapshot(
+            schema_version="2.0",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            nodes=(
+                make_dependency_node(
+                    node_id="asset:voice-1",
+                    kind=DependencyNodeKind.ASSET,
+                    semantic_role=DependencySemanticRole.VOICE,
+                    artifact_id="asset-1",
+                ),
+                make_dependency_node(node_id="creative:shot:shot-1:voice"),
+            ),
+            edges=(
+                DependencyEdge(
+                    source_node_id="creative:shot:shot-1:voice",
+                    target_node_id="asset:voice-1",
+                    reason=DependencyReason.GENERATION_INPUT,
+                    contribution=FingerprintContribution(
+                        key="voice.b", fingerprint=ONE_HASH
+                    ),
+                ),
+                DependencyEdge(
+                    source_node_id="creative:shot:shot-1:voice",
+                    target_node_id="asset:voice-1",
+                    reason=DependencyReason.GENERATION_INPUT,
+                    contribution=FingerprintContribution(
+                        key="voice.a", fingerprint=ZERO_HASH
+                    ),
+                ),
+            ),
+        )
+
+
+def test_dependency_graph_snapshot_requires_revision_id_equal_content_hash():
+    with pytest.raises(ValidationError, match="revision_id"):
+        DependencyGraphSnapshot(
+            schema_version="2.0",
+            revision_id=ZERO_HASH,
+            content_hash=ONE_HASH,
+            nodes=(),
+            edges=(),
+        )
+
+
+def test_dependency_graph_snapshot_pointer_requires_canonical_state_path():
+    with pytest.raises(ValidationError, match="canonical"):
+        DependencyGraphSnapshotPointer(
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            path=Path(f"state/other/{ZERO_HASH}.json"),
+            file_sha256=ONE_HASH,
+        )
+
+
+def test_dependency_graph_snapshot_pointer_rejects_mismatched_revision_and_content_hash():
+    with pytest.raises(ValidationError, match="content_hash"):
+        DependencyGraphSnapshotPointer(
+            revision_id=ZERO_HASH,
+            content_hash=ONE_HASH,
+            path=Path(f"state/dependency_graph.{ZERO_HASH}.json"),
+            file_sha256=ONE_HASH,
+        )
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        Path("state/../dependency_graph.bypass.json"),
+        Path("/tmp/dependency_graph.json"),
+        Path("."),
+    ],
+)
+def test_dependency_graph_snapshot_pointer_rejects_non_relative_clean_path(path):
+    with pytest.raises(ValidationError):
+        DependencyGraphSnapshotPointer(
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            path=path,
+            file_sha256=ONE_HASH,
+        )
+
+
+def test_dependency_graph_snapshot_pointer_requires_independent_file_sha256():
+    pointer = DependencyGraphSnapshotPointer(
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        path=Path(f"state/dependency_graph.{ZERO_HASH}.json"),
+        file_sha256=ONE_HASH,
+    )
+    assert pointer.file_sha256 == ONE_HASH
+    assert pointer.file_sha256 != pointer.revision_id
+    assert pointer.file_sha256 != pointer.content_hash
+
+
+def test_dependency_graph_snapshot_pointer_rejects_invalid_file_sha256():
+    with pytest.raises(ValidationError):
+        DependencyGraphSnapshotPointer(
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            path=Path(f"state/dependency_graph.{ZERO_HASH}.json"),
+            file_sha256="not-a-hash",
+        )
+
+
+def test_project_dependency_evidence_rejects_wrong_owner():
+    with pytest.raises(ValidationError):
+        ProjectDependencyEvidence(
+            owner="registry_snapshot",
+            pointer=make_project_pointer(),
+            artifact_id="story-main",
+            artifact_fingerprint=ZERO_HASH,
+        )
+
+
+def test_registry_dependency_evidence_rejects_wrong_owner():
+    with pytest.raises(ValidationError):
+        RegistryDependencyEvidence(
+            owner="project_snapshot",
+            pointer=make_registry_pointer(),
+            artifact_id="asset-1",
+            artifact_fingerprint=ZERO_HASH,
+        )
+
+
+def test_render_dependency_evidence_rejects_wrong_owner():
+    with pytest.raises(ValidationError):
+        RenderDependencyEvidence(
+            owner="project_snapshot",
+            pointer=make_render_state_pointer(),
+            artifact_id="render-1",
+            artifact_fingerprint=ZERO_HASH,
+        )
+
+
+def test_dependency_node_state_fresh_requires_applied_fingerprint():
+    with pytest.raises(ValidationError, match="applied_fingerprint"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.FRESH,
+        )
+
+
+def test_dependency_node_state_fresh_requires_applied_fingerprint_equal_desired():
+    with pytest.raises(ValidationError, match="applied_fingerprint"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            applied_fingerprint=ONE_HASH,
+            lifecycle=DependencyLifecycle.FRESH,
+            applied_evidence=RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=make_registry_pointer(),
+                artifact_id="asset-1",
+                artifact_fingerprint=ONE_HASH,
+            ),
+        )
+
+
+def test_dependency_node_state_fresh_requires_applied_evidence():
+    with pytest.raises(ValidationError, match="applied_evidence"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            applied_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.FRESH,
+        )
+
+
+def test_dependency_node_state_fresh_requires_evidence_fingerprint_match_applied():
+    with pytest.raises(ValidationError, match="artifact_fingerprint"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            applied_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.FRESH,
+            applied_evidence=RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=make_registry_pointer(),
+                artifact_id="asset-1",
+                artifact_fingerprint=ONE_HASH,
+            ),
+        )
+
+
+def test_dependency_node_state_fresh_rejects_blocked_by():
+    with pytest.raises(ValidationError, match="blocked_by"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            applied_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.FRESH,
+            applied_evidence=RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=make_registry_pointer(),
+                artifact_id="asset-1",
+                artifact_fingerprint=ZERO_HASH,
+            ),
+            blocked_by=("creative:shot:shot-1:voice",),
+        )
+
+
+def test_dependency_node_state_fresh_rejects_error_fields():
+    with pytest.raises(ValidationError, match="error"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            applied_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.FRESH,
+            applied_evidence=RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=make_registry_pointer(),
+                artifact_id="asset-1",
+                artifact_fingerprint=ZERO_HASH,
+            ),
+            error_code="voice_artifact",
+            error_message="oops",
+        )
+
+
+def test_dependency_node_state_failed_requires_typed_error_fields():
+    with pytest.raises(ValidationError, match="error"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.FAILED,
+        )
+
+
+def test_dependency_node_state_failed_rejects_blocked_by():
+    with pytest.raises(ValidationError, match="blocked_by"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.FAILED,
+            error_code="voice_provider_failed",
+            error_message="safe",
+            blocked_by=("creative:shot:shot-1:voice",),
+        )
+
+
+def test_dependency_node_state_blocked_requires_non_empty_blocked_by():
+    with pytest.raises(ValidationError, match="blocked_by"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.BLOCKED,
+        )
+
+
+def test_dependency_node_state_blocked_requires_canonical_blocked_by_order():
+    with pytest.raises(ValidationError, match="sorted"):
+        DependencyNodeState(
+            node_id="asset:caption-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.BLOCKED,
+            blocked_by=(
+                "creative:shot:shot-1:voice",
+                "creative:shot:shot-1:visual",
+            ),
+        )
+
+
+def test_dependency_node_state_blocked_by_must_be_unique():
+    with pytest.raises(ValidationError, match="sorted"):
+        DependencyNodeState(
+            node_id="asset:caption-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.BLOCKED,
+            blocked_by=(
+                "creative:shot:shot-1:voice",
+                "creative:shot:shot-1:voice",
+            ),
+        )
+
+
+def test_dependency_node_state_blocked_rejects_error_fields():
+    with pytest.raises(ValidationError, match="error"):
+        DependencyNodeState(
+            node_id="asset:caption-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.BLOCKED,
+            blocked_by=("creative:shot:shot-1:voice",),
+            error_code="voice_provider_failed",
+            error_message="safe",
+        )
+
+
+def test_dependency_node_state_superseded_requires_applied_fingerprint():
+    with pytest.raises(ValidationError, match="applied_fingerprint"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ONE_HASH,
+            desired_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.SUPERSEDED,
+        )
+
+
+def test_dependency_node_state_stale_rejects_error_fields():
+    with pytest.raises(ValidationError, match="error"):
+        DependencyNodeState(
+            node_id="asset:voice-1",
+            graph_revision_id=ZERO_HASH,
+            desired_fingerprint=ZERO_HASH,
+            lifecycle=DependencyLifecycle.STALE,
+            error_code="voice_provider_failed",
+            error_message="safe",
+        )
+
+
+def test_dependency_node_state_discriminator_picks_project_variant():
+    state = DependencyNodeState(
+        node_id="creative:story:story-1",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        applied_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence={
+            "owner": "project_snapshot",
+            "pointer": make_project_pointer().model_dump(mode="python"),
+            "artifact_id": "story-1",
+            "artifact_fingerprint": ZERO_HASH,
+        },
+    )
+    assert isinstance(state.applied_evidence, ProjectDependencyEvidence)
+
+
+def test_dependency_node_state_discriminator_picks_registry_variant():
+    state = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        applied_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence={
+            "owner": "registry_snapshot",
+            "pointer": make_registry_pointer().model_dump(mode="python"),
+            "artifact_id": "asset-1",
+            "artifact_fingerprint": ZERO_HASH,
+        },
+    )
+    assert isinstance(state.applied_evidence, RegistryDependencyEvidence)
+
+
+def test_dependency_node_state_discriminator_picks_render_variant():
+    state = DependencyNodeState(
+        node_id="render:final",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        applied_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence={
+            "owner": "render_state",
+            "pointer": make_render_state_pointer().model_dump(mode="python"),
+            "artifact_id": "render-1",
+            "artifact_fingerprint": ZERO_HASH,
+        },
+    )
+    assert isinstance(state.applied_evidence, RenderDependencyEvidence)
+
+
+def test_dependency_node_state_rejects_unknown_owner_discriminator():
+    with pytest.raises(ValidationError):
+        DependencyNodeState.model_validate(
+            {
+                "node_id": "asset:voice-1",
+                "graph_revision_id": ZERO_HASH,
+                "desired_fingerprint": ZERO_HASH,
+                "lifecycle": "fresh",
+                "applied_evidence": {
+                    "owner": "unknown_owner",
+                    "pointer": make_registry_pointer().model_dump(mode="python"),
+                    "artifact_id": "asset-1",
+                    "artifact_fingerprint": ZERO_HASH,
+                },
+            }
+        )
+
+
+def make_dependency_graph_transition() -> DependencyGraphTransition:
+    return DependencyGraphTransition(
+        expected_manifest_revision=1,
+        base_dependency_graph=None,
+        candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_dependency_states=(),
+        candidate_dependency_states_hash=ZERO_HASH,
+    )
+
+
+def test_dependency_graph_transition_declares_required_fields():
+    assert set(DependencyGraphTransition.model_fields.keys()) == {
+        "expected_manifest_revision",
+        "base_dependency_graph",
+        "candidate_dependency_graph",
+        "candidate_dependency_states",
+        "candidate_dependency_states_hash",
+    }
+
+
+def test_dependency_graph_transition_strict_and_frozen():
+    transition = make_dependency_graph_transition()
+    assert transition.expected_manifest_revision == 1
+    assert transition.base_dependency_graph is None
+    assert transition.candidate_dependency_graph == make_dependency_graph_snapshot_pointer()
+    assert transition.candidate_dependency_states == ()
+    assert transition.candidate_dependency_states_hash == ZERO_HASH
+
+    with pytest.raises((ValidationError, TypeError)):
+        transition.candidate_dependency_states_hash = ONE_HASH
+
+
+def test_dependency_graph_transition_rejects_zero_expected_manifest_revision():
+    with pytest.raises(ValidationError):
+        DependencyGraphTransition(
+            expected_manifest_revision=0,
+            candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            candidate_dependency_states_hash=ZERO_HASH,
+        )
+
+def test_dependency_graph_transition_rejects_state_graph_revision_mismatch():
+    state = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ONE_HASH,
+        desired_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.STALE,
+    )
+    with pytest.raises(ValidationError, match="graph_revision_id"):
+        DependencyGraphTransition(
+            expected_manifest_revision=1,
+            candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            candidate_dependency_states=(state,),
+            candidate_dependency_states_hash=ZERO_HASH,
+        )
+
+
+def test_dependency_graph_transition_rejects_duplicate_state_node_ids():
+    state_a = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.STALE,
+    )
+    state_b = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ONE_HASH,
+        lifecycle=DependencyLifecycle.STALE,
+    )
+    with pytest.raises(ValidationError, match="unique"):
+        DependencyGraphTransition(
+            expected_manifest_revision=1,
+            candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            candidate_dependency_states=(state_a, state_b),
+            candidate_dependency_states_hash=ZERO_HASH,
+        )
+
+
+def test_dependency_graph_transition_requires_canonical_state_order():
+    state_first = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.STALE,
+    )
+    state_second = DependencyNodeState(
+        node_id="creative:shot:shot-1:voice",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.STALE,
+    )
+    with pytest.raises(ValidationError, match="ordered"):
+        DependencyGraphTransition(
+            expected_manifest_revision=1,
+            candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            candidate_dependency_states=(state_second, state_first),
+            candidate_dependency_states_hash=ZERO_HASH,
+        )
+
+
+def test_dependency_graph_transition_accepts_canonical_state_order():
+    state_first = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.STALE,
+    )
+    state_second = DependencyNodeState(
+        node_id="creative:shot:shot-1:voice",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.STALE,
+    )
+    transition = DependencyGraphTransition(
+        expected_manifest_revision=1,
+        candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_dependency_states=(state_first, state_second),
+        candidate_dependency_states_hash=ZERO_HASH,
+    )
+    assert transition.candidate_dependency_states == (state_first, state_second)
+
+
+# ---------------------------------------------------------------------------
+# Manifest 2.3 P5 graph lifecycle ownership tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("version", ["2.0", "2.1", "2.2"])
+def test_manifest_20_22_omit_dependency_graph_fields_from_serialization(version):
+    manifest = make_state_manifest(schema_version=version)
+    data = manifest.model_dump(mode="json")
+    assert "active_dependency_graph" not in data
+    assert "dependency_states" not in data
+
+
+@pytest.mark.parametrize("version", ["2.0", "2.1", "2.2"])
+def test_manifest_20_22_reject_active_dependency_graph(version):
+    with pytest.raises(ValidationError, match="2.3|graph"):
+        make_state_manifest(
+            schema_version=version,
+            active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        )
+
+
+@pytest.mark.parametrize("version", ["2.0", "2.1", "2.2"])
+def test_manifest_20_22_reject_dependency_states(version):
+    state = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        applied_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence=RegistryDependencyEvidence(
+            owner="registry_snapshot",
+            pointer=make_registry_pointer(),
+            artifact_id="asset-1",
+            artifact_fingerprint=ZERO_HASH,
+        ),
+    )
+    with pytest.raises(ValidationError, match="2.3|graph"):
+        make_state_manifest(
+            schema_version=version,
+            active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            dependency_states=(state,),
+        )
+
+
+def test_manifest_23_accepts_active_dependency_graph_and_empty_states():
+    manifest = make_state_manifest(
+        schema_version="2.3",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        dependency_states=(),
+    )
+    assert manifest.active_dependency_graph is not None
+    assert manifest.dependency_states == ()
+
+
+def test_manifest_23_requires_active_dependency_graph_when_states_present():
+    state = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        applied_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence=RegistryDependencyEvidence(
+            owner="registry_snapshot",
+            pointer=make_registry_pointer(),
+            artifact_id="asset-1",
+            artifact_fingerprint=ZERO_HASH,
+        ),
+    )
+    with pytest.raises(ValidationError, match="active_dependency_graph"):
+        make_state_manifest(
+            schema_version="2.3",
+            dependency_states=(state,),
+        )
+
+
+def test_manifest_23_requires_state_graph_revision_to_match_active_graph():
+    state = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ONE_HASH,
+        desired_fingerprint=ZERO_HASH,
+        applied_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence=RegistryDependencyEvidence(
+            owner="registry_snapshot",
+            pointer=make_registry_pointer(),
+            artifact_id="asset-1",
+            artifact_fingerprint=ZERO_HASH,
+        ),
+    )
+    with pytest.raises(ValidationError, match="graph_revision_id"):
+        make_state_manifest(
+            schema_version="2.3",
+            active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            dependency_states=(state,),
+        )
+
+
+def test_manifest_23_requires_unique_state_node_ids():
+    state = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ZERO_HASH,
+        desired_fingerprint=ZERO_HASH,
+        applied_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence=RegistryDependencyEvidence(
+            owner="registry_snapshot",
+            pointer=make_registry_pointer(),
+            artifact_id="asset-1",
+            artifact_fingerprint=ZERO_HASH,
+        ),
+    )
+    with pytest.raises(ValidationError, match="unique"):
+        make_state_manifest(
+            schema_version="2.3",
+            active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            dependency_states=(state, state),
+        )
+
+
+def test_manifest_23_serializes_new_graph_fields():
+    manifest = make_state_manifest(
+        schema_version="2.3",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        dependency_states=(),
+    )
+    data = manifest.model_dump(mode="json")
+    assert "active_dependency_graph" in data
+    assert "dependency_states" in data
+
+
+def test_manifest_23_omits_active_dependency_graph_when_none():
+    manifest = make_state_manifest(schema_version="2.3")
+    data = manifest.model_dump(mode="json")
+    assert "active_dependency_graph" not in data
+    assert "dependency_states" not in data
+
+
+def test_manifest_20_bytes_does_not_contain_p5_fields():
+    data = make_state_manifest(schema_version="2.0").model_dump(mode="json")
+    forbidden_bytes = (
+        b"active_dependency_graph",
+        b"dependency_states",
+        b"base_dependency_graph",
+        b"candidate_dependency_graph",
+        b"candidate_dependency_states_hash",
+    )
+    import json as _json
+
+    encoded = _json.dumps(data).encode("utf-8")
+    for token in forbidden_bytes:
+        assert token not in encoded
+
+
+# ---------------------------------------------------------------------------
+# StateCommitAttempt graph fields tests
+# ---------------------------------------------------------------------------
+
+
+def test_state_commit_attempt_omits_graph_fields_for_old_operation():
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="commit_project_registry",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        started_at="2026-08-11T00:00:00+00:00",
+    )
+    data = attempt.model_dump(mode="json")
+    assert "base_dependency_graph" not in data
+    assert "candidate_dependency_graph" not in data
+    assert "candidate_dependency_states_hash" not in data
+
+
+def test_state_commit_attempt_p5_operation_accepts_graph_fields():
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="bootstrap_dependency_graph",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_dependency_states_hash=ZERO_HASH,
+        started_at="2026-08-11T00:00:00+00:00",
+        finished_at="2026-08-11T00:00:01+00:00",
+    )
+    assert attempt.base_dependency_graph is not None
+    assert attempt.candidate_dependency_graph is not None
+    assert attempt.candidate_dependency_states_hash == ZERO_HASH
+    data = attempt.model_dump(mode="json")
+    assert "base_dependency_graph" in data
+    assert "candidate_dependency_graph" in data
+    assert "candidate_dependency_states_hash" in data
+
+
+def test_state_commit_attempt_p5_operation_omits_unset_graph_fields():
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="bootstrap_dependency_graph",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        started_at="2026-08-11T00:00:00+00:00",
+    )
+    data = attempt.model_dump(mode="json")
+    assert "base_dependency_graph" not in data
+    assert "candidate_dependency_graph" not in data
+    assert "candidate_dependency_states_hash" not in data
+
+
+def test_state_commit_attempt_non_p5_operation_rejects_graph_fields():
+    with pytest.raises(ValidationError, match="graph"):
+        StateCommitAttempt(
+            attempt_id="attempt-1",
+            operation="historical_custom_commit",
+            status=StateCommitStatus.RUNNING,
+            base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            started_at="2026-08-11T00:00:00+00:00",
+        )
+
+
+def test_state_commit_attempt_rejects_invalid_candidate_dependency_states_hash():
+    with pytest.raises(ValidationError):
+        StateCommitAttempt(
+            attempt_id="attempt-1",
+            operation="bootstrap_dependency_graph",
+            status=StateCommitStatus.SUCCEEDED,
+            base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            candidate_dependency_states_hash="not-a-hash",
+            started_at="2026-08-11T00:00:00+00:00",
+            finished_at="2026-08-11T00:00:01+00:00",
+        )
+
+
+def test_manifest_22_rejects_state_commit_attempt_with_graph_fields():
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="bootstrap_dependency_graph",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_dependency_states_hash=ZERO_HASH,
+        started_at="2026-08-11T00:00:00+00:00",
+        finished_at="2026-08-11T00:00:01+00:00",
+    )
+    with pytest.raises(ValidationError, match="graph"):
+        make_state_manifest(schema_version="2.2", attempts=(attempt,))
+
+
+def test_manifest_23_accepts_state_commit_attempt_with_graph_fields():
+    attempt = StateCommitAttempt(
+        attempt_id="attempt-1",
+        operation="bootstrap_dependency_graph",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_dependency_states_hash=ZERO_HASH,
+        started_at="2026-08-11T00:00:00+00:00",
+        finished_at="2026-08-11T00:00:01+00:00",
+    )
+    manifest = make_state_manifest(
+        schema_version="2.3",
+        attempts=(attempt,),
+    )
+    assert manifest.attempts == (attempt,)
+
+
+# ---------------------------------------------------------------------------
+# LoadedProductionProject.dependency_graph optional seam test
+# ---------------------------------------------------------------------------
+
+
+def test_loaded_production_project_declares_optional_dependency_graph():
+    LoadedProductionProject.model_rebuild()
+    assert "dependency_graph" in LoadedProductionProject.model_fields
+    field = LoadedProductionProject.model_fields["dependency_graph"]
+    assert field.default is None
+    assert not field.is_required()
+    annotation = get_args(field.annotation)
+    assert type(None) in annotation
