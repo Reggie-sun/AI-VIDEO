@@ -23,6 +23,11 @@ from ai_video.production import (
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.composition import resolve_composition, timeline_fingerprint
+from ai_video.production.dependency import (
+    build_dependency_graph,
+    desired_fingerprints,
+    resolve_dependency_state,
+)
 from ai_video.production.hyperframes import (
     HyperFramesRenderResult,
     VerifiedRenderOutput,
@@ -36,17 +41,30 @@ from ai_video.production.models import (
     FixedTransform,
     AudioChannelLayout,
     CaptionTrack,
+    DependencyLifecycle,
+    DependencyEdge,
+    DependencyGraphSnapshotPointer,
+    DependencyNode,
+    DependencyNodeKind,
+    DependencyNodeState,
+    DependencyReason,
+    DependencySemanticRole,
     MeasuredAudioRenderMetadata,
     MeasuredRenderMetadata,
     EgressMetadata,
     ProductionManifest,
     ProductionProject,
+    ProjectDependencyEvidence,
+    FingerprintContribution,
     RegistrySnapshotPointer,
+    RegistryDependencyEvidence,
     RendererCheckReceipt,
     RendererIdentity,
     RendererKind,
     RendererSelectionReceipt,
     RendererSourceReceipt,
+    RenderDependencyEvidence,
+    RenderStateSnapshotPointer,
     ResolvedTimeline,
     ResolvedVisualSpan,
     SourceReference,
@@ -54,6 +72,10 @@ from ai_video.production.models import (
     StateCommitStatus,
     canonical_project_snapshot_path,
     canonical_registry_snapshot_path,
+)
+from ai_video.production.paths import (
+    canonical_dependency_graph_snapshot_path,
+    canonical_render_state_path,
 )
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.state_commit import (
@@ -63,6 +85,7 @@ from ai_video.production.state_commit import (
 from ai_video.production.project import _render_source_payload_matches
 from production_project_factory import (
     load_revision_two_models,
+    make_manifest_23_project,
     make_p4_composition_fixture,
     make_voice_activation_request,
     make_voice_preview_and_authorization,
@@ -81,6 +104,36 @@ def _write_manifest(root: Path, manifest: ProductionManifest) -> None:
     (root / "state/manifest.json").write_text(
         manifest.model_dump_json(indent=2), encoding="utf-8"
     )
+
+
+def _select_manifest_23_graph(root: Path, graph, states) -> ProductionManifest:
+    payload = (
+        json.dumps(
+            graph.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    path = root / canonical_dependency_graph_snapshot_path(graph.revision_id)
+    path.write_bytes(payload)
+    pointer = DependencyGraphSnapshotPointer(
+        revision_id=graph.revision_id,
+        content_hash=graph.content_hash,
+        path=path.relative_to(root),
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    manifest = _manifest(root).model_copy(
+        update={
+            "schema_version": "2.3",
+            "manifest_revision": _manifest(root).manifest_revision + 1,
+            "active_dependency_graph": pointer,
+            "dependency_states": tuple(sorted(states, key=lambda state: state.node_id)),
+        }
+    )
+    _write_manifest(root, manifest)
+    return manifest
 
 
 def _commit_revision_two(
@@ -1523,6 +1576,471 @@ def test_reader_rejects_render_artifact_inode_swap_between_stat_and_open(
         return original_open(path, flags, *args, **kwargs)
 
     monkeypatch.setattr(os, "open", swap_then_open)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_reader_selects_exact_manifest_graph_without_scan_repair_or_write(tmp_path):
+    graph = make_manifest_23_project(tmp_path)
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(tmp_path / "project.yaml")
+
+    assert loaded.dependency_graph == graph
+    assert loaded.manifest.active_dependency_graph is not None
+    assert (
+        loaded.dependency_graph.content_hash
+        == loaded.manifest.active_dependency_graph.content_hash
+    )
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_rejects_tampered_manifest_selected_dependency_graph(tmp_path):
+    make_manifest_23_project(tmp_path)
+    manifest = _manifest(tmp_path)
+    assert manifest.active_dependency_graph is not None
+    graph_path = tmp_path / manifest.active_dependency_graph.path
+    graph_path.write_bytes(graph_path.read_bytes() + b" ")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_reader_rejects_missing_active_dependency_state(tmp_path):
+    make_manifest_23_project(tmp_path)
+    manifest = _manifest(tmp_path)
+    _write_manifest(
+        tmp_path,
+        manifest.model_copy(update={"dependency_states": manifest.dependency_states[1:]}),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_reader_rejects_illegal_dependency_blocked_by(tmp_path):
+    make_manifest_23_project(tmp_path)
+    manifest = _manifest(tmp_path)
+    target = next(
+        state for state in manifest.dependency_states if state.lifecycle.value == "stale"
+    )
+    unrelated = next(
+        state.node_id
+        for state in manifest.dependency_states
+        if state.node_id != target.node_id
+    )
+    states = tuple(
+        state.model_copy(
+            update={"lifecycle": DependencyLifecycle.BLOCKED, "blocked_by": (unrelated,)}
+        )
+        if state.node_id == target.node_id
+        else state
+        for state in manifest.dependency_states
+    )
+    _write_manifest(tmp_path, manifest.model_copy(update={"dependency_states": states}))
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_reader_rejects_dependency_graph_symlink_and_does_not_scan_decoy(tmp_path):
+    make_manifest_23_project(tmp_path)
+    manifest = _manifest(tmp_path)
+    assert manifest.active_dependency_graph is not None
+    selected = tmp_path / manifest.active_dependency_graph.path
+    payload = selected.read_bytes()
+    selected.unlink()
+    decoy = selected.with_name("dependency_graph.decoy.json")
+    decoy.write_bytes(payload)
+    selected.symlink_to(decoy)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_reader_reopens_superseded_project_evidence_from_origin_revision(tmp_path):
+    graph = make_manifest_23_project(tmp_path)
+    original = _manifest(tmp_path)
+    removed_state = next(
+        state
+        for state in original.dependency_states
+        if state.applied_evidence is not None
+        and state.applied_evidence.owner == "project_snapshot"
+    )
+    _commit_revision_two(tmp_path, attempt_id="reader-superseded-origin")
+    remaining_nodes = tuple(
+        node for node in graph.nodes if node.node_id != removed_state.node_id
+    )
+    remaining_edges = tuple(
+        edge
+        for edge in graph.edges
+        if removed_state.node_id
+        not in {edge.source_node_id, edge.target_node_id}
+    )
+    next_graph = build_dependency_graph(remaining_nodes, remaining_edges)
+    next_states = resolve_dependency_state(next_graph, original.dependency_states).states
+    _select_manifest_23_graph(tmp_path, next_graph, next_states)
+
+    loaded = load_production_project(tmp_path / "project.yaml")
+
+    superseded = next(
+        state
+        for state in loaded.manifest.dependency_states
+        if state.node_id == removed_state.node_id
+    )
+    assert superseded.lifecycle is DependencyLifecycle.SUPERSEDED
+    assert superseded.graph_revision_id == graph.revision_id
+    assert superseded.applied_evidence == removed_state.applied_evidence
+
+
+@pytest.mark.parametrize("owner", ["project", "registry"])
+def test_reader_rejects_self_consistent_graph_with_forged_owner_projection(
+    tmp_path, owner
+):
+    loaded = load_production_project(write_production_project(tmp_path))
+    if owner == "project":
+        artifact = loaded.brief
+        node = DependencyNode(
+            node_id=f"creative:brief:{artifact.artifact_id}",
+            kind=DependencyNodeKind.CREATIVE_ARTIFACT,
+            semantic_role=DependencySemanticRole.NONE,
+            artifact_id=artifact.artifact_id,
+            artifact_revision=artifact.revision,
+            contributions=(
+                FingerprintContribution(
+                    key="brief.semantic", fingerprint="f" * 64
+                ),
+            ),
+        )
+    else:
+        artifact = loaded.registry.assets[0]
+        node = DependencyNode(
+            node_id=f"asset:{artifact.asset_id}",
+            kind=DependencyNodeKind.ASSET,
+            semantic_role=DependencySemanticRole.VISUAL,
+            artifact_id=artifact.asset_id,
+            contributions=(
+                FingerprintContribution(key="asset.bytes", fingerprint=artifact.sha256),
+                FingerprintContribution(
+                    key="asset.inputs", fingerprint="f" * 64
+                ),
+            ),
+        )
+    graph = build_dependency_graph((node,), ())
+    fingerprint = desired_fingerprints(graph)[node.node_id]
+    evidence = (
+        ProjectDependencyEvidence(
+            owner="project_snapshot",
+            pointer=loaded.manifest.active_project,
+            artifact_id=node.artifact_id,
+            artifact_fingerprint=fingerprint,
+        )
+        if owner == "project"
+        else RegistryDependencyEvidence(
+            owner="registry_snapshot",
+            pointer=loaded.manifest.active_registry,
+            artifact_id=node.artifact_id,
+            artifact_fingerprint=fingerprint,
+        )
+    )
+    state = DependencyNodeState(
+        node_id=node.node_id,
+        graph_revision_id=graph.revision_id,
+        desired_fingerprint=fingerprint,
+        applied_fingerprint=fingerprint,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence=evidence,
+    )
+    _select_manifest_23_graph(tmp_path, graph, (state,))
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+@pytest.mark.parametrize(
+    ("asset_id", "mutation"),
+    [
+        ("image-shot-1", "missing-bytes"),
+        ("caption-asset-1", "caption-style"),
+        ("image-shot-1", "extra-key"),
+    ],
+)
+def test_reader_rejects_noncanonical_registry_contribution_sets(
+    tmp_path, asset_id, mutation
+):
+    graph = make_manifest_23_project(tmp_path)
+    manifest = _manifest(tmp_path)
+    original = next(node for node in graph.nodes if node.artifact_id == asset_id)
+    contributions = list(original.contributions)
+    if mutation == "missing-bytes":
+        contributions = [item for item in contributions if item.key != "asset.bytes"]
+    elif mutation == "caption-style":
+        contributions = [
+            item.model_copy(update={"fingerprint": "f" * 64})
+            if item.key == "caption.style"
+            else item
+            for item in contributions
+        ]
+    else:
+        contributions.append(
+            FingerprintContribution(key="zz.extra", fingerprint="f" * 64)
+        )
+    node = original.model_copy(
+        update={"contributions": tuple(sorted(contributions, key=lambda item: item.key))}
+    )
+    forged = build_dependency_graph((node,), ())
+    fingerprint = desired_fingerprints(forged)[node.node_id]
+    state = DependencyNodeState(
+        node_id=node.node_id,
+        graph_revision_id=forged.revision_id,
+        desired_fingerprint=fingerprint,
+        applied_fingerprint=fingerprint,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence=RegistryDependencyEvidence(
+            owner="registry_snapshot",
+            pointer=manifest.active_registry,
+            artifact_id=node.artifact_id,
+            artifact_fingerprint=fingerprint,
+        ),
+    )
+    _select_manifest_23_graph(tmp_path, forged, (state,))
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_reader_rejects_forged_voice_semantic_projection(tmp_path):
+    _, request, _, audio_ids, _ = _activate_fake_voice(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    asset = next(item for item in loaded.registry.assets if item.asset_id == audio_ids[0])
+    assert asset.audio_metadata is not None
+
+    def contribution(key: str, schema: str, value: object):
+        return FingerprintContribution(
+            key=key,
+            fingerprint=canonical_sha256({"schema": schema, "value": value}),
+        )
+
+    node = DependencyNode(
+        node_id=f"asset:{asset.asset_id}",
+        kind=DependencyNodeKind.ASSET,
+        semantic_role=DependencySemanticRole.VOICE,
+        artifact_id=asset.asset_id,
+        contributions=tuple(
+            sorted(
+                (
+                    contribution(
+                        "asset.inputs",
+                        "ai-video-asset-inputs/1",
+                        {
+                            "input_artifact_ids": request.input_artifact_ids,
+                            "input_fingerprint": request.input_fingerprint,
+                        },
+                    ),
+                    contribution(
+                        "audio.contract",
+                        "ai-video-audio-contract/1",
+                        {
+                            "audio_kind": request.audio_kind.value,
+                            "script_hash": request.script_hash,
+                            "voice_id": request.voice_id,
+                            "language": request.language,
+                            "sample_rate_hz": request.output_sample_rate_hz,
+                            "channels": request.output_channels,
+                            "input_artifact_ids": request.input_artifact_ids,
+                            "input_fingerprint": request.input_fingerprint,
+                        },
+                    ),
+                    FingerprintContribution(
+                        key="voice.semantic", fingerprint="f" * 64
+                    ),
+                ),
+                key=lambda item: item.key,
+            )
+        ),
+    )
+    graph = build_dependency_graph((node,), ())
+    fingerprint = desired_fingerprints(graph)[node.node_id]
+    state = DependencyNodeState(
+        node_id=node.node_id,
+        graph_revision_id=graph.revision_id,
+        desired_fingerprint=fingerprint,
+        applied_fingerprint=fingerprint,
+        lifecycle=DependencyLifecycle.FRESH,
+        applied_evidence=RegistryDependencyEvidence(
+            owner="registry_snapshot",
+            pointer=loaded.manifest.active_registry,
+            artifact_id=node.artifact_id,
+            artifact_fingerprint=fingerprint,
+        ),
+    )
+    _select_manifest_23_graph(tmp_path, graph, (state,))
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_reader_rejects_active_render_evidence_pointer_split_brain(tmp_path):
+    activated, _, _ = _activate_fake_render(tmp_path)
+    evidence_pointer = activated.active_render_state
+    assert evidence_pointer is not None
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.render_state is not None
+    replacement = seal_artifact(
+        loaded.render_state.model_copy(
+            update={
+                "revision": loaded.render_state.revision + 1,
+                "content_hash": "0" * 64,
+            }
+        )
+    )
+    payload = replacement.model_dump_json(indent=2).encode("utf-8")
+    replacement_path = tmp_path / canonical_render_state_path(
+        replacement.content_hash
+    )
+    replacement_path.write_bytes(payload)
+    selected_pointer = RenderStateSnapshotPointer(
+        path=replacement_path.relative_to(tmp_path),
+        revision=replacement.revision,
+        content_hash=replacement.content_hash,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    graph, states = _historical_render_graph_states(evidence_pointer)
+    manifest = _select_manifest_23_graph(tmp_path, graph, states).model_copy(
+        update={"active_render_state": selected_pointer}
+    )
+    _write_manifest(tmp_path, manifest)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(tmp_path / "project.yaml")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def _historical_render_graph_states(render_pointer):
+    source = DependencyNode(
+        node_id="renderer-source:composition-reader",
+        kind=DependencyNodeKind.RENDERER_SOURCE,
+        semantic_role=DependencySemanticRole.RENDERER_SOURCE,
+        artifact_id="composition-reader",
+        contributions=(
+            FingerprintContribution(key="source.contract", fingerprint="1" * 64),
+        ),
+    )
+    render = DependencyNode(
+        node_id="render:composition-reader",
+        kind=DependencyNodeKind.RENDER,
+        semantic_role=DependencySemanticRole.RENDER,
+        artifact_id="composition-reader",
+        contributions=(
+            FingerprintContribution(key="render.contract", fingerprint="2" * 64),
+        ),
+    )
+    edge = DependencyEdge(
+        source_node_id=source.node_id,
+        target_node_id=render.node_id,
+        reason=DependencyReason.RENDER_EXECUTION,
+        contribution=FingerprintContribution(
+            key="render.source", fingerprint="3" * 64
+        ),
+    )
+    graph = build_dependency_graph((source, render), (edge,))
+    desired = desired_fingerprints(graph)
+    previous = tuple(
+        DependencyNodeState(
+            node_id=node.node_id,
+            graph_revision_id=graph.revision_id,
+            desired_fingerprint=desired[node.node_id],
+            applied_fingerprint=fingerprint,
+            lifecycle=DependencyLifecycle.STALE,
+            applied_evidence=RenderDependencyEvidence(
+                owner="render_state",
+                pointer=render_pointer,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=fingerprint,
+            ),
+        )
+        for node, fingerprint in ((source, "a" * 64), (render, "b" * 64))
+    )
+    return graph, resolve_dependency_state(graph, previous).states
+
+
+def _advance_active_project_and_registry(root: Path, attempt_id: str) -> None:
+    _commit_revision_two(root, attempt_id=attempt_id)
+    manifest = _manifest(root)
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (root / manifest.active_registry.path).read_bytes()
+    )
+    first = registry.assets[0].model_copy(update={"usage_license": "test-revision-2"})
+    _select_resealed_registry(
+        root,
+        registry.model_copy(update={"assets": (first, *registry.assets[1:])}),
+    )
+
+
+def test_manifest_23_reader_reopens_historical_render_pair_for_stale_evidence(
+    tmp_path,
+):
+    activated, _, _ = _activate_fake_render(tmp_path)
+    old_render = activated.active_render_state
+    assert old_render is not None
+    _advance_active_project_and_registry(tmp_path, "reader-new-active-pair")
+    graph, states = _historical_render_graph_states(old_render)
+    manifest = _select_manifest_23_graph(tmp_path, graph, states).model_copy(
+        update={"active_render_state": old_render}
+    )
+    _write_manifest(tmp_path, manifest)
+
+    loaded = load_production_project(tmp_path / "project.yaml")
+
+    assert loaded.render_state is not None
+    assert loaded.render_state.project != loaded.manifest.active_project
+    assert loaded.render_state.registry != loaded.manifest.active_registry
+    assert loaded.manifest.dependency_states[-1].lifecycle in {
+        DependencyLifecycle.STALE,
+        DependencyLifecycle.BLOCKED,
+    }
+
+
+@pytest.mark.parametrize("owner", ["project", "registry", "render"])
+def test_manifest_23_reader_rejects_tampered_historical_render_pair(
+    tmp_path, owner
+):
+    activated, _, _ = _activate_fake_render(tmp_path)
+    old_render = activated.active_render_state
+    assert old_render is not None
+    old_state = load_production_project(tmp_path / "project.yaml").render_state
+    assert old_state is not None
+    _advance_active_project_and_registry(tmp_path, "reader-new-pair-tamper")
+    graph, states = _historical_render_graph_states(old_render)
+    manifest = _select_manifest_23_graph(tmp_path, graph, states).model_copy(
+        update={"active_render_state": old_render}
+    )
+    _write_manifest(tmp_path, manifest)
+    path = {
+        "project": old_state.project.path,
+        "registry": old_state.registry.path,
+        "render": old_render.path,
+    }[owner]
+    target = tmp_path / path
+    target.write_bytes(target.read_bytes() + b" ")
 
     with pytest.raises(AiVideoError) as exc_info:
         load_production_project(tmp_path / "project.yaml")

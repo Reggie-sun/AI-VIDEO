@@ -243,6 +243,7 @@ def make_caption_metadata(*, with_style: bool = True) -> CaptionAssetMetadata:
         alignment_receipt_id="alignment-1",
         timing_fingerprint=EIGHT_HASH,
         style_reference_id="style-1" if with_style else None,
+        style_reference_revision=1 if with_style else None,
         style_content_hash=NINE_HASH if with_style else None,
     )
 
@@ -754,6 +755,10 @@ def test_caption_style_identity_is_all_or_none_and_path_is_canonical():
     data["style_content_hash"] = None
     with pytest.raises(ValidationError, match="style identity"):
         CaptionAssetMetadata.model_validate(data)
+
+    assert metadata.model_dump(mode="json")["style_reference_revision"] == 1
+    legacy = metadata.model_copy(update={"style_reference_revision": None})
+    assert "style_reference_revision" not in legacy.model_dump(mode="json")
 
     style = CaptionStyleReference(
         artifact_id="style-1",

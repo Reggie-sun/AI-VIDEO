@@ -23,28 +23,48 @@ from ai_video.production.audio import (
 )
 from ai_video.production.captions import (
     _canonical_track_bytes,
+    caption_style_fingerprint,
     validate_caption_track_timeline_binding,
 )
 from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.dependency import (
+    _asset_role,
+    _fp,
+    _shot_projection_fingerprints,
+    dependency_graph_semantic_sha256,
+    desired_fingerprints,
+    resolve_dependency_state,
+    voice_semantic_projection_fingerprint,
+)
 from ai_video.production.models import (
     ArtifactReference,
     AssetRegistrySnapshot,
     AssetSourceKind,
     AssetType,
     CaptionTrack,
+    CaptionStyleReference,
     Character,
+    DependencyGraphSnapshot,
+    DependencyGraphSnapshotPointer,
+    DependencyLifecycle,
+    DependencyNodeKind,
+    DependencyNode,
+    DependencySemanticRole,
     LoadedProductionProject,
     ProductionBrief,
     ProductionManifest,
     ProductionProject,
+    ProjectDependencyEvidence,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
+    RegistryDependencyEvidence,
     RendererSourceReceipt,
     RendererAudioBinding,
     RendererCaptionBinding,
     RenderReceipt,
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
+    RenderDependencyEvidence,
     ResolvedTimeline,
     Scene,
     Shot,
@@ -59,6 +79,7 @@ from ai_video.production.models import (
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_audio_asset_path,
+    canonical_dependency_graph_snapshot_path,
     canonical_render_output_path,
     canonical_render_receipt_path,
     canonical_render_source_asset_path,
@@ -1128,6 +1149,344 @@ def _build_loaded_project(
     return bundle
 
 
+def _load_active_dependency_graph(
+    root: Path,
+    pointer: DependencyGraphSnapshotPointer,
+) -> DependencyGraphSnapshot:
+    if pointer.path != canonical_dependency_graph_snapshot_path(pointer.revision_id):
+        raise _invalid("Active dependency graph path is noncanonical.")
+    try:
+        snapshot = _read_regular_file_nofollow(
+            root / pointer.path,
+            contained_by=root / "state",
+        )
+        if snapshot.file_sha256 != pointer.file_sha256:
+            raise ValueError("file hash mismatch")
+        graph = DependencyGraphSnapshot.model_validate_json(snapshot.data)
+        if (
+            graph.revision_id != pointer.revision_id
+            or graph.content_hash != pointer.content_hash
+            or dependency_graph_semantic_sha256(graph) != pointer.content_hash
+        ):
+            raise ValueError("semantic identity mismatch")
+    except (AiVideoError, OSError, ValidationError, ValueError) as exc:
+        detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
+        raise _invalid("Could not verify active dependency graph.", detail) from exc
+    return graph
+
+
+def _verify_dependency_project_evidence(
+    bundle: LoadedProductionProject,
+    evidence: ProjectDependencyEvidence,
+    node: DependencyNode | None = None,
+) -> None:
+    root = bundle.root
+    path = _resolve_candidate_project_path(root, evidence.pointer.path)
+    _verify_snapshot_file_hash(path, evidence.pointer.file_sha256, "project evidence")
+    project = _load_yaml_artifact(path, ProductionProject)
+    if (
+        project.project_id != bundle.manifest.project_id
+        or project.revision != evidence.pointer.revision
+        or project.content_hash != evidence.pointer.content_hash
+    ):
+        raise _invalid("Project dependency evidence identity is invalid.")
+    refs = project.artifacts
+    artifacts = (
+        _load_referenced_artifact(root, refs.brief, ProductionBrief),
+        _load_referenced_artifact(root, refs.story, Story),
+        *(
+            _load_referenced_artifact(root, item, Character)
+            for item in refs.characters
+        ),
+        *(_load_referenced_artifact(root, item, Scene) for item in refs.scenes),
+        _load_referenced_artifact(root, refs.storyboard, Storyboard),
+        *(_load_referenced_artifact(root, item, Shot) for item in refs.shots),
+    )
+    matches = tuple(
+        artifact
+        for artifact in artifacts
+        if artifact.artifact_id == evidence.artifact_id
+        or (isinstance(artifact, Shot) and artifact.shot_id == evidence.artifact_id)
+    )
+    if len(matches) != 1:
+        raise _invalid("Project dependency evidence artifact is not in its snapshot.")
+    if node is None:
+        return
+    artifact = matches[0]
+    if node.artifact_revision != artifact.revision:
+        raise _invalid("Project dependency evidence revision is invalid.")
+    contributions = {item.key: item.fingerprint for item in node.contributions}
+    if isinstance(artifact, Shot) and node.semantic_role in {
+        DependencySemanticRole.VOICE,
+        DependencySemanticRole.VISUAL,
+        DependencySemanticRole.COMPOSITION,
+    }:
+        expected = {
+            f"shot.{node.semantic_role.value}": _shot_projection_fingerprints(artifact)[
+                node.semantic_role
+            ]
+        }
+    else:
+        kind = node.node_id.split(":", 2)[1] if ":" in node.node_id else ""
+        expected = {f"{kind}.semantic": artifact.content_hash}
+    if contributions != expected:
+        raise _invalid("Project dependency evidence projection is invalid.")
+
+
+def _verify_dependency_registry_evidence(
+    bundle: LoadedProductionProject,
+    evidence: RegistryDependencyEvidence,
+    node: DependencyNode | None = None,
+) -> None:
+    root = bundle.root
+    path = _resolve_candidate_registry_path(root, evidence.pointer.path)
+    _verify_snapshot_file_hash(path, evidence.pointer.file_sha256, "registry evidence")
+    registry, _ = load_asset_registry(
+        evidence.pointer.path,
+        root,
+        _resolve_input(root, bundle.project.asset_root, allowed_root=root / "assets"),
+    )
+    assets = tuple(
+        item for item in registry.assets if item.asset_id == evidence.artifact_id
+    )
+    if (
+        registry.revision_id != evidence.pointer.revision_id
+        or registry.content_hash != evidence.pointer.content_hash
+        or len(assets) != 1
+    ):
+        raise _invalid("Registry dependency evidence identity is invalid.")
+    if node is None:
+        return
+    asset = assets[0]
+    if node.artifact_revision is not None or node.semantic_role is not _asset_role(asset):
+        raise _invalid("Registry dependency evidence node identity is invalid.")
+    contributions = {item.key: item.fingerprint for item in node.contributions}
+    voice_attempts = tuple(
+        attempt
+        for attempt in bundle.manifest.attempts
+        if attempt.operation == "voice_generation"
+        and attempt.status is StateCommitStatus.SUCCEEDED
+        and asset.asset_id in attempt.candidate_audio_asset_ids
+        and attempt.candidate_registry == evidence.pointer
+    )
+    if len(voice_attempts) > 1:
+        raise _invalid("Registry dependency voice evidence is ambiguous.")
+    request = None
+    if voice_attempts:
+        try:
+            request, _ = _read_voice_model(
+                root,
+                voice_attempts[0].attempt_id,
+                "request.json",
+                VoiceGenerationRequest,
+            )
+        except (AiVideoError, OSError, ValidationError, ValueError) as exc:
+            detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
+            raise _invalid("Registry dependency voice evidence is invalid.", detail) from exc
+    input_artifact_ids = (
+        request.input_artifact_ids if request is not None else asset.input_artifact_ids
+    )
+    input_fingerprint = (
+        request.input_fingerprint if request is not None else asset.input_fingerprint
+    )
+    expected = {
+        "asset.inputs": _fp(
+            "ai-video-asset-inputs/1",
+            {
+                "input_artifact_ids": input_artifact_ids,
+                "input_fingerprint": input_fingerprint,
+            },
+        )
+    }
+    if request is not None:
+        expected["voice.semantic"] = voice_semantic_projection_fingerprint(request)
+    metadata = asset.caption_metadata
+    if metadata is not None:
+        expected["caption.timing"] = metadata.timing_fingerprint
+        if metadata.style_reference_id is None:
+            expected["caption.style"] = _fp("ai-video-caption-style-none/1", None)
+        else:
+            if (
+                metadata.style_reference_revision is None
+                or metadata.style_content_hash is None
+            ):
+                raise _invalid("Caption dependency style revision is missing.")
+            style_path = root / "assets/styles" / f"{metadata.style_content_hash}.json"
+            try:
+                style = _read_regular_file_nofollow(style_path, contained_by=root / "assets")
+            except (OSError, ValueError) as exc:
+                raise _invalid("Caption dependency style evidence is invalid.", str(exc)) from exc
+            if style.file_sha256 != metadata.style_content_hash:
+                raise _invalid("Caption dependency style bytes are invalid.")
+            style_reference = CaptionStyleReference(
+                artifact_id=metadata.style_reference_id,
+                revision=metadata.style_reference_revision,
+                content_hash=metadata.style_content_hash,
+                path=style_path.relative_to(root),
+            )
+            expected["caption.style"] = caption_style_fingerprint(
+                style_reference, style.data
+            )
+    elif request is None:
+        expected["asset.bytes"] = asset.sha256
+    audio = asset.audio_metadata
+    if audio is not None:
+        contract = (
+            {
+                "audio_kind": request.audio_kind.value,
+                "script_hash": request.script_hash,
+                "voice_id": request.voice_id,
+                "language": request.language,
+                "sample_rate_hz": request.output_sample_rate_hz,
+                "channels": request.output_channels,
+                "input_artifact_ids": request.input_artifact_ids,
+                "input_fingerprint": request.input_fingerprint,
+            }
+            if request is not None
+            else {
+                "audio_kind": audio.audio_kind.value,
+                "script_hash": audio.script_hash,
+                "voice_id": audio.voice_id,
+                "language": audio.language,
+                "duration_samples": audio.duration_samples,
+                "sample_rate_hz": audio.sample_rate_hz,
+                "channels": audio.channels,
+                "input_artifact_ids": audio.source.input_artifact_ids,
+                "input_fingerprint": audio.source.input_fingerprint,
+            }
+        )
+        expected["audio.contract"] = _fp("ai-video-audio-contract/1", contract)
+    if contributions != expected:
+        raise _invalid("Registry dependency evidence projection is invalid.")
+
+
+def _load_exact_render_state(
+    bundle: LoadedProductionProject,
+    pointer: RenderStateSnapshotPointer,
+) -> RenderStateSnapshot:
+    root = bundle.root
+    state, _ = _read_render_model(
+        root,
+        pointer.path,
+        RenderStateSnapshot,
+        expected_file_hash=pointer.file_sha256,
+        label="dependency render state",
+    )
+    if (
+        not verify_artifact_hash(state)
+        or state.revision != pointer.revision
+        or state.content_hash != pointer.content_hash
+    ):
+        raise _invalid("Render dependency evidence identity is invalid.")
+    project_path = _resolve_candidate_project_path(root, state.project.path)
+    registry_path = _resolve_candidate_registry_path(root, state.registry.path)
+    _verify_snapshot_file_hash(
+        project_path, state.project.file_sha256, "render evidence project"
+    )
+    _verify_snapshot_file_hash(
+        registry_path, state.registry.file_sha256, "render evidence registry"
+    )
+    historical = load_production_project_candidate(
+        root,
+        bundle.manifest,
+        state.project.path,
+        state.registry.path,
+    )
+    _verify_manifest_snapshot_identity(historical, state.project, state.registry)
+    return load_verified_render_state(
+        root,
+        pointer,
+        project=state.project,
+        registry=state.registry,
+    )
+
+
+def _verify_dependency_render_evidence(
+    bundle: LoadedProductionProject,
+    evidence: RenderDependencyEvidence,
+) -> None:
+    _load_exact_render_state(bundle, evidence.pointer)
+
+
+def _verify_manifest_dependency_states(
+    bundle: LoadedProductionProject,
+    graph: DependencyGraphSnapshot,
+) -> None:
+    states = bundle.manifest.dependency_states
+    state_by_id = {state.node_id: state for state in states}
+    node_by_id = {node.node_id: node for node in graph.nodes}
+    active_ids = set(node_by_id)
+    if set(state_by_id).intersection(active_ids) != active_ids:
+        raise _invalid("Manifest dependency states do not cover the active graph.")
+    for node_id, state in state_by_id.items():
+        if node_id in active_ids:
+            if state.lifecycle is DependencyLifecycle.SUPERSEDED:
+                raise _invalid("Active dependency node cannot be superseded.")
+        elif state.lifecycle is not DependencyLifecycle.SUPERSEDED:
+            raise _invalid("Only absent dependency nodes may be retained as superseded.")
+        elif state.graph_revision_id == graph.revision_id:
+            raise _invalid("Superseded dependency state must preserve its origin revision.")
+
+    desired = desired_fingerprints(graph)
+    for node_id in sorted(active_ids):
+        state = state_by_id[node_id]
+        node = node_by_id[node_id]
+        if state.desired_fingerprint != desired[node_id]:
+            raise _invalid("Manifest dependency desired fingerprint is invalid.")
+        evidence = state.applied_evidence
+        if evidence is None:
+            continue
+        if evidence.artifact_id != node.artifact_id:
+            raise _invalid("Dependency evidence artifact does not match its node.")
+        if isinstance(evidence, ProjectDependencyEvidence):
+            if node.kind is not DependencyNodeKind.CREATIVE_ARTIFACT:
+                raise _invalid("Project evidence has an invalid dependency owner.")
+            _verify_dependency_project_evidence(bundle, evidence, node)
+        elif isinstance(evidence, RegistryDependencyEvidence):
+            if node.kind is not DependencyNodeKind.ASSET:
+                raise _invalid("Registry evidence has an invalid dependency owner.")
+            _verify_dependency_registry_evidence(bundle, evidence, node)
+        elif isinstance(evidence, RenderDependencyEvidence):
+            if node.kind in {
+                DependencyNodeKind.CREATIVE_ARTIFACT,
+                DependencyNodeKind.ASSET,
+            }:
+                raise _invalid("Render evidence has an invalid dependency owner.")
+            _verify_dependency_render_evidence(bundle, evidence)
+
+    active_render_pointers = {
+        state.applied_evidence.pointer
+        for node_id, state in state_by_id.items()
+        if node_id in active_ids
+        and isinstance(state.applied_evidence, RenderDependencyEvidence)
+    }
+    if bundle.manifest.active_render_state is None:
+        if active_render_pointers:
+            raise _invalid("Active render evidence requires active_render_state.")
+    elif active_render_pointers != {bundle.manifest.active_render_state}:
+        raise _invalid(
+            "Active render evidence must match the Manifest-selected render state."
+        )
+
+    for node_id in sorted(set(state_by_id) - active_ids):
+        evidence = state_by_id[node_id].applied_evidence
+        if isinstance(evidence, ProjectDependencyEvidence):
+            _verify_dependency_project_evidence(bundle, evidence)
+        elif isinstance(evidence, RegistryDependencyEvidence):
+            _verify_dependency_registry_evidence(bundle, evidence)
+        elif isinstance(evidence, RenderDependencyEvidence):
+            _verify_dependency_render_evidence(bundle, evidence)
+
+    try:
+        resolved = resolve_dependency_state(graph, states)
+    except AiVideoError as exc:
+        raise _invalid(
+            "Manifest dependency lifecycle is invalid.", exc.technical_detail
+        ) from exc
+    if resolved.states != tuple(sorted(states, key=lambda state: state.node_id)):
+        raise _invalid("Manifest dependency lifecycle is inconsistent with the graph.")
+
+
 def load_production_project_candidate(
     root: str | Path,
     manifest: ProductionManifest,
@@ -1199,12 +1558,22 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         bundle, manifest.active_project, manifest.active_registry
     )
     _verify_active_voice_evidence(bundle)
+    if manifest.active_dependency_graph is not None:
+        dependency_graph = _load_active_dependency_graph(
+            root, manifest.active_dependency_graph
+        )
+        _verify_manifest_dependency_states(bundle, dependency_graph)
+        bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
     if manifest.active_render_state is not None:
-        render_state = load_verified_render_state(
-            root,
-            manifest.active_render_state,
-            project=manifest.active_project,
-            registry=manifest.active_registry,
+        render_state = (
+            _load_exact_render_state(bundle, manifest.active_render_state)
+            if manifest.schema_version == "2.3"
+            else load_verified_render_state(
+                root,
+                manifest.active_render_state,
+                project=manifest.active_project,
+                registry=manifest.active_registry,
+            )
         )
         bundle = bundle.model_copy(update={"render_state": render_state})
     return bundle

@@ -455,6 +455,7 @@ class CaptionAssetMetadata(StrictModel):
     alignment_receipt_id: str = Field(min_length=1)
     timing_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     style_reference_id: str | None = None
+    style_reference_revision: int | None = Field(default=None, ge=1)
     style_content_hash: str | None = Field(
         default=None, pattern=r"^[0-9a-f]{64}$"
     )
@@ -463,7 +464,18 @@ class CaptionAssetMetadata(StrictModel):
     def _validate_style_identity(self) -> "CaptionAssetMetadata":
         if (self.style_reference_id is None) != (self.style_content_hash is None):
             raise ValueError("caption style identity must be all-or-none")
+        if self.style_reference_id is None and self.style_reference_revision is not None:
+            raise ValueError("caption style revision requires style identity")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_style_revision(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.style_reference_revision is None:
+            data.pop("style_reference_revision", None)
+        return data
 
 
 class EgressMetadata(StrictModel):
@@ -1951,6 +1963,12 @@ class ProductionManifest(StrictModel):
         if len(state_node_ids) != len(set(state_node_ids)):
             raise ValueError(
                 "Production Manifest dependency state node IDs must be unique"
+            )
+        if self.dependency_states != tuple(
+            sorted(self.dependency_states, key=lambda state: state.node_id)
+        ):
+            raise ValueError(
+                "Production Manifest dependency states must be ordered by node_id"
             )
 
     @model_serializer(mode="wrap")

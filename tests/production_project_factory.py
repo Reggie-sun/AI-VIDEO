@@ -1032,6 +1032,7 @@ def make_p4_composition_fixture(
             alignment_receipt_id=track.alignment_receipt_id,
             timing_fingerprint=track.timing_fingerprint,
             style_reference_id=style_reference.artifact_id,
+            style_reference_revision=style_reference.revision,
             style_content_hash=style_reference.content_hash,
         ),
     )
@@ -1166,6 +1167,54 @@ def make_p5_dependency_inputs(root: Path):
             ),
         ),
     )
+
+
+def make_manifest_23_project(root: Path):
+    """Materialize a deterministic pre-render Manifest 2.3 graph fixture."""
+
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        resolve_dependency_state,
+    )
+    from ai_video.production.models import DependencyGraphSnapshotPointer
+    from ai_video.production.paths import canonical_dependency_graph_snapshot_path
+
+    inputs = make_p5_dependency_inputs(root)
+    graph = build_production_dependency_graph(inputs)
+    applied = build_applied_dependency_evidence(inputs, None)
+    states = resolve_dependency_state(graph, applied).states
+    graph_payload = (
+        json.dumps(
+            graph.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    graph_path = root / canonical_dependency_graph_snapshot_path(graph.revision_id)
+    graph_path.parent.mkdir(parents=True, exist_ok=True)
+    graph_path.write_bytes(graph_payload)
+    graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=graph.revision_id,
+        content_hash=graph.content_hash,
+        path=graph_path.relative_to(root),
+        file_sha256=hashlib.sha256(graph_payload).hexdigest(),
+    )
+    manifest = inputs.project.manifest.model_copy(
+        update={
+            "schema_version": "2.3",
+            "manifest_revision": inputs.project.manifest.manifest_revision + 1,
+            "active_registry": inputs.project.manifest.active_registry,
+            "active_dependency_graph": graph_pointer,
+            "dependency_states": states,
+        }
+    )
+    (root / "state/manifest.json").write_text(
+        manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    return graph
 
 
 def load_initial_models(root: Path) -> tuple[ProductionProject, AssetRegistrySnapshot]:
@@ -1339,6 +1388,7 @@ def make_audio_import_upgrade_request(
             alignment_receipt_id=track.alignment_receipt_id,
             timing_fingerprint=track.timing_fingerprint,
             style_reference_id=style.artifact_id,
+            style_reference_revision=style.revision,
             style_content_hash=style.content_hash,
         ),
     )
