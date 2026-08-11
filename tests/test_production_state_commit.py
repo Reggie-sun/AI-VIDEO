@@ -13,12 +13,15 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
     AssetRegistrySnapshot,
+    DependencyLifecycle,
+    DependencyNodeState,
     ProductionProject,
     ProductionManifest,
     ProjectSnapshotPointer,
     RendererKind,
     RendererSelectionReceipt,
     RegistrySnapshotPointer,
+    RegistryDependencyEvidence,
     RenderStateSnapshotPointer,
     Shot,
     StateCommitStatus,
@@ -41,6 +44,7 @@ from ai_video.production.state_commit import (
     _canonical_json_bytes,
     _canonical_yaml_bytes,
     _owned_temp_name,
+    prepare_dependency_graph_transition,
 )
 from ai_video.production.paths import (
     canonical_render_attempt_root,
@@ -2898,3 +2902,502 @@ def test_keyboard_interrupt_after_final_replace_propagates_with_outcome_note(
     assert after.active_project == request.next_project
     assert after.active_registry == request.next_registry
     assert after.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+def _make_p5_bootstrap_transition(root: Path):
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+
+    inputs = project_factory.make_p5_dependency_inputs(root)
+    manifest = read_manifest(root).model_copy(
+        update={"active_registry": inputs.project.manifest.active_registry}
+    )
+    (root / "state/manifest.json").write_text(
+        manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    graph = build_production_dependency_graph(inputs)
+    applied = build_applied_dependency_evidence(inputs, None)
+    states = resolve_dependency_state(graph, applied).states
+    desired = desired_fingerprints(graph)
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=manifest.manifest_revision,
+        base_dependency_graph=manifest.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=states,
+        expected_desired_fingerprints=desired,
+    )
+    return graph, transition, desired
+
+
+def test_prepare_dependency_graph_transition_is_pure_and_recomputes_hashes(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    before = {
+        path.relative_to(tmp_path): path.stat().st_mtime_ns
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+    repeated = prepare_dependency_graph_transition(
+        expected_manifest_revision=transition.expected_manifest_revision,
+        base_dependency_graph=transition.base_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=transition.candidate_dependency_states,
+        expected_desired_fingerprints=desired,
+    )
+
+    assert repeated == transition
+    assert transition.candidate_dependency_graph.revision_id == graph.revision_id
+    assert transition.candidate_dependency_states
+    assert not (tmp_path / transition.candidate_dependency_graph.path).exists()
+    after = {
+        path.relative_to(tmp_path): path.stat().st_mtime_ns
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+    assert after == before
+
+
+def test_prepare_dependency_graph_transition_rejects_bare_applied_fingerprint(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    selected = next(
+        state
+        for state in transition.candidate_dependency_states
+        if state.lifecycle is DependencyLifecycle.STALE
+    )
+    states = tuple(
+        state.model_copy(update={"applied_fingerprint": "f" * 64})
+        if state.node_id == selected.node_id
+        else state
+        for state in transition.candidate_dependency_states
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        prepare_dependency_graph_transition(
+            expected_manifest_revision=transition.expected_manifest_revision,
+            base_dependency_graph=transition.base_dependency_graph,
+            candidate_graph=graph,
+            candidate_dependency_states=states,
+            expected_desired_fingerprints=desired,
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_package_root_exposes_only_reviewed_dependency_transition_surface() -> None:
+    import ai_video.production as production
+
+    assert production.prepare_dependency_graph_transition is prepare_dependency_graph_transition
+    assert hasattr(production.ProductionStateCommitter, "bootstrap_dependency_graph")
+    assert hasattr(production.ProductionStateCommitter, "record_dependency_node_applied")
+    assert hasattr(production.ProductionStateCommitter, "record_dependency_node_failed")
+    assert not hasattr(production, "GraphWriter")
+    assert not hasattr(production, "write_dependency_graph_atomic")
+    assert not hasattr(production, "recover_dependency_graph")
+
+
+@pytest.mark.parametrize("schema_version", ["2.0", "2.1", "2.2"])
+def test_bootstrap_dependency_graph_upgrades_2x_and_exact_replay_is_zero_write(
+    tmp_path: Path, schema_version: str,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    manifest_path = tmp_path / "state/manifest.json"
+    original = read_manifest(tmp_path).model_copy(
+        update={"schema_version": schema_version}
+    )
+    manifest_path.write_text(original.model_dump_json(indent=2), encoding="utf-8")
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+
+    committed = writer.bootstrap_dependency_graph(
+        attempt_id="p5-bootstrap-1",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired,
+    )
+
+    assert committed.schema_version == "2.3"
+    assert committed.active_dependency_graph == transition.candidate_dependency_graph
+    assert committed.dependency_states == transition.candidate_dependency_states
+    assert committed.manifest_revision == transition.expected_manifest_revision + 2
+    assert committed.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    graph_mtime = (tmp_path / transition.candidate_dependency_graph.path).stat().st_mtime_ns
+    manifest_mtime = (tmp_path / "state/manifest.json").stat().st_mtime_ns
+
+    replayed = writer.bootstrap_dependency_graph(
+        attempt_id="p5-bootstrap-1",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired,
+    )
+
+    assert replayed == committed
+    assert (tmp_path / transition.candidate_dependency_graph.path).stat().st_mtime_ns == graph_mtime
+    assert (tmp_path / "state/manifest.json").stat().st_mtime_ns == manifest_mtime
+
+    current_transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=committed.manifest_revision,
+        base_dependency_graph=committed.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=committed.dependency_states,
+        expected_desired_fingerprints=desired,
+    )
+    replayed_with_new_id = writer.bootstrap_dependency_graph(
+        attempt_id=f"p5-bootstrap-{schema_version}-exact-current",
+        graph=graph,
+        transition=current_transition,
+        expected_desired_fingerprints=desired,
+    )
+    assert replayed_with_new_id == committed
+    assert (tmp_path / "state/manifest.json").stat().st_mtime_ns == manifest_mtime
+
+
+def test_record_dependency_node_failed_preserves_precise_frontier(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    committed = writer.bootstrap_dependency_graph(
+        attempt_id="p5-bootstrap-failure",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired,
+    )
+    stale = next(
+        state
+        for state in committed.dependency_states
+        if state.lifecycle is DependencyLifecycle.STALE
+    )
+
+    failed = writer.record_dependency_node_failed(
+        expected_manifest_revision=committed.manifest_revision,
+        active_dependency_graph=committed.active_dependency_graph,
+        candidate_dependency_graph=committed.active_dependency_graph,
+        node_id=stale.node_id,
+        desired_fingerprint=stale.desired_fingerprint,
+        error_code="fixture_failed",
+        error_message="Fixture rebuild failed.",
+    )
+
+    failed_by_id = {state.node_id: state for state in failed.dependency_states}
+    assert failed_by_id[stale.node_id].lifecycle is DependencyLifecycle.FAILED
+    assert failed_by_id[stale.node_id].error_code == "fixture_failed"
+
+
+def test_record_dependency_node_failed_rejects_standalone_renderer_node(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    committed = writer.bootstrap_dependency_graph(
+        attempt_id="p5-bootstrap-renderer-failure",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired,
+    )
+    renderer_state = next(
+        state
+        for state in committed.dependency_states
+        if state.node_id.startswith(("renderer-source:", "render:"))
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.record_dependency_node_failed(
+            expected_manifest_revision=committed.manifest_revision,
+            active_dependency_graph=committed.active_dependency_graph,
+            candidate_dependency_graph=committed.active_dependency_graph,
+            node_id=renderer_state.node_id,
+            desired_fingerprint=renderer_state.desired_fingerprint,
+            error_code="renderer_failed",
+            error_message="safe",
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_dependency_result_replace_failure_maps_unknown_outcome(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    committed = ProductionStateCommitter(tmp_path).bootstrap_dependency_graph(
+        attempt_id="p5-bootstrap-result-outcome",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired,
+    )
+    stale = next(
+        state
+        for state in committed.dependency_states
+        if state.lifecycle is DependencyLifecycle.STALE
+    )
+    writer = make_committer(
+        tmp_path,
+        injector=RaisingCrashInjector(CommitPhase.AFTER_MANIFEST_REPLACE),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.record_dependency_node_failed(
+            expected_manifest_revision=committed.manifest_revision,
+            active_dependency_graph=committed.active_dependency_graph,
+            candidate_dependency_graph=committed.active_dependency_graph,
+            node_id=stale.node_id,
+            desired_fingerprint=stale.desired_fingerprint,
+            error_code="fixture_failed",
+            error_message="safe",
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    after = read_manifest(tmp_path)
+    assert next(
+        state for state in after.dependency_states if state.node_id == stale.node_id
+    ).lifecycle is DependencyLifecycle.FAILED
+
+
+def test_record_dependency_asset_applied_reopens_fixed_registry_owner_and_replays(
+    tmp_path: Path,
+) -> None:
+    from ai_video.production.dependency import (
+        build_dependency_graph,
+        desired_fingerprints,
+    )
+
+    project_factory.write_production_project(tmp_path)
+    production_graph, _, _ = _make_p5_bootstrap_transition(tmp_path)
+    node = next(
+        item
+        for item in production_graph.nodes
+        if item.node_id == "asset:image-shot-1"
+    )
+    graph = build_dependency_graph((node,), ())
+    desired = desired_fingerprints(graph)
+    manifest = read_manifest(tmp_path)
+    stale = DependencyNodeState(
+        node_id=node.node_id,
+        graph_revision_id=graph.revision_id,
+        desired_fingerprint=desired[node.node_id],
+        lifecycle=DependencyLifecycle.STALE,
+    )
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=manifest.manifest_revision,
+        base_dependency_graph=None,
+        candidate_graph=graph,
+        candidate_dependency_states=(stale,),
+        expected_desired_fingerprints=desired,
+    )
+    writer = ProductionStateCommitter(tmp_path)
+    committed = writer.bootstrap_dependency_graph(
+        attempt_id="p5-bootstrap-asset-apply",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired,
+    )
+    evidence = RegistryDependencyEvidence(
+        owner="registry_snapshot",
+        pointer=committed.active_registry,
+        artifact_id=node.artifact_id,
+        artifact_fingerprint=desired[node.node_id],
+    )
+
+    applied = writer.record_dependency_node_applied(
+        expected_manifest_revision=committed.manifest_revision,
+        active_dependency_graph=committed.active_dependency_graph,
+        candidate_dependency_graph=committed.active_dependency_graph,
+        node_id=node.node_id,
+        desired_fingerprint=desired[node.node_id],
+        evidence=evidence,
+    )
+    manifest_mtime = (tmp_path / "state/manifest.json").stat().st_mtime_ns
+    replayed = writer.record_dependency_node_applied(
+        expected_manifest_revision=applied.manifest_revision,
+        active_dependency_graph=applied.active_dependency_graph,
+        candidate_dependency_graph=applied.active_dependency_graph,
+        node_id=node.node_id,
+        desired_fingerprint=desired[node.node_id],
+        evidence=evidence,
+    )
+
+    assert applied.dependency_states[0].lifecycle is DependencyLifecycle.FRESH
+    assert replayed == applied
+    assert (tmp_path / "state/manifest.json").stat().st_mtime_ns == manifest_mtime
+
+
+def test_bootstrap_dependency_graph_rejects_unverified_existing_evidence_before_write(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    selected = next(
+        state
+        for state in transition.candidate_dependency_states
+        if isinstance(state.applied_evidence, RegistryDependencyEvidence)
+    )
+    assert selected.applied_evidence is not None
+    bad_evidence = selected.applied_evidence.model_copy(
+        update={
+            "pointer": selected.applied_evidence.pointer.model_copy(
+                update={"file_sha256": "f" * 64}
+            )
+        }
+    )
+    states = tuple(
+        state.model_copy(update={"applied_evidence": bad_evidence})
+        if state.node_id == selected.node_id
+        else state
+        for state in transition.candidate_dependency_states
+    )
+    forged = prepare_dependency_graph_transition(
+        expected_manifest_revision=transition.expected_manifest_revision,
+        base_dependency_graph=transition.base_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=states,
+        expected_desired_fingerprints=desired,
+    )
+    before = read_manifest(tmp_path)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).bootstrap_dependency_graph(
+            attempt_id="p5-bootstrap-tampered-evidence",
+            graph=graph,
+            transition=forged,
+            expected_desired_fingerprints=desired,
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert read_manifest(tmp_path) == before
+    assert not (tmp_path / forged.candidate_dependency_graph.path).exists()
+
+
+def test_bootstrap_dependency_graph_durably_promotes_before_final_activation(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    ops = RecordingNativeFileOps(tmp_path)
+
+    committed = ProductionStateCommitter(tmp_path, file_ops=ops).bootstrap_dependency_graph(
+        attempt_id="p5-bootstrap-order",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired,
+    )
+
+    graph_path = transition.candidate_dependency_graph.path.as_posix()
+    graph_link = next(
+        index
+        for index, event in enumerate(ops.events)
+        if event.startswith("link:state/") and event.endswith(f"->{graph_path}")
+    )
+    graph_parent_fsync = next(
+        index
+        for index, event in enumerate(ops.events[graph_link + 1 :], graph_link + 1)
+        if event == "fsync_dir:state"
+    )
+    graph_reopen_hash = next(
+        index
+        for index, event in enumerate(
+            ops.events[graph_parent_fsync + 1 :], graph_parent_fsync + 1
+        )
+        if event == f"sha:{graph_path}"
+    )
+    manifest_replaces = [
+        index
+        for index, event in enumerate(ops.events)
+        if event == "replace:state/.p2a-manifest.tmp->state/manifest.json"
+    ]
+
+    assert len(manifest_replaces) == 2
+    assert graph_link < graph_parent_fsync < graph_reopen_hash < manifest_replaces[-1]
+    assert committed.active_dependency_graph == transition.candidate_dependency_graph
+
+
+@pytest.mark.parametrize(
+    ("phase", "candidate_is_durable"),
+    [
+        (CommitPhase.AFTER_ATTEMPT_STARTED, False),
+        (CommitPhase.AFTER_ARTIFACT_VERIFICATION, True),
+    ],
+)
+def test_recovery_converges_interrupted_dependency_bootstrap_without_activation(
+    tmp_path: Path, phase: CommitPhase, candidate_is_durable: bool,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    writer = make_committer(
+        tmp_path,
+        injector=ProcessInterruptInjector(phase, 1, KeyboardInterrupt),
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        writer.bootstrap_dependency_graph(
+            attempt_id=f"p5-bootstrap-crash-{phase.value}",
+            graph=graph,
+            transition=transition,
+            expected_desired_fingerprints=desired,
+        )
+
+    interrupted = read_manifest(tmp_path)
+    assert interrupted.active_dependency_graph == transition.base_dependency_graph
+    assert interrupted.attempts[-1].status is StateCommitStatus.RUNNING
+    assert (
+        tmp_path / transition.candidate_dependency_graph.path
+    ).exists() is candidate_is_durable
+
+    report = ProductionStateCommitter(tmp_path).recover()
+    recovered = read_manifest(tmp_path)
+
+    assert recovered.active_dependency_graph == transition.base_dependency_graph
+    assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
+    assert recovered.manifest_revision == interrupted.manifest_revision + 1
+    candidate_items = [
+        item
+        for item in report.items
+        if item.path == transition.candidate_dependency_graph.path
+    ]
+    assert bool(candidate_items) is candidate_is_durable
+    if candidate_items:
+        assert candidate_items[0].disposition.value == "interrupted_recorded"
+
+
+def test_recovery_reopens_active_graph_after_final_replace_process_interrupt(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    graph, transition, desired = _make_p5_bootstrap_transition(tmp_path)
+    writer = make_committer(
+        tmp_path,
+        injector=ProcessInterruptInjector(
+            CommitPhase.AFTER_MANIFEST_REPLACE, 2, KeyboardInterrupt
+        ),
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        writer.bootstrap_dependency_graph(
+            attempt_id="p5-bootstrap-final-replace-interrupt",
+            graph=graph,
+            transition=transition,
+            expected_desired_fingerprints=desired,
+        )
+
+    committed = read_manifest(tmp_path)
+    assert committed.active_dependency_graph == transition.candidate_dependency_graph
+    assert committed.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    report = ProductionStateCommitter(tmp_path).recover()
+
+    assert report.manifest_revision_after == committed.manifest_revision
+    assert any(
+        item.path == transition.candidate_dependency_graph.path
+        and item.disposition.value == "active"
+        for item in report.items
+    )
