@@ -4,7 +4,7 @@
 
 ## Purpose
 
-当前仓库有三条已实现、边界不同的产品表面：稳定的 `0.1.x` Legacy local-first Python CLI、v0.2 P2 提供的 read-only Production Project Core Python API，以及 P2A 提供的 explicit Production State Commit/Recovery Python API。后续目标是由 Codex 驱动、以 durable project state 为核心的 AI Video / AI Comic Production Harness，但未实施的 slice 仍只是规划。
+当前仓库有边界不同的已实现产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2-P5 提供的 read-only Production Project、explicit P2A State Commit/Recovery、deterministic Composition/HyperFrames、Voice/Captions、immutable Dependency Graph 与 selective rebuild Python APIs。后续目标是由 Codex 驱动、以 durable project state 为核心的 AI Video / AI Comic Production Harness，但 P6-P9 等未实施 slice 仍只是规划。
 
 Agent 必须维护当前产品承诺：
 
@@ -19,9 +19,11 @@ Agent 必须维护当前产品承诺：
 - 当前已实现的 `0.1.x` / legacy runtime 仍是 local-first Python CLI，默认只连接本地 ComfyUI；非本地 ComfyUI 必须显式设置 `allow_non_local: true`。公共命令仍只有三个，产物仍使用当前 flat artifact layout。
 - 当前已实现的 P2 Production Project Core 通过 `ai_video.production.load_production_project()` 暴露，只读取并验证显式物化的 v2 project、creative artifacts、Manifest-selected revision 和 Asset Registry snapshot；它不写入、不激活、不增加 CLI。
 - 当前已实现并验收的 P2A Production State Commit Protocol 通过 `ai_video.production` Python API 暴露，拥有唯一 v2 writer/recovery owner、exact project/registry snapshot activation 和 explicit crash recovery；它不增加 CLI，也不改变 Legacy Manifest/layout。
+- 当前已实现的 P3/P4 通过同一个 `CompositionSpec` -> `ResolvedTimeline` -> pinned local HyperFrames path提供deterministic render、audio/voice/caption contracts；P4已于`f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward合入local `main`，尚未push/release。
+- 当前feature branch已实现P5：`DependencyGraphSnapshot`只保存immutable typed graph inputs，Manifest 2.3独占active graph与desired/applied/lifecycle，`ProductionStateCommitter`仍独占graph write/co-activation/recovery；P5不增加CLI、Provider、renderer或automatic recovery，且尚未merge/push/release。
 - `docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md` 是新的 v0.2 planning target；它不是已实现行为，也不是一次性实施授权。
 - `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 已被 supersede，只保留为 provider-centric 历史设计与可复用安全契约来源。
-- v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0、P1、P2、P2A 的当前状态见 runtime baseline 与 roadmap；P3+ 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。
+- v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0-P5 的当前状态见 runtime baseline 与 roadmap；P6+ 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。
 - 某个 slice 落地前，与该 slice 冲突的当前契约继续有效；不得通过只改文档把 proposed behavior 描述成 runtime truth。
 - Local Wan + ComfyUI 始终保持 legacy default，并在新 domain 中作为 optional `generated_video` asset capability 保留。任何远程 Provider 都必须在后续独立 slice 中满足 explicit opt-in、Budget Guard、Cloud Egress 和 crash-safe persistence gate。
 
@@ -67,11 +69,12 @@ Agent 必须维护当前产品承诺：
 - run manifest 是 pipeline 状态的持久化真相源，必须原子写入。
 - 除非用户要求迁移，否则保持 `README.md` 中描述的产物目录结构不变。
 - 写入配置解析结果和 manifest 记录的路径必须是干净的绝对路径。
-- Legacy mode 保持“上一镜头最后一帧可喂给下一镜头”的链式生成模型；未来 v0.2 dependency graph 不得退化为顺序式 blanket stale。
+- Legacy mode 保持“上一镜头最后一帧可喂给下一镜头”的链式生成模型；v0.2 P5 dependency graph必须保持precise transitive invalidation，不得退化为顺序式blanket stale。
 - 保持项目对 workflow 的通用性，依赖 template + binding，而不是在 CLI 或 pipeline 中写死节点 ID。
 - P2 Production Project Core 是当前 runtime truth：只读加载 strict v2 schemas、验证 semantic hashes、project-root containment、六种 Shot `visual_strategy`、concrete references 和 exact Asset Registry revision。
-- P2 reader 不拥有 writer、activation、lifecycle mutation、desired fingerprint、renderer 或 Provider。已验收的 P2A `ProductionStateCommitter` 是 v2 project/registry snapshot 写入、active pointer 切换与 explicit recovery 的唯一 owner。
-- P3 planning artifact 只定义未来 Composition/HyperFrames adapter 边界；在 P2A 和 Renderer Gate 完成且用户再次授权前，不得安装或执行 renderer runtime。
+- P2 reader 不拥有 writer、activation、lifecycle mutation、desired fingerprint、renderer 或 Provider。已验收的 P2A `ProductionStateCommitter` 是 v2 project/registry/render/graph snapshot 写入、active pointer 切换与 explicit recovery 的唯一 owner。
+- P3/P4 `ResolvedTimeline` 是唯一 order/frame/sample/timing owner；P5只能把它作为opaque fingerprint input消费，不得在graph中推导或另造canonical timeline。
+- P5 immutable graph不得保存fresh/stale/failed/blocked/superseded等mutable state；Manifest 2.3是active graph、desired/applied fingerprints与lifecycle的唯一owner。Same-desired failure不得auto-retry，exact replay不得重复调用provider/renderer或推进state。
 
 ## Module Boundaries
 
@@ -89,10 +92,11 @@ Agent 必须维护当前产品承诺：
 - `src/ai_video/production/validation.py`：负责 Shot visual strategy、reference 和 project-level static validation。
 - `src/ai_video/production/registry.py`：负责 read-only Asset Registry snapshot、revision、entry bytes 和 containment verification。
 - `src/ai_video/production/project.py`：负责 v2 bundle loading、Manifest-selected project revision 和 registry selection verification。
+- `src/ai_video/production/dependency.py`：负责pure immutable graph construction、desired fingerprint resolution、blocked/frontier propagation和selective rebuild decision；不得写文件、Manifest、registry或runtime status。
 - `src/ai_video/production/state_commit.py`：负责 P2A 唯一 v2 state writer、snapshot activation、commit-point error mapping 和 explicit recovery。
-- `src/ai_video/production/__init__.py`：只暴露 P2/P2A public imports，不承载实现逻辑。
+- `src/ai_video/production/__init__.py`：只暴露已批准的v0.2 public imports，不承载实现逻辑。
 
-P2 reader、registry 和 validation modules 均不得写入或激活 state；P2A writer/commit/recovery protocol 必须继续由 `state_commit.py` 单一拥有，不得把 mutation 分散到 reader、registry 或 Legacy manifest/pipeline。不要随意把职责跨模块搬运。优先做局部、小范围、低漂移的修复。
+P2 reader、registry、validation和P5 dependency modules均不得写入或激活state；P2A writer/commit/recovery protocol必须继续由`state_commit.py`单一拥有，不得把mutation分散到reader、registry、dependency或Legacy manifest/pipeline。不要随意把职责跨模块搬运。优先做局部、小范围、低漂移的修复。
 
 ## Coding Standards
 
@@ -147,6 +151,7 @@ P2 reader、registry 和 validation modules 均不得写入或激活 state；P2A
 - ffmpeg 行为：`tests/test_ffmpeg_tools.py`
 - P2 schema、hash、path、strategy、registry 或 loader：`tests/test_production_models.py`、`tests/test_production_validation.py`、`tests/test_production_registry.py`、`tests/test_production_project.py`
 - P2 与 Legacy Config/CLI isolation：在上述 P2 tests 之外加跑 `tests/test_config.py`、`tests/test_cli.py`
+- P5 graph/resolution/Manifest/recovery：`tests/test_production_dependency.py`、`tests/test_production_selective_rebuild.py`、`tests/test_production_models.py`、`tests/test_production_project.py`、`tests/test_production_state_commit.py`、`tests/test_production_state_recovery.py`
 
 如果一次改动跨越多个表面，就运行所有对应测试文件。
 
@@ -159,7 +164,7 @@ P2 reader、registry 和 validation modules 均不得写入或激活 state；P2A
 - 修改 `runs/` 下的 manifest schema 或产物目录结构。
 - 把本地优先策略改成默认允许远程主机。
 - 引入前端、API server、队列管理、音频，或其他 MVP 规范中明确排除的子系统。
-- 执行 v0.2 P3-P9 任一 runtime slice，或把 plan/spec 中的 proposed contract 写成当前行为。P2 read-only core 与 P2A state commit/recovery 已实现；任何超出已验收 P2A contract 的 v2 writer、activation、schema/layout mutation 仍需独立授权与 crash-safety tests，P3 还必须完成 Renderer Gate。P1 只允许在其 Legacy scope 内做独立 bugfix/release handling，不得借此扩展新 product domain。
+- 执行 v0.2 P6-P9 任一 runtime slice，或把 plan/spec 中的 proposed contract 写成当前行为。P2-P5 已实现各自当前contract；任何新的v2 writer、activation、schema/layout mutation仍需独立授权与crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
 
 ## Session Continuity
 
