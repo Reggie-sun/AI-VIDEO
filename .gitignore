@@ -13,3 +13,4 @@ runs/*
 *.png
 node_modules/
 .hyperframes/
+.gstack/
