@@ -2898,13 +2898,29 @@ def test_dependency_node_state_blocked_rejects_error_fields():
         )
 
 
-def test_dependency_node_state_superseded_requires_applied_fingerprint():
-    with pytest.raises(ValidationError, match="applied_fingerprint"):
+def test_dependency_node_state_superseded_allows_never_applied_state():
+    state = DependencyNodeState(
+        node_id="asset:voice-1",
+        graph_revision_id=ONE_HASH,
+        desired_fingerprint=ZERO_HASH,
+        lifecycle=DependencyLifecycle.SUPERSEDED,
+    )
+    assert state.applied_fingerprint is None
+    assert state.applied_evidence is None
+
+
+@pytest.mark.parametrize(
+    "lifecycle",
+    [DependencyLifecycle.STALE, DependencyLifecycle.SUPERSEDED],
+)
+def test_dependency_node_state_non_blocked_lifecycle_rejects_blocked_by(lifecycle):
+    with pytest.raises(ValidationError, match="blocked_by"):
         DependencyNodeState(
             node_id="asset:voice-1",
             graph_revision_id=ONE_HASH,
             desired_fingerprint=ZERO_HASH,
-            lifecycle=DependencyLifecycle.SUPERSEDED,
+            lifecycle=lifecycle,
+            blocked_by=("creative:shot:shot-1:voice",),
         )
 
 
@@ -3043,6 +3059,22 @@ def test_dependency_graph_transition_rejects_state_graph_revision_mismatch():
             candidate_dependency_states=(state,),
             candidate_dependency_states_hash=ZERO_HASH,
         )
+
+
+def test_dependency_graph_transition_accepts_superseded_origin_revision():
+    state = DependencyNodeState(
+        node_id="asset:retired",
+        graph_revision_id=ONE_HASH,
+        desired_fingerprint=ONE_HASH,
+        lifecycle=DependencyLifecycle.SUPERSEDED,
+    )
+    transition = DependencyGraphTransition(
+        expected_manifest_revision=1,
+        candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_dependency_states=(state,),
+        candidate_dependency_states_hash=ZERO_HASH,
+    )
+    assert transition.candidate_dependency_states == (state,)
 
 
 def test_dependency_graph_transition_rejects_duplicate_state_node_ids():
@@ -3207,6 +3239,21 @@ def test_manifest_23_requires_state_graph_revision_to_match_active_graph():
             active_dependency_graph=make_dependency_graph_snapshot_pointer(),
             dependency_states=(state,),
         )
+
+
+def test_manifest_23_accepts_superseded_state_origin_revision():
+    state = DependencyNodeState(
+        node_id="asset:retired",
+        graph_revision_id=ONE_HASH,
+        desired_fingerprint=ONE_HASH,
+        lifecycle=DependencyLifecycle.SUPERSEDED,
+    )
+    manifest = make_state_manifest(
+        schema_version="2.3",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        dependency_states=(state,),
+    )
+    assert manifest.dependency_states == (state,)
 
 
 def test_manifest_23_requires_unique_state_node_ids():

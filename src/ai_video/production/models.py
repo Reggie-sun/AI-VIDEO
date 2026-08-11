@@ -1939,10 +1939,13 @@ class ProductionManifest(StrictModel):
         if self.active_dependency_graph is not None:
             active_revision = self.active_dependency_graph.revision_id
             for state in self.dependency_states:
-                if state.graph_revision_id != active_revision:
+                if (
+                    state.lifecycle is not DependencyLifecycle.SUPERSEDED
+                    and state.graph_revision_id != active_revision
+                ):
                     raise ValueError(
-                        "dependency state graph_revision_id must match "
-                        "active graph revision_id"
+                        "active dependency state graph_revision_id must "
+                        "match active graph revision_id"
                     )
         state_node_ids = [state.node_id for state in self.dependency_states]
         if len(state_node_ids) != len(set(state_node_ids)):
@@ -2261,6 +2264,8 @@ class DependencyNodeState(StrictModel):
                     "fresh lifecycle cannot carry error fields"
                 )
         elif self.lifecycle is DependencyLifecycle.STALE:
+            if self.blocked_by:
+                raise ValueError("stale lifecycle cannot have blocked_by")
             if self.error_code is not None or self.error_message is not None:
                 raise ValueError(
                     "stale lifecycle cannot carry error fields"
@@ -2284,10 +2289,8 @@ class DependencyNodeState(StrictModel):
                     "blocked lifecycle cannot carry error fields"
                 )
         elif self.lifecycle is DependencyLifecycle.SUPERSEDED:
-            if self.applied_fingerprint is None:
-                raise ValueError(
-                    "superseded lifecycle retains applied_fingerprint"
-                )
+            if self.blocked_by:
+                raise ValueError("superseded lifecycle cannot have blocked_by")
             if self.error_code is not None or self.error_message is not None:
                 raise ValueError(
                     "superseded lifecycle cannot carry error fields"
@@ -2320,10 +2323,13 @@ class DependencyGraphTransition(StrictModel):
                 "transition candidate_dependency_states must be ordered by node_id"
             )
         for state in self.candidate_dependency_states:
-            if state.graph_revision_id != active_revision:
+            if (
+                state.lifecycle is not DependencyLifecycle.SUPERSEDED
+                and state.graph_revision_id != active_revision
+            ):
                 raise ValueError(
-                    "transition candidate state graph_revision_id must match "
-                    "candidate_dependency_graph revision_id"
+                    "transition active candidate state graph_revision_id must "
+                    "match candidate_dependency_graph revision_id"
                 )
         return self
 
