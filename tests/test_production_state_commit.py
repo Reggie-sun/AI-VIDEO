@@ -19,6 +19,10 @@ from ai_video.production.models import (
     ProductionProject,
     ProductionManifest,
     ProjectSnapshotPointer,
+    QaLayoutRules,
+    QaLayer,
+    QaPolicy,
+    QaTechnicalThresholds,
     RendererKind,
     RendererSelectionReceipt,
     RegistrySnapshotPointer,
@@ -26,9 +30,10 @@ from ai_video.production.models import (
     RecoveryDisposition,
     RenderStateSnapshotPointer,
     Shot,
+    SourceReference,
     StateCommitStatus,
 )
-from ai_video.production.project import load_production_project_candidate
+from ai_video.production.project import load_production_project, load_production_project_candidate
 from ai_video.production.registry import load_asset_registry
 from ai_video.production.registry import registry_semantic_sha256
 import ai_video.production.state_commit as state_commit
@@ -64,6 +69,63 @@ import production_project_factory as project_factory
 
 ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
+
+
+def make_qa_policy(*, version: str = "1") -> QaPolicy:
+    return seal_artifact(
+        QaPolicy(
+            artifact_id=f"qa-policy-{version}",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id=f"qa-policy-{version}",
+            source_provenance=(
+                SourceReference(kind="derived", reference="p6-test-fixture"),
+            ),
+            policy_id="qa-default",
+            policy_version=version,
+            required_layers=(QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.STRATEGY),
+            technical_thresholds=QaTechnicalThresholds(
+                black_luma_max_milli=10,
+                silence_peak_max_millidb=-60_000,
+                clipping_peak_min_millidb=-100,
+            ),
+            layout_rules=QaLayoutRules(
+                safe_area_inset_milli=50,
+                caption_overflow_tolerance_milli=0,
+            ),
+            strategy_rules_version="1",
+            semantic_requirement="optional",
+        )
+    )
+
+
+def test_p6_policy_activation_migrates_23_and_exact_replay_is_noop(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    writer = ProductionStateCommitter(tmp_path)
+    committed = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    assert committed.schema_version == "2.4"
+    assert committed.active_dependency_graph == before.active_dependency_graph
+    assert committed.dependency_states == before.dependency_states
+    assert committed.active_qa_policy is not None
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.qa_policy == make_qa_policy()
+
+    replay = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    assert replay == committed
 
 
 def test_voice_lifecycle_api_persists_r1_then_mints_one_use_r2_permit(

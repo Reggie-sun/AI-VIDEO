@@ -54,6 +54,8 @@ from ai_video.production.models import (
     ProductionBrief,
     ProductionManifest,
     ProductionProject,
+    QaPolicy,
+    QaPolicyPointer,
     ProjectDependencyEvidence,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
@@ -64,6 +66,8 @@ from ai_video.production.models import (
     RenderReceipt,
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
+    ReviewReceipt,
+    ReviewReceiptPointer,
     RenderDependencyEvidence,
     ResolvedTimeline,
     Scene,
@@ -137,6 +141,62 @@ def _load_json_model(path: Path, model_type: type[ModelT]) -> ModelT:
         return model_type.model_validate_json(path.read_text(encoding="utf-8"))
     except (OSError, ValidationError, ValueError) as exc:
         raise _invalid(f"Could not load production state: {path}", str(exc)) from exc
+
+
+def _load_content_addressed_json(
+    root: Path,
+    path: Path,
+    *,
+    file_sha256: str,
+    model_type: type[ModelT],
+    content_hash: str,
+    label: str,
+) -> ModelT:
+    resolved = _resolve_input(root, path, allowed_root=root / "state")
+    try:
+        snapshot = _read_regular_file_nofollow(resolved, contained_by=root / "state")
+        model = model_type.model_validate_json(snapshot.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid(f"Could not reopen {label}.", str(exc)) from exc
+    if (
+        snapshot.file_sha256 != file_sha256
+        or getattr(model, "content_hash", None) != content_hash
+        or not verify_artifact_hash(model)
+    ):
+        raise _invalid(f"{label} identity is invalid.")
+    return model
+
+
+def load_qa_policy(root: str | Path, pointer: QaPolicyPointer) -> QaPolicy:
+    resolved_root = Path(root).resolve(strict=True)
+    policy = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=QaPolicy,
+        content_hash=pointer.content_hash,
+        label="QA policy",
+    )
+    if policy.policy_id != pointer.policy_id or policy.policy_version != pointer.policy_version:
+        raise _invalid("QA policy pointer identity is invalid.")
+    return policy
+
+
+def load_review_receipt(
+    root: str | Path, pointer: ReviewReceiptPointer
+) -> ReviewReceipt:
+    resolved_root = Path(root).resolve(strict=True)
+    receipt = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=ReviewReceipt,
+        content_hash=pointer.content_hash,
+        label="Review Receipt",
+    )
+    if receipt.review_id != pointer.review_id or receipt.layer != pointer.layer:
+        raise _invalid("Review Receipt pointer identity is invalid.")
+    return receipt
 
 
 def _load_referenced_artifact(
@@ -1659,10 +1719,19 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         )
         _verify_manifest_dependency_states(bundle, dependency_graph)
         bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
+    if manifest.schema_version == "2.4":
+        if manifest.active_qa_policy is None:
+            raise _invalid("Manifest 2.4 requires an active QA policy.")
+        qa_policy = load_qa_policy(root, manifest.active_qa_policy)
+        for receipt_pointer in manifest.active_review_receipts:
+            receipt = load_review_receipt(root, receipt_pointer)
+            if receipt.qa_policy != manifest.active_qa_policy:
+                raise _invalid("Active Review Receipt uses a stale QA policy.")
+        bundle = bundle.model_copy(update={"qa_policy": qa_policy})
     if manifest.active_render_state is not None:
         render_state = (
             _load_exact_render_state(bundle, manifest.active_render_state)
-            if manifest.schema_version == "2.3"
+            if manifest.schema_version in {"2.3", "2.4"}
             else load_verified_render_state(
                 root,
                 manifest.active_render_state,

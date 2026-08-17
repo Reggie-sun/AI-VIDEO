@@ -2228,6 +2228,27 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "Production Manifest 2.4 requires active_dependency_graph"
                 )
+            layers = tuple(item.layer for item in self.review_states)
+            receipt_layers = tuple(item.layer for item in self.active_review_receipts)
+            if len(layers) != len(set(layers)) or len(receipt_layers) != len(
+                set(receipt_layers)
+            ):
+                raise ValueError("Manifest 2.4 review layers must be unique")
+            if layers != tuple(sorted(layers, key=lambda item: item.value)):
+                raise ValueError("Manifest 2.4 review states must be canonically ordered")
+            if receipt_layers != tuple(
+                sorted(receipt_layers, key=lambda item: item.value)
+            ):
+                raise ValueError("Manifest 2.4 review receipts must be canonically ordered")
+            active_by_layer = {
+                item.layer: item for item in self.active_review_receipts
+            }
+            for state in self.review_states:
+                if state.lifecycle is not ReviewLifecycle.STALE:
+                    if state.active_receipt != active_by_layer.get(state.layer):
+                        raise ValueError("current review state requires its active receipt")
+                elif state.active_receipt is not None:
+                    raise ValueError("stale review state cannot select a receipt")
         return self
 
     def _validate_manifest_23_graph_lifecycle(self) -> None:
@@ -2306,6 +2327,7 @@ class LoadedProductionProject(StrictModel):
     asset_paths: dict[str, Path]
     render_state: RenderStateSnapshot | None = None
     dependency_graph: DependencyGraphSnapshot | None = None
+    qa_policy: QaPolicy | None = None
 
     _freeze_asset_paths = field_validator("asset_paths")(_immutable_mapping)
 

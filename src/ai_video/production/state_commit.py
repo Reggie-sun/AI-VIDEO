@@ -35,7 +35,7 @@ from ai_video.production.captions import (
     _canonical_track_bytes,
     caption_timing_fingerprint,
 )
-from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import (
     AssetType,
     AssetRecord,
@@ -56,6 +56,10 @@ from ai_video.production.models import (
     LoadedProductionProject,
     ProductionManifest,
     ProductionProject,
+    QaLayer,
+    QaPolicy,
+    QaPolicyPointer,
+    QaVerdict,
     ProjectSnapshotPointer,
     RecoveryDisposition,
     RecoveryItem,
@@ -70,6 +74,10 @@ from ai_video.production.models import (
     RenderSourceBundlePointer,
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
+    ReviewLayerState,
+    ReviewLifecycle,
+    ReviewReceipt,
+    ReviewReceiptPointer,
     ResolvedTimeline,
     SourceReference,
     StateCommitAttempt,
@@ -98,6 +106,8 @@ from ai_video.production.paths import (
     canonical_voice_audio_candidate_path,
     canonical_audio_asset_path,
     canonical_dependency_graph_snapshot_path,
+    canonical_qa_policy_path,
+    canonical_review_receipt_path,
 )
 from ai_video.production.project import (
     _load_exact_render_state,
@@ -504,7 +514,35 @@ def _handle_cleanup_errors(
         ) from cleanup_errors[0]
 
 
-def _validated_transition(model: ProductionManifest | StateCommitAttempt, update: dict[str, object]) -> ProductionManifest | StateCommitAttempt:
+def _validated_transition(
+    model: ProductionManifest | StateCommitAttempt, update: dict[str, object]
+) -> ProductionManifest | StateCommitAttempt:
+    if isinstance(model, ProductionManifest) and model.schema_version == "2.4":
+        identity_fields = (
+            "active_project",
+            "active_registry",
+            "active_render_state",
+            "active_dependency_graph",
+            "active_qa_policy",
+        )
+        if any(
+            field in update and update[field] != getattr(model, field)
+            for field in identity_fields
+        ):
+            update = {
+                **update,
+                "active_review_receipts": (),
+                "review_states": tuple(
+                    item.model_copy(
+                        update={
+                            "lifecycle": ReviewLifecycle.STALE,
+                            "active_receipt": None,
+                        }
+                    )
+                    for item in model.review_states
+                ),
+                "final_acceptance_state": None,
+            }
     return type(model).model_validate({**model.model_dump(mode="python"), **update})
 
 
@@ -818,6 +856,148 @@ class ProductionStateCommitter:
         self._ops = file_ops or _NativeFileOps()
         self._crash_injector = crash_injector or NoopCrashInjector()
         self._voice_candidate_preparer = voice_candidate_preparer
+
+    def activate_qa_policy(
+        self,
+        policy: QaPolicy,
+        *,
+        expected_manifest_revision: int,
+        attempt_id: str,
+    ) -> ProductionManifest:
+        """Select one immutable QA policy; policy drift only stales review state."""
+        if not verify_artifact_hash(policy):
+            raise _state_invalid("QA policy semantic content hash is invalid.")
+        payload = _canonical_json_bytes(policy)
+        file_sha256 = hashlib.sha256(payload).hexdigest()
+        pointer = QaPolicyPointer(
+            path=canonical_qa_policy_path(policy.content_hash),
+            policy_id=policy.policy_id,
+            policy_version=policy.policy_version,
+            content_hash=policy.content_hash,
+            file_sha256=file_sha256,
+        )
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            if manifest.manifest_revision != expected_manifest_revision:
+                if manifest.schema_version == "2.4" and manifest.active_qa_policy == pointer:
+                    return manifest
+                raise _state_invalid("QA policy base Manifest revision changed.")
+            if manifest.schema_version not in {"2.3", "2.4"}:
+                raise _state_invalid("P6 requires a P5 Manifest 2.3 or 2.4 base.")
+            if manifest.active_dependency_graph is None:
+                raise _state_invalid("P6 requires an active dependency graph.")
+            if manifest.schema_version == "2.4" and manifest.active_qa_policy == pointer:
+                return manifest
+            artifact = PreparedArtifact(pointer.path, payload, file_sha256)
+            self._write_immutable_artifact(artifact, attempt_id=attempt_id)
+            stale_states = tuple(
+                item.model_copy(
+                    update={
+                        "lifecycle": ReviewLifecycle.STALE,
+                        "active_receipt": None,
+                    }
+                )
+                for item in manifest.review_states
+            )
+            final_state = manifest.final_acceptance_state
+            if final_state is not None:
+                final_state = final_state.model_copy(
+                    update={
+                        "lifecycle": ReviewLifecycle.STALE,
+                        "active_receipt": None,
+                    }
+                )
+            updated = manifest.model_copy(
+                update={
+                    "schema_version": "2.4",
+                    "manifest_revision": manifest.manifest_revision + 1,
+                    "active_qa_policy": pointer,
+                    "active_review_receipts": (),
+                    "review_states": stale_states,
+                    "final_acceptance_state": final_state,
+                }
+            )
+            updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
+            self._write_manifest_atomic(updated)
+            return self._read_manifest()
+
+    def record_review_receipt(
+        self,
+        receipt: ReviewReceipt,
+        *,
+        expected_manifest_revision: int,
+        attempt_id: str,
+    ) -> ProductionManifest:
+        """Persist and activate one exact current-layer Review Receipt."""
+        if not verify_artifact_hash(receipt):
+            raise _state_invalid("Review Receipt semantic content hash is invalid.")
+        payload = _canonical_json_bytes(receipt)
+        file_sha256 = hashlib.sha256(payload).hexdigest()
+        pointer = ReviewReceiptPointer(
+            path=canonical_review_receipt_path(receipt.content_hash),
+            review_id=receipt.review_id,
+            layer=receipt.layer,
+            content_hash=receipt.content_hash,
+            file_sha256=file_sha256,
+        )
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            if manifest.manifest_revision != expected_manifest_revision:
+                if pointer in manifest.active_review_receipts:
+                    return manifest
+                raise _state_invalid("Review base Manifest revision changed.")
+            if (
+                manifest.schema_version != "2.4"
+                or manifest.active_qa_policy != receipt.qa_policy
+                or manifest.active_dependency_graph is None
+                or manifest.active_dependency_graph.revision_id
+                != receipt.dependency_graph_revision_id
+                or manifest.active_render_state != receipt.render_state
+            ):
+                raise _state_invalid("Review Receipt does not bind current Production state.")
+            artifact = PreparedArtifact(pointer.path, payload, file_sha256)
+            self._write_immutable_artifact(artifact, attempt_id=attempt_id)
+            desired = canonical_sha256(
+                {
+                    "layer": receipt.layer.value,
+                    "graph": receipt.dependency_graph_revision_id,
+                    "render": receipt.render_state.content_hash,
+                    "output": receipt.render_output_sha256,
+                    "timeline": receipt.timeline_fingerprint,
+                    "policy": receipt.qa_policy.content_hash,
+                }
+            )
+            lifecycle = {
+                QaVerdict.PASS: ReviewLifecycle.FRESH,
+                QaVerdict.FAIL: ReviewLifecycle.FAILED,
+                QaVerdict.NOT_EVALUATED: ReviewLifecycle.NOT_EVALUATED,
+            }[receipt.verdict]
+            state = ReviewLayerState(
+                layer=receipt.layer,
+                desired_fingerprint=desired,
+                applied_fingerprint=desired,
+                lifecycle=lifecycle,
+                active_receipt=pointer,
+            )
+            receipts = tuple(
+                item for item in manifest.active_review_receipts if item.layer != receipt.layer
+            ) + (pointer,)
+            states = tuple(
+                item for item in manifest.review_states if item.layer != receipt.layer
+            ) + (state,)
+            updated = manifest.model_copy(
+                update={
+                    "manifest_revision": manifest.manifest_revision + 1,
+                    "active_review_receipts": tuple(
+                        sorted(receipts, key=lambda item: item.layer.value)
+                    ),
+                    "review_states": tuple(sorted(states, key=lambda item: item.layer.value)),
+                    "final_acceptance_state": None,
+                }
+            )
+            updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
+            self._write_manifest_atomic(updated)
+            return self._read_manifest()
 
     @property
     def project_root(self) -> Path:
@@ -2783,6 +2963,22 @@ class ProductionStateCommitter:
                         for item in manifest.attempts
                     ),
                 }
+                if manifest.schema_version == "2.4":
+                    final_update.update(
+                        {
+                            "active_review_receipts": (),
+                            "review_states": tuple(
+                                item.model_copy(
+                                    update={
+                                        "lifecycle": ReviewLifecycle.STALE,
+                                        "active_receipt": None,
+                                    }
+                                )
+                                for item in manifest.review_states
+                            ),
+                            "final_acceptance_state": None,
+                        }
+                    )
                 if graph_transition is not None:
                     final_update.update(
                         {
