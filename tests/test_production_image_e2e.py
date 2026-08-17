@@ -342,6 +342,56 @@ def test_p7_package_exports_only_safe_image_generation_contracts():
     } & set(production_mod.__all__)
 
 
+@pytest.fixture
+def p7_reuse_runtime(tmp_path):
+    return project_factory.make_p7_reuse_runtime(tmp_path)
+
+
+def test_two_shots_reuse_character_scene_but_keep_distinct_image_provenance(
+    p7_reuse_runtime,
+):
+    first = p7_reuse_runtime.generate_all()
+
+    assert first.provider_calls == 2
+    assert first.total_provider_calls == 2
+    assert len(first.requests) == len(first.assets) == 2
+    assert first.requests[0].references == first.requests[1].references
+    assert first.requests[0].request_fingerprint != first.requests[1].request_fingerprint
+    assert first.requests[0].output_asset_id != first.requests[1].output_asset_id
+    assert first.assets[0].creation_receipt_id != first.assets[1].creation_receipt_id
+    assert first.assets[0].asset_id == first.shot_1_asset_id
+    assert first.assets[1].asset_id == first.shot_2_asset_id
+    assert first.changed_shot_ids == ("shot-1", "shot-2")
+    assert first.history_artifact_count == 16
+    assert first.recovery_preserved_manifest_revision
+
+    second = p7_reuse_runtime.change_only_shot_1_prompt_and_generate()
+
+    assert second.provider_calls == 1
+    assert second.total_provider_calls == 3
+    assert second.changed_asset_ids == (second.shot_1_asset_id,)
+    assert second.shot_2_asset_id == first.shot_2_asset_id
+    assert second.requests[0].target_shot_id == "shot-1"
+    assert second.requests[0].prompt_text != first.requests[0].prompt_text
+    assert second.requests[0].references == first.requests[0].references
+    assert second.requests[0].parameters == first.requests[0].parameters
+    assert all(count == 1 for _, count in second.request_binding_counts)
+    assert second.history_artifact_count == 24
+    assert second.recovery_preserved_manifest_revision
+
+
+def test_explicit_shot_1_replacement_stales_only_exact_consumers(
+    p7_reuse_runtime,
+):
+    result = p7_reuse_runtime.change_only_shot_1_prompt_and_generate()
+
+    assert result.provider_calls == 1
+    assert result.changed_shot_ids == ("shot-1",)
+    assert result.unrelated_voice_caption_nodes_are_fresh
+    assert result.video_provider_calls == 0
+    assert result.renderer_calls == 0
+
+
 def test_regenerated_shot_history_survives_idempotent_recovery(tmp_path):
     """A refreshed P5 pre-state permits exact same-role regeneration history."""
 

@@ -7,7 +7,7 @@ import struct
 import zlib
 from datetime import date
 import wave
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import yaml
@@ -3162,3 +3162,412 @@ def add_p6_policy_to_p7_project(root: Path) -> Path:
         encoding="utf-8",
     )
     return target
+
+
+@dataclass(frozen=True)
+class P7ReuseAcceptanceResult:
+    provider_calls: int
+    total_provider_calls: int
+    requests: tuple[object, ...]
+    assets: tuple[AssetRecord, ...]
+    request_binding_counts: tuple[tuple[str, int], ...]
+    changed_asset_ids: tuple[str, ...]
+    changed_shot_ids: tuple[str, ...]
+    shot_1_asset_id: str
+    shot_2_asset_id: str
+    unrelated_voice_caption_nodes_are_fresh: bool
+    video_provider_calls: int
+    renderer_calls: int
+    history_artifact_count: int
+    recovery_preserved_manifest_revision: bool
+
+
+class P7ReuseAcceptanceRuntime:
+    """Test-only P7 runtime that uses only public durable writer operations."""
+
+    def __init__(self, root: Path) -> None:
+        from ai_video.production.state_commit import ProductionStateCommitter
+
+        self.root = root
+        self.base_inputs = make_p7_image_generation_base(root)
+        self.provider_requests: list[object] = []
+        self.provider_results: list[object] = []
+        self.request_binding_counts: dict[str, int] = {}
+        self.video_provider_calls = 0
+        self.renderer_calls = 0
+        self._first_result: P7ReuseAcceptanceResult | None = None
+        self.writer = ProductionStateCommitter(
+            root,
+            image_candidate_preparer=make_p7_image_candidate_preparer(
+                self.base_inputs
+            ),
+        )
+
+    def _make_call_bundle(
+        self,
+        *,
+        attempt_id: str,
+        shot_id: str,
+        prompt_text: str,
+    ):
+        from ai_video.production.image import (
+            ImageGenerationAuthorization,
+            ImageGenerationPreview,
+            ImageGenerationRequest,
+            ImageProviderParameters,
+            ImageReferenceBinding,
+        )
+
+        loaded = load_production_project(self.root / "project.yaml")
+        assert loaded.manifest.active_dependency_graph is not None
+        assets = {item.asset_id: item for item in loaded.registry.assets}
+        character = loaded.characters[0]
+        scene = loaded.scenes[0]
+        character_asset = assets[character.reference_asset_ids[0]]
+        scene_asset = assets[scene.visual_reference_asset_ids[0]]
+        references = (
+            ImageReferenceBinding(
+                role="character",
+                creative_artifact_id=character.artifact_id,
+                creative_revision=character.revision,
+                creative_content_hash=character.content_hash,
+                asset_id=character_asset.asset_id,
+                asset_sha256=character_asset.sha256,
+            ),
+            ImageReferenceBinding(
+                role="scene",
+                creative_artifact_id=scene.artifact_id,
+                creative_revision=scene.revision,
+                creative_content_hash=scene.content_hash,
+                asset_id=scene_asset.asset_id,
+                asset_sha256=scene_asset.sha256,
+            ),
+        )
+        request = ImageGenerationRequest.create(
+            attempt_id=attempt_id,
+            provider_kind="fake-local",
+            model_id="fixture-image-model-1",
+            target_shot_id=shot_id,
+            target_asset_role="still",
+            prompt_text=prompt_text,
+            negative_prompt_text="blur, watermark",
+            parameters=ImageProviderParameters(
+                seed=17,
+                width=2,
+                height=1,
+                output_format="png",
+                generation_revision=1,
+            ),
+            references=references,
+            base_project=loaded.manifest.active_project,
+            base_registry=loaded.manifest.active_registry,
+            base_dependency_graph=loaded.manifest.active_dependency_graph,
+        )
+        preview = ImageGenerationPreview.create(
+            request=request,
+            reference_total_bytes=(
+                character_asset.size_bytes + scene_asset.size_bytes
+            ),
+        )
+        authorization = ImageGenerationAuthorization.create(
+            request=request,
+            preview=preview,
+            usage_license="fixture-only",
+            policy_receipt_id="fixture-local-image-policy",
+        )
+        return request, preview, authorization
+
+    def generate(self, request, authorization, permit):
+        from ai_video.production.image import (
+            ImageLocalResourceEvidence,
+            ImageProviderResult,
+        )
+
+        assert permit._consume_image_generation_permit(
+            request_fingerprint=request.request_fingerprint
+        )
+        call_index = len(self.provider_requests) + 1
+        rgba = {
+            1: b"\x11\x22\x33\xff",
+            2: b"\x44\x55\x66\xff",
+            3: b"\x77\x88\x99\xff",
+        }[call_index]
+        result = ImageProviderResult.create(
+            request=request,
+            authorization=authorization,
+            image_bytes=_p7_png(rgba=rgba),
+            content_type="image/png",
+            provider_request_id=f"p7-local-{call_index}",
+            adapter=ToolIdentity(name="fake-local-image", version="1"),
+            resource_evidence=ImageLocalResourceEvidence(
+                elapsed_milliseconds=call_index,
+                device_kind="cpu",
+                measured_peak_memory_bytes=4096,
+            ),
+        )
+        self.provider_requests.append(request)
+        self.provider_results.append(result)
+        self.request_binding_counts[request.request_fingerprint] = (
+            self.request_binding_counts.get(request.request_fingerprint, 0) + 1
+        )
+        return result
+
+    def _refresh_ready_project_registry_nodes(self) -> None:
+        from ai_video.production.models import (
+            DependencyLifecycle,
+            DependencyNodeKind,
+            ProjectDependencyEvidence,
+            RegistryDependencyEvidence,
+        )
+
+        while True:
+            loaded = load_production_project(self.root / "project.yaml")
+            graph = loaded.dependency_graph
+            assert graph is not None
+            nodes = {item.node_id: item for item in graph.nodes}
+            ready = next(
+                (
+                    state
+                    for state in loaded.manifest.dependency_states
+                    if state.lifecycle is DependencyLifecycle.STALE
+                    and nodes[state.node_id].kind
+                    in {
+                        DependencyNodeKind.CREATIVE_ARTIFACT,
+                        DependencyNodeKind.ASSET,
+                    }
+                ),
+                None,
+            )
+            if ready is None:
+                return
+            node = nodes[ready.node_id]
+            if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT:
+                evidence = ProjectDependencyEvidence(
+                    owner="project_snapshot",
+                    pointer=loaded.manifest.active_project,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=ready.desired_fingerprint,
+                )
+            else:
+                evidence = RegistryDependencyEvidence(
+                    owner="registry_snapshot",
+                    pointer=loaded.manifest.active_registry,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=ready.desired_fingerprint,
+                )
+            self.writer.record_dependency_node_applied(
+                expected_manifest_revision=loaded.manifest.manifest_revision,
+                active_dependency_graph=loaded.manifest.active_dependency_graph,
+                candidate_dependency_graph=loaded.manifest.active_dependency_graph,
+                node_id=ready.node_id,
+                desired_fingerprint=ready.desired_fingerprint,
+                evidence=evidence,
+            )
+
+    @staticmethod
+    def _shot_asset_ids(loaded) -> dict[str, str]:
+        return {
+            shot.shot_id: next(
+                role.asset_ids[0]
+                for role in shot.required_asset_roles
+                if role.role == "still"
+            )
+            for shot in loaded.shots
+        }
+
+    @staticmethod
+    def _unrelated_voice_caption_nodes_are_fresh(loaded) -> bool:
+        from ai_video.production.models import (
+            DependencyLifecycle,
+            DependencySemanticRole,
+        )
+
+        graph = loaded.dependency_graph
+        assert graph is not None
+        protected_ids = {
+            node.node_id
+            for node in graph.nodes
+            if node.semantic_role
+            in {DependencySemanticRole.VOICE, DependencySemanticRole.CAPTION}
+        }
+        states = {item.node_id: item for item in loaded.manifest.dependency_states}
+        return bool(protected_ids) and all(
+            states[node_id].lifecycle is DependencyLifecycle.FRESH
+            for node_id in protected_ids
+        )
+
+    def _recover_and_count_history(self) -> tuple[int, bool]:
+        from ai_video.production.models import StateCommitStatus
+        from ai_video.production.paths import canonical_image_request_path
+
+        before = load_production_project(self.root / "project.yaml").manifest
+        report = self.writer.recover()
+        loaded = load_production_project(self.root / "project.yaml")
+        attempts = tuple(
+            item
+            for item in loaded.manifest.attempts
+            if item.operation == "image_generation"
+            and item.status is StateCommitStatus.SUCCEEDED
+        )
+        attempt_asset_ids = {
+            asset_id
+            for attempt in attempts
+            for asset_id in attempt.candidate_image_asset_ids
+        }
+        generated_paths = {
+            item.artifact_path
+            for item in loaded.registry.assets
+            if item.asset_id in attempt_asset_ids
+        }
+        report_paths = {item.path for item in report.items}
+        request_paths = {
+            canonical_image_request_path(attempt.image_request.request_fingerprint)
+            for attempt in attempts
+            if attempt.image_request is not None
+        }
+        result_paths = {
+            path
+            for path in report_paths
+            if path.as_posix().startswith("state/images/results/")
+        }
+        receipt_paths = {
+            path
+            for path in report_paths
+            if path.as_posix().startswith("state/images/receipts/")
+        }
+        shot_paths = {
+            path
+            for path in report_paths
+            if path.as_posix().startswith("creative/shots/shot.")
+        }
+        project_paths = {
+            attempt.candidate_project.path
+            for attempt in attempts
+            if attempt.candidate_project is not None
+        }
+        registry_paths = {
+            attempt.candidate_registry.path
+            for attempt in attempts
+            if attempt.candidate_registry is not None
+        }
+        graph_paths = {
+            attempt.candidate_dependency_graph.path
+            for attempt in attempts
+            if attempt.candidate_dependency_graph is not None
+        }
+        groups = (
+            request_paths,
+            result_paths,
+            receipt_paths,
+            generated_paths,
+            shot_paths,
+            project_paths,
+            registry_paths,
+            graph_paths,
+        )
+        assert all(len(group) == len(attempts) for group in groups)
+        history_paths = set().union(*groups)
+        assert len(history_paths) == 8 * len(attempts)
+        assert history_paths <= report_paths
+        return len(history_paths), (
+            report.manifest_revision_before == before.manifest_revision
+            and report.manifest_revision_after == before.manifest_revision
+            and loaded.manifest == before
+        )
+
+    def _result(
+        self,
+        *,
+        phase_start: int,
+        before_assets: dict[str, str],
+    ) -> P7ReuseAcceptanceResult:
+        loaded = load_production_project(self.root / "project.yaml")
+        current_assets = self._shot_asset_ids(loaded)
+        phase_requests = tuple(self.provider_requests[phase_start:])
+        generated = {
+            item.asset_id: item
+            for item in loaded.registry.assets
+            if item.asset_id in {request.output_asset_id for request in phase_requests}
+        }
+        history_count, recovery_unchanged = self._recover_and_count_history()
+        return P7ReuseAcceptanceResult(
+            provider_calls=len(self.provider_requests) - phase_start,
+            total_provider_calls=len(self.provider_requests),
+            requests=phase_requests,
+            assets=tuple(generated[request.output_asset_id] for request in phase_requests),
+            request_binding_counts=tuple(sorted(self.request_binding_counts.items())),
+            changed_asset_ids=tuple(
+                current_assets[shot_id]
+                for shot_id in sorted(current_assets)
+                if current_assets[shot_id] != before_assets[shot_id]
+            ),
+            changed_shot_ids=tuple(
+                shot_id
+                for shot_id in sorted(current_assets)
+                if current_assets[shot_id] != before_assets[shot_id]
+            ),
+            shot_1_asset_id=current_assets["shot-1"],
+            shot_2_asset_id=current_assets["shot-2"],
+            unrelated_voice_caption_nodes_are_fresh=(
+                self._unrelated_voice_caption_nodes_are_fresh(loaded)
+            ),
+            video_provider_calls=self.video_provider_calls,
+            renderer_calls=self.renderer_calls,
+            history_artifact_count=history_count,
+            recovery_preserved_manifest_revision=recovery_unchanged,
+        )
+
+    def generate_all(self) -> P7ReuseAcceptanceResult:
+        if self._first_result is not None:
+            return self._first_result
+        phase_start = len(self.provider_requests)
+        initial = load_production_project(self.root / "project.yaml")
+        before_assets = self._shot_asset_ids(initial)
+        for attempt_id, shot_id, prompt_text in (
+            (
+                "p7-reuse-shot-1-initial",
+                "shot-1",
+                "Hero enters the archive room",
+            ),
+            (
+                "p7-reuse-shot-2-initial",
+                "shot-2",
+                "Hero studies the hidden record",
+            ),
+        ):
+            request, preview, authorization = self._make_call_bundle(
+                attempt_id=attempt_id,
+                shot_id=shot_id,
+                prompt_text=prompt_text,
+            )
+            self.writer.generate_image_asset(
+                request, preview, authorization, self
+            )
+            self._refresh_ready_project_registry_nodes()
+        self._first_result = self._result(
+            phase_start=phase_start,
+            before_assets=before_assets,
+        )
+        return self._first_result
+
+    def change_only_shot_1_prompt_and_generate(self) -> P7ReuseAcceptanceResult:
+        first = self.generate_all()
+        phase_start = len(self.provider_requests)
+        before_assets = {
+            "shot-1": first.shot_1_asset_id,
+            "shot-2": first.shot_2_asset_id,
+        }
+        request, preview, authorization = self._make_call_bundle(
+            attempt_id="p7-reuse-shot-1-prompt-replacement",
+            shot_id="shot-1",
+            prompt_text="Hero enters the archive room under emergency lighting",
+        )
+        self.writer.generate_image_asset(request, preview, authorization, self)
+        return self._result(
+            phase_start=phase_start,
+            before_assets=before_assets,
+        )
+
+
+def make_p7_reuse_runtime(root: Path) -> P7ReuseAcceptanceRuntime:
+    return P7ReuseAcceptanceRuntime(root)
