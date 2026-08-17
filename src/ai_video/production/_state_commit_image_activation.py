@@ -155,8 +155,13 @@ class _StateCommitImageActivationMixin:
         permit: _DurableImageSubmitPermit,
         final_replaced: list[bool],
     ) -> ProductionManifest:
-        del permit
         with self._exclusive_lock():
+            if not permit._image_generation_was_consumed(
+                request_fingerprint=request.request_fingerprint
+            ):
+                raise _state_invalid(
+                    "Image activation durable R+2 evidence is no longer current."
+                )
             manifest = self._read_manifest()
             self._validate_image_request_context(manifest, request, preview)
             attempt = self._require_image_submit_attempt(manifest, request)

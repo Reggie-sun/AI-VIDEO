@@ -211,6 +211,18 @@ def make_image_provider_result(
     )
 
 
+def selected_image_activation_state(manifest: ProductionManifest) -> tuple[object, ...]:
+    """Return the complete selected state that image failures must preserve."""
+
+    return (
+        manifest.active_project,
+        manifest.active_registry,
+        manifest.active_dependency_graph,
+        manifest.active_render_state,
+        manifest.dependency_states,
+    )
+
+
 def make_qa_policy(
     *, version: str = "1", repair_authorities: tuple[ActorIdentity, ...] = ()
 ) -> QaPolicy:
@@ -1278,6 +1290,7 @@ def test_generate_image_asset_rejects_nonlocal_evidence_before_provider_call(
 
     provider = _Provider()
     before = read_manifest(tmp_path)
+    selected_before = selected_image_activation_state(before)
     with pytest.raises(AiVideoError) as exc_info:
         ProductionStateCommitter(tmp_path).generate_image_asset(
             request, preview, authorization, provider
@@ -1286,6 +1299,7 @@ def test_generate_image_asset_rejects_nonlocal_evidence_before_provider_call(
     assert exc_info.value.code is ErrorCode.IMAGE_REQUEST_INVALID
     assert provider.calls == 0
     assert read_manifest(tmp_path) == before
+    assert selected_image_activation_state(read_manifest(tmp_path)) == selected_before
 
 
 def test_generate_image_asset_rejects_stale_base_before_provider_call(
@@ -1309,6 +1323,7 @@ def test_generate_image_asset_rejects_stale_base_before_provider_call(
             raise AssertionError("Provider must not be called")
 
     provider = _Provider()
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
     with pytest.raises(AiVideoError) as exc_info:
         ProductionStateCommitter(tmp_path).generate_image_asset(
             request, preview, authorization, provider
@@ -1316,6 +1331,7 @@ def test_generate_image_asset_rejects_stale_base_before_provider_call(
 
     assert exc_info.value.code is ErrorCode.IMAGE_REQUEST_INVALID
     assert provider.calls == 0
+    assert selected_image_activation_state(read_manifest(tmp_path)) == selected_before
 
 
 def test_generate_image_asset_requires_provider_to_consume_exact_permit(
@@ -1336,6 +1352,7 @@ def test_generate_image_asset_requires_provider_to_consume_exact_permit(
             return result
 
     provider = _Provider()
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
     with pytest.raises(AiVideoError) as exc_info:
         ProductionStateCommitter(tmp_path).generate_image_asset(
             request, preview, authorization, provider
@@ -1346,6 +1363,7 @@ def test_generate_image_asset_requires_provider_to_consume_exact_permit(
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
     assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
     assert after.attempts[-1].image_phase == "provider_call"
+    assert selected_image_activation_state(after) == selected_before
     assert not (
         tmp_path / canonical_image_result_path(result.result_fingerprint)
     ).exists()
@@ -1369,17 +1387,20 @@ def test_generate_image_asset_provider_exception_is_outcome_unknown(
             raise RuntimeError("provider transport ended ambiguously")
 
     provider = _Provider()
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
     with pytest.raises(AiVideoError) as exc_info:
         ProductionStateCommitter(tmp_path).generate_image_asset(
             request, preview, authorization, provider
         )
 
-    attempt = read_manifest(tmp_path).attempts[-1]
+    after = read_manifest(tmp_path)
+    attempt = after.attempts[-1]
     assert provider.calls == 1
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
     assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
     assert attempt.image_phase == "provider_call"
     assert "provider transport ended ambiguously" not in attempt.error_message
+    assert selected_image_activation_state(after) == selected_before
 
 
 def test_generate_image_asset_rejects_post_submit_evidence_drift(
@@ -1402,15 +1423,76 @@ def test_generate_image_asset_rejects_post_submit_evidence_drift(
             )).write_bytes(b"{}\n")
             return result
 
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
     with pytest.raises(AiVideoError) as exc_info:
         ProductionStateCommitter(tmp_path).generate_image_asset(
             request, preview, authorization, _Provider()
         )
 
-    attempt = read_manifest(tmp_path).attempts[-1]
+    after = read_manifest(tmp_path)
+    attempt = after.attempts[-1]
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
     assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
     assert attempt.image_phase == "provider_call"
+    assert selected_image_activation_state(after) == selected_before
+
+
+def test_generate_image_asset_rechecks_consumed_r2_inside_activation_lock(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
+    png_bytes = project_factory._p7_png()
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    class _BetweenChecksCommitter(ProductionStateCommitter):
+        def _activate_image_asset_locked(self, *args, **kwargs):
+            authorization_path = canonical_image_authorization_path(
+                authorization.authorization_fingerprint
+            )
+            (tmp_path / authorization_path).write_bytes(b"{}\n")
+            return super()._activate_image_asset_locked(*args, **kwargs)
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        _BetweenChecksCommitter(
+            tmp_path,
+            image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+                base_inputs
+            ),
+        ).generate_image_asset(request, preview, authorization, provider)
+
+    after = read_manifest(tmp_path)
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert after.attempts[-1].image_phase == "materialize"
+    assert after.attempts[-1].candidate_project is None
+    assert after.attempts[-1].candidate_registry is None
+    assert after.attempts[-1].candidate_dependency_graph is None
+    assert after.attempts[-1].candidate_image_asset_ids == ()
+    assert selected_image_activation_state(after) == selected_before
+    assert not (
+        tmp_path
+        / canonical_image_result_path(
+            make_image_provider_result(
+                request, authorization, png_bytes
+            ).result_fingerprint
+        )
+    ).exists()
 
 
 def test_generate_image_asset_rejects_invalid_preparer_without_activation(
@@ -1454,6 +1536,70 @@ def test_generate_image_asset_rejects_invalid_preparer_without_activation(
         base.active_registry,
         base.active_dependency_graph,
     )
+    assert selected_image_activation_state(after) == selected_image_activation_state(
+        base
+    )
+
+
+def test_generate_image_asset_failure_after_candidate_keeps_candidate_inactive(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    base = read_manifest(tmp_path)
+    selected_before = selected_image_activation_state(base)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    class _FailBeforeFinalReplaceCommitter(ProductionStateCommitter):
+        def _write_manifest_atomic(self, manifest, *, on_replace=None):
+            attempt = next(
+                (
+                    item
+                    for item in manifest.attempts
+                    if item.attempt_id == request.attempt_id
+                ),
+                None,
+            )
+            if attempt is not None and attempt.image_phase == "activate":
+                raise RuntimeError("injected before image final replace")
+            return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        _FailBeforeFinalReplaceCommitter(
+            tmp_path,
+            image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+                base_inputs
+            ),
+        ).generate_image_asset(request, preview, authorization, provider)
+
+    after = read_manifest(tmp_path)
+    attempt = after.attempts[-1]
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.status is not StateCommitStatus.SUCCEEDED
+    assert attempt.image_phase == "candidate"
+    assert selected_image_activation_state(after) == selected_before
+    assert attempt.candidate_project is not None
+    assert attempt.candidate_project != after.active_project
+    assert (tmp_path / attempt.candidate_project.path).is_file()
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert selected_image_activation_state(loaded.manifest) == selected_before
+    assert loaded.project.content_hash == base.active_project.content_hash
 
 
 def test_image_activation_stales_manifest_25_p6_review_and_acceptance_state(
