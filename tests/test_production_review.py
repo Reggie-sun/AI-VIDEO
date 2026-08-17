@@ -101,6 +101,7 @@ class _Manifest25ReviewFixture:
     policy: QaPolicy
     review_layer: QaLayer = QaLayer.TECHNICAL
     review_fails: bool = False
+    review_attempt_id: str = "base-e2e-technical-review"
 
     def load_manifest(self) -> ProductionManifest:
         return load_production_project(self.root / "project.yaml").manifest
@@ -149,7 +150,7 @@ class _Manifest25ReviewFixture:
             )
         )
         begun = self.committer.begin_review(
-            request, attempt_id="base-e2e-technical-review"
+            request, attempt_id=self.review_attempt_id
         )
         request_pointer = begun.attempts[-1].review_request
         assert request_pointer is not None
@@ -254,7 +255,7 @@ class _Manifest25ReviewFixture:
             receipt,
             (evidence,),
             expected_manifest_revision=measured.manifest_revision,
-            attempt_id="base-e2e-technical-review",
+            attempt_id=self.review_attempt_id,
         )
         return next(
             item

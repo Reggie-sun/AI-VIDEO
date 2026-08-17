@@ -21,13 +21,17 @@ from ai_video.production.models import (
     QaLayer,
     RepairAction,
     RepairAuthorization,
+    RepairOutcomeReceipt,
     RepairRequest,
+    RendererKind,
+    RendererSelectionReceipt,
     SourceReference,
     StateCommitAttempt,
 )
 from ai_video.production.project import load_production_project
 from ai_video.production.review import validate_repair_scope
 from ai_video.production.state_commit import (
+    BeginRenderAttemptRequest,
     PreparedArtifact,
     ProductionStateCommitter,
     StateCommitRequest,
@@ -60,6 +64,7 @@ class _Manifest25RepairFixture:
     repair_request: RepairRequest
     approval: ApprovedRepairReceipt
     baseline_states: dict[str, tuple[object, ...]]
+    render_fixture: object
 
     def load_manifest(self) -> ProductionManifest:
         return load_production_project(self.root / "project.yaml").manifest
@@ -166,6 +171,93 @@ class _Manifest25RepairFixture:
             for item in manifest.dependency_states
             if item.node_id not in REPAIR_CLOSURE
         }
+
+    def rerender(self) -> ProductionManifest:
+        manifest = self.load_manifest()
+        graph = load_production_project(self.root / "project.yaml").dependency_graph
+        assert graph is not None
+        selection = RendererSelectionReceipt(
+            receipt_id="selection-base-e2e-repaired-render",
+            attempt_id="base-e2e-repaired-render",
+            requested_kind=RendererKind.HYPERFRAMES,
+            selected_kinds=(RendererKind.HYPERFRAMES,),
+            renderer_version="0.7.103",
+            timeline_fingerprint=self.render_fixture.timeline.composition_fingerprint,
+            current_project=manifest.active_project,
+            current_registry=manifest.active_registry,
+        )
+        self.render_fixture.begin_request = BeginRenderAttemptRequest(
+            manifest.manifest_revision,
+            manifest.active_render_state,
+            selection,
+        )
+        self.render_fixture.dependency_graph = graph
+        self.render_fixture.candidate_dependency_states = manifest.dependency_states
+        return self.render_fixture.render()
+
+    def run_fresh_layout_review(self):
+        bundle = load_production_project(self.root / "project.yaml")
+        assert bundle.qa_policy is not None
+        return _Manifest25ReviewFixture(
+            root=self.root,
+            committer=ProductionStateCommitter(self.root),
+            timeline=self.render_fixture.timeline,
+            policy=bundle.qa_policy,
+            review_layer=QaLayer.LAYOUT,
+            review_fails=False,
+            review_attempt_id="base-e2e-fresh-layout-review",
+        ).run_required_review()
+
+    def outcome(self, approved_pointer, fresh_review_pointer) -> RepairOutcomeReceipt:
+        bundle = load_production_project(self.root / "project.yaml")
+        manifest = bundle.manifest
+        assert manifest.active_render_state is not None
+        assert bundle.render_state is not None
+        state_by_id = {item.node_id: item for item in manifest.dependency_states}
+        return seal_artifact(
+            RepairOutcomeReceipt(
+                artifact_id="repair-outcome-base-e2e-layout",
+                revision=1,
+                content_hash=ZERO_HASH,
+                creation_receipt_id="repair-outcome-base-e2e-layout",
+                source_provenance=(
+                    SourceReference(
+                        kind="derived",
+                        reference=fresh_review_pointer.review_id,
+                    ),
+                ),
+                repair_id=self.approval.repair_id,
+                approved_receipt=approved_pointer,
+                review_receipt_ids=self.approval.review_receipt_ids,
+                issue_ids=self.approval.issue_ids,
+                evidence_ids=self.approval.evidence_ids,
+                root_cause_hypothesis=self.approval.root_cause_hypothesis,
+                selected_repair_action=self.approval.selected_repair_action,
+                exact_target_artifact_ids=self.approval.exact_target_artifact_ids,
+                exact_target_node_ids=self.approval.exact_target_node_ids,
+                expected_invalidation_node_ids=(
+                    self.approval.expected_invalidation_node_ids
+                ),
+                actor=self.approval.actor,
+                authorization=self.approval.authorization,
+                before_fingerprints=self.approval.before_fingerprints,
+                after_fingerprints=(
+                    NamedFingerprint(
+                        name="composition:main",
+                        fingerprint=state_by_id[
+                            "composition:main"
+                        ].desired_fingerprint,
+                    ),
+                ),
+                actual_invalidation_node_ids=REPAIR_CLOSURE,
+                rerender_state=manifest.active_render_state,
+                rerender_output_sha256=bundle.render_state.output.file_sha256,
+                rerender_timeline_fingerprint=(
+                    bundle.render_state.timeline_fingerprint
+                ),
+                fresh_review_receipts=(fresh_review_pointer,),
+            )
+        )
 
 
 def make_manifest_25_failed_layout_review_fixture(
@@ -288,6 +380,7 @@ def make_manifest_25_failed_layout_review_fixture(
         repair_request=request,
         approval=approval,
         baseline_states=baseline,
+        render_fixture=render_fixture,
     )
 
 
@@ -341,3 +434,51 @@ def test_manifest_25_generic_repair_uses_exact_p5_closure_and_preserves_assets(
     assert after.active_registry == before.active_registry
     assert set(fixture.actual_invalidated_nodes(after)) == set(REPAIR_CLOSURE)
     assert fixture.unchanged_media_nodes(after) == fixture.unchanged_media_nodes(before)
+
+
+def test_manifest_25_repair_outcome_binds_rerender_and_preserves_p7_media(
+    tmp_path: Path,
+) -> None:
+    fixture = make_manifest_25_failed_layout_review_fixture(tmp_path)
+    before_bundle = load_production_project(tmp_path / "project.yaml")
+    before = fixture.load_manifest()
+    approved = fixture.committer.record_approved_repair_receipt(
+        fixture.repair_request,
+        fixture.approval,
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="base-e2e-outcome-repair-approval",
+    )
+    approved_pointer = approved.active_approved_repair
+    assert approved_pointer is not None
+    repaired = fixture.committer.commit(
+        fixture.state_commit_request(approved_pointer)
+    )
+    rerendered = fixture.rerender()
+    assert rerendered.active_render_state != fixture.approval.render_state
+    fresh_review = fixture.run_fresh_layout_review()
+    outcome = fixture.outcome(approved_pointer, fresh_review)
+
+    closed = fixture.committer.record_repair_outcome(
+        outcome,
+        expected_manifest_revision=fixture.load_manifest().manifest_revision,
+        attempt_id="base-e2e-repair-outcome",
+    )
+
+    assert closed.schema_version == "2.5"
+    assert _p7_attempts(closed) == _p7_attempts(before)
+    assert closed.active_approved_repair is None
+    active_outcome = closed.repair_outcome_receipts[-1]
+    assert active_outcome.repair_id == outcome.repair_id
+    assert active_outcome.content_hash == outcome.content_hash
+    assert outcome.rerender_state == closed.active_render_state
+    assert outcome.rerender_state == rerendered.active_render_state
+    assert closed.active_project == before.active_project
+    assert closed.active_registry == before.active_registry
+    assert fixture.unchanged_media_nodes(closed) == fixture.unchanged_media_nodes(before)
+    assert repaired.active_project == closed.active_project
+    reopened = load_production_project(tmp_path / "project.yaml")
+    assert reopened.manifest == closed
+    assert reopened.project == before_bundle.project
+    assert reopened.registry == before_bundle.registry
+    assert reopened.render_state is not None
+    assert reopened.render_state.content_hash == outcome.rerender_state.content_hash
