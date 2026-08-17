@@ -25,6 +25,7 @@ from ai_video.production.hashing import seal_artifact
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.composition import resolve_composition, timeline_fingerprint
 from ai_video.production.dependency import (
+    build_applied_dependency_evidence,
     build_dependency_graph,
     build_production_dependency_graph,
     desired_fingerprints,
@@ -63,6 +64,7 @@ from ai_video.production.models import (
     QaLayer,
     QaVerdict,
     ProjectDependencyEvidence,
+    ProjectSnapshotPointer,
     FingerprintContribution,
     RegistrySnapshotPointer,
     RegistryDependencyEvidence,
@@ -108,7 +110,11 @@ from ai_video.production.state_commit import (
     _canonical_json_bytes,
     prepare_dependency_graph_transition,
 )
-from ai_video.production.project import _render_source_payload_matches
+from ai_video.production.project import (
+    _render_source_payload_matches,
+    _verify_dependency_project_evidence,
+    load_production_project_candidate,
+)
 from production_project_factory import (
     add_p6_policy_to_p7_project,
     append_p7_committed_candidate,
@@ -1294,6 +1300,213 @@ def test_loader_reopens_exact_p7_base_registry(tmp_path, p7_committed_project):
 
     with pytest.raises(AiVideoError, match="candidate history"):
         load_production_project(p7_committed_project["project_path"])
+
+
+def _write_p7_historical_projection_states(root: Path, fixture, states) -> None:
+    states_payload = json.dumps(
+        [item.model_dump(mode="json") for item in states],
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    attempt = fixture["attempt"].model_copy(
+        update={
+            "candidate_dependency_states_hash": hashlib.sha256(
+                states_payload
+            ).hexdigest()
+        }
+    )
+    _write_manifest(
+        root,
+        fixture["manifest"].model_copy(
+            update={"dependency_states": states, "attempts": (attempt,)}
+        ),
+    )
+
+
+def _p7_historical_projection_fixture(root: Path):
+    fixture = make_p7_committed_project(root)
+    candidate_inputs = fixture["candidate_inputs"]
+    candidate_graph = fixture["candidate_graph"]
+    request = fixture["request"]
+    manifest = fixture["manifest"]
+    base_project = load_production_project_candidate(
+        root,
+        manifest,
+        request.base_project.path,
+        request.base_registry.path,
+    )
+    base_project = base_project.model_copy(
+        update={
+            "manifest": manifest.model_copy(
+                update={
+                    "active_project": request.base_project,
+                    "active_registry": request.base_registry,
+                    "active_dependency_graph": request.base_dependency_graph,
+                }
+            )
+        }
+    )
+    base_inputs = replace(candidate_inputs, project=base_project)
+    base_graph = build_production_dependency_graph(base_inputs)
+    base_applied = build_applied_dependency_evidence(base_inputs, None)
+    base_states = resolve_dependency_state(base_graph, base_applied).states
+    candidate_states = resolve_dependency_state(candidate_graph, base_states).states
+    _write_p7_historical_projection_states(root, fixture, candidate_states)
+    return fixture, candidate_graph, candidate_states
+
+
+def test_loader_verifies_historical_shot_projection_evidence_after_p7_replacement(
+    tmp_path,
+):
+    fixture, _, _ = _p7_historical_projection_fixture(tmp_path)
+
+    loaded = load_production_project(fixture["project_path"])
+    target = {
+        state.node_id: state
+        for state in loaded.manifest.dependency_states
+        if state.node_id.startswith("creative:shot:shot-1:")
+    }
+
+    assert target["creative:shot:shot-1:composition"].lifecycle is DependencyLifecycle.FRESH
+    assert target["creative:shot:shot-1:voice"].lifecycle is DependencyLifecycle.FRESH
+    assert target["creative:shot:shot-1:visual"].lifecycle is DependencyLifecycle.STALE
+
+
+def test_loader_rejects_forged_historical_shot_projection_fingerprint(tmp_path):
+    fixture, _, states = _p7_historical_projection_fixture(tmp_path)
+    visual = next(
+        state
+        for state in states
+        if state.node_id == "creative:shot:shot-1:visual"
+    )
+    forged_fingerprint = "f" * 64
+    assert visual.applied_evidence is not None
+    forged = visual.model_copy(
+        update={
+            "applied_fingerprint": forged_fingerprint,
+            "applied_evidence": visual.applied_evidence.model_copy(
+                update={"artifact_fingerprint": forged_fingerprint}
+            ),
+        }
+    )
+    forged_states = tuple(
+        forged if state.node_id == forged.node_id else state for state in states
+    )
+    _write_p7_historical_projection_states(tmp_path, fixture, forged_states)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(fixture["project_path"])
+
+    assert "Historical Shot dependency evidence" in (
+        exc_info.value.technical_detail or exc_info.value.user_message
+    )
+
+
+def test_historical_shot_projection_rejects_changed_current_incoming(tmp_path):
+    fixture, graph, _ = _p7_historical_projection_fixture(tmp_path)
+    loaded = load_production_project(fixture["project_path"])
+    state = next(
+        item
+        for item in loaded.manifest.dependency_states
+        if item.node_id == "creative:shot:shot-1:visual"
+    )
+    node = next(item for item in graph.nodes if item.node_id == state.node_id)
+    scene = next(
+        item
+        for item in graph.nodes
+        if item.node_id.startswith("creative:scene:")
+    )
+    changed_scene = scene.model_copy(
+        update={
+            "contributions": tuple(
+                item.model_copy(update={"fingerprint": "f" * 64})
+                for item in scene.contributions
+            )
+        }
+    )
+    changed_graph = build_dependency_graph(
+        tuple(
+            changed_scene if item.node_id == scene.node_id else item
+            for item in graph.nodes
+        ),
+        graph.edges,
+    )
+    changed_desired = desired_fingerprints(changed_graph)
+    changed_state = state.model_copy(
+        update={
+            "graph_revision_id": changed_graph.revision_id,
+            "desired_fingerprint": changed_desired[state.node_id],
+        }
+    )
+    assert changed_state.applied_evidence is not None
+
+    with pytest.raises(AiVideoError, match="Historical Shot dependency evidence"):
+        _verify_dependency_project_evidence(
+            loaded,
+            changed_state.applied_evidence,
+            node,
+            (changed_graph, changed_state),
+        )
+
+
+@pytest.mark.parametrize("revision_offset", [0, 1])
+def test_historical_shot_projection_rejects_nonhistorical_project_evidence(
+    tmp_path, revision_offset
+):
+    fixture, graph, _ = _p7_historical_projection_fixture(tmp_path)
+    loaded = load_production_project(fixture["project_path"])
+    request = fixture["request"]
+    origin = load_production_project_candidate(
+        tmp_path,
+        loaded.manifest,
+        request.base_project.path,
+        request.base_registry.path,
+    )
+    nonhistorical_project = seal_artifact(
+        origin.project.model_copy(
+            update={
+                "revision": loaded.project.revision + revision_offset,
+                "content_hash": "0" * 64,
+            }
+        )
+    )
+    nonhistorical_bytes = yaml.safe_dump(
+        nonhistorical_project.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    nonhistorical_path = canonical_project_snapshot_path(
+        nonhistorical_project.revision, nonhistorical_project.content_hash
+    )
+    (tmp_path / nonhistorical_path).write_bytes(nonhistorical_bytes)
+    nonhistorical_pointer = ProjectSnapshotPointer(
+        path=nonhistorical_path,
+        revision=nonhistorical_project.revision,
+        content_hash=nonhistorical_project.content_hash,
+        file_sha256=hashlib.sha256(nonhistorical_bytes).hexdigest(),
+    )
+    state = next(
+        item
+        for item in loaded.manifest.dependency_states
+        if item.node_id == "creative:shot:shot-1:visual"
+    )
+    node = next(item for item in graph.nodes if item.node_id == state.node_id)
+    assert state.applied_evidence is not None
+    nonhistorical_evidence = state.applied_evidence.model_copy(
+        update={"pointer": nonhistorical_pointer}
+    )
+    nonhistorical_state = state.model_copy(
+        update={"applied_evidence": nonhistorical_evidence}
+    )
+
+    with pytest.raises(AiVideoError, match="chronology"):
+        _verify_dependency_project_evidence(
+            loaded,
+            nonhistorical_evidence,
+            node,
+            (graph, nonhistorical_state),
+        )
 
 
 def test_loader_rejects_unrelated_p7_candidate_registry_suffix(tmp_path):

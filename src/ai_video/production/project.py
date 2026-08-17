@@ -13,6 +13,7 @@ import yaml
 from ai_video.config import load_yaml, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._image_project_reader import verify_active_image_evidence
+import ai_video.production._project_dependency_evidence as _project_evidence
 from ai_video.production.audio import (
     VoiceCallAuthorization,
     VoiceCostReceipt,
@@ -31,7 +32,6 @@ from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.dependency import (
     _asset_role,
     _fp,
-    _shot_projection_fingerprints,
     dependency_graph_semantic_sha256,
     desired_fingerprints,
     resolve_dependency_state,
@@ -48,9 +48,9 @@ from ai_video.production.models import (
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
     DependencyLifecycle,
-    DependencyNodeKind,
     DependencyNode,
-    DependencySemanticRole,
+    DependencyNodeKind,
+    DependencyNodeState,
     FinalAcceptanceReceipt,
     FinalAcceptanceReceiptPointer,
     LoadedProductionProject,
@@ -1312,6 +1312,7 @@ def _verify_dependency_project_evidence(
     bundle: LoadedProductionProject,
     evidence: ProjectDependencyEvidence,
     node: DependencyNode | None = None,
+    context: tuple[DependencyGraphSnapshot, DependencyNodeState] | None = None,
 ) -> None:
     root = bundle.root
     path = _resolve_candidate_project_path(root, evidence.pointer.path)
@@ -1346,20 +1347,16 @@ def _verify_dependency_project_evidence(
     if node is None:
         return
     artifact = matches[0]
-    if node.artifact_revision != artifact.revision:
-        raise _invalid("Project dependency evidence revision is invalid.")
     contributions = {item.key: item.fingerprint for item in node.contributions}
-    if isinstance(artifact, Shot) and node.semantic_role in {
-        DependencySemanticRole.VOICE,
-        DependencySemanticRole.VISUAL,
-        DependencySemanticRole.COMPOSITION,
-    }:
-        expected = {
-            f"shot.{node.semantic_role.value}": _shot_projection_fingerprints(artifact)[
-                node.semantic_role
-            ]
-        }
+    if isinstance(artifact, Shot):
+        graph, state = context or (None, None)
+        _project_evidence.verify_active_shot_projection_evidence(
+            bundle, evidence, node, graph, state, artifact
+        )
+        return
     else:
+        if node.artifact_revision != artifact.revision:
+            raise _invalid("Project dependency evidence revision is invalid.")
         kind = node.node_id.split(":", 2)[1] if ":" in node.node_id else ""
         expected = {f"{kind}.semantic": artifact.content_hash}
     if contributions != expected:
@@ -1644,7 +1641,7 @@ def _verify_manifest_dependency_states(
         if isinstance(evidence, ProjectDependencyEvidence):
             if node.kind is not DependencyNodeKind.CREATIVE_ARTIFACT:
                 raise _invalid("Project evidence has an invalid dependency owner.")
-            _verify_dependency_project_evidence(bundle, evidence, node)
+            _verify_dependency_project_evidence(bundle, evidence, node, (graph, state))
         elif isinstance(evidence, RegistryDependencyEvidence):
             if node.kind is not DependencyNodeKind.ASSET:
                 raise _invalid("Registry evidence has an invalid dependency owner.")
