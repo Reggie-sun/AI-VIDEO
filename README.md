@@ -22,7 +22,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` 合入并 push 到 `origin/main`，merged-main full verification 为 `1386 passed, 4 skipped`。P6 runtime 已完成、独立审查并通过 `be28dc4` checkpoint 整合到 local `main`；focused verification 为 `739 passed`，合入并行 local-main commits 后 full suite 为 `1462 passed, 4 skipped`。P6 尚未 push、release 或 publish。P7 当前 branch acceptance 为 canonical `1115 passed`、image E2E `7 passed` 与 Architecture Gate PASS；没有 merge 到 `main`、push、release 或 publish。
+公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` 合入并 push 到 `origin/main`，merged-main full verification 为 `1386 passed, 4 skipped`。P6 runtime 已完成、独立审查并通过 `be28dc4` checkpoint 整合到 local `main`；focused verification 为 `739 passed`，合入并行 local-main commits 后 full suite 为 `1462 passed, 4 skipped`。P6 尚未 push、release 或 publish。P7 当前 branch acceptance 为 canonical `1128 passed`、image E2E `7 passed`、full `1686 passed, 4 skipped` 与 Architecture Gate PASS；没有 merge 到 `main`、push、release 或 publish。
 
 ## Setup
 
@@ -124,7 +124,7 @@ Manifest 2.5 组合 P6 review/repair 与 P7 image lifecycle，但不让两者互
 
 两个 `static_image` Shot 可以复用同一个 Character 和 Scene reference state，同时各自拥有不同的 generated PNG 与 exact provenance。P7 不修改 `dependency.py`，也不声称 reference bytes 变化会自动触发 regeneration；新 request/output 激活后由既有 P5 resolver 只传播 target Shot visual projection 的精确 downstream invalidation，无关 Shot、audio、voice 和 caption nodes 保持 fresh。Exact replay 的 provider/materializer/Manifest write 均为零；explicit recovery 不 remint permit、不 blind resubmit，只接受 exact old/new tuple 并保留完整 orphan evidence。
 
-P7 branch acceptance 为 canonical `1115 passed`、image E2E `7 passed` 与 Architecture Gate PASS，测试未调用网络、ComfyUI、HyperFrames、video Provider、remote image Provider、secret 或 quota。P7 没有增加 CLI、renderer、Composition/timeline、video generation、concrete Provider 或 runtime dependency；当前 branch 尚未 merge 到 `main`、push、release 或 publish。
+P7 branch acceptance 为 canonical `1128 passed`、image E2E `7 passed`、full `1686 passed, 4 skipped` 与 Architecture Gate PASS，测试未调用网络、ComfyUI、HyperFrames executable、video Provider、remote image Provider、secret 或 quota。P7 没有增加 CLI、renderer、Composition/timeline、video generation、concrete Provider 或 runtime dependency；当前 branch 尚未 merge 到 `main`、push、release 或 publish。
 
 ## Development MCP
 
