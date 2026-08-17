@@ -43,6 +43,11 @@ class ErrorCode(str, Enum):
     DISK_SPACE_LOW = "disk_space_low"
     DEPENDENCY_GRAPH_INVALID = "dependency_graph_invalid"
     DEPENDENCY_RESOLUTION_INVALID = "dependency_resolution_invalid"
+    REVIEW_EVIDENCE_INVALID = "review_evidence_invalid"
+    REVIEW_NOT_CURRENT = "review_not_current"
+    REPAIR_AUTHORIZATION_REQUIRED = "repair_authorization_required"
+    REPAIR_SCOPE_INVALID = "repair_scope_invalid"
+    FINAL_ACCEPTANCE_INVALID = "final_acceptance_invalid"
 
 
 @dataclass

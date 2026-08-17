@@ -258,6 +258,34 @@ class VisualStrategy(str, Enum):
     HYBRID = "hybrid"
 
 
+class QaLayer(str, Enum):
+    TECHNICAL = "technical"
+    LAYOUT = "layout"
+    STRATEGY = "strategy"
+    SEMANTIC = "semantic"
+    FINAL_ACCEPTANCE = "final_acceptance"
+
+
+class QaVerdict(str, Enum):
+    PASS = "pass"
+    FAIL = "fail"
+    NOT_EVALUATED = "not_evaluated"
+
+
+class EvidenceStrength(str, Enum):
+    MEASURED = "measured"
+    RENDERER_BOUND = "renderer_bound"
+    EXPLICIT_EVALUATOR = "explicit_evaluator"
+    HUMAN = "human"
+
+
+class ReviewLifecycle(str, Enum):
+    FRESH = "fresh"
+    STALE = "stale"
+    FAILED = "failed"
+    NOT_EVALUATED = "not_evaluated"
+
+
 class AssetType(str, Enum):
     IMAGE = "image"
     VIDEO = "video"
@@ -1835,8 +1863,127 @@ class RecoveryReport(StrictModel):
         return self
 
 
+def _require_content_addressed_pointer_path(
+    value: Path,
+    *,
+    content_hash: str,
+    prefix: str,
+    label: str,
+) -> Path:
+    clean_path = _require_clean_relative_file_path(value, label)
+    expected = Path(f"{prefix}{content_hash}.json")
+    if clean_path != expected:
+        raise ValueError(f"{label} pointer path must be canonical")
+    return value
+
+
+class QaPolicyPointer(StrictModel):
+    path: Path
+    policy_id: str = Field(min_length=1)
+    policy_version: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "QaPolicyPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/reviews/policy.",
+            label="QA policy",
+        )
+        return self
+
+
+class ReviewReceiptPointer(StrictModel):
+    path: Path
+    review_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "ReviewReceiptPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/reviews/review.",
+            label="review receipt",
+        )
+        return self
+
+
+class ApprovedRepairReceiptPointer(StrictModel):
+    path: Path
+    repair_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "ApprovedRepairReceiptPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/repairs/approved.",
+            label="approved repair receipt",
+        )
+        return self
+
+
+class RepairOutcomeReceiptPointer(StrictModel):
+    path: Path
+    repair_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "RepairOutcomeReceiptPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/repairs/outcome.",
+            label="repair outcome receipt",
+        )
+        return self
+
+
+class FinalAcceptanceReceiptPointer(StrictModel):
+    path: Path
+    acceptance_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "FinalAcceptanceReceiptPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/acceptance/final.",
+            label="final acceptance receipt",
+        )
+        return self
+
+
+class ReviewLayerState(StrictModel):
+    layer: QaLayer
+    desired_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    applied_fingerprint: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    lifecycle: ReviewLifecycle
+    active_receipt: ReviewReceiptPointer | None = None
+
+
+class FinalAcceptanceState(StrictModel):
+    desired_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    applied_fingerprint: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    lifecycle: ReviewLifecycle
+    active_receipt: FinalAcceptanceReceiptPointer | None = None
+
+
 class ProductionManifest(StrictModel):
-    schema_version: Literal["2.0", "2.1", "2.2", "2.3"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2", "2.3", "2.4"] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
     active_project: ProjectSnapshotPointer
@@ -1844,7 +1991,37 @@ class ProductionManifest(StrictModel):
     active_render_state: RenderStateSnapshotPointer | None = None
     active_dependency_graph: DependencyGraphSnapshotPointer | None = None
     dependency_states: tuple[DependencyNodeState, ...] = Field(default=())
+    active_qa_policy: QaPolicyPointer | None = None
+    active_review_receipts: tuple[ReviewReceiptPointer, ...] = Field(default=())
+    review_states: tuple[ReviewLayerState, ...] = Field(default=())
+    active_approved_repair: ApprovedRepairReceiptPointer | None = None
+    repair_outcome_receipts: tuple[RepairOutcomeReceiptPointer, ...] = Field(
+        default=()
+    )
+    final_acceptance_state: FinalAcceptanceState | None = None
     attempts: tuple[StateCommitAttempt, ...] = ()
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p6_fields_in_old_versions(cls, value: object) -> object:
+        if not isinstance(value, Mapping):
+            return value
+        if value.get("schema_version", "2.0") == "2.4":
+            return value
+        p6_fields = {
+            "active_qa_policy",
+            "active_review_receipts",
+            "review_states",
+            "active_approved_repair",
+            "repair_outcome_receipts",
+            "final_acceptance_state",
+        }
+        if p6_fields.intersection(value):
+            raise ValueError(
+                f"Production Manifest {value.get('schema_version', '2.0')} "
+                "cannot contain explicit P6 review fields"
+            )
+        return value
 
     @model_validator(mode="before")
     @classmethod
@@ -1875,7 +2052,7 @@ class ProductionManifest(StrictModel):
     ) -> object:
         if not isinstance(value, Mapping):
             return value
-        if value.get("schema_version", "2.0") == "2.3":
+        if value.get("schema_version", "2.0") in {"2.3", "2.4"}:
             return value
         manifest_version = value.get("schema_version", "2.0")
         if {
@@ -1927,7 +2104,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "running render_state attempt base must match active identity"
                 )
-        if self.schema_version == "2.3":
+        if self.schema_version in {"2.3", "2.4"}:
             self._validate_manifest_23_graph_lifecycle()
         else:
             for attempt in self.attempts:
@@ -1940,6 +2117,13 @@ class ProductionManifest(StrictModel):
                         f"Production Manifest {self.schema_version} "
                         "cannot contain P5 graph attempt fields"
                     )
+        if self.schema_version == "2.4":
+            if self.active_qa_policy is None:
+                raise ValueError("Production Manifest 2.4 requires active_qa_policy")
+            if self.active_dependency_graph is None:
+                raise ValueError(
+                    "Production Manifest 2.4 requires active_dependency_graph"
+                )
         return self
 
     def _validate_manifest_23_graph_lifecycle(self) -> None:
@@ -1978,9 +2162,19 @@ class ProductionManifest(StrictModel):
         data = handler(self)
         if self.schema_version == "2.0" and self.active_render_state is None:
             data.pop("active_render_state", None)
-        if self.schema_version != "2.3" or self.active_dependency_graph is None:
+        if (
+            self.schema_version not in {"2.3", "2.4"}
+            or self.active_dependency_graph is None
+        ):
             data.pop("active_dependency_graph", None)
             data.pop("dependency_states", None)
+        if self.schema_version != "2.4":
+            data.pop("active_qa_policy", None)
+            data.pop("active_review_receipts", None)
+            data.pop("review_states", None)
+            data.pop("active_approved_repair", None)
+            data.pop("repair_outcome_receipts", None)
+            data.pop("final_acceptance_state", None)
         return data
 
 

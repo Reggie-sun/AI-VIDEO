@@ -49,6 +49,9 @@ from ai_video.production.models import (
     MeasuredAudioRenderMetadata,
     MotionDirective,
     ProductionManifest,
+    QaLayer,
+    QaPolicyPointer,
+    QaVerdict,
     ProjectDependencyEvidence,
     ProjectSnapshotPointer,
     RecoveryDisposition,
@@ -3466,3 +3469,92 @@ def test_loaded_production_project_declares_optional_dependency_graph():
     assert not field.is_required()
     annotation = get_args(field.annotation)
     assert type(None) in annotation
+
+
+# ---------------------------------------------------------------------------
+# P6 Review / Repair / Final Acceptance schema tests
+# ---------------------------------------------------------------------------
+
+
+def make_qa_policy_pointer() -> QaPolicyPointer:
+    return QaPolicyPointer(
+        path=Path(f"state/reviews/policy.{ZERO_HASH}.json"),
+        policy_id="qa-default",
+        policy_version="1",
+        content_hash=ZERO_HASH,
+        file_sha256=ONE_HASH,
+    )
+
+
+def test_p6_layer_and_verdict_values_are_exact():
+    assert {item.value for item in QaLayer} == {
+        "technical",
+        "layout",
+        "strategy",
+        "semantic",
+        "final_acceptance",
+    }
+    assert {item.value for item in QaVerdict} == {
+        "pass",
+        "fail",
+        "not_evaluated",
+    }
+
+
+def test_qa_policy_pointer_requires_canonical_content_addressed_path():
+    assert make_qa_policy_pointer().path == Path(
+        f"state/reviews/policy.{ZERO_HASH}.json"
+    )
+    with pytest.raises(ValidationError):
+        QaPolicyPointer(
+            path=Path("state/reviews/policy.latest.json"),
+            policy_id="qa-default",
+            policy_version="1",
+            content_hash=ZERO_HASH,
+            file_sha256=ONE_HASH,
+        )
+
+
+def test_manifest_23_rejects_explicit_p6_fields_and_serializes_unchanged():
+    manifest = make_state_manifest(schema_version="2.3")
+    dumped = manifest.model_dump(mode="json")
+    assert "active_qa_policy" not in dumped
+    assert "review_states" not in dumped
+    with pytest.raises(ValidationError):
+        ProductionManifest.model_validate(
+            {
+                **dumped,
+                "active_qa_policy": make_qa_policy_pointer().model_dump(mode="json"),
+            }
+        )
+
+
+def test_manifest_24_requires_selected_qa_policy_and_defaults_empty_review_state():
+    manifest = make_state_manifest(
+        schema_version="2.4",
+        active_qa_policy=make_qa_policy_pointer(),
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+    )
+    assert manifest.active_qa_policy == make_qa_policy_pointer()
+    assert manifest.active_review_receipts == ()
+    assert manifest.review_states == ()
+    assert manifest.repair_outcome_receipts == ()
+    assert manifest.final_acceptance_state is None
+    with pytest.raises(ValidationError):
+        make_state_manifest(
+            schema_version="2.4",
+            active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        )
+    with pytest.raises(ValidationError):
+        make_state_manifest(
+            schema_version="2.4",
+            active_qa_policy=make_qa_policy_pointer(),
+        )
+
+
+def test_p6_error_codes_are_typed_and_non_retryable():
+    assert ErrorCode.REVIEW_EVIDENCE_INVALID.value == "review_evidence_invalid"
+    assert ErrorCode.REVIEW_NOT_CURRENT.value == "review_not_current"
+    assert ErrorCode.REPAIR_AUTHORIZATION_REQUIRED.value == "repair_authorization_required"
+    assert ErrorCode.REPAIR_SCOPE_INVALID.value == "repair_scope_invalid"
+    assert ErrorCode.FINAL_ACCEPTANCE_INVALID.value == "final_acceptance_invalid"

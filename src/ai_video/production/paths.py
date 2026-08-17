@@ -82,6 +82,54 @@ def canonical_dependency_graph_snapshot_path(revision_id: str) -> Path:
     )
 
 
+def canonical_qa_policy_path(content_hash: str) -> Path:
+    return Path(
+        f"state/reviews/policy.{_require_sha256(content_hash, 'QA policy hash')}.json"
+    )
+
+
+def canonical_review_evidence_path(content_hash: str) -> Path:
+    return Path(
+        f"state/reviews/evidence.{_require_sha256(content_hash, 'review evidence hash')}.json"
+    )
+
+
+def canonical_review_request_path(content_hash: str) -> Path:
+    return Path(
+        f"state/reviews/request.{_require_sha256(content_hash, 'review request hash')}.json"
+    )
+
+
+def canonical_review_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/reviews/review.{_require_sha256(content_hash, 'review receipt hash')}.json"
+    )
+
+
+def canonical_repair_request_path(content_hash: str) -> Path:
+    return Path(
+        f"state/repairs/request.{_require_sha256(content_hash, 'repair request hash')}.json"
+    )
+
+
+def canonical_approved_repair_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/repairs/approved.{_require_sha256(content_hash, 'approved repair receipt hash')}.json"
+    )
+
+
+def canonical_repair_outcome_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/repairs/outcome.{_require_sha256(content_hash, 'repair outcome receipt hash')}.json"
+    )
+
+
+def canonical_final_acceptance_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/acceptance/final.{_require_sha256(content_hash, 'final acceptance receipt hash')}.json"
+    )
+
+
 def canonical_render_output_path(file_sha256: str, suffix: str = ".mp4") -> Path:
     if suffix != ".mp4":
         raise ValueError("Render output suffix must be .mp4.")
