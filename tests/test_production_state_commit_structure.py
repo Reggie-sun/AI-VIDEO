@@ -35,3 +35,14 @@ def test_generic_transaction_and_io_methods_have_private_owners() -> None:
     assert facade.ProductionStateCommitter._write_mutable_atomic.__module__ == io.__name__
     assert facade.ProductionStateCommitter._write_immutable_artifact.__module__ == io.__name__
     assert facade.ProductionStateCommitter._exclusive_lock.__module__ == facade.__name__
+
+
+def test_review_and_dependency_methods_have_domain_owners() -> None:
+    facade = importlib.import_module("ai_video.production.state_commit")
+    review = importlib.import_module("ai_video.production._state_commit_review")
+    dependency = importlib.import_module("ai_video.production._state_commit_dependency")
+    committer = facade.ProductionStateCommitter
+    assert committer.activate_qa_policy.__module__ == review.__name__
+    assert committer.record_final_acceptance.__module__ == review.__name__
+    assert committer.bootstrap_dependency_graph.__module__ == dependency.__name__
+    assert committer.record_dependency_node_failed.__module__ == dependency.__name__
