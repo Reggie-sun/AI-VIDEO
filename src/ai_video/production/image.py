@@ -5,7 +5,7 @@ import re
 import struct
 import unicodedata
 import zlib
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Protocol
 
@@ -17,6 +17,7 @@ from ai_video.production.dependency import (
     ProductionDependencyInputs,
     asset_node_id,
     build_production_dependency_graph,
+    resolve_dependency_state,
     shot_projection_node_id,
 )
 from ai_video.production.hashing import (
@@ -32,6 +33,7 @@ from ai_video.production.models import (
     AssetType,
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
+    DependencyNodeState,
     EgressMetadata,
     LoadedProductionProject,
     ProjectSnapshotPointer,
@@ -586,6 +588,9 @@ class ImageActivationCandidate:
     candidate_inputs: ProductionDependencyInputs
     candidate_graph: DependencyGraphSnapshot
     resolution: DependencyResolution
+    candidate_project_pointer: ProjectSnapshotPointer
+    candidate_registry_pointer: RegistrySnapshotPointer
+    candidate_graph_pointer: DependencyGraphSnapshotPointer
     receipt: ImageProvenanceReceipt
 
     def __new__(cls, token: object) -> "ImageActivationCandidate":
@@ -611,6 +616,9 @@ class ImageActivationCandidate:
         candidate_inputs: ProductionDependencyInputs,
         candidate_graph: DependencyGraphSnapshot,
         resolution: DependencyResolution,
+        candidate_project_pointer: ProjectSnapshotPointer,
+        candidate_registry_pointer: RegistrySnapshotPointer,
+        candidate_graph_pointer: DependencyGraphSnapshotPointer,
         receipt: ImageProvenanceReceipt,
     ) -> "ImageActivationCandidate":
         candidate = cls(_IMAGE_ACTIVATION_TOKEN)
@@ -633,6 +641,8 @@ def _same_except(
 def validate_image_activation_candidate(
     *,
     base_project: LoadedProductionProject,
+    base_inputs: ProductionDependencyInputs,
+    base_dependency_states: tuple[DependencyNodeState, ...],
     request: ImageGenerationRequest,
     authorization: ImageGenerationAuthorization,
     result: ImageProviderResult,
@@ -643,14 +653,10 @@ def validate_image_activation_candidate(
     candidate_graph: DependencyGraphSnapshot,
     candidate_inputs: ProductionDependencyInputs,
     resolution: DependencyResolution,
+    candidate_project_pointer: ProjectSnapshotPointer,
+    candidate_registry_pointer: RegistrySnapshotPointer,
+    candidate_graph_pointer: DependencyGraphSnapshotPointer,
 ) -> ImageActivationCandidate:
-    checked_measured, checked_receipt = validate_image_result(
-        request, authorization, result
-    )
-    if checked_measured != measured or checked_receipt != receipt:
-        raise _image_scope_invalid(
-            "Image activation candidate does not carry the exact validated result."
-        )
     if (
         request.base_project != base_project.manifest.active_project
         or request.base_registry != base_project.manifest.active_registry
@@ -662,6 +668,53 @@ def validate_image_activation_candidate(
     ):
         raise _image_scope_invalid(
             "Image request base pointers do not match the loaded project."
+        )
+    if base_inputs.project != base_project:
+        raise _image_scope_invalid(
+            "Image base dependency inputs do not match the loaded project."
+        )
+
+    registry_assets = {
+        asset.asset_id: asset for asset in base_project.registry.assets
+    }
+    characters = {
+        character.artifact_id: character for character in base_project.characters
+    }
+    scenes = {scene.artifact_id: scene for scene in base_project.scenes}
+    for reference in request.references:
+        if reference.role == "character":
+            creative = characters.get(reference.creative_artifact_id)
+            allowed_asset_ids = (
+                creative.reference_asset_ids if creative is not None else ()
+            )
+        elif reference.role == "scene":
+            creative = scenes.get(reference.creative_artifact_id)
+            allowed_asset_ids = (
+                creative.visual_reference_asset_ids if creative is not None else ()
+            )
+        else:
+            raise _image_scope_invalid(
+                "Image activation does not yet support style reference artifacts."
+            )
+        asset = registry_assets.get(reference.asset_id)
+        if (
+            creative is None
+            or creative.revision != reference.creative_revision
+            or creative.content_hash != reference.creative_content_hash
+            or reference.asset_id not in allowed_asset_ids
+            or asset is None
+            or asset.sha256 != reference.asset_sha256
+        ):
+            raise _image_scope_invalid(
+                "Image reference provenance does not match the loaded base project."
+            )
+
+    checked_measured, checked_receipt = validate_image_result(
+        request, authorization, result
+    )
+    if checked_measured != measured or checked_receipt != receipt:
+        raise _image_scope_invalid(
+            "Image activation candidate does not carry the exact validated result."
         )
 
     base_assets = base_project.registry.assets
@@ -675,6 +728,20 @@ def validate_image_activation_candidate(
         raise _image_scope_invalid(
             "Image candidate Registry must append exactly one sealed asset."
         )
+    base_shot = next(
+        (shot for shot in base_project.shots if shot.shot_id == request.target_shot_id),
+        None,
+    )
+    if base_shot is None:
+        raise _image_scope_invalid("Image request target Shot does not exist.")
+    input_artifact_ids = (
+        base_shot.artifact_id,
+        *(
+            identity
+            for reference in request.references
+            for identity in (reference.creative_artifact_id, reference.asset_id)
+        ),
+    )
     expected_record = AssetRecord(
         asset_id=request.output_asset_id,
         asset_type=AssetType.IMAGE,
@@ -686,7 +753,7 @@ def validate_image_activation_candidate(
         height=measured.height,
         source_kind=AssetSourceKind.GENERATED,
         tool=result.adapter,
-        input_artifact_ids=tuple(item.asset_id for item in request.references),
+        input_artifact_ids=input_artifact_ids,
         input_fingerprint=request.request_fingerprint,
         creation_receipt_id=receipt.content_hash,
         usage_license=authorization.usage_license,
@@ -797,11 +864,14 @@ def validate_image_activation_candidate(
     active_registry = candidate_project.manifest.active_registry
     active_graph = candidate_project.manifest.active_dependency_graph
     if (
-        active_project.revision != candidate_project.project.revision
+        active_project != candidate_project_pointer
+        or active_registry != candidate_registry_pointer
+        or active_graph != candidate_graph_pointer
+        or active_graph is None
+        or active_project.revision != candidate_project.project.revision
         or active_project.content_hash != candidate_project.project.content_hash
         or active_registry.revision_id != candidate_registry.revision_id
         or active_registry.content_hash != candidate_registry.content_hash
-        or active_graph is None
     ):
         raise _image_scope_invalid("Image candidate active pointers are inconsistent.")
     if not _same_except(
@@ -813,13 +883,21 @@ def validate_image_activation_candidate(
 
     if candidate_inputs.project != candidate_project:
         raise _image_scope_invalid("Image candidate dependency inputs use another project.")
+    if replace(candidate_inputs, project=base_project) != base_inputs:
+        raise _image_scope_invalid(
+            "Image candidate changed dependency inputs outside the project."
+        )
     expected_graph = build_production_dependency_graph(candidate_inputs)
+    expected_resolution = resolve_dependency_state(
+        expected_graph, base_dependency_states
+    )
     if (
         candidate_graph != expected_graph
         or candidate_project.dependency_graph != expected_graph
         or resolution.graph != expected_graph
         or active_graph.revision_id != expected_graph.revision_id
         or active_graph.content_hash != expected_graph.content_hash
+        or resolution != expected_resolution
     ):
         raise _image_scope_invalid(
             "Image candidate graph does not equal the existing P5 builder output."
@@ -835,19 +913,17 @@ def validate_image_activation_candidate(
         raise _image_scope_invalid(
             "Image candidate resolution omits the target visual generation frontier."
         )
-    for node_id in affected:
-        if node_id.startswith("creative:shot:") and node_id != target_visual_id:
-            raise _image_scope_invalid(
-                "Image candidate resolution affects an unrelated Shot projection."
-            )
-        if node_id.startswith("asset:") and node_id not in target_asset_node_ids:
-            raise _image_scope_invalid(
-                "Image candidate resolution affects an unrelated asset."
-            )
-        if ":voice" in node_id or ":caption" in node_id:
-            raise _image_scope_invalid(
-                "Image candidate resolution affects voice or caption state."
-            )
+    allowed_affected = {target_visual_id, *target_asset_node_ids} | {
+        node_id
+        for node_id in affected
+        if node_id.startswith(
+            ("composition:", "timeline:", "renderer-source:", "render:")
+        )
+    }
+    if affected != allowed_affected:
+        raise _image_scope_invalid(
+            "Image candidate resolution contains an unrelated dependency node."
+        )
 
     return ImageActivationCandidate._validated(
         image_asset_id=request.output_asset_id,
@@ -858,6 +934,9 @@ def validate_image_activation_candidate(
         candidate_inputs=candidate_inputs,
         candidate_graph=candidate_graph,
         resolution=resolution,
+        candidate_project_pointer=candidate_project_pointer,
+        candidate_registry_pointer=candidate_registry_pointer,
+        candidate_graph_pointer=candidate_graph_pointer,
         receipt=receipt,
     )
 

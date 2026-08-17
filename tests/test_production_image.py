@@ -380,7 +380,14 @@ def p7_candidate(tmp_path):
         height=measured.height,
         source_kind=AssetSourceKind.GENERATED,
         tool=result.adapter,
-        input_artifact_ids=tuple(item.asset_id for item in request.references),
+        input_artifact_ids=(
+            "shot-artifact-1",
+            *(
+                identity
+                for item in request.references
+                for identity in (item.creative_artifact_id, item.asset_id)
+            ),
+        ),
         input_fingerprint=request.request_fingerprint,
         creation_receipt_id=receipt.content_hash,
         usage_license=authorization.usage_license,
@@ -495,12 +502,12 @@ def p7_candidate(tmp_path):
         }
     )
     candidate_inputs = replace(candidate_inputs, project=candidate_project)
-    resolution = resolve_dependency_state(
-        candidate_graph,
-        _fresh_states(base_project, base_graph),
-    )
+    base_dependency_states = _fresh_states(base_project, base_graph)
+    resolution = resolve_dependency_state(candidate_graph, base_dependency_states)
     return {
         "base_project": base_project,
+        "base_inputs": inputs,
+        "base_dependency_states": base_dependency_states,
         "request": request,
         "authorization": authorization,
         "result": result,
@@ -511,6 +518,9 @@ def p7_candidate(tmp_path):
         "candidate_graph": candidate_graph,
         "candidate_inputs": candidate_inputs,
         "resolution": resolution,
+        "candidate_project_pointer": project_pointer,
+        "candidate_registry_pointer": registry_pointer,
+        "candidate_graph_pointer": candidate_graph_pointer,
     }
 
 
@@ -520,6 +530,13 @@ def test_candidate_appends_one_image_and_changes_only_target_shot_role(p7_candid
     assert isinstance(checked, ImageActivationCandidate)
     assert checked.image_asset_id == p7_candidate["request"].output_asset_id
     assert checked.changed_shot_ids == ("shot-1",)
+    assert p7_candidate["candidate_registry"].assets[-1].input_artifact_ids == (
+        "shot-artifact-1",
+        "character-hero",
+        "image-shot-1",
+        "scene-room",
+        "image-shot-1",
+    )
 
 
 @pytest.mark.parametrize("mutation", ["character", "unrelated_shot"])
@@ -561,6 +578,113 @@ def test_candidate_rejects_registry_overwrite_or_extra_asset(p7_candidate, mutat
     tampered = {
         **p7_candidate,
         "candidate_registry": registry.model_copy(update={"assets": assets}),
+    }
+
+    with pytest.raises(AiVideoError) as error:
+        validate_image_activation_candidate(**tampered)
+
+    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_candidate_rejects_unrelated_dependency_input_change(p7_candidate):
+    tampered = {
+        **p7_candidate,
+        "candidate_inputs": replace(
+            p7_candidate["candidate_inputs"],
+            render_contract_fingerprint="f" * 64,
+        ),
+    }
+
+    with pytest.raises(AiVideoError) as error:
+        validate_image_activation_candidate(**tampered)
+
+    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_candidate_rejects_caller_tampered_resolution(p7_candidate):
+    resolution = p7_candidate["resolution"]
+    tampered = {
+        **p7_candidate,
+        "resolution": replace(
+            resolution,
+            affected_node_ids=(
+                *resolution.affected_node_ids,
+                "creative:brief:brief-main",
+            ),
+        ),
+    }
+
+    with pytest.raises(AiVideoError) as error:
+        validate_image_activation_candidate(**tampered)
+
+    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_candidate_rejects_reference_not_owned_by_bound_creative(p7_candidate):
+    request = p7_candidate["request"]
+    foreign_asset = next(
+        asset
+        for asset in p7_candidate["base_project"].registry.assets
+        if asset.asset_id == "image-shot-2"
+    )
+    references = (
+        request.references[0].model_copy(
+            update={
+                "asset_id": foreign_asset.asset_id,
+                "asset_sha256": foreign_asset.sha256,
+            }
+        ),
+        request.references[1],
+    )
+    changed_request = ImageGenerationRequest.create(
+        attempt_id="image-attempt-foreign-reference",
+        provider_kind=request.provider_kind,
+        model_id=request.model_id,
+        target_shot_id=request.target_shot_id,
+        target_asset_role=request.target_asset_role,
+        prompt_text=request.prompt_text,
+        negative_prompt_text=request.negative_prompt_text,
+        parameters=request.parameters,
+        references=references,
+        base_project=request.base_project,
+        base_registry=request.base_registry,
+        base_dependency_graph=request.base_dependency_graph,
+    )
+    authorization = make_authorization(changed_request)
+    result = make_image_result(changed_request, image_bytes=PNG_2X1_RGBA)
+    measured, receipt = validate_image_result(changed_request, authorization, result)
+    tampered = {
+        **p7_candidate,
+        "request": changed_request,
+        "authorization": authorization,
+        "result": result,
+        "measured": measured,
+        "receipt": receipt,
+    }
+
+    with pytest.raises(AiVideoError) as error:
+        validate_image_activation_candidate(**tampered)
+
+    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_candidate_rejects_pointer_file_hash_mismatch(p7_candidate):
+    pointer = p7_candidate["candidate_registry_pointer"].model_copy(
+        update={"file_sha256": "f" * 64}
+    )
+    candidate_project = p7_candidate["candidate_project"].model_copy(
+        update={
+            "manifest": p7_candidate["candidate_project"].manifest.model_copy(
+                update={"active_registry": pointer}
+            )
+        }
+    )
+    tampered = {
+        **p7_candidate,
+        "candidate_project": candidate_project,
+        "candidate_inputs": replace(
+            p7_candidate["candidate_inputs"], project=candidate_project
+        ),
     }
 
     with pytest.raises(AiVideoError) as error:
