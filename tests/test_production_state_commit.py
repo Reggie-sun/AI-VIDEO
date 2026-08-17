@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import pickle
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -12,6 +13,13 @@ from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
+from ai_video.production.image import (
+    ImageGenerationAuthorization,
+    ImageGenerationPreview,
+    ImageGenerationRequest,
+    ImageProviderParameters,
+    ImageReferenceBinding,
+)
 from ai_video.production.models import (
     ActorIdentity,
     ApprovedRepairReceipt,
@@ -74,6 +82,10 @@ from ai_video.production.state_commit import (
     prepare_dependency_graph_transition,
 )
 from ai_video.production.paths import (
+    canonical_image_authorization_path,
+    canonical_image_preview_path,
+    canonical_image_request_path,
+    canonical_image_submit_intent_path,
     canonical_render_attempt_root,
     canonical_render_output_path,
     canonical_render_receipt_path,
@@ -91,6 +103,84 @@ import production_project_factory as project_factory
 
 ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
+
+
+def make_image_call_bundle(
+    root: Path,
+    *,
+    attempt_id: str = "image-attempt-1",
+    prompt_text: str = "Hero enters the archive room",
+    reference_total_bytes_delta: int = 0,
+    base_project: ProjectSnapshotPointer | None = None,
+    base_registry: RegistrySnapshotPointer | None = None,
+    base_dependency_graph=None,
+) -> tuple[
+    ImageGenerationRequest,
+    ImageGenerationPreview,
+    ImageGenerationAuthorization,
+]:
+    loaded = load_production_project(root / "project.yaml")
+    assert loaded.manifest.active_dependency_graph is not None
+    assets = {item.asset_id: item for item in loaded.registry.assets}
+    character = loaded.characters[0]
+    scene = loaded.scenes[0]
+    character_asset = assets[character.reference_asset_ids[0]]
+    scene_asset = assets[scene.visual_reference_asset_ids[0]]
+    references = (
+        ImageReferenceBinding(
+            role="character",
+            creative_artifact_id=character.artifact_id,
+            creative_revision=character.revision,
+            creative_content_hash=character.content_hash,
+            asset_id=character_asset.asset_id,
+            asset_sha256=character_asset.sha256,
+        ),
+        ImageReferenceBinding(
+            role="scene",
+            creative_artifact_id=scene.artifact_id,
+            creative_revision=scene.revision,
+            creative_content_hash=scene.content_hash,
+            asset_id=scene_asset.asset_id,
+            asset_sha256=scene_asset.sha256,
+        ),
+    )
+    request = ImageGenerationRequest.create(
+        attempt_id=attempt_id,
+        provider_kind="fake-local",
+        model_id="fixture-image-model-1",
+        target_shot_id="shot-1",
+        target_asset_role="still",
+        prompt_text=prompt_text,
+        negative_prompt_text="blur, watermark",
+        parameters=ImageProviderParameters(
+            seed=7,
+            width=2,
+            height=1,
+            output_format="png",
+            generation_revision=1,
+        ),
+        references=references,
+        base_project=base_project or loaded.manifest.active_project,
+        base_registry=base_registry or loaded.manifest.active_registry,
+        base_dependency_graph=(
+            base_dependency_graph or loaded.manifest.active_dependency_graph
+        ),
+    )
+    preview = ImageGenerationPreview.create(
+        request=request,
+        reference_total_bytes=(
+            character_asset.size_bytes
+            + scene_asset.size_bytes
+            + reference_total_bytes_delta
+        ),
+    )
+    authorization = ImageGenerationAuthorization.create(
+        request=request,
+        preview=preview,
+        usage_license="fixture-only",
+        policy_receipt_id="fixture-local-image-policy",
+    )
+    return request, preview, authorization
 
 
 def make_qa_policy(
@@ -670,6 +760,318 @@ def test_p6_post_replace_process_interrupt_maps_to_outcome_unknown(
 
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
     assert read_manifest(tmp_path).schema_version == "2.4"
+
+
+def test_image_lifecycle_persists_exact_r1_then_mints_one_use_r2_permit(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before = read_manifest(tmp_path)
+
+    r1 = writer.begin_image_generation(request, preview, authorization)
+
+    assert r1.schema_version == "2.5"
+    assert r1.manifest_revision == before.manifest_revision + 1
+    attempt = r1.attempts[-1]
+    assert attempt.operation == "image_generation"
+    assert attempt.status is StateCommitStatus.RUNNING
+    assert attempt.image_phase == "request"
+    assert attempt.base_project == before.active_project
+    assert attempt.base_registry == before.active_registry
+    assert attempt.base_dependency_graph == before.active_dependency_graph
+    assert attempt.image_request is not None
+    assert attempt.image_request.request_fingerprint == request.request_fingerprint
+    assert (tmp_path / canonical_image_request_path(request.request_fingerprint)).read_bytes() == _canonical_json_bytes(request)
+    assert (tmp_path / canonical_image_preview_path(preview.preview_fingerprint)).read_bytes() == _canonical_json_bytes(preview)
+    assert (tmp_path / canonical_image_authorization_path(authorization.authorization_fingerprint)).read_bytes() == _canonical_json_bytes(authorization)
+
+    permit = writer.record_image_submit_intent(request, preview, authorization)
+
+    r2 = read_manifest(tmp_path)
+    assert r2.manifest_revision == r1.manifest_revision + 1
+    assert r2.attempts[-1].image_phase == "submit_intent"
+    intent_path = tmp_path / canonical_image_submit_intent_path(
+        request.request_fingerprint
+    )
+    intent_bytes = intent_path.read_bytes()
+    assert intent_bytes.endswith(b"\n")
+    intent = json.loads(intent_bytes)
+    assert intent == {
+        "attempt_id": request.attempt_id,
+        "authorization_fingerprint": authorization.authorization_fingerprint,
+        "base_dependency_graph": request.base_dependency_graph.model_dump(mode="json"),
+        "base_project": request.base_project.model_dump(mode="json"),
+        "base_registry": request.base_registry.model_dump(mode="json"),
+        "evidence_hash": attempt.candidate_artifacts_hash,
+        "policy_receipt_id": authorization.policy_receipt_id,
+        "preview_fingerprint": preview.preview_fingerprint,
+        "request_fingerprint": request.request_fingerprint,
+        "schema": "ai-video-image-submit-intent/1",
+        "usage_license": authorization.usage_license,
+    }
+    assert permit._validate_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+    assert not permit._validate_image_generation_permit(
+        request_fingerprint="f" * 64
+    )
+    with pytest.raises(TypeError):
+        permit._validate_image_generation_permit(  # type: ignore[call-arg]
+            request_fingerprint=request.request_fingerprint,
+            attempt_id=request.attempt_id,
+        )
+    with pytest.raises(TypeError):
+        pickle.dumps(permit)
+    with pytest.raises(TypeError):
+        permit._binding["request_fingerprint"] = "f" * 64  # type: ignore[index]
+    assert permit._consume_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+    assert not permit._consume_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+
+
+def test_image_submit_intent_requires_current_r1_and_cannot_remint(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+
+    with pytest.raises(AiVideoError) as missing:
+        writer.record_image_submit_intent(request, preview, authorization)
+    assert missing.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+
+    writer.begin_image_generation(request, preview, authorization)
+    writer.record_image_submit_intent(request, preview, authorization)
+    with pytest.raises(AiVideoError) as replay:
+        writer.record_image_submit_intent(request, preview, authorization)
+    assert replay.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+
+
+def test_image_r1_exact_replay_is_noop_but_reused_attempt_id_is_rejected(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    first = writer.begin_image_generation(request, preview, authorization)
+
+    assert writer.begin_image_generation(request, preview, authorization) == first
+
+    changed, changed_preview, changed_authorization = make_image_call_bundle(
+        tmp_path,
+        attempt_id=request.attempt_id,
+        prompt_text="Hero enters a different archive room",
+    )
+    with pytest.raises(AiVideoError) as reused:
+        writer.begin_image_generation(
+            changed, changed_preview, changed_authorization
+        )
+    assert reused.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path) == first
+
+
+def test_image_r1_rejects_another_unresolved_attempt(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    first = make_image_call_bundle(tmp_path, attempt_id="image-attempt-1")
+    second = make_image_call_bundle(tmp_path, attempt_id="image-attempt-2")
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_image_generation(*first)
+
+    with pytest.raises(AiVideoError) as unresolved:
+        writer.begin_image_generation(*second)
+
+    assert unresolved.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+
+
+@pytest.mark.parametrize("pointer_name", ["project", "registry", "graph"])
+def test_image_r1_rejects_stale_base_identity(
+    tmp_path: Path,
+    pointer_name: str,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.manifest.active_dependency_graph is not None
+    overrides = {
+        "base_project": loaded.manifest.active_project,
+        "base_registry": loaded.manifest.active_registry,
+        "base_dependency_graph": loaded.manifest.active_dependency_graph,
+    }
+    key = {
+        "project": "base_project",
+        "registry": "base_registry",
+        "graph": "base_dependency_graph",
+    }[pointer_name]
+    overrides[key] = overrides[key].model_copy(update={"file_sha256": "f" * 64})
+    bundle = make_image_call_bundle(tmp_path, **overrides)
+
+    with pytest.raises(AiVideoError) as stale:
+        ProductionStateCommitter(tmp_path).begin_image_generation(*bundle)
+
+    assert stale.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path).schema_version == "2.3"
+
+
+@pytest.mark.parametrize("mutation", ["remote_preview", "authorization", "reference_bytes"])
+def test_image_r1_rejects_nonlocal_or_changed_evidence(
+    tmp_path: Path,
+    mutation: str,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(
+        tmp_path,
+        reference_total_bytes_delta=1 if mutation == "reference_bytes" else 0,
+    )
+    if mutation == "remote_preview":
+        preview = preview.model_copy(update={"local_only": False, "remote": True})
+    elif mutation == "authorization":
+        authorization = authorization.model_copy(
+            update={"usage_license": "changed-license"}
+        )
+
+    with pytest.raises(AiVideoError) as invalid:
+        ProductionStateCommitter(tmp_path).begin_image_generation(
+            request, preview, authorization
+        )
+
+    assert invalid.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path).schema_version == "2.3"
+
+
+def test_image_r2_rejects_tampered_r1_evidence_without_advancing_manifest(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    r1 = writer.begin_image_generation(request, preview, authorization)
+    (tmp_path / canonical_image_preview_path(preview.preview_fingerprint)).write_bytes(
+        b"{}\n"
+    )
+
+    with pytest.raises(AiVideoError) as tampered:
+        writer.record_image_submit_intent(request, preview, authorization)
+
+    assert tampered.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path) == r1
+    assert not (
+        tmp_path / canonical_image_submit_intent_path(request.request_fingerprint)
+    ).exists()
+
+
+def test_image_r2_rejects_changed_sealed_license_policy_binding(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    r1 = writer.begin_image_generation(request, preview, authorization)
+    changed = ImageGenerationAuthorization.create(
+        request=request,
+        preview=preview,
+        usage_license="different-fixture-license",
+        policy_receipt_id="different-local-image-policy",
+    )
+
+    with pytest.raises(AiVideoError) as mismatch:
+        writer.record_image_submit_intent(request, preview, changed)
+
+    assert mismatch.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path) == r1
+    assert not (
+        tmp_path / canonical_image_submit_intent_path(request.request_fingerprint)
+    ).exists()
+
+
+@pytest.mark.parametrize("drift", ["manifest", "authorization"])
+def test_image_submit_permit_invalidates_on_durable_state_drift(
+    tmp_path: Path,
+    drift: str,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_image_generation(request, preview, authorization)
+    permit = writer.record_image_submit_intent(request, preview, authorization)
+    if drift == "manifest":
+        manifest = read_manifest(tmp_path)
+        (tmp_path / "state/manifest.json").write_text(
+            manifest.model_dump_json(indent=2), encoding="utf-8"
+        )
+    else:
+        (
+            tmp_path
+            / canonical_image_authorization_path(
+                authorization.authorization_fingerprint
+            )
+        ).write_bytes(b"{}\n")
+
+    assert not permit._validate_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+    assert not permit._consume_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+
+
+def test_image_r1_composes_24_into_25_without_losing_p6_state(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    current = read_manifest(tmp_path)
+    p6 = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=current.manifest_revision,
+        attempt_id="qa-policy-before-image",
+    )
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+
+    p7 = writer.begin_image_generation(request, preview, authorization)
+
+    assert p7.schema_version == "2.5"
+    assert p7.active_qa_policy == p6.active_qa_policy
+    assert p7.active_review_receipts == p6.active_review_receipts
+    assert p7.review_states == p6.review_states
+    assert p7.active_approved_repair == p6.active_approved_repair
+    assert p7.repair_outcome_receipts == p6.repair_outcome_receipts
+    assert p7.final_acceptance_state == p6.final_acceptance_state
+
+
+def test_image_r1_preserves_existing_25_attempt_history(tmp_path: Path) -> None:
+    project_factory.make_p7_committed_project(tmp_path)
+    before = read_manifest(tmp_path)
+    request, preview, authorization = make_image_call_bundle(
+        tmp_path,
+        attempt_id="image-attempt-after-success",
+        prompt_text="Hero returns to the archive room",
+    )
+
+    after = ProductionStateCommitter(tmp_path).begin_image_generation(
+        request, preview, authorization
+    )
+
+    assert after.schema_version == "2.5"
+    assert after.attempts[:-1] == before.attempts
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.active_dependency_graph == before.active_dependency_graph
 
 
 def test_voice_lifecycle_api_persists_r1_then_mints_one_use_r2_permit(

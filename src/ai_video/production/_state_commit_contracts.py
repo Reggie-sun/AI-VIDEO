@@ -13,6 +13,7 @@ import threading
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Callable, Literal, Protocol
 
 from ai_video.production.audio import (
@@ -184,6 +185,7 @@ class NoopCrashInjector:
 
 _VOICE_PERMIT_TOKEN = object()
 _REVIEW_PERMIT_TOKEN = object()
+_IMAGE_PERMIT_TOKEN = object()
 
 
 class _DurableReviewAnalysisPermit:
@@ -265,5 +267,62 @@ class _DurableVoiceSubmitPermit:
         raise TypeError("Voice submit permits cannot be serialized.")
 
 
+class _DurableImageSubmitPermit:
+    """Process-local one-use proof that the exact image R+2 intent is durable."""
+
+    __slots__ = (
+        "_binding",
+        "_manifest_revision",
+        "_manifest_file_sha256",
+        "_durability_validator",
+        "_consumed",
+        "_lock",
+    )
+
+    def __init__(
+        self,
+        token: object,
+        *,
+        binding: dict[str, object],
+        manifest_revision: int,
+        manifest_file_sha256: str,
+        durability_validator: Callable[[], bool],
+    ) -> None:
+        if token is not _IMAGE_PERMIT_TOKEN:
+            raise TypeError(
+                "Image submit permits are minted only by ProductionStateCommitter."
+            )
+        self._binding = MappingProxyType(dict(binding))
+        self._manifest_revision = manifest_revision
+        self._manifest_file_sha256 = manifest_file_sha256
+        self._durability_validator = durability_validator
+        self._consumed = False
+        self._lock = threading.Lock()
+
+    def _validate_image_generation_permit(
+        self, *, request_fingerprint: str
+    ) -> bool:
+        return (
+            not self._consumed
+            and request_fingerprint == self._binding["request_fingerprint"]
+            and self._durability_validator()
+        )
+
+    def _consume_image_generation_permit(
+        self, *, request_fingerprint: str
+    ) -> bool:
+        with self._lock:
+            if not self._validate_image_generation_permit(
+                request_fingerprint=request_fingerprint
+            ):
+                return False
+            self._consumed = True
+            return True
+
+    def __reduce__(self) -> object:
+        raise TypeError("Image submit permits cannot be serialized.")
+
+
 if TYPE_CHECKING:
     DurableVoiceSubmitPermit = _DurableVoiceSubmitPermit
+    DurableImageSubmitPermit = _DurableImageSubmitPermit

@@ -200,6 +200,7 @@ from ._state_commit_contracts import (
     _REVIEW_PERMIT_TOKEN,
     _VOICE_PERMIT_TOKEN,
     _DurableReviewAnalysisPermit,
+    _DurableImageSubmitPermit,
     _DurableVoiceSubmitPermit,
 )
 from ._state_commit_io import _FileOps, _NativeFileOps, _StateCommitIoMixin
@@ -207,6 +208,7 @@ from ._state_commit_recovery import _StateCommitRecoveryMixin
 from ._state_commit_recovery_attempts import _StateCommitRecoveryAttemptsMixin
 from ._state_commit_recovery_fs import _StateCommitRecoveryFsMixin
 from ._state_commit_dependency import _StateCommitDependencyMixin
+from ._state_commit_image_intent import _StateCommitImageIntentMixin
 from ._state_commit_repair import _StateCommitRepairMixin
 from ._state_commit_render_lifecycle import _StateCommitRenderLifecycleMixin
 from ._state_commit_render_support import _StateCommitRenderSupportMixin
@@ -217,7 +219,10 @@ from ._state_commit_voice_candidate import _StateCommitVoiceCandidateMixin
 from ._state_commit_voice_intent import _StateCommitVoiceIntentMixin
 
 if TYPE_CHECKING:
-    from ._state_commit_contracts import DurableVoiceSubmitPermit
+    from ._state_commit_contracts import (
+        DurableImageSubmitPermit,
+        DurableVoiceSubmitPermit,
+    )
 
 try:
     import fcntl
@@ -232,6 +237,7 @@ except ImportError:  # pragma: no cover - exercised through platform injection
 class ProductionStateCommitter(
     _StateCommitReviewMixin,
     _StateCommitRepairMixin,
+    _StateCommitImageIntentMixin,
     _StateCommitVoiceIntentMixin,
     _StateCommitVoiceCandidateMixin,
     _StateCommitVoiceActivationMixin,
