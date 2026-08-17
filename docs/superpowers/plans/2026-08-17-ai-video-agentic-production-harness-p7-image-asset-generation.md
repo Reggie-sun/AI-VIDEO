@@ -16,6 +16,7 @@
 - P7 implementation 从 exact accepted P5 base `52eca580dc93ad756f5c5e266e730b4017d48ce1` 建立独立 branch/worktree；不得从当前含 P6 commits/dirty work 的 `main` 直接开发。
 - 本计划开始 inspection 时 `main` HEAD 是 `2859110`，随后 P6 writer 在本计划隔离 worktree 中工作期间把 `main` 推进到 `29d5bef`，同时 shared P6 files 仍有未提交修改；`origin/main` 保持 `52eca58`。这证明 P6 是 in-progress 而非 accepted base。P7 不得 stage、commit、rewrite 或覆盖当前 P6 文件，Task 5 必须重新记录未来的 exact clean/reviewed P6 HEAD。
 - P7 parallel-safe lane 只拥有新 `production/image.py`、P7 独立 tests，以及只读复用既有 P5 public resolver。所有 shared core edits 必须等 P6 contract freeze 后执行 Task 5。
+- 因 `errors.py` 也是 shared core，Tasks 1-4 的 pure lane 暂用既有 typed errors：image bytes/provenance invalid 为 `ASSET_REGISTRY_INVALID`，request/candidate scope invalid 为 `PRODUCTION_STATE_INVALID`。Task 6 在 P6 freeze 后引入专用 `IMAGE_*` codes并同步更新这些断言。
 - `ProductionStateCommitter` 仍是唯一 v2 writer/recovery owner；P2 reader、Registry reader、`image.py` 和 `dependency.py` 不得写 state。
 - P7 不修改 `src/ai_video/production/dependency.py`，不增加 provider/request nodes，不增加第二 lifecycle owner，不实现 ad-hoc stale propagation。
 - P7 不宣称 Character/Scene/reference bytes 变化会自动触发 image regeneration。Codex 必须显式提交新的 exact request；P7 只保证新 output 激活后由既有 P5 graph 精确传播下游失效。自动 upstream-reference regeneration 需要单独批准 graph evolution。
@@ -411,7 +412,7 @@ def test_validate_image_result_rejects_invalid_png(payload):
     request = make_image_request()
     with pytest.raises(AiVideoError) as error:
         validate_image_result(request, make_authorization(request), make_image_result(request, png_bytes=payload))
-    assert error.value.code is ErrorCode.IMAGE_ASSET_INVALID
+    assert error.value.code is ErrorCode.ASSET_REGISTRY_INVALID
 ```
 
 - [ ] **Step 2: Run RED tests**
@@ -463,7 +464,7 @@ def test_candidate_rejects_mutated_character_or_unrelated_shot(p7_candidate):
     tampered = replace_unrelated_shot_intent(p7_candidate)
     with pytest.raises(AiVideoError) as error:
         validate_image_activation_candidate(**tampered)
-    assert error.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
 
 def test_candidate_rejects_registry_overwrite_or_extra_asset(p7_candidate):
     for tampered in (replace_existing_record(p7_candidate), append_extra_record(p7_candidate)):
@@ -634,7 +635,7 @@ Expected: FAIL because schema 2.5/image attempt fields do not exist.
 
 - [ ] **Step 3: Implement 2.5 conditional invariants**
 
-Add `ErrorCode.IMAGE_REQUEST_INVALID`, `IMAGE_ASSET_INVALID`, `IMAGE_PROVIDER_FAILED`, `IMAGE_PROVIDER_OUTCOME_UNKNOWN`. Add image request summary, phase, provider request ID, candidate image IDs and exact graph candidate requirements to `StateCommitAttempt`; serialize image fields only for `operation="image_generation"`.
+Add `ErrorCode.IMAGE_REQUEST_INVALID`, `IMAGE_ASSET_INVALID`, `IMAGE_PROVIDER_FAILED`, `IMAGE_PROVIDER_OUTCOME_UNKNOWN`, then update the Task 1-4 pure tests/helpers so request/candidate failures use `IMAGE_REQUEST_INVALID` and PNG/result failures use `IMAGE_ASSET_INVALID`. Add image request summary, phase, provider request ID, candidate image IDs and exact graph candidate requirements to `StateCommitAttempt`; serialize image fields only for `operation="image_generation"`.
 
 For 2.5, run P6 invariants when any P6 field exists; do not require P6 state for P7-only manifests. Reject P7 fields in 2.0-2.4. Extend P6-aware operations/version checks to preserve 2.5 without weakening 2.4.
 
