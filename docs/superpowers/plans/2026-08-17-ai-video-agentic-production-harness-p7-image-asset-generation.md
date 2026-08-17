@@ -351,8 +351,10 @@ def test_image_request_binds_prompt_target_references_and_base_pointers():
 
 def test_image_request_rejects_changed_prompt_under_old_fingerprint():
     request = make_image_request(target_shot_id="shot-1", generation_revision=1)
+    payload = request.model_dump(mode="json")
+    payload["prompt_text"] = "different prompt"
     with pytest.raises(ValidationError, match="request_fingerprint"):
-        request.model_copy(update={"prompt_text": "different prompt"})
+        ImageGenerationRequest.model_validate(payload)
 
 def test_image_contract_rejects_remote_preview_and_non_png_output():
     with pytest.raises(ValidationError):
