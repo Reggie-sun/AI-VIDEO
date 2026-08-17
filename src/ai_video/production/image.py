@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import struct
 import unicodedata
@@ -9,7 +10,8 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Protocol
 
-from pydantic import ConfigDict, Field, field_validator, model_validator
+import yaml
+from pydantic import ConfigDict, Field, ValidationError, field_validator, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.dependency import (
@@ -36,6 +38,7 @@ from ai_video.production.models import (
     DependencyNodeState,
     EgressMetadata,
     LoadedProductionProject,
+    ProductionProject,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
     StrictModel,
@@ -591,6 +594,9 @@ class ImageActivationCandidate:
     candidate_project_pointer: ProjectSnapshotPointer
     candidate_registry_pointer: RegistrySnapshotPointer
     candidate_graph_pointer: DependencyGraphSnapshotPointer
+    candidate_project_bytes: bytes
+    candidate_registry_bytes: bytes
+    candidate_graph_bytes: bytes
     receipt: ImageProvenanceReceipt
 
     def __new__(cls, token: object) -> "ImageActivationCandidate":
@@ -619,6 +625,9 @@ class ImageActivationCandidate:
         candidate_project_pointer: ProjectSnapshotPointer,
         candidate_registry_pointer: RegistrySnapshotPointer,
         candidate_graph_pointer: DependencyGraphSnapshotPointer,
+        candidate_project_bytes: bytes,
+        candidate_registry_bytes: bytes,
+        candidate_graph_bytes: bytes,
         receipt: ImageProvenanceReceipt,
     ) -> "ImageActivationCandidate":
         candidate = cls(_IMAGE_ACTIVATION_TOKEN)
@@ -636,6 +645,48 @@ def _same_except(
     return left.model_dump(mode="json", exclude=excluded) == right.model_dump(
         mode="json", exclude=excluded
     )
+
+
+def _verify_prepared_candidate_bytes(
+    *,
+    candidate_project: ProductionProject,
+    candidate_registry: AssetRegistrySnapshot,
+    candidate_graph: DependencyGraphSnapshot,
+    project_pointer: ProjectSnapshotPointer,
+    registry_pointer: RegistrySnapshotPointer,
+    graph_pointer: DependencyGraphSnapshotPointer,
+    project_bytes: bytes,
+    registry_bytes: bytes,
+    graph_bytes: bytes,
+) -> None:
+    if not project_bytes or not registry_bytes or not graph_bytes:
+        raise _image_scope_invalid("Image candidate prepared artifacts cannot be empty.")
+    if (
+        hashlib.sha256(project_bytes).hexdigest() != project_pointer.file_sha256
+        or hashlib.sha256(registry_bytes).hexdigest() != registry_pointer.file_sha256
+        or hashlib.sha256(graph_bytes).hexdigest() != graph_pointer.file_sha256
+    ):
+        raise _image_scope_invalid(
+            "Image candidate pointers do not match exact prepared artifact bytes."
+        )
+    try:
+        reopened_project = ProductionProject.model_validate(
+            yaml.safe_load(project_bytes.decode("utf-8"))
+        )
+        reopened_registry = AssetRegistrySnapshot.model_validate_json(registry_bytes)
+        reopened_graph = DependencyGraphSnapshot.model_validate_json(graph_bytes)
+    except (UnicodeDecodeError, yaml.YAMLError, ValidationError) as exc:
+        raise _image_scope_invalid(
+            "Image candidate prepared artifact bytes cannot be reopened.", str(exc)
+        ) from exc
+    if (
+        reopened_project != candidate_project
+        or reopened_registry != candidate_registry
+        or reopened_graph != candidate_graph
+    ):
+        raise _image_scope_invalid(
+            "Image candidate prepared bytes do not encode the exact candidate models."
+        )
 
 
 def validate_image_activation_candidate(
@@ -656,6 +707,9 @@ def validate_image_activation_candidate(
     candidate_project_pointer: ProjectSnapshotPointer,
     candidate_registry_pointer: RegistrySnapshotPointer,
     candidate_graph_pointer: DependencyGraphSnapshotPointer,
+    candidate_project_bytes: bytes,
+    candidate_registry_bytes: bytes,
+    candidate_graph_bytes: bytes,
 ) -> ImageActivationCandidate:
     if (
         request.base_project != base_project.manifest.active_project
@@ -672,6 +726,10 @@ def validate_image_activation_candidate(
     if base_inputs.project != base_project:
         raise _image_scope_invalid(
             "Image base dependency inputs do not match the loaded project."
+        )
+    if base_dependency_states != base_project.manifest.dependency_states:
+        raise _image_scope_invalid(
+            "Image base dependency states do not match the active Manifest."
         )
 
     registry_assets = {
@@ -874,6 +932,17 @@ def validate_image_activation_candidate(
         or active_registry.content_hash != candidate_registry.content_hash
     ):
         raise _image_scope_invalid("Image candidate active pointers are inconsistent.")
+    _verify_prepared_candidate_bytes(
+        candidate_project=candidate_project.project,
+        candidate_registry=candidate_registry,
+        candidate_graph=candidate_graph,
+        project_pointer=candidate_project_pointer,
+        registry_pointer=candidate_registry_pointer,
+        graph_pointer=candidate_graph_pointer,
+        project_bytes=candidate_project_bytes,
+        registry_bytes=candidate_registry_bytes,
+        graph_bytes=candidate_graph_bytes,
+    )
     if not _same_except(
         base_project.manifest,
         candidate_project.manifest,
@@ -937,6 +1006,9 @@ def validate_image_activation_candidate(
         candidate_project_pointer=candidate_project_pointer,
         candidate_registry_pointer=candidate_registry_pointer,
         candidate_graph_pointer=candidate_graph_pointer,
+        candidate_project_bytes=candidate_project_bytes,
+        candidate_registry_bytes=candidate_registry_bytes,
+        candidate_graph_bytes=candidate_graph_bytes,
         receipt=receipt,
     )
 

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import struct
 import zlib
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
+import yaml
 from pydantic import ValidationError
 
 from ai_video.production.image import (
@@ -315,10 +317,15 @@ def p7_candidate(tmp_path):
         path=Path(f"state/dependency_graph.{base_graph.revision_id}.json"),
         file_sha256=hashlib.sha256(b"base-graph").hexdigest(),
     )
+    base_dependency_states = _fresh_states(inputs.project, base_graph)
     base_project = inputs.project.model_copy(
         update={
             "manifest": inputs.project.manifest.model_copy(
-                update={"active_dependency_graph": base_graph_pointer}
+                update={
+                    "schema_version": "2.3",
+                    "active_dependency_graph": base_graph_pointer,
+                    "dependency_states": base_dependency_states,
+                }
             ),
             "dependency_graph": base_graph,
         }
@@ -405,11 +412,20 @@ def p7_candidate(tmp_path):
     candidate_registry = candidate_registry.model_copy(
         update={"revision_id": registry_hash, "content_hash": registry_hash}
     )
+    candidate_registry_bytes = (
+        json.dumps(
+            candidate_registry.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
     registry_pointer = RegistrySnapshotPointer(
         path=Path(f"assets/registry.{registry_hash}.json"),
         revision_id=registry_hash,
         content_hash=registry_hash,
-        file_sha256=hashlib.sha256(b"candidate-registry").hexdigest(),
+        file_sha256=hashlib.sha256(candidate_registry_bytes).hexdigest(),
     )
 
     base_shot = next(shot for shot in base_project.shots if shot.shot_id == "shot-1")
@@ -456,6 +472,11 @@ def p7_candidate(tmp_path):
             }
         )
     )
+    candidate_project_bytes = yaml.safe_dump(
+        candidate_project_artifact.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
     project_pointer = ProjectSnapshotPointer(
         path=Path(
             f"state/projects/project.{candidate_project_artifact.revision}."
@@ -463,7 +484,7 @@ def p7_candidate(tmp_path):
         ),
         revision=candidate_project_artifact.revision,
         content_hash=candidate_project_artifact.content_hash,
-        file_sha256=hashlib.sha256(b"candidate-project").hexdigest(),
+        file_sha256=hashlib.sha256(candidate_project_bytes).hexdigest(),
     )
     candidate_project = base_project.model_copy(
         update={
@@ -487,11 +508,20 @@ def p7_candidate(tmp_path):
     )
     candidate_inputs = replace(inputs, project=candidate_project)
     candidate_graph = build_production_dependency_graph(candidate_inputs)
+    candidate_graph_bytes = (
+        json.dumps(
+            candidate_graph.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
     candidate_graph_pointer = DependencyGraphSnapshotPointer(
         revision_id=candidate_graph.revision_id,
         content_hash=candidate_graph.content_hash,
         path=Path(f"state/dependency_graph.{candidate_graph.revision_id}.json"),
-        file_sha256=hashlib.sha256(b"candidate-graph").hexdigest(),
+        file_sha256=hashlib.sha256(candidate_graph_bytes).hexdigest(),
     )
     candidate_project = candidate_project.model_copy(
         update={
@@ -502,7 +532,6 @@ def p7_candidate(tmp_path):
         }
     )
     candidate_inputs = replace(candidate_inputs, project=candidate_project)
-    base_dependency_states = _fresh_states(base_project, base_graph)
     resolution = resolve_dependency_state(candidate_graph, base_dependency_states)
     return {
         "base_project": base_project,
@@ -521,6 +550,9 @@ def p7_candidate(tmp_path):
         "candidate_project_pointer": project_pointer,
         "candidate_registry_pointer": registry_pointer,
         "candidate_graph_pointer": candidate_graph_pointer,
+        "candidate_project_bytes": candidate_project_bytes,
+        "candidate_registry_bytes": candidate_registry_bytes,
+        "candidate_graph_bytes": candidate_graph_bytes,
     }
 
 
@@ -682,6 +714,7 @@ def test_candidate_rejects_pointer_file_hash_mismatch(p7_candidate):
     tampered = {
         **p7_candidate,
         "candidate_project": candidate_project,
+        "candidate_registry_pointer": pointer,
         "candidate_inputs": replace(
             p7_candidate["candidate_inputs"], project=candidate_project
         ),
