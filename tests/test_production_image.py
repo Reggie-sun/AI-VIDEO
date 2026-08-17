@@ -587,6 +587,101 @@ def test_candidate_appends_one_image_and_changes_only_target_shot_role(p7_candid
     )
 
 
+def test_candidate_rejects_reused_base_shot_path(p7_candidate):
+    candidate = p7_candidate["candidate_project"]
+    target_shot = candidate.shots[0]
+    base_reference = next(
+        item
+        for item in p7_candidate["base_project"].project.artifacts.shots
+        if item.artifact_id == target_shot.artifact_id
+    )
+    changed_project_artifact = seal_artifact(
+        candidate.project.model_copy(
+            update={
+                "content_hash": ZERO_HASH,
+                "artifacts": candidate.project.artifacts.model_copy(
+                    update={
+                        "shots": tuple(
+                            item.model_copy(update={"path": base_reference.path})
+                            if item.artifact_id == target_shot.artifact_id
+                            else item
+                            for item in candidate.project.artifacts.shots
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    changed_project_bytes = yaml.safe_dump(
+        changed_project_artifact.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    changed_project_pointer = ProjectSnapshotPointer(
+        path=Path(
+            f"state/projects/project.{changed_project_artifact.revision}."
+            f"{changed_project_artifact.content_hash}.yaml"
+        ),
+        revision=changed_project_artifact.revision,
+        content_hash=changed_project_artifact.content_hash,
+        file_sha256=hashlib.sha256(changed_project_bytes).hexdigest(),
+    )
+    changed_candidate = candidate.model_copy(
+        update={
+            "project": changed_project_artifact,
+            "manifest": candidate.manifest.model_copy(
+                update={"active_project": changed_project_pointer}
+            ),
+        }
+    )
+    changed_inputs = replace(
+        p7_candidate["candidate_inputs"], project=changed_candidate
+    )
+    changed_graph = build_production_dependency_graph(changed_inputs)
+    changed_graph_bytes = (
+        json.dumps(
+            changed_graph.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    changed_graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=changed_graph.revision_id,
+        content_hash=changed_graph.content_hash,
+        path=Path(f"state/dependency_graph.{changed_graph.revision_id}.json"),
+        file_sha256=hashlib.sha256(changed_graph_bytes).hexdigest(),
+    )
+    changed_candidate = changed_candidate.model_copy(
+        update={
+            "manifest": changed_candidate.manifest.model_copy(
+                update={"active_dependency_graph": changed_graph_pointer}
+            ),
+            "dependency_graph": changed_graph,
+        }
+    )
+    changed_inputs = replace(changed_inputs, project=changed_candidate)
+    tampered = {
+        **p7_candidate,
+        "candidate_project": changed_candidate,
+        "candidate_inputs": changed_inputs,
+        "candidate_graph": changed_graph,
+        "resolution": resolve_dependency_state(
+            changed_graph, p7_candidate["base_dependency_states"]
+        ),
+        "candidate_project_pointer": changed_project_pointer,
+        "candidate_graph_pointer": changed_graph_pointer,
+        "candidate_project_bytes": changed_project_bytes,
+        "candidate_graph_bytes": changed_graph_bytes,
+    }
+
+    with pytest.raises(AiVideoError, match="outside the target Shot") as error:
+        validate_image_activation_candidate(**tampered)
+
+    assert error.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+
+
 def test_canonical_image_shot_revision_path_is_immutable_and_revisioned():
     assert canonical_image_shot_revision_path(2, "a" * 64) == Path(
         f"creative/shots/shot.2.{'a' * 64}.yaml"
