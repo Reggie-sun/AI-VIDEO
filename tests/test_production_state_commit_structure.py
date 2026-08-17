@@ -72,6 +72,19 @@ def test_render_methods_have_domain_owners() -> None:
     assert committer._validate_render_artifacts.__module__ == support.__name__
 
 
+def test_voice_methods_have_domain_owners_and_one_permit_identity() -> None:
+    facade = importlib.import_module("ai_video.production.state_commit")
+    contracts = importlib.import_module("ai_video.production._state_commit_contracts")
+    intent = importlib.import_module("ai_video.production._state_commit_voice_intent")
+    candidate = importlib.import_module("ai_video.production._state_commit_voice_candidate")
+    activation = importlib.import_module("ai_video.production._state_commit_voice_activation")
+    committer = facade.ProductionStateCommitter
+    assert facade._DurableVoiceSubmitPermit is contracts._DurableVoiceSubmitPermit
+    assert committer.record_voice_submit_intent.__module__ == intent.__name__
+    assert committer._prepare_voice_activation_request.__module__ == candidate.__name__
+    assert committer.generate_voice_asset.__module__ == activation.__name__
+
+
 def test_review_and_repair_modules_stay_focused() -> None:
     production = Path(__file__).parents[1] / "src/ai_video/production"
     assert _effective_loc(production / "_state_commit_review.py") <= 800
@@ -82,3 +95,10 @@ def test_render_modules_stay_focused() -> None:
     production = Path(__file__).parents[1] / "src/ai_video/production"
     assert _effective_loc(production / "_state_commit_render_lifecycle.py") <= 800
     assert _effective_loc(production / "_state_commit_render_support.py") <= 800
+
+
+def test_voice_modules_stay_focused() -> None:
+    production = Path(__file__).parents[1] / "src/ai_video/production"
+    assert _effective_loc(production / "_state_commit_voice_intent.py") <= 800
+    assert _effective_loc(production / "_state_commit_voice_candidate.py") <= 800
+    assert _effective_loc(production / "_state_commit_voice_activation.py") <= 800
