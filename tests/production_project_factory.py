@@ -1971,7 +1971,13 @@ def _p7_png(width: int = 2, height: int = 1) -> bytes:
     )
 
 
-def make_p7_committed_project(root: Path) -> dict[str, object]:
+def make_p7_committed_project(
+    root: Path,
+    *,
+    reference_mutation: str | None = None,
+    unrelated_candidate_suffix: bool = False,
+    changed_candidate_prefix: bool = False,
+) -> dict[str, object]:
     """Materialize one exact Manifest 2.5 image activation without a writer."""
     from ai_video.production.dependency import (
         build_production_dependency_graph,
@@ -2031,6 +2037,44 @@ def make_p7_committed_project(root: Path) -> dict[str, object]:
     scene = base_project.scenes[0]
     character_asset_id = character.reference_asset_ids[0]
     scene_asset_id = scene.visual_reference_asset_ids[0]
+    references = [
+        ImageReferenceBinding(
+            role="character",
+            creative_artifact_id=character.artifact_id,
+            creative_revision=character.revision,
+            creative_content_hash=character.content_hash,
+            asset_id=character_asset_id,
+            asset_sha256=assets[character_asset_id].sha256,
+        ),
+        ImageReferenceBinding(
+            role="scene",
+            creative_artifact_id=scene.artifact_id,
+            creative_revision=scene.revision,
+            creative_content_hash=scene.content_hash,
+            asset_id=scene_asset_id,
+            asset_sha256=assets[scene_asset_id].sha256,
+        ),
+    ]
+    if reference_mutation == "stale_creative_revision":
+        references[0] = references[0].model_copy(
+            update={"creative_revision": references[0].creative_revision + 1}
+        )
+    elif reference_mutation == "stale_creative_hash":
+        references[0] = references[0].model_copy(
+            update={"creative_content_hash": "f" * 64}
+        )
+    elif reference_mutation == "wrong_membership":
+        wrong = assets["image-shot-2"]
+        references[0] = references[0].model_copy(
+            update={"asset_id": wrong.asset_id, "asset_sha256": wrong.sha256}
+        )
+    elif reference_mutation == "wrong_reference_hash":
+        references[0] = references[0].model_copy(
+            update={"asset_sha256": "f" * 64}
+        )
+    elif reference_mutation is not None:
+        raise ValueError(f"unsupported P7 reference mutation: {reference_mutation}")
+
     request = ImageGenerationRequest.create(
         attempt_id="image-reader-attempt-1",
         provider_kind="fake-local",
@@ -2046,24 +2090,7 @@ def make_p7_committed_project(root: Path) -> dict[str, object]:
             output_format="png",
             generation_revision=1,
         ),
-        references=(
-            ImageReferenceBinding(
-                role="character",
-                creative_artifact_id=character.artifact_id,
-                creative_revision=character.revision,
-                creative_content_hash=character.content_hash,
-                asset_id=character_asset_id,
-                asset_sha256=assets[character_asset_id].sha256,
-            ),
-            ImageReferenceBinding(
-                role="scene",
-                creative_artifact_id=scene.artifact_id,
-                creative_revision=scene.revision,
-                creative_content_hash=scene.content_hash,
-                asset_id=scene_asset_id,
-                asset_sha256=assets[scene_asset_id].sha256,
-            ),
-        ),
+        references=tuple(references),
         base_project=base_manifest.active_project,
         base_registry=base_manifest.active_registry,
         base_dependency_graph=base_graph_pointer,
@@ -2119,11 +2146,23 @@ def make_p7_committed_project(root: Path) -> dict[str, object]:
         usage_license=authorization.usage_license,
         egress=EgressMetadata(remote=False),
     )
+    candidate_assets = list(base_project.registry.assets)
+    if changed_candidate_prefix:
+        candidate_assets[0] = candidate_assets[0].model_copy(
+            update={"usage_license": "changed-prefix"}
+        )
+    if unrelated_candidate_suffix:
+        candidate_assets.append(
+            base_project.registry.assets[0].model_copy(
+                update={"asset_id": "image-unrelated-candidate-suffix"}
+            )
+        )
+    candidate_assets.append(image_record)
     candidate_registry = base_project.registry.model_copy(
         update={
             "revision_id": ZERO_HASH,
             "content_hash": ZERO_HASH,
-            "assets": (*base_project.registry.assets, image_record),
+            "assets": tuple(candidate_assets),
         }
     )
     registry_hash = registry_semantic_sha256(candidate_registry)
@@ -2329,6 +2368,359 @@ def make_p7_committed_project(root: Path) -> dict[str, object]:
         "result_path": result_path,
         "receipt_path": receipt_path,
         "image_path": image_record.artifact_path,
+        "candidate_inputs": candidate_inputs,
+        "candidate_project": candidate_project,
+        "candidate_graph": candidate_graph,
+        "candidate_states": candidate_states,
+        "attempt": attempt,
+        "manifest": manifest,
+    }
+
+
+def append_p7_committed_candidate(
+    root: Path,
+    fixture: dict[str, object],
+) -> dict[str, object]:
+    """Append a second exact selected image candidate to the P7 fixture."""
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        resolve_dependency_state,
+    )
+    from ai_video.production.image import (
+        ImageGenerationAuthorization,
+        ImageGenerationPreview,
+        ImageGenerationRequest,
+        ImageLocalResourceEvidence,
+        ImageProviderParameters,
+        ImageProviderResult,
+        ImageReferenceBinding,
+        validate_image_result,
+    )
+    from ai_video.production.models import (
+        DependencyGraphSnapshotPointer,
+        StateCommitAttempt,
+        StateCommitStatus,
+    )
+    from ai_video.production.paths import (
+        canonical_dependency_graph_snapshot_path,
+        canonical_image_asset_path,
+        canonical_image_receipt_path,
+        canonical_image_request_path,
+        canonical_image_result_path,
+    )
+
+    current_manifest = fixture["manifest"]
+    current_project = fixture["candidate_project"].model_copy(
+        update={
+            "manifest": current_manifest,
+            "dependency_graph": fixture["candidate_graph"],
+        }
+    )
+    current_inputs = replace(fixture["candidate_inputs"], project=current_project)
+    assets = {item.asset_id: item for item in current_project.registry.assets}
+    character = current_project.characters[0]
+    scene = current_project.scenes[0]
+    character_asset_id = character.reference_asset_ids[0]
+    scene_asset_id = scene.visual_reference_asset_ids[0]
+    request = ImageGenerationRequest.create(
+        attempt_id="image-reader-attempt-2",
+        provider_kind="fake-local",
+        model_id="fixture-image-model-1",
+        target_shot_id="shot-2",
+        target_asset_role="still",
+        prompt_text="Hero leaves the archive room",
+        negative_prompt_text="blur, watermark",
+        parameters=ImageProviderParameters(
+            seed=8,
+            width=2,
+            height=1,
+            output_format="png",
+            generation_revision=1,
+        ),
+        references=(
+            ImageReferenceBinding(
+                role="character",
+                creative_artifact_id=character.artifact_id,
+                creative_revision=character.revision,
+                creative_content_hash=character.content_hash,
+                asset_id=character_asset_id,
+                asset_sha256=assets[character_asset_id].sha256,
+            ),
+            ImageReferenceBinding(
+                role="scene",
+                creative_artifact_id=scene.artifact_id,
+                creative_revision=scene.revision,
+                creative_content_hash=scene.content_hash,
+                asset_id=scene_asset_id,
+                asset_sha256=assets[scene_asset_id].sha256,
+            ),
+        ),
+        base_project=current_manifest.active_project,
+        base_registry=current_manifest.active_registry,
+        base_dependency_graph=current_manifest.active_dependency_graph,
+    )
+    preview = ImageGenerationPreview.create(
+        request=request,
+        reference_total_bytes=sum(
+            assets[item.asset_id].size_bytes for item in request.references
+        ),
+    )
+    authorization = ImageGenerationAuthorization.create(
+        request=request,
+        preview=preview,
+        usage_license="fixture-only",
+        policy_receipt_id="fixture-local-image-policy",
+    )
+    png_bytes = _p7_png()
+    result = ImageProviderResult.create(
+        request=request,
+        authorization=authorization,
+        image_bytes=png_bytes,
+        content_type="image/png",
+        provider_request_id="fixture-local-image-2",
+        adapter=ToolIdentity(name="fake-local-image", version="1"),
+        resource_evidence=ImageLocalResourceEvidence(
+            elapsed_milliseconds=4,
+            device_kind="cpu",
+            measured_peak_memory_bytes=4096,
+        ),
+    )
+    measured, receipt = validate_image_result(request, authorization, result)
+    target_shot = next(item for item in current_project.shots if item.shot_id == "shot-2")
+    image_record = AssetRecord(
+        asset_id=request.output_asset_id,
+        asset_type=AssetType.IMAGE,
+        artifact_path=canonical_image_asset_path(measured.sha256),
+        sha256=measured.sha256,
+        size_bytes=measured.size_bytes,
+        mime_type=measured.mime_type,
+        width=measured.width,
+        height=measured.height,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=result.adapter,
+        input_artifact_ids=(
+            target_shot.artifact_id,
+            *(
+                identity
+                for item in request.references
+                for identity in (item.creative_artifact_id, item.asset_id)
+            ),
+        ),
+        input_fingerprint=request.request_fingerprint,
+        creation_receipt_id=receipt.content_hash,
+        usage_license=authorization.usage_license,
+        egress=EgressMetadata(remote=False),
+    )
+    candidate_registry = current_project.registry.model_copy(
+        update={
+            "revision_id": ZERO_HASH,
+            "content_hash": ZERO_HASH,
+            "assets": (*current_project.registry.assets, image_record),
+        }
+    )
+    registry_hash = registry_semantic_sha256(candidate_registry)
+    candidate_registry = candidate_registry.model_copy(
+        update={"revision_id": registry_hash, "content_hash": registry_hash}
+    )
+    registry_bytes = _p7_json_bytes(candidate_registry.model_dump(mode="json"))
+    registry_path = Path(f"assets/registry.{registry_hash}.json")
+    registry_pointer = RegistrySnapshotPointer(
+        path=registry_path,
+        revision_id=registry_hash,
+        content_hash=registry_hash,
+        file_sha256=hashlib.sha256(registry_bytes).hexdigest(),
+    )
+    candidate_shot = seal_artifact(
+        target_shot.model_copy(
+            update={
+                "revision": target_shot.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "required_asset_roles": tuple(
+                    role.model_copy(update={"asset_ids": (request.output_asset_id,)})
+                    if role.role == request.target_asset_role
+                    else role
+                    for role in target_shot.required_asset_roles
+                ),
+            }
+        )
+    )
+    shot_reference = next(
+        item
+        for item in current_project.project.artifacts.shots
+        if item.artifact_id == candidate_shot.artifact_id
+    )
+    candidate_project_artifact = seal_artifact(
+        current_project.project.model_copy(
+            update={
+                "revision": current_project.project.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "artifacts": current_project.project.artifacts.model_copy(
+                    update={
+                        "shots": tuple(
+                            ArtifactReference(
+                                artifact_id=candidate_shot.artifact_id,
+                                revision=candidate_shot.revision,
+                                content_hash=candidate_shot.content_hash,
+                                path=shot_reference.path,
+                            )
+                            if item.artifact_id == candidate_shot.artifact_id
+                            else item
+                            for item in current_project.project.artifacts.shots
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    project_bytes = yaml.safe_dump(
+        candidate_project_artifact.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    project_path = Path(
+        f"state/projects/project.{candidate_project_artifact.revision}."
+        f"{candidate_project_artifact.content_hash}.yaml"
+    )
+    project_pointer = ProjectSnapshotPointer(
+        path=project_path,
+        revision=candidate_project_artifact.revision,
+        content_hash=candidate_project_artifact.content_hash,
+        file_sha256=hashlib.sha256(project_bytes).hexdigest(),
+    )
+    candidate_project = current_project.model_copy(
+        update={
+            "project": candidate_project_artifact,
+            "shots": tuple(
+                candidate_shot if item.shot_id == candidate_shot.shot_id else item
+                for item in current_project.shots
+            ),
+            "registry": candidate_registry,
+            "asset_paths": {
+                **current_project.asset_paths,
+                image_record.asset_id: root / image_record.artifact_path,
+            },
+            "manifest": current_manifest.model_copy(
+                update={
+                    "active_project": project_pointer,
+                    "active_registry": registry_pointer,
+                }
+            ),
+        }
+    )
+    candidate_inputs = replace(current_inputs, project=candidate_project)
+    candidate_graph = build_production_dependency_graph(candidate_inputs)
+    graph_bytes = _p7_json_bytes(candidate_graph.model_dump(mode="json"))
+    graph_path = canonical_dependency_graph_snapshot_path(candidate_graph.revision_id)
+    graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=candidate_graph.revision_id,
+        content_hash=candidate_graph.content_hash,
+        path=graph_path,
+        file_sha256=hashlib.sha256(graph_bytes).hexdigest(),
+    )
+    candidate_states = resolve_dependency_state(
+        candidate_graph, fixture["candidate_states"]
+    ).states
+    states_hash = hashlib.sha256(
+        json.dumps(
+            [item.model_dump(mode="json") for item in candidate_states],
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    request_path = canonical_image_request_path(request.request_fingerprint)
+    result_path = canonical_image_result_path(result.result_fingerprint)
+    receipt_path = canonical_image_receipt_path(receipt.content_hash)
+    request_bytes = _p7_json_bytes(request.model_dump(mode="json"))
+    result_bytes = _p7_json_bytes(result.model_dump(mode="json", exclude={"image_bytes"}))
+    receipt_bytes = _p7_json_bytes(receipt.model_dump(mode="json"))
+    shot_bytes = yaml.safe_dump(
+        candidate_shot.model_dump(mode="json"), sort_keys=True, allow_unicode=True
+    ).encode("utf-8")
+    evidence = {
+        request_path: request_bytes,
+        result_path: result_bytes,
+        receipt_path: receipt_bytes,
+        image_record.artifact_path: png_bytes,
+        project_path: project_bytes,
+        registry_path: registry_bytes,
+        graph_path: graph_bytes,
+        shot_reference.path: shot_bytes,
+    }
+    for relative_path, payload in evidence.items():
+        target = root / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+    artifact_pairs = sorted(
+        (path.as_posix(), hashlib.sha256(payload).hexdigest())
+        for path, payload in evidence.items()
+    )
+    attempt = StateCommitAttempt(
+        attempt_id=request.attempt_id,
+        operation="image_generation",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=current_manifest.manifest_revision,
+        base_project=current_manifest.active_project,
+        base_registry=current_manifest.active_registry,
+        candidate_project=project_pointer,
+        candidate_registry=registry_pointer,
+        candidate_artifacts_hash=hashlib.sha256(
+            json.dumps(artifact_pairs, separators=(",", ":")).encode("utf-8")
+        ).hexdigest(),
+        image_request={
+            "request_id": request.request_id,
+            "attempt_id": request.attempt_id,
+            "request_fingerprint": request.request_fingerprint,
+            "provider_kind": request.provider_kind,
+            "model_id": request.model_id,
+            "target_shot_id": request.target_shot_id,
+            "target_asset_role": request.target_asset_role,
+            "output_asset_id": request.output_asset_id,
+            "preview_fingerprint": preview.preview_fingerprint,
+            "authorization_fingerprint": authorization.authorization_fingerprint,
+            "policy_receipt_id": authorization.policy_receipt_id,
+            "usage_license": authorization.usage_license,
+        },
+        image_phase="activate",
+        provider_request_id=result.provider_request_id,
+        candidate_image_asset_ids=(request.output_asset_id,),
+        base_dependency_graph=current_manifest.active_dependency_graph,
+        candidate_dependency_graph=graph_pointer,
+        candidate_dependency_states_hash=states_hash,
+        started_at="2026-08-18T00:01:00+00:00",
+        finished_at="2026-08-18T00:01:01+00:00",
+    )
+    manifest = current_manifest.model_copy(
+        update={
+            "manifest_revision": current_manifest.manifest_revision + 1,
+            "active_project": project_pointer,
+            "active_registry": registry_pointer,
+            "active_dependency_graph": graph_pointer,
+            "dependency_states": candidate_states,
+            "attempts": (*current_manifest.attempts, attempt),
+        }
+    )
+    (root / "state/manifest.json").write_text(
+        manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    return {
+        **fixture,
+        "request": request,
+        "result": result,
+        "receipt": receipt,
+        "image_record": image_record,
+        "request_path": request_path,
+        "result_path": result_path,
+        "receipt_path": receipt_path,
+        "image_path": image_record.artifact_path,
+        "candidate_inputs": candidate_inputs,
+        "candidate_project": candidate_project,
+        "candidate_graph": candidate_graph,
+        "candidate_states": candidate_states,
+        "attempt": attempt,
+        "manifest": manifest,
     }
 
 
@@ -2341,6 +2733,12 @@ def mutate_p7_evidence(root: Path, fixture: dict[str, object], mutation: str) ->
         path = root / "state/manifest.json"
         payload = json.loads(path.read_text(encoding="utf-8"))
         payload["attempts"][0]["candidate_dependency_graph"]["file_sha256"] = "f" * 64
+        path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        return
+    if mutation == "candidate_artifacts_hash":
+        path = root / "state/manifest.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["attempts"][0]["candidate_artifacts_hash"] = "f" * 64
         path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         return
     key, field = {
