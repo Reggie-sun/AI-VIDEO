@@ -648,7 +648,7 @@ Local tools 也必须记录 tool/version 和 elapsed/resource evidence，但不�
 - Legacy `run` / `resume` 不自动创建 v2 project，也不自动启用 Audio、renderer 或 remote Provider。
 - Wan workflow loader、renderer、Comfy client 和 PipelineRunner 继续服务 Legacy mode。
 - 在 future bridge slice 中，可将成功 Legacy clip 注册为 v2 `video` asset；bridge 必须保留原 Manifest path/hash 和 provenance。
-- Local Wan 在 v2 中重新定位为 `generated_video` Visual Asset Provider adapter，但不得删除或绕开现有 production loading path。
+- Local Wan/ComfyUI 在 v2 中保留为 future `generated_video` Visual Asset Provider adapter compatibility target，不得删除或绕开现有 production loading path。P8 先建立 provider-neutral core 与 deterministic fake；按 2026-08-17 P8 slice decision，MiniMax Hailuo V1 是第一个真实 Cloud adapter。这个顺序不把 Cloud 变成默认 path，也不阻塞 future local adapter。
 - P1 的 terminal persistence、direct dependency、FPS compatibility 和 artifact rollback 保留；P1 plan 作为 historical/reusable stabilization record，不再是新 v0.2 主线。
 - 旧 provider-centric spec 中 Budget、Cloud Egress、Take/Attempt 和 crash-safe job lifecycle 仍是 future P8 的 safety input，其 phase order 和 top-level domain 被本 spec supersede。
 
@@ -694,7 +694,7 @@ OpenMontage 证明了 agent-first pipeline、canonical artifacts、renderer sele
 | P5 Dependency Graph and Selective Rebuild | fingerprints、edges、desired/applied state、precise invalidation | Migrates cross-domain rebuild truth |
 | P6 Codex Review and Repair Harness | strategy-aware QA、review/repair/final acceptance receipts | No unapproved auto creative edits |
 | P7 Image Asset Generation | image provider/tool contract、Character/Scene reuse、image provenance | Video Provider still unnecessary |
-| P8 Optional Generated-Video Providers | Accepted Base AI Comic E2E 后先做 Wan v2 adapter；cloud providers only after safety gates | generated_video only |
+| P8 Optional Generated-Video Providers | Accepted Base AI Comic E2E 后先做 provider-neutral core + deterministic fake；MiniMax Hailuo V1 是首个真实 Cloud adapter，future Wan/ComfyUI local adapter复用同一 contract；cloud submit only after safety gates | generated_video asset production only；frame-accurate renderer consumption另行规划 |
 | P9 Episode and Production Hardening | batching、cost rollups、migration hardening、performance、retention | Depends on proven core path |
 
 Dependency and parallel rules are canonical in `docs/v0.2-agentic-production-roadmap.md`。
