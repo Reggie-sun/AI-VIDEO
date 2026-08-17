@@ -1234,6 +1234,28 @@ def test_loader_reopens_selected_p7_image_receipt_and_exact_png(
 
 
 @pytest.mark.parametrize(
+    "artifact_key",
+    ("preview_path", "authorization_path", "submit_intent_path"),
+)
+@pytest.mark.parametrize("mutation", ("missing", "tampered"))
+def test_loader_rejects_missing_or_tampered_p7_submit_audit_evidence(
+    tmp_path, p7_committed_project, artifact_key, mutation
+):
+    artifact_path = tmp_path / p7_committed_project[artifact_key]
+    if mutation == "missing":
+        artifact_path.unlink()
+    else:
+        artifact_path.write_bytes(artifact_path.read_bytes() + b" ")
+    before = _tree_snapshot(tmp_path)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(p7_committed_project["project_path"])
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert _tree_snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize(
     "mutation",
     [
         "receipt_hash",

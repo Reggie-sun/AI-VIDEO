@@ -1951,6 +1951,57 @@ def _p7_json_bytes(value: object) -> bytes:
     ).encode("utf-8")
 
 
+def _p7_submit_audit_evidence(request, preview, authorization):
+    from ai_video.production.paths import (
+        canonical_image_authorization_path,
+        canonical_image_preview_path,
+        canonical_image_request_path,
+        canonical_image_submit_intent_path,
+    )
+
+    request_path = canonical_image_request_path(request.request_fingerprint)
+    preview_path = canonical_image_preview_path(preview.preview_fingerprint)
+    authorization_path = canonical_image_authorization_path(
+        authorization.authorization_fingerprint
+    )
+    r1 = {
+        request_path: _p7_json_bytes(request.model_dump(mode="json")),
+        preview_path: _p7_json_bytes(preview.model_dump(mode="json")),
+        authorization_path: _p7_json_bytes(
+            authorization.model_dump(mode="json")
+        ),
+    }
+    r1_pairs = sorted(
+        (path.as_posix(), hashlib.sha256(payload).hexdigest())
+        for path, payload in r1.items()
+    )
+    evidence_hash = hashlib.sha256(
+        json.dumps(r1_pairs, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    submit_intent_path = canonical_image_submit_intent_path(
+        request.request_fingerprint
+    )
+    submit_intent = {
+        "schema": "ai-video-image-submit-intent/1",
+        "attempt_id": request.attempt_id,
+        "request_fingerprint": request.request_fingerprint,
+        "preview_fingerprint": preview.preview_fingerprint,
+        "authorization_fingerprint": authorization.authorization_fingerprint,
+        "policy_receipt_id": authorization.policy_receipt_id,
+        "usage_license": authorization.usage_license,
+        "base_project": request.base_project.model_dump(mode="json"),
+        "base_registry": request.base_registry.model_dump(mode="json"),
+        "base_dependency_graph": request.base_dependency_graph.model_dump(
+            mode="json"
+        ),
+        "evidence_hash": evidence_hash,
+    }
+    return {
+        **r1,
+        submit_intent_path: _p7_json_bytes(submit_intent),
+    }
+
+
 def _p7_png(
     width: int = 2,
     height: int = 1,
@@ -2599,7 +2650,8 @@ def make_p7_committed_project(
         graph_path: graph_bytes,
         candidate_shot_path: shot_bytes,
     }
-    for relative_path, payload in evidence.items():
+    audit_evidence = _p7_submit_audit_evidence(request, preview, authorization)
+    for relative_path, payload in {**audit_evidence, **evidence}.items():
         target = root / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(payload)
@@ -2663,6 +2715,15 @@ def make_p7_committed_project(
         "receipt": receipt,
         "image_record": image_record,
         "request_path": request_path,
+        "preview_path": next(
+            path for path in audit_evidence if path.parts[-2] == "previews"
+        ),
+        "authorization_path": next(
+            path for path in audit_evidence if path.parts[-2] == "authorizations"
+        ),
+        "submit_intent_path": next(
+            path for path in audit_evidence if path.parts[-2] == "submit-intents"
+        ),
         "result_path": result_path,
         "receipt_path": receipt_path,
         "image_path": image_record.artifact_path,
@@ -2990,7 +3051,8 @@ def append_p7_committed_candidate(
         graph_path: graph_bytes,
         candidate_shot_path: shot_bytes,
     }
-    for relative_path, payload in evidence.items():
+    audit_evidence = _p7_submit_audit_evidence(request, preview, authorization)
+    for relative_path, payload in {**audit_evidence, **evidence}.items():
         target = root / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(payload)
@@ -3063,6 +3125,15 @@ def append_p7_committed_candidate(
         "receipt": receipt,
         "image_record": image_record,
         "request_path": request_path,
+        "preview_path": next(
+            path for path in audit_evidence if path.parts[-2] == "previews"
+        ),
+        "authorization_path": next(
+            path for path in audit_evidence if path.parts[-2] == "authorizations"
+        ),
+        "submit_intent_path": next(
+            path for path in audit_evidence if path.parts[-2] == "submit-intents"
+        ),
         "result_path": result_path,
         "receipt_path": receipt_path,
         "image_path": image_record.artifact_path,

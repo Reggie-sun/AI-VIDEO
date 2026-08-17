@@ -12,6 +12,7 @@ from ai_video.production.dependency import dependency_graph_semantic_sha256
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.image import (
     ImageGenerationAuthorization,
+    ImageGenerationPreview,
     ImageGenerationRequest,
     ImageProvenanceReceipt,
     ImageProviderResult,
@@ -39,10 +40,13 @@ from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_dependency_graph_snapshot_path,
     canonical_image_asset_path,
+    canonical_image_authorization_path,
+    canonical_image_preview_path,
     canonical_image_receipt_path,
     canonical_image_request_path,
     canonical_image_result_path,
     canonical_image_shot_revision_path,
+    canonical_image_submit_intent_path,
 )
 from ai_video.production.registry import registry_semantic_sha256
 
@@ -332,6 +336,90 @@ def _attempt_summary_matches_request(
     }
 
 
+def _verify_submit_audit_chain(
+    bundle: LoadedProductionProject,
+    attempt: StateCommitAttempt,
+    request: ImageGenerationRequest,
+    request_path: Path,
+    request_sha256: str,
+    base_registry: AssetRegistrySnapshot,
+) -> None:
+    summary = attempt.image_request
+    if summary is None:
+        raise ValueError("image attempt request summary is missing")
+
+    preview_path = canonical_image_preview_path(summary.preview_fingerprint)
+    preview_value, preview_sha256 = _read_canonical_json(
+        bundle.root, preview_path, label="image preview"
+    )
+    preview = ImageGenerationPreview.model_validate(preview_value)
+
+    authorization_path = canonical_image_authorization_path(
+        summary.authorization_fingerprint
+    )
+    authorization_value, authorization_sha256 = _read_canonical_json(
+        bundle.root, authorization_path, label="image authorization"
+    )
+    authorization = ImageGenerationAuthorization.model_validate(
+        authorization_value
+    )
+
+    assets = {item.asset_id: item for item in base_registry.assets}
+    reference_asset_ids = tuple(item.asset_id for item in request.references)
+    if (
+        preview.request_fingerprint != request.request_fingerprint
+        or preview.preview_fingerprint != summary.preview_fingerprint
+        or preview.reference_asset_ids != reference_asset_ids
+        or preview.reference_total_bytes
+        != sum(assets[asset_id].size_bytes for asset_id in reference_asset_ids)
+        or authorization.request_fingerprint != request.request_fingerprint
+        or authorization.preview_fingerprint != preview.preview_fingerprint
+        or authorization.authorization_fingerprint
+        != summary.authorization_fingerprint
+        or authorization.policy_receipt_id != summary.policy_receipt_id
+        or authorization.usage_license != summary.usage_license
+    ):
+        raise ValueError(
+            "image preview or authorization does not match its selected attempt"
+        )
+
+    r1_pairs = sorted(
+        (
+            (request_path.as_posix(), request_sha256),
+            (preview_path.as_posix(), preview_sha256),
+            (authorization_path.as_posix(), authorization_sha256),
+        )
+    )
+    evidence_hash = hashlib.sha256(
+        json.dumps(r1_pairs, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    submit_intent_path = canonical_image_submit_intent_path(
+        request.request_fingerprint
+    )
+    submit_intent, _ = _read_canonical_json(
+        bundle.root, submit_intent_path, label="image submit intent"
+    )
+    expected_submit_intent = {
+        "schema": "ai-video-image-submit-intent/1",
+        "attempt_id": request.attempt_id,
+        "request_fingerprint": request.request_fingerprint,
+        "preview_fingerprint": preview.preview_fingerprint,
+        "authorization_fingerprint": authorization.authorization_fingerprint,
+        "policy_receipt_id": authorization.policy_receipt_id,
+        "usage_license": authorization.usage_license,
+        "base_project": request.base_project.model_dump(mode="json"),
+        "base_registry": request.base_registry.model_dump(mode="json"),
+        "base_dependency_graph": request.base_dependency_graph.model_dump(
+            mode="json"
+        ),
+        "evidence_hash": evidence_hash,
+    }
+    if submit_intent != expected_submit_intent:
+        raise ValueError(
+            "image submit intent does not match its exact R+1 evidence"
+        )
+
+
 def _result_fingerprint(
     receipt: ImageProvenanceReceipt,
     attempt: StateCommitAttempt,
@@ -382,6 +470,14 @@ def _verify_evidence(
     ):
         raise ValueError("image request base pointers do not match its attempt")
     _verify_reference_bindings(bundle, request, base_project, base_registry)
+    _verify_submit_audit_chain(
+        bundle,
+        attempt,
+        request,
+        request_path,
+        request_sha256,
+        base_registry,
+    )
 
     receipt_path = canonical_image_receipt_path(asset.creation_receipt_id)
     receipt_value, receipt_sha256 = _read_canonical_json(

@@ -59,6 +59,14 @@ def _write_manifest(root: Path, manifest: ProductionManifest) -> None:
     )
 
 
+def _durable_tree_snapshot(root: Path) -> dict[Path, bytes]:
+    return {
+        path.relative_to(root): path.read_bytes()
+        for path in root.rglob("*")
+        if path.is_file() and path.relative_to(root) != Path("state/commit.lock")
+    }
+
+
 def _make_inactive_image_candidate(root: Path) -> ProductionManifest:
     base_inputs = project_factory.make_p7_image_generation_base(root)
     request, preview, authorization = make_image_call_bundle(root)
@@ -222,6 +230,48 @@ def test_recovery_rejects_tampered_active_image_request_evidence(
 
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
     assert _read_manifest(committed_project) == final
+
+
+@pytest.mark.parametrize(
+    "artifact_key",
+    ("preview_path", "authorization_path", "submit_intent_path"),
+)
+@pytest.mark.parametrize("mutation", ("missing", "tampered"))
+def test_recovery_rejects_missing_or_tampered_active_image_submit_audit_evidence(
+    tmp_path: Path,
+    artifact_key: str,
+    mutation: str,
+) -> None:
+    fixture = project_factory.make_p7_committed_project(tmp_path)
+    artifact_path = tmp_path / fixture[artifact_key]
+    if mutation == "missing":
+        artifact_path.unlink()
+    else:
+        artifact_path.write_bytes(artifact_path.read_bytes() + b" ")
+    manifest_path = tmp_path / "state/manifest.json"
+    manifest_bytes = manifest_path.read_bytes()
+    manifest_revision = _read_manifest(tmp_path).manifest_revision
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).recover()
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert manifest_path.read_bytes() == manifest_bytes
+    assert _read_manifest(tmp_path).manifest_revision == manifest_revision
+
+
+def test_recovery_reopens_active_image_submit_audit_without_durable_writes(
+    tmp_path: Path,
+) -> None:
+    fixture = project_factory.make_p7_committed_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before = _durable_tree_snapshot(tmp_path)
+
+    report = writer.recover()
+
+    assert report.manifest_revision_before == fixture["manifest"].manifest_revision
+    assert report.manifest_revision_after == fixture["manifest"].manifest_revision
+    assert _durable_tree_snapshot(tmp_path) == before
 
 
 def test_recovery_marks_image_submit_outcome_unknown_and_same_request_never_resubmits(
