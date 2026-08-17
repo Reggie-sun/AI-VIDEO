@@ -1,18 +1,37 @@
 from __future__ import annotations
 
+import hashlib
+from dataclasses import dataclass
+from pathlib import Path
+
 import pytest
 
 from ai_video.errors import AiVideoError
+from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
+    ActorIdentity,
     EvidenceStrength,
+    FinalAcceptanceReceipt,
+    ProductionManifest,
     QaLayer,
     QaLayoutRules,
     QaPolicy,
     QaTechnicalThresholds,
     QaVerdict,
     ReviewEvidence,
+    ReviewEvidencePointer,
+    ReviewReceipt,
+    ReviewReceiptPointer,
+    ReviewRequest,
+    SourceReference,
+    StateCommitAttempt,
     ToolIdentity,
     VisualStrategy,
+)
+from ai_video.production.paths import canonical_review_evidence_path
+from ai_video.production.project import (
+    load_final_acceptance_receipt,
+    load_production_project,
 )
 from ai_video.production.review import (
     ReviewIdentity,
@@ -24,7 +43,290 @@ from ai_video.production.review import (
     is_review_current,
     validate_technical_review_context,
 )
+from ai_video.production.state_commit import (
+    ProductionStateCommitter,
+    _canonical_json_bytes,
+)
 import production_project_factory as project_factory
+from test_production_hyperframes import make_manifest_25_render_fixture
+
+
+ZERO_HASH = "0" * 64
+
+
+def _p7_attempts(manifest: ProductionManifest) -> tuple[StateCommitAttempt, ...]:
+    return tuple(
+        item for item in manifest.attempts if item.operation == "image_generation"
+    )
+
+
+def _qa_policy(
+    *,
+    required_layers: tuple[QaLayer, ...],
+    repair_authorities: tuple[ActorIdentity, ...] = (),
+) -> QaPolicy:
+    return seal_artifact(
+        QaPolicy(
+            artifact_id="qa-policy-manifest-25-review",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="qa-policy-manifest-25-review",
+            source_provenance=(
+                SourceReference(kind="derived", reference="base-e2e-review-fixture"),
+            ),
+            policy_id="qa-manifest-25-review",
+            policy_version="1",
+            required_layers=required_layers,
+            technical_thresholds=QaTechnicalThresholds(
+                black_luma_max_milli=10,
+                silence_peak_max_millidb=-60_000,
+                clipping_peak_min_millidb=-100,
+            ),
+            layout_rules=QaLayoutRules(
+                safe_area_inset_milli=50,
+                caption_overflow_tolerance_milli=0,
+            ),
+            strategy_rules_version="1",
+            semantic_requirement="optional",
+            repair_authorities=repair_authorities,
+        )
+    )
+
+
+@dataclass(frozen=True)
+class _Manifest25ReviewFixture:
+    root: Path
+    committer: ProductionStateCommitter
+    timeline: object
+    policy: QaPolicy
+    review_layer: QaLayer = QaLayer.TECHNICAL
+    review_fails: bool = False
+
+    def load_manifest(self) -> ProductionManifest:
+        return load_production_project(self.root / "project.yaml").manifest
+
+    def run_required_review(self) -> ReviewReceiptPointer:
+        bundle = load_production_project(self.root / "project.yaml")
+        manifest = bundle.manifest
+        assert manifest.active_dependency_graph is not None
+        assert manifest.active_render_state is not None
+        assert manifest.active_qa_policy is not None
+        assert bundle.render_state is not None
+        tool = ToolIdentity(name="base-e2e-analyzer", version="1")
+        context = build_technical_review_context(
+            bundle,
+            self.timeline,
+            render_output_sha256=bundle.render_state.output.file_sha256,
+            measurement_contract_version="1",
+        )
+        request = seal_artifact(
+            ReviewRequest(
+                artifact_id="review-request-manifest-25",
+                revision=1,
+                content_hash=ZERO_HASH,
+                creation_receipt_id="review-request-manifest-25",
+                source_provenance=(
+                    SourceReference(kind="derived", reference="base-e2e-review-fixture"),
+                ),
+                request_id="review-request-manifest-25",
+                base_manifest_revision=manifest.manifest_revision,
+                dependency_graph=manifest.active_dependency_graph,
+                dependency_states_hash=canonical_sha256(
+                    {
+                        "dependency_states": [
+                            item.model_dump(mode="json")
+                            for item in manifest.dependency_states
+                        ]
+                    }
+                ),
+                render_state=manifest.active_render_state,
+                render_output_sha256=bundle.render_state.output.file_sha256,
+                timeline_fingerprint=bundle.render_state.timeline_fingerprint,
+                qa_policy=manifest.active_qa_policy,
+                requested_layers=(self.review_layer,),
+                evidence_tool_identities=(tool,),
+                technical_context=context,
+            )
+        )
+        begun = self.committer.begin_review(
+            request, attempt_id="base-e2e-technical-review"
+        )
+        request_pointer = begun.attempts[-1].review_request
+        assert request_pointer is not None
+
+        def analyze(durable_request, permit):
+            assert permit._consume_review_analysis_permit(
+                request_content_hash=durable_request.content_hash,
+                render_output_sha256=durable_request.render_output_sha256,
+                technical_context_hash=canonical_sha256(
+                    durable_request.technical_context.model_dump(mode="json")
+                ),
+            )
+            return durable_request
+
+        self.committer.run_review_analysis(
+            review_request=request_pointer,
+            expected_manifest_revision=begun.manifest_revision,
+            analyzer=analyze,
+        )
+        measured = self.load_manifest()
+        if self.review_layer is QaLayer.LAYOUT:
+            measured_payload = {
+                "coverage_complete": True,
+                "caption_overflow_milli": 1 if self.review_fails else 0,
+                "safe_area_inset_milli": 50,
+                "layer_collision_count": 0,
+                "transition_boundary_violation_count": 0,
+            }
+        else:
+            measured_payload = {
+                "coverage_complete": True,
+                "minimum_luma_milli": 500,
+                "audio_peak_millidb": -1_000,
+                "expects_audio": any(item.expects_audio for item in context.windows),
+                "windows": [
+                    {
+                        "status": "measured",
+                        "visual_strategy": item.visual_strategy.value,
+                        "unique_frame_count": 1,
+                    }
+                    for item in context.windows
+                ],
+            }
+        evidence = seal_artifact(
+            ReviewEvidence(
+                artifact_id=f"review-evidence-manifest-25-{self.review_layer.value}",
+                revision=1,
+                content_hash=ZERO_HASH,
+                creation_receipt_id=f"review-evidence-manifest-25-{self.review_layer.value}",
+                source_provenance=(
+                    SourceReference(kind="derived", reference="base-e2e-analyzer"),
+                ),
+                evidence_id=f"review-evidence-manifest-25-{self.review_layer.value}",
+                layer=self.review_layer,
+                strength=(
+                    EvidenceStrength.RENDERER_BOUND
+                    if self.review_layer is QaLayer.LAYOUT
+                    else EvidenceStrength.MEASURED
+                ),
+                render_output_sha256=request.render_output_sha256,
+                timeline_fingerprint=request.timeline_fingerprint,
+                dependency_graph_revision_id=request.dependency_graph.revision_id,
+                tool_identity=tool,
+                measurement_contract_version="1",
+                subject_ids=tuple(item.shot_id for item in context.windows),
+                measured_payload=measured_payload,
+            )
+        )
+        evidence_payload = _canonical_json_bytes(evidence)
+        evidence_pointer = ReviewEvidencePointer(
+            path=canonical_review_evidence_path(evidence.content_hash),
+            evidence_id=evidence.evidence_id,
+            layer=evidence.layer,
+            strength=evidence.strength,
+            content_hash=evidence.content_hash,
+            file_sha256=hashlib.sha256(evidence_payload).hexdigest(),
+        )
+        receipt = seal_artifact(
+            ReviewReceipt(
+                artifact_id=f"review-receipt-manifest-25-{self.review_layer.value}",
+                revision=1,
+                content_hash=ZERO_HASH,
+                creation_receipt_id=f"review-receipt-manifest-25-{self.review_layer.value}",
+                source_provenance=(
+                    SourceReference(kind="derived", reference=evidence.evidence_id),
+                ),
+                review_id=f"review-receipt-manifest-25-{self.review_layer.value}",
+                layer=self.review_layer,
+                review_request=request_pointer,
+                render_state=request.render_state,
+                render_output_sha256=request.render_output_sha256,
+                timeline_fingerprint=request.timeline_fingerprint,
+                dependency_graph_revision_id=request.dependency_graph.revision_id,
+                qa_policy=request.qa_policy,
+                evidence=(evidence_pointer,),
+                evidence_ids=(evidence.evidence_id,),
+                tool_identities=(tool,),
+                verdict=QaVerdict.FAIL if self.review_fails else QaVerdict.PASS,
+            )
+        )
+        reviewed = self.committer.record_review_receipt(
+            receipt,
+            (evidence,),
+            expected_manifest_revision=measured.manifest_revision,
+            attempt_id="base-e2e-technical-review",
+        )
+        return next(
+            item
+            for item in reviewed.active_review_receipts
+            if item.layer is self.review_layer
+        )
+
+    def acceptance(self, receipt: ReviewReceiptPointer) -> FinalAcceptanceReceipt:
+        bundle = load_production_project(self.root / "project.yaml")
+        manifest = bundle.manifest
+        assert manifest.active_dependency_graph is not None
+        assert manifest.active_render_state is not None
+        assert manifest.active_qa_policy is not None
+        assert bundle.render_state is not None
+        return seal_artifact(
+            FinalAcceptanceReceipt(
+                artifact_id="final-acceptance-manifest-25",
+                revision=1,
+                content_hash=ZERO_HASH,
+                creation_receipt_id="final-acceptance-manifest-25",
+                source_provenance=(
+                    SourceReference(kind="derived", reference=receipt.review_id),
+                ),
+                acceptance_id="final-acceptance-manifest-25",
+                dependency_graph=manifest.active_dependency_graph,
+                dependency_states_hash=canonical_sha256(
+                    {
+                        "dependency_states": [
+                            item.model_dump(mode="json")
+                            for item in manifest.dependency_states
+                        ]
+                    }
+                ),
+                render_state=manifest.active_render_state,
+                render_output_sha256=bundle.render_state.output.file_sha256,
+                timeline_fingerprint=bundle.render_state.timeline_fingerprint,
+                qa_policy=manifest.active_qa_policy,
+                required_review_receipts=(receipt,),
+                verdict=QaVerdict.PASS,
+            )
+        )
+
+
+def make_manifest_25_review_fixture(tmp_path: Path) -> _Manifest25ReviewFixture:
+    runtime = project_factory.make_p7_reuse_runtime(tmp_path)
+    runtime.generate_all()
+    return _Manifest25ReviewFixture(
+        root=tmp_path,
+        committer=ProductionStateCommitter(tmp_path),
+        timeline=runtime.base_inputs.composition_spec,
+        policy=_qa_policy(required_layers=(QaLayer.TECHNICAL,)),
+    )
+
+
+def make_manifest_25_passing_review_fixture(
+    tmp_path: Path,
+) -> _Manifest25ReviewFixture:
+    render_fixture = make_manifest_25_render_fixture(tmp_path)
+    render_fixture.render()
+    fixture = _Manifest25ReviewFixture(
+        root=tmp_path,
+        committer=ProductionStateCommitter(tmp_path),
+        timeline=render_fixture.timeline,
+        policy=_qa_policy(required_layers=(QaLayer.TECHNICAL,)),
+    )
+    before = fixture.load_manifest()
+    fixture.committer.activate_qa_policy(
+        fixture.policy,
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="base-e2e-passing-review-policy",
+    )
+    return fixture
 
 
 def identity(**changes: str) -> ReviewIdentity:
@@ -311,3 +613,45 @@ def test_final_acceptance_fails_closed_for_stale_or_missing_pass():
             verdicts={QaLayer.TECHNICAL: QaVerdict.PASS},
             receipts_current=True,
         )
+
+
+def test_manifest_25_qa_policy_activation_does_not_downgrade_or_drop_p7(
+    tmp_path: Path,
+) -> None:
+    fixture = make_manifest_25_review_fixture(tmp_path)
+    before = fixture.load_manifest()
+    after = fixture.committer.activate_qa_policy(
+        fixture.policy,
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="base-e2e-qa-policy",
+    )
+
+    assert after.schema_version == "2.5"
+    assert _p7_attempts(after) == _p7_attempts(before)
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.active_qa_policy is not None
+
+
+def test_manifest_25_review_and_final_acceptance_bind_current_render_and_preserve_p7(
+    tmp_path: Path,
+) -> None:
+    fixture = make_manifest_25_passing_review_fixture(tmp_path)
+    before = fixture.load_manifest()
+
+    receipt = fixture.run_required_review()
+    acceptance = fixture.acceptance(receipt)
+    accepted = fixture.committer.record_final_acceptance(
+        acceptance,
+        expected_manifest_revision=fixture.load_manifest().manifest_revision,
+        attempt_id="base-e2e-final-acceptance",
+    )
+
+    assert accepted.schema_version == "2.5"
+    assert _p7_attempts(accepted) == _p7_attempts(before)
+    assert accepted.final_acceptance_state is not None
+    assert accepted.final_acceptance_state.active_receipt is not None
+    final_receipt = load_final_acceptance_receipt(
+        tmp_path, accepted.final_acceptance_state.active_receipt
+    )
+    assert final_receipt.render_state == accepted.active_render_state

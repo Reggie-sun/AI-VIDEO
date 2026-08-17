@@ -105,7 +105,10 @@ class _StateCommitRepairMixin:
                 if manifest.active_approved_repair == pointer:
                     return manifest
                 raise _state_invalid("Repair authorization base revision changed.")
-            if manifest.schema_version != "2.4" or manifest.active_qa_policy is None:
+            if (
+                manifest.schema_version not in {"2.4", "2.5"}
+                or manifest.active_qa_policy is None
+            ):
                 raise AiVideoError(
                     ErrorCode.REPAIR_AUTHORIZATION_REQUIRED,
                     "Repair approval requires the current selected QA policy.",
