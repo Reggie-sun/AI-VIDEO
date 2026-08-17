@@ -97,6 +97,27 @@ def test_recovery_methods_have_domain_owners() -> None:
     assert committer._require_recovery_file_hash.__module__ == recovery_fs.__name__
 
 
+def test_committer_mro_preserves_approved_domain_order() -> None:
+    facade = importlib.import_module("ai_video.production.state_commit")
+    assert tuple(
+        owner.__name__ for owner in facade.ProductionStateCommitter.__mro__[1:-1]
+    ) == (
+        "_StateCommitReviewMixin",
+        "_StateCommitRepairMixin",
+        "_StateCommitVoiceIntentMixin",
+        "_StateCommitVoiceCandidateMixin",
+        "_StateCommitVoiceActivationMixin",
+        "_StateCommitRenderLifecycleMixin",
+        "_StateCommitRenderSupportMixin",
+        "_StateCommitDependencyMixin",
+        "_StateCommitRecoveryMixin",
+        "_StateCommitRecoveryAttemptsMixin",
+        "_StateCommitRecoveryFsMixin",
+        "_StateCommitTransactionMixin",
+        "_StateCommitIoMixin",
+    )
+
+
 def test_review_and_repair_modules_stay_focused() -> None:
     production = Path(__file__).parents[1] / "src/ai_video/production"
     assert _effective_loc(production / "_state_commit_review.py") <= 800

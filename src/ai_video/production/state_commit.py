@@ -230,17 +230,17 @@ except ImportError:  # pragma: no cover - exercised through platform injection
 
 
 class ProductionStateCommitter(
-    _StateCommitRecoveryMixin,
-    _StateCommitRecoveryAttemptsMixin,
-    _StateCommitRecoveryFsMixin,
+    _StateCommitReviewMixin,
+    _StateCommitRepairMixin,
     _StateCommitVoiceIntentMixin,
     _StateCommitVoiceCandidateMixin,
     _StateCommitVoiceActivationMixin,
-    _StateCommitReviewMixin,
-    _StateCommitRepairMixin,
-    _StateCommitDependencyMixin,
     _StateCommitRenderLifecycleMixin,
     _StateCommitRenderSupportMixin,
+    _StateCommitDependencyMixin,
+    _StateCommitRecoveryMixin,
+    _StateCommitRecoveryAttemptsMixin,
+    _StateCommitRecoveryFsMixin,
     _StateCommitTransactionMixin,
     _StateCommitIoMixin,
 ):
