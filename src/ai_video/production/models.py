@@ -38,6 +38,16 @@ def _immutable_mapping(value: dict) -> _ImmutableDict:
     return _ImmutableDict(value)
 
 
+def _deep_immutable_json(value: object) -> object:
+    if isinstance(value, dict):
+        return _ImmutableDict(
+            {key: _deep_immutable_json(item) for key, item in value.items()}
+        )
+    if isinstance(value, list | tuple):
+        return tuple(_deep_immutable_json(item) for item in value)
+    return value
+
+
 class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -1717,6 +1727,7 @@ class StateCommitAttempt(StrictModel):
     candidate_dependency_states_hash: str | None = Field(
         default=None, pattern=r"^[0-9a-f]{64}$"
     )
+    approved_repair_receipt: ApprovedRepairReceiptPointer | None = None
     started_at: str
     finished_at: str | None = None
     error_code: str | None = None
@@ -1866,6 +1877,11 @@ class StateCommitAttempt(StrictModel):
                 or self.candidate_caption_asset_ids
             ):
                 raise ValueError("voice candidate bundle requires candidate phase")
+        if self.operation == "repair":
+            if self.approved_repair_receipt is None:
+                raise ValueError("repair attempts require approved repair receipt")
+        elif self.approved_repair_receipt is not None:
+            raise ValueError("non-repair attempt cannot contain repair authorization")
         return self
 
     @model_serializer(mode="wrap")
@@ -1897,6 +1913,8 @@ class StateCommitAttempt(StrictModel):
         ):
             if data.get(field) is None:
                 data.pop(field, None)
+        if self.operation != "repair":
+            data.pop("approved_repair_receipt", None)
         return data
 
 
@@ -1975,6 +1993,25 @@ class ReviewRequestPointer(StrictModel):
             content_hash=self.content_hash,
             prefix="state/reviews/request.",
             label="review request",
+        )
+        return self
+
+
+class ReviewEvidencePointer(StrictModel):
+    path: Path
+    evidence_id: str = Field(min_length=1)
+    layer: QaLayer
+    strength: EvidenceStrength
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "ReviewEvidencePointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/reviews/evidence.",
+            label="review evidence",
         )
         return self
 
@@ -2125,6 +2162,12 @@ class ProductionManifest(StrictModel):
                 f"Production Manifest {value.get('schema_version', '2.0')} "
                 "cannot contain explicit P6 review fields"
             )
+        for attempt in value.get("attempts", ()):
+            if isinstance(attempt, Mapping) and "approved_repair_receipt" in attempt:
+                raise ValueError(
+                    f"Production Manifest {value.get('schema_version', '2.0')} "
+                    "cannot contain P6 repair attempt fields"
+                )
         return value
 
     @model_validator(mode="before")
@@ -2351,6 +2394,7 @@ _P5_AWARE_OPERATIONS: frozenset[str] = frozenset(
         "audio_import",
         "voice_generation",
         "render_state",
+        "repair",
     }
 )
 
@@ -2712,7 +2756,10 @@ class ReviewEvidence(VersionedArtifact):
     subject_ids: tuple[str, ...] = Field(min_length=1)
     measured_payload: dict[str, object]
 
-    _freeze_payload = field_validator("measured_payload")(_immutable_mapping)
+    @field_validator("measured_payload")
+    @classmethod
+    def _freeze_payload(cls, value: dict[str, object]) -> dict[str, object]:
+        return _deep_immutable_json(value)  # type: ignore[return-value]
 
 
 class ReviewReceipt(VersionedArtifact):
@@ -2725,10 +2772,19 @@ class ReviewReceipt(VersionedArtifact):
     timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     dependency_graph_revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     qa_policy: QaPolicyPointer
+    evidence: tuple[ReviewEvidencePointer, ...] = Field(min_length=1)
     evidence_ids: tuple[str, ...] = Field(min_length=1)
     tool_identities: tuple[ToolIdentity, ...] = Field(min_length=1)
     issue_ids: tuple[str, ...] = ()
     verdict: QaVerdict
+
+    @model_validator(mode="after")
+    def _evidence_identity_matches(self) -> "ReviewReceipt":
+        if self.evidence_ids != tuple(item.evidence_id for item in self.evidence):
+            raise ValueError("Review Receipt evidence IDs must match exact pointers")
+        if any(item.layer is not self.layer for item in self.evidence):
+            raise ValueError("Review Receipt evidence layer mismatch")
+        return self
 
 
 class RepairRequest(VersionedArtifact):

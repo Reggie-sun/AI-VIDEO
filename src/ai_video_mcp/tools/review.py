@@ -4,6 +4,7 @@ import subprocess
 import hashlib
 from pathlib import Path
 
+from ai_video.production.models import TechnicalReviewContext, VisualStrategy
 from ai_video_mcp.cache import AnalysisCache
 from ai_video_mcp.config import ServerConfig
 from ai_video_mcp.errors import McpError, McpErrorCode
@@ -41,6 +42,23 @@ def _sample_frame_hashes(video_path: Path, *, sample_fps: float = 1.0) -> list[s
         if parts:
             hashes.append(parts[-1])
     return hashes
+
+
+def _sample_window_hashes(video_path: Path, start_frame: int, end_frame: int) -> list[str]:
+    cmd = [
+        "ffmpeg", "-v", "error", "-i", str(video_path),
+        "-vf", f"select='between(n,{start_frame},{end_frame - 1})',scale=32:32,format=gray",
+        "-vsync", "0", "-f", "framemd5", "-",
+    ]
+    try:
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as exc:
+        raise McpError(McpErrorCode.FFMPEG_FAILED, "Frame window sampling failed") from exc
+    return [
+        line.split(",")[-1].strip()
+        for line in result.stdout.splitlines()
+        if line and not line.startswith("#")
+    ]
 
 
 def _make_issue(
@@ -165,14 +183,48 @@ def video_review(
     p = _validate_video(video_path, config)
 
     if production_context is not None:
+        try:
+            context = TechnicalReviewContext.model_validate(production_context)
+        except ValueError as exc:
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production technical review context is invalid",
+                detail=str(exc),
+            ) from exc
         actual_hash = hashlib.sha256(p.read_bytes()).hexdigest()
-        expected_hash = production_context.get("render_output_sha256")
+        expected_hash = context.render_output_sha256
         if actual_hash != expected_hash:
             raise McpError(
                 McpErrorCode.INVALID_PARAMETER,
                 "Production render output hash does not match review context",
             )
-        frame_hashes = _sample_frame_hashes(p)
+        window_measurements: list[dict] = []
+        frame_hashes: list[str] = []
+        for window in context.windows:
+            hashes = _sample_window_hashes(
+                p, window.start_frame, window.end_frame_exclusive
+            )
+            frame_hashes.extend(hashes)
+            unique = len(set(hashes))
+            count = len(hashes)
+            status = "measured"
+            if window.visual_strategy in {
+                VisualStrategy.IMAGE_MOTION,
+                VisualStrategy.MOTION_GRAPHICS,
+            }:
+                status = "not_evaluated"
+            window_measurements.append(
+                {
+                    "shot_id": window.shot_id,
+                    "visual_strategy": window.visual_strategy.value,
+                    "start_frame": window.start_frame,
+                    "end_frame_exclusive": window.end_frame_exclusive,
+                    "sampled_frame_count": count,
+                    "unique_frame_count": unique,
+                    "unique_frame_ratio": round(unique / count, 3) if count else 0.0,
+                    "status": status,
+                }
+            )
         unique_count = len(set(frame_hashes))
         sample_count = len(frame_hashes)
         ratio = round(unique_count / sample_count, 3) if sample_count else 0.0
@@ -180,13 +232,9 @@ def video_review(
             "mode": "production_evidence",
             "video_path": str(p),
             "render_output_sha256": actual_hash,
-            "timeline_fingerprint": production_context.get(
-                "timeline_fingerprint"
-            ),
-            "measurement_contract_version": production_context.get(
-                "measurement_contract_version"
-            ),
-            "windows": production_context.get("windows", []),
+            "timeline_fingerprint": context.timeline_fingerprint,
+            "measurement_contract_version": context.measurement_contract_version,
+            "windows": window_measurements,
             "measurements": {
                 "sampled_frame_count": sample_count,
                 "unique_frame_count": unique_count,

@@ -84,3 +84,34 @@ class TestVideoReview:
                     "windows": [],
                 },
             )
+
+    def test_unsupported_p3_motion_strategy_is_not_evaluated(
+        self, static_video, mcp_config, mcp_cache
+    ):
+        output_hash = hashlib.sha256(static_video.read_bytes()).hexdigest()
+        result = video_review(
+            str(static_video),
+            mcp_config,
+            mcp_cache,
+            production_context={
+                "render_output_sha256": output_hash,
+                "timeline_fingerprint": "1" * 64,
+                "measurement_contract_version": "1",
+                "windows": [{
+                    "shot_id": "shot-1",
+                    "visual_strategy": "image_motion",
+                    "start_frame": 0,
+                    "end_frame_exclusive": 24,
+                    "expects_audio": False,
+                    "visual_span_ids": ["visual-1"],
+                    "motion_expectation": {
+                        "directive_kind": "pan",
+                        "directive_parameters_fingerprint": "2" * 64,
+                        "measurement_kind": "transform_delta",
+                        "minimum_measured_delta_milli": 5,
+                        "tolerance_milli": 1,
+                    },
+                }],
+            },
+        )
+        assert result["windows"][0]["status"] == "not_evaluated"

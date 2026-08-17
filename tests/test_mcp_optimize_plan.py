@@ -24,8 +24,10 @@ class TestVideoOptimizePlan:
             mcp_cache,
             production_review_receipt={
                 "review_id": "review-1",
-                "issue_ids": ["caption-overflow"],
-                "exact_target_artifact_ids": ["caption-track-1"],
+                "layer": "layout",
+                "path": "state/reviews/review." + "0" * 64 + ".json",
+                "content_hash": "0" * 64,
+                "file_sha256": "1" * 64,
             },
         )
         assert result["mode"] == "production_repair_proposal"

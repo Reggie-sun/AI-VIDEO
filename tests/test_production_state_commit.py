@@ -128,6 +128,60 @@ def test_p6_policy_activation_migrates_23_and_exact_replay_is_noop(
     assert replay == committed
 
 
+def test_unapproved_repair_is_rejected_before_any_commit_attempt(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before_policy = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    current = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before_policy.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    request = project_factory.make_revision_two_request(
+        tmp_path, attempt_id="unapproved-repair"
+    )
+    request = replace(request, operation="repair")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.commit(request)
+
+    assert exc_info.value.code is ErrorCode.REPAIR_AUTHORIZATION_REQUIRED
+    after = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    assert after == current
+    assert not any(item.attempt_id == "unapproved-repair" for item in after.attempts)
+
+
+def test_manifest_24_preserves_p5_transition_support(tmp_path: Path) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    current = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    request = project_factory.make_revision_two_request(
+        tmp_path, attempt_id="manifest-24-p5-transition"
+    )
+    request, _ = project_factory.attach_p5_dependency_transition(tmp_path, request)
+
+    committed = writer.commit(request)
+
+    assert committed.schema_version == "2.4"
+    assert committed.active_dependency_graph == request.dependency_graph_transition.candidate_dependency_graph
+    assert committed.active_qa_policy == current.active_qa_policy
+
+
 def test_voice_lifecycle_api_persists_r1_then_mints_one_use_r2_permit(
     tmp_path: Path,
 ) -> None:

@@ -114,7 +114,12 @@ def apply_video_optimization(
     manifest_path: str | None = None,
     production_mode: bool = False,
 ) -> dict:
-    if production_mode:
+    video = Path(video_path).resolve()
+    production_path = any(
+        (parent / "state/manifest.json").is_file()
+        for parent in (video.parent, *video.parents)
+    )
+    if production_mode or production_path:
         return {
             "mode": "production_repair_refused",
             "applied": False,

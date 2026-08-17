@@ -54,6 +54,25 @@ def test_semantic_requires_explicit_evaluator_or_human_evidence():
     ) is QaVerdict.PASS
 
 
+@pytest.mark.parametrize(
+    ("layer", "issue_id"),
+    [
+        (QaLayer.TECHNICAL, "frozen_frames"),
+        (QaLayer.TECHNICAL, "black_frames"),
+        (QaLayer.TECHNICAL, "silent_audio"),
+        (QaLayer.TECHNICAL, "clipped_audio"),
+        (QaLayer.LAYOUT, "caption_overflow"),
+        (QaLayer.LAYOUT, "safe_area_violation"),
+        (QaLayer.LAYOUT, "layer_collision"),
+        (QaLayer.LAYOUT, "transition_boundary"),
+        (QaLayer.STRATEGY, "strategy_mismatch"),
+    ],
+)
+def test_measured_failures_fail_their_owned_layer(layer, issue_id):
+    evidence = [{"strength": "measured", "result": "fail", "issue_id": issue_id}]
+    assert adjudicate_layer(layer, evidence) is QaVerdict.FAIL
+
+
 def test_static_and_explicit_low_motion_strategy_are_not_misclassified():
     assert adjudicate_visual_motion(
         visual_strategy=VisualStrategy.STATIC_IMAGE,

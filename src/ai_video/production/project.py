@@ -50,6 +50,8 @@ from ai_video.production.models import (
     DependencyNodeKind,
     DependencyNode,
     DependencySemanticRole,
+    FinalAcceptanceReceipt,
+    FinalAcceptanceReceiptPointer,
     LoadedProductionProject,
     ProductionBrief,
     ProductionManifest,
@@ -68,6 +70,8 @@ from ai_video.production.models import (
     RenderStateSnapshotPointer,
     ReviewReceipt,
     ReviewReceiptPointer,
+    ReviewEvidence,
+    ReviewEvidencePointer,
     RenderDependencyEvidence,
     ResolvedTimeline,
     Scene,
@@ -196,6 +200,55 @@ def load_review_receipt(
     )
     if receipt.review_id != pointer.review_id or receipt.layer != pointer.layer:
         raise _invalid("Review Receipt pointer identity is invalid.")
+    for evidence_pointer in receipt.evidence:
+        evidence = load_review_evidence(resolved_root, evidence_pointer)
+        if (
+            evidence.layer is not receipt.layer
+            or evidence.evidence_id not in receipt.evidence_ids
+            or evidence.render_output_sha256 != receipt.render_output_sha256
+            or evidence.timeline_fingerprint != receipt.timeline_fingerprint
+            or evidence.dependency_graph_revision_id
+            != receipt.dependency_graph_revision_id
+        ):
+            raise _invalid("Review evidence does not match its Receipt.")
+    return receipt
+
+
+def load_review_evidence(
+    root: str | Path, pointer: ReviewEvidencePointer
+) -> ReviewEvidence:
+    resolved_root = Path(root).resolve(strict=True)
+    evidence = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=ReviewEvidence,
+        content_hash=pointer.content_hash,
+        label="Review evidence",
+    )
+    if (
+        evidence.evidence_id != pointer.evidence_id
+        or evidence.layer is not pointer.layer
+        or evidence.strength is not pointer.strength
+    ):
+        raise _invalid("Review evidence pointer identity is invalid.")
+    return evidence
+
+
+def load_final_acceptance_receipt(
+    root: str | Path, pointer: FinalAcceptanceReceiptPointer
+) -> FinalAcceptanceReceipt:
+    resolved_root = Path(root).resolve(strict=True)
+    receipt = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=FinalAcceptanceReceipt,
+        content_hash=pointer.content_hash,
+        label="Final Acceptance Receipt",
+    )
+    if receipt.acceptance_id != pointer.acceptance_id:
+        raise _invalid("Final Acceptance Receipt pointer identity is invalid.")
     return receipt
 
 
@@ -1723,10 +1776,41 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         if manifest.active_qa_policy is None:
             raise _invalid("Manifest 2.4 requires an active QA policy.")
         qa_policy = load_qa_policy(root, manifest.active_qa_policy)
+        current_render = (
+            _load_exact_render_state(bundle, manifest.active_render_state)
+            if manifest.active_render_state is not None
+            else None
+        )
         for receipt_pointer in manifest.active_review_receipts:
             receipt = load_review_receipt(root, receipt_pointer)
-            if receipt.qa_policy != manifest.active_qa_policy:
-                raise _invalid("Active Review Receipt uses a stale QA policy.")
+            if (
+                current_render is None
+                or receipt.qa_policy != manifest.active_qa_policy
+                or receipt.dependency_graph_revision_id
+                != manifest.active_dependency_graph.revision_id
+                or receipt.render_state != manifest.active_render_state
+                or receipt.render_output_sha256
+                != current_render.output.file_sha256
+                or receipt.timeline_fingerprint
+                != current_render.timeline_fingerprint
+            ):
+                raise _invalid("Active Review Receipt is stale.")
+        if (
+            manifest.final_acceptance_state is not None
+            and manifest.final_acceptance_state.active_receipt is not None
+        ):
+            final_receipt = load_final_acceptance_receipt(
+                root, manifest.final_acceptance_state.active_receipt
+            )
+            if (
+                final_receipt.dependency_graph != manifest.active_dependency_graph
+                or final_receipt.render_state != manifest.active_render_state
+                or final_receipt.qa_policy != manifest.active_qa_policy
+                or not set(final_receipt.required_review_receipts).issubset(
+                    set(manifest.active_review_receipts)
+                )
+            ):
+                raise _invalid("Final Acceptance Receipt is stale.")
         bundle = bundle.model_copy(update={"qa_policy": qa_policy})
     if manifest.active_render_state is not None:
         render_state = (

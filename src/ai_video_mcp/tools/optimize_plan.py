@@ -4,6 +4,7 @@ from pathlib import Path
 
 from ai_video.config import load_project
 from ai_video.manifest import load_manifest
+from ai_video.production.models import ReviewReceiptPointer
 from ai_video_mcp.cache import AnalysisCache
 from ai_video_mcp.config import ServerConfig
 from ai_video_mcp.tools.review import video_review
@@ -66,14 +67,14 @@ def video_optimize_plan(
     production_review_receipt: dict | None = None,
 ) -> dict:
     if production_review_receipt is not None:
+        pointer = ReviewReceiptPointer.model_validate(production_review_receipt)
         return {
             "mode": "production_repair_proposal",
             "video_path": str(Path(video_path).resolve()),
-            "review_receipt_id": production_review_receipt.get("review_id"),
-            "issue_ids": list(production_review_receipt.get("issue_ids", ())),
-            "exact_target_artifact_ids": list(
-                production_review_receipt.get("exact_target_artifact_ids", ())
-            ),
+            "review_receipt_id": pointer.review_id,
+            "review_receipt_content_hash": pointer.content_hash,
+            "issue_ids": [],
+            "exact_target_artifact_ids": [],
             # Production repair is persisted and authorized by the sole committer.
             "targets": [],
             "next_actions": [
