@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import hashlib
 import re
+import struct
 import unicodedata
+import zlib
 from typing import TYPE_CHECKING, Literal, Protocol
 
 from pydantic import ConfigDict, Field, field_validator, model_validator
 
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
@@ -27,14 +30,44 @@ __all__ = [
     "ImageGenerationPreview",
     "ImageGenerationRequest",
     "ImageLocalResourceEvidence",
+    "ImageProvenanceReceipt",
     "ImageProviderParameters",
     "ImageProviderResult",
     "ImageReferenceBinding",
+    "MeasuredPng",
+    "image_receipt_semantic_sha256",
+    "validate_image_result",
 ]
 
 
 _PROVIDER_IDENTIFIER = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
 _REFERENCE_ROLE_ORDER = {"character": 0, "scene": 1, "style": 2}
+_PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+_PNG_BIT_DEPTHS = {
+    0: {1, 2, 4, 8, 16},
+    2: {8, 16},
+    3: {1, 2, 4, 8},
+    4: {8, 16},
+    6: {8, 16},
+}
+
+
+def _image_bytes_invalid(message: str, detail: str | None = None) -> AiVideoError:
+    return AiVideoError(
+        code=ErrorCode.ASSET_REGISTRY_INVALID,
+        user_message=message,
+        technical_detail=detail,
+        retryable=False,
+    )
+
+
+def _image_scope_invalid(message: str, detail: str | None = None) -> AiVideoError:
+    return AiVideoError(
+        code=ErrorCode.PRODUCTION_STATE_INVALID,
+        user_message=message,
+        technical_detail=detail,
+        retryable=False,
+    )
 
 
 class _ImageStrictModel(StrictModel):
@@ -327,6 +360,195 @@ class ImageProviderResult(_ImageStrictModel):
             cls._fingerprint_payload(serializable)
         )
         return cls.model_validate(data)
+
+
+class MeasuredPng(_ImageStrictModel):
+    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    size_bytes: int = Field(strict=True, gt=0)
+    mime_type: Literal["image/png"]
+    width: int = Field(strict=True, gt=0)
+    height: int = Field(strict=True, gt=0)
+    bit_depth: Literal[1, 2, 4, 8, 16]
+    color_type: Literal[0, 2, 3, 4, 6]
+
+
+class ImageProvenanceReceipt(_ImageStrictModel):
+    request_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    target_shot_id: str = Field(min_length=1)
+    target_asset_role: str = Field(min_length=1)
+    output_asset_id: str = Field(pattern=r"^image-[0-9a-f]{64}$")
+    adapter: ToolIdentity
+    provider_request_id: str | None = None
+    output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    output_size_bytes: int = Field(strict=True, gt=0)
+    output_mime_type: Literal["image/png"]
+    output_width: int = Field(strict=True, gt=0)
+    output_height: int = Field(strict=True, gt=0)
+    usage_license: str = Field(min_length=1)
+    policy_receipt_id: str = Field(min_length=1)
+    references: tuple[ImageReferenceBinding, ...]
+    resource_evidence: ImageLocalResourceEvidence
+    remote: Literal[False]
+    cost_receipt_id: None = None
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("provider_request_id")
+    @classmethod
+    def _sanitize_provider_identifier(cls, value: str | None) -> str | None:
+        if value is not None and _PROVIDER_IDENTIFIER.fullmatch(value) is None:
+            raise ValueError("provider_request_id must be sanitized")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_content_hash(self) -> "ImageProvenanceReceipt":
+        if image_receipt_semantic_sha256(self) != self.content_hash:
+            raise ValueError("content_hash does not match image provenance receipt")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "ImageProvenanceReceipt":
+        data = dict(values)
+        data["content_hash"] = image_receipt_semantic_sha256(data)
+        return cls.model_validate(data)
+
+
+def image_receipt_semantic_sha256(
+    receipt: ImageProvenanceReceipt | dict[str, object],
+) -> str:
+    if isinstance(receipt, ImageProvenanceReceipt):
+        payload = receipt.model_dump(mode="json", exclude={"content_hash"})
+    else:
+        payload = dict(receipt)
+        payload.pop("content_hash", None)
+        payload = {
+            key: value.model_dump(mode="json")
+            if isinstance(value, StrictModel)
+            else tuple(
+                item.model_dump(mode="json")
+                if isinstance(item, StrictModel)
+                else item
+                for item in value
+            )
+            if isinstance(value, tuple)
+            else value
+            for key, value in payload.items()
+        }
+    return canonical_sha256(payload)
+
+
+def _measure_png(payload: bytes) -> MeasuredPng:
+    if not payload.startswith(_PNG_SIGNATURE):
+        raise _image_bytes_invalid("Image provider output is not a PNG file.")
+
+    cursor = len(_PNG_SIGNATURE)
+    chunk_index = 0
+    saw_idat = False
+    saw_iend = False
+    width = height = bit_depth = color_type = None
+    while cursor < len(payload):
+        if len(payload) - cursor < 12:
+            raise _image_bytes_invalid("PNG output contains a truncated chunk.")
+        length = struct.unpack(">I", payload[cursor : cursor + 4])[0]
+        kind = payload[cursor + 4 : cursor + 8]
+        chunk_end = cursor + 12 + length
+        if chunk_end > len(payload):
+            raise _image_bytes_invalid("PNG output contains a truncated chunk.")
+        chunk_data = payload[cursor + 8 : cursor + 8 + length]
+        expected_crc = struct.unpack(">I", payload[cursor + 8 + length : chunk_end])[0]
+        measured_crc = zlib.crc32(kind + chunk_data) & 0xFFFFFFFF
+        if expected_crc != measured_crc:
+            raise _image_bytes_invalid("PNG output contains an invalid chunk checksum.")
+
+        if chunk_index == 0:
+            if kind != b"IHDR" or length != 13:
+                raise _image_bytes_invalid("PNG output must start with a complete IHDR chunk.")
+            (
+                width,
+                height,
+                bit_depth,
+                color_type,
+                compression,
+                filter_method,
+                interlace,
+            ) = struct.unpack(">IIBBBBB", chunk_data)
+            if width <= 0 or height <= 0:
+                raise _image_bytes_invalid("PNG output has invalid dimensions.")
+            if bit_depth not in _PNG_BIT_DEPTHS.get(color_type, set()):
+                raise _image_bytes_invalid("PNG output has an invalid color type or bit depth.")
+            if compression != 0 or filter_method != 0 or interlace not in {0, 1}:
+                raise _image_bytes_invalid("PNG output has unsupported IHDR methods.")
+        elif kind == b"IHDR":
+            raise _image_bytes_invalid("PNG output contains more than one IHDR chunk.")
+
+        if kind == b"IDAT":
+            saw_idat = True
+        if kind == b"IEND":
+            if length != 0 or not saw_idat or chunk_end != len(payload):
+                raise _image_bytes_invalid("PNG output has an invalid IEND boundary.")
+            saw_iend = True
+        cursor = chunk_end
+        chunk_index += 1
+
+    if not saw_iend or width is None or height is None:
+        raise _image_bytes_invalid("PNG output is incomplete.")
+    return MeasuredPng(
+        sha256=hashlib.sha256(payload).hexdigest(),
+        size_bytes=len(payload),
+        mime_type="image/png",
+        width=width,
+        height=height,
+        bit_depth=bit_depth,
+        color_type=color_type,
+    )
+
+
+def validate_image_result(
+    request: ImageGenerationRequest,
+    authorization: ImageGenerationAuthorization,
+    result: ImageProviderResult,
+) -> tuple[MeasuredPng, ImageProvenanceReceipt]:
+    if authorization.request_fingerprint != request.request_fingerprint:
+        raise _image_scope_invalid("Image authorization does not match the request.")
+    if (
+        result.request_id != request.request_id
+        or result.request_fingerprint != request.request_fingerprint
+        or result.preview_fingerprint != authorization.preview_fingerprint
+        or result.authorization_fingerprint != authorization.authorization_fingerprint
+    ):
+        raise _image_scope_invalid("Image provider result does not match its request authorization.")
+
+    measured = _measure_png(result.image_bytes)
+    if (
+        measured.width != request.parameters.width
+        or measured.height != request.parameters.height
+    ):
+        raise _image_bytes_invalid(
+            "Image provider output dimensions do not match the request.",
+            f"expected={request.parameters.width}x{request.parameters.height}, "
+            f"measured={measured.width}x{measured.height}",
+        )
+    receipt = ImageProvenanceReceipt.create(
+        request_id=request.request_id,
+        request_fingerprint=request.request_fingerprint,
+        target_shot_id=request.target_shot_id,
+        target_asset_role=request.target_asset_role,
+        output_asset_id=request.output_asset_id,
+        adapter=result.adapter,
+        provider_request_id=result.provider_request_id,
+        output_sha256=measured.sha256,
+        output_size_bytes=measured.size_bytes,
+        output_mime_type=measured.mime_type,
+        output_width=measured.width,
+        output_height=measured.height,
+        usage_license=authorization.usage_license,
+        policy_receipt_id=authorization.policy_receipt_id,
+        references=request.references,
+        resource_evidence=result.resource_evidence,
+        remote=False,
+        cost_receipt_id=None,
+    )
+    return measured, receipt
 
 
 class ImageAssetProvider(Protocol):

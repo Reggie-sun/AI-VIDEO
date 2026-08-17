@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import hashlib
+import struct
+import zlib
 from pathlib import Path
 
 import pytest
@@ -13,7 +16,9 @@ from ai_video.production.image import (
     ImageProviderParameters,
     ImageProviderResult,
     ImageReferenceBinding,
+    validate_image_result,
 )
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
@@ -26,6 +31,26 @@ ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
 TWO_HASH = "2" * 64
 THREE_HASH = "3" * 64
+
+
+def _png_chunk(kind: bytes, payload: bytes) -> bytes:
+    checksum = zlib.crc32(kind + payload) & 0xFFFFFFFF
+    return struct.pack(">I", len(payload)) + kind + payload + struct.pack(">I", checksum)
+
+
+def _rgba_png(width: int, height: int) -> bytes:
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    row = b"\x00" + (b"\x00\x00\x00\xff" * width)
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + _png_chunk(b"IHDR", ihdr)
+        + _png_chunk(b"IDAT", zlib.compress(row * height))
+        + _png_chunk(b"IEND", b"")
+    )
+
+
+PNG_2X1_RGBA = _rgba_png(2, 1)
+PNG_WITH_TRUNCATED_IHDR = b"\x89PNG\r\n\x1a\n\x00\x00\x00\x0dIHDR\x00\x00"
 
 
 def make_image_request(**overrides: object) -> ImageGenerationRequest:
@@ -191,3 +216,51 @@ def test_image_result_rejects_changed_bytes_under_old_hash():
 
     with pytest.raises(ValidationError, match="image_sha256"):
         ImageProviderResult.model_validate(payload)
+
+
+def test_validate_image_result_uses_measured_png_dimensions_and_hash():
+    request = make_image_request(width=2, height=1)
+    authorization = make_authorization(request)
+    result = make_image_result(request, image_bytes=PNG_2X1_RGBA)
+
+    measured, receipt = validate_image_result(request, authorization, result)
+
+    assert (measured.width, measured.height) == (2, 1)
+    assert measured.sha256 == hashlib.sha256(PNG_2X1_RGBA).hexdigest()
+    assert measured.size_bytes == len(PNG_2X1_RGBA)
+    assert receipt.request_fingerprint == request.request_fingerprint
+    assert receipt.content_hash
+    assert receipt.resource_evidence == result.resource_evidence
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [b"not-png", PNG_WITH_TRUNCATED_IHDR, _rgba_png(1, 2)],
+)
+def test_validate_image_result_rejects_invalid_or_wrong_size_png(payload: bytes):
+    request = make_image_request(width=2, height=1)
+    authorization = make_authorization(request)
+    result = make_image_result(request, image_bytes=payload)
+
+    with pytest.raises(AiVideoError) as error:
+        validate_image_result(request, authorization, result)
+
+    assert error.value.code is ErrorCode.ASSET_REGISTRY_INVALID
+
+
+def test_image_provider_result_rejects_empty_bytes():
+    request = make_image_request()
+
+    with pytest.raises(ValidationError, match="image_bytes"):
+        make_image_result(request, image_bytes=b"")
+
+
+def test_validate_image_result_rejects_wrong_authorization_binding():
+    request = make_image_request()
+    other_request = make_image_request(prompt_text="A different shot prompt")
+    result = make_image_result(request, image_bytes=_rgba_png(512, 512))
+
+    with pytest.raises(AiVideoError) as error:
+        validate_image_result(request, make_authorization(other_request), result)
+
+    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
