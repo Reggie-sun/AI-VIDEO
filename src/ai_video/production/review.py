@@ -9,10 +9,15 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
     EvidenceStrength,
+    LoadedProductionProject,
+    MotionExpectation,
     QaLayer,
     QaPolicy,
     QaVerdict,
     ReviewEvidence,
+    ResolvedTimeline,
+    TechnicalReviewContext,
+    TechnicalReviewWindow,
     VisualStrategy,
 )
 
@@ -25,6 +30,106 @@ class ReviewIdentity:
     render_output_sha256: str
     timeline_fingerprint: str
     qa_policy_content_hash: str
+
+
+def build_technical_review_context(
+    bundle: LoadedProductionProject,
+    timeline: ResolvedTimeline,
+    *,
+    render_output_sha256: str,
+    measurement_contract_version: str,
+) -> TechnicalReviewContext:
+    """Derive complete Shot windows only from verified project/timeline truth."""
+    shots = {item.shot_id: item for item in bundle.shots}
+    grouped: dict[str, list[object]] = {}
+    order: list[str] = []
+    for span in sorted(timeline.visual_spans, key=lambda item: (item.start_frame, item.z_index)):
+        if span.shot_id not in grouped:
+            grouped[span.shot_id] = []
+            order.append(span.shot_id)
+        grouped[span.shot_id].append(span)
+    windows: list[TechnicalReviewWindow] = []
+    for shot_id in order:
+        shot = shots.get(shot_id)
+        spans = grouped[shot_id]
+        if shot is None or not spans:
+            raise ValueError("ResolvedTimeline contains an unknown or empty Shot window")
+        start_frame = min(item.start_frame for item in spans)
+        end_frame = max(item.start_frame + item.duration_frames for item in spans)
+        start_sample = min(item.start_sample for item in spans)
+        end_sample = max(item.start_sample + item.duration_samples for item in spans)
+        expects_audio = any(
+            item.start_sample < end_sample
+            and item.start_sample + item.duration_samples > start_sample
+            for item in timeline.audio_spans
+        )
+        expectation = None
+        if shot.visual_strategy in {
+            VisualStrategy.IMAGE_MOTION,
+            VisualStrategy.MOTION_GRAPHICS,
+        } and shot.motion_directives:
+            directive = shot.motion_directives[0]
+            expectation = MotionExpectation(
+                directive_kind=directive.kind,
+                directive_parameters_fingerprint=canonical_sha256(
+                    directive.parameters
+                ),
+                measurement_kind=(
+                    "layer_state_delta"
+                    if shot.visual_strategy is VisualStrategy.MOTION_GRAPHICS
+                    else "transform_delta"
+                ),
+                minimum_measured_delta_milli=1,
+                tolerance_milli=0,
+            )
+        windows.append(
+            TechnicalReviewWindow(
+                shot_id=shot_id,
+                visual_strategy=shot.visual_strategy,
+                start_frame=start_frame,
+                end_frame_exclusive=end_frame,
+                expects_audio=expects_audio,
+                visual_span_ids=tuple(sorted(item.layer_id for item in spans)),
+                motion_expectation=expectation,
+            )
+        )
+    if (
+        not windows
+        or windows[0].start_frame != 0
+        or windows[-1].end_frame_exclusive != timeline.total_frames
+        or any(
+            left.end_frame_exclusive != right.start_frame
+            for left, right in zip(windows, windows[1:])
+        )
+    ):
+        raise ValueError("Technical review windows must cover the exact timeline once")
+    return TechnicalReviewContext(
+        render_output_sha256=render_output_sha256,
+        timeline_fingerprint=timeline.composition_fingerprint,
+        windows=tuple(windows),
+        measurement_contract_version=measurement_contract_version,
+    )
+
+
+def validate_technical_review_context(
+    context: TechnicalReviewContext,
+    bundle: LoadedProductionProject,
+    timeline: ResolvedTimeline,
+    *,
+    render_output_sha256: str,
+) -> TechnicalReviewContext:
+    expected = build_technical_review_context(
+        bundle,
+        timeline,
+        render_output_sha256=render_output_sha256,
+        measurement_contract_version=context.measurement_contract_version,
+    )
+    if context != expected:
+        raise AiVideoError(
+            ErrorCode.PRODUCTION_STATE_INVALID,
+            "Technical review context does not match verified Shot/timeline truth.",
+        )
+    return context
 
 
 def review_desired_fingerprint(identity: ReviewIdentity, layer: QaLayer) -> str:

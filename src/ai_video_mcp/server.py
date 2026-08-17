@@ -185,9 +185,6 @@ async def video_review(
     max_frames: Optional[int] = None,
     scene_threshold: Optional[float] = None,
     transcribe_audio: bool = False,
-    production_context: Optional[dict] = None,
-    production_project_path: Optional[str] = None,
-    production_review_request: Optional[dict] = None,
     ctx: Context = None,
 ) -> dict:
     """Review a rendered video and return actionable optimization hints for workflow/config/code iteration.
@@ -209,9 +206,6 @@ async def video_review(
             max_frames=max_frames,
             scene_threshold=scene_threshold,
             transcribe_audio=transcribe_audio,
-            production_context=production_context,
-            production_project_path=production_project_path,
-            production_review_request=production_review_request,
         )
     except Exception as e:
         return _handle_error(e)

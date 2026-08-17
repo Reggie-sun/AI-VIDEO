@@ -444,7 +444,7 @@ class TechnicalReviewWindow(StrictModel):
 class TechnicalReviewContext(StrictModel):
     render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
-    windows: tuple[TechnicalReviewWindow, ...]
+    windows: tuple[TechnicalReviewWindow, ...] = Field(min_length=1)
     measurement_contract_version: str = Field(min_length=1)
 
 

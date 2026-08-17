@@ -43,7 +43,9 @@ from ai_video.production.models import (
     StateCommitStatus,
     StateCommitAttempt,
     TechnicalReviewContext,
+    TechnicalReviewWindow,
     ToolIdentity,
+    VisualStrategy,
 )
 from ai_video.production.project import load_production_project, load_production_project_candidate
 from ai_video.production.registry import load_asset_registry
@@ -166,7 +168,14 @@ def test_review_request_is_consumed_once_before_analysis(tmp_path: Path) -> None
     context = TechnicalReviewContext(
         render_output_sha256="7" * 64,
         timeline_fingerprint="6" * 64,
-        windows=(),
+        windows=(TechnicalReviewWindow(
+            shot_id="shot-1",
+            visual_strategy=VisualStrategy.STATIC_IMAGE,
+            start_frame=0,
+            end_frame_exclusive=24,
+            expects_audio=False,
+            visual_span_ids=("visual-1",),
+        ),),
         measurement_contract_version="1",
     )
     request = seal_artifact(
@@ -229,18 +238,37 @@ def test_review_request_is_consumed_once_before_analysis(tmp_path: Path) -> None
         begun.model_dump_json(indent=2), encoding="utf-8"
     )
 
-    consumed = writer.consume_review_analysis_request(
+    def analyze(review_request, permit):
+        assert permit._consume_review_analysis_permit(
+            request_content_hash=review_request.content_hash,
+            render_output_sha256=review_request.render_output_sha256,
+            technical_context_hash=canonical_sha256(
+                review_request.technical_context.model_dump(mode="json")
+            ),
+        )
+        assert not permit._consume_review_analysis_permit(
+            request_content_hash=review_request.content_hash,
+            render_output_sha256=review_request.render_output_sha256,
+            technical_context_hash=canonical_sha256(
+                review_request.technical_context.model_dump(mode="json")
+            ),
+        )
+        return review_request
+
+    consumed = writer.run_review_analysis(
         review_request=pointer,
         expected_manifest_revision=begun.manifest_revision,
+        analyzer=analyze,
     )
     after = read_manifest(tmp_path)
     assert consumed == request
     assert after.attempts[-1].review_phase.value == "evidence"
 
     with pytest.raises(AiVideoError) as exc_info:
-        writer.consume_review_analysis_request(
+        writer.run_review_analysis(
             review_request=pointer,
             expected_manifest_revision=after.manifest_revision,
+            analyzer=analyze,
         )
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
 

@@ -138,6 +138,7 @@ from ai_video.production.project import (
     _verify_dependency_render_evidence,
     _verify_manifest_dependency_states,
     load_production_project_candidate,
+    load_production_project,
     load_qa_policy,
     load_review_receipt,
     load_review_request,
@@ -149,7 +150,10 @@ from ai_video.production.dependency import (
     resolve_dependency_state,
 )
 from ai_video.production.registry import registry_semantic_sha256
-from ai_video.production.review import adjudicate_review_evidence
+from ai_video.production.review import (
+    adjudicate_review_evidence,
+    validate_technical_review_context,
+)
 
 try:
     import fcntl
@@ -322,6 +326,38 @@ _TEMP_ATTEMPT_LABEL_LIMIT = 24
 _TEMP_FINAL_LABEL_LIMIT = 180
 _TEMP_DIGEST_LENGTH = 12
 _VOICE_PERMIT_TOKEN = object()
+_REVIEW_PERMIT_TOKEN = object()
+
+
+class _DurableReviewAnalysisPermit:
+    """Process-local one-use proof of a durable committer-owned review intent."""
+
+    __slots__ = ("_binding", "_durability_validator", "_consumed", "_lock")
+
+    def __init__(
+        self,
+        token: object,
+        *,
+        binding: dict[str, str],
+        durability_validator: Callable[[], bool],
+    ) -> None:
+        if token is not _REVIEW_PERMIT_TOKEN:
+            raise TypeError("Review analysis permits are minted only by ProductionStateCommitter.")
+        self._binding = dict(binding)
+        self._durability_validator = durability_validator
+        self._consumed = False
+        self._lock = threading.Lock()
+
+    def _consume_review_analysis_permit(self, **binding: str) -> bool:
+        with self._lock:
+            if (
+                self._consumed
+                or binding != self._binding
+                or not self._durability_validator()
+            ):
+                return False
+            self._consumed = True
+            return True
 
 
 class _DurableVoiceSubmitPermit:
@@ -1030,8 +1066,17 @@ class ProductionStateCommitter:
             ):
                 raise _state_invalid("Review Receipt does not match its durable request.")
             current_render = self._current_render_state(manifest)
+            bundle = load_production_project(self._project_root / "project.yaml")
+            timeline = self._current_resolved_timeline(current_render)
+            validate_technical_review_context(
+                request.technical_context,
+                bundle,
+                timeline,
+                render_output_sha256=current_render.output.file_sha256,
+            )
             if (
                 manifest.schema_version != "2.4"
+                or bundle.manifest != manifest
                 or manifest.active_qa_policy != receipt.qa_policy
                 or manifest.active_dependency_graph is None
                 or manifest.active_dependency_graph.revision_id
@@ -1185,13 +1230,14 @@ class ProductionStateCommitter:
             self._write_p6_manifest_atomic(updated)
             return self._read_manifest()
 
-    def consume_review_analysis_request(
+    def run_review_analysis(
         self,
         *,
         review_request: ReviewRequestPointer,
         expected_manifest_revision: int,
-    ) -> ReviewRequest:
-        """Atomically consume one durable review intent at the analyzer boundary."""
+        analyzer: Callable[[ReviewRequest, object], object],
+    ) -> object:
+        """Consume durable intent, mint one-use proof, then invoke evidence collection."""
         with self._exclusive_lock():
             manifest = self._read_manifest()
             attempt = next(
@@ -1228,7 +1274,20 @@ class ProductionStateCommitter:
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
             self._write_p6_manifest_atomic(updated)
-            return request
+            permit = _DurableReviewAnalysisPermit(
+                _REVIEW_PERMIT_TOKEN,
+                binding={
+                    "request_content_hash": request.content_hash,
+                    "render_output_sha256": request.render_output_sha256,
+                    "technical_context_hash": canonical_sha256(
+                        request.technical_context.model_dump(mode="json")
+                    ),
+                },
+                durability_validator=lambda: self._review_request_is_consumed(
+                    review_request
+                ),
+            )
+        return analyzer(request, permit)
 
     def record_approved_repair_receipt(
         self,
@@ -1677,6 +1736,44 @@ class ProductionStateCommitter:
         ):
             raise _state_invalid("Current render state identity is invalid.")
         return state
+
+    def _current_resolved_timeline(
+        self, render_state: RenderStateSnapshot
+    ) -> ResolvedTimeline:
+        pointer = render_state.timeline
+        snapshot = _read_regular_file_nofollow(
+            self._project_root / pointer.path,
+            contained_by=self._project_root / "state",
+        )
+        try:
+            timeline = ResolvedTimeline.model_validate_json(snapshot.data)
+        except (ValidationError, ValueError) as exc:
+            raise _state_invalid(
+                "Current ResolvedTimeline could not be reopened.", str(exc)
+            ) from exc
+        if (
+            snapshot.file_sha256 != pointer.file_sha256
+            or timeline.content_hash != pointer.content_hash
+            or timeline.revision != pointer.revision
+            or timeline.composition_fingerprint
+            != render_state.timeline_fingerprint
+            or not verify_artifact_hash(timeline)
+        ):
+            raise _state_invalid("Current ResolvedTimeline identity is invalid.")
+        return timeline
+
+    def _review_request_is_consumed(self, pointer: ReviewRequestPointer) -> bool:
+        try:
+            manifest = self._read_manifest()
+        except AiVideoError:
+            return False
+        return any(
+            item.operation == "review"
+            and item.status is StateCommitStatus.RUNNING
+            and item.review_phase is ReviewAttemptPhase.EVIDENCE
+            and item.review_request == pointer
+            for item in manifest.attempts
+        )
 
     def voice_attempt_paths(self, attempt_id: str) -> VoiceAttemptPaths:
         try:

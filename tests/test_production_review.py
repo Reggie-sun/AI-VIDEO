@@ -19,9 +19,12 @@ from ai_video.production.review import (
     adjudicate_layer,
     adjudicate_review_evidence,
     adjudicate_visual_motion,
+    build_technical_review_context,
     evaluate_final_acceptance,
     is_review_current,
+    validate_technical_review_context,
 )
+import production_project_factory as project_factory
 
 
 def identity(**changes: str) -> ReviewIdentity:
@@ -231,6 +234,68 @@ def test_static_and_explicit_low_motion_strategy_are_not_misclassified():
         motion_expectation=expectation,
         measured_delta_milli=7,
     ) is QaVerdict.FAIL
+
+
+def test_technical_context_is_derived_from_exact_shots_and_timeline(tmp_path):
+    project_factory.write_production_project(tmp_path)
+    inputs, applied = project_factory.make_p5_selective_rebuild_fixture(tmp_path)
+    context = build_technical_review_context(
+        inputs.project,
+        applied.timeline,
+        render_output_sha256=applied.render_state.output.file_sha256,
+        measurement_contract_version="1",
+    )
+
+    assert context.windows
+    assert context.windows[0].start_frame == 0
+    assert context.windows[-1].end_frame_exclusive == applied.timeline.total_frames
+    assert tuple(item.shot_id for item in context.windows) == tuple(
+        dict.fromkeys(item.shot_id for item in applied.timeline.visual_spans)
+    )
+    assert all(
+        item.visual_strategy
+        == next(shot.visual_strategy for shot in inputs.project.shots if shot.shot_id == item.shot_id)
+        for item in context.windows
+    )
+    assert validate_technical_review_context(
+        context,
+        inputs.project,
+        applied.timeline,
+        render_output_sha256=applied.render_state.output.file_sha256,
+    ) == context
+
+
+def test_technical_context_rejects_forged_strategy_or_missing_window(tmp_path):
+    project_factory.write_production_project(tmp_path)
+    inputs, applied = project_factory.make_p5_selective_rebuild_fixture(tmp_path)
+    context = build_technical_review_context(
+        inputs.project,
+        applied.timeline,
+        render_output_sha256=applied.render_state.output.file_sha256,
+        measurement_contract_version="1",
+    )
+    forged_window = context.windows[0].model_copy(
+        update={"visual_strategy": VisualStrategy.GENERATED_VIDEO}
+    )
+    forged = context.model_copy(
+        update={"windows": (forged_window, *context.windows[1:])}
+    )
+    missing = context.model_copy(update={"windows": context.windows[:-1]})
+
+    with pytest.raises(AiVideoError):
+        validate_technical_review_context(
+            forged,
+            inputs.project,
+            applied.timeline,
+            render_output_sha256=applied.render_state.output.file_sha256,
+        )
+    with pytest.raises(AiVideoError):
+        validate_technical_review_context(
+            missing,
+            inputs.project,
+            applied.timeline,
+            render_output_sha256=applied.render_state.output.file_sha256,
+        )
 
 
 def test_final_acceptance_fails_closed_for_stale_or_missing_pass():

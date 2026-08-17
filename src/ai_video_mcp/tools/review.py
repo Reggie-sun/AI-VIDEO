@@ -10,8 +10,8 @@ from ai_video.production.models import (
     TechnicalReviewContext,
     VisualStrategy,
 )
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production.project import load_production_project, load_review_request
-from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video_mcp.cache import AnalysisCache
 from ai_video_mcp.config import ServerConfig
 from ai_video_mcp.errors import McpError, McpErrorCode
@@ -232,6 +232,7 @@ def video_review(
     production_context: dict | None = None,
     production_project_path: str | None = None,
     production_review_request: dict | None = None,
+    production_analysis_permit: object | None = None,
 ) -> dict:
     p = _validate_video(video_path, config)
 
@@ -239,6 +240,7 @@ def video_review(
         production_context,
         production_project_path,
         production_review_request,
+        production_analysis_permit,
     )
     if any(item is not None for item in production_inputs):
         if any(item is None for item in production_inputs):
@@ -271,23 +273,17 @@ def video_review(
                 McpErrorCode.INVALID_PARAMETER,
                 "Production render output hash does not match review context",
             )
-        try:
-            consumed_request = ProductionStateCommitter(
-                bundle.root
-            ).consume_review_analysis_request(
-                review_request=request_pointer,
-                expected_manifest_revision=bundle.manifest.manifest_revision,
-            )
-        except Exception as exc:
+        consume_permit = getattr(
+            production_analysis_permit, "_consume_review_analysis_permit", None
+        )
+        if not callable(consume_permit) or not consume_permit(
+            request_content_hash=durable_request.content_hash,
+            render_output_sha256=actual_hash,
+            technical_context_hash=canonical_sha256(context.model_dump(mode="json")),
+        ):
             raise McpError(
                 McpErrorCode.INVALID_PARAMETER,
-                "Production ReviewRequest is not consumable",
-                detail=str(exc),
-            ) from exc
-        if consumed_request != durable_request:
-            raise McpError(
-                McpErrorCode.INVALID_PARAMETER,
-                "Production ReviewRequest changed before analysis",
+                "Production review requires an unused committer-issued analysis permit",
             )
         window_measurements: list[dict] = []
         frame_hashes: list[str] = []
