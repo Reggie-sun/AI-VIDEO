@@ -1146,7 +1146,7 @@ def test_image_r1_preserves_existing_25_attempt_history(tmp_path: Path) -> None:
     assert after.active_dependency_graph == before.active_dependency_graph
 
 
-def test_dependency_result_and_transition_paths_preserve_manifest_25_p6_fields(
+def test_dependency_result_preserves_manifest_25_and_generic_transition_rejects(
     tmp_path: Path,
 ) -> None:
     from ai_video.production.dependency import desired_fingerprints
@@ -1217,16 +1217,26 @@ def test_dependency_result_and_transition_paths_preserve_manifest_25_p6_fields(
         candidate_dependency_states=applied.dependency_states,
         expected_desired_fingerprints=desired_fingerprints(graph),
     )
-    checked_transition, checked_graph = writer._validate_dependency_transition(
-        applied,
-        expected_manifest_revision=applied.manifest_revision,
-        artifacts=(),
-        transition=transition,
-    )
-
     assert applied.schema_version == "2.5"
-    assert checked_transition == transition
-    assert checked_graph == graph
+    assert (
+        applied.active_project,
+        applied.active_registry,
+        applied.active_dependency_graph,
+        applied.active_render_state,
+    ) == (
+        image.active_project,
+        image.active_registry,
+        image.active_dependency_graph,
+        image.active_render_state,
+    )
+    assert applied.dependency_states != image.dependency_states
+    with pytest.raises(AiVideoError, match="requires Manifest 2.3"):
+        writer._validate_dependency_transition(
+            applied,
+            expected_manifest_revision=applied.manifest_revision,
+            artifacts=(),
+            transition=transition,
+        )
     assert (
         applied.active_qa_policy,
         applied.active_review_receipts,

@@ -1579,6 +1579,29 @@ def test_loader_accepts_two_sequential_selected_p7_candidates_without_writes(
     assert _tree_snapshot(tmp_path) == before
 
 
+def test_loader_rejects_old_image_placed_in_another_shot_after_replacement(
+    tmp_path,
+):
+    first = make_p7_committed_project(tmp_path)
+    fixture = append_p7_committed_candidate(
+        tmp_path,
+        first,
+        target_shot_id="shot-1",
+        extra_old_placement_shot_id="shot-2",
+    )
+    manifest_path = tmp_path / "state/manifest.json"
+    before = manifest_path.read_bytes()
+
+    with pytest.raises(AiVideoError) as load_error:
+        load_production_project(fixture["project_path"])
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).recover()
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert "placement provenance" in (load_error.value.technical_detail or "")
+    assert manifest_path.read_bytes() == before
+
+
 def test_loader_reopens_first_base_registry_in_two_p7_candidate_history(
     tmp_path,
 ):

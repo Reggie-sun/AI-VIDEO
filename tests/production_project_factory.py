@@ -2678,6 +2678,9 @@ def make_p7_committed_project(
 def append_p7_committed_candidate(
     root: Path,
     fixture: dict[str, object],
+    *,
+    target_shot_id: str = "shot-2",
+    extra_old_placement_shot_id: str | None = None,
 ) -> dict[str, object]:
     """Append a second exact selected image candidate to the P7 fixture."""
     from ai_video.production.dependency import (
@@ -2725,7 +2728,7 @@ def append_p7_committed_candidate(
         attempt_id="image-reader-attempt-2",
         provider_kind="fake-local",
         model_id="fixture-image-model-1",
-        target_shot_id="shot-2",
+        target_shot_id=target_shot_id,
         target_asset_role="still",
         prompt_text="Hero leaves the archive room",
         negative_prompt_text="blur, watermark",
@@ -2770,7 +2773,7 @@ def append_p7_committed_candidate(
         usage_license="fixture-only",
         policy_receipt_id="fixture-local-image-policy",
     )
-    png_bytes = _p7_png()
+    png_bytes = _p7_png(rgba=b"\x44\x55\x66\xff")
     result = ImageProviderResult.create(
         request=request,
         authorization=authorization,
@@ -2785,7 +2788,9 @@ def append_p7_committed_candidate(
         ),
     )
     measured, receipt = validate_image_result(request, authorization, result)
-    target_shot = next(item for item in current_project.shots if item.shot_id == "shot-2")
+    target_shot = next(
+        item for item in current_project.shots if item.shot_id == target_shot_id
+    )
     image_record = AssetRecord(
         asset_id=request.output_asset_id,
         asset_type=AssetType.IMAGE,
@@ -2847,6 +2852,52 @@ def append_p7_committed_candidate(
     candidate_shot_path = canonical_image_shot_revision_path(
         candidate_shot.revision, candidate_shot.content_hash
     )
+    extra_shot = None
+    extra_shot_path = None
+    if extra_old_placement_shot_id is not None:
+        if extra_old_placement_shot_id == target_shot_id:
+            raise ValueError("Extra P7 fixture placement must use another Shot.")
+        old_record = fixture["image_record"]
+        extra_base = next(
+            item
+            for item in current_project.shots
+            if item.shot_id == extra_old_placement_shot_id
+        )
+        extra_shot = seal_artifact(
+            extra_base.model_copy(
+                update={
+                    "revision": extra_base.revision + 1,
+                    "content_hash": ZERO_HASH,
+                    "creation_receipt_id": old_record.creation_receipt_id,
+                    "required_asset_roles": tuple(
+                        role.model_copy(update={"asset_ids": (old_record.asset_id,)})
+                        if role.role == request.target_asset_role
+                        else role
+                        for role in extra_base.required_asset_roles
+                    ),
+                }
+            )
+        )
+        extra_shot_path = canonical_image_shot_revision_path(
+            extra_shot.revision, extra_shot.content_hash
+        )
+    candidate_shots = {candidate_shot.artifact_id: candidate_shot}
+    candidate_shot_references = {
+        candidate_shot.artifact_id: ArtifactReference(
+            artifact_id=candidate_shot.artifact_id,
+            revision=candidate_shot.revision,
+            content_hash=candidate_shot.content_hash,
+            path=candidate_shot_path,
+        )
+    }
+    if extra_shot is not None and extra_shot_path is not None:
+        candidate_shots[extra_shot.artifact_id] = extra_shot
+        candidate_shot_references[extra_shot.artifact_id] = ArtifactReference(
+            artifact_id=extra_shot.artifact_id,
+            revision=extra_shot.revision,
+            content_hash=extra_shot.content_hash,
+            path=extra_shot_path,
+        )
     candidate_project_artifact = seal_artifact(
         current_project.project.model_copy(
             update={
@@ -2856,14 +2907,7 @@ def append_p7_committed_candidate(
                 "artifacts": current_project.project.artifacts.model_copy(
                     update={
                         "shots": tuple(
-                            ArtifactReference(
-                                artifact_id=candidate_shot.artifact_id,
-                                revision=candidate_shot.revision,
-                                content_hash=candidate_shot.content_hash,
-                                path=candidate_shot_path,
-                            )
-                            if item.artifact_id == candidate_shot.artifact_id
-                            else item
+                            candidate_shot_references.get(item.artifact_id, item)
                             for item in current_project.project.artifacts.shots
                         )
                     }
@@ -2890,7 +2934,7 @@ def append_p7_committed_candidate(
         update={
             "project": candidate_project_artifact,
             "shots": tuple(
-                candidate_shot if item.shot_id == candidate_shot.shot_id else item
+                candidate_shots.get(item.artifact_id, item)
                 for item in current_project.shots
             ),
             "registry": candidate_registry,
@@ -2950,6 +2994,16 @@ def append_p7_committed_candidate(
         target = root / relative_path
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(payload)
+    if extra_shot is not None and extra_shot_path is not None:
+        extra_target = root / extra_shot_path
+        extra_target.parent.mkdir(parents=True, exist_ok=True)
+        extra_target.write_bytes(
+            yaml.safe_dump(
+                extra_shot.model_dump(mode="json"),
+                sort_keys=True,
+                allow_unicode=True,
+            ).encode("utf-8")
+        )
     artifact_pairs = sorted(
         (path.as_posix(), hashlib.sha256(payload).hexdigest())
         for path, payload in evidence.items()

@@ -114,3 +114,39 @@ DONE — P7 image generation 现在具备 fail-closed crash recovery、精确成
 - `git diff --check`: clean。
 - compileall: passed。
 - 未使用网络、真实 Provider、merge、push 或 release。
+
+## Fix Round 2
+
+### Review Findings
+
+- `NEW-CORR-001`：Fix Round 1 只打开了 private generic 2.5 transition validator，但 downstream transaction/voice/render owners 尚未具备完整 2.5 contract。
+- `NEW-CORR-002`：historical proof 已正确绑定 immutable candidate Shot，但 current active selection 层尚未恢复每个 generated image 的 exact Shot/role/receipt placement 验证。
+
+### Corrections
+
+- `_validate_dependency_transition()` 恢复原有 Manifest `{2.3, 2.4}` boundary；本 Task 只保留 `_dependency_result_context()` 对 2.5 fixed-owner result 的支持，没有扩大 generic transaction、voice 或 render mutation surface。
+- 2.5 regression 现在证明：public `record_dependency_node_applied()` 成功且保持 schema、P6 fields、active Project/Registry/Graph/render pointer；dependency states 仅按 fixed-owner result 推进。相同 2.5 Manifest 携带 generic transition 时继续 fail closed。
+- `verify_active_image_evidence()` 现在为每个当前 generated image 枚举完整 placements，并要求唯一 placement 精确等于 durable request 的 `(target_shot_id, target_asset_role)`。
+- current role 必须只绑定该一个 asset，current Shot `creation_receipt_id` 必须等于 Registry asset receipt；cross-Shot、cross-role、multi-placement 或 receipt split-brain 均拒绝。
+- historical eight-artifact verifier 仍只验证 immutable candidate Shot，没有重新引入 same-role replacement recovery regression。
+
+### Negative Fixture And Proof
+
+新增 self-consistent sealed candidate fixture：
+
+- 第二个 candidate 合法替换同一 `shot-1/still`；
+- Project、两个 Shot revisions、Registry、Graph、dependency states 与 latest eight-artifact proof 全部重新 seal；
+- 同时把旧 generated asset 额外绑定到 `shot-2/still`，并使用旧 Registry receipt，使篡改不会提前落在简单 hash/receipt mismatch。
+
+Standard loader 在 current placement provenance gate fail closed；随后 public `recover()` 同样失败且 Manifest bytes/revision 完全不变。
+
+### Verification
+
+- Focused regressions: `2 passed in 1.48s`。
+- Task 10 required five-file suite: `480 passed in 188.91s`。
+- Structure, Project and Image E2E suite: `163 passed in 16.82s`。
+- Architecture Gate: PASS，`0` errors；仅已有 `src/ai_video/production/image.py +27 LOC` warning，本轮未修改该文件。
+- Pure `src/ai_video/production/dependency.py` diff from `6001879`: empty。
+- `git diff --check`: clean。
+- compileall: passed。
+- 未使用网络、真实 Provider、merge、push 或 release。

@@ -593,17 +593,25 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
         and item.image_phase == "activate"
     )
     assets_by_id = {item.asset_id: item for item in bundle.registry.assets}
-    active_asset_ids = {
-        asset_id
-        for shot in bundle.shots
-        for role in shot.required_asset_roles
-        for asset_id in role.asset_ids
-        if (
-            (asset := assets_by_id.get(asset_id)) is not None
-            and asset.asset_type is AssetType.IMAGE
-            and asset.source_kind is AssetSourceKind.GENERATED
-        )
-    }
+    active_placements: dict[str, list[tuple[str, str, tuple[str, ...], str | None]]] = {}
+    for shot in bundle.shots:
+        for role in shot.required_asset_roles:
+            for asset_id in role.asset_ids:
+                asset = assets_by_id.get(asset_id)
+                if (
+                    asset is not None
+                    and asset.asset_type is AssetType.IMAGE
+                    and asset.source_kind is AssetSourceKind.GENERATED
+                ):
+                    active_placements.setdefault(asset_id, []).append(
+                        (
+                            shot.shot_id,
+                            role.role,
+                            role.asset_ids,
+                            shot.creation_receipt_id,
+                        )
+                    )
+    active_asset_ids = set(active_placements)
     selected: dict[str, StateCommitAttempt] = {}
     for attempt in attempts:
         for asset_id in attempt.candidate_image_asset_ids:
@@ -619,6 +627,24 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
         )
     try:
         for asset_id, attempt in selected.items():
+            summary = attempt.image_request
+            asset = assets_by_id[asset_id]
+            placements = active_placements[asset_id]
+            if (
+                summary is None
+                or placements
+                != [
+                    (
+                        summary.target_shot_id,
+                        summary.target_asset_role,
+                        (asset_id,),
+                        asset.creation_receipt_id,
+                    )
+                ]
+            ):
+                raise ValueError(
+                    "active generated image placement provenance is inconsistent"
+                )
             verify_image_attempt_evidence(bundle, attempt)
 
         if selected:
