@@ -227,6 +227,168 @@ def selected_image_activation_state(manifest: ProductionManifest) -> tuple[objec
     )
 
 
+def _p7_attempts(manifest: ProductionManifest) -> tuple[StateCommitAttempt, ...]:
+    return tuple(
+        item for item in manifest.attempts if item.operation == "image_generation"
+    )
+
+
+def _make_manifest_25_voice_context(tmp_path: Path):
+    base_inputs = project_factory.make_p7_public_image_generation_base(tmp_path)
+    committer = ProductionStateCommitter(
+        tmp_path,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    )
+    request, preview, authorization = make_image_call_bundle(
+        tmp_path,
+        attempt_id="image-before-voice",
+    )
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate,
+                candidate_authorization,
+                project_factory._p7_png(),
+            )
+
+    before = committer.generate_image_asset(
+        request,
+        preview,
+        authorization,
+        _Provider(),
+    )
+    assert before.schema_version == "2.5"
+    return tmp_path, committer, before, base_inputs
+
+
+def _make_manifest_25_voice_base(
+    tmp_path: Path,
+) -> tuple[Path, ProductionStateCommitter, ProductionManifest]:
+    root, committer, before, _ = _make_manifest_25_voice_context(tmp_path)
+    return root, committer, before
+
+
+def _attach_manifest_25_voice_dependency_transition(
+    root: Path,
+    activation: StateCommitRequest,
+    base_inputs,
+    voice_request,
+) -> StateCommitRequest:
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+
+    manifest = read_manifest(root)
+    project_artifact = next(
+        item
+        for item in activation.artifacts
+        if item.relative_path == activation.next_project.path
+    )
+    registry_artifact = next(
+        item
+        for item in activation.artifacts
+        if item.relative_path == activation.next_registry.path
+    )
+    project = ProductionProject.model_validate(yaml.safe_load(project_artifact.payload))
+    registry = AssetRegistrySnapshot.model_validate_json(registry_artifact.payload)
+    candidate_manifest = manifest.model_copy(
+        update={
+            "active_project": activation.next_project,
+            "active_registry": activation.next_registry,
+        }
+    )
+    active_bundle = load_production_project(root / "project.yaml")
+    candidate_bundle = active_bundle.model_copy(
+        update={
+            "manifest": candidate_manifest,
+            "project": project,
+            "registry": registry,
+            "dependency_graph": None,
+            "render_state": None,
+        }
+    )
+    candidate_inputs = replace(
+        base_inputs,
+        project=candidate_bundle,
+        voice_requests=(voice_request,),
+    )
+    graph = build_production_dependency_graph(candidate_inputs)
+    states = resolve_dependency_state(
+        graph,
+        build_applied_dependency_evidence(candidate_inputs, None),
+    ).states
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=activation.expected_manifest_revision,
+        base_dependency_graph=manifest.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=states,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    graph_payload = _canonical_json_bytes(graph)
+    graph_artifact = PreparedArtifact(
+        transition.candidate_dependency_graph.path,
+        graph_payload,
+        hashlib.sha256(graph_payload).hexdigest(),
+    )
+    return replace(
+        activation,
+        artifacts=tuple(
+            sorted(
+                (*activation.artifacts, graph_artifact),
+                key=lambda item: item.relative_path.as_posix(),
+            )
+        ),
+        dependency_graph_transition=transition,
+    )
+
+
+def _make_manifest_25_voice_activation(
+    tmp_path: Path,
+) -> tuple[
+    Path,
+    ProductionStateCommitter,
+    ProductionManifest,
+    StateCommitRequest,
+    tuple[str, ...],
+    tuple[str, ...],
+]:
+    root, committer, before, base_inputs = _make_manifest_25_voice_context(tmp_path)
+    request = project_factory.make_voice_request(root)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    committer.begin_voice_generation(
+        request,
+        preview,
+        authorization,
+        dependency_transition_preparer_available=True,
+    )
+    committer.record_voice_submit_intent(request, preview, authorization)
+    submitted = read_manifest(root)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        root,
+        request,
+        authorization,
+        expected_manifest_revision=submitted.manifest_revision,
+        include_caption=True,
+    )
+    activation = _attach_manifest_25_voice_dependency_transition(
+        root,
+        activation,
+        base_inputs,
+        request,
+    )
+    caption_ids = (f"caption-{request.attempt_id}",)
+    return root, committer, before, activation, audio_ids, caption_ids
+
+
 def make_qa_policy(
     *, version: str = "1", repair_authorities: tuple[ActorIdentity, ...] = ()
 ) -> QaPolicy:
@@ -1146,7 +1308,7 @@ def test_image_r1_preserves_existing_25_attempt_history(tmp_path: Path) -> None:
     assert after.active_dependency_graph == before.active_dependency_graph
 
 
-def test_dependency_result_preserves_manifest_25_and_generic_transition_rejects(
+def test_dependency_result_and_generic_transition_support_manifest_25(
     tmp_path: Path,
 ) -> None:
     from ai_video.production.dependency import desired_fingerprints
@@ -1230,13 +1392,30 @@ def test_dependency_result_preserves_manifest_25_and_generic_transition_rejects(
         image.active_render_state,
     )
     assert applied.dependency_states != image.dependency_states
-    with pytest.raises(AiVideoError, match="requires Manifest 2.3"):
-        writer._validate_dependency_transition(
-            applied,
-            expected_manifest_revision=applied.manifest_revision,
-            artifacts=(),
-            transition=transition,
-        )
+    validated, reopened_graph = writer._validate_dependency_transition(
+        applied,
+        expected_manifest_revision=applied.manifest_revision,
+        artifacts=(),
+        transition=transition,
+    )
+
+    assert validated == transition
+    assert reopened_graph == graph
+    assert applied.schema_version == "2.5"
+    assert tuple(
+        item for item in applied.attempts if item.operation == "image_generation"
+    ) == tuple(
+        item for item in image.attempts if item.operation == "image_generation"
+    )
+    assert (
+        applied.active_project,
+        applied.active_registry,
+        applied.active_dependency_graph,
+    ) == (
+        image.active_project,
+        image.active_registry,
+        image.active_dependency_graph,
+    )
     assert (
         applied.active_qa_policy,
         applied.active_review_receipts,
@@ -1252,6 +1431,47 @@ def test_dependency_result_preserves_manifest_25_and_generic_transition_rejects(
         p6.repair_outcome_receipts,
         p6.final_acceptance_state,
     )
+
+
+def test_manifest_25_voice_intent_and_submit_preserve_p7_state(
+    tmp_path: Path,
+) -> None:
+    root, committer, before = _make_manifest_25_voice_base(tmp_path)
+    request = project_factory.make_voice_request(root)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+
+    intent = committer.begin_voice_generation(
+        request,
+        preview,
+        authorization,
+        dependency_transition_preparer_available=True,
+    )
+    permit = committer.record_voice_submit_intent(request, preview, authorization)
+    submitted = load_production_project(root / "project.yaml").manifest
+
+    assert intent.schema_version == submitted.schema_version == "2.5"
+    assert _p7_attempts(submitted) == _p7_attempts(before)
+    assert submitted.active_project == before.active_project
+    assert permit is not None
+
+
+def test_manifest_25_voice_activation_coactivates_exact_graph_and_preserves_p7_state(
+    tmp_path: Path,
+) -> None:
+    root, committer, before, activation, audio_ids, caption_ids = (
+        _make_manifest_25_voice_activation(tmp_path)
+    )
+    after = committer.activate_voice_assets(
+        activation,
+        audio_asset_ids=audio_ids,
+        caption_asset_ids=caption_ids,
+    )
+
+    assert after.schema_version == "2.5"
+    assert _p7_attempts(after) == _p7_attempts(before)
+    assert after.active_project == before.active_project
+    assert after.active_registry != before.active_registry
+    assert after.active_dependency_graph != before.active_dependency_graph
 
 
 def test_generate_image_asset_persists_candidate_then_atomically_activates(

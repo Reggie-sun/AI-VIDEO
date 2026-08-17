@@ -352,7 +352,7 @@ class _StateCommitDependencyMixin:
         artifacts: tuple[PreparedArtifact, ...],
         transition: DependencyGraphTransition | None,
     ) -> tuple[DependencyGraphTransition | None, DependencyGraphSnapshot | None]:
-        if manifest.schema_version not in {"2.3", "2.4"}:
+        if manifest.schema_version not in {"2.3", "2.4", "2.5"}:
             if transition is not None:
                 raise _state_invalid(
                     "Dependency graph transition requires Manifest 2.3."
