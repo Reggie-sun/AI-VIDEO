@@ -1273,6 +1273,104 @@ def test_generate_image_asset_persists_candidate_then_atomically_activates(
     assert lifecycle_by_id["asset:image-shot-2"] is DependencyLifecycle.FRESH
 
 
+def test_generate_image_asset_exact_replay_has_zero_external_or_write_work(
+    tmp_path: Path,
+) -> None:
+    """Removing the pre-write replay branch must make this counter proof fail."""
+
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+    provider_calls = 0
+    preparer_calls = 0
+    manifest_writes = 0
+    prepare = project_factory.make_p7_image_candidate_preparer(base_inputs)
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            nonlocal provider_calls
+            provider_calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    def counted_prepare(*args):
+        nonlocal preparer_calls
+        preparer_calls += 1
+        return prepare(*args)
+
+    class _CountingCommitter(ProductionStateCommitter):
+        def _write_manifest_atomic(self, manifest, *, on_replace=None):
+            nonlocal manifest_writes
+            manifest_writes += 1
+            return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    writer = _CountingCommitter(
+        tmp_path,
+        image_candidate_preparer=counted_prepare,
+    )
+    first = writer.generate_image_asset(request, preview, authorization, _Provider())
+    provider_calls = preparer_calls = manifest_writes = 0
+
+    replay = writer.generate_image_asset(request, preview, authorization, _Provider())
+
+    assert replay == first
+    assert (provider_calls, preparer_calls, manifest_writes) == (0, 0, 0)
+
+
+def test_generate_image_asset_exact_replay_rejects_tampered_preview_without_work(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    provider_calls = 0
+    preparer_calls = 0
+    manifest_writes = 0
+    prepare = project_factory.make_p7_image_candidate_preparer(base_inputs)
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            nonlocal provider_calls
+            provider_calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, project_factory._p7_png()
+            )
+
+    def counted_prepare(*args):
+        nonlocal preparer_calls
+        preparer_calls += 1
+        return prepare(*args)
+
+    class _CountingCommitter(ProductionStateCommitter):
+        def _write_manifest_atomic(self, manifest, *, on_replace=None):
+            nonlocal manifest_writes
+            manifest_writes += 1
+            return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    writer = _CountingCommitter(
+        tmp_path, image_candidate_preparer=counted_prepare
+    )
+    writer.generate_image_asset(request, preview, authorization, _Provider())
+    provider_calls = preparer_calls = manifest_writes = 0
+    (tmp_path / canonical_image_preview_path(preview.preview_fingerprint)).write_bytes(
+        b"{}\n"
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.generate_image_asset(request, preview, authorization, _Provider())
+
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
+    assert (provider_calls, preparer_calls, manifest_writes) == (0, 0, 0)
+
+
 def test_generate_image_asset_rejects_nonlocal_evidence_before_provider_call(
     tmp_path: Path,
 ) -> None:
@@ -1360,7 +1458,7 @@ def test_generate_image_asset_requires_provider_to_consume_exact_permit(
 
     after = read_manifest(tmp_path)
     assert provider.calls == 1
-    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
     assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
     assert after.attempts[-1].image_phase == "provider_call"
     assert selected_image_activation_state(after) == selected_before
@@ -1396,7 +1494,7 @@ def test_generate_image_asset_provider_exception_is_outcome_unknown(
     after = read_manifest(tmp_path)
     attempt = after.attempts[-1]
     assert provider.calls == 1
-    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
     assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
     assert attempt.image_phase == "provider_call"
     assert "provider transport ended ambiguously" not in attempt.error_message
@@ -1431,7 +1529,7 @@ def test_generate_image_asset_rejects_post_submit_evidence_drift(
 
     after = read_manifest(tmp_path)
     attempt = after.attempts[-1]
-    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
     assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
     assert attempt.image_phase == "provider_call"
     assert selected_image_activation_state(after) == selected_before
@@ -1477,7 +1575,7 @@ def test_generate_image_asset_rechecks_consumed_r2_inside_activation_lock(
 
     after = read_manifest(tmp_path)
     assert provider.calls == 1
-    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
     assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
     assert after.attempts[-1].image_phase == "materialize"
     assert after.attempts[-1].candidate_project is None
@@ -1528,7 +1626,7 @@ def test_generate_image_asset_rejects_invalid_preparer_without_activation(
 
     after = read_manifest(tmp_path)
     assert provider.calls == 1
-    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
     assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
     assert after.attempts[-1].image_phase == "materialize"
     assert (after.active_project, after.active_registry, after.active_dependency_graph) == (
@@ -1589,7 +1687,7 @@ def test_generate_image_asset_failure_after_candidate_keeps_candidate_inactive(
     after = read_manifest(tmp_path)
     attempt = after.attempts[-1]
     assert provider.calls == 1
-    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
     assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
     assert attempt.status is not StateCommitStatus.SUCCEEDED
     assert attempt.image_phase == "candidate"
@@ -3162,6 +3260,13 @@ def test_commit_contract_types_are_frozen_and_expose_all_phases() -> None:
         CommitPhase.AFTER_VOICE_PROVIDER_RESULT,
         CommitPhase.AFTER_VOICE_CANDIDATE_MANIFEST,
         CommitPhase.AFTER_VOICE_FINAL_MANIFEST_REPLACE,
+        CommitPhase.BEFORE_IMAGE_PROVIDER_CALL,
+        CommitPhase.AFTER_IMAGE_PERMIT_CONSUMED,
+        CommitPhase.AFTER_IMAGE_PROVIDER_RESULT,
+        CommitPhase.AFTER_IMAGE_CANDIDATE_MANIFEST_REPLACE,
+        CommitPhase.AFTER_IMAGE_CANDIDATE_MANIFEST_VERIFICATION,
+        CommitPhase.AFTER_IMAGE_FINAL_MANIFEST_REPLACE,
+        CommitPhase.AFTER_IMAGE_FINAL_MANIFEST_VERIFICATION,
     )
     assert NoopCrashInjector().checkpoint(CommitPhase.AFTER_ATTEMPT_STARTED) is None
 

@@ -510,6 +510,69 @@ def _verify_candidate_artifacts_hash(
         raise ValueError("image candidate artifact hash mismatch")
 
 
+def verify_image_attempt_evidence(
+    bundle: LoadedProductionProject,
+    attempt: StateCommitAttempt,
+) -> tuple[tuple[Path, str], ...]:
+    """Reopen the one authoritative eight-artifact P7 candidate proof."""
+
+    if (
+        attempt.operation != "image_generation"
+        or attempt.image_request is None
+        or attempt.candidate_project is None
+        or attempt.candidate_registry is None
+        or attempt.candidate_dependency_graph is None
+        or attempt.candidate_dependency_states_hash is None
+        or len(attempt.candidate_image_asset_ids) != 1
+    ):
+        raise _invalid("P7 image candidate evidence identity is incomplete.")
+    asset_id = attempt.candidate_image_asset_ids[0]
+    assets_by_id = {item.asset_id: item for item in bundle.registry.assets}
+    asset = assets_by_id.get(asset_id)
+    if asset is None:
+        raise _invalid("P7 image candidate asset is absent from its Registry.")
+    try:
+        candidate_project, project_sha256 = _read_candidate_project(bundle, attempt)
+        candidate_registry, registry_sha256 = _read_candidate_registry(
+            bundle, attempt
+        )
+        _, graph_sha256 = _read_candidate_graph(bundle, attempt)
+        base_project = _read_base_project(bundle, attempt)
+        base_registry = _read_base_registry(bundle, attempt)
+        if (
+            attempt.candidate_image_asset_ids != (asset_id,)
+            or len(candidate_registry.assets) != len(base_registry.assets) + 1
+            or candidate_registry.assets[:-1] != base_registry.assets
+            or candidate_registry.assets[-1] != asset
+            or bundle.registry.assets[: len(candidate_registry.assets)]
+            != candidate_registry.assets
+            or candidate_project.creation_receipt_id != asset.creation_receipt_id
+        ):
+            raise ValueError("selected image candidate history is not retained")
+        evidence_pairs = _verify_evidence(
+            bundle,
+            attempt,
+            asset,
+            candidate_project,
+            base_project,
+            base_registry,
+        )
+        pairs = (
+            *evidence_pairs,
+            (attempt.candidate_project.path, project_sha256),
+            (attempt.candidate_registry.path, registry_sha256),
+            (attempt.candidate_dependency_graph.path, graph_sha256),
+        )
+        _verify_candidate_artifacts_hash(attempt, pairs)
+        return pairs
+    except (AiVideoError, OSError, UnicodeError, ValidationError, ValueError) as exc:
+        detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
+        raise _invalid(
+            "P7 image candidate history or reference provenance is invalid.",
+            detail,
+        ) from exc
+
+
 def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
     if bundle.manifest.schema_version != "2.5":
         return
@@ -547,41 +610,7 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
         )
     try:
         for asset_id, attempt in selected.items():
-            candidate_project, project_sha256 = _read_candidate_project(bundle, attempt)
-            candidate_registry, registry_sha256 = _read_candidate_registry(
-                bundle, attempt
-            )
-            _, graph_sha256 = _read_candidate_graph(bundle, attempt)
-            base_project = _read_base_project(bundle, attempt)
-            base_registry = _read_base_registry(bundle, attempt)
-            asset = assets_by_id[asset_id]
-            if (
-                attempt.candidate_image_asset_ids != (asset_id,)
-                or len(candidate_registry.assets) != len(base_registry.assets) + 1
-                or candidate_registry.assets[:-1] != base_registry.assets
-                or candidate_registry.assets[-1] != asset
-                or bundle.registry.assets[: len(candidate_registry.assets)]
-                != candidate_registry.assets
-                or candidate_project.creation_receipt_id != asset.creation_receipt_id
-            ):
-                raise ValueError("selected image candidate history is not retained")
-            evidence_pairs = _verify_evidence(
-                bundle,
-                attempt,
-                asset,
-                candidate_project,
-                base_project,
-                base_registry,
-            )
-            _verify_candidate_artifacts_hash(
-                attempt,
-                (
-                    *evidence_pairs,
-                    (attempt.candidate_project.path, project_sha256),
-                    (attempt.candidate_registry.path, registry_sha256),
-                    (attempt.candidate_dependency_graph.path, graph_sha256),
-                ),
-            )
+            verify_image_attempt_evidence(bundle, attempt)
 
         if selected:
             latest = max(selected.values(), key=lambda item: item.base_manifest_revision)

@@ -29,6 +29,9 @@ from production_project_factory import (  # noqa: E402
     make_manifest_23_project,
     make_p5_dependency_inputs,
     make_p5_bootstrap_transition,
+    make_p7_image_candidate_preparer,
+    make_p7_image_generation_base,
+    _p7_png,
     make_revision_two_request,
     make_voice_activation_request,
     make_voice_preview_and_authorization,
@@ -38,6 +41,10 @@ from test_production_hyperframes import (  # noqa: E402
     FakeRunner,
     make_asset_sources,
     make_resolved_timeline,
+)
+from test_production_state_commit import (  # noqa: E402
+    make_image_call_bundle,
+    make_image_provider_result,
 )
 
 
@@ -61,6 +68,26 @@ def main() -> int:
     if occurrence < 1:
         raise ValueError("phase occurrence must be positive")
     mode = sys.argv[4] if len(sys.argv) > 4 else "project_commit"
+    if mode == "image":
+        base_inputs = make_p7_image_generation_base(root)
+        request, preview, authorization = make_image_call_bundle(root)
+
+        class _Provider:
+            def generate(self, candidate, candidate_authorization, permit):
+                if not permit._consume_image_generation_permit(
+                    request_fingerprint=candidate.request_fingerprint
+                ):
+                    raise AssertionError("image worker permit was not consumable")
+                return make_image_provider_result(
+                    candidate, candidate_authorization, _p7_png()
+                )
+
+        ProductionStateCommitter(
+            root,
+            crash_injector=ExitInjector(phase, occurrence),
+            image_candidate_preparer=make_p7_image_candidate_preparer(base_inputs),
+        ).generate_image_asset(request, preview, authorization, _Provider())
+        return 0
     if mode == "graph_bootstrap":
         graph, transition, desired = make_p5_bootstrap_transition(root)
         ProductionStateCommitter(

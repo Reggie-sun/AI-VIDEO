@@ -163,6 +163,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         "_StateCommitRenderSupportMixin",
         "_StateCommitDependencyMixin",
         "_StateCommitRecoveryMixin",
+        "_StateCommitImageRecoveryMixin",
         "_StateCommitRecoveryAttemptsMixin",
         "_StateCommitRecoveryFsMixin",
         "_StateCommitTransactionMixin",

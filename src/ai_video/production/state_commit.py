@@ -213,6 +213,7 @@ from ._state_commit_dependency import _StateCommitDependencyMixin
 from ._state_commit_image_activation import _StateCommitImageActivationMixin
 from ._state_commit_image_candidate import _StateCommitImageCandidateMixin
 from ._state_commit_image_intent import _StateCommitImageIntentMixin
+from ._state_commit_image_recovery import _StateCommitImageRecoveryMixin
 from ._state_commit_repair import _StateCommitRepairMixin
 from ._state_commit_render_lifecycle import _StateCommitRenderLifecycleMixin
 from ._state_commit_render_support import _StateCommitRenderSupportMixin
@@ -251,6 +252,7 @@ class ProductionStateCommitter(
     _StateCommitRenderSupportMixin,
     _StateCommitDependencyMixin,
     _StateCommitRecoveryMixin,
+    _StateCommitImageRecoveryMixin,
     _StateCommitRecoveryAttemptsMixin,
     _StateCommitRecoveryFsMixin,
     _StateCommitTransactionMixin,

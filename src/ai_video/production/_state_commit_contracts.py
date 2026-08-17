@@ -217,6 +217,13 @@ class CommitPhase(str, Enum):
     AFTER_VOICE_PROVIDER_RESULT = "after_voice_provider_result"
     AFTER_VOICE_CANDIDATE_MANIFEST = "after_voice_candidate_manifest"
     AFTER_VOICE_FINAL_MANIFEST_REPLACE = "after_voice_final_manifest_replace"
+    BEFORE_IMAGE_PROVIDER_CALL = "before_image_provider_call"
+    AFTER_IMAGE_PERMIT_CONSUMED = "after_image_permit_consumed"
+    AFTER_IMAGE_PROVIDER_RESULT = "after_image_provider_result"
+    AFTER_IMAGE_CANDIDATE_MANIFEST_REPLACE = "after_image_candidate_manifest_replace"
+    AFTER_IMAGE_CANDIDATE_MANIFEST_VERIFICATION = "after_image_candidate_manifest_verification"
+    AFTER_IMAGE_FINAL_MANIFEST_REPLACE = "after_image_final_manifest_replace"
+    AFTER_IMAGE_FINAL_MANIFEST_VERIFICATION = "after_image_final_manifest_verification"
 
 
 class CrashInjector(Protocol):
@@ -320,6 +327,7 @@ class _DurableImageSubmitPermit:
         "_manifest_revision",
         "_manifest_file_sha256",
         "_durability_validator",
+        "_consume_callback",
         "_consumed",
         "_lock",
     )
@@ -341,6 +349,7 @@ class _DurableImageSubmitPermit:
         self._manifest_revision = manifest_revision
         self._manifest_file_sha256 = manifest_file_sha256
         self._durability_validator = durability_validator
+        self._consume_callback: Callable[[], None] | None = None
         self._consumed = False
         self._lock = threading.Lock()
 
@@ -362,7 +371,17 @@ class _DurableImageSubmitPermit:
             ):
                 return False
             self._consumed = True
+            if self._consume_callback is not None:
+                self._consume_callback()
             return True
+
+    def _set_image_generation_consume_callback(
+        self, callback: Callable[[], None]
+    ) -> None:
+        with self._lock:
+            if self._consumed or self._consume_callback is not None:
+                raise RuntimeError("Image permit consume checkpoint is already bound.")
+            self._consume_callback = callback
 
     def _image_generation_was_consumed(
         self, *, request_fingerprint: str

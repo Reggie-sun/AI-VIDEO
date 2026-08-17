@@ -13,6 +13,7 @@ from ai_video.production.models import (
     StateCommitAttempt,
     StateCommitStatus,
 )
+from ai_video.production.paths import canonical_image_submit_intent_path
 
 from ._state_commit_common import (
     _candidate_artifacts_hash,
@@ -22,17 +23,17 @@ from ._state_commit_common import (
     _timestamp,
     _validated_transition,
 )
-from ._state_commit_contracts import _DurableImageSubmitPermit
+from ._state_commit_contracts import CommitPhase, _DurableImageSubmitPermit
 
 
 def _image_outcome_unknown(exc: BaseException, message: str) -> AiVideoError:
     if (
         isinstance(exc, AiVideoError)
-        and exc.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+        and exc.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
     ):
         return exc
     error = AiVideoError(
-        ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN,
+        ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN,
         message,
         type(exc).__name__,
         retryable=False,
@@ -51,10 +52,24 @@ class _StateCommitImageActivationMixin:
     ) -> ProductionManifest:
         """Invoke exactly one permitted local Provider call, then activate its result."""
 
+        replay = self._exact_image_replay(
+            request,
+            preview,
+            authorization,
+        )
+        if replay is not None:
+            return replay
         self.begin_image_generation(request, preview, authorization)
         permit = self.record_image_submit_intent(request, preview, authorization)
+        permit._set_image_generation_consume_callback(
+            lambda: self._crash_injector.checkpoint(
+                CommitPhase.AFTER_IMAGE_PERMIT_CONSUMED
+            )
+        )
         try:
+            self._crash_injector.checkpoint(CommitPhase.BEFORE_IMAGE_PROVIDER_CALL)
             result = provider.generate(request, authorization, permit)
+            self._crash_injector.checkpoint(CommitPhase.AFTER_IMAGE_PROVIDER_RESULT)
         except Exception as exc:
             self._record_image_outcome_unknown(
                 request.attempt_id,
@@ -87,6 +102,85 @@ class _StateCommitImageActivationMixin:
             result,
             permit,
         )
+
+    def _exact_image_replay(
+        self,
+        request: ImageGenerationRequest,
+        preview: ImageGenerationPreview,
+        authorization: ImageGenerationAuthorization,
+    ) -> ProductionManifest | None:
+        """Return a fully proven active success before the first durable write."""
+
+        receipt = self._image_receipt(request, preview, authorization)
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            matching = tuple(
+                item
+                for item in manifest.attempts
+                if item.operation == "image_generation"
+                and item.image_request is not None
+                and item.image_request.request_fingerprint
+                == request.request_fingerprint
+            )
+            if not matching:
+                return None
+            if len(matching) != 1:
+                raise _image_outcome_unknown(
+                    ValueError("ambiguous image replay evidence"),
+                    "Image generation outcome is ambiguous; blind retry is forbidden.",
+                )
+            attempt = matching[0]
+            if (
+                attempt.status is not StateCommitStatus.SUCCEEDED
+                or attempt.image_phase != "activate"
+                or attempt.image_request != receipt
+                or attempt.base_project != request.base_project
+                or attempt.base_registry != request.base_registry
+                or attempt.base_dependency_graph != request.base_dependency_graph
+                or attempt.candidate_project != manifest.active_project
+                or attempt.candidate_registry != manifest.active_registry
+                or attempt.candidate_dependency_graph
+                != manifest.active_dependency_graph
+                or attempt.candidate_dependency_states_hash
+                != _dependency_states_hash(manifest.dependency_states)
+                or attempt.candidate_image_asset_ids != (request.output_asset_id,)
+            ):
+                raise _image_outcome_unknown(
+                    ValueError("non-current or terminal image replay evidence"),
+                    "Image generation outcome is unresolved; blind retry is forbidden.",
+                )
+            try:
+                loaded = self._load_production_project(
+                    self._project_root / "project.yaml"
+                )
+                if loaded.manifest != manifest:
+                    raise ValueError("active image replay Manifest changed during reopen")
+                expected_r1 = self._expected_image_r1_artifacts(
+                    request, preview, authorization
+                )
+                expected_intent = self._image_prepared_artifact(
+                    request.attempt_id,
+                    canonical_image_submit_intent_path(
+                        request.request_fingerprint
+                    ),
+                    self._image_submit_intent_payload(
+                        request,
+                        preview,
+                        authorization,
+                        evidence_hash=_candidate_artifacts_hash(expected_r1),
+                    ),
+                )
+                reopened = self._reopen_image_evidence(
+                    request, preview, authorization, include_intent=True
+                )
+                if reopened != (*expected_r1, expected_intent):
+                    raise ValueError("durable image replay request evidence is not exact")
+            except (AiVideoError, OSError, ValueError) as exc:
+                raise _image_outcome_unknown(
+                    exc,
+                    "Image generation success cannot be replayed safely.",
+                ) from exc
+            return manifest
 
     def activate_image_asset(
         self,
@@ -248,12 +342,20 @@ class _StateCommitImageActivationMixin:
                     ),
                 },
             )
-            self._write_manifest_atomic(candidate_manifest)
+            self._write_manifest_atomic(
+                candidate_manifest,
+                on_replace=lambda: self._crash_injector.checkpoint(
+                    CommitPhase.AFTER_IMAGE_CANDIDATE_MANIFEST_REPLACE
+                ),
+            )
             reopened_candidate = self._read_manifest()
             if reopened_candidate != candidate_manifest:
                 raise _state_invalid(
                     "Image candidate Manifest reopen verification failed."
                 )
+            self._crash_injector.checkpoint(
+                CommitPhase.AFTER_IMAGE_CANDIDATE_MANIFEST_VERIFICATION
+            )
 
             final = _validated_transition(
                 reopened_candidate,
@@ -274,6 +376,9 @@ class _StateCommitImageActivationMixin:
 
             def mark_replaced() -> None:
                 final_replaced[0] = True
+                self._crash_injector.checkpoint(
+                    CommitPhase.AFTER_IMAGE_FINAL_MANIFEST_REPLACE
+                )
 
             self._write_manifest_atomic(final, on_replace=mark_replaced)
             reopened = self._read_manifest()
@@ -281,6 +386,9 @@ class _StateCommitImageActivationMixin:
                 raise _state_invalid(
                     "Image final Manifest reopen verification failed."
                 )
+            self._crash_injector.checkpoint(
+                CommitPhase.AFTER_IMAGE_FINAL_MANIFEST_VERIFICATION
+            )
             selected = self._load_production_project(
                 self._project_root / "project.yaml"
             )
@@ -354,7 +462,7 @@ class _StateCommitImageActivationMixin:
                     "status": StateCommitStatus.OUTCOME_UNKNOWN,
                     "image_phase": phase,
                     "finished_at": _timestamp(),
-                    "error_code": ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN.value,
+                    "error_code": ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN.value,
                     "error_message": detail[-2_048:],
                 },
             )

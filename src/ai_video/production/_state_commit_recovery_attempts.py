@@ -43,6 +43,14 @@ class _StateCommitRecoveryAttemptsMixin:
             }:
                 repaired.append(attempt)
                 continue
+            if attempt.operation == "image_generation":
+                replacement, image_items = self._recover_image_attempt(
+                    manifest, attempt
+                )
+                repaired.append(replacement)
+                items.extend(image_items)
+                changed = changed or replacement != attempt
+                continue
             if attempt.operation == "review":
                 if attempt.review_request is None:
                     raise _state_invalid("Interrupted review attempt has no request.")
@@ -72,7 +80,7 @@ class _StateCommitRecoveryAttemptsMixin:
             if attempt.operation == "bootstrap_dependency_graph":
                 if (
                     attempt.base_dependency_graph is None
-                    and manifest.schema_version in {"2.3", "2.4"}
+                    and manifest.schema_version in {"2.3", "2.4", "2.5"}
                     and manifest.active_dependency_graph is not None
                     and manifest.active_dependency_graph
                     != attempt.candidate_dependency_graph
