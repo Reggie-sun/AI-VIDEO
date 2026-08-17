@@ -12,6 +12,7 @@ import yaml
 
 from ai_video.config import load_yaml, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._image_project_reader import verify_active_image_evidence
 from ai_video.production.audio import (
     VoiceCallAuthorization,
     VoiceCostReceipt,
@@ -1769,9 +1770,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     registry_path = _resolve_candidate_registry_path(
         root, manifest.active_registry.path
     )
-    _verify_snapshot_file_hash(
-        project_path, manifest.active_project.file_sha256, "project"
-    )
+    _verify_snapshot_file_hash(project_path, manifest.active_project.file_sha256, "project")
     _verify_snapshot_file_hash(
         registry_path, manifest.active_registry.file_sha256, "registry"
     )
@@ -1781,19 +1780,20 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         manifest.active_project.path,
         manifest.active_registry.path,
     )
-    _verify_manifest_snapshot_identity(
-        bundle, manifest.active_project, manifest.active_registry
-    )
+    _verify_manifest_snapshot_identity(bundle, manifest.active_project, manifest.active_registry)
     _verify_active_voice_evidence(bundle)
+    verify_active_image_evidence(bundle)
     if manifest.active_dependency_graph is not None:
         dependency_graph = _load_active_dependency_graph(
             root, manifest.active_dependency_graph
         )
         _verify_manifest_dependency_states(bundle, dependency_graph)
         bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
-    if manifest.schema_version == "2.4":
+    if manifest.schema_version == "2.4" or (
+        manifest.schema_version == "2.5" and manifest.active_qa_policy is not None
+    ):
         if manifest.active_qa_policy is None:
-            raise _invalid("Manifest 2.4 requires an active QA policy.")
+            raise _invalid(f"Manifest {manifest.schema_version} requires an active QA policy.")
         qa_policy = load_qa_policy(root, manifest.active_qa_policy)
         current_render = (
             _load_exact_render_state(bundle, manifest.active_render_state)
@@ -1861,7 +1861,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     if manifest.active_render_state is not None:
         render_state = (
             _load_exact_render_state(bundle, manifest.active_render_state)
-            if manifest.schema_version in {"2.3", "2.4"}
+            if manifest.schema_version in {"2.3", "2.4", "2.5"}
             else load_verified_render_state(
                 root,
                 manifest.active_render_state,

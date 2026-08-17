@@ -4,6 +4,7 @@ import hashlib
 import io
 import json
 import struct
+import zlib
 from datetime import date
 import wave
 from dataclasses import replace
@@ -1936,3 +1937,479 @@ def make_revision_two_request(root: Path, *, attempt_id: str = "attempt-revision
         registry=registry,
         attempt_id=attempt_id,
     )
+
+
+def _p7_json_bytes(value: object) -> bytes:
+    return (
+        json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+
+
+def _p7_png(width: int = 2, height: int = 1) -> bytes:
+    def chunk(kind: bytes, payload: bytes) -> bytes:
+        checksum = zlib.crc32(kind + payload) & 0xFFFFFFFF
+        return (
+            struct.pack(">I", len(payload))
+            + kind
+            + payload
+            + struct.pack(">I", checksum)
+        )
+
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    row = b"\x00" + (b"\x11\x22\x33\xff" * width)
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", ihdr)
+        + chunk(b"IDAT", zlib.compress(row * height))
+        + chunk(b"IEND", b"")
+    )
+
+
+def make_p7_committed_project(root: Path) -> dict[str, object]:
+    """Materialize one exact Manifest 2.5 image activation without a writer."""
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        resolve_dependency_state,
+    )
+    from ai_video.production.image import (
+        ImageGenerationAuthorization,
+        ImageGenerationPreview,
+        ImageGenerationRequest,
+        ImageLocalResourceEvidence,
+        ImageProviderParameters,
+        ImageProviderResult,
+        ImageReferenceBinding,
+        validate_image_result,
+    )
+    from ai_video.production.models import (
+        DependencyGraphSnapshotPointer,
+        StateCommitAttempt,
+        StateCommitStatus,
+    )
+    from ai_video.production.paths import (
+        canonical_dependency_graph_snapshot_path,
+        canonical_image_asset_path,
+        canonical_image_receipt_path,
+        canonical_image_request_path,
+        canonical_image_result_path,
+    )
+
+    base_inputs = make_p5_dependency_inputs(root)
+    base_project = base_inputs.project
+    base_graph = build_production_dependency_graph(base_inputs)
+    base_states = resolve_dependency_state(base_graph, ()).states
+    base_graph_bytes = _p7_json_bytes(base_graph.model_dump(mode="json"))
+    base_graph_path = canonical_dependency_graph_snapshot_path(base_graph.revision_id)
+    (root / base_graph_path).write_bytes(base_graph_bytes)
+    base_graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=base_graph.revision_id,
+        content_hash=base_graph.content_hash,
+        path=base_graph_path,
+        file_sha256=hashlib.sha256(base_graph_bytes).hexdigest(),
+    )
+    base_manifest = base_project.manifest.model_copy(
+        update={
+            "schema_version": "2.3",
+            "manifest_revision": base_project.manifest.manifest_revision + 1,
+            "active_dependency_graph": base_graph_pointer,
+            "dependency_states": base_states,
+        }
+    )
+    base_project = base_project.model_copy(
+        update={"manifest": base_manifest, "dependency_graph": base_graph}
+    )
+    base_inputs = replace(base_inputs, project=base_project)
+
+    assets = {item.asset_id: item for item in base_project.registry.assets}
+    character = base_project.characters[0]
+    scene = base_project.scenes[0]
+    character_asset_id = character.reference_asset_ids[0]
+    scene_asset_id = scene.visual_reference_asset_ids[0]
+    request = ImageGenerationRequest.create(
+        attempt_id="image-reader-attempt-1",
+        provider_kind="fake-local",
+        model_id="fixture-image-model-1",
+        target_shot_id="shot-1",
+        target_asset_role="still",
+        prompt_text="Hero enters the archive room",
+        negative_prompt_text="blur, watermark",
+        parameters=ImageProviderParameters(
+            seed=7,
+            width=2,
+            height=1,
+            output_format="png",
+            generation_revision=1,
+        ),
+        references=(
+            ImageReferenceBinding(
+                role="character",
+                creative_artifact_id=character.artifact_id,
+                creative_revision=character.revision,
+                creative_content_hash=character.content_hash,
+                asset_id=character_asset_id,
+                asset_sha256=assets[character_asset_id].sha256,
+            ),
+            ImageReferenceBinding(
+                role="scene",
+                creative_artifact_id=scene.artifact_id,
+                creative_revision=scene.revision,
+                creative_content_hash=scene.content_hash,
+                asset_id=scene_asset_id,
+                asset_sha256=assets[scene_asset_id].sha256,
+            ),
+        ),
+        base_project=base_manifest.active_project,
+        base_registry=base_manifest.active_registry,
+        base_dependency_graph=base_graph_pointer,
+    )
+    preview = ImageGenerationPreview.create(
+        request=request,
+        reference_total_bytes=sum(
+            assets[item.asset_id].size_bytes for item in request.references
+        ),
+    )
+    authorization = ImageGenerationAuthorization.create(
+        request=request,
+        preview=preview,
+        usage_license="fixture-only",
+        policy_receipt_id="fixture-local-image-policy",
+    )
+    png_bytes = _p7_png()
+    result = ImageProviderResult.create(
+        request=request,
+        authorization=authorization,
+        image_bytes=png_bytes,
+        content_type="image/png",
+        provider_request_id="fixture-local-image-1",
+        adapter=ToolIdentity(name="fake-local-image", version="1"),
+        resource_evidence=ImageLocalResourceEvidence(
+            elapsed_milliseconds=3,
+            device_kind="cpu",
+            measured_peak_memory_bytes=4096,
+        ),
+    )
+    measured, receipt = validate_image_result(request, authorization, result)
+    image_record = AssetRecord(
+        asset_id=request.output_asset_id,
+        asset_type=AssetType.IMAGE,
+        artifact_path=canonical_image_asset_path(measured.sha256),
+        sha256=measured.sha256,
+        size_bytes=measured.size_bytes,
+        mime_type=measured.mime_type,
+        width=measured.width,
+        height=measured.height,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=result.adapter,
+        input_artifact_ids=(
+            base_project.shots[0].artifact_id,
+            *(
+                identity
+                for item in request.references
+                for identity in (item.creative_artifact_id, item.asset_id)
+            ),
+        ),
+        input_fingerprint=request.request_fingerprint,
+        creation_receipt_id=receipt.content_hash,
+        usage_license=authorization.usage_license,
+        egress=EgressMetadata(remote=False),
+    )
+    candidate_registry = base_project.registry.model_copy(
+        update={
+            "revision_id": ZERO_HASH,
+            "content_hash": ZERO_HASH,
+            "assets": (*base_project.registry.assets, image_record),
+        }
+    )
+    registry_hash = registry_semantic_sha256(candidate_registry)
+    candidate_registry = candidate_registry.model_copy(
+        update={"revision_id": registry_hash, "content_hash": registry_hash}
+    )
+    registry_bytes = _p7_json_bytes(candidate_registry.model_dump(mode="json"))
+    registry_path = Path(f"assets/registry.{registry_hash}.json")
+    registry_pointer = RegistrySnapshotPointer(
+        path=registry_path,
+        revision_id=registry_hash,
+        content_hash=registry_hash,
+        file_sha256=hashlib.sha256(registry_bytes).hexdigest(),
+    )
+
+    base_shot = next(item for item in base_project.shots if item.shot_id == "shot-1")
+    candidate_shot = seal_artifact(
+        base_shot.model_copy(
+            update={
+                "revision": base_shot.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "required_asset_roles": tuple(
+                    role.model_copy(update={"asset_ids": (request.output_asset_id,)})
+                    if role.role == request.target_asset_role
+                    else role
+                    for role in base_shot.required_asset_roles
+                ),
+            }
+        )
+    )
+    shot_reference = next(
+        item
+        for item in base_project.project.artifacts.shots
+        if item.artifact_id == candidate_shot.artifact_id
+    )
+    candidate_project_artifact = seal_artifact(
+        base_project.project.model_copy(
+            update={
+                "revision": base_project.project.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "artifacts": base_project.project.artifacts.model_copy(
+                    update={
+                        "shots": tuple(
+                            ArtifactReference(
+                                artifact_id=candidate_shot.artifact_id,
+                                revision=candidate_shot.revision,
+                                content_hash=candidate_shot.content_hash,
+                                path=shot_reference.path,
+                            )
+                            if item.artifact_id == candidate_shot.artifact_id
+                            else item
+                            for item in base_project.project.artifacts.shots
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    project_bytes = yaml.safe_dump(
+        candidate_project_artifact.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    project_path = Path(
+        f"state/projects/project.{candidate_project_artifact.revision}."
+        f"{candidate_project_artifact.content_hash}.yaml"
+    )
+    project_pointer = ProjectSnapshotPointer(
+        path=project_path,
+        revision=candidate_project_artifact.revision,
+        content_hash=candidate_project_artifact.content_hash,
+        file_sha256=hashlib.sha256(project_bytes).hexdigest(),
+    )
+    candidate_project = base_project.model_copy(
+        update={
+            "project": candidate_project_artifact,
+            "shots": tuple(
+                candidate_shot if item.shot_id == candidate_shot.shot_id else item
+                for item in base_project.shots
+            ),
+            "registry": candidate_registry,
+            "asset_paths": {
+                **base_project.asset_paths,
+                image_record.asset_id: root / image_record.artifact_path,
+            },
+            "manifest": base_manifest.model_copy(
+                update={
+                    "active_project": project_pointer,
+                    "active_registry": registry_pointer,
+                }
+            ),
+        }
+    )
+    candidate_inputs = replace(base_inputs, project=candidate_project)
+    candidate_graph = build_production_dependency_graph(candidate_inputs)
+    graph_bytes = _p7_json_bytes(candidate_graph.model_dump(mode="json"))
+    graph_path = canonical_dependency_graph_snapshot_path(candidate_graph.revision_id)
+    graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=candidate_graph.revision_id,
+        content_hash=candidate_graph.content_hash,
+        path=graph_path,
+        file_sha256=hashlib.sha256(graph_bytes).hexdigest(),
+    )
+    candidate_states = resolve_dependency_state(candidate_graph, base_states).states
+    states_hash = hashlib.sha256(
+        json.dumps(
+            [item.model_dump(mode="json") for item in candidate_states],
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+
+    request_path = canonical_image_request_path(request.request_fingerprint)
+    result_path = canonical_image_result_path(result.result_fingerprint)
+    receipt_path = canonical_image_receipt_path(receipt.content_hash)
+    request_bytes = _p7_json_bytes(request.model_dump(mode="json"))
+    result_bytes = _p7_json_bytes(
+        result.model_dump(mode="json", exclude={"image_bytes"})
+    )
+    receipt_bytes = _p7_json_bytes(receipt.model_dump(mode="json"))
+    shot_bytes = yaml.safe_dump(
+        candidate_shot.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    evidence = {
+        request_path: request_bytes,
+        result_path: result_bytes,
+        receipt_path: receipt_bytes,
+        image_record.artifact_path: png_bytes,
+        project_path: project_bytes,
+        registry_path: registry_bytes,
+        graph_path: graph_bytes,
+        shot_reference.path: shot_bytes,
+    }
+    for relative_path, payload in evidence.items():
+        target = root / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+    artifact_pairs = sorted(
+        (path.as_posix(), hashlib.sha256(payload).hexdigest())
+        for path, payload in evidence.items()
+    )
+    attempt = StateCommitAttempt(
+        attempt_id=request.attempt_id,
+        operation="image_generation",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=base_manifest.manifest_revision,
+        base_project=base_manifest.active_project,
+        base_registry=base_manifest.active_registry,
+        candidate_project=project_pointer,
+        candidate_registry=registry_pointer,
+        candidate_artifacts_hash=hashlib.sha256(
+            json.dumps(artifact_pairs, separators=(",", ":")).encode("utf-8")
+        ).hexdigest(),
+        image_request={
+            "request_id": request.request_id,
+            "attempt_id": request.attempt_id,
+            "request_fingerprint": request.request_fingerprint,
+            "provider_kind": request.provider_kind,
+            "model_id": request.model_id,
+            "target_shot_id": request.target_shot_id,
+            "target_asset_role": request.target_asset_role,
+            "output_asset_id": request.output_asset_id,
+            "preview_fingerprint": preview.preview_fingerprint,
+            "authorization_fingerprint": authorization.authorization_fingerprint,
+            "policy_receipt_id": authorization.policy_receipt_id,
+            "usage_license": authorization.usage_license,
+        },
+        image_phase="activate",
+        provider_request_id=result.provider_request_id,
+        candidate_image_asset_ids=(request.output_asset_id,),
+        base_dependency_graph=base_graph_pointer,
+        candidate_dependency_graph=graph_pointer,
+        candidate_dependency_states_hash=states_hash,
+        started_at="2026-08-18T00:00:00+00:00",
+        finished_at="2026-08-18T00:00:01+00:00",
+    )
+    manifest = base_manifest.model_copy(
+        update={
+            "schema_version": "2.5",
+            "manifest_revision": base_manifest.manifest_revision + 1,
+            "active_project": project_pointer,
+            "active_registry": registry_pointer,
+            "active_dependency_graph": graph_pointer,
+            "dependency_states": candidate_states,
+            "attempts": (attempt,),
+        }
+    )
+    (root / "state/manifest.json").write_text(
+        manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    return {
+        "project_path": root / "project.yaml",
+        "request": request,
+        "result": result,
+        "receipt": receipt,
+        "image_record": image_record,
+        "request_path": request_path,
+        "result_path": result_path,
+        "receipt_path": receipt_path,
+        "image_path": image_record.artifact_path,
+    }
+
+
+def mutate_p7_evidence(root: Path, fixture: dict[str, object], mutation: str) -> None:
+    if mutation == "png_bytes":
+        path = root / fixture["image_path"]
+        path.write_bytes(path.read_bytes()[:-1])
+        return
+    if mutation == "candidate_pointer":
+        path = root / "state/manifest.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["attempts"][0]["candidate_dependency_graph"]["file_sha256"] = "f" * 64
+        path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        return
+    key, field = {
+        "receipt_hash": ("receipt_path", "content_hash"),
+        "request_id": ("request_path", "request_id"),
+        "result_request_id": ("result_path", "request_id"),
+    }[mutation]
+    path = root / fixture[key]
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload[field] = "f" * 64
+    path.write_bytes(_p7_json_bytes(payload))
+
+
+def add_p6_policy_to_p7_project(root: Path) -> Path:
+    from ai_video.production.models import (
+        QaLayoutRules,
+        QaLayer,
+        QaPolicy,
+        QaPolicyPointer,
+        QaTechnicalThresholds,
+    )
+    from ai_video.production.paths import canonical_qa_policy_path
+
+    policy = seal_artifact(
+        QaPolicy(
+            artifact_id="qa-policy-p7-reader",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="qa-policy-p7-reader",
+            source_provenance=(
+                SourceReference(kind="derived", reference="p7-reader-fixture"),
+            ),
+            policy_id="qa-p7-reader",
+            policy_version="1",
+            required_layers=(QaLayer.TECHNICAL,),
+            technical_thresholds=QaTechnicalThresholds(
+                black_luma_max_milli=10,
+                silence_peak_max_millidb=-60_000,
+                clipping_peak_min_millidb=-100,
+            ),
+            layout_rules=QaLayoutRules(
+                safe_area_inset_milli=50,
+                caption_overflow_tolerance_milli=0,
+            ),
+            strategy_rules_version="1",
+            semantic_requirement="optional",
+        )
+    )
+    payload = _p7_json_bytes(policy.model_dump(mode="json"))
+    path = canonical_qa_policy_path(policy.content_hash)
+    target = root / path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(payload)
+    pointer = QaPolicyPointer(
+        path=path,
+        policy_id=policy.policy_id,
+        policy_version=policy.policy_version,
+        content_hash=policy.content_hash,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    manifest_path = root / "state/manifest.json"
+    manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes())
+    manifest_path.write_text(
+        manifest.model_copy(
+            update={
+                "manifest_revision": manifest.manifest_revision + 1,
+                "active_qa_policy": pointer,
+            }
+        ).model_dump_json(indent=2),
+        encoding="utf-8",
+    )
+    return target

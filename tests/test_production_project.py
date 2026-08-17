@@ -85,13 +85,16 @@ from ai_video.production.state_commit import (
 )
 from ai_video.production.project import _render_source_payload_matches
 from production_project_factory import (
+    add_p6_policy_to_p7_project,
     attach_p5_dependency_transition,
     load_revision_two_models,
     make_manifest_23_project,
+    make_p7_committed_project,
     make_p4_composition_fixture,
     make_voice_activation_request,
     make_voice_preview_and_authorization,
     make_voice_request,
+    mutate_p7_evidence,
     write_production_project,
 )
 
@@ -1070,6 +1073,78 @@ def test_reader_reopens_exact_generated_voice_graph_without_writes_or_network(
     )
     assert attempt.voice_phase == "activate"
     assert _tree_snapshot(tmp_path) == before
+
+
+@pytest.fixture
+def p7_committed_project(tmp_path):
+    return make_p7_committed_project(tmp_path)
+
+
+def test_loader_reopens_selected_p7_image_receipt_and_exact_png(
+    tmp_path, p7_committed_project, monkeypatch
+):
+    before = _tree_snapshot(tmp_path)
+
+    def reject_network(*_args, **_kwargs):
+        raise AssertionError("read-only P7 project load attempted network access")
+
+    monkeypatch.setattr(socket, "create_connection", reject_network)
+    loaded = load_production_project(p7_committed_project["project_path"])
+    image = next(
+        item
+        for item in loaded.registry.assets
+        if item.asset_id == p7_committed_project["image_record"].asset_id
+    )
+
+    assert image.source_kind is AssetSourceKind.GENERATED
+    assert image.creation_receipt_id == p7_committed_project["receipt"].content_hash
+    assert _tree_snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "receipt_hash",
+        "png_bytes",
+        "request_id",
+        "result_request_id",
+        "candidate_pointer",
+    ],
+)
+def test_loader_rejects_tampered_p7_evidence(
+    tmp_path, p7_committed_project, mutation
+):
+    mutate_p7_evidence(tmp_path, p7_committed_project, mutation)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(p7_committed_project["project_path"])
+
+    assert exc_info.value.retryable is False
+
+
+def test_loader_ignores_newer_p7_receipt_decoy(tmp_path, p7_committed_project):
+    decoy = tmp_path / "state/images/receipts" / f"{'f' * 64}.json"
+    decoy.write_text('{"decoy":true}\n', encoding="utf-8")
+    decoy.touch()
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(p7_committed_project["project_path"])
+
+    assert p7_committed_project["image_record"].asset_id in loaded.asset_paths
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_loader_runs_p6_verification_for_manifest_25_with_p7_state(
+    tmp_path, p7_committed_project
+):
+    policy_path = add_p6_policy_to_p7_project(tmp_path)
+    loaded = load_production_project(p7_committed_project["project_path"])
+    assert loaded.qa_policy is not None
+
+    policy_path.write_bytes(policy_path.read_bytes() + b" ")
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(p7_committed_project["project_path"])
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
 
 
 def test_reader_rejects_generated_voice_resealed_as_local_egress(tmp_path):
@@ -2104,8 +2179,9 @@ def _advance_active_project_and_registry(root: Path, attempt_id: str) -> None:
     )
 
 
+@pytest.mark.parametrize("schema_version", ["2.3", "2.5"])
 def test_manifest_23_reader_reopens_historical_render_pair_for_stale_evidence(
-    tmp_path,
+    tmp_path, schema_version
 ):
     activated, _, _ = _activate_fake_render(tmp_path)
     old_render = activated.active_render_state
@@ -2113,7 +2189,10 @@ def test_manifest_23_reader_reopens_historical_render_pair_for_stale_evidence(
     _advance_active_project_and_registry(tmp_path, "reader-new-active-pair")
     graph, states = _historical_render_graph_states(old_render)
     manifest = _select_manifest_23_graph(tmp_path, graph, states).model_copy(
-        update={"active_render_state": old_render}
+        update={
+            "schema_version": schema_version,
+            "active_render_state": old_render,
+        }
     )
     _write_manifest(tmp_path, manifest)
 
