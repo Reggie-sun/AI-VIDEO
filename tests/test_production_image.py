@@ -266,7 +266,7 @@ def test_validate_image_result_rejects_invalid_or_wrong_size_png(payload: bytes)
     with pytest.raises(AiVideoError) as error:
         validate_image_result(request, authorization, result)
 
-    assert error.value.code is ErrorCode.ASSET_REGISTRY_INVALID
+    assert error.value.code is ErrorCode.IMAGE_ASSET_INVALID
 
 
 def test_image_provider_result_rejects_empty_bytes():
@@ -284,7 +284,7 @@ def test_validate_image_result_rejects_wrong_authorization_binding():
     with pytest.raises(AiVideoError) as error:
         validate_image_result(request, make_authorization(other_request), result)
 
-    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert error.value.code is ErrorCode.IMAGE_REQUEST_INVALID
 
 
 def _fresh_states(project, graph):
@@ -589,7 +589,7 @@ def test_candidate_rejects_mutated_character_or_unrelated_shot(
     with pytest.raises(AiVideoError) as error:
         validate_image_activation_candidate(**tampered)
 
-    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert error.value.code is ErrorCode.IMAGE_REQUEST_INVALID
 
 
 def test_image_activation_candidate_has_no_public_constructor():
@@ -615,7 +615,7 @@ def test_candidate_rejects_registry_overwrite_or_extra_asset(p7_candidate, mutat
     with pytest.raises(AiVideoError) as error:
         validate_image_activation_candidate(**tampered)
 
-    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert error.value.code is ErrorCode.IMAGE_REQUEST_INVALID
 
 
 def test_candidate_rejects_unrelated_dependency_input_change(p7_candidate):
@@ -630,7 +630,7 @@ def test_candidate_rejects_unrelated_dependency_input_change(p7_candidate):
     with pytest.raises(AiVideoError) as error:
         validate_image_activation_candidate(**tampered)
 
-    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert error.value.code is ErrorCode.IMAGE_REQUEST_INVALID
 
 
 def test_candidate_rejects_caller_tampered_resolution(p7_candidate):
@@ -649,7 +649,7 @@ def test_candidate_rejects_caller_tampered_resolution(p7_candidate):
     with pytest.raises(AiVideoError) as error:
         validate_image_activation_candidate(**tampered)
 
-    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert error.value.code is ErrorCode.IMAGE_REQUEST_INVALID
 
 
 def test_candidate_rejects_reference_not_owned_by_bound_creative(p7_candidate):
@@ -697,7 +697,7 @@ def test_candidate_rejects_reference_not_owned_by_bound_creative(p7_candidate):
     with pytest.raises(AiVideoError) as error:
         validate_image_activation_candidate(**tampered)
 
-    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert error.value.code is ErrorCode.IMAGE_REQUEST_INVALID
 
 
 def test_candidate_rejects_pointer_file_hash_mismatch(p7_candidate):
@@ -723,4 +723,4 @@ def test_candidate_rejects_pointer_file_hash_mismatch(p7_candidate):
     with pytest.raises(AiVideoError) as error:
         validate_image_activation_candidate(**tampered)
 
-    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert error.value.code is ErrorCode.IMAGE_REQUEST_INVALID

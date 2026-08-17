@@ -130,6 +130,50 @@ def canonical_final_acceptance_receipt_path(content_hash: str) -> Path:
     )
 
 
+def canonical_image_request_path(request_fingerprint: str) -> Path:
+    return Path(
+        f"state/images/requests/{_require_sha256(request_fingerprint, 'image request fingerprint')}.json"
+    )
+
+
+def canonical_image_preview_path(preview_fingerprint: str) -> Path:
+    return Path(
+        f"state/images/previews/{_require_sha256(preview_fingerprint, 'image preview fingerprint')}.json"
+    )
+
+
+def canonical_image_authorization_path(authorization_fingerprint: str) -> Path:
+    return Path(
+        "state/images/authorizations/"
+        f"{_require_sha256(authorization_fingerprint, 'image authorization fingerprint')}.json"
+    )
+
+
+def canonical_image_submit_intent_path(request_fingerprint: str) -> Path:
+    return Path(
+        "state/images/submit-intents/"
+        f"{_require_sha256(request_fingerprint, 'image request fingerprint')}.json"
+    )
+
+
+def canonical_image_result_path(result_fingerprint: str) -> Path:
+    return Path(
+        f"state/images/results/{_require_sha256(result_fingerprint, 'image result fingerprint')}.json"
+    )
+
+
+def canonical_image_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/images/receipts/{_require_sha256(content_hash, 'image receipt hash')}.json"
+    )
+
+
+def canonical_image_asset_path(file_sha256: str) -> Path:
+    return Path(
+        f"assets/files/{_require_sha256(file_sha256, 'image file hash')}.png"
+    )
+
+
 def canonical_render_output_path(file_sha256: str, suffix: str = ".mp4") -> Path:
     if suffix != ".mp4":
         raise ValueError("Render output suffix must be .mp4.")

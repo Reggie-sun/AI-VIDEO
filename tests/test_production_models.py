@@ -6,6 +6,8 @@ import pytest
 from pydantic import ValidationError
 
 import ai_video.production as production
+import ai_video.production.models as production_models
+import ai_video.production.paths as production_paths
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
@@ -44,6 +46,7 @@ from ai_video.production.models import (
     DependencySemanticRole,
     DurationPolicy,
     FingerprintContribution,
+    FinalAcceptanceState,
     LoadedProductionProject,
     MeasuredRenderMetadata,
     MeasuredAudioRenderMetadata,
@@ -57,6 +60,8 @@ from ai_video.production.models import (
     RecoveryDisposition,
     RecoveryItem,
     RecoveryReport,
+    ReviewLayerState,
+    ReviewLifecycle,
     RegistryDependencyEvidence,
     RegistrySnapshotPointer,
     RenderArtifactPointer,
@@ -1223,10 +1228,14 @@ def test_voice_attempt_fields_are_manifest_22_only_and_serializer_compatible():
         candidate_artifacts_hash=ZERO_HASH,
         voice_request=request,
         voice_phase="request",
+        provider_request_id="voice-job-1",
         started_at="2026-08-10T00:00:00+00:00",
     )
     manifest = make_state_manifest(schema_version="2.2", attempts=(attempt,))
     assert manifest.attempts[0].voice_request == request
+    assert manifest.model_dump(mode="json")["attempts"][0]["provider_request_id"] == (
+        "voice-job-1"
+    )
 
     with pytest.raises(ValidationError, match="2.1"):
         make_state_manifest(schema_version="2.1", attempts=(attempt,))
@@ -3558,3 +3567,273 @@ def test_p6_error_codes_are_typed_and_non_retryable():
     assert ErrorCode.REPAIR_AUTHORIZATION_REQUIRED.value == "repair_authorization_required"
     assert ErrorCode.REPAIR_SCOPE_INVALID.value == "repair_scope_invalid"
     assert ErrorCode.FINAL_ACCEPTANCE_INVALID.value == "final_acceptance_invalid"
+
+
+# ---------------------------------------------------------------------------
+# P7 Image Generation / Manifest 2.5 schema composition tests
+# ---------------------------------------------------------------------------
+
+
+def make_image_request_receipt_payload() -> dict[str, object]:
+    return {
+        "request_id": ZERO_HASH,
+        "attempt_id": "image-attempt-1",
+        "request_fingerprint": ZERO_HASH,
+        "provider_kind": "fake-local",
+        "model_id": "fixture-image-model-1",
+        "target_shot_id": "shot-1",
+        "target_asset_role": "still",
+        "output_asset_id": f"image-{ZERO_HASH}",
+        "preview_fingerprint": ONE_HASH,
+        "authorization_fingerprint": TWO_HASH,
+        "policy_receipt_id": "local-policy-1",
+        "usage_license": "fixture-only",
+    }
+
+
+def make_image_attempt_payload(
+    *,
+    phase: str = "request",
+    status: str = "running",
+    candidate: bool = False,
+) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "attempt_id": "image-attempt-1",
+        "operation": "image_generation",
+        "status": status,
+        "base_manifest_revision": 1,
+        "base_project": make_project_pointer().model_dump(mode="json"),
+        "base_registry": make_registry_pointer().model_dump(mode="json"),
+        "candidate_artifacts_hash": THREE_HASH,
+        "image_request": make_image_request_receipt_payload(),
+        "image_phase": phase,
+        "base_dependency_graph": make_dependency_graph_snapshot_pointer().model_dump(
+            mode="json"
+        ),
+        "started_at": "2026-08-18T00:00:00+00:00",
+    }
+    if candidate:
+        payload.update(
+            {
+                "candidate_project": make_canonical_project_pointer(
+                    content_hash=FOUR_HASH, file_sha256=FIVE_HASH
+                ).model_dump(mode="json"),
+                "candidate_registry": make_alternate_registry_pointer().model_dump(
+                    mode="json"
+                ),
+                "candidate_dependency_graph": make_dependency_graph_snapshot_pointer(
+                    revision_id=SIX_HASH, file_sha256=SEVEN_HASH
+                ).model_dump(mode="json"),
+                "candidate_dependency_states_hash": EIGHT_HASH,
+                "candidate_image_asset_ids": (f"image-{ZERO_HASH}",),
+            }
+        )
+    if status != "running":
+        payload["finished_at"] = "2026-08-18T00:00:01+00:00"
+    if status in {"failed", "interrupted", "outcome_unknown"}:
+        payload["error_code"] = "typed"
+        payload["error_message"] = "safe"
+    return payload
+
+
+def make_manifest_25_payload(*, attempt: dict[str, object]) -> dict[str, object]:
+    manifest = make_state_manifest(
+        schema_version="2.3",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+    ).model_dump(mode="json")
+    manifest["schema_version"] = "2.5"
+    manifest["attempts"] = (attempt,)
+    return manifest
+
+
+def test_manifest_25_accepts_p7_only_state_from_23():
+    manifest = ProductionManifest.model_validate(
+        make_manifest_25_payload(attempt=make_image_attempt_payload())
+    )
+
+    assert manifest.schema_version == "2.5"
+    assert manifest.active_qa_policy is None
+    assert "active_qa_policy" not in manifest.model_dump(mode="json")
+
+
+def test_manifest_25_preserves_complete_p6_state():
+    p6 = make_state_manifest(
+        schema_version="2.4",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        active_qa_policy=make_qa_policy_pointer(),
+        review_states=(
+            ReviewLayerState(
+                layer=QaLayer.TECHNICAL,
+                desired_fingerprint=THREE_HASH,
+                lifecycle=ReviewLifecycle.STALE,
+            ),
+        ),
+        final_acceptance_state=FinalAcceptanceState(
+            desired_fingerprint=FOUR_HASH,
+            lifecycle=ReviewLifecycle.STALE,
+        ),
+    )
+    payload = p6.model_dump(mode="json")
+    payload["schema_version"] = "2.5"
+    payload["attempts"] = (make_image_attempt_payload(),)
+
+    p7 = ProductionManifest.model_validate(payload)
+
+    assert p7.active_qa_policy == p6.active_qa_policy
+    assert p7.review_states == p6.review_states
+    assert p7.final_acceptance_state == p6.final_acceptance_state
+
+
+def test_manifest_25_runs_complete_p6_invariants_when_any_p6_field_is_explicit():
+    payload = make_manifest_25_payload(attempt=make_image_attempt_payload())
+    payload["review_states"] = ()
+
+    with pytest.raises(ValidationError, match="2.5.*active_qa_policy"):
+        ProductionManifest.model_validate(payload)
+
+
+@pytest.mark.parametrize("version", ["2.0", "2.1", "2.2", "2.3", "2.4"])
+def test_manifest_20_24_rejects_explicit_image_fields(version):
+    payload = make_state_manifest(
+        schema_version="2.4" if version == "2.4" else version,
+        **(
+            {
+                "active_dependency_graph": make_dependency_graph_snapshot_pointer(),
+                "active_qa_policy": make_qa_policy_pointer(),
+            }
+            if version == "2.4"
+            else {
+                "active_dependency_graph": make_dependency_graph_snapshot_pointer()
+            }
+            if version == "2.3"
+            else {}
+        ),
+    ).model_dump(mode="json")
+    payload["attempts"] = (make_image_attempt_payload(),)
+
+    with pytest.raises(ValidationError, match=rf"{version}.*image"):
+        ProductionManifest.model_validate(payload)
+
+
+def test_image_attempt_requires_exact_candidate_graph_bundle():
+    missing = make_image_attempt_payload(phase="candidate")
+    with pytest.raises(ValidationError, match="candidate.*bundle"):
+        ProductionManifest.model_validate(
+            make_manifest_25_payload(attempt=missing)
+        )
+
+    candidate = ProductionManifest.model_validate(
+        make_manifest_25_payload(
+            attempt=make_image_attempt_payload(phase="candidate", candidate=True)
+        )
+    ).attempts[0]
+    assert candidate.candidate_image_asset_ids == (f"image-{ZERO_HASH}",)
+    assert candidate.candidate_dependency_states_hash == EIGHT_HASH
+
+    succeeded = ProductionManifest.model_validate(
+        make_manifest_25_payload(
+            attempt=make_image_attempt_payload(
+                phase="activate", status="succeeded", candidate=True
+            )
+        )
+    ).attempts[0]
+    assert succeeded.status is StateCommitStatus.SUCCEEDED
+    assert succeeded.image_phase == "activate"
+
+
+@pytest.mark.parametrize(
+    ("status", "phase"),
+    [
+        ("succeeded", "candidate"),
+        ("interrupted", "submit_intent"),
+        ("interrupted", "provider_call"),
+        ("outcome_unknown", "request"),
+    ],
+)
+def test_image_attempt_terminal_status_requires_plan_consistent_phase(status, phase):
+    with pytest.raises(ValidationError, match="image.*phase"):
+        ProductionManifest.model_validate(
+            make_manifest_25_payload(
+                attempt=make_image_attempt_payload(
+                    status=status,
+                    phase=phase,
+                    candidate=phase in {"candidate", "activate"},
+                )
+            )
+        )
+
+
+def test_image_attempt_serializes_only_image_fields_and_preserves_voice_provider_id():
+    image = ProductionManifest.model_validate(
+        make_manifest_25_payload(
+            attempt={
+                **make_image_attempt_payload(),
+                "provider_request_id": "local-job-1",
+            }
+        )
+    ).attempts[0].model_dump(mode="json")
+    assert image["image_request"]["request_fingerprint"] == ZERO_HASH
+    assert image["provider_request_id"] == "local-job-1"
+    assert "voice_request" not in image
+    assert "candidate_audio_asset_ids" not in image
+
+    historical = StateCommitAttempt(
+        attempt_id="historical-1",
+        operation="historical_custom_commit",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        started_at="2026-08-18T00:00:00+00:00",
+    ).model_dump(mode="json")
+    assert not {
+        "image_request",
+        "image_phase",
+        "provider_request_id",
+        "candidate_image_asset_ids",
+    }.intersection(historical)
+
+
+def test_image_request_receipt_and_error_codes_are_typed():
+    receipt = production_models.ImageRequestReceipt.model_validate(
+        make_image_request_receipt_payload()
+    )
+    assert receipt.output_asset_id == f"image-{ZERO_HASH}"
+    assert ErrorCode.IMAGE_REQUEST_INVALID.value == "image_request_invalid"
+    assert ErrorCode.IMAGE_ASSET_INVALID.value == "image_asset_invalid"
+    assert ErrorCode.IMAGE_PROVIDER_FAILED.value == "image_provider_failed"
+    assert (
+        ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN.value
+        == "image_provider_outcome_unknown"
+    )
+    mismatched = make_image_request_receipt_payload()
+    mismatched["request_id"] = ONE_HASH
+    with pytest.raises(ValidationError, match="request ID"):
+        production_models.ImageRequestReceipt.model_validate(mismatched)
+
+
+def test_image_lifecycle_paths_are_canonical_and_content_addressed():
+    assert production_paths.canonical_image_request_path(ZERO_HASH) == Path(
+        f"state/images/requests/{ZERO_HASH}.json"
+    )
+    assert production_paths.canonical_image_preview_path(ONE_HASH) == Path(
+        f"state/images/previews/{ONE_HASH}.json"
+    )
+    assert production_paths.canonical_image_authorization_path(TWO_HASH) == Path(
+        f"state/images/authorizations/{TWO_HASH}.json"
+    )
+    assert production_paths.canonical_image_submit_intent_path(ZERO_HASH) == Path(
+        f"state/images/submit-intents/{ZERO_HASH}.json"
+    )
+    assert production_paths.canonical_image_result_path(THREE_HASH) == Path(
+        f"state/images/results/{THREE_HASH}.json"
+    )
+    assert production_paths.canonical_image_receipt_path(FOUR_HASH) == Path(
+        f"state/images/receipts/{FOUR_HASH}.json"
+    )
+    assert production_paths.canonical_image_asset_path(FIVE_HASH) == Path(
+        f"assets/files/{FIVE_HASH}.png"
+    )
+    with pytest.raises(ValueError, match="SHA-256"):
+        production_paths.canonical_image_request_path("latest")

@@ -19,6 +19,14 @@ from pydantic import (
     model_validator,
 )
 
+from ai_video.production._lifecycle_schema import (
+    ImageRequestReceipt,
+    P5_AWARE_OPERATIONS as _P5_AWARE_OPERATIONS,
+    has_p6_state,
+    prune_attempt_fields,
+    validate_provider_attempt,
+)
+
 
 class _ImmutableDict(dict):
     def _reject_mutation(self, *args: object, **kwargs: object) -> None:
@@ -1726,9 +1734,23 @@ class StateCommitAttempt(StrictModel):
         ]
         | None
     ) = None
+    image_request: ImageRequestReceipt | None = None
+    image_phase: (
+        Literal[
+            "request",
+            "submit_intent",
+            "provider_call",
+            "materialize",
+            "validate",
+            "candidate",
+            "activate",
+        ]
+        | None
+    ) = None
     provider_request_id: str | None = None
     candidate_audio_asset_ids: tuple[str, ...] = ()
     candidate_caption_asset_ids: tuple[str, ...] = ()
+    candidate_image_asset_ids: tuple[str, ...] = ()
     base_dependency_graph: DependencyGraphSnapshotPointer | None = None
     candidate_dependency_graph: DependencyGraphSnapshotPointer | None = None
     candidate_dependency_states_hash: str | None = Field(
@@ -1827,65 +1849,7 @@ class StateCommitAttempt(StrictModel):
                 self.render_phase != "activate"
             ):
                 raise ValueError("render_state candidate bundle requires activate phase")
-        voice_fields_present = any(
-            value is not None
-            for value in (
-                self.voice_request,
-                self.voice_phase,
-                self.provider_request_id,
-            )
-        ) or bool(self.candidate_audio_asset_ids or self.candidate_caption_asset_ids)
-        if self.operation != "voice_generation" and voice_fields_present:
-            raise ValueError("non-voice operations cannot contain voice fields")
-        if self.operation == "voice_generation":
-            if self.voice_request is None or self.voice_phase is None:
-                raise ValueError("voice_generation attempts require voice request and phase")
-            if self.voice_request.attempt_id != self.attempt_id:
-                raise ValueError("voice attempt identity does not match request")
-            all_voice_phases = {
-                "request",
-                "submit_intent",
-                "provider_call",
-                "materialize",
-                "probe",
-                "align",
-                "candidate",
-                "activate",
-            }
-            allowed_terminal_phases = {
-                StateCommitStatus.RUNNING: all_voice_phases,
-                StateCommitStatus.SUCCEEDED: {"activate"},
-                StateCommitStatus.FAILED: all_voice_phases,
-                StateCommitStatus.INTERRUPTED: {
-                    "request",
-                    "materialize",
-                    "probe",
-                    "align",
-                    "candidate",
-                },
-                StateCommitStatus.OUTCOME_UNKNOWN: {
-                    "submit_intent",
-                    "provider_call",
-                    "materialize",
-                    "probe",
-                    "align",
-                    "candidate",
-                    "activate",
-                },
-            }
-            if self.voice_phase not in allowed_terminal_phases[self.status]:
-                raise ValueError("voice attempt status and phase are inconsistent")
-            if self.candidate_project not in (None, self.base_project):
-                raise ValueError("voice candidate project identity does not match")
-            if self.voice_phase in {"candidate", "activate"}:
-                if self.candidate_registry is None or not self.candidate_audio_asset_ids:
-                    raise ValueError("voice candidate phase requires candidate audio bundle")
-            elif (
-                self.candidate_registry is not None
-                or self.candidate_audio_asset_ids
-                or self.candidate_caption_asset_ids
-            ):
-                raise ValueError("voice candidate bundle requires candidate phase")
+        validate_provider_attempt(self)
         if self.operation == "repair":
             if self.approved_repair_receipt is None:
                 raise ValueError("repair attempts require approved repair receipt")
@@ -1913,15 +1877,7 @@ class StateCommitAttempt(StrictModel):
                 "render_phase",
             ):
                 data.pop(field, None)
-        if self.operation != "voice_generation":
-            for field in (
-                "voice_request",
-                "voice_phase",
-                "provider_request_id",
-                "candidate_audio_asset_ids",
-                "candidate_caption_asset_ids",
-            ):
-                data.pop(field, None)
+        prune_attempt_fields(data, self.operation)
         for field in (
             "base_dependency_graph",
             "candidate_dependency_graph",
@@ -2143,7 +2099,7 @@ class FinalAcceptanceState(StrictModel):
 
 
 class ProductionManifest(StrictModel):
-    schema_version: Literal["2.0", "2.1", "2.2", "2.3", "2.4"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2", "2.3", "2.4", "2.5"] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
     active_project: ProjectSnapshotPointer
@@ -2166,8 +2122,6 @@ class ProductionManifest(StrictModel):
     def _reject_explicit_p6_fields_in_old_versions(cls, value: object) -> object:
         if not isinstance(value, Mapping):
             return value
-        if value.get("schema_version", "2.0") == "2.4":
-            return value
         p6_fields = {
             "active_qa_policy",
             "active_review_receipts",
@@ -2176,9 +2130,21 @@ class ProductionManifest(StrictModel):
             "repair_outcome_receipts",
             "final_acceptance_state",
         }
+        manifest_version = value.get("schema_version", "2.0")
+        if manifest_version == "2.5" and p6_fields.intersection(value):
+            if value.get("active_qa_policy") is None:
+                raise ValueError(
+                    "Production Manifest 2.5 with P6 fields requires active_qa_policy"
+                )
+            if value.get("active_dependency_graph") is None:
+                raise ValueError(
+                    "Production Manifest 2.5 with P6 fields requires active_dependency_graph"
+                )
+        if manifest_version in {"2.4", "2.5"}:
+            return value
         if p6_fields.intersection(value):
             raise ValueError(
-                f"Production Manifest {value.get('schema_version', '2.0')} "
+                f"Production Manifest {manifest_version} "
                 "cannot contain explicit P6 review fields"
             )
         for attempt in value.get("attempts", ()):
@@ -2188,7 +2154,7 @@ class ProductionManifest(StrictModel):
                 "review_phase",
             }.intersection(attempt):
                 raise ValueError(
-                    f"Production Manifest {value.get('schema_version', '2.0')} "
+                    f"Production Manifest {manifest_version} "
                     "cannot contain P6 repair attempt fields"
                 )
         return value
@@ -2198,7 +2164,7 @@ class ProductionManifest(StrictModel):
     def _reject_explicit_voice_fields_in_old_versions(cls, value: object) -> object:
         if (
             not isinstance(value, Mapping)
-            or value.get("schema_version", "2.0") in {"2.2", "2.3", "2.4"}
+            or value.get("schema_version", "2.0") in {"2.2", "2.3", "2.4", "2.5"}
         ):
             return value
         for attempt in value.get("attempts", ()):
@@ -2222,7 +2188,7 @@ class ProductionManifest(StrictModel):
     ) -> object:
         if not isinstance(value, Mapping):
             return value
-        if value.get("schema_version", "2.0") in {"2.3", "2.4"}:
+        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5"}:
             return value
         manifest_version = value.get("schema_version", "2.0")
         if {
@@ -2245,6 +2211,30 @@ class ProductionManifest(StrictModel):
                 )
         return value
 
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p7_fields_in_old_versions(cls, value: object) -> object:
+        if not isinstance(value, Mapping):
+            return value
+        manifest_version = value.get("schema_version", "2.0")
+        if manifest_version == "2.5":
+            return value
+        image_fields = {
+            "image_request",
+            "image_phase",
+            "candidate_image_asset_ids",
+        }
+        for attempt in value.get("attempts", ()):
+            if isinstance(attempt, Mapping) and (
+                attempt.get("operation") == "image_generation"
+                or image_fields.intersection(attempt)
+            ):
+                raise ValueError(
+                    f"Production Manifest {manifest_version} "
+                    "cannot contain explicit P7 image fields"
+                )
+        return value
+
     @model_validator(mode="after")
     def _validate_unique_attempt_ids(self) -> "ProductionManifest":
         attempt_ids = [item.attempt_id for item in self.attempts]
@@ -2261,6 +2251,12 @@ class ProductionManifest(StrictModel):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain voice attempts"
             )
+        if self.schema_version != "2.5" and any(
+            item.operation == "image_generation" for item in self.attempts
+        ):
+            raise ValueError(
+                f"Production Manifest {self.schema_version} cannot contain P7 image attempts"
+            )
         for attempt in self.attempts:
             if (
                 attempt.operation == "render_state"
@@ -2274,7 +2270,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "running render_state attempt base must match active identity"
                 )
-        if self.schema_version in {"2.3", "2.4"}:
+        if self.schema_version in {"2.3", "2.4", "2.5"}:
             self._validate_manifest_23_graph_lifecycle()
         else:
             for attempt in self.attempts:
@@ -2287,25 +2283,35 @@ class ProductionManifest(StrictModel):
                         f"Production Manifest {self.schema_version} "
                         "cannot contain P5 graph attempt fields"
                     )
-        if self.schema_version == "2.4":
+        if self.schema_version == "2.4" or (
+            self.schema_version == "2.5" and has_p6_state(self)
+        ):
             if self.active_qa_policy is None:
-                raise ValueError("Production Manifest 2.4 requires active_qa_policy")
+                raise ValueError(
+                    f"Production Manifest {self.schema_version} requires active_qa_policy"
+                )
             if self.active_dependency_graph is None:
                 raise ValueError(
-                    "Production Manifest 2.4 requires active_dependency_graph"
+                    f"Production Manifest {self.schema_version} requires active_dependency_graph"
                 )
             layers = tuple(item.layer for item in self.review_states)
             receipt_layers = tuple(item.layer for item in self.active_review_receipts)
             if len(layers) != len(set(layers)) or len(receipt_layers) != len(
                 set(receipt_layers)
             ):
-                raise ValueError("Manifest 2.4 review layers must be unique")
+                raise ValueError(
+                    f"Manifest {self.schema_version} review layers must be unique"
+                )
             if layers != tuple(sorted(layers, key=lambda item: item.value)):
-                raise ValueError("Manifest 2.4 review states must be canonically ordered")
+                raise ValueError(
+                    f"Manifest {self.schema_version} review states must be canonically ordered"
+                )
             if receipt_layers != tuple(
                 sorted(receipt_layers, key=lambda item: item.value)
             ):
-                raise ValueError("Manifest 2.4 review receipts must be canonically ordered")
+                raise ValueError(
+                    f"Manifest {self.schema_version} review receipts must be canonically ordered"
+                )
             active_by_layer = {
                 item.layer: item for item in self.active_review_receipts
             }
@@ -2354,12 +2360,14 @@ class ProductionManifest(StrictModel):
         if self.schema_version == "2.0" and self.active_render_state is None:
             data.pop("active_render_state", None)
         if (
-            self.schema_version not in {"2.3", "2.4"}
+            self.schema_version not in {"2.3", "2.4", "2.5"}
             or self.active_dependency_graph is None
         ):
             data.pop("active_dependency_graph", None)
             data.pop("dependency_states", None)
-        if self.schema_version != "2.4":
+        if self.schema_version != "2.4" and not (
+            self.schema_version == "2.5" and self.active_qa_policy is not None
+        ):
             data.pop("active_qa_policy", None)
             data.pop("active_review_receipts", None)
             data.pop("review_states", None)
@@ -2408,18 +2416,6 @@ class LoadedProductionProject(StrictModel):
 # topological order, semantic hashing and rebuild decisions are owned by
 # ``src/ai_video/production/dependency.py`` (Task 2, not implemented here).
 # ---------------------------------------------------------------------------
-
-
-_P5_AWARE_OPERATIONS: frozenset[str] = frozenset(
-    {
-        "bootstrap_dependency_graph",
-        "commit_project_registry",
-        "audio_import",
-        "voice_generation",
-        "render_state",
-        "repair",
-    }
-)
 
 
 class DependencyNodeKind(str, Enum):

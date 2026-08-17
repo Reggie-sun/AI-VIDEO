@@ -84,7 +84,7 @@ _IMAGE_ACTIVATION_TOKEN = object()
 
 def _image_bytes_invalid(message: str, detail: str | None = None) -> AiVideoError:
     return AiVideoError(
-        code=ErrorCode.ASSET_REGISTRY_INVALID,
+        code=ErrorCode.IMAGE_ASSET_INVALID,
         user_message=message,
         technical_detail=detail,
         retryable=False,
@@ -93,7 +93,7 @@ def _image_bytes_invalid(message: str, detail: str | None = None) -> AiVideoErro
 
 def _image_scope_invalid(message: str, detail: str | None = None) -> AiVideoError:
     return AiVideoError(
-        code=ErrorCode.PRODUCTION_STATE_INVALID,
+        code=ErrorCode.IMAGE_REQUEST_INVALID,
         user_message=message,
         technical_detail=detail,
         retryable=False,
