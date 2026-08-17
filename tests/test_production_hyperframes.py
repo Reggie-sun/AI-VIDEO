@@ -3635,6 +3635,374 @@ def test_manifest_23_render_rejects_missing_preparer_before_runner(
     assert failed.attempts[-1].render_phase == "source"
 
 
+class _CountingRenderCommitter(ProductionStateCommitter):
+    def __init__(self, project_root: Path) -> None:
+        super().__init__(project_root)
+        self.manifest_writes = 0
+
+    def _write_manifest_atomic(self, manifest, *, on_replace=None):
+        self.manifest_writes += 1
+        return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    def _write_render_manifest_atomic(
+        self, manifest, *, candidate: bool, on_replace
+    ) -> None:
+        self.manifest_writes += 1
+        return super()._write_render_manifest_atomic(
+            manifest, candidate=candidate, on_replace=on_replace
+        )
+
+
+@dataclass
+class _Manifest25RenderFixture:
+    root: Path
+    committer: _CountingRenderCommitter
+    begin_request: BeginRenderAttemptRequest
+    timeline: ResolvedTimeline
+    asset_sources: dict[str, Path]
+    browser: Path
+    ip_path: Path
+    runner: FakeRunner
+    dependency_graph: object
+    candidate_dependency_states: tuple[object, ...]
+    changed_nodes: list[str]
+
+    def load_manifest(self) -> ProductionManifest:
+        return ProductionManifest.model_validate_json(
+            (self.root / "state/manifest.json").read_bytes()
+        )
+
+    def prepare_transition(
+        self, activation: ActivateRenderStateRequest
+    ) -> ActivateRenderStateRequest:
+        from ai_video.production.dependency import desired_fingerprints
+        from ai_video.production.models import (
+            DependencyLifecycle,
+            DependencyNodeKind,
+            RenderDependencyEvidence,
+        )
+        from ai_video.production.state_commit import prepare_dependency_graph_transition
+
+        desired = desired_fingerprints(self.dependency_graph)
+        render_kinds = {
+            DependencyNodeKind.COMPOSITION_SPEC,
+            DependencyNodeKind.RESOLVED_TIMELINE,
+            DependencyNodeKind.RENDERER_SOURCE,
+            DependencyNodeKind.RENDER,
+        }
+        by_id = {item.node_id: item for item in self.candidate_dependency_states}
+        states = []
+        self.changed_nodes.clear()
+        for node in self.dependency_graph.nodes:
+            state = by_id[node.node_id]
+            if node.kind in render_kinds:
+                self.changed_nodes.append(node.node_id)
+                state = state.model_copy(
+                    update={
+                        "desired_fingerprint": desired[node.node_id],
+                        "applied_fingerprint": desired[node.node_id],
+                        "lifecycle": DependencyLifecycle.FRESH,
+                        "blocked_by": (),
+                        "error_code": None,
+                        "error_message": None,
+                        "applied_evidence": RenderDependencyEvidence(
+                            owner="render_state",
+                            pointer=activation.next_render_state,
+                            artifact_id=node.artifact_id,
+                            artifact_fingerprint=desired[node.node_id],
+                        ),
+                    }
+                )
+            states.append(state)
+        transition = prepare_dependency_graph_transition(
+            expected_manifest_revision=activation.expected_manifest_revision,
+            base_dependency_graph=self.load_manifest().active_dependency_graph,
+            candidate_graph=self.dependency_graph,
+            candidate_dependency_states=tuple(
+                sorted(states, key=lambda item: item.node_id)
+            ),
+            expected_desired_fingerprints=desired,
+        )
+        graph_payload = _sealed_json_bytes(self.dependency_graph)
+        graph_artifact = PreparedArtifact(
+            transition.candidate_dependency_graph.path,
+            graph_payload,
+            hashlib.sha256(graph_payload).hexdigest(),
+        )
+        return replace(
+            activation,
+            artifacts=tuple(
+                sorted(
+                    (*activation.artifacts, graph_artifact),
+                    key=lambda item: item.relative_path.as_posix(),
+                )
+            ),
+            dependency_graph_transition=transition,
+        )
+
+    def render(self) -> ProductionManifest:
+        return _render_with_hyperframes(
+            committer=self.committer,
+            begin_request=self.begin_request,
+            timeline=self.timeline,
+            asset_sources=self.asset_sources,
+            allowed_asset_root=self.root,
+            runner_factory=lambda: self.runner,
+            browser_path=self.browser,
+            ip_path=self.ip_path,
+            expected_version="0.7.103",
+            dependency_transition_preparer=self.prepare_transition,
+            probe=lambda _fd: {
+                "streams": [
+                    {
+                        "codec_type": "video",
+                        "width": self.timeline.delivery_profile.width,
+                        "height": self.timeline.delivery_profile.height,
+                        "r_frame_rate": f"{self.timeline.delivery_profile.fps}/1",
+                        "nb_frames": str(self.timeline.total_frames),
+                        "codec_name": "h264",
+                    },
+                    {
+                        "codec_type": "audio",
+                        "index": 1,
+                        "codec_name": "aac",
+                        "sample_rate": str(self.timeline.sample_rate),
+                        "channels": 2,
+                        "channel_layout": "stereo",
+                    },
+                ],
+                "packets": [
+                    {
+                        "stream_index": 1,
+                        "pts": "-1024",
+                        "duration": "1024",
+                        "side_data_list": [
+                            {
+                                "side_data_type": "Skip Samples",
+                                "skip_samples": 1024,
+                                "discard_padding": 0,
+                            }
+                        ],
+                    },
+                    {"stream_index": 1, "pts": "0", "duration": "768"},
+                ],
+            },
+            decoded_frames=lambda fd: hashlib.sha256(
+                os.pread(fd, os.fstat(fd).st_size, 0)
+            ).hexdigest(),
+            decoded_audio=lambda _fd, _rate, _channels: (
+                self.timeline.total_samples + 256,
+                "a" * 64,
+            ),
+        )
+
+    def call_counts(self) -> tuple[int, int]:
+        return len(self.runner.calls), self.committer.manifest_writes
+
+
+def _make_manifest_25_render_fixture(
+    tmp_path: Path, *, reviewed: bool
+) -> _Manifest25RenderFixture:
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        resolve_dependency_state,
+    )
+    from ai_video.production.models import (
+        FinalAcceptanceState,
+        QaLayer,
+        ReviewLayerState,
+        ReviewLifecycle,
+    )
+
+    runtime = project_factory.make_p7_reuse_runtime(tmp_path)
+    runtime.generate_all()
+    if reviewed:
+        project_factory.add_p6_policy_to_p7_project(tmp_path)
+        manifest_path = tmp_path / "state/manifest.json"
+        manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes())
+        manifest_path.write_text(
+            manifest.model_copy(
+                update={
+                    "review_states": (
+                        ReviewLayerState(
+                            layer=QaLayer.TECHNICAL,
+                            desired_fingerprint="1" * 64,
+                            applied_fingerprint="1" * 64,
+                            lifecycle=ReviewLifecycle.NOT_EVALUATED,
+                        ),
+                    ),
+                    "final_acceptance_state": FinalAcceptanceState(
+                        desired_fingerprint="2" * 64,
+                        applied_fingerprint="2" * 64,
+                        lifecycle=ReviewLifecycle.NOT_EVALUATED,
+                    ),
+                }
+            ).model_dump_json(indent=2),
+            encoding="utf-8",
+        )
+    loaded = load_production_project(tmp_path / "project.yaml")
+    composition_spec = seal_artifact(
+        runtime.base_inputs.composition_spec.model_copy(
+            update={
+                "revision": runtime.base_inputs.composition_spec.revision + 1,
+                "content_hash": "0" * 64,
+                "layers": tuple(
+                    layer.model_copy(
+                        update={
+                            "asset_id": next(
+                                role.asset_ids[0]
+                                for shot in loaded.shots
+                                if shot.shot_id == layer.shot_id
+                                for role in shot.required_asset_roles
+                                if role.role == layer.asset_role
+                            )
+                        }
+                    )
+                    for layer in runtime.base_inputs.composition_spec.layers
+                ),
+            }
+        )
+    )
+    timeline = resolve_composition(
+        loaded, composition_spec, renderer_version="0.7.103"
+    )
+    asset_sources = {
+        span.asset_id: loaded.asset_paths[span.asset_id]
+        for span in (*timeline.visual_spans, *timeline.audio_spans)
+    }
+    asset_sources.update(
+        {
+            cue.caption_asset_id: loaded.asset_paths[cue.caption_asset_id]
+            for cue in timeline.caption_cues
+        }
+    )
+    style = composition_spec.caption_tracks[0].style_reference
+    assert style is not None
+    asset_sources[style.artifact_id] = tmp_path / style.path
+    graph = build_production_dependency_graph(
+        replace(
+            runtime.base_inputs,
+            project=loaded,
+            composition_spec=composition_spec,
+            voice_requests=(),
+        )
+    )
+    candidate_states = resolve_dependency_state(
+        graph, loaded.manifest.dependency_states
+    ).states
+    selection = RendererSelectionReceipt(
+        receipt_id="selection-manifest-25-render",
+        attempt_id="manifest-25-render",
+        requested_kind=RendererKind.HYPERFRAMES,
+        selected_kinds=(RendererKind.HYPERFRAMES,),
+        renderer_version="0.7.103",
+        timeline_fingerprint=timeline.composition_fingerprint,
+        current_project=loaded.manifest.active_project,
+        current_registry=loaded.manifest.active_registry,
+    )
+    tools = tmp_path / "render-tools"
+    tools.mkdir()
+    return _Manifest25RenderFixture(
+        root=tmp_path,
+        committer=_CountingRenderCommitter(tmp_path),
+        begin_request=BeginRenderAttemptRequest(
+            loaded.manifest.manifest_revision,
+            loaded.manifest.active_render_state,
+            selection,
+        ),
+        timeline=timeline,
+        asset_sources=asset_sources,
+        browser=_write_executable(tools / "chrome"),
+        ip_path=_write_executable(tools / "ip"),
+        runner=FakeRunner(),
+        dependency_graph=graph,
+        candidate_dependency_states=candidate_states,
+        changed_nodes=[],
+    )
+
+
+def make_manifest_25_render_fixture(tmp_path: Path) -> _Manifest25RenderFixture:
+    return _make_manifest_25_render_fixture(tmp_path, reviewed=False)
+
+
+def make_manifest_25_reviewed_render_fixture(
+    tmp_path: Path,
+) -> _Manifest25RenderFixture:
+    return _make_manifest_25_render_fixture(tmp_path, reviewed=True)
+
+
+def test_manifest_25_render_requires_dependency_transition_before_runner(
+    tmp_path: Path,
+) -> None:
+    fixture = make_manifest_25_render_fixture(tmp_path)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        _render_with_hyperframes(
+            committer=fixture.committer,
+            begin_request=fixture.begin_request,
+            timeline=fixture.timeline,
+            asset_sources=fixture.asset_sources,
+            allowed_asset_root=tmp_path,
+            runner_factory=lambda: fixture.runner,
+            browser_path=fixture.browser,
+            ip_path=fixture.ip_path,
+            expected_version="0.7.103",
+            dependency_transition_preparer=None,
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert fixture.runner.calls == []
+
+
+def test_manifest_25_render_activation_preserves_p7_and_stales_exact_reviews(
+    tmp_path: Path,
+) -> None:
+    from ai_video.production.models import ReviewLifecycle
+
+    fixture = make_manifest_25_reviewed_render_fixture(tmp_path)
+    before = fixture.load_manifest()
+
+    result = fixture.render()
+    after = fixture.load_manifest()
+
+    assert after.schema_version == "2.5"
+    assert tuple(
+        item for item in after.attempts if item.operation == "image_generation"
+    ) == tuple(
+        item for item in before.attempts if item.operation == "image_generation"
+    )
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.active_render_state == result.active_render_state
+    assert after.active_render_state is not None
+    assert after.active_review_receipts == ()
+    assert all(
+        item.lifecycle is ReviewLifecycle.STALE and item.active_receipt is None
+        for item in after.review_states
+    )
+    if after.final_acceptance_state is not None:
+        assert after.final_acceptance_state.lifecycle is ReviewLifecycle.STALE
+        assert after.final_acceptance_state.active_receipt is None
+    assert set(fixture.changed_nodes) == {
+        "composition:main",
+        "timeline:main",
+        "renderer-source:main",
+        "render:main",
+    }
+
+
+def test_manifest_25_render_exact_replay_has_zero_runner_and_manifest_writes(
+    tmp_path: Path,
+) -> None:
+    fixture = make_manifest_25_render_fixture(tmp_path)
+    first = fixture.render()
+    counts = fixture.call_counts()
+    second = fixture.render()
+
+    assert second == first
+    assert fixture.call_counts() == counts
+
+
 def test_activation_duplicate_artifacts_terminalizes_owned_r1_as_r2(tmp_path):
     before, committer, request = _prepared_activation_request(
         tmp_path, "duplicate-artifacts"

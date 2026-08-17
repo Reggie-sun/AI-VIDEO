@@ -352,7 +352,7 @@ class _StateCommitRenderLifecycleMixin:
             candidate_graph: DependencyGraphSnapshot | None = None
             if existing.status is StateCommitStatus.SUCCEEDED:
                 transition = request.dependency_graph_transition
-                if manifest.schema_version in {"2.3", "2.4"}:
+                if manifest.schema_version in {"2.3", "2.4", "2.5"}:
                     if transition is None or (
                         existing.base_dependency_graph
                         != transition.base_dependency_graph
@@ -560,7 +560,10 @@ class _StateCommitRenderLifecycleMixin:
                         for item in manifest.attempts
                     ),
                 }
-                if manifest.schema_version == "2.4":
+                if (
+                    manifest.schema_version in {"2.4", "2.5"}
+                    and manifest.active_qa_policy is not None
+                ):
                     final_update.update(
                         {
                             "active_review_receipts": (),
