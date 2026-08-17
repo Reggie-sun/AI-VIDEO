@@ -1,7 +1,27 @@
 from __future__ import annotations
 
+import ast
 import importlib
 from pathlib import Path
+
+
+PRIVATE_MODULES = (
+    "_state_commit_contracts.py",
+    "_state_commit_common.py",
+    "_state_commit_io.py",
+    "_state_commit_transaction.py",
+    "_state_commit_review.py",
+    "_state_commit_repair.py",
+    "_state_commit_dependency.py",
+    "_state_commit_render_lifecycle.py",
+    "_state_commit_render_support.py",
+    "_state_commit_voice_intent.py",
+    "_state_commit_voice_candidate.py",
+    "_state_commit_voice_activation.py",
+    "_state_commit_recovery.py",
+    "_state_commit_recovery_attempts.py",
+    "_state_commit_recovery_fs.py",
+)
 
 
 def _effective_loc(path: Path) -> int:
@@ -142,3 +162,21 @@ def test_recovery_modules_stay_focused() -> None:
     assert _effective_loc(production / "_state_commit_recovery.py") <= 800
     assert _effective_loc(production / "_state_commit_recovery_attempts.py") <= 800
     assert _effective_loc(production / "_state_commit_recovery_fs.py") <= 800
+
+
+def test_private_modules_do_not_import_facade_and_stay_focused() -> None:
+    production = Path(__file__).parents[1] / "src/ai_video/production"
+    for filename in PRIVATE_MODULES:
+        path = production / filename
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        imports_facade = any(
+            isinstance(node, ast.ImportFrom)
+            and (
+                node.module == "state_commit"
+                or any(alias.name == "state_commit" for alias in node.names)
+            )
+            for node in ast.walk(tree)
+        )
+        assert not imports_facade
+        assert _effective_loc(path) <= 800, filename
+    assert _effective_loc(production / "state_commit.py") <= 800

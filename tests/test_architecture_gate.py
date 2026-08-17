@@ -440,7 +440,7 @@ def test_invalid_git_base_ref_is_an_actionable_baseline_finding(
     assert "missing-ref" in result.findings[0].reason
 
 
-def test_current_repository_grandfathers_real_production_state_debt():
+def test_current_repository_records_split_production_state_baseline():
     repository_root = Path(__file__).resolve().parents[1]
 
     result = check_architecture(repository_root)
@@ -451,15 +451,22 @@ def test_current_repository_grandfathers_real_production_state_debt():
     )
 
     assert not result.has_errors
-    assert (
-        baseline["files"]["src/ai_video/production/state_commit.py"][
-            "effective_loc"
-        ]
-        > 3000
-    )
+    files = baseline["files"]
+    assert files["src/ai_video/production/state_commit.py"]["effective_loc"] <= 800
+    assert files["src/ai_video/production/_state_commit_recovery.py"][
+        "effective_loc"
+    ] <= 800
+    assert files["src/ai_video/production/_state_commit_recovery_attempts.py"][
+        "effective_loc"
+    ] <= 800
+    assert files["src/ai_video/production/_state_commit_recovery_fs.py"][
+        "effective_loc"
+    ] <= 800
 
 
-def test_real_production_state_fixture_rejects_artificial_growth(tmp_path: Path):
+def test_real_production_state_fixture_flags_regrowth_past_normal_limit(
+    tmp_path: Path,
+):
     repository_root = Path(__file__).resolve().parents[1]
     _write_config(tmp_path)
     target = tmp_path / "src/ai_video/production/state_commit.py"
@@ -469,12 +476,28 @@ def test_real_production_state_fixture_rejects_artificial_growth(tmp_path: Path)
         target,
     )
     update_baseline(tmp_path)
+    baseline = json.loads(
+        (tmp_path / ".architecture/architecture-baseline.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    base_loc = baseline["files"][
+        "src/ai_video/production/state_commit.py"
+    ]["effective_loc"]
+    growth = 801 - base_loc
     with target.open("a", encoding="utf-8") as handle:
-        handle.write("ARCHITECTURE_GATE_ARTIFICIAL_GROWTH = True\n")
+        handle.writelines(
+            f"ARCHITECTURE_GATE_ARTIFICIAL_GROWTH_{index} = True\n"
+            for index in range(growth)
+        )
 
     result = check_architecture(tmp_path)
 
     finding = next(item for item in result.findings if item.code == "ARCH001")
     assert finding.path == "src/ai_video/production/state_commit.py"
-    assert finding.measurements["delta"] == 1
-    assert finding.severity.value == "ERROR"
+    assert finding.measurements == {
+        "base_loc": base_loc,
+        "current_loc": 801,
+        "delta": growth,
+    }
+    assert finding.severity.value == "WARN"

@@ -93,7 +93,7 @@ Agent 必须维护当前产品承诺：
 - `src/ai_video/production/registry.py`：负责 read-only Asset Registry snapshot、revision、entry bytes 和 containment verification。
 - `src/ai_video/production/project.py`：负责 v2 bundle loading、Manifest-selected project revision 和 registry selection verification。
 - `src/ai_video/production/dependency.py`：负责pure immutable graph construction、desired fingerprint resolution、blocked/frontier propagation和selective rebuild decision；不得写文件、Manifest、registry或runtime status。
-- `src/ai_video/production/state_commit.py`：负责 P2A 唯一 v2 state writer、snapshot activation、commit-point error mapping 和 explicit recovery。
+- `src/ai_video/production/state_commit.py` 及 private `_state_commit_*` implementation modules：共同实现 P2A 唯一 v2 state writer、snapshot activation、commit-point error mapping 和 explicit recovery；`ProductionStateCommitter` façade仍是唯一 public owner，private modules不得形成第二 writer。
 - `src/ai_video/production/__init__.py`：只暴露已批准的v0.2 public imports，不承载实现逻辑。
 
 P2 reader、registry、validation和P5 dependency modules均不得写入或激活state；P2A writer/commit/recovery protocol必须继续由`state_commit.py`单一拥有，不得把mutation分散到reader、registry、dependency或Legacy manifest/pipeline。不要随意把职责跨模块搬运。优先做局部、小范围、低漂移的修复。
