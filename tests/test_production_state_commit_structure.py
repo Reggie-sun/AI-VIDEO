@@ -60,7 +60,25 @@ def test_review_repair_and_dependency_methods_have_domain_owners() -> None:
     assert committer.record_dependency_node_failed.__module__ == dependency.__name__
 
 
+def test_render_methods_have_domain_owners() -> None:
+    facade = importlib.import_module("ai_video.production.state_commit")
+    lifecycle = importlib.import_module(
+        "ai_video.production._state_commit_render_lifecycle"
+    )
+    support = importlib.import_module("ai_video.production._state_commit_render_support")
+    committer = facade.ProductionStateCommitter
+    assert committer.activate_render_state.__module__ == lifecycle.__name__
+    assert committer._write_render_immutable_artifact.__module__ == support.__name__
+    assert committer._validate_render_artifacts.__module__ == support.__name__
+
+
 def test_review_and_repair_modules_stay_focused() -> None:
     production = Path(__file__).parents[1] / "src/ai_video/production"
     assert _effective_loc(production / "_state_commit_review.py") <= 800
     assert _effective_loc(production / "_state_commit_repair.py") <= 800
+
+
+def test_render_modules_stay_focused() -> None:
+    production = Path(__file__).parents[1] / "src/ai_video/production"
+    assert _effective_loc(production / "_state_commit_render_lifecycle.py") <= 800
+    assert _effective_loc(production / "_state_commit_render_support.py") <= 800
