@@ -3164,6 +3164,118 @@ def add_p6_policy_to_p7_project(root: Path) -> Path:
     return target
 
 
+def make_p7_public_image_generation_base(root: Path):
+    """Activate the Task 11 P5 base only through public committer APIs."""
+
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.state_commit import (
+        ProductionStateCommitter,
+        prepare_dependency_graph_transition,
+        prepare_project_registry_commit,
+    )
+
+    inputs = replace(make_p5_dependency_inputs(root), voice_requests=())
+    writer = ProductionStateCommitter(root)
+    initial = load_production_project(root / "project.yaml")
+    selected = writer.commit(
+        prepare_project_registry_commit(
+            manifest=initial.manifest,
+            project=inputs.project.project,
+            registry=inputs.project.registry,
+            attempt_id="p7-reuse-select-p5-registry",
+        )
+    )
+    loaded = load_production_project(root / "project.yaml")
+    assert loaded.manifest == selected
+    inputs = replace(inputs, project=loaded)
+    graph = build_production_dependency_graph(inputs)
+    resolution = resolve_dependency_state(graph, ())
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=selected.manifest_revision,
+        base_dependency_graph=selected.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=resolution.states,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    writer.bootstrap_dependency_graph(
+        attempt_id="p7-reuse-bootstrap-dependency-graph",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    _refresh_p7_ready_project_registry_nodes(root, writer)
+    final = load_production_project(root / "project.yaml")
+    assert final.dependency_graph == graph
+    return replace(inputs, project=final)
+
+
+def _refresh_p7_ready_project_registry_nodes(root: Path, writer) -> None:
+    from ai_video.production.models import (
+        DependencyLifecycle,
+        DependencyNodeKind,
+        ProjectDependencyEvidence,
+        RegistryDependencyEvidence,
+    )
+
+    while True:
+        loaded = load_production_project(root / "project.yaml")
+        graph = loaded.dependency_graph
+        assert graph is not None
+        nodes = {item.node_id: item for item in graph.nodes}
+        ready = next(
+            (
+                state
+                for state in loaded.manifest.dependency_states
+                if state.lifecycle is DependencyLifecycle.STALE
+                and nodes[state.node_id].kind
+                in {
+                    DependencyNodeKind.CREATIVE_ARTIFACT,
+                    DependencyNodeKind.ASSET,
+                }
+            ),
+            None,
+        )
+        if ready is None:
+            return
+        node = nodes[ready.node_id]
+        if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT:
+            evidence = ProjectDependencyEvidence(
+                owner="project_snapshot",
+                pointer=loaded.manifest.active_project,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=ready.desired_fingerprint,
+            )
+        else:
+            evidence = RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=loaded.manifest.active_registry,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=ready.desired_fingerprint,
+            )
+        writer.record_dependency_node_applied(
+            expected_manifest_revision=loaded.manifest.manifest_revision,
+            active_dependency_graph=loaded.manifest.active_dependency_graph,
+            candidate_dependency_graph=loaded.manifest.active_dependency_graph,
+            node_id=ready.node_id,
+            desired_fingerprint=ready.desired_fingerprint,
+            evidence=evidence,
+        )
+
+
+@dataclass(frozen=True)
+class P7RecoveryAttemptProof:
+    attempt_id: str
+    request_fingerprint: str
+    project_path: Path
+    registry_path: Path
+    graph_path: Path
+    artifacts: tuple[Path, ...]
+
+
 @dataclass(frozen=True)
 class P7ReuseAcceptanceResult:
     provider_calls: int
@@ -3175,9 +3287,25 @@ class P7ReuseAcceptanceResult:
     changed_shot_ids: tuple[str, ...]
     shot_1_asset_id: str
     shot_2_asset_id: str
+    public_base_attempt_operations: tuple[str, ...]
+    character_ids: tuple[str, ...]
+    scene_ids: tuple[str, ...]
+    shot_strategies: tuple[tuple[str, str], ...]
+    shared_reference_identities: tuple[tuple[str, str, str], ...]
+    registered_reference_asset_ids: tuple[str, ...]
+    observed_attempt_operations: tuple[str, ...]
+    active_render_state_unchanged: bool
+    recovery_attempts: tuple[P7RecoveryAttemptProof, ...]
+    counterfactual_old_prompt_request: object | None
+    desired_changed_node_ids: tuple[str, ...]
+    affected_node_ids: tuple[str, ...]
+    stale_node_ids: tuple[str, ...]
+    blocked_node_ids: tuple[str, ...]
+    unrelated_fresh_node_ids: tuple[str, ...]
+    unchanged_desired_node_ids: tuple[str, ...]
     unrelated_voice_caption_nodes_are_fresh: bool
-    video_provider_calls: int
-    renderer_calls: int
+    video_provider_attempt_count: int
+    render_attempt_count: int
     history_artifact_count: int
     recovery_preserved_manifest_revision: bool
 
@@ -3189,12 +3317,9 @@ class P7ReuseAcceptanceRuntime:
         from ai_video.production.state_commit import ProductionStateCommitter
 
         self.root = root
-        self.base_inputs = make_p7_image_generation_base(root)
+        self.base_inputs = make_p7_public_image_generation_base(root)
         self.provider_requests: list[object] = []
-        self.provider_results: list[object] = []
         self.request_binding_counts: dict[str, int] = {}
-        self.video_provider_calls = 0
-        self.renderer_calls = 0
         self._first_result: P7ReuseAcceptanceResult | None = None
         self.writer = ProductionStateCommitter(
             root,
@@ -3306,63 +3431,13 @@ class P7ReuseAcceptanceRuntime:
             ),
         )
         self.provider_requests.append(request)
-        self.provider_results.append(result)
         self.request_binding_counts[request.request_fingerprint] = (
             self.request_binding_counts.get(request.request_fingerprint, 0) + 1
         )
         return result
 
     def _refresh_ready_project_registry_nodes(self) -> None:
-        from ai_video.production.models import (
-            DependencyLifecycle,
-            DependencyNodeKind,
-            ProjectDependencyEvidence,
-            RegistryDependencyEvidence,
-        )
-
-        while True:
-            loaded = load_production_project(self.root / "project.yaml")
-            graph = loaded.dependency_graph
-            assert graph is not None
-            nodes = {item.node_id: item for item in graph.nodes}
-            ready = next(
-                (
-                    state
-                    for state in loaded.manifest.dependency_states
-                    if state.lifecycle is DependencyLifecycle.STALE
-                    and nodes[state.node_id].kind
-                    in {
-                        DependencyNodeKind.CREATIVE_ARTIFACT,
-                        DependencyNodeKind.ASSET,
-                    }
-                ),
-                None,
-            )
-            if ready is None:
-                return
-            node = nodes[ready.node_id]
-            if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT:
-                evidence = ProjectDependencyEvidence(
-                    owner="project_snapshot",
-                    pointer=loaded.manifest.active_project,
-                    artifact_id=node.artifact_id,
-                    artifact_fingerprint=ready.desired_fingerprint,
-                )
-            else:
-                evidence = RegistryDependencyEvidence(
-                    owner="registry_snapshot",
-                    pointer=loaded.manifest.active_registry,
-                    artifact_id=node.artifact_id,
-                    artifact_fingerprint=ready.desired_fingerprint,
-                )
-            self.writer.record_dependency_node_applied(
-                expected_manifest_revision=loaded.manifest.manifest_revision,
-                active_dependency_graph=loaded.manifest.active_dependency_graph,
-                candidate_dependency_graph=loaded.manifest.active_dependency_graph,
-                node_id=ready.node_id,
-                desired_fingerprint=ready.desired_fingerprint,
-                evidence=evidence,
-            )
+        _refresh_p7_ready_project_registry_nodes(self.root, self.writer)
 
     @staticmethod
     def _shot_asset_ids(loaded) -> dict[str, str]:
@@ -3396,9 +3471,13 @@ class P7ReuseAcceptanceRuntime:
             for node_id in protected_ids
         )
 
-    def _recover_and_count_history(self) -> tuple[int, bool]:
+    def _recover_and_count_history(
+        self,
+    ) -> tuple[int, bool, tuple[P7RecoveryAttemptProof, ...]]:
+        from ai_video.production._image_project_reader import (
+            verify_image_attempt_evidence,
+        )
         from ai_video.production.models import StateCommitStatus
-        from ai_video.production.paths import canonical_image_request_path
 
         before = load_production_project(self.root / "project.yaml").manifest
         report = self.writer.recover()
@@ -3409,78 +3488,53 @@ class P7ReuseAcceptanceRuntime:
             if item.operation == "image_generation"
             and item.status is StateCommitStatus.SUCCEEDED
         )
-        attempt_asset_ids = {
-            asset_id
-            for attempt in attempts
-            for asset_id in attempt.candidate_image_asset_ids
-        }
-        generated_paths = {
-            item.artifact_path
-            for item in loaded.registry.assets
-            if item.asset_id in attempt_asset_ids
-        }
-        report_paths = {item.path for item in report.items}
-        request_paths = {
-            canonical_image_request_path(attempt.image_request.request_fingerprint)
-            for attempt in attempts
-            if attempt.image_request is not None
-        }
-        result_paths = {
-            path
-            for path in report_paths
-            if path.as_posix().startswith("state/images/results/")
-        }
-        receipt_paths = {
-            path
-            for path in report_paths
-            if path.as_posix().startswith("state/images/receipts/")
-        }
-        shot_paths = {
-            path
-            for path in report_paths
-            if path.as_posix().startswith("creative/shots/shot.")
-        }
-        project_paths = {
-            attempt.candidate_project.path
-            for attempt in attempts
-            if attempt.candidate_project is not None
-        }
-        registry_paths = {
-            attempt.candidate_registry.path
-            for attempt in attempts
-            if attempt.candidate_registry is not None
-        }
-        graph_paths = {
-            attempt.candidate_dependency_graph.path
-            for attempt in attempts
-            if attempt.candidate_dependency_graph is not None
-        }
-        groups = (
-            request_paths,
-            result_paths,
-            receipt_paths,
-            generated_paths,
-            shot_paths,
-            project_paths,
-            registry_paths,
-            graph_paths,
-        )
-        assert all(len(group) == len(attempts) for group in groups)
-        history_paths = set().union(*groups)
-        assert len(history_paths) == 8 * len(attempts)
-        assert history_paths <= report_paths
-        return len(history_paths), (
+        report_pairs = {item.path: item.sha256 for item in report.items}
+        seen: set[Path] = set()
+        proofs = []
+        for attempt in attempts:
+            assert attempt.image_request is not None
+            assert attempt.candidate_project is not None
+            assert attempt.candidate_registry is not None
+            assert attempt.candidate_dependency_graph is not None
+            pairs = verify_image_attempt_evidence(loaded, attempt)
+            pair_map = dict(pairs)
+            assert len(pairs) == len(pair_map) == 8
+            assert not seen.intersection(pair_map)
+            assert all(
+                report_pairs.get(path) == digest
+                for path, digest in pair_map.items()
+            )
+            seen.update(pair_map)
+            proofs.append(
+                P7RecoveryAttemptProof(
+                    attempt_id=attempt.attempt_id,
+                    request_fingerprint=attempt.image_request.request_fingerprint,
+                    project_path=attempt.candidate_project.path,
+                    registry_path=attempt.candidate_registry.path,
+                    graph_path=attempt.candidate_dependency_graph.path,
+                    artifacts=tuple(sorted(pair_map, key=Path.as_posix)),
+                )
+            )
+        assert len(seen) == 8 * len(attempts)
+        return len(seen), (
             report.manifest_revision_before == before.manifest_revision
             and report.manifest_revision_after == before.manifest_revision
             and loaded.manifest == before
-        )
+        ), tuple(proofs)
 
     def _result(
         self,
         *,
         phase_start: int,
         before_assets: dict[str, str],
+        before_manifest: ProductionManifest,
+        counterfactual_old_prompt_request=None,
     ) -> P7ReuseAcceptanceResult:
+        from ai_video.production.models import (
+            DependencyLifecycle,
+            DependencySemanticRole,
+        )
+
         loaded = load_production_project(self.root / "project.yaml")
         current_assets = self._shot_asset_ids(loaded)
         phase_requests = tuple(self.provider_requests[phase_start:])
@@ -3489,7 +3543,30 @@ class P7ReuseAcceptanceRuntime:
             for item in loaded.registry.assets
             if item.asset_id in {request.output_asset_id for request in phase_requests}
         }
-        history_count, recovery_unchanged = self._recover_and_count_history()
+        history_count, recovery_unchanged, recovery_attempts = (
+            self._recover_and_count_history()
+        )
+        before_states = {item.node_id: item for item in before_manifest.dependency_states}
+        after_states = {item.node_id: item for item in loaded.manifest.dependency_states}
+        graph = loaded.dependency_graph
+        assert graph is not None
+        protected_ids = tuple(
+            sorted(
+                node.node_id
+                for node in graph.nodes
+                if node.semantic_role
+                in {DependencySemanticRole.VOICE, DependencySemanticRole.CAPTION}
+            )
+        )
+        shot_2_visual = "creative:shot:shot-2:visual"
+        before_attempt_ids = {item.attempt_id for item in before_manifest.attempts}
+        observed_operations = tuple(
+            item.operation
+            for item in loaded.manifest.attempts
+            if item.attempt_id not in before_attempt_ids
+        )
+        first_references = self.provider_requests[0].references
+        registered_asset_ids = {item.asset_id for item in loaded.registry.assets}
         return P7ReuseAcceptanceResult(
             provider_calls=len(self.provider_requests) - phase_start,
             total_provider_calls=len(self.provider_requests),
@@ -3508,11 +3585,92 @@ class P7ReuseAcceptanceRuntime:
             ),
             shot_1_asset_id=current_assets["shot-1"],
             shot_2_asset_id=current_assets["shot-2"],
+            public_base_attempt_operations=tuple(
+                item.operation
+                for item in loaded.manifest.attempts
+                if item.attempt_id
+                in {
+                    "p7-reuse-select-p5-registry",
+                    "p7-reuse-bootstrap-dependency-graph",
+                }
+            ),
+            character_ids=tuple(item.character_id for item in loaded.characters),
+            scene_ids=tuple(item.scene_id for item in loaded.scenes),
+            shot_strategies=tuple(
+                (item.shot_id, item.visual_strategy.value) for item in loaded.shots
+            ),
+            shared_reference_identities=tuple(
+                (item.role, item.creative_artifact_id, item.asset_id)
+                for item in first_references
+            ),
+            registered_reference_asset_ids=tuple(
+                sorted(
+                    {
+                        item.asset_id
+                        for item in first_references
+                        if item.asset_id in registered_asset_ids
+                    }
+                )
+            ),
+            observed_attempt_operations=observed_operations,
+            active_render_state_unchanged=(
+                loaded.manifest.active_render_state
+                == before_manifest.active_render_state
+            ),
+            recovery_attempts=recovery_attempts,
+            counterfactual_old_prompt_request=counterfactual_old_prompt_request,
+            desired_changed_node_ids=tuple(
+                sorted(
+                    node_id
+                    for node_id, state in after_states.items()
+                    if node_id not in before_states
+                    or before_states[node_id].desired_fingerprint
+                    != state.desired_fingerprint
+                )
+            ),
+            affected_node_ids=tuple(
+                sorted(
+                    node_id
+                    for node_id, state in after_states.items()
+                    if state.lifecycle is not DependencyLifecycle.FRESH
+                )
+            ),
+            stale_node_ids=tuple(
+                sorted(
+                    node_id
+                    for node_id, state in after_states.items()
+                    if state.lifecycle is DependencyLifecycle.STALE
+                )
+            ),
+            blocked_node_ids=tuple(
+                sorted(
+                    node_id
+                    for node_id, state in after_states.items()
+                    if state.lifecycle is DependencyLifecycle.BLOCKED
+                )
+            ),
+            unrelated_fresh_node_ids=tuple(
+                node_id
+                for node_id in protected_ids
+                if after_states[node_id].lifecycle is DependencyLifecycle.FRESH
+            ),
+            unchanged_desired_node_ids=tuple(
+                node_id
+                for node_id in (*protected_ids, shot_2_visual)
+                if node_id in before_states
+                and before_states[node_id].desired_fingerprint
+                == after_states[node_id].desired_fingerprint
+                and after_states[node_id].lifecycle is DependencyLifecycle.FRESH
+            ),
             unrelated_voice_caption_nodes_are_fresh=(
                 self._unrelated_voice_caption_nodes_are_fresh(loaded)
             ),
-            video_provider_calls=self.video_provider_calls,
-            renderer_calls=self.renderer_calls,
+            video_provider_attempt_count=sum(
+                "video" in operation for operation in observed_operations
+            ),
+            render_attempt_count=sum(
+                "render" in operation for operation in observed_operations
+            ),
             history_artifact_count=history_count,
             recovery_preserved_manifest_revision=recovery_unchanged,
         )
@@ -3547,16 +3705,23 @@ class P7ReuseAcceptanceRuntime:
         self._first_result = self._result(
             phase_start=phase_start,
             before_assets=before_assets,
+            before_manifest=initial.manifest,
         )
         return self._first_result
 
     def change_only_shot_1_prompt_and_generate(self) -> P7ReuseAcceptanceResult:
         first = self.generate_all()
         phase_start = len(self.provider_requests)
+        before = load_production_project(self.root / "project.yaml")
         before_assets = {
             "shot-1": first.shot_1_asset_id,
             "shot-2": first.shot_2_asset_id,
         }
+        counterfactual, _, _ = self._make_call_bundle(
+            attempt_id="p7-reuse-shot-1-old-prompt-counterfactual",
+            shot_id="shot-1",
+            prompt_text="Hero enters the archive room",
+        )
         request, preview, authorization = self._make_call_bundle(
             attempt_id="p7-reuse-shot-1-prompt-replacement",
             shot_id="shot-1",
@@ -3566,6 +3731,8 @@ class P7ReuseAcceptanceRuntime:
         return self._result(
             phase_start=phase_start,
             before_assets=before_assets,
+            before_manifest=before.manifest,
+            counterfactual_old_prompt_request=counterfactual,
         )
 
 

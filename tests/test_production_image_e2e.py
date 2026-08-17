@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import socket
 from dataclasses import dataclass, replace
 from pathlib import Path
 
@@ -39,6 +40,7 @@ from ai_video.production.models import (
     ToolIdentity,
 )
 from ai_video.production.project import load_production_project
+from ai_video.production.paths import canonical_image_request_path
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.state_commit import ProductionStateCommitter
 import production_project_factory as project_factory
@@ -343,7 +345,13 @@ def test_p7_package_exports_only_safe_image_generation_contracts():
 
 
 @pytest.fixture
-def p7_reuse_runtime(tmp_path):
+def p7_reuse_runtime(tmp_path, monkeypatch):
+    def reject_network(*args, **kwargs):
+        del args, kwargs
+        raise AssertionError("P7 acceptance fixture must not access the network")
+
+    monkeypatch.setattr(socket.socket, "connect", reject_network)
+    monkeypatch.setattr(socket, "create_connection", reject_network)
     return project_factory.make_p7_reuse_runtime(tmp_path)
 
 
@@ -352,6 +360,21 @@ def test_two_shots_reuse_character_scene_but_keep_distinct_image_provenance(
 ):
     first = p7_reuse_runtime.generate_all()
 
+    assert first.public_base_attempt_operations == (
+        "commit_project_registry",
+        "bootstrap_dependency_graph",
+    )
+    assert first.character_ids == ("hero",)
+    assert first.scene_ids == ("room",)
+    assert first.shot_strategies == (
+        ("shot-1", "static_image"),
+        ("shot-2", "static_image"),
+    )
+    assert first.shared_reference_identities == (
+        ("character", "character-hero", "image-shot-1"),
+        ("scene", "scene-room", "image-shot-1"),
+    )
+    assert first.registered_reference_asset_ids == ("image-shot-1",)
     assert first.provider_calls == 2
     assert first.total_provider_calls == 2
     assert len(first.requests) == len(first.assets) == 2
@@ -364,6 +387,26 @@ def test_two_shots_reuse_character_scene_but_keep_distinct_image_provenance(
     assert first.changed_shot_ids == ("shot-1", "shot-2")
     assert first.history_artifact_count == 16
     assert first.recovery_preserved_manifest_revision
+    assert first.observed_attempt_operations == (
+        "image_generation",
+        "image_generation",
+    )
+    assert first.active_render_state_unchanged
+    assert tuple(len(proof.artifacts) for proof in first.recovery_attempts) == (8, 8)
+    assert all(
+        canonical_image_request_path(proof.request_fingerprint) in proof.artifacts
+        and proof.project_path in proof.artifacts
+        and proof.registry_path in proof.artifacts
+        and proof.graph_path in proof.artifacts
+        for proof in first.recovery_attempts
+    )
+    assert len(
+        {
+            path
+            for proof in first.recovery_attempts
+            for path in proof.artifacts
+        }
+    ) == 16
 
     second = p7_reuse_runtime.change_only_shot_1_prompt_and_generate()
 
@@ -375,9 +418,46 @@ def test_two_shots_reuse_character_scene_but_keep_distinct_image_provenance(
     assert second.requests[0].prompt_text != first.requests[0].prompt_text
     assert second.requests[0].references == first.requests[0].references
     assert second.requests[0].parameters == first.requests[0].parameters
+    assert second.requests[0].provider_kind == first.requests[0].provider_kind
+    assert second.requests[0].model_id == first.requests[0].model_id
+    assert second.requests[0].negative_prompt_text == first.requests[0].negative_prompt_text
+    assert second.counterfactual_old_prompt_request.prompt_text == first.requests[0].prompt_text
+    assert (
+        second.counterfactual_old_prompt_request.request_fingerprint
+        != second.requests[0].request_fingerprint
+    )
+    assert (
+        second.counterfactual_old_prompt_request.references
+        == second.requests[0].references
+    )
+    assert (
+        second.counterfactual_old_prompt_request.parameters
+        == second.requests[0].parameters
+    )
     assert all(count == 1 for _, count in second.request_binding_counts)
     assert second.history_artifact_count == 24
     assert second.recovery_preserved_manifest_revision
+    assert second.observed_attempt_operations == ("image_generation",)
+    assert second.active_render_state_unchanged
+    assert tuple(len(proof.artifacts) for proof in second.recovery_attempts) == (
+        8,
+        8,
+        8,
+    )
+    assert all(
+        canonical_image_request_path(proof.request_fingerprint) in proof.artifacts
+        and proof.project_path in proof.artifacts
+        and proof.registry_path in proof.artifacts
+        and proof.graph_path in proof.artifacts
+        for proof in second.recovery_attempts
+    )
+    assert len(
+        {
+            path
+            for proof in second.recovery_attempts
+            for path in proof.artifacts
+        }
+    ) == 24
 
 
 def test_explicit_shot_1_replacement_stales_only_exact_consumers(
@@ -385,11 +465,67 @@ def test_explicit_shot_1_replacement_stales_only_exact_consumers(
 ):
     result = p7_reuse_runtime.change_only_shot_1_prompt_and_generate()
 
+    first = p7_reuse_runtime.generate_all()
+    expected_changed = tuple(
+        sorted(
+            (
+                f"asset:{first.shot_1_asset_id}",
+                f"asset:{result.shot_1_asset_id}",
+                "creative:shot:shot-1:visual",
+            )
+        )
+    )
+    expected_affected = tuple(
+        sorted(
+            (
+                *expected_changed,
+                "composition:main",
+                "render:main",
+                "renderer-source:main",
+                "timeline:main",
+            )
+        )
+    )
+    expected_unrelated = (
+        "asset:caption-asset-1",
+        "asset:voice-dialogue",
+        "asset:voice-narration",
+        "creative:shot:shot-1:voice",
+        "creative:shot:shot-2:voice",
+    )
     assert result.provider_calls == 1
     assert result.changed_shot_ids == ("shot-1",)
+    assert result.desired_changed_node_ids == expected_changed
+    assert result.affected_node_ids == expected_affected
+    assert result.stale_node_ids == tuple(
+        sorted(
+            (
+                f"asset:{first.shot_1_asset_id}",
+                "composition:main",
+                "creative:shot:shot-1:visual",
+            )
+        )
+    )
+    assert result.blocked_node_ids == tuple(
+        sorted(
+            (
+                f"asset:{result.shot_1_asset_id}",
+                "render:main",
+                "renderer-source:main",
+                "timeline:main",
+            )
+        )
+    )
+    assert result.unrelated_fresh_node_ids == expected_unrelated
+    assert result.unchanged_desired_node_ids == (
+        *expected_unrelated,
+        "creative:shot:shot-2:visual",
+    )
     assert result.unrelated_voice_caption_nodes_are_fresh
-    assert result.video_provider_calls == 0
-    assert result.renderer_calls == 0
+    assert result.observed_attempt_operations == ("image_generation",)
+    assert result.video_provider_attempt_count == 0
+    assert result.render_attempt_count == 0
+    assert result.active_render_state_unchanged
 
 
 def test_regenerated_shot_history_survives_idempotent_recovery(tmp_path):
