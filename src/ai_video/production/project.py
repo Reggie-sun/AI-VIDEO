@@ -1336,11 +1336,8 @@ def _verify_dependency_project_evidence(
         _load_referenced_artifact(root, refs.storyboard, Storyboard),
         *(_load_referenced_artifact(root, item, Shot) for item in refs.shots),
     )
-    matches = tuple(
-        artifact
-        for artifact in artifacts
-        if artifact.artifact_id == evidence.artifact_id
-        or (isinstance(artifact, Shot) and artifact.shot_id == evidence.artifact_id)
+    matches = _project_evidence.matching_evidence_artifacts(
+        artifacts, evidence.artifact_id
     )
     if len(matches) != 1:
         raise _invalid("Project dependency evidence artifact is not in its snapshot.")
@@ -1350,8 +1347,14 @@ def _verify_dependency_project_evidence(
     contributions = {item.key: item.fingerprint for item in node.contributions}
     if isinstance(artifact, Shot):
         graph, state = context or (None, None)
+        origin_graph = graph
+        origin_pointer = _project_evidence.historical_origin_graph_pointer(
+            bundle, evidence
+        )
+        if origin_pointer is not None:
+            origin_graph = _load_active_dependency_graph(root, origin_pointer)
         _project_evidence.verify_active_shot_projection_evidence(
-            bundle, evidence, node, graph, state, artifact
+            bundle, evidence, node, graph, state, artifact, origin_graph
         )
         return
     else:

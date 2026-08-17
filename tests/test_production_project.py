@@ -2533,6 +2533,54 @@ def test_reader_reopens_superseded_project_evidence_from_origin_revision(tmp_pat
     assert superseded.applied_evidence == removed_state.applied_evidence
 
 
+def test_loader_rejects_forged_historical_shot_projection_when_only_upstream_changes(
+    tmp_path,
+):
+    graph = make_manifest_23_project(tmp_path)
+    original = _manifest(tmp_path)
+    removed_state = next(
+        state
+        for state in original.dependency_states
+        if state.applied_evidence is not None
+        and state.applied_evidence.owner == "project_snapshot"
+        and not state.node_id.startswith("creative:shot:")
+    )
+    _commit_revision_two(tmp_path, attempt_id="reader-forged-upstream-origin")
+    next_graph = build_dependency_graph(
+        tuple(node for node in graph.nodes if node.node_id != removed_state.node_id),
+        tuple(
+            edge
+            for edge in graph.edges
+            if removed_state.node_id
+            not in {edge.source_node_id, edge.target_node_id}
+        ),
+    )
+    next_states = resolve_dependency_state(next_graph, original.dependency_states).states
+    blocked = next(
+        state
+        for state in next_states
+        if state.node_id == "creative:shot:shot-1:composition"
+        and state.lifecycle is DependencyLifecycle.BLOCKED
+    )
+    forged_fingerprint = "f" * 64
+    assert blocked.applied_evidence is not None
+    forged = blocked.model_copy(
+        update={
+            "applied_fingerprint": forged_fingerprint,
+            "applied_evidence": blocked.applied_evidence.model_copy(
+                update={"artifact_fingerprint": forged_fingerprint}
+            ),
+        }
+    )
+    forged_states = tuple(
+        forged if state.node_id == forged.node_id else state for state in next_states
+    )
+    _select_manifest_23_graph(tmp_path, next_graph, forged_states)
+
+    with pytest.raises(AiVideoError, match="Historical Shot dependency evidence"):
+        load_production_project(tmp_path / "project.yaml")
+
+
 @pytest.mark.parametrize("owner", ["project", "registry"])
 def test_reader_rejects_self_consistent_graph_with_forged_owner_projection(
     tmp_path, owner

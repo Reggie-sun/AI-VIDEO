@@ -10,6 +10,7 @@ from ai_video.production.dependency import (
 )
 from ai_video.production.models import (
     DependencyGraphSnapshot,
+    DependencyGraphSnapshotPointer,
     DependencyNode,
     DependencyNodeState,
     DependencySemanticRole,
@@ -17,6 +18,8 @@ from ai_video.production.models import (
     LoadedProductionProject,
     ProjectDependencyEvidence,
     Shot,
+    StateCommitStatus,
+    VersionedArtifact,
 )
 
 
@@ -28,6 +31,40 @@ def _invalid(message: str) -> AiVideoError:
     )
 
 
+def matching_evidence_artifacts(
+    artifacts: tuple[VersionedArtifact, ...], artifact_id: str
+) -> tuple[VersionedArtifact, ...]:
+    """Return exact artifact/Shot identity matches from reopened project bytes."""
+
+    return tuple(
+        artifact
+        for artifact in artifacts
+        if artifact.artifact_id == artifact_id
+        or (isinstance(artifact, Shot) and artifact.shot_id == artifact_id)
+    )
+
+
+def historical_origin_graph_pointer(
+    bundle: LoadedProductionProject,
+    evidence: ProjectDependencyEvidence,
+) -> DependencyGraphSnapshotPointer | None:
+    """Select the unique durable graph provenance for historical evidence."""
+
+    if evidence.pointer.revision >= bundle.manifest.active_project.revision:
+        return None
+    attempts = tuple(
+        attempt
+        for attempt in bundle.manifest.attempts
+        if attempt.status is StateCommitStatus.SUCCEEDED
+        and attempt.base_project == evidence.pointer
+        and attempt.base_dependency_graph is not None
+        and attempt.candidate_dependency_graph is not None
+    )
+    if len(attempts) != 1:
+        raise _invalid("Historical Shot dependency evidence provenance is invalid.")
+    return attempts[0].base_dependency_graph
+
+
 def verify_active_shot_projection_evidence(
     bundle: LoadedProductionProject,
     evidence: ProjectDependencyEvidence,
@@ -35,12 +72,13 @@ def verify_active_shot_projection_evidence(
     graph: DependencyGraphSnapshot | None,
     state: DependencyNodeState | None,
     origin: Shot,
+    origin_graph: DependencyGraphSnapshot | None,
 ) -> None:
     """Verify exact historical applied identity against one active Shot node."""
 
     if node.semantic_role not in SHOT_PROJECTION_ROLES:
         raise _invalid("Shot dependency evidence semantic role is invalid.")
-    if graph is None or state is None:
+    if graph is None or state is None or origin_graph is None:
         raise _invalid("Active Shot dependency evidence requires graph state.")
     active_nodes = tuple(item for item in graph.nodes if item.node_id == node.node_id)
     active_desired = desired_fingerprints(graph)
@@ -94,18 +132,28 @@ def verify_active_shot_projection_evidence(
             ),
         }
     )
-    origin_graph = build_dependency_graph(
+    historical_nodes = tuple(
+        item for item in origin_graph.nodes if item.node_id == node.node_id
+    )
+    if (
+        len(historical_nodes) != 1
+        or historical_nodes[0] != origin_node
+        or desired_fingerprints(origin_graph).get(node.node_id)
+        != evidence.artifact_fingerprint
+    ):
+        raise _invalid("Historical Shot dependency evidence is invalid.")
+    hypothetical_graph = build_dependency_graph(
         tuple(
             origin_node if item.node_id == node.node_id else item
             for item in graph.nodes
         ),
         graph.edges,
     )
-    # P5 states do not retain an origin graph pointer. Exact hypothetical
-    # reconstruction covers projection changes (the P7 case); an unchanged
-    # local projection remains valid when only an upstream dependency moved.
+    # A changed local projection must still bind under the current incoming
+    # desired dependencies. An unchanged projection may instead use its exact
+    # durable origin graph when an upstream dependency moved.
     if (
-        desired_fingerprints(origin_graph)[node.node_id]
+        desired_fingerprints(hypothetical_graph)[node.node_id]
         != evidence.artifact_fingerprint
         and origin_expected != current_expected
     ):
