@@ -5,7 +5,7 @@ multi_agent = true
 multi_agent_v2 = true
 
 [mcp_servers.video-analysis]
-command = "/home/reggie/miniconda3/bin/python3"
+command = "/home/reggie/.local/share/ai-video/video-analysis-mcp/bin/python"
 args = ["-m", "ai_video_mcp"]
 cwd = "/home/reggie/vscode_folder/AI-VIDEO"
 
