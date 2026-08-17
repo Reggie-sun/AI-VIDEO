@@ -24,10 +24,25 @@ from ai_video.production.audio import (
     VoiceProviderResult,
 )
 from ai_video.production.captions import PreparedCaptionImport
+from ai_video.production.dependency import (
+    DependencyResolution,
+    ProductionDependencyInputs,
+)
+from ai_video.production.image import (
+    ImageGenerationAuthorization,
+    ImageGenerationRequest,
+    ImageProvenanceReceipt,
+    ImageProviderResult,
+    MeasuredPng,
+)
 from ai_video.production.models import (
     ApprovedRepairReceiptPointer,
     AssetRecord,
+    AssetRegistrySnapshot,
+    DependencyGraphSnapshot,
+    DependencyGraphSnapshotPointer,
     DependencyGraphTransition,
+    LoadedProductionProject,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
     RendererSelectionReceipt,
@@ -135,6 +150,36 @@ class PreparedVoiceCandidate:
     def __post_init__(self) -> None:
         if (self.caption is None) != (self.caption_asset_record is None):
             raise ValueError("Prepared voice caption bytes and AssetRecord must be all-or-none.")
+
+
+@dataclass(frozen=True)
+class PreparedImageCandidate:
+    """Pure candidate identities; it carries no write or activation authority."""
+
+    base_inputs: ProductionDependencyInputs
+    candidate_project: LoadedProductionProject
+    candidate_registry: AssetRegistrySnapshot
+    candidate_inputs: ProductionDependencyInputs
+    candidate_graph: DependencyGraphSnapshot
+    resolution: DependencyResolution
+    candidate_project_pointer: ProjectSnapshotPointer
+    candidate_registry_pointer: RegistrySnapshotPointer
+    candidate_graph_pointer: DependencyGraphSnapshotPointer
+    candidate_project_bytes: bytes
+    candidate_registry_bytes: bytes
+    candidate_graph_bytes: bytes
+
+
+class ImageCandidatePreparer(Protocol):
+    def __call__(
+        self,
+        base_project: LoadedProductionProject,
+        request: ImageGenerationRequest,
+        authorization: ImageGenerationAuthorization,
+        result: ImageProviderResult,
+        measured: MeasuredPng,
+        receipt: ImageProvenanceReceipt,
+    ) -> PreparedImageCandidate: ...
 
 
 class CommitPhase(str, Enum):
@@ -318,6 +363,16 @@ class _DurableImageSubmitPermit:
                 return False
             self._consumed = True
             return True
+
+    def _image_generation_was_consumed(
+        self, *, request_fingerprint: str
+    ) -> bool:
+        with self._lock:
+            return (
+                self._consumed
+                and request_fingerprint == self._binding["request_fingerprint"]
+                and self._durability_validator()
+            )
 
     def __reduce__(self) -> object:
         raise TypeError("Image submit permits cannot be serialized.")

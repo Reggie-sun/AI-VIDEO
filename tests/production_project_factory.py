@@ -1971,6 +1971,290 @@ def _p7_png(width: int = 2, height: int = 1) -> bytes:
     )
 
 
+def make_p7_image_candidate_preparer(base_inputs):
+    """Return a deterministic, write-free Task 9 image candidate preparer."""
+
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        resolve_dependency_state,
+    )
+    from ai_video.production.models import DependencyGraphSnapshotPointer
+    from ai_video.production.paths import (
+        canonical_dependency_graph_snapshot_path,
+        canonical_image_asset_path,
+        canonical_image_shot_revision_path,
+    )
+
+    def prepare(
+        base_project,
+        request,
+        authorization,
+        result,
+        measured,
+        receipt,
+    ):
+        from ai_video.production._state_commit_contracts import PreparedImageCandidate
+
+        live_base_inputs = replace(base_inputs, project=base_project)
+        image_record = AssetRecord(
+            asset_id=request.output_asset_id,
+            asset_type=AssetType.IMAGE,
+            artifact_path=canonical_image_asset_path(measured.sha256),
+            sha256=measured.sha256,
+            size_bytes=measured.size_bytes,
+            mime_type=measured.mime_type,
+            width=measured.width,
+            height=measured.height,
+            source_kind=AssetSourceKind.GENERATED,
+            tool=result.adapter,
+            input_artifact_ids=(
+                next(
+                    item.artifact_id
+                    for item in base_project.shots
+                    if item.shot_id == request.target_shot_id
+                ),
+                *(
+                    identity
+                    for item in request.references
+                    for identity in (item.creative_artifact_id, item.asset_id)
+                ),
+            ),
+            input_fingerprint=request.request_fingerprint,
+            creation_receipt_id=receipt.content_hash,
+            usage_license=authorization.usage_license,
+            egress=EgressMetadata(remote=False),
+        )
+        candidate_registry = base_project.registry.model_copy(
+            update={
+                "revision_id": ZERO_HASH,
+                "content_hash": ZERO_HASH,
+                "assets": (*base_project.registry.assets, image_record),
+            }
+        )
+        registry_hash = registry_semantic_sha256(candidate_registry)
+        candidate_registry = candidate_registry.model_copy(
+            update={"revision_id": registry_hash, "content_hash": registry_hash}
+        )
+        registry_bytes = _p7_json_bytes(candidate_registry.model_dump(mode="json"))
+        registry_path = Path(f"assets/registry.{registry_hash}.json")
+        registry_pointer = RegistrySnapshotPointer(
+            path=registry_path,
+            revision_id=registry_hash,
+            content_hash=registry_hash,
+            file_sha256=hashlib.sha256(registry_bytes).hexdigest(),
+        )
+
+        base_shot = next(
+            item for item in base_project.shots if item.shot_id == request.target_shot_id
+        )
+        candidate_shot = seal_artifact(
+            base_shot.model_copy(
+                update={
+                    "revision": base_shot.revision + 1,
+                    "content_hash": ZERO_HASH,
+                    "creation_receipt_id": receipt.content_hash,
+                    "required_asset_roles": tuple(
+                        role.model_copy(update={"asset_ids": (request.output_asset_id,)})
+                        if role.role == request.target_asset_role
+                        else role
+                        for role in base_shot.required_asset_roles
+                    ),
+                }
+            )
+        )
+        candidate_shot_path = canonical_image_shot_revision_path(
+            candidate_shot.revision, candidate_shot.content_hash
+        )
+        candidate_project_artifact = seal_artifact(
+            base_project.project.model_copy(
+                update={
+                    "revision": base_project.project.revision + 1,
+                    "content_hash": ZERO_HASH,
+                    "creation_receipt_id": receipt.content_hash,
+                    "artifacts": base_project.project.artifacts.model_copy(
+                        update={
+                            "shots": tuple(
+                                ArtifactReference(
+                                    artifact_id=candidate_shot.artifact_id,
+                                    revision=candidate_shot.revision,
+                                    content_hash=candidate_shot.content_hash,
+                                    path=candidate_shot_path,
+                                )
+                                if item.artifact_id == candidate_shot.artifact_id
+                                else item
+                                for item in base_project.project.artifacts.shots
+                            )
+                        }
+                    ),
+                }
+            )
+        )
+        project_bytes = yaml.safe_dump(
+            candidate_project_artifact.model_dump(mode="json"),
+            sort_keys=True,
+            allow_unicode=True,
+        ).encode("utf-8")
+        project_path = Path(
+            f"state/projects/project.{candidate_project_artifact.revision}."
+            f"{candidate_project_artifact.content_hash}.yaml"
+        )
+        project_pointer = ProjectSnapshotPointer(
+            path=project_path,
+            revision=candidate_project_artifact.revision,
+            content_hash=candidate_project_artifact.content_hash,
+            file_sha256=hashlib.sha256(project_bytes).hexdigest(),
+        )
+        candidate_project = base_project.model_copy(
+            update={
+                "project": candidate_project_artifact,
+                "shots": tuple(
+                    candidate_shot if item.shot_id == candidate_shot.shot_id else item
+                    for item in base_project.shots
+                ),
+                "registry": candidate_registry,
+                "asset_paths": {
+                    **base_project.asset_paths,
+                    image_record.asset_id: base_project.root / image_record.artifact_path,
+                },
+                "manifest": base_project.manifest.model_copy(
+                    update={
+                        "active_project": project_pointer,
+                        "active_registry": registry_pointer,
+                    }
+                ),
+            }
+        )
+        candidate_inputs = replace(live_base_inputs, project=candidate_project)
+        candidate_graph = build_production_dependency_graph(candidate_inputs)
+        graph_bytes = _p7_json_bytes(candidate_graph.model_dump(mode="json"))
+        graph_path = canonical_dependency_graph_snapshot_path(candidate_graph.revision_id)
+        graph_pointer = DependencyGraphSnapshotPointer(
+            revision_id=candidate_graph.revision_id,
+            content_hash=candidate_graph.content_hash,
+            path=graph_path,
+            file_sha256=hashlib.sha256(graph_bytes).hexdigest(),
+        )
+        candidate_project = candidate_project.model_copy(
+            update={
+                "manifest": candidate_project.manifest.model_copy(
+                    update={"active_dependency_graph": graph_pointer}
+                ),
+                "dependency_graph": candidate_graph,
+            }
+        )
+        candidate_inputs = replace(candidate_inputs, project=candidate_project)
+        resolution = resolve_dependency_state(
+            candidate_graph, base_project.manifest.dependency_states
+        )
+        return PreparedImageCandidate(
+            base_inputs=live_base_inputs,
+            candidate_project=candidate_project,
+            candidate_registry=candidate_registry,
+            candidate_inputs=candidate_inputs,
+            candidate_graph=candidate_graph,
+            resolution=resolution,
+            candidate_project_pointer=project_pointer,
+            candidate_registry_pointer=registry_pointer,
+            candidate_graph_pointer=graph_pointer,
+            candidate_project_bytes=project_bytes,
+            candidate_registry_bytes=registry_bytes,
+            candidate_graph_bytes=graph_bytes,
+        )
+
+    return prepare
+
+
+def make_p7_image_generation_base(root: Path):
+    """Materialize the exact fresh P5 base used by Task 9 orchestration tests."""
+
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.models import (
+        DependencyGraphSnapshotPointer,
+        DependencyLifecycle,
+        DependencyNodeKind,
+        DependencyNodeState,
+        ProjectDependencyEvidence,
+        RegistryDependencyEvidence,
+    )
+    from ai_video.production.paths import canonical_dependency_graph_snapshot_path
+    from ai_video.production.project import load_production_project
+
+    inputs = replace(make_p5_dependency_inputs(root), voice_requests=())
+    graph = build_production_dependency_graph(inputs)
+    graph_bytes = _p7_json_bytes(graph.model_dump(mode="json"))
+    graph_path = canonical_dependency_graph_snapshot_path(graph.revision_id)
+    (root / graph_path).parent.mkdir(parents=True, exist_ok=True)
+    (root / graph_path).write_bytes(graph_bytes)
+    graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=graph.revision_id,
+        content_hash=graph.content_hash,
+        path=graph_path,
+        file_sha256=hashlib.sha256(graph_bytes).hexdigest(),
+    )
+    manifest_path = root / "state/manifest.json"
+    manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes())
+    desired = desired_fingerprints(graph)
+    existing = {
+        item.node_id: item for item in resolve_dependency_state(graph, ()).states
+    }
+    states = []
+    for node in graph.nodes:
+        if node.node_id in {
+            "asset:image-shot-1",
+            "creative:shot:shot-1:visual",
+        }:
+            states.append(existing[node.node_id])
+            continue
+        if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT:
+            evidence = ProjectDependencyEvidence(
+                owner="project_snapshot",
+                pointer=manifest.active_project,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            )
+        elif node.kind is DependencyNodeKind.ASSET:
+            evidence = RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=inputs.project.manifest.active_registry,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            )
+        else:
+            states.append(existing[node.node_id])
+            continue
+        states.append(
+            DependencyNodeState(
+                node_id=node.node_id,
+                graph_revision_id=graph.revision_id,
+                desired_fingerprint=desired[node.node_id],
+                applied_fingerprint=desired[node.node_id],
+                lifecycle=DependencyLifecycle.FRESH,
+                applied_evidence=evidence,
+            )
+        )
+    manifest_path.write_text(
+        manifest.model_copy(
+            update={
+                "schema_version": "2.3",
+                "manifest_revision": manifest.manifest_revision + 1,
+                "active_registry": inputs.project.manifest.active_registry,
+                "active_dependency_graph": graph_pointer,
+                "dependency_states": resolve_dependency_state(
+                    graph, tuple(sorted(states, key=lambda item: item.node_id))
+                ).states,
+            }
+        ).model_dump_json(indent=2),
+        encoding="utf-8",
+    )
+    loaded = load_production_project(root / "project.yaml")
+    assert build_production_dependency_graph(replace(inputs, project=loaded)) == graph
+    return replace(inputs, project=loaded)
+
+
 def make_p7_committed_project(
     root: Path,
     *,
