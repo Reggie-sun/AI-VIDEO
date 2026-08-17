@@ -6,7 +6,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3 deterministic composition、local HyperFrames rendering、P4 Voice and Captions 与 P5 immutable Dependency Graph、Manifest-owned lifecycle、selective rebuild Python API 已在 local `main` 验收。P5 不增加 CLI command、第二 renderer 或默认 remote Provider behavior。
+公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3 deterministic composition、local HyperFrames rendering、P4 Voice and Captions、P5 immutable Dependency Graph/selective rebuild 与 P6 Codex Review and Repair Harness Python APIs 已在 local `main` 验收。P6 不增加 CLI command、第二 renderer 或默认 remote Provider behavior。
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
@@ -17,10 +17,11 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 - Verified P3 composition plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p3-deterministic-composition-hyperframes-adapter.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p3-deterministic-composition-hyperframes-adapter.md)
 - Accepted P4 voice/caption plan: [`docs/superpowers/plans/2026-08-10-ai-video-agentic-production-harness-p4-voice-and-captions.md`](docs/superpowers/plans/2026-08-10-ai-video-agentic-production-harness-p4-voice-and-captions.md)
 - P5 dependency/selective-rebuild plan: [`docs/superpowers/plans/2026-08-11-ai-video-agentic-production-harness-p5-dependency-graph-selective-rebuild.md`](docs/superpowers/plans/2026-08-11-ai-video-agentic-production-harness-p5-dependency-graph-selective-rebuild.md)
+- Accepted P6 review/repair plan: [`docs/superpowers/plans/2026-08-17-ai-video-agentic-production-harness-p6-codex-review-repair-harness.md`](docs/superpowers/plans/2026-08-17-ai-video-agentic-production-harness-p6-codex-review-repair-harness.md)
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P4 已随 `f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward 合入 local `main`，当时 merged-main full verification 为 `1094 passed, 4 skipped`。P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main`，merged-main full verification 为 `1386 passed, 4 skipped`；这些 local changes 均未 push、release 或 publish。
+公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` 合入并 push 到 `origin/main`，merged-main full verification 为 `1386 passed, 4 skipped`。P6 runtime 已完成、独立审查并通过 `be28dc4` checkpoint 整合到 local `main`；focused verification 为 `739 passed`，合入并行 local-main commits 后 full suite 为 `1462 passed, 4 skipped`。P6 尚未 push、release 或 publish。
 
 ## Setup
 
@@ -62,9 +63,9 @@ from ai_video.production import load_production_project
 project = load_production_project("projects/example/project.yaml")
 ```
 
-上面的路径仅为示意；仓库不包含该 example project。Loader 保持 read-only 和 no-network。它以 `project.yaml` 为 stable validated entrypoint，然后验证 Production Manifest 选中的 project/registry snapshot path、semantic identity 和 exact file hash；也验证 sealed creative artifact reference、六种 Shot `visual_strategy` contract、concrete asset ID/type、local file size/SHA-256 与 project-root containment。对 Manifest 2.1/2.2，它还会验证选中的 P3/P4 timeline、audio/caption provenance、source/receipt/output 与 render-state graph；对 Manifest 2.3，它还验证 active immutable Dependency Graph snapshot 与 Manifest-owned dependency states，但不会 scan、repair 或 rewrite。P2A state 存在后，root `project.yaml` 不是 active snapshot bytes truth。
+上面的路径仅为示意；仓库不包含该 example project。Loader 保持 read-only 和 no-network。它以 `project.yaml` 为 stable validated entrypoint，然后验证 Production Manifest 选中的 project/registry snapshot path、semantic identity 和 exact file hash；也验证 sealed creative artifact reference、六种 Shot `visual_strategy` contract、concrete asset ID/type、local file size/SHA-256 与 project-root containment。对 Manifest 2.1/2.2，它还会验证选中的 P3/P4 timeline、audio/caption provenance、source/receipt/output 与 render-state graph；对 Manifest 2.3，它还验证 active immutable Dependency Graph snapshot 与 Manifest-owned dependency states；对 Manifest 2.4，它还会 reopen 并验证 active QA policy、review/repair/outcome/final-acceptance receipts 及其 exact evidence bindings，但不会 scan、repair 或 rewrite。P2A state 存在后，root `project.yaml` 不是 active snapshot bytes truth。
 
-P2 本身不创建目录、不更新 Manifest，也不激活 registry 或 graph revision。P2A 拥有全部 v2 state changes，并与 reader 保持分离。当前没有 v2 CLI、QA/repair flow、Remotion/Captions.ai adapter、Video Provider 或 cloud fallback。
+P2 本身不创建目录、不更新 Manifest，也不激活 registry 或 graph revision。P2A `ProductionStateCommitter` 继续拥有全部 v2 state changes，并与 reader 保持分离；P6 只在该唯一 writer/control path 上增加 durable QA/repair lifecycle。当前仍没有 v2 CLI、Remotion/Captions.ai final-render adapter、Video Provider 或 cloud fallback。
 
 ## Production State Commit Protocol (P2A)
 
@@ -102,13 +103,23 @@ Manifest 2.3 是 `active_dependency_graph`、per-node desired/applied fingerprin
 
 Graph snapshot 使用 canonical `state/dependency_graph.<revision>.json`。Reader/recovery 保持 Manifest 2.0-2.2 compatibility；2.3 的 graph temp、promotion、verification、final Manifest replace、unknown outcome、orphan preservation 与 idempotent recovery 均 fail closed，rollback 只能停用新的 mutation/rebuild entrypoints并保留 2.3 reader/recovery，不能 schema downgrade。默认 P5 acceptance 使用 two-Shot deterministic P4 fixtures、fake/no-network render/voice evidence；required mutation matrix 已证明 script、voice settings、alignment policy/receipt、caption timing/style、audio mix、visual asset、CompositionSpec、renderer source/render contract 只影响精确节点。最终验证为 canonical `1256 passed, 3 skipped`、Legacy `58 passed`、full `1386 passed, 4 skipped`。
 
-P5 没有实现 P6 QA/repair、P7 image generation、P8 Provider/cloud 或 P9 hardening；future generated-image input 只通过 strict synthetic `AssetRecord` seam 验证。Legacy CLI、Manifest v1、flat `runs/` layout、ComfyUI path 和现有公共 CLI 保持不变。
+P5 slice 本身没有实现 QA/repair、Provider/cloud 或 hardening；P6 在不修改 graph ownership 的前提下增加下述 review/repair lifecycle。Legacy CLI、Manifest v1、flat `runs/` layout、ComfyUI path 和现有公共 CLI 保持不变。
+
+## Codex Review and Repair Harness (P6)
+
+P6 通过 `ai_video.production.review`、Manifest 2.4 和既有 `ProductionStateCommitter` 提供 strategy-aware QA。`video-analysis` MCP 只收集 technical raw measurements；它不拥有 Production Manifest、review/repair lifecycle 或 final acceptance。Technical review context 只能从已验证的 `LoadedProductionProject`、`ResolvedTimeline`、exact render/output hash 和 Shot `visual_strategy` 构建。合法 `static_image`、`image_motion` 与 `motion_graphics` 按各自策略预期判定，不再被统一的 video-like diversity heuristic 误判。
+
+Manifest 2.4 是 selected QA policy、review lifecycle、approved repair/outcome 与 final acceptance 的唯一 mutable owner。Review/Repair/Outcome/Final Acceptance receipts 均为 immutable、content-addressed、versioned evidence，绑定当前 dependency graph revision、timeline fingerprint、render/output identity、QA policy/version、evidence/tool/actor identity 与 before/after fingerprints。`technical`、`layout`、`strategy`、`semantic`、`final_acceptance` 五层全部 fail closed；semantic 只接受 policy-selected explicit evaluator 或 human durable evidence。Final acceptance 必须 reopen 当前 desired graph、`ResolvedTimeline`、render hash 和 fresh required review receipts。
+
+Repair 默认未授权，只有 injected trusted authorizer 返回 QA policy 允许的 `ActorIdentity` 后才能记录 approved receipt 并进入执行。它必须绑定 issue/evidence IDs、root-cause hypothesis、exact target artifacts 与 P5 resolver 得出的 exact invalidation closure；禁止 blanket stale。QA policy-only change 只使 affected review/final acceptance stale，不重建 assets/render；只有 approved Repair Receipt 才能触发 selective rebuild。Exact replay 不重复analysis、repair 或 render，crash/unknown outcome 后不 blind reapply，恢复仍由 `ProductionStateCommitter` 单一拥有。
+
+P6 默认 acceptance 仅使用 deterministic fixtures 与 fake/no-network evidence。Focused result 为 `739 passed`，independent review verdict 为 `accept with concerns` 且无 blocking issue；保留的非阻塞风险是未来补一条不使用 monkeypatch 的 activated render/timeline snapshot reopen E2E。P6 未运行 ComfyUI、HyperFrames executable、Provider、付费 API、secret 或 quota，也不授权 P7-P9 scope。
 
 ## Development MCP
 
 Project-local MCP configuration exposes `video-analysis` as the default video inspection server for this repository.
 
-If you also have a global `videoscan` MCP installed, treat it as optional helper tooling for metadata lookup or raw frame extraction only. For repo work here, use `video-analysis` for probing, scene detection, frame extraction, transcription, review, optimization planning, safe auto-application of config edits, and comprehensive analysis.
+If you also have a global `videoscan` MCP installed, treat it as optional helper tooling for metadata lookup or raw frame extraction only. For repo work here, use `video-analysis` for probing, scene detection, frame extraction, transcription, and technical evidence collection. Its legacy optimization helpers remain outside the Production control plane; Production review requires committer-issued durable intent and a one-use analysis permit, and Production repair/final acceptance remain owned by `ProductionStateCommitter`.
 
 ## Validate Example Files
 
