@@ -38,11 +38,15 @@ class TestApplyVideoOptimization:
         monkeypatch.setattr(
             "ai_video_mcp.tools.apply_optimization.video_optimize_plan", fail
         )
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.apply_optimization.load_production_project",
+            lambda path: object(),
+        )
         result = apply_video_optimization(
             str(tiny_video),
             mcp_config,
             mcp_cache,
-            production_mode=True,
+            production_project_path="/verified/project/project.yaml",
         )
         assert result == {
             "mode": "production_repair_refused",

@@ -1668,6 +1668,12 @@ class StateCommitStatus(str, Enum):
     OUTCOME_UNKNOWN = "outcome_unknown"
 
 
+class ReviewAttemptPhase(str, Enum):
+    REQUESTED = "requested"
+    EVIDENCE = "evidence"
+    ACTIVATE = "activate"
+
+
 class VoiceRequestReceipt(StrictModel):
     request_id: str = Field(min_length=1)
     attempt_id: str = Field(min_length=1)
@@ -1728,6 +1734,8 @@ class StateCommitAttempt(StrictModel):
         default=None, pattern=r"^[0-9a-f]{64}$"
     )
     approved_repair_receipt: ApprovedRepairReceiptPointer | None = None
+    review_request: ReviewRequestPointer | None = None
+    review_phase: ReviewAttemptPhase | None = None
     started_at: str
     finished_at: str | None = None
     error_code: str | None = None
@@ -1882,6 +1890,13 @@ class StateCommitAttempt(StrictModel):
                 raise ValueError("repair attempts require approved repair receipt")
         elif self.approved_repair_receipt is not None:
             raise ValueError("non-repair attempt cannot contain repair authorization")
+        if self.operation == "review":
+            if self.review_request is None or self.review_phase is None:
+                raise ValueError("review attempts require request and phase")
+            if self.status is StateCommitStatus.SUCCEEDED and self.review_phase is not ReviewAttemptPhase.ACTIVATE:
+                raise ValueError("succeeded review attempt requires activate phase")
+        elif self.review_request is not None or self.review_phase is not None:
+            raise ValueError("non-review attempt cannot contain review fields")
         return self
 
     @model_serializer(mode="wrap")
@@ -1915,6 +1930,9 @@ class StateCommitAttempt(StrictModel):
                 data.pop(field, None)
         if self.operation != "repair":
             data.pop("approved_repair_receipt", None)
+        if self.operation != "review":
+            data.pop("review_request", None)
+            data.pop("review_phase", None)
         return data
 
 
@@ -2163,7 +2181,11 @@ class ProductionManifest(StrictModel):
                 "cannot contain explicit P6 review fields"
             )
         for attempt in value.get("attempts", ()):
-            if isinstance(attempt, Mapping) and "approved_repair_receipt" in attempt:
+            if isinstance(attempt, Mapping) and {
+                "approved_repair_receipt",
+                "review_request",
+                "review_phase",
+            }.intersection(attempt):
                 raise ValueError(
                     f"Production Manifest {value.get('schema_version', '2.0')} "
                     "cannot contain P6 repair attempt fields"
@@ -2175,7 +2197,7 @@ class ProductionManifest(StrictModel):
     def _reject_explicit_voice_fields_in_old_versions(cls, value: object) -> object:
         if (
             not isinstance(value, Mapping)
-            or value.get("schema_version", "2.0") in {"2.2", "2.3"}
+            or value.get("schema_version", "2.0") in {"2.2", "2.3", "2.4"}
         ):
             return value
         for attempt in value.get("attempts", ()):
@@ -2742,6 +2764,7 @@ class ReviewRequest(VersionedArtifact):
     qa_policy: QaPolicyPointer
     requested_layers: tuple[QaLayer, ...] = Field(min_length=1)
     evidence_tool_identities: tuple[ToolIdentity, ...] = Field(min_length=1)
+    technical_context: TechnicalReviewContext
 
 
 class ReviewEvidence(VersionedArtifact):
@@ -2767,6 +2790,7 @@ class ReviewReceipt(VersionedArtifact):
     layer: Literal[
         QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.STRATEGY, QaLayer.SEMANTIC
     ]
+    review_request: ReviewRequestPointer
     render_state: RenderStateSnapshotPointer
     render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")

@@ -3,10 +3,20 @@ from __future__ import annotations
 import pytest
 
 from ai_video.errors import AiVideoError
-from ai_video.production.models import QaLayer, QaVerdict, VisualStrategy
+from ai_video.production.models import (
+    EvidenceStrength,
+    QaLayer,
+    QaLayoutRules,
+    QaPolicy,
+    QaTechnicalThresholds,
+    QaVerdict,
+    ReviewEvidence,
+    VisualStrategy,
+)
 from ai_video.production.review import (
     ReviewIdentity,
     adjudicate_layer,
+    adjudicate_review_evidence,
     adjudicate_visual_motion,
     evaluate_final_acceptance,
     is_review_current,
@@ -51,6 +61,59 @@ def test_semantic_requires_explicit_evaluator_or_human_evidence():
     assert adjudicate_layer(
         QaLayer.SEMANTIC,
         [{"strength": "explicit_evaluator", "result": "pass"}],
+    ) is QaVerdict.PASS
+
+
+def policy():
+    return QaPolicy.model_construct(
+        technical_thresholds=QaTechnicalThresholds(
+            black_luma_max_milli=10,
+            silence_peak_max_millidb=-60_000,
+            clipping_peak_min_millidb=-100,
+        ),
+        layout_rules=QaLayoutRules(
+            safe_area_inset_milli=50,
+            caption_overflow_tolerance_milli=0,
+        ),
+    )
+
+
+def evidence(layer, strength, **payload):
+    return ReviewEvidence.model_construct(
+        layer=layer,
+        strength=strength,
+        measured_payload={"coverage_complete": True, **payload},
+    )
+
+
+def test_selected_policy_recomputes_technical_and_layout_verdicts():
+    assert adjudicate_review_evidence(
+        policy(),
+        QaLayer.TECHNICAL,
+        (evidence(QaLayer.TECHNICAL, EvidenceStrength.MEASURED, minimum_luma_milli=9),),
+    ) is QaVerdict.FAIL
+    assert adjudicate_review_evidence(
+        policy(),
+        QaLayer.LAYOUT,
+        (evidence(QaLayer.LAYOUT, EvidenceStrength.RENDERER_BOUND, caption_overflow_milli=1),),
+    ) is QaVerdict.FAIL
+
+
+def test_semantic_typed_evidence_requires_evaluator_identity():
+    assert adjudicate_review_evidence(
+        policy(),
+        QaLayer.SEMANTIC,
+        (evidence(QaLayer.SEMANTIC, EvidenceStrength.EXPLICIT_EVALUATOR, semantic_match=True),),
+    ) is QaVerdict.NOT_EVALUATED
+    assert adjudicate_review_evidence(
+        policy(),
+        QaLayer.SEMANTIC,
+        (evidence(
+            QaLayer.SEMANTIC,
+            EvidenceStrength.EXPLICIT_EVALUATOR,
+            evaluator_identity="fixture-evaluator-v1",
+            semantic_match=True,
+        ),),
     ) is QaVerdict.PASS
 
 

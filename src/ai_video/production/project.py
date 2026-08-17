@@ -26,7 +26,7 @@ from ai_video.production.captions import (
     caption_style_fingerprint,
     validate_caption_track_timeline_binding,
 )
-from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.dependency import (
     _asset_role,
     _fp,
@@ -72,6 +72,8 @@ from ai_video.production.models import (
     ReviewReceiptPointer,
     ReviewEvidence,
     ReviewEvidencePointer,
+    ReviewRequest,
+    ReviewRequestPointer,
     RenderDependencyEvidence,
     ResolvedTimeline,
     Scene,
@@ -250,6 +252,23 @@ def load_final_acceptance_receipt(
     if receipt.acceptance_id != pointer.acceptance_id:
         raise _invalid("Final Acceptance Receipt pointer identity is invalid.")
     return receipt
+
+
+def load_review_request(
+    root: str | Path, pointer: ReviewRequestPointer
+) -> ReviewRequest:
+    resolved_root = Path(root).resolve(strict=True)
+    request = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=ReviewRequest,
+        content_hash=pointer.content_hash,
+        label="ReviewRequest",
+    )
+    if request.request_id != pointer.request_id:
+        raise _invalid("ReviewRequest pointer identity is invalid.")
+    return request
 
 
 def _load_referenced_artifact(
@@ -1802,13 +1821,40 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
             final_receipt = load_final_acceptance_receipt(
                 root, manifest.final_acceptance_state.active_receipt
             )
+            required_layers = {
+                item
+                for item in qa_policy.required_layers
+                if item.value != "final_acceptance"
+            }
+            selected_layers = {
+                item.layer for item in final_receipt.required_review_receipts
+            }
+            dependency_states_hash = canonical_sha256(
+                {
+                    "dependency_states": [
+                        item.model_dump(mode="json")
+                        for item in manifest.dependency_states
+                    ]
+                }
+            )
             if (
+                current_render is None
+                or
                 final_receipt.dependency_graph != manifest.active_dependency_graph
                 or final_receipt.render_state != manifest.active_render_state
                 or final_receipt.qa_policy != manifest.active_qa_policy
-                or not set(final_receipt.required_review_receipts).issubset(
-                    set(manifest.active_review_receipts)
-                )
+                or final_receipt.dependency_states_hash != dependency_states_hash
+                or final_receipt.render_output_sha256
+                != current_render.output.file_sha256
+                or final_receipt.timeline_fingerprint
+                != current_render.timeline_fingerprint
+                or selected_layers != required_layers
+                or set(final_receipt.required_review_receipts)
+                != {
+                    item
+                    for item in manifest.active_review_receipts
+                    if item.layer in required_layers
+                }
             ):
                 raise _invalid("Final Acceptance Receipt is stale.")
         bundle = bundle.model_copy(update={"qa_policy": qa_policy})

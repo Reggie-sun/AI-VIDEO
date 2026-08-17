@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 from ai_video_mcp.tools.optimize_plan import video_optimize_plan
 
@@ -18,17 +19,32 @@ class TestVideoOptimizePlan:
         monkeypatch.setattr(
             "ai_video_mcp.tools.optimize_plan.video_review", fail_review
         )
+        pointer_data = {
+            "review_id": "review-1",
+            "layer": "layout",
+            "path": "state/reviews/review." + "0" * 64 + ".json",
+            "content_hash": "0" * 64,
+            "file_sha256": "1" * 64,
+        }
+        from ai_video.production.models import ReviewReceiptPointer
+        pointer = ReviewReceiptPointer.model_validate(pointer_data)
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.optimize_plan.load_production_project",
+            lambda path: SimpleNamespace(
+                root=Path("/verified/project"),
+                manifest=SimpleNamespace(active_review_receipts=(pointer,)),
+            ),
+        )
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.optimize_plan.load_review_receipt",
+            lambda root, selected: SimpleNamespace(issue_ids=("caption-overflow",)),
+        )
         result = video_optimize_plan(
             str(tiny_video),
             mcp_config,
             mcp_cache,
-            production_review_receipt={
-                "review_id": "review-1",
-                "layer": "layout",
-                "path": "state/reviews/review." + "0" * 64 + ".json",
-                "content_hash": "0" * 64,
-                "file_sha256": "1" * 64,
-            },
+            production_review_receipt=pointer_data,
+            production_project_path="/verified/project/project.yaml",
         )
         assert result["mode"] == "production_repair_proposal"
         assert result["targets"] == []

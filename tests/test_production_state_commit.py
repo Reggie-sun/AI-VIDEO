@@ -182,6 +182,31 @@ def test_manifest_24_preserves_p5_transition_support(tmp_path: Path) -> None:
     assert committed.active_qa_policy == current.active_qa_policy
 
 
+def test_recovery_reports_active_and_historical_p6_policy(tmp_path: Path) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    first = writer.activate_qa_policy(
+        make_qa_policy(version="1"),
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    first_path = first.active_qa_policy.path
+    second = writer.activate_qa_policy(
+        make_qa_policy(version="2"),
+        expected_manifest_revision=first.manifest_revision,
+        attempt_id="qa-policy-2",
+    )
+
+    report = writer.recover()
+    dispositions = {item.path: item.disposition for item in report.items}
+    assert dispositions[second.active_qa_policy.path] is RecoveryDisposition.ACTIVE
+    assert dispositions[first_path] is RecoveryDisposition.ORPHAN_PRESERVED
+
+
 def test_voice_lifecycle_api_persists_r1_then_mints_one_use_r2_permit(
     tmp_path: Path,
 ) -> None:

@@ -88,6 +88,9 @@ from ai_video.production.models import (
     ReviewEvidencePointer,
     ReviewReceipt,
     ReviewReceiptPointer,
+    ReviewRequest,
+    ReviewRequestPointer,
+    ReviewAttemptPhase,
     ResolvedTimeline,
     SourceReference,
     StateCommitAttempt,
@@ -123,6 +126,7 @@ from ai_video.production.paths import (
     canonical_repair_request_path,
     canonical_review_evidence_path,
     canonical_review_receipt_path,
+    canonical_review_request_path,
 )
 from ai_video.production.project import (
     _load_exact_render_state,
@@ -135,6 +139,7 @@ from ai_video.production.project import (
     _verify_manifest_dependency_states,
     load_production_project_candidate,
     load_qa_policy,
+    load_review_receipt,
     load_verified_render_state,
 )
 from ai_video.production.dependency import (
@@ -143,6 +148,7 @@ from ai_video.production.dependency import (
     resolve_dependency_state,
 )
 from ai_video.production.registry import registry_semantic_sha256
+from ai_video.production.review import adjudicate_review_evidence
 
 try:
     import fcntl
@@ -985,6 +991,21 @@ class ProductionStateCommitter:
                 if pointer in manifest.active_review_receipts:
                     return manifest
                 raise _state_invalid("Review base Manifest revision changed.")
+            attempt = next(
+                (
+                    item
+                    for item in manifest.attempts
+                    if item.attempt_id == attempt_id
+                ),
+                None,
+            )
+            if (
+                attempt is None
+                or attempt.operation != "review"
+                or attempt.status is not StateCommitStatus.RUNNING
+                or attempt.review_request != receipt.review_request
+            ):
+                raise _state_invalid("Review Receipt requires its durable running request.")
             current_render = self._current_render_state(manifest)
             if (
                 manifest.schema_version != "2.4"
@@ -1011,20 +1032,10 @@ class ProductionStateCommitter:
                     or item.tool_identity not in receipt.tool_identities
                 ):
                     raise _state_invalid("Review evidence identity does not match receipt.")
-            if receipt.layer is QaLayer.SEMANTIC and not any(
-                item.strength.value in {"explicit_evaluator", "human"}
-                for item in evidence
-            ):
-                expected_verdict = QaVerdict.NOT_EVALUATED
-            elif not evidence or any(
-                item.measured_payload.get("coverage_complete") is not True
-                for item in evidence
-            ):
-                expected_verdict = QaVerdict.NOT_EVALUATED
-            elif any(item.measured_payload.get("failures") for item in evidence):
-                expected_verdict = QaVerdict.FAIL
-            else:
-                expected_verdict = QaVerdict.PASS
+            policy = load_qa_policy(self._project_root, receipt.qa_policy)
+            expected_verdict = adjudicate_review_evidence(
+                policy, receipt.layer, evidence
+            )
             if receipt.verdict is not expected_verdict:
                 raise _state_invalid("Review Receipt verdict does not match durable evidence.")
             for artifact in evidence_artifacts:
@@ -1067,6 +1078,82 @@ class ProductionStateCommitter:
                     ),
                     "review_states": tuple(sorted(states, key=lambda item: item.layer.value)),
                     "final_acceptance_state": None,
+                    "attempts": tuple(
+                        item.model_copy(
+                            update={
+                                "status": StateCommitStatus.SUCCEEDED,
+                                "review_phase": ReviewAttemptPhase.ACTIVATE,
+                                "finished_at": _timestamp(),
+                            }
+                        )
+                        if item.attempt_id == attempt_id
+                        else item
+                        for item in manifest.attempts
+                    ),
+                }
+            )
+            updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
+            self._write_manifest_atomic(updated)
+            return self._read_manifest()
+
+    def begin_review(
+        self,
+        request: ReviewRequest,
+        *,
+        attempt_id: str,
+    ) -> ProductionManifest:
+        """Persist the exact ReviewRequest before any analyzer invocation."""
+        if not verify_artifact_hash(request):
+            raise _state_invalid("ReviewRequest content hash is invalid.")
+        payload = _canonical_json_bytes(request)
+        file_sha256 = hashlib.sha256(payload).hexdigest()
+        pointer = ReviewRequestPointer(
+            path=canonical_review_request_path(request.content_hash),
+            request_id=request.request_id,
+            content_hash=request.content_hash,
+            file_sha256=file_sha256,
+        )
+        artifact = PreparedArtifact(pointer.path, payload, file_sha256)
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            existing = next(
+                (item for item in manifest.attempts if item.attempt_id == attempt_id),
+                None,
+            )
+            if existing is not None:
+                if existing.operation == "review" and existing.review_request == pointer:
+                    return manifest
+                raise _state_invalid("Review attempt ID was already used.")
+            current_render = self._current_render_state(manifest)
+            if (
+                manifest.schema_version != "2.4"
+                or manifest.manifest_revision != request.base_manifest_revision
+                or manifest.active_dependency_graph != request.dependency_graph
+                or self._dependency_states_hash(manifest)
+                != request.dependency_states_hash
+                or manifest.active_render_state != request.render_state
+                or current_render.output.file_sha256 != request.render_output_sha256
+                or current_render.timeline_fingerprint != request.timeline_fingerprint
+                or manifest.active_qa_policy != request.qa_policy
+            ):
+                raise _state_invalid("ReviewRequest does not bind current Production state.")
+            self._write_immutable_artifact(artifact, attempt_id=attempt_id)
+            running = StateCommitAttempt(
+                attempt_id=attempt_id,
+                operation="review",
+                status=StateCommitStatus.RUNNING,
+                base_manifest_revision=manifest.manifest_revision,
+                base_project=manifest.active_project,
+                base_registry=manifest.active_registry,
+                candidate_artifacts_hash=_candidate_artifacts_hash((artifact,)),
+                review_request=pointer,
+                review_phase=ReviewAttemptPhase.REQUESTED,
+                started_at=_timestamp(),
+            )
+            updated = manifest.model_copy(
+                update={
+                    "manifest_revision": manifest.manifest_revision + 1,
+                    "attempts": manifest.attempts + (running,),
                 }
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
@@ -1110,6 +1197,23 @@ class ProductionStateCommitter:
             for field in compared_fields
         ):
             raise _state_invalid("Approved Repair Receipt does not exactly copy its request.")
+        expected_scope_fingerprint = canonical_sha256(
+            {
+                "repair_id": request.repair_id,
+                "actor": request.actor.model_dump(mode="json"),
+                "action": request.selected_repair_action.model_dump(mode="json"),
+                "target_artifact_ids": list(request.exact_target_artifact_ids),
+                "target_node_ids": list(request.exact_target_node_ids),
+                "expected_invalidation_node_ids": list(
+                    request.expected_invalidation_node_ids
+                ),
+            }
+        )
+        if request.authorization.scope_fingerprint != expected_scope_fingerprint:
+            raise AiVideoError(
+                ErrorCode.REPAIR_AUTHORIZATION_REQUIRED,
+                "Repair authorization scope fingerprint is invalid.",
+            )
         request_payload = _canonical_json_bytes(request)
         request_artifact = PreparedArtifact(
             canonical_repair_request_path(request.content_hash),
@@ -1173,10 +1277,10 @@ class ProductionStateCommitter:
                         allowed.add(target)
                         frontier.append(target)
             expected = set(receipt.expected_invalidation_node_ids)
-            if not targets.issubset(expected) or not expected.issubset(allowed):
+            if expected != allowed:
                 raise AiVideoError(
                     ErrorCode.REPAIR_SCOPE_INVALID,
-                    "Repair expected invalidation includes unrelated graph nodes.",
+                    "Repair expected invalidation must equal the exact graph closure.",
                 )
             self._write_immutable_artifact(request_artifact, attempt_id=attempt_id)
             artifact = PreparedArtifact(pointer.path, payload, file_sha256)
@@ -1218,12 +1322,66 @@ class ProductionStateCommitter:
                 raise _state_invalid("Repair outcome base revision changed.")
             current_render = self._current_render_state(manifest)
             state_by_layer = {item.layer: item for item in manifest.review_states}
+            approved_snapshot = _read_regular_file_nofollow(
+                self._project_root / receipt.approved_receipt.path,
+                contained_by=self._project_root / "state",
+            )
+            try:
+                approved = ApprovedRepairReceipt.model_validate_json(
+                    approved_snapshot.data
+                )
+            except (ValidationError, ValueError) as exc:
+                raise _state_invalid(
+                    "Repair outcome approval could not be reopened.", str(exc)
+                ) from exc
+            if (
+                approved_snapshot.file_sha256
+                != receipt.approved_receipt.file_sha256
+                or approved.content_hash != receipt.approved_receipt.content_hash
+                or not verify_artifact_hash(approved)
+            ):
+                raise _state_invalid("Repair outcome approval identity is invalid.")
+            repair_index = next(
+                (index
+                for index, item in enumerate(manifest.attempts)
+                if item.operation == "repair"
+                and item.status is StateCommitStatus.SUCCEEDED
+                and item.approved_repair_receipt == receipt.approved_receipt),
+                None,
+            )
+            if repair_index is None:
+                raise AiVideoError(
+                    ErrorCode.REPAIR_SCOPE_INVALID,
+                    "Repair outcome has no succeeded repair attempt.",
+                )
+            rerender_recorded = any(
+                item.operation == "render_state"
+                and item.status is StateCommitStatus.SUCCEEDED
+                and item.candidate_render_state == receipt.rerender_state
+                for item in manifest.attempts[repair_index + 1 :]
+            )
+            if manifest.active_dependency_graph is None:
+                raise _state_invalid("Repair outcome requires active graph.")
+            graph = self._reopen_dependency_graph(manifest.active_dependency_graph)
+            node_kinds = {item.node_id: item.kind for item in graph.nodes}
+            render_states = tuple(
+                item
+                for item in manifest.dependency_states
+                if node_kinds.get(item.node_id) is DependencyNodeKind.RENDER
+            )
             if (
                 not any(
                     item.operation == "repair"
                     and item.status is StateCommitStatus.SUCCEEDED
                     and item.approved_repair_receipt == receipt.approved_receipt
                     for item in manifest.attempts
+                )
+                or receipt.rerender_state == approved.render_state
+                or not rerender_recorded
+                or not render_states
+                or any(
+                    item.lifecycle is not DependencyLifecycle.FRESH
+                    for item in render_states
                 )
                 or manifest.active_render_state != receipt.rerender_state
                 or current_render.output.file_sha256 != receipt.rerender_output_sha256
@@ -1302,10 +1460,18 @@ class ProductionStateCommitter:
             current_render = self._current_render_state(manifest)
             graph = self._reopen_dependency_graph(manifest.active_dependency_graph)
             node_kinds = {item.node_id: item.kind for item in graph.nodes}
-            render_nodes_fresh = all(
-                state.lifecycle is DependencyLifecycle.FRESH
+            render_states = tuple(
+                state
                 for state in manifest.dependency_states
                 if node_kinds.get(state.node_id) is DependencyNodeKind.RENDER
+            )
+            render_nodes_fresh = all(
+                state.lifecycle is DependencyLifecycle.FRESH
+                for state in render_states
+            )
+            reopened_reviews = tuple(
+                load_review_receipt(self._project_root, item)
+                for item in receipt.required_review_receipts
             )
             if (
                 manifest.active_dependency_graph != receipt.dependency_graph
@@ -1323,6 +1489,8 @@ class ProductionStateCommitter:
                     if item.layer in required_layers
                 }
                 or not render_nodes_fresh
+                or not render_states
+                or any(item.verdict is not QaVerdict.PASS for item in reopened_reviews)
                 or any(
                     active_states.get(layer) is None
                     or active_states[layer].lifecycle is not ReviewLifecycle.FRESH
@@ -4812,6 +4980,61 @@ class ProductionStateCommitter:
                     RecoveryDisposition.ACTIVE,
                 )
             )
+        items.extend(self._p6_active_recovery_items(manifest))
+        return tuple(items)
+
+    def _p6_active_recovery_items(
+        self, manifest: ProductionManifest
+    ) -> tuple[RecoveryItem, ...]:
+        if manifest.schema_version != "2.4" or manifest.active_qa_policy is None:
+            return ()
+        pointers: dict[Path, str] = {
+            manifest.active_qa_policy.path: manifest.active_qa_policy.file_sha256,
+        }
+        for receipt_pointer in manifest.active_review_receipts:
+            receipt = load_review_receipt(self._project_root, receipt_pointer)
+            pointers[receipt_pointer.path] = receipt_pointer.file_sha256
+            for evidence_pointer in receipt.evidence:
+                pointers[evidence_pointer.path] = evidence_pointer.file_sha256
+        if manifest.active_approved_repair is not None:
+            pointer = manifest.active_approved_repair
+            pointers[pointer.path] = pointer.file_sha256
+            snapshot = _read_regular_file_nofollow(
+                self._project_root / pointer.path,
+                contained_by=self._project_root / "state",
+            )
+            approved = ApprovedRepairReceipt.model_validate_json(snapshot.data)
+            request_path = canonical_repair_request_path(
+                approved.request_content_hash
+            )
+            request_snapshot = _read_regular_file_nofollow(
+                self._project_root / request_path,
+                contained_by=self._project_root / "state",
+            )
+            pointers[request_path] = request_snapshot.file_sha256
+        for pointer in manifest.repair_outcome_receipts:
+            pointers[pointer.path] = pointer.file_sha256
+        if (
+            manifest.final_acceptance_state is not None
+            and manifest.final_acceptance_state.active_receipt is not None
+        ):
+            pointer = manifest.final_acceptance_state.active_receipt
+            pointers[pointer.path] = pointer.file_sha256
+        for attempt in manifest.attempts:
+            if attempt.review_request is not None:
+                pointers[attempt.review_request.path] = attempt.review_request.file_sha256
+        items: list[RecoveryItem] = []
+        for path, expected_hash in sorted(pointers.items()):
+            actual_hash = self._require_recovery_file_hash(
+                self._project_root / path, expected_hash
+            )
+            items.append(
+                RecoveryItem(
+                    path=path,
+                    disposition=RecoveryDisposition.ACTIVE,
+                    sha256=actual_hash,
+                )
+            )
         return tuple(items)
 
     def _recovery_dependency_outcome(
@@ -4982,6 +5205,32 @@ class ProductionStateCommitter:
                 StateCommitStatus.OUTCOME_UNKNOWN,
             }:
                 repaired.append(attempt)
+                continue
+            if attempt.operation == "review":
+                if attempt.review_request is None:
+                    raise _state_invalid("Interrupted review attempt has no request.")
+                if attempt.status is StateCommitStatus.RUNNING:
+                    replacement = _validated_transition(
+                        attempt,
+                        {
+                            "status": StateCommitStatus.OUTCOME_UNKNOWN,
+                            "review_phase": ReviewAttemptPhase.EVIDENCE,
+                            "finished_at": _timestamp(),
+                            "error_code": ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN.value,
+                            "error_message": "Review evidence outcome is unknown; do not rerun analysis blindly.",
+                        },
+                    )
+                    repaired.append(replacement)
+                    items.append(
+                        RecoveryItem(
+                            path=attempt.review_request.path,
+                            disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
+                            sha256=attempt.review_request.file_sha256,
+                        )
+                    )
+                    changed = True
+                else:
+                    repaired.append(attempt)
                 continue
             if attempt.operation == "bootstrap_dependency_graph":
                 if (
@@ -5676,7 +5925,55 @@ class ProductionStateCommitter:
             items.setdefault(item.path, item)
         for item in self._render_orphan_items(manifest):
             items.setdefault(item.path, item)
+        for item in self._p6_orphan_items(manifest):
+            items.setdefault(item.path, item)
         return tuple(items[path] for path in sorted(items))
+
+    def _p6_orphan_items(
+        self, manifest: ProductionManifest
+    ) -> tuple[RecoveryItem, ...]:
+        active = {item.path for item in self._p6_active_recovery_items(manifest)}
+        namespaces = (
+            (
+                self._project_root / "state/reviews",
+                re.compile(r"^(?:policy|evidence|request|review)\.(?P<hash>[0-9a-f]{64})\.json$"),
+            ),
+            (
+                self._project_root / "state/repairs",
+                re.compile(r"^(?:request|approved|outcome)\.(?P<hash>[0-9a-f]{64})\.json$"),
+            ),
+            (
+                self._project_root / "state/acceptance",
+                re.compile(r"^final\.(?P<hash>[0-9a-f]{64})\.json$"),
+            ),
+        )
+        items: list[RecoveryItem] = []
+        for directory, pattern in namespaces:
+            for path, match in self._recovery_namespace_entries(directory, pattern):
+                relative = path.relative_to(self._project_root)
+                if relative in active:
+                    continue
+                try:
+                    snapshot = _read_regular_file_nofollow(
+                        path, contained_by=self._project_root / "state"
+                    )
+                    payload = json.loads(snapshot.data)
+                    if (
+                        not isinstance(payload, dict)
+                        or payload.get("content_hash") != match.group("hash")
+                        or canonical_sha256(payload) != match.group("hash")
+                    ):
+                        continue
+                except (OSError, ValueError, json.JSONDecodeError):
+                    continue
+                items.append(
+                    RecoveryItem(
+                        path=relative,
+                        disposition=RecoveryDisposition.ORPHAN_PRESERVED,
+                        sha256=snapshot.file_sha256,
+                    )
+                )
+        return tuple(items)
 
     def _dependency_graph_orphan_items(
         self, manifest: ProductionManifest

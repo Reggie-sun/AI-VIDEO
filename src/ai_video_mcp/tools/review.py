@@ -2,9 +2,16 @@ from __future__ import annotations
 
 import subprocess
 import hashlib
+import re
 from pathlib import Path
 
-from ai_video.production.models import TechnicalReviewContext, VisualStrategy
+from ai_video.production.models import (
+    ReviewRequestPointer,
+    StateCommitStatus,
+    TechnicalReviewContext,
+    VisualStrategy,
+)
+from ai_video.production.project import load_production_project, load_review_request
 from ai_video_mcp.cache import AnalysisCache
 from ai_video_mcp.config import ServerConfig
 from ai_video_mcp.errors import McpError, McpErrorCode
@@ -59,6 +66,49 @@ def _sample_window_hashes(video_path: Path, start_frame: int, end_frame: int) ->
         for line in result.stdout.splitlines()
         if line and not line.startswith("#")
     ]
+
+
+def _technical_signal_measurements(video_path: Path) -> dict:
+    black = subprocess.run(
+        [
+            "ffmpeg", "-v", "info", "-i", str(video_path), "-vf",
+            "blackdetect=d=0.1:pix_th=0.10", "-an", "-f", "null", "-",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    black_ranges = [
+        {"start_seconds": float(start), "end_seconds": float(end)}
+        for start, end in re.findall(
+            r"black_start:([0-9.]+).*?black_end:([0-9.]+)", black.stderr
+        )
+    ]
+    audio = subprocess.run(
+        [
+            "ffmpeg", "-v", "info", "-i", str(video_path), "-af",
+            "silencedetect=noise=-60dB:d=0.1,volumedetect", "-vn", "-f", "null", "-",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    silence_ranges = [
+        {"start_seconds": float(start), "end_seconds": float(end)}
+        for start, end in re.findall(
+            r"silence_start: ([0-9.]+).*?silence_end: ([0-9.]+)",
+            audio.stderr,
+            flags=re.DOTALL,
+        )
+    ]
+    peak = re.search(r"max_volume: (-?[0-9.]+) dB", audio.stderr)
+    return {
+        "black_ranges": black_ranges,
+        "silence_ranges": silence_ranges,
+        "audio_peak_millidb": (
+            round(float(peak.group(1)) * 1000) if peak is not None else None
+        ),
+    }
 
 
 def _make_issue(
@@ -179,10 +229,32 @@ def video_review(
     scene_threshold: float | None = None,
     transcribe_audio: bool = False,
     production_context: dict | None = None,
+    production_project_path: str | None = None,
+    production_review_request: dict | None = None,
 ) -> dict:
     p = _validate_video(video_path, config)
 
     if production_context is not None:
+        if production_project_path is None or production_review_request is None:
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production review requires verified project and durable request",
+            )
+        bundle = load_production_project(production_project_path)
+        request_pointer = ReviewRequestPointer.model_validate(
+            production_review_request
+        )
+        if not any(
+            item.operation == "review"
+            and item.status is StateCommitStatus.RUNNING
+            and item.review_request == request_pointer
+            for item in bundle.manifest.attempts
+        ):
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production ReviewRequest is not active",
+            )
+        durable_request = load_review_request(bundle.root, request_pointer)
         try:
             context = TechnicalReviewContext.model_validate(production_context)
         except ValueError as exc:
@@ -191,6 +263,11 @@ def video_review(
                 "Production technical review context is invalid",
                 detail=str(exc),
             ) from exc
+        if context != durable_request.technical_context:
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production technical context does not match ReviewRequest",
+            )
         actual_hash = hashlib.sha256(p.read_bytes()).hexdigest()
         expected_hash = context.render_output_sha256
         if actual_hash != expected_hash:
@@ -239,6 +316,7 @@ def video_review(
                 "sampled_frame_count": sample_count,
                 "unique_frame_count": unique_count,
                 "unique_frame_ratio": ratio,
+                **_technical_signal_measurements(p),
             },
             # Production thresholds and verdicts belong to production.review.
             "issues": [],

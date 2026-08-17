@@ -186,6 +186,8 @@ async def video_review(
     scene_threshold: Optional[float] = None,
     transcribe_audio: bool = False,
     production_context: Optional[dict] = None,
+    production_project_path: Optional[str] = None,
+    production_review_request: Optional[dict] = None,
     ctx: Context = None,
 ) -> dict:
     """Review a rendered video and return actionable optimization hints for workflow/config/code iteration.
@@ -208,6 +210,8 @@ async def video_review(
             scene_threshold=scene_threshold,
             transcribe_audio=transcribe_audio,
             production_context=production_context,
+            production_project_path=production_project_path,
+            production_review_request=production_review_request,
         )
     except Exception as e:
         return _handle_error(e)
@@ -220,6 +224,7 @@ async def video_optimize_plan(
     shots_path: Optional[str] = None,
     manifest_path: Optional[str] = None,
     production_review_receipt: Optional[dict] = None,
+    production_project_path: Optional[str] = None,
     ctx: Context = None,
 ) -> dict:
     """Map video review issues to concrete repo files and suggested edits.
@@ -240,6 +245,7 @@ async def video_optimize_plan(
             shots_path=shots_path,
             manifest_path=manifest_path,
             production_review_receipt=production_review_receipt,
+            production_project_path=production_project_path,
         )
     except Exception as e:
         return _handle_error(e)
@@ -251,7 +257,7 @@ async def video_apply_optimization(
     project_path: Optional[str] = None,
     shots_path: Optional[str] = None,
     manifest_path: Optional[str] = None,
-    production_mode: bool = False,
+    production_project_path: Optional[str] = None,
     ctx: Context = None,
 ) -> dict:
     """Apply safe optimization edits to project and shot files based on detected video issues.
@@ -271,7 +277,7 @@ async def video_apply_optimization(
             project_path=project_path,
             shots_path=shots_path,
             manifest_path=manifest_path,
-            production_mode=production_mode,
+            production_project_path=production_project_path,
         )
     except Exception as e:
         return _handle_error(e)

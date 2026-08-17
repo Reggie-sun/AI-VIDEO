@@ -7,7 +7,14 @@ from dataclasses import dataclass
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
-from ai_video.production.models import EvidenceStrength, QaLayer, QaVerdict, VisualStrategy
+from ai_video.production.models import (
+    EvidenceStrength,
+    QaLayer,
+    QaPolicy,
+    QaVerdict,
+    ReviewEvidence,
+    VisualStrategy,
+)
 
 
 @dataclass(frozen=True)
@@ -51,6 +58,80 @@ def adjudicate_layer(
         if item.get("result") not in {"pass", "fail"}:
             return QaVerdict.NOT_EVALUATED
     return QaVerdict.PASS
+
+
+def adjudicate_review_evidence(
+    policy: QaPolicy, layer: QaLayer, evidence: Sequence[ReviewEvidence]
+) -> QaVerdict:
+    """Derive verdict from selected policy and typed raw measurements."""
+    if not evidence or any(
+        item.layer is not layer
+        or item.measured_payload.get("coverage_complete") is not True
+        for item in evidence
+    ):
+        return QaVerdict.NOT_EVALUATED
+    if layer is QaLayer.SEMANTIC:
+        authorized = [
+            item
+            for item in evidence
+            if item.strength
+            in {EvidenceStrength.EXPLICIT_EVALUATOR, EvidenceStrength.HUMAN}
+            and isinstance(item.measured_payload.get("evaluator_identity"), str)
+            and bool(item.measured_payload.get("evaluator_identity"))
+        ]
+        if not authorized:
+            return QaVerdict.NOT_EVALUATED
+        return (
+            QaVerdict.PASS
+            if all(item.measured_payload.get("semantic_match") is True for item in authorized)
+            else QaVerdict.FAIL
+        )
+    if layer is QaLayer.TECHNICAL:
+        thresholds = policy.technical_thresholds
+        for item in evidence:
+            payload = item.measured_payload
+            if (
+                isinstance(payload.get("minimum_luma_milli"), int)
+                and payload["minimum_luma_milli"] <= thresholds.black_luma_max_milli
+            ):
+                return QaVerdict.FAIL
+            if payload.get("expects_audio") is True and (
+                isinstance(payload.get("audio_peak_millidb"), int)
+                and payload["audio_peak_millidb"]
+                <= thresholds.silence_peak_max_millidb
+            ):
+                return QaVerdict.FAIL
+            if isinstance(payload.get("audio_peak_millidb"), int) and (
+                payload["audio_peak_millidb"]
+                >= thresholds.clipping_peak_min_millidb
+            ):
+                return QaVerdict.FAIL
+            if payload.get("frozen_required_motion") is True:
+                return QaVerdict.FAIL
+        return QaVerdict.PASS
+    if layer is QaLayer.LAYOUT:
+        rules = policy.layout_rules
+        for item in evidence:
+            payload = item.measured_payload
+            if (
+                isinstance(payload.get("caption_overflow_milli"), int)
+                and payload["caption_overflow_milli"]
+                > rules.caption_overflow_tolerance_milli
+            ) or (
+                isinstance(payload.get("safe_area_inset_milli"), int)
+                and payload["safe_area_inset_milli"] < rules.safe_area_inset_milli
+            ) or int(payload.get("layer_collision_count", 0)) > 0 or int(
+                payload.get("transition_boundary_violation_count", 0)
+            ) > 0:
+                return QaVerdict.FAIL
+        return QaVerdict.PASS
+    if layer is QaLayer.STRATEGY:
+        return (
+            QaVerdict.FAIL
+            if any(item.measured_payload.get("strategy_mismatch") is True for item in evidence)
+            else QaVerdict.PASS
+        )
+    return QaVerdict.NOT_EVALUATED
 
 
 def adjudicate_visual_motion(
