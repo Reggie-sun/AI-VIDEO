@@ -76,8 +76,10 @@ def adjudicate_review_evidence(
             for item in evidence
             if item.strength
             in {EvidenceStrength.EXPLICIT_EVALUATOR, EvidenceStrength.HUMAN}
+            and item.tool_identity in policy.semantic_authorities
             and isinstance(item.measured_payload.get("evaluator_identity"), str)
-            and bool(item.measured_payload.get("evaluator_identity"))
+            and item.measured_payload.get("evaluator_identity")
+            == f"{item.tool_identity.name}@{item.tool_identity.version}"
         ]
         if not authorized:
             return QaVerdict.NOT_EVALUATED
@@ -91,18 +93,13 @@ def adjudicate_review_evidence(
         for item in evidence:
             payload = item.measured_payload
             required = {
-                "black_ranges",
-                "silence_ranges",
+                "minimum_luma_milli",
                 "audio_peak_millidb",
                 "expects_audio",
                 "windows",
             }
             if not required.issubset(payload):
                 return QaVerdict.NOT_EVALUATED
-            if payload["black_ranges"]:
-                return QaVerdict.FAIL
-            if payload["expects_audio"] is True and payload["silence_ranges"]:
-                return QaVerdict.FAIL
             if (
                 payload["expects_audio"] is True
                 and not isinstance(payload["audio_peak_millidb"], int)

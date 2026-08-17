@@ -404,6 +404,7 @@ class ActorIdentity(StrictModel):
 class RepairAuthorization(StrictModel):
     authorization_id: str = Field(min_length=1)
     authorized: Literal[True]
+    authorized_by: ActorIdentity
     scope_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
@@ -2751,6 +2752,14 @@ class QaPolicy(VersionedArtifact):
     layout_rules: QaLayoutRules
     strategy_rules_version: str = Field(min_length=1)
     semantic_requirement: Literal["optional", "required"]
+    semantic_authorities: tuple[ToolIdentity, ...] = ()
+    repair_authorities: tuple[ActorIdentity, ...] = ()
+
+    @model_validator(mode="after")
+    def _require_semantic_authority(self) -> "QaPolicy":
+        if self.semantic_requirement == "required" and not self.semantic_authorities:
+            raise ValueError("required semantic QA needs a policy-selected authority")
+        return self
 
 
 class ReviewRequest(VersionedArtifact):

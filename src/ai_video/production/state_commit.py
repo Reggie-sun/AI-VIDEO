@@ -870,6 +870,7 @@ class ProductionStateCommitter:
         file_ops: _FileOps | None = None,
         crash_injector: CrashInjector | None = None,
         voice_candidate_preparer: VoiceCandidatePreparer | None = None,
+        repair_authorizer: Callable[[RepairRequest], ActorIdentity | None] | None = None,
     ) -> None:
         try:
             self._project_root = Path(project_root).resolve(strict=True)
@@ -880,6 +881,7 @@ class ProductionStateCommitter:
         self._ops = file_ops or _NativeFileOps()
         self._crash_injector = crash_injector or NoopCrashInjector()
         self._voice_candidate_preparer = voice_candidate_preparer
+        self._repair_authorizer = repair_authorizer
 
     def activate_qa_policy(
         self,
@@ -1183,18 +1185,21 @@ class ProductionStateCommitter:
             self._write_p6_manifest_atomic(updated)
             return self._read_manifest()
 
-    def run_review_analysis(
+    def consume_review_analysis_request(
         self,
         *,
-        attempt_id: str,
+        review_request: ReviewRequestPointer,
         expected_manifest_revision: int,
-        analyzer: Callable[[ReviewRequest], tuple[ReviewEvidence, ...]],
-    ) -> tuple[ReviewEvidence, ...]:
-        """Consume one durable review intent before invoking the analyzer once."""
+    ) -> ReviewRequest:
+        """Atomically consume one durable review intent at the analyzer boundary."""
         with self._exclusive_lock():
             manifest = self._read_manifest()
             attempt = next(
-                (item for item in manifest.attempts if item.attempt_id == attempt_id),
+                (
+                    item
+                    for item in manifest.attempts
+                    if item.review_request == review_request
+                ),
                 None,
             )
             if (
@@ -1203,15 +1208,12 @@ class ProductionStateCommitter:
                 or attempt.operation != "review"
                 or attempt.status is not StateCommitStatus.RUNNING
                 or attempt.review_phase is not ReviewAttemptPhase.REQUESTED
-                or attempt.review_request is None
             ):
                 raise AiVideoError(
                     ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN,
                     "Review analysis was already consumed or has unknown outcome; do not rerun blindly.",
                 )
-            request = load_review_request(
-                self._project_root, attempt.review_request
-            )
+            request = load_review_request(self._project_root, review_request)
             consumed = attempt.model_copy(
                 update={"review_phase": ReviewAttemptPhase.EVIDENCE}
             )
@@ -1219,14 +1221,14 @@ class ProductionStateCommitter:
                 update={
                     "manifest_revision": manifest.manifest_revision + 1,
                     "attempts": tuple(
-                        consumed if item.attempt_id == attempt_id else item
+                        consumed if item.attempt_id == attempt.attempt_id else item
                         for item in manifest.attempts
                     ),
                 }
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
             self._write_p6_manifest_atomic(updated)
-        return analyzer(request)
+            return request
 
     def record_approved_repair_receipt(
         self,
@@ -1302,9 +1304,28 @@ class ProductionStateCommitter:
                 if manifest.active_approved_repair == pointer:
                     return manifest
                 raise _state_invalid("Repair authorization base revision changed.")
+            if manifest.schema_version != "2.4" or manifest.active_qa_policy is None:
+                raise AiVideoError(
+                    ErrorCode.REPAIR_AUTHORIZATION_REQUIRED,
+                    "Repair approval requires the current selected QA policy.",
+                )
+            policy = load_qa_policy(self._project_root, manifest.active_qa_policy)
+            authorized_by = (
+                self._repair_authorizer(request)
+                if self._repair_authorizer is not None
+                else None
+            )
             if (
-                manifest.schema_version != "2.4"
-                or manifest.active_dependency_graph != receipt.dependency_graph
+                authorized_by is None
+                or authorized_by not in policy.repair_authorities
+                or receipt.authorization.authorized_by != authorized_by
+            ):
+                raise AiVideoError(
+                    ErrorCode.REPAIR_AUTHORIZATION_REQUIRED,
+                    "Repair approval requires a policy-selected trusted authorizer.",
+                )
+            if (
+                manifest.active_dependency_graph != receipt.dependency_graph
                 or manifest.active_render_state != receipt.render_state
                 or manifest.active_qa_policy != receipt.qa_policy
                 or receipt.base_manifest_revision != manifest.manifest_revision
@@ -6944,7 +6965,7 @@ class ProductionStateCommitter:
 
         try:
             return self._write_manifest_atomic(manifest, on_replace=mark_replaced)
-        except Exception as exc:
+        except BaseException as exc:
             if replaced:
                 raise _outcome_unknown(exc) from exc
             raise
