@@ -25,6 +25,7 @@ PRIVATE_MODULES = (
     "_state_commit_recovery_attempts.py",
     "_state_commit_recovery_fs.py",
 )
+FACADE_MODULE = "ai_video.production.state_commit"
 
 
 def _effective_loc(path: Path) -> int:
@@ -33,6 +34,41 @@ def _effective_loc(path: Path) -> int:
         for line in path.read_text(encoding="utf-8").splitlines()
         if line.strip() and not line.lstrip().startswith("#")
     )
+
+
+def _imports_state_commit_facade(tree: ast.AST) -> bool:
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            if any(alias.name == FACADE_MODULE for alias in node.names):
+                return True
+        elif isinstance(node, ast.ImportFrom):
+            if node.module in {"state_commit", FACADE_MODULE}:
+                return True
+            if node.module == "ai_video.production" and any(
+                alias.name == "state_commit" for alias in node.names
+            ):
+                return True
+            if node.level and node.module is None and any(
+                alias.name == "state_commit" for alias in node.names
+            ):
+                return True
+    return False
+
+
+def test_reverse_import_detection_covers_facade_forms_without_private_false_positive() -> None:
+    cases = (
+        ("import ai_video.production.state_commit", True),
+        (
+            "from ai_video.production.state_commit import ProductionStateCommitter",
+            True,
+        ),
+        ("from ai_video.production import state_commit", True),
+        ("from .state_commit import ProductionStateCommitter", True),
+        ("from . import state_commit", True),
+        ("from ._state_commit_io import _StateCommitIoMixin", False),
+    )
+    for source, expected in cases:
+        assert _imports_state_commit_facade(ast.parse(source)) is expected
 
 
 def test_contracts_and_prepare_helpers_are_owned_by_private_modules() -> None:
@@ -209,14 +245,6 @@ def test_private_modules_do_not_import_facade_and_stay_focused() -> None:
     for filename in PRIVATE_MODULES:
         path = production / filename
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        imports_facade = any(
-            isinstance(node, ast.ImportFrom)
-            and (
-                node.module == "state_commit"
-                or any(alias.name == "state_commit" for alias in node.names)
-            )
-            for node in ast.walk(tree)
-        )
-        assert not imports_facade
+        assert not _imports_state_commit_facade(tree)
         assert _effective_loc(path) <= 800, filename
     assert _effective_loc(production / "state_commit.py") <= 800
