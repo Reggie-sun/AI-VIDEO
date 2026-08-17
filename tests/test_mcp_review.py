@@ -35,13 +35,21 @@ def production_request(monkeypatch, context):
         "ai_video_mcp.tools.review.load_production_project",
         lambda path: SimpleNamespace(
             root=Path("/verified/project"),
-            manifest=SimpleNamespace(attempts=(attempt,)),
+            manifest=SimpleNamespace(manifest_revision=7, attempts=(attempt,)),
         ),
     )
     monkeypatch.setattr(
         "ai_video_mcp.tools.review.load_review_request",
         lambda root, selected: SimpleNamespace(
             technical_context=TechnicalReviewContext.model_validate(context)
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video_mcp.tools.review.ProductionStateCommitter",
+        lambda root: SimpleNamespace(
+            consume_review_analysis_request=lambda **kwargs: SimpleNamespace(
+                technical_context=TechnicalReviewContext.model_validate(context)
+            )
         ),
     )
     return {

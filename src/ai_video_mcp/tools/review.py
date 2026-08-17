@@ -6,13 +6,12 @@ import re
 from pathlib import Path
 
 from ai_video.production.models import (
-    ReviewAttemptPhase,
     ReviewRequestPointer,
-    StateCommitStatus,
     TechnicalReviewContext,
     VisualStrategy,
 )
 from ai_video.production.project import load_production_project, load_review_request
+from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video_mcp.cache import AnalysisCache
 from ai_video_mcp.config import ServerConfig
 from ai_video_mcp.errors import McpError, McpErrorCode
@@ -70,45 +69,46 @@ def _sample_window_hashes(video_path: Path, start_frame: int, end_frame: int) ->
 
 
 def _technical_signal_measurements(video_path: Path) -> dict:
-    black = subprocess.run(
+    luminance = subprocess.run(
         [
             "ffmpeg", "-v", "info", "-i", str(video_path), "-vf",
-            "blackdetect=d=0.1:pix_th=0.10", "-an", "-f", "null", "-",
+            "signalstats,metadata=print", "-an", "-f", "null", "-",
         ],
         capture_output=True,
         text=True,
         check=False,
     )
-    black_ranges = [
-        {"start_seconds": float(start), "end_seconds": float(end)}
-        for start, end in re.findall(
-            r"black_start:([0-9.]+).*?black_end:([0-9.]+)", black.stderr
+    luminance_values = [
+        float(item)
+        for item in re.findall(
+            r"lavfi\.signalstats\.YAVG=([0-9.]+)",
+            luminance.stdout + luminance.stderr,
         )
     ]
     audio = subprocess.run(
         [
             "ffmpeg", "-v", "info", "-i", str(video_path), "-af",
-            "silencedetect=noise=-60dB:d=0.1,volumedetect", "-vn", "-f", "null", "-",
+            "volumedetect", "-vn", "-f", "null", "-",
         ],
         capture_output=True,
         text=True,
         check=False,
     )
-    silence_ranges = [
-        {"start_seconds": float(start), "end_seconds": float(end)}
-        for start, end in re.findall(
-            r"silence_start: ([0-9.]+).*?silence_end: ([0-9.]+)",
-            audio.stderr,
-            flags=re.DOTALL,
-        )
-    ]
     peak = re.search(r"max_volume: (-?[0-9.]+) dB", audio.stderr)
+    minimum_luma = min(luminance_values) if luminance_values else None
     return {
-        "black_ranges": black_ranges,
-        "silence_ranges": silence_ranges,
+        "minimum_luma_milli": (
+            round(max(0.0, minimum_luma - 16.0) / 219.0 * 1000)
+            if minimum_luma is not None
+            else None
+        ),
         "audio_peak_millidb": (
             round(float(peak.group(1)) * 1000) if peak is not None else None
         ),
+        "luminance_measurement_succeeded": (
+            luminance.returncode == 0 and minimum_luma is not None
+        ),
+        "audio_measurement_succeeded": audio.returncode == 0 and peak is not None,
     }
 
 
@@ -250,17 +250,6 @@ def video_review(
         request_pointer = ReviewRequestPointer.model_validate(
             production_review_request
         )
-        if not any(
-            item.operation == "review"
-            and item.status is StateCommitStatus.RUNNING
-            and item.review_phase is ReviewAttemptPhase.EVIDENCE
-            and item.review_request == request_pointer
-            for item in bundle.manifest.attempts
-        ):
-            raise McpError(
-                McpErrorCode.INVALID_PARAMETER,
-                "Production ReviewRequest is not active",
-            )
         durable_request = load_review_request(bundle.root, request_pointer)
         try:
             context = TechnicalReviewContext.model_validate(production_context)
@@ -281,6 +270,24 @@ def video_review(
             raise McpError(
                 McpErrorCode.INVALID_PARAMETER,
                 "Production render output hash does not match review context",
+            )
+        try:
+            consumed_request = ProductionStateCommitter(
+                bundle.root
+            ).consume_review_analysis_request(
+                review_request=request_pointer,
+                expected_manifest_revision=bundle.manifest.manifest_revision,
+            )
+        except Exception as exc:
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production ReviewRequest is not consumable",
+                detail=str(exc),
+            ) from exc
+        if consumed_request != durable_request:
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production ReviewRequest changed before analysis",
             )
         window_measurements: list[dict] = []
         frame_hashes: list[str] = []
@@ -312,6 +319,15 @@ def video_review(
         unique_count = len(set(frame_hashes))
         sample_count = len(frame_hashes)
         ratio = round(unique_count / sample_count, 3) if sample_count else 0.0
+        signals = _technical_signal_measurements(p)
+        coverage_complete = bool(
+            signals["luminance_measurement_succeeded"]
+            and all(item["sampled_frame_count"] > 0 for item in window_measurements)
+            and (
+                not any(item.expects_audio for item in context.windows)
+                or signals["audio_measurement_succeeded"]
+            )
+        )
         return {
             "mode": "production_evidence",
             "video_path": str(p),
@@ -320,13 +336,13 @@ def video_review(
             "measurement_contract_version": context.measurement_contract_version,
             "windows": window_measurements,
             "measurements": {
-                "coverage_complete": True,
+                "coverage_complete": coverage_complete,
                 "sampled_frame_count": sample_count,
                 "unique_frame_count": unique_count,
                 "unique_frame_ratio": ratio,
                 "expects_audio": any(item.expects_audio for item in context.windows),
                 "windows": window_measurements,
-                **_technical_signal_measurements(p),
+                **signals,
             },
             # Production thresholds and verdicts belong to production.review.
             "issues": [],

@@ -11,8 +11,10 @@ import yaml
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.hashing import seal_artifact, verify_artifact_hash
+from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
+    ActorIdentity,
+    ApprovedRepairReceipt,
     AssetRegistrySnapshot,
     DependencyLifecycle,
     DependencyNodeState,
@@ -23,6 +25,13 @@ from ai_video.production.models import (
     QaLayer,
     QaPolicy,
     QaTechnicalThresholds,
+    NamedFingerprint,
+    RepairAction,
+    RepairAuthorization,
+    RepairRequest,
+    ReviewAttemptPhase,
+    ReviewRequest,
+    ReviewRequestPointer,
     RendererKind,
     RendererSelectionReceipt,
     RegistrySnapshotPointer,
@@ -32,6 +41,9 @@ from ai_video.production.models import (
     Shot,
     SourceReference,
     StateCommitStatus,
+    StateCommitAttempt,
+    TechnicalReviewContext,
+    ToolIdentity,
 )
 from ai_video.production.project import load_production_project, load_production_project_candidate
 from ai_video.production.registry import load_asset_registry
@@ -62,6 +74,7 @@ from ai_video.production.paths import (
     canonical_render_source_root,
     canonical_render_state_path,
     canonical_render_timeline_path,
+    canonical_review_request_path,
     canonical_renderer_source_receipt_path,
 )
 import production_project_factory as project_factory
@@ -71,7 +84,9 @@ ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
 
 
-def make_qa_policy(*, version: str = "1") -> QaPolicy:
+def make_qa_policy(
+    *, version: str = "1", repair_authorities: tuple[ActorIdentity, ...] = ()
+) -> QaPolicy:
     return seal_artifact(
         QaPolicy(
             artifact_id=f"qa-policy-{version}",
@@ -95,6 +110,7 @@ def make_qa_policy(*, version: str = "1") -> QaPolicy:
             ),
             strategy_rules_version="1",
             semantic_requirement="optional",
+            repair_authorities=repair_authorities,
         )
     )
 
@@ -128,6 +144,107 @@ def test_p6_policy_activation_migrates_23_and_exact_replay_is_noop(
     assert replay == committed
 
 
+def test_review_request_is_consumed_once_before_analysis(tmp_path: Path) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before = read_manifest(tmp_path)
+    current = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-review-consume",
+    )
+    assert current.active_dependency_graph is not None
+    assert current.active_qa_policy is not None
+    render_hash = "9" * 64
+    render_pointer = RenderStateSnapshotPointer(
+        path=Path(f"state/render/states/{render_hash}.json"),
+        revision=1,
+        content_hash=render_hash,
+        file_sha256="8" * 64,
+    )
+    context = TechnicalReviewContext(
+        render_output_sha256="7" * 64,
+        timeline_fingerprint="6" * 64,
+        windows=(),
+        measurement_contract_version="1",
+    )
+    request = seal_artifact(
+        ReviewRequest(
+            artifact_id="review-request-once",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="review-request-once",
+            source_provenance=(
+                SourceReference(kind="derived", reference="p6-test-fixture"),
+            ),
+            request_id="review-request-once",
+            base_manifest_revision=current.manifest_revision,
+            dependency_graph=current.active_dependency_graph,
+            dependency_states_hash=canonical_sha256(
+                {"dependency_states": [
+                    item.model_dump(mode="json")
+                    for item in current.dependency_states
+                ]}
+            ),
+            render_state=render_pointer,
+            render_output_sha256=context.render_output_sha256,
+            timeline_fingerprint=context.timeline_fingerprint,
+            qa_policy=current.active_qa_policy,
+            requested_layers=(QaLayer.TECHNICAL,),
+            evidence_tool_identities=(ToolIdentity(name="video-analysis", version="1"),),
+            technical_context=context,
+        )
+    )
+    payload = _canonical_json_bytes(request)
+    request_path = canonical_review_request_path(request.content_hash)
+    absolute_request_path = tmp_path / request_path
+    absolute_request_path.parent.mkdir(parents=True, exist_ok=True)
+    absolute_request_path.write_bytes(payload)
+    pointer = ReviewRequestPointer(
+        path=request_path,
+        request_id=request.request_id,
+        content_hash=request.content_hash,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    running = StateCommitAttempt(
+        attempt_id="review-attempt-once",
+        operation="review",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=current.manifest_revision,
+        base_project=current.active_project,
+        base_registry=current.active_registry,
+        candidate_artifacts_hash="5" * 64,
+        review_request=pointer,
+        review_phase=ReviewAttemptPhase.REQUESTED,
+        started_at="2026-08-17T00:00:00Z",
+    )
+    begun = current.model_copy(
+        update={
+            "manifest_revision": current.manifest_revision + 1,
+            "attempts": current.attempts + (running,),
+        }
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        begun.model_dump_json(indent=2), encoding="utf-8"
+    )
+
+    consumed = writer.consume_review_analysis_request(
+        review_request=pointer,
+        expected_manifest_revision=begun.manifest_revision,
+    )
+    after = read_manifest(tmp_path)
+    assert consumed == request
+    assert after.attempts[-1].review_phase.value == "evidence"
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.consume_review_analysis_request(
+            review_request=pointer,
+            expected_manifest_revision=after.manifest_revision,
+        )
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+
+
 def test_unapproved_repair_is_rejected_before_any_commit_attempt(
     tmp_path: Path,
 ) -> None:
@@ -156,6 +273,104 @@ def test_unapproved_repair_is_rejected_before_any_commit_attempt(
     )
     assert after == current
     assert not any(item.attempt_id == "unapproved-repair" for item in after.attempts)
+
+
+def test_caller_signed_repair_approval_is_rejected_without_trusted_authorizer(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    trusted = ActorIdentity(actor_id="human-reviewer", actor_kind="human")
+    writer = ProductionStateCommitter(tmp_path)
+    before = read_manifest(tmp_path)
+    current = writer.activate_qa_policy(
+        make_qa_policy(repair_authorities=(trusted,)),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-repair-authority",
+    )
+    assert current.active_dependency_graph is not None
+    assert current.active_qa_policy is not None
+    actor = ActorIdentity(actor_id="codex", actor_kind="codex")
+    action = RepairAction(kind="caption_layout", parameters_fingerprint="4" * 64)
+    target = current.dependency_states[0].node_id
+    scope = canonical_sha256(
+        {
+            "repair_id": "repair-self-signed",
+            "actor": actor.model_dump(mode="json"),
+            "action": action.model_dump(mode="json"),
+            "target_artifact_ids": ["caption-1"],
+            "target_node_ids": [target],
+            "expected_invalidation_node_ids": [target],
+        }
+    )
+    render_hash = "9" * 64
+    request = seal_artifact(
+        RepairRequest(
+            artifact_id="repair-request-self-signed",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="repair-request-self-signed",
+            source_provenance=(
+                SourceReference(kind="derived", reference="p6-test-fixture"),
+            ),
+            repair_id="repair-self-signed",
+            base_manifest_revision=current.manifest_revision,
+            dependency_graph=current.active_dependency_graph,
+            dependency_states_hash=canonical_sha256(
+                {"dependency_states": [
+                    item.model_dump(mode="json") for item in current.dependency_states
+                ]}
+            ),
+            render_state=RenderStateSnapshotPointer(
+                path=Path(f"state/render/states/{render_hash}.json"),
+                revision=1,
+                content_hash=render_hash,
+                file_sha256="8" * 64,
+            ),
+            render_output_sha256="7" * 64,
+            timeline_fingerprint="6" * 64,
+            qa_policy=current.active_qa_policy,
+            review_receipt_ids=("review-1",),
+            issue_ids=("caption-overflow",),
+            evidence_ids=("evidence-1",),
+            root_cause_hypothesis="caption box exceeds safe area",
+            selected_repair_action=action,
+            exact_target_artifact_ids=("caption-1",),
+            exact_target_node_ids=(target,),
+            expected_invalidation_node_ids=(target,),
+            actor=actor,
+            authorization=RepairAuthorization(
+                authorization_id="caller-signed",
+                authorized=True,
+                authorized_by=trusted,
+                scope_fingerprint=scope,
+            ),
+            before_fingerprints=(
+                NamedFingerprint(name="caption", fingerprint="3" * 64),
+            ),
+        )
+    )
+    receipt = seal_artifact(
+        ApprovedRepairReceipt.model_validate(
+            {
+                **request.model_dump(mode="python"),
+                "artifact_id": "approved-repair-self-signed",
+                "content_hash": ZERO_HASH,
+                "request_content_hash": request.content_hash,
+            }
+        )
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.record_approved_repair_receipt(
+            request,
+            receipt,
+            expected_manifest_revision=current.manifest_revision,
+            attempt_id="approve-self-signed",
+        )
+
+    assert exc_info.value.code is ErrorCode.REPAIR_AUTHORIZATION_REQUIRED
+    assert read_manifest(tmp_path).active_approved_repair is None
 
 
 def test_manifest_24_preserves_p5_transition_support(tmp_path: Path) -> None:
@@ -205,6 +420,30 @@ def test_recovery_reports_active_and_historical_p6_policy(tmp_path: Path) -> Non
     dispositions = {item.path: item.disposition for item in report.items}
     assert dispositions[second.active_qa_policy.path] is RecoveryDisposition.ACTIVE
     assert dispositions[first_path] is RecoveryDisposition.ORPHAN_PRESERVED
+
+
+def test_p6_post_replace_process_interrupt_maps_to_outcome_unknown(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    before = read_manifest(tmp_path)
+    writer = ProductionStateCommitter(
+        tmp_path,
+        crash_injector=ProcessInterruptInjector(
+            CommitPhase.AFTER_MANIFEST_REPLACE, 1, KeyboardInterrupt
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.activate_qa_policy(
+            make_qa_policy(),
+            expected_manifest_revision=before.manifest_revision,
+            attempt_id="qa-policy-post-replace-interrupt",
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert read_manifest(tmp_path).schema_version == "2.4"
 
 
 def test_voice_lifecycle_api_persists_r1_then_mints_one_use_r2_permit(

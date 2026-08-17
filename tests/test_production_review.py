@@ -11,6 +11,7 @@ from ai_video.production.models import (
     QaTechnicalThresholds,
     QaVerdict,
     ReviewEvidence,
+    ToolIdentity,
     VisualStrategy,
 )
 from ai_video.production.review import (
@@ -65,6 +66,7 @@ def test_semantic_requires_explicit_evaluator_or_human_evidence():
 
 
 def policy():
+    semantic_tool = ToolIdentity(name="fixture-evaluator", version="1")
     return QaPolicy.model_construct(
         technical_thresholds=QaTechnicalThresholds(
             black_luma_max_milli=10,
@@ -75,6 +77,7 @@ def policy():
             safe_area_inset_milli=50,
             caption_overflow_tolerance_milli=0,
         ),
+        semantic_authorities=(semantic_tool,),
     )
 
 
@@ -82,6 +85,7 @@ def evidence(layer, strength, **payload):
     return ReviewEvidence.model_construct(
         layer=layer,
         strength=strength,
+        tool_identity=ToolIdentity(name="fixture-evaluator", version="1"),
         measured_payload={"coverage_complete": True, **payload},
     )
 
@@ -142,10 +146,51 @@ def test_semantic_typed_evidence_requires_evaluator_identity():
         (evidence(
             QaLayer.SEMANTIC,
             EvidenceStrength.EXPLICIT_EVALUATOR,
-            evaluator_identity="fixture-evaluator-v1",
+            evaluator_identity="fixture-evaluator@1",
             semantic_match=True,
         ),),
     ) is QaVerdict.PASS
+
+
+def test_semantic_cannot_self_upgrade_without_policy_selected_authority():
+    untrusted_policy = policy().model_copy(update={"semantic_authorities": ()})
+    asserted = evidence(
+        QaLayer.SEMANTIC,
+        EvidenceStrength.EXPLICIT_EVALUATOR,
+        evaluator_identity="fixture-evaluator@1",
+        semantic_match=True,
+    )
+    assert adjudicate_review_evidence(
+        untrusted_policy, QaLayer.SEMANTIC, (asserted,)
+    ) is QaVerdict.NOT_EVALUATED
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"minimum_luma_milli": 0},
+        {"expects_audio": True, "audio_peak_millidb": -70_000},
+        {"audio_peak_millidb": -10},
+        {"windows": [{
+            "status": "measured",
+            "visual_strategy": "generated_video",
+            "unique_frame_count": 1,
+        }]},
+    ],
+)
+def test_selected_policy_detects_black_silent_clipped_and_frozen(payload):
+    measured = {
+        "minimum_luma_milli": 500,
+        "audio_peak_millidb": -1000,
+        "expects_audio": False,
+        "windows": [],
+        **payload,
+    }
+    assert adjudicate_review_evidence(
+        policy(),
+        QaLayer.TECHNICAL,
+        (evidence(QaLayer.TECHNICAL, EvidenceStrength.MEASURED, **measured),),
+    ) is QaVerdict.FAIL
 
 
 @pytest.mark.parametrize(
