@@ -1259,6 +1259,34 @@ def test_loader_rejects_tampered_p7_candidate_artifacts_hash(
         load_production_project(p7_committed_project["project_path"])
 
 
+def test_loader_rejects_noncanonical_p7_candidate_shot_reference(tmp_path):
+    fixture = make_p7_committed_project(
+        tmp_path, noncanonical_candidate_shot_path=True
+    )
+
+    with pytest.raises(AiVideoError, match="candidate history") as exc_info:
+        load_production_project(fixture["project_path"])
+
+    assert "not canonical" in (exc_info.value.technical_detail or "")
+
+
+def test_p7_fixture_preserves_base_and_candidate_shot_revisions(
+    tmp_path, p7_committed_project
+):
+    base_path = tmp_path / "creative/shots/shot-1.yaml"
+    candidate_shot = p7_committed_project["candidate_project"].shots[0]
+    candidate_path = tmp_path / Path(
+        "creative/shots/"
+        f"shot.{candidate_shot.revision}.{candidate_shot.content_hash}.yaml"
+    )
+
+    base_payload = yaml.safe_load(base_path.read_text(encoding="utf-8"))
+    candidate_payload = yaml.safe_load(candidate_path.read_text(encoding="utf-8"))
+    assert base_payload["revision"] == candidate_shot.revision - 1
+    assert candidate_payload["revision"] == candidate_shot.revision
+    assert base_path.read_bytes() != candidate_path.read_bytes()
+
+
 def test_loader_reopens_exact_p7_base_registry(tmp_path, p7_committed_project):
     attempt = _manifest(tmp_path).attempts[0]
     base_path = tmp_path / attempt.base_registry.path

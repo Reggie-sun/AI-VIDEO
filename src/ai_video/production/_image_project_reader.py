@@ -41,6 +41,7 @@ from ai_video.production.paths import (
     canonical_image_receipt_path,
     canonical_image_request_path,
     canonical_image_result_path,
+    canonical_image_shot_revision_path,
 )
 from ai_video.production.registry import registry_semantic_sha256
 
@@ -290,6 +291,10 @@ def _read_candidate_shot(
     )
     if reference is None:
         raise ValueError("image target Shot is absent from the candidate project")
+    if reference.path != canonical_image_shot_revision_path(
+        reference.revision, reference.content_hash
+    ):
+        raise ValueError("image candidate Shot path is not canonical")
     snapshot = _read_regular_file_nofollow(
         bundle.root / reference.path,
         contained_by=bundle.root,

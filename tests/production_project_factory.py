@@ -1977,6 +1977,7 @@ def make_p7_committed_project(
     reference_mutation: str | None = None,
     unrelated_candidate_suffix: bool = False,
     changed_candidate_prefix: bool = False,
+    noncanonical_candidate_shot_path: bool = False,
 ) -> dict[str, object]:
     """Materialize one exact Manifest 2.5 image activation without a writer."""
     from ai_video.production.dependency import (
@@ -2004,6 +2005,7 @@ def make_p7_committed_project(
         canonical_image_receipt_path,
         canonical_image_request_path,
         canonical_image_result_path,
+        canonical_image_shot_revision_path,
     )
 
     base_inputs = make_p5_dependency_inputs(root)
@@ -2196,10 +2198,12 @@ def make_p7_committed_project(
             }
         )
     )
-    shot_reference = next(
-        item
-        for item in base_project.project.artifacts.shots
-        if item.artifact_id == candidate_shot.artifact_id
+    candidate_shot_path = (
+        Path("creative/shots/noncanonical-image-candidate.yaml")
+        if noncanonical_candidate_shot_path
+        else canonical_image_shot_revision_path(
+            candidate_shot.revision, candidate_shot.content_hash
+        )
     )
     candidate_project_artifact = seal_artifact(
         base_project.project.model_copy(
@@ -2214,7 +2218,7 @@ def make_p7_committed_project(
                                 artifact_id=candidate_shot.artifact_id,
                                 revision=candidate_shot.revision,
                                 content_hash=candidate_shot.content_hash,
-                                path=shot_reference.path,
+                                path=candidate_shot_path,
                             )
                             if item.artifact_id == candidate_shot.artifact_id
                             else item
@@ -2301,7 +2305,7 @@ def make_p7_committed_project(
         project_path: project_bytes,
         registry_path: registry_bytes,
         graph_path: graph_bytes,
-        shot_reference.path: shot_bytes,
+        candidate_shot_path: shot_bytes,
     }
     for relative_path, payload in evidence.items():
         target = root / relative_path
@@ -2409,6 +2413,7 @@ def append_p7_committed_candidate(
         canonical_image_receipt_path,
         canonical_image_request_path,
         canonical_image_result_path,
+        canonical_image_shot_revision_path,
     )
 
     current_manifest = fixture["manifest"]
@@ -2547,10 +2552,8 @@ def append_p7_committed_candidate(
             }
         )
     )
-    shot_reference = next(
-        item
-        for item in current_project.project.artifacts.shots
-        if item.artifact_id == candidate_shot.artifact_id
+    candidate_shot_path = canonical_image_shot_revision_path(
+        candidate_shot.revision, candidate_shot.content_hash
     )
     candidate_project_artifact = seal_artifact(
         current_project.project.model_copy(
@@ -2565,7 +2568,7 @@ def append_p7_committed_candidate(
                                 artifact_id=candidate_shot.artifact_id,
                                 revision=candidate_shot.revision,
                                 content_hash=candidate_shot.content_hash,
-                                path=shot_reference.path,
+                                path=candidate_shot_path,
                             )
                             if item.artifact_id == candidate_shot.artifact_id
                             else item
@@ -2649,7 +2652,7 @@ def append_p7_committed_candidate(
         project_path: project_bytes,
         registry_path: registry_bytes,
         graph_path: graph_bytes,
-        shot_reference.path: shot_bytes,
+        candidate_shot_path: shot_bytes,
     }
     for relative_path, payload in evidence.items():
         target = root / relative_path

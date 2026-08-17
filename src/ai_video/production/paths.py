@@ -174,6 +174,15 @@ def canonical_image_asset_path(file_sha256: str) -> Path:
     )
 
 
+def canonical_image_shot_revision_path(revision: int, content_hash: str) -> Path:
+    if type(revision) is not int or revision < 1:
+        raise ValueError("Image Shot revision must be a positive integer.")
+    return Path(
+        "creative/shots/"
+        f"shot.{revision}.{_require_sha256(content_hash, 'image Shot content hash')}.yaml"
+    )
+
+
 def canonical_render_output_path(file_sha256: str, suffix: str = ".mp4") -> Path:
     if suffix != ".mp4":
         raise ValueError("Render output suffix must be .mp4.")

@@ -44,6 +44,7 @@ from ai_video.production.dependency import (
     resolve_dependency_state,
 )
 from ai_video.production.hashing import seal_artifact
+from ai_video.production.paths import canonical_image_shot_revision_path
 from ai_video.production.registry import registry_semantic_sha256
 from production_project_factory import make_p5_selective_rebuild_fixture
 
@@ -451,7 +452,10 @@ def p7_candidate(tmp_path):
         artifact_id=candidate_shot.artifact_id,
         revision=candidate_shot.revision,
         content_hash=candidate_shot.content_hash,
-        path=shot_reference.path,
+        path=Path(
+            "creative/shots/"
+            f"shot.{candidate_shot.revision}.{candidate_shot.content_hash}.yaml"
+        ),
     )
     candidate_project_artifact = seal_artifact(
         base_project.project.model_copy(
@@ -562,6 +566,18 @@ def test_candidate_appends_one_image_and_changes_only_target_shot_role(p7_candid
     assert isinstance(checked, ImageActivationCandidate)
     assert checked.image_asset_id == p7_candidate["request"].output_asset_id
     assert checked.changed_shot_ids == ("shot-1",)
+    candidate_shot = p7_candidate["candidate_project"].shots[0]
+    expected_shot_path = Path(
+        "creative/shots/"
+        f"shot.{candidate_shot.revision}.{candidate_shot.content_hash}.yaml"
+    )
+    expected_shot_bytes = yaml.safe_dump(
+        candidate_shot.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    assert checked.candidate_shot_path == expected_shot_path
+    assert checked.candidate_shot_bytes == expected_shot_bytes
     assert p7_candidate["candidate_registry"].assets[-1].input_artifact_ids == (
         "shot-artifact-1",
         "character-hero",
@@ -569,6 +585,29 @@ def test_candidate_appends_one_image_and_changes_only_target_shot_role(p7_candid
         "scene-room",
         "image-shot-1",
     )
+
+
+def test_canonical_image_shot_revision_path_is_immutable_and_revisioned():
+    assert canonical_image_shot_revision_path(2, "a" * 64) == Path(
+        f"creative/shots/shot.2.{'a' * 64}.yaml"
+    )
+
+
+@pytest.mark.parametrize(
+    ("revision", "content_hash"),
+    [
+        (True, "a" * 64),
+        (0, "a" * 64),
+        (-1, "a" * 64),
+        (1, "A" * 64),
+        (1, "a" * 63),
+    ],
+)
+def test_canonical_image_shot_revision_path_rejects_invalid_identity(
+    revision, content_hash
+):
+    with pytest.raises(ValueError):
+        canonical_image_shot_revision_path(revision, content_hash)
 
 
 @pytest.mark.parametrize("mutation", ["character", "unrelated_shot"])

@@ -44,6 +44,7 @@ from ai_video.production.models import (
     StrictModel,
     ToolIdentity,
 )
+from ai_video.production.paths import canonical_image_shot_revision_path
 from ai_video.production.registry import registry_semantic_sha256
 
 
@@ -585,6 +586,8 @@ def validate_image_result(
 class ImageActivationCandidate:
     image_asset_id: str
     changed_shot_ids: tuple[str, ...]
+    candidate_shot_path: Path
+    candidate_shot_bytes: bytes
     base_project: LoadedProductionProject
     candidate_project: LoadedProductionProject
     candidate_registry: AssetRegistrySnapshot
@@ -616,6 +619,8 @@ class ImageActivationCandidate:
         *,
         image_asset_id: str,
         changed_shot_ids: tuple[str, ...],
+        candidate_shot_path: Path,
+        candidate_shot_bytes: bytes,
         base_project: LoadedProductionProject,
         candidate_project: LoadedProductionProject,
         candidate_registry: AssetRegistrySnapshot,
@@ -871,11 +876,31 @@ def validate_image_activation_candidate(
     )
     if len(base_ref) != 1:
         raise _image_scope_invalid("Target Shot project reference is ambiguous.")
+    candidate_shot_path = canonical_image_shot_revision_path(
+        expected_shot.revision, expected_shot.content_hash
+    )
+    candidate_shot_bytes = yaml.safe_dump(
+        expected_shot.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    try:
+        reopened_shot = type(expected_shot).model_validate(
+            yaml.safe_load(candidate_shot_bytes.decode("utf-8"))
+        )
+    except (UnicodeDecodeError, yaml.YAMLError, ValidationError) as exc:
+        raise _image_scope_invalid(
+            "Image candidate Shot bytes cannot be reopened.", str(exc)
+        ) from exc
+    if reopened_shot != expected_shot or not verify_artifact_hash(reopened_shot):
+        raise _image_scope_invalid(
+            "Image candidate Shot bytes do not encode the exact target revision."
+        )
     expected_ref = ArtifactReference(
         artifact_id=expected_shot.artifact_id,
         revision=expected_shot.revision,
         content_hash=expected_shot.content_hash,
-        path=base_ref[0].path,
+        path=candidate_shot_path,
     )
     expected_project_artifact = seal_artifact(
         base_project.project.model_copy(
@@ -997,6 +1022,8 @@ def validate_image_activation_candidate(
     return ImageActivationCandidate._validated(
         image_asset_id=request.output_asset_id,
         changed_shot_ids=(request.target_shot_id,),
+        candidate_shot_path=candidate_shot_path,
+        candidate_shot_bytes=candidate_shot_bytes,
         base_project=base_project,
         candidate_project=candidate_project,
         candidate_registry=candidate_registry,
