@@ -5,19 +5,41 @@ import re
 import struct
 import unicodedata
 import zlib
+from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Literal, Protocol
 
 from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.hashing import canonical_sha256
+from ai_video.production.dependency import (
+    DependencyResolution,
+    ProductionDependencyInputs,
+    asset_node_id,
+    build_production_dependency_graph,
+    shot_projection_node_id,
+)
+from ai_video.production.hashing import (
+    canonical_sha256,
+    seal_artifact,
+    verify_artifact_hash,
+)
 from ai_video.production.models import (
+    ArtifactReference,
+    AssetRecord,
+    AssetRegistrySnapshot,
+    AssetSourceKind,
+    AssetType,
+    DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
+    EgressMetadata,
+    LoadedProductionProject,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
     StrictModel,
     ToolIdentity,
 )
+from ai_video.production.registry import registry_semantic_sha256
 
 
 if TYPE_CHECKING:
@@ -26,6 +48,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "ImageAssetProvider",
+    "ImageActivationCandidate",
     "ImageGenerationAuthorization",
     "ImageGenerationPreview",
     "ImageGenerationRequest",
@@ -36,6 +59,7 @@ __all__ = [
     "ImageReferenceBinding",
     "MeasuredPng",
     "image_receipt_semantic_sha256",
+    "validate_image_activation_candidate",
     "validate_image_result",
 ]
 
@@ -50,6 +74,7 @@ _PNG_BIT_DEPTHS = {
     4: {8, 16},
     6: {8, 16},
 }
+_IMAGE_ACTIVATION_TOKEN = object()
 
 
 def _image_bytes_invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -549,6 +574,292 @@ def validate_image_result(
         cost_receipt_id=None,
     )
     return measured, receipt
+
+
+@dataclass(frozen=True, init=False)
+class ImageActivationCandidate:
+    image_asset_id: str
+    changed_shot_ids: tuple[str, ...]
+    base_project: LoadedProductionProject
+    candidate_project: LoadedProductionProject
+    candidate_registry: AssetRegistrySnapshot
+    candidate_inputs: ProductionDependencyInputs
+    candidate_graph: DependencyGraphSnapshot
+    resolution: DependencyResolution
+    receipt: ImageProvenanceReceipt
+
+    def __new__(cls, token: object) -> "ImageActivationCandidate":
+        if token is not _IMAGE_ACTIVATION_TOKEN:
+            raise TypeError(
+                "ImageActivationCandidate is returned by "
+                "validate_image_activation_candidate()"
+            )
+        return super().__new__(cls)
+
+    def __init__(self, token: object) -> None:
+        del token
+
+    @classmethod
+    def _validated(
+        cls,
+        *,
+        image_asset_id: str,
+        changed_shot_ids: tuple[str, ...],
+        base_project: LoadedProductionProject,
+        candidate_project: LoadedProductionProject,
+        candidate_registry: AssetRegistrySnapshot,
+        candidate_inputs: ProductionDependencyInputs,
+        candidate_graph: DependencyGraphSnapshot,
+        resolution: DependencyResolution,
+        receipt: ImageProvenanceReceipt,
+    ) -> "ImageActivationCandidate":
+        candidate = cls(_IMAGE_ACTIVATION_TOKEN)
+        for field_name, value in locals().copy().items():
+            if field_name not in {"cls", "candidate"}:
+                object.__setattr__(candidate, field_name, value)
+        return candidate
+
+
+def _same_except(
+    left: StrictModel,
+    right: StrictModel,
+    excluded: set[str],
+) -> bool:
+    return left.model_dump(mode="json", exclude=excluded) == right.model_dump(
+        mode="json", exclude=excluded
+    )
+
+
+def validate_image_activation_candidate(
+    *,
+    base_project: LoadedProductionProject,
+    request: ImageGenerationRequest,
+    authorization: ImageGenerationAuthorization,
+    result: ImageProviderResult,
+    measured: MeasuredPng,
+    receipt: ImageProvenanceReceipt,
+    candidate_project: LoadedProductionProject,
+    candidate_registry: AssetRegistrySnapshot,
+    candidate_graph: DependencyGraphSnapshot,
+    candidate_inputs: ProductionDependencyInputs,
+    resolution: DependencyResolution,
+) -> ImageActivationCandidate:
+    checked_measured, checked_receipt = validate_image_result(
+        request, authorization, result
+    )
+    if checked_measured != measured or checked_receipt != receipt:
+        raise _image_scope_invalid(
+            "Image activation candidate does not carry the exact validated result."
+        )
+    if (
+        request.base_project != base_project.manifest.active_project
+        or request.base_registry != base_project.manifest.active_registry
+        or request.base_dependency_graph
+        != base_project.manifest.active_dependency_graph
+        or base_project.dependency_graph is None
+        or request.base_dependency_graph.revision_id
+        != base_project.dependency_graph.revision_id
+    ):
+        raise _image_scope_invalid(
+            "Image request base pointers do not match the loaded project."
+        )
+
+    base_assets = base_project.registry.assets
+    if (
+        candidate_registry.assets[: len(base_assets)] != base_assets
+        or len(candidate_registry.assets) != len(base_assets) + 1
+        or registry_semantic_sha256(candidate_registry)
+        != candidate_registry.content_hash
+        or candidate_registry.revision_id != candidate_registry.content_hash
+    ):
+        raise _image_scope_invalid(
+            "Image candidate Registry must append exactly one sealed asset."
+        )
+    expected_record = AssetRecord(
+        asset_id=request.output_asset_id,
+        asset_type=AssetType.IMAGE,
+        artifact_path=Path(f"assets/files/{measured.sha256}.png"),
+        sha256=measured.sha256,
+        size_bytes=measured.size_bytes,
+        mime_type=measured.mime_type,
+        width=measured.width,
+        height=measured.height,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=result.adapter,
+        input_artifact_ids=tuple(item.asset_id for item in request.references),
+        input_fingerprint=request.request_fingerprint,
+        creation_receipt_id=receipt.content_hash,
+        usage_license=authorization.usage_license,
+        egress=EgressMetadata(remote=False),
+        cost_receipt_id=None,
+    )
+    if candidate_registry.assets[-1] != expected_record:
+        raise _image_scope_invalid(
+            "Image candidate Registry record does not match the validated output."
+        )
+
+    base_shots = {shot.shot_id: shot for shot in base_project.shots}
+    next_shots = {shot.shot_id: shot for shot in candidate_project.shots}
+    if set(base_shots) != set(next_shots) or request.target_shot_id not in base_shots:
+        raise _image_scope_invalid("Image candidate changed the Shot identity set.")
+    base_shot = base_shots[request.target_shot_id]
+    target_roles = tuple(
+        role
+        for role in base_shot.required_asset_roles
+        if role.role == request.target_asset_role
+    )
+    if len(target_roles) != 1:
+        raise _image_scope_invalid(
+            "Image request target role does not identify exactly one Shot role."
+        )
+    expected_roles = tuple(
+        role.model_copy(update={"asset_ids": (request.output_asset_id,)})
+        if role.role == request.target_asset_role
+        else role
+        for role in base_shot.required_asset_roles
+    )
+    expected_shot = seal_artifact(
+        base_shot.model_copy(
+            update={
+                "revision": base_shot.revision + 1,
+                "content_hash": "0" * 64,
+                "creation_receipt_id": receipt.content_hash,
+                "required_asset_roles": expected_roles,
+            }
+        )
+    )
+    if next_shots[request.target_shot_id] != expected_shot:
+        raise _image_scope_invalid(
+            "Image candidate must change only the target Shot asset role."
+        )
+    if any(
+        next_shots[shot_id] != shot
+        for shot_id, shot in base_shots.items()
+        if shot_id != request.target_shot_id
+    ):
+        raise _image_scope_invalid("Image candidate changed an unrelated Shot.")
+
+    base_ref = tuple(
+        item
+        for item in base_project.project.artifacts.shots
+        if item.artifact_id == expected_shot.artifact_id
+    )
+    if len(base_ref) != 1:
+        raise _image_scope_invalid("Target Shot project reference is ambiguous.")
+    expected_ref = ArtifactReference(
+        artifact_id=expected_shot.artifact_id,
+        revision=expected_shot.revision,
+        content_hash=expected_shot.content_hash,
+        path=base_ref[0].path,
+    )
+    expected_project_artifact = seal_artifact(
+        base_project.project.model_copy(
+            update={
+                "revision": base_project.project.revision + 1,
+                "content_hash": "0" * 64,
+                "creation_receipt_id": receipt.content_hash,
+                "artifacts": base_project.project.artifacts.model_copy(
+                    update={
+                        "shots": tuple(
+                            expected_ref
+                            if item.artifact_id == expected_shot.artifact_id
+                            else item
+                            for item in base_project.project.artifacts.shots
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    if (
+        candidate_project.project != expected_project_artifact
+        or not verify_artifact_hash(candidate_project.project)
+        or candidate_project.registry != candidate_registry
+        or candidate_project.root != base_project.root
+        or candidate_project.brief != base_project.brief
+        or candidate_project.story != base_project.story
+        or candidate_project.characters != base_project.characters
+        or candidate_project.scenes != base_project.scenes
+        or candidate_project.storyboard != base_project.storyboard
+        or candidate_project.render_state != base_project.render_state
+    ):
+        raise _image_scope_invalid(
+            "Image candidate changed project content outside the target Shot."
+        )
+    expected_asset_paths = {
+        **base_project.asset_paths,
+        request.output_asset_id: base_project.root / expected_record.artifact_path,
+    }
+    if dict(candidate_project.asset_paths) != expected_asset_paths:
+        raise _image_scope_invalid("Image candidate asset path map is not exact.")
+
+    active_project = candidate_project.manifest.active_project
+    active_registry = candidate_project.manifest.active_registry
+    active_graph = candidate_project.manifest.active_dependency_graph
+    if (
+        active_project.revision != candidate_project.project.revision
+        or active_project.content_hash != candidate_project.project.content_hash
+        or active_registry.revision_id != candidate_registry.revision_id
+        or active_registry.content_hash != candidate_registry.content_hash
+        or active_graph is None
+    ):
+        raise _image_scope_invalid("Image candidate active pointers are inconsistent.")
+    if not _same_except(
+        base_project.manifest,
+        candidate_project.manifest,
+        {"active_project", "active_registry", "active_dependency_graph"},
+    ):
+        raise _image_scope_invalid("Image candidate changed unrelated Manifest state.")
+
+    if candidate_inputs.project != candidate_project:
+        raise _image_scope_invalid("Image candidate dependency inputs use another project.")
+    expected_graph = build_production_dependency_graph(candidate_inputs)
+    if (
+        candidate_graph != expected_graph
+        or candidate_project.dependency_graph != expected_graph
+        or resolution.graph != expected_graph
+        or active_graph.revision_id != expected_graph.revision_id
+        or active_graph.content_hash != expected_graph.content_hash
+    ):
+        raise _image_scope_invalid(
+            "Image candidate graph does not equal the existing P5 builder output."
+        )
+    target_visual_id = shot_projection_node_id(request.target_shot_id, "visual")
+    output_node_id = asset_node_id(request.output_asset_id)
+    target_asset_node_ids = {
+        asset_node_id(asset_id)
+        for asset_id in target_roles[0].asset_ids
+    } | {output_node_id}
+    affected = set(resolution.affected_node_ids)
+    if not {target_visual_id, output_node_id}.issubset(affected):
+        raise _image_scope_invalid(
+            "Image candidate resolution omits the target visual generation frontier."
+        )
+    for node_id in affected:
+        if node_id.startswith("creative:shot:") and node_id != target_visual_id:
+            raise _image_scope_invalid(
+                "Image candidate resolution affects an unrelated Shot projection."
+            )
+        if node_id.startswith("asset:") and node_id not in target_asset_node_ids:
+            raise _image_scope_invalid(
+                "Image candidate resolution affects an unrelated asset."
+            )
+        if ":voice" in node_id or ":caption" in node_id:
+            raise _image_scope_invalid(
+                "Image candidate resolution affects voice or caption state."
+            )
+
+    return ImageActivationCandidate._validated(
+        image_asset_id=request.output_asset_id,
+        changed_shot_ids=(request.target_shot_id,),
+        base_project=base_project,
+        candidate_project=candidate_project,
+        candidate_registry=candidate_registry,
+        candidate_inputs=candidate_inputs,
+        candidate_graph=candidate_graph,
+        resolution=resolution,
+        receipt=receipt,
+    )
 
 
 class ImageAssetProvider(Protocol):

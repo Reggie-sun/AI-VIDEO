@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import struct
 import zlib
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -12,19 +13,37 @@ from ai_video.production.image import (
     ImageGenerationAuthorization,
     ImageGenerationPreview,
     ImageGenerationRequest,
+    ImageActivationCandidate,
     ImageLocalResourceEvidence,
     ImageProviderParameters,
     ImageProviderResult,
     ImageReferenceBinding,
+    validate_image_activation_candidate,
     validate_image_result,
 )
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
+    ArtifactReference,
+    AssetRecord,
+    AssetSourceKind,
+    AssetType,
+    DependencyLifecycle,
+    DependencyNodeState,
     DependencyGraphSnapshotPointer,
+    EgressMetadata,
+    ProjectDependencyEvidence,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
     ToolIdentity,
 )
+from ai_video.production.dependency import (
+    build_production_dependency_graph,
+    desired_fingerprints,
+    resolve_dependency_state,
+)
+from ai_video.production.hashing import seal_artifact
+from ai_video.production.registry import registry_semantic_sha256
+from production_project_factory import make_p5_selective_rebuild_fixture
 
 
 ZERO_HASH = "0" * 64
@@ -262,5 +281,289 @@ def test_validate_image_result_rejects_wrong_authorization_binding():
 
     with pytest.raises(AiVideoError) as error:
         validate_image_result(request, make_authorization(other_request), result)
+
+    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def _fresh_states(project, graph):
+    desired = desired_fingerprints(graph)
+    return tuple(
+        DependencyNodeState(
+            node_id=node.node_id,
+            graph_revision_id=graph.revision_id,
+            desired_fingerprint=desired[node.node_id],
+            applied_fingerprint=desired[node.node_id],
+            lifecycle=DependencyLifecycle.FRESH,
+            applied_evidence=ProjectDependencyEvidence(
+                owner="project_snapshot",
+                pointer=project.manifest.active_project,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            ),
+        )
+        for node in graph.nodes
+    )
+
+
+@pytest.fixture
+def p7_candidate(tmp_path):
+    inputs, _ = make_p5_selective_rebuild_fixture(tmp_path)
+    base_graph = build_production_dependency_graph(inputs)
+    base_graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=base_graph.revision_id,
+        content_hash=base_graph.content_hash,
+        path=Path(f"state/dependency_graph.{base_graph.revision_id}.json"),
+        file_sha256=hashlib.sha256(b"base-graph").hexdigest(),
+    )
+    base_project = inputs.project.model_copy(
+        update={
+            "manifest": inputs.project.manifest.model_copy(
+                update={"active_dependency_graph": base_graph_pointer}
+            ),
+            "dependency_graph": base_graph,
+        }
+    )
+    inputs = replace(inputs, project=base_project)
+    assets = {asset.asset_id: asset for asset in base_project.registry.assets}
+    character = base_project.characters[0]
+    scene = base_project.scenes[0]
+    character_asset_id = character.reference_asset_ids[0]
+    scene_asset_id = scene.visual_reference_asset_ids[0]
+    request = ImageGenerationRequest.create(
+        attempt_id="image-attempt-candidate-1",
+        provider_kind="fake-local",
+        model_id="fixture-image-model-1",
+        target_shot_id="shot-1",
+        target_asset_role="still",
+        prompt_text="Hero enters the archive room",
+        negative_prompt_text="blur, watermark",
+        parameters=ImageProviderParameters(
+            seed=7,
+            width=2,
+            height=1,
+            output_format="png",
+            generation_revision=1,
+        ),
+        references=(
+            ImageReferenceBinding(
+                role="character",
+                creative_artifact_id=character.artifact_id,
+                creative_revision=character.revision,
+                creative_content_hash=character.content_hash,
+                asset_id=character_asset_id,
+                asset_sha256=assets[character_asset_id].sha256,
+            ),
+            ImageReferenceBinding(
+                role="scene",
+                creative_artifact_id=scene.artifact_id,
+                creative_revision=scene.revision,
+                creative_content_hash=scene.content_hash,
+                asset_id=scene_asset_id,
+                asset_sha256=assets[scene_asset_id].sha256,
+            ),
+        ),
+        base_project=base_project.manifest.active_project,
+        base_registry=base_project.manifest.active_registry,
+        base_dependency_graph=base_graph_pointer,
+    )
+    authorization = make_authorization(request)
+    result = make_image_result(request, image_bytes=PNG_2X1_RGBA)
+    measured, receipt = validate_image_result(request, authorization, result)
+    image_record = AssetRecord(
+        asset_id=request.output_asset_id,
+        asset_type=AssetType.IMAGE,
+        artifact_path=Path(f"assets/files/{measured.sha256}.png"),
+        sha256=measured.sha256,
+        size_bytes=measured.size_bytes,
+        mime_type=measured.mime_type,
+        width=measured.width,
+        height=measured.height,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=result.adapter,
+        input_artifact_ids=tuple(item.asset_id for item in request.references),
+        input_fingerprint=request.request_fingerprint,
+        creation_receipt_id=receipt.content_hash,
+        usage_license=authorization.usage_license,
+        egress=EgressMetadata(remote=False),
+        cost_receipt_id=None,
+    )
+    candidate_registry = base_project.registry.model_copy(
+        update={
+            "revision_id": ZERO_HASH,
+            "content_hash": ZERO_HASH,
+            "assets": (*base_project.registry.assets, image_record),
+        }
+    )
+    registry_hash = registry_semantic_sha256(candidate_registry)
+    candidate_registry = candidate_registry.model_copy(
+        update={"revision_id": registry_hash, "content_hash": registry_hash}
+    )
+    registry_pointer = RegistrySnapshotPointer(
+        path=Path(f"assets/registry.{registry_hash}.json"),
+        revision_id=registry_hash,
+        content_hash=registry_hash,
+        file_sha256=hashlib.sha256(b"candidate-registry").hexdigest(),
+    )
+
+    base_shot = next(shot for shot in base_project.shots if shot.shot_id == "shot-1")
+    role = next(item for item in base_shot.required_asset_roles if item.role == "still")
+    candidate_shot = seal_artifact(
+        base_shot.model_copy(
+            update={
+                "revision": base_shot.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "required_asset_roles": (
+                    role.model_copy(update={"asset_ids": (request.output_asset_id,)}),
+                ),
+            }
+        )
+    )
+    shot_reference = next(
+        item
+        for item in base_project.project.artifacts.shots
+        if item.artifact_id == candidate_shot.artifact_id
+    )
+    candidate_shot_reference = ArtifactReference(
+        artifact_id=candidate_shot.artifact_id,
+        revision=candidate_shot.revision,
+        content_hash=candidate_shot.content_hash,
+        path=shot_reference.path,
+    )
+    candidate_project_artifact = seal_artifact(
+        base_project.project.model_copy(
+            update={
+                "revision": base_project.project.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "artifacts": base_project.project.artifacts.model_copy(
+                    update={
+                        "shots": tuple(
+                            candidate_shot_reference
+                            if item.artifact_id == candidate_shot.artifact_id
+                            else item
+                            for item in base_project.project.artifacts.shots
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    project_pointer = ProjectSnapshotPointer(
+        path=Path(
+            f"state/projects/project.{candidate_project_artifact.revision}."
+            f"{candidate_project_artifact.content_hash}.yaml"
+        ),
+        revision=candidate_project_artifact.revision,
+        content_hash=candidate_project_artifact.content_hash,
+        file_sha256=hashlib.sha256(b"candidate-project").hexdigest(),
+    )
+    candidate_project = base_project.model_copy(
+        update={
+            "project": candidate_project_artifact,
+            "shots": tuple(
+                candidate_shot if shot.shot_id == candidate_shot.shot_id else shot
+                for shot in base_project.shots
+            ),
+            "registry": candidate_registry,
+            "asset_paths": {
+                **base_project.asset_paths,
+                request.output_asset_id: tmp_path / image_record.artifact_path,
+            },
+            "manifest": base_project.manifest.model_copy(
+                update={
+                    "active_project": project_pointer,
+                    "active_registry": registry_pointer,
+                }
+            ),
+        }
+    )
+    candidate_inputs = replace(inputs, project=candidate_project)
+    candidate_graph = build_production_dependency_graph(candidate_inputs)
+    candidate_graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=candidate_graph.revision_id,
+        content_hash=candidate_graph.content_hash,
+        path=Path(f"state/dependency_graph.{candidate_graph.revision_id}.json"),
+        file_sha256=hashlib.sha256(b"candidate-graph").hexdigest(),
+    )
+    candidate_project = candidate_project.model_copy(
+        update={
+            "manifest": candidate_project.manifest.model_copy(
+                update={"active_dependency_graph": candidate_graph_pointer}
+            ),
+            "dependency_graph": candidate_graph,
+        }
+    )
+    candidate_inputs = replace(candidate_inputs, project=candidate_project)
+    resolution = resolve_dependency_state(
+        candidate_graph,
+        _fresh_states(base_project, base_graph),
+    )
+    return {
+        "base_project": base_project,
+        "request": request,
+        "authorization": authorization,
+        "result": result,
+        "measured": measured,
+        "receipt": receipt,
+        "candidate_project": candidate_project,
+        "candidate_registry": candidate_registry,
+        "candidate_graph": candidate_graph,
+        "candidate_inputs": candidate_inputs,
+        "resolution": resolution,
+    }
+
+
+def test_candidate_appends_one_image_and_changes_only_target_shot_role(p7_candidate):
+    checked = validate_image_activation_candidate(**p7_candidate)
+
+    assert isinstance(checked, ImageActivationCandidate)
+    assert checked.image_asset_id == p7_candidate["request"].output_asset_id
+    assert checked.changed_shot_ids == ("shot-1",)
+
+
+@pytest.mark.parametrize("mutation", ["character", "unrelated_shot"])
+def test_candidate_rejects_mutated_character_or_unrelated_shot(
+    p7_candidate, mutation
+):
+    candidate = p7_candidate["candidate_project"]
+    if mutation == "character":
+        changed = candidate.characters[0].model_copy(update={"name": "Unauthorized"})
+        changed_project = candidate.model_copy(update={"characters": (changed,)})
+    else:
+        unrelated = candidate.shots[1].model_copy(update={"intent": "unauthorized"})
+        changed_project = candidate.model_copy(
+            update={"shots": (candidate.shots[0], unrelated)}
+        )
+    tampered = {**p7_candidate, "candidate_project": changed_project}
+
+    with pytest.raises(AiVideoError) as error:
+        validate_image_activation_candidate(**tampered)
+
+    assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_image_activation_candidate_has_no_public_constructor():
+    with pytest.raises(TypeError, match="validate_image_activation_candidate"):
+        ImageActivationCandidate(object())
+
+
+@pytest.mark.parametrize("mutation", ["overwrite", "extra"])
+def test_candidate_rejects_registry_overwrite_or_extra_asset(p7_candidate, mutation):
+    registry = p7_candidate["candidate_registry"]
+    if mutation == "overwrite":
+        assets = (
+            registry.assets[0].model_copy(update={"usage_license": "tampered"}),
+            *registry.assets[1:],
+        )
+    else:
+        assets = (*registry.assets, registry.assets[-1].model_copy(update={"asset_id": "extra"}))
+    tampered = {
+        **p7_candidate,
+        "candidate_registry": registry.model_copy(update={"assets": assets}),
+    }
+
+    with pytest.raises(AiVideoError) as error:
+        validate_image_activation_candidate(**tampered)
 
     assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
