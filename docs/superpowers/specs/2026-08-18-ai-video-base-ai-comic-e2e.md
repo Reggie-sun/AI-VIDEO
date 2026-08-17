@@ -1,6 +1,6 @@
 # AI-VIDEO Base AI Comic E2E Specification
 
-Status: Proposed prerequisite slice for P8. 本文件定义 Manifest 2.5 cross-phase compatibility 与 deterministic Base AI Comic acceptance proof；不授权 P8、Paid Provider Gate、真实 Provider、merge、push 或 release。
+Status: Approved prerequisite design for P8；Base AI Comic implementation 已获授权。本文不授权 P8、Paid Provider Gate、真实 Provider、push 或 release。
 
 ## 1. Goal
 
