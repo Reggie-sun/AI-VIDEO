@@ -1029,6 +1029,34 @@ def test_image_submit_permit_invalidates_on_durable_state_drift(
     )
 
 
+@pytest.mark.parametrize("snapshot_kind", ["project", "registry", "graph"])
+def test_image_submit_permit_reopens_selected_base_snapshot_bytes(
+    tmp_path: Path,
+    snapshot_kind: str,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_image_generation(request, preview, authorization)
+    permit = writer.record_image_submit_intent(request, preview, authorization)
+    pointer = {
+        "project": request.base_project,
+        "registry": request.base_registry,
+        "graph": request.base_dependency_graph,
+    }[snapshot_kind]
+    (tmp_path / pointer.path).write_bytes(b"{}\n")
+
+    with pytest.raises(AiVideoError):
+        load_production_project(tmp_path / "project.yaml")
+    assert not permit._validate_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+    assert not permit._consume_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+
+
 def test_image_r1_composes_24_into_25_without_losing_p6_state(
     tmp_path: Path,
 ) -> None:

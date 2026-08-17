@@ -532,6 +532,7 @@ class _StateCommitImageIntentMixin:
             if snapshot.file_sha256 != manifest_file_sha256:
                 return False
             manifest = ProductionManifest.model_validate_json(snapshot.data)
+            self._validate_image_request_context(manifest, request, preview)
             evidence = self._reopen_image_evidence(
                 request, preview, authorization, include_intent=True
             )
