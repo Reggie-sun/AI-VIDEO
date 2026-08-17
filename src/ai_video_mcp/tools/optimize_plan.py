@@ -68,8 +68,8 @@ def video_optimize_plan(
     production_review_receipt: dict | None = None,
     production_project_path: str | None = None,
 ) -> dict:
-    if production_review_receipt is not None:
-        if production_project_path is None:
+    if production_review_receipt is not None or production_project_path is not None:
+        if production_review_receipt is None or production_project_path is None:
             raise ValueError("Production review planning requires verified project path")
         bundle = load_production_project(production_project_path)
         pointer = ReviewReceiptPointer.model_validate(production_review_receipt)

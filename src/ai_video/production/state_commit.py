@@ -140,6 +140,7 @@ from ai_video.production.project import (
     load_production_project_candidate,
     load_qa_policy,
     load_review_receipt,
+    load_review_request,
     load_verified_render_state,
 )
 from ai_video.production.dependency import (
@@ -941,7 +942,7 @@ class ProductionStateCommitter:
                 }
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
-            self._write_manifest_atomic(updated)
+            self._write_p6_manifest_atomic(updated)
             return self._read_manifest()
 
     def record_review_receipt(
@@ -1003,9 +1004,29 @@ class ProductionStateCommitter:
                 attempt is None
                 or attempt.operation != "review"
                 or attempt.status is not StateCommitStatus.RUNNING
+                or attempt.review_phase is not ReviewAttemptPhase.EVIDENCE
                 or attempt.review_request != receipt.review_request
             ):
                 raise _state_invalid("Review Receipt requires its durable running request.")
+            durable_request = load_review_request(
+                self._project_root, receipt.review_request
+            )
+            if (
+                receipt.layer not in durable_request.requested_layers
+                or any(
+                    identity not in durable_request.evidence_tool_identities
+                    for identity in receipt.tool_identities
+                )
+                or durable_request.dependency_graph.revision_id
+                != receipt.dependency_graph_revision_id
+                or durable_request.render_state != receipt.render_state
+                or durable_request.render_output_sha256
+                != receipt.render_output_sha256
+                or durable_request.timeline_fingerprint
+                != receipt.timeline_fingerprint
+                or durable_request.qa_policy != receipt.qa_policy
+            ):
+                raise _state_invalid("Review Receipt does not match its durable request.")
             current_render = self._current_render_state(manifest)
             if (
                 manifest.schema_version != "2.4"
@@ -1030,6 +1051,8 @@ class ProductionStateCommitter:
                     or item.dependency_graph_revision_id
                     != receipt.dependency_graph_revision_id
                     or item.tool_identity not in receipt.tool_identities
+                    or item.measurement_contract_version
+                    != durable_request.technical_context.measurement_contract_version
                 ):
                     raise _state_invalid("Review evidence identity does not match receipt.")
             policy = load_qa_policy(self._project_root, receipt.qa_policy)
@@ -1093,7 +1116,7 @@ class ProductionStateCommitter:
                 }
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
-            self._write_manifest_atomic(updated)
+            self._write_p6_manifest_atomic(updated)
             return self._read_manifest()
 
     def begin_review(
@@ -1157,8 +1180,53 @@ class ProductionStateCommitter:
                 }
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
-            self._write_manifest_atomic(updated)
+            self._write_p6_manifest_atomic(updated)
             return self._read_manifest()
+
+    def run_review_analysis(
+        self,
+        *,
+        attempt_id: str,
+        expected_manifest_revision: int,
+        analyzer: Callable[[ReviewRequest], tuple[ReviewEvidence, ...]],
+    ) -> tuple[ReviewEvidence, ...]:
+        """Consume one durable review intent before invoking the analyzer once."""
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            attempt = next(
+                (item for item in manifest.attempts if item.attempt_id == attempt_id),
+                None,
+            )
+            if (
+                manifest.manifest_revision != expected_manifest_revision
+                or attempt is None
+                or attempt.operation != "review"
+                or attempt.status is not StateCommitStatus.RUNNING
+                or attempt.review_phase is not ReviewAttemptPhase.REQUESTED
+                or attempt.review_request is None
+            ):
+                raise AiVideoError(
+                    ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN,
+                    "Review analysis was already consumed or has unknown outcome; do not rerun blindly.",
+                )
+            request = load_review_request(
+                self._project_root, attempt.review_request
+            )
+            consumed = attempt.model_copy(
+                update={"review_phase": ReviewAttemptPhase.EVIDENCE}
+            )
+            updated = manifest.model_copy(
+                update={
+                    "manifest_revision": manifest.manifest_revision + 1,
+                    "attempts": tuple(
+                        consumed if item.attempt_id == attempt_id else item
+                        for item in manifest.attempts
+                    ),
+                }
+            )
+            updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
+            self._write_p6_manifest_atomic(updated)
+        return analyzer(request)
 
     def record_approved_repair_receipt(
         self,
@@ -1293,7 +1361,7 @@ class ProductionStateCommitter:
                 }
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
-            self._write_manifest_atomic(updated)
+            self._write_p6_manifest_atomic(updated)
             return self._read_manifest()
 
     def record_repair_outcome(
@@ -1341,6 +1409,23 @@ class ProductionStateCommitter:
                 or not verify_artifact_hash(approved)
             ):
                 raise _state_invalid("Repair outcome approval identity is invalid.")
+            approval_fields_match = all(
+                getattr(receipt, field) == getattr(approved, field)
+                for field in (
+                    "repair_id",
+                    "review_receipt_ids",
+                    "issue_ids",
+                    "evidence_ids",
+                    "root_cause_hypothesis",
+                    "selected_repair_action",
+                    "exact_target_artifact_ids",
+                    "exact_target_node_ids",
+                    "expected_invalidation_node_ids",
+                    "actor",
+                    "authorization",
+                    "before_fingerprints",
+                )
+            )
             repair_index = next(
                 (index
                 for index, item in enumerate(manifest.attempts)
@@ -1387,8 +1472,9 @@ class ProductionStateCommitter:
                 or current_render.output.file_sha256 != receipt.rerender_output_sha256
                 or current_render.timeline_fingerprint
                 != receipt.rerender_timeline_fingerprint
+                or not approval_fields_match
                 or receipt.actual_invalidation_node_ids
-                != receipt.expected_invalidation_node_ids
+                != approved.expected_invalidation_node_ids
                 or not set(receipt.fresh_review_receipts).issubset(
                     set(manifest.active_review_receipts)
                 )
@@ -1414,7 +1500,7 @@ class ProductionStateCommitter:
                 }
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
-            self._write_manifest_atomic(updated)
+            self._write_p6_manifest_atomic(updated)
             return self._read_manifest()
 
     def record_final_acceptance(
@@ -1492,6 +1578,16 @@ class ProductionStateCommitter:
                 or not render_states
                 or any(item.verdict is not QaVerdict.PASS for item in reopened_reviews)
                 or any(
+                    item.dependency_graph_revision_id
+                    != manifest.active_dependency_graph.revision_id
+                    or item.render_state != manifest.active_render_state
+                    or item.qa_policy != manifest.active_qa_policy
+                    or item.render_output_sha256 != current_render.output.file_sha256
+                    or item.timeline_fingerprint
+                    != current_render.timeline_fingerprint
+                    for item in reopened_reviews
+                )
+                or any(
                     active_states.get(layer) is None
                     or active_states[layer].lifecycle is not ReviewLifecycle.FRESH
                     for layer in receipt_layers
@@ -1525,7 +1621,7 @@ class ProductionStateCommitter:
                 }
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
-            self._write_manifest_atomic(updated)
+            self._write_p6_manifest_atomic(updated)
             return self._read_manifest()
 
     @property
@@ -6838,6 +6934,20 @@ class ProductionStateCommitter:
             on_replace=on_replace,
         )
         return final_path
+
+    def _write_p6_manifest_atomic(self, manifest: ProductionManifest) -> Path:
+        replaced = False
+
+        def mark_replaced() -> None:
+            nonlocal replaced
+            replaced = True
+
+        try:
+            return self._write_manifest_atomic(manifest, on_replace=mark_replaced)
+        except Exception as exc:
+            if replaced:
+                raise _outcome_unknown(exc) from exc
+            raise
 
     def _write_mutable_atomic(
         self,

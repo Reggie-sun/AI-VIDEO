@@ -9,6 +9,7 @@ import pytest
 from ai_video_mcp.errors import McpError
 from ai_video_mcp.tools.review import video_review
 from ai_video.production.models import (
+    ReviewAttemptPhase,
     ReviewRequestPointer,
     StateCommitStatus,
     TechnicalReviewContext,
@@ -27,6 +28,7 @@ def production_request(monkeypatch, context):
     attempt = SimpleNamespace(
         operation="review",
         status=StateCommitStatus.RUNNING,
+        review_phase=ReviewAttemptPhase.EVIDENCE,
         review_request=pointer,
     )
     monkeypatch.setattr(
@@ -107,7 +109,19 @@ class TestVideoReview:
         )
         assert result["mode"] == "production_evidence"
         assert result["issues"] == []
+        assert result["measurements"]["coverage_complete"] is True
         assert result["measurements"]["unique_frame_ratio"] <= 0.5
+
+    def test_partial_production_arguments_do_not_fall_back_to_legacy(
+        self, tiny_video, mcp_config, mcp_cache
+    ):
+        with pytest.raises(McpError, match="durable request"):
+            video_review(
+                str(tiny_video),
+                mcp_config,
+                mcp_cache,
+                production_project_path="/verified/project/project.yaml",
+            )
 
     def test_production_context_rejects_output_hash_mismatch(
         self, tiny_video, mcp_config, mcp_cache, monkeypatch

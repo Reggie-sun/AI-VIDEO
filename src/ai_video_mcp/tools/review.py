@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 from ai_video.production.models import (
+    ReviewAttemptPhase,
     ReviewRequestPointer,
     StateCommitStatus,
     TechnicalReviewContext,
@@ -234,8 +235,13 @@ def video_review(
 ) -> dict:
     p = _validate_video(video_path, config)
 
-    if production_context is not None:
-        if production_project_path is None or production_review_request is None:
+    production_inputs = (
+        production_context,
+        production_project_path,
+        production_review_request,
+    )
+    if any(item is not None for item in production_inputs):
+        if any(item is None for item in production_inputs):
             raise McpError(
                 McpErrorCode.INVALID_PARAMETER,
                 "Production review requires verified project and durable request",
@@ -247,6 +253,7 @@ def video_review(
         if not any(
             item.operation == "review"
             and item.status is StateCommitStatus.RUNNING
+            and item.review_phase is ReviewAttemptPhase.EVIDENCE
             and item.review_request == request_pointer
             for item in bundle.manifest.attempts
         ):
@@ -313,9 +320,12 @@ def video_review(
             "measurement_contract_version": context.measurement_contract_version,
             "windows": window_measurements,
             "measurements": {
+                "coverage_complete": True,
                 "sampled_frame_count": sample_count,
                 "unique_frame_count": unique_count,
                 "unique_frame_ratio": ratio,
+                "expects_audio": any(item.expects_audio for item in context.windows),
+                "windows": window_measurements,
                 **_technical_signal_measurements(p),
             },
             # Production thresholds and verdicts belong to production.review.

@@ -90,13 +90,44 @@ def test_selected_policy_recomputes_technical_and_layout_verdicts():
     assert adjudicate_review_evidence(
         policy(),
         QaLayer.TECHNICAL,
-        (evidence(QaLayer.TECHNICAL, EvidenceStrength.MEASURED, minimum_luma_milli=9),),
+        (evidence(
+            QaLayer.TECHNICAL,
+            EvidenceStrength.MEASURED,
+            minimum_luma_milli=9,
+            black_ranges=[],
+            silence_ranges=[],
+            audio_peak_millidb=-1000,
+            expects_audio=False,
+            windows=[],
+        ),),
     ) is QaVerdict.FAIL
     assert adjudicate_review_evidence(
         policy(),
         QaLayer.LAYOUT,
-        (evidence(QaLayer.LAYOUT, EvidenceStrength.RENDERER_BOUND, caption_overflow_milli=1),),
+        (evidence(
+            QaLayer.LAYOUT,
+            EvidenceStrength.RENDERER_BOUND,
+            caption_overflow_milli=1,
+            safe_area_inset_milli=50,
+            layer_collision_count=0,
+            transition_boundary_violation_count=0,
+        ),),
     ) is QaVerdict.FAIL
+
+
+def test_selected_policy_fails_closed_when_required_measurement_is_absent():
+    assert adjudicate_review_evidence(
+        policy(),
+        QaLayer.TECHNICAL,
+        (evidence(
+            QaLayer.TECHNICAL,
+            EvidenceStrength.MEASURED,
+            black_ranges=[],
+            silence_ranges=[],
+            expects_audio=True,
+            windows=[],
+        ),),
+    ) is QaVerdict.NOT_EVALUATED
 
 
 def test_semantic_typed_evidence_requires_evaluator_identity():

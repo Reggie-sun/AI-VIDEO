@@ -90,6 +90,24 @@ def adjudicate_review_evidence(
         thresholds = policy.technical_thresholds
         for item in evidence:
             payload = item.measured_payload
+            required = {
+                "black_ranges",
+                "silence_ranges",
+                "audio_peak_millidb",
+                "expects_audio",
+                "windows",
+            }
+            if not required.issubset(payload):
+                return QaVerdict.NOT_EVALUATED
+            if payload["black_ranges"]:
+                return QaVerdict.FAIL
+            if payload["expects_audio"] is True and payload["silence_ranges"]:
+                return QaVerdict.FAIL
+            if (
+                payload["expects_audio"] is True
+                and not isinstance(payload["audio_peak_millidb"], int)
+            ):
+                return QaVerdict.NOT_EVALUATED
             if (
                 isinstance(payload.get("minimum_luma_milli"), int)
                 and payload["minimum_luma_milli"] <= thresholds.black_luma_max_milli
@@ -108,11 +126,32 @@ def adjudicate_review_evidence(
                 return QaVerdict.FAIL
             if payload.get("frozen_required_motion") is True:
                 return QaVerdict.FAIL
+            windows = payload["windows"]
+            if not isinstance(windows, tuple | list):
+                return QaVerdict.NOT_EVALUATED
+            for window in windows:
+                if not isinstance(window, Mapping):
+                    return QaVerdict.NOT_EVALUATED
+                if window.get("status") == "not_evaluated":
+                    return QaVerdict.NOT_EVALUATED
+                if window.get("visual_strategy") in {
+                    VisualStrategy.GENERATED_VIDEO.value,
+                    VisualStrategy.EXISTING_VIDEO.value,
+                } and int(window.get("unique_frame_count", 0)) <= 1:
+                    return QaVerdict.FAIL
         return QaVerdict.PASS
     if layer is QaLayer.LAYOUT:
         rules = policy.layout_rules
         for item in evidence:
             payload = item.measured_payload
+            required = {
+                "caption_overflow_milli",
+                "safe_area_inset_milli",
+                "layer_collision_count",
+                "transition_boundary_violation_count",
+            }
+            if not required.issubset(payload):
+                return QaVerdict.NOT_EVALUATED
             if (
                 isinstance(payload.get("caption_overflow_milli"), int)
                 and payload["caption_overflow_milli"]
@@ -126,6 +165,13 @@ def adjudicate_review_evidence(
                 return QaVerdict.FAIL
         return QaVerdict.PASS
     if layer is QaLayer.STRATEGY:
+        if any(
+            not {"evaluated_strategy_ids", "strategy_mismatch"}.issubset(
+                item.measured_payload
+            )
+            for item in evidence
+        ):
+            return QaVerdict.NOT_EVALUATED
         return (
             QaVerdict.FAIL
             if any(item.measured_payload.get("strategy_mismatch") is True for item in evidence)

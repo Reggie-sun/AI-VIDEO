@@ -3,6 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from ai_video_mcp.tools.optimize_plan import video_optimize_plan
 
 from conftest import skip_no_ffmpeg
@@ -10,6 +12,17 @@ from conftest import skip_no_ffmpeg
 
 @skip_no_ffmpeg
 class TestVideoOptimizePlan:
+    def test_partial_production_arguments_do_not_fall_back_to_legacy(
+        self, tiny_video, mcp_config, mcp_cache
+    ):
+        with pytest.raises(ValueError, match="verified project path"):
+            video_optimize_plan(
+                str(tiny_video),
+                mcp_config,
+                mcp_cache,
+                production_project_path="/verified/project/project.yaml",
+            )
+
     def test_production_plan_consumes_receipt_without_reanalysis(
         self, tiny_video, mcp_config, mcp_cache, monkeypatch
     ):
