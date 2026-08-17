@@ -1,6 +1,15 @@
 from __future__ import annotations
 
 import importlib
+from pathlib import Path
+
+
+def _effective_loc(path: Path) -> int:
+    return sum(
+        1
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    )
 
 
 def test_contracts_and_prepare_helpers_are_owned_by_private_modules() -> None:
@@ -37,12 +46,21 @@ def test_generic_transaction_and_io_methods_have_private_owners() -> None:
     assert facade.ProductionStateCommitter._exclusive_lock.__module__ == facade.__name__
 
 
-def test_review_and_dependency_methods_have_domain_owners() -> None:
+def test_review_repair_and_dependency_methods_have_domain_owners() -> None:
     facade = importlib.import_module("ai_video.production.state_commit")
     review = importlib.import_module("ai_video.production._state_commit_review")
+    repair = importlib.import_module("ai_video.production._state_commit_repair")
     dependency = importlib.import_module("ai_video.production._state_commit_dependency")
     committer = facade.ProductionStateCommitter
     assert committer.activate_qa_policy.__module__ == review.__name__
     assert committer.record_final_acceptance.__module__ == review.__name__
+    assert committer.record_approved_repair_receipt.__module__ == repair.__name__
+    assert committer.record_repair_outcome.__module__ == repair.__name__
     assert committer.bootstrap_dependency_graph.__module__ == dependency.__name__
     assert committer.record_dependency_node_failed.__module__ == dependency.__name__
+
+
+def test_review_and_repair_modules_stay_focused() -> None:
+    production = Path(__file__).parents[1] / "src/ai_video/production"
+    assert _effective_loc(production / "_state_commit_review.py") <= 800
+    assert _effective_loc(production / "_state_commit_repair.py") <= 800

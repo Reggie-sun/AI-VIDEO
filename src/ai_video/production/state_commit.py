@@ -204,6 +204,7 @@ from ._state_commit_contracts import (
 )
 from ._state_commit_io import _FileOps, _NativeFileOps, _StateCommitIoMixin
 from ._state_commit_dependency import _StateCommitDependencyMixin
+from ._state_commit_repair import _StateCommitRepairMixin
 from ._state_commit_review import _StateCommitReviewMixin
 from ._state_commit_transaction import _StateCommitTransactionMixin
 
@@ -222,6 +223,7 @@ except ImportError:  # pragma: no cover - exercised through platform injection
 
 class ProductionStateCommitter(
     _StateCommitReviewMixin,
+    _StateCommitRepairMixin,
     _StateCommitDependencyMixin,
     _StateCommitTransactionMixin,
     _StateCommitIoMixin,
