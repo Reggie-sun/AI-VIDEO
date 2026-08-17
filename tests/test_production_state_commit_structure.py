@@ -85,6 +85,18 @@ def test_voice_methods_have_domain_owners_and_one_permit_identity() -> None:
     assert committer.generate_voice_asset.__module__ == activation.__name__
 
 
+def test_recovery_methods_have_domain_owners() -> None:
+    facade = importlib.import_module("ai_video.production.state_commit")
+    recovery = importlib.import_module("ai_video.production._state_commit_recovery")
+    attempts = importlib.import_module("ai_video.production._state_commit_recovery_attempts")
+    recovery_fs = importlib.import_module("ai_video.production._state_commit_recovery_fs")
+    committer = facade.ProductionStateCommitter
+    assert committer.recover.__module__ == recovery.__name__
+    assert committer._recover_attempts.__module__ == attempts.__name__
+    assert committer._remove_recovery_temp.__module__ == recovery_fs.__name__
+    assert committer._require_recovery_file_hash.__module__ == recovery_fs.__name__
+
+
 def test_review_and_repair_modules_stay_focused() -> None:
     production = Path(__file__).parents[1] / "src/ai_video/production"
     assert _effective_loc(production / "_state_commit_review.py") <= 800
@@ -102,3 +114,10 @@ def test_voice_modules_stay_focused() -> None:
     assert _effective_loc(production / "_state_commit_voice_intent.py") <= 800
     assert _effective_loc(production / "_state_commit_voice_candidate.py") <= 800
     assert _effective_loc(production / "_state_commit_voice_activation.py") <= 800
+
+
+def test_recovery_modules_stay_focused() -> None:
+    production = Path(__file__).parents[1] / "src/ai_video/production"
+    assert _effective_loc(production / "_state_commit_recovery.py") <= 800
+    assert _effective_loc(production / "_state_commit_recovery_attempts.py") <= 800
+    assert _effective_loc(production / "_state_commit_recovery_fs.py") <= 800
