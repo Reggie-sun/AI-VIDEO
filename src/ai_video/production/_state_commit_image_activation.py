@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._image_project_reader import (
+    _verify_image_activation_chronology,
+)
 from ai_video.production.image import (
     ImageAssetProvider,
     ImageGenerationAuthorization,
@@ -141,8 +144,6 @@ class _StateCommitImageActivationMixin:
                 or attempt.candidate_registry != manifest.active_registry
                 or attempt.candidate_dependency_graph
                 != manifest.active_dependency_graph
-                or attempt.candidate_dependency_states_hash
-                != _dependency_states_hash(manifest.dependency_states)
                 or attempt.candidate_image_asset_ids != (request.output_asset_id,)
             ):
                 raise _image_outcome_unknown(
@@ -155,6 +156,7 @@ class _StateCommitImageActivationMixin:
                 )
                 if loaded.manifest != manifest:
                     raise ValueError("active image replay Manifest changed during reopen")
+                _verify_image_activation_chronology(manifest, attempt)
                 expected_r1 = self._expected_image_r1_artifacts(
                     request, preview, authorization
                 )

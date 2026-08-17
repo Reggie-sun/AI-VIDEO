@@ -352,7 +352,7 @@ class _StateCommitDependencyMixin:
         artifacts: tuple[PreparedArtifact, ...],
         transition: DependencyGraphTransition | None,
     ) -> tuple[DependencyGraphTransition | None, DependencyGraphSnapshot | None]:
-        if manifest.schema_version not in {"2.3", "2.4"}:
+        if manifest.schema_version not in {"2.3", "2.4", "2.5"}:
             if transition is not None:
                 raise _state_invalid(
                     "Dependency graph transition requires Manifest 2.3."
@@ -459,7 +459,23 @@ class _StateCommitDependencyMixin:
             if isinstance(evidence, ProjectDependencyEvidence):
                 if node.kind is not DependencyNodeKind.CREATIVE_ARTIFACT or evidence.pointer != manifest.active_project:
                     raise _state_invalid("Dependency project evidence owner is invalid.")
-                _verify_dependency_project_evidence(bundle, evidence, node)
+                evidence_state = (
+                    current.model_copy(
+                        update={
+                            "applied_fingerprint": desired_fingerprint,
+                            "lifecycle": DependencyLifecycle.FRESH,
+                            "applied_evidence": evidence,
+                            "blocked_by": (),
+                            "error_code": None,
+                            "error_message": None,
+                        }
+                    )
+                    if current.lifecycle is DependencyLifecycle.STALE
+                    else current
+                )
+                _verify_dependency_project_evidence(
+                    bundle, evidence, node, (graph, evidence_state)
+                )
             elif isinstance(evidence, RegistryDependencyEvidence):
                 if node.kind is not DependencyNodeKind.ASSET or evidence.pointer != manifest.active_registry:
                     raise _state_invalid("Dependency registry evidence owner is invalid.")
@@ -556,7 +572,7 @@ class _StateCommitDependencyMixin:
         desired_fingerprint: str,
     ) -> tuple[ProductionManifest, DependencyGraphSnapshot, object, DependencyNodeState]:
         manifest = self._read_manifest()
-        if manifest.schema_version not in {"2.3", "2.4"}:
+        if manifest.schema_version not in {"2.3", "2.4", "2.5"}:
             raise _state_invalid("Dependency results require Manifest 2.3.")
         if manifest.manifest_revision != expected_manifest_revision:
             raise _state_invalid("Production Manifest revision is stale.")

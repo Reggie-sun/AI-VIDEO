@@ -26,6 +26,7 @@ from ai_video.production.models import (
     Character,
     DependencyGraphSnapshot,
     LoadedProductionProject,
+    ProductionManifest,
     ProductionProject,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
@@ -436,27 +437,13 @@ def _verify_evidence(
         bundle, candidate_project, request
     )
 
-    shot = next(
-        (item for item in bundle.shots if item.shot_id == request.target_shot_id),
-        None,
-    )
-    roles = (
-        tuple(
-            item
-            for item in shot.required_asset_roles
-            if item.role == request.target_asset_role
-        )
-        if shot is not None
-        else ()
-    )
-    selected_roles = tuple(
-        (item.shot_id, role.role)
-        for item in bundle.shots
-        for role in item.required_asset_roles
-        if asset.asset_id in role.asset_ids
+    roles = tuple(
+        item
+        for item in candidate_shot.required_asset_roles
+        if item.role == request.target_asset_role
     )
     expected_inputs = (
-        shot.artifact_id if shot is not None else "",
+        candidate_shot.artifact_id,
         *(
             identity
             for item in request.references
@@ -464,11 +451,8 @@ def _verify_evidence(
         ),
     )
     if (
-        shot is None
-        or len(roles) != 1
+        len(roles) != 1
         or roles[0].asset_ids != (asset.asset_id,)
-        or selected_roles != ((request.target_shot_id, request.target_asset_role),)
-        or shot.creation_receipt_id != receipt.content_hash
         or candidate_shot.creation_receipt_id != receipt.content_hash
         or receipt.request_id != request.request_id
         or receipt.request_fingerprint != request.request_fingerprint
@@ -508,6 +492,31 @@ def _verify_candidate_artifacts_hash(
     ).hexdigest()
     if actual != attempt.candidate_artifacts_hash:
         raise ValueError("image candidate artifact hash mismatch")
+
+
+def _verify_image_activation_chronology(
+    manifest: ProductionManifest,
+    attempt: StateCommitAttempt,
+) -> None:
+    """Bind activation-time state evidence without freezing later P5 results."""
+
+    activation_revision = attempt.base_manifest_revision + 4
+    if manifest.manifest_revision < activation_revision:
+        raise ValueError("active image Manifest revision predates activation")
+    if manifest.manifest_revision == activation_revision:
+        states_payload = json.dumps(
+            [
+                item.model_dump(mode="json")
+                for item in manifest.dependency_states
+            ],
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        if attempt.candidate_dependency_states_hash != hashlib.sha256(
+            states_payload
+        ).hexdigest():
+            raise ValueError("active image dependency state hash mismatch")
 
 
 def verify_image_attempt_evidence(
@@ -619,22 +628,7 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
                 or latest.candidate_registry != bundle.manifest.active_registry
             ):
                 raise ValueError("latest selected image candidate is not active")
-            states_payload = json.dumps(
-                [
-                    item.model_dump(mode="json")
-                    for item in bundle.manifest.dependency_states
-                ],
-                ensure_ascii=False,
-                sort_keys=True,
-                separators=(",", ":"),
-            ).encode("utf-8")
-            if (
-                latest.candidate_dependency_graph
-                == bundle.manifest.active_dependency_graph
-                and latest.candidate_dependency_states_hash
-                != hashlib.sha256(states_payload).hexdigest()
-            ):
-                raise ValueError("active image dependency state hash mismatch")
+            _verify_image_activation_chronology(bundle.manifest, latest)
     except (AiVideoError, OSError, UnicodeError, ValidationError, ValueError) as exc:
         detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
         raise _invalid(

@@ -1951,7 +1951,15 @@ def _p7_json_bytes(value: object) -> bytes:
     ).encode("utf-8")
 
 
-def _p7_png(width: int = 2, height: int = 1) -> bytes:
+def _p7_png(
+    width: int = 2,
+    height: int = 1,
+    *,
+    rgba: bytes = b"\x11\x22\x33\xff",
+) -> bytes:
+    if len(rgba) != 4:
+        raise ValueError("P7 fixture RGBA pixel must contain exactly four bytes.")
+
     def chunk(kind: bytes, payload: bytes) -> bytes:
         checksum = zlib.crc32(kind + payload) & 0xFFFFFFFF
         return (
@@ -1962,7 +1970,7 @@ def _p7_png(width: int = 2, height: int = 1) -> bytes:
         )
 
     ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
-    row = b"\x00" + (b"\x11\x22\x33\xff" * width)
+    row = b"\x00" + (rgba * width)
     return (
         b"\x89PNG\r\n\x1a\n"
         + chunk(b"IHDR", ihdr)
@@ -2637,7 +2645,7 @@ def make_p7_committed_project(
     manifest = base_manifest.model_copy(
         update={
             "schema_version": "2.5",
-            "manifest_revision": base_manifest.manifest_revision + 1,
+            "manifest_revision": base_manifest.manifest_revision + 4,
             "active_project": project_pointer,
             "active_registry": registry_pointer,
             "active_dependency_graph": graph_pointer,
@@ -2983,7 +2991,7 @@ def append_p7_committed_candidate(
     )
     manifest = current_manifest.model_copy(
         update={
-            "manifest_revision": current_manifest.manifest_revision + 1,
+            "manifest_revision": current_manifest.manifest_revision + 4,
             "active_project": project_pointer,
             "active_registry": registry_pointer,
             "active_dependency_graph": graph_pointer,
