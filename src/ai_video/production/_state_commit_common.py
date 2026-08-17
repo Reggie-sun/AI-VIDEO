@@ -27,6 +27,7 @@ from ai_video.production.dependency import (
     desired_fingerprints,
     resolve_dependency_state,
 )
+from ai_video.production._lifecycle_schema import has_p6_state
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     AssetRegistrySnapshot,
@@ -239,7 +240,10 @@ def _handle_cleanup_errors(
 def _validated_transition(
     model: ProductionManifest | StateCommitAttempt, update: dict[str, object]
 ) -> ProductionManifest | StateCommitAttempt:
-    if isinstance(model, ProductionManifest) and model.schema_version == "2.4":
+    if isinstance(model, ProductionManifest) and (
+        model.schema_version == "2.4"
+        or (model.schema_version == "2.5" and has_p6_state(model))
+    ):
         identity_fields = (
             "active_project",
             "active_registry",

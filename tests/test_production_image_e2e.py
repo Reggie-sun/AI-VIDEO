@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 import ai_video.production.image as image_mod
+import ai_video.production as production_mod
 from ai_video.production.dependency import (
     DependencyResolution,
     ProductionDependencyInputs,
@@ -309,3 +310,24 @@ def test_p7_pure_lane_has_no_renderer_review_video_or_remote_provider():
         "RemoteImageProvider",
         "render_with_hyperframes",
     } & exported
+
+
+def test_p7_package_exports_only_safe_image_generation_contracts():
+    expected = {
+        "ImageAssetProvider",
+        "ImageGenerationRequest",
+        "ImageGenerationPreview",
+        "ImageGenerationAuthorization",
+        "ImageProviderParameters",
+        "ImageReferenceBinding",
+        "ImageProviderResult",
+        "ImageLocalResourceEvidence",
+    }
+
+    assert expected.issubset(set(production_mod.__all__))
+    assert not {
+        "DurableImageSubmitPermit",
+        "PreparedImageCandidate",
+        "ImageActivationCandidate",
+        "RemoteImageProvider",
+    } & set(production_mod.__all__)

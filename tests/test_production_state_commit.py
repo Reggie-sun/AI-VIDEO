@@ -17,7 +17,9 @@ from ai_video.production.image import (
     ImageGenerationAuthorization,
     ImageGenerationPreview,
     ImageGenerationRequest,
+    ImageLocalResourceEvidence,
     ImageProviderParameters,
+    ImageProviderResult,
     ImageReferenceBinding,
 )
 from ai_video.production.models import (
@@ -27,6 +29,7 @@ from ai_video.production.models import (
     DependencyLifecycle,
     DependencyNodeState,
     EvidenceStrength,
+    FinalAcceptanceState,
     ProductionProject,
     ProductionManifest,
     ProjectSnapshotPointer,
@@ -40,6 +43,8 @@ from ai_video.production.models import (
     RepairAuthorization,
     RepairRequest,
     ReviewAttemptPhase,
+    ReviewLayerState,
+    ReviewLifecycle,
     ReviewEvidence,
     ReviewEvidencePointer,
     ReviewReceipt,
@@ -83,8 +88,11 @@ from ai_video.production.state_commit import (
 )
 from ai_video.production.paths import (
     canonical_image_authorization_path,
+    canonical_image_asset_path,
     canonical_image_preview_path,
+    canonical_image_receipt_path,
     canonical_image_request_path,
+    canonical_image_result_path,
     canonical_image_submit_intent_path,
     canonical_render_attempt_root,
     canonical_render_output_path,
@@ -181,6 +189,26 @@ def make_image_call_bundle(
         policy_receipt_id="fixture-local-image-policy",
     )
     return request, preview, authorization
+
+
+def make_image_provider_result(
+    request: ImageGenerationRequest,
+    authorization: ImageGenerationAuthorization,
+    image_bytes: bytes,
+) -> ImageProviderResult:
+    return ImageProviderResult.create(
+        request=request,
+        authorization=authorization,
+        image_bytes=image_bytes,
+        content_type="image/png",
+        provider_request_id="fixture-local-image-1",
+        adapter=ToolIdentity(name="fake-local-image", version="1"),
+        resource_evidence=ImageLocalResourceEvidence(
+            elapsed_milliseconds=3,
+            device_kind="cpu",
+            measured_peak_memory_bytes=4096,
+        ),
+    )
 
 
 def make_qa_policy(
@@ -1100,6 +1128,391 @@ def test_image_r1_preserves_existing_25_attempt_history(tmp_path: Path) -> None:
     assert after.active_project == before.active_project
     assert after.active_registry == before.active_registry
     assert after.active_dependency_graph == before.active_dependency_graph
+
+
+def test_generate_image_asset_persists_candidate_then_atomically_activates(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    base_project = load_production_project(tmp_path / "project.yaml")
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+
+    class _Provider:
+        calls = 0
+        result = None
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert candidate == request
+            assert candidate_authorization == authorization
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            assert not permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            self.result = make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+            return self.result
+
+    class _RecordingCommitter(ProductionStateCommitter):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.written_manifests = []
+
+        def _write_manifest_atomic(self, manifest, *, on_replace=None):
+            self.written_manifests.append(manifest)
+            return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    provider = _Provider()
+    writer = _RecordingCommitter(
+        tmp_path,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    )
+
+    final = writer.generate_image_asset(request, preview, authorization, provider)
+
+    assert provider.calls == 1
+    candidate, activated = writer.written_manifests[-2:]
+    assert (candidate.active_project, candidate.active_registry, candidate.active_dependency_graph) == (
+        base_project.manifest.active_project,
+        base_project.manifest.active_registry,
+        base_project.manifest.active_dependency_graph,
+    )
+    assert candidate.attempts[-1].image_phase == "candidate"
+    assert candidate.attempts[-1].status is StateCommitStatus.RUNNING
+    assert activated == final
+    assert activated.attempts[-1].image_phase == "activate"
+    assert activated.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    assert (
+        activated.active_render_state
+        == candidate.active_render_state
+        == base_project.manifest.active_render_state
+    )
+    assert (
+        activated.active_project,
+        activated.active_registry,
+        activated.active_dependency_graph,
+    ) == (
+        candidate.attempts[-1].candidate_project,
+        candidate.attempts[-1].candidate_registry,
+        candidate.attempts[-1].candidate_dependency_graph,
+    )
+    assert provider.result is not None
+    result_path = canonical_image_result_path(provider.result.result_fingerprint)
+    result_payload = json.loads((tmp_path / result_path).read_bytes())
+    assert "image_bytes" not in result_payload
+    assert (tmp_path / canonical_image_asset_path(result_payload["image_sha256"])).read_bytes() == png_bytes
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.manifest == activated
+    active_asset = next(
+        item for item in loaded.registry.assets if item.asset_id == request.output_asset_id
+    )
+    active_shot = next(
+        item for item in loaded.shots if item.shot_id == request.target_shot_id
+    )
+    active_role = next(
+        item
+        for item in active_shot.required_asset_roles
+        if item.role == request.target_asset_role
+    )
+    assert active_role.asset_ids == (request.output_asset_id,)
+    receipt_path = canonical_image_receipt_path(active_asset.creation_receipt_id)
+    receipt_payload = json.loads((tmp_path / receipt_path).read_bytes())
+    assert receipt_payload["request_fingerprint"] == request.request_fingerprint
+    shot_path = next(
+        item.path
+        for item in loaded.project.artifacts.shots
+        if item.artifact_id == active_shot.artifact_id
+    )
+    evidence_paths = (
+        canonical_image_request_path(request.request_fingerprint),
+        result_path,
+        receipt_path,
+        active_asset.artifact_path,
+        shot_path,
+        activated.active_project.path,
+        activated.active_registry.path,
+        activated.active_dependency_graph.path,
+    )
+    assert len(evidence_paths) == len(set(evidence_paths)) == 8
+    evidence_pairs = sorted(
+        (
+            path.as_posix(),
+            hashlib.sha256((tmp_path / path).read_bytes()).hexdigest(),
+        )
+        for path in evidence_paths
+    )
+    assert activated.attempts[-1].candidate_artifacts_hash == hashlib.sha256(
+        json.dumps(evidence_pairs, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    lifecycle_by_id = {item.node_id: item.lifecycle for item in activated.dependency_states}
+    for prefix in ("composition:", "timeline:", "renderer-source:", "render:"):
+        assert all(
+            lifecycle in {DependencyLifecycle.STALE, DependencyLifecycle.BLOCKED}
+            for node_id, lifecycle in lifecycle_by_id.items()
+            if node_id.startswith(prefix)
+        )
+    assert lifecycle_by_id["asset:image-shot-2"] is DependencyLifecycle.FRESH
+
+
+def test_generate_image_asset_rejects_nonlocal_evidence_before_provider_call(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    preview = preview.model_copy(update={"local_only": False, "remote": True})
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, *args):
+            self.calls += 1
+            raise AssertionError("Provider must not be called")
+
+    provider = _Provider()
+    before = read_manifest(tmp_path)
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, provider
+        )
+
+    assert exc_info.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert provider.calls == 0
+    assert read_manifest(tmp_path) == before
+
+
+def test_generate_image_asset_rejects_stale_base_before_provider_call(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    request, preview, authorization = make_image_call_bundle(
+        tmp_path,
+        base_project=loaded.manifest.active_project.model_copy(
+            update={"file_sha256": "f" * 64}
+        ),
+    )
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, *args):
+            self.calls += 1
+            raise AssertionError("Provider must not be called")
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, provider
+        )
+
+    assert exc_info.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert provider.calls == 0
+
+
+def test_generate_image_asset_requires_provider_to_consume_exact_permit(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    result = make_image_provider_result(
+        request, authorization, project_factory._p7_png()
+    )
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            return result
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, provider
+        )
+
+    after = read_manifest(tmp_path)
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert after.attempts[-1].image_phase == "provider_call"
+    assert not (
+        tmp_path / canonical_image_result_path(result.result_fingerprint)
+    ).exists()
+
+
+def test_generate_image_asset_provider_exception_is_outcome_unknown(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            raise RuntimeError("provider transport ended ambiguously")
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, provider
+        )
+
+    attempt = read_manifest(tmp_path).attempts[-1]
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.image_phase == "provider_call"
+    assert "provider transport ended ambiguously" not in attempt.error_message
+
+
+def test_generate_image_asset_rejects_post_submit_evidence_drift(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    result = make_image_provider_result(
+        request, authorization, project_factory._p7_png()
+    )
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            (tmp_path / canonical_image_authorization_path(
+                candidate_authorization.authorization_fingerprint
+            )).write_bytes(b"{}\n")
+            return result
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, _Provider()
+        )
+
+    attempt = read_manifest(tmp_path).attempts[-1]
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.image_phase == "provider_call"
+
+
+def test_generate_image_asset_rejects_invalid_preparer_without_activation(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    base = read_manifest(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+    good_preparer = project_factory.make_p7_image_candidate_preparer(base_inputs)
+
+    def invalid_preparer(*args):
+        return replace(good_preparer(*args), candidate_graph_bytes=b"{}\n")
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(
+            tmp_path, image_candidate_preparer=invalid_preparer
+        ).generate_image_asset(request, preview, authorization, provider)
+
+    after = read_manifest(tmp_path)
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert after.attempts[-1].image_phase == "materialize"
+    assert (after.active_project, after.active_registry, after.active_dependency_graph) == (
+        base.active_project,
+        base.active_registry,
+        base.active_dependency_graph,
+    )
+
+
+def test_image_activation_stales_manifest_25_p6_review_and_acceptance_state(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before_policy = read_manifest(tmp_path)
+    p6 = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before_policy.manifest_revision,
+        attempt_id="qa-policy-before-p7-activation",
+    )
+    p6 = p6.model_copy(
+        update={
+            "review_states": (
+                ReviewLayerState(
+                    layer=QaLayer.TECHNICAL,
+                    desired_fingerprint="1" * 64,
+                    applied_fingerprint="1" * 64,
+                    lifecycle=ReviewLifecycle.NOT_EVALUATED,
+                ),
+            ),
+            "final_acceptance_state": FinalAcceptanceState(
+                desired_fingerprint="2" * 64,
+                applied_fingerprint="2" * 64,
+                lifecycle=ReviewLifecycle.NOT_EVALUATED,
+            ),
+        }
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        p6.model_dump_json(indent=2), encoding="utf-8"
+    )
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    final = ProductionStateCommitter(
+        tmp_path,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    ).generate_image_asset(request, preview, authorization, _Provider())
+
+    assert final.schema_version == "2.5"
+    assert final.active_qa_policy == p6.active_qa_policy
+    assert final.active_review_receipts == ()
+    assert final.review_states[0].lifecycle is ReviewLifecycle.STALE
+    assert final.review_states[0].active_receipt is None
+    assert final.final_acceptance_state is None
 
 
 def test_voice_lifecycle_api_persists_r1_then_mints_one_use_r2_permit(

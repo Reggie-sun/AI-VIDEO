@@ -296,7 +296,9 @@ class _StateCommitDependencyMixin:
                 {
                     **manifest.model_dump(mode="python"),
                     "schema_version": (
-                        "2.4" if manifest.schema_version == "2.4" else "2.3"
+                        manifest.schema_version
+                        if manifest.schema_version in {"2.4", "2.5"}
+                        else "2.3"
                     ),
                     "active_project": project_pointer,
                     "active_registry": registry_pointer,

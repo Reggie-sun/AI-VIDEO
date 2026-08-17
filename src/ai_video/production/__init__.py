@@ -48,6 +48,16 @@ from ai_video.production.audio import (
 )
 from ai_video.production.project import load_production_project
 from ai_video.production.hyperframes import render_with_hyperframes
+from ai_video.production.image import (
+    ImageAssetProvider,
+    ImageGenerationAuthorization,
+    ImageGenerationPreview,
+    ImageGenerationRequest,
+    ImageLocalResourceEvidence,
+    ImageProviderParameters,
+    ImageProviderResult,
+    ImageReferenceBinding,
+)
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
@@ -79,6 +89,14 @@ __all__ = [
     "DependencyLifecycle",
     "DependencyNodeState",
     "LoadedProductionProject",
+    "ImageAssetProvider",
+    "ImageGenerationAuthorization",
+    "ImageGenerationPreview",
+    "ImageGenerationRequest",
+    "ImageLocalResourceEvidence",
+    "ImageProviderParameters",
+    "ImageProviderResult",
+    "ImageReferenceBinding",
     "ProductionBrief",
     "ProductionManifest",
     "ProductionStateCommitter",

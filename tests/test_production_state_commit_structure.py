@@ -13,6 +13,8 @@ PRIVATE_MODULES = (
     "_state_commit_review.py",
     "_state_commit_repair.py",
     "_state_commit_image_intent.py",
+    "_state_commit_image_candidate.py",
+    "_state_commit_image_activation.py",
     "_state_commit_dependency.py",
     "_state_commit_render_lifecycle.py",
     "_state_commit_render_support.py",
@@ -44,6 +46,7 @@ def test_contracts_and_prepare_helpers_are_owned_by_private_modules() -> None:
         "CommitPhase", "CrashInjector", "NoopCrashInjector",
         "_DurableReviewAnalysisPermit", "_DurableVoiceSubmitPermit",
         "_DurableImageSubmitPermit",
+        "PreparedImageCandidate", "ImageCandidatePreparer",
     )
     helper_names = (
         "_owned_temp_name", "_canonical_json_bytes", "_canonical_yaml_bytes",
@@ -117,6 +120,20 @@ def test_image_intent_methods_have_domain_owner_and_one_permit_identity() -> Non
     assert committer.record_image_submit_intent.__module__ == intent.__name__
 
 
+def test_image_candidate_and_activation_methods_have_private_domain_owners() -> None:
+    facade = importlib.import_module("ai_video.production.state_commit")
+    candidate = importlib.import_module(
+        "ai_video.production._state_commit_image_candidate"
+    )
+    activation = importlib.import_module(
+        "ai_video.production._state_commit_image_activation"
+    )
+    committer = facade.ProductionStateCommitter
+    assert committer._prepare_validated_image_candidate.__module__ == candidate.__name__
+    assert committer.generate_image_asset.__module__ == activation.__name__
+    assert committer.activate_image_asset.__module__ == activation.__name__
+
+
 def test_recovery_methods_have_domain_owners() -> None:
     facade = importlib.import_module("ai_video.production.state_commit")
     recovery = importlib.import_module("ai_video.production._state_commit_recovery")
@@ -137,6 +154,8 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         "_StateCommitReviewMixin",
         "_StateCommitRepairMixin",
         "_StateCommitImageIntentMixin",
+        "_StateCommitImageCandidateMixin",
+        "_StateCommitImageActivationMixin",
         "_StateCommitVoiceIntentMixin",
         "_StateCommitVoiceCandidateMixin",
         "_StateCommitVoiceActivationMixin",
@@ -173,6 +192,8 @@ def test_voice_modules_stay_focused() -> None:
 def test_image_intent_module_stays_focused() -> None:
     production = Path(__file__).parents[1] / "src/ai_video/production"
     assert _effective_loc(production / "_state_commit_image_intent.py") <= 800
+    assert _effective_loc(production / "_state_commit_image_candidate.py") <= 800
+    assert _effective_loc(production / "_state_commit_image_activation.py") <= 800
 
 
 def test_recovery_modules_stay_focused() -> None:

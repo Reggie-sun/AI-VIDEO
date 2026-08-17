@@ -190,6 +190,7 @@ from ._state_commit_contracts import (
     CrashInjector,
     NoopCrashInjector,
     PreparedArtifact,
+    PreparedImageCandidate,
     PreparedVoiceCandidate,
     RecordRenderFailureRequest,
     RenderAttemptPaths,
@@ -197,6 +198,7 @@ from ._state_commit_contracts import (
     VoiceAttemptPaths,
     VoiceCandidatePreparer,
     VoiceDependencyTransitionPreparer,
+    ImageCandidatePreparer,
     _REVIEW_PERMIT_TOKEN,
     _VOICE_PERMIT_TOKEN,
     _DurableReviewAnalysisPermit,
@@ -208,6 +210,8 @@ from ._state_commit_recovery import _StateCommitRecoveryMixin
 from ._state_commit_recovery_attempts import _StateCommitRecoveryAttemptsMixin
 from ._state_commit_recovery_fs import _StateCommitRecoveryFsMixin
 from ._state_commit_dependency import _StateCommitDependencyMixin
+from ._state_commit_image_activation import _StateCommitImageActivationMixin
+from ._state_commit_image_candidate import _StateCommitImageCandidateMixin
 from ._state_commit_image_intent import _StateCommitImageIntentMixin
 from ._state_commit_repair import _StateCommitRepairMixin
 from ._state_commit_render_lifecycle import _StateCommitRenderLifecycleMixin
@@ -238,6 +242,8 @@ class ProductionStateCommitter(
     _StateCommitReviewMixin,
     _StateCommitRepairMixin,
     _StateCommitImageIntentMixin,
+    _StateCommitImageCandidateMixin,
+    _StateCommitImageActivationMixin,
     _StateCommitVoiceIntentMixin,
     _StateCommitVoiceCandidateMixin,
     _StateCommitVoiceActivationMixin,
@@ -259,6 +265,7 @@ class ProductionStateCommitter(
         file_ops: _FileOps | None = None,
         crash_injector: CrashInjector | None = None,
         voice_candidate_preparer: VoiceCandidatePreparer | None = None,
+        image_candidate_preparer: ImageCandidatePreparer | None = None,
         repair_authorizer: Callable[[RepairRequest], ActorIdentity | None] | None = None,
     ) -> None:
         try:
@@ -270,6 +277,7 @@ class ProductionStateCommitter(
         self._ops = file_ops or _NativeFileOps()
         self._crash_injector = crash_injector or NoopCrashInjector()
         self._voice_candidate_preparer = voice_candidate_preparer
+        self._image_candidate_preparer = image_candidate_preparer
         self._repair_authorizer = repair_authorizer
 
 
