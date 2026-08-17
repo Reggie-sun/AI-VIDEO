@@ -3692,6 +3692,44 @@ def test_manifest_25_runs_complete_p6_invariants_when_any_p6_field_is_explicit()
         ProductionManifest.model_validate(payload)
 
 
+@pytest.mark.parametrize("operation", ["review", "repair"])
+def test_manifest_25_p6_attempt_evidence_requires_active_qa_policy(operation):
+    payload = make_manifest_25_payload(attempt=make_image_attempt_payload())
+    p6_attempt: dict[str, object] = {
+        "attempt_id": f"{operation}-attempt-1",
+        "operation": operation,
+        "status": "running",
+        "base_manifest_revision": 1,
+        "base_project": make_project_pointer().model_dump(mode="json"),
+        "base_registry": make_registry_pointer().model_dump(mode="json"),
+        "candidate_artifacts_hash": ZERO_HASH,
+        "started_at": "2026-08-18T00:00:00+00:00",
+    }
+    if operation == "review":
+        p6_attempt.update(
+            {
+                "review_request": {
+                    "path": f"state/reviews/request.{ONE_HASH}.json",
+                    "request_id": "review-request-1",
+                    "content_hash": ONE_HASH,
+                    "file_sha256": TWO_HASH,
+                },
+                "review_phase": "requested",
+            }
+        )
+    else:
+        p6_attempt["approved_repair_receipt"] = {
+            "path": f"state/repairs/approved.{ONE_HASH}.json",
+            "repair_id": "repair-1",
+            "content_hash": ONE_HASH,
+            "file_sha256": TWO_HASH,
+        }
+    payload["attempts"] = (*payload["attempts"], p6_attempt)
+
+    with pytest.raises(ValidationError, match="2.5.*active_qa_policy"):
+        ProductionManifest.model_validate(payload)
+
+
 @pytest.mark.parametrize("version", ["2.0", "2.1", "2.2", "2.3", "2.4"])
 def test_manifest_20_24_rejects_explicit_image_fields(version):
     payload = make_state_manifest(
@@ -3739,6 +3777,16 @@ def test_image_attempt_requires_exact_candidate_graph_bundle():
     ).attempts[0]
     assert succeeded.status is StateCommitStatus.SUCCEEDED
     assert succeeded.image_phase == "activate"
+
+
+def test_image_attempt_rejects_candidate_asset_not_sealed_by_request():
+    attempt = make_image_attempt_payload(phase="candidate", candidate=True)
+    attempt["candidate_image_asset_ids"] = (f"image-{ONE_HASH}",)
+
+    with pytest.raises(ValidationError, match="candidate.*request"):
+        ProductionManifest.model_validate(
+            make_manifest_25_payload(attempt=attempt)
+        )
 
 
 @pytest.mark.parametrize(

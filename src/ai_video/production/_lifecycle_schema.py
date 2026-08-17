@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -43,7 +42,6 @@ P5_AWARE_OPERATIONS: frozenset[str] = frozenset(
     }
 )
 
-_IMAGE_ASSET_ID_RE = re.compile(r"^image-[0-9a-f]{64}$")
 _VOICE_FIELDS = (
     "voice_request",
     "voice_phase",
@@ -148,12 +146,10 @@ def _validate_image_attempt(attempt: Any) -> None:
     if attempt.image_phase in {"candidate", "activate"}:
         if not all(item is not None for item in candidate_bundle):
             raise ValueError("image candidate phase requires exact candidate bundle")
-        if (
-            len(attempt.candidate_image_asset_ids) != 1
-            or _IMAGE_ASSET_ID_RE.fullmatch(attempt.candidate_image_asset_ids[0])
-            is None
+        if attempt.candidate_image_asset_ids != (
+            attempt.image_request.output_asset_id,
         ):
-            raise ValueError("image candidate bundle requires one canonical image asset ID")
+            raise ValueError("image candidate asset ID must match request output")
     elif any(item is not None for item in candidate_bundle) or (
         attempt.candidate_image_asset_ids
     ):
@@ -172,7 +168,7 @@ def prune_attempt_fields(data: dict[str, object], operation: str) -> None:
 
 
 def has_p6_state(manifest: Any) -> bool:
-    return manifest.active_qa_policy is not None or any(
+    top_level_state = manifest.active_qa_policy is not None or any(
         (
             manifest.active_review_receipts,
             manifest.review_states,
@@ -181,3 +177,11 @@ def has_p6_state(manifest: Any) -> bool:
             manifest.final_acceptance_state,
         )
     )
+    attempt_state = any(
+        attempt.operation in {"review", "repair"}
+        or attempt.review_request is not None
+        or attempt.review_phase is not None
+        or attempt.approved_repair_receipt is not None
+        for attempt in manifest.attempts
+    )
+    return top_level_state or attempt_state
