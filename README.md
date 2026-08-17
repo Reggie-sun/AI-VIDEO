@@ -36,6 +36,22 @@ Requirements:
 - Local ComfyUI already running
 - `ffmpeg` and `ffprobe` on PATH
 
+## Architecture Gate
+
+Repository architecture regression 使用独立、local、no-network gate 验证，不改变 `ai-video` 的三个公共命令：
+
+```bash
+python -m scripts.architecture_gate check
+```
+
+默认比较 version-controlled baseline；在 branch/CI 上可用 `--base-ref <git-ref>` 直接比较 Git base。只有经 review 的显式操作才可更新 deterministic baseline：
+
+```bash
+python -m scripts.architecture_gate update-baseline
+```
+
+Historical oversized modules 与 existing import cycles 可 grandfather；超过 blocking threshold 的 oversized module growth、new blocking-sized module 和 new first-party dependency cycle 会阻止通过。`801–1500` LOC 的 growth/new module 为 warning，new high fan-out 仅作为 reviewer information。
+
 ## Production Project Core Python API
 
 P2 exposes a Python loading API for an explicitly materialized v2 project:

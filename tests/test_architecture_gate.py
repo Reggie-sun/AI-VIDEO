@@ -1,0 +1,480 @@
+from __future__ import annotations
+
+import json
+import shutil
+import subprocess
+from pathlib import Path
+
+import pytest
+
+from scripts.architecture_gate.gate import (
+    check_architecture,
+    render_text,
+    update_baseline,
+)
+
+
+def _write_config(
+    root: Path,
+    *,
+    fan_out_warning: int = 14,
+    exception: tuple[str, str] | None = None,
+) -> None:
+    exception_text = ""
+    if exception is not None:
+        pattern, reason = exception
+        exception_text = (
+            "\n[[exceptions]]\n"
+            f'pattern = "{pattern}"\n'
+            f'reason = "{reason}"\n'
+        )
+    (root / "architecture_gate.toml").write_text(
+        "schema_version = 1\n"
+        'source_roots = ["src"]\n'
+        'baseline = ".architecture/architecture-baseline.json"\n'
+        "normal_loc = 800\n"
+        "blocking_loc = 1500\n"
+        "severe_loc = 3000\n"
+        f"fan_out_warning = {fan_out_warning}\n"
+        "exclude = [\n"
+        '  "**/generated/**",\n'
+        '  "**/vendor/**",\n'
+        '  "**/vendored/**",\n'
+        '  "**/migrations/**",\n'
+        '  "**/snapshots/**",\n'
+        '  "**/*_pb2.py",\n'
+        "]\n"
+        + exception_text,
+        encoding="utf-8",
+    )
+
+
+def _write_module(root: Path, relative_path: str, lines: list[str]) -> Path:
+    path = root / relative_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def _sized_module(root: Path, relative_path: str, effective_loc: int) -> Path:
+    return _write_module(
+        root,
+        relative_path,
+        [f"value_{index} = {index}" for index in range(effective_loc)],
+    )
+
+
+def _codes(result) -> list[str]:
+    return [finding.code for finding in result.findings]
+
+
+@pytest.fixture
+def architecture_repo(tmp_path: Path) -> Path:
+    _write_config(tmp_path)
+    return tmp_path
+
+
+def test_existing_oversized_file_is_grandfathered_when_unchanged(
+    architecture_repo: Path,
+):
+    _sized_module(architecture_repo, "src/app/legacy.py", 1601)
+    update_baseline(architecture_repo)
+
+    result = check_architecture(architecture_repo)
+
+    assert not result.has_errors
+    assert "ARCH001" not in _codes(result)
+
+
+def test_existing_oversized_file_can_shrink_without_a_finding(
+    architecture_repo: Path,
+):
+    path = _sized_module(architecture_repo, "src/app/legacy.py", 1601)
+    update_baseline(architecture_repo)
+    path.write_text("value = 1\n", encoding="utf-8")
+
+    result = check_architecture(architecture_repo)
+
+    assert not result.has_errors
+    assert "ARCH001" not in _codes(result)
+
+
+def test_existing_oversized_file_growth_is_blocking(
+    architecture_repo: Path,
+):
+    path = _sized_module(architecture_repo, "src/app/legacy.py", 1601)
+    update_baseline(architecture_repo)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write("new_responsibility = 1\n")
+
+    result = check_architecture(architecture_repo)
+
+    finding = next(item for item in result.findings if item.code == "ARCH001")
+    assert result.has_errors
+    assert finding.slug == "oversized-module-growth"
+    assert finding.severity.value == "ERROR"
+    assert finding.path == "src/app/legacy.py"
+    assert finding.measurements == {
+        "base_loc": 1601,
+        "current_loc": 1602,
+        "delta": 1,
+    }
+
+
+@pytest.mark.parametrize(
+    ("effective_loc", "expected_code", "expected_severity"),
+    [
+        (800, None, None),
+        (801, "ARCH002", "WARN"),
+        (1501, "ARCH002", "ERROR"),
+    ],
+)
+def test_new_file_size_policy(
+    architecture_repo: Path,
+    effective_loc: int,
+    expected_code: str | None,
+    expected_severity: str | None,
+):
+    update_baseline(architecture_repo)
+    _sized_module(architecture_repo, "src/app/new_module.py", effective_loc)
+
+    result = check_architecture(architecture_repo)
+    finding = next(
+        (item for item in result.findings if item.code == expected_code),
+        None,
+    )
+
+    if expected_code is None:
+        assert not result.findings
+    else:
+        assert finding is not None
+        assert finding.severity.value == expected_severity
+    assert result.has_errors is (expected_severity == "ERROR")
+
+
+def test_new_severely_oversized_file_is_blocking_and_named_as_severe(
+    architecture_repo: Path,
+):
+    update_baseline(architecture_repo)
+    _sized_module(architecture_repo, "src/app/new_severe.py", 3001)
+
+    result = check_architecture(architecture_repo)
+
+    finding = next(item for item in result.findings if item.code == "ARCH002")
+    assert finding.severity.value == "ERROR"
+    assert "severe architecture debt" in finding.reason
+
+
+def test_generated_and_test_files_are_not_normal_production_modules(
+    architecture_repo: Path,
+):
+    update_baseline(architecture_repo)
+    _write_module(
+        architecture_repo,
+        "src/app/generated/client.py",
+        ["# Generated by protocol compiler"]
+        + [f"value_{index} = {index}" for index in range(1601)],
+    )
+    _sized_module(architecture_repo, "tests/test_large_fixture.py", 1601)
+
+    result = check_architecture(architecture_repo)
+
+    assert not result.findings
+
+
+def test_generated_header_is_ignored_outside_generated_directory(
+    architecture_repo: Path,
+):
+    update_baseline(architecture_repo)
+    _write_module(
+        architecture_repo,
+        "src/app/protocol_bindings.py",
+        ["# @generated; DO NOT EDIT"]
+        + [f"value_{index} = {index}" for index in range(1601)],
+    )
+
+    assert not check_architecture(architecture_repo).findings
+
+
+def test_explicit_exception_is_versioned_and_deterministic(tmp_path: Path):
+    _write_config(
+        tmp_path,
+        exception=("src/app/declarative.py", "reviewed declarative mapping"),
+    )
+    _sized_module(tmp_path, "src/app/declarative.py", 1601)
+
+    first = update_baseline(tmp_path).read_bytes()
+    second = update_baseline(tmp_path).read_bytes()
+    baseline = json.loads(second)
+
+    assert first == second
+    assert "src/app/declarative.py" in baseline["files"]
+    assert not check_architecture(tmp_path).findings
+
+
+def test_existing_dependency_cycle_is_grandfathered(architecture_repo: Path):
+    _write_module(architecture_repo, "src/app/a.py", ["import app.b"])
+    _write_module(architecture_repo, "src/app/b.py", ["import app.a"])
+    update_baseline(architecture_repo)
+
+    result = check_architecture(architecture_repo)
+
+    assert "ARCH003" not in _codes(result)
+    assert not result.has_errors
+
+
+def test_existing_dependency_cycle_can_shrink_without_a_false_regression(
+    architecture_repo: Path,
+):
+    _write_module(architecture_repo, "src/app/a.py", ["import app.b"])
+    _write_module(
+        architecture_repo,
+        "src/app/b.py",
+        ["import app.a", "import app.c"],
+    )
+    c_path = _write_module(architecture_repo, "src/app/c.py", ["import app.a"])
+    update_baseline(architecture_repo)
+    c_path.write_text("VALUE = 1\n", encoding="utf-8")
+
+    result = check_architecture(architecture_repo)
+
+    assert "ARCH003" not in _codes(result)
+    assert not result.has_errors
+
+
+def test_new_dependency_cycle_is_blocking(architecture_repo: Path):
+    _write_module(architecture_repo, "src/app/a.py", ["import app.b"])
+    b_path = _write_module(architecture_repo, "src/app/b.py", ["VALUE = 1"])
+    update_baseline(architecture_repo)
+    b_path.write_text("import app.a\n", encoding="utf-8")
+
+    result = check_architecture(architecture_repo)
+
+    finding = next(item for item in result.findings if item.code == "ARCH003")
+    assert result.has_errors
+    assert finding.slug == "dependency-cycle-regression"
+    assert finding.path == "src/app/a.py"
+    assert finding.measurements["modules"] == ["app.a", "app.b"]
+
+
+def test_size_exception_cannot_hide_a_new_dependency_cycle(tmp_path: Path):
+    _write_config(
+        tmp_path,
+        exception=("src/app/declarative.py", "reviewed declarative mapping"),
+    )
+    _write_module(
+        tmp_path,
+        "src/app/declarative.py",
+        ["import app.consumer"]
+        + [f"value_{index} = {index}" for index in range(1601)],
+    )
+    consumer = _write_module(tmp_path, "src/app/consumer.py", ["VALUE = 1"])
+    update_baseline(tmp_path)
+    consumer.write_text("import app.declarative\n", encoding="utf-8")
+
+    result = check_architecture(tmp_path)
+
+    assert "ARCH002" not in _codes(result)
+    assert "ARCH003" in _codes(result)
+    assert result.has_errors
+
+
+def test_normal_new_dependency_does_not_fail(architecture_repo: Path):
+    _write_module(architecture_repo, "src/app/a.py", ["VALUE = 1"])
+    _write_module(architecture_repo, "src/app/b.py", ["VALUE = 2"])
+    update_baseline(architecture_repo)
+    (architecture_repo / "src/app/a.py").write_text(
+        "import app.b\nVALUE = 1\n",
+        encoding="utf-8",
+    )
+
+    result = check_architecture(architecture_repo)
+
+    assert "ARCH003" not in _codes(result)
+    assert not result.has_errors
+
+
+def test_nested_and_type_checking_imports_do_not_create_false_cycles(
+    architecture_repo: Path,
+):
+    _write_module(
+        architecture_repo,
+        "src/app/a.py",
+        [
+            "from typing import TYPE_CHECKING",
+            "if TYPE_CHECKING:",
+            "    import app.b",
+            "def load_b():",
+            "    import app.b",
+        ],
+    )
+    _write_module(architecture_repo, "src/app/b.py", ["import app.a"])
+    update_baseline(architecture_repo)
+
+    result = check_architecture(architecture_repo)
+
+    assert "ARCH003" not in _codes(result)
+    assert not result.has_errors
+
+
+def test_new_high_fan_out_is_reviewer_information(tmp_path: Path):
+    _write_config(tmp_path, fan_out_warning=2)
+    for name in ("b", "c", "d"):
+        _write_module(tmp_path, f"src/app/{name}.py", ["VALUE = 1"])
+    update_baseline(tmp_path)
+    _write_module(
+        tmp_path,
+        "src/app/a.py",
+        ["import app.b", "import app.c", "import app.d"],
+    )
+
+    result = check_architecture(tmp_path)
+
+    finding = next(item for item in result.findings if item.code == "ARCH005")
+    assert finding.severity.value == "INFO"
+    assert finding.measurements["fan_out"] == 3
+    assert not result.has_errors
+
+
+def test_check_never_rewrites_baseline(architecture_repo: Path):
+    _sized_module(architecture_repo, "src/app/legacy.py", 801)
+    baseline_path = update_baseline(architecture_repo)
+    before = baseline_path.read_bytes()
+    (architecture_repo / "src/app/legacy.py").write_text(
+        "value = 1\n",
+        encoding="utf-8",
+    )
+
+    check_architecture(architecture_repo)
+
+    assert baseline_path.read_bytes() == before
+
+
+def test_stale_baseline_entry_is_reported_and_explicit_update_prunes_it(
+    architecture_repo: Path,
+):
+    path = _write_module(architecture_repo, "src/app/old.py", ["VALUE = 1"])
+    baseline_path = update_baseline(architecture_repo)
+    path.unlink()
+
+    result = check_architecture(architecture_repo)
+    finding = next(item for item in result.findings if item.code == "ARCH004")
+    assert finding.severity.value == "INFO"
+    assert not result.has_errors
+
+    update_baseline(architecture_repo)
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    assert "src/app/old.py" not in baseline["files"]
+
+
+def test_missing_baseline_fails_closed_with_stable_finding(
+    architecture_repo: Path,
+):
+    result = check_architecture(architecture_repo)
+
+    assert result.has_errors
+    finding = result.findings[0]
+    assert finding.code == "ARCH004"
+    assert finding.slug == "architecture-baseline-invalid"
+
+
+def test_text_output_is_structured_and_actionable(architecture_repo: Path):
+    path = _sized_module(architecture_repo, "src/app/legacy.py", 1601)
+    update_baseline(architecture_repo)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write("new_responsibility = 1\n")
+
+    output = render_text(check_architecture(architecture_repo))
+
+    assert "ARCH001 oversized-module-growth" in output
+    assert "Path: src/app/legacy.py" in output
+    assert "Severity: ERROR" in output
+    assert "Base LOC: 1601" in output
+    assert "Current LOC: 1602" in output
+    assert "Delta: +1" in output
+    assert "Reason:" in output
+    assert "Recommended actions:" in output
+    assert "transaction lifecycle" in output
+
+
+def test_git_base_ref_takes_precedence_over_committed_baseline(
+    architecture_repo: Path,
+):
+    path = _sized_module(architecture_repo, "src/app/legacy.py", 1601)
+    update_baseline(architecture_repo)
+    subprocess.run(["git", "init", "-q"], cwd=architecture_repo, check=True)
+    subprocess.run(["git", "add", "architecture_gate.toml", ".architecture", "src"], cwd=architecture_repo, check=True)
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=Architecture Gate Test",
+            "-c",
+            "user.email=architecture-gate@example.invalid",
+            "commit",
+            "-qm",
+            "baseline",
+        ],
+        cwd=architecture_repo,
+        check=True,
+    )
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write("new_responsibility = 1\n")
+    update_baseline(architecture_repo)
+
+    result = check_architecture(architecture_repo, base_ref="HEAD")
+
+    assert result.has_errors
+    assert "ARCH001" in _codes(result)
+
+
+def test_invalid_git_base_ref_is_an_actionable_baseline_finding(
+    architecture_repo: Path,
+):
+    update_baseline(architecture_repo)
+
+    result = check_architecture(architecture_repo, base_ref="missing-ref")
+
+    assert result.has_errors
+    assert _codes(result) == ["ARCH004"]
+    assert "missing-ref" in result.findings[0].reason
+
+
+def test_current_repository_grandfathers_real_production_state_debt():
+    repository_root = Path(__file__).resolve().parents[1]
+
+    result = check_architecture(repository_root)
+    baseline = json.loads(
+        (
+            repository_root / ".architecture/architecture-baseline.json"
+        ).read_text(encoding="utf-8")
+    )
+
+    assert not result.has_errors
+    assert (
+        baseline["files"]["src/ai_video/production/state_commit.py"][
+            "effective_loc"
+        ]
+        > 3000
+    )
+
+
+def test_real_production_state_fixture_rejects_artificial_growth(tmp_path: Path):
+    repository_root = Path(__file__).resolve().parents[1]
+    _write_config(tmp_path)
+    target = tmp_path / "src/ai_video/production/state_commit.py"
+    target.parent.mkdir(parents=True)
+    shutil.copyfile(
+        repository_root / "src/ai_video/production/state_commit.py",
+        target,
+    )
+    update_baseline(tmp_path)
+    with target.open("a", encoding="utf-8") as handle:
+        handle.write("ARCHITECTURE_GATE_ARTIFICIAL_GROWTH = True\n")
+
+    result = check_architecture(tmp_path)
+
+    finding = next(item for item in result.findings if item.code == "ARCH001")
+    assert finding.path == "src/ai_video/production/state_commit.py"
+    assert finding.measurements["delta"] == 1
+    assert finding.severity.value == "ERROR"

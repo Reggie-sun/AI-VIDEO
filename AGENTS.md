@@ -106,6 +106,11 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - 追求高内聚、低耦合。不要跨越模块边界去操作别的模块内部状态。
 - 优先依赖注入，而不是硬编码外部依赖。
 
+## Architecture Ratchet
+
+- 当 architecture boundary 与追求 minimal local diff 发生实质冲突时，architecture boundary 优先；“保持改动最小”不得被解释为可以继续扩大已有 oversized、multi-responsibility module。
+- Architecture gate baseline 只用于 grandfather existing debt；不得为了隐藏 regression 而刷新或放宽 baseline。Correctness-critical transaction lifecycle 应保持为一个 cohesive domain boundary，不能为了减小文件而机械拆散 transaction invariant。
+
 ## Error Handling Contract
 
 - 跨模块失败应使用 `AiVideoError` 与 `ErrorCode`。

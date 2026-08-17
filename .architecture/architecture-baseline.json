@@ -1,0 +1,217 @@
+{
+  "cycles": [],
+  "files": {
+    "src/ai_video/__init__.py": {
+      "effective_loc": 1,
+      "fan_out": 0,
+      "module": "ai_video"
+    },
+    "src/ai_video/cli.py": {
+      "effective_loc": 92,
+      "fan_out": 6,
+      "module": "ai_video.cli"
+    },
+    "src/ai_video/comfy_client.py": {
+      "effective_loc": 190,
+      "fan_out": 1,
+      "module": "ai_video.comfy_client"
+    },
+    "src/ai_video/config.py": {
+      "effective_loc": 106,
+      "fan_out": 2,
+      "module": "ai_video.config"
+    },
+    "src/ai_video/errors.py": {
+      "effective_loc": 71,
+      "fan_out": 0,
+      "module": "ai_video.errors"
+    },
+    "src/ai_video/ffmpeg_tools.py": {
+      "effective_loc": 166,
+      "fan_out": 1,
+      "module": "ai_video.ffmpeg_tools"
+    },
+    "src/ai_video/manifest.py": {
+      "effective_loc": 136,
+      "fan_out": 2,
+      "module": "ai_video.manifest"
+    },
+    "src/ai_video/models.py": {
+      "effective_loc": 103,
+      "fan_out": 0,
+      "module": "ai_video.models"
+    },
+    "src/ai_video/pipeline.py": {
+      "effective_loc": 608,
+      "fan_out": 7,
+      "module": "ai_video.pipeline"
+    },
+    "src/ai_video/production/__init__.py": {
+      "effective_loc": 120,
+      "fan_out": 6,
+      "module": "ai_video.production"
+    },
+    "src/ai_video/production/audio.py": {
+      "effective_loc": 1144,
+      "fan_out": 4,
+      "module": "ai_video.production.audio"
+    },
+    "src/ai_video/production/captions.py": {
+      "effective_loc": 776,
+      "fan_out": 3,
+      "module": "ai_video.production.captions"
+    },
+    "src/ai_video/production/composition.py": {
+      "effective_loc": 769,
+      "fan_out": 5,
+      "module": "ai_video.production.composition"
+    },
+    "src/ai_video/production/dependency.py": {
+      "effective_loc": 1611,
+      "fan_out": 5,
+      "module": "ai_video.production.dependency"
+    },
+    "src/ai_video/production/elevenlabs.py": {
+      "effective_loc": 703,
+      "fan_out": 4,
+      "module": "ai_video.production.elevenlabs"
+    },
+    "src/ai_video/production/hashing.py": {
+      "effective_loc": 27,
+      "fan_out": 0,
+      "module": "ai_video.production.hashing"
+    },
+    "src/ai_video/production/hyperframes.py": {
+      "effective_loc": 2564,
+      "fan_out": 7,
+      "module": "ai_video.production.hyperframes"
+    },
+    "src/ai_video/production/image.py": {
+      "effective_loc": 942,
+      "fan_out": 5,
+      "module": "ai_video.production.image"
+    },
+    "src/ai_video/production/models.py": {
+      "effective_loc": 2491,
+      "fan_out": 0,
+      "module": "ai_video.production.models"
+    },
+    "src/ai_video/production/paths.py": {
+      "effective_loc": 644,
+      "fan_out": 0,
+      "module": "ai_video.production.paths"
+    },
+    "src/ai_video/production/project.py": {
+      "effective_loc": 1781,
+      "fan_out": 10,
+      "module": "ai_video.production.project"
+    },
+    "src/ai_video/production/registry.py": {
+      "effective_loc": 191,
+      "fan_out": 5,
+      "module": "ai_video.production.registry"
+    },
+    "src/ai_video/production/review.py": {
+      "effective_loc": 314,
+      "fan_out": 3,
+      "module": "ai_video.production.review"
+    },
+    "src/ai_video/production/state_commit.py": {
+      "effective_loc": 7076,
+      "fan_out": 10,
+      "module": "ai_video.production.state_commit"
+    },
+    "src/ai_video/production/validation.py": {
+      "effective_loc": 272,
+      "fan_out": 2,
+      "module": "ai_video.production.validation"
+    },
+    "src/ai_video/workflow_loader.py": {
+      "effective_loc": 249,
+      "fan_out": 1,
+      "module": "ai_video.workflow_loader"
+    },
+    "src/ai_video/workflow_renderer.py": {
+      "effective_loc": 229,
+      "fan_out": 2,
+      "module": "ai_video.workflow_renderer"
+    },
+    "src/ai_video_mcp/__init__.py": {
+      "effective_loc": 2,
+      "fan_out": 0,
+      "module": "ai_video_mcp"
+    },
+    "src/ai_video_mcp/__main__.py": {
+      "effective_loc": 2,
+      "fan_out": 1,
+      "module": "ai_video_mcp.__main__"
+    },
+    "src/ai_video_mcp/cache.py": {
+      "effective_loc": 36,
+      "fan_out": 0,
+      "module": "ai_video_mcp.cache"
+    },
+    "src/ai_video_mcp/config.py": {
+      "effective_loc": 19,
+      "fan_out": 0,
+      "module": "ai_video_mcp.config"
+    },
+    "src/ai_video_mcp/errors.py": {
+      "effective_loc": 23,
+      "fan_out": 0,
+      "module": "ai_video_mcp.errors"
+    },
+    "src/ai_video_mcp/server.py": {
+      "effective_loc": 246,
+      "fan_out": 11,
+      "module": "ai_video_mcp.server"
+    },
+    "src/ai_video_mcp/tools/__init__.py": {
+      "effective_loc": 0,
+      "fan_out": 0,
+      "module": "ai_video_mcp.tools"
+    },
+    "src/ai_video_mcp/tools/analyze.py": {
+      "effective_loc": 65,
+      "fan_out": 6,
+      "module": "ai_video_mcp.tools.analyze"
+    },
+    "src/ai_video_mcp/tools/apply_optimization.py": {
+      "effective_loc": 150,
+      "fan_out": 9,
+      "module": "ai_video_mcp.tools.apply_optimization"
+    },
+    "src/ai_video_mcp/tools/frames.py": {
+      "effective_loc": 107,
+      "fan_out": 4,
+      "module": "ai_video_mcp.tools.frames"
+    },
+    "src/ai_video_mcp/tools/optimize_plan.py": {
+      "effective_loc": 209,
+      "fan_out": 7,
+      "module": "ai_video_mcp.tools.optimize_plan"
+    },
+    "src/ai_video_mcp/tools/probe.py": {
+      "effective_loc": 111,
+      "fan_out": 3,
+      "module": "ai_video_mcp.tools.probe"
+    },
+    "src/ai_video_mcp/tools/review.py": {
+      "effective_loc": 356,
+      "fan_out": 8,
+      "module": "ai_video_mcp.tools.review"
+    },
+    "src/ai_video_mcp/tools/scene_detect.py": {
+      "effective_loc": 104,
+      "fan_out": 4,
+      "module": "ai_video_mcp.tools.scene_detect"
+    },
+    "src/ai_video_mcp/tools/transcribe.py": {
+      "effective_loc": 107,
+      "fan_out": 4,
+      "module": "ai_video_mcp.tools.transcribe"
+    }
+  },
+  "policy_fingerprint": "81b7a942d7798e139f1ac8d4e6b59e0c8d4c7a265da76f52fedea9ea47d1735d",
+  "schema_version": 1
+}

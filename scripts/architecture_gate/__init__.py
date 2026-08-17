@@ -1,0 +1,1 @@
+"""Deterministic architecture regression gate."""
