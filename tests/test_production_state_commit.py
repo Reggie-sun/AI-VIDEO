@@ -18,6 +18,7 @@ from ai_video.production.models import (
     AssetRegistrySnapshot,
     DependencyLifecycle,
     DependencyNodeState,
+    EvidenceStrength,
     ProductionProject,
     ProductionManifest,
     ProjectSnapshotPointer,
@@ -25,11 +26,15 @@ from ai_video.production.models import (
     QaLayer,
     QaPolicy,
     QaTechnicalThresholds,
+    QaVerdict,
     NamedFingerprint,
     RepairAction,
     RepairAuthorization,
     RepairRequest,
     ReviewAttemptPhase,
+    ReviewEvidence,
+    ReviewEvidencePointer,
+    ReviewReceipt,
     ReviewRequest,
     ReviewRequestPointer,
     RendererKind,
@@ -50,6 +55,7 @@ from ai_video.production.models import (
 from ai_video.production.project import load_production_project, load_production_project_candidate
 from ai_video.production.registry import load_asset_registry
 from ai_video.production.registry import registry_semantic_sha256
+from ai_video.production.review import build_technical_review_context
 import ai_video.production.state_commit as state_commit
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
@@ -77,6 +83,7 @@ from ai_video.production.paths import (
     canonical_render_state_path,
     canonical_render_timeline_path,
     canonical_review_request_path,
+    canonical_review_evidence_path,
     canonical_renderer_source_receipt_path,
 )
 import production_project_factory as project_factory
@@ -271,6 +278,197 @@ def test_review_request_is_consumed_once_before_analysis(tmp_path: Path) -> None
             analyzer=analyze,
         )
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+
+
+def test_begin_review_rejects_forged_context_before_any_write(
+    tmp_path: Path, monkeypatch
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before = read_manifest(tmp_path)
+    current = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-context-validation",
+    )
+    inputs, applied = project_factory.make_p5_selective_rebuild_fixture(tmp_path)
+    render_pointer = RenderStateSnapshotPointer(
+        path=Path(f"state/render/states/{'9' * 64}.json"),
+        revision=1,
+        content_hash="9" * 64,
+        file_sha256="8" * 64,
+    )
+    current = current.model_copy(update={"active_render_state": render_pointer})
+    (tmp_path / "state/manifest.json").write_text(
+        current.model_dump_json(indent=2), encoding="utf-8"
+    )
+    bundle = inputs.project.model_copy(update={"manifest": current})
+    render_state = SimpleNamespace(
+        output=SimpleNamespace(file_sha256=applied.render_state.output.file_sha256),
+        timeline_fingerprint=applied.timeline.composition_fingerprint,
+    )
+    monkeypatch.setattr(
+        state_commit,
+        "load_production_project",
+        lambda path: bundle.model_copy(update={"manifest": read_manifest(tmp_path)}),
+    )
+    monkeypatch.setattr(
+        ProductionStateCommitter,
+        "_current_render_state",
+        lambda self, manifest: render_state,
+    )
+    monkeypatch.setattr(
+        ProductionStateCommitter,
+        "_current_resolved_timeline",
+        lambda self, render: applied.timeline,
+    )
+    context = build_technical_review_context(
+        bundle,
+        applied.timeline,
+        render_output_sha256=render_state.output.file_sha256,
+        measurement_contract_version="1",
+    )
+
+    def make_request(review_context: TechnicalReviewContext) -> ReviewRequest:
+        return seal_artifact(
+            ReviewRequest(
+                artifact_id="review-context-validation",
+                revision=1,
+                content_hash=ZERO_HASH,
+                creation_receipt_id="review-context-validation",
+                source_provenance=(
+                    SourceReference(kind="derived", reference="p6-test-fixture"),
+                ),
+                request_id="review-context-validation",
+                base_manifest_revision=current.manifest_revision,
+                dependency_graph=current.active_dependency_graph,
+                dependency_states_hash=canonical_sha256(
+                    {"dependency_states": [
+                        item.model_dump(mode="json")
+                        for item in current.dependency_states
+                    ]}
+                ),
+                render_state=render_pointer,
+                render_output_sha256=render_state.output.file_sha256,
+                timeline_fingerprint=render_state.timeline_fingerprint,
+                qa_policy=current.active_qa_policy,
+                requested_layers=(QaLayer.TECHNICAL,),
+                evidence_tool_identities=(
+                    ToolIdentity(name="video-analysis", version="1"),
+                ),
+                technical_context=review_context,
+            )
+        )
+
+    forged_window = context.windows[0].model_copy(
+        update={"visual_strategy": VisualStrategy.GENERATED_VIDEO}
+    )
+    forged_request = make_request(
+        context.model_copy(update={"windows": (forged_window, *context.windows[1:])})
+    )
+    before_rejection = read_manifest(tmp_path)
+
+    with pytest.raises(AiVideoError, match="Shot/timeline truth"):
+        writer.begin_review(forged_request, attempt_id="review-forged-context")
+
+    assert read_manifest(tmp_path) == before_rejection
+    assert not (tmp_path / canonical_review_request_path(forged_request.content_hash)).exists()
+    valid_request = make_request(context)
+    begun = writer.begin_review(valid_request, attempt_id="review-valid-context")
+    review_pointer = begun.attempts[-1].review_request
+    assert review_pointer is not None
+
+    def analyze(review_request, permit):
+        assert permit._consume_review_analysis_permit(
+            request_content_hash=review_request.content_hash,
+            render_output_sha256=review_request.render_output_sha256,
+            technical_context_hash=canonical_sha256(
+                review_request.technical_context.model_dump(mode="json")
+            ),
+        )
+        return "measured"
+
+    assert writer.run_review_analysis(
+        review_request=review_pointer,
+        expected_manifest_revision=begun.manifest_revision,
+        analyzer=analyze,
+    ) == "measured"
+    measured_manifest = read_manifest(tmp_path)
+    tool = valid_request.evidence_tool_identities[0]
+    evidence = seal_artifact(
+        ReviewEvidence(
+            artifact_id="technical-evidence-valid",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="technical-evidence-valid",
+            source_provenance=(
+                SourceReference(kind="derived", reference="video-analysis"),
+            ),
+            evidence_id="technical-evidence-valid",
+            layer=QaLayer.TECHNICAL,
+            strength=EvidenceStrength.MEASURED,
+            render_output_sha256=valid_request.render_output_sha256,
+            timeline_fingerprint=valid_request.timeline_fingerprint,
+            dependency_graph_revision_id=valid_request.dependency_graph.revision_id,
+            tool_identity=tool,
+            measurement_contract_version="1",
+            subject_ids=tuple(item.shot_id for item in context.windows),
+            measured_payload={
+                "coverage_complete": True,
+                "minimum_luma_milli": 500,
+                "audio_peak_millidb": -1000,
+                "expects_audio": any(item.expects_audio for item in context.windows),
+                "windows": [
+                    {
+                        "status": "measured",
+                        "visual_strategy": item.visual_strategy.value,
+                        "unique_frame_count": 1,
+                    }
+                    for item in context.windows
+                ],
+            },
+        )
+    )
+    evidence_payload = _canonical_json_bytes(evidence)
+    evidence_pointer = ReviewEvidencePointer(
+        path=canonical_review_evidence_path(evidence.content_hash),
+        evidence_id=evidence.evidence_id,
+        layer=evidence.layer,
+        strength=evidence.strength,
+        content_hash=evidence.content_hash,
+        file_sha256=hashlib.sha256(evidence_payload).hexdigest(),
+    )
+    receipt = seal_artifact(
+        ReviewReceipt(
+            artifact_id="technical-review-valid",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="technical-review-valid",
+            source_provenance=(
+                SourceReference(kind="derived", reference=evidence.evidence_id),
+            ),
+            review_id="technical-review-valid",
+            layer=QaLayer.TECHNICAL,
+            review_request=review_pointer,
+            render_state=valid_request.render_state,
+            render_output_sha256=valid_request.render_output_sha256,
+            timeline_fingerprint=valid_request.timeline_fingerprint,
+            dependency_graph_revision_id=valid_request.dependency_graph.revision_id,
+            qa_policy=valid_request.qa_policy,
+            evidence=(evidence_pointer,),
+            evidence_ids=(evidence.evidence_id,),
+            tool_identities=(tool,),
+            verdict=QaVerdict.PASS,
+        )
+    )
+    reviewed = writer.record_review_receipt(
+        receipt,
+        (evidence,),
+        expected_manifest_revision=measured_manifest.manifest_revision,
+        attempt_id="review-valid-context",
+    )
+    assert reviewed.review_states[-1].lifecycle.value == "fresh"
 
 
 def test_unapproved_repair_is_rejected_before_any_commit_attempt(

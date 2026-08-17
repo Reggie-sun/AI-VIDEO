@@ -1069,7 +1069,7 @@ class ProductionStateCommitter:
             bundle = load_production_project(self._project_root / "project.yaml")
             timeline = self._current_resolved_timeline(current_render)
             validate_technical_review_context(
-                request.technical_context,
+                durable_request.technical_context,
                 bundle,
                 timeline,
                 render_output_sha256=current_render.output.file_sha256,
@@ -1195,8 +1195,17 @@ class ProductionStateCommitter:
                     return manifest
                 raise _state_invalid("Review attempt ID was already used.")
             current_render = self._current_render_state(manifest)
+            bundle = load_production_project(self._project_root / "project.yaml")
+            timeline = self._current_resolved_timeline(current_render)
+            validate_technical_review_context(
+                request.technical_context,
+                bundle,
+                timeline,
+                render_output_sha256=current_render.output.file_sha256,
+            )
             if (
                 manifest.schema_version != "2.4"
+                or bundle.manifest != manifest
                 or manifest.manifest_revision != request.base_manifest_revision
                 or manifest.active_dependency_graph != request.dependency_graph
                 or self._dependency_states_hash(manifest)
