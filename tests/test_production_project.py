@@ -1306,6 +1306,15 @@ def test_loader_rejects_p7_reference_not_bound_to_base_project(
         load_production_project(fixture["project_path"])
 
 
+def test_loader_rejects_p7_style_reference_even_when_scene_backed(tmp_path):
+    fixture = make_p7_committed_project(
+        tmp_path, reference_mutation="style_scene_binding"
+    )
+
+    with pytest.raises(AiVideoError, match="reference"):
+        load_production_project(fixture["project_path"])
+
+
 def test_loader_accepts_two_sequential_selected_p7_candidates_without_writes(
     tmp_path,
 ):

@@ -2072,6 +2072,8 @@ def make_p7_committed_project(
         references[0] = references[0].model_copy(
             update={"asset_sha256": "f" * 64}
         )
+    elif reference_mutation == "style_scene_binding":
+        references.append(references[1].model_copy(update={"role": "style"}))
     elif reference_mutation is not None:
         raise ValueError(f"unsupported P7 reference mutation: {reference_mutation}")
 

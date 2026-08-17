@@ -213,6 +213,8 @@ def _read_creative_reference(
     artifact_id: str,
     role: str,
 ) -> Character | Scene:
+    if role not in {"character", "scene"}:
+        raise ValueError(f"unsupported image reference role: {role}")
     references = (
         project.artifacts.characters if role == "character" else project.artifacts.scenes
     )
