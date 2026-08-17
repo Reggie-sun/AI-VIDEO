@@ -370,6 +370,73 @@ class ToolIdentity(StrictModel):
     version: str
 
 
+class QaTechnicalThresholds(StrictModel):
+    black_luma_max_milli: int = Field(ge=0, le=1000)
+    silence_peak_max_millidb: int = Field(le=0)
+    clipping_peak_min_millidb: int = Field(le=0)
+
+
+class QaLayoutRules(StrictModel):
+    safe_area_inset_milli: int = Field(ge=0, le=500)
+    caption_overflow_tolerance_milli: int = Field(ge=0)
+
+
+class RepairAction(StrictModel):
+    kind: str = Field(min_length=1)
+    parameters_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class ActorIdentity(StrictModel):
+    actor_id: str = Field(min_length=1)
+    actor_kind: Literal["human", "codex", "automation"]
+
+
+class RepairAuthorization(StrictModel):
+    authorization_id: str = Field(min_length=1)
+    authorized: Literal[True]
+    scope_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class NamedFingerprint(StrictModel):
+    name: str = Field(min_length=1)
+    fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class MotionExpectation(StrictModel):
+    directive_kind: str = Field(min_length=1)
+    directive_parameters_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    measurement_kind: Literal[
+        "transform_delta", "layer_state_delta", "decoded_frame_delta"
+    ]
+    minimum_measured_delta_milli: int = Field(ge=0)
+    tolerance_milli: int = Field(ge=0)
+
+
+class TechnicalReviewWindow(StrictModel):
+    shot_id: str = Field(min_length=1)
+    visual_strategy: VisualStrategy
+    start_frame: int = Field(ge=0)
+    end_frame_exclusive: int = Field(gt=0)
+    expects_audio: bool
+    visual_span_ids: tuple[str, ...] = Field(min_length=1)
+    motion_expectation: MotionExpectation | None = None
+
+    @model_validator(mode="after")
+    def _validate_window(self) -> "TechnicalReviewWindow":
+        if self.end_frame_exclusive <= self.start_frame:
+            raise ValueError("technical review window must be non-empty")
+        if self.visual_strategy is VisualStrategy.STATIC_IMAGE and self.motion_expectation:
+            raise ValueError("static_image cannot require motion")
+        return self
+
+
+class TechnicalReviewContext(StrictModel):
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    windows: tuple[TechnicalReviewWindow, ...]
+    measurement_contract_version: str = Field(min_length=1)
+
+
 class AudioKind(str, Enum):
     DIALOGUE = "dialogue"
     NARRATION = "narration"
@@ -1895,9 +1962,29 @@ class QaPolicyPointer(StrictModel):
         return self
 
 
+class ReviewRequestPointer(StrictModel):
+    path: Path
+    request_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "ReviewRequestPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/reviews/request.",
+            label="review request",
+        )
+        return self
+
+
 class ReviewReceiptPointer(StrictModel):
     path: Path
     review_id: str = Field(min_length=1)
+    layer: Literal[
+        QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.STRATEGY, QaLayer.SEMANTIC
+    ]
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -1908,6 +1995,23 @@ class ReviewReceiptPointer(StrictModel):
             content_hash=self.content_hash,
             prefix="state/reviews/review.",
             label="review receipt",
+        )
+        return self
+
+
+class RepairRequestPointer(StrictModel):
+    path: Path
+    repair_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "RepairRequestPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/repairs/request.",
+            label="repair request",
         )
         return self
 
@@ -2546,4 +2650,124 @@ class DependencyGraphTransition(StrictModel):
         return self
 
 
+# ---------------------------------------------------------------------------
+# P6 immutable review, repair, and final-acceptance evidence
+# ---------------------------------------------------------------------------
+
+
+class QaPolicy(VersionedArtifact):
+    policy_id: str = Field(min_length=1)
+    policy_version: str = Field(min_length=1)
+    required_layers: tuple[QaLayer, ...] = Field(min_length=1)
+    technical_thresholds: QaTechnicalThresholds
+    layout_rules: QaLayoutRules
+    strategy_rules_version: str = Field(min_length=1)
+    semantic_requirement: Literal["optional", "required"]
+
+
+class ReviewRequest(VersionedArtifact):
+    request_id: str = Field(min_length=1)
+    base_manifest_revision: int = Field(ge=1)
+    dependency_graph: DependencyGraphSnapshotPointer
+    dependency_states_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    render_state: RenderStateSnapshotPointer
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy: QaPolicyPointer
+    requested_layers: tuple[QaLayer, ...] = Field(min_length=1)
+    evidence_tool_identities: tuple[ToolIdentity, ...] = Field(min_length=1)
+
+
+class ReviewEvidence(VersionedArtifact):
+    evidence_id: str = Field(min_length=1)
+    layer: QaLayer
+    strength: EvidenceStrength
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    dependency_graph_revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    tool_identity: ToolIdentity
+    measurement_contract_version: str = Field(min_length=1)
+    subject_ids: tuple[str, ...] = Field(min_length=1)
+    measured_payload: dict[str, object]
+
+    _freeze_payload = field_validator("measured_payload")(_immutable_mapping)
+
+
+class ReviewReceipt(VersionedArtifact):
+    review_id: str = Field(min_length=1)
+    layer: Literal[
+        QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.STRATEGY, QaLayer.SEMANTIC
+    ]
+    render_state: RenderStateSnapshotPointer
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    dependency_graph_revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy: QaPolicyPointer
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
+    tool_identities: tuple[ToolIdentity, ...] = Field(min_length=1)
+    issue_ids: tuple[str, ...] = ()
+    verdict: QaVerdict
+
+
+class RepairRequest(VersionedArtifact):
+    repair_id: str = Field(min_length=1)
+    base_manifest_revision: int = Field(ge=1)
+    dependency_graph: DependencyGraphSnapshotPointer
+    dependency_states_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    render_state: RenderStateSnapshotPointer
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy: QaPolicyPointer
+    review_receipt_ids: tuple[str, ...] = Field(min_length=1)
+    issue_ids: tuple[str, ...] = Field(min_length=1)
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
+    root_cause_hypothesis: str = Field(min_length=1)
+    selected_repair_action: RepairAction
+    exact_target_artifact_ids: tuple[str, ...] = Field(min_length=1)
+    exact_target_node_ids: tuple[str, ...] = Field(min_length=1)
+    expected_invalidation_node_ids: tuple[str, ...] = Field(min_length=1)
+    actor: ActorIdentity
+    authorization: RepairAuthorization
+    before_fingerprints: tuple[NamedFingerprint, ...] = Field(min_length=1)
+
+
+class ApprovedRepairReceipt(RepairRequest):
+    request_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class RepairOutcomeReceipt(VersionedArtifact):
+    repair_id: str = Field(min_length=1)
+    approved_receipt: ApprovedRepairReceiptPointer
+    review_receipt_ids: tuple[str, ...] = Field(min_length=1)
+    issue_ids: tuple[str, ...] = Field(min_length=1)
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
+    root_cause_hypothesis: str = Field(min_length=1)
+    selected_repair_action: RepairAction
+    exact_target_artifact_ids: tuple[str, ...] = Field(min_length=1)
+    exact_target_node_ids: tuple[str, ...] = Field(min_length=1)
+    expected_invalidation_node_ids: tuple[str, ...] = Field(min_length=1)
+    actor: ActorIdentity
+    authorization: RepairAuthorization
+    before_fingerprints: tuple[NamedFingerprint, ...] = Field(min_length=1)
+    after_fingerprints: tuple[NamedFingerprint, ...] = Field(min_length=1)
+    actual_invalidation_node_ids: tuple[str, ...] = Field(min_length=1)
+    rerender_state: RenderStateSnapshotPointer
+    rerender_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    rerender_timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    fresh_review_receipts: tuple[ReviewReceiptPointer, ...] = Field(min_length=1)
+
+
+class FinalAcceptanceReceipt(VersionedArtifact):
+    acceptance_id: str = Field(min_length=1)
+    dependency_graph: DependencyGraphSnapshotPointer
+    dependency_states_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    render_state: RenderStateSnapshotPointer
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy: QaPolicyPointer
+    required_review_receipts: tuple[ReviewReceiptPointer, ...] = Field(min_length=1)
+    verdict: Literal[QaVerdict.PASS]
+
+
+ProductionManifest.model_rebuild()
 LoadedProductionProject.model_rebuild()

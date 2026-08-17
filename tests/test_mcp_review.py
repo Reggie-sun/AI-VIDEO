@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import hashlib
+
+import pytest
+
+from ai_video_mcp.errors import McpError
 from ai_video_mcp.tools.review import video_review
 
 from conftest import skip_no_ffmpeg
@@ -34,3 +39,48 @@ class TestVideoReview:
         metrics = result["quality_metrics"]
         assert metrics["sampled_frame_count"] >= 2
         assert metrics["unique_frame_ratio"] <= 0.5
+
+    def test_production_static_image_reports_measurement_without_static_failure(
+        self, static_video, mcp_config, mcp_cache
+    ):
+        output_hash = hashlib.sha256(static_video.read_bytes()).hexdigest()
+        result = video_review(
+            str(static_video),
+            mcp_config,
+            mcp_cache,
+            production_context={
+                "render_output_sha256": output_hash,
+                "timeline_fingerprint": "1" * 64,
+                "measurement_contract_version": "1",
+                "windows": [
+                    {
+                        "shot_id": "shot-1",
+                        "visual_strategy": "static_image",
+                        "start_frame": 0,
+                        "end_frame_exclusive": 24,
+                        "expects_audio": False,
+                        "visual_span_ids": ["visual-1"],
+                        "motion_expectation": None,
+                    }
+                ],
+            },
+        )
+        assert result["mode"] == "production_evidence"
+        assert result["issues"] == []
+        assert result["measurements"]["unique_frame_ratio"] <= 0.5
+
+    def test_production_context_rejects_output_hash_mismatch(
+        self, tiny_video, mcp_config, mcp_cache
+    ):
+        with pytest.raises(McpError, match="hash"):
+            video_review(
+                str(tiny_video),
+                mcp_config,
+                mcp_cache,
+                production_context={
+                    "render_output_sha256": "0" * 64,
+                    "timeline_fingerprint": "1" * 64,
+                    "measurement_contract_version": "1",
+                    "windows": [],
+                },
+            )

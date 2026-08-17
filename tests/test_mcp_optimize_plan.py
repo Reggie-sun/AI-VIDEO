@@ -9,6 +9,28 @@ from conftest import skip_no_ffmpeg
 
 @skip_no_ffmpeg
 class TestVideoOptimizePlan:
+    def test_production_plan_consumes_receipt_without_reanalysis(
+        self, tiny_video, mcp_config, mcp_cache, monkeypatch
+    ):
+        def fail_review(*args, **kwargs):
+            raise AssertionError("Production planning must not analyze video")
+
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.optimize_plan.video_review", fail_review
+        )
+        result = video_optimize_plan(
+            str(tiny_video),
+            mcp_config,
+            mcp_cache,
+            production_review_receipt={
+                "review_id": "review-1",
+                "issue_ids": ["caption-overflow"],
+                "exact_target_artifact_ids": ["caption-track-1"],
+            },
+        )
+        assert result["mode"] == "production_repair_proposal"
+        assert result["targets"] == []
+        assert result["review_receipt_id"] == "review-1"
     def test_optimize_plan_maps_review_issues_to_repo_files(
         self,
         tiny_video,

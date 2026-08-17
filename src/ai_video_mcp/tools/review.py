@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import hashlib
 from pathlib import Path
 
 from ai_video_mcp.cache import AnalysisCache
@@ -159,8 +160,41 @@ def video_review(
     max_frames: int | None = None,
     scene_threshold: float | None = None,
     transcribe_audio: bool = False,
+    production_context: dict | None = None,
 ) -> dict:
     p = _validate_video(video_path, config)
+
+    if production_context is not None:
+        actual_hash = hashlib.sha256(p.read_bytes()).hexdigest()
+        expected_hash = production_context.get("render_output_sha256")
+        if actual_hash != expected_hash:
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production render output hash does not match review context",
+            )
+        frame_hashes = _sample_frame_hashes(p)
+        unique_count = len(set(frame_hashes))
+        sample_count = len(frame_hashes)
+        ratio = round(unique_count / sample_count, 3) if sample_count else 0.0
+        return {
+            "mode": "production_evidence",
+            "video_path": str(p),
+            "render_output_sha256": actual_hash,
+            "timeline_fingerprint": production_context.get(
+                "timeline_fingerprint"
+            ),
+            "measurement_contract_version": production_context.get(
+                "measurement_contract_version"
+            ),
+            "windows": production_context.get("windows", []),
+            "measurements": {
+                "sampled_frame_count": sample_count,
+                "unique_frame_count": unique_count,
+                "unique_frame_ratio": ratio,
+            },
+            # Production thresholds and verdicts belong to production.review.
+            "issues": [],
+        }
 
     analysis = video_analyze(
         video_path,

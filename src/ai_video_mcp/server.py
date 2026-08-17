@@ -185,6 +185,7 @@ async def video_review(
     max_frames: Optional[int] = None,
     scene_threshold: Optional[float] = None,
     transcribe_audio: bool = False,
+    production_context: Optional[dict] = None,
     ctx: Context = None,
 ) -> dict:
     """Review a rendered video and return actionable optimization hints for workflow/config/code iteration.
@@ -206,6 +207,7 @@ async def video_review(
             max_frames=max_frames,
             scene_threshold=scene_threshold,
             transcribe_audio=transcribe_audio,
+            production_context=production_context,
         )
     except Exception as e:
         return _handle_error(e)
@@ -217,6 +219,7 @@ async def video_optimize_plan(
     project_path: Optional[str] = None,
     shots_path: Optional[str] = None,
     manifest_path: Optional[str] = None,
+    production_review_receipt: Optional[dict] = None,
     ctx: Context = None,
 ) -> dict:
     """Map video review issues to concrete repo files and suggested edits.
@@ -236,6 +239,7 @@ async def video_optimize_plan(
             project_path=project_path,
             shots_path=shots_path,
             manifest_path=manifest_path,
+            production_review_receipt=production_review_receipt,
         )
     except Exception as e:
         return _handle_error(e)
@@ -247,6 +251,7 @@ async def video_apply_optimization(
     project_path: Optional[str] = None,
     shots_path: Optional[str] = None,
     manifest_path: Optional[str] = None,
+    production_mode: bool = False,
     ctx: Context = None,
 ) -> dict:
     """Apply safe optimization edits to project and shot files based on detected video issues.
@@ -266,6 +271,7 @@ async def video_apply_optimization(
             project_path=project_path,
             shots_path=shots_path,
             manifest_path=manifest_path,
+            production_mode=production_mode,
         )
     except Exception as e:
         return _handle_error(e)

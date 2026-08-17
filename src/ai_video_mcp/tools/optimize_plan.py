@@ -63,7 +63,23 @@ def video_optimize_plan(
     project_path: str | None = None,
     shots_path: str | None = None,
     manifest_path: str | None = None,
+    production_review_receipt: dict | None = None,
 ) -> dict:
+    if production_review_receipt is not None:
+        return {
+            "mode": "production_repair_proposal",
+            "video_path": str(Path(video_path).resolve()),
+            "review_receipt_id": production_review_receipt.get("review_id"),
+            "issue_ids": list(production_review_receipt.get("issue_ids", ())),
+            "exact_target_artifact_ids": list(
+                production_review_receipt.get("exact_target_artifact_ids", ())
+            ),
+            # Production repair is persisted and authorized by the sole committer.
+            "targets": [],
+            "next_actions": [
+                "Submit a durable RepairRequest to ProductionStateCommitter."
+            ],
+        }
     review = video_review(video_path, config, cache)
     resolved_project, resolved_shots = _resolve_inputs(
         project_path=project_path,

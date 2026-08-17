@@ -11,6 +11,27 @@ from conftest import skip_no_ffmpeg
 
 @skip_no_ffmpeg
 class TestApplyVideoOptimization:
+    def test_production_apply_fails_closed_before_planning_or_writes(
+        self, tiny_video, mcp_config, mcp_cache, monkeypatch
+    ):
+        def fail(*args, **kwargs):
+            raise AssertionError("Production apply must not call Legacy helpers")
+
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.apply_optimization.video_optimize_plan", fail
+        )
+        result = apply_video_optimization(
+            str(tiny_video),
+            mcp_config,
+            mcp_cache,
+            production_mode=True,
+        )
+        assert result == {
+            "mode": "production_repair_refused",
+            "applied": False,
+            "reason": "durable_approved_repair_receipt_required",
+            "submit_count": 0,
+        }
     def test_apply_updates_project_and_shots_for_detected_issues(
         self,
         static_video,

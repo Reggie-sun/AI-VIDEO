@@ -112,7 +112,15 @@ def apply_video_optimization(
     project_path: str | None = None,
     shots_path: str | None = None,
     manifest_path: str | None = None,
+    production_mode: bool = False,
 ) -> dict:
+    if production_mode:
+        return {
+            "mode": "production_repair_refused",
+            "applied": False,
+            "reason": "durable_approved_repair_receipt_required",
+            "submit_count": 0,
+        }
     plan = video_optimize_plan(
         video_path,
         config,
