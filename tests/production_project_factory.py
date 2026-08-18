@@ -1891,7 +1891,16 @@ def make_base_ai_comic_current_composition(
                 "creation_receipt_id": f"base-ai-comic-composition-{revision}",
                 "layers": tuple(
                     layer.model_copy(
-                        update={"asset_id": shot_visuals[layer.shot_id]}
+                        update={
+                            "asset_id": shot_visuals[layer.shot_id],
+                            "transform": (
+                                layer.transform.model_copy(
+                                    update={"translate_x_px": 24}
+                                )
+                                if revision == 2 and layer == base.layers[0]
+                                else layer.transform
+                            ),
+                        }
                     )
                     for layer in base.layers
                 ),

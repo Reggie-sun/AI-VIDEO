@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from ai_video.errors import AiVideoError
 from ai_video.production.audio import VoiceCallAuthorization
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.hyperframes import probe_clip_fd_with_executable
@@ -188,7 +189,8 @@ def test_deterministic_review_analyzer_consumes_permit_and_fails_unknown_identit
     failed = analyzer.analyze(initial, initial_permit)
 
     assert initial_permit.consumed
-    assert failed.measured_payload["caption_overflow_milli"] == 1
+    assert failed.measured_payload["caption_overflow_milli"] == 0
+    assert failed.measured_payload["safe_area_inset_milli"] == 49
     with pytest.raises(AssertionError, match="permit"):
         analyzer.analyze(initial, initial_permit)
     assert analyzer.calls == 1
@@ -204,6 +206,7 @@ def test_deterministic_review_analyzer_consumes_permit_and_fails_unknown_identit
     passing = analyzer.analyze(unknown, passing_permit)
     assert passing_permit.consumed
     assert passing.measured_payload["caption_overflow_milli"] == 0
+    assert passing.measured_payload["safe_area_inset_milli"] == 50
 
 
 def _run_deterministic_renderer(
@@ -384,3 +387,80 @@ def test_base_ai_comic_materializes_and_renders_from_current_active_assets(
     assert loaded.manifest.active_review_receipts == ()
     assert loaded.manifest.active_approved_repair is None
     assert loaded.manifest.repair_outcome_receipts == ()
+
+
+def test_base_ai_comic_failed_layout_review_repairs_exact_closure_and_accepts(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    runtime = project_factory.make_base_ai_comic_e2e_runtime(tmp_path)
+    _forbid_network_and_secret_access(monkeypatch)
+
+    initial = runtime.materialize_and_render_initial()
+    stable_media = runtime.media_identity_snapshot()
+
+    failed = runtime.review_initial_render()
+    approval = runtime.approve_exact_layout_repair(failed)
+    before_repair = runtime.load_manifest()
+    repaired_state = runtime.commit_layout_repair(approval)
+    before_rerender = runtime.load_manifest()
+    repaired = runtime.render_current_composition(revision=2)
+    after_rerender = runtime.load_manifest()
+    passing = runtime.review_repaired_render()
+    outcome = runtime.record_repair_outcome(approval, repaired, passing)
+    accepted = runtime.record_final_acceptance(passing)
+
+    assert failed.verdict == "fail"
+    assert failed.issue_ids == ("layout.safe-area",)
+    assert before_repair.active_review_receipts
+    assert failed.pointer in before_repair.active_review_receipts
+    assert set(repaired_state.invalidated_node_ids) == {
+        "composition:main",
+        "timeline:main",
+        "renderer-source:main",
+        "render:main",
+    }
+    assert before_rerender.active_review_receipts == ()
+    stale_at_repair = next(
+        state for state in before_rerender.review_states if state.layer is QaLayer.LAYOUT
+    )
+    assert stale_at_repair.lifecycle == "stale"
+    assert stale_at_repair.active_receipt is None
+    assert after_rerender.active_review_receipts == ()
+    stale_after_rerender = next(
+        state for state in after_rerender.review_states if state.layer is QaLayer.LAYOUT
+    )
+    assert stale_after_rerender.lifecycle == "stale"
+    assert stale_after_rerender.active_receipt is None
+    assert (
+        after_rerender.final_acceptance_state is None
+        or (
+            after_rerender.final_acceptance_state.lifecycle == "stale"
+            and after_rerender.final_acceptance_state.active_receipt is None
+        )
+    )
+    assert runtime.media_identity_snapshot() == stable_media
+    assert repaired.sha256 != initial.sha256
+    assert repaired.probe.duration_milliseconds > 0
+    assert all(receipt.verdict == "pass" for receipt in passing)
+    assert outcome.actual_invalidation_node_ids == repaired_state.invalidated_node_ids
+    assert accepted.render_state == repaired.render_state
+    assert accepted.lifecycle == "fresh"
+
+
+@pytest.mark.parametrize(
+    "mutation", ["add_image_node", "blanket_all_nodes", "stale_render"]
+)
+def test_base_ai_comic_repair_rejects_scope_or_identity_drift_before_mutation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mutation: str,
+) -> None:
+    runtime = project_factory.make_base_ai_comic_e2e_runtime(tmp_path)
+    _forbid_network_and_secret_access(monkeypatch)
+    before = runtime.materialize_review_and_approve()
+
+    with pytest.raises(AiVideoError):
+        runtime.commit_forged_repair(mutation)
+
+    assert runtime.load_manifest() == before

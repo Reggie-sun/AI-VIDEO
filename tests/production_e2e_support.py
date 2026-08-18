@@ -32,14 +32,34 @@ from ai_video.production.hyperframes import (
     probe_clip_fd_with_executable,
 )
 from ai_video.production.models import (
+    ActorIdentity,
+    ApprovedRepairReceipt,
     EvidenceStrength,
+    FinalAcceptanceReceipt,
+    NamedFingerprint,
     QaLayer,
+    QaLayoutRules,
+    QaPolicy,
+    QaTechnicalThresholds,
+    QaVerdict,
+    RepairAction,
+    RepairAuthorization,
+    RepairOutcomeReceipt,
+    RepairRequest,
     ReviewEvidence,
+    ReviewEvidencePointer,
+    ReviewReceipt,
+    ReviewReceiptPointer,
     ReviewRequest,
     SourceReference,
     ToolIdentity,
 )
+from ai_video.production.paths import canonical_review_evidence_path
 from ai_video.production.project import load_production_project
+from ai_video.production.review import (
+    adjudicate_review_evidence,
+    build_technical_review_context,
+)
 from production_voice_e2e_support import (
     make_deterministic_voice_candidate_preparer,
 )
@@ -48,6 +68,18 @@ from production_voice_e2e_support import (
 _VOICE_FIXTURE = (
     Path(__file__).parent / "fixtures/voice_captions/dialogue-mono-48000.wav"
 )
+
+
+def _canonical_json_bytes(value) -> bytes:
+    return (
+        json.dumps(
+            value.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
 
 
 @dataclass(frozen=True)
@@ -82,6 +114,55 @@ class BaseAiComicInitialRender:
     path: Path
     sha256: str
     probe: BaseAiComicRenderProbe
+
+
+@dataclass(frozen=True)
+class BaseAiComicMediaIdentitySnapshot:
+    project: object
+    registry: object
+    assets: tuple[tuple[str, str], ...]
+    characters: tuple[tuple[str, str], ...]
+    scenes: tuple[tuple[str, str], ...]
+    references: tuple[object, ...]
+
+
+@dataclass(frozen=True)
+class BaseAiComicReviewResult:
+    receipt: ReviewReceipt
+    pointer: ReviewReceiptPointer
+    evidence: tuple[ReviewEvidence, ...]
+
+    @property
+    def verdict(self) -> QaVerdict:
+        return self.receipt.verdict
+
+    @property
+    def issue_ids(self) -> tuple[str, ...]:
+        return self.receipt.issue_ids
+
+
+@dataclass(frozen=True)
+class BaseAiComicRepairApproval:
+    request: RepairRequest
+    receipt: ApprovedRepairReceipt
+    pointer: object
+
+
+@dataclass(frozen=True)
+class BaseAiComicRepairCommit:
+    composition: object
+    invalidated_node_ids: tuple[str, ...]
+    manifest: object
+
+
+@dataclass(frozen=True)
+class BaseAiComicFinalAcceptance:
+    receipt: FinalAcceptanceReceipt
+    lifecycle: object
+
+    @property
+    def render_state(self):
+        return self.receipt.render_state
 
 
 class DeterministicVoiceProvider:
@@ -411,8 +492,8 @@ class DeterministicReviewAnalyzer:
                 ),
                 measured_payload={
                     "coverage_complete": True,
-                    "caption_overflow_milli": 0 if passes else 1,
-                    "safe_area_inset_milli": 50,
+                    "caption_overflow_milli": 0,
+                    "safe_area_inset_milli": 50 if passes else 49,
                     "layer_collision_count": 0,
                     "transition_boundary_violation_count": 0,
                 },
@@ -513,6 +594,12 @@ class BaseAiComicE2ERuntime:
         self.renderer = renderer
         self.analyzer = analyzer
         self._voice_request = None
+        self._voice_result = None
+        self._initial_render = None
+        self._repair_commit = None
+        self._trusted_repair_authority = ActorIdentity(
+            actor_id="base-ai-comic-reviewer", actor_kind="human"
+        )
         loaded = load_production_project(root / "project.yaml")
         if loaded.dependency_graph is None:
             raise AssertionError(
@@ -603,7 +690,9 @@ class BaseAiComicE2ERuntime:
         if len(caption_track_ids) != 1:
             raise AssertionError("caption track provenance did not reopen")
         self._voice_request = request
-        return BaseAiComicVoiceResult(audio_ids, caption_ids, caption_track_ids)
+        result = BaseAiComicVoiceResult(audio_ids, caption_ids, caption_track_ids)
+        self._voice_result = result
+        return result
 
     def render_current_composition(
         self, *, revision: int
@@ -717,7 +806,7 @@ class BaseAiComicE2ERuntime:
         duration_milliseconds = round(
             float(probe_payload["format"]["duration"]) * 1000
         )
-        return BaseAiComicInitialRender(
+        result = BaseAiComicInitialRender(
             composition=composition,
             timeline=timeline,
             render_state=manifest.active_render_state,
@@ -743,3 +832,635 @@ class BaseAiComicE2ERuntime:
                 ),
             ),
         )
+        if revision == 1:
+            self._initial_render = result
+        return result
+
+    def load_manifest(self):
+        return load_production_project(self.root / "project.yaml").manifest
+
+    def materialize_and_render_initial(self) -> BaseAiComicInitialRender:
+        self.generate_two_shot_images()
+        self.generate_voice_and_captions()
+        return self.render_current_composition(revision=1)
+
+    def media_identity_snapshot(self) -> BaseAiComicMediaIdentitySnapshot:
+        loaded = load_production_project(self.root / "project.yaml")
+        references = tuple(
+            request.references for request in self.image_runtime.provider_requests
+        )
+        return BaseAiComicMediaIdentitySnapshot(
+            project=loaded.manifest.active_project,
+            registry=loaded.manifest.active_registry,
+            assets=tuple(
+                sorted((item.asset_id, item.sha256) for item in loaded.registry.assets)
+            ),
+            characters=tuple(
+                sorted((item.character_id, item.content_hash) for item in loaded.characters)
+            ),
+            scenes=tuple(
+                sorted((item.scene_id, item.content_hash) for item in loaded.scenes)
+            ),
+            references=references,
+        )
+
+    def _committer(self):
+        from ai_video.production.state_commit import ProductionStateCommitter
+
+        return ProductionStateCommitter(
+            self.root,
+            repair_authorizer=lambda _request: self._trusted_repair_authority,
+        )
+
+    def _qa_policy(self) -> QaPolicy:
+        return seal_artifact(
+            QaPolicy(
+                artifact_id="qa-policy-base-ai-comic-layout",
+                revision=1,
+                content_hash="0" * 64,
+                creation_receipt_id="qa-policy-base-ai-comic-layout",
+                source_provenance=(
+                    SourceReference(
+                        kind="derived", reference="base-ai-comic-e2e"
+                    ),
+                ),
+                policy_id="base-ai-comic-layout",
+                policy_version="1",
+                required_layers=(QaLayer.LAYOUT,),
+                technical_thresholds=QaTechnicalThresholds(
+                    black_luma_max_milli=10,
+                    silence_peak_max_millidb=-60_000,
+                    clipping_peak_min_millidb=-100,
+                ),
+                layout_rules=QaLayoutRules(
+                    safe_area_inset_milli=50,
+                    caption_overflow_tolerance_milli=0,
+                ),
+                strategy_rules_version="1",
+                semantic_requirement="optional",
+                repair_authorities=(self._trusted_repair_authority,),
+            )
+        )
+
+    def _review_current_render(self, *, label: str) -> BaseAiComicReviewResult:
+        from ai_video.production.models import ResolvedTimeline
+
+        bundle = load_production_project(self.root / "project.yaml")
+        manifest = bundle.manifest
+        if (
+            manifest.active_dependency_graph is None
+            or manifest.active_render_state is None
+            or manifest.active_qa_policy is None
+            or bundle.render_state is None
+            or bundle.qa_policy is None
+        ):
+            raise AssertionError("review requires current graph, render, and policy")
+        timeline = ResolvedTimeline.model_validate_json(
+            (self.root / bundle.render_state.timeline.path).read_bytes()
+        )
+        context = build_technical_review_context(
+            bundle,
+            timeline,
+            render_output_sha256=bundle.render_state.output.file_sha256,
+            measurement_contract_version="1",
+        )
+        request = seal_artifact(
+            ReviewRequest(
+                artifact_id=f"review-request-base-ai-comic-{label}",
+                revision=1,
+                content_hash="0" * 64,
+                creation_receipt_id=f"review-request-base-ai-comic-{label}",
+                source_provenance=(
+                    SourceReference(kind="derived", reference="base-ai-comic-e2e"),
+                ),
+                request_id=f"review-request-base-ai-comic-{label}",
+                base_manifest_revision=manifest.manifest_revision,
+                dependency_graph=manifest.active_dependency_graph,
+                dependency_states_hash=canonical_sha256(
+                    {
+                        "dependency_states": [
+                            item.model_dump(mode="json")
+                            for item in manifest.dependency_states
+                        ]
+                    }
+                ),
+                render_state=manifest.active_render_state,
+                render_output_sha256=bundle.render_state.output.file_sha256,
+                timeline_fingerprint=bundle.render_state.timeline_fingerprint,
+                qa_policy=manifest.active_qa_policy,
+                requested_layers=(QaLayer.LAYOUT,),
+                evidence_tool_identities=(self.analyzer.tool_identity,),
+                technical_context=context,
+            )
+        )
+        committer = self._committer()
+        attempt_id = f"base-ai-comic-layout-review-{label}"
+        begun = committer.begin_review(request, attempt_id=attempt_id)
+        attempt = next(
+            item for item in begun.attempts if item.attempt_id == attempt_id
+        )
+        if attempt.review_request is None:
+            raise AssertionError("review request pointer was not persisted")
+        evidence = committer.run_review_analysis(
+            review_request=attempt.review_request,
+            expected_manifest_revision=begun.manifest_revision,
+            analyzer=self.analyzer.analyze,
+        )
+        if not isinstance(evidence, ReviewEvidence):
+            raise AssertionError("review analyzer returned invalid evidence")
+        evidence_payload = _canonical_json_bytes(evidence)
+        evidence_pointer = ReviewEvidencePointer(
+            path=canonical_review_evidence_path(evidence.content_hash),
+            evidence_id=evidence.evidence_id,
+            layer=evidence.layer,
+            strength=evidence.strength,
+            content_hash=evidence.content_hash,
+            file_sha256=hashlib.sha256(evidence_payload).hexdigest(),
+        )
+        verdict = adjudicate_review_evidence(
+            bundle.qa_policy, QaLayer.LAYOUT, (evidence,)
+        )
+        receipt = seal_artifact(
+            ReviewReceipt(
+                artifact_id=f"review-receipt-base-ai-comic-{label}",
+                revision=1,
+                content_hash="0" * 64,
+                creation_receipt_id=f"review-receipt-base-ai-comic-{label}",
+                source_provenance=(
+                    SourceReference(kind="derived", reference=evidence.evidence_id),
+                ),
+                review_id=f"review-base-ai-comic-{label}",
+                layer=QaLayer.LAYOUT,
+                review_request=attempt.review_request,
+                render_state=request.render_state,
+                render_output_sha256=request.render_output_sha256,
+                timeline_fingerprint=request.timeline_fingerprint,
+                dependency_graph_revision_id=(
+                    request.dependency_graph.revision_id
+                ),
+                qa_policy=request.qa_policy,
+                evidence=(evidence_pointer,),
+                evidence_ids=(evidence.evidence_id,),
+                tool_identities=(self.analyzer.tool_identity,),
+                issue_ids=("layout.safe-area",) if verdict is QaVerdict.FAIL else (),
+                verdict=verdict,
+            )
+        )
+        measured = self.load_manifest()
+        reviewed = committer.record_review_receipt(
+            receipt,
+            (evidence,),
+            expected_manifest_revision=measured.manifest_revision,
+            attempt_id=attempt_id,
+        )
+        pointer = next(
+            item
+            for item in reviewed.active_review_receipts
+            if item.layer is QaLayer.LAYOUT
+        )
+        return BaseAiComicReviewResult(receipt, pointer, (evidence,))
+
+    def review_initial_render(self) -> BaseAiComicReviewResult:
+        manifest = self.load_manifest()
+        self._committer().activate_qa_policy(
+            self._qa_policy(),
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="base-ai-comic-layout-policy",
+        )
+        return self._review_current_render(label="initial")
+
+    def review_repaired_render(self) -> tuple[BaseAiComicReviewResult, ...]:
+        current = self.load_manifest()
+        if current.active_render_state is None:
+            raise AssertionError("repaired render is not active")
+        self.analyzer.bind_repaired_render_state(current.active_render_state)
+        result = self._review_current_render(label="repaired")
+        return (result,)
+
+    def approve_exact_layout_repair(
+        self, failed: BaseAiComicReviewResult
+    ) -> BaseAiComicRepairApproval:
+        bundle = load_production_project(self.root / "project.yaml")
+        manifest = bundle.manifest
+        if (
+            failed.verdict is not QaVerdict.FAIL
+            or failed.issue_ids != ("layout.safe-area",)
+            or manifest.active_dependency_graph is None
+            or manifest.active_render_state is None
+            or manifest.active_qa_policy is None
+            or bundle.render_state is None
+        ):
+            raise AssertionError("repair approval requires the exact current layout fail")
+        actor = ActorIdentity(actor_id="codex", actor_kind="codex")
+        action = RepairAction(
+            kind="composition_layout",
+            parameters_fingerprint=canonical_sha256(
+                {"translate_x_px": 24, "issue_id": "layout.safe-area"}
+            ),
+        )
+        closure = (
+            "composition:main",
+            "timeline:main",
+            "renderer-source:main",
+            "render:main",
+        )
+        target_artifact = (
+            self._initial_render.composition.artifact_id
+            if self._initial_render is not None
+            else "composition-main"
+        )
+        scope = canonical_sha256(
+            {
+                "repair_id": "base-ai-comic-layout-repair",
+                "actor": actor.model_dump(mode="json"),
+                "action": action.model_dump(mode="json"),
+                "target_artifact_ids": [target_artifact],
+                "target_node_ids": ["composition:main"],
+                "expected_invalidation_node_ids": list(closure),
+            }
+        )
+        state_by_id = {item.node_id: item for item in manifest.dependency_states}
+        request = seal_artifact(
+            RepairRequest(
+                artifact_id="repair-request-base-ai-comic-layout",
+                revision=1,
+                content_hash="0" * 64,
+                creation_receipt_id="repair-request-base-ai-comic-layout",
+                source_provenance=(
+                    SourceReference(kind="derived", reference=failed.receipt.review_id),
+                ),
+                repair_id="base-ai-comic-layout-repair",
+                base_manifest_revision=manifest.manifest_revision,
+                dependency_graph=manifest.active_dependency_graph,
+                dependency_states_hash=canonical_sha256(
+                    {
+                        "dependency_states": [
+                            item.model_dump(mode="json")
+                            for item in manifest.dependency_states
+                        ]
+                    }
+                ),
+                render_state=manifest.active_render_state,
+                render_output_sha256=bundle.render_state.output.file_sha256,
+                timeline_fingerprint=bundle.render_state.timeline_fingerprint,
+                qa_policy=manifest.active_qa_policy,
+                review_receipt_ids=(failed.receipt.review_id,),
+                issue_ids=failed.issue_ids,
+                evidence_ids=failed.receipt.evidence_ids,
+                root_cause_hypothesis="layout safe area requires deterministic inset",
+                selected_repair_action=action,
+                exact_target_artifact_ids=(target_artifact,),
+                exact_target_node_ids=("composition:main",),
+                expected_invalidation_node_ids=closure,
+                actor=actor,
+                authorization=RepairAuthorization(
+                    authorization_id="base-ai-comic-layout-authorization",
+                    authorized=True,
+                    authorized_by=self._trusted_repair_authority,
+                    scope_fingerprint=scope,
+                ),
+                before_fingerprints=(
+                    NamedFingerprint(
+                        name="composition:main",
+                        fingerprint=state_by_id[
+                            "composition:main"
+                        ].desired_fingerprint,
+                    ),
+                ),
+            )
+        )
+        receipt = seal_artifact(
+            ApprovedRepairReceipt.model_validate(
+                {
+                    **request.model_dump(mode="python"),
+                    "artifact_id": "approved-repair-base-ai-comic-layout",
+                    "content_hash": "0" * 64,
+                    "request_content_hash": request.content_hash,
+                }
+            )
+        )
+        approved = self._committer().record_approved_repair_receipt(
+            request,
+            receipt,
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="base-ai-comic-layout-repair-approval",
+        )
+        if approved.active_approved_repair is None:
+            raise AssertionError("approved repair pointer was not activated")
+        return BaseAiComicRepairApproval(
+            request, receipt, approved.active_approved_repair
+        )
+
+    def _layout_repair_commit_request(
+        self,
+        approval: BaseAiComicRepairApproval,
+        *,
+        mutation: str | None = None,
+    ):
+        from ai_video.production.dependency import (
+            build_dependency_graph,
+            build_production_dependency_graph,
+            desired_fingerprints,
+            resolve_dependency_state,
+        )
+        from ai_video.production.state_commit import (
+            StateCommitRequest,
+            prepare_dependency_graph_transition,
+        )
+        import production_project_factory as project_factory
+
+        if self._voice_request is None:
+            raise AssertionError("repair requires generated voice state")
+        loaded = load_production_project(self.root / "project.yaml")
+        manifest = loaded.manifest
+        composition, styles = project_factory.make_base_ai_comic_current_composition(
+            loaded,
+            self.image_runtime.base_inputs,
+            revision=2,
+            voice_request=self._voice_request,
+        )
+        inputs = replace(
+            self.image_runtime.base_inputs,
+            project=loaded,
+            composition_spec=composition,
+            voice_requests=(
+                *self.image_runtime.base_inputs.voice_requests,
+                self._voice_request,
+            ),
+            caption_style_fingerprints=styles,
+        )
+        graph = build_production_dependency_graph(inputs)
+        if mutation in {"add_image_node", "blanket_all_nodes"}:
+            changed_nodes = []
+            image_changed = False
+            for node in graph.nodes:
+                should_change = mutation == "blanket_all_nodes" or (
+                    mutation == "add_image_node"
+                    and not image_changed
+                    and node.node_id.startswith("asset:")
+                    and "image" in node.artifact_id
+                )
+                if not should_change:
+                    changed_nodes.append(node)
+                    continue
+                image_changed = image_changed or mutation == "add_image_node"
+                first, *rest = node.contributions
+                changed_nodes.append(
+                    node.model_copy(
+                        update={
+                            "contributions": (
+                                first.model_copy(
+                                    update={
+                                        "fingerprint": canonical_sha256(
+                                            {
+                                                "forged": mutation,
+                                                "node": node.node_id,
+                                                "before": first.fingerprint,
+                                            }
+                                        )
+                                    }
+                                ),
+                                *rest,
+                            )
+                        }
+                    )
+                )
+            graph = build_dependency_graph(changed_nodes, graph.edges)
+        states = resolve_dependency_state(graph, manifest.dependency_states).states
+        transition = prepare_dependency_graph_transition(
+            expected_manifest_revision=manifest.manifest_revision,
+            base_dependency_graph=manifest.active_dependency_graph,
+            candidate_graph=graph,
+            candidate_dependency_states=states,
+            expected_desired_fingerprints=desired_fingerprints(graph),
+        )
+        committer = self._committer()
+        graph_payload = _canonical_json_bytes(graph)
+        composition_payload = _canonical_json_bytes(composition)
+        artifacts = tuple(
+            sorted(
+                (
+                    committer.prepare_artifact(
+                        f"base-ai-comic-{mutation or 'layout'}-repair",
+                        manifest.active_project.path,
+                        (self.root / manifest.active_project.path).read_bytes(),
+                    ),
+                    committer.prepare_artifact(
+                        f"base-ai-comic-{mutation or 'layout'}-repair",
+                        manifest.active_registry.path,
+                        (self.root / manifest.active_registry.path).read_bytes(),
+                    ),
+                    committer.prepare_artifact(
+                        f"base-ai-comic-{mutation or 'layout'}-repair",
+                        transition.candidate_dependency_graph.path,
+                        graph_payload,
+                    ),
+                    committer.prepare_artifact(
+                        f"base-ai-comic-{mutation or 'layout'}-repair",
+                        Path(
+                            "state/repairs/candidates/"
+                            f"composition.{composition.content_hash}.json"
+                        ),
+                        composition_payload,
+                    ),
+                ),
+                key=lambda item: item.relative_path.as_posix(),
+            )
+        )
+        before = {
+            item.node_id: item.desired_fingerprint
+            for item in manifest.dependency_states
+        }
+        after = {item.node_id: item.desired_fingerprint for item in states}
+        changed = {
+            node_id
+            for node_id in set(before) | set(after)
+            if before.get(node_id) != after.get(node_id)
+        }
+        approved_order = approval.receipt.expected_invalidation_node_ids
+        invalidated = tuple(item for item in approved_order if item in changed) + tuple(
+            sorted(changed.difference(approved_order))
+        )
+        return (
+            StateCommitRequest(
+                attempt_id=f"base-ai-comic-{mutation or 'layout'}-repair",
+                operation="repair",
+                expected_manifest_revision=manifest.manifest_revision,
+                artifacts=artifacts,
+                next_project=manifest.active_project,
+                next_registry=manifest.active_registry,
+                dependency_graph_transition=transition,
+                approved_repair_receipt=approval.pointer,
+            ),
+            composition,
+            invalidated,
+        )
+
+    def commit_layout_repair(
+        self, approval: BaseAiComicRepairApproval
+    ) -> BaseAiComicRepairCommit:
+        request, composition, invalidated = self._layout_repair_commit_request(
+            approval
+        )
+        manifest = self._committer().commit(request)
+        result = BaseAiComicRepairCommit(composition, invalidated, manifest)
+        self._repair_commit = result
+        return result
+
+    def record_repair_outcome(
+        self,
+        approval: BaseAiComicRepairApproval,
+        repaired: BaseAiComicInitialRender,
+        passing: tuple[BaseAiComicReviewResult, ...],
+    ) -> RepairOutcomeReceipt:
+        if self._repair_commit is None:
+            raise AssertionError("repair outcome requires a committed repair")
+        manifest = self.load_manifest()
+        state_by_id = {item.node_id: item for item in manifest.dependency_states}
+        receipt = seal_artifact(
+            RepairOutcomeReceipt(
+                artifact_id="repair-outcome-base-ai-comic-layout",
+                revision=1,
+                content_hash="0" * 64,
+                creation_receipt_id="repair-outcome-base-ai-comic-layout",
+                source_provenance=(
+                    SourceReference(
+                        kind="derived", reference=passing[0].receipt.review_id
+                    ),
+                ),
+                repair_id=approval.receipt.repair_id,
+                approved_receipt=approval.pointer,
+                review_receipt_ids=approval.receipt.review_receipt_ids,
+                issue_ids=approval.receipt.issue_ids,
+                evidence_ids=approval.receipt.evidence_ids,
+                root_cause_hypothesis=approval.receipt.root_cause_hypothesis,
+                selected_repair_action=approval.receipt.selected_repair_action,
+                exact_target_artifact_ids=approval.receipt.exact_target_artifact_ids,
+                exact_target_node_ids=approval.receipt.exact_target_node_ids,
+                expected_invalidation_node_ids=(
+                    approval.receipt.expected_invalidation_node_ids
+                ),
+                actor=approval.receipt.actor,
+                authorization=approval.receipt.authorization,
+                before_fingerprints=approval.receipt.before_fingerprints,
+                after_fingerprints=(
+                    NamedFingerprint(
+                        name="composition:main",
+                        fingerprint=state_by_id[
+                            "composition:main"
+                        ].desired_fingerprint,
+                    ),
+                ),
+                actual_invalidation_node_ids=(
+                    self._repair_commit.invalidated_node_ids
+                ),
+                rerender_state=repaired.render_state,
+                rerender_output_sha256=repaired.sha256,
+                rerender_timeline_fingerprint=(
+                    repaired.timeline.composition_fingerprint
+                ),
+                fresh_review_receipts=tuple(item.pointer for item in passing),
+            )
+        )
+        self._committer().record_repair_outcome(
+            receipt,
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="base-ai-comic-layout-repair-outcome",
+        )
+        return receipt
+
+    def record_final_acceptance(
+        self, passing: tuple[BaseAiComicReviewResult, ...]
+    ) -> BaseAiComicFinalAcceptance:
+        bundle = load_production_project(self.root / "project.yaml")
+        manifest = bundle.manifest
+        if (
+            manifest.active_dependency_graph is None
+            or manifest.active_render_state is None
+            or manifest.active_qa_policy is None
+            or bundle.render_state is None
+        ):
+            raise AssertionError("final acceptance requires current production state")
+        receipt = seal_artifact(
+            FinalAcceptanceReceipt(
+                artifact_id="final-acceptance-base-ai-comic",
+                revision=1,
+                content_hash="0" * 64,
+                creation_receipt_id="final-acceptance-base-ai-comic",
+                source_provenance=(
+                    SourceReference(
+                        kind="derived", reference=passing[0].receipt.review_id
+                    ),
+                ),
+                acceptance_id="final-acceptance-base-ai-comic",
+                dependency_graph=manifest.active_dependency_graph,
+                dependency_states_hash=canonical_sha256(
+                    {
+                        "dependency_states": [
+                            item.model_dump(mode="json")
+                            for item in manifest.dependency_states
+                        ]
+                    }
+                ),
+                render_state=manifest.active_render_state,
+                render_output_sha256=bundle.render_state.output.file_sha256,
+                timeline_fingerprint=bundle.render_state.timeline_fingerprint,
+                qa_policy=manifest.active_qa_policy,
+                required_review_receipts=tuple(item.pointer for item in passing),
+                verdict=QaVerdict.PASS,
+            )
+        )
+        accepted = self._committer().record_final_acceptance(
+            receipt,
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="base-ai-comic-final-acceptance",
+        )
+        state = accepted.final_acceptance_state
+        if state is None:
+            raise AssertionError("final acceptance state was not activated")
+        return BaseAiComicFinalAcceptance(receipt, state.lifecycle)
+
+    def materialize_review_and_approve(self):
+        self.materialize_and_render_initial()
+        failed = self.review_initial_render()
+        self._last_approval = self.approve_exact_layout_repair(failed)
+        return self.load_manifest()
+
+    def commit_forged_repair(self, mutation: str) -> None:
+        if not hasattr(self, "_last_approval"):
+            raise AssertionError("forged repair requires a current approval")
+        approval = self._last_approval
+        if mutation == "stale_render":
+            manifest = self.load_manifest()
+            stale_request = seal_artifact(
+                approval.request.model_copy(
+                    update={
+                        "content_hash": "0" * 64,
+                        "base_manifest_revision": manifest.manifest_revision,
+                        "render_state": approval.request.render_state.model_copy(
+                            update={"file_sha256": "f" * 64}
+                        ),
+                    }
+                )
+            )
+            stale_receipt = seal_artifact(
+                ApprovedRepairReceipt.model_validate(
+                    {
+                        **stale_request.model_dump(mode="python"),
+                        "artifact_id": "approved-repair-base-ai-comic-stale",
+                        "content_hash": "0" * 64,
+                        "request_content_hash": stale_request.content_hash,
+                    }
+                )
+            )
+            self._committer().record_approved_repair_receipt(
+                stale_request,
+                stale_receipt,
+                expected_manifest_revision=manifest.manifest_revision,
+                attempt_id="base-ai-comic-stale-render-repair",
+            )
+            return
+        request, _, _ = self._layout_repair_commit_request(
+            approval, mutation=mutation
+        )
+        self._committer().commit(request)
