@@ -57,27 +57,40 @@ Historical oversized modules 与 existing import cycles 可 grandfather；超过
 
 ## Development Verification Harness
 
-仓库开发 Harness 是对现有 tests/checks 的轻量 mandatory runner，不是新的 Agent workflow，也不属于产品 runtime。Policy 位于 `.agent/harness/policy.yaml`，入口是 `scripts/agent_harness.py`，每次 verification 的本地 receipt 写入 `.agent/harness/runs/<run_id>/receipt.json`；run artifacts 默认不进入 Git。
+仓库开发 Harness 是对现有 tests/checks 的轻量 mandatory runner，不是新的 Agent workflow，也不属于产品 runtime。Policy 位于 `.agent/harness/policy.yaml`，入口是 `scripts/agent_harness.py`。Completion verification 只接受 non-empty staged delta 或 commit range，在 detached temporary worktree 中运行 exact snapshot；本地 receipt 与 stdout/stderr/JUnit artifacts 写入 `.agent/harness/runs/<run_id>/`，默认不进入 Git。
 
 ```bash
-# 查看当前 changes 必须执行的 checks
+# 查看当前 working tree changes 必须执行的 checks（advisory）
 make harness-inspect
 
-# 执行 checks 并生成 passing/failed receipt
+# 只 stage 本任务文件后，验证 exact index snapshot
 make harness-verify
+
+# 已提交后验证 exact commit range；HEAD_REF 默认且必须解析到当前 HEAD
+make harness-verify-range BASE_REF=HEAD^
+
+# 校验 receipt self-hash、policy hash 与当前 commit/snapshot freshness
+make harness-receipt RECEIPT=.agent/harness/runs/<run_id>/receipt.json
+
+# 检查 owned source/test/workflow 是否存在 policy 漏路由
+make harness-audit
 
 # 只验证 Harness 自身
 make harness-test
+
+# 单独查看全仓测试 + historical-baseline Architecture Gate health
+make harness-repository
 ```
 
-工作区存在 unrelated changes 时，可通过 `HARNESS_ARGS` 限定本任务文件，或在只 stage 本任务文件后验证：
+`--path` 只用于 inspect，不生成 completion receipt。需要检查指定文件时直接运行：
 
 ```bash
-make harness-verify HARNESS_ARGS="--path src/ai_video/cli.py --path tests/test_cli.py"
-make harness-verify HARNESS_ARGS="--staged"
+python scripts/agent_harness.py inspect \
+  --path src/ai_video/cli.py \
+  --path tests/test_cli.py
 ```
 
-Harness 按 changed-path category 合并 required checks；任何未映射路径都会 fail safe 到完整 no-network pytest suite 与 Architecture Gate。P6 Review/Repair 是产品 runtime QA surface，与这个开发 Harness 不同。
+Harness 按 changed-path category 合并 required checks；shared Production owners 路由到完整 Production suite + Legacy CLI/config isolation，任何未映射路径 fail safe 到完整 pytest suite与task-delta Architecture Gate。Check subprocess 使用 argv + `shell=False` 和 timeout；credential/proxy/tool-injection env 不继承，pytest Python process拒绝 non-loopback address-bearing socket/DNS API。这个 guard不隔离 pytest 启动的 subprocess，policy因此不得把可能联网的 child executable列为默认 check。Repository historical Architecture Gate baseline是单独 health signal，不污染 task receipt。P6 Review/Repair是产品 runtime QA surface，与这个开发 Harness不同。
 
 ## Production Project Core Python API
 

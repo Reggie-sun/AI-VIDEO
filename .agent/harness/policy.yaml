@@ -1,92 +1,126 @@
-version: 1
+version: 2
 status: active
 runs_dir: .agent/harness/runs
+default_timeout_seconds: 900
+capture_pytest_junit: true
 
 note: >
-  This policy maps task-owned changed paths to mandatory existing tests and checks.
-  The Harness does not dispatch agents, modify product state, or replace AGENTS.md,
-  source code, tests, and verified runtime evidence.
+  This policy maps an exact staged or commit-range task delta to mandatory existing
+  tests and checks. The Harness does not dispatch agents, modify product state, run
+  live Provider smoke, or replace AGENTS.md, code, tests, and runtime evidence.
 
 ignored_patterns:
   - .pytest_cache/**
   - __pycache__/**
   - "**/__pycache__/**"
 
+sensitive_patterns:
+  - .env
+  - .env.*
+  - "**/.env"
+  - "**/.env.*"
+  - "*credential*"
+  - "*secret*"
+  - "**/*credential*"
+  - "**/*secret*"
+
+audit_patterns:
+  - src/**/*.py
+  - scripts/*.py
+  - scripts/**/*.py
+  - tests/*.py
+  - tests/**/*.py
+  - tests/test_*.py
+  - tests/conftest.py
+  - workflows/**
+
+audit_exempt_patterns:
+  - scripts/__init__.py
+
 always_check_ids:
-  - diff_check
-  - staged_diff_check
+  - scope_diff_check
 
 fallback_check_ids:
   - full_tests
-  - architecture_gate
+  - task_architecture_gate
 
 checks:
-  diff_check:
+  scope_diff_check:
     argv: [git, diff, --check]
     cwd: .
-    append_changed_paths: true
-    description: Check patch whitespace and conflict-marker hygiene.
-  staged_diff_check:
-    argv: [git, diff, --cached, --check]
-    cwd: .
-    append_changed_paths: true
-    description: Check staged patch whitespace and conflict-marker hygiene.
+    scope_diff: true
+    description: Check exact staged or commit-range patch whitespace and conflict markers.
   harness_tests:
-    argv: [python, -m, pytest, tests/test_agent_harness.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_agent_harness.py, -q]
     cwd: .
-    description: Verify Harness policy, routing, receipts, and Make targets.
+    description: Verify Harness scope, routing, isolation, receipts, and Make targets.
+  architecture_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_architecture_gate.py, tests/test_architecture_gate_cli.py, -q]
+    cwd: .
+    description: Verify deterministic Architecture Gate behavior and CLI contracts.
   cli_config_tests:
-    argv: [python, -m, pytest, tests/test_cli.py, tests/test_config.py, tests/test_errors.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_cli.py, tests/test_config.py, tests/test_errors.py, -q]
     cwd: .
     description: Verify CLI, config, path, and typed-error contracts.
   workflow_tests:
-    argv: [python, -m, pytest, tests/test_workflow_loader.py, tests/test_workflow_renderer.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_workflow_loader.py, tests/test_workflow_renderer.py, -q]
     cwd: .
     description: Verify workflow loading and pure binding/rendering.
   legacy_runtime_tests:
-    argv: [python, -m, pytest, tests/test_comfy_client.py, tests/test_pipeline.py, tests/test_manifest.py, tests/test_resume_e2e.py, tests/test_ffmpeg_tools.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_comfy_client.py, tests/test_pipeline.py, tests/test_manifest.py, tests/test_resume_e2e.py, tests/test_ffmpeg_tools.py, -q]
     cwd: .
     description: Verify Legacy transport, orchestration, resume, manifest, and ffmpeg behavior.
   mcp_tests:
-    argv: [python, -m, pytest, tests/test_mcp_probe.py, tests/test_mcp_frames.py, tests/test_mcp_transcribe.py, tests/test_mcp_scene_detect.py, tests/test_mcp_analyze.py, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_probe.py, tests/test_mcp_frames.py, tests/test_mcp_transcribe.py, tests/test_mcp_scene_detect.py, tests/test_mcp_analyze.py, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, -q]
     cwd: .
     description: Verify project-local video-analysis MCP tools.
+  production_contract_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests, -k, production, -q]
+    cwd: .
+    timeout_seconds: 1800
+    description: Verify all Production surfaces for shared schema, reader, writer, and lifecycle owners.
   production_reader_tests:
-    argv: [python, -m, pytest, tests/test_production_models.py, tests/test_production_validation.py, tests/test_production_registry.py, tests/test_production_project.py, tests/test_config.py, tests/test_cli.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_models.py, tests/test_production_validation.py, tests/test_production_registry.py, tests/test_production_project.py, tests/test_config.py, tests/test_cli.py, -q]
     cwd: .
     description: Verify strict read-only Production project contracts and Legacy isolation.
   production_state_tests:
-    argv: [python, -m, pytest, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_production_state_commit_structure.py, tests/test_production_models.py, tests/test_production_project.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_production_state_commit_structure.py, tests/test_production_models.py, tests/test_production_project.py, -q]
     cwd: .
     description: Verify the single Production writer, activation, and explicit recovery.
   production_composition_audio_tests:
-    argv: [python, -m, pytest, tests/test_production_composition.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_captions.py, tests/test_production_elevenlabs.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_composition.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_captions.py, tests/test_production_elevenlabs.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify timeline, renderer, audio, voice, and caption contracts.
   production_dependency_tests:
-    argv: [python, -m, pytest, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, tests/test_production_models.py, tests/test_production_project.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify immutable graph inputs and precise selective rebuild.
   production_review_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, tests/test_production_review.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
-    description: Verify durable review, authorization, repair, and final-acceptance behavior.
+    description: Verify durable review, authorization, repair, and final acceptance.
   production_image_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_image.py, tests/test_production_image_e2e.py, tests/test_production_comfy_image.py, tests/test_production_image_import.py, tests/test_production_p7_1_local_image_e2e.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_image.py, tests/test_production_image_e2e.py, tests/test_production_comfy_image.py, tests/test_production_image_import.py, tests/test_production_p7_1_local_image_e2e.py, tests/test_production_models.py, tests/test_production_registry.py, tests/test_production_validation.py, tests/test_production_project.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_comfy_client.py, tests/test_workflow_loader.py, -q]
     cwd: .
     description: Verify image contracts, local adapter, truthful import, activation, and recovery.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_production_video_fake.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_minimax_h3.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify paid-provider safety and generated-video contracts without live submit.
   full_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, -q]
     cwd: .
-    description: Fail-safe full no-network test suite for unmapped task paths.
-  architecture_gate:
+    timeout_seconds: 1800
+    description: Fail-safe full suite with credentials removed and pytest non-loopback sockets blocked.
+  task_architecture_gate:
     argv: [python, -m, scripts.architecture_gate, check]
     cwd: .
-    description: Reject architecture debt, cycle, and baseline regressions.
+    task_architecture: true
+    description: Reject architecture regressions introduced by the exact task delta.
+  repository_architecture_gate:
+    argv: [python, -m, scripts.architecture_gate, check]
+    cwd: .
+    description: Report repository health against the version-controlled architecture baseline.
 
 categories:
   harness_control:
@@ -94,7 +128,11 @@ categories:
       - AGENTS.md
       - Makefile
       - docs/agent-primary-contract-matrix.md
+      - scripts/agent_harness_audit.py
       - scripts/agent_harness.py
+      - scripts/agent_harness_receipt.py
+      - scripts/agent_harness_runtime.py
+      - scripts/harness_pytest_guard.py
       - tests/test_agent_harness.py
       - .agent/harness/**
     check_ids:
@@ -105,8 +143,23 @@ categories:
       - docs/**
       - "*.md"
     check_ids: []
+  architecture_tooling:
+    patterns:
+      - architecture_gate.toml
+      - scripts/architecture_gate/**
+      - tests/test_architecture_gate.py
+      - tests/test_architecture_gate_cli.py
+    check_ids:
+      - architecture_tests
+      - task_architecture_gate
+  test_infrastructure:
+    patterns:
+      - tests/conftest.py
+    check_ids:
+      - full_tests
   legacy_cli_config:
     patterns:
+      - src/ai_video/__init__.py
       - src/ai_video/cli.py
       - src/ai_video/config.py
       - src/ai_video/models.py
@@ -116,7 +169,7 @@ categories:
       - tests/test_errors.py
     check_ids:
       - cli_config_tests
-      - architecture_gate
+      - task_architecture_gate
   workflow:
     patterns:
       - src/ai_video/workflow_loader.py
@@ -126,7 +179,7 @@ categories:
       - tests/test_workflow_renderer.py
     check_ids:
       - workflow_tests
-      - architecture_gate
+      - task_architecture_gate
   legacy_runtime:
     patterns:
       - src/ai_video/comfy_client.py
@@ -140,41 +193,59 @@ categories:
       - tests/test_ffmpeg_tools.py
     check_ids:
       - legacy_runtime_tests
-      - architecture_gate
+      - task_architecture_gate
   video_analysis_mcp:
     patterns:
       - src/ai_video_mcp/**
       - tests/test_mcp_*.py
     check_ids:
       - mcp_tests
-      - architecture_gate
+      - task_architecture_gate
+  production_shared_contracts:
+    patterns:
+      - src/ai_video/production/__init__.py
+      - src/ai_video/production/models.py
+      - src/ai_video/production/project.py
+      - src/ai_video/production/state_commit.py
+      - src/ai_video/production/_lifecycle_schema.py
+      - src/ai_video/production/_state_commit_common.py
+      - src/ai_video/production/_state_commit_contracts.py
+      - src/ai_video/production/_state_commit_io.py
+      - src/ai_video/production/_state_commit_transaction.py
+      - src/ai_video/production/_state_commit_recovery.py
+      - src/ai_video/production/_state_commit_recovery_*.py
+      - tests/test_production_models.py
+      - tests/test_production_project.py
+      - tests/test_production_state_commit.py
+      - tests/test_production_state_recovery.py
+      - tests/test_production_state_commit_structure.py
+      - tests/test_production_base_ai_comic_e2e.py
+      - tests/production_e2e_support.py
+      - tests/production_project_factory.py
+    check_ids:
+      - production_contract_tests
+      - cli_config_tests
+      - task_architecture_gate
   production_reader:
     patterns:
-      - src/ai_video/production/models.py
+      - src/ai_video/production/_asset_registry_*.py
       - src/ai_video/production/hashing.py
       - src/ai_video/production/paths.py
       - src/ai_video/production/validation.py
       - src/ai_video/production/registry.py
-      - src/ai_video/production/project.py
       - src/ai_video/production/_*project_reader.py
-      - tests/test_production_models.py
       - tests/test_production_validation.py
       - tests/test_production_registry.py
-      - tests/test_production_project.py
     check_ids:
       - production_reader_tests
-      - architecture_gate
+      - task_architecture_gate
   production_state:
     patterns:
-      - src/ai_video/production/state_commit.py
       - src/ai_video/production/_state_commit_*.py
-      - src/ai_video/production/_lifecycle_schema.py
-      - tests/test_production_state_commit.py
-      - tests/test_production_state_recovery.py
-      - tests/test_production_state_commit_structure.py
+      - tests/helpers/p2a_crash_worker.py
     check_ids:
       - production_state_tests
-      - architecture_gate
+      - task_architecture_gate
   production_composition_audio:
     patterns:
       - src/ai_video/production/composition.py
@@ -182,27 +253,34 @@ categories:
       - src/ai_video/production/audio.py
       - src/ai_video/production/captions.py
       - src/ai_video/production/elevenlabs.py
+      - src/ai_video/production/_state_commit_render_*.py
+      - src/ai_video/production/_state_commit_voice_*.py
+      - src/ai_video/production/_voice_project_reader.py
       - tests/test_production_composition.py
       - tests/test_production_hyperframes.py
       - tests/test_production_audio.py
       - tests/test_production_captions.py
       - tests/test_production_elevenlabs.py
       - tests/test_production_voice_captions_e2e.py
+      - tests/production_voice_e2e_support.py
     check_ids:
       - production_composition_audio_tests
-      - architecture_gate
+      - task_architecture_gate
   production_dependency:
     patterns:
       - src/ai_video/production/dependency.py
       - src/ai_video/production/_project_dependency_evidence.py
+      - src/ai_video/production/_state_commit_dependency.py
       - tests/test_production_dependency.py
       - tests/test_production_selective_rebuild.py
     check_ids:
       - production_dependency_tests
-      - architecture_gate
+      - task_architecture_gate
   production_review:
     patterns:
       - src/ai_video/production/review.py
+      - src/ai_video/production/_state_commit_repair.py
+      - src/ai_video/production/_state_commit_review.py
       - src/ai_video_mcp/tools/review.py
       - src/ai_video_mcp/tools/optimize_plan.py
       - src/ai_video_mcp/tools/apply_optimization.py
@@ -213,9 +291,11 @@ categories:
       - tests/test_mcp_apply_optimization.py
     check_ids:
       - production_review_tests
-      - architecture_gate
+      - task_architecture_gate
   production_image:
     patterns:
+      - scripts/check_p7_1_comfy_compatibility.py
+      - scripts/smoke_p7_1_local_image.py
       - src/ai_video/production/image.py
       - src/ai_video/production/comfy_image.py
       - src/ai_video/production/image_import.py
@@ -231,9 +311,10 @@ categories:
       - tests/test_production_p7_1_local_image_e2e.py
     check_ids:
       - production_image_tests
-      - architecture_gate
+      - task_architecture_gate
   production_video_provider:
     patterns:
+      - src/ai_video/production/minimax_h3.py
       - src/ai_video/production/paid_provider.py
       - src/ai_video/production/video.py
       - src/ai_video/production/video_fake.py
@@ -245,9 +326,12 @@ categories:
       - tests/test_production_paid_provider.py
       - tests/test_production_paid_provider_state.py
       - tests/test_production_paid_provider_e2e.py
+      - tests/test_production_minimax_h3.py
       - tests/test_production_video.py
       - tests/test_production_video_fake.py
+      - tests/test_production_video_state_recovery.py
+      - tests/paid_provider_support.py
       - tests/video_provider_contract.py
     check_ids:
       - production_video_provider_tests
-      - architecture_gate
+      - task_architecture_gate

@@ -156,13 +156,14 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 
 ## Development Verification Harness
 
-- 本仓库的开发 Harness 是 [`scripts/agent_harness.py`](/home/reggie/vscode_folder/AI-VIDEO/scripts/agent_harness.py)；它只把 task-owned changed paths 路由到已有 mandatory tests/checks，并在 `.agent/harness/runs/<run_id>/receipt.json` 写执行证据。
+- 本仓库的开发 Harness 是 [`scripts/agent_harness.py`](/home/reggie/vscode_folder/AI-VIDEO/scripts/agent_harness.py)；它把 exact staged delta 或 commit range 路由到已有 mandatory tests/checks，并在 `.agent/harness/runs/<run_id>/receipt.json` 写 execution evidence。`--path` 只允许 advisory inspect，不得生成 completion receipt。
 - [`.agent/harness/policy.yaml`](/home/reggie/vscode_folder/AI-VIDEO/.agent/harness/policy.yaml) 是 changed-path category、check command 与 fail-safe fallback 的 machine-readable truth。修改映射时必须同步 Harness tests 与 contract matrix。
-- `make harness-inspect` 只显示当前 Git changes 需要的 checks；`make harness-verify` 执行 checks 并写 receipt；`make harness-test` 只验证 Harness 自身。
-- 有 unrelated dirty work 时，必须用 repeated `HARNESS_ARGS="--path <task-owned-path> ..."` 或在只 stage 本任务文件后使用 `HARNESS_ARGS="--staged"`，确保 receipt 不吸收无关 changes。
-- 任何 code 或 executable tooling change 在完成前 MUST 有 fresh passing `make harness-verify` receipt。Documentation-only change 可以只命中 `diff_check`；Harness/control-plane change还必须命中 `harness_tests`。Architecture Gate 由涉及 production/source architecture 的 category 选择，不作为所有 tooling/docs change 的 blanket gate。
-- 未被 policy 映射的 task path 必须 fail safe 到 full no-network pytest suite 与 Architecture Gate；不得静默跳过。
-- Harness 不调度 Agent、不修改产品 state、不联网、不替代 `AGENTS.md`、代码、测试或 runtime evidence。P6 Review/Repair 是产品 runtime surface，不是本开发 Harness。
+- `make harness-inspect` 显示当前 Git changes 需要的 checks；`make harness-verify` 只验证 non-empty staged scope；已提交 changes 使用 `make harness-verify-range BASE_REF=<ref> HEAD_REF=<ref>`，其中 `HEAD_REF` 必须解析到当前 `HEAD`；`make harness-test` 只验证 Harness 自身。
+- Completion verification MUST 在 detached temporary worktree 中执行 exact staged snapshot 或 exact head commit；source HEAD/index scope 在 checks 前后必须一致。这样 unrelated dirty work 不进入 execution tree，也不需要通过手写 path list 隐藏。
+- 任何 code 或 executable tooling change 在完成前 MUST 有 fresh passing receipt，并用 `make harness-receipt RECEIPT=<path>` 校验 self-hash、policy hash 与 current snapshot。Documentation-only change可以只命中 `scope_diff_check`；Harness/control-plane change还必须命中 `harness_tests`。
+- Production/source category 使用 task-delta Architecture Gate（`--base-ref`）；version-controlled baseline 的 repository-wide health 只由 `make harness-repository` 单独报告，不得让历史 debt 阻断 unrelated task receipt。
+- 未被 policy 映射的 task path必须 fail safe 到 full pytest suite与task-delta Architecture Gate；`make harness-audit` 必须拒绝 owned source/test/workflow 的 mapping drift。
+- Harness check subprocess 使用 argv + `shell=False`、explicit timeout、sanitized credential/proxy/tool environment；pytest Python process 由 `scripts/harness_pytest_guard.py` 阻止 non-loopback address-bearing socket/DNS API。该 guard 不是 subprocess/OS network namespace；policy不得把可能联网的 child executable列为默认 check。Harness 不调度 Agent、不修改产品 state、不执行 live Provider smoke，也不替代代码、测试或 runtime evidence。
 
 ## Checks By Change Type
 
@@ -176,7 +177,7 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - P2 与 Legacy Config/CLI isolation：在上述 P2 tests 之外加跑 `tests/test_config.py`、`tests/test_cli.py`
 - P5 graph/resolution/Manifest/recovery：`tests/test_production_dependency.py`、`tests/test_production_selective_rebuild.py`、`tests/test_production_models.py`、`tests/test_production_project.py`、`tests/test_production_state_commit.py`、`tests/test_production_state_recovery.py`
 - P7 image contract/activation/recovery：`tests/test_production_image.py`、`tests/test_production_image_e2e.py`、`tests/test_production_models.py`、`tests/test_production_registry.py`、`tests/test_production_validation.py`、`tests/test_production_project.py`、`tests/test_production_dependency.py`、`tests/test_production_selective_rebuild.py`、`tests/test_production_state_commit.py`、`tests/test_production_state_recovery.py`
-- Harness、policy、runs contract 或 `Makefile`：`tests/test_agent_harness.py`
+- Harness、policy、runtime/network guard、runs contract 或 `Makefile`：`tests/test_agent_harness.py`
 
 如果一次改动跨越多个表面，就运行所有对应测试文件。
 
