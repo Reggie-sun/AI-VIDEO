@@ -118,7 +118,11 @@ def test_video_service_persists_request_submit_poll_and_fetch_without_second_tas
     ]
     assert service.resume_next_action(attempt_id=ATTEMPT_ID) == "fetch"
     fetched = service.fetch_once(attempt_id=ATTEMPT_ID)
-    assert (tmp_path / fetched.relative_path).read_bytes() == FIXTURE.read_bytes()
+    fetched_path = tmp_path / fetched.relative_path
+    assert fetched.relative_path.suffix == ".mp4"
+    assert not fetched.relative_path.name.endswith(".mp4.part")
+    assert fetched_path.read_bytes() == FIXTURE.read_bytes()
+    assert list(fetched_path.parent.glob("*.part")) == []
     assert provider.call_counts.submit == 1
     assert provider.call_counts.fetch == 1
 
@@ -237,6 +241,9 @@ def test_restart_polls_durable_task_and_fetch_failure_never_resubmits(
     with pytest.raises(AiVideoError):
         restarted.fetch_once(attempt_id=ATTEMPT_ID)
 
+    fetch_root = tmp_path / "state/video-generation/fetch"
+    assert list(fetch_root.glob("*.part")) == []
+    assert list(fetch_root.glob("*.mp4")) == []
     assert restarted.resume_next_action(attempt_id=ATTEMPT_ID) == "fetch"
     assert provider.call_counts.submit == 1
     assert provider.call_counts.status == 1

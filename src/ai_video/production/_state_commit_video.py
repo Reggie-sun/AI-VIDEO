@@ -351,15 +351,21 @@ class _StateCommitVideoMixin:
             suffix=".mp4.part",
             dir=fetch_root,
         )
-        path = Path(raw_path)
+        temporary_path = Path(raw_path)
+        final_path = temporary_path.with_suffix("")
         handle = os.fdopen(fd, "w+b")
         try:
-            yield path.relative_to(self._project_root), handle
+            yield final_path.relative_to(self._project_root), handle
             handle.flush()
             os.fsync(handle.fileno())
-        except Exception:
             handle.close()
-            path.unlink(missing_ok=True)
+            self._ops.replace(temporary_path, final_path)
+            self._ops.fsync_directory(fetch_root)
+        except BaseException:
+            if not handle.closed:
+                handle.close()
+            temporary_path.unlink(missing_ok=True)
+            final_path.unlink(missing_ok=True)
             raise
         finally:
             if not handle.closed:
