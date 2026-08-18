@@ -4,9 +4,10 @@ import hashlib
 import json
 import shutil
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -23,7 +24,10 @@ from ai_video.production.audio import (
 )
 from ai_video.production.captions import normalize_character_alignment
 from ai_video.production.hashing import canonical_sha256, seal_artifact
-from ai_video.production.hyperframes import RendererCommandResult
+from ai_video.production.hyperframes import (
+    RendererCommandResult,
+    probe_clip_fd_with_executable,
+)
 from ai_video.production.models import (
     EvidenceStrength,
     QaLayer,
@@ -46,6 +50,29 @@ class BaseAiComicCallCounts:
     voice_submit: int = 0
     review_analyze: int = 0
     renderer_run: int = 0
+
+
+@dataclass(frozen=True)
+class BaseAiComicVoiceResult:
+    audio_asset_ids: tuple[str, ...]
+    caption_asset_ids: tuple[str, ...]
+    caption_track_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class BaseAiComicRenderProbe:
+    duration_milliseconds: int
+    video_stream_count: int
+
+
+@dataclass(frozen=True)
+class BaseAiComicInitialRender:
+    composition: object
+    timeline: object
+    render_state: object
+    path: Path
+    sha256: str
+    probe: BaseAiComicRenderProbe
 
 
 class DeterministicVoiceProvider:
@@ -397,6 +424,71 @@ def require_audio_toolchain() -> AudioProbeToolchain:
     )
 
 
+def _required_system_executable(name: str) -> Path:
+    executable = shutil.which(name)
+    if executable is None:
+        pytest.skip(f"base AI comic deterministic support requires {name}")
+    return Path(executable).resolve(strict=True)
+
+
+def _base_ai_comic_voice_candidate_preparer(
+    root: Path, toolchain: AudioProbeToolchain
+):
+    from ai_video.production.captions import CaptionImportRequest
+    from test_production_voice_captions_e2e import _voice_candidate_preparer
+
+    base_prepare = _voice_candidate_preparer(root, toolchain)
+
+    def prepare(request, preview, authorization, result, paths):
+        candidate = base_prepare(
+            request, preview, authorization, result, paths
+        )
+        assert candidate.caption is not None
+        assert candidate.caption_asset_record is not None
+        style_bytes = (
+            b'{"font_family":"Base AI Comic Sans","schema_version":"1"}'
+        )
+        style_hash = hashlib.sha256(style_bytes).hexdigest()
+        base_style = candidate.caption.style_reference
+        assert base_style is not None
+        style = base_style.model_copy(
+            update={
+                "content_hash": style_hash,
+                "path": Path(f"assets/styles/{style_hash}.json"),
+            }
+        )
+        caption = CaptionImportRequest.create(
+            caption_track=candidate.caption.caption_track,
+            style_reference=style,
+            style_bytes=style_bytes,
+        ).prepare()
+        metadata = candidate.caption_asset_record.caption_metadata
+        assert metadata is not None
+        record = candidate.caption_asset_record.model_copy(
+            update={
+                "artifact_path": Path(
+                    f"assets/captions/{caption.track_sha256}.json"
+                ),
+                "sha256": caption.track_sha256,
+                "size_bytes": len(caption.track_bytes),
+                "caption_metadata": metadata.model_copy(
+                    update={
+                        "style_reference_id": style.artifact_id,
+                        "style_reference_revision": style.revision,
+                        "style_content_hash": style.content_hash,
+                    }
+                ),
+            }
+        )
+        return replace(
+            candidate,
+            caption=caption,
+            caption_asset_record=record,
+        )
+
+    return prepare
+
+
 class BaseAiComicE2ERuntime:
     """Test-only composition root; flow methods are introduced by later tasks."""
 
@@ -414,6 +506,7 @@ class BaseAiComicE2ERuntime:
         self.voice_provider = voice_provider
         self.renderer = renderer
         self.analyzer = analyzer
+        self._voice_request = None
         loaded = load_production_project(root / "project.yaml")
         if loaded.dependency_graph is None:
             raise AssertionError(
@@ -437,4 +530,194 @@ class BaseAiComicE2ERuntime:
             voice_submit=self.voice_provider.generate_calls,
             review_analyze=self.analyzer.calls,
             renderer_run=self.renderer.render_calls,
+        )
+
+    def generate_two_shot_images(self):
+        return self.image_runtime.generate_all()
+
+    def generate_voice_and_captions(self) -> BaseAiComicVoiceResult:
+        from ai_video.production.state_commit import ProductionStateCommitter
+        import production_project_factory as project_factory
+
+        toolchain = require_audio_toolchain()
+        request = project_factory.make_base_ai_comic_voice_request(self.root)
+        preview = self.voice_provider.preview(request)
+        authorization = VoiceCallAuthorization.create(
+            request_fingerprint=request.voice_request_fingerprint,
+            preview_fingerprint=preview.preview_fingerprint,
+            pricing_snapshot_id=request.pricing_snapshot_id,
+            budget_reservation_receipt_id=request.budget_reservation_receipt_id,
+            egress_authorization_receipt_id=(
+                request.egress_authorization_receipt_id
+            ),
+            destination=preview.destination,
+            payload_categories=preview.payload_categories,
+            cost_ceiling_microunits=(
+                preview.estimated_cost_upper_bound_microunits
+            ),
+            provider_enabled=True,
+        )
+        committer = ProductionStateCommitter(
+            self.root,
+            voice_candidate_preparer=_base_ai_comic_voice_candidate_preparer(
+                self.root, toolchain
+            ),
+        )
+        committer.generate_voice_asset(
+            request,
+            self.voice_provider,
+            authorization,
+            dependency_transition_preparer=lambda candidate: (
+                project_factory.attach_base_ai_comic_voice_dependency_transition(
+                    self.root,
+                    candidate,
+                    self.image_runtime.base_inputs,
+                    request,
+                )
+            ),
+        )
+        loaded = load_production_project(self.root / "project.yaml")
+        audio_ids = tuple(
+            item.asset_id
+            for item in loaded.registry.assets
+            if item.asset_id == f"voice-{request.attempt_id}"
+        )
+        caption_ids = tuple(
+            item.asset_id
+            for item in loaded.registry.assets
+            if item.asset_id == f"caption-{request.attempt_id}"
+        )
+        if len(audio_ids) != 1 or len(caption_ids) != 1:
+            raise AssertionError("voice/caption activation did not reopen exact assets")
+        caption_track_ids = tuple(
+            item.caption_metadata.caption_track_id
+            for item in loaded.registry.assets
+            if item.asset_id in caption_ids and item.caption_metadata is not None
+        )
+        if len(caption_track_ids) != 1:
+            raise AssertionError("caption track provenance did not reopen")
+        self._voice_request = request
+        return BaseAiComicVoiceResult(audio_ids, caption_ids, caption_track_ids)
+
+    def render_current_composition(
+        self, *, revision: int
+    ) -> BaseAiComicInitialRender:
+        from ai_video.production import render_with_hyperframes
+        from ai_video.production.composition import resolve_composition
+        from ai_video.production.models import (
+            RendererKind,
+            RendererSelectionReceipt,
+            RenderReceipt,
+        )
+        from ai_video.production.state_commit import (
+            BeginRenderAttemptRequest,
+            ProductionStateCommitter,
+        )
+        import production_project_factory as project_factory
+
+        if self._voice_request is None:
+            raise AssertionError("voice/captions must be generated before render")
+        loaded = load_production_project(self.root / "project.yaml")
+        composition, caption_style_fingerprints = (
+            project_factory.make_base_ai_comic_current_composition(
+                loaded,
+                self.image_runtime.base_inputs,
+                revision=revision,
+                voice_request=self._voice_request,
+            )
+        )
+        timeline = resolve_composition(
+            loaded, composition, renderer_version="0.7.103"
+        )
+        asset_sources = {
+            span.asset_id: loaded.asset_paths[span.asset_id]
+            for span in (*timeline.visual_spans, *timeline.audio_spans)
+        }
+        asset_sources.update(
+            {
+                cue.caption_asset_id: loaded.asset_paths[cue.caption_asset_id]
+                for cue in timeline.caption_cues
+            }
+        )
+        for binding in composition.caption_tracks:
+            style = binding.style_reference
+            if style is not None:
+                asset_sources[style.artifact_id] = self.root / style.path
+        selection = RendererSelectionReceipt(
+            receipt_id=f"base-ai-comic-render-selection-{revision}",
+            attempt_id=f"base-ai-comic-render-{revision}",
+            requested_kind=RendererKind.HYPERFRAMES,
+            selected_kinds=(RendererKind.HYPERFRAMES,),
+            renderer_version="0.7.103",
+            timeline_fingerprint=timeline.composition_fingerprint,
+            current_project=loaded.manifest.active_project,
+            current_registry=loaded.manifest.active_registry,
+        )
+        committer = ProductionStateCommitter(self.root)
+        begin = BeginRenderAttemptRequest(
+            loaded.manifest.manifest_revision,
+            loaded.manifest.active_render_state,
+            selection,
+        )
+        transition = project_factory.make_base_ai_comic_render_transition_preparer(
+            self.root,
+            self.image_runtime.base_inputs,
+            composition,
+            self._voice_request,
+            caption_style_fingerprints,
+        )
+        toolchain = require_audio_toolchain()
+        tool_root = self.root / "test-tools/hyperframes"
+        binary = tool_root / "node_modules/.bin/hyperframes"
+        browser = _required_system_executable("true")
+        unshare = _required_system_executable("unshare")
+        ip_path = _required_system_executable("ip")
+        bash = _required_system_executable("bash")
+        with patch(
+            "ai_video.production.hyperframes._NetworkIsolatedHyperFramesRunner",
+            return_value=self.renderer,
+        ):
+            manifest = render_with_hyperframes(
+                committer=committer,
+                begin_request=begin,
+                timeline=timeline,
+                asset_sources=asset_sources,
+                allowed_asset_root=self.root,
+                binary_path=binary,
+                browser_path=browser,
+                unshare_path=unshare,
+                ip_path=ip_path,
+                bash_path=bash,
+                ffmpeg_path=toolchain.ffmpeg_path,
+                ffprobe_path=toolchain.ffprobe_path,
+                dependency_transition_preparer=transition,
+            )
+        reopened = load_production_project(self.root / "project.yaml")
+        state = reopened.render_state
+        if state is None or manifest.active_render_state is None:
+            raise AssertionError("render state did not reopen after activation")
+        receipt = RenderReceipt.model_validate_json(
+            (self.root / state.render_receipt.path).read_bytes()
+        )
+        output = self.root / state.output.path
+        with output.open("rb") as source:
+            probe_payload = probe_clip_fd_with_executable(
+                source.fileno(), toolchain.ffprobe_path
+            )
+        duration_milliseconds = round(
+            float(probe_payload["format"]["duration"]) * 1000
+        )
+        return BaseAiComicInitialRender(
+            composition=composition,
+            timeline=timeline,
+            render_state=manifest.active_render_state,
+            path=output,
+            sha256=receipt.output_sha256,
+            probe=BaseAiComicRenderProbe(
+                duration_milliseconds=duration_milliseconds,
+                video_stream_count=sum(
+                    item.get("codec_type") == "video"
+                    for item in probe_payload["streams"]
+                ),
+            ),
         )

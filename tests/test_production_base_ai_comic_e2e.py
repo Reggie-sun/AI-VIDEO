@@ -16,10 +16,12 @@ from ai_video.production.models import (
     RenderStateSnapshotPointer,
     ReviewRequest,
     SourceReference,
+    StateCommitStatus,
     TechnicalReviewContext,
     TechnicalReviewWindow,
     VisualStrategy,
 )
+from ai_video.production.project import load_production_project
 from ai_video.production.state_commit import ProductionStateCommitter
 from production_e2e_support import (
     BaseAiComicCallCounts,
@@ -267,3 +269,99 @@ def test_deterministic_runner_is_probeable_repeatable_and_source_sensitive(
     assert first_hash == second_hash
     assert repaired_hash != first_hash
     assert runner.render_calls == 3
+
+
+def test_base_ai_comic_materializes_and_renders_from_current_active_assets(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    runtime = project_factory.make_base_ai_comic_e2e_runtime(tmp_path)
+    _forbid_network_and_secret_access(monkeypatch)
+
+    images = runtime.generate_two_shot_images()
+    after_images = load_production_project(tmp_path / "project.yaml")
+    voice = runtime.generate_voice_and_captions()
+    after_voice = load_production_project(tmp_path / "project.yaml")
+    initial = runtime.render_current_composition(revision=1)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    shot_visuals = {
+        shot.shot_id: next(
+            role.asset_ids[0]
+            for role in shot.required_asset_roles
+            if role.role == "still"
+        )
+        for shot in loaded.shots
+    }
+    registry = {item.asset_id: item for item in loaded.registry.assets}
+    composition_visuals = {
+        layer.shot_id: layer.asset_id for layer in initial.composition.layers
+    }
+    image_attempts = tuple(
+        item
+        for item in after_voice.manifest.attempts
+        if item.operation == "image_generation"
+    )
+    voice_attempts = tuple(
+        item
+        for item in after_voice.manifest.attempts
+        if item.operation == "voice_generation"
+    )
+
+    assert images.requests[0].references == images.requests[1].references
+    assert images.shot_1_asset_id != images.shot_2_asset_id
+    assert after_images.manifest.schema_version == "2.5"
+    assert (
+        after_voice.manifest.manifest_revision
+        > after_images.manifest.manifest_revision
+    )
+    assert len(image_attempts) == 2
+    assert all(
+        item.status is StateCommitStatus.SUCCEEDED for item in image_attempts
+    )
+    assert len(voice_attempts) == 1
+    assert voice_attempts[0].status is StateCommitStatus.SUCCEEDED
+    assert loaded.manifest.schema_version == "2.5"
+    assert shot_visuals == {
+        "shot-1": images.shot_1_asset_id,
+        "shot-2": images.shot_2_asset_id,
+    }
+    assert composition_visuals == shot_visuals
+    assert voice.audio_asset_ids
+    assert voice.caption_asset_ids
+    assert voice.caption_track_ids
+    generated_audio = registry[voice.audio_asset_ids[0]]
+    generated_caption = registry[voice.caption_asset_ids[0]]
+    assert generated_audio.audio_metadata is not None
+    assert generated_audio.audio_metadata.provenance_receipt_id
+    assert generated_audio.egress is not None
+    assert generated_caption.caption_metadata is not None
+    assert (
+        generated_caption.caption_metadata.caption_track_id
+        == voice.caption_track_ids[0]
+    )
+    assert generated_caption.caption_metadata.source_audio_asset_id in (
+        voice.audio_asset_ids
+    )
+    assert loaded.asset_paths[voice.audio_asset_ids[0]].is_file()
+    assert loaded.asset_paths[voice.caption_asset_ids[0]].is_file()
+    assert (
+        initial.timeline.composition_spec_id,
+        initial.timeline.composition_spec_revision,
+        initial.timeline.composition_spec_hash,
+    ) == (
+        initial.composition.artifact_id,
+        initial.composition.revision,
+        initial.composition.content_hash,
+    )
+    assert initial.render_state == loaded.manifest.active_render_state
+    assert initial.probe.duration_milliseconds > 0
+    assert initial.probe.video_stream_count == 1
+    assert initial.sha256 == hashlib.sha256(initial.path.read_bytes()).hexdigest()
+    assert runtime.call_counts == BaseAiComicCallCounts(
+        image_submit=2,
+        voice_submit=1,
+        renderer_run=1,
+    )
+    assert loaded.manifest.active_review_receipts == ()
+    assert loaded.manifest.active_approved_repair is None
+    assert loaded.manifest.repair_outcome_receipts == ()
