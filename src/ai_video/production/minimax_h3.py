@@ -60,11 +60,24 @@ _MAX_PROMPT_CHARACTERS = 2_000
 _MAX_VIDEO_BYTES = 256 * 1024 * 1024
 _SECRET_REFERENCE_KIND = "secret_store"
 _SECRET_REFERENCE_ID = "MINIMAX_API_KEY"
+_SAFE_ERROR_TYPE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
+_PROVIDER_ERROR_CODE = re.compile(r"\(([0-9]{4})\)\s*$")
 _SAFE_TASK_ID = re.compile(r"^[A-Za-z0-9._:-]{1,256}$")
 
 
-def _error(code: ErrorCode, message: str, *, retryable: bool = False) -> AiVideoError:
-    return AiVideoError(code=code, user_message=message, retryable=retryable)
+def _error(
+    code: ErrorCode,
+    message: str,
+    *,
+    retryable: bool = False,
+    technical_detail: str | None = None,
+) -> AiVideoError:
+    return AiVideoError(
+        code=code,
+        user_message=message,
+        technical_detail=technical_detail,
+        retryable=retryable,
+    )
 
 
 def _unknown_submit() -> AiVideoError:
@@ -241,6 +254,31 @@ def _signed_https_url(value: object) -> str:
 
 def _provider_file_id(task_id: str) -> str:
     return _FILE_ID_PREFIX + hashlib.sha256(task_id.encode("utf-8")).hexdigest()
+
+
+def _sanitized_provider_error(body: bytes) -> str | None:
+    if len(body) > _MAX_JSON_BYTES:
+        return None
+    try:
+        payload = json.loads(body)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict) or not isinstance(payload.get("error"), dict):
+        return None
+    error = payload["error"]
+    error_type = error.get("type")
+    http_code = error.get("http_code")
+    message = error.get("message")
+    if not isinstance(error_type, str) or _SAFE_ERROR_TYPE.fullmatch(error_type) is None:
+        return None
+    parts = [f"type={error_type}"]
+    if isinstance(http_code, str) and http_code.isdigit() and len(http_code) == 3:
+        parts.append(f"http_code={http_code}")
+    if isinstance(message, str):
+        provider_code = _PROVIDER_ERROR_CODE.search(message)
+        if provider_code is not None:
+            parts.append(f"provider_code={provider_code.group(1)}")
+    return "; ".join(parts)
 
 
 def _permit_is_valid(permit: object, binding: dict[str, str]) -> bool:
@@ -471,6 +509,7 @@ class MiniMaxH3VideoProvider:
                 raise _error(
                     ErrorCode.VIDEO_PROVIDER_FAILED,
                     f"MiniMax H3 submit was rejected with HTTP {response.status_code}.",
+                    technical_detail=_sanitized_provider_error(response.body),
                 )
             raise _unknown_submit()
         try:

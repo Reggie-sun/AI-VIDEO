@@ -779,6 +779,91 @@ def test_pre_acceptance_4xx_is_fail_closed_without_task_identity(
     assert len(transport.calls) == 1
 
 
+def test_official_4xx_error_detail_only_keeps_allowlisted_structured_codes(monkeypatch):
+    _block_socket(monkeypatch)
+    key_shaped_secret = "sk-cp-FAKE_TEST_SECRET_1234567890"
+    (
+        provider,
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        binding,
+        transport,
+        _,
+    ) = _build_submit_inputs()
+    transport.submit_response = _submit_response(
+        status=400,
+        body={
+            "type": "error",
+            "error": {
+                "type": "bad_request_error",
+                "message": f"invalid model for {key_shaped_secret} (2013)",
+                "http_code": "400",
+            },
+            "request_id": "provider-request-id-is-not-retained",
+        },
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            _real_permit(binding),
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
+    assert exc_info.value.technical_detail == (
+        "type=bad_request_error; http_code=400; provider_code=2013"
+    )
+    assert key_shaped_secret not in repr(exc_info.value)
+    assert "provider-request-id" not in repr(exc_info.value)
+
+
+def test_official_4xx_error_detail_drops_arbitrary_free_form_message(monkeypatch):
+    _block_socket(monkeypatch)
+    (
+        provider,
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        binding,
+        transport,
+        _,
+    ) = _build_submit_inputs()
+    sensitive_message = (
+        "request_id=req-private Authorization: Bearer eyJ.fake.jwt "
+        "signed=https://cdn.invalid/video?token=secret raw-prompt=private"
+    )
+    transport.submit_response = _submit_response(
+        status=400,
+        body={
+            "error": {
+                "type": "bad_request_error",
+                "message": sensitive_message,
+                "http_code": "400",
+            }
+        },
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            _real_permit(binding),
+        )
+
+    assert exc_info.value.technical_detail == (
+        "type=bad_request_error; http_code=400"
+    )
+    assert sensitive_message not in repr(exc_info.value)
+
+
 @pytest.mark.parametrize("status", [500, 502, 503, 504])
 def test_5xx_after_permit_consumption_is_outcome_unknown_without_retry(
     monkeypatch: pytest.MonkeyPatch, status: int
