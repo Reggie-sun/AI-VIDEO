@@ -334,7 +334,7 @@ def _paid_preview(
         provider_policy_snapshot_id="minimax-h3-policy-1",
         secret_reference=SecretReference(
             kind="secret_store",
-            reference_id="MINIMAX_API_KEY",
+            reference_id="MINIMAX_H3_API_KEY",
         ),
     )
 
@@ -686,6 +686,50 @@ def test_paid_preview_must_bind_exact_prompt_and_secret_reference(monkeypatch):
 
     assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
     assert transport.calls == []
+
+
+def test_legacy_token_plan_secret_reference_is_rejected_before_credential_resolution(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    _block_socket(monkeypatch)
+    (
+        provider,
+        resolved,
+        video_preview,
+        paid_preview,
+        _,
+        _,
+        transport,
+        secret,
+    ) = _build_submit_inputs()
+    legacy_preview = PaidProviderCallPreview.create(
+        **{
+            **paid_preview.model_dump(
+                exclude={"preview_fingerprint", "secret_reference"}
+            ),
+            "secret_reference": SecretReference(
+                kind="secret_store",
+                reference_id="MINIMAX_API_KEY",
+            ),
+        }
+    )
+    legacy_authorization = _paid_authorization(legacy_preview)
+    legacy_binding = build_video_paid_permit_binding(
+        resolved, video_preview, legacy_preview, legacy_authorization
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            legacy_preview,
+            legacy_authorization,
+            _real_permit(legacy_binding),
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.calls == []
+    assert secret.invocations == 0
 
 
 def test_httpx_transport_never_follows_submit_redirect():

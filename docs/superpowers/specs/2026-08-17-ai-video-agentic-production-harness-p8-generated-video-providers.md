@@ -358,6 +358,8 @@ P8不把 task、poll或 Provider error写入 immutable graph。P5 graph schema�
 
 截至 2026-08-17，MiniMax官方把 Hailuo 2.3/2.3-Fast/02列为 Legacy Models；当前 flagship H3使用独立 V2 API。用户本轮明确选择 Hailuo作为第一真实 Cloud Provider，因此 `MiniMaxHailuoProvider`是明确的 V1 adapter；future H3应作为新的 adapter/dialect实现相同 core contract，不能把 V1 `file_id`写进 core。
 
+Live H3 V2 与 live Hailuo V1 使用 distinct credential variable：H3 V2 pay-as-you-go adapter 的 `PaidProviderCallPreview.secret_reference.reference_id` 必须是 `MINIMAX_H3_API_KEY`（normal pay-as-you-go key），而 Hailuo V1 Token Plan 仍使用 `MINIMAX_API_KEY`（`sk-cp…` Token Plan credential）。两个变量各自独立；H3 adapter 不 fallback 到 `MINIMAX_API_KEY`，Hailuo adapter 也不读取 `MINIMAX_H3_API_KEY`。Live wiring 必须分别为两个 provider 注入对应 secret，缺一即 skip live smoke。
+
 Hailuo V1官方 contract：
 
 - origin `https://api.minimax.io`；Bearer auth；
