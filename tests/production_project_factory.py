@@ -1933,6 +1933,24 @@ def make_base_ai_comic_current_composition(
     return composition, tuple(sorted(style_fingerprints.items()))
 
 
+def make_base_ai_comic_caption_style_fingerprints(
+    loaded,
+    base_inputs,
+    composition_spec,
+):
+    """Reopen caption style bytes for an already sealed CompositionSpec."""
+
+    style_fingerprints = dict(base_inputs.caption_style_fingerprints)
+    for binding in composition_spec.caption_tracks:
+        style = binding.style_reference
+        if style is None:
+            raise AssertionError("base AI comic captions require exact style identity")
+        style_fingerprints[style.artifact_id] = caption_style_fingerprint(
+            style, (loaded.root / style.path).read_bytes()
+        )
+    return tuple(sorted(style_fingerprints.items()))
+
+
 def make_base_ai_comic_render_transition_preparer(
     root: Path,
     base_inputs,

@@ -8,10 +8,15 @@ import pytest
 
 from ai_video.errors import AiVideoError
 from ai_video.production.audio import VoiceCallAuthorization
-from ai_video.production.hashing import canonical_sha256, seal_artifact
+from ai_video.production.hashing import (
+    canonical_sha256,
+    seal_artifact,
+    verify_artifact_hash,
+)
 from ai_video.production.hyperframes import probe_clip_fd_with_executable
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
+    CompositionSpec,
     QaLayer,
     QaPolicyPointer,
     RenderStateSnapshotPointer,
@@ -398,13 +403,49 @@ def test_base_ai_comic_failed_layout_review_repairs_exact_closure_and_accepts(
 
     initial = runtime.materialize_and_render_initial()
     stable_media = runtime.media_identity_snapshot()
+    assert len(stable_media.image_asset_ids) == 2
+    assert stable_media.audio_asset_ids
+    assert stable_media.caption_asset_ids
+    assert stable_media.caption_track_ids
+    assert stable_media.character_references
+    assert stable_media.scene_references
+    assert len(stable_media.image_request_evidence) == 2
+    assert len(stable_media.image_receipt_evidence) == 2
 
     failed = runtime.review_initial_render()
     approval = runtime.approve_exact_layout_repair(failed)
     before_repair = runtime.load_manifest()
     repaired_state = runtime.commit_layout_repair(approval)
+    repaired_composition_path = tmp_path / repaired_state.composition_path
+    repaired_composition_bytes = repaired_composition_path.read_bytes()
+    repaired_composition = CompositionSpec.model_validate_json(
+        repaired_composition_bytes
+    )
+    expected_repaired_composition = seal_artifact(
+        initial.composition.model_copy(
+            update={
+                "revision": 2,
+                "content_hash": "0" * 64,
+                "creation_receipt_id": "base-ai-comic-composition-2",
+                "layers": (
+                    initial.composition.layers[0].model_copy(
+                        update={
+                            "transform": initial.composition.layers[
+                                0
+                            ].transform.model_copy(
+                                update={"translate_x_px": 24}
+                            )
+                        }
+                    ),
+                    *initial.composition.layers[1:],
+                ),
+            }
+        )
+    )
     before_rerender = runtime.load_manifest()
-    repaired = runtime.render_current_composition(revision=2)
+    repaired = runtime.render_current_composition(
+        composition=repaired_composition
+    )
     after_rerender = runtime.load_manifest()
     passing = runtime.review_repaired_render()
     outcome = runtime.record_repair_outcome(approval, repaired, passing)
@@ -420,6 +461,16 @@ def test_base_ai_comic_failed_layout_review_repairs_exact_closure_and_accepts(
         "renderer-source:main",
         "render:main",
     }
+    assert repaired_composition_path.is_file()
+    assert repaired_state.composition_file_sha256 == hashlib.sha256(
+        repaired_composition_bytes
+    ).hexdigest()
+    assert verify_artifact_hash(repaired_composition)
+    assert repaired_composition == repaired_state.composition
+    assert repaired_composition == expected_repaired_composition
+    assert repaired_composition.revision == 2
+    assert repaired_composition.content_hash != initial.composition.content_hash
+    assert repaired_composition.layers[0].transform.translate_x_px == 24
     assert before_rerender.active_review_receipts == ()
     stale_at_repair = next(
         state for state in before_rerender.review_states if state.layer is QaLayer.LAYOUT
@@ -442,6 +493,16 @@ def test_base_ai_comic_failed_layout_review_repairs_exact_closure_and_accepts(
     assert runtime.media_identity_snapshot() == stable_media
     assert repaired.sha256 != initial.sha256
     assert repaired.probe.duration_milliseconds > 0
+    assert repaired.composition == repaired_composition
+    assert (
+        repaired.timeline.composition_spec_id,
+        repaired.timeline.composition_spec_revision,
+        repaired.timeline.composition_spec_hash,
+    ) == (
+        repaired_composition.artifact_id,
+        repaired_composition.revision,
+        repaired_composition.content_hash,
+    )
     assert all(receipt.verdict == "pass" for receipt in passing)
     assert outcome.actual_invalidation_node_ids == repaired_state.invalidated_node_ids
     assert accepted.render_state == repaired.render_state

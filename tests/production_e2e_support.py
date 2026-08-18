@@ -26,14 +26,23 @@ from ai_video.production.captions import (
     CaptionImportRequest,
     normalize_character_alignment,
 )
-from ai_video.production.hashing import canonical_sha256, seal_artifact
+from ai_video.production.hashing import (
+    canonical_sha256,
+    seal_artifact,
+    verify_artifact_hash,
+)
 from ai_video.production.hyperframes import (
     RendererCommandResult,
     probe_clip_fd_with_executable,
 )
+from ai_video.production.image import (
+    ImageGenerationRequest,
+    ImageProvenanceReceipt,
+)
 from ai_video.production.models import (
     ActorIdentity,
     ApprovedRepairReceipt,
+    AssetType,
     EvidenceStrength,
     FinalAcceptanceReceipt,
     NamedFingerprint,
@@ -52,9 +61,14 @@ from ai_video.production.models import (
     ReviewReceiptPointer,
     ReviewRequest,
     SourceReference,
+    StateCommitStatus,
     ToolIdentity,
 )
-from ai_video.production.paths import canonical_review_evidence_path
+from ai_video.production.paths import (
+    canonical_image_receipt_path,
+    canonical_image_request_path,
+    canonical_review_evidence_path,
+)
 from ai_video.production.project import load_production_project
 from ai_video.production.review import (
     adjudicate_review_evidence,
@@ -120,10 +134,14 @@ class BaseAiComicInitialRender:
 class BaseAiComicMediaIdentitySnapshot:
     project: object
     registry: object
-    assets: tuple[tuple[str, str], ...]
-    characters: tuple[tuple[str, str], ...]
-    scenes: tuple[tuple[str, str], ...]
-    references: tuple[object, ...]
+    image_asset_ids: tuple[str, ...]
+    audio_asset_ids: tuple[str, ...]
+    caption_asset_ids: tuple[str, ...]
+    caption_track_ids: tuple[str, ...]
+    character_references: tuple[tuple[object, ...], ...]
+    scene_references: tuple[tuple[object, ...], ...]
+    image_request_evidence: tuple[tuple[Path, str, str], ...]
+    image_receipt_evidence: tuple[tuple[Path, str, str], ...]
 
 
 @dataclass(frozen=True)
@@ -151,6 +169,8 @@ class BaseAiComicRepairApproval:
 @dataclass(frozen=True)
 class BaseAiComicRepairCommit:
     composition: object
+    composition_path: Path
+    composition_file_sha256: str
     invalidated_node_ids: tuple[str, ...]
     manifest: object
 
@@ -695,7 +715,10 @@ class BaseAiComicE2ERuntime:
         return result
 
     def render_current_composition(
-        self, *, revision: int
+        self,
+        *,
+        revision: int | None = None,
+        composition=None,
     ) -> BaseAiComicInitialRender:
         from ai_video.production import render_with_hyperframes
         from ai_video.production.composition import resolve_composition
@@ -714,14 +737,28 @@ class BaseAiComicE2ERuntime:
         if self._voice_request is None:
             raise AssertionError("voice/captions must be generated before render")
         loaded = load_production_project(self.root / "project.yaml")
-        composition, caption_style_fingerprints = (
-            project_factory.make_base_ai_comic_current_composition(
-                loaded,
-                self.image_runtime.base_inputs,
-                revision=revision,
-                voice_request=self._voice_request,
+        if composition is None:
+            if revision is None:
+                raise AssertionError("render requires a revision or exact composition")
+            composition, caption_style_fingerprints = (
+                project_factory.make_base_ai_comic_current_composition(
+                    loaded,
+                    self.image_runtime.base_inputs,
+                    revision=revision,
+                    voice_request=self._voice_request,
+                )
             )
-        )
+        else:
+            if revision is not None:
+                raise AssertionError("exact composition render must not rebuild by revision")
+            caption_style_fingerprints = (
+                project_factory.make_base_ai_comic_caption_style_fingerprints(
+                    loaded,
+                    self.image_runtime.base_inputs,
+                    composition,
+                )
+            )
+            revision = composition.revision
         timeline = resolve_composition(
             loaded, composition, renderer_version="0.7.103"
         )
@@ -846,22 +883,117 @@ class BaseAiComicE2ERuntime:
 
     def media_identity_snapshot(self) -> BaseAiComicMediaIdentitySnapshot:
         loaded = load_production_project(self.root / "project.yaml")
-        references = tuple(
-            request.references for request in self.image_runtime.provider_requests
+        assets = {item.asset_id: item for item in loaded.registry.assets}
+        image_asset_ids: list[str] = []
+        character_references: set[tuple[object, ...]] = set()
+        scene_references: set[tuple[object, ...]] = set()
+        request_evidence: list[tuple[Path, str, str]] = []
+        receipt_evidence: list[tuple[Path, str, str]] = []
+        image_attempts = tuple(
+            item
+            for item in loaded.manifest.attempts
+            if item.operation == "image_generation"
+            and item.status is StateCommitStatus.SUCCEEDED
+        )
+        for attempt in image_attempts:
+            summary = attempt.image_request
+            if summary is None or not attempt.candidate_image_asset_ids:
+                raise AssertionError("durable image attempt evidence is incomplete")
+            request_path = canonical_image_request_path(
+                summary.request_fingerprint
+            )
+            request_bytes = (self.root / request_path).read_bytes()
+            request = ImageGenerationRequest.model_validate_json(request_bytes)
+            if (
+                request.request_fingerprint != summary.request_fingerprint
+                or request.attempt_id != attempt.attempt_id
+                or request.output_asset_id not in attempt.candidate_image_asset_ids
+            ):
+                raise AssertionError("durable image request does not match attempt")
+            request_evidence.append(
+                (
+                    request_path,
+                    hashlib.sha256(request_bytes).hexdigest(),
+                    request.request_fingerprint,
+                )
+            )
+            for reference in request.references:
+                identity = (
+                    reference.creative_artifact_id,
+                    reference.creative_revision,
+                    reference.creative_content_hash,
+                    reference.asset_id,
+                    reference.asset_sha256,
+                )
+                if reference.role == "character":
+                    character_references.add(identity)
+                elif reference.role == "scene":
+                    scene_references.add(identity)
+            for asset_id in attempt.candidate_image_asset_ids:
+                asset = assets.get(asset_id)
+                if asset is None or asset.asset_type is not AssetType.IMAGE:
+                    raise AssertionError("durable image attempt asset is not active")
+                receipt_path = canonical_image_receipt_path(
+                    asset.creation_receipt_id
+                )
+                receipt_bytes = (self.root / receipt_path).read_bytes()
+                receipt = ImageProvenanceReceipt.model_validate_json(
+                    receipt_bytes
+                )
+                if (
+                    receipt.output_asset_id != asset_id
+                    or receipt.output_sha256 != asset.sha256
+                    or receipt.request_fingerprint != request.request_fingerprint
+                    or receipt.references != request.references
+                ):
+                    raise AssertionError(
+                        "durable image provenance does not match request and Registry"
+                    )
+                image_asset_ids.append(asset_id)
+                receipt_evidence.append(
+                    (
+                        receipt_path,
+                        hashlib.sha256(receipt_bytes).hexdigest(),
+                        receipt.content_hash,
+                    )
+                )
+        audio_assets = tuple(
+            sorted(
+                item.asset_id
+                for item in loaded.registry.assets
+                if item.asset_type is AssetType.VOICE
+            )
+        )
+        caption_assets = tuple(
+            sorted(
+                item.asset_id
+                for item in loaded.registry.assets
+                if item.asset_type is AssetType.CAPTION
+            )
+        )
+        caption_track_ids = tuple(
+            sorted(
+                item.caption_metadata.caption_track_id
+                for item in loaded.registry.assets
+                if item.asset_id in caption_assets
+                and item.caption_metadata is not None
+            )
         )
         return BaseAiComicMediaIdentitySnapshot(
             project=loaded.manifest.active_project,
             registry=loaded.manifest.active_registry,
-            assets=tuple(
-                sorted((item.asset_id, item.sha256) for item in loaded.registry.assets)
+            image_asset_ids=tuple(sorted(image_asset_ids)),
+            audio_asset_ids=audio_assets,
+            caption_asset_ids=caption_assets,
+            caption_track_ids=caption_track_ids,
+            character_references=tuple(sorted(character_references)),
+            scene_references=tuple(sorted(scene_references)),
+            image_request_evidence=tuple(
+                sorted(request_evidence, key=lambda item: item[0].as_posix())
             ),
-            characters=tuple(
-                sorted((item.character_id, item.content_hash) for item in loaded.characters)
+            image_receipt_evidence=tuple(
+                sorted(receipt_evidence, key=lambda item: item[0].as_posix())
             ),
-            scenes=tuple(
-                sorted((item.scene_id, item.content_hash) for item in loaded.scenes)
-            ),
-            references=references,
         )
 
     def _committer(self):
@@ -1237,6 +1369,10 @@ class BaseAiComicE2ERuntime:
         committer = self._committer()
         graph_payload = _canonical_json_bytes(graph)
         composition_payload = _canonical_json_bytes(composition)
+        composition_path = Path(
+            "state/repairs/candidates/"
+            f"composition.{composition.content_hash}.json"
+        )
         artifacts = tuple(
             sorted(
                 (
@@ -1257,10 +1393,7 @@ class BaseAiComicE2ERuntime:
                     ),
                     committer.prepare_artifact(
                         f"base-ai-comic-{mutation or 'layout'}-repair",
-                        Path(
-                            "state/repairs/candidates/"
-                            f"composition.{composition.content_hash}.json"
-                        ),
+                        composition_path,
                         composition_payload,
                     ),
                 ),
@@ -1293,17 +1426,38 @@ class BaseAiComicE2ERuntime:
                 approved_repair_receipt=approval.pointer,
             ),
             composition,
+            composition_path,
+            hashlib.sha256(composition_payload).hexdigest(),
             invalidated,
         )
 
     def commit_layout_repair(
         self, approval: BaseAiComicRepairApproval
     ) -> BaseAiComicRepairCommit:
-        request, composition, invalidated = self._layout_repair_commit_request(
-            approval
-        )
+        (
+            request,
+            composition,
+            composition_path,
+            composition_file_sha256,
+            invalidated,
+        ) = self._layout_repair_commit_request(approval)
         manifest = self._committer().commit(request)
-        result = BaseAiComicRepairCommit(composition, invalidated, manifest)
+        committed_bytes = (self.root / composition_path).read_bytes()
+        committed_composition = type(composition).model_validate_json(committed_bytes)
+        if (
+            hashlib.sha256(committed_bytes).hexdigest()
+            != composition_file_sha256
+            or not verify_artifact_hash(committed_composition)
+            or committed_composition != composition
+        ):
+            raise AssertionError("committed repair composition did not reopen exactly")
+        result = BaseAiComicRepairCommit(
+            committed_composition,
+            composition_path,
+            composition_file_sha256,
+            invalidated,
+            manifest,
+        )
         self._repair_commit = result
         return result
 
@@ -1460,7 +1614,7 @@ class BaseAiComicE2ERuntime:
                 attempt_id="base-ai-comic-stale-render-repair",
             )
             return
-        request, _, _ = self._layout_repair_commit_request(
+        request, _, _, _, _ = self._layout_repair_commit_request(
             approval, mutation=mutation
         )
         self._committer().commit(request)
