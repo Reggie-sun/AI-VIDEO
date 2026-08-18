@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   verify:
-    name: verify
+    name: mandatory-gate / verify
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:

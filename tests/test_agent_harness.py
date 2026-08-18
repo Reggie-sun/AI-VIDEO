@@ -112,7 +112,7 @@ def test_mandatory_gate_workflow_preserves_server_check_contract() -> None:
     assert workflow["on"] == {"pull_request": {"branches": ["main"]}}
     assert workflow["permissions"] == {"contents": "read"}
     verify_job = workflow["jobs"]["verify"]
-    assert verify_job["name"] == "verify"
+    assert verify_job["name"] == "mandatory-gate / verify"
     assert verify_job["env"] == {
         "BASE_SHA": "${{ github.event.pull_request.base.sha }}",
         "HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
