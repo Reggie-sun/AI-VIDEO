@@ -226,6 +226,13 @@ from ._state_commit_render_support import _StateCommitRenderSupportMixin
 from ._state_commit_review import _StateCommitReviewMixin
 from ._state_commit_transaction import _StateCommitTransactionMixin
 from ._state_commit_video import _StateCommitVideoMixin
+from ._state_commit_video_activation import _StateCommitVideoActivationMixin
+from ._state_commit_video_candidate import (
+    PreparedVideoCandidate,
+    VideoCandidatePreparer,
+    _StateCommitVideoCandidateMixin,
+)
+from ._state_commit_video_recovery import _StateCommitVideoRecoveryMixin
 from ._state_commit_voice_activation import _StateCommitVoiceActivationMixin
 from ._state_commit_voice_candidate import _StateCommitVoiceCandidateMixin
 from ._state_commit_voice_intent import _StateCommitVoiceIntentMixin
@@ -248,6 +255,8 @@ except ImportError:  # pragma: no cover - exercised through platform injection
 
 class ProductionStateCommitter(
     _StateCommitVideoMixin,
+    _StateCommitVideoCandidateMixin,
+    _StateCommitVideoActivationMixin,
     _StateCommitPaidProviderMixin,
     _StateCommitReviewMixin,
     _StateCommitRepairMixin,
@@ -262,6 +271,7 @@ class ProductionStateCommitter(
     _StateCommitDependencyMixin,
     _StateCommitRecoveryMixin,
     _StateCommitImageRecoveryMixin,
+    _StateCommitVideoRecoveryMixin,
     _StateCommitRecoveryAttemptsMixin,
     _StateCommitRecoveryFsMixin,
     _StateCommitTransactionMixin,
@@ -277,6 +287,7 @@ class ProductionStateCommitter(
         crash_injector: CrashInjector | None = None,
         voice_candidate_preparer: VoiceCandidatePreparer | None = None,
         image_candidate_preparer: ImageCandidatePreparer | None = None,
+        video_candidate_preparer: VideoCandidatePreparer | None = None,
         repair_authorizer: Callable[[RepairRequest], ActorIdentity | None] | None = None,
         paid_provider_authorizer: PaidProviderAuthorizer | None = None,
         paid_provider_clock: Callable[[], datetime] | None = None,
@@ -291,6 +302,7 @@ class ProductionStateCommitter(
         self._crash_injector = crash_injector or NoopCrashInjector()
         self._voice_candidate_preparer = voice_candidate_preparer
         self._image_candidate_preparer = image_candidate_preparer
+        self._video_candidate_preparer = video_candidate_preparer
         self._repair_authorizer = repair_authorizer
         self._paid_provider_authorizer = paid_provider_authorizer
         self._paid_provider_clock = paid_provider_clock or (

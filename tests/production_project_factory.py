@@ -4192,6 +4192,246 @@ def make_base_ai_comic_e2e_runtime(root: Path) -> "BaseAiComicE2ERuntime":
     )
 
 
+def make_p8_video_generation_base(root: Path):
+    """Materialize a fresh Manifest 2.7 / Registry 2.2 graph base."""
+
+    from ai_video.production.models import RegistryDependencyEvidence
+
+    write_production_project(root)
+    base_inputs = make_p5_dependency_inputs(root)
+    make_manifest_23_project(root)
+    loaded = load_production_project(root / "project.yaml")
+    registry = loaded.registry.model_copy(
+        update={
+            "schema_version": "2.2",
+            "revision_id": ZERO_HASH,
+            "content_hash": ZERO_HASH,
+        }
+    )
+    registry_hash = registry_semantic_sha256(registry)
+    registry = registry.model_copy(
+        update={"revision_id": registry_hash, "content_hash": registry_hash}
+    )
+    registry_bytes = _p7_json_bytes(registry.model_dump(mode="json"))
+    registry_path = Path(f"assets/registry.{registry_hash}.json")
+    (root / registry_path).write_bytes(registry_bytes)
+    pointer = RegistrySnapshotPointer(
+        path=registry_path,
+        revision_id=registry_hash,
+        content_hash=registry_hash,
+        file_sha256=hashlib.sha256(registry_bytes).hexdigest(),
+    )
+    states = tuple(
+        state.model_copy(
+            update={
+                "applied_evidence": state.applied_evidence.model_copy(
+                    update={"pointer": pointer}
+                )
+            }
+        )
+        if isinstance(state.applied_evidence, RegistryDependencyEvidence)
+        else state
+        for state in loaded.manifest.dependency_states
+    )
+    manifest = loaded.manifest.model_copy(
+        update={
+            "schema_version": "2.7",
+            "manifest_revision": loaded.manifest.manifest_revision + 1,
+            "active_registry": pointer,
+            "dependency_states": states,
+        }
+    )
+    (root / "state/manifest.json").write_text(
+        manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    selected = load_production_project(root / "project.yaml")
+    return replace(base_inputs, project=selected)
+
+
+def make_p8_video_candidate_preparer(base_inputs):
+    """Return a deterministic write-free generated-video candidate preparer."""
+
+    from ai_video.production._state_commit_video_candidate import (
+        PreparedVideoCandidate,
+        resolve_video_activation_dependency_state,
+    )
+    from ai_video.production.dependency import build_production_dependency_graph
+    from ai_video.production.models import DependencyGraphSnapshotPointer
+    from ai_video.production.paths import (
+        canonical_dependency_graph_snapshot_path,
+        canonical_image_shot_revision_path,
+    )
+
+    def prepare(
+        base_project,
+        request,
+        measured,
+        probe_receipt,
+        provenance,
+        asset_record,
+    ):
+        scope = request.activation_scope
+        assert scope is not None
+        original = scope.request
+        live_base_inputs = replace(base_inputs, project=base_project)
+        registry = base_project.registry.model_copy(
+            update={
+                "schema_version": "2.2",
+                "revision_id": ZERO_HASH,
+                "content_hash": ZERO_HASH,
+                "assets": (*base_project.registry.assets, asset_record),
+            }
+        )
+        registry_hash = registry_semantic_sha256(registry)
+        registry = registry.model_copy(
+            update={"revision_id": registry_hash, "content_hash": registry_hash}
+        )
+        registry_bytes = _p7_json_bytes(registry.model_dump(mode="json"))
+        registry_pointer = RegistrySnapshotPointer(
+            path=Path(f"assets/registry.{registry_hash}.json"),
+            revision_id=registry_hash,
+            content_hash=registry_hash,
+            file_sha256=hashlib.sha256(registry_bytes).hexdigest(),
+        )
+
+        base_shot = next(
+            item for item in base_project.shots
+            if item.shot_id == original.target_shot_id
+        )
+        candidate_shot = seal_artifact(
+            base_shot.model_copy(
+                update={
+                    "revision": base_shot.revision + 1,
+                    "content_hash": ZERO_HASH,
+                    "creation_receipt_id": provenance.content_hash,
+                    "visual_strategy": VisualStrategy.GENERATED_VIDEO,
+                    "generated_video_rationale": (
+                        f"Sealed generation {request.generation_id}."
+                    ),
+                    "required_asset_roles": tuple(
+                        role.model_copy(
+                            update={
+                                "asset_ids": (request.output_asset_id,),
+                                "allowed_asset_types": (AssetType.VIDEO,),
+                            }
+                        )
+                        if role.role == original.target_asset_role
+                        else role
+                        for role in base_shot.required_asset_roles
+                    ),
+                }
+            )
+        )
+        shot_path = canonical_image_shot_revision_path(
+            candidate_shot.revision, candidate_shot.content_hash
+        )
+        shot_bytes = yaml.safe_dump(
+            candidate_shot.model_dump(mode="json"),
+            sort_keys=True,
+            allow_unicode=True,
+        ).encode("utf-8")
+        project = seal_artifact(
+            base_project.project.model_copy(
+                update={
+                    "revision": base_project.project.revision + 1,
+                    "content_hash": ZERO_HASH,
+                    "creation_receipt_id": provenance.content_hash,
+                    "artifacts": base_project.project.artifacts.model_copy(
+                        update={
+                            "shots": tuple(
+                                ArtifactReference(
+                                    artifact_id=candidate_shot.artifact_id,
+                                    revision=candidate_shot.revision,
+                                    content_hash=candidate_shot.content_hash,
+                                    path=shot_path,
+                                )
+                                if item.artifact_id == candidate_shot.artifact_id
+                                else item
+                                for item in base_project.project.artifacts.shots
+                            )
+                        }
+                    ),
+                }
+            )
+        )
+        project_bytes = yaml.safe_dump(
+            project.model_dump(mode="json"), sort_keys=True, allow_unicode=True
+        ).encode("utf-8")
+        project_path = Path(
+            f"state/projects/project.{project.revision}.{project.content_hash}.yaml"
+        )
+        project_pointer = ProjectSnapshotPointer(
+            path=project_path,
+            revision=project.revision,
+            content_hash=project.content_hash,
+            file_sha256=hashlib.sha256(project_bytes).hexdigest(),
+        )
+        candidate = base_project.model_copy(
+            update={
+                "project": project,
+                "shots": tuple(
+                    candidate_shot if item.shot_id == candidate_shot.shot_id else item
+                    for item in base_project.shots
+                ),
+                "registry": registry,
+                "asset_paths": {
+                    **base_project.asset_paths,
+                    asset_record.asset_id: base_project.root / asset_record.artifact_path,
+                },
+                "manifest": base_project.manifest.model_copy(
+                    update={
+                        "active_project": project_pointer,
+                        "active_registry": registry_pointer,
+                    }
+                ),
+            }
+        )
+        candidate_inputs = replace(live_base_inputs, project=candidate)
+        graph = build_production_dependency_graph(candidate_inputs)
+        graph_bytes = _p7_json_bytes(graph.model_dump(mode="json"))
+        graph_pointer = DependencyGraphSnapshotPointer(
+            revision_id=graph.revision_id,
+            content_hash=graph.content_hash,
+            path=canonical_dependency_graph_snapshot_path(graph.revision_id),
+            file_sha256=hashlib.sha256(graph_bytes).hexdigest(),
+        )
+        candidate = candidate.model_copy(
+            update={
+                "manifest": candidate.manifest.model_copy(
+                    update={"active_dependency_graph": graph_pointer}
+                ),
+                "dependency_graph": graph,
+            }
+        )
+        candidate_inputs = replace(candidate_inputs, project=candidate)
+        resolution = resolve_video_activation_dependency_state(
+            graph=graph,
+            base_states=base_project.manifest.dependency_states,
+            project_pointer=project_pointer,
+            registry_pointer=registry_pointer,
+            target_shot_id=original.target_shot_id,
+            output_asset_id=request.output_asset_id,
+        )
+        return PreparedVideoCandidate(
+            base_inputs=live_base_inputs,
+            candidate_project=candidate,
+            candidate_registry=registry,
+            candidate_inputs=candidate_inputs,
+            candidate_graph=graph,
+            resolution=resolution,
+            candidate_project_pointer=project_pointer,
+            candidate_registry_pointer=registry_pointer,
+            candidate_graph_pointer=graph_pointer,
+            candidate_shot_path=shot_path,
+            candidate_shot_bytes=shot_bytes,
+            candidate_project_bytes=project_bytes,
+            candidate_registry_bytes=registry_bytes,
+            candidate_graph_bytes=graph_bytes,
+        )
+
+    return prepare
+
+
 def make_p8_video_evidence(root: Path, *, attempt_id: str = "video-attempt-1") -> dict:
     """Materialize read-only P8 video generation evidence for reopen tests.
 

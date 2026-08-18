@@ -105,7 +105,7 @@ checks:
     cwd: .
     description: Verify image contracts, local adapter, truthful import, activation, and recovery.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify paid-provider safety and generated-video contracts without live submit.
   full_tests:
@@ -326,13 +326,15 @@ categories:
       - src/ai_video/production/seedance_profile.py
       - src/ai_video/production/paid_provider.py
       - src/ai_video/production/video.py
+      - src/ai_video/production/video_artifact.py
       - src/ai_video/production/video_contracts.py
+      - src/ai_video/production/video_dependency.py
       - src/ai_video/production/video_fake.py
       - src/ai_video/production/video_generation.py
       - src/ai_video/production/_paid_provider_project_reader.py
       - src/ai_video/production/_video_project_reader.py
       - src/ai_video/production/_state_commit_paid_provider.py
-      - src/ai_video/production/_state_commit_video.py
+      - src/ai_video/production/_state_commit_video*.py
       - tests/test_production_paid_provider.py
       - tests/test_production_paid_provider_state.py
       - tests/test_production_paid_provider_e2e.py
@@ -342,6 +344,7 @@ categories:
       - tests/test_production_video.py
       - tests/test_production_video_fake.py
       - tests/test_production_video_state_recovery.py
+      - tests/test_production_generated_video_e2e.py
       - tests/paid_provider_support.py
       - tests/video_provider_contract.py
     check_ids:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import VideoAttemptPhase
@@ -205,10 +205,50 @@ class VideoGenerationService:
                 observation,
                 sink,
             )
+        pointer = self._committer.record_video_fetch_result(
+            attempt_id=attempt_id,
+            temporary_path=path,
+            receipt=fetch_receipt,
+        )
         return FetchedVideoCandidate(
-            relative_path=path,
+            relative_path=pointer.artifact_path,
             receipt=fetch_receipt,
         )
 
     def resume_next_action(self, *, attempt_id: str) -> str:
         return self._committer.video_resume_next_action(attempt_id=attempt_id)
+
+    def fetch_and_activate(
+        self,
+        *,
+        attempt_id: str,
+        probe: Callable[[int], dict] | None = None,
+    ):
+        """Finish only the durable next post-submit phases, replaying no effect."""
+
+        attempt, state = self._state(attempt_id)
+        if (
+            attempt.status.value == "succeeded"
+            and state.phase is VideoAttemptPhase.ACTIVATE
+        ):
+            return self._committer.replay_active_video_generation(
+                attempt_id=attempt_id
+            )
+        if state.phase is VideoAttemptPhase.FETCH:
+            self.fetch_once(attempt_id=attempt_id)
+            _, state = self._state(attempt_id)
+        if state.phase is VideoAttemptPhase.VALIDATE:
+            self._committer.prepare_video_activation_candidate(
+                attempt_id=attempt_id,
+                probe=probe,
+            )
+            _, state = self._state(attempt_id)
+        if state.phase is VideoAttemptPhase.CANDIDATE:
+            return self._committer.activate_video_candidate(
+                attempt_id=attempt_id
+            )
+        raise AiVideoError(
+            code=ErrorCode.PRODUCTION_STATE_INVALID,
+            user_message="Video post-fetch activation is not the next durable action.",
+            retryable=False,
+        )

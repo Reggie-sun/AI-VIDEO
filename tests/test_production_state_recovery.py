@@ -158,6 +158,25 @@ def test_recovery_preserves_complete_inactive_image_candidate_and_interrupts(
     }.issubset(preserved)
 
 
+def test_manifest_27_recovery_preserves_inactive_image_candidate(
+    committed_project: Path,
+) -> None:
+    candidate = _make_inactive_image_candidate(committed_project)
+    _write_manifest(
+        committed_project,
+        candidate.model_copy(update={"schema_version": "2.7"}),
+    )
+
+    report = ProductionStateCommitter(committed_project).recover()
+    recovered = _read_manifest(committed_project)
+    attempt = recovered.attempts[-1]
+
+    assert report.manifest_revision_after == report.manifest_revision_before + 1
+    assert recovered.schema_version == "2.7"
+    assert attempt.status is StateCommitStatus.INTERRUPTED
+    assert attempt.image_phase == "candidate"
+
+
 def test_recovery_rejects_mixed_image_project_registry_graph_tuple(
     committed_project: Path,
 ) -> None:
@@ -272,6 +291,26 @@ def test_recovery_reopens_active_image_submit_audit_without_durable_writes(
     assert report.manifest_revision_before == fixture["manifest"].manifest_revision
     assert report.manifest_revision_after == fixture["manifest"].manifest_revision
     assert _durable_tree_snapshot(tmp_path) == before
+
+
+def test_manifest_27_recovery_reports_active_image_evidence(tmp_path: Path) -> None:
+    fixture = project_factory.make_p7_committed_project(tmp_path)
+    upgraded = fixture["manifest"].model_copy(update={"schema_version": "2.7"})
+    _write_manifest(tmp_path, upgraded)
+    before = _durable_tree_snapshot(tmp_path)
+
+    report = ProductionStateCommitter(tmp_path).recover()
+
+    assert report.manifest_revision_before == upgraded.manifest_revision
+    assert report.manifest_revision_after == upgraded.manifest_revision
+    assert _durable_tree_snapshot(tmp_path) == before
+    active_paths = {
+        item.path
+        for item in report.items
+        if item.disposition is RecoveryDisposition.ACTIVE
+    }
+    assert fixture["request_path"] in active_paths
+    assert fixture["receipt_path"] in active_paths
 
 
 def test_recovery_marks_image_submit_outcome_unknown_and_same_request_never_resubmits(

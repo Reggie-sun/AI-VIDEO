@@ -364,6 +364,48 @@ class VideoProviderCapabilities(_VideoStrictModel):
         return cls.model_validate(data)
 
 
+class VideoActivationScope(_VideoStrictModel):
+    """Separately sealed authoring scope kept outside the legacy resolved hash."""
+
+    request: VideoGenerationRequest
+    usage_license: str = Field(min_length=1)
+    scope_fingerprint: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_scope(self) -> "VideoActivationScope":
+        if self.scope_fingerprint != canonical_sha256(
+            {
+                "schema": "ai-video-activation-scope/1",
+                "request": self.request.model_dump(mode="json"),
+                "usage_license": self.usage_license,
+            }
+        ):
+            raise ValueError("activation scope fingerprint does not match request")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        request: VideoGenerationRequest,
+        *,
+        usage_license: str = "provider-output",
+    ) -> "VideoActivationScope":
+        data = {"request": request, "usage_license": usage_license}
+        candidate = cls.model_construct(**data, scope_fingerprint="0" * 64)
+        return cls.model_validate(
+            {
+                **data,
+                "scope_fingerprint": canonical_sha256(
+                    {
+                        "schema": "ai-video-activation-scope/1",
+                        "request": candidate.request.model_dump(mode="json"),
+                        "usage_license": candidate.usage_license,
+                    }
+                ),
+            }
+        )
+
+
 class ResolvedVideoGenerationRequest(_VideoStrictModel):
     generation_id: str = Field(pattern=_SAFE_ID.pattern)
     request_input_hash: str = Field(pattern=_SHA256)
@@ -383,6 +425,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     effective_seed: int | None = Field(default=None, strict=True, ge=-1)
     effective_negative_prompt_text: str
     output_asset_id: str = Field(pattern=_SAFE_ID.pattern)
+    activation_scope: VideoActivationScope | None = None
     resolved_generation_hash: str = Field(pattern=_SHA256)
     desired_generation_fingerprint: str = Field(pattern=_SHA256)
 
@@ -397,7 +440,11 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     def _validate_seal(self) -> "ResolvedVideoGenerationRequest":
         data = self.model_dump(
             mode="json",
-            exclude={"resolved_generation_hash", "desired_generation_fingerprint"},
+            exclude={
+                "activation_scope",
+                "resolved_generation_hash",
+                "desired_generation_fingerprint",
+            },
         )
         schema = (
             "ai-video-resolved-request/3"
@@ -413,6 +460,24 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             raise ValueError("resolved_generation_hash does not match resolved request")
         if self.desired_generation_fingerprint != expected:
             raise ValueError("desired generation fingerprint must equal resolved hash")
+        scope = self.activation_scope
+        if scope is not None:
+            request = scope.request
+            if (
+                request.generation_id != self.generation_id
+                or request.request_input_hash != self.request_input_hash
+                or request.provider_name != self.provider_name
+                or request.provider_kind != self.provider_kind
+                or request.model_id != self.model_id
+                or request.provider_profile != self.provider_profile
+                or request.mode is not self.mode
+                or request.prompt_text != self.prompt_text
+                or request.image_bindings != self.image_bindings
+                or request.media_bindings != self.media_bindings
+                or request.output_requirement != self.effective_output
+                or request.output_asset_id != self.output_asset_id
+            ):
+                raise ValueError("activation scope does not match resolved request")
         return self
 
     def _uses_extended_contract(self) -> bool:
@@ -538,6 +603,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             "effective_seed": effective_seed,
             "effective_negative_prompt_text": effective_negative_prompt_text,
             "output_asset_id": request.output_asset_id,
+            "activation_scope": VideoActivationScope.create(request),
         }
         candidate = cls.model_construct(
             **data,
@@ -546,7 +612,11 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
         )
         fingerprint_data = candidate.model_dump(
             mode="json",
-            exclude={"resolved_generation_hash", "desired_generation_fingerprint"},
+            exclude={
+                "activation_scope",
+                "resolved_generation_hash",
+                "desired_generation_fingerprint",
+            },
             warnings=False,
         )
         schema = (
@@ -1024,6 +1094,7 @@ __all__ = [
     "BillingKind",
     "ProviderProfilePointer",
     "ResolvedVideoGenerationRequest",
+    "VideoActivationScope",
     "VideoCapabilityVariant",
     "VideoExecutionKind",
     "VideoFetchReceipt",

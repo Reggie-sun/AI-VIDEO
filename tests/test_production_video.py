@@ -11,9 +11,18 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
     ActorIdentity,
     DependencyGraphSnapshotPointer,
+    FinalAcceptanceReceiptPointer,
+    FinalAcceptanceState,
+    ProductionManifest,
     ProjectSnapshotPointer,
+    QaLayer,
+    QaPolicyPointer,
     RegistrySnapshotPointer,
+    ReviewLayerState,
+    ReviewLifecycle,
+    ReviewReceiptPointer,
 )
+from ai_video.production._state_commit_common import _validated_transition
 from ai_video.production import video as video_contracts
 from ai_video.production.paid_provider import (
     DurablePaidProviderSubmitPermit,
@@ -86,6 +95,71 @@ def _profile(*, version: str = "hailuo-v1") -> ProviderProfilePointer:
         profile_path=Path(f"provider-profiles/{HASH_D}.json"),
         profile_sha256=HASH_D,
     )
+
+
+def test_manifest_27_identity_transition_stales_existing_p6_acceptance() -> None:
+    review = ReviewReceiptPointer(
+        path=Path(f"state/reviews/review.{HASH_A}.json"),
+        review_id="review-before-video",
+        layer=QaLayer.TECHNICAL,
+        content_hash=HASH_A,
+        file_sha256=HASH_B,
+    )
+    final_receipt = FinalAcceptanceReceiptPointer(
+        path=Path(f"state/acceptance/final.{HASH_B}.json"),
+        acceptance_id="acceptance-before-video",
+        content_hash=HASH_B,
+        file_sha256=HASH_C,
+    )
+    manifest = ProductionManifest(
+        schema_version="2.7",
+        project_id="p8-p6-staleness",
+        manifest_revision=1,
+        active_project=_project_pointer(),
+        active_registry=_registry_pointer(),
+        active_dependency_graph=_graph_pointer(),
+        active_qa_policy=QaPolicyPointer(
+            path=Path(f"state/reviews/policy.{HASH_C}.json"),
+            policy_id="qa-before-video",
+            policy_version="1",
+            content_hash=HASH_C,
+            file_sha256=HASH_D,
+        ),
+        active_review_receipts=(review,),
+        review_states=(
+            ReviewLayerState(
+                layer=QaLayer.TECHNICAL,
+                desired_fingerprint=HASH_A,
+                applied_fingerprint=HASH_A,
+                lifecycle=ReviewLifecycle.FRESH,
+                active_receipt=review,
+            ),
+        ),
+        final_acceptance_state=FinalAcceptanceState(
+            desired_fingerprint=HASH_B,
+            applied_fingerprint=HASH_B,
+            lifecycle=ReviewLifecycle.FRESH,
+            active_receipt=final_receipt,
+        ),
+    )
+    next_project = ProjectSnapshotPointer(
+        path=Path(f"state/projects/project.2.{HASH_D}.yaml"),
+        revision=2,
+        content_hash=HASH_D,
+        file_sha256=HASH_A,
+    )
+
+    transitioned = _validated_transition(
+        manifest,
+        {"active_project": next_project},
+    )
+
+    assert transitioned.active_project == next_project
+    assert transitioned.active_qa_policy == manifest.active_qa_policy
+    assert transitioned.active_review_receipts == ()
+    assert transitioned.review_states[0].lifecycle is ReviewLifecycle.STALE
+    assert transitioned.review_states[0].active_receipt is None
+    assert transitioned.final_acceptance_state is None
 
 
 def _first_frame() -> VideoImageReferenceBinding:
@@ -314,6 +388,16 @@ def test_extended_media_request_is_sealed_and_keeps_legacy_hashes_stable():
     assert _resolved().resolved_generation_hash == (
         "525d9e08851e766a14e000da2f37ce8dcf165db0c0283169074863021eacb8e7"
     )
+    resolved = _resolved()
+    assert resolved.activation_scope is not None
+    assert resolved.activation_scope.request == _request()
+    assert resolved.activation_scope.request.request_input_hash == resolved.request_input_hash
+
+    dumped = resolved.model_dump(mode="json")
+    scope = dumped["activation_scope"]
+    scope["request"]["target_shot_id"] = "shot-tampered"
+    with pytest.raises(ValidationError, match="request_input_hash|activation scope"):
+        ResolvedVideoGenerationRequest.model_validate(dumped)
 
     binding_type = getattr(video_contracts, "VideoMediaReferenceBinding", None)
     output_type = getattr(video_contracts, "VideoFlexibleOutputRequirement", None)

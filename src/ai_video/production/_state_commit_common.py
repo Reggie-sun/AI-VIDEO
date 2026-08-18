@@ -242,7 +242,7 @@ def _validated_transition(
 ) -> ProductionManifest | StateCommitAttempt:
     if isinstance(model, ProductionManifest) and (
         model.schema_version == "2.4"
-        or (model.schema_version in {"2.5", "2.6"} and has_p6_state(model))
+        or (model.schema_version in {"2.5", "2.6", "2.7"} and has_p6_state(model))
     ):
         identity_fields = (
             "active_project",

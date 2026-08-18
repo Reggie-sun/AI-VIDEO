@@ -100,6 +100,19 @@ from ai_video.production.image_import import (
     prepare_human_image_import_commit,
     validate_human_image_import,
 )
+from ai_video.production.video import (
+    ResolvedVideoGenerationRequest,
+    VideoFetchReceipt,
+    VideoGenerationPreview,
+    VideoGenerationRequest,
+    VideoProvider,
+    VideoProviderCapabilities,
+    VideoSubmission,
+    VideoSubmitResult,
+    VideoTaskObservation,
+    VideoTaskState,
+)
+from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
@@ -192,6 +205,17 @@ __all__ = [
     "VoiceAssetProvider",
     "VoiceGenerationRequest",
     "VoiceProviderResult",
+    "ResolvedVideoGenerationRequest",
+    "VideoFetchReceipt",
+    "VideoGenerationPreview",
+    "VideoGenerationRequest",
+    "VideoGenerationService",
+    "VideoProvider",
+    "VideoProviderCapabilities",
+    "VideoSubmission",
+    "VideoSubmitResult",
+    "VideoTaskObservation",
+    "VideoTaskState",
     "load_production_project",
     "load_paid_provider_budget",
     "load_paid_provider_gate_receipt",

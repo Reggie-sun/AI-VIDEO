@@ -237,13 +237,22 @@ def test_nested_globstar_cache_paths_are_ignored() -> None:
 def test_video_recovery_change_routes_to_video_provider_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
-    report = agent_harness.inspect_paths(
-        ["tests/test_production_video_state_recovery.py"], policy
-    )
+    for path in (
+        "src/ai_video/production/video_artifact.py",
+        "src/ai_video/production/video_dependency.py",
+        "src/ai_video/production/_state_commit_video_candidate.py",
+        "src/ai_video/production/_state_commit_video_activation.py",
+        "src/ai_video/production/_state_commit_video_recovery.py",
+        "tests/test_production_video_state_recovery.py",
+        "tests/test_production_generated_video_e2e.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert "production_video_provider" in report["categories"]
+        assert "production_video_provider_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
 
-    assert report["categories"] == ["production_video_provider"]
-    assert "production_video_provider_tests" in report["check_ids"]
-    assert "task_architecture_gate" in report["check_ids"]
+    provider_argv = policy["checks"]["production_video_provider_tests"]["argv"]
+    assert "tests/test_production_generated_video_e2e.py" in provider_argv
 
 
 def test_minimax_adapters_route_to_video_provider_suite() -> None:

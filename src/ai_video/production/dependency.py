@@ -32,7 +32,6 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
     AssetRecord,
-    AssetSourceKind,
     AssetType,
     CompositionSpec,
     DependencyEdge,
@@ -58,6 +57,10 @@ from ai_video.production.models import (
 )
 from ai_video.production.audio import VoiceGenerationRequest
 from ai_video.production.paths import canonical_dependency_graph_snapshot_path
+from ai_video.production.video_dependency import (
+    generated_video_semantic_fingerprint,
+    visual_asset_dependency_reason,
+)
 
 __all__ = [
     "DependencyResolution",
@@ -1370,6 +1373,8 @@ def build_production_dependency_graph(
         }
         if role is DependencySemanticRole.VOICE and request is not None:
             contribution_values["voice.semantic"] = voice_semantic_projection_fingerprint(request)
+        elif (video_fingerprint := generated_video_semantic_fingerprint(asset)) is not None:
+            contribution_values["video.generation"] = video_fingerprint
         elif role is DependencySemanticRole.CAPTION and asset.caption_metadata is not None:
             metadata = asset.caption_metadata
             binding = caption_bindings_by_asset.get(asset.asset_id)
@@ -1451,15 +1456,10 @@ def build_production_dependency_graph(
                 asset = assets_by_id[asset_id]
                 if _asset_role(asset) is not DependencySemanticRole.VISUAL:
                     continue
-                reason = (
-                    DependencyReason.GENERATION_INPUT
-                    if asset.source_kind is AssetSourceKind.GENERATED
-                    else DependencyReason.ASSET_BINDING
-                )
                 add_edge(
                     shot_projection_ids[(shot.shot_id, DependencySemanticRole.VISUAL)],
                     asset_node_id(asset_id),
-                    reason,
+                    visual_asset_dependency_reason(asset),
                     "asset.visual_input",
                     {"shot_id": shot.shot_id, "asset_id": asset_id},
                 )

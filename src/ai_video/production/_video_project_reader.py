@@ -7,24 +7,40 @@ from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._paid_provider_project_reader import (
+    load_paid_provider_budget_by_content_hash,
     load_paid_provider_gate_receipt,
     load_paid_provider_submit_receipt,
 )
 from ai_video.production.models import (
+    AssetSourceKind,
+    AssetType,
+    LoadedProductionProject,
+    PaidProviderAttemptPhase,
     ProductionManifest,
+    StateCommitStatus,
     VideoAttemptPhase,
     VideoFetchReceiptPointer,
     VideoGenerationAttemptState,
     VideoRequestReceiptPointer,
     VideoStatusReceiptPointer,
 )
-from ai_video.production.paths import _read_regular_file_nofollow, resolve_contained_path
+from ai_video.production.paid_provider import BudgetReservationStatus
+from ai_video.production.paths import (
+    _read_regular_file_nofollow,
+    canonical_video_probe_receipt_path,
+    canonical_video_provenance_receipt_path,
+    resolve_contained_path,
+)
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
+    VideoSubmission,
     VideoTaskObservation,
     VideoTaskState,
-    VideoSubmission,
+)
+from ai_video.production.video_artifact import (
+    VideoProbeReceipt,
+    VideoProvenanceReceipt,
 )
 
 
@@ -196,7 +212,149 @@ def verify_video_evidence(
         raise _invalid("Video generation request ownership is ambiguous.")
 
 
-def verify_manifest_video_evidence(root: Path, manifest: ProductionManifest) -> None:
+def _load_video_receipt(root: Path, path: Path, model, label: str):
+    try:
+        raw = _read_regular_file_nofollow(
+            root / path,
+            contained_by=root / "state" / "video-generation",
+        )
+        receipt = model.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid(f"Could not reopen {label}.", str(exc)) from exc
+    return receipt
+
+
+def _verify_active_generated_video(
+    bundle: LoadedProductionProject,
+    attempt,
+    request: ResolvedVideoGenerationRequest,
+) -> None:
+    state = attempt.video_generation_state
+    if state is None:
+        raise _invalid("Active video generation attempt has no lifecycle state.")
+    if (
+        attempt.status is not StateCommitStatus.SUCCEEDED
+        or state.phase is not VideoAttemptPhase.ACTIVATE
+        or attempt.candidate_project != bundle.manifest.active_project
+        or attempt.candidate_registry != bundle.manifest.active_registry
+        or attempt.candidate_dependency_graph
+        != bundle.manifest.active_dependency_graph
+        or state.candidate_video_asset_ids != (request.output_asset_id,)
+    ):
+        raise _invalid("Active generated video selection is not exact.")
+    assets = {
+        asset.asset_id: asset for asset in bundle.registry.assets
+    }
+    asset = assets.get(request.output_asset_id)
+    if (
+        asset is None
+        or asset.asset_type is not AssetType.VIDEO
+        or asset.source_kind is not AssetSourceKind.GENERATED
+        or asset.video_metadata is None
+        or asset.input_fingerprint != request.resolved_generation_hash
+        or asset.video_metadata.request_receipt_fingerprint
+        != request.desired_generation_fingerprint
+        or asset.video_metadata.resolved_generation_hash
+        != request.resolved_generation_hash
+    ):
+        raise _invalid("Active generated video Registry evidence is invalid.")
+    try:
+        artifact = _read_regular_file_nofollow(
+            bundle.asset_paths[asset.asset_id],
+            contained_by=bundle.root / "assets",
+        )
+    except (KeyError, OSError, ValueError) as exc:
+        raise _invalid("Could not reopen active generated video asset.", str(exc)) from exc
+    if artifact.file_sha256 != asset.sha256 or len(artifact.data) != asset.size_bytes:
+        raise _invalid("Active generated video bytes do not match the Registry.")
+
+    metadata = asset.video_metadata
+    probe = _load_video_receipt(
+        bundle.root,
+        canonical_video_probe_receipt_path(metadata.probe_receipt_id),
+        VideoProbeReceipt,
+        "active generated video probe receipt",
+    )
+    provenance = _load_video_receipt(
+        bundle.root,
+        canonical_video_provenance_receipt_path(metadata.provenance_receipt_id),
+        VideoProvenanceReceipt,
+        "active generated video provenance receipt",
+    )
+    observation = (
+        load_video_status_receipt(bundle.root, state.latest_observation)
+        if state.latest_observation is not None
+        else None
+    )
+    fetch = (
+        load_video_fetch_receipt(bundle.root, state.fetch_receipt)
+        if state.fetch_receipt is not None
+        else None
+    )
+    paid_state = attempt.paid_provider_state
+    historical_budget = (
+        load_paid_provider_budget_by_content_hash(bundle.root, asset.cost_receipt_id)
+        if asset.cost_receipt_id is not None
+        else None
+    )
+    reservation = next(
+        (
+            item
+            for item in historical_budget.reservations
+            if paid_state is not None and item.reservation_id == paid_state.reservation_id
+        ),
+        None,
+    ) if historical_budget is not None else None
+    if (
+        probe.content_hash != metadata.probe_receipt_id
+        or probe.request_receipt_fingerprint
+        != request.desired_generation_fingerprint
+        or probe.resolved_generation_hash != request.resolved_generation_hash
+        or probe.measured.artifact_sha256 != asset.sha256
+        or probe.measured.size_bytes != asset.size_bytes
+        or probe.measured.width != metadata.width
+        or probe.measured.height != metadata.height
+        or probe.measured.fps_numerator != metadata.fps_numerator
+        or probe.measured.fps_denominator != metadata.fps_denominator
+        or probe.measured.duration_milliseconds != metadata.duration_milliseconds
+        or probe.measured.frame_count != metadata.frame_count
+        or provenance.content_hash != metadata.provenance_receipt_id
+        or provenance.generation_id != request.generation_id
+        or provenance.request_receipt_fingerprint
+        != request.desired_generation_fingerprint
+        or provenance.resolved_generation_hash != request.resolved_generation_hash
+        or provenance.provider_kind != request.provider_kind
+        or provenance.model_id != request.model_id
+        or provenance.profile_sha256 != request.provider_profile.profile_sha256
+        or provenance.artifact_sha256 != asset.sha256
+        or provenance.probe_receipt_id != probe.content_hash
+        or observation is None
+        or fetch is None
+        or provenance.paid_submit_receipt_fingerprint
+        != fetch.paid_submit_receipt_fingerprint
+        or provenance.observation_fingerprint
+        != observation.observation_fingerprint
+        or provenance.fetch_fingerprint != fetch.fetch_fingerprint
+        or provenance.provider_file_id != fetch.provider_file_id
+        or asset.creation_receipt_id != provenance.content_hash
+        or asset.usage_license != provenance.usage_license
+        or paid_state is None
+        or paid_state.phase is not PaidProviderAttemptPhase.SETTLED
+        or reservation is None
+        or reservation.status is not BudgetReservationStatus.SETTLED
+        or reservation.attempt_id != attempt.attempt_id
+        or reservation.request_fingerprint != request.resolved_generation_hash
+        or reservation.submit_receipt_fingerprint
+        != provenance.paid_submit_receipt_fingerprint
+        or reservation.actual_cost_microunits is None
+    ):
+        raise _invalid("Active generated video provenance chain is invalid.")
+
+
+def verify_manifest_video_evidence(
+    bundle: LoadedProductionProject, manifest: ProductionManifest
+) -> None:
+    root = bundle.root
     states: list[VideoGenerationAttemptState] = []
     for attempt in manifest.attempts:
         state = attempt.video_generation_state
@@ -218,4 +376,12 @@ def verify_manifest_video_evidence(root: Path, manifest: ProductionManifest) -> 
             or gate.preview.model_id != request.model_id
         ):
             raise _invalid("Video attempt does not match its exact Paid Provider Gate.")
+        if (
+            state.phase is VideoAttemptPhase.ACTIVATE
+            and attempt.candidate_project == manifest.active_project
+            and attempt.candidate_registry == manifest.active_registry
+            and attempt.candidate_dependency_graph
+            == manifest.active_dependency_graph
+        ):
+            _verify_active_generated_video(bundle, attempt, request)
     verify_video_evidence(root, states)

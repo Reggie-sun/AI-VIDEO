@@ -90,6 +90,7 @@ from ai_video.production.models import (
     VersionedArtifact,
 )
 from ai_video.production.visual_media import visual_payload_matches
+from ai_video.production.video_dependency import generated_video_semantic_fingerprint
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_audio_asset_path,
@@ -1299,9 +1300,7 @@ def _verify_dependency_registry_evidence(
     input_artifact_ids = (
         request.input_artifact_ids if request is not None else asset.input_artifact_ids
     )
-    input_fingerprint = (
-        request.input_fingerprint if request is not None else asset.input_fingerprint
-    )
+    input_fingerprint = request.input_fingerprint if request else asset.input_fingerprint
     expected = {
         "asset.inputs": _fp(
             "ai-video-asset-inputs/1",
@@ -1313,8 +1312,9 @@ def _verify_dependency_registry_evidence(
     }
     if request is not None:
         expected["voice.semantic"] = voice_semantic_projection_fingerprint(request)
-    metadata = asset.caption_metadata
-    if metadata is not None:
+    elif (video_fingerprint := generated_video_semantic_fingerprint(asset)) is not None:
+        expected["video.generation"] = video_fingerprint
+    elif (metadata := asset.caption_metadata) is not None:
         expected["caption.timing"] = metadata.timing_fingerprint
         if metadata.style_reference_id is None:
             expected["caption.style"] = _fp("ai-video-caption-style-none/1", None)
@@ -1340,7 +1340,7 @@ def _verify_dependency_registry_evidence(
             expected["caption.style"] = caption_style_fingerprint(
                 style_reference, style.data
             )
-    elif request is None:
+    else:
         expected["asset.bytes"] = asset.sha256
     audio = asset.audio_metadata
     if audio is not None:
@@ -1664,7 +1664,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     _verify_active_voice_evidence(bundle)
     verify_active_image_evidence(bundle)
     verify_paid_provider_evidence(root, manifest)
-    verify_manifest_video_evidence(root, manifest)
+    verify_manifest_video_evidence(bundle, manifest)
     if manifest.active_dependency_graph is not None:
         dependency_graph = _load_active_dependency_graph(
             root, manifest.active_dependency_graph

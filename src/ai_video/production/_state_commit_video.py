@@ -11,6 +11,7 @@ from typing import BinaryIO
 
 from ai_video.errors import ErrorCode
 from ai_video.production._video_project_reader import (
+    load_video_fetch_receipt,
     load_video_request_receipt,
     load_video_status_receipt,
 )
@@ -20,16 +21,21 @@ from ai_video.production.models import (
     StateCommitAttempt,
     StateCommitStatus,
     VideoAttemptPhase,
+    VideoFetchReceiptPointer,
     VideoGenerationAttemptState,
     VideoRequestReceiptPointer,
     VideoStatusReceiptPointer,
 )
 from ai_video.production.paths import (
+    _read_regular_file_nofollow,
+    canonical_video_fetch_artifact_path,
+    canonical_video_fetch_receipt_path,
     canonical_video_request_receipt_path,
     canonical_video_status_receipt_path,
 )
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
+    VideoFetchReceipt,
     VideoSubmission,
     VideoTaskObservation,
     VideoTaskState,
@@ -78,6 +84,11 @@ class _StateCommitVideoMixin:
         self, pointer: VideoStatusReceiptPointer
     ) -> VideoTaskObservation:
         return load_video_status_receipt(self._project_root, pointer)
+
+    def _reopen_video_fetch(
+        self, pointer: VideoFetchReceiptPointer
+    ) -> VideoFetchReceipt:
+        return load_video_fetch_receipt(self._project_root, pointer)
 
     def begin_video_generation(
         self,
@@ -320,6 +331,106 @@ class _StateCommitVideoMixin:
             VideoAttemptPhase.CANDIDATE: "activate",
             VideoAttemptPhase.ACTIVATE: "done",
         }[state.phase]
+
+    def record_video_fetch_result(
+        self,
+        *,
+        attempt_id: str,
+        temporary_path: Path,
+        receipt: VideoFetchReceipt,
+    ) -> VideoFetchReceiptPointer:
+        """Promote exact fetched bytes and receipt before local validation."""
+
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            attempt = self._video_attempt(manifest, attempt_id)
+            state = attempt.video_generation_state
+            if (
+                attempt.status is not StateCommitStatus.RUNNING
+                or state is None
+                or state.phase is not VideoAttemptPhase.FETCH
+                or state.latest_observation is None
+                or state.paid_submit_receipt is None
+            ):
+                raise _state_invalid(
+                    "Video fetch result requires the exact durable fetch phase."
+                )
+            observation = self._reopen_video_status(state.latest_observation)
+            if (
+                observation.state is not VideoTaskState.SUCCEEDED
+                or receipt.observation_fingerprint
+                != observation.observation_fingerprint
+                or receipt.paid_submit_receipt_fingerprint
+                != state.paid_submit_receipt.submit_receipt_fingerprint
+                or receipt.provider_file_id != observation.provider_file_id
+            ):
+                raise _state_invalid(
+                    "Video fetch receipt does not match the durable succeeded task."
+                )
+            try:
+                snapshot = _read_regular_file_nofollow(
+                    self._project_root / temporary_path,
+                    contained_by=(
+                        self._project_root / "state" / "video-generation" / "fetch"
+                    ),
+                )
+            except (OSError, ValueError) as exc:
+                raise _state_invalid("Fetched video path is unsafe.", str(exc)) from exc
+            if (
+                snapshot.file_sha256 != receipt.artifact_sha256
+                or snapshot.size_bytes != receipt.size_bytes
+            ):
+                raise _state_invalid(
+                    "Fetched video bytes do not match the Provider receipt."
+                )
+            artifact_path = canonical_video_fetch_artifact_path(
+                receipt.artifact_sha256
+            )
+            artifact = PreparedArtifact(
+                relative_path=artifact_path,
+                payload=snapshot.data,
+                file_sha256=snapshot.file_sha256,
+            )
+            receipt_artifact = _artifact(
+                canonical_video_fetch_receipt_path(receipt.fetch_fingerprint),
+                receipt,
+            )
+            for prepared in (artifact, receipt_artifact):
+                self._write_immutable_artifact(prepared, attempt_id=attempt_id)
+            pointer = VideoFetchReceiptPointer(
+                path=receipt_artifact.relative_path,
+                fetch_fingerprint=receipt.fetch_fingerprint,
+                artifact_path=artifact_path,
+                artifact_sha256=receipt.artifact_sha256,
+                artifact_size_bytes=receipt.size_bytes,
+                file_sha256=receipt_artifact.file_sha256,
+            )
+            self._reopen_video_fetch(pointer)
+            next_state = state.model_copy(
+                update={
+                    "phase": VideoAttemptPhase.VALIDATE,
+                    "fetch_receipt": pointer,
+                }
+            )
+            next_attempt = _validated_transition(
+                attempt, {"video_generation_state": next_state}
+            )
+            next_manifest = _validated_transition(
+                manifest,
+                {
+                    "manifest_revision": manifest.manifest_revision + 1,
+                    "attempts": tuple(
+                        next_attempt if item.attempt_id == attempt_id else item
+                        for item in manifest.attempts
+                    ),
+                },
+            )
+            self._write_manifest_atomic(next_manifest)
+            try:
+                (self._project_root / temporary_path).unlink(missing_ok=True)
+            except OSError:
+                pass
+            return pointer
 
     @contextmanager
     def prepare_video_fetch_sink(

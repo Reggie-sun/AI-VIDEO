@@ -21,6 +21,9 @@ PRIVATE_MODULES = (
     "_state_commit_voice_intent.py",
     "_state_commit_voice_candidate.py",
     "_state_commit_voice_activation.py",
+    "_state_commit_video_candidate.py",
+    "_state_commit_video_activation.py",
+    "_state_commit_video_recovery.py",
     "_state_commit_recovery.py",
     "_state_commit_recovery_attempts.py",
     "_state_commit_recovery_fs.py",
@@ -170,14 +173,27 @@ def test_image_candidate_and_activation_methods_have_private_domain_owners() -> 
     assert committer.activate_image_asset.__module__ == activation.__name__
 
 
+def test_video_candidate_and_activation_methods_have_private_domain_owners() -> None:
+    facade = importlib.import_module("ai_video.production.state_commit")
+    candidate = importlib.import_module(
+        "ai_video.production._state_commit_video_candidate"
+    )
+    activation = importlib.import_module(
+        "ai_video.production._state_commit_video_activation"
+    )
+    committer = facade.ProductionStateCommitter
+    assert committer.prepare_video_activation_candidate.__module__ == candidate.__name__
+    assert committer.activate_video_candidate.__module__ == activation.__name__
+
+
 def test_recovery_methods_have_domain_owners() -> None:
     facade = importlib.import_module("ai_video.production.state_commit")
     recovery = importlib.import_module("ai_video.production._state_commit_recovery")
-    attempts = importlib.import_module("ai_video.production._state_commit_recovery_attempts")
+    video = importlib.import_module("ai_video.production._state_commit_video_recovery")
     recovery_fs = importlib.import_module("ai_video.production._state_commit_recovery_fs")
     committer = facade.ProductionStateCommitter
     assert committer.recover.__module__ == recovery.__name__
-    assert committer._recover_attempts.__module__ == attempts.__name__
+    assert committer._recover_attempts.__module__ == video.__name__
     assert committer._remove_recovery_temp.__module__ == recovery_fs.__name__
     assert committer._require_recovery_file_hash.__module__ == recovery_fs.__name__
 
@@ -188,6 +204,8 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         owner.__name__ for owner in facade.ProductionStateCommitter.__mro__[1:-1]
     ) == (
         "_StateCommitVideoMixin",
+        "_StateCommitVideoCandidateMixin",
+        "_StateCommitVideoActivationMixin",
         "_StateCommitPaidProviderMixin",
         "_StateCommitReviewMixin",
         "_StateCommitRepairMixin",
@@ -202,6 +220,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         "_StateCommitDependencyMixin",
         "_StateCommitRecoveryMixin",
         "_StateCommitImageRecoveryMixin",
+        "_StateCommitVideoRecoveryMixin",
         "_StateCommitRecoveryAttemptsMixin",
         "_StateCommitRecoveryFsMixin",
         "_StateCommitTransactionMixin",

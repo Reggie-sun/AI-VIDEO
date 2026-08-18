@@ -20,7 +20,11 @@ from ai_video.production.paid_provider import (
     PaidProviderSubmitReceipt,
     PaidProviderSubmitOutcome,
 )
-from ai_video.production.paths import _read_regular_file_nofollow, resolve_contained_path
+from ai_video.production.paths import (
+    _read_regular_file_nofollow,
+    canonical_paid_provider_budget_path,
+    resolve_contained_path,
+)
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -58,6 +62,24 @@ def load_paid_provider_budget(
         or budget.content_hash != pointer.content_hash
     ):
         raise _invalid("Paid Provider budget pointer identity is invalid.")
+    return budget
+
+
+def load_paid_provider_budget_by_content_hash(
+    root: str | Path, content_hash: str
+) -> PaidProviderBudgetSnapshot:
+    """Reopen one immutable historical budget by its sealed content identity."""
+
+    resolved_root, resolved = _root_and_path(
+        root, canonical_paid_provider_budget_path(content_hash)
+    )
+    try:
+        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        budget = PaidProviderBudgetSnapshot.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen historical paid Provider budget.", str(exc)) from exc
+    if budget.content_hash != content_hash:
+        raise _invalid("Historical paid Provider budget identity is invalid.")
     return budget
 
 
