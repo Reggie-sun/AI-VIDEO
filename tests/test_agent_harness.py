@@ -112,7 +112,15 @@ def test_mandatory_gate_workflow_preserves_server_check_contract() -> None:
     assert workflow["on"] == {"pull_request": {"branches": ["main"]}}
     assert workflow["permissions"] == {"contents": "read"}
     verify_job = workflow["jobs"]["verify"]
-    assert verify_job["name"] == "verify"
+    assert verify_job["name"] == "mandatory-gate / verify"
+    assert verify_job["env"] == {
+        "BASE_SHA": "${{ github.event.pull_request.base.sha }}",
+        "HEAD_SHA": "${{ github.event.pull_request.head.sha }}",
+        "HARNESS_RUN_ID": (
+            "pr-${{ github.event.pull_request.number }}-"
+            "${{ github.run_id }}-${{ github.run_attempt }}"
+        ),
+    }
     steps = {step["name"]: step for step in verify_job["steps"]}
     checkout = steps["Check out exact PR head"]
     assert checkout["uses"] == (
@@ -137,6 +145,7 @@ def test_mandatory_gate_workflow_preserves_server_check_contract() -> None:
     assert ".agent/harness/runs/${{ env.HARNESS_RUN_ID }}/" in upload["with"][
         "path"
     ]
+    assert upload["with"]["include-hidden-files"] is True
 
 
 def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
