@@ -1,0 +1,118 @@
+{
+  "adapter_contract_version": "1",
+  "binding_path": "workflows/bindings/p7_1_qwen_image_edit_2511_binding.yaml",
+  "binding_sha256": "d575b94c3b810742687f05f634aa40e0ded7eb85741b2b74831d4ab6b1cf7f55",
+  "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+  "components": [
+    {
+      "filename": "qwen_image_edit_2511_bf16.safetensors",
+      "precision": "bf16",
+      "quantization": null,
+      "role": "diffusion",
+      "sha256": "ae42d927b5fac4f278b9a894554c727e619727a63622976f2d95625be4bce08c",
+      "size_bytes": 40861031560,
+      "source_repository_id": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+      "source_revision": "984166f60a9b1fcede5e9b9287b7a7aebc050010"
+    },
+    {
+      "filename": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "precision": "fp8_scaled",
+      "quantization": null,
+      "role": "text_encoder",
+      "sha256": "cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4",
+      "size_bytes": 9384670680,
+      "source_repository_id": "Comfy-Org/HunyuanVideo_1.5_repackaged",
+      "source_revision": "144e6ea259230936cdc6f140b3fe69c8529b5c47"
+    },
+    {
+      "filename": "qwen_image_vae.safetensors",
+      "precision": "mixed",
+      "quantization": null,
+      "role": "vae",
+      "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f",
+      "size_bytes": 253806246,
+      "source_repository_id": "Comfy-Org/Qwen-Image_ComfyUI",
+      "source_revision": "7beb7b647f04469fbe64ba8adc2bb0d7e5e9f73f"
+    }
+  ],
+  "guidance": 4.0,
+  "lane_id": "qwen_image_edit_2511_local",
+  "license_id": "Apache-2.0",
+  "license_source_url": "https://huggingface.co/Qwen/Qwen-Image-Edit-2511/blob/6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9/LICENSE",
+  "loopback_endpoints": [
+    "http://127.0.0.1:8188",
+    "http://localhost:8188",
+    "http://[::1]:8188"
+  ],
+  "max_height": 2048,
+  "max_references": 2,
+  "max_width": 2048,
+  "min_height": 256,
+  "min_references": 2,
+  "min_width": 256,
+  "model_card_url": "https://huggingface.co/Qwen/Qwen-Image-Edit-2511/tree/6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+  "model_repository_id": "Qwen/Qwen-Image-Edit-2511",
+  "model_repository_revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+  "optional_lora_enabled": false,
+  "output_mime_type": "image/png",
+  "output_node_id": "9",
+  "profile_content_hash": "3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df",
+  "required_nodes": [
+    {
+      "name": "UNETLoader",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "CLIPLoader",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "VAELoader",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "TextEncodeQwenImageEditPlus",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "ImageScale",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "FluxKontextMultiReferenceLatentMethod",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "ModelSamplingAuraFlow",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "CFGNorm",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "KSampler",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "VAEDecode",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "SaveImage",
+      "version": "comfyui@7cee3ceb"
+    }
+  ],
+  "sampler": "euler",
+  "scheduler": "simple",
+  "schema_version": "1",
+  "steps": 40,
+  "supported_reference_roles": [
+    "character",
+    "scene"
+  ],
+  "workflow_path": "workflows/templates/p7_1_qwen_image_edit_2511_api.json",
+  "workflow_sha256": "34f1d2a67d049b646eef1c8f0c51aa8c1ad6b9eb5ef176c9ec422c3ff384a85f",
+  "workflow_source_revision": "comfyui_workflow_templates-0.11.43/json-0.1.49/d561a38c15bd7d08758a5e6773d467142244d5b83fc5d3aecdf6d8df9fe881b6",
+  "workflow_source_url": "https://docs.comfy.org/tutorials/image/qwen/qwen-image-edit-2511"
+}

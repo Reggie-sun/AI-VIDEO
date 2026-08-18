@@ -4,7 +4,7 @@
 
 ## Purpose
 
-当前仓库有边界不同的已实现产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2-P5 提供的 read-only Production Project、explicit P2A State Commit/Recovery、deterministic Composition/HyperFrames、Voice/Captions、immutable Dependency Graph 与 selective rebuild Python APIs。后续目标是由 Codex 驱动、以 durable project state 为核心的 AI Video / AI Comic Production Harness，但 P6-P9 等未实施 slice 仍只是规划。
+当前仓库有边界不同的已实现产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2-P7 提供的 read-only Production Project、explicit P2A State Commit/Recovery、deterministic Composition/HyperFrames、Voice/Captions、immutable Dependency Graph/selective rebuild、Codex Review/Repair 和 local-only image asset generation Python APIs。P7 lineage 与 P3-P7 combined Base AI Comic E2E 已合入 local `main`。P7.1 的 offline/runtime-contract 部分增加了 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；2026-08-18 fresh authorized rerun 已通过 Qwen 与 FLUX M7 technical live-local acceptance，M8 仍未验收。P8-P9 等未实施 slice 仍只是规划。
 
 Agent 必须维护当前产品承诺：
 
@@ -19,11 +19,14 @@ Agent 必须维护当前产品承诺：
 - 当前已实现的 `0.1.x` / legacy runtime 仍是 local-first Python CLI，默认只连接本地 ComfyUI；非本地 ComfyUI 必须显式设置 `allow_non_local: true`。公共命令仍只有三个，产物仍使用当前 flat artifact layout。
 - 当前已实现的 P2 Production Project Core 通过 `ai_video.production.load_production_project()` 暴露，只读取并验证显式物化的 v2 project、creative artifacts、Manifest-selected revision 和 Asset Registry snapshot；它不写入、不激活、不增加 CLI。
 - 当前已实现并验收的 P2A Production State Commit Protocol 通过 `ai_video.production` Python API 暴露，拥有唯一 v2 writer/recovery owner、exact project/registry snapshot activation 和 explicit crash recovery；它不增加 CLI，也不改变 Legacy Manifest/layout。
-- 当前已实现的 P3/P4 通过同一个 `CompositionSpec` -> `ResolvedTimeline` -> pinned local HyperFrames path提供deterministic render、audio/voice/caption contracts；P4已于`f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward合入local `main`，尚未push/release。
-- P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main`：`DependencyGraphSnapshot`只保存immutable typed graph inputs，Manifest 2.3独占active graph与desired/applied/lifecycle，`ProductionStateCommitter`仍独占graph write/co-activation/recovery；P5不增加CLI、Provider、renderer或automatic recovery，且尚未push/release。
+- 当前已实现的 P3/P4 通过同一个 `CompositionSpec` -> `ResolvedTimeline` -> pinned local HyperFrames path提供deterministic render、audio/voice/caption contracts；P4已于`f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward合入local `main`，并随 P5 ancestry push 到 `origin/main`，尚未 release。
+- P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main` 并 push 到 `origin/main`：`DependencyGraphSnapshot`只保存immutable typed graph inputs，Manifest 2.3独占active graph与desired/applied/lifecycle，`ProductionStateCommitter`仍独占graph write/co-activation/recovery；P5不增加CLI、Provider、renderer或automatic recovery，且尚未 release。
+- P6 已完成并整合到 local `main`：Manifest 2.4 与既有 `ProductionStateCommitter` 提供 durable review/repair/final-acceptance lifecycle；P5 graph 仍不保存 mutable review state。P6 尚未 push/release。
+- P7 与 Base AI Comic E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但尚未 push、release 或 publish。P7 的 provider-neutral contract、Manifest 2.5 lifecycle、generated PNG provenance、target Shot/Registry/graph atomic activation、exact replay/recovery 与 combined no-Video-Provider proof 保持不变。
+- P7.1 offline/runtime-contract implementation 提供 sealed `ComfyLocalImageProvider`、exact local component/profile/workflow binding、R+1 前 read-only compatibility preflight，以及 `chatgpt_images_2_web` human import receipt/activation。2026-08-18 首次 M7 授权 session 因 smoke reference fixture 不是可解码 PNG 而 fail closed 并止步 FLUX；第二次已证明 Qwen，但 FLUX 被 `ImageScaleToTotalPixels` 缺 `resolution_steps` 拒绝；最终 fix 在 live required-input preflight 与 `resolution_steps=1` 之后，本日 fresh authorized rerun 在 loopback `http://127.0.0.1:8188` 上同时对 Qwen 与 FLUX 通过 technical live acceptance（exactly one provider call per lane, replay adds zero, no remote/browser）。M7 现在是 accepted 的 technical live-local milestone；M8 仍缺人工 ChatGPT outputs 与 blinded review evidence，因此 P7.1 仍不得称为 quality-accepted。任何未来 live smoke/benchmark 仍需 explicit authorization。
 - `docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md` 是新的 v0.2 planning target；它不是已实现行为，也不是一次性实施授权。
 - `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 已被 supersede，只保留为 provider-centric 历史设计与可复用安全契约来源。
-- v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0-P5 的当前状态见 runtime baseline 与 roadmap；P6+ 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。
+- v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0-P7 与 Base AI Comic E2E 的当前状态见 runtime baseline 与 roadmap；P8+ 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。Base E2E acceptance 不等于 Paid Provider Gate 已设计、实现或验收。
 - 某个 slice 落地前，与该 slice 冲突的当前契约继续有效；不得通过只改文档把 proposed behavior 描述成 runtime truth。
 - Local Wan + ComfyUI 始终保持 legacy default，并在新 domain 中作为 optional `generated_video` asset capability 保留。任何远程 Provider 都必须在后续独立 slice 中满足 explicit opt-in、Budget Guard、Cloud Egress 和 crash-safe persistence gate。
 
@@ -38,12 +41,13 @@ Agent 必须维护当前产品承诺：
 1. 用户请求。
 2. 本 `AGENTS.md`。
 3. [`docs/agent-primary-contract-matrix.md`](/home/reggie/vscode_folder/AI-VIDEO/docs/agent-primary-contract-matrix.md)。
-4. [`docs/v0.2-runtime-baseline.md`](/home/reggie/vscode_folder/AI-VIDEO/docs/v0.2-runtime-baseline.md)，确认当前已实现行为。
-5. [`docs/v0.2-agentic-production-roadmap.md`](/home/reggie/vscode_folder/AI-VIDEO/docs/v0.2-agentic-production-roadmap.md)，确认 phase 状态与 gate。
-6. `README.md`、active spec 和当前 slice 的 plan。
-7. 相关源码文件及其对应测试。
-8. `.agent/bug-memory/` 下与当前回归直接相关的记录，仅作为案例证据。
-9. `.workflow/` 下的草稿或 brainstorming 产物，仅作为可选上下文。
+4. [`.agent/harness/policy.yaml`](/home/reggie/vscode_folder/AI-VIDEO/.agent/harness/policy.yaml)，确认 task-owned paths 对应的 mandatory checks。
+5. [`docs/v0.2-runtime-baseline.md`](/home/reggie/vscode_folder/AI-VIDEO/docs/v0.2-runtime-baseline.md)，确认当前已实现行为。
+6. [`docs/v0.2-agentic-production-roadmap.md`](/home/reggie/vscode_folder/AI-VIDEO/docs/v0.2-agentic-production-roadmap.md)，确认 phase 状态与 gate。
+7. `README.md`、active spec 和当前 slice 的 plan。
+8. 相关源码文件及其对应测试。
+9. `.agent/bug-memory/` 下与当前回归直接相关的记录，仅作为案例证据。
+10. `.workflow/` 下的草稿或 brainstorming 产物，仅作为可选上下文。
 
 ## Conflict Resolution
 
@@ -75,6 +79,7 @@ Agent 必须维护当前产品承诺：
 - P2 reader 不拥有 writer、activation、lifecycle mutation、desired fingerprint、renderer 或 Provider。已验收的 P2A `ProductionStateCommitter` 是 v2 project/registry/render/graph snapshot 写入、active pointer 切换与 explicit recovery 的唯一 owner。
 - P3/P4 `ResolvedTimeline` 是唯一 order/frame/sample/timing owner；P5只能把它作为opaque fingerprint input消费，不得在graph中推导或另造canonical timeline。
 - P5 immutable graph不得保存fresh/stale/failed/blocked/superseded等mutable state；Manifest 2.3是active graph、desired/applied fingerprints与lifecycle的唯一owner。Same-desired failure不得auto-retry，exact replay不得重复调用provider/renderer或推进state。Composition、ResolvedTimeline、renderer source与render只能由同一次final `RenderStateSnapshot` activation原子标记fresh，旧render evidence不得分别推进这些node。
+- P7 不修改或复制 P5 resolver：`ImageGenerationRequest` 必须显式绑定 exact Character/Scene/reference inputs；generated PNG 激活后，只能由既有 dependency graph/resolver 计算 target Shot visual projection 及其精确下游 invalidation。Manifest 2.5 组合 P6/P7 mutable lifecycle，`ProductionStateCommitter` 仍是 image evidence、project/registry/graph activation 与 explicit recovery 的唯一 public writer owner。
 
 ## Module Boundaries
 
@@ -91,9 +96,12 @@ Agent 必须维护当前产品承诺：
 - `src/ai_video/production/paths.py`：负责 project-root containment、symlink 防逃逸和 v2 path resolution。
 - `src/ai_video/production/validation.py`：负责 Shot visual strategy、reference 和 project-level static validation。
 - `src/ai_video/production/registry.py`：负责 read-only Asset Registry snapshot、revision、entry bytes 和 containment verification。
-- `src/ai_video/production/project.py`：负责 v2 bundle loading、Manifest-selected project revision 和 registry selection verification。
+- `src/ai_video/production/project.py` 及 private `_image_project_reader.py` / `_voice_project_reader.py` helpers：负责 read-only v2 bundle loading、Manifest-selected project/registry selection verification 与 selected image/voice candidate evidence reopen；不得写入、恢复或激活 state。
 - `src/ai_video/production/dependency.py`：负责pure immutable graph construction、desired fingerprint resolution、blocked/frontier propagation和selective rebuild decision；不得写文件、Manifest、registry或runtime status。
-- `src/ai_video/production/state_commit.py`：负责 P2A 唯一 v2 state writer、snapshot activation、commit-point error mapping 和 explicit recovery。
+- `src/ai_video/production/image.py`：负责 pure P7 image request/preview/authorization/result/provenance contract、PNG measured validation、candidate scope validation 与 `ImageAssetProvider` protocol；不得写文件、调用 Provider 或修改 Manifest。
+- `src/ai_video/production/comfy_image.py`：负责 sealed P7.1 local execution profile、loopback-only ComfyUI adapter、exact workflow binding 与 pre-submit compatibility preflight；不得成为第二 writer，也不得接受 remote endpoint。
+- `src/ai_video/production/image_import.py`：负责 truthful human web-image import receipt、PNG validation 与 exact candidate commit preparation；实际写入仍只能由 `ProductionStateCommitter` 完成。
+- `src/ai_video/production/state_commit.py` 及 private `_state_commit_*` implementation modules：共同实现 P2A 唯一 v2 state writer、snapshot activation、commit-point error mapping 和 explicit recovery；`ProductionStateCommitter` façade仍是唯一 public owner，private modules不得形成第二 writer。
 - `src/ai_video/production/__init__.py`：只暴露已批准的v0.2 public imports，不承载实现逻辑。
 
 P2 reader、registry、validation和P5 dependency modules均不得写入或激活state；P2A writer/commit/recovery protocol必须继续由`state_commit.py`单一拥有，不得把mutation分散到reader、registry、dependency或Legacy manifest/pipeline。不要随意把职责跨模块搬运。优先做局部、小范围、低漂移的修复。
@@ -105,6 +113,11 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - 函数和类尽量保持单一职责。
 - 追求高内聚、低耦合。不要跨越模块边界去操作别的模块内部状态。
 - 优先依赖注入，而不是硬编码外部依赖。
+
+## Architecture Ratchet
+
+- 当 architecture boundary 与追求 minimal local diff 发生实质冲突时，architecture boundary 优先；“保持改动最小”不得被解释为可以继续扩大已有 oversized、multi-responsibility module。
+- Architecture gate baseline 只用于 grandfather existing debt；不得为了隐藏 regression 而刷新或放宽 baseline。Correctness-critical transaction lifecycle 应保持为一个 cohesive domain boundary，不能为了减小文件而机械拆散 transaction invariant。
 
 ## Error Handling Contract
 
@@ -141,6 +154,19 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - 除非用户明确要求真实本地冒烟，否则 ComfyUI 和 ffmpeg 编排优先使用 mock 或 fake 测试。
 - 新增或修改行为时，要覆盖 public function、边界情况和错误情况。
 
+## Development Verification Harness
+
+- 本仓库的开发 Harness 是 [`scripts/agent_harness.py`](/home/reggie/vscode_folder/AI-VIDEO/scripts/agent_harness.py)；它把 exact staged delta 或 commit range 路由到已有 mandatory tests/checks，并在 `.agent/harness/runs/<run_id>/receipt.json` 写 execution evidence。`--path` 只允许 advisory inspect，不得生成 completion receipt。
+- [`.agent/harness/policy.yaml`](/home/reggie/vscode_folder/AI-VIDEO/.agent/harness/policy.yaml) 是 changed-path category、check command 与 fail-safe fallback 的 machine-readable truth。修改映射时必须同步 Harness tests 与 contract matrix。
+- `make harness-inspect` 显示当前 Git changes 需要的 checks；`make harness-verify` 只验证 non-empty staged scope；已提交 changes 使用 `make harness-verify-range BASE_REF=<ref> HEAD_REF=<ref>`，其中 `HEAD_REF` 必须解析到当前 `HEAD`；`make harness-test` 只验证 Harness 自身。
+- Completion verification MUST 在 detached temporary worktree 中执行 exact staged snapshot 或 exact head commit；source HEAD/index scope 在 checks 前后必须一致。这样 unrelated dirty work 不进入 execution tree，也不需要通过手写 path list 隐藏。
+- 任何 code 或 executable tooling change 在完成前 MUST 有 fresh passing receipt，并用 `make harness-receipt RECEIPT=<path>` 校验 self-hash、policy hash 与 current snapshot。Documentation-only change可以只命中 `scope_diff_check`；Harness/control-plane change还必须命中 `harness_tests`。
+- Production/source category 使用 task-delta Architecture Gate（`--base-ref`）；version-controlled baseline 的 repository-wide health 只由 `make harness-repository` 单独报告，不得让历史 debt 阻断 unrelated task receipt。
+- 未被 policy 映射的 task path必须 fail safe 到 full pytest suite与task-delta Architecture Gate；`make harness-audit` 必须拒绝 owned source/test/workflow 的 mapping drift。
+- Harness check subprocess 使用 argv + `shell=False`、explicit timeout、sanitized credential/proxy/tool environment；pytest Python process 由 `scripts/harness_pytest_guard.py` 阻止 non-loopback address-bearing socket/DNS API。该 guard 不是 subprocess/OS network namespace；policy不得把可能联网的 child executable列为默认 check。Harness 不调度 Agent、不修改产品 state、不执行 live Provider smoke，也不替代代码、测试或 runtime evidence。
+- [`.github/workflows/mandatory-gate.yml`](/home/reggie/vscode_folder/AI-VIDEO/.github/workflows/mandatory-gate.yml) 在每个 targeting `main` 的 pull request 上以 exact PR base/head SHA 运行 `make harness-audit` 与现有 `make harness-verify-range`；required check context MUST 稳定为 `mandatory-gate / verify`。CI 必须从 GitHub runner 生成自己的 receipt、JUnit 与 logs artifact，MUST NOT 信任开发者提交的本地 receipt，也不得读取 Provider secret 或运行 live Provider、ComfyUI、付费 smoke。
+- Workflow 存在或 workflow-only push 不等于 server enforcement。GitHub `main` ruleset 必须 active，要求 pull request、branch up to date 与 `mandatory-gate / verify`，并阻止 force push/deletion；普通 actor 不得 bypass。服务端 gate 完成状态必须通过 GitHub API 读取 workflow run/check、ruleset enforcement 和 branch protection/ruleset truth 来证明。
+
 ## Checks By Change Type
 
 - Config 或路径逻辑：`tests/test_config.py`
@@ -152,6 +178,8 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - P2 schema、hash、path、strategy、registry 或 loader：`tests/test_production_models.py`、`tests/test_production_validation.py`、`tests/test_production_registry.py`、`tests/test_production_project.py`
 - P2 与 Legacy Config/CLI isolation：在上述 P2 tests 之外加跑 `tests/test_config.py`、`tests/test_cli.py`
 - P5 graph/resolution/Manifest/recovery：`tests/test_production_dependency.py`、`tests/test_production_selective_rebuild.py`、`tests/test_production_models.py`、`tests/test_production_project.py`、`tests/test_production_state_commit.py`、`tests/test_production_state_recovery.py`
+- P7 image contract/activation/recovery：`tests/test_production_image.py`、`tests/test_production_image_e2e.py`、`tests/test_production_models.py`、`tests/test_production_registry.py`、`tests/test_production_validation.py`、`tests/test_production_project.py`、`tests/test_production_dependency.py`、`tests/test_production_selective_rebuild.py`、`tests/test_production_state_commit.py`、`tests/test_production_state_recovery.py`
+- Harness、policy、runtime/network guard、runs contract 或 `Makefile`：`tests/test_agent_harness.py`
 
 如果一次改动跨越多个表面，就运行所有对应测试文件。
 
@@ -164,7 +192,7 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - 修改 `runs/` 下的 manifest schema 或产物目录结构。
 - 把本地优先策略改成默认允许远程主机。
 - 引入前端、API server、队列管理、音频，或其他 MVP 规范中明确排除的子系统。
-- 执行 v0.2 P6-P9 任一 runtime slice，或把 plan/spec 中的 proposed contract 写成当前行为。P2-P5 已实现各自当前contract；任何新的v2 writer、activation、schema/layout mutation仍需独立授权与crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
+- 执行 P7.1 live smoke/benchmark、v0.2 P8-P9 任一 runtime slice，或把未验收的 plan/spec contract 写成当前行为。P2-P7 与 Base AI Comic E2E 已在 local `main`；P7.1 已通过 offline executable gates 与 2026-08-18 technical live-local acceptance，但仍未通过 M8 blinded quality benchmark。任何未来 P7.1 live smoke、benchmark 或 P8-P9 runtime slice 仍需各自独立 explicit authorization。P8 还必须先有单独获批并验收的 Paid Provider Gate。任何新的 v2 writer、activation、schema/layout mutation 仍需独立授权与 crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
 
 ## Session Continuity
 
@@ -187,4 +215,5 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - 变更过的契约已在代码和测试中体现。
 - 如果公共行为变了，相关文档也已更新。
 - 对应改动面的验证确实跑过。
+- Code 或 executable tooling change 已生成 fresh passing Harness receipt，并在 final delivery 中报告其 repository-relative path。
 - 最终说明里清楚标注剩余风险或未验证区域。

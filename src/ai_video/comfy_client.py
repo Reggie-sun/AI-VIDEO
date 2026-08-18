@@ -48,6 +48,28 @@ class ComfyClient:
                 exc,
             ) from exc
 
+    def get_object_info(self) -> dict[str, Any]:
+        """Return the server's registered node inventory without mutating state."""
+
+        try:
+            response = self.http.get(self._url("/object_info"))
+            response.raise_for_status()
+            payload = response.json()
+        except (httpx.HTTPError, ValueError) as exc:
+            raise retryable_error(
+                ErrorCode.COMFY_UNAVAILABLE,
+                "Could not read the ComfyUI node inventory.",
+                str(exc),
+                exc,
+            ) from exc
+        if not isinstance(payload, dict):
+            raise AiVideoError(
+                ErrorCode.COMFY_UNAVAILABLE,
+                "ComfyUI returned an invalid node inventory.",
+                retryable=False,
+            )
+        return payload
+
     def upload_image(self, path: str | Path) -> str:
         image_path = Path(path)
         try:
@@ -193,6 +215,34 @@ class ComfyClient:
                 exc,
             ) from exc
         target_path.write_bytes(response.content)
+
+    def fetch_artifact_bytes(
+        self,
+        *,
+        filename: str,
+        subfolder: str,
+        type_: str,
+    ) -> bytes:
+        """Byte-returning variant of :meth:`download_artifact` for adapters that
+        must not write to a project path (e.g. P7.1 local image provider).
+
+        Preserves the original ``download_artifact`` semantics; the new method
+        does not mutate the filesystem.
+        """
+        try:
+            response = self.http.get(
+                self._url("/view"),
+                params={"filename": filename, "subfolder": subfolder, "type": type_},
+            )
+            response.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise retryable_error(
+                ErrorCode.COMFY_OUTPUT_MISSING,
+                f"Could not fetch ComfyUI artifact bytes: {filename}",
+                str(exc),
+                exc,
+            ) from exc
+        return bytes(response.content)
 
     def free_memory(self) -> None:
         try:

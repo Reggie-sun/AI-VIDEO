@@ -82,6 +82,176 @@ def canonical_dependency_graph_snapshot_path(revision_id: str) -> Path:
     )
 
 
+def canonical_qa_policy_path(content_hash: str) -> Path:
+    return Path(
+        f"state/reviews/policy.{_require_sha256(content_hash, 'QA policy hash')}.json"
+    )
+
+
+def canonical_review_evidence_path(content_hash: str) -> Path:
+    return Path(
+        f"state/reviews/evidence.{_require_sha256(content_hash, 'review evidence hash')}.json"
+    )
+
+
+def canonical_review_request_path(content_hash: str) -> Path:
+    return Path(
+        f"state/reviews/request.{_require_sha256(content_hash, 'review request hash')}.json"
+    )
+
+
+def canonical_review_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/reviews/review.{_require_sha256(content_hash, 'review receipt hash')}.json"
+    )
+
+
+def canonical_repair_request_path(content_hash: str) -> Path:
+    return Path(
+        f"state/repairs/request.{_require_sha256(content_hash, 'repair request hash')}.json"
+    )
+
+
+def canonical_approved_repair_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/repairs/approved.{_require_sha256(content_hash, 'approved repair receipt hash')}.json"
+    )
+
+
+def canonical_repair_outcome_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/repairs/outcome.{_require_sha256(content_hash, 'repair outcome receipt hash')}.json"
+    )
+
+
+def canonical_final_acceptance_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/acceptance/final.{_require_sha256(content_hash, 'final acceptance receipt hash')}.json"
+    )
+
+
+def canonical_image_request_path(request_fingerprint: str) -> Path:
+    return Path(
+        f"state/images/requests/{_require_sha256(request_fingerprint, 'image request fingerprint')}.json"
+    )
+
+
+def canonical_image_preview_path(preview_fingerprint: str) -> Path:
+    return Path(
+        f"state/images/previews/{_require_sha256(preview_fingerprint, 'image preview fingerprint')}.json"
+    )
+
+
+def canonical_image_authorization_path(authorization_fingerprint: str) -> Path:
+    return Path(
+        "state/images/authorizations/"
+        f"{_require_sha256(authorization_fingerprint, 'image authorization fingerprint')}.json"
+    )
+
+
+def canonical_image_execution_profile_path(profile_content_hash: str) -> Path:
+    return Path(
+        "state/images/execution-profiles/"
+        f"{_require_sha256(profile_content_hash, 'image execution profile hash')}.json"
+    )
+
+
+def canonical_image_submit_intent_path(request_fingerprint: str) -> Path:
+    return Path(
+        "state/images/submit-intents/"
+        f"{_require_sha256(request_fingerprint, 'image request fingerprint')}.json"
+    )
+
+
+def canonical_image_result_path(result_fingerprint: str) -> Path:
+    return Path(
+        f"state/images/results/{_require_sha256(result_fingerprint, 'image result fingerprint')}.json"
+    )
+
+
+def canonical_image_receipt_path(content_hash: str) -> Path:
+    return Path(
+        f"state/images/receipts/{_require_sha256(content_hash, 'image receipt hash')}.json"
+    )
+
+
+def canonical_human_image_import_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/images/import-receipts/"
+        f"{_require_sha256(content_hash, 'human image import receipt hash')}.json"
+    )
+
+
+def canonical_paid_provider_budget_path(content_hash: str) -> Path:
+    return Path(
+        "state/paid-provider/budgets/"
+        f"{_require_sha256(content_hash, 'paid Provider budget hash')}.json"
+    )
+
+
+def canonical_paid_provider_gate_path(gate_receipt_fingerprint: str) -> Path:
+    return Path(
+        "state/paid-provider/gates/"
+        f"{_require_sha256(gate_receipt_fingerprint, 'paid Provider Gate fingerprint')}.json"
+    )
+
+
+def canonical_paid_provider_submit_path(submit_receipt_fingerprint: str) -> Path:
+    return Path(
+        "state/paid-provider/submits/"
+        f"{_require_sha256(submit_receipt_fingerprint, 'paid Provider submit fingerprint')}.json"
+    )
+
+
+def canonical_image_asset_path(file_sha256: str) -> Path:
+    return Path(
+        f"assets/files/{_require_sha256(file_sha256, 'image file hash')}.png"
+    )
+
+
+def canonical_video_request_receipt_path(request_receipt_fingerprint: str) -> Path:
+    return Path(
+        "state/video-generation/requests/"
+        f"{_require_sha256(request_receipt_fingerprint, 'video request fingerprint')}.json"
+    )
+
+
+def canonical_video_status_receipt_path(observation_fingerprint: str) -> Path:
+    return Path(
+        "state/video-generation/status/"
+        f"{_require_sha256(observation_fingerprint, 'video observation fingerprint')}.json"
+    )
+
+
+def canonical_video_asset_path(file_sha256: str) -> Path:
+    return Path(
+        f"assets/files/{_require_sha256(file_sha256, 'video file hash')}.mp4"
+    )
+
+
+def canonical_video_fetch_receipt_path(fetch_fingerprint: str) -> Path:
+    return Path(
+        "state/video-generation/fetch/receipts/"
+        f"{_require_sha256(fetch_fingerprint, 'video fetch fingerprint')}.json"
+    )
+
+
+def canonical_video_fetch_artifact_path(file_sha256: str) -> Path:
+    return Path(
+        "state/video-generation/fetch/files/"
+        f"{_require_sha256(file_sha256, 'fetched video file hash')}.mp4"
+    )
+
+
+def canonical_image_shot_revision_path(revision: int, content_hash: str) -> Path:
+    if type(revision) is not int or revision < 1:
+        raise ValueError("Image Shot revision must be a positive integer.")
+    return Path(
+        "creative/shots/"
+        f"shot.{revision}.{_require_sha256(content_hash, 'image Shot content hash')}.yaml"
+    )
+
+
 def canonical_render_output_path(file_sha256: str, suffix: str = ".mp4") -> Path:
     if suffix != ".mp4":
         raise ValueError("Render output suffix must be .mp4.")

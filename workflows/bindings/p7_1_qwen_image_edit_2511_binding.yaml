@@ -1,0 +1,10 @@
+positive_prompt: ["170:151", "inputs", "prompt"]
+negative_prompt: ["170:149", "inputs", "prompt"]
+seed: ["170:169", "inputs", "seed"]
+width: ["170:160", "inputs", "width"]
+height: ["170:160", "inputs", "height"]
+reference_images:
+  - ["41", "inputs", "image"]
+  - ["83", "inputs", "image"]
+output_prefix: ["9", "inputs", "filename_prefix"]
+output_node_id: "9"

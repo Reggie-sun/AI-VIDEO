@@ -1,0 +1,24 @@
+schema_version = 1
+source_roots = ["src"]
+baseline = ".architecture/architecture-baseline.json"
+
+# Effective LOC excludes blank and comment-only lines. Docstrings remain code.
+normal_loc = 800
+blocking_loc = 1500
+severe_loc = 3000
+fan_out_warning = 14
+
+exclude = [
+  "**/generated/**",
+  "**/vendor/**",
+  "**/vendored/**",
+  "**/migrations/**",
+  "**/snapshots/**",
+  "**/*_pb2.py",
+  "**/*_pb2_grpc.py",
+]
+
+# Add only reviewed exceptions with both a narrow pattern and durable reason:
+# [[exceptions]]
+# pattern = "src/example/declarative_mapping.py"
+# reason = "Intentionally declarative data module; no runtime responsibilities."

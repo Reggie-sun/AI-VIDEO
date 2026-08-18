@@ -6,7 +6,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3 deterministic composition、local HyperFrames rendering、P4 Voice and Captions 与 P5 immutable Dependency Graph、Manifest-owned lifecycle、selective rebuild Python API 已在 local `main` 验收。P5 不增加 CLI command、第二 renderer 或默认 remote Provider behavior。
+公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3-P7 与 combined Base AI Comic E2E 已合入 local `main`。P7.1 offline/runtime-contract implementation 增加 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；2026-08-18 fresh authorized rerun 已通过 M7 technical live-local acceptance（Qwen + FLUX 各一次 provider call，replay 加零，loopback only），但 M8 仍缺人工 ChatGPT outputs 与 blinded review evidence。
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
@@ -17,10 +17,13 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 - Verified P3 composition plan: [`docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p3-deterministic-composition-hyperframes-adapter.md`](docs/superpowers/plans/2026-08-09-ai-video-agentic-production-harness-p3-deterministic-composition-hyperframes-adapter.md)
 - Accepted P4 voice/caption plan: [`docs/superpowers/plans/2026-08-10-ai-video-agentic-production-harness-p4-voice-and-captions.md`](docs/superpowers/plans/2026-08-10-ai-video-agentic-production-harness-p4-voice-and-captions.md)
 - P5 dependency/selective-rebuild plan: [`docs/superpowers/plans/2026-08-11-ai-video-agentic-production-harness-p5-dependency-graph-selective-rebuild.md`](docs/superpowers/plans/2026-08-11-ai-video-agentic-production-harness-p5-dependency-graph-selective-rebuild.md)
+- Accepted P6 review/repair plan: [`docs/superpowers/plans/2026-08-17-ai-video-agentic-production-harness-p6-codex-review-repair-harness.md`](docs/superpowers/plans/2026-08-17-ai-video-agentic-production-harness-p6-codex-review-repair-harness.md)
+- Accepted P7 image-asset plan: [`docs/superpowers/plans/2026-08-17-ai-video-agentic-production-harness-p7-image-asset-generation.md`](docs/superpowers/plans/2026-08-17-ai-video-agentic-production-harness-p7-image-asset-generation.md)
+- Accepted Base AI Comic E2E plan: [`docs/superpowers/plans/2026-08-18-ai-video-base-ai-comic-e2e.md`](docs/superpowers/plans/2026-08-18-ai-video-base-ai-comic-e2e.md)
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P4 已随 `f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward 合入 local `main`，当时 merged-main full verification 为 `1094 passed, 4 skipped`。P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main`，merged-main full verification 为 `1386 passed, 4 skipped`；这些 local changes 均未 push、release 或 publish。
+公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已 push 到 `origin/main`；P6-P7 与 Base E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但 local `main` 尚未 push、release 或 publish。P7.1 不修改 CLI、schema 或 Legacy layout；M7 已通过 2026-08-18 fresh authorized live-local rerun（loopback `http://127.0.0.1:8188`，exactly one Qwen + one FLUX provider call，replay adds zero），但未运行 blind benchmark 或 remote image submission。
 
 ## Setup
 
@@ -36,6 +39,63 @@ Requirements:
 - Local ComfyUI already running
 - `ffmpeg` and `ffprobe` on PATH
 
+## Architecture Gate
+
+Repository architecture regression 使用独立、local、no-network gate 验证，不改变 `ai-video` 的三个公共命令：
+
+```bash
+python -m scripts.architecture_gate check
+```
+
+默认比较 version-controlled baseline；在 branch/CI 上可用 `--base-ref <git-ref>` 直接比较 Git base。只有经 review 的显式操作才可更新 deterministic baseline：
+
+```bash
+python -m scripts.architecture_gate update-baseline
+```
+
+Historical oversized modules 与 existing import cycles 可 grandfather；超过 blocking threshold 的 oversized module growth、new blocking-sized module 和 new first-party dependency cycle 会阻止通过。`801–1500` LOC 的 growth/new module 为 warning，new high fan-out 仅作为 reviewer information。
+
+## Development Verification Harness
+
+仓库开发 Harness 是对现有 tests/checks 的轻量 mandatory runner，不是新的 Agent workflow，也不属于产品 runtime。Policy 位于 `.agent/harness/policy.yaml`，入口是 `scripts/agent_harness.py`。Completion verification 只接受 non-empty staged delta 或 commit range，在 detached temporary worktree 中运行 exact snapshot；本地 receipt 与 stdout/stderr/JUnit artifacts 写入 `.agent/harness/runs/<run_id>/`，默认不进入 Git。
+
+```bash
+# 查看当前 working tree changes 必须执行的 checks（advisory）
+make harness-inspect
+
+# 只 stage 本任务文件后，验证 exact index snapshot
+make harness-verify
+
+# 已提交后验证 exact commit range；HEAD_REF 默认且必须解析到当前 HEAD
+make harness-verify-range BASE_REF=HEAD^
+
+# 校验 receipt self-hash、policy hash 与当前 commit/snapshot freshness
+make harness-receipt RECEIPT=.agent/harness/runs/<run_id>/receipt.json
+
+# 检查 owned source/test/workflow 是否存在 policy 漏路由
+make harness-audit
+
+# 只验证 Harness 自身
+make harness-test
+
+# 单独查看全仓测试 + historical-baseline Architecture Gate health
+make harness-repository
+```
+
+`--path` 只用于 inspect，不生成 completion receipt。需要检查指定文件时直接运行：
+
+```bash
+python scripts/agent_harness.py inspect \
+  --path src/ai_video/cli.py \
+  --path tests/test_cli.py
+```
+
+Harness 按 changed-path category 合并 required checks；shared Production owners 路由到完整 Production suite + Legacy CLI/config isolation，任何未映射路径 fail safe 到完整 pytest suite与task-delta Architecture Gate。Check subprocess 使用 argv + `shell=False` 和 timeout；credential/proxy/tool-injection env 不继承，pytest Python process拒绝 non-loopback address-bearing socket/DNS API。这个 guard不隔离 pytest 启动的 subprocess，policy因此不得把可能联网的 child executable列为默认 check。Repository historical Architecture Gate baseline是单独 health signal，不污染 task receipt。P6 Review/Repair是产品 runtime QA surface，与这个开发 Harness不同。
+
+`.github/workflows/mandatory-gate.yml` 定义 targeting `main` 的 pull request gate，稳定 check context 为 `mandatory-gate / verify`。它以 `permissions: contents: read` checkout exact PR head、保留 full history 且不持久化 credential，然后用 GitHub event 提供的 exact base/head SHA 运行 `make harness-audit` 与 `make harness-verify-range`。Receipt、每个 check 的 stdout/stderr、pytest JUnit 和 workflow logs 都由 GitHub runner 本轮生成并上传；CI 不读取 Provider secret，也不运行 live Provider、ComfyUI 或付费 smoke，开发者提交的本地 receipt不构成 CI proof。
+
+Workflow 文件本身或 workflow-only push 不是 server enforcement。真正保护 `main` 还要求 active GitHub ruleset：必须通过 pull request、required status `mandatory-gate / verify`、branch up to date、禁止 force push 与 deletion，且没有普通 bypass。远端完成状态应通过 GitHub API 同时验证 successful workflow run/check、ruleset enforcement 以及 `main` protection/ruleset truth。
+
 ## Production Project Core Python API
 
 P2 exposes a Python loading API for an explicitly materialized v2 project:
@@ -46,9 +106,9 @@ from ai_video.production import load_production_project
 project = load_production_project("projects/example/project.yaml")
 ```
 
-上面的路径仅为示意；仓库不包含该 example project。Loader 保持 read-only 和 no-network。它以 `project.yaml` 为 stable validated entrypoint，然后验证 Production Manifest 选中的 project/registry snapshot path、semantic identity 和 exact file hash；也验证 sealed creative artifact reference、六种 Shot `visual_strategy` contract、concrete asset ID/type、local file size/SHA-256 与 project-root containment。对 Manifest 2.1/2.2，它还会验证选中的 P3/P4 timeline、audio/caption provenance、source/receipt/output 与 render-state graph；对 Manifest 2.3，它还验证 active immutable Dependency Graph snapshot 与 Manifest-owned dependency states，但不会 scan、repair 或 rewrite。P2A state 存在后，root `project.yaml` 不是 active snapshot bytes truth。
+上面的路径仅为示意；仓库不包含该 example project。Loader 保持 read-only 和 no-network。它以 `project.yaml` 为 stable validated entrypoint，然后验证 Production Manifest 选中的 project/registry snapshot path、semantic identity 和 exact file hash；也验证 sealed creative artifact reference、六种 Shot `visual_strategy` contract、concrete asset ID/type、local file size/SHA-256 与 project-root containment。对 Manifest 2.1/2.2，它还会验证选中的 P3/P4 timeline、audio/caption provenance、source/receipt/output 与 render-state graph；对 Manifest 2.3，它还验证 active immutable Dependency Graph snapshot 与 Manifest-owned dependency states；对 Manifest 2.4，它还会 reopen 并验证 active QA policy、review/repair/outcome/final-acceptance receipts 及其 exact evidence bindings；对 Manifest 2.5，它还会 reopen exact P7 request、submit intent、provider result、measured PNG 和 provenance evidence，但不会 scan、generate、recover、repair 或 rewrite。P2A state 存在后，root `project.yaml` 不是 active snapshot bytes truth。
 
-P2 本身不创建目录、不更新 Manifest，也不激活 registry 或 graph revision。P2A 拥有全部 v2 state changes，并与 reader 保持分离。当前没有 v2 CLI、QA/repair flow、Remotion/Captions.ai adapter、Video Provider 或 cloud fallback。
+P2 本身不创建目录、不更新 Manifest，也不激活 registry 或 graph revision。P2A `ProductionStateCommitter` 继续拥有全部 v2 state changes，并与 reader 保持分离；P6/P7/P7.1 只在该唯一 writer/control path 上增加 durable QA/repair、image lifecycle 与 human-import evidence。Manifest 2.5 可在不改变 schema 的情况下组合保留既有 voice/render/review/repair owners 和全部 P7 evidence。当前仍没有 v2 CLI、production coordinator、Remotion/Captions.ai final-render adapter、Video Provider、remote image Provider 或 cloud fallback。
 
 ## Production State Commit Protocol (P2A)
 
@@ -86,13 +146,47 @@ Manifest 2.3 是 `active_dependency_graph`、per-node desired/applied fingerprin
 
 Graph snapshot 使用 canonical `state/dependency_graph.<revision>.json`。Reader/recovery 保持 Manifest 2.0-2.2 compatibility；2.3 的 graph temp、promotion、verification、final Manifest replace、unknown outcome、orphan preservation 与 idempotent recovery 均 fail closed，rollback 只能停用新的 mutation/rebuild entrypoints并保留 2.3 reader/recovery，不能 schema downgrade。默认 P5 acceptance 使用 two-Shot deterministic P4 fixtures、fake/no-network render/voice evidence；required mutation matrix 已证明 script、voice settings、alignment policy/receipt、caption timing/style、audio mix、visual asset、CompositionSpec、renderer source/render contract 只影响精确节点。最终验证为 canonical `1256 passed, 3 skipped`、Legacy `58 passed`、full `1386 passed, 4 skipped`。
 
-P5 没有实现 P6 QA/repair、P7 image generation、P8 Provider/cloud 或 P9 hardening；future generated-image input 只通过 strict synthetic `AssetRecord` seam 验证。Legacy CLI、Manifest v1、flat `runs/` layout、ComfyUI path 和现有公共 CLI 保持不变。
+P5 slice 本身没有实现 QA/repair、Provider/cloud 或 hardening；P6 在不修改 graph ownership 的前提下增加下述 review/repair lifecycle。Legacy CLI、Manifest v1、flat `runs/` layout、ComfyUI path 和现有公共 CLI 保持不变。
+
+## Codex Review and Repair Runtime (P6)
+
+P6 通过 `ai_video.production.review`、Manifest 2.4 和既有 `ProductionStateCommitter` 提供 strategy-aware QA。`video-analysis` MCP 只收集 technical raw measurements；它不拥有 Production Manifest、review/repair lifecycle 或 final acceptance。Technical review context 只能从已验证的 `LoadedProductionProject`、`ResolvedTimeline`、exact render/output hash 和 Shot `visual_strategy` 构建。合法 `static_image`、`image_motion` 与 `motion_graphics` 按各自策略预期判定，不再被统一的 video-like diversity heuristic 误判。
+
+Manifest 2.4 是 selected QA policy、review lifecycle、approved repair/outcome 与 final acceptance 的唯一 mutable owner。Review/Repair/Outcome/Final Acceptance receipts 均为 immutable、content-addressed、versioned evidence，绑定当前 dependency graph revision、timeline fingerprint、render/output identity、QA policy/version、evidence/tool/actor identity 与 before/after fingerprints。`technical`、`layout`、`strategy`、`semantic`、`final_acceptance` 五层全部 fail closed；semantic 只接受 policy-selected explicit evaluator 或 human durable evidence。Final acceptance 必须 reopen 当前 desired graph、`ResolvedTimeline`、render hash 和 fresh required review receipts。
+
+Repair 默认未授权，只有 injected trusted authorizer 返回 QA policy 允许的 `ActorIdentity` 后才能记录 approved receipt 并进入执行。它必须绑定 issue/evidence IDs、root-cause hypothesis、exact target artifacts 与 P5 resolver 得出的 exact invalidation closure；禁止 blanket stale。QA policy-only change 只使 affected review/final acceptance stale，不重建 assets/render；只有 approved Repair Receipt 才能触发 selective rebuild。Exact replay 不重复analysis、repair 或 render，crash/unknown outcome 后不 blind reapply，恢复仍由 `ProductionStateCommitter` 单一拥有。
+
+P6 默认 acceptance 仅使用 deterministic fixtures 与 fake/no-network evidence。Focused result 为 `739 passed`，independent review verdict 为 `accept with concerns` 且无 blocking issue；保留的非阻塞风险是未来补一条不使用 monkeypatch 的 activated render/timeline snapshot reopen E2E。P6 未运行 ComfyUI、HyperFrames executable、Provider、付费 API、secret 或 quota，也不授权 P8-P9 scope；P7 是后续单独获批并验收的独立 slice。
+
+## Image Asset Generation (P7)
+
+P7 在 `ai_video.production.image` 定义 provider-neutral、local-only 的 immutable image request/preview/authorization/result/provenance contract 和 `ImageAssetProvider` protocol。`ImageGenerationRequest` 显式绑定 target Shot/role、prompt/seed/dimensions、exact Character/Scene/reference identities 以及 base project/registry/graph；repository 没有打包 concrete/live Provider。默认 acceptance 只注入 deterministic fake provider 并验证 PNG bytes、MIME、dimensions、SHA-256、license 和 local/no-egress provenance。
+
+Manifest 2.5 组合 P6 review/repair 与 P7 image lifecycle，但不让两者互为 runtime prerequisite。`ProductionStateCommitter` 仍是 request、submit intent、one-use permit、provider result、PNG/provenance、candidate project/Registry/graph、single final Manifest replace 与 explicit recovery 的唯一 public writer owner。成功 activation 只生成一个新 target Shot revision、向 Registry append 一个 GENERATED/PNG record，并原子切换 exact project/registry/graph tuple；reader 只按 selected evidence reopen，不扫描 newest file 或隐式恢复。
+
+两个 `static_image` Shot 可以复用同一个 Character 和 Scene reference state，同时各自拥有不同的 generated PNG 与 exact provenance。P7 不修改 `dependency.py`，也不声称 reference bytes 变化会自动触发 regeneration；新 request/output 激活后由既有 P5 resolver 只传播 target Shot visual projection 的精确 downstream invalidation，无关 Shot、audio、voice 和 caption nodes 保持 fresh。Exact replay 的 provider/materializer/Manifest write 均为零；explicit recovery 不 remint permit、不 blind resubmit，只接受 exact old/new tuple 并保留完整 orphan evidence。
+
+P7 原始 fake/no-network acceptance 已随 Base E2E 合入 local `main`。它没有增加 CLI、renderer、Composition/timeline、video generation 或 remote Provider；local `main` 尚未 push、release 或 publish。
+
+### Hybrid Local Image Production (P7.1, offline-verified; M7 technical live-accepted; M8 still pending)
+
+`ai_video.production.comfy_image` 提供 sealed Qwen-Image-Edit-2511 与 FLUX.2-klein-4B local execution profile、loopback-only transport、exact workflow binding，以及在任何 P7 R+1 durable evidence 之前执行的 component SHA/size、ComfyUI commit 和 registered `/object_info` node preflight。Exact replay 仍在 preflight 之前返回，因此不会访问 ComfyUI；submit 后 history/output 不确定性继续进入 `outcome_unknown`，recovery 不 remint permit。
+
+`ai_video.production.image_import` 将人工下载的 ChatGPT Images web PNG 记录为 `chatgpt_images_2_web` human import，不虚构 backend model、provider request、durable submit 或 browser automation。Character master、Scene reference、key Shot 与 repair replacement 都复用同一个 `ProductionStateCommitter` project/Registry/P5 graph atomic activation path。
+
+本地 static compatibility gate 已验证 pinned official-template lineage、Qwen profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`、FLUX profile `local-image-profile:sha256:5066c080d58d3d999446ca5db195e8e81fd982052d94144452737f1e89a0f9c7`、两个 lane 的 exact component digests、ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、Torch `2.11.0+cu130` / CUDA `13.0` 与 lane budgets。2026-08-18 首次授权 M7 session 因 smoke reference fixture 不是可解码 PNG 而 fail closed 并止步 FLUX；第二次 session 已证明 Qwen，但 FLUX 被 `ImageScaleToTotalPixels` 因缺 `resolution_steps` 拒绝；最终 fix 在 live required-input preflight 与 `resolution_steps=1` 之后，同一日 fresh authorized rerun 在 loopback `http://127.0.0.1:8188` 上同时通过 Qwen 与 FLUX technical live acceptance：Qwen one first call / replay 加零，elapsed 185501 ms，1456x720 RGB PNG 1209630 bytes SHA-256 `62218606af56ac7d0651c437245d9db386f48f44194f28cdc9b4bd8c94ad40f7`，workflow SHA-256 `34f1d2a67d049b646eef1c8f0c51aa8c1ad6b9eb5ef176c9ec422c3ff384a85f`；FLUX one first call / replay 加零，elapsed 19201 ms，1456x720 RGB PNG 1190375 bytes SHA-256 `303ea92b23a3820047aa5412d8d7b376ffb532d4e028aa7627b9fe19279e8180`，workflow SHA-256 `e44a10fc8d6e6e491055de361d50dacaffb42adeb915f7c3596250a38b66dd22`；整个 session 没有 remote call、browser 或 secret。M8 仍缺至少 18 组人工 ChatGPT web outputs、两名 reviewer 与 tie-break，因此 P7.1 仍不得称为 quality-accepted；M7 现为 technical live-accepted。
+
+## Base AI Comic E2E
+
+已合入 local `main` 的 Base AI Comic E2E 证明 no-Video-Provider production path 可以从 reusable Character/Scene state 生成两个独立 PNG，继续完成 fake voice、canonical `CaptionTrack`、`ResolvedTimeline`、injected HyperFrames render、strategy-aware QA、exact composition repair、rerender 与 Final Acceptance。Fresh runtime 会 reopen exact Project/Registry/Graph/Render/Review/Repair evidence；exact replay 的 image、voice、analysis、renderer 与 Manifest write counters 全部为零。
+
+这个 acceptance 只组合既有 P3-P7 contracts。Manifest 2.5 的 image evidence 在 voice、render、review、repair、recovery 与 replay 后保持不变；没有增加 schema、public CLI、production coordinator、asset layout、runtime dependency、concrete/live Provider 或 P8 implementation。Task 8 full suite 为 `1714 passed, 4 skipped`，Architecture Gate PASS，independent review verdict 为 `accept`、无 blocker。P8 仍需单独获批并验收 Paid Provider Gate；local `main` 尚未 push、release 或 publish。
 
 ## Development MCP
 
 Project-local MCP configuration exposes `video-analysis` as the default video inspection server for this repository.
 
-If you also have a global `videoscan` MCP installed, treat it as optional helper tooling for metadata lookup or raw frame extraction only. For repo work here, use `video-analysis` for probing, scene detection, frame extraction, transcription, review, optimization planning, safe auto-application of config edits, and comprehensive analysis.
+If you also have a global `videoscan` MCP installed, treat it as optional helper tooling for metadata lookup or raw frame extraction only. For repo work here, use `video-analysis` for probing, scene detection, frame extraction, transcription, and technical evidence collection. Its legacy optimization helpers remain outside the Production control plane; Production review requires committer-issued durable intent and a one-use analysis permit, and Production repair/final acceptance remain owned by `ProductionStateCommitter`.
 
 ## Validate Example Files
 

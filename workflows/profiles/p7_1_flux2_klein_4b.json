@@ -1,0 +1,118 @@
+{
+  "adapter_contract_version": "1",
+  "binding_path": "workflows/bindings/p7_1_flux2_klein_4b_binding.yaml",
+  "binding_sha256": "572f18f2ce0756eadc128b2e7594941851f7e6c720f808a5c2159680ba82cb8f",
+  "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+  "components": [
+    {
+      "filename": "flux-2-klein-4b.safetensors",
+      "precision": "bf16",
+      "quantization": null,
+      "role": "diffusion",
+      "sha256": "ec3d4e733a771f61c052fb4856c48b336c55eaf2c65487c2a1faeb9bbda7a343",
+      "size_bytes": 7751105712,
+      "source_repository_id": "black-forest-labs/FLUX.2-klein-4B",
+      "source_revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294"
+    },
+    {
+      "filename": "qwen_3_4b.safetensors",
+      "precision": "bf16",
+      "quantization": null,
+      "role": "text_encoder",
+      "sha256": "6c671498573ac2f7a5501502ccce8d2b08ea6ca2f661c458e708f36b36edfc5a",
+      "size_bytes": 8044982048,
+      "source_repository_id": "Comfy-Org/z_image_turbo",
+      "source_revision": "08d04455279082882deaabc8d0d09fc914c071e1"
+    },
+    {
+      "filename": "flux2-vae.safetensors",
+      "precision": "mixed",
+      "quantization": null,
+      "role": "vae",
+      "sha256": "d64f3a68e1cc4f9f4e29b6e0da38a0204fe9a49f2d4053f0ec1fa1ca02f9c4b5",
+      "size_bytes": 336213556,
+      "source_repository_id": "Comfy-Org/flux2-dev",
+      "source_revision": "ab9055628ea245000e610f2aa2c96f4746093546"
+    }
+  ],
+  "guidance": 1.0,
+  "lane_id": "flux2_klein_4b_local",
+  "license_id": "Apache-2.0",
+  "license_source_url": "https://huggingface.co/black-forest-labs/FLUX.2-klein-4B/blob/e7b7dc27f91deacad38e78976d1f2b499d76a294/LICENSE.md",
+  "loopback_endpoints": [
+    "http://127.0.0.1:8188",
+    "http://localhost:8188",
+    "http://[::1]:8188"
+  ],
+  "max_height": 2048,
+  "max_references": 2,
+  "max_width": 2048,
+  "min_height": 256,
+  "min_references": 2,
+  "min_width": 256,
+  "model_card_url": "https://huggingface.co/black-forest-labs/FLUX.2-klein-4B/tree/e7b7dc27f91deacad38e78976d1f2b499d76a294",
+  "model_repository_id": "black-forest-labs/FLUX.2-klein-4B",
+  "model_repository_revision": "e7b7dc27f91deacad38e78976d1f2b499d76a294",
+  "optional_lora_enabled": false,
+  "output_mime_type": "image/png",
+  "output_node_id": "94",
+  "profile_content_hash": "5066c080d58d3d999446ca5db195e8e81fd982052d94144452737f1e89a0f9c7",
+  "required_nodes": [
+    {
+      "name": "UNETLoader",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "CLIPLoader",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "VAELoader",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "CLIPTextEncode",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "ImageScale",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "ReferenceLatent",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "Flux2Scheduler",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "CFGGuider",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "SamplerCustomAdvanced",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "VAEDecode",
+      "version": "comfyui@7cee3ceb"
+    },
+    {
+      "name": "SaveImage",
+      "version": "comfyui@7cee3ceb"
+    }
+  ],
+  "sampler": "euler",
+  "scheduler": "flux2_distilled",
+  "schema_version": "1",
+  "steps": 4,
+  "supported_reference_roles": [
+    "character",
+    "scene"
+  ],
+  "workflow_path": "workflows/templates/p7_1_flux2_klein_4b_api.json",
+  "workflow_sha256": "e44a10fc8d6e6e491055de361d50dacaffb42adeb915f7c3596250a38b66dd22",
+  "workflow_source_revision": "comfyui_workflow_templates-0.11.43/json-0.1.49/e0388a8870495802314d58fa61616ddcdb7064dac5f85a8787c9e08180b8a560",
+  "workflow_source_url": "https://docs.comfy.org/tutorials/flux/flux-2-klein"
+}

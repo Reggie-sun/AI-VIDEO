@@ -1,0 +1,244 @@
+{
+  "170:145": {
+    "_meta": {
+      "title": "ModelSamplingAuraFlow"
+    },
+    "class_type": "ModelSamplingAuraFlow",
+    "inputs": {
+      "model": [
+        "170:161",
+        0
+      ],
+      "shift": 3.1
+    }
+  },
+  "170:146": {
+    "_meta": {
+      "title": "VAELoader"
+    },
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "qwen_image_vae.safetensors"
+    }
+  },
+  "170:147": {
+    "_meta": {
+      "title": "FluxKontextMultiReferenceLatentMethod"
+    },
+    "class_type": "FluxKontextMultiReferenceLatentMethod",
+    "inputs": {
+      "conditioning": [
+        "170:149",
+        0
+      ],
+      "reference_latents_method": "index_timestep_zero"
+    }
+  },
+  "170:148": {
+    "_meta": {
+      "title": "FluxKontextMultiReferenceLatentMethod"
+    },
+    "class_type": "FluxKontextMultiReferenceLatentMethod",
+    "inputs": {
+      "conditioning": [
+        "170:151",
+        0
+      ],
+      "reference_latents_method": "index_timestep_zero"
+    }
+  },
+  "170:149": {
+    "_meta": {
+      "title": "TextEncodeQwenImageEditPlus"
+    },
+    "class_type": "TextEncodeQwenImageEditPlus",
+    "inputs": {
+      "clip": [
+        "170:162",
+        0
+      ],
+      "image1": [
+        "170:160",
+        0
+      ],
+      "image2": [
+        "83",
+        0
+      ],
+      "prompt": "",
+      "vae": [
+        "170:146",
+        0
+      ]
+    }
+  },
+  "170:151": {
+    "_meta": {
+      "title": "TextEncodeQwenImageEditPlus (Positive)"
+    },
+    "class_type": "TextEncodeQwenImageEditPlus",
+    "inputs": {
+      "clip": [
+        "170:162",
+        0
+      ],
+      "image1": [
+        "170:160",
+        0
+      ],
+      "image2": [
+        "83",
+        0
+      ],
+      "prompt": "Change the furniture leather difference in image 1 to the fur material in image 2.",
+      "vae": [
+        "170:146",
+        0
+      ]
+    }
+  },
+  "170:152": {
+    "_meta": {
+      "title": "CFGNorm"
+    },
+    "class_type": "CFGNorm",
+    "inputs": {
+      "model": [
+        "170:145",
+        0
+      ],
+      "pre_cfg": false,
+      "strength": 1
+    }
+  },
+  "170:156": {
+    "_meta": {
+      "title": "VAEEncode"
+    },
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "170:160",
+        0
+      ],
+      "vae": [
+        "170:146",
+        0
+      ]
+    }
+  },
+  "170:158": {
+    "_meta": {
+      "title": "VAEDecode"
+    },
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "170:169",
+        0
+      ],
+      "vae": [
+        "170:146",
+        0
+      ]
+    }
+  },
+  "170:160": {
+    "_meta": {
+      "title": "Exact request size"
+    },
+    "class_type": "ImageScale",
+    "inputs": {
+      "crop": "disabled",
+      "height": 720,
+      "image": [
+        "41",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": 1456
+    }
+  },
+  "170:161": {
+    "_meta": {
+      "title": "UNETLoader"
+    },
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "qwen_image_edit_2511_bf16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "170:162": {
+    "_meta": {
+      "title": "CLIPLoader"
+    },
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "device": "default",
+      "type": "qwen_image"
+    }
+  },
+  "170:169": {
+    "_meta": {
+      "title": "KSampler"
+    },
+    "class_type": "KSampler",
+    "inputs": {
+      "cfg": 4,
+      "denoise": 1,
+      "latent_image": [
+        "170:156",
+        0
+      ],
+      "model": [
+        "170:152",
+        0
+      ],
+      "negative": [
+        "170:147",
+        0
+      ],
+      "positive": [
+        "170:148",
+        0
+      ],
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "seed": 677909188488042,
+      "steps": 40
+    }
+  },
+  "41": {
+    "_meta": {
+      "title": "LoadImage"
+    },
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "leather_sofa.png"
+    }
+  },
+  "83": {
+    "_meta": {
+      "title": "LoadImage"
+    },
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "texture_fur.png"
+    }
+  },
+  "9": {
+    "_meta": {
+      "title": "SaveImage"
+    },
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "Qwen_Edit_2511",
+      "images": [
+        "170:158",
+        0
+      ]
+    }
+  }
+}

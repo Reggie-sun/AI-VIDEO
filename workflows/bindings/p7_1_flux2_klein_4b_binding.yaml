@@ -1,0 +1,10 @@
+positive_prompt: ["92:109", "inputs", "text"]
+negative_prompt: ["92:86", "inputs", "text"]
+seed: ["92:106", "inputs", "noise_seed"]
+width: ["92:111", "inputs", "width"]
+height: ["92:111", "inputs", "height"]
+reference_images:
+  - ["76", "inputs", "image"]
+  - ["81", "inputs", "image"]
+output_prefix: ["94", "inputs", "filename_prefix"]
+output_node_id: "94"

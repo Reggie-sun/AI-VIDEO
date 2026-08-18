@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+from dataclasses import replace
 from pathlib import Path
 import socket
 
@@ -24,7 +25,9 @@ from ai_video.production.hashing import seal_artifact
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.composition import resolve_composition, timeline_fingerprint
 from ai_video.production.dependency import (
+    build_applied_dependency_evidence,
     build_dependency_graph,
+    build_production_dependency_graph,
     desired_fingerprints,
     resolve_dependency_state,
 )
@@ -52,9 +55,16 @@ from ai_video.production.models import (
     MeasuredAudioRenderMetadata,
     MeasuredRenderMetadata,
     EgressMetadata,
+    EvidenceStrength,
+    FinalAcceptanceReceipt,
+    FinalAcceptanceReceiptPointer,
+    FinalAcceptanceState,
     ProductionManifest,
     ProductionProject,
+    QaLayer,
+    QaVerdict,
     ProjectDependencyEvidence,
+    ProjectSnapshotPointer,
     FingerprintContribution,
     RegistrySnapshotPointer,
     RegistryDependencyEvidence,
@@ -65,33 +75,62 @@ from ai_video.production.models import (
     RendererSourceReceipt,
     RenderDependencyEvidence,
     RenderStateSnapshotPointer,
+    ReviewEvidence,
+    ReviewEvidencePointer,
+    ReviewLayerState,
+    ReviewLifecycle,
+    ReviewReceipt,
+    ReviewReceiptPointer,
+    ReviewRequest,
+    ReviewRequestPointer,
     ResolvedTimeline,
     ResolvedVisualSpan,
     SourceReference,
     StateCommitAttempt,
     StateCommitStatus,
+    TechnicalReviewContext,
+    TechnicalReviewWindow,
+    ToolIdentity,
     canonical_project_snapshot_path,
     canonical_registry_snapshot_path,
 )
 from ai_video.production.paths import (
     canonical_dependency_graph_snapshot_path,
+    canonical_final_acceptance_receipt_path,
     canonical_render_state_path,
+    canonical_review_evidence_path,
+    canonical_review_receipt_path,
+    canonical_review_request_path,
 )
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
+    PreparedArtifact,
+    _canonical_json_bytes,
     prepare_dependency_graph_transition,
 )
-from ai_video.production.project import _render_source_payload_matches
+from ai_video.production.project import (
+    _render_source_payload_matches,
+    _verify_dependency_project_evidence,
+    load_production_project_candidate,
+)
+from ai_video.production._project_dependency_evidence import (
+    verify_active_versioned_artifact_evidence,
+)
 from production_project_factory import (
+    add_p6_policy_to_p7_project,
+    append_p7_committed_candidate,
     attach_p5_dependency_transition,
     load_revision_two_models,
     make_manifest_23_project,
+    make_p7_committed_project,
     make_p4_composition_fixture,
+    make_p8_video_evidence,
     make_voice_activation_request,
     make_voice_preview_and_authorization,
     make_voice_request,
+    mutate_p7_evidence,
     write_production_project,
 )
 
@@ -185,9 +224,34 @@ def _tree_snapshot(root: Path) -> dict[Path, tuple[bytes, int]]:
 
 
 def _activate_fake_render(
-    root: Path, attempt_id: str = "reader-render", *, p4: bool = False
+    root: Path,
+    attempt_id: str = "reader-render",
+    *,
+    p4: bool = False,
+    initialize: bool = True,
+    dependency_inputs=None,
 ):
-    if p4:
+    if dependency_inputs is not None:
+        loaded = load_production_project(root / "project.yaml")
+        spec = dependency_inputs.composition_spec
+        timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+        sources = {
+            item.asset_id: loaded.asset_paths[item.asset_id]
+            for item in (*timeline.visual_spans, *timeline.audio_spans)
+        }
+        sources.update(
+            {
+                item.caption_asset_id: loaded.asset_paths[item.caption_asset_id]
+                for item in timeline.caption_cues
+            }
+        )
+        for track in spec.caption_tracks:
+            if track.style_reference is not None:
+                sources[track.style_reference.artifact_id] = (
+                    root / track.style_reference.path
+                )
+        before = loaded.manifest
+    elif p4:
         loaded, spec = make_p4_composition_fixture(root)
         spec = seal_artifact(
             spec.model_copy(
@@ -225,7 +289,8 @@ def _activate_fake_render(
         sources[style.artifact_id] = root / style.path
         before = committed
     else:
-        write_production_project(root)
+        if initialize:
+            write_production_project(root)
         before = _manifest(root)
     png = (
         Path(__file__).parent / "fixtures/hyperframes/silent_image/source/assets/"
@@ -275,7 +340,7 @@ def _activate_fake_render(
         total_samples=20_000,
         composition_fingerprint="0" * 64,
     )
-    if not p4:
+    if not p4 and dependency_inputs is None:
         timeline = seal_artifact(
             provisional.model_copy(
                 update={"composition_fingerprint": timeline_fingerprint(provisional)}
@@ -340,12 +405,14 @@ def _activate_fake_render(
                         encoder_padding_samples=0,
                         measurement_method="fake-held-fd",
                     )
-                    if p4
+                    if p4 or dependency_inputs is not None
                     else None
                 ),
             ),
             decoded_frame_fingerprint="2" * 64,
-            decoded_audio_fingerprint="3" * 64 if p4 else None,
+            decoded_audio_fingerprint=(
+                "3" * 64 if p4 or dependency_inputs is not None else None
+            ),
         ),
     )
     committer = ProductionStateCommitter(root)
@@ -369,6 +436,78 @@ def _activate_fake_render(
         artifacts=durable.artifacts,
         next_render_state=durable.next_render_state,
     )
+    if dependency_inputs is not None:
+        candidate_bundle = loaded.model_copy(
+            update={
+                "manifest": begun,
+                "dependency_graph": None,
+                "render_state": None,
+            }
+        )
+        graph = build_production_dependency_graph(
+            replace(
+                dependency_inputs,
+                project=candidate_bundle,
+                voice_requests=(),
+            )
+        )
+        desired = desired_fingerprints(graph)
+        states = []
+        for node in graph.nodes:
+            if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT:
+                evidence = ProjectDependencyEvidence(
+                    owner="project_snapshot",
+                    pointer=request.current_project,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=desired[node.node_id],
+                )
+            elif node.kind is DependencyNodeKind.ASSET:
+                evidence = RegistryDependencyEvidence(
+                    owner="registry_snapshot",
+                    pointer=request.current_registry,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=desired[node.node_id],
+                )
+            else:
+                evidence = RenderDependencyEvidence(
+                    owner="render_state",
+                    pointer=request.next_render_state,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=desired[node.node_id],
+                )
+            states.append(
+                DependencyNodeState(
+                    node_id=node.node_id,
+                    graph_revision_id=graph.revision_id,
+                    desired_fingerprint=desired[node.node_id],
+                    applied_fingerprint=desired[node.node_id],
+                    lifecycle=DependencyLifecycle.FRESH,
+                    applied_evidence=evidence,
+                )
+            )
+        transition = prepare_dependency_graph_transition(
+            expected_manifest_revision=request.expected_manifest_revision,
+            base_dependency_graph=begun.active_dependency_graph,
+            candidate_graph=graph,
+            candidate_dependency_states=tuple(states),
+            expected_desired_fingerprints=desired,
+        )
+        graph_payload = _canonical_json_bytes(graph)
+        graph_artifact = PreparedArtifact(
+            transition.candidate_dependency_graph.path,
+            graph_payload,
+            hashlib.sha256(graph_payload).hexdigest(),
+        )
+        request = replace(
+            request,
+            artifacts=tuple(
+                sorted(
+                    (*request.artifacts, graph_artifact),
+                    key=lambda item: item.relative_path.as_posix(),
+                )
+            ),
+            dependency_graph_transition=transition,
+        )
     activated = committer.activate_render_state(request)
     return activated, durable, request
 
@@ -379,6 +518,39 @@ def _activate_fake_voice(root: Path, *, include_caption: bool = True):
         root, attempt_id="reader-voice", include_caption=include_caption
     )
     return project_path, request, committed, audio_ids, caption_ids
+
+
+def _activate_manifest_25_graph_voice(root: Path):
+    project_path = write_production_project(root)
+    make_manifest_23_project(root)
+    _write_manifest(
+        root,
+        _manifest(root).model_copy(update={"schema_version": "2.5"}),
+    )
+    request = make_voice_request(root, attempt_id="reader-voice-graph-25")
+    preview, authorization = make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(root)
+    writer.begin_voice_generation(
+        request,
+        preview,
+        authorization,
+        dependency_transition_preparer_available=True,
+    )
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = make_voice_activation_request(
+        root,
+        request,
+        authorization,
+        expected_manifest_revision=_manifest(root).manifest_revision,
+        include_caption=True,
+    )
+    activation, _ = attach_p5_dependency_transition(root, activation)
+    committed = writer.activate_voice_assets(
+        activation,
+        audio_asset_ids=audio_ids,
+        caption_asset_ids=(f"caption-{request.attempt_id}",),
+    )
+    return project_path, request, committed
 
 
 def _append_fake_voice(root: Path, *, attempt_id: str, include_caption: bool = True):
@@ -422,6 +594,68 @@ def _select_resealed_registry(root: Path, registry: AssetRegistrySnapshot) -> No
     )
     manifest = _manifest(root)
     _write_manifest(root, manifest.model_copy(update={"active_registry": pointer}))
+
+
+def _select_p7_later_voice_caption_registry_extension(
+    root: Path,
+    fixture: dict[str, object],
+    *,
+    changed_prefix: bool = False,
+) -> tuple[RegistrySnapshotPointer, tuple[str, str]]:
+    candidate = fixture["candidate_project"].registry
+    voice = next(item for item in candidate.assets if item.asset_id == "voice-dialogue")
+    caption = next(
+        item for item in candidate.assets if item.asset_id == "caption-asset-1"
+    )
+    voice_extension = voice.model_copy(
+        update={
+            "asset_id": "voice-later-phase",
+            "creation_receipt_id": "receipt-voice-later-phase",
+        }
+    )
+    caption_extension = caption.model_copy(
+        update={
+            "asset_id": "caption-later-phase",
+            "creation_receipt_id": "receipt-caption-later-phase",
+        }
+    )
+    prefix = candidate.assets
+    if changed_prefix:
+        prefix = (
+            prefix[0].model_copy(update={"usage_license": "changed-later-prefix"}),
+            *prefix[1:],
+        )
+    provisional = candidate.model_copy(
+        update={
+            "revision_id": "0" * 64,
+            "content_hash": "0" * 64,
+            "assets": (*prefix, voice_extension, caption_extension),
+        }
+    )
+    digest = registry_semantic_sha256(provisional)
+    extended = provisional.model_copy(
+        update={"revision_id": digest, "content_hash": digest}
+    )
+    payload = extended.model_dump_json(indent=2).encode("utf-8")
+    path = canonical_registry_snapshot_path(digest)
+    (root / path).write_bytes(payload)
+    pointer = RegistrySnapshotPointer(
+        path=path,
+        revision_id=digest,
+        content_hash=digest,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    manifest = _manifest(root)
+    _write_manifest(
+        root,
+        manifest.model_copy(
+            update={
+                "manifest_revision": manifest.manifest_revision + 1,
+                "active_registry": pointer,
+            }
+        ),
+    )
+    return pointer, (voice_extension.asset_id, caption_extension.asset_id)
 
 
 def _rebind_voice_candidate_to_selected_graph(root: Path, attempt_id: str) -> None:
@@ -1072,6 +1306,998 @@ def test_reader_reopens_exact_generated_voice_graph_without_writes_or_network(
     assert _tree_snapshot(tmp_path) == before
 
 
+def test_reader_reopens_manifest_25_voice_candidate_dependency_graph(tmp_path):
+    project_path, request, committed = _activate_manifest_25_graph_voice(tmp_path)
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(project_path)
+
+    attempt = next(
+        item for item in loaded.manifest.attempts if item.attempt_id == request.attempt_id
+    )
+    assert attempt.candidate_dependency_graph == committed.active_dependency_graph
+    assert loaded.dependency_graph is not None
+    assert (
+        loaded.dependency_graph.revision_id
+        == attempt.candidate_dependency_graph.revision_id
+    )
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_rejects_tampered_manifest_25_voice_candidate_graph_pointer(tmp_path):
+    project_path, request, committed = _activate_manifest_25_graph_voice(tmp_path)
+    attempt = next(
+        item for item in committed.attempts if item.attempt_id == request.attempt_id
+    )
+    assert attempt.candidate_dependency_graph is not None
+    forged_attempt = attempt.model_copy(
+        update={
+            "candidate_dependency_graph": attempt.candidate_dependency_graph.model_copy(
+                update={"file_sha256": "f" * 64}
+            )
+        }
+    )
+    _write_manifest(
+        tmp_path,
+        committed.model_copy(
+            update={
+                "attempts": tuple(
+                    forged_attempt if item.attempt_id == request.attempt_id else item
+                    for item in committed.attempts
+                )
+            }
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(project_path)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert exc_info.value.user_message == "Active P4 voice candidate history is invalid."
+    assert exc_info.value.technical_detail == "file hash mismatch"
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected_detail"),
+    (
+        ("bytes", "file hash mismatch"),
+        ("semantic_identity", "revision_id="),
+    ),
+)
+def test_reader_rejects_tampered_manifest_25_voice_candidate_graph(
+    tmp_path,
+    mutation,
+    expected_detail,
+):
+    project_path, request, committed = _activate_manifest_25_graph_voice(tmp_path)
+    attempt = next(
+        item for item in committed.attempts if item.attempt_id == request.attempt_id
+    )
+    assert attempt.candidate_dependency_graph is not None
+    graph_path = tmp_path / attempt.candidate_dependency_graph.path
+    if mutation == "bytes":
+        graph_path.write_bytes(graph_path.read_bytes() + b" ")
+    else:
+        graph_data = json.loads(graph_path.read_bytes())
+        graph_data["nodes"][0]["contributions"][0]["fingerprint"] = "f" * 64
+        graph_payload = (
+            json.dumps(
+                graph_data,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
+        ).encode("utf-8")
+        graph_path.write_bytes(graph_payload)
+        forged_pointer = attempt.candidate_dependency_graph.model_copy(
+            update={"file_sha256": hashlib.sha256(graph_payload).hexdigest()}
+        )
+        forged_attempt = attempt.model_copy(
+            update={"candidate_dependency_graph": forged_pointer}
+        )
+        _write_manifest(
+            tmp_path,
+            committed.model_copy(
+                update={
+                    "active_dependency_graph": forged_pointer,
+                    "attempts": tuple(
+                        forged_attempt
+                        if item.attempt_id == request.attempt_id
+                        else item
+                        for item in committed.attempts
+                    ),
+                }
+            ),
+        )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(project_path)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert exc_info.value.user_message == "Active P4 voice candidate history is invalid."
+    assert expected_detail in (exc_info.value.technical_detail or "")
+
+
+@pytest.fixture
+def p7_committed_project(tmp_path):
+    return make_p7_committed_project(tmp_path)
+
+
+def test_loader_reopens_selected_p7_image_receipt_and_exact_png(
+    tmp_path, p7_committed_project, monkeypatch
+):
+    before = _tree_snapshot(tmp_path)
+
+    def reject_network(*_args, **_kwargs):
+        raise AssertionError("read-only P7 project load attempted network access")
+
+    monkeypatch.setattr(socket, "create_connection", reject_network)
+    loaded = load_production_project(p7_committed_project["project_path"])
+    image = next(
+        item
+        for item in loaded.registry.assets
+        if item.asset_id == p7_committed_project["image_record"].asset_id
+    )
+
+    assert image.source_kind is AssetSourceKind.GENERATED
+    assert image.creation_receipt_id == p7_committed_project["receipt"].content_hash
+    assert _tree_snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize(
+    "artifact_key",
+    ("preview_path", "authorization_path", "submit_intent_path"),
+)
+@pytest.mark.parametrize("mutation", ("missing", "tampered"))
+def test_loader_rejects_missing_or_tampered_p7_submit_audit_evidence(
+    tmp_path, p7_committed_project, artifact_key, mutation
+):
+    artifact_path = tmp_path / p7_committed_project[artifact_key]
+    if mutation == "missing":
+        artifact_path.unlink()
+    else:
+        artifact_path.write_bytes(artifact_path.read_bytes() + b" ")
+    before = _tree_snapshot(tmp_path)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(p7_committed_project["project_path"])
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert _tree_snapshot(tmp_path) == before
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "receipt_hash",
+        "png_bytes",
+        "request_id",
+        "result_request_id",
+        "candidate_pointer",
+    ],
+)
+def test_loader_rejects_tampered_p7_evidence(
+    tmp_path, p7_committed_project, mutation
+):
+    mutate_p7_evidence(tmp_path, p7_committed_project, mutation)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(p7_committed_project["project_path"])
+
+    assert exc_info.value.retryable is False
+
+
+def test_loader_rejects_tampered_p7_candidate_artifacts_hash(
+    tmp_path, p7_committed_project
+):
+    mutate_p7_evidence(
+        tmp_path, p7_committed_project, "candidate_artifacts_hash"
+    )
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(p7_committed_project["project_path"])
+
+
+def test_loader_rejects_noncanonical_p7_candidate_shot_reference(tmp_path):
+    fixture = make_p7_committed_project(
+        tmp_path, noncanonical_candidate_shot_path=True
+    )
+
+    with pytest.raises(AiVideoError, match="candidate history") as exc_info:
+        load_production_project(fixture["project_path"])
+
+    assert "not canonical" in (exc_info.value.technical_detail or "")
+
+
+def test_p7_fixture_preserves_base_and_candidate_shot_revisions(
+    tmp_path, p7_committed_project
+):
+    base_path = tmp_path / "creative/shots/shot-1.yaml"
+    candidate_shot = p7_committed_project["candidate_project"].shots[0]
+    candidate_path = tmp_path / Path(
+        "creative/shots/"
+        f"shot.{candidate_shot.revision}.{candidate_shot.content_hash}.yaml"
+    )
+
+    base_payload = yaml.safe_load(base_path.read_text(encoding="utf-8"))
+    candidate_payload = yaml.safe_load(candidate_path.read_text(encoding="utf-8"))
+    assert base_payload["revision"] == candidate_shot.revision - 1
+    assert candidate_payload["revision"] == candidate_shot.revision
+    assert base_path.read_bytes() != candidate_path.read_bytes()
+
+
+def test_loader_reopens_exact_p7_base_registry(tmp_path, p7_committed_project):
+    attempt = _manifest(tmp_path).attempts[0]
+    base_path = tmp_path / attempt.base_registry.path
+    base_path.write_bytes(base_path.read_bytes() + b" ")
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(p7_committed_project["project_path"])
+
+
+def _write_p7_historical_projection_states(root: Path, fixture, states) -> None:
+    states_payload = json.dumps(
+        [item.model_dump(mode="json") for item in states],
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    attempt = fixture["attempt"].model_copy(
+        update={
+            "candidate_dependency_states_hash": hashlib.sha256(
+                states_payload
+            ).hexdigest()
+        }
+    )
+    _write_manifest(
+        root,
+        fixture["manifest"].model_copy(
+            update={"dependency_states": states, "attempts": (attempt,)}
+        ),
+    )
+
+
+def _p7_historical_projection_fixture(root: Path):
+    fixture = make_p7_committed_project(root)
+    candidate_inputs = fixture["candidate_inputs"]
+    candidate_graph = fixture["candidate_graph"]
+    request = fixture["request"]
+    manifest = fixture["manifest"]
+    base_project = load_production_project_candidate(
+        root,
+        manifest,
+        request.base_project.path,
+        request.base_registry.path,
+    )
+    base_project = base_project.model_copy(
+        update={
+            "manifest": manifest.model_copy(
+                update={
+                    "active_project": request.base_project,
+                    "active_registry": request.base_registry,
+                    "active_dependency_graph": request.base_dependency_graph,
+                }
+            )
+        }
+    )
+    base_inputs = replace(candidate_inputs, project=base_project)
+    base_graph = build_production_dependency_graph(base_inputs)
+    base_applied = build_applied_dependency_evidence(base_inputs, None)
+    base_states = resolve_dependency_state(base_graph, base_applied).states
+    candidate_states = resolve_dependency_state(candidate_graph, base_states).states
+    _write_p7_historical_projection_states(root, fixture, candidate_states)
+    return fixture, candidate_graph, candidate_states
+
+
+def test_loader_verifies_historical_shot_projection_evidence_after_p7_replacement(
+    tmp_path,
+):
+    fixture, _, _ = _p7_historical_projection_fixture(tmp_path)
+
+    loaded = load_production_project(fixture["project_path"])
+    target = {
+        state.node_id: state
+        for state in loaded.manifest.dependency_states
+        if state.node_id.startswith("creative:shot:shot-1:")
+    }
+
+    assert target["creative:shot:shot-1:composition"].lifecycle is DependencyLifecycle.FRESH
+    assert target["creative:shot:shot-1:voice"].lifecycle is DependencyLifecycle.FRESH
+    assert target["creative:shot:shot-1:visual"].lifecycle is DependencyLifecycle.STALE
+
+
+def test_loader_rejects_forged_historical_shot_projection_fingerprint(tmp_path):
+    fixture, _, states = _p7_historical_projection_fixture(tmp_path)
+    visual = next(
+        state
+        for state in states
+        if state.node_id == "creative:shot:shot-1:visual"
+    )
+    forged_fingerprint = "f" * 64
+    assert visual.applied_evidence is not None
+    forged = visual.model_copy(
+        update={
+            "applied_fingerprint": forged_fingerprint,
+            "applied_evidence": visual.applied_evidence.model_copy(
+                update={"artifact_fingerprint": forged_fingerprint}
+            ),
+        }
+    )
+    forged_states = tuple(
+        forged if state.node_id == forged.node_id else state for state in states
+    )
+    _write_p7_historical_projection_states(tmp_path, fixture, forged_states)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(fixture["project_path"])
+
+    assert "Historical Shot dependency evidence" in (
+        exc_info.value.technical_detail or exc_info.value.user_message
+    )
+
+
+def test_historical_shot_projection_rejects_changed_current_incoming(tmp_path):
+    fixture, graph, _ = _p7_historical_projection_fixture(tmp_path)
+    loaded = load_production_project(fixture["project_path"])
+    state = next(
+        item
+        for item in loaded.manifest.dependency_states
+        if item.node_id == "creative:shot:shot-1:visual"
+    )
+    node = next(item for item in graph.nodes if item.node_id == state.node_id)
+    scene = next(
+        item
+        for item in graph.nodes
+        if item.node_id.startswith("creative:scene:")
+    )
+    changed_scene = scene.model_copy(
+        update={
+            "contributions": tuple(
+                item.model_copy(update={"fingerprint": "f" * 64})
+                for item in scene.contributions
+            )
+        }
+    )
+    changed_graph = build_dependency_graph(
+        tuple(
+            changed_scene if item.node_id == scene.node_id else item
+            for item in graph.nodes
+        ),
+        graph.edges,
+    )
+    changed_desired = desired_fingerprints(changed_graph)
+    changed_state = state.model_copy(
+        update={
+            "graph_revision_id": changed_graph.revision_id,
+            "desired_fingerprint": changed_desired[state.node_id],
+        }
+    )
+    assert changed_state.applied_evidence is not None
+
+    with pytest.raises(AiVideoError, match="Historical Shot dependency evidence"):
+        _verify_dependency_project_evidence(
+            loaded,
+            changed_state.applied_evidence,
+            node,
+            (changed_graph, changed_state),
+        )
+
+
+@pytest.mark.parametrize("revision_offset", [0, 1])
+def test_historical_shot_projection_rejects_nonhistorical_project_evidence(
+    tmp_path, revision_offset
+):
+    fixture, graph, _ = _p7_historical_projection_fixture(tmp_path)
+    loaded = load_production_project(fixture["project_path"])
+    request = fixture["request"]
+    origin = load_production_project_candidate(
+        tmp_path,
+        loaded.manifest,
+        request.base_project.path,
+        request.base_registry.path,
+    )
+    nonhistorical_project = seal_artifact(
+        origin.project.model_copy(
+            update={
+                "revision": loaded.project.revision + revision_offset,
+                "content_hash": "0" * 64,
+            }
+        )
+    )
+    nonhistorical_bytes = yaml.safe_dump(
+        nonhistorical_project.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    nonhistorical_path = canonical_project_snapshot_path(
+        nonhistorical_project.revision, nonhistorical_project.content_hash
+    )
+    (tmp_path / nonhistorical_path).write_bytes(nonhistorical_bytes)
+    nonhistorical_pointer = ProjectSnapshotPointer(
+        path=nonhistorical_path,
+        revision=nonhistorical_project.revision,
+        content_hash=nonhistorical_project.content_hash,
+        file_sha256=hashlib.sha256(nonhistorical_bytes).hexdigest(),
+    )
+    state = next(
+        item
+        for item in loaded.manifest.dependency_states
+        if item.node_id == "creative:shot:shot-1:visual"
+    )
+    node = next(item for item in graph.nodes if item.node_id == state.node_id)
+    assert state.applied_evidence is not None
+    nonhistorical_evidence = state.applied_evidence.model_copy(
+        update={"pointer": nonhistorical_pointer}
+    )
+    nonhistorical_state = state.model_copy(
+        update={"applied_evidence": nonhistorical_evidence}
+    )
+
+    with pytest.raises(AiVideoError, match="chronology"):
+        _verify_dependency_project_evidence(
+            loaded,
+            nonhistorical_evidence,
+            node,
+            (graph, nonhistorical_state),
+        )
+
+
+@pytest.mark.parametrize("revision_offset", [0, 1])
+def test_reader_rejects_character_evidence_from_future_or_alternate_project(
+    tmp_path, revision_offset
+):
+    graph = make_manifest_23_project(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    state = next(
+        item
+        for item in loaded.manifest.dependency_states
+        if item.node_id.startswith("creative:character:")
+    )
+    assert state.applied_evidence is not None
+    forged_project = seal_artifact(
+        loaded.project.model_copy(
+            update={
+                "revision": loaded.project.revision + revision_offset,
+                "content_hash": "0" * 64,
+                "creation_receipt_id": "forged-character-project",
+            }
+        )
+    )
+    payload = yaml.safe_dump(
+        forged_project.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    path = canonical_project_snapshot_path(
+        forged_project.revision, forged_project.content_hash
+    )
+    (tmp_path / path).parent.mkdir(parents=True, exist_ok=True)
+    (tmp_path / path).write_bytes(payload)
+    pointer = ProjectSnapshotPointer(
+        path=path,
+        revision=forged_project.revision,
+        content_hash=forged_project.content_hash,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    forged_state = state.model_copy(
+        update={
+            "applied_evidence": state.applied_evidence.model_copy(
+                update={"pointer": pointer}
+            )
+        }
+    )
+    states = tuple(
+        forged_state if item.node_id == state.node_id else item
+        for item in loaded.manifest.dependency_states
+    )
+    _write_manifest(
+        tmp_path, loaded.manifest.model_copy(update={"dependency_states": states})
+    )
+
+    with pytest.raises(AiVideoError, match="state binding"):
+        load_production_project(tmp_path / "project.yaml")
+
+    assert any(item.node_id == state.node_id for item in graph.nodes)
+
+
+def test_character_evidence_rejects_same_revision_different_content(tmp_path):
+    graph = make_manifest_23_project(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    state = next(
+        item
+        for item in loaded.manifest.dependency_states
+        if item.node_id.startswith("creative:character:")
+    )
+    node = next(item for item in graph.nodes if item.node_id == state.node_id)
+    assert state.applied_evidence is not None
+    current = loaded.characters[0]
+    forged_origin = seal_artifact(
+        current.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "appearance_bible": current.appearance_bible + " forged",
+            }
+        )
+    )
+
+    with pytest.raises(AiVideoError, match="state binding"):
+        verify_active_versioned_artifact_evidence(
+            loaded,
+            state.applied_evidence,
+            node,
+            graph,
+            state,
+            forged_origin,
+            current,
+            graph,
+        )
+
+
+def test_loader_rejects_unrelated_p7_candidate_registry_suffix(tmp_path):
+    fixture = make_p7_committed_project(
+        tmp_path, unrelated_candidate_suffix=True
+    )
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(fixture["project_path"])
+
+
+def test_loader_rejects_changed_p7_candidate_registry_prefix(tmp_path):
+    fixture = make_p7_committed_project(
+        tmp_path, changed_candidate_prefix=True
+    )
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(fixture["project_path"])
+
+
+def test_loader_accepts_p7_image_history_after_voice_registry_extension(tmp_path):
+    fixture = make_p7_committed_project(tmp_path)
+    image_attempt = fixture["attempt"]
+    pointer, extension_ids = _select_p7_later_voice_caption_registry_extension(
+        tmp_path, fixture
+    )
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(fixture["project_path"])
+    candidate_registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / image_attempt.candidate_registry.path).read_bytes()
+    )
+
+    assert loaded.manifest.active_project == image_attempt.candidate_project
+    assert pointer != image_attempt.candidate_registry
+    assert loaded.registry.assets[: len(candidate_registry.assets)] == (
+        candidate_registry.assets
+    )
+    assert {item.asset_id for item in loaded.registry.assets}.issuperset(
+        {*extension_ids, fixture["image_record"].asset_id}
+    )
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_p7_reader_rejects_changed_candidate_prefix_after_voice_registry_extension(
+    tmp_path,
+):
+    fixture = make_p7_committed_project(tmp_path)
+    pointer, _ = _select_p7_later_voice_caption_registry_extension(
+        tmp_path,
+        fixture,
+        changed_prefix=True,
+    )
+    assert pointer != fixture["attempt"].candidate_registry
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(fixture["project_path"])
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "stale_creative_revision",
+        "stale_creative_hash",
+        "wrong_membership",
+        "wrong_reference_hash",
+    ],
+)
+def test_loader_rejects_p7_reference_not_bound_to_base_project(
+    tmp_path, mutation
+):
+    fixture = make_p7_committed_project(
+        tmp_path, reference_mutation=mutation
+    )
+
+    with pytest.raises(AiVideoError, match="reference"):
+        load_production_project(fixture["project_path"])
+
+
+def test_loader_rejects_p7_style_reference_even_when_scene_backed(tmp_path):
+    fixture = make_p7_committed_project(
+        tmp_path, reference_mutation="style_scene_binding"
+    )
+
+    with pytest.raises(AiVideoError, match="reference"):
+        load_production_project(fixture["project_path"])
+
+
+def test_loader_accepts_two_sequential_selected_p7_candidates_without_writes(
+    tmp_path,
+):
+    first = make_p7_committed_project(tmp_path)
+    first_asset_id = first["image_record"].asset_id
+    fixture = append_p7_committed_candidate(tmp_path, first)
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(fixture["project_path"])
+
+    assert {first_asset_id, fixture["image_record"].asset_id}.issubset(
+        {item.asset_id for item in loaded.registry.assets}
+    )
+    assert len(
+        [
+            item
+            for item in loaded.manifest.attempts
+            if item.operation == "image_generation"
+        ]
+    ) == 2
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_loader_rejects_old_image_placed_in_another_shot_after_replacement(
+    tmp_path,
+):
+    first = make_p7_committed_project(tmp_path)
+    fixture = append_p7_committed_candidate(
+        tmp_path,
+        first,
+        target_shot_id="shot-1",
+        extra_old_placement_shot_id="shot-2",
+    )
+    manifest_path = tmp_path / "state/manifest.json"
+    before = manifest_path.read_bytes()
+
+    with pytest.raises(AiVideoError) as load_error:
+        load_production_project(fixture["project_path"])
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).recover()
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert "placement provenance" in (load_error.value.technical_detail or "")
+    assert manifest_path.read_bytes() == before
+
+
+def test_loader_reopens_first_base_registry_in_two_p7_candidate_history(
+    tmp_path,
+):
+    first = make_p7_committed_project(tmp_path)
+    fixture = append_p7_committed_candidate(tmp_path, first)
+    first_attempt = _manifest(tmp_path).attempts[0]
+    base_path = tmp_path / first_attempt.base_registry.path
+    base_path.write_bytes(base_path.read_bytes() + b" ")
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(fixture["project_path"])
+
+
+def test_loader_ignores_newer_p7_receipt_decoy(tmp_path, p7_committed_project):
+    decoy = tmp_path / "state/images/receipts" / f"{'f' * 64}.json"
+    decoy.write_text('{"decoy":true}\n', encoding="utf-8")
+    decoy.touch()
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(p7_committed_project["project_path"])
+
+    assert p7_committed_project["image_record"].asset_id in loaded.asset_paths
+    assert _tree_snapshot(tmp_path) == before
+
+
+def _write_p6_artifact(root: Path, path: Path, artifact) -> str:
+    payload = _canonical_json_bytes(artifact)
+    target = root / path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(payload)
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _make_complete_p6_p7_project(root: Path) -> dict[str, object]:
+    fixture = make_p7_committed_project(root)
+    image_manifest = _manifest(root)
+    image_attempts = image_manifest.attempts
+    _write_manifest(
+        root,
+        image_manifest.model_copy(
+            update={"schema_version": "2.3", "attempts": ()}
+        ),
+    )
+    request = fixture["request"]
+    image_record = fixture["image_record"]
+    inputs = fixture["candidate_inputs"]
+    spec = inputs.composition_spec
+    spec = seal_artifact(
+        spec.model_copy(
+            update={
+                "revision": spec.revision + 1,
+                "content_hash": "0" * 64,
+                "creation_receipt_id": fixture["receipt"].content_hash,
+                "layers": tuple(
+                    item.model_copy(update={"asset_id": image_record.asset_id})
+                    if item.shot_id == request.target_shot_id
+                    and item.asset_role == request.target_asset_role
+                    else item
+                    for item in spec.layers
+                ),
+            }
+        )
+    )
+    rendered, _, _ = _activate_fake_render(
+        root,
+        attempt_id="reader-p6-p7-render",
+        initialize=False,
+        dependency_inputs=replace(inputs, composition_spec=spec),
+    )
+    _write_manifest(
+        root,
+        rendered.model_copy(
+            update={
+                "schema_version": "2.5",
+                "attempts": (*image_attempts, *rendered.attempts),
+            }
+        ),
+    )
+    add_p6_policy_to_p7_project(root)
+    manifest = _manifest(root)
+    loaded = load_production_project(fixture["project_path"])
+    render = loaded.render_state
+    assert render is not None
+    assert manifest.active_qa_policy is not None
+    assert manifest.active_dependency_graph is not None
+
+    dependency_states_hash = canonical_sha256(
+        {
+            "dependency_states": [
+                item.model_dump(mode="json")
+                for item in manifest.dependency_states
+            ]
+        }
+    )
+    tool = ToolIdentity(name="video-analysis", version="1")
+    review_request = seal_artifact(
+        ReviewRequest(
+            artifact_id="review-request-p6-p7",
+            revision=1,
+            content_hash="0" * 64,
+            creation_receipt_id="review-request-p6-p7",
+            source_provenance=(
+                SourceReference(kind="derived", reference="p6-p7-reader-fixture"),
+            ),
+            request_id="review-request-p6-p7",
+            base_manifest_revision=manifest.manifest_revision,
+            dependency_graph=manifest.active_dependency_graph,
+            dependency_states_hash=dependency_states_hash,
+            render_state=manifest.active_render_state,
+            render_output_sha256=render.output.file_sha256,
+            timeline_fingerprint=render.timeline_fingerprint,
+            qa_policy=manifest.active_qa_policy,
+            requested_layers=(QaLayer.TECHNICAL,),
+            evidence_tool_identities=(tool,),
+            technical_context=TechnicalReviewContext(
+                render_output_sha256=render.output.file_sha256,
+                timeline_fingerprint=render.timeline_fingerprint,
+                windows=(
+                    TechnicalReviewWindow(
+                        shot_id=request.target_shot_id,
+                        visual_strategy=next(
+                            item.visual_strategy
+                            for item in loaded.shots
+                            if item.shot_id == request.target_shot_id
+                        ),
+                        start_frame=0,
+                        end_frame_exclusive=1,
+                        expects_audio=True,
+                        visual_span_ids=("layer-shot-1",),
+                    ),
+                ),
+                measurement_contract_version="1",
+            ),
+        )
+    )
+    request_path = canonical_review_request_path(review_request.content_hash)
+    request_file_hash = _write_p6_artifact(root, request_path, review_request)
+    request_pointer = ReviewRequestPointer(
+        path=request_path,
+        request_id=review_request.request_id,
+        content_hash=review_request.content_hash,
+        file_sha256=request_file_hash,
+    )
+    evidence = seal_artifact(
+        ReviewEvidence(
+            artifact_id="technical-evidence-p6-p7",
+            revision=1,
+            content_hash="0" * 64,
+            creation_receipt_id="technical-evidence-p6-p7",
+            source_provenance=(
+                SourceReference(kind="derived", reference="video-analysis"),
+            ),
+            evidence_id="technical-evidence-p6-p7",
+            layer=QaLayer.TECHNICAL,
+            strength=EvidenceStrength.MEASURED,
+            render_output_sha256=render.output.file_sha256,
+            timeline_fingerprint=render.timeline_fingerprint,
+            dependency_graph_revision_id=manifest.active_dependency_graph.revision_id,
+            tool_identity=tool,
+            measurement_contract_version="1",
+            subject_ids=(request.target_shot_id,),
+            measured_payload={"coverage_complete": True, "issue_count": 0},
+        )
+    )
+    evidence_path = canonical_review_evidence_path(evidence.content_hash)
+    evidence_file_hash = _write_p6_artifact(root, evidence_path, evidence)
+    evidence_pointer = ReviewEvidencePointer(
+        path=evidence_path,
+        evidence_id=evidence.evidence_id,
+        layer=evidence.layer,
+        strength=evidence.strength,
+        content_hash=evidence.content_hash,
+        file_sha256=evidence_file_hash,
+    )
+    receipt = seal_artifact(
+        ReviewReceipt(
+            artifact_id="technical-review-p6-p7",
+            revision=1,
+            content_hash="0" * 64,
+            creation_receipt_id="technical-review-p6-p7",
+            source_provenance=(
+                SourceReference(kind="derived", reference=evidence.evidence_id),
+            ),
+            review_id="technical-review-p6-p7",
+            layer=QaLayer.TECHNICAL,
+            review_request=request_pointer,
+            render_state=manifest.active_render_state,
+            render_output_sha256=render.output.file_sha256,
+            timeline_fingerprint=render.timeline_fingerprint,
+            dependency_graph_revision_id=manifest.active_dependency_graph.revision_id,
+            qa_policy=manifest.active_qa_policy,
+            evidence=(evidence_pointer,),
+            evidence_ids=(evidence.evidence_id,),
+            tool_identities=(tool,),
+            verdict=QaVerdict.PASS,
+        )
+    )
+    receipt_path = canonical_review_receipt_path(receipt.content_hash)
+    receipt_file_hash = _write_p6_artifact(root, receipt_path, receipt)
+    receipt_pointer = ReviewReceiptPointer(
+        path=receipt_path,
+        review_id=receipt.review_id,
+        layer=receipt.layer,
+        content_hash=receipt.content_hash,
+        file_sha256=receipt_file_hash,
+    )
+    acceptance = seal_artifact(
+        FinalAcceptanceReceipt(
+            artifact_id="final-acceptance-p6-p7",
+            revision=1,
+            content_hash="0" * 64,
+            creation_receipt_id="final-acceptance-p6-p7",
+            source_provenance=(
+                SourceReference(kind="derived", reference=receipt.review_id),
+            ),
+            acceptance_id="final-acceptance-p6-p7",
+            dependency_graph=manifest.active_dependency_graph,
+            dependency_states_hash=dependency_states_hash,
+            render_state=manifest.active_render_state,
+            render_output_sha256=render.output.file_sha256,
+            timeline_fingerprint=render.timeline_fingerprint,
+            qa_policy=manifest.active_qa_policy,
+            required_review_receipts=(receipt_pointer,),
+            verdict=QaVerdict.PASS,
+        )
+    )
+    acceptance_path = canonical_final_acceptance_receipt_path(
+        acceptance.content_hash
+    )
+    acceptance_file_hash = _write_p6_artifact(
+        root, acceptance_path, acceptance
+    )
+    acceptance_pointer = FinalAcceptanceReceiptPointer(
+        path=acceptance_path,
+        acceptance_id=acceptance.acceptance_id,
+        content_hash=acceptance.content_hash,
+        file_sha256=acceptance_file_hash,
+    )
+    review_fingerprint = canonical_sha256(
+        {"review": receipt.content_hash, "policy": manifest.active_qa_policy.content_hash}
+    )
+    acceptance_fingerprint = canonical_sha256(
+        {"acceptance": acceptance.content_hash}
+    )
+    final_manifest = manifest.model_copy(
+        update={
+            "manifest_revision": manifest.manifest_revision + 1,
+            "active_review_receipts": (receipt_pointer,),
+            "review_states": (
+                ReviewLayerState(
+                    layer=QaLayer.TECHNICAL,
+                    desired_fingerprint=review_fingerprint,
+                    applied_fingerprint=review_fingerprint,
+                    lifecycle=ReviewLifecycle.FRESH,
+                    active_receipt=receipt_pointer,
+                ),
+            ),
+            "final_acceptance_state": FinalAcceptanceState(
+                desired_fingerprint=acceptance_fingerprint,
+                applied_fingerprint=acceptance_fingerprint,
+                lifecycle=ReviewLifecycle.FRESH,
+                active_receipt=acceptance_pointer,
+            ),
+        }
+    )
+    _write_manifest(root, final_manifest)
+    return {
+        **fixture,
+        "evidence_path": evidence_path,
+        "review_receipt": receipt_pointer,
+        "acceptance_receipt": acceptance_pointer,
+    }
+
+
+def test_loader_reopens_complete_p6_p7_review_and_final_acceptance(tmp_path):
+    fixture = _make_complete_p6_p7_project(tmp_path)
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(fixture["project_path"])
+
+    assert loaded.qa_policy is not None
+    assert loaded.render_state is not None
+    assert loaded.manifest.active_review_receipts == (fixture["review_receipt"],)
+    assert loaded.manifest.final_acceptance_state is not None
+    assert (
+        loaded.manifest.final_acceptance_state.active_receipt
+        == fixture["acceptance_receipt"]
+    )
+    assert all(
+        item.lifecycle is DependencyLifecycle.FRESH
+        for item in loaded.manifest.dependency_states
+    )
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_loader_rejects_tampered_non_policy_p6_evidence_in_p7_project(tmp_path):
+    fixture = _make_complete_p6_p7_project(tmp_path)
+    evidence_path = tmp_path / fixture["evidence_path"]
+    evidence_path.write_bytes(evidence_path.read_bytes() + b" ")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(fixture["project_path"])
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_loader_runs_p6_verification_for_manifest_25_with_p7_state(
+    tmp_path, p7_committed_project
+):
+    policy_path = add_p6_policy_to_p7_project(tmp_path)
+    loaded = load_production_project(p7_committed_project["project_path"])
+    assert loaded.qa_policy is not None
+
+    policy_path.write_bytes(policy_path.read_bytes() + b" ")
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(p7_committed_project["project_path"])
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_loader_runs_p6_verification_for_manifest_27(tmp_path):
+    fixture = _make_complete_p6_p7_project(tmp_path)
+    manifest = _manifest(tmp_path)
+    _write_manifest(root=tmp_path, manifest=manifest.model_copy(update={"schema_version": "2.7"}))
+    evidence_path = tmp_path / fixture["evidence_path"]
+    evidence_path.write_bytes(evidence_path.read_bytes() + b" ")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(fixture["project_path"])
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
 def test_reader_rejects_generated_voice_resealed_as_local_egress(tmp_path):
     project_path, request, _, _, _ = _activate_fake_voice(
         tmp_path, include_caption=False
@@ -1707,6 +2933,54 @@ def test_reader_reopens_superseded_project_evidence_from_origin_revision(tmp_pat
     assert superseded.applied_evidence == removed_state.applied_evidence
 
 
+def test_loader_rejects_forged_historical_shot_projection_when_only_upstream_changes(
+    tmp_path,
+):
+    graph = make_manifest_23_project(tmp_path)
+    original = _manifest(tmp_path)
+    removed_state = next(
+        state
+        for state in original.dependency_states
+        if state.applied_evidence is not None
+        and state.applied_evidence.owner == "project_snapshot"
+        and not state.node_id.startswith("creative:shot:")
+    )
+    _commit_revision_two(tmp_path, attempt_id="reader-forged-upstream-origin")
+    next_graph = build_dependency_graph(
+        tuple(node for node in graph.nodes if node.node_id != removed_state.node_id),
+        tuple(
+            edge
+            for edge in graph.edges
+            if removed_state.node_id
+            not in {edge.source_node_id, edge.target_node_id}
+        ),
+    )
+    next_states = resolve_dependency_state(next_graph, original.dependency_states).states
+    blocked = next(
+        state
+        for state in next_states
+        if state.node_id == "creative:shot:shot-1:composition"
+        and state.lifecycle is DependencyLifecycle.BLOCKED
+    )
+    forged_fingerprint = "f" * 64
+    assert blocked.applied_evidence is not None
+    forged = blocked.model_copy(
+        update={
+            "applied_fingerprint": forged_fingerprint,
+            "applied_evidence": blocked.applied_evidence.model_copy(
+                update={"artifact_fingerprint": forged_fingerprint}
+            ),
+        }
+    )
+    forged_states = tuple(
+        forged if state.node_id == forged.node_id else state for state in next_states
+    )
+    _select_manifest_23_graph(tmp_path, next_graph, forged_states)
+
+    with pytest.raises(AiVideoError, match="Historical Shot dependency evidence"):
+        load_production_project(tmp_path / "project.yaml")
+
+
 @pytest.mark.parametrize("owner", ["project", "registry"])
 def test_reader_rejects_self_consistent_graph_with_forged_owner_projection(
     tmp_path, owner
@@ -2104,8 +3378,9 @@ def _advance_active_project_and_registry(root: Path, attempt_id: str) -> None:
     )
 
 
+@pytest.mark.parametrize("schema_version", ["2.3", "2.5"])
 def test_manifest_23_reader_reopens_historical_render_pair_for_stale_evidence(
-    tmp_path,
+    tmp_path, schema_version
 ):
     activated, _, _ = _activate_fake_render(tmp_path)
     old_render = activated.active_render_state
@@ -2113,7 +3388,10 @@ def test_manifest_23_reader_reopens_historical_render_pair_for_stale_evidence(
     _advance_active_project_and_registry(tmp_path, "reader-new-active-pair")
     graph, states = _historical_render_graph_states(old_render)
     manifest = _select_manifest_23_graph(tmp_path, graph, states).model_copy(
-        update={"active_render_state": old_render}
+        update={
+            "schema_version": schema_version,
+            "active_render_state": old_render,
+        }
     )
     _write_manifest(tmp_path, manifest)
 
@@ -2155,3 +3433,152 @@ def test_manifest_23_reader_rejects_tampered_historical_render_pair(
         load_production_project(tmp_path / "project.yaml")
 
     assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_p8_video_evidence_reopens_receipts_with_exact_content_hash(tmp_path):
+    from ai_video.production._video_project_reader import (
+        load_video_request_receipt,
+        load_video_status_receipt,
+    )
+
+    fixture = make_p8_video_evidence(tmp_path)
+    resolved = load_video_request_receipt(tmp_path, fixture["request_pointer"])
+    observation = load_video_status_receipt(tmp_path, fixture["status_pointer"])
+
+    assert resolved == fixture["resolved"]
+    assert observation == fixture["observation"]
+
+
+@pytest.mark.parametrize("owner", ["request", "status"])
+def test_p8_video_evidence_rejects_tampered_receipt_bytes(tmp_path, owner):
+    from ai_video.production._video_project_reader import (
+        load_video_request_receipt,
+        load_video_status_receipt,
+    )
+
+    fixture = make_p8_video_evidence(tmp_path)
+    target = fixture[f"{owner}_path"]
+    target.write_bytes(target.read_bytes() + b" ")
+    loader = {
+        "request": load_video_request_receipt,
+        "status": load_video_status_receipt,
+    }[owner]
+    with pytest.raises(AiVideoError) as exc_info:
+        loader(tmp_path, fixture[f"{owner}_pointer"])
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+@pytest.mark.parametrize("owner", ["request", "status"])
+def test_p8_video_evidence_refuses_to_follow_receipt_symlinks(tmp_path, owner):
+    from ai_video.production._video_project_reader import (
+        load_video_request_receipt,
+        load_video_status_receipt,
+    )
+
+    fixture = make_p8_video_evidence(tmp_path)
+    target = fixture[f"{owner}_path"]
+    outside = tmp_path / f"outside-{owner}.json"
+    outside.write_bytes(target.read_bytes())
+    target.unlink()
+    target.symlink_to(outside)
+    loader = {
+        "request": load_video_request_receipt,
+        "status": load_video_status_receipt,
+    }[owner]
+    with pytest.raises(AiVideoError) as exc_info:
+        loader(tmp_path, fixture[f"{owner}_pointer"])
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_p8_video_evidence_binds_observation_to_its_attempt_request(tmp_path):
+    from ai_video.production._video_project_reader import verify_video_evidence
+
+    fixture = make_p8_video_evidence(tmp_path)
+    state = fixture["attempt_state"]
+    verify_video_evidence(tmp_path, (state,))
+
+    foreign = state.request.model_copy(
+        update={
+            "generation_id": "generation-002",
+            "request_input_hash": "9" * 64,
+        }
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        verify_video_evidence(
+            tmp_path, (state.model_copy(update={"request": foreign}),)
+        )
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_p8_video_evidence_binds_observation_to_exact_gate_submission(tmp_path):
+    from ai_video.production._video_project_reader import verify_video_evidence
+    from ai_video.production.hashing import canonical_sha256
+
+    fixture = make_p8_video_evidence(tmp_path)
+    observation = fixture["observation"]
+    data = observation.model_dump(
+        mode="json",
+        exclude={"observation_fingerprint"},
+    )
+    data["submission_fingerprint"] = "9" * 64
+    data["observation_fingerprint"] = canonical_sha256(data)
+    foreign = type(observation).model_validate(data)
+    path = tmp_path / (
+        "state/video-generation/status/"
+        f"{foreign.observation_fingerprint}.json"
+    )
+    path.write_bytes(foreign.model_dump_json().encode("utf-8"))
+    pointer = fixture["status_pointer"].model_copy(
+        update={
+            "path": path.relative_to(tmp_path),
+            "observation_fingerprint": foreign.observation_fingerprint,
+            "file_sha256": sha256_file(path),
+        }
+    )
+    state = fixture["attempt_state"].model_copy(
+        update={"latest_observation": pointer}
+    )
+
+    with pytest.raises(AiVideoError, match="submission"):
+        verify_video_evidence(tmp_path, (state,))
+
+
+def test_p8_candidate_evidence_requires_succeeded_observation(tmp_path):
+    from ai_video.production._video_project_reader import verify_video_evidence
+    from ai_video.production.video import VideoSubmission, VideoTaskObservation
+
+    fixture = make_p8_video_evidence(tmp_path)
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=fixture["resolved"],
+        receipt=fixture["submit_receipt"],
+    )
+    failed = VideoTaskObservation.create(
+        submission=submission,
+        state="failed",
+        observed_at=fixture["observation"].observed_at,
+    )
+    path = tmp_path / (
+        "state/video-generation/status/"
+        f"{failed.observation_fingerprint}.json"
+    )
+    path.write_bytes(failed.model_dump_json().encode("utf-8"))
+    pointer = fixture["status_pointer"].model_copy(
+        update={
+            "path": path.relative_to(tmp_path),
+            "observation_fingerprint": failed.observation_fingerprint,
+            "file_sha256": sha256_file(path),
+        }
+    )
+    state = fixture["attempt_state"].model_copy(
+        update={
+            "phase": "candidate",
+            "latest_observation": pointer,
+            "provider_file_id": None,
+            "candidate_video_asset_ids": (
+                fixture["attempt_state"].request.output_asset_id,
+            ),
+        }
+    )
+
+    with pytest.raises(AiVideoError, match="succeeded"):
+        verify_video_evidence(tmp_path, (state,))

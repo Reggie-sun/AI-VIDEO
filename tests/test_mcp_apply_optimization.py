@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import shutil
 
 import yaml
 
@@ -11,6 +12,48 @@ from conftest import skip_no_ffmpeg
 
 @skip_no_ffmpeg
 class TestApplyVideoOptimization:
+    def test_production_output_path_is_refused_without_caller_mode_flag(
+        self, tiny_video, tmp_path, mcp_config, mcp_cache, monkeypatch
+    ):
+        root = tmp_path / "production"
+        output = root / "state/render/outputs" / tiny_video.name
+        output.parent.mkdir(parents=True)
+        (root / "state/manifest.json").write_text("{}", encoding="utf-8")
+        shutil.copyfile(tiny_video, output)
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.apply_optimization.video_optimize_plan",
+            lambda *args, **kwargs: (_ for _ in ()).throw(
+                AssertionError("Legacy planner must not run")
+            ),
+        )
+        result = apply_video_optimization(str(output), mcp_config, mcp_cache)
+        assert result["mode"] == "production_repair_refused"
+        assert result["submit_count"] == 0
+    def test_production_apply_fails_closed_before_planning_or_writes(
+        self, tiny_video, mcp_config, mcp_cache, monkeypatch
+    ):
+        def fail(*args, **kwargs):
+            raise AssertionError("Production apply must not call Legacy helpers")
+
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.apply_optimization.video_optimize_plan", fail
+        )
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.apply_optimization.load_production_project",
+            lambda path: object(),
+        )
+        result = apply_video_optimization(
+            str(tiny_video),
+            mcp_config,
+            mcp_cache,
+            production_project_path="/verified/project/project.yaml",
+        )
+        assert result == {
+            "mode": "production_repair_refused",
+            "applied": False,
+            "reason": "durable_approved_repair_receipt_required",
+            "submit_count": 0,
+        }
     def test_apply_updates_project_and_shots_for_detected_issues(
         self,
         static_video,

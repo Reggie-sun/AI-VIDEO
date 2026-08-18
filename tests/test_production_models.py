@@ -6,6 +6,8 @@ import pytest
 from pydantic import ValidationError
 
 import ai_video.production as production
+import ai_video.production.models as production_models
+import ai_video.production.paths as production_paths
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
@@ -44,16 +46,22 @@ from ai_video.production.models import (
     DependencySemanticRole,
     DurationPolicy,
     FingerprintContribution,
+    FinalAcceptanceState,
     LoadedProductionProject,
     MeasuredRenderMetadata,
     MeasuredAudioRenderMetadata,
     MotionDirective,
     ProductionManifest,
+    QaLayer,
+    QaPolicyPointer,
+    QaVerdict,
     ProjectDependencyEvidence,
     ProjectSnapshotPointer,
     RecoveryDisposition,
     RecoveryItem,
     RecoveryReport,
+    ReviewLayerState,
+    ReviewLifecycle,
     RegistryDependencyEvidence,
     RegistrySnapshotPointer,
     RenderArtifactPointer,
@@ -620,6 +628,437 @@ def test_registry_20_preserves_generic_records_and_rejects_p4_fields():
             content_hash=ZERO_HASH,
             assets=(make_asset_record(audio_metadata=make_audio_metadata()),),
         )
+
+
+def test_registry_22_requires_measured_metadata_for_generated_video():
+    assert hasattr(production_models, "VideoAssetMetadata")
+    metadata = production_models.VideoAssetMetadata(
+        container_name="mp4",
+        codec_name="h264",
+        width=1280,
+        height=720,
+        fps_numerator=24,
+        fps_denominator=1,
+        duration_milliseconds=3000,
+        frame_count=72,
+        probe_receipt_id="probe-1",
+        request_receipt_fingerprint=ONE_HASH,
+        resolved_generation_hash=TWO_HASH,
+        provenance_receipt_id="provenance-1",
+    )
+    record = AssetRecord(
+        asset_id="video-1",
+        asset_type=AssetType.VIDEO,
+        artifact_path=Path(f"assets/video/{FIVE_HASH}.mp4"),
+        sha256=FIVE_HASH,
+        size_bytes=64,
+        mime_type="video/mp4",
+        duration_seconds=3.0,
+        width=1280,
+        height=720,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture", version="1"),
+        input_fingerprint=SIX_HASH,
+        creation_receipt_id="creation-video-1",
+        usage_license="fixture-only",
+        video_metadata=metadata,
+    )
+    registry = AssetRegistrySnapshot(
+        schema_version="2.2",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(record,),
+    )
+    assert registry.assets[0].video_metadata == metadata
+
+    with pytest.raises(ValidationError, match="generated video"):
+        AssetRegistrySnapshot(
+            schema_version="2.2",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=(record.model_copy(update={"video_metadata": None}),),
+        )
+
+
+def test_registry_22_remote_generated_video_requires_cost_and_exact_egress_identity():
+    metadata = production_models.VideoAssetMetadata(
+        container_name="mp4",
+        codec_name="h264",
+        width=1280,
+        height=720,
+        fps_numerator=24,
+        fps_denominator=1,
+        duration_milliseconds=3000,
+        frame_count=72,
+        probe_receipt_id="probe-1",
+        request_receipt_fingerprint=ONE_HASH,
+        resolved_generation_hash=TWO_HASH,
+        provenance_receipt_id="provenance-1",
+    )
+    record = AssetRecord(
+        asset_id="video-remote-1",
+        asset_type=AssetType.VIDEO,
+        artifact_path=Path(f"assets/files/{FIVE_HASH}.mp4"),
+        sha256=FIVE_HASH,
+        size_bytes=64,
+        mime_type="video/mp4",
+        duration_seconds=3.0,
+        width=1280,
+        height=720,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture", version="1"),
+        input_fingerprint=SIX_HASH,
+        creation_receipt_id="creation-video-remote-1",
+        usage_license="fixture-only",
+        egress=production_models.EgressMetadata(
+            remote=True,
+            destination="https://api.minimax.io",
+            authorization_receipt_id="authorization-1",
+            request_fingerprint=TWO_HASH,
+            payload_fingerprint=THREE_HASH,
+            retention_mode="provider_standard",
+            provider_policy_snapshot_id="policy-1",
+        ),
+        video_metadata=metadata,
+    )
+    with pytest.raises(ValidationError, match="cost receipt"):
+        AssetRegistrySnapshot(
+            schema_version="2.2",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=(record,),
+        )
+    with pytest.raises(ValidationError, match="request identity"):
+        AssetRegistrySnapshot(
+            schema_version="2.2",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=(
+                record.model_copy(
+                    update={
+                        "cost_receipt_id": "cost-1",
+                        "egress": record.egress.model_copy(
+                            update={"request_fingerprint": FOUR_HASH}
+                        ),
+                    }
+                ),
+            ),
+        )
+
+
+@pytest.mark.parametrize("schema_version", ["2.0", "2.1"])
+def test_pre_22_registry_rejects_explicit_video_metadata(schema_version):
+    assert hasattr(production_models, "VideoAssetMetadata")
+    payload = AssetRegistrySnapshot(
+        schema_version=schema_version,
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(make_asset_record(asset_type=AssetType.IMAGE),),
+    ).model_dump(mode="python")
+    payload["assets"][0]["video_metadata"] = {
+        "container_name": "mp4",
+        "codec_name": "h264",
+        "width": 1280,
+        "height": 720,
+        "fps_numerator": 24,
+        "fps_denominator": 1,
+        "duration_milliseconds": 3000,
+        "frame_count": 72,
+        "probe_receipt_id": "probe-1",
+        "request_receipt_fingerprint": ONE_HASH,
+        "resolved_generation_hash": TWO_HASH,
+        "provenance_receipt_id": "provenance-1",
+    }
+    with pytest.raises(ValidationError, match="2.2|video metadata"):
+        AssetRegistrySnapshot.model_validate(payload)
+
+
+def _make_video_generation_attempt_state():
+    required = (
+        "VideoRequestReceiptPointer",
+        "VideoStatusReceiptPointer",
+        "VideoGenerationAttemptState",
+    )
+    assert all(hasattr(production_models, name) for name in required)
+    submit = production_models.PaidProviderSubmitReceiptPointer(
+        path=Path(f"state/paid-provider/submits/{FOUR_HASH}.json"),
+        submit_receipt_fingerprint=FOUR_HASH,
+        file_sha256=FIVE_HASH,
+    )
+    request = production_models.VideoRequestReceiptPointer(
+        path=Path(f"state/video-generation/requests/{ONE_HASH}.json"),
+        request_receipt_fingerprint=ONE_HASH,
+        generation_id="generation-1",
+        request_input_hash=SIX_HASH,
+        resolved_generation_hash=TWO_HASH,
+        output_asset_id="video-1",
+        file_sha256=SEVEN_HASH,
+    )
+    observation = production_models.VideoStatusReceiptPointer(
+        path=Path(f"state/video-generation/status/{THREE_HASH}.json"),
+        observation_fingerprint=THREE_HASH,
+        request_receipt_fingerprint=ONE_HASH,
+        paid_submit_receipt_fingerprint=FOUR_HASH,
+        file_sha256=EIGHT_HASH,
+    )
+    return production_models.VideoGenerationAttemptState(
+        request=request,
+        generation_id="generation-1",
+        resolved_generation_hash=TWO_HASH,
+        phase="polling",
+        paid_submit_receipt=submit,
+        latest_observation=observation,
+    )
+
+
+def test_manifest_27_accepts_gate_bound_video_attempt_without_external_task_id():
+    video_state = _make_video_generation_attempt_state()
+    submit = video_state.paid_submit_receipt
+    assert submit is not None
+    attempt = StateCommitAttempt(
+        attempt_id="video-attempt-1",
+        operation="video_generation",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        video_generation_state=video_state,
+        paid_provider_state=production_models.PaidProviderAttemptState(
+            gate_receipt=production_models.PaidProviderGateReceiptPointer(
+                path=Path(f"state/paid-provider/gates/{NINE_HASH}.json"),
+                gate_receipt_fingerprint=NINE_HASH,
+                file_sha256=ZERO_HASH,
+            ),
+            reservation_id="reservation-video-1",
+            phase="accepted",
+            submit_receipt=submit,
+        ),
+        started_at="2026-08-18T00:00:00Z",
+    )
+    manifest = make_state_manifest(
+        schema_version="2.7",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        active_paid_provider_budget=production_models.PaidProviderBudgetSnapshotPointer(
+            path=Path(f"state/paid-provider/budgets/{ZERO_HASH}.json"),
+            revision=1,
+            content_hash=ZERO_HASH,
+            file_sha256=ONE_HASH,
+        ),
+        attempts=(attempt,),
+    )
+    dumped = manifest.model_dump(mode="json")
+    assert dumped["attempts"][0]["video_generation_state"]["generation_id"] == "generation-1"
+    assert "active_dependency_graph" in dumped
+    assert "active_paid_provider_budget" in dumped
+    assert "external_task_id" not in str(dumped)
+
+
+def test_manifest_27_allows_durable_video_request_before_paid_gate():
+    video_state = _make_video_generation_attempt_state().model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase.REQUEST,
+            "paid_submit_receipt": None,
+            "latest_observation": None,
+        }
+    )
+    attempt = StateCommitAttempt(
+        attempt_id="video-request-attempt-1",
+        operation="video_generation",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        video_generation_state=video_state,
+        started_at="2026-08-18T00:00:00Z",
+    )
+    manifest = make_state_manifest(
+        schema_version="2.7",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        attempts=(attempt,),
+    )
+    assert manifest.attempts[0].paid_provider_state is None
+
+
+@pytest.mark.parametrize(
+    ("paid_phase", "outer_status"),
+    [
+        ("known_no_effect", StateCommitStatus.FAILED),
+        ("outcome_unknown", StateCommitStatus.OUTCOME_UNKNOWN),
+    ],
+)
+def test_manifest_27_preserves_terminal_paid_submit_outcome_without_video_task(
+    paid_phase,
+    outer_status,
+):
+    base_state = _make_video_generation_attempt_state()
+    video_state = base_state.model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase.SUBMIT_INTENT,
+            "paid_submit_receipt": None,
+            "latest_observation": None,
+        }
+    )
+    paid_state = production_models.PaidProviderAttemptState(
+        gate_receipt=production_models.PaidProviderGateReceiptPointer(
+            path=Path(f"state/paid-provider/gates/{NINE_HASH}.json"),
+            gate_receipt_fingerprint=NINE_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        reservation_id="reservation-video-terminal-1",
+        phase=paid_phase,
+        submit_receipt=base_state.paid_submit_receipt,
+    )
+    attempt = StateCommitAttempt(
+        attempt_id="video-terminal-attempt-1",
+        operation="video_generation",
+        status=outer_status,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        video_generation_state=video_state,
+        paid_provider_state=paid_state,
+        started_at="2026-08-18T00:00:00Z",
+        finished_at="2026-08-18T00:00:01Z",
+        error_code="paid_provider_submit_outcome",
+        error_message="paid Provider submit reached a terminal outcome",
+    )
+    assert attempt.status is outer_status
+
+
+@pytest.mark.parametrize(
+    ("paid_phase", "wrong_status"),
+    [
+        ("known_no_effect", StateCommitStatus.OUTCOME_UNKNOWN),
+        ("outcome_unknown", StateCommitStatus.FAILED),
+    ],
+)
+def test_manifest_27_rejects_terminal_paid_submit_outcome_with_wrong_outer_status(
+    paid_phase,
+    wrong_status,
+):
+    base_state = _make_video_generation_attempt_state()
+    video_state = base_state.model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase.SUBMIT_INTENT,
+            "paid_submit_receipt": None,
+            "latest_observation": None,
+        }
+    )
+    paid_state = production_models.PaidProviderAttemptState(
+        gate_receipt=production_models.PaidProviderGateReceiptPointer(
+            path=Path(f"state/paid-provider/gates/{NINE_HASH}.json"),
+            gate_receipt_fingerprint=NINE_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        reservation_id="reservation-video-terminal-1",
+        phase=paid_phase,
+        submit_receipt=base_state.paid_submit_receipt,
+    )
+    with pytest.raises(ValidationError, match="status|phase"):
+        StateCommitAttempt(
+            attempt_id="video-terminal-attempt-1",
+            operation="video_generation",
+            status=wrong_status,
+            base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
+            base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            video_generation_state=video_state,
+            paid_provider_state=paid_state,
+            started_at="2026-08-18T00:00:00Z",
+            finished_at="2026-08-18T00:00:01Z",
+            error_code="paid_provider_submit_outcome",
+            error_message="paid Provider submit reached a terminal outcome",
+        )
+
+
+@pytest.mark.parametrize(
+    ("video_phase", "paid_phase", "include_submit"),
+    [
+        ("submit_intent", "accepted", True),
+        ("submitted", "submit_intent", False),
+        ("polling", "known_no_effect", True),
+        ("fetch", "outcome_unknown", True),
+    ],
+)
+def test_manifest_27_rejects_video_phase_mismatched_to_paid_gate_phase(
+    video_phase,
+    paid_phase,
+    include_submit,
+):
+    video_state = _make_video_generation_attempt_state().model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase(video_phase),
+            "paid_submit_receipt": (
+                _make_video_generation_attempt_state().paid_submit_receipt
+                if include_submit
+                else None
+            ),
+            "latest_observation": (
+                _make_video_generation_attempt_state().latest_observation
+                if video_phase in {"polling", "fetch"}
+                else None
+            ),
+        }
+    )
+    submit = video_state.paid_submit_receipt
+    paid_state = production_models.PaidProviderAttemptState(
+        gate_receipt=production_models.PaidProviderGateReceiptPointer(
+            path=Path(f"state/paid-provider/gates/{NINE_HASH}.json"),
+            gate_receipt_fingerprint=NINE_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        reservation_id="reservation-video-1",
+        phase=paid_phase,
+        submit_receipt=submit,
+    )
+    with pytest.raises(ValidationError, match="video.*paid Provider|phase"):
+        StateCommitAttempt(
+            attempt_id="video-mismatch-attempt-1",
+            operation="video_generation",
+            status=StateCommitStatus.RUNNING,
+            base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
+            base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            video_generation_state=video_state,
+            paid_provider_state=paid_state,
+            started_at="2026-08-18T00:00:00Z",
+        )
+
+
+@pytest.mark.parametrize("schema_version", ["2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6"])
+def test_pre_27_manifest_rejects_explicit_video_attempt_fields(schema_version):
+    payload = make_state_manifest(schema_version="2.0").model_dump(mode="python")
+    payload["schema_version"] = schema_version
+    payload["attempts"] = ({
+        "attempt_id": "video-attempt-1",
+        "operation": "video_generation",
+        "status": "running",
+        "base_manifest_revision": 1,
+        "base_project": make_project_pointer().model_dump(mode="python"),
+        "base_registry": make_registry_pointer().model_dump(mode="python"),
+        "candidate_artifacts_hash": ZERO_HASH,
+        "video_generation_state": _make_video_generation_attempt_state().model_dump(mode="python"),
+        "started_at": "2026-08-18T00:00:00Z",
+    },)
+    with pytest.raises(ValidationError, match="2.7|video"):
+        ProductionManifest.model_validate(payload)
+
+
+def test_video_attempt_schema_rejects_duplicate_external_task_identity():
+    data = _make_video_generation_attempt_state().model_dump(mode="python")
+    data["external_task_id"] = "must-live-only-in-gate-receipt"
+    with pytest.raises(ValidationError, match="extra"):
+        production_models.VideoGenerationAttemptState.model_validate(data)
 
 
 @pytest.mark.parametrize(
@@ -1220,10 +1659,14 @@ def test_voice_attempt_fields_are_manifest_22_only_and_serializer_compatible():
         candidate_artifacts_hash=ZERO_HASH,
         voice_request=request,
         voice_phase="request",
+        provider_request_id="voice-job-1",
         started_at="2026-08-10T00:00:00+00:00",
     )
     manifest = make_state_manifest(schema_version="2.2", attempts=(attempt,))
     assert manifest.attempts[0].voice_request == request
+    assert manifest.model_dump(mode="json")["attempts"][0]["provider_request_id"] == (
+        "voice-job-1"
+    )
 
     with pytest.raises(ValidationError, match="2.1"):
         make_state_manifest(schema_version="2.1", attempts=(attempt,))
@@ -3466,3 +3909,449 @@ def test_loaded_production_project_declares_optional_dependency_graph():
     assert not field.is_required()
     annotation = get_args(field.annotation)
     assert type(None) in annotation
+
+
+# ---------------------------------------------------------------------------
+# P6 Review / Repair / Final Acceptance schema tests
+# ---------------------------------------------------------------------------
+
+
+def make_qa_policy_pointer() -> QaPolicyPointer:
+    return QaPolicyPointer(
+        path=Path(f"state/reviews/policy.{ZERO_HASH}.json"),
+        policy_id="qa-default",
+        policy_version="1",
+        content_hash=ZERO_HASH,
+        file_sha256=ONE_HASH,
+    )
+
+
+def test_p6_layer_and_verdict_values_are_exact():
+    assert {item.value for item in QaLayer} == {
+        "technical",
+        "layout",
+        "strategy",
+        "semantic",
+        "final_acceptance",
+    }
+    assert {item.value for item in QaVerdict} == {
+        "pass",
+        "fail",
+        "not_evaluated",
+    }
+
+
+def test_qa_policy_pointer_requires_canonical_content_addressed_path():
+    assert make_qa_policy_pointer().path == Path(
+        f"state/reviews/policy.{ZERO_HASH}.json"
+    )
+    with pytest.raises(ValidationError):
+        QaPolicyPointer(
+            path=Path("state/reviews/policy.latest.json"),
+            policy_id="qa-default",
+            policy_version="1",
+            content_hash=ZERO_HASH,
+            file_sha256=ONE_HASH,
+        )
+
+
+def test_manifest_23_rejects_explicit_p6_fields_and_serializes_unchanged():
+    manifest = make_state_manifest(schema_version="2.3")
+    dumped = manifest.model_dump(mode="json")
+    assert "active_qa_policy" not in dumped
+    assert "review_states" not in dumped
+    with pytest.raises(ValidationError):
+        ProductionManifest.model_validate(
+            {
+                **dumped,
+                "active_qa_policy": make_qa_policy_pointer().model_dump(mode="json"),
+            }
+        )
+
+
+def test_manifest_24_requires_selected_qa_policy_and_defaults_empty_review_state():
+    manifest = make_state_manifest(
+        schema_version="2.4",
+        active_qa_policy=make_qa_policy_pointer(),
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+    )
+    assert manifest.active_qa_policy == make_qa_policy_pointer()
+    assert manifest.active_review_receipts == ()
+    assert manifest.review_states == ()
+    assert manifest.repair_outcome_receipts == ()
+    assert manifest.final_acceptance_state is None
+    with pytest.raises(ValidationError):
+        make_state_manifest(
+            schema_version="2.4",
+            active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        )
+    with pytest.raises(ValidationError):
+        make_state_manifest(
+            schema_version="2.4",
+            active_qa_policy=make_qa_policy_pointer(),
+        )
+
+
+def test_p6_error_codes_are_typed_and_non_retryable():
+    assert ErrorCode.REVIEW_EVIDENCE_INVALID.value == "review_evidence_invalid"
+    assert ErrorCode.REVIEW_NOT_CURRENT.value == "review_not_current"
+    assert ErrorCode.REPAIR_AUTHORIZATION_REQUIRED.value == "repair_authorization_required"
+    assert ErrorCode.REPAIR_SCOPE_INVALID.value == "repair_scope_invalid"
+    assert ErrorCode.FINAL_ACCEPTANCE_INVALID.value == "final_acceptance_invalid"
+
+
+# ---------------------------------------------------------------------------
+# P7 Image Generation / Manifest 2.5 schema composition tests
+# ---------------------------------------------------------------------------
+
+
+def make_image_request_receipt_payload() -> dict[str, object]:
+    return {
+        "request_id": ZERO_HASH,
+        "attempt_id": "image-attempt-1",
+        "request_fingerprint": ZERO_HASH,
+        "provider_kind": "fake-local",
+        "model_id": "fixture-image-model-1",
+        "target_shot_id": "shot-1",
+        "target_asset_role": "still",
+        "output_asset_id": f"image-{ZERO_HASH}",
+        "preview_fingerprint": ONE_HASH,
+        "authorization_fingerprint": TWO_HASH,
+        "policy_receipt_id": "local-policy-1",
+        "usage_license": "fixture-only",
+    }
+
+
+def make_image_attempt_payload(
+    *,
+    phase: str = "request",
+    status: str = "running",
+    candidate: bool = False,
+) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "attempt_id": "image-attempt-1",
+        "operation": "image_generation",
+        "status": status,
+        "base_manifest_revision": 1,
+        "base_project": make_project_pointer().model_dump(mode="json"),
+        "base_registry": make_registry_pointer().model_dump(mode="json"),
+        "candidate_artifacts_hash": THREE_HASH,
+        "image_request": make_image_request_receipt_payload(),
+        "image_phase": phase,
+        "base_dependency_graph": make_dependency_graph_snapshot_pointer().model_dump(
+            mode="json"
+        ),
+        "started_at": "2026-08-18T00:00:00+00:00",
+    }
+    if candidate:
+        payload.update(
+            {
+                "candidate_project": make_canonical_project_pointer(
+                    content_hash=FOUR_HASH, file_sha256=FIVE_HASH
+                ).model_dump(mode="json"),
+                "candidate_registry": make_alternate_registry_pointer().model_dump(
+                    mode="json"
+                ),
+                "candidate_dependency_graph": make_dependency_graph_snapshot_pointer(
+                    revision_id=SIX_HASH, file_sha256=SEVEN_HASH
+                ).model_dump(mode="json"),
+                "candidate_dependency_states_hash": EIGHT_HASH,
+                "candidate_image_asset_ids": (f"image-{ZERO_HASH}",),
+            }
+        )
+    if status != "running":
+        payload["finished_at"] = "2026-08-18T00:00:01+00:00"
+    if status in {"failed", "interrupted", "outcome_unknown"}:
+        payload["error_code"] = "typed"
+        payload["error_message"] = "safe"
+    return payload
+
+
+def make_manifest_25_payload(*, attempt: dict[str, object]) -> dict[str, object]:
+    manifest = make_state_manifest(
+        schema_version="2.3",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+    ).model_dump(mode="json")
+    manifest["schema_version"] = "2.5"
+    manifest["attempts"] = (attempt,)
+    return manifest
+
+
+def test_manifest_25_accepts_p7_only_state_from_23():
+    manifest = ProductionManifest.model_validate(
+        make_manifest_25_payload(attempt=make_image_attempt_payload())
+    )
+
+    assert manifest.schema_version == "2.5"
+    assert manifest.active_qa_policy is None
+    assert "active_qa_policy" not in manifest.model_dump(mode="json")
+
+
+def test_manifest_25_preserves_complete_p6_state():
+    p6 = make_state_manifest(
+        schema_version="2.4",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        active_qa_policy=make_qa_policy_pointer(),
+        review_states=(
+            ReviewLayerState(
+                layer=QaLayer.TECHNICAL,
+                desired_fingerprint=THREE_HASH,
+                lifecycle=ReviewLifecycle.STALE,
+            ),
+        ),
+        final_acceptance_state=FinalAcceptanceState(
+            desired_fingerprint=FOUR_HASH,
+            lifecycle=ReviewLifecycle.STALE,
+        ),
+    )
+    payload = p6.model_dump(mode="json")
+    payload["schema_version"] = "2.5"
+    payload["attempts"] = (make_image_attempt_payload(),)
+
+    p7 = ProductionManifest.model_validate(payload)
+
+    assert p7.active_qa_policy == p6.active_qa_policy
+    assert p7.review_states == p6.review_states
+    assert p7.final_acceptance_state == p6.final_acceptance_state
+
+
+def test_manifest_25_runs_complete_p6_invariants_when_any_p6_field_is_explicit():
+    payload = make_manifest_25_payload(attempt=make_image_attempt_payload())
+    payload["review_states"] = ()
+
+    with pytest.raises(ValidationError, match="2.5.*active_qa_policy"):
+        ProductionManifest.model_validate(payload)
+
+
+@pytest.mark.parametrize("operation", ["review", "repair"])
+def test_manifest_25_p6_attempt_evidence_requires_active_qa_policy(operation):
+    payload = make_manifest_25_payload(attempt=make_image_attempt_payload())
+    p6_attempt: dict[str, object] = {
+        "attempt_id": f"{operation}-attempt-1",
+        "operation": operation,
+        "status": "running",
+        "base_manifest_revision": 1,
+        "base_project": make_project_pointer().model_dump(mode="json"),
+        "base_registry": make_registry_pointer().model_dump(mode="json"),
+        "candidate_artifacts_hash": ZERO_HASH,
+        "started_at": "2026-08-18T00:00:00+00:00",
+    }
+    if operation == "review":
+        p6_attempt.update(
+            {
+                "review_request": {
+                    "path": f"state/reviews/request.{ONE_HASH}.json",
+                    "request_id": "review-request-1",
+                    "content_hash": ONE_HASH,
+                    "file_sha256": TWO_HASH,
+                },
+                "review_phase": "requested",
+            }
+        )
+    else:
+        p6_attempt["approved_repair_receipt"] = {
+            "path": f"state/repairs/approved.{ONE_HASH}.json",
+            "repair_id": "repair-1",
+            "content_hash": ONE_HASH,
+            "file_sha256": TWO_HASH,
+        }
+    payload["attempts"] = (*payload["attempts"], p6_attempt)
+
+    with pytest.raises(ValidationError, match="2.5.*active_qa_policy"):
+        ProductionManifest.model_validate(payload)
+
+
+@pytest.mark.parametrize("version", ["2.0", "2.1", "2.2", "2.3", "2.4"])
+def test_manifest_20_24_rejects_explicit_image_fields(version):
+    payload = make_state_manifest(
+        schema_version="2.4" if version == "2.4" else version,
+        **(
+            {
+                "active_dependency_graph": make_dependency_graph_snapshot_pointer(),
+                "active_qa_policy": make_qa_policy_pointer(),
+            }
+            if version == "2.4"
+            else {
+                "active_dependency_graph": make_dependency_graph_snapshot_pointer()
+            }
+            if version == "2.3"
+            else {}
+        ),
+    ).model_dump(mode="json")
+    payload["attempts"] = (make_image_attempt_payload(),)
+
+    with pytest.raises(ValidationError, match=rf"{version}.*image"):
+        ProductionManifest.model_validate(payload)
+
+
+def test_image_attempt_requires_exact_candidate_graph_bundle():
+    missing = make_image_attempt_payload(phase="candidate")
+    with pytest.raises(ValidationError, match="candidate.*bundle"):
+        ProductionManifest.model_validate(
+            make_manifest_25_payload(attempt=missing)
+        )
+
+    candidate = ProductionManifest.model_validate(
+        make_manifest_25_payload(
+            attempt=make_image_attempt_payload(phase="candidate", candidate=True)
+        )
+    ).attempts[0]
+    assert candidate.candidate_image_asset_ids == (f"image-{ZERO_HASH}",)
+    assert candidate.candidate_dependency_states_hash == EIGHT_HASH
+
+    succeeded = ProductionManifest.model_validate(
+        make_manifest_25_payload(
+            attempt=make_image_attempt_payload(
+                phase="activate", status="succeeded", candidate=True
+            )
+        )
+    ).attempts[0]
+    assert succeeded.status is StateCommitStatus.SUCCEEDED
+    assert succeeded.image_phase == "activate"
+
+
+def test_image_attempt_rejects_candidate_asset_not_sealed_by_request():
+    attempt = make_image_attempt_payload(phase="candidate", candidate=True)
+    attempt["candidate_image_asset_ids"] = (f"image-{ONE_HASH}",)
+
+    with pytest.raises(ValidationError, match="candidate.*request"):
+        ProductionManifest.model_validate(
+            make_manifest_25_payload(attempt=attempt)
+        )
+
+
+@pytest.mark.parametrize(
+    ("status", "phase"),
+    [
+        ("succeeded", "candidate"),
+        ("interrupted", "submit_intent"),
+        ("interrupted", "provider_call"),
+        ("outcome_unknown", "request"),
+    ],
+)
+def test_image_attempt_terminal_status_requires_plan_consistent_phase(status, phase):
+    with pytest.raises(ValidationError, match="image.*phase"):
+        ProductionManifest.model_validate(
+            make_manifest_25_payload(
+                attempt=make_image_attempt_payload(
+                    status=status,
+                    phase=phase,
+                    candidate=phase in {"candidate", "activate"},
+                )
+            )
+        )
+
+
+def test_image_attempt_serializes_only_image_fields_and_preserves_voice_provider_id():
+    image = ProductionManifest.model_validate(
+        make_manifest_25_payload(
+            attempt={
+                **make_image_attempt_payload(),
+                "provider_request_id": "local-job-1",
+            }
+        )
+    ).attempts[0].model_dump(mode="json")
+    assert image["image_request"]["request_fingerprint"] == ZERO_HASH
+    assert image["provider_request_id"] == "local-job-1"
+    assert "voice_request" not in image
+    assert "candidate_audio_asset_ids" not in image
+
+    historical = StateCommitAttempt(
+        attempt_id="historical-1",
+        operation="historical_custom_commit",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        started_at="2026-08-18T00:00:00+00:00",
+    ).model_dump(mode="json")
+    assert not {
+        "image_request",
+        "image_phase",
+        "provider_request_id",
+        "candidate_image_asset_ids",
+    }.intersection(historical)
+
+
+def test_image_request_receipt_and_error_codes_are_typed():
+    receipt = production_models.ImageRequestReceipt.model_validate(
+        make_image_request_receipt_payload()
+    )
+    assert receipt.output_asset_id == f"image-{ZERO_HASH}"
+    assert ErrorCode.IMAGE_REQUEST_INVALID.value == "image_request_invalid"
+    assert ErrorCode.IMAGE_ASSET_INVALID.value == "image_asset_invalid"
+    assert ErrorCode.IMAGE_PROVIDER_FAILED.value == "image_provider_failed"
+    assert (
+        ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN.value
+        == "image_provider_outcome_unknown"
+    )
+    mismatched = make_image_request_receipt_payload()
+    mismatched["request_id"] = ONE_HASH
+    with pytest.raises(ValidationError, match="request ID"):
+        production_models.ImageRequestReceipt.model_validate(mismatched)
+
+
+def test_image_lifecycle_paths_are_canonical_and_content_addressed():
+    assert production_paths.canonical_image_request_path(ZERO_HASH) == Path(
+        f"state/images/requests/{ZERO_HASH}.json"
+    )
+    assert production_paths.canonical_image_preview_path(ONE_HASH) == Path(
+        f"state/images/previews/{ONE_HASH}.json"
+    )
+    assert production_paths.canonical_image_authorization_path(TWO_HASH) == Path(
+        f"state/images/authorizations/{TWO_HASH}.json"
+    )
+    assert production_paths.canonical_image_submit_intent_path(ZERO_HASH) == Path(
+        f"state/images/submit-intents/{ZERO_HASH}.json"
+    )
+    assert production_paths.canonical_image_result_path(THREE_HASH) == Path(
+        f"state/images/results/{THREE_HASH}.json"
+    )
+    assert production_paths.canonical_image_receipt_path(FOUR_HASH) == Path(
+        f"state/images/receipts/{FOUR_HASH}.json"
+    )
+    assert production_paths.canonical_image_asset_path(FIVE_HASH) == Path(
+        f"assets/files/{FIVE_HASH}.png"
+    )
+    with pytest.raises(ValueError, match="SHA-256"):
+        production_paths.canonical_image_request_path("latest")
+
+
+def test_video_lifecycle_paths_are_canonical_and_content_addressed():
+    assert production_paths.canonical_video_request_receipt_path(ZERO_HASH) == Path(
+        f"state/video-generation/requests/{ZERO_HASH}.json"
+    )
+    assert production_paths.canonical_video_status_receipt_path(ONE_HASH) == Path(
+        f"state/video-generation/status/{ONE_HASH}.json"
+    )
+    assert production_paths.canonical_video_asset_path(TWO_HASH) == Path(
+        f"assets/files/{TWO_HASH}.mp4"
+    )
+    for factory in (
+        production_paths.canonical_video_request_receipt_path,
+        production_paths.canonical_video_status_receipt_path,
+        production_paths.canonical_video_asset_path,
+    ):
+        with pytest.raises(ValueError, match="SHA-256"):
+            factory("latest")
+
+
+def test_video_attempt_pointers_reject_non_canonical_paths():
+    request = _make_video_generation_attempt_state().request
+    data = request.model_dump(mode="python")
+    data["path"] = Path("state/video-generation/requests/latest.json")
+    with pytest.raises(ValidationError, match="canonical"):
+        production_models.VideoRequestReceiptPointer.model_validate(data)
+
+    data = request.model_dump(mode="python")
+    data["path"] = Path(f"../state/video-generation/requests/{ONE_HASH}.json")
+    with pytest.raises(ValidationError, match="canonical"):
+        production_models.VideoRequestReceiptPointer.model_validate(data)
+
+    observation = _make_video_generation_attempt_state().latest_observation
+    assert observation is not None
+    data = observation.model_dump(mode="python")
+    data["path"] = Path(f"/state/video-generation/status/{THREE_HASH}.json")
+    with pytest.raises(ValidationError, match="canonical"):
+        production_models.VideoStatusReceiptPointer.model_validate(data)

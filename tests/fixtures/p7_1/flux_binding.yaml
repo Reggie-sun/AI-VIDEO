@@ -1,0 +1,10 @@
+positive_prompt: ["3", "inputs", "text"]
+negative_prompt: ["4", "inputs", "text"]
+seed: ["6", "inputs", "seed"]
+width: ["8", "inputs", "width"]
+height: ["8", "inputs", "height"]
+reference_images:
+  - ["10", "inputs", "image"]
+  - ["11", "inputs", "image"]
+output_prefix: ["9", "inputs", "filename_prefix"]
+output_node_id: "9"

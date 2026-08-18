@@ -1,8 +1,65 @@
 from __future__ import annotations
 
+import hashlib
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+
+from ai_video_mcp.errors import McpError
 from ai_video_mcp.tools.review import video_review
+from ai_video.production.models import (
+    ReviewAttemptPhase,
+    ReviewRequestPointer,
+    StateCommitStatus,
+    TechnicalReviewContext,
+)
 
 from conftest import skip_no_ffmpeg
+
+
+def production_request(monkeypatch, context):
+    class Permit:
+        def __init__(self):
+            self.consumed = False
+
+        def _consume_review_analysis_permit(self, **binding):
+            if self.consumed:
+                return False
+            self.consumed = True
+            return True
+
+    pointer = ReviewRequestPointer(
+        path=Path("state/reviews/request." + "2" * 64 + ".json"),
+        request_id="request-1",
+        content_hash="2" * 64,
+        file_sha256="3" * 64,
+    )
+    attempt = SimpleNamespace(
+        operation="review",
+        status=StateCommitStatus.RUNNING,
+        review_phase=ReviewAttemptPhase.EVIDENCE,
+        review_request=pointer,
+    )
+    monkeypatch.setattr(
+        "ai_video_mcp.tools.review.load_production_project",
+        lambda path: SimpleNamespace(
+            root=Path("/verified/project"),
+            manifest=SimpleNamespace(manifest_revision=7, attempts=(attempt,)),
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video_mcp.tools.review.load_review_request",
+        lambda root, selected: SimpleNamespace(
+            content_hash=pointer.content_hash,
+            technical_context=TechnicalReviewContext.model_validate(context)
+        ),
+    )
+    return {
+        "production_project_path": "/verified/project/project.yaml",
+        "production_review_request": pointer.model_dump(mode="json"),
+        "production_analysis_permit": Permit(),
+    }
 
 
 @skip_no_ffmpeg
@@ -34,3 +91,138 @@ class TestVideoReview:
         metrics = result["quality_metrics"]
         assert metrics["sampled_frame_count"] >= 2
         assert metrics["unique_frame_ratio"] <= 0.5
+
+    def test_production_static_image_reports_measurement_without_static_failure(
+        self, static_video, mcp_config, mcp_cache, monkeypatch
+    ):
+        output_hash = hashlib.sha256(static_video.read_bytes()).hexdigest()
+        context = {
+            "render_output_sha256": output_hash,
+            "timeline_fingerprint": "1" * 64,
+            "measurement_contract_version": "1",
+            "windows": [
+                {
+                    "shot_id": "shot-1",
+                    "visual_strategy": "static_image",
+                    "start_frame": 0,
+                    "end_frame_exclusive": 24,
+                    "expects_audio": False,
+                    "visual_span_ids": ["visual-1"],
+                    "motion_expectation": None,
+                }
+            ],
+        }
+        result = video_review(
+            str(static_video),
+            mcp_config,
+            mcp_cache,
+            production_context=context,
+            **production_request(monkeypatch, context),
+        )
+        assert result["mode"] == "production_evidence"
+        assert result["issues"] == []
+        assert result["measurements"]["coverage_complete"] is True
+        assert result["measurements"]["unique_frame_ratio"] <= 0.5
+
+    def test_partial_production_arguments_do_not_fall_back_to_legacy(
+        self, tiny_video, mcp_config, mcp_cache
+    ):
+        with pytest.raises(McpError, match="durable request"):
+            video_review(
+                str(tiny_video),
+                mcp_config,
+                mcp_cache,
+                production_project_path="/verified/project/project.yaml",
+            )
+
+    def test_committer_permit_is_one_use_and_second_call_does_not_analyze(
+        self, static_video, mcp_config, mcp_cache, monkeypatch
+    ):
+        output_hash = hashlib.sha256(static_video.read_bytes()).hexdigest()
+        context = {
+            "render_output_sha256": output_hash,
+            "timeline_fingerprint": "1" * 64,
+            "measurement_contract_version": "1",
+            "windows": [{
+                "shot_id": "shot-1",
+                "visual_strategy": "static_image",
+                "start_frame": 0,
+                "end_frame_exclusive": 24,
+                "expects_audio": False,
+                "visual_span_ids": ["visual-1"],
+                "motion_expectation": None,
+            }],
+        }
+        production = production_request(monkeypatch, context)
+        video_review(
+            str(static_video), mcp_config, mcp_cache,
+            production_context=context, **production,
+        )
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.review._sample_window_hashes",
+            lambda *args: (_ for _ in ()).throw(AssertionError("analysis repeated")),
+        )
+        with pytest.raises(McpError, match="unused committer-issued"):
+            video_review(
+                str(static_video), mcp_config, mcp_cache,
+                production_context=context, **production,
+            )
+
+    def test_production_context_rejects_output_hash_mismatch(
+        self, tiny_video, mcp_config, mcp_cache, monkeypatch
+    ):
+        with pytest.raises(McpError, match="hash"):
+            context = {
+                "render_output_sha256": "0" * 64,
+                "timeline_fingerprint": "1" * 64,
+                "measurement_contract_version": "1",
+                "windows": [{
+                    "shot_id": "shot-1",
+                    "visual_strategy": "static_image",
+                    "start_frame": 0,
+                    "end_frame_exclusive": 1,
+                    "expects_audio": False,
+                    "visual_span_ids": ["visual-1"],
+                    "motion_expectation": None,
+                }],
+            }
+            video_review(
+                str(tiny_video),
+                mcp_config,
+                mcp_cache,
+                production_context=context,
+                **production_request(monkeypatch, context),
+            )
+
+    def test_unsupported_p3_motion_strategy_is_not_evaluated(
+        self, static_video, mcp_config, mcp_cache, monkeypatch
+    ):
+        output_hash = hashlib.sha256(static_video.read_bytes()).hexdigest()
+        context = {
+            "render_output_sha256": output_hash,
+            "timeline_fingerprint": "1" * 64,
+            "measurement_contract_version": "1",
+            "windows": [{
+                "shot_id": "shot-1",
+                "visual_strategy": "image_motion",
+                "start_frame": 0,
+                "end_frame_exclusive": 24,
+                "expects_audio": False,
+                "visual_span_ids": ["visual-1"],
+                "motion_expectation": {
+                    "directive_kind": "pan",
+                    "directive_parameters_fingerprint": "2" * 64,
+                    "measurement_kind": "transform_delta",
+                    "minimum_measured_delta_milli": 5,
+                    "tolerance_milli": 1,
+                },
+            }],
+        }
+        result = video_review(
+            str(static_video),
+            mcp_config,
+            mcp_cache,
+            production_context=context,
+            **production_request(monkeypatch, context),
+        )
+        assert result["windows"][0]["status"] == "not_evaluated"

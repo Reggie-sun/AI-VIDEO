@@ -4,12 +4,17 @@ import hashlib
 import io
 import json
 import struct
+import zlib
 from datetime import date
 import wave
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
+
+if TYPE_CHECKING:
+    from production_e2e_support import BaseAiComicE2ERuntime
 
 from ai_video.config import sha256_file
 from ai_video.production.captions import (
@@ -648,6 +653,7 @@ def write_and_load_two_shot_project(
     filenames: tuple[str, str] = ("shot-1.png", "shot-2.png"),
     seconds: tuple[float, float] = (2.0, 2.0),
     fps: int = 24,
+    decodable_pngs: bool = False,
 ):
     """Build a valid two-Shot raster project through the public P2 loader."""
     write_production_project(root)
@@ -722,7 +728,15 @@ def write_and_load_two_shot_project(
         if Path(filename).name != filename:
             raise ValueError("composition fixture filenames must be basenames")
         asset_path = root / "assets/files" / filename
-        payload = b"\x89PNG\r\n\x1a\n" + f"fixture-raster-{index}".encode()
+        payload = (
+            _p7_png(
+                width=1,
+                height=1,
+                rgba=bytes((0x20 * index, 0x30 * index, 0x40 * index, 0xFF)),
+            )
+            if decodable_pngs
+            else b"\x89PNG\r\n\x1a\n" + f"fixture-raster-{index}".encode()
+        )
         asset_path.write_bytes(payload)
         assets.append(
             registry.assets[0].model_copy(
@@ -927,10 +941,13 @@ def _make_audio_asset(
 
 
 def make_p4_composition_fixture(
-    root: Path, *, second_caption_start_sample: int = 24_000
+    root: Path,
+    *,
+    second_caption_start_sample: int = 24_000,
+    decodable_pngs: bool = False,
 ):
     """Build deterministic P4 registry assets around the public P2-loaded project."""
-    loaded = write_and_load_two_shot_project(root)
+    loaded = write_and_load_two_shot_project(root, decodable_pngs=decodable_pngs)
     audio_definitions = (
         ("voice-dialogue", AudioKind.DIALOGUE, 96_000),
         ("voice-narration", AudioKind.NARRATION, 48_000),
@@ -1124,12 +1141,14 @@ def make_p4_composition_fixture(
     return loaded, seal_artifact(spec)
 
 
-def make_p5_dependency_inputs(root: Path):
+def make_p5_dependency_inputs(root: Path, *, decodable_pngs: bool = False):
     """Build verified deterministic P2/P3/P4 inputs for P5 graph tests."""
 
     from ai_video.production.dependency import ProductionDependencyInputs
 
-    loaded, composition_spec = make_p4_composition_fixture(root)
+    loaded, composition_spec = make_p4_composition_fixture(
+        root, decodable_pngs=decodable_pngs
+    )
     registry_path = root / f"assets/registry.{loaded.registry.revision_id}.json"
     registry_payload = (
         json.dumps(
@@ -1700,6 +1719,346 @@ def attach_p5_dependency_transition(root: Path, request):
     ), graph
 
 
+def make_base_ai_comic_voice_request(root: Path):
+    """Bind the Task 5 generated dialogue to Shot 2 without changing defaults."""
+
+    from ai_video.production.audio import (
+        VoiceGenerationRequest,
+        VoiceProviderParameters,
+    )
+
+    manifest = ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_bytes()
+    )
+    return VoiceGenerationRequest.create(
+        request_id="request-base-ai-comic-voice",
+        attempt_id="base-ai-comic-voice",
+        provider_kind="fake",
+        model_id="fixture-model",
+        audio_kind=AudioKind.DIALOGUE,
+        script_text="Exact script",
+        speaker_id="speaker-1",
+        voice_id="voice-1",
+        language="en",
+        output_container="wav",
+        output_codec="pcm_s16le",
+        output_sample_rate_hz=48_000,
+        output_channels=1,
+        provider_parameters=VoiceProviderParameters(stability_milli=500),
+        base_project=manifest.active_project,
+        base_registry=manifest.active_registry,
+        input_artifact_ids=("shot-2",),
+        input_fingerprint="1" * 64,
+        pricing_snapshot_id="fixture-pricing",
+        budget_reservation_receipt_id="budget-1",
+        egress_authorization_receipt_id="egress-1",
+    )
+
+
+def attach_base_ai_comic_voice_dependency_transition(
+    root: Path,
+    request,
+    base_inputs,
+    voice_request,
+):
+    """Attach the exact P5 graph candidate to one public voice activation."""
+
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.state_commit import (
+        PreparedArtifact,
+        prepare_dependency_graph_transition,
+    )
+
+    manifest = ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_bytes()
+    )
+    project_artifact = next(
+        item
+        for item in request.artifacts
+        if item.relative_path == request.next_project.path
+    )
+    registry_artifact = next(
+        item
+        for item in request.artifacts
+        if item.relative_path == request.next_registry.path
+    )
+    project = ProductionProject.model_validate(yaml.safe_load(project_artifact.payload))
+    registry = AssetRegistrySnapshot.model_validate_json(registry_artifact.payload)
+    active = load_production_project(root / "project.yaml")
+    candidate = active.model_copy(
+        update={
+            "manifest": manifest.model_copy(
+                update={
+                    "active_project": request.next_project,
+                    "active_registry": request.next_registry,
+                }
+            ),
+            "project": project,
+            "registry": registry,
+            "dependency_graph": None,
+            "render_state": None,
+        }
+    )
+    composition, style_fingerprints = make_base_ai_comic_current_composition(
+        candidate,
+        base_inputs,
+        revision=1,
+        voice_request=voice_request,
+        artifacts=request.artifacts,
+    )
+    candidate_inputs = replace(
+        base_inputs,
+        project=candidate,
+        composition_spec=composition,
+        voice_requests=(*base_inputs.voice_requests, voice_request),
+        caption_style_fingerprints=style_fingerprints,
+    )
+    graph = build_production_dependency_graph(candidate_inputs)
+    states = resolve_dependency_state(
+        graph, build_applied_dependency_evidence(candidate_inputs, None)
+    ).states
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=request.expected_manifest_revision,
+        base_dependency_graph=manifest.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=states,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    payload = _p7_json_bytes(graph.model_dump(mode="json"))
+    graph_artifact = PreparedArtifact(
+        transition.candidate_dependency_graph.path,
+        payload,
+        hashlib.sha256(payload).hexdigest(),
+    )
+    return replace(
+        request,
+        artifacts=tuple(
+            sorted(
+                (*request.artifacts, graph_artifact),
+                key=lambda item: item.relative_path.as_posix(),
+            )
+        ),
+        dependency_graph_transition=transition,
+    )
+
+
+def make_base_ai_comic_current_composition(
+    loaded,
+    base_inputs,
+    *,
+    revision: int,
+    voice_request,
+    artifacts=(),
+):
+    """Seal one CompositionSpec from current active Shot and media identities."""
+
+    audio_id = f"voice-{voice_request.attempt_id}"
+    caption_id = f"caption-{voice_request.attempt_id}"
+    caption_record = next(
+        item for item in loaded.registry.assets if item.asset_id == caption_id
+    )
+    metadata = caption_record.caption_metadata
+    if (
+        metadata is None
+        or metadata.style_reference_id is None
+        or metadata.style_reference_revision is None
+        or metadata.style_content_hash is None
+    ):
+        raise AssertionError("generated caption style provenance is required")
+    style = CaptionStyleReference(
+        artifact_id=metadata.style_reference_id,
+        revision=metadata.style_reference_revision,
+        content_hash=metadata.style_content_hash,
+        path=Path(f"assets/styles/{metadata.style_content_hash}.json"),
+    )
+    artifact_by_path = {item.relative_path: item.payload for item in artifacts}
+    style_bytes = artifact_by_path.get(style.path)
+    if style_bytes is None:
+        style_bytes = (loaded.root / style.path).read_bytes()
+    shot_visuals = {
+        shot.shot_id: next(
+            role.asset_ids[0]
+            for role in shot.required_asset_roles
+            if role.role == "still"
+        )
+        for shot in loaded.shots
+    }
+    base = base_inputs.composition_spec
+    caption_audio_track_ids = {
+        binding.source_audio_track_id for binding in base.caption_tracks
+    }
+    required_base_audio_tracks = tuple(
+        track
+        for track in base.audio_tracks
+        if track.track_id in caption_audio_track_ids
+    )
+    composition = seal_artifact(
+        base.model_copy(
+            update={
+                "revision": revision,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": f"base-ai-comic-composition-{revision}",
+                "layers": tuple(
+                    layer.model_copy(
+                        update={
+                            "asset_id": shot_visuals[layer.shot_id],
+                            "transform": (
+                                layer.transform.model_copy(
+                                    update={"translate_x_px": 24}
+                                )
+                                if revision == 2 and layer == base.layers[0]
+                                else layer.transform
+                            ),
+                        }
+                    )
+                    for layer in base.layers
+                ),
+                "audio_tracks": (
+                    *required_base_audio_tracks,
+                    AudioTrackSpec(
+                        track_id="base-ai-comic-dialogue",
+                        audio_kind=AudioKind.DIALOGUE,
+                        asset_id=audio_id,
+                        shot_id="shot-2",
+                    ),
+                ),
+                "caption_tracks": (
+                    *base.caption_tracks,
+                    CaptionTrackBinding(
+                        binding_id="base-ai-comic-dialogue-captions",
+                        caption_asset_id=caption_id,
+                        source_audio_track_id="base-ai-comic-dialogue",
+                        shot_id="shot-2",
+                        style_reference=style,
+                    ),
+                ),
+            }
+        )
+    )
+    style_fingerprints = dict(base_inputs.caption_style_fingerprints)
+    style_fingerprints[style.artifact_id] = caption_style_fingerprint(
+        style, style_bytes
+    )
+    return composition, tuple(sorted(style_fingerprints.items()))
+
+
+def make_base_ai_comic_caption_style_fingerprints(
+    loaded,
+    base_inputs,
+    composition_spec,
+):
+    """Reopen caption style bytes for an already sealed CompositionSpec."""
+
+    style_fingerprints = dict(base_inputs.caption_style_fingerprints)
+    for binding in composition_spec.caption_tracks:
+        style = binding.style_reference
+        if style is None:
+            raise AssertionError("base AI comic captions require exact style identity")
+        style_fingerprints[style.artifact_id] = caption_style_fingerprint(
+            style, (loaded.root / style.path).read_bytes()
+        )
+    return tuple(sorted(style_fingerprints.items()))
+
+
+def make_base_ai_comic_render_transition_preparer(
+    root: Path,
+    base_inputs,
+    composition_spec,
+    voice_request,
+    caption_style_fingerprints,
+):
+    """Build a write-free exact render-closure transition preparer."""
+
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.models import (
+        DependencyLifecycle,
+        DependencyNodeKind,
+        DependencyNodeState,
+        RenderDependencyEvidence,
+    )
+    from ai_video.production.state_commit import (
+        PreparedArtifact,
+        prepare_dependency_graph_transition,
+    )
+
+    loaded = load_production_project(root / "project.yaml")
+    candidate_inputs = replace(
+        base_inputs,
+        project=loaded,
+        composition_spec=composition_spec,
+        voice_requests=(*base_inputs.voice_requests, voice_request),
+        caption_style_fingerprints=caption_style_fingerprints,
+    )
+    graph = build_production_dependency_graph(candidate_inputs)
+    applied_states = build_applied_dependency_evidence(candidate_inputs, None)
+    desired = desired_fingerprints(graph)
+    render_kinds = {
+        DependencyNodeKind.COMPOSITION_SPEC,
+        DependencyNodeKind.RESOLVED_TIMELINE,
+        DependencyNodeKind.RENDERER_SOURCE,
+        DependencyNodeKind.RENDER,
+    }
+
+    def prepare(activation):
+        current = load_production_project(root / "project.yaml").manifest
+        render_states = []
+        for node in graph.nodes:
+            if node.kind in render_kinds:
+                render_states.append(
+                    DependencyNodeState(
+                        node_id=node.node_id,
+                        graph_revision_id=graph.revision_id,
+                        desired_fingerprint=desired[node.node_id],
+                        applied_fingerprint=desired[node.node_id],
+                        lifecycle=DependencyLifecycle.FRESH,
+                        applied_evidence=RenderDependencyEvidence(
+                            owner="render_state",
+                            pointer=activation.next_render_state,
+                            artifact_id=node.artifact_id,
+                            artifact_fingerprint=desired[node.node_id],
+                        ),
+                    )
+                )
+        canonical_states = resolve_dependency_state(
+            graph, (*applied_states, *render_states)
+        ).states
+        transition = prepare_dependency_graph_transition(
+            expected_manifest_revision=activation.expected_manifest_revision,
+            base_dependency_graph=current.active_dependency_graph,
+            candidate_graph=graph,
+            candidate_dependency_states=canonical_states,
+            expected_desired_fingerprints=desired,
+        )
+        payload = _p7_json_bytes(graph.model_dump(mode="json"))
+        graph_artifact = PreparedArtifact(
+            transition.candidate_dependency_graph.path,
+            payload,
+            hashlib.sha256(payload).hexdigest(),
+        )
+        return replace(
+            activation,
+            artifacts=tuple(
+                sorted(
+                    (*activation.artifacts, graph_artifact),
+                    key=lambda item: item.relative_path.as_posix(),
+                )
+            ),
+            dependency_graph_transition=transition,
+        )
+
+    return prepare
+
+
 def load_initial_models(root: Path) -> tuple[ProductionProject, AssetRegistrySnapshot]:
     project = ProductionProject.model_validate(
         yaml.safe_load((root / "project.yaml").read_text(encoding="utf-8"))
@@ -1936,3 +2295,2106 @@ def make_revision_two_request(root: Path, *, attempt_id: str = "attempt-revision
         registry=registry,
         attempt_id=attempt_id,
     )
+
+
+def _p7_json_bytes(value: object) -> bytes:
+    return (
+        json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+
+
+def _p7_submit_audit_evidence(request, preview, authorization):
+    from ai_video.production.paths import (
+        canonical_image_authorization_path,
+        canonical_image_preview_path,
+        canonical_image_request_path,
+        canonical_image_submit_intent_path,
+    )
+
+    request_path = canonical_image_request_path(request.request_fingerprint)
+    preview_path = canonical_image_preview_path(preview.preview_fingerprint)
+    authorization_path = canonical_image_authorization_path(
+        authorization.authorization_fingerprint
+    )
+    r1 = {
+        request_path: _p7_json_bytes(request.model_dump(mode="json")),
+        preview_path: _p7_json_bytes(preview.model_dump(mode="json")),
+        authorization_path: _p7_json_bytes(
+            authorization.model_dump(mode="json")
+        ),
+    }
+    r1_pairs = sorted(
+        (path.as_posix(), hashlib.sha256(payload).hexdigest())
+        for path, payload in r1.items()
+    )
+    evidence_hash = hashlib.sha256(
+        json.dumps(r1_pairs, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    submit_intent_path = canonical_image_submit_intent_path(
+        request.request_fingerprint
+    )
+    submit_intent = {
+        "schema": "ai-video-image-submit-intent/1",
+        "attempt_id": request.attempt_id,
+        "request_fingerprint": request.request_fingerprint,
+        "preview_fingerprint": preview.preview_fingerprint,
+        "authorization_fingerprint": authorization.authorization_fingerprint,
+        "policy_receipt_id": authorization.policy_receipt_id,
+        "usage_license": authorization.usage_license,
+        "base_project": request.base_project.model_dump(mode="json"),
+        "base_registry": request.base_registry.model_dump(mode="json"),
+        "base_dependency_graph": request.base_dependency_graph.model_dump(
+            mode="json"
+        ),
+        "evidence_hash": evidence_hash,
+    }
+    return {
+        **r1,
+        submit_intent_path: _p7_json_bytes(submit_intent),
+    }
+
+
+def _p7_png(
+    width: int = 2,
+    height: int = 1,
+    *,
+    rgba: bytes = b"\x11\x22\x33\xff",
+) -> bytes:
+    if len(rgba) != 4:
+        raise ValueError("P7 fixture RGBA pixel must contain exactly four bytes.")
+
+    def chunk(kind: bytes, payload: bytes) -> bytes:
+        checksum = zlib.crc32(kind + payload) & 0xFFFFFFFF
+        return (
+            struct.pack(">I", len(payload))
+            + kind
+            + payload
+            + struct.pack(">I", checksum)
+        )
+
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    row = b"\x00" + (rgba * width)
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", ihdr)
+        + chunk(b"IDAT", zlib.compress(row * height))
+        + chunk(b"IEND", b"")
+    )
+
+
+def make_p7_image_candidate_preparer(base_inputs):
+    """Return a deterministic, write-free Task 9 image candidate preparer."""
+
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        resolve_dependency_state,
+    )
+    from ai_video.production.models import DependencyGraphSnapshotPointer
+    from ai_video.production.paths import (
+        canonical_dependency_graph_snapshot_path,
+        canonical_image_asset_path,
+        canonical_image_shot_revision_path,
+    )
+
+    def prepare(
+        base_project,
+        request,
+        authorization,
+        result,
+        measured,
+        receipt,
+    ):
+        from ai_video.production._state_commit_contracts import PreparedImageCandidate
+
+        live_base_inputs = replace(base_inputs, project=base_project)
+        image_record = AssetRecord(
+            asset_id=request.output_asset_id,
+            asset_type=AssetType.IMAGE,
+            artifact_path=canonical_image_asset_path(measured.sha256),
+            sha256=measured.sha256,
+            size_bytes=measured.size_bytes,
+            mime_type=measured.mime_type,
+            width=measured.width,
+            height=measured.height,
+            source_kind=AssetSourceKind.GENERATED,
+            tool=result.adapter,
+            input_artifact_ids=(
+                next(
+                    item.artifact_id
+                    for item in base_project.shots
+                    if item.shot_id == request.target_shot_id
+                ),
+                *(
+                    identity
+                    for item in request.references
+                    for identity in (item.creative_artifact_id, item.asset_id)
+                ),
+            ),
+            input_fingerprint=request.request_fingerprint,
+            creation_receipt_id=receipt.content_hash,
+            usage_license=authorization.usage_license,
+            egress=EgressMetadata(remote=False),
+        )
+        candidate_registry = base_project.registry.model_copy(
+            update={
+                "revision_id": ZERO_HASH,
+                "content_hash": ZERO_HASH,
+                "assets": (*base_project.registry.assets, image_record),
+            }
+        )
+        registry_hash = registry_semantic_sha256(candidate_registry)
+        candidate_registry = candidate_registry.model_copy(
+            update={"revision_id": registry_hash, "content_hash": registry_hash}
+        )
+        registry_bytes = _p7_json_bytes(candidate_registry.model_dump(mode="json"))
+        registry_path = Path(f"assets/registry.{registry_hash}.json")
+        registry_pointer = RegistrySnapshotPointer(
+            path=registry_path,
+            revision_id=registry_hash,
+            content_hash=registry_hash,
+            file_sha256=hashlib.sha256(registry_bytes).hexdigest(),
+        )
+
+        base_shot = next(
+            item for item in base_project.shots if item.shot_id == request.target_shot_id
+        )
+        candidate_shot = seal_artifact(
+            base_shot.model_copy(
+                update={
+                    "revision": base_shot.revision + 1,
+                    "content_hash": ZERO_HASH,
+                    "creation_receipt_id": receipt.content_hash,
+                    "required_asset_roles": tuple(
+                        role.model_copy(update={"asset_ids": (request.output_asset_id,)})
+                        if role.role == request.target_asset_role
+                        else role
+                        for role in base_shot.required_asset_roles
+                    ),
+                }
+            )
+        )
+        candidate_shot_path = canonical_image_shot_revision_path(
+            candidate_shot.revision, candidate_shot.content_hash
+        )
+        candidate_project_artifact = seal_artifact(
+            base_project.project.model_copy(
+                update={
+                    "revision": base_project.project.revision + 1,
+                    "content_hash": ZERO_HASH,
+                    "creation_receipt_id": receipt.content_hash,
+                    "artifacts": base_project.project.artifacts.model_copy(
+                        update={
+                            "shots": tuple(
+                                ArtifactReference(
+                                    artifact_id=candidate_shot.artifact_id,
+                                    revision=candidate_shot.revision,
+                                    content_hash=candidate_shot.content_hash,
+                                    path=candidate_shot_path,
+                                )
+                                if item.artifact_id == candidate_shot.artifact_id
+                                else item
+                                for item in base_project.project.artifacts.shots
+                            )
+                        }
+                    ),
+                }
+            )
+        )
+        project_bytes = yaml.safe_dump(
+            candidate_project_artifact.model_dump(mode="json"),
+            sort_keys=True,
+            allow_unicode=True,
+        ).encode("utf-8")
+        project_path = Path(
+            f"state/projects/project.{candidate_project_artifact.revision}."
+            f"{candidate_project_artifact.content_hash}.yaml"
+        )
+        project_pointer = ProjectSnapshotPointer(
+            path=project_path,
+            revision=candidate_project_artifact.revision,
+            content_hash=candidate_project_artifact.content_hash,
+            file_sha256=hashlib.sha256(project_bytes).hexdigest(),
+        )
+        candidate_project = base_project.model_copy(
+            update={
+                "project": candidate_project_artifact,
+                "shots": tuple(
+                    candidate_shot if item.shot_id == candidate_shot.shot_id else item
+                    for item in base_project.shots
+                ),
+                "registry": candidate_registry,
+                "asset_paths": {
+                    **base_project.asset_paths,
+                    image_record.asset_id: base_project.root / image_record.artifact_path,
+                },
+                "manifest": base_project.manifest.model_copy(
+                    update={
+                        "active_project": project_pointer,
+                        "active_registry": registry_pointer,
+                    }
+                ),
+            }
+        )
+        candidate_inputs = replace(live_base_inputs, project=candidate_project)
+        candidate_graph = build_production_dependency_graph(candidate_inputs)
+        graph_bytes = _p7_json_bytes(candidate_graph.model_dump(mode="json"))
+        graph_path = canonical_dependency_graph_snapshot_path(candidate_graph.revision_id)
+        graph_pointer = DependencyGraphSnapshotPointer(
+            revision_id=candidate_graph.revision_id,
+            content_hash=candidate_graph.content_hash,
+            path=graph_path,
+            file_sha256=hashlib.sha256(graph_bytes).hexdigest(),
+        )
+        candidate_project = candidate_project.model_copy(
+            update={
+                "manifest": candidate_project.manifest.model_copy(
+                    update={"active_dependency_graph": graph_pointer}
+                ),
+                "dependency_graph": candidate_graph,
+            }
+        )
+        candidate_inputs = replace(candidate_inputs, project=candidate_project)
+        resolution = resolve_dependency_state(
+            candidate_graph, base_project.manifest.dependency_states
+        )
+        return PreparedImageCandidate(
+            base_inputs=live_base_inputs,
+            candidate_project=candidate_project,
+            candidate_registry=candidate_registry,
+            candidate_inputs=candidate_inputs,
+            candidate_graph=candidate_graph,
+            resolution=resolution,
+            candidate_project_pointer=project_pointer,
+            candidate_registry_pointer=registry_pointer,
+            candidate_graph_pointer=graph_pointer,
+            candidate_project_bytes=project_bytes,
+            candidate_registry_bytes=registry_bytes,
+            candidate_graph_bytes=graph_bytes,
+        )
+
+    return prepare
+
+
+def make_p7_image_generation_base(root: Path, *, decodable_pngs: bool = False):
+    """Materialize the exact fresh P5 base used by Task 9 orchestration tests."""
+
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.models import (
+        DependencyGraphSnapshotPointer,
+        DependencyLifecycle,
+        DependencyNodeKind,
+        DependencyNodeState,
+        ProjectDependencyEvidence,
+        RegistryDependencyEvidence,
+    )
+    from ai_video.production.paths import canonical_dependency_graph_snapshot_path
+    from ai_video.production.project import load_production_project
+
+    inputs = replace(
+        make_p5_dependency_inputs(root, decodable_pngs=decodable_pngs),
+        voice_requests=(),
+    )
+    graph = build_production_dependency_graph(inputs)
+    graph_bytes = _p7_json_bytes(graph.model_dump(mode="json"))
+    graph_path = canonical_dependency_graph_snapshot_path(graph.revision_id)
+    (root / graph_path).parent.mkdir(parents=True, exist_ok=True)
+    (root / graph_path).write_bytes(graph_bytes)
+    graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=graph.revision_id,
+        content_hash=graph.content_hash,
+        path=graph_path,
+        file_sha256=hashlib.sha256(graph_bytes).hexdigest(),
+    )
+    manifest_path = root / "state/manifest.json"
+    manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes())
+    desired = desired_fingerprints(graph)
+    existing = {
+        item.node_id: item for item in resolve_dependency_state(graph, ()).states
+    }
+    states = []
+    for node in graph.nodes:
+        if node.node_id in {
+            "asset:image-shot-1",
+            "creative:shot:shot-1:visual",
+        }:
+            states.append(existing[node.node_id])
+            continue
+        if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT:
+            evidence = ProjectDependencyEvidence(
+                owner="project_snapshot",
+                pointer=manifest.active_project,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            )
+        elif node.kind is DependencyNodeKind.ASSET:
+            evidence = RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=inputs.project.manifest.active_registry,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=desired[node.node_id],
+            )
+        else:
+            states.append(existing[node.node_id])
+            continue
+        states.append(
+            DependencyNodeState(
+                node_id=node.node_id,
+                graph_revision_id=graph.revision_id,
+                desired_fingerprint=desired[node.node_id],
+                applied_fingerprint=desired[node.node_id],
+                lifecycle=DependencyLifecycle.FRESH,
+                applied_evidence=evidence,
+            )
+        )
+    manifest_path.write_text(
+        manifest.model_copy(
+            update={
+                "schema_version": "2.3",
+                "manifest_revision": manifest.manifest_revision + 1,
+                "active_registry": inputs.project.manifest.active_registry,
+                "active_dependency_graph": graph_pointer,
+                "dependency_states": resolve_dependency_state(
+                    graph, tuple(sorted(states, key=lambda item: item.node_id))
+                ).states,
+            }
+        ).model_dump_json(indent=2),
+        encoding="utf-8",
+    )
+    loaded = load_production_project(root / "project.yaml")
+    assert build_production_dependency_graph(replace(inputs, project=loaded)) == graph
+    return replace(inputs, project=loaded)
+
+
+def make_p7_committed_project(
+    root: Path,
+    *,
+    reference_mutation: str | None = None,
+    unrelated_candidate_suffix: bool = False,
+    changed_candidate_prefix: bool = False,
+    noncanonical_candidate_shot_path: bool = False,
+) -> dict[str, object]:
+    """Materialize one exact Manifest 2.5 image activation without a writer."""
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        resolve_dependency_state,
+    )
+    from ai_video.production.image import (
+        ImageGenerationAuthorization,
+        ImageGenerationPreview,
+        ImageGenerationRequest,
+        ImageLocalResourceEvidence,
+        ImageProviderParameters,
+        ImageProviderResult,
+        ImageReferenceBinding,
+        validate_image_result,
+    )
+    from ai_video.production.models import (
+        DependencyGraphSnapshotPointer,
+        StateCommitAttempt,
+        StateCommitStatus,
+    )
+    from ai_video.production.paths import (
+        canonical_dependency_graph_snapshot_path,
+        canonical_image_asset_path,
+        canonical_image_receipt_path,
+        canonical_image_request_path,
+        canonical_image_result_path,
+        canonical_image_shot_revision_path,
+    )
+
+    base_inputs = make_p5_dependency_inputs(root)
+    base_project = base_inputs.project
+    base_graph = build_production_dependency_graph(base_inputs)
+    base_states = resolve_dependency_state(base_graph, ()).states
+    base_graph_bytes = _p7_json_bytes(base_graph.model_dump(mode="json"))
+    base_graph_path = canonical_dependency_graph_snapshot_path(base_graph.revision_id)
+    (root / base_graph_path).write_bytes(base_graph_bytes)
+    base_graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=base_graph.revision_id,
+        content_hash=base_graph.content_hash,
+        path=base_graph_path,
+        file_sha256=hashlib.sha256(base_graph_bytes).hexdigest(),
+    )
+    base_manifest = base_project.manifest.model_copy(
+        update={
+            "schema_version": "2.3",
+            "manifest_revision": base_project.manifest.manifest_revision + 1,
+            "active_dependency_graph": base_graph_pointer,
+            "dependency_states": base_states,
+        }
+    )
+    base_project = base_project.model_copy(
+        update={"manifest": base_manifest, "dependency_graph": base_graph}
+    )
+    base_inputs = replace(base_inputs, project=base_project)
+
+    assets = {item.asset_id: item for item in base_project.registry.assets}
+    character = base_project.characters[0]
+    scene = base_project.scenes[0]
+    character_asset_id = character.reference_asset_ids[0]
+    scene_asset_id = scene.visual_reference_asset_ids[0]
+    references = [
+        ImageReferenceBinding(
+            role="character",
+            creative_artifact_id=character.artifact_id,
+            creative_revision=character.revision,
+            creative_content_hash=character.content_hash,
+            asset_id=character_asset_id,
+            asset_sha256=assets[character_asset_id].sha256,
+        ),
+        ImageReferenceBinding(
+            role="scene",
+            creative_artifact_id=scene.artifact_id,
+            creative_revision=scene.revision,
+            creative_content_hash=scene.content_hash,
+            asset_id=scene_asset_id,
+            asset_sha256=assets[scene_asset_id].sha256,
+        ),
+    ]
+    if reference_mutation == "stale_creative_revision":
+        references[0] = references[0].model_copy(
+            update={"creative_revision": references[0].creative_revision + 1}
+        )
+    elif reference_mutation == "stale_creative_hash":
+        references[0] = references[0].model_copy(
+            update={"creative_content_hash": "f" * 64}
+        )
+    elif reference_mutation == "wrong_membership":
+        wrong = assets["image-shot-2"]
+        references[0] = references[0].model_copy(
+            update={"asset_id": wrong.asset_id, "asset_sha256": wrong.sha256}
+        )
+    elif reference_mutation == "wrong_reference_hash":
+        references[0] = references[0].model_copy(
+            update={"asset_sha256": "f" * 64}
+        )
+    elif reference_mutation == "style_scene_binding":
+        references.append(references[1].model_copy(update={"role": "style"}))
+    elif reference_mutation is not None:
+        raise ValueError(f"unsupported P7 reference mutation: {reference_mutation}")
+
+    request = ImageGenerationRequest.create(
+        attempt_id="image-reader-attempt-1",
+        provider_kind="fake-local",
+        model_id="fixture-image-model-1",
+        target_shot_id="shot-1",
+        target_asset_role="still",
+        prompt_text="Hero enters the archive room",
+        negative_prompt_text="blur, watermark",
+        parameters=ImageProviderParameters(
+            seed=7,
+            width=2,
+            height=1,
+            output_format="png",
+            generation_revision=1,
+        ),
+        references=tuple(references),
+        base_project=base_manifest.active_project,
+        base_registry=base_manifest.active_registry,
+        base_dependency_graph=base_graph_pointer,
+    )
+    preview = ImageGenerationPreview.create(
+        request=request,
+        reference_total_bytes=sum(
+            assets[item.asset_id].size_bytes for item in request.references
+        ),
+    )
+    authorization = ImageGenerationAuthorization.create(
+        request=request,
+        preview=preview,
+        usage_license="fixture-only",
+        policy_receipt_id="fixture-local-image-policy",
+    )
+    png_bytes = _p7_png()
+    result = ImageProviderResult.create(
+        request=request,
+        authorization=authorization,
+        image_bytes=png_bytes,
+        content_type="image/png",
+        provider_request_id="fixture-local-image-1",
+        adapter=ToolIdentity(name="fake-local-image", version="1"),
+        resource_evidence=ImageLocalResourceEvidence(
+            elapsed_milliseconds=3,
+            device_kind="cpu",
+            measured_peak_memory_bytes=4096,
+        ),
+    )
+    measured, receipt = validate_image_result(request, authorization, result)
+    image_record = AssetRecord(
+        asset_id=request.output_asset_id,
+        asset_type=AssetType.IMAGE,
+        artifact_path=canonical_image_asset_path(measured.sha256),
+        sha256=measured.sha256,
+        size_bytes=measured.size_bytes,
+        mime_type=measured.mime_type,
+        width=measured.width,
+        height=measured.height,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=result.adapter,
+        input_artifact_ids=(
+            base_project.shots[0].artifact_id,
+            *(
+                identity
+                for item in request.references
+                for identity in (item.creative_artifact_id, item.asset_id)
+            ),
+        ),
+        input_fingerprint=request.request_fingerprint,
+        creation_receipt_id=receipt.content_hash,
+        usage_license=authorization.usage_license,
+        egress=EgressMetadata(remote=False),
+    )
+    candidate_assets = list(base_project.registry.assets)
+    if changed_candidate_prefix:
+        candidate_assets[0] = candidate_assets[0].model_copy(
+            update={"usage_license": "changed-prefix"}
+        )
+    if unrelated_candidate_suffix:
+        candidate_assets.append(
+            base_project.registry.assets[0].model_copy(
+                update={"asset_id": "image-unrelated-candidate-suffix"}
+            )
+        )
+    candidate_assets.append(image_record)
+    candidate_registry = base_project.registry.model_copy(
+        update={
+            "revision_id": ZERO_HASH,
+            "content_hash": ZERO_HASH,
+            "assets": tuple(candidate_assets),
+        }
+    )
+    registry_hash = registry_semantic_sha256(candidate_registry)
+    candidate_registry = candidate_registry.model_copy(
+        update={"revision_id": registry_hash, "content_hash": registry_hash}
+    )
+    registry_bytes = _p7_json_bytes(candidate_registry.model_dump(mode="json"))
+    registry_path = Path(f"assets/registry.{registry_hash}.json")
+    registry_pointer = RegistrySnapshotPointer(
+        path=registry_path,
+        revision_id=registry_hash,
+        content_hash=registry_hash,
+        file_sha256=hashlib.sha256(registry_bytes).hexdigest(),
+    )
+
+    base_shot = next(item for item in base_project.shots if item.shot_id == "shot-1")
+    candidate_shot = seal_artifact(
+        base_shot.model_copy(
+            update={
+                "revision": base_shot.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "required_asset_roles": tuple(
+                    role.model_copy(update={"asset_ids": (request.output_asset_id,)})
+                    if role.role == request.target_asset_role
+                    else role
+                    for role in base_shot.required_asset_roles
+                ),
+            }
+        )
+    )
+    candidate_shot_path = (
+        Path("creative/shots/noncanonical-image-candidate.yaml")
+        if noncanonical_candidate_shot_path
+        else canonical_image_shot_revision_path(
+            candidate_shot.revision, candidate_shot.content_hash
+        )
+    )
+    candidate_project_artifact = seal_artifact(
+        base_project.project.model_copy(
+            update={
+                "revision": base_project.project.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "artifacts": base_project.project.artifacts.model_copy(
+                    update={
+                        "shots": tuple(
+                            ArtifactReference(
+                                artifact_id=candidate_shot.artifact_id,
+                                revision=candidate_shot.revision,
+                                content_hash=candidate_shot.content_hash,
+                                path=candidate_shot_path,
+                            )
+                            if item.artifact_id == candidate_shot.artifact_id
+                            else item
+                            for item in base_project.project.artifacts.shots
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    project_bytes = yaml.safe_dump(
+        candidate_project_artifact.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    project_path = Path(
+        f"state/projects/project.{candidate_project_artifact.revision}."
+        f"{candidate_project_artifact.content_hash}.yaml"
+    )
+    project_pointer = ProjectSnapshotPointer(
+        path=project_path,
+        revision=candidate_project_artifact.revision,
+        content_hash=candidate_project_artifact.content_hash,
+        file_sha256=hashlib.sha256(project_bytes).hexdigest(),
+    )
+    candidate_project = base_project.model_copy(
+        update={
+            "project": candidate_project_artifact,
+            "shots": tuple(
+                candidate_shot if item.shot_id == candidate_shot.shot_id else item
+                for item in base_project.shots
+            ),
+            "registry": candidate_registry,
+            "asset_paths": {
+                **base_project.asset_paths,
+                image_record.asset_id: root / image_record.artifact_path,
+            },
+            "manifest": base_manifest.model_copy(
+                update={
+                    "active_project": project_pointer,
+                    "active_registry": registry_pointer,
+                }
+            ),
+        }
+    )
+    candidate_inputs = replace(base_inputs, project=candidate_project)
+    candidate_graph = build_production_dependency_graph(candidate_inputs)
+    graph_bytes = _p7_json_bytes(candidate_graph.model_dump(mode="json"))
+    graph_path = canonical_dependency_graph_snapshot_path(candidate_graph.revision_id)
+    graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=candidate_graph.revision_id,
+        content_hash=candidate_graph.content_hash,
+        path=graph_path,
+        file_sha256=hashlib.sha256(graph_bytes).hexdigest(),
+    )
+    candidate_states = resolve_dependency_state(candidate_graph, base_states).states
+    states_hash = hashlib.sha256(
+        json.dumps(
+            [item.model_dump(mode="json") for item in candidate_states],
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+
+    request_path = canonical_image_request_path(request.request_fingerprint)
+    result_path = canonical_image_result_path(result.result_fingerprint)
+    receipt_path = canonical_image_receipt_path(receipt.content_hash)
+    request_bytes = _p7_json_bytes(request.model_dump(mode="json"))
+    result_bytes = _p7_json_bytes(
+        result.model_dump(mode="json", exclude={"image_bytes"})
+    )
+    receipt_bytes = _p7_json_bytes(receipt.model_dump(mode="json"))
+    shot_bytes = yaml.safe_dump(
+        candidate_shot.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    evidence = {
+        request_path: request_bytes,
+        result_path: result_bytes,
+        receipt_path: receipt_bytes,
+        image_record.artifact_path: png_bytes,
+        project_path: project_bytes,
+        registry_path: registry_bytes,
+        graph_path: graph_bytes,
+        candidate_shot_path: shot_bytes,
+    }
+    audit_evidence = _p7_submit_audit_evidence(request, preview, authorization)
+    for relative_path, payload in {**audit_evidence, **evidence}.items():
+        target = root / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+    artifact_pairs = sorted(
+        (path.as_posix(), hashlib.sha256(payload).hexdigest())
+        for path, payload in evidence.items()
+    )
+    attempt = StateCommitAttempt(
+        attempt_id=request.attempt_id,
+        operation="image_generation",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=base_manifest.manifest_revision,
+        base_project=base_manifest.active_project,
+        base_registry=base_manifest.active_registry,
+        candidate_project=project_pointer,
+        candidate_registry=registry_pointer,
+        candidate_artifacts_hash=hashlib.sha256(
+            json.dumps(artifact_pairs, separators=(",", ":")).encode("utf-8")
+        ).hexdigest(),
+        image_request={
+            "request_id": request.request_id,
+            "attempt_id": request.attempt_id,
+            "request_fingerprint": request.request_fingerprint,
+            "provider_kind": request.provider_kind,
+            "model_id": request.model_id,
+            "target_shot_id": request.target_shot_id,
+            "target_asset_role": request.target_asset_role,
+            "output_asset_id": request.output_asset_id,
+            "preview_fingerprint": preview.preview_fingerprint,
+            "authorization_fingerprint": authorization.authorization_fingerprint,
+            "policy_receipt_id": authorization.policy_receipt_id,
+            "usage_license": authorization.usage_license,
+        },
+        image_phase="activate",
+        provider_request_id=result.provider_request_id,
+        candidate_image_asset_ids=(request.output_asset_id,),
+        base_dependency_graph=base_graph_pointer,
+        candidate_dependency_graph=graph_pointer,
+        candidate_dependency_states_hash=states_hash,
+        started_at="2026-08-18T00:00:00+00:00",
+        finished_at="2026-08-18T00:00:01+00:00",
+    )
+    manifest = base_manifest.model_copy(
+        update={
+            "schema_version": "2.5",
+            "manifest_revision": base_manifest.manifest_revision + 4,
+            "active_project": project_pointer,
+            "active_registry": registry_pointer,
+            "active_dependency_graph": graph_pointer,
+            "dependency_states": candidate_states,
+            "attempts": (attempt,),
+        }
+    )
+    (root / "state/manifest.json").write_text(
+        manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    return {
+        "project_path": root / "project.yaml",
+        "request": request,
+        "result": result,
+        "receipt": receipt,
+        "image_record": image_record,
+        "request_path": request_path,
+        "preview_path": next(
+            path for path in audit_evidence if path.parts[-2] == "previews"
+        ),
+        "authorization_path": next(
+            path for path in audit_evidence if path.parts[-2] == "authorizations"
+        ),
+        "submit_intent_path": next(
+            path for path in audit_evidence if path.parts[-2] == "submit-intents"
+        ),
+        "result_path": result_path,
+        "receipt_path": receipt_path,
+        "image_path": image_record.artifact_path,
+        "candidate_inputs": candidate_inputs,
+        "candidate_project": candidate_project,
+        "candidate_graph": candidate_graph,
+        "candidate_states": candidate_states,
+        "attempt": attempt,
+        "manifest": manifest,
+    }
+
+
+def append_p7_committed_candidate(
+    root: Path,
+    fixture: dict[str, object],
+    *,
+    target_shot_id: str = "shot-2",
+    extra_old_placement_shot_id: str | None = None,
+) -> dict[str, object]:
+    """Append a second exact selected image candidate to the P7 fixture."""
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        resolve_dependency_state,
+    )
+    from ai_video.production.image import (
+        ImageGenerationAuthorization,
+        ImageGenerationPreview,
+        ImageGenerationRequest,
+        ImageLocalResourceEvidence,
+        ImageProviderParameters,
+        ImageProviderResult,
+        ImageReferenceBinding,
+        validate_image_result,
+    )
+    from ai_video.production.models import (
+        DependencyGraphSnapshotPointer,
+        StateCommitAttempt,
+        StateCommitStatus,
+    )
+    from ai_video.production.paths import (
+        canonical_dependency_graph_snapshot_path,
+        canonical_image_asset_path,
+        canonical_image_receipt_path,
+        canonical_image_request_path,
+        canonical_image_result_path,
+        canonical_image_shot_revision_path,
+    )
+
+    current_manifest = fixture["manifest"]
+    current_project = fixture["candidate_project"].model_copy(
+        update={
+            "manifest": current_manifest,
+            "dependency_graph": fixture["candidate_graph"],
+        }
+    )
+    current_inputs = replace(fixture["candidate_inputs"], project=current_project)
+    assets = {item.asset_id: item for item in current_project.registry.assets}
+    character = current_project.characters[0]
+    scene = current_project.scenes[0]
+    character_asset_id = character.reference_asset_ids[0]
+    scene_asset_id = scene.visual_reference_asset_ids[0]
+    request = ImageGenerationRequest.create(
+        attempt_id="image-reader-attempt-2",
+        provider_kind="fake-local",
+        model_id="fixture-image-model-1",
+        target_shot_id=target_shot_id,
+        target_asset_role="still",
+        prompt_text="Hero leaves the archive room",
+        negative_prompt_text="blur, watermark",
+        parameters=ImageProviderParameters(
+            seed=8,
+            width=2,
+            height=1,
+            output_format="png",
+            generation_revision=1,
+        ),
+        references=(
+            ImageReferenceBinding(
+                role="character",
+                creative_artifact_id=character.artifact_id,
+                creative_revision=character.revision,
+                creative_content_hash=character.content_hash,
+                asset_id=character_asset_id,
+                asset_sha256=assets[character_asset_id].sha256,
+            ),
+            ImageReferenceBinding(
+                role="scene",
+                creative_artifact_id=scene.artifact_id,
+                creative_revision=scene.revision,
+                creative_content_hash=scene.content_hash,
+                asset_id=scene_asset_id,
+                asset_sha256=assets[scene_asset_id].sha256,
+            ),
+        ),
+        base_project=current_manifest.active_project,
+        base_registry=current_manifest.active_registry,
+        base_dependency_graph=current_manifest.active_dependency_graph,
+    )
+    preview = ImageGenerationPreview.create(
+        request=request,
+        reference_total_bytes=sum(
+            assets[item.asset_id].size_bytes for item in request.references
+        ),
+    )
+    authorization = ImageGenerationAuthorization.create(
+        request=request,
+        preview=preview,
+        usage_license="fixture-only",
+        policy_receipt_id="fixture-local-image-policy",
+    )
+    png_bytes = _p7_png(rgba=b"\x44\x55\x66\xff")
+    result = ImageProviderResult.create(
+        request=request,
+        authorization=authorization,
+        image_bytes=png_bytes,
+        content_type="image/png",
+        provider_request_id="fixture-local-image-2",
+        adapter=ToolIdentity(name="fake-local-image", version="1"),
+        resource_evidence=ImageLocalResourceEvidence(
+            elapsed_milliseconds=4,
+            device_kind="cpu",
+            measured_peak_memory_bytes=4096,
+        ),
+    )
+    measured, receipt = validate_image_result(request, authorization, result)
+    target_shot = next(
+        item for item in current_project.shots if item.shot_id == target_shot_id
+    )
+    image_record = AssetRecord(
+        asset_id=request.output_asset_id,
+        asset_type=AssetType.IMAGE,
+        artifact_path=canonical_image_asset_path(measured.sha256),
+        sha256=measured.sha256,
+        size_bytes=measured.size_bytes,
+        mime_type=measured.mime_type,
+        width=measured.width,
+        height=measured.height,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=result.adapter,
+        input_artifact_ids=(
+            target_shot.artifact_id,
+            *(
+                identity
+                for item in request.references
+                for identity in (item.creative_artifact_id, item.asset_id)
+            ),
+        ),
+        input_fingerprint=request.request_fingerprint,
+        creation_receipt_id=receipt.content_hash,
+        usage_license=authorization.usage_license,
+        egress=EgressMetadata(remote=False),
+    )
+    candidate_registry = current_project.registry.model_copy(
+        update={
+            "revision_id": ZERO_HASH,
+            "content_hash": ZERO_HASH,
+            "assets": (*current_project.registry.assets, image_record),
+        }
+    )
+    registry_hash = registry_semantic_sha256(candidate_registry)
+    candidate_registry = candidate_registry.model_copy(
+        update={"revision_id": registry_hash, "content_hash": registry_hash}
+    )
+    registry_bytes = _p7_json_bytes(candidate_registry.model_dump(mode="json"))
+    registry_path = Path(f"assets/registry.{registry_hash}.json")
+    registry_pointer = RegistrySnapshotPointer(
+        path=registry_path,
+        revision_id=registry_hash,
+        content_hash=registry_hash,
+        file_sha256=hashlib.sha256(registry_bytes).hexdigest(),
+    )
+    candidate_shot = seal_artifact(
+        target_shot.model_copy(
+            update={
+                "revision": target_shot.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "required_asset_roles": tuple(
+                    role.model_copy(update={"asset_ids": (request.output_asset_id,)})
+                    if role.role == request.target_asset_role
+                    else role
+                    for role in target_shot.required_asset_roles
+                ),
+            }
+        )
+    )
+    candidate_shot_path = canonical_image_shot_revision_path(
+        candidate_shot.revision, candidate_shot.content_hash
+    )
+    extra_shot = None
+    extra_shot_path = None
+    if extra_old_placement_shot_id is not None:
+        if extra_old_placement_shot_id == target_shot_id:
+            raise ValueError("Extra P7 fixture placement must use another Shot.")
+        old_record = fixture["image_record"]
+        extra_base = next(
+            item
+            for item in current_project.shots
+            if item.shot_id == extra_old_placement_shot_id
+        )
+        extra_shot = seal_artifact(
+            extra_base.model_copy(
+                update={
+                    "revision": extra_base.revision + 1,
+                    "content_hash": ZERO_HASH,
+                    "creation_receipt_id": old_record.creation_receipt_id,
+                    "required_asset_roles": tuple(
+                        role.model_copy(update={"asset_ids": (old_record.asset_id,)})
+                        if role.role == request.target_asset_role
+                        else role
+                        for role in extra_base.required_asset_roles
+                    ),
+                }
+            )
+        )
+        extra_shot_path = canonical_image_shot_revision_path(
+            extra_shot.revision, extra_shot.content_hash
+        )
+    candidate_shots = {candidate_shot.artifact_id: candidate_shot}
+    candidate_shot_references = {
+        candidate_shot.artifact_id: ArtifactReference(
+            artifact_id=candidate_shot.artifact_id,
+            revision=candidate_shot.revision,
+            content_hash=candidate_shot.content_hash,
+            path=candidate_shot_path,
+        )
+    }
+    if extra_shot is not None and extra_shot_path is not None:
+        candidate_shots[extra_shot.artifact_id] = extra_shot
+        candidate_shot_references[extra_shot.artifact_id] = ArtifactReference(
+            artifact_id=extra_shot.artifact_id,
+            revision=extra_shot.revision,
+            content_hash=extra_shot.content_hash,
+            path=extra_shot_path,
+        )
+    candidate_project_artifact = seal_artifact(
+        current_project.project.model_copy(
+            update={
+                "revision": current_project.project.revision + 1,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": receipt.content_hash,
+                "artifacts": current_project.project.artifacts.model_copy(
+                    update={
+                        "shots": tuple(
+                            candidate_shot_references.get(item.artifact_id, item)
+                            for item in current_project.project.artifacts.shots
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    project_bytes = yaml.safe_dump(
+        candidate_project_artifact.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    project_path = Path(
+        f"state/projects/project.{candidate_project_artifact.revision}."
+        f"{candidate_project_artifact.content_hash}.yaml"
+    )
+    project_pointer = ProjectSnapshotPointer(
+        path=project_path,
+        revision=candidate_project_artifact.revision,
+        content_hash=candidate_project_artifact.content_hash,
+        file_sha256=hashlib.sha256(project_bytes).hexdigest(),
+    )
+    candidate_project = current_project.model_copy(
+        update={
+            "project": candidate_project_artifact,
+            "shots": tuple(
+                candidate_shots.get(item.artifact_id, item)
+                for item in current_project.shots
+            ),
+            "registry": candidate_registry,
+            "asset_paths": {
+                **current_project.asset_paths,
+                image_record.asset_id: root / image_record.artifact_path,
+            },
+            "manifest": current_manifest.model_copy(
+                update={
+                    "active_project": project_pointer,
+                    "active_registry": registry_pointer,
+                }
+            ),
+        }
+    )
+    candidate_inputs = replace(current_inputs, project=candidate_project)
+    candidate_graph = build_production_dependency_graph(candidate_inputs)
+    graph_bytes = _p7_json_bytes(candidate_graph.model_dump(mode="json"))
+    graph_path = canonical_dependency_graph_snapshot_path(candidate_graph.revision_id)
+    graph_pointer = DependencyGraphSnapshotPointer(
+        revision_id=candidate_graph.revision_id,
+        content_hash=candidate_graph.content_hash,
+        path=graph_path,
+        file_sha256=hashlib.sha256(graph_bytes).hexdigest(),
+    )
+    candidate_states = resolve_dependency_state(
+        candidate_graph, fixture["candidate_states"]
+    ).states
+    states_hash = hashlib.sha256(
+        json.dumps(
+            [item.model_dump(mode="json") for item in candidate_states],
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    request_path = canonical_image_request_path(request.request_fingerprint)
+    result_path = canonical_image_result_path(result.result_fingerprint)
+    receipt_path = canonical_image_receipt_path(receipt.content_hash)
+    request_bytes = _p7_json_bytes(request.model_dump(mode="json"))
+    result_bytes = _p7_json_bytes(result.model_dump(mode="json", exclude={"image_bytes"}))
+    receipt_bytes = _p7_json_bytes(receipt.model_dump(mode="json"))
+    shot_bytes = yaml.safe_dump(
+        candidate_shot.model_dump(mode="json"), sort_keys=True, allow_unicode=True
+    ).encode("utf-8")
+    evidence = {
+        request_path: request_bytes,
+        result_path: result_bytes,
+        receipt_path: receipt_bytes,
+        image_record.artifact_path: png_bytes,
+        project_path: project_bytes,
+        registry_path: registry_bytes,
+        graph_path: graph_bytes,
+        candidate_shot_path: shot_bytes,
+    }
+    audit_evidence = _p7_submit_audit_evidence(request, preview, authorization)
+    for relative_path, payload in {**audit_evidence, **evidence}.items():
+        target = root / relative_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+    if extra_shot is not None and extra_shot_path is not None:
+        extra_target = root / extra_shot_path
+        extra_target.parent.mkdir(parents=True, exist_ok=True)
+        extra_target.write_bytes(
+            yaml.safe_dump(
+                extra_shot.model_dump(mode="json"),
+                sort_keys=True,
+                allow_unicode=True,
+            ).encode("utf-8")
+        )
+    artifact_pairs = sorted(
+        (path.as_posix(), hashlib.sha256(payload).hexdigest())
+        for path, payload in evidence.items()
+    )
+    attempt = StateCommitAttempt(
+        attempt_id=request.attempt_id,
+        operation="image_generation",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=current_manifest.manifest_revision,
+        base_project=current_manifest.active_project,
+        base_registry=current_manifest.active_registry,
+        candidate_project=project_pointer,
+        candidate_registry=registry_pointer,
+        candidate_artifacts_hash=hashlib.sha256(
+            json.dumps(artifact_pairs, separators=(",", ":")).encode("utf-8")
+        ).hexdigest(),
+        image_request={
+            "request_id": request.request_id,
+            "attempt_id": request.attempt_id,
+            "request_fingerprint": request.request_fingerprint,
+            "provider_kind": request.provider_kind,
+            "model_id": request.model_id,
+            "target_shot_id": request.target_shot_id,
+            "target_asset_role": request.target_asset_role,
+            "output_asset_id": request.output_asset_id,
+            "preview_fingerprint": preview.preview_fingerprint,
+            "authorization_fingerprint": authorization.authorization_fingerprint,
+            "policy_receipt_id": authorization.policy_receipt_id,
+            "usage_license": authorization.usage_license,
+        },
+        image_phase="activate",
+        provider_request_id=result.provider_request_id,
+        candidate_image_asset_ids=(request.output_asset_id,),
+        base_dependency_graph=current_manifest.active_dependency_graph,
+        candidate_dependency_graph=graph_pointer,
+        candidate_dependency_states_hash=states_hash,
+        started_at="2026-08-18T00:01:00+00:00",
+        finished_at="2026-08-18T00:01:01+00:00",
+    )
+    manifest = current_manifest.model_copy(
+        update={
+            "manifest_revision": current_manifest.manifest_revision + 4,
+            "active_project": project_pointer,
+            "active_registry": registry_pointer,
+            "active_dependency_graph": graph_pointer,
+            "dependency_states": candidate_states,
+            "attempts": (*current_manifest.attempts, attempt),
+        }
+    )
+    (root / "state/manifest.json").write_text(
+        manifest.model_dump_json(indent=2), encoding="utf-8"
+    )
+    return {
+        **fixture,
+        "request": request,
+        "result": result,
+        "receipt": receipt,
+        "image_record": image_record,
+        "request_path": request_path,
+        "preview_path": next(
+            path for path in audit_evidence if path.parts[-2] == "previews"
+        ),
+        "authorization_path": next(
+            path for path in audit_evidence if path.parts[-2] == "authorizations"
+        ),
+        "submit_intent_path": next(
+            path for path in audit_evidence if path.parts[-2] == "submit-intents"
+        ),
+        "result_path": result_path,
+        "receipt_path": receipt_path,
+        "image_path": image_record.artifact_path,
+        "candidate_inputs": candidate_inputs,
+        "candidate_project": candidate_project,
+        "candidate_graph": candidate_graph,
+        "candidate_states": candidate_states,
+        "attempt": attempt,
+        "manifest": manifest,
+    }
+
+
+def mutate_p7_evidence(root: Path, fixture: dict[str, object], mutation: str) -> None:
+    if mutation == "png_bytes":
+        path = root / fixture["image_path"]
+        path.write_bytes(path.read_bytes()[:-1])
+        return
+    if mutation == "candidate_pointer":
+        path = root / "state/manifest.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["attempts"][0]["candidate_dependency_graph"]["file_sha256"] = "f" * 64
+        path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        return
+    if mutation == "candidate_artifacts_hash":
+        path = root / "state/manifest.json"
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        payload["attempts"][0]["candidate_artifacts_hash"] = "f" * 64
+        path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        return
+    key, field = {
+        "receipt_hash": ("receipt_path", "content_hash"),
+        "request_id": ("request_path", "request_id"),
+        "result_request_id": ("result_path", "request_id"),
+    }[mutation]
+    path = root / fixture[key]
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload[field] = "f" * 64
+    path.write_bytes(_p7_json_bytes(payload))
+
+
+def add_p6_policy_to_p7_project(root: Path) -> Path:
+    from ai_video.production.models import (
+        QaLayoutRules,
+        QaLayer,
+        QaPolicy,
+        QaPolicyPointer,
+        QaTechnicalThresholds,
+    )
+    from ai_video.production.paths import canonical_qa_policy_path
+
+    policy = seal_artifact(
+        QaPolicy(
+            artifact_id="qa-policy-p7-reader",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="qa-policy-p7-reader",
+            source_provenance=(
+                SourceReference(kind="derived", reference="p7-reader-fixture"),
+            ),
+            policy_id="qa-p7-reader",
+            policy_version="1",
+            required_layers=(QaLayer.TECHNICAL,),
+            technical_thresholds=QaTechnicalThresholds(
+                black_luma_max_milli=10,
+                silence_peak_max_millidb=-60_000,
+                clipping_peak_min_millidb=-100,
+            ),
+            layout_rules=QaLayoutRules(
+                safe_area_inset_milli=50,
+                caption_overflow_tolerance_milli=0,
+            ),
+            strategy_rules_version="1",
+            semantic_requirement="optional",
+        )
+    )
+    payload = _p7_json_bytes(policy.model_dump(mode="json"))
+    path = canonical_qa_policy_path(policy.content_hash)
+    target = root / path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(payload)
+    pointer = QaPolicyPointer(
+        path=path,
+        policy_id=policy.policy_id,
+        policy_version=policy.policy_version,
+        content_hash=policy.content_hash,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    manifest_path = root / "state/manifest.json"
+    manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes())
+    manifest_path.write_text(
+        manifest.model_copy(
+            update={
+                "manifest_revision": manifest.manifest_revision + 1,
+                "active_qa_policy": pointer,
+            }
+        ).model_dump_json(indent=2),
+        encoding="utf-8",
+    )
+    return target
+
+
+def make_p7_public_image_generation_base(root: Path):
+    """Activate the Task 11 P5 base only through public committer APIs."""
+
+    from ai_video.production.dependency import (
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.state_commit import (
+        ProductionStateCommitter,
+        prepare_dependency_graph_transition,
+        prepare_project_registry_commit,
+    )
+
+    inputs = replace(make_p5_dependency_inputs(root), voice_requests=())
+    writer = ProductionStateCommitter(root)
+    initial = load_production_project(root / "project.yaml")
+    selected = writer.commit(
+        prepare_project_registry_commit(
+            manifest=initial.manifest,
+            project=inputs.project.project,
+            registry=inputs.project.registry,
+            attempt_id="p7-reuse-select-p5-registry",
+        )
+    )
+    loaded = load_production_project(root / "project.yaml")
+    assert loaded.manifest == selected
+    inputs = replace(inputs, project=loaded)
+    graph = build_production_dependency_graph(inputs)
+    resolution = resolve_dependency_state(graph, ())
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=selected.manifest_revision,
+        base_dependency_graph=selected.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=resolution.states,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    writer.bootstrap_dependency_graph(
+        attempt_id="p7-reuse-bootstrap-dependency-graph",
+        graph=graph,
+        transition=transition,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    _refresh_p7_ready_project_registry_nodes(root, writer)
+    final = load_production_project(root / "project.yaml")
+    assert final.dependency_graph == graph
+    return replace(inputs, project=final)
+
+
+def _refresh_p7_ready_project_registry_nodes(root: Path, writer) -> None:
+    from ai_video.production.models import (
+        DependencyLifecycle,
+        DependencyNodeKind,
+        ProjectDependencyEvidence,
+        RegistryDependencyEvidence,
+    )
+
+    while True:
+        loaded = load_production_project(root / "project.yaml")
+        graph = loaded.dependency_graph
+        assert graph is not None
+        nodes = {item.node_id: item for item in graph.nodes}
+        ready = next(
+            (
+                state
+                for state in loaded.manifest.dependency_states
+                if state.lifecycle is DependencyLifecycle.STALE
+                and nodes[state.node_id].kind
+                in {
+                    DependencyNodeKind.CREATIVE_ARTIFACT,
+                    DependencyNodeKind.ASSET,
+                }
+            ),
+            None,
+        )
+        if ready is None:
+            return
+        node = nodes[ready.node_id]
+        if node.kind is DependencyNodeKind.CREATIVE_ARTIFACT:
+            evidence = ProjectDependencyEvidence(
+                owner="project_snapshot",
+                pointer=loaded.manifest.active_project,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=ready.desired_fingerprint,
+            )
+        else:
+            evidence = RegistryDependencyEvidence(
+                owner="registry_snapshot",
+                pointer=loaded.manifest.active_registry,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=ready.desired_fingerprint,
+            )
+        writer.record_dependency_node_applied(
+            expected_manifest_revision=loaded.manifest.manifest_revision,
+            active_dependency_graph=loaded.manifest.active_dependency_graph,
+            candidate_dependency_graph=loaded.manifest.active_dependency_graph,
+            node_id=ready.node_id,
+            desired_fingerprint=ready.desired_fingerprint,
+            evidence=evidence,
+        )
+
+
+@dataclass(frozen=True)
+class P7RecoveryAttemptProof:
+    attempt_id: str
+    request_fingerprint: str
+    project_path: Path
+    registry_path: Path
+    graph_path: Path
+    artifacts: tuple[Path, ...]
+
+
+@dataclass(frozen=True)
+class P7ReuseAcceptanceResult:
+    provider_calls: int
+    total_provider_calls: int
+    requests: tuple[object, ...]
+    assets: tuple[AssetRecord, ...]
+    request_binding_counts: tuple[tuple[str, int], ...]
+    changed_asset_ids: tuple[str, ...]
+    changed_shot_ids: tuple[str, ...]
+    shot_1_asset_id: str
+    shot_2_asset_id: str
+    public_base_attempt_operations: tuple[str, ...]
+    character_ids: tuple[str, ...]
+    scene_ids: tuple[str, ...]
+    shot_strategies: tuple[tuple[str, str], ...]
+    shared_reference_identities: tuple[tuple[str, str, str], ...]
+    registered_reference_asset_ids: tuple[str, ...]
+    observed_attempt_operations: tuple[str, ...]
+    active_render_state_unchanged: bool
+    recovery_attempts: tuple[P7RecoveryAttemptProof, ...]
+    counterfactual_old_prompt_request: object | None
+    desired_changed_node_ids: tuple[str, ...]
+    affected_node_ids: tuple[str, ...]
+    stale_node_ids: tuple[str, ...]
+    blocked_node_ids: tuple[str, ...]
+    unrelated_fresh_node_ids: tuple[str, ...]
+    unchanged_desired_node_ids: tuple[str, ...]
+    unrelated_voice_caption_nodes_are_fresh: bool
+    video_provider_attempt_count: int
+    render_attempt_count: int
+    history_artifact_count: int
+    recovery_preserved_manifest_revision: bool
+
+
+class P7ReuseAcceptanceRuntime:
+    """Test-only P7 runtime that uses only public durable writer operations."""
+
+    def __init__(self, root: Path) -> None:
+        from ai_video.production.state_commit import ProductionStateCommitter
+
+        self.root = root
+        self.base_inputs = make_p7_public_image_generation_base(root)
+        self.provider_requests: list[object] = []
+        self.request_binding_counts: dict[str, int] = {}
+        self._first_result: P7ReuseAcceptanceResult | None = None
+        self.writer = ProductionStateCommitter(
+            root,
+            image_candidate_preparer=make_p7_image_candidate_preparer(
+                self.base_inputs
+            ),
+        )
+
+    def _make_call_bundle(
+        self,
+        *,
+        attempt_id: str,
+        shot_id: str,
+        prompt_text: str,
+    ):
+        from ai_video.production.image import (
+            ImageGenerationAuthorization,
+            ImageGenerationPreview,
+            ImageGenerationRequest,
+            ImageProviderParameters,
+            ImageReferenceBinding,
+        )
+
+        loaded = load_production_project(self.root / "project.yaml")
+        assert loaded.manifest.active_dependency_graph is not None
+        assets = {item.asset_id: item for item in loaded.registry.assets}
+        character = loaded.characters[0]
+        scene = loaded.scenes[0]
+        character_asset = assets[character.reference_asset_ids[0]]
+        scene_asset = assets[scene.visual_reference_asset_ids[0]]
+        references = (
+            ImageReferenceBinding(
+                role="character",
+                creative_artifact_id=character.artifact_id,
+                creative_revision=character.revision,
+                creative_content_hash=character.content_hash,
+                asset_id=character_asset.asset_id,
+                asset_sha256=character_asset.sha256,
+            ),
+            ImageReferenceBinding(
+                role="scene",
+                creative_artifact_id=scene.artifact_id,
+                creative_revision=scene.revision,
+                creative_content_hash=scene.content_hash,
+                asset_id=scene_asset.asset_id,
+                asset_sha256=scene_asset.sha256,
+            ),
+        )
+        request = ImageGenerationRequest.create(
+            attempt_id=attempt_id,
+            provider_kind="fake-local",
+            model_id="fixture-image-model-1",
+            target_shot_id=shot_id,
+            target_asset_role="still",
+            prompt_text=prompt_text,
+            negative_prompt_text="blur, watermark",
+            parameters=ImageProviderParameters(
+                seed=17,
+                width=2,
+                height=1,
+                output_format="png",
+                generation_revision=1,
+            ),
+            references=references,
+            base_project=loaded.manifest.active_project,
+            base_registry=loaded.manifest.active_registry,
+            base_dependency_graph=loaded.manifest.active_dependency_graph,
+        )
+        preview = ImageGenerationPreview.create(
+            request=request,
+            reference_total_bytes=(
+                character_asset.size_bytes + scene_asset.size_bytes
+            ),
+        )
+        authorization = ImageGenerationAuthorization.create(
+            request=request,
+            preview=preview,
+            usage_license="fixture-only",
+            policy_receipt_id="fixture-local-image-policy",
+        )
+        return request, preview, authorization
+
+    def generate(self, request, authorization, permit):
+        from ai_video.production.image import (
+            ImageLocalResourceEvidence,
+            ImageProviderResult,
+        )
+
+        assert permit._consume_image_generation_permit(
+            request_fingerprint=request.request_fingerprint
+        )
+        call_index = len(self.provider_requests) + 1
+        rgba = {
+            1: b"\x11\x22\x33\xff",
+            2: b"\x44\x55\x66\xff",
+            3: b"\x77\x88\x99\xff",
+        }[call_index]
+        result = ImageProviderResult.create(
+            request=request,
+            authorization=authorization,
+            image_bytes=_p7_png(rgba=rgba),
+            content_type="image/png",
+            provider_request_id=f"p7-local-{call_index}",
+            adapter=ToolIdentity(name="fake-local-image", version="1"),
+            resource_evidence=ImageLocalResourceEvidence(
+                elapsed_milliseconds=call_index,
+                device_kind="cpu",
+                measured_peak_memory_bytes=4096,
+            ),
+        )
+        self.provider_requests.append(request)
+        self.request_binding_counts[request.request_fingerprint] = (
+            self.request_binding_counts.get(request.request_fingerprint, 0) + 1
+        )
+        return result
+
+    def _refresh_ready_project_registry_nodes(self) -> None:
+        _refresh_p7_ready_project_registry_nodes(self.root, self.writer)
+
+    @staticmethod
+    def _shot_asset_ids(loaded) -> dict[str, str]:
+        return {
+            shot.shot_id: next(
+                role.asset_ids[0]
+                for role in shot.required_asset_roles
+                if role.role == "still"
+            )
+            for shot in loaded.shots
+        }
+
+    @staticmethod
+    def _unrelated_voice_caption_nodes_are_fresh(loaded) -> bool:
+        from ai_video.production.models import (
+            DependencyLifecycle,
+            DependencySemanticRole,
+        )
+
+        graph = loaded.dependency_graph
+        assert graph is not None
+        protected_ids = {
+            node.node_id
+            for node in graph.nodes
+            if node.semantic_role
+            in {DependencySemanticRole.VOICE, DependencySemanticRole.CAPTION}
+        }
+        states = {item.node_id: item for item in loaded.manifest.dependency_states}
+        return bool(protected_ids) and all(
+            states[node_id].lifecycle is DependencyLifecycle.FRESH
+            for node_id in protected_ids
+        )
+
+    def _recover_and_count_history(
+        self,
+    ) -> tuple[int, bool, tuple[P7RecoveryAttemptProof, ...]]:
+        from ai_video.production._image_project_reader import (
+            verify_image_attempt_evidence,
+        )
+        from ai_video.production.models import StateCommitStatus
+
+        before = load_production_project(self.root / "project.yaml").manifest
+        report = self.writer.recover()
+        loaded = load_production_project(self.root / "project.yaml")
+        attempts = tuple(
+            item
+            for item in loaded.manifest.attempts
+            if item.operation == "image_generation"
+            and item.status is StateCommitStatus.SUCCEEDED
+        )
+        report_pairs = {item.path: item.sha256 for item in report.items}
+        seen: set[Path] = set()
+        proofs = []
+        for attempt in attempts:
+            assert attempt.image_request is not None
+            assert attempt.candidate_project is not None
+            assert attempt.candidate_registry is not None
+            assert attempt.candidate_dependency_graph is not None
+            pairs = verify_image_attempt_evidence(loaded, attempt)
+            pair_map = dict(pairs)
+            assert len(pairs) == len(pair_map) == 8
+            assert not seen.intersection(pair_map)
+            assert all(
+                report_pairs.get(path) == digest
+                for path, digest in pair_map.items()
+            )
+            seen.update(pair_map)
+            proofs.append(
+                P7RecoveryAttemptProof(
+                    attempt_id=attempt.attempt_id,
+                    request_fingerprint=attempt.image_request.request_fingerprint,
+                    project_path=attempt.candidate_project.path,
+                    registry_path=attempt.candidate_registry.path,
+                    graph_path=attempt.candidate_dependency_graph.path,
+                    artifacts=tuple(sorted(pair_map, key=Path.as_posix)),
+                )
+            )
+        assert len(seen) == 8 * len(attempts)
+        return len(seen), (
+            report.manifest_revision_before == before.manifest_revision
+            and report.manifest_revision_after == before.manifest_revision
+            and loaded.manifest == before
+        ), tuple(proofs)
+
+    def _result(
+        self,
+        *,
+        phase_start: int,
+        before_assets: dict[str, str],
+        before_manifest: ProductionManifest,
+        counterfactual_old_prompt_request=None,
+    ) -> P7ReuseAcceptanceResult:
+        from ai_video.production.models import (
+            DependencyLifecycle,
+            DependencySemanticRole,
+        )
+
+        loaded = load_production_project(self.root / "project.yaml")
+        current_assets = self._shot_asset_ids(loaded)
+        phase_requests = tuple(self.provider_requests[phase_start:])
+        generated = {
+            item.asset_id: item
+            for item in loaded.registry.assets
+            if item.asset_id in {request.output_asset_id for request in phase_requests}
+        }
+        history_count, recovery_unchanged, recovery_attempts = (
+            self._recover_and_count_history()
+        )
+        before_states = {item.node_id: item for item in before_manifest.dependency_states}
+        after_states = {item.node_id: item for item in loaded.manifest.dependency_states}
+        graph = loaded.dependency_graph
+        assert graph is not None
+        protected_ids = tuple(
+            sorted(
+                node.node_id
+                for node in graph.nodes
+                if node.semantic_role
+                in {DependencySemanticRole.VOICE, DependencySemanticRole.CAPTION}
+            )
+        )
+        shot_2_visual = "creative:shot:shot-2:visual"
+        before_attempt_ids = {item.attempt_id for item in before_manifest.attempts}
+        observed_operations = tuple(
+            item.operation
+            for item in loaded.manifest.attempts
+            if item.attempt_id not in before_attempt_ids
+        )
+        first_references = self.provider_requests[0].references
+        registered_asset_ids = {item.asset_id for item in loaded.registry.assets}
+        return P7ReuseAcceptanceResult(
+            provider_calls=len(self.provider_requests) - phase_start,
+            total_provider_calls=len(self.provider_requests),
+            requests=phase_requests,
+            assets=tuple(generated[request.output_asset_id] for request in phase_requests),
+            request_binding_counts=tuple(sorted(self.request_binding_counts.items())),
+            changed_asset_ids=tuple(
+                current_assets[shot_id]
+                for shot_id in sorted(current_assets)
+                if current_assets[shot_id] != before_assets[shot_id]
+            ),
+            changed_shot_ids=tuple(
+                shot_id
+                for shot_id in sorted(current_assets)
+                if current_assets[shot_id] != before_assets[shot_id]
+            ),
+            shot_1_asset_id=current_assets["shot-1"],
+            shot_2_asset_id=current_assets["shot-2"],
+            public_base_attempt_operations=tuple(
+                item.operation
+                for item in loaded.manifest.attempts
+                if item.attempt_id
+                in {
+                    "p7-reuse-select-p5-registry",
+                    "p7-reuse-bootstrap-dependency-graph",
+                }
+            ),
+            character_ids=tuple(item.character_id for item in loaded.characters),
+            scene_ids=tuple(item.scene_id for item in loaded.scenes),
+            shot_strategies=tuple(
+                (item.shot_id, item.visual_strategy.value) for item in loaded.shots
+            ),
+            shared_reference_identities=tuple(
+                (item.role, item.creative_artifact_id, item.asset_id)
+                for item in first_references
+            ),
+            registered_reference_asset_ids=tuple(
+                sorted(
+                    {
+                        item.asset_id
+                        for item in first_references
+                        if item.asset_id in registered_asset_ids
+                    }
+                )
+            ),
+            observed_attempt_operations=observed_operations,
+            active_render_state_unchanged=(
+                loaded.manifest.active_render_state
+                == before_manifest.active_render_state
+            ),
+            recovery_attempts=recovery_attempts,
+            counterfactual_old_prompt_request=counterfactual_old_prompt_request,
+            desired_changed_node_ids=tuple(
+                sorted(
+                    node_id
+                    for node_id, state in after_states.items()
+                    if node_id not in before_states
+                    or before_states[node_id].desired_fingerprint
+                    != state.desired_fingerprint
+                )
+            ),
+            affected_node_ids=tuple(
+                sorted(
+                    node_id
+                    for node_id, state in after_states.items()
+                    if state.lifecycle is not DependencyLifecycle.FRESH
+                )
+            ),
+            stale_node_ids=tuple(
+                sorted(
+                    node_id
+                    for node_id, state in after_states.items()
+                    if state.lifecycle is DependencyLifecycle.STALE
+                )
+            ),
+            blocked_node_ids=tuple(
+                sorted(
+                    node_id
+                    for node_id, state in after_states.items()
+                    if state.lifecycle is DependencyLifecycle.BLOCKED
+                )
+            ),
+            unrelated_fresh_node_ids=tuple(
+                node_id
+                for node_id in protected_ids
+                if after_states[node_id].lifecycle is DependencyLifecycle.FRESH
+            ),
+            unchanged_desired_node_ids=tuple(
+                node_id
+                for node_id in (*protected_ids, shot_2_visual)
+                if node_id in before_states
+                and before_states[node_id].desired_fingerprint
+                == after_states[node_id].desired_fingerprint
+                and after_states[node_id].lifecycle is DependencyLifecycle.FRESH
+            ),
+            unrelated_voice_caption_nodes_are_fresh=(
+                self._unrelated_voice_caption_nodes_are_fresh(loaded)
+            ),
+            video_provider_attempt_count=sum(
+                "video" in operation for operation in observed_operations
+            ),
+            render_attempt_count=sum(
+                "render" in operation for operation in observed_operations
+            ),
+            history_artifact_count=history_count,
+            recovery_preserved_manifest_revision=recovery_unchanged,
+        )
+
+    def generate_all(self) -> P7ReuseAcceptanceResult:
+        if self._first_result is not None:
+            return self._first_result
+        phase_start = len(self.provider_requests)
+        initial = load_production_project(self.root / "project.yaml")
+        before_assets = self._shot_asset_ids(initial)
+        for attempt_id, shot_id, prompt_text in (
+            (
+                "p7-reuse-shot-1-initial",
+                "shot-1",
+                "Hero enters the archive room",
+            ),
+            (
+                "p7-reuse-shot-2-initial",
+                "shot-2",
+                "Hero studies the hidden record",
+            ),
+        ):
+            request, preview, authorization = self._make_call_bundle(
+                attempt_id=attempt_id,
+                shot_id=shot_id,
+                prompt_text=prompt_text,
+            )
+            self.writer.generate_image_asset(
+                request, preview, authorization, self
+            )
+            self._refresh_ready_project_registry_nodes()
+        self._first_result = self._result(
+            phase_start=phase_start,
+            before_assets=before_assets,
+            before_manifest=initial.manifest,
+        )
+        return self._first_result
+
+    def change_only_shot_1_prompt_and_generate(self) -> P7ReuseAcceptanceResult:
+        first = self.generate_all()
+        phase_start = len(self.provider_requests)
+        before = load_production_project(self.root / "project.yaml")
+        before_assets = {
+            "shot-1": first.shot_1_asset_id,
+            "shot-2": first.shot_2_asset_id,
+        }
+        counterfactual, _, _ = self._make_call_bundle(
+            attempt_id="p7-reuse-shot-1-old-prompt-counterfactual",
+            shot_id="shot-1",
+            prompt_text="Hero enters the archive room",
+        )
+        request, preview, authorization = self._make_call_bundle(
+            attempt_id="p7-reuse-shot-1-prompt-replacement",
+            shot_id="shot-1",
+            prompt_text="Hero enters the archive room under emergency lighting",
+        )
+        self.writer.generate_image_asset(request, preview, authorization, self)
+        return self._result(
+            phase_start=phase_start,
+            before_assets=before_assets,
+            before_manifest=before.manifest,
+            counterfactual_old_prompt_request=counterfactual,
+        )
+
+
+def make_p7_reuse_runtime(root: Path) -> P7ReuseAcceptanceRuntime:
+    return P7ReuseAcceptanceRuntime(root)
+
+
+def make_base_ai_comic_e2e_runtime(root: Path) -> "BaseAiComicE2ERuntime":
+    from production_e2e_support import (
+        BaseAiComicE2ERuntime,
+        DeterministicHyperFramesRunner,
+        DeterministicReviewAnalyzer,
+        DeterministicVoiceProvider,
+        require_audio_toolchain,
+    )
+
+    image_runtime = make_p7_reuse_runtime(root)
+    toolchain = require_audio_toolchain()
+    return BaseAiComicE2ERuntime(
+        root=root,
+        image_runtime=image_runtime,
+        voice_provider=DeterministicVoiceProvider(),
+        renderer=DeterministicHyperFramesRunner(toolchain.ffmpeg_path),
+        analyzer=DeterministicReviewAnalyzer(),
+    )
+
+
+def make_p8_video_evidence(root: Path, *, attempt_id: str = "video-attempt-1") -> dict:
+    """Materialize read-only P8 video generation evidence for reopen tests.
+
+    This is deliberately not a writer: it only lays down the exact receipt bytes a
+    future ``ProductionStateCommitter`` would durably persist, so the read-only
+    reopen surface can be exercised without a P8 writer.
+    """
+    from datetime import UTC, datetime
+
+    from ai_video.production.models import (
+        DependencyGraphSnapshotPointer,
+        PaidProviderSubmitReceiptPointer,
+        VideoGenerationAttemptState,
+        VideoRequestReceiptPointer,
+        VideoStatusReceiptPointer,
+    )
+    from ai_video.production.paid_provider import (
+        PaidProviderSubmitOutcome,
+        PaidProviderSubmitReceipt,
+    )
+    from ai_video.production.video import (
+        BillingKind,
+        ProviderProfilePointer,
+        ResolvedVideoGenerationRequest,
+        VideoCapabilityVariant,
+        VideoExecutionKind,
+        VideoGenerationMode,
+        VideoGenerationRequest,
+        VideoImageReferenceBinding,
+        VideoOutputRequirement,
+        VideoSubmission,
+        VideoTaskObservation,
+        VideoTaskState,
+    )
+
+    hash_a = "a" * 64
+    output = VideoOutputRequirement(
+        duration_seconds=6,
+        width=1280,
+        height=720,
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+    request = VideoGenerationRequest.create(
+        generation_id="generation-001",
+        provider_name="hailuo",
+        provider_kind="minimax_hailuo",
+        model_id="video-01",
+        provider_profile=ProviderProfilePointer(
+            profile_id="hailuo-video-01",
+            profile_version="hailuo-v1",
+            profile_path=Path(f"provider-profiles/{hash_a}.json"),
+            profile_sha256=hash_a,
+        ),
+        target_shot_id="shot-001",
+        target_shot_revision=3,
+        target_shot_content_hash=hash_a,
+        target_asset_role="primary_visual",
+        target_visual_strategy="generated_video",
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        prompt_text="A slow cinematic push toward the city.",
+        negative_prompt_text="flicker",
+        image_bindings=(
+            VideoImageReferenceBinding(
+                role="first_frame",
+                asset_id="image-source",
+                asset_sha256=hash_a,
+                mime_type="image/png",
+                width=1280,
+                height=720,
+            ),
+        ),
+        output_requirement=output,
+        seed=17,
+        base_project=ProjectSnapshotPointer(
+            path=Path(f"state/projects/project.1.{ZERO_HASH}.yaml"),
+            revision=1,
+            content_hash=ZERO_HASH,
+            file_sha256="1" * 64,
+        ),
+        base_registry=RegistrySnapshotPointer(
+            path=Path(f"assets/registry.{ZERO_HASH}.json"),
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            file_sha256="1" * 64,
+        ),
+        base_dependency_graph=DependencyGraphSnapshotPointer(
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            path=Path(f"state/dependency_graph.{ZERO_HASH}.json"),
+            file_sha256="1" * 64,
+        ),
+        input_artifact_ids=("shot-001", "image-source"),
+        output_asset_id="video-output-001",
+    )
+    resolved = ResolvedVideoGenerationRequest.create(
+        request=request,
+        capability=VideoCapabilityVariant(
+            capability_id="hailuo-i2v-6s-720p",
+            provider_kind="minimax_hailuo",
+            model_id="video-01",
+            profile_version="hailuo-v1",
+            execution_kind=VideoExecutionKind.REMOTE,
+            billing_kind=BillingKind.METERED,
+            mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+            output=output,
+            allowed_image_roles=("first_frame", "reference"),
+            required_first_frame=True,
+            max_reference_count=2,
+            allowed_image_mime_types=("image/jpeg", "image/png"),
+            max_image_bytes=10_000_000,
+            min_image_width=512,
+            min_image_height=512,
+            negative_prompt_supported=True,
+            seed_supported=True,
+            fps_supported=True,
+            idempotent_submit=False,
+            lookup_supported=False,
+        ),
+        effective_output=output,
+        effective_seed=17,
+        effective_negative_prompt_text="flicker",
+    )
+    submit_receipt = PaidProviderSubmitReceipt.create(
+        attempt_id=attempt_id,
+        request_fingerprint=resolved.resolved_generation_hash,
+        preview_fingerprint=hash_a,
+        gate_receipt_fingerprint=hash_a,
+        reservation_id="reservation-video-1",
+        outcome=PaidProviderSubmitOutcome.ACCEPTED,
+        external_effect_id="provider-task-1",
+        recorded_at=datetime(2026, 8, 18, tzinfo=UTC),
+    )
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=resolved, receipt=submit_receipt
+    )
+    observation = VideoTaskObservation.create(
+        submission=submission,
+        state=VideoTaskState.SUCCEEDED,
+        observed_at=datetime(2026, 8, 18, 0, 1, tzinfo=UTC),
+        progress_milli=1000,
+        provider_file_id="provider-file-1",
+    )
+
+    request_path = root / (
+        "state/video-generation/requests/"
+        f"{resolved.desired_generation_fingerprint}.json"
+    )
+    status_path = root / (
+        f"state/video-generation/status/{observation.observation_fingerprint}.json"
+    )
+    submit_path = root / (
+        "state/paid-provider/submits/"
+        f"{submit_receipt.submit_receipt_fingerprint}.json"
+    )
+    for path, model in (
+        (request_path, resolved),
+        (status_path, observation),
+        (submit_path, submit_receipt),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(model.model_dump_json().encode("utf-8"))
+
+    request_pointer = VideoRequestReceiptPointer(
+        path=request_path.relative_to(root),
+        request_receipt_fingerprint=resolved.desired_generation_fingerprint,
+        generation_id=resolved.generation_id,
+        request_input_hash=resolved.request_input_hash,
+        resolved_generation_hash=resolved.resolved_generation_hash,
+        output_asset_id=resolved.output_asset_id,
+        file_sha256=sha256_file(request_path),
+    )
+    status_pointer = VideoStatusReceiptPointer(
+        path=status_path.relative_to(root),
+        observation_fingerprint=observation.observation_fingerprint,
+        request_receipt_fingerprint=resolved.desired_generation_fingerprint,
+        paid_submit_receipt_fingerprint=submit_receipt.submit_receipt_fingerprint,
+        file_sha256=sha256_file(status_path),
+    )
+    submit_pointer = PaidProviderSubmitReceiptPointer(
+        path=submit_path.relative_to(root),
+        submit_receipt_fingerprint=submit_receipt.submit_receipt_fingerprint,
+        file_sha256=sha256_file(submit_path),
+    )
+    return {
+        "attempt_id": attempt_id,
+        "resolved": resolved,
+        "submit_receipt": submit_receipt,
+        "observation": observation,
+        "request_path": request_path,
+        "status_path": status_path,
+        "request_pointer": request_pointer,
+        "status_pointer": status_pointer,
+        "submit_pointer": submit_pointer,
+        "attempt_state": VideoGenerationAttemptState(
+            request=request_pointer,
+            generation_id=resolved.generation_id,
+            resolved_generation_hash=resolved.resolved_generation_hash,
+            phase="polling",
+            paid_submit_receipt=submit_pointer,
+            latest_observation=status_pointer,
+            provider_file_id=observation.provider_file_id,
+        ),
+    }

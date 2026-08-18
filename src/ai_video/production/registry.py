@@ -16,7 +16,11 @@ from ai_video.production.models import (
     AssetRegistrySnapshot,
     CaptionTrack,
 )
-from ai_video.production.paths import _read_regular_file_nofollow, resolve_contained_path
+from ai_video.production.paths import (
+    _read_regular_file_nofollow,
+    canonical_video_asset_path,
+    resolve_contained_path,
+)
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -37,12 +41,24 @@ def registry_semantic_sha256(registry: AssetRegistrySnapshot) -> str:
 
 
 def _verify_asset(record: AssetRecord, root: Path, asset_root: Path) -> Path:
-    p4_asset = record.audio_metadata is not None or record.caption_metadata is not None
+    sealed_asset = (
+        record.audio_metadata is not None
+        or record.caption_metadata is not None
+        or record.video_metadata is not None
+    )
+    if record.video_metadata is not None:
+        expected = canonical_video_asset_path(record.sha256)
+        if record.artifact_path != expected:
+            raise _invalid(
+                "Generated video asset path must be content-addressed: "
+                f"{record.asset_id}",
+                str(record.artifact_path),
+            )
     try:
         resolved = resolve_contained_path(
             root,
             record.artifact_path,
-            allowed_root=root / "assets" if p4_asset else asset_root,
+            allowed_root=root / "assets" if sealed_asset else asset_root,
         )
     except ValueError as exc:
         raise _invalid(f"Asset path is unsafe: {record.asset_id}", str(exc)) from exc
@@ -51,7 +67,7 @@ def _verify_asset(record: AssetRecord, root: Path, asset_root: Path) -> Path:
     try:
         payload = (
             _read_regular_file_nofollow(resolved, contained_by=root / "assets").data
-            if p4_asset
+            if sealed_asset
             else resolved.read_bytes()
         )
     except (OSError, ValueError) as exc:

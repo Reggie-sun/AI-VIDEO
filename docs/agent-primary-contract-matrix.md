@@ -1,120 +1,72 @@
-# AI-VIDEO Primary Contract Matrix
+# AI-VIDEO Contract Routing Matrix
 
-这份矩阵是 Codex、Claude 以及类似编码 Agent 共用的执行契约。
+本文件是修改代码前使用的契约路由索引。它回答四个问题：谁拥有该行为、哪些不变量必须保持、哪些替代路径禁止出现，以及最小相关验证是什么。
 
-请与 `AGENTS.md` 配合使用：在修改某个表面前，先找到对应行，保留列出的不变量，并运行要求的验证。
+本文件不是 runtime 状态总账、phase tracker、implementation authorization 或历史验收记录。当前实现真相、阶段方向与 Agent 权限分别由下表中的 canonical source 管理；代码、测试和已验证运行时行为始终优先于文档摘要。
 
-## Global Rules
+## Document Roles
 
-| Contract Area | 中文说明 |
+| Concern | Canonical Source |
 | --- | --- |
-| Product Scope | 当前 `0.1.x` runtime 是 local-first Python CLI + default-local ComfyUI；v0.2 是 Agent-first AI Video / AI Comic Production Harness 的分阶段目标，未落地的 slice 不属于当前行为。 |
-| Truth Source | 用户请求 > 代码/测试/运行时证据 > 仓库契约 > plans/specs > `.workflow/` 草稿记录。 |
-| Change Style | 小步、可测试、低漂移，并保持模块边界稳定。 |
-| Error Model | 跨模块统一使用 `AiVideoError` 与 `ErrorCode`。 |
-| Dependency Policy | 除非有明确理由且获得请求，否则不新增运行时依赖。 |
-| Output Policy | Legacy run 保持当前 flat `runs/<run_id>/` layout；v2 layout 只能由显式 v2 config 和已批准的 Manifest v2 slice 创建。 |
-| Version Gate | P0 文档、P1、P2、P2A 与 P3 已完成各自本地阶段；P4 已于 `f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward 合入 local `main`。P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main`，merged-main full verification 为 `1386 passed, 4 skipped`；尚未 push/release。P6+ 每个 slice 仍必须有独立 plan、授权、验收、rollback 和 contract/docs/tests 更新。 |
-| Agent Boundary | Codex 是 Production Agent；仓库提供 durable state、validation、provenance、dependency、render 和 QA harness，不实现第二套通用 Agent runtime。 |
-| Renderer Ownership | P3/P4 `ResolvedTimeline` 是唯一 frame/sample ordering 与 timing 真相源；P4 只向它增加 canonical audio spans 与 caption cues，不另造 audio timeline。当前唯一实现的 renderer 是 pinned local HyperFrames；caption layout/drawing 归 selected renderer。Remotion、Captions.ai final-render path 与其它 renderer 仍未实现并必须 fail closed；不得 fallback、串联或 double render。 |
+| Agent authority、工作边界、decision gates、Git 与 completion rules | `AGENTS.md` |
+| Changed-path category、mandatory checks 与 local run receipt | `.agent/harness/policy.yaml`、`scripts/agent_harness.py`、`.agent/harness/runs/` |
+| 当前已实现行为、local/origin/release truth、已验证与未验证边界 | `docs/v0.2-runtime-baseline.md` |
+| Phase dependency、status、future gates 与 slice direction | `docs/v0.2-agentic-production-roadmap.md` |
+| 单个 slice 的 accepted scope、tradeoff 与 implementation detail | active spec / plan |
+| Executable behavior | source code、tests 与本轮实际 runtime evidence |
 
-## Contract Matrix
-
-| Surface | Canonical Files | Invariants To Preserve | Common Safe Changes | Required Validation |
-| --- | --- | --- | --- | --- |
-| CLI Contract | `src/ai_video/cli.py`、`README.md`、`tests/test_cli.py` | 公共命令保持为 `validate`、`run`、`resume`。`validate` 必须无副作用。类型化失败要输出面向用户的错误信息，而不是原始 traceback。 | 增加小型参数、优化提示文案、接入新的内部选项、扩展进度输出。 | `pytest tests/test_cli.py -v` |
-| Config Loading & Path Resolution | `src/ai_video/config.py`、`src/ai_video/models.py`、`tests/test_config.py` | project 和 shot 文件通过 YAML + Pydantic 加载。相对路径解析为干净的绝对路径。非本地 ComfyUI 主机需要显式 opt-in。未知角色必须报错。 | 增加校验、优化标准化逻辑、扩展兼容字段且不破坏现有配置。 | `pytest tests/test_config.py -v` |
-| Workflow Loading | `src/ai_video/workflow_loader.py`、`tests/test_workflow_loader.py` | 同时接受 API JSON 和 UI workflow JSON。UI 图转换必须走标准 loader，而不是在别处重复实现。 | 优化校验或转换规则，同时保持现有 fixture 格式继续可用。 | `pytest tests/test_workflow_loader.py -v` |
-| Workflow Rendering | `src/ai_video/workflow_renderer.py`、`tests/test_workflow_renderer.py` | 渲染必须是纯逻辑：把 template + binding + shot context 转成渲染后的 workflow，且不触发网络访问。binding 失败要给出可定位的 path 信息。 | 增加 binding 覆盖、优化 output prefix 处理、通过同一 path helper 支持新映射字段。 | `pytest tests/test_workflow_renderer.py -v` |
-| ComfyUI Transport | `src/ai_video/comfy_client.py`、`tests/test_comfy_client.py` | client 只负责 HTTP 传输、轮询、产物收集和清理钩子。它不能知道 shot 编排顺序。本地优先策略不变。 | 优化重试行为、错误映射、轮询细节或产物选择。 | `pytest tests/test_comfy_client.py -v` |
-| Pipeline Orchestration | `src/ai_video/pipeline.py`、`tests/test_pipeline.py`、`tests/test_resume_e2e.py` | shots 必须按顺序执行。上一帧可喂给下一 shot。重试要有边界。progress callback 应为可选且不侵入。resume 必须基于 manifest 状态并跳过仍然有效的工作。 | 优化进度输出、重试记录、stale 处理或 resume 决策。 | `pytest tests/test_pipeline.py tests/test_resume_e2e.py -v` |
-| Manifest Persistence | `src/ai_video/manifest.py`、`tests/test_manifest.py` | manifest 写入必须原子化。哈希必须代表已持久化产物。成功 shot 的有效性必须基于哈希判断。下游 stale 状态必须来自上游变化。 | 增加 helper、扩展 manifest 校验、收紧 stale 检测。 | `pytest tests/test_manifest.py -v` |
-| ffmpeg Boundary | `src/ai_video/ffmpeg_tools.py`、`tests/test_ffmpeg_tools.py` | ffmpeg helper 负责 probe、校验、抽帧、标准化与最终拼接。当 stream copy 不可用时，拼接必须具备兜底能力。 | 优化 fallback 行为、标准化参数或命令构造，同时保持输出兼容。 | `pytest tests/test_ffmpeg_tools.py -v` |
-| Test Fixtures & Realism | `tests/conftest.py`、所有测试 | 在可行时，测试夹具应复用生产加载路径。编排测试优先使用 fake。除非用户明确要求，否则真实 ComfyUI 只是可选项。 | 扩展 fixtures、增加 e2e 风格 fake 测试、提高真实性但不引入网络依赖。 | 如果 fixture 改动较广，运行受影响测试文件外加 `pytest -v`。 |
-| Output Layout | `README.md`、`src/ai_video/pipeline.py`、manifest 相关测试 | runs 必须写入 `runs/<run_id>/`，包含 manifest、shot 产物、normalized clips 和 final output。路径必须足够稳定，便于 resume 和排查工具使用。 | 增加额外元数据或调试产物，但不能破坏现有预期文件。 | `pytest tests/test_pipeline.py tests/test_manifest.py -v` |
-| v2 Production Project Core | `src/ai_video/production/**`、`tests/test_production_*.py` | P2 只读加载 Manifest-selected project/registry exact revision；creative/asset refs 必须 content-addressed 且留在固定 project roots。不拥有 writer、lifecycle 或 desired fingerprint。 | 收紧 schema、strategy、reference、hash 或 containment validation，保持 no-network 和 Legacy isolation。 | `pytest tests/test_production_models.py tests/test_production_validation.py tests/test_production_registry.py tests/test_production_project.py tests/test_config.py tests/test_cli.py -q` |
-| P2A Production State Commit | `src/ai_video/production/models.py`、`src/ai_video/production/project.py`、`src/ai_video/production/state_commit.py`、`tests/test_production_state_commit.py`、`tests/test_production_state_recovery.py` | `ProductionManifest` 是唯一 lifecycle owner；nested project/registry pointer 必须固定 exact path、semantic identity 和 file hash。`ProductionStateCommitter` 是唯一 writer/recovery owner；POSIX same-filesystem `state/commit.lock` 下 snapshot temp 必须 file-fsync、promote-without-overwrite、parent-directory-fsync 并 reopen verify。running/failed lifecycle 也会 durable Manifest write；仅 final active-pointer replace 是 single logical commit point。恢复必须显式，只接受 exact old/new pair；bounded owned temp 可清理，complete orphan 只能 preserve/report。P2 reader 仍只读，root `project.yaml` 是 stable validated entrypoint 而非 active bytes truth。 | 补强 P2A integrity/recovery validation，不能增加第二 writer/control plane、auto-recovery、CLI 或改变 Legacy Manifest/layout。 | `pytest tests/test_production_models.py tests/test_production_validation.py tests/test_production_registry.py tests/test_production_project.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
-| P3 Deterministic Composition + HyperFrames | `src/ai_video/production/composition.py`、`src/ai_video/production/hyperframes.py`、P2/P2A render-state extensions、`tests/test_production_composition.py`、`tests/test_production_hyperframes.py` | 只接受 local raster `STATIC_IMAGE` + zero-duration `CUT`；`ResolvedTimeline` 是唯一时序真相。只运行 exact `hyperframes@0.7.103`，每个 tool process fresh user/net/PID namespace、controlled env、非 version root `--json`、无 fallback。Selection 必须先 durable；source/lint/check/render/held-FD verify 后，P2A writer 才能切换一个 `active_render_state`。Manifest 2.0/2.1/2.2 reader兼容并保留历史 pair-change pointer 行为；Manifest 2.3 由 P5 precise lifecycle 取代 blanket stale。Recovery按 exact selected identities，完整 orphan只 preserve/report。 | 收紧 composition/source/receipt/path/replay/recovery validation；P4 只能通过既有 Composition/ResolvedTimeline/HyperFrames contract 增加 audio/caption 输入。不能导出低层 runner/adapter、增加 Remotion、CLI 或远程 fallback。 | `python -m pytest tests/test_production_models.py tests/test_production_project.py tests/test_production_composition.py tests/test_production_hyperframes.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
-| P4 Voice and Captions | `src/ai_video/production/audio.py`、`src/ai_video/production/captions.py`、`src/ai_video/production/elevenlabs.py`、P2/P2A/Composition/HyperFrames extensions、`tests/test_production_audio.py`、`tests/test_production_captions.py`、`tests/test_production_elevenlabs.py`、`tests/test_production_voice_captions_e2e.py` | Audio kinds 固定为 `dialogue | narration | ambience | sfx | bgm`；`VoiceGenerationRequest` immutable/self-sealing，provider flow 必须 preview budget/egress、R+1 request、R+2 submit intent + committer-issued one-use permit、materialize/probe/hash/register/alignment、cost/provenance receipt、R+3 candidate 与 R+4 activation。`CaptionTrack` 是 structured canonical source，不能退化为 burned-in pixels。`ResolvedTimeline` 继续唯一 order/frame/sample/timing owner；`ProductionStateCommitter` 继续唯一 Manifest / Registry writer/recovery owner。Unknown outcome 禁止 blind resubmit，replay 不得再次调用 provider/renderer。 | 收紧 audio/caption/receipt/fingerprint/path/replay/recovery validation；默认只用 deterministic fixtures、fake provider 和 no-network。ElevenLabs adapter 仅 explicit opt-in candidate，不从 package root 导出；真实调用须另获授权并重新满足 budget、egress、secret 与 crash-safe persistence gate。P5 可消费这里暴露的 typed fingerprints，但不能把 lifecycle 写回 P4 modules；不能增加 Captions.ai/Remotion、第二 renderer/writer、CLI 或 cloud fallback。 | `python -m pytest tests/test_production_audio.py tests/test_production_captions.py tests/test_production_elevenlabs.py tests/test_production_models.py tests/test_production_validation.py tests/test_production_registry.py tests/test_production_project.py tests/test_production_composition.py tests/test_production_hyperframes.py tests/test_production_state_commit.py tests/test_production_state_recovery.py tests/test_production_voice_captions_e2e.py tests/test_config.py tests/test_cli.py -q` |
-| P5 Dependency Graph + Selective Rebuild | `src/ai_video/production/dependency.py`、P5 models/project/state-commit extensions、`tests/test_production_dependency.py`、`tests/test_production_selective_rebuild.py`、P5 commit/recovery tests | `DependencyGraphSnapshot` immutable/content-addressed，只含 typed nodes/edges/reasons/contributions；`ProductionManifest` 2.3 独占 active graph、desired/applied fingerprints 与 fresh/stale/failed/blocked/superseded lifecycle；`ProductionStateCommitter` 独占 graph snapshot write/co-activation/recovery。Desired fingerprint canonical递归消费 upstream desired，same input stop propagation；failed same-desired 不auto-retry。`ResolvedTimeline` 仍唯一 order/frame/sample/timing owner。Composition、ResolvedTimeline、renderer source与render必须由同一次final render activation原子证明，旧render pointer不得分别推进其中任何node。 | 收紧 graph/schema/hash/path/resolution/frontier/replay/recovery validation，使用 deterministic fake/no-network fixtures。不得增加第二 Manifest/registry/graph writer、auto recovery、blanket stale、timeline 推导、P6 QA/repair、P7/P8 Provider、第二 renderer、CLI 或 Legacy layout change。 | `python -m pytest tests/test_production_dependency.py tests/test_production_selective_rebuild.py tests/test_production_models.py tests/test_production_registry.py tests/test_production_project.py tests/test_production_state_commit.py tests/test_production_state_recovery.py tests/test_production_composition.py tests/test_production_hyperframes.py tests/test_production_audio.py tests/test_production_captions.py tests/test_production_elevenlabs.py tests/test_production_voice_captions_e2e.py tests/test_config.py tests/test_cli.py -q` |
+使用方法：先用 `make harness-inspect` 根据 task-owned changed paths 查看 mandatory checks，再定位受影响的 surface，确认唯一 owner，保持 `Invariants`，不得引入 `Forbidden Alternate Path`。完成前运行 `make harness-verify` 并保留 passing receipt。下表的 `Focused Verification` 是 human-readable contract；`.agent/harness/policy.yaml` 是对应 executable routing，二者变更时必须同步。
 
 ## Cross-Cutting Contracts
 
-### Resume Contract
-
-任何触及 resume 的改动，都必须保留以下规则：
-
-- resume 从 `manifest.json` 启动，而不是重新启动一个新 run。
-- 已完成且仍有效的 shots 要被跳过。
-- 无效、失败或 stale 的 shots 可以被重跑。
-- 缺失的下游产物应触发修复或重跑，而不是静默成功。
-- 恢复成功后，最终输出和 manifest 终态必须再次持久化。
-
-最低验证：
-
-```bash
-pytest tests/test_manifest.py tests/test_pipeline.py tests/test_resume_e2e.py -v
-```
-
-### Manifest Contract
-
-任何触及 manifest 结构或持久化的改动，都必须保留：
-
-- 原子写入，
-- 稳定、可读的 JSON，
-- 可持久化的 `final_output`，
-- 在可用时可持久化的 config/template/binding 路径与哈希字段，
-- 用于有效性检查的 per-shot 产物哈希。
-
-最低验证：
-
-```bash
-pytest tests/test_manifest.py tests/test_pipeline.py -v
-```
-
-### Local-First Contract
-
-Agent 不得悄悄侵蚀本地优先承诺。
-
-在没有用户明确指示时，不得引入以下内容：
-
-- 远程服务依赖，
-- 云端托管的视频生成 API，
-- ComfyUI 的后台进程管理器，
-- 遥测或外部状态同步，
-- 把前端或 API server 变成 CLI 的隐式前置条件。
-
-### v0.2 Planning Gate
-
-- 当前 code/tests 仍是 runtime truth；spec 和 plan 不能覆盖未实现行为。
-- P0 只迁移 product/contract 文档；不得把 spec 写成 runtime truth。
-- 本地 P1 只稳定 Legacy runtime，未引入新 product domain；其 plan 作为 historical stabilization record 保留。
-- P2 已建立 ProductionProject、Assets、Shot visual strategy 的 read-only durable contract；它不拥有 writer、renderer 或云服务。
-- P2A 已 independently accepted 并合并到 local `main`：唯一 writer/recovery owner 写 immutable v2 snapshots，并通过 nested active pointers and one Manifest replace activate exact pair。它不改变 P2 reader 的只读语义或 Legacy Manifest v1/layout，且尚未 push 或 release。
-- P3 已于 `3296b713` fast-forward 合入 local `main` 并保留独立 review、committed-fixture render 与 fail-closed trace proof；local merge 尚未 push/release。当前只允许一个 pinned local HyperFrames path，Remotion 与其它 renderer 必须拒绝。
-- P4 已于 `f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward 合入 local `main`；merged-main full verification 为 `1094 passed, 4 skipped`，尚未 push/release。ElevenLabs 只有 thin explicit-opt-in adapter，未进行 live call、secret 读取或 quota 使用；runtime authorization 不等于 live-call authorization。
-- P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main`，实现 immutable graph、Manifest 2.3 lifecycle、precise resolver 与 explicit recovery，并以 deterministic mutation matrix 完成 acceptance；canonical `1256 passed, 3 skipped`、Legacy `58 passed`、merged-main full `1386 passed, 4 skipped`；尚未 push/release。P5 不授权 P6-P9，也不改变 Legacy CLI/Manifest/layout。
-- P6 strategy-aware QA/repair 完成前，不得让当前 `static_visuals` heuristic 自动否决合法的 `static_image` / `image_motion` Shot。
-- P8 之前不得接入真实 generated-video cloud Provider；任何 paid Provider submit 仍受 Budget Guard、Cloud Egress 和 crash-safe persistence gate。
-- 新 CLI、Manifest schema、artifact layout、远程行为、Audio 或 dependency 仍命中下方 Change Escalation Matrix。
-
-## Change Escalation Matrix
-
-| Proposed Change | Default Agent Action |
+| Contract | Invariant |
 | --- | --- |
-| Tighten validation while keeping current examples working | 直接实现，并补测试。 |
-| Add an optional field compatible with existing configs | 直接实现；如果用户可见则同步补测试和文档。 |
-| Change CLI names, flags, or exit-code meanings | 暂停并确认。 |
-| Change manifest schema or artifact layout | 暂停并确认。 |
-| Add a runtime dependency | 暂停并确认。 |
-| Introduce remote/networked product behavior beyond local ComfyUI | 暂停并确认。 |
-| Add frontend / API / server subsystems | 暂停并确认。 |
+| Product Isolation | Legacy `0.1.x` CLI/Manifest/flat run layout 与 v2 Production Python APIs 保持隔离；除非独立获批，不得借 v2 change 修改 Legacy public surface。 |
+| Mutation Ownership | `ProductionStateCommitter` façade及其 private implementation modules 是 v2 project、registry、render、graph、review、repair、image evidence、paid-provider state、generated-video lifecycle、Manifest activation 与 explicit recovery 的唯一 writer owner。 |
+| Timeline and Dependency Ownership | `ResolvedTimeline` 独占 order/frame/sample/timing；P5 resolver 独占 desired fingerprint、precise invalidation 与 rebuild frontier。其它模块只能消费，不得复制推导。 |
+| Replay and Recovery | Exact replay 不重复 provider、renderer、analyzer 或 Manifest write；unknown outcome fail closed；recovery 必须显式且不得 blind retry、remint permit、猜测 mixed state 或删除 complete orphan evidence。 |
+| Local-First and Provider Safety | Legacy 默认只连接 local ComfyUI；v2 local adapter 必须 loopback-only。任何 remote/paid Provider、live submit、secret 或 cloud egress 继续受 `AGENTS.md` decision gates 约束，且不得成为 fallback。 |
+| Evidence Truth | Immutable evidence 必须 content-addressed 并绑定 exact selected inputs。Plan、console text、Agent memory 或 heuristic 不得升级成 runtime、semantic acceptance 或 quality acceptance。 |
+| Error Model | 跨模块失败使用 `AiVideoError` 与 `ErrorCode`；retryability 由 typed metadata 决定，常规 CLI 输出不得泄露 raw traceback。 |
 
-## Minimum Done Criteria
+## Development Control Surface
 
-Agent 在宣称完成前，至少确认：
+| Surface | Primary Owner | Invariants | Forbidden Alternate Path | Focused Verification |
+| --- | --- | --- | --- | --- |
+| Development Verification Harness | `scripts/agent_harness.py`、`scripts/agent_harness_runtime.py`、`scripts/agent_harness_receipt.py`、`scripts/harness_pytest_guard.py`、`.agent/harness/policy.yaml`、`Makefile`、`.github/workflows/mandatory-gate.yml` | Completion scope只接受non-empty staged delta或commit range，并在detached worktree验证exact snapshot；commands使用argv + `shell=False`、timeout与sanitized env；pytest Python process限制为loopback socket/DNS API，subprocess不在该隔离内；receipt绑定scope/policy/env/check artifact bytes/self-hash；shared Production owner走完整Production + CLI/config isolation，unknown path fail safe到full tests + task-delta Architecture Gate。PR gate以exact event base/head运行同一Harness，GitHub runner独立生成receipt/JUnit/log artifacts；server enforcement要求active `main` ruleset强制PR、up-to-date branch与稳定check `mandatory-gate / verify`，并阻止force push/deletion。 | `--path` completion proof、空scope pass、在shared dirty tree运行checks、默认check启动可联网child process、用historical baseline debt污染task gate、把stale/tampered或开发者提交的receipt当CI proof、静默忽略policy drift、把workflow存在或workflow-only push冒充server enforcement、CI读取Provider secret或运行live/paid smoke。 | `make harness-test && make harness-audit && python scripts/agent_harness.py inspect --path .github/workflows/mandatory-gate.yml`；staged completion用`make harness-verify`，commit completion用`make harness-verify-range BASE_REF=<ref>`并以`make harness-receipt RECEIPT=<path>`检查freshness与artifact hashes；远端另验证successful workflow run/check URL、active ruleset ID/API payload与`main` protection truth。 |
 
-1. 上表中被改动到的契约行仍然成立。
-2. 对应测试已经运行。
-3. 用户可见行为变化已反映到 `README.md` 或相关文档。
-4. 任何剩余缺口都已明确说明。
+## Legacy Runtime Surfaces
+
+| Surface | Primary Owner | Invariants | Forbidden Alternate Path | Focused Verification |
+| --- | --- | --- | --- | --- |
+| CLI | `src/ai_video/cli.py` | Public commands 保持 `validate`、`run`、`resume`；`validate` 无副作用；typed failure 转成用户可理解的输出。 | 在其他模块解析 CLI、增加隐式 v2 command、绕过 typed error mapping。 | `python -m pytest tests/test_cli.py -q` |
+| Config and Paths | `src/ai_video/config.py` | YAML + Pydantic loading；持久化路径为干净绝对路径；non-local ComfyUI 必须 explicit opt-in。 | 在 pipeline/render/client 中重复路径策略或默认放行 remote host。 | `python -m pytest tests/test_config.py -q` |
+| Workflow Loading | `src/ai_video/workflow_loader.py` | API JSON 与 UI workflow JSON 都走标准 production loader。 | 裸 JSON/YAML parsing 形成第二条 UI-to-API conversion path。 | `python -m pytest tests/test_workflow_loader.py -q` |
+| Workflow Rendering | `src/ai_video/workflow_renderer.py` | Template + binding + shot context 的转换保持纯逻辑、no-network，并提供可定位的 binding path error。 | 在 CLI/pipeline 写死 node ID 或在 renderer 内执行 transport。 | `python -m pytest tests/test_workflow_renderer.py -q` |
+| ComfyUI Transport | `src/ai_video/comfy_client.py` | 只负责 HTTP transport、polling、artifact collection 与 typed transport failure；不知道 Shot orchestration。 | 在 client 中实现 Shot order、resume、state activation 或 remote fallback。 | `python -m pytest tests/test_comfy_client.py -q` |
+| Pipeline and Resume | `src/ai_video/pipeline.py` | 顺序 Shot execution、bounded typed retry、optional last-frame chaining；resume 从既有 manifest 恢复并跳过仍有效工作。 | 对同一 `run_id` 再调用 `run()` 模拟 resume，或使用 blanket downstream rerun。 | `python -m pytest tests/test_pipeline.py tests/test_resume_e2e.py -q` |
+| Legacy Manifest and Output | `src/ai_video/manifest.py`、`src/ai_video/pipeline.py` | Manifest 原子写入；artifact hash 代表已持久化 bytes；flat `runs/<run_id>/` layout、terminal state 与 `final_output` 保持可恢复。 | 非原子终态写入、带 `..` 的持久化路径、无 schema authorization 的 layout mutation。 | `python -m pytest tests/test_manifest.py tests/test_pipeline.py -q` |
+| ffmpeg | `src/ai_video/ffmpeg_tools.py` | 负责 probe、clip validation、frame extraction、normalize 与 stitch；stream-copy 不可用时使用既有 re-encode fallback。 | 在 pipeline 复制 ffmpeg policy，或把 v2 renderer ownership隐式并入 Legacy helper。 | `python -m pytest tests/test_ffmpeg_tools.py -q` |
+| Architecture Gate | `scripts/architecture_gate/**`、`architecture_gate.toml` | Gate 只做 deterministic local source analysis；normal check 不写 baseline；historical debt 不得掩盖 regression。 | 复用 production dependency graph、通过刷新 baseline 隐藏 regression、机械拆散 cohesive transaction lifecycle。 | `python -m pytest tests/test_architecture_gate.py tests/test_architecture_gate_cli.py -q && python -m scripts.architecture_gate check` |
+
+## Production Runtime Surfaces
+
+| Surface | Primary Owner | Invariants | Forbidden Alternate Path | Focused Verification |
+| --- | --- | --- | --- | --- |
+| P2 Production Reader | `src/ai_video/production/models.py`、`hashing.py`、`paths.py`、`validation.py`、`registry.py`、`project.py` | Strict/read-only/no-network loading of Manifest-selected exact project/registry revision；semantic hash、reference 和 root containment 必须验证。 | 在 reader/registry/validation 中写入、恢复、激活 state，或绕过 exact selected revision。 | `python -m pytest tests/test_production_models.py tests/test_production_validation.py tests/test_production_registry.py tests/test_production_project.py tests/test_config.py tests/test_cli.py -q` |
+| P2A State Commit and Recovery | `src/ai_video/production/state_commit.py`、`_state_commit_*` | Single committer owner；immutable snapshot write/fsync/promote/reopen；final Manifest replace 是 logical commit point；recovery 只接受 exact old/new state。 | 第二 writer、reader auto-recovery、overwrite promotion、schema downgrade、猜测或自动激活 orphan。 | `python -m pytest tests/test_production_state_commit.py tests/test_production_state_recovery.py tests/test_production_models.py tests/test_production_project.py -q` |
+| P3 Composition and HyperFrames | `src/ai_video/production/composition.py`、`hyperframes.py` | `ResolvedTimeline` 是唯一时序真相；只运行 pinned local HyperFrames path；selection 先 durable，verified source/output/state 后才能原子 activation。 | 第二 timeline、alternate renderer fallback、未验证 output activation、导出低层 runner 形成旁路。 | `python -m pytest tests/test_production_composition.py tests/test_production_hyperframes.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
+| P4 Voice and Captions | `src/ai_video/production/audio.py`、`captions.py`、`elevenlabs.py` | Provider-neutral sealed request；budget/egress preview 和 durable intent precede submit；`CaptionTrack` 是 canonical structured source；audio/caption timing 仍归同一 `ResolvedTimeline`。 | 第二 audio timeline、burned-in pixels 充当 caption truth、blind provider retry、ElevenLabs implicit/default path。 | `python -m pytest tests/test_production_audio.py tests/test_production_captions.py tests/test_production_elevenlabs.py tests/test_production_voice_captions_e2e.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
+| P5 Dependency and Selective Rebuild | `src/ai_video/production/dependency.py` | Graph snapshot immutable 且不存 mutable lifecycle；Manifest 独占 desired/applied states；canonical desired recursion 与 precise transitive invalidation保持不变；render unit 只能 final activation 后一起 fresh。 | Blanket stale、第二 resolver、graph 推导 timeline、单独推进 composition/timeline/source/render node。 | `python -m pytest tests/test_production_dependency.py tests/test_production_selective_rebuild.py tests/test_production_models.py tests/test_production_project.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
+| P6 Review and Repair | `src/ai_video/production/review.py`、`src/ai_video_mcp/tools/review.py`、`optimize_plan.py`、`apply_optimization.py` | `video-analysis` 只收集 raw evidence；Manifest/committer拥有 review/repair/final-acceptance lifecycle；semantic PASS 需要 policy-selected durable evidence；repair 绑定 exact approved P5 closure。 | Analyzer 自判 Production verdict、heuristic 自升 semantic PASS、未经授权 repair、第二 QA/control path。 | `python -m pytest -p no:cacheprovider tests/test_mcp_review.py tests/test_mcp_optimize_plan.py tests/test_mcp_apply_optimization.py tests/test_production_review.py tests/test_production_repair.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
+| P7 Image Contract and Activation | `src/ai_video/production/image.py`、P7 state-commit/reader extensions | Request 绑定 exact target Shot/role、prompt/parameters、Character/Scene/reference 与 base tuple；measured PNG/provenance durable；committer原子切换 target-only project/registry/graph。 | P7 自建 resolver/writer、automatic reference regeneration、remote Provider、renderer/video generation 或 Legacy CLI path。 | `python -m pytest -p no:cacheprovider tests/test_production_image.py tests/test_production_image_e2e.py tests/test_production_models.py tests/test_production_registry.py tests/test_production_validation.py tests/test_production_project.py tests/test_production_dependency.py tests/test_production_selective_rebuild.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
+| P7.1 Local Image Adapter and Human Import | `src/ai_video/production/comfy_image.py`、`image_import.py`、sealed workflows/profiles | Concrete adapter 只接受 profile-listed loopback origin并禁用 proxy/redirect；exact components/workflow/nodes 在 R+1 前 preflight；human import 只记录 truthful actor/source/PNG evidence。 | Remote/fallback endpoint、preflight 后补验证、虚构 web backend/request/automation、第二 import writer。 | `python -m pytest -p no:cacheprovider tests/test_production_comfy_image.py tests/test_production_image_import.py tests/test_production_p7_1_local_image_e2e.py tests/test_comfy_client.py tests/test_workflow_loader.py -q`；涉及 host inventory 时另运行 `scripts/check_p7_1_comfy_compatibility.py` |
+| Paid Provider Safety Gate | `src/ai_video/production/paid_provider.py`、`_state_commit_paid_provider.py`、`_paid_provider_project_reader.py` | Provider-neutral preview、exact egress、secret reference、explicit actor authorization 与 budget reservation 必须绑定同一 sealed request；committer先持久化 one-use submit intent，Gate-owned `PaidProviderSubmitReceipt` 独占 billable external-effect identity；known-no-effect、accepted与outcome-unknown使用不同 durable outcome，unknown不得自动重试。 | Adapter自授权、自行预留/结算budget、在durable intent前submit、持久化raw secret、复制external task ID、unknown后remint permit或blind resubmit。 | `python -m pytest -p no:cacheprovider tests/test_production_paid_provider.py tests/test_production_paid_provider_state.py tests/test_production_paid_provider_e2e.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
+| P8 Video Schema and Read-Only Evidence | `src/ai_video/production/models.py`、`_lifecycle_schema.py`、`registry.py`、`_video_project_reader.py`、`project.py` | Manifest 2.7独占video attempt mutable phase；Registry 2.2 generated-video record要求content-addressed/no-follow MP4 bytes、`VideoAssetMetadata`、exact request/provenance identity，remote record还要求cost与egress identity；reader只reopen并交叉验证exact request/Gate submit/status/fetch evidence，pre-P8 schema保持兼容且拒绝显式P8 fields。 | Schema/reader写state、graph保存mutable video lifecycle、旧schema偷带P8 fields、接受symlink/non-content-addressed bytes、把schema中的`VALIDATE`/`CANDIDATE`/`ACTIVATE` phase当作对应writer已经实现。 | `python -m pytest -p no:cacheprovider tests/test_production_models.py tests/test_production_registry.py tests/test_production_project.py -q` |
+| P8 Video Provider Contract and Pre-Activation Lifecycle | `src/ai_video/production/video.py`、`video_generation.py`、`video_fake.py`、`_state_commit_video.py` | Provider-neutral request/capability/profile resolution；`request_input_hash`、`generation_id`、`resolved_generation_hash`、Gate external-effect identity与artifact SHA保持分离；service每次只执行一个state-backed action，committer独占request、submit linkage、status与held-FD fetch boundary；当前实现到`fetch_once()`返回task-owned fetched candidate为止，尚未实现validate、Registry/Project/Graph candidate commit或activation；Fake path默认no-network，P3 timeline/renderer当前不消费generated MP4。 | Provider-specific core fields、automatic Provider selection/fallback、第二writer/resolver/task ID、以output bytes充当desired identity、在status/poll时stale composition、把fetched candidate当成durable registered/activated asset、把asset seam描述成renderer integration。 | `python -m pytest -p no:cacheprovider tests/test_production_paid_provider_state.py tests/test_production_paid_provider_e2e.py tests/test_production_video.py tests/test_production_video_fake.py tests/test_production_video_state_recovery.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
+| P8 MiniMax H3 Adapter | `src/ai_video/production/minimax_h3.py` | Concrete adapter保持显式、可删除且不反向污染P8 core；固定capability/profile只接受exact compatible request；raw credential不进入model/receipt/repr，transport禁redirect；Gate permit紧邻唯一submit消费，poll/fetch绑定同一task，signed result URL不持久化。代码与mock/fake tests不构成real submit、付费、live或quality acceptance。 | 注册为default/fallback、绕过Paid Provider Gate或committer、自动降级model/profile、泄露secret/signed URL、redirect following、unknown submit后blind retry、把offline test宣传为live acceptance。 | `python -m pytest -p no:cacheprovider tests/test_production_minimax_h3.py tests/test_production_video.py tests/test_production_video_state_recovery.py tests/test_production_paid_provider.py tests/test_production_paid_provider_state.py tests/test_production_paid_provider_e2e.py tests/test_production_state_commit.py tests/test_production_state_recovery.py -q` |
+| Base AI Comic E2E | `tests/test_production_base_ai_comic_e2e.py`、P3-P7 owners | No-Video-Provider path 必须沿唯一 committer/resolver/timeline/review control path完成 durable reopen、exact repair 与 zero-side-effect replay；repair不得 regenerate unaffected P7/voice/caption assets。 | 新 production coordinator、第二 writer/resolver、隐式 Video Provider、用 E2E acceptance 推导 paid/live authorization。 | `python -m pytest -p no:cacheprovider tests/test_production_base_ai_comic_e2e.py -q && python -m scripts.architecture_gate check` |
+
+## Completion Use
+
+本矩阵只定义 surface-level focused gate。最终交付仍必须遵守 `AGENTS.md`：检查实际 diff ownership，通过 Development Harness 运行全部受影响 surface 的 mandatory checks，报告 fresh receipt path，区分本轮执行证据与历史记录，并明确 remaining risk、未验证区域和 publication 状态。

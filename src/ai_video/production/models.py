@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import unicodedata
 from collections.abc import Mapping
-from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
-from typing import Annotated, Literal, Union
+from typing import Literal, Union
 from urllib.parse import urlsplit
 
 from pydantic import (
@@ -17,6 +16,35 @@ from pydantic import (
     field_validator,
     model_serializer,
     model_validator,
+)
+
+from ai_video.production._asset_registry_validation import (
+    reject_explicit_p4_registry_fields,
+    reject_explicit_p8_registry_fields,
+    serialize_asset_record,
+    serialize_egress_metadata,
+    validate_asset_record,
+    validate_egress_metadata,
+    validate_registry_snapshot,
+)
+from ai_video.production._lifecycle_schema import (
+    ImageRequestReceipt,
+    PaidProviderAttemptPhase as PaidProviderAttemptPhase, PaidProviderAttemptState as PaidProviderAttemptState,
+    PaidProviderBudgetSnapshotPointer as PaidProviderBudgetSnapshotPointer, PaidProviderGateReceiptPointer as PaidProviderGateReceiptPointer,
+    PaidProviderSubmitReceiptPointer as PaidProviderSubmitReceiptPointer,
+    P5_AWARE_OPERATIONS as _P5_AWARE_OPERATIONS,
+    VideoAttemptPhase as VideoAttemptPhase,
+    VideoFetchReceiptPointer as VideoFetchReceiptPointer,
+    VideoGenerationAttemptState as VideoGenerationAttemptState,
+    VideoRequestReceiptPointer as VideoRequestReceiptPointer,
+    VideoStatusReceiptPointer as VideoStatusReceiptPointer,
+    has_p6_state,
+    prune_attempt_fields,
+    reject_explicit_p7_fields,
+    reject_explicit_p8_video_fields,
+    reject_explicit_paid_provider_fields,
+    validate_paid_provider_manifest,
+    validate_provider_attempt,
 )
 
 
@@ -36,6 +64,16 @@ class _ImmutableDict(dict):
 
 def _immutable_mapping(value: dict) -> _ImmutableDict:
     return _ImmutableDict(value)
+
+
+def _deep_immutable_json(value: object) -> object:
+    if isinstance(value, dict):
+        return _ImmutableDict(
+            {key: _deep_immutable_json(item) for key, item in value.items()}
+        )
+    if isinstance(value, list | tuple):
+        return tuple(_deep_immutable_json(item) for item in value)
+    return value
 
 
 class StrictModel(BaseModel):
@@ -258,6 +296,34 @@ class VisualStrategy(str, Enum):
     HYBRID = "hybrid"
 
 
+class QaLayer(str, Enum):
+    TECHNICAL = "technical"
+    LAYOUT = "layout"
+    STRATEGY = "strategy"
+    SEMANTIC = "semantic"
+    FINAL_ACCEPTANCE = "final_acceptance"
+
+
+class QaVerdict(str, Enum):
+    PASS = "pass"
+    FAIL = "fail"
+    NOT_EVALUATED = "not_evaluated"
+
+
+class EvidenceStrength(str, Enum):
+    MEASURED = "measured"
+    RENDERER_BOUND = "renderer_bound"
+    EXPLICIT_EVALUATOR = "explicit_evaluator"
+    HUMAN = "human"
+
+
+class ReviewLifecycle(str, Enum):
+    FRESH = "fresh"
+    STALE = "stale"
+    FAILED = "failed"
+    NOT_EVALUATED = "not_evaluated"
+
+
 class AssetType(str, Enum):
     IMAGE = "image"
     VIDEO = "video"
@@ -340,6 +406,74 @@ class AssetSourceKind(str, Enum):
 class ToolIdentity(StrictModel):
     name: str
     version: str
+
+
+class QaTechnicalThresholds(StrictModel):
+    black_luma_max_milli: int = Field(ge=0, le=1000)
+    silence_peak_max_millidb: int = Field(le=0)
+    clipping_peak_min_millidb: int = Field(le=0)
+
+
+class QaLayoutRules(StrictModel):
+    safe_area_inset_milli: int = Field(ge=0, le=500)
+    caption_overflow_tolerance_milli: int = Field(ge=0)
+
+
+class RepairAction(StrictModel):
+    kind: str = Field(min_length=1)
+    parameters_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class ActorIdentity(StrictModel):
+    actor_id: str = Field(min_length=1)
+    actor_kind: Literal["human", "codex", "automation"]
+
+
+class RepairAuthorization(StrictModel):
+    authorization_id: str = Field(min_length=1)
+    authorized: Literal[True]
+    authorized_by: ActorIdentity
+    scope_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class NamedFingerprint(StrictModel):
+    name: str = Field(min_length=1)
+    fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class MotionExpectation(StrictModel):
+    directive_kind: str = Field(min_length=1)
+    directive_parameters_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    measurement_kind: Literal[
+        "transform_delta", "layer_state_delta", "decoded_frame_delta"
+    ]
+    minimum_measured_delta_milli: int = Field(ge=0)
+    tolerance_milli: int = Field(ge=0)
+
+
+class TechnicalReviewWindow(StrictModel):
+    shot_id: str = Field(min_length=1)
+    visual_strategy: VisualStrategy
+    start_frame: int = Field(ge=0)
+    end_frame_exclusive: int = Field(gt=0)
+    expects_audio: bool
+    visual_span_ids: tuple[str, ...] = Field(min_length=1)
+    motion_expectation: MotionExpectation | None = None
+
+    @model_validator(mode="after")
+    def _validate_window(self) -> "TechnicalReviewWindow":
+        if self.end_frame_exclusive <= self.start_frame:
+            raise ValueError("technical review window must be non-empty")
+        if self.visual_strategy is VisualStrategy.STATIC_IMAGE and self.motion_expectation:
+            raise ValueError("static_image cannot require motion")
+        return self
+
+
+class TechnicalReviewContext(StrictModel):
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    windows: tuple[TechnicalReviewWindow, ...] = Field(min_length=1)
+    measurement_contract_version: str = Field(min_length=1)
 
 
 class AudioKind(str, Enum):
@@ -478,6 +612,21 @@ class CaptionAssetMetadata(StrictModel):
         return data
 
 
+class VideoAssetMetadata(StrictModel):
+    container_name: Literal["mp4"]
+    codec_name: str = Field(min_length=1)
+    width: int = Field(strict=True, gt=0)
+    height: int = Field(strict=True, gt=0)
+    fps_numerator: int = Field(strict=True, gt=0)
+    fps_denominator: int = Field(strict=True, gt=0)
+    duration_milliseconds: int = Field(strict=True, gt=0)
+    frame_count: int = Field(strict=True, gt=0)
+    probe_receipt_id: str = Field(min_length=1)
+    request_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    provenance_receipt_id: str = Field(min_length=1)
+
+
 class EgressMetadata(StrictModel):
     remote: bool = Field(default=False, strict=True)
     destination: str | None = None
@@ -493,38 +642,16 @@ class EgressMetadata(StrictModel):
 
     @model_validator(mode="after")
     def _validate_variant(self) -> "EgressMetadata":
-        remote_fields = (
-            self.destination,
-            self.authorization_receipt_id,
-            self.request_fingerprint,
-            self.payload_fingerprint,
-            self.retention_mode,
-            self.provider_policy_snapshot_id,
+        validate_egress_metadata(
+            self, require_canonical_origin=_require_canonical_https_origin
         )
-        if not self.remote:
-            if any(value is not None for value in remote_fields):
-                raise ValueError("local egress metadata cannot contain remote fields")
-            return self
-        if any(value is None for value in remote_fields):
-            raise ValueError("remote egress metadata requires complete authorization")
-        assert self.destination is not None
-        _require_canonical_https_origin(self.destination, "remote destination")
         return self
 
     @model_serializer(mode="wrap")
     def _serialize_compatible_local_variant(
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
-        data = handler(self)
-        if not self.remote:
-            for field in (
-                "request_fingerprint",
-                "payload_fingerprint",
-                "retention_mode",
-                "provider_policy_snapshot_id",
-            ):
-                data.pop(field, None)
-        return data
+        return serialize_egress_metadata(self, handler(self))
 
 
 class AssetRecord(StrictModel):
@@ -547,48 +674,30 @@ class AssetRecord(StrictModel):
     cost_receipt_id: str | None = None
     audio_metadata: AudioAssetMetadata | None = None
     caption_metadata: CaptionAssetMetadata | None = None
+    video_metadata: VideoAssetMetadata | None = None
 
     @model_validator(mode="after")
     def _validate_p4_metadata(self) -> "AssetRecord":
-        audio_types = {AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}
-        if self.audio_metadata is not None:
-            if self.asset_type not in audio_types:
-                raise ValueError("non-audio assets cannot contain audio metadata")
-            if AUDIO_KIND_TO_ASSET_TYPE[self.audio_metadata.audio_kind] != self.asset_type:
-                raise ValueError("audio kind does not match registry asset type")
-            if self.duration_seconds is not None:
-                measured_seconds = Decimal(self.audio_metadata.duration_samples) / Decimal(
-                    self.audio_metadata.sample_rate_hz
-                )
-                display_seconds = Decimal(str(self.duration_seconds))
-                tolerance = Decimal(1) / Decimal(self.audio_metadata.sample_rate_hz)
-                if abs(measured_seconds - display_seconds) > tolerance:
-                    raise ValueError("duration_seconds does not match measured samples")
-        if self.caption_metadata is not None and self.asset_type is not AssetType.CAPTION:
-            raise ValueError("non-caption assets cannot contain caption metadata")
-        if self.asset_type is AssetType.CAPTION and self.audio_metadata is not None:
-            raise ValueError("caption assets cannot contain audio metadata")
-        if self.egress.remote and not (
-            self.asset_type is AssetType.VOICE
-            and self.source_kind is AssetSourceKind.GENERATED
-        ):
-            raise ValueError("remote egress is restricted to generated voice assets")
+        validate_asset_record(
+            self,
+            audio_kind_to_asset_type=AUDIO_KIND_TO_ASSET_TYPE,
+            audio_types=frozenset({AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}),
+            caption_type=AssetType.CAPTION,
+            video_type=AssetType.VIDEO,
+            voice_type=AssetType.VOICE,
+            generated_source=AssetSourceKind.GENERATED,
+        )
         return self
 
     @model_serializer(mode="wrap")
     def _serialize_compatible_metadata(
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
-        data = handler(self)
-        if self.audio_metadata is None:
-            data.pop("audio_metadata", None)
-        if self.caption_metadata is None:
-            data.pop("caption_metadata", None)
-        return data
+        return serialize_asset_record(self, handler(self))
 
 
 class AssetRegistrySnapshot(StrictModel):
-    schema_version: Literal["2.0", "2.1"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2"] = "2.0"
     revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     assets: tuple[AssetRecord, ...]
@@ -596,51 +705,22 @@ class AssetRegistrySnapshot(StrictModel):
     @model_validator(mode="before")
     @classmethod
     def _reject_explicit_p4_fields_in_20(cls, value: object) -> object:
-        if not isinstance(value, Mapping) or value.get("schema_version", "2.0") != "2.0":
-            return value
-        for asset in value.get("assets", ()):
-            if isinstance(asset, Mapping) and {
-                "audio_metadata",
-                "caption_metadata",
-            }.intersection(asset):
-                raise ValueError(
-                    "Asset Registry 2.0 cannot contain explicit P4 fields"
-                )
-            if isinstance(asset, Mapping):
-                egress = asset.get("egress")
-                if isinstance(egress, Mapping) and {
-                    "request_fingerprint",
-                    "payload_fingerprint",
-                    "retention_mode",
-                    "provider_policy_snapshot_id",
-                }.intersection(egress):
-                    raise ValueError(
-                        "Asset Registry 2.0 cannot contain explicit P4 egress fields"
-                    )
-        return value
+        return reject_explicit_p4_registry_fields(value)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p8_fields_in_old_versions(cls, value: object) -> object:
+        return reject_explicit_p8_registry_fields(value)
 
     @model_validator(mode="after")
     def _validate_versioned_metadata(self) -> "AssetRegistrySnapshot":
-        if self.schema_version == "2.0":
-            if any(
-                asset.audio_metadata is not None
-                or asset.caption_metadata is not None
-                or asset.egress.remote
-                for asset in self.assets
-            ):
-                raise ValueError("Asset Registry 2.0 cannot contain P4 metadata")
-            return self
-        for asset in self.assets:
-            if asset.asset_type in {AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}:
-                if asset.audio_metadata is None:
-                    raise ValueError("Asset Registry 2.1 audio assets require audio metadata")
-            elif asset.audio_metadata is not None:
-                raise ValueError("non-audio assets cannot contain audio metadata")
-            if asset.asset_type is AssetType.CAPTION:
-                if asset.caption_metadata is None:
-                    raise ValueError("Asset Registry 2.1 caption assets require caption metadata")
-            elif asset.caption_metadata is not None:
-                raise ValueError("non-caption assets cannot contain caption metadata")
+        validate_registry_snapshot(
+            self,
+            audio_types=frozenset({AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}),
+            caption_type=AssetType.CAPTION,
+            video_type=AssetType.VIDEO,
+            generated_source=AssetSourceKind.GENERATED,
+        )
         return self
 
 
@@ -1563,6 +1643,12 @@ class StateCommitStatus(str, Enum):
     OUTCOME_UNKNOWN = "outcome_unknown"
 
 
+class ReviewAttemptPhase(str, Enum):
+    REQUESTED = "requested"
+    EVIDENCE = "evidence"
+    ACTIVATE = "activate"
+
+
 class VoiceRequestReceipt(StrictModel):
     request_id: str = Field(min_length=1)
     attempt_id: str = Field(min_length=1)
@@ -1614,14 +1700,33 @@ class StateCommitAttempt(StrictModel):
         ]
         | None
     ) = None
+    image_request: ImageRequestReceipt | None = None
+    image_phase: (
+        Literal[
+            "request",
+            "submit_intent",
+            "provider_call",
+            "materialize",
+            "validate",
+            "candidate",
+            "activate",
+        ]
+        | None
+    ) = None
     provider_request_id: str | None = None
     candidate_audio_asset_ids: tuple[str, ...] = ()
     candidate_caption_asset_ids: tuple[str, ...] = ()
+    candidate_image_asset_ids: tuple[str, ...] = ()
     base_dependency_graph: DependencyGraphSnapshotPointer | None = None
     candidate_dependency_graph: DependencyGraphSnapshotPointer | None = None
     candidate_dependency_states_hash: str | None = Field(
         default=None, pattern=r"^[0-9a-f]{64}$"
     )
+    approved_repair_receipt: ApprovedRepairReceiptPointer | None = None
+    review_request: ReviewRequestPointer | None = None
+    review_phase: ReviewAttemptPhase | None = None
+    paid_provider_state: PaidProviderAttemptState | None = None
+    video_generation_state: VideoGenerationAttemptState | None = None
     started_at: str
     finished_at: str | None = None
     error_code: str | None = None
@@ -1712,65 +1817,19 @@ class StateCommitAttempt(StrictModel):
                 self.render_phase != "activate"
             ):
                 raise ValueError("render_state candidate bundle requires activate phase")
-        voice_fields_present = any(
-            value is not None
-            for value in (
-                self.voice_request,
-                self.voice_phase,
-                self.provider_request_id,
-            )
-        ) or bool(self.candidate_audio_asset_ids or self.candidate_caption_asset_ids)
-        if self.operation != "voice_generation" and voice_fields_present:
-            raise ValueError("non-voice operations cannot contain voice fields")
-        if self.operation == "voice_generation":
-            if self.voice_request is None or self.voice_phase is None:
-                raise ValueError("voice_generation attempts require voice request and phase")
-            if self.voice_request.attempt_id != self.attempt_id:
-                raise ValueError("voice attempt identity does not match request")
-            all_voice_phases = {
-                "request",
-                "submit_intent",
-                "provider_call",
-                "materialize",
-                "probe",
-                "align",
-                "candidate",
-                "activate",
-            }
-            allowed_terminal_phases = {
-                StateCommitStatus.RUNNING: all_voice_phases,
-                StateCommitStatus.SUCCEEDED: {"activate"},
-                StateCommitStatus.FAILED: all_voice_phases,
-                StateCommitStatus.INTERRUPTED: {
-                    "request",
-                    "materialize",
-                    "probe",
-                    "align",
-                    "candidate",
-                },
-                StateCommitStatus.OUTCOME_UNKNOWN: {
-                    "submit_intent",
-                    "provider_call",
-                    "materialize",
-                    "probe",
-                    "align",
-                    "candidate",
-                    "activate",
-                },
-            }
-            if self.voice_phase not in allowed_terminal_phases[self.status]:
-                raise ValueError("voice attempt status and phase are inconsistent")
-            if self.candidate_project not in (None, self.base_project):
-                raise ValueError("voice candidate project identity does not match")
-            if self.voice_phase in {"candidate", "activate"}:
-                if self.candidate_registry is None or not self.candidate_audio_asset_ids:
-                    raise ValueError("voice candidate phase requires candidate audio bundle")
-            elif (
-                self.candidate_registry is not None
-                or self.candidate_audio_asset_ids
-                or self.candidate_caption_asset_ids
-            ):
-                raise ValueError("voice candidate bundle requires candidate phase")
+        validate_provider_attempt(self)
+        if self.operation == "repair":
+            if self.approved_repair_receipt is None:
+                raise ValueError("repair attempts require approved repair receipt")
+        elif self.approved_repair_receipt is not None:
+            raise ValueError("non-repair attempt cannot contain repair authorization")
+        if self.operation == "review":
+            if self.review_request is None or self.review_phase is None:
+                raise ValueError("review attempts require request and phase")
+            if self.status is StateCommitStatus.SUCCEEDED and self.review_phase is not ReviewAttemptPhase.ACTIVATE:
+                raise ValueError("succeeded review attempt requires activate phase")
+        elif self.review_request is not None or self.review_phase is not None:
+            raise ValueError("non-review attempt cannot contain review fields")
         return self
 
     @model_serializer(mode="wrap")
@@ -1786,15 +1845,7 @@ class StateCommitAttempt(StrictModel):
                 "render_phase",
             ):
                 data.pop(field, None)
-        if self.operation != "voice_generation":
-            for field in (
-                "voice_request",
-                "voice_phase",
-                "provider_request_id",
-                "candidate_audio_asset_ids",
-                "candidate_caption_asset_ids",
-            ):
-                data.pop(field, None)
+        prune_attempt_fields(data, self.operation)
         for field in (
             "base_dependency_graph",
             "candidate_dependency_graph",
@@ -1802,6 +1853,15 @@ class StateCommitAttempt(StrictModel):
         ):
             if data.get(field) is None:
                 data.pop(field, None)
+        if self.operation != "repair":
+            data.pop("approved_repair_receipt", None)
+        if self.operation != "review":
+            data.pop("review_request", None)
+            data.pop("review_phase", None)
+        if self.paid_provider_state is None:
+            data.pop("paid_provider_state", None)
+        if self.video_generation_state is None:
+            data.pop("video_generation_state", None)
         return data
 
 
@@ -1835,8 +1895,185 @@ class RecoveryReport(StrictModel):
         return self
 
 
+def _require_content_addressed_pointer_path(
+    value: Path,
+    *,
+    content_hash: str,
+    prefix: str,
+    label: str,
+) -> Path:
+    clean_path = _require_clean_relative_file_path(value, label)
+    expected = Path(f"{prefix}{content_hash}.json")
+    if clean_path != expected:
+        raise ValueError(f"{label} pointer path must be canonical")
+    return value
+
+
+class QaPolicyPointer(StrictModel):
+    path: Path
+    policy_id: str = Field(min_length=1)
+    policy_version: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "QaPolicyPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/reviews/policy.",
+            label="QA policy",
+        )
+        return self
+
+
+class ReviewRequestPointer(StrictModel):
+    path: Path
+    request_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "ReviewRequestPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/reviews/request.",
+            label="review request",
+        )
+        return self
+
+
+class ReviewEvidencePointer(StrictModel):
+    path: Path
+    evidence_id: str = Field(min_length=1)
+    layer: QaLayer
+    strength: EvidenceStrength
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "ReviewEvidencePointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/reviews/evidence.",
+            label="review evidence",
+        )
+        return self
+
+
+class ReviewReceiptPointer(StrictModel):
+    path: Path
+    review_id: str = Field(min_length=1)
+    layer: Literal[
+        QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.STRATEGY, QaLayer.SEMANTIC
+    ]
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "ReviewReceiptPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/reviews/review.",
+            label="review receipt",
+        )
+        return self
+
+
+class RepairRequestPointer(StrictModel):
+    path: Path
+    repair_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "RepairRequestPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/repairs/request.",
+            label="repair request",
+        )
+        return self
+
+
+class ApprovedRepairReceiptPointer(StrictModel):
+    path: Path
+    repair_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "ApprovedRepairReceiptPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/repairs/approved.",
+            label="approved repair receipt",
+        )
+        return self
+
+
+class RepairOutcomeReceiptPointer(StrictModel):
+    path: Path
+    repair_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "RepairOutcomeReceiptPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/repairs/outcome.",
+            label="repair outcome receipt",
+        )
+        return self
+
+
+class FinalAcceptanceReceiptPointer(StrictModel):
+    path: Path
+    acceptance_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "FinalAcceptanceReceiptPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/acceptance/final.",
+            label="final acceptance receipt",
+        )
+        return self
+
+
+class ReviewLayerState(StrictModel):
+    layer: QaLayer
+    desired_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    applied_fingerprint: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    lifecycle: ReviewLifecycle
+    active_receipt: ReviewReceiptPointer | None = None
+
+
+class FinalAcceptanceState(StrictModel):
+    desired_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    applied_fingerprint: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    lifecycle: ReviewLifecycle
+    active_receipt: FinalAcceptanceReceiptPointer | None = None
+
+
 class ProductionManifest(StrictModel):
-    schema_version: Literal["2.0", "2.1", "2.2", "2.3"] = "2.0"
+    schema_version: Literal[
+        "2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7"
+    ] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
     active_project: ProjectSnapshotPointer
@@ -1844,14 +2081,73 @@ class ProductionManifest(StrictModel):
     active_render_state: RenderStateSnapshotPointer | None = None
     active_dependency_graph: DependencyGraphSnapshotPointer | None = None
     dependency_states: tuple[DependencyNodeState, ...] = Field(default=())
+    active_qa_policy: QaPolicyPointer | None = None
+    active_review_receipts: tuple[ReviewReceiptPointer, ...] = Field(default=())
+    review_states: tuple[ReviewLayerState, ...] = Field(default=())
+    active_approved_repair: ApprovedRepairReceiptPointer | None = None
+    repair_outcome_receipts: tuple[RepairOutcomeReceiptPointer, ...] = Field(
+        default=()
+    )
+    final_acceptance_state: FinalAcceptanceState | None = None
+    active_paid_provider_budget: PaidProviderBudgetSnapshotPointer | None = None
     attempts: tuple[StateCommitAttempt, ...] = ()
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_paid_provider_fields_in_old_versions(
+        cls, value: object
+    ) -> object:
+        return reject_explicit_paid_provider_fields(value)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p6_fields_in_old_versions(cls, value: object) -> object:
+        if not isinstance(value, Mapping):
+            return value
+        p6_fields = {
+            "active_qa_policy",
+            "active_review_receipts",
+            "review_states",
+            "active_approved_repair",
+            "repair_outcome_receipts",
+            "final_acceptance_state",
+        }
+        manifest_version = value.get("schema_version", "2.0")
+        if manifest_version in {"2.5", "2.6", "2.7"} and p6_fields.intersection(value):
+            if value.get("active_qa_policy") is None:
+                raise ValueError(
+                    "Production Manifest 2.5 with P6 fields requires active_qa_policy"
+                )
+            if value.get("active_dependency_graph") is None:
+                raise ValueError(
+                    "Production Manifest 2.5 with P6 fields requires active_dependency_graph"
+                )
+        if manifest_version in {"2.4", "2.5", "2.6", "2.7"}:
+            return value
+        if p6_fields.intersection(value):
+            raise ValueError(
+                f"Production Manifest {manifest_version} "
+                "cannot contain explicit P6 review fields"
+            )
+        for attempt in value.get("attempts", ()):
+            if isinstance(attempt, Mapping) and {
+                "approved_repair_receipt",
+                "review_request",
+                "review_phase",
+            }.intersection(attempt):
+                raise ValueError(
+                    f"Production Manifest {manifest_version} "
+                    "cannot contain P6 repair attempt fields"
+                )
+        return value
 
     @model_validator(mode="before")
     @classmethod
     def _reject_explicit_voice_fields_in_old_versions(cls, value: object) -> object:
         if (
             not isinstance(value, Mapping)
-            or value.get("schema_version", "2.0") in {"2.2", "2.3"}
+            or value.get("schema_version", "2.0")
+            in {"2.2", "2.3", "2.4", "2.5", "2.6", "2.7"}
         ):
             return value
         for attempt in value.get("attempts", ()):
@@ -1875,7 +2171,7 @@ class ProductionManifest(StrictModel):
     ) -> object:
         if not isinstance(value, Mapping):
             return value
-        if value.get("schema_version", "2.0") == "2.3":
+        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5", "2.6", "2.7"}:
             return value
         manifest_version = value.get("schema_version", "2.0")
         if {
@@ -1898,6 +2194,16 @@ class ProductionManifest(StrictModel):
                 )
         return value
 
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p7_fields_in_old_versions(cls, value: object) -> object:
+        return reject_explicit_p7_fields(value)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p8_video_fields_in_old_versions(cls, value: object) -> object:
+        return reject_explicit_p8_video_fields(value)
+
     @model_validator(mode="after")
     def _validate_unique_attempt_ids(self) -> "ProductionManifest":
         attempt_ids = [item.attempt_id for item in self.attempts]
@@ -1914,6 +2220,20 @@ class ProductionManifest(StrictModel):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain voice attempts"
             )
+        if self.schema_version not in {"2.5", "2.6", "2.7"} and any(
+            item.operation == "image_generation" for item in self.attempts
+        ):
+            raise ValueError(
+                f"Production Manifest {self.schema_version} cannot contain P7 image attempts"
+            )
+        if self.schema_version != "2.7" and any(
+            item.operation == "video_generation"
+            or item.video_generation_state is not None
+            for item in self.attempts
+        ):
+            raise ValueError(
+                f"Production Manifest {self.schema_version} cannot contain P8 video attempts"
+            )
         for attempt in self.attempts:
             if (
                 attempt.operation == "render_state"
@@ -1927,7 +2247,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "running render_state attempt base must match active identity"
                 )
-        if self.schema_version == "2.3":
+        if self.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7"}:
             self._validate_manifest_23_graph_lifecycle()
         else:
             for attempt in self.attempts:
@@ -1940,6 +2260,45 @@ class ProductionManifest(StrictModel):
                         f"Production Manifest {self.schema_version} "
                         "cannot contain P5 graph attempt fields"
                     )
+        if self.schema_version == "2.4" or (
+            self.schema_version in {"2.5", "2.6", "2.7"} and has_p6_state(self)
+        ):
+            if self.active_qa_policy is None:
+                raise ValueError(
+                    f"Production Manifest {self.schema_version} requires active_qa_policy"
+                )
+            if self.active_dependency_graph is None:
+                raise ValueError(
+                    f"Production Manifest {self.schema_version} requires active_dependency_graph"
+                )
+            layers = tuple(item.layer for item in self.review_states)
+            receipt_layers = tuple(item.layer for item in self.active_review_receipts)
+            if len(layers) != len(set(layers)) or len(receipt_layers) != len(
+                set(receipt_layers)
+            ):
+                raise ValueError(
+                    f"Manifest {self.schema_version} review layers must be unique"
+                )
+            if layers != tuple(sorted(layers, key=lambda item: item.value)):
+                raise ValueError(
+                    f"Manifest {self.schema_version} review states must be canonically ordered"
+                )
+            if receipt_layers != tuple(
+                sorted(receipt_layers, key=lambda item: item.value)
+            ):
+                raise ValueError(
+                    f"Manifest {self.schema_version} review receipts must be canonically ordered"
+                )
+            active_by_layer = {
+                item.layer: item for item in self.active_review_receipts
+            }
+            for state in self.review_states:
+                if state.lifecycle is not ReviewLifecycle.STALE:
+                    if state.active_receipt != active_by_layer.get(state.layer):
+                        raise ValueError("current review state requires its active receipt")
+                elif state.active_receipt is not None:
+                    raise ValueError("stale review state cannot select a receipt")
+        validate_paid_provider_manifest(self)
         return self
 
     def _validate_manifest_23_graph_lifecycle(self) -> None:
@@ -1978,9 +2337,24 @@ class ProductionManifest(StrictModel):
         data = handler(self)
         if self.schema_version == "2.0" and self.active_render_state is None:
             data.pop("active_render_state", None)
-        if self.schema_version != "2.3" or self.active_dependency_graph is None:
+        if (
+            self.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7"}
+            or self.active_dependency_graph is None
+        ):
             data.pop("active_dependency_graph", None)
             data.pop("dependency_states", None)
+        if self.schema_version != "2.4" and not (
+            self.schema_version in {"2.5", "2.6", "2.7"}
+            and self.active_qa_policy is not None
+        ):
+            data.pop("active_qa_policy", None)
+            data.pop("active_review_receipts", None)
+            data.pop("review_states", None)
+            data.pop("active_approved_repair", None)
+            data.pop("repair_outcome_receipts", None)
+            data.pop("final_acceptance_state", None)
+        if self.schema_version not in {"2.6", "2.7"}:
+            data.pop("active_paid_provider_budget", None)
         return data
 
 
@@ -2008,6 +2382,7 @@ class LoadedProductionProject(StrictModel):
     asset_paths: dict[str, Path]
     render_state: RenderStateSnapshot | None = None
     dependency_graph: DependencyGraphSnapshot | None = None
+    qa_policy: QaPolicy | None = None
 
     _freeze_asset_paths = field_validator("asset_paths")(_immutable_mapping)
 
@@ -2022,17 +2397,6 @@ class LoadedProductionProject(StrictModel):
 # topological order, semantic hashing and rebuild decisions are owned by
 # ``src/ai_video/production/dependency.py`` (Task 2, not implemented here).
 # ---------------------------------------------------------------------------
-
-
-_P5_AWARE_OPERATIONS: frozenset[str] = frozenset(
-    {
-        "bootstrap_dependency_graph",
-        "commit_project_registry",
-        "audio_import",
-        "voice_generation",
-        "render_state",
-    }
-)
 
 
 class DependencyNodeKind(str, Enum):
@@ -2352,4 +2716,146 @@ class DependencyGraphTransition(StrictModel):
         return self
 
 
+# ---------------------------------------------------------------------------
+# P6 immutable review, repair, and final-acceptance evidence
+# ---------------------------------------------------------------------------
+
+
+class QaPolicy(VersionedArtifact):
+    policy_id: str = Field(min_length=1)
+    policy_version: str = Field(min_length=1)
+    required_layers: tuple[QaLayer, ...] = Field(min_length=1)
+    technical_thresholds: QaTechnicalThresholds
+    layout_rules: QaLayoutRules
+    strategy_rules_version: str = Field(min_length=1)
+    semantic_requirement: Literal["optional", "required"]
+    semantic_authorities: tuple[ToolIdentity, ...] = ()
+    repair_authorities: tuple[ActorIdentity, ...] = ()
+
+    @model_validator(mode="after")
+    def _require_semantic_authority(self) -> "QaPolicy":
+        if self.semantic_requirement == "required" and not self.semantic_authorities:
+            raise ValueError("required semantic QA needs a policy-selected authority")
+        return self
+
+
+class ReviewRequest(VersionedArtifact):
+    request_id: str = Field(min_length=1)
+    base_manifest_revision: int = Field(ge=1)
+    dependency_graph: DependencyGraphSnapshotPointer
+    dependency_states_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    render_state: RenderStateSnapshotPointer
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy: QaPolicyPointer
+    requested_layers: tuple[QaLayer, ...] = Field(min_length=1)
+    evidence_tool_identities: tuple[ToolIdentity, ...] = Field(min_length=1)
+    technical_context: TechnicalReviewContext
+
+
+class ReviewEvidence(VersionedArtifact):
+    evidence_id: str = Field(min_length=1)
+    layer: QaLayer
+    strength: EvidenceStrength
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    dependency_graph_revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    tool_identity: ToolIdentity
+    measurement_contract_version: str = Field(min_length=1)
+    subject_ids: tuple[str, ...] = Field(min_length=1)
+    measured_payload: dict[str, object]
+
+    @field_validator("measured_payload")
+    @classmethod
+    def _freeze_payload(cls, value: dict[str, object]) -> dict[str, object]:
+        return _deep_immutable_json(value)  # type: ignore[return-value]
+
+
+class ReviewReceipt(VersionedArtifact):
+    review_id: str = Field(min_length=1)
+    layer: Literal[
+        QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.STRATEGY, QaLayer.SEMANTIC
+    ]
+    review_request: ReviewRequestPointer
+    render_state: RenderStateSnapshotPointer
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    dependency_graph_revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy: QaPolicyPointer
+    evidence: tuple[ReviewEvidencePointer, ...] = Field(min_length=1)
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
+    tool_identities: tuple[ToolIdentity, ...] = Field(min_length=1)
+    issue_ids: tuple[str, ...] = ()
+    verdict: QaVerdict
+
+    @model_validator(mode="after")
+    def _evidence_identity_matches(self) -> "ReviewReceipt":
+        if self.evidence_ids != tuple(item.evidence_id for item in self.evidence):
+            raise ValueError("Review Receipt evidence IDs must match exact pointers")
+        if any(item.layer is not self.layer for item in self.evidence):
+            raise ValueError("Review Receipt evidence layer mismatch")
+        return self
+
+
+class RepairRequest(VersionedArtifact):
+    repair_id: str = Field(min_length=1)
+    base_manifest_revision: int = Field(ge=1)
+    dependency_graph: DependencyGraphSnapshotPointer
+    dependency_states_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    render_state: RenderStateSnapshotPointer
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy: QaPolicyPointer
+    review_receipt_ids: tuple[str, ...] = Field(min_length=1)
+    issue_ids: tuple[str, ...] = Field(min_length=1)
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
+    root_cause_hypothesis: str = Field(min_length=1)
+    selected_repair_action: RepairAction
+    exact_target_artifact_ids: tuple[str, ...] = Field(min_length=1)
+    exact_target_node_ids: tuple[str, ...] = Field(min_length=1)
+    expected_invalidation_node_ids: tuple[str, ...] = Field(min_length=1)
+    actor: ActorIdentity
+    authorization: RepairAuthorization
+    before_fingerprints: tuple[NamedFingerprint, ...] = Field(min_length=1)
+
+
+class ApprovedRepairReceipt(RepairRequest):
+    request_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class RepairOutcomeReceipt(VersionedArtifact):
+    repair_id: str = Field(min_length=1)
+    approved_receipt: ApprovedRepairReceiptPointer
+    review_receipt_ids: tuple[str, ...] = Field(min_length=1)
+    issue_ids: tuple[str, ...] = Field(min_length=1)
+    evidence_ids: tuple[str, ...] = Field(min_length=1)
+    root_cause_hypothesis: str = Field(min_length=1)
+    selected_repair_action: RepairAction
+    exact_target_artifact_ids: tuple[str, ...] = Field(min_length=1)
+    exact_target_node_ids: tuple[str, ...] = Field(min_length=1)
+    expected_invalidation_node_ids: tuple[str, ...] = Field(min_length=1)
+    actor: ActorIdentity
+    authorization: RepairAuthorization
+    before_fingerprints: tuple[NamedFingerprint, ...] = Field(min_length=1)
+    after_fingerprints: tuple[NamedFingerprint, ...] = Field(min_length=1)
+    actual_invalidation_node_ids: tuple[str, ...] = Field(min_length=1)
+    rerender_state: RenderStateSnapshotPointer
+    rerender_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    rerender_timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    fresh_review_receipts: tuple[ReviewReceiptPointer, ...] = Field(min_length=1)
+
+
+class FinalAcceptanceReceipt(VersionedArtifact):
+    acceptance_id: str = Field(min_length=1)
+    dependency_graph: DependencyGraphSnapshotPointer
+    dependency_states_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    render_state: RenderStateSnapshotPointer
+    render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    timeline_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy: QaPolicyPointer
+    required_review_receipts: tuple[ReviewReceiptPointer, ...] = Field(min_length=1)
+    verdict: Literal[QaVerdict.PASS]
+
+
+ProductionManifest.model_rebuild()
 LoadedProductionProject.model_rebuild()

@@ -1,8 +1,17 @@
 from __future__ import annotations
 
 import subprocess
+import hashlib
+import re
 from pathlib import Path
 
+from ai_video.production.models import (
+    ReviewRequestPointer,
+    TechnicalReviewContext,
+    VisualStrategy,
+)
+from ai_video.production.hashing import canonical_sha256
+from ai_video.production.project import load_production_project, load_review_request
 from ai_video_mcp.cache import AnalysisCache
 from ai_video_mcp.config import ServerConfig
 from ai_video_mcp.errors import McpError, McpErrorCode
@@ -40,6 +49,67 @@ def _sample_frame_hashes(video_path: Path, *, sample_fps: float = 1.0) -> list[s
         if parts:
             hashes.append(parts[-1])
     return hashes
+
+
+def _sample_window_hashes(video_path: Path, start_frame: int, end_frame: int) -> list[str]:
+    cmd = [
+        "ffmpeg", "-v", "error", "-i", str(video_path),
+        "-vf", f"select='between(n,{start_frame},{end_frame - 1})',scale=32:32,format=gray",
+        "-vsync", "0", "-f", "framemd5", "-",
+    ]
+    try:
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as exc:
+        raise McpError(McpErrorCode.FFMPEG_FAILED, "Frame window sampling failed") from exc
+    return [
+        line.split(",")[-1].strip()
+        for line in result.stdout.splitlines()
+        if line and not line.startswith("#")
+    ]
+
+
+def _technical_signal_measurements(video_path: Path) -> dict:
+    luminance = subprocess.run(
+        [
+            "ffmpeg", "-v", "info", "-i", str(video_path), "-vf",
+            "signalstats,metadata=print", "-an", "-f", "null", "-",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    luminance_values = [
+        float(item)
+        for item in re.findall(
+            r"lavfi\.signalstats\.YAVG=([0-9.]+)",
+            luminance.stdout + luminance.stderr,
+        )
+    ]
+    audio = subprocess.run(
+        [
+            "ffmpeg", "-v", "info", "-i", str(video_path), "-af",
+            "volumedetect", "-vn", "-f", "null", "-",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    peak = re.search(r"max_volume: (-?[0-9.]+) dB", audio.stderr)
+    minimum_luma = min(luminance_values) if luminance_values else None
+    return {
+        "minimum_luma_milli": (
+            round(max(0.0, minimum_luma - 16.0) / 219.0 * 1000)
+            if minimum_luma is not None
+            else None
+        ),
+        "audio_peak_millidb": (
+            round(float(peak.group(1)) * 1000) if peak is not None else None
+        ),
+        "luminance_measurement_succeeded": (
+            luminance.returncode == 0 and minimum_luma is not None
+        ),
+        "audio_measurement_succeeded": audio.returncode == 0 and peak is not None,
+    }
 
 
 def _make_issue(
@@ -159,8 +229,120 @@ def video_review(
     max_frames: int | None = None,
     scene_threshold: float | None = None,
     transcribe_audio: bool = False,
+    production_context: dict | None = None,
+    production_project_path: str | None = None,
+    production_review_request: dict | None = None,
+    production_analysis_permit: object | None = None,
 ) -> dict:
     p = _validate_video(video_path, config)
+
+    production_inputs = (
+        production_context,
+        production_project_path,
+        production_review_request,
+        production_analysis_permit,
+    )
+    if any(item is not None for item in production_inputs):
+        if any(item is None for item in production_inputs):
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production review requires verified project and durable request",
+            )
+        bundle = load_production_project(production_project_path)
+        request_pointer = ReviewRequestPointer.model_validate(
+            production_review_request
+        )
+        durable_request = load_review_request(bundle.root, request_pointer)
+        try:
+            context = TechnicalReviewContext.model_validate(production_context)
+        except ValueError as exc:
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production technical review context is invalid",
+                detail=str(exc),
+            ) from exc
+        if context != durable_request.technical_context:
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production technical context does not match ReviewRequest",
+            )
+        actual_hash = hashlib.sha256(p.read_bytes()).hexdigest()
+        expected_hash = context.render_output_sha256
+        if actual_hash != expected_hash:
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production render output hash does not match review context",
+            )
+        consume_permit = getattr(
+            production_analysis_permit, "_consume_review_analysis_permit", None
+        )
+        if not callable(consume_permit) or not consume_permit(
+            request_content_hash=durable_request.content_hash,
+            render_output_sha256=actual_hash,
+            technical_context_hash=canonical_sha256(context.model_dump(mode="json")),
+        ):
+            raise McpError(
+                McpErrorCode.INVALID_PARAMETER,
+                "Production review requires an unused committer-issued analysis permit",
+            )
+        window_measurements: list[dict] = []
+        frame_hashes: list[str] = []
+        for window in context.windows:
+            hashes = _sample_window_hashes(
+                p, window.start_frame, window.end_frame_exclusive
+            )
+            frame_hashes.extend(hashes)
+            unique = len(set(hashes))
+            count = len(hashes)
+            status = "measured"
+            if window.visual_strategy in {
+                VisualStrategy.IMAGE_MOTION,
+                VisualStrategy.MOTION_GRAPHICS,
+            }:
+                status = "not_evaluated"
+            window_measurements.append(
+                {
+                    "shot_id": window.shot_id,
+                    "visual_strategy": window.visual_strategy.value,
+                    "start_frame": window.start_frame,
+                    "end_frame_exclusive": window.end_frame_exclusive,
+                    "sampled_frame_count": count,
+                    "unique_frame_count": unique,
+                    "unique_frame_ratio": round(unique / count, 3) if count else 0.0,
+                    "status": status,
+                }
+            )
+        unique_count = len(set(frame_hashes))
+        sample_count = len(frame_hashes)
+        ratio = round(unique_count / sample_count, 3) if sample_count else 0.0
+        signals = _technical_signal_measurements(p)
+        coverage_complete = bool(
+            signals["luminance_measurement_succeeded"]
+            and all(item["sampled_frame_count"] > 0 for item in window_measurements)
+            and (
+                not any(item.expects_audio for item in context.windows)
+                or signals["audio_measurement_succeeded"]
+            )
+        )
+        return {
+            "mode": "production_evidence",
+            "video_path": str(p),
+            "render_output_sha256": actual_hash,
+            "timeline_fingerprint": context.timeline_fingerprint,
+            "measurement_contract_version": context.measurement_contract_version,
+            "windows": window_measurements,
+            "measurements": {
+                "coverage_complete": coverage_complete,
+                "sampled_frame_count": sample_count,
+                "unique_frame_count": unique_count,
+                "unique_frame_ratio": ratio,
+                "expects_audio": any(item.expects_audio for item in context.windows),
+                "windows": window_measurements,
+                **signals,
+            },
+            # Production thresholds and verdicts belong to production.review.
+            "issues": [],
+        }
 
     analysis = video_analyze(
         video_path,

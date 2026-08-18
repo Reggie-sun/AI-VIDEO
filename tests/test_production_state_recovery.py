@@ -12,6 +12,7 @@ import pytest
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
     AssetRegistrySnapshot,
+    DependencyLifecycle,
     ProductionManifest,
     RecoveryDisposition,
     RegistrySnapshotPointer,
@@ -21,6 +22,7 @@ from ai_video.production.models import (
     RendererSelectionReceipt,
 )
 from ai_video.production.project import load_production_project_candidate
+from ai_video.production.paths import canonical_image_request_path
 from ai_video.production.registry import registry_semantic_sha256
 import ai_video.production.state_commit as state_commit
 from ai_video.production.state_commit import (
@@ -30,6 +32,11 @@ from ai_video.production.state_commit import (
     _owned_temp_name,
 )
 import production_project_factory as project_factory
+from test_production_state_commit import (
+    make_image_call_bundle,
+    make_image_provider_result,
+    make_qa_policy,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +59,51 @@ def _write_manifest(root: Path, manifest: ProductionManifest) -> None:
     )
 
 
+def _durable_tree_snapshot(root: Path) -> dict[Path, bytes]:
+    return {
+        path.relative_to(root): path.read_bytes()
+        for path in root.rglob("*")
+        if path.is_file() and path.relative_to(root) != Path("state/commit.lock")
+    }
+
+
+def _make_inactive_image_candidate(root: Path) -> ProductionManifest:
+    base_inputs = project_factory.make_p7_image_generation_base(root)
+    request, preview, authorization = make_image_call_bundle(root)
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, project_factory._p7_png()
+            )
+
+    class _FailBeforeFinalReplace(ProductionStateCommitter):
+        def _write_manifest_atomic(self, manifest, *, on_replace=None):
+            attempt = next(
+                (
+                    item
+                    for item in manifest.attempts
+                    if item.attempt_id == request.attempt_id
+                ),
+                None,
+            )
+            if attempt is not None and attempt.image_phase == "activate":
+                raise RuntimeError("injected before final image activation")
+            return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    with pytest.raises(AiVideoError):
+        _FailBeforeFinalReplace(
+            root,
+            image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+                base_inputs
+            ),
+        ).generate_image_asset(request, preview, authorization, _Provider())
+    return _read_manifest(root)
+
+
 def test_recovery_marks_r1_voice_interrupted_without_submit(
     committed_project: Path,
 ) -> None:
@@ -66,6 +118,397 @@ def test_recovery_marks_r1_voice_interrupted_without_submit(
     assert report.manifest_revision_after == 3
     assert recovered.attempts[-1].status is StateCommitStatus.INTERRUPTED
     assert recovered.attempts[-1].voice_phase == "request"
+
+
+def test_recovery_preserves_complete_inactive_image_candidate_and_interrupts(
+    committed_project: Path,
+) -> None:
+    """Skipping exact eight-artifact proof must make this recovery test fail."""
+
+    candidate = _make_inactive_image_candidate(committed_project)
+
+    report = ProductionStateCommitter(committed_project).recover()
+    recovered = _read_manifest(committed_project)
+    attempt = recovered.attempts[-1]
+
+    assert attempt.status is StateCommitStatus.INTERRUPTED
+    assert attempt.image_phase == "candidate"
+    assert attempt.error_code == ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN.value
+    assert (
+        recovered.active_project,
+        recovered.active_registry,
+        recovered.active_dependency_graph,
+    ) == (
+        attempt.base_project,
+        attempt.base_registry,
+        attempt.base_dependency_graph,
+    )
+    for field in type(candidate).model_fields:
+        if field not in {"manifest_revision", "attempts"}:
+            assert getattr(recovered, field) == getattr(candidate, field)
+    preserved = {
+        item.path
+        for item in report.items
+        if item.disposition is RecoveryDisposition.INTERRUPTED_RECORDED
+    }
+    assert {
+        attempt.candidate_project.path,
+        attempt.candidate_registry.path,
+        attempt.candidate_dependency_graph.path,
+    }.issubset(preserved)
+
+
+def test_recovery_rejects_mixed_image_project_registry_graph_tuple(
+    committed_project: Path,
+) -> None:
+    candidate = _make_inactive_image_candidate(committed_project)
+    attempt = candidate.attempts[-1]
+    mixed = candidate.model_copy(
+        update={"active_project": attempt.candidate_project}
+    )
+    _write_manifest(committed_project, mixed)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(committed_project).recover()
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert _read_manifest(committed_project) == mixed
+
+
+def test_recovery_rejects_tampered_inactive_image_png(
+    committed_project: Path,
+) -> None:
+    candidate = _make_inactive_image_candidate(committed_project)
+    attempt = candidate.attempts[-1]
+    registry = AssetRegistrySnapshot.model_validate_json(
+        (committed_project / attempt.candidate_registry.path).read_bytes()
+    )
+    image = next(
+        item for item in registry.assets if item.asset_id in attempt.candidate_image_asset_ids
+    )
+    (committed_project / image.artifact_path).write_bytes(b"tampered")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(committed_project).recover()
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert _read_manifest(committed_project) == candidate
+
+
+def test_recovery_rejects_tampered_active_image_request_evidence(
+    committed_project: Path,
+) -> None:
+    """Removing active P7 evidence reopen must make this tamper test fail."""
+
+    base_inputs = project_factory.make_p7_image_generation_base(committed_project)
+    request, preview, authorization = make_image_call_bundle(committed_project)
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate,
+                candidate_authorization,
+                project_factory._p7_png(),
+            )
+
+    final = ProductionStateCommitter(
+        committed_project,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    ).generate_image_asset(request, preview, authorization, _Provider())
+    request_path = committed_project / canonical_image_request_path(
+        request.request_fingerprint
+    )
+    request_path.write_bytes(b"{}\n")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(committed_project).recover()
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert _read_manifest(committed_project) == final
+
+
+@pytest.mark.parametrize(
+    "artifact_key",
+    ("preview_path", "authorization_path", "submit_intent_path"),
+)
+@pytest.mark.parametrize("mutation", ("missing", "tampered"))
+def test_recovery_rejects_missing_or_tampered_active_image_submit_audit_evidence(
+    tmp_path: Path,
+    artifact_key: str,
+    mutation: str,
+) -> None:
+    fixture = project_factory.make_p7_committed_project(tmp_path)
+    artifact_path = tmp_path / fixture[artifact_key]
+    if mutation == "missing":
+        artifact_path.unlink()
+    else:
+        artifact_path.write_bytes(artifact_path.read_bytes() + b" ")
+    manifest_path = tmp_path / "state/manifest.json"
+    manifest_bytes = manifest_path.read_bytes()
+    manifest_revision = _read_manifest(tmp_path).manifest_revision
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).recover()
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+    assert manifest_path.read_bytes() == manifest_bytes
+    assert _read_manifest(tmp_path).manifest_revision == manifest_revision
+
+
+def test_recovery_reopens_active_image_submit_audit_without_durable_writes(
+    tmp_path: Path,
+) -> None:
+    fixture = project_factory.make_p7_committed_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before = _durable_tree_snapshot(tmp_path)
+
+    report = writer.recover()
+
+    assert report.manifest_revision_before == fixture["manifest"].manifest_revision
+    assert report.manifest_revision_after == fixture["manifest"].manifest_revision
+    assert _durable_tree_snapshot(tmp_path) == before
+
+
+def test_recovery_marks_image_submit_outcome_unknown_and_same_request_never_resubmits(
+    committed_project: Path,
+) -> None:
+    project_factory.make_p7_image_generation_base(committed_project)
+    request, preview, authorization = make_image_call_bundle(committed_project)
+    writer = ProductionStateCommitter(committed_project)
+    writer.begin_image_generation(request, preview, authorization)
+    writer.record_image_submit_intent(request, preview, authorization)
+
+    writer.recover()
+    first = _read_manifest(committed_project)
+    attempt = first.attempts[-1]
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.error_code == ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN.value
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            raise AssertionError("same-request recovery replay must not call Provider")
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.generate_image_asset(request, preview, authorization, provider)
+
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
+    assert provider.calls == 0
+    assert _read_manifest(committed_project) == first
+
+
+def test_recovery_preserves_p6_plus_p7_policy_and_stale_retained_render(
+    committed_project: Path,
+) -> None:
+    base_inputs = project_factory.make_p7_image_generation_base(committed_project)
+    writer = ProductionStateCommitter(committed_project)
+    before = _read_manifest(committed_project)
+    with_policy = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="p7-recovery-policy",
+    )
+    request, preview, authorization = make_image_call_bundle(committed_project)
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, project_factory._p7_png()
+            )
+
+    final = ProductionStateCommitter(
+        committed_project,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    ).generate_image_asset(request, preview, authorization, _Provider())
+    assert final.active_qa_policy == with_policy.active_qa_policy
+    assert final.active_render_state == with_policy.active_render_state
+    render_states = tuple(
+        item.lifecycle
+        for item in final.dependency_states
+        if item.node_id.startswith(
+            ("composition:", "timeline:", "renderer-source:", "render:")
+        )
+    )
+    assert render_states and all(
+        lifecycle in {DependencyLifecycle.STALE, DependencyLifecycle.BLOCKED}
+        for lifecycle in render_states
+    )
+
+    report = ProductionStateCommitter(committed_project).recover()
+
+    assert report.manifest_revision_before == report.manifest_revision_after
+    assert _read_manifest(committed_project) == final
+
+
+def _crash_image_and_recover(
+    root: Path,
+    phase: CommitPhase,
+    occurrence: int,
+    *,
+    mode: str = "image",
+) -> StateCommitStatus | None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "tests/helpers/p2a_crash_worker.py",
+            str(root),
+            phase.value,
+            str(occurrence),
+            mode,
+        ],
+        cwd=REPO_ROOT,
+        check=False,
+    )
+    assert result.returncode == 91
+    ProductionStateCommitter(root).recover()
+    recovered = _read_manifest(root)
+    image_attempts = tuple(
+        item for item in recovered.attempts if item.operation == "image_generation"
+    )
+    first_recovery = recovered
+    assert not tuple(root.rglob(".p2a-*.tmp"))
+    repeated = ProductionStateCommitter(root).recover()
+    assert repeated.manifest_revision_before == repeated.manifest_revision_after
+    assert _read_manifest(root) == first_recovery
+    return image_attempts[-1].status if image_attempts else None
+
+
+@pytest.mark.parametrize(
+    ("phase", "expected_status"),
+    (
+        (CommitPhase.BEFORE_IMAGE_PROVIDER_CALL, StateCommitStatus.OUTCOME_UNKNOWN),
+        (CommitPhase.AFTER_IMAGE_PERMIT_CONSUMED, StateCommitStatus.OUTCOME_UNKNOWN),
+        (CommitPhase.AFTER_IMAGE_PROVIDER_RESULT, StateCommitStatus.OUTCOME_UNKNOWN),
+        (
+            CommitPhase.AFTER_IMAGE_CANDIDATE_MANIFEST_REPLACE,
+            StateCommitStatus.INTERRUPTED,
+        ),
+        (
+            CommitPhase.AFTER_IMAGE_CANDIDATE_MANIFEST_VERIFICATION,
+            StateCommitStatus.INTERRUPTED,
+        ),
+        (CommitPhase.AFTER_IMAGE_FINAL_MANIFEST_REPLACE, StateCommitStatus.SUCCEEDED),
+        (
+            CommitPhase.AFTER_IMAGE_FINAL_MANIFEST_VERIFICATION,
+            StateCommitStatus.SUCCEEDED,
+        ),
+    ),
+)
+def test_image_specific_process_crash_recovery_is_fail_closed(
+    committed_project: Path,
+    phase: CommitPhase,
+    expected_status: StateCommitStatus,
+) -> None:
+    assert _crash_image_and_recover(committed_project, phase, 1) is expected_status
+
+
+@pytest.mark.parametrize(
+    "phase",
+    (
+        CommitPhase.AFTER_ARTIFACT_TEMP_WRITE,
+        CommitPhase.AFTER_ARTIFACT_FILE_FSYNC,
+        CommitPhase.AFTER_ARTIFACT_PROMOTION,
+        CommitPhase.AFTER_ARTIFACT_DIRECTORY_FSYNC,
+        CommitPhase.AFTER_ARTIFACT_VERIFICATION,
+    ),
+)
+@pytest.mark.parametrize(
+    ("occurrence", "expected_status"),
+    (
+        (1, None),
+        (4, StateCommitStatus.INTERRUPTED),
+        (5, StateCommitStatus.OUTCOME_UNKNOWN),
+        (6, StateCommitStatus.OUTCOME_UNKNOWN),
+        (7, StateCommitStatus.OUTCOME_UNKNOWN),
+        (8, StateCommitStatus.OUTCOME_UNKNOWN),
+        (9, StateCommitStatus.OUTCOME_UNKNOWN),
+        (10, StateCommitStatus.OUTCOME_UNKNOWN),
+        (11, StateCommitStatus.OUTCOME_UNKNOWN),
+    ),
+)
+def test_image_artifact_byte_window_process_crash_matrix(
+    committed_project: Path,
+    phase: CommitPhase,
+    occurrence: int,
+    expected_status: StateCommitStatus | None,
+) -> None:
+    assert (
+        _crash_image_and_recover(committed_project, phase, occurrence)
+        is expected_status
+    )
+
+
+@pytest.mark.parametrize(
+    "phase",
+    (
+        CommitPhase.AFTER_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_MANIFEST_FILE_FSYNC,
+        CommitPhase.AFTER_MANIFEST_REPLACE,
+        CommitPhase.AFTER_MANIFEST_DIRECTORY_FSYNC,
+    ),
+)
+@pytest.mark.parametrize("occurrence", (1, 2, 3, 4))
+def test_image_manifest_byte_window_process_crash_matrix(
+    committed_project: Path,
+    phase: CommitPhase,
+    occurrence: int,
+) -> None:
+    before_replace = phase in {
+        CommitPhase.AFTER_MANIFEST_TEMP_WRITE,
+        CommitPhase.AFTER_MANIFEST_FILE_FSYNC,
+    }
+    expected = (
+        (None, StateCommitStatus.INTERRUPTED, StateCommitStatus.OUTCOME_UNKNOWN,
+         StateCommitStatus.INTERRUPTED)
+        if before_replace
+        else (
+            StateCommitStatus.INTERRUPTED,
+            StateCommitStatus.OUTCOME_UNKNOWN,
+            StateCommitStatus.INTERRUPTED,
+            StateCommitStatus.SUCCEEDED,
+        )
+    )[occurrence - 1]
+    assert _crash_image_and_recover(committed_project, phase, occurrence) is expected
+
+
+@pytest.mark.parametrize(
+    ("phase", "occurrence", "expected_status"),
+    (
+        (CommitPhase.AFTER_ARTIFACT_TEMP_WRITE, 4, None),
+        (CommitPhase.AFTER_ARTIFACT_PROMOTION, 4, None),
+        (CommitPhase.AFTER_MANIFEST_REPLACE, 1, StateCommitStatus.INTERRUPTED),
+        (
+            CommitPhase.AFTER_IMAGE_PERMIT_CONSUMED,
+            1,
+            StateCommitStatus.OUTCOME_UNKNOWN,
+        ),
+    ),
+)
+def test_local_profile_process_crash_recovery_is_fail_closed(
+    committed_project: Path,
+    phase: CommitPhase,
+    occurrence: int,
+    expected_status: StateCommitStatus | None,
+) -> None:
+    assert _crash_image_and_recover(
+        committed_project,
+        phase,
+        occurrence,
+        mode="image_local_profile",
+    ) is expected_status
 
 
 def test_recovery_marks_r2_voice_outcome_unknown_and_never_remints(
@@ -795,10 +1238,12 @@ def _selected_incomplete_with_project_temp(
                 (
                     "before_render_",
                     "after_render_",
-                    "before_voice_",
-                    "after_voice_",
-                    "after_graph_",
-                )
+                        "before_voice_",
+                        "after_voice_",
+                        "after_graph_",
+                        "before_image_",
+                        "after_image_",
+                    )
             )
         for occurrence in (
             (1, 2)

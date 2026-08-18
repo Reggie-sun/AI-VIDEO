@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
 
 from ai_video_mcp.tools.optimize_plan import video_optimize_plan
 
@@ -9,6 +12,56 @@ from conftest import skip_no_ffmpeg
 
 @skip_no_ffmpeg
 class TestVideoOptimizePlan:
+    def test_partial_production_arguments_do_not_fall_back_to_legacy(
+        self, tiny_video, mcp_config, mcp_cache
+    ):
+        with pytest.raises(ValueError, match="verified project path"):
+            video_optimize_plan(
+                str(tiny_video),
+                mcp_config,
+                mcp_cache,
+                production_project_path="/verified/project/project.yaml",
+            )
+
+    def test_production_plan_consumes_receipt_without_reanalysis(
+        self, tiny_video, mcp_config, mcp_cache, monkeypatch
+    ):
+        def fail_review(*args, **kwargs):
+            raise AssertionError("Production planning must not analyze video")
+
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.optimize_plan.video_review", fail_review
+        )
+        pointer_data = {
+            "review_id": "review-1",
+            "layer": "layout",
+            "path": "state/reviews/review." + "0" * 64 + ".json",
+            "content_hash": "0" * 64,
+            "file_sha256": "1" * 64,
+        }
+        from ai_video.production.models import ReviewReceiptPointer
+        pointer = ReviewReceiptPointer.model_validate(pointer_data)
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.optimize_plan.load_production_project",
+            lambda path: SimpleNamespace(
+                root=Path("/verified/project"),
+                manifest=SimpleNamespace(active_review_receipts=(pointer,)),
+            ),
+        )
+        monkeypatch.setattr(
+            "ai_video_mcp.tools.optimize_plan.load_review_receipt",
+            lambda root, selected: SimpleNamespace(issue_ids=("caption-overflow",)),
+        )
+        result = video_optimize_plan(
+            str(tiny_video),
+            mcp_config,
+            mcp_cache,
+            production_review_receipt=pointer_data,
+            production_project_path="/verified/project/project.yaml",
+        )
+        assert result["mode"] == "production_repair_proposal"
+        assert result["targets"] == []
+        assert result["review_receipt_id"] == "review-1"
     def test_optimize_plan_maps_review_issues_to_repo_files(
         self,
         tiny_video,

@@ -40,9 +40,31 @@ class ErrorCode(str, Enum):
     VOICE_EGRESS_NOT_AUTHORIZED = "voice_egress_not_authorized"
     VOICE_PROVIDER_FAILED = "voice_provider_failed"
     VOICE_PROVIDER_OUTCOME_UNKNOWN = "voice_provider_outcome_unknown"
+    PAID_PROVIDER_AUTHORIZATION_REQUIRED = "paid_provider_authorization_required"
+    PAID_PROVIDER_BUDGET_REJECTED = "paid_provider_budget_rejected"
+    PAID_PROVIDER_EGRESS_NOT_AUTHORIZED = "paid_provider_egress_not_authorized"
+    PAID_PROVIDER_LIVE_AUTHORIZATION_REQUIRED = (
+        "paid_provider_live_authorization_required"
+    )
+    PAID_PROVIDER_KNOWN_NO_EFFECT = "paid_provider_known_no_effect"
+    PAID_PROVIDER_OUTCOME_UNKNOWN = "paid_provider_outcome_unknown"
+    IMAGE_REQUEST_INVALID = "image_request_invalid"
+    IMAGE_ASSET_INVALID = "image_asset_invalid"
+    IMAGE_PROVIDER_FAILED = "image_provider_failed"
+    IMAGE_PROVIDER_OUTCOME_UNKNOWN = "image_provider_outcome_unknown"
+    VIDEO_REQUEST_INVALID = "video_request_invalid"
+    VIDEO_CAPABILITY_UNSUPPORTED = "video_capability_unsupported"
+    VIDEO_PROVIDER_FAILED = "video_provider_failed"
+    VIDEO_PROVIDER_OUTCOME_UNKNOWN = "video_provider_outcome_unknown"
+    VIDEO_ARTIFACT_INVALID = "video_artifact_invalid"
     DISK_SPACE_LOW = "disk_space_low"
     DEPENDENCY_GRAPH_INVALID = "dependency_graph_invalid"
     DEPENDENCY_RESOLUTION_INVALID = "dependency_resolution_invalid"
+    REVIEW_EVIDENCE_INVALID = "review_evidence_invalid"
+    REVIEW_NOT_CURRENT = "review_not_current"
+    REPAIR_AUTHORIZATION_REQUIRED = "repair_authorization_required"
+    REPAIR_SCOPE_INVALID = "repair_scope_invalid"
+    FINAL_ACCEPTANCE_INVALID = "final_acceptance_invalid"
 
 
 @dataclass

@@ -1,0 +1,755 @@
+"""MiniMax Hailuo-2.3 V1 text-to-video Provider adapter.
+
+The adapter is deliberately explicit: it implements one 768P/6s/16:9 T2V
+profile against the official Chinese V1 dialect (``api.minimaxi.com``),
+consumes the existing Paid Provider permit immediately before submit,
+and never persists the signed result URL returned by MiniMax.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import re
+from collections.abc import Callable, Iterator, Mapping
+from contextlib import AbstractContextManager
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from typing import BinaryIO, Literal, Protocol
+from urllib.parse import quote, urlsplit
+
+import httpx
+
+from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.paid_provider import (
+    PaidProviderAuthorizationDecision,
+    PaidProviderCallPreview,
+    PaidProviderSubmitOutcome,
+    PaidProviderSubmitReceipt,
+    validate_paid_provider_authorization,
+)
+from ai_video.production.state_commit import _DurablePaidProviderSubmitPermit
+from ai_video.production.video import (
+    BillingKind,
+    ResolvedVideoGenerationRequest,
+    VideoCapabilityVariant,
+    VideoExecutionKind,
+    VideoFetchReceipt,
+    VideoGenerationMode,
+    VideoGenerationPreview,
+    VideoGenerationRequest,
+    VideoOutputRequirement,
+    VideoProviderCapabilities,
+    VideoSubmission,
+    VideoSubmitResult,
+    VideoTaskObservation,
+    VideoTaskState,
+    build_video_paid_permit_binding,
+)
+
+_ORIGIN = "https://api.minimaxi.com"
+_SUBMIT_URL = f"{_ORIGIN}/v1/video_generation"
+_QUERY_URL = f"{_ORIGIN}/v1/query/video_generation"
+_FILE_RETRIEVE_URL = f"{_ORIGIN}/v1/files/retrieve"
+_MODEL_ID = "MiniMax-Hailuo-2.3"
+_PROVIDER_NAME = "minimax_hailuo"
+_PROVIDER_KIND = "minimax_hailuo"
+_PROFILE_VERSION = "hailuo-2.3-v1"
+_CAPABILITY_ID = "minimax-hailuo-2.3-v1-t2v-768p-6s-16x9"
+_FILE_ID_PREFIX = "hailuo-content-"
+_MAX_JSON_BYTES = 1_000_000
+_MAX_PROMPT_CHARACTERS = 2_000
+_MAX_VIDEO_BYTES = 256 * 1024 * 1024
+_SECRET_REFERENCE_KIND = "secret_store"
+_SECRET_REFERENCE_ID = "MINIMAX_API_KEY"
+_SAFE_TASK_ID = re.compile(r"^[A-Za-z0-9._:-]{1,256}$")
+_SAFE_FILE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,256}$")
+_DEFINITIVE_REJECTION_HTTP_STATUSES = frozenset(
+    {400, 401, 403, 404, 405, 413, 415, 422}
+)
+_TRANSIENT_PROVIDER_CODES = frozenset(
+    {1000, 1001, 1002, 1024, 1033, 1039, 1041, 2045, 2056}
+)
+
+
+def _error(
+    code: ErrorCode,
+    message: str,
+    *,
+    retryable: bool = False,
+    technical_detail: str | None = None,
+) -> AiVideoError:
+    return AiVideoError(
+        code=code,
+        user_message=message,
+        technical_detail=technical_detail,
+        retryable=retryable,
+    )
+
+
+def _unknown_submit() -> AiVideoError:
+    return _error(
+        ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
+        "MiniMax Hailuo submit outcome is unknown after permit consumption.",
+    )
+
+
+@dataclass(frozen=True)
+class MiniMaxHailuoTransportRequest:
+    method: Literal["GET", "POST"]
+    url: str
+    headers: Mapping[str, str] = field(repr=False)
+    body: bytes = field(default=b"", repr=False)
+
+
+@dataclass(frozen=True)
+class MiniMaxHailuoTransportResponse:
+    status_code: int
+    headers: Mapping[str, str]
+    body: bytes = field(repr=False)
+
+
+class MiniMaxHailuoStreamResponse(Protocol):
+    status_code: int
+    headers: Mapping[str, str]
+
+    def iter_bytes(self) -> Iterator[bytes]: ...
+
+
+class MiniMaxHailuoTransport(Protocol):
+    def request(
+        self, request: MiniMaxHailuoTransportRequest
+    ) -> MiniMaxHailuoTransportResponse: ...
+
+    def stream(
+        self, request: MiniMaxHailuoTransportRequest
+    ) -> AbstractContextManager[MiniMaxHailuoStreamResponse]: ...
+
+
+class HttpxMiniMaxHailuoTransport:
+    """Small synchronous transport; request representations redact credentials."""
+
+    def __init__(
+        self,
+        *,
+        client: httpx.Client | None = None,
+        timeout_seconds: float = 60.0,
+    ) -> None:
+        self._client = client or httpx.Client(
+            timeout=httpx.Timeout(timeout_seconds),
+            follow_redirects=False,
+        )
+        self._owns_client = client is None
+
+    def request(
+        self, request: MiniMaxHailuoTransportRequest
+    ) -> MiniMaxHailuoTransportResponse:
+        response = self._client.request(
+            request.method,
+            request.url,
+            headers=dict(request.headers),
+            content=request.body,
+            follow_redirects=False,
+        )
+        return MiniMaxHailuoTransportResponse(
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            body=response.content,
+        )
+
+    def stream(
+        self, request: MiniMaxHailuoTransportRequest
+    ) -> AbstractContextManager[MiniMaxHailuoStreamResponse]:
+        return self._client.stream(
+            request.method,
+            request.url,
+            headers=dict(request.headers),
+            content=request.body,
+            follow_redirects=False,
+        )
+
+    def close(self) -> None:
+        if self._owns_client:
+            self._client.close()
+
+
+CredentialResolver = Callable[[], str]
+
+
+_OUTPUT = VideoOutputRequirement(
+    duration_seconds=6,
+    width=1366,
+    height=768,
+    fps=None,
+    container="mp4",
+    mime_type="video/mp4",
+    native_audio=False,
+)
+_VARIANT = VideoCapabilityVariant(
+    capability_id=_CAPABILITY_ID,
+    provider_kind=_PROVIDER_KIND,
+    model_id=_MODEL_ID,
+    profile_version=_PROFILE_VERSION,
+    execution_kind=VideoExecutionKind.REMOTE,
+    billing_kind=BillingKind.METERED,
+    mode=VideoGenerationMode.TEXT_TO_VIDEO,
+    output=_OUTPUT,
+    allowed_image_roles=(),
+    required_first_frame=False,
+    max_reference_count=0,
+    allowed_image_mime_types=(),
+    max_image_bytes=1,
+    min_image_width=1,
+    min_image_height=1,
+    negative_prompt_supported=False,
+    seed_supported=False,
+    fps_supported=False,
+    idempotent_submit=False,
+    lookup_supported=True,
+)
+_CAPABILITIES = VideoProviderCapabilities.create(
+    provider_name=_PROVIDER_NAME,
+    variants=(_VARIANT,),
+)
+
+
+def _json_object(body: bytes, *, surface: str) -> dict[str, object]:
+    if len(body) > _MAX_JSON_BYTES:
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED, f"MiniMax Hailuo {surface} is too large."
+        )
+    try:
+        value = json.loads(body)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED,
+            f"MiniMax Hailuo {surface} is not valid JSON.",
+        ) from None
+    if not isinstance(value, dict):
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED,
+            f"MiniMax Hailuo {surface} must be a JSON object.",
+        )
+    return value
+
+
+def _base_resp_status(payload: dict[str, object], *, surface: str) -> int:
+    base_resp = payload.get("base_resp")
+    if not isinstance(base_resp, dict):
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED,
+            f"MiniMax Hailuo {surface} base_resp is missing.",
+        )
+    status_code = base_resp.get("status_code")
+    if (
+        not isinstance(status_code, int)
+        or isinstance(status_code, bool)
+        or status_code < 0
+        or status_code > 99_999
+    ):
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED,
+            f"MiniMax Hailuo {surface} base_resp status_code is invalid.",
+        )
+    return status_code
+
+
+def _provider_status_error(*, surface: str, provider_code: int) -> AiVideoError:
+    return _error(
+        ErrorCode.VIDEO_PROVIDER_FAILED,
+        f"MiniMax Hailuo {surface} was rejected by the Provider.",
+        retryable=provider_code in _TRANSIENT_PROVIDER_CODES,
+        technical_detail=f"provider_code={provider_code}",
+    )
+
+
+def _task_id(value: object, *, surface: str) -> str:
+    if not isinstance(value, str) or _SAFE_TASK_ID.fullmatch(value) is None:
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED,
+            f"MiniMax Hailuo {surface} contains an invalid task ID.",
+        )
+    return value
+
+
+def _file_id(value: object, *, surface: str) -> str:
+    if isinstance(value, int) and not isinstance(value, bool):
+        if 0 < value <= 9_223_372_036_854_775_807:
+            return str(value)
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED,
+            f"MiniMax Hailuo {surface} contains an invalid file ID.",
+        )
+    if not isinstance(value, str) or _SAFE_FILE_ID.fullmatch(value) is None:
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED,
+            f"MiniMax Hailuo {surface} contains an invalid file ID.",
+        )
+    return value
+
+
+def _signed_https_url(value: object) -> str:
+    if not isinstance(value, str) or not value:
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED, "MiniMax Hailuo result URL is missing."
+        )
+    try:
+        parsed = urlsplit(value)
+        _ = parsed.port
+    except ValueError:
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED, "MiniMax Hailuo result URL is invalid."
+        ) from None
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname is None
+        or parsed.username is not None
+        or parsed.password is not None
+        or not parsed.path
+        or parsed.fragment
+    ):
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED,
+            "MiniMax Hailuo result URL must be HTTPS without credentials or fragments.",
+        )
+    return value
+
+
+def _provider_file_id(file_id: str) -> str:
+    return _FILE_ID_PREFIX + hashlib.sha256(file_id.encode("utf-8")).hexdigest()
+
+
+def _permit_is_valid(permit: object, binding: dict[str, str]) -> bool:
+    if type(permit) is not _DurablePaidProviderSubmitPermit:
+        return False
+    try:
+        return permit._validate_paid_provider_operation_permit(**binding) is True
+    except Exception:
+        return False
+
+
+def _consume_permit(permit: object, binding: dict[str, str]) -> bool:
+    if type(permit) is not _DurablePaidProviderSubmitPermit:
+        return False
+    try:
+        return permit._consume_paid_provider_operation_permit(**binding) is True
+    except Exception:
+        return False
+
+
+def _validate_submission(
+    submission: VideoSubmission,
+    receipt: PaidProviderSubmitReceipt,
+) -> str:
+    if (
+        receipt.outcome is not PaidProviderSubmitOutcome.ACCEPTED
+        or receipt.submit_receipt_fingerprint != submission.paid_submit_receipt_fingerprint
+        or receipt.request_fingerprint != submission.resolved_generation_hash
+        or receipt.external_effect_id is None
+    ):
+        raise _error(
+            ErrorCode.VIDEO_REQUEST_INVALID,
+            "MiniMax Hailuo evidence does not match the submitted generation.",
+        )
+    return _task_id(receipt.external_effect_id, surface="submit receipt")
+
+
+class MiniMaxHailuoVideoProvider:
+    def __init__(
+        self,
+        *,
+        transport: MiniMaxHailuoTransport,
+        credential: CredentialResolver,
+        now: Callable[[], datetime] | None = None,
+    ) -> None:
+        self._transport = transport
+        self._credential = credential
+        self._now = now or (lambda: datetime.now(UTC))
+
+    def capabilities(self) -> VideoProviderCapabilities:
+        return _CAPABILITIES
+
+    def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
+        if (
+            request.provider_name != _PROVIDER_NAME
+            or request.provider_kind != _PROVIDER_KIND
+            or request.model_id != _MODEL_ID
+            or request.provider_profile.profile_version != _PROFILE_VERSION
+            or request.mode is not VideoGenerationMode.TEXT_TO_VIDEO
+            or request.image_bindings
+            or request.negative_prompt_text
+            or request.seed is not None
+            or request.output_requirement != _OUTPUT
+        ):
+            raise _error(
+                ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                "MiniMax Hailuo request does not match the sealed 768P T2V capability.",
+            )
+        if len(request.prompt_text) > _MAX_PROMPT_CHARACTERS:
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo prompt exceeds 2000 characters.",
+            )
+        return ResolvedVideoGenerationRequest.create(
+            request=request,
+            capability=_VARIANT,
+            effective_output=_OUTPUT,
+            effective_seed=None,
+            effective_negative_prompt_text="",
+        )
+
+    def preview(self, request: ResolvedVideoGenerationRequest) -> VideoGenerationPreview:
+        if (
+            request.provider_name != _PROVIDER_NAME
+            or request.capability_id != _CAPABILITY_ID
+            or request.effective_output != _OUTPUT
+        ):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo resolved request is invalid.",
+            )
+        return VideoGenerationPreview.create(
+            resolved=request,
+            estimated_cost_upper_bound_microunits=2_000_000,
+            currency="CNY",
+            destination=_ORIGIN,
+            egress_item_ids=("prompt",),
+        )
+
+    def _credential_headers(self, *, json_body: bool) -> dict[str, str]:
+        try:
+            secret = self._credential()
+        except Exception:
+            raise _error(
+                ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED,
+                "MiniMax Hailuo credential is unavailable.",
+            ) from None
+        if not isinstance(secret, str) or not secret or not secret.isascii():
+            raise _error(
+                ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED,
+                "MiniMax Hailuo credential is unavailable.",
+            )
+        headers = {"accept": "application/json", "authorization": f"Bearer {secret}"}
+        if json_body:
+            headers["content-type"] = "application/json"
+        return headers
+
+    def _query(self, task_id: str) -> tuple[VideoTaskState, str | None]:
+        url = f"{_QUERY_URL}?task_id={quote(task_id, safe='')}"
+        request = MiniMaxHailuoTransportRequest(
+            method="GET",
+            url=url,
+            headers=self._credential_headers(json_body=False),
+        )
+        try:
+            response = self._transport.request(request)
+        except Exception:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "MiniMax Hailuo task query transport failed.",
+                retryable=True,
+            ) from None
+        if not 200 <= response.status_code < 300:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                f"MiniMax Hailuo task query returned HTTP {response.status_code}.",
+                retryable=response.status_code >= 500 or response.status_code == 429,
+            )
+        payload = _json_object(response.body, surface="query response")
+        provider_code = _base_resp_status(payload, surface="query response")
+        if provider_code != 0:
+            raise _provider_status_error(
+                surface="query response", provider_code=provider_code
+            )
+        if _task_id(payload.get("task_id"), surface="query response") != task_id:
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo query task ID changed.",
+            )
+        status = payload.get("status")
+        if status == "Queueing":
+            return VideoTaskState.QUEUED, None
+        if status == "Preparing":
+            return VideoTaskState.RUNNING, None
+        if status == "Processing":
+            return VideoTaskState.RUNNING, None
+        if status == "Fail":
+            return VideoTaskState.FAILED, None
+        if status != "Success":
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "MiniMax Hailuo query status is invalid.",
+            )
+        file_id = _file_id(payload.get("file_id"), surface="query response")
+        return VideoTaskState.SUCCEEDED, file_id
+
+    def _file_retrieve(self, file_id: str) -> str:
+        url = f"{_FILE_RETRIEVE_URL}?file_id={quote(file_id, safe='')}"
+        request = MiniMaxHailuoTransportRequest(
+            method="GET",
+            url=url,
+            headers=self._credential_headers(json_body=False),
+        )
+        try:
+            response = self._transport.request(request)
+        except Exception:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "MiniMax Hailuo file retrieve transport failed.",
+                retryable=True,
+            ) from None
+        if not 200 <= response.status_code < 300:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                f"MiniMax Hailuo file retrieve returned HTTP {response.status_code}.",
+                retryable=response.status_code >= 500 or response.status_code == 429,
+            )
+        payload = _json_object(response.body, surface="file retrieve response")
+        provider_code = _base_resp_status(payload, surface="file retrieve response")
+        if provider_code != 0:
+            raise _provider_status_error(
+                surface="file retrieve response", provider_code=provider_code
+            )
+        file = payload.get("file")
+        if not isinstance(file, dict):
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "MiniMax Hailuo file retrieve file object is missing.",
+            )
+        if _file_id(file.get("file_id"), surface="file retrieve response") != file_id:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "MiniMax Hailuo file retrieve identity changed.",
+            )
+        return _signed_https_url(file.get("download_url"))
+
+    def submit(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        video_preview: VideoGenerationPreview,
+        paid_preview: PaidProviderCallPreview | None,
+        authorization: PaidProviderAuthorizationDecision | None,
+        permit: object | None,
+    ) -> VideoSubmitResult:
+        if video_preview != self.preview(request):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID, "MiniMax Hailuo preview mismatch."
+            )
+        if paid_preview is None or authorization is None or permit is None:
+            raise _error(
+                ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED,
+                "MiniMax Hailuo submit requires Paid Provider authorization.",
+            )
+        validate_paid_provider_authorization(paid_preview, authorization, now=self._now())
+        binding = build_video_paid_permit_binding(
+            request, video_preview, paid_preview, authorization
+        )
+        prompt_bytes = request.prompt_text.encode("utf-8")
+        prompt_items = paid_preview.egress_items
+        if (
+            len(prompt_items) != 1
+            or prompt_items[0].item_id != "prompt"
+            or prompt_items[0].sha256 != hashlib.sha256(prompt_bytes).hexdigest()
+            or prompt_items[0].size_bytes != len(prompt_bytes)
+            or prompt_items[0].mime_type != "text/plain"
+            or prompt_items[0].purpose != "prompt"
+            or paid_preview.secret_reference.kind != _SECRET_REFERENCE_KIND
+            or paid_preview.secret_reference.reference_id != _SECRET_REFERENCE_ID
+        ):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo paid preview does not bind the exact prompt and credential.",
+            )
+        if not _permit_is_valid(permit, binding):
+            raise _error(
+                ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED,
+                "MiniMax Hailuo submit permit is invalid.",
+            )
+        body = json.dumps(
+            {
+                "model": _MODEL_ID,
+                "prompt": request.prompt_text,
+                "duration": 6,
+                "resolution": "768P",
+            },
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        transport_request = MiniMaxHailuoTransportRequest(
+            method="POST",
+            url=_SUBMIT_URL,
+            headers=self._credential_headers(json_body=True),
+            body=body,
+        )
+        if not _consume_permit(permit, binding):
+            raise _error(
+                ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED,
+                "MiniMax Hailuo submit permit is already consumed.",
+            )
+        try:
+            response = self._transport.request(transport_request)
+        except Exception:
+            raise _unknown_submit() from None
+        if not 200 <= response.status_code < 300:
+            if response.status_code in _DEFINITIVE_REJECTION_HTTP_STATUSES:
+                raise _error(
+                    ErrorCode.VIDEO_PROVIDER_FAILED,
+                    f"MiniMax Hailuo submit was rejected with HTTP {response.status_code}.",
+                )
+            raise _unknown_submit()
+        try:
+            payload = _json_object(response.body, surface="submit response")
+            provider_code = _base_resp_status(payload, surface="submit response")
+        except AiVideoError:
+            raise _unknown_submit() from None
+        if provider_code != 0:
+            raise _provider_status_error(
+                surface="submit response", provider_code=provider_code
+            )
+        try:
+            task_id = _task_id(payload.get("task_id"), surface="submit response")
+        except AiVideoError:
+            raise _unknown_submit() from None
+        return VideoSubmitResult.create(
+            resolved=request,
+            external_effect_id=task_id,
+            submitted_at=self._now(),
+        )
+
+    def get_status(
+        self,
+        submission: VideoSubmission,
+        submit_receipt: PaidProviderSubmitReceipt,
+    ) -> VideoTaskObservation:
+        task_id = _validate_submission(submission, submit_receipt)
+        state, file_id = self._query(task_id)
+        return VideoTaskObservation.create(
+            submission=submission,
+            state=state,
+            observed_at=self._now(),
+            progress_milli={
+                VideoTaskState.QUEUED: 0,
+                VideoTaskState.RUNNING: 500,
+                VideoTaskState.SUCCEEDED: 1000,
+                VideoTaskState.FAILED: 1000,
+            }[state],
+            provider_file_id=(
+                _provider_file_id(file_id)
+                if state is VideoTaskState.SUCCEEDED and file_id is not None
+                else None
+            ),
+        )
+
+    def fetch(
+        self,
+        submission: VideoSubmission,
+        submit_receipt: PaidProviderSubmitReceipt,
+        observation: VideoTaskObservation,
+        sink: BinaryIO,
+    ) -> VideoFetchReceipt:
+        task_id = _validate_submission(submission, submit_receipt)
+        if (
+            observation.submission_fingerprint != submission.submission_fingerprint
+            or observation.paid_submit_receipt_fingerprint
+            != submission.paid_submit_receipt_fingerprint
+            or observation.state is not VideoTaskState.SUCCEEDED
+            or observation.provider_file_id is None
+        ):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo fetch evidence mismatch.",
+            )
+        state, file_id = self._query(task_id)
+        if state is not VideoTaskState.SUCCEEDED or file_id is None:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "MiniMax Hailuo task is not fetchable.",
+            )
+        if _provider_file_id(file_id) != observation.provider_file_id:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "MiniMax Hailuo result identity changed.",
+            )
+        signed_url = self._file_retrieve(file_id)
+        request = MiniMaxHailuoTransportRequest(
+            method="GET",
+            url=signed_url,
+            headers={"accept": "video/mp4"},
+        )
+        digest = hashlib.sha256()
+        size = 0
+        try:
+            with self._transport.stream(request) as response:
+                if not 200 <= response.status_code < 300:
+                    raise _error(
+                        ErrorCode.VIDEO_PROVIDER_FAILED,
+                        f"MiniMax Hailuo download returned HTTP {response.status_code}.",
+                        retryable=response.status_code >= 500 or response.status_code == 429,
+                    )
+                content_type = response.headers.get("content-type", "")
+                if not content_type.lower().startswith("video/mp4"):
+                    raise _error(
+                        ErrorCode.VIDEO_ARTIFACT_INVALID,
+                        "MiniMax Hailuo download is not video/mp4.",
+                    )
+                content_length = response.headers.get("content-length")
+                if content_length is not None:
+                    try:
+                        declared_size = int(content_length)
+                    except ValueError:
+                        raise _error(
+                            ErrorCode.VIDEO_ARTIFACT_INVALID,
+                            "MiniMax Hailuo download Content-Length is invalid.",
+                        ) from None
+                    if declared_size < 0 or declared_size > _MAX_VIDEO_BYTES:
+                        raise _error(
+                            ErrorCode.VIDEO_ARTIFACT_INVALID,
+                            "MiniMax Hailuo download exceeds the size limit.",
+                        )
+                for chunk in response.iter_bytes():
+                    if not chunk:
+                        continue
+                    if size + len(chunk) > _MAX_VIDEO_BYTES:
+                        raise _error(
+                            ErrorCode.VIDEO_ARTIFACT_INVALID,
+                            "MiniMax Hailuo download exceeds the size limit.",
+                        )
+                    sink.write(chunk)
+                    digest.update(chunk)
+                    size += len(chunk)
+        except AiVideoError:
+            raise
+        except Exception:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "MiniMax Hailuo download transport failed.",
+                retryable=True,
+            ) from None
+        if size == 0:
+            raise _error(
+                ErrorCode.VIDEO_ARTIFACT_INVALID, "MiniMax Hailuo download is empty."
+            )
+        if content_length is not None and size != declared_size:
+            raise _error(
+                ErrorCode.VIDEO_ARTIFACT_INVALID,
+                "MiniMax Hailuo download size does not match Content-Length.",
+            )
+        sink.flush()
+        return VideoFetchReceipt.create(
+            submission=submission,
+            observation=observation,
+            content_type="video/mp4",
+            size_bytes=size,
+            artifact_sha256=digest.hexdigest(),
+            fetched_at=self._now(),
+        )
+
+
+__all__ = [
+    "HttpxMiniMaxHailuoTransport",
+    "MiniMaxHailuoStreamResponse",
+    "MiniMaxHailuoTransport",
+    "MiniMaxHailuoTransportRequest",
+    "MiniMaxHailuoTransportResponse",
+    "MiniMaxHailuoVideoProvider",
+]

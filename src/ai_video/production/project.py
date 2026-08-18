@@ -8,10 +8,16 @@ from typing import TypeVar
 import wave
 
 from pydantic import BaseModel, ValidationError
-import yaml
 
 from ai_video.config import load_yaml, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._image_project_reader import verify_active_image_evidence
+from ai_video.production._paid_provider_project_reader import (
+    verify_paid_provider_evidence,
+)
+import ai_video.production._project_dependency_evidence as _project_evidence
+from ai_video.production._video_project_reader import verify_manifest_video_evidence
+from ai_video.production._voice_project_reader import verify_voice_candidate_history
 from ai_video.production.audio import (
     VoiceCallAuthorization,
     VoiceCostReceipt,
@@ -26,11 +32,10 @@ from ai_video.production.captions import (
     caption_style_fingerprint,
     validate_caption_track_timeline_binding,
 )
-from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.dependency import (
     _asset_role,
     _fp,
-    _shot_projection_fingerprints,
     dependency_graph_semantic_sha256,
     desired_fingerprints,
     resolve_dependency_state,
@@ -38,7 +43,6 @@ from ai_video.production.dependency import (
 )
 from ai_video.production.models import (
     ArtifactReference,
-    AssetRegistrySnapshot,
     AssetSourceKind,
     AssetType,
     CaptionTrack,
@@ -47,13 +51,17 @@ from ai_video.production.models import (
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
     DependencyLifecycle,
-    DependencyNodeKind,
     DependencyNode,
-    DependencySemanticRole,
+    DependencyNodeKind,
+    DependencyNodeState,
+    FinalAcceptanceReceipt,
+    FinalAcceptanceReceiptPointer,
     LoadedProductionProject,
     ProductionBrief,
     ProductionManifest,
     ProductionProject,
+    QaPolicy,
+    QaPolicyPointer,
     ProjectDependencyEvidence,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
@@ -64,6 +72,12 @@ from ai_video.production.models import (
     RenderReceipt,
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
+    ReviewReceipt,
+    ReviewReceiptPointer,
+    ReviewEvidence,
+    ReviewEvidencePointer,
+    ReviewRequest,
+    ReviewRequestPointer,
     RenderDependencyEvidence,
     ResolvedTimeline,
     Scene,
@@ -71,7 +85,6 @@ from ai_video.production.models import (
     SourceReference,
     Story,
     Storyboard,
-    StateCommitAttempt,
     StateCommitStatus,
     VoiceRequestReceipt,
     VersionedArtifact,
@@ -91,7 +104,7 @@ from ai_video.production.paths import (
     canonical_voice_attempt_artifact_path,
     resolve_contained_path,
 )
-from ai_video.production.registry import load_asset_registry, registry_semantic_sha256
+from ai_video.production.registry import load_asset_registry
 from ai_video.production.validation import validate_project_references
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
@@ -137,6 +150,128 @@ def _load_json_model(path: Path, model_type: type[ModelT]) -> ModelT:
         return model_type.model_validate_json(path.read_text(encoding="utf-8"))
     except (OSError, ValidationError, ValueError) as exc:
         raise _invalid(f"Could not load production state: {path}", str(exc)) from exc
+
+
+def _load_content_addressed_json(
+    root: Path,
+    path: Path,
+    *,
+    file_sha256: str,
+    model_type: type[ModelT],
+    content_hash: str,
+    label: str,
+) -> ModelT:
+    resolved = _resolve_input(root, path, allowed_root=root / "state")
+    try:
+        snapshot = _read_regular_file_nofollow(resolved, contained_by=root / "state")
+        model = model_type.model_validate_json(snapshot.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid(f"Could not reopen {label}.", str(exc)) from exc
+    if (
+        snapshot.file_sha256 != file_sha256
+        or getattr(model, "content_hash", None) != content_hash
+        or not verify_artifact_hash(model)
+    ):
+        raise _invalid(f"{label} identity is invalid.")
+    return model
+
+
+def load_qa_policy(root: str | Path, pointer: QaPolicyPointer) -> QaPolicy:
+    resolved_root = Path(root).resolve(strict=True)
+    policy = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=QaPolicy,
+        content_hash=pointer.content_hash,
+        label="QA policy",
+    )
+    if policy.policy_id != pointer.policy_id or policy.policy_version != pointer.policy_version:
+        raise _invalid("QA policy pointer identity is invalid.")
+    return policy
+
+
+def load_review_receipt(
+    root: str | Path, pointer: ReviewReceiptPointer
+) -> ReviewReceipt:
+    resolved_root = Path(root).resolve(strict=True)
+    receipt = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=ReviewReceipt,
+        content_hash=pointer.content_hash,
+        label="Review Receipt",
+    )
+    if receipt.review_id != pointer.review_id or receipt.layer != pointer.layer:
+        raise _invalid("Review Receipt pointer identity is invalid.")
+    for evidence_pointer in receipt.evidence:
+        evidence = load_review_evidence(resolved_root, evidence_pointer)
+        if (
+            evidence.layer is not receipt.layer
+            or evidence.evidence_id not in receipt.evidence_ids
+            or evidence.render_output_sha256 != receipt.render_output_sha256
+            or evidence.timeline_fingerprint != receipt.timeline_fingerprint
+            or evidence.dependency_graph_revision_id
+            != receipt.dependency_graph_revision_id
+        ):
+            raise _invalid("Review evidence does not match its Receipt.")
+    return receipt
+
+
+def load_review_evidence(
+    root: str | Path, pointer: ReviewEvidencePointer
+) -> ReviewEvidence:
+    resolved_root = Path(root).resolve(strict=True)
+    evidence = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=ReviewEvidence,
+        content_hash=pointer.content_hash,
+        label="Review evidence",
+    )
+    if (
+        evidence.evidence_id != pointer.evidence_id
+        or evidence.layer is not pointer.layer
+        or evidence.strength is not pointer.strength
+    ):
+        raise _invalid("Review evidence pointer identity is invalid.")
+    return evidence
+
+
+def load_final_acceptance_receipt(
+    root: str | Path, pointer: FinalAcceptanceReceiptPointer
+) -> FinalAcceptanceReceipt:
+    resolved_root = Path(root).resolve(strict=True)
+    receipt = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=FinalAcceptanceReceipt,
+        content_hash=pointer.content_hash,
+        label="Final Acceptance Receipt",
+    )
+    if receipt.acceptance_id != pointer.acceptance_id:
+        raise _invalid("Final Acceptance Receipt pointer identity is invalid.")
+    return receipt
+
+
+def load_review_request(
+    root: str | Path, pointer: ReviewRequestPointer
+) -> ReviewRequest:
+    resolved_root = Path(root).resolve(strict=True)
+    request = _load_content_addressed_json(
+        resolved_root,
+        pointer.path,
+        file_sha256=pointer.file_sha256,
+        model_type=ReviewRequest,
+        content_hash=pointer.content_hash,
+        label="ReviewRequest",
+    )
+    if request.request_id != pointer.request_id:
+        raise _invalid("ReviewRequest pointer identity is invalid.")
+    return request
 
 
 def _load_referenced_artifact(
@@ -256,139 +391,6 @@ def _read_voice_json(
     return value, snapshot.data
 
 
-def _read_voice_registry_pointer(
-    root: Path, pointer: RegistrySnapshotPointer, label: str
-) -> AssetRegistrySnapshot:
-    snapshot = _read_regular_file_nofollow(root / pointer.path, contained_by=root)
-    if snapshot.file_sha256 != pointer.file_sha256:
-        raise ValueError(f"{label} registry file hash mismatch")
-    registry = AssetRegistrySnapshot.model_validate_json(snapshot.data)
-    if (
-        registry.revision_id != pointer.revision_id
-        or registry.content_hash != pointer.content_hash
-        or registry_semantic_sha256(registry) != pointer.content_hash
-    ):
-        raise ValueError(f"{label} registry identity mismatch")
-    return registry
-
-
-def _verify_voice_candidate_history(
-    bundle: LoadedProductionProject,
-    attempts: tuple[StateCommitAttempt, ...],
-) -> dict[str, StateCommitAttempt]:
-    claimed: dict[str, StateCommitAttempt] = {}
-    current_assets = bundle.registry.assets
-    for attempt in attempts:
-        if attempt.candidate_registry is None or attempt.candidate_project not in (
-            None,
-            attempt.base_project,
-        ):
-            raise ValueError("voice attempt candidate pointers are incomplete")
-        project_snapshot = _read_regular_file_nofollow(
-            bundle.root / attempt.base_project.path, contained_by=bundle.root
-        )
-        if project_snapshot.file_sha256 != attempt.base_project.file_sha256:
-            raise ValueError("voice base project file hash mismatch")
-        try:
-            project = ProductionProject.model_validate(
-                yaml.safe_load(project_snapshot.data.decode("utf-8"))
-            )
-        except (UnicodeDecodeError, ValidationError, ValueError, yaml.YAMLError) as exc:
-            raise ValueError("voice base project is invalid") from exc
-        if (
-            project.revision != attempt.base_project.revision
-            or project.content_hash != attempt.base_project.content_hash
-            or not verify_artifact_hash(project)
-        ):
-            raise ValueError("voice base project identity mismatch")
-        base = _read_voice_registry_pointer(bundle.root, attempt.base_registry, "base")
-        candidate = _read_voice_registry_pointer(
-            bundle.root, attempt.candidate_registry, "candidate"
-        )
-        if (
-            candidate.schema_version != "2.1"
-            or candidate.assets[: len(base.assets)] != base.assets
-        ):
-            raise ValueError(
-                "voice candidate registry does not preserve its base prefix"
-            )
-        suffix = candidate.assets[len(base.assets) :]
-        expected_ids = tuple(
-            sorted(
-                (
-                    *attempt.candidate_audio_asset_ids,
-                    *attempt.candidate_caption_asset_ids,
-                )
-            )
-        )
-        if (
-            tuple(item.asset_id for item in suffix) != expected_ids
-            or current_assets[: len(candidate.assets)] != candidate.assets
-        ):
-            raise ValueError(
-                "selected registry does not retain exact voice candidate history"
-            )
-        pairs: list[tuple[str, str]] = [
-            (attempt.base_project.path.as_posix(), project_snapshot.file_sha256),
-            (
-                attempt.candidate_registry.path.as_posix(),
-                attempt.candidate_registry.file_sha256,
-            ),
-        ]
-        for record in suffix:
-            if record.asset_id in claimed:
-                raise ValueError(
-                    "voice candidate asset ID is claimed by multiple attempts"
-                )
-            claimed[record.asset_id] = attempt
-            artifact = _read_regular_file_nofollow(
-                bundle.root / record.artifact_path, contained_by=bundle.root
-            )
-            if (
-                artifact.file_sha256 != record.sha256
-                or artifact.size_bytes != record.size_bytes
-            ):
-                raise ValueError("voice candidate asset bytes do not match registry")
-            pairs.append((record.artifact_path.as_posix(), artifact.file_sha256))
-            metadata = record.caption_metadata
-            if metadata is not None and metadata.style_content_hash is not None:
-                style_path = Path(f"assets/styles/{metadata.style_content_hash}.json")
-                style = _read_regular_file_nofollow(
-                    bundle.root / style_path, contained_by=bundle.root
-                )
-                if style.file_sha256 != metadata.style_content_hash:
-                    raise ValueError("voice candidate caption style hash mismatch")
-                pairs.append((style_path.as_posix(), style.file_sha256))
-        for name in (
-            "request.json",
-            "preview.json",
-            "authorization.json",
-            "submit-intent.json",
-            "alignment.json",
-            "cost.json",
-            "provenance.json",
-            "outcome.json",
-        ):
-            evidence_path = canonical_voice_attempt_artifact_path(
-                bundle.root, attempt.attempt_id, name
-            )
-            evidence = _read_regular_file_nofollow(
-                evidence_path, contained_by=bundle.root
-            )
-            pairs.append(
-                (
-                    evidence_path.relative_to(bundle.root).as_posix(),
-                    evidence.file_sha256,
-                )
-            )
-        if len({path for path, _ in pairs}) != len(pairs):
-            raise ValueError("voice candidate evidence contains duplicate paths")
-        payload = json.dumps(sorted(pairs), separators=(",", ":")).encode("utf-8")
-        if hashlib.sha256(payload).hexdigest() != attempt.candidate_artifacts_hash:
-            raise ValueError("voice candidate artifact evidence hash mismatch")
-    return claimed
-
-
 def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
     attempts = tuple(
         attempt
@@ -398,10 +400,15 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
         and attempt.voice_phase == "activate"
     )
     try:
-        attempts_by_asset = _verify_voice_candidate_history(bundle, attempts)
-    except (OSError, ValidationError, ValueError) as exc:
+        attempts_by_asset = verify_voice_candidate_history(
+            bundle,
+            attempts,
+            load_dependency_graph=_load_active_dependency_graph,
+        )
+    except (AiVideoError, OSError, ValidationError, ValueError) as exc:
+        detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
         raise _invalid(
-            "Active P4 voice candidate history is invalid.", str(exc)
+            "Active P4 voice candidate history is invalid.", detail
         ) from exc
     assets_by_id = {asset.asset_id: asset for asset in bundle.registry.assets}
     generated_voice_ids = {
@@ -1179,6 +1186,7 @@ def _verify_dependency_project_evidence(
     bundle: LoadedProductionProject,
     evidence: ProjectDependencyEvidence,
     node: DependencyNode | None = None,
+    context: tuple[DependencyGraphSnapshot, DependencyNodeState] | None = None,
 ) -> None:
     root = bundle.root
     path = _resolve_candidate_project_path(root, evidence.pointer.path)
@@ -1202,35 +1210,59 @@ def _verify_dependency_project_evidence(
         _load_referenced_artifact(root, refs.storyboard, Storyboard),
         *(_load_referenced_artifact(root, item, Shot) for item in refs.shots),
     )
-    matches = tuple(
-        artifact
-        for artifact in artifacts
-        if artifact.artifact_id == evidence.artifact_id
-        or (isinstance(artifact, Shot) and artifact.shot_id == evidence.artifact_id)
+    matches = _project_evidence.matching_evidence_artifacts(
+        artifacts, evidence.artifact_id
     )
     if len(matches) != 1:
         raise _invalid("Project dependency evidence artifact is not in its snapshot.")
     if node is None:
         return
     artifact = matches[0]
-    if node.artifact_revision != artifact.revision:
-        raise _invalid("Project dependency evidence revision is invalid.")
     contributions = {item.key: item.fingerprint for item in node.contributions}
-    if isinstance(artifact, Shot) and node.semantic_role in {
-        DependencySemanticRole.VOICE,
-        DependencySemanticRole.VISUAL,
-        DependencySemanticRole.COMPOSITION,
-    }:
-        expected = {
-            f"shot.{node.semantic_role.value}": _shot_projection_fingerprints(artifact)[
-                node.semantic_role
-            ]
-        }
+    if isinstance(artifact, Shot):
+        graph, state = context or (None, None)
+        origin_graph = graph
+        origin_pointer = _project_evidence.historical_origin_graph_pointer(
+            bundle, evidence
+        )
+        if origin_pointer is not None:
+            origin_graph = _load_active_dependency_graph(root, origin_pointer)
+        _project_evidence.verify_active_shot_projection_evidence(
+            bundle, evidence, node, graph, state, artifact, origin_graph
+        )
+        return
+    elif isinstance(artifact, (Character, Scene)):
+        graph, state = context or (None, None)
+        origin_graph = graph
+        origin_pointer = _project_evidence.historical_origin_graph_pointer(
+            bundle, evidence
+        )
+        if origin_pointer is not None:
+            origin_graph = _load_active_dependency_graph(root, origin_pointer)
+        current_matches = tuple(
+            item
+            for item in (*bundle.characters, *bundle.scenes)
+            if item.artifact_id == evidence.artifact_id
+        )
+        if len(current_matches) != 1:
+            raise _invalid("Current project dependency artifact is ambiguous.")
+        _project_evidence.verify_active_versioned_artifact_evidence(
+            bundle,
+            evidence,
+            node,
+            graph,
+            state,
+            artifact,
+            current_matches[0],
+            origin_graph,
+        )
     else:
+        if node.artifact_revision != artifact.revision:
+            raise _invalid("Project dependency evidence revision is invalid.")
         kind = node.node_id.split(":", 2)[1] if ":" in node.node_id else ""
         expected = {f"{kind}.semantic": artifact.content_hash}
-    if contributions != expected:
-        raise _invalid("Project dependency evidence projection is invalid.")
+        if contributions != expected:
+            raise _invalid("Project dependency evidence projection is invalid.")
 
 
 def _verify_dependency_registry_evidence(
@@ -1511,7 +1543,7 @@ def _verify_manifest_dependency_states(
         if isinstance(evidence, ProjectDependencyEvidence):
             if node.kind is not DependencyNodeKind.CREATIVE_ARTIFACT:
                 raise _invalid("Project evidence has an invalid dependency owner.")
-            _verify_dependency_project_evidence(bundle, evidence, node)
+            _verify_dependency_project_evidence(bundle, evidence, node, (graph, state))
         elif isinstance(evidence, RegistryDependencyEvidence):
             if node.kind is not DependencyNodeKind.ASSET:
                 raise _invalid("Registry evidence has an invalid dependency owner.")
@@ -1637,9 +1669,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     registry_path = _resolve_candidate_registry_path(
         root, manifest.active_registry.path
     )
-    _verify_snapshot_file_hash(
-        project_path, manifest.active_project.file_sha256, "project"
-    )
+    _verify_snapshot_file_hash(project_path, manifest.active_project.file_sha256, "project")
     _verify_snapshot_file_hash(
         registry_path, manifest.active_registry.file_sha256, "registry"
     )
@@ -1649,20 +1679,91 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         manifest.active_project.path,
         manifest.active_registry.path,
     )
-    _verify_manifest_snapshot_identity(
-        bundle, manifest.active_project, manifest.active_registry
-    )
+    _verify_manifest_snapshot_identity(bundle, manifest.active_project, manifest.active_registry)
     _verify_active_voice_evidence(bundle)
+    verify_active_image_evidence(bundle)
+    verify_paid_provider_evidence(root, manifest)
+    verify_manifest_video_evidence(root, manifest)
     if manifest.active_dependency_graph is not None:
         dependency_graph = _load_active_dependency_graph(
             root, manifest.active_dependency_graph
         )
         _verify_manifest_dependency_states(bundle, dependency_graph)
         bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
+    if manifest.schema_version == "2.4" or (
+        manifest.schema_version in {"2.5", "2.6", "2.7"}
+        and manifest.active_qa_policy is not None
+    ):
+        if manifest.active_qa_policy is None:
+            raise _invalid(f"Manifest {manifest.schema_version} requires an active QA policy.")
+        qa_policy = load_qa_policy(root, manifest.active_qa_policy)
+        current_render = (
+            _load_exact_render_state(bundle, manifest.active_render_state)
+            if manifest.active_render_state is not None
+            else None
+        )
+        for receipt_pointer in manifest.active_review_receipts:
+            receipt = load_review_receipt(root, receipt_pointer)
+            if (
+                current_render is None
+                or receipt.qa_policy != manifest.active_qa_policy
+                or receipt.dependency_graph_revision_id
+                != manifest.active_dependency_graph.revision_id
+                or receipt.render_state != manifest.active_render_state
+                or receipt.render_output_sha256
+                != current_render.output.file_sha256
+                or receipt.timeline_fingerprint
+                != current_render.timeline_fingerprint
+            ):
+                raise _invalid("Active Review Receipt is stale.")
+        if (
+            manifest.final_acceptance_state is not None
+            and manifest.final_acceptance_state.active_receipt is not None
+        ):
+            final_receipt = load_final_acceptance_receipt(
+                root, manifest.final_acceptance_state.active_receipt
+            )
+            required_layers = {
+                item
+                for item in qa_policy.required_layers
+                if item.value != "final_acceptance"
+            }
+            selected_layers = {
+                item.layer for item in final_receipt.required_review_receipts
+            }
+            dependency_states_hash = canonical_sha256(
+                {
+                    "dependency_states": [
+                        item.model_dump(mode="json")
+                        for item in manifest.dependency_states
+                    ]
+                }
+            )
+            if (
+                current_render is None
+                or
+                final_receipt.dependency_graph != manifest.active_dependency_graph
+                or final_receipt.render_state != manifest.active_render_state
+                or final_receipt.qa_policy != manifest.active_qa_policy
+                or final_receipt.dependency_states_hash != dependency_states_hash
+                or final_receipt.render_output_sha256
+                != current_render.output.file_sha256
+                or final_receipt.timeline_fingerprint
+                != current_render.timeline_fingerprint
+                or selected_layers != required_layers
+                or set(final_receipt.required_review_receipts)
+                != {
+                    item
+                    for item in manifest.active_review_receipts
+                    if item.layer in required_layers
+                }
+            ):
+                raise _invalid("Final Acceptance Receipt is stale.")
+        bundle = bundle.model_copy(update={"qa_policy": qa_policy})
     if manifest.active_render_state is not None:
         render_state = (
             _load_exact_render_state(bundle, manifest.active_render_state)
-            if manifest.schema_version == "2.3"
+            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7"}
             else load_verified_render_state(
                 root,
                 manifest.active_render_state,

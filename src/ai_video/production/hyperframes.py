@@ -1408,12 +1408,12 @@ def _render_with_hyperframes(
         return committer._replay_render_attempt(begin_request, manifest)
     try:
         if (
-            manifest.schema_version == "2.3"
+            manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}
             and dependency_transition_preparer is None
         ):
             raise AiVideoError(
                 ErrorCode.PRODUCTION_STATE_INVALID,
-                "Manifest 2.3 render requires a dependency transition preparer.",
+                "Graph-aware Manifest render requires a dependency transition preparer.",
                 retryable=False,
             )
         selection = begin_request.renderer_selection
@@ -1493,7 +1493,7 @@ def _render_with_hyperframes(
         artifacts=durable.artifacts,
         next_render_state=durable.next_render_state,
     )
-    if manifest.schema_version == "2.3":
+    if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}:
         assert dependency_transition_preparer is not None
         try:
             prepared_activation = dependency_transition_preparer(activation)

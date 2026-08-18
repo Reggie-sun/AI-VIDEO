@@ -12,6 +12,7 @@ from ai_video.workflow_renderer import validate_api_workflow
 from ai_video_mcp.cache import AnalysisCache
 from ai_video_mcp.config import ServerConfig
 from ai_video_mcp.tools.optimize_plan import video_optimize_plan
+from ai_video.production.project import load_production_project
 
 
 def _resolve_paths(
@@ -112,7 +113,22 @@ def apply_video_optimization(
     project_path: str | None = None,
     shots_path: str | None = None,
     manifest_path: str | None = None,
+    production_project_path: str | None = None,
 ) -> dict:
+    video = Path(video_path).resolve()
+    production_path = any(
+        (parent / "state/manifest.json").is_file()
+        for parent in (video.parent, *video.parents)
+    )
+    if production_project_path is not None:
+        load_production_project(production_project_path)
+    if production_project_path is not None or production_path:
+        return {
+            "mode": "production_repair_refused",
+            "applied": False,
+            "reason": "durable_approved_repair_receipt_required",
+            "submit_count": 0,
+        }
     plan = video_optimize_plan(
         video_path,
         config,

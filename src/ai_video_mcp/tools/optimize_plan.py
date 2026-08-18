@@ -4,6 +4,8 @@ from pathlib import Path
 
 from ai_video.config import load_project
 from ai_video.manifest import load_manifest
+from ai_video.production.models import ReviewReceiptPointer
+from ai_video.production.project import load_production_project, load_review_receipt
 from ai_video_mcp.cache import AnalysisCache
 from ai_video_mcp.config import ServerConfig
 from ai_video_mcp.tools.review import video_review
@@ -63,7 +65,30 @@ def video_optimize_plan(
     project_path: str | None = None,
     shots_path: str | None = None,
     manifest_path: str | None = None,
+    production_review_receipt: dict | None = None,
+    production_project_path: str | None = None,
 ) -> dict:
+    if production_review_receipt is not None or production_project_path is not None:
+        if production_review_receipt is None or production_project_path is None:
+            raise ValueError("Production review planning requires verified project path")
+        bundle = load_production_project(production_project_path)
+        pointer = ReviewReceiptPointer.model_validate(production_review_receipt)
+        if pointer not in bundle.manifest.active_review_receipts:
+            raise ValueError("Production Review Receipt is not Manifest-selected")
+        receipt = load_review_receipt(bundle.root, pointer)
+        return {
+            "mode": "production_repair_proposal",
+            "video_path": str(Path(video_path).resolve()),
+            "review_receipt_id": pointer.review_id,
+            "review_receipt_content_hash": pointer.content_hash,
+            "issue_ids": list(receipt.issue_ids),
+            "exact_target_artifact_ids": [],
+            # Production repair is persisted and authorized by the sole committer.
+            "targets": [],
+            "next_actions": [
+                "Submit a durable RepairRequest to ProductionStateCommitter."
+            ],
+        }
     review = video_review(video_path, config, cache)
     resolved_project, resolved_shots = _resolve_inputs(
         project_path=project_path,

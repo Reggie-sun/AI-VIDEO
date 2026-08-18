@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import pickle
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -11,14 +12,48 @@ import yaml
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.hashing import seal_artifact, verify_artifact_hash
+from ai_video.production._image_project_reader import (
+    _verify_image_activation_chronology,
+)
+from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
+from ai_video.production.image import (
+    ImageGenerationAuthorization,
+    ImageGenerationPreview,
+    ImageGenerationRequest,
+    ImageLocalResourceEvidence,
+    ImageProviderParameters,
+    ImageProviderResult,
+    ImageReferenceBinding,
+)
 from ai_video.production.models import (
+    ActorIdentity,
+    ApprovedRepairReceipt,
     AssetRegistrySnapshot,
     DependencyLifecycle,
+    DependencyNodeKind,
     DependencyNodeState,
+    EvidenceStrength,
+    FinalAcceptanceState,
     ProductionProject,
     ProductionManifest,
     ProjectSnapshotPointer,
+    QaLayoutRules,
+    QaLayer,
+    QaPolicy,
+    QaTechnicalThresholds,
+    QaVerdict,
+    NamedFingerprint,
+    RepairAction,
+    RepairAuthorization,
+    RepairRequest,
+    ReviewAttemptPhase,
+    ReviewLayerState,
+    ReviewLifecycle,
+    ReviewEvidence,
+    ReviewEvidencePointer,
+    ReviewReceipt,
+    ReviewRequest,
+    ReviewRequestPointer,
     RendererKind,
     RendererSelectionReceipt,
     RegistrySnapshotPointer,
@@ -26,11 +61,18 @@ from ai_video.production.models import (
     RecoveryDisposition,
     RenderStateSnapshotPointer,
     Shot,
+    SourceReference,
     StateCommitStatus,
+    StateCommitAttempt,
+    TechnicalReviewContext,
+    TechnicalReviewWindow,
+    ToolIdentity,
+    VisualStrategy,
 )
-from ai_video.production.project import load_production_project_candidate
+from ai_video.production.project import load_production_project, load_production_project_candidate
 from ai_video.production.registry import load_asset_registry
 from ai_video.production.registry import registry_semantic_sha256
+from ai_video.production.review import build_technical_review_context
 import ai_video.production.state_commit as state_commit
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
@@ -49,6 +91,13 @@ from ai_video.production.state_commit import (
     prepare_dependency_graph_transition,
 )
 from ai_video.production.paths import (
+    canonical_image_authorization_path,
+    canonical_image_asset_path,
+    canonical_image_preview_path,
+    canonical_image_receipt_path,
+    canonical_image_request_path,
+    canonical_image_result_path,
+    canonical_image_submit_intent_path,
     canonical_render_attempt_root,
     canonical_render_output_path,
     canonical_render_receipt_path,
@@ -57,6 +106,8 @@ from ai_video.production.paths import (
     canonical_render_source_root,
     canonical_render_state_path,
     canonical_render_timeline_path,
+    canonical_review_request_path,
+    canonical_review_evidence_path,
     canonical_renderer_source_receipt_path,
 )
 import production_project_factory as project_factory
@@ -64,6 +115,2063 @@ import production_project_factory as project_factory
 
 ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
+
+
+def make_image_call_bundle(
+    root: Path,
+    *,
+    attempt_id: str = "image-attempt-1",
+    prompt_text: str = "Hero enters the archive room",
+    reference_total_bytes_delta: int = 0,
+    base_project: ProjectSnapshotPointer | None = None,
+    base_registry: RegistrySnapshotPointer | None = None,
+    base_dependency_graph=None,
+) -> tuple[
+    ImageGenerationRequest,
+    ImageGenerationPreview,
+    ImageGenerationAuthorization,
+]:
+    loaded = load_production_project(root / "project.yaml")
+    assert loaded.manifest.active_dependency_graph is not None
+    assets = {item.asset_id: item for item in loaded.registry.assets}
+    character = loaded.characters[0]
+    scene = loaded.scenes[0]
+    character_asset = assets[character.reference_asset_ids[0]]
+    scene_asset = assets[scene.visual_reference_asset_ids[0]]
+    references = (
+        ImageReferenceBinding(
+            role="character",
+            creative_artifact_id=character.artifact_id,
+            creative_revision=character.revision,
+            creative_content_hash=character.content_hash,
+            asset_id=character_asset.asset_id,
+            asset_sha256=character_asset.sha256,
+        ),
+        ImageReferenceBinding(
+            role="scene",
+            creative_artifact_id=scene.artifact_id,
+            creative_revision=scene.revision,
+            creative_content_hash=scene.content_hash,
+            asset_id=scene_asset.asset_id,
+            asset_sha256=scene_asset.sha256,
+        ),
+    )
+    request = ImageGenerationRequest.create(
+        attempt_id=attempt_id,
+        provider_kind="fake-local",
+        model_id="fixture-image-model-1",
+        target_shot_id="shot-1",
+        target_asset_role="still",
+        prompt_text=prompt_text,
+        negative_prompt_text="blur, watermark",
+        parameters=ImageProviderParameters(
+            seed=7,
+            width=2,
+            height=1,
+            output_format="png",
+            generation_revision=1,
+        ),
+        references=references,
+        base_project=base_project or loaded.manifest.active_project,
+        base_registry=base_registry or loaded.manifest.active_registry,
+        base_dependency_graph=(
+            base_dependency_graph or loaded.manifest.active_dependency_graph
+        ),
+    )
+    preview = ImageGenerationPreview.create(
+        request=request,
+        reference_total_bytes=(
+            character_asset.size_bytes
+            + scene_asset.size_bytes
+            + reference_total_bytes_delta
+        ),
+    )
+    authorization = ImageGenerationAuthorization.create(
+        request=request,
+        preview=preview,
+        usage_license="fixture-only",
+        policy_receipt_id="fixture-local-image-policy",
+    )
+    return request, preview, authorization
+
+
+def make_image_provider_result(
+    request: ImageGenerationRequest,
+    authorization: ImageGenerationAuthorization,
+    image_bytes: bytes,
+) -> ImageProviderResult:
+    return ImageProviderResult.create(
+        request=request,
+        authorization=authorization,
+        image_bytes=image_bytes,
+        content_type="image/png",
+        provider_request_id="fixture-local-image-1",
+        adapter=ToolIdentity(name="fake-local-image", version="1"),
+        resource_evidence=ImageLocalResourceEvidence(
+            elapsed_milliseconds=3,
+            device_kind="cpu",
+            measured_peak_memory_bytes=4096,
+        ),
+    )
+
+
+def selected_image_activation_state(manifest: ProductionManifest) -> tuple[object, ...]:
+    """Return the complete selected state that image failures must preserve."""
+
+    return (
+        manifest.active_project,
+        manifest.active_registry,
+        manifest.active_dependency_graph,
+        manifest.active_render_state,
+        manifest.dependency_states,
+    )
+
+
+def _p7_attempts(manifest: ProductionManifest) -> tuple[StateCommitAttempt, ...]:
+    return tuple(
+        item for item in manifest.attempts if item.operation == "image_generation"
+    )
+
+
+def _make_manifest_25_voice_context(tmp_path: Path):
+    base_inputs = project_factory.make_p7_public_image_generation_base(tmp_path)
+    committer = ProductionStateCommitter(
+        tmp_path,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    )
+    request, preview, authorization = make_image_call_bundle(
+        tmp_path,
+        attempt_id="image-before-voice",
+    )
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate,
+                candidate_authorization,
+                project_factory._p7_png(),
+            )
+
+    before = committer.generate_image_asset(
+        request,
+        preview,
+        authorization,
+        _Provider(),
+    )
+    assert before.schema_version == "2.5"
+    return tmp_path, committer, before, base_inputs
+
+
+def _make_manifest_25_voice_base(
+    tmp_path: Path,
+) -> tuple[Path, ProductionStateCommitter, ProductionManifest]:
+    root, committer, before, _ = _make_manifest_25_voice_context(tmp_path)
+    return root, committer, before
+
+
+def _attach_manifest_25_voice_dependency_transition(
+    root: Path,
+    activation: StateCommitRequest,
+    base_inputs,
+    voice_request,
+) -> StateCommitRequest:
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+
+    manifest = read_manifest(root)
+    project_artifact = next(
+        item
+        for item in activation.artifacts
+        if item.relative_path == activation.next_project.path
+    )
+    registry_artifact = next(
+        item
+        for item in activation.artifacts
+        if item.relative_path == activation.next_registry.path
+    )
+    project = ProductionProject.model_validate(yaml.safe_load(project_artifact.payload))
+    registry = AssetRegistrySnapshot.model_validate_json(registry_artifact.payload)
+    candidate_manifest = manifest.model_copy(
+        update={
+            "active_project": activation.next_project,
+            "active_registry": activation.next_registry,
+        }
+    )
+    active_bundle = load_production_project(root / "project.yaml")
+    candidate_bundle = active_bundle.model_copy(
+        update={
+            "manifest": candidate_manifest,
+            "project": project,
+            "registry": registry,
+            "dependency_graph": None,
+            "render_state": None,
+        }
+    )
+    candidate_inputs = replace(
+        base_inputs,
+        project=candidate_bundle,
+        voice_requests=(voice_request,),
+    )
+    graph = build_production_dependency_graph(candidate_inputs)
+    states = resolve_dependency_state(
+        graph,
+        build_applied_dependency_evidence(candidate_inputs, None),
+    ).states
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=activation.expected_manifest_revision,
+        base_dependency_graph=manifest.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=states,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    graph_payload = _canonical_json_bytes(graph)
+    graph_artifact = PreparedArtifact(
+        transition.candidate_dependency_graph.path,
+        graph_payload,
+        hashlib.sha256(graph_payload).hexdigest(),
+    )
+    return replace(
+        activation,
+        artifacts=tuple(
+            sorted(
+                (*activation.artifacts, graph_artifact),
+                key=lambda item: item.relative_path.as_posix(),
+            )
+        ),
+        dependency_graph_transition=transition,
+    )
+
+
+def _make_manifest_25_voice_activation(
+    tmp_path: Path,
+) -> tuple[
+    Path,
+    ProductionStateCommitter,
+    ProductionManifest,
+    StateCommitRequest,
+    tuple[str, ...],
+    tuple[str, ...],
+]:
+    root, committer, before, base_inputs = _make_manifest_25_voice_context(tmp_path)
+    request = project_factory.make_voice_request(root)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+    committer.begin_voice_generation(
+        request,
+        preview,
+        authorization,
+        dependency_transition_preparer_available=True,
+    )
+    committer.record_voice_submit_intent(request, preview, authorization)
+    submitted = read_manifest(root)
+    activation, audio_ids = project_factory.make_voice_activation_request(
+        root,
+        request,
+        authorization,
+        expected_manifest_revision=submitted.manifest_revision,
+        include_caption=True,
+    )
+    activation = _attach_manifest_25_voice_dependency_transition(
+        root,
+        activation,
+        base_inputs,
+        request,
+    )
+    caption_ids = (f"caption-{request.attempt_id}",)
+    return root, committer, before, activation, audio_ids, caption_ids
+
+
+def make_qa_policy(
+    *, version: str = "1", repair_authorities: tuple[ActorIdentity, ...] = ()
+) -> QaPolicy:
+    return seal_artifact(
+        QaPolicy(
+            artifact_id=f"qa-policy-{version}",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id=f"qa-policy-{version}",
+            source_provenance=(
+                SourceReference(kind="derived", reference="p6-test-fixture"),
+            ),
+            policy_id="qa-default",
+            policy_version=version,
+            required_layers=(QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.STRATEGY),
+            technical_thresholds=QaTechnicalThresholds(
+                black_luma_max_milli=10,
+                silence_peak_max_millidb=-60_000,
+                clipping_peak_min_millidb=-100,
+            ),
+            layout_rules=QaLayoutRules(
+                safe_area_inset_milli=50,
+                caption_overflow_tolerance_milli=0,
+            ),
+            strategy_rules_version="1",
+            semantic_requirement="optional",
+            repair_authorities=repair_authorities,
+        )
+    )
+
+
+def test_p6_policy_activation_migrates_23_and_exact_replay_is_noop(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    before = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    writer = ProductionStateCommitter(tmp_path)
+    committed = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    assert committed.schema_version == "2.4"
+    assert committed.active_dependency_graph == before.active_dependency_graph
+    assert committed.dependency_states == before.dependency_states
+    assert committed.active_qa_policy is not None
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.qa_policy == make_qa_policy()
+
+    replay = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    assert replay == committed
+
+
+def test_review_request_is_consumed_once_before_analysis(tmp_path: Path) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before = read_manifest(tmp_path)
+    current = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-review-consume",
+    )
+    assert current.active_dependency_graph is not None
+    assert current.active_qa_policy is not None
+    render_hash = "9" * 64
+    render_pointer = RenderStateSnapshotPointer(
+        path=Path(f"state/render/states/{render_hash}.json"),
+        revision=1,
+        content_hash=render_hash,
+        file_sha256="8" * 64,
+    )
+    context = TechnicalReviewContext(
+        render_output_sha256="7" * 64,
+        timeline_fingerprint="6" * 64,
+        windows=(TechnicalReviewWindow(
+            shot_id="shot-1",
+            visual_strategy=VisualStrategy.STATIC_IMAGE,
+            start_frame=0,
+            end_frame_exclusive=24,
+            expects_audio=False,
+            visual_span_ids=("visual-1",),
+        ),),
+        measurement_contract_version="1",
+    )
+    request = seal_artifact(
+        ReviewRequest(
+            artifact_id="review-request-once",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="review-request-once",
+            source_provenance=(
+                SourceReference(kind="derived", reference="p6-test-fixture"),
+            ),
+            request_id="review-request-once",
+            base_manifest_revision=current.manifest_revision,
+            dependency_graph=current.active_dependency_graph,
+            dependency_states_hash=canonical_sha256(
+                {"dependency_states": [
+                    item.model_dump(mode="json")
+                    for item in current.dependency_states
+                ]}
+            ),
+            render_state=render_pointer,
+            render_output_sha256=context.render_output_sha256,
+            timeline_fingerprint=context.timeline_fingerprint,
+            qa_policy=current.active_qa_policy,
+            requested_layers=(QaLayer.TECHNICAL,),
+            evidence_tool_identities=(ToolIdentity(name="video-analysis", version="1"),),
+            technical_context=context,
+        )
+    )
+    payload = _canonical_json_bytes(request)
+    request_path = canonical_review_request_path(request.content_hash)
+    absolute_request_path = tmp_path / request_path
+    absolute_request_path.parent.mkdir(parents=True, exist_ok=True)
+    absolute_request_path.write_bytes(payload)
+    pointer = ReviewRequestPointer(
+        path=request_path,
+        request_id=request.request_id,
+        content_hash=request.content_hash,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    running = StateCommitAttempt(
+        attempt_id="review-attempt-once",
+        operation="review",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=current.manifest_revision,
+        base_project=current.active_project,
+        base_registry=current.active_registry,
+        candidate_artifacts_hash="5" * 64,
+        review_request=pointer,
+        review_phase=ReviewAttemptPhase.REQUESTED,
+        started_at="2026-08-17T00:00:00Z",
+    )
+    begun = current.model_copy(
+        update={
+            "manifest_revision": current.manifest_revision + 1,
+            "attempts": current.attempts + (running,),
+        }
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        begun.model_dump_json(indent=2), encoding="utf-8"
+    )
+
+    def analyze(review_request, permit):
+        assert permit._consume_review_analysis_permit(
+            request_content_hash=review_request.content_hash,
+            render_output_sha256=review_request.render_output_sha256,
+            technical_context_hash=canonical_sha256(
+                review_request.technical_context.model_dump(mode="json")
+            ),
+        )
+        assert not permit._consume_review_analysis_permit(
+            request_content_hash=review_request.content_hash,
+            render_output_sha256=review_request.render_output_sha256,
+            technical_context_hash=canonical_sha256(
+                review_request.technical_context.model_dump(mode="json")
+            ),
+        )
+        return review_request
+
+    consumed = writer.run_review_analysis(
+        review_request=pointer,
+        expected_manifest_revision=begun.manifest_revision,
+        analyzer=analyze,
+    )
+    after = read_manifest(tmp_path)
+    assert consumed == request
+    assert after.attempts[-1].review_phase.value == "evidence"
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.run_review_analysis(
+            review_request=pointer,
+            expected_manifest_revision=after.manifest_revision,
+            analyzer=analyze,
+        )
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+
+
+def test_begin_review_rejects_forged_context_before_any_write(
+    tmp_path: Path, monkeypatch
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before = read_manifest(tmp_path)
+    current = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-context-validation",
+    )
+    inputs, applied = project_factory.make_p5_selective_rebuild_fixture(tmp_path)
+    render_pointer = RenderStateSnapshotPointer(
+        path=Path(f"state/render/states/{'9' * 64}.json"),
+        revision=1,
+        content_hash="9" * 64,
+        file_sha256="8" * 64,
+    )
+    current = current.model_copy(update={"active_render_state": render_pointer})
+    (tmp_path / "state/manifest.json").write_text(
+        current.model_dump_json(indent=2), encoding="utf-8"
+    )
+    bundle = inputs.project.model_copy(update={"manifest": current})
+    render_state = SimpleNamespace(
+        output=SimpleNamespace(file_sha256=applied.render_state.output.file_sha256),
+        timeline_fingerprint=applied.timeline.composition_fingerprint,
+    )
+    monkeypatch.setattr(
+        state_commit,
+        "load_production_project",
+        lambda path: bundle.model_copy(update={"manifest": read_manifest(tmp_path)}),
+    )
+    monkeypatch.setattr(
+        ProductionStateCommitter,
+        "_current_render_state",
+        lambda self, manifest: render_state,
+    )
+    monkeypatch.setattr(
+        ProductionStateCommitter,
+        "_current_resolved_timeline",
+        lambda self, render: applied.timeline,
+    )
+    context = build_technical_review_context(
+        bundle,
+        applied.timeline,
+        render_output_sha256=render_state.output.file_sha256,
+        measurement_contract_version="1",
+    )
+
+    def make_request(review_context: TechnicalReviewContext) -> ReviewRequest:
+        return seal_artifact(
+            ReviewRequest(
+                artifact_id="review-context-validation",
+                revision=1,
+                content_hash=ZERO_HASH,
+                creation_receipt_id="review-context-validation",
+                source_provenance=(
+                    SourceReference(kind="derived", reference="p6-test-fixture"),
+                ),
+                request_id="review-context-validation",
+                base_manifest_revision=current.manifest_revision,
+                dependency_graph=current.active_dependency_graph,
+                dependency_states_hash=canonical_sha256(
+                    {"dependency_states": [
+                        item.model_dump(mode="json")
+                        for item in current.dependency_states
+                    ]}
+                ),
+                render_state=render_pointer,
+                render_output_sha256=render_state.output.file_sha256,
+                timeline_fingerprint=render_state.timeline_fingerprint,
+                qa_policy=current.active_qa_policy,
+                requested_layers=(QaLayer.TECHNICAL,),
+                evidence_tool_identities=(
+                    ToolIdentity(name="video-analysis", version="1"),
+                ),
+                technical_context=review_context,
+            )
+        )
+
+    forged_window = context.windows[0].model_copy(
+        update={"visual_strategy": VisualStrategy.GENERATED_VIDEO}
+    )
+    forged_request = make_request(
+        context.model_copy(update={"windows": (forged_window, *context.windows[1:])})
+    )
+    before_rejection = read_manifest(tmp_path)
+
+    with pytest.raises(AiVideoError, match="Shot/timeline truth"):
+        writer.begin_review(forged_request, attempt_id="review-forged-context")
+
+    assert read_manifest(tmp_path) == before_rejection
+    assert not (tmp_path / canonical_review_request_path(forged_request.content_hash)).exists()
+    valid_request = make_request(context)
+    begun = writer.begin_review(valid_request, attempt_id="review-valid-context")
+    review_pointer = begun.attempts[-1].review_request
+    assert review_pointer is not None
+
+    def analyze(review_request, permit):
+        assert permit._consume_review_analysis_permit(
+            request_content_hash=review_request.content_hash,
+            render_output_sha256=review_request.render_output_sha256,
+            technical_context_hash=canonical_sha256(
+                review_request.technical_context.model_dump(mode="json")
+            ),
+        )
+        return "measured"
+
+    assert writer.run_review_analysis(
+        review_request=review_pointer,
+        expected_manifest_revision=begun.manifest_revision,
+        analyzer=analyze,
+    ) == "measured"
+    measured_manifest = read_manifest(tmp_path)
+    tool = valid_request.evidence_tool_identities[0]
+    evidence = seal_artifact(
+        ReviewEvidence(
+            artifact_id="technical-evidence-valid",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="technical-evidence-valid",
+            source_provenance=(
+                SourceReference(kind="derived", reference="video-analysis"),
+            ),
+            evidence_id="technical-evidence-valid",
+            layer=QaLayer.TECHNICAL,
+            strength=EvidenceStrength.MEASURED,
+            render_output_sha256=valid_request.render_output_sha256,
+            timeline_fingerprint=valid_request.timeline_fingerprint,
+            dependency_graph_revision_id=valid_request.dependency_graph.revision_id,
+            tool_identity=tool,
+            measurement_contract_version="1",
+            subject_ids=tuple(item.shot_id for item in context.windows),
+            measured_payload={
+                "coverage_complete": True,
+                "minimum_luma_milli": 500,
+                "audio_peak_millidb": -1000,
+                "expects_audio": any(item.expects_audio for item in context.windows),
+                "windows": [
+                    {
+                        "status": "measured",
+                        "visual_strategy": item.visual_strategy.value,
+                        "unique_frame_count": 1,
+                    }
+                    for item in context.windows
+                ],
+            },
+        )
+    )
+    evidence_payload = _canonical_json_bytes(evidence)
+    evidence_pointer = ReviewEvidencePointer(
+        path=canonical_review_evidence_path(evidence.content_hash),
+        evidence_id=evidence.evidence_id,
+        layer=evidence.layer,
+        strength=evidence.strength,
+        content_hash=evidence.content_hash,
+        file_sha256=hashlib.sha256(evidence_payload).hexdigest(),
+    )
+    receipt = seal_artifact(
+        ReviewReceipt(
+            artifact_id="technical-review-valid",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="technical-review-valid",
+            source_provenance=(
+                SourceReference(kind="derived", reference=evidence.evidence_id),
+            ),
+            review_id="technical-review-valid",
+            layer=QaLayer.TECHNICAL,
+            review_request=review_pointer,
+            render_state=valid_request.render_state,
+            render_output_sha256=valid_request.render_output_sha256,
+            timeline_fingerprint=valid_request.timeline_fingerprint,
+            dependency_graph_revision_id=valid_request.dependency_graph.revision_id,
+            qa_policy=valid_request.qa_policy,
+            evidence=(evidence_pointer,),
+            evidence_ids=(evidence.evidence_id,),
+            tool_identities=(tool,),
+            verdict=QaVerdict.PASS,
+        )
+    )
+    reviewed = writer.record_review_receipt(
+        receipt,
+        (evidence,),
+        expected_manifest_revision=measured_manifest.manifest_revision,
+        attempt_id="review-valid-context",
+    )
+    assert reviewed.review_states[-1].lifecycle.value == "fresh"
+
+
+def test_unapproved_repair_is_rejected_before_any_commit_attempt(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before_policy = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    current = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before_policy.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    request = project_factory.make_revision_two_request(
+        tmp_path, attempt_id="unapproved-repair"
+    )
+    request = replace(request, operation="repair")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.commit(request)
+
+    assert exc_info.value.code is ErrorCode.REPAIR_AUTHORIZATION_REQUIRED
+    after = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    assert after == current
+    assert not any(item.attempt_id == "unapproved-repair" for item in after.attempts)
+
+
+def test_caller_signed_repair_approval_is_rejected_without_trusted_authorizer(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    trusted = ActorIdentity(actor_id="human-reviewer", actor_kind="human")
+    writer = ProductionStateCommitter(tmp_path)
+    before = read_manifest(tmp_path)
+    current = writer.activate_qa_policy(
+        make_qa_policy(repair_authorities=(trusted,)),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-repair-authority",
+    )
+    assert current.active_dependency_graph is not None
+    assert current.active_qa_policy is not None
+    actor = ActorIdentity(actor_id="codex", actor_kind="codex")
+    action = RepairAction(kind="caption_layout", parameters_fingerprint="4" * 64)
+    target = current.dependency_states[0].node_id
+    scope = canonical_sha256(
+        {
+            "repair_id": "repair-self-signed",
+            "actor": actor.model_dump(mode="json"),
+            "action": action.model_dump(mode="json"),
+            "target_artifact_ids": ["caption-1"],
+            "target_node_ids": [target],
+            "expected_invalidation_node_ids": [target],
+        }
+    )
+    render_hash = "9" * 64
+    request = seal_artifact(
+        RepairRequest(
+            artifact_id="repair-request-self-signed",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="repair-request-self-signed",
+            source_provenance=(
+                SourceReference(kind="derived", reference="p6-test-fixture"),
+            ),
+            repair_id="repair-self-signed",
+            base_manifest_revision=current.manifest_revision,
+            dependency_graph=current.active_dependency_graph,
+            dependency_states_hash=canonical_sha256(
+                {"dependency_states": [
+                    item.model_dump(mode="json") for item in current.dependency_states
+                ]}
+            ),
+            render_state=RenderStateSnapshotPointer(
+                path=Path(f"state/render/states/{render_hash}.json"),
+                revision=1,
+                content_hash=render_hash,
+                file_sha256="8" * 64,
+            ),
+            render_output_sha256="7" * 64,
+            timeline_fingerprint="6" * 64,
+            qa_policy=current.active_qa_policy,
+            review_receipt_ids=("review-1",),
+            issue_ids=("caption-overflow",),
+            evidence_ids=("evidence-1",),
+            root_cause_hypothesis="caption box exceeds safe area",
+            selected_repair_action=action,
+            exact_target_artifact_ids=("caption-1",),
+            exact_target_node_ids=(target,),
+            expected_invalidation_node_ids=(target,),
+            actor=actor,
+            authorization=RepairAuthorization(
+                authorization_id="caller-signed",
+                authorized=True,
+                authorized_by=trusted,
+                scope_fingerprint=scope,
+            ),
+            before_fingerprints=(
+                NamedFingerprint(name="caption", fingerprint="3" * 64),
+            ),
+        )
+    )
+    receipt = seal_artifact(
+        ApprovedRepairReceipt.model_validate(
+            {
+                **request.model_dump(mode="python"),
+                "artifact_id": "approved-repair-self-signed",
+                "content_hash": ZERO_HASH,
+                "request_content_hash": request.content_hash,
+            }
+        )
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.record_approved_repair_receipt(
+            request,
+            receipt,
+            expected_manifest_revision=current.manifest_revision,
+            attempt_id="approve-self-signed",
+        )
+
+    assert exc_info.value.code is ErrorCode.REPAIR_AUTHORIZATION_REQUIRED
+    assert read_manifest(tmp_path).active_approved_repair is None
+
+
+def test_manifest_24_preserves_p5_transition_support(tmp_path: Path) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    current = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    request = project_factory.make_revision_two_request(
+        tmp_path, attempt_id="manifest-24-p5-transition"
+    )
+    request, _ = project_factory.attach_p5_dependency_transition(tmp_path, request)
+
+    committed = writer.commit(request)
+
+    assert committed.schema_version == "2.4"
+    assert committed.active_dependency_graph == request.dependency_graph_transition.candidate_dependency_graph
+    assert committed.active_qa_policy == current.active_qa_policy
+
+
+def test_recovery_reports_active_and_historical_p6_policy(tmp_path: Path) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    manifest = ProductionManifest.model_validate_json(
+        (tmp_path / "state/manifest.json").read_bytes()
+    )
+    first = writer.activate_qa_policy(
+        make_qa_policy(version="1"),
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="qa-policy-1",
+    )
+    first_path = first.active_qa_policy.path
+    second = writer.activate_qa_policy(
+        make_qa_policy(version="2"),
+        expected_manifest_revision=first.manifest_revision,
+        attempt_id="qa-policy-2",
+    )
+
+    report = writer.recover()
+    dispositions = {item.path: item.disposition for item in report.items}
+    assert dispositions[second.active_qa_policy.path] is RecoveryDisposition.ACTIVE
+    assert dispositions[first_path] is RecoveryDisposition.ORPHAN_PRESERVED
+
+
+def test_p6_post_replace_process_interrupt_maps_to_outcome_unknown(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    before = read_manifest(tmp_path)
+    writer = ProductionStateCommitter(
+        tmp_path,
+        crash_injector=ProcessInterruptInjector(
+            CommitPhase.AFTER_MANIFEST_REPLACE, 1, KeyboardInterrupt
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.activate_qa_policy(
+            make_qa_policy(),
+            expected_manifest_revision=before.manifest_revision,
+            attempt_id="qa-policy-post-replace-interrupt",
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert read_manifest(tmp_path).schema_version == "2.4"
+
+
+def test_image_lifecycle_persists_exact_r1_then_mints_one_use_r2_permit(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before = read_manifest(tmp_path)
+
+    r1 = writer.begin_image_generation(request, preview, authorization)
+
+    assert r1.schema_version == "2.5"
+    assert r1.manifest_revision == before.manifest_revision + 1
+    attempt = r1.attempts[-1]
+    assert attempt.operation == "image_generation"
+    assert attempt.status is StateCommitStatus.RUNNING
+    assert attempt.image_phase == "request"
+    assert attempt.base_project == before.active_project
+    assert attempt.base_registry == before.active_registry
+    assert attempt.base_dependency_graph == before.active_dependency_graph
+    assert attempt.image_request is not None
+    assert attempt.image_request.request_fingerprint == request.request_fingerprint
+    assert (tmp_path / canonical_image_request_path(request.request_fingerprint)).read_bytes() == _canonical_json_bytes(request)
+    assert (tmp_path / canonical_image_preview_path(preview.preview_fingerprint)).read_bytes() == _canonical_json_bytes(preview)
+    assert (tmp_path / canonical_image_authorization_path(authorization.authorization_fingerprint)).read_bytes() == _canonical_json_bytes(authorization)
+
+    permit = writer.record_image_submit_intent(request, preview, authorization)
+
+    r2 = read_manifest(tmp_path)
+    assert r2.manifest_revision == r1.manifest_revision + 1
+    assert r2.attempts[-1].image_phase == "submit_intent"
+    intent_path = tmp_path / canonical_image_submit_intent_path(
+        request.request_fingerprint
+    )
+    intent_bytes = intent_path.read_bytes()
+    assert intent_bytes.endswith(b"\n")
+    intent = json.loads(intent_bytes)
+    assert intent == {
+        "attempt_id": request.attempt_id,
+        "authorization_fingerprint": authorization.authorization_fingerprint,
+        "base_dependency_graph": request.base_dependency_graph.model_dump(mode="json"),
+        "base_project": request.base_project.model_dump(mode="json"),
+        "base_registry": request.base_registry.model_dump(mode="json"),
+        "evidence_hash": attempt.candidate_artifacts_hash,
+        "policy_receipt_id": authorization.policy_receipt_id,
+        "preview_fingerprint": preview.preview_fingerprint,
+        "request_fingerprint": request.request_fingerprint,
+        "schema": "ai-video-image-submit-intent/1",
+        "usage_license": authorization.usage_license,
+    }
+    assert permit._validate_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+    assert not permit._validate_image_generation_permit(
+        request_fingerprint="f" * 64
+    )
+    with pytest.raises(TypeError):
+        permit._validate_image_generation_permit(  # type: ignore[call-arg]
+            request_fingerprint=request.request_fingerprint,
+            attempt_id=request.attempt_id,
+        )
+    with pytest.raises(TypeError):
+        pickle.dumps(permit)
+    with pytest.raises(TypeError):
+        permit._binding["request_fingerprint"] = "f" * 64  # type: ignore[index]
+    assert permit._consume_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+    assert not permit._consume_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+
+
+def test_image_submit_intent_requires_current_r1_and_cannot_remint(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+
+    with pytest.raises(AiVideoError) as missing:
+        writer.record_image_submit_intent(request, preview, authorization)
+    assert missing.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+
+    writer.begin_image_generation(request, preview, authorization)
+    writer.record_image_submit_intent(request, preview, authorization)
+    with pytest.raises(AiVideoError) as replay:
+        writer.record_image_submit_intent(request, preview, authorization)
+    assert replay.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+
+
+def test_image_r1_exact_replay_is_noop_but_reused_attempt_id_is_rejected(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    first = writer.begin_image_generation(request, preview, authorization)
+
+    assert writer.begin_image_generation(request, preview, authorization) == first
+
+    changed, changed_preview, changed_authorization = make_image_call_bundle(
+        tmp_path,
+        attempt_id=request.attempt_id,
+        prompt_text="Hero enters a different archive room",
+    )
+    with pytest.raises(AiVideoError) as reused:
+        writer.begin_image_generation(
+            changed, changed_preview, changed_authorization
+        )
+    assert reused.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path) == first
+
+
+def test_image_r1_rejects_another_unresolved_attempt(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    first = make_image_call_bundle(tmp_path, attempt_id="image-attempt-1")
+    second = make_image_call_bundle(tmp_path, attempt_id="image-attempt-2")
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_image_generation(*first)
+
+    with pytest.raises(AiVideoError) as unresolved:
+        writer.begin_image_generation(*second)
+
+    assert unresolved.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+
+
+@pytest.mark.parametrize("pointer_name", ["project", "registry", "graph"])
+def test_image_r1_rejects_stale_base_identity(
+    tmp_path: Path,
+    pointer_name: str,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.manifest.active_dependency_graph is not None
+    overrides = {
+        "base_project": loaded.manifest.active_project,
+        "base_registry": loaded.manifest.active_registry,
+        "base_dependency_graph": loaded.manifest.active_dependency_graph,
+    }
+    key = {
+        "project": "base_project",
+        "registry": "base_registry",
+        "graph": "base_dependency_graph",
+    }[pointer_name]
+    overrides[key] = overrides[key].model_copy(update={"file_sha256": "f" * 64})
+    bundle = make_image_call_bundle(tmp_path, **overrides)
+
+    with pytest.raises(AiVideoError) as stale:
+        ProductionStateCommitter(tmp_path).begin_image_generation(*bundle)
+
+    assert stale.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path).schema_version == "2.3"
+
+
+@pytest.mark.parametrize("mutation", ["remote_preview", "authorization", "reference_bytes"])
+def test_image_r1_rejects_nonlocal_or_changed_evidence(
+    tmp_path: Path,
+    mutation: str,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(
+        tmp_path,
+        reference_total_bytes_delta=1 if mutation == "reference_bytes" else 0,
+    )
+    if mutation == "remote_preview":
+        preview = preview.model_copy(update={"local_only": False, "remote": True})
+    elif mutation == "authorization":
+        authorization = authorization.model_copy(
+            update={"usage_license": "changed-license"}
+        )
+
+    with pytest.raises(AiVideoError) as invalid:
+        ProductionStateCommitter(tmp_path).begin_image_generation(
+            request, preview, authorization
+        )
+
+    assert invalid.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path).schema_version == "2.3"
+
+
+def test_image_r2_rejects_tampered_r1_evidence_without_advancing_manifest(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    r1 = writer.begin_image_generation(request, preview, authorization)
+    (tmp_path / canonical_image_preview_path(preview.preview_fingerprint)).write_bytes(
+        b"{}\n"
+    )
+
+    with pytest.raises(AiVideoError) as tampered:
+        writer.record_image_submit_intent(request, preview, authorization)
+
+    assert tampered.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path) == r1
+    assert not (
+        tmp_path / canonical_image_submit_intent_path(request.request_fingerprint)
+    ).exists()
+
+
+def test_image_r2_rejects_changed_sealed_license_policy_binding(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    r1 = writer.begin_image_generation(request, preview, authorization)
+    changed = ImageGenerationAuthorization.create(
+        request=request,
+        preview=preview,
+        usage_license="different-fixture-license",
+        policy_receipt_id="different-local-image-policy",
+    )
+
+    with pytest.raises(AiVideoError) as mismatch:
+        writer.record_image_submit_intent(request, preview, changed)
+
+    assert mismatch.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert read_manifest(tmp_path) == r1
+    assert not (
+        tmp_path / canonical_image_submit_intent_path(request.request_fingerprint)
+    ).exists()
+
+
+@pytest.mark.parametrize("drift", ["manifest", "authorization"])
+def test_image_submit_permit_invalidates_on_durable_state_drift(
+    tmp_path: Path,
+    drift: str,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_image_generation(request, preview, authorization)
+    permit = writer.record_image_submit_intent(request, preview, authorization)
+    if drift == "manifest":
+        manifest = read_manifest(tmp_path)
+        (tmp_path / "state/manifest.json").write_text(
+            manifest.model_dump_json(indent=2), encoding="utf-8"
+        )
+    else:
+        (
+            tmp_path
+            / canonical_image_authorization_path(
+                authorization.authorization_fingerprint
+            )
+        ).write_bytes(b"{}\n")
+
+    assert not permit._validate_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+    assert not permit._consume_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+
+
+@pytest.mark.parametrize("snapshot_kind", ["project", "registry", "graph"])
+def test_image_submit_permit_reopens_selected_base_snapshot_bytes(
+    tmp_path: Path,
+    snapshot_kind: str,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    writer.begin_image_generation(request, preview, authorization)
+    permit = writer.record_image_submit_intent(request, preview, authorization)
+    pointer = {
+        "project": request.base_project,
+        "registry": request.base_registry,
+        "graph": request.base_dependency_graph,
+    }[snapshot_kind]
+    (tmp_path / pointer.path).write_bytes(b"{}\n")
+
+    with pytest.raises(AiVideoError):
+        load_production_project(tmp_path / "project.yaml")
+    assert not permit._validate_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+    assert not permit._consume_image_generation_permit(
+        request_fingerprint=request.request_fingerprint
+    )
+
+
+def test_image_r1_composes_24_into_25_without_losing_p6_state(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    current = read_manifest(tmp_path)
+    p6 = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=current.manifest_revision,
+        attempt_id="qa-policy-before-image",
+    )
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+
+    p7 = writer.begin_image_generation(request, preview, authorization)
+
+    assert p7.schema_version == "2.5"
+    assert p7.active_qa_policy == p6.active_qa_policy
+    assert p7.active_review_receipts == p6.active_review_receipts
+    assert p7.review_states == p6.review_states
+    assert p7.active_approved_repair == p6.active_approved_repair
+    assert p7.repair_outcome_receipts == p6.repair_outcome_receipts
+    assert p7.final_acceptance_state == p6.final_acceptance_state
+
+
+def test_image_r1_preserves_existing_25_attempt_history(tmp_path: Path) -> None:
+    project_factory.make_p7_committed_project(tmp_path)
+    before = read_manifest(tmp_path)
+    request, preview, authorization = make_image_call_bundle(
+        tmp_path,
+        attempt_id="image-attempt-after-success",
+        prompt_text="Hero returns to the archive room",
+    )
+
+    after = ProductionStateCommitter(tmp_path).begin_image_generation(
+        request, preview, authorization
+    )
+
+    assert after.schema_version == "2.5"
+    assert after.attempts[:-1] == before.attempts
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+    assert after.active_dependency_graph == before.active_dependency_graph
+
+
+def test_dependency_result_and_generic_transition_support_manifest_25(
+    tmp_path: Path,
+) -> None:
+    from ai_video.production.dependency import desired_fingerprints
+
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    writer = ProductionStateCommitter(
+        tmp_path,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    )
+    before_policy = read_manifest(tmp_path)
+    p6 = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before_policy.manifest_revision,
+        attempt_id="qa-policy-before-dependency-result",
+    )
+    request, preview, authorization = make_image_call_bundle(
+        tmp_path,
+        attempt_id="image-before-dependency-result",
+    )
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate,
+                candidate_authorization,
+                project_factory._p7_png(),
+            )
+
+    image = writer.generate_image_asset(
+        request, preview, authorization, _Provider()
+    )
+    loaded = load_production_project(tmp_path / "project.yaml")
+    graph = loaded.dependency_graph
+    assert graph is not None
+    nodes = {item.node_id: item for item in graph.nodes}
+    stale = next(
+        state
+        for state in image.dependency_states
+        if state.lifecycle is DependencyLifecycle.STALE
+        and nodes[state.node_id].kind is DependencyNodeKind.ASSET
+    )
+    node = nodes[stale.node_id]
+    evidence = RegistryDependencyEvidence(
+        owner="registry_snapshot",
+        pointer=image.active_registry,
+        artifact_id=node.artifact_id,
+        artifact_fingerprint=stale.desired_fingerprint,
+    )
+
+    applied = writer.record_dependency_node_applied(
+        expected_manifest_revision=image.manifest_revision,
+        active_dependency_graph=image.active_dependency_graph,
+        candidate_dependency_graph=image.active_dependency_graph,
+        node_id=stale.node_id,
+        desired_fingerprint=stale.desired_fingerprint,
+        evidence=evidence,
+    )
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=applied.manifest_revision,
+        base_dependency_graph=applied.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=applied.dependency_states,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    assert applied.schema_version == "2.5"
+    assert (
+        applied.active_project,
+        applied.active_registry,
+        applied.active_dependency_graph,
+        applied.active_render_state,
+    ) == (
+        image.active_project,
+        image.active_registry,
+        image.active_dependency_graph,
+        image.active_render_state,
+    )
+    assert applied.dependency_states != image.dependency_states
+    validated, reopened_graph = writer._validate_dependency_transition(
+        applied,
+        expected_manifest_revision=applied.manifest_revision,
+        artifacts=(),
+        transition=transition,
+    )
+
+    assert validated == transition
+    assert reopened_graph == graph
+    assert applied.schema_version == "2.5"
+    assert tuple(
+        item for item in applied.attempts if item.operation == "image_generation"
+    ) == tuple(
+        item for item in image.attempts if item.operation == "image_generation"
+    )
+    assert (
+        applied.active_project,
+        applied.active_registry,
+        applied.active_dependency_graph,
+    ) == (
+        image.active_project,
+        image.active_registry,
+        image.active_dependency_graph,
+    )
+    assert (
+        applied.active_qa_policy,
+        applied.active_review_receipts,
+        applied.review_states,
+        applied.active_approved_repair,
+        applied.repair_outcome_receipts,
+        applied.final_acceptance_state,
+    ) == (
+        p6.active_qa_policy,
+        p6.active_review_receipts,
+        p6.review_states,
+        p6.active_approved_repair,
+        p6.repair_outcome_receipts,
+        p6.final_acceptance_state,
+    )
+
+
+def test_manifest_25_voice_intent_and_submit_preserve_p7_state(
+    tmp_path: Path,
+) -> None:
+    root, committer, before = _make_manifest_25_voice_base(tmp_path)
+    request = project_factory.make_voice_request(root)
+    preview, authorization = project_factory.make_voice_preview_and_authorization(request)
+
+    intent = committer.begin_voice_generation(
+        request,
+        preview,
+        authorization,
+        dependency_transition_preparer_available=True,
+    )
+    permit = committer.record_voice_submit_intent(request, preview, authorization)
+    submitted = load_production_project(root / "project.yaml").manifest
+
+    assert intent.schema_version == submitted.schema_version == "2.5"
+    assert _p7_attempts(submitted) == _p7_attempts(before)
+    assert submitted.active_project == before.active_project
+    assert permit is not None
+
+
+def test_manifest_25_voice_activation_coactivates_exact_graph_and_preserves_p7_state(
+    tmp_path: Path,
+) -> None:
+    root, committer, before, activation, audio_ids, caption_ids = (
+        _make_manifest_25_voice_activation(tmp_path)
+    )
+    after = committer.activate_voice_assets(
+        activation,
+        audio_asset_ids=audio_ids,
+        caption_asset_ids=caption_ids,
+    )
+
+    assert after.schema_version == "2.5"
+    assert _p7_attempts(after) == _p7_attempts(before)
+    assert after.active_project == before.active_project
+    assert after.active_registry != before.active_registry
+    assert after.active_dependency_graph != before.active_dependency_graph
+
+
+def test_generate_image_asset_persists_candidate_then_atomically_activates(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    base_project = load_production_project(tmp_path / "project.yaml")
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+
+    class _Provider:
+        calls = 0
+        result = None
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert candidate == request
+            assert candidate_authorization == authorization
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            assert not permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            self.result = make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+            return self.result
+
+    class _RecordingCommitter(ProductionStateCommitter):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.written_manifests = []
+
+        def _write_manifest_atomic(self, manifest, *, on_replace=None):
+            self.written_manifests.append(manifest)
+            return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    provider = _Provider()
+    writer = _RecordingCommitter(
+        tmp_path,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    )
+
+    final = writer.generate_image_asset(request, preview, authorization, provider)
+
+    assert provider.calls == 1
+    candidate, activated = writer.written_manifests[-2:]
+    assert (candidate.active_project, candidate.active_registry, candidate.active_dependency_graph) == (
+        base_project.manifest.active_project,
+        base_project.manifest.active_registry,
+        base_project.manifest.active_dependency_graph,
+    )
+    assert candidate.attempts[-1].image_phase == "candidate"
+    assert candidate.attempts[-1].status is StateCommitStatus.RUNNING
+    assert activated == final
+    assert activated.attempts[-1].image_phase == "activate"
+    assert activated.attempts[-1].status is StateCommitStatus.SUCCEEDED
+    assert (
+        activated.active_render_state
+        == candidate.active_render_state
+        == base_project.manifest.active_render_state
+    )
+    assert (
+        activated.active_project,
+        activated.active_registry,
+        activated.active_dependency_graph,
+    ) == (
+        candidate.attempts[-1].candidate_project,
+        candidate.attempts[-1].candidate_registry,
+        candidate.attempts[-1].candidate_dependency_graph,
+    )
+    assert provider.result is not None
+    result_path = canonical_image_result_path(provider.result.result_fingerprint)
+    result_payload = json.loads((tmp_path / result_path).read_bytes())
+    assert "image_bytes" not in result_payload
+    assert (tmp_path / canonical_image_asset_path(result_payload["image_sha256"])).read_bytes() == png_bytes
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.manifest == activated
+    active_asset = next(
+        item for item in loaded.registry.assets if item.asset_id == request.output_asset_id
+    )
+    active_shot = next(
+        item for item in loaded.shots if item.shot_id == request.target_shot_id
+    )
+    active_role = next(
+        item
+        for item in active_shot.required_asset_roles
+        if item.role == request.target_asset_role
+    )
+    assert active_role.asset_ids == (request.output_asset_id,)
+    receipt_path = canonical_image_receipt_path(active_asset.creation_receipt_id)
+    receipt_payload = json.loads((tmp_path / receipt_path).read_bytes())
+    assert receipt_payload["request_fingerprint"] == request.request_fingerprint
+    shot_path = next(
+        item.path
+        for item in loaded.project.artifacts.shots
+        if item.artifact_id == active_shot.artifact_id
+    )
+    evidence_paths = (
+        canonical_image_request_path(request.request_fingerprint),
+        result_path,
+        receipt_path,
+        active_asset.artifact_path,
+        shot_path,
+        activated.active_project.path,
+        activated.active_registry.path,
+        activated.active_dependency_graph.path,
+    )
+    assert len(evidence_paths) == len(set(evidence_paths)) == 8
+    evidence_pairs = sorted(
+        (
+            path.as_posix(),
+            hashlib.sha256((tmp_path / path).read_bytes()).hexdigest(),
+        )
+        for path in evidence_paths
+    )
+    assert activated.attempts[-1].candidate_artifacts_hash == hashlib.sha256(
+        json.dumps(evidence_pairs, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    lifecycle_by_id = {item.node_id: item.lifecycle for item in activated.dependency_states}
+    for prefix in ("composition:", "timeline:", "renderer-source:", "render:"):
+        assert all(
+            lifecycle in {DependencyLifecycle.STALE, DependencyLifecycle.BLOCKED}
+            for node_id, lifecycle in lifecycle_by_id.items()
+            if node_id.startswith(prefix)
+        )
+    assert lifecycle_by_id["asset:image-shot-2"] is DependencyLifecycle.FRESH
+
+
+def test_generate_image_asset_exact_replay_has_zero_external_or_write_work(
+    tmp_path: Path,
+) -> None:
+    """Removing the pre-write replay branch must make this counter proof fail."""
+
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+    provider_calls = 0
+    preparer_calls = 0
+    manifest_writes = 0
+    prepare = project_factory.make_p7_image_candidate_preparer(base_inputs)
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            nonlocal provider_calls
+            provider_calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    def counted_prepare(*args):
+        nonlocal preparer_calls
+        preparer_calls += 1
+        return prepare(*args)
+
+    class _CountingCommitter(ProductionStateCommitter):
+        def _write_manifest_atomic(self, manifest, *, on_replace=None):
+            nonlocal manifest_writes
+            manifest_writes += 1
+            return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    writer = _CountingCommitter(
+        tmp_path,
+        image_candidate_preparer=counted_prepare,
+    )
+    first = writer.generate_image_asset(request, preview, authorization, _Provider())
+    provider_calls = preparer_calls = manifest_writes = 0
+
+    replay = writer.generate_image_asset(request, preview, authorization, _Provider())
+
+    assert replay == first
+    assert (provider_calls, preparer_calls, manifest_writes) == (0, 0, 0)
+
+
+def test_image_activation_chronology_rejects_exact_hash_drift_and_rollback(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate,
+                candidate_authorization,
+                project_factory._p7_png(),
+            )
+
+    final = ProductionStateCommitter(
+        tmp_path,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    ).generate_image_asset(request, preview, authorization, _Provider())
+    attempt = final.attempts[-1]
+    drifted = final.model_copy(
+        update={
+            "dependency_states": (
+                final.dependency_states[0].model_copy(
+                    update={"desired_fingerprint": "f" * 64}
+                ),
+                *final.dependency_states[1:],
+            )
+        }
+    )
+
+    with pytest.raises(ValueError, match="dependency state hash mismatch"):
+        _verify_image_activation_chronology(drifted, attempt)
+    with pytest.raises(ValueError, match="predates activation"):
+        _verify_image_activation_chronology(
+            final.model_copy(update={"manifest_revision": final.manifest_revision - 1}),
+            attempt,
+        )
+
+
+def test_later_invalid_dependency_states_still_fail_standard_loader(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate,
+                candidate_authorization,
+                project_factory._p7_png(),
+            )
+
+    final = ProductionStateCommitter(
+        tmp_path,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    ).generate_image_asset(request, preview, authorization, _Provider())
+    invalid = final.model_copy(
+        update={
+            "manifest_revision": final.manifest_revision + 1,
+            "dependency_states": final.dependency_states[1:],
+        }
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        invalid.model_dump_json(indent=2), encoding="utf-8"
+    )
+
+    with pytest.raises(AiVideoError, match="dependency state"):
+        load_production_project(tmp_path / "project.yaml")
+
+
+def test_generate_image_asset_exact_replay_rejects_tampered_preview_without_work(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    provider_calls = 0
+    preparer_calls = 0
+    manifest_writes = 0
+    prepare = project_factory.make_p7_image_candidate_preparer(base_inputs)
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            nonlocal provider_calls
+            provider_calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, project_factory._p7_png()
+            )
+
+    def counted_prepare(*args):
+        nonlocal preparer_calls
+        preparer_calls += 1
+        return prepare(*args)
+
+    class _CountingCommitter(ProductionStateCommitter):
+        def _write_manifest_atomic(self, manifest, *, on_replace=None):
+            nonlocal manifest_writes
+            manifest_writes += 1
+            return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    writer = _CountingCommitter(
+        tmp_path, image_candidate_preparer=counted_prepare
+    )
+    writer.generate_image_asset(request, preview, authorization, _Provider())
+    provider_calls = preparer_calls = manifest_writes = 0
+    (tmp_path / canonical_image_preview_path(preview.preview_fingerprint)).write_bytes(
+        b"{}\n"
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.generate_image_asset(request, preview, authorization, _Provider())
+
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
+    assert (provider_calls, preparer_calls, manifest_writes) == (0, 0, 0)
+
+
+def test_generate_image_asset_rejects_nonlocal_evidence_before_provider_call(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    preview = preview.model_copy(update={"local_only": False, "remote": True})
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, *args):
+            self.calls += 1
+            raise AssertionError("Provider must not be called")
+
+    provider = _Provider()
+    before = read_manifest(tmp_path)
+    selected_before = selected_image_activation_state(before)
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, provider
+        )
+
+    assert exc_info.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert provider.calls == 0
+    assert read_manifest(tmp_path) == before
+    assert selected_image_activation_state(read_manifest(tmp_path)) == selected_before
+
+
+def test_generate_image_asset_rejects_stale_base_before_provider_call(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    request, preview, authorization = make_image_call_bundle(
+        tmp_path,
+        base_project=loaded.manifest.active_project.model_copy(
+            update={"file_sha256": "f" * 64}
+        ),
+    )
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, *args):
+            self.calls += 1
+            raise AssertionError("Provider must not be called")
+
+    provider = _Provider()
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, provider
+        )
+
+    assert exc_info.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert provider.calls == 0
+    assert selected_image_activation_state(read_manifest(tmp_path)) == selected_before
+
+
+def test_generate_image_asset_requires_provider_to_consume_exact_permit(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    result = make_image_provider_result(
+        request, authorization, project_factory._p7_png()
+    )
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            return result
+
+    provider = _Provider()
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, provider
+        )
+
+    after = read_manifest(tmp_path)
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
+    assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert after.attempts[-1].image_phase == "provider_call"
+    assert selected_image_activation_state(after) == selected_before
+    assert not (
+        tmp_path / canonical_image_result_path(result.result_fingerprint)
+    ).exists()
+
+
+def test_generate_image_asset_provider_exception_is_outcome_unknown(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            raise RuntimeError("provider transport ended ambiguously")
+
+    provider = _Provider()
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, provider
+        )
+
+    after = read_manifest(tmp_path)
+    attempt = after.attempts[-1]
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.image_phase == "provider_call"
+    assert "provider transport ended ambiguously" not in attempt.error_message
+    assert selected_image_activation_state(after) == selected_before
+
+
+def test_generate_image_asset_rejects_post_submit_evidence_drift(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    result = make_image_provider_result(
+        request, authorization, project_factory._p7_png()
+    )
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            (tmp_path / canonical_image_authorization_path(
+                candidate_authorization.authorization_fingerprint
+            )).write_bytes(b"{}\n")
+            return result
+
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).generate_image_asset(
+            request, preview, authorization, _Provider()
+        )
+
+    after = read_manifest(tmp_path)
+    attempt = after.attempts[-1]
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.image_phase == "provider_call"
+    assert selected_image_activation_state(after) == selected_before
+
+
+def test_generate_image_asset_rechecks_consumed_r2_inside_activation_lock(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    selected_before = selected_image_activation_state(read_manifest(tmp_path))
+    png_bytes = project_factory._p7_png()
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    class _BetweenChecksCommitter(ProductionStateCommitter):
+        def _activate_image_asset_locked(self, *args, **kwargs):
+            authorization_path = canonical_image_authorization_path(
+                authorization.authorization_fingerprint
+            )
+            (tmp_path / authorization_path).write_bytes(b"{}\n")
+            return super()._activate_image_asset_locked(*args, **kwargs)
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        _BetweenChecksCommitter(
+            tmp_path,
+            image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+                base_inputs
+            ),
+        ).generate_image_asset(request, preview, authorization, provider)
+
+    after = read_manifest(tmp_path)
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
+    assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert after.attempts[-1].image_phase == "materialize"
+    assert after.attempts[-1].candidate_project is None
+    assert after.attempts[-1].candidate_registry is None
+    assert after.attempts[-1].candidate_dependency_graph is None
+    assert after.attempts[-1].candidate_image_asset_ids == ()
+    assert selected_image_activation_state(after) == selected_before
+    assert not (
+        tmp_path
+        / canonical_image_result_path(
+            make_image_provider_result(
+                request, authorization, png_bytes
+            ).result_fingerprint
+        )
+    ).exists()
+
+
+def test_generate_image_asset_rejects_invalid_preparer_without_activation(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    base = read_manifest(tmp_path)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+    good_preparer = project_factory.make_p7_image_candidate_preparer(base_inputs)
+
+    def invalid_preparer(*args):
+        return replace(good_preparer(*args), candidate_graph_bytes=b"{}\n")
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(
+            tmp_path, image_candidate_preparer=invalid_preparer
+        ).generate_image_asset(request, preview, authorization, provider)
+
+    after = read_manifest(tmp_path)
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
+    assert after.attempts[-1].status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert after.attempts[-1].image_phase == "materialize"
+    assert (after.active_project, after.active_registry, after.active_dependency_graph) == (
+        base.active_project,
+        base.active_registry,
+        base.active_dependency_graph,
+    )
+    assert selected_image_activation_state(after) == selected_image_activation_state(
+        base
+    )
+
+
+def test_generate_image_asset_failure_after_candidate_keeps_candidate_inactive(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    base = read_manifest(tmp_path)
+    selected_before = selected_image_activation_state(base)
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    class _FailBeforeFinalReplaceCommitter(ProductionStateCommitter):
+        def _write_manifest_atomic(self, manifest, *, on_replace=None):
+            attempt = next(
+                (
+                    item
+                    for item in manifest.attempts
+                    if item.attempt_id == request.attempt_id
+                ),
+                None,
+            )
+            if attempt is not None and attempt.image_phase == "activate":
+                raise RuntimeError("injected before image final replace")
+            return super()._write_manifest_atomic(manifest, on_replace=on_replace)
+
+    provider = _Provider()
+    with pytest.raises(AiVideoError) as exc_info:
+        _FailBeforeFinalReplaceCommitter(
+            tmp_path,
+            image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+                base_inputs
+            ),
+        ).generate_image_asset(request, preview, authorization, provider)
+
+    after = read_manifest(tmp_path)
+    attempt = after.attempts[-1]
+    assert provider.calls == 1
+    assert exc_info.value.code is ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.status is not StateCommitStatus.SUCCEEDED
+    assert attempt.image_phase == "candidate"
+    assert selected_image_activation_state(after) == selected_before
+    assert attempt.candidate_project is not None
+    assert attempt.candidate_project != after.active_project
+    assert (tmp_path / attempt.candidate_project.path).is_file()
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert selected_image_activation_state(loaded.manifest) == selected_before
+    assert loaded.project.content_hash == base.active_project.content_hash
+
+
+def test_image_activation_stales_manifest_25_p6_review_and_acceptance_state(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    before_policy = read_manifest(tmp_path)
+    p6 = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=before_policy.manifest_revision,
+        attempt_id="qa-policy-before-p7-activation",
+    )
+    p6 = p6.model_copy(
+        update={
+            "review_states": (
+                ReviewLayerState(
+                    layer=QaLayer.TECHNICAL,
+                    desired_fingerprint="1" * 64,
+                    applied_fingerprint="1" * 64,
+                    lifecycle=ReviewLifecycle.NOT_EVALUATED,
+                ),
+            ),
+            "final_acceptance_state": FinalAcceptanceState(
+                desired_fingerprint="2" * 64,
+                applied_fingerprint="2" * 64,
+                lifecycle=ReviewLifecycle.NOT_EVALUATED,
+            ),
+        }
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        p6.model_dump_json(indent=2), encoding="utf-8"
+    )
+    request, preview, authorization = make_image_call_bundle(tmp_path)
+    png_bytes = project_factory._p7_png()
+
+    class _Provider:
+        def generate(self, candidate, candidate_authorization, permit):
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate, candidate_authorization, png_bytes
+            )
+
+    final = ProductionStateCommitter(
+        tmp_path,
+        image_candidate_preparer=project_factory.make_p7_image_candidate_preparer(
+            base_inputs
+        ),
+    ).generate_image_asset(request, preview, authorization, _Provider())
+
+    assert final.schema_version == "2.5"
+    assert final.active_qa_policy == p6.active_qa_policy
+    assert final.active_review_receipts == ()
+    assert final.review_states[0].lifecycle is ReviewLifecycle.STALE
+    assert final.review_states[0].active_receipt is None
+    assert final.final_acceptance_state is None
 
 
 def test_voice_lifecycle_api_persists_r1_then_mints_one_use_r2_permit(
@@ -1567,6 +3675,13 @@ def test_commit_contract_types_are_frozen_and_expose_all_phases() -> None:
         CommitPhase.AFTER_VOICE_PROVIDER_RESULT,
         CommitPhase.AFTER_VOICE_CANDIDATE_MANIFEST,
         CommitPhase.AFTER_VOICE_FINAL_MANIFEST_REPLACE,
+        CommitPhase.BEFORE_IMAGE_PROVIDER_CALL,
+        CommitPhase.AFTER_IMAGE_PERMIT_CONSUMED,
+        CommitPhase.AFTER_IMAGE_PROVIDER_RESULT,
+        CommitPhase.AFTER_IMAGE_CANDIDATE_MANIFEST_REPLACE,
+        CommitPhase.AFTER_IMAGE_CANDIDATE_MANIFEST_VERIFICATION,
+        CommitPhase.AFTER_IMAGE_FINAL_MANIFEST_REPLACE,
+        CommitPhase.AFTER_IMAGE_FINAL_MANIFEST_VERIFICATION,
     )
     assert NoopCrashInjector().checkpoint(CommitPhase.AFTER_ATTEMPT_STARTED) is None
 

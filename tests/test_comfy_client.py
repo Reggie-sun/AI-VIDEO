@@ -5,6 +5,32 @@ from ai_video.comfy_client import ComfyClient, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
 
 
+def test_get_object_info_returns_registered_node_inventory():
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.path == "/object_info"
+        return httpx.Response(200, json={"SaveImage": {"display_name": "Save Image"}})
+
+    client = ComfyClient(
+        "http://127.0.0.1:8188",
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    assert set(client.get_object_info()) == {"SaveImage"}
+
+
+def test_get_object_info_rejects_non_object_payload():
+    client = ComfyClient(
+        "http://127.0.0.1:8188",
+        http_client=httpx.Client(
+            transport=httpx.MockTransport(
+                lambda request: httpx.Response(200, json=["SaveImage"])
+            )
+        ),
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        client.get_object_info()
+    assert exc_info.value.code is ErrorCode.COMFY_UNAVAILABLE
+
+
 def test_submit_rejects_node_errors():
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json={"error": "bad prompt", "node_errors": {"6": "bad"}})
@@ -100,3 +126,20 @@ def test_collect_output_downloads_view(tmp_path):
     target = tmp_path / "clip.mp4"
     client.download_artifact(filename="clip.mp4", subfolder="", type_="output", target=target)
     assert target.read_bytes() == b"video"
+
+
+def test_fetch_artifact_bytes_does_not_write_a_target():
+    seen: list[tuple[str, str]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append((request.url.path, request.url.params["filename"]))
+        return httpx.Response(200, content=b"image-bytes")
+
+    client = ComfyClient(
+        "http://127.0.0.1:8188",
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    assert client.fetch_artifact_bytes(
+        filename="frame.png", subfolder="", type_="output"
+    ) == b"image-bytes"
+    assert seen == [("/view", "frame.png")]
