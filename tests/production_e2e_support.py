@@ -101,22 +101,31 @@ def _canonical_json_bytes(value) -> bytes:
 
 def _install_manifest_write_counter(
     monkeypatch: pytest.MonkeyPatch,
+    project_root: Path,
 ) -> _ManifestWriteCounter:
     """Instrument the real ``ProductionStateCommitter`` file-ops seam.
 
     Patches ``_NativeFileOps`` so that two observable Manifest-write
-    effects are counted independently:
+    effects are counted independently, ONLY after the real
+    ``fsync_file()``/``replace()`` returns successfully AND the path is
+    an exact canonical project-root path:
 
-    - ``manifest_temp_write`` increments on a completed ``fsync_file`` of
-      the canonical ``.p2a-manifest.tmp`` path (the durable temp-file
-      write effect inside ``_write_manifest_atomic``).
-    - ``manifest_replace`` increments on a ``replace()`` whose
-      destination is the canonical ``state/manifest.json`` path (the
-      atomic manifest promotion effect).
+    - ``manifest_temp_write`` increments after a successful
+      ``fsync_file()`` of an exact canonical manifest temp path:
+      ``<project_root>/state/.p2a-manifest.tmp``,
+      ``<project_root>/state/.p2a-render-candidate-manifest.tmp``, or
+      ``<project_root>/state/.p2a-render-final-manifest.tmp``.
+    - ``manifest_replace`` increments after a successful ``replace()``
+      whose source is one of those exact canonical temp paths AND whose
+      destination is the exact ``<project_root>/state/manifest.json``
+      path.
 
-    Same-bytes rewrites still increment because the counter is recorded
-    inside ``_CountingFileOps`` before delegating to the real
-    ``_NativeFileOps`` method. ``ProductionStateCommitter`` keeps sole
+    Same-bytes rewrites still count because the real ``os.replace()`` is
+    invoked unconditionally; only the counter increment is conditional.
+    Basename-only matches, noncanonical parents, and failed
+    ``fsync_file()``/``replace()`` do not count because the wrapper
+    delegates to the real method first and only records on success for
+    an exact canonical path. ``ProductionStateCommitter`` keeps sole
     ownership of the Manifest and still performs its atomic write path;
     the test only observes the seam without bypassing it.
 
@@ -133,17 +142,24 @@ def _install_manifest_write_counter(
     from ai_video.production import _state_commit_io as io_module
 
     real_native = io_module._NativeFileOps
-    counter = _ManifestWriteCounter()
+    counter = _ManifestWriteCounter(project_root)
     production_e2e_support = sys.modules[__name__]
 
     class _CountingFileOps(real_native):
         def fsync_file(self, handle, path: Path) -> None:
-            counter.record_temp_write(path)
+            # Delegate to the real native first so a failure propagates
+            # WITHOUT incrementing the counter; on success the canonical-
+            # path check inside ``record_temp_write`` is the only
+            # remaining filter.
             real_native.fsync_file(self, handle, path)
+            counter.record_temp_write(path)
 
         def replace(self, source: Path, destination: Path) -> None:
-            counter.record_replace(source, destination)
+            # Delegate to the real native first so a failure propagates
+            # WITHOUT incrementing the counter; on success both source
+            # and destination must be exact canonical project-root paths.
             real_native.replace(self, source, destination)
+            counter.record_replace(source, destination)
 
     monkeypatch.setattr(io_module, "_NativeFileOps", _CountingFileOps)
     monkeypatch.setattr(
@@ -172,26 +188,61 @@ class _ManifestWriteCounter:
     Each call to ``_install_manifest_write_counter`` returns a fresh
     instance; ``monkeypatch`` restores the previous module-level
     reference at teardown so tests share no state and never need to
-    reset this counter. The two fields are independent:
+    reset this counter. The two fields are independent and ONLY count
+    when called for an exact canonical project-root path:
 
-    - ``temp_write`` increments only when ``fsync_file`` is called for
-      the canonical ``.p2a-manifest.tmp`` path (the durable Manifest
-      temp-write effect).
-    - ``replace`` increments only when ``replace`` is called with a
-      destination whose basename is ``manifest.json`` (the atomic
-      Manifest promotion effect).
+    - ``temp_write`` increments only when ``record_temp_write`` is
+      called with an exact canonical manifest temp path:
+      ``<project_root>/state/.p2a-manifest.tmp``,
+      ``<project_root>/state/.p2a-render-candidate-manifest.tmp``, or
+      ``<project_root>/state/.p2a-render-final-manifest.tmp``.
+    - ``replace`` increments only when ``record_replace`` is called with
+      one of those exact canonical temp paths as ``source`` AND the
+      exact ``<project_root>/state/manifest.json`` path as
+      ``destination``.
+
+    The wrapper installs ``record_temp_write``/``record_replace`` AFTER
+    delegating to the real ``fsync_file()``/``replace()``, so a raised
+    exception never reaches the recorder and the counter stays
+    unchanged. Basename-only matches and noncanonical parents are
+    rejected because path equality is exact. Same-bytes successful
+    promotions count because the real ``os.replace()`` runs
+    unconditionally before the recorder is consulted.
+
+    The ``project_root`` is required when the counter is intended to
+    observe real file-ops; the module-level placeholder counter is
+    created with ``project_root=None`` and stores no canonical paths,
+    so it always reports zero regardless of input.
     """
 
-    def __init__(self) -> None:
+    _CANONICAL_TEMP_NAMES: tuple[str, ...] = (
+        ".p2a-manifest.tmp",
+        ".p2a-render-candidate-manifest.tmp",
+        ".p2a-render-final-manifest.tmp",
+    )
+
+    def __init__(self, project_root: Path | None = None) -> None:
         self._temp_write = 0
         self._replace = 0
+        if project_root is None:
+            self._manifest_path: Path | None = None
+            self._canonical_temp_paths: frozenset[Path] = frozenset()
+        else:
+            self._manifest_path = project_root / "state" / "manifest.json"
+            self._canonical_temp_paths = frozenset(
+                project_root / "state" / name for name in self._CANONICAL_TEMP_NAMES
+            )
 
     def record_temp_write(self, path: Path) -> None:
-        if path.name == ".p2a-manifest.tmp":
+        if path in self._canonical_temp_paths:
             self._temp_write += 1
 
     def record_replace(self, source: Path, destination: Path) -> None:
-        if destination.name == "manifest.json":
+        if (
+            self._manifest_path is not None
+            and destination == self._manifest_path
+            and source in self._canonical_temp_paths
+        ):
             self._replace += 1
 
     @property

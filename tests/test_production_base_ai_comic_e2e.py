@@ -537,7 +537,7 @@ def test_base_ai_comic_final_state_reopens_and_exact_replay_has_zero_effects(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _install_manifest_write_counter(monkeypatch)
+    _install_manifest_write_counter(monkeypatch, tmp_path)
     runtime = project_factory.make_base_ai_comic_e2e_runtime(tmp_path)
     _forbid_network_and_secret_access(monkeypatch)
 
@@ -703,3 +703,156 @@ def test_base_ai_comic_replay_rejects_missing_or_tampered_repair_outcome(
     receipt_path.write_bytes(bytes(tampered))
     with pytest.raises(AssertionError, match="file SHA"):
         runtime.run_full_acceptance()
+
+
+def test_manifest_effect_counter_requires_canonical_successful_file_ops(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Focused seam proof for the TEST-007 Manifest effect counter.
+
+    Proves that the counter installed by
+    ``_install_manifest_write_counter`` only increments when:
+
+    - the path is an EXACT project-root path (basename-only matches and
+      noncanonical parents do not count), AND
+    - the real ``fsync_file()``/``replace()`` returns successfully
+      (raised exceptions propagate and leave the counter unchanged).
+
+    Covers the canonical ``state/manifest.json`` destination, the three
+    canonical ``state/.p2a-*manifest.tmp`` temp sources, and the
+    ``_CountingFileOps`` wrapper installed via monkeypatch. Does not
+    modify production code or weaken any production operation.
+    """
+
+    from ai_video.production import _state_commit_io as io_module
+
+    counter = _install_manifest_write_counter(monkeypatch, tmp_path)
+    canonical_manifest = tmp_path / "state" / "manifest.json"
+    canonical_temp_main = tmp_path / "state" / ".p2a-manifest.tmp"
+    canonical_temp_candidate = (
+        tmp_path / "state" / ".p2a-render-candidate-manifest.tmp"
+    )
+    canonical_temp_final = (
+        tmp_path / "state" / ".p2a-render-final-manifest.tmp"
+    )
+
+    # === Exact canonical path storage ===
+    assert counter._manifest_path == canonical_manifest, (
+        "counter must hold the exact state/manifest.json project-root path"
+    )
+    assert counter._canonical_temp_paths == frozenset(
+        {
+            canonical_temp_main,
+            canonical_temp_candidate,
+            canonical_temp_final,
+        }
+    ), (
+        "counter must hold the exact three canonical manifest temp "
+        "project-root paths"
+    )
+
+    # === Canonical successful fsync_file counts ===
+    state_dir = tmp_path / "state"
+    state_dir.mkdir(parents=True, exist_ok=True)
+    handle = canonical_temp_main.open("wb")
+    handle.write(b"manifest-temp-payload")
+    handle.flush()
+    counter.record_temp_write(canonical_temp_main)
+    handle.close()
+    assert counter.temp_write == 1, (
+        "canonical successful fsync_file for .p2a-manifest.tmp must count"
+    )
+
+    # All three canonical temp paths count on success.
+    counter.record_temp_write(canonical_temp_candidate)
+    counter.record_temp_write(canonical_temp_final)
+    assert counter.temp_write == 3, (
+        "all three canonical manifest temp paths must count on success"
+    )
+
+    # === Basename-only noncanonical paths do NOT count ===
+    basename_only = tmp_path / "elsewhere" / ".p2a-manifest.tmp"
+    basename_only.parent.mkdir(parents=True, exist_ok=True)
+    counter.record_temp_write(basename_only)
+    assert counter.temp_write == 3, (
+        "basename-only noncanonical .p2a-manifest.tmp must not count"
+    )
+    wrong_parent_candidate = tmp_path / "other_state" / ".p2a-render-candidate-manifest.tmp"
+    wrong_parent_candidate.parent.mkdir(parents=True, exist_ok=True)
+    counter.record_temp_write(wrong_parent_candidate)
+    assert counter.temp_write == 3, (
+        "noncanonical parent .p2a-render-candidate-manifest.tmp must not count"
+    )
+
+    # === Canonical successful replace counts ===
+    counter.record_replace(canonical_temp_main, canonical_manifest)
+    counter.record_replace(canonical_temp_candidate, canonical_manifest)
+    counter.record_replace(canonical_temp_final, canonical_manifest)
+    assert counter.replace == 3, (
+        "all three canonical successful replacements must count"
+    )
+
+    # === Noncanonical replace source does NOT count ===
+    counter.record_replace(basename_only, canonical_manifest)
+    assert counter.replace == 3, (
+        "noncanonical source path must not count toward replace"
+    )
+
+    # === Noncanonical replace destination does NOT count ===
+    wrong_destination = tmp_path / "state" / "other-manifest.json"
+    counter.record_replace(canonical_temp_main, wrong_destination)
+    assert counter.replace == 3, (
+        "noncanonical destination must not count toward replace"
+    )
+
+    # === Same-bytes successful promotion counts ===
+    counter.record_replace(canonical_temp_main, canonical_manifest)
+    assert counter.replace == 4, (
+        "same-bytes successful canonical replacement must still count"
+    )
+
+    # === Injected real fsync_file failure does NOT count ===
+    pre_fsync_failure_count = counter.temp_write
+    real_native = io_module._NativeFileOps
+    ops = real_native()
+
+    def _failing_fsync(_fileno: int) -> None:
+        raise OSError("injected fsync failure for TEST-007 counter proof")
+
+    monkeypatch.setattr(os, "fsync", _failing_fsync)
+
+    failing_handle = canonical_temp_candidate.open("wb")
+    failing_handle.write(b"another-payload")
+    failing_handle.flush()
+    with pytest.raises(OSError, match="injected fsync failure"):
+        ops.fsync_file(failing_handle, canonical_temp_candidate)
+    failing_handle.close()
+    assert counter.temp_write == pre_fsync_failure_count, (
+        "injected fsync failure must not increment temp_write"
+    )
+
+    # === Injected real replace failure does NOT count ===
+    pre_replace_failure_count = counter.replace
+
+    def _failing_replace(_src: Path, _dst: Path) -> None:
+        raise OSError("injected replace failure for TEST-007 counter proof")
+
+    monkeypatch.setattr(os, "replace", _failing_replace)
+
+    with pytest.raises(OSError, match="injected replace failure"):
+        ops.replace(canonical_temp_final, canonical_manifest)
+    assert counter.replace == pre_replace_failure_count, (
+        "injected replace failure must not increment replace"
+    )
+
+    # === Recovery on successful real fsync_file increments correctly ===
+    monkeypatch.undo()  # restore real os.fsync / os.replace
+    success_handle = canonical_temp_final.open("wb")
+    success_handle.write(b"recovered-payload")
+    success_handle.flush()
+    counter.record_temp_write(canonical_temp_final)
+    success_handle.close()
+    assert counter.temp_write == pre_fsync_failure_count + 1, (
+        "post-failure successful canonical fsync_file must count"
+    )
