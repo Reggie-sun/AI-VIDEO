@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import unicodedata
 from collections.abc import Mapping
-from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
@@ -19,6 +18,15 @@ from pydantic import (
     model_validator,
 )
 
+from ai_video.production._asset_registry_validation import (
+    reject_explicit_p4_registry_fields,
+    reject_explicit_p8_registry_fields,
+    serialize_asset_record,
+    serialize_egress_metadata,
+    validate_asset_record,
+    validate_egress_metadata,
+    validate_registry_snapshot,
+)
 from ai_video.production._lifecycle_schema import (
     ImageRequestReceipt,
     PaidProviderAttemptPhase as PaidProviderAttemptPhase, PaidProviderAttemptState as PaidProviderAttemptState,
@@ -634,38 +642,16 @@ class EgressMetadata(StrictModel):
 
     @model_validator(mode="after")
     def _validate_variant(self) -> "EgressMetadata":
-        remote_fields = (
-            self.destination,
-            self.authorization_receipt_id,
-            self.request_fingerprint,
-            self.payload_fingerprint,
-            self.retention_mode,
-            self.provider_policy_snapshot_id,
+        validate_egress_metadata(
+            self, require_canonical_origin=_require_canonical_https_origin
         )
-        if not self.remote:
-            if any(value is not None for value in remote_fields):
-                raise ValueError("local egress metadata cannot contain remote fields")
-            return self
-        if any(value is None for value in remote_fields):
-            raise ValueError("remote egress metadata requires complete authorization")
-        assert self.destination is not None
-        _require_canonical_https_origin(self.destination, "remote destination")
         return self
 
     @model_serializer(mode="wrap")
     def _serialize_compatible_local_variant(
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
-        data = handler(self)
-        if not self.remote:
-            for field in (
-                "request_fingerprint",
-                "payload_fingerprint",
-                "retention_mode",
-                "provider_policy_snapshot_id",
-            ):
-                data.pop(field, None)
-        return data
+        return serialize_egress_metadata(self, handler(self))
 
 
 class AssetRecord(StrictModel):
@@ -692,60 +678,22 @@ class AssetRecord(StrictModel):
 
     @model_validator(mode="after")
     def _validate_p4_metadata(self) -> "AssetRecord":
-        audio_types = {AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}
-        if self.audio_metadata is not None:
-            if self.asset_type not in audio_types:
-                raise ValueError("non-audio assets cannot contain audio metadata")
-            if AUDIO_KIND_TO_ASSET_TYPE[self.audio_metadata.audio_kind] != self.asset_type:
-                raise ValueError("audio kind does not match registry asset type")
-            if self.duration_seconds is not None:
-                measured_seconds = Decimal(self.audio_metadata.duration_samples) / Decimal(
-                    self.audio_metadata.sample_rate_hz
-                )
-                display_seconds = Decimal(str(self.duration_seconds))
-                tolerance = Decimal(1) / Decimal(self.audio_metadata.sample_rate_hz)
-                if abs(measured_seconds - display_seconds) > tolerance:
-                    raise ValueError("duration_seconds does not match measured samples")
-        if self.caption_metadata is not None and self.asset_type is not AssetType.CAPTION:
-            raise ValueError("non-caption assets cannot contain caption metadata")
-        if self.asset_type is AssetType.CAPTION and self.audio_metadata is not None:
-            raise ValueError("caption assets cannot contain audio metadata")
-        if self.video_metadata is not None:
-            if self.asset_type is not AssetType.VIDEO:
-                raise ValueError("non-video assets cannot contain video metadata")
-            if self.mime_type != "video/mp4":
-                raise ValueError("video metadata requires video/mp4")
-            if (self.width, self.height) != (
-                self.video_metadata.width,
-                self.video_metadata.height,
-            ):
-                raise ValueError("video dimensions do not match measured metadata")
-            if self.duration_seconds is not None and abs(
-                Decimal(str(self.duration_seconds))
-                - Decimal(self.video_metadata.duration_milliseconds) / Decimal(1000)
-            ) > Decimal("0.001"):
-                raise ValueError("video duration does not match measured metadata")
-        if self.egress.remote and not (
-            self.asset_type in {AssetType.VOICE, AssetType.VIDEO}
-            and self.source_kind is AssetSourceKind.GENERATED
-        ):
-            raise ValueError(
-                "remote egress is restricted to generated voice/video assets"
-            )
+        validate_asset_record(
+            self,
+            audio_kind_to_asset_type=AUDIO_KIND_TO_ASSET_TYPE,
+            audio_types=frozenset({AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}),
+            caption_type=AssetType.CAPTION,
+            video_type=AssetType.VIDEO,
+            voice_type=AssetType.VOICE,
+            generated_source=AssetSourceKind.GENERATED,
+        )
         return self
 
     @model_serializer(mode="wrap")
     def _serialize_compatible_metadata(
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
-        data = handler(self)
-        if self.audio_metadata is None:
-            data.pop("audio_metadata", None)
-        if self.caption_metadata is None:
-            data.pop("caption_metadata", None)
-        if self.video_metadata is None:
-            data.pop("video_metadata", None)
-        return data
+        return serialize_asset_record(self, handler(self))
 
 
 class AssetRegistrySnapshot(StrictModel):
@@ -757,96 +705,22 @@ class AssetRegistrySnapshot(StrictModel):
     @model_validator(mode="before")
     @classmethod
     def _reject_explicit_p4_fields_in_20(cls, value: object) -> object:
-        if not isinstance(value, Mapping) or value.get("schema_version", "2.0") != "2.0":
-            return value
-        for asset in value.get("assets", ()):
-            if isinstance(asset, Mapping) and {
-                "audio_metadata",
-                "caption_metadata",
-            }.intersection(asset):
-                raise ValueError(
-                    "Asset Registry 2.0 cannot contain explicit P4 fields"
-                )
-            if isinstance(asset, Mapping):
-                egress = asset.get("egress")
-                if isinstance(egress, Mapping) and {
-                    "request_fingerprint",
-                    "payload_fingerprint",
-                    "retention_mode",
-                    "provider_policy_snapshot_id",
-                }.intersection(egress):
-                    raise ValueError(
-                        "Asset Registry 2.0 cannot contain explicit P4 egress fields"
-                    )
-        return value
+        return reject_explicit_p4_registry_fields(value)
 
     @model_validator(mode="before")
     @classmethod
     def _reject_explicit_p8_fields_in_old_versions(cls, value: object) -> object:
-        if not isinstance(value, Mapping) or value.get("schema_version", "2.0") == "2.2":
-            return value
-        for asset in value.get("assets", ()):
-            if isinstance(asset, Mapping) and "video_metadata" in asset:
-                raise ValueError(
-                    f"Asset Registry {value.get('schema_version', '2.0')} "
-                    "cannot contain explicit video metadata"
-                )
-        return value
+        return reject_explicit_p8_registry_fields(value)
 
     @model_validator(mode="after")
     def _validate_versioned_metadata(self) -> "AssetRegistrySnapshot":
-        if self.schema_version == "2.0":
-            if any(
-                asset.audio_metadata is not None
-                or asset.caption_metadata is not None
-                or asset.egress.remote
-                for asset in self.assets
-            ):
-                raise ValueError("Asset Registry 2.0 cannot contain P4 metadata")
-            return self
-        for asset in self.assets:
-            if asset.asset_type in {AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}:
-                if asset.audio_metadata is None:
-                    raise ValueError("Asset Registry 2.1 audio assets require audio metadata")
-            elif asset.audio_metadata is not None:
-                raise ValueError("non-audio assets cannot contain audio metadata")
-            if asset.asset_type is AssetType.CAPTION:
-                if asset.caption_metadata is None:
-                    raise ValueError("Asset Registry 2.1 caption assets require caption metadata")
-            elif asset.caption_metadata is not None:
-                raise ValueError("non-caption assets cannot contain caption metadata")
-            if self.schema_version == "2.1":
-                if asset.video_metadata is not None or (
-                    asset.asset_type is AssetType.VIDEO and asset.egress.remote
-                ):
-                    raise ValueError("Asset Registry 2.1 cannot contain P8 video metadata")
-            elif (
-                asset.asset_type is AssetType.VIDEO
-                and asset.source_kind is AssetSourceKind.GENERATED
-                and asset.video_metadata is None
-            ):
-                raise ValueError(
-                    "Asset Registry 2.2 generated video assets require video metadata"
-                )
-            if (
-                self.schema_version == "2.2"
-                and asset.asset_type is AssetType.VIDEO
-                and asset.source_kind is AssetSourceKind.GENERATED
-                and asset.egress.remote
-            ):
-                if asset.cost_receipt_id is None:
-                    raise ValueError(
-                        "Asset Registry 2.2 remote generated video requires a cost receipt"
-                    )
-                assert asset.video_metadata is not None
-                if (
-                    asset.egress.request_fingerprint
-                    != asset.video_metadata.resolved_generation_hash
-                ):
-                    raise ValueError(
-                        "remote generated video egress request identity must match "
-                        "its resolved generation"
-                    )
+        validate_registry_snapshot(
+            self,
+            audio_types=frozenset({AssetType.VOICE, AssetType.MUSIC, AssetType.SFX}),
+            caption_type=AssetType.CAPTION,
+            video_type=AssetType.VIDEO,
+            generated_source=AssetSourceKind.GENERATED,
+        )
         return self
 
 

@@ -177,6 +177,8 @@ def _lineage_bytes(template: Path, lane: str) -> bytes:
             "class_type": "CLIPTextEncode",
             "inputs": {"clip": ["92:108", 0], "text": ""},
         }
+        graph["92:85"]["inputs"].pop("resolution")
+        graph["92:85"]["inputs"]["resolution_steps"] = 1
     return json.dumps(
         graph, ensure_ascii=False, sort_keys=True, indent=2
     ).encode("utf-8") + b"\n"
@@ -279,6 +281,7 @@ def check(args: argparse.Namespace) -> dict[str, Any]:
                         "diffusion filename",
                         "exact ImageScale width/height",
                         "explicit negative CLIPTextEncode",
+                        "ImageScaleToTotalPixels resolution_steps compatibility",
                     ]
                 ),
             }

@@ -56,7 +56,7 @@
   "optional_lora_enabled": false,
   "output_mime_type": "image/png",
   "output_node_id": "94",
-  "profile_content_hash": "3963b58e0aad18e8359044b9ad043c92961c940dde19002f94723cd196718eb8",
+  "profile_content_hash": "5066c080d58d3d999446ca5db195e8e81fd982052d94144452737f1e89a0f9c7",
   "required_nodes": [
     {
       "name": "UNETLoader",
@@ -112,7 +112,7 @@
     "scene"
   ],
   "workflow_path": "workflows/templates/p7_1_flux2_klein_4b_api.json",
-  "workflow_sha256": "9386fa6435a2c1cfa85983b270063f6eca8b33c0490a41b97cc0f590f979758d",
+  "workflow_sha256": "e44a10fc8d6e6e491055de361d50dacaffb42adeb915f7c3596250a38b66dd22",
   "workflow_source_revision": "comfyui_workflow_templates-0.11.43/json-0.1.49/e0388a8870495802314d58fa61616ddcdb7064dac5f85a8787c9e08180b8a560",
   "workflow_source_url": "https://docs.comfy.org/tutorials/flux/flux-2-klein"
 }

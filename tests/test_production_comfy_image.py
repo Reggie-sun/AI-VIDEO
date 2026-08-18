@@ -312,6 +312,58 @@ def test_real_profiles_reopen_reviewed_official_derivatives_and_bind_two_refs(
     assert profile.optional_lora_enabled is False
 
 
+def test_flux_workflow_uses_current_total_pixel_scale_input_contract() -> None:
+    profile = load_local_image_execution_profile(REAL_FLUX_PROFILE, artifact_root=ROOT)
+    workflow = load_local_image_workflow(ROOT / profile.workflow_path)
+
+    inputs = workflow["92:85"]["inputs"]
+
+    assert inputs["resolution_steps"] == 1
+    assert "resolution" not in inputs
+
+
+def test_preflight_rejects_missing_live_required_node_input(tmp_path: Path) -> None:
+    profile = _runtime_profile(tmp_path, source=REAL_FLUX_PROFILE)
+    workflow_path = tmp_path / profile.workflow_path
+    stale_workflow = load_local_image_workflow(workflow_path)
+    stale_workflow["92:85"]["inputs"].pop("resolution_steps")
+    stale_workflow["92:85"]["inputs"]["resolution"] = 1
+    workflow_path.write_text(
+        json.dumps(stale_workflow, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    profile_values = profile.model_dump(mode="python", exclude={"profile_content_hash"})
+    profile_values["workflow_sha256"] = hashlib.sha256(
+        workflow_path.read_bytes()
+    ).hexdigest()
+    profile = LocalImageExecutionProfile.create(**profile_values)
+    request, paths = _request(profile, tmp_path)
+    transport = _FakeTransport()
+    workflow = load_local_image_workflow(workflow_path)
+    object_info = {
+        node["class_type"]: {}
+        for node in workflow.values()
+        if isinstance(node, dict) and isinstance(node.get("class_type"), str)
+    }
+    object_info["ImageScaleToTotalPixels"] = {
+        "input": {
+            "required": {
+                "resolution_steps": ["INT", {"default": 1, "min": 1, "max": 256}]
+            }
+        }
+    }
+    transport.get_object_info = lambda: object_info  # type: ignore[method-assign]
+    provider = _provider(tmp_path, profile, paths, transport)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.preflight(request)
+
+    assert exc_info.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert "92:85.resolution_steps" in (exc_info.value.technical_detail or "")
+    assert transport.uploaded == []
+    assert transport.submitted == []
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [

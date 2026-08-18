@@ -562,6 +562,30 @@ def _git_head(root: Path) -> str:
     return result.stdout.strip()
 
 
+def _missing_required_node_inputs(
+    workflow: dict[str, Any], object_info: dict[str, Any]
+) -> list[str]:
+    missing = []
+    for node_id, node in workflow.items():
+        if not isinstance(node, dict):
+            continue
+        node_info = object_info.get(node.get("class_type"))
+        required = (
+            node_info.get("input", {}).get("required", {})
+            if isinstance(node_info, dict)
+            else {}
+        )
+        inputs = node.get("inputs", {})
+        if not isinstance(required, dict) or not isinstance(inputs, dict):
+            continue
+        missing.extend(
+            f"{node_id}.{input_name}"
+            for input_name in required
+            if input_name not in inputs
+        )
+    return sorted(missing)
+
+
 class ComfyLocalImageProvider:
     def __init__(
         self,
@@ -663,6 +687,12 @@ class ComfyLocalImageProvider:
             raise _invalid(
                 "ComfyUI is missing nodes required by the sealed workflow.",
                 ", ".join(str(item) for item in missing),
+            )
+        missing_inputs = _missing_required_node_inputs(self._workflow, object_info)
+        if missing_inputs:
+            raise _invalid(
+                "ComfyUI node inputs do not match the sealed workflow.",
+                ", ".join(missing_inputs),
             )
         self._preflighted_requests.add(request.request_fingerprint)
 

@@ -312,7 +312,7 @@
         0
       ],
       "megapixels": 1,
-      "resolution": 1,
+      "resolution_steps": 1,
       "upscale_method": "nearest-exact"
     }
   },
