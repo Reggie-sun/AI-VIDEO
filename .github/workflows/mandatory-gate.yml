@@ -64,5 +64,6 @@ jobs:
             mandatory-gate-audit.log
             mandatory-gate-verify.log
             .agent/harness/runs/${{ env.HARNESS_RUN_ID }}/
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 14

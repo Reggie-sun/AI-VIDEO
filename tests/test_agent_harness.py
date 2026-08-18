@@ -145,6 +145,7 @@ def test_mandatory_gate_workflow_preserves_server_check_contract() -> None:
     assert ".agent/harness/runs/${{ env.HARNESS_RUN_ID }}/" in upload["with"][
         "path"
     ]
+    assert upload["with"]["include-hidden-files"] is True
 
 
 def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
