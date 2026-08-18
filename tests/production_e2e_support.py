@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import subprocess
@@ -249,6 +250,7 @@ class DeterministicHyperFramesRunner:
 
         output = Path(args[args.index("-o") + 1])
         mixed_wavs = tuple(sorted((cwd / "assets").glob("*.wav")))
+        source_sha256 = hashlib.sha256((cwd / "index.html").read_bytes()).hexdigest()
         command_line = [
             str(self.ffmpeg_path),
             "-nostdin",
@@ -258,7 +260,7 @@ class DeterministicHyperFramesRunner:
             "-f",
             "lavfi",
             "-i",
-            "color=c=black:s=1280x720:r=24:d=4",
+            f"color=c=0x{source_sha256[:6]}:s=1280x720:r=24:d=4",
         ]
         if mixed_wavs:
             command_line.extend(("-i", str(mixed_wavs[0])))
@@ -322,7 +324,16 @@ class DeterministicReviewAnalyzer:
             raise AssertionError("repaired render must differ from the initial render")
         self.repaired_render_state = render_state
 
-    def analyze(self, request: ReviewRequest) -> ReviewEvidence:
+    def analyze(self, request: ReviewRequest, permit) -> ReviewEvidence:
+        consume = getattr(permit, "_consume_review_analysis_permit", None)
+        if consume is None or not consume(
+            request_content_hash=request.content_hash,
+            render_output_sha256=request.render_output_sha256,
+            technical_context_hash=canonical_sha256(
+                request.technical_context.model_dump(mode="json")
+            ),
+        ):
+            raise AssertionError("durable review analysis permit was not consumed")
         self.calls += 1
         if self.initial_render_state is None:
             self.initial_render_state = request.render_state
