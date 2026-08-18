@@ -25,6 +25,7 @@ sensitive_patterns:
   - "**/*secret*"
 
 audit_patterns:
+  - .github/workflows/**
   - src/**/*.py
   - scripts/*.py
   - scripts/**/*.py
@@ -125,6 +126,7 @@ checks:
 categories:
   harness_control:
     patterns:
+      - .github/workflows/**
       - AGENTS.md
       - Makefile
       - docs/agent-primary-contract-matrix.md
