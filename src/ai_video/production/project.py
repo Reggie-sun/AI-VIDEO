@@ -547,9 +547,10 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
     )
     try:
         attempts_by_asset = _verify_voice_candidate_history(bundle, attempts)
-    except (OSError, ValidationError, ValueError) as exc:
+    except (AiVideoError, OSError, ValidationError, ValueError) as exc:
+        detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
         raise _invalid(
-            "Active P4 voice candidate history is invalid.", str(exc)
+            "Active P4 voice candidate history is invalid.", detail
         ) from exc
     assets_by_id = {asset.asset_id: asset for asset in bundle.registry.assets}
     generated_voice_ids = {

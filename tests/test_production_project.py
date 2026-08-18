@@ -1287,7 +1287,70 @@ def test_reader_rejects_tampered_manifest_25_voice_candidate_graph_pointer(tmp_p
         load_production_project(project_path)
 
     assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
-    assert exc_info.value.user_message == "Could not verify active dependency graph."
+    assert exc_info.value.user_message == "Active P4 voice candidate history is invalid."
+    assert exc_info.value.technical_detail == "file hash mismatch"
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected_detail"),
+    (
+        ("bytes", "file hash mismatch"),
+        ("semantic_identity", "revision_id="),
+    ),
+)
+def test_reader_rejects_tampered_manifest_25_voice_candidate_graph(
+    tmp_path,
+    mutation,
+    expected_detail,
+):
+    project_path, request, committed = _activate_manifest_25_graph_voice(tmp_path)
+    attempt = next(
+        item for item in committed.attempts if item.attempt_id == request.attempt_id
+    )
+    assert attempt.candidate_dependency_graph is not None
+    graph_path = tmp_path / attempt.candidate_dependency_graph.path
+    if mutation == "bytes":
+        graph_path.write_bytes(graph_path.read_bytes() + b" ")
+    else:
+        graph_data = json.loads(graph_path.read_bytes())
+        graph_data["nodes"][0]["contributions"][0]["fingerprint"] = "f" * 64
+        graph_payload = (
+            json.dumps(
+                graph_data,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
+        ).encode("utf-8")
+        graph_path.write_bytes(graph_payload)
+        forged_pointer = attempt.candidate_dependency_graph.model_copy(
+            update={"file_sha256": hashlib.sha256(graph_payload).hexdigest()}
+        )
+        forged_attempt = attempt.model_copy(
+            update={"candidate_dependency_graph": forged_pointer}
+        )
+        _write_manifest(
+            tmp_path,
+            committed.model_copy(
+                update={
+                    "active_dependency_graph": forged_pointer,
+                    "attempts": tuple(
+                        forged_attempt
+                        if item.attempt_id == request.attempt_id
+                        else item
+                        for item in committed.attempts
+                    ),
+                }
+            ),
+        )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(project_path)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert exc_info.value.user_message == "Active P4 voice candidate history is invalid."
+    assert expected_detail in (exc_info.value.technical_detail or "")
 
 
 @pytest.fixture
