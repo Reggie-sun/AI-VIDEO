@@ -4,7 +4,7 @@
 
 ## Purpose
 
-当前仓库有边界不同的已实现产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2-P7 提供的 read-only Production Project、explicit P2A State Commit/Recovery、deterministic Composition/HyperFrames、Voice/Captions、immutable Dependency Graph/selective rebuild、Codex Review/Repair 和 local-only image asset generation Python APIs。P7 lineage 与 P3-P7 combined Base AI Comic E2E 已在 `codex/base-ai-comic-e2e` feature branch 完成验收，但尚未合入 `main`；P8-P9 等未实施 slice 仍只是规划。
+当前仓库有边界不同的已实现产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2-P7 提供的 read-only Production Project、explicit P2A State Commit/Recovery、deterministic Composition/HyperFrames、Voice/Captions、immutable Dependency Graph/selective rebuild、Codex Review/Repair 和 local-only image asset generation Python APIs。P7 lineage 与 P3-P7 combined Base AI Comic E2E 已合入 local `main`。P7.1 的 offline/runtime-contract 部分增加了 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；live smoke 和 blind benchmark 尚未授权或验收。P8-P9 等未实施 slice 仍只是规划。
 
 Agent 必须维护当前产品承诺：
 
@@ -22,8 +22,8 @@ Agent 必须维护当前产品承诺：
 - 当前已实现的 P3/P4 通过同一个 `CompositionSpec` -> `ResolvedTimeline` -> pinned local HyperFrames path提供deterministic render、audio/voice/caption contracts；P4已于`f9eedaeb5f6432d8ba0bf937c78111dbcfa3ce80` fast-forward合入local `main`，并随 P5 ancestry push 到 `origin/main`，尚未 release。
 - P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main` 并 push 到 `origin/main`：`DependencyGraphSnapshot`只保存immutable typed graph inputs，Manifest 2.3独占active graph与desired/applied/lifecycle，`ProductionStateCommitter`仍独占graph write/co-activation/recovery；P5不增加CLI、Provider、renderer或automatic recovery，且尚未 release。
 - P6 已完成并整合到 local `main`：Manifest 2.4 与既有 `ProductionStateCommitter` 提供 durable review/repair/final-acceptance lifecycle；P5 graph 仍不保存 mutable review state。P6 尚未 push/release。
-- P7 已在 `codex/p7-image-assets-20260817` 完成 local-only runtime acceptance：provider-neutral `ImageAssetProvider` contract、Manifest 2.5 image lifecycle、generated PNG provenance、target Shot/Registry/graph atomic activation、exact replay/recovery 和 Character/Scene reference reuse 均只通过 Python API 暴露。验收只使用 deterministic fake/injected provider；没有 concrete/live/remote Provider、renderer 或 video generation，且该 branch 尚未 merge 到 `main`、push、release 或 publish。
-- Base AI Comic E2E 已在 `codex/base-ai-comic-e2e` 证明 P3-P7 可以在未配置 Video Provider 时完成 two-Shot image generation、voice/captions、deterministic render、strategy-aware review、exact selective repair、final acceptance、restart reopen 与 zero-side-effect replay。该 proof 复用 Manifest 2.5 和既有 owners，没有新增 schema、public CLI、production coordinator、Provider、asset layout 或 runtime dependency；当前 branch 同样尚未 merge 到 `main`、push、release 或 publish。
+- P7 与 Base AI Comic E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但尚未 push、release 或 publish。P7 的 provider-neutral contract、Manifest 2.5 lifecycle、generated PNG provenance、target Shot/Registry/graph atomic activation、exact replay/recovery 与 combined no-Video-Provider proof 保持不变。
+- P7.1 offline/runtime-contract implementation 提供 sealed `ComfyLocalImageProvider`、exact local component/profile/workflow binding、R+1 前 read-only compatibility preflight，以及 `chatgpt_images_2_web` human import receipt/activation。它只通过 Python API 暴露，不增加 CLI、remote Provider、renderer 或 video generation；M7 live generation 与 M8 blind benchmark 仍需单独授权，因此不得称为 live-accepted 或 quality-accepted。
 - `docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md` 是新的 v0.2 planning target；它不是已实现行为，也不是一次性实施授权。
 - `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 已被 supersede，只保留为 provider-centric 历史设计与可复用安全契约来源。
 - v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0-P7 与 Base AI Comic E2E 的当前状态见 runtime baseline 与 roadmap；P8+ 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。Base E2E acceptance 不等于 Paid Provider Gate 已设计、实现或验收。
@@ -98,6 +98,8 @@ Agent 必须维护当前产品承诺：
 - `src/ai_video/production/project.py` 及 private `_image_project_reader.py` / `_voice_project_reader.py` helpers：负责 read-only v2 bundle loading、Manifest-selected project/registry selection verification 与 selected image/voice candidate evidence reopen；不得写入、恢复或激活 state。
 - `src/ai_video/production/dependency.py`：负责pure immutable graph construction、desired fingerprint resolution、blocked/frontier propagation和selective rebuild decision；不得写文件、Manifest、registry或runtime status。
 - `src/ai_video/production/image.py`：负责 pure P7 image request/preview/authorization/result/provenance contract、PNG measured validation、candidate scope validation 与 `ImageAssetProvider` protocol；不得写文件、调用 Provider 或修改 Manifest。
+- `src/ai_video/production/comfy_image.py`：负责 sealed P7.1 local execution profile、loopback-only ComfyUI adapter、exact workflow binding 与 pre-submit compatibility preflight；不得成为第二 writer，也不得接受 remote endpoint。
+- `src/ai_video/production/image_import.py`：负责 truthful human web-image import receipt、PNG validation 与 exact candidate commit preparation；实际写入仍只能由 `ProductionStateCommitter` 完成。
 - `src/ai_video/production/state_commit.py` 及 private `_state_commit_*` implementation modules：共同实现 P2A 唯一 v2 state writer、snapshot activation、commit-point error mapping 和 explicit recovery；`ProductionStateCommitter` façade仍是唯一 public owner，private modules不得形成第二 writer。
 - `src/ai_video/production/__init__.py`：只暴露已批准的v0.2 public imports，不承载实现逻辑。
 
@@ -175,7 +177,7 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - 修改 `runs/` 下的 manifest schema 或产物目录结构。
 - 把本地优先策略改成默认允许远程主机。
 - 引入前端、API server、队列管理、音频，或其他 MVP 规范中明确排除的子系统。
-- 执行 v0.2 P8-P9 任一 runtime slice，或把 plan/spec 中的 proposed contract 写成当前行为。P2-P7 已实现各自当前 contract，P7 lineage 与 Base AI Comic E2E 仍只存在于独立 feature branch；P8 还必须先有单独获批并验收的 Paid Provider Gate。任何新的 v2 writer、activation、schema/layout mutation 仍需独立授权与 crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
+- 执行 P7.1 live smoke/benchmark、v0.2 P8-P9 任一 runtime slice，或把未验收的 plan/spec contract 写成当前行为。P2-P7 与 Base AI Comic E2E 已在 local `main`；P7.1 只能把已通过 offline executable gates 的部分写成 runtime truth，不能声称 live/quality acceptance。P8 还必须先有单独获批并验收的 Paid Provider Gate。任何新的 v2 writer、activation、schema/layout mutation 仍需独立授权与 crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
 
 ## Session Continuity
 

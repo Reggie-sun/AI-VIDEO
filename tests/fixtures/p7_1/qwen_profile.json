@@ -1,0 +1,71 @@
+{
+  "schema_version": "1",
+  "lane_id": "qwen_image_edit_2511_local",
+  "adapter_contract_version": "1",
+  "model_repository_id": "Qwen/Qwen-Image-Edit-2511",
+  "model_repository_revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+  "model_card_url": "https://huggingface.co/Qwen/Qwen-Image-Edit-2511",
+  "license_id": "Apache-2.0",
+  "license_source_url": "https://huggingface.co/Qwen/Qwen-Image-Edit-2511/blob/6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9/LICENSE",
+  "components": [
+    {
+      "role": "diffusion",
+      "filename": "qwen_image_edit_2511_bf16.safetensors",
+      "source_repository_id": "Qwen/Qwen-Image-Edit-2511",
+      "source_revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "size_bytes": 1024,
+      "sha256": "ae42d927b5fac4f278b9a894554c727e619727a63622976f2d95625be4bce08c",
+      "precision": "bf16",
+      "quantization": null
+    },
+    {
+      "role": "text_encoder",
+      "filename": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "source_repository_id": "Qwen/Qwen-Image-Edit-2511",
+      "source_revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "size_bytes": 1024,
+      "sha256": "cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4",
+      "precision": "fp8_scaled",
+      "quantization": null
+    },
+    {
+      "role": "vae",
+      "filename": "qwen_image_vae.safetensors",
+      "source_repository_id": "Qwen/Qwen-Image-Edit-2511",
+      "source_revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9",
+      "size_bytes": 1024,
+      "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f",
+      "precision": "fp32",
+      "quantization": null
+    }
+  ],
+  "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+  "required_nodes": [
+    {"name": "CheckpointLoaderSimple", "version": "1.0.0"},
+    {"name": "CLIPTextEncode", "version": "1.0.0"},
+    {"name": "KSampler", "version": "1.0.0"},
+    {"name": "SaveImage", "version": "1.0.0"}
+  ],
+  "workflow_source_url": "https://raw.githubusercontent.com/comfyanonymous/ComfyUI_workflow_templates/0.11.43/image_qwen_image_edit_2511.json",
+  "workflow_source_revision": "0.11.43",
+  "workflow_path": "tests/fixtures/p7_1/qwen_workflow_api.json",
+  "workflow_sha256": "248382331bd4687e144450cb77df6a6e0b2cd2245f1118cb1486052b6eda3487",
+  "binding_path": "tests/fixtures/p7_1/qwen_binding.yaml",
+  "binding_sha256": "27be6722643bd859406606b513522663f59548b5c75be1d38da3e5e3ad167991",
+  "supported_reference_roles": ["character", "scene"],
+  "min_references": 2,
+  "max_references": 2,
+  "min_width": 256,
+  "max_width": 1536,
+  "min_height": 256,
+  "max_height": 1536,
+  "sampler": "euler",
+  "scheduler": "normal",
+  "steps": 20,
+  "guidance": 4.0,
+  "output_node_id": "9",
+  "output_mime_type": "image/png",
+  "loopback_endpoints": ["http://127.0.0.1:8188", "http://localhost:8188", "http://[::1]:8188"],
+  "optional_lora_enabled": false,
+  "profile_content_hash": "e4e14f0d283576b045e652736ff1d3515a0b08644d1b2a07ed1f2d86964191b3"
+}

@@ -149,6 +149,13 @@ def canonical_image_authorization_path(authorization_fingerprint: str) -> Path:
     )
 
 
+def canonical_image_execution_profile_path(profile_content_hash: str) -> Path:
+    return Path(
+        "state/images/execution-profiles/"
+        f"{_require_sha256(profile_content_hash, 'image execution profile hash')}.json"
+    )
+
+
 def canonical_image_submit_intent_path(request_fingerprint: str) -> Path:
     return Path(
         "state/images/submit-intents/"
@@ -165,6 +172,13 @@ def canonical_image_result_path(result_fingerprint: str) -> Path:
 def canonical_image_receipt_path(content_hash: str) -> Path:
     return Path(
         f"state/images/receipts/{_require_sha256(content_hash, 'image receipt hash')}.json"
+    )
+
+
+def canonical_human_image_import_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/images/import-receipts/"
+        f"{_require_sha256(content_hash, 'human image import receipt hash')}.json"
     )
 
 

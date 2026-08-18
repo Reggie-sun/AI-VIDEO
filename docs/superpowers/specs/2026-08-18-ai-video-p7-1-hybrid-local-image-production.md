@@ -1,6 +1,6 @@
 # AI-VIDEO P7.1 Hybrid Local Image Production Specification
 
-Status: Approved product direction；docs-only design。P7.1 runtime implementation remains unauthorized and must wait for accepted Base AI Comic E2E plus a new explicit implementation authorization.
+Status: Approved product direction and explicitly authorized implementation. Offline/runtime-contract milestones are implemented on local `main`; live local generation and blind benchmark remain separately gated and unaccepted.
 
 ## 1. Goal
 

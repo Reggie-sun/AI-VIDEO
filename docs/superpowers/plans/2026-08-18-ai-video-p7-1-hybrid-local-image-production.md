@@ -1,5 +1,7 @@
 # AI-VIDEO P7.1 Hybrid Local Image Production Implementation Plan
 
+Execution status: Milestones 0-6 and the applicable offline verification/review portion of Milestone 9 are implemented on local `main`. Milestone 7 live smoke and Milestone 8 blind benchmark remain blocked on their separate explicit authorizations; no live or quality acceptance is claimed.
+
 **Goal:** 在 accepted Base AI Comic E2E 之后，为 P7 增加 loopback-only ComfyUI local image adapter、Qwen/FLUX sealed execution profiles、truthful ChatGPT web human-import path 和 evidence-based quality gate，同时保留现有 durable lifecycle、single writer、P5/P6 ownership 与 Legacy behavior。
 
 **Scope:** P7.1 local image execution、manual web-image import、deterministic fakes、compatibility/live smoke gate、blind benchmark 和 verified runtime-truth docs。

@@ -6,7 +6,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3 deterministic composition、local HyperFrames rendering、P4 Voice and Captions、P5 immutable Dependency Graph/selective rebuild 与 P6 Codex Review and Repair Harness Python APIs 已在 local `main` 验收。P7 local-only Image Asset Generation lineage 与 P3-P7 combined Base AI Comic E2E 已在 `codex/base-ai-comic-e2e` feature branch 验收，尚未合入 `main`。
+公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3-P7 与 combined Base AI Comic E2E 已合入 local `main`。P7.1 offline/runtime-contract implementation 增加 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；live smoke 和 blind benchmark 尚未授权或验收。
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
@@ -23,7 +23,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` 合入并 push 到 `origin/main`，merged-main full verification 为 `1386 passed, 4 skipped`。P6 runtime 已完成、独立审查并通过 `be28dc4` checkpoint 整合到 local `main`；focused verification 为 `739 passed`，合入并行 local-main commits 后 full suite 为 `1462 passed, 4 skipped`。P6 尚未 push、release 或 publish。P7 branch acceptance 为 canonical `1128 passed`、image E2E `7 passed`、full `1686 passed, 4 skipped` 与 Architecture Gate PASS。当前 Base E2E branch 进一步完成 P3-P7 combined acceptance；P7 与 Base E2E 均未 merge 到 `main`、push、release 或 publish。
+公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已 push 到 `origin/main`；P6-P7 与 Base E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但 local `main` 尚未 push、release 或 publish。P7.1 本轮不修改 CLI、schema 或 Legacy layout，也未运行 live ComfyUI generation、模型下载、blind benchmark 或 remote call。
 
 ## Setup
 
@@ -67,7 +67,7 @@ project = load_production_project("projects/example/project.yaml")
 
 上面的路径仅为示意；仓库不包含该 example project。Loader 保持 read-only 和 no-network。它以 `project.yaml` 为 stable validated entrypoint，然后验证 Production Manifest 选中的 project/registry snapshot path、semantic identity 和 exact file hash；也验证 sealed creative artifact reference、六种 Shot `visual_strategy` contract、concrete asset ID/type、local file size/SHA-256 与 project-root containment。对 Manifest 2.1/2.2，它还会验证选中的 P3/P4 timeline、audio/caption provenance、source/receipt/output 与 render-state graph；对 Manifest 2.3，它还验证 active immutable Dependency Graph snapshot 与 Manifest-owned dependency states；对 Manifest 2.4，它还会 reopen 并验证 active QA policy、review/repair/outcome/final-acceptance receipts 及其 exact evidence bindings；对 Manifest 2.5，它还会 reopen exact P7 request、submit intent、provider result、measured PNG 和 provenance evidence，但不会 scan、generate、recover、repair 或 rewrite。P2A state 存在后，root `project.yaml` 不是 active snapshot bytes truth。
 
-P2 本身不创建目录、不更新 Manifest，也不激活 registry 或 graph revision。P2A `ProductionStateCommitter` 继续拥有全部 v2 state changes，并与 reader 保持分离；P6/P7 只在该唯一 writer/control path 上增加 durable QA/repair 与 image lifecycle。Manifest 2.5 现在可在不改变 schema 的情况下组合保留既有 voice/render/review/repair owners 和全部 P7 evidence。当前仍没有 v2 CLI、production coordinator、Remotion/Captions.ai final-render adapter、Video Provider、concrete/live image Provider 或 cloud fallback。
+P2 本身不创建目录、不更新 Manifest，也不激活 registry 或 graph revision。P2A `ProductionStateCommitter` 继续拥有全部 v2 state changes，并与 reader 保持分离；P6/P7/P7.1 只在该唯一 writer/control path 上增加 durable QA/repair、image lifecycle 与 human-import evidence。Manifest 2.5 可在不改变 schema 的情况下组合保留既有 voice/render/review/repair owners 和全部 P7 evidence。当前仍没有 v2 CLI、production coordinator、Remotion/Captions.ai final-render adapter、Video Provider、remote image Provider 或 cloud fallback。
 
 ## Production State Commit Protocol (P2A)
 
@@ -125,13 +125,21 @@ Manifest 2.5 组合 P6 review/repair 与 P7 image lifecycle，但不让两者互
 
 两个 `static_image` Shot 可以复用同一个 Character 和 Scene reference state，同时各自拥有不同的 generated PNG 与 exact provenance。P7 不修改 `dependency.py`，也不声称 reference bytes 变化会自动触发 regeneration；新 request/output 激活后由既有 P5 resolver 只传播 target Shot visual projection 的精确 downstream invalidation，无关 Shot、audio、voice 和 caption nodes 保持 fresh。Exact replay 的 provider/materializer/Manifest write 均为零；explicit recovery 不 remint permit、不 blind resubmit，只接受 exact old/new tuple 并保留完整 orphan evidence。
 
-P7 branch acceptance 为 canonical `1128 passed`、image E2E `7 passed`、full `1686 passed, 4 skipped` 与 Architecture Gate PASS，测试未调用网络、ComfyUI、HyperFrames executable、video Provider、remote image Provider、secret 或 quota。P7 没有增加 CLI、renderer、Composition/timeline、video generation、concrete Provider 或 runtime dependency；当前 branch 尚未 merge 到 `main`、push、release 或 publish。
+P7 原始 fake/no-network acceptance 已随 Base E2E 合入 local `main`。它没有增加 CLI、renderer、Composition/timeline、video generation 或 remote Provider；local `main` 尚未 push、release 或 publish。
+
+### Hybrid Local Image Production (P7.1, offline-verified)
+
+`ai_video.production.comfy_image` 提供 sealed Qwen-Image-Edit-2511 与 FLUX.2-klein-4B local execution profile、loopback-only transport、exact workflow binding，以及在任何 P7 R+1 durable evidence 之前执行的 component SHA/size、ComfyUI commit 和 registered `/object_info` node preflight。Exact replay 仍在 preflight 之前返回，因此不会访问 ComfyUI；submit 后 history/output 不确定性继续进入 `outcome_unknown`，recovery 不 remint permit。
+
+`ai_video.production.image_import` 将人工下载的 ChatGPT Images web PNG 记录为 `chatgpt_images_2_web` human import，不虚构 backend model、provider request、durable submit 或 browser automation。Character master、Scene reference、key Shot 与 repair replacement 都复用同一个 `ProductionStateCommitter` project/Registry/P5 graph atomic activation path。
+
+本地 static compatibility gate 已验证 pinned official-template lineage、Qwen profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`、FLUX profile `local-image-profile:sha256:3963b58e0aad18e8359044b9ad043c92961c940dde19002f94723cd196718eb8`、两个 lane 的 exact component digests、ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、Torch `2.11.0+cu130` / CUDA `13.0`、lane budgets 与 no-tensor GPU preflight。该证据不是 live generation 或质量结论；M7 live smoke 与 M8 blind benchmark 未获授权，P7.1 因此不得称为 live-accepted 或 quality-accepted。
 
 ## Base AI Comic E2E
 
-当前 `codex/base-ai-comic-e2e` branch 已证明 no-Video-Provider production path 可以从 reusable Character/Scene state 生成两个独立 PNG，继续完成 fake voice、canonical `CaptionTrack`、`ResolvedTimeline`、injected HyperFrames render、strategy-aware QA、exact composition repair、rerender 与 Final Acceptance。Fresh runtime 会 reopen exact Project/Registry/Graph/Render/Review/Repair evidence；exact replay 的 image、voice、analysis、renderer 与 Manifest write counters 全部为零。
+已合入 local `main` 的 Base AI Comic E2E 证明 no-Video-Provider production path 可以从 reusable Character/Scene state 生成两个独立 PNG，继续完成 fake voice、canonical `CaptionTrack`、`ResolvedTimeline`、injected HyperFrames render、strategy-aware QA、exact composition repair、rerender 与 Final Acceptance。Fresh runtime 会 reopen exact Project/Registry/Graph/Render/Review/Repair evidence；exact replay 的 image、voice、analysis、renderer 与 Manifest write counters 全部为零。
 
-这个 acceptance 只组合既有 P3-P7 contracts。Manifest 2.5 的 image evidence 在 voice、render、review、repair、recovery 与 replay 后保持不变；没有增加 schema、public CLI、production coordinator、asset layout、runtime dependency、concrete/live Provider 或 P8 implementation。Task 8 full suite 为 `1714 passed, 4 skipped`，Architecture Gate PASS，independent review verdict 为 `accept`、无 blocker。P8 仍需单独获批并验收 Paid Provider Gate；本 branch 尚未 merge 到 `main`、push、release 或 publish。
+这个 acceptance 只组合既有 P3-P7 contracts。Manifest 2.5 的 image evidence 在 voice、render、review、repair、recovery 与 replay 后保持不变；没有增加 schema、public CLI、production coordinator、asset layout、runtime dependency、concrete/live Provider 或 P8 implementation。Task 8 full suite 为 `1714 passed, 4 skipped`，Architecture Gate PASS，independent review verdict 为 `accept`、无 blocker。P8 仍需单独获批并验收 Paid Provider Gate；local `main` 尚未 push、release 或 publish。
 
 ## Development MCP
 

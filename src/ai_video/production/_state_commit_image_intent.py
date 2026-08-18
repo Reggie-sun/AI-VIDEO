@@ -6,6 +6,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.comfy_image import LocalImageExecutionProfile
 from ai_video.production.image import (
     ImageGenerationAuthorization,
     ImageGenerationPreview,
@@ -20,6 +21,7 @@ from ai_video.production.models import (
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_image_authorization_path,
+    canonical_image_execution_profile_path,
     canonical_image_preview_path,
     canonical_image_request_path,
     canonical_image_submit_intent_path,
@@ -49,6 +51,35 @@ def _image_invalid(message: str, detail: str | None = None) -> AiVideoError:
 
 
 class _StateCommitImageIntentMixin:
+    @staticmethod
+    def _validated_image_execution_profile(
+        request: ImageGenerationRequest,
+        execution_profile: LocalImageExecutionProfile | None,
+    ) -> LocalImageExecutionProfile | None:
+        if request.provider_kind != "comfyui_local":
+            if execution_profile is not None:
+                raise _image_invalid(
+                    "Execution profiles are reserved for the comfyui_local Provider."
+                )
+            return None
+        if execution_profile is None:
+            raise _image_invalid(
+                "The comfyui_local Provider requires an exact execution profile."
+            )
+        try:
+            checked = LocalImageExecutionProfile.model_validate(
+                execution_profile.model_dump(mode="python")
+            )
+        except (AttributeError, ValidationError, ValueError) as exc:
+            raise _image_invalid(
+                "The local image execution profile is not sealed.", str(exc)
+            ) from exc
+        if checked != execution_profile or request.model_id != checked.profile_id:
+            raise _image_invalid(
+                "Image request model_id does not match the exact execution profile."
+            )
+        return checked
+
     @staticmethod
     def _image_receipt(
         request: ImageGenerationRequest,
@@ -195,8 +226,12 @@ class _StateCommitImageIntentMixin:
         request: ImageGenerationRequest,
         preview: ImageGenerationPreview,
         authorization: ImageGenerationAuthorization,
+        execution_profile: LocalImageExecutionProfile | None = None,
     ) -> tuple[PreparedArtifact, ...]:
-        return (
+        checked_profile = self._validated_image_execution_profile(
+            request, execution_profile
+        )
+        evidence = (
             self._image_prepared_artifact(
                 request.attempt_id,
                 canonical_image_request_path(request.request_fingerprint),
@@ -215,18 +250,32 @@ class _StateCommitImageIntentMixin:
                 _canonical_json_bytes(authorization),
             ),
         )
+        if checked_profile is None:
+            return evidence
+        return (
+            *evidence,
+            self._image_prepared_artifact(
+                request.attempt_id,
+                canonical_image_execution_profile_path(
+                    checked_profile.profile_content_hash
+                ),
+                _canonical_json_bytes(checked_profile),
+            ),
+        )
 
     def begin_image_generation(
         self,
         request: ImageGenerationRequest,
         preview: ImageGenerationPreview,
         authorization: ImageGenerationAuthorization,
+        *,
+        execution_profile: LocalImageExecutionProfile | None = None,
     ) -> ProductionManifest:
         """Persist exact image R+1 evidence without invoking a Provider."""
 
         receipt = self._image_receipt(request, preview, authorization)
         evidence = self._expected_image_r1_artifacts(
-            request, preview, authorization
+            request, preview, authorization, execution_profile
         )
         with self._exclusive_lock():
             manifest = self._read_manifest()
@@ -251,7 +300,11 @@ class _StateCommitImageIntentMixin:
                     == request.base_dependency_graph
                 ):
                     reopened = self._reopen_image_evidence(
-                        request, preview, authorization, include_intent=False
+                        request,
+                        preview,
+                        authorization,
+                        execution_profile=execution_profile,
+                        include_intent=False,
                     )
                     if (
                         reopened != evidence
@@ -309,6 +362,8 @@ class _StateCommitImageIntentMixin:
         request: ImageGenerationRequest,
         preview: ImageGenerationPreview,
         authorization: ImageGenerationAuthorization,
+        *,
+        execution_profile: LocalImageExecutionProfile | None = None,
     ) -> _DurableImageSubmitPermit:
         """Persist exact image R+2 intent before minting a one-use permit."""
 
@@ -338,10 +393,14 @@ class _StateCommitImageIntentMixin:
                     "Image submit intent requires the exact current R+1 attempt."
                 )
             expected_r1 = self._expected_image_r1_artifacts(
-                request, preview, authorization
+                request, preview, authorization, execution_profile
             )
             reopened_r1 = self._reopen_image_evidence(
-                request, preview, authorization, include_intent=False
+                request,
+                preview,
+                authorization,
+                execution_profile=execution_profile,
+                include_intent=False,
             )
             if (
                 reopened_r1 != expected_r1
@@ -400,7 +459,11 @@ class _StateCommitImageIntentMixin:
                     "Image submit intent Manifest reopen verification failed."
                 )
             reopened_all = self._reopen_image_evidence(
-                request, preview, authorization, include_intent=True
+                request,
+                preview,
+                authorization,
+                execution_profile=execution_profile,
+                include_intent=True,
             )
             if (
                 reopened_all != (*expected_r1, intent_artifact)
@@ -435,6 +498,7 @@ class _StateCommitImageIntentMixin:
                     request,
                     preview,
                     authorization,
+                    execution_profile=execution_profile,
                     receipt=receipt,
                     manifest_revision=reopened.manifest_revision,
                     manifest_file_sha256=manifest_snapshot.file_sha256,
@@ -479,8 +543,12 @@ class _StateCommitImageIntentMixin:
         preview: ImageGenerationPreview,
         authorization: ImageGenerationAuthorization,
         *,
+        execution_profile: LocalImageExecutionProfile | None = None,
         include_intent: bool,
     ) -> tuple[PreparedArtifact, ...]:
+        checked_profile = self._validated_image_execution_profile(
+            request, execution_profile
+        )
         selected = [
             canonical_image_request_path(request.request_fingerprint),
             canonical_image_preview_path(preview.preview_fingerprint),
@@ -488,6 +556,12 @@ class _StateCommitImageIntentMixin:
                 authorization.authorization_fingerprint
             ),
         ]
+        if checked_profile is not None:
+            selected.append(
+                canonical_image_execution_profile_path(
+                    checked_profile.profile_content_hash
+                )
+            )
         if include_intent:
             selected.append(
                 canonical_image_submit_intent_path(request.request_fingerprint)
@@ -518,6 +592,7 @@ class _StateCommitImageIntentMixin:
         preview: ImageGenerationPreview,
         authorization: ImageGenerationAuthorization,
         *,
+        execution_profile: LocalImageExecutionProfile | None,
         receipt: ImageRequestReceipt,
         manifest_revision: int,
         manifest_file_sha256: str,
@@ -534,11 +609,15 @@ class _StateCommitImageIntentMixin:
             manifest = ProductionManifest.model_validate_json(snapshot.data)
             self._validate_image_request_context(manifest, request, preview)
             evidence = self._reopen_image_evidence(
-                request, preview, authorization, include_intent=True
+                request,
+                preview,
+                authorization,
+                execution_profile=execution_profile,
+                include_intent=True,
             )
             expected = (
                 *self._expected_image_r1_artifacts(
-                    request, preview, authorization
+                    request, preview, authorization, execution_profile
                 ),
                 intent_artifact,
             )

@@ -8,13 +8,39 @@ from ai_video.errors import AiVideoError, ErrorCode
 
 
 VIRTUAL_NODE_TYPES = {"Anything Everywhere", "GetNode", "SetNode"}
-SKIPPED_NODE_TYPES = {"PlaySound|pysssss"}
+SKIPPED_NODE_TYPES = {"PlaySound|pysssss", "MarkdownNote", "Note"}
 
 ARRAY_WIDGET_NAME_MAP: dict[str, list[str | None]] = {
     "LoadImage": ["image", None],
     "Textbox": ["text"],
     "mxSlider": ["Xi", "Xf", "isfloatX"],
     "PrimitiveInt": ["value"],
+    "PrimitiveFloat": ["value"],
+    "PrimitiveBoolean": ["value"],
+    "SaveImage": ["filename_prefix"],
+    "KSamplerSelect": ["sampler_name"],
+    "UNETLoader": ["unet_name", "weight_dtype"],
+    "CLIPLoader": ["clip_name", "type", "device"],
+    "VAELoader": ["vae_name"],
+    "EmptyFlux2LatentImage": ["width", "height", "batch_size"],
+    "ImageScaleToTotalPixels": ["upscale_method", "megapixels", "resolution"],
+    "Flux2Scheduler": ["steps", "width", "height"],
+    "CLIPTextEncode": ["text"],
+    "RandomNoise": ["noise_seed", None],
+    "CFGGuider": ["cfg"],
+    "CFGNorm": ["strength", "pre_cfg"],
+    "KSampler": [
+        "seed",
+        None,
+        "steps",
+        "cfg",
+        "sampler_name",
+        "scheduler",
+        "denoise",
+    ],
+    "LoraLoaderModelOnly": ["lora_name", "strength_model"],
+    "ModelSamplingAuraFlow": ["shift"],
+    "FluxKontextMultiReferenceLatentMethod": ["reference_latents_method"],
     "WanVideoTextEncode": [
         "positive_prompt",
         "negative_prompt",
@@ -113,6 +139,11 @@ def load_workflow_template(path: str | Path) -> dict[str, Any]:
     if _looks_like_api_workflow(raw):
         return raw
     if _looks_like_ui_workflow(raw):
+        if (
+            raw.get("definitions", {}).get("subgraphs")
+            and not raw.get("extra", {}).get("ue_links")
+        ):
+            return SubgraphUiWorkflowConverter(raw).convert()
         return UiWorkflowConverter(raw).convert()
     raise _fail("Workflow JSON is neither ComfyUI API-format nor UI workflow JSON.")
 
@@ -282,3 +313,221 @@ class UiWorkflowConverter:
         if isinstance(widgets, list) and widgets:
             return str(widgets[0])
         return str(node.get("title") or node["id"])
+
+
+class SubgraphUiWorkflowConverter:
+    """Flatten ComfyUI subgraph templates into deterministic API prompt graphs."""
+
+    def __init__(self, workflow: dict[str, Any]):
+        self.workflow = workflow
+        self.definitions = {
+            str(item["id"]): item
+            for item in workflow.get("definitions", {}).get("subgraphs", [])
+        }
+        self.contexts: list[dict[str, Any]] = []
+
+    def convert(self) -> dict[str, Any]:
+        root = self._make_context(
+            nodes=self.workflow.get("nodes", []),
+            links=self.workflow.get("links", []),
+            prefix="",
+            parent=None,
+            input_bindings={},
+            definition=None,
+        )
+        prompt: dict[str, Any] = {}
+        self._emit_context(root, prompt)
+        return prompt
+
+    def _make_context(
+        self,
+        *,
+        nodes: list[dict[str, Any]],
+        links: list[Any],
+        prefix: str,
+        parent: dict[str, Any] | None,
+        input_bindings: dict[int, tuple[str, Any]],
+        definition: dict[str, Any] | None,
+    ) -> dict[str, Any]:
+        normalized_links: dict[int, tuple[int, int, int, int]] = {}
+        for link in links:
+            if isinstance(link, dict):
+                normalized_links[int(link["id"])] = (
+                    int(link["origin_id"]),
+                    int(link["origin_slot"]),
+                    int(link["target_id"]),
+                    int(link["target_slot"]),
+                )
+            else:
+                normalized_links[int(link[0])] = (
+                    int(link[1]), int(link[2]), int(link[3]), int(link[4])
+                )
+        context: dict[str, Any] = {
+            "nodes": {int(item["id"]): item for item in nodes},
+            "links": normalized_links,
+            "prefix": prefix,
+            "parent": parent,
+            "input_bindings": input_bindings,
+            "definition": definition,
+            "children": {},
+        }
+        self.contexts.append(context)
+        for node_id, node in context["nodes"].items():
+            subgraph = self.definitions.get(str(node.get("type")))
+            if subgraph is None or int(node.get("mode", 0)) == 4:
+                continue
+            bindings: dict[int, tuple[str, Any]] = {}
+            definition_inputs = subgraph.get("inputs", [])
+            input_index = {
+                str(item["name"]): index
+                for index, item in enumerate(definition_inputs)
+            }
+            raw_values = node.get("widgets_values")
+            if isinstance(raw_values, list) and raw_values:
+                scalar_indexes = tuple(
+                    index
+                    for index, item in enumerate(definition_inputs)
+                    if item.get("type") != "IMAGE"
+                )
+                if len(raw_values) > len(scalar_indexes):
+                    raise _fail(
+                        "Subgraph has more widget values than scalar inputs.",
+                        f'{node["type"]} ({node_id})',
+                    )
+                for value_index, value in enumerate(raw_values):
+                    bindings[scalar_indexes[value_index]] = ("value", value)
+            for input_def in node.get("inputs") or []:
+                index = input_index.get(str(input_def["name"]))
+                if index is None:
+                    raise _fail(
+                        "Subgraph instance input is not declared by its definition.",
+                        str(input_def["name"]),
+                    )
+                if input_def.get("link") is not None:
+                    bindings[index] = (
+                        "parent_link",
+                        (context, int(input_def["link"])),
+                    )
+            context["children"][node_id] = self._make_context(
+                nodes=subgraph.get("nodes", []),
+                links=subgraph.get("links", []),
+                prefix=f"{prefix}{node_id}:",
+                parent=context,
+                input_bindings=bindings,
+                definition=subgraph,
+            )
+        return context
+
+    def _emit_context(
+        self, context: dict[str, Any], prompt: dict[str, Any]
+    ) -> None:
+        for node_id, node in context["nodes"].items():
+            if node_id in context["children"]:
+                self._emit_context(context["children"][node_id], prompt)
+                continue
+            if int(node.get("mode", 0)) == 4:
+                continue
+            node_type = str(node["type"])
+            if node_type in VIRTUAL_NODE_TYPES or node_type in SKIPPED_NODE_TYPES:
+                continue
+            inputs: dict[str, Any] = {}
+            values = self._widget_values(node)
+            consumed: set[str] = set()
+            for input_def in node.get("inputs") or []:
+                name = str(input_def["name"])
+                link_id = input_def.get("link")
+                if link_id is not None:
+                    resolved = self._resolve_link(context, int(link_id))
+                    if resolved is not None:
+                        inputs[name] = resolved
+                    continue
+                widget_name = (input_def.get("widget") or {}).get("name")
+                if widget_name and widget_name in values:
+                    inputs[widget_name] = values[widget_name]
+                    consumed.add(widget_name)
+            for name, value in values.items():
+                if name not in consumed and name not in inputs:
+                    inputs[name] = value
+            prompt[f'{context["prefix"]}{node_id}'] = {
+                "class_type": node_type,
+                "inputs": inputs,
+                "_meta": {"title": node.get("title") or node_type},
+            }
+
+    def _resolve_link(self, context: dict[str, Any], link_id: int) -> Any:
+        try:
+            origin_id, origin_slot, _, _ = context["links"][link_id]
+        except KeyError as exc:
+            raise _fail("Workflow link reference is missing.", str(link_id)) from exc
+        return self._resolve_port(context, origin_id, origin_slot)
+
+    def _resolve_port(
+        self, context: dict[str, Any], origin_id: int, origin_slot: int
+    ) -> Any:
+        if origin_id == -10:
+            binding = context["input_bindings"].get(origin_slot)
+            if binding is None:
+                return None
+            if binding[0] == "value":
+                return binding[1]
+            parent, link_id = binding[1]
+            return self._resolve_link(parent, link_id)
+        child = context["children"].get(origin_id)
+        if child is None:
+            if origin_id not in context["nodes"]:
+                raise _fail("Workflow references an unknown upstream node.", str(origin_id))
+            return [f'{context["prefix"]}{origin_id}', origin_slot]
+        definition = child["definition"]
+        try:
+            output = definition["outputs"][origin_slot]
+        except (IndexError, KeyError) as exc:
+            raise _fail("Subgraph output reference is invalid.", str(origin_slot)) from exc
+        output_links = {
+            int(item["id"]): item for item in definition.get("links", [])
+        }
+        candidates = tuple(
+            output_links[int(link_id)]
+            for link_id in output.get("linkIds", [])
+            if int(link_id) in output_links
+            and int(output_links[int(link_id)]["target_id"]) == -20
+        )
+        if len(candidates) != 1:
+            raise _fail("Subgraph output is not bound exactly once.", str(origin_slot))
+        selected = candidates[0]
+        return self._resolve_port(
+            child,
+            int(selected["origin_id"]),
+            int(selected["origin_slot"]),
+        )
+
+    @staticmethod
+    def _widget_values(node: dict[str, Any]) -> dict[str, Any]:
+        values = node.get("widgets_values")
+        if values is None:
+            return {}
+        if isinstance(values, dict):
+            clean = dict(values)
+            clean.pop("videopreview", None)
+            return clean
+        if not isinstance(values, list) or not values:
+            return {}
+        node_type = str(node["type"])
+        if node_type == "PrimitiveInt":
+            values = values[:1]
+        names = ARRAY_WIDGET_NAME_MAP.get(node_type)
+        if names is None:
+            names = [
+                input_def.get("widget", {}).get("name")
+                for input_def in node.get("inputs") or []
+                if input_def.get("widget")
+            ]
+        if len(values) > len(names):
+            raise _fail(
+                "Workflow node has more widget values than supported widget names.",
+                f'{node_type} ({node["id"]})',
+            )
+        return {
+            name: values[index]
+            for index, name in enumerate(names)
+            if name is not None and index < len(values)
+        }

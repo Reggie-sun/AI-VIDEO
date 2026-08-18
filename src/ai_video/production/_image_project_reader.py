@@ -8,6 +8,7 @@ import yaml
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.comfy_image import LocalImageExecutionProfile
 from ai_video.production.dependency import dependency_graph_semantic_sha256
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.image import (
@@ -18,6 +19,12 @@ from ai_video.production.image import (
     ImageProviderResult,
     _measure_png,
     validate_image_result,
+)
+from ai_video.production.image_import import (
+    HUMAN_IMAGE_IMPORT_TOOL,
+    HumanImageImportReceipt,
+    human_image_import_asset,
+    validate_human_image_import,
 )
 from ai_video.production.models import (
     AssetRecord,
@@ -41,6 +48,8 @@ from ai_video.production.paths import (
     canonical_dependency_graph_snapshot_path,
     canonical_image_asset_path,
     canonical_image_authorization_path,
+    canonical_image_execution_profile_path,
+    canonical_human_image_import_receipt_path,
     canonical_image_preview_path,
     canonical_image_receipt_path,
     canonical_image_request_path,
@@ -343,7 +352,7 @@ def _verify_submit_audit_chain(
     request_path: Path,
     request_sha256: str,
     base_registry: AssetRegistrySnapshot,
-) -> None:
+) -> tuple[tuple[Path, str], ...]:
     summary = attempt.image_request
     if summary is None:
         raise ValueError("image attempt request summary is missing")
@@ -383,11 +392,27 @@ def _verify_submit_audit_chain(
             "image preview or authorization does not match its selected attempt"
         )
 
+    profile_pairs: tuple[tuple[Path, str], ...] = ()
+    if request.provider_kind == "comfyui_local":
+        prefix = "local-image-profile:sha256:"
+        if not request.model_id.startswith(prefix):
+            raise ValueError("local image model_id is not an execution profile identity")
+        profile_hash = request.model_id.removeprefix(prefix)
+        profile_path = canonical_image_execution_profile_path(profile_hash)
+        profile_value, profile_sha256 = _read_canonical_json(
+            bundle.root, profile_path, label="image execution profile"
+        )
+        profile = LocalImageExecutionProfile.model_validate(profile_value)
+        if profile.profile_id != request.model_id:
+            raise ValueError("image execution profile identity mismatch")
+        profile_pairs = ((profile_path, profile_sha256),)
+
     r1_pairs = sorted(
         (
             (request_path.as_posix(), request_sha256),
             (preview_path.as_posix(), preview_sha256),
             (authorization_path.as_posix(), authorization_sha256),
+            *((path.as_posix(), digest) for path, digest in profile_pairs),
         )
     )
     evidence_hash = hashlib.sha256(
@@ -418,6 +443,7 @@ def _verify_submit_audit_chain(
         raise ValueError(
             "image submit intent does not match its exact R+1 evidence"
         )
+    return profile_pairs
 
 
 def _result_fingerprint(
@@ -470,7 +496,7 @@ def _verify_evidence(
     ):
         raise ValueError("image request base pointers do not match its attempt")
     _verify_reference_bindings(bundle, request, base_project, base_registry)
-    _verify_submit_audit_chain(
+    profile_pairs = _verify_submit_audit_chain(
         bundle,
         attempt,
         request,
@@ -569,6 +595,7 @@ def _verify_evidence(
         raise ValueError("active generated image provenance is inconsistent")
     return (
         (request_path, request_sha256),
+        *profile_pairs,
         (result_path, result_sha256),
         (receipt_path, receipt_sha256),
         (asset.artifact_path, image_snapshot.file_sha256),
@@ -581,7 +608,11 @@ def _verify_candidate_artifacts_hash(
     pairs: tuple[tuple[Path, str], ...],
 ) -> None:
     normalized = sorted((path.as_posix(), digest) for path, digest in pairs)
-    if len(normalized) != 8 or len({path for path, _ in normalized}) != 8:
+    expected_count = 9 if attempt.image_request.provider_kind == "comfyui_local" else 8
+    if (
+        len(normalized) != expected_count
+        or len({path for path, _ in normalized}) != expected_count
+    ):
         raise ValueError("image candidate artifact set is not exact")
     actual = hashlib.sha256(
         json.dumps(normalized, separators=(",", ":")).encode("utf-8")
@@ -619,7 +650,7 @@ def verify_image_attempt_evidence(
     bundle: LoadedProductionProject,
     attempt: StateCommitAttempt,
 ) -> tuple[tuple[Path, str], ...]:
-    """Reopen the one authoritative eight-artifact P7 candidate proof."""
+    """Reopen the authoritative P7 or local-profile P7.1 candidate proof."""
 
     if (
         attempt.operation != "image_generation"
@@ -752,5 +783,65 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
         detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
         raise _invalid(
             "Active P7 image candidate history or reference provenance is invalid.",
+            detail,
+        ) from exc
+
+    try:
+        imported = tuple(
+            item
+            for item in bundle.registry.assets
+            if item.source_kind is AssetSourceKind.IMPORTED
+            and item.asset_type is AssetType.IMAGE
+            and item.tool == HUMAN_IMAGE_IMPORT_TOOL
+        )
+        for asset in imported:
+            receipt_path = canonical_human_image_import_receipt_path(
+                asset.creation_receipt_id
+            )
+            receipt_value, _ = _read_canonical_json(
+                bundle.root, receipt_path, label="human image import receipt"
+            )
+            receipt = HumanImageImportReceipt.model_validate(receipt_value)
+            image = _read_regular_file_nofollow(
+                bundle.root / asset.artifact_path,
+                contained_by=bundle.root / "assets/files",
+            )
+            validate_human_image_import(receipt, image.data)
+            if human_image_import_asset(receipt) != asset:
+                raise ValueError("selected human image import AssetRecord is inconsistent")
+            if receipt.target_kind == "character_master":
+                targets = tuple(
+                    item
+                    for item in bundle.characters
+                    if item.artifact_id == receipt.target_artifact_id
+                    and item.reference_asset_ids == (asset.asset_id,)
+                    and item.creation_receipt_id == receipt.content_hash
+                )
+            elif receipt.target_kind == "scene_reference":
+                targets = tuple(
+                    item
+                    for item in bundle.scenes
+                    if item.artifact_id == receipt.target_artifact_id
+                    and item.visual_reference_asset_ids == (asset.asset_id,)
+                    and item.creation_receipt_id == receipt.content_hash
+                )
+            else:
+                targets = tuple(
+                    item
+                    for item in bundle.shots
+                    if item.artifact_id == receipt.target_artifact_id
+                    and item.creation_receipt_id == receipt.content_hash
+                    and any(
+                        role.role == receipt.target_asset_role
+                        and role.asset_ids == (asset.asset_id,)
+                        for role in item.required_asset_roles
+                    )
+                )
+            if len(targets) != 1:
+                raise ValueError("selected human image import target binding is inconsistent")
+    except (AiVideoError, OSError, UnicodeError, ValidationError, ValueError) as exc:
+        detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
+        raise _invalid(
+            "Active human image import provenance is invalid.",
             detail,
         ) from exc

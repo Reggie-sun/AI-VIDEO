@@ -58,6 +58,19 @@ from ai_video.production.image import (
     ImageProviderResult,
     ImageReferenceBinding,
 )
+from ai_video.production.comfy_image import (
+    ComfyLocalImageProvider,
+    LocalImageBinding,
+    LocalImageExecutionProfile,
+    load_local_image_binding,
+    load_local_image_execution_profile,
+)
+from ai_video.production.image_import import (
+    HumanImageImportReceipt,
+    human_image_import_asset,
+    prepare_human_image_import_commit,
+    validate_human_image_import,
+)
 from ai_video.production.state_commit import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
@@ -97,6 +110,10 @@ __all__ = [
     "ImageProviderParameters",
     "ImageProviderResult",
     "ImageReferenceBinding",
+    "ComfyLocalImageProvider",
+    "LocalImageBinding",
+    "LocalImageExecutionProfile",
+    "HumanImageImportReceipt",
     "ProductionBrief",
     "ProductionManifest",
     "ProductionStateCommitter",
@@ -131,6 +148,11 @@ __all__ = [
     "VoiceGenerationRequest",
     "VoiceProviderResult",
     "load_production_project",
+    "load_local_image_binding",
+    "load_local_image_execution_profile",
+    "human_image_import_asset",
+    "prepare_human_image_import_commit",
+    "validate_human_image_import",
     "prepare_project_registry_commit",
     "prepare_dependency_graph_transition",
     "recover_production_state",

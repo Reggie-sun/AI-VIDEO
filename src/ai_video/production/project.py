@@ -1227,13 +1227,38 @@ def _verify_dependency_project_evidence(
             bundle, evidence, node, graph, state, artifact, origin_graph
         )
         return
+    elif isinstance(artifact, (Character, Scene)):
+        graph, state = context or (None, None)
+        origin_graph = graph
+        origin_pointer = _project_evidence.historical_origin_graph_pointer(
+            bundle, evidence
+        )
+        if origin_pointer is not None:
+            origin_graph = _load_active_dependency_graph(root, origin_pointer)
+        current_matches = tuple(
+            item
+            for item in (*bundle.characters, *bundle.scenes)
+            if item.artifact_id == evidence.artifact_id
+        )
+        if len(current_matches) != 1:
+            raise _invalid("Current project dependency artifact is ambiguous.")
+        _project_evidence.verify_active_versioned_artifact_evidence(
+            bundle,
+            evidence,
+            node,
+            graph,
+            state,
+            artifact,
+            current_matches[0],
+            origin_graph,
+        )
     else:
         if node.artifact_revision != artifact.revision:
             raise _invalid("Project dependency evidence revision is invalid.")
         kind = node.node_id.split(":", 2)[1] if ":" in node.node_id else ""
         expected = {f"{kind}.semantic": artifact.content_hash}
-    if contributions != expected:
-        raise _invalid("Project dependency evidence projection is invalid.")
+        if contributions != expected:
+            raise _invalid("Project dependency evidence projection is invalid.")
 
 
 def _verify_dependency_registry_evidence(

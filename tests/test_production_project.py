@@ -115,6 +115,9 @@ from ai_video.production.project import (
     _verify_dependency_project_evidence,
     load_production_project_candidate,
 )
+from ai_video.production._project_dependency_evidence import (
+    verify_active_versioned_artifact_evidence,
+)
 from production_project_factory import (
     add_p6_policy_to_p7_project,
     append_p7_committed_candidate,
@@ -1736,6 +1739,97 @@ def test_historical_shot_projection_rejects_nonhistorical_project_evidence(
             nonhistorical_evidence,
             node,
             (graph, nonhistorical_state),
+        )
+
+
+@pytest.mark.parametrize("revision_offset", [0, 1])
+def test_reader_rejects_character_evidence_from_future_or_alternate_project(
+    tmp_path, revision_offset
+):
+    graph = make_manifest_23_project(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    state = next(
+        item
+        for item in loaded.manifest.dependency_states
+        if item.node_id.startswith("creative:character:")
+    )
+    assert state.applied_evidence is not None
+    forged_project = seal_artifact(
+        loaded.project.model_copy(
+            update={
+                "revision": loaded.project.revision + revision_offset,
+                "content_hash": "0" * 64,
+                "creation_receipt_id": "forged-character-project",
+            }
+        )
+    )
+    payload = yaml.safe_dump(
+        forged_project.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    path = canonical_project_snapshot_path(
+        forged_project.revision, forged_project.content_hash
+    )
+    (tmp_path / path).parent.mkdir(parents=True, exist_ok=True)
+    (tmp_path / path).write_bytes(payload)
+    pointer = ProjectSnapshotPointer(
+        path=path,
+        revision=forged_project.revision,
+        content_hash=forged_project.content_hash,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    forged_state = state.model_copy(
+        update={
+            "applied_evidence": state.applied_evidence.model_copy(
+                update={"pointer": pointer}
+            )
+        }
+    )
+    states = tuple(
+        forged_state if item.node_id == state.node_id else item
+        for item in loaded.manifest.dependency_states
+    )
+    _write_manifest(
+        tmp_path, loaded.manifest.model_copy(update={"dependency_states": states})
+    )
+
+    with pytest.raises(AiVideoError, match="state binding"):
+        load_production_project(tmp_path / "project.yaml")
+
+    assert any(item.node_id == state.node_id for item in graph.nodes)
+
+
+def test_character_evidence_rejects_same_revision_different_content(tmp_path):
+    graph = make_manifest_23_project(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    state = next(
+        item
+        for item in loaded.manifest.dependency_states
+        if item.node_id.startswith("creative:character:")
+    )
+    node = next(item for item in graph.nodes if item.node_id == state.node_id)
+    assert state.applied_evidence is not None
+    current = loaded.characters[0]
+    forged_origin = seal_artifact(
+        current.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "appearance_bible": current.appearance_bible + " forged",
+            }
+        )
+    )
+
+    with pytest.raises(AiVideoError, match="state binding"):
+        verify_active_versioned_artifact_evidence(
+            loaded,
+            state.applied_evidence,
+            node,
+            graph,
+            state,
+            forged_origin,
+            current,
+            graph,
         )
 
 

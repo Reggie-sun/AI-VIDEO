@@ -357,6 +357,8 @@ def _crash_image_and_recover(
     root: Path,
     phase: CommitPhase,
     occurrence: int,
+    *,
+    mode: str = "image",
 ) -> StateCommitStatus | None:
     result = subprocess.run(
         [
@@ -365,7 +367,7 @@ def _crash_image_and_recover(
             str(root),
             phase.value,
             str(occurrence),
-            "image",
+            mode,
         ],
         cwd=REPO_ROOT,
         check=False,
@@ -480,6 +482,33 @@ def test_image_manifest_byte_window_process_crash_matrix(
         )
     )[occurrence - 1]
     assert _crash_image_and_recover(committed_project, phase, occurrence) is expected
+
+
+@pytest.mark.parametrize(
+    ("phase", "occurrence", "expected_status"),
+    (
+        (CommitPhase.AFTER_ARTIFACT_TEMP_WRITE, 4, None),
+        (CommitPhase.AFTER_ARTIFACT_PROMOTION, 4, None),
+        (CommitPhase.AFTER_MANIFEST_REPLACE, 1, StateCommitStatus.INTERRUPTED),
+        (
+            CommitPhase.AFTER_IMAGE_PERMIT_CONSUMED,
+            1,
+            StateCommitStatus.OUTCOME_UNKNOWN,
+        ),
+    ),
+)
+def test_local_profile_process_crash_recovery_is_fail_closed(
+    committed_project: Path,
+    phase: CommitPhase,
+    occurrence: int,
+    expected_status: StateCommitStatus | None,
+) -> None:
+    assert _crash_image_and_recover(
+        committed_project,
+        phase,
+        occurrence,
+        mode="image_local_profile",
+    ) is expected_status
 
 
 def test_recovery_marks_r2_voice_outcome_unknown_and_never_remints(

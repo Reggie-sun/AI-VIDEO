@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pytest
@@ -54,3 +55,107 @@ def test_load_workflow_template_rejects_unknown_widget_mapping(tmp_path):
 
     assert exc.value.code is ErrorCode.WORKFLOW_INVALID
     assert "widget mapping" in exc.value.user_message.lower()
+
+
+def test_load_workflow_template_flattens_nested_subgraph_ports(tmp_path):
+    template = tmp_path / "subgraph.json"
+    template.write_text(
+        json.dumps(
+            {
+                "nodes": [
+                    {
+                        "id": 1,
+                        "type": "LoadImage",
+                        "inputs": [],
+                        "widgets_values": ["reference.png", "image"],
+                    },
+                    {
+                        "id": 2,
+                        "type": "subgraph-1",
+                        "mode": 0,
+                        "inputs": [
+                            {"name": "image", "type": "IMAGE", "link": 1},
+                            {
+                                "name": "text",
+                                "type": "STRING",
+                                "widget": {"name": "text"},
+                                "link": None,
+                            },
+                        ],
+                        "widgets_values": ["bound prompt"],
+                    },
+                    {
+                        "id": 3,
+                        "type": "SaveImage",
+                        "inputs": [{"name": "images", "link": 2}],
+                        "widgets_values": ["result"],
+                    },
+                ],
+                "links": [
+                    [1, 1, 0, 2, 0, "IMAGE"],
+                    [2, 2, 0, 3, 0, "IMAGE"],
+                ],
+                "definitions": {
+                    "subgraphs": [
+                        {
+                            "id": "subgraph-1",
+                            "inputs": [
+                                {"name": "image", "type": "IMAGE", "linkIds": [10]},
+                                {"name": "text", "type": "STRING", "linkIds": [11]},
+                            ],
+                            "outputs": [
+                                {"name": "IMAGE", "type": "IMAGE", "linkIds": [12]}
+                            ],
+                            "nodes": [
+                                {
+                                    "id": 4,
+                                    "type": "CLIPTextEncode",
+                                    "inputs": [
+                                        {"name": "image", "link": 10},
+                                        {
+                                            "name": "text",
+                                            "widget": {"name": "text"},
+                                            "link": 11,
+                                        },
+                                    ],
+                                    "widgets_values": ["default prompt"],
+                                }
+                            ],
+                            "links": [
+                                {
+                                    "id": 10,
+                                    "origin_id": -10,
+                                    "origin_slot": 0,
+                                    "target_id": 4,
+                                    "target_slot": 0,
+                                },
+                                {
+                                    "id": 11,
+                                    "origin_id": -10,
+                                    "origin_slot": 1,
+                                    "target_id": 4,
+                                    "target_slot": 1,
+                                },
+                                {
+                                    "id": 12,
+                                    "origin_id": 4,
+                                    "origin_slot": 0,
+                                    "target_id": -20,
+                                    "target_slot": 0,
+                                },
+                            ],
+                        }
+                    ]
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    loaded = load_workflow_template(template)
+
+    assert loaded["2:4"]["inputs"] == {
+        "image": ["1", 0],
+        "text": "bound prompt",
+    }
+    assert loaded["3"]["inputs"]["images"] == ["2:4", 0]

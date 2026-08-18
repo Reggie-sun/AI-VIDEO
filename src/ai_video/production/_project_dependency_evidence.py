@@ -160,6 +160,54 @@ def verify_active_shot_projection_evidence(
         raise _invalid("Historical Shot dependency evidence is invalid.")
 
 
+def verify_active_versioned_artifact_evidence(
+    bundle: LoadedProductionProject,
+    evidence: ProjectDependencyEvidence,
+    node: DependencyNode,
+    graph: DependencyGraphSnapshot | None,
+    state: DependencyNodeState | None,
+    origin: VersionedArtifact,
+    current: VersionedArtifact,
+    origin_graph: DependencyGraphSnapshot | None,
+) -> None:
+    """Verify current and historical Character/Scene applied evidence exactly."""
+
+    if graph is None or state is None or origin_graph is None:
+        raise _invalid("Active project dependency evidence requires graph state.")
+    kind = node.node_id.split(":", 2)[1] if ":" in node.node_id else ""
+    key = f"{kind}.semantic"
+    current_expected = {key: current.content_hash}
+    contributions = {item.key: item.fingerprint for item in node.contributions}
+    active_nodes = tuple(item for item in graph.nodes if item.node_id == node.node_id)
+    if (
+        len(active_nodes) != 1
+        or active_nodes[0] != node
+        or state.node_id != node.node_id
+        or state.graph_revision_id != graph.revision_id
+        or state.desired_fingerprint != desired_fingerprints(graph)[node.node_id]
+        or state.applied_evidence != evidence
+        or state.applied_fingerprint != evidence.artifact_fingerprint
+        or node.artifact_revision != current.revision
+        or contributions != current_expected
+        or evidence.pointer.revision > bundle.manifest.active_project.revision
+        or origin.revision > current.revision
+        or (
+            evidence.pointer.revision == bundle.manifest.active_project.revision
+            and evidence.pointer != bundle.manifest.active_project
+        )
+        or (origin.revision == current.revision and origin != current)
+    ):
+        raise _invalid("Project dependency evidence state binding is invalid.")
+    origin_nodes = tuple(item for item in origin_graph.nodes if item.node_id == node.node_id)
+    if (
+        len(origin_nodes) != 1
+        or origin_nodes[0].artifact_revision != origin.revision
+        or {item.key: item.fingerprint for item in origin_nodes[0].contributions}
+        != {key: origin.content_hash}
+        or desired_fingerprints(origin_graph).get(node.node_id)
+        != evidence.artifact_fingerprint
+    ):
+        raise _invalid("Historical project dependency evidence is invalid.")
 SHOT_PROJECTION_ROLES = frozenset(
     {
         DependencySemanticRole.VOICE,

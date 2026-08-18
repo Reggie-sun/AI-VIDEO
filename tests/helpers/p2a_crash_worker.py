@@ -46,6 +46,10 @@ from test_production_state_commit import (  # noqa: E402
     make_image_call_bundle,
     make_image_provider_result,
 )
+from test_production_p7_1_local_image_e2e import (  # noqa: E402
+    _local_bundle,
+    _profile,
+)
 
 
 class ExitInjector:
@@ -68,11 +72,20 @@ def main() -> int:
     if occurrence < 1:
         raise ValueError("phase occurrence must be positive")
     mode = sys.argv[4] if len(sys.argv) > 4 else "project_commit"
-    if mode == "image":
+    if mode in {"image", "image_local_profile"}:
         base_inputs = make_p7_image_generation_base(root)
-        request, preview, authorization = make_image_call_bundle(root)
+        profile = _profile() if mode == "image_local_profile" else None
+        request, preview, authorization = (
+            _local_bundle(root, profile)
+            if profile is not None
+            else make_image_call_bundle(root)
+        )
 
         class _Provider:
+            def preflight(self, candidate):
+                if profile is not None and candidate != request:
+                    raise AssertionError("image worker preflight request mismatch")
+
             def generate(self, candidate, candidate_authorization, permit):
                 if not permit._consume_image_generation_permit(
                     request_fingerprint=candidate.request_fingerprint
@@ -86,7 +99,13 @@ def main() -> int:
             root,
             crash_injector=ExitInjector(phase, occurrence),
             image_candidate_preparer=make_p7_image_candidate_preparer(base_inputs),
-        ).generate_image_asset(request, preview, authorization, _Provider())
+        ).generate_image_asset(
+            request,
+            preview,
+            authorization,
+            _Provider(),
+            execution_profile=profile,
+        )
         return 0
     if mode == "graph_bootstrap":
         graph, transition, desired = make_p5_bootstrap_transition(root)

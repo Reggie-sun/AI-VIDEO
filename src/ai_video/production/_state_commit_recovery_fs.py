@@ -179,25 +179,31 @@ class _StateCommitRecoveryFsMixin:
         return tuple(items)
 
     def _remove_unrecorded_image_request_temps(self) -> tuple[RecoveryItem, ...]:
-        """Clean only the reserved R+1 request namespace before an attempt exists."""
+        """Clean only reserved R+1 namespaces before an attempt exists."""
 
-        directory = self._project_root / "state/images/requests"
-        try:
-            relative_files = _list_regular_files_nofollow(directory)
-        except FileNotFoundError:
-            return ()
-        except (OSError, ValueError) as exc:
-            raise _state_invalid(
-                "Image request temporary files could not be inspected.", str(exc)
-            ) from exc
         items: list[RecoveryItem] = []
-        for relative in sorted(relative_files):
-            if (
-                relative.parent == Path(".")
-                and relative.name.startswith(".p2a-")
-                and relative.name.endswith(".tmp")
-            ):
-                items.extend(self._remove_recovery_temp(directory / relative))
+        for namespace in (
+            "requests",
+            "previews",
+            "authorizations",
+            "execution-profiles",
+        ):
+            directory = self._project_root / "state/images" / namespace
+            try:
+                relative_files = _list_regular_files_nofollow(directory)
+            except FileNotFoundError:
+                continue
+            except (OSError, ValueError) as exc:
+                raise _state_invalid(
+                    "Image R+1 temporary files could not be inspected.", str(exc)
+                ) from exc
+            for relative in sorted(relative_files):
+                if (
+                    relative.parent == Path(".")
+                    and relative.name.startswith(".p2a-")
+                    and relative.name.endswith(".tmp")
+                ):
+                    items.extend(self._remove_recovery_temp(directory / relative))
         return tuple(items)
 
     def _remove_render_attempt_scratch(

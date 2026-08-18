@@ -225,15 +225,23 @@ class _StateCommitTransactionMixin:
                         ),
                     )
                 self._verify_committed_candidates(request)
+                succeeded_attempt = _validated_transition(
+                    running_attempt,
+                    {
+                        "status": StateCommitStatus.SUCCEEDED,
+                        "finished_at": _timestamp(),
+                    },
+                )
                 if graph_transition is not None and candidate_graph is not None:
+                    verification_attempts = manifest.attempts + (succeeded_attempt,)
                     self._verify_dependency_candidate(
                         manifest,
                         candidate_graph,
                         graph_transition.candidate_dependency_states,
                         project_pointer=request.next_project,
                         registry_pointer=request.next_registry,
+                        attempts=verification_attempts,
                     )
-                succeeded_attempt = _validated_transition(running_attempt, {"status": StateCommitStatus.SUCCEEDED, "finished_at": _timestamp()})
                 final_update: dict[str, object] = {
                     "schema_version": (
                         "2.2"

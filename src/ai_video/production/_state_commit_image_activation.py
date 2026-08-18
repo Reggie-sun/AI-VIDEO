@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.comfy_image import LocalImageExecutionProfile
 from ai_video.production._image_project_reader import (
     _verify_image_activation_chronology,
 )
@@ -52,6 +53,8 @@ class _StateCommitImageActivationMixin:
         preview: ImageGenerationPreview,
         authorization: ImageGenerationAuthorization,
         provider: ImageAssetProvider,
+        *,
+        execution_profile: LocalImageExecutionProfile | None = None,
     ) -> ProductionManifest:
         """Invoke exactly one permitted local Provider call, then activate its result."""
 
@@ -59,11 +62,31 @@ class _StateCommitImageActivationMixin:
             request,
             preview,
             authorization,
+            execution_profile=execution_profile,
         )
         if replay is not None:
             return replay
-        self.begin_image_generation(request, preview, authorization)
-        permit = self.record_image_submit_intent(request, preview, authorization)
+        if request.provider_kind == "comfyui_local":
+            preflight = getattr(provider, "preflight", None)
+            if not callable(preflight):
+                raise AiVideoError(
+                    ErrorCode.IMAGE_REQUEST_INVALID,
+                    "Local ComfyUI image generation requires an exact read-only preflight.",
+                    retryable=False,
+                )
+            preflight(request)
+        self.begin_image_generation(
+            request,
+            preview,
+            authorization,
+            execution_profile=execution_profile,
+        )
+        permit = self.record_image_submit_intent(
+            request,
+            preview,
+            authorization,
+            execution_profile=execution_profile,
+        )
         permit._set_image_generation_consume_callback(
             lambda: self._crash_injector.checkpoint(
                 CommitPhase.AFTER_IMAGE_PERMIT_CONSUMED
@@ -104,6 +127,7 @@ class _StateCommitImageActivationMixin:
             authorization,
             result,
             permit,
+            execution_profile=execution_profile,
         )
 
     def _exact_image_replay(
@@ -111,6 +135,8 @@ class _StateCommitImageActivationMixin:
         request: ImageGenerationRequest,
         preview: ImageGenerationPreview,
         authorization: ImageGenerationAuthorization,
+        *,
+        execution_profile: LocalImageExecutionProfile | None = None,
     ) -> ProductionManifest | None:
         """Return a fully proven active success before the first durable write."""
 
@@ -158,7 +184,7 @@ class _StateCommitImageActivationMixin:
                     raise ValueError("active image replay Manifest changed during reopen")
                 _verify_image_activation_chronology(manifest, attempt)
                 expected_r1 = self._expected_image_r1_artifacts(
-                    request, preview, authorization
+                    request, preview, authorization, execution_profile
                 )
                 expected_intent = self._image_prepared_artifact(
                     request.attempt_id,
@@ -173,7 +199,11 @@ class _StateCommitImageActivationMixin:
                     ),
                 )
                 reopened = self._reopen_image_evidence(
-                    request, preview, authorization, include_intent=True
+                    request,
+                    preview,
+                    authorization,
+                    execution_profile=execution_profile,
+                    include_intent=True,
                 )
                 if reopened != (*expected_r1, expected_intent):
                     raise ValueError("durable image replay request evidence is not exact")
@@ -191,6 +221,8 @@ class _StateCommitImageActivationMixin:
         authorization: ImageGenerationAuthorization,
         result: ImageProviderResult,
         permit: _DurableImageSubmitPermit,
+        *,
+        execution_profile: LocalImageExecutionProfile | None = None,
     ) -> ProductionManifest:
         """Persist a validated image candidate and atomically select its bundle."""
 
@@ -211,6 +243,7 @@ class _StateCommitImageActivationMixin:
                 result,
                 permit,
                 final_replaced,
+                execution_profile=execution_profile,
             )
         except Exception as exc:
             if final_replaced[0]:
@@ -250,6 +283,8 @@ class _StateCommitImageActivationMixin:
         result: ImageProviderResult,
         permit: _DurableImageSubmitPermit,
         final_replaced: list[bool],
+        *,
+        execution_profile: LocalImageExecutionProfile | None = None,
     ) -> ProductionManifest:
         with self._exclusive_lock():
             if not permit._image_generation_was_consumed(
@@ -284,12 +319,23 @@ class _StateCommitImageActivationMixin:
                 request, candidate_artifacts
             )
             request_artifact = self._reopen_image_request_artifact(request)
+            profile_artifacts = self._expected_image_r1_artifacts(
+                request, preview, authorization, execution_profile
+            )[3:]
+            reopened_profiles = tuple(
+                self._reopen_exact_image_artifact(artifact)
+                for artifact in profile_artifacts
+            )
             exact_artifacts = (
                 request_artifact,
+                *reopened_profiles,
                 *result_artifacts,
                 *reopened_candidates,
             )
-            if len(exact_artifacts) != 8:
+            expected_artifact_count = (
+                9 if request.provider_kind == "comfyui_local" else 8
+            )
+            if len(exact_artifacts) != expected_artifact_count:
                 raise _state_invalid(
                     "Image activation candidate artifact set is not exact."
                 )
