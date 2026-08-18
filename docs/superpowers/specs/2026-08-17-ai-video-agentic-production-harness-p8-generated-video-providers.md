@@ -1,8 +1,8 @@
 # AI-VIDEO P8 Generated Video Providers Specification
 
-Status: Proposed P8 slice contract. 本文件只定义设计与未来实施边界；不授权 runtime implementation、MiniMax live call、付费提交、merge、push 或 release。
+Status: Accepted offline-first P8 slice contract. 用户已授权从 accepted Paid Provider Gate base 开始实施；本授权不包含 MiniMax live call、真实付费提交、push 或 release。
 
-Planning snapshot: 2026-08-17。审计开始时 local `main` 为 `6c4db4ae88c7026438a0827c1b5bccbaf80feaef`；本轮期间另一个 P6 writer继续推进 local `main`并保留 P6 shared-file dirty work，因此本 spec不把任何 transient HEAD当作 accepted P8 base。P7 plan与 pure image lane位于 sibling worktrees，尚未 merge/accept。P8 runtime implementation仍受 accepted P6/P7、Base AI Comic E2E与 Paid Provider Gate阻塞，Task 0必须重新锁定 exact clean base。
+Implementation snapshot: 2026-08-18。P6、P7 与 Base AI Comic E2E 已在 local `main` accepted；standalone Paid Provider Gate 已于 `cc82a49` 完成 Manifest `2.6` implementation、independent review 与 executable acceptance。P8 的 exact integration base 为 `cc82a49`，并固定使用 `P8_MANIFEST_SCHEMA = "2.7"`、`P8_REGISTRY_SCHEMA = "2.2"`。现有 P7.1 unrelated dirty work 不属于 P8 ownership，必须保留且不得被 P8 覆盖。
 
 ## 1. Goal
 
@@ -35,11 +35,11 @@ Shot / explicit visual requirement
 
 - `Shot` 与六种 `VisualStrategy` 已由 `src/ai_video/production/models.py` 定义；`generated_video` 已存在，但 Shot 不是 Provider request。
 - `src/ai_video/production/validation.py::validate_shot_strategy()` 当前要求 `generated_video` Shot 已绑定 Registry 中 `AssetType.VIDEO + AssetSourceKind.GENERATED` 的 concrete asset。因此 active P2 Project 能表示“已物化 generated video”，不能表示 unresolved placeholder。
-- `AssetRegistrySnapshot` 当前为 2.0/2.1；Registry immutable、append-only、content-addressed。`EgressMetadata` 目前只允许 remote generated voice，因此 remote generated video 需要最小 versioned extension。
-- `ProductionManifest` 当前最高为 2.4；它是 mutable lifecycle、desired/applied、active pointers 与 attempt history 的唯一 owner。
+- `AssetRegistrySnapshot` 当前为 2.0/2.1；Registry immutable、append-only、content-addressed。`EgressMetadata` 目前只允许 remote generated voice，因此 remote generated video 需要最小 versioned `2.2` extension。
+- `ProductionManifest` 当前最高为 2.6；它是 mutable lifecycle、desired/applied、active pointers、Paid Provider Gate budget/attempt truth 与 attempt history 的唯一 owner。
 - `ProductionStateCommitter` 是 project/registry/render/graph/review write、activation 与 explicit recovery 的唯一 owner；P8 不增加第二 writer。
 - P5 graph 已有 visual asset 与 `GENERATION_INPUT` vocabulary，但 generated visual 仍按普通 asset 消费 output bytes。P8 必须增加 request-semantic projection，不能把 nondeterministic artifact hash误当成 desired request identity。
-- P4 已证明 preview/authorization、durable submit intent、committer-issued one-use permit、`outcome_unknown`、fake transport、secret redaction 与 immutable provenance pattern。P8复用其 safety pattern，不复制 voice schema。
+- Manifest 2.6 Paid Provider Gate 已证明 exact preview/authorization、budget reservation、durable submit intent、shared committer-issued one-use `DurablePaidProviderSubmitPermit`、Gate-owned `PaidProviderSubmitReceipt.external_effect_id`、`outcome_unknown`、fake transport与secret redaction。P8直接复用该 Gate contract，不复制 voice 或 P8-specific paid authority。
 - `httpx>=0.27` 已是 runtime dependency；MiniMax adapter 不需要增加 HTTP dependency，也不 shell out 到 `mmx`。
 - `ffmpeg_tools.probe_clip()` 与 P3 held-file-descriptor media verification 可复用；P8 不引入第二套视频 parser。
 - Legacy CLI 仍只有 `validate | run | resume`。当前没有 v2 CLI，P8 不新增 CLI。
@@ -50,16 +50,17 @@ Shot / explicit visual requirement
 
 本 slice 的 mandatory E2E 因此止于：active Project/Registry/graph exact reference 已验证，generated video asset 可供后续 composition adapter 消费。把 MP4 frame-accurately 纳入 `ResolvedTimeline`/HyperFrames 需要独立的 P8 composition compatibility plan；不得藏在 MiniMax adapter 中，也不得建立第二 timeline/renderer。
 
-### 2.3 P7/Base gate
+### 2.3 Accepted P7/Base/Paid Gate
 
-P7 尚未 accepted。P8 应复用 accepted P7 最终确立的 shared Asset Generation vocabulary（request sealing、candidate scope、one-use permit、append-only Registry activation），但不得依赖 sibling worktree 的未合并符号或预占 schema version。Task 0 必须从届时 accepted Manifest 与 Registry base 分别选择 next compatible minor version；当前 P7 plan 中的 Manifest 2.5 / Registry 2.1 只用于估算，不是 P8 已分配的版本号。
+P7 与 Base AI Comic E2E 已 accepted。P8复用其 shared Asset Generation vocabulary（request sealing、candidate scope、append-only Registry activation），并复用 Manifest 2.6 Paid Provider Gate 的 one-use metered-submit permit与 billable-effect identity。Task 0 已从 accepted Manifest `2.6` / Registry `2.1` base 分配 next-compatible Manifest `2.7` / Registry `2.2`。
 
 P8 implementation 开始前必须满足：
 
-1. P6 contract 已 freeze、review 并形成 clean accepted base；
+1. P6 contract 已 freeze、review 并形成 accepted base；
 2. P7 与 Base AI Comic E2E 已 accepted；
-3. P7/shared Manifest version 与 Asset Generation seam 已确认；
-4. Paid Provider Gate 已具备 explicit opt-in、budget upper bound/reservation、egress authorization、secret redaction、crash-safe job receipt 与 fake transport evidence。
+3. P7/shared Manifest `2.5` / Registry `2.1` 与 Asset Generation seam 已确认；
+4. Paid Provider Gate commit `cc82a49` 已具备 explicit opt-in、budget upper bound/reservation、egress authorization、secret redaction、crash-safe submit receipt、one-use permit 与 fake transport evidence；
+5. P8不得复制 `PaidProviderSubmitReceipt.external_effect_id`；video polling/fetch lifecycle只引用 Gate-owned exact billable-effect identity。
 
 ## 3. Contracts P8 Must Preserve
 
@@ -290,7 +291,7 @@ P8 V1不提供公共 cancellation contract；未来若加入 cancellation，必�
 
 ### 10.1 Registry extension
 
-P8需要从 implementation Task 0 确认的 accepted Registry base 派生一个 next compatible minor version（下称“P8 Registry version”；若 P7 按当前 plan accepted 为 2.1，则预期为 2.2）：
+P8从 accepted Registry `2.1` base派生 `P8_REGISTRY_SCHEMA = "2.2"`：
 
 - 所有 accepted pre-P8 Registry reader行为保持；
 - 新 `VideoAssetMetadata` 仅适用于 `VIDEO`；
@@ -460,14 +461,14 @@ Future ComfyUI sanity check：一个 `ComfyUIVideoProvider`应主要新增 adapt
 | --- | --- |
 | Legacy ProjectConfig/CLI/Manifest/layout | no change |
 | ProductionProject/Shot base schema | no provider fields、no secret；existing concrete-reference invariant preserved |
-| Production Manifest | Task 0从 accepted base选择 next compatible minor version；若 P7按当前 plan以2.5 accepted，预期 P8 version为2.6 |
-| Asset Registry | Task 0从 accepted base选择 next compatible minor version并增加 backward-compatible video metadata/remote generated-video rules；若 P7以2.1 accepted，预期为2.2 |
+| Production Manifest | `P8_MANIFEST_SCHEMA = "2.7"` from accepted Paid Provider Gate Manifest `2.6`；保留 Gate-owned budget/submit lifecycle并新增 P8 video lifecycle |
+| Asset Registry | `P8_REGISTRY_SCHEMA = "2.2"` from accepted Registry `2.1`；增加 backward-compatible video metadata/remote generated-video rules |
 | Dependency Graph | keep graph schema 2.0; add typed generated-video semantic/applied evidence |
 | Composition/ResolvedTimeline/renderer | no change in P8 provider core |
 | Package root exports | only reviewed provider-neutral core/service types; concrete MiniMax/fake/permit constructors imported from explicit modules or remain private |
 | Runtime dependencies | no new dependency; use existing `httpx`, stdlib, ffprobe boundary |
 
-Migration：Task 0记录 `P8_MANIFEST_SCHEMA`与 `P8_REGISTRY_SCHEMA`，分别是届时 accepted base的 next compatible minor version；所有 accepted pre-P8 versions remain readable，P8 fields在旧版本 fail closed。No downgrade。P8 disable/rollback保留已写 schema readers、receipts、tasks与 registered artifacts；停止新 submit entrypoints，不删除历史 state。
+Migration：Task 0已记录 `P8_MANIFEST_SCHEMA = "2.7"` 与 `P8_REGISTRY_SCHEMA = "2.2"`；所有 accepted pre-P8 versions remain readable，P8 fields在旧版本 fail closed。No downgrade。P8 disable/rollback保留已写 schema readers、receipts、tasks与 registered artifacts；停止新 submit entrypoints，不删除历史 state。
 
 ## 18. E2E Acceptance
 

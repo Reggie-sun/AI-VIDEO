@@ -1,6 +1,6 @@
 # AI-VIDEO P8 Generated Video Providers Implementation Plan
 
-> Implementation remains under the repository's Native Codex lifecycle. A future implementation turn may select supplemental skills only when they materially lower risk; this plan itself does not authorize a workflow, runtime edits, live calls, merge, push, or release.
+> Implementation remains under the repository's Native Codex lifecycle. 用户已授权在 local `main` 从 accepted Paid Provider Gate base 执行 P8 offline/default-no-network implementation；本授权不包含 live calls、真实付费提交、push 或 release。
 
 **Goal:** 建立 provider-neutral、crash-resumable、cost-aware 的 Generated Video capability，以 deterministic fake 完成 default acceptance，并以 MiniMax Hailuo V1 证明真实 Cloud adapter不污染 Production domain。
 
@@ -12,14 +12,14 @@
 
 ## Global Constraints
 
-- 本文件是 implementation plan，不是 implementation/live-call/merge/push/release authorization。
-- Runtime execution必须等待 accepted P6、accepted P7、accepted Base AI Comic E2E 与 Paid Provider Gate。
-- Task 0必须从届时 accepted P7 Manifest与Registry base分别选择并记录 next compatible minor `P8_MANIFEST_SCHEMA` / `P8_REGISTRY_SCHEMA`；当前 P7 plan中的2.5/2.1只表示预期 base，不预占 P8 version。
+- 本文件记录 implementation contract；实际 runtime authority来自用户当前明确授权，且不扩展到 live-call、真实付费提交、push 或 release。
+- Runtime base已满足 accepted P6、accepted P7、accepted Base AI Comic E2E 与 standalone Paid Provider Gate commit `cc82a49`。
+- Task 0固定 exact integration base `cc82a49`、accepted Manifest `2.6` / Registry `2.1`，并分配 `P8_MANIFEST_SCHEMA = "2.7"` / `P8_REGISTRY_SCHEMA = "2.2"`。
 - 所有 accepted pre-P8 Manifest/Registry versions保持 readable，no downgrade。
 - `ProductionStateCommitter`是唯一 Manifest/Project/Registry/Graph writer、activation与recovery owner。
 - Provider、resolver、service、reader、registry loader、dependency resolver不得直接写 state。
 - Shot选择 `visual_strategy`；Provider不得选择、修改或 fallback strategy。
-- request input hash、generation ID、resolved generation hash、submission/task identity与 artifact SHA-256必须分离。
+- request input hash、generation ID、resolved generation hash、Gate-owned billable-effect identity与 artifact SHA-256必须分离；P8不得持久化第二份 provider task ID。
 - Paid submit POST never retries solely because `AiVideoError.retryable=True`。
 - `outcome_unknown` never auto-resubmits or remints a permit。
 - Secret、Authorization header、cookie、account ID、signed URL与 raw Provider response不得持久化或出现在 logs/fixtures。
@@ -95,7 +95,7 @@ P5当前只能通过 synthetic generated visual `AssetRecord`证明 future seam�
 
 ### Task 0: Freeze the Accepted Base and Reconcile Shared Asset Generation Contract
 
-**Dependencies:** accepted P6、accepted P7、accepted Base AI Comic E2E、explicit P8 implementation authorization。
+**Dependencies:** accepted P6、accepted P7、accepted Base AI Comic E2E、accepted Paid Provider Gate `cc82a49`、explicit P8 implementation authorization。全部已满足。
 
 **Files:**
 
@@ -106,7 +106,7 @@ P5当前只能通过 synthetic generated visual `AssetRecord`证明 future seam�
 - Read: accepted P6/P7 plans and exact implementation commits
 - Modify: this plan to record exact accepted Manifest/Registry bases、selected P8 versions与 shared symbols before code
 
-**Change:** Record exact clean base, accepted P7 shared interfaces, current Manifest/Registry versions, selected next-compatible `P8_MANIFEST_SCHEMA` / `P8_REGISTRY_SCHEMA`, provider safety gate evidence and target-file ownership. If another writer owns any shared file, use a separate branch/worktree and wait/rebase; never share the tree.
+**Change:** Exact integration base为 `cc82a49`；current Manifest/Registry bases为 `2.6` / `2.1`；selected next-compatible versions为 `P8_MANIFEST_SCHEMA = "2.7"` / `P8_REGISTRY_SCHEMA = "2.2"`。P8复用 `DurablePaidProviderSubmitPermit` 与 `PaidProviderSubmitReceipt.external_effect_id`，不得新增 P8-specific paid permit或第二份 external task identity。当前 P7.1 unrelated dirty files不属于 P8 ownership，不覆盖、不 stage、不 commit；若后续 exact target file与其发生冲突则停止并协调。
 
 **Verification:**
 
@@ -127,7 +127,7 @@ python -m pytest tests/test_production_models.py tests/test_production_project.p
   tests/test_production_review.py tests/test_production_repair.py -q
 ```
 
-**Acceptance criteria:** clean explainable base；P6/P7 accepted；exact Manifest/Registry bases与两个 P8 next-compatible versions recorded；Base E2E evidence exists；no overlapping writer；no P8 file exists under a conflicting owner。Failure at any gate stops implementation without edits。
+**Acceptance criteria:** explainable base `cc82a49`；P6/P7/Base E2E/Paid Gate accepted；exact Manifest/Registry bases与两个 P8 next-compatible versions recorded；no overlapping P8 writer；unrelated dirty work preserved；no P8 file exists under a conflicting owner。Failure at any gate stops runtime edits。
 
 ---
 
@@ -580,7 +580,7 @@ git diff --name-only <P8_IMPLEMENTATION_BASE>...HEAD
 - First P8 lifecycle write uses `P8_MANIFEST_SCHEMA`；first generated-video registration uses `P8_REGISTRY_SCHEMA`。
 - All accepted pre-P8 Manifest/Registry versions remain readable；P8 fields rejected in older explicit versions。
 - No automatic bulk migration、no downgrade、no Legacy Manifest v1 change。
-- Current expected values are Manifest 2.6 / Registry 2.2 only if P7 is accepted exactly as currently planned；implementation may not materialize them before Task 0。
+- Selected values are Manifest `2.7` / Registry `2.2` because accepted Paid Provider Gate already owns Manifest `2.6` and Registry remains `2.1` at base `cc82a49`。
 
 ## Rollback
 
