@@ -592,6 +592,68 @@ def _select_resealed_registry(root: Path, registry: AssetRegistrySnapshot) -> No
     _write_manifest(root, manifest.model_copy(update={"active_registry": pointer}))
 
 
+def _select_p7_later_voice_caption_registry_extension(
+    root: Path,
+    fixture: dict[str, object],
+    *,
+    changed_prefix: bool = False,
+) -> tuple[RegistrySnapshotPointer, tuple[str, str]]:
+    candidate = fixture["candidate_project"].registry
+    voice = next(item for item in candidate.assets if item.asset_id == "voice-dialogue")
+    caption = next(
+        item for item in candidate.assets if item.asset_id == "caption-asset-1"
+    )
+    voice_extension = voice.model_copy(
+        update={
+            "asset_id": "voice-later-phase",
+            "creation_receipt_id": "receipt-voice-later-phase",
+        }
+    )
+    caption_extension = caption.model_copy(
+        update={
+            "asset_id": "caption-later-phase",
+            "creation_receipt_id": "receipt-caption-later-phase",
+        }
+    )
+    prefix = candidate.assets
+    if changed_prefix:
+        prefix = (
+            prefix[0].model_copy(update={"usage_license": "changed-later-prefix"}),
+            *prefix[1:],
+        )
+    provisional = candidate.model_copy(
+        update={
+            "revision_id": "0" * 64,
+            "content_hash": "0" * 64,
+            "assets": (*prefix, voice_extension, caption_extension),
+        }
+    )
+    digest = registry_semantic_sha256(provisional)
+    extended = provisional.model_copy(
+        update={"revision_id": digest, "content_hash": digest}
+    )
+    payload = extended.model_dump_json(indent=2).encode("utf-8")
+    path = canonical_registry_snapshot_path(digest)
+    (root / path).write_bytes(payload)
+    pointer = RegistrySnapshotPointer(
+        path=path,
+        revision_id=digest,
+        content_hash=digest,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    manifest = _manifest(root)
+    _write_manifest(
+        root,
+        manifest.model_copy(
+            update={
+                "manifest_revision": manifest.manifest_revision + 1,
+                "active_registry": pointer,
+            }
+        ),
+    )
+    return pointer, (voice_extension.asset_id, caption_extension.asset_id)
+
+
 def _rebind_voice_candidate_to_selected_graph(root: Path, attempt_id: str) -> None:
     manifest = _manifest(root)
     attempt = next(item for item in manifest.attempts if item.attempt_id == attempt_id)
@@ -1690,6 +1752,45 @@ def test_loader_rejects_changed_p7_candidate_registry_prefix(tmp_path):
     fixture = make_p7_committed_project(
         tmp_path, changed_candidate_prefix=True
     )
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(fixture["project_path"])
+
+
+def test_loader_accepts_p7_image_history_after_voice_registry_extension(tmp_path):
+    fixture = make_p7_committed_project(tmp_path)
+    image_attempt = fixture["attempt"]
+    pointer, extension_ids = _select_p7_later_voice_caption_registry_extension(
+        tmp_path, fixture
+    )
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(fixture["project_path"])
+    candidate_registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / image_attempt.candidate_registry.path).read_bytes()
+    )
+
+    assert loaded.manifest.active_project == image_attempt.candidate_project
+    assert pointer != image_attempt.candidate_registry
+    assert loaded.registry.assets[: len(candidate_registry.assets)] == (
+        candidate_registry.assets
+    )
+    assert {item.asset_id for item in loaded.registry.assets}.issuperset(
+        {*extension_ids, fixture["image_record"].asset_id}
+    )
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_p7_reader_rejects_changed_candidate_prefix_after_voice_registry_extension(
+    tmp_path,
+):
+    fixture = make_p7_committed_project(tmp_path)
+    pointer, _ = _select_p7_later_voice_caption_registry_extension(
+        tmp_path,
+        fixture,
+        changed_prefix=True,
+    )
+    assert pointer != fixture["attempt"].candidate_registry
 
     with pytest.raises(AiVideoError, match="candidate history"):
         load_production_project(fixture["project_path"])

@@ -745,10 +745,7 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
 
         if selected:
             latest = max(selected.values(), key=lambda item: item.base_manifest_revision)
-            if (
-                latest.candidate_project != bundle.manifest.active_project
-                or latest.candidate_registry != bundle.manifest.active_registry
-            ):
+            if latest.candidate_project != bundle.manifest.active_project:
                 raise ValueError("latest selected image candidate is not active")
             _verify_image_activation_chronology(bundle.manifest, latest)
     except (AiVideoError, OSError, UnicodeError, ValidationError, ValueError) as exc:
