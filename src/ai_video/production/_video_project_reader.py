@@ -13,6 +13,7 @@ from ai_video.production._paid_provider_project_reader import (
 from ai_video.production.models import (
     ProductionManifest,
     VideoAttemptPhase,
+    VideoFetchReceiptPointer,
     VideoGenerationAttemptState,
     VideoRequestReceiptPointer,
     VideoStatusReceiptPointer,
@@ -20,6 +21,7 @@ from ai_video.production.models import (
 from ai_video.production.paths import _read_regular_file_nofollow, resolve_contained_path
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
+    VideoFetchReceipt,
     VideoTaskObservation,
     VideoTaskState,
     VideoSubmission,
@@ -86,6 +88,39 @@ def load_video_status_receipt(
     return observation
 
 
+def load_video_fetch_receipt(
+    root: str | Path, pointer: VideoFetchReceiptPointer
+) -> VideoFetchReceipt:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved,
+            contained_by=resolved_root / "state",
+        )
+        receipt = VideoFetchReceipt.model_validate_json(raw.data)
+        artifact_path = resolve_contained_path(
+            resolved_root,
+            pointer.artifact_path,
+            allowed_root=resolved_root / "state" / "video-generation" / "fetch",
+        )
+        artifact = _read_regular_file_nofollow(
+            artifact_path,
+            contained_by=resolved_root / "state" / "video-generation" / "fetch",
+        )
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen video fetch evidence.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or receipt.fetch_fingerprint != pointer.fetch_fingerprint
+        or receipt.artifact_sha256 != pointer.artifact_sha256
+        or receipt.size_bytes != pointer.artifact_size_bytes
+        or artifact.file_sha256 != pointer.artifact_sha256
+        or len(artifact.data) != pointer.artifact_size_bytes
+    ):
+        raise _invalid("Video fetch evidence pointer identity is invalid.")
+    return receipt
+
+
 def verify_video_evidence(
     root: str | Path, states: Iterable[VideoGenerationAttemptState]
 ) -> None:
@@ -144,6 +179,19 @@ def verify_video_evidence(
             and observation.state is not VideoTaskState.SUCCEEDED
         ):
             raise _invalid("Video fetch phases require a succeeded observation.")
+        if state.fetch_receipt is not None:
+            fetch = load_video_fetch_receipt(root, state.fetch_receipt)
+            if (
+                fetch.submission_fingerprint != submission.submission_fingerprint
+                or fetch.observation_fingerprint
+                != observation.observation_fingerprint
+                or fetch.paid_submit_receipt_fingerprint
+                != submit_receipt.submit_receipt_fingerprint
+                or fetch.provider_file_id != observation.provider_file_id
+            ):
+                raise _invalid(
+                    "Video fetch evidence does not match its exact submission."
+                )
     if len(request_owners) != len(set(request_owners)):
         raise _invalid("Video generation request ownership is ambiguous.")
 

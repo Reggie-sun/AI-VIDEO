@@ -101,7 +101,7 @@ class _StateCommitRecoveryMixin:
         registry_hash = self._require_recovery_file_hash(
             registry_path, manifest.active_registry.file_sha256
         )
-        if manifest.schema_version in {"2.5", "2.6"}:
+        if manifest.schema_version in {"2.5", "2.6", "2.7"}:
             loaded = self._load_production_project(
                 self._project_root / "project.yaml"
             )
@@ -195,7 +195,7 @@ class _StateCommitRecoveryMixin:
                 )
             )
         if manifest.active_render_state is not None:
-            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}:
+            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7"}:
                 bundle = load_production_project_candidate(
                     self._project_root,
                     manifest,
@@ -259,7 +259,7 @@ class _StateCommitRecoveryMixin:
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
         if (
-            manifest.schema_version not in {"2.4", "2.5", "2.6"}
+            manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7"}
             or manifest.active_qa_policy is None
         ):
             return ()
@@ -325,7 +325,8 @@ class _StateCommitRecoveryMixin:
         if all(item is None for item in graph_fields):
             return "legacy"
         if (
-            manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6"}
+            manifest.schema_version
+            not in {"2.3", "2.4", "2.5", "2.6", "2.7"}
             or attempt.candidate_dependency_graph is None
             or attempt.candidate_dependency_states_hash is None
         ):

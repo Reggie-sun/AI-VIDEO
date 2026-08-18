@@ -16,6 +16,7 @@ from ai_video.production.models import (
     ReviewAttemptPhase,
     StateCommitAttempt,
     StateCommitStatus,
+    VideoAttemptPhase,
 )
 from ai_video.production.paths import _read_regular_file_nofollow
 
@@ -57,6 +58,55 @@ class _StateCommitRecoveryAttemptsMixin:
                 items.extend(image_items)
                 changed = changed or replacement != attempt
                 continue
+            if attempt.operation == "video_generation":
+                state = attempt.video_generation_state
+                if state is None:
+                    raise _state_invalid(
+                        "Interrupted video generation attempt has no state."
+                    )
+                if state.phase is VideoAttemptPhase.REQUEST:
+                    replacement = _validated_transition(
+                        attempt,
+                        {
+                            "status": StateCommitStatus.INTERRUPTED,
+                            "finished_at": _timestamp(),
+                            "error_code": (
+                                ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN.value
+                            ),
+                            "error_message": (
+                                "Video generation was interrupted before durable "
+                                "Paid Provider submit intent."
+                            ),
+                        },
+                    )
+                    repaired.append(replacement)
+                    items.append(
+                        RecoveryItem(
+                            path=state.request.path,
+                            disposition=(
+                                RecoveryDisposition.INTERRUPTED_RECORDED
+                            ),
+                            sha256=state.request.file_sha256,
+                        )
+                    )
+                    changed = True
+                    continue
+                paid_state = attempt.paid_provider_state
+                if (
+                    paid_state is not None
+                    and paid_state.phase.value in {"accepted", "settled"}
+                    and state.phase
+                    in {
+                        VideoAttemptPhase.SUBMITTED,
+                        VideoAttemptPhase.POLLING,
+                        VideoAttemptPhase.FETCH,
+                    }
+                ):
+                    repaired.append(attempt)
+                    continue
+                raise _state_invalid(
+                    "Interrupted video generation lifecycle is inconsistent."
+                )
             if attempt.operation == "review":
                 if attempt.review_request is None:
                     raise _state_invalid("Interrupted review attempt has no request.")
@@ -86,7 +136,8 @@ class _StateCommitRecoveryAttemptsMixin:
             if attempt.operation == "bootstrap_dependency_graph":
                 if (
                     attempt.base_dependency_graph is None
-                    and manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}
+                    and manifest.schema_version
+                    in {"2.3", "2.4", "2.5", "2.6", "2.7"}
                     and manifest.active_dependency_graph is not None
                     and manifest.active_dependency_graph
                     != attempt.candidate_dependency_graph

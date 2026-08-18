@@ -225,6 +225,7 @@ from ._state_commit_render_lifecycle import _StateCommitRenderLifecycleMixin
 from ._state_commit_render_support import _StateCommitRenderSupportMixin
 from ._state_commit_review import _StateCommitReviewMixin
 from ._state_commit_transaction import _StateCommitTransactionMixin
+from ._state_commit_video import _StateCommitVideoMixin
 from ._state_commit_voice_activation import _StateCommitVoiceActivationMixin
 from ._state_commit_voice_candidate import _StateCommitVoiceCandidateMixin
 from ._state_commit_voice_intent import _StateCommitVoiceIntentMixin
@@ -246,6 +247,7 @@ except ImportError:  # pragma: no cover - exercised through platform injection
 
 
 class ProductionStateCommitter(
+    _StateCommitVideoMixin,
     _StateCommitPaidProviderMixin,
     _StateCommitReviewMixin,
     _StateCommitRepairMixin,

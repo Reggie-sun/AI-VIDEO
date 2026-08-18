@@ -155,6 +155,35 @@ class VideoStatusReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class VideoFetchReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    fetch_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_path: Path
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_size_bytes: int = Field(strict=True, gt=0)
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_paths(self) -> "VideoFetchReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/fetch/receipts/"
+                f"{self.fetch_fingerprint}.json"
+            ),
+            "video fetch receipt",
+        )
+        _canonical_paid_path(
+            self.artifact_path,
+            Path(
+                "state/video-generation/fetch/files/"
+                f"{self.artifact_sha256}.mp4"
+            ),
+            "video fetched artifact",
+        )
+        return self
+
+
 class VideoAttemptPhase(str, Enum):
     REQUEST = "request"
     SUBMIT_INTENT = "submit_intent"
@@ -190,6 +219,7 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
     phase: VideoAttemptPhase
     paid_submit_receipt: PaidProviderSubmitReceiptPointer | None = None
     latest_observation: VideoStatusReceiptPointer | None = None
+    fetch_receipt: VideoFetchReceiptPointer | None = None
     provider_file_id: str | None = Field(default=None, min_length=1)
     candidate_video_asset_ids: tuple[str, ...] = ()
 
@@ -201,7 +231,11 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
         ):
             raise ValueError("video attempt identity does not match its request pointer")
         if self.phase in _VIDEO_PRE_SUBMIT_PHASES:
-            if self.paid_submit_receipt is not None or self.latest_observation is not None:
+            if (
+                self.paid_submit_receipt is not None
+                or self.latest_observation is not None
+                or self.fetch_receipt is not None
+            ):
                 raise ValueError(
                     "pre-submit video phases cannot select submit or observation evidence"
                 )
@@ -223,6 +257,15 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
                 raise ValueError("video observation does not match the submit receipt")
         elif self.provider_file_id is not None:
             raise ValueError("video provider file locator requires an observation pointer")
+        if self.phase in {
+            VideoAttemptPhase.VALIDATE,
+            VideoAttemptPhase.CANDIDATE,
+            VideoAttemptPhase.ACTIVATE,
+        }:
+            if self.fetch_receipt is None:
+                raise ValueError("post-fetch video phases require a fetch receipt")
+        elif self.fetch_receipt is not None:
+            raise ValueError("video fetch receipt requires a post-fetch phase")
         if self.phase in _VIDEO_CANDIDATE_PHASES:
             if self.candidate_video_asset_ids != (self.request.output_asset_id,):
                 raise ValueError("video candidate asset ID must match request output")

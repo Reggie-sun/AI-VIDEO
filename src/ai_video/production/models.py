@@ -26,6 +26,7 @@ from ai_video.production._lifecycle_schema import (
     PaidProviderSubmitReceiptPointer as PaidProviderSubmitReceiptPointer,
     P5_AWARE_OPERATIONS as _P5_AWARE_OPERATIONS,
     VideoAttemptPhase as VideoAttemptPhase,
+    VideoFetchReceiptPointer as VideoFetchReceiptPointer,
     VideoGenerationAttemptState as VideoGenerationAttemptState,
     VideoRequestReceiptPointer as VideoRequestReceiptPointer,
     VideoStatusReceiptPointer as VideoStatusReceiptPointer,

@@ -17,6 +17,7 @@ from ai_video.production.models import (
     ProductionManifest,
     StateCommitAttempt,
     StateCommitStatus,
+    VideoAttemptPhase,
 )
 from ai_video.production.paid_provider import (
     PaidProviderAuthorizationDecision,
@@ -148,7 +149,14 @@ class _StateCommitPaidProviderMixin:
                 preview, authorization, now=self._paid_provider_clock()
             )
             manifest = self._read_manifest()
-            if manifest.schema_version not in {"2.2", "2.3", "2.4", "2.5", "2.6"}:
+            if manifest.schema_version not in {
+                "2.2",
+                "2.3",
+                "2.4",
+                "2.5",
+                "2.6",
+                "2.7",
+            }:
                 raise _state_invalid("Paid Provider submit intent requires a provider-aware Manifest.")
             attempt = self._paid_attempt(manifest, preview.attempt_id)
             if (
@@ -171,6 +179,25 @@ class _StateCommitPaidProviderMixin:
                 ):
                     raise _state_invalid(
                         "Paid Provider preview does not match the durable operation request."
+                    )
+            elif preview.operation == "video_generation":
+                video_state = attempt.video_generation_state
+                if video_state is None:
+                    raise _state_invalid(
+                        "Paid Provider video intent requires durable video state."
+                    )
+                request = self._reopen_video_request(video_state.request)
+                if (
+                    manifest.schema_version != "2.7"
+                    or attempt.operation != "video_generation"
+                    or video_state.phase is not VideoAttemptPhase.REQUEST
+                    or request.resolved_generation_hash
+                    != preview.request_fingerprint
+                    or request.provider_kind != preview.provider_kind
+                    or request.model_id != preview.model_id
+                ):
+                    raise _state_invalid(
+                        "Paid Provider preview does not match the durable video request."
                     )
             else:
                 raise _state_invalid(
@@ -219,13 +246,23 @@ class _StateCommitPaidProviderMixin:
                 reservation_id=reservation.reservation_id,
                 phase=PaidProviderAttemptPhase.SUBMIT_INTENT,
             )
-            next_attempt = _validated_transition(
-                attempt, {"paid_provider_state": paid_state}
-            )
+            attempt_update: dict[str, object] = {
+                "paid_provider_state": paid_state
+            }
+            if preview.operation == "video_generation":
+                assert attempt.video_generation_state is not None
+                attempt_update["video_generation_state"] = (
+                    attempt.video_generation_state.model_copy(
+                        update={"phase": VideoAttemptPhase.SUBMIT_INTENT}
+                    )
+                )
+            next_attempt = _validated_transition(attempt, attempt_update)
             next_manifest = _validated_transition(
                 manifest,
                 {
-                    "schema_version": "2.6",
+                    "schema_version": (
+                        "2.7" if manifest.schema_version == "2.7" else "2.6"
+                    ),
                     "manifest_revision": manifest.manifest_revision + 1,
                     "active_paid_provider_budget": budget_pointer,
                     "attempts": tuple(
@@ -310,7 +347,7 @@ class _StateCommitPaidProviderMixin:
             attempt = self._paid_attempt(manifest, receipt.attempt_id)
             state = attempt.paid_provider_state
             if (
-                manifest.schema_version != "2.6"
+                manifest.schema_version not in {"2.6", "2.7"}
                 or state is None
                 or state.phase is not PaidProviderAttemptPhase.SUBMIT_INTENT
                 or manifest.active_paid_provider_budget is None
@@ -363,6 +400,26 @@ class _StateCommitPaidProviderMixin:
                     update={"phase": phase, "submit_receipt": submit_pointer}
                 )
             }
+            if (
+                attempt.operation == "video_generation"
+                and receipt.outcome is PaidProviderSubmitOutcome.ACCEPTED
+            ):
+                video_state = attempt.video_generation_state
+                if (
+                    video_state is None
+                    or video_state.phase is not VideoAttemptPhase.SUBMIT_INTENT
+                    or video_state.resolved_generation_hash
+                    != receipt.request_fingerprint
+                ):
+                    raise _state_invalid(
+                        "Paid Provider submit receipt does not match video intent."
+                    )
+                attempt_update["video_generation_state"] = video_state.model_copy(
+                    update={
+                        "phase": VideoAttemptPhase.SUBMITTED,
+                        "paid_submit_receipt": submit_pointer,
+                    }
+                )
             if receipt.outcome is PaidProviderSubmitOutcome.OUTCOME_UNKNOWN:
                 attempt_update.update(
                     status=StateCommitStatus.OUTCOME_UNKNOWN,

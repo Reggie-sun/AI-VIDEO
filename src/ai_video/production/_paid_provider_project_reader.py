@@ -114,7 +114,17 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
             PaidProviderAttemptPhase.KNOWN_NO_EFFECT: StateCommitStatus.FAILED,
             PaidProviderAttemptPhase.OUTCOME_UNKNOWN: StateCommitStatus.OUTCOME_UNKNOWN,
         }.get(state.phase)
-        if required_status is not None and attempt.status is not required_status:
+        accepted_video_terminal = (
+            attempt.operation == "video_generation"
+            and state.phase is PaidProviderAttemptPhase.ACCEPTED
+            and attempt.status
+            in {StateCommitStatus.FAILED, StateCommitStatus.INTERRUPTED}
+        )
+        if (
+            required_status is not None
+            and attempt.status is not required_status
+            and not accepted_video_terminal
+        ):
             raise _invalid("Paid Provider attempt status is inconsistent with its phase.")
         gate = load_paid_provider_gate_receipt(root, state.gate_receipt)
         gate_budget = load_paid_provider_budget(
