@@ -1,6 +1,6 @@
 # AI-VIDEO P8 Seedance Cloud Provider Implementation Plan
 
-Status: Conditional plan. The 2026-08-19 official compatibility matrix triggered the user-defined provider-neutral scope-expansion stop gate. Tasks after Task 1 are not authorized until that core extension is explicitly approved.
+Status: Offline implementation accepted on 2026-08-19. Provider-neutral extension、Seedance adapter、Harness mapping、focused/recovery verification和native review均完成；live submit未授权、未运行。
 
 **Spec:** `docs/superpowers/specs/2026-08-19-ai-video-p8-seedance-cloud-provider.md`
 
@@ -10,7 +10,7 @@ Status: Conditional plan. The 2026-08-19 official compatibility matrix triggered
 
 ## Problem Boundary
 
-- Single runtime owner: future `src/ai_video/production/seedance.py` owns Ark mapping/transport only.
+- Single runtime owner: `src/ai_video/production/seedance.py` owns Ark mapping/transport only; `seedance_capabilities.py` and `seedance_profile.py` hold declarative matrix/profile data.
 - Durable owner remains `ProductionStateCommitter`.
 - Provider-neutral request/capability owner remains `src/ai_video/production/video.py`.
 - Old path to remove: none; no existing Seedance runtime adapter exists.
@@ -44,34 +44,38 @@ git diff --cached --check
 
 ## Task 1: Evaluate Provider-Neutral Coverage
 
-**Status:** complete; blocker found.
+**Status:** complete; blocker found and reported.
 
-The current P8 core lacks `last_frame`, reference video/audio, reference/edit/extend modes, adaptive dimensions, `duration=-1`/frames/fractional timing, and `mov`. These are semantic request/output capabilities. Hiding them in provider profile data would bypass capability resolution and exact request identity.
+The current P8 core lacked `last_frame`, reference video/audio, reference/edit/extend modes, adaptive dimensions, provider-selected duration/frames, and `mov`. These are semantic request/output capabilities. Hiding them in provider profile data would bypass capability resolution and exact request identity.
 
-**Decision:** stop before runtime implementation. Request explicit authorization for a separate backward-compatible P8 core contract extension.
+**Decision:** implementation stopped at this gate. The user then explicitly authorized the backward-compatible P8 core contract extension.
 
 ## Task 2: Extend P8 Core Contracts
 
-**Status:** blocked; not authorized by this plan.
+**Status:** complete under the user's explicit follow-up authorization.
 
-If separately authorized, first write a dedicated core-extension spec/plan and use strict red-green tests. The minimal candidate scope is:
+The implemented minimal scope is:
 
 - extend provider-neutral input bindings to typed image/video/audio references and exact roles;
 - extend generation modes for reference/edit/extend without Seedance names;
 - represent exact dimensions versus provider-adaptive output;
 - represent integer duration, model-selected duration or explicit frame count without weakening existing invariants;
 - add an accepted container set that can represent `mov` while keeping existing MP4 requests unchanged;
-- keep canonical hashes backward compatible and update Fake/H3/Hailuo contract tests.
+- keep legacy request/resolved canonical hashes backward compatible and update Fake/H3/Hailuo contract tests.
+
+Implementation files are `src/ai_video/production/video.py` and the distinct provider-neutral contract module `src/ai_video/production/video_contracts.py`. No Manifest/schema/activation/renderer change was needed.
 
 If this work requires Manifest/schema/activation/renderer changes, stop again; those remain out of scope.
 
 ## Task 3: Implement Offline Seedance Adapter
 
-**Status:** blocked on Task 2.
+**Status:** offline implementation complete; final acceptance pending Tasks 4–7.
 
 **Create:**
 
 - `src/ai_video/production/seedance.py`
+- `src/ai_video/production/seedance_capabilities.py`
+- `src/ai_video/production/seedance_profile.py`
 - `tests/test_production_seedance.py`
 
 **Modify only if required by shared contract coverage:**
@@ -89,30 +93,31 @@ Implementation contracts:
 - no raw response or secret-bearing repr/error/fixture;
 - fake transport only in default tests.
 
-Focused verification:
+Focused verification executed in the default no-network/fake-transport environment:
 
 ```bash
-.venv/bin/python -m pytest -q \
-  tests/test_production_seedance.py \
-  tests/test_production_video.py \
-  tests/test_production_paid_provider.py \
+PYTHONPATH=src python -m pytest -q \
+  tests/test_production_seedance.py tests/test_production_video.py \
+  tests/test_production_video_fake.py tests/test_production_minimax_h3.py \
+  tests/test_production_minimax_hailuo.py tests/test_production_paid_provider.py \
+  tests/test_production_paid_provider_state.py \
   tests/test_production_video_state_recovery.py \
   tests/test_production_state_recovery.py
 ```
 
-The exact existing test filenames must be rechecked at execution time; no command in this conditional task is evidence of a current pass.
+Current evidence after review fixes: `517 passed in 190.54s` on 2026-08-19. This is offline contract evidence only.
 
 ## Task 4: Harness Mapping
 
-**Status:** blocked on Task 3.
+**Status:** complete after the other staged task reached its own commit checkpoint.
 
-Modify `.agent/harness/policy.yaml` so `src/ai_video/production/seedance.py` and `tests/test_production_seedance.py` map to `production_video_provider_tests`, add the Seedance test command to that check, and update `tests/test_agent_harness.py` with fail-safe mapping assertions.
+Modify `.agent/harness/policy.yaml` so all Seedance source/profile/capability files plus `video_contracts.py` and `tests/test_production_seedance.py` map to `production_video_provider_tests`, add the Seedance test command to that check, and update `tests/test_agent_harness.py` with fail-safe mapping assertions.
 
 Do not broaden unrelated categories or refresh Architecture Gate baselines.
 
 ## Task 5: Independent Safety Review
 
-**Status:** blocked on Task 3.
+**Status:** complete. Native named reviewer final verdict: `accept`, no blocking or non-blocking concerns.
 
 Use a native named `reviewer` after core/safety behavior exists. Required verdict covers permit adjacency, POST non-retry, outcome-unknown recovery, task binding, redirect/origin/size/container checks, exact allowlist coverage and secret/raw-response non-persistence.
 
@@ -120,7 +125,7 @@ Parent verifies every blocking claim and owns the final diff.
 
 ## Task 6: Runtime Truth Documentation
 
-**Status:** blocked on verified Tasks 3–5.
+**Status:** complete; documents state offline-only runtime truth and preserve activation/live boundaries.
 
 Only after executable acceptance, update:
 
@@ -133,7 +138,7 @@ State offline adapter acceptance and exact capability coverage. Do not claim Reg
 
 ## Task 7: Harness Receipt and Commit
 
-**Status:** blocked on implementation.
+**Status:** completion workflow active. Final staged snapshot verification includes `725 passed` plus Architecture Gate PASS; the fresh receipt and post-commit range receipt are reported in delivery.
 
 Parent stages only task-owned files with explicit paths, generates a fresh staged-snapshot Harness receipt, commits a stable checkpoint, then generates and validates a commit-range receipt for the exact commit. Architecture Gate must pass. Unrelated dirty files remain unstaged and untouched.
 

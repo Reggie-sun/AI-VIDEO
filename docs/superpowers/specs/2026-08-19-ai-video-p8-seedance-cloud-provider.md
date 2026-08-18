@@ -1,12 +1,12 @@
 # AI-VIDEO P8 Seedance Cloud Provider Specification
 
-Status: Dated compatibility matrix frozen on 2026-08-19. Runtime implementation is blocked by an explicit P8 provider-neutral contract scope expansion; this document does not authorize that expansion, a paid call, push, or release.
+Status: Dated compatibility matrix frozen and offline implementation accepted on 2026-08-19. Native review verdict is `accept`; default verification is fake-only/no-network. This document does not authorize a paid/live call, push or release.
 
 ## 1. Goal
 
-本 slice 计划增加一个可删除的 `SeedanceVideoProvider` adapter，以 strict typed profile 和 declarative capability variants 覆盖执行日火山方舟官方 Model List 中仍公开可调用的全部 Seedance Model ID。adapter 必须复用 P8 Paid Provider Gate、stepwise submit/poll/fetch 和 fetched-candidate boundary，不增加 CLI、schema writer、resolver、renderer、自动选择或 fallback。
+本 slice 增加一个可删除的 `SeedanceVideoProvider` adapter，以 strict typed profile 和 declarative capability variants 覆盖执行日火山方舟官方 Model List 中仍公开可调用的全部 Seedance Model ID。adapter 复用 P8 Paid Provider Gate、stepwise submit/poll/fetch 和 fetched-candidate boundary，不增加 CLI、schema writer、resolver、renderer、自动选择或 fallback。
 
-本次研究发现，完整 Seedance surface 无法由当前 P8 core 无损表达。依照用户设定的 stop gate，本轮只冻结官方 compatibility matrix 和条件式 implementation plan，不创建部分能力 adapter，也不把 T2V-only 子集称为“全模型适配”。
+研究先发现完整 Seedance surface 无法由原 P8 core 无损表达并按约停止；用户明确授权后，slice 只扩展 provider-neutral media/mode/output contracts，并保持旧 request/resolved hashes 兼容。Seedance-specific fields 仍只存在于 adapter profile。
 
 ## 2. Authoritative Snapshot
 
@@ -93,6 +93,26 @@ Named ratios are `21:9|16:9|4:3|1:1|3:4|9:16`; `adaptive` is model/mode dependen
 
 Official exact pixels vary by family for the same label/ratio (for example 480p 16:9 is 854×480 on 2.5, 864×496 on 2.0/1.5, and 864×480 on 1.0). Therefore capability resolution must be a declarative `(model, resolution, ratio, mode) -> expected-or-adaptive dimensions` variant, not a global width/height lookup. Actual fetched dimensions remain measured evidence.
 
+The strict profile freezes these official named-ratio rasters; columns are ordered `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, `9:16`:
+
+| Family / resolution | 21:9 | 16:9 | 4:3 | 1:1 | 3:4 | 9:16 |
+|---|---|---|---|---|---|---|
+| 2.5 480p | 992×432 | 854×480 | 752×560 | 640×640 | 560×752 | 480×854 |
+| 2.5 720p | 1470×630 | 1280×720 | 1112×834 | 960×960 | 834×1112 | 720×1280 |
+| 2.5 1080p | 2206×946 | 1920×1080 | 1664×1248 | 1440×1440 | 1248×1664 | 1080×1920 |
+| 2.0 family 480p | 992×432 | 864×496 | 752×560 | 640×640 | 560×752 | 496×864 |
+| 2.0 family 720p | 1470×630 | 1280×720 | 1112×834 | 960×960 | 834×1112 | 720×1280 |
+| 2.0 standard 1080p | 2206×946 | 1920×1080 | 1664×1248 | 1440×1440 | 1248×1664 | 1080×1920 |
+| 2.0 standard 4k | 4398×1886 | 3840×2160 | 3326×2494 | 2880×2880 | 2494×3326 | 2160×3840 |
+| 1.5 480p | 992×432 | 864×496 | 752×560 | 640×640 | 560×752 | 496×864 |
+| 1.5 720p | 1470×630 | 1280×720 | 1112×834 | 960×960 | 834×1112 | 720×1280 |
+| 1.5 1080p | 2206×946 | 1920×1080 | 1664×1248 | 1440×1440 | 1248×1664 | 1080×1920 |
+| 1.0 family 480p | 960×416 | 864×480 | 736×544 | 640×640 | 544×736 | 480×864 |
+| 1.0 family 720p | 1504×640 | 1248×704 | 1120×832 | 960×960 | 832×1120 | 704×1248 |
+| 1.0 family 1080p | 2176×928 | 1920×1088 | 1664×1248 | 1440×1440 | 1248×1664 | 1088×1920 |
+
+Create API only accepts `resolution` and `ratio`; it has no output `width`/`height` fields. For named-ratio requests the adapter verifies caller-declared expected pixels against this matrix but submits only the official fields. Adaptive requests carry no invented pre-submit dimensions.
+
 ## 5. Input Limits
 
 | Input | Official constraint |
@@ -126,7 +146,7 @@ The adapter receives an injected credential supplier; it never reads environment
 
 ### 6.2 Status Normalization
 
-Official observed states are `queued`, `running`, `succeeded`, `failed`, `cancelled`, and `expired`. Current P8 core only has queued/running/succeeded/failed; a future adapter may map `cancelled|expired` to normalized failed only while preserving a finite redacted reason code. It must never preserve raw provider responses or URLs.
+Official observed states are `queued`, `running`, `succeeded`, `failed`, `cancelled`, and `expired`. P8 core has queued/running/succeeded/failed; the adapter maps `cancelled|expired` to normalized failed and never preserves raw provider responses or URLs.
 
 `video_url` and `last_frame_url` are short-lived results (24h; 2.5 also documents a 100-download limit). Official docs do not promise a fixed result hostname, redirect behavior, `Content-Length`, or reliable MIME. Fetch must re-query the same persisted task, reject redirects and any origin not present in an explicit typed allowlist, stream into the caller sink with byte ceiling, and validate expected container/MIME before producing a receipt. The live allowlist cannot be guessed from Ark origin; it requires separately authorized real result-host evidence. URL strings never enter Manifest, Registry, logs, exceptions, repr, fixtures or provenance.
 
@@ -149,7 +169,7 @@ Execution-day promotional discounts are transient evidence, not stable capabilit
 
 Only succeeded videos are billed. Official estimated token usage is `(input video duration + output video duration) × output width × output height × output fps / 1024`; actual billing uses returned `usage.completion_tokens`. 2.x/2.5 requests with video input also have model/resolution/ratio/duration-dependent minimum token usage.
 
-Prices are evidence, not constants suitable for silent billing decisions. A `SeedancePricingSnapshot` must be dated and injected into the typed profile. Missing model/mode/input/resolution/tier rate, unknown minimum-token rule or expired snapshot fails preview before durable intent and before network. A live preview must use the account-visible effective price and a conservative upper bound, not assume public list or promotion eligibility.
+Prices are evidence, not constants suitable for silent billing decisions. `SeedancePricingSnapshot` is dated, content-sealed and injected into the typed profile; it must provide a conservative per-model call upper bound for every included Model ID. Missing model coverage or an expired snapshot fails preview before durable intent and before network. The adapter does not derive a payable budget from public list price. A future live preview must inject an account-visible effective snapshot and conservative request upper bound, rather than assume public list or promotion eligibility.
 
 ## 7. Safety and Lifecycle Contracts
 
@@ -163,9 +183,9 @@ Prices are evidence, not constants suitable for silent billing decisions. A `See
 - No automatic provider/model selection, downgrade, retry, fallback or alias normalization.
 - The previously exposed key is compromised and is not usable. Any future live test requires a rotated key supplied via process environment or secret store.
 
-## 8. Provider-Neutral Core Gap Assessment
+## 8. Provider-Neutral Core Extension
 
-Current P8 core cannot truthfully represent the complete matrix:
+The pre-slice P8 core could not truthfully represent the complete matrix:
 
 | Required Seedance contract | Current P8 contract | Result |
 |---|---|---|
@@ -173,20 +193,21 @@ Current P8 core cannot truthfully represent the complete matrix:
 | reference video/audio and audio-only | image bindings only | core change required |
 | explicit reference/edit/extend modes | mode is only `text_to_video|image_to_video` | core change required |
 | adaptive dimensions | `VideoOutputRequirement` requires positive exact width/height | core change required |
-| `duration=-1`, fractional duration, `frames` | positive integer `duration_seconds` only | core change required |
+| provider-selected `duration=-1` and `frames` | positive integer `duration_seconds` only | core change required |
 | 2.5 `mov` output/fetch | container literal is `mp4` | core and fetched-candidate validation change required |
 
-These are provider-neutral capabilities, not fields that may be hidden in a Seedance profile without changing request semantics. Implementing only the overlapping T2V/I2V-MP4 subset would violate the requested “full model adapter” and make capability resolution dishonest.
+These are provider-neutral capabilities, not fields that may be hidden in a Seedance profile without changing request semantics. The authorized extension added typed media bindings, generic modes, flexible timing/dimensions and container support in `video_contracts.py` plus compatibility-preserving integration in `video.py`. Legacy request and resolved hashes remain fixed by regression tests; Fake/H3/Hailuo behavior remains compatible. No Manifest/schema/activation/renderer change was required.
 
-## 9. Decision Gate
+## 9. Acceptance Boundary
 
-Implementation is blocked pending explicit authorization for a separate provider-neutral P8 contract extension that covers the six gaps above, with compatibility tests for Fake/MiniMax adapters. No schema, CLI, renderer, activation, Registry/Project/Graph, or automatic fallback change is implied.
+The provider-neutral scope gate was satisfied by explicit user authorization. Offline adapter acceptance still requires Harness mapping/receipt, Architecture Gate, native independent review and a task-only commit. No schema, CLI, renderer, activation, Registry/Project/Graph, or automatic fallback change is implied.
 
-Until that decision:
+Offline implementation includes:
 
-- do not create `src/ai_video/production/seedance.py`;
-- do not change `tests/video_provider_contract.py` or `.agent/harness/policy.yaml`;
-- do not update baseline/roadmap/README as runtime truth;
-- do not run live submit, pricing lookup with credentials, or account Endpoint discovery.
+- exact seven-Model-ID allowlist and fail-closed retired/alias handling;
+- strict dated capability/profile/raster/pricing identity;
+- default-no-network fake transport tests for resolve/preview/submit/poll/fetch;
+- one-use Paid Provider permit consumption immediately before the only POST;
+- same-task polling/fetching, explicit result-origin allowlist, redirect/size/MIME/container checks and redacted representations/errors.
 
-Offline blocker: provider-neutral scope authorization. Live blockers remain rotated key, exact account Model/Endpoint access, current pricing snapshot, finite single-call budget, egress authorization and explicit one-submit authorization.
+Offline blocker: final review/Harness/commit only. Live blockers remain rotated key, exact account Model/Endpoint access, current pricing snapshot, finite single-call budget, egress authorization and explicit one-submit authorization. No live call was made.

@@ -307,6 +307,228 @@ def test_request_input_hash_seals_caller_intent_but_excludes_generation_id():
         assert _request(**change).request_input_hash != baseline.request_input_hash
 
 
+def test_extended_media_request_is_sealed_and_keeps_legacy_hashes_stable():
+    assert _request().request_input_hash == (
+        "a95362fdc0493bbc9ec08a7bc29e11960cb914ba981915a453e4230592132047"
+    )
+    assert _resolved().resolved_generation_hash == (
+        "525d9e08851e766a14e000da2f37ce8dcf165db0c0283169074863021eacb8e7"
+    )
+
+    binding_type = getattr(video_contracts, "VideoMediaReferenceBinding", None)
+    output_type = getattr(video_contracts, "VideoFlexibleOutputRequirement", None)
+    assert binding_type is not None
+    assert output_type is not None
+    video_binding = binding_type(
+        kind="video",
+        role="reference_video",
+        asset_id="video-source",
+        asset_sha256=HASH_B,
+        mime_type="video/mp4",
+        duration_millis=12_500,
+        size_bytes=20_000_000,
+        width=1920,
+        height=1080,
+        fps=30,
+    )
+    output = output_type(
+        timing_mode="provider_selected",
+        duration_seconds=None,
+        frame_count=None,
+        dimension_mode="adaptive",
+        width=None,
+        height=None,
+        resolution_label="1080p",
+        ratio="adaptive",
+        fps=24,
+        container="mov",
+        mime_type="video/quicktime",
+        native_audio=True,
+    )
+    request = _request(
+        provider_name="seedance",
+        provider_kind="volcengine_ark_seedance",
+        model_id="doubao-seedance-2-5-260628",
+        provider_profile=_profile(version="seedance-2026-08-19"),
+        mode=VideoGenerationMode.VIDEO_EDIT,
+        image_bindings=(),
+        media_bindings=(video_binding,),
+        output_requirement=output,
+        negative_prompt_text="",
+        seed=None,
+        input_artifact_ids=("shot-001", "video-source"),
+    )
+
+    assert request.media_bindings == (video_binding,)
+    assert request.request_input_hash != _request().request_input_hash
+    assert VideoGenerationRequest.model_validate_json(request.model_dump_json()) == request
+
+
+def test_extended_capability_validates_media_and_flexible_output_constraints():
+    binding_type = getattr(video_contracts, "VideoMediaReferenceBinding", None)
+    media_capability_type = getattr(video_contracts, "VideoMediaCapability", None)
+    output_capability_type = getattr(video_contracts, "VideoOutputCapability", None)
+    output_type = getattr(video_contracts, "VideoFlexibleOutputRequirement", None)
+    assert None not in (
+        binding_type,
+        media_capability_type,
+        output_capability_type,
+        output_type,
+    )
+    video_binding = binding_type(
+        kind="video",
+        role="reference_video",
+        asset_id="video-source",
+        asset_sha256=HASH_B,
+        mime_type="video/mp4",
+        duration_millis=12_500,
+        size_bytes=20_000_000,
+        width=1920,
+        height=1080,
+        fps=30,
+    )
+    output = output_type(
+        timing_mode="provider_selected",
+        dimension_mode="adaptive",
+        resolution_label="1080p",
+        ratio="adaptive",
+        fps=24,
+        container="mov",
+        mime_type="video/quicktime",
+        native_audio=True,
+    )
+    request = _request(
+        provider_name="seedance",
+        provider_kind="volcengine_ark_seedance",
+        model_id="doubao-seedance-2-5-260628",
+        provider_profile=_profile(version="seedance-2026-08-19"),
+        mode=VideoGenerationMode.VIDEO_EDIT,
+        image_bindings=(),
+        media_bindings=(video_binding,),
+        output_requirement=output,
+        negative_prompt_text="",
+        seed=None,
+        input_artifact_ids=("shot-001", "video-source"),
+    )
+    capability = _variant(
+        capability_id="seedance-2-5-edit",
+        provider_kind="volcengine_ark_seedance",
+        model_id="doubao-seedance-2-5-260628",
+        profile_version="seedance-2026-08-19",
+        mode=VideoGenerationMode.VIDEO_EDIT,
+        output=None,
+        output_capability=output_capability_type(
+            min_duration_seconds=4,
+            max_duration_seconds=30,
+            provider_selected_duration=True,
+            frame_count_min=None,
+            frame_count_max=None,
+            frame_count_step=None,
+            frame_count_remainder=None,
+            dimension_modes=("adaptive",),
+            resolution_labels=("1080p",),
+            ratios=("adaptive",),
+            fps_values=(24,),
+            containers=("mov",),
+            native_audio_options=(False, True),
+        ),
+        allowed_image_roles=(),
+        required_first_frame=False,
+        max_reference_count=0,
+        allowed_image_mime_types=(),
+        media_capabilities=(
+            media_capability_type(
+                kind="video",
+                roles=("reference_video",),
+                min_count=1,
+                max_count=10,
+                allowed_mime_types=("video/mp4", "video/quicktime"),
+                max_size_bytes=200_000_000,
+                min_duration_millis=4_000,
+                max_duration_millis=30_000,
+            ),
+        ),
+        negative_prompt_supported=False,
+        seed_supported=False,
+    )
+    resolved = ResolvedVideoGenerationRequest.create(
+        request=request,
+        capability=capability,
+        effective_output=output,
+        effective_seed=None,
+        effective_negative_prompt_text="",
+    )
+
+    assert resolved.media_bindings == (video_binding,)
+    assert resolved.effective_output.container == "mov"
+
+    preview = _paid_preview(resolved)
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=resolved,
+        receipt=_paid_submit_receipt(resolved, preview),
+    )
+    assert submission.expected_container == "mov"
+    assert submission.expected_content_type == "video/quicktime"
+
+    oversized = video_binding.model_copy(update={"size_bytes": 200_000_001})
+    with pytest.raises(AiVideoError) as exc_info:
+        ResolvedVideoGenerationRequest.create(
+            request=_request(
+                provider_name="seedance",
+                provider_kind="volcengine_ark_seedance",
+                model_id="doubao-seedance-2-5-260628",
+                provider_profile=_profile(version="seedance-2026-08-19"),
+                mode=VideoGenerationMode.VIDEO_EDIT,
+                image_bindings=(),
+                media_bindings=(oversized,),
+                output_requirement=output,
+                negative_prompt_text="",
+                seed=None,
+                input_artifact_ids=("shot-001", "video-source"),
+            ),
+            capability=capability,
+            effective_output=output,
+            effective_seed=None,
+            effective_negative_prompt_text="",
+        )
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
+
+def test_flexible_output_rejects_ambiguous_timing_and_container_mime_pairs():
+    output_type = getattr(video_contracts, "VideoFlexibleOutputRequirement", None)
+    assert output_type is not None
+
+    with pytest.raises(ValidationError, match="timing"):
+        output_type(
+            timing_mode="exact_seconds",
+            duration_seconds=5,
+            frame_count=121,
+            dimension_mode="exact",
+            width=1280,
+            height=720,
+            resolution_label="720p",
+            ratio="16:9",
+            fps=24,
+            container="mp4",
+            mime_type="video/mp4",
+            native_audio=False,
+        )
+    with pytest.raises(ValidationError, match="container"):
+        output_type(
+            timing_mode="exact_seconds",
+            duration_seconds=5,
+            dimension_mode="exact",
+            width=1280,
+            height=720,
+            resolution_label="720p",
+            ratio="16:9",
+            fps=24,
+            container="mov",
+            mime_type="video/mp4",
+            native_audio=False,
+        )
+
+
 def test_resolved_hash_binds_generation_capability_profile_and_effective_settings():
     request = _request()
     baseline = _resolved(request)
@@ -363,6 +585,10 @@ def test_submission_status_and_fetch_identity_do_not_mutate_request_hashes():
     submission = VideoSubmission.from_paid_submit_receipt(
         resolved=resolved,
         receipt=paid_receipt,
+    )
+    assert (
+        submission.submission_fingerprint
+        == "a15c218dff44321c73ca4696465b4db97413d0faf1d30a4d99304a334b9d1ac9"
     )
     observation = VideoTaskObservation.create(
         submission=submission,
@@ -481,6 +707,13 @@ def test_negative_prompt_seed_and_fps_are_capability_gated(
     with pytest.raises(AiVideoError) as exc_info:
         _resolved(_request(**request_change), variant=_variant(**variant_change))
     assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
+
+def test_request_accepts_minus_one_seed_for_provider_defined_random_sentinel():
+    request = _request(seed=-1)
+
+    assert request.seed == -1
+    assert _resolved(request, effective_seed=-1).effective_seed == -1
 
 
 def test_capability_model_has_no_unrestricted_provider_options_mapping():

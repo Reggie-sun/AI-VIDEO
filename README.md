@@ -108,7 +108,7 @@ project = load_production_project("projects/example/project.yaml")
 
 上面的路径仅为示意；仓库不包含该 example project。Loader 保持 read-only 和 no-network。它以 `project.yaml` 为 stable validated entrypoint，然后验证 Production Manifest 选中的 project/registry snapshot path、semantic identity 和 exact file hash；也验证 sealed creative artifact reference、六种 Shot `visual_strategy` contract、concrete asset ID/type、local file size/SHA-256 与 project-root containment。对 Manifest 2.1/2.2，它还会验证选中的 P3/P4 timeline、audio/caption provenance、source/receipt/output 与 render-state graph；对 Manifest 2.3，它还验证 active immutable Dependency Graph snapshot 与 Manifest-owned dependency states；对 Manifest 2.4，它还会 reopen 并验证 active QA policy、review/repair/outcome/final-acceptance receipts 及其 exact evidence bindings；对 Manifest 2.5，它还会 reopen exact P7 request、submit intent、provider result、measured PNG 和 provenance evidence，但不会 scan、generate、recover、repair 或 rewrite。P2A state 存在后，root `project.yaml` 不是 active snapshot bytes truth。
 
-P2 本身不创建目录、不更新 Manifest，也不激活 registry 或 graph revision。P2A `ProductionStateCommitter` 继续拥有全部 v2 state changes，并与 reader 保持分离；P6/P7/P7.1 只在该唯一 writer/control path 上增加 durable QA/repair、image lifecycle 与 human-import evidence。Manifest 2.5 可在不改变 schema 的情况下组合保留既有 voice/render/review/repair owners 和全部 P7 evidence。当前仍没有 v2 CLI、production coordinator、Remotion/Captions.ai final-render adapter、Video Provider、remote image Provider 或 cloud fallback。
+P2 本身不创建目录、不更新 Manifest，也不激活 registry 或 graph revision。P2A `ProductionStateCommitter` 继续拥有全部 v2 state changes，并与 reader 保持分离；后续 lifecycle 都复用该唯一 writer/control path。当前仍没有 v2 CLI、production coordinator、Remotion/Captions.ai final-render adapter、remote image Provider、automatic Video Provider selection 或 cloud fallback。
 
 ## Production State Commit Protocol (P2A)
 
@@ -176,11 +176,19 @@ P7 原始 fake/no-network acceptance 已随 Base E2E 合入 local `main`。它�
 
 本地 static compatibility gate 已验证 pinned official-template lineage、Qwen profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`、FLUX profile `local-image-profile:sha256:5066c080d58d3d999446ca5db195e8e81fd982052d94144452737f1e89a0f9c7`、两个 lane 的 exact component digests、ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、Torch `2.11.0+cu130` / CUDA `13.0` 与 lane budgets。2026-08-18 首次授权 M7 session 因 smoke reference fixture 不是可解码 PNG 而 fail closed 并止步 FLUX；第二次 session 已证明 Qwen，但 FLUX 被 `ImageScaleToTotalPixels` 因缺 `resolution_steps` 拒绝；最终 fix 在 live required-input preflight 与 `resolution_steps=1` 之后，同一日 fresh authorized rerun 在 loopback `http://127.0.0.1:8188` 上同时通过 Qwen 与 FLUX technical live acceptance：Qwen one first call / replay 加零，elapsed 185501 ms，1456x720 RGB PNG 1209630 bytes SHA-256 `62218606af56ac7d0651c437245d9db386f48f44194f28cdc9b4bd8c94ad40f7`，workflow SHA-256 `34f1d2a67d049b646eef1c8f0c51aa8c1ad6b9eb5ef176c9ec422c3ff384a85f`；FLUX one first call / replay 加零，elapsed 19201 ms，1456x720 RGB PNG 1190375 bytes SHA-256 `303ea92b23a3820047aa5412d8d7b376ffb532d4e028aa7627b9fe19279e8180`，workflow SHA-256 `e44a10fc8d6e6e491055de361d50dacaffb42adeb915f7c3596250a38b66dd22`；整个 session 没有 remote call、browser 或 secret。M8 仍缺至少 18 组人工 ChatGPT web outputs、两名 reviewer 与 tie-break，因此 P7.1 仍不得称为 quality-accepted；M7 现为 technical live-accepted。
 
+## Generated Video Providers (P8, offline-accepted)
+
+P8提供provider-neutral request/capability、Paid Provider Gate、state-backed submit/poll/fetch和fetched-candidate evidence，并保持Fake、MiniMax H3/Hailuo与Seedance为显式、可删除的adapters。新的generic contracts覆盖video/audio references、reference/edit/extend modes、exact/adaptive output、provider-selected/frame timing和MP4/MOV；没有增加CLI、schema writer、automatic selection/fallback或新的runtime dependency。
+
+`SeedanceVideoProvider`按2026-08-19 official snapshot完整覆盖七个current/legacy-callable Model IDs，并拒绝retired/marketing aliases和可扩张profile。它只接受injected `ARK_API_KEY` reference；one-use permit紧邻唯一POST消费，不自动重试POST；poll/fetch绑定exact task/model/endpoint intent，redirect、cross-origin、oversize、MIME/container/brand mismatch均fail closed。Offline focused/recovery evidence为`517 passed`，native reviewer verdict为`accept`。
+
+这不是Seedance cloud-live acceptance：本slice没有使用credential、网络或付费quota，也没有真实succeeded submit。Fetched candidate不会自动写入或激活Registry/Project/Graph；registered H.264 MP4的P3/P4 composition support属于独立consumer slice。未来单次live submit仍需rotated key、exact account Model/Endpoint access、current pricing snapshot、finite budget、egress authorization和明确的一次submit授权。
+
 ## Base AI Comic E2E
 
 已合入 local `main` 的 Base AI Comic E2E 证明 no-Video-Provider production path 可以从 reusable Character/Scene state 生成两个独立 PNG，继续完成 fake voice、canonical `CaptionTrack`、`ResolvedTimeline`、injected HyperFrames render、strategy-aware QA、exact composition repair、rerender 与 Final Acceptance。Fresh runtime 会 reopen exact Project/Registry/Graph/Render/Review/Repair evidence；exact replay 的 image、voice、analysis、renderer 与 Manifest write counters 全部为零。
 
-这个 acceptance 只组合既有 P3-P7 contracts。Manifest 2.5 的 image evidence 在 voice、render、review、repair、recovery 与 replay 后保持不变；没有增加 schema、public CLI、production coordinator、asset layout、runtime dependency、concrete/live Provider 或 P8 implementation。Task 8 full suite 为 `1714 passed, 4 skipped`，Architecture Gate PASS，independent review verdict 为 `accept`、无 blocker。P8 仍需单独获批并验收 Paid Provider Gate；local `main` 尚未 push、release 或 publish。
+这个 acceptance 只组合既有 P3-P7 contracts。Manifest 2.5 的 image evidence 在 voice、render、review、repair、recovery 与 replay 后保持不变；当时没有增加 schema、public CLI、production coordinator、asset layout、runtime dependency、concrete/live Provider 或 P8 implementation。Task 8 full suite 为 `1714 passed, 4 skipped`，Architecture Gate PASS，independent review verdict 为 `accept`、无 blocker。后续P8是独立获批并验收的slice，不改变该no-Video-Provider proof。
 
 ## Development MCP
 

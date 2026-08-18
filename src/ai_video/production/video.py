@@ -28,12 +28,21 @@ from ai_video.production.paid_provider import (
     PaidProviderSubmitReceipt,
     validate_paid_provider_authorization,
 )
+from ai_video.production.video_contracts import (
+    VideoFlexibleOutputRequirement,
+    VideoMediaCapability,
+    VideoMediaReferenceBinding,
+    VideoOutputCapability,
+    VideoProviderTaskBinding,
+    media_bindings_satisfy_capabilities,
+)
 
 
 _SAFE_ID = re.compile(r"^[A-Za-z0-9._:/-]{1,256}$")
 _SHA256 = r"^[0-9a-f]{64}$"
 _MIME_TYPE = r"^[A-Za-z0-9.+-]+/[A-Za-z0-9.+-]+$"
-_ROLE_ORDER = {"first_frame": 0, "reference": 1}
+_ROLE_ORDER = {"first_frame": 0, "last_frame": 1, "reference": 2}
+_MEDIA_ROLE_ORDER = {"reference_video": 0, "reference_audio": 1}
 
 
 def _video_error(code: ErrorCode, message: str) -> AiVideoError:
@@ -80,6 +89,9 @@ class _VideoStrictModel(StrictModel):
 class VideoGenerationMode(str, Enum):
     TEXT_TO_VIDEO = "text_to_video"
     IMAGE_TO_VIDEO = "image_to_video"
+    REFERENCE_TO_VIDEO = "reference_to_video"
+    VIDEO_EDIT = "video_edit"
+    VIDEO_EXTEND = "video_extend"
 
 
 class VideoExecutionKind(str, Enum):
@@ -110,7 +122,7 @@ class VideoOutputRequirement(_VideoStrictModel):
 
 
 class VideoImageReferenceBinding(_VideoStrictModel):
-    role: Literal["first_frame", "reference"]
+    role: Literal["first_frame", "last_frame", "reference"]
     asset_id: str = Field(pattern=_SAFE_ID.pattern)
     asset_sha256: str = Field(pattern=_SHA256)
     mime_type: str = Field(pattern=_MIME_TYPE)
@@ -152,8 +164,9 @@ class VideoGenerationRequest(_VideoStrictModel):
     prompt_text: str = Field(min_length=1)
     negative_prompt_text: str
     image_bindings: tuple[VideoImageReferenceBinding, ...]
-    output_requirement: VideoOutputRequirement
-    seed: int | None = Field(default=None, strict=True, ge=0)
+    media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
+    output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement
+    seed: int | None = Field(default=None, strict=True, ge=-1)
     base_project: ProjectSnapshotPointer
     base_registry: RegistrySnapshotPointer
     base_dependency_graph: DependencyGraphSnapshotPointer
@@ -170,21 +183,58 @@ class VideoGenerationRequest(_VideoStrictModel):
 
     @staticmethod
     def _fingerprint_payload(data: dict[str, object]) -> dict[str, object]:
+        media_bindings = data.get("media_bindings")
+        mode = data.get("mode")
+        output = data.get("output_requirement")
+        image_bindings = data.get("image_bindings")
+        advanced = bool(
+            media_bindings
+            or mode
+            in {
+                VideoGenerationMode.REFERENCE_TO_VIDEO.value,
+                VideoGenerationMode.VIDEO_EDIT.value,
+                VideoGenerationMode.VIDEO_EXTEND.value,
+            }
+            or isinstance(output, dict)
+            and "timing_mode" in output
+            or isinstance(image_bindings, list)
+            and any(binding.get("role") == "last_frame" for binding in image_bindings)
+        )
+        selected = {
+            key: value
+            for key, value in data.items()
+            if key not in {"generation_id", "request_input_hash"}
+        }
+        if not advanced:
+            selected.pop("media_bindings", None)
         return {
-            "schema": "ai-video-generation-request/1",
-            **{
-                key: value
-                for key, value in data.items()
-                if key not in {"generation_id", "request_input_hash"}
-            },
+            "schema": (
+                "ai-video-generation-request/2"
+                if advanced
+                else "ai-video-generation-request/1"
+            ),
+            **selected,
         }
 
     @model_validator(mode="after")
     def _validate_request(self) -> "VideoGenerationRequest":
         if self.mode is VideoGenerationMode.TEXT_TO_VIDEO and self.image_bindings:
             raise ValueError("text-to-video requests cannot contain image bindings")
-        if self.mode is VideoGenerationMode.IMAGE_TO_VIDEO and not self.image_bindings:
+        if self.mode is VideoGenerationMode.TEXT_TO_VIDEO and self.media_bindings:
+            raise ValueError("text-to-video requests cannot contain media bindings")
+        if self.mode is VideoGenerationMode.IMAGE_TO_VIDEO and (
+            not self.image_bindings or self.media_bindings
+        ):
             raise ValueError("image-to-video requests require image bindings")
+        if self.mode is VideoGenerationMode.REFERENCE_TO_VIDEO and not (
+            self.image_bindings or self.media_bindings
+        ):
+            raise ValueError("reference-to-video requests require reference bindings")
+        if self.mode in {
+            VideoGenerationMode.VIDEO_EDIT,
+            VideoGenerationMode.VIDEO_EXTEND,
+        } and not any(binding.kind == "video" for binding in self.media_bindings):
+            raise ValueError("video edit and extend requests require a video reference")
         keys = tuple(
             (_ROLE_ORDER[binding.role], binding.asset_id)
             for binding in self.image_bindings
@@ -195,6 +245,16 @@ class VideoGenerationRequest(_VideoStrictModel):
             self.image_bindings
         ):
             raise ValueError("video image bindings must be unique")
+        media_keys = tuple(
+            (_MEDIA_ROLE_ORDER[binding.role], binding.asset_id)
+            for binding in self.media_bindings
+        )
+        if media_keys != tuple(sorted(media_keys)):
+            raise ValueError("video media bindings must use canonical role and asset order")
+        if len({(binding.role, binding.asset_id) for binding in self.media_bindings}) != len(
+            self.media_bindings
+        ):
+            raise ValueError("video media bindings must be unique")
         if len(set(self.input_artifact_ids)) != len(self.input_artifact_ids):
             raise ValueError("video input artifact IDs must be unique")
         if self.request_input_hash != canonical_sha256(
@@ -223,14 +283,16 @@ class VideoCapabilityVariant(_VideoStrictModel):
     execution_kind: VideoExecutionKind
     billing_kind: BillingKind
     mode: VideoGenerationMode
-    output: VideoOutputRequirement
-    allowed_image_roles: tuple[Literal["first_frame", "reference"], ...]
+    output: VideoOutputRequirement | None = None
+    output_capability: VideoOutputCapability | None = None
+    allowed_image_roles: tuple[Literal["first_frame", "last_frame", "reference"], ...]
     required_first_frame: bool
     max_reference_count: int = Field(strict=True, ge=0, le=32)
     allowed_image_mime_types: tuple[str, ...]
     max_image_bytes: int = Field(strict=True, gt=0)
     min_image_width: int = Field(strict=True, gt=0)
     min_image_height: int = Field(strict=True, gt=0)
+    media_capabilities: tuple[VideoMediaCapability, ...] = ()
     negative_prompt_supported: bool
     seed_supported: bool
     fps_supported: bool
@@ -239,12 +301,17 @@ class VideoCapabilityVariant(_VideoStrictModel):
 
     @model_validator(mode="after")
     def _validate_variant(self) -> "VideoCapabilityVariant":
+        if (self.output is None) == (self.output_capability is None):
+            raise ValueError("video capability requires exactly one output contract")
         if len(set(self.allowed_image_roles)) != len(self.allowed_image_roles):
             raise ValueError("video capability image roles must be unique")
         if len(set(self.allowed_image_mime_types)) != len(self.allowed_image_mime_types):
             raise ValueError("video capability image MIME types must be unique")
         if self.mode is VideoGenerationMode.TEXT_TO_VIDEO and (
-            self.allowed_image_roles or self.required_first_frame or self.max_reference_count
+            self.allowed_image_roles
+            or self.required_first_frame
+            or self.max_reference_count
+            or self.media_capabilities
         ):
             raise ValueError("text-to-video capability cannot declare image bindings")
         if self.required_first_frame and "first_frame" not in self.allowed_image_roles:
@@ -310,8 +377,10 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     mode: VideoGenerationMode
     prompt_text: str = Field(min_length=1)
     image_bindings: tuple[VideoImageReferenceBinding, ...]
-    effective_output: VideoOutputRequirement
-    effective_seed: int | None = Field(default=None, strict=True, ge=0)
+    media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
+    effective_output: VideoOutputRequirement | VideoFlexibleOutputRequirement
+    provider_task_binding: VideoProviderTaskBinding | None = None
+    effective_seed: int | None = Field(default=None, strict=True, ge=-1)
     effective_negative_prompt_text: str
     output_asset_id: str = Field(pattern=_SAFE_ID.pattern)
     resolved_generation_hash: str = Field(pattern=_SHA256)
@@ -330,12 +399,35 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             mode="json",
             exclude={"resolved_generation_hash", "desired_generation_fingerprint"},
         )
-        expected = canonical_sha256({"schema": "ai-video-resolved-request/2", **data})
+        schema = (
+            "ai-video-resolved-request/3"
+            if self._uses_extended_contract()
+            else "ai-video-resolved-request/2"
+        )
+        if schema.endswith("/2"):
+            data.pop("media_bindings", None)
+        if self.provider_task_binding is None:
+            data.pop("provider_task_binding", None)
+        expected = canonical_sha256({"schema": schema, **data})
         if self.resolved_generation_hash != expected:
             raise ValueError("resolved_generation_hash does not match resolved request")
         if self.desired_generation_fingerprint != expected:
             raise ValueError("desired generation fingerprint must equal resolved hash")
         return self
+
+    def _uses_extended_contract(self) -> bool:
+        return bool(
+            self.media_bindings
+            or self.mode
+            in {
+                VideoGenerationMode.REFERENCE_TO_VIDEO,
+                VideoGenerationMode.VIDEO_EDIT,
+                VideoGenerationMode.VIDEO_EXTEND,
+            }
+            or isinstance(self.effective_output, VideoFlexibleOutputRequirement)
+            or self.provider_task_binding is not None
+            or any(binding.role == "last_frame" for binding in self.image_bindings)
+        )
 
     @classmethod
     def create(
@@ -343,9 +435,10 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
         *,
         request: VideoGenerationRequest,
         capability: VideoCapabilityVariant,
-        effective_output: VideoOutputRequirement,
+        effective_output: VideoOutputRequirement | VideoFlexibleOutputRequirement,
         effective_seed: int | None,
         effective_negative_prompt_text: str,
+        provider_task_binding: VideoProviderTaskBinding | None = None,
     ) -> "ResolvedVideoGenerationRequest":
         if (
             capability.provider_kind != request.provider_kind
@@ -357,7 +450,14 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                 "Video request does not match the selected capability variant.",
             )
-        if effective_output != request.output_requirement or effective_output != capability.output:
+        output_supported = (
+            capability.output is not None
+            and effective_output == capability.output
+            or capability.output_capability is not None
+            and isinstance(effective_output, VideoFlexibleOutputRequirement)
+            and capability.output_capability.supports(effective_output)
+        )
+        if effective_output != request.output_requirement or not output_supported:
             raise _video_error(
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                 "Video output requirement is not an exact supported capability combination.",
@@ -386,12 +486,17 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 "Selected video capability does not support a requested FPS.",
             )
         first_frames = sum(binding.role == "first_frame" for binding in request.image_bindings)
+        last_frames = sum(binding.role == "last_frame" for binding in request.image_bindings)
         references = sum(binding.role == "reference" for binding in request.image_bindings)
         if (
             (capability.required_first_frame and first_frames != 1)
             or first_frames > 1
+            or last_frames > 1
             or references > capability.max_reference_count
-            or any(binding.role not in capability.allowed_image_roles for binding in request.image_bindings)
+            or any(
+                binding.role not in capability.allowed_image_roles
+                for binding in request.image_bindings
+            )
             or any(
                 binding.mime_type not in capability.allowed_image_mime_types
                 or binding.width < capability.min_image_width
@@ -407,6 +512,13 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                 "Video image bindings do not satisfy the selected capability variant.",
             )
+        if not media_bindings_satisfy_capabilities(
+            request.media_bindings, capability.media_capabilities
+        ):
+            raise _video_error(
+                ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                "Video media bindings do not satisfy the selected capability variant.",
+            )
         data: dict[str, object] = {
             "generation_id": request.generation_id,
             "request_input_hash": request.request_input_hash,
@@ -420,7 +532,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             "mode": request.mode,
             "prompt_text": request.prompt_text,
             "image_bindings": request.image_bindings,
+            "media_bindings": request.media_bindings,
             "effective_output": effective_output,
+            "provider_task_binding": provider_task_binding,
             "effective_seed": effective_seed,
             "effective_negative_prompt_text": effective_negative_prompt_text,
             "output_asset_id": request.output_asset_id,
@@ -430,16 +544,21 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             resolved_generation_hash="0" * 64,
             desired_generation_fingerprint="0" * 64,
         )
-        fingerprint = canonical_sha256(
-            {
-                "schema": "ai-video-resolved-request/2",
-                **candidate.model_dump(
-                    mode="json",
-                    exclude={"resolved_generation_hash", "desired_generation_fingerprint"},
-                    warnings=False,
-                ),
-            }
+        fingerprint_data = candidate.model_dump(
+            mode="json",
+            exclude={"resolved_generation_hash", "desired_generation_fingerprint"},
+            warnings=False,
         )
+        schema = (
+            "ai-video-resolved-request/3"
+            if candidate._uses_extended_contract()
+            else "ai-video-resolved-request/2"
+        )
+        if schema.endswith("/2"):
+            fingerprint_data.pop("media_bindings", None)
+        if provider_task_binding is None:
+            fingerprint_data.pop("provider_task_binding", None)
+        fingerprint = canonical_sha256({"schema": schema, **fingerprint_data})
         data["resolved_generation_hash"] = fingerprint
         data["desired_generation_fingerprint"] = fingerprint
         return cls.model_validate(data)
@@ -558,6 +677,9 @@ class VideoSubmission(_VideoStrictModel):
     resolved_generation_hash: str = Field(pattern=_SHA256)
     paid_submit_receipt_fingerprint: str = Field(pattern=_SHA256)
     submitted_at: datetime
+    provider_task_binding: VideoProviderTaskBinding | None = None
+    expected_container: Literal["mp4", "mov"] | None = None
+    expected_content_type: Literal["video/mp4", "video/quicktime"] | None = None
     submission_fingerprint: str = Field(pattern=_SHA256)
 
     @field_validator("submitted_at")
@@ -567,8 +689,23 @@ class VideoSubmission(_VideoStrictModel):
 
     @model_validator(mode="after")
     def _validate_seal(self) -> "VideoSubmission":
+        expected_type = {
+            "mp4": "video/mp4",
+            "mov": "video/quicktime",
+            None: None,
+        }[self.expected_container]
+        if self.expected_content_type != expected_type:
+            raise ValueError("video submission container and content type must match")
+        fingerprint_data = self.model_dump(
+            mode="json", exclude={"submission_fingerprint"}
+        )
+        if self.expected_container is None:
+            fingerprint_data.pop("expected_container", None)
+            fingerprint_data.pop("expected_content_type", None)
+        if self.provider_task_binding is None:
+            fingerprint_data.pop("provider_task_binding", None)
         if self.submission_fingerprint != canonical_sha256(
-            self.model_dump(mode="json", exclude={"submission_fingerprint"})
+            fingerprint_data
         ):
             raise ValueError("submission_fingerprint does not match video submission")
         return self
@@ -594,12 +731,33 @@ class VideoSubmission(_VideoStrictModel):
             "resolved_generation_hash": resolved.resolved_generation_hash,
             "paid_submit_receipt_fingerprint": receipt.submit_receipt_fingerprint,
             "submitted_at": receipt.recorded_at,
+            "provider_task_binding": resolved.provider_task_binding,
+            "expected_container": (
+                resolved.effective_output.container
+                if isinstance(
+                    resolved.effective_output, VideoFlexibleOutputRequirement
+                )
+                else None
+            ),
+            "expected_content_type": (
+                resolved.effective_output.mime_type
+                if isinstance(
+                    resolved.effective_output, VideoFlexibleOutputRequirement
+                )
+                else None
+            ),
         }
         candidate = cls.model_construct(**data, submission_fingerprint="0" * 64)
+        fingerprint_data = candidate.model_dump(
+            mode="json", exclude={"submission_fingerprint"}, warnings=False
+        )
+        if data["expected_container"] is None:
+            fingerprint_data.pop("expected_container", None)
+            fingerprint_data.pop("expected_content_type", None)
+        if data["provider_task_binding"] is None:
+            fingerprint_data.pop("provider_task_binding", None)
         data["submission_fingerprint"] = canonical_sha256(
-            candidate.model_dump(
-                mode="json", exclude={"submission_fingerprint"}, warnings=False
-            )
+            fingerprint_data
         )
         return cls.model_validate(data)
 
@@ -662,7 +820,7 @@ class VideoFetchReceipt(_VideoStrictModel):
     observation_fingerprint: str = Field(pattern=_SHA256)
     paid_submit_receipt_fingerprint: str = Field(pattern=_SHA256)
     provider_file_id: str = Field(pattern=_SAFE_ID.pattern)
-    content_type: Literal["video/mp4"]
+    content_type: Literal["video/mp4", "video/quicktime"]
     size_bytes: int = Field(strict=True, gt=0)
     artifact_sha256: str = Field(pattern=_SHA256)
     fetched_at: datetime
@@ -687,7 +845,7 @@ class VideoFetchReceipt(_VideoStrictModel):
         *,
         submission: VideoSubmission,
         observation: VideoTaskObservation,
-        content_type: Literal["video/mp4"],
+        content_type: Literal["video/mp4", "video/quicktime"],
         size_bytes: int,
         artifact_sha256: str,
         fetched_at: datetime,
@@ -702,6 +860,14 @@ class VideoFetchReceipt(_VideoStrictModel):
             raise _video_error(
                 ErrorCode.VIDEO_PROVIDER_FAILED,
                 "Video fetch requires an exact succeeded task observation.",
+            )
+        if (
+            submission.expected_content_type is not None
+            and content_type != submission.expected_content_type
+        ):
+            raise _video_error(
+                ErrorCode.VIDEO_ARTIFACT_INVALID,
+                "Video fetch content type does not match the durable submit intent.",
             )
         data: dict[str, object] = {
             "submission_fingerprint": submission.submission_fingerprint,
@@ -864,8 +1030,13 @@ __all__ = [
     "VideoGenerationMode",
     "VideoGenerationPreview",
     "VideoGenerationRequest",
+    "VideoFlexibleOutputRequirement",
     "VideoImageReferenceBinding",
+    "VideoMediaCapability",
+    "VideoMediaReferenceBinding",
+    "VideoOutputCapability",
     "VideoOutputRequirement",
+    "VideoProviderTaskBinding",
     "VideoProvider",
     "VideoProviderCapabilities",
     "VideoProviderFailure",

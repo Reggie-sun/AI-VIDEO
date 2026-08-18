@@ -246,6 +246,24 @@ def test_minimax_adapters_route_to_video_provider_suite() -> None:
     assert "tests/test_production_minimax_hailuo.py" in provider_argv
 
 
+def test_seedance_adapter_and_extended_contracts_route_to_video_provider_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/production/seedance.py",
+        "src/ai_video/production/seedance_capabilities.py",
+        "src/ai_video/production/seedance_profile.py",
+        "src/ai_video/production/video_contracts.py",
+        "tests/test_production_seedance.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["production_video_provider"]
+        assert "production_video_provider_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
+    provider_argv = policy["checks"]["production_video_provider_tests"]["argv"]
+    assert "tests/test_production_seedance.py" in provider_argv
+
+
 def test_production_test_helpers_route_to_their_contract_owners() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
