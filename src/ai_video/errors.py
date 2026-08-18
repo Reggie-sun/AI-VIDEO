@@ -40,6 +40,14 @@ class ErrorCode(str, Enum):
     VOICE_EGRESS_NOT_AUTHORIZED = "voice_egress_not_authorized"
     VOICE_PROVIDER_FAILED = "voice_provider_failed"
     VOICE_PROVIDER_OUTCOME_UNKNOWN = "voice_provider_outcome_unknown"
+    PAID_PROVIDER_AUTHORIZATION_REQUIRED = "paid_provider_authorization_required"
+    PAID_PROVIDER_BUDGET_REJECTED = "paid_provider_budget_rejected"
+    PAID_PROVIDER_EGRESS_NOT_AUTHORIZED = "paid_provider_egress_not_authorized"
+    PAID_PROVIDER_LIVE_AUTHORIZATION_REQUIRED = (
+        "paid_provider_live_authorization_required"
+    )
+    PAID_PROVIDER_KNOWN_NO_EFFECT = "paid_provider_known_no_effect"
+    PAID_PROVIDER_OUTCOME_UNKNOWN = "paid_provider_outcome_unknown"
     IMAGE_REQUEST_INVALID = "image_request_invalid"
     IMAGE_ASSET_INVALID = "image_asset_invalid"
     IMAGE_PROVIDER_FAILED = "image_provider_failed"

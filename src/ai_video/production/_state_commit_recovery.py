@@ -65,7 +65,9 @@ class _StateCommitRecoveryMixin:
         with self._exclusive_lock():
             manifest = self._read_manifest()
             revision_before = manifest.manifest_revision
+            manifest, paid_items = self._recover_paid_provider_intents(manifest)
             items = list(self._active_recovery_items(manifest))
+            items.extend(paid_items)
             attempts_before_recovery = list(manifest.attempts)
             attempts, changed, interrupted_items = self._recover_attempts(manifest)
 
@@ -99,7 +101,7 @@ class _StateCommitRecoveryMixin:
         registry_hash = self._require_recovery_file_hash(
             registry_path, manifest.active_registry.file_sha256
         )
-        if manifest.schema_version == "2.5":
+        if manifest.schema_version in {"2.5", "2.6"}:
             loaded = self._load_production_project(
                 self._project_root / "project.yaml"
             )
@@ -193,7 +195,7 @@ class _StateCommitRecoveryMixin:
                 )
             )
         if manifest.active_render_state is not None:
-            if manifest.schema_version in {"2.3", "2.4", "2.5"}:
+            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}:
                 bundle = load_production_project_candidate(
                     self._project_root,
                     manifest,
@@ -218,13 +220,46 @@ class _StateCommitRecoveryMixin:
                 )
             )
         items.extend(self._p6_active_recovery_items(manifest))
+        if manifest.active_paid_provider_budget is not None:
+            budget = self._reopen_paid_budget(manifest.active_paid_provider_budget)
+            items.append(
+                RecoveryItem(
+                    path=manifest.active_paid_provider_budget.path,
+                    disposition=RecoveryDisposition.ACTIVE,
+                    sha256=manifest.active_paid_provider_budget.file_sha256,
+                )
+            )
+            reservation_ids = {item.reservation_id for item in budget.reservations}
+            for attempt in manifest.attempts:
+                state = attempt.paid_provider_state
+                if state is None:
+                    continue
+                if state.reservation_id not in reservation_ids:
+                    raise _state_invalid("Paid Provider recovery reservation is missing.")
+                self._reopen_paid_gate(state.gate_receipt)
+                items.append(
+                    RecoveryItem(
+                        path=state.gate_receipt.path,
+                        disposition=RecoveryDisposition.ACTIVE,
+                        sha256=state.gate_receipt.file_sha256,
+                    )
+                )
+                if state.submit_receipt is not None:
+                    self._reopen_paid_submit(state.submit_receipt)
+                    items.append(
+                        RecoveryItem(
+                            path=state.submit_receipt.path,
+                            disposition=RecoveryDisposition.ACTIVE,
+                            sha256=state.submit_receipt.file_sha256,
+                        )
+                    )
         return tuple(items)
 
     def _p6_active_recovery_items(
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
         if (
-            manifest.schema_version not in {"2.4", "2.5"}
+            manifest.schema_version not in {"2.4", "2.5", "2.6"}
             or manifest.active_qa_policy is None
         ):
             return ()
@@ -290,7 +325,7 @@ class _StateCommitRecoveryMixin:
         if all(item is None for item in graph_fields):
             return "legacy"
         if (
-            manifest.schema_version not in {"2.3", "2.4", "2.5"}
+            manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6"}
             or attempt.candidate_dependency_graph is None
             or attempt.candidate_dependency_states_hash is None
         ):

@@ -37,6 +37,7 @@ from ai_video.production.captions import (
 )
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import (
+    ActorIdentity,
     AssetType,
     ApprovedRepairReceipt,
     ApprovedRepairReceiptPointer,
@@ -203,6 +204,7 @@ from ._state_commit_contracts import (
     _VOICE_PERMIT_TOKEN,
     _DurableReviewAnalysisPermit,
     _DurableImageSubmitPermit,
+    _DurablePaidProviderSubmitPermit,
     _DurableVoiceSubmitPermit,
 )
 from ._state_commit_io import _FileOps, _NativeFileOps, _StateCommitIoMixin
@@ -214,6 +216,10 @@ from ._state_commit_image_activation import _StateCommitImageActivationMixin
 from ._state_commit_image_candidate import _StateCommitImageCandidateMixin
 from ._state_commit_image_intent import _StateCommitImageIntentMixin
 from ._state_commit_image_recovery import _StateCommitImageRecoveryMixin
+from ._state_commit_paid_provider import (
+    PaidProviderAuthorizer,
+    _StateCommitPaidProviderMixin,
+)
 from ._state_commit_repair import _StateCommitRepairMixin
 from ._state_commit_render_lifecycle import _StateCommitRenderLifecycleMixin
 from ._state_commit_render_support import _StateCommitRenderSupportMixin
@@ -240,6 +246,7 @@ except ImportError:  # pragma: no cover - exercised through platform injection
 
 
 class ProductionStateCommitter(
+    _StateCommitPaidProviderMixin,
     _StateCommitReviewMixin,
     _StateCommitRepairMixin,
     _StateCommitImageIntentMixin,
@@ -269,6 +276,8 @@ class ProductionStateCommitter(
         voice_candidate_preparer: VoiceCandidatePreparer | None = None,
         image_candidate_preparer: ImageCandidatePreparer | None = None,
         repair_authorizer: Callable[[RepairRequest], ActorIdentity | None] | None = None,
+        paid_provider_authorizer: PaidProviderAuthorizer | None = None,
+        paid_provider_clock: Callable[[], datetime] | None = None,
     ) -> None:
         try:
             self._project_root = Path(project_root).resolve(strict=True)
@@ -281,6 +290,10 @@ class ProductionStateCommitter(
         self._voice_candidate_preparer = voice_candidate_preparer
         self._image_candidate_preparer = image_candidate_preparer
         self._repair_authorizer = repair_authorizer
+        self._paid_provider_authorizer = paid_provider_authorizer
+        self._paid_provider_clock = paid_provider_clock or (
+            lambda: datetime.now(timezone.utc)
+        )
 
 
 

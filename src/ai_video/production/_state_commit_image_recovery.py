@@ -22,7 +22,7 @@ class _StateCommitImageRecoveryMixin:
     def _active_image_recovery_items(
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
-        if manifest.schema_version != "2.5":
+        if manifest.schema_version not in {"2.5", "2.6"}:
             return ()
         bundle = self._load_production_project(self._project_root / "project.yaml")
         pairs: dict[Path, str] = {}
@@ -49,7 +49,7 @@ class _StateCommitImageRecoveryMixin:
         manifest: ProductionManifest,
         attempt: StateCommitAttempt,
     ) -> tuple[StateCommitAttempt, tuple[RecoveryItem, ...]]:
-        if manifest.schema_version != "2.5" or attempt.image_request is None:
+        if manifest.schema_version not in {"2.5", "2.6"} or attempt.image_request is None:
             raise _state_invalid("Interrupted P7 image attempt identity is incomplete.")
 
         if attempt.image_phase == "request":

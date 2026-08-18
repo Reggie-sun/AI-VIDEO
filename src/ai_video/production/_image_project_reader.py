@@ -710,7 +710,7 @@ def verify_image_attempt_evidence(
 
 
 def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
-    if bundle.manifest.schema_version != "2.5":
+    if bundle.manifest.schema_version not in {"2.5", "2.6"}:
         return
     attempts = tuple(
         item

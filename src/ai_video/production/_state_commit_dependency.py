@@ -297,7 +297,7 @@ class _StateCommitDependencyMixin:
                     **manifest.model_dump(mode="python"),
                     "schema_version": (
                         manifest.schema_version
-                        if manifest.schema_version in {"2.4", "2.5"}
+                        if manifest.schema_version in {"2.4", "2.5", "2.6"}
                         else "2.3"
                     ),
                     "active_project": project_pointer,
@@ -352,7 +352,7 @@ class _StateCommitDependencyMixin:
         artifacts: tuple[PreparedArtifact, ...],
         transition: DependencyGraphTransition | None,
     ) -> tuple[DependencyGraphTransition | None, DependencyGraphSnapshot | None]:
-        if manifest.schema_version not in {"2.3", "2.4", "2.5"}:
+        if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6"}:
             if transition is not None:
                 raise _state_invalid(
                     "Dependency graph transition requires Manifest 2.3."
@@ -572,7 +572,7 @@ class _StateCommitDependencyMixin:
         desired_fingerprint: str,
     ) -> tuple[ProductionManifest, DependencyGraphSnapshot, object, DependencyNodeState]:
         manifest = self._read_manifest()
-        if manifest.schema_version not in {"2.3", "2.4", "2.5"}:
+        if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6"}:
             raise _state_invalid("Dependency results require Manifest 2.3.")
         if manifest.manifest_revision != expected_manifest_revision:
             raise _state_invalid("Production Manifest revision is stale.")

@@ -187,6 +187,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
     assert tuple(
         owner.__name__ for owner in facade.ProductionStateCommitter.__mro__[1:-1]
     ) == (
+        "_StateCommitPaidProviderMixin",
         "_StateCommitReviewMixin",
         "_StateCommitRepairMixin",
         "_StateCommitImageIntentMixin",

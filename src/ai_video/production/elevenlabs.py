@@ -27,7 +27,7 @@ from ai_video.production.audio import (
     validate_voice_call_authorization,
 )
 from ai_video.production.models import ToolIdentity
-from ai_video.production.state_commit import _DurableVoiceSubmitPermit
+from ai_video.production.state_commit import _DurablePaidProviderSubmitPermit
 
 
 _ORIGIN = "https://api.elevenlabs.io"
@@ -36,6 +36,7 @@ _MAX_RESPONSE_BYTES = 2 * 1024 * 1024
 _MAX_ALIGNMENT_CHARACTERS = 100_000
 _SANITIZED_RESPONSE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
 _SANITIZED_POLICY_DECISION = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
+_CREDENTIAL_REFERENCE_ID = re.compile(r"^[A-Za-z0-9._:/-]{1,256}$")
 _HTTP_HEADER_NAME = re.compile(r"^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,128}$")
 _CANONICAL_CHARACTER_COST = re.compile(r"^[1-9][0-9]{0,9}$")
 _MAX_RESPONSE_HEADERS = 64
@@ -69,6 +70,7 @@ class ElevenLabsProviderPolicy:
     enable_logging: bool
     zero_retention_entitled: bool
     credential_reference_kind: Literal["environment", "secret_store"]
+    credential_reference_id: str
     license_policy_decision: str
     license_allowed: bool
     use_policy_allowed: bool
@@ -93,6 +95,11 @@ class ElevenLabsProviderPolicy:
             or self.credential_reference_kind not in {"environment", "secret_store"}
         ):
             raise ValueError("ElevenLabs credential reference kind is invalid")
+        if (
+            type(self.credential_reference_id) is not str
+            or _CREDENTIAL_REFERENCE_ID.fullmatch(self.credential_reference_id) is None
+        ):
+            raise ValueError("ElevenLabs credential reference identity is invalid")
         if (
             type(self.license_policy_decision) is not str
             or _SANITIZED_POLICY_DECISION.fullmatch(
@@ -158,35 +165,43 @@ def _post_submit_outcome_unknown() -> AiVideoError:
 def _permit_binding(
     request: VoiceGenerationRequest,
     authorization: VoiceCallAuthorization,
+    preview: VoiceGenerationPreview,
+    policy: ElevenLabsProviderPolicy,
 ) -> dict[str, str]:
     return {
         "attempt_id": request.attempt_id,
+        "operation": "voice_generation",
         "request_fingerprint": request.voice_request_fingerprint,
-        "authorization_fingerprint": authorization.authorization_fingerprint,
         "destination": authorization.destination,
-        "budget_reservation_receipt_id": (
-            authorization.budget_reservation_receipt_id
+        "provider_kind": request.provider_kind,
+        "model_id": request.model_id,
+        "currency": preview.currency,
+        "estimated_cost_upper_bound_microunits": str(
+            preview.estimated_cost_upper_bound_microunits
         ),
-        "egress_authorization_receipt_id": (
-            authorization.egress_authorization_receipt_id
+        "provider_policy_snapshot_id": policy.policy_receipt_id,
+        "retention_mode": (
+            "provider_standard" if policy.enable_logging else "zero_retention"
         ),
+        "secret_reference_kind": policy.credential_reference_kind,
+        "secret_reference_id": policy.credential_reference_id,
     }
 
 
 def _permit_is_valid(permit: object, binding: dict[str, str]) -> bool:
-    if type(permit) is not _DurableVoiceSubmitPermit:
+    if type(permit) is not _DurablePaidProviderSubmitPermit:
         return False
     try:
-        return permit._validate_voice_submit_permit(**binding) is True
+        return permit._validate_paid_provider_operation_permit(**binding) is True
     except Exception:
         return False
 
 
 def _consume_permit(permit: object, binding: dict[str, str]) -> bool:
-    if type(permit) is not _DurableVoiceSubmitPermit:
+    if type(permit) is not _DurablePaidProviderSubmitPermit:
         return False
     try:
-        return permit._consume_voice_submit_permit(**binding) is True
+        return permit._consume_paid_provider_operation_permit(**binding) is True
     except Exception:
         return False
 
@@ -626,7 +641,7 @@ class ElevenLabsVoiceProvider:
                 ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED,
                 "ElevenLabs machine policy authorization is incomplete.",
             )
-        binding = _permit_binding(request, authorization)
+        binding = _permit_binding(request, authorization, preview, self._policy)
         if not _permit_is_valid(permit, binding):
             raise _error(
                 ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED,

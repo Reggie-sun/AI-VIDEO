@@ -133,14 +133,14 @@ class _StateCommitTransactionMixin:
                 raise _state_invalid("Production Manifest revision is stale.")
 
             retained_render_state = manifest.active_render_state
-            if manifest.schema_version not in {"2.3", "2.4", "2.5"} and (
+            if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6"} and (
                 request.next_project != manifest.active_project
                 or request.next_registry != manifest.active_registry
             ):
                 retained_render_state = None
             elif retained_render_state is not None:
                 try:
-                    if manifest.schema_version in {"2.3", "2.4", "2.5"}:
+                    if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}:
                         active_bundle = load_production_project_candidate(
                             self._project_root,
                             manifest,
@@ -195,7 +195,7 @@ class _StateCommitTransactionMixin:
                     "schema_version": (
                         "2.2"
                         if request.operation == "audio_import"
-                        and manifest.schema_version not in {"2.3", "2.4", "2.5"}
+                        and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6"}
                         else manifest.schema_version
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,
@@ -246,7 +246,7 @@ class _StateCommitTransactionMixin:
                     "schema_version": (
                         "2.2"
                         if request.operation == "audio_import"
-                        and manifest.schema_version not in {"2.3", "2.4", "2.5"}
+                        and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6"}
                         else manifest.schema_version
                     ),
                     "manifest_revision": manifest.manifest_revision + 2,
@@ -294,7 +294,7 @@ class _StateCommitTransactionMixin:
                         "schema_version": (
                             "2.2"
                             if request.operation == "audio_import"
-                            and manifest.schema_version not in {"2.3", "2.4", "2.5"}
+                            and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6"}
                             else manifest.schema_version
                         ),
                         "manifest_revision": manifest.manifest_revision + 2,

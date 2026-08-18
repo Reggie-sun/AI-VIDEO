@@ -43,6 +43,12 @@ class _StateCommitRecoveryAttemptsMixin:
             }:
                 repaired.append(attempt)
                 continue
+            if (
+                attempt.paid_provider_state is not None
+                and attempt.paid_provider_state.phase.value == "outcome_unknown"
+            ):
+                repaired.append(attempt)
+                continue
             if attempt.operation == "image_generation":
                 replacement, image_items = self._recover_image_attempt(
                     manifest, attempt
@@ -80,7 +86,7 @@ class _StateCommitRecoveryAttemptsMixin:
             if attempt.operation == "bootstrap_dependency_graph":
                 if (
                     attempt.base_dependency_graph is None
-                    and manifest.schema_version in {"2.3", "2.4", "2.5"}
+                    and manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}
                     and manifest.active_dependency_graph is not None
                     and manifest.active_dependency_graph
                     != attempt.candidate_dependency_graph

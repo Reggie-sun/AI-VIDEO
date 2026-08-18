@@ -30,6 +30,11 @@ from ai_video.production.models import (
     require_canonical_project_snapshot_path,
     require_canonical_registry_snapshot_path,
 )
+from ai_video.production.paid_provider import (
+    PaidProviderBudgetSnapshot,
+    PaidProviderGateReceipt,
+    PaidProviderSubmitReceipt,
+)
 from ai_video.production.paths import (
     _list_regular_files_nofollow,
     _open_directory_nofollow,
@@ -272,7 +277,76 @@ class _StateCommitRecoveryFsMixin:
             items.setdefault(item.path, item)
         for item in self._p6_orphan_items(manifest):
             items.setdefault(item.path, item)
+        for item in self._paid_provider_orphan_items(manifest):
+            items.setdefault(item.path, item)
         return tuple(items[path] for path in sorted(items))
+
+    def _paid_provider_orphan_items(
+        self, manifest: ProductionManifest
+    ) -> tuple[RecoveryItem, ...]:
+        active = set()
+        if manifest.active_paid_provider_budget is not None:
+            active.add(manifest.active_paid_provider_budget.path)
+        for attempt in manifest.attempts:
+            state = attempt.paid_provider_state
+            if state is None:
+                continue
+            active.add(state.gate_receipt.path)
+            if state.submit_receipt is not None:
+                active.add(state.submit_receipt.path)
+            try:
+                gate = self._reopen_paid_gate(state.gate_receipt)
+                active.add(
+                    Path(
+                        "state/paid-provider/budgets/"
+                        f"{gate.budget_snapshot_content_hash}.json"
+                    )
+                )
+            except AiVideoError:
+                return ()
+        namespaces = (
+            (
+                self._project_root / "state/paid-provider/budgets",
+                re.compile(r"^(?P<hash>[0-9a-f]{64})\.json$"),
+                PaidProviderBudgetSnapshot,
+                "content_hash",
+            ),
+            (
+                self._project_root / "state/paid-provider/gates",
+                re.compile(r"^(?P<hash>[0-9a-f]{64})\.json$"),
+                PaidProviderGateReceipt,
+                "gate_receipt_fingerprint",
+            ),
+            (
+                self._project_root / "state/paid-provider/submits",
+                re.compile(r"^(?P<hash>[0-9a-f]{64})\.json$"),
+                PaidProviderSubmitReceipt,
+                "submit_receipt_fingerprint",
+            ),
+        )
+        items: list[RecoveryItem] = []
+        for directory, pattern, model_type, identity_field in namespaces:
+            for path, match in self._recovery_namespace_entries(directory, pattern):
+                relative = path.relative_to(self._project_root)
+                if relative in active:
+                    continue
+                try:
+                    snapshot = _read_regular_file_nofollow(
+                        path, contained_by=self._project_root / "state"
+                    )
+                    model = model_type.model_validate_json(snapshot.data)
+                    if getattr(model, identity_field) != match.group("hash"):
+                        continue
+                except (OSError, ValidationError, ValueError):
+                    continue
+                items.append(
+                    RecoveryItem(
+                        path=relative,
+                        disposition=RecoveryDisposition.ORPHAN_PRESERVED,
+                        sha256=snapshot.file_sha256,
+                    )
+                )
+        return tuple(items)
 
     def _p6_orphan_items(
         self, manifest: ProductionManifest

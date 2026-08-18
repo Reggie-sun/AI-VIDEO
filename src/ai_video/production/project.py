@@ -12,6 +12,9 @@ from pydantic import BaseModel, ValidationError
 from ai_video.config import load_yaml, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._image_project_reader import verify_active_image_evidence
+from ai_video.production._paid_provider_project_reader import (
+    verify_paid_provider_evidence,
+)
 import ai_video.production._project_dependency_evidence as _project_evidence
 from ai_video.production._voice_project_reader import verify_voice_candidate_history
 from ai_video.production.audio import (
@@ -1678,6 +1681,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     _verify_manifest_snapshot_identity(bundle, manifest.active_project, manifest.active_registry)
     _verify_active_voice_evidence(bundle)
     verify_active_image_evidence(bundle)
+    verify_paid_provider_evidence(root, manifest)
     if manifest.active_dependency_graph is not None:
         dependency_graph = _load_active_dependency_graph(
             root, manifest.active_dependency_graph
@@ -1685,7 +1689,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         _verify_manifest_dependency_states(bundle, dependency_graph)
         bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
     if manifest.schema_version == "2.4" or (
-        manifest.schema_version == "2.5" and manifest.active_qa_policy is not None
+        manifest.schema_version in {"2.5", "2.6"} and manifest.active_qa_policy is not None
     ):
         if manifest.active_qa_policy is None:
             raise _invalid(f"Manifest {manifest.schema_version} requires an active QA policy.")
@@ -1756,7 +1760,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     if manifest.active_render_state is not None:
         render_state = (
             _load_exact_render_state(bundle, manifest.active_render_state)
-            if manifest.schema_version in {"2.3", "2.4", "2.5"}
+            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}
             else load_verified_render_state(
                 root,
                 manifest.active_render_state,

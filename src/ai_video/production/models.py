@@ -21,9 +21,15 @@ from pydantic import (
 
 from ai_video.production._lifecycle_schema import (
     ImageRequestReceipt,
+    PaidProviderAttemptPhase as PaidProviderAttemptPhase, PaidProviderAttemptState as PaidProviderAttemptState,
+    PaidProviderBudgetSnapshotPointer as PaidProviderBudgetSnapshotPointer, PaidProviderGateReceiptPointer as PaidProviderGateReceiptPointer,
+    PaidProviderSubmitReceiptPointer as PaidProviderSubmitReceiptPointer,
     P5_AWARE_OPERATIONS as _P5_AWARE_OPERATIONS,
     has_p6_state,
     prune_attempt_fields,
+    reject_explicit_p7_fields,
+    reject_explicit_paid_provider_fields,
+    validate_paid_provider_manifest,
     validate_provider_attempt,
 )
 
@@ -1759,6 +1765,7 @@ class StateCommitAttempt(StrictModel):
     approved_repair_receipt: ApprovedRepairReceiptPointer | None = None
     review_request: ReviewRequestPointer | None = None
     review_phase: ReviewAttemptPhase | None = None
+    paid_provider_state: PaidProviderAttemptState | None = None
     started_at: str
     finished_at: str | None = None
     error_code: str | None = None
@@ -1890,6 +1897,8 @@ class StateCommitAttempt(StrictModel):
         if self.operation != "review":
             data.pop("review_request", None)
             data.pop("review_phase", None)
+        if self.paid_provider_state is None:
+            data.pop("paid_provider_state", None)
         return data
 
 
@@ -2099,7 +2108,7 @@ class FinalAcceptanceState(StrictModel):
 
 
 class ProductionManifest(StrictModel):
-    schema_version: Literal["2.0", "2.1", "2.2", "2.3", "2.4", "2.5"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6"] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
     active_project: ProjectSnapshotPointer
@@ -2115,7 +2124,15 @@ class ProductionManifest(StrictModel):
         default=()
     )
     final_acceptance_state: FinalAcceptanceState | None = None
+    active_paid_provider_budget: PaidProviderBudgetSnapshotPointer | None = None
     attempts: tuple[StateCommitAttempt, ...] = ()
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_paid_provider_fields_in_old_versions(
+        cls, value: object
+    ) -> object:
+        return reject_explicit_paid_provider_fields(value)
 
     @model_validator(mode="before")
     @classmethod
@@ -2131,7 +2148,7 @@ class ProductionManifest(StrictModel):
             "final_acceptance_state",
         }
         manifest_version = value.get("schema_version", "2.0")
-        if manifest_version == "2.5" and p6_fields.intersection(value):
+        if manifest_version in {"2.5", "2.6"} and p6_fields.intersection(value):
             if value.get("active_qa_policy") is None:
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_qa_policy"
@@ -2140,7 +2157,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_dependency_graph"
                 )
-        if manifest_version in {"2.4", "2.5"}:
+        if manifest_version in {"2.4", "2.5", "2.6"}:
             return value
         if p6_fields.intersection(value):
             raise ValueError(
@@ -2164,7 +2181,7 @@ class ProductionManifest(StrictModel):
     def _reject_explicit_voice_fields_in_old_versions(cls, value: object) -> object:
         if (
             not isinstance(value, Mapping)
-            or value.get("schema_version", "2.0") in {"2.2", "2.3", "2.4", "2.5"}
+            or value.get("schema_version", "2.0") in {"2.2", "2.3", "2.4", "2.5", "2.6"}
         ):
             return value
         for attempt in value.get("attempts", ()):
@@ -2188,7 +2205,7 @@ class ProductionManifest(StrictModel):
     ) -> object:
         if not isinstance(value, Mapping):
             return value
-        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5"}:
+        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5", "2.6"}:
             return value
         manifest_version = value.get("schema_version", "2.0")
         if {
@@ -2214,26 +2231,7 @@ class ProductionManifest(StrictModel):
     @model_validator(mode="before")
     @classmethod
     def _reject_explicit_p7_fields_in_old_versions(cls, value: object) -> object:
-        if not isinstance(value, Mapping):
-            return value
-        manifest_version = value.get("schema_version", "2.0")
-        if manifest_version == "2.5":
-            return value
-        image_fields = {
-            "image_request",
-            "image_phase",
-            "candidate_image_asset_ids",
-        }
-        for attempt in value.get("attempts", ()):
-            if isinstance(attempt, Mapping) and (
-                attempt.get("operation") == "image_generation"
-                or image_fields.intersection(attempt)
-            ):
-                raise ValueError(
-                    f"Production Manifest {manifest_version} "
-                    "cannot contain explicit P7 image fields"
-                )
-        return value
+        return reject_explicit_p7_fields(value)
 
     @model_validator(mode="after")
     def _validate_unique_attempt_ids(self) -> "ProductionManifest":
@@ -2251,7 +2249,7 @@ class ProductionManifest(StrictModel):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain voice attempts"
             )
-        if self.schema_version != "2.5" and any(
+        if self.schema_version not in {"2.5", "2.6"} and any(
             item.operation == "image_generation" for item in self.attempts
         ):
             raise ValueError(
@@ -2270,7 +2268,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "running render_state attempt base must match active identity"
                 )
-        if self.schema_version in {"2.3", "2.4", "2.5"}:
+        if self.schema_version in {"2.3", "2.4", "2.5", "2.6"}:
             self._validate_manifest_23_graph_lifecycle()
         else:
             for attempt in self.attempts:
@@ -2284,7 +2282,7 @@ class ProductionManifest(StrictModel):
                         "cannot contain P5 graph attempt fields"
                     )
         if self.schema_version == "2.4" or (
-            self.schema_version == "2.5" and has_p6_state(self)
+            self.schema_version in {"2.5", "2.6"} and has_p6_state(self)
         ):
             if self.active_qa_policy is None:
                 raise ValueError(
@@ -2321,6 +2319,7 @@ class ProductionManifest(StrictModel):
                         raise ValueError("current review state requires its active receipt")
                 elif state.active_receipt is not None:
                     raise ValueError("stale review state cannot select a receipt")
+        validate_paid_provider_manifest(self)
         return self
 
     def _validate_manifest_23_graph_lifecycle(self) -> None:
@@ -2360,13 +2359,13 @@ class ProductionManifest(StrictModel):
         if self.schema_version == "2.0" and self.active_render_state is None:
             data.pop("active_render_state", None)
         if (
-            self.schema_version not in {"2.3", "2.4", "2.5"}
+            self.schema_version not in {"2.3", "2.4", "2.5", "2.6"}
             or self.active_dependency_graph is None
         ):
             data.pop("active_dependency_graph", None)
             data.pop("dependency_states", None)
         if self.schema_version != "2.4" and not (
-            self.schema_version == "2.5" and self.active_qa_policy is not None
+            self.schema_version in {"2.5", "2.6"} and self.active_qa_policy is not None
         ):
             data.pop("active_qa_policy", None)
             data.pop("active_review_receipts", None)
@@ -2374,6 +2373,8 @@ class ProductionManifest(StrictModel):
             data.pop("active_approved_repair", None)
             data.pop("repair_outcome_receipts", None)
             data.pop("final_acceptance_state", None)
+        if self.schema_version != "2.6":
+            data.pop("active_paid_provider_budget", None)
         return data
 
 

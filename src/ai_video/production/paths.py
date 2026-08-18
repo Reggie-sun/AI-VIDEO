@@ -182,6 +182,27 @@ def canonical_human_image_import_receipt_path(content_hash: str) -> Path:
     )
 
 
+def canonical_paid_provider_budget_path(content_hash: str) -> Path:
+    return Path(
+        "state/paid-provider/budgets/"
+        f"{_require_sha256(content_hash, 'paid Provider budget hash')}.json"
+    )
+
+
+def canonical_paid_provider_gate_path(gate_receipt_fingerprint: str) -> Path:
+    return Path(
+        "state/paid-provider/gates/"
+        f"{_require_sha256(gate_receipt_fingerprint, 'paid Provider Gate fingerprint')}.json"
+    )
+
+
+def canonical_paid_provider_submit_path(submit_receipt_fingerprint: str) -> Path:
+    return Path(
+        "state/paid-provider/submits/"
+        f"{_require_sha256(submit_receipt_fingerprint, 'paid Provider submit fingerprint')}.json"
+    )
+
+
 def canonical_image_asset_path(file_sha256: str) -> Path:
     return Path(
         f"assets/files/{_require_sha256(file_sha256, 'image file hash')}.png"

@@ -16,6 +16,12 @@ from ai_video.production.models import (
     ProductionManifest,
     StateCommitStatus,
 )
+from ai_video.production.paid_provider import (
+    PaidProviderCallPreview,
+    PaidProviderEgressItem,
+    PaidProviderSubmitOutcome,
+    PaidProviderSubmitReceipt,
+)
 
 from ._state_commit_common import (
     _candidate_artifacts_hash,
@@ -86,7 +92,7 @@ class _StateCommitVoiceActivationMixin:
             candidate_graph: DependencyGraphSnapshot | None = None
             if attempt.status is StateCommitStatus.SUCCEEDED:
                 transition = request.dependency_graph_transition
-                if manifest.schema_version in {"2.3", "2.4", "2.5"}:
+                if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}:
                     if transition is None or (
                         attempt.base_dependency_graph != transition.base_dependency_graph
                         or attempt.candidate_dependency_graph
@@ -120,7 +126,7 @@ class _StateCommitVoiceActivationMixin:
                     transition=request.dependency_graph_transition,
                 )
             if (
-                manifest.schema_version not in {"2.3", "2.4", "2.5"}
+                manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6"}
                 and (
                     attempt.status is StateCommitStatus.SUCCEEDED
                     or attempt.voice_phase == "candidate"
@@ -282,7 +288,7 @@ class _StateCommitVoiceActivationMixin:
                 "active_registry": request.next_registry,
                 "active_render_state": (
                     manifest.active_render_state
-                    if manifest.schema_version in {"2.3", "2.4", "2.5"}
+                    if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}
                     else None
                 ),
                 "attempts": tuple(
@@ -328,12 +334,13 @@ class _StateCommitVoiceActivationMixin:
         authorization: VoiceCallAuthorization,
         *,
         dependency_transition_preparer: VoiceDependencyTransitionPreparer | None = None,
+        paid_preview: PaidProviderCallPreview | None = None,
     ) -> ProductionManifest:
         """Only public path allowed to invoke one voice provider transport call."""
 
         preflight_manifest = self._read_manifest()
         if (
-            preflight_manifest.schema_version in {"2.3", "2.4", "2.5"}
+            preflight_manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}
             and dependency_transition_preparer is None
         ):
             raise _state_invalid(
@@ -341,6 +348,30 @@ class _StateCommitVoiceActivationMixin:
             )
 
         preview = provider.preview(request)
+        if paid_preview is not None and (
+            paid_preview.operation != "voice_generation"
+            or paid_preview.attempt_id != request.attempt_id
+            or paid_preview.request_fingerprint != request.voice_request_fingerprint
+            or paid_preview.destination != authorization.destination
+            or paid_preview.provider_kind != request.provider_kind
+            or paid_preview.model_id != request.model_id
+            or paid_preview.currency != preview.currency
+            or paid_preview.estimated_cost_upper_bound_microunits
+            != preview.estimated_cost_upper_bound_microunits
+            or paid_preview.egress_items
+            != (
+                PaidProviderEgressItem(
+                    item_id="script",
+                    sha256=request.script_hash,
+                    size_bytes=len(request.script_text.encode("utf-8")),
+                    mime_type="text/plain",
+                    purpose="script",
+                ),
+            )
+        ):
+            raise _state_invalid(
+                "Paid Provider preview does not bind the exact voice request."
+            )
         self.begin_voice_generation(
             request,
             preview,
@@ -349,11 +380,58 @@ class _StateCommitVoiceActivationMixin:
                 dependency_transition_preparer is not None
             ),
         )
-        permit = self.record_voice_submit_intent(request, preview, authorization)
+        legacy_permit = self.record_voice_submit_intent(request, preview, authorization)
+        permit: object = legacy_permit
+        if paid_preview is not None:
+            permit = self.record_paid_provider_submit_intent(
+                paid_preview,
+                reservation_id=f"paid-{request.attempt_id}",
+            )
         try:
             result = provider.generate(request, authorization, permit)
         except AiVideoError as exc:
-            if exc.code is ErrorCode.VOICE_PROVIDER_FAILED:
+            if paid_preview is not None:
+                consumed = permit._paid_provider_operation_was_consumed(
+                    **{
+                        "attempt_id": request.attempt_id,
+                        "operation": paid_preview.operation,
+                        "request_fingerprint": request.voice_request_fingerprint,
+                        "destination": authorization.destination,
+                        "provider_kind": paid_preview.provider_kind,
+                        "model_id": paid_preview.model_id,
+                        "currency": paid_preview.currency,
+                        "estimated_cost_upper_bound_microunits": str(
+                            paid_preview.estimated_cost_upper_bound_microunits
+                        ),
+                        "provider_policy_snapshot_id": (
+                            paid_preview.provider_policy_snapshot_id
+                        ),
+                        "retention_mode": paid_preview.retention_mode,
+                        "secret_reference_kind": paid_preview.secret_reference.kind,
+                        "secret_reference_id": paid_preview.secret_reference.reference_id,
+                    }
+                )
+                state = self._read_manifest().attempts[-1].paid_provider_state
+                assert state is not None
+                self.record_paid_provider_submit_receipt(
+                    PaidProviderSubmitReceipt.create(
+                        attempt_id=request.attempt_id,
+                        request_fingerprint=request.voice_request_fingerprint,
+                        preview_fingerprint=paid_preview.preview_fingerprint,
+                        gate_receipt_fingerprint=(
+                            state.gate_receipt.gate_receipt_fingerprint
+                        ),
+                        reservation_id=state.reservation_id,
+                        outcome=(
+                            PaidProviderSubmitOutcome.OUTCOME_UNKNOWN
+                            if consumed
+                            else PaidProviderSubmitOutcome.KNOWN_NO_EFFECT
+                        ),
+                        external_effect_id=None,
+                        recorded_at=self._paid_provider_clock(),
+                    )
+                )
+            elif exc.code is ErrorCode.VOICE_PROVIDER_FAILED:
                 self.record_voice_failure(
                     request.attempt_id,
                     phase="provider_call",
@@ -370,12 +448,75 @@ class _StateCommitVoiceActivationMixin:
             raise
 
         except Exception as exc:
-            self.record_voice_outcome_unknown(
-                request.attempt_id,
-                phase="provider_call",
-                error_message=f"Voice transport failed after submit intent: {exc}",
-            )
+            if paid_preview is not None:
+                state = self._read_manifest().attempts[-1].paid_provider_state
+                assert state is not None
+                self.record_paid_provider_submit_receipt(
+                    PaidProviderSubmitReceipt.create(
+                        attempt_id=request.attempt_id,
+                        request_fingerprint=request.voice_request_fingerprint,
+                        preview_fingerprint=paid_preview.preview_fingerprint,
+                        gate_receipt_fingerprint=(
+                            state.gate_receipt.gate_receipt_fingerprint
+                        ),
+                        reservation_id=state.reservation_id,
+                        outcome=PaidProviderSubmitOutcome.OUTCOME_UNKNOWN,
+                        external_effect_id=None,
+                        recorded_at=self._paid_provider_clock(),
+                    )
+                )
+            else:
+                self.record_voice_outcome_unknown(
+                    request.attempt_id,
+                    phase="provider_call",
+                    error_message=f"Voice transport failed after submit intent: {exc}",
+                )
             raise
+        if paid_preview is not None:
+            state = self._read_manifest().attempts[-1].paid_provider_state
+            assert state is not None
+            if result.provider_request_id is None:
+                self.record_paid_provider_submit_receipt(
+                    PaidProviderSubmitReceipt.create(
+                        attempt_id=request.attempt_id,
+                        request_fingerprint=request.voice_request_fingerprint,
+                        preview_fingerprint=paid_preview.preview_fingerprint,
+                        gate_receipt_fingerprint=(
+                            state.gate_receipt.gate_receipt_fingerprint
+                        ),
+                        reservation_id=state.reservation_id,
+                        outcome=PaidProviderSubmitOutcome.OUTCOME_UNKNOWN,
+                        external_effect_id=None,
+                        recorded_at=self._paid_provider_clock(),
+                    )
+                )
+                raise _state_invalid(
+                    "Paid voice result has no exact external billable-effect identity."
+                )
+            self.record_paid_provider_submit_receipt(
+                PaidProviderSubmitReceipt.create(
+                    attempt_id=request.attempt_id,
+                    request_fingerprint=request.voice_request_fingerprint,
+                    preview_fingerprint=paid_preview.preview_fingerprint,
+                    gate_receipt_fingerprint=(
+                        state.gate_receipt.gate_receipt_fingerprint
+                    ),
+                    reservation_id=state.reservation_id,
+                    outcome=PaidProviderSubmitOutcome.ACCEPTED,
+                    external_effect_id=result.provider_request_id,
+                    recorded_at=self._paid_provider_clock(),
+                )
+            )
+            actual_cost = (
+                result.cost_receipt.provider_reported_cost_microunits
+                if result.cost_receipt.provider_reported_cost_microunits is not None
+                else result.cost_receipt.measured_billable_units
+                * preview.unit_price_microunits
+            )
+            self.settle_paid_provider_reservation(
+                attempt_id=request.attempt_id,
+                actual_cost_microunits=actual_cost,
+            )
         self._crash_injector.checkpoint(CommitPhase.AFTER_VOICE_PROVIDER_RESULT)
         try:
             self._validate_voice_provider_result(request, preview, authorization, result)
@@ -406,7 +547,7 @@ class _StateCommitVoiceActivationMixin:
             commit_request, audio_ids, caption_ids = self._prepare_voice_activation_request(
                 request, preview, authorization, result, prepared
             )
-            if preflight_manifest.schema_version in {"2.3", "2.4", "2.5"}:
+            if preflight_manifest.schema_version in {"2.3", "2.4", "2.5", "2.6"}:
                 assert dependency_transition_preparer is not None
                 prepared_request = dependency_transition_preparer(commit_request)
                 if (

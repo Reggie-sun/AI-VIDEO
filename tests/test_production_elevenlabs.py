@@ -4,7 +4,7 @@ import base64
 import json
 import socket
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -28,10 +28,17 @@ from ai_video.production.elevenlabs import (
     parse_forced_alignment_response,
 )
 from ai_video.production.models import (
+    ActorIdentity,
     AudioKind,
     ProductionManifest,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
+)
+from ai_video.production.paid_provider import (
+    PaidProviderAuthorizationDecision,
+    PaidProviderCallPreview,
+    PaidProviderEgressItem,
+    SecretReference,
 )
 from ai_video.production.state_commit import ProductionStateCommitter
 from tests import production_project_factory as project_factory
@@ -135,6 +142,7 @@ def _policy(**overrides) -> ElevenLabsProviderPolicy:
         "enable_logging": True,
         "zero_retention_entitled": False,
         "credential_reference_kind": "secret_store",
+        "credential_reference_id": "ELEVENLABS_API_KEY",
         "license_policy_decision": "test-noncommercial-attributed",
         "license_allowed": True,
         "use_policy_allowed": True,
@@ -199,10 +207,72 @@ def _issue_real_permit(root: Path, provider, request, authorization):
         }
     )
     manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
-    writer = ProductionStateCommitter(root)
     preview = provider.preview(request)
+    paid_preview = PaidProviderCallPreview.create(
+        attempt_id=request.attempt_id,
+        operation="voice_generation",
+        provider_kind=request.provider_kind,
+        model_id=request.model_id,
+        request_fingerprint=request.voice_request_fingerprint,
+        billing_mode="remote_metered",
+        currency=preview.currency,
+        estimated_cost_upper_bound_microunits=(
+            preview.estimated_cost_upper_bound_microunits
+        ),
+        destination=preview.destination,
+        method="POST",
+        egress_items=(
+            PaidProviderEgressItem(
+                item_id="script",
+                sha256=request.script_hash,
+                size_bytes=len(request.script_text.encode("utf-8")),
+                mime_type="text/plain",
+                purpose="script",
+            ),
+        ),
+        retention_mode=(
+            "provider_standard" if provider._policy.enable_logging else "zero_retention"
+        ),
+        provider_policy_snapshot_id=provider._policy.policy_receipt_id,
+        secret_reference=SecretReference(
+            kind=provider._policy.credential_reference_kind,
+            reference_id=provider._policy.credential_reference_id,
+        ),
+    )
+    now = datetime(2026, 8, 18, 12, 0, tzinfo=timezone.utc)
+    paid_authorization = PaidProviderAuthorizationDecision.create(
+        attempt_id=request.attempt_id,
+        preview_fingerprint=paid_preview.preview_fingerprint,
+        explicit_opt_in=True,
+        actor=ActorIdentity(actor_id="test-owner", actor_kind="human"),
+        opt_in_policy_receipt_id="test-opt-in",
+        budget_policy_id="test-budget",
+        budget_currency=preview.currency,
+        project_budget_ceiling_microunits=10_000_000,
+        per_call_ceiling_microunits=max(
+            1, preview.estimated_cost_upper_bound_microunits
+        ),
+        egress_authorized=True,
+        egress_policy_receipt_id="test-egress",
+        live_test_authorized=True,
+        live_authorization_receipt_id="test-live",
+        issued_at=now,
+        expires_at=now + timedelta(minutes=10),
+        max_submit_count=1,
+    )
+    writer = ProductionStateCommitter(
+        root,
+        paid_provider_authorizer=lambda exact: (
+            paid_authorization if exact == paid_preview else None
+        ),
+        paid_provider_clock=lambda: now,
+    )
     writer.begin_voice_generation(request, preview, authorization)
-    return writer.record_voice_submit_intent(request, preview, authorization)
+    writer.record_voice_submit_intent(request, preview, authorization)
+    return writer.record_paid_provider_submit_intent(
+        paid_preview,
+        reservation_id=f"paid-{request.attempt_id}",
+    )
 
 
 def _generate(provider, request, authorization, *, permit=None):
@@ -781,6 +851,7 @@ def test_machine_policy_denial_is_zero_call_and_does_not_consume_permit(tmp_path
         enable_logging=True,
         zero_retention_entitled=False,
         credential_reference_kind="secret_store",
+        credential_reference_id="ELEVENLABS_API_KEY",
         license_policy_decision="fixture-policy-allowed",
         license_allowed=False,
         use_policy_allowed=True,
@@ -801,6 +872,7 @@ def test_machine_policy_denial_is_zero_call_and_does_not_consume_permit(tmp_path
         enable_logging=True,
         zero_retention_entitled=False,
         credential_reference_kind="secret_store",
+        credential_reference_id="ELEVENLABS_API_KEY",
         license_policy_decision="fixture-policy-allowed",
         license_allowed=True,
         use_policy_allowed=True,
@@ -811,12 +883,123 @@ def test_machine_policy_denial_is_zero_call_and_does_not_consume_permit(tmp_path
     assert transport.invocations == 1
 
 
+def test_public_voice_orchestrator_routes_metered_transport_through_paid_gate(tmp_path):
+    transport = _FakeTransport(_response())
+    provider = _provider(transport)
+    request = _request(attempt_id="paid-public-voice")
+    authorization = _authorization(provider, request)
+    preview = provider.preview(request)
+    paid_preview = PaidProviderCallPreview.create(
+        attempt_id=request.attempt_id,
+        operation="voice_generation",
+        provider_kind=request.provider_kind,
+        model_id=request.model_id,
+        request_fingerprint=request.voice_request_fingerprint,
+        billing_mode="remote_metered",
+        currency=preview.currency,
+        estimated_cost_upper_bound_microunits=(
+            preview.estimated_cost_upper_bound_microunits
+        ),
+        destination=preview.destination,
+        method="POST",
+        egress_items=(
+            PaidProviderEgressItem(
+                item_id="script",
+                sha256=request.script_hash,
+                size_bytes=len(request.script_text.encode("utf-8")),
+                mime_type="text/plain",
+                purpose="script",
+            ),
+        ),
+        retention_mode="provider_standard",
+        provider_policy_snapshot_id=provider._policy.policy_receipt_id,
+        secret_reference=SecretReference(
+            kind="secret_store",
+            reference_id=provider._policy.credential_reference_id,
+        ),
+    )
+    now = datetime(2026, 8, 18, 12, 0, tzinfo=timezone.utc)
+    paid_authorization = PaidProviderAuthorizationDecision.create(
+        attempt_id=request.attempt_id,
+        preview_fingerprint=paid_preview.preview_fingerprint,
+        explicit_opt_in=True,
+        actor=ActorIdentity(actor_id="test-owner", actor_kind="human"),
+        opt_in_policy_receipt_id="test-opt-in",
+        budget_policy_id="test-budget",
+        budget_currency=preview.currency,
+        project_budget_ceiling_microunits=10_000_000,
+        per_call_ceiling_microunits=max(
+            1, preview.estimated_cost_upper_bound_microunits
+        ),
+        egress_authorized=True,
+        egress_policy_receipt_id="test-egress",
+        live_test_authorized=True,
+        live_authorization_receipt_id="test-live",
+        issued_at=now,
+        expires_at=now + timedelta(minutes=10),
+        max_submit_count=1,
+    )
+    project_factory.write_production_project(tmp_path)
+    manifest_path = tmp_path / "state/manifest.json"
+    manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes()).model_copy(
+        update={
+            "active_project": request.base_project,
+            "active_registry": request.base_registry,
+        }
+    )
+    manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
+    committer = ProductionStateCommitter(
+        tmp_path,
+        paid_provider_authorizer=lambda exact: (
+            paid_authorization if exact == paid_preview else None
+        ),
+        paid_provider_clock=lambda: now,
+    )
+
+    with pytest.raises(AiVideoError) as exc:
+        committer.generate_voice_asset(
+            request,
+            provider,
+            authorization,
+            paid_preview=paid_preview,
+        )
+
+    recorded = committer._read_manifest().attempts[-1]
+    assert exc.value.code is ErrorCode.PRODUCTION_STATE_UNSUPPORTED
+    assert transport.invocations == 1
+    assert recorded.paid_provider_state is not None
+    assert recorded.paid_provider_state.phase.value == "settled"
+    assert recorded.status.value == "outcome_unknown"
+
+
+def test_exact_credential_reference_mismatch_is_zero_call(tmp_path):
+    transport = _IgnoringPermitTransport(_response())
+    authorized_provider = _provider(transport)
+    request = _request(attempt_id="credential-reference-mismatch")
+    authorization = _authorization(authorized_provider, request)
+    permit = _issue_real_permit(
+        tmp_path, authorized_provider, request, authorization
+    )
+    mismatched_provider = _provider(
+        transport,
+        policy=_policy(credential_reference_id="another-secret-reference"),
+    )
+
+    with pytest.raises(AiVideoError) as caught:
+        mismatched_provider.generate(request, authorization, permit)
+
+    assert caught.value.code is ErrorCode.VOICE_EGRESS_NOT_AUTHORIZED
+    assert transport.invocations == 0
+
+
 @pytest.mark.parametrize(
     "override",
     [
         {"license_allowed": "true"},
         {"use_policy_allowed": 1},
         {"voice_authorization_verified": "yes"},
+        {"credential_reference_id": ""},
+        {"credential_reference_id": "unsafe reference\nvalue"},
         {"policy_receipt_id": ""},
         {"policy_receipt_id": "unsafe receipt\nvalue"},
         {"policy_receipt_id": "x" * 129},
@@ -828,6 +1011,7 @@ def test_machine_policy_fields_reject_coercion_and_malformed_receipts(override):
         "enable_logging": True,
         "zero_retention_entitled": False,
         "credential_reference_kind": "secret_store",
+        "credential_reference_id": "ELEVENLABS_API_KEY",
         "license_policy_decision": "fixture-policy-allowed",
         "license_allowed": True,
         "use_policy_allowed": True,

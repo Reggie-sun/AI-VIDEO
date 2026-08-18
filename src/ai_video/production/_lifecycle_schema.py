@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
+from enum import Enum
+from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -27,6 +30,86 @@ class ImageRequestReceipt(BaseModel):
             raise ValueError("image request ID must equal request fingerprint")
         if self.output_asset_id != f"image-{self.request_fingerprint}":
             raise ValueError("image output asset ID must match request fingerprint")
+        return self
+
+
+class _PaidLifecycleModel(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+def _canonical_paid_path(value: Path, expected: Path, label: str) -> Path:
+    if value.is_absolute() or ".." in value.parts or value != expected:
+        raise ValueError(f"{label} path must be canonical")
+    return value
+
+
+class PaidProviderBudgetSnapshotPointer(_PaidLifecycleModel):
+    path: Path
+    revision: int = Field(ge=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "PaidProviderBudgetSnapshotPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(f"state/paid-provider/budgets/{self.content_hash}.json"),
+            "paid Provider budget",
+        )
+        return self
+
+
+class PaidProviderGateReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    gate_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "PaidProviderGateReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(f"state/paid-provider/gates/{self.gate_receipt_fingerprint}.json"),
+            "paid Provider Gate receipt",
+        )
+        return self
+
+
+class PaidProviderSubmitReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    submit_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "PaidProviderSubmitReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(f"state/paid-provider/submits/{self.submit_receipt_fingerprint}.json"),
+            "paid Provider submit receipt",
+        )
+        return self
+
+
+class PaidProviderAttemptPhase(str, Enum):
+    SUBMIT_INTENT = "submit_intent"
+    ACCEPTED = "accepted"
+    KNOWN_NO_EFFECT = "known_no_effect"
+    OUTCOME_UNKNOWN = "outcome_unknown"
+    SETTLED = "settled"
+
+
+class PaidProviderAttemptState(_PaidLifecycleModel):
+    gate_receipt: PaidProviderGateReceiptPointer
+    reservation_id: str = Field(min_length=1)
+    phase: PaidProviderAttemptPhase
+    submit_receipt: PaidProviderSubmitReceiptPointer | None = None
+
+    @model_validator(mode="after")
+    def _validate_phase_evidence(self) -> "PaidProviderAttemptState":
+        if self.phase is PaidProviderAttemptPhase.SUBMIT_INTENT:
+            if self.submit_receipt is not None:
+                raise ValueError("submit intent cannot select a submit receipt")
+        elif self.submit_receipt is None:
+            raise ValueError("paid Provider terminal phase requires a submit receipt")
         return self
 
 
@@ -185,3 +268,61 @@ def has_p6_state(manifest: Any) -> bool:
         for attempt in manifest.attempts
     )
     return top_level_state or attempt_state
+
+
+def reject_explicit_paid_provider_fields(value: object) -> object:
+    if not isinstance(value, Mapping):
+        return value
+    manifest_version = value.get("schema_version", "2.0")
+    has_paid_attempt = any(
+        isinstance(attempt, Mapping) and "paid_provider_state" in attempt
+        for attempt in value.get("attempts", ())
+    )
+    if manifest_version != "2.6" and (
+        "active_paid_provider_budget" in value or has_paid_attempt
+    ):
+        raise ValueError(
+            f"Production Manifest {manifest_version} cannot contain explicit paid Provider fields"
+        )
+    return value
+
+
+def reject_explicit_p7_fields(value: object) -> object:
+    if not isinstance(value, Mapping):
+        return value
+    manifest_version = value.get("schema_version", "2.0")
+    if manifest_version in {"2.5", "2.6"}:
+        return value
+    image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
+    for attempt in value.get("attempts", ()):
+        if isinstance(attempt, Mapping) and (
+            attempt.get("operation") == "image_generation"
+            or image_fields.intersection(attempt)
+        ):
+            raise ValueError(
+                f"Production Manifest {manifest_version} cannot contain explicit P7 image fields"
+            )
+    return value
+
+
+def validate_paid_provider_manifest(manifest: Any) -> None:
+    paid_attempts = [
+        attempt
+        for attempt in manifest.attempts
+        if attempt.paid_provider_state is not None
+    ]
+    if paid_attempts and manifest.active_paid_provider_budget is None:
+        raise ValueError("paid Provider attempts require an active paid Provider budget")
+    gate_owners = [
+        attempt.paid_provider_state.gate_receipt.gate_receipt_fingerprint
+        for attempt in paid_attempts
+    ]
+    submit_owners = [
+        attempt.paid_provider_state.submit_receipt.submit_receipt_fingerprint
+        for attempt in paid_attempts
+        if attempt.paid_provider_state.submit_receipt is not None
+    ]
+    if len(gate_owners) != len(set(gate_owners)) or len(submit_owners) != len(
+        set(submit_owners)
+    ):
+        raise ValueError("paid Provider receipt ownership must be unique")

@@ -238,6 +238,7 @@ class NoopCrashInjector:
 _VOICE_PERMIT_TOKEN = object()
 _REVIEW_PERMIT_TOKEN = object()
 _IMAGE_PERMIT_TOKEN = object()
+_PAID_PROVIDER_PERMIT_TOKEN = object()
 
 
 class _DurableReviewAnalysisPermit:
@@ -397,6 +398,116 @@ class _DurableImageSubmitPermit:
         raise TypeError("Image submit permits cannot be serialized.")
 
 
+class _DurablePaidProviderSubmitPermit:
+    """Process-local one-use proof of the exact Manifest-selected paid intent."""
+
+    __slots__ = ("_binding", "_durability_validator", "_consumed", "_lock")
+
+    def __init__(
+        self,
+        token: object,
+        *,
+        binding: dict[str, str],
+        durability_validator: Callable[[], bool],
+    ) -> None:
+        if token is not _PAID_PROVIDER_PERMIT_TOKEN:
+            raise TypeError(
+                "Paid Provider submit permits are minted only by ProductionStateCommitter."
+            )
+        self._binding = MappingProxyType(dict(binding))
+        self._durability_validator = durability_validator
+        self._consumed = False
+        self._lock = threading.Lock()
+
+    def _validate_paid_provider_submit_permit(self, **binding: str) -> bool:
+        return (
+            not self._consumed
+            and binding == self._binding
+            and self._durability_validator()
+        )
+
+    def _consume_paid_provider_submit_permit(self, **binding: str) -> bool:
+        with self._lock:
+            if not self._validate_paid_provider_submit_permit(**binding):
+                return False
+            self._consumed = True
+            return True
+
+    def _validate_paid_provider_operation_permit(
+        self,
+        *,
+        attempt_id: str,
+        operation: str,
+        request_fingerprint: str,
+        destination: str,
+        provider_kind: str,
+        model_id: str,
+        currency: str,
+        estimated_cost_upper_bound_microunits: str,
+        provider_policy_snapshot_id: str,
+        retention_mode: str,
+        secret_reference_kind: str,
+        secret_reference_id: str,
+    ) -> bool:
+        return (
+            not self._consumed
+            and attempt_id == self._binding["attempt_id"]
+            and operation == self._binding["operation"]
+            and request_fingerprint == self._binding["request_fingerprint"]
+            and destination == self._binding["destination"]
+            and provider_kind == self._binding["provider_kind"]
+            and model_id == self._binding["model_id"]
+            and currency == self._binding["currency"]
+            and estimated_cost_upper_bound_microunits
+            == self._binding["estimated_cost_upper_bound_microunits"]
+            and provider_policy_snapshot_id
+            == self._binding["provider_policy_snapshot_id"]
+            and retention_mode == self._binding["retention_mode"]
+            and secret_reference_kind == self._binding["secret_reference_kind"]
+            and secret_reference_id == self._binding["secret_reference_id"]
+            and self._durability_validator()
+        )
+
+    def _consume_paid_provider_operation_permit(
+        self, **binding: str
+    ) -> bool:
+        with self._lock:
+            if not self._validate_paid_provider_operation_permit(**binding):
+                return False
+            self._consumed = True
+            return True
+
+    def _paid_provider_operation_was_consumed(
+        self, **binding: str
+    ) -> bool:
+        with self._lock:
+            return (
+                self._consumed
+                and binding == {
+                    key: self._binding[key]
+                    for key in (
+                        "attempt_id",
+                        "operation",
+                        "request_fingerprint",
+                        "destination",
+                        "provider_kind",
+                        "model_id",
+                        "currency",
+                        "estimated_cost_upper_bound_microunits",
+                        "provider_policy_snapshot_id",
+                        "retention_mode",
+                        "secret_reference_kind",
+                        "secret_reference_id",
+                    )
+                }
+                and self._durability_validator()
+            )
+
+    def __reduce__(self) -> object:
+        raise TypeError("Paid Provider submit permits cannot be serialized.")
+
+
 if TYPE_CHECKING:
     DurableVoiceSubmitPermit = _DurableVoiceSubmitPermit
     DurableImageSubmitPermit = _DurableImageSubmitPermit
+    DurablePaidProviderSubmitPermit = _DurablePaidProviderSubmitPermit
