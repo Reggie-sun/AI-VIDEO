@@ -1202,6 +1202,51 @@ def test_file_retrieve_emits_exact_endpoint_with_bearer(monkeypatch):
     assert "authorization" not in transport.stream_calls[0].headers
 
 
+def test_fetch_canonicalizes_retrieve_int64_file_id_to_query_string(monkeypatch):
+    _block_socket(monkeypatch)
+    numeric_file_id = "176844028768320"
+    transport = _FakeTransport(
+        query_response=_query_response(
+            body={
+                "task_id": TASK_ID,
+                "status": "Success",
+                "file_id": numeric_file_id,
+                "base_resp": {"status_code": 0, "status_msg": "ok"},
+            }
+        ),
+        file_retrieve_response=_file_retrieve_response(
+            body={
+                "file": {
+                    "file_id": int(numeric_file_id),
+                    "download_url": SIGNED_URL,
+                }
+            }
+        ),
+        download_response=_download_response(body=b"canonical-id-video"),
+    )
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport, credential=_SecretResolver(), now=_fixed_now
+    )
+    resolved = provider.resolve(_request())
+    paid_preview = _paid_preview(resolved)
+    submit_receipt = _paid_submit_receipt(resolved, paid_preview)
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=resolved, receipt=submit_receipt
+    )
+    observation = VideoTaskObservation.create(
+        submission=submission,
+        state=VideoTaskState.SUCCEEDED,
+        observed_at=datetime(2026, 8, 18, 12, 5, tzinfo=UTC),
+        progress_milli=1000,
+        provider_file_id=_provider_file_id(numeric_file_id),
+    )
+
+    receipt = provider.fetch(submission, submit_receipt, observation, BytesIO())
+
+    assert receipt.provider_file_id == _provider_file_id(numeric_file_id)
+    assert len(transport.stream_calls) == 1
+
+
 def test_file_retrieve_transient_base_resp_is_retryable_without_download(monkeypatch):
     _block_socket(monkeypatch)
     transport = _FakeTransport(

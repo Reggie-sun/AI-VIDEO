@@ -273,6 +273,13 @@ def _task_id(value: object, *, surface: str) -> str:
 
 
 def _file_id(value: object, *, surface: str) -> str:
+    if isinstance(value, int) and not isinstance(value, bool):
+        if 0 < value <= 9_223_372_036_854_775_807:
+            return str(value)
+        raise _error(
+            ErrorCode.VIDEO_PROVIDER_FAILED,
+            f"MiniMax Hailuo {surface} contains an invalid file ID.",
+        )
     if not isinstance(value, str) or _SAFE_FILE_ID.fullmatch(value) is None:
         raise _error(
             ErrorCode.VIDEO_PROVIDER_FAILED,
