@@ -89,6 +89,7 @@ from ai_video.production.models import (
     VoiceRequestReceipt,
     VersionedArtifact,
 )
+from ai_video.production.visual_media import visual_payload_matches
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_audio_asset_path,
@@ -697,28 +698,6 @@ def _bundle_hash(state: RenderStateSnapshot) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def _raster_matches(payload: bytes, suffix: str, mime_type: str) -> bool:
-    return (
-        (
-            suffix == ".png"
-            and mime_type == "image/png"
-            and payload.startswith(b"\x89PNG\r\n\x1a\n")
-        )
-        or (
-            suffix == ".jpg"
-            and mime_type == "image/jpeg"
-            and payload.startswith(b"\xff\xd8\xff")
-        )
-        or (
-            suffix == ".webp"
-            and mime_type == "image/webp"
-            and len(payload) >= 12
-            and payload[:4] == b"RIFF"
-            and payload[8:12] == b"WEBP"
-        )
-    )
-
-
 def _render_source_binding_map(
     source: RendererSourceReceipt,
 ) -> dict[Path, tuple[str, str, object]]:
@@ -818,7 +797,9 @@ def _render_source_payload_matches(
 ) -> bool:
     if role == "visual":
         mime_type = getattr(binding, "asset_mime_type", "")
-        return _raster_matches(payload, suffix, mime_type)
+        return visual_payload_matches(
+            payload, suffix=suffix, mime_type=mime_type
+        )
     if role == "audio":
         if not isinstance(binding, RendererAudioBinding):
             return False

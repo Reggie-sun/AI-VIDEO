@@ -39,6 +39,11 @@ from ai_video.production.models import (
     VisualStrategy,
 )
 from ai_video.production.paths import NoFollowFile, _read_regular_file_nofollow
+from ai_video.production.visual_media import (
+    VisualMediaValidationError,
+    resolved_video_trim_duration,
+    validated_visual_suffix,
+)
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -92,34 +97,18 @@ def _ceil_frame_at_sample(sample: int, *, fps: int, sample_rate: int) -> int:
     return (sample * fps + sample_rate - 1) // sample_rate
 
 
-def _validated_raster_suffix(
+def _validated_visual_suffix(
     snapshot: NoFollowFile,
     *,
     suffix: str,
     mime_type: str,
 ) -> str:
-    head = snapshot.data[:16]
-    suffix = suffix.lower()
-    if (
-        mime_type == "image/png"
-        and suffix == ".png"
-        and head.startswith(b"\x89PNG\r\n\x1a\n")
-    ):
-        return ".png"
-    if (
-        mime_type == "image/jpeg"
-        and suffix in {".jpg", ".jpeg"}
-        and head.startswith(b"\xff\xd8\xff")
-    ):
-        return ".jpg"
-    if (
-        mime_type == "image/webp"
-        and suffix == ".webp"
-        and head[:4] == b"RIFF"
-        and head[8:12] == b"WEBP"
-    ):
-        return ".webp"
-    raise _invalid("P3 asset MIME, magic bytes and raster suffix do not agree.")
+    try:
+        return validated_visual_suffix(
+            snapshot.data, suffix=suffix, mime_type=mime_type
+        )
+    except VisualMediaValidationError as exc:
+        raise _invalid(str(exc)) from exc
 
 
 def timeline_fingerprint(timeline: ResolvedTimeline) -> str:
@@ -666,8 +655,14 @@ def _resolve_composition(
         shot = shots_by_id.get(shot_id)
         if shot is None:
             raise _invalid(f"CompositionSpec references unknown Shot {shot_id}.")
-        if shot.visual_strategy is not VisualStrategy.STATIC_IMAGE:
-            raise _invalid(f"Shot {shot_id} must use static_image in P3.")
+        if shot.visual_strategy not in {
+            VisualStrategy.STATIC_IMAGE,
+            VisualStrategy.GENERATED_VIDEO,
+            VisualStrategy.EXISTING_VIDEO,
+        }:
+            raise _invalid(
+                f"Shot {shot_id} uses a visual strategy unsupported by composition."
+            )
         if shot.motion_directives:
             raise _invalid(f"Shot {shot_id} must not use motion_directives in P3.")
         duration_frames = duration_frames_by_shot[shot_id]
@@ -692,8 +687,6 @@ def _resolve_composition(
         )
         roles = {item.role: item for item in shot.required_asset_roles}
         for layer in sorted(shot_layers, key=lambda item: (item.z_index, item.layer_id)):
-            if layer.trim_start_frame != 0 or layer.trim_duration_frames is not None:
-                raise _invalid("P3 static raster layers do not implement trim.")
             asset = assets_by_id.get(layer.asset_id)
             source_path = project.asset_paths.get(layer.asset_id)
             if asset is None or source_path is None:
@@ -705,13 +698,36 @@ def _resolve_composition(
                 raise _invalid(
                     f"Layer {layer.layer_id} is not bound to its declared Shot asset role."
                 )
+            is_video = shot.visual_strategy in {
+                VisualStrategy.GENERATED_VIDEO,
+                VisualStrategy.EXISTING_VIDEO,
+            }
+            expected_type = AssetType.VIDEO if is_video else AssetType.IMAGE
             if (
-                AssetType.IMAGE not in role.allowed_asset_types
-                or asset.asset_type is not AssetType.IMAGE
+                expected_type not in role.allowed_asset_types
+                or asset.asset_type is not expected_type
             ):
                 raise _invalid(
-                    f"Layer {layer.layer_id} must bind a registry image asset."
+                    f"Layer {layer.layer_id} must bind a registry "
+                    f"{expected_type.value} asset."
                 )
+            if is_video:
+                try:
+                    trim_duration_frames = resolved_video_trim_duration(
+                        asset,
+                        layer,
+                        duration_frames=duration_frames,
+                        delivery_profile=spec.delivery_profile,
+                    )
+                except VisualMediaValidationError as exc:
+                    raise _invalid(str(exc)) from exc
+            else:
+                if (
+                    layer.trim_start_frame != 0
+                    or layer.trim_duration_frames is not None
+                ):
+                    raise _invalid("P3 static raster layers do not implement trim.")
+                trim_duration_frames = None
             if asset.artifact_path.is_absolute() or ".." in asset.artifact_path.parts:
                 raise _invalid(f"Asset path is not clean: {asset.asset_id}.")
             registered_path = project.root / asset.artifact_path
@@ -730,7 +746,7 @@ def _resolve_composition(
                 raise _invalid(
                     f"Asset bytes changed before timeline resolution: {asset.asset_id}."
                 )
-            suffix = _validated_raster_suffix(
+            suffix = _validated_visual_suffix(
                 source_snapshot,
                 suffix=registered_path.suffix,
                 mime_type=asset.mime_type,
@@ -750,7 +766,7 @@ def _resolve_composition(
                     start_sample=start_sample,
                     duration_samples=end_sample - start_sample,
                     trim_start_frame=layer.trim_start_frame,
-                    trim_duration_frames=layer.trim_duration_frames,
+                    trim_duration_frames=trim_duration_frames,
                     transform=layer.transform,
                     opacity_milli=layer.opacity_milli,
                     z_index=layer.z_index,

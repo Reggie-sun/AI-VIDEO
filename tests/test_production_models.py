@@ -1591,7 +1591,7 @@ def test_audio_measured_integer_fields_reject_bool(field, value):
         AudioAssetMetadata.model_validate(data)
 
 
-def test_source_bundle_accepts_only_hash_named_p4_suffixes_and_exact_bindings():
+def test_source_bundle_accepts_only_hash_named_media_suffixes_and_exact_bindings():
     root = Path(f"state/render/sources/{SIX_HASH}")
     bundle = RenderSourceBundlePointer(
         root_path=root,
@@ -1610,9 +1610,14 @@ def test_source_bundle_accepts_only_hash_named_p4_suffixes_and_exact_bindings():
                 file_sha256=TWO_HASH,
                 size_bytes=64,
             ),
+            RenderSourceFilePointer(
+                path=root / "assets" / f"{THREE_HASH}.mp4",
+                file_sha256=THREE_HASH,
+                size_bytes=64,
+            ),
         ),
     )
-    assert len(bundle.assets) == 2
+    assert len(bundle.assets) == 3
 
     data = bundle.model_dump(mode="python")
     data["assets"][0]["path"] = root / "assets" / f"{ONE_HASH}.exe"

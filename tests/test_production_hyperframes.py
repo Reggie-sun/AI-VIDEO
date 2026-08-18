@@ -64,6 +64,7 @@ from ai_video.production.models import (
 )
 from ai_video.production.paths import (
     _copy_held_fd_to_regular_file_nofollow,
+    canonical_render_source_asset_path,
     canonical_render_state_path,
     canonical_renderer_source_receipt_path,
 )
@@ -217,6 +218,42 @@ def make_asset_sources(tmp_path: Path, timeline: ResolvedTimeline) -> dict[str, 
         span.asset_id: red if span.asset_sha256 == RED_HASH else blue
         for span in timeline.visual_spans
     }
+
+
+def _minimal_mp4_bytes() -> bytes:
+    return (
+        struct.pack(">I4s4sI4s", 20, b"ftyp", b"isom", 0, b"isom")
+        + struct.pack(">I4s", 8, b"moov")
+    )
+
+
+def _with_video_span(
+    tmp_path: Path,
+    timeline: ResolvedTimeline,
+    sources: dict[str, Path],
+) -> tuple[ResolvedTimeline, dict[str, Path]]:
+    first = timeline.visual_spans[0]
+    payload = _minimal_mp4_bytes()
+    path = tmp_path / "inputs/video.mp4"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+    digest = hashlib.sha256(payload).hexdigest()
+    video = first.model_copy(
+        update={
+            "asset_sha256": digest,
+            "asset_mime_type": "video/mp4",
+            "materialized_path": Path(f"assets/{digest}.mp4"),
+            "trim_start_frame": 6,
+            "trim_duration_frames": first.duration_frames,
+        }
+    )
+    timeline = _reseal_timeline(
+        timeline,
+        visual_spans=(video, *timeline.visual_spans[1:]),
+    )
+    sources = dict(sources)
+    sources[first.asset_id] = path
+    return timeline, sources
 
 
 def _materialize(tmp_path: Path, timeline: ResolvedTimeline | None = None):
@@ -659,6 +696,103 @@ def test_source_is_materialized_only_from_timeline_and_bound_assets(tmp_path):
     assert all("data-duration" not in attrs for attrs in parsed.clip_attributes)
     assert html.count("animation-duration:") == 2
     assert html.count("@keyframes p3-layer-") == 2
+
+
+def test_mp4_visual_span_is_materialized_as_muted_frame_accurate_media(tmp_path):
+    timeline = make_resolved_timeline()
+    sources = make_asset_sources(tmp_path, timeline)
+    timeline, sources = _with_video_span(tmp_path, timeline, sources)
+
+    result = materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "video-source",
+        allowed_staging_parent=tmp_path,
+    )
+
+    html = result.index_path.read_text(encoding="utf-8")
+    assert html.count("<video") == 1
+    assert html.count("<img") == 1
+    assert " muted playsinline" in html
+    assert 'id="p3-video-' in html
+    assert 'data-start="0"' in html
+    assert 'data-duration="0.208333333"' in html
+    assert 'data-media-start="0.25"' in html
+    assert [
+        binding.asset_mime_type
+        for binding in result.asset_bindings
+        if binding.asset_id == timeline.visual_spans[0].asset_id
+    ] == ["video/mp4"]
+    audit_hyperframes_source(
+        result.index_path,
+        expected_timeline=timeline,
+        expected_assets=result.asset_bindings,
+    )
+
+
+def test_mp4_visual_span_keeps_p4_mixed_audio_and_captions(tmp_path):
+    _, _, timeline, sources = _p4_resolved_inputs(tmp_path)
+    timeline, sources = _with_video_span(tmp_path, timeline, sources)
+
+    result = materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "video-p4-source",
+        allowed_staging_parent=tmp_path,
+    )
+
+    html = result.index_path.read_text(encoding="utf-8")
+    assert html.count("<video") == 1
+    assert html.count("<audio") == 1
+    assert html.count("data-caption-track-id") == len(timeline.caption_cues)
+
+
+def test_mp4_visual_span_uses_canonical_durable_source_path(tmp_path):
+    timeline = make_resolved_timeline()
+    sources = make_asset_sources(tmp_path, timeline)
+    timeline, sources = _with_video_span(tmp_path, timeline, sources)
+    result = materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "video-durable-source",
+        allowed_staging_parent=tmp_path,
+    )
+    video = next(
+        binding
+        for binding in result.asset_bindings
+        if binding.asset_mime_type == "video/mp4"
+    )
+
+    assert canonical_render_source_asset_path(
+        result.bundle_sha256,
+        video.asset_sha256,
+        ".mp4",
+    ) == Path(
+        f"state/render/sources/{result.bundle_sha256}/assets/{video.asset_sha256}.mp4"
+    )
+
+
+def test_materializer_rejects_mp4_magic_or_box_structure_mismatch(tmp_path):
+    timeline = make_resolved_timeline()
+    sources = make_asset_sources(tmp_path, timeline)
+    timeline, sources = _with_video_span(tmp_path, timeline, sources)
+    sources[timeline.visual_spans[0].asset_id].write_bytes(
+        struct.pack(">I4s4sI4s", 20, b"ftyp", b"isom", 0, b"isom")
+    )
+
+    _assert_source_invalid(
+        lambda: materialize_hyperframes_source(
+            timeline,
+            asset_sources=sources,
+            allowed_asset_root=tmp_path,
+            staging_root=tmp_path / "invalid-video-source",
+            allowed_staging_parent=tmp_path,
+        )
+    )
+    assert not (tmp_path / "invalid-video-source").exists()
 
 
 def test_materializer_validates_target_containment_before_any_mkdir_or_copy(tmp_path):
@@ -2088,7 +2222,26 @@ def test_namespace_capability_failure_has_no_host_fallback(tmp_path, monkeypatch
 def test_production_runner_accepts_only_lock_owned_binary_and_validated_tools(
     tmp_path, monkeypatch
 ):
-    project_root = Path(__file__).parents[1]
+    project_root = tmp_path / "project"
+    lock_package = json.loads(
+        (Path(__file__).parents[1] / "package-lock.json").read_text(encoding="utf-8")
+    )["packages"]["node_modules/hyperframes"]
+    (project_root / "node_modules/hyperframes/bin").mkdir(parents=True)
+    _write_executable(
+        project_root / "node_modules/hyperframes/bin/hyperframes.mjs"
+    )
+    binary = project_root / "node_modules/.bin/hyperframes"
+    binary.parent.mkdir(parents=True)
+    binary.symlink_to(Path("../hyperframes/bin/hyperframes.mjs"))
+    (project_root / "node_modules/hyperframes/package.json").write_text(
+        json.dumps({"version": lock_package["version"]}), encoding="utf-8"
+    )
+    (project_root / "package-lock.json").write_text(
+        json.dumps(
+            {"packages": {"node_modules/hyperframes": lock_package}}
+        ),
+        encoding="utf-8",
+    )
     browser = _write_executable(tmp_path / "chrome")
     ip_path = _write_executable(tmp_path / "ip")
     unshare = _write_executable(tmp_path / "unshare")
@@ -2098,13 +2251,13 @@ def test_production_runner_accepts_only_lock_owned_binary_and_validated_tools(
     )
     runner = _NetworkIsolatedHyperFramesRunner(
         project_root=project_root,
-        binary=project_root / "node_modules/.bin/hyperframes",
+        binary=binary,
         browser_path=browser,
         ip_path=ip_path,
         unshare_path=unshare,
         bash_path=bash,
     )
-    assert runner._binary == project_root / "node_modules/.bin/hyperframes"
+    assert runner._binary == binary
     with pytest.raises(AiVideoError) as caught:
         _NetworkIsolatedHyperFramesRunner(
             project_root=project_root,

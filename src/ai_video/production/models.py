@@ -1053,7 +1053,7 @@ class ResolvedVisualSpan(StrictModel):
     asset_role: str
     asset_id: str
     asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    asset_mime_type: Literal["image/png", "image/jpeg", "image/webp"]
+    asset_mime_type: Literal["image/png", "image/jpeg", "image/webp", "video/mp4"]
     materialized_path: Path
     start_frame: int = Field(ge=0)
     duration_frames: int = Field(gt=0)
@@ -1261,7 +1261,7 @@ class RendererCheckReceipt(StrictModel):
 class RendererAssetBinding(StrictModel):
     asset_id: str
     asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    asset_mime_type: Literal["image/png", "image/jpeg", "image/webp"]
+    asset_mime_type: Literal["image/png", "image/jpeg", "image/webp", "video/mp4"]
     materialized_path: Path
 
 
@@ -1375,7 +1375,7 @@ class RenderSourceBundlePointer(StrictModel):
             if asset.path.stem != asset.file_sha256 or asset.path.suffix not in {
                 ".png",
                 ".jpg",
-                ".webp",
+                ".webp", ".mp4",
                 ".wav",
                 ".mp3",
                 ".m4a",

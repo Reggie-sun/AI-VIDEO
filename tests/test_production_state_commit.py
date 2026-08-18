@@ -3703,6 +3703,7 @@ def test_render_path_contract_uses_full_hashes_and_safe_attempt_ids(tmp_path: Pa
     for suffix in (
         ".jpg",
         ".webp",
+        ".mp4",
         ".wav",
         ".mp3",
         ".m4a",

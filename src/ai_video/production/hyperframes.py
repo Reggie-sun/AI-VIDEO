@@ -32,12 +32,11 @@ from ai_video.production.captions import (
     validate_caption_track_timeline_binding,
 )
 from ai_video.production.composition import (
-    _validated_raster_suffix,
+    _validated_visual_suffix,
     timeline_fingerprint,
 )
 from ai_video.production.hashing import seal_artifact, verify_artifact_hash
 from ai_video.production.models import (
-    FixedTransform,
     AudioChannelLayout,
     CaptionTrack,
     MeasuredAudioRenderMetadata,
@@ -93,6 +92,7 @@ from ai_video.production.state_commit import (
     RecordRenderFailureRequest,
     RenderAttemptPaths,
 )
+from ai_video.production.visual_media import render_visual_element, visual_media_css
 
 RenderDependencyTransitionPreparer = Callable[
     [ActivateRenderStateRequest], ActivateRenderStateRequest
@@ -465,15 +465,6 @@ def _decimal_milli(value: int) -> str:
     return rendered.rstrip("0").rstrip(".") or "0"
 
 
-def _css_transform(transform: FixedTransform) -> str:
-    return (
-        f"translate({transform.translate_x_px}px,{transform.translate_y_px}px) "
-        f"scale({_decimal_milli(transform.scale_x_milli)},"
-        f"{_decimal_milli(transform.scale_y_milli)}) "
-        f"rotate({_decimal_milli(transform.rotation_millidegrees)}deg)"
-    )
-
-
 def _sample_seconds(samples: int, sample_rate: int) -> str:
     value = Decimal(samples) / Decimal(sample_rate)
     rendered = format(value.quantize(Decimal("0.000000001")), "f")
@@ -659,7 +650,7 @@ def _render_source(
     caption_elements: list[str] = []
     animations: list[str] = []
     keyframes: list[str] = []
-    for span in timeline.visual_spans:
+    for track_index, span in enumerate(timeline.visual_spans):
         name = _css_animation_name(span.layer_id)
         animations.append(
             f".{name}{{animation-name:{name};animation-duration:{duration}s;"
@@ -677,6 +668,14 @@ def _render_source(
                 target_opacity=_decimal_milli(span.opacity_milli),
             )
         )
+        media = render_visual_element(
+            span,
+            video_id=_stable_dom_id("p3-video", span.layer_id),
+            start_seconds=_clip_start_seconds(span.start_frame, fps),
+            duration_seconds=_seconds(span.duration_frames, fps),
+            media_start_seconds=_clip_start_seconds(span.trim_start_frame, fps),
+            track_index=track_index,
+        )
         clips.append(
             "\n".join(
                 [
@@ -693,11 +692,7 @@ def _render_source(
                         ' data-transition-kind="cut" data-transition-frames="0"'
                         f' style="z-index:{span.z_index}">'
                     ),
-                    (
-                        f'  <img src="{span.materialized_path.as_posix()}"'
-                        f' style="transform:{escape(_css_transform(span.transform))};'
-                        'transform-origin:0 0" alt="" />'
-                    ),
+                    media,
                     "</div>",
                 ]
             )
@@ -743,7 +738,7 @@ def _render_source(
             "    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}",
             "    #stage{position:relative;overflow:hidden}",
             "    .clip{position:absolute;inset:0}",
-            "    .clip img{width:100%;height:100%;object-fit:cover}",
+            visual_media_css(timeline.visual_spans),
             *(
                 (
                     "    .caption{position:absolute;left:5%;right:5%;bottom:8%;padding:10px;background:#00ffff;color:#000;text-align:center;font:700 24px/1.25 sans-serif}",
@@ -925,7 +920,7 @@ def _audit_hyperframes_source(
         target_snapshot = _read_regular_file_nofollow(target, contained_by=source_root)
         if target_snapshot.file_sha256 != binding.asset_sha256:
             raise _source_invalid(f"Changed source asset: {binding.asset_id}.")
-        _validated_raster_suffix(
+        _validated_visual_suffix(
             target_snapshot,
             suffix=target.suffix,
             mime_type=binding.asset_mime_type,
@@ -1206,7 +1201,7 @@ def _materialize_hyperframes_source(
         source_snapshot = _read_regular_file_nofollow(
             source, contained_by=allowed_asset_root
         )
-        suffix = _validated_raster_suffix(
+        suffix = _validated_visual_suffix(
             source_snapshot,
             suffix=source.suffix,
             mime_type=span.asset_mime_type,
@@ -1673,7 +1668,7 @@ def prepare_durable_render_artifacts(
             materialized.root / binding.materialized_path,
             contained_by=materialized.root,
         )
-        suffix = _validated_raster_suffix(
+        suffix = _validated_visual_suffix(
             snapshot,
             suffix=binding.materialized_path.suffix,
             mime_type=binding.asset_mime_type,

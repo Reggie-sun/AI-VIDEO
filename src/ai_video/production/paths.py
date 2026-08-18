@@ -45,6 +45,7 @@ def canonical_render_source_asset_path(
         ".png",
         ".jpg",
         ".webp",
+        ".mp4",
         ".wav",
         ".mp3",
         ".m4a",

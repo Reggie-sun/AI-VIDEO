@@ -10,7 +10,9 @@ import pytest
 from ai_video.production import dependency as dep_mod
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import (
+    AssetRoleRequirement,
     AssetSourceKind,
+    AssetType,
     DependencyLifecycle,
     DependencyNodeKind,
     DependencyNodeState,
@@ -19,6 +21,8 @@ from ai_video.production.models import (
     RenderDependencyEvidence,
     RendererKind,
     ToolIdentity,
+    VideoAssetMetadata,
+    VisualStrategy,
 )
 from production_project_factory import make_p5_selective_rebuild_fixture
 
@@ -441,6 +445,84 @@ def test_required_mutation_matrix_is_precise(
         if state.lifecycle is DependencyLifecycle.FRESH
     } == EXPECTED_NODE_IDS - must_rebuild
     assert resolution.exact_replay is (mutation == "alignment_receipt_only")
+
+
+def test_generated_video_trim_only_stales_existing_composition_closure(tmp_path):
+    inputs, applied = make_p5_selective_rebuild_fixture(tmp_path)
+    video_metadata = VideoAssetMetadata(
+        container_name="mp4",
+        codec_name="h264",
+        width=1280,
+        height=720,
+        fps_numerator=24,
+        fps_denominator=1,
+        duration_milliseconds=3000,
+        frame_count=72,
+        probe_receipt_id="probe-video-shot-2",
+        request_receipt_fingerprint="1" * 64,
+        resolved_generation_hash="2" * 64,
+        provenance_receipt_id="provenance-video-shot-2",
+    )
+    assets = tuple(
+        asset.model_copy(
+            update={
+                "asset_type": AssetType.VIDEO,
+                "mime_type": "video/mp4",
+                "video_metadata": video_metadata,
+            }
+        )
+        if asset.asset_id == "image-shot-2"
+        else asset
+        for asset in inputs.project.registry.assets
+    )
+    shots = tuple(
+        shot.model_copy(
+            update={
+                "visual_strategy": VisualStrategy.GENERATED_VIDEO,
+                "required_asset_roles": (
+                    AssetRoleRequirement(
+                        role="still",
+                        asset_ids=("image-shot-2",),
+                        allowed_asset_types=(AssetType.VIDEO,),
+                    ),
+                ),
+            }
+        )
+        if shot.shot_id == "shot-2"
+        else shot
+        for shot in inputs.project.shots
+    )
+    baseline_inputs = replace(
+        inputs,
+        project=inputs.project.model_copy(
+            update={
+                "registry": inputs.project.registry.model_copy(
+                    update={"assets": assets}
+                ),
+                "shots": shots,
+            }
+        ),
+    )
+    before = dep_mod.build_production_dependency_graph(baseline_inputs)
+    previous = _all_fresh_states(baseline_inputs, applied, before)
+    layers = tuple(
+        layer.model_copy(update={"trim_start_frame": 12, "trim_duration_frames": 48})
+        if layer.shot_id == "shot-2"
+        else layer
+        for layer in baseline_inputs.composition_spec.layers
+    )
+    changed_spec = seal_artifact(
+        baseline_inputs.composition_spec.model_copy(
+            update={"content_hash": "0" * 64, "layers": layers}
+        )
+    )
+    changed_inputs = replace(baseline_inputs, composition_spec=changed_spec)
+    after = dep_mod.build_production_dependency_graph(changed_inputs)
+    resolution = dep_mod.resolve_dependency_state(after, previous)
+
+    decision = dep_mod.select_rebuild_nodes(resolution)
+
+    assert set(decision.affected_node_ids) == COMPOSITION_REBUILD
 
 
 def test_same_desired_failure_stays_failed_and_blocks_transitive_dependents(tmp_path):

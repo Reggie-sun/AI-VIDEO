@@ -177,12 +177,17 @@ def test_minimax_adapter_routes_to_video_provider_suite() -> None:
 
     for path in (
         "src/ai_video/production/minimax_h3.py",
+        "src/ai_video/production/minimax_hailuo.py",
         "tests/test_production_minimax_h3.py",
+        "tests/test_production_minimax_hailuo.py",
     ):
         report = agent_harness.inspect_paths([path], policy)
         assert "production_video_provider" in report["categories"]
         assert "production_video_provider_tests" in report["check_ids"]
     assert "tests/test_production_minimax_h3.py" in policy["checks"][
+        "production_video_provider_tests"
+    ]["argv"]
+    assert "tests/test_production_minimax_hailuo.py" in policy["checks"][
         "production_video_provider_tests"
     ]["argv"]
 

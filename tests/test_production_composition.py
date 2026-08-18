@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import struct
 from pathlib import Path
 
 import pytest
@@ -15,6 +16,7 @@ from ai_video.production.models import (
     AudioKind,
     AudioTrackSpec,
     AssetRoleRequirement,
+    AssetSourceKind,
     AssetType,
     CaptionTrack,
     CaptionTrackBinding,
@@ -24,7 +26,9 @@ from ai_video.production.models import (
     DuckingSpec,
     MotionDirective,
     RendererKind,
+    ToolIdentity,
     TransitionKind,
+    VideoAssetMetadata,
     VisualStrategy,
 )
 from ai_video.production.paths import (
@@ -94,6 +98,98 @@ def _replace_asset(project, index: int, **changes):
     return project.model_copy(
         update={"registry": project.registry.model_copy(update={"assets": tuple(assets)})}
     )
+
+
+def _minimal_mp4_bytes() -> bytes:
+    return (
+        struct.pack(">I4s4sI4s", 20, b"ftyp", b"isom", 0, b"isom")
+        + struct.pack(">I4s", 8, b"moov")
+    )
+
+
+def _with_video_layer(
+    root: Path,
+    loaded,
+    spec,
+    *,
+    strategy: VisualStrategy = VisualStrategy.GENERATED_VIDEO,
+    trim_start_frame: int = 12,
+    trim_duration_frames: int | None = 48,
+    metadata_changes: dict[str, object] | None = None,
+):
+    payload = _minimal_mp4_bytes()
+    path = root / "assets/files/shot-1.mp4"
+    path.write_bytes(payload)
+    metadata = VideoAssetMetadata(
+        container_name="mp4",
+        codec_name="h264",
+        width=1280,
+        height=720,
+        fps_numerator=24,
+        fps_denominator=1,
+        duration_milliseconds=3000,
+        frame_count=72,
+        probe_receipt_id="probe-video-shot-1",
+        request_receipt_fingerprint="1" * 64,
+        resolved_generation_hash="2" * 64,
+        provenance_receipt_id="provenance-video-shot-1",
+    )
+    if metadata_changes:
+        metadata = metadata.model_copy(update=metadata_changes)
+    original = loaded.registry.assets[0]
+    video = original.model_copy(
+        update={
+            "asset_type": AssetType.VIDEO,
+            "artifact_path": path.relative_to(root),
+            "sha256": hashlib.sha256(payload).hexdigest(),
+            "size_bytes": len(payload),
+            "mime_type": "video/mp4",
+            "duration_seconds": 3.0,
+            "width": 1280,
+            "height": 720,
+            "source_kind": AssetSourceKind.GENERATED,
+            "tool": ToolIdentity(name="fixture-video", version="1"),
+            "video_metadata": metadata,
+        }
+    )
+    role = AssetRoleRequirement(
+        role="video",
+        asset_ids=(video.asset_id,),
+        allowed_asset_types=(AssetType.VIDEO,),
+    )
+    shot = loaded.shots[0].model_copy(
+        update={
+            "visual_strategy": strategy,
+            "required_asset_roles": (role,),
+        }
+    )
+    asset_paths = dict(loaded.asset_paths)
+    asset_paths[video.asset_id] = path
+    loaded = loaded.model_copy(
+        update={
+            "shots": (shot, loaded.shots[1]),
+            "registry": loaded.registry.model_copy(
+                update={"assets": (video, *loaded.registry.assets[1:])}
+            ),
+            "asset_paths": asset_paths,
+        }
+    )
+    layer = spec.layers[0].model_copy(
+        update={
+            "asset_role": "video",
+            "trim_start_frame": trim_start_frame,
+            "trim_duration_frames": trim_duration_frames,
+        }
+    )
+    spec = seal_artifact(
+        spec.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "layers": (layer, *spec.layers[1:]),
+            }
+        )
+    )
+    return loaded, spec
 
 
 def _with_overlapping_caption_binding(root, loaded, spec):
@@ -879,6 +975,89 @@ def test_rejects_non_default_trim(tmp_path, changes):
     _assert_invalid(loaded, spec.model_copy(update={"layers": layers}))
 
 
+@pytest.mark.parametrize(
+    "strategy",
+    [VisualStrategy.GENERATED_VIDEO, VisualStrategy.EXISTING_VIDEO],
+)
+def test_resolves_mp4_visual_span_trim_with_canonical_shot_timing(
+    tmp_path, strategy
+):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_layer(tmp_path, loaded, spec, strategy=strategy)
+
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+
+    video = timeline.visual_spans[0]
+    assert video.asset_mime_type == "video/mp4"
+    assert video.materialized_path.suffix == ".mp4"
+    assert (video.start_frame, video.duration_frames) == (0, 48)
+    assert (video.start_sample, video.duration_samples) == (0, 96_000)
+    assert (video.trim_start_frame, video.trim_duration_frames) == (12, 48)
+    assert timeline.visual_spans[1].start_frame == 48
+    assert (timeline.total_frames, timeline.total_samples) == (96, 192_000)
+
+
+def test_omitted_mp4_trim_duration_resolves_to_exact_shot_duration(tmp_path):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_layer(
+        tmp_path,
+        loaded,
+        spec,
+        trim_start_frame=12,
+        trim_duration_frames=None,
+    )
+
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+
+    assert timeline.visual_spans[0].trim_duration_frames == 48
+
+
+@pytest.mark.parametrize(
+    "metadata_changes",
+    [
+        {"codec_name": "hevc"},
+        {"width": 1920},
+        {"fps_numerator": 25},
+        {"frame_count": 59, "duration_milliseconds": 2458},
+    ],
+)
+def test_rejects_unsupported_or_too_short_mp4_metadata(
+    tmp_path, metadata_changes
+):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_layer(
+        tmp_path,
+        loaded,
+        spec,
+        metadata_changes=metadata_changes,
+    )
+    _assert_invalid(loaded, spec)
+
+
+def test_rejects_tampered_or_unreadable_mp4_bytes(tmp_path):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_layer(tmp_path, loaded, spec)
+    path = loaded.asset_paths[loaded.registry.assets[0].asset_id]
+    path.write_bytes(b"not-an-mp4")
+    _assert_invalid(loaded, spec)
+
+
+def test_p4_audio_and_captions_keep_the_same_timeline_with_mp4_visual(tmp_path):
+    loaded, spec = make_p4_composition_fixture(tmp_path)
+    baseline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+    loaded, spec = _with_video_layer(tmp_path, loaded, spec)
+
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+
+    assert timeline.visual_spans[0].asset_mime_type == "video/mp4"
+    assert timeline.audio_spans == baseline.audio_spans
+    assert timeline.caption_cues == baseline.caption_cues
+    assert (timeline.total_frames, timeline.total_samples) == (
+        baseline.total_frames,
+        baseline.total_samples,
+    )
+
+
 def test_rejects_duplicate_layer_id_and_duplicate_z_order(tmp_path):
     loaded, spec = make_loaded_project_and_spec(tmp_path)
     duplicate_id = spec.layers[0].model_copy(
@@ -951,8 +1130,6 @@ def test_rejects_motion_directives(tmp_path):
     [
         VisualStrategy.IMAGE_MOTION,
         VisualStrategy.MOTION_GRAPHICS,
-        VisualStrategy.GENERATED_VIDEO,
-        VisualStrategy.EXISTING_VIDEO,
         VisualStrategy.HYBRID,
     ],
 )
