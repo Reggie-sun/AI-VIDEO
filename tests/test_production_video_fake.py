@@ -8,6 +8,8 @@ import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.video import (
+    VideoGenerationMode,
+    VideoGenerationPreview,
     VideoProviderCapabilities,
     VideoSubmission,
     VideoTaskState,
@@ -24,7 +26,11 @@ from test_production_video import (
     _request,
     _variant,
 )
-from video_provider_contract import PaidProviderPermitDouble, assert_video_provider_contract
+from video_provider_contract import (
+    PaidProviderPermitDouble,
+    VideoProviderContractCase,
+    assert_video_provider_contract,
+)
 
 
 FIXTURE_PATH = Path(__file__).parent / "fixtures/generated_video/fake-video.mp4"
@@ -47,11 +53,18 @@ def _provider(*, scenario: FakeVideoScenario | None = None) -> ScriptedFakeVideo
 
 def _accepted_submission(provider: ScriptedFakeVideoProvider):
     resolved = provider.resolve(_request())
-    paid_preview = _paid_preview(resolved)
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview=video_preview)
     authorization = _paid_authorization(paid_preview)
-    binding = build_video_paid_permit_binding(resolved, paid_preview, authorization)
+    binding = build_video_paid_permit_binding(
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+    )
     result = provider.submit(
         resolved,
+        video_preview,
         paid_preview,
         authorization,
         PaidProviderPermitDouble(binding),
@@ -70,7 +83,33 @@ def _accepted_submission(provider: ScriptedFakeVideoProvider):
 
 def test_fake_provider_contract_and_success_sequence_are_deterministic():
     provider = _provider()
-    assert_video_provider_contract(provider=provider)
+    assert_video_provider_contract(
+        _provider,
+        (
+            VideoProviderContractCase(
+                request=_request(),
+                unsupported_request=_request(
+                    mode=VideoGenerationMode.TEXT_TO_VIDEO,
+                    image_bindings=(),
+                ),
+                paid_preview_factory=lambda resolved, video_preview: _paid_preview(
+                    resolved,
+                    video_preview=video_preview,
+                ),
+                authorization_factory=_paid_authorization,
+                submit_receipt_factory=lambda resolved, preview, result: (
+                    _paid_submit_receipt(
+                        resolved,
+                        preview,
+                        external_effect_id=result.external_effect_id,
+                    )
+                ),
+                expected_artifact_sha256=hashlib.sha256(
+                    _artifact_bytes()
+                ).hexdigest(),
+            ),
+        ),
+    )
     _, paid_receipt, submission = _accepted_submission(provider)
     observations = [provider.get_status(submission, paid_receipt) for _ in range(3)]
     sink = BytesIO()
@@ -92,9 +131,15 @@ def test_fake_provider_contract_and_success_sequence_are_deterministic():
 def test_fake_metered_submit_rejects_bad_permit_with_zero_submit_calls(permit_kind: str):
     provider = _provider()
     resolved = provider.resolve(_request())
-    paid_preview = _paid_preview(resolved)
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview=video_preview)
     authorization = _paid_authorization(paid_preview)
-    binding = build_video_paid_permit_binding(resolved, paid_preview, authorization)
+    binding = build_video_paid_permit_binding(
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+    )
     permit = PaidProviderPermitDouble(
         {**binding, "request_fingerprint": "f" * 64}
         if permit_kind == "mismatched"
@@ -106,6 +151,7 @@ def test_fake_metered_submit_rejects_bad_permit_with_zero_submit_calls(permit_ki
     with pytest.raises(AiVideoError) as exc_info:
         provider.submit(
             resolved,
+            video_preview,
             paid_preview,
             authorization,
             None if permit_kind == "missing" else permit,
@@ -124,15 +170,98 @@ def test_fake_metered_submit_rejects_bad_permit_with_zero_submit_calls(permit_ki
 def test_fake_submit_terminal_outcomes_are_typed(outcome: str, error_code: ErrorCode):
     provider = _provider(scenario=FakeVideoScenario(submit_outcome=outcome))
     resolved = provider.resolve(_request())
-    paid_preview = _paid_preview(resolved)
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview=video_preview)
     authorization = _paid_authorization(paid_preview)
     permit = PaidProviderPermitDouble(
-        build_video_paid_permit_binding(resolved, paid_preview, authorization)
+        build_video_paid_permit_binding(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+        )
     )
     with pytest.raises(AiVideoError) as exc_info:
-        provider.submit(resolved, paid_preview, authorization, permit)
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            permit,
+        )
     assert exc_info.value.code is error_code
     assert provider.call_counts.submit == 1
+
+
+@pytest.mark.parametrize(
+    "paid_preview_changes",
+    [
+        {"destination": "https://other.invalid"},
+        {"estimated_cost_upper_bound_microunits": 1_000_001},
+        {"egress_item_ids": ("reference",)},
+    ],
+)
+def test_fake_submit_rejects_paid_preview_that_differs_from_video_preview(
+    paid_preview_changes: dict[str, object],
+):
+    provider = _provider()
+    resolved = provider.resolve(_request())
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(
+        resolved,
+        video_preview=video_preview,
+        **paid_preview_changes,
+    )
+    authorization = _paid_authorization(paid_preview)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            PaidProviderPermitDouble({}),
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert provider.call_counts.submit == 0
+
+
+def test_fake_submit_rejects_jointly_substituted_video_and_paid_previews():
+    provider = _provider()
+    resolved = provider.resolve(_request())
+    substituted_video_preview = VideoGenerationPreview.create(
+        resolved=resolved,
+        estimated_cost_upper_bound_microunits=1_000_000,
+        currency="USD",
+        destination="https://other.invalid",
+        egress_item_ids=("prompt",),
+    )
+    substituted_paid_preview = _paid_preview(
+        resolved,
+        video_preview=substituted_video_preview,
+    )
+    authorization = _paid_authorization(substituted_paid_preview)
+    permit = PaidProviderPermitDouble(
+        build_video_paid_permit_binding(
+            resolved,
+            substituted_video_preview,
+            substituted_paid_preview,
+            authorization,
+        )
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            substituted_video_preview,
+            substituted_paid_preview,
+            authorization,
+            permit,
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert provider.call_counts.submit == 0
 
 
 def test_fake_transient_status_failure_does_not_resubmit():

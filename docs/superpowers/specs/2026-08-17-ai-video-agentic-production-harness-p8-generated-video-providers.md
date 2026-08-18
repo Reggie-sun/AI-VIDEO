@@ -90,6 +90,7 @@ class VideoProvider(Protocol):
     def submit(
         self,
         request: ResolvedVideoGenerationRequest,
+        video_preview: VideoGenerationPreview,
         paid_preview: PaidProviderCallPreview | None,
         authorization: PaidProviderAuthorizationDecision | None,
         permit: DurablePaidProviderSubmitPermit | None,
@@ -102,6 +103,7 @@ class VideoProvider(Protocol):
     def fetch(
         self,
         submission: VideoSubmission,
+        submit_receipt: PaidProviderSubmitReceipt,
         observation: VideoTaskObservation,
         sink: BinaryIO,
     ) -> VideoFetchReceipt: ...

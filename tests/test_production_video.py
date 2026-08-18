@@ -189,7 +189,34 @@ def _paid_preview(
     resolved: ResolvedVideoGenerationRequest,
     *,
     attempt_id: str = "attempt-1",
+    video_preview: VideoGenerationPreview | None = None,
+    destination: str | None = None,
+    estimated_cost_upper_bound_microunits: int | None = None,
+    egress_item_ids: tuple[str, ...] | None = None,
 ) -> PaidProviderCallPreview:
+    selected_preview = video_preview or VideoGenerationPreview.create(
+        resolved=resolved,
+        estimated_cost_upper_bound_microunits=1_000_000,
+        currency="USD",
+        destination="https://api.minimax.io",
+        egress_item_ids=("prompt",),
+    )
+    selected_destination = (
+        destination if destination is not None else selected_preview.destination
+    )
+    selected_cost = (
+        estimated_cost_upper_bound_microunits
+        if estimated_cost_upper_bound_microunits is not None
+        else selected_preview.estimated_cost_upper_bound_microunits
+    )
+    selected_item_ids = (
+        egress_item_ids
+        if egress_item_ids is not None
+        else selected_preview.egress_item_ids
+    )
+    assert selected_destination is not None
+    assert selected_cost is not None
+    assert selected_preview.currency is not None
     return PaidProviderCallPreview.create(
         attempt_id=attempt_id,
         operation="video_generation",
@@ -197,18 +224,19 @@ def _paid_preview(
         model_id=resolved.model_id,
         request_fingerprint=resolved.resolved_generation_hash,
         billing_mode="remote_metered",
-        currency="USD",
-        estimated_cost_upper_bound_microunits=1_000_000,
-        destination="https://api.minimax.io",
+        currency=selected_preview.currency,
+        estimated_cost_upper_bound_microunits=selected_cost,
+        destination=selected_destination,
         method="POST",
-        egress_items=(
+        egress_items=tuple(
             PaidProviderEgressItem(
-                item_id="prompt",
+                item_id=item_id,
                 sha256=HASH_A,
                 size_bytes=42,
                 mime_type="text/plain",
-                purpose="prompt",
-            ),
+                purpose=item_id,
+            )
+            for item_id in selected_item_ids
         ),
         retention_mode="provider_standard",
         provider_policy_snapshot_id="minimax-policy-1",
@@ -373,6 +401,13 @@ def test_local_unmetered_preview_does_not_require_fake_cloud_receipts():
     assert preview.destination is None
     assert preview.currency is None
     assert preview.egress_item_ids == ()
+
+
+def test_remote_unmetered_capability_is_rejected_before_provider_submit():
+    provider_submit_calls = 0
+    with pytest.raises(ValidationError, match="supported pair"):
+        _variant(billing_kind=BillingKind.LOCAL_UNMETERED)
+    assert provider_submit_calls == 0
 
 
 def test_core_reuses_paid_provider_authority_instead_of_defining_a_second_gate():

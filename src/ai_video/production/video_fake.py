@@ -123,6 +123,12 @@ class ScriptedFakeVideoProvider:
         self, request: ResolvedVideoGenerationRequest
     ) -> VideoGenerationPreview:
         self._preview_calls += 1
+        return self._build_preview(request)
+
+    @staticmethod
+    def _build_preview(
+        request: ResolvedVideoGenerationRequest,
+    ) -> VideoGenerationPreview:
         if request.billing_kind is BillingKind.METERED:
             return VideoGenerationPreview.create(
                 resolved=request,
@@ -142,10 +148,19 @@ class ScriptedFakeVideoProvider:
     def submit(
         self,
         request: ResolvedVideoGenerationRequest,
+        video_preview: VideoGenerationPreview,
         paid_preview: PaidProviderCallPreview | None,
         authorization: PaidProviderAuthorizationDecision | None,
         permit: DurablePaidProviderSubmitPermit | None,
     ) -> VideoSubmitResult:
+        if video_preview != self._build_preview(request):
+            raise AiVideoError(
+                code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message=(
+                    "Fake video submit preview does not match its resolved Provider preview."
+                ),
+                retryable=False,
+            )
         if request.billing_kind is BillingKind.METERED:
             if paid_preview is None or authorization is None or permit is None:
                 raise AiVideoError(
@@ -155,6 +170,7 @@ class ScriptedFakeVideoProvider:
                 )
             binding = build_video_paid_permit_binding(
                 request,
+                video_preview,
                 paid_preview,
                 authorization,
             )

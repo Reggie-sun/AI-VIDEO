@@ -249,8 +249,16 @@ class VideoCapabilityVariant(_VideoStrictModel):
             raise ValueError("text-to-video capability cannot declare image bindings")
         if self.required_first_frame and "first_frame" not in self.allowed_image_roles:
             raise ValueError("required first frame must be an allowed image role")
-        if self.execution_kind is VideoExecutionKind.LOCAL and self.billing_kind is BillingKind.METERED:
-            raise ValueError("local video capability cannot be metered")
+        if (
+            self.execution_kind is VideoExecutionKind.LOCAL
+            and self.billing_kind is not BillingKind.LOCAL_UNMETERED
+        ) or (
+            self.execution_kind is VideoExecutionKind.REMOTE
+            and self.billing_kind is not BillingKind.METERED
+        ):
+            raise ValueError(
+                "video capability execution and billing kinds must use a supported pair"
+            )
         return self
 
 
@@ -733,6 +741,7 @@ class VideoProviderFailure(_VideoStrictModel):
 
 def build_video_paid_permit_binding(
     request: ResolvedVideoGenerationRequest,
+    video_preview: VideoGenerationPreview,
     paid_preview: PaidProviderCallPreview,
     authorization: PaidProviderAuthorizationDecision,
 ) -> dict[str, str]:
@@ -741,10 +750,19 @@ def build_video_paid_permit_binding(
     if (
         request.execution_kind is not VideoExecutionKind.REMOTE
         or request.billing_kind is not BillingKind.METERED
+        or video_preview.resolved_generation_hash != request.resolved_generation_hash
+        or video_preview.execution_kind is not VideoExecutionKind.REMOTE
+        or video_preview.billing_kind is not BillingKind.METERED
         or paid_preview.operation != "video_generation"
         or paid_preview.request_fingerprint != request.resolved_generation_hash
         or paid_preview.provider_kind != request.provider_kind
         or paid_preview.model_id != request.model_id
+        or paid_preview.destination != video_preview.destination
+        or paid_preview.currency != video_preview.currency
+        or paid_preview.estimated_cost_upper_bound_microunits
+        != video_preview.estimated_cost_upper_bound_microunits
+        or tuple(item.item_id for item in paid_preview.egress_items)
+        != video_preview.egress_item_ids
     ):
         raise _video_error(
             ErrorCode.VIDEO_REQUEST_INVALID,
@@ -783,6 +801,7 @@ class VideoProvider(Protocol):
     def submit(
         self,
         request: ResolvedVideoGenerationRequest,
+        video_preview: VideoGenerationPreview,
         paid_preview: PaidProviderCallPreview | None,
         authorization: PaidProviderAuthorizationDecision | None,
         permit: DurablePaidProviderSubmitPermit | None,
