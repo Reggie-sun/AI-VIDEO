@@ -1,6 +1,6 @@
 # AI-VIDEO P7.1 Hybrid Local Image Production Implementation Plan
 
-Execution status: Milestones 0-6 and the applicable offline verification/review portion of Milestone 9 are implemented on local `main`. The first authorized Milestone 7 session failed closed after one Qwen submit and requires fresh authorization to rerun; Milestone 8 lacks mandatory human outputs/review evidence. No live or quality acceptance is claimed.
+Execution status: Milestones 0-6 and the applicable offline verification/review portion of Milestone 9 are implemented on local `main`. The 2026-08-18 fresh authorized Milestone 7 rerun passed both Qwen and FLUX technical live acceptance on loopback `http://127.0.0.1:8188` (exactly one provider call per lane, replay adds zero, no remote/browser/secret); the earlier two sessions failed closed without blind retry. Milestone 7 is now technical live-accepted; Milestone 8 still lacks mandatory human outputs/review evidence, so P7.1 remains not quality-accepted.
 
 **Goal:** 在 accepted Base AI Comic E2E 之后，为 P7 增加 loopback-only ComfyUI local image adapter、Qwen/FLUX sealed execution profiles、truthful ChatGPT web human-import path 和 evidence-based quality gate，同时保留现有 durable lifecycle、single writer、P5/P6 ownership 与 Legacy behavior。
 
@@ -480,7 +480,7 @@ python -c 'from ai_video.workflow_loader import load_workflow_template; load_wor
 
 **Files:** No code changes during the smoke; output goes to an isolated, path-resolved scratch Production Project outside committed fixtures。
 
-**Owner / Dependencies:** Requires explicit live-local-smoke authorization after Milestone 6. No authorization means this milestone remains blocked and P7.1 cannot be called live-accepted。
+**Owner / Dependencies:** Requires explicit live-local-smoke authorization after Milestone 6. That condition was satisfied for the accepted 2026-08-18 session; every future rerun or benchmark still requires fresh explicit authorization。
 
 **Contract:** One command performs exactly one Qwen and one FLUX first execution, then exact replay of both. Maximum Provider/Comfy prompt calls are `2`; replay adds `0`. Endpoint is literal loopback; no browser or remote traffic。
 
@@ -502,7 +502,7 @@ The script must fail unless `--confirm-live-local-generation` is explicit. It pr
 
 **Failure behavior:** A failure after either `/prompt` submission stops the session. Do not retry the failed profile or proceed to another submit when outcome is unknown. Run explicit recovery and report the state。
 
-**2026-08-18 execution evidence:** Static compatibility passed with `network_used: false`. The first authorized session submitted Qwen exactly once, then ComfyUI rejected the internal reference fixture as `Truncated File Read`; the committer recorded `image_provider_outcome_unknown`, stopped before FLUX and recovered Manifest revision 6. The session was not retried. The harness now requests decodable PNG fixtures and has an executable chunk/CRC/IDAT-decompression regression, but another live submit requires fresh authorization。
+**2026-08-18 execution evidence:** Static compatibility passed with `network_used: false`, ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`, official Qwen template SHA-256 `d561a38c15bd7d08758a5e6773d467142244d5b83fc5d3aecdf6d8df9fe881b6` 与 distilled FLUX template SHA-256 `e0388a8870495802314d58fa61616ddcdb7064dac5f85a8787c9e08180b8a560`、derived workflow exact、8 diffusion / 4 text encoders / 6 VAE / 0 LoRA inventory。The first authorized session submitted Qwen exactly once, then ComfyUI rejected the internal reference fixture as `Truncated File Read`; the committer recorded `image_provider_outcome_unknown`, stopped before FLUX and recovered Manifest revision 6. A second authorized session proved Qwen, but FLUX was rejected by `ImageScaleToTotalPixels` for missing `resolution_steps`; no blind retry followed. The bounded fix added a live required-input preflight and `resolution_steps=1`. The same-day fresh authorized rerun, on literal loopback `http://127.0.0.1:8188`, passed both lanes: Qwen one first call / replay 加零, elapsed 185501 ms, 1456x720 RGB PNG 1209630 bytes SHA-256 `62218606af56ac7d0651c437245d9db386f48f44194f28cdc9b4bd8c94ad40f7`, profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`, workflow SHA-256 `34f1d2a67d049b646eef1c8f0c51aa8c1ad6b9eb5ef176c9ec422c3ff384a85f`; FLUX one first call / replay 加零, elapsed 19201 ms, 1456x720 RGB PNG 1190375 bytes SHA-256 `303ea92b23a3820047aa5412d8d7b376ffb532d4e028aa7627b9fe19279e8180`, profile `local-image-profile:sha256:5066c080d58d3d999446ca5db195e8e81fd982052d94144452737f1e89a0f9c7`, workflow SHA-256 `e44a10fc8d6e6e491055de361d50dacaffb42adeb915f7c3596250a38b66dd22`; `remote_used=false`, `browser_used=false`, no API key or quota. Milestone 7 is now technical live-accepted.
 
 **Acceptance:** Exactly two first-run submits at most, two valid PNG activations, and replay counters all zero. No non-loopback socket, API key or browser is used。
 

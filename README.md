@@ -6,7 +6,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3-P7 与 combined Base AI Comic E2E 已合入 local `main`。P7.1 offline/runtime-contract implementation 增加 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；首次授权 live smoke 已 fail closed，尚未通过 live 或 blind quality acceptance。
+公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3-P7 与 combined Base AI Comic E2E 已合入 local `main`。P7.1 offline/runtime-contract implementation 增加 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；2026-08-18 fresh authorized rerun 已通过 M7 technical live-local acceptance（Qwen + FLUX 各一次 provider call，replay 加零，loopback only），但 M8 仍缺人工 ChatGPT outputs 与 blinded review evidence。
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
@@ -23,7 +23,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已 push 到 `origin/main`；P6-P7 与 Base E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但 local `main` 尚未 push、release 或 publish。P7.1 不修改 CLI、schema 或 Legacy layout；M7 只产生一次 loopback Qwen submit，未下载模型、未调用 remote service，也未运行 blind benchmark。
+公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已 push 到 `origin/main`；P6-P7 与 Base E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但 local `main` 尚未 push、release 或 publish。P7.1 不修改 CLI、schema 或 Legacy layout；M7 已通过 2026-08-18 fresh authorized live-local rerun（loopback `http://127.0.0.1:8188`，exactly one Qwen + one FLUX provider call，replay adds zero），但未运行 blind benchmark 或 remote image submission。
 
 ## Setup
 
@@ -164,13 +164,13 @@ Manifest 2.5 组合 P6 review/repair 与 P7 image lifecycle，但不让两者互
 
 P7 原始 fake/no-network acceptance 已随 Base E2E 合入 local `main`。它没有增加 CLI、renderer、Composition/timeline、video generation 或 remote Provider；local `main` 尚未 push、release 或 publish。
 
-### Hybrid Local Image Production (P7.1, offline-verified; live blocked)
+### Hybrid Local Image Production (P7.1, offline-verified; M7 technical live-accepted; M8 still pending)
 
 `ai_video.production.comfy_image` 提供 sealed Qwen-Image-Edit-2511 与 FLUX.2-klein-4B local execution profile、loopback-only transport、exact workflow binding，以及在任何 P7 R+1 durable evidence 之前执行的 component SHA/size、ComfyUI commit 和 registered `/object_info` node preflight。Exact replay 仍在 preflight 之前返回，因此不会访问 ComfyUI；submit 后 history/output 不确定性继续进入 `outcome_unknown`，recovery 不 remint permit。
 
 `ai_video.production.image_import` 将人工下载的 ChatGPT Images web PNG 记录为 `chatgpt_images_2_web` human import，不虚构 backend model、provider request、durable submit 或 browser automation。Character master、Scene reference、key Shot 与 repair replacement 都复用同一个 `ProductionStateCommitter` project/Registry/P5 graph atomic activation path。
 
-本地 static compatibility gate 已验证 pinned official-template lineage、Qwen profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`、FLUX profile `local-image-profile:sha256:3963b58e0aad18e8359044b9ad043c92961c940dde19002f94723cd196718eb8`、两个 lane 的 exact component digests、ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、Torch `2.11.0+cu130` / CUDA `13.0` 与 lane budgets。2026-08-18 的首次授权 M7 session 在唯一一次 Qwen submit 后因 reference fixture 不是可解码 PNG 而失败，Manifest 记录 `outcome_unknown` 并 recovery 到 revision 6；没有 blind retry，也没有 FLUX submit。smoke fixture validation 已增加 PNG chunk/CRC/IDAT 解压回归并改用有效 PNG，但重新 live submit 需要新授权。M8 仍缺至少 18 组人工 ChatGPT web outputs、两名 reviewer 与 tie-break，因此 P7.1 仍不得称为 live-accepted 或 quality-accepted。
+本地 static compatibility gate 已验证 pinned official-template lineage、Qwen profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`、FLUX profile `local-image-profile:sha256:5066c080d58d3d999446ca5db195e8e81fd982052d94144452737f1e89a0f9c7`、两个 lane 的 exact component digests、ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、Torch `2.11.0+cu130` / CUDA `13.0` 与 lane budgets。2026-08-18 首次授权 M7 session 因 smoke reference fixture 不是可解码 PNG 而 fail closed 并止步 FLUX；第二次 session 已证明 Qwen，但 FLUX 被 `ImageScaleToTotalPixels` 因缺 `resolution_steps` 拒绝；最终 fix 在 live required-input preflight 与 `resolution_steps=1` 之后，同一日 fresh authorized rerun 在 loopback `http://127.0.0.1:8188` 上同时通过 Qwen 与 FLUX technical live acceptance：Qwen one first call / replay 加零，elapsed 185501 ms，1456x720 RGB PNG 1209630 bytes SHA-256 `62218606af56ac7d0651c437245d9db386f48f44194f28cdc9b4bd8c94ad40f7`，workflow SHA-256 `34f1d2a67d049b646eef1c8f0c51aa8c1ad6b9eb5ef176c9ec422c3ff384a85f`；FLUX one first call / replay 加零，elapsed 19201 ms，1456x720 RGB PNG 1190375 bytes SHA-256 `303ea92b23a3820047aa5412d8d7b376ffb532d4e028aa7627b9fe19279e8180`，workflow SHA-256 `e44a10fc8d6e6e491055de361d50dacaffb42adeb915f7c3596250a38b66dd22`；整个 session 没有 remote call、browser 或 secret。M8 仍缺至少 18 组人工 ChatGPT web outputs、两名 reviewer 与 tie-break，因此 P7.1 仍不得称为 quality-accepted；M7 现为 technical live-accepted。
 
 ## Base AI Comic E2E
 

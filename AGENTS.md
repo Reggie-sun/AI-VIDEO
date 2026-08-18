@@ -4,7 +4,7 @@
 
 ## Purpose
 
-当前仓库有边界不同的已实现产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2-P7 提供的 read-only Production Project、explicit P2A State Commit/Recovery、deterministic Composition/HyperFrames、Voice/Captions、immutable Dependency Graph/selective rebuild、Codex Review/Repair 和 local-only image asset generation Python APIs。P7 lineage 与 P3-P7 combined Base AI Comic E2E 已合入 local `main`。P7.1 的 offline/runtime-contract 部分增加了 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；M7 首次授权 smoke 已 fail closed，尚无 successful live acceptance，M8 也未验收。P8-P9 等未实施 slice 仍只是规划。
+当前仓库有边界不同的已实现产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2-P7 提供的 read-only Production Project、explicit P2A State Commit/Recovery、deterministic Composition/HyperFrames、Voice/Captions、immutable Dependency Graph/selective rebuild、Codex Review/Repair 和 local-only image asset generation Python APIs。P7 lineage 与 P3-P7 combined Base AI Comic E2E 已合入 local `main`。P7.1 的 offline/runtime-contract 部分增加了 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；2026-08-18 fresh authorized rerun 已通过 Qwen 与 FLUX M7 technical live-local acceptance，M8 仍未验收。P8-P9 等未实施 slice 仍只是规划。
 
 Agent 必须维护当前产品承诺：
 
@@ -23,7 +23,7 @@ Agent 必须维护当前产品承诺：
 - P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main` 并 push 到 `origin/main`：`DependencyGraphSnapshot`只保存immutable typed graph inputs，Manifest 2.3独占active graph与desired/applied/lifecycle，`ProductionStateCommitter`仍独占graph write/co-activation/recovery；P5不增加CLI、Provider、renderer或automatic recovery，且尚未 release。
 - P6 已完成并整合到 local `main`：Manifest 2.4 与既有 `ProductionStateCommitter` 提供 durable review/repair/final-acceptance lifecycle；P5 graph 仍不保存 mutable review state。P6 尚未 push/release。
 - P7 与 Base AI Comic E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但尚未 push、release 或 publish。P7 的 provider-neutral contract、Manifest 2.5 lifecycle、generated PNG provenance、target Shot/Registry/graph atomic activation、exact replay/recovery 与 combined no-Video-Provider proof 保持不变。
-- P7.1 offline/runtime-contract implementation 提供 sealed `ComfyLocalImageProvider`、exact local component/profile/workflow binding、R+1 前 read-only compatibility preflight，以及 `chatgpt_images_2_web` human import receipt/activation。首次 M7 授权 session 的 Qwen submit 因 smoke reference fixture 不是可解码 PNG 而进入 `outcome_unknown`，recovery 后没有 blind retry 或 FLUX submit；smoke fixture validation 已补可解码 PNG gate，但重新 live submit 仍需新授权。M8 仍缺人工 ChatGPT outputs 与 blinded review evidence，因此不得称为 live-accepted 或 quality-accepted。
+- P7.1 offline/runtime-contract implementation 提供 sealed `ComfyLocalImageProvider`、exact local component/profile/workflow binding、R+1 前 read-only compatibility preflight，以及 `chatgpt_images_2_web` human import receipt/activation。2026-08-18 首次 M7 授权 session 因 smoke reference fixture 不是可解码 PNG 而 fail closed 并止步 FLUX；第二次已证明 Qwen，但 FLUX 被 `ImageScaleToTotalPixels` 缺 `resolution_steps` 拒绝；最终 fix 在 live required-input preflight 与 `resolution_steps=1` 之后，本日 fresh authorized rerun 在 loopback `http://127.0.0.1:8188` 上同时对 Qwen 与 FLUX 通过 technical live acceptance（exactly one provider call per lane, replay adds zero, no remote/browser）。M7 现在是 accepted 的 technical live-local milestone；M8 仍缺人工 ChatGPT outputs 与 blinded review evidence，因此 P7.1 仍不得称为 quality-accepted。任何未来 live smoke/benchmark 仍需 explicit authorization。
 - `docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md` 是新的 v0.2 planning target；它不是已实现行为，也不是一次性实施授权。
 - `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 已被 supersede，只保留为 provider-centric 历史设计与可复用安全契约来源。
 - v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0-P7 与 Base AI Comic E2E 的当前状态见 runtime baseline 与 roadmap；P8+ 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。Base E2E acceptance 不等于 Paid Provider Gate 已设计、实现或验收。
@@ -190,7 +190,7 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - 修改 `runs/` 下的 manifest schema 或产物目录结构。
 - 把本地优先策略改成默认允许远程主机。
 - 引入前端、API server、队列管理、音频，或其他 MVP 规范中明确排除的子系统。
-- 执行 P7.1 live smoke/benchmark、v0.2 P8-P9 任一 runtime slice，或把未验收的 plan/spec contract 写成当前行为。P2-P7 与 Base AI Comic E2E 已在 local `main`；P7.1 只能把已通过 offline executable gates 的部分写成 runtime truth，不能声称 live/quality acceptance。P8 还必须先有单独获批并验收的 Paid Provider Gate。任何新的 v2 writer、activation、schema/layout mutation 仍需独立授权与 crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
+- 执行 P7.1 live smoke/benchmark、v0.2 P8-P9 任一 runtime slice，或把未验收的 plan/spec contract 写成当前行为。P2-P7 与 Base AI Comic E2E 已在 local `main`；P7.1 已通过 offline executable gates 与 2026-08-18 technical live-local acceptance，但仍未通过 M8 blinded quality benchmark。任何未来 P7.1 live smoke、benchmark 或 P8-P9 runtime slice 仍需各自独立 explicit authorization。P8 还必须先有单独获批并验收的 Paid Provider Gate。任何新的 v2 writer、activation、schema/layout mutation 仍需独立授权与 crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
 
 ## Session Continuity
 
