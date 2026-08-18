@@ -56,6 +56,7 @@ from ai_video.production.models import (
     RepairAuthorization,
     RepairOutcomeReceipt,
     RepairRequest,
+    RenderStateSnapshot,
     ReviewEvidence,
     ReviewEvidencePointer,
     ReviewLifecycle,
@@ -98,12 +99,111 @@ def _canonical_json_bytes(value) -> bytes:
     ).encode("utf-8")
 
 
+def _install_manifest_write_counter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> _ManifestWriteCounter:
+    """Instrument the real ``ProductionStateCommitter`` file-ops seam.
+
+    Patches ``_NativeFileOps`` so that two observable Manifest-write
+    effects are counted independently:
+
+    - ``manifest_temp_write`` increments on a completed ``fsync_file`` of
+      the canonical ``.p2a-manifest.tmp`` path (the durable temp-file
+      write effect inside ``_write_manifest_atomic``).
+    - ``manifest_replace`` increments on a ``replace()`` whose
+      destination is the canonical ``state/manifest.json`` path (the
+      atomic manifest promotion effect).
+
+    Same-bytes rewrites still increment because the counter is recorded
+    inside ``_CountingFileOps`` before delegating to the real
+    ``_NativeFileOps`` method. ``ProductionStateCommitter`` keeps sole
+    ownership of the Manifest and still performs its atomic write path;
+    the test only observes the seam without bypassing it.
+
+    Each call returns a fresh ``_ManifestWriteCounter`` installed via
+    ``monkeypatch``; ``monkeypatch`` restores the original
+    ``_NativeFileOps`` and the module-level counter reference at
+    teardown, so test isolation is automatic and the counter is
+    cumulative for the lifetime of one test (initial acceptance, both
+    clean recoveries, same-runtime replay, and fresh-runtime replay).
+    """
+
+    import sys
+
+    from ai_video.production import _state_commit_io as io_module
+
+    real_native = io_module._NativeFileOps
+    counter = _ManifestWriteCounter()
+    production_e2e_support = sys.modules[__name__]
+
+    class _CountingFileOps(real_native):
+        def fsync_file(self, handle, path: Path) -> None:
+            counter.record_temp_write(path)
+            real_native.fsync_file(self, handle, path)
+
+        def replace(self, source: Path, destination: Path) -> None:
+            counter.record_replace(source, destination)
+            real_native.replace(self, source, destination)
+
+    monkeypatch.setattr(io_module, "_NativeFileOps", _CountingFileOps)
+    monkeypatch.setattr(
+        "ai_video.production.state_commit._NativeFileOps", _CountingFileOps
+    )
+    monkeypatch.setattr(production_e2e_support, "_MANIFEST_WRITE_COUNTER", counter)
+    return counter
+
+
 @dataclass(frozen=True)
 class BaseAiComicCallCounts:
     image_submit: int = 0
+    voice_preview: int = 0
     voice_submit: int = 0
     review_analyze: int = 0
+    renderer_version: int = 0
+    renderer_doctor: int = 0
     renderer_run: int = 0
+    manifest_temp_write: int = 0
+    manifest_replace: int = 0
+
+
+class _ManifestWriteCounter:
+    """Test-only counter for observable Manifest file-ops effects.
+
+    Each call to ``_install_manifest_write_counter`` returns a fresh
+    instance; ``monkeypatch`` restores the previous module-level
+    reference at teardown so tests share no state and never need to
+    reset this counter. The two fields are independent:
+
+    - ``temp_write`` increments only when ``fsync_file`` is called for
+      the canonical ``.p2a-manifest.tmp`` path (the durable Manifest
+      temp-write effect).
+    - ``replace`` increments only when ``replace`` is called with a
+      destination whose basename is ``manifest.json`` (the atomic
+      Manifest promotion effect).
+    """
+
+    def __init__(self) -> None:
+        self._temp_write = 0
+        self._replace = 0
+
+    def record_temp_write(self, path: Path) -> None:
+        if path.name == ".p2a-manifest.tmp":
+            self._temp_write += 1
+
+    def record_replace(self, source: Path, destination: Path) -> None:
+        if destination.name == "manifest.json":
+            self._replace += 1
+
+    @property
+    def temp_write(self) -> int:
+        return self._temp_write
+
+    @property
+    def replace(self) -> int:
+        return self._replace
+
+
+_MANIFEST_WRITE_COUNTER = _ManifestWriteCounter()
 
 
 @dataclass(frozen=True)
@@ -198,6 +298,7 @@ class BaseAiComicFullAcceptanceResult:
     acceptance_receipt: FinalAcceptanceReceipt
     repair_outcome_pointer: object
     repair_outcome_repair_id: str
+    repair_outcome_receipt: RepairOutcomeReceipt
     acceptance_lifecycle: ReviewLifecycle
 
 
@@ -656,9 +757,14 @@ class BaseAiComicE2ERuntime:
     def call_counts(self) -> BaseAiComicCallCounts:
         return BaseAiComicCallCounts(
             image_submit=len(self.image_runtime.provider_requests),
+            voice_preview=self.voice_provider.preview_calls,
             voice_submit=self.voice_provider.generate_calls,
             review_analyze=self.analyzer.calls,
-            renderer_run=self.renderer.render_calls,
+            renderer_version=self.renderer.version_calls,
+            renderer_doctor=self.renderer.doctor_calls,
+            renderer_run=self.renderer.run_calls,
+            manifest_temp_write=_MANIFEST_WRITE_COUNTER.temp_write,
+            manifest_replace=_MANIFEST_WRITE_COUNTER.replace,
         )
 
     def generate_two_shot_images(self):
@@ -909,18 +1015,87 @@ class BaseAiComicE2ERuntime:
             )
         if manifest.active_render_state is None:
             raise AssertionError("replay requires an active render state")
-        acceptance_pointer = acceptance_state.active_receipt
-        receipt = FinalAcceptanceReceipt.model_validate_json(
-            (self.root / acceptance_pointer.path).read_bytes()
+        if not manifest.repair_outcome_receipts:
+            raise AssertionError("replay requires an active repair outcome receipt")
+
+        # Bind the repair outcome from durable reopened state first so the
+        # final acceptance and render identity can be re-verified against it.
+        repair_outcome_pointer = manifest.repair_outcome_receipts[-1]
+        repair_outcome_path = self.root / repair_outcome_pointer.path
+        repair_outcome_bytes = repair_outcome_path.read_bytes()
+        if (
+            hashlib.sha256(repair_outcome_bytes).hexdigest()
+            != repair_outcome_pointer.file_sha256
+        ):
+            raise AssertionError(
+                "repair outcome receipt file SHA does not match pointer"
+            )
+        repair_outcome_receipt = RepairOutcomeReceipt.model_validate_json(
+            repair_outcome_bytes
         )
+        if not verify_artifact_hash(repair_outcome_receipt):
+            raise AssertionError(
+                "repair outcome receipt semantic content hash did not validate"
+            )
+        if (
+            repair_outcome_receipt.repair_id != repair_outcome_pointer.repair_id
+            or repair_outcome_receipt.content_hash
+            != repair_outcome_pointer.content_hash
+        ):
+            raise AssertionError(
+                "repair outcome receipt identity does not match its pointer"
+            )
+        if (
+            repair_outcome_receipt.rerender_state
+            != manifest.active_render_state
+        ):
+            raise AssertionError(
+                "repair outcome rerender_state does not match active render state"
+            )
+        rerender_snapshot = RenderStateSnapshot.model_validate_json(
+            (self.root / repair_outcome_receipt.rerender_state.path).read_bytes()
+        )
+        rerender_output_sha256 = hashlib.sha256(
+            (self.root / rerender_snapshot.output.path).read_bytes()
+        ).hexdigest()
+        if (
+            repair_outcome_receipt.rerender_output_sha256
+            != rerender_output_sha256
+        ):
+            raise AssertionError(
+                "repair outcome rerender_output_sha256 does not match "
+                "reopened MP4"
+            )
+
+        # Bind the final acceptance receipt from durable reopened state.
+        acceptance_pointer = acceptance_state.active_receipt
+        acceptance_path = self.root / acceptance_pointer.path
+        acceptance_bytes = acceptance_path.read_bytes()
+        if (
+            hashlib.sha256(acceptance_bytes).hexdigest()
+            != acceptance_pointer.file_sha256
+        ):
+            raise AssertionError(
+                "final acceptance receipt file SHA does not match pointer"
+            )
+        receipt = FinalAcceptanceReceipt.model_validate_json(acceptance_bytes)
+        if not verify_artifact_hash(receipt):
+            raise AssertionError(
+                "final acceptance receipt semantic content hash did not validate"
+            )
+        if (
+            receipt.render_state != manifest.active_render_state
+            or receipt.render_output_sha256 != rerender_output_sha256
+        ):
+            raise AssertionError(
+                "final acceptance receipt does not bind current render/MP4"
+            )
+
         render_state_snapshot = bundle.render_state
         if render_state_snapshot is None:
             raise AssertionError("reopened bundle missing active render state")
         output_path = self.root / render_state_snapshot.output.path
         mp4_sha256 = hashlib.sha256(output_path.read_bytes()).hexdigest()
-        if not manifest.repair_outcome_receipts:
-            raise AssertionError("replay requires an active repair outcome receipt")
-        repair_outcome_pointer = manifest.repair_outcome_receipts[-1]
         return BaseAiComicFullAcceptanceResult(
             render_state=manifest.active_render_state,
             render_output_sha256=render_state_snapshot.output.file_sha256,
@@ -930,7 +1105,8 @@ class BaseAiComicE2ERuntime:
             acceptance_id=receipt.acceptance_id,
             acceptance_receipt=receipt,
             repair_outcome_pointer=repair_outcome_pointer,
-            repair_outcome_repair_id=repair_outcome_pointer.repair_id,
+            repair_outcome_repair_id=repair_outcome_receipt.repair_id,
+            repair_outcome_receipt=repair_outcome_receipt,
             acceptance_lifecycle=acceptance_state.lifecycle,
         )
 

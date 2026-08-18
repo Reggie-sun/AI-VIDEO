@@ -35,6 +35,7 @@ from production_e2e_support import (
     DeterministicHyperFramesRunner,
     DeterministicReviewAnalyzer,
     DeterministicVoiceProvider,
+    _install_manifest_write_counter,
     make_base_ai_comic_reopen_runtime,
     require_audio_toolchain,
 )
@@ -388,8 +389,11 @@ def test_base_ai_comic_materializes_and_renders_from_current_active_assets(
     assert initial.sha256 == hashlib.sha256(initial.path.read_bytes()).hexdigest()
     assert runtime.call_counts == BaseAiComicCallCounts(
         image_submit=2,
+        voice_preview=3,
         voice_submit=1,
-        renderer_run=1,
+        renderer_version=1,
+        renderer_doctor=1,
+        renderer_run=3,
     )
     assert loaded.manifest.active_review_receipts == ()
     assert loaded.manifest.active_approved_repair is None
@@ -533,30 +537,102 @@ def test_base_ai_comic_final_state_reopens_and_exact_replay_has_zero_effects(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    _install_manifest_write_counter(monkeypatch)
     runtime = project_factory.make_base_ai_comic_e2e_runtime(tmp_path)
     _forbid_network_and_secret_access(monkeypatch)
 
     final = runtime.run_full_acceptance()
     before_manifest_bytes = runtime.manifest_bytes()
     before_counts = runtime.call_counts
+    baseline_manifest_temp_writes = before_counts.manifest_temp_write
+    baseline_manifest_replaces = before_counts.manifest_replace
     final_mp4_bytes = final.output_path.read_bytes()
     final_mp4_sha = hashlib.sha256(final_mp4_bytes).hexdigest()
+    assert baseline_manifest_temp_writes > 0, (
+        "accepted baseline must durably write the Manifest temp file"
+    )
+    assert baseline_manifest_replaces > 0, (
+        "accepted baseline must atomically promote the Manifest"
+    )
+    # ``manifest_temp_write`` counts only the canonical
+    # ``.p2a-manifest.tmp`` durable temp-write effects, while
+    # ``manifest_replace`` counts every atomic promotion of
+    # ``state/manifest.json`` (including the render-specific
+    # candidate/final Manifest promotions whose temp paths are
+    # ``.p2a-render-{candidate,final}-manifest.tmp``). The replace
+    # counter is therefore an upper bound on the temp-write counter for
+    # the same shared Manifest file, but the two counters observe
+    # different canonical seams and are kept independent.
+    assert baseline_manifest_replaces >= baseline_manifest_temp_writes
+    assert before_counts.voice_preview >= before_counts.voice_submit
+    assert before_counts.renderer_version >= 1, (
+        "accepted baseline must exercise the renderer version probe"
+    )
+    assert before_counts.renderer_doctor >= 1, (
+        "accepted baseline must exercise the renderer doctor probe"
+    )
+    assert before_counts.renderer_run >= 1, (
+        "accepted baseline must exercise the renderer run command"
+    )
 
     recovery = recover_production_state(tmp_path)
     after_recovery_bytes = runtime.manifest_bytes()
     assert recovery.manifest_revision_after == recovery.manifest_revision_before
     assert after_recovery_bytes == before_manifest_bytes
+    assert runtime.call_counts == before_counts, (
+        "clean recovery must add zero call-count effects"
+    )
+    assert (
+        before_counts.manifest_temp_write == baseline_manifest_temp_writes
+    ), "clean recovery must not durably write the Manifest temp file"
+    assert (
+        before_counts.manifest_replace == baseline_manifest_replaces
+    ), "clean recovery must not atomically promote the Manifest"
+
+    recovery_repeat = recover_production_state(tmp_path)
+    assert (
+        recovery_repeat.manifest_revision_after
+        == recovery_repeat.manifest_revision_before
+    )
+    assert runtime.manifest_bytes() == before_manifest_bytes
+    assert runtime.call_counts == before_counts, (
+        "repeated clean recovery must remain idempotent"
+    )
 
     replay = runtime.run_full_acceptance()
     assert replay == final
-    assert runtime.call_counts == before_counts
+    assert runtime.call_counts == before_counts, (
+        "same-runtime replay must add zero call-count effects"
+    )
+    assert (
+        before_counts.manifest_temp_write == baseline_manifest_temp_writes
+    ), "same-runtime replay must not durably write the Manifest temp file"
+    assert (
+        before_counts.manifest_replace == baseline_manifest_replaces
+    ), "same-runtime replay must not atomically promote the Manifest"
     assert runtime.manifest_bytes() == before_manifest_bytes
 
     fresh = make_base_ai_comic_reopen_runtime(tmp_path)
-    assert fresh.call_counts == BaseAiComicCallCounts()
+    fresh_baseline = fresh.call_counts
+    # Fresh runtime creation observes the test-scoped counter without
+    # mutating it, so the cumulative Manifest counters equal the
+    # accepted baseline and the fresh fake effect fields start at zero.
+    assert fresh_baseline.image_submit == 0
+    assert fresh_baseline.voice_preview == 0
+    assert fresh_baseline.voice_submit == 0
+    assert fresh_baseline.review_analyze == 0
+    assert fresh_baseline.renderer_version == 0
+    assert fresh_baseline.renderer_doctor == 0
+    assert fresh_baseline.renderer_run == 0
+    assert (
+        fresh_baseline.manifest_temp_write == baseline_manifest_temp_writes
+    )
+    assert fresh_baseline.manifest_replace == baseline_manifest_replaces
     fresh_replay = fresh.run_full_acceptance()
     assert fresh_replay == final
-    assert fresh.call_counts == BaseAiComicCallCounts()
+    assert fresh.call_counts == fresh_baseline, (
+        "fresh-runtime replay must add zero call-count effects"
+    )
     assert fresh.manifest_bytes() == before_manifest_bytes
 
     reopened = load_production_project(tmp_path / "project.yaml")
@@ -570,3 +646,60 @@ def test_base_ai_comic_final_state_reopens_and_exact_replay_has_zero_effects(
     assert final_mp4_sha == hashlib.sha256(final.output_path.read_bytes()).hexdigest()
     assert final.mp4_sha256 == final_mp4_sha
     assert final.render_output_sha256 == final_mp4_sha
+
+    # TEST-008 — exact durable reopen of the final RepairOutcomeReceipt from
+    # pointer.path, with file SHA, semantic content hash, repair_id, rerender
+    # state, and rerender MP4 bound to the final accepted/current artifacts.
+    pointer = final.repair_outcome_pointer
+    receipt_bytes = (tmp_path / pointer.path).read_bytes()
+    assert (
+        hashlib.sha256(receipt_bytes).hexdigest() == pointer.file_sha256
+    )
+    assert pointer.content_hash == final.repair_outcome_receipt.content_hash
+    assert pointer.repair_id == final.repair_outcome_repair_id
+    assert verify_artifact_hash(final.repair_outcome_receipt)
+    assert (
+        final.repair_outcome_receipt.rerender_state
+        == reopened.manifest.active_render_state
+    )
+    assert (
+        final.repair_outcome_receipt.rerender_state
+        == final.acceptance_receipt.render_state
+    )
+    assert (
+        final.repair_outcome_receipt.rerender_output_sha256
+        == final.mp4_sha256
+    )
+    assert (
+        final.repair_outcome_receipt.rerender_output_sha256
+        == final.acceptance_receipt.render_output_sha256
+    )
+    assert verify_artifact_hash(final.acceptance_receipt)
+    assert final.acceptance_id == final.acceptance_receipt.acceptance_id
+
+
+def test_base_ai_comic_replay_rejects_missing_or_tampered_repair_outcome(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    runtime = project_factory.make_base_ai_comic_e2e_runtime(tmp_path)
+    _forbid_network_and_secret_access(monkeypatch)
+    final = runtime.run_full_acceptance()
+
+    pointer = final.repair_outcome_pointer
+    receipt_path = tmp_path / pointer.path
+    receipt_bytes = receipt_path.read_bytes()
+
+    # Case 1: missing repair outcome file -> reopen must fail because the
+    # project loader does not verify repair outcome bytes itself.
+    receipt_path.unlink()
+    with pytest.raises(FileNotFoundError):
+        runtime.run_full_acceptance()
+
+    # Case 2: tampered repair outcome file with mismatched SHA -> reopen must
+    # raise the exact reopened SHA binding assertion before model parsing.
+    tampered = bytearray(receipt_bytes)
+    tampered[0] = (tampered[0] + 1) % 256
+    receipt_path.write_bytes(bytes(tampered))
+    with pytest.raises(AssertionError, match="file SHA"):
+        runtime.run_full_acceptance()
