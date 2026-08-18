@@ -46,7 +46,7 @@ from ai_video.production.video import (
     build_video_paid_permit_binding,
 )
 
-_ORIGIN = "https://api.minimax.io"
+_ORIGIN = "https://api.minimaxi.com"
 _SUBMIT_URL = f"{_ORIGIN}/v2/video_generation"
 _QUERY_URL = f"{_ORIGIN}/v2/query/video_generation/{{task_id}}"
 _MODEL_ID = "MiniMax-H3"
@@ -331,8 +331,8 @@ class MiniMaxH3VideoProvider:
             raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "MiniMax H3 resolved request is invalid.")
         return VideoGenerationPreview.create(
             resolved=request,
-            estimated_cost_upper_bound_microunits=320_000,
-            currency="USD",
+            estimated_cost_upper_bound_microunits=2_000_000,
+            currency="CNY",
             destination=_ORIGIN,
             egress_item_ids=("prompt",),
         )

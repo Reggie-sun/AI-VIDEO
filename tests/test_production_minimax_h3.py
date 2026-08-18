@@ -294,9 +294,9 @@ def _real_permit(binding: dict[str, str]) -> _DurablePaidProviderSubmitPermit:
 def _preview(resolved: ResolvedVideoGenerationRequest) -> VideoGenerationPreview:
     return VideoGenerationPreview.create(
         resolved=resolved,
-        estimated_cost_upper_bound_microunits=320_000,
-        currency="USD",
-        destination="https://api.minimax.io",
+        estimated_cost_upper_bound_microunits=2_000_000,
+        currency="CNY",
+        destination="https://api.minimaxi.com",
         egress_item_ids=("prompt",),
     )
 
@@ -497,9 +497,9 @@ def test_preview_seals_destination_currency_and_upper_bound():
     )
     resolved = provider.resolve(_request())
     preview = provider.preview(resolved)
-    assert preview.destination == "https://api.minimax.io"
-    assert preview.currency == "USD"
-    assert preview.estimated_cost_upper_bound_microunits == 320_000
+    assert preview.destination == "https://api.minimaxi.com"
+    assert preview.currency == "CNY"
+    assert preview.estimated_cost_upper_bound_microunits == 2_000_000
     assert preview.egress_item_ids == ("prompt",)
     assert preview.billing_kind is BillingKind.METERED
 
@@ -527,7 +527,7 @@ def test_accepted_submit_emits_exact_request_payload_and_task_id_without_reveali
     assert len(transport.calls) == 1
     sent = transport.calls[0]
     assert sent.method == "POST"
-    assert sent.url == "https://api.minimax.io/v2/video_generation"
+    assert sent.url == "https://api.minimaxi.com/v2/video_generation"
     assert sent.headers == {
         "accept": "application/json",
         "content-type": "application/json",
@@ -695,7 +695,7 @@ def test_httpx_transport_never_follows_submit_redirect():
         calls.append(request)
         return httpx.Response(
             307,
-            headers={"location": "https://api.minimax.io/redirected"},
+            headers={"location": "https://api.minimaxi.com/redirected"},
         )
 
     client = httpx.Client(
@@ -706,7 +706,7 @@ def test_httpx_transport_never_follows_submit_redirect():
     response = transport.request(
         MiniMaxH3TransportRequest(
             method="POST",
-            url="https://api.minimax.io/v2/video_generation",
+            url="https://api.minimaxi.com/v2/video_generation",
             headers={"authorization": f"Bearer {SECRET_TEXT}"},
             body=b"{}",
         )
@@ -964,7 +964,7 @@ def test_status_query_path_contains_exact_task_id_and_bearer(monkeypatch):
     query_call = transport.calls[0]
     assert query_call.method == "GET"
     assert query_call.url == (
-        "https://api.minimax.io/v2/query/video_generation/abc.def-123_xyz"
+        "https://api.minimaxi.com/v2/query/video_generation/abc.def-123_xyz"
     )
     assert query_call.headers["authorization"] == f"Bearer {SECRET_TEXT}"
 
