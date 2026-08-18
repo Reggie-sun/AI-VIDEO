@@ -63,7 +63,7 @@ The exact implementation file set must be revalidated at Task 0. The intended mi
 - Create `workflows/templates/p7_1_flux2_klein_4b_api.json`。
 - Create `workflows/bindings/p7_1_flux2_klein_4b_binding.yaml`。
 
-These files are not created in this planning turn. Their source commit and SHA-256 are fixed only after compatibility review; mutable upstream `main` URLs are evidence sources, not runtime inputs。
+These files are not created in this planning turn. The workflow files must be pinned derivatives of the applicable official templates shipped by `comfyui_workflow_templates`, not newly invented graphs. Their source package/version, source template path and SHA-256 are fixed after compatibility review; mutable upstream `main` URLs are evidence sources, not runtime inputs. Binding files own the approved local filename/parameter substitutions and must not overwrite the installed official templates。
 
 ### Planned tests and fixtures
 
@@ -74,6 +74,7 @@ These files are not created in this planning turn. Their source commit and SHA-2
 - Create `tests/fixtures/p7_1/qwen_workflow_api.json` and `tests/fixtures/p7_1/flux_workflow_api.json` using minimal synthetic nodes, not redistributed model files。
 - Modify `tests/test_comfy_client.py`、`tests/test_workflow_loader.py`、`tests/test_workflow_renderer.py` only for reused boundary regressions。
 - Modify `tests/test_production_state_commit.py`、`tests/test_production_state_recovery.py`、`tests/test_production_project.py` and `tests/production_project_factory.py` for profile/import/replay/recovery evidence。
+- Create `scripts/check_p7_1_comfy_compatibility.py` as a read-only host preflight that inventories all Comfy model categories, performs header-only diffusion detection and compares official-template lineage/bindings without loading model tensors。
 - Create `scripts/smoke_p7_1_local_image.py` only for an explicit live local smoke; it is not a public product CLI。
 - Create `docs/benchmarks/p7-1-hybrid-image-inputs.json` and `docs/benchmarks/p7-1-hybrid-image-results.json` only after benchmark cases/results exist; generated benchmark images remain outside Git unless separately approved as small fixtures。
 
@@ -378,12 +379,15 @@ python -m pytest -p no:cacheprovider \
 **Files:**
 
 - Create the two real profile JSON files and reviewed workflow/binding files listed in File Map
+- Create `scripts/check_p7_1_comfy_compatibility.py`
 - Create `scripts/smoke_p7_1_local_image.py`
 - Create or modify `tests/test_production_comfy_image.py` for real-profile static validation
 
-**Owner / Dependencies:** Requires a new explicit download/install authorization. This milestone cannot be inferred from runtime implementation authorization。
+**Owner / Dependencies:** The six selected model components and the PyTorch `cu130` repair were separately authorized and completed on 2026-08-18. Their dated evidence must be reverified, not treated as implementation acceptance. Any additional download, optional LoRA, dependency change or ComfyUI update still requires new explicit authorization and cannot be inferred from runtime implementation authorization。
 
 **Contract:** Every model component and workflow is immutable, licensed, digest-verified and compatible with exact local ComfyUI/node inventory before GPU submit。
+
+**Dated preflight evidence, not runtime truth:** `/home/reggie/ComfyUI` remained at `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`; the dedicated environment reported `torch/torchvision/torchaudio` as `2.11.0+cu130` / `0.26.0+cu130` / `2.11.0+cu130`; `pip check`, CUDA visibility and a minimal CUDA tensor operation passed. Installed `comfyui_workflow_templates 0.11.43` supplied Qwen template SHA-256 `d561a38c15bd7d08758a5e6773d467142244d5b83fc5d3aecdf6d8df9fe881b6` and distilled FLUX template SHA-256 `e0388a8870495802314d58fa61616ddcdb7064dac5f85a8787c9e08180b8a560`. No service/model inference was run。
 
 **Implementation Notes:**
 
@@ -401,7 +405,20 @@ black-forest-labs/FLUX.2-klein-4B
 
 Do not assume these are still current; pin by immutable revision and record source URLs. Pin each Comfy split component separately. Do not treat a model-repository revision as the file digest。
 
-2. Recheck disk before download:
+2. Reopen the installed official templates as the normative graph sources:
+
+```text
+comfyui_workflow_templates 0.11.43
+  image_qwen_image_edit_2511.json
+  sha256 d561a38c15bd7d08758a5e6773d467142244d5b83fc5d3aecdf6d8df9fe881b6
+
+  image_flux2_klein_image_edit_4b_distilled.json
+  sha256 e0388a8870495802314d58fa61616ddcdb7064dac5f85a8787c9e08180b8a560
+```
+
+Generate the reviewed API-format derivatives through the existing loader/conversion path. The Qwen binding selects `qwen_image_edit_2511_bf16.safetensors` instead of the template's FP8 default; the FLUX binding selects `flux-2-klein-4b.safetensors` instead of its FP8 default. Keep `Enable 4steps LoRA? = false`; the absent optional LoRA must neither block validation nor execute the lazy branch. Require a machine-readable graph diff proving that every other change is deterministic conversion or a declared binding placeholder。
+
+3. Recheck disk before any further authorized download:
 
 ```bash
 df -BG /home/reggie /home/reggie/ComfyUI
@@ -409,18 +426,39 @@ df -BG /home/reggie /home/reggie/ComfyUI
 
 Require `>=200 GiB` free and enforce `160 GiB` total hard cap with lane budgets `90/40/30 GiB` from the spec. Download to a path-resolved staging directory, verify size/SHA-256, then promote. No partial file may be treated as installed。
 
-3. Inspect current ComfyUI `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa` and its node inventory without modifying it. Validate workflow through API-format loader and local `/object_info`/system capability response before submit. If incompatible, stop and request separate ComfyUI update authorization; do not update automatically。
+4. Inspect current ComfyUI `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa` and its node inventory without modifying it. Validate workflow through API-format loader and local `/object_info`/system capability response before submit. If incompatible, stop and request separate ComfyUI update authorization; do not update automatically。
 
-4. VRAM/RAM preflight records GPU identity, driver/CUDA/Torch, free/total VRAM and RAM. FLUX's official ~13 GB statement is only upstream guidance. Qwen BF16/offload on 32 GB is unproven and must pass measured load/inference. OOM fails the profile; no silent FP8/GGUF/LoRA substitution。
+5. Run the read-only all-local-model regression before any live P7.1 submit. It must enumerate ComfyUI's effective `folder_paths` rather than only filenames known to P7.1, record every diffusion/text-encoder/VAE/LoRA filename, and header-detect every local diffusion weight. The 2026-08-18 baseline was eight diffusion models, four text encoders, six VAEs and zero LoRAs; all eight diffusion files detected as their existing Wan 2.2, MiniMax H3, Qwen or FLUX classes. Inventory drift is allowed only when fully reported; a previously recognized model becoming unknown is a blocker。
+
+Planned command shape:
+
+```bash
+/home/reggie/micromamba/envs/comfyui/bin/python \
+  scripts/check_p7_1_comfy_compatibility.py \
+  --comfy-root /home/reggie/ComfyUI \
+  --qwen-official-template image_qwen_image_edit_2511.json \
+  --flux-official-template image_flux2_klein_image_edit_4b_distilled.json \
+  --output /absolute/scratch/p7-1-comfy-compatibility.json
+```
+
+The command is no-network and must not start ComfyUI, allocate CUDA tensors or load model tensor bytes. This static shared-environment regression does not claim live Wan/MiniMax inference and does not expand P7.1 into those product lanes。
+
+6. VRAM/RAM preflight records GPU identity, driver/CUDA/Torch, free/total VRAM and RAM. FLUX's official ~13 GB statement is only upstream guidance. Qwen BF16/offload on 32 GB is unproven and must pass measured load/inference. OOM fails the profile; no silent FP8/GGUF/LoRA substitution。
 
 **RED:** Static profile tests fail until all real source revisions, component digests, workflow/binding hashes and node versions are complete and exact。
 
-**Acceptance:** Both real profiles pass static/offline validation; model files are present only if explicitly authorized; no GPU generation has occurred yet。
+**Acceptance:** Both real profiles pass static/offline validation; official-template lineage and the binding-only graph diff are exact; Qwen's disabled optional LoRA is not required; every currently discoverable local diffusion model remains recognized; global model paths and existing Wan/MiniMax/Legacy workflows are unchanged; model files are present only if explicitly authorized; no GPU generation has occurred yet。
 
 **Verification:**
 
 ```bash
 python -m pytest -p no:cacheprovider tests/test_production_comfy_image.py -q
+/home/reggie/micromamba/envs/comfyui/bin/python \
+  scripts/check_p7_1_comfy_compatibility.py \
+  --comfy-root /home/reggie/ComfyUI \
+  --qwen-official-template image_qwen_image_edit_2511.json \
+  --flux-official-template image_flux2_klein_image_edit_4b_distilled.json \
+  --output /absolute/scratch/p7-1-comfy-compatibility.json
 sha256sum \
   workflows/profiles/p7_1_qwen_image_edit_2511.json \
   workflows/profiles/p7_1_flux2_klein_4b.json \

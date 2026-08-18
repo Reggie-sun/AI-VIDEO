@@ -80,12 +80,66 @@ The following facts were checked on 2026-08-18 and are planning evidence, not ru
 | --- | --- | --- |
 | Qwen | The official [`Qwen/Qwen-Image-Edit-2511` model card](https://huggingface.co/Qwen/Qwen-Image-Edit-2511) identifies Apache 2.0, multi-image inputs, improved character consistency and multi-person consistency. The Hugging Face API reported repository revision `6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9`. | This exact revision is the discovery pin. Implementation must still pin every actual ComfyUI model component and measured SHA-256; repository revision alone is insufficient. |
 | FLUX | The official [`black-forest-labs/FLUX.2-klein-4B` model card](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B) states Apache 2.0, text/image generation and multi-reference editing, and approximately 13 GB VRAM. The Hugging Face API reported revision `e7b7dc27f91deacad38e78976d1f2b499d76a294`. | This exact distilled 4B model identity is required. A `base`, 9B, third-party quantization or API model is not an equivalent substitute. |
-| Qwen + ComfyUI | The official ComfyUI documentation publishes a [Qwen-Image-Edit-2511 native workflow](https://docs.comfy.org/tutorials/image/qwen/qwen-image-edit-2511) and lists its split diffusion model, text encoder, optional LoRA and VAE. | The official workflow is a compatibility reference. P7.1 must vendor a reviewed API-format derivative with exact source revision and digest, not follow mutable `main` at runtime. |
-| FLUX + ComfyUI | The official ComfyUI organization publishes [FLUX.2 Klein workflow templates](https://github.com/Comfy-Org/workflow_templates) and the BFL card states ComfyUI availability. | The compatibility gate must prove a workflow for the exact selected distilled 4B checkpoint. It must not silently substitute the available `base`/FP8 template variant. |
+| Qwen + ComfyUI | The official ComfyUI documentation publishes a [Qwen-Image-Edit-2511 native workflow](https://docs.comfy.org/tutorials/image/qwen/qwen-image-edit-2511) and lists its split diffusion model, text encoder, optional LoRA and VAE. | The official workflow is the normative graph baseline, not merely an example. P7.1 must pin and vendor a reviewed API-format derivative with exact package/source revision and digest, then select the approved local model components through bindings rather than hand-authoring an unrelated graph or following mutable `main` at runtime. |
+| FLUX + ComfyUI | The official ComfyUI organization publishes [FLUX.2 Klein workflow templates](https://github.com/Comfy-Org/workflow_templates) and the BFL card states ComfyUI availability. | The exact distilled 4B official template is the normative graph baseline. Its FP8 widget default is not a requirement to replace an approved BF16 checkpoint; the sealed binding selects the exact local component while preserving reviewed graph semantics. `base`, 9B and API variants remain non-equivalent lanes. |
 | ComfyUI API | Official [ComfyUI developer documentation](https://docs.comfy.org/development/overview) describes local workflows and a local server API; workflows are node graphs that can generate images and save outputs. | Reuse API-format workflow submission and local transport; do not depend on UI automation. |
 | ChatGPT | OpenAI documents [ChatGPT Images 2.0](https://openai.com/index/introducing-chatgpt-images-2-0/) as a ChatGPT product surface. | The repository records `chatgpt_images_2_web` as a human-declared source surface, not as an API model ID or runtime Provider identity. |
 
-Current local inspection found `/home/reggie/ComfyUI` at `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`, with local branch `ahead 9, behind 19`. P7.1 planning does not claim this checkout is compatible. It must not be updated or modified without separate authorization.
+Current local inspection found `/home/reggie/ComfyUI` at `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`, with local branch `ahead 9, behind 19`. It must not be updated or modified without separate authorization.
+
+### 4.1 Dated Local Host Compatibility Snapshot
+
+After separately authorized model downloads and a separately authorized PyTorch build repair, the following was measured on 2026-08-18. This is host/preflight evidence, not P7.1 runtime acceptance or a quality claim:
+
+- the dedicated ComfyUI environment is Python `3.12.13` with `torch 2.11.0+cu130`, `torchvision 0.26.0+cu130`, `torchaudio 2.11.0+cu130`, `comfy-kitchen 0.2.31` and `comfy-aimdo 0.4.13`；
+- `pip check`, CUDA visibility on the RTX 5090 and a minimal CUDA tensor operation passed；
+- installed `comfyui_workflow_templates 0.11.43` contains `image_qwen_image_edit_2511.json` with SHA-256 `d561a38c15bd7d08758a5e6773d467142244d5b83fc5d3aecdf6d8df9fe881b6` and `image_flux2_klein_image_edit_4b_distilled.json` with SHA-256 `e0388a8870495802314d58fa61616ddcdb7064dac5f85a8787c9e08180b8a560`；
+- ComfyUI's actual filename inventory exposes eight diffusion models, four text encoders, six VAEs and zero installed LoRAs；
+- header-only detection identified all eight local diffusion files: four existing Wan 2.2 files as `WAN21_T2V`, two existing MiniMax H3 files as `MiniMaxH3`, Qwen as `QwenImage`, and FLUX as `Flux2`；
+- no ComfyUI server, full model load, image/video inference or P7 durable lifecycle was exercised, so live compatibility remains unproven。
+
+The effective `folder_paths` inventory at that snapshot was:
+
+```text
+diffusion_models:
+  Wan2_2-I2V-A14B-HIGH_fp8_e4m3fn_scaled_KJ.safetensors
+  Wan2_2-I2V-A14B-LOW_fp8_e4m3fn_scaled_KJ.safetensors
+  flux-2-klein-4b.safetensors
+  minimax_h3_fl2va_pruned_int8_convrot.safetensors
+  minimax_h3_ref2va_pruned_int8_convrot.safetensors
+  qwen_image_edit_2511_bf16.safetensors
+  wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors
+  wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors
+text_encoders:
+  qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors
+  qwen_2.5_vl_7b_fp8_scaled.safetensors
+  qwen_3_4b.safetensors
+  umt5-xxl-enc-bf16.safetensors
+vae:
+  Wan2_1_VAE_bf16.safetensors
+  flux2-vae.safetensors
+  minimax_h3_audio_vae_fp32.safetensors
+  minimax_h3_video_vae_fp16.safetensors
+  qwen_image_vae.safetensors
+  wan_2.1_vae.safetensors
+loras: none
+checkpoints: none
+```
+
+This inventory is deliberately dated and must be regenerated rather than copied forward as current truth.
+
+The downloaded P7.1 component evidence is:
+
+| Role | Local filename | SHA-256 |
+| --- | --- | --- |
+| Qwen diffusion | `qwen_image_edit_2511_bf16.safetensors` | `ae42d927b5fac4f278b9a894554c727e619727a63622976f2d95625be4bce08c` |
+| Qwen text encoder | `qwen_2.5_vl_7b_fp8_scaled.safetensors` | `cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4` |
+| Qwen VAE | `qwen_image_vae.safetensors` | `a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f` |
+| FLUX diffusion | `flux-2-klein-4b.safetensors` | `ec3d4e733a771f61c052fb4856c48b336c55eaf2c65487c2a1faeb9bbda7a343` |
+| FLUX text encoder | `qwen_3_4b.safetensors` | `6c671498573ac2f7a5501502ccce8d2b08ea6ca2f661c458e708f36b36edfc5a` |
+| FLUX VAE | `flux2-vae.safetensors` | `d64f3a68e1cc4f9f4e29b6e0da38a0204fe9a49f2d4053f0ec1fa1ca02f9c4b5` |
+
+The Qwen official template defaults `Enable 4steps LoRA?` to `false`, and its model switch uses a lazy branch. Therefore absence of the optional Lightning LoRA is not a compatibility blocker for the non-LoRA profile. Enabling that LoRA later requires its own licensed/digested component declaration, binding change, profile hash and benchmark reset.
 
 ## 5. Design Decision
 
@@ -96,6 +150,14 @@ Three approaches were considered:
 3. **Rejected: ChatGPT browser/API as a Provider.** Browser use has no repository-owned durable submit/outcome protocol, unattended automation is excluded, and no OpenAI Image API authorization exists.
 
 The selected adapter is model-neutral at the transport boundary. Qwen and FLUX differ only through immutable execution profiles, workflows and bindings. The product routing remains explicit and quality-driven; there is no automatic fallback between lanes.
+
+### 5.1 Official Template and Local Binding Rule
+
+- Start from the exact installed official Qwen and distilled FLUX templates recorded in section 4.1; do not design replacement graphs from scratch while an applicable official graph exists。
+- Convert/load the pinned official UI workflow through the existing `load_workflow_template()` path and review the resulting API graph. A vendored derivative must retain official graph lineage, source package/version and source SHA-256。
+- Bind only declared widget/API paths to the sealed local filenames, prompt, seed, dimensions, references and output prefix. For the current host this means Qwen FP8-default filename to approved Qwen BF16 and FLUX FP8-default filename to approved FLUX BF16; it does not mean changing model identity or precision silently at runtime。
+- Any topology change beyond deterministic UI-to-API conversion and explicit binding placeholders requires a reviewed graph diff, a new workflow digest and focused compatibility tests。
+- P7.1 must not modify global ComfyUI model search paths, rename existing model files, overwrite official installed templates, or mutate existing Wan/MiniMax/Legacy workflows。
 
 ## 6. Hybrid Production Profile
 
@@ -258,6 +320,10 @@ Comfy cancellation or queue cleanup is best-effort operational cleanup, never au
 
 - First test the current local ComfyUI commit `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa` read-only。
 - Pin the exact commit and node inventory in each accepted profile。
+- Re-enumerate every current ComfyUI diffusion model, text encoder, VAE and LoRA through `folder_paths`; a hard-coded P7-only directory listing is insufficient。
+- Run header-level detection for every discoverable local diffusion model and require the previously supported Wan/MiniMax families plus Qwen/FLUX to remain recognized. This protects the shared ComfyUI environment but does not claim those pre-existing families passed live inference。
+- Use the pinned official workflow graph as the source and prove that the vendored derivative differs only by reviewed UI-to-API conversion and declared bindings. Official default filenames that select a different precision are binding inputs, not automatic blockers or permission to download/substitute that precision。
+- Keep Qwen Lightning LoRA disabled for the current non-LoRA profile. Its absence must not fail static validation or execute the lazy LoRA branch。
 - If it is incompatible, stop. Updating/rebasing `/home/reggie/ComfyUI` requires separate authorization and a rollback plan; P7.1 implementation may not perform it implicitly。
 - Qwen BF16/offload viability on RTX 5090 32 GB is unproven. No FP8/GGUF/LoRA substitution is permitted without a new profile, source/license verification and benchmark reset。
 
