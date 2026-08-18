@@ -329,6 +329,24 @@ def test_resolved_hash_binds_generation_capability_profile_and_effective_setting
     assert baseline.desired_generation_fingerprint == baseline.resolved_generation_hash
 
 
+def test_resolved_request_round_trip_preserves_prompt_and_hash_rejects_mutation():
+    resolved = _resolved()
+    assert resolved.prompt_text == "A slow cinematic push toward the city."
+    dumped = resolved.model_dump(mode="json")
+    assert dumped["prompt_text"] == "A slow cinematic push toward the city."
+    rehydrated = ResolvedVideoGenerationRequest.model_validate(dumped)
+    assert rehydrated.prompt_text == resolved.prompt_text
+    assert rehydrated.resolved_generation_hash == resolved.resolved_generation_hash
+    assert rehydrated.desired_generation_fingerprint == resolved.desired_generation_fingerprint
+
+    with pytest.raises(ValidationError, match="resolved_generation_hash"):
+        ResolvedVideoGenerationRequest.model_validate({**dumped, "prompt_text": "Different."})
+    with pytest.raises(ValidationError, match="resolved_generation_hash"):
+        ResolvedVideoGenerationRequest.model_validate(
+            {**dumped, "resolved_generation_hash": "0" * 64}
+        )
+
+
 def test_submission_status_and_fetch_identity_do_not_mutate_request_hashes():
     resolved = _resolved()
     preview = _paid_preview(resolved)

@@ -105,14 +105,22 @@ class VideoGenerationService:
                 permit,
             )
         except AiVideoError as exc:
-            if exc.code is ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN:
+            if exc.code in {
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
+            }:
+                outcome = (
+                    PaidProviderSubmitOutcome.KNOWN_NO_EFFECT
+                    if exc.code is ErrorCode.VIDEO_PROVIDER_FAILED
+                    else PaidProviderSubmitOutcome.OUTCOME_UNKNOWN
+                )
                 receipt = PaidProviderSubmitReceipt.create(
                     attempt_id=attempt_id,
                     request_fingerprint=request.resolved_generation_hash,
                     preview_fingerprint=gate.preview.preview_fingerprint,
                     gate_receipt_fingerprint=gate.gate_receipt_fingerprint,
                     reservation_id=paid_state.reservation_id,
-                    outcome=PaidProviderSubmitOutcome.OUTCOME_UNKNOWN,
+                    outcome=outcome,
                     external_effect_id=None,
                     recorded_at=self._committer._paid_provider_clock(),
                 )

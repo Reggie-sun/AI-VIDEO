@@ -308,6 +308,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     execution_kind: VideoExecutionKind
     billing_kind: BillingKind
     mode: VideoGenerationMode
+    prompt_text: str = Field(min_length=1)
     image_bindings: tuple[VideoImageReferenceBinding, ...]
     effective_output: VideoOutputRequirement
     effective_seed: int | None = Field(default=None, strict=True, ge=0)
@@ -316,13 +317,20 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     resolved_generation_hash: str = Field(pattern=_SHA256)
     desired_generation_fingerprint: str = Field(pattern=_SHA256)
 
+    @field_validator("prompt_text")
+    @classmethod
+    def _require_nfc(cls, value: str) -> str:
+        if unicodedata.normalize("NFC", value) != value:
+            raise ValueError("resolved video prompt text must use Unicode NFC normalization")
+        return value
+
     @model_validator(mode="after")
     def _validate_seal(self) -> "ResolvedVideoGenerationRequest":
         data = self.model_dump(
             mode="json",
             exclude={"resolved_generation_hash", "desired_generation_fingerprint"},
         )
-        expected = canonical_sha256({"schema": "ai-video-resolved-request/1", **data})
+        expected = canonical_sha256({"schema": "ai-video-resolved-request/2", **data})
         if self.resolved_generation_hash != expected:
             raise ValueError("resolved_generation_hash does not match resolved request")
         if self.desired_generation_fingerprint != expected:
@@ -410,6 +418,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             "execution_kind": capability.execution_kind,
             "billing_kind": capability.billing_kind,
             "mode": request.mode,
+            "prompt_text": request.prompt_text,
             "image_bindings": request.image_bindings,
             "effective_output": effective_output,
             "effective_seed": effective_seed,
@@ -423,7 +432,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
         )
         fingerprint = canonical_sha256(
             {
-                "schema": "ai-video-resolved-request/1",
+                "schema": "ai-video-resolved-request/2",
                 **candidate.model_dump(
                     mode="json",
                     exclude={"resolved_generation_hash", "desired_generation_fingerprint"},

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from ai_video.errors import AiVideoError
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
     PaidProviderAttemptPhase,
     ProductionManifest,
@@ -162,6 +162,52 @@ def test_recovery_of_unresolved_submit_intent_is_outcome_unknown_and_never_remin
         )
         == "stop"
     )
+
+
+def test_rejected_submit_persists_known_no_effect_and_never_remints(tmp_path: Path):
+    committer, service, provider, resolved, paid_preview = _runtime(
+        tmp_path,
+        scenario=FakeVideoScenario(submit_outcome="rejected"),
+    )
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        service.submit_once(
+            attempt_id=ATTEMPT_ID,
+            paid_preview=paid_preview,
+            reservation_id="video-reservation-1",
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
+    attempt = committer._read_manifest().attempts[-1]
+    assert attempt.status is StateCommitStatus.FAILED
+    assert attempt.paid_provider_state is not None
+    assert attempt.paid_provider_state.phase is PaidProviderAttemptPhase.KNOWN_NO_EFFECT
+    assert service.resume_next_action(attempt_id=ATTEMPT_ID) == "stop"
+    assert provider.call_counts.submit == 1
+
+
+def test_ambiguous_submit_persists_outcome_unknown_and_never_remints(tmp_path: Path):
+    committer, service, provider, resolved, paid_preview = _runtime(
+        tmp_path,
+        scenario=FakeVideoScenario(submit_outcome="outcome_unknown"),
+    )
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        service.submit_once(
+            attempt_id=ATTEMPT_ID,
+            paid_preview=paid_preview,
+            reservation_id="video-reservation-1",
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
+    attempt = committer._read_manifest().attempts[-1]
+    assert attempt.status is StateCommitStatus.OUTCOME_UNKNOWN
+    assert attempt.paid_provider_state is not None
+    assert attempt.paid_provider_state.phase is PaidProviderAttemptPhase.OUTCOME_UNKNOWN
+    assert service.resume_next_action(attempt_id=ATTEMPT_ID) == "stop"
+    assert provider.call_counts.submit == 1
 
 
 def test_restart_polls_durable_task_and_fetch_failure_never_resubmits(
