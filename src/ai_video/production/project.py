@@ -468,6 +468,21 @@ def _verify_voice_candidate_history(
                 attempt.candidate_registry.file_sha256,
             ),
         ]
+        if (attempt.base_dependency_graph is None) != (
+            attempt.candidate_dependency_graph is None
+        ):
+            raise ValueError("voice attempt dependency graph pointers are incomplete")
+        if attempt.candidate_dependency_graph is not None:
+            _load_active_dependency_graph(
+                bundle.root,
+                attempt.candidate_dependency_graph,
+            )
+            pairs.append(
+                (
+                    attempt.candidate_dependency_graph.path.as_posix(),
+                    attempt.candidate_dependency_graph.file_sha256,
+                )
+            )
         for record in suffix:
             if record.asset_id in claimed:
                 raise ValueError(

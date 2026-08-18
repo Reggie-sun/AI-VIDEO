@@ -516,6 +516,39 @@ def _activate_fake_voice(root: Path, *, include_caption: bool = True):
     return project_path, request, committed, audio_ids, caption_ids
 
 
+def _activate_manifest_25_graph_voice(root: Path):
+    project_path = write_production_project(root)
+    make_manifest_23_project(root)
+    _write_manifest(
+        root,
+        _manifest(root).model_copy(update={"schema_version": "2.5"}),
+    )
+    request = make_voice_request(root, attempt_id="reader-voice-graph-25")
+    preview, authorization = make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(root)
+    writer.begin_voice_generation(
+        request,
+        preview,
+        authorization,
+        dependency_transition_preparer_available=True,
+    )
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = make_voice_activation_request(
+        root,
+        request,
+        authorization,
+        expected_manifest_revision=_manifest(root).manifest_revision,
+        include_caption=True,
+    )
+    activation, _ = attach_p5_dependency_transition(root, activation)
+    committed = writer.activate_voice_assets(
+        activation,
+        audio_asset_ids=audio_ids,
+        caption_asset_ids=(f"caption-{request.attempt_id}",),
+    )
+    return project_path, request, committed
+
+
 def _append_fake_voice(root: Path, *, attempt_id: str, include_caption: bool = True):
     request = make_voice_request(root, attempt_id=attempt_id)
     preview, authorization = make_voice_preview_and_authorization(request)
@@ -1205,6 +1238,56 @@ def test_reader_reopens_exact_generated_voice_graph_without_writes_or_network(
     )
     assert attempt.voice_phase == "activate"
     assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_reopens_manifest_25_voice_candidate_dependency_graph(tmp_path):
+    project_path, request, committed = _activate_manifest_25_graph_voice(tmp_path)
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(project_path)
+
+    attempt = next(
+        item for item in loaded.manifest.attempts if item.attempt_id == request.attempt_id
+    )
+    assert attempt.candidate_dependency_graph == committed.active_dependency_graph
+    assert loaded.dependency_graph is not None
+    assert (
+        loaded.dependency_graph.revision_id
+        == attempt.candidate_dependency_graph.revision_id
+    )
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_rejects_tampered_manifest_25_voice_candidate_graph_pointer(tmp_path):
+    project_path, request, committed = _activate_manifest_25_graph_voice(tmp_path)
+    attempt = next(
+        item for item in committed.attempts if item.attempt_id == request.attempt_id
+    )
+    assert attempt.candidate_dependency_graph is not None
+    forged_attempt = attempt.model_copy(
+        update={
+            "candidate_dependency_graph": attempt.candidate_dependency_graph.model_copy(
+                update={"file_sha256": "f" * 64}
+            )
+        }
+    )
+    _write_manifest(
+        tmp_path,
+        committed.model_copy(
+            update={
+                "attempts": tuple(
+                    forged_attempt if item.attempt_id == request.attempt_id else item
+                    for item in committed.attempts
+                )
+            }
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(project_path)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert exc_info.value.user_message == "Could not verify active dependency graph."
 
 
 @pytest.fixture
