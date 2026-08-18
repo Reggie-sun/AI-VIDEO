@@ -164,6 +164,8 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - Production/source category 使用 task-delta Architecture Gate（`--base-ref`）；version-controlled baseline 的 repository-wide health 只由 `make harness-repository` 单独报告，不得让历史 debt 阻断 unrelated task receipt。
 - 未被 policy 映射的 task path必须 fail safe 到 full pytest suite与task-delta Architecture Gate；`make harness-audit` 必须拒绝 owned source/test/workflow 的 mapping drift。
 - Harness check subprocess 使用 argv + `shell=False`、explicit timeout、sanitized credential/proxy/tool environment；pytest Python process 由 `scripts/harness_pytest_guard.py` 阻止 non-loopback address-bearing socket/DNS API。该 guard 不是 subprocess/OS network namespace；policy不得把可能联网的 child executable列为默认 check。Harness 不调度 Agent、不修改产品 state、不执行 live Provider smoke，也不替代代码、测试或 runtime evidence。
+- [`.github/workflows/mandatory-gate.yml`](/home/reggie/vscode_folder/AI-VIDEO/.github/workflows/mandatory-gate.yml) 在每个 targeting `main` 的 pull request 上以 exact PR base/head SHA 运行 `make harness-audit` 与现有 `make harness-verify-range`；required check context MUST 稳定为 `mandatory-gate / verify`。CI 必须从 GitHub runner 生成自己的 receipt、JUnit 与 logs artifact，MUST NOT 信任开发者提交的本地 receipt，也不得读取 Provider secret 或运行 live Provider、ComfyUI、付费 smoke。
+- Workflow 存在或 workflow-only push 不等于 server enforcement。GitHub `main` ruleset 必须 active，要求 pull request、branch up to date 与 `mandatory-gate / verify`，并阻止 force push/deletion；普通 actor 不得 bypass。服务端 gate 完成状态必须通过 GitHub API 读取 workflow run/check、ruleset enforcement 和 branch protection/ruleset truth 来证明。
 
 ## Checks By Change Type
 

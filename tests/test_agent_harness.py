@@ -10,6 +10,7 @@ import time
 from pathlib import Path
 
 import pytest
+import yaml
 
 from scripts import agent_harness
 from scripts import harness_pytest_guard
@@ -89,6 +90,53 @@ def test_tracked_harness_runs_contract_is_not_ignored() -> None:
     assert report["ignored_paths"] == []
     assert report["categories"] == ["harness_control"]
     assert "harness_tests" in report["check_ids"]
+
+
+def test_github_workflow_routes_to_harness_control_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths(
+        [".github/workflows/mandatory-gate.yml"], policy
+    )
+
+    assert report["categories"] == ["harness_control"]
+    assert report["fallback_paths"] == []
+    assert report["check_ids"] == ["scope_diff_check", "harness_tests"]
+
+
+def test_mandatory_gate_workflow_preserves_server_check_contract() -> None:
+    workflow_path = ROOT / ".github/workflows/mandatory-gate.yml"
+    workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+
+    assert workflow["name"] == "mandatory-gate"
+    assert workflow["on"] == {"pull_request": {"branches": ["main"]}}
+    assert workflow["permissions"] == {"contents": "read"}
+    verify_job = workflow["jobs"]["verify"]
+    assert verify_job["name"] == "verify"
+    steps = {step["name"]: step for step in verify_job["steps"]}
+    checkout = steps["Check out exact PR head"]
+    assert checkout["uses"] == (
+        "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"
+    )
+    assert checkout["with"]["ref"] == "${{ env.HEAD_SHA }}"
+    assert checkout["with"]["fetch-depth"] == 0
+    assert checkout["with"]["persist-credentials"] is False
+    assert steps["Set up Python"]["uses"] == (
+        "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97"
+    )
+    assert "make harness-audit" in steps["Audit Harness policy"]["run"]
+    range_command = steps["Verify exact PR range"]["run"]
+    assert 'BASE_REF="${BASE_SHA}"' in range_command
+    assert 'HEAD_REF="${HEAD_SHA}"' in range_command
+    assert 'RUN_ID="${HARNESS_RUN_ID}"' in range_command
+    upload = steps["Upload Harness receipt, JUnit, and logs"]
+    assert upload["if"] == "always()"
+    assert upload["uses"] == (
+        "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
+    )
+    assert ".agent/harness/runs/${{ env.HARNESS_RUN_ID }}/" in upload["with"][
+        "path"
+    ]
 
 
 def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
@@ -172,19 +220,21 @@ def test_video_recovery_change_routes_to_video_provider_suite() -> None:
     assert "task_architecture_gate" in report["check_ids"]
 
 
-def test_minimax_adapter_routes_to_video_provider_suite() -> None:
+def test_minimax_adapters_route_to_video_provider_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
     for path in (
         "src/ai_video/production/minimax_h3.py",
+        "src/ai_video/production/minimax_hailuo.py",
         "tests/test_production_minimax_h3.py",
+        "tests/test_production_minimax_hailuo.py",
     ):
         report = agent_harness.inspect_paths([path], policy)
         assert "production_video_provider" in report["categories"]
         assert "production_video_provider_tests" in report["check_ids"]
-    assert "tests/test_production_minimax_h3.py" in policy["checks"][
-        "production_video_provider_tests"
-    ]["argv"]
+    provider_argv = policy["checks"]["production_video_provider_tests"]["argv"]
+    assert "tests/test_production_minimax_h3.py" in provider_argv
+    assert "tests/test_production_minimax_hailuo.py" in provider_argv
 
 
 def test_production_test_helpers_route_to_their_contract_owners() -> None:

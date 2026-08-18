@@ -92,6 +92,10 @@ python scripts/agent_harness.py inspect \
 
 Harness 按 changed-path category 合并 required checks；shared Production owners 路由到完整 Production suite + Legacy CLI/config isolation，任何未映射路径 fail safe 到完整 pytest suite与task-delta Architecture Gate。Check subprocess 使用 argv + `shell=False` 和 timeout；credential/proxy/tool-injection env 不继承，pytest Python process拒绝 non-loopback address-bearing socket/DNS API。这个 guard不隔离 pytest 启动的 subprocess，policy因此不得把可能联网的 child executable列为默认 check。Repository historical Architecture Gate baseline是单独 health signal，不污染 task receipt。P6 Review/Repair是产品 runtime QA surface，与这个开发 Harness不同。
 
+`.github/workflows/mandatory-gate.yml` 定义 targeting `main` 的 pull request gate，稳定 check context 为 `mandatory-gate / verify`。它以 `permissions: contents: read` checkout exact PR head、保留 full history 且不持久化 credential，然后用 GitHub event 提供的 exact base/head SHA 运行 `make harness-audit` 与 `make harness-verify-range`。Receipt、每个 check 的 stdout/stderr、pytest JUnit 和 workflow logs 都由 GitHub runner 本轮生成并上传；CI 不读取 Provider secret，也不运行 live Provider、ComfyUI 或付费 smoke，开发者提交的本地 receipt不构成 CI proof。
+
+Workflow 文件本身或 workflow-only push 不是 server enforcement。真正保护 `main` 还要求 active GitHub ruleset：必须通过 pull request、required status `mandatory-gate / verify`、branch up to date、禁止 force push 与 deletion，且没有普通 bypass。远端完成状态应通过 GitHub API 同时验证 successful workflow run/check、ruleset enforcement 以及 `main` protection/ruleset truth。
+
 ## Production Project Core Python API
 
 P2 exposes a Python loading API for an explicitly materialized v2 project:
