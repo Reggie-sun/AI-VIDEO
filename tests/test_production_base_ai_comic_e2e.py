@@ -329,6 +329,24 @@ def test_base_ai_comic_materializes_and_renders_from_current_active_assets(
     assert voice.audio_asset_ids
     assert voice.caption_asset_ids
     assert voice.caption_track_ids
+    assert set(voice.audio_asset_ids).issubset(
+        {span.asset_id for span in initial.timeline.audio_spans}
+    )
+    assert set(voice.caption_asset_ids).issubset(
+        {cue.caption_asset_id for cue in initial.timeline.caption_cues}
+    )
+    generated_audio_track_ids = {
+        span.track_id
+        for span in initial.timeline.audio_spans
+        if span.asset_id in voice.audio_asset_ids
+    }
+    assert generated_audio_track_ids
+    assert initial.probe.staged_audio_binding_ids == (
+        f"p4-mix-{initial.timeline.composition_fingerprint}",
+    )
+    assert generated_audio_track_ids.issubset(
+        set(initial.probe.staged_audio_track_ids)
+    )
     generated_audio = registry[voice.audio_asset_ids[0]]
     generated_caption = registry[voice.caption_asset_ids[0]]
     assert generated_audio.audio_metadata is not None
@@ -356,6 +374,7 @@ def test_base_ai_comic_materializes_and_renders_from_current_active_assets(
     assert initial.render_state == loaded.manifest.active_render_state
     assert initial.probe.duration_milliseconds > 0
     assert initial.probe.video_stream_count == 1
+    assert initial.probe.audio_stream_count == 1
     assert initial.sha256 == hashlib.sha256(initial.path.read_bytes()).hexdigest()
     assert runtime.call_counts == BaseAiComicCallCounts(
         image_submit=2,

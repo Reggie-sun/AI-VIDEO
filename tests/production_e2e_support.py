@@ -22,7 +22,10 @@ from ai_video.production.audio import (
     VoiceProvenanceReceipt,
     build_voice_generation_preview,
 )
-from ai_video.production.captions import normalize_character_alignment
+from ai_video.production.captions import (
+    CaptionImportRequest,
+    normalize_character_alignment,
+)
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.hyperframes import (
     RendererCommandResult,
@@ -37,6 +40,9 @@ from ai_video.production.models import (
     ToolIdentity,
 )
 from ai_video.production.project import load_production_project
+from production_voice_e2e_support import (
+    make_deterministic_voice_candidate_preparer,
+)
 
 
 _VOICE_FIXTURE = (
@@ -63,6 +69,9 @@ class BaseAiComicVoiceResult:
 class BaseAiComicRenderProbe:
     duration_milliseconds: int
     video_stream_count: int
+    audio_stream_count: int
+    staged_audio_binding_ids: tuple[str, ...]
+    staged_audio_track_ids: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -434,10 +443,7 @@ def _required_system_executable(name: str) -> Path:
 def _base_ai_comic_voice_candidate_preparer(
     root: Path, toolchain: AudioProbeToolchain
 ):
-    from ai_video.production.captions import CaptionImportRequest
-    from test_production_voice_captions_e2e import _voice_candidate_preparer
-
-    base_prepare = _voice_candidate_preparer(root, toolchain)
+    base_prepare = make_deterministic_voice_candidate_preparer(root, toolchain)
 
     def prepare(request, preview, authorization, result, paths):
         candidate = base_prepare(
@@ -607,6 +613,7 @@ class BaseAiComicE2ERuntime:
         from ai_video.production.models import (
             RendererKind,
             RendererSelectionReceipt,
+            RendererSourceReceipt,
             RenderReceipt,
         )
         from ai_video.production.state_commit import (
@@ -699,6 +706,9 @@ class BaseAiComicE2ERuntime:
         receipt = RenderReceipt.model_validate_json(
             (self.root / state.render_receipt.path).read_bytes()
         )
+        source_receipt = RendererSourceReceipt.model_validate_json(
+            (self.root / state.source_receipt.path).read_bytes()
+        )
         output = self.root / state.output.path
         with output.open("rb") as source:
             probe_payload = probe_clip_fd_with_executable(
@@ -718,6 +728,18 @@ class BaseAiComicE2ERuntime:
                 video_stream_count=sum(
                     item.get("codec_type") == "video"
                     for item in probe_payload["streams"]
+                ),
+                audio_stream_count=sum(
+                    item.get("codec_type") == "audio"
+                    for item in probe_payload["streams"]
+                ),
+                staged_audio_binding_ids=tuple(
+                    item.asset_id for item in source_receipt.audio_bindings
+                ),
+                staged_audio_track_ids=tuple(
+                    track_id
+                    for item in source_receipt.audio_bindings
+                    for track_id in item.resolved_track_ids
                 ),
             ),
         )
