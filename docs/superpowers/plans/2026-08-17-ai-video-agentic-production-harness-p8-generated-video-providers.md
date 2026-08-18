@@ -2,6 +2,8 @@
 
 > Implementation remains under the repository's Native Codex lifecycle. 用户已授权在 local `main` 从 accepted Paid Provider Gate base 执行 P8 offline/default-no-network implementation；本授权不包含 live calls、真实付费提交、push 或 release。
 
+**Status:** Offline P8 implementation accepted on local `main` on 2026-08-19。Provider core、Paid Gate、Fake、H3/Hailuo/Seedance offline adapters、durable recovery与candidate activation已进入local `main`；最终activation/recovery checkpoint为`a089eac`。Hailuo有三条live-success MP4，H3 live因余额不足`HTTP 402 / code 1008`未成功，Seedance未授权live。独立MP4 composition compatibility已由`1362687`验收。
+
 **Goal:** 建立 provider-neutral、crash-resumable、cost-aware 的 Generated Video capability，以 deterministic fake 完成 default acceptance，并以 MiniMax Hailuo V1 证明真实 Cloud adapter不污染 Production domain。
 
 **Architecture:** `video.py`定义 immutable request/capability/task/provenance与 Provider Protocol；`video_generation.py`只做 stepwise orchestration；`ProductionStateCommitter`继续独占 durable write/activation/recovery。MiniMax与 Fake都是明确 adapter，P5只消费 resolved-generation desired evidence与 artifact applied evidence，Registry只保存 immutable generated-video provenance。
@@ -24,7 +26,7 @@
 - `outcome_unknown` never auto-resubmits or remints a permit。
 - Secret、Authorization header、cookie、account ID、signed URL与 raw Provider response不得持久化或出现在 logs/fixtures。
 - Legacy CLI/config/Manifest v1/flat runs/default-local ComfyUI保持不变。
-- P8不修改 Composition/ResolvedTimeline/HyperFrames；generated MP4 consumption需要独立 plan。
+- P8 provider core不修改Composition/ResolvedTimeline/HyperFrames；独立generated-MP4 compatibility plan已由`1362687`完成验收，且不改变provider lifecycle ownership。
 - Default `pytest`必须 zero external network、zero real MiniMax submit、zero charge。
 
 ---
@@ -469,7 +471,7 @@ python -m pytest tests/test_production_generated_video_e2e.py \
   tests/test_production_project.py tests/test_production_registry.py -q
 ```
 
-**Acceptance criteria:** user target flow is proven through active registered asset and Production reference；test explicitly states P3 MP4 rendering remains deferred；all default evidence deterministic/offline。
+**Acceptance criteria:** user target flow is proven through active registered asset and Production reference；provider lifecycle不假称自动render activation；独立`1362687` slice已证明带exact metadata的H.264 MP4可进入既有P3/P4 renderer；all default provider evidence deterministic/offline。
 
 ---
 
@@ -512,7 +514,7 @@ The first command must skip by default. The second must perform zero external ca
 
 ### Task 9: Full P8 Gate, Independent Review, Documentation and Rollback Proof
 
-**Dependencies:** Tasks 1-8 implementation complete；Task 8 live call remains optional/separately authorized。
+**Dependencies:** Tasks 1-7 implementation complete；Task 8 live call remains optional/separately authorized，且不是offline P8 closure blocker。
 
 **Files:**
 
@@ -523,28 +525,24 @@ The first command must skip by default. The second must perform zero external ca
 - Modify: `docs/v0.2-agentic-production-roadmap.md`
 - Modify: this plan with actual verification evidence only if repository convention requires status recording
 
-**Change:** Document only verified runtime behavior：provider-neutral explicit lifecycle、exact Task-0-selected P8 Manifest/Registry versions、single committer、fake default、Hailuo V1 thin explicit adapter、no live default、no CLI、no renderer MP4 support、P5 semantic/applied evidence、resume/no-blind-resubmit、rollback/read compatibility。Do not claim live MiniMax unless exact command/result exists。
+**Change:** Document only verified runtime behavior：provider-neutral explicit lifecycle、exact Task-0-selected P8 Manifest/Registry versions、single committer、fake default、H3/Hailuo/Seedance thin explicit adapters、no live default、no CLI、P5 semantic/applied evidence、resume/no-blind-resubmit、rollback/read compatibility。明确Hailuo三条live success、H3余额失败、Seedance offline-only，并把独立`1362687` MP4 composition acceptance与provider lifecycle分开。不得用既有证据授权新live调用。
 
 **Focused verification:**
 
 ```bash
 python -m pytest \
+  tests/test_production_paid_provider.py \
+  tests/test_production_paid_provider_state.py \
+  tests/test_production_paid_provider_e2e.py \
   tests/test_production_video.py \
   tests/test_production_video_fake.py \
-  tests/test_production_minimax_hailuo.py \
   tests/test_production_video_state_recovery.py \
   tests/test_production_generated_video_e2e.py \
-  tests/test_production_models.py \
-  tests/test_production_validation.py \
-  tests/test_production_registry.py \
-  tests/test_production_project.py \
-  tests/test_production_dependency.py \
-  tests/test_production_selective_rebuild.py \
+  tests/test_production_minimax_h3.py \
+  tests/test_production_minimax_hailuo.py \
+  tests/test_production_seedance.py \
   tests/test_production_state_commit.py \
-  tests/test_production_state_recovery.py \
-  tests/test_production_review.py \
-  tests/test_production_repair.py \
-  tests/test_config.py tests/test_cli.py -q
+  tests/test_production_state_recovery.py -q
 ```
 
 Then run:
@@ -570,7 +568,9 @@ git diff --name-only <P8_IMPLEMENTATION_BASE>...HEAD
 9. Can secret/raw response/signed URL enter state/log/fixture/error?
 10. Does default full pytest prove zero network/charge?
 
-**Acceptance criteria:** reviewer verdict accept；all blocking issues resolved；focused/full tests actually pass；diff contains only P8 and exact versioned integration；Task 8 default skipped；no P3 renderer claim；docs match Git/runtime truth。
+**Acceptance criteria:** reviewer verdict accept；all blocking issues resolved；focused/full tests actually pass；diff contains only P8 closure truth；Task 8 remains optional and default skipped；provider lifecycle与独立MP4 renderer compatibility claim不混淆；docs match Git/runtime truth。
+
+**Closure evidence:** `a089eac feat: activate generated video candidates`通过fresh staged receipt `.agent/harness/runs/p8-video-activation-20260819-v6/receipt.json`与fresh commit-range receipt `.agent/harness/runs/p8-video-activation-20260819-range-v1/receipt.json`。两份receipt均self-verified；完整`production_video_provider_tests`为`742 passed`，production contracts为`2036 passed, 3 skipped`，state为`933 passed`，dependency为`1045 passed`，Architecture Gate PASS。Task 8仍是optional/separately authorized，本次closure没有新live/paid调用。
 
 ---
 
@@ -605,9 +605,9 @@ Rollback must not：schema downgrade、delete unknown remote tasks、release uns
 - MP4 is locally measured、hashed、registered and provenance-bound before activation；
 - P8 Registry append-only and P8 Manifest sole lifecycle ownership hold；
 - P5 desired uses the resolved generation fingerprint and applied uses exact artifact evidence；
-- Hailuo V1 adapter matches current official docs and uses injected HTTP transport；
+- H3/Hailuo/Seedance adapters通过offline acceptance并使用injected transport；只有Hailuo具有live-success evidence；
 - API key alone cannot run live test；default full pytest zero network/charge；
 - Legacy/P1-P7 contracts pass；
-- generated-video rendering remains honestly deferred to a separate plan；
+- generated-video rendering由独立`1362687` compatibility plan验收，不并入Provider lifecycle或自动activation；
 - code/tests/docs are independently reviewed and committed at stable checkpoints；
 - completion does not imply push、release、live operation或 authorization for another Provider。

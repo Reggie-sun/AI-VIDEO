@@ -1,14 +1,14 @@
 # AI-VIDEO P8 Generated Video Providers Specification
 
-Status: Accepted offline-first P8 slice contract. 用户已授权从 accepted Paid Provider Gate base 开始实施；本授权不包含 MiniMax live call、真实付费提交、push 或 release。
+Status: Offline implementation accepted on local `main`. Provider core、Paid Provider Gate、Fake、MiniMax H3/Hailuo 与 Seedance offline adapters均已完成 executable acceptance；本状态不授权新的 live call、真实付费提交、push 或 release。
 
-Implementation snapshot: 2026-08-18。P6、P7 与 Base AI Comic E2E 已在 local `main` accepted；standalone Paid Provider Gate 已于 `cc82a49` 完成 Manifest `2.6` implementation、independent review 与 executable acceptance。Concurrent P7.1 fixture hardening 已由独立 checkpoint `3890295` 收口；P8 的 exact execution base 为 `3890295`，并固定使用 `P8_MANIFEST_SCHEMA = "2.7"`、`P8_REGISTRY_SCHEMA = "2.2"`。P8不改写该 P7.1 ownership。
+Implementation snapshot: 2026-08-19。P6、P7 与 Base AI Comic E2E 已在 local `main` accepted；standalone Paid Provider Gate 已于 `cc82a49` 完成 Manifest `2.6` implementation、independent review 与 executable acceptance。P8 的 exact execution base为`3890295`，并固定使用`P8_MANIFEST_SCHEMA = "2.7"`、`P8_REGISTRY_SCHEMA = "2.2"`；最终candidate activation/recovery closure由`a089eac`提交，fresh staged/range receipts为`.agent/harness/runs/p8-video-activation-20260819-v6/receipt.json`与`.agent/harness/runs/p8-video-activation-20260819-range-v1/receipt.json`。Hailuo已有三条真实 succeeded/fetched MP4 proof；H3 live到达真实API但因余额不足返回`HTTP 402 / code 1008`，因此只有offline acceptance；Seedance只完成offline/fake-transport acceptance且未授权live。独立 generated-MP4 compatibility slice已由`1362687`验收，不改变P8 provider lifecycle ownership。
 
 ## 1. Goal
 
 P8 建立最小但真实的 provider-neutral Generated Video capability：Production domain 可以为一个显式 Shot visual requirement 构造 durable request，解析并验证显式选择的 Provider，持久化外部 task lifecycle，取得并验证视频，注册 immutable Asset，并把 exact provenance 与 P5 lifecycle 绑定，而不让 Production Pipeline、Shot、Asset Registry 或 dependency resolver 依赖 MiniMax-specific API。
 
-MiniMax Hailuo 是第一个真实 Cloud Video Provider adapter。它用于证明 abstraction，而不是成为 core domain、默认 provider、fallback 或 creative planner。
+MiniMax Hailuo 是第一个取得真实成功证据的 Cloud Video Provider adapter；H3与Seedance也已作为显式、可删除的offline adapters验证同一 abstraction。任何 concrete adapter都不是 core domain、默认 provider、fallback 或 creative planner。
 
 目标链路：
 
@@ -44,11 +44,11 @@ Shot / explicit visual requirement
 - `ffmpeg_tools.probe_clip()` 与 P3 held-file-descriptor media verification 可复用；P8 不引入第二套视频 parser。
 - Legacy CLI 仍只有 `validate | run | resume`。当前没有 v2 CLI，P8 不新增 CLI。
 
-### 2.2 Current composition conflict
+### 2.2 Composition boundary and accepted compatibility slice
 
-`CompositionSpec` / `ResolvedTimeline` / HyperFrames 当前只接受 raster `STATIC_IMAGE` visual span；`ResolvedVisualSpan.asset_mime_type` 只允许 PNG/JPEG/WebP。P8 provider architecture 可以完成生成、注册、dependency activation 与 Production reference，但不能假称现有 renderer 已能消费 MP4。
+P8 provider core本身不修改`CompositionSpec`、`ResolvedTimeline`或HyperFrames，也不把fetched candidate自动解释为render activation。独立 compatibility slice已于`1362687 feat: compose generated MP4 visual spans`完成：带exact `VideoAssetMetadata`的本地H.264 MP4可作为`GENERATED_VIDEO` / `EXISTING_VIDEO` visual span进入既有`CompositionSpec -> ResolvedTimeline -> HyperFrames`，并继续由P4独占audio/caption mix与mux。
 
-本 slice 的 mandatory E2E 因此止于：active Project/Registry/graph exact reference 已验证，generated video asset 可供后续 composition adapter 消费。把 MP4 frame-accurately 纳入 `ResolvedTimeline`/HyperFrames 需要独立的 P8 composition compatibility plan；不得藏在 MiniMax adapter 中，也不得建立第二 timeline/renderer。
+Provider lifecycle mandatory E2E仍止于active Project/Registry/graph exact reference；consumer compatibility由独立plan与receipt验收。两者没有合并writer、timeline或renderer ownership，也不意味着任意fetched candidate会自动注册、激活或进入render。
 
 ### 2.3 Accepted P7/Base/Paid Gate
 
@@ -356,7 +356,7 @@ P8不把 task、poll或 Provider error写入 immutable graph。P5 graph schema�
 
 ### 13.1 Current official compatibility snapshot
 
-截至 2026-08-17，MiniMax官方把 Hailuo 2.3/2.3-Fast/02列为 Legacy Models；当前 flagship H3使用独立 V2 API。用户本轮明确选择 Hailuo作为第一真实 Cloud Provider，因此 `MiniMaxHailuoProvider`是明确的 V1 adapter；future H3应作为新的 adapter/dialect实现相同 core contract，不能把 V1 `file_id`写进 core。
+截至 2026-08-17，MiniMax官方把 Hailuo 2.3/2.3-Fast/02列为 Legacy Models；flagship H3使用独立 V2 API。`MiniMaxHailuoProvider`是明确的 V1 adapter，已实现的H3 V2 adapter则以独立dialect复用同一core contract；V1 `file_id`没有进入core。两者均已offline accepted，但只有Hailuo有live-success evidence。
 
 Live H3 V2 与 live Hailuo V1 使用 distinct credential variable：H3 V2 pay-as-you-go adapter 的 `PaidProviderCallPreview.secret_reference.reference_id` 必须是 `MINIMAX_H3_API_KEY`（normal pay-as-you-go key），而 Hailuo V1 Token Plan 仍使用 `MINIMAX_API_KEY`（`sk-cp…` Token Plan credential）。两个变量各自独立；H3 adapter 不 fallback 到 `MINIMAX_API_KEY`，Hailuo adapter 也不读取 `MINIMAX_H3_API_KEY`。Live wiring 必须分别为两个 provider 注入对应 secret，缺一即 skip live smoke。
 
@@ -452,13 +452,13 @@ P8 includes：
 
 P8 non-goals：
 
-- Seedance、Kling、Veo、H3或完整 ComfyUI provider implementation；
+- 当前已验收H3/Hailuo/Seedance之外的Kling、Veo或完整ComfyUI provider implementation；
 - provider marketplace、automatic routing、cheapest/best model selection；
 - general billing/accounting、quota scheduler、multi-region/distributed queue；
 - Take marketplace或 prompt engineering framework；
 - new public CLI/v2 server/webhook callback surface；
 - renderer/timeline redesign或第二 renderer；
-- generated MP4的 frame-accurate HyperFrames consumption；
+- 在P8 provider core内实现generated MP4 composition；该能力由独立`1362687` compatibility slice提供；
 - P1-P7 unrelated refactor；
 - silent remote fallback或 real API call in default CI。
 
@@ -522,7 +522,7 @@ Required failure E2E：
 ## 19. Quality Bar Self-Check
 
 - 删除 `minimax_hailuo.py` 后，core request/capability/fake/lifecycle/Registry/P5 contract仍完整。
-- 新增 Seedance/Kling/ComfyUI主要是 adapter + typed profile + capability declaration + contract tests。
+- 已验收的H3与Seedance证明新增Provider主要是adapter + typed profile + capability declaration + contract tests，不需要污染core lifecycle。
 - worker crash后已有 task ID只继续 poll；无 task ID且无官方 reconcile时 fail closed。
 - polling/fetch失败永不回到 submit。
 - same Shot重跑由 generation ID、request input/resolved generation hash、Manifest attempt与 P5 applied evidence决定 reuse/recover/new generation。
@@ -532,7 +532,7 @@ Required failure E2E：
 
 - Hailuo V1已是 Legacy API，官方可能下线或改变 model availability；implementation与 live smoke前必须重新核对 official docs。
 - V1缺少 idempotency/reconcile/cancel，submit-after-accept-before-task-persist gap只能 fail closed，不能完全消除。
-- 当前 Base AI Comic/P7尚未 accepted；P8 code不可从未合并 sibling worktree猜 schema。
-- P3 renderer不消费 MP4；P8 provider E2E不等于 final rendered episode支持 generated video。
+- Base AI Comic/P7已accepted；未来adapter仍不得从未合并或并发lane猜schema。
+- 已验收的独立composition slice只支持带exact metadata的本地H.264 MP4；P8 provider E2E本身仍不等于candidate已注册、激活或进入final render。
 - provider pricing、quota、rate limits会变化；只接受 execution-time pricing snapshot，不写死账户权益。
 - prompt/source media可能有隐私、license与内容政策风险；egress/license authorization必须独立存在。

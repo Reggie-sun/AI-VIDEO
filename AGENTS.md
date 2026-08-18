@@ -4,7 +4,7 @@
 
 ## Purpose
 
-当前仓库有边界不同的已实现产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2-P7 提供的 read-only Production Project、explicit P2A State Commit/Recovery、deterministic Composition/HyperFrames、Voice/Captions、immutable Dependency Graph/selective rebuild、Codex Review/Repair 和 local-only image asset generation Python APIs。P7 lineage 与 P3-P7 combined Base AI Comic E2E 已合入 local `main`。P7.1 的 offline/runtime-contract 部分增加了 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；2026-08-18 fresh authorized rerun 已通过 Qwen 与 FLUX M7 technical live-local acceptance，M8 仍未验收。P8-P9 等未实施 slice 仍只是规划。
+当前仓库有边界不同的已实现产品表面：稳定的 `0.1.x` Legacy local-first Python CLI，以及 v0.2 P2-P8 提供的 read-only Production Project、explicit P2A State Commit/Recovery、deterministic Composition/HyperFrames、Voice/Captions、immutable Dependency Graph/selective rebuild、Codex Review/Repair、local-only image asset generation 与 optional generated-video Provider Python APIs。P7 lineage 与 P3-P7 combined Base AI Comic E2E 已合入 local `main`。P7.1 的 offline/runtime-contract 部分增加了 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；2026-08-18 fresh authorized rerun 已通过 Qwen 与 FLUX M7 technical live-local acceptance，M8 仍未验收。P8 provider core、Paid Provider Gate、Fake、MiniMax H3/Hailuo 与 Seedance offline adapters 已验收；P9 仍只是规划。
 
 Agent 必须维护当前产品承诺：
 
@@ -23,11 +23,12 @@ Agent 必须维护当前产品承诺：
 - P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` fast-forward 合入 local `main` 并 push 到 `origin/main`：`DependencyGraphSnapshot`只保存immutable typed graph inputs，Manifest 2.3独占active graph与desired/applied/lifecycle，`ProductionStateCommitter`仍独占graph write/co-activation/recovery；P5不增加CLI、Provider、renderer或automatic recovery，且尚未 release。
 - P6 已完成并整合到 local `main`：Manifest 2.4 与既有 `ProductionStateCommitter` 提供 durable review/repair/final-acceptance lifecycle；P5 graph 仍不保存 mutable review state。P6 尚未 push/release。
 - P7 与 Base AI Comic E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但尚未 push、release 或 publish。P7 的 provider-neutral contract、Manifest 2.5 lifecycle、generated PNG provenance、target Shot/Registry/graph atomic activation、exact replay/recovery 与 combined no-Video-Provider proof 保持不变。
+- P8 provider-neutral core、Manifest 2.7 / Registry 2.2、Paid Provider Gate、durable submit/poll/fetch/recovery、candidate activation、Fake 与 MiniMax H3/Hailuo adapters 已进入 local `main`；Seedance offline adapter通过 `c54435f`进入，最终activation/recovery closure通过`a089eac`进入。Hailuo已有三条真实 succeeded/fetched MP4 proof；H3 live已到达真实API但因余额不足返回`402 / code 1008`，因此H3只有offline acceptance而无live success；Seedance只完成offline/fake-transport acceptance，未授权live。所有adapter都保持显式、可删除、非默认且不得remote fallback。
 - 独立 generated-MP4 composition compatibility slice 已于2026-08-19在local `main`实现并完成technical local acceptance：带exact `VideoAssetMetadata`的H.264 MP4可作为`GENERATED_VIDEO` / `EXISTING_VIDEO` visual span进入既有`CompositionSpec -> ResolvedTimeline -> HyperFrames`，由同一个P4 timeline完成audio/caption mix与mux；不新增timeline、renderer、writer、CLI、manifest schema或dependency。三个Hailuo MP4已生成`423@24fps`且含AAC audio stream的本地成片。此compatibility不等于P8 fetched candidate已自动完成Registry/Project/Graph activation，也不授权新的Provider调用。
 - P7.1 offline/runtime-contract implementation 提供 sealed `ComfyLocalImageProvider`、exact local component/profile/workflow binding、R+1 前 read-only compatibility preflight，以及 `chatgpt_images_2_web` human import receipt/activation。2026-08-18 首次 M7 授权 session 因 smoke reference fixture 不是可解码 PNG 而 fail closed 并止步 FLUX；第二次已证明 Qwen，但 FLUX 被 `ImageScaleToTotalPixels` 缺 `resolution_steps` 拒绝；最终 fix 在 live required-input preflight 与 `resolution_steps=1` 之后，本日 fresh authorized rerun 在 loopback `http://127.0.0.1:8188` 上同时对 Qwen 与 FLUX 通过 technical live acceptance（exactly one provider call per lane, replay adds zero, no remote/browser）。M7 现在是 accepted 的 technical live-local milestone；M8 仍缺人工 ChatGPT outputs 与 blinded review evidence，因此 P7.1 仍不得称为 quality-accepted。任何未来 live smoke/benchmark 仍需 explicit authorization。
 - `docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md` 是新的 v0.2 planning target；它不是已实现行为，也不是一次性实施授权。
 - `docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md` 已被 supersede，只保留为 provider-centric 历史设计与可复用安全契约来源。
-- v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0-P7 与 Base AI Comic E2E 的当前状态见 runtime baseline 与 roadmap；P8+ 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。Base E2E acceptance 不等于 Paid Provider Gate 已设计、实现或验收。
+- v0.2 的每个 runtime slice 都必须拥有独立 plan、明确验收、回滚路径和用户实施授权。P0-P8 与 Base AI Comic E2E 的当前状态见 runtime baseline 与 roadmap；P9+ 或任何新的 Provider/live slice 的 plan 不等于 runtime 实施授权，也不得据此推断后续 slice 已实现。P8 offline acceptance不授权新的paid/live submit。
 - 某个 slice 落地前，与该 slice 冲突的当前契约继续有效；不得通过只改文档把 proposed behavior 描述成 runtime truth。
 - Local Wan + ComfyUI 始终保持 legacy default，并在新 domain 中作为 optional `generated_video` asset capability 保留。任何远程 Provider 都必须在后续独立 slice 中满足 explicit opt-in、Budget Guard、Cloud Egress 和 crash-safe persistence gate。
 
@@ -193,7 +194,7 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - 修改 `runs/` 下的 manifest schema 或产物目录结构。
 - 把本地优先策略改成默认允许远程主机。
 - 引入前端、API server、队列管理、音频，或其他 MVP 规范中明确排除的子系统。
-- 执行 P7.1 live smoke/benchmark、v0.2 P8-P9 任一 runtime slice，或把未验收的 plan/spec contract 写成当前行为。P2-P7 与 Base AI Comic E2E 已在 local `main`；P7.1 已通过 offline executable gates 与 2026-08-18 technical live-local acceptance，但仍未通过 M8 blinded quality benchmark。任何未来 P7.1 live smoke、benchmark 或 P8-P9 runtime slice 仍需各自独立 explicit authorization。P8 还必须先有单独获批并验收的 Paid Provider Gate。任何新的 v2 writer、activation、schema/layout mutation 仍需独立授权与 crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
+- 执行 P7.1 live smoke/benchmark、任何新的 P8 Provider/live submit、v0.2 P9 runtime slice，或把未验收的 plan/spec contract 写成当前行为。P2-P8 与 Base AI Comic E2E 已在 local `main`；P7.1 已通过 offline executable gates 与 2026-08-18 technical live-local acceptance，但仍未通过 M8 blinded quality benchmark。任何未来 P7.1 live smoke、benchmark、H3/Seedance live submit、新 P8 adapter 或 P9 runtime slice仍需各自独立 explicit authorization。任何新的 v2 writer、activation、schema/layout mutation仍需独立授权与 crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
 
 ## Session Continuity
 

@@ -20,7 +20,7 @@
 - [x] 保持 raster committed fixture/hash 不变，并验证 P5 无 resolver change。
 - [x] 使用三个本地 Hailuo MP4、本地 narration/soundscape 完成真实 pinned HyperFrames render。
 - [x] Native reviewer 检查 final diff、failure modes、semantic scope 与 tests；verdict为`accept with concerns`、无blocking issue，保留真实decodability依赖render gate与future dedicated MP4 reopen test两项concern。
-- [ ] 生成并校验 fresh Harness receipt，提交 task-only checkpoint。
+- [x] staged Harness `generated-video-compat-20260819-v3`通过并完成self-verification；task-only checkpoint为`1362687 feat: compose generated MP4 visual spans`。
 
 ## Verification
 
@@ -42,4 +42,4 @@ ffprobe runs/generated-video-compat-20260819-001/final/final.mp4
 video-analysis.video_probe(runs/generated-video-compat-20260819-001/final/final.mp4)
 ```
 
-最终 gate：task-only staged Harness snapshot、fresh receipt self-verification、specific-file checkpoint commit；不 pull/rebase/push/release。
+最终 gate已完成：task-only staged Harness snapshot、fresh receipt self-verification与specific-file checkpoint commit `1362687`；未pull/rebase/push/release。

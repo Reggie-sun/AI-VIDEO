@@ -14,7 +14,7 @@ Status: Offline implementation accepted on 2026-08-19. Provider-neutral extensio
 - Durable owner remains `ProductionStateCommitter`.
 - Provider-neutral request/capability owner remains `src/ai_video/production/video.py`.
 - Old path to remove: none; no existing Seedance runtime adapter exists.
-- Unchanged boundary: fetched candidate only. No Registry/Project/Graph activation, renderer MP4 support, CLI, schema writer, automatic selection or fallback.
+- Unchanged boundary: Seedance adapter ownership止于provider lifecycle与fetched candidate；它不自行执行Registry/Project/Graph activation或render。Provider-neutral activation仍由P8 core/`ProductionStateCommitter`独占，MP4 consumption则由独立且已验收的`1362687` compatibility slice提供。无CLI、schema writer、automatic selection或fallback。
 - Credential reference is exactly `ARK_API_KEY`, supplied through an injected credential supplier.
 - Default verification is fake transport, zero network and zero cost.
 
@@ -69,7 +69,7 @@ If this work requires Manifest/schema/activation/renderer changes, stop again; t
 
 ## Task 3: Implement Offline Seedance Adapter
 
-**Status:** offline implementation complete; final acceptance pending Tasks 4–7.
+**Status:** complete；Tasks 4–7均已完成offline verification、docs、Harness receipt与checkpoint。
 
 **Create:**
 
@@ -134,11 +134,11 @@ Only after executable acceptance, update:
 - `docs/v0.2-agentic-production-roadmap.md`
 - `README.md`
 
-State offline adapter acceptance and exact capability coverage. Do not claim Registry/Project/Graph activation, renderer support or cloud-live connectivity.
+State offline adapter acceptance and exact capability coverage. Do not claim that Seedance adapter owns or automatically invokes Registry/Project/Graph activation or rendering；independent MP4 consumption acceptance belongs to `1362687`. Do not claim cloud-live connectivity.
 
 ## Task 7: Harness Receipt and Commit
 
-**Status:** completion workflow active. Final staged snapshot verification includes `725 passed` plus Architecture Gate PASS; the fresh receipt and post-commit range receipt are reported in delivery.
+**Status:** complete. Final staged snapshot verification includes `725 passed` plus Architecture Gate PASS；checkpoint为`c54435f feat: add offline Seedance video provider`。Fresh commit-range receipt为`.agent/harness/runs/20260818T180559630328Z/receipt.json`，已通过`make harness-receipt`校验。
 
 Parent stages only task-owned files with explicit paths, generates a fresh staged-snapshot Harness receipt, commits a stable checkpoint, then generates and validates a commit-range receipt for the exact commit. Architecture Gate must pass. Unrelated dirty files remain unstaged and untouched.
 

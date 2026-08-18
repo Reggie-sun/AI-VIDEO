@@ -178,11 +178,15 @@ P7 原始 fake/no-network acceptance 已随 Base E2E 合入 local `main`。它�
 
 ## Generated Video Providers (P8, offline-accepted)
 
-P8提供provider-neutral request/capability、Paid Provider Gate、state-backed submit/poll/fetch和fetched-candidate evidence，并保持Fake、MiniMax H3/Hailuo与Seedance为显式、可删除的adapters。新的generic contracts覆盖video/audio references、reference/edit/extend modes、exact/adaptive output、provider-selected/frame timing和MP4/MOV；没有增加CLI、schema writer、automatic selection/fallback或新的runtime dependency。
+P8提供provider-neutral request/capability、Paid Provider Gate、state-backed submit/poll/fetch、measured artifact/provenance、candidate activation与explicit recovery，并保持Fake、MiniMax H3/Hailuo与Seedance为显式、可删除的adapters。新的generic contracts覆盖video/audio references、reference/edit/extend modes、exact/adaptive output、provider-selected/frame timing和MP4/MOV；Manifest 2.7与Registry 2.2由既有`ProductionStateCommitter`单一writer拥有，没有增加CLI、automatic selection/fallback或新的runtime dependency。
+
+MiniMax H3/Hailuo均已通过offline adapter acceptance。已有三次经授权的Hailuo任务到达provider succeeded并取得本地MP4；H3经授权的live尝试到达真实API，但返回余额不足`HTTP 402 / code 1008`，因此没有H3 live-success artifact，也不会自动重试或把余额失败当作P8 offline blocker。
 
 `SeedanceVideoProvider`按2026-08-19 official snapshot完整覆盖七个current/legacy-callable Model IDs，并拒绝retired/marketing aliases和可扩张profile。它只接受injected `ARK_API_KEY` reference；one-use permit紧邻唯一POST消费，不自动重试POST；poll/fetch绑定exact task/model/endpoint intent，redirect、cross-origin、oversize、MIME/container/brand mismatch均fail closed。Offline focused/recovery evidence为`517 passed`，native reviewer verdict为`accept`。
 
-这不是Seedance cloud-live acceptance：本slice没有使用credential、网络或付费quota，也没有真实succeeded submit。Fetched candidate不会自动写入或激活Registry/Project/Graph；registered H.264 MP4的P3/P4 composition support属于独立consumer slice。未来单次live submit仍需rotated key、exact account Model/Endpoint access、current pricing snapshot、finite budget、egress authorization和明确的一次submit授权。
+这不是Seedance cloud-live acceptance：本slice没有使用credential、网络或付费quota，也没有真实succeeded submit。Fetch成功本身不会自动激活任何production state；只有settled Paid Provider budget、exact request/status/fetch evidence与held-FD本地probe全部通过后，显式调用既有committer activation path才会物化candidate，并原子切换exact Project/Registry/P5 graph tuple，同时使旧P6 review/final acceptance按identity transition变为stale。registered H.264 MP4的P3/P4 composition support属于独立且已验收的consumer slice。P8 closure不新增CLI、不启用默认remote fallback，也不代表push/release。未来单次live submit仍需rotated key、exact account Model/Endpoint access、current pricing snapshot、finite budget、egress authorization和明确的一次submit授权。
+
+最终activation/recovery closure由`a089eac`提交；fresh staged与commit-range receipts分别为`.agent/harness/runs/p8-video-activation-20260819-v6/receipt.json`和`.agent/harness/runs/p8-video-activation-20260819-range-v1/receipt.json`。其中完整`production_video_provider_tests`为`742 passed`，production contracts为`2036 passed, 3 skipped`，Architecture Gate PASS。
 
 ## Base AI Comic E2E
 
