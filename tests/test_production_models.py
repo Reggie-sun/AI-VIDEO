@@ -630,6 +630,437 @@ def test_registry_20_preserves_generic_records_and_rejects_p4_fields():
         )
 
 
+def test_registry_22_requires_measured_metadata_for_generated_video():
+    assert hasattr(production_models, "VideoAssetMetadata")
+    metadata = production_models.VideoAssetMetadata(
+        container_name="mp4",
+        codec_name="h264",
+        width=1280,
+        height=720,
+        fps_numerator=24,
+        fps_denominator=1,
+        duration_milliseconds=3000,
+        frame_count=72,
+        probe_receipt_id="probe-1",
+        request_receipt_fingerprint=ONE_HASH,
+        resolved_generation_hash=TWO_HASH,
+        provenance_receipt_id="provenance-1",
+    )
+    record = AssetRecord(
+        asset_id="video-1",
+        asset_type=AssetType.VIDEO,
+        artifact_path=Path(f"assets/video/{FIVE_HASH}.mp4"),
+        sha256=FIVE_HASH,
+        size_bytes=64,
+        mime_type="video/mp4",
+        duration_seconds=3.0,
+        width=1280,
+        height=720,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture", version="1"),
+        input_fingerprint=SIX_HASH,
+        creation_receipt_id="creation-video-1",
+        usage_license="fixture-only",
+        video_metadata=metadata,
+    )
+    registry = AssetRegistrySnapshot(
+        schema_version="2.2",
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(record,),
+    )
+    assert registry.assets[0].video_metadata == metadata
+
+    with pytest.raises(ValidationError, match="generated video"):
+        AssetRegistrySnapshot(
+            schema_version="2.2",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=(record.model_copy(update={"video_metadata": None}),),
+        )
+
+
+def test_registry_22_remote_generated_video_requires_cost_and_exact_egress_identity():
+    metadata = production_models.VideoAssetMetadata(
+        container_name="mp4",
+        codec_name="h264",
+        width=1280,
+        height=720,
+        fps_numerator=24,
+        fps_denominator=1,
+        duration_milliseconds=3000,
+        frame_count=72,
+        probe_receipt_id="probe-1",
+        request_receipt_fingerprint=ONE_HASH,
+        resolved_generation_hash=TWO_HASH,
+        provenance_receipt_id="provenance-1",
+    )
+    record = AssetRecord(
+        asset_id="video-remote-1",
+        asset_type=AssetType.VIDEO,
+        artifact_path=Path(f"assets/files/{FIVE_HASH}.mp4"),
+        sha256=FIVE_HASH,
+        size_bytes=64,
+        mime_type="video/mp4",
+        duration_seconds=3.0,
+        width=1280,
+        height=720,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture", version="1"),
+        input_fingerprint=SIX_HASH,
+        creation_receipt_id="creation-video-remote-1",
+        usage_license="fixture-only",
+        egress=production_models.EgressMetadata(
+            remote=True,
+            destination="https://api.minimax.io",
+            authorization_receipt_id="authorization-1",
+            request_fingerprint=TWO_HASH,
+            payload_fingerprint=THREE_HASH,
+            retention_mode="provider_standard",
+            provider_policy_snapshot_id="policy-1",
+        ),
+        video_metadata=metadata,
+    )
+    with pytest.raises(ValidationError, match="cost receipt"):
+        AssetRegistrySnapshot(
+            schema_version="2.2",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=(record,),
+        )
+    with pytest.raises(ValidationError, match="request identity"):
+        AssetRegistrySnapshot(
+            schema_version="2.2",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=(
+                record.model_copy(
+                    update={
+                        "cost_receipt_id": "cost-1",
+                        "egress": record.egress.model_copy(
+                            update={"request_fingerprint": FOUR_HASH}
+                        ),
+                    }
+                ),
+            ),
+        )
+
+
+@pytest.mark.parametrize("schema_version", ["2.0", "2.1"])
+def test_pre_22_registry_rejects_explicit_video_metadata(schema_version):
+    assert hasattr(production_models, "VideoAssetMetadata")
+    payload = AssetRegistrySnapshot(
+        schema_version=schema_version,
+        revision_id=ZERO_HASH,
+        content_hash=ZERO_HASH,
+        assets=(make_asset_record(asset_type=AssetType.IMAGE),),
+    ).model_dump(mode="python")
+    payload["assets"][0]["video_metadata"] = {
+        "container_name": "mp4",
+        "codec_name": "h264",
+        "width": 1280,
+        "height": 720,
+        "fps_numerator": 24,
+        "fps_denominator": 1,
+        "duration_milliseconds": 3000,
+        "frame_count": 72,
+        "probe_receipt_id": "probe-1",
+        "request_receipt_fingerprint": ONE_HASH,
+        "resolved_generation_hash": TWO_HASH,
+        "provenance_receipt_id": "provenance-1",
+    }
+    with pytest.raises(ValidationError, match="2.2|video metadata"):
+        AssetRegistrySnapshot.model_validate(payload)
+
+
+def _make_video_generation_attempt_state():
+    required = (
+        "VideoRequestReceiptPointer",
+        "VideoStatusReceiptPointer",
+        "VideoGenerationAttemptState",
+    )
+    assert all(hasattr(production_models, name) for name in required)
+    submit = production_models.PaidProviderSubmitReceiptPointer(
+        path=Path(f"state/paid-provider/submits/{FOUR_HASH}.json"),
+        submit_receipt_fingerprint=FOUR_HASH,
+        file_sha256=FIVE_HASH,
+    )
+    request = production_models.VideoRequestReceiptPointer(
+        path=Path(f"state/video-generation/requests/{ONE_HASH}.json"),
+        request_receipt_fingerprint=ONE_HASH,
+        generation_id="generation-1",
+        request_input_hash=SIX_HASH,
+        resolved_generation_hash=TWO_HASH,
+        output_asset_id="video-1",
+        file_sha256=SEVEN_HASH,
+    )
+    observation = production_models.VideoStatusReceiptPointer(
+        path=Path(f"state/video-generation/status/{THREE_HASH}.json"),
+        observation_fingerprint=THREE_HASH,
+        request_receipt_fingerprint=ONE_HASH,
+        paid_submit_receipt_fingerprint=FOUR_HASH,
+        file_sha256=EIGHT_HASH,
+    )
+    return production_models.VideoGenerationAttemptState(
+        request=request,
+        generation_id="generation-1",
+        resolved_generation_hash=TWO_HASH,
+        phase="polling",
+        paid_submit_receipt=submit,
+        latest_observation=observation,
+    )
+
+
+def test_manifest_27_accepts_gate_bound_video_attempt_without_external_task_id():
+    video_state = _make_video_generation_attempt_state()
+    submit = video_state.paid_submit_receipt
+    assert submit is not None
+    attempt = StateCommitAttempt(
+        attempt_id="video-attempt-1",
+        operation="video_generation",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        video_generation_state=video_state,
+        paid_provider_state=production_models.PaidProviderAttemptState(
+            gate_receipt=production_models.PaidProviderGateReceiptPointer(
+                path=Path(f"state/paid-provider/gates/{NINE_HASH}.json"),
+                gate_receipt_fingerprint=NINE_HASH,
+                file_sha256=ZERO_HASH,
+            ),
+            reservation_id="reservation-video-1",
+            phase="accepted",
+            submit_receipt=submit,
+        ),
+        started_at="2026-08-18T00:00:00Z",
+    )
+    manifest = make_state_manifest(
+        schema_version="2.7",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        active_paid_provider_budget=production_models.PaidProviderBudgetSnapshotPointer(
+            path=Path(f"state/paid-provider/budgets/{ZERO_HASH}.json"),
+            revision=1,
+            content_hash=ZERO_HASH,
+            file_sha256=ONE_HASH,
+        ),
+        attempts=(attempt,),
+    )
+    dumped = manifest.model_dump(mode="json")
+    assert dumped["attempts"][0]["video_generation_state"]["generation_id"] == "generation-1"
+    assert "active_dependency_graph" in dumped
+    assert "active_paid_provider_budget" in dumped
+    assert "external_task_id" not in str(dumped)
+
+
+def test_manifest_27_allows_durable_video_request_before_paid_gate():
+    video_state = _make_video_generation_attempt_state().model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase.REQUEST,
+            "paid_submit_receipt": None,
+            "latest_observation": None,
+        }
+    )
+    attempt = StateCommitAttempt(
+        attempt_id="video-request-attempt-1",
+        operation="video_generation",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        video_generation_state=video_state,
+        started_at="2026-08-18T00:00:00Z",
+    )
+    manifest = make_state_manifest(
+        schema_version="2.7",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        attempts=(attempt,),
+    )
+    assert manifest.attempts[0].paid_provider_state is None
+
+
+@pytest.mark.parametrize(
+    ("paid_phase", "outer_status"),
+    [
+        ("known_no_effect", StateCommitStatus.FAILED),
+        ("outcome_unknown", StateCommitStatus.OUTCOME_UNKNOWN),
+    ],
+)
+def test_manifest_27_preserves_terminal_paid_submit_outcome_without_video_task(
+    paid_phase,
+    outer_status,
+):
+    base_state = _make_video_generation_attempt_state()
+    video_state = base_state.model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase.SUBMIT_INTENT,
+            "paid_submit_receipt": None,
+            "latest_observation": None,
+        }
+    )
+    paid_state = production_models.PaidProviderAttemptState(
+        gate_receipt=production_models.PaidProviderGateReceiptPointer(
+            path=Path(f"state/paid-provider/gates/{NINE_HASH}.json"),
+            gate_receipt_fingerprint=NINE_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        reservation_id="reservation-video-terminal-1",
+        phase=paid_phase,
+        submit_receipt=base_state.paid_submit_receipt,
+    )
+    attempt = StateCommitAttempt(
+        attempt_id="video-terminal-attempt-1",
+        operation="video_generation",
+        status=outer_status,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        video_generation_state=video_state,
+        paid_provider_state=paid_state,
+        started_at="2026-08-18T00:00:00Z",
+        finished_at="2026-08-18T00:00:01Z",
+        error_code="paid_provider_submit_outcome",
+        error_message="paid Provider submit reached a terminal outcome",
+    )
+    assert attempt.status is outer_status
+
+
+@pytest.mark.parametrize(
+    ("paid_phase", "wrong_status"),
+    [
+        ("known_no_effect", StateCommitStatus.OUTCOME_UNKNOWN),
+        ("outcome_unknown", StateCommitStatus.FAILED),
+    ],
+)
+def test_manifest_27_rejects_terminal_paid_submit_outcome_with_wrong_outer_status(
+    paid_phase,
+    wrong_status,
+):
+    base_state = _make_video_generation_attempt_state()
+    video_state = base_state.model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase.SUBMIT_INTENT,
+            "paid_submit_receipt": None,
+            "latest_observation": None,
+        }
+    )
+    paid_state = production_models.PaidProviderAttemptState(
+        gate_receipt=production_models.PaidProviderGateReceiptPointer(
+            path=Path(f"state/paid-provider/gates/{NINE_HASH}.json"),
+            gate_receipt_fingerprint=NINE_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        reservation_id="reservation-video-terminal-1",
+        phase=paid_phase,
+        submit_receipt=base_state.paid_submit_receipt,
+    )
+    with pytest.raises(ValidationError, match="status|phase"):
+        StateCommitAttempt(
+            attempt_id="video-terminal-attempt-1",
+            operation="video_generation",
+            status=wrong_status,
+            base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
+            base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            video_generation_state=video_state,
+            paid_provider_state=paid_state,
+            started_at="2026-08-18T00:00:00Z",
+            finished_at="2026-08-18T00:00:01Z",
+            error_code="paid_provider_submit_outcome",
+            error_message="paid Provider submit reached a terminal outcome",
+        )
+
+
+@pytest.mark.parametrize(
+    ("video_phase", "paid_phase", "include_submit"),
+    [
+        ("submit_intent", "accepted", True),
+        ("submitted", "submit_intent", False),
+        ("polling", "known_no_effect", True),
+        ("fetch", "outcome_unknown", True),
+    ],
+)
+def test_manifest_27_rejects_video_phase_mismatched_to_paid_gate_phase(
+    video_phase,
+    paid_phase,
+    include_submit,
+):
+    video_state = _make_video_generation_attempt_state().model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase(video_phase),
+            "paid_submit_receipt": (
+                _make_video_generation_attempt_state().paid_submit_receipt
+                if include_submit
+                else None
+            ),
+            "latest_observation": (
+                _make_video_generation_attempt_state().latest_observation
+                if video_phase in {"polling", "fetch"}
+                else None
+            ),
+        }
+    )
+    submit = video_state.paid_submit_receipt
+    paid_state = production_models.PaidProviderAttemptState(
+        gate_receipt=production_models.PaidProviderGateReceiptPointer(
+            path=Path(f"state/paid-provider/gates/{NINE_HASH}.json"),
+            gate_receipt_fingerprint=NINE_HASH,
+            file_sha256=ZERO_HASH,
+        ),
+        reservation_id="reservation-video-1",
+        phase=paid_phase,
+        submit_receipt=submit,
+    )
+    with pytest.raises(ValidationError, match="video.*paid Provider|phase"):
+        StateCommitAttempt(
+            attempt_id="video-mismatch-attempt-1",
+            operation="video_generation",
+            status=StateCommitStatus.RUNNING,
+            base_manifest_revision=1,
+            base_project=make_project_pointer(),
+            base_registry=make_registry_pointer(),
+            base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+            candidate_artifacts_hash=ZERO_HASH,
+            video_generation_state=video_state,
+            paid_provider_state=paid_state,
+            started_at="2026-08-18T00:00:00Z",
+        )
+
+
+@pytest.mark.parametrize("schema_version", ["2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6"])
+def test_pre_27_manifest_rejects_explicit_video_attempt_fields(schema_version):
+    payload = make_state_manifest(schema_version="2.0").model_dump(mode="python")
+    payload["schema_version"] = schema_version
+    payload["attempts"] = ({
+        "attempt_id": "video-attempt-1",
+        "operation": "video_generation",
+        "status": "running",
+        "base_manifest_revision": 1,
+        "base_project": make_project_pointer().model_dump(mode="python"),
+        "base_registry": make_registry_pointer().model_dump(mode="python"),
+        "candidate_artifacts_hash": ZERO_HASH,
+        "video_generation_state": _make_video_generation_attempt_state().model_dump(mode="python"),
+        "started_at": "2026-08-18T00:00:00Z",
+    },)
+    with pytest.raises(ValidationError, match="2.7|video"):
+        ProductionManifest.model_validate(payload)
+
+
+def test_video_attempt_schema_rejects_duplicate_external_task_identity():
+    data = _make_video_generation_attempt_state().model_dump(mode="python")
+    data["external_task_id"] = "must-live-only-in-gate-receipt"
+    with pytest.raises(ValidationError, match="extra"):
+        production_models.VideoGenerationAttemptState.model_validate(data)
+
+
 @pytest.mark.parametrize(
     ("field", "value"),
     [
@@ -3885,3 +4316,42 @@ def test_image_lifecycle_paths_are_canonical_and_content_addressed():
     )
     with pytest.raises(ValueError, match="SHA-256"):
         production_paths.canonical_image_request_path("latest")
+
+
+def test_video_lifecycle_paths_are_canonical_and_content_addressed():
+    assert production_paths.canonical_video_request_receipt_path(ZERO_HASH) == Path(
+        f"state/video-generation/requests/{ZERO_HASH}.json"
+    )
+    assert production_paths.canonical_video_status_receipt_path(ONE_HASH) == Path(
+        f"state/video-generation/status/{ONE_HASH}.json"
+    )
+    assert production_paths.canonical_video_asset_path(TWO_HASH) == Path(
+        f"assets/files/{TWO_HASH}.mp4"
+    )
+    for factory in (
+        production_paths.canonical_video_request_receipt_path,
+        production_paths.canonical_video_status_receipt_path,
+        production_paths.canonical_video_asset_path,
+    ):
+        with pytest.raises(ValueError, match="SHA-256"):
+            factory("latest")
+
+
+def test_video_attempt_pointers_reject_non_canonical_paths():
+    request = _make_video_generation_attempt_state().request
+    data = request.model_dump(mode="python")
+    data["path"] = Path("state/video-generation/requests/latest.json")
+    with pytest.raises(ValidationError, match="canonical"):
+        production_models.VideoRequestReceiptPointer.model_validate(data)
+
+    data = request.model_dump(mode="python")
+    data["path"] = Path(f"../state/video-generation/requests/{ONE_HASH}.json")
+    with pytest.raises(ValidationError, match="canonical"):
+        production_models.VideoRequestReceiptPointer.model_validate(data)
+
+    observation = _make_video_generation_attempt_state().latest_observation
+    assert observation is not None
+    data = observation.model_dump(mode="python")
+    data["path"] = Path(f"/state/video-generation/status/{THREE_HASH}.json")
+    with pytest.raises(ValidationError, match="canonical"):
+        production_models.VideoStatusReceiptPointer.model_validate(data)

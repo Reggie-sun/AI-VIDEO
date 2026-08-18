@@ -126,6 +126,7 @@ from production_project_factory import (
     make_manifest_23_project,
     make_p7_committed_project,
     make_p4_composition_fixture,
+    make_p8_video_evidence,
     make_voice_activation_request,
     make_voice_preview_and_authorization,
     make_voice_request,
@@ -2284,6 +2285,19 @@ def test_loader_runs_p6_verification_for_manifest_25_with_p7_state(
     assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
 
 
+def test_loader_runs_p6_verification_for_manifest_27(tmp_path):
+    fixture = _make_complete_p6_p7_project(tmp_path)
+    manifest = _manifest(tmp_path)
+    _write_manifest(root=tmp_path, manifest=manifest.model_copy(update={"schema_version": "2.7"}))
+    evidence_path = tmp_path / fixture["evidence_path"]
+    evidence_path.write_bytes(evidence_path.read_bytes() + b" ")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(fixture["project_path"])
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
 def test_reader_rejects_generated_voice_resealed_as_local_egress(tmp_path):
     project_path, request, _, _, _ = _activate_fake_voice(
         tmp_path, include_caption=False
@@ -3419,3 +3433,152 @@ def test_manifest_23_reader_rejects_tampered_historical_render_pair(
         load_production_project(tmp_path / "project.yaml")
 
     assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_p8_video_evidence_reopens_receipts_with_exact_content_hash(tmp_path):
+    from ai_video.production._video_project_reader import (
+        load_video_request_receipt,
+        load_video_status_receipt,
+    )
+
+    fixture = make_p8_video_evidence(tmp_path)
+    resolved = load_video_request_receipt(tmp_path, fixture["request_pointer"])
+    observation = load_video_status_receipt(tmp_path, fixture["status_pointer"])
+
+    assert resolved == fixture["resolved"]
+    assert observation == fixture["observation"]
+
+
+@pytest.mark.parametrize("owner", ["request", "status"])
+def test_p8_video_evidence_rejects_tampered_receipt_bytes(tmp_path, owner):
+    from ai_video.production._video_project_reader import (
+        load_video_request_receipt,
+        load_video_status_receipt,
+    )
+
+    fixture = make_p8_video_evidence(tmp_path)
+    target = fixture[f"{owner}_path"]
+    target.write_bytes(target.read_bytes() + b" ")
+    loader = {
+        "request": load_video_request_receipt,
+        "status": load_video_status_receipt,
+    }[owner]
+    with pytest.raises(AiVideoError) as exc_info:
+        loader(tmp_path, fixture[f"{owner}_pointer"])
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+@pytest.mark.parametrize("owner", ["request", "status"])
+def test_p8_video_evidence_refuses_to_follow_receipt_symlinks(tmp_path, owner):
+    from ai_video.production._video_project_reader import (
+        load_video_request_receipt,
+        load_video_status_receipt,
+    )
+
+    fixture = make_p8_video_evidence(tmp_path)
+    target = fixture[f"{owner}_path"]
+    outside = tmp_path / f"outside-{owner}.json"
+    outside.write_bytes(target.read_bytes())
+    target.unlink()
+    target.symlink_to(outside)
+    loader = {
+        "request": load_video_request_receipt,
+        "status": load_video_status_receipt,
+    }[owner]
+    with pytest.raises(AiVideoError) as exc_info:
+        loader(tmp_path, fixture[f"{owner}_pointer"])
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_p8_video_evidence_binds_observation_to_its_attempt_request(tmp_path):
+    from ai_video.production._video_project_reader import verify_video_evidence
+
+    fixture = make_p8_video_evidence(tmp_path)
+    state = fixture["attempt_state"]
+    verify_video_evidence(tmp_path, (state,))
+
+    foreign = state.request.model_copy(
+        update={
+            "generation_id": "generation-002",
+            "request_input_hash": "9" * 64,
+        }
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        verify_video_evidence(
+            tmp_path, (state.model_copy(update={"request": foreign}),)
+        )
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_p8_video_evidence_binds_observation_to_exact_gate_submission(tmp_path):
+    from ai_video.production._video_project_reader import verify_video_evidence
+    from ai_video.production.hashing import canonical_sha256
+
+    fixture = make_p8_video_evidence(tmp_path)
+    observation = fixture["observation"]
+    data = observation.model_dump(
+        mode="json",
+        exclude={"observation_fingerprint"},
+    )
+    data["submission_fingerprint"] = "9" * 64
+    data["observation_fingerprint"] = canonical_sha256(data)
+    foreign = type(observation).model_validate(data)
+    path = tmp_path / (
+        "state/video-generation/status/"
+        f"{foreign.observation_fingerprint}.json"
+    )
+    path.write_bytes(foreign.model_dump_json().encode("utf-8"))
+    pointer = fixture["status_pointer"].model_copy(
+        update={
+            "path": path.relative_to(tmp_path),
+            "observation_fingerprint": foreign.observation_fingerprint,
+            "file_sha256": sha256_file(path),
+        }
+    )
+    state = fixture["attempt_state"].model_copy(
+        update={"latest_observation": pointer}
+    )
+
+    with pytest.raises(AiVideoError, match="submission"):
+        verify_video_evidence(tmp_path, (state,))
+
+
+def test_p8_candidate_evidence_requires_succeeded_observation(tmp_path):
+    from ai_video.production._video_project_reader import verify_video_evidence
+    from ai_video.production.video import VideoSubmission, VideoTaskObservation
+
+    fixture = make_p8_video_evidence(tmp_path)
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=fixture["resolved"],
+        receipt=fixture["submit_receipt"],
+    )
+    failed = VideoTaskObservation.create(
+        submission=submission,
+        state="failed",
+        observed_at=fixture["observation"].observed_at,
+    )
+    path = tmp_path / (
+        "state/video-generation/status/"
+        f"{failed.observation_fingerprint}.json"
+    )
+    path.write_bytes(failed.model_dump_json().encode("utf-8"))
+    pointer = fixture["status_pointer"].model_copy(
+        update={
+            "path": path.relative_to(tmp_path),
+            "observation_fingerprint": failed.observation_fingerprint,
+            "file_sha256": sha256_file(path),
+        }
+    )
+    state = fixture["attempt_state"].model_copy(
+        update={
+            "phase": "candidate",
+            "latest_observation": pointer,
+            "provider_file_id": None,
+            "candidate_video_asset_ids": (
+                fixture["attempt_state"].request.output_asset_id,
+            ),
+        }
+    )
+
+    with pytest.raises(AiVideoError, match="succeeded"):
+        verify_video_evidence(tmp_path, (state,))

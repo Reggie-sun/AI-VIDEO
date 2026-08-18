@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -331,6 +332,92 @@ def test_registry_rejects_absolute_registry_path(tmp_path):
     with pytest.raises(AiVideoError) as exc:
         load_asset_registry(path, tmp_path, tmp_path / "assets/files")
     assert exc.value.code is ErrorCode.ASSET_REGISTRY_INVALID
+
+
+def make_generated_video_record(root: Path, *, artifact_path: Path | None = None):
+    from ai_video.production.models import VideoAssetMetadata
+    from ai_video.production.paths import canonical_video_asset_path
+
+    payload = b"\x00\x00\x00\x18ftypmp42generated-video-bytes"
+    digest = hashlib.sha256(payload).hexdigest()
+    stored = artifact_path if artifact_path is not None else canonical_video_asset_path(digest)
+    target = root / stored
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(payload)
+    return AssetRecord(
+        asset_id="video-output-001",
+        asset_type=AssetType.VIDEO,
+        artifact_path=stored,
+        sha256=digest,
+        size_bytes=len(payload),
+        mime_type="video/mp4",
+        duration_seconds=3.0,
+        width=1280,
+        height=720,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture", version="1"),
+        input_fingerprint=ZERO_HASH,
+        creation_receipt_id="receipt-video-output-001",
+        usage_license="test-only",
+        video_metadata=VideoAssetMetadata(
+            container_name="mp4",
+            codec_name="h264",
+            width=1280,
+            height=720,
+            fps_numerator=24,
+            fps_denominator=1,
+            duration_milliseconds=3000,
+            frame_count=72,
+            probe_receipt_id="probe-video-output-001",
+            request_receipt_fingerprint=ONE_HASH,
+            resolved_generation_hash=ONE_HASH,
+            provenance_receipt_id="provenance-video-output-001",
+        ),
+    )
+
+
+def write_video_registry(root: Path, record) -> Path:
+    return write_snapshot(
+        root,
+        AssetRegistrySnapshot(
+            schema_version="2.2",
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            assets=(record,),
+        ),
+    )
+
+
+def test_registry_22_reopens_generated_video_bytes_no_follow(tmp_path):
+    record = make_generated_video_record(tmp_path)
+    path = write_video_registry(tmp_path, record)
+    snapshot, asset_paths = load(path, tmp_path)
+    assert snapshot.schema_version == "2.2"
+    assert snapshot.assets[0].video_metadata is not None
+    assert asset_paths["video-output-001"] == (tmp_path / record.artifact_path).resolve()
+
+
+def test_registry_22_rejects_symlinked_generated_video_asset(tmp_path):
+    record = make_generated_video_record(tmp_path)
+    path = write_video_registry(tmp_path, record)
+    asset = tmp_path / record.artifact_path
+    payload = asset.read_bytes()
+    outside = tmp_path / "outside.mp4"
+    outside.write_bytes(payload)
+    asset.unlink()
+    asset.symlink_to(outside)
+    with pytest.raises(AiVideoError) as exc:
+        load(path, tmp_path)
+    assert exc.value.code is ErrorCode.ASSET_REGISTRY_INVALID
+
+
+def test_registry_22_requires_content_addressed_generated_video_path(tmp_path):
+    record = make_generated_video_record(
+        tmp_path, artifact_path=Path("assets/files/latest.mp4")
+    )
+    path = write_video_registry(tmp_path, record)
+    with pytest.raises(AiVideoError, match="content-addressed"):
+        load(path, tmp_path)
 
 
 def test_project_root_symlink_loop_returns_typed_registry_error(tmp_path):

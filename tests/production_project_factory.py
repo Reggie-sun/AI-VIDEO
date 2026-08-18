@@ -4190,3 +4190,211 @@ def make_base_ai_comic_e2e_runtime(root: Path) -> "BaseAiComicE2ERuntime":
         renderer=DeterministicHyperFramesRunner(toolchain.ffmpeg_path),
         analyzer=DeterministicReviewAnalyzer(),
     )
+
+
+def make_p8_video_evidence(root: Path, *, attempt_id: str = "video-attempt-1") -> dict:
+    """Materialize read-only P8 video generation evidence for reopen tests.
+
+    This is deliberately not a writer: it only lays down the exact receipt bytes a
+    future ``ProductionStateCommitter`` would durably persist, so the read-only
+    reopen surface can be exercised without a P8 writer.
+    """
+    from datetime import UTC, datetime
+
+    from ai_video.production.models import (
+        DependencyGraphSnapshotPointer,
+        PaidProviderSubmitReceiptPointer,
+        VideoGenerationAttemptState,
+        VideoRequestReceiptPointer,
+        VideoStatusReceiptPointer,
+    )
+    from ai_video.production.paid_provider import (
+        PaidProviderSubmitOutcome,
+        PaidProviderSubmitReceipt,
+    )
+    from ai_video.production.video import (
+        BillingKind,
+        ProviderProfilePointer,
+        ResolvedVideoGenerationRequest,
+        VideoCapabilityVariant,
+        VideoExecutionKind,
+        VideoGenerationMode,
+        VideoGenerationRequest,
+        VideoImageReferenceBinding,
+        VideoOutputRequirement,
+        VideoSubmission,
+        VideoTaskObservation,
+        VideoTaskState,
+    )
+
+    hash_a = "a" * 64
+    output = VideoOutputRequirement(
+        duration_seconds=6,
+        width=1280,
+        height=720,
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+    request = VideoGenerationRequest.create(
+        generation_id="generation-001",
+        provider_name="hailuo",
+        provider_kind="minimax_hailuo",
+        model_id="video-01",
+        provider_profile=ProviderProfilePointer(
+            profile_id="hailuo-video-01",
+            profile_version="hailuo-v1",
+            profile_path=Path(f"provider-profiles/{hash_a}.json"),
+            profile_sha256=hash_a,
+        ),
+        target_shot_id="shot-001",
+        target_shot_revision=3,
+        target_shot_content_hash=hash_a,
+        target_asset_role="primary_visual",
+        target_visual_strategy="generated_video",
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        prompt_text="A slow cinematic push toward the city.",
+        negative_prompt_text="flicker",
+        image_bindings=(
+            VideoImageReferenceBinding(
+                role="first_frame",
+                asset_id="image-source",
+                asset_sha256=hash_a,
+                mime_type="image/png",
+                width=1280,
+                height=720,
+            ),
+        ),
+        output_requirement=output,
+        seed=17,
+        base_project=ProjectSnapshotPointer(
+            path=Path(f"state/projects/project.1.{ZERO_HASH}.yaml"),
+            revision=1,
+            content_hash=ZERO_HASH,
+            file_sha256="1" * 64,
+        ),
+        base_registry=RegistrySnapshotPointer(
+            path=Path(f"assets/registry.{ZERO_HASH}.json"),
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            file_sha256="1" * 64,
+        ),
+        base_dependency_graph=DependencyGraphSnapshotPointer(
+            revision_id=ZERO_HASH,
+            content_hash=ZERO_HASH,
+            path=Path(f"state/dependency_graph.{ZERO_HASH}.json"),
+            file_sha256="1" * 64,
+        ),
+        input_artifact_ids=("shot-001", "image-source"),
+        output_asset_id="video-output-001",
+    )
+    resolved = ResolvedVideoGenerationRequest.create(
+        request=request,
+        capability=VideoCapabilityVariant(
+            capability_id="hailuo-i2v-6s-720p",
+            provider_kind="minimax_hailuo",
+            model_id="video-01",
+            profile_version="hailuo-v1",
+            execution_kind=VideoExecutionKind.REMOTE,
+            billing_kind=BillingKind.METERED,
+            mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+            output=output,
+            allowed_image_roles=("first_frame", "reference"),
+            required_first_frame=True,
+            max_reference_count=2,
+            allowed_image_mime_types=("image/jpeg", "image/png"),
+            max_image_bytes=10_000_000,
+            min_image_width=512,
+            min_image_height=512,
+            negative_prompt_supported=True,
+            seed_supported=True,
+            fps_supported=True,
+            idempotent_submit=False,
+            lookup_supported=False,
+        ),
+        effective_output=output,
+        effective_seed=17,
+        effective_negative_prompt_text="flicker",
+    )
+    submit_receipt = PaidProviderSubmitReceipt.create(
+        attempt_id=attempt_id,
+        request_fingerprint=resolved.resolved_generation_hash,
+        preview_fingerprint=hash_a,
+        gate_receipt_fingerprint=hash_a,
+        reservation_id="reservation-video-1",
+        outcome=PaidProviderSubmitOutcome.ACCEPTED,
+        external_effect_id="provider-task-1",
+        recorded_at=datetime(2026, 8, 18, tzinfo=UTC),
+    )
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=resolved, receipt=submit_receipt
+    )
+    observation = VideoTaskObservation.create(
+        submission=submission,
+        state=VideoTaskState.SUCCEEDED,
+        observed_at=datetime(2026, 8, 18, 0, 1, tzinfo=UTC),
+        progress_milli=1000,
+        provider_file_id="provider-file-1",
+    )
+
+    request_path = root / (
+        "state/video-generation/requests/"
+        f"{resolved.desired_generation_fingerprint}.json"
+    )
+    status_path = root / (
+        f"state/video-generation/status/{observation.observation_fingerprint}.json"
+    )
+    submit_path = root / (
+        "state/paid-provider/submits/"
+        f"{submit_receipt.submit_receipt_fingerprint}.json"
+    )
+    for path, model in (
+        (request_path, resolved),
+        (status_path, observation),
+        (submit_path, submit_receipt),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(model.model_dump_json().encode("utf-8"))
+
+    request_pointer = VideoRequestReceiptPointer(
+        path=request_path.relative_to(root),
+        request_receipt_fingerprint=resolved.desired_generation_fingerprint,
+        generation_id=resolved.generation_id,
+        request_input_hash=resolved.request_input_hash,
+        resolved_generation_hash=resolved.resolved_generation_hash,
+        output_asset_id=resolved.output_asset_id,
+        file_sha256=sha256_file(request_path),
+    )
+    status_pointer = VideoStatusReceiptPointer(
+        path=status_path.relative_to(root),
+        observation_fingerprint=observation.observation_fingerprint,
+        request_receipt_fingerprint=resolved.desired_generation_fingerprint,
+        paid_submit_receipt_fingerprint=submit_receipt.submit_receipt_fingerprint,
+        file_sha256=sha256_file(status_path),
+    )
+    submit_pointer = PaidProviderSubmitReceiptPointer(
+        path=submit_path.relative_to(root),
+        submit_receipt_fingerprint=submit_receipt.submit_receipt_fingerprint,
+        file_sha256=sha256_file(submit_path),
+    )
+    return {
+        "attempt_id": attempt_id,
+        "resolved": resolved,
+        "submit_receipt": submit_receipt,
+        "observation": observation,
+        "request_path": request_path,
+        "status_path": status_path,
+        "request_pointer": request_pointer,
+        "status_pointer": status_pointer,
+        "submit_pointer": submit_pointer,
+        "attempt_state": VideoGenerationAttemptState(
+            request=request_pointer,
+            generation_id=resolved.generation_id,
+            resolved_generation_hash=resolved.resolved_generation_hash,
+            phase="polling",
+            paid_submit_receipt=submit_pointer,
+            latest_observation=status_pointer,
+            provider_file_id=observation.provider_file_id,
+        ),
+    }

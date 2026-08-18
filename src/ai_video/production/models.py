@@ -6,7 +6,7 @@ from decimal import Decimal
 from enum import Enum
 from pathlib import Path
 from types import MappingProxyType
-from typing import Annotated, Literal, Union
+from typing import Literal, Union
 from urllib.parse import urlsplit
 
 from pydantic import (
@@ -25,9 +25,14 @@ from ai_video.production._lifecycle_schema import (
     PaidProviderBudgetSnapshotPointer as PaidProviderBudgetSnapshotPointer, PaidProviderGateReceiptPointer as PaidProviderGateReceiptPointer,
     PaidProviderSubmitReceiptPointer as PaidProviderSubmitReceiptPointer,
     P5_AWARE_OPERATIONS as _P5_AWARE_OPERATIONS,
+    VideoAttemptPhase as VideoAttemptPhase,
+    VideoGenerationAttemptState as VideoGenerationAttemptState,
+    VideoRequestReceiptPointer as VideoRequestReceiptPointer,
+    VideoStatusReceiptPointer as VideoStatusReceiptPointer,
     has_p6_state,
     prune_attempt_fields,
     reject_explicit_p7_fields,
+    reject_explicit_p8_video_fields,
     reject_explicit_paid_provider_fields,
     validate_paid_provider_manifest,
     validate_provider_attempt,
@@ -598,6 +603,21 @@ class CaptionAssetMetadata(StrictModel):
         return data
 
 
+class VideoAssetMetadata(StrictModel):
+    container_name: Literal["mp4"]
+    codec_name: str = Field(min_length=1)
+    width: int = Field(strict=True, gt=0)
+    height: int = Field(strict=True, gt=0)
+    fps_numerator: int = Field(strict=True, gt=0)
+    fps_denominator: int = Field(strict=True, gt=0)
+    duration_milliseconds: int = Field(strict=True, gt=0)
+    frame_count: int = Field(strict=True, gt=0)
+    probe_receipt_id: str = Field(min_length=1)
+    request_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    provenance_receipt_id: str = Field(min_length=1)
+
+
 class EgressMetadata(StrictModel):
     remote: bool = Field(default=False, strict=True)
     destination: str | None = None
@@ -667,6 +687,7 @@ class AssetRecord(StrictModel):
     cost_receipt_id: str | None = None
     audio_metadata: AudioAssetMetadata | None = None
     caption_metadata: CaptionAssetMetadata | None = None
+    video_metadata: VideoAssetMetadata | None = None
 
     @model_validator(mode="after")
     def _validate_p4_metadata(self) -> "AssetRecord":
@@ -688,11 +709,28 @@ class AssetRecord(StrictModel):
             raise ValueError("non-caption assets cannot contain caption metadata")
         if self.asset_type is AssetType.CAPTION and self.audio_metadata is not None:
             raise ValueError("caption assets cannot contain audio metadata")
+        if self.video_metadata is not None:
+            if self.asset_type is not AssetType.VIDEO:
+                raise ValueError("non-video assets cannot contain video metadata")
+            if self.mime_type != "video/mp4":
+                raise ValueError("video metadata requires video/mp4")
+            if (self.width, self.height) != (
+                self.video_metadata.width,
+                self.video_metadata.height,
+            ):
+                raise ValueError("video dimensions do not match measured metadata")
+            if self.duration_seconds is not None and abs(
+                Decimal(str(self.duration_seconds))
+                - Decimal(self.video_metadata.duration_milliseconds) / Decimal(1000)
+            ) > Decimal("0.001"):
+                raise ValueError("video duration does not match measured metadata")
         if self.egress.remote and not (
-            self.asset_type is AssetType.VOICE
+            self.asset_type in {AssetType.VOICE, AssetType.VIDEO}
             and self.source_kind is AssetSourceKind.GENERATED
         ):
-            raise ValueError("remote egress is restricted to generated voice assets")
+            raise ValueError(
+                "remote egress is restricted to generated voice/video assets"
+            )
         return self
 
     @model_serializer(mode="wrap")
@@ -704,11 +742,13 @@ class AssetRecord(StrictModel):
             data.pop("audio_metadata", None)
         if self.caption_metadata is None:
             data.pop("caption_metadata", None)
+        if self.video_metadata is None:
+            data.pop("video_metadata", None)
         return data
 
 
 class AssetRegistrySnapshot(StrictModel):
-    schema_version: Literal["2.0", "2.1"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2"] = "2.0"
     revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     assets: tuple[AssetRecord, ...]
@@ -739,6 +779,19 @@ class AssetRegistrySnapshot(StrictModel):
                     )
         return value
 
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p8_fields_in_old_versions(cls, value: object) -> object:
+        if not isinstance(value, Mapping) or value.get("schema_version", "2.0") == "2.2":
+            return value
+        for asset in value.get("assets", ()):
+            if isinstance(asset, Mapping) and "video_metadata" in asset:
+                raise ValueError(
+                    f"Asset Registry {value.get('schema_version', '2.0')} "
+                    "cannot contain explicit video metadata"
+                )
+        return value
+
     @model_validator(mode="after")
     def _validate_versioned_metadata(self) -> "AssetRegistrySnapshot":
         if self.schema_version == "2.0":
@@ -761,6 +814,38 @@ class AssetRegistrySnapshot(StrictModel):
                     raise ValueError("Asset Registry 2.1 caption assets require caption metadata")
             elif asset.caption_metadata is not None:
                 raise ValueError("non-caption assets cannot contain caption metadata")
+            if self.schema_version == "2.1":
+                if asset.video_metadata is not None or (
+                    asset.asset_type is AssetType.VIDEO and asset.egress.remote
+                ):
+                    raise ValueError("Asset Registry 2.1 cannot contain P8 video metadata")
+            elif (
+                asset.asset_type is AssetType.VIDEO
+                and asset.source_kind is AssetSourceKind.GENERATED
+                and asset.video_metadata is None
+            ):
+                raise ValueError(
+                    "Asset Registry 2.2 generated video assets require video metadata"
+                )
+            if (
+                self.schema_version == "2.2"
+                and asset.asset_type is AssetType.VIDEO
+                and asset.source_kind is AssetSourceKind.GENERATED
+                and asset.egress.remote
+            ):
+                if asset.cost_receipt_id is None:
+                    raise ValueError(
+                        "Asset Registry 2.2 remote generated video requires a cost receipt"
+                    )
+                assert asset.video_metadata is not None
+                if (
+                    asset.egress.request_fingerprint
+                    != asset.video_metadata.resolved_generation_hash
+                ):
+                    raise ValueError(
+                        "remote generated video egress request identity must match "
+                        "its resolved generation"
+                    )
         return self
 
 
@@ -1766,6 +1851,7 @@ class StateCommitAttempt(StrictModel):
     review_request: ReviewRequestPointer | None = None
     review_phase: ReviewAttemptPhase | None = None
     paid_provider_state: PaidProviderAttemptState | None = None
+    video_generation_state: VideoGenerationAttemptState | None = None
     started_at: str
     finished_at: str | None = None
     error_code: str | None = None
@@ -1899,6 +1985,8 @@ class StateCommitAttempt(StrictModel):
             data.pop("review_phase", None)
         if self.paid_provider_state is None:
             data.pop("paid_provider_state", None)
+        if self.video_generation_state is None:
+            data.pop("video_generation_state", None)
         return data
 
 
@@ -2108,7 +2196,9 @@ class FinalAcceptanceState(StrictModel):
 
 
 class ProductionManifest(StrictModel):
-    schema_version: Literal["2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6"] = "2.0"
+    schema_version: Literal[
+        "2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7"
+    ] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
     active_project: ProjectSnapshotPointer
@@ -2148,7 +2238,7 @@ class ProductionManifest(StrictModel):
             "final_acceptance_state",
         }
         manifest_version = value.get("schema_version", "2.0")
-        if manifest_version in {"2.5", "2.6"} and p6_fields.intersection(value):
+        if manifest_version in {"2.5", "2.6", "2.7"} and p6_fields.intersection(value):
             if value.get("active_qa_policy") is None:
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_qa_policy"
@@ -2157,7 +2247,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_dependency_graph"
                 )
-        if manifest_version in {"2.4", "2.5", "2.6"}:
+        if manifest_version in {"2.4", "2.5", "2.6", "2.7"}:
             return value
         if p6_fields.intersection(value):
             raise ValueError(
@@ -2181,7 +2271,8 @@ class ProductionManifest(StrictModel):
     def _reject_explicit_voice_fields_in_old_versions(cls, value: object) -> object:
         if (
             not isinstance(value, Mapping)
-            or value.get("schema_version", "2.0") in {"2.2", "2.3", "2.4", "2.5", "2.6"}
+            or value.get("schema_version", "2.0")
+            in {"2.2", "2.3", "2.4", "2.5", "2.6", "2.7"}
         ):
             return value
         for attempt in value.get("attempts", ()):
@@ -2205,7 +2296,7 @@ class ProductionManifest(StrictModel):
     ) -> object:
         if not isinstance(value, Mapping):
             return value
-        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5", "2.6"}:
+        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5", "2.6", "2.7"}:
             return value
         manifest_version = value.get("schema_version", "2.0")
         if {
@@ -2233,6 +2324,11 @@ class ProductionManifest(StrictModel):
     def _reject_explicit_p7_fields_in_old_versions(cls, value: object) -> object:
         return reject_explicit_p7_fields(value)
 
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_p8_video_fields_in_old_versions(cls, value: object) -> object:
+        return reject_explicit_p8_video_fields(value)
+
     @model_validator(mode="after")
     def _validate_unique_attempt_ids(self) -> "ProductionManifest":
         attempt_ids = [item.attempt_id for item in self.attempts]
@@ -2249,11 +2345,19 @@ class ProductionManifest(StrictModel):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain voice attempts"
             )
-        if self.schema_version not in {"2.5", "2.6"} and any(
+        if self.schema_version not in {"2.5", "2.6", "2.7"} and any(
             item.operation == "image_generation" for item in self.attempts
         ):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain P7 image attempts"
+            )
+        if self.schema_version != "2.7" and any(
+            item.operation == "video_generation"
+            or item.video_generation_state is not None
+            for item in self.attempts
+        ):
+            raise ValueError(
+                f"Production Manifest {self.schema_version} cannot contain P8 video attempts"
             )
         for attempt in self.attempts:
             if (
@@ -2268,7 +2372,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "running render_state attempt base must match active identity"
                 )
-        if self.schema_version in {"2.3", "2.4", "2.5", "2.6"}:
+        if self.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7"}:
             self._validate_manifest_23_graph_lifecycle()
         else:
             for attempt in self.attempts:
@@ -2282,7 +2386,7 @@ class ProductionManifest(StrictModel):
                         "cannot contain P5 graph attempt fields"
                     )
         if self.schema_version == "2.4" or (
-            self.schema_version in {"2.5", "2.6"} and has_p6_state(self)
+            self.schema_version in {"2.5", "2.6", "2.7"} and has_p6_state(self)
         ):
             if self.active_qa_policy is None:
                 raise ValueError(
@@ -2359,13 +2463,14 @@ class ProductionManifest(StrictModel):
         if self.schema_version == "2.0" and self.active_render_state is None:
             data.pop("active_render_state", None)
         if (
-            self.schema_version not in {"2.3", "2.4", "2.5", "2.6"}
+            self.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7"}
             or self.active_dependency_graph is None
         ):
             data.pop("active_dependency_graph", None)
             data.pop("dependency_states", None)
         if self.schema_version != "2.4" and not (
-            self.schema_version in {"2.5", "2.6"} and self.active_qa_policy is not None
+            self.schema_version in {"2.5", "2.6", "2.7"}
+            and self.active_qa_policy is not None
         ):
             data.pop("active_qa_policy", None)
             data.pop("active_review_receipts", None)
@@ -2373,7 +2478,7 @@ class ProductionManifest(StrictModel):
             data.pop("active_approved_repair", None)
             data.pop("repair_outcome_receipts", None)
             data.pop("final_acceptance_state", None)
-        if self.schema_version != "2.6":
+        if self.schema_version not in {"2.6", "2.7"}:
             data.pop("active_paid_provider_budget", None)
         return data
 

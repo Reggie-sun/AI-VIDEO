@@ -113,6 +113,124 @@ class PaidProviderAttemptState(_PaidLifecycleModel):
         return self
 
 
+class VideoRequestReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    request_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    generation_id: str = Field(min_length=1)
+    request_input_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    output_asset_id: str = Field(min_length=1)
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "VideoRequestReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/requests/"
+                f"{self.request_receipt_fingerprint}.json"
+            ),
+            "video generation request receipt",
+        )
+        return self
+
+
+class VideoStatusReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    observation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    paid_submit_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "VideoStatusReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/status/"
+                f"{self.observation_fingerprint}.json"
+            ),
+            "video generation status receipt",
+        )
+        return self
+
+
+class VideoAttemptPhase(str, Enum):
+    REQUEST = "request"
+    SUBMIT_INTENT = "submit_intent"
+    SUBMITTED = "submitted"
+    POLLING = "polling"
+    FETCH = "fetch"
+    VALIDATE = "validate"
+    CANDIDATE = "candidate"
+    ACTIVATE = "activate"
+
+
+_VIDEO_PRE_SUBMIT_PHASES = frozenset(
+    {VideoAttemptPhase.REQUEST, VideoAttemptPhase.SUBMIT_INTENT}
+)
+_VIDEO_OBSERVED_PHASES = frozenset(
+    {
+        VideoAttemptPhase.POLLING,
+        VideoAttemptPhase.FETCH,
+        VideoAttemptPhase.VALIDATE,
+        VideoAttemptPhase.CANDIDATE,
+        VideoAttemptPhase.ACTIVATE,
+    }
+)
+_VIDEO_CANDIDATE_PHASES = frozenset(
+    {VideoAttemptPhase.CANDIDATE, VideoAttemptPhase.ACTIVATE}
+)
+
+
+class VideoGenerationAttemptState(_PaidLifecycleModel):
+    request: VideoRequestReceiptPointer
+    generation_id: str = Field(min_length=1)
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    phase: VideoAttemptPhase
+    paid_submit_receipt: PaidProviderSubmitReceiptPointer | None = None
+    latest_observation: VideoStatusReceiptPointer | None = None
+    provider_file_id: str | None = Field(default=None, min_length=1)
+    candidate_video_asset_ids: tuple[str, ...] = ()
+
+    @model_validator(mode="after")
+    def _validate_video_attempt_state(self) -> "VideoGenerationAttemptState":
+        if (
+            self.request.generation_id != self.generation_id
+            or self.request.resolved_generation_hash != self.resolved_generation_hash
+        ):
+            raise ValueError("video attempt identity does not match its request pointer")
+        if self.phase in _VIDEO_PRE_SUBMIT_PHASES:
+            if self.paid_submit_receipt is not None or self.latest_observation is not None:
+                raise ValueError(
+                    "pre-submit video phases cannot select submit or observation evidence"
+                )
+        elif self.paid_submit_receipt is None:
+            raise ValueError("submitted video phases require a paid Provider submit receipt")
+        if self.phase in _VIDEO_OBSERVED_PHASES and self.latest_observation is None:
+            raise ValueError("observed video phases require a latest observation pointer")
+        if self.latest_observation is not None:
+            if (
+                self.latest_observation.request_receipt_fingerprint
+                != self.request.request_receipt_fingerprint
+            ):
+                raise ValueError("video observation does not belong to the attempt request")
+            if (
+                self.paid_submit_receipt is not None
+                and self.latest_observation.paid_submit_receipt_fingerprint
+                != self.paid_submit_receipt.submit_receipt_fingerprint
+            ):
+                raise ValueError("video observation does not match the submit receipt")
+        elif self.provider_file_id is not None:
+            raise ValueError("video provider file locator requires an observation pointer")
+        if self.phase in _VIDEO_CANDIDATE_PHASES:
+            if self.candidate_video_asset_ids != (self.request.output_asset_id,):
+                raise ValueError("video candidate asset ID must match request output")
+        elif self.candidate_video_asset_ids:
+            raise ValueError("video candidate asset IDs require candidate or activate phase")
+        return self
+
+
 P5_AWARE_OPERATIONS: frozenset[str] = frozenset(
     {
         "bootstrap_dependency_graph",
@@ -120,6 +238,7 @@ P5_AWARE_OPERATIONS: frozenset[str] = frozenset(
         "audio_import",
         "voice_generation",
         "image_generation",
+        "video_generation",
         "render_state",
         "repair",
     }
@@ -132,6 +251,7 @@ _VOICE_FIELDS = (
     "candidate_caption_asset_ids",
 )
 _IMAGE_FIELDS = ("image_request", "image_phase", "candidate_image_asset_ids")
+_VIDEO_FIELDS = ("video_generation_state",)
 
 
 def validate_provider_attempt(attempt: Any) -> None:
@@ -142,10 +262,15 @@ def validate_provider_attempt(attempt: Any) -> None:
     image_fields_present = any(
         getattr(attempt, field) not in (None, ()) for field in _IMAGE_FIELDS
     )
+    video_fields_present = any(
+        getattr(attempt, field) not in (None, ()) for field in _VIDEO_FIELDS
+    )
     if operation != "voice_generation" and voice_fields_present:
         raise ValueError("non-voice operations cannot contain voice fields")
     if operation != "image_generation" and image_fields_present:
         raise ValueError("non-image operations cannot contain image fields")
+    if operation != "video_generation" and video_fields_present:
+        raise ValueError("non-video operations cannot contain video fields")
     if operation not in {"voice_generation", "image_generation"} and (
         attempt.provider_request_id is not None
     ):
@@ -156,6 +281,94 @@ def validate_provider_attempt(attempt: Any) -> None:
         _validate_voice_attempt(attempt)
     if operation == "image_generation":
         _validate_image_attempt(attempt)
+    if operation == "video_generation":
+        _validate_video_attempt(attempt)
+
+
+def _validate_video_attempt(attempt: Any) -> None:
+    state = attempt.video_generation_state
+    if state is None:
+        raise ValueError("video_generation attempts require video generation state")
+    if attempt.base_dependency_graph is None:
+        raise ValueError("video_generation attempts require base dependency graph")
+    paid_state = attempt.paid_provider_state
+    if state.phase is VideoAttemptPhase.REQUEST:
+        if paid_state is not None:
+            raise ValueError("video request phase cannot contain paid Provider Gate state")
+    else:
+        if paid_state is None:
+            raise ValueError("post-request video phases require paid Provider Gate state")
+        if state.phase is VideoAttemptPhase.SUBMIT_INTENT:
+            allowed_submit_outcomes = {
+                (PaidProviderAttemptPhase.SUBMIT_INTENT, "running"),
+                (PaidProviderAttemptPhase.KNOWN_NO_EFFECT, "failed"),
+                (PaidProviderAttemptPhase.OUTCOME_UNKNOWN, "outcome_unknown"),
+            }
+            if (paid_state.phase, attempt.status.value) not in allowed_submit_outcomes:
+                raise ValueError(
+                    "video submit intent, paid Provider phase, and outer status "
+                    "are inconsistent"
+                )
+        else:
+            allowed_paid_phases = {
+                VideoAttemptPhase.SUBMITTED: {
+                    PaidProviderAttemptPhase.ACCEPTED,
+                    PaidProviderAttemptPhase.SETTLED,
+                },
+                VideoAttemptPhase.POLLING: {
+                    PaidProviderAttemptPhase.ACCEPTED,
+                    PaidProviderAttemptPhase.SETTLED,
+                },
+                VideoAttemptPhase.FETCH: {
+                    PaidProviderAttemptPhase.ACCEPTED,
+                    PaidProviderAttemptPhase.SETTLED,
+                },
+                VideoAttemptPhase.VALIDATE: {
+                    PaidProviderAttemptPhase.ACCEPTED,
+                    PaidProviderAttemptPhase.SETTLED,
+                },
+                VideoAttemptPhase.CANDIDATE: {
+                    PaidProviderAttemptPhase.SETTLED,
+                },
+                VideoAttemptPhase.ACTIVATE: {
+                    PaidProviderAttemptPhase.SETTLED,
+                },
+            }[state.phase]
+            if paid_state.phase not in allowed_paid_phases:
+                raise ValueError(
+                    "video phase is incompatible with paid Provider Gate phase"
+                )
+    allowed_phases = {
+        "running": set(VideoAttemptPhase),
+        "succeeded": {VideoAttemptPhase.ACTIVATE},
+        "failed": set(VideoAttemptPhase),
+        "interrupted": {
+            VideoAttemptPhase.REQUEST,
+            VideoAttemptPhase.FETCH,
+            VideoAttemptPhase.VALIDATE,
+            VideoAttemptPhase.CANDIDATE,
+        },
+        "outcome_unknown": set(VideoAttemptPhase) - {VideoAttemptPhase.REQUEST},
+    }
+    if state.phase not in allowed_phases[attempt.status.value]:
+        raise ValueError("video attempt status and phase are inconsistent")
+    if (
+        state.paid_submit_receipt is not None
+        and paid_state is not None
+        and paid_state.submit_receipt != state.paid_submit_receipt
+    ):
+        raise ValueError("video submit receipt must match the paid Provider Gate receipt")
+    candidate_bundle = (
+        attempt.candidate_project,
+        attempt.candidate_registry,
+        attempt.candidate_dependency_graph,
+        attempt.candidate_dependency_states_hash,
+    )
+    if state.phase in _VIDEO_CANDIDATE_PHASES:
+        if not all(item is not None for item in candidate_bundle):
+            raise ValueError("video candidate phase requires exact candidate bundle")
+    elif any(item is not None for item in candidate_bundle):
+        raise ValueError("video candidate bundle requires candidate or activate phase")
 
 
 def _validate_voice_attempt(attempt: Any) -> None:
@@ -246,6 +459,9 @@ def prune_attempt_fields(data: dict[str, object], operation: str) -> None:
     if operation != "image_generation":
         for field in _IMAGE_FIELDS:
             data.pop(field, None)
+    if operation != "video_generation":
+        for field in _VIDEO_FIELDS:
+            data.pop(field, None)
     if operation not in {"voice_generation", "image_generation"}:
         data.pop("provider_request_id", None)
 
@@ -278,7 +494,7 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
         isinstance(attempt, Mapping) and "paid_provider_state" in attempt
         for attempt in value.get("attempts", ())
     )
-    if manifest_version != "2.6" and (
+    if manifest_version not in {"2.6", "2.7"} and (
         "active_paid_provider_budget" in value or has_paid_attempt
     ):
         raise ValueError(
@@ -287,11 +503,29 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
     return value
 
 
+def reject_explicit_p8_video_fields(value: object) -> object:
+    if not isinstance(value, Mapping):
+        return value
+    manifest_version = value.get("schema_version", "2.0")
+    if manifest_version == "2.7":
+        return value
+    for attempt in value.get("attempts", ()):
+        if isinstance(attempt, Mapping) and (
+            attempt.get("operation") == "video_generation"
+            or "video_generation_state" in attempt
+        ):
+            raise ValueError(
+                f"Production Manifest {manifest_version} "
+                "cannot contain explicit P8 video fields"
+            )
+    return value
+
+
 def reject_explicit_p7_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version in {"2.5", "2.6"}:
+    if manifest_version in {"2.5", "2.6", "2.7"}:
         return value
     image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
     for attempt in value.get("attempts", ()):

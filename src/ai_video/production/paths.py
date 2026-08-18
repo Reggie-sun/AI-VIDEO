@@ -209,6 +209,26 @@ def canonical_image_asset_path(file_sha256: str) -> Path:
     )
 
 
+def canonical_video_request_receipt_path(request_receipt_fingerprint: str) -> Path:
+    return Path(
+        "state/video-generation/requests/"
+        f"{_require_sha256(request_receipt_fingerprint, 'video request fingerprint')}.json"
+    )
+
+
+def canonical_video_status_receipt_path(observation_fingerprint: str) -> Path:
+    return Path(
+        "state/video-generation/status/"
+        f"{_require_sha256(observation_fingerprint, 'video observation fingerprint')}.json"
+    )
+
+
+def canonical_video_asset_path(file_sha256: str) -> Path:
+    return Path(
+        f"assets/files/{_require_sha256(file_sha256, 'video file hash')}.mp4"
+    )
+
+
 def canonical_image_shot_revision_path(revision: int, content_hash: str) -> Path:
     if type(revision) is not int or revision < 1:
         raise ValueError("Image Shot revision must be a positive integer.")
