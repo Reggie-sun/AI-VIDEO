@@ -6,7 +6,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 
 ## Roadmap Status
 
-公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3-P7 与 combined Base AI Comic E2E 已合入 local `main`。P7.1 offline/runtime-contract implementation 增加 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；live smoke 和 blind benchmark 尚未授权或验收。
+公共 CLI 仍是本 README 描述的 local-first `0.1.x` surface。P2 是可导入、只读的 Python API，用于 strict Production Project 与 content-addressed local assets；P2A 拥有 v2 state commit 和 explicit recovery。P3-P7 与 combined Base AI Comic E2E 已合入 local `main`。P7.1 offline/runtime-contract implementation 增加 sealed loopback-only ComfyUI image adapter 与 truthful human web-image import；首次授权 live smoke 已 fail closed，尚未通过 live 或 blind quality acceptance。
 
 - Current runtime evidence: [`docs/v0.2-runtime-baseline.md`](docs/v0.2-runtime-baseline.md)
 - New target contract: [`docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md`](docs/superpowers/specs/2026-08-09-ai-video-agentic-production-harness-v0.2.md)
@@ -23,7 +23,7 @@ The MVP reads a project config and shot list, renders ComfyUI workflow JSON per 
 - Historical superseded spec: [`docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md`](docs/superpowers/specs/2026-08-08-ai-video-production-runtime-v0.2.md)
 - Implemented local Legacy stabilization record: [`docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md`](docs/superpowers/plans/2026-08-08-ai-video-production-runtime-p1-runtime-truth-fixes.md)
 
-公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已 push 到 `origin/main`；P6-P7 与 Base E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但 local `main` 尚未 push、release 或 publish。P7.1 本轮不修改 CLI、schema 或 Legacy layout，也未运行 live ComfyUI generation、模型下载、blind benchmark 或 remote call。
+公共命令仍是 `validate`、`run` 和 `resume`；Legacy generation 继续只使用 default-local ComfyUI，Manifest v1 与 flat Legacy artifact layout 仍有效。P5 已 push 到 `origin/main`；P6-P7 与 Base E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`，但 local `main` 尚未 push、release 或 publish。P7.1 不修改 CLI、schema 或 Legacy layout；M7 只产生一次 loopback Qwen submit，未下载模型、未调用 remote service，也未运行 blind benchmark。
 
 ## Setup
 
@@ -127,13 +127,13 @@ Manifest 2.5 组合 P6 review/repair 与 P7 image lifecycle，但不让两者互
 
 P7 原始 fake/no-network acceptance 已随 Base E2E 合入 local `main`。它没有增加 CLI、renderer、Composition/timeline、video generation 或 remote Provider；local `main` 尚未 push、release 或 publish。
 
-### Hybrid Local Image Production (P7.1, offline-verified)
+### Hybrid Local Image Production (P7.1, offline-verified; live blocked)
 
 `ai_video.production.comfy_image` 提供 sealed Qwen-Image-Edit-2511 与 FLUX.2-klein-4B local execution profile、loopback-only transport、exact workflow binding，以及在任何 P7 R+1 durable evidence 之前执行的 component SHA/size、ComfyUI commit 和 registered `/object_info` node preflight。Exact replay 仍在 preflight 之前返回，因此不会访问 ComfyUI；submit 后 history/output 不确定性继续进入 `outcome_unknown`，recovery 不 remint permit。
 
 `ai_video.production.image_import` 将人工下载的 ChatGPT Images web PNG 记录为 `chatgpt_images_2_web` human import，不虚构 backend model、provider request、durable submit 或 browser automation。Character master、Scene reference、key Shot 与 repair replacement 都复用同一个 `ProductionStateCommitter` project/Registry/P5 graph atomic activation path。
 
-本地 static compatibility gate 已验证 pinned official-template lineage、Qwen profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`、FLUX profile `local-image-profile:sha256:3963b58e0aad18e8359044b9ad043c92961c940dde19002f94723cd196718eb8`、两个 lane 的 exact component digests、ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、Torch `2.11.0+cu130` / CUDA `13.0`、lane budgets 与 no-tensor GPU preflight。该证据不是 live generation 或质量结论；M7 live smoke 与 M8 blind benchmark 未获授权，P7.1 因此不得称为 live-accepted 或 quality-accepted。
+本地 static compatibility gate 已验证 pinned official-template lineage、Qwen profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`、FLUX profile `local-image-profile:sha256:3963b58e0aad18e8359044b9ad043c92961c940dde19002f94723cd196718eb8`、两个 lane 的 exact component digests、ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、Torch `2.11.0+cu130` / CUDA `13.0` 与 lane budgets。2026-08-18 的首次授权 M7 session 在唯一一次 Qwen submit 后因 reference fixture 不是可解码 PNG 而失败，Manifest 记录 `outcome_unknown` 并 recovery 到 revision 6；没有 blind retry，也没有 FLUX submit。harness 已增加 PNG chunk/CRC/IDAT 解压回归并改用有效 PNG，但重新 live submit 需要新授权。M8 仍缺至少 18 组人工 ChatGPT web outputs、两名 reviewer 与 tie-break，因此 P7.1 仍不得称为 live-accepted 或 quality-accepted。
 
 ## Base AI Comic E2E
 

@@ -14,7 +14,7 @@
 | Error Model | 跨模块统一使用 `AiVideoError` 与 `ErrorCode`。 |
 | Dependency Policy | 除非有明确理由且获得请求，否则不新增运行时依赖。 |
 | Output Policy | Legacy run 保持当前 flat `runs/<run_id>/` layout；v2 layout 只能由显式 v2 config 和已批准的 Manifest v2 slice 创建。 |
-| Version Gate | P0-P5 已完成各自阶段，P5 已 push 到 `origin/main`。P6、P7 与 P3-P7 combined Base AI Comic E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`；尚未 push/release。P7.1 offline/runtime-contract implementation 已完成，M7 live smoke 与 M8 blind benchmark 未授权或验收。P8 runtime 与 Paid Provider Gate 均未实现；后续 slice 仍必须有独立 plan、授权、验收、rollback 和 contract/docs/tests 更新。 |
+| Version Gate | P0-P5 已完成各自阶段，P5 已 push 到 `origin/main`。P6、P7 与 P3-P7 combined Base AI Comic E2E 已通过 `abc69c39b9d3d5f9ba317ecb65bbf26f1070d7d8` 合入 local `main`；尚未 push/release。P7.1 offline/runtime-contract implementation 已完成；首次 M7 session fail closed，尚无 live acceptance，M8 也未验收。P8 runtime 与 Paid Provider Gate 均未实现；后续 slice 仍必须有独立 plan、授权、验收、rollback 和 contract/docs/tests 更新。 |
 | Agent Boundary | Codex 是 Production Agent；仓库提供 durable state、validation、provenance、dependency、render 和 QA harness，不实现第二套通用 Agent runtime。 |
 | Renderer Ownership | P3/P4 `ResolvedTimeline` 是唯一 frame/sample ordering 与 timing 真相源；P4 只向它增加 canonical audio spans 与 caption cues，不另造 audio timeline。当前唯一实现的 renderer 是 pinned local HyperFrames；caption layout/drawing 归 selected renderer。Remotion、Captions.ai final-render path 与其它 renderer 仍未实现并必须 fail closed；不得 fallback、串联或 double render。 |
 
@@ -101,7 +101,7 @@ Agent 不得悄悄侵蚀本地优先承诺。
 - P5 已于 `0d663566c4db4542922e38d770608e3e02d53745` 合入并 push 到 `origin/main`，实现 immutable graph、Manifest 2.3 lifecycle、precise resolver 与 explicit recovery，并以 deterministic mutation matrix 完成 acceptance；canonical `1256 passed, 3 skipped`、Legacy `58 passed`、merged-main full `1386 passed, 4 skipped`；尚未 release。P5 不改变 Legacy CLI/Manifest/layout。
 - P6 已完成、独立 review `accept with concerns` 并通过 `be28dc4` checkpoint 整合 local `main`；Manifest 2.4 与 `ProductionStateCommitter` 拥有 durable review/repair/final acceptance，P5 graph 仍不保存 mutable review status。Focused `739 passed`、full `1462 passed, 4 skipped`；无 blocking issue，尚未 push/release。
 - P7 与 Base AI Comic E2E 已完成 acceptance 并合入 local `main`；Manifest 2.5、exact repair closure、restart reopen 与 zero-side-effect replay contract保持不变。Local `main` 尚未 push/release。
-- P7.1 offline/runtime-contract implementation 已完成 static compatibility 与 deterministic fake/recovery/import gates；未运行 live ComfyUI generation或blind benchmark，不作质量 acceptance 声明。
+- P7.1 offline/runtime-contract implementation 已完成 static compatibility 与 deterministic fake/recovery/import gates。首次授权 M7 session 仅提交 Qwen 一次，因 invalid PNG fixture 进入 `outcome_unknown` 并 recovery；没有 retry 或 FLUX submit。harness fix 已通过离线 regression，M7 rerun 与 M8 benchmark 均未验收，不作 live/quality acceptance 声明。
 - Production QA 必须使用 Shot `visual_strategy` 与 exact timeline windows；当前 `static_visuals` heuristic 不得自动否决合法的 `static_image`、`image_motion` 或 `motion_graphics` Shot。
 - P8 runtime 与 Paid Provider Gate 仍未实现。开始 P8 前必须先单独设计、计划、实现并验收 Paid Provider Gate；任何 paid Provider submit 仍受 Budget Guard、Cloud Egress、secret redaction 和 crash-safe persistence gate。
 - 新 CLI、Manifest schema、artifact layout、远程行为、Audio 或 dependency 仍命中下方 Change Escalation Matrix。

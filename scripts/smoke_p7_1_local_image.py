@@ -99,7 +99,9 @@ def _run_lane(
 ) -> dict[str, object]:
     root.mkdir(parents=True)
     project_factory.write_production_project(root)
-    base_inputs = project_factory.make_p7_image_generation_base(root)
+    base_inputs = project_factory.make_p7_image_generation_base(
+        root, decodable_pngs=True
+    )
     profile = load_local_image_execution_profile(PROFILES[lane], artifact_root=REPO_ROOT)
     request, preview, authorization = _request_for_profile(root, profile, lane)
     loaded = load_production_project(root / "project.yaml")

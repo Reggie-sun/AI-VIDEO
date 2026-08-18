@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 import socket
+import struct
+import zlib
 from pathlib import Path
 
 import pytest
@@ -29,6 +31,41 @@ from test_production_state_commit import (
 FIXTURES = Path(__file__).parent / "fixtures/p7_1"
 ROOT = Path(__file__).parents[1]
 REAL_QWEN_PROFILE = ROOT / "workflows/profiles/p7_1_qwen_image_edit_2511.json"
+
+
+def test_live_smoke_reference_fixture_is_decodable_png(tmp_path: Path) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_p7_image_generation_base(tmp_path, decodable_pngs=True)
+    profile = _profile()
+    request, _, _ = _local_bundle(tmp_path, profile)
+    loaded = load_production_project(tmp_path / "project.yaml")
+
+    for reference in request.references:
+        payload = loaded.asset_paths[reference.asset_id].read_bytes()
+        assert payload.startswith(b"\x89PNG\r\n\x1a\n")
+        offset = 8
+        idat = bytearray()
+        dimensions = None
+        saw_iend = False
+        while offset < len(payload):
+            length = struct.unpack(">I", payload[offset : offset + 4])[0]
+            kind = payload[offset + 4 : offset + 8]
+            value = payload[offset + 8 : offset + 8 + length]
+            checksum = struct.unpack(
+                ">I", payload[offset + 8 + length : offset + 12 + length]
+            )[0]
+            assert zlib.crc32(kind + value) & 0xFFFFFFFF == checksum
+            offset += 12 + length
+            if kind == b"IHDR":
+                dimensions = struct.unpack(">II", value[:8])
+            elif kind == b"IDAT":
+                idat.extend(value)
+            elif kind == b"IEND":
+                saw_iend = True
+                break
+        assert dimensions is not None and saw_iend and offset == len(payload)
+        width, height = dimensions
+        assert len(zlib.decompress(idat)) == height * (1 + width * 4)
 
 
 def _profile() -> LocalImageExecutionProfile:

@@ -1,6 +1,6 @@
 # AI-VIDEO P7.1 Hybrid Local Image Production Implementation Plan
 
-Execution status: Milestones 0-6 and the applicable offline verification/review portion of Milestone 9 are implemented on local `main`. Milestone 7 live smoke and Milestone 8 blind benchmark remain blocked on their separate explicit authorizations; no live or quality acceptance is claimed.
+Execution status: Milestones 0-6 and the applicable offline verification/review portion of Milestone 9 are implemented on local `main`. The first authorized Milestone 7 session failed closed after one Qwen submit and requires fresh authorization to rerun; Milestone 8 lacks mandatory human outputs/review evidence. No live or quality acceptance is claimed.
 
 **Goal:** 在 accepted Base AI Comic E2E 之后，为 P7 增加 loopback-only ComfyUI local image adapter、Qwen/FLUX sealed execution profiles、truthful ChatGPT web human-import path 和 evidence-based quality gate，同时保留现有 durable lifecycle、single writer、P5/P6 ownership 与 Legacy behavior。
 
@@ -501,6 +501,8 @@ python -m scripts.smoke_p7_1_local_image \
 The script must fail unless `--confirm-live-local-generation` is explicit. It prints sanitized profile IDs, ComfyUI commit, model/workflow digests, prompt IDs, elapsed time, peak VRAM/RAM, output hashes and replay counters; it never prints prompt reference bytes or secrets。
 
 **Failure behavior:** A failure after either `/prompt` submission stops the session. Do not retry the failed profile or proceed to another submit when outcome is unknown. Run explicit recovery and report the state。
+
+**2026-08-18 execution evidence:** Static compatibility passed with `network_used: false`. The first authorized session submitted Qwen exactly once, then ComfyUI rejected the internal reference fixture as `Truncated File Read`; the committer recorded `image_provider_outcome_unknown`, stopped before FLUX and recovered Manifest revision 6. The session was not retried. The harness now requests decodable PNG fixtures and has an executable chunk/CRC/IDAT-decompression regression, but another live submit requires fresh authorization。
 
 **Acceptance:** Exactly two first-run submits at most, two valid PNG activations, and replay counters all zero. No non-loopback socket, API key or browser is used。
 

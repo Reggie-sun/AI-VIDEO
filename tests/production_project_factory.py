@@ -653,6 +653,7 @@ def write_and_load_two_shot_project(
     filenames: tuple[str, str] = ("shot-1.png", "shot-2.png"),
     seconds: tuple[float, float] = (2.0, 2.0),
     fps: int = 24,
+    decodable_pngs: bool = False,
 ):
     """Build a valid two-Shot raster project through the public P2 loader."""
     write_production_project(root)
@@ -727,7 +728,15 @@ def write_and_load_two_shot_project(
         if Path(filename).name != filename:
             raise ValueError("composition fixture filenames must be basenames")
         asset_path = root / "assets/files" / filename
-        payload = b"\x89PNG\r\n\x1a\n" + f"fixture-raster-{index}".encode()
+        payload = (
+            _p7_png(
+                width=1,
+                height=1,
+                rgba=bytes((0x20 * index, 0x30 * index, 0x40 * index, 0xFF)),
+            )
+            if decodable_pngs
+            else b"\x89PNG\r\n\x1a\n" + f"fixture-raster-{index}".encode()
+        )
         asset_path.write_bytes(payload)
         assets.append(
             registry.assets[0].model_copy(
@@ -932,10 +941,13 @@ def _make_audio_asset(
 
 
 def make_p4_composition_fixture(
-    root: Path, *, second_caption_start_sample: int = 24_000
+    root: Path,
+    *,
+    second_caption_start_sample: int = 24_000,
+    decodable_pngs: bool = False,
 ):
     """Build deterministic P4 registry assets around the public P2-loaded project."""
-    loaded = write_and_load_two_shot_project(root)
+    loaded = write_and_load_two_shot_project(root, decodable_pngs=decodable_pngs)
     audio_definitions = (
         ("voice-dialogue", AudioKind.DIALOGUE, 96_000),
         ("voice-narration", AudioKind.NARRATION, 48_000),
@@ -1129,12 +1141,14 @@ def make_p4_composition_fixture(
     return loaded, seal_artifact(spec)
 
 
-def make_p5_dependency_inputs(root: Path):
+def make_p5_dependency_inputs(root: Path, *, decodable_pngs: bool = False):
     """Build verified deterministic P2/P3/P4 inputs for P5 graph tests."""
 
     from ai_video.production.dependency import ProductionDependencyInputs
 
-    loaded, composition_spec = make_p4_composition_fixture(root)
+    loaded, composition_spec = make_p4_composition_fixture(
+        root, decodable_pngs=decodable_pngs
+    )
     registry_path = root / f"assets/registry.{loaded.registry.revision_id}.json"
     registry_payload = (
         json.dumps(
@@ -2567,7 +2581,7 @@ def make_p7_image_candidate_preparer(base_inputs):
     return prepare
 
 
-def make_p7_image_generation_base(root: Path):
+def make_p7_image_generation_base(root: Path, *, decodable_pngs: bool = False):
     """Materialize the exact fresh P5 base used by Task 9 orchestration tests."""
 
     from ai_video.production.dependency import (
@@ -2586,7 +2600,10 @@ def make_p7_image_generation_base(root: Path):
     from ai_video.production.paths import canonical_dependency_graph_snapshot_path
     from ai_video.production.project import load_production_project
 
-    inputs = replace(make_p5_dependency_inputs(root), voice_requests=())
+    inputs = replace(
+        make_p5_dependency_inputs(root, decodable_pngs=decodable_pngs),
+        voice_requests=(),
+    )
     graph = build_production_dependency_graph(inputs)
     graph_bytes = _p7_json_bytes(graph.model_dump(mode="json"))
     graph_path = canonical_dependency_graph_snapshot_path(graph.revision_id)
