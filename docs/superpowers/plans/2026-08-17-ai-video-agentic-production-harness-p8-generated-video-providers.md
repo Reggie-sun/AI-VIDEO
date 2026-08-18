@@ -14,7 +14,7 @@
 
 - 本文件记录 implementation contract；实际 runtime authority来自用户当前明确授权，且不扩展到 live-call、真实付费提交、push 或 release。
 - Runtime base已满足 accepted P6、accepted P7、accepted Base AI Comic E2E 与 standalone Paid Provider Gate commit `cc82a49`。
-- Task 0固定 exact integration base `cc82a49`、accepted Manifest `2.6` / Registry `2.1`，并分配 `P8_MANIFEST_SCHEMA = "2.7"` / `P8_REGISTRY_SCHEMA = "2.2"`。
+- Task 0固定 Paid Gate checkpoint `cc82a49` 与 post-P7.1 exact execution base `3890295`、accepted Manifest `2.6` / Registry `2.1`，并分配 `P8_MANIFEST_SCHEMA = "2.7"` / `P8_REGISTRY_SCHEMA = "2.2"`。
 - 所有 accepted pre-P8 Manifest/Registry versions保持 readable，no downgrade。
 - `ProductionStateCommitter`是唯一 Manifest/Project/Registry/Graph writer、activation与recovery owner。
 - Provider、resolver、service、reader、registry loader、dependency resolver不得直接写 state。
@@ -106,7 +106,7 @@ P5当前只能通过 synthetic generated visual `AssetRecord`证明 future seam�
 - Read: accepted P6/P7 plans and exact implementation commits
 - Modify: this plan to record exact accepted Manifest/Registry bases、selected P8 versions与 shared symbols before code
 
-**Change:** Exact integration base为 `cc82a49`；current Manifest/Registry bases为 `2.6` / `2.1`；selected next-compatible versions为 `P8_MANIFEST_SCHEMA = "2.7"` / `P8_REGISTRY_SCHEMA = "2.2"`。P8复用 `DurablePaidProviderSubmitPermit` 与 `PaidProviderSubmitReceipt.external_effect_id`，不得新增 P8-specific paid permit或第二份 external task identity。当前 P7.1 unrelated dirty files不属于 P8 ownership，不覆盖、不 stage、不 commit；若后续 exact target file与其发生冲突则停止并协调。
+**Change:** Paid Gate checkpoint为 `cc82a49`，exact execution base为 `3890295`；current Manifest/Registry bases为 `2.6` / `2.1`；selected next-compatible versions为 `P8_MANIFEST_SCHEMA = "2.7"` / `P8_REGISTRY_SCHEMA = "2.2"`。P8复用 `DurablePaidProviderSubmitPermit` 与 `PaidProviderSubmitReceipt.external_effect_id`，不得新增 P8-specific paid permit或第二份 external task identity。P7.1 concurrent changes由 `3890295` 独立拥有；P8不改写该 ownership。
 
 **Verification:**
 
@@ -127,7 +127,7 @@ python -m pytest tests/test_production_models.py tests/test_production_project.p
   tests/test_production_review.py tests/test_production_repair.py -q
 ```
 
-**Acceptance criteria:** explainable base `cc82a49`；P6/P7/Base E2E/Paid Gate accepted；exact Manifest/Registry bases与两个 P8 next-compatible versions recorded；no overlapping P8 writer；unrelated dirty work preserved；no P8 file exists under a conflicting owner。Failure at any gate stops runtime edits。
+**Acceptance criteria:** explainable Gate checkpoint `cc82a49` / execution base `3890295`；P6/P7/Base E2E/Paid Gate accepted；exact Manifest/Registry bases与两个 P8 next-compatible versions recorded；no overlapping P8 writer；concurrent P7.1 ownership preserved；no P8 file exists under a conflicting owner。Failure at any gate stops runtime edits。
 
 ---
 
@@ -152,19 +152,19 @@ python -m pytest tests/test_production_models.py tests/test_production_project.p
 - `VideoCapabilityVariant`
 - `VideoProviderCapabilities`
 - `VideoGenerationPreview`
-- `VideoCallAuthorization.create(...)`
+- shared `PaidProviderCallPreview(operation="video_generation")` / `PaidProviderAuthorizationDecision`
 - `VideoSubmission`
 - `VideoTaskState`
 - `VideoTaskObservation`
 - `VideoFetchReceipt`
-- type-check-only、不可公开构造的 `DurableVideoSubmitPermit` nominal interface
+- existing type-check-only `DurablePaidProviderSubmitPermit` nominal interface；no P8-specific permit
 - `VideoProviderFailure`
 - `VideoProvider` Protocol
 - `VideoProviderRegistry.resolve(name)`
 
-**Change:** Implement strict/frozen/self-sealing models from the spec. `request_input_hash` seals caller intent before resolution and excludes `generation_id`、effective values与 authorization receipts；`resolved_generation_hash` / `desired_generation_fingerprint` binds `generation_id + request_input_hash + capability/profile version + exact effective settings + output slot`。Both exclude `attempt_id`、task ID、timestamps、secret与 artifact bytes；authorization fingerprint is created after preview and separately binds resolved hash、policy，以及仅 remote/metered所需的 egress/budget receipts。Provider profile is a content-addressed pointer, not arbitrary options dict. Resolver is injected mapping only and has no automatic selection/fallback. P8 V1不提供 cancellation method。
+**Change:** Implement strict/frozen/self-sealing models from the spec. `request_input_hash` seals caller intent before resolution and excludes `generation_id`、effective values与 authorization receipts；`resolved_generation_hash` / `desired_generation_fingerprint` binds `generation_id + request_input_hash + capability/profile version + exact effective settings + output slot`。Both exclude `attempt_id`、task ID、timestamps、secret与 artifact bytes；remote/metered authorization直接使用 shared Paid Provider Gate并绑定 resolved hash。Provider profile is a content-addressed pointer, not arbitrary options dict. Resolver is injected mapping only and has no automatic selection/fallback. P8 V1不提供 cancellation method。
 
-Add bounded `ErrorCode` values: `VIDEO_REQUEST_INVALID`、`VIDEO_CAPABILITY_UNSUPPORTED`、`VIDEO_BUDGET_REJECTED`、`VIDEO_EGRESS_NOT_AUTHORIZED`、`VIDEO_PROVIDER_FAILED`、`VIDEO_PROVIDER_OUTCOME_UNKNOWN`、`VIDEO_ARTIFACT_INVALID`。Detailed operation/certainty/retry safety stays in `VideoProviderFailure` rather than multiplying global codes。
+Add bounded `ErrorCode` values: `VIDEO_REQUEST_INVALID`、`VIDEO_CAPABILITY_UNSUPPORTED`、`VIDEO_PROVIDER_FAILED`、`VIDEO_PROVIDER_OUTCOME_UNKNOWN`、`VIDEO_ARTIFACT_INVALID`。Budget/egress failures复用 existing `PAID_PROVIDER_BUDGET_REJECTED` / `PAID_PROVIDER_EGRESS_NOT_AUTHORIZED`。Detailed operation/certainty/retry safety stays in `VideoProviderFailure` rather than multiplying global codes。
 
 **Tests:**
 
@@ -208,7 +208,7 @@ python -m pytest tests/test_production_video.py tests/test_errors.py -q
 - `VideoProviderCallCounts`
 - reusable `assert_video_provider_contract(provider_factory, capability_cases)` test helper
 
-**Change:** Fake validates capabilities, requires the Task 1 nominal permit interface, and uses a test-only issuer/validator fixture to prove the permit gate before the Task 4 concrete committer minting exists. It returns stable task IDs, exposes one observation per `get_status()`, writes committed fixture bytes to caller-owned sink and records exact submit/status/fetch calls. It never sleeps、reads env、opens network或 writes state；the test issuer is never exported to runtime code。
+**Change:** Fake validates capabilities, requires the shared `DurablePaidProviderSubmitPermit` nominal interface for remote metered submit, and uses a test-only protocol double before Task 4 proves the real committer permit. It returns an ephemeral stable task ID；durable polling evidence只绑定 caller提供的 Gate submit receipt fingerprint。Fake exposes one observation per `get_status()`，writes committed fixture bytes to caller-owned sink and records exact submit/status/fetch calls. It never sleeps、reads env、opens network或 writes state；the test double is never exported to runtime code。
 
 Generate the fixture once as a repository test asset; tests treat committed bytes as immutable and compare repeated SHA-256, not encoder-version reproducibility。Fixture must contain one MP4 video stream、no audio、24fps、non-zero duration。
 
@@ -249,7 +249,7 @@ python -m pytest tests/test_production_video.py tests/test_production_video_fake
 - `P8_REGISTRY_SCHEMA` compatibility validators
 - canonical `state/video-generation/**` and `assets/video/**` path helpers
 
-**Change:** Add fixed-shape P8 attempt summary containing request pointer/hash、generation ID、phase、exact opaque external task ID/file ID、latest observation pointer、candidate video asset IDs and candidate graph identity. Durable opaque IDs只做 bounded validation，超限/非法直接 fail closed；不得截断、替换、normalization或 hash，日志另用 redacted display ID。Mutable phase lives only in Manifest。Add P8 Registry measured `VideoAssetMetadata`; remote egress expands only to generated voice/video, and remote generated video requires cost/egress/provenance evidence。
+**Change:** Add fixed-shape P8 attempt summary containing request pointer/hash、generation ID、phase、Gate submit receipt pointer/fingerprint、optional provider file locator、latest observation pointer、candidate video asset IDs and candidate graph identity。Exact opaque external task ID只存在 `PaidProviderSubmitReceipt.external_effect_id`；P8 Manifest不得复制。Mutable phase lives only in Manifest。Add P8 Registry measured `VideoAssetMetadata`; remote egress expands only to generated voice/video, and remote generated video requires cost/egress/provenance evidence。
 
 Project reader reopens only exact Manifest-selected request/status/provenance/Registry evidence using containment/no-follow/hash checks；it never scans newest files、recovers、creates directories or contacts Provider。
 
@@ -290,7 +290,7 @@ python -m pytest tests/test_production_models.py tests/test_production_registry.
 
 **Interfaces produced:**
 
-- private concrete `_DurableVideoSubmitPermit` implementing the Task 1 nominal interface, plus committer-only minting/validation
+- reuse existing private `_DurablePaidProviderSubmitPermit` with `operation="video_generation"`；no second permit class
 - `ProductionStateCommitter.begin_video_generation()`
 - `record_video_submit_intent()`
 - `record_video_submission()`
@@ -299,7 +299,7 @@ python -m pytest tests/test_production_models.py tests/test_production_registry.
 - `prepare_video_fetch_sink()` / committer-owned held-FD fetch boundary
 - `VideoGenerationService.start()`、`.submit_once()`、`.refresh_once()`、`.fetch_and_activate()`、`.resume_next_action()`
 
-**Change:** Persist R+1 request/profile/preview/authorization before R+2 submit intent. Mint one permit only after exact Manifest replace is reopened and verified. Consume permit atomically at Provider submit boundary. Persist task ID immediately. Every later service operation loads exact persisted submission and cannot call submit path。
+**Change:** Persist R+1 video request/profile before Gate submit intent。Gate persists preview/authorization/reservation and mints one existing paid permit only after exact Manifest replace is reopened and verified。Consume permit atomically at Provider submit boundary，then immediately persist the sole `PaidProviderSubmitReceipt` containing task ID。Every later service operation reopens that exact receipt and cannot call submit path。Restart with an existing unresolved `submit_intent` follows Gate recovery to `outcome_unknown` and never remints。
 
 `refresh_once()` makes one status call and persists normalized observation；deadline produces resumable timeout with task identity retained。`fetch_and_activate()` is allowed only for durable succeeded observation. Recovery never calls Provider、never remints permit、never converts outcome unknown to failed/safe automatically。
 
@@ -580,7 +580,7 @@ git diff --name-only <P8_IMPLEMENTATION_BASE>...HEAD
 - First P8 lifecycle write uses `P8_MANIFEST_SCHEMA`；first generated-video registration uses `P8_REGISTRY_SCHEMA`。
 - All accepted pre-P8 Manifest/Registry versions remain readable；P8 fields rejected in older explicit versions。
 - No automatic bulk migration、no downgrade、no Legacy Manifest v1 change。
-- Selected values are Manifest `2.7` / Registry `2.2` because accepted Paid Provider Gate already owns Manifest `2.6` and Registry remains `2.1` at base `cc82a49`。
+- Selected values are Manifest `2.7` / Registry `2.2` because accepted Paid Provider Gate owns Manifest `2.6` and Registry remains `2.1` at exact execution base `3890295`。
 
 ## Rollback
 

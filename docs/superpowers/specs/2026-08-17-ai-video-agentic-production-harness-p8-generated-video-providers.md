@@ -2,7 +2,7 @@
 
 Status: Accepted offline-first P8 slice contract. 用户已授权从 accepted Paid Provider Gate base 开始实施；本授权不包含 MiniMax live call、真实付费提交、push 或 release。
 
-Implementation snapshot: 2026-08-18。P6、P7 与 Base AI Comic E2E 已在 local `main` accepted；standalone Paid Provider Gate 已于 `cc82a49` 完成 Manifest `2.6` implementation、independent review 与 executable acceptance。P8 的 exact integration base 为 `cc82a49`，并固定使用 `P8_MANIFEST_SCHEMA = "2.7"`、`P8_REGISTRY_SCHEMA = "2.2"`。现有 P7.1 unrelated dirty work 不属于 P8 ownership，必须保留且不得被 P8 覆盖。
+Implementation snapshot: 2026-08-18。P6、P7 与 Base AI Comic E2E 已在 local `main` accepted；standalone Paid Provider Gate 已于 `cc82a49` 完成 Manifest `2.6` implementation、independent review 与 executable acceptance。Concurrent P7.1 fixture hardening 已由独立 checkpoint `3890295` 收口；P8 的 exact execution base 为 `3890295`，并固定使用 `P8_MANIFEST_SCHEMA = "2.7"`、`P8_REGISTRY_SCHEMA = "2.2"`。P8不改写该 P7.1 ownership。
 
 ## 1. Goal
 
@@ -90,10 +90,15 @@ class VideoProvider(Protocol):
     def submit(
         self,
         request: ResolvedVideoGenerationRequest,
-        authorization: VideoCallAuthorization,
-        permit: DurableVideoSubmitPermit,
-    ) -> VideoSubmission: ...
-    def get_status(self, submission: VideoSubmission) -> VideoTaskObservation: ...
+        paid_preview: PaidProviderCallPreview | None,
+        authorization: PaidProviderAuthorizationDecision | None,
+        permit: DurablePaidProviderSubmitPermit | None,
+    ) -> VideoSubmitResult: ...
+    def get_status(
+        self,
+        submission: VideoSubmission,
+        submit_receipt: PaidProviderSubmitReceipt,
+    ) -> VideoTaskObservation: ...
     def fetch(
         self,
         submission: VideoSubmission,
@@ -102,7 +107,7 @@ class VideoProvider(Protocol):
     ) -> VideoFetchReceipt: ...
 ```
 
-`DurableVideoSubmitPermit` 是 non-serializable、process-local、one-use capability，只能在 exact request/authorization/submit intent 已 durable 后由 committer mint。它不是 public constructor。
+Remote metered submit直接复用 standalone Gate 的 `DurablePaidProviderSubmitPermit`。P8不定义 `DurableVideoSubmitPermit` 或第二套 authorization authority；local/unmetered adapter以 `None` 表达不需要 paid authority，不得伪造 Cloud receipts。
 
 `VideoGenerationService` 不直接写文件或 Manifest。它负责：
 
@@ -158,7 +163,7 @@ src/ai_video/production/state_commit.py
 
 Core 不出现 `hailuo_model_name`、`prompt_optimizer`、`fast_pretreatment` 等字段。Concrete adapter的 non-secret typed profile作为 content-addressed snapshot保存；core request只绑定 profile identity/hash。Profile不得包含 credential或 signed URL。
 
-`VideoCallAuthorization` 在 Provider resolution与 preview之后单独创建，绑定 `resolved_generation_hash`、preview fingerprint、policy receipt；仅 `execution_kind=remote`强制 egress receipt，仅 `billing_kind=metered`强制 budget reservation。Local ComfyUI一类未来 adapter不得被迫伪造 Cloud receipts。
+Remote metered request在 Provider resolution之后构造 `PaidProviderCallPreview(operation="video_generation")`，并使用 Gate-owned `PaidProviderAuthorizationDecision` 绑定 exact resolved hash、egress、budget与 live opt-in。P8不另建 `VideoCallAuthorization`；Local ComfyUI一类未来 adapter传 `None`，不得被迫伪造 Cloud receipts。
 
 ### 5.2 Requested, resolved and measured values
 
@@ -208,7 +213,7 @@ P8固定区分五类 identity：
 | `request_input_hash` | caller intent before Provider resolution | prompt/source hashes、requested common settings、explicit provider/profile pointer、target/output slot | generation ID、resolved/effective settings、authorization、task ID、artifact bytes |
 | `generation_id` | caller-issued identity for one explicit candidate generation | stable opaque ID | request/effective values、attempt/task/artifact identity |
 | `resolved_generation_hash` / `desired_generation_fingerprint` | one exact resolved creative generation intent and P5 desired evidence | generation ID + request input hash + capability/profile version + exact effective settings + output slot | authorization、attempt/task ID、poll state、artifact hash |
-| submission identity | one billable submit lifecycle | attempt ID、desired generation fingerprint、authorization fingerprint、client idempotency token、external task ID when known | artifact hash |
+| submission identity | one billable submit lifecycle | Gate attempt、resolved generation fingerprint、Gate authorization/receipt fingerprint；exact task ID只在 `PaidProviderSubmitReceipt.external_effect_id` | artifact hash；P8 durable duplicate task ID |
 | artifact identity | exact materialized output | asset ID、MP4 SHA-256、size、measured media metadata | request equivalence assumption |
 
 相同 requested inputs甚至相同 seed不保证 bit-identical MP4。Schema按字段角色禁止用 artifact hash替代 request/resolved identity，而不依赖“两个 SHA-256 值必须不相等”的脆弱 validator。若明确要求“同参数再生成一个候选”，`request_input_hash`保持相同，但创建新 `generation_id`，从而得到新的 `resolved_generation_hash` / `desired_generation_fingerprint`与 output asset ID；不得伪装为 infrastructure retry。
@@ -241,14 +246,14 @@ fetch/download failure          -> resumable fetch failure, same task retained
 artifact validation failure     -> failed, bytes not registered
 ```
 
-P8 V1不提供公共 cancellation contract；未来若加入 cancellation，必须另行设计 durable cancel intent、outcome ambiguity与 restart semantics。每次 `get_status()`只观察一个已持久化 task；P8不在 Provider 内部无限 sleep。Manifest保存 Provider返回的 exact opaque external task ID；只做 bounded validation，超限或非法结构直接 fail closed，不截断、不替换、不 normalization、不 hash。日志可另派生 redacted display ID。Status history如需保留，使用 bounded immutable normalized receipts，不落 raw response。
+P8 V1不提供公共 cancellation contract；未来若加入 cancellation，必须另行设计 durable cancel intent、outcome ambiguity与 restart semantics。每次 `get_status()`只观察一个 Gate receipt-selected task；P8不在 Provider 内部无限 sleep。Exact opaque external task ID只由 `PaidProviderSubmitReceipt.external_effect_id`持久化；P8 Manifest保存该 submit receipt pointer/fingerprint，不复制 task ID。Status history使用 bounded immutable normalized receipts并绑定 submit receipt fingerprint，不落 raw response。
 
 ### 8.2 Crash windows
 
 - request/authorization durable 前：Provider call count 0；可重新开始。
 - submit intent durable 后、Provider call前：permit尚未消费，可继续 exact action。
-- permit消费/POST 后、task ID durable 前：若 Provider不能官方 lookup/idempotent replay，必须 `outcome_unknown`；不 mint新 permit、不自动 POST。
-- task ID durable 后：restart只 poll该 task。
+- permit消费/POST 后、Gate submit receipt durable前：必须 `outcome_unknown`；不 mint新 permit、不自动 POST。
+- accepted Gate submit receipt durable后：restart从 receipt reopen唯一 task ID并只 poll该 task。
 - success observation durable 后、fetch失败：只 fetch同一 remote result。
 - local bytes完成但 Registry/Manifest未 activate：reopen exact candidate并显式 recover；不重新 submit/fetch已验证 bytes。
 - final Manifest replace后：exact replay返回现有 active asset，Provider/fetch/write counts均为0。
@@ -259,7 +264,7 @@ P8 V1不提供公共 cancellation contract；未来若加入 cancellation，必�
 
 1. submit前 durable保存 generation/request/submission identity、policy authorization、applicable budget reservation/egress authorization与 one-use intent；
 2. adapter仅在 exact one-use permit消费时发送一次 POST；
-3. task ID收到后立即 durable commit；
+3. task ID收到后立即写入唯一 Gate `PaidProviderSubmitReceipt`；
 4. 只有官方明确提供 lookup或有保证期的 idempotent replay时才允许 reconcile；
 5. 无官方保证时保持 `outcome_unknown`、预算 unsettled/reserved并要求 explicit operator reconciliation。
 
@@ -482,7 +487,7 @@ load exact ProductionProject
   -> validate capability with zero network
   -> durable request + authorization + submit intent
   -> exactly one submit
-  -> persist fake external task ID
+  -> persist one Gate submit receipt containing the fake external task ID
   -> process restart
   -> poll same task queued/running/succeeded
   -> inject one transient poll failure without resubmit

@@ -21,3 +21,19 @@ def test_retryable_error_preserves_cause():
     assert error.retryable is True
     assert error.cause is cause
     assert isinstance(error, AiVideoError)
+
+
+def test_p8_video_error_codes_are_stable_public_values():
+    assert {
+        ErrorCode.VIDEO_REQUEST_INVALID.value,
+        ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED.value,
+        ErrorCode.VIDEO_PROVIDER_FAILED.value,
+        ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN.value,
+        ErrorCode.VIDEO_ARTIFACT_INVALID.value,
+    } == {
+        "video_request_invalid",
+        "video_capability_unsupported",
+        "video_provider_failed",
+        "video_provider_outcome_unknown",
+        "video_artifact_invalid",
+    }
