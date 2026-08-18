@@ -43,6 +43,7 @@ from ai_video.production.models import (
     ActorIdentity,
     ApprovedRepairReceipt,
     AssetType,
+    CompositionSpec,
     EvidenceStrength,
     FinalAcceptanceReceipt,
     NamedFingerprint,
@@ -57,6 +58,7 @@ from ai_video.production.models import (
     RepairRequest,
     ReviewEvidence,
     ReviewEvidencePointer,
+    ReviewLifecycle,
     ReviewReceipt,
     ReviewReceiptPointer,
     ReviewRequest,
@@ -183,6 +185,20 @@ class BaseAiComicFinalAcceptance:
     @property
     def render_state(self):
         return self.receipt.render_state
+
+
+@dataclass(frozen=True)
+class BaseAiComicFullAcceptanceResult:
+    render_state: object
+    render_output_sha256: str
+    output_path: Path
+    mp4_sha256: str
+    acceptance_pointer: object
+    acceptance_id: str
+    acceptance_receipt: FinalAcceptanceReceipt
+    repair_outcome_pointer: object
+    repair_outcome_repair_id: str
+    acceptance_lifecycle: ReviewLifecycle
 
 
 class DeterministicVoiceProvider:
@@ -875,6 +891,72 @@ class BaseAiComicE2ERuntime:
 
     def load_manifest(self):
         return load_production_project(self.root / "project.yaml").manifest
+
+    def manifest_bytes(self) -> bytes:
+        return (self.root / "state/manifest.json").read_bytes()
+
+    def _reopen_full_acceptance_result(
+        self, bundle, manifest
+    ) -> BaseAiComicFullAcceptanceResult:
+        acceptance_state = manifest.final_acceptance_state
+        if (
+            acceptance_state is None
+            or acceptance_state.active_receipt is None
+            or acceptance_state.lifecycle is not ReviewLifecycle.FRESH
+        ):
+            raise AssertionError(
+                "replay requires a fresh final acceptance with an active receipt"
+            )
+        if manifest.active_render_state is None:
+            raise AssertionError("replay requires an active render state")
+        acceptance_pointer = acceptance_state.active_receipt
+        receipt = FinalAcceptanceReceipt.model_validate_json(
+            (self.root / acceptance_pointer.path).read_bytes()
+        )
+        render_state_snapshot = bundle.render_state
+        if render_state_snapshot is None:
+            raise AssertionError("reopened bundle missing active render state")
+        output_path = self.root / render_state_snapshot.output.path
+        mp4_sha256 = hashlib.sha256(output_path.read_bytes()).hexdigest()
+        if not manifest.repair_outcome_receipts:
+            raise AssertionError("replay requires an active repair outcome receipt")
+        repair_outcome_pointer = manifest.repair_outcome_receipts[-1]
+        return BaseAiComicFullAcceptanceResult(
+            render_state=manifest.active_render_state,
+            render_output_sha256=render_state_snapshot.output.file_sha256,
+            output_path=output_path,
+            mp4_sha256=mp4_sha256,
+            acceptance_pointer=acceptance_pointer,
+            acceptance_id=receipt.acceptance_id,
+            acceptance_receipt=receipt,
+            repair_outcome_pointer=repair_outcome_pointer,
+            repair_outcome_repair_id=repair_outcome_pointer.repair_id,
+            acceptance_lifecycle=acceptance_state.lifecycle,
+        )
+
+    def run_full_acceptance(self) -> BaseAiComicFullAcceptanceResult:
+        bundle = load_production_project(self.root / "project.yaml")
+        manifest = bundle.manifest
+        if (
+            manifest.final_acceptance_state is not None
+            and manifest.final_acceptance_state.active_receipt is not None
+            and manifest.final_acceptance_state.lifecycle is ReviewLifecycle.FRESH
+        ):
+            return self._reopen_full_acceptance_result(bundle, manifest)
+        self.materialize_and_render_initial()
+        failed = self.review_initial_render()
+        approval = self.approve_exact_layout_repair(failed)
+        repair_commit = self.commit_layout_repair(approval)
+        repaired_composition_path = self.root / repair_commit.composition_path
+        repaired_composition = CompositionSpec.model_validate_json(
+            repaired_composition_path.read_bytes()
+        )
+        repaired = self.render_current_composition(composition=repaired_composition)
+        passing = self.review_repaired_render()
+        self.record_repair_outcome(approval, repaired, passing)
+        self.record_final_acceptance(passing)
+        reopened = load_production_project(self.root / "project.yaml")
+        return self._reopen_full_acceptance_result(reopened, reopened.manifest)
 
     def materialize_and_render_initial(self) -> BaseAiComicInitialRender:
         self.generate_two_shot_images()
@@ -1618,3 +1700,55 @@ class BaseAiComicE2ERuntime:
             approval, mutation=mutation
         )
         self._committer().commit(request)
+
+
+class _ReopenImageRuntime:
+    """Test-only image runtime stub that reuses existing durable state.
+
+    The reopen runtime never calls provider side effects; it exists so a
+    fresh ``BaseAiComicE2ERuntime`` can reopen the accepted project without
+    re-running the image setup and overwriting the final acceptance state.
+    """
+
+    def __init__(self, root: Path, base_inputs: object) -> None:
+        self.root = root
+        self.base_inputs = base_inputs
+        self.provider_requests: list[object] = []
+        self.request_binding_counts: dict[str, int] = {}
+        self._first_result = None
+        self.writer = None
+
+    def generate_all(self):
+        raise AssertionError(
+            "reopen image runtime must not generate new images; "
+            "exact replay must short-circuit before any provider call"
+        )
+
+    def change_only_shot_1_prompt_and_generate(self):
+        raise AssertionError(
+            "reopen image runtime must not regenerate images; "
+            "exact replay must short-circuit before any provider call"
+        )
+
+
+def make_base_ai_comic_reopen_runtime(
+    root: Path,
+) -> BaseAiComicE2ERuntime:
+    """Create a fresh ``BaseAiComicE2ERuntime`` against an existing project.
+
+    The factory reuses the already-committed durable state and never
+    invokes image/voice/analyzer/renderer side effects, so a fresh process
+    can reopen the accepted final state and exact replay short-circuits
+    through durable evidence only.
+    """
+
+    toolchain = require_audio_toolchain()
+    loaded = load_production_project(root / "project.yaml")
+    image_runtime = _ReopenImageRuntime(root, loaded)
+    return BaseAiComicE2ERuntime(
+        root=root,
+        image_runtime=image_runtime,
+        voice_provider=DeterministicVoiceProvider(),
+        renderer=DeterministicHyperFramesRunner(toolchain.ffmpeg_path),
+        analyzer=DeterministicReviewAnalyzer(),
+    )

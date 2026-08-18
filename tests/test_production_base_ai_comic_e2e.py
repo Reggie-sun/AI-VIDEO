@@ -29,11 +29,13 @@ from ai_video.production.models import (
 )
 from ai_video.production.project import load_production_project
 from ai_video.production.state_commit import ProductionStateCommitter
+from ai_video.production.state_commit import recover_production_state
 from production_e2e_support import (
     BaseAiComicCallCounts,
     DeterministicHyperFramesRunner,
     DeterministicReviewAnalyzer,
     DeterministicVoiceProvider,
+    make_base_ai_comic_reopen_runtime,
     require_audio_toolchain,
 )
 import production_project_factory as project_factory
@@ -525,3 +527,46 @@ def test_base_ai_comic_repair_rejects_scope_or_identity_drift_before_mutation(
         runtime.commit_forged_repair(mutation)
 
     assert runtime.load_manifest() == before
+
+
+def test_base_ai_comic_final_state_reopens_and_exact_replay_has_zero_effects(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    runtime = project_factory.make_base_ai_comic_e2e_runtime(tmp_path)
+    _forbid_network_and_secret_access(monkeypatch)
+
+    final = runtime.run_full_acceptance()
+    before_manifest_bytes = runtime.manifest_bytes()
+    before_counts = runtime.call_counts
+    final_mp4_bytes = final.output_path.read_bytes()
+    final_mp4_sha = hashlib.sha256(final_mp4_bytes).hexdigest()
+
+    recovery = recover_production_state(tmp_path)
+    after_recovery_bytes = runtime.manifest_bytes()
+    assert recovery.manifest_revision_after == recovery.manifest_revision_before
+    assert after_recovery_bytes == before_manifest_bytes
+
+    replay = runtime.run_full_acceptance()
+    assert replay == final
+    assert runtime.call_counts == before_counts
+    assert runtime.manifest_bytes() == before_manifest_bytes
+
+    fresh = make_base_ai_comic_reopen_runtime(tmp_path)
+    assert fresh.call_counts == BaseAiComicCallCounts()
+    fresh_replay = fresh.run_full_acceptance()
+    assert fresh_replay == final
+    assert fresh.call_counts == BaseAiComicCallCounts()
+    assert fresh.manifest_bytes() == before_manifest_bytes
+
+    reopened = load_production_project(tmp_path / "project.yaml")
+    assert reopened.manifest.final_acceptance_state is not None
+    assert reopened.manifest.final_acceptance_state.active_receipt is not None
+    assert (
+        reopened.manifest.final_acceptance_state.active_receipt
+        == final.acceptance_pointer
+    )
+    assert reopened.manifest.active_render_state == final.render_state
+    assert final_mp4_sha == hashlib.sha256(final.output_path.read_bytes()).hexdigest()
+    assert final.mp4_sha256 == final_mp4_sha
+    assert final.render_output_sha256 == final_mp4_sha
