@@ -55,6 +55,30 @@ python -m scripts.architecture_gate update-baseline
 
 Historical oversized modules 与 existing import cycles 可 grandfather；超过 blocking threshold 的 oversized module growth、new blocking-sized module 和 new first-party dependency cycle 会阻止通过。`801–1500` LOC 的 growth/new module 为 warning，new high fan-out 仅作为 reviewer information。
 
+## Development Verification Harness
+
+仓库开发 Harness 是对现有 tests/checks 的轻量 mandatory runner，不是新的 Agent workflow，也不属于产品 runtime。Policy 位于 `.agent/harness/policy.yaml`，入口是 `scripts/agent_harness.py`，每次 verification 的本地 receipt 写入 `.agent/harness/runs/<run_id>/receipt.json`；run artifacts 默认不进入 Git。
+
+```bash
+# 查看当前 changes 必须执行的 checks
+make harness-inspect
+
+# 执行 checks 并生成 passing/failed receipt
+make harness-verify
+
+# 只验证 Harness 自身
+make harness-test
+```
+
+工作区存在 unrelated changes 时，可通过 `HARNESS_ARGS` 限定本任务文件，或在只 stage 本任务文件后验证：
+
+```bash
+make harness-verify HARNESS_ARGS="--path src/ai_video/cli.py --path tests/test_cli.py"
+make harness-verify HARNESS_ARGS="--staged"
+```
+
+Harness 按 changed-path category 合并 required checks；任何未映射路径都会 fail safe 到完整 no-network pytest suite 与 Architecture Gate。P6 Review/Repair 是产品 runtime QA surface，与这个开发 Harness 不同。
+
 ## Production Project Core Python API
 
 P2 exposes a Python loading API for an explicitly materialized v2 project:
@@ -107,7 +131,7 @@ Graph snapshot 使用 canonical `state/dependency_graph.<revision>.json`。Reade
 
 P5 slice 本身没有实现 QA/repair、Provider/cloud 或 hardening；P6 在不修改 graph ownership 的前提下增加下述 review/repair lifecycle。Legacy CLI、Manifest v1、flat `runs/` layout、ComfyUI path 和现有公共 CLI 保持不变。
 
-## Codex Review and Repair Harness (P6)
+## Codex Review and Repair Runtime (P6)
 
 P6 通过 `ai_video.production.review`、Manifest 2.4 和既有 `ProductionStateCommitter` 提供 strategy-aware QA。`video-analysis` MCP 只收集 technical raw measurements；它不拥有 Production Manifest、review/repair lifecycle 或 final acceptance。Technical review context 只能从已验证的 `LoadedProductionProject`、`ResolvedTimeline`、exact render/output hash 和 Shot `visual_strategy` 构建。合法 `static_image`、`image_motion` 与 `motion_graphics` 按各自策略预期判定，不再被统一的 video-like diversity heuristic 误判。
 
@@ -133,7 +157,7 @@ P7 原始 fake/no-network acceptance 已随 Base E2E 合入 local `main`。它�
 
 `ai_video.production.image_import` 将人工下载的 ChatGPT Images web PNG 记录为 `chatgpt_images_2_web` human import，不虚构 backend model、provider request、durable submit 或 browser automation。Character master、Scene reference、key Shot 与 repair replacement 都复用同一个 `ProductionStateCommitter` project/Registry/P5 graph atomic activation path。
 
-本地 static compatibility gate 已验证 pinned official-template lineage、Qwen profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`、FLUX profile `local-image-profile:sha256:3963b58e0aad18e8359044b9ad043c92961c940dde19002f94723cd196718eb8`、两个 lane 的 exact component digests、ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、Torch `2.11.0+cu130` / CUDA `13.0` 与 lane budgets。2026-08-18 的首次授权 M7 session 在唯一一次 Qwen submit 后因 reference fixture 不是可解码 PNG 而失败，Manifest 记录 `outcome_unknown` 并 recovery 到 revision 6；没有 blind retry，也没有 FLUX submit。harness 已增加 PNG chunk/CRC/IDAT 解压回归并改用有效 PNG，但重新 live submit 需要新授权。M8 仍缺至少 18 组人工 ChatGPT web outputs、两名 reviewer 与 tie-break，因此 P7.1 仍不得称为 live-accepted 或 quality-accepted。
+本地 static compatibility gate 已验证 pinned official-template lineage、Qwen profile `local-image-profile:sha256:3871ae162aabe70ff3217ea6a9dbc4e83194b70a1d00e2ca249da202d4d8c6df`、FLUX profile `local-image-profile:sha256:3963b58e0aad18e8359044b9ad043c92961c940dde19002f94723cd196718eb8`、两个 lane 的 exact component digests、ComfyUI checkout `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、Torch `2.11.0+cu130` / CUDA `13.0` 与 lane budgets。2026-08-18 的首次授权 M7 session 在唯一一次 Qwen submit 后因 reference fixture 不是可解码 PNG 而失败，Manifest 记录 `outcome_unknown` 并 recovery 到 revision 6；没有 blind retry，也没有 FLUX submit。smoke fixture validation 已增加 PNG chunk/CRC/IDAT 解压回归并改用有效 PNG，但重新 live submit 需要新授权。M8 仍缺至少 18 组人工 ChatGPT web outputs、两名 reviewer 与 tie-break，因此 P7.1 仍不得称为 live-accepted 或 quality-accepted。
 
 ## Base AI Comic E2E
 

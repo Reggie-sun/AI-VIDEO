@@ -9,12 +9,13 @@
 | Concern | Canonical Source |
 | --- | --- |
 | Agent authority、工作边界、decision gates、Git 与 completion rules | `AGENTS.md` |
+| Changed-path category、mandatory checks 与 local run receipt | `.agent/harness/policy.yaml`、`scripts/agent_harness.py`、`.agent/harness/runs/` |
 | 当前已实现行为、local/origin/release truth、已验证与未验证边界 | `docs/v0.2-runtime-baseline.md` |
 | Phase dependency、status、future gates 与 slice direction | `docs/v0.2-agentic-production-roadmap.md` |
 | 单个 slice 的 accepted scope、tradeoff 与 implementation detail | active spec / plan |
 | Executable behavior | source code、tests 与本轮实际 runtime evidence |
 
-使用方法：定位受影响的 surface，确认唯一 owner，保持 `Invariants`，不得引入 `Forbidden Alternate Path`，然后运行 `Focused Verification`。跨多个 surface 的改动必须合并运行所有相关验证；用户可见行为变化还必须按 `AGENTS.md` 更新相关文档。
+使用方法：先用 `make harness-inspect` 根据 task-owned changed paths 查看 mandatory checks，再定位受影响的 surface，确认唯一 owner，保持 `Invariants`，不得引入 `Forbidden Alternate Path`。完成前运行 `make harness-verify` 并保留 passing receipt。下表的 `Focused Verification` 是 human-readable contract；`.agent/harness/policy.yaml` 是对应 executable routing，二者变更时必须同步。
 
 ## Cross-Cutting Contracts
 
@@ -27,6 +28,12 @@
 | Local-First and Provider Safety | Legacy 默认只连接 local ComfyUI；v2 local adapter 必须 loopback-only。任何 remote/paid Provider、live submit、secret 或 cloud egress 继续受 `AGENTS.md` decision gates 约束，且不得成为 fallback。 |
 | Evidence Truth | Immutable evidence 必须 content-addressed 并绑定 exact selected inputs。Plan、console text、Agent memory 或 heuristic 不得升级成 runtime、semantic acceptance 或 quality acceptance。 |
 | Error Model | 跨模块失败使用 `AiVideoError` 与 `ErrorCode`；retryability 由 typed metadata 决定，常规 CLI 输出不得泄露 raw traceback。 |
+
+## Development Control Surface
+
+| Surface | Primary Owner | Invariants | Forbidden Alternate Path | Focused Verification |
+| --- | --- | --- | --- | --- |
+| Development Verification Harness | `scripts/agent_harness.py`、`.agent/harness/policy.yaml`、`Makefile` | 只根据 task-owned paths 选择已有 checks；commands 使用 argv + `shell=False`；每次 verify 原子写 local ignored receipt；unknown path fail safe 到 full tests + Architecture Gate。 | Agent dispatch、产品 state mutation、network/live smoke、把历史 receipt 当本轮 proof、静默忽略 unmapped path。 | `make harness-test && make harness-inspect HARNESS_ARGS="--path scripts/agent_harness.py"`；Architecture Gate 仅由对应 source category 选择。 |
 
 ## Legacy Runtime Surfaces
 
@@ -58,4 +65,4 @@
 
 ## Completion Use
 
-本矩阵只定义 surface-level focused gate。最终交付仍必须遵守 `AGENTS.md`：检查实际 diff ownership，运行与全部受影响 surface 成比例的验证，区分本轮执行证据与历史记录，并明确 remaining risk、未验证区域和 publication 状态。
+本矩阵只定义 surface-level focused gate。最终交付仍必须遵守 `AGENTS.md`：检查实际 diff ownership，通过 Development Harness 运行全部受影响 surface 的 mandatory checks，报告 fresh receipt path，区分本轮执行证据与历史记录，并明确 remaining risk、未验证区域和 publication 状态。
