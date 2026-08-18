@@ -337,7 +337,7 @@ class _StateCommitVoiceActivationMixin:
             and dependency_transition_preparer is None
         ):
             raise _state_invalid(
-                "Manifest 2.3 voice generation requires a dependency transition preparer."
+                "Graph-aware Manifest voice generation requires a dependency transition preparer."
             )
 
         preview = provider.preview(request)

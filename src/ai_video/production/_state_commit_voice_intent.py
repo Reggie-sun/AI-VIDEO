@@ -162,7 +162,7 @@ class _StateCommitVoiceIntentMixin:
                 and not dependency_transition_preparer_available
             ):
                 raise _state_invalid(
-                    "Manifest 2.3 voice generation requires a dependency transition preparer."
+                    "Graph-aware Manifest voice generation requires a dependency transition preparer."
                 )
             existing = next(
                 (item for item in manifest.attempts if item.attempt_id == request.attempt_id),
