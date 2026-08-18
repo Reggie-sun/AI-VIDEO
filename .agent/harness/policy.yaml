@@ -89,7 +89,7 @@ checks:
     cwd: .
     description: Verify the single Production writer, activation, and explicit recovery.
   production_composition_audio_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_composition.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_captions.py, tests/test_production_elevenlabs.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_composition.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_captions.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify timeline, renderer, audio, voice, and caption contracts.
   production_dependency_tests:
@@ -256,6 +256,7 @@ categories:
       - src/ai_video/production/audio.py
       - src/ai_video/production/captions.py
       - src/ai_video/production/elevenlabs.py
+      - src/ai_video/production/minimax_speech.py
       - src/ai_video/production/_state_commit_render_*.py
       - src/ai_video/production/_state_commit_voice_*.py
       - src/ai_video/production/_voice_project_reader.py
@@ -264,6 +265,7 @@ categories:
       - tests/test_production_audio.py
       - tests/test_production_captions.py
       - tests/test_production_elevenlabs.py
+      - tests/test_production_minimax_speech.py
       - tests/test_production_voice_captions_e2e.py
       - tests/production_voice_e2e_support.py
     check_ids:

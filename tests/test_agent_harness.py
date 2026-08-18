@@ -169,6 +169,9 @@ def test_production_policy_commands_cover_repository_mandatory_contract_tests() 
     policy = agent_harness.load_policy(POLICY_PATH)
     dependency_argv = policy["checks"]["production_dependency_tests"]["argv"]
     image_argv = policy["checks"]["production_image_tests"]["argv"]
+    composition_audio_argv = policy["checks"][
+        "production_composition_audio_tests"
+    ]["argv"]
 
     for path in (
         "tests/test_production_models.py",
@@ -184,6 +187,20 @@ def test_production_policy_commands_cover_repository_mandatory_contract_tests() 
         "tests/test_workflow_loader.py",
     ):
         assert path in image_argv
+    assert "tests/test_production_minimax_speech.py" in composition_audio_argv
+
+
+def test_minimax_speech_adapter_routes_to_composition_audio_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/production/minimax_speech.py",
+        "tests/test_production_minimax_speech.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == []
+        assert "production_composition_audio" in report["categories"]
+        assert "production_composition_audio_tests" in report["check_ids"]
 
 
 def test_root_level_credential_filenames_are_sensitive() -> None:
