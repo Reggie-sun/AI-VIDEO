@@ -11,3 +11,11 @@ cwd = "/home/reggie/vscode_folder/AI-VIDEO"
 
 [mcp_servers.video-analysis.env]
 PYTHONPATH = "/home/reggie/vscode_folder/AI-VIDEO/src"
+
+[mcp_servers.codegraph]
+command = "node"
+args = [
+    "/home/reggie/vscode_folder/MCP/mcp-server-codegraph/dist/index.js",
+    "/home/reggie/vscode_folder/AI-VIDEO",
+]
+cwd = "/home/reggie/vscode_folder/MCP/mcp-server-codegraph"
