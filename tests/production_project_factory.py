@@ -9,8 +9,12 @@ from datetime import date
 import wave
 from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
+
+if TYPE_CHECKING:
+    from production_e2e_support import BaseAiComicE2ERuntime
 
 from ai_video.config import sha256_file
 from ai_video.production.captions import (
@@ -1699,6 +1703,346 @@ def attach_p5_dependency_transition(root: Path, request):
         artifacts=artifacts,
         dependency_graph_transition=transition,
     ), graph
+
+
+def make_base_ai_comic_voice_request(root: Path):
+    """Bind the Task 5 generated dialogue to Shot 2 without changing defaults."""
+
+    from ai_video.production.audio import (
+        VoiceGenerationRequest,
+        VoiceProviderParameters,
+    )
+
+    manifest = ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_bytes()
+    )
+    return VoiceGenerationRequest.create(
+        request_id="request-base-ai-comic-voice",
+        attempt_id="base-ai-comic-voice",
+        provider_kind="fake",
+        model_id="fixture-model",
+        audio_kind=AudioKind.DIALOGUE,
+        script_text="Exact script",
+        speaker_id="speaker-1",
+        voice_id="voice-1",
+        language="en",
+        output_container="wav",
+        output_codec="pcm_s16le",
+        output_sample_rate_hz=48_000,
+        output_channels=1,
+        provider_parameters=VoiceProviderParameters(stability_milli=500),
+        base_project=manifest.active_project,
+        base_registry=manifest.active_registry,
+        input_artifact_ids=("shot-2",),
+        input_fingerprint="1" * 64,
+        pricing_snapshot_id="fixture-pricing",
+        budget_reservation_receipt_id="budget-1",
+        egress_authorization_receipt_id="egress-1",
+    )
+
+
+def attach_base_ai_comic_voice_dependency_transition(
+    root: Path,
+    request,
+    base_inputs,
+    voice_request,
+):
+    """Attach the exact P5 graph candidate to one public voice activation."""
+
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.state_commit import (
+        PreparedArtifact,
+        prepare_dependency_graph_transition,
+    )
+
+    manifest = ProductionManifest.model_validate_json(
+        (root / "state/manifest.json").read_bytes()
+    )
+    project_artifact = next(
+        item
+        for item in request.artifacts
+        if item.relative_path == request.next_project.path
+    )
+    registry_artifact = next(
+        item
+        for item in request.artifacts
+        if item.relative_path == request.next_registry.path
+    )
+    project = ProductionProject.model_validate(yaml.safe_load(project_artifact.payload))
+    registry = AssetRegistrySnapshot.model_validate_json(registry_artifact.payload)
+    active = load_production_project(root / "project.yaml")
+    candidate = active.model_copy(
+        update={
+            "manifest": manifest.model_copy(
+                update={
+                    "active_project": request.next_project,
+                    "active_registry": request.next_registry,
+                }
+            ),
+            "project": project,
+            "registry": registry,
+            "dependency_graph": None,
+            "render_state": None,
+        }
+    )
+    composition, style_fingerprints = make_base_ai_comic_current_composition(
+        candidate,
+        base_inputs,
+        revision=1,
+        voice_request=voice_request,
+        artifacts=request.artifacts,
+    )
+    candidate_inputs = replace(
+        base_inputs,
+        project=candidate,
+        composition_spec=composition,
+        voice_requests=(*base_inputs.voice_requests, voice_request),
+        caption_style_fingerprints=style_fingerprints,
+    )
+    graph = build_production_dependency_graph(candidate_inputs)
+    states = resolve_dependency_state(
+        graph, build_applied_dependency_evidence(candidate_inputs, None)
+    ).states
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=request.expected_manifest_revision,
+        base_dependency_graph=manifest.active_dependency_graph,
+        candidate_graph=graph,
+        candidate_dependency_states=states,
+        expected_desired_fingerprints=desired_fingerprints(graph),
+    )
+    payload = _p7_json_bytes(graph.model_dump(mode="json"))
+    graph_artifact = PreparedArtifact(
+        transition.candidate_dependency_graph.path,
+        payload,
+        hashlib.sha256(payload).hexdigest(),
+    )
+    return replace(
+        request,
+        artifacts=tuple(
+            sorted(
+                (*request.artifacts, graph_artifact),
+                key=lambda item: item.relative_path.as_posix(),
+            )
+        ),
+        dependency_graph_transition=transition,
+    )
+
+
+def make_base_ai_comic_current_composition(
+    loaded,
+    base_inputs,
+    *,
+    revision: int,
+    voice_request,
+    artifacts=(),
+):
+    """Seal one CompositionSpec from current active Shot and media identities."""
+
+    audio_id = f"voice-{voice_request.attempt_id}"
+    caption_id = f"caption-{voice_request.attempt_id}"
+    caption_record = next(
+        item for item in loaded.registry.assets if item.asset_id == caption_id
+    )
+    metadata = caption_record.caption_metadata
+    if (
+        metadata is None
+        or metadata.style_reference_id is None
+        or metadata.style_reference_revision is None
+        or metadata.style_content_hash is None
+    ):
+        raise AssertionError("generated caption style provenance is required")
+    style = CaptionStyleReference(
+        artifact_id=metadata.style_reference_id,
+        revision=metadata.style_reference_revision,
+        content_hash=metadata.style_content_hash,
+        path=Path(f"assets/styles/{metadata.style_content_hash}.json"),
+    )
+    artifact_by_path = {item.relative_path: item.payload for item in artifacts}
+    style_bytes = artifact_by_path.get(style.path)
+    if style_bytes is None:
+        style_bytes = (loaded.root / style.path).read_bytes()
+    shot_visuals = {
+        shot.shot_id: next(
+            role.asset_ids[0]
+            for role in shot.required_asset_roles
+            if role.role == "still"
+        )
+        for shot in loaded.shots
+    }
+    base = base_inputs.composition_spec
+    caption_audio_track_ids = {
+        binding.source_audio_track_id for binding in base.caption_tracks
+    }
+    required_base_audio_tracks = tuple(
+        track
+        for track in base.audio_tracks
+        if track.track_id in caption_audio_track_ids
+    )
+    composition = seal_artifact(
+        base.model_copy(
+            update={
+                "revision": revision,
+                "content_hash": ZERO_HASH,
+                "creation_receipt_id": f"base-ai-comic-composition-{revision}",
+                "layers": tuple(
+                    layer.model_copy(
+                        update={
+                            "asset_id": shot_visuals[layer.shot_id],
+                            "transform": (
+                                layer.transform.model_copy(
+                                    update={"translate_x_px": 24}
+                                )
+                                if revision == 2 and layer == base.layers[0]
+                                else layer.transform
+                            ),
+                        }
+                    )
+                    for layer in base.layers
+                ),
+                "audio_tracks": (
+                    *required_base_audio_tracks,
+                    AudioTrackSpec(
+                        track_id="base-ai-comic-dialogue",
+                        audio_kind=AudioKind.DIALOGUE,
+                        asset_id=audio_id,
+                        shot_id="shot-2",
+                    ),
+                ),
+                "caption_tracks": (
+                    *base.caption_tracks,
+                    CaptionTrackBinding(
+                        binding_id="base-ai-comic-dialogue-captions",
+                        caption_asset_id=caption_id,
+                        source_audio_track_id="base-ai-comic-dialogue",
+                        shot_id="shot-2",
+                        style_reference=style,
+                    ),
+                ),
+            }
+        )
+    )
+    style_fingerprints = dict(base_inputs.caption_style_fingerprints)
+    style_fingerprints[style.artifact_id] = caption_style_fingerprint(
+        style, style_bytes
+    )
+    return composition, tuple(sorted(style_fingerprints.items()))
+
+
+def make_base_ai_comic_caption_style_fingerprints(
+    loaded,
+    base_inputs,
+    composition_spec,
+):
+    """Reopen caption style bytes for an already sealed CompositionSpec."""
+
+    style_fingerprints = dict(base_inputs.caption_style_fingerprints)
+    for binding in composition_spec.caption_tracks:
+        style = binding.style_reference
+        if style is None:
+            raise AssertionError("base AI comic captions require exact style identity")
+        style_fingerprints[style.artifact_id] = caption_style_fingerprint(
+            style, (loaded.root / style.path).read_bytes()
+        )
+    return tuple(sorted(style_fingerprints.items()))
+
+
+def make_base_ai_comic_render_transition_preparer(
+    root: Path,
+    base_inputs,
+    composition_spec,
+    voice_request,
+    caption_style_fingerprints,
+):
+    """Build a write-free exact render-closure transition preparer."""
+
+    from ai_video.production.dependency import (
+        build_applied_dependency_evidence,
+        build_production_dependency_graph,
+        desired_fingerprints,
+        resolve_dependency_state,
+    )
+    from ai_video.production.models import (
+        DependencyLifecycle,
+        DependencyNodeKind,
+        DependencyNodeState,
+        RenderDependencyEvidence,
+    )
+    from ai_video.production.state_commit import (
+        PreparedArtifact,
+        prepare_dependency_graph_transition,
+    )
+
+    loaded = load_production_project(root / "project.yaml")
+    candidate_inputs = replace(
+        base_inputs,
+        project=loaded,
+        composition_spec=composition_spec,
+        voice_requests=(*base_inputs.voice_requests, voice_request),
+        caption_style_fingerprints=caption_style_fingerprints,
+    )
+    graph = build_production_dependency_graph(candidate_inputs)
+    applied_states = build_applied_dependency_evidence(candidate_inputs, None)
+    desired = desired_fingerprints(graph)
+    render_kinds = {
+        DependencyNodeKind.COMPOSITION_SPEC,
+        DependencyNodeKind.RESOLVED_TIMELINE,
+        DependencyNodeKind.RENDERER_SOURCE,
+        DependencyNodeKind.RENDER,
+    }
+
+    def prepare(activation):
+        current = load_production_project(root / "project.yaml").manifest
+        render_states = []
+        for node in graph.nodes:
+            if node.kind in render_kinds:
+                render_states.append(
+                    DependencyNodeState(
+                        node_id=node.node_id,
+                        graph_revision_id=graph.revision_id,
+                        desired_fingerprint=desired[node.node_id],
+                        applied_fingerprint=desired[node.node_id],
+                        lifecycle=DependencyLifecycle.FRESH,
+                        applied_evidence=RenderDependencyEvidence(
+                            owner="render_state",
+                            pointer=activation.next_render_state,
+                            artifact_id=node.artifact_id,
+                            artifact_fingerprint=desired[node.node_id],
+                        ),
+                    )
+                )
+        canonical_states = resolve_dependency_state(
+            graph, (*applied_states, *render_states)
+        ).states
+        transition = prepare_dependency_graph_transition(
+            expected_manifest_revision=activation.expected_manifest_revision,
+            base_dependency_graph=current.active_dependency_graph,
+            candidate_graph=graph,
+            candidate_dependency_states=canonical_states,
+            expected_desired_fingerprints=desired,
+        )
+        payload = _p7_json_bytes(graph.model_dump(mode="json"))
+        graph_artifact = PreparedArtifact(
+            transition.candidate_dependency_graph.path,
+            payload,
+            hashlib.sha256(payload).hexdigest(),
+        )
+        return replace(
+            activation,
+            artifacts=tuple(
+                sorted(
+                    (*activation.artifacts, graph_artifact),
+                    key=lambda item: item.relative_path.as_posix(),
+                )
+            ),
+            dependency_graph_transition=transition,
+        )
+
+    return prepare
 
 
 def load_initial_models(root: Path) -> tuple[ProductionProject, AssetRegistrySnapshot]:
@@ -3809,3 +4153,23 @@ class P7ReuseAcceptanceRuntime:
 
 def make_p7_reuse_runtime(root: Path) -> P7ReuseAcceptanceRuntime:
     return P7ReuseAcceptanceRuntime(root)
+
+
+def make_base_ai_comic_e2e_runtime(root: Path) -> "BaseAiComicE2ERuntime":
+    from production_e2e_support import (
+        BaseAiComicE2ERuntime,
+        DeterministicHyperFramesRunner,
+        DeterministicReviewAnalyzer,
+        DeterministicVoiceProvider,
+        require_audio_toolchain,
+    )
+
+    image_runtime = make_p7_reuse_runtime(root)
+    toolchain = require_audio_toolchain()
+    return BaseAiComicE2ERuntime(
+        root=root,
+        image_runtime=image_runtime,
+        voice_provider=DeterministicVoiceProvider(),
+        renderer=DeterministicHyperFramesRunner(toolchain.ffmpeg_path),
+        analyzer=DeterministicReviewAnalyzer(),
+    )

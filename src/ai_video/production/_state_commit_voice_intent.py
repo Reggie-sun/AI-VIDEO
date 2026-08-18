@@ -158,11 +158,11 @@ class _StateCommitVoiceIntentMixin:
         with self._exclusive_lock():
             manifest = self._read_manifest()
             if (
-                manifest.schema_version in {"2.3", "2.4"}
+                manifest.schema_version in {"2.3", "2.4", "2.5"}
                 and not dependency_transition_preparer_available
             ):
                 raise _state_invalid(
-                    "Manifest 2.3 voice generation requires a dependency transition preparer."
+                    "Graph-aware Manifest voice generation requires a dependency transition preparer."
                 )
             existing = next(
                 (item for item in manifest.attempts if item.attempt_id == request.attempt_id),
@@ -218,7 +218,7 @@ class _StateCommitVoiceIntentMixin:
                 {
                     "schema_version": (
                         manifest.schema_version
-                        if manifest.schema_version in {"2.3", "2.4"}
+                        if manifest.schema_version in {"2.3", "2.4", "2.5"}
                         else "2.2"
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,

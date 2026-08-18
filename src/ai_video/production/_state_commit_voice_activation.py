@@ -86,7 +86,7 @@ class _StateCommitVoiceActivationMixin:
             candidate_graph: DependencyGraphSnapshot | None = None
             if attempt.status is StateCommitStatus.SUCCEEDED:
                 transition = request.dependency_graph_transition
-                if manifest.schema_version in {"2.3", "2.4"}:
+                if manifest.schema_version in {"2.3", "2.4", "2.5"}:
                     if transition is None or (
                         attempt.base_dependency_graph != transition.base_dependency_graph
                         or attempt.candidate_dependency_graph
@@ -120,7 +120,7 @@ class _StateCommitVoiceActivationMixin:
                     transition=request.dependency_graph_transition,
                 )
             if (
-                manifest.schema_version not in {"2.3", "2.4"}
+                manifest.schema_version not in {"2.3", "2.4", "2.5"}
                 and (
                     attempt.status is StateCommitStatus.SUCCEEDED
                     or attempt.voice_phase == "candidate"
@@ -282,7 +282,7 @@ class _StateCommitVoiceActivationMixin:
                 "active_registry": request.next_registry,
                 "active_render_state": (
                     manifest.active_render_state
-                    if manifest.schema_version in {"2.3", "2.4"}
+                    if manifest.schema_version in {"2.3", "2.4", "2.5"}
                     else None
                 ),
                 "attempts": tuple(
@@ -333,11 +333,11 @@ class _StateCommitVoiceActivationMixin:
 
         preflight_manifest = self._read_manifest()
         if (
-            preflight_manifest.schema_version in {"2.3", "2.4"}
+            preflight_manifest.schema_version in {"2.3", "2.4", "2.5"}
             and dependency_transition_preparer is None
         ):
             raise _state_invalid(
-                "Manifest 2.3 voice generation requires a dependency transition preparer."
+                "Graph-aware Manifest voice generation requires a dependency transition preparer."
             )
 
         preview = provider.preview(request)
@@ -406,7 +406,7 @@ class _StateCommitVoiceActivationMixin:
             commit_request, audio_ids, caption_ids = self._prepare_voice_activation_request(
                 request, preview, authorization, result, prepared
             )
-            if preflight_manifest.schema_version in {"2.3", "2.4"}:
+            if preflight_manifest.schema_version in {"2.3", "2.4", "2.5"}:
                 assert dependency_transition_preparer is not None
                 prepared_request = dependency_transition_preparer(commit_request)
                 if (

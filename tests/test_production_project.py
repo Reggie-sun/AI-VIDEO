@@ -516,6 +516,39 @@ def _activate_fake_voice(root: Path, *, include_caption: bool = True):
     return project_path, request, committed, audio_ids, caption_ids
 
 
+def _activate_manifest_25_graph_voice(root: Path):
+    project_path = write_production_project(root)
+    make_manifest_23_project(root)
+    _write_manifest(
+        root,
+        _manifest(root).model_copy(update={"schema_version": "2.5"}),
+    )
+    request = make_voice_request(root, attempt_id="reader-voice-graph-25")
+    preview, authorization = make_voice_preview_and_authorization(request)
+    writer = ProductionStateCommitter(root)
+    writer.begin_voice_generation(
+        request,
+        preview,
+        authorization,
+        dependency_transition_preparer_available=True,
+    )
+    writer.record_voice_submit_intent(request, preview, authorization)
+    activation, audio_ids = make_voice_activation_request(
+        root,
+        request,
+        authorization,
+        expected_manifest_revision=_manifest(root).manifest_revision,
+        include_caption=True,
+    )
+    activation, _ = attach_p5_dependency_transition(root, activation)
+    committed = writer.activate_voice_assets(
+        activation,
+        audio_asset_ids=audio_ids,
+        caption_asset_ids=(f"caption-{request.attempt_id}",),
+    )
+    return project_path, request, committed
+
+
 def _append_fake_voice(root: Path, *, attempt_id: str, include_caption: bool = True):
     request = make_voice_request(root, attempt_id=attempt_id)
     preview, authorization = make_voice_preview_and_authorization(request)
@@ -557,6 +590,68 @@ def _select_resealed_registry(root: Path, registry: AssetRegistrySnapshot) -> No
     )
     manifest = _manifest(root)
     _write_manifest(root, manifest.model_copy(update={"active_registry": pointer}))
+
+
+def _select_p7_later_voice_caption_registry_extension(
+    root: Path,
+    fixture: dict[str, object],
+    *,
+    changed_prefix: bool = False,
+) -> tuple[RegistrySnapshotPointer, tuple[str, str]]:
+    candidate = fixture["candidate_project"].registry
+    voice = next(item for item in candidate.assets if item.asset_id == "voice-dialogue")
+    caption = next(
+        item for item in candidate.assets if item.asset_id == "caption-asset-1"
+    )
+    voice_extension = voice.model_copy(
+        update={
+            "asset_id": "voice-later-phase",
+            "creation_receipt_id": "receipt-voice-later-phase",
+        }
+    )
+    caption_extension = caption.model_copy(
+        update={
+            "asset_id": "caption-later-phase",
+            "creation_receipt_id": "receipt-caption-later-phase",
+        }
+    )
+    prefix = candidate.assets
+    if changed_prefix:
+        prefix = (
+            prefix[0].model_copy(update={"usage_license": "changed-later-prefix"}),
+            *prefix[1:],
+        )
+    provisional = candidate.model_copy(
+        update={
+            "revision_id": "0" * 64,
+            "content_hash": "0" * 64,
+            "assets": (*prefix, voice_extension, caption_extension),
+        }
+    )
+    digest = registry_semantic_sha256(provisional)
+    extended = provisional.model_copy(
+        update={"revision_id": digest, "content_hash": digest}
+    )
+    payload = extended.model_dump_json(indent=2).encode("utf-8")
+    path = canonical_registry_snapshot_path(digest)
+    (root / path).write_bytes(payload)
+    pointer = RegistrySnapshotPointer(
+        path=path,
+        revision_id=digest,
+        content_hash=digest,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    manifest = _manifest(root)
+    _write_manifest(
+        root,
+        manifest.model_copy(
+            update={
+                "manifest_revision": manifest.manifest_revision + 1,
+                "active_registry": pointer,
+            }
+        ),
+    )
+    return pointer, (voice_extension.asset_id, caption_extension.asset_id)
 
 
 def _rebind_voice_candidate_to_selected_graph(root: Path, attempt_id: str) -> None:
@@ -1207,6 +1302,119 @@ def test_reader_reopens_exact_generated_voice_graph_without_writes_or_network(
     assert _tree_snapshot(tmp_path) == before
 
 
+def test_reader_reopens_manifest_25_voice_candidate_dependency_graph(tmp_path):
+    project_path, request, committed = _activate_manifest_25_graph_voice(tmp_path)
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(project_path)
+
+    attempt = next(
+        item for item in loaded.manifest.attempts if item.attempt_id == request.attempt_id
+    )
+    assert attempt.candidate_dependency_graph == committed.active_dependency_graph
+    assert loaded.dependency_graph is not None
+    assert (
+        loaded.dependency_graph.revision_id
+        == attempt.candidate_dependency_graph.revision_id
+    )
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_reader_rejects_tampered_manifest_25_voice_candidate_graph_pointer(tmp_path):
+    project_path, request, committed = _activate_manifest_25_graph_voice(tmp_path)
+    attempt = next(
+        item for item in committed.attempts if item.attempt_id == request.attempt_id
+    )
+    assert attempt.candidate_dependency_graph is not None
+    forged_attempt = attempt.model_copy(
+        update={
+            "candidate_dependency_graph": attempt.candidate_dependency_graph.model_copy(
+                update={"file_sha256": "f" * 64}
+            )
+        }
+    )
+    _write_manifest(
+        tmp_path,
+        committed.model_copy(
+            update={
+                "attempts": tuple(
+                    forged_attempt if item.attempt_id == request.attempt_id else item
+                    for item in committed.attempts
+                )
+            }
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(project_path)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert exc_info.value.user_message == "Active P4 voice candidate history is invalid."
+    assert exc_info.value.technical_detail == "file hash mismatch"
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected_detail"),
+    (
+        ("bytes", "file hash mismatch"),
+        ("semantic_identity", "revision_id="),
+    ),
+)
+def test_reader_rejects_tampered_manifest_25_voice_candidate_graph(
+    tmp_path,
+    mutation,
+    expected_detail,
+):
+    project_path, request, committed = _activate_manifest_25_graph_voice(tmp_path)
+    attempt = next(
+        item for item in committed.attempts if item.attempt_id == request.attempt_id
+    )
+    assert attempt.candidate_dependency_graph is not None
+    graph_path = tmp_path / attempt.candidate_dependency_graph.path
+    if mutation == "bytes":
+        graph_path.write_bytes(graph_path.read_bytes() + b" ")
+    else:
+        graph_data = json.loads(graph_path.read_bytes())
+        graph_data["nodes"][0]["contributions"][0]["fingerprint"] = "f" * 64
+        graph_payload = (
+            json.dumps(
+                graph_data,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+            + "\n"
+        ).encode("utf-8")
+        graph_path.write_bytes(graph_payload)
+        forged_pointer = attempt.candidate_dependency_graph.model_copy(
+            update={"file_sha256": hashlib.sha256(graph_payload).hexdigest()}
+        )
+        forged_attempt = attempt.model_copy(
+            update={"candidate_dependency_graph": forged_pointer}
+        )
+        _write_manifest(
+            tmp_path,
+            committed.model_copy(
+                update={
+                    "active_dependency_graph": forged_pointer,
+                    "attempts": tuple(
+                        forged_attempt
+                        if item.attempt_id == request.attempt_id
+                        else item
+                        for item in committed.attempts
+                    ),
+                }
+            ),
+        )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_production_project(project_path)
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert exc_info.value.user_message == "Active P4 voice candidate history is invalid."
+    assert expected_detail in (exc_info.value.technical_detail or "")
+
+
 @pytest.fixture
 def p7_committed_project(tmp_path):
     return make_p7_committed_project(tmp_path)
@@ -1544,6 +1752,45 @@ def test_loader_rejects_changed_p7_candidate_registry_prefix(tmp_path):
     fixture = make_p7_committed_project(
         tmp_path, changed_candidate_prefix=True
     )
+
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(fixture["project_path"])
+
+
+def test_loader_accepts_p7_image_history_after_voice_registry_extension(tmp_path):
+    fixture = make_p7_committed_project(tmp_path)
+    image_attempt = fixture["attempt"]
+    pointer, extension_ids = _select_p7_later_voice_caption_registry_extension(
+        tmp_path, fixture
+    )
+    before = _tree_snapshot(tmp_path)
+
+    loaded = load_production_project(fixture["project_path"])
+    candidate_registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / image_attempt.candidate_registry.path).read_bytes()
+    )
+
+    assert loaded.manifest.active_project == image_attempt.candidate_project
+    assert pointer != image_attempt.candidate_registry
+    assert loaded.registry.assets[: len(candidate_registry.assets)] == (
+        candidate_registry.assets
+    )
+    assert {item.asset_id for item in loaded.registry.assets}.issuperset(
+        {*extension_ids, fixture["image_record"].asset_id}
+    )
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_p7_reader_rejects_changed_candidate_prefix_after_voice_registry_extension(
+    tmp_path,
+):
+    fixture = make_p7_committed_project(tmp_path)
+    pointer, _ = _select_p7_later_voice_caption_registry_extension(
+        tmp_path,
+        fixture,
+        changed_prefix=True,
+    )
+    assert pointer != fixture["attempt"].candidate_registry
 
     with pytest.raises(AiVideoError, match="candidate history"):
         load_production_project(fixture["project_path"])
