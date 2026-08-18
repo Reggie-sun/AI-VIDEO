@@ -9,8 +9,12 @@ from datetime import date
 import wave
 from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
+
+if TYPE_CHECKING:
+    from production_e2e_support import BaseAiComicE2ERuntime
 
 from ai_video.config import sha256_file
 from ai_video.production.captions import (
@@ -3809,3 +3813,23 @@ class P7ReuseAcceptanceRuntime:
 
 def make_p7_reuse_runtime(root: Path) -> P7ReuseAcceptanceRuntime:
     return P7ReuseAcceptanceRuntime(root)
+
+
+def make_base_ai_comic_e2e_runtime(root: Path) -> "BaseAiComicE2ERuntime":
+    from production_e2e_support import (
+        BaseAiComicE2ERuntime,
+        DeterministicHyperFramesRunner,
+        DeterministicReviewAnalyzer,
+        DeterministicVoiceProvider,
+        require_audio_toolchain,
+    )
+
+    image_runtime = make_p7_reuse_runtime(root)
+    toolchain = require_audio_toolchain()
+    return BaseAiComicE2ERuntime(
+        root=root,
+        image_runtime=image_runtime,
+        voice_provider=DeterministicVoiceProvider(),
+        renderer=DeterministicHyperFramesRunner(toolchain.ffmpeg_path),
+        analyzer=DeterministicReviewAnalyzer(),
+    )
