@@ -6,12 +6,14 @@ import struct
 import zlib
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
 from pydantic import ValidationError
 
 from ai_video.production.image import (
+    ContinuityTerminalImageReferenceBinding,
     ImageGenerationAuthorization,
     ImageGenerationPreview,
     ImageGenerationRequest,
@@ -20,8 +22,15 @@ from ai_video.production.image import (
     ImageProviderParameters,
     ImageProviderResult,
     ImageReferenceBinding,
+    _validate_continuity_terminal_reference,
     validate_image_activation_candidate,
     validate_image_result,
+)
+from ai_video.production.video import (
+    ContinuityConstraintSet,
+    HardCutKeyframeBinding,
+    TerminalFrameEvidence,
+    validate_hard_cut_keyframe_binding_against_project,
 )
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
@@ -37,6 +46,7 @@ from ai_video.production.models import (
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
     ToolIdentity,
+    VideoAssetMetadata,
 )
 from ai_video.production.dependency import (
     build_production_dependency_graph,
@@ -135,6 +145,86 @@ def make_image_request(**overrides: object) -> ImageGenerationRequest:
     return ImageGenerationRequest.create(**values)
 
 
+def _hard_cut_constraints() -> ContinuityConstraintSet:
+    return ContinuityConstraintSet.create(
+        scene_identity={
+            "artifact_id": "scene-archive",
+            "revision": 1,
+            "content_hash": TWO_HASH,
+        },
+        character_identities=(
+            {
+                "artifact_id": "character-hero",
+                "revision": 1,
+                "content_hash": ZERO_HASH,
+            },
+        ),
+        camera_axis="camera-left-of-door-table-axis",
+        framing="hard-cut-medium-from-medium-wide",
+        lighting="window-key-camera-left",
+        color="neutral-warm-red-scarf",
+        motion_direction="screen-left-to-right",
+        exit_state="right-hand-on-chair-back",
+        entrance_state="right-hand-on-chair-back-continuing",
+    )
+
+
+def _hard_cut_terminal() -> TerminalFrameEvidence:
+    return TerminalFrameEvidence.create(
+        source_shot_id="shot-0",
+        source_shot_revision=4,
+        source_shot_content_hash=ZERO_HASH,
+        source_video_asset_id="video-shot-0",
+        source_video_sha256=ONE_HASH,
+        source_generation_id="generation-shot-0",
+        source_request_input_hash=TWO_HASH,
+        source_resolved_generation_hash=THREE_HASH,
+        source_provenance_receipt_id="video-provenance-shot-0",
+        extraction_receipt_id=THREE_HASH,
+        source_registry=RegistrySnapshotPointer(
+            path=Path(f"assets/registry.{ONE_HASH}.json"),
+            revision_id=ONE_HASH,
+            content_hash=ONE_HASH,
+            file_sha256=TWO_HASH,
+        ),
+        source_container_name="mp4",
+        source_codec_name="h264",
+        source_width=512,
+        source_height=512,
+        source_fps_numerator=24,
+        source_fps_denominator=1,
+        source_duration_milliseconds=5167,
+        source_frame_count=124,
+        frame_index=123,
+        timestamp_numerator=123,
+        timestamp_denominator=24,
+        selection_rule="generated_candidate_terminal",
+        extraction_contract_version="terminal-frame-v1",
+        extractor_name="ffmpeg",
+        extractor_version="7.1",
+        extracted_asset_id="video-shot-0:terminal-frame",
+        extracted_sha256=THREE_HASH,
+        extracted_mime_type="image/png",
+        extracted_size_bytes=4096,
+        extracted_width=512,
+        extracted_height=512,
+        extracted_color_space="unmeasured",
+    )
+
+
+def _hard_cut_reference() -> ContinuityTerminalImageReferenceBinding:
+    return ContinuityTerminalImageReferenceBinding.create(
+        role="continuity_terminal",
+        terminal_frame=_hard_cut_terminal(),
+        asset_id="video-shot-0:terminal-frame",
+        asset_sha256=THREE_HASH,
+        target_shot_id="shot-1",
+        target_shot_revision=1,
+        target_shot_content_hash=ZERO_HASH,
+        constraints=_hard_cut_constraints(),
+    )
+
+
 def make_preview_payload(**overrides: object) -> dict[str, object]:
     request = make_image_request()
     preview = ImageGenerationPreview.create(
@@ -192,6 +282,338 @@ def test_image_request_binds_prompt_target_references_and_base_pointers():
         "scene",
     )
     assert request.base_dependency_graph.revision_id == TWO_HASH
+
+
+def test_hard_cut_image_request_binds_character_and_exact_terminal() -> None:
+    ordinary = make_image_request()
+    character = ordinary.references[0]
+    terminal = _hard_cut_reference()
+
+    request = make_image_request(references=(character, terminal))
+
+    assert tuple(item.role for item in request.references) == (
+        "character",
+        "continuity_terminal",
+    )
+    assert request.references[1] == terminal
+    assert request.request_fingerprint != ordinary.request_fingerprint
+    assert make_image_request().request_fingerprint == ordinary.request_fingerprint
+
+
+def test_hard_cut_image_request_rejects_missing_or_mixed_reference_shape() -> None:
+    ordinary = make_image_request()
+    terminal = _hard_cut_reference()
+
+    with pytest.raises(
+        ValidationError, match="hard-cut.*character.*continuity terminal"
+    ):
+        make_image_request(references=(terminal,))
+    with pytest.raises(
+        ValidationError, match="hard-cut.*character.*continuity terminal"
+    ):
+        make_image_request(
+            references=(ordinary.references[0], terminal, ordinary.references[1])
+        )
+    with pytest.raises(
+        ValidationError, match="hard-cut.*character.*continuity terminal"
+    ):
+        make_image_request(
+            references=(
+                ordinary.references[0],
+                ordinary.references[0].model_copy(
+                    update={"asset_id": "image-character-second"}
+                ),
+                terminal,
+            )
+        )
+    with pytest.raises(ValidationError, match="target Shot"):
+        make_image_request(
+            references=(
+                ordinary.references[0],
+                ContinuityTerminalImageReferenceBinding.create(
+                    **{
+                        **terminal.model_dump(mode="python", exclude={"binding_hash"}),
+                        "target_shot_id": "shot-other",
+                    }
+                ),
+            )
+        )
+
+
+def test_hard_cut_terminal_reference_rejects_tampered_registry_lineage(
+    tmp_path: Path,
+) -> None:
+    inputs, _ = make_p5_selective_rebuild_fixture(tmp_path)
+    source_shot, target_shot = inputs.project.shots[:2]
+    character = inputs.project.characters[0]
+    scene = inputs.project.scenes[0]
+    source_video = AssetRecord(
+        asset_id="video-hard-cut-source",
+        asset_type=AssetType.VIDEO,
+        artifact_path=Path(f"assets/files/{ONE_HASH}.mp4"),
+        sha256=ONE_HASH,
+        size_bytes=4096,
+        mime_type="video/mp4",
+        duration_seconds=5.167,
+        width=512,
+        height=512,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture-video", version="1"),
+        input_artifact_ids=(source_shot.artifact_id,),
+        input_fingerprint=THREE_HASH,
+        creation_receipt_id="video-provenance-shot-0",
+        usage_license="test-only",
+        egress=EgressMetadata(remote=False),
+        video_metadata=VideoAssetMetadata(
+            container_name="mp4",
+            codec_name="h264",
+            width=512,
+            height=512,
+            fps_numerator=24,
+            fps_denominator=1,
+            duration_milliseconds=5167,
+            frame_count=124,
+            probe_receipt_id="video-probe-shot-0",
+            request_receipt_fingerprint=TWO_HASH,
+            resolved_generation_hash=THREE_HASH,
+            provenance_receipt_id="video-provenance-shot-0",
+        ),
+    )
+    terminal_asset = AssetRecord(
+        asset_id="video-hard-cut-source:terminal-frame",
+        asset_type=AssetType.IMAGE,
+        artifact_path=Path(f"assets/files/{THREE_HASH}.png"),
+        sha256=THREE_HASH,
+        size_bytes=4096,
+        mime_type="image/png",
+        width=512,
+        height=512,
+        source_kind=AssetSourceKind.DERIVED,
+        tool=ToolIdentity(name="ffmpeg", version="7.1"),
+        input_artifact_ids=(source_video.asset_id,),
+        input_fingerprint=THREE_HASH,
+        creation_receipt_id=THREE_HASH,
+        usage_license="test-only",
+    )
+    project = inputs.project.model_copy(
+        update={
+            "registry": inputs.project.registry.model_copy(
+                update={
+                    "assets": (
+                        *inputs.project.registry.assets,
+                        source_video,
+                        terminal_asset,
+                    )
+                }
+            )
+        }
+    )
+    terminal = _hard_cut_terminal().model_copy(
+        update={
+            "source_shot_id": source_shot.shot_id,
+            "source_shot_revision": source_shot.revision,
+            "source_shot_content_hash": source_shot.content_hash,
+            "source_video_asset_id": source_video.asset_id,
+            "source_video_sha256": source_video.sha256,
+            "extraction_receipt_id": THREE_HASH,
+            "extracted_asset_id": terminal_asset.asset_id,
+            "extracted_sha256": terminal_asset.sha256,
+            "content_hash": ZERO_HASH,
+        }
+    )
+    terminal = TerminalFrameEvidence.create(
+        **terminal.model_dump(mode="python", exclude={"content_hash"})
+    )
+    constraints = ContinuityConstraintSet.create(
+        scene_identity={
+            "artifact_id": scene.artifact_id,
+            "revision": scene.revision,
+            "content_hash": scene.content_hash,
+        },
+        character_identities=(
+            {
+                "artifact_id": character.artifact_id,
+                "revision": character.revision,
+                "content_hash": character.content_hash,
+            },
+        ),
+        camera_axis="same-side",
+        framing="medium-hard-cut",
+        lighting="window-left",
+        color="neutral-warm",
+        motion_direction="left-to-right",
+        exit_state="hand-on-chair",
+        entrance_state="hand-on-chair-continuing",
+    )
+    binding = ContinuityTerminalImageReferenceBinding.create(
+        role="continuity_terminal",
+        terminal_frame=terminal,
+        asset_id=terminal_asset.asset_id,
+        asset_sha256=terminal_asset.sha256,
+        target_shot_id=target_shot.shot_id,
+        target_shot_revision=target_shot.revision,
+        target_shot_content_hash=target_shot.content_hash,
+        constraints=constraints,
+    )
+    state = SimpleNamespace(
+        phase=SimpleNamespace(value="activate"),
+        request=SimpleNamespace(
+            generation_id=terminal.source_generation_id,
+            request_input_hash=terminal.source_request_input_hash,
+            resolved_generation_hash=terminal.source_resolved_generation_hash,
+        ),
+        terminal_frame_evidence=SimpleNamespace(
+            content_hash=terminal.content_hash,
+            extracted_asset_id=terminal.extracted_asset_id,
+            extracted_sha256=terminal.extracted_sha256,
+        ),
+        terminal_frame_extraction=SimpleNamespace(
+            content_hash=terminal.extraction_receipt_id,
+            extracted_asset_id=terminal.extracted_asset_id,
+            extracted_sha256=terminal.extracted_sha256,
+        ),
+        candidate_video_asset_ids=(terminal.source_video_asset_id,),
+        candidate_continuity_asset_ids=(terminal.extracted_asset_id,),
+    )
+    source_attempt = SimpleNamespace(
+        operation="video_generation",
+        status=SimpleNamespace(value="succeeded"),
+        video_generation_state=state,
+        candidate_registry=terminal.source_registry,
+    )
+    selected_source_shot = source_shot.model_copy(
+        update={
+            "required_asset_roles": (
+                source_shot.required_asset_roles[0].model_copy(
+                    update={"asset_ids": (source_video.asset_id,)}
+                ),
+            )
+        }
+    )
+    project = SimpleNamespace(
+        **{
+            **project.__dict__,
+            "shots": tuple(
+                selected_source_shot if shot.shot_id == source_shot.shot_id else shot
+                for shot in project.shots
+            ),
+            "manifest": SimpleNamespace(
+                **{
+                    **project.manifest.__dict__,
+                    "attempts": (source_attempt,),
+                }
+            ),
+        }
+    )
+
+    _validate_continuity_terminal_reference(binding, project)
+    tampered = SimpleNamespace(
+        **{
+            **project.__dict__,
+            "registry": project.registry.model_copy(
+                update={
+                    "assets": tuple(
+                        asset.model_copy(update={"sha256": ZERO_HASH})
+                        if asset.asset_id == terminal_asset.asset_id
+                        else asset
+                        for asset in project.registry.assets
+                    )
+                }
+            ),
+        }
+    )
+    with pytest.raises(ValueError, match="terminal frame evidence"):
+        _validate_continuity_terminal_reference(binding, tampered)
+
+    keyframe = AssetRecord(
+        asset_id="image-hard-cut-keyframe",
+        asset_type=AssetType.IMAGE,
+        artifact_path=Path(f"assets/files/{TWO_HASH}.png"),
+        sha256=TWO_HASH,
+        size_bytes=8192,
+        mime_type="image/png",
+        width=512,
+        height=512,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture-image", version="1"),
+        input_artifact_ids=(
+            character.artifact_id,
+            character.reference_asset_ids[0],
+            terminal_asset.asset_id,
+        ),
+        input_fingerprint=ONE_HASH,
+        creation_receipt_id=TWO_HASH,
+        usage_license="test-only",
+        egress=EgressMetadata(remote=False),
+    )
+    image_attempt = SimpleNamespace(
+        operation="image_generation",
+        status=SimpleNamespace(value="succeeded"),
+        image_phase="activate",
+        image_request=SimpleNamespace(
+            request_fingerprint=keyframe.input_fingerprint,
+            output_asset_id=keyframe.asset_id,
+            target_shot_id=target_shot.shot_id,
+        ),
+        candidate_image_asset_ids=(keyframe.asset_id,),
+        candidate_project=project.manifest.active_project,
+        candidate_registry=project.manifest.active_registry,
+        candidate_dependency_graph=project.manifest.active_dependency_graph,
+    )
+    project_with_keyframe = SimpleNamespace(
+        **{
+            **project.__dict__,
+            "registry": project.registry.model_copy(
+                update={"assets": (*project.registry.assets, keyframe)}
+            ),
+            "manifest": SimpleNamespace(
+                **{
+                    **project.manifest.__dict__,
+                    "attempts": (source_attempt, image_attempt),
+                }
+            ),
+        }
+    )
+    hard_cut = HardCutKeyframeBinding.create(
+        role="hard_cut_keyframe",
+        terminal_frame=terminal,
+        keyframe_asset_id=keyframe.asset_id,
+        keyframe_asset_sha256=keyframe.sha256,
+        keyframe_mime_type="image/png",
+        keyframe_width=keyframe.width,
+        keyframe_height=keyframe.height,
+        keyframe_size_bytes=keyframe.size_bytes,
+        keyframe_request_fingerprint=keyframe.input_fingerprint,
+        keyframe_provenance_receipt_id=keyframe.creation_receipt_id,
+        target_shot_id=target_shot.shot_id,
+        target_shot_revision=target_shot.revision,
+        target_shot_content_hash=target_shot.content_hash,
+        constraints=constraints,
+    )
+    video_request = SimpleNamespace(
+        hard_cut_keyframe_binding=hard_cut,
+        base_project=project_with_keyframe.manifest.active_project,
+        base_registry=project_with_keyframe.manifest.active_registry,
+        base_dependency_graph=project_with_keyframe.manifest.active_dependency_graph,
+    )
+    validate_hard_cut_keyframe_binding_against_project(
+        video_request, project_with_keyframe
+    )
+    with pytest.raises(ValueError, match="hard-cut keyframe lineage"):
+        validate_hard_cut_keyframe_binding_against_project(
+            SimpleNamespace(
+                **{
+                    **video_request.__dict__,
+                    "base_registry": RegistrySnapshotPointer(
+                        path=Path(f"assets/registry.{ZERO_HASH}.json"),
+                        revision_id=ZERO_HASH,
+                        content_hash=ZERO_HASH,
+                        file_sha256=ZERO_HASH,
+                    ),
+                },
+            ),
+            project_with_keyframe,
+        )
 
 
 def test_image_request_rejects_changed_prompt_under_old_fingerprint():
@@ -442,11 +864,6 @@ def p7_candidate(tmp_path):
                 ),
             }
         )
-    )
-    shot_reference = next(
-        item
-        for item in base_project.project.artifacts.shots
-        if item.artifact_id == candidate_shot.artifact_id
     )
     candidate_shot_reference = ArtifactReference(
         artifact_id=candidate_shot.artifact_id,

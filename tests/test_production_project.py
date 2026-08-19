@@ -118,6 +118,7 @@ from ai_video.production.project import (
 from ai_video.production._project_dependency_evidence import (
     verify_active_versioned_artifact_evidence,
 )
+from ai_video.production._image_project_reader import verify_active_image_evidence
 from production_project_factory import (
     add_p6_policy_to_p7_project,
     append_p7_committed_candidate,
@@ -1874,6 +1875,51 @@ def test_loader_accepts_p7_image_history_after_voice_registry_extension(tmp_path
         {*extension_ids, fixture["image_record"].asset_id}
     )
     assert _tree_snapshot(tmp_path) == before
+
+
+def test_image_reader_accepts_active_p7_image_after_later_manifest_28_project(
+    tmp_path,
+):
+    fixture = make_p7_committed_project(tmp_path)
+    loaded = load_production_project(fixture["project_path"])
+    later_project = seal_artifact(
+        loaded.project.model_copy(
+            update={
+                "revision": loaded.project.revision + 1,
+                "content_hash": "0" * 64,
+                "creation_receipt_id": "unrelated-later-project-activation",
+            }
+        )
+    )
+    later_bytes = yaml.safe_dump(
+        later_project.model_dump(mode="json"),
+        sort_keys=True,
+        allow_unicode=True,
+    ).encode("utf-8")
+    later_path = canonical_project_snapshot_path(
+        later_project.revision, later_project.content_hash
+    )
+    (tmp_path / later_path).write_bytes(later_bytes)
+    later_pointer = ProjectSnapshotPointer(
+        path=later_path,
+        revision=later_project.revision,
+        content_hash=later_project.content_hash,
+        file_sha256=hashlib.sha256(later_bytes).hexdigest(),
+    )
+    advanced = loaded.model_copy(
+        update={
+            "project": later_project,
+            "manifest": loaded.manifest.model_copy(
+                update={
+                    "schema_version": "2.8",
+                    "manifest_revision": loaded.manifest.manifest_revision + 1,
+                    "active_project": later_pointer,
+                }
+            ),
+        }
+    )
+
+    verify_active_image_evidence(advanced)
 
 
 def test_p7_reader_rejects_changed_candidate_prefix_after_voice_registry_extension(

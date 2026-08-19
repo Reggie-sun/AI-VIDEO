@@ -16,11 +16,11 @@ from ai_video.comfy_client import ComfyClient, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.image import (
+    ImageGenerationReferenceBinding,
     ImageGenerationAuthorization,
     ImageGenerationRequest,
     ImageLocalResourceEvidence,
     ImageProviderResult,
-    ImageReferenceBinding,
 )
 from ai_video.production.models import StrictModel, ToolIdentity
 from ai_video.workflow_loader import load_workflow_template
@@ -109,7 +109,9 @@ class LocalImageExecutionProfile(StrictModel):
     workflow_sha256: str = Field(pattern=_SHA256_PATTERN)
     binding_path: Path
     binding_sha256: str = Field(pattern=_SHA256_PATTERN)
-    supported_reference_roles: tuple[Literal["character", "scene", "style"], ...]
+    supported_reference_roles: tuple[
+        Literal["character", "scene", "style", "continuity_terminal"], ...
+    ]
     min_references: int = Field(strict=True, ge=1)
     max_references: int = Field(strict=True, ge=1)
     min_width: int = Field(strict=True, gt=0)
@@ -536,7 +538,7 @@ class LocalImageTransport(Protocol):
     ) -> bytes: ...
 
 
-ReferenceResolver = Callable[[ImageReferenceBinding], Path]
+ReferenceResolver = Callable[[ImageGenerationReferenceBinding], Path]
 CommitResolver = Callable[[], str]
 
 

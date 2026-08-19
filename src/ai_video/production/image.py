@@ -8,7 +8,7 @@ import unicodedata
 import zlib
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, Protocol
+from typing import TYPE_CHECKING, Annotated, Literal, Protocol, TypeAlias
 
 import yaml
 from pydantic import ConfigDict, Field, ValidationError, field_validator, model_validator
@@ -35,6 +35,7 @@ from ai_video.production.models import (
     AssetType,
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
+    DependencyLifecycle,
     DependencyNodeState,
     EgressMetadata,
     LoadedProductionProject,
@@ -46,6 +47,11 @@ from ai_video.production.models import (
 )
 from ai_video.production.paths import canonical_image_shot_revision_path
 from ai_video.production.registry import registry_semantic_sha256
+from ai_video.production.video import (
+    ContinuityConstraintSet,
+    TerminalFrameEvidence,
+    validate_terminal_frame_evidence_against_project,
+)
 
 
 if TYPE_CHECKING:
@@ -55,6 +61,7 @@ if TYPE_CHECKING:
 __all__ = [
     "ImageAssetProvider",
     "ImageActivationCandidate",
+    "ContinuityTerminalImageReferenceBinding",
     "ImageGenerationAuthorization",
     "ImageGenerationPreview",
     "ImageGenerationRequest",
@@ -63,6 +70,7 @@ __all__ = [
     "ImageProviderParameters",
     "ImageProviderResult",
     "ImageReferenceBinding",
+    "ImageGenerationReferenceBinding",
     "MeasuredPng",
     "image_receipt_semantic_sha256",
     "validate_image_activation_candidate",
@@ -71,7 +79,12 @@ __all__ = [
 
 
 _PROVIDER_IDENTIFIER = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
-_REFERENCE_ROLE_ORDER = {"character": 0, "scene": 1, "style": 2}
+_REFERENCE_ROLE_ORDER = {
+    "character": 0,
+    "continuity_terminal": 1,
+    "scene": 2,
+    "style": 3,
+}
 _PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
 _PNG_BIT_DEPTHS = {
     0: {1, 2, 4, 8, 16},
@@ -126,6 +139,119 @@ class ImageReferenceBinding(_ImageStrictModel):
     asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
+class ContinuityTerminalImageReferenceBinding(_ImageStrictModel):
+    role: Literal["continuity_terminal"]
+    terminal_frame: TerminalFrameEvidence
+    asset_id: str = Field(min_length=1)
+    asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    target_shot_id: str = Field(min_length=1)
+    target_shot_revision: int = Field(strict=True, ge=1)
+    target_shot_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    constraints: ContinuityConstraintSet
+    binding_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_seal(self) -> "ContinuityTerminalImageReferenceBinding":
+        terminal = self.terminal_frame
+        if (
+            self.asset_id != terminal.extracted_asset_id
+            or self.asset_sha256 != terminal.extracted_sha256
+        ):
+            raise ValueError(
+                "continuity terminal asset does not match terminal evidence"
+            )
+        if self.target_shot_id == terminal.source_shot_id:
+            raise ValueError("continuity terminal must target a downstream Shot")
+        expected = canonical_sha256(
+            {
+                "schema": "ai-video-continuity-terminal-image-reference/1",
+                **self.model_dump(mode="json", exclude={"binding_hash"}),
+            }
+        )
+        if self.binding_hash != expected:
+            raise ValueError("continuity terminal binding hash does not match content")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "ContinuityTerminalImageReferenceBinding":
+        data = dict(values)
+        candidate = cls.model_construct(**data, binding_hash="0" * 64)
+        data["binding_hash"] = canonical_sha256(
+            {
+                "schema": "ai-video-continuity-terminal-image-reference/1",
+                **candidate.model_dump(
+                    mode="json", exclude={"binding_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
+ImageGenerationReferenceBinding: TypeAlias = Annotated[
+    ImageReferenceBinding | ContinuityTerminalImageReferenceBinding,
+    Field(discriminator="role"),
+]
+
+
+def _reference_sort_key(
+    reference: ImageGenerationReferenceBinding,
+) -> tuple[int, str, str]:
+    owner_id = (
+        reference.creative_artifact_id
+        if isinstance(reference, ImageReferenceBinding)
+        else reference.terminal_frame.source_shot_id
+    )
+    return (_REFERENCE_ROLE_ORDER[reference.role], owner_id, reference.asset_id)
+
+
+def _reference_graph_input_ids(
+    reference: ImageGenerationReferenceBinding,
+) -> tuple[str, ...]:
+    if isinstance(reference, ImageReferenceBinding):
+        return (reference.creative_artifact_id, reference.asset_id)
+    return (reference.asset_id,)
+
+
+def _validate_continuity_terminal_reference(
+    reference: ContinuityTerminalImageReferenceBinding,
+    project: LoadedProductionProject,
+    *,
+    validate_target: bool = True,
+) -> None:
+    terminal = reference.terminal_frame
+    shots = {item.shot_id: item for item in project.shots}
+    scenes = {item.artifact_id: item for item in project.scenes}
+    characters = {item.artifact_id: item for item in project.characters}
+    target_shot = shots.get(reference.target_shot_id)
+    scene_identity = reference.constraints.scene_identity
+    scene = scenes.get(scene_identity.artifact_id)
+    validate_terminal_frame_evidence_against_project(terminal, project)
+    if (
+        validate_target
+        and (
+            target_shot is None
+            or target_shot.revision != reference.target_shot_revision
+            or target_shot.content_hash != reference.target_shot_content_hash
+        )
+        or scene is None
+        or scene.revision != scene_identity.revision
+        or scene.content_hash != scene_identity.content_hash
+    ):
+        raise ValueError(
+            "continuity terminal reference does not match the active project"
+        )
+    for identity in reference.constraints.character_identities:
+        character = characters.get(identity.artifact_id)
+        if (
+            character is None
+            or character.revision != identity.revision
+            or character.content_hash != identity.content_hash
+        ):
+            raise ValueError(
+                "continuity terminal character identity does not match the active project"
+            )
+
+
 class ImageGenerationRequest(_ImageStrictModel):
     request_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     attempt_id: str = Field(min_length=1)
@@ -137,7 +263,7 @@ class ImageGenerationRequest(_ImageStrictModel):
     prompt_text: str = Field(min_length=1)
     negative_prompt_text: str
     parameters: ImageProviderParameters
-    references: tuple[ImageReferenceBinding, ...]
+    references: tuple[ImageGenerationReferenceBinding, ...]
     base_project: ProjectSnapshotPointer
     base_registry: RegistrySnapshotPointer
     base_dependency_graph: DependencyGraphSnapshotPointer
@@ -149,8 +275,18 @@ class ImageGenerationRequest(_ImageStrictModel):
         negative_prompt_text = data["negative_prompt_text"]
         if not isinstance(prompt_text, str) or not isinstance(negative_prompt_text, str):
             raise ValueError("image prompts must be text")
+        references = data["references"]
+        uses_continuity_terminal = any(
+            (item.get("role") if isinstance(item, dict) else item.role)
+            == "continuity_terminal"
+            for item in references
+        )
         return {
-            "schema": "ai-video-image-request/1",
+            "schema": (
+                "ai-video-image-request/2"
+                if uses_continuity_terminal
+                else "ai-video-image-request/1"
+            ),
             "provider_kind": data["provider_kind"],
             "model_id": data["model_id"],
             "target_shot_id": data["target_shot_id"],
@@ -175,17 +311,35 @@ class ImageGenerationRequest(_ImageStrictModel):
 
     @model_validator(mode="after")
     def _validate_sealed_request(self) -> "ImageGenerationRequest":
-        keys = tuple(
-            (_REFERENCE_ROLE_ORDER[item.role], item.creative_artifact_id, item.asset_id)
-            for item in self.references
-        )
+        keys = tuple(_reference_sort_key(item) for item in self.references)
         if keys != tuple(sorted(keys)):
             raise ValueError("image references must use canonical order")
         unique = {(item.role, item.asset_id) for item in self.references}
         if len(unique) != len(self.references):
             raise ValueError("image references must be unique by role and asset_id")
         roles = {item.role for item in self.references}
-        if not {"character", "scene"}.issubset(roles):
+        if "continuity_terminal" in roles:
+            if (
+                len(self.references) != 2
+                or tuple(item.role for item in self.references).count("character") != 1
+                or tuple(item.role for item in self.references).count(
+                    "continuity_terminal"
+                )
+                != 1
+            ):
+                raise ValueError(
+                    "hard-cut image request requires exactly character and continuity terminal references"
+                )
+            terminal = next(
+                item
+                for item in self.references
+                if isinstance(item, ContinuityTerminalImageReferenceBinding)
+            )
+            if terminal.target_shot_id != self.target_shot_id:
+                raise ValueError(
+                    "continuity terminal binding does not match target Shot"
+                )
+        elif not {"character", "scene"}.issubset(roles):
             raise ValueError("image request requires character and scene references")
         payload = self._fingerprint_payload(self.model_dump(mode="json"))
         expected = canonical_sha256(payload)
@@ -418,7 +572,7 @@ class ImageProvenanceReceipt(_ImageStrictModel):
     output_height: int = Field(strict=True, gt=0)
     usage_license: str = Field(min_length=1)
     policy_receipt_id: str = Field(min_length=1)
-    references: tuple[ImageReferenceBinding, ...]
+    references: tuple[ImageGenerationReferenceBinding, ...]
     resource_evidence: ImageLocalResourceEvidence
     remote: Literal[False]
     cost_receipt_id: None = None
@@ -749,6 +903,14 @@ def validate_image_activation_candidate(
     }
     scenes = {scene.artifact_id: scene for scene in base_project.scenes}
     for reference in request.references:
+        if isinstance(reference, ContinuityTerminalImageReferenceBinding):
+            try:
+                _validate_continuity_terminal_reference(reference, base_project)
+            except ValueError as exc:
+                raise _image_scope_invalid(
+                    "Image continuity terminal provenance does not match the loaded base project."
+                ) from exc
+            continue
         if reference.role == "character":
             creative = characters.get(reference.creative_artifact_id)
             allowed_asset_ids = (
@@ -806,7 +968,7 @@ def validate_image_activation_candidate(
         *(
             identity
             for reference in request.references
-            for identity in (reference.creative_artifact_id, reference.asset_id)
+            for identity in _reference_graph_input_ids(reference)
         ),
     )
     expected_record = AssetRecord(
@@ -1011,14 +1173,28 @@ def validate_image_activation_candidate(
         raise _image_scope_invalid(
             "Image candidate resolution omits the target visual generation frontier."
         )
+    uses_continuity_terminal = any(
+        isinstance(reference, ContinuityTerminalImageReferenceBinding)
+        for reference in request.references
+    )
+    previously_nonfresh = (
+        {
+            state.node_id
+            for state in base_dependency_states
+            if state.lifecycle is not DependencyLifecycle.FRESH
+        }
+        if uses_continuity_terminal
+        else set()
+    )
+    newly_affected = affected - previously_nonfresh
     allowed_affected = {target_visual_id, *target_asset_node_ids} | {
         node_id
-        for node_id in affected
+        for node_id in newly_affected
         if node_id.startswith(
             ("composition:", "timeline:", "renderer-source:", "render:")
         )
     }
-    if affected != allowed_affected:
+    if newly_affected != allowed_affected:
         raise _image_scope_invalid(
             "Image candidate resolution contains an unrelated dependency node."
         )

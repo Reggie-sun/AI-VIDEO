@@ -2305,8 +2305,11 @@ def test_generated_image_record_uses_generic_future_extension_seam(tmp_path):
     assert "submit_image" not in dep_mod.__all__
 
 
-def test_terminal_frame_dependency_invalidates_only_explicit_video_closure(tmp_path):
+def test_hard_cut_terminal_keyframe_dependency_invalidates_only_explicit_closure(
+    tmp_path,
+):
     inputs = make_p5_dependency_inputs(tmp_path)
+    character_asset_id = inputs.project.characters[0].reference_asset_ids[0]
     terminal = AssetRecord(
         asset_id="video-shot-1:terminal-frame",
         asset_type=AssetType.IMAGE,
@@ -2323,6 +2326,22 @@ def test_terminal_frame_dependency_invalidates_only_explicit_video_closure(tmp_p
         creation_receipt_id=THREE_HASH,
         usage_license="test-only",
     )
+    keyframe = AssetRecord(
+        asset_id="image-shot-2-hard-cut-keyframe",
+        asset_type=AssetType.IMAGE,
+        artifact_path=Path(f"assets/files/{THREE_HASH}.png"),
+        sha256=THREE_HASH,
+        size_bytes=2048,
+        mime_type="image/png",
+        width=1280,
+        height=720,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture-image", version="1"),
+        input_artifact_ids=(character_asset_id, terminal.asset_id),
+        input_fingerprint=FOUR_HASH,
+        creation_receipt_id=FOUR_HASH,
+        usage_license="test-only",
+    )
     downstream = AssetRecord(
         asset_id="video-shot-2",
         asset_type=AssetType.VIDEO,
@@ -2335,7 +2354,7 @@ def test_terminal_frame_dependency_invalidates_only_explicit_video_closure(tmp_p
         height=720,
         source_kind=AssetSourceKind.GENERATED,
         tool=ToolIdentity(name="fixture-video", version="1"),
-        input_artifact_ids=(terminal.asset_id,),
+        input_artifact_ids=(keyframe.asset_id,),
         input_fingerprint=SIX_HASH,
         creation_receipt_id=SIX_HASH,
         usage_license="test-only",
@@ -2399,6 +2418,7 @@ def test_terminal_frame_dependency_invalidates_only_explicit_video_closure(tmp_p
             "assets": (
                 *inputs.project.registry.assets,
                 terminal,
+                keyframe,
                 downstream,
                 downstream_terminal,
                 transitive,
@@ -2487,6 +2507,7 @@ def test_terminal_frame_dependency_invalidates_only_explicit_video_closure(tmp_p
 
     assert set(resolution.affected_node_ids) == {
         f"asset:{terminal.asset_id}",
+        f"asset:{keyframe.asset_id}",
         f"asset:{downstream.asset_id}",
         f"asset:{downstream_terminal.asset_id}",
         f"asset:{transitive.asset_id}",
@@ -2499,6 +2520,109 @@ def test_terminal_frame_dependency_invalidates_only_explicit_video_closure(tmp_p
     assert resolution.by_id["creative:shot:shot-2:visual"].lifecycle is DependencyLifecycle.FRESH
     assert resolution.by_id["asset:voice-narration"].lifecycle is DependencyLifecycle.FRESH
     assert resolution.by_id[f"asset:{unlinked.asset_id}"].lifecycle is DependencyLifecycle.FRESH
+
+    character_asset = next(
+        asset for asset in registry.assets if asset.asset_id == character_asset_id
+    )
+    changed_character = character_asset.model_copy(update={"sha256": SEVEN_HASH})
+    character_registry = registry.model_copy(
+        update={
+            "assets": tuple(
+                changed_character if asset.asset_id == character_asset_id else asset
+                for asset in registry.assets
+            )
+        }
+    )
+    character_resolution = dep_mod.resolve_dependency_state(
+        dep_mod.build_production_dependency_graph(
+            replace(
+                bound_inputs,
+                project=project.model_copy(update={"registry": character_registry}),
+            )
+        ),
+        previous,
+    )
+    assert set(character_resolution.affected_node_ids) == {
+        f"asset:{character_asset_id}",
+        f"asset:{keyframe.asset_id}",
+        f"asset:{downstream.asset_id}",
+        f"asset:{downstream_terminal.asset_id}",
+        f"asset:{transitive.asset_id}",
+        "composition:main",
+        "timeline:main",
+        "renderer-source:main",
+        "render:main",
+    }
+    assert character_resolution.by_id[f"asset:{terminal.asset_id}"].lifecycle is DependencyLifecycle.FRESH
+    assert character_resolution.by_id[f"asset:{unlinked.asset_id}"].lifecycle is DependencyLifecycle.FRESH
+
+    changed_keyframe = keyframe.model_copy(update={"input_fingerprint": SEVEN_HASH})
+    keyframe_registry = registry.model_copy(
+        update={
+            "assets": tuple(
+                changed_keyframe if asset.asset_id == keyframe.asset_id else asset
+                for asset in registry.assets
+            )
+        }
+    )
+    keyframe_resolution = dep_mod.resolve_dependency_state(
+        dep_mod.build_production_dependency_graph(
+            replace(
+                bound_inputs,
+                project=project.model_copy(update={"registry": keyframe_registry}),
+            )
+        ),
+        previous,
+    )
+    assert set(keyframe_resolution.affected_node_ids) == {
+        f"asset:{keyframe.asset_id}",
+        f"asset:{downstream.asset_id}",
+        f"asset:{downstream_terminal.asset_id}",
+        f"asset:{transitive.asset_id}",
+        "composition:main",
+        "timeline:main",
+        "renderer-source:main",
+        "render:main",
+    }
+    assert keyframe_resolution.by_id[f"asset:{terminal.asset_id}"].lifecycle is DependencyLifecycle.FRESH
+    assert keyframe_resolution.by_id[f"asset:{character_asset_id}"].lifecycle is DependencyLifecycle.FRESH
+
+    changed_video = downstream.model_copy(
+        update={
+            "input_fingerprint": SEVEN_HASH,
+            "video_metadata": downstream.video_metadata.model_copy(
+                update={"resolved_generation_hash": SEVEN_HASH}
+            ),
+        }
+    )
+    video_registry = registry.model_copy(
+        update={
+            "assets": tuple(
+                changed_video if asset.asset_id == downstream.asset_id else asset
+                for asset in registry.assets
+            )
+        }
+    )
+    video_resolution = dep_mod.resolve_dependency_state(
+        dep_mod.build_production_dependency_graph(
+            replace(
+                bound_inputs,
+                project=project.model_copy(update={"registry": video_registry}),
+            )
+        ),
+        previous,
+    )
+    assert set(video_resolution.affected_node_ids) == {
+        f"asset:{downstream.asset_id}",
+        f"asset:{downstream_terminal.asset_id}",
+        f"asset:{transitive.asset_id}",
+        "composition:main",
+        "timeline:main",
+        "renderer-source:main",
+        "render:main",
+    }
+    assert video_resolution.by_id[f"asset:{keyframe.asset_id}"].lifecycle is DependencyLifecycle.FRESH
+    assert video_resolution.by_id[f"asset:{terminal.asset_id}"].lifecycle is DependencyLifecycle.FRESH
 
 
 def test_applied_evidence_bootstraps_precise_pre_render_frontier(tmp_path):

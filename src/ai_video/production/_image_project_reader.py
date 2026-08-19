@@ -12,12 +12,15 @@ from ai_video.production.comfy_image import LocalImageExecutionProfile
 from ai_video.production.dependency import dependency_graph_semantic_sha256
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.image import (
+    ContinuityTerminalImageReferenceBinding,
     ImageGenerationAuthorization,
     ImageGenerationPreview,
     ImageGenerationRequest,
     ImageProvenanceReceipt,
     ImageProviderResult,
     _measure_png,
+    _reference_graph_input_ids,
+    _validate_continuity_terminal_reference,
     validate_image_result,
 )
 from ai_video.production.image_import import (
@@ -262,6 +265,69 @@ def _verify_reference_bindings(
 ) -> None:
     assets = {item.asset_id: item for item in base_registry.assets}
     for binding in request.references:
+        if isinstance(binding, ContinuityTerminalImageReferenceBinding):
+            from ai_video.production._video_project_reader import (
+                load_terminal_frame_evidence,
+                load_video_request_receipt,
+            )
+
+            _validate_continuity_terminal_reference(
+                binding, bundle, validate_target=False
+            )
+            active_target = next(
+                (shot for shot in bundle.shots if shot.shot_id == binding.target_shot_id),
+                None,
+            )
+            base_target = next(
+                (
+                    item
+                    for item in base_project.artifacts.shots
+                    if active_target is not None
+                    and item.artifact_id == active_target.artifact_id
+                ),
+                None,
+            )
+            if (
+                base_target is None
+                or base_target.revision != binding.target_shot_revision
+                or base_target.content_hash != binding.target_shot_content_hash
+            ):
+                raise ValueError(
+                    "continuity terminal target does not match the base project"
+                )
+            matching = tuple(
+                attempt
+                for attempt in bundle.manifest.attempts
+                if attempt.video_generation_state is not None
+                and attempt.video_generation_state.terminal_frame_evidence is not None
+                and attempt.video_generation_state.terminal_frame_evidence.content_hash
+                == binding.terminal_frame.content_hash
+            )
+            if len(matching) != 1:
+                raise ValueError(
+                    "continuity terminal has no unique source activation"
+                )
+            state = matching[0].video_generation_state
+            assert state is not None and state.terminal_frame_evidence is not None
+            source_request = load_video_request_receipt(bundle.root, state.request)
+            source_scope = source_request.activation_scope
+            if (
+                load_terminal_frame_evidence(
+                    bundle.root, state.terminal_frame_evidence
+                )
+                != binding.terminal_frame
+                or source_scope is None
+                or source_scope.request.target_shot_id
+                != binding.terminal_frame.source_shot_id
+                or source_scope.request.target_shot_revision
+                != binding.terminal_frame.source_shot_revision
+                or source_scope.request.target_shot_content_hash
+                != binding.terminal_frame.source_shot_content_hash
+            ):
+                raise ValueError(
+                    "continuity terminal does not match durable evidence bytes"
+                )
+            continue
         artifact = _read_creative_reference(
             bundle,
             base_project,
@@ -569,7 +635,7 @@ def _verify_evidence(
         *(
             identity
             for item in request.references
-            for identity in (item.creative_artifact_id, item.asset_id)
+            for identity in _reference_graph_input_ids(item)
         ),
     )
     if (
@@ -631,6 +697,8 @@ def _verify_image_activation_chronology(
     if manifest.manifest_revision < activation_revision:
         raise ValueError("active image Manifest revision predates activation")
     if manifest.manifest_revision == activation_revision:
+        if attempt.candidate_project != manifest.active_project:
+            raise ValueError("selected image candidate was not activated")
         states_payload = json.dumps(
             [
                 item.model_dump(mode="json")
@@ -709,8 +777,89 @@ def verify_image_attempt_evidence(
         ) from exc
 
 
+def reopen_image_attempt_request(
+    bundle: LoadedProductionProject,
+    attempt: StateCommitAttempt,
+) -> ImageGenerationRequest:
+    verify_image_attempt_evidence(bundle, attempt)
+    if attempt.image_request is None:
+        raise _invalid("P7 image attempt has no request summary.")
+    request_value, _ = _read_canonical_json(
+        bundle.root,
+        canonical_image_request_path(attempt.image_request.request_fingerprint),
+        label="image request",
+    )
+    try:
+        request = ImageGenerationRequest.model_validate(request_value)
+    except ValidationError as exc:
+        raise _invalid("P7 image request evidence is invalid.", str(exc)) from exc
+    if not _attempt_summary_matches_request(attempt, request):
+        raise _invalid("P7 image request does not match its selected attempt.")
+    return request
+
+
+def verify_hard_cut_keyframe_evidence(
+    bundle: LoadedProductionProject,
+    resolved_request,
+    *,
+    require_active_base: bool,
+) -> None:
+    from ai_video.production._video_project_reader import load_terminal_frame_evidence
+    from ai_video.production.video import (
+        validate_hard_cut_keyframe_binding_against_project,
+    )
+
+    scope = resolved_request.activation_scope
+    if scope is None or scope.request.hard_cut_keyframe_binding is None:
+        return
+    request = scope.request
+    binding = request.hard_cut_keyframe_binding
+    validate_hard_cut_keyframe_binding_against_project(
+        request,
+        bundle,
+        require_active_base=require_active_base,
+    )
+    image_attempts = tuple(
+        attempt
+        for attempt in bundle.manifest.attempts
+        if attempt.image_request is not None
+        and attempt.image_request.request_fingerprint
+        == binding.keyframe_request_fingerprint
+    )
+    if len(image_attempts) != 1:
+        raise _invalid("Hard-cut keyframe has no unique P7 activation.")
+    image_request = reopen_image_attempt_request(bundle, image_attempts[0])
+    terminal_references = tuple(
+        reference
+        for reference in image_request.references
+        if reference.role == "continuity_terminal"
+    )
+    matching_terminal_pointers = tuple(
+        attempt.video_generation_state.terminal_frame_evidence
+        for attempt in bundle.manifest.attempts
+        if attempt.video_generation_state is not None
+        and attempt.video_generation_state.terminal_frame_evidence is not None
+        and attempt.video_generation_state.terminal_frame_evidence.content_hash
+        == binding.terminal_frame.content_hash
+    )
+    if (
+        image_request.output_asset_id != binding.keyframe_asset_id
+        or len(terminal_references) != 1
+        or terminal_references[0].terminal_frame != binding.terminal_frame
+        or terminal_references[0].constraints != binding.constraints
+        or len(matching_terminal_pointers) != 1
+        or load_terminal_frame_evidence(
+            bundle.root, matching_terminal_pointers[0]
+        )
+        != binding.terminal_frame
+    ):
+        raise _invalid(
+            "Hard-cut binding does not match exact durable P7 and terminal evidence."
+        )
+
+
 def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
-    if bundle.manifest.schema_version not in {"2.5", "2.6"}:
+    if bundle.manifest.schema_version not in {"2.5", "2.6", "2.7", "2.8"}:
         return
     attempts = tuple(
         item
@@ -776,8 +925,6 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
 
         if selected:
             latest = max(selected.values(), key=lambda item: item.base_manifest_revision)
-            if latest.candidate_project != bundle.manifest.active_project:
-                raise ValueError("latest selected image candidate is not active")
             _verify_image_activation_chronology(bundle.manifest, latest)
     except (AiVideoError, OSError, UnicodeError, ValidationError, ValueError) as exc:
         detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)

@@ -326,6 +326,7 @@ categories:
       - src/ai_video/production/seedance_profile.py
       - src/ai_video/production/paid_provider.py
       - src/ai_video/production/video.py
+      - src/ai_video/production/_video_continuity.py
       - src/ai_video/production/video_artifact.py
       - src/ai_video/production/video_contracts.py
       - src/ai_video/production/video_dependency.py

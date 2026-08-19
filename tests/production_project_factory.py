@@ -2401,6 +2401,7 @@ def make_p7_image_candidate_preparer(base_inputs):
         canonical_image_asset_path,
         canonical_image_shot_revision_path,
     )
+    from ai_video.production.image import _reference_graph_input_ids
 
     def prepare(
         base_project,
@@ -2433,7 +2434,7 @@ def make_p7_image_candidate_preparer(base_inputs):
                 *(
                     identity
                     for item in request.references
-                    for identity in (item.creative_artifact_id, item.asset_id)
+                    for identity in _reference_graph_input_ids(item)
                 ),
             ),
             input_fingerprint=request.request_fingerprint,

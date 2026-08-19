@@ -559,6 +559,16 @@ def _verify_active_generated_video(
     state = attempt.video_generation_state
     if state is None:
         raise _invalid("Active video generation attempt has no lifecycle state.")
+    if request.hard_cut_keyframe_binding is not None:
+        from ai_video.production._image_project_reader import (
+            verify_hard_cut_keyframe_evidence,
+        )
+
+        verify_hard_cut_keyframe_evidence(
+            bundle,
+            request,
+            require_active_base=False,
+        )
     if (
         attempt.status is not StateCommitStatus.SUCCEEDED
         or state.phase is not VideoAttemptPhase.ACTIVATE

@@ -8,7 +8,7 @@
 
 该 proof 使用背对镜头的小机器人沿暗巷直线前进，两个 clip 基本保持同一构图。它没有有效压测人脸、服装、角色表演、遮挡、独立 keyframe、镜头尺度变化或对话空间关系，因此不得算作 `C2_HARD_CUT_KEYFRAME_I2V` subjective acceptance，也不得解锁 Shot Router runtime implementation。
 
-本规范定义下一步最小但有代表性的 C2 闭环。它允许为 truthful hard-cut lineage 进行本规范列明的最小 schema/runtime extension；不授权 cloud、remote 或 paid Provider 调用。
+本规范定义下一步最小但有代表性的 C2 闭环。C2 provider-neutral request/reference、additive local image profile、active-lineage validation、historical hash compatibility与P5 typed closure现已完成offline technical implementation；representative GPU live与subjective acceptance尚未执行。本文不授权cloud、remote或paid Provider调用。
 
 ## Goal
 
@@ -27,7 +27,7 @@
 | Level | Meaning | Current State | Router Gate |
 | --- | --- | --- | --- |
 | `C1_CONTINUATION_I2V` | Shot N terminal PNG 直接成为 Shot N+1 first frame，接近一个连续镜头被切成两段 | 已有 technical live-local evidence；subjective quality只适用于该简单 fixture | 不足以解锁 Router |
-| `C2_HARD_CUT_KEYFRAME_I2V` | Shot N+1 先生成独立构图 keyframe；keyframe generation 消费 Shot N terminal + canonical references，再由 I2V 动起来 | 尚未实现、尚无 live/subjective evidence | 必须通过 representative proof |
+| `C2_HARD_CUT_KEYFRAME_I2V` | Shot N+1 先生成独立构图 keyframe；keyframe generation 消费 Shot N terminal + canonical references，再由 I2V 动起来 | offline technical implementation完成；尚无representative live/subjective evidence | 必须通过 representative proof |
 | `C3_REFERENCE_TO_VIDEO` | Provider 原生同时消费多角色/场景/视频 references | future optional capability | 不是本闭环前置条件 |
 
 Crossfade、插帧、optical flow、prompt-only continuity 与后期修图不构成上述任何 conditioning level。

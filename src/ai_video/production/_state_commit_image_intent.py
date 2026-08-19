@@ -7,10 +7,16 @@ from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.comfy_image import LocalImageExecutionProfile
+from ai_video.production._video_project_reader import (
+    load_terminal_frame_evidence,
+    load_video_request_receipt,
+)
 from ai_video.production.image import (
+    ContinuityTerminalImageReferenceBinding,
     ImageGenerationAuthorization,
     ImageGenerationPreview,
     ImageGenerationRequest,
+    _validate_continuity_terminal_reference,
 )
 from ai_video.production.models import (
     ImageRequestReceipt,
@@ -184,6 +190,52 @@ class _StateCommitImageIntentMixin:
         scenes = {item.artifact_id: item for item in loaded.scenes}
         reference_bytes = 0
         for reference in request.references:
+            if isinstance(reference, ContinuityTerminalImageReferenceBinding):
+                try:
+                    _validate_continuity_terminal_reference(reference, loaded)
+                    source_attempt = next(
+                        attempt
+                        for attempt in loaded.manifest.attempts
+                        if attempt.video_generation_state is not None
+                        and attempt.video_generation_state.terminal_frame_evidence
+                        is not None
+                        and attempt.video_generation_state.terminal_frame_evidence.content_hash
+                        == reference.terminal_frame.content_hash
+                    )
+                    source_state = source_attempt.video_generation_state
+                    assert source_state is not None
+                    pointer = source_state.terminal_frame_evidence
+                    assert pointer is not None
+                    source_request = load_video_request_receipt(
+                        self._project_root, source_state.request
+                    )
+                    source_scope = source_request.activation_scope
+                    if (
+                        load_terminal_frame_evidence(self._project_root, pointer)
+                        != reference.terminal_frame
+                        or source_scope is None
+                        or source_scope.request.target_shot_id
+                        != reference.terminal_frame.source_shot_id
+                        or source_scope.request.target_shot_revision
+                        != reference.terminal_frame.source_shot_revision
+                        or source_scope.request.target_shot_content_hash
+                        != reference.terminal_frame.source_shot_content_hash
+                    ):
+                        raise ValueError(
+                            "continuity terminal does not match durable evidence bytes"
+                        )
+                except (StopIteration, ValueError) as exc:
+                    raise _image_invalid(
+                        "Image continuity terminal identity is stale or invalid.",
+                        str(exc),
+                    ) from exc
+                asset = assets.get(reference.asset_id)
+                if asset is None:
+                    raise _image_invalid(
+                        "Image continuity terminal is absent from the active Registry."
+                    )
+                reference_bytes += asset.size_bytes
+                continue
             if reference.role == "character":
                 creative = characters.get(reference.creative_artifact_id)
                 allowed_asset_ids = (
@@ -345,7 +397,9 @@ class _StateCommitImageIntentMixin:
                 manifest,
                 {
                     "schema_version": (
-                        "2.6" if manifest.schema_version == "2.6" else "2.5"
+                        manifest.schema_version
+                        if manifest.schema_version in {"2.5", "2.6", "2.7", "2.8"}
+                        else "2.5"
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,
                     "attempts": manifest.attempts + (attempt,),

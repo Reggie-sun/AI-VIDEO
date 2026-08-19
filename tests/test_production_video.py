@@ -35,9 +35,11 @@ from ai_video.production.paid_provider import (
 )
 from ai_video.production.video import (
     BillingKind,
+    HardCutKeyframeBinding,
     ProviderProfilePointer,
     ResolvedVideoGenerationRequest,
     VideoCapabilityVariant,
+    VideoActivationScope,
     VideoExecutionKind,
     VideoFetchReceipt,
     VideoGenerationMode,
@@ -255,6 +257,27 @@ def _continuity_binding(**changes: object):
     }
     values.update(changes)
     return video_contracts.ContinuityReferenceBinding.create(**values)
+
+
+def _hard_cut_keyframe_binding(**changes: object):
+    values: dict[str, object] = {
+        "role": "hard_cut_keyframe",
+        "terminal_frame": _terminal_frame(),
+        "keyframe_asset_id": "image-hard-cut-shot-001",
+        "keyframe_asset_sha256": HASH_B,
+        "keyframe_mime_type": "image/png",
+        "keyframe_width": 1280,
+        "keyframe_height": 720,
+        "keyframe_size_bytes": 8192,
+        "keyframe_request_fingerprint": HASH_C,
+        "keyframe_provenance_receipt_id": HASH_D,
+        "target_shot_id": "shot-001",
+        "target_shot_revision": 3,
+        "target_shot_content_hash": HASH_A,
+        "constraints": _continuity_constraints(),
+    }
+    values.update(changes)
+    return HardCutKeyframeBinding.create(**values)
 
 
 def _output(*, duration_seconds: int = 6, fps: int | None = 24) -> VideoOutputRequirement:
@@ -520,6 +543,126 @@ def test_continuity_request_binds_exact_terminal_evidence_and_constraints():
     assert resolved.activation_scope.request.continuity_binding == binding
 
 
+def test_hard_cut_request_binds_derived_keyframe_and_upstream_terminal_lineage():
+    binding = _hard_cut_keyframe_binding()
+    first_frame = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id=binding.keyframe_asset_id,
+        asset_sha256=binding.keyframe_asset_sha256,
+        mime_type=binding.keyframe_mime_type,
+        width=binding.keyframe_width,
+        height=binding.keyframe_height,
+        size_bytes=binding.keyframe_size_bytes,
+    )
+    request = _request(
+        image_bindings=(first_frame,),
+        hard_cut_keyframe_binding=binding,
+        input_artifact_ids=("shot-001", binding.keyframe_asset_id),
+    )
+
+    assert request.hard_cut_keyframe_binding == binding
+    assert request.continuity_binding is None
+    resolved = _resolved(request)
+    assert resolved.hard_cut_keyframe_binding == binding
+    assert resolved.activation_scope is not None
+    assert resolved.activation_scope.request.hard_cut_keyframe_binding == binding
+
+    with pytest.raises(ValidationError, match="exact derived keyframe"):
+        _request(
+            image_bindings=(
+                first_frame.model_copy(update={"asset_sha256": HASH_D}),
+            ),
+            hard_cut_keyframe_binding=binding,
+            input_artifact_ids=("shot-001", binding.keyframe_asset_id),
+        )
+    with pytest.raises(ValidationError, match="identity and bytes"):
+        _hard_cut_keyframe_binding(
+            keyframe_asset_sha256=binding.terminal_frame.extracted_sha256
+        )
+
+
+def test_hard_cut_field_absence_preserves_historical_p8_hashes_exactly():
+    request = _request()
+    scope = VideoActivationScope.create(request)
+    resolved = _resolved(request)
+
+    assert request.request_input_hash == (
+        "a95362fdc0493bbc9ec08a7bc29e11960cb914ba981915a453e4230592132047"
+    )
+    assert scope.scope_fingerprint == (
+        "dd55e6339eba1a47b420bb769d182a105e4044911f7e7603b528ad9f3b0a3cc5"
+    )
+    assert resolved.resolved_generation_hash == (
+        "525d9e08851e766a14e000da2f37ce8dcf165db0c0283169074863021eacb8e7"
+    )
+    assert resolved.desired_generation_fingerprint == resolved.resolved_generation_hash
+    assert (
+        "hard_cut_keyframe_binding"
+        not in VideoGenerationRequest._fingerprint_payload(
+            request.model_dump(mode="json")
+        )
+    )
+
+    text_request = _request(
+        mode=VideoGenerationMode.TEXT_TO_VIDEO,
+        image_bindings=(),
+        input_artifact_ids=("shot-001",),
+    )
+    text_variant = _variant(
+        mode=VideoGenerationMode.TEXT_TO_VIDEO,
+        required_first_frame=False,
+        allowed_image_roles=(),
+        max_reference_count=0,
+        allowed_image_mime_types=(),
+    )
+    terminal = _terminal_frame()
+    continuation_request = _request(
+        image_bindings=(
+            VideoImageReferenceBinding(
+                role="first_frame",
+                asset_id=terminal.extracted_asset_id,
+                asset_sha256=terminal.extracted_sha256,
+                mime_type=terminal.extracted_mime_type,
+                width=terminal.extracted_width,
+                height=terminal.extracted_height,
+                size_bytes=terminal.extracted_size_bytes,
+            ),
+        ),
+        continuity_binding=_continuity_binding(),
+        input_artifact_ids=(
+            "shot-001",
+            terminal.source_shot_id,
+            terminal.source_video_asset_id,
+            terminal.extracted_asset_id,
+        ),
+    )
+    fixtures = (
+        (
+            text_request,
+            text_variant,
+            "39d920d007d4871704e5ea9388004611d0c12d49c484b5f07c01c1fdd6d1ee03",
+            "63be71c2befe1fceb33cd1f14b78d732ab01ffd009e0c3aaa49b06ac5f301751",
+            "15d74bd963f4baa15e78a1dd40dc3550d2a36a2492942b5ccacc64ca5a019ccd",
+        ),
+        (
+            continuation_request,
+            _variant(),
+            "67d7fcb658c7a141eeebb752e4c621da31f6c998c8c0530e4c3800cebe5bb01d",
+            "8d706774e383d03e26290630eadc6dacf505ef1a2141bdfd2af9a118af56ef01",
+            "f716d6f2f9d4f1cfd9310ff4a9b3386f9becb7eb6a356bdf6ac5ee74fed0b2ad",
+        ),
+    )
+    for historical_request, variant, request_hash, scope_hash, resolved_hash in fixtures:
+        payload = historical_request.model_dump(mode="json")
+        payload.pop("hard_cut_keyframe_binding")
+        reopened = VideoGenerationRequest.model_validate(payload)
+        historical_resolved = _resolved(reopened, variant=variant)
+        assert reopened.request_input_hash == request_hash
+        assert VideoActivationScope.create(reopened).scope_fingerprint == scope_hash
+        assert historical_resolved.desired_generation_fingerprint == resolved_hash
+        assert historical_resolved.resolved_generation_hash == resolved_hash
+
+
 def test_continuity_request_preserves_explicit_optional_last_frame():
     binding = _continuity_binding()
     terminal = binding.terminal_frame
@@ -701,10 +844,12 @@ def test_continuity_request_rejects_unbound_or_mismatched_inputs(
 def test_historical_activation_scope_reopens_without_continuity_defaults():
     historical = _resolved().model_dump(mode="json")
     historical.pop("continuity_binding")
+    historical.pop("hard_cut_keyframe_binding")
     historical.pop("seal_terminal_frame")
     scope = historical["activation_scope"]
     scope_request = scope["request"]
     scope_request.pop("continuity_binding")
+    scope_request.pop("hard_cut_keyframe_binding")
     scope_request.pop("seal_terminal_frame")
     scope["scope_fingerprint"] = video_contracts.canonical_sha256(
         {

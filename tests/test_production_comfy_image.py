@@ -23,12 +23,14 @@ from ai_video.production.comfy_image import (
     validate_profile_request_match,
 )
 from ai_video.production.image import (
+    ContinuityTerminalImageReferenceBinding,
     ImageGenerationAuthorization,
     ImageGenerationPreview,
     ImageGenerationRequest,
     ImageProviderParameters,
     ImageReferenceBinding,
 )
+from ai_video.production.video import ContinuityConstraintSet, TerminalFrameEvidence
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
@@ -42,6 +44,7 @@ QWEN_PROFILE = FIXTURES / "qwen_profile.json"
 FLUX_PROFILE = FIXTURES / "flux_profile.json"
 REAL_QWEN_PROFILE = ROOT / "workflows/profiles/p7_1_qwen_image_edit_2511.json"
 REAL_FLUX_PROFILE = ROOT / "workflows/profiles/p7_1_flux2_klein_4b.json"
+REAL_HARD_CUT_PROFILE = ROOT / "workflows/profiles/p7_1_qwen_hard_cut_keyframe.json"
 PNG = b"\x89PNG\r\n\x1a\nfixture-png"
 HASHES = tuple(f"{index}" * 64 for index in range(4))
 
@@ -154,6 +157,87 @@ def _request(profile: LocalImageExecutionProfile, root: Path) -> tuple[ImageGene
     return request, paths
 
 
+def _hard_cut_request(
+    profile: LocalImageExecutionProfile, root: Path
+) -> tuple[ImageGenerationRequest, dict[str, Path]]:
+    ordinary, paths = _request(profile, root)
+    terminal_path = paths.pop("scene-ref")
+    terminal = TerminalFrameEvidence.create(
+        source_shot_id="shot-0",
+        source_shot_revision=1,
+        source_shot_content_hash=HASHES[0],
+        source_video_asset_id="video-shot-0",
+        source_video_sha256=HASHES[1],
+        source_generation_id="generation-shot-0",
+        source_request_input_hash=HASHES[2],
+        source_resolved_generation_hash=HASHES[3],
+        source_provenance_receipt_id="provenance-shot-0",
+        extraction_receipt_id=HASHES[3],
+        source_registry=ordinary.base_registry,
+        source_container_name="mp4",
+        source_codec_name="h264",
+        source_width=512,
+        source_height=512,
+        source_fps_numerator=24,
+        source_fps_denominator=1,
+        source_duration_milliseconds=5167,
+        source_frame_count=124,
+        frame_index=123,
+        timestamp_numerator=123,
+        timestamp_denominator=24,
+        selection_rule="generated_candidate_terminal",
+        extraction_contract_version="terminal-frame-v1",
+        extractor_name="ffmpeg",
+        extractor_version="7.1",
+        extracted_asset_id="terminal-ref",
+        extracted_sha256=hashlib.sha256(terminal_path.read_bytes()).hexdigest(),
+        extracted_mime_type="image/png",
+        extracted_size_bytes=len(terminal_path.read_bytes()),
+        extracted_width=512,
+        extracted_height=512,
+        extracted_color_space="unmeasured",
+    )
+    constraints = ContinuityConstraintSet.create(
+        scene_identity={
+            "artifact_id": "scene-archive",
+            "revision": 1,
+            "content_hash": HASHES[1],
+        },
+        character_identities=(
+            {
+                "artifact_id": "character-hero",
+                "revision": 1,
+                "content_hash": HASHES[0],
+            },
+        ),
+        camera_axis="same-side",
+        framing="medium-hard-cut",
+        lighting="window-left",
+        color="neutral-warm",
+        motion_direction="left-to-right",
+        exit_state="hand-on-chair",
+        entrance_state="hand-on-chair-continuing",
+    )
+    terminal_binding = ContinuityTerminalImageReferenceBinding.create(
+        role="continuity_terminal",
+        terminal_frame=terminal,
+        asset_id=terminal.extracted_asset_id,
+        asset_sha256=terminal.extracted_sha256,
+        target_shot_id=ordinary.target_shot_id,
+        target_shot_revision=1,
+        target_shot_content_hash=HASHES[0],
+        constraints=constraints,
+    )
+    values = ordinary.model_dump(
+        mode="json",
+        exclude={"request_id", "request_fingerprint", "output_asset_id"},
+    )
+    values["references"] = (ordinary.references[0], terminal_binding)
+    request = ImageGenerationRequest.create(**values)
+    paths[terminal.extracted_asset_id] = terminal_path
+    return request, paths
+
+
 def _authorization(request: ImageGenerationRequest) -> ImageGenerationAuthorization:
     preview = ImageGenerationPreview.create(request=request, reference_total_bytes=1)
     return ImageGenerationAuthorization.create(
@@ -249,6 +333,38 @@ def test_realistic_fixture_profiles_are_sealed_and_reopen_exact_files() -> None:
     flux = load_local_image_execution_profile(FLUX_PROFILE, artifact_root=ROOT)
     assert qwen.profile_id == "local-image-profile:sha256:" + qwen.profile_content_hash
     assert flux.model_repository_id == "black-forest-labs/FLUX.2-klein-4B"
+
+
+def test_additive_hard_cut_profile_accepts_character_and_terminal_only(
+    tmp_path: Path,
+) -> None:
+    profile = load_local_image_execution_profile(
+        REAL_HARD_CUT_PROFILE, artifact_root=ROOT
+    )
+    request, _ = _hard_cut_request(profile, tmp_path)
+
+    validate_profile_request_match(profile, request)
+    assert profile.supported_reference_roles == (
+        "character",
+        "continuity_terminal",
+    )
+    assert profile.max_references == 2
+
+
+def test_ordinary_profile_denies_hard_cut_before_upload_or_submit(
+    tmp_path: Path,
+) -> None:
+    profile = _runtime_profile(tmp_path)
+    request, paths = _hard_cut_request(profile, tmp_path)
+    transport = _FakeTransport()
+    provider = _provider(tmp_path, profile, paths, transport)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.preflight(request)
+
+    assert exc_info.value.code is ErrorCode.IMAGE_REQUEST_INVALID
+    assert transport.uploaded == []
+    assert transport.submitted == []
 
 
 @pytest.mark.parametrize(
@@ -465,6 +581,25 @@ def test_fake_provider_consumes_once_uploads_in_order_and_returns_one_png(
     assert transport.fetches == 1
     assert result.image_bytes == PNG
     assert result.provider_request_id == "prompt-p7-1"
+
+
+def test_hard_cut_provider_uploads_exact_terminal_as_second_reference(
+    tmp_path: Path,
+) -> None:
+    profile = _runtime_profile(tmp_path, source=REAL_HARD_CUT_PROFILE)
+    request, paths = _hard_cut_request(profile, tmp_path)
+    terminal = request.references[1]
+    transport = _FakeTransport()
+    provider = _provider(tmp_path, profile, paths, transport)
+
+    provider.preflight(request)
+    provider.generate(request, _authorization(request), _Permit())
+
+    assert transport.uploaded == ["character.png", "scene.png"]
+    assert hashlib.sha256(paths[terminal.asset_id].read_bytes()).hexdigest() == (
+        terminal.asset_sha256
+    )
+    assert len(transport.submitted) == 1
 
 
 def test_fake_provider_is_network_free(tmp_path: Path) -> None:

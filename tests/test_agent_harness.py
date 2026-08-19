@@ -238,6 +238,7 @@ def test_video_recovery_change_routes_to_video_provider_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
     for path in (
+        "src/ai_video/production/_video_continuity.py",
         "src/ai_video/production/video_artifact.py",
         "src/ai_video/production/video_dependency.py",
         "src/ai_video/production/_state_commit_video_candidate.py",

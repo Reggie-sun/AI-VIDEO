@@ -9,12 +9,15 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import BinaryIO
 
-from ai_video.errors import ErrorCode
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._lifecycle_schema import (
     LocalVideoFetchReceiptPointer,
     LocalVideoStatusReceiptPointer,
     LocalVideoSubmitIntentPointer,
     LocalVideoSubmitReceiptPointer,
+)
+from ai_video.production._image_project_reader import (
+    verify_hard_cut_keyframe_evidence,
 )
 from ai_video.production._video_project_reader import (
     load_local_video_fetch_receipt,
@@ -231,12 +234,31 @@ class _StateCommitVideoMixin:
                 and (
                     request.activation_scope.request.seal_terminal_frame
                     or request.continuity_binding is not None
+                    or request.hard_cut_keyframe_binding is not None
                 )
                 and manifest.schema_version != "2.8"
             ):
                 raise _state_invalid(
                     "Shot continuity requires Production Manifest 2.8."
                 )
+            if request.hard_cut_keyframe_binding is not None:
+                try:
+                    loaded = self._load_production_project(
+                        self._project_root / "project.yaml"
+                    )
+                    if loaded.manifest != manifest or request.activation_scope is None:
+                        raise ValueError(
+                            "active project changed during hard-cut validation"
+                        )
+                    verify_hard_cut_keyframe_evidence(
+                        loaded,
+                        request,
+                        require_active_base=True,
+                    )
+                except (AiVideoError, OSError, ValueError) as exc:
+                    raise _state_invalid(
+                        "Hard-cut keyframe lineage is not active or exact.", str(exc)
+                    ) from exc
             if manifest.active_dependency_graph is None:
                 raise _state_invalid(
                     "Video generation requires an active dependency graph."

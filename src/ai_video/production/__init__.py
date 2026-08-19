@@ -78,6 +78,7 @@ from ai_video.production.paid_provider import (
 )
 from ai_video.production.hyperframes import render_with_hyperframes
 from ai_video.production.image import (
+    ContinuityTerminalImageReferenceBinding,
     ImageAssetProvider,
     ImageGenerationAuthorization,
     ImageGenerationPreview,
@@ -118,6 +119,7 @@ from ai_video.production.video import (
     ContinuityArtifactIdentity,
     ContinuityConstraintSet,
     ContinuityReferenceBinding,
+    HardCutKeyframeBinding,
     ResolvedVideoGenerationRequest,
     TerminalFrameEvidence,
     VideoFetchReceipt,
@@ -186,6 +188,7 @@ __all__ = [
     "ImageProviderParameters",
     "ImageProviderResult",
     "ImageReferenceBinding",
+    "ContinuityTerminalImageReferenceBinding",
     "ComfyLocalImageProvider",
     "ComfyUIVideoProvider",
     "LocalImageBinding",
@@ -235,6 +238,7 @@ __all__ = [
     "ContinuityArtifactIdentity",
     "ContinuityConstraintSet",
     "ContinuityReferenceBinding",
+    "HardCutKeyframeBinding",
     "ResolvedVideoGenerationRequest",
     "TerminalFrameEvidence",
     "VideoFetchReceipt",

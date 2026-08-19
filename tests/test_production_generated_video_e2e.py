@@ -15,15 +15,29 @@ from ai_video.production.models import (
     VideoAttemptPhase,
 )
 from ai_video.production._video_project_reader import (
+    load_terminal_frame_evidence,
     load_video_fetch_receipt,
     load_video_request_receipt,
     load_video_status_receipt,
 )
+from ai_video.production.image import (
+    ContinuityTerminalImageReferenceBinding,
+    ImageGenerationAuthorization,
+    ImageGenerationPreview,
+    ImageGenerationRequest,
+    ImageProviderParameters,
+    ImageReferenceBinding,
+)
 from ai_video.production.hyperframes import probe_clip_fd
-from ai_video.production.paths import _open_regular_file_nofollow
+from ai_video.production.paths import (
+    _open_regular_file_nofollow,
+    canonical_image_request_path,
+)
 from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video import (
     BillingKind,
+    ContinuityConstraintSet,
+    HardCutKeyframeBinding,
     ProviderProfilePointer,
     VideoCapabilityVariant,
     VideoExecutionKind,
@@ -45,9 +59,12 @@ from ai_video.production.video_artifact import (
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.project import load_production_project
 from production_project_factory import (
+    _p7_png,
+    make_p7_image_candidate_preparer,
     make_p8_video_candidate_preparer,
     make_p8_video_generation_base,
 )
+from test_production_state_commit import make_image_provider_result
 from test_production_video import _paid_authorization, _paid_preview
 
 
@@ -235,6 +252,318 @@ def test_terminal_frame_is_extracted_registered_activated_and_replayed_exactly(
 
     assert replayed == activated
     assert (evidence_path.read_bytes(), terminal_path.read_bytes()) == before
+
+
+def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_call(
+    tmp_path: Path,
+) -> None:
+    inputs, provider, _, source_committer = _reach_fetch(
+        tmp_path, seal_terminal_frame=True
+    )
+    VideoGenerationService(
+        committer=source_committer, provider=provider
+    ).fetch_and_activate(attempt_id=ATTEMPT_ID)
+    selected = load_production_project(tmp_path / "project.yaml")
+    source_state = selected.manifest.attempts[-1].video_generation_state
+    assert source_state is not None and source_state.terminal_frame_evidence is not None
+    terminal = load_terminal_frame_evidence(
+        tmp_path, source_state.terminal_frame_evidence
+    )
+    target = selected.shots[1]
+    character = selected.characters[0]
+    scene = selected.scenes[0]
+    assets = {asset.asset_id: asset for asset in selected.registry.assets}
+    character_asset = assets[character.reference_asset_ids[0]]
+    terminal_asset = assets[terminal.extracted_asset_id]
+    constraints = ContinuityConstraintSet.create(
+        scene_identity={
+            "artifact_id": scene.artifact_id,
+            "revision": scene.revision,
+            "content_hash": scene.content_hash,
+        },
+        character_identities=(
+            {
+                "artifact_id": character.artifact_id,
+                "revision": character.revision,
+                "content_hash": character.content_hash,
+            },
+        ),
+        camera_axis="camera-left-of-door-table-axis",
+        framing="hard-cut-medium-from-medium-wide",
+        lighting="window-key-camera-left",
+        color="neutral-warm-red-scarf",
+        motion_direction="screen-left-to-right",
+        exit_state="right-hand-on-chair-back",
+        entrance_state="right-hand-on-chair-back-continuing",
+    )
+    request = ImageGenerationRequest.create(
+        attempt_id="hard-cut-keyframe-image",
+        provider_kind="fake-local",
+        model_id="fixture-image-model-1",
+        target_shot_id=target.shot_id,
+        target_asset_role=target.required_asset_roles[0].role,
+        prompt_text="Alice continues from the chair-touch exit state in a new medium framing.",
+        negative_prompt_text="identity drift, axis reversal, changed wardrobe",
+        parameters=ImageProviderParameters(
+            seed=23,
+            width=2,
+            height=1,
+            output_format="png",
+            generation_revision=1,
+        ),
+        references=(
+            ImageReferenceBinding(
+                role="character",
+                creative_artifact_id=character.artifact_id,
+                creative_revision=character.revision,
+                creative_content_hash=character.content_hash,
+                asset_id=character_asset.asset_id,
+                asset_sha256=character_asset.sha256,
+            ),
+            ContinuityTerminalImageReferenceBinding.create(
+                role="continuity_terminal",
+                terminal_frame=terminal,
+                asset_id=terminal_asset.asset_id,
+                asset_sha256=terminal_asset.sha256,
+                target_shot_id=target.shot_id,
+                target_shot_revision=target.revision,
+                target_shot_content_hash=target.content_hash,
+                constraints=constraints,
+            ),
+        ),
+        base_project=selected.manifest.active_project,
+        base_registry=selected.manifest.active_registry,
+        base_dependency_graph=selected.manifest.active_dependency_graph,
+    )
+    preview = ImageGenerationPreview.create(
+        request=request,
+        reference_total_bytes=character_asset.size_bytes + terminal_asset.size_bytes,
+    )
+    authorization = ImageGenerationAuthorization.create(
+        request=request,
+        preview=preview,
+        usage_license="fixture-only",
+        policy_receipt_id="hard-cut-local-policy",
+    )
+
+    class _Provider:
+        calls = 0
+
+        def generate(self, candidate, candidate_authorization, permit):
+            self.calls += 1
+            assert permit._consume_image_generation_permit(
+                request_fingerprint=candidate.request_fingerprint
+            )
+            return make_image_provider_result(
+                candidate,
+                candidate_authorization,
+                _p7_png(),
+            )
+
+    image_provider = _Provider()
+    prepare = make_p7_image_candidate_preparer(inputs)
+    prepare_calls = 0
+
+    def _prepare(*args, **kwargs):
+        nonlocal prepare_calls
+        prepare_calls += 1
+        candidate = prepare(*args, **kwargs)
+        return candidate
+
+    image_committer = ProductionStateCommitter(
+        tmp_path,
+        image_candidate_preparer=_prepare,
+    )
+    activated = image_committer.generate_image_asset(
+        request,
+        preview,
+        authorization,
+        image_provider,
+    )
+    reopened = load_production_project(tmp_path / "project.yaml")
+
+    assert activated.schema_version == "2.8"
+    assert reopened.manifest == activated
+    assert request.output_asset_id in {
+        asset_id
+        for role in reopened.shots[1].required_asset_roles
+        for asset_id in role.asset_ids
+    }
+    replayed = image_committer.generate_image_asset(
+        request,
+        preview,
+        authorization,
+        image_provider,
+    )
+    assert replayed == activated
+    assert image_provider.calls == 1
+    assert prepare_calls == 1
+
+    keyframe_project = reopened
+    target = keyframe_project.shots[1]
+    keyframe = next(
+        asset
+        for asset in keyframe_project.registry.assets
+        if asset.asset_id == request.output_asset_id
+    )
+    hard_cut = HardCutKeyframeBinding.create(
+        role="hard_cut_keyframe",
+        terminal_frame=terminal,
+        keyframe_asset_id=keyframe.asset_id,
+        keyframe_asset_sha256=keyframe.sha256,
+        keyframe_mime_type="image/png",
+        keyframe_width=keyframe.width,
+        keyframe_height=keyframe.height,
+        keyframe_size_bytes=keyframe.size_bytes,
+        keyframe_request_fingerprint=request.request_fingerprint,
+        keyframe_provenance_receipt_id=keyframe.creation_receipt_id,
+        target_shot_id=target.shot_id,
+        target_shot_revision=target.revision,
+        target_shot_content_hash=target.content_hash,
+        constraints=constraints,
+    )
+    video_output = VideoOutputRequirement(
+        duration_seconds=1,
+        width=64,
+        height=64,
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+    profile_sha = "e" * 64
+    video_request = VideoGenerationRequest.create(
+        generation_id="hard-cut-video-generation",
+        provider_name="fake-hard-cut-video",
+        provider_kind="fake_video",
+        model_id="fake-h264",
+        provider_profile=ProviderProfilePointer(
+            profile_id="fake-hard-cut-profile",
+            profile_version="v1",
+            profile_path=Path(f"provider-profiles/{profile_sha}.json"),
+            profile_sha256=profile_sha,
+        ),
+        target_shot_id=target.shot_id,
+        target_shot_revision=target.revision,
+        target_shot_content_hash=target.content_hash,
+        target_asset_role=target.required_asset_roles[0].role,
+        target_visual_strategy="generated_video",
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        prompt_text="Alice pulls the chair and sits without changing axis or wardrobe.",
+        negative_prompt_text="identity drift, axis reversal, lighting change",
+        image_bindings=(
+            VideoImageReferenceBinding(
+                role="first_frame",
+                asset_id=keyframe.asset_id,
+                asset_sha256=keyframe.sha256,
+                mime_type=keyframe.mime_type,
+                width=keyframe.width,
+                height=keyframe.height,
+                size_bytes=keyframe.size_bytes,
+            ),
+        ),
+        hard_cut_keyframe_binding=hard_cut,
+        output_requirement=video_output,
+        seed=29,
+        base_project=keyframe_project.manifest.active_project,
+        base_registry=keyframe_project.manifest.active_registry,
+        base_dependency_graph=keyframe_project.manifest.active_dependency_graph,
+        input_artifact_ids=(target.artifact_id, keyframe.asset_id),
+        output_asset_id="video-output-hard-cut-shot-2",
+    )
+    variant = VideoCapabilityVariant(
+        capability_id="fake-hard-cut-i2v",
+        provider_kind="fake_video",
+        model_id="fake-h264",
+        profile_version="v1",
+        execution_kind=VideoExecutionKind.REMOTE,
+        billing_kind=BillingKind.METERED,
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        output=video_output,
+        allowed_image_roles=("first_frame",),
+        required_first_frame=True,
+        max_reference_count=0,
+        allowed_image_mime_types=("image/png",),
+        max_image_bytes=max(keyframe.size_bytes, 1),
+        min_image_width=1,
+        min_image_height=1,
+        negative_prompt_supported=True,
+        seed_supported=True,
+        fps_supported=True,
+        idempotent_submit=False,
+        lookup_supported=False,
+    )
+    video_provider = ScriptedFakeVideoProvider(
+        capabilities=VideoProviderCapabilities.create(
+            provider_name="fake-hard-cut-video", variants=(variant,)
+        ),
+        artifact_bytes=FIXTURE.read_bytes(),
+        scenario=FakeVideoScenario(
+            external_effect_id="fake-hard-cut-task-2",
+            provider_file_id="fake-hard-cut-file-2",
+        ),
+    )
+    resolved_video = video_provider.resolve(video_request)
+    video_preview = video_provider.preview(resolved_video)
+    paid_preview = _paid_preview(
+        resolved_video,
+        attempt_id="hard-cut-video-attempt",
+        video_preview=video_preview,
+    )
+    paid_authorization = _paid_authorization(paid_preview)
+    video_committer = ProductionStateCommitter(
+        tmp_path,
+        video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
+        paid_provider_authorizer=(
+            lambda exact: paid_authorization if exact == paid_preview else None
+        ),
+        paid_provider_clock=lambda: paid_authorization.issued_at,
+    )
+    video_service = VideoGenerationService(
+        committer=video_committer,
+        provider=video_provider,
+    )
+    video_service.start(
+        attempt_id="hard-cut-video-attempt",
+        request=resolved_video,
+    )
+    video_service.submit_once(
+        attempt_id="hard-cut-video-attempt",
+        paid_preview=paid_preview,
+        reservation_id="hard-cut-video-reservation",
+    )
+    video_service.refresh_once(attempt_id="hard-cut-video-attempt")
+    video_service.refresh_once(attempt_id="hard-cut-video-attempt")
+    video_service.refresh_once(attempt_id="hard-cut-video-attempt")
+    video_committer.settle_paid_provider_reservation(
+        attempt_id="hard-cut-video-attempt",
+        actual_cost_microunits=1_000_000,
+    )
+    video_activated = video_service.fetch_and_activate(
+        attempt_id="hard-cut-video-attempt"
+    )
+    final_project = load_production_project(tmp_path / "project.yaml")
+    before_replay = video_provider.call_counts
+    video_replayed = video_service.fetch_and_activate(
+        attempt_id="hard-cut-video-attempt"
+    )
+
+    assert final_project.manifest == video_activated
+    assert video_replayed == video_activated
+    assert video_provider.call_counts == before_replay
+    assert video_provider.call_counts.submit == 1
+    assert video_provider.call_counts.fetch == 1
+    recovered = ProductionStateCommitter(tmp_path).recover()
+    assert recovered.manifest_revision_before == video_activated.manifest_revision
+    assert recovered.manifest_revision_after == video_activated.manifest_revision
+    assert load_production_project(tmp_path / "project.yaml").manifest == video_activated
+    assert video_provider.call_counts == before_replay
+
+    (tmp_path / canonical_image_request_path(request.request_fingerprint)).write_text(
+        "{}\n", encoding="utf-8"
+    )
+    with pytest.raises(AiVideoError, match="P7 image candidate history"):
+        load_production_project(tmp_path / "project.yaml")
 
 
 def test_terminal_frame_replay_rejects_tampered_evidence(tmp_path: Path):

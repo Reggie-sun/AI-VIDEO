@@ -84,22 +84,74 @@ def generated_video_continuity_edge_args(
                 },
             )
         )
+    hard_cut_keyframe_ids: set[str] = set()
+    for keyframe in ordered_assets:
+        if (
+            keyframe.asset_type is not AssetType.IMAGE
+            or keyframe.source_kind is not AssetSourceKind.GENERATED
+        ):
+            continue
+        for input_asset_id in keyframe.input_artifact_ids:
+            terminal = terminal_assets.get(input_asset_id)
+            if terminal is None:
+                continue
+            hard_cut_keyframe_ids.add(keyframe.asset_id)
+            edges.append(
+                (
+                    f"asset:{terminal.asset_id}",
+                    f"asset:{keyframe.asset_id}",
+                    DependencyReason.GENERATION_INPUT,
+                    "image.continuity_terminal",
+                    {
+                        "terminal_asset_id": terminal.asset_id,
+                        "terminal_asset_sha256": terminal.sha256,
+                        "keyframe_asset_id": keyframe.asset_id,
+                        "keyframe_request_fingerprint": keyframe.input_fingerprint,
+                    },
+                )
+            )
+    for keyframe in ordered_assets:
+        if keyframe.asset_id not in hard_cut_keyframe_ids:
+            continue
+        for input_asset_id in keyframe.input_artifact_ids:
+            source = assets_by_id.get(input_asset_id)
+            if source is None or input_asset_id in terminal_assets:
+                continue
+            edges.append(
+                (
+                    f"asset:{source.asset_id}",
+                    f"asset:{keyframe.asset_id}",
+                    DependencyReason.GENERATION_INPUT,
+                    "image.reference_input",
+                    {
+                        "source_asset_id": source.asset_id,
+                        "source_asset_sha256": source.sha256,
+                        "keyframe_asset_id": keyframe.asset_id,
+                        "keyframe_request_fingerprint": keyframe.input_fingerprint,
+                    },
+                )
+            )
     for target in ordered_assets:
         if generated_video_semantic_fingerprint(target) is None:
             continue
         for input_asset_id in target.input_artifact_ids:
-            terminal = terminal_assets.get(input_asset_id)
-            if terminal is None:
+            source_image = assets_by_id.get(input_asset_id)
+            if (
+                source_image is None
+                or source_image.asset_type is not AssetType.IMAGE
+                or source_image.asset_id not in terminal_assets
+                and source_image.asset_id not in hard_cut_keyframe_ids
+            ):
                 continue
             edges.append(
                 (
-                    f"asset:{terminal.asset_id}",
+                    f"asset:{source_image.asset_id}",
                     f"asset:{target.asset_id}",
                     DependencyReason.GENERATION_INPUT,
                     "video.reference_input",
                     {
-                        "source_asset_id": terminal.asset_id,
-                        "source_asset_sha256": terminal.sha256,
+                        "source_asset_id": source_image.asset_id,
+                        "source_asset_sha256": source_image.sha256,
                         "target_asset_id": target.asset_id,
                         "target_generation_fingerprint": target.input_fingerprint,
                     },
