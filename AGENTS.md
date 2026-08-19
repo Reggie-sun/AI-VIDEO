@@ -40,13 +40,72 @@ Agent 必须维护当前产品承诺：
 - 过程更新要简短、具体，并且基于真实仓库证据。
 - 如果执行 review，先给出问题和风险，再给摘要。
 
-## Optional Creative Skill Routing
+## Creative Skill Routing
 
-- 当任务涉及 shot language、motion design、camera movement、pacing、transition、sound design、beat sync、image-motion inspiration 或 visual QA 时，Agent SHOULD 主动使用 `video-shotcraft`。
-- `video-shotcraft` 仅作为 optional creative shot-design skill。
-- 其 Remotion implementation、timeline 或 renderer 仅作为创意与实现参考；Agent MUST 将选定方案翻译为 AI-VIDEO composition directives。
-- MUST NOT 让它拥有或绕过 `ProductionProject`、Asset Registry、Production Manifest、Dependency Graph、`ResolvedTimeline`、HyperFrames renderer 或 QA / Repair lifecycle。
-- 对纯 runtime、state、schema、provider、dependency 或 recovery 任务，MUST NOT 仅因项目涉及视频而触发该 Skill。
+AI-VIDEO remains the sole owner of production truth. External Skills provide advisory knowledge only unless an explicitly approved project contract says otherwise. A Skill recommendation MUST be translated into AI-VIDEO domain contracts before execution and MUST NOT directly mutate or own canonical production state.
+
+Use the minimum matching Skill set. Installation, description matching, or the general fact that this repository produces video MUST NOT by itself trigger a Skill. Pure production-state, asset, schema, dependency, timeline, render, activation, recovery, or Provider-lifecycle work stays with AI-VIDEO code and accepted contracts.
+
+### `hell-grind-aigc-skill`
+
+Agent SHOULD proactively use `hell-grind-aigc-skill` for:
+
+- semantic Shot design and image/video prompt structure;
+- open state, close state, and cross-Shot continuity;
+- identity, state, spatial, axis, action, light, environment, and audio continuity;
+- generation-failure diagnosis, iteration strategy, and candidate reasoning.
+
+Prefer this Skill when the central question is “what must remain or change between Shots?” or “why did this generated Shot fail?”. AI-VIDEO Character, Scene, Shot, asset, and production records remain source of truth. MUST NOT initialize, create, or maintain a parallel Hell-Grind project schema, asset registry, generation ledger, review state, or delivery truth.
+
+### `higgsfield`
+
+Agent SHOULD proactively use `higgsfield` for:
+
+- provider/model-specific prompt adaptation;
+- Seedance, Hailuo, Kling, Veo, and other supported-model generation guidance;
+- T2V, I2V, reference, continuation, extension, and related mode guidance;
+- provider-specific camera/prompt vocabulary, troubleshooting, and iteration advice.
+
+Use this Skill only after AI-VIDEO semantic Shot and continuity intent is established. Model or mode recommendations are advisory and MUST NOT select or switch the active Provider, read credentials, submit generation, or bypass AI-VIDEO Provider Router, Paid Provider Gate, budget, cloud-egress, provenance, durable submit/poll/fetch, candidate activation, or recovery lifecycle. Higgsfield CLI, MCP, platform accounts, workspaces, memory, ledger, and project workflows are not AI-VIDEO production owners.
+
+### `video-shotcraft`
+
+Agent SHOULD proactively use `video-shotcraft` for:
+
+- motion design, image motion, and motion graphics;
+- shot language, pacing, and transitions;
+- camera-movement, SFX, beat-sync, and visual-QA ideas.
+
+Treat its Remotion implementations, recipes, timeline, and renderer as creative or implementation reference only. Translate selected guidance into AI-VIDEO composition directives. MUST NOT create a second canonical timeline or renderer, replace `ResolvedTimeline` or HyperFrames, or bypass AI-VIDEO QA / Repair lifecycle.
+
+### Routing Precedence
+
+- Semantic continuity or Shot-state problem -> `hell-grind-aigc-skill`.
+- Specific generative-model or Provider-prompting problem -> `higgsfield`.
+- Deterministic motion-design, graphics, or pacing problem -> `video-shotcraft`.
+- Production state, assets, dependency, timeline, render, Provider execution, activation, or recovery problem -> AI-VIDEO code and contracts; external Skills are not owners.
+
+When more than one Skill applies, invoke them in dependency order. A later Skill MAY adapt an earlier advisory result for its own lane but MUST NOT redefine the upstream semantic contract or downstream production truth.
+
+For generated-video continuity:
+
+```text
+AI-VIDEO Shot intent
+  -> hell-grind-aigc-skill: establish semantic continuity
+  -> higgsfield: adapt the approved contract to Provider prompt/mode guidance
+  -> AI-VIDEO: create the Provider Request and own provenance, lifecycle, activation, and recovery
+```
+
+For deterministic image motion or motion graphics:
+
+```text
+AI-VIDEO Shot intent
+  -> hell-grind-aigc-skill when semantic character/spatial state needs clarification
+  -> video-shotcraft: propose push-in, parallax, easing, pacing, transition, SFX, or beat treatment
+  -> AI-VIDEO CompositionSpec -> ResolvedTimeline -> HyperFrames
+```
+
+MUST NOT invert these flows by allowing `higgsfield` or `video-shotcraft` to invent canonical Character/Scene/Shot facts, continuity, Provider choice, timeline, state, or delivery decisions.
 
 ## Read Order
 
