@@ -322,6 +322,7 @@ categories:
       - src/ai_video/production/minimax_h3.py
       - src/ai_video/production/minimax_hailuo.py
       - src/ai_video/production/seedance.py
+      - src/ai_video/production/seedance_asset.py
       - src/ai_video/production/seedance_capabilities.py
       - src/ai_video/production/seedance_profile.py
       - src/ai_video/production/paid_provider.py

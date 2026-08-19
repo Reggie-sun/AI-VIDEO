@@ -1,6 +1,6 @@
 # AI-VIDEO P8 Seedance Cloud Provider Specification
 
-Status: Dated compatibility matrix frozen and offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic reached provider `succeeded` and fetched an MP4 on 2026-08-19; the tracked audio-opt-out payload correction remains offline-verified and has not been re-submitted live. Default verification remains fake-only/no-network. This document does not authorize another paid/live call, push or release.
+Status: Dated compatibility matrix frozen and offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic reached provider `succeeded` and fetched an MP4 on 2026-08-19; the tracked audio-opt-out payload correction remains offline-verified and has not been re-submitted live. On 2026-08-20 the accepted adapter gained a sealed, human-observed Ark Console materialization receipt and exact local-asset resolver; no new Asset API or video submit was made. Default verification remains fake-only/no-network. This document does not authorize another paid/live call, push or release.
 
 ## 1. Goal
 
@@ -19,6 +19,9 @@ Primary sources:
 - [Get video generation task](https://www.volcengine.com/docs/82379/1521309?lang=zh)：同一 task 查询、状态和短期下载 URL。
 - [Model pricing](https://www.volcengine.com/docs/82379/1544106?lang=zh)：当前按量刊例价、活动折扣和 token 估算公式。
 - [Model retirement notice](https://www.volcengine.com/docs/82379/1350667?lang=zh)：EOM/EOS 与迁移目标。
+- [Trusted asset library](https://www.volcengine.com/docs/82379/2315856?lang=zh)：真人授权、Ark Console materialization、`Asset ID`与`asset://<asset_id>`使用规则。
+- [Advanced creation entitlement](https://www.volcengine.com/docs/82379/2377608?lang=zh)：基础权益的Console/API边界与Assets API订阅条件。
+- [CreateAsset](https://www.volcengine.com/docs/82379/2318271?lang=zh)：Assets API的独立provider operation；本slice不猜测或调用该operation。
 
 官方 API Explorer 是 Create API 的交互入口，但动态页面不作为独立 alias source。只有 Model List 中的 exact Model ID，或账户中显式绑定到这些 Model ID 的 exact Endpoint ID，能进入 allowlist。
 
@@ -133,6 +136,8 @@ Create API only accepts `resolution` and `ratio`; it has no output `width`/`heig
 
 V1 adapter must accept already materialized, measured, sealed local inputs only. Public remote input URLs, inline Base64, `asset://` IDs and draft task IDs are distinct egress/provenance surfaces and cannot be enabled implicitly.
 
+The production import surface is `SeedanceAssetMaterializationReceipt` plus `SeedanceAssetReferenceResolver`. It accepts only an Ark Console observation of an `Active` `asset-...` identity, binds it to the exact local asset ID/SHA-256/MIME/size, requires a human observer and exact confirmation-evidence SHA-256, and rejects ambiguous or mismatched mappings before permit consumption and before network. A local Registry ID can never be interpolated into `asset://`. This is a truthful import path for an already materialized Ark asset, not an uploader and not proof that a specific Alice asset currently exists.
+
 ## 6. API, Status and Price Semantics
 
 ### 6.1 Endpoints and Authentication
@@ -175,6 +180,7 @@ Prices are evidence, not constants suitable for silent billing decisions. `Seeda
 ## 7. Safety and Lifecycle Contracts
 
 - resolve/capability/preview are pure and zero-network.
+- Ark asset import/resolve is local and zero-network; Ark Console enrollment remains an external human action. Basic rights do not imply Assets API automation, and this slice adds no AK/SK credential or guessed upload endpoint.
 - Remote input upload/egress, account lookup and pricing refresh are separate explicit operations; none occurs during request construction.
 - The committer issues the exact one-use Paid Provider permit only after durable intent. `submit()` validates and consumes it immediately adjacent to the single POST.
 - POST is never automatically retried. Transport ambiguity becomes `outcome_unknown`, is durably persisted, and waits for explicit reconciliation.

@@ -168,3 +168,11 @@ The live sequence progressed from credential failure to account-route failure, t
 - changes no provider-neutral contract、schema、CLI、writer、resolver、renderer or fallback behavior.
 
 The regression test was observed RED against the original payload and GREEN after the minimal adapter change. Focused Seedance/Paid Provider/recovery verification is `108 passed`.
+
+## Task 9: Trusted Ark Asset Identity Import
+
+**Status:** implementation and focused offline verification complete on 2026-08-20; no remote Asset API or video submit was executed.
+
+The missing production owner for already-materialized Ark identities is now `src/ai_video/production/seedance_asset.py`. `SeedanceAssetMaterializationReceipt` seals a human-observed Ark Console `Active` asset, its confirmation-evidence SHA-256, materialization scope and rights note against one exact local asset ID/SHA-256/MIME/size. `SeedanceAssetReferenceResolver` rejects missing, ambiguous, tampered or mismatched receipts and emits only a real `asset://asset-...` URI. `SeedanceVideoProvider` additionally rejects a local Registry ID masquerading as an Ark URI before permit consumption/network.
+
+This task does not automate Ark Console enrollment, add Assets API/AK/SK support, change Manifest/CLI/layout, or claim that the Alice keyframe already has a provider asset. The representative Seedance lane remains zero-submit until the human-controlled Ark materialization and exact receipt evidence exist.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib
 import importlib.util
 import json
 from contextlib import contextmanager
@@ -8,6 +9,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
@@ -51,6 +53,40 @@ HASH_C = "c" * 64
 HASH_D = "d" * 64
 FIXED_NOW = datetime(2026, 8, 19, 1, 0, tzinfo=UTC)
 PROMPT = "A restrained cinematic orbit around the subject."
+
+
+def _provider_asset_reference(binding) -> str:
+    return f"asset://asset-{binding.asset_sha256[:24]}"
+
+
+def _sealed_asset_resolver(*bindings):
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    receipts = []
+    evidence = {}
+    for index, binding in enumerate(bindings):
+        confirmation = f"ark-console-confirmation-{index}".encode()
+        provider_asset_id = f"asset-test-{index}-{binding.asset_sha256[:16]}"
+        receipts.append(
+            asset_module.SeedanceAssetMaterializationReceipt.create(
+                source_asset_id=binding.asset_id,
+                source_asset_sha256=binding.asset_sha256,
+                source_mime_type=binding.mime_type,
+                source_size_bytes=binding.size_bytes,
+                provider_asset_id=provider_asset_id,
+                provider_asset_group_id=f"group-test-{index}",
+                materialization_scope="aigc",
+                observed_status="Active",
+                observed_at=FIXED_NOW,
+                observed_by=ActorIdentity(actor_id="operator", actor_kind="human"),
+                provider_confirmation_sha256=hashlib.sha256(confirmation).hexdigest(),
+                rights_source_note="Synthetic test fixture.",
+            )
+        )
+        evidence[provider_asset_id] = confirmation
+    return asset_module.SeedanceAssetReferenceResolver(
+        tuple(receipts), provider_confirmation_evidence=evidence
+    )
+
 
 ARK_API_KEY_REFERENCE = getattr(seedance_adapter, "ARK_API_KEY_REFERENCE", None)
 SEEDANCE_MODEL_IDS = getattr(seedance_adapter, "SEEDANCE_MODEL_IDS", ())
@@ -333,7 +369,7 @@ def test_model_specific_frames_and_audio_only_constraints_fail_closed():
         profile=profile,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     frame_output = VideoFlexibleOutputRequirement(
@@ -410,7 +446,7 @@ def test_profile_pins_endpoint_to_known_model_and_submit_uses_exact_endpoint():
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -546,7 +582,7 @@ def test_poll_rejects_a_different_allowlisted_model_for_the_same_task():
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -579,7 +615,7 @@ def test_terminal_provider_statuses_normalize_to_failed(provider_status: str):
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -600,7 +636,7 @@ def test_default_profile_covers_exact_current_model_ids_and_modes_without_aliase
         profile=_profile(),
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     variants = provider.capabilities().variants
@@ -779,7 +815,7 @@ def test_exact_output_requires_official_model_specific_pixel_mapping():
         profile=profile,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
 
@@ -822,7 +858,7 @@ def test_seedance_legacy_seed_range_accepts_random_sentinel_and_rejects_overflow
         profile=profile,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     legacy_output = VideoFlexibleOutputRequirement(
@@ -866,7 +902,7 @@ def test_seedance_2_5_edit_requires_at_least_four_second_video_input():
         profile=profile,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     short_video = VideoMediaReferenceBinding(
@@ -909,7 +945,7 @@ def test_seedance_2_5_edit_requires_provider_selected_duration():
         profile=profile,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     video = VideoMediaReferenceBinding(
@@ -962,7 +998,7 @@ def test_reference_media_total_duration_fails_closed():
         profile=profile,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
 
@@ -998,7 +1034,7 @@ def test_reference_video_geometry_fails_closed():
         profile=profile,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     video = VideoMediaReferenceBinding(
@@ -1032,7 +1068,7 @@ def test_seedance_image_geometry_rejects_oversized_or_out_of_ratio_inputs():
         profile=profile,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     for width, height in ((6001, 1000), (300, 1000)):
@@ -1076,7 +1112,7 @@ def test_resolve_fails_closed_for_marketing_alias_and_expired_pricing():
         profile=profile,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     with pytest.raises(AiVideoError) as exc_info:
@@ -1098,7 +1134,7 @@ def test_resolve_fails_closed_for_marketing_alias_and_expired_pricing():
         profile=expired,
         transport=_FakeTransport(),
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     ).resolve(_request(expired))
     with pytest.raises(AiVideoError) as exc_info:
@@ -1106,7 +1142,7 @@ def test_resolve_fails_closed_for_marketing_alias_and_expired_pricing():
             profile=expired,
             transport=_FakeTransport(),
             credential=lambda: "rotated-test-secret",
-            input_reference=lambda binding: f"asset://{binding.asset_id}",
+            input_reference=_provider_asset_reference,
             now=lambda: FIXED_NOW,
         ).preview(resolved)
     assert exc_info.value.code is ErrorCode.PAID_PROVIDER_BUDGET_REJECTED
@@ -1120,7 +1156,7 @@ def test_submit_consumes_one_permit_and_never_retries_unknown_post():
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -1145,7 +1181,7 @@ def test_missing_injected_ark_credential_fails_before_permit_consumption_or_netw
         profile=profile,
         transport=transport,
         credential=lambda: "",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -1176,7 +1212,7 @@ def test_credential_supplier_failure_is_sanitized_before_network():
         profile=profile,
         transport=transport,
         credential=failing_credential,
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -1255,6 +1291,244 @@ def test_input_reference_supplier_failure_is_sanitized_before_network():
     assert transport.requests == []
 
 
+def test_local_registry_asset_id_cannot_masquerade_as_ark_asset_uri():
+    profile = _profile()
+    transport = _FakeTransport()
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=lambda _binding: "asset://asset-local-registry-1",
+        now=lambda: FIXED_NOW,
+    )
+    first_frame = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-local-keyframe-1",
+        asset_sha256=HASH_B,
+        mime_type="image/png",
+        width=864,
+        height=496,
+        size_bytes=1_000_000,
+    )
+    request = _request(
+        profile,
+        model_id="doubao-seedance-2-0-mini-260615",
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        image_bindings=(first_frame,),
+        output=VideoFlexibleOutputRequirement(
+            timing_mode="exact_seconds",
+            duration_seconds=5,
+            dimension_mode="exact",
+            width=864,
+            height=496,
+            resolution_label="480p",
+            ratio="16:9",
+            fps=24,
+            container="mp4",
+            mime_type="video/mp4",
+            native_audio=False,
+        ),
+    )
+    resolved = provider.resolve(request)
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview)
+    authorization = _authorization(paid_preview)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            _permit(resolved, video_preview, paid_preview, authorization),
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.requests == []
+
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+
+    class ForgedResolver(asset_module.SeedanceAssetReferenceResolver):
+        def __init__(self):
+            pass
+
+        def __call__(self, _binding):
+            return "asset://asset-local-registry-1"
+
+    forged_transport = _FakeTransport()
+    forged_transport.responses.append(_json_response({"id": "task-subclass-bypass"}))
+    forged_provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=forged_transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=ForgedResolver(),
+        now=lambda: FIXED_NOW,
+    )
+    forged_permit = _permit(resolved, video_preview, paid_preview, authorization)
+
+    with pytest.raises(AiVideoError) as subclass_exc:
+        forged_provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            forged_permit,
+        )
+
+    permit_binding = build_video_paid_permit_binding(
+        resolved, video_preview, paid_preview, authorization
+    )
+    assert subclass_exc.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert forged_transport.requests == []
+    assert forged_permit._validate_paid_provider_operation_permit(**permit_binding)
+
+
+def test_active_ark_asset_receipt_resolves_exact_local_first_frame_identity():
+    assert importlib.util.find_spec("ai_video.production.seedance_asset") is not None
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    confirmation = b"ark-console-active-asset-confirmation"
+    receipt = asset_module.SeedanceAssetMaterializationReceipt.create(
+        source_asset_id="image-local-keyframe-1",
+        source_asset_sha256=HASH_B,
+        source_mime_type="image/png",
+        source_size_bytes=1_000_000,
+        provider_asset_id="asset-20260820153000-alice1",
+        provider_asset_group_id="group-20260820150000-alice1",
+        materialization_scope="aigc",
+        observed_status="Active",
+        observed_at=FIXED_NOW,
+        observed_by=ActorIdentity(actor_id="operator", actor_kind="human"),
+        provider_confirmation_sha256=hashlib.sha256(confirmation).hexdigest(),
+        rights_source_note="Project-owned fictional character keyframe.",
+    )
+    resolver = asset_module.SeedanceAssetReferenceResolver(
+        (receipt,),
+        provider_confirmation_evidence={receipt.provider_asset_id: confirmation},
+    )
+    first_frame = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-local-keyframe-1",
+        asset_sha256=HASH_B,
+        mime_type="image/png",
+        width=864,
+        height=496,
+        size_bytes=1_000_000,
+    )
+
+    assert resolver(first_frame) == "asset://asset-20260820153000-alice1"
+    assert receipt.content_hash != HASH_A
+
+
+def test_ark_asset_materialization_owner_is_public_production_api():
+    production = importlib.import_module("ai_video.production")
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+
+    assert (
+        production.SeedanceAssetMaterializationReceipt
+        is asset_module.SeedanceAssetMaterializationReceipt
+    )
+    assert (
+        production.SeedanceAssetReferenceResolver
+        is asset_module.SeedanceAssetReferenceResolver
+    )
+
+
+def test_ark_asset_resolver_rejects_tampered_confirmation_evidence():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    confirmation = b"ark-console-active-asset-confirmation"
+    receipt = asset_module.SeedanceAssetMaterializationReceipt.create(
+        source_asset_id="image-local-keyframe-1",
+        source_asset_sha256=HASH_B,
+        source_mime_type="image/png",
+        source_size_bytes=1_000_000,
+        provider_asset_id="asset-20260820153000-alice1",
+        provider_asset_group_id="group-20260820150000-alice1",
+        materialization_scope="aigc",
+        observed_status="Active",
+        observed_at=FIXED_NOW,
+        observed_by=ActorIdentity(actor_id="operator", actor_kind="human"),
+        provider_confirmation_sha256=hashlib.sha256(confirmation).hexdigest(),
+        rights_source_note="Project-owned fictional character keyframe.",
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        asset_module.SeedanceAssetReferenceResolver(
+            (receipt,),
+            provider_confirmation_evidence={
+                receipt.provider_asset_id: b"tampered-confirmation"
+            },
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+
+
+def test_ark_asset_resolver_rejects_local_input_hash_mismatch():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    confirmation = b"ark-console-active-asset-confirmation"
+    receipt = asset_module.SeedanceAssetMaterializationReceipt.create(
+        source_asset_id="image-local-keyframe-1",
+        source_asset_sha256=HASH_B,
+        source_mime_type="image/png",
+        source_size_bytes=1_000_000,
+        provider_asset_id="asset-20260820153000-alice1",
+        provider_asset_group_id="group-20260820150000-alice1",
+        materialization_scope="aigc",
+        observed_status="Active",
+        observed_at=FIXED_NOW,
+        observed_by=ActorIdentity(actor_id="operator", actor_kind="human"),
+        provider_confirmation_sha256=hashlib.sha256(confirmation).hexdigest(),
+        rights_source_note="Project-owned fictional character keyframe.",
+    )
+    resolver = asset_module.SeedanceAssetReferenceResolver(
+        (receipt,),
+        provider_confirmation_evidence={receipt.provider_asset_id: confirmation},
+    )
+    changed_first_frame = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id=receipt.source_asset_id,
+        asset_sha256=HASH_D,
+        mime_type="image/png",
+        width=864,
+        height=496,
+        size_bytes=1_000_000,
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        resolver(changed_first_frame)
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("observed_status", "Processing"),
+        ("observed_by", ActorIdentity(actor_id="bot", actor_kind="automation")),
+    ],
+)
+def test_ark_asset_receipt_requires_human_observed_active_state(field, value):
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    confirmation = b"ark-console-active-asset-confirmation"
+    values = {
+        "source_asset_id": "image-local-keyframe-1",
+        "source_asset_sha256": HASH_B,
+        "source_mime_type": "image/png",
+        "source_size_bytes": 1_000_000,
+        "provider_asset_id": "asset-20260820153000-alice1",
+        "provider_asset_group_id": "group-20260820150000-alice1",
+        "materialization_scope": "aigc",
+        "observed_status": "Active",
+        "observed_at": FIXED_NOW,
+        "observed_by": ActorIdentity(actor_id="operator", actor_kind="human"),
+        "provider_confirmation_sha256": hashlib.sha256(confirmation).hexdigest(),
+        "rights_source_note": "Project-owned fictional character keyframe.",
+    }
+    values[field] = value
+
+    with pytest.raises(ValidationError):
+        asset_module.SeedanceAssetMaterializationReceipt.create(**values)
+
+
 def test_mini_default_payload_omits_optional_defaults_but_preserves_audio_opt_out():
     profile = _profile()
     transport = _FakeTransport()
@@ -1263,7 +1537,7 @@ def test_mini_default_payload_omits_optional_defaults_but_preserves_audio_opt_ou
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     request = _request(
@@ -1310,13 +1584,6 @@ def test_seedance_2_0_mini_continuity_binds_exact_terminal_frame_payload():
     profile = _profile()
     transport = _FakeTransport()
     transport.responses.append(_json_response({"id": "task-seedance-mini-continuity-1"}))
-    provider = SeedanceVideoProvider(
-        profile=profile,
-        transport=transport,
-        credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
-        now=lambda: FIXED_NOW,
-    )
     terminal = TerminalFrameEvidence.create(
         source_shot_id="shot-0",
         source_shot_revision=1,
@@ -1389,6 +1656,13 @@ def test_seedance_2_0_mini_continuity_binds_exact_terminal_frame_payload():
         height=terminal.extracted_height,
         size_bytes=terminal.extracted_size_bytes,
     )
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=_sealed_asset_resolver(first_frame),
+        now=lambda: FIXED_NOW,
+    )
     request = _request(
         profile,
         model_id="doubao-seedance-2-0-mini-260615",
@@ -1435,7 +1709,7 @@ def test_seedance_2_0_mini_continuity_binds_exact_terminal_frame_payload():
     assert payload["generate_audio"] is False
     assert payload["content"][1] == {
         "type": "image_url",
-        "image_url": {"url": "asset://terminal-frame-shot-0"},
+        "image_url": {"url": "asset://asset-test-0-bbbbbbbbbbbbbbbb"},
         "role": "first_frame",
     }
 
@@ -1479,7 +1753,7 @@ def test_non_default_provider_fields_remain_explicit(
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(
@@ -1520,13 +1794,6 @@ def test_seedance_2_5_edit_payload_maps_explicit_reference_and_provider_fields()
     profile = _profile()
     transport = _FakeTransport()
     transport.responses.append(_json_response({"id": "task-seedance-edit-1"}))
-    provider = SeedanceVideoProvider(
-        profile=profile,
-        transport=transport,
-        credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
-        now=lambda: FIXED_NOW,
-    )
     video_binding = VideoMediaReferenceBinding(
         kind="video",
         role="reference_video",
@@ -1538,6 +1805,13 @@ def test_seedance_2_5_edit_payload_maps_explicit_reference_and_provider_fields()
         width=1920,
         height=1080,
         fps=30,
+    )
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=_sealed_asset_resolver(video_binding),
+        now=lambda: FIXED_NOW,
     )
     request = _request(
         profile,
@@ -1576,7 +1850,7 @@ def test_seedance_2_5_edit_payload_maps_explicit_reference_and_provider_fields()
     assert payload["generate_audio"] is True
     assert payload["content"][1] == {
         "type": "video_url",
-        "video_url": {"url": "asset://video-source"},
+        "video_url": {"url": "asset://asset-test-0-bbbbbbbbbbbbbbbb"},
         "role": "reference_video",
     }
 
@@ -1608,7 +1882,7 @@ def test_poll_and_fetch_bind_same_task_and_accept_only_allowed_origin_mp4():
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -1648,7 +1922,7 @@ def test_poll_rejects_provider_response_for_a_different_task_id():
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -1694,7 +1968,7 @@ def test_fetch_accepts_only_measured_supported_video_containers(
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     output = VideoFlexibleOutputRequirement(
@@ -1753,7 +2027,7 @@ def test_fetch_rejects_malformed_or_wrong_brand_container(
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     output = VideoFlexibleOutputRequirement(
@@ -1802,7 +2076,7 @@ def test_fetch_rejects_container_that_differs_from_durable_submit_intent():
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -1844,7 +2118,7 @@ def test_fetch_rejects_download_over_profile_byte_ceiling():
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))
@@ -1893,7 +2167,7 @@ def test_fetch_fails_closed_for_origin_redirect_and_non_video(
         profile=profile,
         transport=transport,
         credential=lambda: "rotated-test-secret",
-        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        input_reference=_provider_asset_reference,
         now=lambda: FIXED_NOW,
     )
     resolved = provider.resolve(_request(profile))

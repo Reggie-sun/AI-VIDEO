@@ -115,6 +115,10 @@ from ai_video.production.image_import import (
     prepare_human_image_import_commit,
     validate_human_image_import,
 )
+from ai_video.production.seedance_asset import (
+    SeedanceAssetMaterializationReceipt,
+    SeedanceAssetReferenceResolver,
+)
 from ai_video.production.video import (
     ContinuityArtifactIdentity,
     ContinuityConstraintSet,
@@ -225,6 +229,8 @@ __all__ = [
     "RenderStateSnapshotPointer",
     "ResolvedTimeline",
     "Scene",
+    "SeedanceAssetMaterializationReceipt",
+    "SeedanceAssetReferenceResolver",
     "Shot",
     "StateCommitAttempt",
     "StateCommitRequest",

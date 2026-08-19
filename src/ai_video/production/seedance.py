@@ -2,8 +2,9 @@
 
 The adapter owns Ark payload/status/download mapping only. It consumes the
 shared Paid Provider permit immediately before its single submit POST and
-keeps credentials, provider asset references, result URLs, and raw responses
-out of durable production contracts.
+keeps credentials, result URLs, and raw responses out of durable production
+contracts. Provider asset references enter only through the separately sealed
+materialization receipt contract.
 """
 
 from __future__ import annotations
@@ -39,6 +40,7 @@ from ai_video.production.seedance_profile import (
     SeedancePricingSnapshot,
     SeedanceProviderProfile,
 )
+from ai_video.production.seedance_asset import SeedanceAssetReferenceResolver
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
@@ -66,7 +68,7 @@ _PROVIDER_NAME = "seedance"
 _PROVIDER_KIND = "volcengine_ark_seedance"
 _MAX_JSON_BYTES = 1_000_000
 _SAFE_TASK_ID = re.compile(r"^[A-Za-z0-9._:-]{1,256}$")
-_SAFE_ASSET_REFERENCE = re.compile(r"^asset://[A-Za-z0-9._:/-]{1,256}$")
+_SAFE_ASSET_REFERENCE = re.compile(r"^asset://asset-[A-Za-z0-9._:-]{1,250}$")
 _FILE_ID_PREFIX = "seedance-content-"
 _MP4_MAJOR_BRANDS = {
     b"M4V ",
@@ -177,9 +179,6 @@ class HttpxSeedanceTransport:
             self._client.close()
 
 
-InputReferenceResolver = Callable[
-    [VideoImageReferenceBinding | VideoMediaReferenceBinding], str
-]
 CredentialResolver = Callable[[], str]
 
 
@@ -246,7 +245,7 @@ class SeedanceVideoProvider:
         profile: SeedanceProviderProfile,
         transport: SeedanceTransport,
         credential: CredentialResolver,
-        input_reference: InputReferenceResolver,
+        input_reference: SeedanceAssetReferenceResolver,
         now: Callable[[], datetime] | None = None,
     ) -> None:
         self._profile = profile
@@ -465,6 +464,11 @@ class SeedanceVideoProvider:
     def _asset_reference(
         self, binding: VideoImageReferenceBinding | VideoMediaReferenceBinding
     ) -> str:
+        if type(self._input_reference) is not SeedanceAssetReferenceResolver:
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "Seedance input reference requires a sealed Ark asset resolver.",
+            )
         try:
             value = self._input_reference(binding)
         except Exception:

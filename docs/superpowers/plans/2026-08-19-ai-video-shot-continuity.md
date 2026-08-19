@@ -270,7 +270,7 @@ Offline verification：
 pytest -q tests/test_production_seedance.py tests/test_production_video.py
 ```
 
-2026-08-20 live preflight result：exact model/capability与`generate_audio=false`保持sealed；按官方`23 CNY / million tokens`与仓库token公式计算2.484 CNY，并seal保守`3 CNY` preview upper bound。Shared keyframe仍没有受信任的Ark `asset://` identity，现有adapter也没有可验证的materialization owner，因此authorization/permit未签发且POST为零。该blocker不能由Hailuo success、临时第三方URL或猜测upload API替代。
+2026-08-20 live preflight result：exact model/capability与`generate_audio=false`保持sealed；按官方`23 CNY / million tokens`与仓库token公式计算2.484 CNY，并seal保守`3 CNY` preview upper bound。后续bugfix已实现sealed Ark Console `Active` materialization receipt与exact local-asset resolver，补齐可验证的identity import owner；但Shared keyframe仍没有真实Ark `asset-...`和confirmation evidence，因此authorization/permit未签发且POST为零。该external materialization gate不能由Hailuo success、临时第三方URL或猜测upload API替代。
 
 ### Execution Order for Cost Control
 

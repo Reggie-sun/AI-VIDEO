@@ -182,7 +182,7 @@ P8提供provider-neutral request/capability、Paid Provider Gate、state-backed 
 
 MiniMax H3/Hailuo均已通过offline adapter acceptance。已有三次经授权的Hailuo任务到达provider succeeded并取得本地MP4；H3经授权的live尝试到达真实API，但返回余额不足`HTTP 402 / code 1008`，因此没有H3 live-success artifact，也不会自动重试或把余额失败当作P8 offline blocker。
 
-`SeedanceVideoProvider`按2026-08-19 official snapshot完整覆盖七个current/legacy-callable Model IDs，并拒绝retired/marketing aliases和可扩张profile。它只接受injected `ARK_API_KEY` reference；one-use permit紧邻唯一POST消费，不自动重试POST；poll/fetch绑定exact task/model/endpoint intent，redirect、cross-origin、oversize、MIME/container/brand mismatch均fail closed。默认payload始终显式发送`generate_audio`，但省略false/default/MP4/zero-valued optional defaults；非默认值继续显式发送。原offline focused/recovery evidence为`517 passed`，本次payload regression与相关safety/recovery组合为`108 passed`。
+`SeedanceVideoProvider`按2026-08-19 official snapshot完整覆盖七个current/legacy-callable Model IDs，并拒绝retired/marketing aliases和可扩张profile。它只接受injected `ARK_API_KEY` reference；one-use permit紧邻唯一POST消费，不自动重试POST；poll/fetch绑定exact task/model/endpoint intent，redirect、cross-origin、oversize、MIME/container/brand mismatch均fail closed。默认payload始终显式发送`generate_audio`，但省略false/default/MP4/zero-valued optional defaults；非默认值继续显式发送。`SeedanceAssetMaterializationReceipt`与`SeedanceAssetReferenceResolver`提供already-materialized Ark Console `Active asset-...`的sealed human import，精确绑定local asset ID/SHA/MIME/size与confirmation evidence；它不上传素材、不调用Assets API，也不允许local Registry ID伪装成Ark URI。原offline focused/recovery evidence为`517 passed`，payload regression与相关safety/recovery组合为`108 passed`；identity import bugfix的Seedance/Paid Provider/recovery聚焦组合为`418 passed`。
 
 ## Shot Continuity (provider-neutral technical core)
 

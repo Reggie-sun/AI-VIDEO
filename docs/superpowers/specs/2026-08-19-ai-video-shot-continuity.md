@@ -216,7 +216,7 @@ References:
 
 ### Seedance 2.0 Mini
 
-当前仓库capability table与adapter已对`doubao-seedance-2-0-mini-260615`的I2V first-frame、optional last-frame、audio opt-out、response/fetch与permit mapping完成offline executable acceptance；这不等于continuity live、billing settlement、activation或quality acceptance。2026-08-20 Alice C2 preflight完成exact model/capability resolution并seal `generate_audio=false`。Fresh pricing以官方无视频输入单价`23 CNY / million tokens`和仓库公式估算2.484 CNY，seal保守`3 CNY` upper bound并成功生成preview；但shared local PNG没有exact Ark-registered `asset://` identity，因此Paid Provider authorization/permit未创建、remote submit为零。任何future submit必须先由受信任的Ark asset materialization owner提供exact identity，不能猜测upload endpoint、使用第三方临时URL或让upstream变化绕过sealed capability identity。
+当前仓库capability table与adapter已对`doubao-seedance-2-0-mini-260615`的I2V first-frame、optional last-frame、audio opt out、response/fetch与permit mapping完成offline executable acceptance；这不等于continuity live、billing settlement、activation或quality acceptance。2026-08-20 Alice C2 preflight完成exact model/capability resolution并seal `generate_audio=false`。Fresh pricing以官方无视频输入单价`23 CNY / million tokens`和仓库公式估算2.484 CNY，seal保守`3 CNY` upper bound并成功生成preview。同日后续bugfix已增加`SeedanceAssetMaterializationReceipt`与`SeedanceAssetReferenceResolver`，补齐already-materialized Ark identity的可信导入owner，并拒绝local Registry ID伪装为`asset://`。shared local PNG仍尚未在Ark Console materialize为真实`asset-...`且没有exact confirmation evidence，因此Paid Provider authorization/permit仍未创建、remote submit为零。不能猜测upload endpoint、使用第三方临时URL或让upstream变化绕过sealed capability identity。
 
 此前 Seedance Mini diagnostic 只证明一次 cloud connectivity 和 fetched MP4；它不证明 tracked continuity payload、billing settlement、activation 或 quality acceptance。
 
