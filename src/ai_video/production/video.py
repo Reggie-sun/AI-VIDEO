@@ -131,6 +131,183 @@ class VideoImageReferenceBinding(_VideoStrictModel):
     size_bytes: int | None = Field(default=None, strict=True, ge=0)
 
 
+class ContinuityArtifactIdentity(_VideoStrictModel):
+    artifact_id: str = Field(pattern=_SAFE_ID.pattern)
+    revision: int = Field(strict=True, ge=1)
+    content_hash: str = Field(pattern=_SHA256)
+
+
+class ContinuityConstraintSet(_VideoStrictModel):
+    scene_identity: ContinuityArtifactIdentity
+    character_identities: tuple[ContinuityArtifactIdentity, ...] = Field(
+        min_length=1
+    )
+    camera_axis: str = Field(min_length=1)
+    framing: str = Field(min_length=1)
+    lighting: str = Field(min_length=1)
+    color: str = Field(min_length=1)
+    motion_direction: str = Field(min_length=1)
+    exit_state: str = Field(min_length=1)
+    entrance_state: str = Field(min_length=1)
+    content_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_seal(self) -> "ContinuityConstraintSet":
+        identities = tuple(
+            (item.artifact_id, item.revision, item.content_hash)
+            for item in self.character_identities
+        )
+        if identities != tuple(sorted(identities)) or len(identities) != len(
+            set(identities)
+        ):
+            raise ValueError("continuity character identities must be unique and ordered")
+        text_values = (
+            self.camera_axis,
+            self.framing,
+            self.lighting,
+            self.color,
+            self.motion_direction,
+            self.exit_state,
+            self.entrance_state,
+        )
+        if any(unicodedata.normalize("NFC", value) != value for value in text_values):
+            raise ValueError("continuity constraint text must use Unicode NFC normalization")
+        expected = canonical_sha256(
+            {
+                "schema": "ai-video-continuity-constraints/1",
+                **self.model_dump(mode="json", exclude={"content_hash"}),
+            }
+        )
+        if self.content_hash != expected:
+            raise ValueError("continuity constraint hash does not match content")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "ContinuityConstraintSet":
+        data = dict(values)
+        candidate = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            {
+                "schema": "ai-video-continuity-constraints/1",
+                **candidate.model_dump(
+                    mode="json", exclude={"content_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
+class TerminalFrameEvidence(_VideoStrictModel):
+    source_shot_id: str = Field(pattern=_SAFE_ID.pattern)
+    source_shot_revision: int = Field(strict=True, ge=1)
+    source_shot_content_hash: str = Field(pattern=_SHA256)
+    source_video_asset_id: str = Field(pattern=_SAFE_ID.pattern)
+    source_video_sha256: str = Field(pattern=_SHA256)
+    source_generation_id: str = Field(pattern=_SAFE_ID.pattern)
+    source_request_input_hash: str = Field(pattern=_SHA256)
+    source_resolved_generation_hash: str = Field(pattern=_SHA256)
+    source_provenance_receipt_id: str = Field(pattern=_SAFE_ID.pattern)
+    extraction_receipt_id: str = Field(pattern=_SHA256)
+    source_registry: RegistrySnapshotPointer
+    source_container_name: Literal["mp4"]
+    source_codec_name: str = Field(min_length=1)
+    source_width: int = Field(strict=True, gt=0)
+    source_height: int = Field(strict=True, gt=0)
+    source_fps_numerator: int = Field(strict=True, gt=0)
+    source_fps_denominator: int = Field(strict=True, gt=0)
+    source_duration_milliseconds: int = Field(strict=True, gt=0)
+    source_frame_count: int = Field(strict=True, gt=0)
+    frame_index: int = Field(strict=True, ge=0)
+    timestamp_numerator: int = Field(strict=True, ge=0)
+    timestamp_denominator: int = Field(strict=True, gt=0)
+    selection_rule: Literal["generated_candidate_terminal", "resolved_trim_out"]
+    extraction_contract_version: str = Field(pattern=_SAFE_ID.pattern)
+    extractor_name: str = Field(pattern=_SAFE_ID.pattern)
+    extractor_version: str = Field(pattern=_SAFE_ID.pattern)
+    extracted_asset_id: str = Field(pattern=_SAFE_ID.pattern)
+    extracted_sha256: str = Field(pattern=_SHA256)
+    extracted_mime_type: Literal["image/png"]
+    extracted_size_bytes: int = Field(strict=True, gt=0)
+    extracted_width: int = Field(strict=True, gt=0)
+    extracted_height: int = Field(strict=True, gt=0)
+    extracted_color_space: str = Field(pattern=_SAFE_ID.pattern)
+    content_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_seal(self) -> "TerminalFrameEvidence":
+        if self.frame_index >= self.source_frame_count:
+            raise ValueError("terminal frame index is outside source video")
+        if (
+            self.selection_rule == "generated_candidate_terminal"
+            and self.frame_index != self.source_frame_count - 1
+        ):
+            raise ValueError("generated candidate terminal frame must be the last frame")
+        if (
+            self.timestamp_numerator * 1000
+            >= self.source_duration_milliseconds * self.timestamp_denominator
+        ):
+            raise ValueError("terminal frame timestamp is outside source duration")
+        expected = canonical_sha256(
+            {
+                "schema": "ai-video-terminal-frame-evidence/1",
+                **self.model_dump(mode="json", exclude={"content_hash"}),
+            }
+        )
+        if self.content_hash != expected:
+            raise ValueError("terminal frame evidence hash does not match content")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "TerminalFrameEvidence":
+        data = dict(values)
+        candidate = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            {
+                "schema": "ai-video-terminal-frame-evidence/1",
+                **candidate.model_dump(
+                    mode="json", exclude={"content_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
+class ContinuityReferenceBinding(_VideoStrictModel):
+    role: Literal["first_frame"]
+    terminal_frame: TerminalFrameEvidence
+    target_shot_id: str = Field(pattern=_SAFE_ID.pattern)
+    target_shot_revision: int = Field(strict=True, ge=1)
+    target_shot_content_hash: str = Field(pattern=_SHA256)
+    constraints: ContinuityConstraintSet
+    binding_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_seal(self) -> "ContinuityReferenceBinding":
+        expected = canonical_sha256(
+            {
+                "schema": "ai-video-continuity-reference-binding/1",
+                **self.model_dump(mode="json", exclude={"binding_hash"}),
+            }
+        )
+        if self.binding_hash != expected:
+            raise ValueError("continuity binding hash does not match content")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "ContinuityReferenceBinding":
+        data = dict(values)
+        candidate = cls.model_construct(**data, binding_hash="0" * 64)
+        data["binding_hash"] = canonical_sha256(
+            {
+                "schema": "ai-video-continuity-reference-binding/1",
+                **candidate.model_dump(
+                    mode="json", exclude={"binding_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
 class ProviderProfilePointer(_VideoStrictModel):
     profile_id: str = Field(pattern=_SAFE_ID.pattern)
     profile_version: str = Field(pattern=_SAFE_ID.pattern)
@@ -164,6 +341,8 @@ class VideoGenerationRequest(_VideoStrictModel):
     prompt_text: str = Field(min_length=1)
     negative_prompt_text: str
     image_bindings: tuple[VideoImageReferenceBinding, ...]
+    continuity_binding: ContinuityReferenceBinding | None = None
+    seal_terminal_frame: bool = Field(default=False, strict=True)
     media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
     output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement
     seed: int | None = Field(default=None, strict=True, ge=-1)
@@ -187,6 +366,8 @@ class VideoGenerationRequest(_VideoStrictModel):
         mode = data.get("mode")
         output = data.get("output_requirement")
         image_bindings = data.get("image_bindings")
+        continuity = data.get("continuity_binding")
+        seal_terminal_frame = data.get("seal_terminal_frame", False)
         advanced = bool(
             media_bindings
             or mode
@@ -207,9 +388,15 @@ class VideoGenerationRequest(_VideoStrictModel):
         }
         if not advanced:
             selected.pop("media_bindings", None)
+        if continuity is None:
+            selected.pop("continuity_binding", None)
+        if not seal_terminal_frame:
+            selected.pop("seal_terminal_frame", None)
         return {
             "schema": (
-                "ai-video-generation-request/2"
+                "ai-video-generation-request/3"
+                if continuity is not None or seal_terminal_frame
+                else "ai-video-generation-request/2"
                 if advanced
                 else "ai-video-generation-request/1"
             ),
@@ -257,6 +444,36 @@ class VideoGenerationRequest(_VideoStrictModel):
             raise ValueError("video media bindings must be unique")
         if len(set(self.input_artifact_ids)) != len(self.input_artifact_ids):
             raise ValueError("video input artifact IDs must be unique")
+        continuity = self.continuity_binding
+        if continuity is not None:
+            terminal = continuity.terminal_frame
+            if self.mode is not VideoGenerationMode.IMAGE_TO_VIDEO:
+                raise ValueError("continuity requests must use image-to-video mode")
+            if (
+                continuity.target_shot_id != self.target_shot_id
+                or continuity.target_shot_revision != self.target_shot_revision
+                or continuity.target_shot_content_hash
+                != self.target_shot_content_hash
+            ):
+                raise ValueError("continuity binding does not match target Shot")
+            expected_frame = VideoImageReferenceBinding(
+                role="first_frame",
+                asset_id=terminal.extracted_asset_id,
+                asset_sha256=terminal.extracted_sha256,
+                mime_type=terminal.extracted_mime_type,
+                width=terminal.extracted_width,
+                height=terminal.extracted_height,
+                size_bytes=terminal.extracted_size_bytes,
+            )
+            if self.image_bindings != (expected_frame,):
+                raise ValueError("continuity request does not bind the exact terminal frame")
+            required_inputs = {
+                terminal.source_shot_id,
+                terminal.source_video_asset_id,
+                terminal.extracted_asset_id,
+            }
+            if not required_inputs.issubset(self.input_artifact_ids):
+                raise ValueError("continuity input artifact identity is incomplete")
         if self.request_input_hash != canonical_sha256(
             self._fingerprint_payload(self.model_dump(mode="json"))
         ):
@@ -371,14 +588,31 @@ class VideoActivationScope(_VideoStrictModel):
     usage_license: str = Field(min_length=1)
     scope_fingerprint: str = Field(pattern=_SHA256)
 
+    @staticmethod
+    def _fingerprint_payload(
+        request: VideoGenerationRequest, usage_license: str
+    ) -> dict[str, object]:
+        request_payload = request.model_dump(mode="json")
+        uses_continuity = (
+            request.continuity_binding is not None or request.seal_terminal_frame
+        )
+        if not uses_continuity:
+            request_payload.pop("continuity_binding", None)
+            request_payload.pop("seal_terminal_frame", None)
+        return {
+            "schema": (
+                "ai-video-activation-scope/2"
+                if uses_continuity
+                else "ai-video-activation-scope/1"
+            ),
+            "request": request_payload,
+            "usage_license": usage_license,
+        }
+
     @model_validator(mode="after")
     def _validate_scope(self) -> "VideoActivationScope":
         if self.scope_fingerprint != canonical_sha256(
-            {
-                "schema": "ai-video-activation-scope/1",
-                "request": self.request.model_dump(mode="json"),
-                "usage_license": self.usage_license,
-            }
+            self._fingerprint_payload(self.request, self.usage_license)
         ):
             raise ValueError("activation scope fingerprint does not match request")
         return self
@@ -396,11 +630,9 @@ class VideoActivationScope(_VideoStrictModel):
             {
                 **data,
                 "scope_fingerprint": canonical_sha256(
-                    {
-                        "schema": "ai-video-activation-scope/1",
-                        "request": candidate.request.model_dump(mode="json"),
-                        "usage_license": candidate.usage_license,
-                    }
+                    cls._fingerprint_payload(
+                        candidate.request, candidate.usage_license
+                    )
                 ),
             }
         )
@@ -419,6 +651,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     mode: VideoGenerationMode
     prompt_text: str = Field(min_length=1)
     image_bindings: tuple[VideoImageReferenceBinding, ...]
+    continuity_binding: ContinuityReferenceBinding | None = None
+    seal_terminal_frame: bool = Field(default=False, strict=True)
     media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
     effective_output: VideoOutputRequirement | VideoFlexibleOutputRequirement
     provider_task_binding: VideoProviderTaskBinding | None = None
@@ -447,12 +681,18 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             },
         )
         schema = (
-            "ai-video-resolved-request/3"
+            "ai-video-resolved-request/4"
+            if self.continuity_binding is not None or self.seal_terminal_frame
+            else "ai-video-resolved-request/3"
             if self._uses_extended_contract()
             else "ai-video-resolved-request/2"
         )
         if schema.endswith("/2"):
             data.pop("media_bindings", None)
+        if self.continuity_binding is None:
+            data.pop("continuity_binding", None)
+        if not self.seal_terminal_frame:
+            data.pop("seal_terminal_frame", None)
         if self.provider_task_binding is None:
             data.pop("provider_task_binding", None)
         expected = canonical_sha256({"schema": schema, **data})
@@ -473,6 +713,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 or request.mode is not self.mode
                 or request.prompt_text != self.prompt_text
                 or request.image_bindings != self.image_bindings
+                or request.continuity_binding != self.continuity_binding
+                or request.seal_terminal_frame != self.seal_terminal_frame
                 or request.media_bindings != self.media_bindings
                 or request.output_requirement != self.effective_output
                 or request.output_asset_id != self.output_asset_id
@@ -597,6 +839,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             "mode": request.mode,
             "prompt_text": request.prompt_text,
             "image_bindings": request.image_bindings,
+            "continuity_binding": request.continuity_binding,
+            "seal_terminal_frame": request.seal_terminal_frame,
             "media_bindings": request.media_bindings,
             "effective_output": effective_output,
             "provider_task_binding": provider_task_binding,
@@ -620,12 +864,18 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             warnings=False,
         )
         schema = (
-            "ai-video-resolved-request/3"
+            "ai-video-resolved-request/4"
+            if candidate.continuity_binding is not None or candidate.seal_terminal_frame
+            else "ai-video-resolved-request/3"
             if candidate._uses_extended_contract()
             else "ai-video-resolved-request/2"
         )
         if schema.endswith("/2"):
             fingerprint_data.pop("media_bindings", None)
+        if candidate.continuity_binding is None:
+            fingerprint_data.pop("continuity_binding", None)
+        if not candidate.seal_terminal_frame:
+            fingerprint_data.pop("seal_terminal_frame", None)
         if provider_task_binding is None:
             fingerprint_data.pop("provider_task_binding", None)
         fingerprint = canonical_sha256({"schema": schema, **fingerprint_data})
@@ -1092,8 +1342,12 @@ class VideoProviderRegistry:
 
 __all__ = [
     "BillingKind",
+    "ContinuityArtifactIdentity",
+    "ContinuityConstraintSet",
+    "ContinuityReferenceBinding",
     "ProviderProfilePointer",
     "ResolvedVideoGenerationRequest",
+    "TerminalFrameEvidence",
     "VideoActivationScope",
     "VideoCapabilityVariant",
     "VideoExecutionKind",

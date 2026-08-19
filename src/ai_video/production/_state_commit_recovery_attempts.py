@@ -137,7 +137,7 @@ class _StateCommitRecoveryAttemptsMixin:
                 if (
                     attempt.base_dependency_graph is None
                     and manifest.schema_version
-                    in {"2.3", "2.4", "2.5", "2.6", "2.7"}
+                    in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8"}
                     and manifest.active_dependency_graph is not None
                     and manifest.active_dependency_graph
                     != attempt.candidate_dependency_graph

@@ -468,7 +468,7 @@ def image_receipt_semantic_sha256(
     return canonical_sha256(payload)
 
 
-def _measure_png(payload: bytes) -> MeasuredPng:
+def measure_png_bytes(payload: bytes) -> MeasuredPng:
     if not payload.startswith(_PNG_SIGNATURE):
         raise _image_bytes_invalid("Image provider output is not a PNG file.")
 
@@ -534,6 +534,10 @@ def _measure_png(payload: bytes) -> MeasuredPng:
     )
 
 
+# Private compatibility alias for existing sealed image readers/importers.
+_measure_png = measure_png_bytes
+
+
 def validate_image_result(
     request: ImageGenerationRequest,
     authorization: ImageGenerationAuthorization,
@@ -549,7 +553,7 @@ def validate_image_result(
     ):
         raise _image_scope_invalid("Image provider result does not match its request authorization.")
 
-    measured = _measure_png(result.image_bytes)
+    measured = measure_png_bytes(result.image_bytes)
     if (
         measured.width != request.parameters.width
         or measured.height != request.parameters.height

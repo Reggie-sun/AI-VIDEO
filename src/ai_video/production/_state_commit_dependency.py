@@ -298,7 +298,7 @@ class _StateCommitDependencyMixin:
                     "schema_version": (
                         manifest.schema_version
                         if manifest.schema_version
-                        in {"2.4", "2.5", "2.6", "2.7"}
+                        in {"2.4", "2.5", "2.6", "2.7", "2.8"}
                         else "2.3"
                     ),
                     "active_project": project_pointer,
@@ -359,6 +359,7 @@ class _StateCommitDependencyMixin:
             "2.5",
             "2.6",
             "2.7",
+            "2.8",
         }:
             if transition is not None:
                 raise _state_invalid(
@@ -585,6 +586,7 @@ class _StateCommitDependencyMixin:
             "2.5",
             "2.6",
             "2.7",
+            "2.8",
         }:
             raise _state_invalid("Dependency results require Manifest 2.3.")
         if manifest.manifest_revision != expected_manifest_revision:

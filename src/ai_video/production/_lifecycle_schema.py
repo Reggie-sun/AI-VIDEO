@@ -5,7 +5,14 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 
 class ImageRequestReceipt(BaseModel):
@@ -184,6 +191,46 @@ class VideoFetchReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class TerminalFrameEvidencePointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    extracted_asset_id: str = Field(min_length=1)
+    extracted_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "TerminalFrameEvidencePointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/terminal-evidence/"
+                f"{self.content_hash}.json"
+            ),
+            "terminal frame evidence",
+        )
+        return self
+
+
+class TerminalFrameExtractionReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    extracted_asset_id: str = Field(min_length=1)
+    extracted_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "TerminalFrameExtractionReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/terminal-extractions/"
+                f"{self.content_hash}.json"
+            ),
+            "terminal frame extraction receipt",
+        )
+        return self
+
+
 class VideoAttemptPhase(str, Enum):
     REQUEST = "request"
     SUBMIT_INTENT = "submit_intent"
@@ -221,7 +268,23 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
     latest_observation: VideoStatusReceiptPointer | None = None
     fetch_receipt: VideoFetchReceiptPointer | None = None
     provider_file_id: str | None = Field(default=None, min_length=1)
+    terminal_frame_evidence: TerminalFrameEvidencePointer | None = None
+    terminal_frame_extraction: TerminalFrameExtractionReceiptPointer | None = None
     candidate_video_asset_ids: tuple[str, ...] = ()
+    candidate_continuity_asset_ids: tuple[str, ...] = ()
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_continuity_state(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.terminal_frame_evidence is None:
+            data.pop("terminal_frame_evidence", None)
+        if self.terminal_frame_extraction is None:
+            data.pop("terminal_frame_extraction", None)
+        if not self.candidate_continuity_asset_ids:
+            data.pop("candidate_continuity_asset_ids", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_video_attempt_state(self) -> "VideoGenerationAttemptState":
@@ -269,7 +332,30 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
         if self.phase in _VIDEO_CANDIDATE_PHASES:
             if self.candidate_video_asset_ids != (self.request.output_asset_id,):
                 raise ValueError("video candidate asset ID must match request output")
-        elif self.candidate_video_asset_ids:
+            if self.terminal_frame_evidence is None:
+                if self.candidate_continuity_asset_ids or self.terminal_frame_extraction:
+                    raise ValueError(
+                        "continuity candidate asset requires terminal frame evidence"
+                    )
+            elif (
+                self.terminal_frame_extraction is None
+                or self.candidate_continuity_asset_ids
+                != (self.terminal_frame_evidence.extracted_asset_id,)
+                or self.terminal_frame_extraction.extracted_asset_id
+                != self.terminal_frame_evidence.extracted_asset_id
+                or self.terminal_frame_extraction.extracted_sha256
+                != self.terminal_frame_evidence.extracted_sha256
+            ):
+                raise ValueError(
+                    "continuity candidate asset must match terminal frame evidence"
+                )
+        elif (
+            self.candidate_video_asset_ids
+            or self.candidate_continuity_asset_ids
+            or self.terminal_frame_evidence is not None
+            or self.terminal_frame_extraction is not None
+            and self.phase is not VideoAttemptPhase.VALIDATE
+        ):
             raise ValueError("video candidate asset IDs require candidate or activate phase")
         return self
 
@@ -537,7 +623,7 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
         isinstance(attempt, Mapping) and "paid_provider_state" in attempt
         for attempt in value.get("attempts", ())
     )
-    if manifest_version not in {"2.6", "2.7"} and (
+    if manifest_version not in {"2.6", "2.7", "2.8"} and (
         "active_paid_provider_budget" in value or has_paid_attempt
     ):
         raise ValueError(
@@ -551,6 +637,22 @@ def reject_explicit_p8_video_fields(value: object) -> object:
         return value
     manifest_version = value.get("schema_version", "2.0")
     if manifest_version == "2.7":
+        continuity_fields = {
+            "terminal_frame_evidence",
+            "terminal_frame_extraction",
+            "candidate_continuity_asset_ids",
+        }
+        for attempt in value.get("attempts", ()):
+            if not isinstance(attempt, Mapping):
+                continue
+            state = attempt.get("video_generation_state")
+            if isinstance(state, Mapping) and continuity_fields.intersection(state):
+                raise ValueError(
+                    "Production Manifest 2.7 cannot contain explicit "
+                    "Shot continuity fields; Manifest 2.8 is required"
+                )
+        return value
+    if manifest_version == "2.8":
         return value
     for attempt in value.get("attempts", ()):
         if isinstance(attempt, Mapping) and (
@@ -568,7 +670,7 @@ def reject_explicit_p7_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version in {"2.5", "2.6", "2.7"}:
+    if manifest_version in {"2.5", "2.6", "2.7", "2.8"}:
         return value
     image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
     for attempt in value.get("attempts", ()):

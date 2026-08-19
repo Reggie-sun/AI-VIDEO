@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import socket
+import base64
+from collections.abc import Callable
 from contextlib import AbstractContextManager
 from datetime import UTC, datetime, timedelta
 from io import BytesIO
@@ -12,6 +14,7 @@ from pathlib import Path
 
 import httpx
 import pytest
+from pydantic import ValidationError
 
 import ai_video.production as production_root
 import ai_video.production.minimax_hailuo as hailuo_module
@@ -469,26 +472,51 @@ def test_module_is_not_exported_from_package_root():
         assert not hasattr(production_root, name)
 
 
-def test_capabilities_seal_minimal_t2v_only_profile():
+def test_capabilities_seal_t2v_and_i2v_profiles():
     provider = MiniMaxHailuoVideoProvider(
         transport=_FakeTransport(), credential=_SecretResolver()
     )
     capabilities = provider.capabilities()
     assert capabilities.provider_name == "minimax_hailuo"
-    assert len(capabilities.variants) == 1
-    variant = capabilities.variants[0]
-    assert variant.capability_id == "minimax-hailuo-2.3-v1-t2v-768p-6s-16x9"
-    assert variant.execution_kind is VideoExecutionKind.REMOTE
-    assert variant.billing_kind is BillingKind.METERED
-    assert variant.mode is VideoGenerationMode.TEXT_TO_VIDEO
-    assert variant.output.duration_seconds == 6
-    assert variant.output.native_audio is False
-    assert variant.output.fps is None
-    assert variant.allowed_image_roles == ()
-    assert variant.negative_prompt_supported is False
-    assert variant.seed_supported is False
-    assert variant.fps_supported is False
-    assert variant.lookup_supported is True
+    assert len(capabilities.variants) == 2
+    by_id = {variant.capability_id: variant for variant in capabilities.variants}
+
+    t2v = by_id["minimax-hailuo-2.3-v1-t2v-768p-6s-16x9"]
+    assert t2v.provider_kind == "minimax_hailuo"
+    assert t2v.model_id == "MiniMax-Hailuo-2.3"
+    assert t2v.profile_version == "hailuo-2.3-v1"
+    assert t2v.execution_kind is VideoExecutionKind.REMOTE
+    assert t2v.billing_kind is BillingKind.METERED
+    assert t2v.mode is VideoGenerationMode.TEXT_TO_VIDEO
+    assert t2v.output.duration_seconds == 6
+    assert t2v.output.native_audio is False
+    assert t2v.output.fps is None
+    assert t2v.allowed_image_roles == ()
+    assert t2v.negative_prompt_supported is False
+    assert t2v.seed_supported is False
+    assert t2v.fps_supported is False
+    assert t2v.lookup_supported is True
+
+    i2v = by_id["minimax-hailuo-2.3-v1-i2v-768p-6s-first_frame"]
+    assert i2v.provider_kind == "minimax_hailuo"
+    assert i2v.model_id == "MiniMax-Hailuo-2.3"
+    assert i2v.profile_version == "hailuo-2.3-v1"
+    assert i2v.execution_kind is VideoExecutionKind.REMOTE
+    assert i2v.billing_kind is BillingKind.METERED
+    assert i2v.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+    assert i2v.output.duration_seconds == 6
+    assert i2v.output.width == 1366
+    assert i2v.output.height == 768
+    assert i2v.output.native_audio is False
+    assert i2v.allowed_image_roles == ("first_frame",)
+    assert "last_frame" not in i2v.allowed_image_roles
+    assert "reference" not in i2v.allowed_image_roles
+    assert i2v.required_first_frame is True
+    assert i2v.max_reference_count == 0
+    assert i2v.negative_prompt_supported is False
+    assert i2v.seed_supported is False
+    assert i2v.fps_supported is False
+    assert i2v.lookup_supported is True
 
 
 def test_resolve_rejects_seed_and_negative_prompt_and_image_bindings():
@@ -539,6 +567,570 @@ def test_preview_seals_destination_currency_and_upper_bound():
     assert preview.estimated_cost_upper_bound_microunits == 2_000_000
     assert preview.egress_item_ids == ("prompt",)
     assert preview.billing_kind is BillingKind.METERED
+
+
+_I2V_CAPABILITY_ID = "minimax-hailuo-2.3-v1-i2v-768p-6s-first_frame"
+_I2V_PROMPT_TEXT = "An astronaut rides a horse on the moon, frame as first frame"
+_I2V_FIRST_FRAME_BYTES = bytes(range(64))
+_I2V_FIRST_FRAME_SHA = hashlib.sha256(_I2V_FIRST_FRAME_BYTES).hexdigest()
+
+
+def _i2v_first_frame(**changes: object) -> VideoImageReferenceBinding:
+    values: dict[str, object] = {
+        "role": "first_frame",
+        "asset_id": "first-frame-asset-1",
+        "asset_sha256": _I2V_FIRST_FRAME_SHA,
+        "mime_type": "image/png",
+        "width": 1024,
+        "height": 576,
+        "size_bytes": len(_I2V_FIRST_FRAME_BYTES),
+    }
+    values.update(changes)
+    return VideoImageReferenceBinding(**values)
+
+
+def _i2v_output(**changes: object) -> VideoOutputRequirement:
+    values: dict[str, object] = {
+        "duration_seconds": 6,
+        "width": 1366,
+        "height": 768,
+        "fps": None,
+        "container": "mp4",
+        "mime_type": "video/mp4",
+        "native_audio": False,
+    }
+    values.update(changes)
+    return VideoOutputRequirement(**values)
+
+
+def _i2v_request(**changes: object) -> VideoGenerationRequest:
+    values: dict[str, object] = {
+        "mode": VideoGenerationMode.IMAGE_TO_VIDEO,
+        "prompt_text": _I2V_PROMPT_TEXT,
+        "image_bindings": (_i2v_first_frame(),),
+        "output_requirement": _i2v_output(),
+    }
+    values.update(changes)
+    return _request(**values)
+
+
+def _i2v_image_resolver() -> Callable[[VideoImageReferenceBinding], bytes]:
+    def _resolve(binding: VideoImageReferenceBinding) -> bytes:
+        return _I2V_FIRST_FRAME_BYTES
+
+    return _resolve
+
+
+def test_resolve_i2v_accepts_exact_first_frame_binding():
+    provider = MiniMaxHailuoVideoProvider(
+        transport=_FakeTransport(),
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    resolved = provider.resolve(_i2v_request())
+    assert resolved.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+    assert resolved.capability_id == _I2V_CAPABILITY_ID
+    assert resolved.provider_name == "minimax_hailuo"
+    assert resolved.model_id == "MiniMax-Hailuo-2.3"
+    assert resolved.provider_profile.profile_version == "hailuo-2.3-v1"
+    assert len(resolved.image_bindings) == 1
+    assert resolved.image_bindings[0].role == "first_frame"
+    assert resolved.effective_output.duration_seconds == 6
+    assert resolved.effective_output.width == 1366
+    assert resolved.effective_output.height == 768
+    assert resolved.effective_output.native_audio is False
+
+
+def test_resolve_i2v_rejects_last_frame_role_without_transport(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    last_frame = VideoImageReferenceBinding(
+        role="last_frame",
+        asset_id="last-frame-asset-1",
+        asset_sha256=HASH_A,
+        mime_type="image/png",
+        width=1024,
+        height=576,
+        size_bytes=len(_I2V_FIRST_FRAME_BYTES),
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(_i2v_request(image_bindings=(last_frame,)))
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.calls == []
+
+
+def test_resolve_i2v_rejects_reference_role_without_transport(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    reference = VideoImageReferenceBinding(
+        role="reference",
+        asset_id="reference-asset-1",
+        asset_sha256=HASH_A,
+        mime_type="image/png",
+        width=1024,
+        height=576,
+        size_bytes=len(_I2V_FIRST_FRAME_BYTES),
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(_i2v_request(image_bindings=(reference,)))
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.calls == []
+
+
+def test_resolve_i2v_rejects_empty_image_bindings(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    with pytest.raises(ValidationError, match="image-to-video"):
+        provider.resolve(_i2v_request(image_bindings=()))
+    assert transport.calls == []
+
+
+def test_resolve_i2v_rejects_multiple_image_bindings(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    first = _i2v_first_frame(asset_id="first-frame-asset-A")
+    second = _i2v_first_frame(asset_id="first-frame-asset-B")
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(_i2v_request(image_bindings=(first, second)))
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.calls == []
+
+
+def test_resolve_i2v_rejects_unsupported_image_mime(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    binding = _i2v_first_frame(mime_type="image/bmp")
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(_i2v_request(image_bindings=(binding,)))
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.calls == []
+
+
+def test_resolve_i2v_rejects_image_below_min_dimension(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    binding = _i2v_first_frame(width=64, height=64)
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(_i2v_request(image_bindings=(binding,)))
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.calls == []
+
+
+def test_resolve_i2v_rejects_wrong_output_duration(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    wrong_output = _i2v_output(duration_seconds=10)
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(_i2v_request(output_requirement=wrong_output))
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.calls == []
+
+
+def test_resolve_i2v_rejects_wrong_resolution(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    wrong_output = _i2v_output(width=1920, height=1080)
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(_i2v_request(output_requirement=wrong_output))
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.calls == []
+
+
+def test_preview_i2v_seals_destination_currency_and_first_frame_egress():
+    provider = MiniMaxHailuoVideoProvider(
+        transport=_FakeTransport(),
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    resolved = provider.resolve(_i2v_request())
+    preview = provider.preview(resolved)
+    assert preview.destination == "https://api.minimaxi.com"
+    assert preview.currency == "CNY"
+    assert preview.estimated_cost_upper_bound_microunits == 3_000_000
+    assert preview.egress_item_ids == ("prompt", "first-frame-asset-1")
+    assert preview.billing_kind is BillingKind.METERED
+
+
+def _i2v_paid_preview(
+    resolved: ResolvedVideoGenerationRequest,
+    *,
+    attempt_id: str = "attempt-i2v-1",
+    video_preview: VideoGenerationPreview | None = None,
+) -> PaidProviderCallPreview:
+    preview = video_preview or VideoGenerationPreview.create(
+        resolved=resolved,
+        estimated_cost_upper_bound_microunits=3_000_000,
+        currency="CNY",
+        destination="https://api.minimaxi.com",
+        egress_item_ids=("prompt", resolved.image_bindings[0].asset_id),
+    )
+    prompt_bytes = resolved.prompt_text.encode("utf-8")
+    first_frame_bytes = _I2V_FIRST_FRAME_BYTES
+    first_frame_binding = resolved.image_bindings[0]
+    return PaidProviderCallPreview.create(
+        attempt_id=attempt_id,
+        operation="video_generation",
+        provider_kind=resolved.provider_kind,
+        model_id=resolved.model_id,
+        request_fingerprint=resolved.resolved_generation_hash,
+        billing_mode="remote_metered",
+        currency=preview.currency,
+        estimated_cost_upper_bound_microunits=(
+            preview.estimated_cost_upper_bound_microunits
+        ),
+        destination=preview.destination,
+        method="POST",
+        egress_items=(
+            PaidProviderEgressItem(
+                item_id="prompt",
+                sha256=hashlib.sha256(prompt_bytes).hexdigest(),
+                size_bytes=len(prompt_bytes),
+                mime_type="text/plain",
+                purpose="prompt",
+            ),
+            PaidProviderEgressItem(
+                item_id=first_frame_binding.asset_id,
+                sha256=first_frame_binding.asset_sha256,
+                size_bytes=first_frame_binding.size_bytes,
+                mime_type=first_frame_binding.mime_type,
+                purpose="reference",
+            ),
+        ),
+        retention_mode="provider_standard",
+        provider_policy_snapshot_id="minimax-hailuo-policy-1",
+        secret_reference=SecretReference(
+            kind="secret_store",
+            reference_id="MINIMAX_API_KEY",
+        ),
+    )
+
+
+def _i2v_paid_authorization(
+    preview: PaidProviderCallPreview,
+) -> PaidProviderAuthorizationDecision:
+    issued_at = _FIXED_NOW - timedelta(minutes=1)
+    return PaidProviderAuthorizationDecision.create(
+        attempt_id=preview.attempt_id,
+        preview_fingerprint=preview.preview_fingerprint,
+        explicit_opt_in=True,
+        actor=ActorIdentity(actor_id="test-owner", actor_kind="human"),
+        opt_in_policy_receipt_id="opt-in-i2v",
+        budget_policy_id="budget-i2v",
+        budget_currency=preview.currency,
+        project_budget_ceiling_microunits=10_000_000,
+        per_call_ceiling_microunits=max(
+            1, preview.estimated_cost_upper_bound_microunits
+        ),
+        egress_authorized=True,
+        egress_policy_receipt_id="egress-i2v",
+        live_test_authorized=True,
+        live_authorization_receipt_id="live-i2v",
+        issued_at=issued_at,
+        expires_at=issued_at + timedelta(minutes=10),
+        max_submit_count=1,
+    )
+
+
+def _build_i2v_submit_inputs(
+    *,
+    transport: _FakeTransport | None = None,
+    image_resolver: Callable[[VideoImageReferenceBinding], bytes] | None = None,
+) -> tuple[
+    MiniMaxHailuoVideoProvider,
+    ResolvedVideoGenerationRequest,
+    VideoGenerationPreview,
+    PaidProviderCallPreview,
+    PaidProviderAuthorizationDecision,
+    dict[str, str],
+    _FakeTransport,
+    _SecretResolver,
+]:
+    transport_obj = transport or _FakeTransport(submit_response=_submit_response())
+    secret = _SecretResolver()
+    resolver = image_resolver or _i2v_image_resolver()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport_obj,
+        credential=secret,
+        image_resolver=resolver,
+        now=_fixed_now,
+    )
+    resolved = provider.resolve(_i2v_request())
+    video_preview = provider.preview(resolved)
+    paid_preview = _i2v_paid_preview(resolved, video_preview=video_preview)
+    authorization = _i2v_paid_authorization(paid_preview)
+    binding = build_video_paid_permit_binding(
+        resolved, video_preview, paid_preview, authorization
+    )
+    return (
+        provider,
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        binding,
+        transport_obj,
+        secret,
+    )
+
+
+def test_i2v_accepted_submit_emits_exact_payload_with_first_frame_image(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    _block_socket(monkeypatch)
+    (
+        provider,
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        binding,
+        transport,
+        secret,
+    ) = _build_i2v_submit_inputs()
+    permit = _real_permit(binding)
+
+    result = provider.submit(
+        resolved, video_preview, paid_preview, authorization, permit
+    )
+
+    assert len(transport.calls) == 1
+    sent = transport.calls[0]
+    assert sent.method == "POST"
+    assert sent.url == "https://api.minimaxi.com/v1/video_generation"
+    payload = json.loads(sent.body)
+    prefix, encoded = payload["first_frame_image"].split(",", 1)
+    assert prefix == "data:image/png;base64"
+    decoded_bytes = base64.b64decode(encoded)
+    assert decoded_bytes == _I2V_FIRST_FRAME_BYTES
+    assert payload == {
+        "model": "MiniMax-Hailuo-2.3",
+        "prompt": _I2V_PROMPT_TEXT,
+        "duration": 6,
+        "resolution": "768P",
+        "first_frame_image": (
+            "data:image/png;base64,"
+            + base64.b64encode(_I2V_FIRST_FRAME_BYTES).decode("ascii")
+        ),
+    }
+    assert result.external_effect_id == TASK_ID
+    assert result.resolved_generation_hash == resolved.resolved_generation_hash
+    assert secret.invocations == 1
+
+    assert SECRET_TEXT not in repr(provider)
+    assert SECRET_TEXT not in str(sent.body)
+    assert SECRET_TEXT not in repr(transport.calls)
+    assert SECRET_TEXT not in repr(paid_preview)
+    assert SECRET_TEXT not in repr(authorization)
+    assert _I2V_FIRST_FRAME_BYTES.decode("latin-1", errors="replace") not in repr(
+        sent.body
+    )
+
+
+def test_i2v_submit_rejects_when_paid_preview_omits_first_frame_image(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    _block_socket(monkeypatch)
+    (
+        provider,
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        binding,
+        transport,
+        _,
+    ) = _build_i2v_submit_inputs()
+    bad_preview = PaidProviderCallPreview.create(
+        **{
+            **paid_preview.model_dump(
+                exclude={"preview_fingerprint", "egress_items"}
+            ),
+            "egress_items": (
+                PaidProviderEgressItem(
+                    item_id="prompt",
+                    sha256=hashlib.sha256(_I2V_PROMPT_TEXT.encode("utf-8")).hexdigest(),
+                    size_bytes=len(_I2V_PROMPT_TEXT.encode("utf-8")),
+                    mime_type="text/plain",
+                    purpose="prompt",
+                ),
+            ),
+        }
+    )
+    bad_authorization = _i2v_paid_authorization(bad_preview)
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            bad_preview,
+            bad_authorization,
+            _real_permit(binding),
+        )
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.calls == []
+
+
+def test_i2v_submit_rejects_when_first_frame_image_hash_mismatches(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    _block_socket(monkeypatch)
+    (
+        provider,
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        binding,
+        transport,
+        _,
+    ) = _build_i2v_submit_inputs()
+    tampered_bytes = bytes(reversed(_I2V_FIRST_FRAME_BYTES))
+
+    def _tampered_resolver(binding: VideoImageReferenceBinding) -> bytes:
+        return tampered_bytes
+
+    provider_wrong = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_tampered_resolver,
+        now=_fixed_now,
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        provider_wrong.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            _real_permit(binding),
+        )
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.calls == []
+
+
+def test_i2v_submit_rejects_missing_image_resolver_without_transport(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    _block_socket(monkeypatch)
+    (
+        provider,
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        binding,
+        transport,
+        _,
+    ) = _build_i2v_submit_inputs()
+    provider_no_resolver = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        now=_fixed_now,
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        provider_no_resolver.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            _real_permit(binding),
+        )
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.calls == []
+
+
+@pytest.mark.parametrize("permit_kind", ["none", "mismatched", "consumed"])
+def test_i2v_invalid_permits_are_rejected_before_transport(
+    monkeypatch: pytest.MonkeyPatch, permit_kind: str
+):
+    _block_socket(monkeypatch)
+    (
+        provider,
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        binding,
+        transport,
+        _,
+    ) = _build_i2v_submit_inputs()
+    if permit_kind == "none":
+        candidate = None
+    elif permit_kind == "mismatched":
+        candidate = _PermitDouble({**binding, "request_fingerprint": "f" * 64})
+    else:
+        first_permit = _real_permit(binding)
+        provider.submit(
+            resolved, video_preview, paid_preview, authorization, first_permit
+        )
+        transport.calls.clear()
+        candidate = first_permit
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved, video_preview, paid_preview, authorization, candidate
+        )
+    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED
+    assert transport.calls == []
+
+
+def test_i2v_capability_denial_never_calls_transport(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    last_frame = VideoImageReferenceBinding(
+        role="last_frame",
+        asset_id="last-frame-asset-1",
+        asset_sha256=HASH_A,
+        mime_type="image/png",
+        width=1024,
+        height=576,
+        size_bytes=len(_I2V_FIRST_FRAME_BYTES),
+    )
+    with pytest.raises(AiVideoError):
+        provider.resolve(_i2v_request(image_bindings=(last_frame,)))
+    assert transport.calls == []
 
 
 def test_accepted_submit_emits_exact_request_payload_and_task_id_without_revealing_secret(

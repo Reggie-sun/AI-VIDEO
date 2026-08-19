@@ -53,6 +53,11 @@ from ai_video.production.video import (
     VideoTaskObservation,
     VideoTaskState,
 )
+from ai_video.production.video_artifact import (
+    MeasuredVideoMetadata,
+    TerminalFrameExtractionResult,
+    extract_terminal_frame_candidate,
+)
 
 
 HASH_A = "a" * 64
@@ -171,6 +176,85 @@ def _first_frame() -> VideoImageReferenceBinding:
         width=1280,
         height=720,
     )
+
+
+def _continuity_constraints(**changes: object):
+    values: dict[str, object] = {
+        "scene_identity": {
+            "artifact_id": "scene-001",
+            "revision": 2,
+            "content_hash": HASH_B,
+        },
+        "character_identities": (
+            {
+                "artifact_id": "character-001",
+                "revision": 3,
+                "content_hash": HASH_C,
+            },
+        ),
+        "camera_axis": "axis-east-facing-left",
+        "framing": "medium-wide-subject-left-third",
+        "lighting": "warm-window-key-camera-right",
+        "color": "warm-amber-low-saturation",
+        "motion_direction": "subject-exits-screen-right",
+        "exit_state": "right-foot-forward-at-doorway",
+        "entrance_state": "right-foot-forward-entering-hall",
+    }
+    values.update(changes)
+    return video_contracts.ContinuityConstraintSet.create(**values)
+
+
+def _terminal_frame(**changes: object):
+    values: dict[str, object] = {
+        "source_shot_id": "shot-000",
+        "source_shot_revision": 4,
+        "source_shot_content_hash": HASH_A,
+        "source_video_asset_id": "video-source-000",
+        "source_video_sha256": HASH_B,
+        "source_generation_id": "generation-source-000",
+        "source_request_input_hash": HASH_C,
+        "source_resolved_generation_hash": HASH_D,
+        "source_provenance_receipt_id": "video-provenance-source-000",
+        "extraction_receipt_id": HASH_D,
+        "source_registry": _registry_pointer(),
+        "source_container_name": "mp4",
+        "source_codec_name": "h264",
+        "source_width": 1280,
+        "source_height": 720,
+        "source_fps_numerator": 24,
+        "source_fps_denominator": 1,
+        "source_duration_milliseconds": 6000,
+        "source_frame_count": 144,
+        "frame_index": 143,
+        "timestamp_numerator": 143,
+        "timestamp_denominator": 24,
+        "selection_rule": "generated_candidate_terminal",
+        "extraction_contract_version": "terminal-frame-v1",
+        "extractor_name": "ffmpeg",
+        "extractor_version": "7.1",
+        "extracted_asset_id": "terminal-frame-shot-000",
+        "extracted_sha256": HASH_A,
+        "extracted_mime_type": "image/png",
+        "extracted_size_bytes": 4096,
+        "extracted_width": 1280,
+        "extracted_height": 720,
+        "extracted_color_space": "bt709",
+    }
+    values.update(changes)
+    return video_contracts.TerminalFrameEvidence.create(**values)
+
+
+def _continuity_binding(**changes: object):
+    values: dict[str, object] = {
+        "role": "first_frame",
+        "terminal_frame": _terminal_frame(),
+        "target_shot_id": "shot-001",
+        "target_shot_revision": 3,
+        "target_shot_content_hash": HASH_A,
+        "constraints": _continuity_constraints(),
+    }
+    values.update(changes)
+    return video_contracts.ContinuityReferenceBinding.create(**values)
 
 
 def _output(*, duration_seconds: int = 6, fps: int | None = 24) -> VideoOutputRequirement:
@@ -379,6 +463,221 @@ def test_request_input_hash_seals_caller_intent_but_excludes_generation_id():
     )
     for change in changes:
         assert _request(**change).request_input_hash != baseline.request_input_hash
+
+
+def test_continuity_request_binds_exact_terminal_evidence_and_constraints():
+    binding = _continuity_binding()
+    terminal = binding.terminal_frame
+    first_frame = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id=terminal.extracted_asset_id,
+        asset_sha256=terminal.extracted_sha256,
+        mime_type=terminal.extracted_mime_type,
+        width=terminal.extracted_width,
+        height=terminal.extracted_height,
+        size_bytes=terminal.extracted_size_bytes,
+    )
+    request = _request(
+        image_bindings=(first_frame,),
+        continuity_binding=binding,
+        input_artifact_ids=(
+            "shot-001",
+            terminal.source_shot_id,
+            terminal.source_video_asset_id,
+            terminal.extracted_asset_id,
+        ),
+    )
+
+    assert request.continuity_binding == binding
+    assert _request(
+        generation_id="generation-002",
+        image_bindings=(first_frame,),
+        continuity_binding=binding,
+        input_artifact_ids=request.input_artifact_ids,
+    ).request_input_hash == request.request_input_hash
+    assert _request(
+        image_bindings=(
+            first_frame.model_copy(update={"asset_sha256": HASH_D}),
+        ),
+        continuity_binding=_continuity_binding(
+            terminal_frame=_terminal_frame(extracted_sha256=HASH_D)
+        ),
+        input_artifact_ids=request.input_artifact_ids,
+    ).request_input_hash != request.request_input_hash
+    assert _request(
+        image_bindings=(first_frame,),
+        continuity_binding=_continuity_binding(
+            constraints=_continuity_constraints(
+                motion_direction="subject-exits-screen-left"
+            )
+        ),
+        input_artifact_ids=request.input_artifact_ids,
+    ).request_input_hash != request.request_input_hash
+
+    resolved = _resolved(request)
+    assert resolved.continuity_binding == binding
+    assert resolved.activation_scope is not None
+    assert resolved.activation_scope.request.continuity_binding == binding
+
+
+def test_terminal_frame_sealing_changes_request_hash_without_changing_legacy_hash():
+    baseline = _request()
+    sealed = _request(seal_terminal_frame=True)
+
+    assert baseline.model_dump(mode="json").get("seal_terminal_frame") is False
+    assert sealed.request_input_hash != baseline.request_input_hash
+    assert _request().request_input_hash == baseline.request_input_hash
+
+
+def test_extract_terminal_frame_candidate_seals_exact_source_and_measured_png(tmp_path: Path):
+    source = b"exact-source-video-bytes"
+    source_path = tmp_path / "source.mp4"
+    source_path.write_bytes(source)
+    png = (
+        Path(__file__).parent
+        / "fixtures/hyperframes/silent_image/source/assets/"
+        "1ac67c3a1c909b3356cf6ff490c0f88b8a30ef4c28ca579657f6007146abe71c.png"
+    ).read_bytes()
+    measured = MeasuredVideoMetadata(
+        container_name="mp4",
+        codec_name="h264",
+        width=320,
+        height=180,
+        fps_numerator=24,
+        fps_denominator=1,
+        duration_milliseconds=1000,
+        frame_count=24,
+        audio_stream_count=0,
+        size_bytes=len(source),
+        artifact_sha256=__import__("hashlib").sha256(source).hexdigest(),
+    )
+    resolved = _resolved(_request(seal_terminal_frame=True))
+
+    with source_path.open("rb") as held:
+        extracted, measured_png, receipt = extract_terminal_frame_candidate(
+            held.fileno(),
+            request=resolved,
+            measured_video=measured,
+            source_provenance_receipt_id=HASH_A,
+            extracted_asset_id="video-output-001:terminal-frame",
+            extractor=lambda exact, frame_index: TerminalFrameExtractionResult(
+                png_bytes=png,
+                extractor_name="fixture-extractor",
+                extractor_version="1.0",
+            )
+            if exact == source and frame_index == 23
+            else (_ for _ in ()).throw(AssertionError("wrong extraction input")),
+        )
+
+    assert extracted == png
+    assert measured_png.sha256 == receipt.extracted_sha256
+    assert receipt.source_video_sha256 == measured.artifact_sha256
+    assert receipt.frame_index == 23
+    assert (receipt.timestamp_numerator, receipt.timestamp_denominator) == (23, 24)
+    assert receipt.content_hash == video_contracts.canonical_sha256(
+        {
+            "schema": "ai-video-terminal-frame-extraction/1",
+            **receipt.model_dump(mode="json", exclude={"content_hash"}),
+        }
+    )
+
+
+def test_extract_terminal_frame_candidate_rejects_tampered_source_bytes(tmp_path: Path):
+    source_path = tmp_path / "source.mp4"
+    source_path.write_bytes(b"tampered")
+    measured = MeasuredVideoMetadata(
+        container_name="mp4",
+        codec_name="h264",
+        width=320,
+        height=180,
+        fps_numerator=24,
+        fps_denominator=1,
+        duration_milliseconds=1000,
+        frame_count=24,
+        audio_stream_count=0,
+        size_bytes=8,
+        artifact_sha256=HASH_A,
+    )
+
+    with source_path.open("rb") as held, pytest.raises(
+        AiVideoError, match="exact measured source"
+    ):
+        extract_terminal_frame_candidate(
+            held.fileno(),
+            request=_resolved(_request(seal_terminal_frame=True)),
+            measured_video=measured,
+            source_provenance_receipt_id=HASH_A,
+            extracted_asset_id="video-output-001:terminal-frame",
+            extractor=lambda *_: pytest.fail("extractor must not run"),
+        )
+@pytest.mark.parametrize(
+    ("case", "match"),
+    [
+        ("t2v", "text-to-video"),
+        ("wrong_target", "target Shot"),
+        ("missing_input", "input artifact"),
+        ("wrong_frame", "terminal frame"),
+    ],
+)
+def test_continuity_request_rejects_unbound_or_mismatched_inputs(
+    case: str, match: str
+):
+    values = {
+        "continuity_binding": _continuity_binding(),
+        "image_bindings": (
+            VideoImageReferenceBinding(
+                role="first_frame",
+                asset_id="terminal-frame-shot-000",
+                asset_sha256=HASH_A,
+                mime_type="image/png",
+                width=1280,
+                height=720,
+                size_bytes=4096,
+            ),
+        ),
+        "input_artifact_ids": (
+            "shot-001",
+            "shot-000",
+            "video-source-000",
+            "terminal-frame-shot-000",
+        ),
+    }
+    if case == "t2v":
+        values["mode"] = VideoGenerationMode.TEXT_TO_VIDEO
+    elif case == "wrong_target":
+        values["continuity_binding"] = _continuity_binding(
+            target_shot_id="shot-other"
+        )
+    elif case == "missing_input":
+        values["input_artifact_ids"] = ("shot-001", "video-source-000")
+    elif case == "wrong_frame":
+        values["image_bindings"] = (_first_frame(),)
+    with pytest.raises(ValidationError, match=match):
+        _request(**values)
+
+
+def test_historical_activation_scope_reopens_without_continuity_defaults():
+    historical = _resolved().model_dump(mode="json")
+    historical.pop("continuity_binding")
+    historical.pop("seal_terminal_frame")
+    scope = historical["activation_scope"]
+    scope_request = scope["request"]
+    scope_request.pop("continuity_binding")
+    scope_request.pop("seal_terminal_frame")
+    scope["scope_fingerprint"] = video_contracts.canonical_sha256(
+        {
+            "schema": "ai-video-activation-scope/1",
+            "request": scope_request,
+            "usage_license": scope["usage_license"],
+        }
+    )
+
+    reopened = ResolvedVideoGenerationRequest.model_validate(historical)
+
+    assert reopened.activation_scope is not None
+    assert reopened.activation_scope.request.continuity_binding is None
+    assert reopened.activation_scope.request.seal_terminal_frame is False
+    assert reopened.resolved_generation_hash == _resolved().resolved_generation_hash
 
 
 def test_extended_media_request_is_sealed_and_keeps_legacy_hashes_stable():

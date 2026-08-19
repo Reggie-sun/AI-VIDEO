@@ -57,6 +57,7 @@ from ai_video.production.models import (
     StateCommitAttempt,
     StateCommitStatus,
     ToolIdentity,
+    VideoAssetMetadata,
     VoiceRequestReceipt,
 )
 from production_project_factory import (
@@ -2302,6 +2303,202 @@ def test_generated_image_record_uses_generic_future_extension_seam(tmp_path):
     )
     assert "image_provider" not in dep_mod.__all__
     assert "submit_image" not in dep_mod.__all__
+
+
+def test_terminal_frame_dependency_invalidates_only_explicit_video_closure(tmp_path):
+    inputs = make_p5_dependency_inputs(tmp_path)
+    terminal = AssetRecord(
+        asset_id="video-shot-1:terminal-frame",
+        asset_type=AssetType.IMAGE,
+        artifact_path=Path(f"assets/files/{ONE_HASH}.png"),
+        sha256=ONE_HASH,
+        size_bytes=1024,
+        mime_type="image/png",
+        width=1280,
+        height=720,
+        source_kind=AssetSourceKind.DERIVED,
+        tool=ToolIdentity(name="ffmpeg", version="7.1"),
+        input_artifact_ids=("video-shot-1",),
+        input_fingerprint=TWO_HASH,
+        creation_receipt_id=THREE_HASH,
+        usage_license="test-only",
+    )
+    downstream = AssetRecord(
+        asset_id="video-shot-2",
+        asset_type=AssetType.VIDEO,
+        artifact_path=Path(f"assets/files/{FOUR_HASH}.mp4"),
+        sha256=FOUR_HASH,
+        size_bytes=4096,
+        mime_type="video/mp4",
+        duration_seconds=6,
+        width=1280,
+        height=720,
+        source_kind=AssetSourceKind.GENERATED,
+        tool=ToolIdentity(name="fixture-video", version="1"),
+        input_artifact_ids=(terminal.asset_id,),
+        input_fingerprint=SIX_HASH,
+        creation_receipt_id=SIX_HASH,
+        usage_license="test-only",
+        egress=EgressMetadata(
+            remote=True,
+            destination="https://provider.invalid",
+            authorization_receipt_id="egress-1",
+            request_fingerprint=FIVE_HASH,
+            payload_fingerprint=SIX_HASH,
+            retention_mode="provider_standard",
+            provider_policy_snapshot_id="policy-1",
+        ),
+        cost_receipt_id="cost-1",
+        video_metadata=VideoAssetMetadata(
+            container_name="mp4",
+            codec_name="h264",
+            width=1280,
+            height=720,
+            fps_numerator=24,
+            fps_denominator=1,
+            duration_milliseconds=6000,
+            frame_count=144,
+            probe_receipt_id="probe-1",
+            request_receipt_fingerprint=FIVE_HASH,
+            resolved_generation_hash=SIX_HASH,
+            provenance_receipt_id="provenance-1",
+        ),
+    )
+    downstream_terminal = terminal.model_copy(
+        update={
+            "asset_id": "video-shot-2:terminal-frame",
+            "artifact_path": Path(f"assets/files/{TWO_HASH}.png"),
+            "sha256": TWO_HASH,
+            "input_artifact_ids": (downstream.asset_id,),
+            "input_fingerprint": THREE_HASH,
+            "creation_receipt_id": THREE_HASH,
+        }
+    )
+    transitive = downstream.model_copy(
+        update={
+            "asset_id": "video-shot-3",
+            "artifact_path": Path(f"assets/files/{THREE_HASH}.mp4"),
+            "sha256": THREE_HASH,
+            "input_artifact_ids": (downstream_terminal.asset_id,),
+            "input_fingerprint": SIX_HASH,
+            "creation_receipt_id": FOUR_HASH,
+        }
+    )
+    unlinked = downstream.model_copy(
+        update={
+            "asset_id": "video-unlinked",
+            "artifact_path": Path(f"assets/files/{FIVE_HASH}.mp4"),
+            "sha256": FIVE_HASH,
+            "input_artifact_ids": (),
+            "input_fingerprint": SIX_HASH,
+            "creation_receipt_id": FIVE_HASH,
+        }
+    )
+    registry = inputs.project.registry.model_copy(
+        update={
+            "assets": (
+                *inputs.project.registry.assets,
+                terminal,
+                downstream,
+                downstream_terminal,
+                transitive,
+                unlinked,
+            )
+        }
+    )
+    project = inputs.project.model_copy(update={"registry": registry})
+    layers = tuple(
+        layer.model_copy(update={"asset_id": downstream.asset_id})
+        if layer.shot_id == "shot-2"
+        else layer
+        for layer in inputs.composition_spec.layers
+    )
+    bound_inputs = replace(
+        inputs,
+        project=project,
+        composition_spec=inputs.composition_spec.model_copy(update={"layers": layers}),
+    )
+    before_graph = dep_mod.build_production_dependency_graph(bound_inputs)
+    before_desired = dep_mod.desired_fingerprints(before_graph)
+    previous = tuple(
+        DependencyNodeState(
+            node_id=node.node_id,
+            graph_revision_id=before_graph.revision_id,
+            desired_fingerprint=before_desired[node.node_id],
+            applied_fingerprint=before_desired[node.node_id],
+            lifecycle=DependencyLifecycle.FRESH,
+            applied_evidence=ProjectDependencyEvidence(
+                owner="project_snapshot",
+                pointer=inputs.project.manifest.active_project,
+                artifact_id=node.artifact_id,
+                artifact_fingerprint=before_desired[node.node_id],
+            ),
+        )
+        for node in before_graph.nodes
+    )
+    exact_replay = dep_mod.resolve_dependency_state(before_graph, previous)
+    assert exact_replay.exact_replay
+    assert exact_replay.affected_node_ids == ()
+
+    failed_video = next(
+        state for state in previous if state.node_id == f"asset:{downstream.asset_id}"
+    ).model_copy(
+        update={
+            "lifecycle": DependencyLifecycle.FAILED,
+            "error_code": "VIDEO_GENERATION_FAILED",
+            "error_message": "fixture failure",
+        }
+    )
+    same_desired = dep_mod.resolve_dependency_state(
+        before_graph,
+        tuple(
+            failed_video if state.node_id == failed_video.node_id else state
+            for state in previous
+        ),
+    )
+    assert same_desired.by_id[failed_video.node_id].lifecycle is DependencyLifecycle.FAILED
+    assert (
+        same_desired.by_id[f"asset:{downstream_terminal.asset_id}"].lifecycle
+        is DependencyLifecycle.BLOCKED
+    )
+    assert (
+        same_desired.by_id[f"asset:{transitive.asset_id}"].lifecycle
+        is DependencyLifecycle.BLOCKED
+    )
+    assert failed_video.node_id not in same_desired.ready_node_ids
+
+    changed_terminal = terminal.model_copy(update={"sha256": SEVEN_HASH})
+    changed_registry = registry.model_copy(
+        update={
+            "assets": tuple(
+                changed_terminal if asset.asset_id == terminal.asset_id else asset
+                for asset in registry.assets
+            )
+        }
+    )
+    changed_inputs = replace(
+        bound_inputs,
+        project=project.model_copy(update={"registry": changed_registry}),
+    )
+
+    resolution = dep_mod.resolve_dependency_state(
+        dep_mod.build_production_dependency_graph(changed_inputs), previous
+    )
+
+    assert set(resolution.affected_node_ids) == {
+        f"asset:{terminal.asset_id}",
+        f"asset:{downstream.asset_id}",
+        f"asset:{downstream_terminal.asset_id}",
+        f"asset:{transitive.asset_id}",
+        "composition:main",
+        "timeline:main",
+        "renderer-source:main",
+        "render:main",
+    }
+    assert resolution.by_id["creative:shot:shot-1:visual"].lifecycle is DependencyLifecycle.FRESH
+    assert resolution.by_id["creative:shot:shot-2:visual"].lifecycle is DependencyLifecycle.FRESH
+    assert resolution.by_id["asset:voice-narration"].lifecycle is DependencyLifecycle.FRESH
+    assert resolution.by_id[f"asset:{unlinked.asset_id}"].lifecycle is DependencyLifecycle.FRESH
 
 
 def test_applied_evidence_bootstraps_precise_pre_render_frontier(tmp_path):

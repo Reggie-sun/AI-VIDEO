@@ -2,7 +2,7 @@
 
 ## Status
 
-本文档是上述 Shot Continuity specification 的 proposed implementation plan。它不构成 implementation 或 Provider/live authorization。本轮只创建文档，不修改 runtime、tests、schema、layout 或 generated media。
+本文档最初是上述 Shot Continuity specification 的 proposed implementation plan。2026-08-19后续明确执行请求已完成Milestone 1-5、Hailuo 2.3/Seedance 2.0 Mini offline portions与provider-neutral technical suites；Manifest 2.8 / terminal PNG Registry activation属于另行明确授权的scope expansion。Local MiniMax H3因缺sealed complete workflow/profile保持pending；Milestone 9-10的Provider live与subjective acceptance未执行。没有调用Provider、重新生成媒体、push或release。
 
 ## Objective
 

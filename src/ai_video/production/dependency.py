@@ -57,10 +57,7 @@ from ai_video.production.models import (
 )
 from ai_video.production.audio import VoiceGenerationRequest
 from ai_video.production.paths import canonical_dependency_graph_snapshot_path
-from ai_video.production.video_dependency import (
-    generated_video_semantic_fingerprint,
-    visual_asset_dependency_reason,
-)
+import ai_video.production.video_dependency as video_dep
 
 __all__ = [
     "DependencyResolution",
@@ -169,6 +166,7 @@ _EDGE_ALLOWLIST: Final[frozenset[tuple[DependencyNodeKind, DependencySemanticRol
             (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.VOICE, DependencyReason.GENERATION_INPUT, DependencyNodeKind.ASSET, DependencySemanticRole.VOICE),
             (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.VISUAL, DependencyReason.GENERATION_INPUT, DependencyNodeKind.ASSET, DependencySemanticRole.VISUAL),
             (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.VISUAL, DependencyReason.ASSET_BINDING, DependencyNodeKind.ASSET, DependencySemanticRole.VISUAL),
+            (DependencyNodeKind.ASSET, DependencySemanticRole.VISUAL, DependencyReason.GENERATION_INPUT, DependencyNodeKind.ASSET, DependencySemanticRole.VISUAL),
             (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.COMPOSITION, DependencyReason.COMPOSITION_RESOLUTION, DependencyNodeKind.COMPOSITION_SPEC, DependencySemanticRole.COMPOSITION),
             (DependencyNodeKind.ASSET, DependencySemanticRole.VOICE, DependencyReason.AUDIO_SOURCE, DependencyNodeKind.ASSET, DependencySemanticRole.CAPTION),
             (DependencyNodeKind.ASSET, DependencySemanticRole.VOICE, DependencyReason.AUDIO_SOURCE, DependencyNodeKind.COMPOSITION_SPEC, DependencySemanticRole.COMPOSITION),
@@ -1373,7 +1371,7 @@ def build_production_dependency_graph(
         }
         if role is DependencySemanticRole.VOICE and request is not None:
             contribution_values["voice.semantic"] = voice_semantic_projection_fingerprint(request)
-        elif (video_fingerprint := generated_video_semantic_fingerprint(asset)) is not None:
+        elif (video_fingerprint := video_dep.generated_video_semantic_fingerprint(asset)) is not None:
             contribution_values["video.generation"] = video_fingerprint
         elif role is DependencySemanticRole.CAPTION and asset.caption_metadata is not None:
             metadata = asset.caption_metadata
@@ -1450,6 +1448,9 @@ def build_production_dependency_graph(
             )
         )
 
+    for edge_args in video_dep.generated_video_continuity_edge_args(project.registry.assets):
+        add_edge(*edge_args)
+
     for shot in project.shots:
         for requirement in shot.required_asset_roles:
             for asset_id in requirement.asset_ids:
@@ -1459,7 +1460,7 @@ def build_production_dependency_graph(
                 add_edge(
                     shot_projection_ids[(shot.shot_id, DependencySemanticRole.VISUAL)],
                     asset_node_id(asset_id),
-                    visual_asset_dependency_reason(asset),
+                    video_dep.visual_asset_dependency_reason(asset),
                     "asset.visual_input",
                     {"shot_id": shot.shot_id, "asset_id": asset_id},
                 )

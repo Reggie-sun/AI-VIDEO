@@ -14,6 +14,8 @@ from ai_video.production._video_project_reader import (
     load_video_fetch_receipt,
     load_video_request_receipt,
     load_video_status_receipt,
+    load_terminal_frame_evidence,
+    load_terminal_frame_extraction,
 )
 from ai_video.production.models import (
     PaidProviderAttemptPhase,
@@ -25,6 +27,8 @@ from ai_video.production.models import (
     VideoGenerationAttemptState,
     VideoRequestReceiptPointer,
     VideoStatusReceiptPointer,
+    TerminalFrameEvidencePointer,
+    TerminalFrameExtractionReceiptPointer,
 )
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
@@ -90,6 +94,70 @@ class _StateCommitVideoMixin:
     ) -> VideoFetchReceipt:
         return load_video_fetch_receipt(self._project_root, pointer)
 
+    def _reopen_terminal_frame_evidence(
+        self, pointer: TerminalFrameEvidencePointer
+    ):
+        return load_terminal_frame_evidence(self._project_root, pointer)
+
+    def _reopen_terminal_frame_extraction(
+        self, pointer: TerminalFrameExtractionReceiptPointer
+    ):
+        return load_terminal_frame_extraction(self._project_root, pointer)
+
+    def _reopen_terminal_frame_chain(
+        self,
+        state: VideoGenerationAttemptState,
+        request: ResolvedVideoGenerationRequest,
+        *,
+        source_registry,
+    ):
+        scope = request.activation_scope
+        if scope is None:
+            raise _state_invalid("Video request has no durable authoring scope.")
+        expected_ids = (
+            (f"{request.output_asset_id}:terminal-frame",)
+            if scope.request.seal_terminal_frame
+            else ()
+        )
+        if not expected_ids:
+            if (
+                state.terminal_frame_extraction is not None
+                or state.terminal_frame_evidence is not None
+                or state.candidate_continuity_asset_ids
+            ):
+                raise _state_invalid("Unexpected terminal frame state is present.")
+            return None
+        if (
+            state.terminal_frame_extraction is None
+            or state.terminal_frame_evidence is None
+            or state.candidate_continuity_asset_ids != expected_ids
+        ):
+            raise _state_invalid("Terminal frame evidence chain is incomplete.")
+        _, extraction = self._reopen_terminal_frame_extraction(
+            state.terminal_frame_extraction
+        )
+        evidence = self._reopen_terminal_frame_evidence(
+            state.terminal_frame_evidence
+        )
+        if (
+            evidence.extraction_receipt_id != extraction.content_hash
+            or evidence.source_registry != source_registry
+            or evidence.source_shot_id != scope.request.target_shot_id
+            or evidence.source_shot_revision != scope.request.target_shot_revision
+            or evidence.source_shot_content_hash
+            != scope.request.target_shot_content_hash
+            or evidence.source_video_asset_id != request.output_asset_id
+            or evidence.source_generation_id != request.generation_id
+            or evidence.source_request_input_hash != request.request_input_hash
+            or evidence.source_resolved_generation_hash
+            != request.resolved_generation_hash
+            or evidence.extracted_asset_id not in expected_ids
+        ):
+            raise _state_invalid(
+                "Terminal frame evidence does not bind the exact candidate."
+            )
+        return evidence
+
     def begin_video_generation(
         self,
         *,
@@ -117,9 +185,20 @@ class _StateCommitVideoMixin:
         )
         with self._exclusive_lock():
             manifest = self._read_manifest()
-            if manifest.schema_version != "2.7":
+            if manifest.schema_version not in {"2.7", "2.8"}:
                 raise _state_invalid(
-                    "Video generation requires Production Manifest 2.7."
+                    "Video generation requires Production Manifest 2.7 or 2.8."
+                )
+            if (
+                request.activation_scope is not None
+                and (
+                    request.activation_scope.request.seal_terminal_frame
+                    or request.continuity_binding is not None
+                )
+                and manifest.schema_version != "2.8"
+            ):
+                raise _state_invalid(
+                    "Shot continuity requires Production Manifest 2.8."
                 )
             if manifest.active_dependency_graph is None:
                 raise _state_invalid(

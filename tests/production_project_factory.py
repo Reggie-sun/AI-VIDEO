@@ -4192,8 +4192,8 @@ def make_base_ai_comic_e2e_runtime(root: Path) -> "BaseAiComicE2ERuntime":
     )
 
 
-def make_p8_video_generation_base(root: Path):
-    """Materialize a fresh Manifest 2.7 / Registry 2.2 graph base."""
+def make_p8_video_generation_base(root: Path, *, schema_version: str = "2.7"):
+    """Materialize a fresh video-generation / Registry 2.2 graph base."""
 
     from ai_video.production.models import RegistryDependencyEvidence
 
@@ -4235,7 +4235,7 @@ def make_p8_video_generation_base(root: Path):
     )
     manifest = loaded.manifest.model_copy(
         update={
-            "schema_version": "2.7",
+            "schema_version": schema_version,
             "manifest_revision": loaded.manifest.manifest_revision + 1,
             "active_registry": pointer,
             "dependency_states": states,
@@ -4269,6 +4269,7 @@ def make_p8_video_candidate_preparer(base_inputs):
         probe_receipt,
         provenance,
         asset_record,
+        continuity_asset_record=None,
     ):
         scope = request.activation_scope
         assert scope is not None
@@ -4279,7 +4280,11 @@ def make_p8_video_candidate_preparer(base_inputs):
                 "schema_version": "2.2",
                 "revision_id": ZERO_HASH,
                 "content_hash": ZERO_HASH,
-                "assets": (*base_project.registry.assets, asset_record),
+                "assets": (
+                    *base_project.registry.assets,
+                    asset_record,
+                    *((continuity_asset_record,) if continuity_asset_record else ()),
+                ),
             }
         )
         registry_hash = registry_semantic_sha256(registry)
@@ -4377,6 +4382,15 @@ def make_p8_video_candidate_preparer(base_inputs):
                 "asset_paths": {
                     **base_project.asset_paths,
                     asset_record.asset_id: base_project.root / asset_record.artifact_path,
+                    **(
+                        {
+                            continuity_asset_record.asset_id: (
+                                base_project.root / continuity_asset_record.artifact_path
+                            )
+                        }
+                        if continuity_asset_record is not None
+                        else {}
+                    ),
                 },
                 "manifest": base_project.manifest.model_copy(
                     update={
@@ -4411,6 +4425,11 @@ def make_p8_video_candidate_preparer(base_inputs):
             registry_pointer=registry_pointer,
             target_shot_id=original.target_shot_id,
             output_asset_id=request.output_asset_id,
+            continuity_asset_id=(
+                continuity_asset_record.asset_id
+                if continuity_asset_record is not None
+                else None
+            ),
         )
         return PreparedVideoCandidate(
             base_inputs=live_base_inputs,

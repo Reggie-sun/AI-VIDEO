@@ -101,7 +101,11 @@ from ai_video.production.image_import import (
     validate_human_image_import,
 )
 from ai_video.production.video import (
+    ContinuityArtifactIdentity,
+    ContinuityConstraintSet,
+    ContinuityReferenceBinding,
     ResolvedVideoGenerationRequest,
+    TerminalFrameEvidence,
     VideoFetchReceipt,
     VideoGenerationPreview,
     VideoGenerationRequest,
@@ -205,7 +209,11 @@ __all__ = [
     "VoiceAssetProvider",
     "VoiceGenerationRequest",
     "VoiceProviderResult",
+    "ContinuityArtifactIdentity",
+    "ContinuityConstraintSet",
+    "ContinuityReferenceBinding",
     "ResolvedVideoGenerationRequest",
+    "TerminalFrameEvidence",
     "VideoFetchReceipt",
     "VideoGenerationPreview",
     "VideoGenerationRequest",

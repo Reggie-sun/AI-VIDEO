@@ -51,6 +51,21 @@ class _StateCommitVideoActivationMixin:
             scope = request.activation_scope
             if scope is None:
                 raise _state_invalid("Video activation request has no durable scope.")
+            expected_continuity_ids = (
+                (f"{request.output_asset_id}:terminal-frame",)
+                if scope.request.seal_terminal_frame
+                else ()
+            )
+            if state.candidate_continuity_asset_ids != expected_continuity_ids or (
+                (state.terminal_frame_evidence is None)
+                != (not scope.request.seal_terminal_frame)
+            ):
+                raise _state_invalid(
+                    "Video continuity activation identity is incomplete."
+                )
+            self._reopen_terminal_frame_chain(
+                state, request, source_registry=attempt.candidate_registry
+            )
             resolution = resolve_video_activation_dependency_state(
                 graph=graph,
                 base_states=manifest.dependency_states,
@@ -58,6 +73,11 @@ class _StateCommitVideoActivationMixin:
                 registry_pointer=attempt.candidate_registry,
                 target_shot_id=scope.request.target_shot_id,
                 output_asset_id=request.output_asset_id,
+                continuity_asset_id=(
+                    expected_continuity_ids[0]
+                    if expected_continuity_ids
+                    else None
+                ),
             )
             if (
                 _dependency_states_hash(resolution.states)
@@ -126,5 +146,22 @@ class _StateCommitVideoActivationMixin:
             or state.candidate_video_asset_ids != (state.request.output_asset_id,)
         ):
             raise _state_invalid("Video generation success is not exact active evidence.")
+        request = self._reopen_video_request(state.request)
+        scope = request.activation_scope
+        if scope is None:
+            raise _state_invalid("Video generation success has no durable scope.")
+        expected_continuity_ids = (
+            (f"{request.output_asset_id}:terminal-frame",)
+            if scope.request.seal_terminal_frame
+            else ()
+        )
+        if state.candidate_continuity_asset_ids != expected_continuity_ids or (
+            (state.terminal_frame_evidence is None)
+            != (not scope.request.seal_terminal_frame)
+        ):
+            raise _state_invalid("Video continuity success is not exact active evidence.")
+        self._reopen_terminal_frame_chain(
+            state, request, source_registry=manifest.active_registry
+        )
         self._load_production_project(self._project_root / "project.yaml")
         return manifest

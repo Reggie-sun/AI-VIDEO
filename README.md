@@ -184,6 +184,14 @@ MiniMax H3/Hailuo均已通过offline adapter acceptance。已有三次经授权�
 
 `SeedanceVideoProvider`按2026-08-19 official snapshot完整覆盖七个current/legacy-callable Model IDs，并拒绝retired/marketing aliases和可扩张profile。它只接受injected `ARK_API_KEY` reference；one-use permit紧邻唯一POST消费，不自动重试POST；poll/fetch绑定exact task/model/endpoint intent，redirect、cross-origin、oversize、MIME/container/brand mismatch均fail closed。默认payload始终显式发送`generate_audio`，但省略false/default/MP4/zero-valued optional defaults；非默认值继续显式发送。原offline focused/recovery evidence为`517 passed`，本次payload regression与相关safety/recovery组合为`108 passed`。
 
+## Shot Continuity (provider-neutral technical core)
+
+Shot Continuity现在能把一个activated generated-video candidate的exact terminal frame提取为content-addressed PNG，并以sealed extraction/evidence、source Shot/candidate/generation/Registry/provenance和continuity constraints绑定下一条I2V request。Manifest 2.8仍由同一个`ProductionStateCommitter`拥有multi-asset candidate activation与explicit recovery；P5只沿显式terminal input edge计算真实downstream closure，`ResolvedTimeline`、P4 audio/captions/final mux与HyperFrames renderer不变。
+
+当前structured continuity constraints进入request fingerprint、P5 invalidation和后续review lineage；Hailuo/Seedance adapter实际提交的是exact first-frame bytes与既有prompt字段，并没有Provider原生的scene/camera/motion/lighting结构化参数。因此offline payload acceptance不等于这些语义约束已被模型执行，更不等于subjective continuity acceptance。
+
+`MiniMax-Hailuo-2.3` first-frame I2V和Seedance 2.0 Mini first-frame/audio-opt-out payload已通过offline tests。没有执行新的Provider submit或视频生成。本机MiniMax H3 checkpoint与native ComfyUI I2V node虽已识别，但缺少sealed complete workflow/profile，因此没有启用local adapter，也不存在local/live/three-lane/subjective quality acceptance。
+
 2026-08-19一次单独授权的Mini诊断使用one POST到达provider `succeeded`并取得1,278,577-byte H.264 MP4（SHA-256 `b6ea0864d3b400cf1648868a816eedc1c24f42c2bc605a60335b9f982ea91c67`）。该诊断为定位原`HTTP 400`而省略全部optional/default fields，也因此省略`generate_audio`并收到意外AAC音轨；它证明Mini cloud submit/poll/fetch connectivity，不证明当前tracked `generate_audio:false` payload已live accepted。Reservation尚未按exact provider billing结算，也未执行candidate activation。Fetch成功本身不会自动激活任何production state；只有settled Paid Provider budget、exact request/status/fetch evidence与held-FD本地probe全部通过后，显式调用既有committer activation path才会物化candidate。未来每次live submit仍需新的exact access、current pricing snapshot、finite budget、egress authorization和明确的一次submit授权。
 
 最终activation/recovery closure由`a089eac`提交；fresh staged与commit-range receipts分别为`.agent/harness/runs/p8-video-activation-20260819-v6/receipt.json`和`.agent/harness/runs/p8-video-activation-20260819-range-v1/receipt.json`。其中完整`production_video_provider_tests`为`742 passed`，production contracts为`2036 passed, 3 skipped`，Architecture Gate PASS。

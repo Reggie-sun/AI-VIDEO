@@ -5,6 +5,9 @@ from __future__ import annotations
 import hashlib
 import os
 import re
+import subprocess
+import tempfile
+from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from fractions import Fraction
 from pathlib import Path
@@ -14,17 +17,20 @@ from pydantic import ConfigDict, Field, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.image import MeasuredPng, measure_png_bytes
 from ai_video.production.models import (
     AssetRecord,
     AssetSourceKind,
     AssetType,
     EgressMetadata,
+    RegistrySnapshotPointer,
     StrictModel,
     ToolIdentity,
     VideoAssetMetadata,
 )
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
+    TerminalFrameEvidence,
     VideoFetchReceipt,
     VideoTaskObservation,
 )
@@ -58,6 +64,246 @@ class MeasuredVideoMetadata(_VideoArtifactStrictModel):
     audio_stream_count: int = Field(strict=True, ge=0)
     size_bytes: int = Field(strict=True, gt=0)
     artifact_sha256: str = Field(pattern=_SHA256)
+
+
+@dataclass(frozen=True)
+class TerminalFrameExtractionResult:
+    png_bytes: bytes
+    extractor_name: str
+    extractor_version: str
+
+
+class TerminalFrameExtractionReceipt(_VideoArtifactStrictModel):
+    source_shot_id: str = Field(pattern=_SAFE_ID.pattern)
+    source_shot_revision: int = Field(strict=True, ge=1)
+    source_shot_content_hash: str = Field(pattern=_SHA256)
+    source_video_asset_id: str = Field(pattern=_SAFE_ID.pattern)
+    source_video_sha256: str = Field(pattern=_SHA256)
+    source_generation_id: str = Field(pattern=_SAFE_ID.pattern)
+    source_request_input_hash: str = Field(pattern=_SHA256)
+    source_resolved_generation_hash: str = Field(pattern=_SHA256)
+    source_provenance_receipt_id: str = Field(pattern=_SAFE_ID.pattern)
+    source_container_name: Literal["mp4"]
+    source_codec_name: str = Field(min_length=1)
+    source_width: int = Field(strict=True, gt=0)
+    source_height: int = Field(strict=True, gt=0)
+    source_fps_numerator: int = Field(strict=True, gt=0)
+    source_fps_denominator: int = Field(strict=True, gt=0)
+    source_duration_milliseconds: int = Field(strict=True, gt=0)
+    source_frame_count: int = Field(strict=True, gt=0)
+    frame_index: int = Field(strict=True, ge=0)
+    timestamp_numerator: int = Field(strict=True, ge=0)
+    timestamp_denominator: int = Field(strict=True, gt=0)
+    selection_rule: Literal["generated_candidate_terminal"]
+    extraction_contract_version: Literal["terminal-frame-v1"]
+    extractor_name: str = Field(pattern=_SAFE_ID.pattern)
+    extractor_version: str = Field(pattern=_SAFE_ID.pattern)
+    extracted_asset_id: str = Field(pattern=_SAFE_ID.pattern)
+    extracted_sha256: str = Field(pattern=_SHA256)
+    extracted_mime_type: Literal["image/png"]
+    extracted_size_bytes: int = Field(strict=True, gt=0)
+    extracted_width: int = Field(strict=True, gt=0)
+    extracted_height: int = Field(strict=True, gt=0)
+    extracted_color_space: Literal["unmeasured"]
+    content_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_seal(self) -> "TerminalFrameExtractionReceipt":
+        if self.frame_index != self.source_frame_count - 1:
+            raise ValueError("terminal extraction must select the last source frame")
+        expected = canonical_sha256(
+            {
+                "schema": "ai-video-terminal-frame-extraction/1",
+                **self.model_dump(mode="json", exclude={"content_hash"}),
+            }
+        )
+        if self.content_hash != expected:
+            raise ValueError("terminal extraction receipt content hash is invalid")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "TerminalFrameExtractionReceipt":
+        data = dict(values)
+        candidate = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            {
+                "schema": "ai-video-terminal-frame-extraction/1",
+                **candidate.model_dump(
+                    mode="json", exclude={"content_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
+TerminalFrameExtractor = Callable[[bytes, int], TerminalFrameExtractionResult]
+
+
+def _default_terminal_frame_extractor(
+    source_bytes: bytes, frame_index: int
+) -> TerminalFrameExtractionResult:
+    from ai_video.ffmpeg_tools import run_command
+
+    with tempfile.TemporaryDirectory(prefix="ai-video-terminal-frame-") as scratch:
+        source = Path(scratch) / "source.mp4"
+        target = Path(scratch) / "terminal.png"
+        source.write_bytes(source_bytes)
+        run_command(
+            [
+                "ffmpeg",
+                "-y",
+                "-i",
+                str(source),
+                "-vf",
+                f"select=eq(n\\,{frame_index})",
+                "-frames:v",
+                "1",
+                str(target),
+            ]
+        )
+        try:
+            version_line = subprocess.run(
+                ["ffmpeg", "-version"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.splitlines()[0]
+            version = version_line.split()[2]
+            payload = target.read_bytes()
+        except (IndexError, OSError, subprocess.SubprocessError) as exc:
+            raise _video_artifact_error(
+                "Terminal frame extractor identity or output is unreadable."
+            ) from exc
+    return TerminalFrameExtractionResult(
+        png_bytes=payload,
+        extractor_name="ffmpeg",
+        extractor_version=version,
+    )
+
+
+def extract_terminal_frame_candidate(
+    held_fd: int,
+    *,
+    request: ResolvedVideoGenerationRequest,
+    measured_video: MeasuredVideoMetadata,
+    source_provenance_receipt_id: str,
+    extracted_asset_id: str,
+    extractor: TerminalFrameExtractor | None = None,
+) -> tuple[bytes, MeasuredPng, TerminalFrameExtractionReceipt]:
+    """Extract and seal the exact final decoded frame from held source bytes."""
+
+    scope = request.activation_scope
+    if scope is None or not scope.request.seal_terminal_frame:
+        raise _video_artifact_error(
+            "Terminal frame extraction requires an explicitly sealed request."
+        )
+    opened = os.fstat(held_fd)
+    position = os.lseek(held_fd, 0, os.SEEK_CUR)
+    os.lseek(held_fd, 0, os.SEEK_SET)
+    source_bytes = b""
+    while chunk := os.read(held_fd, 1024 * 1024):
+        source_bytes += chunk
+    os.lseek(held_fd, position, os.SEEK_SET)
+    if (
+        opened.st_nlink != 1
+        or len(source_bytes) != measured_video.size_bytes
+        or hashlib.sha256(source_bytes).hexdigest()
+        != measured_video.artifact_sha256
+    ):
+        raise _video_artifact_error(
+            "Terminal frame extraction requires the exact measured source bytes."
+        )
+    frame_index = measured_video.frame_count - 1
+    result = (extractor or _default_terminal_frame_extractor)(
+        source_bytes, frame_index
+    )
+    measured_png = measure_png_bytes(result.png_bytes)
+    if (
+        measured_png.width != measured_video.width
+        or measured_png.height != measured_video.height
+    ):
+        raise _video_artifact_error(
+            "Terminal frame dimensions do not match the source video."
+        )
+    original = scope.request
+    receipt = TerminalFrameExtractionReceipt.create(
+        source_shot_id=original.target_shot_id,
+        source_shot_revision=original.target_shot_revision,
+        source_shot_content_hash=original.target_shot_content_hash,
+        source_video_asset_id=request.output_asset_id,
+        source_video_sha256=measured_video.artifact_sha256,
+        source_generation_id=request.generation_id,
+        source_request_input_hash=request.request_input_hash,
+        source_resolved_generation_hash=request.resolved_generation_hash,
+        source_provenance_receipt_id=source_provenance_receipt_id,
+        source_container_name=measured_video.container_name,
+        source_codec_name=measured_video.codec_name,
+        source_width=measured_video.width,
+        source_height=measured_video.height,
+        source_fps_numerator=measured_video.fps_numerator,
+        source_fps_denominator=measured_video.fps_denominator,
+        source_duration_milliseconds=measured_video.duration_milliseconds,
+        source_frame_count=measured_video.frame_count,
+        frame_index=frame_index,
+        timestamp_numerator=frame_index * measured_video.fps_denominator,
+        timestamp_denominator=measured_video.fps_numerator,
+        selection_rule="generated_candidate_terminal",
+        extraction_contract_version="terminal-frame-v1",
+        extractor_name=result.extractor_name,
+        extractor_version=result.extractor_version,
+        extracted_asset_id=extracted_asset_id,
+        extracted_sha256=measured_png.sha256,
+        extracted_mime_type="image/png",
+        extracted_size_bytes=measured_png.size_bytes,
+        extracted_width=measured_png.width,
+        extracted_height=measured_png.height,
+        extracted_color_space="unmeasured",
+    )
+    return result.png_bytes, measured_png, receipt
+
+
+def bind_terminal_frame_evidence(
+    extraction: TerminalFrameExtractionReceipt,
+    *,
+    source_registry: RegistrySnapshotPointer,
+) -> TerminalFrameEvidence:
+    data = extraction.model_dump(mode="python", exclude={"content_hash"})
+    return TerminalFrameEvidence.create(
+        **data,
+        source_registry=source_registry,
+        extraction_receipt_id=extraction.content_hash,
+    )
+
+
+def build_terminal_frame_asset_record(
+    *,
+    request: ResolvedVideoGenerationRequest,
+    extraction: TerminalFrameExtractionReceipt,
+) -> AssetRecord:
+    scope = request.activation_scope
+    if scope is None:
+        raise _video_artifact_error(
+            "Terminal frame asset requires durable authoring scope."
+        )
+    return AssetRecord(
+        asset_id=extraction.extracted_asset_id,
+        asset_type=AssetType.IMAGE,
+        artifact_path=Path(f"assets/files/{extraction.extracted_sha256}.png"),
+        sha256=extraction.extracted_sha256,
+        size_bytes=extraction.extracted_size_bytes,
+        mime_type="image/png",
+        width=extraction.extracted_width,
+        height=extraction.extracted_height,
+        source_kind=AssetSourceKind.DERIVED,
+        tool=ToolIdentity(
+            name=extraction.extractor_name,
+            version=extraction.extractor_version,
+        ),
+        input_artifact_ids=(request.output_asset_id,),
+        input_fingerprint=extraction.content_hash,
+        creation_receipt_id=extraction.content_hash,
+        usage_license=scope.usage_license,
+    )
 
 
 class VideoProbeReceipt(_VideoArtifactStrictModel):
@@ -342,8 +588,13 @@ def build_generated_video_asset_record(
 
 __all__ = [
     "MeasuredVideoMetadata",
+    "TerminalFrameExtractionReceipt",
+    "TerminalFrameExtractionResult",
     "VideoProbeReceipt",
     "VideoProvenanceReceipt",
+    "bind_terminal_frame_evidence",
     "build_generated_video_asset_record",
+    "build_terminal_frame_asset_record",
+    "extract_terminal_frame_candidate",
     "probe_generated_video_candidate",
 ]

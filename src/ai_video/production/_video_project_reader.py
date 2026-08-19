@@ -12,23 +12,29 @@ from ai_video.production._paid_provider_project_reader import (
     load_paid_provider_submit_receipt,
 )
 from ai_video.production.models import (
+    AssetRecord,
     AssetSourceKind,
     AssetType,
     LoadedProductionProject,
     PaidProviderAttemptPhase,
     ProductionManifest,
     StateCommitStatus,
+    StateCommitAttempt,
     VideoAttemptPhase,
     VideoFetchReceiptPointer,
     VideoGenerationAttemptState,
     VideoRequestReceiptPointer,
     VideoStatusReceiptPointer,
+    TerminalFrameEvidencePointer,
+    TerminalFrameExtractionReceiptPointer,
 )
 from ai_video.production.paid_provider import BudgetReservationStatus
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_video_probe_receipt_path,
     canonical_video_provenance_receipt_path,
+    canonical_image_asset_path,
+    canonical_terminal_frame_extraction_receipt_path,
     resolve_contained_path,
 )
 from ai_video.production.video import (
@@ -37,10 +43,13 @@ from ai_video.production.video import (
     VideoSubmission,
     VideoTaskObservation,
     VideoTaskState,
+    TerminalFrameEvidence,
 )
 from ai_video.production.video_artifact import (
+    TerminalFrameExtractionReceipt,
     VideoProbeReceipt,
     VideoProvenanceReceipt,
+    bind_terminal_frame_evidence,
 )
 
 
@@ -137,6 +146,87 @@ def load_video_fetch_receipt(
     return receipt
 
 
+def load_terminal_frame_evidence(
+    root: str | Path, pointer: TerminalFrameEvidencePointer
+) -> TerminalFrameEvidence:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
+        evidence = TerminalFrameEvidence.model_validate_json(raw.data)
+        extraction_path = resolve_contained_path(
+            resolved_root,
+            canonical_terminal_frame_extraction_receipt_path(
+                evidence.extraction_receipt_id
+            ),
+            allowed_root=resolved_root / "state" / "video-generation",
+        )
+        extraction_raw = _read_regular_file_nofollow(
+            extraction_path,
+            contained_by=resolved_root / "state" / "video-generation",
+        )
+        extraction = TerminalFrameExtractionReceipt.model_validate_json(
+            extraction_raw.data
+        )
+        image_path = resolve_contained_path(
+            resolved_root,
+            canonical_image_asset_path(evidence.extracted_sha256),
+            allowed_root=resolved_root / "assets",
+        )
+        image = _read_regular_file_nofollow(
+            image_path, contained_by=resolved_root / "assets"
+        )
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen terminal frame evidence.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or evidence.content_hash != pointer.content_hash
+        or evidence.extracted_asset_id != pointer.extracted_asset_id
+        or evidence.extracted_sha256 != pointer.extracted_sha256
+        or extraction.content_hash != evidence.extraction_receipt_id
+        or bind_terminal_frame_evidence(
+            extraction, source_registry=evidence.source_registry
+        )
+        != evidence
+        or image.file_sha256 != evidence.extracted_sha256
+        or len(image.data) != evidence.extracted_size_bytes
+    ):
+        raise _invalid("Terminal frame evidence pointer identity is invalid.")
+    return evidence
+
+
+def load_terminal_frame_extraction(
+    root: str | Path, pointer: TerminalFrameExtractionReceiptPointer
+) -> tuple[bytes, TerminalFrameExtractionReceipt]:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
+        extraction = TerminalFrameExtractionReceipt.model_validate_json(raw.data)
+        image_path = resolve_contained_path(
+            resolved_root,
+            canonical_image_asset_path(extraction.extracted_sha256),
+            allowed_root=resolved_root / "assets",
+        )
+        image = _read_regular_file_nofollow(
+            image_path, contained_by=resolved_root / "assets"
+        )
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen terminal frame extraction.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or extraction.content_hash != pointer.content_hash
+        or extraction.extracted_asset_id != pointer.extracted_asset_id
+        or extraction.extracted_sha256 != pointer.extracted_sha256
+        or image.file_sha256 != extraction.extracted_sha256
+        or len(image.data) != extraction.extracted_size_bytes
+    ):
+        raise _invalid("Terminal frame extraction pointer identity is invalid.")
+    return image.data, extraction
+
+
 def verify_video_evidence(
     root: str | Path, states: Iterable[VideoGenerationAttemptState]
 ) -> None:
@@ -222,6 +312,87 @@ def _load_video_receipt(root: Path, path: Path, model, label: str):
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
         raise _invalid(f"Could not reopen {label}.", str(exc)) from exc
     return receipt
+
+
+def _verify_active_terminal_frame(
+    bundle: LoadedProductionProject,
+    attempt: StateCommitAttempt,
+    request: ResolvedVideoGenerationRequest,
+    video_asset: AssetRecord,
+    provenance: VideoProvenanceReceipt,
+) -> None:
+    state = attempt.video_generation_state
+    scope = request.activation_scope
+    if state is None or scope is None:
+        raise _invalid("Active generated video has no durable authoring scope.")
+    expects_terminal = scope.request.seal_terminal_frame
+    pointers_present = (
+        state.terminal_frame_extraction is not None
+        and state.terminal_frame_evidence is not None
+    )
+    if not expects_terminal:
+        if (
+            pointers_present
+            or state.terminal_frame_extraction is not None
+            or state.terminal_frame_evidence is not None
+            or state.candidate_continuity_asset_ids
+        ):
+            raise _invalid("Unexpected terminal frame state is active.")
+        return
+    if not pointers_present:
+        raise _invalid("Active terminal frame evidence is incomplete.")
+
+    assert state.terminal_frame_extraction is not None
+    assert state.terminal_frame_evidence is not None
+    _, extraction = load_terminal_frame_extraction(
+        bundle.root, state.terminal_frame_extraction
+    )
+    evidence = load_terminal_frame_evidence(bundle.root, state.terminal_frame_evidence)
+    expected_asset_id = f"{request.output_asset_id}:terminal-frame"
+    assets = {asset.asset_id: asset for asset in bundle.registry.assets}
+    terminal_asset = assets.get(expected_asset_id)
+    metadata = video_asset.video_metadata
+    if (
+        metadata is None
+        or state.candidate_continuity_asset_ids != (expected_asset_id,)
+        or extraction.content_hash != evidence.extraction_receipt_id
+        or evidence.source_registry != bundle.manifest.active_registry
+        or evidence.source_registry != attempt.candidate_registry
+        or evidence.source_shot_id != scope.request.target_shot_id
+        or evidence.source_shot_revision != scope.request.target_shot_revision
+        or evidence.source_shot_content_hash
+        != scope.request.target_shot_content_hash
+        or evidence.source_video_asset_id != request.output_asset_id
+        or evidence.source_video_sha256 != video_asset.sha256
+        or evidence.source_generation_id != request.generation_id
+        or evidence.source_request_input_hash != request.request_input_hash
+        or evidence.source_resolved_generation_hash
+        != request.resolved_generation_hash
+        or evidence.source_provenance_receipt_id != provenance.content_hash
+        or evidence.source_container_name != metadata.container_name
+        or evidence.source_codec_name != metadata.codec_name
+        or evidence.source_width != metadata.width
+        or evidence.source_height != metadata.height
+        or evidence.source_fps_numerator != metadata.fps_numerator
+        or evidence.source_fps_denominator != metadata.fps_denominator
+        or evidence.source_duration_milliseconds != metadata.duration_milliseconds
+        or evidence.source_frame_count != metadata.frame_count
+        or terminal_asset is None
+        or terminal_asset.asset_type is not AssetType.IMAGE
+        or terminal_asset.source_kind is not AssetSourceKind.DERIVED
+        or terminal_asset.artifact_path
+        != canonical_image_asset_path(evidence.extracted_sha256)
+        or terminal_asset.sha256 != evidence.extracted_sha256
+        or terminal_asset.size_bytes != evidence.extracted_size_bytes
+        or terminal_asset.mime_type != evidence.extracted_mime_type
+        or terminal_asset.width != evidence.extracted_width
+        or terminal_asset.height != evidence.extracted_height
+        or terminal_asset.input_artifact_ids != (request.output_asset_id,)
+        or terminal_asset.input_fingerprint != extraction.content_hash
+        or terminal_asset.creation_receipt_id != extraction.content_hash
+        or terminal_asset.usage_license != scope.usage_license
+    ):
+        raise _invalid("Active terminal frame evidence chain is invalid.")
 
 
 def _verify_active_generated_video(
@@ -349,6 +520,7 @@ def _verify_active_generated_video(
         or reservation.actual_cost_microunits is None
     ):
         raise _invalid("Active generated video provenance chain is invalid.")
+    _verify_active_terminal_frame(bundle, attempt, request, asset, provenance)
 
 
 def verify_manifest_video_evidence(

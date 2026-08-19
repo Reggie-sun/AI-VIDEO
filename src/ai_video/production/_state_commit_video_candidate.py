@@ -32,6 +32,8 @@ from ai_video.production.models import (
     RegistryDependencyEvidence,
     RegistrySnapshotPointer,
     StateCommitStatus,
+    TerminalFrameEvidencePointer,
+    TerminalFrameExtractionReceiptPointer,
     VideoAttemptPhase,
 )
 from ai_video.production.paid_provider import BudgetReservationStatus
@@ -39,16 +41,23 @@ from ai_video.production.paths import (
     _open_regular_file_nofollow,
     _read_regular_file_nofollow,
     canonical_video_asset_path,
+    canonical_image_asset_path,
     canonical_video_probe_receipt_path,
     canonical_video_provenance_receipt_path,
+    canonical_terminal_frame_evidence_path,
+    canonical_terminal_frame_extraction_receipt_path,
 )
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.video import ResolvedVideoGenerationRequest
 from ai_video.production.video_artifact import (
     MeasuredVideoMetadata,
+    TerminalFrameExtractor,
     VideoProbeReceipt,
     VideoProvenanceReceipt,
+    bind_terminal_frame_evidence,
     build_generated_video_asset_record,
+    build_terminal_frame_asset_record,
+    extract_terminal_frame_candidate,
     probe_generated_video_candidate,
 )
 
@@ -89,6 +98,7 @@ class VideoCandidatePreparer(Protocol):
         probe_receipt: VideoProbeReceipt,
         provenance: VideoProvenanceReceipt,
         asset_record: AssetRecord,
+        continuity_asset_record: AssetRecord | None = None,
     ) -> PreparedVideoCandidate: ...
 
 
@@ -120,6 +130,7 @@ def resolve_video_activation_dependency_state(
     registry_pointer: RegistrySnapshotPointer,
     target_shot_id: str,
     output_asset_id: str,
+    continuity_asset_id: str | None = None,
 ) -> DependencyResolution:
     """Apply the exact generated asset and target visual in a restart-safe form."""
 
@@ -128,16 +139,24 @@ def resolve_video_activation_dependency_state(
     visual_node_id = shot_projection_node_id(
         target_shot_id, DependencySemanticRole.VISUAL.value
     )
-    asset_id = asset_node_id(output_asset_id)
-    if visual_node_id not in node_by_id or asset_id not in node_by_id:
+    asset_ids = [asset_node_id(output_asset_id)]
+    if continuity_asset_id is not None:
+        asset_ids.append(asset_node_id(continuity_asset_id))
+    if visual_node_id not in node_by_id or any(
+        node_id not in node_by_id for node_id in asset_ids
+    ):
         raise _state_invalid("Video activation target dependency nodes are missing.")
     seeds = [
-        item for item in base_states if item.node_id not in {visual_node_id, asset_id}
+        item
+        for item in base_states
+        if item.node_id not in {visual_node_id, *asset_ids}
     ]
-    for node_id, pointer, owner in (
-        (visual_node_id, project_pointer, "project_snapshot"),
-        (asset_id, registry_pointer, "registry_snapshot"),
-    ):
+    owned_nodes = [(visual_node_id, project_pointer, "project_snapshot")]
+    owned_nodes.extend(
+        (node_id, registry_pointer, "registry_snapshot")
+        for node_id in asset_ids
+    )
+    for node_id, pointer, owner in owned_nodes:
         node = node_by_id[node_id]
         evidence = (
             ProjectDependencyEvidence(
@@ -175,6 +194,7 @@ def validate_video_activation_candidate(
     base_project: LoadedProductionProject,
     request: ResolvedVideoGenerationRequest,
     asset_record: AssetRecord,
+    continuity_asset_record: AssetRecord | None,
     prepared: PreparedVideoCandidate,
 ) -> PreparedVideoCandidate:
     scope = request.activation_scope
@@ -226,10 +246,15 @@ def validate_video_activation_candidate(
 
     base_assets = base_project.registry.assets
     registry = prepared.candidate_registry
+    appended_assets = (
+        (asset_record, continuity_asset_record)
+        if continuity_asset_record is not None
+        else (asset_record,)
+    )
     if (
         registry.schema_version != "2.2"
         or registry.assets[: len(base_assets)] != base_assets
-        or registry.assets[len(base_assets):] != (asset_record,)
+        or registry.assets[len(base_assets):] != appended_assets
         or registry_semantic_sha256(registry) != registry.content_hash
         or registry.revision_id != registry.content_hash
     ):
@@ -249,6 +274,15 @@ def validate_video_activation_candidate(
         != {
             **base_project.asset_paths,
             request.output_asset_id: base_project.root / asset_record.artifact_path,
+            **(
+                {
+                    continuity_asset_record.asset_id: (
+                        base_project.root / continuity_asset_record.artifact_path
+                    )
+                }
+                if continuity_asset_record is not None
+                else {}
+            ),
         }
     ):
         raise _state_invalid("Video candidate changed unrelated project content.")
@@ -282,6 +316,11 @@ def validate_video_activation_candidate(
         registry_pointer=prepared.candidate_registry_pointer,
         target_shot_id=original.target_shot_id,
         output_asset_id=request.output_asset_id,
+        continuity_asset_id=(
+            continuity_asset_record.asset_id
+            if continuity_asset_record is not None
+            else None
+        ),
     )
     if (
         prepared.candidate_graph != expected_graph
@@ -322,6 +361,7 @@ class _StateCommitVideoCandidateMixin:
         *,
         attempt_id: str,
         probe: Callable[[int], dict] | None = None,
+        terminal_frame_extractor: TerminalFrameExtractor | None = None,
     ):
         """Measure fetched bytes and persist an inactive exact bundle candidate."""
 
@@ -368,6 +408,8 @@ class _StateCommitVideoCandidateMixin:
             request = self._reopen_video_request(state.request)
             observation = self._reopen_video_status(state.latest_observation)
             fetch_receipt = self._reopen_video_fetch(state.fetch_receipt)
+            terminal_frame_bytes = None
+            terminal_extraction = None
             with _open_regular_file_nofollow(
                 self._project_root / state.fetch_receipt.artifact_path,
                 contained_by=(
@@ -380,12 +422,98 @@ class _StateCommitVideoCandidateMixin:
                     fetch_receipt,
                     probe=probe,
                 )
-            provenance = VideoProvenanceReceipt.create(
-                request=request,
-                observation=observation,
-                fetch_receipt=fetch_receipt,
-                probe_receipt=probe_receipt,
-            )
+                provenance = VideoProvenanceReceipt.create(
+                    request=request,
+                    observation=observation,
+                    fetch_receipt=fetch_receipt,
+                    probe_receipt=probe_receipt,
+                )
+                if (
+                    request.activation_scope.request.seal_terminal_frame
+                    and state.terminal_frame_extraction is None
+                ):
+                    terminal_frame_bytes, _, terminal_extraction = (
+                        extract_terminal_frame_candidate(
+                            held_fd,
+                            request=request,
+                            measured_video=measured,
+                            source_provenance_receipt_id=provenance.content_hash,
+                            extracted_asset_id=(
+                                f"{request.output_asset_id}:terminal-frame"
+                            ),
+                            extractor=terminal_frame_extractor,
+                        )
+                    )
+            if state.terminal_frame_extraction is not None:
+                terminal_frame_bytes, terminal_extraction = (
+                    self._reopen_terminal_frame_extraction(
+                        state.terminal_frame_extraction
+                    )
+                )
+            elif terminal_extraction is not None and terminal_frame_bytes is not None:
+                terminal_asset_artifact = _prepared_artifact(
+                    canonical_image_asset_path(terminal_extraction.extracted_sha256),
+                    terminal_frame_bytes,
+                )
+                terminal_extraction_artifact = _prepared_artifact(
+                    canonical_terminal_frame_extraction_receipt_path(
+                        terminal_extraction.content_hash
+                    ),
+                    _canonical_json_bytes(terminal_extraction),
+                )
+                for artifact in (
+                    terminal_asset_artifact,
+                    terminal_extraction_artifact,
+                ):
+                    self._write_immutable_artifact(
+                        artifact, attempt_id=attempt_id
+                    )
+                    self._reopen_exact_video_artifact(artifact)
+                extraction_pointer = TerminalFrameExtractionReceiptPointer(
+                    path=terminal_extraction_artifact.relative_path,
+                    content_hash=terminal_extraction.content_hash,
+                    extracted_asset_id=terminal_extraction.extracted_asset_id,
+                    extracted_sha256=terminal_extraction.extracted_sha256,
+                    file_sha256=terminal_extraction_artifact.file_sha256,
+                )
+                checkpoint_state = state.model_copy(
+                    update={"terminal_frame_extraction": extraction_pointer}
+                )
+                checkpoint_attempt = _validated_transition(
+                    attempt,
+                    {"video_generation_state": checkpoint_state},
+                )
+                checkpoint_manifest = _validated_transition(
+                    manifest,
+                    {
+                        "manifest_revision": manifest.manifest_revision + 1,
+                        "attempts": tuple(
+                            checkpoint_attempt
+                            if item.attempt_id == attempt_id
+                            else item
+                            for item in manifest.attempts
+                        ),
+                    },
+                )
+                self._write_manifest_atomic(checkpoint_manifest)
+                manifest = self._read_manifest()
+                attempt = self._video_attempt(manifest, attempt_id)
+                state = attempt.video_generation_state
+                if state is None:
+                    raise _state_invalid(
+                        "Terminal extraction checkpoint lost video state."
+                    )
+            if terminal_extraction is not None and (
+                terminal_extraction.source_resolved_generation_hash
+                != request.resolved_generation_hash
+                or terminal_extraction.source_provenance_receipt_id
+                != provenance.content_hash
+                or terminal_extraction.source_video_sha256
+                != measured.artifact_sha256
+            ):
+                raise _state_invalid(
+                    "Terminal extraction checkpoint does not match exact source evidence."
+                )
             gate = self._reopen_paid_gate(paid_state.gate_receipt)
             egress = EgressMetadata(
                 remote=True,
@@ -404,6 +532,14 @@ class _StateCommitVideoCandidateMixin:
                 egress=egress,
                 cost_receipt_id=manifest.active_paid_provider_budget.content_hash,
             )
+            continuity_asset_record = (
+                build_terminal_frame_asset_record(
+                    request=request,
+                    extraction=terminal_extraction,
+                )
+                if terminal_extraction is not None
+                else None
+            )
             if self._video_candidate_preparer is None:
                 raise _state_invalid(
                     "Video candidate preparation requires an injected deterministic preparer."
@@ -420,6 +556,7 @@ class _StateCommitVideoCandidateMixin:
                 probe_receipt,
                 provenance,
                 asset_record,
+                continuity_asset_record,
             )
             if not isinstance(prepared, PreparedVideoCandidate):
                 raise _state_invalid("Video candidate preparer returned an unsafe value.")
@@ -427,6 +564,7 @@ class _StateCommitVideoCandidateMixin:
                 base_project=base_project,
                 request=request,
                 asset_record=asset_record,
+                continuity_asset_record=continuity_asset_record,
                 prepared=prepared,
             )
             fetched = _read_regular_file_nofollow(
@@ -442,6 +580,36 @@ class _StateCommitVideoCandidateMixin:
                 raise _state_invalid(
                     "Fetched video path changed after held-file validation."
                 )
+            terminal_evidence = (
+                bind_terminal_frame_evidence(
+                    terminal_extraction,
+                    source_registry=accepted.candidate_registry_pointer,
+                )
+                if terminal_extraction is not None
+                else None
+            )
+            terminal_evidence_artifact = (
+                _prepared_artifact(
+                    canonical_terminal_frame_evidence_path(
+                        terminal_evidence.content_hash
+                    ),
+                    _canonical_json_bytes(terminal_evidence),
+                )
+                if terminal_evidence is not None
+                else None
+            )
+            terminal_pointer = (
+                TerminalFrameEvidencePointer(
+                    path=terminal_evidence_artifact.relative_path,
+                    content_hash=terminal_evidence.content_hash,
+                    extracted_asset_id=terminal_evidence.extracted_asset_id,
+                    extracted_sha256=terminal_evidence.extracted_sha256,
+                    file_sha256=terminal_evidence_artifact.file_sha256,
+                )
+                if terminal_evidence is not None
+                and terminal_evidence_artifact is not None
+                else None
+            )
             artifacts = (
                 _prepared_artifact(
                     canonical_video_asset_path(measured.artifact_sha256),
@@ -454,6 +622,15 @@ class _StateCommitVideoCandidateMixin:
                 _prepared_artifact(
                     canonical_video_provenance_receipt_path(provenance.content_hash),
                     _canonical_json_bytes(provenance),
+                ),
+                *(
+                    (
+                        terminal_evidence_artifact,
+                    )
+                    if terminal_extraction is not None
+                    and terminal_frame_bytes is not None
+                    and terminal_evidence_artifact is not None
+                    else ()
                 ),
                 _prepared_artifact(
                     accepted.candidate_shot_path, accepted.candidate_shot_bytes
@@ -485,7 +662,14 @@ class _StateCommitVideoCandidateMixin:
             candidate_state = state.model_copy(
                 update={
                     "phase": VideoAttemptPhase.CANDIDATE,
+                    "terminal_frame_extraction": state.terminal_frame_extraction,
+                    "terminal_frame_evidence": terminal_pointer,
                     "candidate_video_asset_ids": (request.output_asset_id,),
+                    "candidate_continuity_asset_ids": (
+                        (continuity_asset_record.asset_id,)
+                        if continuity_asset_record is not None
+                        else ()
+                    ),
                 }
             )
             candidate_attempt = _validated_transition(

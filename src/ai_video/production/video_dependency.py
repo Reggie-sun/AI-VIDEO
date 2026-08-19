@@ -3,7 +3,23 @@
 from __future__ import annotations
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.models import AssetRecord, AssetSourceKind, DependencyReason
+from collections.abc import Iterable, Mapping
+
+from ai_video.production.models import (
+    AssetRecord,
+    AssetSourceKind,
+    AssetType,
+    DependencyReason,
+)
+
+
+VideoContinuityEdgeArgs = tuple[
+    str,
+    str,
+    DependencyReason,
+    str,
+    Mapping[str, str],
+]
 
 
 def generated_video_semantic_fingerprint(asset: AssetRecord) -> str | None:
@@ -14,7 +30,7 @@ def generated_video_semantic_fingerprint(asset: AssetRecord) -> str | None:
         return None
     if asset.input_fingerprint != metadata.resolved_generation_hash:
         raise AiVideoError(
-            code=ErrorCode.PRODUCTION_GRAPH_INVALID,
+            code=ErrorCode.DEPENDENCY_GRAPH_INVALID,
             user_message=(
                 "generated video asset input identity does not match its "
                 "resolved generation"
@@ -32,7 +48,68 @@ def visual_asset_dependency_reason(asset: AssetRecord) -> DependencyReason:
     return DependencyReason.ASSET_BINDING
 
 
+def generated_video_continuity_edge_args(
+    assets: Iterable[AssetRecord],
+) -> tuple[VideoContinuityEdgeArgs, ...]:
+    """Project only explicit generated-video terminal-frame lineage into P5."""
+
+    ordered_assets = tuple(assets)
+    assets_by_id = {asset.asset_id: asset for asset in ordered_assets}
+    terminal_assets = {
+        asset.asset_id: asset
+        for asset in ordered_assets
+        if asset.asset_type is AssetType.IMAGE
+        and asset.source_kind is AssetSourceKind.DERIVED
+        and asset.asset_id.endswith(":terminal-frame")
+        and asset.input_artifact_ids
+        == (asset.asset_id.removesuffix(":terminal-frame"),)
+    }
+    edges: list[VideoContinuityEdgeArgs] = []
+    for terminal in terminal_assets.values():
+        source_asset_id = terminal.input_artifact_ids[0]
+        source = assets_by_id.get(source_asset_id)
+        if source is None or generated_video_semantic_fingerprint(source) is None:
+            continue
+        edges.append(
+            (
+                f"asset:{source_asset_id}",
+                f"asset:{terminal.asset_id}",
+                DependencyReason.GENERATION_INPUT,
+                "video.terminal_frame",
+                {
+                    "source_asset_id": source_asset_id,
+                    "source_generation_fingerprint": source.input_fingerprint,
+                    "terminal_asset_id": terminal.asset_id,
+                    "terminal_evidence_fingerprint": terminal.input_fingerprint,
+                },
+            )
+        )
+    for target in ordered_assets:
+        if generated_video_semantic_fingerprint(target) is None:
+            continue
+        for input_asset_id in target.input_artifact_ids:
+            terminal = terminal_assets.get(input_asset_id)
+            if terminal is None:
+                continue
+            edges.append(
+                (
+                    f"asset:{terminal.asset_id}",
+                    f"asset:{target.asset_id}",
+                    DependencyReason.GENERATION_INPUT,
+                    "video.reference_input",
+                    {
+                        "source_asset_id": terminal.asset_id,
+                        "source_asset_sha256": terminal.sha256,
+                        "target_asset_id": target.asset_id,
+                        "target_generation_fingerprint": target.input_fingerprint,
+                    },
+                )
+            )
+    return tuple(edges)
+
+
 __all__ = [
+    "generated_video_continuity_edge_args",
     "generated_video_semantic_fingerprint",
     "visual_asset_dependency_reason",
 ]

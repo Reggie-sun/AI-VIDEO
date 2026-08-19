@@ -1,13 +1,22 @@
-"""MiniMax Hailuo-2.3 V1 text-to-video Provider adapter.
+"""MiniMax Hailuo-2.3 V1 video Provider adapter.
 
-The adapter is deliberately explicit: it implements one 768P/6s/16:9 T2V
-profile against the official Chinese V1 dialect (``api.minimaxi.com``),
-consumes the existing Paid Provider permit immediately before submit,
-and never persists the signed result URL returned by MiniMax.
+The adapter is deliberately explicit: it implements two 768P/6s sealed
+variants against the official Chinese V1 dialect (``api.minimaxi.com``):
+
+* ``TEXT_TO_VIDEO`` with no image bindings;
+* ``IMAGE_TO_VIDEO`` with exactly one ``first_frame`` binding (no
+  ``last_frame`` and no extra references).
+
+Both variants consume the existing Paid Provider permit immediately
+before submit and never persist the signed result URL returned by
+MiniMax. Provider-specific image byte resolution, base64 encoding and
+``first_frame_image`` payload mapping happen inside the adapter and
+never enter the provider-neutral core contracts.
 """
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import re
@@ -38,6 +47,7 @@ from ai_video.production.video import (
     VideoGenerationMode,
     VideoGenerationPreview,
     VideoGenerationRequest,
+    VideoImageReferenceBinding,
     VideoOutputRequirement,
     VideoProviderCapabilities,
     VideoSubmission,
@@ -56,6 +66,7 @@ _PROVIDER_NAME = "minimax_hailuo"
 _PROVIDER_KIND = "minimax_hailuo"
 _PROFILE_VERSION = "hailuo-2.3-v1"
 _CAPABILITY_ID = "minimax-hailuo-2.3-v1-t2v-768p-6s-16x9"
+_I2V_CAPABILITY_ID = "minimax-hailuo-2.3-v1-i2v-768p-6s-first_frame"
 _FILE_ID_PREFIX = "hailuo-content-"
 _MAX_JSON_BYTES = 1_000_000
 _MAX_PROMPT_CHARACTERS = 2_000
@@ -70,6 +81,11 @@ _DEFINITIVE_REJECTION_HTTP_STATUSES = frozenset(
 _TRANSIENT_PROVIDER_CODES = frozenset(
     {1000, 1001, 1002, 1024, 1033, 1039, 1041, 2045, 2056}
 )
+_FIRST_FRAME_EGRESS_ITEM_ID = "first_frame_image"
+_PROMPT_EGRESS_ITEM_ID = "prompt"
+_I2V_IMAGE_MIME_TYPES = ("image/jpeg", "image/png", "image/webp")
+_MAX_I2V_IMAGE_BYTES = 20 * 1024 * 1024 - 1
+_MIN_I2V_IMAGE_DIMENSION = 301
 
 
 def _error(
@@ -174,6 +190,7 @@ class HttpxMiniMaxHailuoTransport:
 
 
 CredentialResolver = Callable[[], str]
+ImageResolver = Callable[[VideoImageReferenceBinding], bytes]
 
 
 _OUTPUT = VideoOutputRequirement(
@@ -207,9 +224,40 @@ _VARIANT = VideoCapabilityVariant(
     idempotent_submit=False,
     lookup_supported=True,
 )
+_I2V_OUTPUT = VideoOutputRequirement(
+    duration_seconds=6,
+    width=1366,
+    height=768,
+    fps=None,
+    container="mp4",
+    mime_type="video/mp4",
+    native_audio=False,
+)
+_I2V_VARIANT = VideoCapabilityVariant(
+    capability_id=_I2V_CAPABILITY_ID,
+    provider_kind=_PROVIDER_KIND,
+    model_id=_MODEL_ID,
+    profile_version=_PROFILE_VERSION,
+    execution_kind=VideoExecutionKind.REMOTE,
+    billing_kind=BillingKind.METERED,
+    mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+    output=_I2V_OUTPUT,
+    allowed_image_roles=("first_frame",),
+    required_first_frame=True,
+    max_reference_count=0,
+    allowed_image_mime_types=_I2V_IMAGE_MIME_TYPES,
+    max_image_bytes=_MAX_I2V_IMAGE_BYTES,
+    min_image_width=_MIN_I2V_IMAGE_DIMENSION,
+    min_image_height=_MIN_I2V_IMAGE_DIMENSION,
+    negative_prompt_supported=False,
+    seed_supported=False,
+    fps_supported=False,
+    idempotent_submit=False,
+    lookup_supported=True,
+)
 _CAPABILITIES = VideoProviderCapabilities.create(
     provider_name=_PROVIDER_NAME,
-    variants=(_VARIANT,),
+    variants=(_VARIANT, _I2V_VARIANT),
 )
 
 
@@ -360,10 +408,12 @@ class MiniMaxHailuoVideoProvider:
         *,
         transport: MiniMaxHailuoTransport,
         credential: CredentialResolver,
+        image_resolver: ImageResolver | None = None,
         now: Callable[[], datetime] | None = None,
     ) -> None:
         self._transport = transport
         self._credential = credential
+        self._image_resolver = image_resolver
         self._now = now or (lambda: datetime.now(UTC))
 
     def capabilities(self) -> VideoProviderCapabilities:
@@ -375,46 +425,194 @@ class MiniMaxHailuoVideoProvider:
             or request.provider_kind != _PROVIDER_KIND
             or request.model_id != _MODEL_ID
             or request.provider_profile.profile_version != _PROFILE_VERSION
-            or request.mode is not VideoGenerationMode.TEXT_TO_VIDEO
-            or request.image_bindings
             or request.negative_prompt_text
             or request.seed is not None
-            or request.output_requirement != _OUTPUT
         ):
             raise _error(
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
-                "MiniMax Hailuo request does not match the sealed 768P T2V capability.",
+                "MiniMax Hailuo request does not match the sealed 768P capability.",
             )
         if len(request.prompt_text) > _MAX_PROMPT_CHARACTERS:
             raise _error(
                 ErrorCode.VIDEO_REQUEST_INVALID,
                 "MiniMax Hailuo prompt exceeds 2000 characters.",
             )
-        return ResolvedVideoGenerationRequest.create(
-            request=request,
-            capability=_VARIANT,
-            effective_output=_OUTPUT,
-            effective_seed=None,
-            effective_negative_prompt_text="",
+        if request.mode is VideoGenerationMode.TEXT_TO_VIDEO:
+            if request.image_bindings or request.output_requirement != _OUTPUT:
+                raise _error(
+                    ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                    "MiniMax Hailuo T2V request must not include image bindings.",
+                )
+            return ResolvedVideoGenerationRequest.create(
+                request=request,
+                capability=_VARIANT,
+                effective_output=_OUTPUT,
+                effective_seed=None,
+                effective_negative_prompt_text="",
+            )
+        if request.mode is VideoGenerationMode.IMAGE_TO_VIDEO:
+            if request.output_requirement != _I2V_OUTPUT:
+                raise _error(
+                    ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                    "MiniMax Hailuo I2V request does not match the sealed 768P output.",
+                )
+            if len(request.image_bindings) != 1:
+                raise _error(
+                    ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                    "MiniMax Hailuo I2V request requires exactly one first_frame binding.",
+                )
+            binding = request.image_bindings[0]
+            if binding.role != "first_frame":
+                raise _error(
+                    ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                    "MiniMax Hailuo I2V does not support last_frame or reference roles.",
+                )
+            if (
+                binding.mime_type not in _I2V_IMAGE_MIME_TYPES
+                or binding.size_bytes is None
+                or binding.size_bytes <= 0
+                or binding.size_bytes > _MAX_I2V_IMAGE_BYTES
+                or binding.width < _MIN_I2V_IMAGE_DIMENSION
+                or binding.height < _MIN_I2V_IMAGE_DIMENSION
+                or binding.width * 5 < binding.height * 2
+                or binding.width * 2 > binding.height * 5
+            ):
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "MiniMax Hailuo I2V first-frame image does not match the sealed geometry/MIME/size.",
+                )
+            return ResolvedVideoGenerationRequest.create(
+                request=request,
+                capability=_I2V_VARIANT,
+                effective_output=_I2V_OUTPUT,
+                effective_seed=None,
+                effective_negative_prompt_text="",
+            )
+        raise _error(
+            ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+            "MiniMax Hailuo request does not match a sealed capability variant.",
         )
 
     def preview(self, request: ResolvedVideoGenerationRequest) -> VideoGenerationPreview:
         if (
             request.provider_name != _PROVIDER_NAME
-            or request.capability_id != _CAPABILITY_ID
-            or request.effective_output != _OUTPUT
+            or request.provider_kind != _PROVIDER_KIND
+            or request.model_id != _MODEL_ID
         ):
             raise _error(
                 ErrorCode.VIDEO_REQUEST_INVALID,
                 "MiniMax Hailuo resolved request is invalid.",
             )
-        return VideoGenerationPreview.create(
-            resolved=request,
-            estimated_cost_upper_bound_microunits=2_000_000,
-            currency="CNY",
-            destination=_ORIGIN,
-            egress_item_ids=("prompt",),
+        if request.capability_id == _CAPABILITY_ID:
+            if request.effective_output != _OUTPUT:
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "MiniMax Hailuo resolved T2V request is invalid.",
+                )
+            return VideoGenerationPreview.create(
+                resolved=request,
+                estimated_cost_upper_bound_microunits=2_000_000,
+                currency="CNY",
+                destination=_ORIGIN,
+                egress_item_ids=(_PROMPT_EGRESS_ITEM_ID,),
+            )
+        if request.capability_id == _I2V_CAPABILITY_ID:
+            if request.effective_output != _I2V_OUTPUT:
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "MiniMax Hailuo resolved I2V request is invalid.",
+                )
+            return VideoGenerationPreview.create(
+                resolved=request,
+                estimated_cost_upper_bound_microunits=3_000_000,
+                currency="CNY",
+                destination=_ORIGIN,
+                egress_item_ids=(
+                    _PROMPT_EGRESS_ITEM_ID,
+                    request.image_bindings[0].asset_id,
+                ),
+            )
+        raise _error(
+            ErrorCode.VIDEO_REQUEST_INVALID,
+            "MiniMax Hailuo resolved request is invalid.",
         )
+
+    def _validate_i2v_egress(
+        self,
+        prompt_items: tuple[object, ...],
+        request: ResolvedVideoGenerationRequest,
+        prompt_bytes: bytes,
+    ) -> None:
+        if len(prompt_items) != 2:
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo I2V paid preview must bind prompt and first_frame_image.",
+            )
+        items_by_id = {
+            getattr(item, "item_id", None): item for item in prompt_items
+        }
+        prompt_item = items_by_id.get(_PROMPT_EGRESS_ITEM_ID)
+        image_item = items_by_id.get(request.image_bindings[0].asset_id)
+        if prompt_item is None or image_item is None:
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo I2V paid preview must bind prompt and first_frame_image.",
+            )
+        if (
+            getattr(prompt_item, "sha256", None)
+            != hashlib.sha256(prompt_bytes).hexdigest()
+            or getattr(prompt_item, "size_bytes", None) != len(prompt_bytes)
+            or getattr(prompt_item, "mime_type", None) != "text/plain"
+            or getattr(prompt_item, "purpose", None) != "prompt"
+        ):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo I2V paid preview does not bind the exact prompt.",
+            )
+        binding = request.image_bindings[0]
+        if (
+            getattr(image_item, "sha256", None) != binding.asset_sha256
+            or getattr(image_item, "size_bytes", None) != binding.size_bytes
+            or getattr(image_item, "mime_type", None) != binding.mime_type
+            or getattr(image_item, "purpose", None) != "reference"
+        ):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo I2V paid preview does not bind the exact first-frame image.",
+            )
+
+    def _encode_first_frame(
+        self, request: ResolvedVideoGenerationRequest
+    ) -> str:
+        if self._image_resolver is None:
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo I2V requires an image byte resolver.",
+            )
+        binding = request.image_bindings[0]
+        try:
+            image_bytes = self._image_resolver(binding)
+        except Exception:
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo I2V first-frame image could not be resolved.",
+            ) from None
+        if not isinstance(image_bytes, (bytes, bytearray)):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo I2V first-frame image bytes are invalid.",
+            )
+        image_bytes = bytes(image_bytes)
+        if (
+            hashlib.sha256(image_bytes).hexdigest() != binding.asset_sha256
+            or len(image_bytes) != binding.size_bytes
+        ):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "MiniMax Hailuo I2V first-frame image bytes do not match binding.",
+            )
+        encoded = base64.b64encode(image_bytes).decode("ascii")
+        return f"data:{binding.mime_type};base64,{encoded}"
 
     def _credential_headers(self, *, json_body: bool) -> dict[str, str]:
         try:
@@ -547,34 +745,57 @@ class MiniMaxHailuoVideoProvider:
         prompt_bytes = request.prompt_text.encode("utf-8")
         prompt_items = paid_preview.egress_items
         if (
-            len(prompt_items) != 1
-            or prompt_items[0].item_id != "prompt"
-            or prompt_items[0].sha256 != hashlib.sha256(prompt_bytes).hexdigest()
-            or prompt_items[0].size_bytes != len(prompt_bytes)
-            or prompt_items[0].mime_type != "text/plain"
-            or prompt_items[0].purpose != "prompt"
-            or paid_preview.secret_reference.kind != _SECRET_REFERENCE_KIND
+            paid_preview.secret_reference.kind != _SECRET_REFERENCE_KIND
             or paid_preview.secret_reference.reference_id != _SECRET_REFERENCE_ID
         ):
             raise _error(
                 ErrorCode.VIDEO_REQUEST_INVALID,
-                "MiniMax Hailuo paid preview does not bind the exact prompt and credential.",
+                "MiniMax Hailuo paid preview does not bind the exact credential.",
             )
         if not _permit_is_valid(permit, binding):
             raise _error(
                 ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED,
                 "MiniMax Hailuo submit permit is invalid.",
             )
-        body = json.dumps(
-            {
-                "model": _MODEL_ID,
-                "prompt": request.prompt_text,
-                "duration": 6,
-                "resolution": "768P",
-            },
-            ensure_ascii=False,
-            separators=(",", ":"),
-        ).encode("utf-8")
+        is_i2v = request.capability_id == _I2V_CAPABILITY_ID
+        if is_i2v:
+            self._validate_i2v_egress(prompt_items, request, prompt_bytes)
+            first_frame_b64 = self._encode_first_frame(request)
+            body = json.dumps(
+                {
+                    "model": _MODEL_ID,
+                    "prompt": request.prompt_text,
+                    "duration": 6,
+                    "resolution": "768P",
+                    _FIRST_FRAME_EGRESS_ITEM_ID: first_frame_b64,
+                },
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        else:
+            if (
+                len(prompt_items) != 1
+                or prompt_items[0].item_id != _PROMPT_EGRESS_ITEM_ID
+                or prompt_items[0].sha256
+                != hashlib.sha256(prompt_bytes).hexdigest()
+                or prompt_items[0].size_bytes != len(prompt_bytes)
+                or prompt_items[0].mime_type != "text/plain"
+                or prompt_items[0].purpose != "prompt"
+            ):
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "MiniMax Hailuo paid preview does not bind the exact prompt and credential.",
+                )
+            body = json.dumps(
+                {
+                    "model": _MODEL_ID,
+                    "prompt": request.prompt_text,
+                    "duration": 6,
+                    "resolution": "768P",
+                },
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ).encode("utf-8")
         transport_request = MiniMaxHailuoTransportRequest(
             method="POST",
             url=_SUBMIT_URL,

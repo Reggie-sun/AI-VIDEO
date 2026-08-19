@@ -2,7 +2,7 @@
 
 ## Status
 
-本文档是独立的、docs-only 的 proposed contract。它不描述当前已实现的 runtime truth，不修改既有 P8 Provider contract，也不授权实现、重新生成视频、远程提交、付费调用、push 或 release。
+本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation，以及Hailuo 2.3和Seedance 2.0 Mini offline adapter mapping；下文“当前尚未实现”等陈述保留为implementation前baseline。Local MiniMax H3 sealed workflow/profile、任何新Provider live proof、重新生成Shot 2/3与subjective quality acceptance仍未完成，也未由本次technical implementation授权或证明。既有P8 Provider contract仍不被改写。
 
 当前已实现的是 frame-accurate composition：generated MP4 已能进入唯一的 `CompositionSpec -> ResolvedTimeline -> HyperFrames` 路径，并保持 P4 audio/caption/final mux 语义。当前尚未实现的是 semantic/visual continuity：三个独立生成的 Shot 不会因为精确硬切而自动共享场景、角色、镜头轴线、光线或运动状态。
 

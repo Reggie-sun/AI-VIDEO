@@ -30,7 +30,10 @@ from ai_video.production._state_commit_contracts import (
     _DurablePaidProviderSubmitPermit,
 )
 from ai_video.production.video import (
+    ContinuityConstraintSet,
+    ContinuityReferenceBinding,
     ProviderProfilePointer,
+    TerminalFrameEvidence,
     VideoCapabilityVariant,
     VideoFlexibleOutputRequirement,
     VideoGenerationMode,
@@ -158,6 +161,8 @@ def _request(
     media_bindings: tuple[VideoMediaReferenceBinding, ...] = (),
     output: VideoFlexibleOutputRequirement | None = None,
     seed: int | None = None,
+    continuity_binding: ContinuityReferenceBinding | None = None,
+    input_artifact_ids: tuple[str, ...] | None = None,
 ) -> VideoGenerationRequest:
     selected_output = output or VideoFlexibleOutputRequirement(
         timing_mode="exact_seconds",
@@ -187,13 +192,15 @@ def _request(
         prompt_text=PROMPT,
         negative_prompt_text="",
         image_bindings=image_bindings,
+        continuity_binding=continuity_binding,
         media_bindings=media_bindings,
         output_requirement=selected_output,
         seed=seed,
         base_project=_project_pointer(),
         base_registry=_registry_pointer(),
         base_dependency_graph=_graph_pointer(),
-        input_artifact_ids=(
+        input_artifact_ids=input_artifact_ids
+        or (
             "shot-1",
             *(binding.asset_id for binding in image_bindings),
             *(binding.asset_id for binding in media_bindings),
@@ -1296,6 +1303,140 @@ def test_mini_default_payload_omits_optional_defaults_but_preserves_audio_opt_ou
         "ratio": "16:9",
         "generate_audio": False,
         "duration": 5,
+    }
+
+
+def test_seedance_2_0_mini_continuity_binds_exact_terminal_frame_payload():
+    profile = _profile()
+    transport = _FakeTransport()
+    transport.responses.append(_json_response({"id": "task-seedance-mini-continuity-1"}))
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        now=lambda: FIXED_NOW,
+    )
+    terminal = TerminalFrameEvidence.create(
+        source_shot_id="shot-0",
+        source_shot_revision=1,
+        source_shot_content_hash=HASH_A,
+        source_video_asset_id="video-source-0",
+        source_video_sha256=HASH_B,
+        source_generation_id="seedance-generation-0",
+        source_request_input_hash=HASH_C,
+        source_resolved_generation_hash=HASH_D,
+        source_provenance_receipt_id="seedance-provenance-0",
+        extraction_receipt_id=HASH_D,
+        source_registry=_registry_pointer(),
+        source_container_name="mp4",
+        source_codec_name="h264",
+        source_width=864,
+        source_height=496,
+        source_fps_numerator=24,
+        source_fps_denominator=1,
+        source_duration_milliseconds=5000,
+        source_frame_count=120,
+        frame_index=119,
+        timestamp_numerator=119,
+        timestamp_denominator=24,
+        selection_rule="generated_candidate_terminal",
+        extraction_contract_version="terminal-frame-v1",
+        extractor_name="ffmpeg",
+        extractor_version="7.1",
+        extracted_asset_id="terminal-frame-shot-0",
+        extracted_sha256=HASH_B,
+        extracted_mime_type="image/png",
+        extracted_size_bytes=1_000_000,
+        extracted_width=864,
+        extracted_height=496,
+        extracted_color_space="srgb",
+    )
+    continuity = ContinuityReferenceBinding.create(
+        role="first_frame",
+        terminal_frame=terminal,
+        target_shot_id="shot-1",
+        target_shot_revision=1,
+        target_shot_content_hash=HASH_A,
+        constraints=ContinuityConstraintSet.create(
+            scene_identity={
+                "artifact_id": "scene-1",
+                "revision": 1,
+                "content_hash": HASH_A,
+            },
+            character_identities=(
+                {
+                    "artifact_id": "character-1",
+                    "revision": 1,
+                    "content_hash": HASH_B,
+                },
+            ),
+            camera_axis="axis-east-facing-left",
+            framing="medium-wide-subject-left-third",
+            lighting="warm-window-key-camera-right",
+            color="warm-amber-low-saturation",
+            motion_direction="subject-exits-screen-right",
+            exit_state="right-foot-forward-at-doorway",
+            entrance_state="right-foot-forward-entering-hall",
+        ),
+    )
+    first_frame = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id=terminal.extracted_asset_id,
+        asset_sha256=terminal.extracted_sha256,
+        mime_type=terminal.extracted_mime_type,
+        width=terminal.extracted_width,
+        height=terminal.extracted_height,
+        size_bytes=terminal.extracted_size_bytes,
+    )
+    request = _request(
+        profile,
+        model_id="doubao-seedance-2-0-mini-260615",
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        image_bindings=(first_frame,),
+        continuity_binding=continuity,
+        input_artifact_ids=(
+            "shot-1",
+            terminal.source_shot_id,
+            terminal.source_video_asset_id,
+            terminal.extracted_asset_id,
+        ),
+        output=VideoFlexibleOutputRequirement(
+            timing_mode="exact_seconds",
+            duration_seconds=5,
+            dimension_mode="exact",
+            width=864,
+            height=496,
+            resolution_label="480p",
+            ratio="16:9",
+            fps=24,
+            container="mp4",
+            mime_type="video/mp4",
+            native_audio=False,
+        ),
+    )
+    resolved = provider.resolve(request)
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview)
+    authorization = _authorization(paid_preview)
+
+    provider.submit(
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        _permit(resolved, video_preview, paid_preview, authorization),
+    )
+
+    assert resolved.continuity_binding == continuity
+    assert paid_preview.egress_items[1].sha256 == terminal.extracted_sha256
+    payload = json.loads(transport.requests[0].body)
+    assert payload["model"] == "doubao-seedance-2-0-mini-260615"
+    assert payload["generate_audio"] is False
+    assert payload["content"][1] == {
+        "type": "image_url",
+        "image_url": {"url": "asset://terminal-frame-shot-0"},
+        "role": "first_frame",
     }
 
 

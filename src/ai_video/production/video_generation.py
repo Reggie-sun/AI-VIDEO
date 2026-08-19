@@ -23,6 +23,7 @@ from ai_video.production.video import (
 
 if TYPE_CHECKING:
     from ai_video.production.state_commit import ProductionStateCommitter
+    from ai_video.production.video_artifact import TerminalFrameExtractor
 
 
 @dataclass(frozen=True)
@@ -223,6 +224,7 @@ class VideoGenerationService:
         *,
         attempt_id: str,
         probe: Callable[[int], dict] | None = None,
+        terminal_frame_extractor: TerminalFrameExtractor | None = None,
     ):
         """Finish only the durable next post-submit phases, replaying no effect."""
 
@@ -241,6 +243,7 @@ class VideoGenerationService:
             self._committer.prepare_video_activation_candidate(
                 attempt_id=attempt_id,
                 probe=probe,
+                terminal_frame_extractor=terminal_frame_extractor,
             )
             _, state = self._state(attempt_id)
         if state.phase is VideoAttemptPhase.CANDIDATE:

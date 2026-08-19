@@ -811,6 +811,143 @@ def _make_video_generation_attempt_state():
     )
 
 
+def _make_terminal_frame_evidence_pointer():
+    return production_models.TerminalFrameEvidencePointer(
+        path=Path(f"state/video-generation/terminal-evidence/{NINE_HASH}.json"),
+        content_hash=NINE_HASH,
+        extracted_asset_id="terminal-frame-video-1",
+        extracted_sha256=ZERO_HASH,
+        file_sha256=ONE_HASH,
+    )
+
+
+def _make_terminal_frame_extraction_pointer():
+    return production_models.TerminalFrameExtractionReceiptPointer(
+        path=Path(f"state/video-generation/terminal-extractions/{EIGHT_HASH}.json"),
+        content_hash=EIGHT_HASH,
+        extracted_asset_id="terminal-frame-video-1",
+        extracted_sha256=ZERO_HASH,
+        file_sha256=NINE_HASH,
+    )
+
+
+def test_manifest_28_video_state_seals_terminal_frame_candidate_identity():
+    base = _make_video_generation_attempt_state()
+    payload = base.model_dump(mode="python")
+    payload.update(
+        {
+            "phase": "candidate",
+            "fetch_receipt": production_models.VideoFetchReceiptPointer(
+                path=Path(
+                    f"state/video-generation/fetch/receipts/{FIVE_HASH}.json"
+                ),
+                fetch_fingerprint=FIVE_HASH,
+                artifact_path=Path(
+                    f"state/video-generation/fetch/files/{SIX_HASH}.mp4"
+                ),
+                artifact_sha256=SIX_HASH,
+                artifact_size_bytes=4096,
+                file_sha256=SEVEN_HASH,
+            ),
+            "terminal_frame_evidence": _make_terminal_frame_evidence_pointer(),
+            "terminal_frame_extraction": _make_terminal_frame_extraction_pointer(),
+            "candidate_video_asset_ids": ("video-1",),
+            "candidate_continuity_asset_ids": ("terminal-frame-video-1",),
+        }
+    )
+
+    state = production_models.VideoGenerationAttemptState.model_validate(payload)
+
+    assert state.terminal_frame_evidence == _make_terminal_frame_evidence_pointer()
+    assert state.terminal_frame_extraction == _make_terminal_frame_extraction_pointer()
+    assert state.candidate_video_asset_ids == ("video-1",)
+    assert state.candidate_continuity_asset_ids == ("terminal-frame-video-1",)
+
+
+def test_manifest_28_validate_phase_can_checkpoint_terminal_extraction():
+    base = _make_video_generation_attempt_state()
+    state = base.model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase.VALIDATE,
+            "fetch_receipt": production_models.VideoFetchReceiptPointer(
+                path=Path(
+                    f"state/video-generation/fetch/receipts/{FIVE_HASH}.json"
+                ),
+                fetch_fingerprint=FIVE_HASH,
+                artifact_path=Path(
+                    f"state/video-generation/fetch/files/{SIX_HASH}.mp4"
+                ),
+                artifact_sha256=SIX_HASH,
+                artifact_size_bytes=4096,
+                file_sha256=SEVEN_HASH,
+            ),
+            "terminal_frame_extraction": _make_terminal_frame_extraction_pointer(),
+        }
+    )
+
+    assert state.terminal_frame_extraction == _make_terminal_frame_extraction_pointer()
+    assert state.terminal_frame_evidence is None
+
+
+def test_manifest_27_rejects_explicit_shot_continuity_state():
+    payload = make_state_manifest(schema_version="2.0").model_dump(mode="python")
+    payload["schema_version"] = "2.7"
+    state = _make_video_generation_attempt_state().model_dump(mode="python")
+    state["terminal_frame_evidence"] = _make_terminal_frame_evidence_pointer().model_dump(
+        mode="python"
+    )
+    payload["attempts"] = (
+        {
+            "attempt_id": "video-continuity-attempt-1",
+            "operation": "video_generation",
+            "status": "running",
+            "base_manifest_revision": 1,
+            "base_project": make_project_pointer().model_dump(mode="python"),
+            "base_registry": make_registry_pointer().model_dump(mode="python"),
+            "base_dependency_graph": make_dependency_graph_snapshot_pointer().model_dump(
+                mode="python"
+            ),
+            "candidate_artifacts_hash": ZERO_HASH,
+            "video_generation_state": state,
+            "started_at": "2026-08-18T00:00:00Z",
+        },
+    )
+
+    with pytest.raises(ValidationError, match="2.8|continuity"):
+        ProductionManifest.model_validate(payload)
+
+
+def test_manifest_28_keeps_existing_video_request_lifecycle_compatible():
+    state = _make_video_generation_attempt_state().model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase.REQUEST,
+            "paid_submit_receipt": None,
+            "latest_observation": None,
+        }
+    )
+    attempt = StateCommitAttempt(
+        attempt_id="video-28-request-attempt-1",
+        operation="video_generation",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        video_generation_state=state,
+        started_at="2026-08-18T00:00:00Z",
+    )
+
+    manifest = make_state_manifest(
+        schema_version="2.8",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        attempts=(attempt,),
+    )
+
+    assert manifest.schema_version == "2.8"
+    assert manifest.attempts[0].video_generation_state == state
+
+
 def test_manifest_27_accepts_gate_bound_video_attempt_without_external_task_id():
     video_state = _make_video_generation_attempt_state()
     submit = video_state.paid_submit_receipt

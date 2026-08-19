@@ -37,7 +37,10 @@ from ai_video.production.video_fake import (
     FakeVideoScenario,
     ScriptedFakeVideoProvider,
 )
-from ai_video.production.video_artifact import probe_generated_video_candidate
+from ai_video.production.video_artifact import (
+    _default_terminal_frame_extractor,
+    probe_generated_video_candidate,
+)
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.project import load_production_project
 from production_project_factory import (
@@ -51,8 +54,10 @@ FIXTURE = Path(__file__).parent / "fixtures/generated_video/fake-video.mp4"
 ATTEMPT_ID = "p8-generated-video-e2e"
 
 
-def _runtime(root: Path):
-    inputs = make_p8_video_generation_base(root)
+def _runtime(root: Path, *, seal_terminal_frame: bool = False):
+    inputs = make_p8_video_generation_base(
+        root, schema_version="2.8" if seal_terminal_frame else "2.7"
+    )
     loaded = inputs.project
     shot = loaded.shots[0]
     source = loaded.registry.assets[0]
@@ -96,6 +101,7 @@ def _runtime(root: Path):
                 size_bytes=source.size_bytes,
             ),
         ),
+        seal_terminal_frame=seal_terminal_frame,
         output_requirement=output,
         seed=17,
         base_project=loaded.manifest.active_project,
@@ -159,8 +165,12 @@ def _runtime(root: Path):
     return inputs, provider, resolved, paid_preview, committer
 
 
-def _reach_fetch(root: Path, *, settle: bool = True):
-    inputs, provider, resolved, paid_preview, committer = _runtime(root)
+def _reach_fetch(
+    root: Path, *, settle: bool = True, seal_terminal_frame: bool = False
+):
+    inputs, provider, resolved, paid_preview, committer = _runtime(
+        root, seal_terminal_frame=seal_terminal_frame
+    )
     service = VideoGenerationService(committer=committer, provider=provider)
     service.start(attempt_id=ATTEMPT_ID, request=resolved)
     service.submit_once(
@@ -179,6 +189,138 @@ def _reach_fetch(root: Path, *, settle: bool = True):
             actual_cost_microunits=1_000_000,
         )
     return inputs, provider, resolved, committer
+
+
+def test_terminal_frame_is_extracted_registered_activated_and_replayed_exactly(
+    tmp_path: Path,
+):
+    inputs, provider, resolved, committer = _reach_fetch(
+        tmp_path, seal_terminal_frame=True
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+
+    activated = service.fetch_and_activate(attempt_id=ATTEMPT_ID)
+    selected = load_production_project(tmp_path / "project.yaml")
+    state = activated.attempts[-1].video_generation_state
+
+    assert state is not None
+    assert state.terminal_frame_evidence is not None
+    assert state.candidate_video_asset_ids == (resolved.output_asset_id,)
+    assert state.candidate_continuity_asset_ids == (
+        f"{resolved.output_asset_id}:terminal-frame",
+    )
+    video_asset, terminal_asset = selected.registry.assets[-2:]
+    assert video_asset.asset_id == resolved.output_asset_id
+    assert terminal_asset.asset_id == state.terminal_frame_evidence.extracted_asset_id
+    assert terminal_asset.input_artifact_ids == (video_asset.asset_id,)
+    assert (tmp_path / terminal_asset.artifact_path).read_bytes().startswith(
+        b"\x89PNG\r\n\x1a\n"
+    )
+    evidence_path = tmp_path / state.terminal_frame_evidence.path
+    terminal_path = tmp_path / terminal_asset.artifact_path
+    before = (evidence_path.read_bytes(), terminal_path.read_bytes())
+
+    replayed = service.fetch_and_activate(attempt_id=ATTEMPT_ID)
+
+    assert replayed == activated
+    assert (evidence_path.read_bytes(), terminal_path.read_bytes()) == before
+
+
+def test_terminal_frame_replay_rejects_tampered_evidence(tmp_path: Path):
+    _, provider, _, committer = _reach_fetch(
+        tmp_path, seal_terminal_frame=True
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    activated = service.fetch_and_activate(attempt_id=ATTEMPT_ID)
+    state = activated.attempts[-1].video_generation_state
+    assert state is not None and state.terminal_frame_evidence is not None
+    (tmp_path / state.terminal_frame_evidence.path).write_text(
+        "{}", encoding="utf-8"
+    )
+
+    with pytest.raises(AiVideoError, match="terminal frame evidence"):
+        service.fetch_and_activate(attempt_id=ATTEMPT_ID)
+
+
+def test_active_project_reader_rejects_tampered_terminal_frame_evidence(
+    tmp_path: Path,
+):
+    _, provider, _, committer = _reach_fetch(tmp_path, seal_terminal_frame=True)
+    activated = VideoGenerationService(
+        committer=committer, provider=provider
+    ).fetch_and_activate(attempt_id=ATTEMPT_ID)
+    state = activated.attempts[-1].video_generation_state
+    assert state is not None and state.terminal_frame_evidence is not None
+    (tmp_path / state.terminal_frame_evidence.path).write_text(
+        "{}", encoding="utf-8"
+    )
+
+    with pytest.raises(AiVideoError, match="terminal frame evidence"):
+        load_production_project(tmp_path / "project.yaml")
+
+
+def test_active_project_reader_rejects_tampered_terminal_extraction_receipt(
+    tmp_path: Path,
+):
+    _, provider, _, committer = _reach_fetch(tmp_path, seal_terminal_frame=True)
+    activated = VideoGenerationService(
+        committer=committer, provider=provider
+    ).fetch_and_activate(attempt_id=ATTEMPT_ID)
+    state = activated.attempts[-1].video_generation_state
+    assert state is not None and state.terminal_frame_extraction is not None
+    (tmp_path / state.terminal_frame_extraction.path).write_text(
+        "{}", encoding="utf-8"
+    )
+
+    with pytest.raises(AiVideoError, match="terminal frame extraction"):
+        load_production_project(tmp_path / "project.yaml")
+
+
+def test_terminal_extraction_checkpoint_prevents_repeat_after_candidate_failure(
+    tmp_path: Path,
+):
+    inputs, provider, _, _ = _reach_fetch(tmp_path, seal_terminal_frame=True)
+    extraction_calls = 0
+
+    def counted_extractor(source: bytes, frame_index: int):
+        nonlocal extraction_calls
+        extraction_calls += 1
+        return _default_terminal_frame_extractor(source, frame_index)
+
+    def failing_preparer(*_args):
+        raise RuntimeError("candidate preparation interrupted")
+
+    interrupted = VideoGenerationService(
+        committer=ProductionStateCommitter(
+            tmp_path, video_candidate_preparer=failing_preparer
+        ),
+        provider=provider,
+    )
+    with pytest.raises(RuntimeError, match="interrupted"):
+        interrupted.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            terminal_frame_extractor=counted_extractor,
+        )
+    checkpointed = ProductionStateCommitter(tmp_path)._read_manifest()
+    checkpoint_state = checkpointed.attempts[-1].video_generation_state
+    assert checkpoint_state is not None
+    assert checkpoint_state.terminal_frame_extraction is not None
+    assert extraction_calls == 1
+    ProductionStateCommitter(tmp_path).recover()
+
+    resumed = VideoGenerationService(
+        committer=ProductionStateCommitter(
+            tmp_path,
+            video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
+        ),
+        provider=provider,
+    )
+    resumed.fetch_and_activate(
+        attempt_id=ATTEMPT_ID,
+        terminal_frame_extractor=counted_extractor,
+    )
+
+    assert extraction_calls == 1
 
 
 def test_fake_video_fetch_activate_reopen_and_replay_are_exact(tmp_path: Path):
@@ -392,8 +534,13 @@ def test_active_video_reopens_after_later_paid_budget_revision(tmp_path: Path):
     assert reopened.cost_receipt_id == historical_cost_id
 
 
-def test_candidate_recovery_keeps_old_tuple_until_explicit_activation(tmp_path: Path):
-    inputs, provider, _, committer = _reach_fetch(tmp_path)
+@pytest.mark.parametrize("seal_terminal_frame", (False, True))
+def test_candidate_recovery_keeps_old_tuple_until_explicit_activation(
+    tmp_path: Path, seal_terminal_frame: bool
+):
+    inputs, provider, _, committer = _reach_fetch(
+        tmp_path, seal_terminal_frame=seal_terminal_frame
+    )
     service = VideoGenerationService(committer=committer, provider=provider)
     service.fetch_once(attempt_id=ATTEMPT_ID)
     base = committer._read_manifest()
@@ -401,6 +548,9 @@ def test_candidate_recovery_keeps_old_tuple_until_explicit_activation(tmp_path: 
     candidate_attempt = candidate.attempts[-1]
     assert candidate_attempt.video_generation_state is not None
     assert candidate_attempt.video_generation_state.phase is VideoAttemptPhase.CANDIDATE
+    assert bool(
+        candidate_attempt.video_generation_state.terminal_frame_evidence
+    ) is seal_terminal_frame
     assert candidate.active_project == base.active_project
     assert candidate.active_registry == base.active_registry
     assert candidate.active_dependency_graph == base.active_dependency_graph
@@ -417,6 +567,70 @@ def test_candidate_recovery_keeps_old_tuple_until_explicit_activation(tmp_path: 
     final = recovered_committer.activate_video_candidate(attempt_id=ATTEMPT_ID)
     assert final.attempts[-1].status is StateCommitStatus.SUCCEEDED
     assert final.active_project == candidate_attempt.candidate_project
+
+
+def test_candidate_recovery_rejects_tampered_terminal_frame_evidence(
+    tmp_path: Path,
+):
+    _, provider, _, committer = _reach_fetch(
+        tmp_path, seal_terminal_frame=True
+    )
+    VideoGenerationService(committer=committer, provider=provider).fetch_once(
+        attempt_id=ATTEMPT_ID
+    )
+    candidate = committer.prepare_video_activation_candidate(
+        attempt_id=ATTEMPT_ID
+    )
+    state = candidate.attempts[-1].video_generation_state
+    assert state is not None and state.terminal_frame_evidence is not None
+    (tmp_path / state.terminal_frame_evidence.path).write_text(
+        "{}", encoding="utf-8"
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).recover()
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+
+
+def test_activation_rejects_tampered_terminal_extraction_receipt(tmp_path: Path):
+    _, provider, _, committer = _reach_fetch(tmp_path, seal_terminal_frame=True)
+    VideoGenerationService(committer=committer, provider=provider).fetch_once(
+        attempt_id=ATTEMPT_ID
+    )
+    candidate = committer.prepare_video_activation_candidate(
+        attempt_id=ATTEMPT_ID
+    )
+    state = candidate.attempts[-1].video_generation_state
+    assert state is not None and state.terminal_frame_extraction is not None
+    (tmp_path / state.terminal_frame_extraction.path).write_text(
+        "{}", encoding="utf-8"
+    )
+
+    with pytest.raises(AiVideoError, match="terminal frame extraction"):
+        committer.activate_video_candidate(attempt_id=ATTEMPT_ID)
+
+
+def test_candidate_recovery_rejects_tampered_terminal_extraction_receipt(
+    tmp_path: Path,
+):
+    _, provider, _, committer = _reach_fetch(tmp_path, seal_terminal_frame=True)
+    VideoGenerationService(committer=committer, provider=provider).fetch_once(
+        attempt_id=ATTEMPT_ID
+    )
+    candidate = committer.prepare_video_activation_candidate(
+        attempt_id=ATTEMPT_ID
+    )
+    state = candidate.attempts[-1].video_generation_state
+    assert state is not None and state.terminal_frame_extraction is not None
+    (tmp_path / state.terminal_frame_extraction.path).write_text(
+        "{}", encoding="utf-8"
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).recover()
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
 
 
 def test_candidate_rejects_fetch_path_replacement_after_held_fd_probe(tmp_path: Path):

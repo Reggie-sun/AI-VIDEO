@@ -258,6 +258,20 @@ def canonical_video_provenance_receipt_path(content_hash: str) -> Path:
     )
 
 
+def canonical_terminal_frame_extraction_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/terminal-extractions/"
+        f"{_require_sha256(content_hash, 'terminal extraction receipt hash')}.json"
+    )
+
+
+def canonical_terminal_frame_evidence_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/terminal-evidence/"
+        f"{_require_sha256(content_hash, 'terminal frame evidence hash')}.json"
+    )
+
+
 def canonical_image_shot_revision_path(revision: int, content_hash: str) -> Path:
     if type(revision) is not int or revision < 1:
         raise ValueError("Image Shot revision must be a positive integer.")
