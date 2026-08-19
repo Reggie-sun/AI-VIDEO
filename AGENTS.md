@@ -185,6 +185,15 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 
 如果一次改动跨越多个表面，就运行所有对应测试文件。
 
+## Task-Scoped Paid Authorization
+
+- 当用户明确要求执行一个其 accepted scope 必然包含 remote/paid Provider 调用的任务时，该执行请求本身即构成该任务所需调用的 explicit opt-in 与 paid/live authorization。Agent MUST NOT 仅因为调用会产生费用而对同一任务重复请求授权。
+- 有效的执行请求包括明确要求实现并运行、生成、重新生成、修复并做 live verification 等动作。仅要求写 `spec`、`plan`、review、分析可行性，或询问“能否执行”，不授权实际 Provider 调用。
+- 授权严格限定于用户要求的 task、已接受的 Provider/model、必要输入与完成目标所需的最少调用次数；不得复用于相邻 benchmark、未要求的质量探索、不同 Provider/model、新的 output variant，或扩大后的 scope。
+- Task-scoped authorization 不替代现有 Paid Provider Gate。调用前仍必须完成 exact preview、Budget Guard、Cloud Egress、secret reference、durable submit intent 与 one-use permit；不得绕过 crash-safe persistence、known-no-effect/outcome-unknown handling 或 replay protection。
+- 若缺少可执行的 budget ceiling、预计费用超过 ceiling、Provider/model 或 egress scope 发生实质变化、需要超过已接受的调用上限，或前一次结果为 outcome unknown，必须停止并报告具体 gate；不得把原执行请求解释为无限额度、blind retry 或任意 Provider 授权。
+- 历史 live evidence、已通过的 offline tests、已有 key/余额或某个已完成 run 均不构成新调用授权；授权必须来自用户对当前任务的明确执行请求。
+
 ## Decision Gates
 
 除非用户已经明确要求，否则遇到以下变更先暂停并确认：
@@ -194,7 +203,7 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 - 修改 `runs/` 下的 manifest schema 或产物目录结构。
 - 把本地优先策略改成默认允许远程主机。
 - 引入前端、API server、队列管理、音频，或其他 MVP 规范中明确排除的子系统。
-- 执行 P7.1 live smoke/benchmark、任何新的 P8 Provider/live submit、v0.2 P9 runtime slice，或把未验收的 plan/spec contract 写成当前行为。P2-P8 与 Base AI Comic E2E 已在 local `main`；P7.1 已通过 offline executable gates 与 2026-08-18 technical live-local acceptance，但仍未通过 M8 blinded quality benchmark。任何未来 P7.1 live smoke、benchmark、H3/Seedance live submit、新 P8 adapter 或 P9 runtime slice仍需各自独立 explicit authorization。任何新的 v2 writer、activation、schema/layout mutation仍需独立授权与 crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
+- 执行 P7.1 live smoke/benchmark、任何新的 P8 Provider/live submit、v0.2 P9 runtime slice，或把未验收的 plan/spec contract 写成当前行为。P2-P8 与 Base AI Comic E2E 已在 local `main`；P7.1 已通过 offline executable gates 与 2026-08-18 technical live-local acceptance，但仍未通过 M8 blinded quality benchmark。未来 P7.1 live smoke、benchmark、H3/Seedance live submit、新 P8 adapter 或 P9 runtime slice仍需当前任务的 explicit authorization；符合上一节定义的用户直接执行请求已满足该 authorization，不得为同一任务重复确认。任何新的 v2 writer、activation、schema/layout mutation仍需独立授权与 crash-safety tests。P1只允许在其Legacy scope内做独立bugfix/release handling，不得借此扩展新product domain。
 
 ## Session Continuity
 
