@@ -2,7 +2,7 @@
 
 ## Status
 
-本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation，以及Hailuo 2.3和Seedance 2.0 Mini offline adapter mapping；下文“当前尚未实现”等陈述保留为implementation前baseline。Local MiniMax H3 sealed workflow/profile、任何新Provider live proof、重新生成Shot 2/3与subjective quality acceptance仍未完成，也未由本次technical implementation授权或证明。既有P8 Provider contract仍不被改写。
+本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation，以及Hailuo 2.3和Seedance 2.0 Mini offline adapter mapping；下文“当前尚未实现”等陈述保留为implementation前baseline。Local MiniMax H3已完成一次raw loopback checkpoint smoke，但sealed workflow/profile、production `ComfyUIVideoProvider`、continuity chaining proof、任何新的cloud Provider live proof、重新生成Shot 2/3与subjective quality acceptance仍未完成。既有P8 Provider contract仍不被改写。
 
 当前已实现的是 frame-accurate composition：generated MP4 已能进入唯一的 `CompositionSpec -> ResolvedTimeline -> HyperFrames` 路径，并保持 P4 audio/caption/final mux 语义。当前尚未实现的是 semantic/visual continuity：三个独立生成的 Shot 不会因为精确硬切而自动共享场景、角色、镜头轴线、光线或运动状态。
 
@@ -138,7 +138,45 @@ Continuity request 必须在 submit 前完成 provider-neutral capability resolu
 
 ### Local Continuity Lane
 
-当前 local runtime truth 只有 Legacy/local-first ComfyUI 边界与 optional Wan capability，没有 production `ComfyUIVideoProvider` continuity adapter，也没有可证实的 “MiniMax local” model/profile。未来实现前必须取得并 seal：exact local engine、model checkpoint/hash、workflow/profile、input node contract、loopback endpoint 和 output capability。不能解析这些 identity 时必须 fail closed，且不得切换到 MiniMax cloud。
+当前已确认本机ComfyUI原生MiniMax H3 nodes、`fl2va`/`ref2va` checkpoints、量化Qwen3-VL text encoder与video/audio VAEs。2026-08-19 raw smoke在literal loopback `http://127.0.0.1:8188`上使用`fl2va`、14-node ad-hoc API workflow、seed `20260819`、608x352、22 frames、20 steps完成一次单提交/零重试生成；ComfyUI报告约19.85秒，产物为0.917秒、24fps、H.264 + AAC MP4，SHA-256为`837b416d4185790e148fcb2389766727939aca26d7a31f2b91a4806796d32f3f`。Host-local evidence位于`runs/h3-local-live-20260819-fresh/`。该proof只证明checkpoint可以在当前RTX 5090 host完成短推理；它没有消费`first_frame`/`last_frame`/reference，没有进入P8 lifecycle，也不是continuity、长时长或subjective quality acceptance。
+
+当前仍没有production `ComfyUIVideoProvider` continuity adapter或sealed MiniMax H3 execution profile。未来实现必须seal exact ComfyUI commit、checkpoint/content hashes、text encoder、VAEs、workflow/template、binding、registered node inventory、loopback endpoint、FPS/17k+5 frame-grid、trained duration boundary、native-audio policy与output capability。不能解析这些identity时必须fail closed，且不得切换到MiniMax cloud。
+
+Local H3至少需要两个相互独立的profile：
+
+- `fl2va` continuity profile：将exact upstream terminal PNG绑定到`MiniMaxH3ImageToVideo.first_frame`；只有显式storyboard endpoint要求时才绑定`last_frame`。它是多Shot terminal-to-entrance continuity的最小本地闭环。
+- optional `ref2va` identity profile：通过`MiniMaxH3ReferenceToVideo`消费显式reference image/video/audio，用于角色、场景、服装或表演参考。它不能替代exact terminal-frame lineage，也不能与`fl2va`共用checkpoint identity。
+
+仅提高现有smoke workflow的`length`只会生成一个更长的单Shot，不构成跨Shot continuity。H3 node虽然允许更长frame count，但其文档训练区间约为124-362 frames；超出该范围必须作为独立quality/performance risk报告，不能因为schema允许而宣称已支持。
+
+### Cost Control and Provider Portability
+
+Shot Continuity必须保持“一个provider-neutral lifecycle，多个显式provider lanes”。以下contract在Local H3、Hailuo、Seedance与未来Provider之间复用，不得在adapter内复制：
+
+- `ContinuityConstraintSet`、`TerminalFrameEvidence`与`ContinuityReferenceBinding`；
+- exact request/resolved fingerprints、candidate provenance与terminal artifact identity；
+- Manifest 2.8 activation/recovery、exact replay与same-desired failure rules；
+- P5 continuity dependency、precise downstream invalidation；
+- P3/P4唯一composition/timeline/audio/caption/final mux ownership。
+
+切换Provider不是只替换`model_id`。每个lane仍必须提供并独立验收：
+
+- concrete adapter/transport；
+- exact capability variant，例如`first_frame`、`last_frame`、reference、native audio、duration、resolution与container；
+- provider-specific workflow/profile或cloud payload mapping；
+- local resource policy或remote Paid Provider Gate/Cloud Egress；
+- output parsing、measured validation、error normalization与live/quality evidence。
+
+任何lane不支持当前continuity request时必须在submit前fail closed；不得删除`last_frame`/reference、退化为T2V、改用另一个model或fallback到cloud。Provider selection必须显式并进入resolved identity。
+
+Local H3的成本控制角色是低边际成本draft lane，而不是自动替代最终cloud lane。推荐production policy：
+
+1. 在本地H3上迭代prompt、continuity constraints、terminal-to-first-frame binding、camera/motion entrance与reference选择。
+2. 使用本地technical/visual gate淘汰明显断裂的候选；失败不消耗remote quota。
+3. 只有显式选中的Shot才进入Hailuo/Seedance等付费lane，并继续使用exact budget reservation、egress authorization与one-use submit permit。
+4. Remote lane必须重新完成自身live artifact和subjective quality gate；Local H3成功不能证明另一个model会产生相同构图、动作、身份一致性或音频。
+
+这一路由可以减少付费prompt/reference调试和无效重试，但不能把本地GPU时间、电力、RAM/VRAM占用记作零成本，也不能让自动router在未授权时选择remote Provider。是否从local draft升级到paid final必须是显式production decision，并保留两个generation identities与各自provenance。
 
 ### MiniMax Cloud Hailuo 2.3
 
