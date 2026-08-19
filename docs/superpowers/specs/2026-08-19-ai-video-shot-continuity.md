@@ -2,7 +2,7 @@
 
 ## Status
 
-本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation、Hailuo 2.3与Seedance 2.0 Mini offline adapter mapping，以及Local MiniMax H3 `fl2va` sealed workflow/profile、loopback-only `ComfyUIVideoProvider`和durable local submit/status/fetch/activation/recovery evidence。一次获授权的two-Shot live-local proof已证明Shot A exact terminal PNG进入Shot B `first_frame`，两段MP4均完成measured validation、activation、reopen与zero-call replay。2026-08-20另一项bounded authorization生成并激活Alice咖啡厅C2 shared terminal/keyframe，随后Hailuo 2.3唯一一次remote submit完成succeeded/fetched/measured与人工review，但canonical activation因zero-network migration复制external-effect receipt而被拒绝；Seedance 2.0 Mini则因过期sealed price snapshot和缺少exact Ark registered asset materialization在POST前fail closed。Local H3 C2 Shot 2、Hailuo canonical activation、Seedance live、`ref2va`和blinded comparative acceptance仍未完成；既有P8 remote/Paid Provider contract不被改写。
+本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation、Hailuo 2.3与Seedance 2.0 Mini offline adapter mapping，以及Local MiniMax H3 `fl2va` sealed workflow/profile、loopback-only `ComfyUIVideoProvider`和durable local submit/status/fetch/activation/recovery evidence。一次获授权的two-Shot live-local proof已证明Shot A exact terminal PNG进入Shot B `first_frame`，两段MP4均完成measured validation、activation、reopen与zero-call replay。2026-08-20后续bounded authorizations生成并激活Alice咖啡厅C2 shared terminal/keyframe，并以新的adaptive Hailuo 2.3 request完成one-submit、fetch、canonical activation/recovery/replay与人工review；Seedance 2.0 Mini已得到fresh `3 CNY` preview，但因缺少exact Ark registered asset materialization仍在POST前fail closed。Local H3 C2 Shot 2、Seedance live、`ref2va`和blinded comparative acceptance仍未完成；既有P8 remote/Paid Provider contract不被改写。
 
 当前已实现frame-accurate composition与显式Local H3 terminal-to-first-frame continuity lane：generated MP4仍进入唯一的`CompositionSpec -> ResolvedTimeline -> HyperFrames`路径并保持P4 audio/caption/final mux语义。该lane不会让任意三个独立生成的Shot自动共享场景、角色、镜头轴线、光线或运动状态；只有带exact continuity binding并逐Shot生成的edge获得技术保证，语义质量仍需独立人工验收。
 
@@ -36,13 +36,13 @@ Shot Continuity 的目标是让 Shot N 已 sealed 的 terminal-frame/reference s
 - P5 graph只在显式terminal-image input存在时建立typed asset-to-generation edge，并沿真实closure做precise invalidation。
 - `LocalVideoSubmitIntent`、submit/status/fetch receipts与one-use local permit形成独立于Paid Provider Gate的durable local evidence chain；local与remote evidence不得混合。
 - `ComfyUIVideoProvider`只接受sealed profile列出的literal loopback endpoint，在R+1前验证ComfyUI commit、四个model components、native node inventory、template/binding/profile hashes与output bounds；任何mismatch均在上传或submit前fail closed，且无remote fallback。
-- Hailuo 2.3 continuity payload现已有Alice C2 one-submit succeeded/fetched/measured evidence，但没有canonical activation acceptance；Seedance 2.0 Mini仍只有offline acceptance和一次current-task pre-submit fail-closed evidence。Hailuo的结果不能外推为Seedance、three-lane或Router acceptance。
+- Hailuo 2.3 continuity payload现已有Alice C2 adaptive one-submit canonical technical acceptance；Seedance 2.0 Mini仍只有offline acceptance和一次current-task pre-submit fail-closed evidence。Hailuo的结果不能外推为Seedance、three-lane或Router acceptance。
 
 ## Scope
 
 本规范覆盖 provider-neutral continuity request、terminal-frame artifact/provenance、capability denial、durable activation/recovery、P5 precise invalidation，以及 technical/provider/subjective acceptance 的分层边界。
 
-本contract面向三个彼此隔离的provider lane；Local H3已实现，Hailuo 2.3已有Alice C2 one-submit succeeded/fetched/measured evidence但canonical activation blocked，Seedance仍只有offline mapping与pre-submit fail-closed evidence，三lane/Router gate未完成：
+本contract面向三个彼此隔离的provider lane；Local H3已实现，Hailuo 2.3已有Alice C2 adaptive one-submit canonical technical evidence，Seedance仍只有offline mapping与pre-submit fail-closed evidence，三lane/Router gate未完成：
 
 1. `local continuity lane`：用户称为“MiniMax 本地”的目标必须先解析为 exact local engine、model、workflow/profile 和 loopback endpoint。若实际执行器是 Wan + ComfyUI，应按其真实 identity 命名；若仍调用 MiniMax cloud，则它不是 local lane。未完成 identity resolution 前不得 submit。
 2. `MiniMax cloud Hailuo 2.3 lane`：目标 model 为 `MiniMax-Hailuo-2.3`，只在 adapter 显式支持并验证 I2V `first_frame` 后进入 continuity flow。
@@ -206,7 +206,7 @@ Local H3的成本控制角色是低边际成本draft lane，而不是自动替�
 
 ### MiniMax Cloud Hailuo 2.3
 
-MiniMax 官方 I2V contract 当前列出 `MiniMax-Hailuo-2.3`，以 `first_frame_image` 接收首帧图像；官方 model guide 同时把 Hailuo 2.3列为 T2V/I2V model。当前仓库adapter已增加并offline验证独立I2V capability/payload mapping；它不声明`last_frame`。2026-08-20 Alice C2 lane用exact activated keyframe完成唯一一次remote POST，Provider task succeeded并fetch SHA-256 `58e3a09658134a18cc184f4fb536834c6139a6ff9d55985b76fb5b7af663194d`；真实输出为H.264 `1326x768@24fps`、141 frames、5.875s、无音轨。该evidence把新I2V resolve/preview的`768P` geometry收敛为adaptive，不再错误签发固定`1366x768 / 16:9`；尚未submit的历史fixed-geometry request会在Provider gate前fail closed。一次zero-network corrected-contract migration虽生成可reopen的local candidate，却复制了原external task ID的accepted receipt，因此不计canonical activation/recovery/P5 acceptance。人工review只接受本Hailuo visual lane并保留轻微facial variation concern；官方 first/last-frame示例属于其他明确model时，仍不得推断Hailuo 2.3支持未声明的`last_frame`。
+MiniMax 官方 I2V contract 当前列出 `MiniMax-Hailuo-2.3`，以 `first_frame_image` 接收首帧图像；官方 model guide 同时把 Hailuo 2.3列为 T2V/I2V model。当前仓库adapter已增加并offline验证独立I2V capability/payload mapping；它不声明`last_frame`。首个Alice C2 result把I2V `768P` geometry收敛为adaptive；其non-canonical receipt migration继续只作为失败证据保留。用户随后授权的新adaptive request消费同一exact activated keyframe，唯一一次POST产生task `432581080539416`，8次poll后fetch MP4 SHA-256 `90b4fc1842b4a74332ebcae7e20c1e0cc1cdd7166037702e4dd1b37d2ed0bdca`；真实输出为H.264 `1326x768@24fps`、141 frames、5.875s、无音轨，并完成canonical activation、reopen、recovery与zero-effect exact replay。首帧与shared keyframe SSIM `0.941854`，black/freeze检测为零。人工review接受本Hailuo lane并保留轻微facial variation concern；官方 first/last-frame示例属于其他明确model时，仍不得推断Hailuo 2.3支持未声明的`last_frame`。
 
 References:
 
@@ -216,7 +216,7 @@ References:
 
 ### Seedance 2.0 Mini
 
-当前仓库capability table与adapter已对`doubao-seedance-2-0-mini-260615`的I2V first-frame、optional last-frame、audio opt-out、response/fetch与permit mapping完成offline executable acceptance；这不等于continuity live、billing settlement、activation或quality acceptance。2026-08-20 Alice C2 preflight完成exact model/capability resolution并seal `generate_audio=false`，但唯一sealed pricing snapshot已过期，且shared local PNG没有exact Ark-registered `asset://` identity；因此current preview未签发、Paid Provider gate/permit未创建、remote submit为零。历史`1.2 CNY` upper bound只作为expired evidence保留，不能当作current budget。任何future profile refresh仍必须重新核对exact official model/mode/input roles，且必须有受信任的Ark asset materialization owner，不能让upstream变化绕过sealed capability identity。
+当前仓库capability table与adapter已对`doubao-seedance-2-0-mini-260615`的I2V first-frame、optional last-frame、audio opt-out、response/fetch与permit mapping完成offline executable acceptance；这不等于continuity live、billing settlement、activation或quality acceptance。2026-08-20 Alice C2 preflight完成exact model/capability resolution并seal `generate_audio=false`。Fresh pricing以官方无视频输入单价`23 CNY / million tokens`和仓库公式估算2.484 CNY，seal保守`3 CNY` upper bound并成功生成preview；但shared local PNG没有exact Ark-registered `asset://` identity，因此Paid Provider authorization/permit未创建、remote submit为零。任何future submit必须先由受信任的Ark asset materialization owner提供exact identity，不能猜测upload endpoint、使用第三方临时URL或让upstream变化绕过sealed capability identity。
 
 此前 Seedance Mini diagnostic 只证明一次 cloud connectivity 和 fetched MP4；它不证明 tracked continuity payload、billing settlement、activation 或 quality acceptance。
 
@@ -304,7 +304,7 @@ P5 graph 必须表达一个 typed continuity dependency：Shot N 的 exact activ
 
 ## Authorization Boundary
 
-2026-08-19 Local MiniMax H3 `fl2va` two-Shot proof由当时任务单独授权并完成。2026-08-20用户又对Alice C2 Hailuo 2.3与Seedance 2.0 Mini各最多一次remote submit作出独立task-scoped authorization：Hailuo消耗唯一一次submit并完成succeeded/fetched/measured，但canonical activation仍blocked；Seedance因current budget与egress materialization gate不满足而保持零submit。两项授权都不扩展到blind retry、其他model/provider、`ref2va`、Shot Router或额外benchmark。任何后续live execution仍需新的bounded task scope，并重新满足exact provider/model、预算、Cloud Egress与Paid Provider one-use permit。
+2026-08-19 Local MiniMax H3 `fl2va` two-Shot proof由当时任务单独授权并完成。2026-08-20用户先对Alice C2 Hailuo 2.3与Seedance 2.0 Mini各最多一次remote submit作出独立task-scoped authorization，随后以“全部授权继续”批准解决已报告blocker所需的新bounded adaptive Hailuo request。该request已消费一次submit并完成canonical lifecycle；Seedance fresh budget已满足但仍因egress materialization gate保持零submit。两项lane都不扩展为blind retry、其他model/provider、`ref2va`、Shot Router或额外benchmark；任何后续live execution仍必须重新满足exact provider/model、预算、Cloud Egress与Paid Provider one-use permit。
 
 ## Rollback
 

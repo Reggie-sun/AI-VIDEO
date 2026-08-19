@@ -6,7 +6,7 @@
 
 本计划不实现Shot Router，不调用任何cloud/remote/paid Provider，不修改CLI，不新增第二writer、timeline、renderer或dependency resolver。
 
-2026-08-20 status note：后续用户另行授权的cloud comparison不属于本计划执行authority，但复用了本计划的Alice terminal与activated P7 hard-cut keyframe。Hailuo 2.3 lane已one-submit succeeded/fetched/measured并通过visual review with minor concerns，但canonical activation因duplicate external-effect receipt migration被拒绝；Seedance在current price/Ark asset materialization gate前fail closed并保持零submit。Local H3 Shot 2仍未执行，因此本计划Definition of Done与Router gate均未达成。
+2026-08-20 status note：后续用户另行授权的cloud comparison不属于本计划执行authority，但复用了本计划的Alice terminal与activated P7 hard-cut keyframe。新的adaptive Hailuo 2.3 request已one-submit完成canonical fetch/activation/recovery/replay并通过visual review with minor concerns；Seedance fresh `3 CNY` preview通过，但在Ark asset materialization gate前fail closed并保持零submit。Local H3 Shot 2仍未执行，因此本计划Definition of Done与Router gate均未达成。
 
 ## Current and Target Behavior
 
