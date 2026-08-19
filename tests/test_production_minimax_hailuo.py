@@ -62,6 +62,7 @@ from ai_video.production.video import (
     VideoImageReferenceBinding,
     build_video_paid_permit_binding,
 )
+from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.video_generation import VideoGenerationService
 from production_project_factory import (
     make_manifest_23_project,
@@ -504,10 +505,15 @@ def test_capabilities_seal_t2v_and_i2v_profiles():
     assert i2v.execution_kind is VideoExecutionKind.REMOTE
     assert i2v.billing_kind is BillingKind.METERED
     assert i2v.mode is VideoGenerationMode.IMAGE_TO_VIDEO
-    assert i2v.output.duration_seconds == 6
-    assert i2v.output.width == 1366
-    assert i2v.output.height == 768
-    assert i2v.output.native_audio is False
+    assert i2v.output is None
+    assert i2v.output_capability is not None
+    assert i2v.output_capability.frame_count_min == 141
+    assert i2v.output_capability.frame_count_max == 141
+    assert 24 in i2v.output_capability.fps_values
+    assert False in i2v.output_capability.native_audio_options
+    assert "16:9" in i2v.output_capability.ratios
+    assert "768P" in i2v.output_capability.resolution_labels
+    assert i2v.output_capability.provider_selected_duration is False
     assert i2v.allowed_image_roles == ("first_frame",)
     assert "last_frame" not in i2v.allowed_image_roles
     assert "reference" not in i2v.allowed_image_roles
@@ -515,8 +521,22 @@ def test_capabilities_seal_t2v_and_i2v_profiles():
     assert i2v.max_reference_count == 0
     assert i2v.negative_prompt_supported is False
     assert i2v.seed_supported is False
-    assert i2v.fps_supported is False
+    assert i2v.fps_supported is True
     assert i2v.lookup_supported is True
+
+
+def test_resolve_preserves_historical_six_second_t2v_contract():
+    provider = MiniMaxHailuoVideoProvider(
+        transport=_FakeTransport(),
+        credential=_SecretResolver(),
+    )
+
+    resolved = provider.resolve(_request())
+
+    assert resolved.mode is VideoGenerationMode.TEXT_TO_VIDEO
+    assert resolved.effective_output == _output()
+    assert resolved.effective_output.duration_seconds == 6
+    assert resolved.effective_output.fps is None
 
 
 def test_resolve_rejects_seed_and_negative_prompt_and_image_bindings():
@@ -589,18 +609,22 @@ def _i2v_first_frame(**changes: object) -> VideoImageReferenceBinding:
     return VideoImageReferenceBinding(**values)
 
 
-def _i2v_output(**changes: object) -> VideoOutputRequirement:
+def _i2v_output(**changes: object) -> VideoFlexibleOutputRequirement:
     values: dict[str, object] = {
-        "duration_seconds": 6,
+        "timing_mode": "frame_count",
+        "frame_count": 141,
+        "dimension_mode": "exact",
         "width": 1366,
         "height": 768,
-        "fps": None,
+        "resolution_label": "768P",
+        "ratio": "16:9",
+        "fps": 24,
         "container": "mp4",
         "mime_type": "video/mp4",
         "native_audio": False,
     }
     values.update(changes)
-    return VideoOutputRequirement(**values)
+    return VideoFlexibleOutputRequirement(**values)
 
 
 def _i2v_request(**changes: object) -> VideoGenerationRequest:
@@ -635,10 +659,39 @@ def test_resolve_i2v_accepts_exact_first_frame_binding():
     assert resolved.provider_profile.profile_version == "hailuo-2.3-v1"
     assert len(resolved.image_bindings) == 1
     assert resolved.image_bindings[0].role == "first_frame"
-    assert resolved.effective_output.duration_seconds == 6
     assert resolved.effective_output.width == 1366
     assert resolved.effective_output.height == 768
     assert resolved.effective_output.native_audio is False
+
+
+def test_resolve_i2v_sealed_output_expresses_live_measured_artifact_contract():
+    """I2V sealed output must express the truthful 141-frame@24fps MP4 contract.
+
+    Live MiniMax Hailuo-2.3 I2V response for ``duration=6`` is a H.264 MP4 at
+    1366x768, 24fps, 141 frames, ~5875ms, no audio. The sealed output contract
+    must carry ``frame_count=141`` and ``fps=24`` so ``probe_generated_video_candidate``
+    can accept the measured artifact while still rejecting wrong frame count,
+    fps, geometry, or audio.
+    """
+    provider = MiniMaxHailuoVideoProvider(
+        transport=_FakeTransport(),
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    resolved = provider.resolve(_i2v_request())
+    output = resolved.effective_output
+    assert output.timing_mode == "frame_count"
+    assert output.frame_count == 141
+    assert output.fps == 24
+    assert output.width == 1366
+    assert output.height == 768
+    assert output.dimension_mode == "exact"
+    assert output.resolution_label == "768P"
+    assert output.ratio == "16:9"
+    assert output.container == "mp4"
+    assert output.mime_type == "video/mp4"
+    assert output.native_audio is False
+    assert output.duration_seconds is None
 
 
 def test_resolve_i2v_rejects_last_frame_role_without_transport(monkeypatch):
@@ -746,7 +799,7 @@ def test_resolve_i2v_rejects_image_below_min_dimension(monkeypatch):
     assert transport.calls == []
 
 
-def test_resolve_i2v_rejects_wrong_output_duration(monkeypatch):
+def test_resolve_i2v_rejects_wrong_output_frame_count(monkeypatch):
     _block_socket(monkeypatch)
     transport = _FakeTransport()
     provider = MiniMaxHailuoVideoProvider(
@@ -754,7 +807,7 @@ def test_resolve_i2v_rejects_wrong_output_duration(monkeypatch):
         credential=_SecretResolver(),
         image_resolver=_i2v_image_resolver(),
     )
-    wrong_output = _i2v_output(duration_seconds=10)
+    wrong_output = _i2v_output(frame_count=120)
     with pytest.raises(AiVideoError) as exc_info:
         provider.resolve(_i2v_request(output_requirement=wrong_output))
     assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
@@ -770,6 +823,21 @@ def test_resolve_i2v_rejects_wrong_resolution(monkeypatch):
         image_resolver=_i2v_image_resolver(),
     )
     wrong_output = _i2v_output(width=1920, height=1080)
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(_i2v_request(output_requirement=wrong_output))
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.calls == []
+
+
+def test_resolve_i2v_rejects_wrong_output_fps(monkeypatch):
+    _block_socket(monkeypatch)
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    wrong_output = _i2v_output(fps=30)
     with pytest.raises(AiVideoError) as exc_info:
         provider.resolve(_i2v_request(output_requirement=wrong_output))
     assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED

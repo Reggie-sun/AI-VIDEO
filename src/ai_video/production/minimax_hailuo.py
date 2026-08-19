@@ -56,6 +56,10 @@ from ai_video.production.video import (
     VideoTaskState,
     build_video_paid_permit_binding,
 )
+from ai_video.production.video_contracts import (
+    VideoFlexibleOutputRequirement,
+    VideoOutputCapability,
+)
 
 _ORIGIN = "https://api.minimaxi.com"
 _SUBMIT_URL = f"{_ORIGIN}/v1/video_generation"
@@ -193,6 +197,22 @@ CredentialResolver = Callable[[], str]
 ImageResolver = Callable[[VideoImageReferenceBinding], bytes]
 
 
+_I2V_OUTPUT_CAPABILITY = VideoOutputCapability(
+    min_duration_seconds=6,
+    max_duration_seconds=6,
+    provider_selected_duration=False,
+    timing_modes=("frame_count",),
+    frame_count_min=141,
+    frame_count_max=141,
+    frame_count_step=1,
+    frame_count_remainder=0,
+    dimension_modes=("exact",),
+    resolution_labels=("768P",),
+    ratios=("16:9",),
+    fps_values=(24,),
+    containers=("mp4",),
+    native_audio_options=(False,),
+)
 _OUTPUT = VideoOutputRequirement(
     duration_seconds=6,
     width=1366,
@@ -224,11 +244,15 @@ _VARIANT = VideoCapabilityVariant(
     idempotent_submit=False,
     lookup_supported=True,
 )
-_I2V_OUTPUT = VideoOutputRequirement(
-    duration_seconds=6,
+_I2V_OUTPUT = VideoFlexibleOutputRequirement(
+    timing_mode="frame_count",
+    frame_count=141,
+    dimension_mode="exact",
     width=1366,
     height=768,
-    fps=None,
+    resolution_label="768P",
+    ratio="16:9",
+    fps=24,
     container="mp4",
     mime_type="video/mp4",
     native_audio=False,
@@ -241,7 +265,7 @@ _I2V_VARIANT = VideoCapabilityVariant(
     execution_kind=VideoExecutionKind.REMOTE,
     billing_kind=BillingKind.METERED,
     mode=VideoGenerationMode.IMAGE_TO_VIDEO,
-    output=_I2V_OUTPUT,
+    output_capability=_I2V_OUTPUT_CAPABILITY,
     allowed_image_roles=("first_frame",),
     required_first_frame=True,
     max_reference_count=0,
@@ -251,7 +275,7 @@ _I2V_VARIANT = VideoCapabilityVariant(
     min_image_height=_MIN_I2V_IMAGE_DIMENSION,
     negative_prompt_supported=False,
     seed_supported=False,
-    fps_supported=False,
+    fps_supported=True,
     idempotent_submit=False,
     lookup_supported=True,
 )
