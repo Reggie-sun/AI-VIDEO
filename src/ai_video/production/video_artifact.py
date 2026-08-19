@@ -13,11 +13,21 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Callable, Literal
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.image import MeasuredPng, measure_png_bytes
+from ai_video.production.local_video import (
+    LocalVideoFetchReceipt,
+    LocalVideoTaskObservation,
+)
 from ai_video.production.models import (
     AssetRecord,
     AssetSourceKind,
@@ -326,7 +336,7 @@ class VideoProbeReceipt(_VideoArtifactStrictModel):
         cls,
         *,
         request: ResolvedVideoGenerationRequest,
-        fetch_receipt: VideoFetchReceipt,
+        fetch_receipt: VideoFetchReceipt | LocalVideoFetchReceipt,
         measured: MeasuredVideoMetadata,
     ) -> "VideoProbeReceipt":
         data = {
@@ -353,7 +363,8 @@ class VideoProvenanceReceipt(_VideoArtifactStrictModel):
     provider_kind: str = Field(pattern=_SAFE_ID.pattern)
     model_id: str = Field(pattern=_SAFE_ID.pattern)
     profile_sha256: str = Field(pattern=_SHA256)
-    paid_submit_receipt_fingerprint: str = Field(pattern=_SHA256)
+    paid_submit_receipt_fingerprint: str | None = Field(default=None, pattern=_SHA256)
+    local_submit_result_fingerprint: str | None = Field(default=None, pattern=_SHA256)
     observation_fingerprint: str = Field(pattern=_SHA256)
     fetch_fingerprint: str = Field(pattern=_SHA256)
     provider_file_id: str = Field(pattern=_SAFE_ID.pattern)
@@ -364,11 +375,26 @@ class VideoProvenanceReceipt(_VideoArtifactStrictModel):
 
     @model_validator(mode="after")
     def _validate_seal(self) -> "VideoProvenanceReceipt":
+        if (self.paid_submit_receipt_fingerprint is None) == (
+            self.local_submit_result_fingerprint is None
+        ):
+            raise ValueError("video provenance requires exactly one submit identity")
         if self.content_hash != canonical_sha256(
             self.model_dump(mode="json", exclude={"content_hash"})
         ):
             raise ValueError("video provenance receipt content hash is invalid")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_variant(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.local_submit_result_fingerprint is None:
+            data.pop("local_submit_result_fingerprint", None)
+        if self.paid_submit_receipt_fingerprint is None:
+            data.pop("paid_submit_receipt_fingerprint", None)
+        return data
 
     @classmethod
     def create(
@@ -411,6 +437,47 @@ class VideoProvenanceReceipt(_VideoArtifactStrictModel):
             }
         )
 
+    @classmethod
+    def create_local(
+        cls,
+        *,
+        request: ResolvedVideoGenerationRequest,
+        observation: LocalVideoTaskObservation,
+        fetch_receipt: LocalVideoFetchReceipt,
+        probe_receipt: VideoProbeReceipt,
+    ) -> "VideoProvenanceReceipt":
+        scope = request.activation_scope
+        if scope is None:
+            raise AiVideoError(
+                code=ErrorCode.VIDEO_REQUEST_INVALID,
+                user_message="Video activation requires durable authoring scope.",
+                retryable=False,
+            )
+        data = {
+            "generation_id": request.generation_id,
+            "request_receipt_fingerprint": request.desired_generation_fingerprint,
+            "resolved_generation_hash": request.resolved_generation_hash,
+            "provider_kind": request.provider_kind,
+            "model_id": request.model_id,
+            "profile_sha256": request.provider_profile.profile_sha256,
+            "local_submit_result_fingerprint": fetch_receipt.submit_result_fingerprint,
+            "observation_fingerprint": observation.observation_fingerprint,
+            "fetch_fingerprint": fetch_receipt.fetch_fingerprint,
+            "provider_file_id": fetch_receipt.provider_file_id,
+            "artifact_sha256": fetch_receipt.artifact_sha256,
+            "probe_receipt_id": probe_receipt.content_hash,
+            "usage_license": scope.usage_license,
+        }
+        candidate = cls.model_construct(**data, content_hash="0" * 64)
+        return cls.model_validate(
+            {
+                **data,
+                "content_hash": canonical_sha256(
+                    candidate.model_dump(mode="json", exclude={"content_hash"})
+                ),
+            }
+        )
+
 
 def _probe_fraction(value: object, label: str) -> Fraction:
     try:
@@ -425,7 +492,7 @@ def _probe_fraction(value: object, label: str) -> Fraction:
 def probe_generated_video_candidate(
     held_fd: int,
     expected_request: ResolvedVideoGenerationRequest,
-    fetch_receipt: VideoFetchReceipt,
+    fetch_receipt: VideoFetchReceipt | LocalVideoFetchReceipt,
     *,
     probe: Callable[[int], dict] | None = None,
     max_size_bytes: int = 2_147_483_648,

@@ -465,7 +465,13 @@ class VideoGenerationRequest(_VideoStrictModel):
                 height=terminal.extracted_height,
                 size_bytes=terminal.extracted_size_bytes,
             )
-            if self.image_bindings != (expected_frame,):
+            optional_last = self.image_bindings[1:]
+            if (
+                not self.image_bindings
+                or self.image_bindings[0] != expected_frame
+                or len(optional_last) > 1
+                or any(item.role != "last_frame" for item in optional_last)
+            ):
                 raise ValueError("continuity request does not bind the exact terminal frame")
             required_inputs = {
                 terminal.source_shot_id,

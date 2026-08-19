@@ -191,6 +191,94 @@ class VideoFetchReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class LocalVideoSubmitIntentPointer(_PaidLifecycleModel):
+    path: Path
+    intent_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "LocalVideoSubmitIntentPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/local/intents/"
+                f"{self.intent_fingerprint}.json"
+            ),
+            "local video submit intent",
+        )
+        return self
+
+
+class LocalVideoSubmitReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    result_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    provider_request_id: str = Field(min_length=1)
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "LocalVideoSubmitReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/local/submits/"
+                f"{self.result_fingerprint}.json"
+            ),
+            "local video submit receipt",
+        )
+        return self
+
+
+class LocalVideoStatusReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    observation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    submit_result_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "LocalVideoStatusReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/local/status/"
+                f"{self.observation_fingerprint}.json"
+            ),
+            "local video status receipt",
+        )
+        return self
+
+
+class LocalVideoFetchReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    fetch_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_path: Path
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_size_bytes: int = Field(strict=True, gt=0)
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_paths(self) -> "LocalVideoFetchReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/local/fetch/receipts/"
+                f"{self.fetch_fingerprint}.json"
+            ),
+            "local video fetch receipt",
+        )
+        _canonical_paid_path(
+            self.artifact_path,
+            Path(
+                "state/video-generation/fetch/files/"
+                f"{self.artifact_sha256}.mp4"
+            ),
+            "local video fetched artifact",
+        )
+        return self
+
+
 class TerminalFrameEvidencePointer(_PaidLifecycleModel):
     path: Path
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -267,6 +355,10 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
     paid_submit_receipt: PaidProviderSubmitReceiptPointer | None = None
     latest_observation: VideoStatusReceiptPointer | None = None
     fetch_receipt: VideoFetchReceiptPointer | None = None
+    local_submit_intent: LocalVideoSubmitIntentPointer | None = None
+    local_submit_receipt: LocalVideoSubmitReceiptPointer | None = None
+    local_latest_observation: LocalVideoStatusReceiptPointer | None = None
+    local_fetch_receipt: LocalVideoFetchReceiptPointer | None = None
     provider_file_id: str | None = Field(default=None, min_length=1)
     terminal_frame_evidence: TerminalFrameEvidencePointer | None = None
     terminal_frame_extraction: TerminalFrameExtractionReceiptPointer | None = None
@@ -284,6 +376,14 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             data.pop("terminal_frame_extraction", None)
         if not self.candidate_continuity_asset_ids:
             data.pop("candidate_continuity_asset_ids", None)
+        for field in (
+            "local_submit_intent",
+            "local_submit_receipt",
+            "local_latest_observation",
+            "local_fetch_receipt",
+        ):
+            if getattr(self, field) is None:
+                data.pop(field, None)
         return data
 
     @model_validator(mode="after")
@@ -293,31 +393,70 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             or self.request.resolved_generation_hash != self.resolved_generation_hash
         ):
             raise ValueError("video attempt identity does not match its request pointer")
-        if self.phase in _VIDEO_PRE_SUBMIT_PHASES:
+        local_fields = (
+            self.local_submit_intent,
+            self.local_submit_receipt,
+            self.local_latest_observation,
+            self.local_fetch_receipt,
+        )
+        remote_fields = (
+            self.paid_submit_receipt,
+            self.latest_observation,
+            self.fetch_receipt,
+        )
+        local_lane = any(item is not None for item in local_fields)
+        remote_lane = any(item is not None for item in remote_fields)
+        if local_lane and remote_lane:
+            raise ValueError("video attempt cannot mix local and paid evidence")
+        if self.phase is VideoAttemptPhase.REQUEST:
             if (
-                self.paid_submit_receipt is not None
-                or self.latest_observation is not None
-                or self.fetch_receipt is not None
+                local_lane
+                or remote_lane
             ):
                 raise ValueError(
                     "pre-submit video phases cannot select submit or observation evidence"
                 )
+        elif self.phase is VideoAttemptPhase.SUBMIT_INTENT:
+            if local_lane and (
+                self.local_submit_intent is None
+                or any(item is not None for item in local_fields[1:])
+            ):
+                raise ValueError("local video submit intent contains terminal evidence")
+            if remote_lane:
+                raise ValueError(
+                    "paid video submit intent phase cannot contain submit evidence"
+                )
+        elif local_lane:
+            if self.local_submit_intent is None or self.local_submit_receipt is None:
+                raise ValueError("submitted local video phases require exact submit evidence")
         elif self.paid_submit_receipt is None:
             raise ValueError("submitted video phases require a paid Provider submit receipt")
-        if self.phase in _VIDEO_OBSERVED_PHASES and self.latest_observation is None:
+        observation = (
+            self.local_latest_observation if local_lane else self.latest_observation
+        )
+        fetch = self.local_fetch_receipt if local_lane else self.fetch_receipt
+        if self.phase in _VIDEO_OBSERVED_PHASES and observation is None:
             raise ValueError("observed video phases require a latest observation pointer")
-        if self.latest_observation is not None:
+        if observation is not None:
             if (
-                self.latest_observation.request_receipt_fingerprint
+                observation.request_receipt_fingerprint
                 != self.request.request_receipt_fingerprint
             ):
                 raise ValueError("video observation does not belong to the attempt request")
-            if (
+            if not local_lane and (
                 self.paid_submit_receipt is not None
+                and self.latest_observation is not None
                 and self.latest_observation.paid_submit_receipt_fingerprint
                 != self.paid_submit_receipt.submit_receipt_fingerprint
             ):
                 raise ValueError("video observation does not match the submit receipt")
+            if local_lane and (
+                self.local_submit_receipt is None
+                or self.local_latest_observation is None
+                or self.local_latest_observation.submit_result_fingerprint
+                != self.local_submit_receipt.result_fingerprint
+            ):
+                raise ValueError("local video observation does not match submit receipt")
         elif self.provider_file_id is not None:
             raise ValueError("video provider file locator requires an observation pointer")
         if self.phase in {
@@ -325,9 +464,9 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             VideoAttemptPhase.CANDIDATE,
             VideoAttemptPhase.ACTIVATE,
         }:
-            if self.fetch_receipt is None:
+            if fetch is None:
                 raise ValueError("post-fetch video phases require a fetch receipt")
-        elif self.fetch_receipt is not None:
+        elif fetch is not None:
             raise ValueError("video fetch receipt requires a post-fetch phase")
         if self.phase in _VIDEO_CANDIDATE_PHASES:
             if self.candidate_video_asset_ids != (self.request.output_asset_id,):
@@ -421,9 +560,16 @@ def _validate_video_attempt(attempt: Any) -> None:
     if attempt.base_dependency_graph is None:
         raise ValueError("video_generation attempts require base dependency graph")
     paid_state = attempt.paid_provider_state
+    local_lane = state.local_submit_intent is not None
     if state.phase is VideoAttemptPhase.REQUEST:
         if paid_state is not None:
             raise ValueError("video request phase cannot contain paid Provider Gate state")
+    elif local_lane:
+        if paid_state is not None:
+            raise ValueError("local video attempt cannot contain paid Provider Gate state")
+        if state.phase is VideoAttemptPhase.SUBMIT_INTENT:
+            if attempt.status.value not in {"running", "failed", "outcome_unknown"}:
+                raise ValueError("local video submit intent status is inconsistent")
     else:
         if paid_state is None:
             raise ValueError("post-request video phases require paid Provider Gate state")

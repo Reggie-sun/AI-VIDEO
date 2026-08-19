@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from copy import deepcopy
 from pathlib import Path
 
@@ -211,6 +212,16 @@ def test_terminal_frame_is_extracted_registered_activated_and_replayed_exactly(
     )
     video_asset, terminal_asset = selected.registry.assets[-2:]
     assert video_asset.asset_id == resolved.output_asset_id
+    assert video_asset.video_metadata is not None
+    provenance_payload = json.loads(
+        (
+            tmp_path
+            / "state/video-generation/provenance"
+            / f"{video_asset.video_metadata.provenance_receipt_id}.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert "paid_submit_receipt_fingerprint" in provenance_payload
+    assert "local_submit_result_fingerprint" not in provenance_payload
     assert terminal_asset.asset_id == state.terminal_frame_evidence.extracted_asset_id
     assert terminal_asset.input_artifact_ids == (video_asset.asset_id,)
     assert (tmp_path / terminal_asset.artifact_path).read_bytes().startswith(

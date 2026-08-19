@@ -370,48 +370,88 @@ class _StateCommitVideoCandidateMixin:
             attempt = self._video_attempt(manifest, attempt_id)
             state = attempt.video_generation_state
             paid_state = attempt.paid_provider_state
+            local_lane = state is not None and state.local_fetch_receipt is not None
             if (
                 attempt.status is not StateCommitStatus.RUNNING
                 or state is None
                 or state.phase is not VideoAttemptPhase.VALIDATE
-                or state.fetch_receipt is None
-                or state.latest_observation is None
-                or state.paid_submit_receipt is None
-                or paid_state is None
-                or paid_state.phase is not PaidProviderAttemptPhase.SETTLED
-                or manifest.active_paid_provider_budget is None
             ):
                 raise _state_invalid(
-                    "Video validation requires exact fetched and settled evidence."
-                )
-            budget = self._reopen_paid_budget(manifest.active_paid_provider_budget)
-            reservation = next(
-                (
-                    item
-                    for item in budget.reservations
-                    if item.reservation_id == paid_state.reservation_id
-                ),
-                None,
-            )
-            if (
-                reservation is None
-                or reservation.status is not BudgetReservationStatus.SETTLED
-                or reservation.attempt_id != attempt_id
-                or reservation.request_fingerprint != state.request.resolved_generation_hash
-                or reservation.submit_receipt_fingerprint
-                != state.paid_submit_receipt.submit_receipt_fingerprint
-                or reservation.actual_cost_microunits is None
-            ):
-                raise _state_invalid(
-                    "Video validation requires the exact settled budget receipt."
+                    "Video validation requires exact durable fetched evidence."
                 )
             request = self._reopen_video_request(state.request)
-            observation = self._reopen_video_status(state.latest_observation)
-            fetch_receipt = self._reopen_video_fetch(state.fetch_receipt)
+            if local_lane:
+                if (
+                    state.local_latest_observation is None
+                    or state.local_submit_receipt is None
+                    or paid_state is not None
+                ):
+                    raise _state_invalid("Local video evidence chain is incomplete.")
+                fetch_pointer = state.local_fetch_receipt
+                observation = self._reopen_local_video_status(
+                    state.local_latest_observation
+                )
+                fetch_receipt = self._reopen_local_video_fetch(fetch_pointer)
+                egress = EgressMetadata()
+                cost_receipt_id = None
+            else:
+                if (
+                    state.fetch_receipt is None
+                    or state.latest_observation is None
+                    or state.paid_submit_receipt is None
+                    or paid_state is None
+                    or paid_state.phase is not PaidProviderAttemptPhase.SETTLED
+                    or manifest.active_paid_provider_budget is None
+                ):
+                    raise _state_invalid(
+                        "Remote video validation requires exact settled evidence."
+                    )
+                budget = self._reopen_paid_budget(
+                    manifest.active_paid_provider_budget
+                )
+                reservation = next(
+                    (
+                        item
+                        for item in budget.reservations
+                        if item.reservation_id == paid_state.reservation_id
+                    ),
+                    None,
+                )
+                if (
+                    reservation is None
+                    or reservation.status is not BudgetReservationStatus.SETTLED
+                    or reservation.attempt_id != attempt_id
+                    or reservation.request_fingerprint
+                    != state.request.resolved_generation_hash
+                    or reservation.submit_receipt_fingerprint
+                    != state.paid_submit_receipt.submit_receipt_fingerprint
+                    or reservation.actual_cost_microunits is None
+                ):
+                    raise _state_invalid(
+                        "Video validation requires the exact settled budget receipt."
+                    )
+                fetch_pointer = state.fetch_receipt
+                observation = self._reopen_video_status(state.latest_observation)
+                fetch_receipt = self._reopen_video_fetch(fetch_pointer)
+                gate = self._reopen_paid_gate(paid_state.gate_receipt)
+                egress = EgressMetadata(
+                    remote=True,
+                    destination=gate.preview.destination,
+                    authorization_receipt_id=(
+                        gate.authorization.egress_policy_receipt_id
+                    ),
+                    request_fingerprint=request.resolved_generation_hash,
+                    payload_fingerprint=gate.preview.preview_fingerprint,
+                    retention_mode=gate.preview.retention_mode,
+                    provider_policy_snapshot_id=(
+                        gate.preview.provider_policy_snapshot_id
+                    ),
+                )
+                cost_receipt_id = manifest.active_paid_provider_budget.content_hash
             terminal_frame_bytes = None
             terminal_extraction = None
             with _open_regular_file_nofollow(
-                self._project_root / state.fetch_receipt.artifact_path,
+                self._project_root / fetch_pointer.artifact_path,
                 contained_by=(
                     self._project_root / "state" / "video-generation" / "fetch"
                 ),
@@ -422,11 +462,20 @@ class _StateCommitVideoCandidateMixin:
                     fetch_receipt,
                     probe=probe,
                 )
-                provenance = VideoProvenanceReceipt.create(
-                    request=request,
-                    observation=observation,
-                    fetch_receipt=fetch_receipt,
-                    probe_receipt=probe_receipt,
+                provenance = (
+                    VideoProvenanceReceipt.create_local(
+                        request=request,
+                        observation=observation,
+                        fetch_receipt=fetch_receipt,
+                        probe_receipt=probe_receipt,
+                    )
+                    if local_lane
+                    else VideoProvenanceReceipt.create(
+                        request=request,
+                        observation=observation,
+                        fetch_receipt=fetch_receipt,
+                        probe_receipt=probe_receipt,
+                    )
                 )
                 if (
                     request.activation_scope.request.seal_terminal_frame
@@ -514,23 +563,13 @@ class _StateCommitVideoCandidateMixin:
                 raise _state_invalid(
                     "Terminal extraction checkpoint does not match exact source evidence."
                 )
-            gate = self._reopen_paid_gate(paid_state.gate_receipt)
-            egress = EgressMetadata(
-                remote=True,
-                destination=gate.preview.destination,
-                authorization_receipt_id=gate.authorization.egress_policy_receipt_id,
-                request_fingerprint=request.resolved_generation_hash,
-                payload_fingerprint=gate.preview.preview_fingerprint,
-                retention_mode=gate.preview.retention_mode,
-                provider_policy_snapshot_id=gate.preview.provider_policy_snapshot_id,
-            )
             asset_record = build_generated_video_asset_record(
                 request=request,
                 measured=measured,
                 probe_receipt=probe_receipt,
                 provenance=provenance,
                 egress=egress,
-                cost_receipt_id=manifest.active_paid_provider_budget.content_hash,
+                cost_receipt_id=cost_receipt_id,
             )
             continuity_asset_record = (
                 build_terminal_frame_asset_record(
@@ -568,7 +607,7 @@ class _StateCommitVideoCandidateMixin:
                 prepared=prepared,
             )
             fetched = _read_regular_file_nofollow(
-                self._project_root / state.fetch_receipt.artifact_path,
+                self._project_root / fetch_pointer.artifact_path,
                 contained_by=(
                     self._project_root / "state" / "video-generation" / "fetch"
                 ),

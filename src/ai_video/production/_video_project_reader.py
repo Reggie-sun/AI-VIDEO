@@ -6,6 +6,12 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._lifecycle_schema import (
+    LocalVideoFetchReceiptPointer,
+    LocalVideoStatusReceiptPointer,
+    LocalVideoSubmitIntentPointer,
+    LocalVideoSubmitReceiptPointer,
+)
 from ai_video.production._paid_provider_project_reader import (
     load_paid_provider_budget_by_content_hash,
     load_paid_provider_gate_receipt,
@@ -27,6 +33,12 @@ from ai_video.production.models import (
     VideoStatusReceiptPointer,
     TerminalFrameEvidencePointer,
     TerminalFrameExtractionReceiptPointer,
+)
+from ai_video.production.local_video import (
+    LocalVideoFetchReceipt,
+    LocalVideoSubmitIntent,
+    LocalVideoSubmitResult,
+    LocalVideoTaskObservation,
 )
 from ai_video.production.paid_provider import BudgetReservationStatus
 from ai_video.production.paths import (
@@ -146,6 +158,92 @@ def load_video_fetch_receipt(
     return receipt
 
 
+def load_local_video_submit_intent(
+    root: str | Path, pointer: LocalVideoSubmitIntentPointer
+) -> LocalVideoSubmitIntent:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        intent = LocalVideoSubmitIntent.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen local video submit intent.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or intent.intent_fingerprint != pointer.intent_fingerprint
+        or intent.request_fingerprint != pointer.request_fingerprint
+    ):
+        raise _invalid("Local video submit intent pointer identity is invalid.")
+    return intent
+
+
+def load_local_video_submit_receipt(
+    root: str | Path, pointer: LocalVideoSubmitReceiptPointer
+) -> LocalVideoSubmitResult:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        result = LocalVideoSubmitResult.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen local video submit receipt.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or result.result_fingerprint != pointer.result_fingerprint
+        or result.resolved_generation_hash != pointer.request_fingerprint
+        or result.provider_request_id != pointer.provider_request_id
+    ):
+        raise _invalid("Local video submit receipt pointer identity is invalid.")
+    return result
+
+
+def load_local_video_status_receipt(
+    root: str | Path, pointer: LocalVideoStatusReceiptPointer
+) -> LocalVideoTaskObservation:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        observation = LocalVideoTaskObservation.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen local video observation.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or observation.observation_fingerprint != pointer.observation_fingerprint
+        or observation.submit_result_fingerprint
+        != pointer.submit_result_fingerprint
+    ):
+        raise _invalid("Local video observation pointer identity is invalid.")
+    return observation
+
+
+def load_local_video_fetch_receipt(
+    root: str | Path, pointer: LocalVideoFetchReceiptPointer
+) -> LocalVideoFetchReceipt:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        receipt = LocalVideoFetchReceipt.model_validate_json(raw.data)
+        artifact_path = resolve_contained_path(
+            resolved_root,
+            pointer.artifact_path,
+            allowed_root=resolved_root / "state" / "video-generation" / "fetch",
+        )
+        artifact = _read_regular_file_nofollow(
+            artifact_path,
+            contained_by=resolved_root / "state" / "video-generation" / "fetch",
+        )
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen local video fetch evidence.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or receipt.fetch_fingerprint != pointer.fetch_fingerprint
+        or receipt.artifact_sha256 != pointer.artifact_sha256
+        or receipt.size_bytes != pointer.artifact_size_bytes
+        or artifact.file_sha256 != pointer.artifact_sha256
+        or len(artifact.data) != pointer.artifact_size_bytes
+    ):
+        raise _invalid("Local video fetch pointer identity is invalid.")
+    return receipt
+
+
 def load_terminal_frame_evidence(
     root: str | Path, pointer: TerminalFrameEvidencePointer
 ) -> TerminalFrameEvidence:
@@ -239,6 +337,64 @@ def verify_video_evidence(
             or request.resolved_generation_hash != state.resolved_generation_hash
         ):
             raise _invalid("Video attempt identity does not match its request evidence.")
+        if state.local_submit_intent is not None:
+            intent = load_local_video_submit_intent(root, state.local_submit_intent)
+            if intent.request_fingerprint != request.resolved_generation_hash:
+                raise _invalid("Local video intent does not match its request.")
+            if state.local_submit_receipt is None:
+                continue
+            result = load_local_video_submit_receipt(
+                root, state.local_submit_receipt
+            )
+            try:
+                from ai_video.production.local_video import LocalVideoSubmission
+
+                submission = LocalVideoSubmission.from_submit_result(
+                    resolved=request, result=result
+                )
+            except (AiVideoError, ValueError) as exc:
+                raise _invalid(
+                    "Local video submit result cannot reconstruct its submission.",
+                    str(exc),
+                ) from exc
+            if state.local_latest_observation is None:
+                continue
+            observation = load_local_video_status_receipt(
+                root, state.local_latest_observation
+            )
+            if (
+                observation.submission_fingerprint
+                != submission.submission_fingerprint
+                or observation.submit_result_fingerprint
+                != result.result_fingerprint
+                or state.provider_file_id != observation.provider_file_id
+            ):
+                raise _invalid("Local video observation identity is invalid.")
+            if (
+                state.phase
+                in {
+                    VideoAttemptPhase.FETCH,
+                    VideoAttemptPhase.VALIDATE,
+                    VideoAttemptPhase.CANDIDATE,
+                    VideoAttemptPhase.ACTIVATE,
+                }
+                and observation.state is not VideoTaskState.SUCCEEDED
+            ):
+                raise _invalid("Local video fetch phases require success.")
+            if state.local_fetch_receipt is not None:
+                fetch = load_local_video_fetch_receipt(
+                    root, state.local_fetch_receipt
+                )
+                if (
+                    fetch.submission_fingerprint
+                    != submission.submission_fingerprint
+                    or fetch.observation_fingerprint
+                    != observation.observation_fingerprint
+                    or fetch.submit_result_fingerprint != result.result_fingerprint
+                    or fetch.provider_file_id != observation.provider_file_id
+                ):
+                    raise _invalid("Local video fetch evidence is not exact.")
+            continue
         if state.latest_observation is None:
             continue
         if (
@@ -452,13 +608,18 @@ def _verify_active_generated_video(
         VideoProvenanceReceipt,
         "active generated video provenance receipt",
     )
+    local_lane = state.local_submit_intent is not None
     observation = (
-        load_video_status_receipt(bundle.root, state.latest_observation)
+        load_local_video_status_receipt(bundle.root, state.local_latest_observation)
+        if local_lane and state.local_latest_observation is not None
+        else load_video_status_receipt(bundle.root, state.latest_observation)
         if state.latest_observation is not None
         else None
     )
     fetch = (
-        load_video_fetch_receipt(bundle.root, state.fetch_receipt)
+        load_local_video_fetch_receipt(bundle.root, state.local_fetch_receipt)
+        if local_lane and state.local_fetch_receipt is not None
+        else load_video_fetch_receipt(bundle.root, state.fetch_receipt)
         if state.fetch_receipt is not None
         else None
     )
@@ -501,14 +662,31 @@ def _verify_active_generated_video(
         or provenance.probe_receipt_id != probe.content_hash
         or observation is None
         or fetch is None
-        or provenance.paid_submit_receipt_fingerprint
-        != fetch.paid_submit_receipt_fingerprint
         or provenance.observation_fingerprint
         != observation.observation_fingerprint
         or provenance.fetch_fingerprint != fetch.fetch_fingerprint
         or provenance.provider_file_id != fetch.provider_file_id
         or asset.creation_receipt_id != provenance.content_hash
         or asset.usage_license != provenance.usage_license
+    ):
+        raise _invalid("Active generated video provenance chain is invalid.")
+    if local_lane:
+        if (
+            state.local_submit_receipt is None
+            or fetch.submit_result_fingerprint
+            != state.local_submit_receipt.result_fingerprint
+            or provenance.local_submit_result_fingerprint
+            != fetch.submit_result_fingerprint
+            or provenance.paid_submit_receipt_fingerprint is not None
+            or paid_state is not None
+            or asset.cost_receipt_id is not None
+            or asset.egress.remote
+        ):
+            raise _invalid("Active local video provenance chain is invalid.")
+    elif (
+        provenance.paid_submit_receipt_fingerprint
+        != fetch.paid_submit_receipt_fingerprint
+        or provenance.local_submit_result_fingerprint is not None
         or paid_state is None
         or paid_state.phase is not PaidProviderAttemptPhase.SETTLED
         or reservation is None
@@ -519,7 +697,7 @@ def _verify_active_generated_video(
         != provenance.paid_submit_receipt_fingerprint
         or reservation.actual_cost_microunits is None
     ):
-        raise _invalid("Active generated video provenance chain is invalid.")
+        raise _invalid("Active remote video provenance chain is invalid.")
     _verify_active_terminal_frame(bundle, attempt, request, asset, provenance)
 
 
@@ -536,10 +714,29 @@ def verify_manifest_video_evidence(
         if state.phase is VideoAttemptPhase.REQUEST:
             continue
         paid_state = attempt.paid_provider_state
+        request = load_video_request_receipt(root, state.request)
+        if state.local_submit_intent is not None:
+            intent = load_local_video_submit_intent(root, state.local_submit_intent)
+            if (
+                paid_state is not None
+                or intent.attempt_id != attempt.attempt_id
+                or intent.request_fingerprint != request.resolved_generation_hash
+                or request.execution_kind.value != "local"
+                or request.billing_kind.value != "local_unmetered"
+            ):
+                raise _invalid("Local video attempt identity is invalid.")
+            if (
+                state.phase is VideoAttemptPhase.ACTIVATE
+                and attempt.candidate_project == manifest.active_project
+                and attempt.candidate_registry == manifest.active_registry
+                and attempt.candidate_dependency_graph
+                == manifest.active_dependency_graph
+            ):
+                _verify_active_generated_video(bundle, attempt, request)
+            continue
         if paid_state is None:
             raise _invalid("Video attempt is missing Paid Provider Gate evidence.")
         gate = load_paid_provider_gate_receipt(root, paid_state.gate_receipt)
-        request = load_video_request_receipt(root, state.request)
         if (
             gate.preview.operation != "video_generation"
             or gate.preview.attempt_id != attempt.attempt_id

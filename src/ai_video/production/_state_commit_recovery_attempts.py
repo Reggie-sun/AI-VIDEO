@@ -93,6 +93,46 @@ class _StateCommitRecoveryAttemptsMixin:
                     continue
                 paid_state = attempt.paid_provider_state
                 if (
+                    state.local_submit_intent is not None
+                    and state.phase is VideoAttemptPhase.SUBMIT_INTENT
+                ):
+                    replacement = _validated_transition(
+                        attempt,
+                        {
+                            "status": StateCommitStatus.OUTCOME_UNKNOWN,
+                            "finished_at": _timestamp(),
+                            "error_code": (
+                                ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN.value
+                            ),
+                            "error_message": (
+                                "Local video submit outcome is unknown; do not "
+                                "resubmit blindly."
+                            ),
+                        },
+                    )
+                    repaired.append(replacement)
+                    items.append(
+                        RecoveryItem(
+                            path=state.local_submit_intent.path,
+                            disposition=RecoveryDisposition.INTERRUPTED_RECORDED,
+                            sha256=state.local_submit_intent.file_sha256,
+                        )
+                    )
+                    changed = True
+                    continue
+                if (
+                    state.local_submit_receipt is not None
+                    and paid_state is None
+                    and state.phase
+                    in {
+                        VideoAttemptPhase.SUBMITTED,
+                        VideoAttemptPhase.POLLING,
+                        VideoAttemptPhase.FETCH,
+                    }
+                ):
+                    repaired.append(attempt)
+                    continue
+                if (
                     paid_state is not None
                     and paid_state.phase.value in {"accepted", "settled"}
                     and state.phase

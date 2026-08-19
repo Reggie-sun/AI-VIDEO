@@ -7,7 +7,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Callable
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.models import VideoAttemptPhase
+from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
+from ai_video.production.local_video import (
+    LocalVideoFetchReceipt,
+    LocalVideoProvider,
+    LocalVideoSubmission,
+    LocalVideoSubmitResult,
+    LocalVideoTaskObservation,
+)
 from ai_video.production.paid_provider import (
     PaidProviderCallPreview,
     PaidProviderSubmitOutcome,
@@ -29,7 +36,7 @@ if TYPE_CHECKING:
 @dataclass(frozen=True)
 class FetchedVideoCandidate:
     relative_path: Path
-    receipt: VideoFetchReceipt
+    receipt: VideoFetchReceipt | LocalVideoFetchReceipt
 
 
 class VideoGenerationService:
@@ -39,7 +46,7 @@ class VideoGenerationService:
         self,
         *,
         committer: ProductionStateCommitter,
-        provider: VideoProvider,
+        provider: VideoProvider | LocalVideoProvider,
     ) -> None:
         self._committer = committer
         self._provider = provider
@@ -143,6 +150,141 @@ class VideoGenerationService:
             receipt=receipt,
         )
 
+    def submit_local_once(self, *, attempt_id: str) -> LocalVideoSubmission:
+        """Submit exactly once after the committer persists a local intent."""
+
+        attempt, state = self._state(attempt_id)
+        if (
+            attempt.status is not StateCommitStatus.RUNNING
+            or state.phase is not VideoAttemptPhase.REQUEST
+            or attempt.paid_provider_state is not None
+        ):
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Local video submit is not the next durable action.",
+                retryable=False,
+            )
+        request = self._committer._reopen_video_request(state.request)
+        preview = self._provider.preview(request)
+        intent, permit = self._committer.record_local_video_submit_intent(
+            attempt_id=attempt_id,
+            preview=preview,
+        )
+        try:
+            result = self._provider.submit_local(
+                request,
+                preview,
+                intent,
+                permit,
+            )
+        except AiVideoError as exc:
+            if exc.code in {
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
+            }:
+                self._committer.record_video_provider_failure(
+                    attempt_id=attempt_id,
+                    error_code=exc.code,
+                    message=exc.user_message,
+                )
+            raise
+        if not isinstance(result, LocalVideoSubmitResult):
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Local video Provider returned an invalid submit result.",
+                retryable=False,
+            )
+        self._committer.record_local_video_submit_result(
+            attempt_id=attempt_id,
+            result=result,
+        )
+        return LocalVideoSubmission.from_submit_result(
+            resolved=request,
+            result=result,
+        )
+
+    def refresh_local_once(self, *, attempt_id: str) -> LocalVideoTaskObservation:
+        attempt, state = self._state(attempt_id)
+        if (
+            attempt.status is not StateCommitStatus.RUNNING
+            or state.phase
+            not in {VideoAttemptPhase.SUBMITTED, VideoAttemptPhase.POLLING}
+            or state.local_submit_receipt is None
+            or attempt.paid_provider_state is not None
+        ):
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Local video poll is not the next durable action.",
+                retryable=False,
+            )
+        request = self._committer._reopen_video_request(state.request)
+        result = self._committer._reopen_local_video_submit(
+            state.local_submit_receipt
+        )
+        submission = LocalVideoSubmission.from_submit_result(
+            resolved=request, result=result
+        )
+        try:
+            observation = self._provider.get_local_status(submission)
+        except AiVideoError as exc:
+            if exc.code in {
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
+            }:
+                self._committer.record_video_provider_failure(
+                    attempt_id=attempt_id,
+                    error_code=exc.code,
+                    message=exc.user_message,
+                )
+            raise
+        self._committer.record_local_video_status_observation(
+            attempt_id=attempt_id,
+            observation=observation,
+        )
+        return observation
+
+    def fetch_local_once(self, *, attempt_id: str) -> FetchedVideoCandidate:
+        attempt, state = self._state(attempt_id)
+        if (
+            attempt.status is not StateCommitStatus.RUNNING
+            or state.phase is not VideoAttemptPhase.FETCH
+            or state.local_latest_observation is None
+            or state.local_submit_receipt is None
+            or attempt.paid_provider_state is not None
+        ):
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Local video fetch is not the next durable action.",
+                retryable=False,
+            )
+        request = self._committer._reopen_video_request(state.request)
+        result = self._committer._reopen_local_video_submit(
+            state.local_submit_receipt
+        )
+        submission = LocalVideoSubmission.from_submit_result(
+            resolved=request, result=result
+        )
+        observation = self._committer._reopen_local_video_status(
+            state.local_latest_observation
+        )
+        with self._committer.prepare_video_fetch_sink(
+            attempt_id=attempt_id
+        ) as (path, sink):
+            fetch_receipt = self._provider.fetch_local(
+                submission,
+                observation,
+                sink,
+            )
+        pointer = self._committer.record_local_video_fetch_result(
+            attempt_id=attempt_id,
+            temporary_path=path,
+            receipt=fetch_receipt,
+        )
+        return FetchedVideoCandidate(
+            relative_path=pointer.artifact_path,
+            receipt=fetch_receipt,
+        )
+
     def refresh_once(self, *, attempt_id: str) -> VideoTaskObservation:
         attempt, state = self._state(attempt_id)
         if state.phase not in {
@@ -237,7 +379,10 @@ class VideoGenerationService:
                 attempt_id=attempt_id
             )
         if state.phase is VideoAttemptPhase.FETCH:
-            self.fetch_once(attempt_id=attempt_id)
+            if state.local_submit_receipt is not None:
+                self.fetch_local_once(attempt_id=attempt_id)
+            else:
+                self.fetch_once(attempt_id=attempt_id)
             _, state = self._state(attempt_id)
         if state.phase is VideoAttemptPhase.VALIDATE:
             self._committer.prepare_video_activation_candidate(

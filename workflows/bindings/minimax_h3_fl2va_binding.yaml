@@ -1,0 +1,14 @@
+prompt: ["5", "inputs", "prompt"]
+first_frame: ["15", "inputs", "image"]
+last_frame: ["16", "inputs", "image"]
+last_frame_node_id: "16"
+last_frame_target: ["5", "inputs", "last_frame"]
+seed: ["6", "inputs", "noise_seed"]
+width: ["5", "inputs", "width"]
+height: ["5", "inputs", "height"]
+length: ["5", "inputs", "length"]
+frame_count: ["5", "inputs", "length"]
+steps: ["9", "inputs", "steps"]
+sampler: ["8", "inputs", "sampler_name"]
+output_prefix: ["14", "inputs", "filename_prefix"]
+output_node_id: "14"

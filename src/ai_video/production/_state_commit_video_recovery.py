@@ -44,11 +44,15 @@ class _StateCommitVideoRecoveryMixin:
                 continue
 
             if state.phase is VideoAttemptPhase.VALIDATE:
-                if state.fetch_receipt is None:
+                fetch_pointer = state.local_fetch_receipt or state.fetch_receipt
+                if fetch_pointer is None:
                     raise _state_invalid(
                         "Recoverable video validation has no fetch receipt."
                     )
-                self._reopen_video_fetch(state.fetch_receipt)
+                if state.local_fetch_receipt is not None:
+                    self._reopen_local_video_fetch(state.local_fetch_receipt)
+                else:
+                    self._reopen_video_fetch(state.fetch_receipt)
                 if state.terminal_frame_extraction is not None:
                     self._reopen_terminal_frame_extraction(
                         state.terminal_frame_extraction
@@ -61,9 +65,9 @@ class _StateCommitVideoRecoveryMixin:
                 )
                 candidate_items.append(
                     RecoveryItem(
-                        path=state.fetch_receipt.path,
+                        path=fetch_pointer.path,
                         disposition=RecoveryDisposition.ACTIVE,
-                        sha256=state.fetch_receipt.file_sha256,
+                        sha256=fetch_pointer.file_sha256,
                     )
                 )
                 continue

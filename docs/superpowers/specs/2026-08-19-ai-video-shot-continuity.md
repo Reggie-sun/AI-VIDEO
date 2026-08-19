@@ -2,9 +2,9 @@
 
 ## Status
 
-本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation，以及Hailuo 2.3和Seedance 2.0 Mini offline adapter mapping；下文“当前尚未实现”等陈述保留为implementation前baseline。Local MiniMax H3已完成一次raw loopback checkpoint smoke，但sealed workflow/profile、production `ComfyUIVideoProvider`、continuity chaining proof、任何新的cloud Provider live proof、重新生成Shot 2/3与subjective quality acceptance仍未完成。2026-08-19本次docs-only更新只固定官方H3 I2V workflow及其项目派生规则，不表示workflow、adapter或continuity live proof已经实现。既有P8 Provider contract仍不被改写。
+本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation、Hailuo 2.3与Seedance 2.0 Mini offline adapter mapping，以及Local MiniMax H3 `fl2va` sealed workflow/profile、loopback-only `ComfyUIVideoProvider`和durable local submit/status/fetch/activation/recovery evidence。一次获授权的two-Shot live-local proof已证明Shot A exact terminal PNG进入Shot B `first_frame`，两段MP4均完成measured validation、activation、reopen与zero-call replay。Cloud Provider continuity live、`ref2va`和blinded subjective quality acceptance仍未完成；既有P8 remote/Paid Provider contract不被改写。
 
-当前已实现的是 frame-accurate composition：generated MP4 已能进入唯一的 `CompositionSpec -> ResolvedTimeline -> HyperFrames` 路径，并保持 P4 audio/caption/final mux 语义。当前尚未实现的是 semantic/visual continuity：三个独立生成的 Shot 不会因为精确硬切而自动共享场景、角色、镜头轴线、光线或运动状态。
+当前已实现frame-accurate composition与显式Local H3 terminal-to-first-frame continuity lane：generated MP4仍进入唯一的`CompositionSpec -> ResolvedTimeline -> HyperFrames`路径并保持P4 audio/caption/final mux语义。该lane不会让任意三个独立生成的Shot自动共享场景、角色、镜头轴线、光线或运动状态；只有带exact continuity binding并逐Shot生成的edge获得技术保证，语义质量仍需独立人工验收。
 
 ## Goal
 
@@ -30,19 +30,19 @@ Shot Continuity 的目标是让 Shot N 已 sealed 的 terminal-frame/reference s
 - P5 resolver 能基于 immutable typed graph 做 precise transitive invalidation，且 `Shot.continuity_constraints` 已进入 Shot visual projection fingerprint。
 - P3/P4 仍由唯一的 `ResolvedTimeline` 和唯一的 HyperFrames renderer 负责 frame/sample/timing/render。
 
-这些能力尚不足以实现本规范：
+当前实现进一步提供：
 
-- 普通 `first_frame` binding 没有绑定 source Shot、source candidate、source generation、terminal-frame extraction receipt 或 continuity constraint snapshot。
-- fetched MP4 provenance 没有 terminal-frame evidence。
-- P5 graph 没有从 Shot N 的 activated candidate/terminal evidence 指向 Shot N+1 generation input 的 typed edge。
-- 当前 MiniMax Hailuo adapter 只声明 T2V；Seedance capability table 虽已声明特定 I2V/last-frame 能力，但 continuity payload、activation 和 live proof 尚未验收。
-- 当前仓库没有已验收的 “MiniMax local video Provider” runtime。Local Wan + ComfyUI 仍是 local-first optional capability，但不得在缺少 exact runtime/model/profile 证据时被重命名或推断为 MiniMax local。
+- `ContinuityReferenceBinding`把普通`first_frame`扩展为source Shot/candidate/generation、terminal extraction receipt、exact PNG bytes和continuity constraint snapshot的sealed lineage；fetched MP4 provenance可共同激活derived terminal PNG。
+- P5 graph只在显式terminal-image input存在时建立typed asset-to-generation edge，并沿真实closure做precise invalidation。
+- `LocalVideoSubmitIntent`、submit/status/fetch receipts与one-use local permit形成独立于Paid Provider Gate的durable local evidence chain；local与remote evidence不得混合。
+- `ComfyUIVideoProvider`只接受sealed profile列出的literal loopback endpoint，在R+1前验证ComfyUI commit、四个model components、native node inventory、template/binding/profile hashes与output bounds；任何mismatch均在上传或submit前fail closed，且无remote fallback。
+- Hailuo 2.3与Seedance 2.0 Mini continuity payload仍只有offline acceptance；它们的cloud live、billing和subjective quality不能由Local H3结果外推。
 
 ## Scope
 
 本规范覆盖 provider-neutral continuity request、terminal-frame artifact/provenance、capability denial、durable activation/recovery、P5 precise invalidation，以及 technical/provider/subjective acceptance 的分层边界。
 
-未来实现可面向三个彼此隔离的 provider lane：
+本contract面向三个彼此隔离的provider lane；Local H3已实现，两个cloud lane仍只有offline mapping：
 
 1. `local continuity lane`：用户称为“MiniMax 本地”的目标必须先解析为 exact local engine、model、workflow/profile 和 loopback endpoint。若实际执行器是 Wan + ComfyUI，应按其真实 identity 命名；若仍调用 MiniMax cloud，则它不是 local lane。未完成 identity resolution 前不得 submit。
 2. `MiniMax cloud Hailuo 2.3 lane`：目标 model 为 `MiniMax-Hailuo-2.3`，只在 adapter 显式支持并验证 I2V `first_frame` 后进入 continuity flow。
@@ -57,7 +57,7 @@ Provider-specific payload、model naming、duration/resolution 限制不得进�
 - 不新增第二 timeline、第二 renderer、第二 state writer 或通用 Agent runtime。
 - 不把 crossfade、插帧、optical flow、prompt 文案复用或剪辑遮挡描述为完整 continuity solution。
 - 不改变 Legacy CLI、Legacy layout、public CLI commands、default no-network 或 local-first policy。
-- 不重新生成 Shot 2/3，不调用本地或云端 video Provider，不产生新的付费行为。
+- 不调用cloud video Provider，不产生新的付费行为，也不增加local失败后的cloud fallback；本slice只执行用户明确授权的bounded Local H3 two-Shot proof。
 - 不修改 P8 provider spec，不把 proposed continuity fields 写成已实现 runtime truth。
 - 默认不增加 dependency、CLI、Manifest schema 或 artifact layout。
 
@@ -164,14 +164,14 @@ Local H3 `fl2va` lane 的 reviewed upstream baseline 是 Comfy-Org 官方 I2V wo
 
 ### Local Continuity Lane
 
-当前已确认本机ComfyUI原生MiniMax H3 nodes、`fl2va`/`ref2va` checkpoints、量化Qwen3-VL text encoder与video/audio VAEs。2026-08-19 raw smoke在literal loopback `http://127.0.0.1:8188`上使用`fl2va`、14-node ad-hoc API workflow、seed `20260819`、608x352、22 frames、20 steps完成一次单提交/零重试生成；ComfyUI报告约19.85秒，产物为0.917秒、24fps、H.264 + AAC MP4，SHA-256为`837b416d4185790e148fcb2389766727939aca26d7a31f2b91a4806796d32f3f`。Host-local evidence位于`runs/h3-local-live-20260819-fresh/`。该proof只证明checkpoint可以在当前RTX 5090 host完成短推理；它没有消费`first_frame`/`last_frame`/reference，没有进入P8 lifecycle，也不是continuity、长时长或subjective quality acceptance。
+Local H3 `fl2va` production lane现由`workflows/templates/minimax_h3_fl2va_api.json`、`workflows/bindings/minimax_h3_fl2va_binding.yaml`与`workflows/profiles/minimax_h3_fl2va.json`固定。Profile seal official upstream provenance、derived workflow SHA-256 `c736a12f35fd89f10a8db86f0769a85ca7bceb80d16feab62a1666cfd078737b`、binding SHA-256 `e0ae28bdaaa81ac70578b11e97f95cacab826273ec09f82bfcf430176fb05a4c`、ComfyUI commit `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、四个model component hashes、native node inventory、literal loopback endpoint、24fps、17k+5 frame-grid、124-362 trained frame boundary、native audio与MP4 output bounds；profile content hash为`456b59c7a907d4b07c7d951d63ec03cbd0fb5c64638dbc8dad870aca09e2b604`。
 
-当前仍没有production `ComfyUIVideoProvider` continuity adapter或sealed MiniMax H3 execution profile。未来实现必须seal exact ComfyUI commit、checkpoint/content hashes、text encoder、VAEs、workflow/template、binding、registered node inventory、loopback endpoint、FPS/17k+5 frame-grid、trained duration boundary、native-audio policy与output capability。不能解析这些identity时必须fail closed，且不得切换到MiniMax cloud。
+2026-08-19获授权的live-local proof位于`runs/h3-shot-continuity-live-20260819-v3/`。它在`http://127.0.0.1:8188`上完成两次proof submit和零次remote call：Shot A MP4 SHA-256为`c06eb0c4a89fdb3837ef4111b3ddf945b5c5dca00750762f2eb91163b19b1448`，其frame 123 exact terminal PNG SHA-256为`cb5bbc17ad361b4b8445657608e245c179446efb68a5976b4df09eb0ecbaf42c`；Shot B `first_frame`绑定同一asset与SHA-256，输出MP4 SHA-256为`e2a54e9cbced71ff4eb2fe1afb6485e1591741af59ef80ecb9874f12373a7946`，replay新增submit为零。两段均为608x352、24fps、124 frames、5.167秒、H.264 + AAC，并完成candidate/terminal activation与Manifest revision 21 reopen。此前一次diagnostic submit在fixture activation阶段fail closed，不计入accepted proof且未blind retry。
 
-Local H3至少需要两个相互独立的profile：
+Local H3的profile边界如下：
 
-- `fl2va` continuity profile：将exact upstream terminal PNG绑定到`MiniMaxH3ImageToVideo.first_frame`；只有显式storyboard endpoint要求时才绑定`last_frame`。它是多Shot terminal-to-entrance continuity的最小本地闭环。
-- optional `ref2va` identity profile：通过`MiniMaxH3ReferenceToVideo`消费显式reference image/video/audio，用于角色、场景、服装或表演参考。它不能替代exact terminal-frame lineage，也不能与`fl2va`共用checkpoint identity。
+- 已实现的`fl2va` continuity profile：将exact upstream terminal PNG绑定到`MiniMaxH3ImageToVideo.first_frame`；只有request显式提供时才在deterministic节点图中保留`last_frame`。它是多Shot terminal-to-entrance continuity的最小本地闭环。
+- 尚未实现的optional `ref2va` identity profile：未来可通过`MiniMaxH3ReferenceToVideo`消费显式reference image/video/audio，用于角色、场景、服装或表演参考。它不能替代exact terminal-frame lineage，也不能与`fl2va`共用checkpoint identity。
 
 仅提高现有smoke workflow的`length`只会生成一个更长的单Shot，不构成跨Shot continuity。H3 node虽然允许更长frame count，但其文档训练区间约为124-362 frames；超出该范围必须作为独立quality/performance risk报告，不能因为schema允许而宣称已支持。
 
@@ -206,7 +206,7 @@ Local H3的成本控制角色是低边际成本draft lane，而不是自动替�
 
 ### MiniMax Cloud Hailuo 2.3
 
-MiniMax 官方 I2V contract 当前列出 `MiniMax-Hailuo-2.3`，以 `first_frame_image` 接收首帧图像；官方 model guide 同时把 Hailuo 2.3列为 T2V/I2V model。当前仓库 adapter 仍只声明 T2V，因此未来实现必须新增独立、tested 的 I2V capability/payload mapping，不能仅修改 prompt。官方 first/last-frame 示例属于其他明确 model 时，不得推断 Hailuo 2.3 支持未声明的 `last_frame`。
+MiniMax 官方 I2V contract 当前列出 `MiniMax-Hailuo-2.3`，以 `first_frame_image` 接收首帧图像；官方 model guide 同时把 Hailuo 2.3列为 T2V/I2V model。当前仓库adapter已增加并offline验证独立I2V capability/payload mapping；它不声明`last_frame`，也没有新的continuity live proof。官方 first/last-frame示例属于其他明确model时，不得推断Hailuo 2.3支持未声明的`last_frame`。
 
 References:
 
@@ -216,7 +216,7 @@ References:
 
 ### Seedance 2.0 Mini
 
-当前仓库 capability table 对 `doubao-seedance-2-0-mini-260615` 声明了 I2V first/last-frame 能力，但这只是当前 tracked contract，不等于 continuity live acceptance。未来实现必须以 exact official profile snapshot 重新核对 model/mode/input roles，并为 first-frame payload、optional last-frame payload、audio opt-out、response parsing、fetch、activation 和 replay 建立 executable evidence。
+当前仓库capability table与adapter已对`doubao-seedance-2-0-mini-260615`的I2V first-frame、optional last-frame、audio opt-out、response/fetch与permit mapping完成offline executable acceptance；这不等于continuity live、billing settlement、activation或quality acceptance。任何future profile refresh仍必须重新核对exact official model/mode/input roles，不能让upstream变化绕过sealed capability identity。
 
 此前 Seedance Mini diagnostic 只证明一次 cloud connectivity 和 fetched MP4；它不证明 tracked continuity payload、billing settlement、activation 或 quality acceptance。
 
@@ -231,7 +231,7 @@ Reference: [Volcengine Doubao Seedance 2.0 Series Tutorial](https://www.volcengi
 5. reopen/recovery 必须从 durable evidence 验证 image hash、metadata、source candidate 和 downstream binding；tampered、unreadable、symlink escape、wrong source Shot 或 wrong Registry revision 全部 fail closed。
 6. 相同 source candidate、selection rule、extractor contract 和 continuity constraints 的 exact replay 必须返回相同 evidence，不重复 extraction 或 durable writes。
 
-当前 P8 activation 假设只 append 一个 generated video Registry asset。若 terminal image 必须作为第二个 active Registry asset 才能满足 durable reopen，或若 request/Manifest 必须保存新 pointer，则这会触发 schema/layout/activation protocol expansion。实现者必须先用 executable spike 证明无法通过现有 immutable provenance/evidence seam 达成；确认不可避免后，只能提交独立 scope-expansion spec 和授权请求。本 docs-only slice 不预先批准该 mutation。
+已授权并实现的Manifest 2.8 compatible extension允许candidate activation在同一`ProductionStateCommitter` transaction中共同append generated video与derived terminal PNG Registry assets，并保存terminal extraction/evidence pointer。Local evidence pointer只在local attempt中出现，remote 2.8 serialization保持原有shape；reader与recovery拒绝local/remote evidence混合、tampered pointer或不一致的Project/Registry/graph tuple。该extension没有新增第二writer、Registry schema version、公共CLI或artifact layout。
 
 ## P5 Precise Invalidation
 
@@ -270,7 +270,7 @@ P5 graph 必须表达一个 typed continuity dependency：Shot N 的 exact activ
 
 ### Executable Contract Acceptance
 
-未来实现必须至少覆盖：
+当前实现与后续lane必须持续覆盖：
 
 - terminal evidence 与 exact source Shot/candidate/Registry/provenance binding；
 - request hash 对 terminal bytes/evidence/constraint 变化敏感，对 generation instance identity 的既有 replay 语义保持兼容；
@@ -292,6 +292,8 @@ P5 graph 必须表达一个 typed continuity dependency：Shot N 的 exact activ
 
 自动 `video-analysis` 与人工 review 是不同 gate。两者分别检查 scene/character identity、camera axis/direction、motion direction、lighting/color、entrance/exit state和叙事空间关系；任何单一 similarity score 不得替代逐项 verdict。
 
+当前Local H3 evidence已确认Shot A最后解码帧与terminal PNG byte-identical；Shot B首个解码帧相对该terminal PNG为PSNR `33.73 dB`、SSIM `0.791`，无转场side-by-side显示主体、构图、光线与屏幕方向连续。Project-local `video-analysis`确认两段均为单一scene且124个视频帧没有重复，同时将608x352标记为低于其1024x576 iteration review建议基线。因此该证据只满足本lane的technical live-local proof，不能替代blinded human rubric或宣称subjective quality accepted。
+
 ### Acceptance Tiers
 
 1. `technical acceptance`：Fake/offline executable contracts、local artifact verification、replay/recovery/P5 tests 和 composition invariants 全部通过。
@@ -302,7 +304,7 @@ P5 graph 必须表达一个 typed continuity dependency：Shot N 的 exact activ
 
 ## Authorization Boundary
 
-重新生成 Shot 2/3、调用 MiniMax cloud Hailuo 2.3、Seedance 2.0 Mini 或任何所谓 local MiniMax runtime 都是新的执行行为；远程 lane 还可能产生付费。Live execution 必须取得明确列出 provider/model、预算和调用边界的 task-scoped authorization、Budget Guard、Cloud Egress 和 bounded-call plan；同一条明确执行请求可以同时授权其中列明的多个 lane，不要求为每个 lane重复询问。本 docs-only task 不授予这些权限，schema/layout scope expansion 仍必须独立授权。
+本次Local MiniMax H3 `fl2va` two-Shot proof已由用户对当前任务的明确执行请求授权并完成；该授权没有扩展到MiniMax cloud Hailuo 2.3、Seedance 2.0 Mini、`ref2va`或额外local benchmark。任何后续local live execution仍需新的bounded task scope；远程lane还必须满足exact provider/model、预算、Cloud Egress与Paid Provider one-use permit。已完成的Local H3 evidence不能复用为任何cloud submit授权。
 
 ## Rollback
 

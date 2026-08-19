@@ -224,6 +224,34 @@ def canonical_video_status_receipt_path(observation_fingerprint: str) -> Path:
     )
 
 
+def canonical_local_video_submit_intent_path(intent_fingerprint: str) -> Path:
+    return Path(
+        "state/video-generation/local/intents/"
+        f"{_require_sha256(intent_fingerprint, 'local video intent fingerprint')}.json"
+    )
+
+
+def canonical_local_video_submit_receipt_path(result_fingerprint: str) -> Path:
+    return Path(
+        "state/video-generation/local/submits/"
+        f"{_require_sha256(result_fingerprint, 'local video submit fingerprint')}.json"
+    )
+
+
+def canonical_local_video_status_receipt_path(observation_fingerprint: str) -> Path:
+    return Path(
+        "state/video-generation/local/status/"
+        f"{_require_sha256(observation_fingerprint, 'local video observation fingerprint')}.json"
+    )
+
+
+def canonical_local_video_fetch_receipt_path(fetch_fingerprint: str) -> Path:
+    return Path(
+        "state/video-generation/local/fetch/receipts/"
+        f"{_require_sha256(fetch_fingerprint, 'local video fetch fingerprint')}.json"
+    )
+
+
 def canonical_video_asset_path(file_sha256: str) -> Path:
     return Path(
         f"assets/files/{_require_sha256(file_sha256, 'video file hash')}.mp4"

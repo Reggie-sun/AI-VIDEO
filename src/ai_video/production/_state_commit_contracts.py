@@ -239,6 +239,7 @@ _VOICE_PERMIT_TOKEN = object()
 _REVIEW_PERMIT_TOKEN = object()
 _IMAGE_PERMIT_TOKEN = object()
 _PAID_PROVIDER_PERMIT_TOKEN = object()
+_LOCAL_VIDEO_PERMIT_TOKEN = object()
 
 
 class _DurableReviewAnalysisPermit:
@@ -505,6 +506,51 @@ class _DurablePaidProviderSubmitPermit:
 
     def __reduce__(self) -> object:
         raise TypeError("Paid Provider submit permits cannot be serialized.")
+
+
+class _DurableLocalVideoSubmitPermit:
+    """Process-local one-use proof of an exact durable local video intent."""
+
+    __slots__ = ("_binding", "_durability_validator", "_consumed", "_lock")
+
+    def __init__(
+        self,
+        token: object,
+        *,
+        binding: dict[str, str],
+        durability_validator: Callable[[], bool],
+    ) -> None:
+        if token is not _LOCAL_VIDEO_PERMIT_TOKEN:
+            raise TypeError(
+                "Local video submit permits are minted only by ProductionStateCommitter."
+            )
+        self._binding = MappingProxyType(dict(binding))
+        self._durability_validator = durability_validator
+        self._consumed = False
+        self._lock = threading.Lock()
+
+    def _consume_local_video_submit_permit(
+        self,
+        *,
+        intent_fingerprint: str,
+        request_fingerprint: str,
+    ) -> bool:
+        binding = {
+            "intent_fingerprint": intent_fingerprint,
+            "request_fingerprint": request_fingerprint,
+        }
+        with self._lock:
+            if (
+                self._consumed
+                or binding != self._binding
+                or not self._durability_validator()
+            ):
+                return False
+            self._consumed = True
+            return True
+
+    def __reduce__(self) -> object:
+        raise TypeError("Local video submit permits cannot be serialized.")
 
 
 if TYPE_CHECKING:

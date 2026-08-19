@@ -520,6 +520,48 @@ def test_continuity_request_binds_exact_terminal_evidence_and_constraints():
     assert resolved.activation_scope.request.continuity_binding == binding
 
 
+def test_continuity_request_preserves_explicit_optional_last_frame():
+    binding = _continuity_binding()
+    terminal = binding.terminal_frame
+    first_frame = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id=terminal.extracted_asset_id,
+        asset_sha256=terminal.extracted_sha256,
+        mime_type=terminal.extracted_mime_type,
+        width=terminal.extracted_width,
+        height=terminal.extracted_height,
+        size_bytes=terminal.extracted_size_bytes,
+    )
+    last_frame = VideoImageReferenceBinding(
+        role="last_frame",
+        asset_id="storyboard-endpoint",
+        asset_sha256=HASH_D,
+        mime_type="image/png",
+        width=1280,
+        height=720,
+        size_bytes=4096,
+    )
+    request = _request(
+        image_bindings=(first_frame, last_frame),
+        continuity_binding=binding,
+        input_artifact_ids=(
+            "shot-001",
+            terminal.source_shot_id,
+            terminal.source_video_asset_id,
+            terminal.extracted_asset_id,
+            last_frame.asset_id,
+        ),
+    )
+
+    resolved = _resolved(
+        request,
+        variant=_variant(
+            allowed_image_roles=("first_frame", "last_frame", "reference")
+        ),
+    )
+    assert resolved.image_bindings == (first_frame, last_frame)
+
+
 def test_terminal_frame_sealing_changes_request_hash_without_changing_legacy_hash():
     baseline = _request()
     sealed = _request(seal_terminal_frame=True)

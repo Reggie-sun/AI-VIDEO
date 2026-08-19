@@ -94,6 +94,20 @@ from ai_video.production.comfy_image import (
     load_local_image_binding,
     load_local_image_execution_profile,
 )
+from ai_video.production.comfy_video import (
+    ComfyUIVideoProvider,
+    LocalVideoBinding,
+    LocalVideoExecutionProfile,
+    load_local_video_execution_profile,
+)
+from ai_video.production.local_video import (
+    LocalVideoFetchReceipt,
+    LocalVideoProvider,
+    LocalVideoSubmission,
+    LocalVideoSubmitIntent,
+    LocalVideoSubmitResult,
+    LocalVideoTaskObservation,
+)
 from ai_video.production.image_import import (
     HumanImageImportReceipt,
     human_image_import_asset,
@@ -173,8 +187,17 @@ __all__ = [
     "ImageProviderResult",
     "ImageReferenceBinding",
     "ComfyLocalImageProvider",
+    "ComfyUIVideoProvider",
     "LocalImageBinding",
     "LocalImageExecutionProfile",
+    "LocalVideoBinding",
+    "LocalVideoExecutionProfile",
+    "LocalVideoFetchReceipt",
+    "LocalVideoProvider",
+    "LocalVideoSubmission",
+    "LocalVideoSubmitIntent",
+    "LocalVideoSubmitResult",
+    "LocalVideoTaskObservation",
     "HumanImageImportReceipt",
     "ProductionBrief",
     "ProductionManifest",
@@ -230,6 +253,7 @@ __all__ = [
     "load_paid_provider_submit_receipt",
     "load_local_image_binding",
     "load_local_image_execution_profile",
+    "load_local_video_execution_profile",
     "human_image_import_asset",
     "prepare_human_image_import_commit",
     "validate_human_image_import",
