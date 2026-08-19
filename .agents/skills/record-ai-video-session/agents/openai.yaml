@@ -1,0 +1,6 @@
+interface:
+  display_name: "Record AI-VIDEO Session"
+  short_description: "Capture durable AI-VIDEO session records at checkpoints"
+  default_prompt: "Use $record-ai-video-session to preserve the current AI-VIDEO session as a truthful agent record."
+policy:
+  allow_implicit_invocation: true

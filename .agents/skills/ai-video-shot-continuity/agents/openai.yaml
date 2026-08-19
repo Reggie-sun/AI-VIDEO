@@ -1,6 +1,0 @@
-interface:
-  display_name: "AI-VIDEO Shot Continuity"
-  short_description: "Protect H3 continuity, evidence, and playback contracts"
-  default_prompt: "Use $ai-video-shot-continuity to handle an AI-VIDEO Shot Continuity task while preserving runtime, evidence, and playback boundaries."
-policy:
-  allow_implicit_invocation: true
