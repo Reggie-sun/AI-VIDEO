@@ -2,7 +2,7 @@
 
 ## Status
 
-本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation，以及Hailuo 2.3和Seedance 2.0 Mini offline adapter mapping；下文“当前尚未实现”等陈述保留为implementation前baseline。Local MiniMax H3已完成一次raw loopback checkpoint smoke，但sealed workflow/profile、production `ComfyUIVideoProvider`、continuity chaining proof、任何新的cloud Provider live proof、重新生成Shot 2/3与subjective quality acceptance仍未完成。既有P8 Provider contract仍不被改写。
+本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation，以及Hailuo 2.3和Seedance 2.0 Mini offline adapter mapping；下文“当前尚未实现”等陈述保留为implementation前baseline。Local MiniMax H3已完成一次raw loopback checkpoint smoke，但sealed workflow/profile、production `ComfyUIVideoProvider`、continuity chaining proof、任何新的cloud Provider live proof、重新生成Shot 2/3与subjective quality acceptance仍未完成。2026-08-19本次docs-only更新只固定官方H3 I2V workflow及其项目派生规则，不表示workflow、adapter或continuity live proof已经实现。既有P8 Provider contract仍不被改写。
 
 当前已实现的是 frame-accurate composition：generated MP4 已能进入唯一的 `CompositionSpec -> ResolvedTimeline -> HyperFrames` 路径，并保持 P4 audio/caption/final mux 语义。当前尚未实现的是 semantic/visual continuity：三个独立生成的 Shot 不会因为精确硬切而自动共享场景、角色、镜头轴线、光线或运动状态。
 
@@ -135,6 +135,32 @@ Continuity request 必须在 submit 前完成 provider-neutral capability resolu
 - Provider adapter 只能翻译已经 resolved 的 request；不得自行删除 continuity binding、替换 reference 或降低 constraint。
 
 ## Provider-Specific Profiles
+
+### Official Upstream Workflow Baseline
+
+Local H3 `fl2va` lane 的 reviewed upstream baseline 是 Comfy-Org 官方 I2V workflow，而不是本机 raw smoke 时临时拼装的节点图：
+
+- repository：`Comfy-Org/workflow_templates`；
+- pinned commit：`0e0f4577453136eaa1c0e9d4b700e3e5ce5bb416`；
+- path：`templates/video_minimax_h3_i2v.json`；
+- pinned URL：`https://github.com/Comfy-Org/workflow_templates/blob/0e0f4577453136eaa1c0e9d4b700e3e5ce5bb416/templates/video_minimax_h3_i2v.json`；
+- raw JSON SHA-256：`313b029321a8be303e827dad471bff3022ca564c8bf8c6198a3e70b65c599671`；
+- upstream repository license：MIT；
+- official core node：ComfyUI core `MiniMaxH3ImageToVideo`，接受必需的 `first_frame` 和 optional `last_frame`；
+- model components：`minimax_h3_fl2va_pruned_int8_convrot.safetensors`、`qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors`、`minimax_h3_video_vae_fp16.safetensors` 与 `minimax_h3_audio_vae_fp32.safetensors`。
+
+该官方文件是 UI/subgraph workflow，只证明reviewed节点图与上述model components的compatibility baseline；它不能原样进入AI-VIDEO production loader，也不拥有或替代AI-VIDEO的Manifest、Registry、`TerminalFrameEvidence`、P5 invalidation、candidate activation/recovery或exact replay lifecycle。
+
+项目派生版本必须保留可reopen的upstream provenance，并以结构化清单记录相对pinned raw JSON的全部有意修改。派生规则如下：
+
+- reviewed/export为deterministic API-format JSON；
+- 删除UI-only notes、demo input asset与非必需的subgraph/UI metadata；
+- optional LoRA、remote refiner与任何cloud fallback默认关闭，且不得隐藏在profile外被自动启用；
+- 保留官方native H3 conditioning、sampling、video/audio decode与MP4 output contract；
+- 将exact terminal PNG bytes绑定为`MiniMaxH3ImageToVideo.first_frame`；只有request与sealed profile都显式要求时才绑定`last_frame`，不得静默增加或删除；
+- `fl2va`与`ref2va`保持不同workflow/profile identity，不得合并成一个profile或共享checkpoint identity。
+
+官方workflow后续更新不会自动改变sealed production profile。任何upgrade必须选择新的exact upstream commit/path/hash/license，重新review并记录derived diff，重新seal derived workflow、binding与profile hashes，并重新通过offline及后续单独授权的acceptance gates；未完成resealing时继续使用当前pinned baseline或fail closed。
 
 ### Local Continuity Lane
 

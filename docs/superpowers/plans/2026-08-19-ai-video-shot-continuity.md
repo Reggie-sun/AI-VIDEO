@@ -2,7 +2,7 @@
 
 ## Status
 
-本文档最初是上述 Shot Continuity specification 的 proposed implementation plan。2026-08-19后续明确执行请求已完成Milestone 1-5、Hailuo 2.3/Seedance 2.0 Mini offline portions与provider-neutral technical suites；Manifest 2.8 / terminal PNG Registry activation属于另行明确授权的scope expansion。Local MiniMax H3已完成一次raw loopback checkpoint smoke，但sealed workflow/profile、production `ComfyUIVideoProvider`与continuity chaining proof仍保持pending；该smoke没有消费terminal/first-frame continuity input，也不完成Milestone 9-10。Cloud Provider continuity live与subjective acceptance均未执行；没有push或release。
+本文档最初是上述 Shot Continuity specification 的 proposed implementation plan。2026-08-19后续明确执行请求已完成Milestone 1-5、Hailuo 2.3/Seedance 2.0 Mini offline portions与provider-neutral technical suites；Manifest 2.8 / terminal PNG Registry activation属于另行明确授权的scope expansion。Local MiniMax H3已完成一次raw loopback checkpoint smoke，但sealed workflow/profile、production `ComfyUIVideoProvider`与continuity chaining proof仍保持pending；该smoke没有消费terminal/first-frame continuity input，也不完成Milestone 9-10。2026-08-19本次docs-only更新只固定官方H3 I2V upstream baseline及derived workflow计划，不表示workflow、adapter或continuity live proof已经实现。Cloud Provider continuity live与subjective acceptance均未执行；没有push或release。
 
 ## Objective
 
@@ -200,9 +200,38 @@ Provider lanes必须在 provider-neutral core、Fake E2E 和 P5 gates通过后�
 Target surface：
 
 - Add `src/ai_video/production/comfy_video.py` — loopback-only `ComfyUIVideoProvider` transport、preflight、submit/poll/history/fetch mapping；不得复用cloud `MiniMaxH3VideoProvider`或Paid Provider permits。
-- Add `workflows/templates/minimax_h3_fl2va_api.json`、`workflows/bindings/minimax_h3_fl2va_binding.yaml`与`workflows/profiles/minimax_h3_fl2va.json` — exact `first_frame`/optional explicit `last_frame`、prompt、seed、dimensions、17k+5 frame-grid、sampler、steps、native audio与output binding。
+- Add `workflows/templates/minimax_h3_fl2va_api.json` — 从pinned Comfy-Org official UI/subgraph workflow reviewed/export而来，不得把14-node ad-hoc raw smoke JSON直接提升为production template。
+- Add `workflows/bindings/minimax_h3_fl2va_binding.yaml` — exact `prompt`、`first_frame`、optional explicit `last_frame`、`seed`、`width`、`height`、`length`/`frame_count`、`steps`/`sampler`与`output_prefix` binding。
+- Add `workflows/profiles/minimax_h3_fl2va.json` — seal upstream provenance、derived workflow/binding、runtime/components/nodes/endpoints与output/resource bounds。
 - Optional add独立`minimax_h3_ref2va` template/binding/profile — 只有角色/场景reference acceptance需要时才进入；不得与`fl2va`共用checkpoint/profile identity。
 - Add `tests/test_production_comfy_video.py`与`tests/test_production_local_h3_continuity_e2e.py` — sealed profile/preflight、exact first-frame bytes、no-network transport fake、history/fetch、replay/recovery与two-Shot chaining。
+
+Official derivation contract：
+
+- upstream repository固定为`Comfy-Org/workflow_templates`，commit固定为`0e0f4577453136eaa1c0e9d4b700e3e5ce5bb416`，path固定为`templates/video_minimax_h3_i2v.json`，raw JSON SHA-256固定为`313b029321a8be303e827dad471bff3022ca564c8bf8c6198a3e70b65c599671`，license记录为MIT；
+- derivation清单必须记录UI/subgraph到deterministic API-format JSON的全部有意修改，包括删除UI-only notes、demo input asset和非必需subgraph/UI metadata；
+- optional LoRA、remote refiner与cloud fallback默认关闭，同时保留官方native H3 conditioning、sampling、video/audio decode和MP4 output contract；
+- exact terminal PNG只绑定到`MiniMaxH3ImageToVideo.first_frame`；`last_frame`只有在request与profile均显式要求时才出现，且不得把`ref2va`与`fl2va`混成同一个profile；
+- upstream新版本不得自动覆盖sealed profile；upgrade必须重新review、记录derived diff、重新seal全部hash并重新验收。
+
+`workflows/profiles/minimax_h3_fl2va.json`至少必须seal：
+
+- upstream repository、commit、path、raw JSON hash与license；
+- derived API workflow hash与binding hash；
+- exact ComfyUI commit；
+- `minimax_h3_fl2va_pruned_int8_convrot.safetensors`、`qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors`、`minimax_h3_video_vae_fp16.safetensors`、`minimax_h3_audio_vae_fp32.safetensors`四个model component hashes；
+- required native node inventory，包括`MiniMaxH3ImageToVideo`及官方conditioning、sampling、video/audio decode与MP4 output path所需nodes；
+- literal loopback endpoints；
+- resolution、17k+5 frame-grid、duration、native-audio与output bounds。
+
+Offline tests除既有adapter/replay/recovery assertions外，必须证明：
+
+- pinned upstream provenance能够reopen，并验证repository/commit/path/raw hash/license与derived modification manifest；
+- template、binding或profile任一hash tampering均fail closed；
+- exact terminal PNG bytes进入`first_frame`，不是仅path/name相同；
+- optional `last_frame`不会被adapter或template静默增加、删除或降级；
+- transport/profile没有remote endpoint、proxy、refiner或cloud fallback；
+- official upstream发生变化时不会绕过profile resealing或自动改变active production identity。
 
 Implementation必须复用现有`VideoGenerationRequest`、`ContinuityReferenceBinding`、terminal evidence、Manifest 2.8与P5 continuity edge；不得新增local-only continuity schema、第二writer或第二resolver。`fl2va`是最小必需lane，`ref2va`是identity/reference增强lane。
 
