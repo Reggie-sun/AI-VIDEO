@@ -2,7 +2,7 @@
 
 ## Status
 
-本文档最初是上述 Shot Continuity specification 的 proposed implementation plan。2026-08-19后续明确执行请求已完成Milestone 1-5、Hailuo 2.3/Seedance 2.0 Mini offline portions与provider-neutral technical suites；Manifest 2.8 / terminal PNG Registry activation属于另行明确授权的scope expansion。Local MiniMax H3因缺sealed complete workflow/profile保持pending；Milestone 9-10的Provider live与subjective acceptance未执行。没有调用Provider、重新生成媒体、push或release。
+本文档最初是上述 Shot Continuity specification 的 proposed implementation plan。2026-08-19后续明确执行请求已完成Milestone 1-5、Hailuo 2.3/Seedance 2.0 Mini offline portions与provider-neutral technical suites；Manifest 2.8 / terminal PNG Registry activation属于另行明确授权的scope expansion。Local MiniMax H3已完成一次raw loopback checkpoint smoke，但sealed workflow/profile、production `ComfyUIVideoProvider`与continuity chaining proof仍保持pending；该smoke没有消费terminal/first-frame continuity input，也不完成Milestone 9-10。Cloud Provider continuity live与subjective acceptance均未执行；没有push或release。
 
 ## Objective
 
@@ -24,7 +24,7 @@ Implementation 开始前必须同时满足：
 
 1. 用户单独授权 implementation；本 docs-only approval 不复用。
 2. 工作区 writer ownership 清晰，目标 files 无 overlapping uncommitted work。
-3. “MiniMax 本地”解析为 exact engine/model/workflow/profile/endpoint；若不能证明 loopback local execution，则不建立该 lane。
+3. “MiniMax 本地”的engine/model/loopback identity已经由raw smoke解析为本机ComfyUI + native MiniMax H3；implementation开始前仍必须seal exact checkpoint hashes、complete workflow/binding/profile、node inventory和output contract。Raw smoke JSON不能直接升级为production profile。
 4. MiniMax Hailuo 2.3 与 Seedance 2.0 Mini 的 official capability snapshots 刷新并保存可审计出处。
 5. 对 terminal evidence 是否能在现有 schema/layout 内 durable reopen 完成 bounded executable spike；若不能，先停下提交独立 scope-expansion spec。
 
@@ -195,13 +195,18 @@ Provider lanes必须在 provider-neutral core、Fake E2E 和 P5 gates通过后�
 
 ### Lane A: Local Continuity
 
-先解析用户所称 “MiniMax 本地” 的真实 identity：
+当前identity已解析为本机ComfyUI native MiniMax H3，而不是Wan或MiniMax cloud。2026-08-19 raw smoke使用`minimax_h3_fl2va_pruned_int8_convrot.safetensors`、量化Qwen3-VL text encoder、video/audio VAEs与14-node ad-hoc API workflow，在`127.0.0.1:8188`完成608x352、22-frame、20-step单提交/零重试生成。该证据只关闭engine/checkpoint可执行性问题，不关闭workflow/profile、continuity或quality gate。
 
-- 若为 Wan + ComfyUI：建立独立、loopback-only、exact workflow/profile binding 的 local video adapter；不得把它命名为 MiniMax Provider。
-- 若为一个真实 local MiniMax-compatible runtime：要求 exact binary/server/model/checkpoint/API contract 和 loopback proof，再决定 adapter name。
-- 若底层仍访问 MiniMax cloud：归入 Lane B，并受 Paid Provider Gate 和 Cloud Egress 约束。
+Target surface：
 
-任何 local adapter 都必须无 remote fallback、默认不联网，并以 Fake/sealed loopback tests证明 `first_frame` exact bytes进入 workflow binding。新 `ComfyUIVideoProvider` 本身若超出现有 P8 approved adapter scope，需要独立 implementation authorization。
+- Add `src/ai_video/production/comfy_video.py` — loopback-only `ComfyUIVideoProvider` transport、preflight、submit/poll/history/fetch mapping；不得复用cloud `MiniMaxH3VideoProvider`或Paid Provider permits。
+- Add `workflows/templates/minimax_h3_fl2va_api.json`、`workflows/bindings/minimax_h3_fl2va_binding.yaml`与`workflows/profiles/minimax_h3_fl2va.json` — exact `first_frame`/optional explicit `last_frame`、prompt、seed、dimensions、17k+5 frame-grid、sampler、steps、native audio与output binding。
+- Optional add独立`minimax_h3_ref2va` template/binding/profile — 只有角色/场景reference acceptance需要时才进入；不得与`fl2va`共用checkpoint/profile identity。
+- Add `tests/test_production_comfy_video.py`与`tests/test_production_local_h3_continuity_e2e.py` — sealed profile/preflight、exact first-frame bytes、no-network transport fake、history/fetch、replay/recovery与two-Shot chaining。
+
+Implementation必须复用现有`VideoGenerationRequest`、`ContinuityReferenceBinding`、terminal evidence、Manifest 2.8与P5 continuity edge；不得新增local-only continuity schema、第二writer或第二resolver。`fl2va`是最小必需lane，`ref2va`是identity/reference增强lane。
+
+任何local adapter都必须无remote fallback、默认不联网，并以Fake/sealed loopback tests证明`first_frame` exact bytes进入workflow binding。它必须seal ComfyUI commit、checkpoint/text encoder/VAE hashes、workflow/binding/profile hashes、registered nodes、FPS/duration limits和output capability。新`ComfyUIVideoProvider`超出现有P8 approved concrete adapters，仍需要独立implementation authorization。
 
 ### Lane B: MiniMax Cloud Hailuo 2.3
 
@@ -233,6 +238,20 @@ Offline verification：
 ```bash
 pytest -q tests/test_production_seedance.py tests/test_production_video.py
 ```
+
+### Execution Order for Cost Control
+
+Provider-neutral continuity core保持唯一实现；Local H3、Hailuo与Seedance只在adapter/profile/capability mapping处分叉。切换lane不能只修改`model_id`，也不得复制terminal evidence、Manifest、P5或composition lifecycle。
+
+为减少付费prompt/reference调试，后续execution order固定为：
+
+1. 完成Local H3 `fl2va` sealed workflow/profile与offline adapter tests。
+2. 经单独live-local授权，用exact Shot N terminal PNG生成Shot N+1本地draft，并验证terminal hash等于workflow消费的`first_frame` bytes。
+3. 使用`video-analysis`与人工检查淘汰scene/character/camera/motion/lighting明显断裂的draft；必要时继续本地迭代，或按独立scope增加`ref2va`。
+4. 只有显式选中的Shot/continuity edge才进入Hailuo或Seedance paid lane；每次remote submit仍需要exact budget、egress与one-use permit。
+5. Paid output重新执行自身activation/replay与subjective gate；Local H3成功不能外推为cloud model质量或payload acceptance。
+
+本地GPU时间、电力、RAM/VRAM必须进入resource report，但不伪造remote budget receipt。不得实现自动“local失败后cloud fallback”或根据价格自动选Provider；lane promotion是显式production decision，并保留独立generation identity与provenance。
 
 ## Milestone 7: Prove End-to-End Without Live Calls
 
@@ -295,7 +314,7 @@ Technical acceptance report必须列出 tests、Harness receipt、artifact hashe
 
 ## Milestone 9: Separately Authorized Provider Live Proof
 
-本 milestone 只有在用户以 task-scoped request 明确列出允许执行的 provider/model、预算和调用边界后才能执行，并且每个 remote lane使用独立 Budget Guard/Cloud Egress/bounded-call plan。一条请求可以同时授权其中明确列明的多个 lane；不得把 docs-only approval、旧 diagnostic 或未列明的 provider当作授权。
+本 milestone 只有在用户以task-scoped request明确列出允许执行的lane/model/profile和调用边界后才能执行。Local H3 continuity proof需要独立live-local授权、loopback-only command与bounded GPU/resource plan；每个remote lane使用独立Budget Guard/Cloud Egress/bounded-call plan。一条请求可以同时授权其中明确列明的多个lane；不得把docs-only approval、raw local T2V smoke、旧cloud diagnostic或未列明的Provider当作授权。
 
 每个 lane 的 live proof至少证明：
 
@@ -303,10 +322,10 @@ Technical acceptance report必须列出 tests、Harness receipt、artifact hashe
 - Shot N terminal evidence hash 等于 submit payload 消费的 first-frame bytes；
 - exactly bounded submit/status/fetch，replay新增零调用；
 - fetched MP4 measured validation、terminal evidence、candidate activation和 reopen/recovery；
-- provider cost/budget receipt完整；
+- local lane的resource/runtime report或remote lane的cost/budget receipt完整；
 - 不把一次 lane success 外推到其他 lane。
 
-重新生成 Shot 2/3属于新的本地执行或付费调用。它不在本 docs-only task授权范围内，也不能由旧 P8/Hailuo/Seedance diagnostic授权覆盖。
+Local H3 raw smoke不满足上述条件，因为它没有消费continuity first-frame。重新生成Shot 2/3属于新的本地执行或付费调用；它不在本docs-only task授权范围内，也不能由旧P8/Hailuo/Seedance diagnostic或本次raw smoke授权覆盖。
 
 ## Milestone 10: Subjective Continuity Acceptance
 
