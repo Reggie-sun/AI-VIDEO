@@ -8,7 +8,7 @@
 
 该 proof 使用背对镜头的小机器人沿暗巷直线前进，两个 clip 基本保持同一构图。它没有有效压测人脸、服装、角色表演、遮挡、独立 keyframe、镜头尺度变化或对话空间关系，因此不得算作 `C2_HARD_CUT_KEYFRAME_I2V` subjective acceptance，也不得解锁 Shot Router runtime implementation。
 
-本规范定义下一步最小但有代表性的 C2 闭环。C2 provider-neutral request/reference、additive local image profile、active-lineage validation、historical hash compatibility与P5 typed closure现已完成offline technical implementation；representative GPU live与subjective acceptance尚未执行。本文不授权cloud、remote或paid Provider调用。
+本规范定义下一步最小但有代表性的 C2 闭环。C2 provider-neutral request/reference、additive local image profile、active-lineage validation、historical hash compatibility与P5 typed closure已完成technical implementation。2026-08-20后续独立授权任务已生成并激活Alice representative Shot 1 terminal与P7 hard-cut keyframe，并用该keyframe完成Hailuo 2.3 one-submit succeeded/fetched/measured与人工review；但Hailuo canonical activation、本规范要求的Local H3 Shot 2、完整local live闭环和blinded subjective gate仍未执行。本文本身不授权cloud、remote或paid Provider调用；上述Hailuo/Seedance scope来自后续用户指令。
 
 ## Goal
 
@@ -27,7 +27,7 @@
 | Level | Meaning | Current State | Router Gate |
 | --- | --- | --- | --- |
 | `C1_CONTINUATION_I2V` | Shot N terminal PNG 直接成为 Shot N+1 first frame，接近一个连续镜头被切成两段 | 已有 technical live-local evidence；subjective quality只适用于该简单 fixture | 不足以解锁 Router |
-| `C2_HARD_CUT_KEYFRAME_I2V` | Shot N+1 先生成独立构图 keyframe；keyframe generation 消费 Shot N terminal + canonical references，再由 I2V 动起来 | offline technical implementation完成；尚无representative live/subjective evidence | 必须通过 representative proof |
+| `C2_HARD_CUT_KEYFRAME_I2V` | Shot N+1 先生成独立构图 keyframe；keyframe generation 消费 Shot N terminal + canonical references，再由 I2V 动起来 | technical implementation与Alice shared prerequisite完成；Hailuo visual review通过并有轻微concern但canonical activation blocked；Local H3 Shot 2和Seedance comparison仍缺 | 必须完成本规范的local representative proof |
 | `C3_REFERENCE_TO_VIDEO` | Provider 原生同时消费多角色/场景/视频 references | future optional capability | 不是本闭环前置条件 |
 
 Crossfade、插帧、optical flow、prompt-only continuity 与后期修图不构成上述任何 conditioning level。
@@ -207,6 +207,8 @@ Technical acceptance、local live proof与subjective acceptance必须分别报�
 本规范只定义允许的设计边界，不能自行授予implementation authority。当前用户已在本任务中明确要求“执行plan”并选择“升级Hard-cut”，因此本次authority覆盖C2 technical implementation及其offline verification；它不覆盖GPU live generation、Router runtime implementation或remote Provider。live proof开始前必须获得新的bounded authorization，并记录exact local image/H3 profiles、最多一次Shot 2 keyframe submit、最多一次Shot 2 video submit，以及是否复用已激活的Shot 1 input。任何额外重试都需要新的明确授权。
 
 MiniMax cloud、Hailuo 2.3、Seedance 2.0 Mini、remote Provider、免费quota与paid call均不在本slice内；`.env`中存在key不构成授权。
+
+后续2026-08-20用户指令单独扩展了Hailuo 2.3与Seedance 2.0 Mini各最多一次submit的cloud comparison authority；它不修改本slice的Local H3 Definition of Done。Hailuo已消耗一次并完成succeeded/fetched/measured但canonical activation blocked，Seedance因pre-submit gates失败保持零次，二者均未授权Router或重试。
 
 ## Scope-Expansion Stop Gate
 

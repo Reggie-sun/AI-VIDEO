@@ -2,7 +2,7 @@
 
 ## Status
 
-本文档最初是上述 Shot Continuity specification 的 proposed implementation plan。2026-08-19后续明确执行请求已完成Milestone 1-5、Hailuo 2.3/Seedance 2.0 Mini offline portions、provider-neutral technical suites，以及Milestone 6 Lane A的Local MiniMax H3 `fl2va` sealed workflow/profile、loopback-only adapter与durable local lifecycle。当前任务的bounded live-local proof还完成了Milestone 9的Local H3 lane：Shot A exact terminal PNG进入Shot B `first_frame`，两段均succeeded/fetched/validated/activated/reopened，replay新增零调用。Milestone 10 blinded subjective acceptance、`ref2va`和两条cloud lane live proof仍pending；没有cloud/paid call、push或release。
+本文档最初是上述 Shot Continuity specification 的 proposed implementation plan。2026-08-19后续明确执行请求已完成Milestone 1-5、Hailuo 2.3/Seedance 2.0 Mini offline portions、provider-neutral technical suites，以及Milestone 6 Lane A的Local MiniMax H3 `fl2va` sealed workflow/profile、loopback-only adapter与durable local lifecycle；Milestone 9的C1 Local H3 lane也已完成。2026-08-20 separately authorized Alice C2 task又完成shared terminal/keyframe prerequisite与Lane B Hailuo 2.3 one-submit succeeded/fetched/measured proof，human visual review为`pass with minor concerns`；其zero-network corrected-contract migration因复制external-effect receipt不计canonical activation/recovery。Lane C Seedance完成exact resolve但因expired sealed pricing与缺少Ark registered asset materialization在POST前fail closed，submit count为零。Local H3 C2 Shot 2、Hailuo canonical activation、Seedance live、`ref2va`、blinded three-lane acceptance与Router仍pending；没有push或release。
 
 ## Objective
 
@@ -252,6 +252,8 @@ Offline verification：
 pytest -q tests/test_production_minimax_hailuo.py tests/test_production_video.py
 ```
 
+2026-08-20 live result：exact activated keyframe SHA-256 `5072a65b0e13a7fae2b809d3dc0afb24dc6980c75b0ce9342559b60801c158fc`进入`first_frame_image`，唯一一次POST生成MP4 SHA-256 `58e3a09658134a18cc184f4fb536834c6139a6ff9d55985b76fb5b7af663194d`。Provider实测`768P`输出为`1326x768`，因此adapter I2V geometry改为adaptive；其余141 frames、24fps、MP4、no-audio契约保持。Original lifecycle完成succeeded/fetched/measured；zero-network migration复制同一external task ID的accepted receipt，故candidate activation/recovery/P5 evidence不计canonical acceptance，且不得在当前one-submit scope重试。
+
 ### Lane C: Seedance 2.0 Mini
 
 Target surface：
@@ -267,6 +269,8 @@ Offline verification：
 ```bash
 pytest -q tests/test_production_seedance.py tests/test_production_video.py
 ```
+
+2026-08-20 live preflight result：exact `doubao-seedance-2-0-mini-260615` I2V/audio-opt-out resolve通过；current preview因sealed price snapshot expired而拒绝，同时shared keyframe没有exact Ark registered asset ID，accepted adapter没有upload/materialization owner。Gate/permit/POST/poll/fetch/activation均为零；不得把历史1.2 CNY ceiling或此前diagnostic connectivity当作本lane live acceptance。
 
 ### Execution Order for Cost Control
 

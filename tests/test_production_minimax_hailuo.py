@@ -60,6 +60,7 @@ from ai_video.production.video import (
     VideoTaskObservation,
     VideoTaskState,
     VideoImageReferenceBinding,
+    VideoOutputCapability,
     build_video_paid_permit_binding,
 )
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
@@ -511,7 +512,8 @@ def test_capabilities_seal_t2v_and_i2v_profiles():
     assert i2v.output_capability.frame_count_max == 141
     assert 24 in i2v.output_capability.fps_values
     assert False in i2v.output_capability.native_audio_options
-    assert "16:9" in i2v.output_capability.ratios
+    assert i2v.output_capability.ratios == ("adaptive",)
+    assert i2v.output_capability.dimension_modes == ("adaptive",)
     assert "768P" in i2v.output_capability.resolution_labels
     assert i2v.output_capability.provider_selected_duration is False
     assert i2v.allowed_image_roles == ("first_frame",)
@@ -613,11 +615,11 @@ def _i2v_output(**changes: object) -> VideoFlexibleOutputRequirement:
     values: dict[str, object] = {
         "timing_mode": "frame_count",
         "frame_count": 141,
-        "dimension_mode": "exact",
-        "width": 1366,
-        "height": 768,
+        "dimension_mode": "adaptive",
+        "width": None,
+        "height": None,
         "resolution_label": "768P",
-        "ratio": "16:9",
+        "ratio": "adaptive",
         "fps": 24,
         "container": "mp4",
         "mime_type": "video/mp4",
@@ -659,19 +661,19 @@ def test_resolve_i2v_accepts_exact_first_frame_binding():
     assert resolved.provider_profile.profile_version == "hailuo-2.3-v1"
     assert len(resolved.image_bindings) == 1
     assert resolved.image_bindings[0].role == "first_frame"
-    assert resolved.effective_output.width == 1366
-    assert resolved.effective_output.height == 768
+    assert resolved.effective_output.width is None
+    assert resolved.effective_output.height is None
     assert resolved.effective_output.native_audio is False
 
 
 def test_resolve_i2v_sealed_output_expresses_live_measured_artifact_contract():
     """I2V sealed output must express the truthful 141-frame@24fps MP4 contract.
 
-    Live MiniMax Hailuo-2.3 I2V response for ``duration=6`` is a H.264 MP4 at
-    1366x768, 24fps, 141 frames, ~5875ms, no audio. The sealed output contract
-    must carry ``frame_count=141`` and ``fps=24`` so ``probe_generated_video_candidate``
-    can accept the measured artifact while still rejecting wrong frame count,
-    fps, geometry, or audio.
+    Live MiniMax Hailuo-2.3 I2V responses for ``duration=6`` are H.264 MP4s at
+    24fps, 141 frames, ~5875ms, with no audio. Geometry follows the accepted
+    first-frame aspect ratio within the provider's 768P tier, so the sealed
+    output must keep dimensions adaptive while rejecting wrong frame count,
+    fps, resolution tier, or audio.
     """
     provider = MiniMaxHailuoVideoProvider(
         transport=_FakeTransport(),
@@ -683,15 +685,131 @@ def test_resolve_i2v_sealed_output_expresses_live_measured_artifact_contract():
     assert output.timing_mode == "frame_count"
     assert output.frame_count == 141
     assert output.fps == 24
-    assert output.width == 1366
-    assert output.height == 768
-    assert output.dimension_mode == "exact"
+    assert output.width is None
+    assert output.height is None
+    assert output.dimension_mode == "adaptive"
     assert output.resolution_label == "768P"
-    assert output.ratio == "16:9"
+    assert output.ratio == "adaptive"
     assert output.container == "mp4"
     assert output.mime_type == "video/mp4"
     assert output.native_audio is False
     assert output.duration_seconds is None
+
+
+def test_resolve_i2v_keeps_768p_geometry_adaptive_for_non_16_9_first_frame():
+    """A 768P I2V request must not falsely promise fixed 16:9 output geometry."""
+
+    provider = MiniMaxHailuoVideoProvider(
+        transport=_FakeTransport(),
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    first_frame = _i2v_first_frame(width=608, height=352)
+    adaptive_768p = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=141,
+        dimension_mode="adaptive",
+        width=None,
+        height=None,
+        resolution_label="768P",
+        ratio="adaptive",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+
+    resolved = provider.resolve(
+        _i2v_request(
+            image_bindings=(first_frame,),
+            output_requirement=adaptive_768p,
+        )
+    )
+
+    assert resolved.effective_output == adaptive_768p
+
+
+def test_resolve_i2v_rejects_false_exact_16_9_geometry():
+    provider = MiniMaxHailuoVideoProvider(
+        transport=_FakeTransport(),
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    false_exact_output = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=141,
+        dimension_mode="exact",
+        width=1366,
+        height=768,
+        resolution_label="768P",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(_i2v_request(output_requirement=false_exact_output))
+
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
+
+def test_preview_rejects_historical_fixed_geometry_without_transport():
+    transport = _FakeTransport()
+    provider = MiniMaxHailuoVideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        image_resolver=_i2v_image_resolver(),
+    )
+    historical_output = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=141,
+        dimension_mode="exact",
+        width=1366,
+        height=768,
+        resolution_label="768P",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+    request = _i2v_request(output_requirement=historical_output)
+    historical_capability = hailuo_module._I2V_VARIANT.model_copy(
+        update={
+            "output_capability": VideoOutputCapability(
+                min_duration_seconds=6,
+                max_duration_seconds=6,
+                provider_selected_duration=False,
+                timing_modes=("frame_count",),
+                frame_count_min=141,
+                frame_count_max=141,
+                frame_count_step=1,
+                frame_count_remainder=0,
+                dimension_modes=("exact",),
+                resolution_labels=("768P",),
+                ratios=("16:9",),
+                fps_values=(24,),
+                containers=("mp4",),
+                native_audio_options=(False,),
+            )
+        }
+    )
+    resolved = ResolvedVideoGenerationRequest.create(
+        request=request,
+        capability=historical_capability,
+        effective_output=historical_output,
+        effective_seed=None,
+        effective_negative_prompt_text="",
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.preview(resolved)
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.calls == []
+    assert transport.stream_calls == []
 
 
 def test_resolve_i2v_rejects_last_frame_role_without_transport(monkeypatch):
@@ -822,7 +940,7 @@ def test_resolve_i2v_rejects_wrong_resolution(monkeypatch):
         credential=_SecretResolver(),
         image_resolver=_i2v_image_resolver(),
     )
-    wrong_output = _i2v_output(width=1920, height=1080)
+    wrong_output = _i2v_output(resolution_label="1080P")
     with pytest.raises(AiVideoError) as exc_info:
         provider.resolve(_i2v_request(output_requirement=wrong_output))
     assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
