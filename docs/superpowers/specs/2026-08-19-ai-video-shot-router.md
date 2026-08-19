@@ -4,7 +4,7 @@
 
 本规范是独立的 docs-only proposed contract。当前 runtime 没有 Shot Router：`Shot.visual_strategy` 由 authoring data 显式给出，`VideoGenerationRequest` 由 caller 显式选择 mode/provider/profile，`VideoProviderRegistry` 只做 exact lookup 并禁止 selection/fallback。
 
-本规范可以在 [Minimal Shot Continuity Proof specification](./2026-08-19-ai-video-minimal-shot-continuity-proof.md) 验收前完成设计，但 Router runtime implementation 被其 `Exit Gate for Shot Router` 阻塞。本文不得被描述为当前行为或 implementation authorization。
+本规范可以在 [Minimal Shot Continuity Proof specification](./2026-08-19-ai-video-minimal-shot-continuity-proof.md) 验收前完成设计，但 Router runtime implementation 被其 `C2_HARD_CUT_KEYFRAME_I2V` exit gate 阻塞。已有 `C1_CONTINUATION_I2V` technical proof 只证明尾帧原样续拍，不能替代该 gate。本文不得被描述为当前行为或 implementation authorization。
 
 ## Goal
 
@@ -87,7 +87,7 @@ Character Bible + Scene/Shot intent + exact available assets
 - `character_ids` 与每个角色的 narrative importance；
 - Character Bible 与 canonical character reference identities；
 - Scene identity 与 canonical scene reference；
-- available Shot keyframe/first-frame/last-frame identities；
+- available Shot keyframe/first-frame/last-frame identities及其derivation lineage；
 - activated upstream terminal evidence 与 `ContinuityConstraintSet`；
 - motion directives：subject motion、camera motion、complexity、required performance；
 - framing、camera axis/direction、entrance/exit 与 spatial-storytelling requirements；
@@ -134,6 +134,8 @@ proposal 不能作为 second truth 被 request、P5、composition 或 render 消
 - `LIGHT_MOTION_FROM_KEYFRAME`
 - `IMPORTANT_CHARACTER_REQUIRES_VISUAL_ANCHOR`
 - `UPSTREAM_TERMINAL_REQUIRES_I2V`
+- `HARD_CUT_REQUIRES_DERIVED_KEYFRAME`
+- `CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME`
 - `CANONICAL_REFERENCES_ENABLE_R2V`
 - `FREE_ENVIRONMENT_MOTION_ENABLES_T2V`
 - `HERO_SHOT_REQUIRES_HYBRID_OR_V2V`
@@ -160,13 +162,14 @@ Reason codes 不得包含 model name，不能通过自由文本决定 replay/inv
 
 ### Rule 2: Continuity Is Required
 
-只要 Shot 有 activated upstream terminal evidence 且 entrance state 要延续前一 Shot，就选择：
+Router必须先区分continuity intent，不能只因存在upstream terminal就统一选择同一种I2V：
 
-- `visual_strategy = generated_video`；
-- `mode = image_to_video`；
-- required role 包含 exact `first_frame` continuity binding。
+- `continuous_take`：叙事要求从exact terminal pose/pixels直接续拍。选择`generated_video + image_to_video`，`first_frame`必须直接绑定upstream terminal，reason为`CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME`。
+- `hard_cut`：叙事要求新的framing或camera distance，但仍需延续角色、场景、轴线和动作。先进入P7 hard-cut keyframe preparation，required references为`character + continuity_terminal`；keyframe激活后再选择`generated_video + image_to_video`，`first_frame`绑定derived keyframe，reason为`HARD_CUT_REQUIRES_DERIVED_KEYFRAME`。
 
-如果角色 reference 同时重要，只有 Provider variant 明确支持同一 resolved request 所需的 first-frame + references 时才可组合；否则优先保护 terminal continuity，使用已冻结 identity 的 Shot keyframe/terminal frame，或返回 capability blocked。不得删除 terminal binding 改跑 R2V/T2V。
+hard-cut decision必须seal“terminal -> keyframe request/output -> video first frame”lineage。不得把terminal原样first-frame伪装为hard cut，也不得生成一个只看character/scene、不真实消费terminal的独立keyframe。
+
+如果selected Provider/profile不支持required role set，返回capability blocked。不得删除terminal lineage改跑普通R2V/T2V，也不得静默切换Provider。
 
 ### Rule 3: Important Character Without Upstream Terminal
 
@@ -189,7 +192,8 @@ Reason codes 不得包含 model name，不能通过自由文本决定 replay/inv
 | No | No | Not required | None | `static_image` |
 | No | No | Not required | Light transform only | `image_motion` |
 | No | No | Not required | Complex/free | `generated_video + text_to_video` |
-| Yes | Yes | Any | Character action | `generated_video + image_to_video + first_frame` |
+| Yes | Yes, continuous-take | Any | Character action | `generated_video + image_to_video + terminal first_frame` |
+| Yes | Yes, hard-cut | Character + terminal | Character action/new framing | prepare derived keyframe, then `generated_video + image_to_video` |
 | Yes | No | Yes, Provider supports exact set | Character action | `generated_video + reference_to_video` |
 | Yes | No | Yes, Provider only supports first frame | Character action | prepare keyframe, then `generated_video + image_to_video` |
 | Yes | No | No | Any generated motion | `blocked_missing_input` |
@@ -201,7 +205,7 @@ Reason codes 不得包含 model name，不能通过自由文本决定 replay/inv
 
 Router core 只输出 capability requirements。Provider-specific mapping 保留在 adapter/profile：
 
-- Local H3 `fl2va`、optional `ref2va`；
+- Local H3 `fl2va`用于terminal-first-frame或derived-keyframe-first-frame；optional `ref2va`保持独立capability；
 - MiniMax cloud Hailuo 2.3；
 - Seedance 2.0 Mini；
 - 未来明确注册的 Provider。
@@ -299,7 +303,7 @@ Local H3、Hailuo、Seedance等各 Provider 的 live/quality acceptance继续独
 
 开始 Router runtime implementation 前必须同时满足：
 
-1. Minimal Shot Continuity Proof 已达到 subjective continuity acceptance；
+1. Minimal Shot Continuity Proof 的 `C2_HARD_CUT_KEYFRAME_I2V` 已达到technical、local live与subjective continuity acceptance；C1 proof不能替代；
 2. Router implementation plan 已独立完成并获用户授权；
 3. exact file/module ownership、RED tests、focused verification 与 rollback 已稳定；
 4. 已确认第一版不需要 schema/layout/CLI mutation，或对应 scope expansion 已另行获批；
