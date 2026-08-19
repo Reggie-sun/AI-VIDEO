@@ -2,7 +2,7 @@
 
 > Implementation remains under the repository's Native Codex lifecycle. 用户已授权在 local `main` 从 accepted Paid Provider Gate base 执行 P8 offline/default-no-network implementation；本授权不包含 live calls、真实付费提交、push 或 release。
 
-**Status:** Offline P8 implementation accepted on local `main` on 2026-08-19。Provider core、Paid Gate、Fake、H3/Hailuo/Seedance offline adapters、durable recovery与candidate activation已进入local `main`；最终activation/recovery checkpoint为`a089eac`。Hailuo有三条live-success MP4，H3 live因余额不足`HTTP 402 / code 1008`未成功，Seedance未授权live。独立MP4 composition compatibility已由`1362687`验收。
+**Status:** Offline P8 implementation accepted on local `main` on 2026-08-19。Provider core、Paid Gate、Fake、H3/Hailuo/Seedance offline adapters、durable recovery与candidate activation已进入local `main`；最终activation/recovery checkpoint为`a089eac`。Hailuo有三条live-success MP4，H3 live因余额不足`HTTP 402 / code 1008`未成功。Seedance Mini有一次authorized diagnostic succeeded/fetched MP4，但tracked audio-opt-out payload、billing settlement与activation未live accepted。独立MP4 composition compatibility已由`1362687`验收。
 
 **Goal:** 建立 provider-neutral、crash-resumable、cost-aware 的 Generated Video capability，以 deterministic fake 完成 default acceptance，并以 MiniMax Hailuo V1 证明真实 Cloud adapter不污染 Production domain。
 
@@ -525,7 +525,7 @@ The first command must skip by default. The second must perform zero external ca
 - Modify: `docs/v0.2-agentic-production-roadmap.md`
 - Modify: this plan with actual verification evidence only if repository convention requires status recording
 
-**Change:** Document only verified runtime behavior：provider-neutral explicit lifecycle、exact Task-0-selected P8 Manifest/Registry versions、single committer、fake default、H3/Hailuo/Seedance thin explicit adapters、no live default、no CLI、P5 semantic/applied evidence、resume/no-blind-resubmit、rollback/read compatibility。明确Hailuo三条live success、H3余额失败、Seedance offline-only，并把独立`1362687` MP4 composition acceptance与provider lifecycle分开。不得用既有证据授权新live调用。
+**Change:** Document only verified runtime behavior：provider-neutral explicit lifecycle、exact Task-0-selected P8 Manifest/Registry versions、single committer、fake default、H3/Hailuo/Seedance thin explicit adapters、no live default、no CLI、P5 semantic/applied evidence、resume/no-blind-resubmit、rollback/read compatibility。明确Hailuo三条live success、H3余额失败、Seedance Mini diagnostic succeeded/fetched但tracked payload/billing/activation仍pending，并把独立`1362687` MP4 composition acceptance与provider lifecycle分开。不得用既有证据授权新live调用。
 
 **Focused verification:**
 
@@ -605,7 +605,7 @@ Rollback must not：schema downgrade、delete unknown remote tasks、release uns
 - MP4 is locally measured、hashed、registered and provenance-bound before activation；
 - P8 Registry append-only and P8 Manifest sole lifecycle ownership hold；
 - P5 desired uses the resolved generation fingerprint and applied uses exact artifact evidence；
-- H3/Hailuo/Seedance adapters通过offline acceptance并使用injected transport；只有Hailuo具有live-success evidence；
+- H3/Hailuo/Seedance adapters通过offline acceptance并使用injected transport；Hailuo具有完整live-success evidence，Seedance只有Mini diagnostic submit/poll/fetch evidence且tracked payload/billing/activation未live accepted；
 - API key alone cannot run live test；default full pytest zero network/charge；
 - Legacy/P1-P7 contracts pass；
 - generated-video rendering由独立`1362687` compatibility plan验收，不并入Provider lifecycle或自动activation；

@@ -1248,6 +1248,133 @@ def test_input_reference_supplier_failure_is_sanitized_before_network():
     assert transport.requests == []
 
 
+def test_mini_default_payload_omits_optional_defaults_but_preserves_audio_opt_out():
+    profile = _profile()
+    transport = _FakeTransport()
+    transport.responses.append(_json_response({"id": "task-seedance-mini-1"}))
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        now=lambda: FIXED_NOW,
+    )
+    request = _request(
+        profile,
+        model_id="doubao-seedance-2-0-mini-260615",
+        output=VideoFlexibleOutputRequirement(
+            timing_mode="exact_seconds",
+            duration_seconds=5,
+            dimension_mode="exact",
+            width=864,
+            height=496,
+            resolution_label="480p",
+            ratio="16:9",
+            fps=24,
+            container="mp4",
+            mime_type="video/mp4",
+            native_audio=False,
+        ),
+    )
+    resolved = provider.resolve(request)
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview)
+    authorization = _authorization(paid_preview)
+
+    provider.submit(
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        _permit(resolved, video_preview, paid_preview, authorization),
+    )
+
+    assert json.loads(transport.requests[0].body) == {
+        "model": "doubao-seedance-2-0-mini-260615",
+        "content": [{"type": "text", "text": PROMPT}],
+        "resolution": "480p",
+        "ratio": "16:9",
+        "generate_audio": False,
+        "duration": 5,
+    }
+
+
+@pytest.mark.parametrize(
+    ("model_id", "profile_field", "profile_value"),
+    [
+        ("doubao-seedance-2-0-mini-260615", "watermark", True),
+        ("doubao-seedance-2-0-mini-260615", "return_last_frame", True),
+        ("doubao-seedance-2-0-mini-260615", "priority", 3),
+        ("doubao-seedance-1-5-pro-251215", "service_tier", "flex"),
+    ],
+)
+def test_non_default_provider_fields_remain_explicit(
+    model_id: str, profile_field: str, profile_value: object
+):
+    base = _profile()
+    original = next(
+        entry
+        for entry in base.capabilities
+        if entry.variant.model_id == model_id
+        and entry.variant.mode is VideoGenerationMode.TEXT_TO_VIDEO
+    )
+    customized = SeedanceCapabilityProfile(
+        **{**original.model_dump(), profile_field: profile_value}
+    )
+    profile = SeedanceProviderProfile.create(
+        pricing=base.pricing,
+        result_origins=base.result_origins,
+        capabilities=tuple(
+            customized
+            if entry.variant.capability_id == original.variant.capability_id
+            else entry
+            for entry in base.capabilities
+        ),
+        max_download_bytes=base.max_download_bytes,
+    )
+    transport = _FakeTransport()
+    transport.responses.append(_json_response({"id": "task-seedance-explicit-1"}))
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=lambda binding: f"asset://{binding.asset_id}",
+        now=lambda: FIXED_NOW,
+    )
+    resolved = provider.resolve(
+        _request(
+            profile,
+            model_id=model_id,
+            output=VideoFlexibleOutputRequirement(
+                timing_mode="exact_seconds",
+                duration_seconds=5,
+                dimension_mode="exact",
+                width=1280,
+                height=720,
+                resolution_label="720p",
+                ratio="16:9",
+                fps=24,
+                container="mp4",
+                mime_type="video/mp4",
+                native_audio=False,
+            ),
+        )
+    )
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview)
+    authorization = _authorization(paid_preview)
+
+    provider.submit(
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        _permit(resolved, video_preview, paid_preview, authorization),
+    )
+
+    assert json.loads(transport.requests[0].body)[profile_field] == profile_value
+
+
 def test_seedance_2_5_edit_payload_maps_explicit_reference_and_provider_fields():
     profile = _profile()
     transport = _FakeTransport()

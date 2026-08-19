@@ -1,6 +1,6 @@
 # AI-VIDEO P8 Seedance Cloud Provider Specification
 
-Status: Dated compatibility matrix frozen and offline implementation accepted on 2026-08-19. Native review verdict is `accept`; default verification is fake-only/no-network. This document does not authorize a paid/live call, push or release.
+Status: Dated compatibility matrix frozen and offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic reached provider `succeeded` and fetched an MP4 on 2026-08-19; the tracked audio-opt-out payload correction remains offline-verified and has not been re-submitted live. Default verification remains fake-only/no-network. This document does not authorize another paid/live call, push or release.
 
 ## 1. Goal
 
@@ -80,6 +80,7 @@ Additional typed fields:
 - `execution_expires_after`: `3600..259200`, default 172800 seconds.
 - `callback_url` is excluded from V1 adapter. Poll remains the sole observation path.
 - `tools`, `safety_identifier` and draft-to-final task chaining need explicit profile policy; they are not silently emitted.
+- Payload emission is value-sensitive: `generate_audio` is always emitted because it is part of the resolved output contract; `watermark=false`, `return_last_frame=false`, `service_tier=default`, `output_format=mp4` and `priority=0` are omitted. Non-default values remain explicit. This prevents optional defaults from changing Mini request acceptance while preserving an exact audio opt-out.
 - Detailed Create field documentation restricts `frames` to 1.0 pro/pro-fast, while the API Explorer summary labels it more broadly. The detailed field contract wins fail closed: 2.x/2.5 never emit `frames` until official documentation is reconciled or an explicitly authorized live check proves support.
 
 ### 4.1 Named Ratios and Measured Output
@@ -210,4 +211,4 @@ Offline implementation includes:
 - one-use Paid Provider permit consumption immediately before the only POST;
 - same-task polling/fetching, explicit result-origin allowlist, redirect/size/MIME/container checks and redacted representations/errors.
 
-Offline blocker: final review/Harness/commit only. Live blockers remain rotated key, exact account Model/Endpoint access, current pricing snapshot, finite single-call budget, egress authorization and explicit one-submit authorization. No live call was made.
+Offline blocker: final review/Harness/commit only for the post-live payload correction. The authorized Mini diagnostic used the exact Model ID, one POST and the existing durable gate, reached `succeeded`, and fetched a 1,278,577-byte H.264 MP4 with SHA-256 `b6ea0864d3b400cf1648868a816eedc1c24f42c2bc605a60335b9f982ea91c67`. Its minimal diagnostic payload omitted `generate_audio`, so Ark produced an AAC stream despite the requested `native_audio=false`; it proves cloud submit/poll/fetch connectivity, not acceptance of the tracked audio-opt-out payload or final activation. The reservation remains unsettled pending exact provider billing evidence. Any new live submit still requires a fresh rotated credential, exact access, current pricing snapshot, finite one-call budget, egress authorization and explicit one-submit authorization.

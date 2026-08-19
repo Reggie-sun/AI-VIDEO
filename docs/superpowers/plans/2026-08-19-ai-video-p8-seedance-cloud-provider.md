@@ -1,6 +1,6 @@
 # AI-VIDEO P8 Seedance Cloud Provider Implementation Plan
 
-Status: Offline implementation accepted on 2026-08-19. Provider-neutral extension、Seedance adapter、Harness mapping、focused/recovery verification和native review均完成；live submit未授权、未运行。
+Status: Offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic later reached provider `succeeded` and fetched an MP4. The follow-up tracked payload correction is offline-verified but not live re-submitted; billing settlement、candidate activation、push和release均未完成。
 
 **Spec:** `docs/superpowers/specs/2026-08-19-ai-video-p8-seedance-cloud-provider.md`
 
@@ -144,7 +144,9 @@ Parent stages only task-owned files with explicit paths, generates a fresh stage
 
 ## Live Gate
 
-Live is not part of this plan. A future single submit requires all of:
+The 2026-08-19 authorized diagnostic satisfied the gate for one Mini submit only. It used one POST, reached `succeeded`, fetched a 1,278,577-byte H.264 MP4 and did not retry. The diagnostic omitted all optional/default fields and therefore also omitted `generate_audio`; Ark returned an AAC stream, so that run does not verify the tracked `generate_audio:false` correction. The durable reservation remains unsettled and no activation was attempted.
+
+Every future single submit still requires all of:
 
 - rotated `ARK_API_KEY` injected through process environment or secret store;
 - exact account Model/Endpoint access;
@@ -152,4 +154,17 @@ Live is not part of this plan. A future single submit requires all of:
 - input egress authorization;
 - explicit authorization for exactly one paid submit.
 
-Without a real succeeded task and validated fetched artifact, delivery must say offline-only and cloud live unverified.
+Without a fresh authorization and an exact successful request matching the tracked payload, delivery must distinguish diagnostic cloud connectivity from production-payload live acceptance.
+
+## Task 8: Live-Evidence Payload Correction
+
+**Status:** implementation and focused offline verification complete; independent review、Harness、commit and exact live re-verification remain pending.
+
+The live sequence progressed from credential failure to account-route failure, then `HTTP 400` with the original default-heavy payload. A single authorized diagnostic using only `model`、`content`、`resolution`、`ratio` and `duration` was accepted and fetched successfully. The production correction therefore:
+
+- always emits `generate_audio` to preserve the resolved `native_audio` contract;
+- omits `watermark=false`、`return_last_frame=false`、`service_tier=default`、`output_format=mp4` and `priority=0`;
+- continues to emit each non-default field;
+- changes no provider-neutral contract、schema、CLI、writer、resolver、renderer or fallback behavior.
+
+The regression test was observed RED against the original payload and GREEN after the minimal adapter change. Focused Seedance/Paid Provider/recovery verification is `108 passed`.

@@ -507,11 +507,15 @@ class SeedanceVideoProvider:
             "resolution": output.resolution_label,
             "ratio": output.ratio,
             "generate_audio": output.native_audio,
-            "watermark": profile.watermark,
-            "return_last_frame": profile.return_last_frame,
-            "service_tier": profile.service_tier,
-            "output_format": output.container,
         }
+        if profile.watermark:
+            payload["watermark"] = True
+        if profile.return_last_frame:
+            payload["return_last_frame"] = True
+        if profile.service_tier != "default":
+            payload["service_tier"] = profile.service_tier
+        if output.container != "mp4":
+            payload["output_format"] = output.container
         if output.timing_mode == "exact_seconds":
             payload["duration"] = output.duration_seconds
         elif output.timing_mode == "provider_selected":
@@ -524,7 +528,7 @@ class SeedanceVideoProvider:
             payload["camera_fixed"] = True
         if profile.draft:
             payload["draft"] = True
-        if profile.priority is not None:
+        if profile.priority not in {None, 0}:
             payload["priority"] = profile.priority
         if profile.omni_reference_task_type is not None:
             payload["omni_reference_task_type"] = profile.omni_reference_task_type
