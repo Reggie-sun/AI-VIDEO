@@ -7,8 +7,8 @@ from typing import Literal
 
 from pydantic import ConfigDict, Field, model_validator
 
-from ai_video.production.hashing import canonical_sha256
-from ai_video.production.models import StrictModel, VisualStrategy
+from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
+from ai_video.production.models import Shot, StrictModel, VisualStrategy
 from ai_video.production.video import (
     ProviderProfilePointer,
     VideoCapabilityVariant,
@@ -42,10 +42,11 @@ class RoutingOutcome(str, Enum):
     BLOCKED_AUTHORIZATION = "blocked_authorization"
 
 
-class ContinuityIntent(str, Enum):
+class ContinuityMode(str, Enum):
+    EXACT_TERMINAL = "exact_terminal"
+    REFERENCE = "reference"
+    SEMANTIC = "semantic"
     NONE = "none"
-    CONTINUOUS_TAKE = "continuous_take"
-    HARD_CUT = "hard_cut"
 
 
 class MotionRequirement(str, Enum):
@@ -65,9 +66,16 @@ class RouterReasonCode(str, Enum):
     IMPORTANT_CHARACTER_REQUIRES_VISUAL_ANCHOR = (
         "IMPORTANT_CHARACTER_REQUIRES_VISUAL_ANCHOR"
     )
-    CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME = (
-        "CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME"
+    EXACT_TERMINAL_USES_FIRST_FRAME = (
+        "EXACT_TERMINAL_USES_FIRST_FRAME"
     )
+    REFERENCE_CONTINUITY_USES_TERMINAL_REFERENCE = (
+        "REFERENCE_CONTINUITY_USES_TERMINAL_REFERENCE"
+    )
+    SEMANTIC_CONTINUITY_USES_STATE_ONLY = (
+        "SEMANTIC_CONTINUITY_USES_STATE_ONLY"
+    )
+    NO_CONTINUITY = "NO_CONTINUITY"
     CANONICAL_REFERENCES_ENABLE_R2V = "CANONICAL_REFERENCES_ENABLE_R2V"
     FREE_ENVIRONMENT_MOTION_ENABLES_T2V = (
         "FREE_ENVIRONMENT_MOTION_ENABLES_T2V"
@@ -76,6 +84,7 @@ class RouterReasonCode(str, Enum):
     MISSING_CHARACTER_REFERENCE = "MISSING_CHARACTER_REFERENCE"
     MISSING_SCENE_REFERENCE = "MISSING_SCENE_REFERENCE"
     MISSING_CONTINUITY_TERMINAL = "MISSING_CONTINUITY_TERMINAL"
+    MISSING_SEMANTIC_CONTINUITY_STATE = "MISSING_SEMANTIC_CONTINUITY_STATE"
     MISSING_SHOT_KEYFRAME = "MISSING_SHOT_KEYFRAME"
     PROVIDER_CAPABILITY_DENIED = "PROVIDER_CAPABILITY_DENIED"
     LOCAL_RESOURCE_POLICY_DENIED = "LOCAL_RESOURCE_POLICY_DENIED"
@@ -84,9 +93,6 @@ class RouterReasonCode(str, Enum):
     VISUAL_STRATEGY_POLICY_DENIED = "VISUAL_STRATEGY_POLICY_DENIED"
     ROUTER_REQUIRES_GENERATED_VIDEO_SHOT = (
         "ROUTER_REQUIRES_GENERATED_VIDEO_SHOT"
-    )
-    HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED = (
-        "HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED"
     )
 
 
@@ -108,6 +114,66 @@ class RouterAssetIdentity(_RouterModel):
     height: int | None = Field(default=None, strict=True, gt=0)
 
 
+class RouterContinuityState(_RouterModel):
+    """Exact semantic state inherited without requiring upstream pixels."""
+
+    state_id: str = Field(pattern=_SAFE_ID)
+    state_revision: int = Field(strict=True, ge=1)
+    character_identity_hashes: tuple[str, ...]
+    story_state_hash: str = Field(pattern=_SHA256)
+    wardrobe_state_hashes: tuple[str, ...]
+    injury_state_hashes: tuple[str, ...]
+    prop_state_hashes: tuple[str, ...]
+    scene_state_hash: str | None = Field(default=None, pattern=_SHA256)
+    content_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_hash_sets(self) -> "RouterContinuityState":
+        for values, label in (
+            (self.character_identity_hashes, "character identity hashes"),
+            (self.wardrobe_state_hashes, "wardrobe state hashes"),
+            (self.injury_state_hashes, "injury state hashes"),
+            (self.prop_state_hashes, "prop state hashes"),
+        ):
+            if len(set(values)) != len(values):
+                raise ValueError(f"{label} must be unique")
+            if tuple(sorted(values)) != values:
+                raise ValueError(f"{label} must use canonical sorted order")
+            if any(
+                len(value) != 64
+                or any(character not in "0123456789abcdef" for character in value)
+                for value in values
+            ):
+                raise ValueError(f"{label} must be lowercase SHA-256")
+        expected = canonical_sha256(
+            {
+                "schema": "ai-video-router-continuity-state/1",
+                **self.model_dump(mode="json", exclude={"content_hash"}),
+            }
+        )
+        if self.content_hash != expected:
+            raise ValueError("continuity state hash does not match content")
+        return self
+
+    @property
+    def shot_constraint_token(self) -> str:
+        return f"continuity-state:{self.content_hash}"
+
+    @classmethod
+    def create(cls, **values: object) -> "RouterContinuityState":
+        data = dict(values)
+        candidate = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            {
+                "schema": "ai-video-router-continuity-state/1",
+                **candidate.model_dump(
+                    mode="json", exclude={"content_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
 class RouterPolicyIdentity(_RouterModel):
     policy_id: str = Field(pattern=_SAFE_ID)
     policy_version: str = Field(pattern=_SAFE_ID)
@@ -122,6 +188,7 @@ class VideoRoutingPolicy(_RouterModel):
 
 
 class ShotRoutingContext(_RouterModel):
+    activated_shot: Shot
     target_shot_id: str = Field(pattern=_SAFE_ID)
     target_shot_revision: int = Field(strict=True, ge=1)
     target_shot_content_hash: str = Field(pattern=_SHA256)
@@ -136,12 +203,20 @@ class ShotRoutingContext(_RouterModel):
     shot_keyframe: RouterAssetIdentity | None
     upstream_terminal: RouterAssetIdentity | None
     motion_requirement: MotionRequirement
-    continuity_intent: ContinuityIntent
+    continuity_mode: ContinuityMode
+    semantic_continuity_state: RouterContinuityState | None
     allowed_visual_strategies: tuple[VisualStrategy, ...] = Field(min_length=1)
     allowed_generation_modes: tuple[VideoGenerationMode, ...] = Field(min_length=1)
 
     @model_validator(mode="after")
     def _validate_exact_context(self) -> "ShotRoutingContext":
+        if (
+            not verify_artifact_hash(self.activated_shot)
+            or self.activated_shot.shot_id != self.target_shot_id
+            or self.activated_shot.revision != self.target_shot_revision
+            or self.activated_shot.content_hash != self.target_shot_content_hash
+        ):
+            raise ValueError("routing target must match the exact sealed activated Shot")
         for value in self.character_bible_content_hashes:
             if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
                 raise ValueError("character Bible hashes must be lowercase SHA-256")
@@ -153,6 +228,16 @@ class ShotRoutingContext(_RouterModel):
         ):
             if len(set(values)) != len(values):
                 raise ValueError(f"{label} must be unique")
+        if (
+            self.continuity_mode
+            in {ContinuityMode.REFERENCE, ContinuityMode.SEMANTIC}
+            and self.semantic_continuity_state is not None
+            and self.semantic_continuity_state.shot_constraint_token
+            not in self.activated_shot.continuity_constraints
+        ):
+            raise ValueError(
+                "continuity state must be materialized in the activated target Shot"
+            )
         identities = (
             *self.canonical_character_references,
             *(
@@ -210,6 +295,8 @@ class ShotVisualRoutingProposal(_RouterModel):
     target_shot_id: str = Field(pattern=_SAFE_ID)
     target_shot_revision: int = Field(strict=True, ge=1)
     target_shot_content_hash: str = Field(pattern=_SHA256)
+    continuity_mode: ContinuityMode
+    semantic_continuity_state: RouterContinuityState | None
     proposed_visual_strategy: VisualStrategy | None
     required_generation_mode: VideoGenerationMode | None
     required_binding_roles: tuple[str, ...]
@@ -255,6 +342,8 @@ class VideoGenerationRoutingDecision(_RouterModel):
     target_shot_id: str = Field(pattern=_SAFE_ID)
     target_shot_revision: int = Field(strict=True, ge=1)
     target_shot_content_hash: str = Field(pattern=_SHA256)
+    continuity_mode: ContinuityMode
+    semantic_continuity_state: RouterContinuityState | None
     required_mode: VideoGenerationMode | None
     selected_mode: VideoGenerationMode | None
     required_binding_roles: tuple[str, ...]
@@ -284,10 +373,16 @@ class VideoGenerationRoutingDecision(_RouterModel):
 
     def semantic_payload(self) -> dict[str, object]:
         return {
-            "schema": "ai-video-shot-routing-semantic/1",
+            "schema": "ai-video-shot-routing-semantic/2",
             "target_shot_id": self.target_shot_id,
             "target_shot_revision": self.target_shot_revision,
             "target_shot_content_hash": self.target_shot_content_hash,
+            "continuity_mode": self.continuity_mode.value,
+            "semantic_continuity_state": (
+                self.semantic_continuity_state.model_dump(mode="json")
+                if self.semantic_continuity_state is not None
+                else None
+            ),
             "required_mode": (
                 self.required_mode.value if self.required_mode is not None else None
             ),
@@ -384,39 +479,58 @@ class ShotVisualResolver:
         context: ShotRoutingContext,
         policy: VideoRoutingPolicy,
     ) -> ShotVisualRoutingProposal:
-        if context.continuity_intent is ContinuityIntent.HARD_CUT:
-            return self._blocked(
-                context,
-                policy,
-                RoutingOutcome.BLOCKED_POLICY,
-                RouterReasonCode.HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED,
-                "C2 hard-cut character continuity has not passed subjective quality acceptance.",
-            )
-        if context.approved_existing_video is not None:
-            return self._propose(
-                context,
-                policy,
-                VisualStrategy.EXISTING_VIDEO,
-                RouterReasonCode.APPROVED_EXISTING_VIDEO,
-                "An exact approved video asset already satisfies the Shot.",
-            )
-        if context.continuity_intent is ContinuityIntent.CONTINUOUS_TAKE:
+        if context.continuity_mode is ContinuityMode.EXACT_TERMINAL:
             if context.upstream_terminal is None:
                 return self._blocked(
                     context,
                     policy,
                     RoutingOutcome.BLOCKED_MISSING_INPUT,
                     RouterReasonCode.MISSING_CONTINUITY_TERMINAL,
-                    "Continuous-take routing requires the exact upstream terminal frame.",
+                    "Exact-terminal continuity requires the upstream terminal frame.",
                 )
             return self._propose(
                 context,
                 policy,
                 VisualStrategy.GENERATED_VIDEO,
-                RouterReasonCode.CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME,
+                RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME,
                 "Continue the action from the exact terminal frame without redrawing it.",
                 required_generation_mode=VideoGenerationMode.IMAGE_TO_VIDEO,
                 required_binding_roles=("first_frame",),
+            )
+        if context.continuity_mode is ContinuityMode.REFERENCE:
+            blocked = self._reference_inputs_block(context, policy)
+            if blocked is not None:
+                return blocked
+            return self._propose(
+                context,
+                policy,
+                VisualStrategy.GENERATED_VIDEO,
+                RouterReasonCode.REFERENCE_CONTINUITY_USES_TERMINAL_REFERENCE,
+                "Inherit terminal and canonical state as references while allowing a new framing.",
+                required_generation_mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+                required_binding_roles=("reference",),
+            )
+        if (
+            context.continuity_mode is ContinuityMode.SEMANTIC
+            and context.semantic_continuity_state is None
+        ):
+            return self._blocked(
+                context,
+                policy,
+                RoutingOutcome.BLOCKED_MISSING_INPUT,
+                RouterReasonCode.MISSING_SEMANTIC_CONTINUITY_STATE,
+                "Semantic continuity requires an exact typed continuity-state snapshot.",
+            )
+        if (
+            context.continuity_mode is ContinuityMode.NONE
+            and context.approved_existing_video is not None
+        ):
+            return self._propose(
+                context,
+                policy,
+                VisualStrategy.EXISTING_VIDEO,
+                RouterReasonCode.APPROVED_EXISTING_VIDEO,
+                "An exact approved video asset already satisfies the Shot.",
             )
         if context.motion_requirement is MotionRequirement.NONE:
             return self._propose(
@@ -483,6 +597,45 @@ class ShotVisualResolver:
             required_generation_mode=VideoGenerationMode.TEXT_TO_VIDEO,
         )
 
+    def _reference_inputs_block(
+        self,
+        context: ShotRoutingContext,
+        policy: VideoRoutingPolicy,
+    ) -> ShotVisualRoutingProposal | None:
+        if context.upstream_terminal is None:
+            return self._blocked(
+                context,
+                policy,
+                RoutingOutcome.BLOCKED_MISSING_INPUT,
+                RouterReasonCode.MISSING_CONTINUITY_TERMINAL,
+                "Reference continuity requires the exact upstream terminal evidence.",
+            )
+        if context.semantic_continuity_state is None:
+            return self._blocked(
+                context,
+                policy,
+                RoutingOutcome.BLOCKED_MISSING_INPUT,
+                RouterReasonCode.MISSING_SEMANTIC_CONTINUITY_STATE,
+                "Reference continuity requires an exact typed continuity-state snapshot.",
+            )
+        if not context.canonical_character_references:
+            return self._blocked(
+                context,
+                policy,
+                RoutingOutcome.BLOCKED_MISSING_INPUT,
+                RouterReasonCode.MISSING_CHARACTER_REFERENCE,
+                "Reference continuity requires canonical character references.",
+            )
+        if context.canonical_scene_reference is None:
+            return self._blocked(
+                context,
+                policy,
+                RoutingOutcome.BLOCKED_MISSING_INPUT,
+                RouterReasonCode.MISSING_SCENE_REFERENCE,
+                "Reference continuity requires the canonical scene reference.",
+            )
+        return None
+
     def _propose(
         self,
         context: ShotRoutingContext,
@@ -517,6 +670,8 @@ class ShotVisualResolver:
             target_shot_id=context.target_shot_id,
             target_shot_revision=context.target_shot_revision,
             target_shot_content_hash=context.target_shot_content_hash,
+            continuity_mode=context.continuity_mode,
+            semantic_continuity_state=self._effective_state(context),
             proposed_visual_strategy=strategy,
             required_generation_mode=required_generation_mode,
             required_binding_roles=required_binding_roles,
@@ -538,6 +693,8 @@ class ShotVisualResolver:
             target_shot_id=context.target_shot_id,
             target_shot_revision=context.target_shot_revision,
             target_shot_content_hash=context.target_shot_content_hash,
+            continuity_mode=context.continuity_mode,
+            semantic_continuity_state=self._effective_state(context),
             proposed_visual_strategy=None,
             required_generation_mode=None,
             required_binding_roles=(),
@@ -547,6 +704,17 @@ class ShotVisualResolver:
             outcome=outcome,
         )
 
+    @staticmethod
+    def _effective_state(
+        context: ShotRoutingContext,
+    ) -> RouterContinuityState | None:
+        if context.continuity_mode not in {
+            ContinuityMode.REFERENCE,
+            ContinuityMode.SEMANTIC,
+        }:
+            return None
+        return context.semantic_continuity_state
+
 
 class VideoGenerationResolver:
     """Resolve one exact selected capability without provider fallback."""
@@ -555,7 +723,6 @@ class VideoGenerationResolver:
         self,
         *,
         context: ShotRoutingContext,
-        activated_visual_strategy: VisualStrategy,
         policy: VideoRoutingPolicy,
         provider_profile: ProviderProfilePointer,
         capabilities: VideoProviderCapabilities,
@@ -566,6 +733,13 @@ class VideoGenerationResolver:
             "target_shot_id": context.target_shot_id,
             "target_shot_revision": context.target_shot_revision,
             "target_shot_content_hash": context.target_shot_content_hash,
+            "continuity_mode": context.continuity_mode,
+            "semantic_continuity_state": (
+                context.semantic_continuity_state
+                if context.continuity_mode
+                in {ContinuityMode.REFERENCE, ContinuityMode.SEMANTIC}
+                else None
+            ),
             "provider_name": capabilities.provider_name,
             "provider_profile": provider_profile,
             "provider_capabilities_fingerprint": (
@@ -577,12 +751,27 @@ class VideoGenerationResolver:
             "output_requirement": output_requirement,
             "policy": policy.identity,
         }
-        if context.continuity_intent is ContinuityIntent.HARD_CUT:
+        if (
+            context.continuity_mode
+            in {ContinuityMode.EXACT_TERMINAL, ContinuityMode.REFERENCE}
+            and context.upstream_terminal is None
+        ):
             return self._blocked(
                 base,
-                RoutingOutcome.BLOCKED_POLICY,
-                RouterReasonCode.HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED,
-                "C2 hard-cut character continuity has not passed subjective quality acceptance.",
+                RoutingOutcome.BLOCKED_MISSING_INPUT,
+                RouterReasonCode.MISSING_CONTINUITY_TERMINAL,
+                "The selected continuity mode requires upstream terminal evidence.",
+            )
+        if (
+            context.continuity_mode
+            in {ContinuityMode.REFERENCE, ContinuityMode.SEMANTIC}
+            and context.semantic_continuity_state is None
+        ):
+            return self._blocked(
+                base,
+                RoutingOutcome.BLOCKED_MISSING_INPUT,
+                RouterReasonCode.MISSING_SEMANTIC_CONTINUITY_STATE,
+                "The selected continuity mode requires a typed continuity-state snapshot.",
             )
         selected = next(
             (
@@ -608,7 +797,7 @@ class VideoGenerationResolver:
                 "execution_kind": selected.execution_kind,
             }
         )
-        if activated_visual_strategy not in {
+        if context.activated_shot.visual_strategy not in {
             VisualStrategy.GENERATED_VIDEO,
             VisualStrategy.HYBRID,
         }:
@@ -630,19 +819,37 @@ class VideoGenerationResolver:
         inputs: tuple[RouterAssetIdentity, ...]
         reason: RouterReasonCode
         rationale: str
-        if context.continuity_intent is ContinuityIntent.CONTINUOUS_TAKE:
-            if context.upstream_terminal is None:
-                return self._blocked(
-                    base,
-                    RoutingOutcome.BLOCKED_MISSING_INPUT,
-                    RouterReasonCode.MISSING_CONTINUITY_TERMINAL,
-                    "Continuous-take routing requires the exact upstream terminal frame.",
-                )
+        if context.continuity_mode is ContinuityMode.EXACT_TERMINAL:
+            assert context.upstream_terminal is not None
             required_mode = VideoGenerationMode.IMAGE_TO_VIDEO
             required_roles = ("first_frame",)
             inputs = (context.upstream_terminal,)
-            reason = RouterReasonCode.CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME
+            reason = RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME
             rationale = "Continue from the exact upstream terminal without an intermediate redraw."
+        elif context.continuity_mode is ContinuityMode.REFERENCE:
+            assert context.upstream_terminal is not None
+            if not context.canonical_character_references:
+                return self._blocked(
+                    base,
+                    RoutingOutcome.BLOCKED_MISSING_INPUT,
+                    RouterReasonCode.MISSING_CHARACTER_REFERENCE,
+                    "Reference continuity requires an exact character reference.",
+                )
+            if context.canonical_scene_reference is None:
+                return self._blocked(
+                    base,
+                    RoutingOutcome.BLOCKED_MISSING_INPUT,
+                    RouterReasonCode.MISSING_SCENE_REFERENCE,
+                    "Reference continuity requires an exact scene reference.",
+                )
+            required_mode = VideoGenerationMode.REFERENCE_TO_VIDEO
+            inputs = self._continuity_references(context)
+            required_roles = ("reference",) * len(inputs)
+            reason = RouterReasonCode.REFERENCE_CONTINUITY_USES_TERMINAL_REFERENCE
+            rationale = (
+                "Use terminal and canonical assets as references without binding terminal "
+                "pixels as the next first frame."
+            )
         elif context.important_character_ids:
             if selected.mode is VideoGenerationMode.REFERENCE_TO_VIDEO:
                 if not context.canonical_character_references:
@@ -701,8 +908,20 @@ class VideoGenerationResolver:
             required_mode = VideoGenerationMode.TEXT_TO_VIDEO
             required_roles = ()
             inputs = ()
-            reason = RouterReasonCode.FREE_ENVIRONMENT_MOTION_ENABLES_T2V
-            rationale = "The Shot has no important identity or continuity edge."
+            reason = (
+                RouterReasonCode.SEMANTIC_CONTINUITY_USES_STATE_ONLY
+                if context.continuity_mode is ContinuityMode.SEMANTIC
+                else RouterReasonCode.NO_CONTINUITY
+            )
+            rationale = (
+                "Use typed story state without consuming upstream terminal pixels."
+                if context.continuity_mode is ContinuityMode.SEMANTIC
+                else "The Shot starts an independent visual state."
+            )
+
+        if context.continuity_mode is ContinuityMode.SEMANTIC:
+            reason = RouterReasonCode.SEMANTIC_CONTINUITY_USES_STATE_ONLY
+            rationale = "Use typed continuity state without consuming upstream terminal pixels."
 
         if (
             required_mode not in context.allowed_generation_modes
@@ -773,6 +992,19 @@ class VideoGenerationResolver:
             context.canonical_scene_reference,
         )
         return tuple(sorted(references, key=lambda asset: asset.asset_id))
+
+    @classmethod
+    def _continuity_references(
+        cls,
+        context: ShotRoutingContext,
+    ) -> tuple[RouterAssetIdentity, ...]:
+        assert context.upstream_terminal is not None
+        return tuple(
+            sorted(
+                (context.upstream_terminal, *cls._canonical_references(context)),
+                key=lambda asset: asset.asset_id,
+            )
+        )
 
     @staticmethod
     def _supports_roles(

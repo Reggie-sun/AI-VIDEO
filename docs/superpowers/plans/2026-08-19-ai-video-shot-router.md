@@ -2,7 +2,7 @@
 
 ## Objective
 
-实现 [Shot Router specification](../specs/2026-08-19-ai-video-shot-router.md) 的诚实降级第一阶段：`ShotVisualResolver`产生authoring proposal，`VideoGenerationResolver`为已激活generated-video/hybrid Shot选择provider-neutral generation mode、required bindings与capability requirements；C1 exact-terminal continuation可选择，C2 hard-cut一律typed blocked。
+实现 [Shot Router specification](../specs/2026-08-19-ai-video-shot-router.md) 对四档 Shot continuity contract 的消费：`ShotVisualResolver`产生authoring proposal，`VideoGenerationResolver`为已激活generated-video/hybrid Shot选择provider-neutral generation mode、required bindings与capability requirements；`exact_terminal`、`reference`、`semantic`、`none`具有互斥的pixel/state输入规则。Provider routing是正交维度，可以选择不同的exact Provider/profile，但不得改写或降级Shot continuity mode。
 
 本计划不自动选择或fallback Provider，不调用network，不读取secret，不mint permit，不提交generation，不增加第二份durable `visual_strategy` truth。
 
@@ -12,11 +12,11 @@
 
 1. C2 technical lineage已存在，但两轮representative subjective review未通过；
 2. 用户明确选择诚实降级 Router，并要求继续 implementation；
-3. C1 `h3-minimal-shot-continuity-proof-20260819-v1` 证明exact terminal直接进入Shot 2可得到连续动作，但不解锁hard-cut；
+3. C1 `h3-minimal-shot-continuity-proof-20260819-v1` 证明exact terminal直接进入Shot 2可得到连续动作，但不证明C2 derived-keyframe主观质量；
 4. 当前task在用户授权的dedicated worktree中执行，无target-file ownership冲突；
 5. no schema/layout/CLI/P5/state-writer mutation assumption仍成立。
 
-第一阶段不得新增任何可由policy flag自行解锁的hard-cut路径。未来C2 quality acceptance需独立授权、实现和verification。
+`hard_cut`不属于continuity mode。既有C2 derived-keyframe主观质量失败仍不得被描述为quality accepted；真正的`reference` routing只有exact R2V capability满足terminal+canonical reference roles时才能选择。
 
 ## Problem Boundary
 
@@ -49,6 +49,7 @@ Router必须可整体删除并恢复caller显式选择行为。
 - `ShotVisualRoutingProposal`只有proposed/blocked outcomes，不可被request/P5/render直接消费；
 - `VideoGenerationRoutingDecision`包含selected mode、ordered binding roles、exact inputs、capability/output requirements与stable reason codes；
 - `semantic_routing_hash`只覆盖生成语义；`audit_decision_hash`额外覆盖policy与rationale；
+- reference/semantic state hash必须先以canonical token物化进activated Shot的既有`continuity_constraints`；state变化由target Shot hash进入现有request/P5 truth，不建立第二份durable state；
 - policy-only/rationale/order noise只改变audit hash或完全不变，不改变semantic hash；
 - provider registration order与dict order不影响结果。
 
@@ -66,17 +67,18 @@ pytest -q tests/test_production_shot_router.py
 
 ### Tests
 
-稳定以下priority matrix；`hard_cut` quality gate是唯一高于第1项的fail-closed规则：
+稳定以下priority matrix；continuity mode优先于没有continuity证明的既有素材复用：
 
 1. approved existing clip -> `existing_video`。
 2. no visible motion -> `static_image`。
 3. transform/parallax only -> `image_motion`。
 4. graphic/text animation -> `motion_graphics`。
-5. important character + continuous-take terminal -> generated video proposal with terminal-first-frame requirement。
-6. important character + hard-cut terminal -> `blocked_policy / HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED`。
-7. important character withoutvisual anchors -> blocked，不得T2V。
-8. identity-free free motion -> `generated_video + text_to_video`。
-9. hero/edit/repair paths在第一阶段一律以`HERO_SHOT_REQUIRES_HYBRID_OR_V2V`阻断；未来只有在独立slice提供exact source-media binding与对应generation contract后才可选择hybrid/video edit，且不能作为continuity failure fallback。
+5. `exact_terminal` -> generated video proposal with terminal-first-frame requirement。
+6. `reference` -> terminal+canonical refs+semantic state as references，terminal不得成为first frame。
+7. `semantic` -> typed state required，terminal必须排除。
+8. `none` -> 不消费terminal/state；important character without visual anchors仍blocked，不得T2V。
+9. identity-free free motion -> `generated_video + text_to_video`。
+10. hero/edit/repair paths在第一阶段一律以`HERO_SHOT_REQUIRES_HYBRID_OR_V2V`阻断；未来只有在独立slice提供exact source-media binding与对应generation contract后才可选择hybrid/video edit，且不能作为continuity failure fallback。
 
 ### Implementation
 
@@ -93,9 +95,10 @@ pytest -q tests/test_production_shot_router.py
 ### Tests
 
 - resolver只接受已经激活且strategy为generated-video/hybrid的Shot。
-- continuous-take选择I2V + exact terminal first-frame。
-- hard-cut即使derived keyframe与terminal lineage都已激活也必须typed blocked。
-- canonical references且exact profile支持时可选择R2V；不支持则blocked。
+- `exact_terminal`选择I2V + exact terminal first-frame。
+- `reference`选择R2V，terminal与canonical refs全部使用reference role，不得复制构图。
+- `semantic`只seal typed continuity state并排除terminal pixels；`none`排除所有continuity输入。
+- canonical references且exact profile支持时可选择R2V；不支持则blocked，不得fallback。
 - reference bindings复用现有`VideoGenerationRequest` canonical order；等价caller tuple换序必须收敛到相同ordered inputs与semantic hash。
 - T2V只适用于无重要identity、无continuity edge的free generation。
 - selected exact provider/profile capability不满足required roles时blocked；不得查找下一个Provider。
@@ -160,7 +163,7 @@ pytest -q \
 
 ## Milestone 6: Integration, Review, and Harness
 
-构造representative inputs，覆盖static/image-motion/motion-graphics/I2V continuation/R2V/T2V/existing/hybrid/blocked lanes，并证明hard-cut稳定blocked。所有固定主角continuity Shot都不得路由到裸T2V，remote path未授权时不得触发secret、Budget Guard或network。
+构造representative inputs，覆盖static/image-motion/motion-graphics、四档continuity、I2V/R2V/T2V/existing/hybrid/blocked lanes，并证明C2 derived-keyframe主观失败没有被误写为reference quality acceptance。所有固定主角continuity Shot都不得路由到裸T2V，remote path未授权时不得触发secret、Budget Guard或network。
 
 运行：
 
@@ -195,7 +198,7 @@ Technical acceptance要求：
 - deterministic matrix与stable reason codes有executable tests；
 - authoring proposal不成为second truth；
 - 第一阶段没有proposal materialization或第二writer；
-- continuous-take使用exact terminal，hard-cut稳定返回quality-unaccepted typed block；
+- 四档continuity均有typed executable contract；`exact_terminal`复制terminal到first frame，`reference`只作reference，`semantic`与`none`均不消费terminal pixels；
 - capability/resource/authorization denial全部fail closed；
 - semantic/audit hash分离且P5 invalidation精确；
 - no-network integration与fresh Harness通过。

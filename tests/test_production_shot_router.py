@@ -3,11 +3,21 @@ from __future__ import annotations
 from pydantic import ValidationError
 import pytest
 
-from ai_video.production.models import VisualStrategy
+from ai_video.production.hashing import seal_artifact
+from ai_video.production.models import (
+    DependencyGraphSnapshotPointer,
+    DurationPolicy,
+    ProjectSnapshotPointer,
+    RegistrySnapshotPointer,
+    Shot,
+    SourceReference,
+    VisualStrategy,
+)
 from ai_video.production.shot_router import (
-    ContinuityIntent,
+    ContinuityMode,
     MotionRequirement,
     RouterAssetIdentity,
+    RouterContinuityState,
     RouterPolicyIdentity,
     RouterReasonCode,
     RoutingOutcome,
@@ -22,6 +32,8 @@ from ai_video.production.video import (
     VideoCapabilityVariant,
     VideoExecutionKind,
     VideoGenerationMode,
+    VideoGenerationRequest,
+    VideoImageReferenceBinding,
     VideoOutputRequirement,
     VideoProviderCapabilities,
 )
@@ -60,13 +72,15 @@ def _asset(
 def _context(
     *,
     motion: MotionRequirement = MotionRequirement.CHARACTER_ACTION,
-    continuity: ContinuityIntent = ContinuityIntent.NONE,
+    continuity: ContinuityMode = ContinuityMode.NONE,
     important: bool = True,
     existing_video: RouterAssetIdentity | None = None,
     terminal: RouterAssetIdentity | None = None,
     keyframe: RouterAssetIdentity | None = None,
     character_references: tuple[RouterAssetIdentity, ...] | None = None,
     scene_reference: RouterAssetIdentity | None = None,
+    continuity_state: RouterContinuityState | None = None,
+    visual_strategy: VisualStrategy = VisualStrategy.GENERATED_VIDEO,
 ) -> ShotRoutingContext:
     if character_references is None:
         character_references = (
@@ -76,10 +90,36 @@ def _context(
         )
     if scene_reference is None and important:
         scene_reference = _asset("scene_reference", "scene", HASH_B)
+    continuity_constraints = (
+        (continuity_state.shot_constraint_token,)
+        if continuity_state is not None
+        and continuity in {ContinuityMode.REFERENCE, ContinuityMode.SEMANTIC}
+        else ()
+    )
+    activated_shot = seal_artifact(
+        Shot(
+            artifact_id="shot-artifact-2",
+            revision=3,
+            content_hash="0" * 64,
+            creation_receipt_id="router-test-authoring",
+            source_provenance=(
+                SourceReference(kind="user_input", reference="router-test"),
+            ),
+            shot_id="shot-2",
+            scene_id="scene-room",
+            storyboard_beat_id="beat-2",
+            intent="Continue the exact authored action.",
+            duration_policy=DurationPolicy(mode="fixed", seconds=4),
+            character_ids=("hero",) if important else (),
+            continuity_constraints=continuity_constraints,
+            visual_strategy=visual_strategy,
+        )
+    )
     return ShotRoutingContext(
-        target_shot_id="shot-2",
-        target_shot_revision=3,
-        target_shot_content_hash=HASH_C,
+        activated_shot=activated_shot,
+        target_shot_id=activated_shot.shot_id,
+        target_shot_revision=activated_shot.revision,
+        target_shot_content_hash=activated_shot.content_hash,
         storyboard_revision=2,
         storyboard_content_hash=HASH_D,
         character_bible_content_hashes=(HASH_A,) if important else (),
@@ -91,9 +131,23 @@ def _context(
         shot_keyframe=keyframe,
         upstream_terminal=terminal,
         motion_requirement=motion,
-        continuity_intent=continuity,
+        continuity_mode=continuity,
+        semantic_continuity_state=continuity_state,
         allowed_visual_strategies=tuple(VisualStrategy),
         allowed_generation_modes=tuple(VideoGenerationMode),
+    )
+
+
+def _continuity_state(*, story_state_hash: str = HASH_A) -> RouterContinuityState:
+    return RouterContinuityState.create(
+        state_id="alice-continuity",
+        state_revision=2,
+        character_identity_hashes=(HASH_A,),
+        story_state_hash=story_state_hash,
+        wardrobe_state_hashes=(HASH_B,),
+        injury_state_hashes=(HASH_C,),
+        prop_state_hashes=(HASH_D,),
+        scene_state_hash=HASH_B,
     )
 
 
@@ -193,6 +247,64 @@ def _profile() -> ProviderProfilePointer:
     )
 
 
+def _request_from_decision(decision) -> VideoGenerationRequest:
+    from pathlib import Path
+
+    bindings = tuple(
+        VideoImageReferenceBinding(
+            role="reference",
+            asset_id=asset.asset_id,
+            asset_sha256=asset.asset_sha256,
+            mime_type=asset.mime_type,
+            width=asset.width,
+            height=asset.height,
+            size_bytes=asset.size_bytes,
+        )
+        for asset in decision.input_assets
+    )
+    return VideoGenerationRequest.create(
+        generation_id=f"generation-{decision.target_shot_content_hash[:12]}",
+        provider_name=decision.provider_name,
+        provider_kind="local_test",
+        model_id="model-test",
+        provider_profile=decision.provider_profile,
+        target_shot_id=decision.target_shot_id,
+        target_shot_revision=decision.target_shot_revision,
+        target_shot_content_hash=decision.target_shot_content_hash,
+        target_asset_role="primary_visual",
+        target_visual_strategy="generated_video",
+        mode=decision.selected_mode,
+        prompt_text="Preserve the exact activated semantic continuity state.",
+        negative_prompt_text="",
+        image_bindings=bindings,
+        output_requirement=decision.output_requirement,
+        seed=17,
+        base_project=ProjectSnapshotPointer(
+            path=Path("project.yaml"),
+            revision=1,
+            content_hash=HASH_A,
+            file_sha256=HASH_B,
+        ),
+        base_registry=RegistrySnapshotPointer(
+            path=Path(f"assets/registry.{HASH_B}.json"),
+            revision_id=HASH_B,
+            content_hash=HASH_B,
+            file_sha256=HASH_C,
+        ),
+        base_dependency_graph=DependencyGraphSnapshotPointer(
+            path=Path(f"state/dependency_graph.{HASH_C}.json"),
+            revision_id=HASH_C,
+            content_hash=HASH_C,
+            file_sha256=HASH_D,
+        ),
+        input_artifact_ids=(
+            decision.target_shot_id,
+            *(asset.asset_id for asset in decision.input_assets),
+        ),
+        output_asset_id="video-output",
+    )
+
+
 @pytest.mark.parametrize(
     ("context", "expected_strategy", "expected_reason"),
     [
@@ -250,26 +362,29 @@ def test_visual_resolver_blocks_important_character_without_anchor() -> None:
     assert result.required_generation_mode is not VideoGenerationMode.TEXT_TO_VIDEO
 
 
-def test_hard_cut_is_truthfully_blocked_until_subjective_quality_is_accepted() -> None:
+def test_reference_continuity_proposes_r2v_without_copying_terminal_as_first_frame() -> None:
+    terminal = _asset("continuity_terminal", "terminal", HASH_C)
     context = _context(
-        continuity=ContinuityIntent.HARD_CUT,
-        terminal=_asset("continuity_terminal", "terminal", HASH_C),
-        keyframe=_asset("first_frame", "derived-keyframe", HASH_D),
+        continuity=ContinuityMode.REFERENCE,
+        terminal=terminal,
+        continuity_state=_continuity_state(),
     )
 
     visual = ShotVisualResolver().resolve(context, _policy())
 
-    assert visual.outcome is RoutingOutcome.BLOCKED_POLICY
-    assert visual.proposed_visual_strategy is None
+    assert visual.outcome is RoutingOutcome.PROPOSED
+    assert visual.proposed_visual_strategy is VisualStrategy.GENERATED_VIDEO
+    assert visual.required_generation_mode is VideoGenerationMode.REFERENCE_TO_VIDEO
+    assert visual.required_binding_roles == ("reference",)
     assert visual.reason_codes == (
-        RouterReasonCode.HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED,
+        RouterReasonCode.REFERENCE_CONTINUITY_USES_TERMINAL_REFERENCE,
     )
 
 
-def test_approved_existing_video_precedes_continuous_take_generation() -> None:
+def test_exact_terminal_continuity_precedes_unproven_existing_video() -> None:
     existing = _asset("existing_video", "approved", HASH_D)
     context = _context(
-        continuity=ContinuityIntent.CONTINUOUS_TAKE,
+        continuity=ContinuityMode.EXACT_TERMINAL,
         existing_video=existing,
         terminal=_asset("continuity_terminal", "terminal", HASH_C),
     )
@@ -277,9 +392,11 @@ def test_approved_existing_video_precedes_continuous_take_generation() -> None:
     proposal = ShotVisualResolver().resolve(context, _policy())
 
     assert proposal.outcome is RoutingOutcome.PROPOSED
-    assert proposal.proposed_visual_strategy is VisualStrategy.EXISTING_VIDEO
-    assert proposal.required_generation_mode is None
-    assert proposal.reason_codes == (RouterReasonCode.APPROVED_EXISTING_VIDEO,)
+    assert proposal.proposed_visual_strategy is VisualStrategy.GENERATED_VIDEO
+    assert proposal.required_generation_mode is VideoGenerationMode.IMAGE_TO_VIDEO
+    assert proposal.reason_codes == (
+        RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME,
+    )
 
 
 def test_approved_existing_video_requires_mp4_mime() -> None:
@@ -294,56 +411,52 @@ def test_approved_existing_video_requires_mp4_mime() -> None:
         )
 
 
-@pytest.mark.parametrize(
-    "motion",
-    tuple(MotionRequirement),
-)
-def test_hard_cut_block_precedes_every_visual_motion_lane(
-    motion: MotionRequirement,
-) -> None:
+def test_reference_continuity_requires_semantic_state() -> None:
     context = _context(
-        motion=motion,
-        continuity=ContinuityIntent.HARD_CUT,
-        existing_video=_asset("existing_video", "approved", HASH_D),
+        continuity=ContinuityMode.REFERENCE,
         terminal=_asset("continuity_terminal", "terminal", HASH_C),
-        keyframe=_asset("first_frame", "derived-keyframe", HASH_D),
     )
 
     result = ShotVisualResolver().resolve(context, _policy())
 
-    assert result.outcome is RoutingOutcome.BLOCKED_POLICY
+    assert result.outcome is RoutingOutcome.BLOCKED_MISSING_INPUT
     assert result.reason_codes == (
-        RouterReasonCode.HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED,
+        RouterReasonCode.MISSING_SEMANTIC_CONTINUITY_STATE,
     )
 
 
-def test_hard_cut_video_block_precedes_strategy_and_capability_lookup() -> None:
+def test_reference_continuity_requires_exact_r2v_capability_without_fallback() -> None:
     context = _context(
-        continuity=ContinuityIntent.HARD_CUT,
+        continuity=ContinuityMode.REFERENCE,
         terminal=_asset("continuity_terminal", "terminal", HASH_C),
-        keyframe=_asset("first_frame", "derived-keyframe", HASH_D),
+        continuity_state=_continuity_state(),
     )
 
     result = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.STATIC_IMAGE,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
-        selected_capability_id="not-present",
+        selected_capability_id="capability-text_to_video",
         output_requirement=_output(),
     )
 
-    assert result.outcome is RoutingOutcome.BLOCKED_POLICY
+    assert result.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert result.required_mode is VideoGenerationMode.REFERENCE_TO_VIDEO
+    assert context.upstream_terminal in result.input_assets
+    assert tuple(asset.asset_id for asset in result.input_assets) == tuple(
+        sorted(asset.asset_id for asset in result.input_assets)
+    )
+    assert "first_frame" not in result.required_binding_roles
     assert result.reason_codes == (
-        RouterReasonCode.HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED,
+        RouterReasonCode.PROVIDER_CAPABILITY_DENIED,
     )
 
 
-def test_continuous_take_without_important_character_still_requires_terminal_i2v() -> None:
+def test_exact_terminal_without_important_character_still_requires_terminal_i2v() -> None:
     terminal = _asset("continuity_terminal", "terminal", HASH_C)
     context = _context(
-        continuity=ContinuityIntent.CONTINUOUS_TAKE,
+        continuity=ContinuityMode.EXACT_TERMINAL,
         important=False,
         terminal=terminal,
     )
@@ -356,17 +469,16 @@ def test_continuous_take_without_important_character_still_requires_terminal_i2v
     assert result.required_binding_roles == ("first_frame",)
 
 
-def test_continuous_take_uses_exact_terminal_as_first_frame() -> None:
+def test_exact_terminal_uses_exact_terminal_as_first_frame() -> None:
     terminal = _asset("continuity_terminal", "terminal", HASH_C)
     context = _context(
-        continuity=ContinuityIntent.CONTINUOUS_TAKE,
+        continuity=ContinuityMode.EXACT_TERMINAL,
         terminal=terminal,
     )
     capabilities = _capabilities(_variant(VideoGenerationMode.IMAGE_TO_VIDEO))
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=capabilities,
@@ -380,7 +492,7 @@ def test_continuous_take_uses_exact_terminal_as_first_frame() -> None:
     assert decision.required_binding_roles == ("first_frame",)
     assert decision.input_assets == (terminal,)
     assert decision.reason_codes == (
-        RouterReasonCode.CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME,
+        RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME,
     )
 
 
@@ -389,7 +501,6 @@ def test_free_motion_can_use_text_to_video_without_identity_or_continuity() -> N
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
@@ -417,7 +528,6 @@ def test_exact_capability_denial_does_not_try_another_variant() -> None:
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(unused_r2v, selected_t2v),
@@ -442,13 +552,12 @@ def test_terminal_mime_and_measurements_must_satisfy_exact_capability() -> None:
         mime_type="image/jpeg",
     )
     context = _context(
-        continuity=ContinuityIntent.CONTINUOUS_TAKE,
+        continuity=ContinuityMode.EXACT_TERMINAL,
         terminal=terminal,
     )
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(_variant(VideoGenerationMode.IMAGE_TO_VIDEO)),
@@ -468,7 +577,6 @@ def test_selected_profile_version_must_match_capability() -> None:
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(),
         provider_profile=profile,
         capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
@@ -485,7 +593,7 @@ def test_selected_profile_version_must_match_capability() -> None:
 def test_routing_context_rejects_asset_in_the_wrong_semantic_role() -> None:
     with pytest.raises(ValidationError):
         _context(
-            continuity=ContinuityIntent.CONTINUOUS_TAKE,
+            continuity=ContinuityMode.EXACT_TERMINAL,
             terminal=_asset("first_frame", "wrong-terminal-role", HASH_C),
         )
 
@@ -500,7 +608,6 @@ def test_hero_or_repair_remains_blocked_in_first_phase() -> None:
     visual = ShotVisualResolver().resolve(context, policy)
     generation = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.HYBRID,
         policy=policy,
         provider_profile=_profile(),
         capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
@@ -521,7 +628,6 @@ def test_remote_capability_requires_authorization_before_selection() -> None:
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(
@@ -546,7 +652,6 @@ def test_local_capability_requires_available_local_resources() -> None:
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(local_resources=False),
         provider_profile=_profile(),
         capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
@@ -565,7 +670,6 @@ def test_remote_capability_requires_budget_after_authorization() -> None:
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(remote_authorized=True),
         provider_profile=_profile(),
         capabilities=_capabilities(
@@ -590,7 +694,6 @@ def test_output_requirement_must_match_exact_capability() -> None:
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
@@ -616,7 +719,6 @@ def test_generation_mode_must_be_allowed_by_context() -> None:
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
@@ -647,11 +749,14 @@ def test_visual_strategy_must_be_allowed_by_context() -> None:
 
 
 def test_video_resolver_rejects_non_generated_activated_strategy() -> None:
-    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+    context = _context(
+        motion=MotionRequirement.FREE_COMPLEX,
+        important=False,
+        visual_strategy=VisualStrategy.STATIC_IMAGE,
+    )
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.EXISTING_VIDEO,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
@@ -666,11 +771,14 @@ def test_video_resolver_rejects_non_generated_activated_strategy() -> None:
 
 
 def test_hybrid_generated_layer_uses_the_same_exact_generation_contract() -> None:
-    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+    context = _context(
+        motion=MotionRequirement.FREE_COMPLEX,
+        important=False,
+        visual_strategy=VisualStrategy.HYBRID,
+    )
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.HYBRID,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
@@ -687,7 +795,6 @@ def test_reference_input_order_is_canonicalized_before_semantic_hashing() -> Non
     second_reference = _asset("character_reference", "second", HASH_B)
     scene_reference = _asset("scene_reference", "scene", HASH_C)
     common = {
-        "activated_visual_strategy": VisualStrategy.GENERATED_VIDEO,
         "policy": _policy(),
         "provider_profile": _profile(),
         "capabilities": _capabilities(
@@ -725,7 +832,6 @@ def test_remote_authorization_changes_audit_not_semantic_routing() -> None:
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
     kwargs = {
         "context": context,
-        "activated_visual_strategy": VisualStrategy.GENERATED_VIDEO,
         "provider_profile": _profile(),
         "capabilities": _capabilities(
             _variant(
@@ -753,11 +859,19 @@ def test_remote_authorization_changes_audit_not_semantic_routing() -> None:
 
 
 def test_exact_reference_capability_selects_r2v_with_all_anchors() -> None:
-    context = _context()
+    terminal = _asset("continuity_terminal", "z-terminal", HASH_C)
+    character = _asset("character_reference", "a-character", HASH_A)
+    scene = _asset("scene_reference", "m-scene", HASH_B)
+    context = _context(
+        continuity=ContinuityMode.REFERENCE,
+        terminal=terminal,
+        continuity_state=_continuity_state(),
+        character_references=(character,),
+        scene_reference=scene,
+    )
 
     decision = VideoGenerationResolver().resolve(
         context=context,
-        activated_visual_strategy=VisualStrategy.GENERATED_VIDEO,
         policy=_policy(),
         provider_profile=_profile(),
         capabilities=_capabilities(
@@ -769,18 +883,201 @@ def test_exact_reference_capability_selects_r2v_with_all_anchors() -> None:
 
     assert decision.outcome is RoutingOutcome.SELECTED
     assert decision.selected_mode is VideoGenerationMode.REFERENCE_TO_VIDEO
-    assert decision.required_binding_roles == ("reference", "reference")
-    assert decision.input_assets == (
-        *context.canonical_character_references,
-        context.canonical_scene_reference,
+    assert decision.continuity_mode is ContinuityMode.REFERENCE
+    assert decision.required_binding_roles == (
+        "reference",
+        "reference",
+        "reference",
     )
+    assert decision.input_assets == (character, scene, terminal)
+    assert all(role != "first_frame" for role in decision.required_binding_roles)
+    assert decision.reason_codes == (
+        RouterReasonCode.REFERENCE_CONTINUITY_USES_TERMINAL_REFERENCE,
+    )
+    request = _request_from_decision(decision)
+    assert tuple(binding.asset_id for binding in request.image_bindings) == (
+        "asset-a-character",
+        "asset-m-scene",
+        "asset-z-terminal",
+    )
+
+
+def test_semantic_continuity_carries_state_but_never_terminal_pixels() -> None:
+    terminal = _asset("continuity_terminal", "available-but-unused", HASH_C)
+    state = _continuity_state()
+    context = _context(
+        continuity=ContinuityMode.SEMANTIC,
+        terminal=terminal,
+        continuity_state=state,
+    )
+
+    decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=_capabilities(
+            _variant(VideoGenerationMode.REFERENCE_TO_VIDEO)
+        ),
+        selected_capability_id="capability-reference_to_video",
+        output_requirement=_output(),
+    )
+
+    assert decision.outcome is RoutingOutcome.SELECTED
+    assert decision.continuity_mode is ContinuityMode.SEMANTIC
+    assert decision.semantic_continuity_state == state
+    assert terminal not in decision.input_assets
+    assert all(asset.role != "continuity_terminal" for asset in decision.input_assets)
+    assert decision.reason_codes == (
+        RouterReasonCode.SEMANTIC_CONTINUITY_USES_STATE_ONLY,
+    )
+
+
+def test_semantic_continuity_requires_sealed_state() -> None:
+    context = _context(continuity=ContinuityMode.SEMANTIC)
+
+    decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=_capabilities(
+            _variant(VideoGenerationMode.REFERENCE_TO_VIDEO)
+        ),
+        selected_capability_id="capability-reference_to_video",
+        output_requirement=_output(),
+    )
+
+    assert decision.outcome is RoutingOutcome.BLOCKED_MISSING_INPUT
+    assert decision.reason_codes == (
+        RouterReasonCode.MISSING_SEMANTIC_CONTINUITY_STATE,
+    )
+
+
+def test_semantic_continuity_does_not_reuse_unproven_existing_video() -> None:
+    context = _context(
+        continuity=ContinuityMode.SEMANTIC,
+        continuity_state=_continuity_state(),
+        existing_video=_asset("existing_video", "unproven", HASH_D),
+    )
+
+    proposal = ShotVisualResolver().resolve(context, _policy())
+
+    assert proposal.outcome is RoutingOutcome.PROPOSED
+    assert proposal.proposed_visual_strategy is VisualStrategy.GENERATED_VIDEO
+    assert proposal.proposed_visual_strategy is not VisualStrategy.EXISTING_VIDEO
+
+
+def test_continuity_state_must_be_materialized_in_activated_shot() -> None:
+    state = _continuity_state()
+    context = _context(
+        continuity=ContinuityMode.SEMANTIC,
+        continuity_state=state,
+    )
+
+    unprojected_shot = seal_artifact(
+        context.activated_shot.model_copy(
+            update={"content_hash": "0" * 64, "continuity_constraints": ()}
+        )
+    )
+    with pytest.raises(ValidationError):
+        ShotRoutingContext.model_validate(
+            {
+                **context.model_dump(mode="json"),
+                "activated_shot": unprojected_shot.model_dump(mode="json"),
+                "target_shot_content_hash": unprojected_shot.content_hash,
+            }
+        )
+
+
+def test_none_continuity_ignores_available_terminal_and_semantic_state() -> None:
+    terminal = _asset("continuity_terminal", "available-but-unused", HASH_C)
+    context = _context(
+        motion=MotionRequirement.FREE_COMPLEX,
+        continuity=ContinuityMode.NONE,
+        important=False,
+        terminal=terminal,
+        continuity_state=_continuity_state(),
+    )
+
+    decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
+        selected_capability_id="capability-text_to_video",
+        output_requirement=_output(),
+    )
+
+    assert decision.outcome is RoutingOutcome.SELECTED
+    assert decision.continuity_mode is ContinuityMode.NONE
+    assert decision.semantic_continuity_state is None
+    assert decision.input_assets == ()
+    assert decision.reason_codes == (RouterReasonCode.NO_CONTINUITY,)
+
+
+def test_exact_terminal_ignores_extra_semantic_state() -> None:
+    terminal = _asset("continuity_terminal", "terminal", HASH_C)
+    context = _context(
+        continuity=ContinuityMode.EXACT_TERMINAL,
+        terminal=terminal,
+        continuity_state=_continuity_state(),
+    )
+
+    decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=_capabilities(_variant(VideoGenerationMode.IMAGE_TO_VIDEO)),
+        selected_capability_id="capability-image_to_video",
+        output_requirement=_output(),
+    )
+
+    assert decision.outcome is RoutingOutcome.SELECTED
+    assert decision.semantic_continuity_state is None
+
+
+def test_continuity_mode_and_state_change_semantic_routing_hash() -> None:
+    common = {
+        "policy": _policy(),
+        "provider_profile": _profile(),
+        "capabilities": _capabilities(
+            _variant(VideoGenerationMode.REFERENCE_TO_VIDEO)
+        ),
+        "selected_capability_id": "capability-reference_to_video",
+        "output_requirement": _output(),
+    }
+    first_state = _continuity_state(story_state_hash=HASH_A)
+    second_state = _continuity_state(story_state_hash=HASH_D)
+    first = VideoGenerationResolver().resolve(
+        context=_context(
+            continuity=ContinuityMode.SEMANTIC,
+            continuity_state=first_state,
+        ),
+        **common,
+    )
+    second = VideoGenerationResolver().resolve(
+        context=_context(
+            continuity=ContinuityMode.SEMANTIC,
+            continuity_state=second_state,
+        ),
+        **common,
+    )
+    none = VideoGenerationResolver().resolve(
+        context=_context(continuity=ContinuityMode.NONE),
+        **common,
+    )
+
+    assert first.semantic_routing_hash != second.semantic_routing_hash
+    assert first.semantic_routing_hash != none.semantic_routing_hash
+    assert first.target_shot_content_hash != second.target_shot_content_hash
+    first_request = _request_from_decision(first)
+    second_request = _request_from_decision(second)
+    assert first_request.request_input_hash != second_request.request_input_hash
 
 
 def test_policy_identity_changes_audit_hash_but_not_semantic_hash() -> None:
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
     kwargs = {
         "context": context,
-        "activated_visual_strategy": VisualStrategy.GENERATED_VIDEO,
         "provider_profile": _profile(),
         "capabilities": _capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
         "selected_capability_id": "capability-text_to_video",
@@ -812,7 +1109,6 @@ def test_unselected_capability_order_does_not_change_semantic_routing() -> None:
     )
     common = {
         "context": context,
-        "activated_visual_strategy": VisualStrategy.GENERATED_VIDEO,
         "policy": _policy(),
         "provider_profile": _profile(),
         "selected_capability_id": "selected-t2v",
@@ -846,9 +1142,13 @@ def test_router_models_are_strict_and_immutable() -> None:
 
 def test_router_surface_is_available_from_production_package() -> None:
     from ai_video.production import (
+        ContinuityMode as PublicContinuityMode,
+        RouterContinuityState as PublicRouterContinuityState,
         ShotVisualResolver as PublicShotVisualResolver,
         VideoGenerationResolver as PublicVideoGenerationResolver,
     )
 
+    assert PublicContinuityMode is ContinuityMode
+    assert PublicRouterContinuityState is RouterContinuityState
     assert PublicShotVisualResolver is ShotVisualResolver
     assert PublicVideoGenerationResolver is VideoGenerationResolver

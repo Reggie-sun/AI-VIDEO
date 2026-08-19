@@ -134,9 +134,10 @@ from ai_video.production.video import (
 )
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.shot_router import (
-    ContinuityIntent,
+    ContinuityMode,
     MotionRequirement,
     RouterAssetIdentity,
+    RouterContinuityState,
     RouterPolicyIdentity,
     RouterReasonCode,
     RoutingOutcome,
@@ -171,7 +172,7 @@ __all__ = [
     "Character",
     "CaptionAssetMetadata",
     "CaptionTrack",
-    "ContinuityIntent",
+    "ContinuityMode",
     "CompositionSpec",
     "DependencyGraphSnapshot",
     "DependencyGraphSnapshotPointer",
@@ -241,6 +242,7 @@ __all__ = [
     "RenderStateSnapshotPointer",
     "ResolvedTimeline",
     "RouterAssetIdentity",
+    "RouterContinuityState",
     "RouterPolicyIdentity",
     "RouterReasonCode",
     "RoutingOutcome",
