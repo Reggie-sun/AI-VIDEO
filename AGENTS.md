@@ -186,6 +186,14 @@ P2 reader、registry、validation和P5 dependency modules均不得写入或激�
 
 如果一次改动跨越多个表面，就运行所有对应测试文件。
 
+## Provider Credential Location
+
+- Seedance / Volcengine Ark credential 不保存在 repository、`.env`、run artifact、prompt、command argument、test fixture 或本文件中。raw key 当前保存在本机当前用户的 Secret Service（通常由 GNOME Keyring 提供），通过 `secret-tool` 按以下 exact attributes 检索：`application ai-video`、`provider seedance`、`credential ARK_API_KEY`。
+- Seedance adapter 的稳定 provider contract reference 是 `ARK_API_KEY`，对应 `src/ai_video/production/seedance.py` 中的 `ARK_API_KEY_REFERENCE`。不得改用 `SEEDANCE_API_KEY`，不得读取 MiniMax credential，也不得建立 environment 或其他 Provider key fallback。
+- Agent 必须把 Secret Service lookup 封装在注入 `SeedanceVideoProvider` 的 credential supplier 内；raw lookup result只可存在于 supplier/provider调用所需的进程内存中，不得进入 state、logs、errors、repr、fixtures、Harness receipt 或持久化 artifact。
+- 不得在交互式终端裸运行会把 secret 写到 stdout 的 `secret-tool lookup application ai-video provider seedance credential ARK_API_KEY`。若只需确认 credential 是否可用，必须使用不回显内容的 length/presence check；任何 live调用仍需遵守 Paid Provider Gate 与下一节的 task-scoped authorization。
+- Secret Service entry存在不代表 credential仍有效、账户具有 exact Model/Endpoint access、余额充足、价格已确认或当前 task 已获 live authorization。lookup失败、keyring locked、credential invalid/rotated 时必须 fail closed，不得搜索 repository、shell history 或其他 secret source进行替代。
+
 ## Task-Scoped Paid Authorization
 
 - 当用户明确要求执行一个其 accepted scope 必然包含 remote/paid Provider 调用的任务时，该执行请求本身即构成该任务所需调用的 explicit opt-in 与 paid/live authorization。Agent MUST NOT 仅因为调用会产生费用而对同一任务重复请求授权。
