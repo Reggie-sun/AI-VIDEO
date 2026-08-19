@@ -40,6 +40,14 @@ Agent 必须维护当前产品承诺：
 - 过程更新要简短、具体，并且基于真实仓库证据。
 - 如果执行 review，先给出问题和风险，再给摘要。
 
+## Optional Creative Skill Routing
+
+- 当任务涉及 shot language、motion design、camera movement、pacing、transition、sound design、beat sync、image-motion inspiration 或 visual QA 时，Agent SHOULD 主动使用 `video-shotcraft`。
+- `video-shotcraft` 仅作为 optional creative shot-design skill。
+- 其 Remotion implementation、timeline 或 renderer 仅作为创意与实现参考；Agent MUST 将选定方案翻译为 AI-VIDEO composition directives。
+- MUST NOT 让它拥有或绕过 `ProductionProject`、Asset Registry、Production Manifest、Dependency Graph、`ResolvedTimeline`、HyperFrames renderer 或 QA / Repair lifecycle。
+- 对纯 runtime、state、schema、provider、dependency 或 recovery 任务，MUST NOT 仅因项目涉及视频而触发该 Skill。
+
 ## Read Order
 
 1. 用户请求。
