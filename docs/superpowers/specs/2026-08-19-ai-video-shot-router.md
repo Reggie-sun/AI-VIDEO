@@ -2,9 +2,9 @@
 
 ## Status
 
-本规范是独立的 docs-only proposed contract。当前 runtime 没有 Shot Router：`Shot.visual_strategy` 由 authoring data 显式给出，`VideoGenerationRequest` 由 caller 显式选择 mode/provider/profile，`VideoProviderRegistry` 只做 exact lookup 并禁止 selection/fallback。
+本规范的第一阶段 degraded runtime 已实现 pure `ShotVisualResolver` 与 `VideoGenerationResolver`。`Shot.visual_strategy` 仍由 authoring data 显式给出，Router proposal 不会自行物化 revision；`VideoProviderRegistry` 仍只做 exact lookup 并禁止 selection/fallback。
 
-本规范可以在 [Minimal Shot Continuity Proof specification](./2026-08-19-ai-video-minimal-shot-continuity-proof.md) 验收前完成设计，但 Router runtime implementation 被其 `C2_HARD_CUT_KEYFRAME_I2V` exit gate 阻塞。已有 `C1_CONTINUATION_I2V` technical proof 只证明尾帧原样续拍，不能替代该 gate。本文不得被描述为当前行为或 implementation authorization。
+2026-08-20 的两轮 C2 representative subjective review 均未通过：`terminal -> independently redrawn keyframe -> Shot 2` 仍出现人物姿态/构图断开。用户据此明确选择诚实降级 Router：已验收的 C1 exact-terminal continuation 可以选择；任何 `hard_cut` 必须返回 typed `blocked_policy / HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED`，不得生成 derived-keyframe decision、不得降级到普通 R2V/T2V。C2 未来通过独立 subjective gate 后，才可在新授权 slice 中解锁。
 
 ## Goal
 
@@ -28,13 +28,13 @@ Router 的核心原则是：
 | `VideoGenerationRequest` | sealed provider/model/profile、image/media bindings、continuity binding、output、base tuple 与 request hash | Router 输出必须在 request seal 之前被解析；sealed request 后不得改写 |
 | `VideoProviderRegistry` | exact injected name lookup；未知 provider fail closed；无 selection/fallback | Router 不得把 Registry 改成隐式 ranking/fallback engine |
 | P5 dependency resolver | 唯一 desired fingerprint 与 precise downstream invalidation owner | P5 只消费 activated Shot 与 sealed generation request 的 semantic projection，不消费并列 Router truth |
-| `ProductionStateCommitter` | 唯一 durable writer/activation/recovery owner | Router 只能提出 authoring proposal；只有 committer 可把 proposal 物化为新 Shot/Storyboard revision 并激活 |
+| `ProductionStateCommitter` | 唯一 durable writer/activation/recovery owner | 第一阶段 Router 不提供 proposal materialization；未来若新增接受 proposal 的 slice，仍只有 committer 可物化并激活新 Shot/Storyboard revision |
 
 ## Scope
 
 本规范覆盖两个彼此分离的 pure resolver，但不增加第二份 durable `visual_strategy` truth：
 
-1. `ShotVisualResolver`：从当前 Shot/Storyboard revision、intent 和可用资产产生 coarse `VisualStrategy` authoring proposal。proposal 不是 runtime truth；只有 `ProductionStateCommitter` 将其物化并激活为新的 Shot/Storyboard revision 后，`Shot.visual_strategy` 才成为 canonical truth。
+1. `ShotVisualResolver`：从当前 Shot/Storyboard revision、intent 和可用资产产生 coarse `VisualStrategy` authoring proposal。proposal 不是 runtime truth，第一阶段也没有 materialization API；caller 仍需显式 authoring。未来若新增接受 proposal 的 slice，仍只有 `ProductionStateCommitter` 可物化并激活新的 Shot/Storyboard revision。
 2. `VideoGenerationResolver`：只读取已经激活、明确为 `generated_video` 或含 generated-video layer 的 `hybrid` Shot，决定 provider-neutral `VideoGenerationMode`、required reference roles、capability requirements 和 execution requirements。
 
 Provider 实例仍由 Router core 之外的显式 production policy、authorization 和 exact registry name 选择。Router core 只返回 required capability set 和 execution requirements，不返回 ranked/eligible Provider list；它不得自行调用 Provider、申请预算、读取 secret、提交任务、激活候选或渲染。
@@ -60,7 +60,7 @@ Character Bible + Scene/Shot intent + exact available assets
               authoring proposal only
                          |
                          v
-       ProductionStateCommitter materializes/activates
+       explicit future authoring slice + ProductionStateCommitter activates
                          |
                          v
         canonical activated Shot.visual_strategy
@@ -104,7 +104,7 @@ Character Bible + Scene/Shot intent + exact available assets
 `ShotVisualResolver` 的逻辑输出是 `ShotVisualRoutingProposal`，至少包含：
 
 - exact target Shot identity/revision/content hash；
-- proposed coarse `visual_strategy` 与需要物化的 provider-neutral Shot fields；
+- proposed coarse `visual_strategy` 与未来显式 authoring 时所需的 provider-neutral Shot fields；本阶段不物化；
 - stable semantic reason codes；
 - policy id/version/hash 与 audit proposal hash；
 - outcome：`proposed`、`blocked_missing_input`、`blocked_policy` 或 `blocked_authorization`。
@@ -134,7 +134,7 @@ proposal 不能作为 second truth 被 request、P5、composition 或 render 消
 - `LIGHT_MOTION_FROM_KEYFRAME`
 - `IMPORTANT_CHARACTER_REQUIRES_VISUAL_ANCHOR`
 - `UPSTREAM_TERMINAL_REQUIRES_I2V`
-- `HARD_CUT_REQUIRES_DERIVED_KEYFRAME`
+- `HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED`
 - `CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME`
 - `CANONICAL_REFERENCES_ENABLE_R2V`
 - `FREE_ENVIRONMENT_MOTION_ENABLES_T2V`
@@ -151,11 +151,11 @@ Reason codes 不得包含 model name，不能通过自由文本决定 replay/inv
 
 ## Deterministic Routing Rules
 
-规则按以下优先级执行，前面的 blocking rule 不得被后面的自由生成覆盖：
+第一阶段先执行唯一的 degraded quality gate：任何 `hard_cut` 都必须在资产、capability与motion判断前 fail closed。通过该 gate 后，规则按以下优先级执行；前面的已满足路径或 blocking rule 不得被后面的自由生成覆盖。
 
 ### Rule 1: Existing or Static Asset Suffices
 
-- 已有 exact video asset 且无需再生成：`existing_video`。
+- 已有 exact approved `video/mp4` asset 且无需再生成：`existing_video`；该路径优先于 `continuous_take` 的再次生成。
 - 没有可见运动要求：`static_image`。
 - 只有 pan/zoom/parallax/轻微层运动，且不需要角色真实动作：`image_motion`。
 - 主要是文字、图形、粒子或版式动画：`motion_graphics`。
@@ -165,9 +165,9 @@ Reason codes 不得包含 model name，不能通过自由文本决定 replay/inv
 Router必须先区分continuity intent，不能只因存在upstream terminal就统一选择同一种I2V：
 
 - `continuous_take`：叙事要求从exact terminal pose/pixels直接续拍。选择`generated_video + image_to_video`，`first_frame`必须直接绑定upstream terminal，reason为`CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME`。
-- `hard_cut`：叙事要求新的framing或camera distance，但仍需延续角色、场景、轴线和动作。先进入P7 hard-cut keyframe preparation，required references为`character + continuity_terminal`；keyframe激活后再选择`generated_video + image_to_video`，`first_frame`绑定derived keyframe，reason为`HARD_CUT_REQUIRES_DERIVED_KEYFRAME`。
+- `hard_cut`：叙事要求新的framing或camera distance，但当前 C2 subjective quality gate 未通过。第一阶段 Router 必须返回 `blocked_policy`，reason 为 `HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED`；即使 derived keyframe 与 technical lineage 已存在，也不得选择 generation mode。
 
-hard-cut decision必须seal“terminal -> keyframe request/output -> video first frame”lineage。不得把terminal原样first-frame伪装为hard cut，也不得生成一个只看character/scene、不真实消费terminal的独立keyframe。
+既有 C2 technical contract 继续seal“terminal -> keyframe request/output -> video first frame”lineage，但第一阶段 Router 对 hard-cut 只返回 quality block，不生成新的 generation decision。不得把terminal原样first-frame伪装为hard cut，也不得生成一个只看character/scene、不真实消费terminal的独立keyframe。
 
 如果selected Provider/profile不支持required role set，返回capability blocked。不得删除terminal lineage改跑普通R2V/T2V，也不得静默切换Provider。
 
@@ -183,7 +183,7 @@ hard-cut decision必须seal“terminal -> keyframe request/output -> video first
 
 ### Rule 5: Hero and Repair Paths
 
-明确的 hero shot、已有视频重演、style transfer 或局部修复可选择 `video_edit`、`video_extend` 或 `hybrid`，但必须由单独 policy 明确允许并具备 exact source video binding。它们不是 continuity failure 的自动 fallback。
+明确的 hero shot、已有视频重演、style transfer 或局部修复在第一阶段一律返回`blocked_policy / HERO_SHOT_REQUIRES_HYBRID_OR_V2V`。未来独立 slice 只有在提供 exact source-video binding、对应 generation contract 与 explicit policy 后，才可选择 `video_edit`、`video_extend` 或 `hybrid`；它们始终不是 continuity failure 的自动 fallback。
 
 ## Decision Matrix
 
@@ -193,11 +193,11 @@ hard-cut decision必须seal“terminal -> keyframe request/output -> video first
 | No | No | Not required | Light transform only | `image_motion` |
 | No | No | Not required | Complex/free | `generated_video + text_to_video` |
 | Yes | Yes, continuous-take | Any | Character action | `generated_video + image_to_video + terminal first_frame` |
-| Yes | Yes, hard-cut | Character + terminal | Character action/new framing | prepare derived keyframe, then `generated_video + image_to_video` |
+| Yes | Yes, hard-cut | Character + terminal | Character action/new framing | `blocked_policy + HARD_CUT_CONTINUITY_QUALITY_UNACCEPTED` |
 | Yes | No | Yes, Provider supports exact set | Character action | `generated_video + reference_to_video` |
 | Yes | No | Yes, Provider only supports first frame | Character action | prepare keyframe, then `generated_video + image_to_video` |
 | Yes | No | No | Any generated motion | `blocked_missing_input` |
-| Any | Any | Any | Existing approved clip suffices | `existing_video` |
+| Any | Any non-hard-cut | Any | Existing approved clip suffices | `existing_video` |
 
 相同 inputs、policy version 与 capability snapshot 必须产生相同 audit decision；相同 selected strategy/mode/bindings/inputs/capability/output projection 必须产生相同 semantic routing hash。规则冲突必须按固定 priority 解决，不能依赖 dict order、Provider registration order 或模型自由文本判断。
 
@@ -285,7 +285,7 @@ Router 失败必须是 typed, stable, user-actionable：
 
 ### Integration Contract Tests
 
-1. accepted authoring proposal只能由`ProductionStateCommitter`物化/激活为新Shot revision；P5继续只消费activated Shot。
+1. 第一阶段不接受或物化 authoring proposal，caller 继续显式 authoring；未来若增加接受 proposal 的 slice，仍只能由`ProductionStateCommitter`物化/激活新Shot revision，P5继续只消费activated Shot。
 2. `VideoGenerationRoutingDecision`可构造现有 `VideoGenerationRequest`，不增加 Provider-specific core fields。
 3. unsupported role/mode/profile 在 preview/submit前 fail closed，transport call count为零。
 4. Local-only policy不触发 remote lookup、secret access、Budget Guard或network。
@@ -303,11 +303,11 @@ Local H3、Hailuo、Seedance等各 Provider 的 live/quality acceptance继续独
 
 开始 Router runtime implementation 前必须同时满足：
 
-1. Minimal Shot Continuity Proof 的 `C2_HARD_CUT_KEYFRAME_I2V` 已达到technical、local live与subjective continuity acceptance；C1 proof不能替代；
-2. Router implementation plan 已独立完成并获用户授权；
+1. 用户已明确接受第一阶段 degraded scope，且 C2 hard-cut 必须 fail closed；
+2. C1 exact-terminal proof 只解锁 `continuous_take`，不能被描述为 C2 hard-cut quality acceptance；
 3. exact file/module ownership、RED tests、focused verification 与 rollback 已稳定；
-4. 已确认第一版不需要 schema/layout/CLI mutation，或对应 scope expansion 已另行获批；
-5. live/paid Provider 调用仍有独立 task-scoped authorization。
+4. 第一阶段不做 proposal materialization，不修改 schema/layout/CLI/P5/state writer；
+5. live/paid Provider 调用仍需独立 task-scoped authorization，本 Router implementation 不调用 Provider。
 
 ## Rollback
 
