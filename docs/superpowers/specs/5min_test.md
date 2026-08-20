@@ -148,6 +148,40 @@ hybrid
 所有 Shot = generated_video
 ```
 
+## Reference Asset And Final Shot Visual
+
+本 Spec 明确区分：
+
+```text
+Reference Asset
+= 告诉生成或 review 系统角色、场景、道具或视觉状态应该是什么
+
+Final Shot Visual
+= 观众在该 Shot 中最终真正看到的 image / video asset
+```
+
+Character / Scene reference asset 默认不得自动成为 Final Shot Visual。只有 Shot contract 明确写出导演理由、复用范围和 review 要求时，reference 或 approved reusable plate 才能直接进入最终画面。不得为了凑满 5 分钟，把 reference 的 crop、resize 或轻微派生版本包装成 Shot-specific visual。
+
+每个 Shot 进入 composition 前必须能回答：
+
+```text
+这个 Shot 的画面具体表达什么？
+最终视觉资产是哪一个？
+为什么它适合这个 Shot？
+是否与 Character / Scene continuity 一致？
+是否只是为了填时长而重复旧图？
+```
+
+对于 static / image-motion Shot，默认路径是：
+
+```text
+Shot intent
+→ Shot-specific image / approved reusable plate
+→ optional image motion
+```
+
+不得把 `static` 解释为可以随意复用 Character / Scene reference。本规则复用现有 Shot、Asset、Composition 与 Review contracts，不要求新 schema。
+
 ### Static / Image Motion
 
 优先用于：
@@ -372,6 +406,19 @@ Scene Reference Pack
 
 如果 Character / Scene reference 本身质量不合格，应先修 reference，而不是通过视频 Prompt 强行修复。
 
+Reference Pack 锁定只证明 identity / scene guidance 可用，不证明任何 Shot 已有 Final Shot Visual。重要角色 Shot 的 final asset 必须绑定现有 `Shot.character_ids` 与 approved `Character.reference_asset_ids` / visual state，并在进入 Pilot acceptance 前完成 identity review。
+
+## 12A. Visual Repetition And Identity Gate
+
+在不新增复杂 CV 系统的前提下，使用现有 asset identity、content hash、timeline 与 project-local `video-analysis` 支持最低限度的 review routing：
+
+* 同一个 final image asset 被多个非连续 Shots 复用时，必须记录明确导演理由；没有理由则为 error；
+* 多个 Shot 只改变 captions / narration、但 final visual asset identity 不变时，必须进入人工 review；
+* 连续较长时间主体画面几乎不变化时，`video-analysis` 或 asset/timeline audit 只产生 warning，最终由人工观看判断是否有导演意图；
+* 重要角色 Shot 必须使用 approved character visual state，并对 final asset 完成 identity、wardrobe 与 state review。
+
+本 Gate 不要求所有重复都失败，也不把 creative quality 判断塞入 development Harness。Harness 继续证明 code/state correctness；repetition、identity 与 watchability 由 Pilot Reality Gate + Review + human viewing 决定。
+
 ---
 
 # 13. Voice and Captions
@@ -412,14 +459,18 @@ rough cut 必须包含真实可听的：
 5. Shot visual strategy
 6. Static/image assets
 7. Voice + captions
-8. Generated-video Shots
-9. ResolvedTimeline
-10. First complete rough cut
-11. Watch full video
-12. Record defects
-13. Selective repair
-14. Second complete render
-15. Final rough-cut acceptance
+8. 30～60 秒 Pilot（连续 4～8 Shots）
+9. Human Pilot review
+10. Pilot-local repair + rerender
+11. Pilot GO / NO-GO
+12. Generated-video Shots in bounded batches（仅 GO 后）
+13. ResolvedTimeline
+14. First complete rough cut
+15. Watch full video
+16. Record defects
+17. Selective repair
+18. Second complete render
+19. Final rough-cut acceptance
 ```
 
 核心规则：
@@ -428,9 +479,39 @@ rough cut 必须包含真实可听的：
 
 不得在 Shot 1～5 上无限优化，导致永远没有完整 rough cut。
 
+但“尽快得到完整 5 分钟”不得覆盖 Pilot Gate。Pilot NO-GO 时必须 STOP，不得用更多 placeholder、reference-derived still 或未审 final asset 继续扩到 5 分钟。
+
+## 14A. Pilot Reality Gate
+
+进入任何 5-minute bulk production 前，必须先完成一个真实、连续的代表性 Pilot：
+
+```text
+4～8 个连续 Shots
+约 30～60 秒
+同一个主要角色
+至少一个连续 Shot transition
+至少一个 static / image-motion Shot
+至少一个 Local H3 generated-video Shot
+真实 voice
+真实 captions
+最终 HyperFrames composition
+完整可播放 MP4
+```
+
+Pilot 必须实际观看；unit tests、hash、Manifest、`ffprobe`、contact sheet 或 `video-analysis` 均不能单独给出 GO。人工 Gate 至少检查：
+
+* **Visual**：主角 identity / wardrobe、scene、每镜画面目的、剧情对应、无意义重复；
+* **Continuity**：Shot N close → Shot N+1 open、screen direction、action phase、props、light、space；
+* **Pacing**：无导演意图的长静止、captions 与画面推进错位、static hold 是否合理；
+* **Production**：问题能归入 Asset / Shot / Prompt / Provider / Timeline / QA，且单 Shot 可局部重建。
+
+Pilot 未达到“基本能看、角色基本稳定、画面与剧情对应、无大量重复 reference、声音字幕正常、无重大连续性跳变”时，结论必须是 `NO-GO`，并在 Pilot 内局部修复、重新 render 和重新观看；不得继续扩量。
+
 ---
 
 # 15. First Complete Cut Gate
+
+本 Gate 只在 Pilot 已由 human review 给出 `GO` 后开放。
 
 第一版完整 rough cut 可以包含：
 
@@ -663,11 +744,19 @@ silent Provider fallback
 修改单 Shot 导致错误 blanket rebuild
 真实 Shot 无法进入 composition
 严重 continuity state 无法表达
+Pilot 未完成实际观看或 verdict 为 NO-GO
+reference / reference-derived plate 被无理由当作 Final Shot Visual
+多个非连续 Shots 复用同一 final asset 且没有导演理由
+重要角色 final asset 未完成 identity review
 ```
 
 ---
 
 # 23. Acceptance Criteria
+
+## 0. Pilot
+
+在任何 5-minute batch acceptance 之前，存在一份实际观看并得到 `GO` 的 30～60 秒 Pilot MP4，且包含连续 4～8 Shots、static/image-motion、H3 generated-video、真实 voice/captions 与最终 HyperFrames composition。Pilot verdict、最大问题、局部 repair 和 rerender evidence 可追溯；没有 Pilot GO 时本 Spec 整体不得通过。
 
 本轮通过需要同时满足：
 
@@ -765,6 +854,8 @@ H3 可以作为主要 generated-video lane。
 ```
 
 本轮仍然具有非常高的验证价值。
+
+但“具有验证价值”不等于可以继续批量生产或宣称 quality acceptance。只有 Pilot Reality Gate 和后续 full-watch 都通过时，technical production closure 才能升级为可交付 rough-cut acceptance。
 
 ---
 

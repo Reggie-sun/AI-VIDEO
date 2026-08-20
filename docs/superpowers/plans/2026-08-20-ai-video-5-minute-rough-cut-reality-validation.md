@@ -1,6 +1,6 @@
 # AI-VIDEO 5-Minute Rough Cut Reality Validation Execution Plan
 
-**Goal:** 使用当前已实现的 AI-VIDEO Production contracts，完成一部 270～330 秒、30～45 个 Shots、可完整播放且包含画面、语音、字幕的真实 short-drama rough cut，并以一次真实 selective repair 证明从 defect diagnosis 到 final rerender 的闭环。
+**Goal:** 使用当前已实现的 AI-VIDEO Production contracts，先完成并实际观看一段 30～60 秒、连续 4～8 Shots 的真实 Pilot，只有 Pilot GO 后才扩到 270～330 秒、30～45 个 Shots 的 short-drama rough cut，并以真实 selective repair 证明从 defect diagnosis 到 rerender 的闭环。
 
 **Scope:** 1 个完整故事、1 个主要角色、最多 1 个主要配角、1～2 个主要场景；planning target 为 36 个 Shots / 300 秒，其中约 20 个 `static_image`、约 16 个 `generated_video`，最终数量允许在 spec 范围内因故事节奏调整。
 
@@ -14,7 +14,7 @@
 
 **Out of Scope:** P9、Studio UI、自动 Provider ranking/fallback、全模型 benchmark、Seedance/Hailuo 必选、Remotion 或第二 renderer、第二 timeline、第二 Manifest/Registry writer、schema redesign、LoRA training、无人值守生产和商业级 final polish。
 
-**Acceptance Criteria:** 真实 `final.mp4` 时长 270～330 秒、画面/语音/字幕完整；同时使用 static/image lane、generated-video lane、voice/caption、composition/render、QA/review；包含一组三 Shot continuity sequence；完成一次真实 defect 的 selective repair，且不从零重做全片；最终报告覆盖 spec Section 23.F 的全部指标。
+**Acceptance Criteria:** 批量生产前先有实际观看并得到 GO 的 30～60 秒 Pilot MP4，包含连续 4～8 Shots、同一主要角色、static/image-motion、H3 generated-video、真实 voice/captions 与 HyperFrames composition；Pilot NO-GO 时 STOP。Pilot GO 后的真实 `final.mp4` 时长 270～330 秒、画面/语音/字幕完整；同时使用 static/image lane、generated-video lane、voice/caption、composition/render、QA/review；包含一组三 Shot continuity sequence；完成一次真实 defect 的 selective repair，且不从零重做全片；最终报告覆盖 spec Section 23.F 的全部指标。
 
 **Verification:** strict reopen、exact replay、P5 closure comparison、`ffprobe`、project-local `video-analysis`、三次人工 full-watch、final acceptance receipt，以及任何 code/tooling delta 对应的 fresh Harness receipt。未执行的 remote Provider、主观质量或商业级 acceptance 不得由其他 evidence 外推。
 
@@ -34,6 +34,7 @@
 - **Continuity mapping:** `exact_terminal` 只用于同一动作/机位的连续段；`reference` 通过 canonical Character/Scene references 和必要的独立 keyframe 重新构图；`semantic` 只继承故事/角色状态；不允许统一复制上一 Shot terminal frame。
 - **Unchanged contracts:** P3/P4 audio/caption/mux、P5 typed graph、P6 approval/final acceptance、P7 image provenance、P8 Provider request/activation/recovery、Shot Router 的 Provider-selection boundary均保持不变。
 - **Focused runtime seam:** `ShotVisualResolver` / `VideoGenerationResolver` 只作 pure routing；image 使用 `ProductionStateCommitter.generate_image_asset()`；video 使用 `VideoGenerationService` 与 committer-owned activation；composition 使用 `resolve_composition()` 和 `render_with_hyperframes()`；review/repair/final acceptance只通过 P6 committer methods。
+- **Reference / final boundary:** Character / Scene reference 只提供 identity、state、space 或 style guidance；Final Shot Visual 必须绑定具体 Shot intent。无导演理由不得把 reference、crop/resize 或简单派生自动当作 final visual。
 
 ## File and Artifact Map
 
@@ -48,6 +49,8 @@
 - Create: `runs/$RUN_ID/project.yaml` — stable Production Project entrypoint；active truth 仍由其 Manifest pointers指向 exact snapshots。
 - Create: `runs/$RUN_ID/state/**` — 仅由既有 `ProductionStateCommitter` 和 approved loaders/lifecycles创建的 canonical Project、Registry、graph、render、review、repair、image、video、voice evidence。
 - Create: `runs/$RUN_ID/evidence/production-record.jsonl` — append-only per-Shot operator observations；不保存或改写 lifecycle state。
+- Create: `runs/$RUN_ID/deliverables/pilot.mp4` — 30～60 秒 Reality Gate 成片；必须先 human GO，才能进入 5-minute bulk production。
+- Create: `runs/$RUN_ID/evidence/pilot-review.{json,md}` — exact Pilot bytes 的 Visual / Continuity / Pacing / Production review、repair 与 GO/NO-GO。
 - Create: `runs/$RUN_ID/evidence/first-cut-review-{story,continuity,system}.md` — 三次 full-watch 的独立记录。
 - Create: `runs/$RUN_ID/evidence/{ffprobe,video-analysis}-final.json` — exact final bytes 的 machine-readable technical evidence。
 - Create: `runs/$RUN_ID/evidence/reality-validation-report.{json,md}` — spec Section 23.F 指标、failure classification、repair closure、cost/resource summary 与 remaining risks。
@@ -60,13 +63,12 @@
 - Modify: `docs/v0.2-runtime-baseline.md` — 只记录本轮实际已验证行为、artifact identity 和未验证边界。
 - Modify: `docs/v0.2-agentic-production-roadmap.md` — 只记录本 slice 的真实 gate 状态与下一决策。
 
-### Explicitly unchanged unless a blocker is proven
+### Explicitly unchanged unless a blocker is proven or this task explicitly owns the document
 
 - `src/ai_video/production/**`
 - `tests/**`
 - `workflows/**`
 - `.agent/harness/policy.yaml`
-- `AGENTS.md`
 - `README.md`
 - Legacy `src/ai_video/{cli,pipeline,manifest}.py`
 
@@ -82,11 +84,14 @@
 - Read: `docs/v0.2-runtime-baseline.md`
 - Read: `docs/v0.2-agentic-production-roadmap.md`
 - Read: this plan and its spec
+- Search/read: `docs/record_for_agent/` records directly relevant to real media production、quality regression、Provider quality、continuity 与 rough cut
 - Modify: no runtime file
 
 **Owner / Dependencies:** Parent/operator owns the full production lifecycle. Execution must be single-writer in the current working tree unless the user separately requests a worktree; no overlapping writer may own Production state, docs truth, or blocker-fix files.
 
 **Contract:** 确认 current `HEAD`、working-tree ownership、supported visual strategies、exact local H3/image profiles、HyperFrames/ffmpeg availability和 no-network regression baseline。Preflight 不创建 run、不提交 Provider、不读取或输出 secret。
+
+`docs/record_for_agent/` 只提供可复用经验，必须重新核对 current code/run truth；普通代码修改不得因此读取整个目录。
 
 **Implementation Notes:**
 
@@ -110,9 +115,11 @@
 
 **Contract:** 冻结一条 5 分钟内完整、低角色数、低场景数且包含关键动作的故事；planning target 为 36 Shots / 300 秒。每个 Shot 必须有明确 `visual_strategy`、`continuity_mode`、duration budget、asset roles、dialogue/narration和 `open_state -> changes_here -> close_state`。
 
+`Reference Asset` 只负责说明角色/场景应该是什么；`Final Shot Visual` 是观众最终看到的 asset。Character / Scene reference 默认不得自动成为 final visual，crop/resize/轻微派生也不能自动升级为 Shot-specific visual。每个 Shot 必须记录画面目的、final asset、适配理由、continuity fit 与 reuse rationale；没有导演理由的非连续重复绑定不得进入 composition。
+
 **Implementation Notes:**
 
-- 默认分配 20 个 `static_image` 与 16 个 `generated_video`；只有已存在且注册的真实 source 才使用 `existing_video`。若故事调整，最终仍需 30～45 Shots、270～330 秒，并在 report 解释比例变化。
+- 默认分配 20 个 `static_image` 与 16 个 `generated_video`；只有已存在且注册的真实 source 才使用 `existing_video`。若故事调整，最终仍需 30～45 Shots、270～330 秒，并在 report 解释比例变化。不得为凑时长 blanket downgrade；每个降级必须有 Shot-specific replacement、导演理由和 human review。
 - 在生成前锁定 Character Reference Pack、Scene Reference Pack、主要服装状态和关键道具。角色/场景 reference 不合格时先修 reference，不进入 bulk video generation。
 - 至少设计一个连续三 Shot sequence：包含可审计的 N→N+1→N+2 state progression；continuity mode 可以组合 `exact_terminal`、`reference`、`semantic`，但每条 edge 必须有叙事理由。
 - 为 ordinary generated Shot 设定最多 2 次本地 candidate generation；Hero Shot 最多 3 次。超出上限先诊断 Asset / Shot state / Prompt / Provider 层，不通过重复生成掩盖问题。
@@ -158,14 +165,38 @@
 
 **Implementation Notes:**
 
-- Static lane 默认使用 sealed local Qwen image adapter；必要的 human image import必须使用 existing import contract。不得使用 unattended browser automation或假称 OpenAI Image API provenance。
+- Static lane 默认使用 sealed local Qwen image adapter；必要的 human image import必须使用 existing import contract。不得使用 unattended browser automation或假称 OpenAI Image API provenance。每个 static/image-motion Shot 必须使用 Shot-specific image 或有明确导演理由的 approved reusable plate；不得拿 Character / Scene reference 或其简单 crop 顶替。
 - Voice 默认选择当前已支持且可诚实记录 provenance 的路径：本地/人工音频走 `AudioImportRequest`；若选择现有 remote speech adapter，则在 request 固定后执行 voice preview/authorization/durable intent/one-use permit，费用计入本 run。不得在这两条路径之间 silent fallback。
 - 先根据实际音频 duration生成/调整 `CaptionTrack`，再冻结 Shot duration budget。字幕 source text、speaker/voice identity、alignment和 audio bytes必须能互相核对。
 - 每激活一个 asset，append一条 per-Shot record：generation count、elapsed time、candidate identity、failure reason、manual intervention、accepted flag。
 
-**Acceptance:** 所有 static Shots 已有 accepted source；全部 dialogue/narration可听且字幕文本/时间可追溯；duration budget仍落在 270～330 秒；未发生未授权 remote submit。
+**Acceptance:** 所有 Pilot static Shots 已有 Shot-specific accepted source；任何非连续 final-asset reuse 都有导演理由和人工 review；全部 dialogue/narration可听且字幕文本/时间可追溯；Pilot duration为 30～60 秒；未发生未授权 remote submit。
 
 **Verification:** P7/P4 strict reopen；抽查至少主角、配角、两个场景和关键道具的 reference binding；probe全部 audio；验证 CaptionTrack 对应 script和 source samples。
+
+### Milestone 3A: Pass The 30–60 Second Pilot Reality Gate
+
+**Files:**
+
+- Create through existing owners: 4～8 个连续 Pilot Shot visuals、必要 H3 generated-video assets、Pilot `ResolvedTimeline` / HyperFrames state
+- Create: `deliverables/pilot.mp4`
+- Create: Pilot `ffprobe`、current-byte contact sheet / `video-analysis` raw evidence、human review 与 repair notes
+
+**Owner / Dependencies:** Milestone 3。AI-VIDEO Shot / Asset / P4 / P8 / P3 / P6 owners保持不变；Skills只提供 authoring guidance。
+
+**Contract:** 从当前故事选择连续 4～8 Shots（约 30～60 秒），包含同一个主要角色、至少一个真实 transition、至少一个 static/image-motion Shot、至少一个 Local H3 generated-video Shot、真实 voice、真实 captions 与最终 HyperFrames composition。Pilot 必须实际观看；hash、Manifest、tests、`ffprobe`、contact sheet 与 `video-analysis` 不能单独给 GO。
+
+**Implementation Notes:**
+
+1. 每个 Shot 先回答 visual intent、final asset、适配理由、continuity fit 与 reuse rationale；reference 默认不得成为 final visual。
+2. 使用现有 asset IDs / hashes 做低成本 repetition audit：同一 final image 跨非连续 Shots 复用且无导演理由时 fail；连续长静止或 captions-only progression进入人工 review。
+3. 使用现有 `Character.reference_asset_ids`、`Shot.character_ids`、continuity 与 Review contracts完成 important-character identity review；不新增 Character schema、LoRA、Manifest或 identity database。
+4. 人工检查 Visual / Continuity / Pacing / Production 四组问题，并给出明确 `GO` 或 `NO-GO`。
+5. `NO-GO` 时只修 Pilot 内最小责任层，证明单 Shot selective rebuild，重新 render并重新观看；不得批量扩到 5 分钟。
+
+**Acceptance:** `deliverables/pilot.mp4` 完整可播放且经 human review 达到基本能看、角色基本稳定、画面与剧情对应、无大量重复 reference、声音字幕正常、无重大 continuity jump；verdict 为 `GO`。
+
+**Verification:** strict reopen、exact replay、P5 closure、`ffprobe`、project-local `video-analysis`、current-byte contact sheet、完整人工观看与明确 verdict。缺任一项即 `NO-GO`。
 
 ### Milestone 4: Produce Generated-Video Shots in Bounded Batches
 
@@ -174,19 +205,19 @@
 - Create through P8 lifecycle: Local H3 requests、durable local submit intents/results、fetched/measured MP4、terminal evidence、activated Project/Registry/Graph snapshots
 - Append: per-Shot production records and failure classifications
 
-**Owner / Dependencies:** Milestone 3；Shot Router仅提出 explicit feasible route，operator批准具体 visual/provider/profile，`VideoGenerationService` 执行已有 lifecycle。
+**Owner / Dependencies:** Milestone 3A 已 GO；Shot Router仅提出 explicit feasible route，operator批准具体 visual/provider/profile，`VideoGenerationService` 执行已有 lifecycle。
 
 **Contract:** H3 是 primary generated-video lane。每个 request 绑定 exact Shot、mode、prompt、reference/terminal evidence、output requirement、profile和 active base tuple；Provider失败不得触发自动切换。
 
 **Implementation Notes:**
 
-1. 先执行代表性的三 Shot continuity sequence，不立即批量生成全片。`exact_terminal` 证明 source terminal bytes等于 downstream `first_frame`；`reference` 若需要新构图，先用 P7 canonical references生成独立 keyframe，再交给 H3 I2V；`semantic` 不伪造像素连续。
+1. Pilot 中先执行代表性的三 Shot continuity sequence，不立即批量生成全片。`exact_terminal` 证明 source terminal bytes等于 downstream `first_frame`；`reference` 若需要新构图，先用 P7 canonical references生成独立 Shot-specific keyframe，再交给 H3 I2V；`semantic` 不伪造像素连续。
 2. 代表 sequence通过 technical reopen与人工 continuity inspection后，以 4～6 Shots 为一批推进。每批完成后更新真实 generation count、success rate、local elapsed time、identity/continuity defects，避免最后集中补账。
 3. 非关键 Shot 达到可观看标准即停止迭代；quality一般但不阻碍观看时保留并进入 first cut。超过 Milestone 1 candidate上限或连续三次同类失败时，先定位 Asset / Shot state / Prompt / Provider/model责任层。
 4. Hailuo只允许作为明确列名的 rescue/Hero Shot。每个 cloud Shot必须单独保存 exact preview、cost ceiling、egress、authorization、one-use permit和 outcome；Seedance不是本轮 completion dependency。
 5. Provider outcome unknown 时停止该 Shot，执行 explicit recovery并保留完整 orphan evidence；不得 remint permit或复制 external task identity。
 
-**Acceptance:** 所有 planned generated Shots都有 activated H.264 MP4或被明确降级为 spec允许的 static Shot；三 Shot continuity chain可重开且人工检查；H3 generation和任何 remote call/cost均逐 Shot计数。
+**Acceptance:** Pilot GO 后的所有 planned generated Shots都有 activated H.264 MP4，或以逐 Shot导演理由、Shot-specific replacement 与 human review显式降级；不得为凑时长 blanket downgrade。三 Shot continuity chain可重开且人工检查；H3 generation和任何 remote call/cost均逐 Shot计数。
 
 **Verification:** `VideoGenerationService.fetch_and_activate()` 后 strict reopen；exact replay新增 submit/fetch/activation均为零；MP4 measured metadata满足 composition contract；P5只 stale真实 downstream closure。
 
@@ -198,7 +229,7 @@
 - Create: `deliverables/first-complete-rough-cut.mp4`
 - Create: first-cut `ffprobe` and hash evidence
 
-**Owner / Dependencies:** Milestone 4。`resolve_composition()` 独占 timeline resolution，`render_with_hyperframes()` 是唯一 render path，committer独占 render state activation。
+**Owner / Dependencies:** Milestone 3A GO + Milestone 4。`resolve_composition()` 独占 timeline resolution，`render_with_hyperframes()` 是唯一 render path，committer独占 render state activation。
 
 **Contract:** 第一版必须从 0 秒播放到最后、故事完整、无缺失 source、声音基本可听、字幕基本可读、每个 Shot有明确 asset来源。允许少量非关键 static replacement和未精修素材，但不允许 broken timeline或 silent source fallback。
 
@@ -317,14 +348,21 @@
 4. 单 Shot change触发错误 blanket rebuild，或 repair无法绑定 exact P5 closure。
 5. Provider outcome unknown、费用超过 exact ceiling、需要新增 remote call、Provider/model/egress发生变化。
 6. 需要 schema/layout/public API/new writer/new renderer/new timeline/new Provider-selection path 才能继续。
+7. Pilot 没有实际观看、verdict 为 `NO-GO`，或 Pilot repair 后仍未达到 basic watchability。
+8. Character / Scene reference 或其简单派生被无导演理由当作 Final Shot Visual。
+9. 同一 final asset 被多个非连续 Shots 复用且没有 director rationale / human review。
+10. 重要角色 final asset 未完成 identity / wardrobe / state review。
 
-以下情况记录为 observation，但不阻止 first/final rough cut：非关键 Shot质量一般、部分 Shot降级为 static、Hailuo不支持特定 reference capability、基础 BGM/SFX不完美、少量 candidate需要人工选择。
+以下情况在 Pilot 已 GO、Shot-specific visual成立且有人工 review 后可记录为 observation：非关键 Shot质量一般、Hailuo不支持特定 reference capability、基础 BGM/SFX不完美、少量 candidate需要人工选择。不得再把“部分 Shot降级为 static”作为 blanket exemption。
 
 ## Spec Coverage Matrix
 
 | Spec concern | Plan owner |
 | --- | --- |
 | Objective、Scope、Story、Production profile | Milestones 1 and 9 |
+| 30～60 秒 Pilot Reality Gate 与 GO/NO-GO | Milestone 3A |
+| Reference Asset / Final Shot Visual 与 Shot-specific visual | Problem Boundary、Milestones 1、3 and 3A |
+| Visual repetition / identity / human viewing | Milestone 3A and Milestone 6 |
 | Shot strategy and current renderer compatibility | Problem Boundary、Milestones 1 and 5 |
 | Provider policy and paid authorization | Status Boundary、Milestone 4、Stop Gates |
 | Exact/reference/semantic continuity and Shot state | Milestones 1 and 4 |

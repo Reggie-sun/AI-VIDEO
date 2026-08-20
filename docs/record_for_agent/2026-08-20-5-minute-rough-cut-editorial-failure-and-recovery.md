@@ -37,6 +37,31 @@ Active Project 中的 36 个 exact Shot artifact paths 重新计数后确认上�
 
 因此该 run 的唯一正确状态是 **REJECTED / INCOMPLETE**。
 
+## Exact Active Run Visual Reuse Audit
+
+对 active Project revision 5 的 36 个 exact Shot artifacts、active Registry 与 active `ResolvedTimeline` 重新逐项核对，得到：
+
+- active final visual bindings：36；
+- unique final visual bytes：9（6 images + 3 Local H3 videos）；
+- `static_image` Shots：33；`generated_video` Shots：3；
+- 33 个 static Shots 全部绑定 `rough-still-flux-01` 到 `rough-still-flux-06`；
+- 这 6 张 still 全部由同一个 `reference-flux-library` 经 ffmpeg 派生；
+- 每张 still 被 5～6 个非连续 Shots 复用；去掉每张第一次使用后，存在 27 次重复 final-asset binding；
+- byte/ID 层没有 Shot 直接把 `reference-flux-library` 作为 `primary_visual`（direct count = 0），但 production-intent 层 33 个 Shot 都把同一 reference 的简单派生 plate 当成 Final Shot Visual；
+- 36 个 Shot 的 `intent` 文本各自不同，但 33 个 static intents 只由 6 张 final images承载；独立 Shot intent 没有转化成独立 visual evidence。
+
+Active timeline 为 7200 frames / 300 seconds。33 个 static spans 共 6624 frames / 276 seconds，占 92%；其中 `shot-001`～`shot-012` 形成 0～108 秒 static run，`shot-016`～`shot-036` 形成 132～300 秒 static run。每个 span 本身持续 8～9 秒，transform 不变且没有 motion directive；captions 在推进，主体画面不推进。
+
+Historical Project revision 4 还把 `rough-still-qwen-01`～`06` 的 helmet/teal-jacket persona 绑定到 18 个 Shots：`007`～`012`、`019`～`024`、`031`～`036`。Project revision 5 把这 18 个 Shots 换成现有 flux persona，消除了最明显的 black-haired/helmet 交替，却把 12 张 still 收缩为 6 张，进一步加重 repetition；这是 asset substitution，不是 Shot-specific visual repair。
+
+以上计数必须保持三个层次：
+
+1. direct reference asset ID used as final：`0`；
+2. reference-derived final plates used by Shots：`33`；
+3. repeated bindings beyond the six first uses：`27`。
+
+不得只报告其中一个数字来淡化 reference-to-final 降级或 repetition。
+
 ## Media Artifact Layers
 
 ### First complete rough cut
@@ -164,6 +189,10 @@ Receipt `status=passed`、`closure_eligible=true`，其中 `production_contract_
 
 Harness 对工程闭环仍然必要；本次错误是将其证据边界外推，而不是 Harness 本身证明了错误的媒体质量。
 
+Current run 的 P6 policy 虽声明 required layers 为 `technical / layout / semantic`，实际 durable Review requests 只有两次 `layout`：first cut `fail` 与 caption repair `pass`。三份 first-cut operator reports 已把 story/continuity/system 判为 `fail`，但没有形成 current-render semantic PASS；`final_acceptance_state` 仍为 `null`。因此 QA 的真实行为是：它正确阻止了 formal Final Acceptance，却没有在 full-length render 前设置 Pilot stop gate，也没有阻止 operator 在高 severity visual defects未关闭时继续生成新的 300 秒 candidate。
+
+`video-analysis` 的 `static_visuals` 只能作为 raw warning；它不应自动判断电影好坏。漏拦点是 production order 与 human gate，而不是需要扩张 development Harness。
+
 ## Git And Publication State
 
 写 record 前重新检查：
@@ -194,12 +223,13 @@ Harness 对工程闭环仍然必要；本次错误是将其证据边界外推，
 
 1. 保留当前 run 为 rejected diagnostic evidence；不要覆盖、删除或 promote `final-candidate.mp4`。
 2. 对 `relay-seven-representative-keyframe-shot-001` 做 explicit outcome reconciliation；无法建立 canonical exact-result evidence时保持 `outcome_unknown`。
-3. 重新建立 native Character/Scene Reference Pack，并先人工检查 Shots 001/007/019/031 的四张 representative keyframes。
-4. 四张 keyframes 未通过 identity、scene、composition 与 variation gate时，不进入 video bulk generation。
-5. 恢复约 `20 static / 16 generated` 的 shot plan；代表 sequence通过后每批仅推进 4～6 Shots。
-6. 每个 batch 检查 identity、continuity、motion、variation、pacing、caption readability与 source quality，不等到 final render 后集中发现。
-7. 对最终 exact candidate bytes重新生成 hash-bound `ffprobe`、project-local `video-analysis` 和 contact sheet，并完成 story/continuity/system 三次 full-watch。
-8. 只有 P6 repair closure 和 explicit Final Acceptance 都通过，才创建 `deliverables/final.mp4` 与 reality-validation report。
+3. 重新建立 native Character/Scene Reference Pack，并明确它只负责 guidance，不自动成为 Final Shot Visual。
+4. 先选择连续 4～8 Shots / 30～60 秒，逐 Shot创建 Shot-specific visual 或有导演理由的 reusable plate；每个 final asset回答 visual intent、适配理由、continuity fit和 reuse rationale。
+5. Pilot 必须包含 static/image-motion、Local H3、真实 voice/captions 与最终 HyperFrames composition，并由人实际观看。Pilot `NO-GO` 时只在 Pilot 内局部修复和 rerender，不进入 5-minute bulk。
+6. Pilot GO 后才恢复约 `20 static / 16 generated` 的 shot plan；每批仅推进 4～6 Shots。
+7. 每个 batch 检查 identity、continuity、motion、variation、pacing、caption readability与 source quality，不等到 final render 后集中发现。
+8. 对最终 exact candidate bytes重新生成 hash-bound `ffprobe`、project-local `video-analysis` 和 contact sheet，并完成 story/continuity/system 三次 full-watch。
+9. 只有 P6 repair closure 和 explicit Final Acceptance 都通过，才创建 `deliverables/final.mp4` 与 reality-validation report。
 
 ## Agent Guardrails
 

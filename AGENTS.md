@@ -217,6 +217,8 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 - Behavioral change 必须有覆盖 public behavior、boundary 与 failure path 的 executable evidence；优先 targeted checks，结束前运行 policy 要求的完整组合。未实际执行不得声称 passing。
 - Harness 不调度 Agent、不修改产品 state、不读取 Provider secret，也不执行 live Provider、ComfyUI、paid smoke 或媒体生成。CI 必须生成自己的 evidence，不能信任提交的本地 receipt。
 - Workflow 文件存在不等于 server enforcement；需要声明 remote protection/publish truth 时必须重新验证当前 GitHub ruleset / branch protection。
+- Harness 的 technical PASS 不代表作品可看。Real media 或 rough-cut 批量生产前，必须先完成约 30～60 秒、连续 4～8 Shots 的真实 Pilot，包含 task 所需的主要角色、static/image-motion、generated-video、voice、captions 与最终 HyperFrames composition；Pilot 必须由人实际观看并给出明确 GO/NO-GO，NO-GO 时不得继续扩量。
+- Character / Scene reference asset 默认只提供 identity、state、space 或 style guidance，不得自动成为观众最终看到的 Shot visual。Final Shot Visual 必须绑定 Shot-specific visual intent；跨非连续 Shots 复用同一 final asset 时必须有明确导演理由并进入人工 review。
 
 ## Provider Credential and Paid Execution Rules
 
