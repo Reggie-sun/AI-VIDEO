@@ -101,21 +101,36 @@ AI-VIDEO remains the sole owner of production truth. External Skills provide adv
 
 Use the minimum matching Skill set. Installation、description matching 或“本仓库生产视频”本身不构成触发条件。纯 production-state、asset、schema、dependency、timeline、render、activation、recovery 或 Provider-lifecycle 工作只使用 AI-VIDEO code 与 accepted contracts。
 
+### Creative Skill Preflight Gate
+
+当 task 包含 generated-video Shot 设计、跨 Shot continuity、image/video prompt 编写或修改、Provider/model-specific prompt adaptation、camera/motion design、generation failure diagnosis 或 creative iteration 时，匹配的 Creative Skill 从建议项升级为 task-level mandatory preflight。Agent MUST 在首次编写或修改 prompt、continuity contract 或 execution script 之前完成步骤 1–2，并在进入 live/paid Provider exact preview、permit mint/consume 或 POST 之前完成步骤 3–4：
+
+1. 根据 Routing Precedence 选择并实际读取最小匹配 Skill；不得仅凭记忆、Skill 名称或 `AGENTS.md` 摘要声称已使用。
+2. 在 commentary 中声明选中的 Skill、选择原因，以及每个 Skill 将约束的具体 creative concern。
+3. 在进入 live/paid Provider exact preview、permit mint/consume 或 POST 之前，报告最小 `Creative Skill Preflight Evidence`：
+   - semantic Shot `open_state`、`close_state` 与必须保持/改变的 continuity invariants；
+   - actual terminal / reference handoff、screen axis、action direction 与 camera endpoint；
+   - Provider/model-specific prompt adaptation，以及 Skill guidance 对最终 prompt 造成的具体变化；
+   - relevant Skill lint/preflight 结果，或该 Skill 没有 executable lint surface 的明确说明。
+4. 若 mandatory preflight 或上述 evidence 不完整，Agent MUST fail closed，不得进入付费 preview、mint/consume submit permit 或执行 Provider POST。
+
+该 gate 是 Agent authoring/process prerequisite，不是 Production runtime contract。Run script、Provider adapter、Manifest、receipt、timeline 与 renderer MUST NOT import、联网调用或依赖 Creative Skill；`runtime_skill_calls = 0` 是正确边界，不能被解释为 Agent authoring 阶段可以跳过 Skill。若 task 只涉及 production state、asset identity、schema、dependency、timeline consumption、render execution、activation、recovery 或 Provider lifecycle，且不创作或修改 creative intent/prompt，则不触发本 preflight；Agent 应明确说明该判定，不能把它用于规避真实 creative work。
+
 ### `hell-grind-aigc-skill`
 
-SHOULD proactively use for semantic Shot design、open/close state、cross-Shot continuity、identity/state/spatial/axis/action/light/environment/audio continuity、image/video prompt structure、generation failure diagnosis、iteration 与 candidate reasoning。
+MUST use when the task includes semantic Shot design、open/close state、cross-Shot continuity、identity/state/spatial/axis/action/light/environment/audio continuity、image/video prompt structure、generation failure diagnosis、iteration 或 candidate reasoning。
 
 优先用于“Shots 之间什么必须保持或改变？”以及“generated Shot 为什么失败？”。AI-VIDEO Character、Scene、Shot 与 asset records 始终是 source of truth。MUST NOT 创建或维护平行的 Hell-Grind project schema、asset registry、generation ledger、review state 或 delivery truth。
 
 ### `higgsfield`
 
-SHOULD proactively use for provider/model-specific prompt adaptation、Seedance/Hailuo/Kling/Veo guidance、T2V/I2V/reference/continuation/extension mode guidance、provider-specific camera vocabulary 与 generation troubleshooting。
+MUST use when the task includes provider/model-specific prompt adaptation、Seedance/Hailuo/Kling/Veo guidance、T2V/I2V/reference/continuation/extension mode guidance、provider-specific camera vocabulary 或 generation troubleshooting。
 
 只在 AI-VIDEO semantic Shot / continuity intent 已建立后使用。Model/mode 推荐不得选择或切换 active Provider、读取 credential、提交 generation，或绕过 AI-VIDEO Provider Router、Paid Provider Gate、budget、cloud egress、provenance、lifecycle、activation 与 recovery。Higgsfield CLI、MCP、account、workspace、memory 或 ledger 不是 AI-VIDEO owner。
 
 ### `video-shotcraft`
 
-SHOULD proactively use for motion design、image motion、motion graphics、shot language、camera movement、pacing、transition、SFX、beat sync 与 visual QA ideas。
+MUST use when the task includes motion design、image motion、motion graphics、shot language、camera movement、pacing、transition、SFX、beat sync 或 visual QA ideas。
 
 其 Remotion implementation、recipe、timeline 与 renderer 只作为 creative / implementation reference。选定方案必须翻译成 AI-VIDEO composition directives；不得创建第二套 canonical timeline/renderer、替代 `ResolvedTimeline` / HyperFrames，或绕过 AI-VIDEO QA / Repair lifecycle。
 
