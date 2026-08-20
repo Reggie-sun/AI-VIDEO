@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 PRIVATE_MODULES = (
+    "_state_commit_bootstrap.py",
     "_state_commit_contracts.py",
     "_state_commit_common.py",
     "_state_commit_io.py",
@@ -101,12 +102,14 @@ def test_contracts_and_prepare_helpers_are_owned_by_private_modules() -> None:
 
 def test_generic_transaction_and_io_methods_have_private_owners() -> None:
     facade = importlib.import_module("ai_video.production.state_commit")
+    bootstrap = importlib.import_module("ai_video.production._state_commit_bootstrap")
     io = importlib.import_module("ai_video.production._state_commit_io")
     transaction = importlib.import_module("ai_video.production._state_commit_transaction")
     assert facade._NativeFileOps is io._NativeFileOps
     assert facade.ProductionStateCommitter._commit_locked.__module__ == transaction.__name__
     assert facade.ProductionStateCommitter._write_mutable_atomic.__module__ == io.__name__
     assert facade.ProductionStateCommitter._write_immutable_artifact.__module__ == io.__name__
+    assert facade.ProductionStateCommitter.bootstrap_initial_state.__module__ == bootstrap.__name__
     assert facade.ProductionStateCommitter._exclusive_lock.__module__ == facade.__name__
 
 
@@ -203,6 +206,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
     assert tuple(
         owner.__name__ for owner in facade.ProductionStateCommitter.__mro__[1:-1]
     ) == (
+        "_StateCommitBootstrapMixin",
         "_StateCommitVideoMixin",
         "_StateCommitVideoCandidateMixin",
         "_StateCommitVideoActivationMixin",

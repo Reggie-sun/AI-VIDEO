@@ -184,6 +184,7 @@ from ._state_commit_common import (
     prepare_dependency_graph_transition,
     prepare_project_registry_commit,
 )
+from ._state_commit_bootstrap import _StateCommitBootstrapMixin
 from ._state_commit_contracts import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
@@ -254,6 +255,7 @@ except ImportError:  # pragma: no cover - exercised through platform injection
 
 
 class ProductionStateCommitter(
+    _StateCommitBootstrapMixin,
     _StateCommitVideoMixin,
     _StateCommitVideoCandidateMixin,
     _StateCommitVideoActivationMixin,

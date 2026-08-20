@@ -339,12 +339,15 @@ def test_production_test_helpers_route_to_their_contract_owners() -> None:
 
     shared = agent_harness.inspect_paths(["tests/production_project_factory.py"], policy)
     state = agent_harness.inspect_paths(["tests/helpers/p2a_crash_worker.py"], policy)
+    bootstrap = agent_harness.inspect_paths(["tests/test_production_bootstrap.py"], policy)
     video = agent_harness.inspect_paths(["tests/paid_provider_support.py"], policy)
 
     assert shared["categories"] == ["production_shared_contracts"]
     assert "production_contract_tests" in shared["check_ids"]
     assert state["categories"] == ["production_state"]
     assert "production_state_tests" in state["check_ids"]
+    assert bootstrap["categories"] == ["production_state"]
+    assert "production_state_tests" in bootstrap["check_ids"]
     assert video["categories"] == ["production_video_provider"]
     assert "production_video_provider_tests" in video["check_ids"]
 

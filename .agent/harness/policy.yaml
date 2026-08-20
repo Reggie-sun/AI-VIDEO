@@ -85,7 +85,7 @@ checks:
     cwd: .
     description: Verify strict read-only Production project contracts and Legacy isolation.
   production_state_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_production_state_commit_structure.py, tests/test_production_models.py, tests/test_production_project.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_bootstrap.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_production_state_commit_structure.py, tests/test_production_models.py, tests/test_production_project.py, -q]
     cwd: .
     description: Verify the single Production writer, activation, and explicit recovery.
   production_composition_audio_tests:
@@ -249,6 +249,7 @@ categories:
     patterns:
       - src/ai_video/production/_state_commit_*.py
       - tests/helpers/p2a_crash_worker.py
+      - tests/test_production_bootstrap.py
     check_ids:
       - production_state_tests
       - task_architecture_gate
