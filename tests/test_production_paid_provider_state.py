@@ -209,7 +209,11 @@ def _preview() -> PaidProviderCallPreview:
     )
 
 
-def _authorization(preview: PaidProviderCallPreview) -> PaidProviderAuthorizationDecision:
+def _authorization(
+    preview: PaidProviderCallPreview,
+    *,
+    egress_policy_receipt_id: str = "egress-1",
+) -> PaidProviderAuthorizationDecision:
     return PaidProviderAuthorizationDecision.create(
         attempt_id=preview.attempt_id,
         preview_fingerprint=preview.preview_fingerprint,
@@ -221,7 +225,7 @@ def _authorization(preview: PaidProviderCallPreview) -> PaidProviderAuthorizatio
         project_budget_ceiling_microunits=10_000_000,
         per_call_ceiling_microunits=3_000_000,
         egress_authorized=True,
-        egress_policy_receipt_id="egress-1",
+        egress_policy_receipt_id=egress_policy_receipt_id,
         live_test_authorized=True,
         live_authorization_receipt_id="live-1",
         issued_at=NOW,
@@ -299,7 +303,13 @@ def test_submit_intent_rejects_preview_not_matching_durable_operation_request(
         )
 
 
-def _consume(permit, preview: PaidProviderCallPreview, gate_fingerprint: str) -> bool:
+def _consume(
+    permit,
+    preview: PaidProviderCallPreview,
+    gate_fingerprint: str,
+    authorization: PaidProviderAuthorizationDecision | None = None,
+) -> bool:
+    selected_authorization = authorization or _authorization(preview)
     return permit._consume_paid_provider_submit_permit(
         attempt_id=preview.attempt_id,
         operation=preview.operation,
@@ -314,6 +324,7 @@ def _consume(permit, preview: PaidProviderCallPreview, gate_fingerprint: str) ->
         estimated_cost_upper_bound_microunits=str(
             preview.estimated_cost_upper_bound_microunits
         ),
+        authorization_fingerprint=selected_authorization.authorization_fingerprint,
         provider_policy_snapshot_id=preview.provider_policy_snapshot_id,
         retention_mode=preview.retention_mode,
         secret_reference_kind=preview.secret_reference.kind,
@@ -336,6 +347,28 @@ def test_committer_atomically_reserves_reopens_and_mints_one_use_permit(tmp_path
     assert state.phase is PaidProviderAttemptPhase.SUBMIT_INTENT
     assert _consume(permit, preview, state.gate_receipt.gate_receipt_fingerprint)
     assert not _consume(permit, preview, state.gate_receipt.gate_receipt_fingerprint)
+
+
+def test_durable_permit_rejects_authorization_not_selected_by_reopened_gate(
+    tmp_path: Path,
+):
+    committer, preview = _committer(tmp_path)
+    permit = committer.record_paid_provider_submit_intent(
+        preview, reservation_id="reservation-1"
+    )
+    state = committer._read_manifest().attempts[0].paid_provider_state
+    assert state is not None
+    submit_authorization = _authorization(
+        preview, egress_policy_receipt_id="egress-2"
+    )
+
+    assert not _consume(
+        permit,
+        preview,
+        state.gate_receipt.gate_receipt_fingerprint,
+        submit_authorization,
+    )
+    assert _consume(permit, preview, state.gate_receipt.gate_receipt_fingerprint)
 
 
 def test_submit_receipt_and_settlement_survive_restart(tmp_path: Path):

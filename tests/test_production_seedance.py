@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import base64
 import hashlib
 import importlib
 import importlib.util
 import json
+import struct
+import zlib
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -14,10 +17,16 @@ from pydantic import ValidationError
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
     ActorIdentity,
+    AssetRecord,
+    AssetRegistrySnapshot,
+    AssetSourceKind,
+    AssetType,
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
+    ToolIdentity,
 )
+from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.paid_provider import (
     PaidProviderAuthorizationDecision,
     PaidProviderCallPreview,
@@ -53,6 +62,22 @@ HASH_C = "c" * 64
 HASH_D = "d" * 64
 FIXED_NOW = datetime(2026, 8, 19, 1, 0, tzinfo=UTC)
 PROMPT = "A restrained cinematic orbit around the subject."
+
+
+def _png_chunk(kind: bytes, payload: bytes) -> bytes:
+    checksum = zlib.crc32(kind + payload) & 0xFFFFFFFF
+    return struct.pack(">I", len(payload)) + kind + payload + struct.pack(">I", checksum)
+
+
+def _rgba_png(width: int = 320, height: int = 320) -> bytes:
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0)
+    row = b"\x00" + b"\x22\x44\x66\xff" * width
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + _png_chunk(b"IHDR", ihdr)
+        + _png_chunk(b"IDAT", zlib.compress(row * height))
+        + _png_chunk(b"IEND", b"")
+    )
 
 
 def _provider_asset_reference(binding) -> str:
@@ -199,6 +224,7 @@ def _request(
     seed: int | None = None,
     continuity_binding: ContinuityReferenceBinding | None = None,
     input_artifact_ids: tuple[str, ...] | None = None,
+    base_registry: RegistrySnapshotPointer | None = None,
 ) -> VideoGenerationRequest:
     selected_output = output or VideoFlexibleOutputRequirement(
         timing_mode="exact_seconds",
@@ -233,7 +259,7 @@ def _request(
         output_requirement=selected_output,
         seed=seed,
         base_project=_project_pointer(),
-        base_registry=_registry_pointer(),
+        base_registry=base_registry or _registry_pointer(),
         base_dependency_graph=_graph_pointer(),
         input_artifact_ids=input_artifact_ids
         or (
@@ -283,7 +309,11 @@ def _paid_preview(resolved, video_preview) -> PaidProviderCallPreview:
     )
 
 
-def _authorization(preview: PaidProviderCallPreview) -> PaidProviderAuthorizationDecision:
+def _authorization(
+    preview: PaidProviderCallPreview,
+    *,
+    egress_policy_receipt_id: str = "egress-seedance",
+) -> PaidProviderAuthorizationDecision:
     return PaidProviderAuthorizationDecision.create(
         attempt_id=preview.attempt_id,
         preview_fingerprint=preview.preview_fingerprint,
@@ -295,7 +325,7 @@ def _authorization(preview: PaidProviderCallPreview) -> PaidProviderAuthorizatio
         project_budget_ceiling_microunits=20_000_000,
         per_call_ceiling_microunits=10_000_000,
         egress_authorized=True,
-        egress_policy_receipt_id="egress-seedance",
+        egress_policy_receipt_id=egress_policy_receipt_id,
         live_test_authorized=True,
         live_authorization_receipt_id="live-seedance",
         issued_at=FIXED_NOW - timedelta(minutes=1),
@@ -1201,6 +1231,54 @@ def test_missing_injected_ark_credential_fails_before_permit_consumption_or_netw
     )
 
 
+def test_submit_rejects_authorization_not_selected_by_durable_permit_before_network():
+    profile = _profile()
+    transport = _FakeTransport()
+    transport.responses.append(_json_response({"id": "task-must-not-submit"}))
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=_provider_asset_reference,
+        now=lambda: FIXED_NOW,
+    )
+    resolved = provider.resolve(_request(profile))
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview)
+    durable_authorization = _authorization(
+        paid_preview, egress_policy_receipt_id="egress-policy-r1"
+    )
+    submit_authorization = _authorization(
+        paid_preview, egress_policy_receipt_id="egress-policy-r2"
+    )
+    permit = _permit(
+        resolved,
+        video_preview,
+        paid_preview,
+        durable_authorization,
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            submit_authorization,
+            permit,
+        )
+
+    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED
+    assert transport.requests == []
+    assert permit._validate_paid_provider_operation_permit(
+        **build_video_paid_permit_binding(
+            resolved,
+            video_preview,
+            paid_preview,
+            durable_authorization,
+        )
+    )
+
+
 def test_credential_supplier_failure_is_sanitized_before_network():
     profile = _profile()
     transport = _FakeTransport()
@@ -1431,6 +1509,26 @@ def test_ark_asset_materialization_owner_is_public_production_api():
         production.SeedanceAssetReferenceResolver
         is asset_module.SeedanceAssetReferenceResolver
     )
+    assert (
+        production.SeedanceSyntheticImageAuthorizer
+        is asset_module.SeedanceSyntheticImageAuthorizer
+    )
+    assert (
+        production.SeedanceSyntheticImageReferenceReceipt
+        is asset_module.SeedanceSyntheticImageReferenceReceipt
+    )
+    assert (
+        production.SeedanceSyntheticImageReceiptBinding
+        is asset_module.SeedanceSyntheticImageReceiptBinding
+    )
+    assert (
+        production.SeedanceSyntheticImageEgressPolicyReceipt
+        is asset_module.SeedanceSyntheticImageEgressPolicyReceipt
+    )
+    assert (
+        production.SeedanceSyntheticImageReferenceResolver
+        is asset_module.SeedanceSyntheticImageReferenceResolver
+    )
 
 
 def test_ark_asset_resolver_rejects_tampered_confirmation_evidence():
@@ -1527,6 +1625,733 @@ def test_ark_asset_receipt_requires_human_observed_active_state(field, value):
 
     with pytest.raises(ValidationError):
         asset_module.SeedanceAssetMaterializationReceipt.create(**values)
+
+
+def _synthetic_receipt(
+    asset_module,
+    binding: VideoImageReferenceBinding,
+    *,
+    classification: str = "clearly_illustrated_anime_non_real_character",
+    attested_by: ActorIdentity | None = None,
+    registry_revision_id: str = HASH_C,
+):
+    return asset_module.SeedanceSyntheticImageReferenceReceipt.create(
+        source_asset_id=binding.asset_id,
+        source_registry_revision_id=registry_revision_id,
+        source_asset_sha256=binding.asset_sha256,
+        source_mime_type=binding.mime_type,
+        source_size_bytes=binding.size_bytes,
+        source_width=binding.width,
+        source_height=binding.height,
+        creator=ActorIdentity(actor_id="fictional-character-artist", actor_kind="human"),
+        source_record_id="source-generation-receipt-1",
+        source_tool=ToolIdentity(name="gpt-image-2", version="2026-08-20"),
+        source_evidence_sha256=HASH_D,
+        rights_source_note="Project-owned synthetic illustrated character.",
+        classification=classification,
+        attested_by=attested_by
+        or ActorIdentity(actor_id="rights-reviewer", actor_kind="human"),
+        task_scope_id="seedance-synthetic-test-1",
+        attested_at=FIXED_NOW,
+        transport="inline_base64",
+        provider_kind="volcengine_ark_seedance",
+        model_id="doubao-seedance-2-0-mini-260615",
+        mode="image_to_video",
+        permitted_use="Seedance I2V test fixture.",
+    )
+
+
+def _synthetic_policy_receipt(
+    asset_module,
+    *children,
+    attempt_id: str = "seedance-attempt-1",
+    request_fingerprint: str = HASH_A,
+    preview_fingerprint: str = HASH_B,
+    model_id: str = "doubao-seedance-2-0-mini-260615",
+):
+    return asset_module.SeedanceSyntheticImageEgressPolicyReceipt.create(
+        task_scope_id="seedance-synthetic-test-1",
+        attempt_id=attempt_id,
+        request_fingerprint=request_fingerprint,
+        preview_fingerprint=preview_fingerprint,
+        prompt_sha256=hashlib.sha256(PROMPT.encode()).hexdigest(),
+        prompt_size_bytes=len(PROMPT.encode()),
+        provider_kind="volcengine_ark_seedance",
+        model_id=model_id,
+        mode="image_to_video",
+        transport="inline_base64",
+        destination="https://ark.cn-beijing.volces.com",
+        retention_mode="provider_standard",
+        children=children,
+    )
+
+
+def _canonical_model_bytes(model) -> bytes:
+    return json.dumps(
+        model.model_dump(mode="json"),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+
+
+def _synthetic_evidence_source(asset_module, receipts, aggregate):
+    evidence = {
+        f"seedance-synthetic-egress:{aggregate.content_hash}": _canonical_model_bytes(
+            aggregate
+        )
+    }
+    evidence.update(
+        {
+            f"seedance-synthetic-image:{receipt.content_hash}": _canonical_model_bytes(
+                receipt
+            )
+            for receipt in receipts
+        }
+    )
+    return evidence.__getitem__
+
+
+def _synthetic_registry(*bindings: VideoImageReferenceBinding):
+    records = tuple(
+        AssetRecord(
+            asset_id=binding.asset_id,
+            asset_type=AssetType.IMAGE,
+            artifact_path=Path(f"assets/imported/{binding.asset_sha256}.png"),
+            sha256=binding.asset_sha256,
+            size_bytes=binding.size_bytes,
+            mime_type=binding.mime_type,
+            width=binding.width,
+            height=binding.height,
+            source_kind=AssetSourceKind.GENERATED,
+            tool=ToolIdentity(name="gpt-image-2", version="2026-08-20"),
+            input_fingerprint=HASH_A,
+            creation_receipt_id="source-generation-receipt-1",
+            usage_license="project-owned-synthetic",
+        )
+        for binding in bindings
+    )
+    provisional = AssetRegistrySnapshot(
+        schema_version="2.0",
+        revision_id=HASH_A,
+        content_hash=HASH_A,
+        assets=records,
+    )
+    revision_id = registry_semantic_sha256(provisional)
+    registry = provisional.model_copy(
+        update={"revision_id": revision_id, "content_hash": revision_id}
+    )
+    payload = _canonical_model_bytes(registry)
+    pointer = RegistrySnapshotPointer(
+        path=Path(f"assets/registry.{revision_id}.json"),
+        revision_id=revision_id,
+        content_hash=revision_id,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    return registry, payload, pointer
+
+
+def test_synthetic_png_resolver_seals_exact_bytes_and_request_aggregate():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-anime-first-frame-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+    registry, registry_bytes, _ = _synthetic_registry(binding)
+    receipt = _synthetic_receipt(
+        asset_module, binding, registry_revision_id=registry.revision_id
+    )
+    child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=binding.role,
+        asset_id=binding.asset_id,
+        receipt_content_hash=receipt.content_hash,
+    )
+    aggregate = _synthetic_policy_receipt(asset_module, child)
+    resolver = asset_module.SeedanceSyntheticImageReferenceResolver(
+        (receipt,),
+        policy_receipt=aggregate,
+        image_bytes={binding.asset_id: png},
+        evidence_source=_synthetic_evidence_source(
+            asset_module, (receipt,), aggregate
+        ),
+        registry_snapshot_bytes=registry_bytes,
+    )
+
+    assert resolver(binding) == (
+        "data:image/png;base64," + base64.b64encode(png).decode("ascii")
+    )
+    assert resolver.egress_policy_receipt_id == (
+        f"seedance-synthetic-egress:{aggregate.content_hash}"
+    )
+    assert base64.b64encode(png).decode("ascii") not in repr(resolver)
+
+
+def test_synthetic_resolver_rejects_unreopenable_canonical_evidence():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-anime-first-frame-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+    receipt = _synthetic_receipt(asset_module, binding)
+    child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=binding.role,
+        asset_id=binding.asset_id,
+        receipt_content_hash=receipt.content_hash,
+    )
+    aggregate = _synthetic_policy_receipt(asset_module, child)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        asset_module.SeedanceSyntheticImageReferenceResolver(
+            (receipt,),
+            policy_receipt=aggregate,
+            image_bytes={binding.asset_id: png},
+            evidence_source=lambda _evidence_id: b"{}",
+            registry_snapshot_bytes=b"{}",
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+
+
+def test_synthetic_resolver_rejects_registry_asset_record_mismatch():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-anime-first-frame-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+    mismatched_registry_binding = binding.model_copy(update={"asset_sha256": HASH_D})
+    registry, registry_bytes, _ = _synthetic_registry(mismatched_registry_binding)
+    receipt = _synthetic_receipt(
+        asset_module, binding, registry_revision_id=registry.revision_id
+    )
+    child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=binding.role,
+        asset_id=binding.asset_id,
+        receipt_content_hash=receipt.content_hash,
+    )
+    aggregate = _synthetic_policy_receipt(asset_module, child)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        asset_module.SeedanceSyntheticImageReferenceResolver(
+            (receipt,),
+            policy_receipt=aggregate,
+            image_bytes={binding.asset_id: png},
+            evidence_source=_synthetic_evidence_source(
+                asset_module, (receipt,), aggregate
+            ),
+            registry_snapshot_bytes=registry_bytes,
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+
+
+@pytest.mark.parametrize(
+    "classification",
+    ["real_person_or_protected_identity", "synthetic_photorealistic_person"],
+)
+def test_synthetic_receipt_rejects_identity_bearing_classes(classification):
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-ineligible-person-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+
+    with pytest.raises(ValidationError):
+        _synthetic_receipt(asset_module, binding, classification=classification)
+
+
+def test_synthetic_receipt_requires_human_attestation():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-anime-first-frame-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+
+    with pytest.raises(ValidationError):
+        _synthetic_receipt(
+            asset_module,
+            binding,
+            attested_by=ActorIdentity(actor_id="classifier", actor_kind="automation"),
+        )
+
+
+def test_synthetic_resolver_rejects_tampered_bytes_and_noncanonical_children():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    first_png = _rgba_png()
+    last_png = _rgba_png(width=321)
+    first = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-anime-first-frame-1",
+        asset_sha256=hashlib.sha256(first_png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(first_png),
+    )
+    last = VideoImageReferenceBinding(
+        role="last_frame",
+        asset_id="image-anime-last-frame-1",
+        asset_sha256=hashlib.sha256(last_png).hexdigest(),
+        mime_type="image/png",
+        width=321,
+        height=320,
+        size_bytes=len(last_png),
+    )
+    registry, registry_bytes, _ = _synthetic_registry(first, last)
+    first_receipt = _synthetic_receipt(
+        asset_module, first, registry_revision_id=registry.revision_id
+    )
+    last_receipt = _synthetic_receipt(
+        asset_module, last, registry_revision_id=registry.revision_id
+    )
+    first_child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=first.role,
+        asset_id=first.asset_id,
+        receipt_content_hash=first_receipt.content_hash,
+    )
+    last_child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=last.role,
+        asset_id=last.asset_id,
+        receipt_content_hash=last_receipt.content_hash,
+    )
+
+    with pytest.raises(ValidationError):
+        _synthetic_policy_receipt(asset_module, last_child, first_child)
+
+    aggregate = _synthetic_policy_receipt(asset_module, first_child, last_child)
+    with pytest.raises(AiVideoError) as exc_info:
+        asset_module.SeedanceSyntheticImageReferenceResolver(
+            (first_receipt, last_receipt),
+            policy_receipt=aggregate,
+            image_bytes={
+                first.asset_id: first_png + b"tampered",
+                last.asset_id: last_png,
+            },
+            evidence_source=_synthetic_evidence_source(
+                asset_module, (first_receipt, last_receipt), aggregate
+            ),
+            registry_snapshot_bytes=registry_bytes,
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+
+
+def _synthetic_submit_fixture(*, registry_file_sha256: str | None = None):
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    profile = _profile()
+    png = _rgba_png(width=864, height=496)
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-anime-first-frame-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=864,
+        height=496,
+        size_bytes=len(png),
+    )
+    registry, registry_bytes, registry_pointer = _synthetic_registry(binding)
+    receipt = _synthetic_receipt(
+        asset_module, binding, registry_revision_id=registry.revision_id
+    )
+    child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=binding.role,
+        asset_id=binding.asset_id,
+        receipt_content_hash=receipt.content_hash,
+    )
+    placeholder = _synthetic_policy_receipt(asset_module, child)
+    placeholder_resolver = asset_module.SeedanceSyntheticImageReferenceResolver(
+        (receipt,),
+        policy_receipt=placeholder,
+        image_bytes={binding.asset_id: png},
+        evidence_source=_synthetic_evidence_source(
+            asset_module, (receipt,), placeholder
+        ),
+        registry_snapshot_bytes=registry_bytes,
+    )
+    bootstrap = SeedanceVideoProvider(
+        profile=profile,
+        transport=_FakeTransport(),
+        credential=lambda: "rotated-test-secret",
+        input_reference=placeholder_resolver,
+        now=lambda: FIXED_NOW,
+    )
+    request = _request(
+        profile,
+        model_id="doubao-seedance-2-0-mini-260615",
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        image_bindings=(binding,),
+        base_registry=(
+            registry_pointer
+            if registry_file_sha256 is None
+            else registry_pointer.model_copy(
+                update={"file_sha256": registry_file_sha256}
+            )
+        ),
+        output=VideoFlexibleOutputRequirement(
+            timing_mode="exact_seconds",
+            duration_seconds=5,
+            dimension_mode="exact",
+            width=864,
+            height=496,
+            resolution_label="480p",
+            ratio="16:9",
+            fps=24,
+            container="mp4",
+            mime_type="video/mp4",
+            native_audio=False,
+        ),
+    )
+    resolved = bootstrap.resolve(request)
+    video_preview = bootstrap.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview)
+    aggregate = _synthetic_policy_receipt(
+        asset_module,
+        child,
+        attempt_id=paid_preview.attempt_id,
+        request_fingerprint=resolved.resolved_generation_hash,
+        preview_fingerprint=paid_preview.preview_fingerprint,
+        model_id=resolved.model_id,
+    )
+    resolver = asset_module.SeedanceSyntheticImageReferenceResolver(
+        (receipt,),
+        policy_receipt=aggregate,
+        image_bytes={binding.asset_id: png},
+        evidence_source=_synthetic_evidence_source(
+            asset_module, (receipt,), aggregate
+        ),
+        registry_snapshot_bytes=registry_bytes,
+    )
+    return (
+        profile,
+        resolved,
+        video_preview,
+        paid_preview,
+        resolver,
+        png,
+        receipt,
+        aggregate,
+    )
+
+
+def test_synthetic_authorizer_rejects_unreopenable_policy_evidence():
+    (
+        _,
+        _,
+        _,
+        paid_preview,
+        resolver,
+        _,
+        _,
+        _,
+    ) = _synthetic_submit_fixture()
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+    authorizer = importlib.import_module(
+        "ai_video.production.seedance_asset"
+    ).SeedanceSyntheticImageAuthorizer(
+        delegate=lambda exact: authorization if exact == paid_preview else None,
+        evidence_source=lambda _evidence_id: b"{}",
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        authorizer(paid_preview)
+
+    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
+
+
+def test_synthetic_authorizer_independently_reopens_exact_preview_evidence():
+    (
+        _,
+        _,
+        _,
+        paid_preview,
+        resolver,
+        _,
+        receipt,
+        aggregate,
+    ) = _synthetic_submit_fixture()
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    authorizer = asset_module.SeedanceSyntheticImageAuthorizer(
+        delegate=lambda exact: authorization if exact == paid_preview else None,
+        evidence_source=_synthetic_evidence_source(
+            asset_module, (receipt,), aggregate
+        ),
+    )
+
+    assert authorizer(paid_preview) == authorization
+
+
+def test_synthetic_authorizer_rejects_preview_not_bound_by_policy_evidence():
+    (
+        _,
+        _,
+        _,
+        paid_preview,
+        resolver,
+        _,
+        receipt,
+        aggregate,
+    ) = _synthetic_submit_fixture()
+    items = list(paid_preview.egress_items)
+    items[0] = items[0].model_copy(update={"sha256": HASH_D})
+    mismatched_preview = PaidProviderCallPreview.create(
+        **{
+            **paid_preview.model_dump(
+                mode="python", exclude={"preview_fingerprint"}
+            ),
+            "egress_items": tuple(items),
+        }
+    )
+    authorization = _authorization(
+        mismatched_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    authorizer = asset_module.SeedanceSyntheticImageAuthorizer(
+        delegate=lambda exact: authorization if exact == mismatched_preview else None,
+        evidence_source=_synthetic_evidence_source(
+            asset_module, (receipt,), aggregate
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        authorizer(mismatched_preview)
+
+    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
+
+
+def test_synthetic_submit_rejects_registry_snapshot_pointer_mismatch_before_network():
+    (
+        profile,
+        resolved,
+        video_preview,
+        paid_preview,
+        resolver,
+        _,
+        _,
+        _,
+    ) = _synthetic_submit_fixture(registry_file_sha256=HASH_D)
+    transport = _FakeTransport()
+    transport.responses.append(_json_response({"id": "task-must-not-submit"}))
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=resolver,
+        now=lambda: FIXED_NOW,
+    )
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+    permit = _permit(
+        resolved, video_preview, paid_preview, authorization
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            permit,
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.requests == []
+    assert permit._validate_paid_provider_operation_permit(
+        **build_video_paid_permit_binding(
+            resolved, video_preview, paid_preview, authorization
+        )
+    )
+
+
+def test_synthetic_inline_submit_uses_exact_data_uri_and_audio_opt_out():
+    profile, resolved, video_preview, paid_preview, resolver, png, _, _ = (
+        _synthetic_submit_fixture()
+    )
+    transport = _FakeTransport()
+    transport.responses.append(_json_response({"id": "task-synthetic-inline-1"}))
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=resolver,
+        now=lambda: FIXED_NOW,
+    )
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+
+    result = provider.submit(
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        _permit(resolved, video_preview, paid_preview, authorization),
+    )
+
+    payload = json.loads(transport.requests[0].body)
+    assert result.external_effect_id == "task-synthetic-inline-1"
+    assert payload["content"][1] == {
+        "type": "image_url",
+        "image_url": {
+            "url": "data:image/png;base64,"
+            + base64.b64encode(png).decode("ascii")
+        },
+        "role": "first_frame",
+    }
+    assert payload["generate_audio"] is False
+    assert base64.b64encode(png).decode("ascii") not in repr(transport.requests[0])
+
+
+def test_synthetic_submit_rejects_wrong_aggregate_authorization_before_network():
+    profile, resolved, video_preview, paid_preview, resolver, _, _, _ = (
+        _synthetic_submit_fixture()
+    )
+    transport = _FakeTransport()
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=resolver,
+        now=lambda: FIXED_NOW,
+    )
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id="seedance-synthetic-egress:" + HASH_D,
+    )
+    permit = _permit(resolved, video_preview, paid_preview, authorization)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            permit,
+        )
+
+    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
+    assert transport.requests == []
+    assert permit._validate_paid_provider_operation_permit(
+        **build_video_paid_permit_binding(
+            resolved, video_preview, paid_preview, authorization
+        )
+    )
+
+
+def _compact_multi_image_body(target_size: int) -> bytes:
+    payload = {
+        "model": "doubao-seedance-2-0-mini-260615",
+        "content": [
+            {"type": "text", "text": ""},
+            {
+                "type": "image_url",
+                "image_url": {"url": "data:image/png;base64,"},
+                "role": "first_frame",
+            },
+            {
+                "type": "image_url",
+                "image_url": {"url": "data:image/png;base64,"},
+                "role": "last_frame",
+            },
+        ],
+        "generate_audio": False,
+    }
+    empty = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
+    filler_size = target_size - len(empty)
+    base64_size = filler_size - (filler_size % 4)
+    prompt_size = filler_size - base64_size
+    first_size = (base64_size // 8) * 4
+    second_size = base64_size - first_size
+    payload["content"][0]["text"] = "x" * prompt_size
+    payload["content"][1]["image_url"]["url"] += "A" * first_size
+    payload["content"][2]["image_url"]["url"] += "A" * second_size
+    body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
+    assert len(body) == target_size
+    return body
+
+
+@pytest.mark.parametrize(
+    ("target_size", "accepted"),
+    [(63_999_999, True), (64_000_000, True), (64_000_001, False)],
+)
+def test_seedance_final_compact_multi_image_body_enforces_decimal_limit(
+    target_size,
+    accepted,
+):
+    body = _compact_multi_image_body(target_size)
+
+    if accepted:
+        assert seedance_adapter._validate_submit_body_size(body) is body
+        return
+    with pytest.raises(AiVideoError) as exc_info:
+        seedance_adapter._validate_submit_body_size(body)
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+
+
+def test_synthetic_receipt_enforces_strict_30_decimal_megabyte_boundary():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    below = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-below-limit-1",
+        asset_sha256=HASH_A,
+        mime_type="image/png",
+        width=864,
+        height=496,
+        size_bytes=29_999_999,
+    )
+    exact = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-at-limit-1",
+        asset_sha256=HASH_A,
+        mime_type="image/png",
+        width=864,
+        height=496,
+        size_bytes=30_000_000,
+    )
+
+    assert _synthetic_receipt(asset_module, below).source_size_bytes == 29_999_999
+    with pytest.raises(ValidationError):
+        _synthetic_receipt(asset_module, exact)
 
 
 def test_mini_default_payload_omits_optional_defaults_but_preserves_audio_opt_out():

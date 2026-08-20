@@ -118,6 +118,11 @@ from ai_video.production.image_import import (
 from ai_video.production.seedance_asset import (
     SeedanceAssetMaterializationReceipt,
     SeedanceAssetReferenceResolver,
+    SeedanceSyntheticImageAuthorizer,
+    SeedanceSyntheticImageEgressPolicyReceipt,
+    SeedanceSyntheticImageReceiptBinding,
+    SeedanceSyntheticImageReferenceReceipt,
+    SeedanceSyntheticImageReferenceResolver,
 )
 from ai_video.production.video import (
     ContinuityArtifactIdentity,
@@ -231,6 +236,11 @@ __all__ = [
     "Scene",
     "SeedanceAssetMaterializationReceipt",
     "SeedanceAssetReferenceResolver",
+    "SeedanceSyntheticImageAuthorizer",
+    "SeedanceSyntheticImageEgressPolicyReceipt",
+    "SeedanceSyntheticImageReceiptBinding",
+    "SeedanceSyntheticImageReferenceReceipt",
+    "SeedanceSyntheticImageReferenceResolver",
     "Shot",
     "StateCommitAttempt",
     "StateCommitRequest",

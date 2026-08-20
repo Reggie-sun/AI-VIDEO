@@ -296,6 +296,7 @@ class _StateCommitPaidProviderMixin:
                 "estimated_cost_upper_bound_microunits": str(
                     preview.estimated_cost_upper_bound_microunits
                 ),
+                "authorization_fingerprint": authorization.authorization_fingerprint,
                 "provider_policy_snapshot_id": preview.provider_policy_snapshot_id,
                 "retention_mode": preview.retention_mode,
                 "secret_reference_kind": preview.secret_reference.kind,
@@ -337,6 +338,8 @@ class _StateCommitPaidProviderMixin:
                     gate := self._reopen_paid_gate(state.gate_receipt)
                 ).preview.preview_fingerprint
                 == binding["preview_fingerprint"]
+                and gate.authorization.authorization_fingerprint
+                == binding["authorization_fingerprint"]
                 and gate.reservation_id == binding["reservation_id"]
             )
         except Exception:

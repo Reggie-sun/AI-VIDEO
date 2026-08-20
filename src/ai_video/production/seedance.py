@@ -40,7 +40,10 @@ from ai_video.production.seedance_profile import (
     SeedancePricingSnapshot,
     SeedanceProviderProfile,
 )
-from ai_video.production.seedance_asset import SeedanceAssetReferenceResolver
+from ai_video.production.seedance_asset import (
+    SeedanceAssetReferenceResolver,
+    SeedanceSyntheticImageReferenceResolver,
+)
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
@@ -67,6 +70,7 @@ _QUERY_URL = f"{SEEDANCE_ORIGIN}/api/v3/contents/generations/tasks/{{task_id}}"
 _PROVIDER_NAME = "seedance"
 _PROVIDER_KIND = "volcengine_ark_seedance"
 _MAX_JSON_BYTES = 1_000_000
+SEEDANCE_MAX_REQUEST_BODY_BYTES = 64_000_000
 _SAFE_TASK_ID = re.compile(r"^[A-Za-z0-9._:-]{1,256}$")
 _SAFE_ASSET_REFERENCE = re.compile(r"^asset://asset-[A-Za-z0-9._:-]{1,250}$")
 _FILE_ID_PREFIX = "seedance-content-"
@@ -105,6 +109,15 @@ def _unknown_submit() -> AiVideoError:
         ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
         "Seedance submit outcome is unknown after permit consumption.",
     )
+
+
+def _validate_submit_body_size(body: bytes) -> bytes:
+    if len(body) > SEEDANCE_MAX_REQUEST_BODY_BYTES:
+        raise _error(
+            ErrorCode.VIDEO_REQUEST_INVALID,
+            "Seedance request body exceeds the supported byte limit.",
+        )
+    return body
 
 
 @dataclass(frozen=True)
@@ -245,7 +258,9 @@ class SeedanceVideoProvider:
         profile: SeedanceProviderProfile,
         transport: SeedanceTransport,
         credential: CredentialResolver,
-        input_reference: SeedanceAssetReferenceResolver,
+        input_reference: (
+            SeedanceAssetReferenceResolver | SeedanceSyntheticImageReferenceResolver
+        ),
         now: Callable[[], datetime] | None = None,
     ) -> None:
         self._profile = profile
@@ -464,6 +479,19 @@ class SeedanceVideoProvider:
     def _asset_reference(
         self, binding: VideoImageReferenceBinding | VideoMediaReferenceBinding
     ) -> str:
+        if type(self._input_reference) is SeedanceSyntheticImageReferenceResolver:
+            if type(binding) is not VideoImageReferenceBinding:
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "Seedance synthetic input cannot resolve media bindings.",
+                )
+            try:
+                return self._input_reference(binding)
+            except Exception:
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "Seedance synthetic input reference is unavailable.",
+                ) from None
         if type(self._input_reference) is not SeedanceAssetReferenceResolver:
             raise _error(
                 ErrorCode.VIDEO_REQUEST_INVALID,
@@ -554,6 +582,8 @@ class SeedanceVideoProvider:
                 "Seedance submit requires Paid Provider authorization.",
             )
         validate_paid_provider_authorization(paid_preview, authorization, now=self._now())
+        if type(self._input_reference) is SeedanceSyntheticImageReferenceResolver:
+            self._input_reference.validate_submit(request, paid_preview, authorization)
         binding = build_video_paid_permit_binding(
             request, video_preview, paid_preview, authorization
         )
@@ -567,9 +597,11 @@ class SeedanceVideoProvider:
                 ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED,
                 "Seedance submit permit is invalid.",
             )
-        body = json.dumps(
-            self._payload(request), ensure_ascii=False, separators=(",", ":")
-        ).encode()
+        body = _validate_submit_body_size(
+            json.dumps(
+                self._payload(request), ensure_ascii=False, separators=(",", ":")
+            ).encode()
+        )
         transport_request = SeedanceTransportRequest(
             method="POST",
             url=_SUBMIT_URL,

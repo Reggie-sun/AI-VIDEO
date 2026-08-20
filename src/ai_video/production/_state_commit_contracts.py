@@ -449,6 +449,7 @@ class _DurablePaidProviderSubmitPermit:
         retention_mode: str,
         secret_reference_kind: str,
         secret_reference_id: str,
+        authorization_fingerprint: str | None = None,
     ) -> bool:
         return (
             not self._consumed
@@ -466,6 +467,11 @@ class _DurablePaidProviderSubmitPermit:
             and retention_mode == self._binding["retention_mode"]
             and secret_reference_kind == self._binding["secret_reference_kind"]
             and secret_reference_id == self._binding["secret_reference_id"]
+            and (
+                authorization_fingerprint is None
+                or authorization_fingerprint
+                == self._binding["authorization_fingerprint"]
+            )
             and self._durability_validator()
         )
 
@@ -482,24 +488,28 @@ class _DurablePaidProviderSubmitPermit:
         self, **binding: str
     ) -> bool:
         with self._lock:
+            keys = (
+                "attempt_id",
+                "operation",
+                "request_fingerprint",
+                "destination",
+                "provider_kind",
+                "model_id",
+                "currency",
+                "estimated_cost_upper_bound_microunits",
+                "provider_policy_snapshot_id",
+                "retention_mode",
+                "secret_reference_kind",
+                "secret_reference_id",
+            )
+            if "authorization_fingerprint" in binding:
+                keys += ("authorization_fingerprint",)
             return (
                 self._consumed
+                and set(binding) == set(keys)
                 and binding == {
                     key: self._binding[key]
-                    for key in (
-                        "attempt_id",
-                        "operation",
-                        "request_fingerprint",
-                        "destination",
-                        "provider_kind",
-                        "model_id",
-                        "currency",
-                        "estimated_cost_upper_bound_microunits",
-                        "provider_policy_snapshot_id",
-                        "retention_mode",
-                        "secret_reference_kind",
-                        "secret_reference_id",
-                    )
+                    for key in keys
                 }
                 and self._durability_validator()
             )

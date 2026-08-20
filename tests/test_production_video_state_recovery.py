@@ -127,6 +127,43 @@ def test_video_service_persists_request_submit_poll_and_fetch_without_second_tas
     assert provider.call_counts.fetch == 1
 
 
+def test_real_durable_video_permit_rejects_submit_authorization_not_in_gate(
+    tmp_path: Path,
+):
+    committer, service, provider, resolved, paid_preview = _runtime(tmp_path)
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    permit = committer.record_paid_provider_submit_intent(
+        paid_preview,
+        reservation_id="video-reservation-1",
+    )
+    video_preview = provider.preview(resolved)
+    gate_authorization = _paid_authorization(paid_preview)
+    submit_authorization = _paid_authorization(
+        paid_preview,
+        egress_policy_receipt_id="egress-policy-2",
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            submit_authorization,
+            permit,
+        )
+
+    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED
+    assert provider.call_counts.submit == 0
+    provider.submit(
+        resolved,
+        video_preview,
+        paid_preview,
+        gate_authorization,
+        permit,
+    )
+    assert provider.call_counts.submit == 1
+
+
 def test_recovery_before_gate_marks_request_interrupted_without_provider_call(
     tmp_path: Path,
 ):

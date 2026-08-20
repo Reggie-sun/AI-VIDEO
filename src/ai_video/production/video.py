@@ -1176,6 +1176,7 @@ def build_video_paid_permit_binding(
         "estimated_cost_upper_bound_microunits": str(
             paid_preview.estimated_cost_upper_bound_microunits
         ),
+        "authorization_fingerprint": authorization.authorization_fingerprint,
         "provider_policy_snapshot_id": paid_preview.provider_policy_snapshot_id,
         "retention_mode": paid_preview.retention_mode,
         "secret_reference_kind": paid_preview.secret_reference.kind,

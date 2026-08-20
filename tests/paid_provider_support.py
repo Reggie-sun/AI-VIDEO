@@ -94,6 +94,9 @@ class ScriptedFakePaidProviderTransport:
             estimated_cost_upper_bound_microunits=str(
                 preview.estimated_cost_upper_bound_microunits
             ),
+            authorization_fingerprint=(
+                paid_authorization(preview).authorization_fingerprint
+            ),
             provider_policy_snapshot_id=preview.provider_policy_snapshot_id,
             retention_mode=preview.retention_mode,
             secret_reference_kind=preview.secret_reference.kind,
