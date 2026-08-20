@@ -178,6 +178,7 @@ def test_shot_router_routes_to_exact_contract_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "production_shot_router_tests",
+            "provider_neutral_video_requirement_tests",
             "task_architecture_gate",
         ]
 
@@ -205,6 +206,7 @@ def test_video_planner_routes_to_exact_contract_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "video_planner_tests",
+            "provider_neutral_video_requirement_tests",
             "task_architecture_gate",
         ]
 
@@ -462,6 +464,43 @@ def test_project_skill_installation_routes_to_control_plane_harness(path: str) -
 
     assert "control_plane" in report["categories"]
     assert "harness_tests" in report["check_ids"]
+
+
+@pytest.mark.parametrize(
+    ("path", "expected_categories"),
+    [
+        (
+            "src/ai_video/production/video_requirement.py",
+            {"provider_neutral_video_requirement", "production_video_provider"},
+        ),
+        (
+            "src/ai_video/production/_video_requirement_routing.py",
+            {"provider_neutral_video_requirement", "production_video_provider"},
+        ),
+        (
+            "src/ai_video/production/video_compiler.py",
+            {"provider_neutral_video_requirement", "production_video_provider"},
+        ),
+        (
+            "src/ai_video/planning/video_planner.py",
+            {"video_planning"},
+        ),
+        (
+            "src/ai_video/production/shot_router.py",
+            {"production_shot_router"},
+        ),
+    ],
+)
+def test_provider_neutral_generation_paths_route_focused_contract(
+    path: str,
+    expected_categories: set[str],
+) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths([path], policy)
+
+    assert expected_categories.issubset(report["categories"])
+    assert "provider_neutral_video_requirement_tests" in report["check_ids"]
 
 
 def test_inspection_falls_back_to_full_tests_and_task_architecture_gate() -> None:

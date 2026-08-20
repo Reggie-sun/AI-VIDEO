@@ -42,6 +42,12 @@ from ai_video.production.video_contracts import (
     VideoFlexibleOutputRequirement,
     VideoOutputCapability,
 )
+from ai_video.production.shot_router import ProviderBoundVideoRequest
+from ai_video.production.video_compiler import (
+    ProviderRequestCompilationResult,
+    compile_provider_video_request,
+)
+from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
 from ai_video.workflow_loader import load_workflow_template
 from ai_video.workflow_renderer import _set_path, validate_api_workflow
 
@@ -545,6 +551,19 @@ class ComfyUIVideoProvider:
                     lookup_supported=False,
                 ),
             ),
+        )
+
+    def compile_request(
+        self,
+        provider_bound: ProviderBoundVideoRequest,
+        requirement: ProviderNeutralVideoRequirement,
+    ) -> ProviderRequestCompilationResult:
+        return compile_provider_video_request(
+            provider_bound=provider_bound,
+            requirement=requirement,
+            compiler_id="comfy-local-h3-video-compiler",
+            compiler_version="1",
+            capabilities=self.capabilities(),
         )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:

@@ -37,6 +37,20 @@ from ai_video.production.models import (
     Shot,
     VisualStrategy,
 )
+from ai_video.production.video_requirement import (
+    AudioNeed,
+    GenerationIntent as NeutralGenerationIntent,
+    GenerationOperation,
+    OutputGeometryPolicy,
+    OutputNeed,
+    ProviderNeutralGenerationIntentProjection,
+    ProviderNeutralVideoRequirement,
+    QualityNeed,
+    SemanticReferenceRole,
+    SubjectAction,
+    MotionEnvelope,
+    VerifiedGenerationRequirementProjection,
+)
 from tests.fixtures.planning_factory import (
     ONE_HASH,
     TWO_HASH,
@@ -59,6 +73,422 @@ def _semantic_hash(model: object, *excluded_fields: str) -> str:
     for field in excluded_fields:
         data.pop(field)
     return canonical_sha256(data)
+
+
+def _neutral_generation_intent(
+    *,
+    generation_operation: GenerationOperation = GenerationOperation.AUTO,
+    semantic_reference_roles: tuple[SemanticReferenceRole, ...] = (),
+    media_reference_asset_ids: tuple[str, ...] = (),
+) -> ProviderNeutralGenerationIntentProjection:
+    return ProviderNeutralGenerationIntentProjection.create(
+        generation_intent=NeutralGenerationIntent(
+            subject_action=SubjectAction(
+                start_state="standing",
+                progression="walks across the room",
+            ),
+            motion_envelope=MotionEnvelope(
+                onset="gentle",
+                peak="steady",
+                settle="complete",
+            ),
+        ),
+        output_need=OutputNeed(
+            timing_mode="fixed",
+            duration_seconds=3,
+            geometry_policy=OutputGeometryPolicy.ADAPTIVE,
+            aspect_ratio="16:9",
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.OPTIONAL,
+        quality_need=QualityNeed(objective_tier="production"),
+        generation_operation=generation_operation,
+        semantic_reference_roles=semantic_reference_roles,
+        media_reference_asset_ids=media_reference_asset_ids,
+    )
+
+
+def test_v3_dynamic_plan_blocks_prose_only_unspecified_generation_semantics():
+    shot = _generated_shot(character_ids=())
+    projection = ProviderNeutralGenerationIntentProjection.create(
+        generation_intent=NeutralGenerationIntent(),
+        output_need=OutputNeed(
+            duration_seconds=3,
+            geometry_policy=OutputGeometryPolicy.ADAPTIVE,
+            aspect_ratio="16:9",
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.OPTIONAL,
+        quality_need=QualityNeed(objective_tier="production"),
+    )
+    request = make_request(
+        target_shot=shot,
+        character_context=(),
+        available_assets=(),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=projection,
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.BLOCKED
+    assert ReasonCode.ACTION_INTENT_REQUIRED in plan.reason_codes
+    with pytest.raises(AiVideoError) as exc:
+        require_current_video_plan(current_request=request, plan=plan)
+    assert exc.value.code is ErrorCode.PLANNING_PREFLIGHT_BLOCKED
+
+
+def test_v3_plan_embeds_one_requirement_and_returns_verified_router_projection():
+    request = make_request(
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(),
+    )
+
+    plan = VideoPlanner().plan(request)
+    serialized = plan.model_dump(mode="json")
+    projection = require_current_video_plan(current_request=request, plan=plan)
+
+    assert plan.planning_contract_version == "video-planner/3"
+    assert plan.generation_requirement.source_request_content_hash == (
+        request.request_content_hash
+    )
+    assert "generation_requirement" in serialized
+    for duplicate in (
+        "generation_mode",
+        "continuity_mode",
+        "motion_requirement",
+        "required_asset_roles",
+        "capability_requirements",
+    ):
+        assert duplicate not in serialized
+        assert duplicate not in type(plan).model_fields
+    assert isinstance(projection, VerifiedGenerationRequirementProjection)
+    assert projection.requirement == plan.generation_requirement
+    assert projection.plan_hash == plan.plan_hash
+
+    duplicate_payload = plan.model_dump(
+        mode="python",
+        exclude={"plan_id", "plan_hash"},
+    )
+    duplicate_payload["generation_mode"] = plan.generation_mode
+    with pytest.raises(ValidationError, match="duplicate generation truth"):
+        VideoGenerationPlan.create(**duplicate_payload)
+
+
+def test_v3_typed_media_references_are_hash_bound_into_the_one_requirement():
+    shot = _generated_shot(character_ids=())
+    video = AvailableAsset(
+        role=AssetRole.EXISTING_VIDEO,
+        asset_id="reference-video-1",
+        asset_sha256="3" * 64,
+        canonical_owner_id="shot-reference",
+        canonical_owner_content_hash="4" * 64,
+        mime_type="video/mp4",
+        width=1920,
+        height=1080,
+        size_bytes=4096,
+        duration_millis=3200,
+        fps=24,
+    )
+    audio = AvailableAsset(
+        role=AssetRole.REFERENCE_AUDIO,
+        asset_id="reference-audio-1",
+        asset_sha256="5" * 64,
+        canonical_owner_id="audio-reference",
+        canonical_owner_content_hash="6" * 64,
+        mime_type="audio/wav",
+        size_bytes=2048,
+        duration_millis=3200,
+    )
+    request = make_request(
+        target_shot=shot,
+        character_context=(),
+        available_assets=(video, audio),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(
+            semantic_reference_roles=(
+                SemanticReferenceRole.VIDEO_REFERENCE,
+                SemanticReferenceRole.AUDIO_REFERENCE,
+            )
+        ),
+    )
+
+    plan = VideoPlanner().plan(request)
+    projection = require_current_video_plan(current_request=request, plan=plan)
+
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert plan.generation_mode is GenerationMode.REFERENCE_TO_VIDEO
+    assert projection.requirement.semantic_reference_roles == (
+        SemanticReferenceRole.AUDIO_REFERENCE,
+        SemanticReferenceRole.VIDEO_REFERENCE,
+    )
+    evidence = {item.role: item for item in projection.requirement.asset_evidence}
+    assert evidence[SemanticReferenceRole.VIDEO_REFERENCE].duration_millis == 3200
+    assert evidence[SemanticReferenceRole.VIDEO_REFERENCE].fps == 24
+    assert evidence[SemanticReferenceRole.VIDEO_REFERENCE].canonical_owner_content_hash == (
+        "4" * 64
+    )
+
+
+def test_v3_missing_declared_media_reference_blocks_before_routing():
+    shot = _generated_shot(character_ids=())
+    request = make_request(
+        target_shot=shot,
+        character_context=(),
+        available_assets=(),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(
+            semantic_reference_roles=(SemanticReferenceRole.VIDEO_REFERENCE,)
+        ),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.BLOCKED
+    assert ReasonCode.MISSING_REFERENCES in plan.reason_codes
+    with pytest.raises(AiVideoError) as exc:
+        require_current_video_plan(current_request=request, plan=plan)
+    assert exc.value.code is ErrorCode.PLANNING_PREFLIGHT_BLOCKED
+
+
+def test_v3_exact_terminal_is_preserved_with_declared_video_reference():
+    shot = _generated_shot(character_ids=())
+    terminal = _terminal_reference()
+    video = AvailableAsset(
+        role=AssetRole.EXISTING_VIDEO,
+        asset_id="reference-video-1",
+        asset_sha256="3" * 64,
+        canonical_owner_id="reference-shot",
+        canonical_owner_content_hash="4" * 64,
+        mime_type="video/mp4",
+        width=1920,
+        height=1080,
+        size_bytes=4096,
+        duration_millis=5000,
+        fps=24,
+    )
+    request = make_request(
+        target_shot=shot,
+        character_context=(),
+        available_assets=(terminal, video),
+        previous_shot_state=make_previous_state(
+            is_same_action=True,
+            has_terminal_frame_asset_id=terminal.asset_id,
+        ),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(
+            semantic_reference_roles=(SemanticReferenceRole.VIDEO_REFERENCE,)
+        ),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert plan.generation_mode is GenerationMode.REFERENCE_TO_VIDEO
+    assert plan.generation_requirement is not None
+    assert set(plan.generation_requirement.semantic_reference_roles) == {
+        SemanticReferenceRole.CONTINUITY_TERMINAL,
+        SemanticReferenceRole.VIDEO_REFERENCE,
+    }
+    assert {item.asset_id for item in plan.generation_requirement.asset_evidence} == {
+        terminal.asset_id,
+        video.asset_id,
+    }
+
+
+@pytest.mark.parametrize(
+    ("operation", "expected_mode"),
+    [
+        (GenerationOperation.VIDEO_EDIT, GenerationMode.VIDEO_EDIT),
+        (GenerationOperation.VIDEO_EXTEND, GenerationMode.VIDEO_EXTEND),
+    ],
+)
+def test_v3_video_edit_and_extend_are_reachable_neutral_modes(
+    operation: GenerationOperation,
+    expected_mode: GenerationMode,
+):
+    shot = _generated_shot(character_ids=())
+    video = AvailableAsset(
+        role=AssetRole.EXISTING_VIDEO,
+        asset_id="reference-video-1",
+        asset_sha256="3" * 64,
+        canonical_owner_id="reference-shot",
+        canonical_owner_content_hash="4" * 64,
+        mime_type="video/mp4",
+        width=1280,
+        height=720,
+        size_bytes=4096,
+        duration_millis=5000,
+        fps=24,
+    )
+    request = make_request(
+        target_shot=shot,
+        character_context=(),
+        available_assets=(video,),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(
+            generation_operation=operation,
+        ),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert plan.generation_mode is expected_mode
+    assert plan.generation_requirement is not None
+    assert plan.generation_requirement.semantic_reference_roles == (
+        SemanticReferenceRole.VIDEO_REFERENCE,
+    )
+
+
+def test_v3_requirement_excludes_unrelated_same_role_asset():
+    shot = _generated_shot()
+    unrelated = make_available_asset(
+        role=AssetRole.CHARACTER_REFERENCE,
+        asset_id="reference-villain",
+        canonical_owner_id="villain",
+    )
+    request = make_request(
+        target_shot=shot,
+        available_assets=(_character_reference(), unrelated, _scene_reference()),
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert plan.generation_requirement is not None
+    assert "reference-villain" not in {
+        item.asset_id for item in plan.generation_requirement.asset_evidence
+    }
+
+
+def test_v3_requirement_blocks_ambiguous_generic_video_references():
+    shot = _generated_shot(character_ids=())
+    videos = tuple(
+        AvailableAsset(
+            role=AssetRole.EXISTING_VIDEO,
+            asset_id=f"reference-video-{index}",
+            asset_sha256=str(index + 7) * 64,
+            canonical_owner_id=f"source-{index}",
+            canonical_owner_content_hash=str(index + 4) * 64,
+            mime_type="video/mp4",
+            width=1280,
+            height=720,
+            size_bytes=1_024,
+            duration_millis=5_000,
+            fps=24,
+        )
+        for index in range(2)
+    )
+    request = make_request(
+        target_shot=shot,
+        character_context=(),
+        available_assets=videos,
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(
+            generation_operation=GenerationOperation.VIDEO_EDIT,
+        ),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.BLOCKED
+    assert ReasonCode.MISSING_REFERENCES in plan.reason_codes
+    assert plan.generation_requirement is not None
+    assert plan.generation_requirement.asset_evidence == ()
+
+
+@pytest.mark.parametrize("reference_count", (2, 3))
+def test_v3_requirement_derives_exact_multi_video_selection(
+    reference_count: int,
+):
+    shot = _generated_shot(character_ids=())
+    videos = tuple(
+        AvailableAsset(
+            role=AssetRole.EXISTING_VIDEO,
+            asset_id=f"selected-video-{index}",
+            asset_sha256=str(index + 7) * 64,
+            canonical_owner_id=f"source-{index}",
+            canonical_owner_content_hash=str(index + 4) * 64,
+            mime_type="video/mp4",
+            width=1280,
+            height=720,
+            size_bytes=1_024,
+            duration_millis=5_000,
+            fps=24,
+        )
+        for index in range(reference_count)
+    )
+    unselected = AvailableAsset(
+        role=AssetRole.EXISTING_VIDEO,
+        asset_id="unselected-video",
+        asset_sha256="a" * 64,
+        canonical_owner_id="unselected-source",
+        canonical_owner_content_hash="b" * 64,
+        mime_type="video/mp4",
+        width=1280,
+        height=720,
+        size_bytes=1_024,
+        duration_millis=5_000,
+        fps=24,
+    )
+    request = make_request(
+        target_shot=shot,
+        character_context=(),
+        available_assets=(*videos, unselected),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(
+            generation_operation=GenerationOperation.VIDEO_EDIT,
+            media_reference_asset_ids=tuple(item.asset_id for item in videos),
+        ),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert plan.generation_requirement is not None
+    assert tuple(
+        item.asset_id for item in plan.generation_requirement.asset_evidence
+    ) == tuple(item.asset_id for item in videos)
+
+
+def test_v3_requirement_blocks_missing_exact_media_selection():
+    shot = _generated_shot(character_ids=())
+    request = make_request(
+        target_shot=shot,
+        character_context=(),
+        available_assets=(),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(
+            generation_operation=GenerationOperation.VIDEO_EXTEND,
+            media_reference_asset_ids=("missing-video",),
+        ),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.BLOCKED
+    assert ReasonCode.MISSING_REFERENCES in plan.reason_codes
 
 
 @pytest.mark.parametrize(
@@ -982,7 +1412,10 @@ def test_t10_planning_import_boundary_and_no_runtime_skill_calls():
             elif isinstance(node, ast.ImportFrom) and node.module:
                 modules = (node.module,)
             for module in modules:
-                assert not module.startswith(forbidden_prefixes), (
+                assert not any(
+                    module == prefix or module.startswith(f"{prefix}.")
+                    for prefix in forbidden_prefixes
+                ), (
                     f"{path}:{node.lineno} forbidden planning import {module}"
                 )
                 assert module not in skill_tokens
@@ -1043,6 +1476,8 @@ def _current_dynamic_request():
         available_assets=(),
         shot_intent_evidence=make_intent_evidence(target_shot=shot),
         review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(),
     )
 
 
@@ -1060,10 +1495,11 @@ def _rebuild_request(
 def _rebuild_plan(
     plan: VideoGenerationPlan, **updates: object
 ) -> VideoGenerationPlan:
-    payload = plan.model_dump(
-        mode="python",
-        exclude={"plan_id", "plan_hash"},
-    )
+    payload = {
+        field: getattr(plan, field)
+        for field in type(plan).model_fields
+        if field not in {"plan_id", "plan_hash"}
+    }
     payload.update(updates)
     return VideoGenerationPlan.create(**payload)
 
@@ -1102,13 +1538,13 @@ def test_ac17_main_agent_preflight_stops_before_execution(stop_reason):
         )
         plan = VideoPlanner().plan(current_request)
     elif stop_reason == "stale_source_request_hash":
-        plan = _rebuild_plan(plan, source_request_content_hash=TWO_HASH)
+        plan = plan.model_copy(update={"source_request_content_hash": TWO_HASH})
     elif stop_reason == "stale_shot_id":
-        plan = _rebuild_plan(plan, target_shot_id="shot-other")
+        plan = plan.model_copy(update={"target_shot_id": "shot-other"})
     elif stop_reason == "stale_shot_revision":
-        plan = _rebuild_plan(plan, target_shot_revision=99)
+        plan = plan.model_copy(update={"target_shot_revision": 99})
     elif stop_reason == "stale_shot_hash":
-        plan = _rebuild_plan(plan, target_shot_content_hash=TWO_HASH)
+        plan = plan.model_copy(update={"target_shot_content_hash": TWO_HASH})
     elif stop_reason == "changed_review_same_shot_hash":
         current_request = _rebuild_request(
             current_request,
@@ -1235,10 +1671,14 @@ def test_ac18_proposed_plan_only_enters_existing_production_handoff():
     )
 
     assert result == "eligible"
-    handoff.assert_called_once_with(
-        current_shot=current_request.target_shot,
-        plan_hint=plan,
+    handoff.assert_called_once()
+    handoff_kwargs = handoff.call_args.kwargs
+    assert handoff_kwargs["current_shot"] == current_request.target_shot
+    assert isinstance(
+        handoff_kwargs["generation_requirement"],
+        VerifiedGenerationRequirementProjection,
     )
+    assert "plan_hint" not in handoff_kwargs
     for forbidden in (
         "generated",
         "reviewed",
@@ -1255,10 +1695,12 @@ def test_consumer_accepts_current_plan_directly():
     request = _current_dynamic_request()
     plan = VideoPlanner().plan(request)
 
-    assert require_current_video_plan(
+    projection = require_current_video_plan(
         current_request=request,
         plan=plan,
-    ) is None
+    )
+    assert isinstance(projection, VerifiedGenerationRequirementProjection)
+    assert projection.requirement == plan.generation_requirement
 
 
 @pytest.mark.parametrize("forged", ["request", "plan", "plan_id"])
@@ -1270,13 +1712,45 @@ def test_consumer_rejects_invalid_request_or_plan_seal(forged):
     elif forged == "plan":
         plan = plan.model_copy(update={"confidence": 0.1})
     else:
-        payload = plan.model_dump(mode="python", exclude={"plan_hash"})
-        payload["plan_id"] = "plan-arbitrary"
-        payload["plan_hash"] = canonical_sha256(payload)
-        plan = VideoGenerationPlan.model_validate(payload)
+        forged_plan = plan.model_copy(update={"plan_id": "plan-arbitrary"})
+        plan = forged_plan.model_copy(
+            update={"plan_hash": _semantic_hash(forged_plan, "plan_hash")}
+        )
 
     with pytest.raises(AiVideoError) as exc:
         require_current_video_plan(current_request=request, plan=plan)
+
+    assert exc.value.code is ErrorCode.PLANNING_PREFLIGHT_BLOCKED
+
+
+def test_consumer_rejects_resealed_requirement_not_uniquely_derived_by_planner():
+    request = _current_dynamic_request()
+    plan = VideoPlanner().plan(request)
+    requirement = plan.generation_requirement
+    assert requirement is not None
+    forged_requirement = ProviderNeutralVideoRequirement.create(
+        **{
+            **requirement.model_dump(
+                mode="python",
+                exclude={"requirement_id", "requirement_hash"},
+            ),
+            "output_need": requirement.output_need.model_copy(
+                update={"fps": 30}
+            ),
+        }
+    )
+    forged_plan = VideoGenerationPlan.create(
+        **{
+            **plan.model_dump(
+                mode="python",
+                exclude={"plan_id", "plan_hash"},
+            ),
+            "generation_requirement": forged_requirement,
+        }
+    )
+
+    with pytest.raises(AiVideoError) as exc:
+        require_current_video_plan(current_request=request, plan=forged_plan)
 
     assert exc.value.code is ErrorCode.PLANNING_PREFLIGHT_BLOCKED
 
@@ -1296,24 +1770,12 @@ def test_consumer_allows_auditable_static_fallback_warning_when_resolved():
             allows_static_fallback=True,
         ),
         production_policy=make_policy(accept_static_image_fallback=True),
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(),
     )
     plan = VideoPlanner().plan(request)
 
     assert PlanWarning.STATIC_FALLBACK_REQUIRES_REVIEW in plan.warnings
     assert PlanWarning.REQUIRES_HUMAN_REVIEW not in plan.warnings
-    assert require_current_video_plan(current_request=request, plan=plan) is None
-
-
-def test_t12_integration_contract_keeps_stop_and_downstream_ownership_explicit():
-    integration = Path(
-        "docs/specs/video-planner-subagent/integration.md"
-    ).read_text(encoding="utf-8")
-
-    for required_text in (
-        "source_request_content_hash",
-        "APPROVED_REUSABLE_PLATE",
-        "router, Provider, placeholder/materializer, composition and render are not invoked",
-        "PROPOSED` does **not** mean",
-        "human Pilot Reality Gate",
-    ):
-        assert required_text in integration
+    projection = require_current_video_plan(current_request=request, plan=plan)
+    assert isinstance(projection, VerifiedGenerationRequirementProjection)

@@ -14,6 +14,7 @@ from ai_video.production.models import (
     VisualStrategy,
 )
 from ai_video.production.shot_router import (
+    AdapterCompilerContract,
     ContinuityMode,
     MotionRequirement,
     RouterAssetIdentity,
@@ -23,9 +24,24 @@ from ai_video.production.shot_router import (
     RoutingOutcome,
     ShotRoutingContext,
     ShotVisualResolver,
+    VideoGenerationLifecycleEnvelope,
     VideoGenerationResolver,
     VideoRoutingPolicy,
 )
+from ai_video.production.video_requirement import (
+    AudioNeed,
+    CapabilityNeed,
+    ContinuityMode as RequirementContinuityMode,
+    ExpressionStrength,
+    GenerationIntent,
+    GenerationMode as RequirementGenerationMode,
+    MotionRequirement as RequirementMotionRequirement,
+    OutputNeed,
+    ProviderNeutralVideoRequirement,
+    QualityNeed,
+    VerifiedGenerationRequirementProjection,
+)
+from tests.fixtures.planning_factory import make_scene
 from ai_video.production.video import (
     BillingKind,
     ProviderProfilePointer,
@@ -59,8 +75,10 @@ def _asset(
     *,
     mime_type: str | None = None,
     size_bytes: int = 1_000_000,
-    width: int = 1024,
-    height: int = 576,
+    width: int | None = 1024,
+    height: int | None = 576,
+    duration_millis: int | None = None,
+    fps: int | None = None,
     registry_revision_id: str = HASH_F,
     canonical_owner_id: str | None = None,
     canonical_owner_content_hash: str | None = None,
@@ -89,6 +107,8 @@ def _asset(
         size_bytes=size_bytes,
         width=width,
         height=height,
+        duration_millis=duration_millis,
+        fps=fps,
     )
 
 
@@ -103,6 +123,9 @@ def _context(
     character_references: tuple[RouterAssetIdentity, ...] | None = None,
     scene_reference: RouterAssetIdentity | None = None,
     continuity_state: RouterContinuityState | None = None,
+    last_frame: RouterAssetIdentity | None = None,
+    reference_videos: tuple[RouterAssetIdentity, ...] = (),
+    reference_audios: tuple[RouterAssetIdentity, ...] = (),
     visual_strategy: VisualStrategy = VisualStrategy.GENERATED_VIDEO,
     shot_id: str = "shot-2",
     scene_id: str = "scene-room",
@@ -164,6 +187,9 @@ def _context(
         approved_existing_video=existing_video,
         shot_keyframe=keyframe,
         upstream_terminal=terminal,
+        last_frame=last_frame,
+        reference_videos=reference_videos,
+        reference_audios=reference_audios,
         motion_requirement=motion,
         continuity_mode=continuity,
         semantic_continuity_state=continuity_state,
@@ -311,6 +337,68 @@ def _profile() -> ProviderProfilePointer:
         profile_version="1",
         profile_path=Path(f"provider-profiles/{HASH_D}.json"),
         profile_sha256=HASH_D,
+    )
+
+
+def _verified_requirement(
+    context: ShotRoutingContext,
+) -> VerifiedGenerationRequirementProjection:
+    requirement = ProviderNeutralVideoRequirement.create(
+        source_request_content_hash=HASH_A,
+        intent_evidence_hash=HASH_B,
+        generation_intent_hash=HASH_C,
+        target_shot=context.activated_shot,
+        scene=make_scene(scene_id=context.activated_shot.scene_id),
+        generation_mode=RequirementGenerationMode.TEXT_TO_VIDEO,
+        continuity_mode=RequirementContinuityMode.NONE,
+        motion_requirement=RequirementMotionRequirement.FREE_COMPLEX,
+        generation_intent=GenerationIntent(),
+        output_need=OutputNeed(
+            duration_seconds=4,
+            width=1024,
+            height=576,
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.FORBIDDEN,
+        quality_need=QualityNeed(objective_tier="production"),
+    )
+    return VerifiedGenerationRequirementProjection.create(
+        requirement=requirement,
+        plan_hash=HASH_D,
+        verified_source_request_content_hash=HASH_A,
+        target_shot_id=context.target_shot_id,
+        target_shot_revision=context.target_shot_revision,
+        target_shot_content_hash=context.target_shot_content_hash,
+    )
+
+
+def _lifecycle(context: ShotRoutingContext) -> VideoGenerationLifecycleEnvelope:
+    from pathlib import Path
+
+    return VideoGenerationLifecycleEnvelope(
+        generation_id="generation-shot-2",
+        target_asset_role="primary_visual",
+        base_project=ProjectSnapshotPointer(
+            path=Path("project.yaml"),
+            revision=1,
+            content_hash=HASH_A,
+            file_sha256=HASH_B,
+        ),
+        base_registry=RegistrySnapshotPointer(
+            path=Path(f"assets/registry.{HASH_F}.json"),
+            revision_id=HASH_F,
+            content_hash=HASH_F,
+            file_sha256=HASH_C,
+        ),
+        base_dependency_graph=DependencyGraphSnapshotPointer(
+            path=Path(f"state/dependency_graph.{HASH_C}.json"),
+            revision_id=HASH_C,
+            content_hash=HASH_C,
+            file_sha256=HASH_D,
+        ),
+        input_artifact_ids=(context.target_shot_id,),
+        output_asset_id="video-output",
     )
 
 
@@ -1414,6 +1502,146 @@ def test_router_models_are_strict_and_immutable() -> None:
     with pytest.raises(ValidationError):
         context.target_shot_revision = 4
 
+
+def test_router_exposes_prompt_free_provider_bound_projection_contract() -> None:
+    from ai_video.production import shot_router
+
+    assert hasattr(shot_router, "ProviderBoundVideoRequest")
+    assert hasattr(VideoGenerationResolver, "resolve_requirement")
+
+
+def test_router_projects_verified_requirement_to_deterministic_prompt_free_bound_request() -> None:
+    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+    projection = _verified_requirement(context)
+    compiler = AdapterCompilerContract.create(
+        compiler_id="fake-video-compiler",
+        compiler_version="1",
+    )
+    kwargs = {
+        "projection": projection,
+        "context": context,
+        "policy": _policy(),
+        "provider_profile": _profile(),
+        "capabilities": _capabilities(
+            _variant(VideoGenerationMode.TEXT_TO_VIDEO)
+        ),
+        "selected_capability_id": "capability-text_to_video",
+        "output_requirement": _output(),
+        "lifecycle": _lifecycle(context),
+        "compiler_contract": compiler,
+    }
+
+    first = VideoGenerationResolver().resolve_requirement(**kwargs)
+    second = VideoGenerationResolver().resolve_requirement(**kwargs)
+
+    assert first.decision.outcome is RoutingOutcome.SELECTED
+    assert first.provider_bound_request == second.provider_bound_request
+    assert first.provider_bound_request is not None
+    assert first.provider_bound_request.requirement_hash == (
+        projection.requirement.requirement_hash
+    )
+    serialized = first.provider_bound_request.model_dump(mode="json")
+    assert "prompt_text" not in serialized
+    assert "payload" not in serialized
+
+
+def test_router_native_control_requirement_blocks_without_bound_request() -> None:
+    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+    projection = _verified_requirement(context)
+    intent = projection.requirement.generation_intent.model_copy(
+        update={
+            "camera_intent": projection.requirement.generation_intent.camera_intent.model_copy(
+                update={
+                    "expression_strength": ExpressionStrength.NATIVE_CONTROL_REQUIRED
+                }
+            )
+        }
+    )
+    requirement = ProviderNeutralVideoRequirement.create(
+        **{
+            **projection.requirement.model_dump(
+                mode="python",
+                exclude={"requirement_id", "requirement_hash"},
+            ),
+            "generation_intent": intent,
+        }
+    )
+    projection = VerifiedGenerationRequirementProjection.create(
+        requirement=requirement,
+        plan_hash=HASH_D,
+        verified_source_request_content_hash=HASH_A,
+        target_shot_id=context.target_shot_id,
+        target_shot_revision=context.target_shot_revision,
+        target_shot_content_hash=context.target_shot_content_hash,
+    )
+
+    result = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
+        selected_capability_id="capability-text_to_video",
+        output_requirement=_output(),
+        lifecycle=_lifecycle(context),
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="fake-video-compiler",
+            compiler_version="1",
+        ),
+    )
+
+    assert result.decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert result.provider_bound_request is None
+
+
+def test_router_intersects_provider_execution_with_requirement_policy() -> None:
+    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+    projection = _verified_requirement(context)
+    requirement = ProviderNeutralVideoRequirement.create(
+        **{
+            **projection.requirement.model_dump(
+                mode="python",
+                exclude={"requirement_id", "requirement_hash"},
+            ),
+            "capability_need": CapabilityNeed(
+                accepts_local_execution=True,
+                accepts_remote_execution=False,
+            ),
+        }
+    )
+    projection = VerifiedGenerationRequirementProjection.create(
+        requirement=requirement,
+        plan_hash=projection.plan_hash,
+        verified_source_request_content_hash=(
+            projection.verified_source_request_content_hash
+        ),
+        target_shot_id=projection.target_shot_id,
+        target_shot_revision=projection.target_shot_revision,
+        target_shot_content_hash=projection.target_shot_content_hash,
+    )
+
+    result = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(remote_authorized=True, budget_authorized=True),
+        provider_profile=_profile(),
+        capabilities=_capabilities(
+            _variant(
+                VideoGenerationMode.TEXT_TO_VIDEO,
+                execution_kind=VideoExecutionKind.REMOTE,
+            )
+        ),
+        selected_capability_id="capability-text_to_video",
+        output_requirement=_output(),
+        lifecycle=_lifecycle(context),
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="fake-video-compiler",
+            compiler_version="1",
+        ),
+    )
+
+    assert result.decision.outcome is RoutingOutcome.BLOCKED_AUTHORIZATION
+    assert result.provider_bound_request is None
 
 def test_router_surface_is_available_from_production_package() -> None:
     from ai_video.production import (

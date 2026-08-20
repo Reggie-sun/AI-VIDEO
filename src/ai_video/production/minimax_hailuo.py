@@ -60,6 +60,12 @@ from ai_video.production.video_contracts import (
     VideoFlexibleOutputRequirement,
     VideoOutputCapability,
 )
+from ai_video.production.shot_router import ProviderBoundVideoRequest
+from ai_video.production.video_compiler import (
+    ProviderRequestCompilationResult,
+    compile_provider_video_request,
+)
+from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
 
 _ORIGIN = "https://api.minimaxi.com"
 _SUBMIT_URL = f"{_ORIGIN}/v1/video_generation"
@@ -442,6 +448,19 @@ class MiniMaxHailuoVideoProvider:
 
     def capabilities(self) -> VideoProviderCapabilities:
         return _CAPABILITIES
+
+    def compile_request(
+        self,
+        provider_bound: ProviderBoundVideoRequest,
+        requirement: ProviderNeutralVideoRequirement,
+    ) -> ProviderRequestCompilationResult:
+        return compile_provider_video_request(
+            provider_bound=provider_bound,
+            requirement=requirement,
+            compiler_id="minimax-hailuo-video-compiler",
+            compiler_version="1",
+            capabilities=_CAPABILITIES,
+        )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
         if (

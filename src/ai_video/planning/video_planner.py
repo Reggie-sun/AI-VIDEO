@@ -22,6 +22,19 @@ from ai_video.planning._planner_models import (
     _canonical_hash_without,
 )
 from ai_video.production.models import AssetType, Shot, VisualStrategy
+from ai_video.production.hashing import canonical_sha256
+from ai_video.production.video_requirement import (
+    AssetEvidence as RequirementAssetEvidence,
+    CapabilityNeed,
+    ContinuityMode as RequirementContinuityMode,
+    GenerationMode as RequirementGenerationMode,
+    GenerationOperation,
+    MotionRequirement as RequirementMotionRequirement,
+    ProviderNeutralVideoRequirement,
+    ReviewEvidenceLink,
+    SemanticReferenceRole,
+    VerifiedGenerationRequirementProjection,
+)
 
 
 _CAMERA_TRANSFORM_KINDS = frozenset({"pan", "zoom", "parallax"})
@@ -78,40 +91,91 @@ def _is_shot_bound_final_visual(
     )
 
 
-def _available_role(request: VideoPlanningRequest, role: AssetRole) -> bool:
+def _asset_matches_role(
+    request: VideoPlanningRequest,
+    asset: AvailableAsset,
+    role: AssetRole,
+) -> bool:
+    if asset.role is not role:
+        return False
     if role is AssetRole.CHARACTER_REFERENCE:
         character_ids = {
             item.character_id
             for item in request.character_context
             if item.character_id in request.target_shot.character_ids
         }
-        return any(
-            asset.role is role and asset.canonical_owner_id in character_ids
-            for asset in request.available_assets
-        )
+        return asset.canonical_owner_id in character_ids
     if role is AssetRole.SCENE_REFERENCE:
         if request.scene_context.scene_id != request.target_shot.scene_id:
             return False
-        return any(
-            asset.role is role
-            and asset.canonical_owner_id == request.target_shot.scene_id
-            for asset in request.available_assets
-        )
+        return asset.canonical_owner_id == request.target_shot.scene_id
     if role is AssetRole.PREVIOUS_SHOT_TERMINAL:
         state = request.previous_shot_state
         terminal_id = state.has_terminal_frame_asset_id if state else None
         previous_shot_id = state.previous_shot_id if state else None
-        return terminal_id is not None and previous_shot_id is not None and any(
-            asset.role is role
+        return (
+            terminal_id is not None
+            and previous_shot_id is not None
             and asset.asset_id == terminal_id
             and asset.canonical_owner_id == previous_shot_id
-            for asset in request.available_assets
         )
+    if role in {
+        AssetRole.EXISTING_VIDEO,
+        AssetRole.REFERENCE_AUDIO,
+    }:
+        selection = (
+            request.generation_intent.media_reference_asset_ids
+            if request.generation_intent is not None
+            else ()
+        )
+        return not selection or asset.asset_id in selection
+    if role is AssetRole.LAST_FRAME:
+        return True
     review = _current_review(request)
-    return any(
-        asset.role is role
-        and _is_shot_bound_final_visual(request, asset, review=review)
+    return _is_shot_bound_final_visual(request, asset, review=review)
+
+
+def _available_role(request: VideoPlanningRequest, role: AssetRole) -> bool:
+    matches = tuple(
+        asset
         for asset in request.available_assets
+        if _asset_matches_role(request, asset, role)
+    )
+    if role is AssetRole.CHARACTER_REFERENCE:
+        target_characters = set(request.target_shot.character_ids)
+        owners = tuple(asset.canonical_owner_id for asset in matches)
+        return set(owners) == target_characters and len(owners) == len(
+            target_characters
+        )
+    if role in {AssetRole.EXISTING_VIDEO, AssetRole.REFERENCE_AUDIO} and (
+        request.generation_intent is not None
+        and request.generation_intent.media_reference_asset_ids
+    ):
+        return bool(matches)
+    return len(matches) == 1
+
+
+def _media_selection_is_complete(
+    request: VideoPlanningRequest,
+    required: tuple[RequiredAssetRole, ...],
+) -> bool:
+    projection = request.generation_intent
+    selected_ids = (
+        set(projection.media_reference_asset_ids) if projection is not None else set()
+    )
+    if not selected_ids:
+        return True
+    required_media_roles = {
+        item.role
+        for item in required
+        if item.role in {AssetRole.EXISTING_VIDEO, AssetRole.REFERENCE_AUDIO}
+    }
+    selected_assets = tuple(
+        asset for asset in request.available_assets if asset.asset_id in selected_ids
+    )
+    return bool(
+        len(selected_assets) == len(selected_ids)
+        and all(asset.role in required_media_roles for asset in selected_assets)
     )
 
 
@@ -296,6 +360,75 @@ def _dynamic_decision(
         return GenerationMode.HYBRID, PlanOutcome.PROPOSED, ()
 
     important_character = bool(request.target_shot.character_ids)
+    declared_roles = (
+        request.generation_intent.semantic_reference_roles
+        if request.generation_intent is not None
+        else ()
+    )
+    generation_operation = (
+        request.generation_intent.generation_operation
+        if request.generation_intent is not None
+        else GenerationOperation.AUTO
+    )
+    if declared_roles or generation_operation is not GenerationOperation.AUTO:
+        roles = list(declared_roles)
+        if generation_operation is not GenerationOperation.AUTO and (
+            SemanticReferenceRole.VIDEO_REFERENCE not in roles
+        ):
+            roles.append(SemanticReferenceRole.VIDEO_REFERENCE)
+        if (
+            continuity is ContinuityMode.EXACT_TERMINAL
+            and SemanticReferenceRole.CONTINUITY_TERMINAL not in roles
+        ):
+            roles.append(SemanticReferenceRole.CONTINUITY_TERMINAL)
+        if important_character:
+            for role in (
+                SemanticReferenceRole.IDENTITY,
+                SemanticReferenceRole.SCENE,
+            ):
+                if role not in roles:
+                    roles.append(role)
+            _append_unique(reasons, ReasonCode.IMPORTANT_CHARACTER)
+            _append_unique(reasons, ReasonCode.IDENTITY_REQUIRED)
+        required = tuple(
+            RequiredAssetRole(
+                role=_asset_role(role),
+                reason_code=(
+                    ReasonCode.IDENTITY_REQUIRED
+                    if role is SemanticReferenceRole.IDENTITY
+                    else ReasonCode.CONTINUITY_REQUIRED
+                    if role
+                    in {
+                        SemanticReferenceRole.SCENE,
+                        SemanticReferenceRole.CONTINUITY_TERMINAL,
+                    }
+                    else ReasonCode.REFERENCE_AVAILABLE
+                ),
+            )
+            for role in roles
+        )
+        missing = tuple(
+            item for item in required if not _available_role(request, item.role)
+        )
+        if missing or not _media_selection_is_complete(request, required):
+            _append_unique(reasons, ReasonCode.MISSING_REFERENCES)
+            _append_unique(warnings, PlanWarning.REQUIRES_HUMAN_REVIEW)
+            return (
+                GenerationMode(generation_operation.value)
+                if generation_operation is not GenerationOperation.AUTO
+                else GenerationMode.REFERENCE_TO_VIDEO,
+                PlanOutcome.BLOCKED,
+                required,
+            )
+        _append_unique(reasons, ReasonCode.REFERENCE_AVAILABLE)
+        return (
+            GenerationMode(generation_operation.value)
+            if generation_operation is not GenerationOperation.AUTO
+            else GenerationMode.REFERENCE_TO_VIDEO,
+            PlanOutcome.PROPOSED,
+            required,
+        )
+
     has_character_reference = _available_role(
         request, AssetRole.CHARACTER_REFERENCE
     )
@@ -388,13 +521,182 @@ def _confidence(
     return 0.9
 
 
-def _rationale(reasons: list[ReasonCode], outcome: PlanOutcome) -> str:
+def _rationale(
+    reasons: list[ReasonCode],
+    outcome: PlanOutcome,
+    *,
+    contract_version: str,
+) -> str:
     labels = ", ".join(reason.value for reason in reasons)
-    return f"{outcome.value} by video-planner/2: {labels}."
+    return f"{outcome.value} by {contract_version}: {labels}."
+
+
+def _semantic_role(role: AssetRole) -> SemanticReferenceRole:
+    return {
+        AssetRole.CHARACTER_REFERENCE: SemanticReferenceRole.IDENTITY,
+        AssetRole.SCENE_REFERENCE: SemanticReferenceRole.SCENE,
+        AssetRole.PREVIOUS_SHOT_TERMINAL: SemanticReferenceRole.CONTINUITY_TERMINAL,
+        AssetRole.APPROVED_KEYFRAME: SemanticReferenceRole.FIRST_FRAME,
+        AssetRole.APPROVED_REUSABLE_PLATE: SemanticReferenceRole.FIRST_FRAME,
+        AssetRole.EXISTING_VIDEO: SemanticReferenceRole.VIDEO_REFERENCE,
+        AssetRole.REFERENCE_AUDIO: SemanticReferenceRole.AUDIO_REFERENCE,
+        AssetRole.LAST_FRAME: SemanticReferenceRole.LAST_FRAME,
+    }[role]
+
+
+def _asset_role(role: SemanticReferenceRole) -> AssetRole:
+    return {
+        SemanticReferenceRole.IDENTITY: AssetRole.CHARACTER_REFERENCE,
+        SemanticReferenceRole.SCENE: AssetRole.SCENE_REFERENCE,
+        SemanticReferenceRole.FIRST_FRAME: AssetRole.APPROVED_KEYFRAME,
+        SemanticReferenceRole.LAST_FRAME: AssetRole.LAST_FRAME,
+        SemanticReferenceRole.CONTINUITY_TERMINAL: AssetRole.PREVIOUS_SHOT_TERMINAL,
+        SemanticReferenceRole.VIDEO_REFERENCE: AssetRole.EXISTING_VIDEO,
+        SemanticReferenceRole.AUDIO_REFERENCE: AssetRole.REFERENCE_AUDIO,
+    }[role]
+
+
+def _build_generation_requirement(
+    request: VideoPlanningRequest,
+    *,
+    mode: GenerationMode,
+    continuity: ContinuityMode,
+    motion: MotionRequirement,
+    required: tuple[RequiredAssetRole, ...],
+) -> ProviderNeutralVideoRequirement:
+    projection = request.generation_intent
+    if projection is None:
+        raise _preflight_error("video-planner/3 requires typed generation intent")
+    required_roles = tuple(
+        sorted(
+            {
+                *(_semantic_role(item.role) for item in required),
+                *projection.semantic_reference_roles,
+            },
+            key=lambda role: role.value,
+        )
+    )
+    required_role_set = set(required_roles)
+    evidence = tuple(
+        RequirementAssetEvidence(
+            role=_semantic_role(asset.role),
+            asset_id=asset.asset_id,
+            asset_sha256=asset.asset_sha256,
+            canonical_owner_id=asset.canonical_owner_id,
+            canonical_owner_content_hash=asset.canonical_owner_content_hash,
+            mime_type=asset.mime_type,
+            width=asset.width,
+            height=asset.height,
+            size_bytes=asset.size_bytes,
+            duration_millis=asset.duration_millis,
+            fps=asset.fps,
+        )
+        for asset in request.available_assets
+        if _semantic_role(asset.role) in required_role_set
+        and any(
+            _available_role(request, item.role)
+            and _asset_matches_role(request, asset, item.role)
+            for item in required
+            if _semantic_role(item.role) is _semantic_role(asset.role)
+        )
+    )
+    evidenced_roles = {asset.role for asset in evidence}
+    semantic_roles = tuple(
+        role for role in required_roles if role in evidenced_roles
+    )
+    review = _current_review(request)
+    review_link = (
+        ReviewEvidenceLink(
+            evidence_ref=review.evidence_ref,
+            target_shot_id=review.target_shot_id,
+            target_shot_content_hash=review.target_shot_content_hash,
+            review_decision_hash=canonical_sha256(review.model_dump(mode="json")),
+        )
+        if review is not None
+        else None
+    )
+    return ProviderNeutralVideoRequirement.create(
+        source_request_content_hash=request.request_content_hash,
+        intent_evidence_hash=canonical_sha256(
+            request.shot_intent_evidence.model_dump(mode="json")
+        ),
+        generation_intent_hash=projection.projection_hash,
+        target_shot=request.target_shot,
+        scene=request.scene_context,
+        characters=tuple(
+            character
+            for character in request.character_context
+            if character.character_id in request.target_shot.character_ids
+        ),
+        review_evidence=review_link,
+        asset_evidence=evidence,
+        generation_mode=RequirementGenerationMode(mode.value),
+        continuity_mode=RequirementContinuityMode(continuity.value),
+        motion_requirement=RequirementMotionRequirement(motion.value),
+        generation_intent=projection.generation_intent,
+        semantic_reference_roles=semantic_roles,
+        capability_need=CapabilityNeed(
+            needs_identity_reference=(SemanticReferenceRole.IDENTITY in semantic_roles),
+            needs_scene_reference=(SemanticReferenceRole.SCENE in semantic_roles),
+            needs_first_frame=bool(
+                {SemanticReferenceRole.FIRST_FRAME, SemanticReferenceRole.CONTINUITY_TERMINAL}
+                & set(semantic_roles)
+            ),
+            needs_last_frame=SemanticReferenceRole.LAST_FRAME in semantic_roles,
+            needs_terminal_reference=(
+                continuity is ContinuityMode.EXACT_TERMINAL
+            ),
+            needs_native_audio=projection.audio_need.value == "required",
+            needs_continuity_state=continuity is not ContinuityMode.NONE,
+            max_reference_count=(
+                sum(
+                    item.role
+                    in {
+                        SemanticReferenceRole.IDENTITY,
+                        SemanticReferenceRole.SCENE,
+                    }
+                    for item in evidence
+                )
+                or None
+            ),
+            accepts_local_execution=(
+                request.production_policy.local_resources_available
+            ),
+            accepts_remote_execution=bool(
+                request.production_policy.remote_authorized
+                and request.production_policy.budget_authorized
+            ),
+        ),
+        output_need=projection.output_need,
+        audio_need=projection.audio_need,
+        quality_need=projection.quality_need,
+    )
+
+
+def _typed_generation_intent_is_sufficient(
+    request: VideoPlanningRequest,
+    mode: GenerationMode,
+) -> bool:
+    if mode in {GenerationMode.STATIC_IMAGE, GenerationMode.IMAGE_MOTION}:
+        return True
+    projection = request.generation_intent
+    if projection is None:
+        return False
+    intent = projection.generation_intent
+    return any(
+        value != "unspecified"
+        for value in (
+            intent.subject_action.progression,
+            intent.motion_envelope.onset,
+            intent.motion_envelope.peak,
+            intent.motion_envelope.settle,
+            intent.camera_intent.movement,
+        )
+    )
 
 
 class VideoPlanner:
-    CONTRACT_VERSION = "video-planner/2"
+    CONTRACT_VERSION = "video-planner/3"
 
     def plan(self, request: VideoPlanningRequest) -> VideoGenerationPlan:
         reasons: list[ReasonCode] = []
@@ -452,30 +754,59 @@ class VideoPlanner:
             outcome = PlanOutcome.BLOCKED
         if PlanWarning.REQUIRES_HUMAN_REVIEW in warnings:
             outcome = PlanOutcome.BLOCKED
-        return VideoGenerationPlan.create(
-            source_request_content_hash=request.request_content_hash,
-            target_shot_id=request.target_shot.shot_id,
-            target_shot_revision=request.target_shot.revision,
-            target_shot_content_hash=request.target_shot.content_hash,
-            generation_mode=mode,
-            continuity_mode=continuity,
-            motion_requirement=motion,
-            required_asset_roles=required,
-            capability_requirements=_capabilities(
+        if (
+            request.planning_contract_version == self.CONTRACT_VERSION
+            and not _typed_generation_intent_is_sufficient(request, mode)
+        ):
+            _append_unique(reasons, ReasonCode.ACTION_INTENT_REQUIRED)
+            _append_unique(warnings, PlanWarning.REQUIRES_HUMAN_REVIEW)
+            outcome = PlanOutcome.BLOCKED
+        requirement = (
+            _build_generation_requirement(
                 request,
                 mode=mode,
                 continuity=continuity,
-            ),
-            reason_codes=tuple(reasons),
-            confidence=_confidence(
+                motion=motion,
+                required=required,
+            )
+            if request.planning_contract_version == self.CONTRACT_VERSION
+            else None
+        )
+        plan_values: dict[str, object] = {
+            "source_request_content_hash": request.request_content_hash,
+            "target_shot_id": request.target_shot.shot_id,
+            "target_shot_revision": request.target_shot.revision,
+            "target_shot_content_hash": request.target_shot.content_hash,
+            "generation_requirement": requirement,
+            "reason_codes": tuple(reasons),
+            "confidence": _confidence(
                 outcome=outcome,
                 reasons=reasons,
                 warnings=warnings,
             ),
-            warnings=tuple(warnings),
-            outcome=outcome,
-            rationale=_rationale(reasons, outcome),
-            planning_contract_version=self.CONTRACT_VERSION,
+            "warnings": tuple(warnings),
+            "outcome": outcome,
+            "rationale": _rationale(
+                reasons,
+                outcome,
+                contract_version=request.planning_contract_version,
+            ),
+            "planning_contract_version": request.planning_contract_version,
+        }
+        if request.planning_contract_version == "video-planner/2":
+            plan_values.update(
+                generation_mode=mode,
+                continuity_mode=continuity,
+                motion_requirement=motion,
+                required_asset_roles=required,
+                capability_requirements=_capabilities(
+                    request,
+                    mode=mode,
+                    continuity=continuity,
+                ),
+            )
+        return VideoGenerationPlan.create(
+            **plan_values,
         )
 
     @staticmethod
@@ -518,7 +849,14 @@ def require_current_video_plan(
     *,
     current_request: VideoPlanningRequest,
     plan: VideoGenerationPlan,
-) -> None:
+) -> VerifiedGenerationRequirementProjection:
+    if (
+        current_request.planning_contract_version != "video-planner/3"
+        or plan.planning_contract_version != "video-planner/3"
+    ):
+        raise _preflight_error(
+            "legacy video-planner/2 evidence must be rebuilt before a new attempt"
+        )
     expected_request_hash = _canonical_hash_without(
         current_request,
         "request_id",
@@ -528,6 +866,11 @@ def require_current_video_plan(
         raise _preflight_error("current request seal is invalid")
     if plan.plan_hash != _canonical_hash_without(plan, "plan_hash"):
         raise _preflight_error("plan seal is invalid")
+    expected_plan = VideoPlanner().plan(current_request)
+    if plan.plan_hash != expected_plan.plan_hash:
+        raise _preflight_error(
+            "plan is not the unique current derivation for its request"
+        )
     expected_plan_id = f"plan-{plan.source_request_content_hash[:24]}"
     if plan.plan_id != expected_plan_id:
         raise _preflight_error("plan id is not bound to its source request")
@@ -552,6 +895,69 @@ def require_current_video_plan(
         raise _preflight_error(
             f"required current assets are missing or invalid: {', '.join(missing)}"
         )
+    requirement = plan.generation_requirement
+    if requirement is None:
+        raise _preflight_error("current plan has no embedded generation requirement")
+    if (
+        requirement.source_request_content_hash
+        != current_request.request_content_hash
+        or requirement.intent_evidence_hash
+        != canonical_sha256(
+            current_request.shot_intent_evidence.model_dump(mode="json")
+        )
+        or current_request.generation_intent is None
+        or requirement.generation_intent_hash
+        != current_request.generation_intent.projection_hash
+        or requirement.generation_intent
+        != current_request.generation_intent.generation_intent
+        or requirement.scene != current_request.scene_context
+        or requirement.characters
+        != tuple(
+            character
+            for character in current_request.character_context
+            if character.character_id in current_request.target_shot.character_ids
+        )
+    ):
+        raise _preflight_error("embedded generation requirement is stale")
+    current_assets = {
+        (asset.asset_id, asset.asset_sha256): asset
+        for asset in current_request.available_assets
+    }
+    for evidence in requirement.asset_evidence:
+        asset = current_assets.get((evidence.asset_id, evidence.asset_sha256))
+        if asset is None or (
+            evidence.canonical_owner_id != asset.canonical_owner_id
+            or evidence.canonical_owner_content_hash
+            != asset.canonical_owner_content_hash
+            or evidence.mime_type != asset.mime_type
+            or evidence.width != asset.width
+            or evidence.height != asset.height
+            or evidence.size_bytes != asset.size_bytes
+            or evidence.duration_millis != asset.duration_millis
+            or evidence.fps != asset.fps
+        ):
+            raise _preflight_error("embedded requirement asset evidence is stale")
+    review = _current_review(current_request)
+    expected_review_hash = (
+        canonical_sha256(review.model_dump(mode="json"))
+        if review is not None
+        else None
+    )
+    if (
+        (requirement.review_evidence is None) != (review is None)
+        or requirement.review_evidence is not None
+        and requirement.review_evidence.review_decision_hash
+        != expected_review_hash
+    ):
+        raise _preflight_error("embedded requirement Review evidence is stale")
+    return VerifiedGenerationRequirementProjection.create(
+        requirement=requirement,
+        plan_hash=plan.plan_hash,
+        verified_source_request_content_hash=current_request.request_content_hash,
+        target_shot_id=current_request.target_shot.shot_id,
+        target_shot_revision=current_request.target_shot.revision,
+        target_shot_content_hash=current_request.target_shot.content_hash,
+    )
 
 
 def prepare_shot_for_existing_production(
@@ -560,8 +966,11 @@ def prepare_shot_for_existing_production(
     plan: VideoGenerationPlan,
     production_handoff: Callable[..., Any],
 ) -> Any:
-    require_current_video_plan(current_request=current_request, plan=plan)
+    projection = require_current_video_plan(
+        current_request=current_request,
+        plan=plan,
+    )
     return production_handoff(
         current_shot=current_request.target_shot,
-        plan_hint=plan,
+        generation_requirement=projection,
     )

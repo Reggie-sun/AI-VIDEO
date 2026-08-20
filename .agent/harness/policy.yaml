@@ -116,6 +116,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_planning_video_planner.py, tests/test_errors.py, -q]
     cwd: .
     description: Verify provider-neutral Video Planner proposals and Main Agent STOP semantics.
+  provider_neutral_video_requirement_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_video_requirement.py, tests/test_planning_video_planner.py, tests/test_production_shot_router.py, tests/test_production_video_fake.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_video.py, -q]
+    cwd: .
+    description: Verify the sealed neutral requirement, Router binding, adapter compiler result, and lifecycle lineage.
   full_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, -q]
     cwd: .
@@ -344,6 +348,9 @@ categories:
       - src/ai_video/production/video_artifact.py
       - src/ai_video/production/video_contracts.py
       - src/ai_video/production/video_dependency.py
+      - src/ai_video/production/video_requirement.py
+      - src/ai_video/production/_video_requirement_routing.py
+      - src/ai_video/production/video_compiler.py
       - src/ai_video/production/video_fake.py
       - src/ai_video/production/video_generation.py
       - src/ai_video/production/local_video.py
@@ -368,6 +375,7 @@ categories:
       - tests/video_provider_contract.py
     check_ids:
       - production_video_provider_tests
+      - provider_neutral_video_requirement_tests
       - task_architecture_gate
   production_shot_router:
     patterns:
@@ -375,6 +383,7 @@ categories:
       - tests/test_production_shot_router.py
     check_ids:
       - production_shot_router_tests
+      - provider_neutral_video_requirement_tests
       - task_architecture_gate
   video_planning:
     patterns:
@@ -383,6 +392,17 @@ categories:
       - tests/test_planning_video_planner.py
     check_ids:
       - video_planner_tests
+      - provider_neutral_video_requirement_tests
+      - task_architecture_gate
+  provider_neutral_video_requirement:
+    patterns:
+      - src/ai_video/production/video_requirement.py
+      - src/ai_video/production/_video_requirement_routing.py
+      - src/ai_video/production/video_compiler.py
+      - tests/test_production_video_requirement.py
+      - tests/test_production_provider_neutral_adapters.py
+    check_ids:
+      - provider_neutral_video_requirement_tests
       - task_architecture_gate
   agent_memory_dev_tool:
     # Local, read-only RAG over docs/record_for_agent/. Dev / Codex

@@ -164,6 +164,14 @@ class VideoGenerationRequest(_VideoStrictModel):
     provider_kind: str = Field(pattern=_SAFE_ID.pattern)
     model_id: str = Field(pattern=_SAFE_ID.pattern)
     provider_profile: ProviderProfilePointer
+    requirement_hash: str | None = Field(default=None, pattern=_SHA256)
+    provider_bound_request_hash: str | None = Field(default=None, pattern=_SHA256)
+    adapter_compiler_id: str | None = Field(default=None, pattern=_SAFE_ID.pattern)
+    adapter_compiler_version: str | None = Field(
+        default=None,
+        pattern=_SAFE_ID.pattern,
+    )
+    adapter_compiler_hash: str | None = Field(default=None, pattern=_SHA256)
     target_shot_id: str = Field(pattern=_SAFE_ID.pattern)
     target_shot_revision: int = Field(strict=True, ge=1)
     target_shot_content_hash: str = Field(pattern=_SHA256)
@@ -202,6 +210,16 @@ class VideoGenerationRequest(_VideoStrictModel):
         continuity = data.get("continuity_binding")
         hard_cut = data.get("hard_cut_keyframe_binding")
         seal_terminal_frame = data.get("seal_terminal_frame", False)
+        lineage_fields = (
+            "requirement_hash",
+            "provider_bound_request_hash",
+            "adapter_compiler_id",
+            "adapter_compiler_version",
+            "adapter_compiler_hash",
+        )
+        uses_provider_neutral_lineage = all(
+            data.get(field) is not None for field in lineage_fields
+        )
         advanced = bool(
             media_bindings
             or mode
@@ -228,9 +246,14 @@ class VideoGenerationRequest(_VideoStrictModel):
             selected.pop("hard_cut_keyframe_binding", None)
         if not seal_terminal_frame:
             selected.pop("seal_terminal_frame", None)
+        if not uses_provider_neutral_lineage:
+            for field in lineage_fields:
+                selected.pop(field, None)
         return {
             "schema": (
-                "ai-video-generation-request/4"
+                "ai-video-generation-request/5"
+                if uses_provider_neutral_lineage
+                else "ai-video-generation-request/4"
                 if hard_cut is not None
                 else "ai-video-generation-request/3"
                 if continuity is not None or seal_terminal_frame
@@ -243,6 +266,17 @@ class VideoGenerationRequest(_VideoStrictModel):
 
     @model_validator(mode="after")
     def _validate_request(self) -> "VideoGenerationRequest":
+        lineage = (
+            self.requirement_hash,
+            self.provider_bound_request_hash,
+            self.adapter_compiler_id,
+            self.adapter_compiler_version,
+            self.adapter_compiler_hash,
+        )
+        if any(value is not None for value in lineage) and not all(
+            value is not None for value in lineage
+        ):
+            raise ValueError("provider-neutral lineage must be fully specified")
         if self.mode is VideoGenerationMode.TEXT_TO_VIDEO and self.image_bindings:
             raise ValueError("text-to-video requests cannot contain image bindings")
         if self.mode is VideoGenerationMode.TEXT_TO_VIDEO and self.media_bindings:
@@ -478,6 +512,16 @@ class VideoActivationScope(_VideoStrictModel):
             request.continuity_binding is not None or request.seal_terminal_frame
         )
         uses_hard_cut = request.hard_cut_keyframe_binding is not None
+        uses_provider_neutral_lineage = request.requirement_hash is not None
+        if not uses_provider_neutral_lineage:
+            for field in (
+                "requirement_hash",
+                "provider_bound_request_hash",
+                "adapter_compiler_id",
+                "adapter_compiler_version",
+                "adapter_compiler_hash",
+            ):
+                request_payload.pop(field, None)
         if not uses_continuity:
             request_payload.pop("continuity_binding", None)
             request_payload.pop("seal_terminal_frame", None)
@@ -485,7 +529,9 @@ class VideoActivationScope(_VideoStrictModel):
             request_payload.pop("hard_cut_keyframe_binding", None)
         return {
             "schema": (
-                "ai-video-activation-scope/3"
+                "ai-video-activation-scope/4"
+                if uses_provider_neutral_lineage
+                else "ai-video-activation-scope/3"
                 if uses_hard_cut
                 else "ai-video-activation-scope/2"
                 if uses_continuity
@@ -531,6 +577,14 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     provider_kind: str = Field(pattern=_SAFE_ID.pattern)
     model_id: str = Field(pattern=_SAFE_ID.pattern)
     provider_profile: ProviderProfilePointer
+    requirement_hash: str | None = Field(default=None, pattern=_SHA256)
+    provider_bound_request_hash: str | None = Field(default=None, pattern=_SHA256)
+    adapter_compiler_id: str | None = Field(default=None, pattern=_SAFE_ID.pattern)
+    adapter_compiler_version: str | None = Field(
+        default=None,
+        pattern=_SAFE_ID.pattern,
+    )
+    adapter_compiler_hash: str | None = Field(default=None, pattern=_SHA256)
     capability_id: str = Field(pattern=_SAFE_ID.pattern)
     execution_kind: VideoExecutionKind
     billing_kind: BillingKind
@@ -559,6 +613,19 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
 
     @model_validator(mode="after")
     def _validate_seal(self) -> "ResolvedVideoGenerationRequest":
+        lineage_fields = (
+            "requirement_hash",
+            "provider_bound_request_hash",
+            "adapter_compiler_id",
+            "adapter_compiler_version",
+            "adapter_compiler_hash",
+        )
+        lineage = tuple(getattr(self, field) for field in lineage_fields)
+        if any(value is not None for value in lineage) and not all(
+            value is not None for value in lineage
+        ):
+            raise ValueError("provider-neutral lineage must be fully specified")
+        uses_provider_neutral_lineage = all(value is not None for value in lineage)
         data = self.model_dump(
             mode="json",
             exclude={
@@ -568,7 +635,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             },
         )
         schema = (
-            "ai-video-resolved-request/5"
+            "ai-video-resolved-request/6"
+            if uses_provider_neutral_lineage
+            else "ai-video-resolved-request/5"
             if self.hard_cut_keyframe_binding is not None
             else "ai-video-resolved-request/4"
             if self.continuity_binding is not None or self.seal_terminal_frame
@@ -578,6 +647,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
         )
         if schema.endswith("/2"):
             data.pop("media_bindings", None)
+        if not uses_provider_neutral_lineage:
+            for field in lineage_fields:
+                data.pop(field, None)
         if self.continuity_binding is None:
             data.pop("continuity_binding", None)
         if self.hard_cut_keyframe_binding is None:
@@ -601,6 +673,13 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 or request.provider_kind != self.provider_kind
                 or request.model_id != self.model_id
                 or request.provider_profile != self.provider_profile
+                or request.requirement_hash != self.requirement_hash
+                or request.provider_bound_request_hash
+                != self.provider_bound_request_hash
+                or request.adapter_compiler_id != self.adapter_compiler_id
+                or request.adapter_compiler_version
+                != self.adapter_compiler_version
+                or request.adapter_compiler_hash != self.adapter_compiler_hash
                 or request.mode is not self.mode
                 or request.prompt_text != self.prompt_text
                 or request.image_bindings != self.image_bindings
@@ -725,6 +804,11 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             "provider_kind": request.provider_kind,
             "model_id": request.model_id,
             "provider_profile": request.provider_profile,
+            "requirement_hash": request.requirement_hash,
+            "provider_bound_request_hash": request.provider_bound_request_hash,
+            "adapter_compiler_id": request.adapter_compiler_id,
+            "adapter_compiler_version": request.adapter_compiler_version,
+            "adapter_compiler_hash": request.adapter_compiler_hash,
             "capability_id": capability.capability_id,
             "execution_kind": capability.execution_kind,
             "billing_kind": capability.billing_kind,
@@ -757,7 +841,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             warnings=False,
         )
         schema = (
-            "ai-video-resolved-request/5"
+            "ai-video-resolved-request/6"
+            if candidate.requirement_hash is not None
+            else "ai-video-resolved-request/5"
             if candidate.hard_cut_keyframe_binding is not None
             else "ai-video-resolved-request/4"
             if candidate.continuity_binding is not None or candidate.seal_terminal_frame
@@ -767,6 +853,15 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
         )
         if schema.endswith("/2"):
             fingerprint_data.pop("media_bindings", None)
+        if candidate.requirement_hash is None:
+            for field in (
+                "requirement_hash",
+                "provider_bound_request_hash",
+                "adapter_compiler_id",
+                "adapter_compiler_version",
+                "adapter_compiler_hash",
+            ):
+                fingerprint_data.pop(field, None)
         if candidate.continuity_binding is None:
             fingerprint_data.pop("continuity_binding", None)
         if candidate.hard_cut_keyframe_binding is None:

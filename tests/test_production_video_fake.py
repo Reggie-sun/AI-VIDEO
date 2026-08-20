@@ -19,6 +19,15 @@ from ai_video.production.video_fake import (
     FakeVideoScenario,
     ScriptedFakeVideoProvider,
 )
+from ai_video.production.video_compiler import (
+    ProviderRequirementUnsupported,
+    require_compiled_provider_request,
+)
+from ai_video.production.shot_router import (
+    AdapterCompilerContract,
+    MotionRequirement as RouterMotionRequirement,
+    VideoGenerationResolver,
+)
 from test_production_video import (
     _paid_authorization,
     _paid_preview,
@@ -30,6 +39,16 @@ from video_provider_contract import (
     PaidProviderPermitDouble,
     VideoProviderContractCase,
     assert_video_provider_contract,
+)
+from test_production_shot_router import (
+    _capabilities as _router_capabilities,
+    _context as _router_context,
+    _lifecycle as _router_lifecycle,
+    _output as _router_output,
+    _policy as _router_policy,
+    _profile as _router_profile,
+    _variant as _router_variant,
+    _verified_requirement,
 )
 
 
@@ -79,6 +98,125 @@ def _accepted_submission(provider: ScriptedFakeVideoProvider):
         receipt=paid_receipt,
     )
     return resolved, paid_receipt, submission
+
+
+def test_fake_compiler_projects_bound_requirement_without_provider_side_effects():
+    context = _router_context(
+        motion=RouterMotionRequirement.FREE_COMPLEX,
+        important=False,
+    )
+    capabilities = _router_capabilities(
+        _router_variant(VideoGenerationMode.TEXT_TO_VIDEO)
+    )
+    provider = ScriptedFakeVideoProvider(
+        capabilities=capabilities,
+        artifact_bytes=_artifact_bytes(),
+    )
+    compiler_contract = AdapterCompilerContract.create(
+        compiler_id="fake-video-compiler",
+        compiler_version="1",
+    )
+    projection = _verified_requirement(context)
+    routing = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_router_policy(),
+        provider_profile=_router_profile(),
+        capabilities=capabilities,
+        selected_capability_id="capability-text_to_video",
+        output_requirement=_router_output(),
+        lifecycle=_router_lifecycle(context),
+        compiler_contract=compiler_contract,
+    )
+    assert routing.provider_bound_request is not None
+
+    first = provider.compile_request(
+        routing.provider_bound_request,
+        projection.requirement,
+    )
+    second = provider.compile_request(
+        routing.provider_bound_request,
+        projection.requirement,
+    )
+
+    assert first == second
+    assert first.outcome == "compiled"
+    assert first.request.requirement_hash == projection.requirement.requirement_hash
+    assert first.request.provider_bound_request_hash == (
+        routing.provider_bound_request.provider_bound_request_hash
+    )
+    resolved = provider.resolve(first.request)
+    assert resolved.requirement_hash == projection.requirement.requirement_hash
+    assert resolved.provider_bound_request_hash == (
+        routing.provider_bound_request.provider_bound_request_hash
+    )
+    assert resolved.activation_scope is not None
+    assert resolved.activation_scope.request == first.request
+    for field in (
+        "generation_mode=",
+        "continuity_mode=",
+        "motion_requirement=",
+        "audio_need=",
+        "open_state=",
+        "identity_preservation=",
+        "scene_id=",
+        "space_screen_direction=",
+        "axis_camera=",
+        "action_progression=",
+        "motion_direction=",
+        "camera_framing=",
+        "camera_position_lock=",
+        "camera_orientation_lock=",
+        "pacing_tempo=",
+        "quality_objective=",
+    ):
+        assert field in first.provider_native_prompt
+    assert provider.call_counts == type(provider.call_counts)(0, 1, 0, 0, 0, 0)
+
+
+def test_fake_compiler_returns_typed_unsupported_for_wrong_compiler_contract():
+    context = _router_context(
+        motion=RouterMotionRequirement.FREE_COMPLEX,
+        important=False,
+    )
+    capabilities = _router_capabilities(
+        _router_variant(VideoGenerationMode.TEXT_TO_VIDEO)
+    )
+    projection = _verified_requirement(context)
+    routing = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_router_policy(),
+        provider_profile=_router_profile(),
+        capabilities=capabilities,
+        selected_capability_id="capability-text_to_video",
+        output_requirement=_router_output(),
+        lifecycle=_router_lifecycle(context),
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="another-compiler",
+            compiler_version="1",
+        ),
+    )
+    assert routing.provider_bound_request is not None
+    provider = ScriptedFakeVideoProvider(
+        capabilities=capabilities,
+        artifact_bytes=_artifact_bytes(),
+    )
+
+    result = provider.compile_request(
+        routing.provider_bound_request,
+        projection.requirement,
+    )
+
+    assert isinstance(result, ProviderRequirementUnsupported)
+    assert result.retryable is False
+    assert result.prompt_text is None
+    assert result.payload is None
+    assert provider.call_counts == type(provider.call_counts)(0, 0, 0, 0, 0, 0)
+    with pytest.raises(AiVideoError) as exc:
+        require_compiled_provider_request(result)
+    assert exc.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert exc.value.retryable is False
 
 
 def test_fake_provider_contract_and_success_sequence_are_deterministic():

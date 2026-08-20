@@ -488,6 +488,82 @@ def test_request_input_hash_seals_caller_intent_but_excludes_generation_id():
         assert _request(**change).request_input_hash != baseline.request_input_hash
 
 
+def test_provider_neutral_lineage_uses_noncolliding_request_resolved_and_scope_schemas():
+    request = _request(
+        requirement_hash=HASH_B,
+        provider_bound_request_hash=HASH_C,
+        adapter_compiler_id="fake-video-compiler",
+        adapter_compiler_version="1",
+        adapter_compiler_hash=HASH_D,
+    )
+
+    request_payload = VideoGenerationRequest._fingerprint_payload(
+        request.model_dump(mode="json")
+    )
+    assert request_payload["schema"] == "ai-video-generation-request/5"
+    assert request_payload["requirement_hash"] == HASH_B
+    assert request_payload["provider_bound_request_hash"] == HASH_C
+    assert request.request_input_hash != _request().request_input_hash
+
+    scope = VideoActivationScope.create(request)
+    scope_payload = VideoActivationScope._fingerprint_payload(
+        request,
+        scope.usage_license,
+    )
+    assert scope_payload["schema"] == "ai-video-activation-scope/4"
+
+    resolved = _resolved(request)
+    expected_payload = resolved.model_dump(
+        mode="json",
+        exclude={
+            "activation_scope",
+            "resolved_generation_hash",
+            "desired_generation_fingerprint",
+        },
+    )
+    expected_payload.pop("continuity_binding")
+    expected_payload.pop("hard_cut_keyframe_binding")
+    expected_payload.pop("seal_terminal_frame")
+    expected_payload.pop("provider_task_binding")
+    expected = video_contracts.canonical_sha256(
+        {"schema": "ai-video-resolved-request/6", **expected_payload}
+    )
+    assert resolved.resolved_generation_hash == expected
+    assert resolved.desired_generation_fingerprint == expected
+
+
+def test_provider_neutral_lineage_is_all_or_none_and_each_identity_is_sealed():
+    with pytest.raises(ValidationError, match="provider-neutral lineage"):
+        _request(requirement_hash=HASH_B)
+
+    baseline = _request(
+        requirement_hash=HASH_B,
+        provider_bound_request_hash=HASH_C,
+        adapter_compiler_id="fake-video-compiler",
+        adapter_compiler_version="1",
+        adapter_compiler_hash=HASH_D,
+    )
+    changes = (
+        {"requirement_hash": HASH_A},
+        {"provider_bound_request_hash": HASH_A},
+        {"adapter_compiler_id": "fake-video-compiler-v2"},
+        {"adapter_compiler_version": "2"},
+        {"adapter_compiler_hash": HASH_A},
+    )
+    for change in changes:
+        assert _request(
+            requirement_hash=change.get("requirement_hash", HASH_B),
+            provider_bound_request_hash=change.get(
+                "provider_bound_request_hash", HASH_C
+            ),
+            adapter_compiler_id=change.get(
+                "adapter_compiler_id", "fake-video-compiler"
+            ),
+            adapter_compiler_version=change.get("adapter_compiler_version", "1"),
+            adapter_compiler_hash=change.get("adapter_compiler_hash", HASH_D),
+        ).request_input_hash != baseline.request_input_hash
+
+
 def test_continuity_request_binds_exact_terminal_evidence_and_constraints():
     binding = _continuity_binding()
     terminal = binding.terminal_frame
@@ -843,11 +919,27 @@ def test_continuity_request_rejects_unbound_or_mismatched_inputs(
 
 def test_historical_activation_scope_reopens_without_continuity_defaults():
     historical = _resolved().model_dump(mode="json")
+    for field in (
+        "requirement_hash",
+        "provider_bound_request_hash",
+        "adapter_compiler_id",
+        "adapter_compiler_version",
+        "adapter_compiler_hash",
+    ):
+        historical.pop(field)
     historical.pop("continuity_binding")
     historical.pop("hard_cut_keyframe_binding")
     historical.pop("seal_terminal_frame")
     scope = historical["activation_scope"]
     scope_request = scope["request"]
+    for field in (
+        "requirement_hash",
+        "provider_bound_request_hash",
+        "adapter_compiler_id",
+        "adapter_compiler_version",
+        "adapter_compiler_hash",
+    ):
+        scope_request.pop(field)
     scope_request.pop("continuity_binding")
     scope_request.pop("hard_cut_keyframe_binding")
     scope_request.pop("seal_terminal_frame")

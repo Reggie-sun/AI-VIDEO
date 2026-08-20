@@ -3,10 +3,14 @@ from __future__ import annotations
 from enum import Enum
 from typing import Literal
 
-from pydantic import Field
+from pydantic import AliasChoices, Field, model_validator
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import Character, Scene, Shot, StrictModel
+from ai_video.production.video_requirement import (
+    ProviderNeutralGenerationIntentProjection,
+    ProviderNeutralVideoRequirement,
+)
 
 
 _SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
@@ -29,6 +33,8 @@ class AssetRole(str, Enum):
     APPROVED_KEYFRAME = "approved_keyframe"
     APPROVED_REUSABLE_PLATE = "approved_reusable_plate"
     EXISTING_VIDEO = "existing_video"
+    REFERENCE_AUDIO = "reference_audio"
+    LAST_FRAME = "last_frame"
 
 
 class GenerationMode(str, Enum):
@@ -38,6 +44,8 @@ class GenerationMode(str, Enum):
     IMAGE_TO_VIDEO = "image_to_video"
     FIRST_LAST_FRAME_VIDEO = "first_last_frame_video"
     REFERENCE_TO_VIDEO = "reference_to_video"
+    VIDEO_EDIT = "video_edit"
+    VIDEO_EXTEND = "video_extend"
     HYBRID = "hybrid"
 
 
@@ -137,10 +145,13 @@ class AvailableAsset(StrictModel):
     asset_id: str = Field(pattern=_SAFE_ID)
     asset_sha256: str = Field(pattern=_SHA256)
     canonical_owner_id: str | None = Field(default=None, pattern=_SAFE_ID)
+    canonical_owner_content_hash: str | None = Field(default=None, pattern=_SHA256)
     mime_type: str = Field(pattern=_MIME_TYPE)
     width: int | None = Field(default=None, gt=0)
     height: int | None = Field(default=None, gt=0)
     size_bytes: int | None = Field(default=None, gt=0)
+    duration_millis: int | None = Field(default=None, strict=True, gt=0)
+    fps: int | None = Field(default=None, strict=True, gt=0, le=240)
 
 
 class ReviewDecisionProjection(StrictModel):
@@ -203,8 +214,29 @@ class VideoPlanningRequest(StrictModel):
     shot_intent_evidence: ShotIntentEvidence
     review_decision: ReviewDecisionProjection | None
     production_policy: ProductionPolicyInput
-    planning_contract_version: Literal["video-planner/2"]
+    generation_intent: ProviderNeutralGenerationIntentProjection | None = None
+    planning_contract_version: Literal["video-planner/2", "video-planner/3"]
     request_content_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_versioned_intent(self) -> "VideoPlanningRequest":
+        if self.planning_contract_version == "video-planner/3":
+            if self.generation_intent is None:
+                raise ValueError("video-planner/3 requires typed generation intent")
+        elif self.generation_intent is not None:
+            raise ValueError("video-planner/2 cannot carry generation intent")
+        return self
+
+    def model_dump(self, *args: object, **kwargs: object) -> dict[str, object]:
+        payload = super().model_dump(*args, **kwargs)
+        if self.planning_contract_version == "video-planner/2":
+            payload.pop("generation_intent", None)
+            for asset in payload.get("available_assets", ()):
+                if isinstance(asset, dict):
+                    asset.pop("canonical_owner_content_hash", None)
+                    asset.pop("duration_millis", None)
+                    asset.pop("fps", None)
+        return payload
 
     @classmethod
     def create(cls, **values: object) -> "VideoPlanningRequest":
@@ -229,18 +261,183 @@ class VideoGenerationPlan(StrictModel):
     target_shot_id: str = Field(pattern=_SAFE_ID)
     target_shot_revision: int = Field(ge=1)
     target_shot_content_hash: str = Field(pattern=_SHA256)
-    generation_mode: GenerationMode
-    continuity_mode: ContinuityMode
-    motion_requirement: MotionRequirement
-    required_asset_roles: tuple[RequiredAssetRole, ...]
-    capability_requirements: CapabilityRequirements
+    legacy_generation_mode: GenerationMode | None = Field(
+        default=None,
+        validation_alias=AliasChoices("generation_mode", "legacy_generation_mode"),
+    )
+    legacy_continuity_mode: ContinuityMode | None = Field(
+        default=None,
+        validation_alias=AliasChoices("continuity_mode", "legacy_continuity_mode"),
+    )
+    legacy_motion_requirement: MotionRequirement | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "motion_requirement", "legacy_motion_requirement"
+        ),
+    )
+    legacy_required_asset_roles: tuple[RequiredAssetRole, ...] | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "required_asset_roles", "legacy_required_asset_roles"
+        ),
+    )
+    legacy_capability_requirements: CapabilityRequirements | None = Field(
+        default=None,
+        validation_alias=AliasChoices(
+            "capability_requirements", "legacy_capability_requirements"
+        ),
+    )
+    generation_requirement: ProviderNeutralVideoRequirement | None = None
     reason_codes: tuple[ReasonCode, ...] = Field(min_length=1)
     confidence: float = Field(ge=0.0, le=1.0)
     warnings: tuple[PlanWarning, ...] = ()
     outcome: PlanOutcome
     rationale: str = Field(min_length=1)
-    planning_contract_version: Literal["video-planner/2"]
+    planning_contract_version: Literal["video-planner/2", "video-planner/3"]
     plan_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_versioned_requirement(self) -> "VideoGenerationPlan":
+        requirement = self.generation_requirement
+        if self.planning_contract_version == "video-planner/2":
+            if requirement is not None:
+                raise ValueError("video-planner/2 cannot carry generation requirement")
+            if any(
+                value is None
+                for value in (
+                    self.legacy_generation_mode,
+                    self.legacy_continuity_mode,
+                    self.legacy_motion_requirement,
+                    self.legacy_required_asset_roles,
+                    self.legacy_capability_requirements,
+                )
+            ):
+                raise ValueError("video-planner/2 requires historical plan fields")
+            return self
+        if requirement is None:
+            raise ValueError("video-planner/3 requires generation requirement")
+        if any(
+            value is not None
+            for value in (
+                self.legacy_generation_mode,
+                self.legacy_continuity_mode,
+                self.legacy_motion_requirement,
+                self.legacy_required_asset_roles,
+                self.legacy_capability_requirements,
+            )
+        ):
+            raise ValueError("video-planner/3 cannot carry duplicate generation truth")
+        if (
+            requirement.source_request_content_hash
+            != self.source_request_content_hash
+            or requirement.target_shot.shot_id != self.target_shot_id
+            or requirement.target_shot.revision != self.target_shot_revision
+            or requirement.target_shot.content_hash != self.target_shot_content_hash
+            or requirement.generation_mode.value != self.generation_mode.value
+            or requirement.continuity_mode.value != self.continuity_mode.value
+            or requirement.motion_requirement.value != self.motion_requirement.value
+        ):
+            raise ValueError("generation requirement does not match plan truth")
+        return self
+
+    @property
+    def generation_mode(self) -> GenerationMode:
+        if self.generation_requirement is not None:
+            return GenerationMode(self.generation_requirement.generation_mode.value)
+        assert self.legacy_generation_mode is not None
+        return self.legacy_generation_mode
+
+    @property
+    def continuity_mode(self) -> ContinuityMode:
+        if self.generation_requirement is not None:
+            return ContinuityMode(self.generation_requirement.continuity_mode.value)
+        assert self.legacy_continuity_mode is not None
+        return self.legacy_continuity_mode
+
+    @property
+    def motion_requirement(self) -> MotionRequirement:
+        if self.generation_requirement is not None:
+            return MotionRequirement(
+                self.generation_requirement.motion_requirement.value
+            )
+        assert self.legacy_motion_requirement is not None
+        return self.legacy_motion_requirement
+
+    @property
+    def required_asset_roles(self) -> tuple[RequiredAssetRole, ...]:
+        if self.generation_requirement is None:
+            assert self.legacy_required_asset_roles is not None
+            return self.legacy_required_asset_roles
+        mapping = {
+            "identity": (
+                AssetRole.CHARACTER_REFERENCE,
+                ReasonCode.IDENTITY_REQUIRED,
+            ),
+            "scene": (AssetRole.SCENE_REFERENCE, ReasonCode.CONTINUITY_REQUIRED),
+            "first_frame": (AssetRole.APPROVED_KEYFRAME, ReasonCode.REFERENCE_AVAILABLE),
+            "last_frame": (AssetRole.LAST_FRAME, ReasonCode.REFERENCE_AVAILABLE),
+            "continuity_terminal": (
+                AssetRole.PREVIOUS_SHOT_TERMINAL,
+                ReasonCode.CONTINUITY_SAME_ACTION,
+            ),
+            "video_reference": (
+                AssetRole.EXISTING_VIDEO,
+                ReasonCode.REFERENCE_AVAILABLE,
+            ),
+            "audio_reference": (
+                AssetRole.REFERENCE_AUDIO,
+                ReasonCode.REFERENCE_AVAILABLE,
+            ),
+        }
+        return tuple(
+            RequiredAssetRole(
+                role=mapping[role.value][0],
+                reason_code=mapping[role.value][1],
+            )
+            for role in self.generation_requirement.semantic_reference_roles
+        )
+
+    @property
+    def capability_requirements(self) -> CapabilityRequirements:
+        if self.generation_requirement is None:
+            assert self.legacy_capability_requirements is not None
+            return self.legacy_capability_requirements
+        need = self.generation_requirement.capability_need
+        return CapabilityRequirements(
+            needs_character_reference=need.needs_identity_reference,
+            needs_scene_reference=need.needs_scene_reference,
+            needs_first_frame=need.needs_first_frame,
+            needs_last_frame=need.needs_last_frame,
+            needs_terminal_reference=need.needs_terminal_reference,
+            needs_audio_native=need.needs_native_audio,
+            needs_continuity_state=need.needs_continuity_state,
+            max_reference_count=need.max_reference_count,
+            accepts_local_execution=need.accepts_local_execution,
+            accepts_remote_execution=need.accepts_remote_execution,
+        )
+
+    def model_dump(self, *args: object, **kwargs: object) -> dict[str, object]:
+        payload = super().model_dump(*args, **kwargs)
+        if self.planning_contract_version == "video-planner/2":
+            payload.pop("generation_requirement", None)
+            for legacy, public in (
+                ("legacy_generation_mode", "generation_mode"),
+                ("legacy_continuity_mode", "continuity_mode"),
+                ("legacy_motion_requirement", "motion_requirement"),
+                ("legacy_required_asset_roles", "required_asset_roles"),
+                ("legacy_capability_requirements", "capability_requirements"),
+            ):
+                payload[public] = payload.pop(legacy)
+        else:
+            for field in (
+                "legacy_generation_mode",
+                "legacy_continuity_mode",
+                "legacy_motion_requirement",
+                "legacy_required_asset_roles",
+                "legacy_capability_requirements",
+            ):
+                payload.pop(field, None)
+        return payload
 
     @classmethod
     def create(cls, **values: object) -> "VideoGenerationPlan":
@@ -250,8 +447,5 @@ class VideoGenerationPlan(StrictModel):
         payload["plan_hash"] = _UNSEALED_HASH
         draft = cls.model_validate(payload)
         plan_hash = _canonical_hash_without(draft, "plan_hash")
-        return cls.model_validate(
-            draft.model_copy(update={"plan_hash": plan_hash}).model_dump(
-                mode="python"
-            )
-        )
+        payload["plan_hash"] = plan_hash
+        return cls.model_validate(payload)

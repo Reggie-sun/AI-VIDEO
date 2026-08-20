@@ -28,6 +28,12 @@ from ai_video.production.video import (
     VideoFetchReceipt,
     build_video_paid_permit_binding,
 )
+from ai_video.production.shot_router import ProviderBoundVideoRequest
+from ai_video.production.video_compiler import (
+    ProviderRequestCompilationResult,
+    compile_provider_video_request,
+)
+from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
 
 
 @dataclass(frozen=True)
@@ -91,6 +97,19 @@ class ScriptedFakeVideoProvider:
     def capabilities(self) -> VideoProviderCapabilities:
         self._capabilities_calls += 1
         return self._capabilities
+
+    def compile_request(
+        self,
+        provider_bound: ProviderBoundVideoRequest,
+        requirement: ProviderNeutralVideoRequirement,
+    ) -> ProviderRequestCompilationResult:
+        return compile_provider_video_request(
+            provider_bound=provider_bound,
+            requirement=requirement,
+            compiler_id="fake-video-compiler",
+            compiler_version="1",
+            capabilities=self._capabilities,
+        )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
         self._resolve_calls += 1

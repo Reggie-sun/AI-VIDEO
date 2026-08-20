@@ -61,6 +61,12 @@ from ai_video.production.video import (
     VideoProviderTaskBinding,
     build_video_paid_permit_binding,
 )
+from ai_video.production.shot_router import ProviderBoundVideoRequest
+from ai_video.production.video_compiler import (
+    ProviderRequestCompilationResult,
+    compile_provider_video_request,
+)
+from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
 
 
 ARK_API_KEY_REFERENCE = "ARK_API_KEY"
@@ -278,6 +284,19 @@ class SeedanceVideoProvider:
 
     def capabilities(self) -> VideoProviderCapabilities:
         return self._capabilities
+
+    def compile_request(
+        self,
+        provider_bound: ProviderBoundVideoRequest,
+        requirement: ProviderNeutralVideoRequirement,
+    ) -> ProviderRequestCompilationResult:
+        return compile_provider_video_request(
+            provider_bound=provider_bound,
+            requirement=requirement,
+            compiler_id="seedance-video-compiler",
+            compiler_version="1",
+            capabilities=self._capabilities,
+        )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
         if (
