@@ -1,374 +1,213 @@
-# Shot Quality Gate + Video Quality Gate — Integration Guide (v2)
+# Shot Readiness Gate — Integration v3
 
-Audience: Main Agent / Codex authors and `ProductionStateCommitter` maintainers who want a cheap, typed safety net before / after Provider calls without changing canonical ownership.
+Status: proposed integration contract; no runtime implementation in this docs slice
 
-Status: paired with `requirements.md` + `design.md` + `tasks.md`.
+Audience: Main Agent/planning maintainers
 
-## 1. Why this module exists
+## INT-01 — Ready Current Plan
 
-AI-VIDEO Production is canonical owner of Manifest, Asset Registry, Timeline, Provider selection, and Review. Gates do **not** replace any of those. They exist to:
-
-- **Save Provider budget** by rejecting structurally flawed Shots before any Provider call.
-- **Save reviewer attention** by surfacing obvious deliverable defects right after fetch, before P6 Review.
-- **Surface structural sanity** of fetched Provider receipts (hash + content type), independent of Provider's own claims.
-
-A gate produces a typed `*QualityReceipt` that callers own. The committer may accept the receipt as an optional handoff parameter and store its `content_hash` on the attempt state — losing the receipt loses no canonical truth (committer only stores the hash; the full receipt stays with the caller).
-
-## 2. Scope (revised after Codex review)
-
-v2 ships only:
-
-| Gate | Checks |
-|---|---|
-| `ShotQualityGate` | `IDENTITY_ANCHOR`, `STRATEGY`, `COMPLEXITY` |
-| `VideoQualityGate` | `RECEIPT_INTEGRITY`, `CONTENT_TYPE_BINDING` |
-
-Continuity, capability binding, multi-usage reference detection, scene reference warning, and VLM `IDENTITY_DRIFT` are deferred to D1–D5 in [tasks.md](tasks.md#out-of-scope-tasks-deferred).
-
-## 3. When to call
-
-| Gate | Call site | Skip when |
-|---|---|---|
-| `ShotQualityGate.evaluate` | After `VideoPlanner.plan(...)` returns `PROPOSED`, before any `commit_video_generation` / Provider submission | Shot's `visual_strategy` is `EXISTING_VIDEO` or `STATIC_IMAGE` |
-| `VideoQualityGate.evaluate` | After `FetchedVideoCandidate` is in hand, before `commit_video_activation` | Shot's `visual_strategy` is `STATIC_IMAGE` |
-
-Skipping a gate is allowed. The committer accepts `None` for both handoff parameters.
-
-## 4. Public surface
+The Main Agent freshly rebuilds the current `VideoPlanningRequest` from canonical Shot, asset binding, Review decision, and policy projections, then asks the accepted Video Planner for a plan.
 
 ```python
-from ai_video.quality_gates import (
-    ShotQualityGate,
-    VideoQualityGate,
-    ShotQualityGateRequest,
-    ShotQualityReceipt,
-    VideoQualityGateRequest,
-    VideoQualityReceipt,
-    GateStatus,
-    ShotCheckId,
-    VideoCheckId,
-    BlockedReason,
-    GateWarning,
+current_request = VideoPlanningRequest.create(
+    request_id="planner-shot-7-current",
+    target_shot=current_shot,
+    character_context=current_characters,
+    scene_context=current_scene,
+    available_assets=current_assets,
+    previous_shot_state=current_previous_state,
+    shot_intent_evidence=current_intent_evidence,
+    review_decision=current_review_projection,
+    production_policy=current_policy,
+    planning_contract_version="video-planner/2",
 )
-```
+plan = VideoPlanner().plan(current_request)
 
-Only `ShotQualityGate.evaluate` and `VideoQualityGate.evaluate` are callable. Everything else is data.
-
-## 5. Call pattern
-
-```python
-from ai_video.quality_gates import ShotQualityGate, VideoQualityGate
-
-# pre-generation
-shot_receipt = ShotQualityGate().evaluate(shot_request, receipt_id="sq-shot-7-attempt-1")
-# → ShotQualityReceipt (sealed VersionedArtifact, content-hashed)
-
-# post-fetch
-video_receipt = VideoQualityGate().evaluate(video_request, receipt_id="vq-shot-7-fetched")
-# → VideoQualityReceipt (sealed VersionedArtifact, content-hashed)
-```
-
-No constructor arguments. No async. Sync only. `receipt_id` is required (or auto-derived as `f"{gate_name}-{request_content_hash[:16]}"`).
-
-## 6. Shot Quality Gate integration
-
-### 6.1 Minimal example
-
-```python
-from ai_video.quality_gates import ShotQualityGate, ShotQualityGateRequest
-
-request = ShotQualityGateRequest.create(
-    request_id="sqg-shot-7-attempt-1",
-    target_shot=project.shots["shot-7"],
-    character_context=tuple(
-        project.characters[c] for c in project.shots["shot-7"].character_ids
-    ),
-    scene_context=project.scenes[project.shots["shot-7"].scene_id],
-    available_assets=tuple(
-        AvailableAsset(
-            role=asset.role,
-            asset_id=asset.asset_id,
-            asset_sha256=asset.sha256,
-            canonical_owner_id=asset.canonical_owner_id,
-            mime_type=asset.mime_type,
-        )
-        for asset in registry.assets_for_shot("shot-7")
-    ),
-    video_generation_plan=planner_plan,  # may be None
-    contract_version="shot-quality-gate/1",
+readiness_request = ShotReadinessRequest.create(
+    request_id="readiness-shot-7-attempt-1",
+    current_request=current_request,
+    plan=plan,
+    contract_version="shot-readiness-gate/1",
 )
-
-receipt = ShotQualityGate().evaluate(request, receipt_id="sq-shot-7-attempt-1")
+result = ShotReadinessGate().evaluate(readiness_request)
+require_ready(result)
 ```
 
-### 6.2 Reading the receipt
-
-```python
-match receipt.status:
-    case GateStatus.PASS:
-        # proceed to committer; attach receipt as handoff if desired
-        ...
-    case GateStatus.WARNING:
-        # proceed but record GateWarning items as receipt-side evidence
-        ...
-    case GateStatus.BLOCKED:
-        # do NOT proceed; inspect BlockedReason and either
-        #   (a) re-author Shot intent, (b) gather missing assets, or (c) escalate
-        ...
-    case GateStatus.NOT_EVALUATED:
-        # proceed only if caller policy allows un-evaluated evidence; record gap
-        ...
-```
-
-`receipt.content_hash` is stable per `request_content_hash` + `receipt_id`; use it to dedupe re-evaluations.
-
-### 6.3 What callers MUST NOT do
-
-- Do **not** write the receipt into Manifest, Asset Registry, or Timeline.
-- Do **not** assume a `PASS` proves the Video is good (P6 Review still owns acceptance).
-- Do **not** retry the gate with mutated inputs to "force" a different status.
-- Do **not** treat `NOT_EVALUATED` as `PASS` silently — the gap must be recorded.
-
-## 7. Video Quality Gate integration
-
-### 7.1 Minimal example
-
-```python
-from ai_video.quality_gates import VideoQualityGate, VideoQualityGateRequest
-
-request = VideoQualityGateRequest.create(
-    request_id="vqg-shot-7-fetched",
-    target_shot=project.shots["shot-7"],
-    video_generation_plan=planner_plan,
-    fetched_candidate=fetched_candidate,  # from video_generation.VideoGenerationService
-    contract_version="video-quality-gate/1",
-)
-
-receipt = VideoQualityGate().evaluate(request, receipt_id="vq-shot-7-fetched")
-```
-
-### 7.2 Reading the receipt
-
-Same `match` pattern as Shot Quality Gate. Key behaviors:
-
-- `RECEIPT_INTEGRITY` failures are deterministic and should be treated as fatal for this candidate.
-- `CONTENT_TYPE_BINDING` BLOCKED is fatal only if the Provider declared an expected type and broke it.
-
-### 7.3 What callers MUST NOT do
-
-- Do **not** mark the candidate `activated` when `status == BLOCKED`.
-- Do **not** write the receipt into Manifest or any durable artifact.
-- Do **not** call the gate from inside `ProductionStateCommitter` writes (gates are caller-side; committer reads the receipt, never invokes the gate).
-
-## 8. Comitter handoff
-
-The committer accepts `*QualityReceipt` as **optional** parameters on existing methods.
-
-### 8.1 Passing a PASS receipt
-
-```python
-committer.begin_video_generation(
-    attempt_id="va-shot-7",
-    request=resolved_request,
-    pre_submit_gate_receipt=shot_receipt,   # receipt with status != BLOCKED
-)
-
-# ... fetch happens ...
-
-committer.commit_video_activation(
-    attempt_id="va-shot-7",
-    post_fetch_gate_receipt=video_receipt,  # receipt with status != BLOCKED
-)
-```
-
-After successful handoff:
-
-- `attempt.pre_submit_gate_receipt_hash == shot_receipt.content_hash`
-- `attempt.post_fetch_gate_receipt_hash == video_receipt.content_hash`
-
-### 8.2 Passing a BLOCKED receipt
-
-```python
-blocked_receipt = VideoQualityGate().evaluate(request_with_bad_receipt, receipt_id="vq-1")
-assert blocked_receipt.status == GateStatus.BLOCKED
-
-with pytest.raises(AiVideoError) as exc:
-    committer.commit_video_activation(
-        attempt_id="va-shot-7",
-        post_fetch_gate_receipt=blocked_receipt,
-)
-assert exc.value.code == ErrorCode.PRODUCTION_STATE_INVALID
-```
-
-The committer refuses to activate. Caller must fix root cause and retry from a fresh receipt.
-
-### 8.3 Omitting the receipt
-
-```python
-committer.begin_video_generation(
-    attempt_id="va-shot-7",
-    request=resolved_request,
-    # pre_submit_gate_receipt omitted → defaults to None
-)
-```
-
-Comitter proceeds exactly as today. `pre_submit_gate_receipt_hash` stays `None` on the attempt state.
-
-## 9. Worked example: Alice walks out of cafe, missing reference
-
-### Setup
-
-- `shot-7`, intent `"Alice walks out of cafe."`, `visual_strategy=GENERATED_VIDEO`, `character_ids=("alice",)`.
-- Asset Registry has `ref-cafe` (SCENE_REFERENCE) but **no** `ref-alice`.
-
-### Request
-
-```python
-request = ShotQualityGateRequest.create(
-    request_id="sqg-shot-7",
-    target_shot=project.shots["shot-7"],
-    character_context=(project.characters["alice"],),
-    scene_context=project.scenes["scene-cafe"],
-    available_assets=(
-        AvailableAsset(role=AssetRole.SCENE_REFERENCE, asset_id="ref-cafe", asset_sha256=HASH_A, canonical_owner_id=None, mime_type="image/png"),
-    ),
-    video_generation_plan=planner_plan,
-    contract_version="shot-quality-gate/1",
-)
-```
-
-### Expected receipt (illustrative JSON)
+Illustrative result:
 
 ```json
 {
-  "artifact_id": "sq-shot-7",
-  "revision": 1,
-  "content_hash": "8b7c...64hex",
-  "creation_receipt_id": "sq-shot-7",
-  "receipt_id": "sq-shot-7",
-  "gate_name": "shot_quality_gate",
-  "gate_version": "shot-quality-gate/1",
-  "status": "blocked",
+  "source_readiness_request_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "status": "ready",
   "checks": [
     {
-      "check_id": "identity_anchor",
-      "severity": "blocked",
-      "reason_codes": ["missing_identity_anchor"],
+      "check_id": "request_plan_binding",
+      "severity": "pass",
+      "reasons": [],
       "payload": {
-        "character_ids": ["alice"],
-        "character_reference_asset_ids": [],
-        "matched_owner_ids": []
-      },
-      "message": "Important character 'alice' has no approved character reference asset whose canonical_owner_id matches the target character."
+        "readiness_request_seal_valid": true,
+        "request_seal_valid": true,
+        "plan_seal_valid": true,
+        "plan_id_valid": true,
+        "source_request_matches": true,
+        "target_shot_id_matches": true,
+        "target_shot_revision_matches": true,
+        "target_shot_content_hash_matches": true,
+        "contract_versions_supported": true
+      }
     },
     {
-      "check_id": "strategy",
+      "check_id": "plan_eligibility",
       "severity": "pass",
-      "reason_codes": [],
-      "payload": {"plan_outcome": "proposed", "generation_mode": "reference_to_video", "has_important_character": true},
-      "message": "Strategy check passed."
+      "reasons": [],
+      "payload": {
+        "plan_outcome": "proposed",
+        "unresolved_human_review": false,
+        "warnings": []
+      }
     },
     {
-      "check_id": "complexity",
+      "check_id": "required_asset_readiness",
       "severity": "pass",
-      "reason_codes": [],
-      "payload": {"intent_word_count": 5, "directive_count": 0, "intent_limit": 24, "directive_limit": 4},
-      "message": "Complexity within limits."
+      "reasons": [],
+      "payload": {
+        "required_roles": ["character_reference", "scene_reference"],
+        "ready_roles": ["character_reference", "scene_reference"],
+        "missing_roles": []
+      }
     }
   ],
-  "blocked_reasons": ["missing_identity_anchor"],
-  "warnings": []
+  "blocked_reasons": [],
+  "contract_version": "shot-readiness-gate/1",
+  "result_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 }
 ```
 
-### Caller interpretation
+`READY` authorizes only entry into existing Production gates. It is not generation, selection, activation, Review PASS, human creative PASS, or Final Acceptance.
 
-- `status == BLOCKED` → **do not** submit to Provider.
-- `MISSING_IDENTITY_ANCHOR` is the actionable reason; trigger Asset import workflow or re-author the Shot intent.
-- Optionally hand the BLOCKED receipt to committer — committer will refuse and raise `AiVideoError(PRODUCTION_STATE_INVALID)`.
+## INT-02 — Stale or Blocked Plan Stops
 
-## 10. Worked example: fetched video with bad receipt hash
+If current asset binding, Review decision, policy, Shot revision, or any other semantic input changes, the Main Agent rebuilds `current_request`. An old plan then fails source binding.
 
-### Setup
+```python
+result = ShotReadinessGate().evaluate(
+    ShotReadinessRequest.create(
+        request_id="readiness-shot-7-after-edit",
+        current_request=fresh_current_request,
+        plan=old_plan,
+        contract_version="shot-readiness-gate/1",
+    )
+)
 
-`FetchedVideoCandidate` whose `VideoFetchReceipt.fetch_fingerprint` was tampered or doesn't match the canonical payload.
+assert result.status is ReadinessStatus.BLOCKED
+assert ReadinessBlockedReason.PLAN_SOURCE_STALE in result.blocked_reasons
+require_ready(result)  # raises PLANNING_PREFLIGHT_BLOCKED
+```
 
-### Expected receipt (illustrative JSON)
+The same STOP applies when the planner itself returned `BLOCKED` or still carries `REQUIRES_HUMAN_REVIEW`. The readiness gate reports that fact; it does not reinterpret or repair it.
+
+Illustrative blocked fragment:
 
 ```json
 {
-  "artifact_id": "vq-shot-7-fetched",
-  "revision": 1,
-  "content_hash": "fe29...64hex",
-  "creation_receipt_id": "vq-shot-7-fetched",
-  "receipt_id": "vq-shot-7-fetched",
-  "gate_name": "video_quality_gate",
-  "gate_version": "video-quality-gate/1",
   "status": "blocked",
+  "blocked_reasons": ["plan_source_stale"],
   "checks": [
     {
-      "check_id": "receipt_integrity",
+      "check_id": "request_plan_binding",
       "severity": "blocked",
-      "reason_codes": ["receipt_hash_mismatch"],
+      "reasons": ["plan_source_stale"],
       "payload": {
-        "receipt_kind": "video",
-        "fetch_fingerprint_matches": false,
-        "submission_observation_linked": true,
-        "artifact_sha256_well_formed": true
-      },
-      "message": "Video fetch receipt seal does not match canonical payload; possible tampering."
+        "readiness_request_seal_valid": true,
+        "request_seal_valid": true,
+        "plan_seal_valid": true,
+        "plan_id_valid": true,
+        "source_request_matches": false,
+        "target_shot_id_matches": true,
+        "target_shot_revision_matches": true,
+        "target_shot_content_hash_matches": true,
+        "contract_versions_supported": true
+      }
     }
-  ],
-  "blocked_reasons": ["receipt_hash_mismatch"],
-  "warnings": []
+  ]
 }
 ```
 
-### Caller interpretation
+The fragment omits the other required checks and hash only for readability; a valid result always contains all three canonical outcomes.
 
-- `status == BLOCKED` → **do not** call `commit_video_activation`.
-- Caller may retry the Provider call (subject to budget/policy gates) or escalate.
-- If caller accidentally hands this receipt to committer, committer raises `AiVideoError(PRODUCTION_STATE_INVALID)`.
+## INT-03 — Missing Current Asset Stops
 
-## 11. Failure modes callers must handle
+The gate checks only roles already declared by the plan. It does not decide that a role should have been required.
 
-| Failure | Source | What caller does |
-|---|---|---|
-| `pydantic.ValidationError` on request | Caller passed malformed inputs | Fix inputs; do not retry |
-| `receipt.status == BLOCKED` | Gate detected a hard failure | Do not proceed; fix root cause |
-| `receipt.status == NOT_EVALUATED` | Required input was missing | Record gap; advance only if policy allows |
-| `receipt.content_hash` changes between attempts | Inputs changed | Re-evaluate with new request; do not assume determinism across content edits |
-| `AiVideoError(PRODUCTION_STATE_INVALID)` from committer | Handed a BLOCKED receipt | Fix root cause; do not retry with same receipt |
-| Forbidden field rejection | Caller code tried to inject forbidden keys | Fix caller code; gates are read-only types |
+```python
+plan.required_asset_roles
+# -> CHARACTER_REFERENCE, SCENE_REFERENCE
 
-## 12. Ordering relative to other AI-VIDEO components
+current_request.available_assets
+# -> current SCENE_REFERENCE only
 
-```
-Main Agent
-  ├─ hell-grind-aigc-skill   (creative intent, continuity state)
-  ├─ higgsfield              (model-specific prompt adaptation; advisory)
-  ├─ VideoPlanner.plan       (generation strategy; provider-neutral)
-  ├─ ShotQualityGate.evaluate  ◀── NEW (before gen)
-  ├─ ProductionStateCommitter.begin_video_generation(..., pre_submit_gate_receipt=?)
-  ├─ VideoProvider
-  ├─ VideoQualityGate.evaluate  ◀── NEW (after fetch)
-  ├─ ProductionStateCommitter.commit_video_activation(..., post_fetch_gate_receipt=?)
-  └─ production.review (P6)
+result = ShotReadinessGate().evaluate(readiness_request)
+assert result.status is ReadinessStatus.BLOCKED
+
+assets = next(
+    check
+    for check in result.checks
+    if check.check_id is ShotReadinessCheckId.REQUIRED_ASSET_READINESS
+)
+assert assets.payload.missing_roles == (AssetRole.CHARACTER_REFERENCE,)
 ```
 
-Gates do not import Production; committer may optionally import gate types for the handoff.
+Wrong owners and wrong final-visual bindings are treated as missing readiness. The caller must fix canonical assets/Review evidence and rebuild a fresh planning request; it must not mutate the ephemeral result.
 
-## 13. Migration & rollout
+## INT-04 — Compatibility and Downstream Route
 
-- Slice is additive; no existing module breaks.
-- Land as a single PR per the two-PR plan in [tasks.md](tasks.md) (T1–T12 + T13 → PR1; T14–T18 → PR2).
-- Old flow remains valid: callers may skip gates; committer may receive `None` for both handoff parameters.
+Existing callers may keep using:
 
-## 14. References
+```python
+prepare_shot_for_existing_production(
+    current_request=current_request,
+    plan=plan,
+    production_handoff=existing_handoff,
+)
+```
 
-- `requirements.md` — acceptance criteria
-- `design.md` — module design, schemas, algorithm
-- `tasks.md` — staged implementation plan
-- `test-spec.md` — full test cases
-- `src/ai_video/quality_gates/` — module (post-merge)
-- `tests/test_quality_gates.py` and `tests/test_state_commit_gate_receipt.py` — tests (post-merge)
+After the future implementation, the internal route is:
+
+```text
+prepare_shot_for_existing_production
+  -> require_current_video_plan                # compatibility wrapper
+  -> ShotReadinessRequest.create
+  -> ShotReadinessGate.evaluate
+  -> require_ready
+  -> existing_handoff only when READY
+```
+
+On any block, Router, Provider, placeholder/materializer, composition, and render are not invoked.
+
+After handoff, existing owners remain unchanged:
+
+```text
+existing Router / Provider
+  -> VideoGenerationService submit/poll/fetch
+  -> typed fetch receipt + committer durable linkage
+  -> prepare_video_activation_candidate
+  -> activate_video_candidate
+  -> composition/render when selected by existing flow
+  -> P6 Review / Repair
+  -> human Pilot Reality Gate / Final Acceptance
+```
+
+There is no post-fetch `VideoQualityGate`, `commit_video_activation()`, readiness receipt handoff, or Manifest readiness hash in v3.
+
+## Caller Rules
+
+- MUST rebuild current planning projections from canonical owners before evaluation.
+- MUST use the exact plan paired with the current request hash.
+- MUST stop on `BLOCKED`; changing only diagnostic `request_id` cannot make a result ready.
+- MUST NOT treat a result as Registry, Manifest, Review, activation, provenance, or delivery evidence.
+- MUST NOT call a Provider, retry, repair, or persist state from inside gate evaluation.
+- MUST send subjective/semantic/media-quality questions to existing P6 Review/Pilot owners.
+
+## No Migration in v3
+
+The runtime slice described here is a pure Main Agent/planning-side compatibility migration. It changes no Production schema, Manifest version, committer API, recovery path, Provider request, artifact layout, CLI, timeline, renderer, or Review contract.

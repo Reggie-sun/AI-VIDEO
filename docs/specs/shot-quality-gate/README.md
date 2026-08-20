@@ -1,86 +1,70 @@
-# Shot Quality Gate + Video Quality Gate — Slice
+# Shot Readiness Gate — Slice v3
 
-Status: spec draft v2 (revised after Codex review; scope reduced)
-Owner: AI-VIDEO Production Harness extension (provider-neutral, advisory)
+Status: proposed v3 specification; docs only; no runtime implementation accepted
 
-This slice adds **two** typed **quality gates** that sit *adjacent* to AI-VIDEO Production — **not inside** it. They are the cheapest reliable way to catch obvious mistakes before/after video generation without changing canonical ownership.
+Owner: Main Agent planning-side pre-submit readiness
 
-## 1. Why this slice exists (revised scope)
+本 slice 将 v2 的两个“quality gate”收敛为一个 provider-neutral `ShotReadinessGate`。它消费 current sealed `VideoPlanningRequest` 与已生成的 `VideoGenerationPlan`，在任何 Router、Provider、placeholder/materializer、composition 或 render 调用前给出 deterministic `READY | BLOCKED` 结果。
 
-The first draft (v1) tried to cover continuity, capability binding, multi-usage reference detection, and a VLM `IDENTITY_DRIFT` slot. Codex review (SCORE 2/10) showed that several of those checks required schema fields that don't exist on `FetchedVideoCandidate` or `PreviousShotState`, and would have duplicated ownership that already lives in Review/Repair.
+它不重新推导 `VideoPlanner` 的 strategy、continuity、motion 或 capability truth，也不判断 identity drift、动作自然度、跨 Shot continuity、主观画质或 Final Acceptance。上述 perceptual/semantic quality 仍归 P6 Review 与 human Pilot Reality Gate。
 
-This v2 reduces scope to **only what current types allow**:
+## Documents
 
-| Gate | Checks (deterministic only) |
-|---|---|
-| **Shot Quality Gate** | `IDENTITY_ANCHOR`, `STRATEGY`, `COMPLEXITY` |
-| **Video Quality Gate** | `RECEIPT_INTEGRITY`, `CONTENT_TYPE_BINDING` |
+1. [requirements.md](requirements.md) — scope、requirements、acceptance 与 traceability。
+2. [design.md](design.md) — decision ledger、schemas、algorithm、owner migration 与 Harness routing contract。
+3. [tasks.md](tasks.md) — T1–T8 的 RED-first implementation plan 和 deferred slices。
+4. [test-spec.md](test-spec.md) — TC-01–TC-20 executable test contract。
+5. [integration.md](integration.md) — Main Agent STOP integration 与 current Production route。
 
-The dropped checks (continuity, capability binding, multi-usage reference, VLM `IDENTITY_DRIFT`, scene reference warning, complexity warning) are deferred to D1–D5 in [tasks.md](tasks.md#out-of-scope-tasks-deferred) for when the underlying types are extended or new typed seams exist.
+## v3 Decision Summary
 
-## 2. Documents (read in order)
+| Disposition | Check / seam | Canonical owner / rationale |
+| --- | --- | --- |
+| Keep, rename, and make typed | current plan readiness | `ShotReadinessGate`; replaces the decision body currently inside `require_current_video_plan()` |
+| Keep | current request/plan/Shot binding | Gate consumes existing seals and identities; it does not invent canonical truth |
+| Keep | required asset readiness | Gate checks only roles already declared by the accepted plan against the current request projection |
+| Remove | v2 `STRATEGY` re-derivation | `VideoPlanner` already owns strategy coherence |
+| Remove | v2 `COMPLEXITY` | `intent.split()` is not deterministic multilingual semantics and has no canonical typed owner |
+| Remove | `RECEIPT_INTEGRITY` | typed fetch receipt validation and durable reopen already own the seal |
+| Remove | `CONTENT_TYPE_BINDING` | `VideoFetchReceipt.create()` already checks the durable expected content type; the receipt has no submission projection to re-resolve it |
+| Remove from v3 | post-fetch `VideoQualityGate` | no non-duplicative fully projected structural check currently exists |
+| Remove from v3 | committer parameters and Manifest hash fields | a pure pre-submit slice has no writer or schema seam |
+| Defer | receipt persistence | only as a separately approved Manifest migration with version/reopen/compatibility/recovery contracts |
+| Defer | future post-fetch structural projection | only after a real gap exists outside fetch constructor/committer/Review owners |
 
-1. [requirements.md](requirements.md) — WHAT and WHY. Acceptance criteria, scope, forbidden responsibilities.
-2. [design.md](design.md) — HOW. Package layout, schemas, algorithm, public surface, test plan.
-3. [tasks.md](tasks.md) — Phased implementation plan (T1–T12). TDD-first.
-4. [test-spec.md](test-spec.md) — Full test cases (Cases 1–7 + determinism + forbidden-field + architecture gate).
-5. [integration.md](integration.md) — How callers consume the gates; worked JSON examples.
+## Planned Runtime Surface
 
-## 3. Planned code (post-merge)
+The future implementation slice may add:
 
 - `src/ai_video/quality_gates/__init__.py`
-- `src/ai_video/quality_gates/_gate_models.py`
-- `src/ai_video/quality_gates/shot_quality_gate.py`
-- `src/ai_video/quality_gates/video_quality_gate.py`
-- `tests/test_quality_gates.py`
-- `tests/fixtures/quality_gates_factory.py`
+- `src/ai_video/quality_gates/_readiness_models.py`
+- `src/ai_video/quality_gates/shot_readiness_gate.py`
+- `src/ai_video/planning/_asset_readiness.py` (single extracted owner for existing role-readiness semantics)
+- `tests/fixtures/shot_readiness_factory.py`
+- `tests/test_shot_readiness_gate.py`
 
-Plus three minimal Production-side seams (all optional, additive, no breakage of existing call sites):
+It must also convert `planning.require_current_video_plan()` into a compatibility wrapper that delegates to the gate and preserves `ErrorCode.PLANNING_PREFLIGHT_BLOCKED`. It must not leave two readiness algorithms.
 
-- `src/ai_video/production/_lifecycle_schema.py` — add two optional fields to `VideoGenerationAttemptState`.
-- `src/ai_video/production/_state_commit_video.py` — add two optional parameters to existing committer methods.
-- `src/ai_video/production/_state_commit_gate_receipt.py` — small helper to validate gate receipt hashes.
+## Boundary at a Glance
 
-## 4. Boundary at a glance
+| Concern | Sole owner |
+| --- | --- |
+| Character / Scene / Shot truth | `ProductionProject` creative artifacts |
+| Asset identity, provenance, and active binding | Asset Registry + canonical Shot roles |
+| Strategy, continuity, motion, required roles, and capability proposal | `VideoPlanner` |
+| Pre-submit current-plan readiness and STOP decision | `ShotReadinessGate` |
+| Provider selection/execution and fetched candidate lifecycle | existing AI-VIDEO Router / Provider / `ProductionStateCommitter` |
+| Manifest writes, activation, and recovery | `ProductionStateCommitter` |
+| Timing and render | `ResolvedTimeline` + HyperFrames |
+| Semantic/perceptual QA, repair, and Final Acceptance | P6 Review / Repair + human Pilot Reality Gate |
 
-| Concern | Owner |
-|---|---|
-| Creative intent | Codex + Character / Scene / Shot |
-| Project schema | `ProductionProject` |
-| Asset identity | Asset Registry |
-| Manifest lifecycle | `ProductionStateCommitter` |
-| Provider selection | AI-VIDEO Provider Router |
-| Default render | `HyperFrames` |
-| QA / Repair | AI-VIDEO Review / Repair |
-| Generation strategy hint | `VideoPlanner` |
-| **Pre-gen shot validation** | **`ShotQualityGate` (NEW)** |
-| **Post-fetch receipt validation** | **`VideoQualityGate` (NEW)** |
-| **Optional gate-receipt handoff into committer** | **`committer` (extended; gate receipt stays side-receipt, not Manifest owner)** |
+`READY` only means that the current sealed plan is eligible to enter existing Production gates. It does not mean generated, selected, activated, reviewed, quality-accepted, or finally accepted.
 
-`ShotQualityGate` and `VideoQualityGate` are the only NEW logic owners. They produce **typed receipts** that callers may pass into the committer as advisory inputs; the committer never *requires* a receipt and never *writes* one. Losing a gate receipt loses no canonical truth.
+## Status and Count
 
-## 5. Relationship to existing Review/Repair
-
-- **P6 Review** (`production.review`) decides *final acceptance* of the rendered timeline based on collected QA evidence.
-- **Shot/Video Quality Gates** decide *whether to spend the next call* (pre-gen) and *whether the fetched receipt is structurally consistent* (post-fetch). They are advisory and disposable.
-- Gates **never** substitute for Review; they only produce structural pre-checks and may raise a `BLOCKED` status that the caller must respect.
-- Gate results **do not flow** into `ReviewEvidence` (which is render-bound). They flow into Manifest as **optional hash pointers** (no payload duplication), and the full receipt is owned by the caller.
-
-## 6. Explicitly out of scope (this slice)
-
-- Creating a second Review system.
-- Replacing `production.review.adjudicate_review_evidence` or `evaluate_final_acceptance`.
-- Writing Manifest, Asset Registry, Timeline, or any durable artifact (gate receipts are caller-side; committer stores only their hashes if supplied).
-- Choosing a Provider, selecting a Profile, fetching Provider capabilities.
-- Calling H3 / Hailuo / Seedance / ComfyUI / any video provider.
-- VLM/Human evaluator deployments. **No** `IDENTITY_DRIFT` or story-alignment check ships in this slice.
-- Continuity or capability binding checks (deferred — require schema additions and ownership clarification).
-- Automatic repair, retry, or remediation.
-- LangGraph / new Agent Runtime / MCP server.
-- New dependency graph schema.
-
-## 7. Status of this slice
-
-- Specs: v2 written after Codex review. Scope reduced to 3 + 2 deterministic checks.
-- Implementation: not started. Run T1–T12 per `tasks.md` after spec approval.
-- Tests: drafted alongside spec; will execute against the implemented module.
+- Specification: proposed v3, internally paired across all six documents.
+- Runtime implementation: not started by this docs-only task.
+- Implementation tasks: T1–T8 exactly.
+- Executable cases planned: TC-01–TC-20 exactly.
+- Deferred sections: D1–D2 only; neither is part of v3 acceptance.
+- Provider calls, media generation, Manifest migration, policy edits, and runtime code changes: absent from this revision.

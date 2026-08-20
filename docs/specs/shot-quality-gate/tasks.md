@@ -1,316 +1,137 @@
-# Shot Quality Gate + Video Quality Gate — Tasks (v2)
+# Shot Readiness Gate — Tasks v3
 
-Status: implementation plan v2 (paired with `requirements.md` + `design.md`)
-Approach: TDD-first, staged by risk / dependency. Scope reduced to 3 + 2 deterministic checks per Codex review.
+Status: implementation plan for the proposed runtime slice
 
-Each task is small enough to land in one PR (≤ 1 day of focused work). Tests are written first.
+Approach: RED-first, one readiness owner, no Provider or lifecycle writes
 
-## Sequencing rationale
+There are exactly eight implementation tasks. This docs-only revision executes none of them.
 
-```
-T1 schema baseline ─┬─ T2 typed payload classes ─┐
-                    ├─ T3 receipt classes (VersionedArtifact) ──┐
-                    ├─ T4 forbidden-field guards ──────────────┤
-                                                              ├─ T5 status aggregation helper
-                                                              ├─ T6 Shot IDENTITY_ANCHOR
-                                                              ├─ T7 Shot STRATEGY
-                                                              └─ T8 Shot COMPLEXITY
-                                                                                  │
-                                                                                  ├─ T9 Video RECEIPT_INTEGRITY
-                                                                                  └─ T10 Video CONTENT_TYPE_BINDING
-                                                                                                  │
-                                                                                                  ▼
-                                                                       T11 determinism tests
-                                                                       T12 architecture import gate
-                                                                       T13 committer seam helper
-                                                                       T14 optional fields on attempt state
-                                                                       T15 optional params on committer methods
-                                                                       T16 integration doc + example
-                                                                       T17 end-to-end test
-                                                                       T18 final review + acceptance
+## Problem Boundary Before Implementation
+
+- Problem: the existing `require_current_video_plan()` has correct STOP semantics but returns only first-error exceptions, while v2 proposed duplicate and invalid post-fetch/lifecycle checks.
+- Single target owner: `ShotReadinessGate` for typed current-plan eligibility.
+- Old path to retire: the decision body inside `require_current_video_plan()`; the public function remains a delegating compatibility wrapper.
+- Unchanged contract: Video Planner proposal truth, Product/Registry/Manifest/Review owners, `PLANNING_PREFLIGHT_BLOCKED`, zero-call STOP, and current Production activation path.
+- Focused verification: `python -m pytest -p no:cacheprovider tests/test_shot_readiness_gate.py tests/test_planning_video_planner.py tests/test_errors.py -q`.
+
+## Sequence
+
+```text
+T1 models + discriminator + hashes
+  -> T2 binding check
+  -> T3 eligibility check
+  -> T4 required asset readiness
+  -> T5 result aggregation + require_ready
+  -> T6 compatibility migration + old-body retirement
+  -> T7 architecture/Harness routing
+  -> T8 exact-snapshot verification and acceptance
 ```
 
-Foundation (T1–T4) unblocks parallel work on T5–T10. T11–T12 close the determinism and import surface. T13–T15 land the committer seam. T16–T18 land docs and full-suite verification.
+## T1 — RED Models, Discrimination, and Hashing
 
-## Tasks
+Deliver:
 
-### T1 — Schema baseline (foundational)
+- future package skeleton and `_readiness_models.py`;
+- enums, three payloads, three Literal-bound outcome models, discriminated union;
+- `ShotReadinessRequest.create()` exact three-field semantic projection;
+- `ShotReadinessResult.create()` seal and cross-field validation.
 
-Deliverables:
+Tests first: TC-11–TC-14 plus extra-field rejection.
 
-- `src/ai_video/quality_gates/__init__.py` (stub with docstring)
-- `src/ai_video/quality_gates/_gate_models.py`
-- Enums: `GateStatus`, `CheckSeverity`, `ShotCheckId`, `VideoCheckId`, `BlockedReason`, `GateWarning`
-- Models: `ShotQualityGateRequest`, `VideoQualityGateRequest`
-- All models `extra="forbid"`, `frozen=True`, `StrictModel` base
-- `request_content_hash` computed via `canonical_sha256`
+Acceptance: wrong payload combinations fail; diagnostic ids do not affect semantic/result hash.
 
-Tests: schema round-trip + `extra="forbid"` rejection.
+## T2 — Request/Plan Binding Check
 
-Acceptance: pytest passes for `test_quality_gates.py::test_schemas_baseline`.
+Deliver `_check_request_plan_binding()` for the exact D-04.1 booleans and ordered reasons, including recomputation of the outer readiness request seal. It must reuse accepted hashing helpers and must not call the planner.
 
-Effort: human ~2h, CC ~10min.
+Tests first: TC-01–TC-05.
 
-### T2 — Typed payload classes
+Acceptance: every forged/stale identity is blocked with deterministic reasons.
 
-Deliverables:
+## T3 — Plan Eligibility Check
 
-- `IdentityAnchorPayload`, `StrategyPayload`, `ComplexityPayload`
-- `ReceiptIntegrityPayload`, `ContentTypeBindingPayload`
-- All `extra="forbid"`, `frozen=True`, `StrictModel`
+Deliver `_check_plan_eligibility()` consuming only `outcome` and `warnings`.
 
-Tests: each payload rejects a forbidden key via `ValidationError`.
+Tests first: TC-06 and TC-07.
 
-Effort: human ~1h, CC ~5min.
+Acceptance: planner `BLOCKED` and unresolved human review stop; no strategy/confidence/capability re-derivation exists.
 
-### T3 — Receipt classes (VersionedArtifact)
+## T4 — Required Asset Readiness Check
 
-Deliverables:
+Deliver `_check_required_asset_readiness()` and extract the existing `_current_review`, exact final-visual binding, `_available_role`, and `_required_role_is_available` helpers into `src/ai_video/planning/_asset_readiness.py` as the one cycle-safe shared owner.
 
-- `ShotCheckOutcome`, `VideoCheckOutcome` (with discriminated `payload` typed correctly)
-- `ShotQualityReceipt(VersionedArtifact)`, `VideoQualityReceipt(VersionedArtifact)`
-- `create()` sealed classmethods
-- `content_hash` sealing via existing `seal_artifact` pattern
+Tests first: TC-08–TC-10.
 
-Tests: receipt `model_validate` round-trip; `create()` produces stable `content_hash`.
+Acceptance: Character/Scene/final-visual/terminal ownership stays exact; the gate checks only plan-declared roles; no duplicate helper remains.
 
-Effort: human ~2h, CC ~10min.
+## T5 — Gate Evaluation, Result Validation, and `require_ready`
 
-### T4 — Forbidden-field guard tests
+Deliver:
 
-Deliverables:
+- `ShotReadinessGate.evaluate()` returning all three canonical outcomes;
+- binary aggregation;
+- `require_ready()` seal/status validation and typed STOP conversion;
+- public exports limited to gate/data/require function.
 
-- `test_quality_gates.py::test_*_rejects_forbidden_field` parameterized
-- Forbidden list enforced (see design §4.5)
-- Tests cover both receipts + both outcomes + all 5 payloads
+Tests first: TC-15 and result-validator branches from TC-11–TC-13.
 
-Tests: 8 forbidden-field rejections.
+Acceptance: complete deterministic diagnostics, no short-circuit side effect, no warning/not-evaluated status.
 
-Effort: human ~30min, CC ~3min.
+## T6 — Compatibility Migration and Old-Path Retirement
 
-### T5 — Status aggregation helper
+Change only the planning-side consumer seam needed to establish a single owner:
 
-Deliverables:
+- convert `require_current_video_plan()` to delegate to `ShotReadinessGate` + `require_ready()`;
+- preserve signature, error code, non-retryability, and `prepare_shot_for_existing_production()` behavior;
+- remove the old duplicated binding/eligibility/asset decision body;
+- adapt current planning tests rather than weakening them.
 
-- `_aggregate_status(severities: tuple[CheckSeverity, ...]) -> GateStatus` implementing FR-3
-- Priority: BLOCKED > NOT_EVALUATED > WARNING > PASS
+Tests first: TC-16 and TC-17, including Router/Provider/materializer/composition/render spies.
 
-Tests: 7 cases (all single-severity + mixed).
+Acceptance: blocked path has zero downstream calls; ready path calls the existing handoff once.
 
-Effort: human ~30min, CC ~3min.
+## T7 — Architecture Boundary and Harness Routing
 
-### T6 — Shot check `IDENTITY_ANCHOR`
+Deliver in the same runtime commit:
 
-Deliverables:
+- import/no-IO Architecture tests from TC-18;
+- `.agent/harness/policy.yaml` check/category from D-07;
+- add `shot_readiness_gate_tests` to the existing `video_planning.check_ids` so T6 compatibility changes route to both suites;
+- `tests/test_agent_harness.py` routing proof from TC-19;
+- negative owner audit from TC-20 (no VideoQualityGate, committer/Manifest seam, receipt hash fields, or quality claims).
 
-- `_check_identity_anchor(target_shot, available_assets) -> ShotCheckOutcome`
-- Verifies `canonical_owner_id` matches target character (FR-4, design §5.2)
-- Environment shot (no characters) → `PASS`
-- Missing references OR mismatched owner → `BLOCKED`
+Acceptance: both quality-gate and planning compatibility paths route to the focused checks; policy change itself passes Harness tests.
 
-Tests: 4 cases (env, all-match, missing-ref, mismatched-owner).
+## T8 — Exact Snapshot Verification and Acceptance
 
-Effort: human ~1h, CC ~5min.
+Before staging, review ownership and final diff. Stage only task files. Run:
 
-### T7 — Shot check `STRATEGY`
+1. focused tests from the problem boundary;
+2. Harness inspection for the exact staged snapshot;
+3. Harness verification on the exact non-empty staged snapshot or exact commit range in its detached execution tree;
+4. receipt integrity verification;
+5. `git diff --check` and scoped link/anchor checks.
 
-Deliverables:
+Acceptance: AC-01–AC-12 and TC-01–TC-20 are traceable; receipt reports fresh/passed/integrity/policy/snapshot true; independent review has no blocker.
 
-- `_check_strategy(target_shot, video_generation_plan) -> ShotCheckOutcome`
-- Plan None → `NOT_EVALUATED, STRATEGY_PLAN_MISSING`
-- Plan BLOCKED → `BLOCKED, STRATEGY_CONTRADICTS_SHOT`
-- T2V + important character → `BLOCKED`
-- R2V + no character → `WARNING, STRATEGY_RISKY`
-- Otherwise → `PASS`
+## Deferred Slices
 
-Tests: 5 cases.
+### D1 — Provider-Neutral Post-Fetch Structural Projection
 
-Effort: human ~1h, CC ~5min.
+Do not start until a concrete structural fact is found that is not already guaranteed by typed receipt construction, fetch owner, committer, candidate validation, or P6 Review. The accepted design must provide a fully projected input schema and remain no-IO/provider-neutral. D1 must not infer a submission from `submission_fingerprint`.
 
-### T8 — Shot check `COMPLEXITY`
+### D2 — Durable Readiness Evidence Migration
 
-Deliverables:
+Do not start without explicit approval. A complete proposal must include Manifest schema version, writer API, canonical path/layout, content addressing, reopen, backward/forward compatibility, recovery/crash windows, replay, invalidation, and exact activation semantics. An “optional hash field” is not migration-free.
 
-- `_check_complexity(target_shot) -> ShotCheckOutcome`
-- Module-level constants `INTENT_WORD_LIMIT=24`, `DIRECTIVE_LIMIT=4`
-- Heuristic only — text + directive count
+Identity drift, continuity quality, motion naturalness, subjective picture quality, final acceptance, and automatic repair are not deferred gate tasks; they remain with existing Review/Pilot/Repair owners.
 
-Tests: 3 cases (low, high intent, many directives).
+## Definition of Done
 
-Effort: human ~30min, CC ~3min.
-
-### T9 — Video check `RECEIPT_INTEGRITY`
-
-Deliverables:
-
-- `_check_receipt_integrity(fetched_candidate) -> VideoCheckOutcome`
-- Re-verify `fetch_fingerprint` matches `canonical_sha256(payload)`
-- Validate `artifact_sha256` is 64 lowercase hex
-
-Tests: 3 cases (valid, hash-mismatch, malformed-sha).
-
-Effort: human ~1h, CC ~5min.
-
-### T10 — Video check `CONTENT_TYPE_BINDING`
-
-Deliverables:
-
-- `_check_content_type_binding(fetched_candidate) -> VideoCheckOutcome`
-- Resolve expected type from receipt pointer when available
-- `PASS` if no expected declared; `BLOCKED` if declared and differs
-
-Tests: 3 cases (no expected, match, mismatch).
-
-Effort: human ~1h, CC ~5min.
-
-### T11 — Determinism tests
-
-Deliverables:
-
-- Two-call determinism: same request + receipt_id → identical `content_hash`
-- Three sequential calls → identical hash
-- Different `target_shot_content_hash` → different receipt `content_hash`
-- Different `receipt_id` → different receipt `content_hash`
-
-Tests: 4 cases per gate (8 total).
-
-Effort: human ~30min, CC ~3min.
-
-### T12 — Architecture import gate
-
-Deliverables:
-
-- AST scan of `src/ai_video/quality_gates/**` for forbidden imports
-- Forbidden list: see design §3 blacklist (incl. `production.video_generation`)
-- Each forbidden import causes test failure with file:line
-
-Tests: 1 AST-scan test covering each forbidden module name.
-
-Effort: human ~2h, CC ~10min.
-
-### T13 — Comitter seam helper
-
-Deliverables:
-
-- `src/ai_video/production/_state_commit_gate_receipt.py`
-- `_validate_gate_receipt(receipt, expected_gate_name, request_fingerprint)` raises on:
-  - mismatched gate_name
-  - invalid content_hash seal
-  - status == BLOCKED
-- Accepts duck-typed receipt (no `ai_video.quality_gates` import in the helper module itself; only type checks via attribute access)
-
-Tests: 3 cases (mismatch, invalid seal, BLOCKED refusal).
-
-Effort: human ~1h, CC ~5min.
-
-### T14 — Optional fields on `VideoGenerationAttemptState`
-
-Deliverables:
-
-- Add `pre_submit_gate_receipt_hash` and `post_fetch_gate_receipt_hash` to `VideoGenerationAttemptState`
-- Extend `_serialize_optional_continuity_state` to strip them when `None`
-- All fields default `None`; existing test fixtures unchanged
-
-Tests: schema-level round-trip; serializer strips None fields; pattern rejects malformed hash.
-
-Effort: human ~1h, CC ~5min.
-
-### T15 — Optional parameters on committer methods
-
-Deliverables:
-
-- `ProductionStateCommitter.begin_video_generation` accepts `pre_submit_gate_receipt: ShotQualityReceipt | None = None`
-- `ProductionStateCommitter.commit_video_activation` accepts `post_fetch_gate_receipt: VideoQualityReceipt | None = None`
-- Both methods: when supplied, call `_validate_gate_receipt`; on pass, persist `receipt.content_hash` into attempt state
-- When `None`, proceed exactly as today
-
-Tests: AC-11, AC-12 — BLOCKED refuses, PASS persists hash, None leaves hash None.
-
-Effort: human ~2h, CC ~10min.
-
-### T16 — Integration doc + example
-
-Deliverables:
-
-- `docs/specs/shot-quality-gate/integration.md`
-- Two worked examples: Shot Gate `BLOCKED` and Video Gate `BLOCKED`
-- One committer handoff example (PASS receipt persisted as hash)
-- One committer refusal example (BLOCKED receipt raises `AiVideoError`)
-- JSON output samples for both gates
-
-Effort: human ~2h, CC ~10min.
-
-### T17 — End-to-end test
-
-Deliverables:
-
-- `tests/test_quality_gates.py::test_end_to_end_shot_gate_blocks_missing_identity`
-- `tests/test_quality_gates.py::test_end_to_end_video_gate_blocks_receipt_hash_mismatch`
-- `tests/test_state_commit_gate_receipt.py::test_end_to_end_committer_persists_pass_hash`
-- Construct full request, run gate, assert result shape / hash / reasons
-- Then hand receipt to committer (in-memory fixture), assert hash is stored
-
-Tests: 3 cases.
-
-Effort: human ~2h, CC ~10min.
-
-### T18 — Final review & acceptance
-
-Deliverables:
-
-- All AC-1..AC-12 verified
-- `pytest tests/test_quality_gates.py` passes
-- `pytest tests/test_state_commit_gate_receipt.py` passes
-- `pytest tests/test_architecture_gate.py` passes (with new gate)
-- `pytest tests/` (full suite) passes — no regression
-- Final completion report
-
-Effort: human ~1h, CC ~10min.
-
-## Total effort
-
-| Bucket | Human | CC |
-|---|---|---|
-| T1–T5 (schemas + aggregation) | ~6h | ~30min |
-| T6–T8 (Shot checks) | ~2.5h | ~15min |
-| T9–T10 (Video checks) | ~2h | ~10min |
-| T11–T12 (determinism + gate) | ~2.5h | ~15min |
-| T13–T15 (committer seam) | ~4h | ~20min |
-| T16–T17 (docs + e2e) | ~4h | ~20min |
-| T18 (review) | ~1h | ~10min |
-| **Total** | **~22h** | **~120min** |
-
-Single PR scope if sliced aggressively (T1–T8 + T12 would be useful Shot-only MVP). Recommend landing T1–T12 + T13 as PR1, T14–T18 as PR2.
-
-## Definition of done (per task)
-
-1. Test written and failing (or accepted as new) before implementation.
-2. Implementation passes the test.
-3. No new warnings from ruff/mypy (project default).
-4. No drive-by changes to unrelated files.
-5. Commit message references task id (e.g. `T6: implement IDENTITY_ANCHOR check`).
-7. `git diff` reviewed against the ownership boundary before commit.
-
-## Out-of-scope tasks (deferred)
-
-These will be tracked as separate slices later:
-
-- D1 — Continuity checks (CONTINUITY_TERMINAL, CONTINUITY_LOCATION) — requires extending `PreviousShotState` with wardrobe/props or accepting `Shot.continuity_constraints` as the source.
-- D2 — Capability binding check (CAPABILITY_BINDING) — requires typed seam to selected `VideoProviderCapabilities`; will need committer to expose capabilities or for `_state_commit_video_candidate` to carry them.
-- D3 — Multi-usage reference detection (REFERENCE_VS_FINAL_VISUAL) — requires a canonical usage index owned by Manifest, not a parallel snapshot.
-- D4 — VLM-backed `IDENTITY_DRIFT` evaluation — requires VLM adapter; out of scope until Provider adapter selection is approved.
-- D5 — Scene reference warning (SCENE_BINDING) — soft warning only; defer until a canonical scene-reference snapshot exists.
-- D6 — Story alignment VLM check.
-- D7 — Cross-Shot batch evaluation.
-- D8 — Repair-loop integration: P6 Review consuming gate results and emitting `RepairRequest`.
-
-## Risk register per task
-
-| Task | Risk | Mitigation |
-|---|---|---|
-| T6 | Wrong asset passes IDENTITY_ANCHOR if `canonical_owner_id` not checked | Test pinned: mismatched-owner → BLOCKED |
-| T9 | Receipt seal re-verification drifts from production seal pattern | Use existing `canonical_sha256` helper exactly; covered by test |
-| T12 | AST blacklist misses transitive leak via `production.video_generation` | Explicitly listed in blacklist; AST test fails if anyone imports it |
-| T13 | Helper couples committer to gate package | Helper is duck-typed; no `ai_video.quality_gates` import in helper module |
-| T14 | New fields break sealed-validation of existing fixtures | Defaults `None`; existing tests still pass |
-| T15 | Existing call sites accidentally lose optional arg | All call sites pre-existing; new param defaults `None`; tests pin current call paths |
+- exactly T1–T8 complete;
+- no D1/D2 implementation mixed into v3;
+- no second readiness algorithm;
+- no Product schema/lifecycle/Provider/media changes;
+- all TC-01–TC-20 pass;
+- independent reviewer verdict is `accept` or `accept with concerns` with no blocking issue;
+- fresh exact-snapshot Harness receipt is fully valid.
