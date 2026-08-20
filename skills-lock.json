@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "h3-video": {
+      "source": "open-video-ai/open-video",
+      "sourceType": "github",
+      "skillPath": "skill/h3-video/SKILL.md",
+      "computedHash": "616997366fad9ce3eaca7721337bcc5315d05c20324b5db55bfd2cd93226128b"
+    },
     "open-video": {
       "source": "open-video-ai/open-video",
       "sourceType": "github",

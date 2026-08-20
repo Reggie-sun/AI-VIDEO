@@ -42,6 +42,10 @@ Use the minimum matching Skill set. Installation、description matching 或“�
 
 `open-video` MUST NOT 运行或安装其 product/CLI/Python runtime，不得执行 `open-video install/pull/status/run`、ComfyUI submit、generation、judge loop、refine loop、ffmpeg stitch、artifact/receipt write，也不得成为 video engine、Provider、renderer、Production runtime 或 Agent runtime/lifecycle owner。上游 multi-shot Director path 标记为 evolving/design-scaffold；其 capability、constraint、model 与 quality claims 只能作为候选知识，使用前必须由当前 AI-VIDEO code、sealed profile、tests 或 runtime evidence 重新验证。
 
+`h3-video` MUST use only when an approved AI-VIDEO Shot Contract and Generation Requirement already exist and the task explicitly targets MiniMax H3 guidance. It consumes those fixed inputs and returns advisory `recommended H3 mode`、`required inputs`、`prompt considerations` 与 `known limitations`。It MAY advise on the H3 3-field prompt grammar、T2V/I2V/FL2VA/R2V mode fit、camera/audio/visible-audible wording、resolution/steps/scheduler/quant constraints and H3-specific failure diagnosis. It MUST NOT accept Story-only input, choose a Provider, modify the Shot or Generation Requirement, or promote advice into canonical truth.
+
+Within AI-VIDEO, the operational sections of upstream `h3-video` are reference-only. The Skill MUST NOT install or run OpenVideo、download H3 weights、inspect or start ComfyUI、execute dry-run/generation/review/delivery commands、read `OPEN_VIDEO_VLM_KEY` or any other credential、call a Provider/API, or write media/receipt/runtime state. Exact capability、profile、mode token、setting and limitation claims MUST be revalidated against the selected AI-VIDEO MiniMax H3 adapter、sealed profile、workflow、tests and current runtime evidence before use. `h3-video` owns neither the adapter nor its execution lifecycle.
+
 `hell-grind-aigc-skill` MUST use when the task includes semantic Shot design、open/close state、cross-Shot continuity、identity/state/spatial/axis/action/light/environment/audio continuity、image/video prompt structure、generation failure diagnosis、iteration 或 candidate reasoning。它优先回答“Shots 之间什么必须保持或改变？”以及“generated Shot 为什么失败？”。AI-VIDEO Character、Scene、Shot 与 asset records 始终是 source of truth；不得创建平行的 project schema、asset registry、generation ledger、review state 或 delivery truth。
 
 `higgsfield` MUST use when the task includes provider/model-specific prompt adaptation、Seedance/Hailuo/Kling/Veo guidance、T2V/I2V/reference/continuation/extension mode guidance、provider-specific camera vocabulary 或 generation troubleshooting。它只在 AI-VIDEO semantic Shot / continuity intent 已建立后使用，不得选择 active Provider、读取 credential、提交 generation 或绕过 AI-VIDEO gates。
@@ -52,7 +56,8 @@ Routing precedence：
 
 - Concept/script -> ordered Director coverage / Shot plan -> `open-video`。
 - Semantic continuity / Shot-state problem -> `hell-grind-aigc-skill`。
-- Specific generative model / Provider prompting problem -> `higgsfield`。
+- Approved Shot + Generation Requirement + selected MiniMax H3 target -> `h3-video`。
+- Other supported generative model / Provider prompting problem -> `higgsfield`。
 - Deterministic motion design / graphics / pacing problem -> `video-shotcraft`。
 - Production state / assets / dependency / timeline / render / Provider execution / activation / recovery -> AI-VIDEO code and contracts。
 
@@ -70,6 +75,12 @@ AI-VIDEO Shot intent
   -> hell-grind-aigc-skill: establish semantic continuity
   -> higgsfield: adapt the approved contract to Provider prompt/mode guidance
   -> AI-VIDEO Provider Request: provenance, lifecycle, activation, recovery
+
+MiniMax H3 generation guidance:
+AI-VIDEO approved Shot Contract + Generation Requirement + preselected H3 target
+  -> h3-video: advisory H3 mode, required inputs, prompt considerations, limitations
+  -> AI-VIDEO MiniMax H3 adapter: exact capability/profile resolution and execution gates
+  -> AI-VIDEO runtime owners: lifecycle, evidence, activation, review, recovery
 
 image motion / motion graphics:
 AI-VIDEO Shot intent
