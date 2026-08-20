@@ -299,6 +299,22 @@ def test_minimax_adapters_route_to_video_provider_suite() -> None:
     assert "tests/test_production_minimax_hailuo.py" in provider_argv
 
 
+def test_h3_workflow_artifacts_route_to_video_provider_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "workflows/bindings/minimax_h3_fl2va.json",
+        "workflows/profiles/minimax_h3_fl2va_quality.json",
+        "workflows/templates/minimax_h3_fl2va_api.json",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert "workflow" in report["categories"]
+        assert "production_video_provider" in report["categories"]
+        assert "workflow_tests" in report["check_ids"]
+        assert "production_video_provider_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
+
+
 def test_seedance_adapter_and_extended_contracts_route_to_video_provider_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

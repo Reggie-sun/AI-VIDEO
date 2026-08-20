@@ -323,6 +323,9 @@ categories:
       - task_architecture_gate
   production_video_provider:
     patterns:
+      - workflows/bindings/minimax_h3_fl2va*
+      - workflows/profiles/minimax_h3_fl2va*
+      - workflows/templates/minimax_h3_fl2va*
       - src/ai_video/production/minimax_h3.py
       - src/ai_video/production/minimax_hailuo.py
       - src/ai_video/production/seedance.py

@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.production.models import StrictModel
 
@@ -109,6 +115,11 @@ class VideoOutputCapability(_VideoContractModel):
     frame_count_step: int | None = Field(default=None, strict=True, gt=0)
     frame_count_remainder: int | None = Field(default=None, strict=True, ge=0)
     dimension_modes: tuple[Literal["exact", "adaptive"], ...] = Field(min_length=1)
+    min_width: int | None = Field(default=None, strict=True, gt=0, le=16384)
+    max_width: int | None = Field(default=None, strict=True, gt=0, le=16384)
+    min_height: int | None = Field(default=None, strict=True, gt=0, le=16384)
+    max_height: int | None = Field(default=None, strict=True, gt=0, le=16384)
+    dimension_multiple: int | None = Field(default=None, strict=True, gt=0)
     resolution_labels: tuple[str, ...] = Field(min_length=1)
     ratios: tuple[
         Literal["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"], ...
@@ -150,6 +161,26 @@ class VideoOutputCapability(_VideoContractModel):
                 and self.frame_count_min is None
             ):
                 raise ValueError("video output timing modes exceed declared timing support")
+        dimension_values = (
+            self.min_width,
+            self.max_width,
+            self.min_height,
+            self.max_height,
+            self.dimension_multiple,
+        )
+        if any(value is not None for value in dimension_values) and any(
+            value is None for value in dimension_values
+        ):
+            raise ValueError("exact video dimension capability must be fully specified")
+        if self.min_width is not None and (
+            "exact" not in self.dimension_modes
+            or self.max_width is None
+            or self.min_height is None
+            or self.max_height is None
+            or self.min_width > self.max_width
+            or self.min_height > self.max_height
+        ):
+            raise ValueError("exact video dimension range is invalid")
         for values, label in (
             (self.dimension_modes, "dimension modes"),
             (self.resolution_labels, "resolution labels"),
@@ -161,6 +192,22 @@ class VideoOutputCapability(_VideoContractModel):
             if len(set(values)) != len(values):
                 raise ValueError(f"video output capability {label} must be unique")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_geometry(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.min_width is None:
+            for key in (
+                "min_width",
+                "max_width",
+                "min_height",
+                "max_height",
+                "dimension_multiple",
+            ):
+                data.pop(key, None)
+        return data
 
     def supports(self, output: VideoFlexibleOutputRequirement) -> bool:
         timing_modes = self.timing_modes or (
@@ -189,8 +236,23 @@ class VideoOutputCapability(_VideoContractModel):
                 and self.frame_count_min <= output.frame_count <= self.frame_count_max
                 and output.frame_count % self.frame_count_step == self.frame_count_remainder
             )
+        dimensions_supported = True
+        if output.dimension_mode == "exact" and self.min_width is not None:
+            dimensions_supported = bool(
+                output.width is not None
+                and output.height is not None
+                and self.max_width is not None
+                and self.min_height is not None
+                and self.max_height is not None
+                and self.dimension_multiple is not None
+                and self.min_width <= output.width <= self.max_width
+                and self.min_height <= output.height <= self.max_height
+                and output.width % self.dimension_multiple == 0
+                and output.height % self.dimension_multiple == 0
+            )
         return bool(
             timing_supported
+            and dimensions_supported
             and output.dimension_mode in self.dimension_modes
             and output.resolution_label in self.resolution_labels
             and output.ratio in self.ratios

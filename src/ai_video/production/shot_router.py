@@ -108,10 +108,35 @@ class RouterAssetIdentity(_RouterModel):
     ]
     asset_id: str = Field(pattern=_SAFE_ID)
     asset_sha256: str = Field(pattern=_SHA256)
+    source_registry_revision_id: str = Field(pattern=_SHA256)
+    canonical_owner_kind: Literal["character", "scene"] | None = None
+    canonical_owner_id: str | None = Field(default=None, pattern=_SAFE_ID)
+    canonical_owner_content_hash: str | None = Field(default=None, pattern=_SHA256)
     mime_type: str = Field(pattern=_MIME_TYPE)
     size_bytes: int | None = Field(default=None, strict=True, gt=0)
     width: int | None = Field(default=None, strict=True, gt=0)
     height: int | None = Field(default=None, strict=True, gt=0)
+
+    @model_validator(mode="after")
+    def _validate_canonical_owner(self) -> "RouterAssetIdentity":
+        owner_values = (
+            self.canonical_owner_kind,
+            self.canonical_owner_id,
+            self.canonical_owner_content_hash,
+        )
+        if any(value is not None for value in owner_values) and any(
+            value is None for value in owner_values
+        ):
+            raise ValueError("canonical asset owner identity must be fully specified")
+        expected_owner = {
+            "character_reference": "character",
+            "scene_reference": "scene",
+        }.get(self.role)
+        if expected_owner is None and any(value is not None for value in owner_values):
+            raise ValueError("non-canonical routing assets cannot claim an artifact owner")
+        if expected_owner is not None and self.canonical_owner_kind != expected_owner:
+            raise ValueError(f"{self.role} requires a canonical {expected_owner} owner")
+        return self
 
 
 class RouterContinuityState(_RouterModel):
@@ -194,6 +219,7 @@ class ShotRoutingContext(_RouterModel):
     target_shot_content_hash: str = Field(pattern=_SHA256)
     storyboard_revision: int = Field(strict=True, ge=1)
     storyboard_content_hash: str = Field(pattern=_SHA256)
+    selected_registry_revision_id: str = Field(pattern=_SHA256)
     character_bible_content_hashes: tuple[str, ...]
     scene_content_hash: str = Field(pattern=_SHA256)
     important_character_ids: tuple[str, ...]
@@ -228,6 +254,14 @@ class ShotRoutingContext(_RouterModel):
         ):
             if len(set(values)) != len(values):
                 raise ValueError(f"{label} must be unique")
+        if len(self.character_bible_content_hashes) != len(
+            self.important_character_ids
+        ):
+            raise ValueError("important Character IDs and Bible hashes must align")
+        if not set(self.important_character_ids).issubset(
+            self.activated_shot.character_ids
+        ):
+            raise ValueError("important Character IDs must belong to the target Shot")
         if (
             self.continuity_mode
             in {ContinuityMode.REFERENCE, ContinuityMode.SEMANTIC}
@@ -249,16 +283,60 @@ class ShotRoutingContext(_RouterModel):
             *((self.shot_keyframe,) if self.shot_keyframe else ()),
             *((self.upstream_terminal,) if self.upstream_terminal else ()),
         )
+        if any(
+            item.source_registry_revision_id != self.selected_registry_revision_id
+            for item in identities
+        ):
+            raise ValueError("routing assets must use the exact selected Registry revision")
         if len({(item.role, item.asset_id) for item in identities}) != len(identities):
             raise ValueError("routing asset role and ID pairs must be unique")
+        canonical_references = (
+            *self.canonical_character_references,
+            *((self.canonical_scene_reference,) if self.canonical_scene_reference else ()),
+        )
+        if len({item.asset_id for item in canonical_references}) != len(
+            canonical_references
+        ):
+            raise ValueError("canonical routing reference asset IDs must be unique")
+        if (
+            self.continuity_mode is ContinuityMode.REFERENCE
+            and self.upstream_terminal is not None
+            and self.upstream_terminal.asset_id
+            in {item.asset_id for item in canonical_references}
+        ):
+            raise ValueError(
+                "reference continuity inputs must project to unique request bindings"
+            )
+        character_owners = dict(
+            zip(
+                self.important_character_ids,
+                self.character_bible_content_hashes,
+                strict=True,
+            )
+        )
         for reference in self.canonical_character_references:
             self._require_asset(reference, "character_reference", "character reference")
+            if (
+                reference.canonical_owner_id not in character_owners
+                or character_owners[reference.canonical_owner_id]
+                != reference.canonical_owner_content_hash
+            ):
+                raise ValueError(
+                    "character reference must match an exact important Character"
+                )
         if self.canonical_scene_reference is not None:
             self._require_asset(
                 self.canonical_scene_reference,
                 "scene_reference",
                 "scene reference",
             )
+            if (
+                self.canonical_scene_reference.canonical_owner_id
+                != self.activated_shot.scene_id
+                or self.canonical_scene_reference.canonical_owner_content_hash
+                != self.scene_content_hash
+            ):
+                raise ValueError("scene reference must match the exact target Scene")
         if self.approved_existing_video is not None:
             self._require_asset(
                 self.approved_existing_video,
@@ -418,6 +496,16 @@ class VideoGenerationRoutingDecision(_RouterModel):
             or self.execution_kind is None
         ):
             raise ValueError("selected routing outcome requires an exact capability")
+        projected_bindings = tuple(
+            (role, asset.asset_id)
+            for role, asset in zip(
+                self.required_binding_roles,
+                self.input_assets,
+                strict=True,
+            )
+        )
+        if len(set(projected_bindings)) != len(projected_bindings):
+            raise ValueError("routing decision must project unique request bindings")
         if self.semantic_routing_hash != canonical_sha256(self.semantic_payload()):
             raise ValueError("semantic routing hash does not match decision")
         audit_payload = {

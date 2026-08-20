@@ -37,7 +37,10 @@ from ai_video.production.video import (
     VideoOutputRequirement,
     VideoProviderCapabilities,
 )
-from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
+from ai_video.production.video_contracts import (
+    VideoFlexibleOutputRequirement,
+    VideoOutputCapability,
+)
 
 
 HASH_A = "a" * 64
@@ -58,11 +61,27 @@ def _asset(
     size_bytes: int = 1_000_000,
     width: int = 1024,
     height: int = 576,
+    registry_revision_id: str = HASH_F,
+    canonical_owner_id: str | None = None,
+    canonical_owner_content_hash: str | None = None,
 ) -> RouterAssetIdentity:
+    canonical_owner_kind = None
+    if role == "character_reference":
+        canonical_owner_kind = "character"
+        canonical_owner_id = canonical_owner_id or "hero"
+        canonical_owner_content_hash = canonical_owner_content_hash or HASH_A
+    elif role == "scene_reference":
+        canonical_owner_kind = "scene"
+        canonical_owner_id = canonical_owner_id or "scene-room"
+        canonical_owner_content_hash = canonical_owner_content_hash or HASH_B
     return RouterAssetIdentity(
         role=role,
         asset_id=f"asset-{suffix}",
         asset_sha256=sha256,
+        source_registry_revision_id=registry_revision_id,
+        canonical_owner_kind=canonical_owner_kind,
+        canonical_owner_id=canonical_owner_id,
+        canonical_owner_content_hash=canonical_owner_content_hash,
         mime_type=(
             mime_type
             or ("video/mp4" if role == "existing_video" else "image/png")
@@ -136,6 +155,7 @@ def _context(
         target_shot_content_hash=activated_shot.content_hash,
         storyboard_revision=2,
         storyboard_content_hash=HASH_D,
+        selected_registry_revision_id=HASH_F,
         character_bible_content_hashes=character_bible_hashes,
         scene_content_hash=scene_content_hash,
         important_character_ids=important_character_ids,
@@ -203,6 +223,30 @@ def _output() -> VideoOutputRequirement:
         mime_type="video/mp4",
         native_audio=False,
     )
+
+
+def test_output_capability_omits_absent_exact_geometry_from_identity() -> None:
+    capability = VideoOutputCapability(
+        min_duration_seconds=1,
+        max_duration_seconds=10,
+        provider_selected_duration=True,
+        dimension_modes=("adaptive",),
+        resolution_labels=("adaptive",),
+        ratios=("adaptive",),
+        fps_values=(24,),
+        containers=("mp4",),
+        native_audio_options=(False,),
+    )
+
+    payload = capability.model_dump(mode="json")
+
+    assert not {
+        "min_width",
+        "max_width",
+        "min_height",
+        "max_height",
+        "dimension_multiple",
+    }.intersection(payload)
 
 
 def _variant(
@@ -439,6 +483,75 @@ def test_approved_existing_video_requires_mp4_mime() -> None:
                 HASH_D,
                 mime_type="image/png",
             )
+        )
+
+
+def test_context_binds_canonical_references_to_registry_and_subjects() -> None:
+    payload = _context().model_dump(mode="json")
+    payload["selected_registry_revision_id"] = HASH_F
+    payload["canonical_character_references"][0].update(
+        {
+            "source_registry_revision_id": HASH_F,
+            "canonical_owner_kind": "character",
+            "canonical_owner_id": "hero",
+            "canonical_owner_content_hash": HASH_A,
+        }
+    )
+    payload["canonical_scene_reference"].update(
+        {
+            "source_registry_revision_id": HASH_F,
+            "canonical_owner_kind": "scene",
+            "canonical_owner_id": "scene-room",
+            "canonical_owner_content_hash": HASH_B,
+        }
+    )
+
+    context = ShotRoutingContext.model_validate(payload)
+
+    assert context.selected_registry_revision_id == HASH_F
+    invalid_owner = context.model_dump(mode="json")
+    invalid_owner["canonical_character_references"][0][
+        "canonical_owner_id"
+    ] = "intruder"
+    with pytest.raises(ValidationError):
+        ShotRoutingContext.model_validate(invalid_owner)
+
+    invalid_scene_owner = context.model_dump(mode="json")
+    invalid_scene_owner["canonical_scene_reference"][
+        "canonical_owner_id"
+    ] = "scene-elsewhere"
+    with pytest.raises(ValidationError):
+        ShotRoutingContext.model_validate(invalid_scene_owner)
+
+    invalid_registry = context.model_dump(mode="json")
+    invalid_registry["canonical_scene_reference"][
+        "source_registry_revision_id"
+    ] = HASH_E
+    with pytest.raises(ValidationError):
+        ShotRoutingContext.model_validate(invalid_registry)
+
+
+def test_context_rejects_duplicate_asset_id_across_projected_roles() -> None:
+    character = _asset("character_reference", "shared", HASH_A)
+    scene = _asset("scene_reference", "scene", HASH_B).model_copy(
+        update={"asset_id": character.asset_id}
+    )
+
+    with pytest.raises(ValidationError):
+        _context(
+            character_references=(character,),
+            scene_reference=scene,
+        )
+
+    terminal = _asset("continuity_terminal", "terminal", HASH_C).model_copy(
+        update={"asset_id": character.asset_id}
+    )
+    with pytest.raises(ValidationError):
+        _context(
+            continuity=ContinuityMode.REFERENCE,
+            continuity_state=_continuity_state(),
+            character_references=(character,),
+            terminal=terminal,
         )
 
 
@@ -981,11 +1094,15 @@ def test_reference_routing_generalizes_across_distinct_references_and_prompts() 
             "character_reference",
             f"{case['character_id']}-reference",
             case["character_hash"],
+            canonical_owner_id=case["character_id"],
+            canonical_owner_content_hash=case["character_hash"],
         )
         scene_reference = _asset(
             "scene_reference",
             f"{case['scene_id']}-reference",
             case["scene_hash"],
+            canonical_owner_id=case["scene_id"],
+            canonical_owner_content_hash=case["scene_hash"],
         )
         terminal = _asset(
             "continuity_terminal",
@@ -1412,6 +1529,16 @@ def test_exact_terminal_accepts_real_h3_and_hailuo_i2v_capabilities() -> None:
         selected_capability_id=h3_variant.capability_id,
         output_requirement=h3_output,
     )
+    unsupported_h3_decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=h3_profile,
+        capabilities=h3_capabilities,
+        selected_capability_id=h3_variant.capability_id,
+        output_requirement=h3_output.model_copy(
+            update={"width": 16384, "height": 16384}
+        ),
+    )
     hailuo_decision = VideoGenerationResolver().resolve(
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
@@ -1427,6 +1554,10 @@ def test_exact_terminal_accepts_real_h3_and_hailuo_i2v_capabilities() -> None:
     assert h3_decision.input_assets == (terminal,)
     assert h3_decision.reason_codes == (
         RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME,
+    )
+    assert unsupported_h3_decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert unsupported_h3_decision.reason_codes == (
+        RouterReasonCode.PROVIDER_CAPABILITY_DENIED,
     )
     assert hailuo_decision.outcome is RoutingOutcome.SELECTED
     assert (
