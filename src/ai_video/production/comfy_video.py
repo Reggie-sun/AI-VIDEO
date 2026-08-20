@@ -196,6 +196,14 @@ class LocalVideoExecutionProfile(StrictModel):
         return cls.model_validate(data)
 
 
+class LocalVideoQualityExecutionProfile(LocalVideoExecutionProfile):
+    schema_version: Literal["2"]
+    lane_id: Literal["minimax_h3_fl2va_quality_local"]
+    output_codec: Literal["h264"]
+    output_encoding: Literal["re-encode"]
+    output_crf: int = Field(strict=True, ge=16, le=18)
+
+
 class LocalVideoBinding(StrictModel):
     prompt: tuple[str | int, ...]
     first_frame: tuple[str | int, ...]
@@ -253,9 +261,17 @@ def _read_exact(root: Path, relative: Path, digest: str, label: str) -> bytes:
 
 def load_local_video_execution_profile(
     path: str | Path, *, artifact_root: str | Path
-) -> LocalVideoExecutionProfile:
+) -> LocalVideoExecutionProfile | LocalVideoQualityExecutionProfile:
     try:
-        profile = LocalVideoExecutionProfile.model_validate_json(Path(path).read_bytes())
+        payload = json.loads(Path(path).read_bytes())
+        if not isinstance(payload, dict):
+            raise ValueError("profile payload must be a JSON object")
+        profile_type = (
+            LocalVideoQualityExecutionProfile
+            if payload.get("schema_version") == "2"
+            else LocalVideoExecutionProfile
+        )
+        profile = profile_type.model_validate(payload)
     except (OSError, ValueError) as exc:
         raise _invalid("Local video execution profile is invalid.", str(exc)) from exc
     root = Path(artifact_root).resolve(strict=True)
@@ -304,6 +320,14 @@ def _validate_workflow(
         "sampler": ("8", "inputs", "sampler_name"),
         "output_prefix": ("14", "inputs", "filename_prefix"),
     }
+    if isinstance(profile, LocalVideoQualityExecutionProfile):
+        expected_encoder_inputs: dict[str, object] = {
+            "codec": profile.output_codec,
+            "codec.encoding": profile.output_encoding,
+            "codec.encoding.crf": profile.output_crf,
+        }
+    else:
+        expected_encoder_inputs = {"codec": "auto"}
     if (
         any(getattr(binding, key) != value for key, value in expected_binding.items())
         or binding.output_node_id != profile.output_node_id
@@ -312,6 +336,10 @@ def _validate_workflow(
         or workflow["9"]["inputs"].get("steps") != profile.steps
         or workflow["13"]["inputs"].get("fps") != float(profile.fps)
         or workflow["14"]["inputs"].get("format") != profile.output_container
+        or any(
+            workflow["14"]["inputs"].get(key) != value
+            for key, value in expected_encoder_inputs.items()
+        )
     ):
         raise _invalid("Local H3 workflow bindings or native settings changed.")
 

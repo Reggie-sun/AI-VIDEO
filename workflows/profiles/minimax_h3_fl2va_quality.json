@@ -1,0 +1,100 @@
+{
+  "schema_version": "2",
+  "lane_id": "minimax_h3_fl2va_quality_local",
+  "adapter_contract_version": "1",
+  "upstream_repository": "https://github.com/Comfy-Org/workflow_templates",
+  "upstream_commit": "0e0f4577453136eaa1c0e9d4b700e3e5ce5bb416",
+  "upstream_path": "templates/video_minimax_h3_i2v.json",
+  "upstream_url": "https://github.com/Comfy-Org/workflow_templates/blob/0e0f4577453136eaa1c0e9d4b700e3e5ce5bb416/templates/video_minimax_h3_i2v.json",
+  "upstream_sha256": "313b029321a8be303e827dad471bff3022ca564c8bf8c6198a3e70b65c599671",
+  "upstream_license_id": "MIT",
+  "derived_modifications": [
+    "exported the official Image to Video (MiniMax H3) subgraph to deterministic API format",
+    "removed UI notes, demo assets, subgraph metadata, optional LoRA and turbo switch paths",
+    "exposed exact first_frame and explicit optional last_frame bindings",
+    "retained native H3 conditioning, res_multistep sampling and video/audio VAE decode",
+    "set the additive quality profile default canvas to 1344x672 without changing sampler or steps",
+    "configured native SaveVideo for explicit H.264 re-encode at CRF 17"
+  ],
+  "model_repository_id": "Comfy-Org/MiniMax-H3",
+  "model_repository_revision": "dc559027db79c174125df4d827db55cd11178860",
+  "components": [
+    {
+      "role": "diffusion",
+      "filename": "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "size_bytes": 20970379616,
+      "sha256": "e889202c41dafb67b10d67b97f0d8541508036a6090af23425a5c2615d03c47a",
+      "precision": "int8_convrot"
+    },
+    {
+      "role": "text_encoder",
+      "filename": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "size_bytes": 15687142551,
+      "sha256": "35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6",
+      "precision": "nvfp4_awq"
+    },
+    {
+      "role": "video_vae",
+      "filename": "minimax_h3_video_vae_fp16.safetensors",
+      "size_bytes": 5207808496,
+      "sha256": "7c1f131492e7eddacaac9069a61b81bdd39de5cc96561e677c5eab1cdce5e522",
+      "precision": "fp16"
+    },
+    {
+      "role": "audio_vae",
+      "filename": "minimax_h3_audio_vae_fp32.safetensors",
+      "size_bytes": 605254808,
+      "sha256": "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48",
+      "precision": "fp32"
+    }
+  ],
+  "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+  "required_nodes": [
+    "UNETLoader",
+    "CLIPLoader",
+    "VAELoader",
+    "LoadImage",
+    "MiniMaxH3ImageToVideo",
+    "RandomNoise",
+    "BasicGuider",
+    "KSamplerSelect",
+    "BasicScheduler",
+    "SamplerCustomAdvanced",
+    "VAEDecode",
+    "VAEDecodeAudio",
+    "CreateVideo",
+    "SaveVideo"
+  ],
+  "workflow_path": "workflows/templates/minimax_h3_fl2va_quality_api.json",
+  "workflow_sha256": "8b6c338279d8af768fae8106034f9f26e8e9d59583e95a8ca8b16d36a930ad65",
+  "binding_path": "workflows/bindings/minimax_h3_fl2va_quality_binding.yaml",
+  "binding_sha256": "e0ae28bdaaa81ac70578b11e97f95cacab826273ec09f82bfcf430176fb05a4c",
+  "loopback_endpoints": [
+    "http://127.0.0.1:8188"
+  ],
+  "min_width": 352,
+  "max_width": 1344,
+  "min_height": 352,
+  "max_height": 768,
+  "dimension_multiple": 32,
+  "fps": 24,
+  "min_frame_count": 124,
+  "max_frame_count": 362,
+  "frame_grid_step": 17,
+  "frame_grid_remainder": 5,
+  "native_audio_required": true,
+  "output_container": "mp4",
+  "output_mime_type": "video/mp4",
+  "sampler": "res_multistep",
+  "scheduler": "simple",
+  "steps": 20,
+  "output_node_id": "14",
+  "optional_last_frame_supported": true,
+  "optional_lora_enabled": false,
+  "remote_refiner_enabled": false,
+  "cloud_fallback_enabled": false,
+  "output_codec": "h264",
+  "output_encoding": "re-encode",
+  "output_crf": 17,
+  "profile_content_hash": "a154259fa9530e7c2df8865539eaeeef1886c0da51385a61d02c5c93fdb1ad6d"
+}
