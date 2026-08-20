@@ -39,6 +39,53 @@ Requirements:
 - Local ComfyUI already running
 - `ffmpeg` and `ffprobe` on PATH
 
+## Agent Memory RAG
+
+Agent Memory 是独立于 Production runtime 的本地 advisory retrieval tool。默认
+`experience` scope 只检索 `docs/record_for_agent/`；`superpowers` scope 检索
+`docs/superpowers/` 中的历史 specs/plans，结果不得当作当前 runtime truth。
+
+安装 optional dependencies，并显式下载 pinned multilingual E5 ONNX 模型：
+
+```bash
+pip install -e ".[agent-memory]"
+python - <<'PY'
+from pathlib import Path
+from huggingface_hub import snapshot_download
+
+snapshot_download(
+    repo_id="intfloat/multilingual-e5-small",
+    revision="614241f622f53c4eeff9890bdc4f31cfecc418b3",
+    local_dir=Path(
+        "~/.cache/ai-video/agent-memory/"
+        "intfloat-multilingual-e5-small-614241f622f5"
+    ).expanduser(),
+    allow_patterns=[
+        "config.json",
+        "sentencepiece.bpe.model",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "onnx/config.json",
+        "onnx/model_qint8_avx512_vnni.onnx",
+    ],
+)
+PY
+```
+
+Runtime 不会自动下载模型或联网 fallback。构建两个 named corpora 并检索：
+
+```bash
+python -m scripts.agent_memory --scope all build
+python -m scripts.agent_memory --scope all search \
+  "ProductionStateCommitter recovery owner"
+python -m scripts.agent_memory --scope superpowers search \
+  "镜头连续性 contract"
+```
+
+Index manifest 会绑定 corpus digest、chunking、embedding identity 与 library
+versions；source 或 model 不匹配时 search 会 fail closed 并要求 rebuild。
+
 ## Architecture Gate
 
 Repository architecture regression 使用独立、local、no-network gate 验证，不改变 `ai-video` 的三个公共命令：
