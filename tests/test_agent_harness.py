@@ -165,6 +165,32 @@ def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
     ]
 
 
+def test_shot_router_routes_to_exact_contract_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/production/shot_router.py",
+        "tests/test_production_shot_router.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["production_shot_router"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "production_shot_router_tests",
+            "task_architecture_gate",
+        ]
+
+    argv = policy["checks"]["production_shot_router_tests"]["argv"]
+    for path in (
+        "tests/test_production_shot_router.py",
+        "tests/test_production_video.py",
+        "tests/test_production_dependency.py",
+        "tests/test_production_selective_rebuild.py",
+    ):
+        assert path in argv
+
+
 def test_production_policy_commands_cover_repository_mandatory_contract_tests() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
     dependency_argv = policy["checks"]["production_dependency_tests"]["argv"]

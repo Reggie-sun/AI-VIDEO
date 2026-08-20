@@ -16,6 +16,7 @@ from ai_video.production.comfy_video import (
     LocalVideoExecutionProfile,
     load_local_video_execution_profile,
 )
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production.local_video import (
     LocalVideoSubmission,
     LocalVideoSubmitIntent,
@@ -38,6 +39,9 @@ from production_project_factory import make_p8_video_generation_base
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PROFILE_PATH = REPO_ROOT / "workflows/profiles/minimax_h3_fl2va.json"
+QUALITY_PROFILE_PATH = (
+    REPO_ROOT / "workflows/profiles/minimax_h3_fl2va_quality.json"
+)
 MP4 = Path(__file__).parent / "fixtures/generated_video/fake-video.mp4"
 
 
@@ -135,19 +139,20 @@ class Transport:
         return self.payload
 
 
-def _profile_and_comfy_root(tmp_path: Path):
+def _profile_and_comfy_root(
+    tmp_path: Path, profile_path: Path = PROFILE_PATH
+):
     artifact_root = tmp_path / "artifact-root"
-    workflow = artifact_root / "workflows/templates/minimax_h3_fl2va_api.json"
-    binding = artifact_root / "workflows/bindings/minimax_h3_fl2va_binding.yaml"
+    canonical = load_local_video_execution_profile(
+        profile_path, artifact_root=REPO_ROOT
+    )
+    raw = canonical.model_dump(mode="json")
+    workflow = artifact_root / canonical.workflow_path
+    binding = artifact_root / canonical.binding_path
     workflow.parent.mkdir(parents=True)
     binding.parent.mkdir(parents=True)
-    shutil.copyfile(
-        REPO_ROOT / "workflows/templates/minimax_h3_fl2va_api.json", workflow
-    )
-    shutil.copyfile(
-        REPO_ROOT / "workflows/bindings/minimax_h3_fl2va_binding.yaml", binding
-    )
-    raw = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
+    shutil.copyfile(REPO_ROOT / canonical.workflow_path, workflow)
+    shutil.copyfile(REPO_ROOT / canonical.binding_path, binding)
     comfy_root = tmp_path / "ComfyUI"
     components = []
     directories = {
@@ -168,7 +173,7 @@ def _profile_and_comfy_root(tmp_path: Path):
                 "sha256": hashlib.sha256(payload).hexdigest(),
             }
         )
-    profile = LocalVideoExecutionProfile.create(
+    profile = type(canonical).create(
         **{
             **raw,
             "components": components,
@@ -180,7 +185,14 @@ def _profile_and_comfy_root(tmp_path: Path):
     return artifact_root, comfy_root, profile
 
 
-def _request(root: Path, profile: LocalVideoExecutionProfile, *, last: bool):
+def _request(
+    root: Path,
+    profile: LocalVideoExecutionProfile,
+    *,
+    last: bool,
+    width: int = 608,
+    height: int = 352,
+):
     inputs = make_p8_video_generation_base(root, schema_version="2.8")
     shot = inputs.project.shots[0]
     source = inputs.project.registry.assets[0]
@@ -296,8 +308,8 @@ def _request(root: Path, profile: LocalVideoExecutionProfile, *, last: bool):
             timing_mode="frame_count",
             frame_count=124,
             dimension_mode="exact",
-            width=608,
-            height=352,
+            width=width,
+            height=height,
             resolution_label="h3_native",
             ratio="adaptive",
             fps=24,
@@ -386,6 +398,149 @@ def test_h3_profile_and_artifacts_fail_closed_on_tampering(tmp_path: Path) -> No
     raw["upstream_commit"] = "f" * 40
     with pytest.raises(ValueError):
         LocalVideoExecutionProfile.model_validate(raw)
+
+
+@pytest.mark.parametrize("payload", ("null", "[]", "42"))
+def test_h3_profile_rejects_non_object_json(
+    tmp_path: Path, payload: str
+) -> None:
+    candidate = tmp_path / "profile.json"
+    candidate.write_text(payload, encoding="utf-8")
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_local_video_execution_profile(candidate, artifact_root=REPO_ROOT)
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+
+
+def test_h3_quality_profile_is_additive_and_old_profile_hashes_are_unchanged() -> None:
+    assert hashlib.sha256(PROFILE_PATH.read_bytes()).hexdigest() == (
+        "efca71d54bdd9f8a935c1911429d00b38e351e497df35db630b4bdab320f1d1c"
+    )
+    assert hashlib.sha256(
+        (REPO_ROOT / "workflows/templates/minimax_h3_fl2va_api.json").read_bytes()
+    ).hexdigest() == "c736a12f35fd89f10a8db86f0769a85ca7bceb80d16feab62a1666cfd078737b"
+    assert hashlib.sha256(
+        (REPO_ROOT / "workflows/bindings/minimax_h3_fl2va_binding.yaml").read_bytes()
+    ).hexdigest() == "e0ae28bdaaa81ac70578b11e97f95cacab826273ec09f82bfcf430176fb05a4c"
+    old_profile = load_local_video_execution_profile(
+        PROFILE_PATH, artifact_root=REPO_ROOT
+    )
+    assert old_profile.profile_content_hash == (
+        "456b59c7a907d4b07c7d951d63ec03cbd0fb5c64638dbc8dad870aca09e2b604"
+    )
+
+    quality = load_local_video_execution_profile(
+        QUALITY_PROFILE_PATH, artifact_root=REPO_ROOT
+    )
+    assert quality.lane_id == "minimax_h3_fl2va_quality_local"
+    assert quality.workflow_path == Path(
+        "workflows/templates/minimax_h3_fl2va_quality_api.json"
+    )
+    assert quality.binding_path == Path(
+        "workflows/bindings/minimax_h3_fl2va_quality_binding.yaml"
+    )
+
+
+def test_h3_quality_profile_renders_1344x672_with_explicit_h264_crf17(
+    tmp_path: Path,
+) -> None:
+    artifact_root, comfy_root, profile = _profile_and_comfy_root(
+        tmp_path, QUALITY_PROFILE_PATH
+    )
+    project_root = tmp_path / "project"
+    inputs, request, _ = _request(
+        project_root, profile, last=False, width=1344, height=672
+    )
+    transport = Transport(MP4.read_bytes())
+    provider = ComfyUIVideoProvider(
+        profile,
+        artifact_root=artifact_root,
+        comfy_root=comfy_root,
+        image_root=project_root,
+        image_resolver=lambda asset_id, _: inputs.project.asset_paths[asset_id],
+        transport=transport,
+        commit_resolver=lambda: "b" * 40,
+        clock=lambda: datetime(2026, 8, 20, tzinfo=UTC),
+        poll_interval_seconds=0,
+    )
+    resolved = provider.resolve(request)
+    provider.preflight(resolved)
+    preview = provider.preview(resolved)
+    intent = LocalVideoSubmitIntent.create(
+        attempt_id="adapter-quality-test",
+        request=resolved,
+        preview=preview,
+        recorded_at=datetime(2026, 8, 20, tzinfo=UTC),
+    )
+    provider.submit_local(
+        resolved,
+        preview,
+        intent,
+        Permit(intent.intent_fingerprint, resolved.resolved_generation_hash),
+    )
+
+    workflow = transport.workflows[-1]
+    assert workflow["5"]["inputs"]["width"] == 1344
+    assert workflow["5"]["inputs"]["height"] == 672
+    assert workflow["14"]["inputs"]["codec"] == "h264"
+    assert workflow["14"]["inputs"]["codec.encoding"] == "re-encode"
+    assert workflow["14"]["inputs"]["codec.encoding.crf"] == 17
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("output_codec", "auto"),
+        ("output_encoding", "auto"),
+        ("output_crf", 15),
+        ("output_crf", 19),
+    ),
+)
+def test_h3_quality_profile_rejects_illegal_encoder_parameters(
+    tmp_path: Path, field: str, value: object
+) -> None:
+    raw = json.loads(QUALITY_PROFILE_PATH.read_text(encoding="utf-8"))
+    raw[field] = value
+    raw["profile_content_hash"] = canonical_sha256(
+        {key: item for key, item in raw.items() if key != "profile_content_hash"}
+    )
+    candidate = tmp_path / "quality-profile.json"
+    candidate.write_text(
+        json.dumps(raw, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        load_local_video_execution_profile(candidate, artifact_root=REPO_ROOT)
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+
+
+def test_h3_quality_profile_rejects_resealed_workflow_with_wrong_crf(
+    tmp_path: Path,
+) -> None:
+    artifact_root, comfy_root, profile = _profile_and_comfy_root(
+        tmp_path, QUALITY_PROFILE_PATH
+    )
+    workflow_path = artifact_root / profile.workflow_path
+    workflow = json.loads(workflow_path.read_text(encoding="utf-8"))
+    workflow["14"]["inputs"]["codec.encoding.crf"] = 23
+    workflow_path.write_text(
+        json.dumps(workflow, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    values = profile.model_dump(mode="python", exclude={"profile_content_hash"})
+    values["workflow_sha256"] = hashlib.sha256(workflow_path.read_bytes()).hexdigest()
+    resealed = type(profile).create(**values)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ComfyUIVideoProvider(
+            resealed,
+            artifact_root=artifact_root,
+            comfy_root=comfy_root,
+            image_root=tmp_path,
+            image_resolver=lambda *_: tmp_path / "missing",
+            transport=Transport(MP4.read_bytes()),
+            commit_resolver=lambda: "b" * 40,
+        )
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
 
 
 @pytest.mark.parametrize("artifact", ("workflow", "binding"))

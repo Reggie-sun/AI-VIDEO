@@ -2,9 +2,9 @@
 
 ## Status
 
-本规范是独立的 docs-only proposed contract。当前 runtime 没有 Shot Router：`Shot.visual_strategy` 由 authoring data 显式给出，`VideoGenerationRequest` 由 caller 显式选择 mode/provider/profile，`VideoProviderRegistry` 只做 exact lookup 并禁止 selection/fallback。
+本规范的第一阶段 degraded runtime 已实现 pure `ShotVisualResolver` 与 `VideoGenerationResolver`。`Shot.visual_strategy` 仍由 authoring data 显式给出，Router proposal 不会自行物化 revision；`VideoProviderRegistry` 仍只做 exact lookup 并禁止 selection/fallback。
 
-本规范可以在 [Minimal Shot Continuity Proof specification](./2026-08-19-ai-video-minimal-shot-continuity-proof.md) 验收前完成设计，但 Router runtime implementation 被其 `C2_HARD_CUT_KEYFRAME_I2V` exit gate 阻塞。已有 `C1_CONTINUATION_I2V` technical proof 只证明尾帧原样续拍，不能替代该 gate。本文不得被描述为当前行为或 implementation authorization。
+2026-08-20 的 contract correction 将 Shot continuity 明确拆成 `exact_terminal`、`reference`、`semantic`、`none` 四档。Provider routing 与 Shot continuity 是两个正交维度：前者决定由哪个 exact Provider/profile 执行，后者决定下一 Shot 可以继承哪些 pixel/state inputs。`hard_cut` 是剪辑/构图意图，不再错误地充当 continuity mode。既有 C2 `terminal -> independently redrawn keyframe -> Shot 2` 两轮主观质量失败仍是有效风险证据，但它只阻止把该 derived-keyframe 实现宣称为 quality accepted，不阻止 Router 消费真正的 reference continuity contract。
 
 ## Goal
 
@@ -14,9 +14,12 @@ Router 的核心原则是：
 
 - 固定主角、连续剧情、同服装、同场景和对话镜头优先使用视觉锚点；
 - T2V 用于不依赖固定身份的自由生成，而不是 continuity 的默认路径；
+- `exact_terminal` 继承像素和构图，`reference` 继承状态但允许重新构图，`semantic` 只继承 typed story/character state，`none` 建立独立视觉状态；
 - 上层 `Shot` 保持 provider-neutral，不出现 `h3_reference_to_video_with_three_images` 等 model-specific enum；
 - planning-time 可以选择不同策略，但 sealed request 之后不得静默降级或 fallback；
 - Provider selection、network、budget 和 authorization 始终显式。
+
+四档 mode 属于 activated Shot contract，不是 Provider enum。Provider routing 可以选择不同 Provider/profile，但被选中的 capability 必须原样满足该 Shot 的 continuity contract；不得以切换 Provider 为理由静默降档。
 
 ## Current Runtime Truth
 
@@ -28,13 +31,13 @@ Router 的核心原则是：
 | `VideoGenerationRequest` | sealed provider/model/profile、image/media bindings、continuity binding、output、base tuple 与 request hash | Router 输出必须在 request seal 之前被解析；sealed request 后不得改写 |
 | `VideoProviderRegistry` | exact injected name lookup；未知 provider fail closed；无 selection/fallback | Router 不得把 Registry 改成隐式 ranking/fallback engine |
 | P5 dependency resolver | 唯一 desired fingerprint 与 precise downstream invalidation owner | P5 只消费 activated Shot 与 sealed generation request 的 semantic projection，不消费并列 Router truth |
-| `ProductionStateCommitter` | 唯一 durable writer/activation/recovery owner | Router 只能提出 authoring proposal；只有 committer 可把 proposal 物化为新 Shot/Storyboard revision 并激活 |
+| `ProductionStateCommitter` | 唯一 durable writer/activation/recovery owner | 第一阶段 Router 不提供 proposal materialization；未来若新增接受 proposal 的 slice，仍只有 committer 可物化并激活新 Shot/Storyboard revision |
 
 ## Scope
 
 本规范覆盖两个彼此分离的 pure resolver，但不增加第二份 durable `visual_strategy` truth：
 
-1. `ShotVisualResolver`：从当前 Shot/Storyboard revision、intent 和可用资产产生 coarse `VisualStrategy` authoring proposal。proposal 不是 runtime truth；只有 `ProductionStateCommitter` 将其物化并激活为新的 Shot/Storyboard revision 后，`Shot.visual_strategy` 才成为 canonical truth。
+1. `ShotVisualResolver`：从当前 Shot/Storyboard revision、intent 和可用资产产生 coarse `VisualStrategy` authoring proposal。proposal 不是 runtime truth，第一阶段也没有 materialization API；caller 仍需显式 authoring。未来若新增接受 proposal 的 slice，仍只有 `ProductionStateCommitter` 可物化并激活新的 Shot/Storyboard revision。
 2. `VideoGenerationResolver`：只读取已经激活、明确为 `generated_video` 或含 generated-video layer 的 `hybrid` Shot，决定 provider-neutral `VideoGenerationMode`、required reference roles、capability requirements 和 execution requirements。
 
 Provider 实例仍由 Router core 之外的显式 production policy、authorization 和 exact registry name 选择。Router core 只返回 required capability set 和 execution requirements，不返回 ranked/eligible Provider list；它不得自行调用 Provider、申请预算、读取 secret、提交任务、激活候选或渲染。
@@ -60,7 +63,7 @@ Character Bible + Scene/Shot intent + exact available assets
               authoring proposal only
                          |
                          v
-       ProductionStateCommitter materializes/activates
+       explicit future authoring slice + ProductionStateCommitter activates
                          |
                          v
         canonical activated Shot.visual_strategy
@@ -94,6 +97,7 @@ Character Bible + Scene/Shot intent + exact available assets
 - allowed visual strategies、generation modes和execution kinds；
 - quality tier、latency/resource policy、episode budget policy与 explicit authorization state；
 - Router policy id/version/content hash。
+- explicit `continuity_mode`；`reference`/`semantic` 所需的 typed semantic continuity state，至少覆盖 character identity、story、wardrobe、injury、prop 与可选 scene state hashes。state由`content_hash` seal，并以`continuity-state:<hash>` token先物化进activated Shot的既有`continuity_constraints`；Router必须验证该projection存在。
 
 `VideoGenerationResolver` 额外读取 activated Shot、由外部 production policy 预先选择的一个 exact Provider/profile identity，以及该 profile 的 sealed capability snapshot。它不得看到一个用于自动 fallback 的 Provider list。若这个 exact selection 不支持 required mode/roles/output，结果是 blocked，不选择下一个 Provider。
 
@@ -104,7 +108,8 @@ Character Bible + Scene/Shot intent + exact available assets
 `ShotVisualResolver` 的逻辑输出是 `ShotVisualRoutingProposal`，至少包含：
 
 - exact target Shot identity/revision/content hash；
-- proposed coarse `visual_strategy` 与需要物化的 provider-neutral Shot fields；
+- explicit continuity mode；`none` 不携带 continuity state，其余模式只携带对该模式有效的 typed state；
+- proposed coarse `visual_strategy` 与未来显式 authoring 时所需的 provider-neutral Shot fields；本阶段不物化；
 - stable semantic reason codes；
 - policy id/version/hash 与 audit proposal hash；
 - outcome：`proposed`、`blocked_missing_input`、`blocked_policy` 或 `blocked_authorization`。
@@ -124,7 +129,7 @@ proposal 不能作为 second truth 被 request、P5、composition 或 render 消
 - `audit_decision_hash`：额外覆盖 policy id/version/hash 与解释信息；
 - outcome：`selected`、`blocked_missing_input`、`blocked_capability`、`blocked_policy` 或 `blocked_authorization`。
 
-只有 `semantic_routing_hash` 对应的 selected mode/bindings/inputs/capability/output projection可进入现有 request/P5 desired fingerprint。`audit_decision_hash` 和 policy identity本身不得导致 generation stale。第一版实现应优先由现有 activated Shot 与 `VideoGenerationRequest` 承载 durable semantic truth；默认不新增 Manifest/Registry schema。若 crash-safe audit 必须独立 reopen Router receipt，需先用 executable spike 证明现有 evidence 无法承载，再提出独立 schema/layout scope expansion。
+只有 `semantic_routing_hash` 对应的 selected mode/bindings/inputs/capability/output projection可进入现有 request/P5 desired fingerprint。`reference`/`semantic` state不得只存在于transient Router decision：其sealed token必须先进入activated Shot的既有`continuity_constraints`，因此state变化会产生新Shot content hash；该exact target hash随后进入现有`VideoGenerationRequest.request_input_hash`和P5已消费的generated-video semantic evidence。`audit_decision_hash` 和 policy identity本身不得导致 generation stale。默认不新增 Manifest/Registry/request schema。若 crash-safe audit 必须独立 reopen Router receipt，需先用 executable spike 证明现有 evidence 无法承载，再提出独立 schema/layout scope expansion。
 
 ## Stable Reason Codes
 
@@ -133,15 +138,17 @@ proposal 不能作为 second truth 被 request、P5、composition 或 render 消
 - `NO_MOTION_REQUIRED`
 - `LIGHT_MOTION_FROM_KEYFRAME`
 - `IMPORTANT_CHARACTER_REQUIRES_VISUAL_ANCHOR`
-- `UPSTREAM_TERMINAL_REQUIRES_I2V`
-- `HARD_CUT_REQUIRES_DERIVED_KEYFRAME`
-- `CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME`
+- `EXACT_TERMINAL_USES_FIRST_FRAME`
+- `REFERENCE_CONTINUITY_USES_TERMINAL_REFERENCE`
+- `SEMANTIC_CONTINUITY_USES_STATE_ONLY`
+- `NO_CONTINUITY`
 - `CANONICAL_REFERENCES_ENABLE_R2V`
 - `FREE_ENVIRONMENT_MOTION_ENABLES_T2V`
 - `HERO_SHOT_REQUIRES_HYBRID_OR_V2V`
 - `MISSING_CHARACTER_REFERENCE`
 - `MISSING_SCENE_REFERENCE`
 - `MISSING_CONTINUITY_TERMINAL`
+- `MISSING_SEMANTIC_CONTINUITY_STATE`
 - `PROVIDER_CAPABILITY_DENIED`
 - `LOCAL_RESOURCE_POLICY_DENIED`
 - `REMOTE_AUTHORIZATION_REQUIRED`
@@ -151,25 +158,25 @@ Reason codes 不得包含 model name，不能通过自由文本决定 replay/inv
 
 ## Deterministic Routing Rules
 
-规则按以下优先级执行，前面的 blocking rule 不得被后面的自由生成覆盖：
+Router先解析 explicit continuity mode，再考虑可复用资产或自由生成；前面的已满足路径或 blocking rule 不得被后面的自由生成覆盖。
 
 ### Rule 1: Existing or Static Asset Suffices
 
-- 已有 exact video asset 且无需再生成：`existing_video`。
+- `none` 模式下已有 exact approved `video/mp4` asset 且无需再生成：`existing_video`。其他 continuity mode 只有在另有 exact continuity evidence 时才能复用既有视频；当前 context 没有这类证明，因此不能覆盖 continuity requirement。
 - 没有可见运动要求：`static_image`。
 - 只有 pan/zoom/parallax/轻微层运动，且不需要角色真实动作：`image_motion`。
 - 主要是文字、图形、粒子或版式动画：`motion_graphics`。
 
 ### Rule 2: Continuity Is Required
 
-Router必须先区分continuity intent，不能只因存在upstream terminal就统一选择同一种I2V：
+Router必须区分四档continuity，不能只因存在upstream terminal就统一选择I2V：
 
-- `continuous_take`：叙事要求从exact terminal pose/pixels直接续拍。选择`generated_video + image_to_video`，`first_frame`必须直接绑定upstream terminal，reason为`CONTINUOUS_TAKE_USES_TERMINAL_FIRST_FRAME`。
-- `hard_cut`：叙事要求新的framing或camera distance，但仍需延续角色、场景、轴线和动作。先进入P7 hard-cut keyframe preparation，required references为`character + continuity_terminal`；keyframe激活后再选择`generated_video + image_to_video`，`first_frame`绑定derived keyframe，reason为`HARD_CUT_REQUIRES_DERIVED_KEYFRAME`。
+- `exact_terminal`：用于同机位、同空间关系的长动作续生成。选择`generated_video + image_to_video`，upstream terminal必须直接绑定`first_frame`；额外semantic state不属于本档输入并被忽略。
+- `reference`：upstream terminal、canonical character/scene references和typed continuity state共同作为reference；选择`reference_to_video`，terminal绝不能绑定`first_frame`，允许Shot N+1重新构图。exact profile缺少R2V/reference roles时typed capability blocked，不降级I2V/T2V。
+- `semantic`：只继承typed character identity、story、wardrobe、injury、prop与scene state；upstream terminal即使可用也必须从input assets排除。实际视频可由anchored R2V/I2V或identity-free T2V完成，但semantic state进入generation semantic hash。
+- `none`：建立独立视觉状态，不消费terminal或semantic continuity state；Shot自身仍可因固定角色要求使用canonical visual anchors。
 
-hard-cut decision必须seal“terminal -> keyframe request/output -> video first frame”lineage。不得把terminal原样first-frame伪装为hard cut，也不得生成一个只看character/scene、不真实消费terminal的独立keyframe。
-
-如果selected Provider/profile不支持required role set，返回capability blocked。不得删除terminal lineage改跑普通R2V/T2V，也不得静默切换Provider。
+既有 C2 technical contract继续seal“terminal -> keyframe request/output -> video first frame”lineage，但它只是reference continuity的一种候选实现，尚未通过subjective quality gate。Router当前可选择的是exact capability明确支持terminal+canonical refs的R2V contract，不得把terminal原样first-frame伪装为reference continuity。
 
 ### Rule 3: Important Character Without Upstream Terminal
 
@@ -183,21 +190,16 @@ hard-cut decision必须seal“terminal -> keyframe request/output -> video first
 
 ### Rule 5: Hero and Repair Paths
 
-明确的 hero shot、已有视频重演、style transfer 或局部修复可选择 `video_edit`、`video_extend` 或 `hybrid`，但必须由单独 policy 明确允许并具备 exact source video binding。它们不是 continuity failure 的自动 fallback。
+明确的 hero shot、已有视频重演、style transfer 或局部修复在第一阶段一律返回`blocked_policy / HERO_SHOT_REQUIRES_HYBRID_OR_V2V`。未来独立 slice 只有在提供 exact source-video binding、对应 generation contract 与 explicit policy 后，才可选择 `video_edit`、`video_extend` 或 `hybrid`；它们始终不是 continuity failure 的自动 fallback。
 
 ## Decision Matrix
 
-| Important Character | Upstream Terminal | Canonical References | Motion Need | Decision |
-| --- | --- | --- | --- | --- |
-| No | No | Not required | None | `static_image` |
-| No | No | Not required | Light transform only | `image_motion` |
-| No | No | Not required | Complex/free | `generated_video + text_to_video` |
-| Yes | Yes, continuous-take | Any | Character action | `generated_video + image_to_video + terminal first_frame` |
-| Yes | Yes, hard-cut | Character + terminal | Character action/new framing | prepare derived keyframe, then `generated_video + image_to_video` |
-| Yes | No | Yes, Provider supports exact set | Character action | `generated_video + reference_to_video` |
-| Yes | No | Yes, Provider only supports first frame | Character action | prepare keyframe, then `generated_video + image_to_video` |
-| Yes | No | No | Any generated motion | `blocked_missing_input` |
-| Any | Any | Any | Existing approved clip suffices | `existing_video` |
+| Continuity Mode | Required Continuity Input | Pixel Rule | Typical Decision |
+| --- | --- | --- | --- |
+| `exact_terminal` | upstream terminal | terminal is exact `first_frame`；不消费semantic state | `generated_video + image_to_video` |
+| `reference` | terminal + character refs + scene ref + semantic state | terminal is `reference`, never `first_frame` | `generated_video + reference_to_video` |
+| `semantic` | typed semantic state | terminal excluded even if available | anchored R2V/I2V or identity-free T2V |
+| `none` | none | terminal and continuity state excluded | existing/static/image-motion/graphics or independent generation |
 
 相同 inputs、policy version 与 capability snapshot 必须产生相同 audit decision；相同 selected strategy/mode/bindings/inputs/capability/output projection 必须产生相同 semantic routing hash。规则冲突必须按固定 priority 解决，不能依赖 dict order、Provider registration order 或模型自由文本判断。
 
@@ -205,7 +207,7 @@ hard-cut decision必须seal“terminal -> keyframe request/output -> video first
 
 Router core 只输出 capability requirements。Provider-specific mapping 保留在 adapter/profile：
 
-- Local H3 `fl2va`用于terminal-first-frame或derived-keyframe-first-frame；optional `ref2va`保持独立capability；
+- Local H3 `fl2va`只满足`exact_terminal`或已独立准备好的keyframe-first-frame；它不满足`reference`。optional `ref2va`保持独立capability和独立quality gate；
 - MiniMax cloud Hailuo 2.3；
 - Seedance 2.0 Mini；
 - 未来明确注册的 Provider。
@@ -281,11 +283,12 @@ Router 失败必须是 typed, stable, user-actionable：
 4. static、image motion、motion graphics、existing video和hybrid边界分别测试。
 5. 相同 canonical inputs 产生相同 audit/semantic hashes；无关自由文本/registration order不改变 semantic result。
 6. policy-only变化只改变 audit hash；reference/terminal/capability/selected output变化精确改变 semantic hash。
-7. authoring proposal不能被P5/request/render消费；只有committer激活后的新Shot revision成为canonical strategy。
+7. 泛化回归不得复用单一fixture自证：至少两套在Character reference bytes/hash、Scene reference bytes/hash、Shot intent/prompt与continuity state上互不相同的输入，都必须得到正确mode/roles；各自构造的`VideoGenerationRequest`必须保留exact prompt/reference set并产生不同`request_input_hash`。
+8. authoring proposal不能被P5/request/render消费；只有committer激活后的新Shot revision成为canonical strategy。
 
 ### Integration Contract Tests
 
-1. accepted authoring proposal只能由`ProductionStateCommitter`物化/激活为新Shot revision；P5继续只消费activated Shot。
+1. 第一阶段不接受或物化 authoring proposal，caller 继续显式 authoring；未来若增加接受 proposal 的 slice，仍只能由`ProductionStateCommitter`物化/激活新Shot revision，P5继续只消费activated Shot。
 2. `VideoGenerationRoutingDecision`可构造现有 `VideoGenerationRequest`，不增加 Provider-specific core fields。
 3. unsupported role/mode/profile 在 preview/submit前 fail closed，transport call count为零。
 4. Local-only policy不触发 remote lookup、secret access、Budget Guard或network。
@@ -295,7 +298,7 @@ Router 失败必须是 typed, stable, user-actionable：
 
 ### Quality Acceptance
 
-Router technical acceptance只证明规则实现正确，不证明生成质量。至少用一组 representative episode shot list 做人工 audit：每个 Shot 的 strategy/mode、reason code、required references和blocked reason必须可解释；所有固定主角 continuity Shot不得被路由到裸 T2V。
+Router technical acceptance只证明规则实现正确，不证明生成质量。至少用一组 representative episode shot list 做人工 audit：每个 Shot 的 strategy/mode、reason code、required references和blocked reason必须可解释；所有固定主角 continuity Shot不得被路由到裸 T2V。单个角色/场景/prompt的成功不得称为泛化；跨内容媒体样例也只能证明其实际运行的continuity mode和exact Provider capability。
 
 Local H3、Hailuo、Seedance等各 Provider 的 live/quality acceptance继续独立报告。一个 Provider成功不能证明 Router 对另一 Provider的选择正确。
 
@@ -303,11 +306,11 @@ Local H3、Hailuo、Seedance等各 Provider 的 live/quality acceptance继续独
 
 开始 Router runtime implementation 前必须同时满足：
 
-1. Minimal Shot Continuity Proof 的 `C2_HARD_CUT_KEYFRAME_I2V` 已达到technical、local live与subjective continuity acceptance；C1 proof不能替代；
-2. Router implementation plan 已独立完成并获用户授权；
+1. 用户已明确接受四档continuity scope，且不同档位不得静默互相fallback；
+2. C1 exact-terminal proof只证明`exact_terminal`，不能被描述为`reference`或C2 derived-keyframe quality acceptance；
 3. exact file/module ownership、RED tests、focused verification 与 rollback 已稳定；
-4. 已确认第一版不需要 schema/layout/CLI mutation，或对应 scope expansion 已另行获批；
-5. live/paid Provider 调用仍有独立 task-scoped authorization。
+4. 第一阶段不做 proposal materialization，不修改 schema/layout/CLI/P5/state writer；
+5. live/paid Provider 调用仍需独立 task-scoped authorization，本 Router implementation 不调用 Provider。
 
 ## Rollback
 

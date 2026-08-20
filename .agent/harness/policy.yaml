@@ -108,6 +108,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify paid-provider safety and generated-video contracts without live submit.
+  production_shot_router_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_shot_router.py, tests/test_production_video.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, -q]
+    cwd: .
+    description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
   full_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, -q]
     cwd: .
@@ -355,4 +359,11 @@ categories:
       - tests/video_provider_contract.py
     check_ids:
       - production_video_provider_tests
+      - task_architecture_gate
+  production_shot_router:
+    patterns:
+      - src/ai_video/production/shot_router.py
+      - tests/test_production_shot_router.py
+    check_ids:
+      - production_shot_router_tests
       - task_architecture_gate
