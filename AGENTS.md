@@ -223,7 +223,8 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 ## Provider Credential and Paid Execution Rules
 
 - Seedance / Volcengine Ark raw credential 不得存入 repository、`.env`、artifact、prompt、command argument、fixture、log、error、repr、receipt 或本文档。
-- 稳定 credential reference 是 `ARK_API_KEY`；本机 Secret Service exact attributes 为 `application ai-video`、`provider seedance`、`credential ARK_API_KEY`。不得改用 `SEEDANCE_API_KEY`、读取 MiniMax credential 或建立 environment/provider fallback。
+- 稳定 credential reference 是 `ARK_API_KEY`；本机 Secret Service exact attributes 为 `application ai-video`、`provider seedance`、`credential ARK_API_KEY`。不得改用 `SEEDANCE_API_KEY` 或建立 environment/provider fallback。
+- MiniMax Speech credential 已存入本机 Secret Service；`secret-tool` label 为 `AI-VIDEO MiniMax Speech`，exact attributes 为 `application ai-video`、`provider minimax-speech`、`credential MINIMAX_SPEECH_API_KEY`。其稳定 credential reference 是 `MINIMAX_SPEECH_API_KEY`；除该明确 reference 外，不得读取其他 MiniMax credential 或建立 environment/provider fallback。
 - Secret lookup 必须封装在 injected credential supplier 中。不得在交互终端把 secret 输出到 stdout；presence check 必须不回显。Lookup失败、keyring locked、credential invalid/rotated 时 fail closed，不得搜索 repo、shell history 或替代 secret source。
 - Credential 存在不证明 access、pricing、余额或当前 task authorization。
 - 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；不得仅因付费对同一任务重复询问。Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
