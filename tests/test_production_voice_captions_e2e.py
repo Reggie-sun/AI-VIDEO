@@ -374,7 +374,8 @@ class _FakeHyperFramesRunner:
         if command == "render":
             source = (cwd / "index.html").read_text(encoding="utf-8")
             caption_elements = re.findall(
-                r'<div[^>]*class="clip caption"[^>]*>', source
+                r'<div[^>]*class="[^"]*\bclip\b[^"]*\bcaption\b[^"]*"[^>]*>',
+                source,
             )
             self.caption_frame_windows = tuple(
                 (

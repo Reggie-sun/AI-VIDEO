@@ -112,6 +112,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_shot_router.py, tests/test_production_video.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, -q]
     cwd: .
     description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
+  video_planner_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_planning_video_planner.py, tests/test_errors.py, -q]
+    cwd: .
+    description: Verify provider-neutral Video Planner proposals and Main Agent STOP semantics.
   full_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, -q]
     cwd: .
@@ -257,6 +261,7 @@ categories:
     patterns:
       - src/ai_video/production/composition.py
       - src/ai_video/production/hyperframes.py
+      - src/ai_video/production/_hyperframes_*.py
       - src/ai_video/production/visual_media.py
       - src/ai_video/production/audio.py
       - src/ai_video/production/captions.py
@@ -370,6 +375,14 @@ categories:
       - tests/test_production_shot_router.py
     check_ids:
       - production_shot_router_tests
+      - task_architecture_gate
+  video_planning:
+    patterns:
+      - src/ai_video/planning/**
+      - tests/fixtures/planning_factory.py
+      - tests/test_planning_video_planner.py
+    check_ids:
+      - video_planner_tests
       - task_architecture_gate
   agent_memory_dev_tool:
     # Local, read-only RAG over docs/record_for_agent/. Dev / Codex

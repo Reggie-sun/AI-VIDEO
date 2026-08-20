@@ -191,6 +191,44 @@ def test_shot_router_routes_to_exact_contract_suite() -> None:
         assert path in argv
 
 
+def test_video_planner_routes_to_exact_contract_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/planning/video_planner.py",
+        "tests/fixtures/planning_factory.py",
+        "tests/test_planning_video_planner.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["video_planning"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "video_planner_tests",
+            "task_architecture_gate",
+        ]
+
+    argv = policy["checks"]["video_planner_tests"]["argv"]
+    assert "tests/test_planning_video_planner.py" in argv
+    assert "tests/test_errors.py" in argv
+
+
+def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths(
+        ["src/ai_video/production/_hyperframes_source.py"], policy
+    )
+
+    assert report["categories"] == ["production_composition_audio"]
+    assert report["fallback_paths"] == []
+    assert report["check_ids"] == [
+        "scope_diff_check",
+        "production_composition_audio_tests",
+        "task_architecture_gate",
+    ]
+
+
 def test_production_policy_commands_cover_repository_mandatory_contract_tests() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
     dependency_argv = policy["checks"]["production_dependency_tests"]["argv"]
