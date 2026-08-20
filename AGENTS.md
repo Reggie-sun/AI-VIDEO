@@ -101,6 +101,15 @@ AI-VIDEO remains the sole owner of production truth. External Skills provide adv
 
 Use the minimum matching Skill set. Installation、description matching 或“本仓库生产视频”本身不构成触发条件。纯 production-state、asset、schema、dependency、timeline、render、activation、recovery 或 Provider-lifecycle 工作只使用 AI-VIDEO code 与 accepted contracts。
 
+### Agent-Side Image Generation Provider Preference
+
+当用户明确要求 Agent 实际生成图片时，默认优先使用 project-local `gpt-image-2` MCP 的 `chatgpt-web` backend；本地 ComfyUI 作为次选。该优先级只约束 Codex / Agent 的交互式工具选择，不是 Production runtime Provider selector，不改变 Legacy local-first default，也不得让 MCP 成为 `ImageAssetProvider`、writer、Asset Registry、Manifest、activation、recovery 或 delivery truth owner。
+
+- 调用前必须用 `backend_status` 验证 selected backend 精确为 `chatgpt-web` 且 ready；禁止为了可用性切换到 `api` 或 `auto`。Provider preference 本身不构成 live authorization；只有用户当前明确要求实际生图时，才可在该 accepted scope 内执行最少必要调用。
+- 只有在 MCP 于任何 remote submit 前明确未配置或不可用，或用户明确指定本地生成时，才可选择 loopback-only ComfyUI。`generate_image` 已调用、超时或 outcome unknown 后必须 fail closed，不得自动切换 ComfyUI、重复提交或把 fallback 当成 retry。
+- MCP 返回的文件、metadata、`saved` / `ready` 状态只是真实来源待核验的 raw candidate，不是 canonical asset、provenance、QA acceptance、activation 或 final delivery。候选进入 Production 时必须通过既有 truthful import contract 记录实际 actor/source，或通过未来单独批准的 AI-VIDEO Provider adapter；任何 durable mutation 仍只归 `ProductionStateCommitter`。
+- 不得保存、打印或提交 ChatGPT session material、browser profile、signed source URL 或 raw credential。MCP output directory 不得作为 Production artifact root；失败诊断截图、页面文本与 conversation metadata 不得进入 repository、receipt 或交付物。
+
 ### Creative Skill Preflight Gate
 
 当 task 包含 generated-video Shot 设计、跨 Shot continuity、image/video prompt 编写或修改、Provider/model-specific prompt adaptation、camera/motion design、generation failure diagnosis 或 creative iteration 时，匹配的 Creative Skill 从建议项升级为 task-level mandatory preflight。Agent MUST 在首次编写或修改 prompt、continuity contract 或 execution script 之前完成步骤 1–2，并在进入 live/paid Provider exact preview、permit mint/consume 或 POST 之前完成步骤 3–4：
@@ -246,23 +255,35 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 
 ## Agent Experience Memory (Advisory)
 
-For tasks involving real media production, Provider quality, continuity,
-rough-cut quality, known regressions, or previously observed failures,
-search `docs/record_for_agent/` through the local Agent Experience Memory
-before substantial execution:
+The Agent Experience Memory under `docs/record_for_agent/` is an advisory
+historical knowledge source.
 
-```bash
-python -m scripts.agent_memory build
-python -m scripts.agent_memory search "<query>"
-```
+Use `scripts/agent_memory.py search` before substantial execution when
+the task involves:
 
-Before completion of such tasks, perform one final relevant-memory search
-to check for repeated historical failures.
+- real media production;
+- rough-cut or final output quality;
+- known regressions or repeated failures;
+- Provider/model behavior;
+- continuity, identity drift, reference usage;
+- image/video generation strategy;
+- architecture decisions with previous rejected approaches;
+- recovery from previous incidents.
 
-Retrieved records are advisory evidence only and never override current
-code, tests, or runtime truth. The memory system MUST NOT select Providers,
-mutate Manifest/Asset Registry/Dependency Graph, read credentials, contact
-the network, run paid models, execute repair, or generate media.
+The Agent SHOULD NOT query memory for trivial changes such as formatting,
+typo fixes, isolated refactors, or tests with no relation to previous
+production experience.
+
+Retrieved memories are advisory only. They MUST NOT override:
+
+1. user instructions;
+2. current code and tests;
+3. runtime evidence;
+4. current architecture contracts.
+
+Before completing a task involving production quality, Provider behavior,
+or known failure domains, perform a final relevant memory search to check
+for repeated mistakes.
 
 ## Completion Standard
 
