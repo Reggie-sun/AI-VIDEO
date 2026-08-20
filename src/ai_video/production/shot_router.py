@@ -1011,7 +1011,8 @@ class VideoGenerationResolver:
         capability: VideoCapabilityVariant,
         required_roles: tuple[str, ...],
     ) -> bool:
-        if len(required_roles) > capability.max_reference_count:
+        reference_count = sum(1 for role in required_roles if role == "reference")
+        if reference_count > capability.max_reference_count:
             return False
         if capability.required_first_frame and (
             not required_roles or required_roles[0] != "first_frame"

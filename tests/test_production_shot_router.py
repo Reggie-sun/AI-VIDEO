@@ -37,6 +37,7 @@ from ai_video.production.video import (
     VideoOutputRequirement,
     VideoProviderCapabilities,
 )
+from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 
 
 HASH_A = "a" * 64
@@ -1309,3 +1310,130 @@ def test_router_surface_is_available_from_production_package() -> None:
     assert PublicRouterContinuityState is RouterContinuityState
     assert PublicShotVisualResolver is ShotVisualResolver
     assert PublicVideoGenerationResolver is VideoGenerationResolver
+
+
+def test_exact_terminal_accepts_real_h3_and_hailuo_i2v_capabilities() -> None:
+    from pathlib import Path
+
+    from ai_video.production.comfy_video import (
+        ComfyUIVideoProvider,
+        load_local_video_execution_profile,
+    )
+    from ai_video.production.minimax_hailuo import MiniMaxHailuoVideoProvider
+
+    root = Path(__file__).resolve().parents[1]
+    h3_execution_profile = load_local_video_execution_profile(
+        root / "workflows/profiles/minimax_h3_fl2va_quality.json",
+        artifact_root=root,
+    )
+    h3_provider = ComfyUIVideoProvider(
+        h3_execution_profile,
+        artifact_root=root,
+        comfy_root=root,
+        image_root=root,
+        image_resolver=lambda *_: root / "unused.png",
+        transport=object(),
+        commit_resolver=lambda: h3_execution_profile.comfyui_commit,
+    )
+    h3_capabilities = h3_provider.capabilities()
+    h3_variant = next(
+        variant
+        for variant in h3_capabilities.variants
+        if variant.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+    )
+    hailuo_capabilities = MiniMaxHailuoVideoProvider(
+        transport=object(),
+        credential=lambda _: (_ for _ in ()).throw(
+            AssertionError("offline capability inspection must not read credentials")
+        ),
+    ).capabilities()
+    hailuo_i2v_variant = next(
+        variant
+        for variant in hailuo_capabilities.variants
+        if variant.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+    )
+    assert h3_variant.required_first_frame is True
+    assert h3_variant.max_reference_count == 0
+    assert hailuo_i2v_variant.required_first_frame is True
+    assert hailuo_i2v_variant.max_reference_count == 0
+    h3_output = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=124,
+        dimension_mode="exact",
+        width=1344,
+        height=672,
+        resolution_label="h3_native",
+        ratio="adaptive",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=True,
+    )
+    hailuo_i2v_output = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=141,
+        dimension_mode="exact",
+        width=1366,
+        height=768,
+        resolution_label="768P",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+
+    h3_profile = ProviderProfilePointer(
+        profile_id="minimax-h3-fl2va-quality",
+        profile_version="v1",
+        profile_path=Path(
+            f"provider-profiles/{h3_execution_profile.profile_content_hash}.json"
+        ),
+        profile_sha256=h3_execution_profile.profile_content_hash,
+    )
+    hailuo_profile = ProviderProfilePointer(
+        profile_id="minimax-hailuo-default",
+        profile_version="hailuo-2.3-v1",
+        profile_path=Path(f"provider-profiles/{HASH_A}.json"),
+        profile_sha256=HASH_A,
+    )
+
+    terminal = _asset("continuity_terminal", "terminal", HASH_C)
+    context = _context(
+        continuity=ContinuityMode.EXACT_TERMINAL,
+        terminal=terminal,
+    )
+
+    h3_decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=h3_profile,
+        capabilities=h3_capabilities,
+        selected_capability_id=h3_variant.capability_id,
+        output_requirement=h3_output,
+    )
+    hailuo_decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(remote_authorized=True, budget_authorized=True),
+        provider_profile=hailuo_profile,
+        capabilities=hailuo_capabilities,
+        selected_capability_id=hailuo_i2v_variant.capability_id,
+        output_requirement=hailuo_i2v_output,
+    )
+
+    assert h3_decision.outcome is RoutingOutcome.SELECTED
+    assert h3_decision.selected_capability_id == h3_variant.capability_id
+    assert h3_decision.required_binding_roles == ("first_frame",)
+    assert h3_decision.input_assets == (terminal,)
+    assert h3_decision.reason_codes == (
+        RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME,
+    )
+    assert hailuo_decision.outcome is RoutingOutcome.SELECTED
+    assert (
+        hailuo_decision.selected_capability_id == hailuo_i2v_variant.capability_id
+    )
+    assert hailuo_decision.required_binding_roles == ("first_frame",)
+    assert hailuo_decision.input_assets == (terminal,)
+    assert hailuo_decision.reason_codes == (
+        RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME,
+    )
