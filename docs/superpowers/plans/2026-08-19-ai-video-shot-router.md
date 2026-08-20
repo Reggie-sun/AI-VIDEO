@@ -163,7 +163,7 @@ pytest -q \
 
 ## Milestone 6: Integration, Review, and Harness
 
-构造representative inputs，覆盖static/image-motion/motion-graphics、四档continuity、I2V/R2V/T2V/existing/hybrid/blocked lanes，并证明C2 derived-keyframe主观失败没有被误写为reference quality acceptance。所有固定主角continuity Shot都不得路由到裸T2V，remote path未授权时不得触发secret、Budget Guard或network。
+构造representative inputs，覆盖static/image-motion/motion-graphics、四档continuity、I2V/R2V/T2V/existing/hybrid/blocked lanes，并证明C2 derived-keyframe主观失败没有被误写为reference quality acceptance。至少增加两套互不复用Character/Scene reference hashes、Shot intent/prompt和continuity state的variation cases，证明request保留各自exact prompt/reference set且hash随输入变化；不得用同一fixture的重复replay声称泛化。所有固定主角continuity Shot都不得路由到裸T2V，remote path未授权时不得触发secret、Budget Guard或network。
 
 运行：
 
@@ -199,6 +199,7 @@ Technical acceptance要求：
 - authoring proposal不成为second truth；
 - 第一阶段没有proposal materialization或第二writer；
 - 四档continuity均有typed executable contract；`exact_terminal`复制terminal到first frame，`reference`只作reference，`semantic`与`none`均不消费terminal pixels；
+- 至少两套不同Character/Scene references、Shot prompt与continuity state通过同一contract；bindings、request prompt与request hash必须反映各自输入，而不是固定fixture；
 - capability/resource/authorization denial全部fail closed；
 - semantic/audit hash分离且P5 invalidation精确；
 - no-network integration与fresh Harness通过。

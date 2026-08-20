@@ -43,6 +43,9 @@ HASH_A = "a" * 64
 HASH_B = "b" * 64
 HASH_C = "c" * 64
 HASH_D = "d" * 64
+HASH_E = "e" * 64
+HASH_F = "f" * 64
+HASH_0 = "0" * 64
 
 
 def _asset(
@@ -81,7 +84,17 @@ def _context(
     scene_reference: RouterAssetIdentity | None = None,
     continuity_state: RouterContinuityState | None = None,
     visual_strategy: VisualStrategy = VisualStrategy.GENERATED_VIDEO,
+    shot_id: str = "shot-2",
+    scene_id: str = "scene-room",
+    shot_intent: str = "Continue the exact authored action.",
+    important_character_ids: tuple[str, ...] | None = None,
+    character_bible_hashes: tuple[str, ...] | None = None,
+    scene_content_hash: str = HASH_B,
 ) -> ShotRoutingContext:
+    if important_character_ids is None:
+        important_character_ids = ("hero",) if important else ()
+    if character_bible_hashes is None:
+        character_bible_hashes = (HASH_A,) if important else ()
     if character_references is None:
         character_references = (
             (_asset("character_reference", "character", HASH_A),)
@@ -98,19 +111,19 @@ def _context(
     )
     activated_shot = seal_artifact(
         Shot(
-            artifact_id="shot-artifact-2",
+            artifact_id=f"{shot_id}-artifact",
             revision=3,
             content_hash="0" * 64,
             creation_receipt_id="router-test-authoring",
             source_provenance=(
                 SourceReference(kind="user_input", reference="router-test"),
             ),
-            shot_id="shot-2",
-            scene_id="scene-room",
+            shot_id=shot_id,
+            scene_id=scene_id,
             storyboard_beat_id="beat-2",
-            intent="Continue the exact authored action.",
+            intent=shot_intent,
             duration_policy=DurationPolicy(mode="fixed", seconds=4),
-            character_ids=("hero",) if important else (),
+            character_ids=important_character_ids,
             continuity_constraints=continuity_constraints,
             visual_strategy=visual_strategy,
         )
@@ -122,9 +135,9 @@ def _context(
         target_shot_content_hash=activated_shot.content_hash,
         storyboard_revision=2,
         storyboard_content_hash=HASH_D,
-        character_bible_content_hashes=(HASH_A,) if important else (),
-        scene_content_hash=HASH_B,
-        important_character_ids=("hero",) if important else (),
+        character_bible_content_hashes=character_bible_hashes,
+        scene_content_hash=scene_content_hash,
+        important_character_ids=important_character_ids,
         canonical_character_references=character_references,
         canonical_scene_reference=scene_reference,
         approved_existing_video=existing_video,
@@ -138,16 +151,25 @@ def _context(
     )
 
 
-def _continuity_state(*, story_state_hash: str = HASH_A) -> RouterContinuityState:
+def _continuity_state(
+    *,
+    state_id: str = "alice-continuity",
+    character_identity_hashes: tuple[str, ...] = (HASH_A,),
+    story_state_hash: str = HASH_A,
+    wardrobe_state_hashes: tuple[str, ...] = (HASH_B,),
+    injury_state_hashes: tuple[str, ...] = (HASH_C,),
+    prop_state_hashes: tuple[str, ...] = (HASH_D,),
+    scene_state_hash: str | None = HASH_B,
+) -> RouterContinuityState:
     return RouterContinuityState.create(
-        state_id="alice-continuity",
+        state_id=state_id,
         state_revision=2,
-        character_identity_hashes=(HASH_A,),
+        character_identity_hashes=character_identity_hashes,
         story_state_hash=story_state_hash,
-        wardrobe_state_hashes=(HASH_B,),
-        injury_state_hashes=(HASH_C,),
-        prop_state_hashes=(HASH_D,),
-        scene_state_hash=HASH_B,
+        wardrobe_state_hashes=wardrobe_state_hashes,
+        injury_state_hashes=injury_state_hashes,
+        prop_state_hashes=prop_state_hashes,
+        scene_state_hash=scene_state_hash,
     )
 
 
@@ -247,12 +269,16 @@ def _profile() -> ProviderProfilePointer:
     )
 
 
-def _request_from_decision(decision) -> VideoGenerationRequest:
+def _request_from_decision(
+    decision,
+    *,
+    prompt_text: str = "Preserve the exact activated semantic continuity state.",
+) -> VideoGenerationRequest:
     from pathlib import Path
 
     bindings = tuple(
         VideoImageReferenceBinding(
-            role="reference",
+            role=role,
             asset_id=asset.asset_id,
             asset_sha256=asset.asset_sha256,
             mime_type=asset.mime_type,
@@ -260,7 +286,11 @@ def _request_from_decision(decision) -> VideoGenerationRequest:
             height=asset.height,
             size_bytes=asset.size_bytes,
         )
-        for asset in decision.input_assets
+        for asset, role in zip(
+            decision.input_assets,
+            decision.required_binding_roles,
+            strict=True,
+        )
     )
     return VideoGenerationRequest.create(
         generation_id=f"generation-{decision.target_shot_content_hash[:12]}",
@@ -274,7 +304,7 @@ def _request_from_decision(decision) -> VideoGenerationRequest:
         target_asset_role="primary_visual",
         target_visual_strategy="generated_video",
         mode=decision.selected_mode,
-        prompt_text="Preserve the exact activated semantic continuity state.",
+        prompt_text=prompt_text,
         negative_prompt_text="",
         image_bindings=bindings,
         output_requirement=decision.output_requirement,
@@ -900,6 +930,133 @@ def test_exact_reference_capability_selects_r2v_with_all_anchors() -> None:
         "asset-m-scene",
         "asset-z-terminal",
     )
+
+
+def test_reference_routing_generalizes_across_distinct_references_and_prompts() -> None:
+    cases = (
+        {
+            "shot_id": "shot-alice-doorway",
+            "scene_id": "scene-warehouse-door",
+            "shot_intent": (
+                "Low-angle side close-up: Alice pivots at the warehouse door, "
+                "black coat torn at the left shoulder, pistol held in her right hand."
+            ),
+            "character_id": "alice",
+            "character_hash": HASH_A,
+            "scene_hash": HASH_B,
+            "terminal_hash": HASH_C,
+            "state": _continuity_state(
+                state_id="alice-doorway-continuity",
+                story_state_hash=HASH_D,
+            ),
+        },
+        {
+            "shot_id": "shot-kai-train",
+            "scene_id": "scene-sunlit-train",
+            "shot_intent": (
+                "Wide tracking shot: Kai in a yellow raincoat runs left along a "
+                "sunlit train platform while carrying a blue violin case."
+            ),
+            "character_id": "kai",
+            "character_hash": HASH_E,
+            "scene_hash": HASH_F,
+            "terminal_hash": HASH_0,
+            "state": _continuity_state(
+                state_id="kai-train-continuity",
+                character_identity_hashes=(HASH_E,),
+                story_state_hash=HASH_E,
+                wardrobe_state_hashes=(HASH_F,),
+                injury_state_hashes=(),
+                prop_state_hashes=(HASH_0,),
+                scene_state_hash=HASH_F,
+            ),
+        },
+    )
+    decisions = []
+    requests = []
+
+    for case in cases:
+        character_reference = _asset(
+            "character_reference",
+            f"{case['character_id']}-reference",
+            case["character_hash"],
+        )
+        scene_reference = _asset(
+            "scene_reference",
+            f"{case['scene_id']}-reference",
+            case["scene_hash"],
+        )
+        terminal = _asset(
+            "continuity_terminal",
+            f"{case['shot_id']}-terminal",
+            case["terminal_hash"],
+        )
+        context = _context(
+            continuity=ContinuityMode.REFERENCE,
+            terminal=terminal,
+            continuity_state=case["state"],
+            character_references=(character_reference,),
+            scene_reference=scene_reference,
+            shot_id=case["shot_id"],
+            scene_id=case["scene_id"],
+            shot_intent=case["shot_intent"],
+            important_character_ids=(case["character_id"],),
+            character_bible_hashes=(case["character_hash"],),
+            scene_content_hash=case["scene_hash"],
+        )
+        decision = VideoGenerationResolver().resolve(
+            context=context,
+            policy=_policy(),
+            provider_profile=_profile(),
+            capabilities=_capabilities(
+                _variant(VideoGenerationMode.REFERENCE_TO_VIDEO)
+            ),
+            selected_capability_id="capability-reference_to_video",
+            output_requirement=_output(),
+        )
+        request = _request_from_decision(
+            decision,
+            prompt_text=case["shot_intent"],
+        )
+        expected_bindings = tuple(
+            (
+                "reference",
+                asset.asset_id,
+                asset.asset_sha256,
+            )
+            for asset in sorted(
+                (character_reference, scene_reference, terminal),
+                key=lambda item: item.asset_id,
+            )
+        )
+
+        assert decision.outcome is RoutingOutcome.SELECTED
+        assert decision.selected_mode is VideoGenerationMode.REFERENCE_TO_VIDEO
+        assert decision.semantic_continuity_state == case["state"]
+        assert (
+            case["state"].shot_constraint_token
+            in context.activated_shot.continuity_constraints
+        )
+        assert tuple(
+            (binding.role, binding.asset_id, binding.asset_sha256)
+            for binding in request.image_bindings
+        ) == expected_bindings
+        decisions.append(decision)
+        requests.append(request)
+
+    assert all(decision.outcome is RoutingOutcome.SELECTED for decision in decisions)
+    assert all(
+        decision.selected_mode is VideoGenerationMode.REFERENCE_TO_VIDEO
+        for decision in decisions
+    )
+    assert all(decision.required_binding_roles == ("reference",) * 3 for decision in decisions)
+    assert requests[0].prompt_text == cases[0]["shot_intent"]
+    assert requests[1].prompt_text == cases[1]["shot_intent"]
+    assert requests[0].request_input_hash != requests[1].request_input_hash
+    assert decisions[0].semantic_routing_hash != decisions[1].semantic_routing_hash
+    assert {
+        binding.asset_sha256 for binding in requests[0].image_bindings
+    }.isdisjoint(binding.asset_sha256 for binding in requests[1].image_bindings)
 
 
 def test_semantic_continuity_carries_state_but_never_terminal_pixels() -> None:

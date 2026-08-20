@@ -283,7 +283,8 @@ Router 失败必须是 typed, stable, user-actionable：
 4. static、image motion、motion graphics、existing video和hybrid边界分别测试。
 5. 相同 canonical inputs 产生相同 audit/semantic hashes；无关自由文本/registration order不改变 semantic result。
 6. policy-only变化只改变 audit hash；reference/terminal/capability/selected output变化精确改变 semantic hash。
-7. authoring proposal不能被P5/request/render消费；只有committer激活后的新Shot revision成为canonical strategy。
+7. 泛化回归不得复用单一fixture自证：至少两套在Character reference bytes/hash、Scene reference bytes/hash、Shot intent/prompt与continuity state上互不相同的输入，都必须得到正确mode/roles；各自构造的`VideoGenerationRequest`必须保留exact prompt/reference set并产生不同`request_input_hash`。
+8. authoring proposal不能被P5/request/render消费；只有committer激活后的新Shot revision成为canonical strategy。
 
 ### Integration Contract Tests
 
@@ -297,7 +298,7 @@ Router 失败必须是 typed, stable, user-actionable：
 
 ### Quality Acceptance
 
-Router technical acceptance只证明规则实现正确，不证明生成质量。至少用一组 representative episode shot list 做人工 audit：每个 Shot 的 strategy/mode、reason code、required references和blocked reason必须可解释；所有固定主角 continuity Shot不得被路由到裸 T2V。
+Router technical acceptance只证明规则实现正确，不证明生成质量。至少用一组 representative episode shot list 做人工 audit：每个 Shot 的 strategy/mode、reason code、required references和blocked reason必须可解释；所有固定主角 continuity Shot不得被路由到裸 T2V。单个角色/场景/prompt的成功不得称为泛化；跨内容媒体样例也只能证明其实际运行的continuity mode和exact Provider capability。
 
 Local H3、Hailuo、Seedance等各 Provider 的 live/quality acceptance继续独立报告。一个 Provider成功不能证明 Router 对另一 Provider的选择正确。
 
