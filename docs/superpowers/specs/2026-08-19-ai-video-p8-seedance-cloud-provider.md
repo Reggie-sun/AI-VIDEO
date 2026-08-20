@@ -138,6 +138,75 @@ V1 adapter must accept already materialized, measured, sealed local inputs only.
 
 The production import surface is `SeedanceAssetMaterializationReceipt` plus `SeedanceAssetReferenceResolver`. It accepts only an Ark Console observation of an `Active` `asset-...` identity, binds it to the exact local asset ID/SHA-256/MIME/size, requires a human observer and exact confirmation-evidence SHA-256, and rejects ambiguous or mismatched mappings before permit consumption and before network. A local Registry ID can never be interpolated into `asset://`. This is a truthful import path for an already materialized Ark asset, not an uploader and not proof that a specific Alice asset currently exists.
 
+### 5.1 Proposed Synthetic / Illustrated Image Input Lane (Not Implemented)
+
+Status: contract proposal checked against current official documentation on `2026-08-20`; no runtime code, uploader, remote materialization, Provider submit, activation or live proof exists for this lane. The Provider transport and proposed internal receipt-binding design are documented below, but neither is implemented. This lane must not be represented as accepted runtime behavior until its RED/GREEN implementation, independent review and Harness receipt are complete.
+
+#### Official Transport Boundary
+
+The current [Create video generation task](https://www.volcengine.com/docs/82379/1520757?lang=zh) field contract explicitly documents three values for `content.image_url.url`: a public image URL, inline `data:image/<format>;base64,<bytes>`, or a material URI `asset://<ASSET_ID>`. The same page includes `Seedance 2.0 mini` in the supported 2.0-family matrix, limits each image to less than 30 MB and the request body to 64 MB, and says not to use Base64 for large files. AI-VIDEO uses the current decimal-byte constants `SEEDANCE_MAX_IMAGE_BYTES = 30_000_000` with strict `<` eligibility and `SEEDANCE_MAX_REQUEST_BODY_BYTES = 64_000_000` with inclusive `<=` eligibility. The page also states that Seedance 2.5 / 2.0 do not directly accept reference images or videos containing a real human face, directing those cases to the platform's authorized/material solutions.
+
+These are separate trust and egress surfaces, not interchangeable spellings:
+
+| Surface | Officially evidenced use | Proposed AI-VIDEO rule |
+|---|---|---|
+| inline Base64 | Exact Create video field accepts a `data:image/...;base64,...` value | May carry only an eligible sealed synthetic/illustrated or ordinary non-character local asset; bytes are encoded in memory from an exact Registry revision and are listed as image egress in preview. |
+| stable public HTTPS URL | Exact Create video field accepts an image public URL | May carry only an eligible sealed asset through an approved, controlled, immutable origin receipt. The Provider adapter does not upload, mint, discover or silently replace the URL. |
+| `asset://<ASSET_ID>` | Exact Create field supports preset material / virtual-person IDs; [Trusted asset library](https://www.volcengine.com/docs/82379/2315856?lang=zh) requires authorized real-person material to be enrolled and used by exact Asset ID | Remains the only accepted lane for real persons, protected identities and any face/identity case that is ambiguous under this proposal. |
+| Files / Assets API | The Create video field does not document `file_id` or a general Files API. [CreateAsset](https://www.volcengine.com/docs/82379/2318271?lang=zh) is a separate AK-authenticated Assets operation that ingests a public URL and explicitly does not accept Base64 | Not an ordinary-image uploader and not part of this proposal. No guessed upload endpoint, AK credential, implicit enrollment or conversion from local Registry ID is allowed. |
+
+The first implementation slice selects inline Base64 only. Although the official Create surface also accepts a public URL, AI-VIDEO currently has no approved publisher/materializer, immutable object-origin contract or retention proof for that path. HTTPS therefore remains a documented future transport gate, not a V1 fallback. A request that exceeds the safe inline/request-body ceiling must stop; it must not silently upload, switch to URL or route through Assets API.
+
+[Advanced creation entitlement](https://www.volcengine.com/docs/82379/2377608?lang=zh) describes Assets API/private material management as a separate enterprise entitlement/subscription, while [Model pricing](https://www.volcengine.com/docs/82379/1544106?lang=zh) prices video generation separately. Therefore this contract distinguishes: ordinary image transport (no official standalone per-image upload price is established by these sources), video-generation billing, and asset-library/API entitlement. None proves an account's current access, effective price or authorization.
+
+#### Classification and Provenance Gate
+
+Transport eligibility must be decided from sealed provenance plus a task-scoped human attestation. Agent/model visual inspection may raise risk but cannot establish that a depicted person is fictional, that an identity is unprotected, or that the caller holds rights.
+
+| Required class | Ordinary Base64 / HTTPS lane | Required disposition |
+|---|---:|---|
+| `real_person_or_protected_identity` | forbidden | Resolve through the existing trusted `SeedanceAssetMaterializationReceipt -> SeedanceAssetReferenceResolver -> asset://...` path only when an authorized provider asset exists; otherwise stop. |
+| `synthetic_photorealistic_person` | forbidden in V1 | Treat a clear photorealistic face as identity-bearing/ambiguous even when the image was AI-generated; use the trusted path or stop. A generator label alone cannot waive the face restriction. |
+| `clearly_illustrated_anime_non_real_character` | conditionally eligible | Requires explicit human attestation that the subject is non-real, the source/creator and rights are known, and no protected identity is intentionally reproduced. |
+| `ordinary_non_character_image` | conditionally eligible | Requires explicit human attestation that no recognizable real person, protected identity or character is present and that source rights permit the egress/use. |
+
+A proposed immutable `SeedanceSyntheticImageReferenceReceipt` must bind, at minimum:
+
+- exact local Asset Registry ID and selected revision, SHA-256, MIME, byte size, width and height;
+- exact creator/source/tool identity and version, source record or generation-evidence digest, and a rights/permission statement;
+- one of the four classes above, human attestor identity, task ID/scope, attestation timestamp and content digest;
+- selected transport, Provider/model/mode and permitted use;
+- for HTTPS only, canonical approved origin, non-secret object identity, remote-byte SHA-256, read-back evidence, retention-until and expiry semantics.
+
+A proposed immutable `SeedanceSyntheticImageEgressPolicyReceipt`, owned by the same `seedance_asset.py` boundary, aggregates one request's children. It must bind the canonical ordered tuple of every `(role, asset_id, child_receipt_content_hash)` to the exact prompt/image preview identity, task scope, Provider/model/mode, selected transport, destination and retention. Missing、extra、duplicate、reordered or role/asset-mismatched children invalidate the aggregate. Its content hash changes when any child evidence, role, order, prompt/preview identity or egress setting changes.
+
+Missing provenance, conflicting evidence, an unknown source, suspected real-person likeness, an intentionally reproduced protected identity, or classification uncertainty makes the synthetic lane ineligible. The caller must either provide a separately authorized trusted-material receipt or stop; there is no automatic downgrade from HTTPS/Base64 to `asset://`, no inference from filename/prompt/style metadata, and no classification based solely on Agent vision.
+
+#### Input Identity and Cloud Egress
+
+- Base64 is constructed only after re-reading the selected Registry bytes and matching the sealed SHA-256/size/MIME/geometry. The raw Base64 value is never persisted in Manifest, Registry, receipt, logs, errors, fixtures or repr; its bytes still count as explicit cloud egress and toward the 64 MB request-body ceiling.
+- HTTPS requires a pre-existing approved publisher/materializer receipt and separately authorized typed network preflight that prove read-back bytes equal the exact local bytes. Allowed origins are explicit and typed; the object must remain immutable and reachable through at least the selected sealed capability/profile execution-expiry window. Anonymous third-party temporary hosts, redirects, mutable object keys, unknown retention, unsealed uploads and automatic host fallback are forbidden. The preflight must not hide network I/O inside model validation.
+- Raw signed URLs, query credentials and bearer material are never persisted. V1 does not accept a signed-URL-only origin; adding such a mechanism would require a separate secret/expiry contract and approval.
+- The existing `PaidProviderCallPreview.egress_items` continues to name prompt egress and every image's exact asset ID, SHA-256, MIME and byte size. That is necessary but does not alone bind the separate classification/provenance/attestation receipt. `VideoGenerationRequest.input_artifact_ids` must not carry a bare receipt fingerprint: those IDs are canonical dependency-graph inputs and later Asset Records require them to identify real graph-addressable artifacts.
+- `SeedanceSyntheticImageEgressPolicyReceipt` is the single sealed task egress-policy evidence for the request. Its exact safe content-addressed ID is `seedance-synthetic-egress:<content_hash>` with the lowercase 64-hex receipt hash; the injected resolver and Paid Provider authorizer must independently reopen and validate the aggregate plus every ordered child receipt, then require `PaidProviderAuthorizationDecision.egress_policy_receipt_id` to equal that exact ID. The existing authorization evidence source must retain all canonical receipt bytes under their content-addressed IDs; an ID without retrievable matching evidence fails closed. This reuses the established authorization reference contract and does not create a second Registry/Manifest writer or new artifact layout.
+- The durable `PaidProviderGateReceipt` already persists the full authorization, but current operation-permit projection does not bind `authorization_fingerprint`. The implementation must add that existing fingerprint to permit minting、video permit projection、validate/consume/consumed checks and durability reopen comparison. Because the fingerprint seals `egress_policy_receipt_id`, the authorization supplied to `SeedanceVideoProvider.submit()` must then be the exact authorization stored in the durable Gate. The mismatch case—Gate `A1/R1`, submit `A2/R2` for the same preview—must leave the permit unconsumed and perform zero POST. This is a bounded internal permit-safety change, not a persisted Manifest/Gate schema or layout change.
+- `SeedanceSyntheticImageReferenceResolver` is the proposed single owner for validating this receipt and producing the in-memory `image_url` payload item. It neither uploads nor writes Registry/Manifest state and cannot select a Provider or transport. The existing trusted receipt/resolver remain unchanged and authoritative for their lane.
+- The resolver validates each image's exact bytes and strict `size_bytes < 30_000_000` ceiling. The adapter owns aggregate size: after constructing the final compact JSON body, and before permit consumption, it must reject `len(body) > 64_000_000`. No resolver may infer aggregate safety from individual image sizes.
+
+#### Failure and Recovery Semantics
+
+The following are semantic labels for typed `AiVideoError` behavior to be mapped to approved `ErrorCode` values during implementation; they are not claims that these runtime enums already exist:
+
+| Condition | Fail-closed behavior |
+|---|---|
+| classification/provenance ambiguity | Reject before egress, durable intent and permit consumption; require trusted materialization or corrected human evidence. |
+| HTTPS unreachable/expired/redirected | Reject that exact reference before Provider POST; do not switch host, inline bytes, upload, fallback or consume the submit permit. |
+| local/remote bytes, MIME, size or geometry mismatch | Integrity failure; invalidate the synthetic receipt and require explicit re-materialization/re-attestation. |
+| Provider rejects a known submitted task/input | Persist the exact known failure against the consumed permit/task identity; do not retry with another transport/model or remint a permit automatically. |
+| POST outcome unknown | Preserve existing `outcome_unknown` behavior: no blind retry, transport fallback, new upload or permit remint; reconcile the exact durable intent explicitly. |
+
+All validation and payload construction complete before submit. The one-use permit is still validated and consumed immediately adjacent to the sole Provider POST. The intended additive lane creates no second writer or mutable lifecycle and changes no persisted Manifest/Gate schema or layout, CLI, timeline, renderer, activation owner or Provider selector. Until the authorization-fingerprint binding and exact receipt lookup checks are implemented, the synthetic lane remains unavailable and must fail closed.
+
 ## 6. API, Status and Price Semantics
 
 ### 6.1 Endpoints and Authentication

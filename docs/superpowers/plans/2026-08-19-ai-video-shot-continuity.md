@@ -270,7 +270,7 @@ Offline verification：
 pytest -q tests/test_production_seedance.py tests/test_production_video.py
 ```
 
-2026-08-20 live preflight result：exact model/capability与`generate_audio=false`保持sealed；按官方`23 CNY / million tokens`与仓库token公式计算2.484 CNY，并seal保守`3 CNY` preview upper bound。后续bugfix已实现sealed Ark Console `Active` materialization receipt与exact local-asset resolver，补齐可验证的identity import owner；但Shared keyframe仍没有真实Ark `asset-...`和confirmation evidence，因此authorization/permit未签发且POST为零。该external materialization gate不能由Hailuo success、临时第三方URL或猜测upload API替代。
+2026-08-20 live preflight result：exact model/capability与`generate_audio=false`保持sealed；按官方`23 CNY / million tokens`与仓库token公式计算2.484 CNY，并seal保守`3 CNY` preview upper bound。后续bugfix已实现sealed Ark Console `Active` materialization receipt与exact local-asset resolver，补齐可验证的identity import owner；但Shared keyframe仍没有真实Ark `asset-...`和confirmation evidence，因此authorization/permit未签发且POST为零。P8 Seedance plan新增的inline-Base64 synthetic/illustrated lane仍是未实现、未授权的独立后续task，只允许sealed且human-attested的明确非真人/非受保护角色或普通非角色图片；Alice photorealistic keyframe明确不符合该V1分类。因此本continuity lane的external materialization gate不能由该proposal、Hailuo success、临时第三方URL或猜测upload API替代。
 
 ### Execution Order for Cost Control
 

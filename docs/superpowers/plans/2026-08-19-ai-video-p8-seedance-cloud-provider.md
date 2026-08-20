@@ -1,6 +1,6 @@
 # AI-VIDEO P8 Seedance Cloud Provider Implementation Plan
 
-Status: Offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic later reached provider `succeeded` and fetched an MP4. The follow-up tracked payload correction is offline-verified but not live re-submitted; billing settlement、candidate activation、push和release均未完成。
+Status: Offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic later reached provider `succeeded` and fetched an MP4. The follow-up tracked payload correction is offline-verified but not live re-submitted; billing settlement、candidate activation、push和release均未完成。2026-08-20新增的synthetic/illustrated input lane目前仅为docs-only proposed contract；没有对应runtime、test或live authorization。
 
 **Spec:** `docs/superpowers/specs/2026-08-19-ai-video-p8-seedance-cloud-provider.md`
 
@@ -176,3 +176,127 @@ The regression test was observed RED against the original payload and GREEN afte
 The missing production owner for already-materialized Ark identities is now `src/ai_video/production/seedance_asset.py`. `SeedanceAssetMaterializationReceipt` seals a human-observed Ark Console `Active` asset, its confirmation-evidence SHA-256, materialization scope and rights note against one exact local asset ID/SHA-256/MIME/size. `SeedanceAssetReferenceResolver` rejects missing, ambiguous, tampered or mismatched receipts and emits only a real `asset://asset-...` URI. `SeedanceVideoProvider` additionally rejects a local Registry ID masquerading as an Ark URI before permit consumption/network.
 
 This task does not automate Ark Console enrollment, add Assets API/AK/SK support, change Manifest/CLI/layout, or claim that the Alice keyframe already has a provider asset. The representative Seedance lane remains zero-submit until the human-controlled Ark materialization and exact receipt evidence exist.
+
+## Task 10: Synthetic / Illustrated Inline Image Lane
+
+**Status:** proposed docs-only；official transport and internal receipt-binding design documented, but not implemented and not authorized for remote execution.
+
+### Contract Decision
+
+Current official `CreateContentsGenerationsTasks` documentation proves that `content.image_url.url` accepts a public URL、inline `data:image/<format>;base64,...` or `asset://<ASSET_ID>` for the Seedance 2.0 family, including Mini. The first AI-VIDEO transport proposal selects inline Base64 only because it can be derived directly from exact local bytes without inventing an uploader or persisting a remote URL. Public HTTPS remains deferred until a separately approved publisher/materializer contract can prove origin、immutability、read-back identity、retention and expiry. General Files API、CreateAsset automation and implicit fallback remain excluded. Implementation still starts fail closed until the exact synthetic receipt is bound through the authorization and operation permit as specified below.
+
+The existing trusted owner is unchanged:
+
+```text
+real person / protected or ambiguous identity
+  -> SeedanceAssetMaterializationReceipt
+  -> SeedanceAssetReferenceResolver
+  -> asset://<ASSET_ID>
+```
+
+The additive proposal is:
+
+```text
+attested illustrated/anime/non-real or ordinary non-character asset
+  -> SeedanceSyntheticImageReferenceReceipt
+  -> SeedanceSyntheticImageEgressPolicyReceipt (canonical ordered aggregate)
+  -> SeedanceSyntheticImageReferenceResolver
+  -> in-memory data:image/...;base64,...
+```
+
+`synthetic_photorealistic_person` remains ineligible for this V1 lane and must use an authorized trusted asset or stop. Classification must come from sealed source/tool/rights provenance plus task-scoped human attestation; Agent vision is advisory only.
+
+### Problem Boundary and Ownership
+
+- Proposed source owner: `src/ai_video/production/seedance_asset.py` owns the per-image immutable receipt、request-level immutable aggregate egress-policy receipt and exact-byte inline resolver. It does not write Manifest/Registry state or upload bytes.
+- Adapter translation owner: `src/ai_video/production/seedance.py` accepts only the exact trusted resolver or exact synthetic resolver and emits the selected payload after validation. It must not accept an arbitrary caller callable as a bypass.
+- Shared permit-binding owners: `src/ai_video/production/_state_commit_paid_provider.py` mints and durability-checks the exact Gate permit; `src/ai_video/production/_state_commit_contracts.py` validates/consumes it; `src/ai_video/production/video.py` projects the exact video binding. Their bounded change is only to carry the already sealed `authorization_fingerprint`; shared voice/video behavior outside that identity strengthening remains unchanged.
+- Focused test owner: `tests/test_production_seedance.py`.
+- Shared permit regression owners: `tests/test_production_paid_provider_state.py` and `tests/test_production_video.py`; compatibility checks remain in `tests/test_production_elevenlabs.py` and `tests/test_production_minimax_speech.py`. Do not create a parallel Gate implementation.
+- Old path to remove: none. Existing `SeedanceAssetMaterializationReceipt` / `SeedanceAssetReferenceResolver` behavior and tests remain unchanged.
+- Schema/layout migration: none. No new writer、Manifest lifecycle、CLI、timeline、renderer、Provider selector or automatic fallback.
+- Evidence binding: `SeedanceSyntheticImageEgressPolicyReceipt` canonically binds the ordered tuple of every `(role, asset_id, SeedanceSyntheticImageReferenceReceipt.content_hash)` plus prompt/preview、task、Provider/model/mode、transport、destination and retention. Its exact ID is `seedance-synthetic-egress:<lowercase-64-hex-content_hash>` and must equal `PaidProviderAuthorizationDecision.egress_policy_receipt_id`; the existing authorization evidence source retains/reopens the aggregate and every child under their exact IDs. The resolver and authorizer independently verify the same aggregate/children 1:1. `input_artifact_ids` remains graph-only and unchanged.
+- Permit binding: add the existing `authorization_fingerprint` to mint-time binding、`build_video_paid_permit_binding()`、operation permit validate/consume/consumed paths and durability reopen comparison. This pins the submit-time authorization to the authorization persisted in the exact `PaidProviderGateReceipt` without a persisted schema/layout change.
+- Scope-expansion stop gate: if implementation cannot retain/reopen the exact egress-policy receipt through the existing authorization evidence source, or requires a new persisted schema/layout/writer, stop and propose that expansion separately.
+
+### RED 0: Authorization and Permit Identity
+
+Add focused failing contract tests before production code:
+
+- a bare receipt/content hash in `input_artifact_ids` is not accepted as evidence and cannot produce a dangling generated-asset dependency;
+- same preview plus durable Gate authorization `A1/R1` and submit-time authorization `A2/R2` fails before POST and leaves the permit unconsumed;
+- changing any child receipt、role、asset ID、canonical order or preview/egress setting changes the aggregate `egress_policy_receipt_id` and sealed authorization fingerprint;
+- missing or unreopenable egress-policy receipt bytes fail before permit/network;
+- the ordered child receipts、aggregate authorization evidence、Paid Provider Gate and consumed permit form one exact chain;
+- missing、extra、mismatched or duplicate receipts relative to image bindings fail before egress/permit/network.
+
+### GREEN 0: Minimal Shared Permit Strengthening
+
+Implement only the internal identity projection needed to carry `authorization_fingerprint` through permit mint、durability and the video operation's validation/consumption binding. Reopen the exact Gate and compare its sealed authorization fingerprint. `build_video_paid_permit_binding()` supplies the submit-time fingerprint; existing voice permit callers retain their current operation binding and receive no synthetic-input semantics. Do not add a second permit type、writer、Manifest field、artifact layout or Provider-specific branch in the shared committer, and prove the existing voice providers remain compatible.
+
+### RED 1: Classification, Provenance and Identity
+
+After the binding gate is approved, add failing tests before production code for:
+
+- all four exact classes: real/protected、synthetic photorealistic、clearly illustrated/anime/non-real、ordinary non-character；only the final two may enter the proposed lane;
+- missing human attestor、task scope、creator/source/tool identity、rights statement、Registry revision、SHA-256、MIME、size or geometry fails closed;
+- ambiguous/suspected real-person likeness、unknown source or protected identity fails before egress/permit/network and cannot auto-downgrade;
+- receipt content hash or any local selected bytes/metadata mismatch fails closed;
+- changing classification/provenance/attestation identity changes the child receipt、aggregate egress-policy receipt and authorization fingerprint bound to the Gate/permit;
+- missing、extra、mismatched or duplicate receipt-to-image-binding mappings fail closed 1:1.
+
+Run and preserve the RED evidence:
+
+```bash
+PYTHONPATH=src python -m pytest -p no:cacheprovider \
+  tests/test_production_seedance.py -q
+```
+
+### GREEN 1: Minimal Immutable Receipt and Resolver
+
+Implement only enough in `seedance_asset.py` to make the RED cases pass:
+
+- strict/frozen `SeedanceSyntheticImageReferenceReceipt` with exact local identity、provenance、rights、classification and human/task attestation;
+- strict/frozen `SeedanceSyntheticImageEgressPolicyReceipt` with canonical ordered role/asset/child bindings plus exact preview/task/Provider/transport/retention identity;
+- `SeedanceSyntheticImageReferenceResolver` that re-reads injected exact bytes、verifies SHA-256/size/MIME/geometry、enforces official format and per-image `<30 MB` bounds, and constructs the data URI in memory;
+- raw Base64/body、secret or input bytes never enter durable receipts、Manifest、Registry、logs、errors、repr or fixtures;
+- no file/network I/O hidden inside model validation and no upload/materialization behavior.
+
+### RED 2: Payload, Egress, Permit and Failure Semantics
+
+Add failing fake-transport tests proving:
+
+- the request and Paid Provider egress preview bind each image's exact asset ID、SHA-256、MIME and size, while the exact authorization、durable Gate and permit separately bind the matching aggregate synthetic receipt; receipt hashes never enter `input_artifact_ids`;
+- protected/ambiguous input、tampered bytes or invalid data-URI MIME produce zero Provider POST and leave the submit permit unconsumed;
+- exact `29_999_999` / `30_000_000` per-image boundaries prove strict `<30_000_000` eligibility, while final compact serialized bodies at `63_999_999`、`64_000_000` and `64_000_001` bytes—including multi-image/Base64 expansion cases—prove that the adapter accepts only `len(body) <= 64_000_000` before permit consumption;
+- payload uses the official `image_url.url` data URI and preserves `role` plus `generate_audio=false` without logging/persisting the Base64;
+- existing trusted `asset://` payload remains byte-for-byte compatible and no generic resolver callable can bypass either exact resolver;
+- known provider rejection records the existing known failure; transport ambiguity after permit consumption remains `outcome_unknown` with no retry、fallback or permit remint.
+
+### GREEN 2: Minimal Adapter Union
+
+After GREEN 0, modify only `seedance.py`、`seedance_asset.py` and the focused test file for the Provider-specific slice. Before permit issuance, the authorizer independently reopens and validates the exact aggregate/children. Before permit consumption, the adapter accepts the explicit synthetic resolver, revalidates aggregate/children 1:1 and requires the supplied authorization's aggregate receipt ID; it then constructs the final compact JSON body, rejects `len(body) > 64_000_000`, and consumes the one-use permit immediately adjacent to the sole POST. Existing trusted `asset://` resolver behavior remains unchanged. V1 requests must not mix trusted `asset://` and inline Base64 resolvers; mixed transport remains a separate contract decision. Do not add HTTPS、Files API、CreateAsset、AK/SK、uploader、Provider fallback or new profile selection.
+
+### Offline Verification and Independent Review
+
+After all RED/GREEN cycles, run:
+
+```bash
+PYTHONPATH=src python -m pytest -p no:cacheprovider \
+  tests/test_production_seedance.py \
+  tests/test_production_video.py \
+  tests/test_production_paid_provider.py \
+  tests/test_production_paid_provider_state.py \
+  tests/test_production_elevenlabs.py \
+  tests/test_production_minimax_speech.py \
+  tests/test_production_video_state_recovery.py \
+  tests/test_production_state_recovery.py -q
+```
+
+Use native named `reviewer` for the final safety/contract review. Required verdict covers classification authority、provenance identity、raw Base64 non-persistence、exact egress preview、trusted-path compatibility、permit adjacency、known rejection、outcome-unknown and absence of uploader/fallback paths. Parent verifies every blocking claim and reviews the final diff.
+
+Inspect exact changed paths against `.agent/harness/policy.yaml`; existing owned source/tests should route to `production_video_provider_tests` plus task Architecture Gate. Update Harness mapping only if the actual implementation adds an otherwise unmapped owned path. Stage exact task files, run `make harness-verify`, validate the fresh receipt with `make harness-receipt RECEIPT=<path>`, and create a task-only checkpoint.
+
+### Separate Live Gate
+
+Docs approval、offline fake transport and a passing Harness do not authorize any remote call. A future live proof requires a new task-scoped authorization、current exact model/profile/pricing、finite budget、prompt/image egress approval、rotated injected `ARK_API_KEY` and one-use permit. It must use one already accepted illustrated/anime or ordinary non-character asset, one bounded submit, measured fetch/activation/recovery and zero-effect replay. It must not reuse the earlier diagnostic、Alice photorealistic keyframe or another lane's authorization.
