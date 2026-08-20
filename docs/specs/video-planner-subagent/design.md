@@ -1,105 +1,99 @@
 # Video Planner Subagent — Design
 
-Status: draft v1 (paired with `requirements.md`)
+Status: proposed v2 (paired with `requirements.md`)
 Owner: AI-VIDEO planning intelligence layer
-Module path: `src/ai_video/planning/` (new package)
+Module path: `src/ai_video/planning/`
 
 ## 1. Position in the architecture
 
-```
-                ┌──────────────────────────────┐
-                │       Main Agent / Codex     │
-                └──────────────┬───────────────┘
-                               │ planning call
-                               ▼
-        ┌──────────────────────────────────────────┐
-        │   planning.video_planner.VideoPlanner    │  ◀── NEW
-        │   pure function, no IO, no Provider      │
-        │   returns VideoGenerationPlan            │
-        └──────────────┬───────────────────────────┘
-                       │ hint (not binding)
-                       ▼
-        ┌──────────────────────────────────────────┐
-        │   production.shot_router.ShotVisualResolver │
-        │   + VideoGenerationResolver              │  (existing, untouched)
-        └──────────────┬───────────────────────────┘
-                       │
-                       ▼
-        ┌──────────────────────────────────────────┐
-        │   production.video.VideoProvider         │
-        │   HyperFrames / state_commit / timeline   │  (canonical owners)
-        └──────────────────────────────────────────┘
+```text
+approved AI-VIDEO Shot / Asset / Review truth
+  -> Main Agent builds sealed per-Shot request projections
+  -> VideoPlanner.plan()                         # pure, provider-neutral
+  -> Main Agent current-plan consumer / STOP    # executable preflight seam
+  -> existing AI-VIDEO Provider / Asset execution
+  -> Composition -> Review -> human Pilot Reality Gate
 ```
 
-**This module sits OUTSIDE production** and **BEFORE** `ShotVisualResolver`. Its output is advisory; Production retains final authority.
+The planner sits outside Production. Production modules MUST NOT import `ai_video.planning`. The Main Agent calls planner and consumes its result before invoking existing Production entry points. `Shot.visual_strategy` is a declared strategy to validate, not the source of motion truth.
 
 ## 2. Package layout
 
-```
+```text
 src/ai_video/planning/
-├── __init__.py                 # public surface only
-├── video_planner.py            # VideoPlanner, plan(), dataclasses
-└── _planner_models.py          # pydantic StrictModel subclasses (sealed)
+├── __init__.py
+├── _planner_models.py
+└── video_planner.py
 
 tests/
+├── fixtures/planning_factory.py
 └── test_planning_video_planner.py
 ```
 
-Files MUST stay under 800 lines (per AGENTS.md coding standards). Each file under 400 lines.
+This is planned layout only. This docs slice does not create runtime files.
 
-## 3. Module imports — whitelist & blacklist
+## 3. Import boundary
 
-### Allowed imports (whitelist)
+Allowed imports:
 
-- `ai_video.production.models` — `Shot`, `Character`, `Scene`, `StrictModel`, `VisualStrategy`, `AssetType`, `AssetRoleRequirement`, `MotionDirective`, `VersionedArtifact`
-- `ai_video.production.hashing` — `canonical_sha256`, `seal_artifact`, `verify_artifact_hash`
-- `ai_video.errors` — `AiVideoError`, `ErrorCode`
-- Standard library + pydantic
+- `ai_video.production.models`: read-only `Shot`, `Character`, `Scene`, `StrictModel`, `VisualStrategy`, `AssetType`, `AssetRoleRequirement`, `MotionDirective`;
+- `ai_video.production.hashing`: canonical hashing/sealing helpers;
+- `ai_video.errors`: typed error definitions;
+- standard library and pydantic.
 
-### Forbidden imports (blacklist, enforced by Architecture Gate)
+Forbidden imports:
 
-- `ai_video.production.state_commit` and any `_state_commit_*`
-- `ai_video.production.dependency`
-- `ai_video.production.composition`
-- `ai_video.production.hyperframes`
-- `ai_video.production.manifest`
-- `ai_video.production.registry` (read paths allowed only inside `ProductionProject`; planner receives snapshots via `VideoPlanningRequest`)
-- `ai_video.production.video` (the producer, not the schema)
-- `ai_video.production.seedance` / `seedance_capabilities` / `seedance_profile` / `seedance_asset`
-- `ai_video.production.minimax_h3` / `minimax_hailuo` / `minimax_speech` / `elevenlabs`
-- `ai_video.comfy_client`
-- `ai_video.ffmpeg_tools`
-- `ai_video.cli`
-- `os.environ`, `subprocess`, `httpx`, `requests`, `urllib`
-- `keyring`, `cryptography.hazmat.primitives.kdf` (anything secret-shaped)
+- Production state writers, Manifest, Registry, dependency, composition, HyperFrames, timeline, Provider adapters, CLI, ComfyUI/ffmpeg transports;
+- `os.environ`, network clients, subprocess, keyring or other secret surfaces.
 
-> The blacklist is enforced by `tests/test_architecture_gate.py` through AST inspection of `src/ai_video/planning/`. Any new import requires an explicit extension in that test.
+An Architecture Gate also asserts that Production does not import `ai_video.planning`.
 
-## 4. Schemas
+## 4. Request projections
+
+All models are frozen and `extra="forbid"`. Every semantic request projection participates in `request_content_hash`; they are immutable projections of existing AI-VIDEO truth, not new durable owners.
+
+`request_content_hash` excludes only `request_id` and the hash field itself; `request_id` is diagnostic correlation, not semantic input. Rebuilding an otherwise identical request with a new diagnostic id must not change the plan.
 
 ### 4.1 `VideoPlanningRequest`
 
-A sealed wrapper that bundles inputs the Main Agent already has access to. **No new schema for Shot / Character / Scene** — reuse.
-
 ```python
 class VideoPlanningRequest(StrictModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-
-    request_id: str                       # uuid or content-hash-prefixed id
-    target_shot: Shot                     # the activated Shot
-    character_context: tuple[Character, ...]    # only important characters
-    scene_context: Scene                          # exact scene of the Shot
-    available_assets: tuple[AvailableAsset, ...]  # see 4.2
-    previous_shot_state: PreviousShotState | None  # see 4.3
-    production_policy: ProductionPolicyInput       # see 4.4
-    planning_contract_version: Literal["video-planner/1"]
-    request_content_hash: str                     # sha256 of sealed payload
-
-    @classmethod
-    def create(cls, **values) -> "VideoPlanningRequest": ...
+    request_id: str
+    target_shot: Shot
+    character_context: tuple[Character, ...]
+    scene_context: Scene
+    available_assets: tuple[AvailableAsset, ...]
+    previous_shot_state: PreviousShotState | None
+    shot_intent_evidence: ShotIntentEvidence
+    review_decision: ReviewDecisionProjection | None
+    production_policy: ProductionPolicyInput
+    planning_contract_version: Literal["video-planner/2"]
+    request_content_hash: str
 ```
 
-### 4.2 `AvailableAsset`
+`target_shot` must be the current activated/selected canonical Shot revision supplied by the caller. The planner itself does not read Production state.
+
+### 4.2 `ShotIntentEvidence`
+
+```python
+class ShotIntentEvidence(StrictModel):
+    target_shot_id: str
+    target_shot_content_hash: str
+    open_state_ref: str | None = None
+    close_state_ref: str | None = None
+    character_action_required: bool = False
+    continuous_action_required: bool = False
+    spatial_change_required: bool = False
+    state_change_required: bool = False
+    subject_motion_directive_present: bool = False
+    evidence_unresolved: bool = False
+```
+
+Main Agent derives this projection from approved Shot intent, Storyboard/continuity constraints, open/close state, and typed motion directives. `open_state_ref` / `close_state_ref` identify existing evidence; they do not duplicate full creative state. Natural-language keyword matching MUST NOT set the action booleans. If approved typed evidence cannot resolve a prose intent, set `evidence_unresolved=True` and require review.
+
+`requires_subject_motion` is true when any action/change boolean or `subject_motion_directive_present` is true.
+
+### 4.3 `AvailableAsset`
 
 ```python
 class AssetRole(str, Enum):
@@ -107,49 +101,72 @@ class AssetRole(str, Enum):
     SCENE_REFERENCE = "scene_reference"
     PREVIOUS_SHOT_TERMINAL = "previous_shot_terminal"
     APPROVED_KEYFRAME = "approved_keyframe"
+    APPROVED_REUSABLE_PLATE = "approved_reusable_plate"
     EXISTING_VIDEO = "existing_video"
 
 class AvailableAsset(StrictModel):
     role: AssetRole
-    asset_id: str                        # pattern _SAFE_ID
-    asset_sha256: str                    # 64-hex
-    canonical_owner_id: str | None       # character / scene id if applicable
+    asset_id: str
+    asset_sha256: str
+    canonical_owner_id: str | None
     mime_type: str
     width: int | None = None
     height: int | None = None
     size_bytes: int | None = None
 ```
 
-### 4.3 `PreviousShotState`
+Role semantics:
+
+- `CHARACTER_REFERENCE` / `SCENE_REFERENCE`: identity/state/space/style guidance only; never Final Shot Visual readiness.
+- `APPROVED_KEYFRAME`: satisfies Final Shot Visual only when `canonical_owner_id == target_shot.shot_id` and target Shot canonical `required_asset_roles` binds the exact asset id to its final-visual role.
+- `APPROVED_REUSABLE_PLATE`: satisfies Final Shot Visual only with the same exact target-Shot binding plus a matching current `ReviewDecisionProjection` that allows reuse and provides rationale.
+- `PREVIOUS_SHOT_TERMINAL`: continuity input for `EXACT_TERMINAL`, not a generic final visual for unrelated Shots.
+
+### 4.4 `ReviewDecisionProjection`
+
+```python
+class ReviewDecisionProjection(StrictModel):
+    evidence_ref: str
+    target_shot_id: str
+    target_shot_content_hash: str
+    rationale: str
+    allows_intentional_static: bool = False
+    allows_static_fallback: bool = False
+    allows_reusable_plate: bool = False
+```
+
+`evidence_ref` must identify the exact current canonical AI-VIDEO Review/director evidence used by Main Agent. This is an ephemeral pointer/summary; planner neither creates nor persists approval. It is current only when the evidence identity and Shot id/hash match the freshly built request. Missing, revoked, replaced or mismatched evidence changes `request_content_hash` and invalidates the old plan.
+
+### 4.5 `PreviousShotState`
 
 ```python
 class PreviousShotState(StrictModel):
-    previous_shot_id: str | None         # None = first shot in project
+    previous_shot_id: str | None
     previous_shot_content_hash: str | None
     is_same_scene: bool
     is_same_story_beat: bool
-    is_same_action: bool                 # True → continuity candidate
-    is_angle_change: bool                # True → reference continuity candidate
+    is_same_action: bool
+    is_angle_change: bool
     has_terminal_frame_asset_id: str | None
-    semantic_jump: bool                  # True → semantic continuity
+    semantic_jump: bool
 ```
 
-All bool flags are mutually compatible (the planner uses them, doesn't enforce exclusivity).
-
-### 4.4 `ProductionPolicyInput`
+### 4.6 `ProductionPolicyInput`
 
 ```python
 class ProductionPolicyInput(StrictModel):
     local_resources_available: bool = True
-    remote_authorized: bool = False       # task-scoped only
+    remote_authorized: bool = False
     budget_authorized: bool = False
-    quality_preference: Literal[
-        "draft", "preview", "production", "hero"
-    ] = "production"
-    accept_static_image_fallback: bool = False   # production owner may override
+    quality_preference: Literal["draft", "preview", "production", "hero"] = "production"
+    accept_static_image_fallback: bool = False
 ```
 
-### 4.5 `GenerationMode`
+`accept_static_image_fallback` is an algorithm input, not a comment or Production override hint.
+
+## 5. Plan schemas
+
+### 5.1 Strategy enums
 
 ```python
 class GenerationMode(str, Enum):
@@ -160,25 +177,13 @@ class GenerationMode(str, Enum):
     FIRST_LAST_FRAME_VIDEO = "first_last_frame_video"
     REFERENCE_TO_VIDEO = "reference_to_video"
     HYBRID = "hybrid"
-```
 
-Note: the 7th "hybrid" covers `motion_graphics` + planned overlays. The planner emits `hybrid` when motion is graphic and Shot says `VisualStrategy.MOTION_GRAPHICS`.
-
-### 4.6 `ContinuityMode`
-
-```python
 class ContinuityMode(str, Enum):
     EXACT_TERMINAL = "exact_terminal"
     REFERENCE = "reference"
     SEMANTIC = "semantic"
     NONE = "none"
-```
 
-Mirrors `production.shot_router.ContinuityMode` semantically but **is a distinct enum** — different module, different owner. A converter helper lives next to the planner (`def to_router_continuity_mode(p: PlannerContinuityMode) -> RouterContinuityMode`) but is not invoked inside the planner.
-
-### 4.7 `MotionRequirement`
-
-```python
 class MotionRequirement(str, Enum):
     NONE = "none"
     LIGHT_TRANSFORM = "light_transform"
@@ -188,78 +193,46 @@ class MotionRequirement(str, Enum):
     HERO_OR_REPAIR = "hero_or_repair"
 ```
 
-### 4.8 `AssetRole` (in plan)
+`pan`, `zoom`, `zoompan`, and `parallax` are camera/image transforms. By themselves they can support `LIGHT_TRANSFORM`, but can never satisfy `CHARACTER_ACTION` or a required open→close subject-state transition.
 
-```python
-class RequiredAssetRole(StrictModel):
-    role: AssetRole
-    reason_code: ReasonCode
-```
+### 5.2 Typed audit values
 
-### 4.9 `CapabilityRequirements`
-
-```python
-class CapabilityRequirements(StrictModel):
-    needs_character_reference: bool = False
-    needs_scene_reference: bool = False
-    needs_first_frame: bool = False
-    needs_last_frame: bool = False
-    needs_terminal_reference: bool = False
-    needs_audio_native: bool = False
-    needs_continuity_state: bool = False
-    max_reference_count: int | None = Field(default=None, ge=0, le=8)
-    min_output_duration_seconds: int | None = Field(default=None, ge=1, le=600)
-    accepts_local_execution: bool = True
-    accepts_remote_execution: bool = True
-```
-
-### 4.10 `ReasonCode`
+Keep v1 reason/warning values and add:
 
 ```python
 class ReasonCode(str, Enum):
-    IMPORTANT_CHARACTER = "important_character"
-    IDENTITY_REQUIRED = "identity_required"
-    CONTINUITY_REQUIRED = "continuity_required"
-    REFERENCE_AVAILABLE = "reference_available"
-    TERMINAL_AVAILABLE = "terminal_available"
-    NO_CHARACTER_REFERENCE = "no_character_reference"
-    NO_SCENE_REFERENCE = "no_scene_reference"
-    NO_VISUAL_ANCHOR = "no_visual_anchor"
-    FREE_ENVIRONMENT = "free_environment"
-    FIRST_SHOT = "first_shot"
-    SEMANTIC_JUMP = "semantic_jump"
-    MOTION_NONE = "motion_none"
-    MOTION_LIGHT = "motion_light"
-    MOTION_GRAPHIC = "motion_graphic"
-    MOTION_HERO_REQUIRES_POLICY = "motion_hero_requires_policy"
-    MISSING_TERMINAL = "missing_terminal"
-    MISSING_REFERENCES = "missing_references"
-    CONTINUITY_ANGLE_CHANGE = "continuity_angle_change"
-    CONTINUITY_SAME_ACTION = "continuity_same_action"
-```
+    # v1 identity / continuity / availability values omitted here for brevity
+    ACTION_INTENT_REQUIRED = "action_intent_required"
+    STRATEGY_MOTION_MISMATCH = "strategy_motion_mismatch"
+    CAMERA_MOTION_ONLY = "camera_motion_only"
+    FINAL_SHOT_VISUAL_REQUIRED = "final_shot_visual_required"
+    FINAL_SHOT_VISUAL_AVAILABLE = "final_shot_visual_available"
+    REUSABLE_PLATE_APPROVED = "reusable_plate_approved"
+    INTENTIONAL_STATIC = "intentional_static"
+    STATIC_FALLBACK_ACCEPTED = "static_fallback_accepted"
 
-### 4.11 `PlanWarning`
-
-```python
 class PlanWarning(str, Enum):
-    MISSING_CHARACTER_REFERENCE = "missing_character_reference"
-    MISSING_SCENE_REFERENCE = "missing_scene_reference"
-    MISSING_TERMINAL_FRAME = "missing_terminal_frame"
-    LOW_CONFIDENCE = "low_confidence"
+    # v1 missing-reference / terminal / low-confidence values omitted
+    FINAL_SHOT_VISUAL_MISSING = "final_shot_visual_missing"
+    CAMERA_MOTION_NOT_SUBJECT_MOTION = "camera_motion_not_subject_motion"
+    STATIC_FALLBACK_REQUIRES_REVIEW = "static_fallback_requires_review"
     REQUIRES_HUMAN_REVIEW = "requires_human_review"
 ```
 
-### 4.12 `VideoGenerationPlan`
+### 5.3 `VideoGenerationPlan`
 
 ```python
 class PlanOutcome(str, Enum):
     PROPOSED = "proposed"
     BLOCKED = "blocked"
 
-class VideoGenerationPlan(StrictModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+class RequiredAssetRole(StrictModel):
+    role: AssetRole
+    reason_code: ReasonCode
 
-    plan_id: str                          # uuid
+class VideoGenerationPlan(StrictModel):
+    plan_id: str  # deterministic: f"plan-{request_content_hash[:24]}"
+    source_request_content_hash: str
     target_shot_id: str
     target_shot_revision: int
     target_shot_content_hash: str
@@ -268,266 +241,164 @@ class VideoGenerationPlan(StrictModel):
     motion_requirement: MotionRequirement
     required_asset_roles: tuple[RequiredAssetRole, ...]
     capability_requirements: CapabilityRequirements
-    reason_codes: tuple[ReasonCode, ...] = Field(min_length=1)
-    confidence: float = Field(ge=0.0, le=1.0)
-    warnings: tuple[PlanWarning, ...] = ()
+    reason_codes: tuple[ReasonCode, ...]
+    confidence: float
+    warnings: tuple[PlanWarning, ...]
     outcome: PlanOutcome
-    rationale: str                        # min_length=1
-    planning_contract_version: Literal["video-planner/1"]
-    plan_hash: str                        # sha256 over canonical payload
-
-    @classmethod
-    def create(cls, **values) -> "VideoGenerationPlan": ...
+    rationale: str
+    planning_contract_version: Literal["video-planner/2"]
+    plan_hash: str
 ```
 
-### 4.13 Forbidden fields guard
+No third outcome is needed. `BLOCKED` plus typed warnings expresses unresolved mismatch/review. `PROPOSED` remains deliberately narrow and is not a creative PASS.
 
-`VideoGenerationPlan` uses `extra="forbid"`. A separate test injects a forbidden field via `model_construct` to verify rejection. The forbidden list (in tests/test_architecture_gate.py):
+Forbidden fields include Provider selection, paths, Manifest/timeline state, generated/reviewed/selected/locked/activated/final-acceptance flags, and Review receipt payloads.
 
-- `provider_name`, `provider_kind`, `provider_profile`, `selected_provider`
-- `selected_capability_id`, `selected_mode`, `selected_provider_profile`
-- `manifest_revision`, `timeline_position`, `asset_path`, `artifact_path`
-- `output_asset_id`, `input_artifact_ids`
+## 6. Algorithm
 
-## 5. Algorithm
+`VideoPlanner.plan()` runs in this order. Reordering these stages is a contract violation because it can recreate the static-first self-certification loop.
 
-The planner is a single pure function `VideoPlanner.plan(request) -> VideoGenerationPlan`. It runs in 6 stages:
+### Stage 1 — Validate current evidence
 
-### Stage 1 — Identity & scene classification
+- `ShotIntentEvidence.target_shot_id/content_hash` must match target Shot; otherwise `BLOCKED`.
+- Review projection counts only when its Shot id/hash match.
+- Classify available assets by role, owner, exact target-Shot canonical binding, and current reuse approval.
+- If `evidence_unresolved=True`, add `REQUIRES_HUMAN_REVIEW`; do not keyword-guess motion.
 
-```
-is_character_important   = len(target_shot.character_ids) > 0
-is_environment_shot      = not is_character_important
-is_first_shot            = previous_shot_state is None
-is_semantic_jump         = previous_shot_state.semantic_jump
-```
+### Stage 2 — Derive continuity
 
-### Stage 2 — Continuity decision
-
-```
-if is_first_shot:
-    continuity_mode = NONE
-elif is_semantic_jump:
-    continuity_mode = SEMANTIC
-elif previous_shot_state.is_same_action and not previous_shot_state.is_angle_change:
-    continuity_mode = EXACT_TERMINAL
-elif previous_shot_state.is_angle_change:
-    continuity_mode = REFERENCE
-else:
-    continuity_mode = REFERENCE   # default safe choice for non-first Shot
+```text
+first Shot                         -> NONE
+semantic jump / explicit reset    -> SEMANTIC
+same action, no angle change      -> EXACT_TERMINAL
+angle change                      -> REFERENCE
+otherwise                         -> REFERENCE
 ```
 
-### Stage 3 — Motion classification
+Only `EXACT_TERMINAL` requires terminal reference capability.
 
-Mapped from `Shot.motion_directives` + `Shot.visual_strategy`:
+### Stage 3 — Derive required motion independently
 
-| `Shot.visual_strategy` | motion_requirement |
-|---|---|
-| `STATIC_IMAGE` | `NONE` |
-| `IMAGE_MOTION` | `LIGHT_TRANSFORM` |
-| `MOTION_GRAPHICS` | `GRAPHIC` |
-| `EXISTING_VIDEO` | `NONE` (returns EXISTING_VIDEO outcome; not in this slice) |
-| `GENERATED_VIDEO` | derive from `motion_directives` |
-| `HYBRID` | derive per directive mix |
+1. If typed intent evidence requires subject motion, return `CHARACTER_ACTION` (or `HERO_OR_REPAIR` when explicitly classified upstream).
+2. Else if `Shot.motion_directives` contain subject animation/non-transform motion, return `CHARACTER_ACTION`.
+3. Else if directives contain only pan/zoom/zoompan/parallax, return `LIGHT_TRANSFORM` and record `CAMERA_MOTION_ONLY`.
+4. Else `MOTION_GRAPHICS` maps to `GRAPHIC`; coherent explicit static maps to `NONE`; otherwise generated/hybrid intent maps to `FREE_COMPLEX`.
 
-For `GENERATED_VIDEO` heuristic:
+`Shot.visual_strategy` may constrain the declared lane, but cannot erase a motion requirement derived in steps 1–2.
 
-- 0 directives → `FREE_COMPLEX`
-- only `pan` / `zoom` / `parallax` → `LIGHT_TRANSFORM`
-- otherwise → `CHARACTER_ACTION`
+### Stage 4 — Coherence and fallback gate
 
-If `motion_requirement = HERO_OR_REPAIR` → blocked outcome by default.
+Let `declared_static_lane` mean `STATIC_IMAGE` or `IMAGE_MOTION` whose directives are camera-only.
 
-### Stage 4 — Generation mode decision
+| Required intent/motion | Declared lane | Policy/evidence | Result |
+|---|---|---|---|
+| subject action/change | static lane | `accept_static_image_fallback=False` | `BLOCKED`, mismatch + review |
+| subject action/change | static lane | fallback true but no matching Review decision/final visual/rationale | `BLOCKED` |
+| subject action/change | static lane | fallback true + matching Review allows fallback + final visual ready + rationale | `PROPOSED`, fallback reasons/warning; never creative PASS |
+| no subject action/change | `STATIC_IMAGE` | Shot-specific keyframe + intentional-static rationale | `PROPOSED` |
+| no subject action/change | `IMAGE_MOTION` | Shot-specific keyframe or approved reusable plate + rationale | `PROPOSED` |
+| any static/image-motion | no Final Shot Visual | any | `BLOCKED`, `FINAL_SHOT_VISUAL_MISSING` |
 
-The decision table combines identity × continuity × motion × available assets:
+The action-fallback proposal includes `STATIC_FALLBACK_REQUIRES_REVIEW` even when matching review evidence is present, preserving audit visibility. Add unresolved `REQUIRES_HUMAN_REVIEW` only when current approval is absent/invalid, which forces the Main Agent STOP seam.
 
-| Continuity | Important char? | has_char_ref | has_scene_ref | has_terminal | Mode |
-|---|---|---|---|---|---|
-| `NONE` | no | n/a | n/a | n/a | `TEXT_TO_VIDEO` (free environment) |
-| `NONE` | yes | yes | yes | n/a | `REFERENCE_TO_VIDEO` |
-| `NONE` | yes | no | n/a | n/a | **BLOCKED** (no visual anchor) |
-| `EXACT_TERMINAL` | yes | n/a | n/a | yes | `IMAGE_TO_VIDEO` (use terminal as first frame) |
-| `EXACT_TERMINAL` | yes | n/a | n/a | no | **BLOCKED** (missing terminal) |
-| `REFERENCE` | yes | yes | yes | n/a | `REFERENCE_TO_VIDEO` |
-| `REFERENCE` | yes | no | n/a | n/a | **BLOCKED** (MISSING_REFERENCES) |
-| `SEMANTIC` | yes | yes | yes | n/a | `REFERENCE_TO_VIDEO` |
-| `SEMANTIC` | no | n/a | n/a | n/a | `TEXT_TO_VIDEO` |
+### Stage 5 — Dynamic generation decision
 
-Overrides:
+After the coherence/fallback gate, use identity × continuity × available reference/terminal evidence:
 
-- `motion_requirement = NONE` → `STATIC_IMAGE` regardless of continuity
-- `motion_requirement = LIGHT_TRANSFORM` → `IMAGE_MOTION` regardless
-- `motion_requirement = GRAPHIC` → `HYBRID` (or planner returns `MOTION_GRAPHICS` in rationale)
-- `motion_requirement = HERO_OR_REPAIR` → **BLOCKED** with `REQUIRES_HUMAN_REVIEW` warning
+| Continuity | Important character? | Evidence | Mode |
+|---|---|---|---|
+| `NONE` | no | no explicit motion contradiction | `TEXT_TO_VIDEO` |
+| `NONE` | yes | character + scene refs | `REFERENCE_TO_VIDEO` |
+| `NONE` | yes | no visual anchor | `BLOCKED` |
+| `EXACT_TERMINAL` | any | current upstream terminal | `IMAGE_TO_VIDEO` or `FIRST_LAST_FRAME_VIDEO` |
+| `EXACT_TERMINAL` | any | terminal missing | `BLOCKED` |
+| `REFERENCE` / `SEMANTIC` | yes | character + scene refs | `REFERENCE_TO_VIDEO` |
+| `REFERENCE` / `SEMANTIC` | yes | required refs missing | `BLOCKED` |
+| `SEMANTIC` | no | no explicit identity anchor required | `TEXT_TO_VIDEO` |
 
-The override branches run before the decision table; the override path is itself a valid generation_mode selection.
+`GRAPHIC` maps to `HYBRID`. `HERO_OR_REPAIR` is `BLOCKED` with human review. Dynamic mode selection never names a Provider.
 
-### Stage 5 — Required assets & capability
+### Stage 6 — Required assets and capability
 
-`required_asset_roles` is built from the chosen mode:
+- `REFERENCE_TO_VIDEO`: required Character/Scene reference roles.
+- `IMAGE_TO_VIDEO` / `FIRST_LAST_FRAME_VIDEO`: exact terminal for `EXACT_TERMINAL`, otherwise Shot-specific `APPROVED_KEYFRAME`.
+- `STATIC_IMAGE` / `IMAGE_MOTION`: `APPROVED_KEYFRAME` or `APPROVED_REUSABLE_PLATE`; reference roles alone never satisfy this requirement.
+- `TEXT_TO_VIDEO`: no asset role unless canonical Shot bindings require one.
+- `HYBRID`: derive existing layer/visual requirements without creating a second composition schema.
 
-- `REFERENCE_TO_VIDEO`: `(CHARACTER_REFERENCE, SCENE_REFERENCE)` — one each
-- `IMAGE_TO_VIDEO` / `FIRST_LAST_FRAME_VIDEO`: `PREVIOUS_SHOT_TERMINAL` (if `EXACT_TERMINAL`) or `APPROVED_KEYFRAME`
-- `TEXT_TO_VIDEO`: empty (no assets required)
-- `IMAGE_MOTION`: `APPROVED_KEYFRAME`
-- `STATIC_IMAGE`: empty (caller can still add references if Shot says so)
+The plan records required roles. Main Agent consumer separately verifies exact assets are still present/current before execution.
 
-`capability_requirements` flags:
+### Stage 7 — Reasons, warnings, confidence
 
-- `needs_character_reference` = `any(role == CHARACTER_REFERENCE for role in required_asset_roles)`
-- `needs_scene_reference` = `any(role == SCENE_REFERENCE for role in required_asset_roles)`
-- `needs_terminal_reference` = `continuity_mode == EXACT_TERMINAL and outcome == PROPOSED`
-- `needs_first_frame` = `generation_mode in {IMAGE_TO_VIDEO, FIRST_LAST_FRAME_VIDEO}`
-- `needs_last_frame` = `generation_mode == FIRST_LAST_FRAME_VIDEO`
-- `needs_continuity_state` = `continuity_mode in {REFERENCE, SEMANTIC}`
-- `accepts_local_execution` = `production_policy.local_resources_available`
-- `accepts_remote_execution` = `production_policy.remote_authorized and production_policy.budget_authorized`
+- Every branch emits typed reasons consistent with chosen mode/outcome.
+- `rationale` is assembled from deterministic templates keyed by typed reasons; it is not LLM/free-form output.
+- Clear dynamic table match with all evidence may be high confidence.
+- Intentional-static or action-fallback paths are never assigned automatic `1.0` merely because `visual_strategy` declared static.
+- `confidence` never overrides `BLOCKED`, missing assets, stale identity, or a human-review warning.
 
-### Stage 6 — Reason codes, confidence, warnings
+## 7. Main Agent consumer contract
 
-- `reason_codes` is built incrementally as overrides + decision + capability flags fire.
-- `confidence`:
+The minimum executable seam is a pure/locally testable Main Agent function, conceptually:
 
-| Condition | confidence |
-|---|---|
-| Override path (NONE / LIGHT) | 1.0 |
-| Decision table single match, all required refs present | 0.9 |
-| Decision table single match, refs inferred from policy | 0.75 |
-| Multiple alternatives plausible (e.g. ref + terminal both available) | 0.6 |
-| Blocked with one clear cause | 0.9 |
-| Blocked with multiple reasons | 0.5 |
+```python
+def require_current_video_plan(*, current_request: VideoPlanningRequest,
+                               plan: VideoGenerationPlan) -> None:
+    """Return only when downstream Production invocation is eligible; otherwise raise typed STOP."""
+```
 
-- `warnings` additively:
+It must fail closed on:
 
-  - `MISSING_CHARACTER_REFERENCE` if `IMPORTANT_CHARACTER` is in reason_codes and no character asset is in `required_asset_roles`
-  - `MISSING_SCENE_REFERENCE` analogously
-  - `MISSING_TERMINAL_FRAME` if `EXACT_TERMINAL` and no terminal available
-  - `LOW_CONFIDENCE` if `confidence < 0.6`
-  - `REQUIRES_HUMAN_REVIEW` if outcome is BLOCKED or motion is HERO_OR_REPAIR
+- `plan.source_request_content_hash != current_request.request_content_hash`; the caller must freshly rebuild `current_request` from current Shot, asset binding, Review decision and policy projections before consumption;
+- Shot id/revision/content hash mismatch;
+- `PlanOutcome.BLOCKED`;
+- missing required asset, wrong owner, or missing exact canonical binding;
+- unresolved `REQUIRES_HUMAN_REVIEW`.
 
-## 6. `VideoPlanner` API
+On failure, router/Provider/placeholder/materializer/composition/render must not be called. On success, it only authorizes handoff to existing Production gates; it does not activate or accept anything. The consumer stays on the Main Agent/planning side, so Production does not gain a reverse dependency.
+
+## 8. API and public surface
+
+`VideoPlanner` is stateless:
 
 ```python
 class VideoPlanner:
-    """Provider-neutral Video Planning Intelligence Layer."""
+    CONTRACT_VERSION = "video-planner/2"
 
-    CONTRACT_VERSION: Literal["video-planner/1"] = "video-planner/1"
-
-    def plan(self, request: VideoPlanningRequest) -> VideoGenerationPlan:
-        """Pure function. Same request → same plan_hash."""
+    def plan(self, request: VideoPlanningRequest) -> VideoGenerationPlan: ...
 
     @staticmethod
-    def derive_previous_shot_state(
-        *,
-        previous_shot: Shot | None,
-        target_shot: Shot,
-    ) -> PreviousShotState:
-        """Helper for Main Agent. Pure, deterministic."""
+    def derive_previous_shot_state(*, previous_shot: Shot | None,
+                                   target_shot: Shot) -> PreviousShotState: ...
 ```
 
-No constructor arguments; no DI; no state.
+Public exports may include the request/plan projection models and enums defined above. No Provider converter is called by planner. A future D1 hint projection may live outside Production, but is not the STOP gate.
 
-## 7. Failure handling
+## 9. Failure handling
 
-- If `request` is malformed → pydantic `ValidationError` (caller's responsibility).
-- If `Shot.visual_strategy == EXISTING_VIDEO` → plan returns `outcome = BLOCKED` with rationale pointing to existing video path (out-of-slice; Main Agent should pick EXISTING_VIDEO outcome directly).
-- If decision cannot be made cleanly (e.g. multiple conflicting overrides) → returns BLOCKED with `LOW_CONFIDENCE` warning; never invents a mode.
+- malformed request → pydantic `ValidationError`;
+- stale/mismatched intent/review evidence → `BLOCKED`;
+- `EXISTING_VIDEO` outside accepted planning path → `BLOCKED`, explicit rationale;
+- conflicting or unresolved evidence → `BLOCKED` + `LOW_CONFIDENCE`/`REQUIRES_HUMAN_REVIEW`;
+- never invent a strategy, mutate Shot, render placeholder, or auto-fallback.
 
-## 8. Performance
+## 10. Compatibility and ownership
 
-- O(1) wrt Shot count (single Shot per call).
-- `plan_hash` computed once at end; no caching across calls.
-- Target: < 5 ms per call on a single Shot. Trivial compared to Production.
-
-## 9. Public surface (`__init__.py`)
-
-```python
-from ai_video.planning._planner_models import (
-    VideoPlanningRequest,
-    VideoGenerationPlan,
-    AvailableAsset,
-    PreviousShotState,
-    ProductionPolicyInput,
-    GenerationMode,
-    ContinuityMode,
-    MotionRequirement,
-    AssetRole,
-    RequiredAssetRole,
-    CapabilityRequirements,
-    ReasonCode,
-    PlanWarning,
-    PlanOutcome,
-)
-from ai_video.planning.video_planner import VideoPlanner
-
-__all__ = [
-    "VideoPlanner",
-    "VideoPlanningRequest",
-    "VideoGenerationPlan",
-    "AvailableAsset",
-    "PreviousShotState",
-    "ProductionPolicyInput",
-    "GenerationMode",
-    "ContinuityMode",
-    "MotionRequirement",
-    "AssetRole",
-    "RequiredAssetRole",
-    "CapabilityRequirements",
-    "ReasonCode",
-    "PlanWarning",
-    "PlanOutcome",
-]
-```
-
-No other symbols exported. `VideoPlanner` is the only callable.
-
-## 10. Cross-module contract
-
-- `production.shot_router.ShotVisualResolver` may consume `VideoGenerationPlan` as advisory input — out of slice scope (a future "planner→router bridge" task).
-- `production` modules MUST NOT import `ai_video.planning` (preserves ownership direction).
-- `planning` modules MAY import `production.models` and `production.hashing` (read-only types & utilities).
+- No existing Production public API, schema, Manifest, Registry, timeline, renderer or Provider change.
+- No new dependency or CLI flag.
+- Planner consumes one Shot at a time; D3 multi-Shot planning remains out of scope.
+- Repetition/frame-diversity/Pilot/full-watch/Final Acceptance remain Review/Pilot concerns.
 
 ## 11. Testing
 
-See `tests/test_planning_video_planner.py` (in repo) for the full test suite. Coverage:
+Tests must cover AC-1～AC-18, especially the real static-first mismatch, camera-only zoompan boundary, fallback policy, reference-vs-final role, and Main Agent zero-call STOP seam. See `test-spec.md`; delivery ordering and traceability are in `tasks.md`.
 
-| Layer | What | Count |
-|---|---|---|
-| Unit | AC-1..AC-5 | 5 |
-| Unit | Forbidden fields rejection | 6 |
-| Unit | Pure determinism (hash stability) | 3 |
-| Unit | Continuity mode matrix | 8 |
-| Unit | Motion override branches | 4 |
-| Unit | Schema sealing (`create()` round-trip) | 2 |
-| Unit | `derive_previous_shot_state` helper | 3 |
-| Architecture | import blacklist enforcement | 1 |
-| Architecture | `extra="forbid"` rejection | 1 |
-| **Total** | | **33** |
+## 12. Risk controls
 
-Test fixtures live in `tests/fixtures/planning_factory.py` (new helper module).
-
-## 12. Documentation deliverables
-
-- `docs/specs/video-planner-subagent/requirements.md` — this slice's WHAT
-- `docs/specs/video-planner-subagent/design.md` — this file (HOW)
-- `docs/specs/video-planner-subagent/tasks.md` — staged implementation plan
-- `docs/specs/video-planner-subagent/test-spec.md` — full test spec
-- `docs/specs/video-planner-subagent/integration.md` — Main Agent call pattern + example
-
-## 13. Compatibility
-
-- No public API change to existing modules.
-- No new dependency.
-- No CLI flag added.
-- No new schema migration. `Shot` / `Character` / `Scene` untouched.
-- Tests: adds one new test file; existing tests unchanged.
-
-## 14. Risk & open questions
-
-| Risk | Mitigation |
+| Risk | Control |
 |---|---|
-| `VideoPlanner` may grow into a Provider selector | Blacklist enforced; forbidden field guard in plan |
-| Reason codes drift from router codes | Distinct enum; no semantic equality claim; bridge not required for this slice |
-| `derive_previous_shot_state` overlaps with shot_router helpers | Helper is read-only and lives outside production; router may consume its output later |
-| Future LLMs could be tempted to call planner from production | Module is import-whitelisted; production modules cannot import planning |
+| `visual_strategy` self-certifies wrong bootstrap | derive motion first from typed intent/open-close/directives, then check coherence |
+| reference is reused as final image | exact target-Shot final-role binding + owner/reuse rationale checks |
+| fallback true becomes automatic downgrade | matching Review projection and final visual required; audit warning retained |
+| `BLOCKED` is ignored | mandatory Main Agent consumer + zero-call spies |
+| planner grows into quality gate | single-Shot scope; Review/Pilot explicitly retain aggregate/final quality |
+| planner becomes Production owner | import gate, no IO, no durable state, no reverse Production import |

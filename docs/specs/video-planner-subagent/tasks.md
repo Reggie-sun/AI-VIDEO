@@ -1,285 +1,284 @@
 # Video Planner Subagent — Tasks
 
-Status: implementation plan v1 (paired with `requirements.md` + `design.md`)
-Approach: TDD-first, staged by risk / dependency.
+Status: implementation plan v2 (contract repair complete; implementation not started)
+Approach: strict RED → GREEN for behavioral contracts; provider-neutral and plan-only.
 
-Each task is small enough to land in one PR (≤1 day of focused work). Tests are written first.
+## Problem boundary
 
-## Sequencing rationale
+- Single owner: `ai_video.planning` proposes per-Shot strategy; Main Agent consumes/STOPs; existing AI-VIDEO owners execute and accept.
+- Old path to remove/replace: `visual_strategy -> motion -> unconditional static/image-motion override`, empty static final-asset requirements, unconditional override confidence `1.0`, and comment-only `BLOCKED` handling.
+- Unchanged contracts: no Production writer/Provider/timeline/render ownership, no Router refactor, no new Manifest/Registry/schema, no multi-Shot quality subsystem.
+- Focused future verification: `pytest tests/test_planning_video_planner.py` plus Architecture Gate and policy-routed exact-snapshot Harness.
 
+## Sequencing
+
+```text
+T1 request/plan projections
+  -> T2 typed audit vocabulary
+  -> T3 continuity
+  -> T4 RED: intent/motion evidence and camera-only boundary
+  -> T5 RED: coherence + fallback decision
+  -> T6 RED: Reference vs Final Shot Visual readiness
+  -> T7 confidence/warnings
+  -> T8 forbidden-field guard
+  -> T9 determinism
+  -> T10 architecture gate
+  -> T11 previous-state helper
+  -> T12 integration contract
+  -> T13 executable Main Agent STOP seam
+  -> T14 full failure-mode regression acceptance
 ```
-T1 schema baseline ─┬─ T2 reason codes & warnings ─┐
-                    ├─ T3 continuity decision ─────┤
-                    └─ T4 motion override ─────────┤
-                                                   ├─ T5 decision table ─┬─ T6 capability flags
-                                                   │                      ├─ T7 confidence calc
-                                                   │                      ├─ T8 forbidden-field guard
-                                                   │                      └─ T9 determinism test
-                                                   ├─ T10 architecture import gate
-                                                   ├─ T11 derive_previous_shot_state helper
-                                                   └─ T12 integration doc + example
-                                                                            │
-                                                                            ▼
-                                                            T13 end-to-end Main Agent example
-                                                            T14 final review + acceptance
-```
 
-Foundation (T1–T4) is small and unblocks parallel work on T5–T9. T10 hardens the boundary so no later task can leak imports. T11–T14 close out.
+T4–T7 must land from failing behavioral tests. T13 is part of this slice; D1 is no longer allowed to defer executable STOP semantics.
 
 ## Tasks
 
-### T1 — Schema baseline (foundational)
+### T1 — Schema baseline and immutable projections
+
+RED:
+
+- schema tests fail until all models are frozen, `extra="forbid"`, and seal/hash correctly;
+- request rejects intent/review projections whose Shot identity/hash shape is invalid.
 
 Deliverables:
 
-- `src/ai_video/planning/__init__.py` (empty stub, just docstring)
-- `src/ai_video/planning/_planner_models.py`
-- Enums: `GenerationMode`, `ContinuityMode`, `MotionRequirement`, `AssetRole`, `ReasonCode`, `PlanWarning`, `PlanOutcome`
-- Models: `AvailableAsset`, `PreviousShotState`, `ProductionPolicyInput`, `CapabilityRequirements`, `RequiredAssetRole`, `VideoPlanningRequest`, `VideoGenerationPlan`
-- All models `extra="forbid"`, `frozen=True`, `StrictModel` base
-- `VideoPlanningRequest.create()` and `VideoGenerationPlan.create()` sealed classmethods
-- `plan_hash` and `request_content_hash` computed via `canonical_sha256`
+- planned package `src/ai_video/planning/` and `tests/fixtures/planning_factory.py`;
+- enums/models from design §§4–5, including `ShotIntentEvidence`, `ReviewDecisionProjection`, `APPROVED_REUSABLE_PLATE`, and `PlanOutcome.PROPOSED | BLOCKED`;
+- `VideoGenerationPlan.source_request_content_hash` binding all current semantic request projections;
+- sealed `VideoPlanningRequest.create()` and `VideoGenerationPlan.create()` using existing canonical hashing;
+- no new Story/Character/Scene/Shot/Manifest/Registry schema.
 
-Tests: schema round-trip + `extra="forbid"` rejection.
+Acceptance: schema round-trip, strict-extra, enum, identity/hash, and seal tests pass.
 
-Acceptance: pytest passes for `test_planning_video_planner.py::test_schemas_baseline`.
+### T2 — Typed reasons and warnings
 
-Effort: human ~3h, CC ~10min.
+RED:
 
-### T2 — Reason codes & warnings
+- each required mismatch/fallback/final-visual branch initially lacks the expected typed reason/warning.
 
 Deliverables:
 
-- `ReasonCode` enum finalised with all values from design §4.10
-- `PlanWarning` enum finalised with all values from design §4.11
-- Helper `_append_reason(codes, code)` and `_append_warning(warnings, warning)` in `video_planner.py` (private, no IO)
-- Empty `VideoPlanner.plan()` skeleton that returns BLOCKED with single reason `MOTION_HERO_REQUIRES_POLICY` (so other tests have something to assert against)
+- preserve v1 reason/warning values;
+- add `ACTION_INTENT_REQUIRED`, `STRATEGY_MOTION_MISMATCH`, `CAMERA_MOTION_ONLY`, `FINAL_SHOT_VISUAL_REQUIRED`, `FINAL_SHOT_VISUAL_AVAILABLE`, `REUSABLE_PLATE_APPROVED`, `INTENTIONAL_STATIC`, `STATIC_FALLBACK_ACCEPTED`;
+- add `FINAL_SHOT_VISUAL_MISSING`, `CAMERA_MOTION_NOT_SUBJECT_MOTION`, `STATIC_FALLBACK_REQUIRES_REVIEW`, `REQUIRES_HUMAN_REVIEW`;
+- deterministic append helpers with no free-form warning values.
 
-Tests: AC-1..AC-5 reason-code assertions only (full algorithm comes in T5).
-
-Acceptance: reason code invariants documented; helper tested in isolation.
-
-Effort: human ~1h, CC ~5min.
+Acceptance: every AC branch has at least one logically consistent reason; warnings are controlled enums.
 
 ### T3 — Continuity decision
 
-Deliverables:
+RED:
 
-- `_decide_continuity(request) -> ContinuityMode` private method
-- Implements design §5 stage 2 logic
-- Returns enum, not string
-- Pinned tests:
-  - first shot → NONE
-  - semantic jump → SEMANTIC
-  - same action + no angle change → EXACT_TERMINAL
-  - angle change → REFERENCE
-  - default (second shot, no flags) → REFERENCE
-
-Tests: full continuity matrix (8 cases).
-
-Acceptance: tests pinned to enum value, not string.
-
-Effort: human ~1h, CC ~5min.
-
-### T4 — Motion override branches
+- matrix pins first Shot, semantic jump, same-action continuation, angle change, and default reference behavior;
+- `REFERENCE` explicitly asserts `needs_terminal_reference is False`.
 
 Deliverables:
 
-- `_decide_motion(target_shot) -> MotionRequirement` private method
-- Implements design §5 stage 3 logic
-- Returns enum
+- `_decide_continuity(request) -> ContinuityMode` per design Stage 2;
+- terminal requirement only for `EXACT_TERMINAL`.
 
-Tests:
+Acceptance: full continuity matrix passes without using natural-language keyword heuristics.
 
-- `STATIC_IMAGE` Shot → `NONE`
-- `IMAGE_MOTION` Shot → `LIGHT_TRANSFORM`
-- `MOTION_GRAPHICS` Shot → `GRAPHIC`
-- `GENERATED_VIDEO` Shot with no directives → `FREE_COMPLEX`
-- `GENERATED_VIDEO` Shot with only pan/zoom/parallax → `LIGHT_TRANSFORM`
-- `GENERATED_VIDEO` Shot with composite directives → `CHARACTER_ACTION`
+### T4 — Intent-first motion classification
 
-Effort: human ~1h, CC ~5min.
+RED:
 
-### T5 — Generation mode decision table
+- character-action Shot declared `STATIC_IMAGE` must not classify as `NONE`;
+- continuous/spatial/open→close state change must not classify as static;
+- action Shot with only pan/zoom/zoompan/parallax must record camera-only evidence and must not claim character motion;
+- unresolved prose-only intent requires human review instead of keyword-selected mode.
 
 Deliverables:
 
-- `_decide_generation_mode(request, continuity, motion) -> GenerationMode | BLOCKED` private method
-- Implements design §5 stage 4 decision table
-- Returns `None` sentinel when blocked (not a string)
+- `_derive_required_motion(request) -> MotionRequirement` consumes `ShotIntentEvidence`, typed motion directives and continuity constraints before declared strategy;
+- transform-only directive classifier;
+- explicit evidence precedence from design Stage 3.
 
-Tests:
+Acceptance: AC-11 and AC-12 RED cases pass; old `STATIC_IMAGE -> NONE` and `IMAGE_MOTION -> LIGHT_TRANSFORM` assertions are removed as standalone truth claims.
 
-- 9-row decision table → expect exact mode or BLOCKED
-- Override branches (motion NONE / LIGHT / GRAPHIC / HERO_OR_REPAIR) override decision table
+### T5 — Coherence and static fallback decision
 
-Effort: human ~3h, CC ~15min.
+RED:
 
-### T6 — Required assets & capability flags
-
-Deliverables:
-
-- `_build_required_asset_roles(mode, request) -> tuple[RequiredAssetRole, ...]`
-- `_build_capability_requirements(mode, continuity, policy) -> CapabilityRequirements`
-- Implements design §5 stage 5
-
-Tests:
-
-- Each generation mode produces the right required_asset_roles
-- Capability flags match design §5 stage 5 rules
-- `accepts_remote_execution = False` when `policy.remote_authorized=False`
-
-Effort: human ~2h, CC ~10min.
-
-### T7 — Confidence calculation & warnings
+- action + static/image-motion mismatch is `BLOCKED` when fallback false;
+- fallback true without final visual/rationale/current Review evidence remains `BLOCKED`;
+- fully evidenced fallback returns `PROPOSED` with fallback reason/warning, never creative PASS;
+- mismatch path never receives unconditional confidence `1.0`.
 
 Deliverables:
 
-- `_compute_confidence(mode, request, refs_present) -> float`
-- `_compute_warnings(mode, request, confidence, refs_present) -> tuple[PlanWarning, ...]`
-- Implements design §5 stage 6
+- `_check_strategy_coherence(...)` runs before generation-mode selection;
+- `accept_static_image_fallback` is read in the algorithm;
+- dynamic decision table runs only after coherence gate;
+- no automatic Shot mutation, placeholder, retry or Provider fallback.
 
-Tests:
+Acceptance: AC-13 and AC-16 pass along with legacy dynamic cases AC-1～AC-5.
 
-- Override path → 1.0
-- Decision-table single match with all refs → 0.9
-- Multiple plausible alternatives → 0.6
-- Multiple blocked reasons → 0.5
-- Warning list contains expected warnings
+### T6 — Reference and Final Shot Visual readiness
 
-Effort: human ~2h, CC ~10min.
+RED:
+
+- Character/Scene references alone do not satisfy static/image-motion final visual;
+- wrong `canonical_owner_id`, missing exact target-Shot final-role binding, or stale review evidence is rejected;
+- Shot-specific approved keyframe + intentional-static rationale succeeds;
+- reusable plate succeeds only with exact target-Shot binding and current reuse approval/rationale.
+
+Deliverables:
+
+- `_classify_asset_readiness(request)` distinguishes reference guidance, terminal evidence, Shot-specific keyframe and approved reusable plate;
+- `_build_required_asset_roles(...)` requires `APPROVED_KEYFRAME` or `APPROVED_REUSABLE_PLATE` for static/image-motion;
+- reuse existing `Shot.required_asset_roles` binding semantics; no new durable asset role store.
+
+Acceptance: AC-14 and AC-15 pass; static required assets are never empty by default.
+
+### T7 — Confidence, review and warning semantics
+
+RED:
+
+- declared static override alone cannot yield confidence `1.0`;
+- unresolved mismatch/review yields `BLOCKED` + `REQUIRES_HUMAN_REVIEW`;
+- evidenced action fallback keeps `STATIC_FALLBACK_REQUIRES_REVIEW` audit warning;
+- confidence never changes STOP eligibility.
+
+Deliverables:
+
+- deterministic `_compute_confidence` and `_compute_warnings` after all gates;
+- explicit separation of audit warning from unresolved human-review warning.
+
+Acceptance: exact typed warning/reason assertions pass for all static-first cases.
 
 ### T8 — Forbidden-field guard
 
-Deliverables:
+RED:
 
-- `VideoGenerationPlan` schema uses `extra="forbid"` (already in T1)
-- Test injects forbidden fields via `model_construct` and asserts `ValidationError`
-- Forbidden list enforced in `tests/test_planning_video_planner.py::test_forbidden_fields_rejected`
-
-Tests: 6 forbidden-field rejections (one per forbidden key).
-
-Effort: human ~30min, CC ~3min.
-
-### T9 — Determinism test
+- plan rejects Provider selection, Manifest/timeline/path/output fields and generated/reviewed/selected/locked/activated/final-acceptance flags.
 
 Deliverables:
 
-- Helper `assert_plan_hash_stable(plan_factory)` in tests
-- Two-call determinism: same request → identical `plan_hash`
-- Three sequential calls → identical hash
-- Different `target_shot_content_hash` → different `plan_hash`
+- `extra="forbid"` plan model and parametrized forbidden-field tests.
 
-Tests: 3 cases.
+Acceptance: AC-7 passes with precise field-level failures.
 
-Effort: human ~30min, CC ~3min.
+### T9 — Determinism and current identity
+
+RED:
+
+- identical sealed request called repeatedly must match exactly;
+- changing Shot content hash, intent projection, Review evidence identity/decision, policy or asset binding must change request hash and invalidate an old plan even if Shot hash is unchanged.
+
+Deliverables:
+
+- deterministic plan construction with no clock/UUID entropy in hashed payload;
+- diagnostic `request_id` excluded from semantic request hash and deterministic `plan_id` derived from request content hash;
+- stable identity tests.
+
+Acceptance: AC-6 passes.
 
 ### T10 — Architecture import gate
 
+RED:
+
+- fixture import of any forbidden writer/Provider/IO module fails with file:line;
+- fixture Production import of `ai_video.planning` fails.
+
 Deliverables:
 
-- `tests/test_architecture_gate.py` extension (or new `tests/test_planning_architecture_gate.py`)
-- AST scan of `src/ai_video/planning/` for forbidden imports
-- Forbidden list: see design §3 blacklist
-- Whitelist: see design §3 whitelist
-- Each forbidden import in `src/ai_video/planning/**` causes test failure with file:line
+- AST gate for design §3 allow/deny boundary;
+- no runtime Skill imports or calls.
 
-Tests: 1 AST-scan test covering each forbidden module name.
-
-Effort: human ~2h, CC ~10min.
+Acceptance: AC-8 passes; Production dependency direction remains unchanged.
 
 ### T11 — `derive_previous_shot_state` helper
 
-Deliverables:
+RED:
 
-- `VideoPlanner.derive_previous_shot_state(previous_shot, target_shot) -> PreviousShotState`
-- Pure: same inputs → same `content_hash`
-- Heuristics:
-  - `previous_shot is None` → all None/False except `semantic_jump=True` (treat as reset)
-  - same `scene_id` → `is_same_scene=True`
-  - same `storyboard_beat_id` → `is_same_story_beat=True`
-  - equal `intent` → `is_same_action=True`
-  - `is_angle_change` heuristic: same scene + same beat + same action → not angle change; otherwise → True
-
-Tests: 3 cases (first shot / same scene / angle change).
-
-Effort: human ~1h, CC ~5min.
-
-### T12 — Integration doc + example
+- first Shot/reset, same-action continuation, angle change and semantic jump cases;
+- helper must not infer `is_same_action` merely from equal prose strings when typed continuity says otherwise.
 
 Deliverables:
 
-- `docs/specs/video-planner-subagent/integration.md` (see deliverable file)
-- One Main Agent call example with full Python snippet
-- One plan JSON output example
-- One discussion of "what Main Agent does after plan"
+- pure helper that consumes existing Shot/continuity evidence;
+- no filesystem/Registry/Manifest read.
 
-Effort: human ~2h, CC ~10min.
+Acceptance: output is deterministic and supports T3 without owning continuity truth.
 
-### T13 — End-to-end Main Agent example test
+### T12 — Integration contract and examples
 
 Deliverables:
 
-- `tests/test_planning_video_planner.py::test_end_to_end_main_agent_flow`
-- Constructs a full `VideoPlanningRequest` from a fixture `Shot`
-- Runs `VideoPlanner.plan()`
-- Asserts plan shape, hash, and key reason codes
+- update `integration.md` with request construction, current plan check, Final Shot Visual rules, illustrative JSON and downstream route;
+- explicitly state `PROPOSED != generated/reviewed/selected/locked/activated/PASS/Final Acceptance`;
+- explicitly forbid run-local placeholder continuation after any STOP condition.
 
-Tests: 1 case.
+Acceptance: AC-10 and AC-18 are reviewable and mirrored by executable assertions in T13.
 
-Effort: human ~1h, CC ~5min.
+### T13 — Executable Main Agent consumer/STOP seam
 
-### T14 — Final review & acceptance
+RED:
+
+- `BLOCKED`, stale source request hash, stale Shot id/revision/hash, missing required assets, wrong owner/binding, or unresolved `REQUIRES_HUMAN_REVIEW` must raise typed STOP;
+- router, Provider, placeholder/materializer, composition and render spies must each remain at 0 calls;
+- a current `PROPOSED` plan with satisfied assets may only call an existing Production handoff spy; it must not set acceptance/activation state.
 
 Deliverables:
 
-- All AC-1..AC-10 verified
-- `pytest tests/test_planning_video_planner.py` passes
-- `pytest tests/test_architecture_gate.py` passes (including new gate)
-- `pytest tests/` (full suite) passes — no regression
-- README mention of new module (one line) — optional, only if user wants
-- Final completion report
+- minimal Main Agent/planning-side `require_current_video_plan(...)` consumer or equivalent executable seam; caller freshly rebuilds current sealed request and consumer compares `source_request_content_hash`;
+- no Production module import of planner and no `ShotVisualResolver` refactor.
 
-Effort: human ~1h, CC ~10min.
+Acceptance: AC-17 and AC-18 pass. This task owns stop semantics; future D1 does not.
 
-## Total effort
+### T14 — Final regression and acceptance
 
-| Bucket | Human | CC |
-|---|---|---|
-| T1–T9 (core) | ~13.5h | ~60min |
-| T10 (gate) | ~2h | ~10min |
-| T11 (helper) | ~1h | ~5min |
-| T12 (docs) | ~2h | ~10min |
-| T13 (e2e) | ~1h | ~5min |
-| T14 (review) | ~1h | ~10min |
-| **Total** | **~20.5h** | **~100min** |
+Deliverables:
 
-Single PR scope if sliced aggressively (T1–T7 alone would already be a useful MVP). Recommend landing T1–T9 first as PR1, T10–T14 as PR2.
+- prove AC-1～AC-18 with executable tests;
+- explicitly run the real failure-mode suite: static bootstrap mismatch, camera-only zoompan, fallback false/true, reference-vs-final asset, intentional static success, zero-call STOP, and `PROPOSED != PASS`;
+- run focused planning tests, Architecture Gate and applicable full suite;
+- review requirements/design/tasks/test/integration traceability for contradictions;
+- stage only task-owned files and run `.agent/harness/policy.yaml` checks on the exact staged snapshot; verify receipt when policy requires one;
+- final completion report distinguishes proposed docs, accepted code, test evidence and runtime truth.
 
-## Definition of done (per task)
+Acceptance: generic hash/import tests alone are insufficient. T14 is incomplete until every incident regression is GREEN and the Main Agent stop seam is executable.
 
-1. Test written and failing (or accepted as new) before implementation.
-2. Implementation passes the test.
-3. No new warnings from ruff/mypy (project default).
-4. No drive-by changes to unrelated files.
-5. Commit message references task id (e.g. `T5: implement decision table`).
-6. `git diff` reviewed against the ownership boundary before commit.
+## Traceability matrix
 
-## Out-of-scope tasks (deferred)
+| Contract / AC | Requirements | Design | RED tests | Implementation task | Integration acceptance |
+|---|---|---|---|---|---|
+| Legacy dynamic strategy AC-1～AC-5 | FR-3/4/8 | Stages 2/3/5/6 | Cases 1～5 | T3～T6 | current proposal may enter Production gates |
+| Determinism and isolation AC-6～AC-8 | FR-2/11 | §§3/4/5/8 | hash, forbidden-field, import gates | T8～T10 | plan sealed; no durable/Provider ownership |
+| Coverage/docs AC-9～AC-10 | verification plan | §11 | coverage + integration contract tests | T12/T14 | exact examples and STOP route |
+| Static bootstrap mismatch AC-11 | FR-4/5 | Stages 3/4/7 | Case 6 | T4/T5/T7 | `BLOCKED` stops all downstream calls |
+| Camera-only zoompan AC-12 | FR-4/5 | §5.1 + Stage 3 | Case 7 | T4 | camera transform cannot satisfy subject action |
+| Fallback false AC-13 | FR-7 | Stage 4 | Case 8 | T5 | no silent downgrade |
+| Reference vs final visual AC-14 | FR-6 | §§4.3/6 Stage 1/6 | Case 9 | T6 | missing final visual STOP |
+| Intentional static AC-15 | FR-5/6 | Stage 4 | Case 10 | T5/T6/T7 | eligible proposal only |
+| Evidenced fallback true AC-16 | FR-7 | §§4.4/6 Stage 4 | Case 11 | T5/T7 | audit warning retained; no auto PASS |
+| Executable STOP AC-17 | FR-12 | §7 | Case 12 spies | T13 | zero router/Provider/placeholder-materializer/composition/render calls |
+| `PROPOSED` semantics AC-18 | FR-13/14 | §§5.3/7/10 | Case 13 | T12/T13/T14 | downstream Review/Pilot still mandatory |
 
-These will be tracked as separate slices later:
+## Definition of done
 
-- D1 — `planner→router bridge`: convert `VideoGenerationPlan` into `ShotRoutingContext` hints for `ShotVisualResolver`
-- D2 — LangGraph-style plan/craft/validate/judge/refine loop using planner output
-- D3 — Multi-Shot planning (single Shot is the only current call shape)
-- D4 — Cost & latency estimation fields in plan
-- D5 — Plan history / replan heuristics across Shots
+1. RED observed before implementation for T4–T7 and T13 incident behavior.
+2. Scoped implementation makes those exact cases GREEN without weakening assertions.
+3. No unrelated edits, new Provider/dependency/schema, Production reverse import or durable ownership.
+4. Parent reviews final diff and independent reviewer checks semantic consistency.
+5. Exact staged snapshot passes policy-routed Harness checks before task-only commit.
 
-## Risk register per task
+## Deferred work
+
+- D1 — optional planner-to-router hint projection. It may translate an already-consumed proposal but does not own STOP semantics and must not refactor Router.
+- D2 — plan/craft/validate/judge/refine orchestration.
+- D3 — Multi-Shot planning. Remains out of scope; repetition/frame-diversity/Pilot gates stay with Review/Pilot.
+- D4 — cost/latency estimation.
+- D5 — plan history/replan heuristics.
+
+## Risk register
 
 | Task | Risk | Mitigation |
 |---|---|---|
-| T5 | Decision-table branches mis-classify edge cases | Pinned tests cover 9 rows + override branches |
-| T7 | Confidence floats non-deterministic | Pure function — only inputs drive confidence |
-| T10 | AST scan brittle under refactor | Blacklist stored as constant list; readable failure |
-| T12 | Doc example drifts from code | Example is part of T13 e2e test |
+| T4 | prose heuristics silently classify action | typed intent evidence precedence; unresolved prose requires review |
+| T5 | policy true becomes automatic fallback | final visual + matching Review projection + rationale required |
+| T6 | references masquerade as final visuals | exact target owner/binding checks |
+| T7 | confidence hides mismatch | confidence cannot clear STOP/warning |
+| T13 | advisory plan is ignored | mandatory consumer plus zero-call spies |
+| T14 | pure-function tests pass while incident remains | named real failure regressions are completion criteria |

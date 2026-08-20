@@ -1,189 +1,72 @@
 # Video Planner Subagent — Integration Guide
 
-Audience: Main Agent / Codex authors who need to ask "what generation strategy should this Shot use?" before invoking AI-VIDEO Production.
+Audience: Main Agent / run authors preparing an existing AI-VIDEO Shot for generation or composition.
 
-Status: paired with `requirements.md` + `design.md` + `tasks.md`.
+Status: mandatory consumer contract specification; no runtime implementation is claimed by this docs slice.
 
-## 1. When Main Agent should call this module
+## 1. Required ordering
 
-Call the planner **before** any of:
+Every Shot preparing to enter Provider/Asset execution or composition must obtain a plan for the current Shot revision/hash and pass the Main Agent consumer:
 
-- `ProductionStateCommitter.commit_video_intent(...)`
-- `ShotVisualResolver.resolve(...)` inside Production
-- Any decision about whether to invoke a Provider
-- Any prompt engineering that branches on Shot identity / continuity
-
-If Main Agent is **purely** reasoning about Story / Scene / Storyboard (no Shot yet), no call is needed.
-
-## 2. Why this module exists
-
-AI-VIDEO Production is canonical owner of Manifest, Asset Registry, Timeline, Provider selection, and review. Main Agent does not (and must not) duplicate those decisions. But Main Agent needs a structured way to say:
-
-> "Given this Shot's intent, characters, scene, available references, and previous Shot state — what generation strategy should I steer the system toward?"
-
-The planner answers that question with a `VideoGenerationPlan`. It is:
-
-- **Provider-neutral** — never names a Provider
-- **Pure** — same input → same `plan_hash`
-- **Stateless** — no DB, no cache, no IO
-- **Advisory** — Production still owns final selection
-
-## 3. Public surface
-
-```python
-from ai_video.planning import (
-    VideoPlanner,
-    VideoPlanningRequest,
-    VideoGenerationPlan,
-    # enums (rarely needed by Main Agent, but useful for switch logic):
-    GenerationMode,
-    ContinuityMode,
-    MotionRequirement,
-    PlanOutcome,
-    PlanWarning,
-    ReasonCode,
-)
+```text
+approved AI-VIDEO Shot / Asset / Review truth
+  -> VideoPlanner per-Shot preflight
+  -> Main Agent current-plan consumer / STOP
+  -> AI-VIDEO Provider / Asset execution
+  -> Composition
+  -> Review
+  -> human Pilot Reality Gate
 ```
 
-Only `VideoPlanner.plan(request)` is callable. Everything else is data.
+Call before router/Provider choice, generation submit, placeholder materialization, composition, render, or any run-local shortcut that could produce a Shot visual.
 
-## 4. Call pattern
+The planner is not needed before a canonical Shot exists. Provider/model prompt adaptation is outside this slice.
+
+## 2. Ownership and semantics
+
+The planner is provider-neutral, pure and stateless. Its output is advisory as a strategy proposal, but consumption is mandatory:
+
+- Production retains Provider selection/execution and durable state ownership.
+- Asset Registry and canonical Shot bindings retain asset truth.
+- Review retains creative-quality evidence.
+- Human Pilot Reality Gate retains 30～60 second full-watch/reality acceptance.
+- Main Agent must enforce planner STOP conditions before calling Production.
+
+“Advisory” means planner does not bind Production selection. It does not mean the caller may ignore `BLOCKED`.
+
+## 3. Building the current request
+
+Main Agent supplies:
+
+| Request field | Canonical source / projection rule |
+|---|---|
+| `target_shot` | current activated/selected `Shot` from `ProductionProject` |
+| Character/Scene context | exact current canonical artifacts referenced by Shot |
+| `previous_shot_state` | typed current upstream Shot/continuity evidence |
+| `shot_intent_evidence` | sealed projection of approved intent, open/close state, continuity constraints and motion directives |
+| `available_assets` | read-only current Registry/Shot-binding snapshot |
+| `review_decision` | optional current pointer/summary from existing AI-VIDEO Review/director evidence |
+| `production_policy` | task-scoped policy; `accept_static_image_fallback` must not be invented |
+
+`Shot.intent` prose is not sufficient to derive action with keywords. If typed evidence cannot resolve it, set `evidence_unresolved=True`; the plan must require human review.
+
+### Reference and final visual mapping
+
+When constructing `available_assets`:
+
+- Character/Scene reference roles remain reference guidance.
+- A keyframe may be labeled `APPROVED_KEYFRAME` only when its `canonical_owner_id` is the target Shot and target Shot canonical `required_asset_roles` binds that exact asset to its final-visual role.
+- A reusable plate may be labeled `APPROVED_REUSABLE_PLATE` only with the same target-Shot binding plus current Review/director reuse evidence and rationale.
+- Do not relabel a reference-pack image or simple derivative as a final Shot visual merely because the bytes exist.
+
+## 4. Request example
+
+Illustrative API shape only:
 
 ```python
-from ai_video.planning import VideoPlanner
-
-planner = VideoPlanner()  # stateless; safe to construct per-call or once
-plan = planner.plan(request)
-# → VideoGenerationPlan (frozen, sealed, hash-stable)
-```
-
-No constructor arguments. No context manager. No async. Sync call only.
-
-## 5. Building `VideoPlanningRequest`
-
-Main Agent already has the following from `ProductionProject`:
-
-- The activated `Shot` (one of `project.shots`)
-- The `Scene` (`project.scenes[shot.scene_id]`)
-- The `Character` list (filter `shot.character_ids`)
-- The asset registry snapshot
-
-Main Agent **derives** `PreviousShotState` from upstream Shot context (the planner exposes `VideoPlanner.derive_previous_shot_state` for this).
-
-### 5.1 Minimal example
-
-```python
-from ai_video.planning import (
-    AvailableAsset,
-    AssetRole,
-    PreviousShotState,
-    ProductionPolicyInput,
-    VideoPlanningRequest,
-)
-
 request = VideoPlanningRequest.create(
     request_id="plan-shot-7-attempt-1",
-    target_shot=project.shots["shot-7"],
-    character_context=tuple(
-        project.characters[c] for c in project.shots["shot-7"].character_ids
-    ),
-    scene_context=project.scenes[project.shots["shot-7"].scene_id],
-    available_assets=(
-        AvailableAsset(
-            role=AssetRole.CHARACTER_REFERENCE,
-            asset_id=registry.assets["ref-alice"].asset_id,
-            asset_sha256=registry.assets["ref-alice"].sha256,
-            mime_type="image/png",
-            width=1024, height=576, size_bytes=200_000,
-        ),
-        AvailableAsset(
-            role=AssetRole.SCENE_REFERENCE,
-            asset_id=registry.assets["ref-cafe"].asset_id,
-            asset_sha256=registry.assets["ref-cafe"].sha256,
-            mime_type="image/png",
-            width=1920, height=1080, size_bytes=800_000,
-        ),
-    ),
-    previous_shot_state=VideoPlanner.derive_previous_shot_state(
-        previous_shot=previous_shot,  # None for first Shot
-        target_shot=project.shots["shot-7"],
-    ),
-    production_policy=ProductionPolicyInput(
-        local_resources_available=True,
-        remote_authorized=False,            # task-scoped only
-        budget_authorized=False,
-        quality_preference="production",
-        accept_static_image_fallback=False,
-    ),
-    planning_contract_version="video-planner/1",
-)
-
-plan = VideoPlanner().plan(request)
-```
-
-### 5.2 Fields Main Agent must fill
-
-| Field | Source |
-|---|---|
-| `request_id` | Main Agent's own identifier (uuid, monotonic, or `f"plan-{shot_id}-{attempt}"`) |
-| `target_shot` | activated `Shot` from `ProductionProject` (no new schema) |
-| `character_context` | `tuple` of `Character` matching `target_shot.character_ids` |
-| `scene_context` | the single `Scene` matching `target_shot.scene_id` |
-| `available_assets` | filter Asset Registry by role; project-local registry snapshot only |
-| `previous_shot_state` | `VideoPlanner.derive_previous_shot_state(...)` is the canonical helper |
-| `production_policy` | Main Agent task-scoped policy (do not invent) |
-| `planning_contract_version` | literal `"video-planner/1"` |
-
-## 6. Reading the plan
-
-```python
-match plan.outcome:
-    case PlanOutcome.PROPOSED:
-        # Plan is a hint; Production still resolves the exact capability.
-        # Main Agent should:
-        #   1. ensure all required_asset_roles exist in the registry;
-        #      if MISSING_* warnings are present, fall back to BLOCKED handling.
-        #   2. surface the capability_requirements to Production as advisory input.
-        ...
-    case PlanOutcome.BLOCKED:
-        # Planner says: do not auto-route this Shot to a Provider.
-        # Common reasons:
-        #   - missing character / scene reference
-        #   - missing terminal frame for EXACT_TERMINAL
-        #   - hero/repair policy needed
-        # Main Agent should:
-        #   1. inspect plan.reason_codes and plan.warnings
-        #   2. decide whether to (a) re-author Shot intent, (b) gather missing
-        #      assets, or (c) escalate to user.
-        ...
-```
-
-`plan.plan_hash` is stable per `target_shot_content_hash` + context; use it to dedupe replans.
-
-## 7. What Main Agent does NOT do with the plan
-
-- Does **not** call any Provider based on `generation_mode` alone.
-- Does **not** assume any provider is available (planner is provider-neutral).
-- Does **not** write plan into Manifest, Asset Registry, or any durable artifact.
-- Does **not** retry the planner with mutated inputs to "force" a different mode.
-- Does **not** use `plan_hash` as a Manifest receipt.
-
-The plan is a hint passed to Production (e.g. via the future planner→router bridge). Production may accept, partially accept, or override the hint.
-
-## 8. Worked example: Alice walks out of cafe
-
-### Setup
-
-- `target_shot`: `shot-7`, intent `"Alice walks out of cafe."`, visual_strategy `GENERATED_VIDEO`, character_ids `("alice",)`, scene_id `"scene-cafe"`.
-- `previous_shot`: `shot-6`, same storyboard beat, intent `"Alice sits in cafe window."`, same scene, no angle change flagged by upstream.
-- Asset Registry has `ref-alice` (CHARACTER_REFERENCE) and `ref-cafe` (SCENE_REFERENCE); no terminal asset for shot-6 yet (it has not been activated).
-
-### Request
-
-```python
-request = VideoPlanningRequest.create(
-    request_id="plan-shot-7",
-    target_shot=project.shots["shot-7"],
+    target_shot=current_shot,
     character_context=(project.characters["alice"],),
     scene_context=project.scenes["scene-cafe"],
     available_assets=(
@@ -191,151 +74,225 @@ request = VideoPlanningRequest.create(
             role=AssetRole.CHARACTER_REFERENCE,
             asset_id="ref-alice",
             asset_sha256=registry.assets["ref-alice"].sha256,
+            canonical_owner_id="alice",
             mime_type="image/png",
-            width=1024, height=576, size_bytes=200_000,
         ),
         AvailableAsset(
             role=AssetRole.SCENE_REFERENCE,
             asset_id="ref-cafe",
             asset_sha256=registry.assets["ref-cafe"].sha256,
+            canonical_owner_id="scene-cafe",
             mime_type="image/png",
-            width=1920, height=1080, size_bytes=800_000,
         ),
     ),
     previous_shot_state=VideoPlanner.derive_previous_shot_state(
-        previous_shot=project.shots["shot-6"],
-        target_shot=project.shots["shot-7"],
+        previous_shot=previous_shot,
+        target_shot=current_shot,
     ),
-    production_policy=ProductionPolicyInput(),
-    planning_contract_version="video-planner/1",
+    shot_intent_evidence=ShotIntentEvidence(
+        target_shot_id=current_shot.shot_id,
+        target_shot_content_hash=current_shot.content_hash,
+        open_state_ref="alice-inside-cafe",
+        close_state_ref="alice-outside-cafe",
+        character_action_required=True,
+        spatial_change_required=True,
+    ),
+    review_decision=None,
+    production_policy=ProductionPolicyInput(
+        local_resources_available=True,
+        remote_authorized=False,
+        budget_authorized=False,
+        quality_preference="production",
+        accept_static_image_fallback=False,
+    ),
+    planning_contract_version="video-planner/2",
 )
+
+plan = VideoPlanner().plan(request)
 ```
 
-### Expected plan (illustrative JSON)
+The example references only existing project/asset truth plus ephemeral projections. It does not write Manifest/Registry/Review state.
+
+## 5. Mandatory Main Agent consumer
+
+The future integration must have an executable seam equivalent to:
+
+```python
+def prepare_shot_for_existing_production(*, current_request, plan,
+                                         production_handoff):
+    require_current_video_plan(
+        current_request=current_request,
+        plan=plan,
+    )
+    return production_handoff(
+        current_shot=current_request.target_shot,
+        plan_hint=plan,
+    )
+```
+
+`require_current_video_plan(...)` must STOP with typed failure when any condition is true:
+
+1. `plan.source_request_content_hash` differs from a freshly rebuilt current request hash (which includes current Shot, Review evidence identity, policy and asset-binding projections);
+2. plan Shot id/revision/content hash is not current;
+3. `plan.outcome == PlanOutcome.BLOCKED`;
+4. any `required_asset_roles` item is absent, stale, wrong-owner, or lacks exact target-Shot binding;
+5. `REQUIRES_HUMAN_REVIEW` is unresolved.
+
+STOP means router, Provider, placeholder/materializer, composition and render are not invoked. A run-local script may not catch the failure and continue with a placeholder.
+
+On success, `production_handoff` only enters existing Production gates. It does not write acceptance or activation state. This seam lives on the Main Agent/planning side; Production modules must not import planner.
+
+## 6. Outcome handling
+
+```python
+match plan.outcome:
+    case PlanOutcome.BLOCKED:
+        raise planning_preflight_blocked(plan.reason_codes, plan.warnings)
+    case PlanOutcome.PROPOSED:
+        require_current_request_identity(plan, current_request)
+        require_current_assets(
+            plan.required_asset_roles,
+            current_request.available_assets,
+            current_request.target_shot,
+        )
+        require_resolved_review_warnings(plan.warnings)
+        # Eligible only to enter existing Production gates.
+```
+
+`PROPOSED` does **not** mean:
+
+- generated;
+- reviewed or human creative PASS;
+- selected or locked;
+- activated;
+- composition complete;
+- Pilot passed;
+- Final Acceptance.
+
+`plan_hash` is only a deterministic plan identity. It is not a Manifest receipt, Review receipt, activation pointer or approval token.
+
+## 7. Worked mismatch example: action Shot bootstrapped static
+
+Setup:
+
+- Shot intent/open-close evidence says Alice moves from inside to outside the cafe;
+- `Shot.visual_strategy` was incorrectly bootstrapped as `STATIC_IMAGE`;
+- only Character/Scene references are available;
+- `accept_static_image_fallback=False`.
+
+Illustrative plan:
 
 ```json
 {
-  "plan_id": "3f5b2b7c-9b6f-4a8d-8c0c-4a2f7c5b3e1d",
   "target_shot_id": "shot-7",
   "target_shot_revision": 3,
   "target_shot_content_hash": "ab12...64hex",
-  "generation_mode": "reference_to_video",
+  "source_request_content_hash": "cd34...64hex",
+  "generation_mode": "static_image",
   "continuity_mode": "reference",
   "motion_requirement": "character_action",
   "required_asset_roles": [
     {
-      "role": "character_reference",
-      "reason_code": "reference_available"
-    },
-    {
-      "role": "scene_reference",
-      "reason_code": "reference_available"
+      "role": "approved_keyframe",
+      "reason_code": "final_shot_visual_required"
     }
   ],
-  "capability_requirements": {
-    "needs_character_reference": true,
-    "needs_scene_reference": true,
-    "needs_first_frame": false,
-    "needs_last_frame": false,
-    "needs_terminal_reference": false,
-    "needs_audio_native": false,
-    "needs_continuity_state": true,
-    "max_reference_count": 4,
-    "min_output_duration_seconds": 3,
-    "accepts_local_execution": true,
-    "accepts_remote_execution": false
-  },
   "reason_codes": [
-    "important_character",
-    "identity_required",
-    "continuity_required",
-    "reference_available",
-    "continuity_angle_change"
+    "action_intent_required",
+    "strategy_motion_mismatch"
   ],
-  "confidence": 0.85,
-  "warnings": [],
-  "outcome": "proposed",
-  "rationale": "Important character with references and a same-scene angle change from shot-6; reference continuity is sufficient.",
-  "planning_contract_version": "video-planner/1",
+  "warnings": [
+    "final_shot_visual_missing",
+    "requires_human_review"
+  ],
+  "confidence": 0.9,
+  "outcome": "blocked",
+  "rationale": "Subject action and spatial change cannot be satisfied by the declared static strategy; references are not a final Shot visual.",
+  "planning_contract_version": "video-planner/2",
   "plan_hash": "9f2e...64hex"
 }
 ```
 
-### Main Agent interpretation
+Main Agent interpretation: STOP. Do not route, call a Provider, generate a placeholder, compose, or render. Re-author the Shot strategy or gather the required current evidence/assets and create a new plan.
 
-- `outcome = proposed` and `generation_mode = reference_to_video` → proceed.
-- `required_asset_roles` are both present in the registry → no asset gap.
-- `warnings` is empty → no escalation needed.
-- Hand off to Production with the plan attached as advisory; Production still chooses the exact Provider / capability.
+The `generation_mode` field remains the audited declared/proposed lane even on `BLOCKED`; downstream code must key eligibility from `outcome` and the mandatory consumer, never from mode alone.
 
-### Worked example: no references for important character
+## 8. Worked intentional-static example
 
-#### Setup
+Setup:
 
-Same `shot-7`, but Registry has no `ref-alice` yet (Alice's reference pack is not yet imported).
+- typed intent requires no subject action or state/spatial change;
+- target Shot canonically binds `keyframe-shot-12` as its final visual;
+- asset owner is `shot-12`;
+- current director/Review evidence records the intentional-static rationale.
 
-#### Expected plan
+Expected key assertions:
 
-```json
-{
-  "plan_id": "9e8a...uuid",
-  "target_shot_id": "shot-7",
-  "generation_mode": "reference_to_video",
-  "continuity_mode": "reference",
-  "outcome": "blocked",
-  "reason_codes": ["missing_references", "no_character_reference"],
-  "warnings": ["missing_character_reference"],
-  "confidence": 0.6,
-  "rationale": "Important character requires a character reference; none is available in the registry.",
-  "plan_hash": "..."
-}
+```python
+assert plan.outcome is PlanOutcome.PROPOSED
+assert plan.generation_mode is GenerationMode.STATIC_IMAGE
+assert ReasonCode.INTENTIONAL_STATIC in plan.reason_codes
+assert ReasonCode.FINAL_SHOT_VISUAL_AVAILABLE in plan.reason_codes
 ```
 
-#### Main Agent interpretation
+Main Agent may now enter existing Production gates. Review still checks the composed result; the human Pilot Gate still checks real pacing, repetition and watchability.
 
-- `outcome = blocked` → do **not** invoke Provider with T2V fallback.
-- `warnings = ["missing_character_reference"]` → escalate to user or trigger the Asset import workflow before retrying.
-- `plan_hash` is stable: a re-plan after importing `ref-alice` will produce a different plan_hash.
+## 9. Static fallback true
 
-## 9. Failure modes Main Agent must handle
+For an action Shot, `accept_static_image_fallback=True` is insufficient by itself. The request must also contain:
 
-| Failure | Source | What Main Agent does |
-|---|---|---|
-| `pydantic.ValidationError` on `VideoPlanningRequest.create(...)` | Caller passed malformed `Shot` / asset / scene | Fix inputs; do not retry |
-| `plan.outcome = BLOCKED` with `MISSING_*` warnings | Planner detected missing anchors | Run Asset import / re-author intent / escalate |
-| `plan.confidence < 0.6` | Planner sees ambiguous state | Inspect `reason_codes` and `warnings`; consider re-asking user |
-| Plan hash changes between attempts | Underlying inputs changed | Re-route with new plan; do not assume determinism across content edits |
-| Provider cannot satisfy `capability_requirements` | Production reports BLOCKED_CAPABILITY | Main Agent decides: relax constraints (e.g. drop `accepts_remote_execution`), switch Shot, or accept degraded mode |
+- approved Shot-specific keyframe or approved reusable plate with exact target-Shot binding;
+- explicit fallback/director rationale;
+- matching current Review decision allowing static fallback (and reuse if applicable).
 
-## 10. Ordering relative to other AI-VIDEO components
+When complete, planner may return `PROPOSED` with `STATIC_FALLBACK_ACCEPTED` and `STATIC_FALLBACK_REQUIRES_REVIEW`. This is auditable degraded intent, not automatic creative PASS. Missing or stale evidence returns `BLOCKED` + unresolved `REQUIRES_HUMAN_REVIEW`.
 
-```
-Main Agent
-  ├─ hell-grind-aigc-skill   (creative intent, continuity state)
-  ├─ higgsfield              (model-specific prompt adaptation; advisory)
-  ├─ VideoPlanner.plan       (generation strategy; provider-neutral)
-  ├─ AI-VIDEO Production
-  │    ├─ ShotVisualResolver (provider-aware routing, uses VideoProviderCapabilities)
-  │    ├─ VideoProvider      (local / remote execution)
-  │    ├─ ProductionStateCommitter (canonical write)
-  │    └─ HyperFrames        (default render)
-  └─ video-shotcraft         (motion design, beat sync; advisory)
-```
+## 10. Failure table
 
-The planner sits **after** hell-grind (semantic intent established) and **before** AI-VIDEO Production. It does not import higgsfield or video-shotcraft; those remain advisory and are invoked separately.
+| Failure | Main Agent action |
+|---|---|
+| malformed request | fix inputs; do not retry blindly |
+| stale plan or evidence identity | rebuild request from current canonical truth; STOP current attempt |
+| strategy/motion mismatch | re-author strategy or obtain explicit reviewed fallback evidence; STOP |
+| final visual missing | obtain/bind Shot-specific keyframe or approved reusable plate; references alone are insufficient |
+| `BLOCKED` | STOP before router/Provider/placeholder-materializer/composition/render |
+| unresolved human review | obtain current Review/human decision; STOP |
+| downstream capability unavailable | existing Production policy handles it; planner does not rank/select/fallback Providers |
 
-## 11. Migration & rollout
+## 11. Review and Pilot responsibilities
 
-- Slice is additive; no existing module changes.
-- Land as a single PR per the two-PR plan in `tasks.md` (T1–T9 → PR1; T10–T14 → PR2).
-- Old routing path is untouched; Production continues to use `ShotVisualResolver` without the planner.
-- Optional Main Agent integration: enable `planner → router` bridge after D1 lands.
+Planner solves per-Shot preflight only:
 
-## 12. References
+- intent/strategy coherence;
+- camera transform vs subject action boundary;
+- static fallback eligibility;
+- reference vs final visual readiness;
+- required capability/assets and typed reasons/warnings.
 
-- `requirements.md` — acceptance criteria
-- `design.md` — module design, schema, algorithm
-- `tasks.md` — staged implementation plan
-- `test-spec.md` — test cases
-- `src/ai_video/planning/` — module (post-merge)
-- `tests/test_planning_video_planner.py` — tests (post-merge)
+Review/Pilot still solve:
+
+- repeated final visuals across Shots;
+- long static regions and frame diversity;
+- final pacing, continuity as watched, audio/visual integration;
+- 30～60 second Pilot Reality Gate and human full-watch;
+- repair and creative-quality decision evidence; human full-watch and Final Acceptance decision.
+
+Durable selection/lock/activation persistence remains with the existing Production Manifest lifecycle and `ProductionStateCommitter`; Review/Pilot do not become lifecycle writers.
+
+Do not extend `VideoPlanner` into an aggregate repetition scanner or quality owner to satisfy this contract.
+
+## 12. Rollout boundary
+
+- Current slice: repaired docs/spec/plan only.
+- Future implementation: T1～T14, including Main Agent consumer in T13.
+- D1: optional planner-to-router hint projection only; it may not own or defer STOP semantics and must not refactor Router.
+- D3: multi-Shot planning remains deferred.
+- No Provider prompt/model adaptation, media generation, Production runtime mutation, or Router change is part of this slice.
+
+## 13. References
+
+- `requirements.md` — AC-1～AC-18
+- `design.md` — schemas, evidence precedence, algorithm and consumer contract
+- `tasks.md` — RED/GREEN execution plan and traceability matrix
+- `test-spec.md` — incident regressions and zero-call STOP proof
+- `docs/record_for_agent/2026-08-20-5-minute-rough-cut-editorial-failure-and-recovery.md` — historical failure evidence
