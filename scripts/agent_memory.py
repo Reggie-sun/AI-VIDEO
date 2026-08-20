@@ -18,6 +18,21 @@ import json
 import sys
 from pathlib import Path
 
+
+# Make the ``src`` layout importable when the consumer invokes this CLI
+# without setting ``PYTHONPATH=src``.  Codex, Claude, and humans all run
+# the same one-liner ``python -m scripts.agent_memory ...`` regardless of
+# their working directory, so the entry script must self-bootstrap.
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_REPO_ROOT = _SCRIPT_DIR.parent
+_SRC_DIR = _REPO_ROOT / "src"
+# Repo root is added so ``scripts`` is discoverable from any cwd when the
+# consumer runs ``python -m scripts.agent_memory ...``.
+for _path in (str(_REPO_ROOT), str(_SRC_DIR)):
+    if _path not in sys.path:
+        sys.path.insert(0, _path)
+
+
 from ai_video.agent_memory.config import (
     DEFAULT_CORPUS_ROOT,
     DEFAULT_EMBEDDING,
@@ -30,7 +45,16 @@ from ai_video.agent_memory.retrieval import format_text, search
 
 
 def _resolve(path: str) -> Path:
-    return Path(path).resolve()
+    """Resolve ``path`` to an absolute path.
+
+    Relative inputs are anchored to the repository root (not the
+    consumer's cwd), so the CLI is portable across worktrees, sandboxes,
+    and CI shells.
+    """
+    p = Path(path)
+    if not p.is_absolute():
+        p = _REPO_ROOT / p
+    return p.resolve()
 
 
 def cmd_build(args: argparse.Namespace) -> int:
