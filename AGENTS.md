@@ -244,6 +244,26 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 - Project-local `video-analysis` 是本仓库默认视频检查工具；全局 `videoscan` 只可作为 metadata/frame helper，不能成为 Production QA owner。
 - 交付 generated-video 时只提供真实 live/fetched/validated output；不得把 preflight、fake fixture、smoke artifact、technical evidence 或 fetch success冒充 activated、quality-accepted 或 final delivery truth。
 
+## Agent Experience Memory (Advisory)
+
+For tasks involving real media production, Provider quality, continuity,
+rough-cut quality, known regressions, or previously observed failures,
+search `docs/record_for_agent/` through the local Agent Experience Memory
+before substantial execution:
+
+```bash
+python -m scripts.agent_memory build
+python -m scripts.agent_memory search "<query>"
+```
+
+Before completion of such tasks, perform one final relevant-memory search
+to check for repeated historical failures.
+
+Retrieved records are advisory evidence only and never override current
+code, tests, or runtime truth. The memory system MUST NOT select Providers,
+mutate Manifest/Asset Registry/Dependency Graph, read credentials, contact
+the network, run paid models, execute repair, or generate media.
+
 ## Completion Standard
 
 在宣称完成前确认：

@@ -371,3 +371,13 @@ categories:
     check_ids:
       - production_shot_router_tests
       - task_architecture_gate
+  agent_memory_dev_tool:
+    # Local, read-only RAG over docs/record_for_agent/. Dev / Codex
+    # authoring tool only; never participates in Production state.
+    patterns:
+      - src/ai_video/agent_memory/**
+      - scripts/agent_memory.py
+      - tests/test_agent_memory.py
+    check_ids:
+      - full_tests
+      - task_architecture_gate

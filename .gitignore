@@ -14,3 +14,5 @@ runs/*
 node_modules/
 .hyperframes/
 .gstack/
+# Local Agent Experience Memory index (rebuilt by scripts/agent_memory.py).
+.agent/memory/
