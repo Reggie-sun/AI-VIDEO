@@ -12,6 +12,18 @@ cwd = "/home/reggie/vscode_folder/AI-VIDEO"
 [mcp_servers.video-analysis.env]
 PYTHONPATH = "/home/reggie/vscode_folder/AI-VIDEO/src"
 
+[mcp_servers.gpt-image-2]
+command = "/home/reggie/.local/share/ai-video/gpt-image-2-mcp/launch-chatgpt-web.sh"
+cwd = "/home/reggie/vscode_folder/AI-VIDEO"
+
+[mcp_servers.gpt-image-2.env]
+GPT_IMAGE_BACKEND = "chatgpt-web"
+CHATGPT_WEB_PROFILE_DIR = "/home/reggie/.local/share/ai-video/gpt-image-2-mcp/profile"
+CHATGPT_WEB_LOGIN_TIMEOUT_SECONDS = "900"
+CHATGPT_HIDE_WINDOW = "0"
+CHROME_PATH = "/usr/bin/google-chrome"
+XDG_DATA_HOME = "/home/reggie/.local/share/ai-video/gpt-image-2-mcp/data"
+
 [mcp_servers.codegraph]
 command = "node"
 args = [
