@@ -65,6 +65,7 @@ class ErrorCode(str, Enum):
     REPAIR_AUTHORIZATION_REQUIRED = "repair_authorization_required"
     REPAIR_SCOPE_INVALID = "repair_scope_invalid"
     FINAL_ACCEPTANCE_INVALID = "final_acceptance_invalid"
+    PLANNING_PREFLIGHT_BLOCKED = "planning_preflight_blocked"
 
 
 @dataclass
