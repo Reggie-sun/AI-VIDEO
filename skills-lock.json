@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "open-video": {
+      "source": "open-video-ai/open-video",
+      "sourceType": "github",
+      "skillPath": "skill/open-video/SKILL.md",
+      "computedHash": "736401d7ffc1a3a716618c243525689a59fcf2546c22c0067a8fdd35e851ff6f"
+    }
+  }
+}

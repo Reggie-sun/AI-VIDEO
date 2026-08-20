@@ -447,6 +447,23 @@ def test_domain_committer_helpers_route_to_their_domain_suite(
     assert check_id in report["check_ids"]
 
 
+@pytest.mark.parametrize(
+    "path",
+    [
+        ".gitattributes",
+        ".agents/skills/open-video/SKILL.md",
+        "skills-lock.json",
+    ],
+)
+def test_project_skill_installation_routes_to_control_plane_harness(path: str) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths([path], policy)
+
+    assert "control_plane" in report["categories"]
+    assert "harness_tests" in report["check_ids"]
+
+
 def test_inspection_falls_back_to_full_tests_and_task_architecture_gate() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

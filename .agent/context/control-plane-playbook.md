@@ -38,6 +38,10 @@ Use the minimum matching Skill set. Installation、description matching 或“�
 
 ### Skill Selection
 
+`open-video` MUST use when the task needs Director-level concept/script decomposition、ordered Shot planning、coverage、per-Shot objective、multi-Shot segmentation、transition/handoff intent 或 review criteria。它是 project-local Shot Planning knowledge Skill；其 `plan -> craft -> validate -> generate -> judge -> refine -> stitch -> deliver` 只作为 authoring rubric。Agent MAY 提取 shot decomposition、H3 prompt grammar、continuity questions 与 judging heuristics，然后必须将结果翻译成 approved AI-VIDEO Character / Scene / Shot artifacts 和现有 contracts。
+
+`open-video` MUST NOT 运行或安装其 product/CLI/Python runtime，不得执行 `open-video install/pull/status/run`、ComfyUI submit、generation、judge loop、refine loop、ffmpeg stitch、artifact/receipt write，也不得成为 video engine、Provider、renderer、Production runtime 或 Agent runtime/lifecycle owner。上游 multi-shot Director path 标记为 evolving/design-scaffold；其 capability、constraint、model 与 quality claims 只能作为候选知识，使用前必须由当前 AI-VIDEO code、sealed profile、tests 或 runtime evidence 重新验证。
+
 `hell-grind-aigc-skill` MUST use when the task includes semantic Shot design、open/close state、cross-Shot continuity、identity/state/spatial/axis/action/light/environment/audio continuity、image/video prompt structure、generation failure diagnosis、iteration 或 candidate reasoning。它优先回答“Shots 之间什么必须保持或改变？”以及“generated Shot 为什么失败？”。AI-VIDEO Character、Scene、Shot 与 asset records 始终是 source of truth；不得创建平行的 project schema、asset registry、generation ledger、review state 或 delivery truth。
 
 `higgsfield` MUST use when the task includes provider/model-specific prompt adaptation、Seedance/Hailuo/Kling/Veo guidance、T2V/I2V/reference/continuation/extension mode guidance、provider-specific camera vocabulary 或 generation troubleshooting。它只在 AI-VIDEO semantic Shot / continuity intent 已建立后使用，不得选择 active Provider、读取 credential、提交 generation 或绕过 AI-VIDEO gates。
@@ -46,6 +50,7 @@ Use the minimum matching Skill set. Installation、description matching 或“�
 
 Routing precedence：
 
+- Concept/script -> ordered Director coverage / Shot plan -> `open-video`。
 - Semantic continuity / Shot-state problem -> `hell-grind-aigc-skill`。
 - Specific generative model / Provider prompting problem -> `higgsfield`。
 - Deterministic motion design / graphics / pacing problem -> `video-shotcraft`。
@@ -54,6 +59,12 @@ Routing precedence：
 多 Skill 组合必须按依赖顺序调用；后续 Skill 可以适配前序 advisory result，但不能重定义上游 semantic contract 或下游 production truth。
 
 ```text
+multi-shot direction:
+AI-VIDEO concept / script
+  -> open-video: advisory coverage, Shot order, objectives, transitions, review questions
+  -> AI-VIDEO approved Character / Scene / Shot artifacts
+  -> downstream matching Creative Skills only when their concerns are present
+
 generated-video continuity:
 AI-VIDEO Shot intent
   -> hell-grind-aigc-skill: establish semantic continuity
@@ -67,7 +78,7 @@ AI-VIDEO Shot intent
   -> AI-VIDEO CompositionSpec -> ResolvedTimeline -> HyperFrames
 ```
 
-External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、Asset Registry、Manifest、Dependency Graph、timeline、renderer selection、Provider lifecycle、review/repair 或 delivery state。
+External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、Asset Registry、Manifest、Dependency Graph、timeline、renderer selection、Provider lifecycle、review/repair、delivery state、Production runtime 或 Agent runtime。安装 Skill 不新增 runtime dependency；`runtime_skill_calls = 0` 保持不变。
 
 ## 2. Module Boundaries And Focused Owners
 

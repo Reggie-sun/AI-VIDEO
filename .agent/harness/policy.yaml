@@ -397,6 +397,9 @@ categories:
   control_plane:
     patterns:
       - AGENTS.md
+      - .gitattributes
+      - .agents/skills/**
+      - skills-lock.json
       - docs/agent-primary-contract-matrix.md
       - .agent/context/control-plane-playbook.md
       - .agent/context/session-handoff.md
