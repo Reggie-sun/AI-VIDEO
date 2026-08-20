@@ -2,6 +2,8 @@
 
 Date: 2026-08-20
 
+Last updated: 2026-08-21
+
 ## Purpose
 
 本文记录 `Relay Seven` 五分钟 rough-cut reality-validation run 的实际失败、Creative Skill 使用边界、媒体与 Manifest truth、一次中断后的 explicit recovery，以及后续 Agent 必须执行的 editorial gates。
@@ -193,9 +195,42 @@ Current run 的 P6 policy 虽声明 required layers 为 `technical / layout / se
 
 `video-analysis` 的 `static_visuals` 只能作为 raw warning；它不应自动判断电影好坏。漏拦点是 production order 与 human gate，而不是需要扩张 development Harness。
 
+## Pilot Render Reconciliation (2026-08-21)
+
+本次 30 秒 Pilot 暴露了另一个必须单独记录的 production-order failure：`shot-012` 的新 H3 asset 已经进入 canonical Shot / Asset truth，但最后一次 composition 仍然使用旧 revision 的 image-motion asset。
+
+旧 render 的 production record 明确显示：
+
+- Manifest revision `83` 的 active visual asset 为 `pilot30-shot-012-image-motion-video`；
+- delivery `pilot-30s-current.mp4` 的 SHA-256 为 `facd76152c449b3e1119fd537b84e520b38f6600becded48f68ddeb96cc9a80a`；
+- 随后 Manifest revision `91` 才激活 `relay-seven-pilot30-shot-012-h3-action-video`，video SHA-256 为 `76e6c264a9d3b5e5837af85e422e63fd86613728f78ad5682f025d302c612726`；
+- revision `91` 之后没有自动触发 composition/render，所以“新 asset 已激活”不等于“当前交付 MP4 已替换”。
+
+在没有重新调用 Provider 的前提下，使用现有 `runs/relay-seven-pilot-gate-20260820-v5/render_pilot.py` 重新执行 HyperFrames composition。新的 production record 为 Manifest revision `94`，visual spans 为：
+
+```text
+relay-seven-pilot30-shot-010-video:delivery-1344x672
+relay-seven-pilot30-shot-011-video:delivery-1344x672
+relay-seven-pilot30-shot-012-h3-action-video
+relay-seven-pilot-shot-013-video
+```
+
+新版交付：
+
+```text
+/home/reggie/vscode_folder/AI-VIDEO-pilot-gate/runs/relay-seven-pilot-gate-20260820-v5/deliverables/pilot-30s-shot012-h3-r2.mp4
+SHA-256: 77c0e0e3daca34d4f784c9429d57b020b8637e82a6a41f2f102e95268d4a1422
+```
+
+`ffprobe` 事实：H.264 `1344x672`、24 fps、720 frames、duration `30.022` seconds；AAC `48 kHz`、stereo；size `12,869,060` bytes。该文件与重新生成的 `deliverables/pilot-30s-current.mp4` byte-identical。16～22 秒的 `shot-012` 抽帧可见 H3 action 画面，不再是旧静图/zoompan plate。
+
+这只是 asset-to-composition 的技术修复和真实 MP4 交付，不是人工 watchability acceptance；尚未记录 Pilot `GO`，也不得据此恢复 5-minute batch production。后续任何 visual asset activation 都必须明确触发或阻止 stale render，并在 delivery evidence 中绑定 active Manifest revision、visual asset list 与 output SHA-256。
+
 ## Git And Publication State
 
-写 record 前重新检查：
+### Original Failure Checkpoint (2026-08-20)
+
+写 original failure record 前重新检查：
 
 - Branch: `main`
 - HEAD: `54f93e9`
@@ -205,6 +240,16 @@ Current run 的 P6 policy 虽声明 required layers 为 `technical / layout / se
 - 在 record checkpoint 前的第二次 gate 中，`.codex/config.toml` 已由另一个 actor 出现在 staged index；本 record 未读取、修改、unstage 或认领它，并要求使用 path-limited commit 保留其 index state。
 
 本 record 不认领、不检查、不修改、不 stage 上述 unrelated paths。当前 source/test changes 没有被本 record 转换成 completed implementation truth，也没有新的 full test 或 Harness receipt。没有 push 或 release。
+
+### Current Documentation/Pilot Checkpoint (2026-08-21)
+
+- Branch: `main`
+- HEAD: `128a6d6 docs: require pilot reality gate before rough-cut batch`
+- Local branch: ahead `21` relative to `origin/main`
+- Documentation commit files: `AGENTS.md`、本 record、5-minute plan、5-minute spec
+- Fresh staged Harness receipt: `.agent/harness/runs/pilot-gate-docs-20260821-v1/receipt.json`；51 harness tests passed，receipt `status=passed`、`closure_eligible=true`、`snapshot_matches=true`
+- 当前没有 staged paths；`.agent/context/session-handoff.md`、`CLAUDE.md`、production source/tests、`docs/specs/` 与 `index.json` 等 unrelated dirty/untracked paths 均保持原样，未被本 checkpoint stage 或 commit。
+- `128a6d6` 尚未 push；本次 Pilot rerender 只写 sibling Pilot run 的 runtime/media evidence，没有修改 main repository source。
 
 ## Assessment
 
@@ -216,6 +261,7 @@ Current run 的 P6 policy 虽声明 required layers 为 `technical / layout / se
 4. Representative sequence 与 4～6 Shot batch stop gates 没有执行。
 5. 当前 rerender candidate 缺与 exact bytes 匹配的 fresh analysis/contact sheet/full-watch evidence。
 6. User-visible quality failure出现后，candidate 没有被错误升级为 Final Acceptance；这一 fail-closed boundary必须保留。
+7. Pilot 的 H3 asset-to-composition stale pointer 已通过 revision `94` 的 local rerender 修正，但仍需人工观看才能判断 motion、continuity、pacing、voice 与 captions 是否基本可看。
 
 ## Remaining Risks Or Next Work
 
@@ -237,6 +283,7 @@ Current run 的 P6 policy 虽声明 required layers 为 `technical / layout / se
 - `technical continuity` 不等于 `character identity continuity` 或 `editorial continuity`。
 - `300-second playable MP4` 不等于 `watchable rough cut`。
 - `caption layout PASS` 不等于 visual/story PASS。
+- `asset activation` 不等于 `current composition/render delivery`；每次 active visual revision 都必须重新核对 Manifest revision、visual asset list 与 output hash。
 - Analysis/contact sheet 必须绑定 current exact render SHA；stale evidence不得沿文件名复用。
 - `outcome_unknown` 必须 explicit reconcile，不能 blind retry、猜测 external result或手工 activation。
 - Harness receipt 只证明对应 code snapshot；不得用它替代 human/media acceptance。
