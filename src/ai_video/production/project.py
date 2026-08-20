@@ -707,7 +707,14 @@ def _render_source_binding_map(
     bindings: dict[Path, tuple[str, str, object]] = {}
 
     def add(path: Path, role: str, digest: str, binding: object) -> None:
-        if path in bindings:
+        previous = bindings.get(path)
+        if previous is not None:
+            if (
+                role == "caption_style"
+                and previous[0] == role
+                and previous[1] == digest
+            ):
+                return
             raise ValueError("render source bindings contain a duplicate path")
         bindings[path] = (role, digest, binding)
 

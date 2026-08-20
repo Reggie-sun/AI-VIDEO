@@ -111,11 +111,13 @@ from ai_video.production.state_commit import (
     prepare_dependency_graph_transition,
 )
 from ai_video.production.project import (
+    _render_source_binding_map,
     _render_source_payload_matches,
     _verify_dependency_project_evidence,
     load_production_project_candidate,
 )
 from ai_video.production._project_dependency_evidence import (
+    historical_origin_graph_pointer,
     verify_active_versioned_artifact_evidence,
 )
 from ai_video.production._image_project_reader import verify_active_image_evidence
@@ -1262,6 +1264,64 @@ def test_reader_loads_20_historical_custom_operation_without_rewrite(tmp_path):
     assert loaded.manifest.attempts[-1].operation == "historical_custom_operation"
     assert loaded.render_state is None
     assert _tree_snapshot(tmp_path) == before
+
+
+def test_historical_project_evidence_ignores_graph_only_transitions(tmp_path):
+    write_production_project(tmp_path)
+    make_manifest_23_project(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    manifest = loaded.manifest
+    graph = manifest.active_dependency_graph
+    assert graph is not None
+    graph_only = StateCommitAttempt(
+        attempt_id="graph-only-transition",
+        operation="bootstrap_dependency_graph",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=manifest.manifest_revision,
+        base_project=manifest.active_project,
+        base_registry=manifest.active_registry,
+        base_dependency_graph=graph,
+        candidate_dependency_graph=graph,
+        candidate_artifacts_hash="1" * 64,
+        started_at="2026-01-01T00:00:00+00:00",
+        finished_at="2026-01-01T00:00:01+00:00",
+    )
+    candidate_hash = "2" * 64
+    candidate_project = ProjectSnapshotPointer(
+        path=canonical_project_snapshot_path(2, candidate_hash),
+        revision=2,
+        content_hash=candidate_hash,
+        file_sha256="3" * 64,
+    )
+    project_transition = StateCommitAttempt(
+        attempt_id="project-transition",
+        operation="commit_project_registry",
+        status=StateCommitStatus.SUCCEEDED,
+        base_manifest_revision=manifest.manifest_revision + 1,
+        base_project=manifest.active_project,
+        base_registry=manifest.active_registry,
+        candidate_project=candidate_project,
+        base_dependency_graph=graph,
+        candidate_dependency_graph=graph,
+        candidate_artifacts_hash="4" * 64,
+        started_at="2026-01-01T00:00:02+00:00",
+        finished_at="2026-01-01T00:00:03+00:00",
+    )
+    candidate_manifest = manifest.model_copy(
+        update={
+            "active_project": candidate_project,
+            "attempts": manifest.attempts + (graph_only, project_transition),
+        }
+    )
+    bundle = loaded.model_copy(update={"manifest": candidate_manifest})
+    evidence = ProjectDependencyEvidence(
+        owner="project_snapshot",
+        pointer=manifest.active_project,
+        artifact_id=loaded.shots[0].artifact_id,
+        artifact_fingerprint="5" * 64,
+    )
+
+    assert historical_origin_graph_pointer(bundle, evidence) == graph
 
 
 def test_reader_loads_21_with_none_render_state_without_rewrite(tmp_path):
@@ -2683,6 +2743,40 @@ def test_reader_verifies_p4_audio_caption_and_style_binding_set_without_rewrite(
     assert len(source["audio_bindings"]) == 1
     assert len(source["caption_bindings"]) == 1
     assert _tree_snapshot(tmp_path) == before
+
+
+def test_render_source_binding_map_deduplicates_shared_caption_style_only(tmp_path):
+    _, durable, _ = _activate_fake_render(tmp_path, p4=True)
+    source = RendererSourceReceipt.model_validate_json(
+        (tmp_path / durable.state.source_receipt.path).read_bytes()
+    )
+    caption = source.caption_bindings[0]
+    second_caption = caption.model_copy(
+        update={
+            "caption_track_id": "caption-track-shared-style",
+            "caption_asset_sha256": "f" * 64,
+            "materialized_path": caption.materialized_path.with_name(f"{'f' * 64}.json"),
+            "resolved_cue_ids": ("segment-shared-style",),
+        }
+    )
+    shared = source.model_copy(
+        update={"caption_bindings": (caption, second_caption)}
+    )
+
+    binding_map = _render_source_binding_map(shared)
+
+    assert caption.style_materialized_path is not None
+    assert binding_map[caption.style_materialized_path][:2] == (
+        "caption_style",
+        caption.style_content_hash,
+    )
+    assert second_caption.materialized_path in binding_map
+
+    conflicting = source.model_copy(
+        update={"caption_bindings": (caption, caption)}
+    )
+    with pytest.raises(ValueError, match="duplicate path"):
+        _render_source_binding_map(conflicting)
 
 
 @pytest.mark.parametrize("mutation", ["text", "timing"])

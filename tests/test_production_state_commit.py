@@ -919,6 +919,48 @@ def test_manifest_24_preserves_p5_transition_support(tmp_path: Path) -> None:
     assert committed.active_qa_policy == current.active_qa_policy
 
 
+def test_manifest_schema_upgrade_is_monotonic_exact_and_replayable(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    manifest = read_manifest(tmp_path)
+    before = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="qa-policy-before-schema-upgrade",
+    )
+
+    upgraded = writer.upgrade_manifest_schema(
+        "2.8",
+        expected_manifest_revision=before.manifest_revision,
+    )
+
+    assert upgraded.schema_version == "2.8"
+    assert upgraded.manifest_revision == before.manifest_revision + 1
+    assert upgraded.model_copy(
+        update={
+            "schema_version": before.schema_version,
+            "manifest_revision": before.manifest_revision,
+        }
+    ) == before
+    assert load_production_project(tmp_path / "project.yaml").manifest == upgraded
+    assert writer.upgrade_manifest_schema(
+        "2.8",
+        expected_manifest_revision=before.manifest_revision,
+    ) == upgraded
+
+    with pytest.raises(AiVideoError) as exc_info:
+        writer.upgrade_manifest_schema(
+            "2.7",
+            expected_manifest_revision=upgraded.manifest_revision,
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert read_manifest(tmp_path) == upgraded
+
+
 def test_recovery_reports_active_and_historical_p6_policy(tmp_path: Path) -> None:
     project_factory.write_production_project(tmp_path)
     project_factory.make_manifest_23_project(tmp_path)

@@ -32,6 +32,7 @@ from ai_video.production.hyperframes import (
     _controlled_env,
     _css_visibility_keyframes,
     _parse_source_document,
+    _render_source,
     _render_with_hyperframes,
     _renderer_tool_root,
     _sealed_json_bytes,
@@ -316,8 +317,70 @@ def test_p4_source_materializes_exact_audio_caption_and_style_bindings(tmp_path)
     assert "<audio" in source
     assert source.count("<audio") == 1 and 'data-volume="1"' in source
     assert "data-caption-track-id" in source
+    assert 'font-family:"Fixture Sans"' in source
+    assert "top:auto" in source
+    assert "width:90%" in source
+    assert "background:transparent" in source
+    assert "#00ffff" not in source.lower()
     assert "http://" not in source and "https://" not in source
     assert "Remotion" not in source and "Captions.ai" not in source
+
+
+def test_p4_audit_keeps_legacy_caption_source_readable(tmp_path):
+    _, _, timeline, sources = _p4_resolved_inputs(tmp_path)
+    result = materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "staging-p4-legacy-audit",
+        allowed_staging_parent=tmp_path,
+    )
+    result.index_path.write_text(
+        _render_source(
+            timeline,
+            result.audio_bindings[0],
+            legacy_caption_style=True,
+        ),
+        encoding="utf-8",
+    )
+
+    audit_hyperframes_source(
+        result.index_path,
+        expected_assets=result.asset_bindings,
+        expected_timeline=timeline,
+        expected_audio=result.audio_bindings,
+        expected_captions=result.caption_bindings,
+    )
+
+
+def test_p4_audit_keeps_pre_top_fix_styled_caption_source_readable(tmp_path):
+    _, spec, timeline, sources = _p4_resolved_inputs(tmp_path)
+    result = materialize_hyperframes_source(
+        timeline,
+        asset_sources=sources,
+        allowed_asset_root=tmp_path,
+        staging_root=tmp_path / "staging-p4-pre-top-fix-audit",
+        allowed_staging_parent=tmp_path,
+    )
+    style = spec.caption_tracks[0].style_reference
+    assert style is not None
+    result.index_path.write_text(
+        _render_source(
+            timeline,
+            result.audio_bindings[0],
+            {style.content_hash: json.loads(sources[style.artifact_id].read_bytes())},
+            caption_top_auto=False,
+        ),
+        encoding="utf-8",
+    )
+
+    audit_hyperframes_source(
+        result.index_path,
+        expected_assets=result.asset_bindings,
+        expected_timeline=timeline,
+        expected_audio=result.audio_bindings,
+        expected_captions=result.caption_bindings,
+    )
 
 
 def test_p4_canonical_caption_text_may_contain_urls_and_code_like_terms(tmp_path):

@@ -57,6 +57,8 @@ def historical_origin_graph_pointer(
         for attempt in bundle.manifest.attempts
         if attempt.status is StateCommitStatus.SUCCEEDED
         and attempt.base_project == evidence.pointer
+        and attempt.candidate_project is not None
+        and attempt.candidate_project.revision > evidence.pointer.revision
         and attempt.base_dependency_graph is not None
         and attempt.candidate_dependency_graph is not None
     )

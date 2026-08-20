@@ -639,10 +639,74 @@ def _stable_dom_id(prefix: str, identity: str) -> str:
     return f"{prefix}-{hashlib.sha256(identity.encode('utf-8')).hexdigest()}"
 
 
+def _caption_style_css(style_hash: str, style: Mapping[str, object]) -> str:
+    if style.get("schema_version") != "1":
+        raise _source_invalid("Caption style schema version is unsupported.")
+
+    def integer(name: str, default: int, minimum: int, maximum: int) -> int:
+        value = style.get(name, default)
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise _source_invalid(f"Caption style {name} must be an integer.")
+        if not minimum <= value <= maximum:
+            raise _source_invalid(f"Caption style {name} is out of range.")
+        return value
+
+    def color(name: str, default: str) -> str:
+        value = style.get(name, default)
+        if not isinstance(value, str) or re.fullmatch(r"#[0-9A-Fa-f]{6}", value) is None:
+            raise _source_invalid(f"Caption style {name} must be a six-digit hex color.")
+        return value.upper()
+
+    font_family = style.get("font_family", "sans-serif")
+    if (
+        not isinstance(font_family, str)
+        or not 1 <= len(font_family) <= 100
+        or any(ord(character) < 32 for character in font_family)
+    ):
+        raise _source_invalid("Caption style font_family is invalid.")
+    font_size = integer("font_size_px", 24, 8, 200)
+    bottom = integer("bottom_margin_px", 52, 0, 500)
+    max_width = integer("max_width_milli", 900, 100, 1000)
+    outline_width = integer("outline_width_px", 2, 0, 20)
+    text_color = color("text_color", "#FFFFFF")
+    outline_color = color("outline_color", "#101820")
+    width_percent = format(Decimal(max_width) / Decimal(10), "f").rstrip("0").rstrip(".")
+    quoted_family = json.dumps(font_family, ensure_ascii=True)
+    shadow = "none"
+    if outline_width:
+        shadow = ",".join(
+            (
+                f"-{outline_width}px 0 {outline_color}",
+                f"{outline_width}px 0 {outline_color}",
+                f"0 -{outline_width}px {outline_color}",
+                f"0 {outline_width}px {outline_color}",
+            )
+        )
+    return (
+        f"    .caption-style-{style_hash}{{left:50%;right:auto;"
+        f"bottom:{bottom}px;width:{width_percent};transform:translateX(-50%);"
+        f"padding:0;background:transparent;color:{text_color};text-align:center;"
+        f"font-family:{quoted_family};font-size:{font_size}px;font-weight:700;"
+        f"line-height:1.25;white-space:pre-wrap;text-shadow:{shadow}}}"
+    )
+
+
 def _render_source(
     timeline: ResolvedTimeline,
     mixed_audio: RendererAudioBinding | None = None,
+    caption_styles: Mapping[str, Mapping[str, object]] | None = None,
+    *,
+    legacy_caption_style: bool = False,
+    caption_top_auto: bool = True,
 ) -> str:
+    caption_styles = caption_styles or {}
+    expected_style_hashes = {
+        cue.style_content_hash for cue in timeline.caption_cues if cue.style_content_hash
+    }
+    if not legacy_caption_style and set(caption_styles) != expected_style_hashes:
+        raise _source_invalid("Caption style values do not match the resolved timeline.")
+    if legacy_caption_style and caption_styles:
+        raise _source_invalid("Legacy caption source cannot consume style values.")
     fps = timeline.delivery_profile.fps
     duration = _seconds(timeline.total_frames, fps)
     clips: list[str] = []
@@ -711,9 +775,14 @@ def _render_source(
             )
         )
     for track_index, cue in enumerate(timeline.caption_cues, start=20_000):
+        if cue.style_content_hash is None:
+            raise _source_invalid("Resolved caption cue is missing its style identity.")
+        caption_class = "clip caption"
+        if not legacy_caption_style:
+            caption_class += f" caption-style-{cue.style_content_hash}"
         caption_elements.append(
             (
-                f'<div id="{_stable_dom_id("p4-caption", cue.caption_track_id + ":" + cue.segment_id)}" class="clip caption" data-layout-allow-caption-zone'
+                f'<div id="{_stable_dom_id("p4-caption", cue.caption_track_id + ":" + cue.segment_id)}" class="{caption_class}" data-layout-allow-caption-zone'
                 f' data-caption-track-id="{escape(cue.caption_track_id)}"'
                 f' data-caption-asset-id="{escape(cue.caption_asset_id)}"'
                 f' data-caption-asset-sha256="{cue.caption_asset_sha256}"'
@@ -741,10 +810,22 @@ def _render_source(
             visual_media_css(timeline.visual_spans),
             *(
                 (
-                    "    .caption{position:absolute;left:5%;right:5%;bottom:8%;padding:10px;background:#00ffff;color:#000;text-align:center;font:700 24px/1.25 sans-serif}",
+                    (
+                        "    .caption{position:absolute;left:5%;right:5%;bottom:8%;padding:10px;background:#00ffff;color:#000;text-align:center;font:700 24px/1.25 sans-serif}"
+                        if legacy_caption_style
+                        else (
+                            "    .caption{position:absolute;top:auto}"
+                            if caption_top_auto
+                            else "    .caption{position:absolute}"
+                        )
+                    ),
                 )
                 if timeline.caption_cues
                 else ()
+            ),
+            *(
+                _caption_style_css(style_hash, caption_styles[style_hash])
+                for style_hash in sorted(caption_styles)
             ),
             *(f"    {rule}" for rule in animations),
             *(f"    {rule}" for rule in keyframes),
@@ -856,6 +937,36 @@ def _validate_timeline(timeline: ResolvedTimeline) -> None:
         raise _source_invalid("Resolved timeline fingerprint is invalid.")
 
 
+def _load_materialized_caption_styles(
+    source_root: Path,
+    bindings: tuple[RendererCaptionBinding, ...],
+) -> dict[str, Mapping[str, object]]:
+    styles: dict[str, Mapping[str, object]] = {}
+    for binding in bindings:
+        if (
+            binding.style_content_hash is None
+            or binding.style_materialized_path is None
+        ):
+            raise _source_invalid("Renderer caption binding is missing its style source.")
+        snapshot = _read_regular_file_nofollow(
+            source_root / binding.style_materialized_path,
+            contained_by=source_root,
+        )
+        if snapshot.file_sha256 != binding.style_content_hash:
+            raise _source_invalid("Caption style source hash does not match its binding.")
+        try:
+            value = json.loads(snapshot.data)
+        except (UnicodeError, json.JSONDecodeError) as exc:
+            raise _source_invalid("Caption style JSON is invalid.", str(exc)) from exc
+        if not isinstance(value, dict):
+            raise _source_invalid("Caption style JSON must be an object.")
+        previous = styles.get(binding.style_content_hash)
+        if previous is not None and previous != value:
+            raise _source_invalid("Caption style identity has conflicting values.")
+        styles[binding.style_content_hash] = value
+    return styles
+
+
 def _audit_hyperframes_source(
     index_path: Path,
     *,
@@ -885,17 +996,43 @@ def _audit_hyperframes_source(
     snapshot = _read_regular_file_nofollow(index_path, contained_by=source_root)
     source = snapshot.data.decode("utf-8", errors="strict")
     parsed = _parse_source_document(source)
-    expected = _parse_source_document(
+    caption_styles = _load_materialized_caption_styles(
+        source_root, expected_captions
+    )
+    expected_current = _parse_source_document(
         _render_source(
             expected_timeline,
             expected_audio[0] if expected_audio else None,
+            caption_styles,
         )
     )
-    if (
-        parsed.document_model != expected.document_model
-        or parsed.css_model != expected.css_model
-        or parsed.stage_attributes != expected.stage_attributes
-        or parsed.clip_attributes != expected.clip_attributes
+    expected_legacy = _parse_source_document(
+        _render_source(
+            expected_timeline,
+            expected_audio[0] if expected_audio else None,
+            legacy_caption_style=True,
+        )
+    )
+    expected_pre_top_fix = _parse_source_document(
+        _render_source(
+            expected_timeline,
+            expected_audio[0] if expected_audio else None,
+            caption_styles,
+            caption_top_auto=False,
+        )
+    )
+
+    def structure_matches(expected: _ParsedSourceDocument) -> bool:
+        return (
+            parsed.document_model == expected.document_model
+            and parsed.css_model == expected.css_model
+            and parsed.stage_attributes == expected.stage_attributes
+            and parsed.clip_attributes == expected.clip_attributes
+        )
+
+    if not any(
+        structure_matches(expected)
+        for expected in (expected_current, expected_pre_top_fix, expected_legacy)
     ):
         raise _source_invalid("HyperFrames source structure does not match the timeline.")
     if parsed.stage_attributes.get("data-no-timeline", "missing") is not None:
@@ -1108,6 +1245,7 @@ def _materialize_hyperframes_source(
         )
 
     caption_bindings_list: list[RendererCaptionBinding] = []
+    caption_styles: dict[str, Mapping[str, object]] = {}
     for caption_id in sorted(caption_ids):
         cues = tuple(
             item for item in timeline.caption_cues if item.caption_asset_id == caption_id
@@ -1169,6 +1307,10 @@ def _materialize_hyperframes_source(
             raise _source_invalid("Caption style JSON is invalid.", str(exc)) from exc
         if not isinstance(style_value, dict):
             raise _source_invalid("Caption style JSON must be an object.")
+        previous_style = caption_styles.get(style_hash)
+        if previous_style is not None and previous_style != style_value:
+            raise _source_invalid("Caption style identity has conflicting values.")
+        caption_styles[style_hash] = style_value
         style_relative = Path("assets") / f"{style_hash}.json"
         targets_by_id[style_id] = _validate_contained_target(
             root, style_relative, before_creation=True
@@ -1186,7 +1328,9 @@ def _materialize_hyperframes_source(
         )
     caption_bindings = tuple(caption_bindings_list)
     source_text = _render_source(
-        timeline, audio_bindings[0] if audio_bindings else None
+        timeline,
+        audio_bindings[0] if audio_bindings else None,
+        caption_styles,
     )
     parsed_source = _parse_source_document(source_text)
     for url in parsed_source.all_urls:

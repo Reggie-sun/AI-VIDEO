@@ -29,7 +29,91 @@ from ._state_commit_common import (
 from ._state_commit_contracts import PreparedArtifact
 
 
+_MANIFEST_SCHEMA_ORDER = (
+    "2.0",
+    "2.1",
+    "2.2",
+    "2.3",
+    "2.4",
+    "2.5",
+    "2.6",
+    "2.7",
+    "2.8",
+)
+
+
 class _StateCommitBootstrapMixin:
+    def upgrade_manifest_schema(
+        self,
+        target_schema_version: str,
+        *,
+        expected_manifest_revision: int,
+    ) -> ProductionManifest:
+        """Advance only the selected Manifest schema through the canonical writer."""
+
+        if target_schema_version not in _MANIFEST_SCHEMA_ORDER:
+            raise _state_invalid("Target Production Manifest schema is unsupported.")
+        manifest_replaced = [False]
+        try:
+            with self._exclusive_lock():
+                current = self._read_manifest()
+                if current.schema_version == target_schema_version:
+                    if expected_manifest_revision not in {
+                        current.manifest_revision,
+                        current.manifest_revision - 1,
+                    }:
+                        raise _state_invalid(
+                            "Production Manifest schema replay revision changed."
+                        )
+                    reopened = load_production_project(
+                        self._project_root / "project.yaml"
+                    )
+                    if reopened.manifest != current:
+                        raise _state_invalid(
+                            "Production Manifest schema replay did not reopen safely."
+                        )
+                    return current
+                if current.manifest_revision != expected_manifest_revision:
+                    raise _state_invalid(
+                        "Production Manifest schema upgrade base revision changed."
+                    )
+                if _MANIFEST_SCHEMA_ORDER.index(target_schema_version) < (
+                    _MANIFEST_SCHEMA_ORDER.index(current.schema_version)
+                ):
+                    raise _state_invalid(
+                        "Production Manifest schema cannot be downgraded."
+                    )
+                updated = ProductionManifest.model_validate(
+                    current.model_copy(
+                        update={
+                            "schema_version": target_schema_version,
+                            "manifest_revision": current.manifest_revision + 1,
+                        }
+                    ).model_dump(mode="python")
+                )
+                self._write_manifest_atomic(
+                    updated,
+                    on_replace=lambda: manifest_replaced.__setitem__(0, True),
+                )
+                reopened = load_production_project(
+                    self._project_root / "project.yaml"
+                )
+                if reopened.manifest != updated:
+                    raise _state_invalid(
+                        "Upgraded Production Manifest did not reopen exactly."
+                    )
+                return updated
+        except Exception as exc:
+            if manifest_replaced[0]:
+                raise _outcome_unknown(exc) from exc
+            raise
+        except BaseException as exc:
+            if manifest_replaced[0]:
+                exc.add_note(
+                    "Production Manifest schema upgrade outcome may be committed or unknown."
+                )
+            raise
+
     def bootstrap_initial_state(
         self,
         *,
