@@ -1,345 +1,224 @@
-# Shot Quality Gate + Video Quality Gate — Requirements (v2)
+# Shot Readiness Gate — Requirements v3
 
-Status: revised after Codex review; scope reduced
-Owner: AI-VIDEO Production Harness extension
-Target module path: `src/ai_video/quality_gates/` (new top-level package)
+Status: proposed v3; runtime implementation pending
 
-## 1. Context (revised)
+Owner: Main Agent planning-side pre-submit readiness
 
-After the v1 spec received SCORE 2/10 from Codex (13 ambiguities, 6 ownership concerns, 10 risks), the v2 spec reduces scope to only what current types allow without schema additions.
+Target module: `src/ai_video/quality_gates/`
 
-Verified facts (read directly from source):
+## Context
 
-- `FetchedVideoCandidate` ([src/ai_video/production/video_generation.py:36-39](../../src/ai_video/production/video_generation.py)) is `relative_path: Path` + `receipt: VideoFetchReceipt | LocalVideoFetchReceipt`. No duration/fps/dimensions/mime/terminal_frame_asset_id fields.
-- `VideoFetchReceipt` ([src/ai_video/production/video.py:1035-1056](../../src/ai_video/production/video.py)) carries `submission_fingerprint`, `observation_fingerprint`, `paid_submit_receipt_fingerprint`, `provider_file_id`, `content_type` (Literal "video/mp4" / "video/quicktime"), `size_bytes`, `artifact_sha256`, `fetched_at`, `fetch_fingerprint`. No duration/fps/dimensions/terminal.
-- `PreviousShotState` ([src/ai_video/planning/_planner_models.py:129](../../src/ai_video/planning/_planner_models.py)) has only `previous_shot_id`, `previous_shot_content_hash`, `is_same_scene`, `is_same_story_beat`, `is_same_action`, `is_angle_change`, `has_terminal_frame_asset_id`, `semantic_jump`. No wardrobe/props strings.
-- `AvailableAsset` ([src/ai_video/planning/_planner_models.py:118](../../src/ai_video/planning/_planner_models.py)) has `canonical_owner_id: str | None` — usable for identity verification.
-- `production.video_generation` transitively imports `production.video`, `production.local_video`, `production.paid_provider` — i.e. importing `video_generation` from gates would break the import boundary.
+The accepted Video Planner already produces a sealed `VideoGenerationPlan` and exposes `require_current_video_plan()`. Current source proves that the consumer validates current request/plan seals, plan id, source request hash, target Shot identity, plan outcome, unresolved human review, and required asset readiness before the existing Production handoff.
 
-Therefore the v2 gate surfaces only:
+v3 must not create a parallel algorithm. It specifies a typed `ShotReadinessGate` as the single evolution of that consumer: the gate returns complete discriminated diagnostics, while `require_current_video_plan()` becomes a compatibility wrapper that delegates to the gate and preserves existing STOP behavior.
 
-| Gate | Checks |
-|---|---|
-| Shot | `IDENTITY_ANCHOR`, `STRATEGY`, `COMPLEXITY` |
-| Video | `RECEIPT_INTEGRITY`, `CONTENT_TYPE_BINDING` |
+Current source also proves:
 
-All other checks are deferred to D1–D5 in [tasks.md](tasks.md#out-of-scope-tasks-deferred).
+- `VideoFetchReceipt` and `LocalVideoFetchReceipt` reject an invalid `fetch_fingerprint` during model validation/reopen.
+- `VideoFetchReceipt.create()` rejects a fetched content type that differs from `VideoSubmission.expected_content_type`.
+- `FetchedVideoCandidate` contains only `relative_path` and a typed fetch receipt; it carries no submission object or subjective media evidence.
+- the actual activation API is `activate_video_candidate()`, after `prepare_video_activation_candidate()`.
 
-## 2. Who is affected
+Therefore v3 contains no post-fetch gate, committer parameter, Manifest field, receipt pointer, Provider import, or media-quality claim.
 
-| Role | Pain today | After this slice |
-|---|---|---|
-| Main Agent / Codex | Cannot cheaply stop a flawed Shot before paying a Provider | Calls `ShotQualityGate.evaluate(request)` and respects `BLOCKED`/`WARNING`/`NOT_EVALUATED` status |
-| Production Committer | Activates whatever the Provider returned without structural sanity | Optionally accepts `VideoQualityReceipt` via new optional parameter; hash stored as advisory pointer on `VideoGenerationAttemptState` |
-| P6 Review | Receives only post-render evidence | Receives gate receipt hashes via Manifest pointers (P6 may optionally correlate) |
-| Provider budget | Wasted on clearly-flawed Shots | Blocked at gate; budget reserved for viable Shots |
+## Goal
 
-## 3. What this slice must deliver
+Provide one pure, deterministic, provider-neutral readiness decision that:
 
-1. `ShotQualityGate.evaluate(request) -> ShotQualityReceipt` — pure, deterministic, no IO, no Production imports.
-3. `VideoQualityGate.evaluate(request) -> VideoQualityReceipt` — pure, deterministic, no IO, no Production imports.
-4. Typed `GateStatus` enum: `PASS` / `WARNING` / `BLOCKED` / `NOT_EVALUATED`.
-5. Typed check IDs (`ShotCheckId` / `VideoCheckId`) for each individual check.
-6. Receipts are `VersionedArtifact` with `content_hash` (reusing existing seal pattern).
-7. Three deterministic Shot checks and two deterministic Video checks.
-8. `NOT_EVALUATED` is a **first-class final status**, not a downgrade to `PASS`.
-9. Architecture Gate extension enforcing import blacklist on `src/ai_video/quality_gates/**`.
-10. Minimal committer seam: two optional fields on `VideoGenerationAttemptState` + two optional parameters on existing committer methods.
+1. consumes, but does not re-derive, accepted Video Planner truth;
+2. verifies that the request and plan are current and mutually bound;
+3. verifies only the asset roles already required by the plan;
+4. produces typed all-check diagnostics with true payload discrimination;
+5. enforces Main Agent STOP before all downstream side effects;
+6. preserves all existing Production, Review, Registry, Manifest, timeline, renderer, and Provider owners.
 
-## 4. Explicitly out of scope
+## Explicitly Out of Scope
 
-- Calling any Provider.
-- Selecting a Provider / Profile / Capability.
-- Reading `ARK_API_KEY`, `os.environ`, or `keyring`.
-- Writing Manifest, Asset Registry, Timeline, dependency graph, or any durable artifact.
-- Replacing `production.review.adjudicate_review_evidence` or `evaluate_final_acceptance`.
-- Replacing `ShotVisualResolver` / `VideoGenerationResolver` / `VideoPlanner` / `HyperFrames`.
-- Continuity checks (dropped; defer to D1).
-- Capability binding checks (dropped; defer to D2).
-- Multi-usage reference detection (dropped; defer to D3).
-- VLM/Human `IDENTITY_DRIFT` evaluation (dropped; defer to D4).
-- Scene reference warning (dropped; defer to D5).
-- Automatic retry, repair, or remediation.
+- strategy, motion, continuity, capability, or fallback re-derivation;
+- natural-language complexity/token/word-count heuristics;
+- identity drift, face/wardrobe similarity, action naturalness, scene consistency, frame diversity, blur, resolution preference, or subjective quality;
+- fetch receipt seal/content-type revalidation;
+- Provider/profile selection, ranking, fallback, call, poll, fetch, retry, or repair;
+- Manifest/Registry/dependency/timeline/render writes, activation, recovery, or new durable evidence;
+- new CLI, dependency, Provider, renderer, timeline, writer, automatic repair, or acceptance path;
+- changes to P6 Review / Repair or human Pilot Reality Gate.
 
-## 5. Functional requirements
+## Functional Requirements
 
-### FR-1 — Receipts are sealed VersionedArtifact
+### R-01 — Request and plan binding
 
-```python
-class ShotQualityReceipt(VersionedArtifact):
-    receipt_id: str = Field(min_length=1)
-    gate_name: Literal["shot_quality_gate"] = "shot_quality_gate"
-    gate_version: Literal["shot-quality-gate/1"] = "shot-quality-gate/1"
-    status: GateStatus
-    checks: tuple[ShotCheckOutcome, ...]
-    blocked_reasons: tuple[BlockedReason, ...] = ()
-    warnings: tuple[GateWarning, ...] = ()
+`ShotReadinessRequest` must require one `VideoPlanningRequest` and one `VideoGenerationPlan`. Evaluation must block unless all are true:
 
-class VideoQualityReceipt(VersionedArtifact):
-    receipt_id: str = Field(min_length=1)
-    gate_name: Literal["video_quality_gate"] = "video_quality_gate"
-    gate_version: Literal["video-quality-gate/1"] = "video-quality-gate/1"
-    status: GateStatus
-    checks: tuple[VideoCheckOutcome, ...]
-    blocked_reasons: tuple[BlockedReason, ...] = ()
-    warnings: tuple[GateWarning, ...] = ()
+- outer readiness request hash matches the exact R-05 semantic projection;
+- current request semantic seal is valid;
+- plan semantic seal and deterministic `plan_id` are valid;
+- `plan.source_request_content_hash == current_request.request_content_hash`;
+- target Shot id, revision, and content hash match exactly;
+- both contracts use the accepted `video-planner/2` version.
+
+The gate reads these fields; it does not reconstruct planner intent, continuity, motion, strategy, reasons, or capabilities.
+
+### R-02 — Plan eligibility
+
+The gate must block when:
+
+- `plan.outcome == PlanOutcome.BLOCKED`; or
+- `PlanWarning.REQUIRES_HUMAN_REVIEW` remains in `plan.warnings`.
+
+Other typed planner warnings remain visible but do not independently block unless the Video Planner contract says they are unresolved. `READY` does not upgrade any warning to creative or quality acceptance.
+
+### R-03 — Required asset readiness
+
+For each `plan.required_asset_roles` item, the gate must evaluate availability against the exact current `VideoPlanningRequest` projection and existing role semantics:
+
+- Character reference owner must be one of the target Shot's current Character ids.
+- Scene reference owner must match the target Shot's current Scene id.
+- Previous terminal must match both the current previous-Shot id and terminal asset id.
+- Approved keyframe/reusable plate must keep the existing exact target-Shot final-visual binding and current Review projection requirements.
+
+The gate must not infer additional required roles, inspect Asset Registry files, or treat its projection as a second Registry. Missing/wrong-owner/wrong-binding assets block.
+
+### R-04 — Truly discriminated outcomes
+
+The result must contain exactly one outcome for each check id, in canonical order:
+
+1. `request_plan_binding`;
+2. `plan_eligibility`;
+3. `required_asset_readiness`.
+
+Each outcome is a distinct model with `check_id: Literal[...]` and its own payload type. The union must use `Field(discriminator="check_id")`. A request-plan outcome cannot carry an asset payload, and model validation must reject every wrong `check_id`/payload combination.
+
+Every model is frozen and `extra="forbid"`.
+
+### R-05 — Deterministic semantic hashing
+
+`request_id` is diagnostic correlation only. It must not change `ShotReadinessRequest.request_content_hash` or `ShotReadinessResult.result_hash`.
+
+The readiness request semantic projection is exactly:
+
+```text
+contract_version
+current_request.request_content_hash
+plan.plan_hash
 ```
 
-Both use `extra="forbid"` on the receipt itself and on every nested check outcome. Content-hash sealing follows existing `production.hashing.seal_artifact` pattern.
+Evaluation must recompute and validate the outer readiness request seal even when the caller supplies an already-constructed model; field shape validation alone is insufficient. The result carries `source_readiness_request_hash == ShotReadinessRequest.request_content_hash`. Its own hash excludes only `result_hash`; the result does not copy diagnostic `request_id`. Rebuilding with a different readiness `request_id` or nested `VideoPlanningRequest.request_id`, while semantic hashes remain identical, must produce the same readiness hashes and result payload.
 
-### FR-2 — Typed per-check payloads (no `Mapping[str, object]`)
+### R-06 — Binary status and STOP semantics
 
-Each check outcome carries a **typed frozen** payload — not a loose mapping. This addresses Codex risk: payload fields can't smuggle in `provider_*` / `manifest_*` / `accepted` keys.
+Statuses are only `READY | BLOCKED`; check severities are only `PASS | BLOCKED`.
 
-```python
-class IdentityAnchorPayload(StrictModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-    character_ids: tuple[str, ...]
-    character_reference_asset_ids: tuple[str, ...]
-    matched_owner_ids: tuple[str, ...]
+- any blocked check → result `BLOCKED`;
+- all three checks pass → result `READY`.
 
-class StrategyPayload(StrictModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-    plan_outcome: str | None       # PROPOSED | BLOCKED | None
-    generation_mode: str | None    # generation mode value or None
-    has_important_character: bool
+There is no `WARNING` or `NOT_EVALUATED` gate status. Missing plan/input is malformed request or `BLOCKED`, never silent pass. A Main Agent handoff must call `require_ready()` (directly or through the compatibility wrapper) before Router, Provider, placeholder/materializer, composition, or render. On `BLOCKED`, all downstream call counts remain zero.
 
-class ComplexityPayload(StrictModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-    intent_word_count: int = Field(ge=0)
-    directive_count: int = Field(ge=0)
-    intent_limit: int = Field(ge=1)
-    directive_limit: int = Field(ge=1)
+### R-07 — Single owner and compatibility migration
 
-class ReceiptIntegrityPayload(StrictModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-    receipt_kind: Literal["video", "local_video"]
-    fetch_fingerprint_matches: bool
-    submission_observation_linked: bool
-    artifact_sha256_well_formed: bool
+The future implementation must retire the decision body currently in `require_current_video_plan()`:
 
-class ContentTypeBindingPayload(StrictModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-    receipt_content_type: Literal["video/mp4", "video/quicktime"]
-    expected_content_type: str | None
-    matches: bool | None    # None when no expected type was declared
+- `ShotReadinessGate.evaluate()` becomes the only readiness decision owner.
+- `require_current_video_plan()` constructs/evaluates the readiness request or accepts the result, delegates to `require_ready()`, and preserves `AiVideoError(ErrorCode.PLANNING_PREFLIGHT_BLOCKED, retryable=False)`.
+- `prepare_shot_for_existing_production()` keeps its public behavior and zero-call boundary.
+- shared asset-role logic must have one implementation; copying it into both planning and quality-gate modules is forbidden.
+
+### R-08 — Pure and provider-neutral boundary
+
+The gate must perform no filesystem, network, clock, random, environment, subprocess, secret, Provider, Registry, Manifest, committer, dependency, timeline, renderer, Review, or media access.
+
+Allowed imports are limited to:
+
+- `ai_video.planning._planner_models` typed planning contracts;
+- `ai_video.planning._asset_readiness` as the single planning-owned pure role-readiness seam;
+- `ai_video.production.models` and `ai_video.production.hashing` read-only schema/hash helpers;
+- `ai_video.errors` for compatibility STOP conversion;
+- standard library and pydantic.
+
+Production modules must not import `ai_video.quality_gates`.
+
+### R-09 — No persistence or lifecycle seam
+
+`ShotReadinessResult` is ephemeral decision data. v3 adds no `VersionedArtifact`, receipt id, receipt file, Manifest pointer, `VideoGenerationAttemptState` field, committer parameter, schema version, activation rule, or recovery behavior.
+
+If persistence is ever required, it is D2 and must be a separately authorized migration slice.
+
+### R-10 — Post-fetch owner audit
+
+v3 defines no `VideoQualityGate`.
+
+- fetch receipt seal belongs to typed receipt constructors/validators and durable reopen;
+- observation/submission/file-byte linkage belongs to fetch owner and committer;
+- expected content type belongs to `VideoSubmission` + `VideoFetchReceipt.create()`;
+- technical/perceptual/semantic quality belongs to candidate validation and P6 Review/Pilot.
+
+A future post-fetch gate is allowed only after a concrete non-duplicated structural gap and a provider-neutral fully projected input schema are accepted.
+
+### R-11 — Harness routing contract
+
+The later runtime implementation must update `.agent/harness/policy.yaml` and Harness tests in the same change. The planned check is:
+
+```yaml
+shot_readiness_gate_tests:
+  argv: [python, -m, pytest, -p, no:cacheprovider,
+         tests/test_shot_readiness_gate.py,
+         tests/test_planning_video_planner.py,
+         tests/test_errors.py, -q]
 ```
 
-```python
-class ShotCheckOutcome(StrictModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-    check_id: ShotCheckId
-    severity: CheckSeverity
-    reason_codes: tuple[BlockedReason | GateWarning, ...] = ()
-    payload: IdentityAnchorPayload | StrategyPayload | ComplexityPayload
-    message: str = Field(min_length=1, max_length=400)
+The planned category maps:
 
-class VideoCheckOutcome(StrictModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
-    check_id: VideoCheckId
-    severity: CheckSeverity
-    reason_codes: tuple[BlockedReason | GateWarning, ...] = ()
-    payload: ReceiptIntegrityPayload | ContentTypeBindingPayload
-    message: str = Field(min_length=1, max_length=400)
-```
+- `src/ai_video/quality_gates/**`;
+- `tests/fixtures/shot_readiness_factory.py`;
+- `tests/test_shot_readiness_gate.py`.
 
-### FR-3 — Status aggregation rule (NOT_EVALUATED is first-class)
+It routes to `shot_readiness_gate_tests` and `task_architecture_gate`. Changes to `planning/video_planner.py` and its tests continue to route through `video_planner_tests` and must also run the readiness check when they touch the compatibility seam. This docs-only v3 revision does not edit policy.
 
-Final `status` from per-check severities, in priority order:
+To make that executable, the later policy change must also add `shot_readiness_gate_tests` to the existing `video_planning.check_ids`; defining only the new quality-gate category is insufficient. Harness routing tests must pin both categories.
 
-1. If any check severity == `BLOCKED` → `BLOCKED`.
-2. Else if any check severity == `NOT_EVALUATED` → `NOT_EVALUATED`.
-3. Else if any check severity == `WARNING` → `WARNING`.
-4. Else → `PASS`.
+### R-12 — Quality terminology boundary
 
-`PASS` is reached only when every check is `PASS`. This fixes the v1 contradiction where Case 2 (env Shot, no plan) expected `PASS` but produced `NOT_EVALUATED`.
+Names, messages, examples, and completion claims must use “readiness”, “structural/current-plan preflight”, or “eligibility”. They must not claim that this gate detects identity drift, continuity quality, motion naturalness, visual defects, or final picture quality.
 
-### FR-4 — Three Shot checks
+## Acceptance Criteria
 
-| Check ID | Deterministic input | Severity | Failure case |
-|---|---|---|---|
-| `IDENTITY_ANCHOR` | `target_shot.character_ids`, `available_assets` filtered by `AssetRole.CHARACTER_REFERENCE` | `BLOCKED` | At least one character in `character_ids` has no character-reference asset whose `canonical_owner_id` matches that character id |
-| `STRATEGY` | `target_shot`, `video_generation_plan` | `BLOCKED` (plan is BLOCKED or T2V with important character) / `WARNING` (R2V without character / plan missing required mode) / `NOT_EVALUATED` (plan is None) | See [design.md §5](design.md#5-shot-quality-gate-algorithm) |
-| `COMPLEXITY` | `target_shot.intent` (token count), `target_shot.motion_directives` length | `WARNING` if `intent_word_count > INTENT_WORD_LIMIT (24)` or `directive_count > DIRECTIVE_LIMIT (4)`, else `PASS` | Heuristic only |
+1. AC-01 — valid current request + valid `PROPOSED` plan + all required assets current → `READY`.
+2. AC-02 — invalid outer readiness request seal, invalid nested planning request seal, invalid plan seal, or invalid deterministic plan id → `BLOCKED` with binding reason.
+3. AC-03 — stale source request hash or stale target Shot id/revision/content hash → `BLOCKED`.
+4. AC-04 — `PlanOutcome.BLOCKED` → `BLOCKED`; gate does not reinterpret planner reasons.
+5. AC-05 — unresolved `REQUIRES_HUMAN_REVIEW` → `BLOCKED`; resolved audit warnings alone do not create a second policy.
+6. AC-06 — missing required asset, wrong owner, wrong Shot final-role binding, or wrong terminal owner → `BLOCKED`.
+7. AC-07 — every wrong `check_id`/payload combination fails model validation.
+8. AC-08 — different diagnostic ids with identical semantic hashes produce byte-identical result payload/hash.
+9. AC-09 — blocked compatibility path raises `PLANNING_PREFLIGHT_BLOCKED` and all downstream spies remain zero.
+10. AC-10 — ready compatibility path invokes the existing handoff exactly once and does not claim activation/Review/Final Acceptance.
+11. AC-11 — Architecture tests reject forbidden imports and any Production reverse import.
+12. AC-12 — exact staged/commit-range Harness receipt is fresh, passed, integrity-valid, policy-valid, and snapshot-valid.
 
-### FR-5 — Two Video checks
+## Traceability Matrix
 
-| Check ID | Deterministic input | Severity | Failure case |
-|---|---|---|---|
-| `RECEIPT_INTEGRITY` | `FetchedVideoCandidate.receipt` | `BLOCKED` if `fetch_fingerprint` does NOT match `canonical_sha256(model_dump(exclude={"fetch_fingerprint"}))`, OR `submission_fingerprint` ≠ `observation_fingerprint`, OR `artifact_sha256` is malformed; else `PASS` | Hash tampering or pointer mismatch |
-| `CONTENT_TYPE_BINDING` | `receipt.content_type`, `receipt.submission.expected_content_type` (when available) | `BLOCKED` if expected type was declared and differs from receipt's type; `PASS` if expected type matches or no expected type declared | Provider content type does not match declared intent |
+| Requirement | Design | Tasks | Tests | Integration |
+| --- | --- | --- | --- | --- |
+| R-01 binding | D-02, D-04.1 | T1, T2 | TC-01–TC-05 | INT-01, INT-02 |
+| R-02 eligibility | D-04.2 | T3 | TC-06, TC-07 | INT-01, INT-02 |
+| R-03 assets | D-04.3 | T4 | TC-08–TC-10 | INT-03 |
+| R-04 discrimination | D-03 | T1, T5 | TC-11–TC-13 | INT-01–INT-03 |
+| R-05 hashing | D-02, D-03 | T1, T5 | TC-14 | INT-01 |
+| R-06 STOP | D-05 | T5, T6 | TC-15–TC-17 | INT-02, INT-04 |
+| R-07 single owner | D-05 | T6 | TC-15–TC-17 | INT-04 |
+| R-08 pure boundary | D-06 | T7 | TC-18 | INT-04 |
+| R-09 no persistence | D-08 | T7 | TC-20 | INT-04 |
+| R-10 post-fetch audit | D-09 | T7 | TC-20 | INT-04 |
+| R-11 Harness | D-07 | T7, T8 | TC-19 | INT-04 |
+| R-12 terminology | D-01, D-10 | T8 | TC-20 | INT-01–INT-04 |
 
-Both checks operate **only** on existing receipt fields. No duration/fps/dimension assertions.
+## Risks and Rollback
 
-### FR-6 — Pure determinism
+| Risk | Control |
+| --- | --- |
+| second readiness algorithm | compatibility wrapper delegates; duplicated old body is removed |
+| gate re-derives planner truth | only plan outcome/warnings/required roles are consumed |
+| caller treats `READY` as quality acceptance | binary eligibility wording and forbidden lifecycle/acceptance fields |
+| diagnostic id changes semantics | explicit three-field semantic projection |
+| future post-fetch scope repeats owners | D1 requires a demonstrated gap and fully projected schema |
 
-- Receipts use `VersionedArtifact.content_hash` (existing seal).
-- Same `request_content_hash` → same `receipt.content_hash`.
-- Two calls with identical inputs (including `receipt_id`) → byte-identical receipts.
-- No filesystem, network, secret, clock, or random state enters the function.
-- No transitive import of `os.environ`, `keyring`, `subprocess`, `httpx`, `requests`.
-
-### FR-7 — Reason codes are typed enums
-
-```python
-class GateStatus(str, Enum):
-    PASS = "pass"
-    WARNING = "warning"
-    BLOCKED = "blocked"
-    NOT_EVALUATED = "not_evaluated"
-
-class CheckSeverity(str, Enum):
-    PASS = "pass"
-    WARNING = "warning"
-    BLOCKED = "blocked"
-    NOT_EVALUATED = "not_evaluated"
-
-class ShotCheckId(str, Enum):
-    IDENTITY_ANCHOR = "identity_anchor"
-    STRATEGY = "strategy"
-    COMPLEXITY = "complexity"
-
-class VideoCheckId(str, Enum):
-    RECEIPT_INTEGRITY = "receipt_integrity"
-    CONTENT_TYPE_BINDING = "content_type_binding"
-
-class BlockedReason(str, Enum):
-    MISSING_IDENTITY_ANCHOR = "missing_identity_anchor"
-    STRATEGY_CONTRADICTS_SHOT = "strategy_contradicts_shot"
-    RECEIPT_HASH_MISMATCH = "receipt_hash_mismatch"
-    RECEIPT_POINTER_MISMATCH = "receipt_pointer_mismatch"
-    RECEIPT_HASH_MALFORMED = "receipt_hash_malformed"
-    CONTENT_TYPE_MISMATCH = "content_type_mismatch"
-
-class GateWarning(str, Enum):
-    COMPLEXITY_HIGH = "complexity_high"
-    STRATEGY_RISKY = "strategy_risky"
-    STRATEGY_PLAN_MISSING = "strategy_plan_missing"
-```
-
-### FR-8 — Caller-supplied receipt_id is deterministic
-
-`receipt_id` is caller-supplied (or auto-derived as `f"{gate_name}-{request_content_hash[:16]}"`). It is part of the canonical payload and goes into `content_hash`. Replays with the same `receipt_id` produce identical receipts.
-
-### FR-9 — Reuse AI-VIDEO types; only add minimum schema
-
-Inputs reuse existing types:
-
-- `Shot`, `Character`, `Scene`, `AvailableAsset`, `PreviousShotState`, `VideoGenerationPlan` (from `planning._planner_models`).
-- `FetchedVideoCandidate`, `VideoFetchReceipt`, `LocalVideoFetchReceipt`, `VideoSubmission` (from `production.video_generation` and `production.video`).
-
-New types (in `_gate_models.py`):
-
-- Enums in FR-7.
-- Typed payloads in FR-2.
-- `ShotCheckOutcome`, `VideoCheckOutcome`.
-- `ShotQualityReceipt`, `VideoQualityReceipt` (VersionedArtifact subclasses).
-
-New fields on existing Production types (additive, all optional, all `None` default — no breakage of existing call sites):
-
-| File | Field |
-|---|---|
-| `production/_lifecycle_schema.py` `VideoGenerationAttemptState` | `pre_submit_gate_receipt_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")` |
-| `production/_lifecycle_schema.py` `VideoGenerationAttemptState` | `post_fetch_gate_receipt_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")` |
-
-New optional parameters on existing committer methods:
-
-| Method | New optional parameter |
-|---|---|
-| `ProductionStateCommitter.begin_video_generation(...)` | `pre_submit_gate_receipt: ShotQualityReceipt | None = None` |
-| `ProductionStateCommitter.commit_video_activation(...)` | `post_fetch_gate_receipt: VideoQualityReceipt | None = None` |
-
-When supplied, committer validates:
-
-1. `receipt.content_hash` is well-formed.
-2. `receipt.gate_name` matches the expected gate.
-3. If `BLOCKED`, refuse the operation (`AiVideoError(PRODUCTION_STATE_INVALID, ...)`).
-
-When `None`, committer proceeds exactly as today.
-
-### FR-10 — Production ownership boundary (gate side)
-
-`src/ai_video/quality_gates/**` MUST NOT import:
-
-- `ai_video.production.state_commit` or any `_state_commit_*`
-- `ai_video.production.dependency`
-- `ai_video.production.composition`
-- `ai_video.production.hyperframes`
-- `ai_video.production.manifest`
-- `ai_video.production.registry`
-- `ai_video.production.shot_router`
-- `ai_video.production.video` (the producer / request schema)
-- `ai_video.production.seedance` / `seedance_*` / `minimax_*` / `comfy_*` / `elevenlabs` / `local_video`
-- `ai_video.production.paid_provider` / `paid_provider_gate`
-- `ai_video.production.video_generation` (transitively imports `production.video` and `local_video` and `paid_provider`)
-- `ai_video.comfy_client`, `ai_video.ffmpeg_tools`, `ai_video.cli`
-- `os.environ`, `subprocess`, `httpx`, `requests`, `urllib`
-- `keyring`, `cryptography.hazmat.primitives.kdf`
-
-Allowed imports:
-
-- `ai_video.production.models` — read-only types (`Shot`, `Character`, `Scene`, `StrictModel`, `VisualStrategy`, `VersionedArtifact`).
-- `ai_video.production.hashing` — `canonical_sha256`.
-- `ai_video.planning._planner_models` — `AvailableAsset`, `PreviousShotState`, `VideoGenerationPlan`, `GenerationMode`, `PlanOutcome`.
-- `ai_video.errors` — `AiVideoError`, `ErrorCode`.
-- Standard library + pydantic.
-
-Enforced by AST scan in `tests/test_architecture_gate.py` (extension).
-
-The reverse direction (Production importing quality_gates) is **allowed** — committer may import receipts for the optional handoff parameter. Direction is asymmetric.
-
-### FR-11 — Receipt hashes flow through committer only if supplied
-
-If caller passes `pre_submit_gate_receipt=` / `post_fetch_gate_receipt=` to committer:
-
-- Validates `gate_name`, `content_hash` shape, and BLOCKED status (FR-9).
-- On accept: persists `pre_submit_gate_receipt_hash` / `post_fetch_gate_receipt_hash` on the new attempt state.
-- On reject: raises `AiVideoError(PRODUCTION_STATE_INVALID)`.
-
-If caller passes `None`:
-
-- Committer proceeds exactly as today.
-- The hash field stays `None`.
-
-The committer NEVER creates a receipt. Receipts are caller-owned; committer only stores their hashes when explicitly handed one.
-
-### FR-12 — Integration evidence
-
-`integration.md` documents at least one worked example for each gate and at least one committer handoff example.
-
-## 6. Acceptance criteria
-
-1. AC-1 — Shot with important character + no reference asset → `BLOCKED`, `MISSING_IDENTITY_ANCHOR` in `blocked_reasons`.
-2. AC-2 — Important character + reference asset with mismatched `canonical_owner_id` (asset belongs to a different character) → `BLOCKED` with `MISSING_IDENTITY_ANCHOR`. `matched_owner_ids` is empty.
-3. AC-3 — Environment shot (no characters) + no plan → `NOT_EVALUATED` (STRATEGY check returns NOT_EVALUATED because plan is missing).
-4. AC-4 — Important character + plan with `outcome=BLOCKED` → Shot Gate `BLOCKED` with `STRATEGY_CONTRADICTS_SHOT`.
-5. AC-5 — Important character + plan `generation_mode=TEXT_TO_VIDEO` → `BLOCKED` with `STRATEGY_CONTRADICTS_SHOT`.
-6. AC-6 — Fetched video with `fetch_fingerprint` not matching payload → Video Gate `BLOCKED` with `RECEIPT_HASH_MISMATCH`.
-7. AC-7 — Fetched video whose `content_type` does not match `submission.expected_content_type` → Video Gate `BLOCKED` with `CONTENT_TYPE_MISMATCH`.
-8. AC-8 — Both gates are pure: same `request_content_hash` and `receipt_id` → same `content_hash`; two calls are byte-identical.
-9. AC-9 — All receipts and check outcomes reject forbidden fields via `extra="forbid"` (including typed payload classes).
-10. AC-10 — Architecture Gate blacklist forbids `state_commit*` / `dependency` / `composition` / `hyperframes` / `registry` / `shot_router` / `video` / `video_generation` / Provider adapters / `paid_provider` / `comfy_client` / `ffmpeg_tools` / `cli` / `os.environ` / `keyring` / `subprocess` / `httpx` / `requests` imports from `src/ai_video/quality_gates/**`.
-11. AC-11 — Committing a `BLOCKED` `VideoQualityReceipt` to `commit_video_activation` raises `AiVideoError(PRODUCTION_STATE_INVALID)`.
-12. AC-12 — Committing a `PASS` receipt succeeds and persists the receipt hash on the attempt state; calling the same commit without the receipt still succeeds and leaves the hash `None`.
-
-## 7. Verification plan
-
-- Unit tests: `tests/test_quality_gates.py` (Cases 1–7 plus determinism + forbidden fields + architecture gate).
-- Comitter seam tests: `tests/test_state_commit_gate_receipt.py` (AC-11, AC-12).
-- Pure-function smoke: same request + receipt_id twice → identical receipt.
-- Architecture gate: AST scan extension in `tests/test_architecture_gate.py`.
-- Negative tests: forbidden fields raise `ValidationError`; forbidden imports raise test failure with file:line.
-- Forbidden-call test: monkeypatch the blacklisted modules; gate functions must not trigger import.
-
-## 8. Risk & rollback
-
-| Risk | Mitigation |
-|---|---|
-| Gate becomes a stealth Review/Repair replacement | Forbidden fields (incl. typed payloads with `extra="forbid"`); no `accepted`/`activated` outputs |
-| Gate starts writing Manifest | FR-10 import blacklist + AST gate; committer stores only hashes, never payloads |
-| Committer becomes the de-facto gate owner | Gate runs outside committer; committer only validates BLOCKED status and stores hash; receipt lives with caller |
-| Receipt hash mismatch indicates tampering | RECEIPT_INTEGRITY is `BLOCKED`; committer refuses; caller must retry from a fresh receipt |
-| Receipt v1 vs v2 evolution | `gate_version` field pins the contract; mismatched versions are rejected |
-| Production module accidentally imports gate | FR-10 is asymmetric; gate side forbids production imports; reverse direction is allowed but not required |
-
-Rollback: delete `src/ai_video/quality_gates/`, drop the 2 optional fields from `VideoGenerationAttemptState`, drop the 2 optional parameters from committer methods, drop the helper module. No required-schema changes are introduced.
+Runtime rollback for the future implementation is to restore the existing `require_current_video_plan()` body and remove `src/ai_video/quality_gates/` plus its tests/policy category. v3 itself is docs-only and has no runtime rollback or migration.
