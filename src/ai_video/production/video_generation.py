@@ -225,7 +225,7 @@ class VideoGenerationService:
             resolved=request, result=result
         )
         try:
-            observation = self._provider.get_local_status(submission)
+            observation = self._provider.get_local_status(request, submission)
         except AiVideoError as exc:
             if exc.code in {
                 ErrorCode.VIDEO_PROVIDER_FAILED,
@@ -271,6 +271,7 @@ class VideoGenerationService:
             attempt_id=attempt_id
         ) as (path, sink):
             fetch_receipt = self._provider.fetch_local(
+                request,
                 submission,
                 observation,
                 sink,

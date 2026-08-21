@@ -561,12 +561,12 @@ def test_t8_selects_only_final_audio_artifact_and_fetches_it(tmp_path: Path) -> 
     submission = LocalVideoSubmission.from_submit_result(
         resolved=request, result=result
     )
-    observation = provider.get_local_status(submission)
+    observation = provider.get_local_status(request, submission)
     assert observation.state is VideoTaskState.SUCCEEDED
     assert observation.provider_file_id is not None
     assert "-audio.mp4" in observation.provider_file_id
     sink = BytesIO()
-    receipt = provider.fetch_local(submission, observation, sink)
+    receipt = provider.fetch_local(request, submission, observation, sink)
     assert transport.fetched == ["ai_video_t8_00001-audio.mp4"]
     assert sink.getvalue() == MP4.read_bytes()
     assert receipt.artifact_sha256 == hashlib.sha256(MP4.read_bytes()).hexdigest()
@@ -593,7 +593,7 @@ def test_t8_rejects_video_only_or_ambiguous_audio_outputs(
         ),
     )
     with pytest.raises(AiVideoError) as exc_info:
-        provider.get_local_status(submission)
+        provider.get_local_status(request, submission)
     assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
 
 

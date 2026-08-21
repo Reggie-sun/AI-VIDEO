@@ -3,13 +3,22 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Protocol
+from typing import BinaryIO, Protocol
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.local_video import (
+    DurableLocalVideoSubmitPermit,
+    LocalVideoFetchReceipt,
+    LocalVideoSubmission,
+    LocalVideoSubmitIntent,
+    LocalVideoSubmitResult,
+    LocalVideoTaskObservation,
+)
 from ai_video.production.shot_router import ProviderBoundVideoRequest
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoCapabilityVariant,
+    VideoGenerationPreview,
     VideoGenerationRequest,
     VideoProviderCapabilities,
 )
@@ -42,6 +51,34 @@ class _ChildProvider(Protocol):
         self, request: VideoGenerationRequest
     ) -> ResolvedVideoGenerationRequest: ...
 
+    def preview(
+        self, request: ResolvedVideoGenerationRequest
+    ) -> VideoGenerationPreview: ...
+
+    def preflight(self, request: ResolvedVideoGenerationRequest) -> None: ...
+
+    def submit_local(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        preview: VideoGenerationPreview,
+        intent: LocalVideoSubmitIntent,
+        permit: DurableLocalVideoSubmitPermit,
+    ) -> LocalVideoSubmitResult: ...
+
+    def get_local_status(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        submission: LocalVideoSubmission,
+    ) -> LocalVideoTaskObservation: ...
+
+    def fetch_local(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        submission: LocalVideoSubmission,
+        observation: LocalVideoTaskObservation,
+        sink: BinaryIO,
+    ) -> LocalVideoFetchReceipt: ...
+
 
 def _identity(variant: VideoCapabilityVariant) -> tuple[object, ...]:
     return (
@@ -52,13 +89,23 @@ def _identity(variant: VideoCapabilityVariant) -> tuple[object, ...]:
     )
 
 
+def _resolved_identity(request: ResolvedVideoGenerationRequest) -> tuple[object, ...]:
+    return (
+        request.provider_kind,
+        request.model_id,
+        request.provider_profile.profile_version,
+        request.mode,
+    )
+
+
 class LocalH3VideoProviderFamily:
     """Expose additive local H3 capabilities without owning execution state.
 
     Shot Router consumes the combined capability snapshot. Provider-neutral
     compilation and request resolution are delegated to exactly one child.
-    Preview, submit, status, fetch, and recovery remain owned by that selected
-    child adapter; the family never creates a second lifecycle registry.
+    Preview, preflight, submit, status, and fetch are delegated to that
+    selected child adapter. Durable lifecycle and recovery remain committer-
+    owned; the family never creates a second registry or persists action state.
     """
 
     def __init__(self, children: Iterable[_ChildProvider]) -> None:
@@ -102,6 +149,21 @@ class LocalH3VideoProviderFamily:
     def capabilities(self) -> VideoProviderCapabilities:
         return self._capabilities
 
+    def _resolve_child(
+        self, request: ResolvedVideoGenerationRequest
+    ) -> _ChildProvider:
+        if request.provider_name != _PROVIDER_NAME:
+            raise _invalid(
+                "Local H3 family received a request for another provider.",
+                request.provider_name,
+            )
+        child = self._by_identity.get(_resolved_identity(request))
+        if child is None:
+            raise _invalid(
+                "Local H3 family has no exact adapter for the request identity."
+            )
+        return child
+
     def compile_request(
         self,
         provider_bound: ProviderBoundVideoRequest,
@@ -140,6 +202,59 @@ class LocalH3VideoProviderFamily:
                 "Local H3 family has no exact adapter for the request identity."
             )
         return child.resolve(request)
+
+    def preview(
+        self, request: ResolvedVideoGenerationRequest
+    ) -> VideoGenerationPreview:
+        return self._resolve_child(request).preview(request)
+
+    def preflight(self, request: ResolvedVideoGenerationRequest) -> None:
+        self._resolve_child(request).preflight(request)
+
+    def submit_local(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        preview: VideoGenerationPreview,
+        intent: LocalVideoSubmitIntent,
+        permit: DurableLocalVideoSubmitPermit,
+    ) -> LocalVideoSubmitResult:
+        return self._resolve_child(request).submit_local(
+            request, preview, intent, permit
+        )
+
+    def get_local_status(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        submission: LocalVideoSubmission,
+    ) -> LocalVideoTaskObservation:
+        child = self._resolve_child(request)
+        if submission.resolved_generation_hash != request.resolved_generation_hash:
+            raise _invalid(
+                "Local H3 submission does not match the reopened request."
+            )
+        return child.get_local_status(request, submission)
+
+    def fetch_local(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        submission: LocalVideoSubmission,
+        observation: LocalVideoTaskObservation,
+        sink: BinaryIO,
+    ) -> LocalVideoFetchReceipt:
+        child = self._resolve_child(request)
+        if submission.resolved_generation_hash != request.resolved_generation_hash:
+            raise _invalid(
+                "Local H3 submission does not match the reopened request."
+            )
+        if (
+            observation.submission_fingerprint != submission.submission_fingerprint
+            or observation.submit_result_fingerprint
+            != submission.submit_result_fingerprint
+        ):
+            raise _invalid(
+                "Local H3 observation does not match the durable submission."
+            )
+        return child.fetch_local(request, submission, observation, sink)
 
 
 __all__ = ["LocalH3VideoProviderFamily"]

@@ -2,24 +2,24 @@
 
 ## Status
 
-Partial implementation已提交到local `main` commit
-`15ef1d510a59cc9d46445b1fafff2ac2b34a1473`。该commit完成capability aggregation、
-`compile_request()`与`resolve()`，但未实现完整family local execution pass-through或
-Registry-to-Service runtime assembly。本Plan现同时记录implemented work与remaining blocker。
+Target source/tests implemented in the current local change。Commit
+`15ef1d510a59cc9d46445b1fafff2ac2b34a1473` 提供原始capability aggregation、
+`compile_request()`与`resolve()`；本slice补全request-aware full family pass-through、restart-safe
+status/fetch与pure Registry coexistence regression。Final closure仍取决于independent review与exact
+commit-range Harness receipt。
 
-本轮用户只授权修订specs/plans。允许写入仅限本Plan、配套Local H3 Spec以及existing
-provider-neutral parent Spec/Plan；不授权source/test/policy/runtime/Provider/ComfyUI/network/
-credential/media、push或release。
+本轮授权source、tests、focused Harness policy route与对应canonical docs；不授权
+Provider/ComfyUI/network/credential/media、live quality acceptance、push或release。
+Seedance dirty work保持独立，不由本slice覆盖或提交。
 
-Current audit发现：
+Implementation audit确认：
 
-- current code中的family只实现`capabilities()`、`compile_request()`、`resolve()`；
-- canonical matrix描述current family只做compile/resolve，selected child继续实现具体action；
-- 但exact-name Registry无法同时注册两个同名children，而partial family又不能注入
-  `VideoGenerationService`；因此full stateless `LocalVideoProvider` pass-through仍是target contract，
-  不是已经完成的current truth；
-- workspace中未找到覆盖exact implementation snapshot且状态为`passed`的Harness receipt，故不能
-  仅凭commit或canonical prose重申fresh offline closure。
+- family已实现capabilities/compiler/resolve及preview/preflight/submit/status/fetch完整pass-through；
+- status/fetch seam显式携带committer重开的resolved request，不修改durable schema/hash，也不保存cache；
+- Registry pure regression验证family与distinct-name remote objects并存、exact lookup、duplicate rejection
+  与zero Provider calls；
+- concrete product caller仍负责显式Registry lookup与Service injection；本slice不新增global coordinator；
+- exact implementation snapshot必须取得fresh passing Harness receipt后才能声明offline closure。
 
 ## Goal and Boundary
 
@@ -61,13 +61,14 @@ timeline/review schemas、local/paid seams、no-fallback、Base AI Comic no-Vide
 | --- | --- | --- |
 | Quality child | `src/ai_video/production/comfy_t8_video.py` | existing sealed lane；full local execution |
 | Turbo child | `src/ai_video/production/comfy_t8_turbo_video.py` | additive sealed lane；full local execution |
-| Family | `src/ai_video/production/local_h3_provider_family.py` | current: capability aggregation + compile/resolve；target: full stateless local pass-through |
+| Family | `src/ai_video/production/local_h3_provider_family.py` | implemented: capability aggregation、compile/resolve 与 full stateless local pass-through |
 | Workflows | `workflows/{templates,bindings,profiles}/minimax_h3_t8_t2va_{quality,turbo}*` | exact Quality/Turbo seals |
 | Tests | focused T8/family/Router/provider-neutral suites | offline source evidence |
 | Canonical routing | policy、contract matrix、runtime baseline | current owner and claim boundaries |
 
-本轮不修改上述implementation files。Unrelated `.agent/harness/policy.yaml` 与
-`src/ai_video/production/seedance_asset.py` dirty changes不属于本task，必须保留且不得stage/commit。
+本轮已修改表内明确列出的 implementation files，并同步 local protocol 与 Service 的 reopened-request 传递。
+用户已明确授权将 `.agent/harness/policy.yaml` 的 focused-test route 纳入本 task；
+`src/ai_video/production/seedance_asset.py` dirty change 仍不属于本 task，必须保留且不得 stage/commit。
 
 ## Contract Checkpoint
 
@@ -121,11 +122,11 @@ Exit：focused capability/profile tests pass on a fresh exact snapshot。
 - reject empty、foreign、duplicate或unknown child/identity；
 - family MUST NOT retain last-selected child or runtime state。
 
-Exit：current implemented three-method surface remains stable while T4 completes the missing provider seam。
+Exit：原始three-method behavior保持兼容，T4在其上additive补全local seam。
 
 ### T4 — Complete full family seam and multi-provider coexistence
 
-**Status:** docs target in this task；source/tests/policy implementation remains future authorized work。
+**Status:** source/tests implemented；exact Harness closure pending final acceptance。
 
 - parent provider-neutral Spec/Plan must show Local H3、Seedance、Hailuo、MiniMax H3 and future
   distinct-name Providers as peers；
@@ -134,26 +135,28 @@ Exit：current implemented three-method surface remains stable while T4 complete
 - `VideoGenerationService` remains exact injected-provider lifecycle service，not Registry owner；
 - family capability snapshot cannot contain remote Provider variants。
 
-Required future implementation：
+Implemented work：
 
 - expand the family child protocol to the complete `LocalVideoProvider` seam；
 - delegate `preview()`/`preflight()`/`submit_local()` by sealed resolved request identity；
-- delegate `get_local_status()`/`fetch_local()` by durable submission resolved identity；
+- extend `LocalVideoProvider` status/fetch seam with the committer-reopened resolved request；
+- delegate `get_local_status()`/`fetch_local()` by that exact identity and reject mismatched
+  submission/observation seals before child effects；
 - preserve inputs/outputs/permit/submission/observation/receipt byte-for-byte；
 - reconstruct a fresh family after restart and prove the same durable identity reaches the same child；
-- register only one `("comfy-local-h3-t8", family)` entry and inject that family into
-  `VideoGenerationService`；
+- prove one `("comfy-local-h3-t8", family)` entry can coexist with distinct-name Providers and be the exact
+  object an explicit caller injects into `VideoGenerationService`；
 - prove family contains no attempt phase、permit、task ID、poll、artifact、activation或recovery state。
 
-Future pure regression should construct one Registry containing the Local H3 family object plus distinct-name
-fake remote Providers，assert exact lookup、duplicate-name rejection and zero runtime/Provider calls。
+The pure regression constructs one Registry containing the Local H3 family object plus distinct-name fake remote
+Providers，and asserts exact lookup、duplicate-name rejection and zero runtime/Provider calls。
 
 Exit：one registered T8 family completes both Quality/Turbo local action paths；distinct-name Providers coexist；
 no global selector、fallback or second lifecycle owner。
 
 ### T5 — Preserve selected-child lifecycle
 
-**Status:** child action implementations exist；family pass-through/restart proof remains pending T4。
+**Status:** child actions and family request-aware pass-through implemented；live proof remains separate。
 
 - Quality/Turbo child independently implements preview/preflight/submit_local/status/fetch；
 - durable request identity and lifecycle receipts remain exact；
@@ -165,7 +168,8 @@ Exit：existing child lifecycle regression suites remain green through the compl
 
 ### T6 — Synchronize docs and Harness routing
 
-**Status:** current implementation changed canonical docs/policy；this task changes only four specs/plans。
+**Status:** source/tests、canonical docs与existing required family/Turbo Harness `argv` synchronized；用户已
+明确授权把该pre-existing policy hunk纳入本implementation snapshot。
 
 - Local H3 child docs link to provider-neutral parent owner；
 - parent docs own cross-provider coexistence and assembly boundary；
@@ -176,18 +180,18 @@ Exit：Harness inspect maps exact four docs without fallback。
 
 ### T7 — Independent review and exact acceptance
 
-**Status:** required for this documentation correction；implementation closure remains separate。
+**Status:** required for this implementation；pending independent review and exact Harness closure。
 
 Docs review must confirm：
 
 - no global-only-provider implication；
-- no claim that the full family façade is current or implemented；
+- full family façade behavior matches source/tests and does not imply live/media acceptance；
 - Registry、Router、Service、child、committer ownership remains distinct；
 - Seedance/Hailuo/MiniMax H3 coexistence is unchanged；
 - no historical live evidence or committed code is promoted beyond available receipts。
 
-This docs task runs exact commit-range Harness for its four files. A separate implementation verification task
-must rerun the policy-selected source/test range for `15ef1d5` before claiming fresh offline closure。
+This implementation task runs the policy-selected source/test checks and exact commit-range Harness before
+claiming fresh offline closure。
 
 ### T8 — Optional local live technical proof
 
@@ -204,7 +208,7 @@ reopen/replay and human verdict。Turbo failure must not trigger Quality or remo
 | Additive Quality/Turbo identities | T2 | profile/capability tests |
 | Family aggregation/compile/resolve current surface | T3 | family source/tests + docs review |
 | Full stateless family execution façade | T4–T5 | family-to-Service lifecycle/restart regressions |
-| Multi-provider coexistence | T4 | parent docs；future pure Registry regression |
+| Multi-provider coexistence | T4 | parent docs；pure Registry regression |
 | Selected child owns lifecycle | T5 | child/local lifecycle tests |
 | No ranking/fallback | T2–T5 | Router/family/child negative tests |
 | Exact docs correction | T6–T7 | diff check + Harness receipt |
@@ -246,27 +250,27 @@ make harness-verify
 make harness-receipt RECEIPT=<fresh-receipt-path>
 ```
 
-For this docs-only correction，use exact staged snapshot or exact commit range and require
-`changed_paths` to equal the four task-owned Spec/Plan files。
+For this implementation，use the exact staged snapshot or exact commit range and require all task-owned
+source、test与canonical doc paths to be present。
 
 ## Harness Changed-Path Routing
 
 | Changed paths | Required checks |
 | --- | --- |
 | four `docs/superpowers/{specs,plans}/...` files | `documentation` + `scope_diff_check` |
-| future family/source/test change | `production_video_provider_tests` + provider-neutral/Router checks + Architecture Gate |
-| future policy change | `harness_tests` plus all categories matched by exact delta |
+| family/source/test change | `production_video_provider_tests` + provider-neutral/Router checks + Architecture Gate |
+| policy change | `harness_tests` plus all categories matched by exact delta |
 
-Path mapping alone is insufficient for future test additions；new coexistence regression must be present in an
+Path mapping alone is insufficient for test additions；the coexistence regression must be present in an
 actually executed check `argv`。
 
 ## Acceptance Lane Separation
 
 | Lane | Status | Boundary |
 | --- | --- | --- |
-| Docs correction | current task | no code/runtime/media |
-| Existing partial implementation | committed at `15ef1d5` | full family lifecycle and fresh passing exact-range receipt not confirmed |
-| Pure coexistence regression | pending code scope | no Provider/runtime calls |
+| Source/test implementation | current task | offline only；no Provider/runtime/media calls |
+| Existing partial implementation | superseded by additive full seam | historical `15ef1d5` behavior remains compatible |
+| Pure coexistence regression | implemented | no Provider/runtime calls |
 | Local live technical | separate task | one exact loopback child |
 | Quality vs Turbo A/B | separate plan | no default ranking inference |
 | Seedance/Hailuo/cloud live | separate paid task | full Provider-specific gates |
@@ -277,7 +281,7 @@ Native reviewer must return `accept`、`accept with concerns` or `reject` and ch
 
 - Local H3 spec is clearly a child slice；
 - parent spec owns multi-provider coexistence；
-- current three-method implementation is described as partial，while target full family seam closes exact-name assembly；
+- additive full family seam preserves the historical three methods and closes exact-name assembly；
 - registry exact lookup is not described asselection；
 - service injection and local/remote seams are not invented；
 - claims distinguish committed、freshly verified、live and quality truth。
@@ -286,14 +290,13 @@ Parent verifies all material claims against current files and final diff。
 
 ## Rollback and Recovery
 
-- Docs correction rollback only reverts this task’s four files；
-- implementation rollback preservesQuality and all other Providers；
+- implementation rollback reverts task-owned source/tests/docs together while preserving Quality and all other Providers；
 - durable attempts useexisting explicit recovery，never convert to anotherlane/provider；
 - rollback never createsfallback、second writer、second Registry or second lifecycle。
 
 ## Deferred and Explicitly Unauthorised
 
-- source/test/policy changes，includingfull family seam and Registry coexistence tests；
+- further source/test/policy changes beyond this accepted family seam；
 - global Provider catalog or automatic assembly；
 - Provider ranking/fallback、multi-candidate generation；
 - T8/Turbo/ComfyUI install or runtime mutation；

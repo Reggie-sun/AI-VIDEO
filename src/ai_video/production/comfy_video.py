@@ -729,7 +729,9 @@ class ComfyUIVideoProvider:
             ) from exc
 
     def get_local_status(
-        self, submission: LocalVideoSubmission
+        self,
+        request: ResolvedVideoGenerationRequest,
+        submission: LocalVideoSubmission,
     ) -> LocalVideoTaskObservation:
         job = self._transport.poll_job(
             submission.provider_request_id,
@@ -766,6 +768,7 @@ class ComfyUIVideoProvider:
 
     def fetch_local(
         self,
+        request: ResolvedVideoGenerationRequest,
         submission: LocalVideoSubmission,
         observation: LocalVideoTaskObservation,
         sink: BinaryIO,

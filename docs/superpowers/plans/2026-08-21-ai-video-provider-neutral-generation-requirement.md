@@ -15,11 +15,10 @@ requirement、Router、Planner与Architecture checks。
 quality acceptance、Final Acceptance或release。
 
 Local `main` commit `15ef1d510a59cc9d46445b1fafff2ac2b34a1473`后来additive加入
-`comfy-local-h3-t8` Quality/Turbo family。2026-08-21的docs correction将current three-method
-family标为partial，并把provider-name-scoped完整stateless local pass-through列为remaining target；
-同时补齐Local H3、Seedance、Hailuo、MiniMax H3与future Providers的coexistence/assembly boundary。
-该correction不扩大T1–T9 durable lifecycle，也不以历史receipt替代target implementation仍需的fresh
-verification。
+`comfy-local-h3-t8` Quality/Turbo partial family。Current implementation slice补全provider-name-scoped
+stateless local pass-through、request-aware restart dispatch与pure multi-provider coexistence regression；
+Local H3、Seedance、Hailuo、MiniMax H3与future Providers继续作为distinct-name peers。该slice不扩大
+T1–T9 durable lifecycle，也不以历史receipt替代current implementation所需的fresh verification。
 
 ## Goal and Boundary
 
@@ -58,7 +57,7 @@ Unchanged：Shot、Registry、Manifest、committer、permit、recovery、Depende
 | Core lifecycle DTO | `src/ai_video/production/video.py` | compiler protocol/result、request `/5`、resolved `/6`、activation scope `/4` while preserving all historical branches |
 | Fake | `src/ai_video/production/video_fake.py` | deterministic compiled/unsupported acceptance |
 | Local H3 | `src/ai_video/production/comfy_video.py` and exact profile-owned tests | offline compiler mapping only；sealed workflows unchanged unless separately approved |
-| Local H3 T8 family | `comfy_t8_video.py`, `comfy_t8_turbo_video.py`, `local_h3_provider_family.py` | current aggregation/compile/resolve；remaining target是same-name full stateless local pass-through |
+| Local H3 T8 family | `comfy_t8_video.py`, `comfy_t8_turbo_video.py`, `local_h3_provider_family.py` | same-name full stateless local pass-through 已实现；按 reopened request 的 exact identity 委托 selected child |
 | Cloud adapters | `src/ai_video/production/minimax_h3.py`, `minimax_hailuo.py`, `seedance.py` | offline deterministic compiler mappings；no network |
 | Tests | focused planning/router/video/provider test files | RED/GREEN, compatibility, no-side-effect, retirement |
 | Harness/docs | `.agent/harness/policy.yaml`, Harness tests, canonical docs | exact changed-path routing and verified runtime truth only after implementation |
@@ -167,7 +166,7 @@ Exit：fake adapter -> existing resolve/preview/lifecycle tests pass offline；o
 Implemented work：
 
 - Local H3 `fl2va`: first frame required、last frame optional、no reference slots、exact geometry/24fps/native audio/seed semantics；
-- Local H3 T8 family: Quality/Turbo保持同一`provider_name`下的distinct exact capabilities；current family合并capabilities并委托compile/resolve；remaining target按durable identity委托完整local seam，selected child仍实现具体action；
+- Local H3 T8 family: Quality/Turbo保持同一`provider_name`下的distinct exact capabilities；family合并capabilities并委托compile/resolve，并已按reopened request的exact durable identity委托完整local seam；selected child仍实现具体action；
 - keep base and additive quality profile seals unchanged unless a separate profile migration is explicitly approved；
 - cloud H3: T2V fixed output/no refs/no seed/no negative prompt；
 - convert only approved neutral semantics to reviewed grammar；
@@ -256,7 +255,7 @@ Cloud/paid live remains another separately authorized task with full Paid Provid
 
 ### T11 — Multi-Provider coexistence clarification and regression
 
-**Docs implemented in this correction；full family assembly与pure executable regression remain pending separate code scope.**
+**Full family seam and pure executable regression implemented；exact Harness closure pending final acceptance.**
 
 Required contract：
 
@@ -268,12 +267,12 @@ Required contract：
 - local family snapshots cannot contain remote Provider variants；
 - Local H3 target family is the sole `comfy-local-h3-t8` Registry entry and delegates the complete local seam
   by durable identity，while selected child implements concrete actions；
-- current three-method family is partial and cannot yet satisfy that Registry-to-Service assembly；
+- family preserves the historical three methods and now satisfies the complete request-aware local seam；
 - all tests remainpure/no-network/no-Provider-call。
 
-Future regression target：extend an existing provider-neutral/registry test file rather than create a second
-catalog or coordinator. The test must be added to an actually executed Harness check `argv`；path mapping alone
-is insufficient。
+Implemented regression：extend existing family/local lifecycle tests rather than create a second catalog or
+coordinator。The tests cover distinct-name exact lookup、duplicate rejection、zero Provider calls and fresh-family
+restart through the Registry-to-Service seam；they must remain in an actually executed Harness check `argv`。
 
 ## Requirements-to-Tasks Traceability
 
@@ -429,7 +428,7 @@ Implementation review使用native named `reviewer`，至少检查：
 - requirement是否真的是plan内唯一generation truth；
 - Router是否仍独占selection且无fallback；
 - Registry是否只做exact lookup、distinct-name Providers是否可并列、Service是否只消费exact injected Provider；
-- Local H3 current partial/target full-seam边界是否准确；target family是否仅在same-name local
+- Local H3 historical partial/current full-seam边界是否准确；family是否仅在same-name local
   children内委托且不吸收remote Providers、global selection或durable lifecycle；
 - Adapter是否只表达、不重创作/降级；
 - legacy request/resolved/activation-scope hashes是否精确保持，且new `/5`/`/6`/`/4` branches无version collision；

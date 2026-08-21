@@ -363,12 +363,12 @@ def test_turbo_preflight_and_submit_render_the_exact_six_step_graph(
     submission = LocalVideoSubmission.from_submit_result(
         resolved=request, result=result
     )
-    observation = provider.get_local_status(submission)
+    observation = provider.get_local_status(request, submission)
     assert observation.state is VideoTaskState.SUCCEEDED
     assert observation.provider_file_id is not None
     assert observation.provider_file_id.endswith("turbo_00001-audio.mp4:output")
     sink = BytesIO()
-    receipt = provider.fetch_local(submission, observation, sink)
+    receipt = provider.fetch_local(request, submission, observation, sink)
     assert receipt.artifact_sha256 == hashlib.sha256(MP4.read_bytes()).hexdigest()
     assert sink.getvalue() == MP4.read_bytes()
 

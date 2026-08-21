@@ -387,11 +387,11 @@ def test_comfy_h3_binds_exact_frames_and_preserves_optional_last(
     submission = LocalVideoSubmission.from_submit_result(
         resolved=resolved, result=result
     )
-    observation = provider.get_local_status(submission)
+    observation = provider.get_local_status(resolved, submission)
     from io import BytesIO
 
     sink = BytesIO()
-    receipt = provider.fetch_local(submission, observation, sink)
+    receipt = provider.fetch_local(resolved, submission, observation, sink)
     assert sink.getvalue() == MP4.read_bytes()
     assert receipt.artifact_sha256 == hashlib.sha256(MP4.read_bytes()).hexdigest()
 
@@ -644,7 +644,7 @@ def test_h3_submit_ambiguity_and_terminal_job_failure_are_normalized(
             submitted_at=datetime(2026, 8, 19, tzinfo=UTC),
         ),
     )
-    observation = failed_provider.get_local_status(submission)
+    observation = failed_provider.get_local_status(failed_resolved, submission)
     assert observation.state is VideoTaskState.FAILED
     assert observation.provider_file_id is None
 
@@ -744,7 +744,7 @@ def test_h3_poll_timeout_is_outcome_unknown(tmp_path: Path) -> None:
         ),
     )
     with pytest.raises(AiVideoError) as exc_info:
-        provider.get_local_status(submission)
+        provider.get_local_status(resolved, submission)
     assert exc_info.value.code is ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
 
 

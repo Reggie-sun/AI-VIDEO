@@ -15,12 +15,12 @@ evidence，不把本slice升级为Shot Quality Gate、subjective quality accepta
 Acceptance或release truth。
 
 后续local `main` commit `15ef1d510a59cc9d46445b1fafff2ac2b34a1473` additive加入
-`comfy-local-h3-t8` Quality/Turbo family。Current source只完成provider-name-scoped capability/
-compiler/resolver façade；配套Local H3 child Spec把完整stateless `LocalVideoProvider` pass-through列为
-尚未实现的target，以闭合同名children的Registry-to-Service assembly。无论partial或target状态，
-family都不改变本Spec的cross-provider selection、Registry lookup、local/remote lifecycle ownership。
-其exact target implementation snapshot的fresh passing Harness closure需独立重新验证，不能由本Spec的
-历史receipt代替。
+`comfy-local-h3-t8` Quality/Turbo partial family；current implementation slice在其上补全provider-name-
+scoped stateless `LocalVideoProvider` pass-through。Status/fetch由`VideoGenerationService`同时传入committer
+重开的resolved request和durable submission，family不保存last-selected/cache；pure regression证明该
+family与Seedance、Hailuo、MiniMax H3等distinct-name objects可在同一Registry exact coexist。该变化不
+改变本Spec的cross-provider selection、Registry lookup、local/remote lifecycle ownership，也不由本Spec
+历史receipt替代其exact target snapshot所需的fresh Harness closure。
 
 ## Problem Boundary
 
@@ -438,19 +438,19 @@ truth。Compatibility fixtures可reopen历史requests，但不得用于创建新
 13. Default acceptance uses fake/offline/no-network execution；no credential、Provider、ComfyUI或media generation occurs。
 14. Exact staged/commit-range Harness receipt is fresh、passing、integrity-valid、policy-valid和snapshot-valid。
 
-## Pending Multi-Provider Assembly Criteria
+## Multi-Provider Assembly Criteria
 
-以下是T11与Local H3 T8 target family的future acceptance，不在T1–T9历史receipt或commit
-`15ef1d5`的已验证范围内：
+以下是T11与Local H3 T8 family的current implementation acceptance；它不属于T1–T9历史receipt或
+commit `15ef1d5`的已验证范围，必须由本slice的fresh receipt单独证明：
 
 1. `VideoProviderRegistry`允许Local H3、Seedance、Hailuo、MiniMax H3和future distinct-name
    Providers并列exact lookup；duplicate exact name fail closed，且lookup不选择或fallback。
-2. Local H3 family capabilities不包含remote variants；target family只实现same-name local identity
+2. Local H3 family capabilities不包含remote variants；family只实现same-name local identity
    pass-through，绝不实现remote或cross-provider dispatch。
 3. The sole `comfy-local-h3-t8` Registry entry can be injected into `VideoGenerationService` and routes
    Quality/Turbo preview/submit/status/fetch to the exact child by durable identity。
 4. Fresh-family restart routes status/fetch to the same child without process-local last-selection state。
-5. Exact source/test/policy snapshot取得fresh passing、integrity-valid、policy-valid、snapshot-valid Harness
+5. Exact source/test/canonical-doc snapshot取得fresh passing、integrity-valid、policy-valid、snapshot-valid Harness
    receipt后，才能声明target assembly complete。
 
 ## Acceptance Lanes
@@ -482,7 +482,7 @@ truth。Compatibility fixtures可reopen历史requests，但不得用于创建新
 - Router输出不含prompt的`ProviderBoundVideoRequest`；
 - Adapter返回compiled或typed unsupported result；
 - distinct-name Providers可并列存在；Registry exact lookup、Router selection、Service injection与Provider execution保持不同owners；
-- Local H3 T8 target family是provider-name-scoped完整local pass-through，不是global catalog或cross-provider execution façade；current partial implementation必须明确标记；
+- Local H3 T8 family是provider-name-scoped完整local pass-through，不是global catalog或cross-provider execution façade；historical partial与current source/test truth必须明确区分；
 - existing `VideoGenerationRequest`作为lifecycle DTO，以request `/5`、resolved `/6`、activation scope `/4`接入并保持全部历史hash；
 - capability denial和adapter unsupported均fail closed，不触发fallback。
 

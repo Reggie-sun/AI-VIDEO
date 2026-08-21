@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.local_h3_provider_family import LocalH3VideoProviderFamily
 from ai_video.production.local_video import (
     LocalVideoFetchReceipt,
     LocalVideoSubmission,
@@ -27,6 +28,7 @@ from ai_video.production.video import (
     VideoImageReferenceBinding,
     VideoOutputRequirement,
     VideoProviderCapabilities,
+    VideoProviderRegistry,
     VideoTaskState,
 )
 from ai_video.production.video_fake import ScriptedFakeVideoProvider
@@ -73,6 +75,9 @@ class LocalVideoProviderDouble:
     def preview(self, request):
         return self._delegate.preview(request)
 
+    def preflight(self, request) -> None:
+        return None
+
     def submit_local(self, request, preview, intent, permit):
         if preview != self.preview(request):
             raise AssertionError("preview mismatch")
@@ -104,7 +109,7 @@ class LocalVideoProviderDouble:
             submitted_at=datetime(2026, 8, 19, tzinfo=UTC),
         )
 
-    def get_local_status(self, submission: LocalVideoSubmission):
+    def get_local_status(self, request, submission: LocalVideoSubmission):
         self.status_calls += 1
         if self.status_error is not None:
             raise AiVideoError(
@@ -126,7 +131,7 @@ class LocalVideoProviderDouble:
             observed_at=datetime(2026, 8, 19, 0, 0, 1, tzinfo=UTC),
         )
 
-    def fetch_local(self, submission, observation, sink):
+    def fetch_local(self, request, submission, observation, sink):
         self.fetch_calls += 1
         sink.write(self._artifact_bytes)
         return LocalVideoFetchReceipt.create(
@@ -337,6 +342,67 @@ def test_t8_t2va_reuses_local_intent_permit_and_state_lifecycle(tmp_path: Path) 
     assert service.resume_next_action(attempt_id=ATTEMPT_ID) == "fetch"
     assert provider.submit_calls == 1
     assert provider.status_calls == 1
+
+
+def test_t8_family_registry_assembly_restarts_without_last_selected_state(
+    tmp_path: Path,
+) -> None:
+    _, quality, resolved, committer = _runtime(tmp_path, t8_t2va=True)
+    quality_variant = quality.capabilities().variants[0]
+    turbo_variant = VideoCapabilityVariant.model_validate(
+        {
+            **quality_variant.model_dump(mode="python"),
+            "capability_id": "minimax-h3-t8-t2va-turbo-v1",
+            "provider_kind": "minimax_h3_t8_t2va_turbo",
+            "model_id": "minimax-h3-t8-t2va-turbo",
+        }
+    )
+    turbo = LocalVideoProviderDouble(
+        capabilities=VideoProviderCapabilities.create(
+            provider_name="comfy-local-h3-t8",
+            variants=(turbo_variant,),
+        ),
+        artifact_bytes=FIXTURE.read_bytes(),
+    )
+    family = LocalH3VideoProviderFamily((quality, turbo))
+    seedance = object()
+    hailuo = object()
+    registry = VideoProviderRegistry(
+        (
+            ("comfy-local-h3-t8", family),
+            ("seedance", seedance),
+            ("minimax_hailuo", hailuo),
+        )
+    )
+
+    selected = registry.resolve(resolved.provider_name)
+    assert selected is family
+    assert registry.resolve("seedance") is seedance
+    assert registry.resolve("minimax_hailuo") is hailuo
+
+    service = VideoGenerationService(committer=committer, provider=selected)
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.submit_local_once(attempt_id=ATTEMPT_ID)
+
+    restarted_family = LocalH3VideoProviderFamily((quality, turbo))
+    restarted_registry = VideoProviderRegistry(
+        (("comfy-local-h3-t8", restarted_family),)
+    )
+    restarted_service = VideoGenerationService(
+        committer=committer,
+        provider=restarted_registry.resolve(resolved.provider_name),
+    )
+    observation = restarted_service.refresh_local_once(attempt_id=ATTEMPT_ID)
+    candidate = restarted_service.fetch_local_once(attempt_id=ATTEMPT_ID)
+
+    assert observation.state is VideoTaskState.SUCCEEDED
+    assert isinstance(candidate.receipt, LocalVideoFetchReceipt)
+    assert quality.submit_calls == 1
+    assert quality.status_calls == 1
+    assert quality.fetch_calls == 1
+    assert turbo.submit_calls == 0
+    assert turbo.status_calls == 0
+    assert turbo.fetch_calls == 0
 
 
 def test_local_submit_intent_recovery_stops_without_resubmit(tmp_path: Path) -> None:

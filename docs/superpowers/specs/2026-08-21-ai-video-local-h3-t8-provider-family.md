@@ -2,21 +2,19 @@
 
 ## Status
 
-Proposed v2 target contract。Local `main` commit
-`15ef1d510a59cc9d46445b1fafff2ac2b34a1473` 已实现capability aggregation、
-`compile_request()`与`resolve()`，但尚未实现本Spec要求的完整stateless
-`LocalVideoProvider` execution façade，也未闭合Registry-to-Service runtime assembly。
+Implemented source/test target in the current local change。Local `main` commit
+`15ef1d510a59cc9d46445b1fafff2ac2b34a1473` 提供最初的capability aggregation、
+`compile_request()`与`resolve()`；本slice在其上补全stateless `LocalVideoProvider` façade、
+request-aware restart dispatch与pure multi-provider Registry coexistence regression。Exact commit-range
+Harness closure仍以本slice最终receipt为准。
 
 本文件只描述`provider_name = "comfy-local-h3-t8"`的local child slice，不是全局Provider
 selector、registry owner或lifecycle owner。Target family即使实现完整local seam，也只在该exact
 provider name内按durable identity委托，不选择Seedance、Hailuo或其它Provider。
 
-Canonical matrix 与 runtime baseline 已记录current partial implementation；本次文档修正时，workspace
-中没有找到覆盖 exact implementation snapshot 且状态为 `passed` 的 Harness receipt。因此本文只把
-source/test/workflow presence写成committed partial implementation truth，不把它升级为target contract
-complete、fresh gate closure、
-live media、quality acceptance、Final Acceptance、push 或 release truth。重新声明 offline acceptance
-前必须对 exact implementation commit range 运行并验证 fresh Harness receipt。
+Canonical matrix 与 runtime baseline同步记录本slice的source/test behavior。该实现不证明live media、
+quality acceptance、Final Acceptance、push或release truth；contract closure必须以exact implementation
+commit range的fresh passing Harness receipt为准。
 
 本 Spec 是
 `2026-08-21-ai-video-provider-neutral-generation-requirement.md` 的 provider-specific child spec。
@@ -99,7 +97,7 @@ LocalH3VideoProviderFamily.capabilities()
 ## Non-Goals
 
 - 不实现 global Provider catalog、automatic candidate discovery、Provider ranking 或 fallback；
-- 不修改 `VideoProviderRegistry`、`VideoGenerationService` 或跨 Provider assembly；
+- 不修改 `VideoProviderRegistry` 的 exact-name lookup，也不向 `VideoGenerationService` 添加 Provider selection、fallback 或第二套 lifecycle owner；本 slice 仅让 Service 把 committer 重新打开的 request 传给 local status/fetch 以完成无状态 identity dispatch；
 - 不把 remote `VideoProvider` 与 local `LocalVideoProvider` 合并成新 protocol；
 - 不修改 Seedance、Hailuo、MiniMax cloud H3 或其它 distinct-name Provider；
 - 不修改或重新封装既有 Quality workflow/profile bytes；
@@ -112,7 +110,7 @@ LocalH3VideoProviderFamily.capabilities()
 
 ## Current Source Truth
 
-Commit `15ef1d5` contains：
+Commit `15ef1d5` established：
 
 - `ComfyUIT8VideoProvider` Quality child；
 - `ComfyUIT8TurboVideoProvider` Turbo child；
@@ -121,16 +119,18 @@ Commit `15ef1d5` contains：
 - focused Quality/Turbo/family/Router/provider-neutral tests；
 - package exports、Harness routing、contract matrix 与 runtime baseline updates。
 
-Current family source只定义：
+Current slice在该partial surface上新增：
 
-- `capabilities()`；
-- `compile_request()`；
-- `resolve()`。
+- `preview()`、`preflight()`与`submit_local()`按reopened resolved request exact identity委托；
+- `get_local_status()`与`fetch_local()`同时消费reopened resolved request和durable submission，先验证
+  request/submission/observation seals，再委托同一child；
+- `LocalVideoProvider`、`VideoGenerationService`与local Comfy adapters使用request-aware status/fetch seam；
+- pure Registry regression证明Local H3 family可与Seedance、Hailuo、MiniMax H3等distinct-name objects
+  共存，exact lookup不调用Provider，duplicate name fail closed。
 
-它没有实现 `preview()`、`submit_local()`、`get_local_status()` 或 `fetch_local()`，也没有production
-wiring将family作为完整`LocalVideoProvider`传给`VideoGenerationService`。因此commit `15ef1d5`
-只闭合offline capability/compiler/resolver slice；full runtime assembly仍是本Spec与Plan中的明确
-implementation blocker，不得描述成已经完成或intentional final boundary。
+Family不保存resolved-hash cache、last-selected child或lifecycle state；fresh process可仅凭committer重开的
+resolved request完成相同dispatch。当前仓库仍没有具体product-level production caller负责构造全局Registry；
+本slice只闭合family可被exact lookup并注入`VideoGenerationService`的contract，不新增第二coordinator。
 
 ## Ownership Model
 
@@ -184,8 +184,9 @@ foreign `provider_name`、unknown capability 或 unknown identity都必须 fail 
 3. `resolve()`：按 exact identity tuple 委托给唯一 child；
 4. `preview()`与`preflight()`：从sealed resolved request identity选择同一child并原样委托；
 5. `submit_local()`：从request/preview/intent/permit绑定的exact identity选择同一child并原样委托；
-6. `get_local_status()`与`fetch_local()`：从durable `LocalVideoSubmission.resolved` identity
-   选择同一child并原样委托。
+6. `get_local_status()`与`fetch_local()`：从committer重开的
+   `ResolvedVideoGenerationRequest` exact identity选择同一child，并验证durable submission/observation
+   seals后原样委托。
 
 Family MUST NOT：
 
@@ -214,8 +215,8 @@ Turbo child 与 family形成 duplicate entries。它不表示 global Registry �
 Registry 不做 selection、execution-kind dispatch 或 fallback；`VideoGenerationService`也不会自行
 查询Registry。Existing explicit caller必须按durable `request.provider_name`获得exact registered
 Provider object，并按sealed `execution_kind`使用local或remote lifecycle seam。对
-`comfy-local-h3-t8`，该registered object必须是完成本Spec target contract的family；当前partial
-implementation尚不满足这一assembly requirement。
+`comfy-local-h3-t8`，该registered object必须是完成本Spec contract的family。Current pure regression
+已验证该exact object与distinct-name Providers共存；具体product caller仍必须显式完成lookup/injection。
 
 ## Profile and Workflow Sealing
 
@@ -235,7 +236,8 @@ Router/family acceptance不执行 ComfyUI。进入 local execution 时：
 1. explicit assembly按provider name注入registered family；
 2. `VideoGenerationService` reopen durable resolved request；
 3. family按durable identity委托selected child执行preview/preflight与local permit-gated submit；
-4. family在restart后的status/fetch阶段继续从durable submission identity委托同一child；
+4. family在restart后的status/fetch阶段使用committer重开的resolved request identity，并校验durable
+   submission/observation seals后委托同一child；
 5. `ProductionStateCommitter`独占durable intent、permit、state、candidate、activation与recovery。
 
 Turbo failure不得切换Quality，Quality failure不得切换Turbo；local failure不得切换Seedance、Hailuo或
@@ -250,7 +252,7 @@ remint permit或手工激活 output。
 - public package exports只做 additive exposure；
 - Seedance、Hailuo、MiniMax H3 identities、profiles、permits与historical evidence不变；
 - Base AI Comic E2E 在没有 Video Provider时仍必须可运行；
-- current family尚未实现完整的local lifecycle façade；target family也永远不是global Provider registry。
+- current family已实现完整的local pass-through façade，但永远不是global Provider registry或lifecycle owner。
 
 ## Acceptance Criteria
 
@@ -263,7 +265,8 @@ remint permit或手工激活 output。
 7. A pure coexistence regression应证明同一 Registry可同时保存Local H3、Seedance、Hailuo与其它
    distinct-name fake Providers，exact name返回exact object，duplicate name fail closed，且不调用runtime。
 8. Family capability snapshot不得混入remote Provider variants。
-9. Fresh-family restart必须从durable resolved identity把status/fetch路由回同一child，不依赖last-selected state。
+9. Fresh-family restart必须从committer重开的resolved request identity把status/fetch路由回同一child，
+   并拒绝不匹配的submission/observation，不依赖last-selected state。
 10. No schema、global catalog、automatic selection、ranking或fallback change。
 11. Exact target implementation snapshot必须取得fresh passing Harness receipt后才能声明contract complete。
 
@@ -279,9 +282,8 @@ remint permit或手工激活 output。
 
 ## Explicitly Unverified
 
-- fresh passing Harness closure for exact commit `15ef1d5`；
-- complete Registry-to-`VideoGenerationService` wiring for this family；
-- family preview/submit/status/fetch pass-through and restart proof；
+- exact implementation commit-range的fresh passing Harness closure（在本slice completion时生成）；
+- concrete product-level caller对Registry-to-`VideoGenerationService`的wiring；
 - real T8/Turbo/ComfyUI compatibility and installed bytes；
 - Turbo live submit/status/fetch、wall time、VRAM/RAM或media quality；
 - Turbo是否优于Quality或适合成为default；
@@ -289,9 +291,8 @@ remint permit或手工激活 output。
 
 ## Rollback
 
-- 本次文档修正可通过只撤销对应 docs commit回滚，不改变runtime。
-- Implementation rollback必须整体移除Turbo/family/additive exports/policy/docs delta，同时保留
-  Quality child、historical evidence与其它 Providers。
+- Implementation rollback必须整体撤销本slice的request-aware local seam、family pass-through、tests与
+  canonical docs，同时保留Quality/Turbo profile/workflow bytes、historical evidence与其它 Providers。
 - 已经durable begin的attempt只能走existing explicit recovery；不得改写为另一lane或Provider。
 
 ## Design Decisions
@@ -302,7 +303,7 @@ remint permit或手工激活 output。
 - Router selects；family aggregates and identity-dispatches；selected child executes；committer persists；
 - no ranking、no fallback、no runtime availability selection；
 - local与remote seams保持分离；
-- current assembly尚未闭合，是future implementation blocker；
+- family与pure Registry-to-Service assembly contract已闭合；concrete product caller仍需显式lookup/injection；
 - live/media/quality均需要独立evidence。
 
 修改 Seedance/Hailuo/其它Provider本身、引入global catalog、automatic assembly、cross-provider ranking/

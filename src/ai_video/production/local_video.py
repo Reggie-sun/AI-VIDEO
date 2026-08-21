@@ -328,6 +328,8 @@ class LocalVideoProvider(Protocol):
         self, request: ResolvedVideoGenerationRequest
     ) -> VideoGenerationPreview: ...
 
+    def preflight(self, request: ResolvedVideoGenerationRequest) -> None: ...
+
     def submit_local(
         self,
         request: ResolvedVideoGenerationRequest,
@@ -337,11 +339,14 @@ class LocalVideoProvider(Protocol):
     ) -> LocalVideoSubmitResult: ...
 
     def get_local_status(
-        self, submission: LocalVideoSubmission
+        self,
+        request: ResolvedVideoGenerationRequest,
+        submission: LocalVideoSubmission,
     ) -> LocalVideoTaskObservation: ...
 
     def fetch_local(
         self,
+        request: ResolvedVideoGenerationRequest,
         submission: LocalVideoSubmission,
         observation: LocalVideoTaskObservation,
         sink: BinaryIO,
