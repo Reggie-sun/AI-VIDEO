@@ -131,6 +131,7 @@ class RouterAssetIdentity(_RouterModel):
         "character_reference",
         "scene_reference",
         "first_frame",
+        "last_frame",
         "continuity_terminal",
         "reference_video",
         "reference_audio",

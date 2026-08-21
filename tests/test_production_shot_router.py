@@ -1503,6 +1503,19 @@ def test_router_models_are_strict_and_immutable() -> None:
         context.target_shot_revision = 4
 
 
+def test_router_context_accepts_explicit_optional_last_frame() -> None:
+    last_frame = _asset("last_frame", "planned-endpoint", HASH_E)
+
+    context = _context(
+        motion=MotionRequirement.CHARACTER_ACTION,
+        important=False,
+        keyframe=_asset("first_frame", "opening", HASH_D),
+        last_frame=last_frame,
+    )
+
+    assert context.last_frame == last_frame
+
+
 def test_router_exposes_prompt_free_provider_bound_projection_contract() -> None:
     from ai_video.production import shot_router
 
