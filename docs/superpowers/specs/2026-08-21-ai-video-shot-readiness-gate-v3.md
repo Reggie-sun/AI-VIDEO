@@ -2,137 +2,249 @@
 
 ## Status
 
-Proposed v3; documentation-only specification. Runtime implementation is not included in this migration.
+Proposed v3 contract repair；documentation-only。本文件对齐当前已实现的
+`video-planner/3`、plan 内嵌 `ProviderNeutralVideoRequirement` 与
+`VerifiedGenerationRequirementProjection` truth。本 slice 不实现 runtime、不运行
+Provider、不生成或分析媒体，也不构成 generation、activation、Review、quality 或
+Final Acceptance evidence。
 
-This document consolidates the former `docs/specs/shot-quality-gate/` v3 bundle. The source bundle is intentionally removed after migration so this file is the single Superpowers-format spec for the slice.
+配套 implementation plan：
+`docs/superpowers/plans/2026-08-21-ai-video-shot-readiness-gate-v3.md`。
+
+## Problem Boundary
+
+当前 `require_current_video_plan()` 已经同时承担两类责任：
+
+1. 验证 current `VideoPlanningRequest`、`VideoGenerationPlan`、内嵌 requirement 与
+   `VerifiedGenerationRequirementProjection` 的 exact freshness lineage；
+2. 决定 plan eligibility、required-asset readiness 与 downstream STOP。
+
+前者属于 Planning freshness boundary，后者应收敛为一个明确的 pre-submit readiness
+owner。旧 ShotReadinessGate spec 仍固定 `video-planner/2` 并把 plan 作为
+`plan_hint` 交给下游；这与 current v3 code 和 tests 冲突。修复目标不是新增一套
+Planner 或 post-fetch QA，而是保留 Planning freshness verifier/issuer，并把唯一
+`READY/BLOCKED` decision 移交 `ShotReadinessGate`。
 
 ## Goal
 
-Define one pure, deterministic, provider-neutral pre-submit `ShotReadinessGate` that:
+定义一个 pure、deterministic、provider-neutral 的 pre-submit
+`ShotReadinessGate`：
 
-- consumes an accepted sealed `VideoPlanningRequest` and its `VideoGenerationPlan` without re-deriving Planner truth;
-- verifies current request/plan binding and only the asset roles already declared by the plan;
-- returns complete typed diagnostics with true discriminated payload binding;
-- enforces Main Agent STOP semantics before Router, Provider, materializer, composition, or render side effects;
-- leaves Production, Review, Registry, Manifest, timeline, renderer, Provider, and activation ownership unchanged.
+- 只消费 current planning inputs及 Planning-owned verified freshness outcome，不独立
+  推导 generation mode、continuity、motion、required roles、capabilities 或 requirement；
+- exact 绑定 v3 request、plan、plan 内嵌 requirement 与
+  `VerifiedGenerationRequirementProjection`；
+- 对 plan eligibility 与 plan-declared required assets 产生完整 typed diagnostics；
+- 在 Router、compiler、Provider、materializer、composition 或 render 之前执行 STOP；
+- `READY` 仅返回 existing downstream 所需的 verified requirement projection，不返回
+  plan hint，也不改变任何 Production lifecycle owner。
 
-The gate is structural/current-plan readiness only. It does not detect identity drift, continuity quality, motion naturalness, subjective visual quality, or Final Acceptance.
-
-## Current Runtime Truth
-
-The accepted source surface already exposes a sealed `VideoGenerationPlan` and `require_current_video_plan()` consumer. The current consumer validates request/plan seals, deterministic plan identity, source request hash, target Shot identity, plan outcome, unresolved human review, and required asset readiness before the existing Production handoff.
-
-The current production source also establishes the post-fetch owner boundary:
-
-- `VideoFetchReceipt` and `LocalVideoFetchReceipt` validate `fetch_fingerprint` during construction/reopen;
-- `VideoFetchReceipt.create()` validates the fetched content type against `VideoSubmission.expected_content_type`;
-- `FetchedVideoCandidate` carries only `relative_path` and a typed receipt, not a submission projection or subjective media evidence;
-- activation is performed by `prepare_video_activation_candidate()` followed by `activate_video_candidate()`.
-
-Therefore v3 removes the duplicate post-fetch `VideoQualityGate`, does not import Provider/lifecycle modules, and adds no committer or Manifest hash field.
+Gate 只回答“这个 current v3 plan 是否具备进入既有下游 gates 的结构条件”。它不检测
+identity drift、motion naturalness、continuity quality、blur、sharpness、分辨率偏好、
+subjective picture quality 或 Final Acceptance。
 
 ## Scope
 
-### In scope
+### In Scope
 
-- one-Shot current-plan readiness;
-- exact request/plan/Shot binding;
-- plan-declared required-asset readiness;
-- frozen strict models, deterministic semantic hashes, and discriminated outcomes;
-- Main Agent STOP and compatibility migration from `require_current_video_plan()`;
-- import/no-IO/no-Provider/no-writer architecture boundaries;
-- future Harness routing contract and requirements-to-tests traceability.
+- one-Shot、new-attempt、pre-submit structural readiness；
+- current v3 request/plan/requirement/projection exact binding与freshness；
+- plan outcome、unresolved human review与plan-declared required assets；
+- frozen strict models、deterministic hashes、discriminated diagnostics与typed STOP；
+- `require_current_video_plan()` compatibility façade migration；
+- historical v2 reopen compatibility与new-attempt rejection boundary；
+- cycle-safe single required-asset readiness owner；
+- import/no-IO/no-writer boundaries、focused tests、Harness routing与rollback。
 
-### Non-goals
+### Out of Scope
 
-- Planner strategy, continuity, motion, capability, or fallback re-derivation;
-- natural-language complexity or token heuristics;
-- identity drift, face/wardrobe similarity, action naturalness, scene consistency, frame diversity, blur, resolution preference, or subjective quality;
-- fetch receipt/content-type revalidation already owned by typed constructors and fetch owners;
-- Provider selection, ranking, submit, poll, fetch, retry, repair, or fallback execution;
-- Manifest/Registry/dependency/timeline/render writes, activation, recovery, or durable readiness evidence;
-- new CLI, dependency, Provider, renderer, timeline, writer, automatic repair, or acceptance path;
-- changes to P6 Review/Repair or the human Pilot Reality Gate.
+- 在 Gate 内重新实现、直接运行或复制 Planner semantic derivation；Planning freshness
+  verifier为验证unique current derivation而复用current `VideoPlanner`的既有行为保持不变；
+- Router capability matching、Provider/profile selection、compiler expression或fallback；
+- submit、poll、fetch、retry、media validation、candidate activation或repair；
+- Manifest、Registry、Dependency Graph、committer、recovery、timeline或renderer changes；
+- P6 Review/Repair、human Pilot Reality Gate、Final Acceptance或post-fetch
+  `VideoQualityGate`；
+- `seed=None` compiler/ComfyUI fix、Local H3 rerun、Candidate 2/3或任何 live experiment；
+- new dependency、CLI、schema、artifact layout、durable readiness receipt或第二 writer。
 
-## Ownership Model and Invariants
+## Runtime Truth to Preserve
 
-| Concern | Sole owner |
-| --- | --- |
-| Character / Scene / Shot truth | `ProductionProject` creative artifacts |
-| Asset identity, provenance, and active binding | Asset Registry and canonical Shot roles |
-| Strategy, continuity, motion, required roles, and capabilities | `VideoPlanner` |
-| Current-plan eligibility and pre-submit STOP | `ShotReadinessGate` |
-| Provider selection, execution, and fetched candidate lifecycle | Existing AI-VIDEO Router / Provider / `ProductionStateCommitter` |
-| Manifest writes, activation, and recovery | `ProductionStateCommitter` |
-| Timing and render | `ResolvedTimeline` and HyperFrames |
-| Semantic/perceptual QA and Final Acceptance | P6 Review/Repair and human Pilot Reality Gate |
+- `VideoPlanner.CONTRACT_VERSION == "video-planner/3"`。
+- New v3 plan必须内嵌一个 `ProviderNeutralVideoRequirement`，并禁止 serialized
+  `generation_mode`、`continuity_mode`、`motion_requirement`、
+  `required_asset_roles` 与 `capability_requirements` duplicate truth。
+- Current Planning boundary验证 request seal、plan seal、unique current derivation、
+  plan/source/Shot lineage、embedded requirement evidence，并返回
+  `VerifiedGenerationRequirementProjection`。
+- `prepare_shot_for_existing_production()` currently hands off
+  `current_shot` 与 `generation_requirement`；`plan_hint` 已退休且不得恢复。
+- Router只消费 verified requirement projection，独占 exact Provider/profile/capability
+  selection；compiler只做 deterministic native expression。
+- Historical `video-planner/2` request/plan仍可按原 bytes parse/reopen，但不能签发 v3
+  verified projection，也不能创建 new attempt。
 
-The gate must remain pure and provider-neutral. It must not read canonical stores, write evidence, activate a candidate, or accept quality. Production code must not reverse-import `ai_video.quality_gates`.
+## Ownership and Invariants
+
+| Concern | Sole owner | Gate rule |
+| --- | --- | --- |
+| Character / Scene / Shot truth | `ProductionProject` creative artifacts | read projected identities only |
+| Plan and embedded requirement derivation | `VideoPlanner` | do not reconstruct or reinterpret |
+| Current plan/requirement freshness projection | Planning pure verifier | emit verified projection or typed verification failure；no readiness verdict |
+| Required-asset role semantics | one cycle-safe pure Planning helper | Planner and Gate reuse the same implementation |
+| Pre-submit readiness and STOP | `ShotReadinessGate` | sole `READY/BLOCKED` decision owner |
+| Provider/profile/capability selection | Shot Router | unchanged；no fallback |
+| Submit/fetch/activation/recovery | existing Provider lifecycle and `ProductionStateCommitter` | zero calls on BLOCKED |
+| Timing/render | `ResolvedTimeline` and HyperFrames | unchanged |
+| Semantic/perceptual QA and acceptance | P6 Review/Repair and human Pilot Reality Gate | forbidden Gate scope |
+
+The Gate and shared helpers must remain pure：no filesystem、network、environment、secret、
+clock、randomness、Provider、Registry lookup、Manifest write或media access。Production modules
+must not reverse-import readiness models to decide lifecycle state。
+
+## Planning Freshness Seam
+
+Implementation extracts the existing structural verifier from
+`require_current_video_plan()` into one Planning-owned pure function. Logical result：
+
+```text
+CurrentPlanProjectionVerification
+  = VerifiedGenerationRequirementProjection
+  | CurrentPlanProjectionFailure
+```
+
+`CurrentPlanProjectionFailure`是Planning-internal、frozen、strict typed diagnostic，包含
+ordered `reason_codes`与ordered `field_paths`。Its reason vocabulary is fixed to：
+
+```text
+LEGACY_CONTRACT
+REQUEST_SEAL_INVALID
+PLAN_SEAL_INVALID
+PLAN_NOT_UNIQUE_CURRENT_DERIVATION
+PLAN_ID_INVALID
+SOURCE_REQUEST_STALE
+TARGET_SHOT_STALE
+EMBEDDED_REQUIREMENT_MISSING
+EMBEDDED_REQUIREMENT_STALE
+VERIFIED_PROJECTION_INVALID
+```
+
+The verifier collects every independently evaluable failure rather than returning free-form
+first-error text；dependent checks that cannot be evaluated remain explicitly false in the Gate's
+binding payload。The failure object is not exported as a production handoff and cannot authorize
+Router entry。
+
+This verifier preserves the current checks：
+
+1. request and plan are both `video-planner/3`；
+2. request semantic seal is valid；
+3. plan semantic seal and deterministic `plan_id` are valid；
+4. the plan is the unique current `VideoPlanner` derivation for the request；
+5. source request and target Shot id/revision/content hash match exactly；
+6. the embedded requirement exists and its seal、source request、intent evidence、typed
+   generation intent、Scene、Character、asset evidence与Review evidence are current；
+7. the resulting projection seal and request/plan/requirement/Shot lineage are exact。
+
+The verifier does not decide `READY`、plan eligibility或required-asset readiness。The Gate
+does not implement a second derivation algorithm；it consumes this Planning-owned result and
+turns verification failure into binding diagnostics。Only `READY` may expose the verified
+projection to downstream code。
 
 ## Request Contract
 
 ```python
 class ShotReadinessRequest(StrictModel):
-    request_id: str                 # diagnostic only
+    request_id: str  # diagnostic only
     current_request: VideoPlanningRequest
     plan: VideoGenerationPlan
     contract_version: Literal["shot-readiness-gate/1"]
     request_content_hash: str
 ```
 
-All models are frozen, strict, and `extra="forbid"`. `ShotReadinessRequest.create()` computes `request_content_hash` from exactly:
+All models are frozen、strict、`extra="forbid"`。`create()` computes
+`request_content_hash` from exactly：
 
 ```python
 {
     "contract_version": "shot-readiness-gate/1",
     "current_request_content_hash": current_request.request_content_hash,
     "plan_hash": plan.plan_hash,
+    "embedded_requirement_hash": (
+        plan.generation_requirement.requirement_hash
+        if plan.generation_requirement is not None
+        else None
+    ),
 }
 ```
 
-Neither the outer `request_id` nor nested `VideoPlanningRequest.request_id` participates. Evaluation must recompute this outer seal even for an already-constructed model, and must independently validate both nested planner seals.
+Outer `request_id` 与 nested `VideoPlanningRequest.request_id`不参与 hash。Evaluation必须
+重算 outer seal，即使对象由 `model_copy()` 或低层构造绕过 validation。
 
-## Result Contract
+`VerifiedGenerationRequirementProjection`不是 caller-supplied hint。它只能由上述 Planning
+freshness verifier产生，并在 Gate `READY` result中返回；这样不存在 plan 与 projection
+分别替换或 independently trusted 的双输入路径。
 
-The result has only `READY` and `BLOCKED` statuses and exactly three outcomes in this order:
+## Result and Diagnostics Contract
 
-1. `request_plan_binding`;
-2. `plan_eligibility`;
-3. `required_asset_readiness`.
+```text
+ShotReadinessResult
+  status: READY | BLOCKED
+  checks: exactly three ordered discriminated outcomes
+  verified_generation_requirement: VerifiedGenerationRequirementProjection | None
+  result_hash: SHA-256
+```
 
-Each check id has its own frozen payload and `Literal`-bound outcome model. The union uses `Field(discriminator="check_id")`; wrong check/payload combinations must fail validation. The result hash is the canonical hash of the result excluding only `result_hash`, and the result carries no diagnostic request id.
+Checks始终按下列顺序出现：
 
-### Binding payload
+1. `request_plan_binding`；
+2. `plan_eligibility`；
+3. `required_asset_readiness`。
 
-`RequestPlanBindingPayload` reports validity of the outer readiness seal, nested request seal, plan seal, deterministic plan id, source request match, target Shot id/revision/content hash, and supported contract versions.
+Each check id has its own frozen payload and `Literal`-bound outcome model。Union使用
+`Field(discriminator="check_id")`；wrong check/payload组合必须 validation fail。每个
+outcome包含 ordered typed reason codes，不依赖自由文本匹配。Required codes：
 
-### Eligibility payload
+| Code | Meaning |
+| --- | --- |
+| `READINESS_REQUEST_SEAL_INVALID` | outer readiness seal无效 |
+| `LEGACY_PLANNER_REOPEN_ONLY` | v2只允许historical reopen，不能进入new attempt |
+| `CURRENT_PLAN_PROJECTION_INVALID` | Planning freshness verifier拒绝request/plan/requirement lineage |
+| `VERIFIED_PROJECTION_BINDING_INVALID` | emitted projection seal或request/plan/requirement/Shot binding不一致 |
+| `PLAN_BLOCKED` | Planner outcome为`BLOCKED` |
+| `HUMAN_REVIEW_UNRESOLVED` | `REQUIRES_HUMAN_REVIEW`仍存在 |
+| `REQUIRED_ASSET_MISSING` | 一个或多个plan-declared roles不满足current exact binding |
 
-`PlanEligibilityPayload` reports `plan_outcome`, unresolved `REQUIRES_HUMAN_REVIEW`, and the original planner warnings. The gate does not reinterpret Planner reasons or confidence.
+Binding payload必须显式报告 outer seal、request seal、plan seal、current v3 contract、
+unique derivation、source request、target Shot、embedded requirement和verified projection
+binding status。Eligibility payload原样报告 `plan.outcome`、warnings和unresolved review，
+不重解释 Planner reasons/confidence。Asset payload报告 ordered required、ready与missing
+roles，只检查 `plan.required_asset_roles` compatibility property投影的角色。
 
-### Asset payload
+`verified_generation_requirement`仅在 `status == READY` 时存在，并且必须同时等于
+Planning verifier output、绑定 `plan.plan_hash`、包含与
+`plan.generation_requirement`相同的 requirement、绑定 current request hash与exact Shot
+identity。`BLOCKED` result中该字段必须为 `None`，防止 diagnostic result成为下游 bypass。
 
-`RequiredAssetReadinessPayload` reports the plan's ordered required roles, ready roles, and missing roles. It checks only roles present in `plan.required_asset_roles` and never invents additional roles.
+`result_hash`覆盖除自身外的完整 result。Result不保存 diagnostic request id、Provider
+identity、receipt path、lifecycle phase或quality verdict。
 
 ## Deterministic Evaluation
 
-`ShotReadinessGate.evaluate()` always emits all three checks; it does not short-circuit diagnostics. Downstream work is nevertheless forbidden until `require_ready(result)` succeeds.
+`ShotReadinessGate.evaluate()` always emits all three checks and does not short-circuit
+diagnostics。Untrusted plan fields may be reported for diagnostics, but cannot yield a top-level
+verified projection unless binding check passes。
 
-### Request/plan binding
+### 1. Request/Plan/Requirement/Projection Binding
 
-The gate independently verifies:
+- recompute outer readiness seal；
+- invoke the sole Planning freshness verifier；
+- reject v2 with `LEGACY_PLANNER_REOPEN_ONLY` and do not auto-convert it；
+- when verification succeeds, independently validate projection seal and exact equality among
+  request hash、plan hash、embedded requirement hash、projection requirement、target Shot
+  id/revision/content hash；
+- never call Router、compiler、Provider或Production lifecycle。
 
-1. outer readiness hash against the exact semantic projection above;
-2. current planner request semantic seal;
-3. plan semantic seal;
-4. `plan_id == f"plan-{plan.source_request_content_hash[:24]}"`;
-5. `plan.source_request_content_hash == current_request.request_content_hash`;
-6. exact target Shot id, revision, and content hash;
-7. both contracts are `video-planner/2`.
-
-Any false value blocks with ordered typed reasons. The gate never calls `VideoPlanner.plan()` and never reconstructs strategy, continuity, motion, reasons, or capabilities.
-
-### Plan eligibility
+### 2. Plan Eligibility
 
 ```text
 plan.outcome == BLOCKED                 -> BLOCKED / PLAN_BLOCKED
@@ -140,195 +252,197 @@ REQUIRES_HUMAN_REVIEW remains present  -> BLOCKED / HUMAN_REVIEW_UNRESOLVED
 otherwise                              -> PASS
 ```
 
-Resolved audit warnings remain visible but do not create a second policy.
+Resolved audit warnings remain visible but do not create a second policy。
 
-### Required asset readiness
+### 3. Required-Asset Readiness
 
-Use one shared pure role-readiness seam for the existing semantics:
+Gate只检查 plan-declared roles，并复用 Planner同一个cycle-safe pure helper：
 
-- Character reference owner matches a current target-Shot Character;
-- Scene reference owner matches the target Scene;
-- previous terminal matches both current previous-Shot identity and terminal asset id;
-- approved keyframe/reusable plate has the exact target-Shot final-visual binding and required current Review projection.
+- Character reference owner集合exact匹配target Shot Character集合；
+- Scene reference owner exact匹配target Scene；
+- previous terminal exact匹配previous Shot identity与declared terminal asset id；
+- approved keyframe/reusable plate exact匹配target Shot final-visual binding与current Review
+  projection；
+- selected existing video/audio reference exact匹配typed media selection；
+- last-frame role遵循current Planner semantics。
 
-Wrong owner, wrong binding, or missing role is `REQUIRED_ASSET_MISSING`. The gate does not inspect Registry files or treat a Character/Scene reference as a Final Shot Visual.
+Wrong owner、wrong content binding、ambiguous selection、missing role或missing current Review
+均为 `REQUIRED_ASSET_MISSING`。Gate不得新增隐式角色，不得读取 Registry，也不得把
+Character/Scene reference当成Final Shot Visual。
 
 ### Aggregation and STOP
 
 ```text
-any check BLOCKED -> result BLOCKED
-all checks PASS   -> result READY
+any check BLOCKED -> result BLOCKED, verified projection None
+all checks PASS   -> result READY, exact verified projection present
 ```
 
-`require_ready()` rejects an invalid or blocked result with `AiVideoError(ErrorCode.PLANNING_PREFLIGHT_BLOCKED, retryable=False)`. The compatibility `require_current_video_plan()` delegates to this single decision owner while preserving its public signature and error behavior. `prepare_shot_for_existing_production()` keeps its public route.
+`require_ready(result)` returns `VerifiedGenerationRequirementProjection` only for a valid
+`READY` result。Otherwise it raises
+`AiVideoError(ErrorCode.PLANNING_PREFLIGHT_BLOCKED, retryable=False)`，并在
+`technical_detail`中使用stable typed reason codes。
 
-On a block, Router, Provider, placeholder/materializer, composition, and render call counts must remain zero. `READY` authorizes only entry into existing Production gates; it is not generation, selection, activation, Review PASS, human creative PASS, or Final Acceptance.
+On `BLOCKED`，Router、compiler、Provider、placeholder/materializer、composition、render、
+Manifest、Registry与committer call counts必须为0。`READY`仅允许进入已有Router及后续
+gates；它不等于routing selection、generation、fetch、activation、Review PASS、human
+creative PASS或Final Acceptance。
 
-## Import, Side-Effect, and Lifecycle Boundary
+## Compatibility Migration
 
-The future package may contain:
+### `require_current_video_plan()`
 
-```text
-src/ai_video/quality_gates/
-├── __init__.py
-├── _readiness_models.py
-└── shot_readiness_gate.py
-```
-
-Allowed imports are typed planning contracts, the shared pure planning asset-readiness seam, read-only schema/hash helpers, `ai_video.errors`, the standard library, and pydantic. Forbidden imports include Provider adapters, `production.video_generation`, `local_video`, lifecycle/committer modules, Manifest, Registry, dependency, timeline, renderer, Review, CLI/transports, filesystem/network/environment/secret APIs, and media access.
-
-v3 adds no `VersionedArtifact`, receipt id/path, Manifest pointer, `VideoGenerationAttemptState` field, committer parameter, schema version, activation rule, or recovery behavior. Any durable readiness evidence is a separate migration requiring schema version, reopen, compatibility, recovery, replay, invalidation, and exact writer contracts.
-
-## Post-Fetch Owner Audit
-
-No `VideoQualityGate` exists in v3.
-
-| Rejected v2 check | Existing owner | v3 decision |
-| --- | --- | --- |
-| fetch fingerprint | typed receipt validators and reopen | remove |
-| submission/observation linkage | receipt constructor, fetch owner, committer | remove |
-| artifact SHA/size linkage | typed fields and committer byte verification | remove |
-| expected content type | `VideoSubmission` + `VideoFetchReceipt.create()` | remove |
-| identity/continuity/motion/visual quality | P6 Review / Pilot and typed continuity owners | forbidden scope |
-
-The remote receipt has only `submission_fingerprint`, so a pure gate cannot recover `expected_content_type` without IO or a new projection. A future post-fetch structural projection requires a concrete non-duplicated gap and fully projected provider-neutral input schema.
-
-## Main Agent Integration
+Public signature and return type remain：
 
 ```python
-current_request = VideoPlanningRequest.create(
-    request_id="planner-shot-7-current",
-    target_shot=current_shot,
-    character_context=current_characters,
-    scene_context=current_scene,
-    available_assets=current_assets,
-    previous_shot_state=current_previous_state,
-    shot_intent_evidence=current_intent_evidence,
-    review_decision=current_review_projection,
-    production_policy=current_policy,
-    planning_contract_version="video-planner/2",
-)
-plan = VideoPlanner().plan(current_request)
-readiness_request = ShotReadinessRequest.create(
-    request_id="readiness-shot-7-attempt-1",
+def require_current_video_plan(
+    *, current_request: VideoPlanningRequest, plan: VideoGenerationPlan
+) -> VerifiedGenerationRequirementProjection: ...
+```
+
+Its old decision body is retired。The façade creates/evaluates
+`ShotReadinessRequest`，calls `require_ready()`，and returns that exact projection。It must not
+retain parallel plan-outcome、warning或required-asset checks。
+
+`prepare_shot_for_existing_production()` keeps its public route and handoff：
+
+```python
+projection = require_current_video_plan(
     current_request=current_request,
     plan=plan,
-    contract_version="shot-readiness-gate/1",
 )
-result = ShotReadinessGate().evaluate(readiness_request)
-require_ready(result)
-existing_handoff(current_shot=current_request.target_shot, plan_hint=plan)
+return production_handoff(
+    current_shot=current_request.target_shot,
+    generation_requirement=projection,
+)
 ```
 
-For stale/blocked input, the Main Agent rebuilds the current planning projections and evaluates a fresh request. It must not mutate the ephemeral result, retry a Provider, repair, or persist gate state. Existing downstream ownership remains:
+`plan_hint` is forbidden in implementation、tests、examples和handoff kwargs。
+
+### Historical `video-planner/2`
+
+- Preserve byte-identical v2 request/plan parse、hash fixture与historical reopen behavior。
+- Do not add generation requirement or verified projection fields to v2 serialization。
+- The readiness/new-attempt boundary always emits `LEGACY_PLANNER_REOPEN_ONLY` and STOP for
+  v2；caller must rebuild a current v3 request from canonical inputs。
+- No automatic v2→v3 conversion、hash rewrite、dual-readiness path或legacy new-attempt
+  exception is allowed。
+
+## Import and Module Boundary
+
+Planned cohesive layout：
 
 ```text
-existing Router / Provider
-  -> submit / poll / fetch
-  -> typed receipt + committer durable linkage
-  -> prepare_video_activation_candidate
-  -> activate_video_candidate
-  -> composition / render
-  -> P6 Review / Repair
-  -> human Pilot Reality Gate / Final Acceptance
+src/ai_video/planning/_asset_readiness.py
+src/ai_video/quality_gates/__init__.py
+src/ai_video/quality_gates/_readiness_models.py
+src/ai_video/quality_gates/shot_readiness_gate.py
 ```
 
-## Requirements and Traceability
+`_asset_readiness.py` becomes the sole owner of current role/owner/final-visual/media-selection
+semantics and is consumed by both `VideoPlanner` and the Gate。It imports no Gate、Router、
+Provider、writer或lifecycle module。
 
-| Requirement | Design | Task | Tests | Integration |
-| --- | --- | --- | --- | --- |
-| R-01 request/plan binding | D-02, D-04.1 | T1–T2 | TC-01–TC-05 | INT-01–INT-02 |
-| R-02 plan eligibility | D-04.2 | T3 | TC-06–TC-07 | INT-01–INT-02 |
-| R-03 required assets | D-04.3 | T4 | TC-08–TC-10 | INT-03 |
-| R-04 discriminated outcomes | D-03 | T1, T5 | TC-11–TC-13 | INT-01–INT-03 |
-| R-05 deterministic hashing | D-02–D-03 | T1, T5 | TC-14 | INT-01 |
-| R-06 binary STOP | D-05 | T5–T6 | TC-15–TC-17 | INT-02, INT-04 |
-| R-07 single owner | D-05 | T6 | TC-15–TC-17 | INT-04 |
-| R-08 pure boundary | D-06 | T7 | TC-18 | INT-04 |
-| R-09 no persistence | D-08 | T7 | TC-20 | INT-04 |
-| R-10 post-fetch audit | D-09 | T7 | TC-20 | INT-04 |
-| R-11 Harness routing | D-07 | T7–T8 | TC-19 | INT-04 |
-| R-12 terminology boundary | D-01, D-10 | T8 | TC-20 | INT-01–INT-04 |
+The Gate may import planning contracts、the Planning freshness verifier、the shared asset helper、
+cycle-neutral requirement projection models、canonical hashing、`ai_video.errors`、pydantic and
+the standard library。Forbidden imports include Router、Provider adapters、
+`production.video_generation`、local/cloud video adapters、committer/lifecycle、Manifest、
+Registry、dependency、timeline、renderer、Review、CLI/transports、filesystem/network/environment/
+secret/media APIs。
 
-## Implementation Tasks
+`video_planner.py` uses a function-local import for the compatibility façade if needed to avoid
+module initialization cycles；architecture/import tests must prove importing either package does
+not execute IO or create a reverse Production dependency。
 
-Exactly eight tasks are planned:
+## Harness Routing and Test Contract
 
-- **T1 — RED models, discrimination, and hashing:** add strict/frozen models, exact semantic projection, discriminated outcomes, and result validation; cover TC-11–TC-14.
-- **T2 — Request/plan binding:** implement independent seal, identity, version, and deterministic plan-id checks; cover TC-01–TC-05.
-- **T3 — Plan eligibility:** consume only outcome and warnings; cover TC-06–TC-07.
-- **T4 — Required asset readiness:** extract the existing pure role-readiness helpers into one cycle-safe shared owner; cover TC-08–TC-10.
-- **T5 — Evaluation and `require_ready`:** emit all checks, aggregate binary status, and preserve typed STOP conversion; cover TC-15 and validator branches.
-- **T6 — Compatibility migration:** delegate `require_current_video_plan()` and retire the duplicate decision body while preserving handoff behavior; cover TC-16–TC-17.
-- **T7 — Architecture and Harness routing:** add import/no-IO tests and the future policy category/check mapping, including the existing `video_planning.check_ids` overlap; cover TC-18–TC-20.
-- **T8 — Exact snapshot verification:** run focused tests, exact staged/commit-range Harness verification, receipt validation, link/anchor checks, and final review.
-
-## Test Contract
-
-The future runtime tests use `python -m pytest -p no:cacheprovider` and contain exactly TC-01–TC-20:
-
-| Cases | Contract |
-| --- | --- |
-| TC-01–TC-05 | current request/plan, outer/nested seal, plan id, stale source, and Shot identity binding |
-| TC-06–TC-07 | planner-blocked and unresolved human-review eligibility |
-| TC-08–TC-10 | missing, wrong-owner, wrong-final-visual, and wrong-terminal assets |
-| TC-11–TC-14 | discriminated payloads, exact result structure, contradiction rejection, diagnostic hash exclusion |
-| TC-15–TC-17 | forged/blocked result STOP, zero downstream calls, ready handoff exactly once |
-| TC-18–TC-20 | import/no-side-effect boundary, Harness routing, owner/terminology audit |
-
-Focused command for the future runtime slice:
-
-```bash
-python -m pytest -p no:cacheprovider \
-  tests/test_shot_readiness_gate.py \
-  tests/test_planning_video_planner.py \
-  tests/test_errors.py -q
-```
-
-Final acceptance must use the policy-routed exact staged snapshot or exact commit range. No live Provider, ComfyUI, network, secret, media generation, ffmpeg quality analysis, or browser test belongs to this pure backend slice.
-
-## Harness Routing Contract
-
-The later runtime implementation must update `.agent/harness/policy.yaml` and Harness tests in the same change. The planned focused check is:
+Future implementation adds a focused check：
 
 ```yaml
 shot_readiness_gate_tests:
   argv: [python, -m, pytest, -p, no:cacheprovider,
          tests/test_shot_readiness_gate.py,
          tests/test_planning_video_planner.py,
+         tests/test_production_video_requirement.py,
          tests/test_errors.py, -q]
 ```
 
-The future `shot_readiness_gate` category maps `src/ai_video/quality_gates/**`, its fixture, and its tests to `shot_readiness_gate_tests` plus `task_architecture_gate`. Because T6 changes the planning compatibility seam, the existing `video_planning.check_ids` must also include `shot_readiness_gate_tests`. This v3 documentation migration does not edit runtime policy.
+Future category `shot_readiness_gate` maps `src/ai_video/quality_gates/**`、
+`src/ai_video/planning/_asset_readiness.py`与`tests/test_shot_readiness_gate.py` to
+`shot_readiness_gate_tests` + `task_architecture_gate`。Because the compatibility façade and
+Planning helper change, existing `video_planning.check_ids` must also include
+`shot_readiness_gate_tests`。`.agent/harness/policy.yaml` and Harness routing tests change in the
+same implementation commit；this docs slice does not edit runtime policy。
 
-## Acceptance
+Focused future command：
 
-- one Superpowers-format spec is the sole documentation truth for this slice;
-- exactly R-01–R-12, D-01–D-10, T1–T8, TC-01–TC-20, and INT-01–INT-04 remain traceable;
-- no post-fetch `VideoQualityGate`, committer hash field, Manifest migration, Provider import, or quality claim is introduced;
-- the future implementation has one readiness algorithm and preserves existing STOP/error/handoff contracts;
-- independent review has no blocker and exact-snapshot Harness verification is fresh, passed, integrity-valid, policy-valid, and snapshot-valid.
+```bash
+python -m pytest -p no:cacheprovider \
+  tests/test_shot_readiness_gate.py \
+  tests/test_planning_video_planner.py \
+  tests/test_production_video_requirement.py \
+  tests/test_errors.py -q
+```
 
-## Deferred Slices
+Integration STOP seam：
 
-### D1 — Provider-Neutral Post-Fetch Structural Projection
+```bash
+python -m pytest -p no:cacheprovider \
+  tests/test_shot_readiness_gate.py \
+  tests/test_planning_video_planner.py \
+  tests/test_production_shot_router.py \
+  tests/test_production_video_requirement.py \
+  tests/test_production_video.py \
+  tests/test_errors.py -q
+```
 
-Do not start until a concrete structural fact is demonstrated to be outside typed receipt construction, fetch owner, committer, candidate validation, and P6 Review. The input must be fully projected and provider-neutral; it must not infer a submission from `submission_fingerprint`.
+Final implementation acceptance must use the policy-routed exact staged snapshot or exact commit
+range and a fresh self-verified Harness receipt。No Provider、ComfyUI、network、secret、media、
+ffmpeg quality analysis or browser test belongs to this pure backend slice。
 
-### D2 — Durable Readiness Evidence Migration
+## Requirements and Acceptance
 
-Requires explicit approval and a complete Manifest schema/version, writer, path/layout, content-addressing, reopen, compatibility, recovery/crash-window, replay, invalidation, and activation contract. An optional hash field is not migration-free.
-
-Identity drift, continuity quality, motion naturalness, subjective picture quality, Final Acceptance, and automatic repair remain with existing Review/Pilot/Repair owners and are not deferred gate tasks.
-
-## Risks and Rollback
-
-| Risk | Control |
+| Requirement | Acceptance evidence |
 | --- | --- |
-| second readiness algorithm | compatibility wrapper delegates; old decision body is retired |
-| gate re-derives Planner truth | gate consumes only sealed plan outcome/warnings/required roles |
-| `READY` is mistaken for quality acceptance | binary eligibility wording and lifecycle/acceptance field prohibition |
-| diagnostic identity changes semantics | explicit three-field request projection |
-| future post-fetch scope repeats an owner | D1 requires a demonstrated gap and fully projected schema |
+| R-01 exact v3 lineage | request/plan/requirement/projection seal and mutation matrix |
+| R-02 no Planner re-derivation | one Planning verifier call；no second semantic builder |
+| R-03 one readiness owner | compatibility façade has no parallel eligibility/asset body |
+| R-04 v2 compatibility | historical hashes/reopen unchanged；new-attempt typed STOP |
+| R-05 no `plan_hint` | source/test/example search and exact handoff kwargs |
+| R-06 shared asset owner | Planner and Gate import one cycle-safe helper；wrong-binding matrix |
+| R-07 typed complete diagnostics | ordered discriminated checks、stable reasons、result hash |
+| R-08 zero side effects | BLOCKED spies for Router through committer all remain zero |
+| R-09 lifecycle/quality isolation | import audit and unchanged focused P6/P8 contracts |
+| R-10 Harness truth | exact routing tests and fresh staged/commit-range receipt |
 
-The v3 document migration itself has no runtime rollback. A future implementation rollback restores the existing compatibility consumer and removes the quality-gate package/tests/policy category without changing Production schema or Manifest state.
+Implementation acceptance requires all ten requirements, independent review with no blocking
+issue, final parent diff review, and exact-snapshot Harness verification。Passing this gate proves
+only structural readiness。
+
+## Rollback
+
+This docs repair has no runtime rollback beyond reverting the two docs files。
+
+Future runtime rollback is one atomic code-unit revert：restore the previous
+`require_current_video_plan()` body、remove the Gate package/tests/policy category、and move the
+shared asset helper back only if all consumers are reverted together。There is no schema、Manifest、
+Registry、artifact-layout或durable-state migration，so no data conversion or recovery action is
+permitted。Rollback must preserve v2 reopen fixtures and must not restore `plan_hint` or open a v2
+new-attempt path。
+
+## Deferred Work and Experiment Boundary
+
+After this runtime Gate is separately implemented、reviewed、committed and verified, the independent
+`VideoGenerationRequest /5 effective_seed=None` compiler/Local H3 blocker may be diagnosed and
+fixed in its own code slice。Only after that fix is accepted may a separately authorized Local H3
+experiment be attempted。
+
+That experiment may contribute P6 Review/Pilot perceptual evidence。Its success or failure must not
+redesign ShotReadinessGate, change readiness reasons, add post-fetch quality logic, or be interpreted
+as this Gate's acceptance。Candidate 1 remains an external regression oracle for that later task；
+Candidate 2/3 and live generation are not authorized by this Spec。
+
+The preserved oracle is
+`runs/c2-alice-local-h3-quality-candidate-1-20260821/output/alice-c2-local-h3-quality-candidate-1.mp4`
+with SHA-256
+`2b02881d81b1226ab90e9791a472be7b6f02ef1b8584e5b2e1fe7d4050773de8`。This path/hash is a
+later experiment input identity only，不是readiness、quality或current media acceptance evidence。
