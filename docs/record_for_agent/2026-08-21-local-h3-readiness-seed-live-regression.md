@@ -115,3 +115,57 @@ Candidate 1 oracle保持不变：
 - 不得重用本次one-use live execution作为新submit授权。
 - 不得把run artifact、fetch成功或Registry activation称为P6 Review或Final Acceptance。
 - 后续若继续质量判断，只能把本次artifact交给existing P6 Review/Pilot或明确human review；不得让`ShotReadinessGate`承担感知质量。
+
+## Motion-Continuity Repair Follow-up
+
+上一版single-shot的two-shot review derivative在约15秒处出现明显动作突变：画面像被突然下令一样从站立直接进入坐下。该`NO-GO`是人工对motion naturalness/temporal continuity的观察，不是`ShotReadinessGate`结构性判定失败；gate仍只负责pre-submit readiness。
+
+旧review derivative保留为对照，不是canonical asset：
+
+- path：`runs/c2-alice-local-h3-t10-regression-20260821-001/review/two-shot/alice-c2-t10-two-shot-review.mp4`
+- SHA-256：`8bd153ee9b4bbf403300444d452a26c709597550386cde8577ed65c419f8274a`
+- `ffprobe`：`1344x672`、486 frames、20.320s、H.264 + AAC 32 kHz stereo
+
+经用户授权的修复实验只调整了临时请求中的动作意图与节奏描述，没有修改tracked runtime、Provider adapter、model/profile、camera lock、first-frame binding、`1344x672`、124 frames、24 fps或native audio contract。动作意图的变化是：开始时右手继续停在绿色椅背、身体保持平衡；先保留约0.75秒的细微呼吸和渐进重心转移，再缓慢拉椅、自然屈膝坐下，最后抬眼；同时把motion onset、peak、settle、amplitude、pacing cadence与tempo改为连续、受控、无突然加速。
+
+这是受控边界的重要限制：Local H3的`effective_seed`由完整`request_input_hash`机械派生，因此动作意图变化同时导致新的确定性seed，并非只改变一个变量的严格A/B。新lineage为：
+
+- experiment-bound repository commit：`dce11a2fd439ab06a5055a3ecb97a235d0332978`
+- plan hash：`a8c481326328dd98cc39224fac88ec7b872c939bef8c5f1a35ad41f6abb1af7c`
+- readiness result hash：`d6373be34e66174090f3a669ccf52094ddfb28a076dc424140ca6c1e6c4df0b8`
+- verified requirement hash：`e6b1bdc3425bcec5301ae8df212d36d704b7c1cf5d2916d46f5217b1f709c428`
+- compiled request input hash：`6953f7b94e4f0f702cbd3a9a3de95131980b3ba7a8906ac50a355fde16322670`
+- compiled seed：`None`
+- resolved generation hash：`e520956490811b166d69587859fcd85c6d0cf4b1a9f11ea4d49bce5b1a503c10`
+- effective seed：`7589682172304232304`
+- profile SHA-256：`a154259fa9530e7c2df8865539eaeeef1886c0da51385a61d02c5c93fdb1ad6d`
+
+## Follow-up Live Evidence
+
+本次只执行一个新的loopback Local H3 request，未生成Candidate 2/3：
+
+- report：`runs/c2-alice-local-h3-motion-continuity-fix-20260821-001/evidence/t10-live-report.json`
+- provider request ID：`28dc3075-9631-41f9-9c90-95a35a6fba69`
+- provider/model：`comfy-local-h3` / `minimax-h3-fl2va`
+- submit / poll / fetch：`1 / 1 / 1`
+- first-frame upload：`1`；`object_info_calls=1`；`remote_calls=0`
+- output：`runs/c2-alice-local-h3-motion-continuity-fix-20260821-001/output/alice-c2-local-h3-motion-continuity-fix-1.mp4`
+- output SHA-256：`8c0ad4591067084132db46c0001b9bb3480a3a41f982d202bd327bcd981b986d`
+- output bytes：`1,634,135`
+- activated Registry asset：`video-alice-c2-local-h3-motion-continuity-fix-1`
+- Manifest revision：`42`；explicit recovery保持`42 -> 42`；exact replay的submit/poll/fetch/upload/object-info/remote effect delta均为`0`
+- `ffprobe`：H.264 High、`1344x672`、24 fps、124 frames、5.166667s；AAC LC、32 kHz、stereo、5.167s
+
+新two-shot review derivative只用于人工检查，不修改canonical asset或Manifest：
+
+- path：`runs/c2-alice-local-h3-motion-continuity-fix-20260821-001/review/two-shot/alice-c2-motion-continuity-fix-two-shot-review.mp4`
+- SHA-256：`fa1876f7cf711ef0ac56dea23b84ab1c1a96ba65f6d844efc01d8b9c58d5e56d`
+- `ffprobe`：H.264、`1344x672`、486 frames、20.320s；AAC、32 kHz、stereo
+- exact seam sheet：`runs/c2-alice-local-h3-motion-continuity-fix-20260821-001/review/two-shot/seam-exact-frames-358-365.jpg`
+- seam sheet SHA-256：`80aa32aa3517216924f4a47aa34d1e013c8a228308341b70c188eb39ce47f010`
+
+用户观看新review derivative后明确回复“效果可以”。因此本次记录的human verdict为该exact review derivative的`GO`；它不外推为通用quality PASS、P6 Review/Pilot receipt或Final Acceptance。后续质量判断仍应交给existing P6 Review/Pilot与明确人工rubric，不能让`ShotReadinessGate`根据本次媒体结果扩张为感知质量owner。
+
+## Workspace And Publication State
+
+记录更新前branch为`main`，HEAD为`d8da18b`；实验本身绑定上面的`dce11a2` snapshot。记录写入时working tree另有未请求处理的`src/ai_video/production/seedance_asset.py`修改，以及Local H3 T8相关untracked files；本次只修改本record，不覆盖、stage或commit这些并发/用户工作。该record commit不包含Provider、seed修复、媒体生成或release/push。
