@@ -1,0 +1,43 @@
+{
+  "record_kind": "historical_quality_experience_import",
+  "schema_version": "1.0",
+  "import_id": "legacy-h3-alice-a",
+  "imported_at": "2026-08-21T13:00:00Z",
+  "source_document": "docs/record_for_agent/2026-08-20-h3-alice-quality.md",
+  "source_document_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "fields": [
+    {
+      "field_name": "effective_seed",
+      "evidence": {
+        "state": "unknown",
+        "reason": "source document does not state the effective seed"
+      }
+    },
+    {
+      "field_name": "human_verdict",
+      "evidence": {
+        "state": "incomplete",
+        "known_fragment": "local comparison preferred the quality profile",
+        "missing_fields": ["reviewer_id", "rubric_version"],
+        "source_document": "docs/record_for_agent/2026-08-20-h3-alice-quality.md",
+        "source_span": "Outcome"
+      }
+    },
+    {
+      "field_name": "paid_cost",
+      "evidence": {
+        "state": "not_applicable",
+        "reason": "the observed lane was local and unmetered"
+      }
+    },
+    {
+      "field_name": "provider_name",
+      "evidence": {
+        "state": "known",
+        "value": "comfy-local-h3",
+        "source_document": "docs/record_for_agent/2026-08-20-h3-alice-quality.md",
+        "source_span": "Provider"
+      }
+    }
+  ]
+}

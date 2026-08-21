@@ -258,6 +258,34 @@ def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
         assert path in argv
 
 
+def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/quality_intelligence/models.py",
+        "tests/test_quality_experience_dataset.py",
+        "tests/fixtures/quality_experience/v1/prospective_failure.json",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["quality_intelligence"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "quality_intelligence_tests",
+            "task_architecture_gate",
+        ]
+
+    argv = policy["checks"]["quality_intelligence_tests"]["argv"]
+    for path in (
+        "tests/test_quality_experience_models.py",
+        "tests/test_quality_experience_store.py",
+        "tests/test_quality_experience_dataset.py",
+        "tests/test_quality_experience_rag_projection.py",
+    ):
+        assert path in argv
+    assert "tests/test_agent_memory.py" in argv
+
+
 def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

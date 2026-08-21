@@ -1,0 +1,430 @@
+{
+  "record_kind": "prospective_q0_attempt",
+  "schema_version": "1.0",
+  "experiment_id": "exp-2026-08-21-pilot-a",
+  "pilot_id": "pilot_a",
+  "captured_at": "2026-08-21T12:00:00Z",
+  "repository_commit": "33beb13d5b8ae68ee109e41d2df7f186ea1f1b1b",
+  "purpose": {
+    "value": "compare local Q0 capture semantics"
+  },
+  "hypothesis": {
+    "value": "tagged evidence models preserve exact identity"
+  },
+  "capture_actor": "codex",
+  "authorization_boundary": "lab_only_pilot_v1",
+  "canonical_runtime_boundary": "production_manifest",
+  "identity": {
+    "project_artifact_id": "project_001",
+    "project_artifact_revision": 3,
+    "project_artifact_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifest_observation_revision": 5,
+    "manifest_observation_file_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "registry_observation_revision": 4,
+    "registry_observation_file_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "scene_id": "scene_001",
+    "scene_revision": 2,
+    "scene_content_hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "shot_id": "shot_001",
+    "shot_revision": 1,
+    "shot_content_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "generation_id": "gen_001",
+    "attempt_id": "attempt_001"
+  },
+  "lineage": {
+    "attempt_sequence": 1,
+    "attempt_kind": "initial",
+    "predecessor": null
+  },
+  "planning": {
+    "planning_request_hash": "0101010101010101010101010101010101010101010101010101010101010101",
+    "plan_hash": "0202020202020202020202020202020202020202020202020202020202020202",
+    "requirement_hash": "0303030303030303030303030303030303030303030303030303030303030303",
+    "readiness_request_hash": "0404040404040404040404040404040404040404040404040404040404040404",
+    "readiness_result_hash": "0505050505050505050505050505050505050505050505050505050505050505",
+    "readiness_state": "READY",
+    "check_reason_codes": [
+      "bindings_valid",
+      "requirements_present"
+    ]
+  },
+  "routing": {
+    "semantic_decision_hash": "0606060606060606060606060606060606060606060606060606060606060606",
+    "audit_decision_hash": "0707070707070707070707070707070707070707070707070707070707070707",
+    "policy_id": "router_policy_v1",
+    "policy_version": "1.0.0",
+    "policy_hash": "0808080808080808080808080808080808080808080808080808080808080808",
+    "provider_capabilities_fingerprint": "0909090909090909090909090909090909090909090909090909090909090909",
+    "selected_capability_id": "local_i2v_720p",
+    "selected_capability_fingerprint": "1010101010101010101010101010101010101010101010101010101010101010",
+    "provider_bound_request_hash": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "provider": {
+    "name": "local_comfyui_video",
+    "kind": "local_video",
+    "execution_kind": "local",
+    "billing_kind": "unmetered",
+    "profile_id": "profile_v1",
+    "profile_version": "1.0.0",
+    "profile_path": "provider-profiles/local-video.json",
+    "profile_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "capability_id": "local_i2v_720p",
+    "workflow_id": {
+      "state": "known",
+      "value": "workflow_local_v1",
+      "source_document": "provider-profiles/local-video.json",
+      "source_span": "workflow.id"
+    },
+    "workflow_version": {
+      "state": "known",
+      "value": "1.0.0",
+      "source_document": "provider-profiles/local-video.json",
+      "source_span": "workflow.version"
+    },
+    "workflow_path": {
+      "state": "known",
+      "value": "workflows/local-video.json",
+      "source_document": "provider-profiles/local-video.json",
+      "source_span": "workflow.path"
+    },
+    "workflow_fingerprint": {
+      "state": "known",
+      "value": "1212121212121212121212121212121212121212121212121212121212121212",
+      "source_document": "workflows/local-video.json",
+      "source_span": "content_hash"
+    },
+    "model_id": {
+      "state": "known",
+      "value": "model_x_1",
+      "source_document": "provider-profiles/local-video.json",
+      "source_span": "model_id"
+    },
+    "adapter_compiler_id": "compiler_v1",
+    "adapter_compiler_version": "1.0.0",
+    "adapter_compiler_hash": "1313131313131313131313131313131313131313131313131313131313131313"
+  },
+  "prompt": {
+    "prompt_sha256": "1414141414141414141414141414141414141414141414141414141414141414",
+    "negative_prompt_sha256": "1515151515151515151515151515151515151515151515151515151515151515",
+    "structured_intent_hash": "1616161616161616161616161616161616161616161616161616161616161616",
+    "compiler_id": "compiler_v1",
+    "compiler_version": "1.0.0",
+    "compiler_hash": "1313131313131313131313131313131313131313131313131313131313131313"
+  },
+  "parameters": {
+    "requested_seed": {
+      "state": "not_applicable",
+      "reason": "caller_did_not_request_seed"
+    },
+    "effective_seed": {
+      "state": "known",
+      "value": 17,
+      "source_document": "state/manifest.json",
+      "source_span": "attempts.0.seed"
+    },
+    "effective_output_hash": "1717171717171717171717171717171717171717171717171717171717171717",
+    "duration_milliseconds": 6000,
+    "frame_count": 144,
+    "fps_numerator": 24,
+    "fps_denominator": 1,
+    "steps": {
+      "state": "known",
+      "value": 20,
+      "source_document": "provider-profiles/local-video.json",
+      "source_span": "steps"
+    },
+    "sampler": {
+      "state": "known",
+      "value": "res_multistep",
+      "source_document": "provider-profiles/local-video.json",
+      "source_span": "sampler"
+    },
+    "scheduler": {
+      "state": "known",
+      "value": "simple",
+      "source_document": "provider-profiles/local-video.json",
+      "source_span": "scheduler"
+    },
+    "audio_mode": {
+      "state": "known",
+      "value": "native_audio",
+      "source_document": "provider-profiles/local-video.json",
+      "source_span": "audio_mode"
+    },
+    "provider_parameters": {
+      "parameters": []
+    },
+    "sources": {
+      "items": [
+        {
+          "key": "audio_mode",
+          "source": "provider_selected"
+        },
+        {
+          "key": "duration_milliseconds",
+          "source": "requested"
+        },
+        {
+          "key": "effective_seed",
+          "source": "provider_selected"
+        },
+        {
+          "key": "fps",
+          "source": "requested"
+        },
+        {
+          "key": "frame_count",
+          "source": "effective"
+        },
+        {
+          "key": "requested_seed",
+          "source": "requested"
+        },
+        {
+          "key": "sampler",
+          "source": "default"
+        },
+        {
+          "key": "scheduler",
+          "source": "default"
+        },
+        {
+          "key": "steps",
+          "source": "default"
+        }
+      ]
+    }
+  },
+  "inputs": {
+    "items": [
+      {
+        "role": "first_frame",
+        "artifact_id": "image_source_001",
+        "revision": {
+          "state": "known",
+          "value": 1,
+          "source_document": "assets/registry.json",
+          "source_span": "records.0.revision"
+        },
+        "content_hash": "1818181818181818181818181818181818181818181818181818181818181818",
+        "file_sha256": "1919191919191919191919191919191919191919191919191919191919191919",
+        "mime_type": "image/png",
+        "size_bytes": 4096,
+        "registry_revision": "registry_v4",
+        "registry_file_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "creation_receipt_hash": "2020202020202020202020202020202020202020202020202020202020202020",
+        "provenance_receipt_hash": "2121212121212121212121212121212121212121212121212121212121212121",
+        "creation_receipt_id": "creation_receipt_001",
+        "provenance_receipt_id": "input_provenance_001"
+      }
+    ]
+  },
+  "continuity": {
+    "mode": "none",
+    "source_shot_id": {
+      "state": "not_applicable",
+      "reason": "no_continuity_requested"
+    },
+    "target_shot_id": "shot_001",
+    "terminal_frame_hash": {
+      "state": "not_applicable",
+      "reason": "no_continuity_requested"
+    },
+    "keyframe_hash": {
+      "state": "not_applicable",
+      "reason": "no_continuity_requested"
+    },
+    "continuity_state_hash": {
+      "state": "not_applicable",
+      "reason": "no_continuity_requested"
+    },
+    "first_frame_binding_hash": {
+      "state": "not_applicable",
+      "reason": "no_continuity_requested"
+    },
+    "last_frame_binding_hash": {
+      "state": "not_applicable",
+      "reason": "no_continuity_requested"
+    }
+  },
+  "outcome": {
+    "variant": "succeeded",
+    "terminal_boundary": "activated",
+    "observed_at": "2026-08-21T12:00:00Z"
+  },
+  "artifact_evidence": {
+    "state": "known",
+    "boundary": "canonical",
+    "relative_path": "shots/shot_001/render.mp4",
+    "asset_id": "asset_render_001",
+    "file_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "size_bytes": 12345678,
+    "container": "mp4",
+    "codec": "h264",
+    "width": 1280,
+    "height": 720,
+    "fps_numerator": 24,
+    "fps_denominator": 1,
+    "duration_milliseconds": 6000,
+    "frame_count": 144,
+    "audio_stream_count": 1,
+    "probe_receipt_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+    "provenance_receipt_hash": "2323232323232323232323232323232323232323232323232323232323232323",
+    "ffprobe_hash": "2828282828282828282828282828282828282828282828282828282828282828",
+    "video_probe_receipt_id": "video_probe_receipt_001",
+    "provenance_receipt_id": "artifact_provenance_001"
+  },
+  "durability": {
+    "activation_state": "activated",
+    "manifest_revision": 5,
+    "strict_reopen_result": "verified",
+    "recovery_observation": "not_required",
+    "exact_replay_counters": {
+      "provider_calls": 0,
+      "renderer_calls": 0,
+      "analyzer_calls": 0,
+      "manifest_writes": 0
+    },
+    "exact_replay_result": "zero_effect"
+  },
+  "analyzer": {
+    "state": "known",
+    "evidence": [
+      {
+        "evidence_id": "video_probe_001",
+        "evidence_hash": "2424242424242424242424242424242424242424242424242424242424242424",
+        "tool_name": "video_analysis",
+        "tool_version": "1.0.0",
+        "measurement_contract_version": "q0_v1",
+        "subject_id": "asset_render_001",
+        "span_hash": "2525252525252525252525252525252525252525252525252525252525252525",
+        "measurements_hash": "2626262626262626262626262626262626262626262626262626262626262626",
+        "measurements": {
+          "parameters": [
+            {
+              "key": "audio_integrity",
+              "value": {
+                "state": "known",
+                "value": true,
+                "source_document": "analysis/video.json",
+                "source_span": "measurements.audio_integrity"
+              }
+            },
+            {
+              "key": "black_ratio",
+              "value": {
+                "state": "known",
+                "value": 0.0,
+                "source_document": "analysis/video.json",
+                "source_span": "measurements.black_ratio"
+              }
+            },
+            {
+              "key": "continuity_score",
+              "value": {
+                "state": "known",
+                "value": 0.91,
+                "source_document": "analysis/video.json",
+                "source_span": "measurements.continuity_score"
+              }
+            },
+            {
+              "key": "detail_score",
+              "value": {
+                "state": "known",
+                "value": 0.88,
+                "source_document": "analysis/video.json",
+                "source_span": "measurements.detail_score"
+              }
+            },
+            {
+              "key": "freeze_ratio",
+              "value": {
+                "state": "known",
+                "value": 0.0,
+                "source_document": "analysis/video.json",
+                "source_span": "measurements.freeze_ratio"
+              }
+            },
+            {
+              "key": "scene_change_count",
+              "value": {
+                "state": "known",
+                "value": 1,
+                "source_document": "analysis/video.json",
+                "source_span": "measurements.scene_change_count"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "human_review": {
+    "status": "GO",
+    "reviewer_id": {
+      "state": "known",
+      "value": "reviewer_alpha",
+      "source_document": "reviews/q0.json",
+      "source_span": "reviewer.id"
+    },
+    "reviewer_kind": {
+      "state": "known",
+      "value": "human",
+      "source_document": "reviews/q0.json",
+      "source_span": "reviewer.kind"
+    },
+    "rubric_id": "visual_quality_v1",
+    "rubric_version": "1.0.0",
+    "rubric_hash": "2727272727272727272727272727272727272727272727272727272727272727",
+    "watched_at": {
+      "state": "known",
+      "value": "2026-08-21T12:00:00Z",
+      "source_document": "reviews/q0.json",
+      "source_span": "watched_at"
+    },
+    "items": {
+      "items": [
+        {
+          "item_id": "composition",
+          "verdict": "pass",
+          "concerns": []
+        }
+      ]
+    }
+  },
+  "intervention": {
+    "kind": "none",
+    "failure_taxonomy": {
+      "state": "not_applicable",
+      "reason": "no_intervention"
+    },
+    "changed_variables": {
+      "parameters": []
+    },
+    "unchanged_controls": {
+      "parameters": []
+    },
+    "confounders": [],
+    "rationale": {
+      "value": "no intervention applied"
+    }
+  },
+  "outcome_boundary": {
+    "artifact_claim": {
+      "value": "exact artifact completed the declared Q0 protocol"
+    },
+    "p6_state": "not_present",
+    "p6_observations": [],
+    "allowed_conclusions": [
+      {
+        "value": "this exact attempt is represented"
+      }
+    ],
+    "forbidden_extrapolations": [
+      {
+        "value": "does not establish general quality acceptance"
+      }
+    ]
+  }
+}

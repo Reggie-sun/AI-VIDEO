@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "pilot_id": "pilot_a",
+  "cohort": {
+    "schema_version": "1.0",
+    "pilot_id": "pilot_a",
+    "relative_path": "cohorts/pilot_a/cohort.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.json",
+    "content_hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "file_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "terminal_manifest": {
+    "schema_version": "1.0",
+    "relative_path": "state/manifest.json",
+    "project_id": "project_001",
+    "manifest_revision": 2,
+    "file_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "attempt_count": 5,
+    "ordered_attempt_ids_hash": "ec721898b94b5a8a712ecca2476d5aa8c8cf7b765faa5423546ab0135da74dff"
+  },
+  "entries": [
+    {
+      "attempt_identity_key": {"canonical_runtime_boundary": "production_manifest", "project_id": "project_001", "attempt_id": "attempt_001", "generation_id": "generation_shot_001", "identity_hash": "bfd09779e2176303b38ac564aea457f2a57d3fd52a19056d9fd2cae82a17732c"},
+      "shot": {"project_id": "project_001", "scene_id": "scene_001", "shot_id": "shot_001"},
+      "shot_revision": 1,
+      "shot_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "attempt_sequence": 2
+    },
+    {
+      "attempt_identity_key": {"canonical_runtime_boundary": "production_manifest", "project_id": "project_001", "attempt_id": "attempt_002", "generation_id": "generation_shot_002", "identity_hash": "0409c0544b8f6ddd03bf403ef5315706d60821f614014b5f5bc3ab665c5f19d8"},
+      "shot": {"project_id": "project_001", "scene_id": "scene_001", "shot_id": "shot_002"},
+      "shot_revision": 1,
+      "shot_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "attempt_sequence": 3
+    },
+    {
+      "attempt_identity_key": {"canonical_runtime_boundary": "production_manifest", "project_id": "project_001", "attempt_id": "attempt_003", "generation_id": "generation_shot_003", "identity_hash": "e6df0f2a3ff77ea8f7bde9448912b42f48f12ac88b28b5a991bfac74e32a8a97"},
+      "shot": {"project_id": "project_001", "scene_id": "scene_001", "shot_id": "shot_003"},
+      "shot_revision": 1,
+      "shot_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "attempt_sequence": 4
+    },
+    {
+      "attempt_identity_key": {"canonical_runtime_boundary": "production_manifest", "project_id": "project_001", "attempt_id": "attempt_004", "generation_id": "generation_shot_004", "identity_hash": "cea1523b4728a3e9b019e5a74e2995445a6b53fb9c43b71accfb8de03932b40f"},
+      "shot": {"project_id": "project_001", "scene_id": "scene_001", "shot_id": "shot_004"},
+      "shot_revision": 1,
+      "shot_content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "attempt_sequence": 5
+    }
+  ]
+}

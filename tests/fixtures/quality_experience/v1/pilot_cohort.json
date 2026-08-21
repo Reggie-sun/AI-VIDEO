@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "pilot_id": "pilot_a",
+  "purpose": {"value": "passive capture completeness"},
+  "hypothesis": {"value": "all exact attempts remain represented"},
+  "authorization_boundary": "q0_passive_capture_only",
+  "capture_contract_version": "qer_v1",
+  "rubric_id": "visual_quality_v1",
+  "rubric_version": "1.0.0",
+  "rubric_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "repository_commit": "0000000000000000000000000000000000000000",
+  "allowed_attempt_source": "production_manifest",
+  "base_manifest": {
+    "schema_version": "1.0",
+    "relative_path": "state/manifest.json",
+    "project_id": "project_001",
+    "manifest_revision": 1,
+    "file_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "attempt_count": 1,
+    "ordered_attempt_ids_hash": "6854272313d041d1d8c96d8a99e05c2b93e44f5b9c5bb715b9a903784a9ef961"
+  },
+  "shot_keys": [
+    {"project_id": "project_001", "scene_id": "scene_001", "shot_id": "shot_001"},
+    {"project_id": "project_001", "scene_id": "scene_001", "shot_id": "shot_002"},
+    {"project_id": "project_001", "scene_id": "scene_001", "shot_id": "shot_003"},
+    {"project_id": "project_001", "scene_id": "scene_001", "shot_id": "shot_004"}
+  ]
+}
