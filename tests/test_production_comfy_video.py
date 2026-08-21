@@ -190,6 +190,7 @@ def _request(
     profile: LocalVideoExecutionProfile,
     *,
     last: bool,
+    seed: int | None = 19,
     width: int = 608,
     height: int = 352,
 ):
@@ -317,7 +318,7 @@ def _request(
             mime_type="video/mp4",
             native_audio=True,
         ),
-        seed=19,
+        seed=seed,
         base_project=inputs.project.manifest.active_project,
         base_registry=inputs.project.manifest.active_registry,
         base_dependency_graph=inputs.project.manifest.active_dependency_graph,
@@ -335,12 +336,13 @@ def _request(
 
 
 @pytest.mark.parametrize("last", (False, True))
+@pytest.mark.parametrize("seed", (19, None))
 def test_comfy_h3_binds_exact_frames_and_preserves_optional_last(
-    tmp_path: Path, last: bool
+    tmp_path: Path, last: bool, seed: int | None
 ) -> None:
     artifact_root, comfy_root, profile = _profile_and_comfy_root(tmp_path)
     project_root = tmp_path / "project"
-    inputs, request, source = _request(project_root, profile, last=last)
+    inputs, request, source = _request(project_root, profile, last=last, seed=seed)
     transport = Transport(MP4.read_bytes())
     provider = ComfyUIVideoProvider(
         profile,
@@ -371,6 +373,13 @@ def test_comfy_h3_binds_exact_frames_and_preserves_optional_last(
     workflow = transport.workflows[-1]
 
     assert hashlib.sha256(transport.uploaded[0]).hexdigest() == source.sha256
+    expected_seed = (
+        seed
+        if seed is not None
+        else int(request.request_input_hash[:16], 16) & ((1 << 63) - 1)
+    )
+    assert resolved.effective_seed == expected_seed
+    assert workflow["6"]["inputs"]["noise_seed"] == expected_seed
     assert workflow["5"]["inputs"]["first_frame"] == ["15", 0]
     assert ("last_frame" in workflow["5"]["inputs"]) is last
     assert ("16" in workflow) is last

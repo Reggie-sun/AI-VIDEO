@@ -54,6 +54,7 @@ from ai_video.workflow_renderer import _set_path, validate_api_workflow
 
 _SHA256 = r"^[0-9a-f]{64}$"
 _REVISION = r"^[0-9a-f]{40}$"
+_MAX_DETERMINISTIC_SEED = (1 << 63) - 1
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -63,6 +64,12 @@ def _invalid(message: str, detail: str | None = None) -> AiVideoError:
         technical_detail=detail,
         retryable=False,
     )
+
+
+def _effective_seed(request: VideoGenerationRequest) -> int:
+    if request.seed is not None:
+        return request.seed
+    return int(request.request_input_hash[:16], 16) & _MAX_DETERMINISTIC_SEED
 
 
 def _provider_failure(
@@ -596,7 +603,7 @@ class ComfyUIVideoProvider:
             request=request,
             capability=matching[0],
             effective_output=output,
-            effective_seed=request.seed,
+            effective_seed=_effective_seed(request),
             effective_negative_prompt_text=request.negative_prompt_text,
         )
 

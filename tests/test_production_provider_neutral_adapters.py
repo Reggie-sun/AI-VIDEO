@@ -320,9 +320,14 @@ def test_local_h3_compiles_neutral_first_frame_without_runtime_execution(
     )
 
     assert isinstance(compiled, CompiledProviderVideoRequest)
+    assert compiled.request.seed is None
     resolved = provider.resolve(compiled.request)
     assert resolved.requirement_hash == projection.requirement.requirement_hash
     assert resolved.provider_name == "comfy-local-h3"
+    assert resolved.effective_seed == (
+        int(compiled.request.request_input_hash[:16], 16) & ((1 << 63) - 1)
+    )
+    assert provider.resolve(compiled.request) == resolved
 
 
 def test_hailuo_compiles_first_frame_to_adaptive_i2v_without_fixed_pixels() -> None:
