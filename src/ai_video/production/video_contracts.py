@@ -20,8 +20,178 @@ _SHA256 = r"^[0-9a-f]{64}$"
 _MIME_TYPE = r"^[A-Za-z0-9.+-]+/[A-Za-z0-9.+-]+$"
 
 
+VIDEO_BINDING_ROLE_UNIVERSE: tuple[
+    Literal[
+        "first_frame",
+        "last_frame",
+        "reference",
+        "reference_video",
+        "reference_audio",
+    ],
+    ...,
+] = (
+    "first_frame",
+    "last_frame",
+    "reference",
+    "reference_video",
+    "reference_audio",
+)
+_VIDEO_BINDING_ROLE_INDEX = {role: index for index, role in enumerate(VIDEO_BINDING_ROLE_UNIVERSE)}
+_VIDEO_BINDING_CARDINALITY_MAX = 32
+
+
 class _VideoContractModel(StrictModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
+
+
+class VideoBindingCardinalityConstraint(_VideoContractModel):
+    """Exact role/group cardinality owned by the capability.
+
+    Roles are stored in the canonical fixed order declared by
+    :data:`VIDEO_BINDING_ROLE_UNIVERSE`. Bounds must satisfy
+    ``0 <= min_count <= max_count <= 32``.
+    """
+
+    roles: tuple[str, ...]
+    min_count: int = Field(strict=True)
+    max_count: int = Field(strict=True)
+
+    @model_validator(mode="after")
+    def _validate_constraint(self) -> "VideoBindingCardinalityConstraint":
+        if not self.roles:
+            raise ValueError("binding cardinality constraint roles cannot be empty")
+        if any(role not in _VIDEO_BINDING_ROLE_INDEX for role in self.roles):
+            raise ValueError("binding cardinality constraint role is unknown")
+        if len(set(self.roles)) != len(self.roles):
+            raise ValueError("binding cardinality constraint roles must be unique")
+        if not (
+            0
+            <= self.min_count
+            <= self.max_count
+            <= _VIDEO_BINDING_CARDINALITY_MAX
+        ):
+            raise ValueError("binding cardinality constraint bound is invalid")
+        object.__setattr__(
+            self,
+            "roles",
+            tuple(sorted(self.roles, key=lambda role: _VIDEO_BINDING_ROLE_INDEX[role])),
+        )
+        return self
+
+    @model_serializer(mode="wrap")
+    def _canonical_serializer(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        return {
+            "roles": list(data["roles"]),
+            "min_count": data["min_count"],
+            "max_count": data["max_count"],
+        }
+
+
+def canonicalize_cardinality_constraints(
+    constraints: tuple[VideoBindingCardinalityConstraint, ...],
+) -> tuple[VideoBindingCardinalityConstraint, ...]:
+    """Return constraints sorted by canonical role tuple.
+
+    The returned tuple contains exactly one constraint per canonical role tuple;
+    duplicates with the same canonical role tuple are detected and rejected by
+    :func:`validate_cardinality_constraints`.
+    """
+
+    return tuple(
+        sorted(
+            constraints,
+            key=lambda item: tuple(
+                _VIDEO_BINDING_ROLE_INDEX[role] for role in item.roles
+            ),
+        )
+    )
+
+
+def validate_cardinality_constraints(
+    constraints: tuple[VideoBindingCardinalityConstraint, ...],
+) -> tuple[VideoBindingCardinalityConstraint, ...]:
+    """Reject duplicate role tuples and globally unsatisfiable overlaps."""
+
+    canonical = canonicalize_cardinality_constraints(constraints)
+    seen: set[tuple[str, ...]] = set()
+    for constraint in canonical:
+        key = tuple(constraint.roles)
+        if key in seen:
+            raise ValueError("binding cardinality constraint role tuple is duplicate")
+        seen.add(key)
+    if not _is_satisfiable(canonical):
+        raise ValueError("binding cardinality constraint set is unsatisfiable")
+    return canonical
+
+
+def binding_counts_satisfy_constraints(
+    constraints: tuple[VideoBindingCardinalityConstraint, ...],
+    counts: dict[str, int],
+) -> bool:
+    """Evaluate one exact request count vector against every constraint."""
+
+    if set(counts) - set(VIDEO_BINDING_ROLE_UNIVERSE):
+        return False
+    if any(
+        not isinstance(value, int) or isinstance(value, bool) or value < 0
+        for value in counts.values()
+    ):
+        return False
+    return all(
+        constraint.min_count
+        <= sum(counts.get(role, 0) for role in constraint.roles)
+        <= constraint.max_count
+        for constraint in constraints
+    )
+
+
+def _is_satisfiable(
+    constraints: tuple[VideoBindingCardinalityConstraint, ...],
+) -> bool:
+    universe = tuple(
+        role
+        for role in VIDEO_BINDING_ROLE_UNIVERSE
+        if any(role in constraint.roles for constraint in constraints)
+    )
+    upper_bounds = {
+        role: min(
+            constraint.max_count
+            for constraint in constraints
+            if role in constraint.roles
+        )
+        for role in universe
+    }
+    counts: dict[str, int] = {}
+
+    def feasible_prefix() -> bool:
+        for constraint in constraints:
+            assigned = sum(counts.get(role, 0) for role in constraint.roles)
+            if assigned > constraint.max_count:
+                return False
+            remaining = sum(
+                upper_bounds[role]
+                for role in constraint.roles
+                if role not in counts
+            )
+            if assigned + remaining < constraint.min_count:
+                return False
+        return True
+
+    def search(role_index: int) -> bool:
+        if role_index == len(universe):
+            return binding_counts_satisfy_constraints(constraints, counts)
+        role = universe[role_index]
+        for value in range(upper_bounds[role] + 1):
+            counts[role] = value
+            if feasible_prefix() and search(role_index + 1):
+                return True
+        counts.pop(role, None)
+        return False
+
+    return search(0)
 
 
 class VideoProviderTaskBinding(_VideoContractModel):
@@ -317,10 +487,15 @@ def media_bindings_satisfy_capabilities(
 
 
 __all__ = [
+    "VIDEO_BINDING_ROLE_UNIVERSE",
+    "VideoBindingCardinalityConstraint",
     "VideoFlexibleOutputRequirement",
     "VideoMediaCapability",
     "VideoMediaReferenceBinding",
     "VideoOutputCapability",
     "VideoProviderTaskBinding",
+    "binding_counts_satisfy_constraints",
+    "canonicalize_cardinality_constraints",
     "media_bindings_satisfy_capabilities",
+    "validate_cardinality_constraints",
 ]

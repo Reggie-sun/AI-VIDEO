@@ -1650,3 +1650,193 @@ def test_failure_certainty_and_retry_safety_are_independent_from_generic_retryab
     assert failure.generic_retryable is True
     assert failure.outcome_certainty == "outcome_unknown"
     assert failure.retry_safety == "unsafe_same_effect"
+
+
+def _cardinality_constraint(**changes: object):
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+
+    values: dict[str, object] = {
+        "roles": ("first_frame",),
+        "min_count": 1,
+        "max_count": 1,
+    }
+    values.update(changes)
+    return VideoBindingCardinalityConstraint(**values)
+
+
+def test_cardinality_constraint_canonicalizes_role_order_and_rejects_unknown_or_empty():
+    from ai_video.production.video_contracts import (
+        VIDEO_BINDING_ROLE_UNIVERSE,
+        VideoBindingCardinalityConstraint,
+        canonicalize_cardinality_constraints,
+    )
+
+    canonical = VideoBindingCardinalityConstraint(
+        roles=("reference_video", "first_frame"),
+        min_count=0,
+        max_count=1,
+    )
+    assert canonical.roles == ("first_frame", "reference_video")
+
+    normalized = canonicalize_cardinality_constraints(
+        (canonical, VideoBindingCardinalityConstraint(roles=("first_frame",), min_count=1, max_count=1))
+    )
+    assert normalized == canonicalize_cardinality_constraints(normalized)
+
+    with pytest.raises(ValidationError, match="unknown"):
+        VideoBindingCardinalityConstraint(roles=("first_frame", "spoof"), min_count=0, max_count=1)
+    with pytest.raises(ValidationError, match="empty"):
+        VideoBindingCardinalityConstraint(roles=(), min_count=0, max_count=1)
+    assert set(VIDEO_BINDING_ROLE_UNIVERSE) == {
+        "first_frame",
+        "last_frame",
+        "reference",
+        "reference_video",
+        "reference_audio",
+    }
+
+
+def test_cardinality_constraint_rejects_invalid_bounds_and_duplicate_groups():
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+
+    with pytest.raises(ValidationError, match="bound"):
+        VideoBindingCardinalityConstraint(roles=("first_frame",), min_count=2, max_count=1)
+    with pytest.raises(ValidationError, match="bound"):
+        VideoBindingCardinalityConstraint(roles=("first_frame",), min_count=-1, max_count=1)
+    with pytest.raises(ValidationError, match="bound"):
+        VideoBindingCardinalityConstraint(roles=("first_frame",), min_count=0, max_count=33)
+
+    duplicate = (
+        VideoBindingCardinalityConstraint(roles=("first_frame",), min_count=0, max_count=1),
+        VideoBindingCardinalityConstraint(roles=("first_frame",), min_count=1, max_count=2),
+    )
+    with pytest.raises(ValueError, match="duplicate"):
+        VideoBindingCardinalityConstraint.model_validate(
+            {"roles": ("first_frame",), "min_count": 0, "max_count": 1},
+        )  # smoke-confirm model accepts single
+        from ai_video.production.video_contracts import validate_cardinality_constraints
+
+        validate_cardinality_constraints(duplicate)
+
+
+def test_cardinality_satisfiability_rejects_globally_unsatisfiable_overlap():
+    from ai_video.production.video_contracts import (
+        VideoBindingCardinalityConstraint,
+        validate_cardinality_constraints,
+    )
+
+    contradictory = (
+        VideoBindingCardinalityConstraint(roles=("reference",), min_count=2, max_count=2),
+        VideoBindingCardinalityConstraint(
+            roles=("first_frame", "reference"),
+            min_count=0,
+            max_count=0,
+        ),
+    )
+    with pytest.raises(ValueError, match="unsatisfiable"):
+        validate_cardinality_constraints(contradictory)
+
+    satisfiable = (
+        VideoBindingCardinalityConstraint(roles=("first_frame",), min_count=1, max_count=1),
+        VideoBindingCardinalityConstraint(roles=("last_frame",), min_count=1, max_count=1),
+        VideoBindingCardinalityConstraint(roles=("reference",), min_count=0, max_count=0),
+    )
+    validate_cardinality_constraints(satisfiable)
+
+
+def test_cardinality_request_count_evaluator_is_exact_and_bounded():
+    from ai_video.production.video_contracts import (
+        VideoBindingCardinalityConstraint,
+        binding_counts_satisfy_constraints,
+    )
+
+    constraints = (
+        VideoBindingCardinalityConstraint(roles=("first_frame",), min_count=1, max_count=1),
+        VideoBindingCardinalityConstraint(roles=("last_frame",), min_count=1, max_count=1),
+        VideoBindingCardinalityConstraint(roles=("reference",), min_count=0, max_count=0),
+    )
+    assert binding_counts_satisfy_constraints(
+        constraints,
+        {"first_frame": 1, "last_frame": 1, "reference": 0},
+    )
+    assert not binding_counts_satisfy_constraints(
+        constraints,
+        {"first_frame": 1, "last_frame": 0, "reference": 0},
+    )
+    assert not binding_counts_satisfy_constraints(
+        constraints,
+        {"first_frame": 1, "last_frame": 1, "reference": 0, "spoof": 1},
+    )
+
+
+def test_capability_variant_defaults_to_empty_cardinality_constraints_and_legacy_hash_is_stable():
+    from ai_video.production.hashing import canonical_sha256
+
+    variant = VideoCapabilityVariant(
+        capability_id="legacy-variant",
+        provider_kind="legacy",
+        model_id="legacy-model",
+        profile_version="legacy-v1",
+        execution_kind=VideoExecutionKind.REMOTE,
+        billing_kind=BillingKind.METERED,
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        output=_output(),
+        allowed_image_roles=("first_frame",),
+        required_first_frame=True,
+        max_reference_count=1,
+        allowed_image_mime_types=("image/png",),
+        max_image_bytes=10_000_000,
+        min_image_width=512,
+        min_image_height=512,
+        negative_prompt_supported=True,
+        seed_supported=True,
+        fps_supported=True,
+        idempotent_submit=False,
+        lookup_supported=False,
+    )
+    assert variant.binding_cardinality_constraints == ()
+
+    from ai_video.production._video_capability_fingerprint import (
+        project_capability_variant,
+    )
+
+    legacy_dump = project_capability_variant(variant)
+    assert "binding_cardinality_constraints" not in legacy_dump
+    assert canonical_sha256(legacy_dump) == canonical_sha256(
+        variant.model_dump(mode="json", exclude={"binding_cardinality_constraints"})
+    )
+
+
+def test_provider_capabilities_fingerprint_stays_bit_for_bit_for_legacy_empty_constraints():
+    from ai_video.production.hashing import canonical_sha256
+
+    capabilities = VideoProviderCapabilities.create(
+        provider_name="legacy-provider",
+        variants=(_variant(),),
+    )
+    legacy_payload = {
+        "provider_name": capabilities.provider_name,
+        "variants": tuple(
+            variant.model_dump(mode="json", exclude={"binding_cardinality_constraints"})
+            for variant in capabilities.variants
+        ),
+    }
+    assert (
+        capabilities.capabilities_fingerprint
+        == canonical_sha256(legacy_payload)
+    )
+
+
+def test_resolved_request_defense_in_depth_rejects_cardinality_violation_after_capability_pass():
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+
+    constrained_variant = _variant(
+        capability_id="hailuo-i2v-with-cardinality",
+        binding_cardinality_constraints=(
+            VideoBindingCardinalityConstraint(roles=("first_frame",), min_count=1, max_count=1),
+            VideoBindingCardinalityConstraint(roles=("last_frame",), min_count=1, max_count=1),
+        ),
+    )
+    with pytest.raises(AiVideoError) as exc_info:
+        _resolved(_request(), variant=constrained_variant)
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED

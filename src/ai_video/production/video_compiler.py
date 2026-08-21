@@ -237,7 +237,7 @@ def compile_provider_video_request(
         or provider_bound.billing_kind is not capability.billing_kind
         or provider_bound.mode is not capability.mode
         or provider_bound.capability_fingerprint
-        != canonical_sha256(capability.model_dump(mode="json"))
+        != _capability_fingerprint(capability)
     ):
         return _unsupported(
             provider_bound,
@@ -377,6 +377,14 @@ def compile_provider_video_request(
         request=request,
         payload_projection_hash=payload_hash,
     )
+
+
+def _capability_fingerprint(capability: VideoCapabilityVariant) -> str:
+    from ai_video.production._video_capability_fingerprint import (
+        project_capability_variant,
+    )
+
+    return canonical_sha256(project_capability_variant(capability))
 
 
 def _compile_neutral_prompt(requirement: ProviderNeutralVideoRequirement) -> str:

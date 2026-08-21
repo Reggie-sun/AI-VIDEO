@@ -1923,3 +1923,263 @@ def test_exact_terminal_accepts_real_h3_and_hailuo_i2v_capabilities() -> None:
     assert hailuo_decision.reason_codes == (
         RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME,
     )
+
+
+def _cardinality_constraint(**changes: object):
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+
+    values: dict[str, object] = {
+        "roles": ("first_frame",),
+        "min_count": 1,
+        "max_count": 1,
+    }
+    values.update(changes)
+    return VideoBindingCardinalityConstraint(**values)
+
+
+def test_router_rejects_capability_cardinality_violation_before_provider_bound_construction() -> None:
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+
+    variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        capability_id="cardinality-i2v",
+    )
+    variant_with_constraints = variant.model_copy(
+        update={
+            "binding_cardinality_constraints": (
+                VideoBindingCardinalityConstraint(
+                    roles=("first_frame",), min_count=1, max_count=1
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("last_frame",), min_count=1, max_count=1
+                ),
+            )
+        }
+    )
+    capabilities = _capabilities(variant_with_constraints)
+    keyframe = _asset("first_frame", "i2v-keyframe", HASH_A)
+    context = _context(
+        important=True,
+        keyframe=keyframe,
+    )
+    decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=capabilities,
+        selected_capability_id=variant_with_constraints.capability_id,
+        output_requirement=_output(),
+    )
+    assert decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert decision.reason_codes == (RouterReasonCode.PROVIDER_CAPABILITY_DENIED,)
+
+
+def test_router_distinguishes_i2va_from_fl2va_when_both_are_image_to_video_mode() -> None:
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+
+    i2va_variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO, capability_id="i2va-only"
+    ).model_copy(
+        update={
+            "binding_cardinality_constraints": (
+                VideoBindingCardinalityConstraint(
+                    roles=("first_frame",), min_count=1, max_count=1
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("reference",), min_count=0, max_count=0
+                ),
+            )
+        }
+    )
+    fl2va_variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO, capability_id="fl2va-only"
+    ).model_copy(
+        update={
+            "allowed_image_roles": ("first_frame", "last_frame"),
+            "binding_cardinality_constraints": (
+                VideoBindingCardinalityConstraint(
+                    roles=("first_frame",), min_count=1, max_count=1
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("last_frame",), min_count=1, max_count=1
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("reference",), min_count=0, max_count=0
+                ),
+            ),
+        }
+    )
+    capabilities = _capabilities(i2va_variant, fl2va_variant)
+    keyframe = _asset("first_frame", "i2v-keyframe", HASH_A)
+    last_frame = _asset("last_frame", "i2v-last", HASH_B)
+    i2va_context = _context(important=True, keyframe=keyframe)
+    fl2va_context = _context(
+        important=True, keyframe=keyframe, last_frame=last_frame
+    )
+
+    i2va_decision = VideoGenerationResolver().resolve(
+        context=i2va_context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=capabilities,
+        selected_capability_id=i2va_variant.capability_id,
+        output_requirement=_output(),
+    )
+    fl2va_decision = VideoGenerationResolver().resolve(
+        context=fl2va_context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=capabilities,
+        selected_capability_id=fl2va_variant.capability_id,
+        output_requirement=_output(),
+        requirement_mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        requirement_binding_roles=("first_frame", "last_frame"),
+        requirement_input_assets=(keyframe, last_frame),
+    )
+    cross_decision = VideoGenerationResolver().resolve(
+        context=i2va_context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=capabilities,
+        selected_capability_id=fl2va_variant.capability_id,
+        output_requirement=_output(),
+        requirement_mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        requirement_binding_roles=("first_frame",),
+        requirement_input_assets=(keyframe,),
+    )
+
+    assert i2va_decision.outcome is RoutingOutcome.SELECTED
+    assert fl2va_decision.outcome is RoutingOutcome.SELECTED
+    assert cross_decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+
+
+def test_router_ref2va_capability_rejects_missing_or_overflowing_references() -> None:
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+
+    ref2va_variant = _variant(
+        VideoGenerationMode.REFERENCE_TO_VIDEO,
+        capability_id="ref2va-only",
+    ).model_copy(
+        update={
+            "allowed_image_roles": ("reference",),
+            "max_reference_count": 9,
+            "binding_cardinality_constraints": (
+                VideoBindingCardinalityConstraint(
+                    roles=("first_frame",), min_count=0, max_count=0
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("last_frame",), min_count=0, max_count=0
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("reference",), min_count=0, max_count=9
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("reference_video",), min_count=0, max_count=3
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("reference_audio",), min_count=0, max_count=3
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("reference", "reference_video", "reference_audio"),
+                    min_count=1,
+                    max_count=15,
+                ),
+            ),
+        }
+    )
+    capabilities = _capabilities(ref2va_variant)
+    context_no_ref = _context(important=False)
+    overflow_refs: tuple[RouterAssetIdentity, ...] = tuple(
+        _asset(
+            "character_reference",
+            f"ref-{i}",
+            HASH_A,
+            canonical_owner_id=f"character-{i}",
+        )
+        for i in range(10)
+    )
+    overflow_context = _context(important=False)
+    no_ref_decision = VideoGenerationResolver().resolve(
+        context=context_no_ref,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=capabilities,
+        selected_capability_id=ref2va_variant.capability_id,
+        output_requirement=_output(),
+        requirement_mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+        requirement_binding_roles=(),
+        requirement_input_assets=(),
+    )
+    overflow_decision = VideoGenerationResolver().resolve(
+        context=overflow_context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=capabilities,
+        selected_capability_id=ref2va_variant.capability_id,
+        output_requirement=_output(),
+        requirement_mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+        requirement_binding_roles=("reference",) * len(overflow_refs),
+        requirement_input_assets=overflow_refs,
+    )
+    assert no_ref_decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert overflow_decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+
+
+def test_router_does_not_fallback_when_v2_capability_id_is_unknown() -> None:
+    i2va_variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO, capability_id="i2va-real"
+    )
+    fl2va_variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO, capability_id="fl2va-real"
+    ).model_copy(update={"allowed_image_roles": ("first_frame", "last_frame")})
+    capabilities = _capabilities(i2va_variant, fl2va_variant)
+    context = _context(
+        important=True,
+        keyframe=_asset("first_frame", "keyframe", HASH_A),
+    )
+    decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=capabilities,
+        selected_capability_id="minimax-h3-t8-i2va-turbo-native-v2",
+        output_requirement=_output(),
+    )
+    assert decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert decision.reason_codes == (RouterReasonCode.PROVIDER_CAPABILITY_DENIED,)
+
+
+def test_router_selected_capability_fingerprint_includes_canonical_constraints() -> None:
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+    from ai_video.production.hashing import canonical_sha256
+
+    variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO, capability_id="card-i2v"
+    ).model_copy(
+        update={
+            "binding_cardinality_constraints": (
+                VideoBindingCardinalityConstraint(
+                    roles=("first_frame",), min_count=1, max_count=1
+                ),
+                VideoBindingCardinalityConstraint(
+                    roles=("reference",), min_count=0, max_count=0
+                ),
+            )
+        }
+    )
+    capabilities = _capabilities(variant)
+    context = _context(
+        important=True,
+        keyframe=_asset("first_frame", "keyframe", HASH_A),
+    )
+    decision = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=capabilities,
+        selected_capability_id=variant.capability_id,
+        output_requirement=_output(),
+    )
+    assert decision.outcome is RoutingOutcome.SELECTED
+    legacy_dump = variant.model_dump(mode="json", exclude={"binding_cardinality_constraints"})
+    assert decision.selected_capability_fingerprint != canonical_sha256(legacy_dump)

@@ -1,0 +1,16 @@
+task_type: ["6", "inputs", "task_type"]
+prompt: ["6", "inputs", "prompt"]
+seed: ["8", "inputs", "noise_seed"]
+width: ["6", "inputs", "width"]
+height: ["6", "inputs", "height"]
+length: ["6", "inputs", "length"]
+frame_count: ["6", "inputs", "length"]
+steps: ["7", "inputs", "steps"]
+sampler: ["7", "inputs", "sampler_name"]
+scheduler: ["7", "inputs", "scheduler"]
+output_prefix: ["12", "inputs", "filename_prefix"]
+conditioning_node_id: "6"
+first_frame_node_id: null
+last_frame_node_id: null
+dynamic_node_start: 13
+output_node_id: "12"

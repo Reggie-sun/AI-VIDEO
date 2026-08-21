@@ -70,24 +70,27 @@ class ComfyClient:
             )
         return payload
 
-    def upload_image(self, path: str | Path) -> str:
-        image_path = Path(path)
+    def upload_input(self, path: str | Path) -> str:
+        input_path = Path(path)
         try:
-            with image_path.open("rb") as handle:
+            with input_path.open("rb") as handle:
                 response = self.http.post(
                     self._url("/upload/image"),
-                    files={"image": (image_path.name, handle)},
+                    files={"image": (input_path.name, handle)},
                 )
             response.raise_for_status()
         except (OSError, httpx.HTTPError) as exc:
             raise retryable_error(
                 ErrorCode.COMFY_SUBMISSION_FAILED,
-                f"Could not upload image: {image_path}",
+                f"Could not upload ComfyUI input: {input_path}",
                 str(exc),
                 exc if isinstance(exc, BaseException) else None,
             ) from exc
         data = response.json()
-        return data.get("name") or data.get("filename") or image_path.name
+        return data.get("name") or data.get("filename") or input_path.name
+
+    def upload_image(self, path: str | Path) -> str:
+        return self.upload_input(path)
 
     def prepare_image(self, path: str | Path) -> str:
         return self.upload_image(path)

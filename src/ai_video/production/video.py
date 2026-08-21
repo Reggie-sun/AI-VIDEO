@@ -38,12 +38,14 @@ from ai_video.production._video_continuity import (
     validate_terminal_frame_evidence_against_project as validate_terminal_frame_evidence_against_project,
 )
 from ai_video.production.video_contracts import (
+    VideoBindingCardinalityConstraint,
     VideoFlexibleOutputRequirement,
     VideoMediaCapability,
     VideoMediaReferenceBinding,
     VideoOutputCapability,
     VideoProviderTaskBinding,
     media_bindings_satisfy_capabilities,
+    validate_cardinality_constraints,
 )
 
 
@@ -56,6 +58,29 @@ _MEDIA_ROLE_ORDER = {"reference_video": 0, "reference_audio": 1}
 
 def _video_error(code: ErrorCode, message: str) -> AiVideoError:
     return AiVideoError(code=code, user_message=message, retryable=False)
+
+
+def _validate_cardinality_against_request(
+    constraints: tuple[VideoBindingCardinalityConstraint, ...],
+    request: VideoGenerationRequest,
+) -> None:
+    from ai_video.production.video_contracts import binding_counts_satisfy_constraints
+
+    image_counts = {
+        role: sum(1 for binding in request.image_bindings if binding.role == role)
+        for role in ("first_frame", "last_frame", "reference")
+    }
+    media_counts = {
+        role: sum(1 for binding in request.media_bindings if binding.role == role)
+        for role in ("reference_video", "reference_audio")
+    }
+    if not binding_counts_satisfy_constraints(
+        constraints, {**image_counts, **media_counts}
+    ):
+        raise _video_error(
+            ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+            "Video bindings violate the capability binding cardinality constraints.",
+        )
 
 
 def _require_aware(value: datetime, label: str) -> datetime:
@@ -430,6 +455,7 @@ class VideoCapabilityVariant(_VideoStrictModel):
     fps_supported: bool
     idempotent_submit: bool
     lookup_supported: bool
+    binding_cardinality_constraints: tuple[VideoBindingCardinalityConstraint, ...] = ()
 
     @model_validator(mode="after")
     def _validate_variant(self) -> "VideoCapabilityVariant":
@@ -458,6 +484,11 @@ class VideoCapabilityVariant(_VideoStrictModel):
             raise ValueError(
                 "video capability execution and billing kinds must use a supported pair"
             )
+        object.__setattr__(
+            self,
+            "binding_cardinality_constraints",
+            validate_cardinality_constraints(self.binding_cardinality_constraints),
+        )
         return self
 
 
@@ -470,8 +501,12 @@ class VideoProviderCapabilities(_VideoStrictModel):
     def _validate_seal(self) -> "VideoProviderCapabilities":
         if len({variant.capability_id for variant in self.variants}) != len(self.variants):
             raise ValueError("video capability IDs must be unique")
+        from ai_video.production._video_capability_fingerprint import (
+            project_provider_capabilities,
+        )
+
         if self.capabilities_fingerprint != canonical_sha256(
-            self.model_dump(mode="json", exclude={"capabilities_fingerprint"})
+            project_provider_capabilities(self)
         ):
             raise ValueError("capabilities_fingerprint does not match variants")
         return self
@@ -483,15 +518,21 @@ class VideoProviderCapabilities(_VideoStrictModel):
         provider_name: str,
         variants: tuple[VideoCapabilityVariant, ...],
     ) -> "VideoProviderCapabilities":
+        variants = tuple(
+            VideoCapabilityVariant.model_validate(variant.model_dump(mode="python"))
+            for variant in variants
+        )
         data: dict[str, object] = {
             "provider_name": provider_name,
             "variants": variants,
         }
         candidate = cls.model_construct(**data, capabilities_fingerprint="0" * 64)
+        from ai_video.production._video_capability_fingerprint import (
+            project_provider_capabilities,
+        )
+
         data["capabilities_fingerprint"] = canonical_sha256(
-            candidate.model_dump(
-                mode="json", exclude={"capabilities_fingerprint"}, warnings=False
-            )
+            project_provider_capabilities(candidate)
         )
         return cls.model_validate(data)
 
@@ -796,6 +837,11 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             raise _video_error(
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                 "Video media bindings do not satisfy the selected capability variant.",
+            )
+        if capability.binding_cardinality_constraints:
+            _validate_cardinality_against_request(
+                capability.binding_cardinality_constraints,
+                request,
             )
         data: dict[str, object] = {
             "generation_id": request.generation_id,

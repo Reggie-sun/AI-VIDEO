@@ -16,6 +16,10 @@ from ai_video.production._video_requirement_routing import (
     validate_provider_bound_projection,
     validate_requirement_asset_lineage,
 )
+from ai_video.production._video_capability_fingerprint import (
+    binding_roles_satisfy_variant,
+    capability_variant_fingerprint,
+)
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
@@ -1100,8 +1104,8 @@ class VideoGenerationResolver:
         base.update(
             {
                 "selected_capability_id": selected.capability_id,
-                "selected_capability_fingerprint": canonical_sha256(
-                    selected.model_dump(mode="json")
+                "selected_capability_fingerprint": capability_variant_fingerprint(
+                    selected
                 ),
                 "execution_kind": selected.execution_kind,
             }
@@ -1246,6 +1250,7 @@ class VideoGenerationResolver:
             or not self._supports_assets(selected, inputs)
             or not self._supports_output(selected, output_requirement)
             or provider_profile.profile_version != selected.profile_version
+            or not binding_roles_satisfy_variant(selected, required_roles)
         ):
             return self._blocked(
                 base,

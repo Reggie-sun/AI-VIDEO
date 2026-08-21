@@ -450,6 +450,26 @@ def test_h3_workflow_artifacts_route_to_video_provider_suite() -> None:
         assert "task_architecture_gate" in report["check_ids"]
 
 
+def test_t8_native_turbo_v2_code_workflows_and_tests_route_to_provider_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/production/_video_capability_fingerprint.py",
+        "src/ai_video/production/comfy_t8_native_turbo_profile.py",
+        "src/ai_video/production/comfy_t8_native_turbo_video.py",
+        "workflows/bindings/minimax_h3_t8_ref2va_turbo_native_v2_binding.yaml",
+        "workflows/profiles/minimax_h3_t8_i2va_turbo_native_v2.json",
+        "workflows/templates/minimax_h3_t8_fl2va_turbo_native_v2_api.json",
+        "tests/test_production_comfy_t8_native_turbo_video.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert "production_video_provider" in report["categories"]
+        assert "production_video_provider_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
+    provider_argv = policy["checks"]["production_video_provider_tests"]["argv"]
+    assert "tests/test_production_comfy_t8_native_turbo_video.py" in provider_argv
+
+
 def test_seedance_adapter_and_extended_contracts_route_to_video_provider_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

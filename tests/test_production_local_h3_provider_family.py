@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -15,6 +16,21 @@ from ai_video.production.video import (
     VideoProviderRegistry,
 )
 from ai_video.production.video_contracts import VideoOutputCapability
+from ai_video.production.hashing import canonical_sha256
+from ai_video.production._video_capability_fingerprint import (
+    project_capability_variant,
+)
+from ai_video.production.comfy_t8_video import (
+    ComfyUIT8VideoProvider,
+    load_t8_video_execution_profile,
+)
+from ai_video.production.comfy_t8_turbo_video import (
+    load_t8_turbo_video_execution_profile,
+    t8_turbo_capabilities,
+)
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _output() -> VideoOutputCapability:
@@ -164,6 +180,38 @@ def test_family_exposes_both_capabilities_in_deterministic_order() -> None:
     ) == (
         "minimax-h3-t8-t2va-quality-v1",
         "minimax-h3-t8-t2va-turbo-v1",
+    )
+
+
+def test_real_v1_capability_and_two_child_family_fingerprints_are_frozen() -> None:
+    quality_profile = load_t8_video_execution_profile(
+        REPO_ROOT / "workflows/profiles/minimax_h3_t8_t2va_quality.json",
+        artifact_root=REPO_ROOT,
+    )
+    quality_provider = object.__new__(ComfyUIT8VideoProvider)
+    quality_provider.profile = quality_profile
+    quality = quality_provider.capabilities()
+    turbo_profile = load_t8_turbo_video_execution_profile(
+        REPO_ROOT / "workflows/profiles/minimax_h3_t8_t2va_turbo.json",
+        artifact_root=REPO_ROOT,
+    )
+    turbo = t8_turbo_capabilities(turbo_profile)
+
+    assert canonical_sha256(project_capability_variant(quality.variants[0])) == (
+        "6ed812530fb4cff8fc3b3667396b1a50c3829ce5b109efa048ad649c8555aa31"
+    )
+    assert quality.capabilities_fingerprint == (
+        "3b9e58ee57b38c51506573e9cb59127f75dd5b4ee4fe65c9efb97aed06e01761"
+    )
+    assert canonical_sha256(project_capability_variant(turbo.variants[0])) == (
+        "1db0db35311e01b3a5a49af0caf63b9fd0163e99743bcbccf511aa10db037ffb"
+    )
+    assert turbo.capabilities_fingerprint == (
+        "dc10a59156e1ab820f86f2fae0d8107ee7c3a55ead417a084eafeae579683799"
+    )
+    family = LocalH3VideoProviderFamily((_Child(quality.variants[0]), _Child(turbo.variants[0])))
+    assert family.capabilities().capabilities_fingerprint == (
+        "fe029252f59553434aeb23cfc0576ef5d6d476f27fb0bce57ed17ca0d7d68210"
     )
 
 

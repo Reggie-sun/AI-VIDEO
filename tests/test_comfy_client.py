@@ -5,6 +5,44 @@ from ai_video.comfy_client import ComfyClient, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
 
 
+def test_upload_input_reuses_loopback_image_route_for_generic_bytes(tmp_path):
+    source = tmp_path / "reference.mp4"
+    source.write_bytes(b"reference-video")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = request.read()
+        assert request.method == "POST"
+        assert request.url.path == "/upload/image"
+        assert b'name="image"' in body
+        assert b'filename="reference.mp4"' in body
+        assert b"reference-video" in body
+        return httpx.Response(200, json={"name": "server-reference.mp4"})
+
+    client = ComfyClient(
+        "http://127.0.0.1:8188",
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+
+    assert client.upload_input(source) == "server-reference.mp4"
+
+
+def test_upload_image_remains_a_compatible_upload_input_wrapper(
+    tmp_path, monkeypatch
+):
+    source = tmp_path / "frame.png"
+    source.write_bytes(b"png")
+    client = ComfyClient("http://127.0.0.1:8188")
+    seen = []
+    monkeypatch.setattr(
+        client,
+        "upload_input",
+        lambda path: seen.append(path) or "server-frame.png",
+    )
+
+    assert client.upload_image(source) == "server-frame.png"
+    assert seen == [source]
+
+
 def test_get_object_info_returns_registered_node_inventory():
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.url.path == "/object_info"

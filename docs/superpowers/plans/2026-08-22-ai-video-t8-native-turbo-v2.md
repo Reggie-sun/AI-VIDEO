@@ -2,10 +2,11 @@
 
 ## Status
 
-Accepted implementation plan for
+Partial offline implementation of the accepted plan for
 `docs/superpowers/specs/2026-08-22-ai-video-t8-native-turbo-v2.md`。
-本文件只规划后续实现；它不代表四条 capability 已实现、已进入 Router snapshot、已完成
-local ComfyUI smoke、已通过媒体质量验收或已替代现有 Quality / hybrid Turbo v1 lane。
+四条capability的adapter/workflow/profile offline foundation与generic cardinality已经实现，
+但Gate 0A仍阻塞全部V2，Gate 0B另阻塞Ref2VA；它们未进入production family snapshot，
+也未完成local ComfyUI smoke、媒体质量验收或替代现有Quality / hybrid Turbo v1 lane。
 
 四条 required lane 均在本计划内：
 

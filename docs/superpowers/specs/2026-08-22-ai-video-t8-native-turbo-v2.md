@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed，spec-only。本文定义后续窗口可实施的 additive `T8-native Turbo v2` target；required capability set 包括 T2VA、I2VA、FL2VA 与 Ref2VA。当前没有实现、测试、Harness receipt、local live smoke、media quality acceptance、push 或 release truth。
+Partial implementation。T2VA、I2VA、FL2VA 与 Ref2VA 的offline adapter、workflow/profile seal、generic cardinality与compatibility tests已实现；四条profile仍因Gate 0A blocked，Ref2VA另受Gate 0B阻塞，均未进入production family snapshot。当前没有local live smoke、media quality acceptance、push或release truth；offline code acceptance仍以本轮fresh Harness receipt为准。
 
 本 Spec 是 `2026-08-21-ai-video-local-h3-t8-provider-family.md` 的 provider-specific child。现有 `comfy-local-h3-t8` Quality lane 与 hybrid Turbo v1 仍是当前 runtime truth；本文不得被引用为它们已经迁移或退役的证据。
 
