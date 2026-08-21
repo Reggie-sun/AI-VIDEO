@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed，spec-only。本文定义后续窗口可实施的 additive `T8-native Turbo v2` target；当前没有实现、测试、Harness receipt、local live smoke、media quality acceptance、push 或 release truth。
+Proposed，spec-only。本文定义后续窗口可实施的 additive `T8-native Turbo v2` target；required capability set 包括 T2VA、I2VA、FL2VA 与 Ref2VA。当前没有实现、测试、Harness receipt、local live smoke、media quality acceptance、push 或 release truth。
 
 本 Spec 是 `2026-08-21-ai-video-local-h3-t8-provider-family.md` 的 provider-specific child。现有 `comfy-local-h3-t8` Quality lane 与 hybrid Turbo v1 仍是当前 runtime truth；本文不得被引用为它们已经迁移或退役的证据。
 
@@ -13,6 +13,7 @@ Proposed，spec-only。本文定义后续窗口可实施的 additive `T8-native 
 - Larry 只提供 Turbo LoRA weight provenance；
 - T8 独占 H3 audio/video conditioning、双时钟 sampling setup 与 AV decode；
 - ComfyUI `SamplerCustomAdvanced` 只执行 T8 输出的唯一 sampler/sigma contract；
+- T2VA、I2VA、FL2VA 与 Ref2VA 分别以独立 capability/profile 暴露，不能由一个运行时 `task_type` 开关伪装成多能力支持；
 - Shot Router 继续独占 provider/profile/capability selection；
 - 现有 local permit、status/fetch、`ProductionStateCommitter` 与 recovery lifecycle 原样复用；
 - 当前 hybrid Turbo v1 保持可重放、可恢复且不被静默替换。
@@ -78,6 +79,9 @@ T8 `1.36.2` 的官方 stable graph和 converter给出另一条明确路径：
 - T8 commit：`977df788fcf8b971dc3d0fc7d6baa79a0edfaf40`
 - T8 version：`1.36.2`
 - Stable workflow：`examples/workflows/01-basic-generation/2026-08-06_H3_Turbo_Stable_4V4A.json`
+- I2VA model/task evidence：`examples/workflows/10-speed/2026-08-19_H3_SPEED_I2VA_Lock_Stock20_Advanced_EXP.json`
+- FL2VA model/task evidence：`examples/workflows/10-speed/2026-08-09_H3_SPEED_FL2VA_Stock20_Advanced_EXP.json`
+- Ref2VA model/task evidence：`examples/workflows/10-speed/2026-08-09_H3_SPEED_Ref2VA_Stock20_Advanced_EXP.json`
 - Converter：`tools/convert_minimax_h3_lora_for_comfyui.py`
 - Larry node repository comparison baseline：`https://github.com/Larryvrh/ComfyUI-MiniMax-H3-Turbo`
 - Larry node commit：`4274783a23afcfdbea3b4876cb79effd6c510785`
@@ -116,11 +120,19 @@ V2 workflow 禁止包含：
 
 ### Model And LoRA Compatibility
 
-V2 baseline model必须是 non-pruned：
+T2VA、I2VA 与 FL2VA baseline model必须是 non-pruned：
 
 ```text
 minimax_h3_fl2va_int8_convrot.safetensors
 ```
+
+Ref2VA 必须使用独立、non-pruned Ref2VA base：
+
+```text
+minimax_h3_ref2va_int8_convrot.safetensors
+```
+
+T8 upstream mode examples明确区分 FL2VA-family 与 Ref2VA model。Ref2VA capability不得未经evidence复用FL2VA model，也不得回退到本机现有`minimax_h3_ref2va_pruned_int8_convrot.safetensors`。若non-pruned Ref2VA asset尚未安装或Turbo LoRA compatibility尚未验证，Ref2VA capability必须保持unavailable，整份Spec实施状态仍为partial。
 
 V2 baseline LoRA必须是 T8 converter输出的 native ComfyUI-key artifact，当前本机候选 filename 为：
 
@@ -164,31 +176,46 @@ V2 是 `LocalH3VideoProviderFamily` 的 additive child：
 
 V2 failure不得 fallback到Turbo v1、Quality、原生H3、Seedance、Hailuo或remote MiniMax。V1与V2只能由Router显式选择。
 
-## Capability Model
+## Required Capability Model
 
-### Required First Slice
+### Terminology
 
-第一实施 slice 只要求 T2VA：
+本Spec使用T8 upstream正式任务名：
+
+- 用户所说 `I2V` 对应 T8 `I2VA`；
+- 用户所说 `FL2V` 对应 T8 `FL2VA`；
+- 用户所说 `R2V` 对应 T8 `Ref2VA`；
+- `Ref2VA` 是 reference-to-video，不是 remote-to-video，也不是普通 first-frame I2V alias。
+
+AI-VIDEO public capability ID 使用明确的 `i2va`、`fl2va`、`ref2va` token，避免把不同binding grammar压成模糊的`i2v/r2v`。
+
+### Required Capability Set
+
+四条lane都是本Spec最终完成条件。Implementation MAY按T2VA → I2VA → FL2VA → Ref2VA分阶段提交，但只完成T2VA时必须报告`partial`，不得宣称本Spec complete。
+
+| T8 task | Proposed capability ID | Proposed provider kind | Proposed model ID | Neutral mode |
+| --- | --- | --- | --- | --- |
+| T2VA | `minimax-h3-t8-t2va-turbo-native-v2` | `minimax_h3_t8_t2va_turbo_native` | `minimax-h3-t8-t2va-turbo-native` | `TEXT_TO_VIDEO` |
+| I2VA | `minimax-h3-t8-i2va-turbo-native-v2` | `minimax_h3_t8_i2va_turbo_native` | `minimax-h3-t8-i2va-turbo-native` | `IMAGE_TO_VIDEO` |
+| FL2VA | `minimax-h3-t8-fl2va-turbo-native-v2` | `minimax_h3_t8_fl2va_turbo_native` | `minimax-h3-t8-fl2va-turbo-native` | `FIRST_LAST_FRAME_VIDEO` |
+| Ref2VA | `minimax-h3-t8-ref2va-turbo-native-v2` | `minimax_h3_t8_ref2va_turbo_native` | `minimax-h3-t8-ref2va-turbo-native` | `REFERENCE_TO_VIDEO` |
+
+所有capabilities共享：
 
 | Field | Required value |
 | --- | --- |
 | `provider_name` | `comfy-local-h3-t8` |
-| proposed `capability_id` | `minimax-h3-t8-t2va-turbo-native-v2` |
-| proposed `provider_kind` | `minimax_h3_t8_t2va_turbo_native` |
-| proposed `model_id` | `minimax-h3-t8-t2va-turbo-native` |
 | `profile_version` | `v2` |
-| `mode` | `TEXT_TO_VIDEO` |
 | `execution_kind` | `LOCAL` |
 | `billing_kind` | `LOCAL_UNMETERED` |
-| image/media bindings | none |
 | output | `1344x768`, 124 frames, 24 fps, native audio MP4 |
 | remote/fallback | disabled |
 
 最终命名前 implementation 必须验证它不会与 current family snapshot中的现有 identity/capability冲突。命名变化必须同步code、tests、profile、matrix和policy，不能由adapter内部 alias。
 
-### Mode Expansion Contract
+### Required Mode Grammar
 
-T8-native backbone后续可扩展 I2VA、FL2VA 与 Ref2VA，但每种模式必须是独立 capability/profile，不得把不同 binding grammar压进一个宽泛 capability：
+四种模式必须是独立 capability/profile，不得把不同binding grammar压进一个宽泛capability：
 
 | T8 task | Provider-neutral `GenerationMode` | Provider-bound `VideoGenerationMode` | Required bindings | Minimum contract |
 | --- | --- | --- | --- | --- |
@@ -199,11 +226,39 @@ T8-native backbone后续可扩展 I2VA、FL2VA 与 Ref2VA，但每种模式必�
 
 Mode-specific adapter必须从现有 provider-neutral roles映射 T8 `task_type`，不得修改 `ProviderNeutralVideoRequirement` 来容纳 T8私有参数。Exact terminal continuity继续由Router/continuity binding把 accepted upstream terminal bytes映射为 `first_frame`；adapter不能自己选 bridge frame。
 
-I2VA、FL2VA、Ref2VA 在完成各自 template/binding/profile seal、offline tests和独立 local live media proof前，不得出现在 production capability snapshot中。T2VA V2完成不自动证明其它模式可用。
+Required exact grammar：
+
+- T2VA：禁止`first_frame`、`last_frame`及任何reference media；
+- I2VA：必须且只能有一个`first_frame`，禁止`last_frame`和reference media；
+- FL2VA：必须恰有一个`first_frame`和一个`last_frame`，禁止reference media；
+- Ref2VA：禁止`first_frame`和`last_frame`，必须至少有一个reference medium；
+- Ref2VA上限必须seal为T8当前contract允许的最多9张reference images、3个reference videos和3个standalone reference audios；
+- Ref2VA video在`official_2_to_15s` policy下必须是24fps的48–360 frames；
+- 本V2不支持reference-video soundtrack linkage：T8 `ref_video_audios`必须seal为空，video reference只绑定画面；neutral `AUDIO_REFERENCE`只作为standalone audio映射到`ref_audio_N`，不得猜测或合成same-ordinal video关系；
+- `L2VA`与`Hybrid`不属于本Spec，不能由上述四条capability接受。
+
+### Router-Owned Binding Cardinality Contract
+
+现有I2VA与FL2VA都会投影为provider-bound `IMAGE_TO_VIDEO`。仅靠`mode`、`allowed_image_roles`、`required_first_frame`与allowed-role子集检查，无法让Router在selection阶段区分“只有首帧”和“首帧+末帧”，也无法拒绝重复keyframe role。本Spec因此要求给generic `VideoCapabilityVariant`增加immutable、fingerprinted binding cardinality constraints，并由Shot Router在构造provider-bound request前验证。该contract属于通用capability grammar，不进入`ProviderNeutralVideoRequirement`，也不包含T8私有字段。
+
+Required结构是可同时约束单个role和role group的`binding_cardinality_constraints`，每条声明`roles`、`min_count`和`max_count`。Role universe与canonical order固定为`first_frame`、`last_frame`、`reference`、`reference_video`、`reference_audio`。每条constraint的`roles`必须non-empty、unique并按该顺序canonicalize；同一个role tuple只能声明一次；`0 <= min_count <= max_count <= 32`；整个overlapping constraint set必须存在至少一个可满足的count vector，否则capability snapshot validation fail closed。Constraints自身按canonical role tuple排序后再seal，确保语义等价的声明只有一个fingerprint representation。V2 exact constraints为：
+
+| Capability | `first_frame` | `last_frame` | image `reference` | `reference_video` | `reference_audio` | reference group total |
+| --- | --- | --- | --- | --- | --- | --- |
+| T2VA | 0 | 0 | 0 | 0 | 0 | 0 |
+| I2VA | exactly 1 | 0 | 0 | 0 | 0 | 0 |
+| FL2VA | exactly 1 | exactly 1 | 0 | 0 | 0 | 0 |
+| Ref2VA | 0 | 0 | 0–9 | 0–3 | 0–3 | 1–15 |
+
+Non-empty constraints必须进入capability fingerprint，并与现有`allowed_image_roles`、`max_reference_count`和`media_capabilities`共同生效。Implementation必须建立一个shared backward-compatible fingerprint projection，供`VideoProviderCapabilities` seal/validation、Shot Router selected capability fingerprint和compiler lineage comparison共同调用：empty `binding_cardinality_constraints`从projection中省略，使旧variant/snapshot bytes投影得到与当前runtime完全相同的hash；non-empty constraints则以规定的canonical representation进入projection。不得让三个call sites继续各自直接散列不同的`model_dump()`结果。
+
+Missing field加载为empty constraints，selection behavior与fingerprint都保持existing behavior，避免改变Quality、Turbo v1、原生H3或remote providers。Implementation tests必须pin所有existing provider variant/snapshot fingerprints，并以historical Turbo v1 provider-bound request证明reopen/replay lineage仍成立。Adapter可以对selected request重复校验作为defense in depth，但不得承担capability selection或把Router错误延迟到ComfyUI submit。
+
+I2VA、FL2VA、Ref2VA 在完成各自template/binding/profile seal、offline tests和独立local live media proof前，不得出现在production capability snapshot中。T2VA V2完成不自动证明其它模式可用，也不满足本Spec最终completion。
 
 ## Workflow And Output Contract
 
-T2VA V2 API workflow必须至少包含并正确连接：
+每个mode-specific V2 API workflow必须至少包含并正确连接同一T8-native backbone：
 
 - `UNETLoader`；
 - `CLIPLoader`；
@@ -217,9 +272,18 @@ T2VA V2 API workflow必须至少包含并正确连接：
 - `MiniMaxH3AVDecodeT8`；
 - `VHS_VideoCombine`。
 
-T2VA fixed media baseline：
+每个profile必须literal固定自己的`task_type`和binding grammar；runtime request不能覆盖成另一task。Mode-specific workflow inputs：
 
-- `task_type = "T2VA"`；
+| Capability | Fixed `task_type` | Required workflow inputs | Forbidden workflow inputs |
+| --- | --- | --- | --- |
+| T2VA | `T2VA` | prompt | first/last/reference media |
+| I2VA | `I2VA` | prompt + `first_frame` | `last_frame`、reference media |
+| FL2VA | `FL2VA` | prompt + `first_frame` + `last_frame` | reference media |
+| Ref2VA | `Ref2VA` | prompt + at least one sealed reference input | `first_frame`、`last_frame` |
+
+Shared fixed media baseline：
+
+- `task_type` 必须是对应profile声明的exact `T2VA`、`I2VA`、`FL2VA`或`Ref2VA`值；
 - `audio_mode = "native"`；
 - width `1344`；
 - height `768`；
@@ -230,11 +294,13 @@ T2VA fixed media baseline：
 - CRF `17`，作为AI-VIDEO质量profile对上游Stable 4V4A示例CRF `19`的deliberate encoder override；
 - remote/cloud fallback disabled。
 
+I2VA/FL2VA keyframes必须按T8 contract分别编码到exact frame 0与exact final frame `frame_count - 1`。Ref2VA references必须按provider-bound request中的sealed canonical order确定性映射到`ref_image_N`、`ref_video_N`和standalone `ref_audio_N`；`ref_video_audio_N`保持未连接/空值。Adapter不得按文件枚举顺序、ComfyUI history或相邻audio猜测ordinal。
+
 Output history必须从profile-declared output node唯一选择 final `*-audio.mp4`。Video-only sibling、wrong node、wrong suffix、zero/duplicate final AV、missing audio stream、wrong resolution/frame count或ambiguous locator都必须 fail closed。
 
 ## Profile And Preflight Seal
 
-Profile 必须封存并在 permit/submit之前验证：
+Profile 必须封存并在permit consumption / ComfyUI POST之前验证：
 
 - exact T8 commit/version/license；
 - exact ComfyUI commit和T8 stable `dual_clock_euler/native_flow` runtime capability；native `FLOW_AV`只属于未来选择其它ComfyUI sampler的可选route，不是本stable-default V2的前置条件；
@@ -242,7 +308,7 @@ Profile 必须封存并在 permit/submit之前验证：
 - exact SageAttention version/source commit/launch capability；
 - exact workflow/template/binding/profile hashes；
 - exact required node inventory与每个required node的input schema hash；
-- exact non-pruned diffusion model、text encoder、video VAE、audio VAE和converted LoRA identities/hashes；
+- exact mode-compatible non-pruned diffusion model、text encoder、video VAE、audio VAE和converted LoRA identities/hashes；每个base model都必须独立证明LoRA compatibility，尤其Ref2VA不能继承FL2VA proof；
 - exact converter provenance和conversion evidence；
 - 4 steps、12/3 shifts、`dual_clock_euler/native_flow`；
 - resolution/frame/fps/output bounds；
@@ -272,7 +338,8 @@ Profile 必须封存并在 permit/submit之前验证：
 - 不引入global Provider catalog、automatic ranking或fallback；
 - 不把T8设为Manifest、Registry、Dependency Graph、Timeline、Repair或Final Acceptance owner；
 - 不引入T8 Long Video、Studio Timeline、Repair、Reel、Context IR、remote API或credential；
-- 不把T2VA完成外推为I2VA/FL2VA/Ref2VA完成；
+- 不把T2VA完成外推为I2VA/FL2VA/Ref2VA完成，也不把partial staged rollout描述成整份Spec完成；
+- 不实现T8 `L2VA`或`Hybrid` capability；它们需要独立scope与binding contract；
 - 不声称4-step Turbo质量、速度、显存或音频优于现有v1/Quality，除非有fresh受控证据。
 
 ## Acceptance Criteria
@@ -282,25 +349,31 @@ Profile 必须封存并在 permit/submit之前验证：
 3. V2 graph使用non-pruned INT8 ConvRot base、T8-converted Larry LoRA、`LoraLoaderBypassModelOnly`和exactly one `MiniMaxH3DualClockSamplerT8`。
 4. V2 graph不包含 `MiniMaxH3TurboLoRA`、`MiniMaxH3TurboSampler`、`BasicScheduler`、`KSamplerSelect`或external sigma/scheduler owner。
 5. T8 dual-clock settings精确为4 steps、video shift 12、audio shift 3、`dual_clock_euler/native_flow`。
-6. Base model、source LoRA、converter、converted LoRA、T8/ComfyUI/runtime nodes、workflow/binding/profile和output semantics全部exact seal；任一drift在permit/submit前fail closed。
+6. Base model、source LoRA、converter、converted LoRA、T8/ComfyUI/runtime nodes、workflow/binding/profile和output semantics全部exact seal；任一drift在permit consumption / ComfyUI POST前fail closed。
 7. V2复用existing local permit/state/status/fetch、`ProductionStateCommitter`与recovery contracts，不创建第二lifecycle。
 8. Final output唯一选择declared output node的`*-audio.mp4`并测得native audio；video-only sibling被拒绝。
-9. T2VA只暴露`TEXT_TO_VIDEO`且拒绝image/media bindings。
-10. 后续I2VA、FL2VA、Ref2VA各自使用独立 capability/profile并严格验证required roles；未完成local proof前不暴露。
-11. Offline tests证明Router explicit selection、no fallback、profile/input-schema seal、single sampler owner、pruned-base rejection、converted-LoRA verification、local lifecycle/restart dispatch和v1 behavior不变；FL2VA必须精确证明neutral `FIRST_LAST_FRAME_VIDEO`投影为provider-bound `IMAGE_TO_VIDEO`并保留`first_frame + last_frame` grammar。
-12. T2VA V2在声明live-ready前必须完成至少一次sealed loopback smoke，验证`1344x768`、124 frames、24 fps、native audio、final suffix和artifact materialization。
-13. V1/V2受控A/B必须固定prompt、seed、resolution、frames、runtime launch与output checks，并分别报告wall time、VRAM/RAM、motion/blur、audio和artifact hashes；A/B结果不自动改变Router default。
-14. Exact implementation staged snapshot或commit range必须取得fresh passing Harness receipt，且native independent review没有blocking issue。
+9. Required capability snapshot最终包含四条distinct lanes：T2VA、I2VA、FL2VA、Ref2VA；每条只接受本Spec定义的neutral mode和binding grammar，禁止`L2VA`/`Hybrid`或cross-mode inputs。
+10. Shot Router在selection阶段执行fingerprinted generic role/group cardinality constraints，精确拒绝missing、extra、duplicate或cross-mode bindings；constraints按本Spec canonicalize并验证satisfiable。
+11. Ref2VA只支持image、video-frame与standalone audio references；`ref_video_audios`必须seal为空，任何same-ordinal soundtrack linkage留给未来独立neutral relation contract。
+12. Shared backward-compatible fingerprint projection对empty constraints省略新字段、对non-empty constraints包含canonical值；all fingerprint call sites使用同一projection，existing variant/snapshot hashes与historical Turbo v1 lineage保持bit-for-bit不变。
+13. I2VA、FL2VA、Ref2VA各自使用独立capability/template/binding/profile、model compatibility seal和local proof；单条未通过时只能保持该条unavailable，整份Spec仍为partial。
+14. Offline tests证明Router explicit selection、no fallback、profile/input-schema seal、single sampler owner、pruned-base rejection、converted-LoRA verification、local lifecycle/restart dispatch和v1 behavior不变；FL2VA必须精确证明neutral `FIRST_LAST_FRAME_VIDEO`投影为provider-bound `IMAGE_TO_VIDEO`并保留`first_frame + last_frame` grammar。
+15. T2VA、I2VA、FL2VA与Ref2VA在各自声明live-ready前都必须完成至少一次sealed loopback smoke，验证required input bytes/provenance、`1344x768`、124 frames、24 fps、native audio、final suffix和artifact materialization。
+16. V1/V2受控A/B必须固定prompt、seed、resolution、frames、runtime launch与output checks，并分别报告wall time、VRAM/RAM、motion/blur、audio和artifact hashes；A/B结果不自动改变Router default。
+17. Exact implementation staged snapshot或commit range必须取得fresh passing Harness receipt，且native independent review没有blocking issue。
 
 ## Verification Contract
 
 后续 implementation plan必须覆盖以下最小测试面：
 
 - dedicated V2 provider/profile/workflow tests；
-- `tests/test_production_shot_router.py` 的explicit V2 selection、unsupported/no-fallback和mode binding cases；
+- `tests/test_production_shot_router.py` 的四mode explicit V2 selection、unsupported/no-fallback、missing/extra/duplicate/cross-mode role rejection、Ref2VA group cardinality和exact binding cases；
 - provider-neutral adapter regression，证明不引入T8私有requirement grammar；
 - provider family regression，证明Quality、hybrid Turbo v1与T8-native Turbo v2 deterministic coexistence和restart dispatch；
+- fingerprint compatibility tests，pin existing variant/snapshot hashes、historical Turbo v1 lineage和non-empty canonical constraints；
+- cardinality model tests，覆盖role/group canonicalization、duplicate group、invalid bounds、contradictory/unsatisfiable overlaps与unknown role rejection；
 - local state lifecycle tests，证明intent/permit/status/fetch/recovery reuse；
+- workflow/binding tests，证明Ref2VA `ref_video_audios`保持空值、standalone audio只映射到`ref_audio_N`；
 - output tests，证明video-only sibling rejection和`*-audio.mp4` materialization；
 - Harness routing tests和`.agent/harness/policy.yaml` / `docs/agent-primary-contract-matrix.md`同步；
 - focused `python -m pytest`；
@@ -312,9 +385,9 @@ Harness只证明tracked implementation/control-plane snapshot，不执行live Co
 
 ## Promotion Gates
 
-### Gate A — Offline T2VA Contract
+### Gate A — Offline T2VA Foundation
 
-V2 adapter、workflow、binding、profile和tests通过offline focused tests与Harness；不得据此声称live compatibility或质量。
+T2VA adapter、workflow、binding、profile和tests通过offline focused tests与Harness；此时整份Spec状态仍为partial，不得据此声称live compatibility、其它mode支持或质量。
 
 ### Gate B — Local T2VA Technical Smoke
 
@@ -324,9 +397,9 @@ Exact sealed environment完成一次loopback submit/status/fetch/materialize，�
 
 固定输入和环境完成blind或至少independent media review。若V2没有明确收益，保留为experimental/additive lane；不得为“架构更干净”而删除可用v1。
 
-### Gate D — Mode Expansion
+### Gate D — Required I2VA / FL2VA / Ref2VA Completion
 
-按I2VA、FL2VA、Ref2VA逐个新增独立profile、binding、tests和live proof。每个mode independently通过前不得在Router capability snapshot中宣称支持。
+按I2VA、FL2VA、Ref2VA逐个新增独立profile、binding、tests和live proof。每个mode independently通过前不得在Router capability snapshot中宣称支持；只有四条required capabilities都达到各自local technical gate，才能声明本Spec implementation complete。
 
 ### Gate E — Optional V1 Retirement
 
@@ -340,6 +413,7 @@ Exact sealed environment完成一次loopback submit/status/fetch/materialize，�
 2. 当前ComfyUI commit对 `LoraLoaderBypassModelOnly` 与 `MiniMaxH3DualClockSamplerT8` 暴露的exact input schema是什么，是否与upstream Stable 4V4A UI graph一致？
 3. Non-pruned INT8 ConvRot base在RTX 5090、1344x768、124 frames、native audio、4 steps下的实际VRAM/RAM和wall time是多少？
 4. V2与hybrid v1在相同prompt/seed下的motion smear、细节、音频稳定性和failure rate是否有material差异？
-5. I2VA、FL2VA、Ref2VA各自的first/last/reference数量、格式、尺寸、时长和audio-mode bounds应如何seal，且如何映射现有provider-neutral roles而不修改neutral schema？
+5. 在本Spec已固定的mode grammar与T8上限内，I2VA、FL2VA、Ref2VA各自还需要哪些更窄的production size/MIME/audio-mode bounds，才能在不修改neutral schema的前提下形成稳定profile？
+6. Ref2VA non-pruned INT8 model的local asset identity与Turbo LoRA compatibility如何证明；若需要不同LoRA/conversion artifact，其source和converted seals是什么？
 
 上述未决项不阻塞spec acceptance，但阻塞对应capability的implementation/live-ready或promotion claim。
