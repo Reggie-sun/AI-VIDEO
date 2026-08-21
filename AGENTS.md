@@ -56,6 +56,23 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 
 如果用户请求有意改变既有契约，必须在同一任务中同步更新代码、测试与对应 canonical 文档。不得只改文档就把 proposed behavior 描述成 runtime truth。
 
+## Spec And Plan Routing
+
+Agent 必须根据当前 task 的 uncertainty、contract impact、execution complexity、handoff need 与 verification risk，自主选择 `neither`、`spec only`、`plan only` 或 `spec + plan`。除非用户明确限定 artifact scope，否则不得仅为询问“是否需要写 spec / plan”而暂停；应在过程更新中简短说明选择及依据，然后继续到自然停止点。用户明确要求或禁止 spec / plan 时，以用户指令为准。
+
+- `neither`：需求、owner、边界和验证方式已清晰，且工作是 narrow bug fix、局部 documentation/configuration、mechanical change 或可在单次连续执行中安全完成的 bounded implementation。此类 task 使用 thread 内的 lightweight contract / plan 即可，不创建重复 artifact。
+- `spec only`：目标行为、public contract、schema/data model、canonical owner、lifecycle/state、compatibility、safety gate 或关键 tradeoff 尚需形成 durable target，但尚未获准实施、暂不需要 execution sequencing，或 implementation plan 会过早固化未知细节。
+- `plan only`：已有 accepted spec、canonical contract 或足够明确的用户要求，但 implementation 跨多个 modules/milestones、存在 ordering/migration/recovery concern、需要 delegated handoff、预计跨 session，或 verification matrix 需要 durable sequencing。
+- `spec + plan`：既需要稳定新的或显著变化的 target contract，又需要组织 non-trivial execution。必须先收敛 spec，再让 plan 引用该 spec；不得用 plan 偷带未解决的 product/architecture 决策。
+
+下列情况默认提高到 durable spec：开始新的 runtime slice；改变 public API/CLI、schema、Manifest、artifact layout、canonical owner、Provider/renderer/timeline selection、activation/recovery、paid/cloud/secret/safety contract；或存在多个合理方案且选择会影响 compatibility 或后续 slices。下列情况默认提高到 durable plan：改动跨越多个 canonical owners、需要 migration 或 rollback、包含多个有依赖关系的 implementation units、需要跨 session / agent handoff，或无法用一个 focused verification command可信覆盖。
+
+Agent 不得仅因 file count、task 被称为 feature、使用了 Skill、存在历史 spec/plan，或“先写文档更完整”而创建 artifact。Root cause 尚未确定的 diagnosis 应先收集 evidence；除非 investigation 本身需要 durable multi-session coordination，否则不得用 prospective spec / plan 代替 diagnosis。已有 active artifact 能被安全更新时，优先更新唯一 owner，不创建并行 spec / plan。
+
+Durable specs 写入 `docs/superpowers/specs/YYYY-MM-DD-<slug>.md`，durable plans 写入 `docs/superpowers/plans/YYYY-MM-DD-<slug>.md`；这些路径只是 artifact storage，不会自动启用 Superpowers 或其他 workflow。Artifact 必须记录 `Status`、accepted scope、out-of-scope、contracts/invariants、acceptance criteria、verification，以及 relevant assumptions / unresolved decisions；plan 还必须引用 governing spec 或明确写明其直接依据的 canonical contract。若关键选择会扩大用户 scope、触发 `Decision Gates` 或产生 materially different outcomes，必须先向用户提问，不能由 Agent 借写 spec / plan 自行批准。
+
+创建或更新 spec / plan 属于 task preparation，不代表 implementation、remote/paid call、quality acceptance、push 或 release 已获授权，也不改变 Runtime Truth Sources。若用户请求 implementation 且上述关键选择均已解决，Agent 可在同一 task 内先写必要 artifact 再继续实施，无需为 lifecycle transition 重复请求确认。
+
 ## Product Invariants
 
 ### Legacy `0.1.x`
