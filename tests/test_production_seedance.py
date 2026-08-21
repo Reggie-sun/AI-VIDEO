@@ -1756,7 +1756,7 @@ def _synthetic_registry(
     registry = provisional.model_copy(
         update={"revision_id": revision_id, "content_hash": revision_id}
     )
-    payload = _canonical_model_bytes(registry)
+    payload = _canonical_model_bytes(registry) + b"\n"
     pointer = RegistrySnapshotPointer(
         path=Path(f"assets/registry.{revision_id}.json"),
         revision_id=revision_id,
@@ -1805,6 +1805,45 @@ def test_synthetic_png_resolver_seals_exact_bytes_and_request_aggregate():
         f"seedance-synthetic-egress:{aggregate.content_hash}"
     )
     assert base64.b64encode(png).decode("ascii") not in repr(resolver)
+
+
+@pytest.mark.parametrize("terminator", [b"", b"\n\n"])
+def test_synthetic_resolver_rejects_noncanonical_registry_terminator(terminator):
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-anime-registry-terminator-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+    registry, registry_bytes, _ = _synthetic_registry(binding)
+    receipt = _synthetic_receipt(
+        asset_module, binding, registry_revision_id=registry.revision_id
+    )
+    child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=binding.role,
+        asset_id=binding.asset_id,
+        receipt_content_hash=receipt.content_hash,
+    )
+    aggregate = _synthetic_policy_receipt(asset_module, child)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        asset_module.SeedanceSyntheticImageReferenceResolver(
+            (receipt,),
+            policy_receipt=aggregate,
+            image_bytes={binding.asset_id: png},
+            evidence_source=_synthetic_evidence_source(
+                asset_module, (receipt,), aggregate
+            ),
+            registry_snapshot_bytes=registry_bytes.rstrip(b"\n") + terminator,
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert "Registry evidence is not canonical" in str(exc_info.value)
 
 
 def test_synthetic_resolver_rejects_unreopenable_canonical_evidence():

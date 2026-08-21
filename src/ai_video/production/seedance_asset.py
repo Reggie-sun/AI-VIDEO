@@ -78,6 +78,10 @@ def _canonical_model_bytes(model: StrictModel) -> bytes:
     ).encode()
 
 
+def _canonical_registry_bytes(registry: AssetRegistrySnapshot) -> bytes:
+    return _canonical_model_bytes(registry) + b"\n"
+
+
 def _read_evidence(
     source: SeedanceSyntheticEvidenceSource,
     evidence_id: str,
@@ -391,7 +395,7 @@ def _reopen_registry_snapshot(payload: bytes) -> AssetRegistrySnapshot:
     except Exception:
         raise _invalid("Seedance Registry evidence is invalid.") from None
     if (
-        _canonical_model_bytes(registry) != payload
+        _canonical_registry_bytes(registry) != payload
         or registry.revision_id != registry.content_hash
         or registry.content_hash != registry_semantic_sha256(registry)
     ):
