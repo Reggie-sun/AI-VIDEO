@@ -182,9 +182,17 @@ class OnnxSubjectTrackerBackend:
         assets: ContinuityModelAssets,
         session_factory: OnnxSessionFactory = _default_session_factory,
     ) -> None:
+        if profile.inference_runtime.name not in (
+            "onnxruntime",
+            "onnxruntime-gpu",
+        ):
+            raise _review_error(
+                "Continuity visual runtime does not match the sealed profile.",
+                profile.inference_runtime.name,
+            )
         expected_runtimes = (
             (profile.numeric_runtime, "numpy"),
-            (profile.inference_runtime, "onnxruntime"),
+            (profile.inference_runtime, profile.inference_runtime.name),
         )
         for identity, package_name in expected_runtimes:
             try:
@@ -923,6 +931,29 @@ class HybridContinuityEvaluatorV1:
                             "Checked the same ReID track after its trusted exit crossing."
                         ),
                     )
+
+        if (
+            getattr(profile, "automatic_match_policy", None)
+            == "human-confirmation-required"
+        ):
+
+            def require_human_confirmation(
+                automatic: ContinuityCheckMeasurement,
+            ) -> ContinuityCheckMeasurement:
+                if automatic.status != "match":
+                    return automatic
+                return _not_evaluated(
+                    automatic.expected,
+                    (
+                        "Automatic observation "
+                        f"{automatic.observed!r} requires bound human confirmation."
+                    ),
+                )
+
+            motion = require_human_confirmation(motion)
+            entrance = require_human_confirmation(entrance)
+            exit_state = require_human_confirmation(exit_state)
+            reentry = require_human_confirmation(reentry)
 
         identity = _not_evaluated(
             str(tuple(item.artifact_id for item in constraints.character_identities)),

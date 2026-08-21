@@ -5,6 +5,7 @@ import importlib.metadata
 import os
 import shutil
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -38,6 +39,18 @@ HASH_B = "b" * 64
 HASH_C = "c" * 64
 HASH_D = "d" * 64
 HASH_E = "e" * 64
+
+
+def _onnx_runtime_identity() -> ToolIdentity:
+    for package_name in ("onnxruntime", "onnxruntime-gpu"):
+        try:
+            return ToolIdentity(
+                name=package_name,
+                version=importlib.metadata.version(package_name),
+            )
+        except importlib.metadata.PackageNotFoundError:
+            continue
+    raise AssertionError("an ONNX Runtime distribution is required")
 
 
 def _onnx_model(*, role: str, payload: bytes):
@@ -76,12 +89,13 @@ def _visual_profile(
         numeric_runtime=ToolIdentity(
             name="numpy", version=importlib.metadata.version("numpy")
         ),
-        inference_runtime=ToolIdentity(
-            name="onnxruntime",
-            version=(
-                inference_runtime_version
-                or importlib.metadata.version("onnxruntime")
-            ),
+        inference_runtime=_onnx_runtime_identity().model_copy(
+            update={
+                "version": (
+                    inference_runtime_version
+                    or _onnx_runtime_identity().version
+                )
+            }
         ),
         detector=_onnx_model(role="detector", payload=detector_bytes),
         reid=_onnx_model(role="reid", payload=reid_bytes),
@@ -95,6 +109,26 @@ def _visual_profile(
         minimum_direction_delta_milli=150,
         minimum_direction_consistency_milli=750,
         edge_band_milli=150,
+    )
+
+
+def _human_confirmation_visual_profile():
+    base_profile = _visual_profile(
+        detector_bytes=b"detector-v1", reid_bytes=b"reid-v1"
+    )
+    return SimpleNamespace(
+        **{
+            name: getattr(base_profile, name)
+            for name in type(base_profile).model_fields
+            if name != "profile_content_hash"
+        },
+        automatic_match_policy="human-confirmation-required",
+        profile_content_hash=continuity_evaluator.canonical_sha256(
+            {
+                "base": base_profile.profile_content_hash,
+                "automatic_match_policy": "human-confirmation-required",
+            }
+        ),
     )
 
 
@@ -597,13 +631,16 @@ def _tracked_evaluate(
     resolved=None,
     human_fallback=None,
     human_fallback_identity=None,
+    visual_profile=None,
 ):
     artifact_bytes = b"tracked-continuity-artifact"
     artifact = tmp_path / "tracked.mp4"
     artifact.write_bytes(artifact_bytes)
     detector = b"detector-v1"
     reid = b"reid-v1"
-    profile = _visual_profile(detector_bytes=detector, reid_bytes=reid)
+    profile = visual_profile or _visual_profile(
+        detector_bytes=detector, reid_bytes=reid
+    )
     sampler = _FixtureRgbSampler(len(observations))
     tracker = _FixtureTrackedBackend(profile, observations)
     evaluator = continuity_evaluator.HybridContinuityEvaluatorV1(
@@ -652,6 +689,123 @@ def test_tracked_measurements_bind_profile_and_signed_subject_state(
     assert evidence.coverage_complete is False
     assert adjudicate_generated_shot_continuity(evidence) is QaVerdict.NOT_EVALUATED
     assert sampler.calls == tracker.calls == 1
+
+
+def test_profile_can_require_human_confirmation_for_automatic_matches(
+    tmp_path: Path,
+) -> None:
+    guarded_profile = _human_confirmation_visual_profile()
+    track = "subject-track-a"
+    observations = (
+        _tracked_observation(0, "absent"),
+        _tracked_observation(
+            1, "present", center_x_milli=80, track_identity=track
+        ),
+        _tracked_observation(
+            2, "present", center_x_milli=500, track_identity=track
+        ),
+        _tracked_observation(
+            3, "present", center_x_milli=920, track_identity=track
+        ),
+        _tracked_observation(4, "absent"),
+    )
+
+    evidence, *_ = _tracked_evaluate(
+        tmp_path,
+        observations,
+        visual_profile=guarded_profile,
+    )
+
+    measurements = evidence.raw_measurements
+    assert measurements is not None
+    assert measurements.motion_direction.status == "not_evaluated"
+    assert measurements.entrance_state.status == "not_evaluated"
+    assert measurements.exit_state.status == "not_evaluated"
+    assert measurements.unexpected_reentry.status == "not_evaluated"
+    assert evidence.coverage_complete is False
+    assert adjudicate_generated_shot_continuity(evidence) is QaVerdict.NOT_EVALUATED
+
+    human_identity = ToolIdentity(
+        name="fixture-human-continuity", version="guarded-1"
+    )
+
+    def fallback(_held_fd, request, measured, qa_policy_content_hash):
+        binding = request.continuity_binding
+        original = request.activation_scope.request
+        assert binding is not None
+        return GeneratedShotContinuityEvidence.create(
+            source_shot_id=binding.terminal_frame.source_shot_id,
+            target_shot_id=original.target_shot_id,
+            target_shot_content_hash=original.target_shot_content_hash,
+            resolved_generation_hash=request.resolved_generation_hash,
+            artifact_sha256=measured.artifact_sha256,
+            continuity_constraints_hash=binding.constraints.content_hash,
+            qa_policy_content_hash=qa_policy_content_hash,
+            evaluator=human_identity,
+            strength=EvidenceStrength.HUMAN,
+            coverage_complete=True,
+            identity_match=True,
+            camera_axis_match=True,
+            framing_match=True,
+            motion_direction_match=True,
+            entrance_state_match=True,
+            exit_state_match=True,
+            unexpected_reentry=False,
+            rationale="Human confirmed the guarded automatic observations.",
+        )
+
+    confirmed, *_ = _tracked_evaluate(
+        tmp_path,
+        observations,
+        visual_profile=guarded_profile,
+        human_fallback=fallback,
+        human_fallback_identity=human_identity,
+    )
+
+    assert confirmed.strength is EvidenceStrength.HUMAN
+    assert confirmed.coverage_complete is True
+    assert adjudicate_generated_shot_continuity(confirmed) is QaVerdict.PASS
+
+
+def test_human_confirmation_policy_preserves_automatic_mismatch(
+    tmp_path: Path,
+) -> None:
+    track = "subject-track-a"
+    observations = (
+        _tracked_observation(0, "absent"),
+        _tracked_observation(
+            1, "present", center_x_milli=920, track_identity=track
+        ),
+        _tracked_observation(
+            2, "present", center_x_milli=500, track_identity=track
+        ),
+        _tracked_observation(
+            3, "present", center_x_milli=80, track_identity=track
+        ),
+        _tracked_observation(4, "absent"),
+    )
+    fallback_calls = 0
+
+    def forbidden_fallback(*_args):
+        nonlocal fallback_calls
+        fallback_calls += 1
+        raise AssertionError("known automatic mismatch must not request fallback")
+
+    evidence, *_ = _tracked_evaluate(
+        tmp_path,
+        observations,
+        visual_profile=_human_confirmation_visual_profile(),
+        human_fallback=forbidden_fallback,
+        human_fallback_identity=ToolIdentity(
+            name="fixture-human-continuity", version="guarded-1"
+        ),
+    )
+
+    measurements = evidence.raw_measurements
+    assert measurements is not None
+    assert measurements.motion_direction.status == "mismatch"
+    assert adjudicate_generated_shot_continuity(evidence) is QaVerdict.FAIL
+    assert fallback_calls == 0
 
 
 def test_evaluator_intent_binds_profile_before_visual_execution(
