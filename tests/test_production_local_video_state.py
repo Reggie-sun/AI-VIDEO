@@ -142,6 +142,7 @@ class LocalVideoProviderDouble:
 def _runtime(
     root: Path,
     *,
+    t8_t2va: bool = False,
     submit_error: ErrorCode | None = None,
     status_state: VideoTaskState = VideoTaskState.SUCCEEDED,
     status_error: ErrorCode | None = None,
@@ -156,16 +157,26 @@ def _runtime(
         fps=24,
         container="mp4",
         mime_type="video/mp4",
-        native_audio=False,
+        native_audio=t8_t2va,
     )
     profile_sha = "a" * 64
+    provider_name = "comfy-local-h3-t8" if t8_t2va else "comfy-local-h3"
+    provider_kind = "minimax_h3_t8_t2va" if t8_t2va else "minimax_h3_fl2va"
+    model_id = "minimax-h3-t8-t2va-quality" if t8_t2va else "minimax-h3-fl2va"
+    generation_mode = (
+        VideoGenerationMode.TEXT_TO_VIDEO
+        if t8_t2va
+        else VideoGenerationMode.IMAGE_TO_VIDEO
+    )
     request = VideoGenerationRequest.create(
         generation_id="local-h3-generation-1",
-        provider_name="comfy-local-h3",
-        provider_kind="minimax_h3_fl2va",
-        model_id="minimax-h3-fl2va",
+        provider_name=provider_name,
+        provider_kind=provider_kind,
+        model_id=model_id,
         provider_profile=ProviderProfilePointer(
-            profile_id="minimax-h3-fl2va",
+            profile_id=(
+                "minimax-h3-t8-t2va-quality" if t8_t2va else "minimax-h3-fl2va"
+            ),
             profile_version="v1",
             profile_path=Path(f"provider-profiles/{profile_sha}.json"),
             profile_sha256=profile_sha,
@@ -175,43 +186,51 @@ def _runtime(
         target_shot_content_hash=shot.content_hash,
         target_asset_role=shot.required_asset_roles[0].role,
         target_visual_strategy="generated_video",
-        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        mode=generation_mode,
         prompt_text="Continue the camera move from the exact terminal frame.",
         negative_prompt_text="",
         image_bindings=(
-            VideoImageReferenceBinding(
-                role="first_frame",
-                asset_id=source.asset_id,
-                asset_sha256=source.sha256,
-                mime_type=source.mime_type,
-                width=source.width or 64,
-                height=source.height or 64,
-                size_bytes=source.size_bytes,
-            ),
+            ()
+            if t8_t2va
+            else (
+                VideoImageReferenceBinding(
+                    role="first_frame",
+                    asset_id=source.asset_id,
+                    asset_sha256=source.sha256,
+                    mime_type=source.mime_type,
+                    width=source.width or 64,
+                    height=source.height or 64,
+                    size_bytes=source.size_bytes,
+                ),
+            )
         ),
-        seal_terminal_frame=True,
+        seal_terminal_frame=not t8_t2va,
         output_requirement=output,
         seed=19,
         base_project=inputs.project.manifest.active_project,
         base_registry=inputs.project.manifest.active_registry,
         base_dependency_graph=inputs.project.manifest.active_dependency_graph,
-        input_artifact_ids=(shot.artifact_id, source.asset_id),
+        input_artifact_ids=(
+            (shot.artifact_id,) if t8_t2va else (shot.artifact_id, source.asset_id)
+        ),
         output_asset_id="local-h3-video-1",
     )
     variant = VideoCapabilityVariant(
-        capability_id="minimax-h3-fl2va-local",
-        provider_kind="minimax_h3_fl2va",
-        model_id="minimax-h3-fl2va",
+        capability_id=(
+            "minimax-h3-t8-t2va-quality-v1" if t8_t2va else "minimax-h3-fl2va-local"
+        ),
+        provider_kind=provider_kind,
+        model_id=model_id,
         profile_version="v1",
         execution_kind=VideoExecutionKind.LOCAL,
         billing_kind=BillingKind.LOCAL_UNMETERED,
-        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        mode=generation_mode,
         output=output,
-        allowed_image_roles=("first_frame", "last_frame"),
-        required_first_frame=True,
+        allowed_image_roles=(() if t8_t2va else ("first_frame", "last_frame")),
+        required_first_frame=not t8_t2va,
         max_reference_count=0,
-        allowed_image_mime_types=(source.mime_type,),
-        max_image_bytes=max(source.size_bytes, 1),
+        allowed_image_mime_types=(() if t8_t2va else (source.mime_type,)),
+        max_image_bytes=(1 if t8_t2va else max(source.size_bytes, 1)),
         min_image_width=1,
         min_image_height=1,
         negative_prompt_supported=False,
@@ -222,7 +241,7 @@ def _runtime(
     )
     provider = LocalVideoProviderDouble(
         capabilities=VideoProviderCapabilities.create(
-            provider_name="comfy-local-h3", variants=(variant,)
+            provider_name=provider_name, variants=(variant,)
         ),
         artifact_bytes=FIXTURE.read_bytes(),
         submit_error=submit_error,
@@ -293,6 +312,31 @@ def test_local_video_lifecycle_never_claims_paid_authority_and_replays_exactly(
         service.submit_local_once(attempt_id=ATTEMPT_ID)
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
     assert provider.submit_calls == 1
+
+
+def test_t8_t2va_reuses_local_intent_permit_and_state_lifecycle(tmp_path: Path) -> None:
+    _, provider, resolved, committer = _runtime(tmp_path, t8_t2va=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    submission = service.submit_local_once(attempt_id=ATTEMPT_ID)
+    observation = service.refresh_local_once(attempt_id=ATTEMPT_ID)
+
+    assert resolved.provider_name == "comfy-local-h3-t8"
+    assert resolved.mode is VideoGenerationMode.TEXT_TO_VIDEO
+    assert resolved.image_bindings == ()
+    assert resolved.effective_output.native_audio is True
+    assert submission.provider_request_id == "comfy-prompt-1"
+    assert observation.state is VideoTaskState.SUCCEEDED
+    state = committer._read_manifest().attempts[-1]
+    assert state.paid_provider_state is None
+    assert state.video_generation_state is not None
+    assert state.video_generation_state.local_submit_intent is not None
+    assert state.video_generation_state.local_submit_receipt is not None
+    assert state.video_generation_state.local_latest_observation is not None
+    assert service.resume_next_action(attempt_id=ATTEMPT_ID) == "fetch"
+    assert provider.submit_calls == 1
+    assert provider.status_calls == 1
 
 
 def test_local_submit_intent_recovery_stops_without_resubmit(tmp_path: Path) -> None:

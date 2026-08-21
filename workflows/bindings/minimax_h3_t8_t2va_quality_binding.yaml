@@ -1,0 +1,11 @@
+prompt: ["5", "inputs", "prompt"]
+seed: ["7", "inputs", "noise_seed"]
+width: ["5", "inputs", "width"]
+height: ["5", "inputs", "height"]
+length: ["5", "inputs", "length"]
+frame_count: ["5", "inputs", "length"]
+steps: ["6", "inputs", "steps"]
+sampler: ["6", "inputs", "sampler_name"]
+scheduler: ["6", "inputs", "scheduler"]
+output_prefix: ["11", "inputs", "filename_prefix"]
+output_node_id: "11"

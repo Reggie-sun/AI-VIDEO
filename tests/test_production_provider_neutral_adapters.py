@@ -10,6 +10,10 @@ import pytest
 
 from ai_video.production._video_requirement_routing import requirement_output_matches
 from ai_video.production.comfy_video import ComfyUIVideoProvider
+from ai_video.production.comfy_t8_video import (
+    ComfyUIT8VideoProvider,
+    load_t8_video_execution_profile,
+)
 from ai_video.production.minimax_h3 import MiniMaxH3VideoProvider
 from ai_video.production.minimax_hailuo import MiniMaxHailuoVideoProvider
 from ai_video.production.seedance import SeedanceVideoProvider
@@ -328,6 +332,88 @@ def test_local_h3_compiles_neutral_first_frame_without_runtime_execution(
         int(compiled.request.request_input_hash[:16], 16) & ((1 << 63) - 1)
     )
     assert provider.resolve(compiled.request) == resolved
+
+
+def test_local_t8_compiles_exact_neutral_t2va_without_runtime_execution() -> None:
+    root = Path(__file__).resolve().parents[1]
+    profile = load_t8_video_execution_profile(
+        root / "workflows/profiles/minimax_h3_t8_t2va_quality.json",
+        artifact_root=root,
+    )
+    provider = ComfyUIT8VideoProvider(
+        profile,
+        artifact_root=root,
+        comfy_root=root,
+        runtime_inspector=lambda: (_ for _ in ()).throw(
+            AssertionError("offline compiler mapping must not inspect runtime")
+        ),
+        transport=object(),
+    )
+    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+    output = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=124,
+        dimension_mode="exact",
+        width=1344,
+        height=768,
+        resolution_label="h3_t8_native",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=True,
+    )
+    projection = _replace_requirement(
+        _verified_requirement(context),
+        generation_mode=RequirementGenerationMode.TEXT_TO_VIDEO,
+        continuity_mode=RequirementContinuityMode.NONE,
+        semantic_reference_roles=(),
+        asset_evidence=(),
+        output_need=OutputNeed(
+            timing_mode="frame_count",
+            frame_count=124,
+            geometry_policy=OutputGeometryPolicy.EXACT,
+            width=1344,
+            height=768,
+            aspect_ratio="16:9",
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.REQUIRED,
+    )
+    routing = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(),
+        provider_profile=ProviderProfilePointer(
+            profile_id="minimax-h3-t8-t2va-quality",
+            profile_version="v1",
+            profile_path=Path(f"provider-profiles/{profile.profile_content_hash}.json"),
+            profile_sha256=profile.profile_content_hash,
+        ),
+        capabilities=provider.capabilities(),
+        selected_capability_id="minimax-h3-t8-t2va-quality-v1",
+        output_requirement=output,
+        lifecycle=_lifecycle(context),
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="comfy-local-h3-t8-video-compiler",
+            compiler_version="1",
+        ),
+    )
+
+    assert routing.decision.outcome is RoutingOutcome.SELECTED
+    assert routing.provider_bound_request is not None
+    compiled = provider.compile_request(
+        routing.provider_bound_request,
+        projection.requirement,
+    )
+    assert isinstance(compiled, CompiledProviderVideoRequest)
+    assert compiled.request.image_bindings == ()
+    assert compiled.request.media_bindings == ()
+    resolved = provider.resolve(compiled.request)
+    assert resolved.provider_name == "comfy-local-h3-t8"
+    assert resolved.capability_id == "minimax-h3-t8-t2va-quality-v1"
+    assert resolved.effective_output.native_audio is True
 
 
 def test_hailuo_compiles_first_frame_to_adaptive_i2v_without_fixed_pixels() -> None:

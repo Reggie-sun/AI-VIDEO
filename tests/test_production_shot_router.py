@@ -1657,6 +1657,80 @@ def test_router_surface_is_available_from_production_package() -> None:
     assert PublicVideoGenerationResolver is VideoGenerationResolver
 
 
+def test_t8_t2va_requires_explicit_capability_selection_without_fallback() -> None:
+    from pathlib import Path
+
+    from ai_video.production.comfy_t8_video import (
+        ComfyUIT8VideoProvider,
+        load_t8_video_execution_profile,
+    )
+
+    root = Path(__file__).resolve().parents[1]
+    execution_profile = load_t8_video_execution_profile(
+        root / "workflows/profiles/minimax_h3_t8_t2va_quality.json",
+        artifact_root=root,
+    )
+    provider = ComfyUIT8VideoProvider(
+        execution_profile,
+        artifact_root=root,
+        comfy_root=root,
+        runtime_inspector=lambda: (_ for _ in ()).throw(
+            AssertionError("Router selection must not inspect the local runtime")
+        ),
+        transport=object(),
+    )
+    capabilities = provider.capabilities()
+    output = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=124,
+        dimension_mode="exact",
+        width=1344,
+        height=768,
+        resolution_label="h3_t8_native",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=True,
+    )
+    profile = ProviderProfilePointer(
+        profile_id="minimax-h3-t8-t2va-quality",
+        profile_version="v1",
+        profile_path=Path(
+            f"provider-profiles/{execution_profile.profile_content_hash}.json"
+        ),
+        profile_sha256=execution_profile.profile_content_hash,
+    )
+    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+
+    selected = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=profile,
+        capabilities=capabilities,
+        selected_capability_id="minimax-h3-t8-t2va-quality-v1",
+        output_requirement=output,
+    )
+    missing = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=profile,
+        capabilities=capabilities,
+        selected_capability_id="minimax-h3-fl2va-local-v1",
+        output_requirement=output,
+    )
+
+    assert selected.outcome is RoutingOutcome.SELECTED
+    assert selected.provider_name == "comfy-local-h3-t8"
+    assert selected.required_mode is VideoGenerationMode.TEXT_TO_VIDEO
+    assert selected.required_binding_roles == ()
+    assert missing.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert missing.provider_name == "comfy-local-h3-t8"
+    assert missing.selected_capability_id == "minimax-h3-fl2va-local-v1"
+    assert missing.selected_capability_fingerprint is None
+    assert missing.reason_codes == (RouterReasonCode.PROVIDER_CAPABILITY_DENIED,)
+
+
 def test_exact_terminal_accepts_real_h3_and_hailuo_i2v_capabilities() -> None:
     from pathlib import Path
 
