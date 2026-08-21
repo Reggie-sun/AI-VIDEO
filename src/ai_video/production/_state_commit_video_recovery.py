@@ -57,6 +57,23 @@ class _StateCommitVideoRecoveryMixin:
                     self._reopen_terminal_frame_extraction(
                         state.terminal_frame_extraction
                     )
+                if state.continuity_evaluation is not None:
+                    continuity_intent = self._reopen_continuity_evaluation_intent(
+                        state.continuity_evaluation.intent
+                    )
+                    if state.continuity_evaluation.evidence is not None:
+                        continuity_evidence = (
+                            self._reopen_generated_shot_continuity_evidence(
+                                state.continuity_evaluation.evidence
+                            )
+                        )
+                        if (
+                            continuity_evidence.evaluation_fingerprint
+                            != continuity_intent.evaluation_fingerprint
+                        ):
+                            raise _state_invalid(
+                                "Recoverable continuity evidence does not match its intent."
+                            )
                 protected_validate[attempt.attempt_id] = attempt
                 # The generic recovery owner must not reinterpret a safely
                 # persisted post-fetch phase.  Restore this exact attempt below.

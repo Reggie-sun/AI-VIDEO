@@ -82,17 +82,17 @@ class _StateCommitReviewMixin:
             manifest = self._read_manifest()
             if manifest.manifest_revision != expected_manifest_revision:
                 if (
-                    manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8"}
+                    manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}
                     and manifest.active_qa_policy == pointer
                 ):
                     return manifest
                 raise _state_invalid("QA policy base Manifest revision changed.")
-            if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8"}:
+            if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}:
                 raise _state_invalid("P6 requires a P5 Manifest 2.3, 2.4, or 2.5 base.")
             if manifest.active_dependency_graph is None:
                 raise _state_invalid("P6 requires an active dependency graph.")
             if (
-                manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8"}
+                manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}
                 and manifest.active_qa_policy == pointer
             ):
                 return manifest
@@ -224,7 +224,7 @@ class _StateCommitReviewMixin:
                 render_output_sha256=current_render.output.file_sha256,
             )
             if (
-                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8"}
+                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}
                 or bundle.manifest != manifest
                 or manifest.active_qa_policy != receipt.qa_policy
                 or manifest.active_dependency_graph is None
@@ -354,7 +354,7 @@ class _StateCommitReviewMixin:
                 render_output_sha256=current_render.output.file_sha256,
             )
             if (
-                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8"}
+                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}
                 or bundle.manifest != manifest
                 or manifest.manifest_revision != request.base_manifest_revision
                 or manifest.active_dependency_graph != request.dependency_graph

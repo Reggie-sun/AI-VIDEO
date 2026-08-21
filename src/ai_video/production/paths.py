@@ -286,6 +286,20 @@ def canonical_video_provenance_receipt_path(content_hash: str) -> Path:
     )
 
 
+def canonical_continuity_evaluation_intent_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/continuity-evaluation/intents/"
+        f"{_require_sha256(content_hash, 'continuity evaluation intent hash')}.json"
+    )
+
+
+def canonical_generated_shot_continuity_evidence_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/continuity-evaluation/evidence/"
+        f"{_require_sha256(content_hash, 'generated Shot continuity evidence hash')}.json"
+    )
+
+
 def canonical_terminal_frame_extraction_receipt_path(content_hash: str) -> Path:
     return Path(
         "state/video-generation/terminal-extractions/"

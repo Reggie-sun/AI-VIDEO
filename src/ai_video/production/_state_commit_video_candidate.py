@@ -56,6 +56,7 @@ from ai_video.production.video_artifact import (
     TerminalFrameExtractor,
     VideoProbeReceipt,
     VideoProvenanceReceipt,
+    _measure_generated_video_candidate_for_committer,
     bind_terminal_frame_evidence,
     build_generated_video_asset_record,
     build_terminal_frame_asset_record,
@@ -71,6 +72,7 @@ from ._state_commit_common import (
     _validated_transition,
 )
 from ._state_commit_contracts import PreparedArtifact
+from ._state_commit_video_continuity import checkpoint_generated_shot_continuity
 
 
 @dataclass(frozen=True)
@@ -479,34 +481,68 @@ class _StateCommitVideoCandidateMixin:
                     self._project_root / "state" / "video-generation" / "fetch"
                 ),
             ) as (held_fd, _):
-                fetched_bytes, measured, probe_receipt = probe_generated_video_candidate(
-                    held_fd,
-                    request,
-                    fetch_receipt,
-                    probe=probe,
-                    continuity_reviewer=continuity_reviewer,
-                    continuity_policy_content_hash=continuity_policy_content_hash,
-                    continuity_authorities=continuity_authorities,
-                )
-                provenance = (
-                    VideoProvenanceReceipt.create_local(
-                        request=request,
-                        observation=observation,
-                        fetch_receipt=fetch_receipt,
-                        probe_receipt=probe_receipt,
+                fetched_bytes, measured, probe_receipt = (
+                    _measure_generated_video_candidate_for_committer(
+                        held_fd,
+                        request,
+                        fetch_receipt,
+                        probe=probe,
                     )
-                    if local_lane
-                    else VideoProvenanceReceipt.create(
-                        request=request,
-                        observation=observation,
-                        fetch_receipt=fetch_receipt,
-                        probe_receipt=probe_receipt,
+                    if request.continuity_binding is not None
+                    else probe_generated_video_candidate(
+                        held_fd,
+                        request,
+                        fetch_receipt,
+                        probe=probe,
+                        continuity_reviewer=continuity_reviewer,
+                        continuity_policy_content_hash=continuity_policy_content_hash,
+                        continuity_authorities=continuity_authorities,
                     )
                 )
-                if (
-                    request.activation_scope.request.seal_terminal_frame
-                    and state.terminal_frame_extraction is None
-                ):
+                if request.continuity_binding is not None:
+                    manifest, attempt, state, probe_receipt = (
+                        checkpoint_generated_shot_continuity(
+                            self,
+                            attempt_id=attempt_id,
+                            manifest=manifest,
+                            attempt=attempt,
+                            state=state,
+                            held_fd=held_fd,
+                            request=request,
+                            measured=measured,
+                            fetch_receipt=fetch_receipt,
+                            continuity_reviewer=continuity_reviewer,
+                            continuity_policy_content_hash=(
+                                continuity_policy_content_hash
+                            ),
+                            continuity_authorities=continuity_authorities,
+                        )
+                    )
+            provenance = (
+                VideoProvenanceReceipt.create_local(
+                    request=request,
+                    observation=observation,
+                    fetch_receipt=fetch_receipt,
+                    probe_receipt=probe_receipt,
+                )
+                if local_lane
+                else VideoProvenanceReceipt.create(
+                    request=request,
+                    observation=observation,
+                    fetch_receipt=fetch_receipt,
+                    probe_receipt=probe_receipt,
+                )
+            )
+            if (
+                request.activation_scope.request.seal_terminal_frame
+                and state.terminal_frame_extraction is None
+            ):
+                with _open_regular_file_nofollow(
+                    self._project_root / fetch_pointer.artifact_path,
+                    contained_by=(
+                        self._project_root / "state" / "video-generation" / "fetch"
+                    ),
+                ) as (held_fd, _):
                     terminal_frame_bytes, _, terminal_extraction = (
                         extract_terminal_frame_candidate(
                             held_fd,

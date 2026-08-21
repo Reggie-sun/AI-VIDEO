@@ -106,7 +106,7 @@ class _StateCommitRepairMixin:
                     return manifest
                 raise _state_invalid("Repair authorization base revision changed.")
             if (
-                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8"}
+                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}
                 or manifest.active_qa_policy is None
             ):
                 raise AiVideoError(

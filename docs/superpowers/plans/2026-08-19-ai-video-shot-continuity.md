@@ -370,6 +370,41 @@ Local H3 accepted evidence位于`runs/h3-shot-continuity-live-20260819-v3/`：pr
 
 Subjective acceptance必须独立于 technical和live verdict。单一相似度、crossfade后观感或 prompt 文案一致均不足以通过。
 
+## Milestone 11: Bounded Hybrid Continuity Evaluator V1
+
+### Authorized Surface
+
+- `src/ai_video/production/continuity_evaluator.py`：sealed local ONNX profile、RGB frame sampler、
+  deterministic subject tracker 与 raw measurements；不产 verdict。
+- `src/ai_video/production/review.py`：只扩展 backward-compatible raw measurement/profile identity。
+- `src/ai_video/production/_lifecycle_schema.py`、`_state_commit_video*.py`、`video_artifact.py`、
+  `video_generation.py`、reader/paths/models export：仅实现由唯一 committer 拥有的 evaluator evidence
+  checkpoint、reopen 与 recovery；不得新增第二 writer。
+- `tests/test_production_continuity_evaluator.py` 与最接近的 P8 lifecycle tests；Harness/docs 只按真实
+  changed paths 同步。
+- `pyproject.toml`：Option A 允许把现有 agent-memory extra 中的 pinned `numpy`/`onnxruntime` 范围
+  提升为 Production base dependency；不得增加 OpenCV、SciPy、remote SDK 或其他 runtime dependency。
+
+### TDD and Compatibility Order
+
+1. RED：sealed profile/config/model hash进入 evidence identity；model bytes mismatch 在 session 创建前拒绝。
+2. RED：fake deterministic detector/ReID outputs 覆盖 exact frame binding、方向反转、exit mismatch、
+   same-track re-entry、低 confidence/coverage 与 ambiguous track `not_evaluated`。
+3. RED：identity/axis/framing 无可信 backend 时保持 incomplete，并证明独立 human evidence仍可完成 P6。
+4. RED：evaluator 完成后 candidate preparation 故障，recovery/retry不重复 sampler、ONNX evaluator或
+   fallback side effect；tampered pointer/evidence fail closed。
+5. GREEN：实现最小 cohesive adapter 与 Manifest-compatible checkpoint，保持历史 Manifest 2.8、旧
+   `GeneratedShotContinuityEvidence` payload/hash、P3/P4/P5/Provider/activation contracts不变。
+6. 运行 focused suites、native independent review、exact staged Harness与receipt self-verification，只
+   提交 task-owned files。
+
+### Offline Capability Boundary
+
+本 milestone 不下载或捆绑模型。只有 fixture/fake-session tests 时，交付状态必须写成
+`adapter and durable lifecycle accepted; live visual backend unavailable`。真实 detector/ReID assets
+必须另行提供 license/source/exact SHA-256/size 与符合 profile 的 I/O contract，并经过 no-network local
+smoke 后，才可升级为 live automatic evaluator capability；face-only detector不能外推为通用 continuity。
+
 ## Documentation Closure
 
 本次Local H3 implementation完成后同步更新runtime baseline、roadmap、primary contract matrix与AGENTS中的runtime truth，并清楚记录：

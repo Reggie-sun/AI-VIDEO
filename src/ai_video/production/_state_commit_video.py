@@ -29,6 +29,8 @@ from ai_video.production._video_project_reader import (
     load_video_status_receipt,
     load_terminal_frame_evidence,
     load_terminal_frame_extraction,
+    load_continuity_evaluation_intent,
+    load_generated_shot_continuity_evidence,
 )
 from ai_video.production.models import (
     PaidProviderAttemptPhase,
@@ -144,6 +146,12 @@ class _StateCommitVideoMixin:
     ):
         return load_terminal_frame_extraction(self._project_root, pointer)
 
+    def _reopen_continuity_evaluation_intent(self, pointer):
+        return load_continuity_evaluation_intent(self._project_root, pointer)
+
+    def _reopen_generated_shot_continuity_evidence(self, pointer):
+        return load_generated_shot_continuity_evidence(self._project_root, pointer)
+
     def _reopen_terminal_frame_chain(
         self,
         state: VideoGenerationAttemptState,
@@ -225,9 +233,9 @@ class _StateCommitVideoMixin:
         )
         with self._exclusive_lock():
             manifest = self._read_manifest()
-            if manifest.schema_version not in {"2.7", "2.8"}:
+            if manifest.schema_version not in {"2.7", "2.8", "2.9"}:
                 raise _state_invalid(
-                    "Video generation requires Production Manifest 2.7 or 2.8."
+                    "Video generation requires Production Manifest 2.7, 2.8, or 2.9."
                 )
             if (
                 request.activation_scope is not None
@@ -236,11 +244,22 @@ class _StateCommitVideoMixin:
                     or request.continuity_binding is not None
                     or request.hard_cut_keyframe_binding is not None
                 )
-                and manifest.schema_version != "2.8"
+                and request.continuity_binding is not None
+                and manifest.schema_version != "2.9"
             ):
                 raise _state_invalid(
-                    "Shot continuity requires Production Manifest 2.8."
+                    "Evaluated Shot continuity requires Production Manifest 2.9."
                 )
+            if (
+                request.activation_scope is not None
+                and (
+                    request.activation_scope.request.seal_terminal_frame
+                    or request.hard_cut_keyframe_binding is not None
+                )
+                and request.continuity_binding is None
+                and manifest.schema_version not in {"2.8", "2.9"}
+            ):
+                raise _state_invalid("Shot continuity artifacts require Manifest 2.8 or 2.9.")
             if request.hard_cut_keyframe_binding is not None:
                 try:
                     loaded = self._load_production_project(

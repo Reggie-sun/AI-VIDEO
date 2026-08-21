@@ -302,6 +302,55 @@ P5 graph 必须表达一个 typed continuity dependency：Shot N 的 exact activ
 
 三层必须分别报告。Technical acceptance 不等于 live proof，live proof 也不等于 subjective quality acceptance。
 
+## Bounded Hybrid Continuity Evaluator V1
+
+2026-08-22 的 Option A 授权增加一个 local/no-network evaluator slice。该 slice 可以把
+`numpy>=1.26,<3` 与 `onnxruntime>=1.20,<2` 提升为 Production runtime dependency，并允许
+Manifest-compatible durable validation checkpoint；授权不包含网络访问、模型下载、媒体生成、
+Provider 调用或 quality-acceptance claim。
+
+### Visual Backend Profile
+
+自动判定 motion direction、entrance、exit 与 unexpected re-entry 必须建立在 exact sampled
+RGB frames、subject detections 和跨帧 track identity 上。Production adapter 只接受 sealed
+`continuity-visual-profile/1`，其中至少固定 evaluator/config hash、sampler identity与sample geometry、
+exact NumPy/ONNX Runtime identity、detector 与
+ReID ONNX bytes hash/size、明确的 tensor I/O contract、detector class allowlist、tracker algorithm/
+threshold version，以及 CPU-only `onnxruntime` execution provider。模型 path 是 local resolution，
+不得进入 semantic hash；runtime 必须在建立 session 前重算 exact bytes hash/size。MCP、remote
+Provider、credential、implicit model discovery 与 network fallback 全部禁止。
+
+当前仓库和本机 ComfyUI model inventory 没有可直接验收的 general subject detector + ReID asset
+pair；现有 face-only ONNX 不能替代通用 subject tracking。因此 implementation 可以 executable-test
+profile、adapter、track measurements 与 fail-closed behavior，但在真实模型文件按许可、来源、exact
+hash/profile 提供并单独验证前，不得声明 live automatic visual capability。
+
+### Measurement and Verdict Contract
+
+- evaluator 输出 exact artifact/frame/profile-bound raw measurements，不包含 verdict；最终 verdict
+  仍只由 `adjudicate_generated_shot_continuity()` 派生。
+- motion/entrance/exit/re-entry 只有在单一 dominant track、连续 coverage、confidence 和稳定性均
+  达到 sealed profile gate 后才可 `match` 或 `mismatch`；低 coverage、遮挡、ambiguous tracks、
+  unsupported constraint grammar 或不可信 model output 必须 `not_evaluated`。
+- entrance 与 exit 必须由 signed subject occupancy/track state 推导；absolute frame difference、edge
+  activity 或单一 centroid 不能作为 action direction 证据。
+- unexpected re-entry 必须证明同一 track identity 已 exit 后再次出现；没有可信 ReID continuity 时
+  必须 `not_evaluated`。
+- identity、camera axis 与 framing 在没有各自可信 reference/pose/geometry backend 时保持
+  `not_evaluated` 并转 human fallback；不得根据 detector label、bounding box 或 prompt 猜测通过。
+- human fallback 是独立 authorized evidence source。Automatic incomplete evidence 本身不能 PASS，
+  也不能把 human conclusion 伪装成 model observation。
+
+### Durable Validation Checkpoint
+
+`ProductionStateCommitter` 仍是唯一 writer。Continuity evaluator 完成并通过 exact request/policy/
+artifact/constraints/evaluator binding 后，其 content-addressed evidence 必须在 candidate preparation
+之前写入 immutable artifact，并由 Manifest attempt 保存 canonical pointer。`VALIDATE` retry/recovery
+只能 reopen、rehash 和 re-adjudicate该 exact evidence；不得再次运行 frame sampler、ONNX evaluator
+或 human fallback。Tampered、wrong-request、wrong-policy、wrong-profile、wrong-artifact 或 stale evidence
+全部 fail closed。历史 Manifest 2.8 与历史无 raw-measurement evidence 必须保持可读；只有包含新 pointer
+的 attempt 才要求下一 compatible Manifest schema。
+
 ## Authorization Boundary
 
 2026-08-19 Local MiniMax H3 `fl2va` two-Shot proof由当时任务单独授权并完成。2026-08-20用户先对Alice C2 Hailuo 2.3与Seedance 2.0 Mini各最多一次remote submit作出独立task-scoped authorization，随后以“全部授权继续”批准解决已报告blocker所需的新bounded adaptive Hailuo request。该request已消费一次submit并完成canonical lifecycle；Seedance fresh budget已满足但仍因egress materialization gate保持零submit。两项lane都不扩展为blind retry、其他model/provider、`ref2va`、Shot Router或额外benchmark；任何后续live execution仍必须重新满足exact provider/model、预算、Cloud Egress与Paid Provider one-use permit。

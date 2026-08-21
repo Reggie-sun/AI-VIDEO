@@ -379,6 +379,7 @@ def test_video_recovery_change_routes_to_video_provider_suite() -> None:
         "src/ai_video/production/video_artifact.py",
         "src/ai_video/production/video_dependency.py",
         "src/ai_video/production/_state_commit_video_candidate.py",
+        "src/ai_video/production/_state_commit_video_continuity.py",
         "src/ai_video/production/_state_commit_video_activation.py",
         "src/ai_video/production/_state_commit_video_recovery.py",
         "tests/test_production_video_state_recovery.py",

@@ -11,6 +11,8 @@ from ai_video.production._lifecycle_schema import (
     LocalVideoStatusReceiptPointer,
     LocalVideoSubmitIntentPointer,
     LocalVideoSubmitReceiptPointer,
+    ContinuityEvaluationIntentPointer,
+    GeneratedShotContinuityEvidencePointer,
 )
 from ai_video.production._paid_provider_project_reader import (
     load_paid_provider_budget_by_content_hash,
@@ -47,6 +49,8 @@ from ai_video.production.paths import (
     canonical_video_provenance_receipt_path,
     canonical_image_asset_path,
     canonical_terminal_frame_extraction_receipt_path,
+    canonical_continuity_evaluation_intent_path,
+    canonical_generated_shot_continuity_evidence_path,
     resolve_contained_path,
 )
 from ai_video.production.video import (
@@ -62,6 +66,10 @@ from ai_video.production.video_artifact import (
     VideoProbeReceipt,
     VideoProvenanceReceipt,
     bind_terminal_frame_evidence,
+)
+from ai_video.production.review import (
+    ContinuityEvaluationIntent,
+    GeneratedShotContinuityEvidence,
 )
 
 
@@ -294,6 +302,53 @@ def load_terminal_frame_evidence(
     return evidence
 
 
+def load_continuity_evaluation_intent(
+    root: str | Path, pointer: ContinuityEvaluationIntentPointer
+) -> ContinuityEvaluationIntent:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
+        intent = ContinuityEvaluationIntent.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen continuity evaluation intent.", str(exc)) from exc
+    if (
+        pointer.path != canonical_continuity_evaluation_intent_path(intent.content_hash)
+        or raw.file_sha256 != pointer.file_sha256
+        or intent.content_hash != pointer.content_hash
+        or intent.evaluation_fingerprint != pointer.evaluation_fingerprint
+        or intent.artifact_sha256 != pointer.artifact_sha256
+        or intent.evaluator_profile_content_hash
+        != pointer.evaluator_profile_content_hash
+    ):
+        raise _invalid("Continuity evaluation intent pointer identity is invalid.")
+    return intent
+
+
+def load_generated_shot_continuity_evidence(
+    root: str | Path, pointer: GeneratedShotContinuityEvidencePointer
+) -> GeneratedShotContinuityEvidence:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
+        evidence = GeneratedShotContinuityEvidence.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen generated Shot continuity evidence.", str(exc)) from exc
+    if (
+        pointer.path
+        != canonical_generated_shot_continuity_evidence_path(evidence.content_hash)
+        or raw.file_sha256 != pointer.file_sha256
+        or evidence.content_hash != pointer.content_hash
+        or evidence.evaluation_fingerprint != pointer.evaluation_fingerprint
+        or evidence.artifact_sha256 != pointer.artifact_sha256
+    ):
+        raise _invalid("Generated Shot continuity evidence pointer identity is invalid.")
+    return evidence
+
+
 def load_terminal_frame_extraction(
     root: str | Path, pointer: TerminalFrameExtractionReceiptPointer
 ) -> tuple[bytes, TerminalFrameExtractionReceipt]:
@@ -337,6 +392,25 @@ def verify_video_evidence(
             or request.resolved_generation_hash != state.resolved_generation_hash
         ):
             raise _invalid("Video attempt identity does not match its request evidence.")
+        if state.continuity_evaluation is not None:
+            intent = load_continuity_evaluation_intent(
+                root, state.continuity_evaluation.intent
+            )
+            if (
+                request.continuity_binding is None
+                or intent.resolved_generation_hash != request.resolved_generation_hash
+                or intent.artifact_sha256
+                != state.continuity_evaluation.intent.artifact_sha256
+                or intent.continuity_constraints_hash
+                != request.continuity_binding.constraints.content_hash
+            ):
+                raise _invalid("Continuity evaluation intent is not exact.")
+            if state.continuity_evaluation.evidence is not None:
+                evidence = load_generated_shot_continuity_evidence(
+                    root, state.continuity_evaluation.evidence
+                )
+                if evidence.evaluation_fingerprint != intent.evaluation_fingerprint:
+                    raise _invalid("Continuity evaluation evidence is not exact.")
         if state.local_submit_intent is not None:
             intent = load_local_video_submit_intent(root, state.local_submit_intent)
             if intent.request_fingerprint != request.resolved_generation_hash:

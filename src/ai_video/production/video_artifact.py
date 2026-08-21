@@ -41,6 +41,7 @@ from ai_video.production.models import (
 )
 from ai_video.production.review import (
     GeneratedShotContinuityEvidence,
+    TrackedGeneratedShotContinuityMeasurements,
     adjudicate_generated_shot_continuity,
 )
 from ai_video.production.video import (
@@ -419,9 +420,40 @@ def _review_generated_shot_continuity(
         except OSError:
             pass
         os.lseek(held_fd, position, os.SEEK_SET)
+    return validate_generated_shot_continuity_evidence(
+        evidence,
+        request=request,
+        measured=measured,
+        policy_content_hash=policy_content_hash,
+        authorities=authorities,
+        require_pass=True,
+    )
+
+
+def validate_generated_shot_continuity_evidence(
+    evidence: GeneratedShotContinuityEvidence,
+    *,
+    request: ResolvedVideoGenerationRequest,
+    measured: MeasuredVideoMetadata,
+    policy_content_hash: str,
+    authorities: tuple[ToolIdentity, ...],
+    require_pass: bool,
+) -> GeneratedShotContinuityEvidence:
+    binding = request.continuity_binding
     original = request.activation_scope.request if request.activation_scope else None
+    measurements = (
+        evidence.raw_measurements
+        if isinstance(evidence, GeneratedShotContinuityEvidence)
+        else None
+    )
+    fallback_is_authorized = not (
+        isinstance(measurements, TrackedGeneratedShotContinuityMeasurements)
+        and measurements.fallback_evidence is not None
+        and measurements.fallback_evidence.evaluator not in authorities
+    )
     if (
-        not isinstance(evidence, GeneratedShotContinuityEvidence)
+        binding is None
+        or not isinstance(evidence, GeneratedShotContinuityEvidence)
         or original is None
         or evidence.source_shot_id != binding.terminal_frame.source_shot_id
         or evidence.target_shot_id != original.target_shot_id
@@ -431,6 +463,7 @@ def _review_generated_shot_continuity(
         or evidence.continuity_constraints_hash != binding.constraints.content_hash
         or evidence.qa_policy_content_hash != policy_content_hash
         or evidence.evaluator not in authorities
+        or not fallback_is_authorized
     ):
         raise AiVideoError(
             code=ErrorCode.REVIEW_EVIDENCE_INVALID,
@@ -440,7 +473,7 @@ def _review_generated_shot_continuity(
             retryable=False,
         )
     verdict = adjudicate_generated_shot_continuity(evidence)
-    if verdict is not QaVerdict.PASS:
+    if require_pass and verdict is not QaVerdict.PASS:
         raise AiVideoError(
             code=ErrorCode.REVIEW_EVIDENCE_INVALID,
             user_message=(
@@ -450,6 +483,45 @@ def _review_generated_shot_continuity(
             retryable=False,
         )
     return evidence
+
+
+def invoke_generated_shot_continuity_reviewer(
+    held_fd: int,
+    request: ResolvedVideoGenerationRequest,
+    measured: MeasuredVideoMetadata,
+    reviewer: GeneratedShotContinuityReviewer,
+    policy_content_hash: str,
+    authorities: tuple[ToolIdentity, ...],
+) -> GeneratedShotContinuityEvidence:
+    position = os.lseek(held_fd, 0, os.SEEK_CUR)
+    review_fd = os.dup(held_fd)
+    try:
+        os.lseek(review_fd, 0, os.SEEK_SET)
+        evidence = reviewer(review_fd, request, measured, policy_content_hash)
+    except AiVideoError:
+        raise
+    except Exception as exc:
+        raise AiVideoError(
+            code=ErrorCode.REVIEW_EVIDENCE_INVALID,
+            user_message="Generated Shot continuity evaluator failed.",
+            technical_detail=str(exc),
+            retryable=False,
+            cause=exc,
+        ) from exc
+    finally:
+        try:
+            os.close(review_fd)
+        except OSError:
+            pass
+        os.lseek(held_fd, position, os.SEEK_SET)
+    return validate_generated_shot_continuity_evidence(
+        evidence,
+        request=request,
+        measured=measured,
+        policy_content_hash=policy_content_hash,
+        authorities=authorities,
+        require_pass=False,
+    )
 
 
 class VideoProvenanceReceipt(_VideoArtifactStrictModel):
@@ -585,7 +657,7 @@ def _probe_fraction(value: object, label: str) -> Fraction:
     return result
 
 
-def probe_generated_video_candidate(
+def _probe_generated_video_candidate(
     held_fd: int,
     expected_request: ResolvedVideoGenerationRequest,
     fetch_receipt: VideoFetchReceipt | LocalVideoFetchReceipt,
@@ -594,6 +666,7 @@ def probe_generated_video_candidate(
     continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
     continuity_policy_content_hash: str | None = None,
     continuity_authorities: tuple[ToolIdentity, ...] = (),
+    defer_continuity_review: bool,
     max_size_bytes: int = 2_147_483_648,
 ) -> tuple[bytes, MeasuredVideoMetadata, VideoProbeReceipt]:
     """Measure one held regular MP4 and reject Provider-claimed metadata."""
@@ -689,13 +762,17 @@ def probe_generated_video_candidate(
         raise _video_artifact_error(
             "Measured video does not match the exact resolved output contract."
         )
-    continuity_evidence = _review_generated_shot_continuity(
-        held_fd,
-        expected_request,
-        measured,
-        continuity_reviewer,
-        continuity_policy_content_hash,
-        continuity_authorities,
+    continuity_evidence = (
+        None
+        if defer_continuity_review
+        else _review_generated_shot_continuity(
+            held_fd,
+            expected_request,
+            measured,
+            continuity_reviewer,
+            continuity_policy_content_hash,
+            continuity_authorities,
+        )
     )
     receipt = VideoProbeReceipt.create(
         request=expected_request,
@@ -704,6 +781,52 @@ def probe_generated_video_candidate(
         continuity_evidence=continuity_evidence,
     )
     return b"".join(chunks), measured, receipt
+
+
+def probe_generated_video_candidate(
+    held_fd: int,
+    expected_request: ResolvedVideoGenerationRequest,
+    fetch_receipt: VideoFetchReceipt | LocalVideoFetchReceipt,
+    *,
+    probe: Callable[[int], dict] | None = None,
+    continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
+    continuity_policy_content_hash: str | None = None,
+    continuity_authorities: tuple[ToolIdentity, ...] = (),
+    max_size_bytes: int = 2_147_483_648,
+) -> tuple[bytes, MeasuredVideoMetadata, VideoProbeReceipt]:
+    """Measure one held MP4 and enforce continuity evidence when required."""
+
+    return _probe_generated_video_candidate(
+        held_fd,
+        expected_request,
+        fetch_receipt,
+        probe=probe,
+        continuity_reviewer=continuity_reviewer,
+        continuity_policy_content_hash=continuity_policy_content_hash,
+        continuity_authorities=continuity_authorities,
+        defer_continuity_review=False,
+        max_size_bytes=max_size_bytes,
+    )
+
+
+def _measure_generated_video_candidate_for_committer(
+    held_fd: int,
+    expected_request: ResolvedVideoGenerationRequest,
+    fetch_receipt: VideoFetchReceipt | LocalVideoFetchReceipt,
+    *,
+    probe: Callable[[int], dict] | None = None,
+    max_size_bytes: int = 2_147_483_648,
+) -> tuple[bytes, MeasuredVideoMetadata, VideoProbeReceipt]:
+    """Private measurement seam used before the committer checkpoints evidence."""
+
+    return _probe_generated_video_candidate(
+        held_fd,
+        expected_request,
+        fetch_receipt,
+        probe=probe,
+        defer_continuity_review=True,
+        max_size_bytes=max_size_bytes,
+    )
 
 
 def build_generated_video_asset_record(

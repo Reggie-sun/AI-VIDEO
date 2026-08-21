@@ -96,6 +96,196 @@ class GeneratedShotContinuityMeasurements(StrictModel):
         return self
 
 
+class ContinuityTrackedSubjectFrameMeasurement(StrictModel):
+    frame_index: int = Field(strict=True, ge=0)
+    state: Literal["present", "absent", "ambiguous"]
+    x_min_milli: int | None = Field(default=None, ge=0, le=1000)
+    x_max_milli: int | None = Field(default=None, ge=0, le=1000)
+    detection_confidence_milli: int | None = Field(default=None, ge=0, le=1000)
+    track_identity: str | None = Field(default=None, min_length=1)
+
+    @model_validator(mode="after")
+    def _validate_presence(self) -> "ContinuityTrackedSubjectFrameMeasurement":
+        present_values = (
+            self.x_min_milli,
+            self.x_max_milli,
+            self.detection_confidence_milli,
+            self.track_identity,
+        )
+        if self.state == "present":
+            if any(value is None for value in present_values):
+                raise ValueError("present continuity track frames require exact identity and box")
+            if self.x_min_milli >= self.x_max_milli:  # type: ignore[operator]
+                raise ValueError("continuity track box is invalid")
+        elif any(value is not None for value in present_values):
+            raise ValueError("non-present continuity track frames cannot claim a subject")
+        return self
+
+
+class ContinuityHumanFallbackEvidence(StrictModel):
+    source_shot_id: str = Field(min_length=1)
+    target_shot_id: str = Field(min_length=1)
+    target_shot_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    continuity_constraints_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluator: ToolIdentity
+    identity_match: bool
+    camera_axis_match: bool
+    framing_match: bool
+    motion_direction_match: bool
+    entrance_state_match: bool
+    exit_state_match: bool
+    unexpected_reentry: bool
+    rationale: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_content_hash(self) -> "ContinuityHumanFallbackEvidence":
+        expected = canonical_sha256(
+            {
+                "schema": "continuity-human-fallback-evidence/1",
+                **self.model_dump(mode="json", exclude={"content_hash"}),
+            }
+        )
+        if self.content_hash != expected:
+            raise ValueError("continuity human fallback evidence hash is invalid")
+        return self
+
+    @classmethod
+    def from_generated(
+        cls, evidence: "GeneratedShotContinuityEvidence"
+    ) -> "ContinuityHumanFallbackEvidence":
+        data = {
+            field: getattr(evidence, field)
+            for field in (
+                "source_shot_id",
+                "target_shot_id",
+                "target_shot_content_hash",
+                "resolved_generation_hash",
+                "artifact_sha256",
+                "continuity_constraints_hash",
+                "qa_policy_content_hash",
+                "evaluator",
+                "identity_match",
+                "camera_axis_match",
+                "framing_match",
+                "motion_direction_match",
+                "entrance_state_match",
+                "exit_state_match",
+                "unexpected_reentry",
+                "rationale",
+            )
+        }
+        candidate = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            {
+                "schema": "continuity-human-fallback-evidence/1",
+                **candidate.model_dump(
+                    mode="json", exclude={"content_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
+class TrackedGeneratedShotContinuityMeasurements(StrictModel):
+    measurement_contract_version: Literal["tracked-continuity-evaluator/1"]
+    sampler: ToolIdentity
+    evaluator_profile_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sample_width: int = Field(strict=True, gt=0)
+    sample_height: int = Field(strict=True, gt=0)
+    sampled_frames: tuple[ContinuitySampledFrameMeasurement, ...] = Field(min_length=2)
+    subject_track: tuple[ContinuityTrackedSubjectFrameMeasurement, ...] = Field(
+        min_length=2
+    )
+    fallback_evidence: ContinuityHumanFallbackEvidence | None = None
+    identity: ContinuityCheckMeasurement
+    camera_axis: ContinuityCheckMeasurement
+    framing: ContinuityCheckMeasurement
+    motion_direction: ContinuityCheckMeasurement
+    entrance_state: ContinuityCheckMeasurement
+    exit_state: ContinuityCheckMeasurement
+    unexpected_reentry: ContinuityCheckMeasurement
+
+    @model_validator(mode="after")
+    def _validate_track_binding(self) -> "TrackedGeneratedShotContinuityMeasurements":
+        sample_indices = tuple(item.frame_index for item in self.sampled_frames)
+        track_indices = tuple(item.frame_index for item in self.subject_track)
+        if (
+            sample_indices != tuple(sorted(set(sample_indices)))
+            or track_indices != sample_indices
+        ):
+            raise ValueError("continuity subject track must bind every sampled frame exactly")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_fallback(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.fallback_evidence is None:
+            data.pop("fallback_evidence", None)
+        return data
+
+
+class ContinuityEvaluationIntent(StrictModel):
+    source_shot_id: str = Field(min_length=1)
+    target_shot_id: str = Field(min_length=1)
+    target_shot_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    continuity_constraints_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluator: ToolIdentity
+    evaluator_profile_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_intent(self) -> "ContinuityEvaluationIntent":
+        expected_fingerprint = _continuity_evaluation_fingerprint_values(
+            source_shot_id=self.source_shot_id,
+            target_shot_id=self.target_shot_id,
+            target_shot_content_hash=self.target_shot_content_hash,
+            resolved_generation_hash=self.resolved_generation_hash,
+            artifact_sha256=self.artifact_sha256,
+            continuity_constraints_hash=self.continuity_constraints_hash,
+            qa_policy_content_hash=self.qa_policy_content_hash,
+            evaluator=self.evaluator,
+            evaluator_profile_content_hash=self.evaluator_profile_content_hash,
+        )
+        if self.evaluation_fingerprint != expected_fingerprint:
+            raise ValueError("continuity evaluation intent fingerprint is invalid")
+        if self.content_hash != canonical_sha256(
+            {
+                "schema": "continuity-evaluation-intent/1",
+                **self.model_dump(mode="json", exclude={"content_hash"}),
+            }
+        ):
+            raise ValueError("continuity evaluation intent hash is invalid")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "ContinuityEvaluationIntent":
+        data = dict(values)
+        data["evaluation_fingerprint"] = _continuity_evaluation_fingerprint_values(
+            **data  # type: ignore[arg-type]
+        )
+        provisional = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            {
+                "schema": "continuity-evaluation-intent/1",
+                **provisional.model_dump(
+                    mode="json", exclude={"content_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
 class GeneratedShotContinuityEvidence(StrictModel):
     """Raw evaluator evidence for one exact continuity-bound generated Shot."""
 
@@ -116,7 +306,12 @@ class GeneratedShotContinuityEvidence(StrictModel):
     entrance_state_match: bool
     exit_state_match: bool
     unexpected_reentry: bool
-    raw_measurements: GeneratedShotContinuityMeasurements | None = None
+    raw_measurements: (
+        GeneratedShotContinuityMeasurements
+        | TrackedGeneratedShotContinuityMeasurements
+        | None
+    ) = None
+    evaluation_fingerprint: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     rationale: str = Field(min_length=1)
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -153,6 +348,54 @@ class GeneratedShotContinuityEvidence(StrictModel):
             )
             if self.coverage_complete != complete:
                 raise ValueError("continuity measurement coverage does not match evidence")
+            if isinstance(measurements, TrackedGeneratedShotContinuityMeasurements):
+                if (measurements.fallback_evidence is not None) != (
+                    self.strength is EvidenceStrength.HUMAN
+                ):
+                    raise ValueError(
+                        "continuity human fallback does not match evidence strength"
+                    )
+                fallback = measurements.fallback_evidence
+                if fallback is not None:
+                    if (
+                        fallback.source_shot_id != self.source_shot_id
+                        or fallback.target_shot_id != self.target_shot_id
+                        or fallback.target_shot_content_hash
+                        != self.target_shot_content_hash
+                        or fallback.resolved_generation_hash
+                        != self.resolved_generation_hash
+                        or fallback.artifact_sha256 != self.artifact_sha256
+                        or fallback.continuity_constraints_hash
+                        != self.continuity_constraints_hash
+                        or fallback.qa_policy_content_hash
+                        != self.qa_policy_content_hash
+                    ):
+                        raise ValueError(
+                            "continuity human fallback binding is not exact"
+                        )
+                    fallback_statuses = {
+                        "identity": fallback.identity_match,
+                        "camera_axis": fallback.camera_axis_match,
+                        "framing": fallback.framing_match,
+                        "motion_direction": fallback.motion_direction_match,
+                        "entrance_state": fallback.entrance_state_match,
+                        "exit_state": fallback.exit_state_match,
+                    }
+                    if any(
+                        getattr(measurements, field).status
+                        != ("match" if matches else "mismatch")
+                        for field, matches in fallback_statuses.items()
+                    ) or measurements.unexpected_reentry.status != (
+                        "mismatch" if fallback.unexpected_reentry else "match"
+                    ):
+                        raise ValueError(
+                            "continuity human fallback conclusion was not preserved"
+                        )
+                expected_fingerprint = _tracked_continuity_evaluation_fingerprint(
+                    self, measurements.evaluator_profile_content_hash
+                )
+                if self.evaluation_fingerprint != expected_fingerprint:
+                    raise ValueError("continuity evaluation fingerprint is invalid")
         expected = canonical_sha256(
             {
                 "schema": "generated-shot-continuity-evidence/1",
@@ -172,15 +415,38 @@ class GeneratedShotContinuityEvidence(StrictModel):
         data = handler(self)
         if self.raw_measurements is None:
             data.pop("raw_measurements", None)
+        if self.evaluation_fingerprint is None:
+            data.pop("evaluation_fingerprint", None)
         return data
 
     @classmethod
     def create(cls, **values: object) -> "GeneratedShotContinuityEvidence":
         data = dict(values)
         if data.get("raw_measurements") is not None:
-            data["raw_measurements"] = GeneratedShotContinuityMeasurements.model_validate(
-                data["raw_measurements"]
+            measurement_data = data["raw_measurements"]
+            version = (
+                measurement_data.get("measurement_contract_version")
+                if isinstance(measurement_data, Mapping)
+                else getattr(measurement_data, "measurement_contract_version", None)
             )
+            measurement_type = (
+                TrackedGeneratedShotContinuityMeasurements
+                if version == "tracked-continuity-evaluator/1"
+                else GeneratedShotContinuityMeasurements
+            )
+            data["raw_measurements"] = measurement_type.model_validate(measurement_data)
+            if isinstance(
+                data["raw_measurements"], TrackedGeneratedShotContinuityMeasurements
+            ) and data.get("evaluation_fingerprint") is None:
+                provisional_evidence = cls.model_construct(
+                    **data, content_hash="0" * 64
+                )
+                data["evaluation_fingerprint"] = (
+                    _tracked_continuity_evaluation_fingerprint(
+                        provisional_evidence,
+                        data["raw_measurements"].evaluator_profile_content_hash,
+                    )
+                )
         candidate = cls.model_construct(**data, content_hash="0" * 64)
         data["content_hash"] = canonical_sha256(
             {
@@ -194,6 +460,51 @@ class GeneratedShotContinuityEvidence(StrictModel):
             }
         )
         return cls.model_validate(data)
+
+
+def _tracked_continuity_evaluation_fingerprint(
+    evidence: GeneratedShotContinuityEvidence,
+    evaluator_profile_content_hash: str,
+) -> str:
+    return _continuity_evaluation_fingerprint_values(
+        source_shot_id=evidence.source_shot_id,
+        target_shot_id=evidence.target_shot_id,
+        target_shot_content_hash=evidence.target_shot_content_hash,
+        resolved_generation_hash=evidence.resolved_generation_hash,
+        artifact_sha256=evidence.artifact_sha256,
+        continuity_constraints_hash=evidence.continuity_constraints_hash,
+        qa_policy_content_hash=evidence.qa_policy_content_hash,
+        evaluator=evidence.evaluator,
+        evaluator_profile_content_hash=evaluator_profile_content_hash,
+    )
+
+
+def _continuity_evaluation_fingerprint_values(
+    *,
+    source_shot_id: str,
+    target_shot_id: str,
+    target_shot_content_hash: str,
+    resolved_generation_hash: str,
+    artifact_sha256: str,
+    continuity_constraints_hash: str,
+    qa_policy_content_hash: str,
+    evaluator: ToolIdentity,
+    evaluator_profile_content_hash: str,
+) -> str:
+    return canonical_sha256(
+        {
+            "schema": "continuity-evaluation-fingerprint/1",
+            "source_shot_id": source_shot_id,
+            "target_shot_id": target_shot_id,
+            "target_shot_content_hash": target_shot_content_hash,
+            "resolved_generation_hash": resolved_generation_hash,
+            "source_clip_hash": artifact_sha256,
+            "continuity_constraints_hash": continuity_constraints_hash,
+            "qa_policy_content_hash": qa_policy_content_hash,
+            "evaluator": evaluator.model_dump(mode="json"),
+            "evaluator_profile_content_hash": evaluator_profile_content_hash,
+        }
+    )
 
 
 def adjudicate_generated_shot_continuity(

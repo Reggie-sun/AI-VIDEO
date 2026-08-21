@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -10,8 +11,17 @@ import pytest
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
     DependencyLifecycle,
+    EvidenceStrength,
+    QaLayer,
+    QaLayoutRules,
+    QaPolicy,
+    QaPolicyPointer,
+    QaTechnicalThresholds,
+    ProductionManifest,
     RegistryDependencyEvidence,
+    SourceReference,
     StateCommitStatus,
+    ToolIdentity,
     VideoAttemptPhase,
 )
 from ai_video.production._video_project_reader import (
@@ -32,6 +42,12 @@ from ai_video.production.hyperframes import probe_clip_fd
 from ai_video.production.paths import (
     _open_regular_file_nofollow,
     canonical_image_request_path,
+    canonical_qa_policy_path,
+)
+from ai_video.production.hashing import seal_artifact
+from ai_video.production.review import (
+    ContinuityEvaluationIntent,
+    GeneratedShotContinuityEvidence,
 )
 from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video import (
@@ -65,18 +81,79 @@ from production_project_factory import (
     make_p8_video_generation_base,
 )
 from test_production_state_commit import make_image_provider_result
-from test_production_video import _paid_authorization, _paid_preview
+from test_production_video import (
+    _continuity_binding,
+    _paid_authorization,
+    _paid_preview,
+    _terminal_frame,
+)
 
 
 FIXTURE = Path(__file__).parent / "fixtures/generated_video/fake-video.mp4"
 ATTEMPT_ID = "p8-generated-video-e2e"
+CONTINUITY_EVALUATOR = ToolIdentity(
+    name="fixture-durable-continuity-evaluator", version="1"
+)
 
 
-def _runtime(root: Path, *, seal_terminal_frame: bool = False):
+def _runtime(
+    root: Path, *, seal_terminal_frame: bool = False, continuity: bool = False
+):
     inputs = make_p8_video_generation_base(
-        root, schema_version="2.8" if seal_terminal_frame else "2.7"
+        root,
+        schema_version=(
+            "2.9" if continuity else "2.8" if seal_terminal_frame else "2.7"
+        ),
     )
     loaded = inputs.project
+    if continuity:
+        policy = seal_artifact(
+            QaPolicy(
+                artifact_id="qa-policy-continuity-evaluator-v1",
+                revision=1,
+                content_hash="0" * 64,
+                creation_receipt_id="qa-policy-continuity-evaluator-v1",
+                source_provenance=(
+                    SourceReference(kind="derived", reference="continuity-fixture"),
+                ),
+                policy_id="qa-continuity-evaluator-v1",
+                policy_version="1",
+                required_layers=(QaLayer.SEMANTIC,),
+                technical_thresholds=QaTechnicalThresholds(
+                    black_luma_max_milli=10,
+                    silence_peak_max_millidb=-60_000,
+                    clipping_peak_min_millidb=-100,
+                ),
+                layout_rules=QaLayoutRules(
+                    safe_area_inset_milli=50,
+                    caption_overflow_tolerance_milli=0,
+                ),
+                strategy_rules_version="1",
+                semantic_requirement="required",
+                semantic_authorities=(CONTINUITY_EVALUATOR,),
+            )
+        )
+        policy_bytes = policy.model_dump_json().encode("utf-8")
+        policy_path = canonical_qa_policy_path(policy.content_hash)
+        (root / policy_path).parent.mkdir(parents=True, exist_ok=True)
+        (root / policy_path).write_bytes(policy_bytes)
+        policy_pointer = QaPolicyPointer(
+            path=policy_path,
+            policy_id=policy.policy_id,
+            policy_version=policy.policy_version,
+            content_hash=policy.content_hash,
+            file_sha256=hashlib.sha256(policy_bytes).hexdigest(),
+        )
+        manifest_path = root / "state/manifest.json"
+        manifest = loaded.manifest.model_copy(
+            update={
+                "manifest_revision": loaded.manifest.manifest_revision + 1,
+                "active_qa_policy": policy_pointer,
+            }
+        )
+        manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
+        loaded = load_production_project(root / "project.yaml")
+        inputs = replace(inputs, project=loaded)
     shot = loaded.shots[0]
     source = loaded.registry.assets[0]
     output = VideoOutputRequirement(
@@ -89,6 +166,45 @@ def _runtime(root: Path, *, seal_terminal_frame: bool = False):
         native_audio=False,
     )
     profile_sha = "d" * 64
+    continuity_binding = None
+    image_bindings = (
+        VideoImageReferenceBinding(
+            role="first_frame",
+            asset_id=source.asset_id,
+            asset_sha256=source.sha256,
+            mime_type=source.mime_type,
+            width=source.width or 64,
+            height=source.height or 64,
+            size_bytes=source.size_bytes,
+        ),
+    )
+    input_artifact_ids = (shot.artifact_id, source.asset_id)
+    if continuity:
+        source_shot = loaded.shots[1]
+        terminal = _terminal_frame(
+            source_shot_id=source_shot.shot_id,
+            source_shot_revision=source_shot.revision,
+            source_shot_content_hash=source_shot.content_hash,
+            source_video_asset_id=loaded.registry.assets[1].asset_id,
+            extracted_asset_id=source.asset_id,
+            extracted_sha256=source.sha256,
+            extracted_mime_type=source.mime_type,
+            extracted_width=source.width or 64,
+            extracted_height=source.height or 64,
+            extracted_size_bytes=source.size_bytes,
+        )
+        continuity_binding = _continuity_binding(
+            terminal_frame=terminal,
+            target_shot_id=shot.shot_id,
+            target_shot_revision=shot.revision,
+            target_shot_content_hash=shot.content_hash,
+        )
+        input_artifact_ids = (
+            shot.artifact_id,
+            terminal.source_shot_id,
+            terminal.source_video_asset_id,
+            source.asset_id,
+        )
     request = VideoGenerationRequest.create(
         generation_id="p8-generation-001",
         provider_name="fake-video",
@@ -108,24 +224,15 @@ def _runtime(root: Path, *, seal_terminal_frame: bool = False):
         mode=VideoGenerationMode.IMAGE_TO_VIDEO,
         prompt_text="A sealed one-second archive-room push-in.",
         negative_prompt_text="flicker",
-        image_bindings=(
-            VideoImageReferenceBinding(
-                role="first_frame",
-                asset_id=source.asset_id,
-                asset_sha256=source.sha256,
-                mime_type=source.mime_type,
-                width=source.width or 64,
-                height=source.height or 64,
-                size_bytes=source.size_bytes,
-            ),
-        ),
+        image_bindings=image_bindings,
+        continuity_binding=continuity_binding,
         seal_terminal_frame=seal_terminal_frame,
         output_requirement=output,
         seed=17,
         base_project=loaded.manifest.active_project,
         base_registry=loaded.manifest.active_registry,
         base_dependency_graph=loaded.manifest.active_dependency_graph,
-        input_artifact_ids=(shot.artifact_id, source.asset_id),
+        input_artifact_ids=input_artifact_ids,
         output_asset_id="video-output-p8-001",
     )
     variant = VideoCapabilityVariant(
@@ -184,10 +291,14 @@ def _runtime(root: Path, *, seal_terminal_frame: bool = False):
 
 
 def _reach_fetch(
-    root: Path, *, settle: bool = True, seal_terminal_frame: bool = False
+    root: Path,
+    *,
+    settle: bool = True,
+    seal_terminal_frame: bool = False,
+    continuity: bool = False,
 ):
     inputs, provider, resolved, paid_preview, committer = _runtime(
-        root, seal_terminal_frame=seal_terminal_frame
+        root, seal_terminal_frame=seal_terminal_frame, continuity=continuity
     )
     service = VideoGenerationService(committer=committer, provider=provider)
     service.start(attempt_id=ATTEMPT_ID, request=resolved)
@@ -661,6 +772,172 @@ def test_terminal_extraction_checkpoint_prevents_repeat_after_candidate_failure(
     )
 
     assert extraction_calls == 1
+
+
+class _CountingDurableContinuityReviewer:
+    def __init__(self, *, fail_during_evaluation: bool = False) -> None:
+        self.calls = 0
+        self.fail_during_evaluation = fail_during_evaluation
+        self.intent: ContinuityEvaluationIntent | None = None
+
+    def create_intent(self, request, measured, qa_policy_content_hash):
+        binding = request.continuity_binding
+        original = request.activation_scope.request
+        assert binding is not None
+        self.intent = ContinuityEvaluationIntent.create(
+            source_shot_id=binding.terminal_frame.source_shot_id,
+            target_shot_id=original.target_shot_id,
+            target_shot_content_hash=original.target_shot_content_hash,
+            resolved_generation_hash=request.resolved_generation_hash,
+            artifact_sha256=measured.artifact_sha256,
+            continuity_constraints_hash=binding.constraints.content_hash,
+            qa_policy_content_hash=qa_policy_content_hash,
+            evaluator=CONTINUITY_EVALUATOR,
+            evaluator_profile_content_hash="f" * 64,
+        )
+        return self.intent
+
+    def __call__(self, held_fd, request, measured, qa_policy_content_hash):
+        del held_fd
+        self.calls += 1
+        if self.fail_during_evaluation:
+            raise RuntimeError("evaluator interrupted after durable intent")
+        assert self.intent is not None
+        binding = request.continuity_binding
+        original = request.activation_scope.request
+        assert binding is not None
+        return GeneratedShotContinuityEvidence.create(
+            source_shot_id=binding.terminal_frame.source_shot_id,
+            target_shot_id=original.target_shot_id,
+            target_shot_content_hash=original.target_shot_content_hash,
+            resolved_generation_hash=request.resolved_generation_hash,
+            artifact_sha256=measured.artifact_sha256,
+            continuity_constraints_hash=binding.constraints.content_hash,
+            qa_policy_content_hash=qa_policy_content_hash,
+            evaluator=CONTINUITY_EVALUATOR,
+            strength=EvidenceStrength.HUMAN,
+            coverage_complete=True,
+            identity_match=True,
+            camera_axis_match=True,
+            framing_match=True,
+            motion_direction_match=True,
+            entrance_state_match=True,
+            exit_state_match=True,
+            unexpected_reentry=False,
+            evaluation_fingerprint=self.intent.evaluation_fingerprint,
+            rationale="Fixture human reviewed every exact continuity dimension.",
+        )
+
+
+def test_continuity_evidence_checkpoint_prevents_repeat_after_candidate_failure(
+    tmp_path: Path,
+) -> None:
+    inputs, provider, _, committer = _reach_fetch(tmp_path, continuity=True)
+    VideoGenerationService(committer=committer, provider=provider).fetch_once(
+        attempt_id=ATTEMPT_ID
+    )
+    reviewer = _CountingDurableContinuityReviewer()
+
+    def failing_preparer(*_args):
+        raise RuntimeError("candidate preparation interrupted")
+
+    interrupted = VideoGenerationService(
+        committer=ProductionStateCommitter(
+            tmp_path, video_candidate_preparer=failing_preparer
+        ),
+        provider=provider,
+    )
+    with pytest.raises(RuntimeError, match="candidate preparation interrupted"):
+        interrupted.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            continuity_reviewer=reviewer,
+        )
+    checkpointed = ProductionStateCommitter(tmp_path)._read_manifest()
+    checkpoint_state = checkpointed.attempts[-1].video_generation_state
+    assert checkpoint_state is not None
+    assert checkpoint_state.continuity_evaluation is not None
+    assert checkpoint_state.continuity_evaluation.phase.value == "evidenced"
+    assert reviewer.calls == 1
+    ProductionStateCommitter(tmp_path).recover()
+
+    resumed = VideoGenerationService(
+        committer=ProductionStateCommitter(
+            tmp_path,
+            video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
+        ),
+        provider=provider,
+    )
+    activated = resumed.fetch_and_activate(attempt_id=ATTEMPT_ID)
+    replayed = resumed.fetch_and_activate(attempt_id=ATTEMPT_ID)
+
+    assert replayed == activated
+    assert reviewer.calls == 1
+    historical_shape = activated.model_dump(mode="json")
+    historical_shape["schema_version"] = "2.8"
+    with pytest.raises(ValueError, match="Manifest 2.9 is required"):
+        ProductionManifest.model_validate(historical_shape)
+
+
+def test_continuity_intent_only_retry_never_repeats_unknown_evaluator(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, continuity=True)
+    VideoGenerationService(committer=committer, provider=provider).fetch_once(
+        attempt_id=ATTEMPT_ID
+    )
+    reviewer = _CountingDurableContinuityReviewer(fail_during_evaluation=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+
+    with pytest.raises(AiVideoError, match="evaluator failed"):
+        service.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            continuity_reviewer=reviewer,
+        )
+    assert reviewer.calls == 1
+    with pytest.raises(AiVideoError) as unknown:
+        service.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            continuity_reviewer=reviewer,
+        )
+
+    assert unknown.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert reviewer.calls == 1
+
+
+def test_recovery_rejects_tampered_continuity_evidence_checkpoint(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, continuity=True)
+    VideoGenerationService(committer=committer, provider=provider).fetch_once(
+        attempt_id=ATTEMPT_ID
+    )
+    reviewer = _CountingDurableContinuityReviewer()
+
+    def failing_preparer(*_args):
+        raise RuntimeError("candidate preparation interrupted")
+
+    with pytest.raises(RuntimeError, match="candidate preparation interrupted"):
+        VideoGenerationService(
+            committer=ProductionStateCommitter(
+                tmp_path, video_candidate_preparer=failing_preparer
+            ),
+            provider=provider,
+        ).fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            continuity_reviewer=reviewer,
+        )
+    manifest = ProductionStateCommitter(tmp_path)._read_manifest()
+    state = manifest.attempts[-1].video_generation_state
+    assert state is not None and state.continuity_evaluation is not None
+    assert state.continuity_evaluation.evidence is not None
+    (tmp_path / state.continuity_evaluation.evidence.path).write_text(
+        "{}", encoding="utf-8"
+    )
+
+    with pytest.raises(AiVideoError) as rejected:
+        ProductionStateCommitter(tmp_path).recover()
+
+    assert rejected.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
 
 
 def test_fake_video_fetch_activate_reopen_and_replay_are_exact(tmp_path: Path):

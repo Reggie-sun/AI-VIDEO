@@ -319,6 +319,72 @@ class TerminalFrameExtractionReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class ContinuityEvaluationIntentPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluator_profile_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "ContinuityEvaluationIntentPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/continuity-evaluation/intents/"
+                f"{self.content_hash}.json"
+            ),
+            "continuity evaluation intent",
+        )
+        return self
+
+
+class GeneratedShotContinuityEvidencePointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "GeneratedShotContinuityEvidencePointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/continuity-evaluation/evidence/"
+                f"{self.content_hash}.json"
+            ),
+            "generated Shot continuity evidence",
+        )
+        return self
+
+
+class ContinuityEvaluationPhase(str, Enum):
+    INTENT = "intent"
+    EVIDENCED = "evidenced"
+
+
+class ContinuityEvaluationState(_PaidLifecycleModel):
+    phase: ContinuityEvaluationPhase
+    intent: ContinuityEvaluationIntentPointer
+    evidence: GeneratedShotContinuityEvidencePointer | None = None
+
+    @model_validator(mode="after")
+    def _validate_phase(self) -> "ContinuityEvaluationState":
+        if self.phase is ContinuityEvaluationPhase.INTENT:
+            if self.evidence is not None:
+                raise ValueError("continuity evaluation intent cannot contain evidence")
+        elif (
+            self.evidence is None
+            or self.evidence.evaluation_fingerprint
+            != self.intent.evaluation_fingerprint
+            or self.evidence.artifact_sha256 != self.intent.artifact_sha256
+        ):
+            raise ValueError("continuity evaluation evidence does not match its intent")
+        return self
+
+
 class VideoAttemptPhase(str, Enum):
     REQUEST = "request"
     SUBMIT_INTENT = "submit_intent"
@@ -362,6 +428,7 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
     provider_file_id: str | None = Field(default=None, min_length=1)
     terminal_frame_evidence: TerminalFrameEvidencePointer | None = None
     terminal_frame_extraction: TerminalFrameExtractionReceiptPointer | None = None
+    continuity_evaluation: ContinuityEvaluationState | None = None
     candidate_video_asset_ids: tuple[str, ...] = ()
     candidate_continuity_asset_ids: tuple[str, ...] = ()
 
@@ -374,6 +441,8 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             data.pop("terminal_frame_evidence", None)
         if self.terminal_frame_extraction is None:
             data.pop("terminal_frame_extraction", None)
+        if self.continuity_evaluation is None:
+            data.pop("continuity_evaluation", None)
         if not self.candidate_continuity_asset_ids:
             data.pop("candidate_continuity_asset_ids", None)
         for field in (
@@ -468,6 +537,18 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
                 raise ValueError("post-fetch video phases require a fetch receipt")
         elif fetch is not None:
             raise ValueError("video fetch receipt requires a post-fetch phase")
+        if self.continuity_evaluation is not None:
+            if self.phase not in {
+                VideoAttemptPhase.VALIDATE,
+                VideoAttemptPhase.CANDIDATE,
+                VideoAttemptPhase.ACTIVATE,
+            }:
+                raise ValueError("continuity evaluation requires a post-fetch phase")
+            if (
+                self.continuity_evaluation.phase is ContinuityEvaluationPhase.INTENT
+                and self.phase is not VideoAttemptPhase.VALIDATE
+            ):
+                raise ValueError("incomplete continuity evaluation must remain in validate")
         if self.phase in _VIDEO_CANDIDATE_PHASES:
             if self.candidate_video_asset_ids != (self.request.output_asset_id,):
                 raise ValueError("video candidate asset ID must match request output")
@@ -769,7 +850,7 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
         isinstance(attempt, Mapping) and "paid_provider_state" in attempt
         for attempt in value.get("attempts", ())
     )
-    if manifest_version not in {"2.6", "2.7", "2.8"} and (
+    if manifest_version not in {"2.6", "2.7", "2.8", "2.9"} and (
         "active_paid_provider_budget" in value or has_paid_attempt
     ):
         raise ValueError(
@@ -799,6 +880,17 @@ def reject_explicit_p8_video_fields(value: object) -> object:
                 )
         return value
     if manifest_version == "2.8":
+        for attempt in value.get("attempts", ()):
+            if not isinstance(attempt, Mapping):
+                continue
+            state = attempt.get("video_generation_state")
+            if isinstance(state, Mapping) and "continuity_evaluation" in state:
+                raise ValueError(
+                    "Production Manifest 2.8 cannot contain durable continuity "
+                    "evaluation fields; Manifest 2.9 is required"
+                )
+        return value
+    if manifest_version == "2.9":
         return value
     for attempt in value.get("attempts", ()):
         if isinstance(attempt, Mapping) and (
@@ -816,7 +908,7 @@ def reject_explicit_p7_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version in {"2.5", "2.6", "2.7", "2.8"}:
+    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9"}:
         return value
     image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
     for attempt in value.get("attempts", ()):
