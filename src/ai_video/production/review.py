@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
@@ -36,6 +37,65 @@ class ReviewIdentity:
     qa_policy_content_hash: str
 
 
+class ContinuityCheckMeasurement(StrictModel):
+    status: Literal["match", "mismatch", "not_evaluated"]
+    expected: str = Field(min_length=1)
+    observed: str | None = None
+    confidence_milli: int | None = Field(default=None, ge=0, le=1000)
+    rationale: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _validate_observation(self) -> "ContinuityCheckMeasurement":
+        evaluated = self.status != "not_evaluated"
+        if evaluated != (self.observed is not None and self.confidence_milli is not None):
+            raise ValueError("evaluated continuity checks require observed value and confidence")
+        return self
+
+
+class ContinuitySampledFrameMeasurement(StrictModel):
+    frame_index: int = Field(strict=True, ge=0)
+    frame_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class ContinuityTransitionMeasurement(StrictModel):
+    start_frame_index: int = Field(strict=True, ge=0)
+    end_frame_index: int = Field(strict=True, ge=0)
+    changed_pixel_count: int = Field(strict=True, ge=0)
+    centroid_x_milli: int | None = Field(default=None, ge=0, le=1000)
+    left_edge_touched: bool
+    right_edge_touched: bool
+
+
+class GeneratedShotContinuityMeasurements(StrictModel):
+    measurement_contract_version: Literal["hybrid-continuity-evaluator-v1"]
+    sampler: ToolIdentity
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sample_width: int = Field(strict=True, gt=0)
+    sample_height: int = Field(strict=True, gt=0)
+    sampled_frames: tuple[ContinuitySampledFrameMeasurement, ...] = Field(min_length=2)
+    transitions: tuple[ContinuityTransitionMeasurement, ...]
+    identity: ContinuityCheckMeasurement
+    camera_axis: ContinuityCheckMeasurement
+    framing: ContinuityCheckMeasurement
+    motion_direction: ContinuityCheckMeasurement
+    entrance_state: ContinuityCheckMeasurement
+    exit_state: ContinuityCheckMeasurement
+    unexpected_reentry: ContinuityCheckMeasurement
+
+    @model_validator(mode="after")
+    def _validate_samples(self) -> "GeneratedShotContinuityMeasurements":
+        indices = tuple(item.frame_index for item in self.sampled_frames)
+        if indices != tuple(sorted(set(indices))):
+            raise ValueError("continuity sampled frame indices must be unique and ordered")
+        expected_transitions = tuple(zip(indices, indices[1:]))
+        observed_transitions = tuple(
+            (item.start_frame_index, item.end_frame_index) for item in self.transitions
+        )
+        if observed_transitions != expected_transitions:
+            raise ValueError("continuity transitions must bind adjacent sampled frames")
+        return self
+
+
 class GeneratedShotContinuityEvidence(StrictModel):
     """Raw evaluator evidence for one exact continuity-bound generated Shot."""
 
@@ -56,6 +116,7 @@ class GeneratedShotContinuityEvidence(StrictModel):
     entrance_state_match: bool
     exit_state_match: bool
     unexpected_reentry: bool
+    raw_measurements: GeneratedShotContinuityMeasurements | None = None
     rationale: str = Field(min_length=1)
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -68,25 +129,67 @@ class GeneratedShotContinuityEvidence(StrictModel):
             raise ValueError(
                 "generated Shot continuity requires explicit evaluator or human evidence"
             )
+        if self.raw_measurements is not None:
+            measurements = self.raw_measurements
+            statuses = {
+                "identity_match": measurements.identity.status,
+                "camera_axis_match": measurements.camera_axis.status,
+                "framing_match": measurements.framing.status,
+                "motion_direction_match": measurements.motion_direction.status,
+                "entrance_state_match": measurements.entrance_state.status,
+                "exit_state_match": measurements.exit_state.status,
+            }
+            if measurements.artifact_sha256 != self.artifact_sha256 or any(
+                getattr(self, field) != (status == "match")
+                for field, status in statuses.items()
+            ):
+                raise ValueError("continuity measurements do not match evidence fields")
+            reentry_status = measurements.unexpected_reentry.status
+            if self.unexpected_reentry != (reentry_status == "mismatch"):
+                raise ValueError("continuity re-entry measurement does not match evidence")
+            complete = all(
+                status != "not_evaluated"
+                for status in (*statuses.values(), reentry_status)
+            )
+            if self.coverage_complete != complete:
+                raise ValueError("continuity measurement coverage does not match evidence")
         expected = canonical_sha256(
             {
                 "schema": "generated-shot-continuity-evidence/1",
-                **self.model_dump(mode="json", exclude={"content_hash"}),
+                **self.model_dump(
+                    mode="json", exclude={"content_hash"}, exclude_none=True
+                ),
             }
         )
         if self.content_hash != expected:
             raise ValueError("generated Shot continuity evidence hash is invalid")
         return self
 
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_variant(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.raw_measurements is None:
+            data.pop("raw_measurements", None)
+        return data
+
     @classmethod
     def create(cls, **values: object) -> "GeneratedShotContinuityEvidence":
         data = dict(values)
+        if data.get("raw_measurements") is not None:
+            data["raw_measurements"] = GeneratedShotContinuityMeasurements.model_validate(
+                data["raw_measurements"]
+            )
         candidate = cls.model_construct(**data, content_hash="0" * 64)
         data["content_hash"] = canonical_sha256(
             {
                 "schema": "generated-shot-continuity-evidence/1",
                 **candidate.model_dump(
-                    mode="json", exclude={"content_hash"}, warnings=False
+                    mode="json",
+                    exclude={"content_hash"},
+                    exclude_none=True,
+                    warnings=False,
                 ),
             }
         )
@@ -98,6 +201,19 @@ def adjudicate_generated_shot_continuity(
 ) -> QaVerdict:
     """Derive a verdict from raw continuity evidence; evaluators never self-verdict."""
 
+    if evidence.raw_measurements is not None and any(
+        item.status == "mismatch"
+        for item in (
+            evidence.raw_measurements.identity,
+            evidence.raw_measurements.camera_axis,
+            evidence.raw_measurements.framing,
+            evidence.raw_measurements.motion_direction,
+            evidence.raw_measurements.entrance_state,
+            evidence.raw_measurements.exit_state,
+            evidence.raw_measurements.unexpected_reentry,
+        )
+    ):
+        return QaVerdict.FAIL
     if not evidence.coverage_complete:
         return QaVerdict.NOT_EVALUATED
     if (
