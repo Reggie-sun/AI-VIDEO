@@ -34,7 +34,9 @@ from ai_video.production.project import (
     load_production_project,
 )
 from ai_video.production.review import (
+    GeneratedShotContinuityEvidence,
     ReviewIdentity,
+    adjudicate_generated_shot_continuity,
     adjudicate_layer,
     adjudicate_review_evidence,
     adjudicate_visual_motion,
@@ -369,6 +371,65 @@ def test_semantic_requires_explicit_evaluator_or_human_evidence():
         QaLayer.SEMANTIC,
         [{"strength": "explicit_evaluator", "result": "pass"}],
     ) is QaVerdict.PASS
+
+
+def _generated_continuity_evidence(
+    **changes: object,
+) -> GeneratedShotContinuityEvidence:
+    values: dict[str, object] = {
+        "source_shot_id": "shot-001",
+        "target_shot_id": "shot-002",
+        "target_shot_content_hash": "1" * 64,
+        "resolved_generation_hash": "2" * 64,
+        "artifact_sha256": "3" * 64,
+        "continuity_constraints_hash": "4" * 64,
+        "qa_policy_content_hash": "5" * 64,
+        "evaluator": ToolIdentity(name="continuity-evaluator", version="1"),
+        "strength": EvidenceStrength.EXPLICIT_EVALUATOR,
+        "coverage_complete": True,
+        "identity_match": True,
+        "camera_axis_match": True,
+        "framing_match": True,
+        "motion_direction_match": True,
+        "entrance_state_match": True,
+        "exit_state_match": True,
+        "unexpected_reentry": False,
+        "rationale": "Observed exact Shot boundary and target clip.",
+    }
+    values.update(changes)
+    return GeneratedShotContinuityEvidence.create(**values)
+
+
+def test_generated_shot_continuity_requires_complete_matching_evidence():
+    evidence = _generated_continuity_evidence()
+
+    assert adjudicate_generated_shot_continuity(evidence) is QaVerdict.PASS
+    assert "verdict" not in type(evidence).model_fields
+    with pytest.raises(ValueError, match="evidence hash"):
+        GeneratedShotContinuityEvidence.model_validate(
+            {**evidence.model_dump(mode="json"), "artifact_sha256": "5" * 64}
+        )
+
+
+@pytest.mark.parametrize(
+    ("changes", "expected"),
+    (
+        ({"coverage_complete": False}, QaVerdict.NOT_EVALUATED),
+        ({"motion_direction_match": False}, QaVerdict.FAIL),
+        ({"exit_state_match": False}, QaVerdict.FAIL),
+        ({"unexpected_reentry": True}, QaVerdict.FAIL),
+    ),
+)
+def test_generated_shot_continuity_blocks_reversal_and_reentry(
+    changes: dict[str, object],
+    expected: QaVerdict,
+):
+    assert (
+        adjudicate_generated_shot_continuity(
+            _generated_continuity_evidence(**changes)
+        )
+        is expected
+    )
 
 
 def policy():

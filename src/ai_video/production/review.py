@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
+from pydantic import Field, model_validator
+
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
@@ -16,8 +18,10 @@ from ai_video.production.models import (
     QaVerdict,
     ReviewEvidence,
     ResolvedTimeline,
+    StrictModel,
     TechnicalReviewContext,
     TechnicalReviewWindow,
+    ToolIdentity,
     VisualStrategy,
 )
 
@@ -30,6 +34,83 @@ class ReviewIdentity:
     render_output_sha256: str
     timeline_fingerprint: str
     qa_policy_content_hash: str
+
+
+class GeneratedShotContinuityEvidence(StrictModel):
+    """Raw evaluator evidence for one exact continuity-bound generated Shot."""
+
+    source_shot_id: str = Field(min_length=1)
+    target_shot_id: str = Field(min_length=1)
+    target_shot_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    continuity_constraints_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluator: ToolIdentity
+    strength: EvidenceStrength
+    coverage_complete: bool
+    identity_match: bool
+    camera_axis_match: bool
+    framing_match: bool
+    motion_direction_match: bool
+    entrance_state_match: bool
+    exit_state_match: bool
+    unexpected_reentry: bool
+    rationale: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_evidence(self) -> "GeneratedShotContinuityEvidence":
+        if self.strength not in {
+            EvidenceStrength.EXPLICIT_EVALUATOR,
+            EvidenceStrength.HUMAN,
+        }:
+            raise ValueError(
+                "generated Shot continuity requires explicit evaluator or human evidence"
+            )
+        expected = canonical_sha256(
+            {
+                "schema": "generated-shot-continuity-evidence/1",
+                **self.model_dump(mode="json", exclude={"content_hash"}),
+            }
+        )
+        if self.content_hash != expected:
+            raise ValueError("generated Shot continuity evidence hash is invalid")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "GeneratedShotContinuityEvidence":
+        data = dict(values)
+        candidate = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            {
+                "schema": "generated-shot-continuity-evidence/1",
+                **candidate.model_dump(
+                    mode="json", exclude={"content_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
+def adjudicate_generated_shot_continuity(
+    evidence: GeneratedShotContinuityEvidence,
+) -> QaVerdict:
+    """Derive a verdict from raw continuity evidence; evaluators never self-verdict."""
+
+    if not evidence.coverage_complete:
+        return QaVerdict.NOT_EVALUATED
+    if (
+        evidence.identity_match
+        and evidence.camera_axis_match
+        and evidence.framing_match
+        and evidence.motion_direction_match
+        and evidence.entrance_state_match
+        and evidence.exit_state_match
+        and not evidence.unexpected_reentry
+    ):
+        return QaVerdict.PASS
+    return QaVerdict.FAIL
 
 
 def build_technical_review_context(

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import os
 from datetime import UTC, datetime, timedelta
 from typing import get_type_hints
 from pathlib import Path
@@ -11,6 +13,7 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
     ActorIdentity,
     DependencyGraphSnapshotPointer,
+    EvidenceStrength,
     FinalAcceptanceReceiptPointer,
     FinalAcceptanceState,
     ProductionManifest,
@@ -21,6 +24,7 @@ from ai_video.production.models import (
     ReviewLayerState,
     ReviewLifecycle,
     ReviewReceiptPointer,
+    ToolIdentity,
 )
 from ai_video.production._state_commit_common import _validated_transition
 from ai_video.production import video as video_contracts
@@ -58,8 +62,11 @@ from ai_video.production.video import (
 from ai_video.production.video_artifact import (
     MeasuredVideoMetadata,
     TerminalFrameExtractionResult,
+    VideoProbeReceipt,
     extract_terminal_frame_candidate,
+    probe_generated_video_candidate,
 )
+from ai_video.production.review import GeneratedShotContinuityEvidence
 
 
 HASH_A = "a" * 64
@@ -366,6 +373,108 @@ def _resolved(
     )
 
 
+def _continuity_resolved() -> ResolvedVideoGenerationRequest:
+    binding = _continuity_binding()
+    terminal = binding.terminal_frame
+    first_frame = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id=terminal.extracted_asset_id,
+        asset_sha256=terminal.extracted_sha256,
+        mime_type=terminal.extracted_mime_type,
+        width=terminal.extracted_width,
+        height=terminal.extracted_height,
+        size_bytes=terminal.extracted_size_bytes,
+    )
+    return _resolved(
+        _request(
+            image_bindings=(first_frame,),
+            continuity_binding=binding,
+            input_artifact_ids=(
+                "shot-001",
+                terminal.source_shot_id,
+                terminal.source_video_asset_id,
+                terminal.extracted_asset_id,
+            ),
+        )
+    )
+
+
+def _continuity_fetch_receipt(
+    resolved: ResolvedVideoGenerationRequest,
+    artifact_bytes: bytes,
+) -> VideoFetchReceipt:
+    preview = _paid_preview(resolved)
+    paid_receipt = _paid_submit_receipt(resolved, preview)
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=resolved,
+        receipt=paid_receipt,
+    )
+    observation = VideoTaskObservation.create(
+        submission=submission,
+        state=VideoTaskState.SUCCEEDED,
+        observed_at=datetime(2026, 8, 21, 0, 1, tzinfo=UTC),
+        progress_milli=1000,
+        provider_file_id="continuity-file-1",
+    )
+    return VideoFetchReceipt.create(
+        submission=submission,
+        observation=observation,
+        content_type="video/mp4",
+        size_bytes=len(artifact_bytes),
+        artifact_sha256=hashlib.sha256(artifact_bytes).hexdigest(),
+        fetched_at=datetime(2026, 8, 21, 0, 2, tzinfo=UTC),
+    )
+
+
+def _continuity_probe(_: int) -> dict[str, object]:
+    return {
+        "streams": [
+            {
+                "codec_type": "video",
+                "codec_name": "h264",
+                "width": 1280,
+                "height": 720,
+                "avg_frame_rate": "24/1",
+                "duration": "6",
+                "nb_frames": "144",
+            }
+        ],
+        "format": {"format_name": "mov,mp4", "duration": "6"},
+    }
+
+
+def _continuity_evidence(
+    resolved: ResolvedVideoGenerationRequest,
+    artifact_sha256: str,
+    **changes: object,
+) -> GeneratedShotContinuityEvidence:
+    assert resolved.continuity_binding is not None
+    assert resolved.activation_scope is not None
+    original = resolved.activation_scope.request
+    values: dict[str, object] = {
+        "source_shot_id": resolved.continuity_binding.terminal_frame.source_shot_id,
+        "target_shot_id": original.target_shot_id,
+        "target_shot_content_hash": original.target_shot_content_hash,
+        "resolved_generation_hash": resolved.resolved_generation_hash,
+        "artifact_sha256": artifact_sha256,
+        "continuity_constraints_hash": resolved.continuity_binding.constraints.content_hash,
+        "qa_policy_content_hash": HASH_B,
+        "evaluator": ToolIdentity(name="continuity-evaluator", version="1"),
+        "strength": EvidenceStrength.EXPLICIT_EVALUATOR,
+        "coverage_complete": True,
+        "identity_match": True,
+        "camera_axis_match": True,
+        "framing_match": True,
+        "motion_direction_match": True,
+        "entrance_state_match": True,
+        "exit_state_match": True,
+        "unexpected_reentry": False,
+        "rationale": "Exact decoded-frame continuity observation.",
+    }
+    values.update(changes)
+    return GeneratedShotContinuityEvidence.create(**values)
+
+
 def _paid_preview(
     resolved: ResolvedVideoGenerationRequest,
     *,
@@ -617,6 +726,135 @@ def test_continuity_request_binds_exact_terminal_evidence_and_constraints():
     assert resolved.continuity_binding == binding
     assert resolved.activation_scope is not None
     assert resolved.activation_scope.request.continuity_binding == binding
+
+
+def test_continuity_candidate_requires_exact_passing_per_shot_review(
+    tmp_path: Path,
+):
+    resolved = _continuity_resolved()
+    artifact_bytes = b"sealed-continuity-video"
+    receipt = _continuity_fetch_receipt(resolved, artifact_bytes)
+    source = tmp_path / "candidate.mp4"
+    source.write_bytes(artifact_bytes)
+
+    with source.open("rb") as held:
+        with pytest.raises(AiVideoError) as missing:
+            probe_generated_video_candidate(
+                held.fileno(),
+                resolved,
+                receipt,
+                probe=_continuity_probe,
+            )
+    assert missing.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+
+    expected = _continuity_evidence(resolved, receipt.artifact_sha256)
+    observed_bytes: list[bytes] = []
+
+    def reviewer(held_fd, *_):
+        observed_bytes.append(os.read(held_fd, len(artifact_bytes)))
+        return expected
+
+    with source.open("rb") as held:
+        held.seek(7)
+        _, _, probe_receipt = probe_generated_video_candidate(
+            held.fileno(),
+            resolved,
+            receipt,
+            probe=_continuity_probe,
+            continuity_reviewer=reviewer,
+            continuity_policy_content_hash=HASH_B,
+            continuity_authorities=(expected.evaluator,),
+        )
+        assert held.tell() == 7
+
+    assert probe_receipt.continuity_evidence == expected
+    assert observed_bytes == [artifact_bytes]
+
+    untrusted = _continuity_evidence(
+        resolved,
+        receipt.artifact_sha256,
+        evaluator=ToolIdentity(name="untrusted-evaluator", version="1"),
+    )
+    with source.open("rb") as held:
+        with pytest.raises(AiVideoError) as rejected:
+            probe_generated_video_candidate(
+                held.fileno(),
+                resolved,
+                receipt,
+                probe=_continuity_probe,
+                continuity_reviewer=lambda *_: untrusted,
+                continuity_policy_content_hash=HASH_B,
+                continuity_authorities=(expected.evaluator,),
+            )
+    assert rejected.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+
+
+def test_historical_probe_receipt_reopens_without_continuity_evidence():
+    resolved = _resolved()
+    artifact_bytes = b"historical-video-probe"
+    fetch_receipt = _continuity_fetch_receipt(resolved, artifact_bytes)
+    measured = MeasuredVideoMetadata(
+        container_name="mp4",
+        codec_name="h264",
+        width=1280,
+        height=720,
+        fps_numerator=24,
+        fps_denominator=1,
+        duration_milliseconds=6000,
+        frame_count=144,
+        audio_stream_count=0,
+        size_bytes=len(artifact_bytes),
+        artifact_sha256=fetch_receipt.artifact_sha256,
+    )
+    receipt = VideoProbeReceipt.create(
+        request=resolved,
+        fetch_receipt=fetch_receipt,
+        measured=measured,
+    )
+    historical = receipt.model_dump(mode="json")
+
+    assert "continuity_evidence" not in historical
+    assert VideoProbeReceipt.model_validate(historical) == receipt
+
+
+@pytest.mark.parametrize(
+    "changes",
+    (
+        {"motion_direction_match": False},
+        {"exit_state_match": False},
+        {"unexpected_reentry": True},
+        {"coverage_complete": False},
+        {"qa_policy_content_hash": HASH_C},
+    ),
+)
+def test_continuity_candidate_blocks_incomplete_or_reversed_evidence(
+    tmp_path: Path,
+    changes: dict[str, object],
+):
+    resolved = _continuity_resolved()
+    artifact_bytes = b"reversed-continuity-video"
+    receipt = _continuity_fetch_receipt(resolved, artifact_bytes)
+    evidence = _continuity_evidence(
+        resolved,
+        receipt.artifact_sha256,
+        **changes,
+    )
+    source = tmp_path / "candidate.mp4"
+    source.write_bytes(artifact_bytes)
+
+    with source.open("rb") as held:
+        with pytest.raises(AiVideoError) as rejected:
+            probe_generated_video_candidate(
+                held.fileno(),
+                resolved,
+                receipt,
+                probe=_continuity_probe,
+                continuity_reviewer=lambda *_: evidence,
+                continuity_policy_content_hash=HASH_B,
+                continuity_authorities=(evidence.evaluator,),
+            )
+
+    assert rejected.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
 
 
 def test_hard_cut_request_binds_derived_keyframe_and_upstream_terminal_lineage():

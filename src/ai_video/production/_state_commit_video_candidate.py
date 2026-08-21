@@ -47,9 +47,11 @@ from ai_video.production.paths import (
     canonical_terminal_frame_evidence_path,
     canonical_terminal_frame_extraction_receipt_path,
 )
+from ai_video.production.project import load_qa_policy
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.video import ResolvedVideoGenerationRequest
 from ai_video.production.video_artifact import (
+    GeneratedShotContinuityReviewer,
     MeasuredVideoMetadata,
     TerminalFrameExtractor,
     VideoProbeReceipt,
@@ -362,6 +364,7 @@ class _StateCommitVideoCandidateMixin:
         attempt_id: str,
         probe: Callable[[int], dict] | None = None,
         terminal_frame_extractor: TerminalFrameExtractor | None = None,
+        continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
     ):
         """Measure fetched bytes and persist an inactive exact bundle candidate."""
 
@@ -380,6 +383,26 @@ class _StateCommitVideoCandidateMixin:
                     "Video validation requires exact durable fetched evidence."
                 )
             request = self._reopen_video_request(state.request)
+            continuity_policy_content_hash = None
+            continuity_authorities = ()
+            if request.continuity_binding is not None:
+                if manifest.active_qa_policy is None:
+                    raise _state_invalid(
+                        "Continuity-bound video validation requires an active QA policy."
+                    )
+                policy = load_qa_policy(
+                    self._project_root,
+                    manifest.active_qa_policy,
+                )
+                if (
+                    policy.content_hash != manifest.active_qa_policy.content_hash
+                    or not policy.semantic_authorities
+                ):
+                    raise _state_invalid(
+                        "Continuity-bound video validation requires semantic authorities."
+                    )
+                continuity_policy_content_hash = policy.content_hash
+                continuity_authorities = policy.semantic_authorities
             if local_lane:
                 if (
                     state.local_latest_observation is None
@@ -461,6 +484,9 @@ class _StateCommitVideoCandidateMixin:
                     request,
                     fetch_receipt,
                     probe=probe,
+                    continuity_reviewer=continuity_reviewer,
+                    continuity_policy_content_hash=continuity_policy_content_hash,
+                    continuity_authorities=continuity_authorities,
                 )
                 provenance = (
                     VideoProvenanceReceipt.create_local(
