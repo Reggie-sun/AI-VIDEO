@@ -115,6 +115,34 @@ class PlanOutcome(str, Enum):
     BLOCKED = "blocked"
 
 
+class CurrentPlanProjectionFailureReason(str, Enum):
+    LEGACY_CONTRACT = "legacy_contract"
+    REQUEST_SEAL_INVALID = "request_seal_invalid"
+    PLAN_SEAL_INVALID = "plan_seal_invalid"
+    PLAN_NOT_UNIQUE_CURRENT_DERIVATION = "plan_not_unique_current_derivation"
+    PLAN_ID_INVALID = "plan_id_invalid"
+    SOURCE_REQUEST_STALE = "source_request_stale"
+    TARGET_SHOT_STALE = "target_shot_stale"
+    EMBEDDED_REQUIREMENT_MISSING = "embedded_requirement_missing"
+    EMBEDDED_REQUIREMENT_STALE = "embedded_requirement_stale"
+    VERIFIED_PROJECTION_INVALID = "verified_projection_invalid"
+
+
+class CurrentPlanProjectionFailure(StrictModel):
+    reason_codes: tuple[CurrentPlanProjectionFailureReason, ...] = Field(
+        min_length=1
+    )
+    field_paths: tuple[str, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _validate_diagnostics(self) -> "CurrentPlanProjectionFailure":
+        if len(set(self.reason_codes)) != len(self.reason_codes):
+            raise ValueError("projection failure reason_codes must be unique")
+        if len(set(self.field_paths)) != len(self.field_paths):
+            raise ValueError("projection failure field_paths must be unique")
+        return self
+
+
 class ShotIntentEvidence(StrictModel):
     target_shot_id: str = Field(pattern=_SAFE_ID)
     target_shot_content_hash: str = Field(pattern=_SHA256)

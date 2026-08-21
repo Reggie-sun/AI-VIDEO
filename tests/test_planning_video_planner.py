@@ -665,18 +665,22 @@ def test_t1_planning_public_surface_does_not_create_production_truth_owners():
 
 
 def _character_reference():
+    character = make_character()
     return make_available_asset(
         role=AssetRole.CHARACTER_REFERENCE,
         asset_id="reference-hero",
         canonical_owner_id="hero",
+        canonical_owner_content_hash=character.content_hash,
     )
 
 
 def _scene_reference():
+    scene = make_scene()
     return make_available_asset(
         role=AssetRole.SCENE_REFERENCE,
         asset_id="reference-room",
         canonical_owner_id="room",
+        canonical_owner_content_hash=scene.content_hash,
     )
 
 
@@ -685,6 +689,7 @@ def _terminal_reference():
         role=AssetRole.PREVIOUS_SHOT_TERMINAL,
         asset_id="terminal-shot-0",
         canonical_owner_id="shot-0",
+        canonical_owner_content_hash=TWO_HASH,
     )
 
 
@@ -991,7 +996,11 @@ def test_ac13_fallback_false_blocks_even_with_keyframe(strategy):
     shot = make_shot(visual_strategy=strategy)
     request = make_request(
         target_shot=shot,
-        available_assets=(make_available_asset(),),
+        available_assets=(
+            make_available_asset(
+                canonical_owner_content_hash=shot.content_hash
+            ),
+        ),
         shot_intent_evidence=make_intent_evidence(
             target_shot=shot,
             character_action_required=True,
@@ -1639,10 +1648,14 @@ def test_ac17_main_agent_preflight_stops_before_execution(stop_reason):
 
     downstream = tuple(Mock(name=name) for name in (
         "router",
+        "compiler",
         "provider",
         "materializer",
         "composition",
         "render",
+        "manifest",
+        "registry",
+        "committer",
     ))
     handoff = Mock(side_effect=lambda **_: [call() for call in downstream])
 
@@ -1759,7 +1772,11 @@ def test_consumer_allows_auditable_static_fallback_warning_when_resolved():
     shot = make_shot(visual_strategy=VisualStrategy.STATIC_IMAGE)
     request = make_request(
         target_shot=shot,
-        available_assets=(make_available_asset(),),
+        available_assets=(
+            make_available_asset(
+                canonical_owner_content_hash=shot.content_hash
+            ),
+        ),
         shot_intent_evidence=make_intent_evidence(
             target_shot=shot,
             character_action_required=True,

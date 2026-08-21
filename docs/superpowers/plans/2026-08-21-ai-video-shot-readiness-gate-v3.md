@@ -2,13 +2,18 @@
 
 ## Status
 
-Proposed implementation plan；current task is documentation-only。No runtime、Provider、media、
-seed fix、quality acceptance、push或release is authorized by this artifact。
+Implemented and offline-accepted on local `main`；not pushed or released。本Plan对应的pure
+runtime、tests、Harness routing与canonical docs已完成；没有运行Provider、生成/分析媒体、修复
+seed blocker或作出quality acceptance。
 
-本 Plan 只实现配套 canonical Spec
-`docs/superpowers/specs/2026-08-21-ai-video-shot-readiness-gate-v3.md` 的未来工作；仓库中不
-存在需要保留、迁移或并行执行的第二份“旧 QA Gate Spec”。后续实现必须原地更新这一份
-Spec 的 status/evidence，不得另建竞争的 gate truth。
+本 Plan 实现配套 canonical Spec
+`docs/superpowers/specs/2026-08-21-ai-video-shot-readiness-gate-v3.md`；仓库中不
+存在需要保留、迁移或并行执行的第二份“旧 QA Gate Spec”。本实现已原地更新这一份Spec的
+status/evidence，没有另建竞争的 gate truth。
+
+**Implementation Evidence:** focused Gate/Planner/Router/P8 seam `241 passed`；Harness与
+Architecture tests `89 passed`；Architecture Gate PASS。Final acceptance仍要求native reviewer
+无blocking issue、exact staged snapshot receipt自验证和task commit-range verification。
 
 **Goal:** 实现一个 pure、deterministic、provider-neutral 的
 `ShotReadinessGate`，对 current `video-planner/3` request、plan、内嵌 requirement 与
@@ -29,9 +34,9 @@ compiler、Manifest、Registry、committer、recovery、P5、`ResolvedTimeline`�
 Review/Pilot owners不变；BLOCKED后downstream side effects为0；READY只返回verified
 requirement projection。
 
-**Current / Target Behavior:** 当前 `require_current_video_plan()`同时验证freshness并决定
-eligibility/assets。目标把current structural verifier保留为Planning-owned projection seam，
-把唯一 `READY/BLOCKED` 与 STOP decision移到 `ShotReadinessGate`；existing façade继续返回
+**Implemented Behavior:** `require_current_video_plan()`保留为compatibility façade；current
+structural verifier已成为Planning-owned projection seam，唯一 `READY/BLOCKED` 与 STOP
+decision已移到 `ShotReadinessGate`；existing façade继续返回
 `VerifiedGenerationRequirementProjection`，handoff继续使用`generation_requirement`且不出现
 `plan_hint`。
 
@@ -87,6 +92,7 @@ No worktree is created unless the user explicitly requests one。
 | --- | --- | --- |
 | Shared asset semantics | Create `src/ai_video/planning/_asset_readiness.py` | sole cycle-safe role/owner/final-visual/media-selection readiness logic |
 | Planning verification diagnostics | Modify `src/ai_video/planning/_planner_models.py` | internal frozen failure model and exact reason vocabulary；no readiness verdict |
+| Planning freshness implementation | Create `src/ai_video/planning/_current_plan_projection.py` | cohesive private exact-lineage verifier；`video_planner.py` retains the sole façade and derivation callback |
 | Planning freshness and façade | Modify `src/ai_video/planning/video_planner.py` | typed projection verification；delegate readiness；no parallel decision body |
 | Readiness models | Create `src/ai_video/quality_gates/_readiness_models.py` | strict request/result/check payloads、reason enums、hashes、validators |
 | Gate behavior | Create `src/ai_video/quality_gates/shot_readiness_gate.py` | three-check evaluation、aggregation、`require_ready()` |
@@ -95,6 +101,7 @@ No worktree is created unless the user explicitly requests one。
 | Compatibility tests | Modify `tests/test_planning_video_planner.py` | façade return/handoff、v2 boundary、old-body retirement、no `plan_hint` |
 | Harness | Modify `.agent/harness/policy.yaml`, `tests/test_agent_harness.py` | changed-path category、focused check、overlap routing |
 | Canonical docs after executable proof | Modify `docs/agent-primary-contract-matrix.md`, `docs/v0.2-runtime-baseline.md`, `docs/v0.2-agentic-production-roadmap.md`, this Spec/Plan status only as current evidence supports | report implemented behavior without live/quality claims |
+| Retired integration example | Modify `docs/superpowers/specs/2026-08-21-ai-video-video-planner-subagent.md` | replace the stale v2 `plan_hint` example with current v3 verified projection handoff |
 
 Do not modify Router、Provider adapters、compiler、Manifest/Registry/committer、Dependency Graph、
 timeline、P6 Review/Pilot、workflow profiles或media files in this implementation slice。

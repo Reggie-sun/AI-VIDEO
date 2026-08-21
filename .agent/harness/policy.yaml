@@ -120,6 +120,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_video_requirement.py, tests/test_planning_video_planner.py, tests/test_production_shot_router.py, tests/test_production_video_fake.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_video.py, -q]
     cwd: .
     description: Verify the sealed neutral requirement, Router binding, adapter compiler result, and lifecycle lineage.
+  shot_readiness_gate_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_shot_readiness_gate.py, tests/test_planning_video_planner.py, tests/test_production_video_requirement.py, tests/test_errors.py, -q]
+    cwd: .
+    description: Verify exact planning lineage, structural readiness, typed STOP diagnostics, and compatibility handoff.
   full_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, -q]
     cwd: .
@@ -393,6 +397,15 @@ categories:
     check_ids:
       - video_planner_tests
       - provider_neutral_video_requirement_tests
+      - shot_readiness_gate_tests
+      - task_architecture_gate
+  shot_readiness_gate:
+    patterns:
+      - src/ai_video/quality_gates/**
+      - src/ai_video/planning/_asset_readiness.py
+      - tests/test_shot_readiness_gate.py
+    check_ids:
+      - shot_readiness_gate_tests
       - task_architecture_gate
   provider_neutral_video_requirement:
     patterns:

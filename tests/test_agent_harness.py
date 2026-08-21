@@ -207,12 +207,55 @@ def test_video_planner_routes_to_exact_contract_suite() -> None:
             "scope_diff_check",
             "video_planner_tests",
             "provider_neutral_video_requirement_tests",
+            "shot_readiness_gate_tests",
             "task_architecture_gate",
         ]
 
     argv = policy["checks"]["video_planner_tests"]["argv"]
     assert "tests/test_planning_video_planner.py" in argv
     assert "tests/test_errors.py" in argv
+
+
+def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/quality_gates/shot_readiness_gate.py",
+        "tests/test_shot_readiness_gate.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["shot_readiness_gate"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "shot_readiness_gate_tests",
+            "task_architecture_gate",
+        ]
+
+    helper_report = agent_harness.inspect_paths(
+        ["src/ai_video/planning/_asset_readiness.py"], policy
+    )
+    assert helper_report["categories"] == [
+        "video_planning",
+        "shot_readiness_gate",
+    ]
+    assert helper_report["fallback_paths"] == []
+    assert helper_report["check_ids"] == [
+        "scope_diff_check",
+        "video_planner_tests",
+        "provider_neutral_video_requirement_tests",
+        "shot_readiness_gate_tests",
+        "task_architecture_gate",
+    ]
+
+    argv = policy["checks"]["shot_readiness_gate_tests"]["argv"]
+    for path in (
+        "tests/test_shot_readiness_gate.py",
+        "tests/test_planning_video_planner.py",
+        "tests/test_production_video_requirement.py",
+        "tests/test_errors.py",
+    ):
+        assert path in argv
 
 
 def test_hyperframes_source_routes_to_composition_audio_suite() -> None:

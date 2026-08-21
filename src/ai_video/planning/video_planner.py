@@ -3,12 +3,20 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, TypeVar
 
-from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.planning._asset_readiness import (
+    asset_matches_role as _asset_matches_role,
+    available_role as _available_role,
+    current_review as _current_review,
+    media_selection_is_complete as _media_selection_is_complete,
+)
+from ai_video.planning._current_plan_projection import (
+    verify_current_generation_requirement_projection,
+)
 from ai_video.planning._planner_models import (
     AssetRole,
-    AvailableAsset,
     CapabilityRequirements,
     ContinuityMode,
+    CurrentPlanProjectionFailure,
     GenerationMode,
     MotionRequirement,
     PlanOutcome,
@@ -16,12 +24,11 @@ from ai_video.planning._planner_models import (
     PreviousShotState,
     ReasonCode,
     RequiredAssetRole,
-    ReviewDecisionProjection,
     VideoGenerationPlan,
     VideoPlanningRequest,
     _canonical_hash_without,
 )
-from ai_video.production.models import AssetType, Shot, VisualStrategy
+from ai_video.production.models import Shot, VisualStrategy
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.video_requirement import (
     AssetEvidence as RequirementAssetEvidence,
@@ -39,151 +46,12 @@ from ai_video.production.video_requirement import (
 
 _CAMERA_TRANSFORM_KINDS = frozenset({"pan", "zoom", "parallax"})
 _SUBJECT_MOTION_KINDS = frozenset({"animate"})
-_FINAL_VISUAL_ROLE = "final_visual"
 _ItemT = TypeVar("_ItemT")
 
 
 def _append_unique(items: list[_ItemT], value: _ItemT) -> None:
     if value not in items:
         items.append(value)
-
-
-def _current_review(
-    request: VideoPlanningRequest,
-) -> ReviewDecisionProjection | None:
-    review = request.review_decision
-    if review is None:
-        return None
-    if (
-        review.target_shot_id != request.target_shot.shot_id
-        or review.target_shot_content_hash != request.target_shot.content_hash
-    ):
-        return None
-    return review
-
-
-def _has_exact_image_binding(request: VideoPlanningRequest, asset_id: str) -> bool:
-    return any(
-        requirement.role == _FINAL_VISUAL_ROLE
-        and asset_id in requirement.asset_ids
-        and AssetType.IMAGE in requirement.allowed_asset_types
-        for requirement in request.target_shot.required_asset_roles
-    )
-
-
-def _is_shot_bound_final_visual(
-    request: VideoPlanningRequest,
-    asset: AvailableAsset,
-    *,
-    review: ReviewDecisionProjection | None,
-) -> bool:
-    if asset.canonical_owner_id != request.target_shot.shot_id:
-        return False
-    if not _has_exact_image_binding(request, asset.asset_id):
-        return False
-    if asset.role is AssetRole.APPROVED_KEYFRAME:
-        return True
-    return bool(
-        asset.role is AssetRole.APPROVED_REUSABLE_PLATE
-        and review is not None
-        and review.allows_reusable_plate
-        and review.rationale.strip()
-    )
-
-
-def _asset_matches_role(
-    request: VideoPlanningRequest,
-    asset: AvailableAsset,
-    role: AssetRole,
-) -> bool:
-    if asset.role is not role:
-        return False
-    if role is AssetRole.CHARACTER_REFERENCE:
-        character_ids = {
-            item.character_id
-            for item in request.character_context
-            if item.character_id in request.target_shot.character_ids
-        }
-        return asset.canonical_owner_id in character_ids
-    if role is AssetRole.SCENE_REFERENCE:
-        if request.scene_context.scene_id != request.target_shot.scene_id:
-            return False
-        return asset.canonical_owner_id == request.target_shot.scene_id
-    if role is AssetRole.PREVIOUS_SHOT_TERMINAL:
-        state = request.previous_shot_state
-        terminal_id = state.has_terminal_frame_asset_id if state else None
-        previous_shot_id = state.previous_shot_id if state else None
-        return (
-            terminal_id is not None
-            and previous_shot_id is not None
-            and asset.asset_id == terminal_id
-            and asset.canonical_owner_id == previous_shot_id
-        )
-    if role in {
-        AssetRole.EXISTING_VIDEO,
-        AssetRole.REFERENCE_AUDIO,
-    }:
-        selection = (
-            request.generation_intent.media_reference_asset_ids
-            if request.generation_intent is not None
-            else ()
-        )
-        return not selection or asset.asset_id in selection
-    if role is AssetRole.LAST_FRAME:
-        return True
-    review = _current_review(request)
-    return _is_shot_bound_final_visual(request, asset, review=review)
-
-
-def _available_role(request: VideoPlanningRequest, role: AssetRole) -> bool:
-    matches = tuple(
-        asset
-        for asset in request.available_assets
-        if _asset_matches_role(request, asset, role)
-    )
-    if role is AssetRole.CHARACTER_REFERENCE:
-        target_characters = set(request.target_shot.character_ids)
-        owners = tuple(asset.canonical_owner_id for asset in matches)
-        return set(owners) == target_characters and len(owners) == len(
-            target_characters
-        )
-    if role in {AssetRole.EXISTING_VIDEO, AssetRole.REFERENCE_AUDIO} and (
-        request.generation_intent is not None
-        and request.generation_intent.media_reference_asset_ids
-    ):
-        return bool(matches)
-    return len(matches) == 1
-
-
-def _media_selection_is_complete(
-    request: VideoPlanningRequest,
-    required: tuple[RequiredAssetRole, ...],
-) -> bool:
-    projection = request.generation_intent
-    selected_ids = (
-        set(projection.media_reference_asset_ids) if projection is not None else set()
-    )
-    if not selected_ids:
-        return True
-    required_media_roles = {
-        item.role
-        for item in required
-        if item.role in {AssetRole.EXISTING_VIDEO, AssetRole.REFERENCE_AUDIO}
-    }
-    selected_assets = tuple(
-        asset for asset in request.available_assets if asset.asset_id in selected_ids
-    )
-    return bool(
-        len(selected_assets) == len(selected_ids)
-        and all(asset.role in required_media_roles for asset in selected_assets)
-    )
-
-
-def _required_role_is_available(
-    request: VideoPlanningRequest,
-    requirement: RequiredAssetRole,
-) -> bool:
-    return _available_role(request, requirement.role)
 
 
 def _decide_continuity(
@@ -836,12 +704,15 @@ class VideoPlanner:
         )
 
 
-def _preflight_error(detail: str) -> AiVideoError:
-    return AiVideoError(
-        code=ErrorCode.PLANNING_PREFLIGHT_BLOCKED,
-        user_message="Video planning preflight blocked downstream execution.",
-        technical_detail=detail,
-        retryable=False,
+def _verify_current_generation_requirement_projection(
+    *,
+    current_request: VideoPlanningRequest,
+    plan: VideoGenerationPlan,
+) -> VerifiedGenerationRequirementProjection | CurrentPlanProjectionFailure:
+    return verify_current_generation_requirement_projection(
+        current_request=current_request,
+        plan=plan,
+        derive_plan=VideoPlanner().plan,
     )
 
 
@@ -850,114 +721,18 @@ def require_current_video_plan(
     current_request: VideoPlanningRequest,
     plan: VideoGenerationPlan,
 ) -> VerifiedGenerationRequirementProjection:
-    if (
-        current_request.planning_contract_version != "video-planner/3"
-        or plan.planning_contract_version != "video-planner/3"
-    ):
-        raise _preflight_error(
-            "legacy video-planner/2 evidence must be rebuilt before a new attempt"
-        )
-    expected_request_hash = _canonical_hash_without(
-        current_request,
-        "request_id",
-        "request_content_hash",
+    from ai_video.quality_gates import (
+        ShotReadinessGate,
+        ShotReadinessRequest,
+        require_ready,
     )
-    if current_request.request_content_hash != expected_request_hash:
-        raise _preflight_error("current request seal is invalid")
-    if plan.plan_hash != _canonical_hash_without(plan, "plan_hash"):
-        raise _preflight_error("plan seal is invalid")
-    expected_plan = VideoPlanner().plan(current_request)
-    if plan.plan_hash != expected_plan.plan_hash:
-        raise _preflight_error(
-            "plan is not the unique current derivation for its request"
-        )
-    expected_plan_id = f"plan-{plan.source_request_content_hash[:24]}"
-    if plan.plan_id != expected_plan_id:
-        raise _preflight_error("plan id is not bound to its source request")
-    if plan.source_request_content_hash != current_request.request_content_hash:
-        raise _preflight_error("plan source request is stale")
-    if plan.target_shot_id != current_request.target_shot.shot_id:
-        raise _preflight_error("plan target Shot id is stale")
-    if plan.target_shot_revision != current_request.target_shot.revision:
-        raise _preflight_error("plan target Shot revision is stale")
-    if plan.target_shot_content_hash != current_request.target_shot.content_hash:
-        raise _preflight_error("plan target Shot content hash is stale")
-    if plan.outcome is PlanOutcome.BLOCKED:
-        raise _preflight_error("plan outcome is blocked")
-    if PlanWarning.REQUIRES_HUMAN_REVIEW in plan.warnings:
-        raise _preflight_error("plan still requires human review")
-    missing = tuple(
-        requirement.role.value
-        for requirement in plan.required_asset_roles
-        if not _required_role_is_available(current_request, requirement)
+
+    readiness_request = ShotReadinessRequest.create(
+        request_id=f"readiness-{current_request.target_shot.shot_id}",
+        current_request=current_request,
+        plan=plan,
     )
-    if missing:
-        raise _preflight_error(
-            f"required current assets are missing or invalid: {', '.join(missing)}"
-        )
-    requirement = plan.generation_requirement
-    if requirement is None:
-        raise _preflight_error("current plan has no embedded generation requirement")
-    if (
-        requirement.source_request_content_hash
-        != current_request.request_content_hash
-        or requirement.intent_evidence_hash
-        != canonical_sha256(
-            current_request.shot_intent_evidence.model_dump(mode="json")
-        )
-        or current_request.generation_intent is None
-        or requirement.generation_intent_hash
-        != current_request.generation_intent.projection_hash
-        or requirement.generation_intent
-        != current_request.generation_intent.generation_intent
-        or requirement.scene != current_request.scene_context
-        or requirement.characters
-        != tuple(
-            character
-            for character in current_request.character_context
-            if character.character_id in current_request.target_shot.character_ids
-        )
-    ):
-        raise _preflight_error("embedded generation requirement is stale")
-    current_assets = {
-        (asset.asset_id, asset.asset_sha256): asset
-        for asset in current_request.available_assets
-    }
-    for evidence in requirement.asset_evidence:
-        asset = current_assets.get((evidence.asset_id, evidence.asset_sha256))
-        if asset is None or (
-            evidence.canonical_owner_id != asset.canonical_owner_id
-            or evidence.canonical_owner_content_hash
-            != asset.canonical_owner_content_hash
-            or evidence.mime_type != asset.mime_type
-            or evidence.width != asset.width
-            or evidence.height != asset.height
-            or evidence.size_bytes != asset.size_bytes
-            or evidence.duration_millis != asset.duration_millis
-            or evidence.fps != asset.fps
-        ):
-            raise _preflight_error("embedded requirement asset evidence is stale")
-    review = _current_review(current_request)
-    expected_review_hash = (
-        canonical_sha256(review.model_dump(mode="json"))
-        if review is not None
-        else None
-    )
-    if (
-        (requirement.review_evidence is None) != (review is None)
-        or requirement.review_evidence is not None
-        and requirement.review_evidence.review_decision_hash
-        != expected_review_hash
-    ):
-        raise _preflight_error("embedded requirement Review evidence is stale")
-    return VerifiedGenerationRequirementProjection.create(
-        requirement=requirement,
-        plan_hash=plan.plan_hash,
-        verified_source_request_content_hash=current_request.request_content_hash,
-        target_shot_id=current_request.target_shot.shot_id,
-        target_shot_revision=current_request.target_shot.revision,
-        target_shot_content_hash=current_request.target_shot.content_hash,
-    )
+    return require_ready(ShotReadinessGate().evaluate(readiness_request))
 
 
 def prepare_shot_for_existing_production(

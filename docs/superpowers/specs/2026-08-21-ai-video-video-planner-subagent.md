@@ -185,11 +185,15 @@ request = VideoPlanningRequest.create(
     shot_intent_evidence=intent_evidence,
     review_decision=current_review,
     production_policy=policy,
-    planning_contract_version="video-planner/2",
+    planning_contract_version="video-planner/3",
+    generation_intent=current_generation_intent,
 )
 plan = VideoPlanner().plan(request)
-require_current_video_plan(current_request=request, plan=plan)
-existing_production_handoff(current_shot=request.target_shot, plan_hint=plan)
+projection = require_current_video_plan(current_request=request, plan=plan)
+existing_production_handoff(
+    current_shot=request.target_shot,
+    generation_requirement=projection,
+)
 ```
 
 When the plan is `BLOCKED`, `require_current_video_plan()` raises typed `ErrorCode.PLANNING_PREFLIGHT_BLOCKED` and the handoff is not called. When `PROPOSED` and current, the existing handoff is called once.

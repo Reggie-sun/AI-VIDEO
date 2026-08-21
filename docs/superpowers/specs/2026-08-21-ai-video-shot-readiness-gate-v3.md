@@ -2,11 +2,16 @@
 
 ## Status
 
-Proposed v3 contract repair；documentation-only。本文件对齐当前已实现的
+Implemented and offline-accepted on local `main`；not pushed or released。本文件对齐
 `video-planner/3`、plan 内嵌 `ProviderNeutralVideoRequirement` 与
-`VerifiedGenerationRequirementProjection` truth。本 slice 不实现 runtime、不运行
-Provider、不生成或分析媒体，也不构成 generation、activation、Review、quality 或
-Final Acceptance evidence。
+`VerifiedGenerationRequirementProjection` truth。Implementation包含pure Planning verifier、
+strict Gate models、唯一structural readiness decision、typed STOP、shared asset owner、
+compatibility façade与Harness routing；没有运行Provider、生成或分析媒体，也不构成
+generation、activation、Review、quality或Final Acceptance evidence。
+
+当前executable evidence为focused Gate/Planner/Router/P8 seam `241 passed`、Harness与
+Architecture tests `89 passed`、Architecture Gate PASS。最终completion仍以本task exact staged
+snapshot receipt、independent review和commit-range verification为准。
 
 本 repository 只有这一份 canonical `ShotReadinessGate` Spec。本次修改是在该文件中
 原地修订 contract，不存在另一份“旧 QA Gate Spec”、并行 gate spec 或基于实验失败新建
@@ -359,7 +364,7 @@ not execute IO or create a reverse Production dependency。
 
 ## Harness Routing and Test Contract
 
-Future implementation adds a focused check：
+Implementation adds the focused check：
 
 ```yaml
 shot_readiness_gate_tests:
@@ -370,14 +375,14 @@ shot_readiness_gate_tests:
          tests/test_errors.py, -q]
 ```
 
-Future category `shot_readiness_gate` maps `src/ai_video/quality_gates/**`、
+Category `shot_readiness_gate` maps `src/ai_video/quality_gates/**`、
 `src/ai_video/planning/_asset_readiness.py`与`tests/test_shot_readiness_gate.py` to
 `shot_readiness_gate_tests` + `task_architecture_gate`。Because the compatibility façade and
 Planning helper change, existing `video_planning.check_ids` must also include
 `shot_readiness_gate_tests`。`.agent/harness/policy.yaml` and Harness routing tests change in the
-same implementation commit；this docs slice does not edit runtime policy。
+same implementation commit。
 
-Focused future command：
+Focused command：
 
 ```bash
 python -m pytest -p no:cacheprovider \
@@ -426,7 +431,7 @@ only structural readiness。
 
 This docs repair has no runtime rollback beyond reverting the two docs files。
 
-Future runtime rollback is one atomic code-unit revert：restore the previous
+Runtime rollback is one atomic code-unit revert：restore the previous
 `require_current_video_plan()` body、remove the Gate package/tests/policy category、and move the
 shared asset helper back only if all consumers are reverted together。There is no schema、Manifest、
 Registry、artifact-layout或durable-state migration，so no data conversion or recovery action is
@@ -435,10 +440,10 @@ new-attempt path。
 
 ## Deferred Work and Experiment Boundary
 
-After this runtime Gate is separately implemented、reviewed、committed and verified, the independent
+After this runtime Gate is reviewed、committed and exact-snapshot verified, the independent
 `VideoGenerationRequest /5 effective_seed=None` compiler/Local H3 blocker may be diagnosed and
-fixed in its own code slice。Only after that fix is accepted may a separately authorized Local H3
-experiment be attempted。
+fixed in its own code slice。Only after that fix is accepted may the separately user-authorized
+Local H3 experiment be attempted。
 
 That experiment may contribute P6 Review/Pilot perceptual evidence。Its success or failure must not
 redesign ShotReadinessGate, change readiness reasons, add post-fetch quality logic, or be interpreted

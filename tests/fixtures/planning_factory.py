@@ -158,6 +158,7 @@ def make_available_asset(
     asset_id: str = "keyframe-shot-1",
     asset_sha256: str = ONE_HASH,
     canonical_owner_id: str | None = "shot-1",
+    canonical_owner_content_hash: str | None = None,
     mime_type: str = "image/png",
 ) -> AvailableAsset:
     return AvailableAsset(
@@ -165,6 +166,7 @@ def make_available_asset(
         asset_id=asset_id,
         asset_sha256=asset_sha256,
         canonical_owner_id=canonical_owner_id,
+        canonical_owner_content_hash=canonical_owner_content_hash,
         mime_type=mime_type,
         width=1920,
         height=1080,
@@ -235,7 +237,11 @@ def make_request(**overrides: object) -> VideoPlanningRequest:
         "target_shot": target_shot,
         "character_context": (make_character(),),
         "scene_context": make_scene(),
-        "available_assets": (make_available_asset(),),
+        "available_assets": (
+            make_available_asset(
+                canonical_owner_content_hash=target_shot.content_hash
+            ),
+        ),
         "previous_shot_state": None,
         "shot_intent_evidence": make_intent_evidence(target_shot=target_shot),
         "review_decision": make_review_decision(target_shot=target_shot),
