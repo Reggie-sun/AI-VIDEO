@@ -8,6 +8,10 @@ Proposed v3 contract repair；documentation-only。本文件对齐当前已实�
 Provider、不生成或分析媒体，也不构成 generation、activation、Review、quality 或
 Final Acceptance evidence。
 
+本 repository 只有这一份 canonical `ShotReadinessGate` Spec。本次修改是在该文件中
+原地修订 contract，不存在另一份“旧 QA Gate Spec”、并行 gate spec 或基于实验失败新建
+Spec 的路径；“QA Gate”仅是对本 pre-submit structural gate 的口语称呼。
+
 配套 implementation plan：
 `docs/superpowers/plans/2026-08-21-ai-video-shot-readiness-gate-v3.md`。
 
@@ -20,10 +24,10 @@ Final Acceptance evidence。
 2. 决定 plan eligibility、required-asset readiness 与 downstream STOP。
 
 前者属于 Planning freshness boundary，后者应收敛为一个明确的 pre-submit readiness
-owner。旧 ShotReadinessGate spec 仍固定 `video-planner/2` 并把 plan 作为
-`plan_hint` 交给下游；这与 current v3 code 和 tests 冲突。修复目标不是新增一套
-Planner 或 post-fetch QA，而是保留 Planning freshness verifier/issuer，并把唯一
-`READY/BLOCKED` decision 移交 `ShotReadinessGate`。
+owner。本 canonical Spec 的先前内容仍固定 `video-planner/2` 并把 plan 作为
+`plan_hint` 交给下游；这与 current v3 code 和 tests 冲突。本次原地修订的目标不是新增
+另一份 Spec、另一套 Planner 或 post-fetch QA，而是保留 Planning freshness
+verifier/issuer，并把唯一 `READY/BLOCKED` decision 移交 `ShotReadinessGate`。
 
 ## Goal
 

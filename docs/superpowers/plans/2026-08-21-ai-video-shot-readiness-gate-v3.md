@@ -5,6 +5,11 @@
 Proposed implementation plan；current task is documentation-only。No runtime、Provider、media、
 seed fix、quality acceptance、push或release is authorized by this artifact。
 
+本 Plan 只实现配套 canonical Spec
+`docs/superpowers/specs/2026-08-21-ai-video-shot-readiness-gate-v3.md` 的未来工作；仓库中不
+存在需要保留、迁移或并行执行的第二份“旧 QA Gate Spec”。后续实现必须原地更新这一份
+Spec 的 status/evidence，不得另建竞争的 gate truth。
+
 **Goal:** 实现一个 pure、deterministic、provider-neutral 的
 `ShotReadinessGate`，对 current `video-planner/3` request、plan、内嵌 requirement 与
 verified projection执行唯一 pre-submit structural readiness decision，并保持所有
