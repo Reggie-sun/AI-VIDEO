@@ -117,6 +117,7 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 - 稳定 credential reference 与本机 Secret Service exact attributes 以 `AGENTS.md` 为准；不得改用未声明的 environment key、读取其他 Provider credential 或建立 environment/provider fallback。
 - Secret lookup 必须封装在 injected credential supplier 中。不得在交互终端把 secret 输出到 stdout；presence check 必须不回显。Lookup失败、keyring locked、credential invalid/rotated 时 fail closed，不得搜索 repo、shell history 或替代 secret source。
 - Credential 存在不证明 access、pricing、余额或当前 task authorization。
+- 当前 task scope 内的 loopback local ComfyUI Provider generation 是 local、unmetered、no-cloud-egress execution，不适用 remote/paid task-scoped authorization，也不需要额外 user confirmation。用户明确禁止 live generation 时仍必须停止；sealed profile、preflight、local permit、唯一 committer、recovery 与 media verification gates 不因该豁免而放宽。
 - 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
 - Authorization 仅覆盖 accepted Provider/model、inputs、budget 与完成目标所需的最少调用；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。
 - Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 exact preview、finite budget ceiling/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit。

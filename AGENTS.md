@@ -146,6 +146,7 @@ Creative skill selection、Agent-side image generation preference、mandatory pr
 - Seedance / Volcengine Ark raw credential 不得存入 repository、`.env`、artifact、prompt、command argument、fixture、log、error、repr、receipt 或本文档。
 - 稳定 credential reference 是 `ARK_API_KEY`；本机 Secret Service exact attributes 为 `application ai-video`、`provider seedance`、`credential ARK_API_KEY`。不得改用 `SEEDANCE_API_KEY` 或建立 environment/provider fallback。
 - MiniMax Speech credential 已存入本机 Secret Service；`secret-tool` label 为 `AI-VIDEO MiniMax Speech`，exact attributes 为 `application ai-video`、`provider minimax-speech`、`credential MINIMAX_SPEECH_API_KEY`。其稳定 credential reference 是 `MINIMAX_SPEECH_API_KEY`；除该明确 reference 外，不得读取其他 MiniMax credential 或建立 environment/provider fallback。
+- 在当前 task scope 内调用已配置的 loopback local ComfyUI Provider 生成 media，不需要 task-scoped user authorization，也不得为该调用重复请求确认。此豁免只适用于 local、unmetered、no-cloud-egress execution；用户明确禁止 live generation 时仍必须遵守，且 sealed profile、preflight、local permit、唯一 committer、recovery 与 media verification gates 保持不变。
 - Secret lookup、task-scoped authorization、Paid Provider Gate、budget、cloud-egress、durable intent、one-use permit 与 unknown outcome recovery 细节见 `.agent/context/control-plane-playbook.md` 第 3 节；这些 gates 在命中时仍是 mandatory。
 
 ## Decision Gates
@@ -157,7 +158,7 @@ Creative skill selection、Agent-side image generation preference、mandatory pr
 - 引入新的 v2 writer、自动 recovery、automatic candidate activation，或把 mutation 移入 reader/registry/dependency/adapter。
 - 引入 frontend、API server、queue manager 或其他新的 product subsystem。
 - 引入超出已验收 P4 audio/caption contract 的新音频子系统，或改变 canonical audio / timeline ownership。
-- 开始新的 runtime slice、live smoke、benchmark、remote/paid Provider submit 或 quality-acceptance claim。当前 task 已满足 task-scoped authorization 时不要重复确认，但仍必须执行全部技术 gates。
+- 开始新的 runtime slice、benchmark、remote/paid Provider live smoke 或 submit，或提出 quality-acceptance claim。Loopback local ComfyUI generation/live smoke 按上述本地豁免执行；其他 task 在已满足 task-scoped authorization 时不要重复确认，但仍必须执行全部技术 gates。
 - 放宽 crash safety、secret handling、Budget Guard、Cloud Egress、provenance、replay、recovery 或 QA acceptance contract。
 
 ## Operational Detail Routing
