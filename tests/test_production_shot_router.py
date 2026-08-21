@@ -1657,20 +1657,25 @@ def test_router_surface_is_available_from_production_package() -> None:
     assert PublicVideoGenerationResolver is VideoGenerationResolver
 
 
-def test_t8_t2va_requires_explicit_capability_selection_without_fallback() -> None:
+def test_t8_family_requires_explicit_quality_or_turbo_selection_without_fallback() -> None:
     from pathlib import Path
 
     from ai_video.production.comfy_t8_video import (
         ComfyUIT8VideoProvider,
         load_t8_video_execution_profile,
     )
+    from ai_video.production.comfy_t8_turbo_video import (
+        ComfyUIT8TurboVideoProvider,
+        load_t8_turbo_video_execution_profile,
+    )
+    from ai_video.production.local_h3_provider_family import LocalH3VideoProviderFamily
 
     root = Path(__file__).resolve().parents[1]
     execution_profile = load_t8_video_execution_profile(
         root / "workflows/profiles/minimax_h3_t8_t2va_quality.json",
         artifact_root=root,
     )
-    provider = ComfyUIT8VideoProvider(
+    quality_provider = ComfyUIT8VideoProvider(
         execution_profile,
         artifact_root=root,
         comfy_root=root,
@@ -1679,7 +1684,22 @@ def test_t8_t2va_requires_explicit_capability_selection_without_fallback() -> No
         ),
         transport=object(),
     )
-    capabilities = provider.capabilities()
+    turbo_profile = load_t8_turbo_video_execution_profile(
+        root / "workflows/profiles/minimax_h3_t8_t2va_turbo.json",
+        artifact_root=root,
+    )
+    turbo_provider = ComfyUIT8TurboVideoProvider(
+        turbo_profile,
+        artifact_root=root,
+        comfy_root=root,
+        runtime_inspector=lambda: (_ for _ in ()).throw(
+            AssertionError("Router selection must not inspect the local runtime")
+        ),
+        transport=object(),
+    )
+    capabilities = LocalH3VideoProviderFamily(
+        (quality_provider, turbo_provider)
+    ).capabilities()
     output = VideoFlexibleOutputRequirement(
         timing_mode="frame_count",
         frame_count=124,
@@ -1711,6 +1731,21 @@ def test_t8_t2va_requires_explicit_capability_selection_without_fallback() -> No
         selected_capability_id="minimax-h3-t8-t2va-quality-v1",
         output_requirement=output,
     )
+    turbo_selected = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=ProviderProfilePointer(
+            profile_id="minimax-h3-t8-t2va-turbo",
+            profile_version="v1",
+            profile_path=Path(
+                f"provider-profiles/{turbo_profile.profile_content_hash}.json"
+            ),
+            profile_sha256=turbo_profile.profile_content_hash,
+        ),
+        capabilities=capabilities,
+        selected_capability_id="minimax-h3-t8-t2va-turbo-v1",
+        output_requirement=output,
+    )
     missing = VideoGenerationResolver().resolve(
         context=context,
         policy=_policy(),
@@ -1724,6 +1759,11 @@ def test_t8_t2va_requires_explicit_capability_selection_without_fallback() -> No
     assert selected.provider_name == "comfy-local-h3-t8"
     assert selected.required_mode is VideoGenerationMode.TEXT_TO_VIDEO
     assert selected.required_binding_roles == ()
+    assert turbo_selected.outcome is RoutingOutcome.SELECTED
+    assert turbo_selected.provider_name == "comfy-local-h3-t8"
+    assert turbo_selected.selected_capability_id == "minimax-h3-t8-t2va-turbo-v1"
+    assert turbo_selected.required_mode is VideoGenerationMode.TEXT_TO_VIDEO
+    assert turbo_selected.required_binding_roles == ()
     assert missing.outcome is RoutingOutcome.BLOCKED_CAPABILITY
     assert missing.provider_name == "comfy-local-h3-t8"
     assert missing.selected_capability_id == "minimax-h3-fl2va-local-v1"

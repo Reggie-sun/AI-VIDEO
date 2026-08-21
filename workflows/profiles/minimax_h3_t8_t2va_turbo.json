@@ -1,0 +1,105 @@
+{
+  "schema_version": "1",
+  "lane_id": "minimax_h3_t8_t2va_turbo_local",
+  "adapter_contract_version": "1",
+  "t8_repository": "https://github.com/T8mars/comfyui-minimax-h3-audio-T8",
+  "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40",
+  "t8_version": "1.36.2",
+  "t8_license_id": "GPL-3.0-or-later",
+  "turbo_repository": "https://github.com/Larryvrh/ComfyUI-MiniMax-H3-Turbo",
+  "turbo_commit": "4274783a23afcfdbea3b4876cb79effd6c510785",
+  "turbo_version": "1.2.3",
+  "turbo_license_id": "Apache-2.0",
+  "adapter_implementation_origin": "AI-VIDEO",
+  "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+  "videohelpersuite_commit": "4ee72c065db22c9d96c2427954dc69e7b908444b",
+  "sageattention_version": "2.2.0",
+  "sageattention_source_commit": "d1a57a546c3d395b1ffcbeecc66d81db76f3b4b5",
+  "required_launch_capabilities": [
+    "sage_attention"
+  ],
+  "model_repository_id": "Comfy-Org/MiniMax-H3",
+  "model_repository_revision": "dc559027db79c174125df4d827db55cd11178860",
+  "components": [
+    {
+      "role": "diffusion",
+      "filename": "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "size_bytes": 20970379616,
+      "sha256": "e889202c41dafb67b10d67b97f0d8541508036a6090af23425a5c2615d03c47a",
+      "precision": "int8_convrot"
+    },
+    {
+      "role": "text_encoder",
+      "filename": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "size_bytes": 15687142551,
+      "sha256": "35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6",
+      "precision": "nvfp4_awq"
+    },
+    {
+      "role": "video_vae",
+      "filename": "minimax_h3_video_vae_fp16.safetensors",
+      "size_bytes": 5207808496,
+      "sha256": "7c1f131492e7eddacaac9069a61b81bdd39de5cc96561e677c5eab1cdce5e522",
+      "precision": "fp16"
+    },
+    {
+      "role": "audio_vae",
+      "filename": "minimax_h3_audio_vae_fp32.safetensors",
+      "size_bytes": 605254808,
+      "sha256": "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48",
+      "precision": "fp32"
+    }
+  ],
+  "lora": {
+    "filename": "minimax_h3_turbo_v4_step600_ema.safetensors",
+    "size_bytes": 779849816,
+    "sha256": "5f3a626cd72c93a8b9318d6760c510bc5092d2ab13aaba1f932c5bab07a416d3",
+    "strength": 1.0,
+    "low_vram": false
+  },
+  "required_nodes": [
+    "UNETLoader",
+    "CLIPLoader",
+    "VAELoader",
+    "MiniMaxH3AudioConditioningT8",
+    "MiniMaxH3TurboLoRA",
+    "MiniMaxH3TurboSampler",
+    "BasicScheduler",
+    "RandomNoise",
+    "BasicGuider",
+    "SamplerCustomAdvanced",
+    "MiniMaxH3AVDecodeT8",
+    "VHS_VideoCombine"
+  ],
+  "required_turbo_nodes": [
+    "MiniMaxH3AudioConditioningT8",
+    "MiniMaxH3TurboLoRA",
+    "MiniMaxH3TurboSampler",
+    "MiniMaxH3AVDecodeT8"
+  ],
+  "turbo_node_input_schema_sha256": "76b696b1b6550558893c0a2ab611f73b66bff34681a0aee518afcca37c364071",
+  "workflow_path": "workflows/templates/minimax_h3_t8_t2va_turbo_api.json",
+  "workflow_sha256": "ddcc472653a17d7a1f5e90acb51695b13085ba3e4ba3d7208bf960cc2c82c77e",
+  "binding_path": "workflows/bindings/minimax_h3_t8_t2va_turbo_binding.yaml",
+  "binding_sha256": "32348d90dda8c3f3fcfe693e42026e6b68b1a76a649266ed91e1b0a9575a132d",
+  "loopback_endpoints": [
+    "http://127.0.0.1:8188"
+  ],
+  "width": 1344,
+  "height": 768,
+  "frame_count": 124,
+  "fps": 24,
+  "native_audio_required": true,
+  "output_container": "mp4",
+  "output_mime_type": "video/mp4",
+  "scheduler": "simple",
+  "steps": 6,
+  "denoise": 1.0,
+  "output_crf": 17,
+  "output_node_id": "13",
+  "final_av_filename_suffix": "-audio.mp4",
+  "reject_video_only_sibling": true,
+  "remote_provider_enabled": false,
+  "cloud_fallback_enabled": false,
+  "profile_content_hash": "317170c4574cf7b7f89ab144e63b00a64c9b4cf643bad61fde4b4011d36a2212"
+}

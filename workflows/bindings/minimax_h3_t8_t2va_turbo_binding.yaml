@@ -1,0 +1,13 @@
+prompt: ["5", "inputs", "prompt"]
+seed: ["9", "inputs", "noise_seed"]
+width: ["5", "inputs", "width"]
+height: ["5", "inputs", "height"]
+length: ["5", "inputs", "length"]
+frame_count: ["5", "inputs", "length"]
+steps: ["8", "inputs", "steps"]
+scheduler: ["8", "inputs", "scheduler"]
+lora_name: ["6", "inputs", "lora_name"]
+lora_strength: ["6", "inputs", "strength"]
+low_vram: ["6", "inputs", "low_vram"]
+output_prefix: ["13", "inputs", "filename_prefix"]
+output_node_id: "13"

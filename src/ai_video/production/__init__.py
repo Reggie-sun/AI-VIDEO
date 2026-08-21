@@ -109,6 +109,15 @@ from ai_video.production.comfy_t8_video import (
     T8RuntimeInspection,
     load_t8_video_execution_profile,
 )
+from ai_video.production.comfy_t8_turbo_video import (
+    ComfyUIT8TurboVideoProvider,
+    T8TurboBinding,
+    T8TurboExecutionProfile,
+    T8TurboLoraComponent,
+    T8TurboRuntimeInspection,
+    load_t8_turbo_video_execution_profile,
+)
+from ai_video.production.local_h3_provider_family import LocalH3VideoProviderFamily
 from ai_video.production.local_video import (
     LocalVideoFetchReceipt,
     LocalVideoProvider,
@@ -225,6 +234,7 @@ __all__ = [
     "ComfyLocalImageProvider",
     "ComfyUIVideoProvider",
     "ComfyUIT8VideoProvider",
+    "ComfyUIT8TurboVideoProvider",
     "LocalImageBinding",
     "LocalImageExecutionProfile",
     "LocalVideoBinding",
@@ -233,6 +243,11 @@ __all__ = [
     "T8ExecutionProfile",
     "T8ModelComponent",
     "T8RuntimeInspection",
+    "T8TurboBinding",
+    "T8TurboExecutionProfile",
+    "T8TurboLoraComponent",
+    "T8TurboRuntimeInspection",
+    "LocalH3VideoProviderFamily",
     "LocalVideoFetchReceipt",
     "LocalVideoProvider",
     "LocalVideoSubmission",
@@ -316,6 +331,7 @@ __all__ = [
     "load_local_image_execution_profile",
     "load_local_video_execution_profile",
     "load_t8_video_execution_profile",
+    "load_t8_turbo_video_execution_profile",
     "human_image_import_asset",
     "prepare_human_image_import_commit",
     "validate_human_image_import",

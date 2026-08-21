@@ -622,6 +622,29 @@ def test_t8_endpoint_has_no_remote_or_provider_fallback(tmp_path: Path) -> None:
         provider.resolve(wrong)
 
 
+def test_t8_quality_child_rejects_a_turbo_resolved_capability(
+    tmp_path: Path,
+) -> None:
+    provider, transport, profile = _provider(tmp_path)
+    quality = provider.resolve(_request(profile))
+    turbo = quality.model_copy(
+        update={
+            "provider_kind": "minimax_h3_t8_t2va_turbo",
+            "model_id": "minimax-h3-t8-t2va-turbo",
+            "capability_id": "minimax-h3-t8-t2va-turbo-v1",
+        }
+    )
+
+    with pytest.raises(AiVideoError) as preview_error:
+        provider.preview(turbo)
+    with pytest.raises(AiVideoError) as preflight_error:
+        provider.preflight(turbo)
+
+    assert preview_error.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert preflight_error.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.workflows == []
+
+
 def test_t8_profile_rejects_resealed_workflow_or_schema_drift(tmp_path: Path) -> None:
     artifact_root, comfy_root, profile = _sandbox(tmp_path)
     workflow_path = artifact_root / profile.workflow_path

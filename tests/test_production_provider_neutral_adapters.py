@@ -14,6 +14,11 @@ from ai_video.production.comfy_t8_video import (
     ComfyUIT8VideoProvider,
     load_t8_video_execution_profile,
 )
+from ai_video.production.comfy_t8_turbo_video import (
+    ComfyUIT8TurboVideoProvider,
+    load_t8_turbo_video_execution_profile,
+)
+from ai_video.production.local_h3_provider_family import LocalH3VideoProviderFamily
 from ai_video.production.minimax_h3 import MiniMaxH3VideoProvider
 from ai_video.production.minimax_hailuo import MiniMaxHailuoVideoProvider
 from ai_video.production.seedance import SeedanceVideoProvider
@@ -334,13 +339,13 @@ def test_local_h3_compiles_neutral_first_frame_without_runtime_execution(
     assert provider.resolve(compiled.request) == resolved
 
 
-def test_local_t8_compiles_exact_neutral_t2va_without_runtime_execution() -> None:
+def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -> None:
     root = Path(__file__).resolve().parents[1]
     profile = load_t8_video_execution_profile(
         root / "workflows/profiles/minimax_h3_t8_t2va_quality.json",
         artifact_root=root,
     )
-    provider = ComfyUIT8VideoProvider(
+    quality_provider = ComfyUIT8VideoProvider(
         profile,
         artifact_root=root,
         comfy_root=root,
@@ -349,6 +354,20 @@ def test_local_t8_compiles_exact_neutral_t2va_without_runtime_execution() -> Non
         ),
         transport=object(),
     )
+    turbo_profile = load_t8_turbo_video_execution_profile(
+        root / "workflows/profiles/minimax_h3_t8_t2va_turbo.json",
+        artifact_root=root,
+    )
+    turbo_provider = ComfyUIT8TurboVideoProvider(
+        turbo_profile,
+        artifact_root=root,
+        comfy_root=root,
+        runtime_inspector=lambda: (_ for _ in ()).throw(
+            AssertionError("offline compiler mapping must not inspect runtime")
+        ),
+        transport=object(),
+    )
+    family = LocalH3VideoProviderFamily((quality_provider, turbo_provider))
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
     output = VideoFlexibleOutputRequirement(
         timing_mode="frame_count",
@@ -381,39 +400,56 @@ def test_local_t8_compiles_exact_neutral_t2va_without_runtime_execution() -> Non
         ),
         audio_need=AudioNeed.REQUIRED,
     )
-    routing = VideoGenerationResolver().resolve_requirement(
-        projection=projection,
-        context=context,
-        policy=_policy(),
-        provider_profile=ProviderProfilePointer(
-            profile_id="minimax-h3-t8-t2va-quality",
-            profile_version="v1",
-            profile_path=Path(f"provider-profiles/{profile.profile_content_hash}.json"),
-            profile_sha256=profile.profile_content_hash,
+    lanes = (
+        (
+            profile,
+            "minimax-h3-t8-t2va-quality",
+            "minimax-h3-t8-t2va-quality-v1",
+            "comfy-local-h3-t8-video-compiler",
         ),
-        capabilities=provider.capabilities(),
-        selected_capability_id="minimax-h3-t8-t2va-quality-v1",
-        output_requirement=output,
-        lifecycle=_lifecycle(context),
-        compiler_contract=AdapterCompilerContract.create(
-            compiler_id="comfy-local-h3-t8-video-compiler",
-            compiler_version="1",
+        (
+            turbo_profile,
+            "minimax-h3-t8-t2va-turbo",
+            "minimax-h3-t8-t2va-turbo-v1",
+            "comfy-local-h3-t8-turbo-video-compiler",
         ),
     )
+    for selected_profile, profile_id, capability_id, compiler_id in lanes:
+        routing = VideoGenerationResolver().resolve_requirement(
+            projection=projection,
+            context=context,
+            policy=_policy(),
+            provider_profile=ProviderProfilePointer(
+                profile_id=profile_id,
+                profile_version="v1",
+                profile_path=Path(
+                    f"provider-profiles/{selected_profile.profile_content_hash}.json"
+                ),
+                profile_sha256=selected_profile.profile_content_hash,
+            ),
+            capabilities=family.capabilities(),
+            selected_capability_id=capability_id,
+            output_requirement=output,
+            lifecycle=_lifecycle(context),
+            compiler_contract=AdapterCompilerContract.create(
+                compiler_id=compiler_id,
+                compiler_version="1",
+            ),
+        )
 
-    assert routing.decision.outcome is RoutingOutcome.SELECTED
-    assert routing.provider_bound_request is not None
-    compiled = provider.compile_request(
-        routing.provider_bound_request,
-        projection.requirement,
-    )
-    assert isinstance(compiled, CompiledProviderVideoRequest)
-    assert compiled.request.image_bindings == ()
-    assert compiled.request.media_bindings == ()
-    resolved = provider.resolve(compiled.request)
-    assert resolved.provider_name == "comfy-local-h3-t8"
-    assert resolved.capability_id == "minimax-h3-t8-t2va-quality-v1"
-    assert resolved.effective_output.native_audio is True
+        assert routing.decision.outcome is RoutingOutcome.SELECTED
+        assert routing.provider_bound_request is not None
+        compiled = family.compile_request(
+            routing.provider_bound_request,
+            projection.requirement,
+        )
+        assert isinstance(compiled, CompiledProviderVideoRequest)
+        assert compiled.request.image_bindings == ()
+        assert compiled.request.media_bindings == ()
+        resolved = family.resolve(compiled.request)
+        assert resolved.provider_name == "comfy-local-h3-t8"
+        assert resolved.capability_id == capability_id
+        assert resolved.effective_output.native_audio is True
 
 
 def test_hailuo_compiles_first_frame_to_adaptive_i2v_without_fixed_pixels() -> None:
