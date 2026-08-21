@@ -28,6 +28,8 @@
 | Local-First and Provider Safety | Legacy 默认只连接 local ComfyUI；v2 local adapter 必须 loopback-only。任何 remote/paid Provider、live submit、secret 或 cloud egress 继续受 `AGENTS.md` decision gates 约束，且不得成为 fallback。 |
 | Evidence Truth | Immutable evidence 必须 content-addressed 并绑定 exact selected inputs。Plan、console text、Agent memory 或 heuristic 不得升级成 runtime、semantic acceptance 或 quality acceptance。 |
 | Error Model | 跨模块失败使用 `AiVideoError` 与 `ErrorCode`；retryability 由 typed metadata 决定，常规 CLI 输出不得泄露 raw traceback。 |
+| Development Governance Isolation | Codex、`AGENTS.md`、`.agent/`、`.agents/`、`.codex/`、`.workflow/`、Development Verification Harness、Architecture Gate 与 developer-only Agent Memory 只拥有开发治理。`src/ai_video/**` Product Runtime 不得 import、执行或依赖这些 artifacts，也不得把 `.workflow/` session 当作 production session。 |
+| Agent Session Fact Domain | 当前没有通用 Product Agent Loop、Tool Registry 或 event-sourced Product Session。未来若引入 Product Agent Session，其 append-only events 只能拥有 model-visible conversation、decision context 与 non-authoritative telemetry；Project、Registry、Manifest、Provider effect、activation、review、repair 与 delivery truth 继续由既有 domain owners 独占。 |
 
 ## Development Control Surface
 

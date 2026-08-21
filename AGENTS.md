@@ -5,6 +5,7 @@
 ## Purpose
 
 - 保持 Legacy `0.1.x` local-first CLI 与 v0.2 Production Python APIs 的边界清晰。
+- 保持 Development Governance 与 AI-VIDEO Product Runtime 的依赖方向清晰；Product Runtime 不得依赖 Codex、Skills、`.agent/`、`.agents/`、`.codex/`、`.workflow/` 或 Agent Memory control plane。
 - 维护 manifest-first、content-addressed evidence、explicit recovery、precise invalidation 与 deterministic composition 等长期产品契约。
 - 让每项变更先找到唯一 owner，再按真实 changed paths 完成可复现验证。
 - 默认使用中文沟通；`command`、`path`、API、schema、class 与 Skill 名保持原文。过程更新应简短、具体、基于当前仓库证据；review 先报告问题与风险。
@@ -84,7 +85,7 @@ Durable specs 写入 `docs/superpowers/specs/YYYY-MM-DD-<slug>.md`，durable pla
 - Legacy Manifest、flat artifact layout 与既有 config/workflow/ffmpeg semantics 保持兼容，除非明确批准 migration。
 - Workflow 保持 template + binding，不得在 CLI、pipeline 或 transport 中写死 node IDs。
 
-### v0.2 Production Harness
+### v0.2 Production Runtime
 
 - `ProductionProject` 与 Asset Registry 读取必须 strict、read-only、no-network，并验证 selected revision、semantic/content identity、path containment 与 registered bytes。
 - `ProductionStateCommitter` 是唯一 v2 write、activation 与 explicit recovery owner；mutation 不得扩散到 reader、registry、validation、dependency 或 Legacy Manifest/pipeline。
@@ -93,6 +94,13 @@ Durable specs 写入 `docs/superpowers/specs/YYYY-MM-DD-<slug>.md`，durable pla
 - HyperFrames 是默认 Production renderer。只有显式批准的 adapter contract 才能改变 renderer selection；不得出现隐式 fallback 或第二条 canonical timeline。
 - Image、video、voice 与其他 Providers 是 optional capabilities。基础 Production path 在没有 Video Provider 时仍必须能够完成 image、motion graphics、voice、captions 与 deterministic composition。
 - Remote/paid execution 必须 explicit opt-in，并通过既有 budget、cloud-egress、secret、durable intent、one-use permit、provenance、activation 与 recovery gates。
+
+### Development Governance And Product Runtime
+
+- Development Governance 包括 Codex、`AGENTS.md`、`.agent/`、`.agents/`、`.codex/`、`.workflow/`、Development Verification Harness、Architecture Gate 与 developer-only Agent Memory。它们可以检查、验证或辅助修改 Product Runtime，但不是 Production state、asset、Provider lifecycle、review 或 delivery truth。
+- AI-VIDEO Product Runtime 包括 Legacy runtime、`src/ai_video/production/**`、planning、quality gates、Provider adapters、Manifest、Registry、Dependency Graph、ResolvedTimeline、review/repair 与 delivery lifecycle。Product Runtime MUST NOT import、执行或以其他方式依赖 Development Governance artifacts；`.workflow/` 中的 `session`、role 或 brainstorming state 不得解释为 product session。
+- 当前不存在通用 Product Agent Loop、Product Tool Registry 或 event-sourced Product Session。`VideoPlanner`、Shot Router 与 quality gates 是 deterministic domain logic，不得仅因带有 planner、router、reviewer 或 agent-facing 名称就迁入通用 Agent Framework。
+- 未来若引入 Product Agent Session，其 append-only events 只能拥有 model-visible conversation、decision context 或 non-authoritative telemetry。它不得成为 Project、Asset Registry、Production Manifest、Provider external-effect、activation、review、repair 或 delivery 的第二事实源；Production Manifest 继续独占 mutable lifecycle 与 active pointers，`ProductionStateCommitter` 继续独占 durable write、activation 与 recovery。
 
 ### Cross-Cutting Safety
 
