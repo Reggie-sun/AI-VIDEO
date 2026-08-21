@@ -1634,6 +1634,10 @@ def _synthetic_receipt(
     classification: str = "clearly_illustrated_anime_non_real_character",
     attested_by: ActorIdentity | None = None,
     registry_revision_id: str = HASH_C,
+    permitted_use: str = "Seedance I2V test fixture.",
+    source_record_id: str = "source-generation-receipt-1",
+    source_tool: ToolIdentity | None = None,
+    source_evidence_sha256: str = HASH_D,
 ):
     return asset_module.SeedanceSyntheticImageReferenceReceipt.create(
         source_asset_id=binding.asset_id,
@@ -1644,9 +1648,10 @@ def _synthetic_receipt(
         source_width=binding.width,
         source_height=binding.height,
         creator=ActorIdentity(actor_id="fictional-character-artist", actor_kind="human"),
-        source_record_id="source-generation-receipt-1",
-        source_tool=ToolIdentity(name="gpt-image-2", version="2026-08-20"),
-        source_evidence_sha256=HASH_D,
+        source_record_id=source_record_id,
+        source_tool=source_tool
+        or ToolIdentity(name="gpt-image-2", version="2026-08-20"),
+        source_evidence_sha256=source_evidence_sha256,
         rights_source_note="Project-owned synthetic illustrated character.",
         classification=classification,
         attested_by=attested_by
@@ -1657,7 +1662,7 @@ def _synthetic_receipt(
         provider_kind="volcengine_ark_seedance",
         model_id="doubao-seedance-2-0-mini-260615",
         mode="image_to_video",
-        permitted_use="Seedance I2V test fixture.",
+        permitted_use=permitted_use,
     )
 
 
@@ -1695,7 +1700,13 @@ def _canonical_model_bytes(model) -> bytes:
     ).encode()
 
 
-def _synthetic_evidence_source(asset_module, receipts, aggregate):
+def _synthetic_evidence_source(
+    asset_module,
+    receipts,
+    aggregate,
+    *,
+    source_records: dict[str, bytes] | None = None,
+):
     evidence = {
         f"seedance-synthetic-egress:{aggregate.content_hash}": _canonical_model_bytes(
             aggregate
@@ -1709,10 +1720,14 @@ def _synthetic_evidence_source(asset_module, receipts, aggregate):
             for receipt in receipts
         }
     )
+    evidence.update(source_records or {})
     return evidence.__getitem__
 
 
-def _synthetic_registry(*bindings: VideoImageReferenceBinding):
+def _synthetic_registry(
+    *bindings: VideoImageReferenceBinding,
+    record_updates: dict[str, object] | None = None,
+):
     records = tuple(
         AssetRecord(
             asset_id=binding.asset_id,
@@ -1728,7 +1743,7 @@ def _synthetic_registry(*bindings: VideoImageReferenceBinding):
             input_fingerprint=HASH_A,
             creation_receipt_id="source-generation-receipt-1",
             usage_license="project-owned-synthetic",
-        )
+        ).model_copy(update=record_updates or {})
         for binding in bindings
     )
     provisional = AssetRegistrySnapshot(
@@ -1862,11 +1877,7 @@ def test_synthetic_resolver_rejects_registry_asset_record_mismatch():
     assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
 
 
-@pytest.mark.parametrize(
-    "classification",
-    ["real_person_or_protected_identity", "synthetic_photorealistic_person"],
-)
-def test_synthetic_receipt_rejects_identity_bearing_classes(classification):
+def test_synthetic_receipt_rejects_real_or_protected_identity():
     asset_module = importlib.import_module("ai_video.production.seedance_asset")
     png = _rgba_png()
     binding = VideoImageReferenceBinding(
@@ -1880,7 +1891,58 @@ def test_synthetic_receipt_rejects_identity_bearing_classes(classification):
     )
 
     with pytest.raises(ValidationError):
-        _synthetic_receipt(asset_module, binding, classification=classification)
+        _synthetic_receipt(
+            asset_module,
+            binding,
+            classification="real_person_or_protected_identity",
+        )
+
+
+def test_synthetic_receipt_rejects_unattested_photorealistic_fictional_identity():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-unattested-photorealistic-fictional-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+
+    with pytest.raises(ValidationError):
+        _synthetic_receipt(
+            asset_module,
+            binding,
+            classification="synthetic_photorealistic_person",
+        )
+
+
+def test_synthetic_receipt_permits_attested_project_owned_photorealistic_fictional_identity():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-attested-photorealistic-fictional-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+
+    receipt = _synthetic_receipt(
+        asset_module,
+        binding,
+        classification="synthetic_photorealistic_person",
+        permitted_use=(
+            "project-owned-fictional-no-protected-identity:seedance-i2v"
+        ),
+    )
+
+    assert receipt.classification == "synthetic_photorealistic_person"
+    assert receipt.attested_by.actor_kind == "human"
 
 
 def test_synthetic_receipt_requires_human_attestation():
@@ -1902,6 +1964,138 @@ def test_synthetic_receipt_requires_human_attestation():
             binding,
             attested_by=ActorIdentity(actor_id="classifier", actor_kind="automation"),
         )
+
+
+@pytest.mark.parametrize(
+    "record_updates",
+    [
+        {"source_kind": AssetSourceKind.IMPORTED},
+        {"tool": ToolIdentity(name="unknown-tool", version="1")},
+        {"creation_receipt_id": "different-generation-receipt"},
+        {"usage_license": "unknown"},
+    ],
+)
+def test_photorealistic_fictional_resolver_rejects_unsealed_registry_provenance(
+    record_updates,
+):
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    source_evidence = b"canonical-source-generation-receipt"
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-photorealistic-fictional-provenance-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+    registry, registry_bytes, _ = _synthetic_registry(
+        binding,
+        record_updates=record_updates,
+    )
+    receipt = _synthetic_receipt(
+        asset_module,
+        binding,
+        classification="synthetic_photorealistic_person",
+        registry_revision_id=registry.revision_id,
+        permitted_use=(
+            "project-owned-fictional-no-protected-identity:seedance-i2v"
+        ),
+        source_evidence_sha256=hashlib.sha256(source_evidence).hexdigest(),
+    )
+    child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=binding.role,
+        asset_id=binding.asset_id,
+        receipt_content_hash=receipt.content_hash,
+    )
+    aggregate = _synthetic_policy_receipt(asset_module, child)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        asset_module.SeedanceSyntheticImageReferenceResolver(
+            (receipt,),
+            policy_receipt=aggregate,
+            image_bytes={binding.asset_id: png},
+            evidence_source=_synthetic_evidence_source(
+                asset_module,
+                (receipt,),
+                aggregate,
+                source_records={receipt.source_record_id: source_evidence},
+            ),
+            registry_snapshot_bytes=registry_bytes,
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert "provenance is not sealed" in str(exc_info.value)
+
+
+@pytest.mark.parametrize(
+    "source_records",
+    [
+        {},
+        {"terminal-frame-extraction-receipt-1": b"tampered-source-evidence"},
+    ],
+)
+def test_photorealistic_fictional_resolver_reopens_exact_source_evidence(
+    source_records,
+):
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png()
+    source_record_id = "terminal-frame-extraction-receipt-1"
+    source_evidence = b"canonical-terminal-frame-extraction-receipt"
+    source_tool = ToolIdentity(name="ffmpeg", version="9c33b2f")
+    binding = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id="image-photorealistic-fictional-source-evidence-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=320,
+        height=320,
+        size_bytes=len(png),
+    )
+    registry, registry_bytes, _ = _synthetic_registry(
+        binding,
+        record_updates={
+            "source_kind": AssetSourceKind.DERIVED,
+            "tool": source_tool,
+            "creation_receipt_id": source_record_id,
+            "usage_license": "provider-output",
+        },
+    )
+    receipt = _synthetic_receipt(
+        asset_module,
+        binding,
+        classification="synthetic_photorealistic_person",
+        registry_revision_id=registry.revision_id,
+        permitted_use=(
+            "project-owned-fictional-no-protected-identity:seedance-i2v"
+        ),
+        source_record_id=source_record_id,
+        source_tool=source_tool,
+        source_evidence_sha256=hashlib.sha256(source_evidence).hexdigest(),
+    )
+    child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=binding.role,
+        asset_id=binding.asset_id,
+        receipt_content_hash=receipt.content_hash,
+    )
+    aggregate = _synthetic_policy_receipt(asset_module, child)
+
+    with pytest.raises(AiVideoError) as exc_info:
+        asset_module.SeedanceSyntheticImageReferenceResolver(
+            (receipt,),
+            policy_receipt=aggregate,
+            image_bytes={binding.asset_id: png},
+            evidence_source=_synthetic_evidence_source(
+                asset_module,
+                (receipt,),
+                aggregate,
+                source_records=source_records,
+            ),
+            registry_snapshot_bytes=registry_bytes,
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
 
 
 def test_synthetic_resolver_rejects_tampered_bytes_and_noncanonical_children():
@@ -1965,7 +2159,16 @@ def test_synthetic_resolver_rejects_tampered_bytes_and_noncanonical_children():
     assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
 
 
-def _synthetic_submit_fixture(*, registry_file_sha256: str | None = None):
+def _synthetic_submit_fixture(
+    *,
+    registry_file_sha256: str | None = None,
+    classification: str = "clearly_illustrated_anime_non_real_character",
+    permitted_use: str = "Seedance I2V test fixture.",
+    registry_record_updates: dict[str, object] | None = None,
+    source_record_id: str = "source-generation-receipt-1",
+    source_tool: ToolIdentity | None = None,
+    source_evidence_bytes: bytes | None = None,
+):
     asset_module = importlib.import_module("ai_video.production.seedance_asset")
     profile = _profile()
     png = _rgba_png(width=864, height=496)
@@ -1978,9 +2181,23 @@ def _synthetic_submit_fixture(*, registry_file_sha256: str | None = None):
         height=496,
         size_bytes=len(png),
     )
-    registry, registry_bytes, registry_pointer = _synthetic_registry(binding)
+    registry, registry_bytes, registry_pointer = _synthetic_registry(
+        binding,
+        record_updates=registry_record_updates,
+    )
     receipt = _synthetic_receipt(
-        asset_module, binding, registry_revision_id=registry.revision_id
+        asset_module,
+        binding,
+        classification=classification,
+        registry_revision_id=registry.revision_id,
+        permitted_use=permitted_use,
+        source_record_id=source_record_id,
+        source_tool=source_tool,
+        source_evidence_sha256=(
+            HASH_D
+            if source_evidence_bytes is None
+            else hashlib.sha256(source_evidence_bytes).hexdigest()
+        ),
     )
     child = asset_module.SeedanceSyntheticImageReceiptBinding(
         role=binding.role,
@@ -1993,7 +2210,14 @@ def _synthetic_submit_fixture(*, registry_file_sha256: str | None = None):
         policy_receipt=placeholder,
         image_bytes={binding.asset_id: png},
         evidence_source=_synthetic_evidence_source(
-            asset_module, (receipt,), placeholder
+            asset_module,
+            (receipt,),
+            placeholder,
+            source_records=(
+                None
+                if source_evidence_bytes is None
+                else {source_record_id: source_evidence_bytes}
+            ),
         ),
         registry_snapshot_bytes=registry_bytes,
     )
@@ -2046,7 +2270,14 @@ def _synthetic_submit_fixture(*, registry_file_sha256: str | None = None):
         policy_receipt=aggregate,
         image_bytes={binding.asset_id: png},
         evidence_source=_synthetic_evidence_source(
-            asset_module, (receipt,), aggregate
+            asset_module,
+            (receipt,),
+            aggregate,
+            source_records=(
+                None
+                if source_evidence_bytes is None
+                else {source_record_id: source_evidence_bytes}
+            ),
         ),
         registry_snapshot_bytes=registry_bytes,
     )
@@ -2155,6 +2386,64 @@ def test_synthetic_authorizer_rejects_preview_not_bound_by_policy_evidence():
     assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
 
 
+@pytest.mark.parametrize(
+    "source_records",
+    [
+        {},
+        {"terminal-frame-extraction-receipt-1": b"tampered-source-evidence"},
+    ],
+)
+def test_photorealistic_fictional_authorizer_reopens_source_evidence(
+    source_records,
+):
+    source_record_id = "terminal-frame-extraction-receipt-1"
+    source_evidence = b"canonical-terminal-frame-extraction-receipt"
+    source_tool = ToolIdentity(name="ffmpeg", version="9c33b2f")
+    (
+        _,
+        _,
+        _,
+        paid_preview,
+        resolver,
+        _,
+        receipt,
+        aggregate,
+    ) = _synthetic_submit_fixture(
+        classification="synthetic_photorealistic_person",
+        permitted_use=(
+            "project-owned-fictional-no-protected-identity:seedance-i2v"
+        ),
+        registry_record_updates={
+            "source_kind": AssetSourceKind.DERIVED,
+            "tool": source_tool,
+            "creation_receipt_id": source_record_id,
+            "usage_license": "provider-output",
+        },
+        source_record_id=source_record_id,
+        source_tool=source_tool,
+        source_evidence_bytes=source_evidence,
+    )
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    authorizer = asset_module.SeedanceSyntheticImageAuthorizer(
+        delegate=lambda exact: authorization if exact == paid_preview else None,
+        evidence_source=_synthetic_evidence_source(
+            asset_module,
+            (receipt,),
+            aggregate,
+            source_records=source_records,
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        authorizer(paid_preview)
+
+    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
+
+
 def test_synthetic_submit_rejects_registry_snapshot_pointer_mismatch_before_network():
     (
         profile,
@@ -2239,6 +2528,65 @@ def test_synthetic_inline_submit_uses_exact_data_uri_and_audio_opt_out():
     }
     assert payload["generate_audio"] is False
     assert base64.b64encode(png).decode("ascii") not in repr(transport.requests[0])
+
+
+def test_photorealistic_fictional_inline_submit_uses_attested_derived_provider_output():
+    source_tool = ToolIdentity(name="ffmpeg", version="9c33b2f")
+    source_record_id = "terminal-frame-extraction-receipt-1"
+    source_evidence = b"canonical-terminal-frame-extraction-receipt"
+    profile, resolved, video_preview, paid_preview, resolver, png, receipt, _ = (
+        _synthetic_submit_fixture(
+            classification="synthetic_photorealistic_person",
+            permitted_use=(
+                "project-owned-fictional-no-protected-identity:seedance-i2v"
+            ),
+            registry_record_updates={
+                "source_kind": AssetSourceKind.DERIVED,
+                "tool": source_tool,
+                "creation_receipt_id": source_record_id,
+                "usage_license": "provider-output",
+            },
+            source_record_id=source_record_id,
+            source_tool=source_tool,
+            source_evidence_bytes=source_evidence,
+        )
+    )
+    transport = _FakeTransport()
+    transport.responses.append(
+        _json_response({"id": "task-photorealistic-fictional-inline-1"})
+    )
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=resolver,
+        now=lambda: FIXED_NOW,
+    )
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+
+    result = provider.submit(
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        _permit(resolved, video_preview, paid_preview, authorization),
+    )
+
+    payload = json.loads(transport.requests[0].body)
+    assert result.external_effect_id == "task-photorealistic-fictional-inline-1"
+    assert receipt.classification == "synthetic_photorealistic_person"
+    assert payload["content"][1] == {
+        "type": "image_url",
+        "image_url": {
+            "url": "data:image/png;base64,"
+            + base64.b64encode(png).decode("ascii")
+        },
+        "role": "first_frame",
+    }
+    assert payload["generate_audio"] is False
 
 
 def test_synthetic_submit_rejects_wrong_aggregate_authorization_before_network():

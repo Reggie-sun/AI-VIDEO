@@ -1,6 +1,6 @@
 # AI-VIDEO P8 Seedance Cloud Provider Implementation Plan
 
-Status: Offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic later reached provider `succeeded` and fetched an MP4. The follow-up tracked payload correction is offline-verified but not live re-submitted; billing settlement、candidate activation、push和release均未完成。2026-08-20新增的synthetic/illustrated inline PNG lane已完成offline runtime和fake-transport验证；没有对应live authorization、remote submit或activation。
+Status: Offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic later reached provider `succeeded` and fetched an MP4. The follow-up tracked payload correction is offline-verified but not live re-submitted; billing settlement、candidate activation、push和release均未完成。2026-08-20新增的synthetic/illustrated inline PNG lane已完成offline runtime和fake-transport验证；2026-08-22用户授权将具有exact human claim与sealed generated/derived provenance的project-owned fictional photorealistic identity作为additive conditional exception。没有对应live authorization、remote submit或activation。
 
 **Spec:** `docs/superpowers/specs/2026-08-19-ai-video-p8-seedance-cloud-provider.md`
 
@@ -197,14 +197,14 @@ real person / protected or ambiguous identity
 The additive implemented lane is:
 
 ```text
-attested illustrated/anime/non-real or ordinary non-character asset
+attested project-owned fictional photorealistic、illustrated/anime/non-real or ordinary non-character asset
   -> SeedanceSyntheticImageReferenceReceipt
   -> SeedanceSyntheticImageEgressPolicyReceipt (canonical ordered aggregate)
   -> SeedanceSyntheticImageReferenceResolver
   -> in-memory data:image/...;base64,...
 ```
 
-`synthetic_photorealistic_person` remains ineligible for this V1 lane and must use an authorized trusted asset or stop. Classification must come from sealed source/tool/rights provenance plus task-scoped human attestation; Agent vision is advisory only.
+`synthetic_photorealistic_person` is eligible only when `permitted_use` is exactly `project-owned-fictional-no-protected-identity:seedance-i2v`, the task-scoped attestor is human, the selected Registry record proves a matching `generated|derived` source、tool、creation receipt and `project-owned-synthetic|provider-output` usage license, and the injected evidence source reopens that creation receipt's exact bytes with the child's sealed SHA-256. A missing、ambiguous、real、protected or mismatched identity must use an authorized trusted asset or stop. Classification comes from sealed source/tool/rights provenance plus task-scoped human attestation; Agent vision is advisory only.
 
 ### Problem Boundary and Ownership
 
@@ -238,7 +238,8 @@ Implement only the internal identity projection needed to carry `authorization_f
 
 After the binding gate is approved, add failing tests before production code for:
 
-- all four exact classes: real/protected、synthetic photorealistic、clearly illustrated/anime/non-real、ordinary non-character；only the final two may enter the inline lane;
+- all four exact classes: real/protected、synthetic photorealistic、clearly illustrated/anime/non-real、ordinary non-character；the final two retain their existing conditional lane, while synthetic photorealistic may enter only with the exact project-owned fictional claim and sealed generated/derived Registry provenance;
+- synthetic photorealistic with a missing/wrong claim、automation attestor、imported/unknown source、tool mismatch、creation-receipt mismatch、missing or hash-mismatched creation-receipt bytes、or unaccepted usage license fails before egress/permit/network;
 - missing human attestor、task scope、creator/source/tool identity、rights statement、Registry revision、SHA-256、MIME、size or geometry fails closed;
 - ambiguous/suspected real-person likeness、unknown source or protected identity fails before egress/permit/network and cannot auto-downgrade;
 - receipt content hash or any local selected bytes/metadata mismatch fails closed;
@@ -257,6 +258,8 @@ PYTHONPATH=src python -m pytest -p no:cacheprovider \
 Implement only enough in `seedance_asset.py` to make the RED cases pass:
 
 - strict/frozen `SeedanceSyntheticImageReferenceReceipt` with exact local identity、provenance、rights、classification and human/task attestation;
+- an exact validated `permitted_use=project-owned-fictional-no-protected-identity:seedance-i2v` exception for `synthetic_photorealistic_person`; do not parse `rights_source_note`、prompt or filename as an identity signal;
+- independent authorizer/resolver reopening of the photorealistic child's source receipt by `source_record_id`, with exact `source_evidence_sha256` verification;
 - strict/frozen `SeedanceSyntheticImageEgressPolicyReceipt` with canonical ordered role/asset/child bindings plus exact preview/task/Provider/transport/retention identity;
 - `SeedanceSyntheticImageReferenceResolver` that re-reads injected exact PNG bytes、independently measures SHA-256/size/`image/png` MIME/geometry、enforces the per-image `<30 MB` bound, and constructs the data URI in memory;
 - raw Base64/body、secret or input bytes never enter durable receipts、Manifest、Registry、logs、errors、repr or fixtures;

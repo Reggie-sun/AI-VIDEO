@@ -18,6 +18,7 @@ from ai_video.production.image import measure_png_bytes
 from ai_video.production.models import (
     ActorIdentity,
     AssetRegistrySnapshot,
+    AssetSourceKind,
     AssetType,
     StrictModel,
     ToolIdentity,
@@ -38,6 +39,17 @@ SEEDANCE_MAX_SYNTHETIC_IMAGE_BYTES = 30_000_000
 _SYNTHETIC_EGRESS_ID_PREFIX = "seedance-synthetic-egress:"
 _SYNTHETIC_IMAGE_ID_PREFIX = "seedance-synthetic-image:"
 _IMAGE_ROLE_ORDER = {"first_frame": 0, "last_frame": 1, "reference": 2}
+_PROJECT_OWNED_FICTIONAL_IDENTITY_USE = (
+    "project-owned-fictional-no-protected-identity:seedance-i2v"
+)
+_FICTIONAL_IDENTITY_SOURCE_KINDS = {
+    AssetSourceKind.GENERATED,
+    AssetSourceKind.DERIVED,
+}
+_FICTIONAL_IDENTITY_USAGE_LICENSES = {
+    "project-owned-synthetic",
+    "provider-output",
+}
 
 SeedanceSyntheticEvidenceSource = Callable[[str], bytes]
 SeedancePaidProviderAuthorizer = Callable[
@@ -213,7 +225,17 @@ class SeedanceSyntheticImageReferenceReceipt(StrictModel):
 
     @model_validator(mode="after")
     def _validate_eligibility(self) -> "SeedanceSyntheticImageReferenceReceipt":
+        if self.classification == "real_person_or_protected_identity":
+            raise ValueError("Seedance inline input rejects real or protected identity")
+        if (
+            self.classification == "synthetic_photorealistic_person"
+            and self.permitted_use != _PROJECT_OWNED_FICTIONAL_IDENTITY_USE
+        ):
+            raise ValueError(
+                "Seedance photorealistic fictional identity requires explicit project-owned attestation"
+            )
         if self.classification not in {
+            "synthetic_photorealistic_person",
             "clearly_illustrated_anime_non_real_character",
             "ordinary_non_character_image",
         }:
@@ -347,6 +369,20 @@ def _reopen_synthetic_evidence(
     return policy, tuple(receipts)
 
 
+def _validate_photorealistic_source_evidence(
+    source: SeedanceSyntheticEvidenceSource,
+    receipts: tuple[SeedanceSyntheticImageReferenceReceipt, ...],
+) -> None:
+    for receipt in receipts:
+        if receipt.classification != "synthetic_photorealistic_person":
+            continue
+        source_bytes = _read_evidence(source, receipt.source_record_id)
+        if hashlib.sha256(source_bytes).hexdigest() != receipt.source_evidence_sha256:
+            raise _invalid(
+                "Seedance photorealistic fictional identity source evidence does not match."
+            )
+
+
 def _reopen_registry_snapshot(payload: bytes) -> AssetRegistrySnapshot:
     if type(payload) is not bytes:
         raise _invalid("Seedance Registry evidence bytes are invalid.")
@@ -425,6 +461,10 @@ class SeedanceSyntheticImageAuthorizer:
                 self._evidence_source,
                 authorization.egress_policy_receipt_id,
             )
+            _validate_photorealistic_source_evidence(
+                self._evidence_source,
+                receipts,
+            )
         except AiVideoError:
             raise _egress_denied(
                 "Seedance synthetic authorization evidence is unavailable."
@@ -450,6 +490,7 @@ class SeedanceSyntheticImageReferenceResolver:
         )
         if reopened_policy != policy_receipt or reopened_receipts != receipts:
             raise _invalid("Seedance synthetic evidence does not match caller identity.")
+        _validate_photorealistic_source_evidence(evidence_source, receipts)
         registry = _reopen_registry_snapshot(registry_snapshot_bytes)
         by_source: dict[str, SeedanceSyntheticImageReferenceReceipt] = {}
         measured_bytes: dict[str, bytes] = {}
@@ -491,6 +532,15 @@ class SeedanceSyntheticImageReferenceResolver:
                 or record.height != receipt.source_height
             ):
                 raise _invalid("Seedance synthetic Registry asset does not match receipt.")
+            if receipt.classification == "synthetic_photorealistic_person" and (
+                record.source_kind not in _FICTIONAL_IDENTITY_SOURCE_KINDS
+                or record.tool != receipt.source_tool
+                or record.creation_receipt_id != receipt.source_record_id
+                or record.usage_license not in _FICTIONAL_IDENTITY_USAGE_LICENSES
+            ):
+                raise _invalid(
+                    "Seedance photorealistic fictional identity provenance is not sealed."
+                )
             by_source[receipt.source_asset_id] = receipt
             measured_bytes[receipt.source_asset_id] = payload
         if set(image_bytes) != set(by_source):
