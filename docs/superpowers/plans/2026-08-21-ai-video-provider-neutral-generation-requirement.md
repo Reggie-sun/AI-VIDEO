@@ -14,6 +14,13 @@ requirement、Router、Planner与Architecture checks。
 仍未执行。本Plan及既有receipt均不授权新的Provider/ComfyUI/network/credential调用、媒体生成、
 quality acceptance、Final Acceptance或release。
 
+Local `main` commit `15ef1d510a59cc9d46445b1fafff2ac2b34a1473`后来additive加入
+`comfy-local-h3-t8` Quality/Turbo family。2026-08-21的docs correction将current three-method
+family标为partial，并把provider-name-scoped完整stateless local pass-through列为remaining target；
+同时补齐Local H3、Seedance、Hailuo、MiniMax H3与future Providers的coexistence/assembly boundary。
+该correction不扩大T1–T9 durable lifecycle，也不以历史receipt替代target implementation仍需的fresh
+verification。
+
 ## Goal and Boundary
 
 按最小vertical slice实现：
@@ -21,14 +28,19 @@ quality acceptance、Final Acceptance或release。
 ```text
 pure requirement model/builder
   -> planner projection
-  -> Router mapping
+  -> explicit Provider candidate snapshots
+  -> Router exact Provider/profile/capability mapping
   -> fake adapter compiler contract
-  -> H3/Hailuo/Seedance offline mappings
+  -> Local H3 families / cloud H3 / Hailuo / Seedance offline mappings
+  -> exact Provider lookup + explicit local/remote service assembly
   -> tests/Harness and old-path retirement
   -> separately authorized Local H3 live acceptance
 ```
 
-Single owner：`VideoPlanner`唯一派生neutral requirement；Shot Router唯一产生Provider/profile/capability selection；selected Adapter唯一编译Provider grammar；existing `ProductionStateCommitter`唯一持久化lifecycle。
+Single owner：`VideoPlanner`唯一派生neutral requirement；Shot Router唯一产生Provider/profile/capability
+selection；`VideoProviderRegistry`只做exact-name lookup；explicit caller按sealed `execution_kind`注入
+exact Provider；selected Adapter唯一编译/执行Provider grammar；existing `ProductionStateCommitter`
+唯一持久化lifecycle。
 
 Old paths to remove：run-local prompt construction、orchestration direct provider-bound request construction、Adapter implicit creative decision。
 
@@ -46,6 +58,7 @@ Unchanged：Shot、Registry、Manifest、committer、permit、recovery、Depende
 | Core lifecycle DTO | `src/ai_video/production/video.py` | compiler protocol/result、request `/5`、resolved `/6`、activation scope `/4` while preserving all historical branches |
 | Fake | `src/ai_video/production/video_fake.py` | deterministic compiled/unsupported acceptance |
 | Local H3 | `src/ai_video/production/comfy_video.py` and exact profile-owned tests | offline compiler mapping only；sealed workflows unchanged unless separately approved |
+| Local H3 T8 family | `comfy_t8_video.py`, `comfy_t8_turbo_video.py`, `local_h3_provider_family.py` | current aggregation/compile/resolve；remaining target是same-name full stateless local pass-through |
 | Cloud adapters | `src/ai_video/production/minimax_h3.py`, `minimax_hailuo.py`, `seedance.py` | offline deterministic compiler mappings；no network |
 | Tests | focused planning/router/video/provider test files | RED/GREEN, compatibility, no-side-effect, retirement |
 | Harness/docs | `.agent/harness/policy.yaml`, Harness tests, canonical docs | exact changed-path routing and verified runtime truth only after implementation |
@@ -121,6 +134,8 @@ Implemented work：
 - preserve audit hash policy/capability ownership；
 - create sealed provider-bound projection with exact selection、bindings、output、base pointers和compiler contract；
 - preserve single exact capability/no fallback behavior；
+- keepProvider candidate snapshots explicit；Registry lookup不得成为pre-selection、ranking或fallback；
+- bindselected `provider_name`、`execution_kind`与`billing_kind` so explicit assembly can inject the exact local or remote adapter without reselecting；
 - reject unexpressible native-control/role/output needs before Adapter when capability metadata already proves denial。
 
 RED cases first：all enum values map once or typed block、reference count excludes first/last、capability/profile mismatch、local/remote authorization、same input deterministic provider-bound hash、Provider change leaves requirement hash unchanged。
@@ -145,13 +160,14 @@ RED cases first：compiled determinism、unsupported field paths/reasons、no pa
 
 Exit：fake adapter -> existing resolve/preview/lifecycle tests pass offline；old direct creation remains only in marked legacy fixtures。
 
-### T5 — Local H3 and cloud H3 offline mappings
+### T5 — Local H3 families and cloud H3 offline mappings
 
 **Goal:** 对current sealed H3 capability实现deterministic compiler，不修改workflow或live behavior。
 
 Implemented work：
 
 - Local H3 `fl2va`: first frame required、last frame optional、no reference slots、exact geometry/24fps/native audio/seed semantics；
+- Local H3 T8 family: Quality/Turbo保持同一`provider_name`下的distinct exact capabilities；current family合并capabilities并委托compile/resolve；remaining target按durable identity委托完整local seam，selected child仍实现具体action；
 - keep base and additive quality profile seals unchanged unless a separate profile migration is explicitly approved；
 - cloud H3: T2V fixed output/no refs/no seed/no negative prompt；
 - convert only approved neutral semantics to reviewed grammar；
@@ -238,6 +254,27 @@ Executed boundary：
 
 Cloud/paid live remains another separately authorized task with full Paid Provider Gate。
 
+### T11 — Multi-Provider coexistence clarification and regression
+
+**Docs implemented in this correction；full family assembly与pure executable regression remain pending separate code scope.**
+
+Required contract：
+
+- one `VideoProviderRegistry` may contain `comfy-local-h3-t8`、`seedance`、`minimax_hailuo`、
+  `minimax_h3` and future distinct-name Providers；
+- exact lookup returns the exact injected object；duplicate exact name fails closed；
+- Registry does not select、rank、inspect runtime or fallback；
+- `VideoGenerationService` receives one exact injected Provider and does not query Registry；
+- local family snapshots cannot contain remote Provider variants；
+- Local H3 target family is the sole `comfy-local-h3-t8` Registry entry and delegates the complete local seam
+  by durable identity，while selected child implements concrete actions；
+- current three-method family is partial and cannot yet satisfy that Registry-to-Service assembly；
+- all tests remainpure/no-network/no-Provider-call。
+
+Future regression target：extend an existing provider-neutral/registry test file rather than create a second
+catalog or coordinator. The test must be added to an actually executed Harness check `argv`；path mapping alone
+is insufficient。
+
 ## Requirements-to-Tasks Traceability
 
 | Requirement | Tasks | Primary tests |
@@ -247,6 +284,7 @@ Cloud/paid live remains another separately authorized task with full Paid Provid
 | Router selection ownership/no fallback | T3 | capability/policy/authorization blocked decisions |
 | adapter compile/unsupported contract | T4 | fake compiler discriminated results、zero effects |
 | H3/Hailuo/Seedance differences | T5–T7 | provider-specific offline matrices |
+| distinct-name Provider coexistence and exact assembly boundary | T3, T11 | Registry exact lookup/duplicate rejection、zero-call pure regression |
 | request/resolved/scope fingerprint and P5 invalidation | T4, T8 | all legacy hash fixtures、new `/5`/`/6`/`/4` branches、precise closure |
 | old path retirement | T8 | import/constructor/search/spy tests |
 | unchanged lifecycle owners | T8–T9 | state/recovery/paid/dependency suites |
@@ -260,6 +298,7 @@ Cloud/paid live remains another separately authorized task with full Paid Provid
 | Requirement model | strict schema、hash、canonical order、forbidden fields、exact evidence | IO、Provider imports、quality verdict |
 | Planner | request/plan v3 typed projection、single derivation、nesting、verified envelope、freshness、STOP、determinism | Provider/profile selection、prose inference |
 | Router | exhaustive projection、exact capability/profile、role counts、no fallback | prompt creation、state write |
+| Provider coexistence | distinct names coexist、exact lookup、sealed execution kind、duplicate rejection | ranking、fallback、runtime inspection、Provider calls |
 | Fake compiler | compiled/unsupported union、no mutation、lineage、legacy hash compatibility | network、permit、submit |
 | Local/cloud H3 | exact role/output/seed/audio grammar boundary | ComfyUI/API call、generic Candidate 1 prompt |
 | Hailuo | adaptive geometry、first-frame-only、unsupported close/reference/audio | paid preview/POST |
@@ -302,11 +341,14 @@ python -m pytest -p no:cacheprovider \
   tests/test_production_video_state_recovery.py -q
 ```
 
-### H3/Hailuo/Seedance offline mappings
+### H3 families/Hailuo/Seedance offline mappings
 
 ```bash
 python -m pytest -p no:cacheprovider \
   tests/test_production_comfy_video.py \
+  tests/test_production_comfy_t8_video.py \
+  tests/test_production_comfy_t8_turbo_video.py \
+  tests/test_production_local_h3_provider_family.py \
   tests/test_production_minimax_h3.py \
   tests/test_production_minimax_hailuo.py \
   tests/test_production_seedance.py \
@@ -386,6 +428,9 @@ Implementation review使用native named `reviewer`，至少检查：
 
 - requirement是否真的是plan内唯一generation truth；
 - Router是否仍独占selection且无fallback；
+- Registry是否只做exact lookup、distinct-name Providers是否可并列、Service是否只消费exact injected Provider；
+- Local H3 current partial/target full-seam边界是否准确；target family是否仅在same-name local
+  children内委托且不吸收remote Providers、global selection或durable lifecycle；
 - Adapter是否只表达、不重创作/降级；
 - legacy request/resolved/activation-scope hashes是否精确保持，且new `/5`/`/6`/`/4` branches无version collision；
 - tests是否覆盖真实old paths和semantic unsupported，而不只是happy path；
@@ -405,6 +450,7 @@ Reviewer必须输出`Verdict`、`Blocking issues`、`Non-blocking concerns`、fi
 
 - `ShotReadinessGate` implementation、Shot Quality Gate、subjective quality automation；
 - Provider ranking/fallback、multi-candidate generation、Candidate 2/3；
+- global automatic Provider catalog、candidate discovery或Registry-to-Service coordinator；
 - new Manifest/Registry layout、second writer/resolver/timeline/renderer；
 - Local H3 live、Hailuo/Seedance/cloud paid live、billing settlement；
 - push、release、publication或remote protection changes。

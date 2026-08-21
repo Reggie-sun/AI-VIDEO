@@ -2,107 +2,149 @@
 
 ## Status
 
-Proposed v1；docs-only specification。本文件描述当前 Local MiniMax H3 T8/T2VA
-Quality + Turbo lane 的目标合同与验收边界，不声明 working-tree draft 已完成，不授权
-修改 source/test/workflow，不启动 ComfyUI，不生成媒体，也不构成主观质量、P6 Review、
-Final Acceptance、push 或 release truth。
+Proposed v2 target contract。Local `main` commit
+`15ef1d510a59cc9d46445b1fafff2ac2b34a1473` 已实现capability aggregation、
+`compile_request()`与`resolve()`，但尚未实现本Spec要求的完整stateless
+`LocalVideoProvider` execution façade，也未闭合Registry-to-Service runtime assembly。
 
-Source snapshot：既有 Quality adapter 由 commit `e10c494` 引入；Turbo adapter、
-`LocalH3VideoProviderFamily`、对应 workflow/profile/tests 与 canonical docs/policy 在写本文时
-仍属于并发 working-tree implementation lane。只有 exact staged snapshot 或 exact commit range
-取得 fresh passing Harness receipt 后，才能把对应实现写成 accepted runtime truth。
+本文件只描述`provider_name = "comfy-local-h3-t8"`的local child slice，不是全局Provider
+selector、registry owner或lifecycle owner。Target family即使实现完整local seam，也只在该exact
+provider name内按durable identity委托，不选择Seedance、Hailuo或其它Provider。
+
+Canonical matrix 与 runtime baseline 已记录current partial implementation；本次文档修正时，workspace
+中没有找到覆盖 exact implementation snapshot 且状态为 `passed` 的 Harness receipt。因此本文只把
+source/test/workflow presence写成committed partial implementation truth，不把它升级为target contract
+complete、fresh gate closure、
+live media、quality acceptance、Final Acceptance、push 或 release truth。重新声明 offline acceptance
+前必须对 exact implementation commit range 运行并验证 fresh Harness receipt。
+
+本 Spec 是
+`2026-08-21-ai-video-provider-neutral-generation-requirement.md` 的 provider-specific child spec。
+跨 Provider coexistence、Router selection 与 assembly boundary 由该 parent spec 定义；本文件只约束
+Local H3 T8 Quality/Turbo family 内部。
 
 ## Problem Boundary
 
-`comfy-local-h3-t8` 已有一条显式 Quality T2VA capability。当前 draft 又增加 Turbo T2VA，
-两条 lane 共享 local H3/T8 runtime family，但具有不同 model/profile identity、sampling graph、
-step count 与 LoRA requirement。
+`comfy-local-h3-t8` 在同一个 local runtime identity 下公开两条 T2VA lane：
 
-如果直接用一个 adapter 替换另一个，或让 Router 只看到模糊的 provider-level capability，
-会产生以下风险：
+- Quality：既有、无 LoRA、20 steps、`res_multistep`；
+- Turbo：additive、exact Turbo LoRA、6 steps、`simple`。
 
-- Turbo 静默覆盖已经 sealed 的 Quality profile；
-- Router 选择 provider 后由 adapter 再决定 Quality/Turbo，形成第二个 selector；
-- capability mismatch 自动 fallback，破坏 exact selection；
-- family wrapper 扩张为第二套 submit/status/fetch/recovery lifecycle owner；
-- offline workflow/schema tests 被错误外推为真实 ComfyUI compatibility、媒体质量或音画验收。
+它们共享一个 `provider_name`，但拥有不同 `capability_id`、`provider_kind`、`model_id`、
+profile、workflow 与 runtime requirements。若把二者注册为同名 Provider objects、让 adapter 在
+Router 后再次选 lane，或把 family 扩张为全局 Provider selector，会产生 duplicate registration、
+silent fallback、identity drift 或第二套 lifecycle truth。
 
-本 slice 只解决一个边界：在同一个 provider name 下 additive 暴露两个显式、互不歧义的
-capability，并把 selected child 一直保持到既有 local-video lifecycle。它不扩大 T8 upstream
-runtime 的 ownership，也不采用 upstream Long Video、Studio、Repair、Reel、Context IR
-Provider 或其它 advanced/experimental subsystem。
+本 slice 只解决：
+
+1. 在一个 provider-name-scoped capability snapshot 中 additive 暴露 Quality + Turbo；
+2. 按 Router 已选择的 exact capability 委托 `compile_request()`；
+3. 按 sealed resolved identity 委托 `resolve()`；
+4. 让同一个registered family按durable resolved identity将完整local execution seam委托给
+   exact selected child；
+5. 保持具体 child adapter对Provider action的implementation ownership，同时由family提供无状态
+   pass-through。
+
+它不解决跨 Provider candidate discovery、global catalog、automatic Registry assembly、remote/local
+cross-provider dispatch或Provider ranking；但它必须闭合`comfy-local-h3-t8`自身的exact-name
+Registry-to-Service handoff。
+
+## Architecture Context
+
+```text
+Provider-neutral requirement
+  -> explicit candidate Provider capability snapshots
+     ├── comfy-local-h3-t8: LocalH3VideoProviderFamily
+     │    ├── Quality child
+     │    └── Turbo child
+     ├── seedance: SeedanceVideoProvider
+     ├── minimax_hailuo: MiniMaxHailuoVideoProvider
+     ├── minimax_h3: MiniMaxH3VideoProvider
+     └── future distinct-name Providers
+  -> Shot Router selects one exact provider/profile/capability
+  -> selected adapter/family compiles and resolves
+  -> exact registry entry is injected into existing local or remote lifecycle
+  -> ProductionStateCommitter remains the only durable lifecycle/activation/recovery owner
+```
+
+`LocalH3VideoProviderFamily` 只存在于第一条 local branch 内。它不得吸收 Seedance、Hailuo、
+MiniMax cloud H3 或 future distinct-name Provider，也不得拥有上图中的 candidate-set、Router、
+Registry assembly 或 execution-kind dispatch。
 
 ## Goal
 
-建立唯一链路：
+Local H3 T8 branch 的target唯一链路是：
 
 ```text
-ProviderNeutralVideoRequirement
-  -> Shot Router selects one exact capability
-     -> LocalH3VideoProviderFamily compile/resolve produces one exact resolved request
-        -> existing VideoGenerationService uses the family as one registered provider
-           -> family dispatches each LocalVideoProvider action to the exact child
-              -> existing ProductionStateCommitter owns lifecycle/activation/recovery
+LocalH3VideoProviderFamily.capabilities()
+  -> Shot Router selects exact Quality or Turbo capability
+  -> LocalH3VideoProviderFamily.compile_request() delegates to selected child
+  -> LocalH3VideoProviderFamily.resolve() delegates by exact sealed identity
+  -> VideoGenerationService receives the same registered family
+  -> family delegates preview/preflight/submit_local/status/fetch by durable identity
+  -> selected child performs the exact Provider action
+  -> VideoGenerationService + ProductionStateCommitter own durable lifecycle
 ```
 
-该链路必须保证：
+必须保证：
 
-- Quality 与 Turbo 是 additive siblings，不是 replacement、ranking 或 fallback 顺序；
-- Router 继续独占 Provider/profile/capability selection；
-- family 是无durable state的dispatch façade，并按 exact identity委托完整local provider seam；
-- selected child 继续消费 existing durable local permit并执行具体Provider action；
-- existing Manifest、Registry、Dependency Graph、Timeline、Review/Repair 与 activation owner不变；
-- offline contract acceptance、local live technical proof、media/subjective acceptance严格分层。
+- Quality 与 Turbo 是 additive siblings，不是 replacement、ranking 或 fallback order；
+- Router 独占 exact Provider/profile/capability selection；
+- family 是无durable state的完整`LocalVideoProvider` façade；
+- family只做immutable lookup与identity-based pass-through，不实现Provider-native action logic；
+- selected child实现具体preview/preflight/submit/status/fetch action；
+- no availability/error/performance-based reselection；
+- offline、local live、media/subjective acceptance严格分层。
 
 ## Non-Goals
 
-- 不修改或重新封装既有 `minimax_h3_t8_t2va_quality_local` bytes；
+- 不实现 global Provider catalog、automatic candidate discovery、Provider ranking 或 fallback；
+- 不修改 `VideoProviderRegistry`、`VideoGenerationService` 或跨 Provider assembly；
+- 不把 remote `VideoProvider` 与 local `LocalVideoProvider` 合并成新 protocol；
+- 不修改 Seedance、Hailuo、MiniMax cloud H3 或其它 distinct-name Provider；
+- 不修改或重新封装既有 Quality workflow/profile bytes；
 - 不把 Turbo 设为 default、preferred、faster-is-better 或 quality-is-better route；
-- 不实现 Provider ranking、automatic selection、fallback、retry或multi-candidate generation；
 - 不安装/升级 T8、Turbo、ComfyUI、VideoHelperSuite、SageAttention、模型或 LoRA；
-- 不启用 upstream Long Video、Studio、Repair、Reel、Context IR Provider、speech、
-  multi-keyframe、Prompt Relay 或 Advanced/EXP routes；
-- 不改变 `VideoGenerationRequest`、resolved request、Manifest、Registry 或 artifact layout schema；
-- 不新增 credential、remote endpoint、cloud egress、paid permit或Provider API path；
-- 不生成视频，不判断速度、显存、画面锐度、motion、identity、continuity或audio quality；
-- 不修改 Legacy `0.1.x` CLI、Manifest或local-first semantics。
+- 不改变 request/resolved request、Manifest、Registry 或 artifact layout schema；
+- 不新增 credential、remote endpoint、cloud egress、paid permit 或 Provider API path；
+- 不生成视频，不判断速度、显存、画面锐度、motion、identity、continuity 或 audio quality；
+- 不修改 Legacy `0.1.x` CLI、Manifest 或 local-first semantics。
 
 ## Current Source Truth
 
-### Accepted base
+Commit `15ef1d5` contains：
 
-- `src/ai_video/production/comfy_t8_video.py` 定义 sealed Quality child
-  `ComfyUIT8VideoProvider`。
-- Quality profile只公开 `minimax-h3-t8-t2va-quality-v1`，固定
-  `1344x768`、124 frames、24 fps、native audio、20 steps、
-  `res_multistep` + `simple`、CRF 17、无 LoRA、loopback-only。
-- existing local-video request、durable permit、status、fetch、activation、replay与explicit
-  recovery contracts已经存在；本 slice 不建立替代实现。
+- `ComfyUIT8VideoProvider` Quality child；
+- `ComfyUIT8TurboVideoProvider` Turbo child；
+- `LocalH3VideoProviderFamily` capability aggregation、compile dispatch 与 resolve dispatch；
+- Turbo workflow/template/profile/binding seals；
+- focused Quality/Turbo/family/Router/provider-neutral tests；
+- package exports、Harness routing、contract matrix 与 runtime baseline updates。
 
-### Draft additions
+Current family source只定义：
 
-- `src/ai_video/production/comfy_t8_turbo_video.py` 定义 Turbo child draft；
-- `src/ai_video/production/local_h3_provider_family.py` 定义 Router-facing family draft；
-- `workflows/{templates,bindings,profiles}/minimax_h3_t8_t2va_turbo*` seal Turbo graph；
-- focused tests覆盖 Turbo profile/preflight/submit/positive status-fetch与family exact dispatch；
-- Harness policy、contract matrix、runtime baseline与Production package exports正在同步。
+- `capabilities()`；
+- `compile_request()`；
+- `resolve()`。
 
-这些 file presence 只证明 draft surface 存在。它们不证明 tests passing、real runtime
-compatibility、negative status/fetch matrix、media generation 或 quality acceptance。
+它没有实现 `preview()`、`submit_local()`、`get_local_status()` 或 `fetch_local()`，也没有production
+wiring将family作为完整`LocalVideoProvider`传给`VideoGenerationService`。因此commit `15ef1d5`
+只闭合offline capability/compiler/resolver slice；full runtime assembly仍是本Spec与Plan中的明确
+implementation blocker，不得描述成已经完成或intentional final boundary。
 
 ## Ownership Model
 
 | Concern | Single owner | This slice rule |
 | --- | --- | --- |
-| Provider-neutral generation intent | current Planning / requirement owners | 不加入T8/Turbo字段或Provider grammar |
-| Provider/profile/capability selection | Shot Router | 必须选择exact Quality或Turbo capability；denial不fallback |
-| Capability aggregation and in-memory action dispatch | `LocalH3VideoProviderFamily` | 组合、排序、校验并按sealed identity委托；无durable state、无fallback |
-| Provider-native compile/resolve | selected Quality或Turbo child | 只能表达selected capability；不能换lane |
-| Workflow/profile/preflight | selected child + exact sealed artifacts | exact bytes、runtime inventory、node schema在submit前fail closed |
-| Preview/submit/status/fetch implementation | selected child | family只做same-child pass-through；不得改写request、permit、observation或artifact |
-| Durable local permit/lifecycle | existing `VideoGenerationService` + `ProductionStateCommitter` | 不新增writer、attempt table或recovery path |
-| Candidate validation/activation | existing P8/P5 owners | fetch不等于activation |
-| Media/quality acceptance | P6 Review/Repair + human gate | offline adapter acceptance不判质量 |
+| Provider-neutral intent | Planning / requirement owners | 不加入 T8/Turbo grammar |
+| Cross-Provider candidate set | explicit caller/orchestration input | family 不发现或加入其它 Providers |
+| Provider/profile/capability selection | Shot Router | exact selection；denial不 fallback |
+| Local T8 capability aggregation and action dispatch | `LocalH3VideoProviderFamily` | 合并同名child snapshots，并按durable identity原样委托完整local seam；无durable state |
+| Provider-native compile/resolve | selected Quality/Turbo child through family | family按 exact capability/identity委托 |
+| Preview/preflight/local submit/status/fetch implementation | selected Quality/Turbo child | family只做identity pass-through，不重写inputs/outputs |
+| Exact Provider lookup | `VideoProviderRegistry` | exact-name lookup only；不选择、不 fallback |
+| Durable lifecycle | `VideoGenerationService` + `ProductionStateCommitter` | 不新增 writer、attempt table 或 recovery path |
+| Quality/Final Acceptance | P6 Review/Repair + human gate | offline tests不判质量 |
 
 ## Capability Contract
 
@@ -123,204 +165,146 @@ compatibility、negative status/fetch matrix、media generation 或 quality acce
 | Encoder | H.264 MP4, CRF 17 | H.264 MP4, CRF 17 |
 | Remote/fallback | disabled | disabled |
 
-两条 lane 的 identity tuple 必须按以下 exact key保持唯一：
+Identity tuple必须为：
 
 ```text
 (provider_kind, model_id, profile_version, mode)
 ```
 
-`capability_id` 在一个 family capability snapshot 内也必须唯一。任何 duplicate capability ID 或 duplicate identity tuple
-在 family construction 时返回 non-retryable `VIDEO_REQUEST_INVALID`，不得按插入顺序选一个。
+`capability_id` 与 identity tuple 在一个 family snapshot 内必须分别唯一。duplicate、empty family、
+foreign `provider_name`、unknown capability 或 unknown identity都必须 fail closed。
 
 ## Provider Family Contract
 
-`LocalH3VideoProviderFamily` 是同一个 `provider_name` 的唯一 registered provider façade，并实现
-完整 `LocalVideoProvider` seam。它只允许以下 public responsibilities：
+`LocalH3VideoProviderFamily` target public responsibilities只有：
 
-1. `capabilities()`：合并所有 child variants，并按 `capability_id` deterministic排序；
-2. `compile_request()`：以 Router 已选的 `capability_id` 委托给唯一 child；
-3. `resolve()`：以 exact identity tuple 委托给唯一 child；
-4. `preview()`、`preflight()`与`submit_local()`：从sealed resolved request identity选择同一个
-   child实例并原样委托；
-5. `get_local_status()`与`fetch_local()`：从`LocalVideoSubmission.resolved`的sealed identity选择
-   同一个child并原样委托。
+1. `capabilities()`：合并同属 `comfy-local-h3-t8` 的 child variants并按
+   `capability_id` deterministic排序；
+2. `compile_request()`：按 Router 已选择的 `capability_id` 委托给唯一 child；
+3. `resolve()`：按 exact identity tuple 委托给唯一 child；
+4. `preview()`与`preflight()`：从sealed resolved request identity选择同一child并原样委托；
+5. `submit_local()`：从request/preview/intent/permit绑定的exact identity选择同一child并原样委托；
+6. `get_local_status()`与`fetch_local()`：从durable `LocalVideoSubmission.resolved` identity
+   选择同一child并原样委托。
 
-`VideoProviderRegistry`只注册一次`("comfy-local-h3-t8", family)`；不得用相同provider name分别
-注册Quality和Turbo child。`VideoGenerationService`接收family作为完整`LocalVideoProvider`，从
-durable request reopen得到的identity在submit、restart后的status与fetch阶段都必须路由回同一个
-child profile。Family可以持有immutable child lookup与child实例，但不得保存attempt phase、permit、
-task ID、poll result、artifact locator、activation或recovery truth。
+Family MUST NOT：
 
-Family 必须 fail closed：
+- 保存process-local last-selected child、attempt phase、permit、task ID、poll result、artifact locator、activation或
+  recovery truth；
+- 修改或重新签发child inputs、outputs、permit、submission、observation或fetch receipt；
+- 按 runtime availability、性能、错误类型、插入顺序或历史成功率重新选 child；
+- 聚合不同 `provider_name` 的 capabilities；
+- 充当 `VideoProviderRegistry`、global catalog 或 cross-provider execution dispatcher。
 
-- children为空；
-- child `provider_name` 不是 `comfy-local-h3-t8`；
-- duplicate capability ID；
-- duplicate identity tuple；
-- request来自另一个 provider；
-- selected capability或request identity不存在。
+## Multi-Provider Coexistence Contract
 
-Family只允许执行identity-based pass-through，MUST NOT在委托前后重写Provider inputs/outputs，
-也MUST NOT保存permit、provider task ID、poll history、artifact locator、activation或recovery
-state。任何phase都不得在resolve后按性能、runtime availability、错误类型或插入顺序重新选择
-另一个child。Family restart必须从durable resolved identity重建同一dispatch，不依赖process-local
-“last selected child”。
+`VideoProviderRegistry` 是 exact injected lookup，可同时包含：
+
+```text
+("comfy-local-h3-t8", <LocalH3VideoProviderFamily>)
+("seedance", <SeedanceVideoProvider>)
+("minimax_hailuo", <MiniMaxHailuoVideoProvider>)
+("minimax_h3", <MiniMaxH3VideoProvider>)
+(<future-distinct-name>, <future provider>)
+```
+
+“唯一”只表示：同一个 `provider_name = "comfy-local-h3-t8"` 不能同时注册 Quality child、
+Turbo child 与 family形成 duplicate entries。它不表示 global Registry 只能有一个 Provider。
+
+Registry 不做 selection、execution-kind dispatch 或 fallback；`VideoGenerationService`也不会自行
+查询Registry。Existing explicit caller必须按durable `request.provider_name`获得exact registered
+Provider object，并按sealed `execution_kind`使用local或remote lifecycle seam。对
+`comfy-local-h3-t8`，该registered object必须是完成本Spec target contract的family；当前partial
+implementation尚不满足这一assembly requirement。
 
 ## Profile and Workflow Sealing
 
-### Quality preservation
-
-- existing Quality profile/workflow/binding bytes与capability identity保持不变；
-- Turbo不得复用Quality capability ID、`provider_kind`或`model_id`；
-- Turbo adoption test必须固定Quality profile file SHA-256，证明新增lane没有re-seal旧lane；
-- Quality tests必须与Turbo/family tests一起运行。
-
-### Turbo seal
-
-Turbo profile必须至少绑定：
-
-- exact T8 repository/commit/version/license；
-- exact Turbo repository commit `4274783a23afcfdbea3b4876cb79effd6c510785`、
-  version `1.2.3`与Apache-2.0 metadata；
-- exact ComfyUI、VideoHelperSuite、SageAttention identities；
-- exact four H3 model components与Turbo LoRA size/SHA-256；
-- exact workflow/binding bytes；
-- exact custom-node input schema hash；
-- loopback endpoints、launch capabilities、dimensions、frames/fps、native audio、steps、
-  scheduler、denoise、CRF、output node与final AV suffix；
-- `remote_provider_enabled=false`、`cloud_fallback_enabled=false`。
-
-`required_turbo_nodes` 只表示需要做input-schema hash的四个T8/Turbo custom nodes：
-`MiniMaxH3AudioConditioningT8`、`MiniMaxH3TurboLoRA`、
-`MiniMaxH3TurboSampler`、`MiniMaxH3AVDecodeT8`。完整 `required_nodes` 可以包含该
-sealed workflow实际使用的ComfyUI/VHS core nodes，但任何增删都必须更新exact profile、
-workflow seal与tests，不能在runtime动态扩张。
-
-### Upstream ownership exclusion
-
-T8 upstream是GPL-3.0-or-later runtime reference；Turbo plugin metadata是Apache-2.0。
-AI-VIDEO adapter必须保持project-native implementation，不复制或分发未审查的upstream
-implementation。即使对应custom nodes已安装，也不得消费upstream自带Manifest、Timeline、
-Repair、Studio、delivery或external-provider state。
+- Quality profile/workflow/binding bytes与existing hashes保持不变；
+- Turbo template、binding与profile互相 seal exact bytes；
+- Turbo固定 T8 runtime、Turbo plugin、四组件、exact LoRA、node inventory、node input schema、
+  output node `13`、H.264 MP4/native audio/CRF 17；
+- both lanes保持 literal loopback-only origin、`remote_provider_enabled=false` 与
+  `cloud_fallback_enabled=false`；
+- output history必须唯一选择 profile-declared output node中的一个 final `*-audio.mp4`；
+  wrong node、video-only sibling、zero/duplicate final AV、wrong suffix或ambiguous locator fail closed。
 
 ## Execution and Lifecycle Contract
 
-Family + selected child必须继续满足existing local provider seam：
+Router/family acceptance不执行 ComfyUI。进入 local execution 时：
 
-```text
-resolve
-  -> preview
-  -> preflight exact runtime/components/nodes
-  -> ProductionStateCommitter records durable local submit intent
-  -> family dispatches to exact child
-  -> selected child consumes one-use local permit immediately before submit
-  -> status observation
-  -> held-FD fetch and measured artifact validation
-  -> explicit candidate validation/activation
-  -> reopen / exact replay / explicit recovery
-```
+1. explicit assembly按provider name注入registered family；
+2. `VideoGenerationService` reopen durable resolved request；
+3. family按durable identity委托selected child执行preview/preflight与local permit-gated submit；
+4. family在restart后的status/fetch阶段继续从durable submission identity委托同一child；
+5. `ProductionStateCommitter`独占durable intent、permit、state、candidate、activation与recovery。
 
-Quality/Turbo child可以共享implementation helper或inherit stable behavior，但动态字段必须读取
-`self.profile`。Turbo继承的 status/fetch path必须使用Turbo `output_node_id="13"`与
-`final_av_filename_suffix="-audio.mp4"`，不得硬编码Quality node `"11"`。
-
-当前 source中 `_final_av_artifact(history, self.profile)` 已按实例profile选择output node，且
-current Turbo focused test已经覆盖node `13` terminal history -> succeeded observation -> fetch receipt
-的positive path。Future acceptance仍必须补齐wrong node、video-only sibling、zero/duplicate final AV、
-wrong suffix与ambiguous locator的fail-closed negative matrix；positive path本身不得再描述为缺失。
-
-Unknown submit/poll outcome继续使用existing typed fail-closed behavior；不得因Turbo失败自动切换
-Quality、remint permit、blind resubmit或手工激活某个ComfyUI output。
+Turbo failure不得切换Quality，Quality failure不得切换Turbo；local failure不得切换Seedance、Hailuo或
+其它 remote Provider。Unknown outcome继续使用existing typed fail-closed recovery，不 blind retry、
+remint permit或手工激活 output。
 
 ## Compatibility and Migration
 
-- 不需要Manifest、Registry、request、resolved request或artifact layout migration；
-- existing Quality attempts、hashes、profile与capability继续reopen和replay；
-- new Turbo attempt必须从current requirement和Router exact selection创建，不能把historical
-  Quality request改写成Turbo；
-- public package exports可以additive暴露Turbo/family types，但不得移除Quality exports；
-- Harness policy必须覆盖Turbo source/tests/workflow/profile/binding与family path；
-- runtime baseline只能在exact implementation receipt通过后写为offline accepted；在此之前
-  应明确标记working-tree draft或proposed。
+- 不需要 Manifest、Registry、request、resolved request 或 artifact layout migration；
+- historical Quality attempts、hashes与profile继续reopen/replay；
+- new Turbo attempt必须由current requirement + Router exact selection创建；
+- public package exports只做 additive exposure；
+- Seedance、Hailuo、MiniMax H3 identities、profiles、permits与historical evidence不变；
+- Base AI Comic E2E 在没有 Video Provider时仍必须可运行；
+- current family尚未实现完整的local lifecycle façade；target family也永远不是global Provider registry。
 
-## Acceptance Criteria for Future Implementation
+## Acceptance Criteria
 
-1. Existing Quality profile bytes、file SHA-256、capability identity与focused tests保持不变。
-2. Turbo profile/workflow/binding exact互相seal，并拒绝path、hash、component、LoRA、runtime
-   identity、node inventory或input schema drift。
-3. Turbo只公开一个distinct explicit local/unmetered T2VA capability；不公开remote/fallback。
-4. Family deterministic暴露Quality + Turbo，拒绝empty、foreign provider、snapshot内duplicate ID与
-   duplicate identity。
-5. Router对Quality与Turbo都必须要求explicit capability selection；missing或wrong capability
-   typed BLOCKED且不fallback、不触发runtime inspection。
-6. Family compile只委托selected capability owner；resolve与每个local provider action只委托
-   durable identity对应的同一个child，并可作为唯一`comfy-local-h3-t8` registration传给
-   `VideoGenerationService`。
-7. Quality child拒绝Turbo request，Turbo child拒绝Quality request；不能相互吸收。
-8. Turbo preflight在permit/submit前验证exact runtime、四组件、LoRA与node schema；任何drift
-   保持zero submit effect。
-9. Turbo render固定6 steps、`simple`、denoise 1.0、exact LoRA、T2VA、native audio、
-   `1344x768`、124 frames、24 fps、CRF 17和output node `13`。
-10. Turbo offline lifecycle tests保留现有node `13` positive status/fetch proof，并证明video-only
-    sibling不构成成功；wrong node、zero/duplicate final AV、wrong suffix或ambiguous locator fail closed。
-11. Existing local durable intent、one-use permit、status/fetch、activation、reopen、replay与
-    recovery tests保持green；family不出现第二套state。
-12. Production exports、contract matrix、runtime baseline与Harness path mapping准确同步；docs不把
-    offline acceptance写成live或quality truth。
-13. Default acceptance全部pure/fake/offline/no-network；不读credential、不启动ComfyUI、
-    不生成媒体。
-14. Independent review无blocking issue；exact staged snapshot或commit range取得fresh passing、
-    integrity-valid、policy-valid、snapshot-valid Harness receipt。
+1. Quality profile bytes、identity与focused tests保持不变。
+2. Turbo profile/workflow/binding exact seal，并拒绝 runtime、component、LoRA、node或output drift。
+3. Family deterministic暴露Quality + Turbo，拒绝empty、foreign、duplicate与unknown identity。
+4. Router对两条lane都要求explicit capability selection；denial不fallback。
+5. Family对compile/resolve和完整local execution seam都只做identity-based pass-through；不得保存durable state。
+6. Selected child继续实现具体local action logic；family可作为sole `comfy-local-h3-t8` Registry entry注入`VideoGenerationService`。
+7. A pure coexistence regression应证明同一 Registry可同时保存Local H3、Seedance、Hailuo与其它
+   distinct-name fake Providers，exact name返回exact object，duplicate name fail closed，且不调用runtime。
+8. Family capability snapshot不得混入remote Provider variants。
+9. Fresh-family restart必须从durable resolved identity把status/fetch路由回同一child，不依赖last-selected state。
+10. No schema、global catalog、automatic selection、ranking或fallback change。
+11. Exact target implementation snapshot必须取得fresh passing Harness receipt后才能声明contract complete。
 
 ## Acceptance Lanes
 
 | Lane | Can prove | Cannot prove |
 | --- | --- | --- |
-| Pure/profile | schema、hash、identity、workflow binding、determinism、fail-closed | installed runtime compatibility、submit、media |
-| Fake/offline lifecycle | Router selection、selected-child dispatch、permit、node 13 status/fetch、replay/recovery | GPU、wall time、VRAM、real audio/video |
-| Local live technical, separate explicit execution task | one exact loopback runtime/profile succeeds with measured MP4/audio evidence | universal quality、Turbo better than Quality、Final Acceptance |
-| Controlled media A/B, separate task | fixed-input Quality vs Turbo measurements and human verdict | other prompts/assets/hardware or default ranking |
-
-用户当前只要求spec/plan，因此本轮停在docs-only lane。未来Local ComfyUI execution若由用户明确
-要求，可按repository的local-unmetered authorization exemption执行，但仍必须完成sealed profile、
-preflight、permit、lifecycle、recovery与media verification gates；该exemption不是本Spec的live授权。
+| Pure/profile | schema、hash、identity、determinism、coexistence lookup | runtime、submit、media |
+| Fake/offline compiler | Router selection、family compile/resolve dispatch、unsupported/no-fallback | complete family lifecycle、GPU、media |
+| Family lifecycle regression | full identity pass-through、restart same-child、existing child semantics | live quality |
+| Local live technical, separate task | exact loopback profile produces measured artifact | universal quality、default ranking |
+| Controlled A/B, separate task | fixed-input Quality vs Turbo comparison | other providers or default selection |
 
 ## Explicitly Unverified
 
-- T8 `1.36.2`、Turbo `1.2.3`与本机ComfyUI exact commit的真实compatibility；
-- real model/LoRA bytes与profile declarations是否匹配当前host；
-- real `/object_info`是否匹配sealed custom-node input schema；
-- Turbo submit/status/fetch是否在真实host成功；
-- actual wall time、VRAM/RAM、audio sync、motion、identity、continuity、sharpness或stability；
-- Turbo是否比Quality更快、更好或更适合作为默认lane；
-- `1344x768`相对既有`1344x672`quality lane的受控收益。
-
-上述事实只能由后续fresh runtime/media evidence补充，不得由unit tests、profile file、upstream claim、
-larger bitrate或历史Quality evidence推断。
+- fresh passing Harness closure for exact commit `15ef1d5`；
+- complete Registry-to-`VideoGenerationService` wiring for this family；
+- family preview/submit/status/fetch pass-through and restart proof；
+- real T8/Turbo/ComfyUI compatibility and installed bytes；
+- Turbo live submit/status/fetch、wall time、VRAM/RAM或media quality；
+- Turbo是否优于Quality或适合成为default；
+- any new Seedance/Hailuo/MiniMax H3 live behavior。
 
 ## Rollback
 
-- Docs-only rollback：删除本Spec与配套Plan；runtime无变化。
-- Future offline implementation rollback：删除Turbo adapter/family/workflow/profile/tests及additive
-  exports/policy/docs delta；必须保留Quality adapter/profile/workflow/binding与所有历史evidence。
-- 若Turbo attempt已经durable begin，只能使用existing explicit recovery记录known-no-effect、failed
-  或outcome-unknown；不得通过rollback删除complete orphan evidence、改写成Quality attempt或blind
-  retry。
-- Rollback不得引入automatic fallback、第二lifecycle owner或remote endpoint。
+- 本次文档修正可通过只撤销对应 docs commit回滚，不改变runtime。
+- Implementation rollback必须整体移除Turbo/family/additive exports/policy/docs delta，同时保留
+  Quality child、historical evidence与其它 Providers。
+- 已经durable begin的attempt只能走existing explicit recovery；不得改写为另一lane或Provider。
 
 ## Design Decisions
 
-本Spec固定以下选择：
-
-- shared provider name + distinct explicit capability identities；
-- family是唯一registered、无durable state的完整`LocalVideoProvider` dispatch façade；
-- child执行具体Provider action，committer拥有durable lifecycle；
-- Quality bytes保持不变，Turbo是additive profile；
-- exact identity tuple为`provider_kind + model_id + profile_version + mode`；
+- Local H3 family是 provider-name-scoped、stateless、完整local provider façade，不是global Provider family；
+- Quality/Turbo共享provider name但使用distinct explicit capability identities；
+- Registry可并列保存多个distinct-name Providers；
+- Router selects；family aggregates and identity-dispatches；selected child executes；committer persists；
 - no ranking、no fallback、no runtime availability selection；
-- offline acceptance必须补Turbo node 13 status/fetch fail-closed negative matrix；
-- upstream second-truth subsystems永不进入AI-VIDEO production truth；
-- live technical proof与Quality-vs-Turbo A/B均是独立future execution task。
+- local与remote seams保持分离；
+- current assembly尚未闭合，是future implementation blocker；
+- live/media/quality均需要独立evidence。
 
-任何改变这些选择、启用remote/external-provider route、修改Manifest/Registry/request schema、引入
-default ranking或把family扩张为lifecycle owner，均是新的scope expansion，必须单独Spec与用户授权。
+修改 Seedance/Hailuo/其它Provider本身、引入global catalog、automatic assembly、cross-provider ranking/
+fallback、新schema或第二lifecycle owner，都是独立scope；但这些 Providers 的既有共存不是future
+scope expansion，而是必须保持的unchanged architecture contract。

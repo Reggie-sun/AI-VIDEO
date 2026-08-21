@@ -14,6 +14,14 @@ ComfyUI或credential，也未生成媒体；后续Local H3 technical regression�
 evidence，不把本slice升级为Shot Quality Gate、subjective quality acceptance、activation、Final
 Acceptance或release truth。
 
+后续local `main` commit `15ef1d510a59cc9d46445b1fafff2ac2b34a1473` additive加入
+`comfy-local-h3-t8` Quality/Turbo family。Current source只完成provider-name-scoped capability/
+compiler/resolver façade；配套Local H3 child Spec把完整stateless `LocalVideoProvider` pass-through列为
+尚未实现的target，以闭合同名children的Registry-to-Service assembly。无论partial或target状态，
+family都不改变本Spec的cross-provider selection、Registry lookup、local/remote lifecycle ownership。
+其exact target implementation snapshot的fresh passing Harness closure需独立重新验证，不能由本Spec的
+历史receipt代替。
+
 ## Problem Boundary
 
 当前 runtime 已有三段有效但尚未形成唯一端到端合同的 truth：
@@ -52,6 +60,8 @@ Canonical Shot + Intent Evidence + Continuity
 - 不实现或替代 `ShotReadinessGate`、Shot Quality Gate、post-fetch quality gate、P6 Review/Repair或human Pilot Reality Gate；
 - 不判断 identity drift、motion naturalness、continuity quality、画面美感、subjective sharpness或Final Acceptance；
 - 不新增 Provider ranking、automatic selection policy、fallback、retry、repair、candidate iteration或Candidate 2/3；
+- 不新增global Provider catalog、automatic candidate discovery、Registry-owned selection或
+  Registry-to-Service automatic assembly；
 - 不改变 canonical Shot、Asset Registry、Manifest、Dependency Graph、`ResolvedTimeline`、renderer、committer、permit或recovery schema ownership；
 - 不把 Local H3 Alice C2 Candidate 1 的 prompt、locked-camera 英文句子或任何 run-local prompt提升为通用 Shot truth；
 - 不调用 Creative Skill、Provider、ComfyUI、network、credential或media tooling；runtime Skill calls必须保持 `0`；
@@ -63,6 +73,12 @@ Canonical Shot + Intent Evidence + Continuity
 - `VideoPlanner.plan()` 是当前唯一 provider-neutral planning decision owner；`require_current_video_plan()`负责 current request/plan STOP。
 - `ShotRoutingContext` 绑定 exact activated Shot、selected Registry revision、Character/Scene references、terminal/keyframe与typed semantic continuity state。
 - `VideoGenerationResolver` 对一个 exact selected capability做 role、asset、output、local/remote policy与budget匹配；denial返回 typed blocked decision且不 fallback。
+- `VideoProviderRegistry`按exact `provider_name`保存多个injected Provider objects；只拒绝duplicate
+  name，不做selection、ranking或fallback。
+- `VideoGenerationService`每个实例只接收一个exact `VideoProvider | LocalVideoProvider`；它不查询
+  Registry，也不在remote/local Providers之间自动dispatch。
+- `comfy-local-h3-t8` family只合并Quality/Turbo capabilities并委托compile/resolve；Seedance、
+  Hailuo与MiniMax cloud H3使用distinct provider names和各自adapter，不进入该family。
 - `VideoGenerationRequest` 当前混合 Provider/model/profile、prompt、bindings、output、base snapshot与lifecycle identity；request `/1`–`/4`、resolved request `/2`–`/5`与activation scope `/1`–`/3` hashes已有兼容契约。
 - Provider adapters当前在 `resolve()` 验证 request/capability，并在 submit boundary构造 provider payload；它们不得成为 state writer或activation owner。
 
@@ -75,6 +91,8 @@ Canonical Shot + Intent Evidence + Continuity
 | Requirement derivation | `VideoPlanner` | 只有 Planner 可从 current request 派生；model constructor只 seal，不做 creative decision |
 | Requirement schema and verified boundary envelope | pure cycle-neutral `src/ai_video/production/video_requirement.py` | Planning 与 Router可共同 import；该 module无 IO、Provider、writer或lifecycle dependency |
 | Provider/profile/capability selection | Shot Router | Provider identity只能从 Router decision进入 provider-bound request |
+| Exact Provider object lookup | `VideoProviderRegistry` | exact-name lookup only；可以并列多个distinct-name Providers，不选择、不fallback |
+| Registry-to-Service assembly | explicit caller/orchestration boundary | 按selected `provider_name`和sealed `execution_kind`注入exact adapter；本Spec不新增coordinator |
 | Provider-native expression | selected Provider adapter compiler | 只做 deterministic expression；不能改变 requirement |
 | Request/submit/fetch/activation lifecycle | existing P8 owners and `ProductionStateCommitter` | 不新增 writer、attempt state或activation path |
 | Desired fingerprint and invalidation | Dependency Graph / existing resolved generation identity | requirement hash作为新 input contribution，不建立第二 resolver |
@@ -207,6 +225,39 @@ Router只消费：
 
 Provider/profile/capability identity只能由 Router decision产生。Planning先验证plan与embedded requirement并只投影verified hash lineage；`shot_router.py`不得import或解析plan。Orchestration可以提供explicit candidate set或selected policy input，但不能把Provider identity直接写入 request。Router保持 current no-fallback semantics：一个 exact decision被 capability/policy拒绝时返回 blocked；不得尝试第二个 Provider/profile。
 
+### Multi-Provider coexistence and assembly
+
+Provider-neutral architecture必须允许以下peer Providers同时存在：
+
+```text
+comfy-local-h3-t8 -> Local H3 Quality/Turbo capability family
+seedance           -> SeedanceVideoProvider
+minimax_hailuo     -> MiniMaxHailuoVideoProvider
+minimax_h3         -> MiniMaxH3VideoProvider
+future name        -> future explicit Provider adapter
+```
+
+`VideoProviderRegistry`是exact injected lookup，不是candidate catalog、Router或fallback engine。
+它可以同时保存上述distinct names；“sole/unique registration”只能限定在某一个exact
+`provider_name`内部。例如`comfy-local-h3-t8`不能同时把Quality child、Turbo child与family注册为
+三个同名entries，但这不限制Registry同时保存Seedance、Hailuo或future Providers。
+
+Router对caller显式提供的candidate capability snapshot做exact selection。当前
+`VideoGenerationResolver`一次消费一个`VideoProviderCapabilities` snapshot；本Spec不声称已经存在
+一个自动汇总所有Providers的global catalog。若future orchestration提供多个candidate snapshots，
+它仍必须把exact candidate set和policy作为显式input交给Router，不得在Router外预选、排序或fallback。
+
+Router成功后，existing explicit caller按selected `provider_name`获取exact Provider object，并按
+sealed `execution_kind`进入local或remote lifecycle seam。`VideoGenerationService`只消费已经注入的
+exact Provider；它不查询Registry，也不决定execution kind。Registry、Service与Provider adapter都
+不得成为第二个selector。
+
+Local H3 T8 target family聚合same-name Quality/Turbo capabilities，并按durable identity把
+`compile_request()`、`resolve()`和完整`LocalVideoProvider` seam原样委托给exact child。Current source
+只完成compile/resolve，因此同名children的runtime assembly尚未闭合。Remote Providers继续拥有
+独立`VideoProvider` seam；family不得吸收remote variants、代理remote calls或成为global execution
+façade。
+
 ### `ProviderBoundVideoRequest`
 
 Router成功后创建一个 sealed、pure、non-durable projection：
@@ -288,6 +339,7 @@ Adapter可应用 sealed profile中不改变semantic requirement的mechanical def
 | Lane | Current capability expression | Neutral mapping | Must return unsupported when |
 | --- | --- | --- | --- |
 | Local H3 `comfy-local-h3` `fl2va` | I2V；required `first_frame`；optional `last_frame`；`max_reference_count=0`；PNG；exact dimensions within sealed bounds/multiple；24fps；native audio；seed supported；loopback-only | open endpoint -> `first_frame`；close endpoint可在requirement明确时 -> `last_frame`；camera/action/pacing只按reviewed deterministic H3 grammar表达；output必须匹配sealed profile | requirement需要identity/scene/continuity reference slots、reference media、negative prompt、unsupported native camera control、超出profile geometry/timing，或只靠prompt不能满足native enforcement |
+| Local H3 T8 `comfy-local-h3-t8` family | T2V；Quality与Turbo为两个exact local/unmetered capabilities；current family聚合/compile/resolve，target补完整stateless local pass-through | Router必须显式选择Quality或Turbo；family按durable capability/identity委托，不产生第二次选择 | missing/wrong capability、duplicate/foreign identity、unsupported output，或任何需要remote/reference/edit/extend的requirement；不得改选sibling或remote Provider |
 | MiniMax cloud H3 | T2V only；fixed 4s/1366x768；no image/media refs；native audio；no seed/negative prompt | 仅适合无reference且允许T2V的requirement；semantic fields可编译进prompt | any exact first/last/reference role、seed、negative prompt、different output或native structured control required |
 | `MiniMax-Hailuo-2.3` I2V | exactly one `first_frame`；no `last_frame`/reference；adaptive `768P`；141 frames@24fps；MP4；no native audio；no seed/negative prompt | open endpoint -> `first_frame`；output必须保留adaptive geometry；neutral action/camera/pacing编译为Hailuo prompt | close endpoint必须由last-frame control保证、任何reference slot/native audio/seed/negative prompt、fixed pixel claim或native control requirement无法表达 |
 | Seedance 2.0 Mini I2V | required `first_frame`；supports `last_frame`；480p/720p exact or adaptive family mapping；provider-selected/exact duration；MP4；native audio false/true | first/last endpoints映射为role；audio/output由exact capability选择；Ark asset identity由existing sealed materialization resolver提供，不进入requirement | required asset无sealed Active Ark identity、output/audio不匹配、reference semantics被错误压成I2V role、或native control在selected capability不存在 |
@@ -369,7 +421,7 @@ truth。Compatibility fixtures可reopen历史requests，但不得用于创建新
 - No Manifest/Registry layout migration is required solely for the embedded ephemeral requirement；existing attempt serialization may carry additive request fields through the existing request envelope only after compatibility tests prove reopen。
 - No automatic conversion of historical requests to `/5`；replay of historical attempts keeps historical hashes and zero external effects。
 
-## Implementation Acceptance Criteria
+## Accepted T1-T9 Implementation Criteria
 
 1. One current request deterministically produces one plan with one embedded requirement；same input bytes yield identical hashes。
 2. Top-level plan generation fields are not serialized duplicates；compatibility properties read the nested requirement only。
@@ -385,6 +437,21 @@ truth。Compatibility fixtures可reopen历史requests，但不得用于创建新
 12. Existing lifecycle, permit, unknown-outcome, activation, recovery, timeline, Review and Final Acceptance tests remain green。
 13. Default acceptance uses fake/offline/no-network execution；no credential、Provider、ComfyUI或media generation occurs。
 14. Exact staged/commit-range Harness receipt is fresh、passing、integrity-valid、policy-valid和snapshot-valid。
+
+## Pending Multi-Provider Assembly Criteria
+
+以下是T11与Local H3 T8 target family的future acceptance，不在T1–T9历史receipt或commit
+`15ef1d5`的已验证范围内：
+
+1. `VideoProviderRegistry`允许Local H3、Seedance、Hailuo、MiniMax H3和future distinct-name
+   Providers并列exact lookup；duplicate exact name fail closed，且lookup不选择或fallback。
+2. Local H3 family capabilities不包含remote variants；target family只实现same-name local identity
+   pass-through，绝不实现remote或cross-provider dispatch。
+3. The sole `comfy-local-h3-t8` Registry entry can be injected into `VideoGenerationService` and routes
+   Quality/Turbo preview/submit/status/fetch to the exact child by durable identity。
+4. Fresh-family restart routes status/fetch to the same child without process-local last-selection state。
+5. Exact source/test/policy snapshot取得fresh passing、integrity-valid、policy-valid、snapshot-valid Harness
+   receipt后，才能声明target assembly complete。
 
 ## Acceptance Lanes
 
@@ -414,6 +481,8 @@ truth。Compatibility fixtures可reopen历史requests，但不得用于创建新
 - Planning签发cycle-neutral verified envelope；Router不importplan type；
 - Router输出不含prompt的`ProviderBoundVideoRequest`；
 - Adapter返回compiled或typed unsupported result；
+- distinct-name Providers可并列存在；Registry exact lookup、Router selection、Service injection与Provider execution保持不同owners；
+- Local H3 T8 target family是provider-name-scoped完整local pass-through，不是global catalog或cross-provider execution façade；current partial implementation必须明确标记；
 - existing `VideoGenerationRequest`作为lifecycle DTO，以request `/5`、resolved `/6`、activation scope `/4`接入并保持全部历史hash；
 - capability denial和adapter unsupported均fail closed，不触发fallback。
 
