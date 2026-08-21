@@ -2,9 +2,17 @@
 
 ## Status
 
-Proposed v1；docs-only architecture specification。本文件不实现 runtime、不授权 Provider 调用、不生成媒体，也不构成 Shot Quality Gate、subjective quality acceptance、activation、Final Acceptance 或 release truth。
+Implemented and offline-accepted at commit
+`007e99cb1d79f9c2b91a909b15db1f9360f65236`，该commit也是current cached
+`origin/main`；尚未release。T1–T9已落地`video-planner/3` requirement、verified
+projection、Router-owned exact selection、provider-bound request、deterministic compilers、new
+request/resolved/activation lineage、old-path retirement、focused tests与Harness routing。
 
-实现只有在本 Spec 与配套 Plan 完成 independent review、review verdict 被接受，且用户再次明确授权 implementation slice 后才可开始。
+Exact implementation snapshot的passing Harness receipt位于
+`.agent/harness/runs/20260820T223106358086Z/receipt.json`。该offline slice未调用Provider、
+ComfyUI或credential，也未生成媒体；后续Local H3 technical regression属于独立授权的runtime
+evidence，不把本slice升级为Shot Quality Gate、subjective quality acceptance、activation、Final
+Acceptance或release truth。
 
 ## Problem Boundary
 
@@ -323,7 +331,8 @@ P5只消费既有desired generation contribution。Requirement改变必须使tar
 | Adapter内隐式creative decision | deterministic mapping table + typed unsupported result | mutation/forbidden-default tests证明adapter不能删降requirement或选Provider |
 | duplicate planner/router enums and manual projection | one explicit versioned projection table and exhaustive enum tests | each Planner mode/continuity/motion maps exactly once or blocks |
 
-Implementation完成前必须删除production call sites的旧path，而不是永久dual-write或shadow-run两套truth。Compatibility fixtures可reopen历史requests，但不得用于创建新production attempts。
+Implementation已删除production call sites的旧path；不得重新引入永久dual-write或shadow-run两套
+truth。Compatibility fixtures可reopen历史requests，但不得用于创建新production attempts。
 
 ## Unchanged Contracts
 
@@ -349,7 +358,9 @@ Implementation完成前必须删除production call sites的旧path，而不是�
 - Current source accessors may delegate old field names to the nested requirement for one implementation checkpoint, but serialized duplicate fields are forbidden。
 - Planning boundary验证v3 request/plan/requirement并签发cycle-neutral verified envelope；Router不importplanning package。
 - v2 plans are not durable state；new boundary rejects them with typed stale/unsupported result and requires replanning。
-- Proposed `ShotReadinessGate` docs must be updated during its future implementation to consume v3 without re-deriving requirement；本slice不实现该gate。
+- 后续独立的`ShotReadinessGate` slice已于commit
+  `404facdb254115b79d156e5d42f2136b5510d800`实现，并消费v3 verified projection而不重新推导
+  requirement；该gate不属于本slice，也不反向扩大本slice的ownership。
 
 ### Durable request migration
 
@@ -358,7 +369,7 @@ Implementation完成前必须删除production call sites的旧path，而不是�
 - No Manifest/Registry layout migration is required solely for the embedded ephemeral requirement；existing attempt serialization may carry additive request fields through the existing request envelope only after compatibility tests prove reopen。
 - No automatic conversion of historical requests to `/5`；replay of historical attempts keeps historical hashes and zero external effects。
 
-## Acceptance Criteria for Future Implementation
+## Implementation Acceptance Criteria
 
 1. One current request deterministically produces one plan with one embedded requirement；same input bytes yield identical hashes。
 2. Top-level plan generation fields are not serialized duplicates；compatibility properties read the nested requirement only。
@@ -386,8 +397,10 @@ Implementation完成前必须删除production call sites的旧path，而不是�
 
 ## Rollback
 
-- Docs-only slice rollback：删除本Spec与配套Plan；runtime无变化。
-- Future implementation在任何 live acceptance前rollback：revert requirement/Router/compiler integration as one unit；保留historical `/1`–`/4` reopen tests与existing lifecycle bytes。
+- Documentation status rollback只revert本次状态文字，不改变runtime。
+- Implemented vertical slice在任何future live acceptance之外的rollback：revert
+  requirement/Router/compiler integration as one unit；保留historical `/1`–`/4` reopen tests与
+  existing lifecycle bytes。
 - 若new `/5` attempt已durable begin，必须使用existing explicit recovery完成或fail closed；不得downgrade成legacy request、删除complete orphan evidence或恢复direct-construction path。
 - Rollback不得重新引入automatic fallback、第二 requirement truth或adapter creative defaults。
 

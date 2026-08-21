@@ -2,16 +2,17 @@
 
 ## Status
 
-Proposed implementation plan；本窗口只写Plan，不执行任何task。
+Implemented and offline-accepted at commit
+`007e99cb1d79f9c2b91a909b15db1f9360f65236`，该commit也是current cached
+`origin/main`；尚未release。T1–T9的source、tests、Harness routing、canonical docs与old-path
+retirement均已完成。Exact implementation snapshot的passing receipt为
+`.agent/harness/runs/20260820T223106358086Z/receipt.json`，覆盖Harness、video Provider、shared
+requirement、Router、Planner与Architecture checks。
 
-Implementation start gate：
-
-1. `docs/superpowers/specs/2026-08-21-ai-video-provider-neutral-generation-requirement.md` 与本Plan完成independent review；
-2. review verdict被parent核验并接受；
-3. 用户再次明确授权implementation；
-4. implementation开始前重新检查current `main`、dirty state、live ownership、policy routing和Provider capability snapshots。
-
-本Plan不授权source/test/policy修改、不授权Provider/ComfyUI/network/credential、不生成媒体，也不授权Local H3或cloud/paid live acceptance。
+本Plan下方的task decomposition保留为implementation history；其中`Implemented work`描述已由
+上述commit完成的offline slice。T10 Local H3 regression后来在独立授权下执行，cloud/paid live
+仍未执行。本Plan及既有receipt均不授权新的Provider/ComfyUI/network/credential调用、媒体生成、
+quality acceptance、Final Acceptance或release。
 
 ## Goal and Boundary
 
@@ -33,11 +34,11 @@ Old paths to remove：run-local prompt construction、orchestration direct provi
 
 Unchanged：Shot、Registry、Manifest、committer、permit、recovery、Dependency Graph、`ResolvedTimeline`、HyperFrames、Review/Repair、Final Acceptance、Legacy CLI/Manifest。
 
-## Planned Change Surface
+## Implemented Change Surface
 
-以下是future implementation的expected ownership surface，不是本轮allowed writes：
+以下是commit `007e99c`实际采用的ownership surface；表内边界不授权新的修改：
 
-| Area | Expected files | Purpose |
+| Area | Implemented files | Purpose |
 | --- | --- | --- |
 | Pure schema | `src/ai_video/production/video_requirement.py` | strict nested neutral models、hashing、forbidden fields；no IO |
 | Planner | `src/ai_video/planning/_planner_models.py`, `video_planner.py` | request/plan v3、typed generation intent、single builder、verified boundary、freshness |
@@ -74,7 +75,7 @@ python -m pytest -p no:cacheprovider \
 
 **Goal:** 建立cycle-neutral strict models，不接Router/Adapter。
 
-Planned work：
+Implemented work：
 
 - add `ProviderNeutralVideoRequirement`及cohesive nested identity/state/continuity/action/camera/reference/output/audio/quality models；
 - implement canonical ordering、NFC validation、requirement ID/hash、recursive forbidden-field validation；
@@ -90,7 +91,7 @@ Exit：pure focused command passes；no current Planner/Router behavior changed�
 
 **Goal:** `VideoPlanner`成为唯一requirement builder，plan内不再重复serialized generation truth。
 
-Planned work：
+Implemented work：
 
 - preserve historical `VideoPlanningRequest` / plan v2 hash fixtures but reject them for new attempts；
 - add required v3 typed generation-intent projection for open/close state、identity/scene/space/axis、action/motion/pacing、camera endpoints and objective capability needs；
@@ -111,7 +112,7 @@ Exit：planner focused tests and existing STOP spies pass；Router/Provider coun
 
 **Goal:** Router从embedded requirement做exact capability matching并输出prompt-free `ProviderBoundVideoRequest`。
 
-Planned work：
+Implemented work：
 
 - consume only the cycle-neutral verified requirement projection；`shot_router.py` must not import `ai_video.planning` or `VideoGenerationPlan`；
 - add one explicit exhaustive mapping from requirement enums/semantic roles to Router mode/roles；
@@ -130,7 +131,7 @@ Exit：Router tests pass；no adapter/Provider/lifecycle call occurs on blocked 
 
 **Goal:** 稳定Adapter API和unsupported semantics，再接real adapters。
 
-Planned work：
+Implemented work：
 
 - define `compile_request(provider_bound, requirement)` pure protocol；
 - define discriminated `CompiledProviderVideoRequest | ProviderRequirementUnsupported`；
@@ -148,7 +149,7 @@ Exit：fake adapter -> existing resolve/preview/lifecycle tests pass offline；o
 
 **Goal:** 对current sealed H3 capability实现deterministic compiler，不修改workflow或live behavior。
 
-Planned work：
+Implemented work：
 
 - Local H3 `fl2va`: first frame required、last frame optional、no reference slots、exact geometry/24fps/native audio/seed semantics；
 - keep base and additive quality profile seals unchanged unless a separate profile migration is explicitly approved；
@@ -163,7 +164,7 @@ Exit：offline H3 tests pass；no ComfyUI、network、credential或media generat
 
 **Goal:** 保留Hailuo 2.3 adaptive I2V truth和strict role boundary。
 
-Planned work：
+Implemented work：
 
 - exactly one first frame；no last/reference role；adaptive `768P`、141 frames@24fps、MP4/no native audio；
 - compile semantic action/camera/pacing without claiming native control；
@@ -176,7 +177,7 @@ Exit：Hailuo offline mapping and legacy lifecycle tests pass；no paid preview/
 
 **Goal:** 对exact dated profile按mode映射semantic roles，保持Ark materialization和paid gates。
 
-Planned work：
+Implemented work：
 
 - I2V first/last role、R2V image refs、edit/extend video/audio refs分别映射；
 - enforce 2.0 Mini count/measurement/duration/output/audio limits and model-specific capability differences；
@@ -191,7 +192,7 @@ Exit：Seedance offline/fake transport tests pass；no credential、Ark call、c
 
 **Goal:** 只有新链路能创建new production attempts，同时历史证据可reopen/replay。
 
-Planned work：
+Implemented work：
 
 - replace production direct request constructors with Planner -> requirement -> Router -> compiler；
 - remove run-local prompt builders and adapter creative defaults；
@@ -207,7 +208,7 @@ Exit：architecture tests find no alternate production path；historical hashes 
 
 **Goal:** 对exact staged snapshot完成policy-routed acceptance。
 
-Planned work：
+Implemented work：
 
 - add `src/ai_video/production/video_requirement.py` and its tests to `production_video_provider` routing；
 - because Planner and Router change，existing `video_planning` and `production_shot_router` categories must also route the shared requirement/focused checks；
@@ -220,9 +221,13 @@ Exit：fresh receipt integrity/policy/snapshot checks pass；independent reviewe
 
 ### T10 — Separately authorized Local H3 live acceptance
 
-**Not part of implementation authorization.** 只有T1–T9 accepted且用户再次明确授权live task后，才可制定bounded execution record。
+**Executed later under separate authorization.** T1–T9 accepted后，Local H3 initial technical
+regression及后续一次用户授权的motion-continuity repair已分别完成；exact lineage、调用计数、
+artifact hash与human verdict记录在
+`docs/record_for_agent/2026-08-21-local-h3-readiness-seed-live-regression.md`。这些runtime
+evidence不属于T1–T9 offline acceptance，也不授权future submit。
 
-Planned boundary：
+Executed boundary：
 
 - exactly one Local H3 compiled request `/5` / resolved `/6` unless user separately expands scope；
 - use current sealed additive quality profile and approved source assets；
@@ -264,7 +269,8 @@ Cloud/paid live remains another separately authorized task with full Paid Provid
 
 ## Exact Verification Commands
 
-Commands are future implementation commands。使用repository-standard `python -m pytest`，不得用裸`pytest`。
+以下是implementation使用并由passing Harness snapshot覆盖的verification commands；后续重验仍使用
+repository-standard `python -m pytest`，不得用裸`pytest`。
 
 ### Pure model and Planner
 
@@ -344,7 +350,7 @@ make harness-receipt RECEIPT=<fresh-range-receipt-path>
 
 ## Harness Changed-Path Routing
 
-Future `.agent/harness/policy.yaml`必须在同一implementation change中显式覆盖：
+`.agent/harness/policy.yaml`已在同一implementation commit中加入以下changed-path routing：
 
 | Changed paths | Required categories/checks |
 | --- | --- |
@@ -364,9 +370,11 @@ Future `.agent/harness/policy.yaml`必须在同一implementation change中显式
 
 不能证明：Provider account access、current pricing、network、billing、real media、visual quality、human GO或Final Acceptance。
 
-### Local H3 live proof — T10 separate authorization
+### Local H3 live proof — T10 executed separately
 
-必须另获user authorization，且使用loopback-only exact profile、one bounded request、current assets、fresh runtime evidence、`ffprobe`/`video-analysis`和human review。不得生成Candidate 2/3，不得把technical proof外推为universal quality acceptance。
+Initial loopback-only technical regression及后续一次明确授权的motion-continuity repair已完成；两次
+均保留exact profile、current assets、fresh runtime evidence、`ffprobe`与human review边界，且未命名
+为Candidate 2/3。该结果不外推为universal quality acceptance，也不授权新的live submit。
 
 ### Cloud/paid live proof — separate future plan
 

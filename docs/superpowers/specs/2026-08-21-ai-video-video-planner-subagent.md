@@ -2,7 +2,18 @@
 
 ## Status
 
-Proposed v2; documentation-only specification. Runtime implementation is planned but not accepted by this document.
+Implemented and offline-accepted。Initial provider-neutral Planner runtime由commit
+`779d40d9f7426f82d2dac72a73adee3b22d283bb`引入，Harness/architecture closure由
+`a232d151f0ca3d1b33588e05db4c2dc2545aeaf5`完成；passing completion receipt为
+`.agent/harness/runs/video-planner-complete-20aeeff-a232d15/receipt.json`。Commit `007e99c`
+将new-attempt contract升级到`video-planner/3`并内嵌provider-neutral requirement；commit
+`404facd`再把current projection verification与structural readiness decision分别收敛到Planning
+verifier和`ShotReadinessGate`。Planner v3 core已进入current cached `origin/main`，后续Gate
+compatibility refinement仍只在local `main`；均尚未release。
+
+本spec没有独立同名`docs/superpowers/plans/`文件；这是保留的documentation organization gap，
+不是runtime未实现证据。本status不证明Provider调用、media generation、activation、creative
+quality、Review或Final Acceptance。
 
 The planner is a provider-neutral, plan-only per-Shot preflight. It audits the coherence of approved Shot intent, continuity evidence, motion requirements, available references, and the declared visual strategy before AI-VIDEO generation or composition. It does not own Production state, select a Provider, render media, or accept creative quality.
 
@@ -28,7 +39,9 @@ The accepted source surface is `src/ai_video/planning/`:
 - `require_current_video_plan()` is the Main Agent consumer. It validates request/plan seals, source request hash, Shot identity, outcome, human-review warnings, and required current assets before invoking a handoff.
 - `prepare_shot_for_existing_production()` is a compatibility handoff wrapper; it does not create durable state.
 
-The planner is proposed/runtime-adjacent. The existence of named modules or tests is not acceptance evidence by itself; executable truth remains source, tests, policy-routed Harness receipts, and verified runtime behavior.
+The planner is implemented and offline-accepted. Named modules or tests alone仍不构成acceptance；
+上述commits、policy-routed Harness receipts、current source/tests与verified runtime evidence共同定义
+current truth。
 
 ## Scope
 
