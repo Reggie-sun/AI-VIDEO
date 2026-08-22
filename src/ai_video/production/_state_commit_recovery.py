@@ -27,6 +27,7 @@ from ai_video.production.paths import (
     canonical_continuity_transition_policy_path,
     canonical_dependency_graph_snapshot_path,
     canonical_execution_stack_identity_path,
+    canonical_execution_stack_materialization_source_path,
     canonical_p0_qualification_input_path,
     canonical_real_shot_validation_set_path,
     canonical_repair_request_path,
@@ -281,6 +282,15 @@ class _StateCommitRecoveryMixin:
                     hashlib.sha256(_canonical_json_bytes(item)).hexdigest()
                 )
                 for item in stacks
+            },
+            **{
+                canonical_execution_stack_materialization_source_path(
+                    kind,
+                    getattr(item, f"{kind}_hash"),
+                ): getattr(item, f"{kind}_hash")
+                for item in stacks
+                if item.materialization_status == "materialized"
+                for kind in ("profile", "compiler", "workflow")
             },
             **{
                 canonical_continuity_transition_policy_path(item.policy_hash): (

@@ -6,6 +6,10 @@ from typing import TypeVar
 
 from pydantic import BaseModel, ValidationError
 
+from ai_video.production.execution_stack_materialization import (
+    prepare_execution_stack_source_artifacts,
+    verify_execution_stack_source_artifacts,
+)
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
     P0QualificationPreparedReceiptPointer,
@@ -370,9 +374,18 @@ class _StateCommitP0QualificationMixin:
                 canonical_p0_qualification_receipt_path(materialized_receipt.content_hash),
                 materialized_receipt,
             )
+            source_artifacts = tuple(
+                PreparedArtifact(
+                    relative_path=artifact.relative_path,
+                    payload=artifact.payload,
+                    file_sha256=artifact.file_sha256,
+                )
+                for artifact in prepare_execution_stack_source_artifacts(materializations)
+            )
             artifacts = tuple(
                 sorted(
                     (
+                        *source_artifacts,
                         *(
                             _prepared_artifact(
                                 canonical_execution_stack_identity_path(stack.execution_stack_hash),
@@ -425,8 +438,15 @@ class _StateCommitP0QualificationMixin:
             reopened = self._read_manifest()
             if reopened != updated:
                 raise _state_invalid("P0 materialization Manifest did not reopen exactly.")
-            self._reopen_p0_pointer(
-                materialized_receipt_pointer := updated.active_p0_qualification_prepared
+            final_bundle = self._reopen_p0_pointer(
+                updated.active_p0_qualification_prepared
+            )
+            self._validate_p0_selection_current(
+                reopened,
+                final_bundle[0],
+                policies=final_bundle[2],
+                validation_set=final_bundle[3],
+                require_materialized=True,
             )
             return reopened
 
@@ -454,10 +474,23 @@ class _StateCommitP0QualificationMixin:
             policies=policies,
             validation_set=validation_set,
         )
-        if require_materialized:
-            reopened = self._reopen_p0_pointer(manifest.active_p0_qualification_prepared)
-            if any(stack.materialization_status != "materialized" for stack in reopened[1]):
-                raise _state_invalid("P0 execution stack is unmaterialized and cannot execute.")
+        reopened = self._reopen_p0_pointer(manifest.active_p0_qualification_prepared)
+        materialized = tuple(
+            stack.materialization_status == "materialized" for stack in reopened[1]
+        )
+        if require_materialized and not all(materialized):
+            raise _state_invalid("P0 execution stack is unmaterialized and cannot execute.")
+        if all(materialized):
+            try:
+                verify_execution_stack_source_artifacts(
+                    self._project_root,
+                    reopened[1],
+                )
+            except ValueError as exc:
+                raise _state_invalid(
+                    "P0 execution stack source artifacts are invalid.",
+                    str(exc),
+                ) from exc
 
     def _reopen_p0_pointer(
         self, pointer: P0QualificationPreparedReceiptPointer

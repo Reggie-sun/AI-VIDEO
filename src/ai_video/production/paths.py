@@ -197,6 +197,18 @@ def canonical_execution_stack_identity_path(content_hash: str) -> Path:
     )
 
 
+def canonical_execution_stack_materialization_source_path(
+    kind: str,
+    content_hash: str,
+) -> Path:
+    if kind not in {"profile", "compiler", "workflow"}:
+        raise ValueError("Execution stack materialization source kind is unsupported")
+    return Path(
+        "state/video-qualification/execution-stack-sources/"
+        f"{kind}/{_require_sha256(content_hash, 'execution stack source hash')}.bin"
+    )
+
+
 def canonical_continuity_transition_policy_path(content_hash: str) -> Path:
     return Path(
         "state/video-qualification/transition-policies/"

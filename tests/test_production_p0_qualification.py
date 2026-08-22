@@ -12,6 +12,7 @@ from ai_video.production.models import (
     P0QualificationPreparedReceiptPointer,
     ProductionManifest,
     ProjectSnapshotPointer,
+    RecoveryDisposition,
     RegistrySnapshotPointer,
     canonical_project_snapshot_path,
     canonical_registry_snapshot_path,
@@ -24,7 +25,7 @@ from ai_video.production.paths import (
     canonical_real_shot_validation_set_path,
 )
 from ai_video.production.project import load_production_project
-from ai_video.production.state_commit import ProductionStateCommitter
+from ai_video.production.state_commit import CommitPhase, ProductionStateCommitter
 from ai_video.production._state_commit_common import _validated_transition
 from ai_video.production.video_execution_stack import (
     ExecutionStackMaterialization,
@@ -641,6 +642,95 @@ def test_recovery_reopens_all_selected_p0_evidence_and_rejects_tamper(
     assert error.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
 
 
+def test_recovery_tracks_and_rehashes_materialized_source_artifacts(tmp_path: Path):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-source-recovery-base",
+    )
+    materials = (_materialization("m0", 6), _materialization("m1", 9))
+    writer.materialize_p0_qualification(
+        materializations=materials,
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id="p0-source-recovery-materialize",
+    )
+
+    report = writer.recover()
+    active_paths = {
+        item.path for item in report.items if item.disposition.value == "active"
+    }
+    expected_sources = {
+        _materialization_source_path(tmp_path, kind, content_hash).relative_to(tmp_path)
+        for materialization in materials
+        for kind, content_hash in (
+            ("profile", materialization.profile_hash),
+            ("compiler", materialization.compiler_hash),
+            ("workflow", materialization.workflow_hash),
+        )
+    }
+    assert expected_sources <= active_paths
+
+    damaged = _materialization_source_path(
+        tmp_path,
+        "workflow",
+        materials[0].workflow_hash,
+    )
+    damaged.write_bytes(b"damaged-workflow")
+    with pytest.raises(AiVideoError) as error:
+        writer.recover()
+    assert error.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+
+
+def test_recovery_preserves_source_promoted_before_materialization_manifest(
+    tmp_path: Path,
+):
+    class _CrashAfterFirstArtifactPromotion:
+        def checkpoint(self, phase: CommitPhase) -> None:
+            if phase is CommitPhase.AFTER_ARTIFACT_PROMOTION:
+                raise RuntimeError("fixture crash after first artifact promotion")
+
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    prepared = writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-source-orphan-base",
+    )
+    crashing = ProductionStateCommitter(
+        tmp_path,
+        crash_injector=_CrashAfterFirstArtifactPromotion(),
+    )
+    with pytest.raises(AiVideoError, match="promote immutable"):
+        crashing.materialize_p0_qualification(
+            materializations=(_materialization("m0", 6), _materialization("m1", 9)),
+            expected_manifest_revision=prepared.manifest_revision,
+            attempt_id="p0-source-orphan-materialize",
+        )
+
+    assert ProductionStateCommitter(tmp_path).reopen_p0_qualification_prepared()[0] == receipt
+    source_paths = tuple(
+        path.relative_to(tmp_path)
+        for path in tmp_path.glob(
+            "state/video-qualification/execution-stack-sources/*/*.bin"
+        )
+    )
+    assert len(source_paths) == 1
+    report = ProductionStateCommitter(tmp_path).recover()
+    assert any(
+        item.path == source_paths[0]
+        and item.disposition is RecoveryDisposition.ORPHAN_PRESERVED
+        for item in report.items
+    )
+
+
 def test_p0_commit_rejects_receipt_not_bound_to_current_project(tmp_path: Path):
     (
         writer,
@@ -871,6 +961,19 @@ def _materialization(label: str, profile_index: int) -> ExecutionStackMaterializ
     )
 
 
+def _materialization_source_path(
+    root: Path,
+    kind: str,
+    content_hash: str,
+) -> Path:
+    return (
+        root
+        / "state/video-qualification/execution-stack-sources"
+        / kind
+        / f"{content_hash}.bin"
+    )
+
+
 def test_unmaterialized_p0_denies_execution_stack_use(tmp_path: Path):
     writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
     writer.record_p0_qualification_prepared(
@@ -919,6 +1022,73 @@ def test_materialization_reseals_all_stack_dependents_and_keeps_m1_absent(tmp_pa
     assert all(item.execution_stack_hashes == tuple(sorted(stack.execution_stack_hash for stack in new_stacks)) for item in new_inputs)
     assert new_stacks[1].components[1].presence == "absent"
     assert new_stacks[1].components[1].content_hash == "none"
+
+
+def test_materialization_persists_exact_content_addressed_source_bytes(tmp_path: Path):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-materialize-source-base",
+    )
+    materials = (_materialization("m0", 6), _materialization("m1", 9))
+    writer.materialize_p0_qualification(
+        materializations=materials,
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id="p0-materialize-source",
+    )
+
+    for materialization in materials:
+        for kind in ("profile", "compiler", "workflow"):
+            content_hash = getattr(materialization, f"{kind}_hash")
+            payload = getattr(materialization, f"{kind}_bytes")
+            assert _materialization_source_path(
+                tmp_path, kind, content_hash
+            ).read_bytes() == payload
+
+
+@pytest.mark.parametrize("damage", ("missing", "tampered", "swapped", "symlink"))
+def test_materialized_source_artifact_damage_fails_closed(
+    tmp_path: Path,
+    damage: str,
+):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id=f"p0-materialize-source-{damage}-base",
+    )
+    materials = (_materialization("m0", 6), _materialization("m1", 9))
+    writer.materialize_p0_qualification(
+        materializations=materials,
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id=f"p0-materialize-source-{damage}",
+    )
+    profile_path = _materialization_source_path(
+        tmp_path,
+        "profile",
+        materials[0].profile_hash,
+    )
+    if damage == "missing":
+        profile_path.unlink()
+    elif damage == "tampered":
+        profile_path.write_bytes(b"tampered-profile")
+    elif damage == "swapped":
+        profile_path.write_bytes(materials[0].compiler_bytes)
+    else:
+        profile_path.unlink()
+        profile_path.symlink_to(tmp_path / "project.yaml")
+
+    with pytest.raises(AiVideoError, match="source"):
+        writer.reopen_p0_qualification_prepared(require_materialized=True)
 
 
 def test_materialized_stack_drift_and_stale_dependents_are_denied(tmp_path: Path):

@@ -400,6 +400,7 @@ categories:
   shot_continuity_p0:
     patterns:
       - scripts/prepare_shot_continuity_p0.py
+      - src/ai_video/production/execution_stack_materialization.py
       - src/ai_video/production/video_execution_stack.py
       - src/ai_video/production/video_transition.py
       - tests/test_prepare_shot_continuity_p0.py
