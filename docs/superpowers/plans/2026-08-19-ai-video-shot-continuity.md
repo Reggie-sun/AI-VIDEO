@@ -749,7 +749,33 @@ no fallback
 保存exact input SHA-256、Registry identities、request/resolved/fingerprint、`execution_stack_hash`、
 submit/status/fetch receipts、output/probe、decoded first/last frame hashes与replay counters。
 
-Single-boundary technical smoke通过后，使用同一sealed snapshot执行6 Shot / 30-second
+### T8 32-Second Route-Kill Screen
+
+Single-boundary technical smoke通过后，先执行spec中的T8 32-second capability screen，不直接进入
+6-Shot baseline。该screen使用一个exact Local T8 model/checkpoint/profile、`ScenePlusIdentity`、22-frame
+latent context、single character、single station-concourse scene与medium motion。
+
+Freeze receipt在GPU运行前必须包含：
+
+- exact model/checkpoint/profile/runtime/plugin/workflow hashes；
+- exact canonical reference bytes/hash与frozen three-field prompt hash；
+- single-take Shot contract；
+- `1344x768`、`24 fps`、`770 frames = 32.083s`；
+- exact sampling/context settings；
+- first seed `320001`与conditional seeds `320002`、`320003`、`320004`；
+- frozen `CONTINUE`/`STOP` rubric与“不允许临时降低门槛”。
+
+First seed只回答“这条长镜头路线在当前5090和用户审美下是否值得继续”：
+
+1. `STOP`：立即结束32-second route，不跑后续seeds，不降resolution/duration/motion/rubric来补考；
+2. `CONTINUE`：保持其他所有frozen surfaces不变，顺序跑完另外3个seeds；
+3. 无论结果，都只报告experimental evidence，不把32.083-second output描述为当前OpenVideo
+   15-second product profile的supported capability。
+
+当该route评估得到明确的用户结论后，才继续single-Provider baseline。长镜头route为`STOP`不自动
+否定正常hard-cut baseline；两个实验回答不同问题。
+
+Single-Provider route冻结后，使用同一sealed snapshot执行6 Shot / 30-second
 single-stack baseline。该baseline不得包含跨Provider；如果成片不值得保留，先归因selected model/
 checkpoint/profile、canonical reference、prompt、Shot contract或sampling，不得启动Milestone 8。
 
@@ -1143,7 +1169,8 @@ freeze inventory + RealShotValidationSet + policies + unmaterialized stack paylo
           |                     |
 Implementation I2          Validation V2
 Milestone 6               Milestone 7
-lifecycle/replay/P5       6-Shot / 30s baseline + P6
+lifecycle/replay/P5       T8 32s route-kill screen
+                          then 6-Shot / 30s baseline + P6
           |                     |
           +----------+----------+
                      |

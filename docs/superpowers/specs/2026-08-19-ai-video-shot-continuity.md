@@ -758,6 +758,47 @@ frame-integrity和side-by-side artifacts。具体PSNR/SSIM、resolution、frame 
 runtime baseline或exact record，不在本normative spec固化；任何该类evidence都只满足technical
 live-local proof，不能替代blinded human rubric或宣称subjective quality accepted。
 
+### T8 32-Second Capability Screen
+
+30-second multi-Shot baseline之前，先对Local T8做一次有意的out-of-envelope长镜头筛选。该实验
+只回答：`ScenePlusIdentity + 22-frame latent context`在当前RTX 5090和用户审美下，是否值得
+继续投入。它不证明current OpenVideo product profile已支持32秒Shot；当前product guidance的
+supported maximum仍为15秒/Shot。
+
+实验前冻结：
+
+| Frozen surface | Contract |
+| --- | --- |
+| Model/checkpoint/profile | exact Local T8 model/checkpoint/profile；`ScenePlusIdentity`；22-frame latent context；exact runtime/plugin/workflow seals |
+| Reference | 一张approved canonical character reference，exact bytes/hash |
+| Shot contract | single character、single station-concourse scene、single continuous take、medium subject/camera motion、no cut |
+| Seed | first screen `320001`；conditional seeds `320002`、`320003`、`320004`预先冻结，不在观看后替换 |
+| Resolution/timing | `1344x768`、`24 fps`、model-grid `770 frames = 32.083s`；不伪称exact 32.000s |
+| Sampling | exact sampler/scheduler/steps/quant/conditioning/context-overlap settings |
+| Prompt | 本节frozen H3 three-field prompt |
+| Rubric | first seed只产生`CONTINUE`/`STOP`；不允许临时降低门槛 |
+
+Frozen prompt：
+
+```text
+For the target video, <Picture 1> is fully referenced for the exact character identity, short straight black bob haircut, beige trench coat, white shirt, dark trousers, white sneakers and distinctive small red leather satchel with a brass buckle.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic realistic photography in one uninterrupted take inside a modern quiet railway-station concourse under soft overcast daylight. The same 25-year-old East Asian woman walks steadily from frame left toward frame right at medium speed while carrying the red leather satchel in her right hand. A waist-to-chest-height camera tracks parallel with restrained stabilized inertia and medium motion, preserving realistic body scale and spatial layout. She passes concrete columns and glass windows, briefly turns her head toward a departure display without changing identity, continues walking, then gradually slows and comes to a natural stop near the end. Preserve one character, one scene, one continuous screen direction, physically plausible gait, cloth and satchel motion, stable face, wardrobe, lighting and architecture. No cut, scene reset, pose reset, teleportation, motion freeze, repeated action loop, sudden acceleration, unmotivated zoom, duplicated person, extra limbs, text, subtitle or logo.
+overall_soundscape: Continuous quiet concourse ambience, soft ventilation and distant restrained station activity. Footsteps, coat movement and the leather satchel remain physically synchronized throughout the uninterrupted take.
+non_diegetic_music: No non-diegetic music.
+```
+
+First seed `320001`只做route-kill screen，不作capability PASS：
+
+- `STOP`：OOM/crash、无法完成exact 770-frame output，或raw full-speed观看出现明显identity/scene
+  drift、latent-context seam、motion freeze/loop、结构崩坏，或用户明确不愿为这条路线再看3个seeds；
+- `CONTINUE`：长镜头在当前5090上完整可看，单角色/单场景、中等运动与context-window
+  transitions没有明昴fatal defect，且用户明确认为值得再跑3个seeds。
+
+只有first seed为`CONTINUE`时，才顺序执行`320002`、`320003`、`320004`。三个conditional seeds
+不改任何其他frozen surface。如果first seed为`STOP`，立即停止扩展该长镜头路线，不用
+shorter duration、lower resolution、更弱motion或更松rubric改写结论。
+
 ### Single-Provider 30-Second Six-Shot Baseline
 
 跨Provider试验前必须先完成一条single-Provider/model baseline。该baseline只回答：在允许正常
