@@ -18,6 +18,10 @@ Hailuo 与 Seedance Mini attempts 继续作为 runtime record；它们不再决�
 本轮只更新 plan。Plan 本身不授权 runtime implementation、模型安装/融合、ComfyUI 升级、local live
 generation、remote/paid preview/POST、permit、activation、push 或 release。
 
+2026-08-22进一步接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
+Implementation lane与Validation lane。Validation必须绑定immutable checkpoint，不得在同一次attempt期间
+读取正在变化的source/workflow/profile；并行执行不会放宽Provider、permit、P6或same-file ownership gates。
+
 ## Goal
 
 按一个可验证、无 fallback 的顺序交付：
@@ -258,6 +262,19 @@ Production child。
   routing/ownership updates；同步 `tests/test_agent_harness.py`。
 - Keep this plan and governing spec as the only Shot Continuity artifact owners。
 
+### Parallel Lane Ownership
+
+- Implementation lane独占repository source、tests、workflow template/binding/profile与canonical docs的写入。
+- Validation lane不拥有repository files；它只消费一个已commit、已hash、preflight通过的candidate snapshot，
+  并通过canonical Product Runtime写入attempt、receipt、artifact与review evidence。
+- Validation发现的问题只能形成immutable failure evidence和bounded change request；不得hot-edit正在验证的
+  workflow/profile/model identity，也不得直接修改Implementation lane文件。
+- 同一Validation attempt开始后，candidate commit、workflow、binding、profile、model/artifact、fixture、
+  prompt、sampling参数与rubric全部冻结。任一项改变都产生新candidate identity并要求新attempt；旧evidence
+  不得迁移到新snapshot。
+- 两个write-capable workers仍不得同时修改同一file。Validation runner不因产生runtime evidence而取得
+  repository writer authority。
+
 ## Entry Gates
 
 开始任何 implementation milestone 前：
@@ -270,6 +287,61 @@ Production child。
    intent与one-use permit；不得复用历史authorization或permit。
 6. Model/artifact inventory必须记录 exact filename、bytes、SHA-256、license/provenance、ComfyUI/T8 commit、
    node schema与profile hashes；缺项保持unavailable。
+
+## Parallel Execution Model
+
+### Phase P0 — Shared Freeze
+
+Milestone 3先冻结inventory、four-anchor fixture、prompt、Stock20参数、rubric、candidate identities与effect
+budget。P0是两个lane的共同前置条件；冻结前不得启动M0 generation，也不得创建final Production
+capability identity。
+
+### Phase P1 — Qualification and Safe Implementation in Parallel
+
+P0完成后并行推进：
+
+| Lane | Allowed work | Forbidden work |
+| --- | --- | --- |
+| Implementation I1 | Milestone 1 C4 regression；Milestone 2 Seedance base-only isolation；Milestone 5的candidate-neutral RED contracts、child protocol/family denial tests与fake transport seam | 不确定winner前不得封最终capability/model/profile/workflow identity；不得修改Validation正在消费的sealed candidate bundle |
+| Validation V1 | Milestone 4 M0 single-boundary attempt；M0失败时按gate执行conditional M1；保存exact technical与human evidence | 不修改source/tests/workflow/profile；不重试、不fallback、不边看结果边改阈值 |
+
+I1可以先写winner-independent tests和interfaces，但所有包含`ref2va-stock20`或`hybrid-stock20`的Production
+files/exports/active snapshot必须等Join Gate J1。
+
+### Join Gate J1 — Select One Winner
+
+J1只接受M0或M1中一个满足frozen gates的candidate：
+
+- winner identity、model/artifact、workflow/binding/profile与qualification evidence全部sealed；
+- loser保持experimental evidence，不进入Production snapshot；
+- 两者都失败则停止Local destination implementation，不用Implementation lane的进度倒逼quality PASS；
+- unknown outcome先走explicit recovery，J1保持open。
+
+J1关闭后，Implementation lane才可完成Milestone 5 winner-specific child与Production exports。
+
+### Phase P2 — Production Integration and Multi-Shot Pilot in Parallel
+
+Milestone 5形成一个task-only checkpoint，并通过focused tests、preflight与exact Harness后，冻结为
+`validation_snapshot`。随后并行推进：
+
+| Lane | Allowed work | Snapshot rule |
+| --- | --- | --- |
+| Implementation I2 | Milestone 6 fake lifecycle、recovery、replay、P5与documentation preparation | 可在与provider/profile/workflow不重叠的files继续；若修改validation snapshot中的任何bytes，必须产生新checkpoint并使旧Pilot不具备promotion资格 |
+| Validation V2 | Milestone 7先复核single boundary，再做3–4 Shot、至少2个continuity edges的single-Provider full-speed Pilot | 全程固定commit/profile/workflow/model/artifact/fixture/rubric；one submit per generation，no retry，no fallback |
+
+Validation V2不得在I2尚未commit的working tree上运行，也不得把later code changes与earlier media receipts拼成
+同一acceptance bundle。
+
+### Join Gate J2 — Destination Acceptance
+
+只有I2 lifecycle/replay/P5 evidence与V2 boundary/identity/motion/P6/human evidence同时绑定同一或可证明
+byte-identical的validation snapshot，才能达到`C4_DESTINATION_READY`。若I2在Pilot后改变任何semantic或
+execution identity，必须重跑受影响的V2 gates。
+
+### Phase P3 — Transition Work
+
+J2关闭后才开始Milestone 8 directed certification。Milestone 9 Seedance semantic lane可独立准备formal
+evidence，但不得作为Local失败fallback，也不得在J2前被用来声称multi-provider readiness。
 
 ## Milestone 1: Reconfirm C4 Core Closure
 
@@ -339,6 +411,9 @@ Seedance 2.0 model支持exact four-role union。
 
 ## Milestone 3: Freeze Local T8 Candidate Qualification
 
+本milestone是Parallel Phase P0，由两个lane共同消费；不得把它分成两份各自漂移的fixture、profile或
+rubric。
+
 ### Inventory Preflight
 
 生成read-only inventory report，绑定：
@@ -370,10 +445,13 @@ task_type        -> literal Hybrid
 
 ### Exit Criteria
 
-形成content-addressed qualification inputs与两个明确candidate states；尚未生成媒体时只能报告
-`qualification prepared`。
+形成content-addressed qualification inputs、两个明确candidate states与P0 freeze receipt；尚未生成媒体
+时只能报告`qualification prepared`。P0关闭后可同时启动Implementation I1与Validation V1。
 
 ## Milestone 4: Execute M0, Then Conditional M1
+
+本milestone属于Validation V1。它只验证单个continuity boundary的model/conditioning feasibility，不等待
+完整Production child，也不替代Milestone 7的multi-shot Pilot。
 
 ### M0 — Stock Ref2VA Control
 
@@ -409,7 +487,8 @@ task_type        -> literal Hybrid
 ### Exit Criteria
 
 最多一个candidate被选为Production implementation winner。两个都失败时本计划在Local destination gate
-保持blocked，不注册C4 capability。
+保持blocked，不注册C4 capability。Winner evidence关闭Join Gate J1；在此之前Implementation I1只能完成
+candidate-neutral work。
 
 ## Milestone 5: Implement Winner-Specific Local C4 Child
 
@@ -425,6 +504,9 @@ task_type        -> literal Hybrid
 - request只能使用`IMAGE_TO_VIDEO + MULTI_ANCHOR`；
 - compile/resolve/preview纯deterministic，preflight无Provider effect；
 - one-use local permit、loopback-only endpoint、no remote/fallback。
+
+上述winner-independent RED cases可在Implementation I1编写。包含winner capability ID、model identity、
+artifact requirement或final workflow filename的expected values必须在J1关闭后一次性冻结，不能由I1猜测。
 
 ### GREEN
 
@@ -455,6 +537,12 @@ python -m pytest -p no:cacheprovider \
   tests/test_production_shot_router.py \
   tests/test_production_provider_neutral_adapters.py -q
 ```
+
+### Validation Snapshot Checkpoint
+
+Milestone 5完成后必须先建立task-only commit，并对exact commit range完成focused tests、profile preflight、
+Harness与receipt verification。该commit及其workflow/profile/model/artifact hashes构成唯一
+`validation_snapshot`；Milestone 7不得消费unstaged working tree或later unsealed edits。
 
 ## Milestone 6: Close Lifecycle, Replay and P5
 
@@ -487,6 +575,8 @@ python -m pytest -p no:cacheprovider \
 
 ## Milestone 7: Full Four-Anchor Local Acceptance
 
+本milestone属于Validation V2，可以与Milestone 6中不修改`validation_snapshot` bytes的work并行。
+
 ### Technical Smoke
 
 对winner执行一个single request：
@@ -506,6 +596,14 @@ no fallback
 保存exact input SHA-256、Registry identities、request/resolved/fingerprint、workflow/profile/model/artifact
 hashes、submit/status/fetch receipts、output/probe、decoded first/last frame hashes与replay counters。
 
+Single-boundary technical smoke通过后，使用同一sealed snapshot继续3–4 Shot single-Provider Pilot：
+
+- 至少3个Shots与2个continuity edges；
+- 同一canonical character与scene，包含一次明显subject motion和一次明显camera motion；
+- 每个generation各自one submit、no retry、no fallback；
+- 每个edge分别记录exact anchors、boundary/identity/motion evidence，不用平均分掩盖单edge失败；
+- 最终按full-speed sequence review累计identity drift、camera velocity drift、action phase与空间叙事连续性。
+
 ### Quality Gates
 
 - Boundary：decoded frame 0与terminal frame分别计算frozen PSNR/SSIM/perceptual metrics，保存side-by-side与
@@ -520,7 +618,9 @@ hashes、submit/status/fetch receipts、output/probe、decoded first/last frame 
 ### Exit Criteria
 
 全部通过后达到`C4_DESTINATION_READY`。任何quality dimension rejection、`NOT_EVALUATED`缺human fallback、
-unknown outcome或incomplete evidence都保持`experimental / unavailable`。
+unknown outcome或incomplete evidence都保持`experimental / unavailable`。Promotion bundle必须同时包含
+Milestone 6的I2 evidence与本milestone的V2 evidence，并证明二者绑定same/byte-identical
+`validation_snapshot`，从而关闭Join Gate J2。
 
 ## Milestone 8: Establish Directed Transition Certification
 
@@ -643,7 +743,8 @@ Harness不执行Provider、paid call、media generation或P6；receipt只能证�
 ### `C4_DESTINATION_READY`
 
 - 一个winner-specific Local T8 child完成profile/preflight、fake lifecycle、full four-anchor local smoke、
-  activation/reopen/replay、boundary/identity/motion与P6/human acceptance。
+  3–4 Shot single-Provider Pilot、activation/reopen/replay、boundary/identity/motion与P6/human acceptance；
+- Implementation与Validation evidence绑定same/byte-identical sealed snapshot，Join Gate J2关闭。
 
 ### `DIRECTED_TRANSITION_READY`
 
@@ -673,6 +774,7 @@ pair后最多升级到`DIRECTED_TRANSITION_READY`。在第二个same-grade desti
 | Lifecycle | permit、submit/status/fetch、unknown recovery、candidate/activation/reopen/replay |
 | P5 | four exact inputs的precise closure；unrelated assets保持fresh |
 | Local live | one request、one submit、no retry、no fallback，全部input/output hashes |
+| Multi-shot Pilot | 3–4 Shots、至少2 edges、same snapshot、逐edge evidence与full-speed cumulative drift review |
 | Boundary | decoded frame 0/terminal evidence，native role与pixel equality分开 |
 | Identity | multi-window subject/appearance/drift；不足为`NOT_EVALUATED` |
 | Motion | direction、velocity、phase、entrance/exit、stop/re-entry |
@@ -683,34 +785,47 @@ pair后最多升级到`DIRECTED_TRANSITION_READY`。在第二个same-grade desti
 ## Execution Order
 
 ```text
-Milestone 1  C4 core regression closure
-      |
-      +---- Milestone 2  Seedance 2.0 active-inventory isolation
-      |
-      v
-Milestone 3  Local candidate inventory + frozen qualification
-      v
-Milestone 4  M0; conditional M1; select one winner
-      v
-Milestone 5  winner-specific Local C4 child
-      v
-Milestone 6  lifecycle/replay/P5 closure
-      v
-Milestone 7  full four-anchor local + P6 acceptance
-      v
-Milestone 8  directed transition certification
+P0 / Milestone 3
+freeze inventory + fixture + candidates + rubric
+                     |
+          +----------+----------+
+          |                     |
+Implementation I1          Validation V1
+Milestone 1               Milestone 4
+Milestone 2               M0 single edge
+Milestone 5 RED/common     conditional M1
+          |                     |
+          +----------+----------+
+                     |
+              Join Gate J1
+              select one winner
+                     |
+              Milestone 5 GREEN
+              sealed child checkpoint
+                     |
+          +----------+----------+
+          |                     |
+Implementation I2          Validation V2
+Milestone 6               Milestone 7
+lifecycle/replay/P5       3-4 Shot Pilot + P6
+          |                     |
+          +----------+----------+
+                     |
+              Join Gate J2
+              C4_DESTINATION_READY
+                     |
+              Milestone 8
+              directed certification
 
 Milestone 9  optional base Seedance semantic lane
-      |
-      v
 Milestone 10 same-grade second-destination claim gate
-
-Milestone 11 documentation/review/Harness runs at each real checkpoint
+Milestone 11 docs/review/Harness at every checkpoint
 ```
 
-Milestone 2可与Milestone 3的read-only preparation独立进行，但不得并发修改同一files。Milestone 4必须在
-qualification inputs/rubric冻结后进行；Milestone 5不得在winner确定前创建模糊Production identity；
-Milestone 8必须在destination ready后进行；Milestone 9不阻塞Local Grade E，也不得成为其fallback。
+并行表示wall-clock overlap，不表示dependency消失。Milestone 4必须在P0冻结后进行；Milestone 5不得在
+J1前创建final Production identity；Milestone 7只消费sealed checkpoint；Milestone 8必须在J2后进行；
+Milestone 9不阻塞Local Grade E，也不得成为其fallback。任何same-file writer overlap仍在写入前由用户决定
+ownership或顺序。
 
 ## Rollback and Failure Policy
 
@@ -733,6 +848,10 @@ Milestone 8必须在destination ready后进行；Milestone 9不阻塞Local Grade
 - 至少一个不同source Provider到Local T8的exact direction达到`DIRECTED_TRANSITION_READY`；
 - canonical docs、independent review与exact Harness receipts完成；
 - 未购买、未授权、未验证或不同grade的routes继续fail closed。
+
+并行执行本身不构成acceptance。Final evidence必须证明Implementation I2与Validation V2绑定同一或
+byte-identical `validation_snapshot`；若candidate source、workflow、profile、model/artifact、fixture或
+rubric在Pilot期间漂移，相关Pilot必须重新运行。
 
 这仍不等于“多 Provider destination可以同等级流畅切换”。只有Milestone 10的第二个same-grade destination
 和对应directed certifications真正完成后，才能升级该产品声明；只有完整声明矩阵逐项认证后，才能称
