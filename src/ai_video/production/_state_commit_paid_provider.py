@@ -158,6 +158,7 @@ class _StateCommitPaidProviderMixin:
                 "2.7",
                 "2.8",
                 "2.9",
+                "2.10",
             }:
                 raise _state_invalid("Paid Provider submit intent requires a provider-aware Manifest.")
             attempt = self._paid_attempt(manifest, preview.attempt_id)
@@ -190,7 +191,7 @@ class _StateCommitPaidProviderMixin:
                     )
                 request = self._reopen_video_request(video_state.request)
                 if (
-                    manifest.schema_version not in {"2.7", "2.8", "2.9"}
+                    manifest.schema_version not in {"2.7", "2.8", "2.9", "2.10"}
                     or attempt.operation != "video_generation"
                     or video_state.phase is not VideoAttemptPhase.REQUEST
                     or request.resolved_generation_hash
@@ -264,7 +265,7 @@ class _StateCommitPaidProviderMixin:
                 {
                     "schema_version": (
                         manifest.schema_version
-                        if manifest.schema_version in {"2.7", "2.8", "2.9"}
+                        if manifest.schema_version in {"2.7", "2.8", "2.9", "2.10"}
                         else "2.6"
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,
@@ -354,7 +355,7 @@ class _StateCommitPaidProviderMixin:
             attempt = self._paid_attempt(manifest, receipt.attempt_id)
             state = attempt.paid_provider_state
             if (
-                manifest.schema_version not in {"2.6", "2.7", "2.8", "2.9"}
+                manifest.schema_version not in {"2.6", "2.7", "2.8", "2.9", "2.10"}
                 or state is None
                 or state.phase is not PaidProviderAttemptPhase.SUBMIT_INTENT
                 or manifest.active_paid_provider_budget is None

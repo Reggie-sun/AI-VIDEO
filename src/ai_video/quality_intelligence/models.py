@@ -15,7 +15,9 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    SerializerFunctionWrapHandler,
     field_validator,
+    model_serializer,
     model_validator,
 )
 
@@ -121,6 +123,12 @@ def _require_sorted_safe_ids(values: tuple[str, ...], label: str) -> tuple[str, 
     if any(re.fullmatch(_SAFE_ID, value) is None for value in values):
         raise ValueError(f"{label} contain an invalid identifier")
     return values
+
+
+def _require_plain_pattern(value: object, pattern: str, label: str) -> object:
+    if isinstance(value, str) and re.fullmatch(pattern, value) is None:
+        raise ValueError(f"{label} is invalid")
+    return value
 
 
 def _validate_evidence_metadata(model: object) -> None:
@@ -440,7 +448,7 @@ class AttemptIdentityKey(StrictModel):
 
 class QualityRecordPointer(StrictModel):
     record_kind: Literal["prospective_q0_attempt"]
-    schema_version: Literal["1.0"]
+    schema_version: Literal["1.0", "1.1"]
     relative_path: str
     content_hash: str = Field(pattern=_HEX64)
     file_sha256: str = Field(pattern=_HEX64)
@@ -529,9 +537,19 @@ class ProviderBinding(StrictModel):
     workflow_path: EvidencePath
     workflow_fingerprint: EvidenceHex64
     model_id: EvidenceString
-    adapter_compiler_id: str = Field(pattern=_SAFE_ID)
-    adapter_compiler_version: str = Field(pattern=_SAFE_ID)
-    adapter_compiler_hash: str = Field(pattern=_HEX64)
+    adapter_compiler_id: str | EvidenceString
+    adapter_compiler_version: str | EvidenceString
+    adapter_compiler_hash: str | EvidenceHex64
+
+    @field_validator("adapter_compiler_id", "adapter_compiler_version")
+    @classmethod
+    def _plain_compiler_id_is_safe(cls, value: object) -> object:
+        return _require_plain_pattern(value, _SAFE_ID, "compiler identity")
+
+    @field_validator("adapter_compiler_hash")
+    @classmethod
+    def _plain_compiler_hash_is_hex(cls, value: object) -> object:
+        return _require_plain_pattern(value, _HEX64, "compiler hash")
 
     _clean_profile_path = field_validator("profile_path")(
         _require_clean_relative_path
@@ -551,13 +569,24 @@ class ProviderBinding(StrictModel):
 
 
 class PlanningBinding(StrictModel):
-    planning_request_hash: str = Field(pattern=_HEX64)
-    plan_hash: str = Field(pattern=_HEX64)
-    requirement_hash: str = Field(pattern=_HEX64)
-    readiness_request_hash: str = Field(pattern=_HEX64)
-    readiness_result_hash: str = Field(pattern=_HEX64)
-    readiness_state: Literal["READY", "BLOCKED"]
+    planning_request_hash: str | EvidenceHex64
+    plan_hash: str | EvidenceHex64
+    requirement_hash: str | EvidenceHex64
+    readiness_request_hash: str | EvidenceHex64
+    readiness_result_hash: str | EvidenceHex64
+    readiness_state: Literal["READY", "BLOCKED"] | EvidenceString
     check_reason_codes: tuple[str, ...]
+
+    @field_validator(
+        "planning_request_hash",
+        "plan_hash",
+        "requirement_hash",
+        "readiness_request_hash",
+        "readiness_result_hash",
+    )
+    @classmethod
+    def _plain_hash_is_hex(cls, value: object) -> object:
+        return _require_plain_pattern(value, _HEX64, "planning hash")
 
     @model_validator(mode="after")
     def _canonical_reasons(self) -> "PlanningBinding":
@@ -566,24 +595,51 @@ class PlanningBinding(StrictModel):
 
 
 class RoutingBinding(StrictModel):
-    semantic_decision_hash: str = Field(pattern=_HEX64)
-    audit_decision_hash: str = Field(pattern=_HEX64)
-    policy_id: str = Field(pattern=_SAFE_ID)
-    policy_version: str = Field(pattern=_SAFE_ID)
-    policy_hash: str = Field(pattern=_HEX64)
-    provider_capabilities_fingerprint: str = Field(pattern=_HEX64)
+    semantic_decision_hash: str | EvidenceHex64
+    audit_decision_hash: str | EvidenceHex64
+    policy_id: str | EvidenceString
+    policy_version: str | EvidenceString
+    policy_hash: str | EvidenceHex64
+    provider_capabilities_fingerprint: str | EvidenceHex64
     selected_capability_id: str = Field(pattern=_SAFE_ID)
-    selected_capability_fingerprint: str = Field(pattern=_HEX64)
-    provider_bound_request_hash: str = Field(pattern=_HEX64)
+    selected_capability_fingerprint: str | EvidenceHex64
+    provider_bound_request_hash: str | EvidenceHex64
+
+    @field_validator("policy_id", "policy_version")
+    @classmethod
+    def _plain_policy_identity_is_safe(cls, value: object) -> object:
+        return _require_plain_pattern(value, _SAFE_ID, "routing policy identity")
+
+    @field_validator(
+        "semantic_decision_hash",
+        "audit_decision_hash",
+        "policy_hash",
+        "provider_capabilities_fingerprint",
+        "selected_capability_fingerprint",
+        "provider_bound_request_hash",
+    )
+    @classmethod
+    def _plain_hash_is_hex(cls, value: object) -> object:
+        return _require_plain_pattern(value, _HEX64, "routing hash")
 
 
 class PromptBinding(StrictModel):
     prompt_sha256: str = Field(pattern=_HEX64)
     negative_prompt_sha256: str = Field(pattern=_HEX64)
-    structured_intent_hash: str = Field(pattern=_HEX64)
-    compiler_id: str = Field(pattern=_SAFE_ID)
-    compiler_version: str = Field(pattern=_SAFE_ID)
-    compiler_hash: str = Field(pattern=_HEX64)
+    structured_intent_hash: str | EvidenceHex64
+    compiler_id: str | EvidenceString
+    compiler_version: str | EvidenceString
+    compiler_hash: str | EvidenceHex64
+
+    @field_validator("compiler_id", "compiler_version")
+    @classmethod
+    def _plain_compiler_identity_is_safe(cls, value: object) -> object:
+        return _require_plain_pattern(value, _SAFE_ID, "prompt compiler identity")
+
+    @field_validator("structured_intent_hash", "compiler_hash")
+    @classmethod
+    def _plain_hash_is_hex(cls, value: object) -> object:
+        return _require_plain_pattern(value, _HEX64, "prompt hash")
 
 
 class ParameterBinding(StrictModel):
@@ -631,9 +687,19 @@ class InputBinding(StrictModel):
     registry_revision: str = Field(pattern=_SAFE_ID)
     registry_file_sha256: str = Field(pattern=_HEX64)
     creation_receipt_id: str = Field(pattern=_SAFE_ID)
-    creation_receipt_hash: str = Field(pattern=_HEX64)
-    provenance_receipt_id: str = Field(pattern=_SAFE_ID)
-    provenance_receipt_hash: str = Field(pattern=_HEX64)
+    creation_receipt_hash: str | EvidenceHex64
+    provenance_receipt_id: str | EvidenceString
+    provenance_receipt_hash: str | EvidenceHex64
+
+    @field_validator("provenance_receipt_id")
+    @classmethod
+    def _plain_provenance_id_is_safe(cls, value: object) -> object:
+        return _require_plain_pattern(value, _SAFE_ID, "provenance identity")
+
+    @field_validator("creation_receipt_hash", "provenance_receipt_hash")
+    @classmethod
+    def _plain_receipt_hash_is_hex(cls, value: object) -> object:
+        return _require_plain_pattern(value, _HEX64, "receipt hash")
 
     @property
     def sort_key(self) -> tuple[str, str]:
@@ -929,6 +995,29 @@ class ExactEvidencePointer(StrictModel):
     )
 
 
+class ContinuityEvidenceBinding(StrictModel):
+    intent: ExactEvidencePointer
+    evidence: ExactEvidencePointer
+    evaluation_fingerprint: str = Field(pattern=_HEX64)
+    artifact_sha256: str = Field(pattern=_HEX64)
+    resolved_generation_hash: str = Field(pattern=_HEX64)
+    target_shot_content_hash: str = Field(pattern=_HEX64)
+    constraints_hash: str = Field(pattern=_HEX64)
+    qa_policy_hash: str = Field(pattern=_HEX64)
+    evaluator_profile_hash: str = Field(pattern=_HEX64)
+    evaluator_identity: str = Field(pattern=_SAFE_ID)
+    authority_binding_hash: str = Field(pattern=_HEX64)
+    human_fallback_hash: EvidenceHex64
+
+    @model_validator(mode="after")
+    def _require_exact_pointer_kinds(self) -> "ContinuityEvidenceBinding":
+        if self.intent.kind != "continuity_intent":
+            raise ValueError("continuity intent pointer kind is invalid")
+        if self.evidence.kind != "continuity_evidence":
+            raise ValueError("continuity evidence pointer kind is invalid")
+        return self
+
+
 class OutcomeBoundaryBinding(StrictModel):
     artifact_claim: BoundedFreeText
     p6_state: Literal["not_present", "present", "stale"]
@@ -945,6 +1034,13 @@ class OutcomeBoundaryBinding(StrictModel):
             raise ValueError("absent P6 state cannot contain pointers")
         if self.p6_state != "not_present" and not self.p6_observations:
             raise ValueError("observed P6 state requires exact pointers")
+        has_fresh = any(
+            item.freshness == "fresh" for item in self.p6_observations
+        )
+        if self.p6_state == "present" and not has_fresh:
+            raise ValueError("present P6 state requires a fresh pointer")
+        if self.p6_state == "stale" and has_fresh:
+            raise ValueError("stale P6 state cannot contain a fresh pointer")
         return self
 
 
@@ -987,7 +1083,7 @@ AttemptOutcome = Annotated[
 
 class QualityExperienceRecordV1(StrictModel):
     record_kind: Literal["prospective_q0_attempt"]
-    schema_version: Literal["1.0"]
+    schema_version: Literal["1.0", "1.1"]
     content_hash: str | None = Field(default=None, pattern=_HEX64)
     experiment_id: str = Field(pattern=_SAFE_ID)
     pilot_id: str = Field(pattern=_SAFE_ID)
@@ -1007,6 +1103,7 @@ class QualityExperienceRecordV1(StrictModel):
     parameters: ParameterBinding
     inputs: InputBindings
     continuity: ContinuityBinding
+    continuity_evidence: ContinuityEvidenceBinding | None = None
     outcome: AttemptOutcome
     artifact_evidence: ArtifactEvidence
     durability: DurabilityBinding
@@ -1020,6 +1117,15 @@ class QualityExperienceRecordV1(StrictModel):
     def _canonical_captured_at(cls, value: str) -> str:
         return _require_utc_timestamp(value)
 
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_schema(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.schema_version == "1.0":
+            data.pop("continuity_evidence", None)
+        return data
+
     @property
     def attempt_identity_key(self) -> AttemptIdentityKey:
         return AttemptIdentityKey.from_components(
@@ -1031,6 +1137,62 @@ class QualityExperienceRecordV1(StrictModel):
 
     @model_validator(mode="after")
     def _require_complete_exact_bindings(self) -> "QualityExperienceRecordV1":
+        if self.schema_version == "1.0" and self.continuity_evidence is not None:
+            raise ValueError("schema 1.0 cannot contain continuity evidence")
+        if self.schema_version == "1.1" and self.continuity_evidence is None:
+            raise ValueError("schema 1.1 requires continuity evidence")
+        if self.schema_version == "1.1":
+            continuity_evidence = self.continuity_evidence
+            continuity_state = self.continuity.continuity_state_hash
+            if (
+                not isinstance(self.artifact_evidence, ArtifactEvidenceKnown)
+                or self.continuity.mode == "none"
+                or continuity_state.state is not EvidenceState.KNOWN
+                or continuity_state.value is None
+                or continuity_evidence.artifact_sha256
+                != self.artifact_evidence.file_sha256
+                or continuity_evidence.target_shot_content_hash
+                != self.identity.shot_content_hash
+                or continuity_evidence.constraints_hash != continuity_state.value
+            ):
+                raise ValueError(
+                    "schema 1.1 continuity evidence must bind the exact artifact and Shot"
+                )
+        if self.schema_version == "1.0":
+            legacy_values = (
+                self.planning.planning_request_hash,
+                self.planning.plan_hash,
+                self.planning.requirement_hash,
+                self.planning.readiness_request_hash,
+                self.planning.readiness_result_hash,
+                self.planning.readiness_state,
+                self.routing.semantic_decision_hash,
+                self.routing.audit_decision_hash,
+                self.routing.policy_id,
+                self.routing.policy_version,
+                self.routing.policy_hash,
+                self.routing.provider_capabilities_fingerprint,
+                self.routing.selected_capability_fingerprint,
+                self.routing.provider_bound_request_hash,
+                self.provider.adapter_compiler_id,
+                self.provider.adapter_compiler_version,
+                self.provider.adapter_compiler_hash,
+                self.prompt.structured_intent_hash,
+                self.prompt.compiler_id,
+                self.prompt.compiler_version,
+                self.prompt.compiler_hash,
+                *(
+                    value
+                    for item in self.inputs.items
+                    for value in (
+                        item.creation_receipt_hash,
+                        item.provenance_receipt_id,
+                        item.provenance_receipt_hash,
+                    )
+                ),
+            )
+            if any(not isinstance(value, str) for value in legacy_values):
+                raise ValueError("schema 1.0 requires legacy exact string bindings")
         if self.routing.selected_capability_id != self.provider.capability_id:
             raise ValueError("routing and Provider capability identities must match")
         if self.continuity.target_shot_id != self.identity.shot_id:

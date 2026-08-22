@@ -262,7 +262,12 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
     for path in (
+        "src/ai_video/quality_intelligence/_capture_contracts.py",
+        "src/ai_video/quality_intelligence/_capture_human.py",
+        "src/ai_video/quality_intelligence/_capture_p6.py",
+        "src/ai_video/quality_intelligence/capture.py",
         "src/ai_video/quality_intelligence/models.py",
+        "tests/test_quality_experience_capture.py",
         "tests/test_quality_experience_dataset.py",
         "tests/fixtures/quality_experience/v1/prospective_failure.json",
     ):
@@ -277,6 +282,7 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
 
     argv = policy["checks"]["quality_intelligence_tests"]["argv"]
     for path in (
+        "tests/test_quality_experience_capture.py",
         "tests/test_quality_experience_models.py",
         "tests/test_quality_experience_store.py",
         "tests/test_quality_experience_dataset.py",

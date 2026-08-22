@@ -695,6 +695,27 @@ def test_manifest_25_qa_policy_activation_does_not_downgrade_or_drop_p7(
     assert after.active_qa_policy is not None
 
 
+def test_manifest_210_qa_policy_activation_preserves_latest_runtime(
+    tmp_path: Path,
+) -> None:
+    fixture = make_manifest_25_review_fixture(tmp_path)
+    before = fixture.load_manifest().model_copy(update={"schema_version": "2.10"})
+    (tmp_path / "state/manifest.json").write_text(
+        before.model_dump_json(indent=2), encoding="utf-8"
+    )
+
+    after = fixture.committer.activate_qa_policy(
+        fixture.policy,
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="manifest-210-qa-policy",
+    )
+
+    assert after.schema_version == "2.10"
+    assert _p7_attempts(after) == _p7_attempts(before)
+    assert after.active_render_state == before.active_render_state
+    assert after.active_qa_policy is not None
+
+
 def test_manifest_25_review_and_final_acceptance_bind_current_render_and_preserve_p7(
     tmp_path: Path,
 ) -> None:

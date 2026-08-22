@@ -125,7 +125,7 @@ checks:
     cwd: .
     description: Verify exact planning lineage, structural readiness, typed STOP diagnostics, and compatibility handoff.
   quality_intelligence_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_quality_experience_models.py, tests/test_quality_experience_store.py, tests/test_quality_experience_dataset.py, tests/test_quality_experience_rag_projection.py, tests/test_agent_memory.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_quality_experience_capture.py, tests/test_quality_experience_models.py, tests/test_quality_experience_store.py, tests/test_quality_experience_dataset.py, tests/test_quality_experience_rag_projection.py, tests/test_agent_memory.py, -q]
     cwd: .
     description: Verify passive Quality Experience schemas, immutable closure, exact lookup, sanitized projection, and Agent Memory isolation without live Provider or index rebuild.
   full_tests:

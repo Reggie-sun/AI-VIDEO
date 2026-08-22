@@ -75,6 +75,199 @@ def test_record_enforces_schema_version_one_dot_zero() -> None:
         QualityExperienceRecordV1.model_validate(bad)
 
 
+def _continuity_evidence_binding() -> dict[str, object]:
+    return {
+        "intent": {
+            "kind": "continuity_intent",
+            "relative_path": "state/video-generation/continuity/intents/" + "1" * 64 + ".json",
+            "content_hash": "1" * 64,
+            "file_sha256": "2" * 64,
+            "freshness": "fresh",
+        },
+        "evidence": {
+            "kind": "continuity_evidence",
+            "relative_path": "state/video-generation/continuity/evidence/" + "3" * 64 + ".json",
+            "content_hash": "3" * 64,
+            "file_sha256": "4" * 64,
+            "freshness": "fresh",
+        },
+        "evaluation_fingerprint": "5" * 64,
+        "artifact_sha256": "3" * 64,
+        "resolved_generation_hash": "7" * 64,
+        "target_shot_content_hash": "e" * 64,
+        "constraints_hash": "9" * 64,
+        "qa_policy_hash": "a" * 64,
+        "evaluator_profile_hash": "b" * 64,
+        "evaluator_identity": "continuity-evaluator-v1",
+        "authority_binding_hash": "c" * 64,
+        "human_fallback_hash": {
+            "state": "not_applicable",
+            "reason": "automatic_evidence_used",
+        },
+    }
+
+
+def _schema_one_dot_one_payload() -> dict[str, object]:
+    payload = _load("prospective_success.json")
+    payload["schema_version"] = "1.1"
+    payload["continuity_evidence"] = _continuity_evidence_binding()
+    payload["continuity"] = {
+        "mode": "exact_terminal",
+        "source_shot_id": {
+            "state": "known",
+            "value": "shot_000",
+            "source_document": "state/video-generation/request.json",
+            "source_span": "continuity_binding.source_shot_id",
+        },
+        "target_shot_id": "shot_001",
+        "terminal_frame_hash": {
+            "state": "known",
+            "value": "8" * 64,
+            "source_document": "state/video-generation/request.json",
+            "source_span": "continuity_binding.terminal_frame_hash",
+        },
+        "keyframe_hash": {
+            "state": "not_applicable",
+            "reason": "hard_cut_keyframe_not_used",
+        },
+        "continuity_state_hash": {
+            "state": "known",
+            "value": "9" * 64,
+            "source_document": "state/video-generation/request.json",
+            "source_span": "continuity_binding.constraints_hash",
+        },
+        "first_frame_binding_hash": {
+            "state": "known",
+            "value": "7" * 64,
+            "source_document": "state/video-generation/request.json",
+            "source_span": "continuity_binding.binding_hash",
+        },
+        "last_frame_binding_hash": {
+            "state": "not_applicable",
+            "reason": "last_frame_not_used",
+        },
+    }
+    return payload
+
+
+def test_record_schema_one_dot_one_requires_independent_continuity_evidence() -> None:
+    payload = _load("prospective_success.json")
+    payload["schema_version"] = "1.1"
+
+    with pytest.raises(ValidationError):
+        QualityExperienceRecordV1.model_validate(payload)
+
+    payload = _schema_one_dot_one_payload()
+    record = QualityExperienceRecordV1.model_validate(payload)
+
+    assert record.schema_version == "1.1"
+    assert record.continuity_evidence.evidence.kind == "continuity_evidence"
+
+
+@pytest.mark.parametrize(
+    "mismatch", ("artifact", "target_shot", "constraints", "continuity_mode")
+)
+def test_record_schema_one_dot_one_rejects_cross_binding_mismatch(
+    mismatch: str,
+) -> None:
+    payload = _schema_one_dot_one_payload()
+    if mismatch == "artifact":
+        payload["continuity_evidence"]["artifact_sha256"] = "f" * 64
+    elif mismatch == "target_shot":
+        payload["continuity_evidence"]["target_shot_content_hash"] = "f" * 64
+    elif mismatch == "constraints":
+        payload["continuity_evidence"]["constraints_hash"] = "f" * 64
+    else:
+        payload["continuity"] = _load("prospective_success.json")["continuity"]
+
+    with pytest.raises(ValidationError):
+        QualityExperienceRecordV1.model_validate(payload)
+
+
+def test_record_schema_one_dot_zero_rejects_continuity_evidence_extension() -> None:
+    payload = _load("prospective_success.json")
+    payload["continuity_evidence"] = _continuity_evidence_binding()
+
+    with pytest.raises(ValidationError):
+        QualityExperienceRecordV1.model_validate(payload)
+
+
+@pytest.mark.parametrize(
+    ("p6_state", "freshness"),
+    (("present", "stale"), ("stale", "fresh")),
+)
+def test_outcome_boundary_p6_state_matches_pointer_freshness(
+    p6_state: str,
+    freshness: str,
+) -> None:
+    payload = _load("prospective_success.json")
+    payload["outcome_boundary"]["p6_state"] = p6_state
+    payload["outcome_boundary"]["p6_observations"] = [
+        {
+            "kind": "repair_outcome",
+            "relative_path": "state/repairs/outcome." + "1" * 64 + ".json",
+            "content_hash": "1" * 64,
+            "file_sha256": "2" * 64,
+            "freshness": freshness,
+        }
+    ]
+
+    with pytest.raises(ValidationError):
+        QualityExperienceRecordV1.model_validate(payload)
+
+
+def test_record_schema_one_dot_one_tags_unavailable_runtime_lineage() -> None:
+    payload = _schema_one_dot_one_payload()
+    not_applicable = {"state": "not_applicable", "reason": "not_persisted"}
+    for field in (
+        "planning_request_hash",
+        "plan_hash",
+        "requirement_hash",
+        "readiness_request_hash",
+        "readiness_result_hash",
+    ):
+        payload["planning"][field] = not_applicable
+    payload["planning"]["readiness_state"] = not_applicable
+    for field in (
+        "semantic_decision_hash",
+        "audit_decision_hash",
+        "policy_id",
+        "policy_version",
+        "policy_hash",
+        "provider_capabilities_fingerprint",
+        "selected_capability_fingerprint",
+        "provider_bound_request_hash",
+    ):
+        payload["routing"][field] = not_applicable
+    payload["provider"]["adapter_compiler_id"] = not_applicable
+    payload["provider"]["adapter_compiler_version"] = not_applicable
+    payload["provider"]["adapter_compiler_hash"] = not_applicable
+    payload["prompt"]["structured_intent_hash"] = not_applicable
+    payload["prompt"]["compiler_id"] = not_applicable
+    payload["prompt"]["compiler_version"] = not_applicable
+    payload["prompt"]["compiler_hash"] = not_applicable
+    payload["inputs"]["items"][0]["creation_receipt_hash"] = not_applicable
+    payload["inputs"]["items"][0]["provenance_receipt_id"] = not_applicable
+    payload["inputs"]["items"][0]["provenance_receipt_hash"] = not_applicable
+
+    record = QualityExperienceRecordV1.model_validate(payload)
+
+    assert record.schema_version == "1.1"
+    assert record.planning.plan_hash.state.value == "not_applicable"
+    assert record.prompt.compiler_hash.state.value == "not_applicable"
+
+
+def test_record_schema_one_dot_zero_rejects_tagged_runtime_lineage() -> None:
+    payload = _load("prospective_success.json")
+    payload["planning"]["plan_hash"] = {
+        "state": "not_applicable",
+        "reason": "not_persisted",
+    }
+
+    with pytest.raises(ValidationError):
+        QualityExperienceRecordV1.model_validate(payload)
+
+
 def test_record_enforces_record_kind_literal() -> None:
     bad = dict(_load("prospective_success.json"))
     bad["record_kind"] = "retrospective"

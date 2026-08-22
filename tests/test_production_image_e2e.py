@@ -528,6 +528,26 @@ def test_explicit_shot_1_replacement_stales_only_exact_consumers(
     assert result.active_render_state_unchanged
 
 
+def test_manifest_210_image_regeneration_preserves_latest_schema(
+    p7_reuse_runtime,
+) -> None:
+    p7_reuse_runtime.generate_all()
+    root = p7_reuse_runtime.root
+    before = load_production_project(root / "project.yaml").manifest.model_copy(
+        update={"schema_version": "2.10"}
+    )
+    (root / "state/manifest.json").write_text(
+        before.model_dump_json(indent=2), encoding="utf-8"
+    )
+
+    result = p7_reuse_runtime.change_only_shot_1_prompt_and_generate()
+    after = load_production_project(root / "project.yaml").manifest
+
+    assert after.schema_version == "2.10"
+    assert result.provider_calls == 1
+    assert result.changed_shot_ids == ("shot-1",)
+
+
 def test_regenerated_shot_history_survives_idempotent_recovery(tmp_path):
     """A refreshed P5 pre-state permits exact same-role regeneration history."""
 

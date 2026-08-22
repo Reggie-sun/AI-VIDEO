@@ -475,6 +475,7 @@ class _StateCommitVideoCandidateMixin:
                 cost_receipt_id = manifest.active_paid_provider_budget.content_hash
             terminal_frame_bytes = None
             terminal_extraction = None
+            provenance = None
             with _open_regular_file_nofollow(
                 self._project_root / fetch_pointer.artifact_path,
                 contained_by=(
@@ -500,7 +501,7 @@ class _StateCommitVideoCandidateMixin:
                     )
                 )
                 if request.continuity_binding is not None:
-                    manifest, attempt, state, probe_receipt = (
+                    manifest, attempt, state, probe_receipt, provenance = (
                         checkpoint_generated_shot_continuity(
                             self,
                             attempt_id=attempt_id,
@@ -511,6 +512,8 @@ class _StateCommitVideoCandidateMixin:
                             request=request,
                             measured=measured,
                             fetch_receipt=fetch_receipt,
+                            observation=observation,
+                            local_lane=local_lane,
                             continuity_reviewer=continuity_reviewer,
                             continuity_policy_content_hash=(
                                 continuity_policy_content_hash
@@ -518,21 +521,22 @@ class _StateCommitVideoCandidateMixin:
                             continuity_authorities=continuity_authorities,
                         )
                     )
-            provenance = (
-                VideoProvenanceReceipt.create_local(
-                    request=request,
-                    observation=observation,
-                    fetch_receipt=fetch_receipt,
-                    probe_receipt=probe_receipt,
+            if provenance is None:
+                provenance = (
+                    VideoProvenanceReceipt.create_local(
+                        request=request,
+                        observation=observation,
+                        fetch_receipt=fetch_receipt,
+                        probe_receipt=probe_receipt,
+                    )
+                    if local_lane
+                    else VideoProvenanceReceipt.create(
+                        request=request,
+                        observation=observation,
+                        fetch_receipt=fetch_receipt,
+                        probe_receipt=probe_receipt,
+                    )
                 )
-                if local_lane
-                else VideoProvenanceReceipt.create(
-                    request=request,
-                    observation=observation,
-                    fetch_receipt=fetch_receipt,
-                    probe_receipt=probe_receipt,
-                )
-            )
             if (
                 request.activation_scope.request.seal_terminal_frame
                 and state.terminal_frame_extraction is None
@@ -716,13 +720,27 @@ class _StateCommitVideoCandidateMixin:
                     canonical_video_asset_path(measured.artifact_sha256),
                     fetched_bytes,
                 ),
-                _prepared_artifact(
-                    canonical_video_probe_receipt_path(probe_receipt.content_hash),
-                    _canonical_json_bytes(probe_receipt),
-                ),
-                _prepared_artifact(
-                    canonical_video_provenance_receipt_path(provenance.content_hash),
-                    _canonical_json_bytes(provenance),
+                *(
+                    ()
+                    if (
+                        request.continuity_binding is not None
+                        and state.continuity_evaluation is not None
+                        and state.continuity_evaluation.probe is not None
+                    )
+                    else (
+                        _prepared_artifact(
+                            canonical_video_probe_receipt_path(
+                                probe_receipt.content_hash
+                            ),
+                            _canonical_json_bytes(probe_receipt),
+                        ),
+                        _prepared_artifact(
+                            canonical_video_provenance_receipt_path(
+                                provenance.content_hash
+                            ),
+                            _canonical_json_bytes(provenance),
+                        ),
+                    )
                 ),
                 *(
                     (
