@@ -175,10 +175,18 @@ def test_ref2va_profile_seals_standalone_reference_audio_only() -> None:
     assert profile.reference_video_max_duration_millis == 15000
 
 
-def test_ref2va_profile_rejects_group_qualified_video_audio_linkage() -> None:
+@pytest.mark.parametrize(
+    "forbidden_key",
+    (
+        "ref_video_audios",
+        "ref_video_audios.ref_video_audio_0",
+        "ref_video_audios.any_future_relation",
+    ),
+)
+def test_ref2va_profile_rejects_video_audio_linkage(forbidden_key: str) -> None:
     profile = _load("Ref2VA")
     workflow = json.loads((REPO_ROOT / profile.workflow_path).read_text())
-    workflow["6"]["inputs"]["ref_video_audios.ref_video_audio_0"] = ["14", 1]
+    workflow["6"]["inputs"][forbidden_key] = ["14", 1]
 
     with pytest.raises(AiVideoError) as exc_info:
         validate_native_turbo_workflow(
