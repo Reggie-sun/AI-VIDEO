@@ -126,8 +126,11 @@ Harness policy，并非T8 runtime behavior regression。Commit
 Focused seam tests为`27 passed`，repository policy audit的`unmapped_paths`与`unverified_paths`
 均为空。Exact closure receipt为
 `.agent/harness/runs/t8-v2-unmapped-provider-seams-closure-20260822/receipt.json`：
-`112 passed`，receipt verification为`passed=true`、`fresh=true`、
-`scope_worktree_clean=true`、`snapshot_matches=true`与`artifact_integrity=true`。
+`112 passed`；在其exact head `2138a66890de6d408117f6520c6e82897b6bafb9`生成后立即验证时，
+receipt为`passed=true`、`fresh=true`、`scope_worktree_clean=true`、
+`snapshot_matches=true`与`artifact_integrity=true`。后续documentation commit会使该旧receipt的
+current-head `fresh`与`snapshot_matches`变为false，但不改变其exact snapshot已经passing的事实；
+current-head authority必须使用后续独立receipt重新验证。
 
 本任务只在本地`main`形成commits，当前没有push、release、default promotion、v1 retirement或
 P6 Final Acceptance。
