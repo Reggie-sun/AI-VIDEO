@@ -182,10 +182,16 @@ def test_ref2va_profile_seals_standalone_reference_audio_only() -> None:
     "forbidden_key",
     (
         "ref_video_audios",
+        "ref_video_audios.",
         "ref_video_audios.ref_video_audio_0",
         "ref_video_audios.any_future_relation",
     ),
-    ids=("exact-group", "current-autogrow-key", "future-autogrow-key"),
+    ids=(
+        "exact-group",
+        "empty-autogrow-member",
+        "current-autogrow-key",
+        "future-autogrow-key",
+    ),
 )
 def test_ref2va_profile_rejects_video_audio_linkage(forbidden_key: str) -> None:
     profile = _load("Ref2VA")
