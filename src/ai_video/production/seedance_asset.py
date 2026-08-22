@@ -39,9 +39,11 @@ SEEDANCE_MAX_SYNTHETIC_IMAGE_BYTES = 30_000_000
 _SYNTHETIC_EGRESS_ID_PREFIX = "seedance-synthetic-egress:"
 _SYNTHETIC_IMAGE_ID_PREFIX = "seedance-synthetic-image:"
 _IMAGE_ROLE_ORDER = {"first_frame": 0, "last_frame": 1, "reference": 2}
-_PROJECT_OWNED_FICTIONAL_IDENTITY_USE = (
-    "project-owned-fictional-no-protected-identity:seedance-i2v"
-)
+SeedanceSyntheticImageMode = Literal["image_to_video", "reference_to_video"]
+_PROJECT_OWNED_FICTIONAL_IDENTITY_USES: Mapping[str, str] = {
+    "image_to_video": "project-owned-fictional-no-protected-identity:seedance-i2v",
+    "reference_to_video": "project-owned-fictional-no-protected-identity:seedance-r2v",
+}
 _FICTIONAL_IDENTITY_SOURCE_KINDS = {
     AssetSourceKind.GENERATED,
     AssetSourceKind.DERIVED,
@@ -199,7 +201,7 @@ class SeedanceSyntheticImageReferenceReceipt(StrictModel):
     schema_version: Literal["1"] = "1"
     provider_kind: Literal["volcengine_ark_seedance"]
     model_id: str = Field(pattern=r"^[A-Za-z0-9._:-]{1,256}$")
-    mode: Literal["image_to_video"]
+    mode: SeedanceSyntheticImageMode
     transport: Literal["inline_base64"]
     source_asset_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$")
     source_registry_revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -233,7 +235,8 @@ class SeedanceSyntheticImageReferenceReceipt(StrictModel):
             raise ValueError("Seedance inline input rejects real or protected identity")
         if (
             self.classification == "synthetic_photorealistic_person"
-            and self.permitted_use != _PROJECT_OWNED_FICTIONAL_IDENTITY_USE
+            and self.permitted_use
+            != _PROJECT_OWNED_FICTIONAL_IDENTITY_USES[self.mode]
         ):
             raise ValueError(
                 "Seedance photorealistic fictional identity requires explicit project-owned attestation"
@@ -295,7 +298,7 @@ class SeedanceSyntheticImageEgressPolicyReceipt(StrictModel):
     prompt_size_bytes: int = Field(strict=True, ge=0)
     provider_kind: Literal["volcengine_ark_seedance"]
     model_id: str = Field(pattern=r"^[A-Za-z0-9._:-]{1,256}$")
-    mode: Literal["image_to_video"]
+    mode: SeedanceSyntheticImageMode
     transport: Literal["inline_base64"]
     destination: Literal["https://ark.cn-beijing.volces.com"]
     retention_mode: Literal["provider_standard", "zero_retention"]
@@ -304,6 +307,15 @@ class SeedanceSyntheticImageEgressPolicyReceipt(StrictModel):
 
     @model_validator(mode="after")
     def _validate_aggregate(self) -> "SeedanceSyntheticImageEgressPolicyReceipt":
+        allowed_roles = (
+            {"first_frame", "last_frame"}
+            if self.mode == "image_to_video"
+            else {"reference"}
+        )
+        if any(child.role not in allowed_roles for child in self.children):
+            raise ValueError(
+                "Seedance synthetic receipt role does not match generation mode"
+            )
         keys = tuple(
             (_IMAGE_ROLE_ORDER[child.role], child.asset_id) for child in self.children
         )

@@ -1,6 +1,6 @@
 # AI-VIDEO P8 Seedance Cloud Provider Implementation Plan
 
-Status: Offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic later reached provider `succeeded` and fetched an MP4. The follow-up tracked payload correction is offline-verified but not live re-submitted; billing settlement、candidate activation、push和release均未完成。2026-08-20新增的synthetic/illustrated inline PNG lane已完成offline runtime和fake-transport验证；2026-08-22用户授权将具有exact human claim与sealed generated/derived provenance的project-owned fictional photorealistic identity作为additive conditional exception。没有对应live authorization、remote submit或activation。
+Status: Offline implementation accepted on 2026-08-19. A separately authorized Mini diagnostic later reached provider `succeeded` and fetched an MP4. The follow-up tracked payload correction is offline-verified but not live re-submitted; billing settlement、candidate activation、push和release均未完成。2026-08-20新增的synthetic/illustrated inline PNG lane已完成offline runtime和fake-transport验证；2026-08-22用户授权将具有exact human claim与sealed generated/derived provenance的project-owned fictional photorealistic identity作为additive conditional exception，并进一步批准image-only synthetic `reference_to_video` extension。R2V extension只有offline fake-transport evidence，没有对应live authorization、remote submit或activation。
 
 **Spec:** `docs/superpowers/specs/2026-08-19-ai-video-p8-seedance-cloud-provider.md`
 
@@ -204,7 +204,15 @@ attested project-owned fictional photorealistic、illustrated/anime/non-real or 
   -> in-memory data:image/...;base64,...
 ```
 
-`synthetic_photorealistic_person` is eligible only when `permitted_use` is exactly `project-owned-fictional-no-protected-identity:seedance-i2v`, the task-scoped attestor is human, the selected Registry record proves a matching `generated|derived` source、tool、creation receipt and `project-owned-synthetic|provider-output` usage license, and the injected evidence source reopens that creation receipt's exact bytes with the child's sealed SHA-256. A missing、ambiguous、real、protected or mismatched identity must use an authorized trusted asset or stop. Classification comes from sealed source/tool/rights provenance plus task-scoped human attestation; Agent vision is advisory only.
+`synthetic_photorealistic_person` is eligible only when `permitted_use` exactly matches the selected mode: `project-owned-fictional-no-protected-identity:seedance-i2v` for `image_to_video`, or `project-owned-fictional-no-protected-identity:seedance-r2v` for `reference_to_video`. The task-scoped attestor must be human, the selected Registry record must prove a matching `generated|derived` source、tool、creation receipt and `project-owned-synthetic|provider-output` usage license, and the injected evidence source must reopen that creation receipt's exact bytes with the child's sealed SHA-256. A claim cannot be reused across modes. A missing、ambiguous、real、protected or mismatched identity must use an authorized trusted asset or stop. Classification comes from sealed source/tool/rights provenance plus task-scoped human attestation; Agent vision is advisory only.
+
+### Follow-up: Image-only Synthetic R2V Extension (`2026-08-22`)
+
+The accepted follow-up is deliberately additive: `SeedanceSyntheticImageReferenceReceipt` and `SeedanceSyntheticImageEgressPolicyReceipt` accept `reference_to_video` in addition to the existing `image_to_video`. R2V children must all use `role=reference`; I2V children remain limited to `first_frame` / `last_frame`. The adapter already maps `reference` to the official `reference_image` payload role, so no second payload path、Provider selector or resolver is introduced.
+
+Synthetic R2V remains PNG-image-only. Any `reference_video` or `reference_audio` binding fails before permit consumption and before network. Trusted `asset://` behavior remains unchanged for real/protected/ambiguous identity and for Provider-managed media. Paid preview、exact egress、durable authorization、one-use permit、unknown-outcome、no-fallback and activation ownership remain unchanged.
+
+Focused RED proved the old single-mode receipt rejected R2V and the old aggregate accepted an I2V `reference` role. GREEN extends only the two sealed mode fields, enforces mode-specific child roles and introduces the R2V-specific fictional-identity claim. Focused verification is `python -m pytest -p no:cacheprovider tests/test_production_seedance.py -q`; live Provider proof remains a separate paid gate.
 
 ### Problem Boundary and Ownership
 
@@ -258,7 +266,7 @@ PYTHONPATH=src python -m pytest -p no:cacheprovider \
 Implement only enough in `seedance_asset.py` to make the RED cases pass:
 
 - strict/frozen `SeedanceSyntheticImageReferenceReceipt` with exact local identity、provenance、rights、classification and human/task attestation;
-- an exact validated `permitted_use=project-owned-fictional-no-protected-identity:seedance-i2v` exception for `synthetic_photorealistic_person`; do not parse `rights_source_note`、prompt or filename as an identity signal;
+- an exact mode-specific `permitted_use` exception for `synthetic_photorealistic_person`: `project-owned-fictional-no-protected-identity:seedance-i2v` for I2V and `project-owned-fictional-no-protected-identity:seedance-r2v` for R2V; do not parse `rights_source_note`、prompt or filename as an identity signal;
 - independent authorizer/resolver reopening of the photorealistic child's source receipt by `source_record_id`, with exact `source_evidence_sha256` verification;
 - strict/frozen `SeedanceSyntheticImageEgressPolicyReceipt` with canonical ordered role/asset/child bindings plus exact preview/task/Provider/transport/retention identity;
 - `SeedanceSyntheticImageReferenceResolver` that re-reads injected exact PNG bytes、independently measures SHA-256/size/`image/png` MIME/geometry、enforces the per-image `<30 MB` bound, and constructs the data URI in memory;

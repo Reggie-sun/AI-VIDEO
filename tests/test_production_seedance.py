@@ -1631,6 +1631,7 @@ def _synthetic_receipt(
     asset_module,
     binding: VideoImageReferenceBinding,
     *,
+    mode: VideoGenerationMode = VideoGenerationMode.IMAGE_TO_VIDEO,
     classification: str = "clearly_illustrated_anime_non_real_character",
     attested_by: ActorIdentity | None = None,
     registry_revision_id: str = HASH_C,
@@ -1661,7 +1662,7 @@ def _synthetic_receipt(
         transport="inline_base64",
         provider_kind="volcengine_ark_seedance",
         model_id="doubao-seedance-2-0-mini-260615",
-        mode="image_to_video",
+        mode=mode.value,
         permitted_use=permitted_use,
     )
 
@@ -1669,6 +1670,7 @@ def _synthetic_receipt(
 def _synthetic_policy_receipt(
     asset_module,
     *children,
+    mode: VideoGenerationMode = VideoGenerationMode.IMAGE_TO_VIDEO,
     attempt_id: str = "seedance-attempt-1",
     request_fingerprint: str = HASH_A,
     preview_fingerprint: str = HASH_B,
@@ -1683,7 +1685,7 @@ def _synthetic_policy_receipt(
         prompt_size_bytes=len(PROMPT.encode()),
         provider_kind="volcengine_ark_seedance",
         model_id=model_id,
-        mode="image_to_video",
+        mode=mode.value,
         transport="inline_base64",
         destination="https://ark.cn-beijing.volces.com",
         retention_mode="provider_standard",
@@ -1984,6 +1986,42 @@ def test_synthetic_receipt_permits_attested_project_owned_photorealistic_fiction
     assert receipt.attested_by.actor_kind == "human"
 
 
+def test_synthetic_photorealistic_reference_to_video_requires_mode_specific_claim():
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    png = _rgba_png(width=864, height=496)
+    binding = VideoImageReferenceBinding(
+        role="reference",
+        asset_id="image-fictional-r2v-reference-1",
+        asset_sha256=hashlib.sha256(png).hexdigest(),
+        mime_type="image/png",
+        width=864,
+        height=496,
+        size_bytes=len(png),
+    )
+
+    with pytest.raises(ValidationError):
+        _synthetic_receipt(
+            asset_module,
+            binding,
+            mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+            classification="synthetic_photorealistic_person",
+            permitted_use=(
+                "project-owned-fictional-no-protected-identity:seedance-i2v"
+            ),
+        )
+
+    receipt = _synthetic_receipt(
+        asset_module,
+        binding,
+        mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+        classification="synthetic_photorealistic_person",
+        permitted_use="project-owned-fictional-no-protected-identity:seedance-r2v",
+    )
+    assert receipt.mode == "reference_to_video"
+    assert receipt.permitted_use.endswith(":seedance-r2v")
+    assert receipt.attested_by.actor_kind == "human"
+
+
 def test_synthetic_receipt_requires_human_attestation():
     asset_module = importlib.import_module("ai_video.production.seedance_asset")
     png = _rgba_png()
@@ -2200,6 +2238,9 @@ def test_synthetic_resolver_rejects_tampered_bytes_and_noncanonical_children():
 
 def _synthetic_submit_fixture(
     *,
+    mode: VideoGenerationMode = VideoGenerationMode.IMAGE_TO_VIDEO,
+    binding_role: str = "first_frame",
+    media_bindings: tuple[VideoMediaReferenceBinding, ...] = (),
     registry_file_sha256: str | None = None,
     classification: str = "clearly_illustrated_anime_non_real_character",
     permitted_use: str = "Seedance I2V test fixture.",
@@ -2212,7 +2253,7 @@ def _synthetic_submit_fixture(
     profile = _profile()
     png = _rgba_png(width=864, height=496)
     binding = VideoImageReferenceBinding(
-        role="first_frame",
+        role=binding_role,
         asset_id="image-anime-first-frame-1",
         asset_sha256=hashlib.sha256(png).hexdigest(),
         mime_type="image/png",
@@ -2227,6 +2268,7 @@ def _synthetic_submit_fixture(
     receipt = _synthetic_receipt(
         asset_module,
         binding,
+        mode=mode,
         classification=classification,
         registry_revision_id=registry.revision_id,
         permitted_use=permitted_use,
@@ -2243,7 +2285,7 @@ def _synthetic_submit_fixture(
         asset_id=binding.asset_id,
         receipt_content_hash=receipt.content_hash,
     )
-    placeholder = _synthetic_policy_receipt(asset_module, child)
+    placeholder = _synthetic_policy_receipt(asset_module, child, mode=mode)
     placeholder_resolver = asset_module.SeedanceSyntheticImageReferenceResolver(
         (receipt,),
         policy_receipt=placeholder,
@@ -2270,8 +2312,9 @@ def _synthetic_submit_fixture(
     request = _request(
         profile,
         model_id="doubao-seedance-2-0-mini-260615",
-        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        mode=mode,
         image_bindings=(binding,),
+        media_bindings=media_bindings,
         base_registry=(
             registry_pointer
             if registry_file_sha256 is None
@@ -2299,6 +2342,7 @@ def _synthetic_submit_fixture(
     aggregate = _synthetic_policy_receipt(
         asset_module,
         child,
+        mode=mode,
         attempt_id=paid_preview.attempt_id,
         request_fingerprint=resolved.resolved_generation_hash,
         preview_fingerprint=paid_preview.preview_fingerprint,
@@ -2567,6 +2611,139 @@ def test_synthetic_inline_submit_uses_exact_data_uri_and_audio_opt_out():
     }
     assert payload["generate_audio"] is False
     assert base64.b64encode(png).decode("ascii") not in repr(transport.requests[0])
+
+
+def test_synthetic_reference_to_video_inline_submit_uses_reference_image_role():
+    profile, resolved, video_preview, paid_preview, resolver, png, _, _ = (
+        _synthetic_submit_fixture(
+            mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+            binding_role="reference",
+        )
+    )
+    transport = _FakeTransport()
+    transport.responses.append(_json_response({"id": "task-synthetic-r2v-inline-1"}))
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=resolver,
+        now=lambda: FIXED_NOW,
+    )
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+
+    result = provider.submit(
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+        _permit(resolved, video_preview, paid_preview, authorization),
+    )
+
+    payload = json.loads(transport.requests[0].body)
+    assert result.external_effect_id == "task-synthetic-r2v-inline-1"
+    assert resolved.mode is VideoGenerationMode.REFERENCE_TO_VIDEO
+    assert payload["content"][1] == {
+        "type": "image_url",
+        "image_url": {
+            "url": "data:image/png;base64,"
+            + base64.b64encode(png).decode("ascii")
+        },
+        "role": "reference_image",
+    }
+    assert payload["generate_audio"] is False
+
+
+@pytest.mark.parametrize(
+    ("mode", "role"),
+    [
+        (VideoGenerationMode.IMAGE_TO_VIDEO, "reference"),
+        (VideoGenerationMode.REFERENCE_TO_VIDEO, "first_frame"),
+    ],
+)
+def test_synthetic_policy_rejects_roles_from_another_generation_mode(mode, role):
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    child = asset_module.SeedanceSyntheticImageReceiptBinding(
+        role=role,
+        asset_id="image-synthetic-mode-role-1",
+        receipt_content_hash=HASH_A,
+    )
+
+    with pytest.raises(ValidationError):
+        _synthetic_policy_receipt(asset_module, child, mode=mode)
+
+
+@pytest.mark.parametrize(
+    ("kind", "role", "mime_type"),
+    [
+        ("video", "reference_video", "video/mp4"),
+        ("audio", "reference_audio", "audio/wav"),
+    ],
+)
+def test_synthetic_reference_to_video_rejects_media_before_permit_consumption(
+    kind,
+    role,
+    mime_type,
+):
+    media_kwargs = {
+        "kind": kind,
+        "role": role,
+        "asset_id": f"{kind}-r2v-reference-1",
+        "asset_sha256": HASH_B,
+        "mime_type": mime_type,
+        "duration_millis": 5_000,
+        "size_bytes": 5_000_000,
+    }
+    if kind == "video":
+        media_kwargs.update(width=1280, height=720, fps=24)
+    media = VideoMediaReferenceBinding(**media_kwargs)
+    profile, resolved, video_preview, paid_preview, resolver, _, _, _ = (
+        _synthetic_submit_fixture(
+            mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+            binding_role="reference",
+            media_bindings=(media,),
+        )
+    )
+    transport = _FakeTransport()
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=resolver,
+        now=lambda: FIXED_NOW,
+    )
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+    permit = _permit(
+        resolved,
+        video_preview,
+        paid_preview,
+        authorization,
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            permit,
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert transport.requests == []
+    assert permit._validate_paid_provider_operation_permit(
+        **build_video_paid_permit_binding(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+        )
+    )
 
 
 def test_photorealistic_fictional_inline_submit_uses_attested_derived_provider_output():
