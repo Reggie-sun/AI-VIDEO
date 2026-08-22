@@ -274,7 +274,7 @@ def _literal(node: ast.AST) -> object:
                 values = annotation.slice.elts if isinstance(
                     annotation.slice, ast.Tuple
                 ) else [annotation.slice]
-                literals = tuple(ast.literal_eval(value) for value in values)
+                literals = [ast.literal_eval(value) for value in values]
                 return literals[0] if len(literals) == 1 else literals
     raise ValueError("symbol is not a literal assignment")
 

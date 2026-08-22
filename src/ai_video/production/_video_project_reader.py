@@ -13,6 +13,8 @@ from ai_video.production._lifecycle_schema import (
     LocalVideoSubmitReceiptPointer,
     ContinuityEvaluationIntentPointer,
     GeneratedShotContinuityEvidencePointer,
+    VideoProbeReceiptPointer,
+    VideoProvenanceReceiptPointer,
 )
 from ai_video.production._paid_provider_project_reader import (
     load_paid_provider_budget_by_content_hash,
@@ -349,6 +351,64 @@ def load_generated_shot_continuity_evidence(
     return evidence
 
 
+def load_video_probe_receipt(
+    root: str | Path, pointer: VideoProbeReceiptPointer
+) -> VideoProbeReceipt:
+    resolved_root = Path(root).resolve(strict=True)
+    receipt = _load_video_receipt(
+        resolved_root,
+        pointer.path,
+        VideoProbeReceipt,
+        "video probe receipt",
+    )
+    raw = _read_regular_file_nofollow(
+        resolved_root / pointer.path,
+        contained_by=resolved_root / "state" / "video-generation",
+    )
+    if (
+        pointer.path != canonical_video_probe_receipt_path(receipt.content_hash)
+        or receipt.content_hash != pointer.content_hash
+        or receipt.request_receipt_fingerprint
+        != pointer.request_receipt_fingerprint
+        or receipt.resolved_generation_hash != pointer.resolved_generation_hash
+        or receipt.fetch_fingerprint != pointer.fetch_fingerprint
+        or receipt.measured.artifact_sha256 != pointer.artifact_sha256
+        or raw.file_sha256 != pointer.file_sha256
+    ):
+        raise _invalid("Video probe receipt pointer identity is invalid.")
+    return receipt
+
+
+def load_video_provenance_receipt(
+    root: str | Path, pointer: VideoProvenanceReceiptPointer
+) -> VideoProvenanceReceipt:
+    resolved_root = Path(root).resolve(strict=True)
+    receipt = _load_video_receipt(
+        resolved_root,
+        pointer.path,
+        VideoProvenanceReceipt,
+        "video provenance receipt",
+    )
+    raw = _read_regular_file_nofollow(
+        resolved_root / pointer.path,
+        contained_by=resolved_root / "state" / "video-generation",
+    )
+    if (
+        pointer.path
+        != canonical_video_provenance_receipt_path(receipt.content_hash)
+        or receipt.content_hash != pointer.content_hash
+        or receipt.request_receipt_fingerprint
+        != pointer.request_receipt_fingerprint
+        or receipt.resolved_generation_hash != pointer.resolved_generation_hash
+        or receipt.fetch_fingerprint != pointer.fetch_fingerprint
+        or receipt.artifact_sha256 != pointer.artifact_sha256
+        or receipt.probe_receipt_id != pointer.probe_receipt_id
+        or raw.file_sha256 != pointer.file_sha256
+    ):
+        raise _invalid("Video provenance receipt pointer identity is invalid.")
+    return receipt
+
+
 def load_terminal_frame_extraction(
     root: str | Path, pointer: TerminalFrameExtractionReceiptPointer
 ) -> tuple[bytes, TerminalFrameExtractionReceipt]:
@@ -378,6 +438,37 @@ def load_terminal_frame_extraction(
     ):
         raise _invalid("Terminal frame extraction pointer identity is invalid.")
     return image.data, extraction
+
+
+def _verify_continuity_capture_checkpoint(
+    root: str | Path,
+    state: VideoGenerationAttemptState,
+    request: ResolvedVideoGenerationRequest,
+    fetch: VideoFetchReceipt | LocalVideoFetchReceipt | None,
+) -> None:
+    evaluation = state.continuity_evaluation
+    if evaluation is None or evaluation.probe is None:
+        return
+    if evaluation.provenance is None or evaluation.evidence is None or fetch is None:
+        raise _invalid("Continuity capture checkpoint is incomplete.")
+    probe = load_video_probe_receipt(root, evaluation.probe)
+    provenance = load_video_provenance_receipt(root, evaluation.provenance)
+    if (
+        probe.request_receipt_fingerprint
+        != request.desired_generation_fingerprint
+        or probe.resolved_generation_hash != request.resolved_generation_hash
+        or probe.fetch_fingerprint != fetch.fetch_fingerprint
+        or probe.measured.artifact_sha256 != fetch.artifact_sha256
+        or probe.continuity_evidence is None
+        or probe.continuity_evidence.content_hash != evaluation.evidence.content_hash
+        or provenance.request_receipt_fingerprint
+        != request.desired_generation_fingerprint
+        or provenance.resolved_generation_hash != request.resolved_generation_hash
+        or provenance.fetch_fingerprint != fetch.fetch_fingerprint
+        or provenance.artifact_sha256 != fetch.artifact_sha256
+        or provenance.probe_receipt_id != probe.content_hash
+    ):
+        raise _invalid("Continuity capture checkpoint is not exact.")
 
 
 def verify_video_evidence(
@@ -468,6 +559,9 @@ def verify_video_evidence(
                     or fetch.provider_file_id != observation.provider_file_id
                 ):
                     raise _invalid("Local video fetch evidence is not exact.")
+                _verify_continuity_capture_checkpoint(root, state, request, fetch)
+            elif state.continuity_evaluation is not None:
+                _verify_continuity_capture_checkpoint(root, state, request, None)
             continue
         if state.latest_observation is None:
             continue
@@ -528,6 +622,9 @@ def verify_video_evidence(
                 raise _invalid(
                     "Video fetch evidence does not match its exact submission."
                 )
+            _verify_continuity_capture_checkpoint(root, state, request, fetch)
+        elif state.continuity_evaluation is not None:
+            _verify_continuity_capture_checkpoint(root, state, request, None)
     if len(request_owners) != len(set(request_owners)):
         raise _invalid("Video generation request ownership is ambiguous.")
 

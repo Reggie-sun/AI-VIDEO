@@ -19,6 +19,7 @@ from ai_video.production.models import (
     require_canonical_registry_snapshot_path,
 )
 from ai_video.production.paths import _read_regular_file_nofollow
+from ai_video.production._repair_freshness import approved_repair_is_current
 from ai_video.production.project import (
     _load_exact_render_state,
     load_production_project_candidate,
@@ -133,14 +134,14 @@ class _StateCommitTransactionMixin:
                 raise _state_invalid("Production Manifest revision is stale.")
 
             retained_render_state = manifest.active_render_state
-            if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9"} and (
+            if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"} and (
                 request.next_project != manifest.active_project
                 or request.next_registry != manifest.active_registry
             ):
                 retained_render_state = None
             elif retained_render_state is not None:
                 try:
-                    if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}:
+                    if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}:
                         active_bundle = load_production_project_candidate(
                             self._project_root,
                             manifest,
@@ -195,7 +196,7 @@ class _StateCommitTransactionMixin:
                     "schema_version": (
                         "2.2"
                         if request.operation == "audio_import"
-                        and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}
+                        and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}
                         else manifest.schema_version
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,
@@ -246,7 +247,7 @@ class _StateCommitTransactionMixin:
                     "schema_version": (
                         "2.2"
                         if request.operation == "audio_import"
-                        and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}
+                        and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}
                         else manifest.schema_version
                     ),
                     "manifest_revision": manifest.manifest_revision + 2,
@@ -294,7 +295,7 @@ class _StateCommitTransactionMixin:
                         "schema_version": (
                             "2.2"
                             if request.operation == "audio_import"
-                            and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}
+                            and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}
                             else manifest.schema_version
                         ),
                         "manifest_revision": manifest.manifest_revision + 2,
@@ -456,16 +457,8 @@ class _StateCommitTransactionMixin:
         ):
             raise _state_invalid("Approved Repair Receipt identity is invalid.")
         current_render = self._current_render_state(manifest)
-        if (
-            manifest.active_dependency_graph != approved.dependency_graph
-            or self._dependency_states_hash(manifest)
-            != approved.dependency_states_hash
-            or manifest.active_render_state != approved.render_state
-            or current_render.output.file_sha256 != approved.render_output_sha256
-            or current_render.timeline_fingerprint != approved.timeline_fingerprint
-            or manifest.active_qa_policy != approved.qa_policy
-            or tuple(item.review_id for item in manifest.active_review_receipts)
-            != approved.review_receipt_ids
+        if not approved_repair_is_current(
+            manifest, approved, current_render=current_render
         ):
             raise AiVideoError(
                 ErrorCode.REPAIR_AUTHORIZATION_REQUIRED,

@@ -150,7 +150,7 @@ checks:
     cwd: .
     description: Verify exact planning lineage, structural readiness, typed STOP diagnostics, and compatibility handoff.
   quality_intelligence_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_quality_experience_models.py, tests/test_quality_experience_store.py, tests/test_quality_experience_dataset.py, tests/test_quality_experience_rag_projection.py, tests/test_agent_memory.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_quality_experience_capture.py, tests/test_quality_experience_models.py, tests/test_quality_experience_store.py, tests/test_quality_experience_dataset.py, tests/test_quality_experience_rag_projection.py, tests/test_agent_memory.py, -q]
     cwd: .
     description: Verify passive Quality Experience schemas, immutable closure, exact lookup, sanitized projection, and Agent Memory isolation without live Provider or index rebuild.
   provider_console_python_tests:
@@ -299,6 +299,7 @@ categories:
       - task_architecture_gate
   production_state:
     patterns:
+      - src/ai_video/production/_repair_freshness.py
       - src/ai_video/production/_state_commit_*.py
       - tests/helpers/p2a_crash_worker.py
       - tests/test_production_bootstrap.py
@@ -341,6 +342,7 @@ categories:
       - task_architecture_gate
   production_review:
     patterns:
+      - src/ai_video/production/_repair_freshness.py
       - src/ai_video/production/review.py
       - src/ai_video/production/continuity_evaluator.py
       - src/ai_video/production/continuity_onnx_backend.py
@@ -458,6 +460,8 @@ categories:
       - task_architecture_gate
   production_shot_router:
     patterns:
+      - src/ai_video/production/_shot_router_contracts.py
+      - src/ai_video/production/_shot_visual_resolver.py
       - src/ai_video/production/shot_router.py
       - tests/test_production_shot_router.py
     check_ids:

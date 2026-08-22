@@ -360,6 +360,51 @@ class GeneratedShotContinuityEvidencePointer(_PaidLifecycleModel):
         return self
 
 
+class VideoProbeReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    fetch_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "VideoProbeReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/probes/"
+                f"{self.content_hash}.json"
+            ),
+            "video probe receipt",
+        )
+        return self
+
+
+class VideoProvenanceReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    fetch_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    probe_receipt_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "VideoProvenanceReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/provenance/"
+                f"{self.content_hash}.json"
+            ),
+            "video provenance receipt",
+        )
+        return self
+
+
 class ContinuityEvaluationPhase(str, Enum):
     INTENT = "intent"
     EVIDENCED = "evidenced"
@@ -369,11 +414,27 @@ class ContinuityEvaluationState(_PaidLifecycleModel):
     phase: ContinuityEvaluationPhase
     intent: ContinuityEvaluationIntentPointer
     evidence: GeneratedShotContinuityEvidencePointer | None = None
+    probe: VideoProbeReceiptPointer | None = None
+    provenance: VideoProvenanceReceiptPointer | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_variant(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.probe is None:
+            data.pop("probe", None)
+        if self.provenance is None:
+            data.pop("provenance", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_phase(self) -> "ContinuityEvaluationState":
         if self.phase is ContinuityEvaluationPhase.INTENT:
-            if self.evidence is not None:
+            if any(
+                item is not None
+                for item in (self.evidence, self.probe, self.provenance)
+            ):
                 raise ValueError("continuity evaluation intent cannot contain evidence")
         elif (
             self.evidence is None
@@ -382,6 +443,23 @@ class ContinuityEvaluationState(_PaidLifecycleModel):
             or self.evidence.artifact_sha256 != self.intent.artifact_sha256
         ):
             raise ValueError("continuity evaluation evidence does not match its intent")
+        if (self.probe is None) != (self.provenance is None):
+            raise ValueError(
+                "continuity capture checkpoint requires probe and provenance together"
+            )
+        if self.probe is not None and self.provenance is not None and (
+            self.probe.resolved_generation_hash
+            != self.provenance.resolved_generation_hash
+            or self.probe.artifact_sha256 != self.intent.artifact_sha256
+            or self.probe.request_receipt_fingerprint
+            != self.provenance.request_receipt_fingerprint
+            or self.probe.fetch_fingerprint != self.provenance.fetch_fingerprint
+            or self.probe.artifact_sha256 != self.provenance.artifact_sha256
+            or self.provenance.probe_receipt_id != self.probe.content_hash
+        ):
+            raise ValueError(
+                "continuity capture checkpoint does not bind exact video evidence"
+            )
         return self
 
 
@@ -850,7 +928,7 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
         isinstance(attempt, Mapping) and "paid_provider_state" in attempt
         for attempt in value.get("attempts", ())
     )
-    if manifest_version not in {"2.6", "2.7", "2.8", "2.9"} and (
+    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10"} and (
         "active_paid_provider_budget" in value or has_paid_attempt
     ):
         raise ValueError(
@@ -891,6 +969,45 @@ def reject_explicit_p8_video_fields(value: object) -> object:
                 )
         return value
     if manifest_version == "2.9":
+        for attempt in value.get("attempts", ()):
+            if not isinstance(attempt, Mapping):
+                continue
+            state = attempt.get("video_generation_state")
+            evaluation = (
+                state.get("continuity_evaluation")
+                if isinstance(state, Mapping)
+                else None
+            )
+            if isinstance(evaluation, Mapping) and (
+                "probe" in evaluation or "provenance" in evaluation
+            ):
+                raise ValueError(
+                    "Production Manifest 2.9 cannot contain continuity capture "
+                    "checkpoint fields; Manifest 2.10 is required"
+                )
+        return value
+    if manifest_version == "2.10":
+        for attempt in value.get("attempts", ()):
+            if not isinstance(attempt, Mapping):
+                continue
+            state = attempt.get("video_generation_state")
+            evaluation = (
+                state.get("continuity_evaluation")
+                if isinstance(state, Mapping)
+                else None
+            )
+            if (
+                isinstance(evaluation, Mapping)
+                and evaluation.get("phase") == ContinuityEvaluationPhase.EVIDENCED.value
+                and (
+                    evaluation.get("probe") is None
+                    or evaluation.get("provenance") is None
+                )
+            ):
+                raise ValueError(
+                    "Production Manifest 2.10 evidenced continuity requires "
+                    "exact probe and provenance checkpoints"
+                )
         return value
     for attempt in value.get("attempts", ()):
         if isinstance(attempt, Mapping) and (
@@ -908,7 +1025,7 @@ def reject_explicit_p7_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9"}:
+    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}:
         return value
     image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
     for attempt in value.get("attempts", ()):

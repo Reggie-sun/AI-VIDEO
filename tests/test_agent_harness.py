@@ -209,6 +209,8 @@ def test_shot_router_routes_to_exact_contract_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
     for path in (
+        "src/ai_video/production/_shot_router_contracts.py",
+        "src/ai_video/production/_shot_visual_resolver.py",
         "src/ai_video/production/shot_router.py",
         "tests/test_production_shot_router.py",
     ):
@@ -306,7 +308,12 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
     for path in (
+        "src/ai_video/quality_intelligence/_capture_contracts.py",
+        "src/ai_video/quality_intelligence/_capture_human.py",
+        "src/ai_video/quality_intelligence/_capture_p6.py",
+        "src/ai_video/quality_intelligence/capture.py",
         "src/ai_video/quality_intelligence/models.py",
+        "tests/test_quality_experience_capture.py",
         "tests/test_quality_experience_dataset.py",
         "tests/fixtures/quality_experience/v1/prospective_failure.json",
     ):
@@ -322,6 +329,7 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
 
     argv = policy["checks"]["quality_intelligence_tests"]["argv"]
     for path in (
+        "tests/test_quality_experience_capture.py",
         "tests/test_quality_experience_models.py",
         "tests/test_quality_experience_store.py",
         "tests/test_quality_experience_dataset.py",
@@ -645,6 +653,19 @@ def test_production_test_helpers_route_to_their_contract_owners() -> None:
     assert "production_video_provider_tests" in video["check_ids"]
 
 
+def test_approved_repair_freshness_routes_to_state_and_review_suites() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths(
+        ["src/ai_video/production/_repair_freshness.py"], policy
+    )
+
+    assert set(report["categories"]) == {"production_state", "production_review"}
+    assert "production_state_tests" in report["check_ids"]
+    assert "production_review_tests" in report["check_ids"]
+    assert "task_architecture_gate" in report["check_ids"]
+
+
 def test_shared_committer_helpers_route_to_full_production_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
@@ -737,6 +758,14 @@ def test_project_skill_installation_routes_to_control_plane_harness(path: str) -
         (
             "src/ai_video/planning/video_planner.py",
             {"video_planning"},
+        ),
+        (
+            "src/ai_video/production/_shot_router_contracts.py",
+            {"production_shot_router"},
+        ),
+        (
+            "src/ai_video/production/_shot_visual_resolver.py",
+            {"production_shot_router"},
         ),
         (
             "src/ai_video/production/shot_router.py",

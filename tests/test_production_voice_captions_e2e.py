@@ -519,6 +519,36 @@ def _sample_rgb_frame(held_fd: int, frame: int, *, ffmpeg_path: Path) -> bytes:
     return completed.stdout[:3]
 
 
+def test_manifest_210_voice_generation_preserves_latest_schema(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_and_load_two_shot_project(tmp_path)
+    before = load_production_project(tmp_path / "project.yaml").manifest.model_copy(
+        update={"schema_version": "2.10"}
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        before.model_dump_json(indent=2), encoding="utf-8"
+    )
+    request = project_factory.make_voice_request(
+        tmp_path, attempt_id="voice-manifest-210"
+    )
+    preview, authorization = project_factory.make_voice_preview_and_authorization(
+        request
+    )
+    committer = ProductionStateCommitter(tmp_path)
+
+    after = committer.begin_voice_generation(
+        request,
+        preview,
+        authorization,
+        dependency_transition_preparer_available=True,
+    )
+
+    assert after.schema_version == "2.10"
+    assert after.attempts[-1].voice_phase == "request"
+    assert after.attempts[-1].status is StateCommitStatus.RUNNING
+
+
 def test_p4_fake_voice_captions_end_to_end_is_durable_offline_and_replay_safe(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

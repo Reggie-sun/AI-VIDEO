@@ -141,7 +141,7 @@ surfaces:
       - type: python_literal_equals
         path: src/ai_video/quality_intelligence/models.py
         symbol: QualityExperienceRecordV1.schema_version
-        expected: "1.0"
+        expected: ["1.0", "1.1"]
       - type: python_symbol_exists
         path: src/ai_video/quality_intelligence/store.py
         symbol: QualityExperienceStore

@@ -1679,7 +1679,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         _verify_manifest_dependency_states(bundle, dependency_graph)
         bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
     if manifest.schema_version == "2.4" or (
-        manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9"}
+        manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}
         and manifest.active_qa_policy is not None
     ):
         if manifest.active_qa_policy is None:
@@ -1751,7 +1751,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     if manifest.active_render_state is not None:
         render_state = (
             _load_exact_render_state(bundle, manifest.active_render_state)
-            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}
+            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}
             else load_verified_render_state(
                 root,
                 manifest.active_render_state,

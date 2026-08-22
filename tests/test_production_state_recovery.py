@@ -67,6 +67,44 @@ def _durable_tree_snapshot(root: Path) -> dict[Path, bytes]:
     }
 
 
+def test_manifest_210_recovery_strictly_reopens_active_p6_policy(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    manifest = _read_manifest(tmp_path)
+    selected = writer.activate_qa_policy(
+        make_qa_policy(),
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="manifest-210-recovery-policy",
+    )
+    upgraded = writer.upgrade_manifest_schema(
+        "2.10", expected_manifest_revision=selected.manifest_revision
+    )
+    assert upgraded.active_qa_policy is not None
+    policy_path = tmp_path / upgraded.active_qa_policy.path
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    policy["semantic_requirement"] = "tampered requirement"
+    policy_bytes = json.dumps(policy).encode("utf-8")
+    policy_path.write_bytes(policy_bytes)
+    tampered = upgraded.model_copy(
+        update={
+            "active_qa_policy": upgraded.active_qa_policy.model_copy(
+                update={
+                    "file_sha256": hashlib.sha256(policy_bytes).hexdigest()
+                }
+            )
+        }
+    )
+    _write_manifest(tmp_path, tampered)
+
+    with pytest.raises(AiVideoError) as rejected:
+        writer.recover()
+
+    assert rejected.value.code is ErrorCode.PRODUCTION_STATE_RECOVERY_FAILED
+
+
 def _make_inactive_image_candidate(root: Path) -> ProductionManifest:
     base_inputs = project_factory.make_p7_image_generation_base(root)
     request, preview, authorization = make_image_call_bundle(root)

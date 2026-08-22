@@ -146,7 +146,7 @@ class _StateCommitImageIntentMixin:
         request: ImageGenerationRequest,
         preview: ImageGenerationPreview,
     ) -> None:
-        if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9"}:
+        if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}:
             raise _image_invalid(
                 "Image generation requires an active Manifest dependency graph."
             )
@@ -398,7 +398,7 @@ class _StateCommitImageIntentMixin:
                 {
                     "schema_version": (
                         manifest.schema_version
-                        if manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9"}
+                        if manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}
                         else "2.5"
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,

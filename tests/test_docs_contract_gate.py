@@ -285,6 +285,26 @@ def test_python_literal_reads_class_annotation(tmp_path: Path) -> None:
     assert _check(root).ok
 
 
+def test_python_literal_reads_multi_value_class_annotation(tmp_path: Path) -> None:
+    surface = _surface(
+        assertions=[
+            {
+                "type": "python_literal_equals",
+                "path": "src/example.py",
+                "symbol": "Example.SCHEMA_VERSION",
+                "expected": ["1.0", "1.1"],
+            }
+        ]
+    )
+    root = _repository(tmp_path, [surface])
+    (root / "src/example.py").write_text(
+        'from typing import Literal\n\nclass Example:\n    SCHEMA_VERSION: Literal["1.0", "1.1"]\n',
+        encoding="utf-8",
+    )
+
+    assert _check(root).ok
+
+
 def test_quality_schema_annotation_change_without_metadata_fails(
     tmp_path: Path,
 ) -> None:

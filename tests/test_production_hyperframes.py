@@ -4207,6 +4207,21 @@ def test_manifest_25_render_activation_preserves_p7_and_stales_exact_reviews(
     }
 
 
+def test_manifest_210_render_preserves_latest_schema(tmp_path: Path) -> None:
+    fixture = make_manifest_25_render_fixture(tmp_path)
+    before = fixture.load_manifest().model_copy(update={"schema_version": "2.10"})
+    (tmp_path / "state/manifest.json").write_text(
+        before.model_dump_json(indent=2), encoding="utf-8"
+    )
+
+    fixture.render()
+    after = fixture.load_manifest()
+
+    assert after.schema_version == "2.10"
+    assert after.active_project == before.active_project
+    assert after.active_registry == before.active_registry
+
+
 def test_manifest_25_render_exact_replay_has_zero_runner_and_manifest_writes(
     tmp_path: Path,
 ) -> None:

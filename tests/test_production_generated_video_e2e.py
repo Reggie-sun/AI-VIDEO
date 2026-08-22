@@ -96,13 +96,22 @@ CONTINUITY_EVALUATOR = ToolIdentity(
 )
 
 
+def _durable_tree_snapshot(root: Path) -> dict[Path, bytes]:
+    return {
+        path.relative_to(root): path.read_bytes()
+        for path in root.rglob("*")
+        if path.is_file()
+        and path.relative_to(root) != Path("state/commit.lock")
+    }
+
+
 def _runtime(
     root: Path, *, seal_terminal_frame: bool = False, continuity: bool = False
 ):
     inputs = make_p8_video_generation_base(
         root,
         schema_version=(
-            "2.9" if continuity else "2.8" if seal_terminal_frame else "2.7"
+            "2.10" if continuity else "2.8" if seal_terminal_frame else "2.7"
         ),
     )
     loaded = inputs.project
@@ -775,9 +784,17 @@ def test_terminal_extraction_checkpoint_prevents_repeat_after_candidate_failure(
 
 
 class _CountingDurableContinuityReviewer:
-    def __init__(self, *, fail_during_evaluation: bool = False) -> None:
+    def __init__(
+        self,
+        *,
+        fail_during_evaluation: bool = False,
+        identity_match: bool = True,
+        coverage_complete: bool = True,
+    ) -> None:
         self.calls = 0
         self.fail_during_evaluation = fail_during_evaluation
+        self.identity_match = identity_match
+        self.coverage_complete = coverage_complete
         self.intent: ContinuityEvaluationIntent | None = None
 
     def create_intent(self, request, measured, qa_policy_content_hash):
@@ -816,8 +833,8 @@ class _CountingDurableContinuityReviewer:
             qa_policy_content_hash=qa_policy_content_hash,
             evaluator=CONTINUITY_EVALUATOR,
             strength=EvidenceStrength.HUMAN,
-            coverage_complete=True,
-            identity_match=True,
+            coverage_complete=self.coverage_complete,
+            identity_match=self.identity_match,
             camera_axis_match=True,
             framing_match=True,
             motion_direction_match=True,
@@ -827,6 +844,110 @@ class _CountingDurableContinuityReviewer:
             evaluation_fingerprint=self.intent.evaluation_fingerprint,
             rationale="Fixture human reviewed every exact continuity dimension.",
         )
+
+
+def test_continuity_fail_checkpoints_probe_and_provenance_before_adjudication(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, continuity=True)
+    VideoGenerationService(committer=committer, provider=provider).fetch_once(
+        attempt_id=ATTEMPT_ID
+    )
+
+    with pytest.raises(AiVideoError) as rejected:
+        VideoGenerationService(committer=committer, provider=provider).fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            continuity_reviewer=_CountingDurableContinuityReviewer(
+                identity_match=False
+            ),
+        )
+
+    assert rejected.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    checkpointed = ProductionStateCommitter(tmp_path)._read_manifest()
+    state = checkpointed.attempts[-1].video_generation_state
+    assert state is not None and state.continuity_evaluation is not None
+    assert state.continuity_evaluation.probe is not None
+    assert state.continuity_evaluation.provenance is not None
+    assert (tmp_path / state.continuity_evaluation.probe.path).is_file()
+    assert (tmp_path / state.continuity_evaluation.provenance.path).is_file()
+    load_production_project(tmp_path / "project.yaml")
+
+
+def test_historical_manifest_29_evidenced_replay_reuses_evaluator_evidence(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, continuity=True)
+    VideoGenerationService(committer=committer, provider=provider).fetch_once(
+        attempt_id=ATTEMPT_ID
+    )
+    original = _CountingDurableContinuityReviewer(identity_match=False)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    with pytest.raises(AiVideoError):
+        service.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            continuity_reviewer=original,
+        )
+
+    manifest = committer._read_manifest()
+    attempt = manifest.attempts[-1]
+    state = attempt.video_generation_state
+    assert state is not None and state.continuity_evaluation is not None
+    historical_evaluation = state.continuity_evaluation.model_copy(
+        update={"probe": None, "provenance": None}
+    )
+    historical_state = state.model_copy(
+        update={"continuity_evaluation": historical_evaluation}
+    )
+    historical_attempt = attempt.model_copy(
+        update={"video_generation_state": historical_state}
+    )
+    historical = manifest.model_copy(
+        update={
+            "schema_version": "2.9",
+            "attempts": (*manifest.attempts[:-1], historical_attempt),
+        }
+    )
+    (tmp_path / "state/manifest.json").write_text(
+        historical.model_dump_json(indent=2), encoding="utf-8"
+    )
+    reopened = load_production_project(tmp_path / "project.yaml")
+    assert reopened.manifest.schema_version == "2.9"
+    before = _durable_tree_snapshot(tmp_path)
+    replay_reviewer = _CountingDurableContinuityReviewer(identity_match=True)
+
+    with pytest.raises(AiVideoError) as replayed:
+        VideoGenerationService(
+            committer=ProductionStateCommitter(tmp_path),
+            provider=provider,
+        ).fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            continuity_reviewer=replay_reviewer,
+        )
+
+    assert replayed.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert replay_reviewer.calls == 0
+    assert _durable_tree_snapshot(tmp_path) == before
+
+
+def test_new_continuity_attempt_rejects_manifest_29_before_provider_submit(
+    tmp_path: Path,
+) -> None:
+    _, provider, resolved, _, committer = _runtime(tmp_path, continuity=True)
+    manifest_path = tmp_path / "state/manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["schema_version"] = "2.9"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    before = provider.call_counts
+
+    with pytest.raises(AiVideoError) as rejected:
+        VideoGenerationService(committer=committer, provider=provider).start(
+            attempt_id=ATTEMPT_ID,
+            request=resolved,
+        )
+
+    assert rejected.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert provider.call_counts == before
+    assert provider.call_counts.submit == 0
 
 
 def test_continuity_evidence_checkpoint_prevents_repeat_after_candidate_failure(
@@ -872,6 +993,16 @@ def test_continuity_evidence_checkpoint_prevents_repeat_after_candidate_failure(
 
     assert replayed == activated
     assert reviewer.calls == 1
+    manifest_29 = activated.model_dump(mode="json")
+    manifest_29["schema_version"] = "2.9"
+    with pytest.raises(ValueError, match="Manifest 2.10 is required"):
+        ProductionManifest.model_validate(manifest_29)
+    incomplete_210 = activated.model_dump(mode="json")
+    incomplete_210["attempts"][-1]["video_generation_state"][
+        "continuity_evaluation"
+    ].pop("probe")
+    with pytest.raises(ValueError, match="exact probe and provenance"):
+        ProductionManifest.model_validate(incomplete_210)
     historical_shape = activated.model_dump(mode="json")
     historical_shape["schema_version"] = "2.8"
     with pytest.raises(ValueError, match="Manifest 2.9 is required"):

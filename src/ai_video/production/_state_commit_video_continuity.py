@@ -11,14 +11,19 @@ from ai_video.production.models import (
     ContinuityEvaluationState,
     GeneratedShotContinuityEvidencePointer,
     QaVerdict,
+    VideoProbeReceiptPointer,
+    VideoProvenanceReceiptPointer,
 )
 from ai_video.production.paths import (
     canonical_continuity_evaluation_intent_path,
     canonical_generated_shot_continuity_evidence_path,
+    canonical_video_probe_receipt_path,
+    canonical_video_provenance_receipt_path,
 )
 from ai_video.production.review import adjudicate_generated_shot_continuity
 from ai_video.production.video_artifact import (
     VideoProbeReceipt,
+    VideoProvenanceReceipt,
     invoke_generated_shot_continuity_reviewer,
     validate_generated_shot_continuity_evidence,
 )
@@ -48,6 +53,8 @@ def checkpoint_generated_shot_continuity(
     request,
     measured,
     fetch_receipt,
+    observation,
+    local_lane,
     continuity_reviewer,
     continuity_policy_content_hash,
     continuity_authorities,
@@ -60,14 +67,14 @@ def checkpoint_generated_shot_continuity(
     if evaluation_state is None:
         create_intent = getattr(continuity_reviewer, "create_intent", None)
         if (
-            manifest.schema_version != "2.9"
+            manifest.schema_version != "2.10"
             or continuity_reviewer is None
             or create_intent is None
             or continuity_policy_content_hash is None
             or not continuity_authorities
         ):
             raise _state_invalid(
-                "Continuity evaluation requires Manifest 2.9 and a durable evaluator intent."
+                "Continuity evaluation requires Manifest 2.10 and a durable evaluator intent."
             )
         intent = create_intent(request, measured, continuity_policy_content_hash)
         binding = request.continuity_binding
@@ -160,10 +167,42 @@ def checkpoint_generated_shot_continuity(
             ),
             _canonical_json_bytes(evidence),
         )
-        committer._write_immutable_artifact(
-            evidence_artifact, attempt_id=attempt_id
+        probe_receipt = VideoProbeReceipt.create(
+            request=request,
+            fetch_receipt=fetch_receipt,
+            measured=measured,
+            continuity_evidence=evidence,
         )
-        committer._reopen_exact_video_artifact(evidence_artifact)
+        provenance = (
+            VideoProvenanceReceipt.create_local(
+                request=request,
+                observation=observation,
+                fetch_receipt=fetch_receipt,
+                probe_receipt=probe_receipt,
+            )
+            if local_lane
+            else VideoProvenanceReceipt.create(
+                request=request,
+                observation=observation,
+                fetch_receipt=fetch_receipt,
+                probe_receipt=probe_receipt,
+            )
+        )
+        probe_artifact = _prepared_artifact(
+            canonical_video_probe_receipt_path(probe_receipt.content_hash),
+            _canonical_json_bytes(probe_receipt),
+        )
+        provenance_artifact = _prepared_artifact(
+            canonical_video_provenance_receipt_path(provenance.content_hash),
+            _canonical_json_bytes(provenance),
+        )
+        for artifact in (
+            evidence_artifact,
+            probe_artifact,
+            provenance_artifact,
+        ):
+            committer._write_immutable_artifact(artifact, attempt_id=attempt_id)
+            committer._reopen_exact_video_artifact(artifact)
         evidence_pointer = GeneratedShotContinuityEvidencePointer(
             path=evidence_artifact.relative_path,
             content_hash=evidence.content_hash,
@@ -171,12 +210,37 @@ def checkpoint_generated_shot_continuity(
             artifact_sha256=evidence.artifact_sha256,
             file_sha256=evidence_artifact.file_sha256,
         )
+        probe_pointer = VideoProbeReceiptPointer(
+            path=probe_artifact.relative_path,
+            content_hash=probe_receipt.content_hash,
+            request_receipt_fingerprint=(
+                probe_receipt.request_receipt_fingerprint
+            ),
+            resolved_generation_hash=probe_receipt.resolved_generation_hash,
+            fetch_fingerprint=probe_receipt.fetch_fingerprint,
+            artifact_sha256=probe_receipt.measured.artifact_sha256,
+            file_sha256=probe_artifact.file_sha256,
+        )
+        provenance_pointer = VideoProvenanceReceiptPointer(
+            path=provenance_artifact.relative_path,
+            content_hash=provenance.content_hash,
+            request_receipt_fingerprint=(
+                provenance.request_receipt_fingerprint
+            ),
+            resolved_generation_hash=provenance.resolved_generation_hash,
+            fetch_fingerprint=provenance.fetch_fingerprint,
+            artifact_sha256=provenance.artifact_sha256,
+            probe_receipt_id=provenance.probe_receipt_id,
+            file_sha256=provenance_artifact.file_sha256,
+        )
         evidenced_state = state.model_copy(
             update={
                 "continuity_evaluation": ContinuityEvaluationState(
                     phase=ContinuityEvaluationPhase.EVIDENCED,
                     intent=evaluation_state.intent,
                     evidence=evidence_pointer,
+                    probe=probe_pointer,
+                    provenance=provenance_pointer,
                 )
             }
         )
@@ -205,6 +269,37 @@ def checkpoint_generated_shot_continuity(
         evidence = committer._reopen_generated_shot_continuity_evidence(
             evaluation_state.evidence
         )
+        if evaluation_state.probe is None or evaluation_state.provenance is None:
+            if manifest.schema_version != "2.9":
+                raise _state_invalid("Continuity capture checkpoint is incomplete.")
+            probe_receipt = VideoProbeReceipt.create(
+                request=request,
+                fetch_receipt=fetch_receipt,
+                measured=measured,
+                continuity_evidence=evidence,
+            )
+            provenance = (
+                VideoProvenanceReceipt.create_local(
+                    request=request,
+                    observation=observation,
+                    fetch_receipt=fetch_receipt,
+                    probe_receipt=probe_receipt,
+                )
+                if local_lane
+                else VideoProvenanceReceipt.create(
+                    request=request,
+                    observation=observation,
+                    fetch_receipt=fetch_receipt,
+                    probe_receipt=probe_receipt,
+                )
+            )
+        else:
+            probe_receipt = committer._reopen_video_probe_receipt(
+                evaluation_state.probe
+            )
+            provenance = committer._reopen_video_provenance_receipt(
+                evaluation_state.provenance
+            )
 
     validate_generated_shot_continuity_evidence(
         evidence,
@@ -214,12 +309,13 @@ def checkpoint_generated_shot_continuity(
         authorities=continuity_authorities,
         require_pass=False,
     )
-    probe_receipt = VideoProbeReceipt.create(
-        request=request,
-        fetch_receipt=fetch_receipt,
-        measured=measured,
-        continuity_evidence=evidence,
-    )
+    if (
+        probe_receipt.continuity_evidence != evidence
+        or probe_receipt.fetch_fingerprint != fetch_receipt.fetch_fingerprint
+        or provenance.probe_receipt_id != probe_receipt.content_hash
+        or provenance.artifact_sha256 != measured.artifact_sha256
+    ):
+        raise _state_invalid("Continuity capture checkpoint is not exact.")
     verdict = adjudicate_generated_shot_continuity(evidence)
     if verdict is not QaVerdict.PASS:
         raise AiVideoError(
@@ -230,4 +326,4 @@ def checkpoint_generated_shot_continuity(
             technical_detail=f"verdict={verdict.value}",
             retryable=False,
         )
-    return manifest, attempt, state, probe_receipt
+    return manifest, attempt, state, probe_receipt, provenance
