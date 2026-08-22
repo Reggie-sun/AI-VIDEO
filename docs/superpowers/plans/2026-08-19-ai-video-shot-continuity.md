@@ -2,611 +2,738 @@
 
 ## Status
 
-本文档最初是上述 Shot Continuity specification 的 proposed implementation plan。2026-08-19后续明确执行请求已完成Milestone 1-5、Hailuo 2.3/Seedance 2.0 Mini offline portions、provider-neutral technical suites，以及Milestone 6 Lane A的Local MiniMax H3 `fl2va` sealed workflow/profile、loopback-only adapter与durable local lifecycle；Milestone 9的C1 Local H3 lane也已完成。2026-08-20 separately authorized Alice C2 tasks完成shared terminal/keyframe prerequisite；首个Hailuo result收敛adaptive geometry但其receipt migration不计canonical lifecycle，随后新bounded adaptive request完成one-submit/fetch/activation/recovery/replay，human visual review为`pass with minor concerns`。Lane C Seedance完成exact resolve与fresh `3 CNY` preview，但因缺少Ark registered asset materialization在POST前fail closed，submit count为零。Local H3 C2 Shot 2、Seedance live、`ref2va`、blinded three-lane acceptance与Router仍pending；没有push或release。
+Active canonical implementation plan，governed by
+[Shot Continuity Specification](../specs/2026-08-19-ai-video-shot-continuity.md)。
 
-2026-08-22本plan继续作为唯一Shot Continuity execution owner，并增加`C4_MULTI_ANCHOR_MOTION_CONTINUITY` ordered implementation lane。C4 spec已冻结，implementation尚未开始。v7在full-speed user review后因identity与camera-motion discontinuity被明确拒绝，fetched Seedance artifact保持unactivated；历史reviewer `accept with concerns`、SSIM与Provider success不构成C4 acceptance。本轮authority只覆盖本spec/plan更新，不覆盖runtime code、media generation、paid preview/POST或permit。
+截至 2026-08-22，C1/C2/C3、terminal evidence、provider-neutral C4 binding、request/resolved
+hash、exact cardinality grammar 与 Router fail-closed gate 已实现；当前等级为
+`C4_CORE_READY`。未完成项集中在 concrete destination capability、完整四锚点 local smoke、
+boundary/identity/motion quality evidence、P6 Final Acceptance，以及有向 Provider transition
+certification。
 
-## Objective
+本计划替换旧版中“重新实现 C4 core”和“以 Seedance Mini 作为 C4 destination”的过时步骤。历史
+Hailuo 与 Seedance Mini attempts 继续作为 runtime record；它们不再决定 future capability target，也不
+构成 C4 或多 Provider acceptance。
 
-在不复制 timeline、renderer、state writer、P5 resolver 或 Agent runtime 的前提下，把 Shot N 的 exact activated terminal-frame state 变成 Shot N+1 可验证的 `first_frame` continuity input，并为 local continuity、MiniMax cloud Hailuo 2.3 与 Seedance 2.0 Mini 建立互不混淆的 capability-gated lane。
+本轮只更新 plan。Plan 本身不授权 runtime implementation、模型安装/融合、ComfyUI 升级、local live
+generation、remote/paid preview/POST、permit、activation、push 或 release。
 
-新增C4 objective：把first-frame-only continuity升级为同一generation同时消费exact terminal、canonical identity、approved endpoint与exact upstream motion tail的multi-anchor contract，并将static boundary acceptance与motion boundary acceptance分别验收。任何Provider在无法证明完整mixed capability时必须在paid preview/POST前fail closed。
+## Goal
 
-## Problem Boundary
+按一个可验证、无 fallback 的顺序交付：
 
-- `single timing owner`: `ResolvedTimeline`。
-- `single durable/activation/recovery owner`: `ProductionStateCommitter`。
-- `single invalidation owner`: 既有 P5 graph builder/resolver/selective rebuild。
-- `single render owner`: 既有 HyperFrames renderer。
-- `old path to retire`: 只在 continuity-enabled Shot 上禁止“没有 exact upstream binding 的独立生成”路径；普通 P8 T2V/I2V 和非 continuity Shot 不退役。
-- `C4 old path to retire`: 对显式C4 attempt，退役exact-terminal Router只投影`("first_frame",)`以及continuity validator只接受`first_frame + optional last_frame`的路径；C1/C2/C3与ordinary P8 paths保持不变。
-- `unchanged contracts`: P3/P4 audio/captions/mux、Legacy CLI/layout、static-image、existing generated-MP4 compatibility、default no-network、Paid Provider Gate。
-- `focused verification`: 以 P8 request/activation E2E、P5 selective rebuild、P3/P4 composition/HyperFrames 和 provider adapter tests 为主；任何 live proof 单独授权。
+1. 保持现有 provider-neutral C4 core 为唯一四锚点合同；
+2. 资格判定并实现一个 Local T8 `C4_NATIVE_BOUNDARY_MOTION` destination child；
+3. 把已购买的 base `doubao-seedance-2-0-260128` 与 Fast/Mini 分离为 exact model contracts，active
+   inventory 默认只暴露 base；
+4. 用 immutable directed certification 表达具体的
+   `source provider/model/profile/capability -> destination provider/model/profile/capability` transition；
+5. 只有至少两个不同 destination Providers 在同一 grade 上分别通过全部 gates，才允许声明
+   `SAME_GRADE_MULTI_DESTINATION_READY`。
+
+目标不是 runtime 自动选模、失败降级或“任意 Provider 一键互换”。Planner/Router 只可显式选择已经
+sealed 且对 exact grade、model、profile 与 direction 完成认证的 destination。
+
+## Scope
+
+### Included
+
+- C4 core regression/tamper closure，不重复实现已存在的 owner；
+- Local T8 C4 model qualification：M0 stock Ref2VA，必要时 M1 sealed Hybrid artifact；
+- winner-specific workflow、binding、profile、capability 与 local child adapter；
+- `LocalH3VideoProviderFamily` additive child registration 与 exact dispatch；
+- local lifecycle、recovery、activation、reopen、replay 与 P5 closure；
+- four-anchor technical smoke、decoded boundary、identity、motion 与 P6/human evidence；
+- directed `ProviderTransitionCertification` persistence seam 与 exact pair certification；
+- Seedance 2.0 base/Fast/Mini 的 catalog、active inventory、profile、pricing、endpoint 与 response identity
+  isolation；
+- 可选的 base Seedance 2.0 `C4_SEMANTIC_MULTI_REFERENCE` lane，前提是 separate formal evidence、
+  authorization 与 quality gates 均满足；
+- canonical docs、tests、Architecture Gate、exact-snapshot Harness 与 independent review。
+
+### Out of Scope
+
+- 不新增 timeline、renderer、state writer、automatic recovery 或 Provider fallback；
+- 不扩宽现有 T8 `T2VA`、`I2VA`、`FL2VA`、`Ref2VA` capability identity；
+- 不把多个 capability 的并集描述为一个 C4 capability；
+- 不把 Seedance frame mode 与 reference mode 的 serializer 字段共存当作 official cross-mode support；
+- 不购买或启用 Fast/Mini；无 fresh entitlement 时它们不得进入 active snapshot；
+- 不在第一版启用 Turbo LoRA；
+- 不自动构建、修复或替换 Hybrid artifact；
+- 不升级 pinned ComfyUI 或引入 `MiniMaxH3AddGuide`；
+- 不引入 remote/cloud fallback，不进行 blind retry；
+- 不改变 Legacy CLI、default no-network、HyperFrames 或 `ResolvedTimeline` ownership；
+- 不把 transport success、hash closure、SSIM、reviewer verdict 或 fetched artifact当作 P6 Final
+  Acceptance；
+- 不承诺 `FULL_MATRIX_READY`，除非所有对外声明的有向 pair 都有独立 certification。
+
+## Contract Surfaces
+
+### C4 Provider-Neutral Contract
+
+现有 `C4MultiAnchorBinding`、`ProviderNeutralVideoRequirement`、`VideoGenerationRequest`、
+`ResolvedVideoGenerationRequest`、activation scope 与 Router gate 是 stable contract。Motion grade 的 exact
+shape 保持：
+
+| Semantic anchor | Native role | Cardinality |
+| --- | --- | ---: |
+| exact upstream terminal | `first_frame` | 1 |
+| approved future endpoint | `last_frame` | 1 |
+| canonical identity image | `reference` | 1 |
+| exact upstream motion tail | `reference_video` | 1 |
+| audio reference | `reference_audio` | 0 |
+| all roles | — | 4 |
+
+Public neutral identity 保持 `IMAGE_TO_VIDEO + MULTI_ANCHOR`；T8 `task_type=Hybrid` 只存在于
+provider-native compiler/workflow。
+
+### Product Grades
+
+| Grade | Contract | Allowed claim |
+| --- | --- | --- |
+| `C4_NATIVE_BOUNDARY_MOTION` | same native request 中 exact first/last/reference/reference_video | native exact-role input binding；decoded boundary、identity、motion仍需独立证据 |
+| `C4_SEMANTIC_MULTI_REFERENCE` | opening/ending/identity/motion 均作为 semantic references | semantic guidance；不得宣称 native first/last 或 pixel-exact boundary |
+
+Grade E 失败不得自动改成 Grade S。两者必须使用不同 capability ID、request contract、product label、
+acceptance rubric 与 quality evidence。
+
+### Local T8 Qualification Contract
+
+资格顺序固定为：
+
+```text
+M0: stock Ref2VA + T8 Hybrid conditioning + Stock20
+    sampler=dual_clock_euler
+    flow=native_flow
+    Turbo LoRA=off
+
+       only if M0 fails frozen gates
+
+M1: exact validated pruned FL2VA/Ref2VA pair
+    + sealed T8 Hybrid artifact
+    + same Stock20 baseline
+```
+
+M0 与 M1 是 offline qualification candidates，不是 runtime fallback。最终 active snapshot 只能注册一个
+winner；失败时不得自动切换 candidate。候选 identities 固定为：
+
+- `minimax-h3-t8-c4-motion-ref2va-stock20-v1`；
+- `minimax-h3-t8-c4-motion-hybrid-stock20-v1`。
+
+同一 capability ID 后续不得替换 model bytes、artifact recipe 或 sampling profile。
+
+### Seedance 2.0 Model Isolation Contract
+
+base、Fast 与 Mini 复用 Ark async task transport 和 `SeedanceVideoProvider` submit/status/fetch lifecycle，
+但绝不是 drop-in interchangeable capabilities。每个 model 必须独立 seal：
+
+- exact `model_id`、API deployment/endpoint identity 与 expected response model；
+- exact mode 与 allowed role/cardinality grammar；
+- resolution、duration、FPS、container、reference bounds 与 audio behavior；
+- profile version、pricing snapshot、egress preview、permit 与 resolved request hash；
+- offline compiler、live receipt、quality 与 P6 evidence。
+
+当前 accepted active inventory 只包含 base `doubao-seedance-2-0-260128`。Fast/Mini 仍可保留在 provider
+catalog 和 compatibility tests 中，但没有 fresh entitlement、pricing 和 exact profile evidence时不得出现在
+active `SeedanceProviderProfile.capabilities` 或 Router snapshot。
+
+### Transition Certification Contract
+
+每个可声明的 direction 必须拥有 immutable、content-addressed
+`ProviderTransitionCertification`，至少绑定：
+
+- exact source provider/model/profile/capability、accepted output与P6 evidence；
+- exact destination provider/model/profile/capability；
+- selected continuity grade 与 exact anchor contract hash；
+- terminal/motion-tail derivation与materialization receipts；
+- output normalization contract；
+- technical/live/boundary/identity/motion/P6 evidence；
+- certification schema/version/content hash。
+
+Certification 是 evidence，不是第二 lifecycle owner。Active pointer、candidate、activation 与 recovery 仍只由
+`ProductionStateCommitter`/Production Manifest 拥有。
+
+## Invariants
+
+- `ResolvedTimeline` 是唯一 order/frame/sample/timing owner。
+- `ProductionStateCommitter` 是唯一 durable write、activation 与 recovery owner。
+- Dependency Graph 独占 dependency、fingerprint、invalidation 与 rebuild frontier。
+- HyperFrames 是唯一默认 Production renderer。
+- Router 只选择一个 exact capability；family 只聚合和 exact dispatch，不保存 last-selected state。
+- Missing、duplicate、extra、wrong-order、tampered、stale 或 unsupported inputs必须在 compiler、preview、
+  permit consume 与 Provider POST 前 fail closed，effect count 为零。
+- Local/paid attempt lifecycle、permit 与 evidence不得混合。
+- Hybrid artifact build 是 explicit inventory preparation；runtime只能 reopen、rehash、verify、consume。
+- Exact replay 不重复 Provider、artifact build、motion-tail extraction、activation 或 render effects。
+- C1/C2/C3、Legacy T2V/I2V/R2V、historical request/resolved hashes在 C4 fields缺失时保持兼容。
+- Technical PASS、live connectivity、quality acceptance 与 P6 Final Acceptance 分层报告。
+
+## Current and Target Behavior
+
+| Surface | Current | Target |
+| --- | --- | --- |
+| C4 core | implemented offline | preserve，补足negative regression，不重复设计 |
+| Local T8 V2 | separate T2VA/I2VA/FL2VA/Ref2VA children | additive winner-specific C4 Hybrid child |
+| Local four-anchor live | absent | one exact request / one submit / no retry / no fallback，完成全矩阵证据 |
+| Seedance active profile | current profile要求覆盖全局model catalog | active capabilities/pricing只覆盖explicit entitled subset，默认base only |
+| Seedance model switching | shared adapter，但profile集合过宽 | exact model/profile/price/endpoint/response isolation，新model即新attempt |
+| Seedance exact C4 | cross-mode union未证明 | 继续fail closed；formal evidence不足不注册Grade E |
+| Seedance semantic C4 | 未注册 | optional base-only Grade S capability，独立授权与验收 |
+| Transition truth | provider/lane evidence分散 | immutable directed pair certification + Manifest-owned pointer |
+| Multi-provider claim | 不可声称流畅切换 | 达到相应claim level后只声明已认证grade与directions |
+
+## Compatibility
+
+- `default_seedance_capabilities()` 继续表示 adapter 能理解的 authoritative provider catalog；active account
+  inventory通过 explicit profile subset表达，不通过删除catalog或family wildcard表达。
+- `SeedanceProviderProfile.create_default()` 若保留，只可用于 complete catalog fixtures/diagnostics；
+  Production assembly必须显式传入 entitled capabilities 与 matching pricing subset。
+- Existing `SeedanceVideoProvider` transport envelope保持；model isolation发生在 profile construction、
+  capability selection、pricing、permit fingerprint与response validation。
+- Existing local child APIs 与 `LocalH3VideoProviderFamily` protocol保持；新child additive注册。
+- Schema/layout默认不变。若 transition certification 无法复用现有 immutable evidence + Manifest pointer seam，
+  必须触发 Decision Gate，先更新 spec/plan并取得 migration authorization。
+
+## File and Ownership Map
+
+### Stable C4 Core — Audit/Test First
+
+- `src/ai_video/production/_video_continuity.py`
+- `src/ai_video/production/video_requirement.py`
+- `src/ai_video/production/video.py`
+- `src/ai_video/production/_video_capability_fingerprint.py`
+- `src/ai_video/production/_video_requirement_routing.py`
+- `src/ai_video/production/shot_router.py`
+
+这些文件只在 RED test证明真实缺口时做最小修正；不得为了接 Provider 再建一套 C4 contract。
+
+### Local T8 Destination
+
+- Create `src/ai_video/production/comfy_t8_hybrid_c4_profile.py`：winner-specific sealed profile、node/model/
+  workflow/output preflight。
+- Create `src/ai_video/production/comfy_t8_hybrid_c4_video.py`：capability、compiler、resolve/preview、exact
+  local transport delegation。
+- Modify `src/ai_video/production/local_h3_provider_family.py`：仅 additive exact child aggregation/dispatch。
+- Modify `src/ai_video/production/__init__.py`：public exports。
+- Conditional create `src/ai_video/production/h3_hybrid_artifact.py`：仅 M1 胜出时实现 build receipt model 与
+  runtime reopen/verify seam；不拥有 Production lifecycle。
+- Create `tests/test_production_comfy_t8_hybrid_c4_video.py`。
+- Conditional create `tests/test_production_h3_hybrid_artifact.py`。
+- Modify `tests/test_production_local_h3_provider_family.py`。
+- Modify closest Router/request/provider-neutral/lifecycle/P5 E2E tests only when RED requires。
+
+Winner确定后，workflow files必须把 candidate identity写入文件名，不使用模糊 generic identity：
+
+- M0 winner：`workflows/{templates,bindings,profiles}/minimax_h3_t8_c4_motion_ref2va_stock20_v1.*`；
+- M1 winner：`workflows/{templates,bindings,profiles}/minimax_h3_t8_c4_motion_hybrid_stock20_v1.*`。
+
+Template为`*_api.json`，binding为`*_binding.yaml`，profile为`.json`。不得同时把两个candidate发布为
+Production child。
+
+### Seedance 2.0 Isolation
+
+- Modify `src/ai_video/production/seedance_capabilities.py`：保持official catalog与exact per-model matrix；新增
+  deterministic subset selection/validation seam，不引入family wildcard。
+- Modify `src/ai_video/production/seedance_profile.py`：pricing models必须与selected capability models exact
+  match，并允许official catalog的non-empty entitled subset；默认Production assembly为base only。
+- Modify `src/ai_video/production/seedance.py` only if active-profile compiler/response validation RED证明需要。
+- Modify `tests/test_production_seedance.py`：base-only active inventory、cross-model denial、bounds、pricing、
+  endpoint、response identity 与 zero-effect regression。
+
+### Transition Evidence
+
+- First inspect/reuse `src/ai_video/production/video_artifact.py`、lifecycle schema、Manifest pointer与
+  `ProductionStateCommitter` seams。
+- If compatible without migration，create `src/ai_video/production/video_transition.py` for immutable model、
+  hash validation与pair adjudication，and create `tests/test_production_video_transition.py`。
+- Modify committer/lifecycle tests only for the existing pointer seam proven by RED。
+- If persistence requires schema version、Manifest layout或artifact layout migration，stop before production edits；
+  this plan does not authorize that branch。
+
+### Canonical Documentation and Harness
+
+- Modify `docs/v0.2-runtime-baseline.md` only after implementation/live truth changes。
+- Modify `docs/v0.2-agentic-production-roadmap.md` only for actual gate status。
+- Modify `docs/agent-primary-contract-matrix.md` and `.agent/harness/policy.yaml` only if new owned surfaces require
+  routing/ownership updates；同步 `tests/test_agent_harness.py`。
+- Keep this plan and governing spec as the only Shot Continuity artifact owners。
 
 ## Entry Gates
 
-Implementation 开始前必须同时满足：
+开始任何 implementation milestone 前：
 
-1. 用户已单独授权本次Local H3 implementation、compatible Manifest/local evidence expansion和bounded live-local proof；该授权不复用于cloud/paid lane。
-2. 工作区 writer ownership 清晰，目标 files 无 overlapping uncommitted work。
-3. “MiniMax 本地”的engine/model/loopback identity已解析为本机ComfyUI + native MiniMax H3，并已seal exact checkpoint hashes、complete workflow/binding/profile、node inventory和output contract；raw smoke JSON没有升级为production profile。
-4. MiniMax Hailuo 2.3 与 Seedance 2.0 Mini 的 official capability snapshots 刷新并保存可审计出处。
-5. 对 terminal evidence 是否能在现有 schema/layout 内 durable reopen 完成 bounded executable spike；若不能，先停下提交独立 scope-expansion spec。
+1. 重新读取 repository rules、contract matrix、Harness policy、runtime baseline与本spec/plan。
+2. 检查 `git status`、live agents、exact target-file ownership；same-file overlap必须由用户决定顺序。
+3. 记录 problem boundary、single owner、old path、unchanged contracts与focused verification command。
+4. Local implementation authority不自动授权live generation；计划执行到 live gate 时重新核对当前用户scope。
+5. Remote/paid Seedance work必须另有 task-scoped authorization、fresh pricing/budget、Cloud Egress、durable
+   intent与one-use permit；不得复用历史authorization或permit。
+6. Model/artifact inventory必须记录 exact filename、bytes、SHA-256、license/provenance、ComfyUI/T8 commit、
+   node schema与profile hashes；缺项保持unavailable。
 
-## Milestone 1: Freeze Provider-Neutral RED Contracts
-
-### Target Surface
-
-- `src/ai_video/production/video.py`
-- `src/ai_video/production/video_contracts.py`
-- `tests/test_production_video.py`
+## Milestone 1: Reconfirm C4 Core Closure
 
 ### Work
 
-先写 failing tests，固定 `ContinuityConstraintSet`、`TerminalFrameEvidence` 和 `ContinuityReferenceBinding` 的 canonical fields/hash 语义。选择向后兼容的 extension/composition seam，使旧 `VideoGenerationRequest` 和旧 request/resolved hash fixtures保持稳定。
+先运行现有 C4 suites，证明当前 core 已覆盖：
 
-RED cases 至少包括：
+- exact three/four-anchor cardinality；
+- Registry revision、target Shot、role/order/hash/materialization tamper；
+- one selected capability，禁止sub-capability union；
+- C1/C2/C3与legacy hash/reopen compatibility；
+- denial发生在compiler/preview/permit/POST之前且effect count为零。
 
-- binding 缺 source Shot/candidate/video asset/evidence/constraints 任一 identity 时拒绝；
-- extracted image hash 或 upstream candidate hash 改变时 request desired fingerprint 改变；
-- generation instance identity 变化不破坏既有 exact replay 语义；
-- wrong target Shot/revision、wrong role、duplicate binding 和 non-canonical ordering 拒绝；
-- continuity-enabled request 不能使用 T2V mode 或空 `first_frame`。
-
-### Verification
-
-```bash
-pytest -q tests/test_production_video.py
-```
-
-## Milestone 2: Implement Capability-Gated Resolution
-
-### Target Surface
-
-- `src/ai_video/production/video.py`
-- `src/ai_video/production/video_contracts.py`
-- `tests/test_production_video.py`
-
-### Work
-
-复用 `VideoCapabilityVariant` 与 `ResolvedVideoGenerationRequest`。Provider adapter construction、`capabilities()` 和 `resolve()` 必须无外部副作用；continuity request 的 mode/role/MIME/size/dimension/output coupling 必须在 `preview`、durable submit intent 和任何 Provider external effect 前 fail closed。若需要表达 terminal evidence lineage，扩展 resolved request hash，而不是在 adapter 中读取任意 path。
-
-必须保留：
-
-- unsupported capability 返回 typed `VIDEO_CAPABILITY_UNSUPPORTED`；
-- submit call count 为零；
-- 无 T2V、prompt-only 或 remote fallback；
-- provider-specific fields 不进入 core contract。
+若全部GREEN，不修改stable core；直接保存baseline并进入Milestone 2。只有出现可复现RED时，才在canonical
+owner内做最小修正并添加regression test。
 
 ### Verification
-
-```bash
-pytest -q tests/test_production_video.py
-```
-
-## Milestone 3: Seal Terminal-Frame Evidence
-
-### Target Surface
-
-- `src/ai_video/production/video_artifact.py`
-- `src/ai_video/production/_state_commit_video_candidate.py`
-- `src/ai_video/production/state_commit.py`
-- `tests/test_production_video.py`
-- `tests/test_production_generated_video_e2e.py`
-- `tests/test_production_video_state_recovery.py`
-- `tests/test_production_state_commit.py`
-- `tests/test_production_state_recovery.py`
-
-### Work
-
-以 strict RED-first tests 定义 source video measured metadata、terminal frame selection、held-FD extraction、image measured validation、canonical extraction receipt 和 evidence hash。Extraction 必须读取 exact source bytes，并把 source Shot/candidate/generation/Registry/provenance 全部 seal。
-
-优先复用现有 immutable artifact/provenance seam，不改变 public layout。Scratch file 只存在于 transaction 内，不能成为 durable reference。
-
-### Scope-Expansion Stop Gate
-
-若 executable spike 证明以下任一项不可避免，立即停止实现并请求独立授权：
-
-- 一个 candidate transaction 必须 append 第二个 active Registry asset；
-- Manifest 必须增加 terminal-frame pointer/lifecycle；
-- artifact layout 必须新增 public directory contract；
-- video activation 从“exactly one appended asset”变成 multi-asset activation。
-
-该授权必须带 schema versioning、legacy reopen、crash matrix、migration/rollback 和 contract-matrix 更新。本 plan 不预先批准它。
-
-### Verification
-
-```bash
-pytest -q \
-  tests/test_production_video.py \
-  tests/test_production_generated_video_e2e.py \
-  tests/test_production_video_state_recovery.py \
-  tests/test_production_state_commit.py \
-  tests/test_production_state_recovery.py
-```
-
-## Milestone 4: Extend Durable Activation and Recovery
-
-### Target Surface
-
-- `src/ai_video/production/_state_commit_video_candidate.py`
-- relevant private `_state_commit_*` transaction helpers
-- `src/ai_video/production/state_commit.py`
-- `tests/test_production_generated_video_e2e.py`
-- `tests/test_production_video_state_recovery.py`
-- `tests/test_production_state_commit.py`
-- `tests/test_production_state_recovery.py`
-
-### Work
-
-由 `ProductionStateCommitter` façade共同提交 terminal evidence、source candidate binding、downstream request receipt 和 existing Project/Registry/graph activation。为以下 crash point 添加 fixtures：
-
-- fetched video 已 durable、尚未 extraction；
-- extracted evidence 已 durable、尚未 candidate preparation；
-- candidate 已准备、尚未 activation；
-- activation commit point 前后；
-- recovery reopen 时 evidence tampered/unreadable/wrong source。
-
-Exact replay 必须不重复 fetch、extract、candidate preparation、activation 或文件写入。若 Provider effect 已发生，recovery 继续使用 existing attempt/receipt，不得 resubmit。
-
-### Verification
-
-```bash
-pytest -q \
-  tests/test_production_generated_video_e2e.py \
-  tests/test_production_video_state_recovery.py \
-  tests/test_production_state_commit.py \
-  tests/test_production_state_recovery.py
-```
-
-## Milestone 5: Add P5 Continuity Dependency
-
-### Target Surface
-
-- `src/ai_video/production/dependency.py`
-- `tests/test_production_dependency.py`
-- `tests/test_production_selective_rebuild.py`
-- activation E2E fixture that builds the graph
-
-### Work
-
-先用 failing graph tests 固定一个 typed, allowlisted continuity edge：source terminal evidence N 到 generated visual asset N+1。不得把 source change 映射到 Shot N+1 authoring artifact，也不得用 Shot 顺序循环生成 blanket edges。
-
-Test matrix：
-
-- source candidate bytes 改变，只 stale N+1 output 和真实 composition/render closure；
-- terminal selection/evidence 改变，closure 相同；
-- Shot N+1 continuity constraints 改变，stale N+1 output；
-- N+2 只有存在显式 N+1→N+2 continuity edge时才 transitive stale；
-- unlinked later Shots、voice、captions 和 unrelated assets保持 fresh；
-- same desired failure保持 failed/blocked；
-- exact replay 无 execution unit/state advance；
-- graph 不保存 timeline 或 mutable lifecycle duplicate。
-
-如果需要新增 edge enum/reason，必须保持 graph strict validation 和旧 snapshot reopen compatibility；若需要 graph/Manifest schema bump，则触发独立 scope-expansion gate。
-
-### Verification
-
-```bash
-pytest -q \
-  tests/test_production_dependency.py \
-  tests/test_production_selective_rebuild.py \
-  tests/test_production_generated_video_e2e.py
-```
-
-## Milestone 6: Implement Provider Lanes Separately
-
-Provider lanes必须在 provider-neutral core、Fake E2E 和 P5 gates通过后分别实现。一个 lane 的证据不能替代另一个 lane。
-
-### Lane A: Local Continuity
-
-当前identity已解析并seal为本机ComfyUI native MiniMax H3 `fl2va`，不是Wan或MiniMax cloud。Production template由pinned Comfy-Org official UI/subgraph workflow reviewed/export，而非raw smoke节点图；sealed profile固定ComfyUI commit、四组件、native nodes、loopback endpoint、24fps、17k+5 frame-grid、124-362 trained frame boundary、native audio和MP4 bounds。
-
-Target surface：
-
-- Add `src/ai_video/production/comfy_video.py` — loopback-only `ComfyUIVideoProvider` transport、preflight、submit/poll/history/fetch mapping；不得复用cloud `MiniMaxH3VideoProvider`或Paid Provider permits。
-- Add `workflows/templates/minimax_h3_fl2va_api.json` — 从pinned Comfy-Org official UI/subgraph workflow reviewed/export而来，不得把14-node ad-hoc raw smoke JSON直接提升为production template。
-- Add `workflows/bindings/minimax_h3_fl2va_binding.yaml` — exact `prompt`、`first_frame`、optional explicit `last_frame`、`seed`、`width`、`height`、`length`/`frame_count`、`steps`/`sampler`与`output_prefix` binding。
-- Add `workflows/profiles/minimax_h3_fl2va.json` — seal upstream provenance、derived workflow/binding、runtime/components/nodes/endpoints与output/resource bounds。
-- Optional add独立`minimax_h3_ref2va` template/binding/profile — 只有角色/场景reference acceptance需要时才进入；不得与`fl2va`共用checkpoint/profile identity。
-- Add `tests/test_production_comfy_video.py`与`tests/test_production_local_video_state.py` — sealed profile/preflight、exact first-frame bytes、no-network transport fake、history/fetch、replay/recovery与two-Shot chaining。
-
-Official derivation contract：
-
-- upstream repository固定为`Comfy-Org/workflow_templates`，commit固定为`0e0f4577453136eaa1c0e9d4b700e3e5ce5bb416`，path固定为`templates/video_minimax_h3_i2v.json`，raw JSON SHA-256固定为`313b029321a8be303e827dad471bff3022ca564c8bf8c6198a3e70b65c599671`，license记录为MIT；
-- derivation清单必须记录UI/subgraph到deterministic API-format JSON的全部有意修改，包括删除UI-only notes、demo input asset和非必需subgraph/UI metadata；
-- optional LoRA、remote refiner与cloud fallback默认关闭，同时保留官方native H3 conditioning、sampling、video/audio decode和MP4 output contract；
-- exact terminal PNG只绑定到`MiniMaxH3ImageToVideo.first_frame`；`last_frame`只有在request与profile均显式要求时才出现，且不得把`ref2va`与`fl2va`混成同一个profile；
-- upstream新版本不得自动覆盖sealed profile；upgrade必须重新review、记录derived diff、重新seal全部hash并重新验收。
-
-`workflows/profiles/minimax_h3_fl2va.json`至少必须seal：
-
-- upstream repository、commit、path、raw JSON hash与license；
-- derived API workflow hash与binding hash；
-- exact ComfyUI commit；
-- `minimax_h3_fl2va_pruned_int8_convrot.safetensors`、`qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors`、`minimax_h3_video_vae_fp16.safetensors`、`minimax_h3_audio_vae_fp32.safetensors`四个model component hashes；
-- required native node inventory，包括`MiniMaxH3ImageToVideo`及官方conditioning、sampling、video/audio decode与MP4 output path所需nodes；
-- literal loopback endpoints；
-- resolution、17k+5 frame-grid、duration、native-audio与output bounds。
-
-Offline tests除既有adapter/replay/recovery assertions外，必须证明：
-
-- pinned upstream provenance能够reopen，并验证repository/commit/path/raw hash/license与derived modification manifest；
-- template、binding或profile任一hash tampering均fail closed；
-- exact terminal PNG bytes进入`first_frame`，不是仅path/name相同；
-- optional `last_frame`不会被adapter或template静默增加、删除或降级；
-- transport/profile没有remote endpoint、proxy、refiner或cloud fallback；
-- official upstream发生变化时不会绕过profile resealing或自动改变active production identity。
-
-Implementation必须复用现有`VideoGenerationRequest`、`ContinuityReferenceBinding`、terminal evidence、Manifest 2.8与P5 continuity edge；不得新增local-only continuity schema、第二writer或第二resolver。`fl2va`是最小必需lane，`ref2va`是identity/reference增强lane。
-
-任何local adapter都必须无remote fallback、默认不联网，并以Fake/sealed loopback tests证明`first_frame` exact bytes进入workflow binding。它必须seal ComfyUI commit、checkpoint/text encoder/VAE hashes、workflow/binding/profile hashes、registered nodes、FPS/duration limits和output capability。上述Local H3 surface已在本次明确授权下实现；`ref2va`或任何新的provider/profile仍需要独立implementation authorization。
-
-### Lane B: MiniMax Cloud Hailuo 2.3
-
-Target surface：
-
-- `src/ai_video/production/minimax_hailuo.py`
-- `tests/test_production_minimax_hailuo.py`
-
-基于 refreshed official profile，新增 `MiniMax-Hailuo-2.3` I2V variant和 `first_frame_image` mapping。Tests 必须检查 exact model、image encoding/reference、duration/resolution coupling、sanitized failures、authorization/permit、submit-once 和 unsupported last-frame denial。不得因其他 Hailuo model 有 first/last-frame API 就把该能力外推到 2.3。
-
-Offline verification：
-
-```bash
-pytest -q tests/test_production_minimax_hailuo.py tests/test_production_video.py
-```
-
-2026-08-20 live result：首个request证明Provider的`768P`输出为adaptive `1326x768`；其zero-network receipt migration不计canonical lifecycle。用户随后授权的新bounded adaptive request继续消费exact activated keyframe SHA-256 `5072a65b0e13a7fae2b809d3dc0afb24dc6980c75b0ce9342559b60801c158fc`作为`first_frame_image`，唯一一次POST生成task `432581080539416`与MP4 SHA-256 `90b4fc1842b4a74332ebcae7e20c1e0cc1cdd7166037702e4dd1b37d2ed0bdca`。输出为`1326x768@24fps`、141 frames、5.875s、MP4、no-audio；candidate activation、reopen、recovery、P5 closure与zero-effect replay全部canonical通过。Project-local `video-analysis`、black/freeze和7点抽帧检查通过，首帧SSIM为`0.941854`。
-
-### Lane C: Seedance 2.0 Mini
-
-Target surface：
-
-- `src/ai_video/production/seedance_capabilities.py`
-- `src/ai_video/production/seedance.py`
-- `tests/test_production_seedance.py`
-
-刷新 `doubao-seedance-2-0-mini-260615` official capability snapshot，验证 I2V first-frame 与 optional last-frame 的 exact content payload、MIME/geometry、audio opt-out、profile fields、response/fetch mapping、sanitized failures 和 authorization/permit。Current capability table 的声明不是 live proof，不能仅靠 fixture pass 宣称 provider acceptance。
-
-Offline verification：
-
-```bash
-pytest -q tests/test_production_seedance.py tests/test_production_video.py
-```
-
-2026-08-20 live preflight result：exact model/capability与`generate_audio=false`保持sealed；按官方`23 CNY / million tokens`与仓库token公式计算2.484 CNY，并seal保守`3 CNY` preview upper bound。后续bugfix已实现sealed Ark Console `Active` materialization receipt与exact local-asset resolver，补齐可验证的identity import owner；但Shared keyframe仍没有真实Ark `asset-...`和confirmation evidence，因此authorization/permit未签发且POST为零。P8 Seedance plan新增的inline-Base64 synthetic/illustrated lane仍是未实现、未授权的独立后续task，只允许sealed且human-attested的明确非真人/非受保护角色或普通非角色图片；Alice photorealistic keyframe明确不符合该V1分类。因此本continuity lane的external materialization gate不能由该proposal、Hailuo success、临时第三方URL或猜测upload API替代。
-
-### Execution Order for Cost Control
-
-Provider-neutral continuity core保持唯一实现；Local H3、Hailuo与Seedance只在adapter/profile/capability mapping处分叉。切换lane不能只修改`model_id`，也不得复制terminal evidence、Manifest、P5或composition lifecycle。
-
-为减少付费prompt/reference调试，后续execution order固定为：
-
-1. 已完成Local H3 `fl2va` sealed workflow/profile与offline adapter tests。
-2. 已在本次live-local授权下用exact Shot A terminal PNG生成Shot B本地draft，并验证terminal hash等于workflow消费的`first_frame` bytes。
-3. 已使用`video-analysis`与无转场side-by-side完成technical inspection；blind human rubric、额外本地迭代与`ref2va`仍是独立后续scope。
-4. 只有显式选中的Shot/continuity edge才进入Hailuo或Seedance paid lane；每次remote submit仍需要exact budget、egress与one-use permit。
-5. Paid output重新执行自身activation/replay与subjective gate；Local H3成功不能外推为cloud model质量或payload acceptance。
-
-本地GPU时间、电力、RAM/VRAM必须进入resource report，但不伪造remote budget receipt。不得实现自动“local失败后cloud fallback”或根据价格自动选Provider；lane promotion是显式production decision，并保留独立generation identity与provenance。
-
-## Milestone 7: Prove End-to-End Without Live Calls
-
-### Target Surface
-
-- `tests/test_production_generated_video_e2e.py`
-- `tests/test_production_composition.py`
-- `tests/test_production_hyperframes.py`
-- relevant Fake Provider fixtures
-
-### Work
-
-构造至少三 Shot 的 local Fake chain：N terminal evidence作为 N+1 first-frame binding，N+1 terminal evidence作为 N+2 binding。证明 submit/fetch/extract/activate/recovery/P5 closure，并把 activated MP4 送入现有 composition path。
-
-Composition/HyperFrames tests只验证 unchanged invariants：exact trims、frame/sample boundaries、video element binding、audio/caption mix和 final mux request。它们不得以 crossfade或渲染结果伪装 Provider conditioning proof。
-
-### Verification
-
-```bash
-pytest -q \
-  tests/test_production_generated_video_e2e.py \
-  tests/test_production_composition.py \
-  tests/test_production_hyperframes.py \
-  tests/test_production_dependency.py \
-  tests/test_production_selective_rebuild.py
-```
-
-## Milestone 8: Technical Acceptance and Harness
-
-运行 policy/contract matrix 对 P8 Provider lifecycle 要求的完整 safety/recovery集合，再叠加本 slice 的 P5 和 P3/P4 suites；并按 `.agent/harness/policy.yaml` 对 exact staged delta执行 fresh Harness。任何 code/tooling change 必须生成并校验 fresh receipt。下列命令是当前计划基线；实际 changed paths 若触发更多 Harness checks，以 policy 结果为准。
-
-```bash
-pytest -q \
-  tests/test_production_paid_provider.py \
-  tests/test_production_paid_provider_state.py \
-  tests/test_production_paid_provider_e2e.py \
-  tests/test_production_video.py \
-  tests/test_production_video_fake.py \
-  tests/test_production_video_state_recovery.py \
-  tests/test_production_generated_video_e2e.py \
-  tests/test_production_models.py \
-  tests/test_production_registry.py \
-  tests/test_production_project.py \
-  tests/test_production_state_commit.py \
-  tests/test_production_state_recovery.py \
-  tests/test_production_dependency.py \
-  tests/test_production_selective_rebuild.py \
-  tests/test_production_composition.py \
-  tests/test_production_hyperframes.py \
-  tests/test_production_minimax_h3.py \
-  tests/test_production_minimax_hailuo.py \
-  tests/test_production_seedance.py
-
-git add <exact-task-files>
-make harness-verify
-make harness-receipt RECEIPT=<fresh-receipt-path>
-```
-
-Technical acceptance report必须列出 tests、Harness receipt、artifact hashes、exact replay counters、recovery points 和 P5 affected-node sets；不能写成 provider live或 subjective quality已通过。
-
-## Milestone 9: Separately Authorized Provider Live Proof
-
-本 milestone 只有在用户以task-scoped request明确列出允许执行的lane/model/profile和调用边界后才能执行。当前任务已授权并完成Local H3 `fl2va` continuity proof；每个remote lane仍需要独立Budget Guard/Cloud Egress/bounded-call plan。不得把本地成功、旧cloud diagnostic或未列明的Provider当作其他lane授权。
-
-每个 lane 的 live proof至少证明：
-
-- exact provider/model/profile/capability snapshot；
-- Shot N terminal evidence hash 等于 submit payload 消费的 first-frame bytes；
-- exactly bounded submit/status/fetch，replay新增零调用；
-- fetched MP4 measured validation、terminal evidence、candidate activation和 reopen/recovery；
-- local lane的resource/runtime report或remote lane的cost/budget receipt完整；
-- 不把一次 lane success 外推到其他 lane。
-
-Local H3 accepted evidence位于`runs/h3-shot-continuity-live-20260819-v3/`：profile hash `456b59c7a907d4b07c7d951d63ec03cbd0fb5c64638dbc8dad870aca09e2b604`，loopback proof submit为2、remote call为0；Shot A terminal与Shot B `first_frame`共用SHA-256 `cb5bbc17ad361b4b8445657608e245c179446efb68a5976b4df09eb0ecbaf42c`，两个H.264/AAC MP4均为608x352、24fps、124 frames、5.167秒，Manifest最终revision为21，replay新增调用为零。一次较早diagnostic submit在fixture activation时fail closed且没有blind retry；它不计入accepted two-Shot proof。
-
-## Milestone 10: Subjective Continuity Acceptance
-
-在 live proof之后，为每条 continuity edge生成未加转场的 terminal/initial pair和最终序列。分别执行：
-
-- local `video-analysis`：scene/character identity、camera direction、motion direction、lighting/color、entrance/exit和spatial relation逐项报告；
-- blinded human review：使用预先冻结的 rubric，对同一维度评分并给出 blocking discontinuity；
-- Provider/lane comparison：local、Hailuo 2.3、Seedance 2.0 Mini分别报告，不混合平均掩盖失败。
-
-Subjective acceptance必须独立于 technical和live verdict。单一相似度、crossfade后观感或 prompt 文案一致均不足以通过。
-
-## Milestone 11: Bounded Hybrid Continuity Evaluator V1
-
-### Authorized Surface
-
-- `src/ai_video/production/continuity_evaluator.py`：sealed local ONNX profile、RGB frame sampler、
-  deterministic subject tracker 与 raw measurements；不产 verdict。
-- `src/ai_video/production/review.py`：只扩展 backward-compatible raw measurement/profile identity。
-- `src/ai_video/production/_lifecycle_schema.py`、`_state_commit_video*.py`、`video_artifact.py`、
-  `video_generation.py`、reader/paths/models export：仅实现由唯一 committer 拥有的 evaluator evidence
-  checkpoint、reopen 与 recovery；不得新增第二 writer。
-- `tests/test_production_continuity_evaluator.py` 与最接近的 P8 lifecycle tests；Harness/docs 只按真实
-  changed paths 同步。
-- `pyproject.toml`：Option A 允许把现有 agent-memory extra 中的 pinned `numpy`/`onnxruntime` 范围
-  提升为 Production base dependency；不得增加 OpenCV、SciPy、remote SDK 或其他 runtime dependency。
-
-### TDD and Compatibility Order
-
-1. RED：sealed profile/config/model hash进入 evidence identity；model bytes mismatch 在 session 创建前拒绝。
-2. RED：fake deterministic detector/ReID outputs 覆盖 exact frame binding、方向反转、exit mismatch、
-   same-track re-entry、低 confidence/coverage 与 ambiguous track `not_evaluated`。
-3. RED：identity/axis/framing 无可信 backend 时保持 incomplete，并证明独立 human evidence仍可完成 P6。
-4. RED：evaluator 完成后 candidate preparation 故障，recovery/retry不重复 sampler、ONNX evaluator或
-   fallback side effect；tampered pointer/evidence fail closed。
-5. GREEN：实现最小 cohesive adapter 与 Manifest-compatible checkpoint，保持历史 Manifest 2.8、旧
-   `GeneratedShotContinuityEvidence` payload/hash、P3/P4/P5/Provider/activation contracts不变。
-6. 运行 focused suites、native independent review、exact staged Harness与receipt self-verification，只
-   提交 task-owned files。
-
-### Offline Capability Boundary
-
-本 milestone 不下载或捆绑模型。只有 fixture/fake-session tests 时，交付状态必须写成
-`adapter and durable lifecycle accepted; live visual backend unavailable`。真实 detector/ReID assets
-必须另行提供 license/source/exact SHA-256/size 与符合 profile 的 I/O contract，并经过 no-network local
-smoke 后，才可升级为 live automatic evaluator capability；face-only detector不能外推为通用 continuity。
-
-## Milestone 12: C4 Multi-Anchor Motion Continuity
-
-本milestone由[Shot Continuity specification](../specs/2026-08-19-ai-video-shot-continuity.md)的`C4 Multi-Anchor Motion Continuity Contract`治理。它是新的ordered implementation lane，不回写C1/C2/C3历史语义，也不把v7失败take重新激活。
-
-### Problem Boundary and Implementation Gate
-
-- `single request owner`：`VideoGenerationRequest`与`ProviderNeutralVideoRequirement`继续拥有sealed provider-neutral input contract；不得在Seedance adapter中另造C4 request truth。
-- `single selection owner`：`VideoGenerationResolver`继续独占exact capability selection；adapter compiler只做deterministic native projection。
-- `single artifact/lifecycle owner`：Asset Registry与`ProductionStateCommitter`继续独占input identity、derived motion-tail evidence、durable write、activation与recovery。
-- `single dependency/timing owners`：P5 Dependency Graph与`ResolvedTimeline`保持不变；motion-tail source range是generation evidence，不是第二timeline。
-- `unchanged paid owners`：existing Paid Provider Gate、Cloud Egress、budget、durable intent、one-use permit与unknown-outcome recovery保持不变。
-- `old C4 path removed`：C4不得继续使用first-frame-only Router projection、prompt identity substitute、three-static-image-only acceptance或separate capability union。
-- `focused verification`：`python -m pytest`覆盖video requirement/request、Router、capability cardinality、Seedance materialization/payload、paid lifecycle、P5 closure、replay/recovery；最终以exact staged snapshot或exact commit range运行Harness。
-
-Implementation开始前必须重新检查live agents、allowed paths、`git status`与exact target-file overlap，并获得新的runtime implementation authority。2026-08-22 docs lane开始时，`src/ai_video/production/seedance_asset.py`、`tests/test_production_seedance.py`、`.agent/harness/policy.yaml`、`tests/test_agent_harness.py`与`docs/agent-primary-contract-matrix.md`均存在其他session changes；本lane期间共享`main`又由外部session推进，前四个paths分别进入`cf5a357`与`5e2674a`，当前candidate-surface status recheck只剩`docs/agent-primary-contract-matrix.md`仍有uncommitted same-file overlap。由于这些external commits不出现在本thread live-agent tree中，future code lane不得把clean status解释为无人拥有；必须以当时fresh ownership evidence为准。未由用户决定仍在overlap的file ownership/顺序前不得写该file；其他完全不相交的target files不因此自动blocked。
-
-### 12.1 RED — Freeze Rejection and Tamper Matrix
-
-Target surface：
-
-- `tests/test_production_video.py`
-- `tests/test_production_video_requirement.py`
-- `tests/test_production_shot_router.py`
-- `tests/test_production_provider_neutral_adapters.py`
-- `tests/test_production_seedance.py`
-
-先运行并保存当前baseline，然后添加failing tests，证明当前validator拒绝`continuity_binding + independent reference`，current exact-terminal Router只输出`first_frame`，current Seedance Mini seal不能同时满足四个roles。RED matrix至少覆盖：
-
-1. static C4缺terminal、identity或approved endpoint；motion C4另缺motion tail；
-2. 任一semantic/native role重复、错role、错canonical order或额外undeclared binding；
-3. terminal wrong source/candidate/Registry revision、terminal bytes/evidence tampered；
-4. identity不是独立canonical Character asset、owner/revision/hash不匹配或由terminal/scene plate冒充；
-5. endpoint缺human approval/feasibility receipt、wrong target Shot、hash/dimensions tampered或不可达；
-6. motion tail不是accepted upstream artifact的精确尾段、range/frame count/hash/receipt tampered、未以terminal frame结束或来自另一个take；
-7. capability只支持任意子集或多个capability并集时，Router/adapter/preview/submit call count均为零；
-8. C1/C2/C3与legacy empty-C4 payload、request/resolved/capability fingerprints逐字节保持兼容。
-
-Test fixtures必须显式冻结`open_state -> changes_here -> close_state`：terminal/motion tail提供open motion phase，canonical identity/red satchel/axis/screen direction进入must-hold，approved endpoint提供close pose/FOV/scale。v7 regression分别标记`F-ID-DRIFT`与`F-CAMERA-PATH`/`F-CONTINUITY`，不以prompt变长作为expected fix。
-
-Focused RED command：
 
 ```bash
 python -m pytest -p no:cacheprovider \
   tests/test_production_video.py \
   tests/test_production_video_requirement.py \
   tests/test_production_shot_router.py \
-  tests/test_production_provider_neutral_adapters.py \
-  tests/test_production_seedance.py -q
+  tests/test_production_provider_neutral_adapters.py -q
 ```
 
-### 12.2 GREEN — Provider-Neutral Request and Cardinality Contract
+### Exit Criteria
 
-Target surface：
+`C4_CORE_READY`保持成立；不得因此升级Provider、live或quality claim。
 
-- `src/ai_video/production/_video_continuity.py`
-- `src/ai_video/production/video_artifact.py`
-- `src/ai_video/production/video_requirement.py`
-- `src/ai_video/production/video_contracts.py`
-- `src/ai_video/production/video.py`
-- `src/ai_video/production/_video_capability_fingerprint.py`
-- closest tests from 12.1
+## Milestone 2: Isolate Seedance 2.0 Active Inventory
 
-以最小strict models实现spec冻结的四个semantic anchors：`continuity_terminal -> first_frame`、`identity -> reference`、`approved_endpoint -> last_frame`与`continuity_motion_tail -> reference_video`。Motion-tail evidence必须绑定accepted source artifact、rational time range、inclusive frame range、exact extracted bytes与receipt；endpoint必须绑定feasibility receipt。所有anchors都必须绑定Registry revision、SHA-256、role、provenance与materialization receipt identity。
+### RED
 
-扩展`ProviderNeutralVideoRequirement`与`VideoGenerationRequest`时使用additive schema/version selection；C4 fields缺失时历史hash/reopen完全不变。C4 validator只接受exact static three-anchor shape或exact motion four-anchor shape，并把所选tier的全部anchor/evidence/materialization hashes纳入request、resolved、activation-scope与desired fingerprints。`input_artifact_ids`和P5 inputs必须包含所选tier的全部exact Registry assets/evidence，不得以prompt或provider URI代替。
+在`tests/test_production_seedance.py`先固定：
 
-`VideoBindingCardinalityConstraint`分别冻结static exact grammar（`first_frame=1`、`last_frame=1`、`reference=1`、`reference_video=0`、`reference_audio=0`、all-role total `=3`）与motion exact grammar（前三个仍各为1、`reference_video=1`、`reference_audio=0`、all-role total `=4`）。Constraint canonicalization/fingerprint仍保持legacy empty-constraint omission semantics；static pass不得被报告为motion pass。
+1. base-only entitlement生成的active profile只暴露`doubao-seedance-2-0-260128`；
+2. pricing model set与selected capability model set必须exact match；缺失或多余均拒绝；
+3. Fast/Mini catalog entry存在不能使其进入active snapshot；
+4. family alias、cross-model profile reuse、wrong endpoint/deployment与response model mismatch拒绝；
+5. base-only 1080p/4k request若绑定Fast/Mini profile，在preview/permit/POST前失败且effect count为零；
+6. exact model切换产生新的profile/request/permit/attempt identity，不继承另一model acceptance；
+7. existing base/Fast/Mini mode-specific compiler behavior继续通过。
 
-### 12.3 GREEN — Exact Router Projection
+### GREEN
 
-Target surface：
+把official catalog与active account profile分开：
 
-- `src/ai_video/production/_video_requirement_routing.py`
-- `src/ai_video/production/shot_router.py`
-- `tests/test_production_shot_router.py`
-- `tests/test_production_video_requirement.py`
+- catalog validation继续证明每个selected entry与authoritative matrix一致；
+- `SeedanceProviderProfile`接受official catalog的non-empty exact subset；
+- pricing只覆盖selected subset，不再要求全局model集合；
+- Production profile assembly显式选择base model capabilities，不依赖`create_default()`；
+- Provider在compile、preview、submit/status/fetch与response reopen各阶段都绑定same exact model identity。
 
-扩展`requirement_bindings()`的exact pool与role mapping，使C4 provider-bound projection一一绑定terminal、canonical identity、approved endpoint与motion tail。Semantic slots必须保持spec固定身份；`VideoGenerationRequest.image_bindings`与`media_bindings`按现有唯一canonical order序列化，role/asset pair不得因排序分离。
+不得通过删除Fast/Mini catalog tests或把base bounds复制给其他models来达成GREEN。
 
-`VideoGenerationResolver`只可选择一个满足完整mode、roles、media bounds与cardinality的variant。Missing/stale inputs、wrong target、selected capability subset或officially unproven mode必须返回typed capability/missing-input denial；不得尝试T2V、R2V、I2V或另一个Provider fallback。C1 exact-terminal behavior继续只投影`first_frame`，只有显式C4 requirement进入four-anchor projection。
+### Verification
 
-### 12.4 GREEN/STOP — Capability Seal and Provider Projection
+```bash
+python -m pytest -p no:cacheprovider tests/test_production_seedance.py -q
+```
 
-Target surface：
+### Exit Criteria
 
-- `src/ai_video/production/seedance_capabilities.py`
-- `src/ai_video/production/seedance_profile.py`
-- `src/ai_video/production/seedance.py`
-- `tests/test_production_seedance.py`
-- governing Seedance spec/runtime baseline/contract matrix only after implementation truth changes
+能够诚实声明“接口transport共用，model contract独立，当前active inventory为base only”。这不证明任何
+Seedance 2.0 model支持exact four-role union。
 
-先取得dated formal API evidence，证明`doubao-seedance-2-0-mini-260615`在同一native request/mode中支持`first_frame + last_frame + reference_image + reference_video`，并记录exact request schema、limits与model identity。Adapter现有`reference_image`serialization、其他Seedance 2.0 model、2.5 capability、Skill或UI行为均不足以证明Mini mixed contract。
+## Milestone 3: Freeze Local T8 Candidate Qualification
 
-- 若formal evidence完整：新增独立C4 capability/profile version与fingerprint，声明full cardinality、media semantics、MIME/geometry/duration/output bounds；Provider-specific compiler只把verified provider-bound inputs投影到exact native payload，不重创作或删除bindings。
-- 若formal evidence缺失或含糊：不得修改`default_seedance_capabilities()`现有Mini seal；添加fail-closed tests并把Seedance C4状态报告为`blocked before paid preview/POST`。不得伪造mixed capability或改选Provider。
+### Inventory Preflight
 
-任何profile/API evidence变化都必须重新seal capability fingerprint并验证injected profile不能扩大official matrix。
+生成read-only inventory report，绑定：
 
-### 12.5 GREEN — Materialization, Cloud Egress, Preview and Permit Fingerprint
+- pinned ComfyUI与T8 plugin commit/version/license；
+- Hybrid conditioning nodes/input schemas；
+- installed stock Ref2VA identity；
+- M1所需 exact validated pruned FL2VA/Ref2VA pair是否存在；
+- Hybrid artifact/sidecar是否存在；
+- CLIP、video/audio VAE、sampler、scheduler与output node identity；
+- literal loopback endpoint与remote/fallback disabled flags。
 
-Target surface：
+缺失M1 pair/artifact不阻塞M0；不得把当前non-pruned pair扩宽为已验证M1输入。
 
-- `src/ai_video/production/seedance_asset.py`
-- `src/ai_video/production/seedance.py`
-- existing paid-provider preview/permit surfaces only where exact C4 binding requires
-- `tests/test_production_seedance.py`
-- closest paid-provider state/E2E tests
+### Qualification Fixture
 
-为terminal、identity、endpoint与motion tail分别验证exact Asset Registry ID/revision/SHA/MIME/size、provenance和provider materialization receipt。Motion tail materialization必须引用derived tail bytes，而不是整个source video、review derivative或filename。`SeedanceAssetReferenceResolver`只能为四个exact bindings返回receipt-backed active Ark identities；缺失、重复、confirmation evidence mismatch或local Registry ID冒充`asset://`必须fail closed。
+在观看结果前冻结一个exact四锚点fixture、prompt、resolution、frame count、FPS、Stock20参数与rubric。
+Compiler/workflow tests必须证明：
 
-Paid preview的egress items必须逐项包含prompt与四个anchor bytes identities；budget/authorization、Cloud Egress、durable submit intent和one-use permit fingerprint必须绑定同一C4 request、capability、materialization receipts与ordered egress list。任一值变化都需要新preview/authorization/permit；unknown outcome不得blind retry或remint。失败必须发生在permit consume与POST之前。
+```text
+first_frame      -> Hybrid conditioning first_frame
+last_frame       -> Hybrid conditioning last_frame
+reference        -> ref_images.ref_image_0
+reference_video  -> ref_videos.ref_video_0
+ref_video_audios -> empty
+ref_audios       -> empty
+task_type        -> literal Hybrid
+```
 
-### 12.6 GREEN — Offline Payload, Materialization, Replay, Recovery and P5
+### Exit Criteria
 
-Target surface：
+形成content-addressed qualification inputs与两个明确candidate states；尚未生成媒体时只能报告
+`qualification prepared`。
 
-- tests from 12.1 and 12.5
-- `tests/test_production_paid_provider.py`
-- `tests/test_production_paid_provider_state.py`
-- `tests/test_production_paid_provider_e2e.py`
-- `tests/test_production_video_state_recovery.py`
-- `tests/test_production_generated_video_e2e.py`
-- `tests/test_production_dependency.py`
-- `tests/test_production_selective_rebuild.py`
-- existing committer/dependency implementation only if RED evidence proves a gap
+## Milestone 4: Execute M0, Then Conditional M1
 
-使用Fake transport和sealed local fixtures证明：
+### M0 — Stock Ref2VA Control
 
-- supported C4 capability产生exact deterministic payload，四个bindings与materialized identities逐项匹配，offline tests不触网、不读取credential、不消费permit；
-- missing/tampered/stale materialization、payload role/order drift、capability/profile fingerprint drift均在external effect前拒绝；
-- exact replay不重复motion-tail extraction、materialization、preview、submit、poll、fetch、validation、activation或render；
-- before-submit、accepted、known-no-effect、outcome-unknown、fetched、validated与activation crash points继续走existing explicit recovery，unknown不自动retry；
-- terminal/identity/endpoint/tail任一变化只stale target generation与真实composition/render closure；unlinked Shots、voice、captions与unrelated assets保持fresh；
-- static boundary evidence与motion boundary evidence分别seal、reopen并由P6 adjudication，不把SSIM或Provider result直接写成Final Acceptance。
+在Local live authority仍有效且preflight全通过时，只提交一次M0：
 
-Focused verification至少运行policy映射的`provider_neutral_video_requirement_tests`、`production_shot_router_tests`、`production_video_provider_tests`与task Architecture Gate；实际changed paths触发更多checks时以Harness inspection为准。
+- exact four anchors；
+- stock Ref2VA；
+- T8 Hybrid conditioning；
+- Stock20、`dual_clock_euler`、`native_flow`；
+- Turbo off、reference audio empty；
+- one local permit、one submit、no retry、no fallback。
 
-### 12.7 Exact Snapshot Harness and Checkpoint
+记录workflow execution、output/probe、decoded boundaries、identity windows、motion windows、P6/human verdict。
 
-完成implementation与focused tests后：
+### M0 Decision
 
-1. 重新检查live agents、exact target ownership和`git diff`；解决任何same-file conflict，保留unrelated dirty work。
-2. 只用`git add <exact-task-files>`建立non-empty staged snapshot；不得stage其他session changes。
-3. 运行Harness inspection，再对exact staged snapshot执行`make harness-verify`；若先形成task-only checkpoint，则用exact commit range执行`make harness-verify-range BASE_REF=<ref>`。
-4. 用`make harness-receipt RECEIPT=<path>`验证scope、policy、artifact hashes与freshness，并创建task-only checkpoint commit；不得push/release。
+- 所有frozen technical、boundary、identity、motion与P6 gates通过：M0是winner，跳过M1。
+- 任一gate失败：保留exact failure evidence，不调整阈值、不隐式重试；只有满足M1 inventory gate才进入M1。
+- Unknown outcome：走existing explicit recovery，不把它解释为quality failure或重试许可。
 
-Harness不运行Provider、media generation或paid smoke；passing receipt只能证明offline code/control-plane gates。
+### M1 — Sealed Hybrid Artifact
 
-### 12.8 Native Independent Review
+仅当M0未通过且exact validated pruned pair可用时执行：
 
-在code/tests与fresh Harness之后、任何live smoke之前，使用native named `reviewer`进行独立review。Reviewer必须检查：
+1. explicit inventory-preparation operation构建artifact与sidecar；
+2. build receipt绑定source hashes、builder source/recipe、selected blocks/modalities、tensor keys/shapes/
+   dtypes、curve hashes、output bytes/size/hash；
+3. runtime只reopen/rehash/verify/consume；missing/tampered artifact保持blocked；
+4. 使用与M0相同fixture、Stock20与rubric进行one-submit验证。
 
-- mixed binding是否真实由single capability表达，而非mode/capability union；
-- validator/Router是否解决v7暴露的identity和camera-motion failure，而非只让tests通过；
-- four-anchor tamper、materialization、egress、permit、replay/recovery与P5 closure是否fail closed；
-- historical C1/C2/C3 hashes与unchanged owners是否保持；
-- tests是否覆盖真实current rejection path和wrong-order/duplicate/tampered cases。
+不得自动build、quarantine后自动修复、stock fallback、cloud fallback或用Turbo改变归因变量。
 
-输出必须含`Verdict`、blocking issues、non-blocking concerns、file/test evidence与minimal follow-up。Parent直接验证重要claims并关闭blocking issues；reviewer不能授权live execution或改写solution。
+### Exit Criteria
 
-### 12.9 Separately Authorized C4 Live Smoke
+最多一个candidate被选为Production implementation winner。两个都失败时本计划在Local destination gate
+保持blocked，不注册C4 capability。
 
-只有以下条件全部满足后才可开始：implementation checkpoint、all focused tests、formal complete capability evidence、fresh passing Harness、native reviewer无blocking issue、exact inputs/materialization ready、Creative Skill preflight complete，以及新的task-scoped paid authorization、fresh budget/egress decision和新的one-use permit。
+## Milestone 5: Implement Winner-Specific Local C4 Child
 
-Live smoke必须使用一个exact Provider/model/profile/capability、预先冻结的Shot open/close state与四个anchors；调用次数/预算必须bounded，不允许automatic retry、T2V/prompt/Provider fallback。先报告`C4_STATIC_BOUNDARY`，再以full-speed playback、upstream/downstream motion measurements与human/user visual review单独报告`C4_MOTION_BOUNDARY`。SSIM只作辅助；任何identity、axis、screen direction、subject scale/FOV、reachable displacement、teleport、gait phase、subject/camera velocity维度失败都保持C4 rejected/pending并禁止activation。
+### RED
 
-v7已经消费的authorization、permit、submit与fetched artifact全部不可复用；新live smoke不得自动激活candidate，也不得把Provider success或reviewer verdict当Final Acceptance。
+在`tests/test_production_comfy_t8_hybrid_c4_video.py`固定：
 
-## Documentation Closure
+- capability ID/model/profile/task type与winner exact identity一致；
+- exact 1/1/1/1 cardinality，audio/missing/duplicate/extra/wrong-order全部拒绝；
+- workflow node bindings与payload order deterministic；
+- ref video audio与standalone reference audio永远为空；
+- model/node/workflow/binding/profile/output hash drift在upload/submit前拒绝；
+- request只能使用`IMAGE_TO_VIDEO + MULTI_ANCHOR`；
+- compile/resolve/preview纯deterministic，preflight无Provider effect；
+- one-use local permit、loopback-only endpoint、no remote/fallback。
 
-本次Local H3 implementation完成后同步更新runtime baseline、roadmap、primary contract matrix与AGENTS中的runtime truth，并清楚记录：
+### GREEN
 
-- provider-neutral contract已实现范围；
-- 每个 provider lane的offline/live/quality状态；
-- schema/layout是否保持不变；
-- Harness receipt、local evidence与未授权 lane；
-- rollback和known limitations。
+实现winner-specific profile、workflow与child：
 
-原 P8 provider spec保持历史和当前 provider contract，不被重写成 continuity spec。
+- 不改写existing FL2VA/Ref2VA child identity；
+- child拥有workflow rendering、native mapping、profile preflight与ComfyUI transport actions；
+- family只聚合capabilities并按capability/resolved identity exact dispatch；
+- durable lifecycle继续由service/committer拥有；
+- profile seal包含全部model/artifact/node/workflow/sampling/output/locality identities。
 
-C4 implementation完成后再同步runtime baseline、contract matrix、Harness routing与Seedance provider docs；在此之前只能描述为`frozen target / implementation pending`。若formal Mini API evidence不能证明full mixed capability，documentation closure必须保留Seedance C4 pre-preview blocker，不得把fail-closed状态写成live-ready。
+### Family Verification
+
+在`tests/test_production_local_h3_provider_family.py`证明：
+
+- capability IDs/identities disjoint；
+- deterministic snapshot ordering；
+- selected C4 request只到C4 child；
+- restart无last-selected state；
+- C4 child failure不调用其他local child或remote Provider。
+
+### Verification
+
+```bash
+python -m pytest -p no:cacheprovider \
+  tests/test_production_comfy_t8_hybrid_c4_video.py \
+  tests/test_production_local_h3_provider_family.py \
+  tests/test_production_shot_router.py \
+  tests/test_production_provider_neutral_adapters.py -q
+```
+
+## Milestone 6: Close Lifecycle, Replay and P5
+
+### Work
+
+使用fake local transport与sealed fixtures覆盖：
+
+- compile -> resolve -> preview -> preflight -> intent/permit -> submit/status/fetch；
+- before-submit、accepted、known-no-effect、outcome-unknown、fetched、validated、candidate与activation crash
+  points；
+- activation后Project/Registry/graph/Manifest一致；
+- reopen重验request/profile/model/artifact/workflow/input/output hashes；
+- exact replay的Provider、extraction、activation与render effect count均为零；
+- terminal/identity/endpoint/motion-tail任一变化只stale target generation与真实composition/render closure；
+- unlinked Shots、voice、captions与unrelated assets保持fresh；
+- local evidence不进入paid lifecycle，paid evidence不进入local attempt。
+
+只有RED证明existing owner有缺口时才修改committer、dependency或lifecycle production files。
+
+### Verification
+
+```bash
+python -m pytest -p no:cacheprovider \
+  tests/test_production_local_video_state.py \
+  tests/test_production_video_state_recovery.py \
+  tests/test_production_generated_video_e2e.py \
+  tests/test_production_dependency.py \
+  tests/test_production_selective_rebuild.py -q
+```
+
+## Milestone 7: Full Four-Anchor Local Acceptance
+
+### Technical Smoke
+
+对winner执行一个single request：
+
+```text
+one first_frame
+one last_frame
+one reference image
+one reference video
+one prompt
+one exact model/profile
+one submit
+no retry
+no fallback
+```
+
+保存exact input SHA-256、Registry identities、request/resolved/fingerprint、workflow/profile/model/artifact
+hashes、submit/status/fetch receipts、output/probe、decoded first/last frame hashes与replay counters。
+
+### Quality Gates
+
+- Boundary：decoded frame 0与terminal frame分别计算frozen PSNR/SSIM/perceptual metrics，保存side-by-side与
+  crop evidence；native role不夸大为pixel-identical。
+- Identity：first/middle/last windows检查face/subject、hair、clothes、props、body scale与drift；backend
+  coverage不足时为`NOT_EVALUATED`。
+- Motion：检查subject/camera direction与velocity、action phase、entrance/exit、unexpected stop/re-entry；
+  单帧metric不得代替motion evidence。
+- P6/Human：消费exact request/output/anchors、technical/strategy/semantic evidence与human verdict；只有P6
+  是Final Acceptance owner。
+
+### Exit Criteria
+
+全部通过后达到`C4_DESTINATION_READY`。任何quality dimension rejection、`NOT_EVALUATED`缺human fallback、
+unknown outcome或incomplete evidence都保持`experimental / unavailable`。
+
+## Milestone 8: Establish Directed Transition Certification
+
+### Persistence Seam Spike
+
+先用tests验证existing immutable evidence + Manifest pointer能否表达certification，且不新增writer或mutable
+lifecycle：
+
+- content hash覆盖source/destination exact identities、grade、anchors、normalization与全部evidence；
+- reverse direction、不同model/profile、不同grade或changed output normalization产生不同identity；
+- pointer tamper、missing evidence、source未activated/P6未接受、destination未ready全部fail closed；
+- replay只reopen/revalidate，不重复Provider或committer effect。
+
+若无需schema/layout migration，按File Map实现`video_transition.py`与现有committer pointer seam。若需要
+Manifest/artifact migration，在任何production schema edit前停止并触发Decision Gate。
+
+### First Directed Pairs
+
+只对已有accepted source output、exact terminal/motion-tail derivation与ready Local destination建立pair。
+每个direction独立运行：
+
+1. source evidence reopen；
+2. exact anchor derivation/materialization；
+3. Local C4 destination generation；
+4. normalization、boundary、identity、motion与P6；
+5. immutable certification seal与reopen/replay。
+
+Reverse direction不自动成立。历史failed/unactivated Seedance result不能作为accepted source。
+
+### Exit Criteria
+
+至少一个不同source Provider到Local T8的pair通过后达到`DIRECTED_TRANSITION_READY`，声明必须写出exact
+direction；仍不能说“多个destination可流畅切换”。
+
+## Milestone 9: Optional Base Seedance 2.0 Semantic Destination
+
+这是独立Grade S lane，不是Local Grade E失败后的fallback。
+
+### Formal Evidence Gate
+
+必须先取得base `doubao-seedance-2-0-260128` exact model-specific、dated contract，证明同一reference
+request允许opening image、ending image、identity image与motion video的semantic union，并冻结counts、
+duration、resolution、audio、payload与response semantics。Adapter能序列化字段不满足此gate。
+
+### Implementation and Paid Gate
+
+Formal evidence完整时才可新增独立Grade S capability/profile/compiler tests；request必须明确opening/ending
+只是semantic references。任何remote live probe还需要fresh entitlement、pricing、budget、Cloud Egress、
+durable intent与one-use permit，且最多一次POST、no retry、no fallback。
+
+Formal evidence缺失、profile/materialization不完整或用户未授权时，保持pre-preview/POST fail closed，不修改
+exact Grade E seal。
+
+### Exit Criteria
+
+通过transport、lifecycle、semantic boundary/identity/motion与P6后，只能声明base model的
+`C4_SEMANTIC_MULTI_REFERENCE` destination ready。它与Local Grade E不是同一grade，不能合并为
+`SAME_GRADE_MULTI_DESTINATION_READY`。
+
+## Milestone 10: Same-Grade Multi-Destination Gate
+
+达到“同等级多 Provider 可流畅切换”前必须存在至少两个不同destination Providers，各自：
+
+- 使用同一provider-neutral grade、fixture与frozen rubric；
+- 拥有独立exact capability/profile/model/pricing/evidence；
+- 通过compile、denial、lifecycle、live、boundary、identity、motion、P6与replay；
+- 通过deterministic explicit selection与no-fallback tests；
+- 对每个声明的source direction拥有独立certification。
+
+当前已知Provider evidence不足以安排第二个Grade E destination，因此本milestone是hard claim gate，不是
+可以由Local T8或Seedance Grade S单独关闭的implementation checklist。第二个same-grade destination出现
+formal evidence后，必须更新governing spec/plan的exact model/profile scope再执行。
+
+## Milestone 11: Documentation, Review and Exact Verification
+
+### Documentation Closure
+
+按实际完成层级同步：
+
+- `docs/v0.2-runtime-baseline.md`：implemented、live、quality、P6与unavailable truth；
+- `docs/v0.2-agentic-production-roadmap.md`：remaining gates；
+- `docs/agent-primary-contract-matrix.md`：new surface owner与禁止旁路；
+- `.agent/harness/policy.yaml`/`tests/test_agent_harness.py`：只有changed-path routing需要时同步。
+
+不得把plan、workflow文件、offline tests或single Provider success写成Production/multi-provider acceptance。
+
+### Independent Review
+
+Core behavior、Provider gating、paid/profile isolation、transition persistence或fallback behavior发生变化后，
+使用native named `reviewer`检查：
+
+- one-capability C4 grammar是否真实；
+- Seedance catalog与active inventory是否分离且cross-model fail closed；
+- Local candidate qualification是否存在隐式fallback或identity substitution；
+- certification是否是immutable evidence而非第二state owner；
+- replay/recovery/P5与historical compatibility是否保持；
+- tests是否覆盖真实failure mode而非只验证serializer。
+
+Parent必须复核blocking claims并关闭问题。
+
+### Exact Verification
+
+每个code checkpoint：
+
+1. 运行focused tests与`git diff --check`；
+2. 只`git add <exact-task-files>`；
+3. 运行Harness inspection；
+4. 对non-empty exact staged snapshot或exact commit range运行Harness；
+5. 验证receipt integrity/freshness；
+6. 只commit task-owned files，不push/release。
+
+Harness不执行Provider、paid call、media generation或P6；receipt只能证明对应offline code/control-plane gates。
+
+## Acceptance Criteria
+
+### `C4_CORE_READY`
+
+- Existing provider-neutral contract、hash、cardinality与Router tests保持GREEN。
+
+### `C4_DESTINATION_READY`
+
+- 一个winner-specific Local T8 child完成profile/preflight、fake lifecycle、full four-anchor local smoke、
+  activation/reopen/replay、boundary/identity/motion与P6/human acceptance。
+
+### `DIRECTED_TRANSITION_READY`
+
+- 至少一个source与不同destination Provider的exact direction拥有fresh immutable certification。
+
+### `SAME_GRADE_MULTI_DESTINATION_READY`
+
+- 同一grade至少两个不同destination Providers完成独立sealed capability与全部acceptance；
+- explicit selection、denial、reopen、replay与no-fallback tests通过。
+
+### `FULL_MATRIX_READY`
+
+- 每个对外声明支持的directed pair都拥有独立fresh certification。
+
+低层级不得代替高层级。Local T8 child完成后最多升级到`C4_DESTINATION_READY`；加一个跨Provider source
+pair后最多升级到`DIRECTED_TRANSITION_READY`。在第二个same-grade destination通过前，最终交付必须明确
+写“尚不能声称多 Provider 同等级流畅切换”。
+
+## Verification Matrix
+
+| Gate | Minimum executable evidence |
+| --- | --- |
+| Core/cardinality | missing/duplicate/extra/wrong-order/tamper/sub-capability-union zero-effect tests |
+| Seedance isolation | base-only snapshot、pricing/profile exact set、bounds、endpoint、response model与cross-model denial |
+| Local inventory | exact ComfyUI/T8/model/artifact/node/workflow/profile hashes与license/provenance |
+| Workflow/compiler | literal Hybrid、exact four mappings、empty audio、deterministic payload/output |
+| Lifecycle | permit、submit/status/fetch、unknown recovery、candidate/activation/reopen/replay |
+| P5 | four exact inputs的precise closure；unrelated assets保持fresh |
+| Local live | one request、one submit、no retry、no fallback，全部input/output hashes |
+| Boundary | decoded frame 0/terminal evidence，native role与pixel equality分开 |
+| Identity | multi-window subject/appearance/drift；不足为`NOT_EVALUATED` |
+| Motion | direction、velocity、phase、entrance/exit、stop/re-entry |
+| P6/Human | exact evidence + human verdict，由P6唯一给Final Acceptance |
+| Transition | exact directed pair、grade、normalization、evidence hash、tamper/reverse denial |
+| Harness | exact staged snapshot或commit range的fresh passing receipt |
+
+## Execution Order
+
+```text
+Milestone 1  C4 core regression closure
+      |
+      +---- Milestone 2  Seedance 2.0 active-inventory isolation
+      |
+      v
+Milestone 3  Local candidate inventory + frozen qualification
+      v
+Milestone 4  M0; conditional M1; select one winner
+      v
+Milestone 5  winner-specific Local C4 child
+      v
+Milestone 6  lifecycle/replay/P5 closure
+      v
+Milestone 7  full four-anchor local + P6 acceptance
+      v
+Milestone 8  directed transition certification
+
+Milestone 9  optional base Seedance semantic lane
+      |
+      v
+Milestone 10 same-grade second-destination claim gate
+
+Milestone 11 documentation/review/Harness runs at each real checkpoint
+```
+
+Milestone 2可与Milestone 3的read-only preparation独立进行，但不得并发修改同一files。Milestone 4必须在
+qualification inputs/rubric冻结后进行；Milestone 5不得在winner确定前创建模糊Production identity；
+Milestone 8必须在destination ready后进行；Milestone 9不阻塞Local Grade E，也不得成为其fallback。
+
+## Rollback and Failure Policy
+
+- Candidate失败：保留evidence，capability保持unavailable，不改阈值、不替换identity。
+- Local unknown outcome：existing explicit recovery；不blind retry、不remint permit。
+- Hybrid artifact missing/tampered：attempt blocked；runtime不build/repair/fallback。
+- Seedance entitlement/profile/pricing不完整：active snapshot不暴露model；preview/POST effect count为零。
+- Provider response model mismatch：fail closed，不接受family-compatible替代。
+- Grade E quality失败：不自动改为Grade S。
+- Certification tamper/stale：拒绝transition claim，不影响canonical source/destination lifecycle truth。
+- Persistence需要migration：在schema/layout edit前停止并请求Decision Gate。
+- Reviewer/Harness失败：修复并重新验证exact snapshot，不用旧receipt覆盖。
 
 ## Final Definition of Done
 
-`provider-neutral technical implementation complete` 只表示 provider-neutral request/evidence、durable lifecycle、P5 precise invalidation、P3/P4 invariants 和 fresh Harness 已通过；它不得暗示任何 provider live或quality acceptance。
+本计划的第一可交付终点是：
 
-只有以下条件同时满足，才能称本计划要求的 `three-lane Shot Continuity acceptance complete`：
+- Seedance 2.0 shared transport与base/Fast/Mini exact model isolation已实现，active inventory为base only；
+- Local T8一个winner-specific C4 destination达到`C4_DESTINATION_READY`；
+- 至少一个不同source Provider到Local T8的exact direction达到`DIRECTED_TRANSITION_READY`；
+- canonical docs、independent review与exact Harness receipts完成；
+- 未购买、未授权、未验证或不同grade的routes继续fail closed。
 
-- request/reference/provenance binding executable tests通过；
-- tamper/unreadable/capability denial fail closed；
-- durable activation/recovery与exact replay通过；
-- P5 precise invalidation只影响真实 closure；
-- P3/P4、static-image、Legacy、no-network和generated-MP4 compatibility无回归；
-- fresh Harness receipt验证成功；
-- local continuity、MiniMax cloud Hailuo 2.3 和 Seedance 2.0 Mini 三条 lane 都已解析为 exact runtime/model/profile，并在 task-scoped authorization 下分别完成 live proof；
-- subjective continuity review单独通过。
-
-任一 lane 未完成 exact identity resolution、被 capability denial、未获授权或未通过 live proof时，three-lane acceptance 必须保持 `pending` 或 `blocked`，不能由另一 lane 的成功代替。若仅完成前六项，必须报告为 `provider-neutral technical acceptance only`，不得称 live、three-lane 或 quality accepted。
-
-`C4_MULTI_ANCHOR_MOTION_CONTINUITY complete`另要求Milestone 12.1-12.8全部完成、selected Provider formal capability evidence完整，并在new authorization下分别通过static boundary与motion boundary live/subjective acceptance。仅完成three-static-anchor technical path时必须报告`C4 static boundary only`；没有exact motion tail或full-speed human acceptance时不得称motion continuity已解决。
+这仍不等于“多 Provider destination可以同等级流畅切换”。只有Milestone 10的第二个same-grade destination
+和对应directed certifications真正完成后，才能升级该产品声明；只有完整声明矩阵逐项认证后，才能称
+`FULL_MATRIX_READY`。
