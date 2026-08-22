@@ -609,3 +609,302 @@ def test_unexpected_reentry_pass_uses_non_inverted_evidence_meaning(
 
     assert captured[0].unexpected_reentry is False
     assert captured[0].coverage_complete is True
+
+
+# ---------------------------------------------------------------------------
+# T1: validate_once seam (Console validate action)
+# ---------------------------------------------------------------------------
+
+
+class _ValidateOnlyService:
+    """Records which VideoGenerationService seam the coordinator invokes."""
+
+    def __init__(self, committer: _FakeCommitter) -> None:
+        self.committer = committer
+        self.validate_calls: list[object] = []
+        self.activate_calls: list[object] = []
+        self.fetch_and_activate_calls: list[object] = []
+
+    def validate_once(self, *, attempt_id: str, continuity_reviewer=None):
+        self.validate_calls.append((attempt_id, continuity_reviewer))
+        return {"attempt_id": attempt_id, "validated": True}
+
+    def activate_once(self, *, attempt_id: str):
+        self.activate_calls.append(attempt_id)
+        return {"attempt_id": attempt_id, "activated": True}
+
+    def fetch_and_activate(self, *, attempt_id: str, continuity_reviewer=None):
+        self.fetch_and_activate_calls.append((attempt_id, continuity_reviewer))
+        return {"attempt_id": attempt_id, "activated": True}
+
+
+def _coordinator_with_validate_only_service(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    *,
+    gpu_execution_lease=lambda: nullcontext(),
+    reviewer_factory=None,
+):
+    import ai_video.production.continuity_review_coordinator as coordinator_module
+
+    committer = _FakeCommitter(tmp_path)
+    service = _ValidateOnlyService(committer)
+    monkeypatch.setattr(
+        coordinator_module,
+        "load_qa_policy",
+        lambda _root, _pointer: committer.policy,
+    )
+    factory_calls: list[object] = []
+
+    def default_factory(*, config, human_fallback, human_fallback_identity):
+        factory_calls.append((config, human_fallback, human_fallback_identity))
+        return human_fallback
+
+    coordinator = ContinuityReviewCoordinator(
+        committer=committer,
+        video_service=service,  # type: ignore[arg-type]
+        reviewer_config=_config(),
+        reviewer_identity=HUMAN,
+        gpu_execution_lease=gpu_execution_lease,
+        reviewer_factory=reviewer_factory or default_factory,
+    )
+    return coordinator, committer, service, factory_calls
+
+
+def test_validate_once_seam_is_exposed_on_coordinator() -> None:
+    """T1 requires ContinuityReviewCoordinator.validate_once to exist."""
+
+    assert hasattr(ContinuityReviewCoordinator, "validate_once"), (
+        "ContinuityReviewCoordinator must expose validate_once as a public seam"
+    )
+
+
+def test_validate_once_invokes_only_service_validate_once(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """validate_once must delegate to video_service.validate_once only."""
+
+    coordinator, _, service, factory_calls = _coordinator_with_validate_only_service(
+        monkeypatch, tmp_path
+    )
+    request = coordinator.prepare_request(attempt_id="attempt-1")
+    decision = _decision(request)
+
+    result = coordinator.validate_once(attempt_id="attempt-1", decision=decision)
+
+    assert result == {"attempt_id": "attempt-1", "validated": True}
+    assert len(service.validate_calls) == 1
+    assert len(service.activate_calls) == 0
+    assert len(service.fetch_and_activate_calls) == 0
+    assert factory_calls, "validate_once must construct the reviewer exactly once"
+
+
+def test_validate_once_rejects_stale_request_hash_before_gpu_lease(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Stale review_request_content_hash must fail before acquiring the GPU."""
+
+    lease_calls = 0
+
+    @contextmanager
+    def gpu_execution_lease():
+        nonlocal lease_calls
+        lease_calls += 1
+        yield
+
+    coordinator, _, service, factory_calls = _coordinator_with_validate_only_service(
+        monkeypatch, tmp_path, gpu_execution_lease=gpu_execution_lease
+    )
+    request = coordinator.prepare_request(attempt_id="attempt-1")
+    stale_decision = _decision(request, review_request_content_hash="f" * 64)
+
+    with pytest.raises(AiVideoError) as caught:
+        coordinator.validate_once(attempt_id="attempt-1", decision=stale_decision)
+
+    assert caught.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert lease_calls == 0
+    assert factory_calls == []
+    assert service.validate_calls == []
+
+
+def test_validate_once_requires_exact_decision_model_before_gpu_lease(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    @contextmanager
+    def gpu_execution_lease():
+        raise AssertionError("GPU must not be acquired for an unvalidated model")
+        yield
+
+    coordinator, _, service, factory_calls = _coordinator_with_validate_only_service(
+        monkeypatch, tmp_path, gpu_execution_lease=gpu_execution_lease
+    )
+
+    with pytest.raises(AiVideoError) as caught:
+        coordinator.validate_once(  # type: ignore[arg-type]
+            attempt_id="attempt-1",
+            decision={"reviewer_identity": HUMAN},
+        )
+
+    assert caught.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert factory_calls == []
+    assert service.validate_calls == []
+
+
+def test_validate_once_rejects_wrong_reviewer_identity_before_gpu_lease(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Wrong reviewer identity must fail before any side effects."""
+
+    @contextmanager
+    def gpu_execution_lease():
+        raise AssertionError("GPU must not be acquired for a stale decision")
+        yield
+
+    coordinator, _, service, factory_calls = _coordinator_with_validate_only_service(
+        monkeypatch, tmp_path, gpu_execution_lease=gpu_execution_lease
+    )
+    request = coordinator.prepare_request(attempt_id="attempt-1")
+    wrong_reviewer = _decision(request, reviewer_identity=AUTOMATIC)
+
+    with pytest.raises(AiVideoError) as caught:
+        coordinator.validate_once(
+            attempt_id="attempt-1", decision=wrong_reviewer
+        )
+
+    assert caught.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert factory_calls == []
+    assert service.validate_calls == []
+
+
+def test_validate_once_rejects_incomplete_axes_before_gpu_lease(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """NOT_SURE on any axis must be rejected before acquiring the GPU."""
+
+    lease_calls = 0
+
+    @contextmanager
+    def gpu_execution_lease():
+        nonlocal lease_calls
+        lease_calls += 1
+        yield
+
+    coordinator, _, service, factory_calls = _coordinator_with_validate_only_service(
+        monkeypatch, tmp_path, gpu_execution_lease=gpu_execution_lease
+    )
+    request = coordinator.prepare_request(attempt_id="attempt-1")
+    incomplete = _decision(request, identity="NOT_SURE")
+
+    with pytest.raises(AiVideoError) as caught:
+        coordinator.validate_once(attempt_id="attempt-1", decision=incomplete)
+
+    assert caught.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert lease_calls == 0
+    assert factory_calls == []
+    assert service.validate_calls == []
+
+
+def test_validate_once_rejects_gpu_busy_without_calling_service(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """A typed GPU busy error must surface and skip the validate service call."""
+
+    @contextmanager
+    def busy_lease():
+        raise AiVideoError(
+            ErrorCode.PRODUCTION_STATE_BUSY,
+            "Local continuity evaluator is busy.",
+            retryable=True,
+        )
+        yield
+
+    coordinator, _, service, factory_calls = _coordinator_with_validate_only_service(
+        monkeypatch, tmp_path, gpu_execution_lease=busy_lease
+    )
+    request = coordinator.prepare_request(attempt_id="attempt-1")
+    decision = _decision(request)
+
+    with pytest.raises(AiVideoError) as caught:
+        coordinator.validate_once(attempt_id="attempt-1", decision=decision)
+
+    assert caught.value.code is ErrorCode.PRODUCTION_STATE_BUSY
+    assert factory_calls == []
+    assert service.validate_calls == []
+
+
+def test_validate_once_rejects_invalid_reviewer_runtime_without_calling_service(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """A reviewer factory failure must surface as a typed error."""
+
+    def invalid_factory(**_kwargs):
+        raise ValueError("invalid sealed runtime")
+
+    coordinator, _, service, factory_calls = _coordinator_with_validate_only_service(
+        monkeypatch,
+        tmp_path,
+        reviewer_factory=invalid_factory,
+    )
+    request = coordinator.prepare_request(attempt_id="attempt-1")
+    decision = _decision(request)
+
+    with pytest.raises(AiVideoError) as caught:
+        coordinator.validate_once(attempt_id="attempt-1", decision=decision)
+
+    assert caught.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert factory_calls == []
+    assert service.validate_calls == []
+
+
+def test_validate_once_legacy_validate_and_activate_remains_compatible(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """The legacy validate_and_activate(decision_path) API must keep working."""
+
+    coordinator, _, service, factory_calls = _coordinator(
+        monkeypatch, tmp_path
+    )
+    request = coordinator.prepare_request(attempt_id="attempt-1")
+    decision_path = tmp_path / "decision.json"
+    decision_path.write_text(
+        _decision(request).model_dump_json(), encoding="utf-8"
+    )
+
+    result = coordinator.validate_and_activate(
+        attempt_id="attempt-1", decision_path=decision_path
+    )
+
+    assert result == {"attempt_id": "attempt-1", "activated": True}
+    assert service.calls, "Legacy validate_and_activate must still invoke the service"
+    assert len(factory_calls) == 1
+    # Legacy path uses fetch_and_activate, never the new validate_once seam.
+    assert not hasattr(service, "validate_once") or not getattr(
+        service, "validate_once_calls", []
+    )
+
+
+def test_validate_once_does_not_call_fetch_and_activate_or_activate_once(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """The new seam must never invoke the legacy or activate actions."""
+
+    coordinator, _, service, _ = _coordinator_with_validate_only_service(
+        monkeypatch, tmp_path
+    )
+    request = coordinator.prepare_request(attempt_id="attempt-1")
+    decision = _decision(request)
+
+    coordinator.validate_once(attempt_id="attempt-1", decision=decision)
+
+    assert service.fetch_and_activate_calls == []
+    assert service.activate_calls == []
+    assert len(service.validate_calls) == 1

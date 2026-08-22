@@ -2,11 +2,11 @@
 
 ## Status
 
-Proposed for acceptance。本文定义 Provider Console 从只读 observer 进入本机 operator execution control
-的下一条 runtime slice；在本 Spec 被用户接受前，不授权实现、live Provider submit、付费调用或
-Manifest mutation。
+Accepted。用户已接受本文定义的 governing contract，并授权按配套 implementation plan 开始实施。
 
-现有只读契约继续由
+本轮 execution scope 先完成 T0/T1 offline core seam；不得由此提前执行 live Provider submit、付费调用、
+Secret Service lookup、`runs/**` mutation 或 T6 frontend。后续阶段仍须满足本文既有 technical gates、
+Decision Gates 与 exact verification contract。现有只读契约继续由
 `docs/superpowers/specs/2026-08-22-ai-video-provider-console-runs-integration.md` 管理。本文只增加显式
 execution path，不把原有 `GET/HEAD` projection 改造成隐式 writer。
 

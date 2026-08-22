@@ -185,6 +185,13 @@ class _VideoService(Protocol):
         continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
     ) -> object: ...
 
+    def validate_once(
+        self,
+        *,
+        attempt_id: str,
+        continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
+    ) -> object: ...
+
 
 ReviewerFactory = Callable[..., GeneratedShotContinuityReviewer]
 
@@ -549,6 +556,67 @@ class ContinuityReviewCoordinator:
                 ) from exc
             guarded_reviewer = self._guard_reviewer(snapshot, reviewer)
             return self._video_service.fetch_and_activate(
+                attempt_id=attempt_id,
+                continuity_reviewer=guarded_reviewer,
+            )
+
+    def validate_once(
+        self,
+        *,
+        attempt_id: str,
+        decision: HumanReviewDecisionV1,
+    ) -> object:
+        """Validate-only seam: invoke ``video_service.validate_once`` exactly once.
+
+        The ``decision`` argument must already be a strict-validated
+        ``HumanReviewDecisionV1`` model. This seam mirrors the same canonical
+        snapshot, decision binding, GPU lease, reviewer construction and
+        runtime guard checks as the legacy combined path, but never advances
+        canonical activation: it only delegates to
+        ``VideoGenerationService.validate_once``.
+        """
+
+        if not isinstance(decision, HumanReviewDecisionV1):
+            raise _review_error(
+                "Human continuity decision must be a HumanReviewDecisionV1 model."
+            )
+        snapshot = self._snapshot(attempt_id=attempt_id, allow_existing=False)
+        if (
+            decision.review_request_content_hash != snapshot.request.content_hash
+            or decision.reviewer_identity != snapshot.request.required_reviewer
+        ):
+            raise _review_error(
+                "Human continuity decision does not match the current review request."
+            )
+        decision.require_complete()
+        fallback = self._human_fallback(snapshot, decision)
+        with ExitStack() as stack:
+            try:
+                stack.enter_context(self._gpu_execution_lease())
+            except AiVideoError:
+                raise
+            except Exception as exc:
+                raise AiVideoError(
+                    code=ErrorCode.PRODUCTION_STATE_BUSY,
+                    user_message="Local continuity evaluator lease is unavailable.",
+                    technical_detail=str(exc),
+                    retryable=True,
+                    cause=exc,
+                ) from exc
+            try:
+                reviewer = self._reviewer_factory(
+                    config=self._reviewer_config,
+                    human_fallback=fallback,
+                    human_fallback_identity=self._reviewer_identity,
+                )
+            except AiVideoError:
+                raise
+            except Exception as exc:
+                raise _review_error(
+                    "Local continuity reviewer runtime is invalid.", str(exc)
+                ) from exc
+            guarded_reviewer = self._guard_reviewer(snapshot, reviewer)
+            return self._video_service.validate_once(
                 attempt_id=attempt_id,
                 continuity_reviewer=guarded_reviewer,
             )

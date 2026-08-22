@@ -2,11 +2,12 @@
 
 ## Status
 
-Draft，not executable until governing spec is accepted：
-`docs/superpowers/specs/2026-08-22-ai-video-provider-console-execution-control.md`。
+Executable。governing spec 已由用户接受，本文可以按 sequence 执行。
 
-本计划覆盖 provider-neutral execution control，不把 Seedance live proof当成终点。live call 位于所有 offline
-contracts、review 与 Harness closure 之后。
+当前 continuation target 仅执行 T0/T1 offline core seam；不得提前进入 T2+、调用 live Provider、读取 raw
+secret、修改 `runs/**` 或进入 T6 frontend。后续阶段继续受 governing spec 的 technical gates、Decision Gates
+与 task-scoped authorization 约束。本计划覆盖 provider-neutral execution control，不把 Seedance live proof当成
+终点；live call 位于所有 offline contracts、review 与 Harness closure 之后。
 
 ## Contract Checkpoint Before Code
 

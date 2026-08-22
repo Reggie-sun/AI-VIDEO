@@ -406,3 +406,50 @@ class VideoGenerationService:
             user_message="Video post-fetch activation is not the next durable action.",
             retryable=False,
         )
+
+    def validate_once(
+        self,
+        *,
+        attempt_id: str,
+        probe: Callable[[int], dict] | None = None,
+        terminal_frame_extractor: TerminalFrameExtractor | None = None,
+        continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
+    ):
+        """Perform exactly one canonical prepare action without any activation."""
+
+        attempt, state = self._state(attempt_id)
+        if (
+            attempt.status is not StateCommitStatus.RUNNING
+            or state.phase is not VideoAttemptPhase.VALIDATE
+        ):
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message=(
+                    "Video validation requires a running VALIDATE attempt."
+                ),
+                retryable=False,
+            )
+        return self._committer.prepare_video_activation_candidate(
+            attempt_id=attempt_id,
+            probe=probe,
+            terminal_frame_extractor=terminal_frame_extractor,
+            continuity_reviewer=continuity_reviewer,
+        )
+
+    def activate_once(self, *, attempt_id: str):
+        """Perform exactly one canonical activation action without re-validating."""
+
+        attempt, state = self._state(attempt_id)
+        if (
+            attempt.status
+            not in {StateCommitStatus.RUNNING, StateCommitStatus.INTERRUPTED}
+            or state.phase is not VideoAttemptPhase.CANDIDATE
+        ):
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message=(
+                    "Video activation requires a recoverable CANDIDATE attempt."
+                ),
+                retryable=False,
+            )
+        return self._committer.activate_video_candidate(attempt_id=attempt_id)
