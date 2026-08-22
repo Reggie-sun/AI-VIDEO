@@ -10,6 +10,46 @@ continuity evaluator/reviewer callback、P6 receipt writer 或 Provider lifecycl
 完成并通过验证，只表示 capture seam 可被显式调用；不表示产品已经接受“每个 Shot 自动调用”的
 orchestration owner。
 
+## When The Next Step Can Start
+
+### Current Answer — 2026-08-22
+
+**现在还不能开始 automatic-caller implementation。** 当前 `main` 尚未包含 Q0 post-QA capture
+foundation commit `509acc6760c364247515db567432fe6ca9c8a03d`；因此下一步仍是先完成该 commit 的安全
+integration，并在合并后的 exact tree 上重新验证。
+
+**automatic-caller spec + plan 可以在以下事件全部发生后立即开始：**
+
+1. Q0 capture foundation 已进入当前 `main`；
+2. 合并时与当前 `main` 的 same-file edits 已由各自 owner 明确 reconciliation，没有覆盖并发工作；
+3. 合并结果的 focused tests、Architecture Gate 与 Harness receipt 为 fresh/passing；
+4. `main` 上的 executable truth 仍保持 Production 不 import Q0、显式 capture replay/zero-write contract
+   通过。
+
+满足这四项后，不需要等待 live Provider、媒体生成、paid smoke、RAG rebuild 或真实 Pilot 数据，便可以
+开始下一步 spec + plan。
+
+**automatic-caller implementation 只能在 spec + plan 又满足以下条件后开始：**
+
+1. spec 状态为 `Accepted`，plan 明确引用该 spec；
+2. application-level orchestration owner 已落实到精确 module/API，而不是抽象地写“未来 Product
+   Agent Loop”；
+3. Q0 pilot/run context 的 canonical source 已接受，caller 无需猜测或伪造 context；
+4. trigger 明确位于 durable post-QA checkpoint 之后；
+5. complete analyzer evidence 的来源和 exact artifact binding 已确定；
+6. failure isolation、replay、conflict、privacy 与 offline E2E acceptance tests 已写清；
+7. implementation target files 没有 active same-file writer conflict。
+
+因此实际顺序固定为：
+
+```text
+Q0 capture foundation merge to main
+  -> merged-tree verification and fresh receipt
+  -> automatic-caller spec + plan
+  -> owner/context/trigger contracts accepted
+  -> strict RED/GREEN implementation
+```
+
 ## Goal
 
 在 Production QA checkpoint 已经完成后，由唯一 application-level caller 自动调用
