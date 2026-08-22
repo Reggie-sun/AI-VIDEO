@@ -32,6 +32,8 @@ generation fingerprint。修改 Playbook 不会使 Production downstream 自动 
 Comparison 覆盖 current HEAD 的全部 `GenerationMode`，包括 `VIDEO_EDIT` 与
 `VIDEO_EXTEND`。Unknown strategy在proposal validation处直接失败，不会作为弱类型值进入comparison；
 `NOT_COMPARABLE`用于target Shot identity不一致等“不是同一对象”的情况。
+Comparison 是 pure development-side operation：它不修改 current plan，不调用 Provider，
+不写 Manifest，不访问 network，也不读取 credential；`production_effect` 固定为 `none`。
 
 ## Validation
 
