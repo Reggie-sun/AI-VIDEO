@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
+from ai_video.production._video_capability_fingerprint import (
+    c4_exact_cardinality_grammar_satisfies_variant,
+)
 from ai_video.production.video import VideoGenerationMode, VideoOutputRequirement
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.video_requirement import (
@@ -278,3 +281,65 @@ def as_capability_blocked(
         outcome=outcome,
     )
     return type(decision).create(**values)
+
+
+def enforce_c4_requirement_gate(
+    requirement: ProviderNeutralVideoRequirement,
+    context: Any,
+    capabilities: Any,
+    selected_capability_id: str,
+    decision: Any,
+) -> Any:
+    """Apply exact C4 Registry and one-variant grammar checks before binding."""
+
+    binding = requirement.c4_multi_anchor_binding
+    if binding is None or decision.outcome.value != "selected":
+        return decision
+    reason_code_type = type(decision.reason_codes[0])
+    outcome_type = type(decision.outcome)
+    if binding.selected_registry_revision_id != context.selected_registry_revision_id:
+        return as_capability_blocked(
+            decision,
+            reason_code=reason_code_type("C4_REGISTRY_REVISION_MISMATCH"),
+            outcome=outcome_type("blocked_missing_input"),
+            rationale=(
+                "The sealed C4 requirement does not use the selected Registry revision."
+            ),
+        )
+    selected = next(
+        (
+            variant
+            for variant in capabilities.variants
+            if variant.capability_id == selected_capability_id
+        ),
+        None,
+    )
+    if selected is None or not c4_exact_cardinality_grammar_satisfies_variant(
+        selected,
+        motion=binding.tier.value == "motion_boundary",
+    ):
+        return as_capability_blocked(
+            decision,
+            reason_code=reason_code_type("PROVIDER_CAPABILITY_DENIED"),
+            outcome=outcome_type("blocked_capability"),
+            rationale="The selected capability lacks the exact complete C4 grammar.",
+        )
+    return decision
+
+
+def requirement_route_is_unsupported(
+    requirement: ProviderNeutralVideoRequirement,
+    context: Any,
+    expected_mode: VideoGenerationMode,
+    decision: Any,
+    output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement,
+) -> bool:
+    """Return whether neutral intent cannot be represented by the routing result."""
+
+    return (
+        requirement.continuity_mode.value != context.continuity_mode.value
+        or expected_mode is not decision.required_mode
+        or not requirement_output_matches(requirement, output_requirement)
+        or requirement.generation_intent.camera_intent.expression_strength.value
+        == "native_control_required"
+    )
