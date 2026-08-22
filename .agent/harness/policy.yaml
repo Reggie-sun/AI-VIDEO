@@ -7,7 +7,9 @@ capture_pytest_junit: true
 note: >
   This policy maps an exact staged or commit-range task delta to mandatory existing
   tests and checks. The Harness does not dispatch agents, modify product state, run
-  live Provider smoke, or replace AGENTS.md, code, tests, and runtime evidence.
+  live Provider smoke, or replace AGENTS.md, code, tests, and runtime evidence. A
+  check with covered_by_check_ids remains selected and is skipped only after every
+  listed covering check has actually passed in the same exact-snapshot run.
 
 ignored_patterns:
   - .pytest_cache/**
@@ -108,18 +110,22 @@ checks:
   production_reader_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_models.py, tests/test_production_validation.py, tests/test_production_registry.py, tests/test_production_project.py, tests/test_config.py, tests/test_cli.py, -q]
     cwd: .
+    covered_by_check_ids: [production_contract_tests, cli_config_tests]
     description: Verify strict read-only Production project contracts and Legacy isolation.
   production_state_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_bootstrap.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_production_state_commit_structure.py, tests/test_production_models.py, tests/test_production_project.py, -q]
     cwd: .
+    covered_by_check_ids: [production_contract_tests]
     description: Verify the single Production writer, activation, and explicit recovery.
   production_composition_audio_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_composition.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_captions.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
+    covered_by_check_ids: [production_contract_tests]
     description: Verify timeline, renderer, audio, voice, and caption contracts.
   production_dependency_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, tests/test_production_models.py, tests/test_production_project.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
+    covered_by_check_ids: [production_contract_tests]
     description: Verify immutable graph inputs and precise selective rebuild.
   production_review_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, tests/test_production_review.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
@@ -132,10 +138,12 @@ checks:
   production_video_provider_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
+    covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
   production_shot_router_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_shot_router.py, tests/test_production_video.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, -q]
     cwd: .
+    covered_by_check_ids: [production_contract_tests]
     description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
   video_planner_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_planning_video_planner.py, tests/test_errors.py, -q]

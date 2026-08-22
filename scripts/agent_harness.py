@@ -124,6 +124,7 @@ def load_policy(path: Path = POLICY_PATH) -> dict[str, Any]:
     checks = policy.get("checks")
     if not isinstance(checks, dict) or not checks:
         raise ValueError("checks must be a non-empty mapping")
+    coverage_dependencies: dict[str, list[str]] = {}
     for check_id, config in checks.items():
         if not isinstance(check_id, str) or not isinstance(config, dict):
             raise ValueError("each check must be a named mapping")
@@ -143,11 +144,20 @@ def load_policy(path: Path = POLICY_PATH) -> dict[str, Any]:
         for flag in ("scope_diff", "task_architecture"):
             if not isinstance(config.get(flag, False), bool):
                 raise ValueError(f"check {check_id!r} {flag} must be boolean")
+        covered_by_check_ids = _string_list(config, "covered_by_check_ids")
+        if check_id in covered_by_check_ids:
+            raise ValueError(f"check {check_id!r} cannot cover itself")
+        coverage_dependencies[check_id] = covered_by_check_ids
 
     known_check_ids = set(checks)
     referenced = [
         *_string_list(policy, "always_check_ids"),
         *_string_list(policy, "fallback_check_ids"),
+        *(
+            dependency
+            for dependencies in coverage_dependencies.values()
+            for dependency in dependencies
+        ),
     ]
     categories = policy.get("categories")
     if not isinstance(categories, dict):
@@ -164,6 +174,23 @@ def load_policy(path: Path = POLICY_PATH) -> dict[str, Any]:
     unknown = sorted(set(referenced) - known_check_ids)
     if unknown:
         raise ValueError(f"policy references unknown checks: {unknown}")
+
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit_coverage_dependencies(check_id: str) -> None:
+        if check_id in visited:
+            return
+        if check_id in visiting:
+            raise ValueError(f"check coverage contains a cycle at {check_id!r}")
+        visiting.add(check_id)
+        for dependency in coverage_dependencies[check_id]:
+            visit_coverage_dependencies(dependency)
+        visiting.remove(check_id)
+        visited.add(check_id)
+
+    for check_id in checks:
+        visit_coverage_dependencies(check_id)
 
     for key in (
         "ignored_patterns",
@@ -574,9 +601,25 @@ def verify_inspection(
 
     env = build_check_environment()
     passed = True
+    passed_check_ids: set[str] = set()
     check_ids = list(inspection["check_ids"])
     for check_index, check_id in enumerate(check_ids, start=1):
         config = policy["checks"][check_id]
+        covered_by_check_ids = list(config.get("covered_by_check_ids", []))
+        if covered_by_check_ids and all(
+            covering_check_id in passed_check_ids
+            for covering_check_id in covered_by_check_ids
+        ):
+            receipt["checks"].append(
+                {
+                    "check_id": check_id,
+                    "status": "skipped",
+                    "reason": "covered by passed checks",
+                    "covered_by_check_ids": covered_by_check_ids,
+                }
+            )
+            receipt_io.write_receipt(receipt_path, receipt)
+            continue
         junit_path = None
         if policy.get("capture_pytest_junit", False) and "pytest" in config["argv"]:
             junit_path = run_dir / f"{check_index:02d}-{check_id}.junit.xml"
@@ -648,6 +691,7 @@ def verify_inspection(
                     }
                 )
             break
+        passed_check_ids.add(check_id)
         receipt_io.write_receipt(receipt_path, receipt)
 
     try:

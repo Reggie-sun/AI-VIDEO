@@ -88,6 +88,31 @@ def test_repository_policy_v2_loads_and_references_known_checks() -> None:
     assert not [path for path in referenced_test_files if not (ROOT / path).is_file()]
 
 
+def test_policy_rejects_unknown_coverage_dependency(tmp_path: Path) -> None:
+    policy = _minimal_policy()
+    policy["checks"]["unit"]["covered_by_check_ids"] = ["missing"]
+    policy_path = tmp_path / "policy.yaml"
+    policy_path.write_text(yaml.safe_dump(policy), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="unknown checks.*missing"):
+        agent_harness.load_policy(policy_path)
+
+
+def test_policy_rejects_cyclic_check_coverage(tmp_path: Path) -> None:
+    policy = _minimal_policy()
+    policy["checks"]["unit"]["covered_by_check_ids"] = ["other"]
+    policy["checks"]["other"] = {
+        "argv": [sys.executable, "-c", "print('other')"],
+        "cwd": ".",
+        "covered_by_check_ids": ["unit"],
+    }
+    policy_path = tmp_path / "policy.yaml"
+    policy_path.write_text(yaml.safe_dump(policy), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="coverage contains a cycle"):
+        agent_harness.load_policy(policy_path)
+
+
 def test_tracked_harness_runs_contract_is_not_ignored() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
@@ -467,6 +492,31 @@ def test_production_policy_commands_cover_repository_mandatory_contract_tests() 
     ):
         assert path in image_argv
     assert "tests/test_production_minimax_speech.py" in composition_audio_argv
+
+
+def test_production_policy_declares_only_complete_cross_check_coverage() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    assert policy["checks"]["production_reader_tests"]["covered_by_check_ids"] == [
+        "production_contract_tests",
+        "cli_config_tests",
+    ]
+    for check_id in (
+        "production_state_tests",
+        "production_composition_audio_tests",
+        "production_dependency_tests",
+        "production_video_provider_tests",
+        "production_shot_router_tests",
+    ):
+        assert policy["checks"][check_id]["covered_by_check_ids"] == [
+            "production_contract_tests"
+        ]
+    for check_id in (
+        "production_review_tests",
+        "production_image_tests",
+        "provider_neutral_video_requirement_tests",
+    ):
+        assert "covered_by_check_ids" not in policy["checks"][check_id]
 
 
 def test_minimax_speech_adapter_routes_to_composition_audio_suite() -> None:
@@ -1012,6 +1062,129 @@ def test_verification_writes_integrity_bound_receipt_and_logs(tmp_path: Path) ->
     stdout_path = receipt_path.parent / receipt["checks"][0]["stdout"]["path"]
     stdout_path.write_text("tampered\n", encoding="utf-8")
     assert agent_harness.verify_receipt_artifacts(receipt, receipt_path.parent) is False
+
+
+def test_verification_records_covered_check_without_executing_it(
+    tmp_path: Path,
+) -> None:
+    policy = _minimal_policy()
+    policy["checks"]["covered"] = {
+        "argv": [sys.executable, "-c", "raise SystemExit('must not run')"],
+        "cwd": ".",
+        "description": "Covered by the unit check.",
+        "covered_by_check_ids": ["unit"],
+    }
+    inspection = {
+        "changed_paths": ["src/example.py"],
+        "ignored_paths": [],
+        "sensitive_paths": [],
+        "categories": ["example"],
+        "fallback_paths": [],
+        "check_ids": ["unit", "covered"],
+    }
+    scope = {
+        "mode": "commit_range",
+        "changed_paths": ["src/example.py"],
+        "head_oid": "b" * 40,
+        "closure_eligible": True,
+    }
+    executed: list[tuple[str, ...]] = []
+
+    def recording_runner(
+        argv: tuple[str, ...],
+        _cwd: Path,
+        _timeout_seconds: float,
+        _env: dict[str, str],
+    ) -> agent_harness.CommandResult:
+        executed.append(argv)
+        return agent_harness.CommandResult(
+            status="passed", exit_code=0, stdout="ok\n", stderr=""
+        )
+
+    receipt_path, passed = agent_harness.verify_inspection(
+        inspection,
+        policy,
+        scope=scope,
+        source_snapshot={"scope_sha256": "c" * 64},
+        project_root=tmp_path,
+        execution_root=tmp_path,
+        runs_dir=tmp_path / "runs",
+        run_id="covered-run",
+        runner=recording_runner,
+    )
+
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert passed is True
+    assert len(executed) == 1
+    assert receipt["selected_check_ids"] == ["unit", "covered"]
+    assert receipt["checks"][0]["status"] == "passed"
+    assert receipt["checks"][1] == {
+        "check_id": "covered",
+        "status": "skipped",
+        "reason": "covered by passed checks",
+        "covered_by_check_ids": ["unit"],
+    }
+    assert agent_harness.verify_receipt_integrity(receipt) is True
+
+
+def test_verification_executes_check_when_not_all_covering_checks_passed(
+    tmp_path: Path,
+) -> None:
+    policy = _minimal_policy()
+    policy["checks"]["covered"] = {
+        "argv": [sys.executable, "-c", "print('covered')"],
+        "cwd": ".",
+        "description": "Requires two covering checks.",
+        "covered_by_check_ids": ["unit", "not-selected"],
+    }
+    policy["checks"]["not-selected"] = {
+        "argv": [sys.executable, "-c", "print('not selected')"],
+        "cwd": ".",
+        "description": "Known covering check outside this routed scope.",
+    }
+    inspection = {
+        "changed_paths": ["src/example.py"],
+        "ignored_paths": [],
+        "sensitive_paths": [],
+        "categories": ["example"],
+        "fallback_paths": [],
+        "check_ids": ["unit", "covered"],
+    }
+    scope = {
+        "mode": "commit_range",
+        "changed_paths": ["src/example.py"],
+        "head_oid": "b" * 40,
+        "closure_eligible": True,
+    }
+    executed: list[tuple[str, ...]] = []
+
+    def recording_runner(
+        argv: tuple[str, ...],
+        _cwd: Path,
+        _timeout_seconds: float,
+        _env: dict[str, str],
+    ) -> agent_harness.CommandResult:
+        executed.append(argv)
+        return agent_harness.CommandResult(
+            status="passed", exit_code=0, stdout="ok\n", stderr=""
+        )
+
+    receipt_path, passed = agent_harness.verify_inspection(
+        inspection,
+        policy,
+        scope=scope,
+        source_snapshot={"scope_sha256": "c" * 64},
+        project_root=tmp_path,
+        execution_root=tmp_path,
+        runs_dir=tmp_path / "runs",
+        run_id="not-covered-run",
+        runner=recording_runner,
+    )
+
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert passed is True
+    assert len(executed) == 2
+    assert [check["status"] for check in receipt["checks"]] == ["passed", "passed"]
 
 
 def test_runner_exception_finalizes_failed_receipt(tmp_path: Path) -> None:
