@@ -71,13 +71,36 @@ advisory experience，不能写 Manifest、Registry、Planner、Router、Provide
 4. 未来 Agent 通过 exact lookup/RAG 读取 advisory context，再回到 source code、receipts
    和 current runtime 验证，不把 record/RAG 当成更高 authority。
 
-该流程可以作为 session close checklist，但目前不存在强制自动 hook；如果用户忘记调用
-skill，不应假设 record 已存在。
+项目现已注册Development Governance范围内的project-local Codex hook作为漏记保护：
+`SessionStart`保存Git-internal baseline；`PreCompact`在存在尚未处理的repository变化时注入
+context；`Stop`对每个changed fingerprint最多阻止一次，并请求Agent用
+`record-ai-video-session`评估stable boundary。hook本身不写`docs/record_for_agent/`，也不决定
+是否应记录；若skill判断尚未稳定、变化trivial或与当前session无关，就正常结束且不创建
+record。因此它提高触发可靠性，但仍不是“完美自动记录”。
+
+## Session-Close Hook Implementation Evidence
+
+2026-08-22已实现project-local hook：`.codex/hooks.json`注册`SessionStart`、`PreCompact`
+与`Stop`，实际逻辑由
+`.agents/skills/record-ai-video-session/scripts/session_record_hook.py`拥有。fingerprint绑定
+`HEAD`、porcelain status、staged index identity及modified/untracked worktree bytes摘要；state只
+保存摘要到`.git/ai-video-session-record-hook/`。`PreCompact`与`Stop`共享request marker，
+同一fingerprint最多注入一次evaluation request；`stop_hook_active`递归路径会continue并标记
+该fingerprint已处理。
+
+本轮strict RED/GREEN回归覆盖clean-to-dirty、pre-existing dirty same-path edit、staged与
+untracked same-path edit、request后继续编辑、跨`PreCompact`/`Stop`去重、缺baseline、
+outside-root与Git-internal state。focused control-plane suite为`126 passed`，Documentation
+Contract Gate通过，native reviewer scoped re-review verdict为`accept with concerns`。exact
+commit-range Harness receipt路径为
+`.agent/harness/runs/ai-video-session-record-hook-20260822/receipt.json`。
 
 ## Guardrails
 
 - Product Runtime 不得 import、执行或依赖 `record-ai-video-session`、`.agent/`、`.agents/`
-  或 Agent Memory；这些属于 Development Governance。
+  、`.codex/`或 Agent Memory；这些属于 Development Governance。
+- project-local hook state只写`.git/ai-video-session-record-hook/`，不得保存transcript、prompt、
+  raw Provider response、credential或Production lifecycle state。
 - 自动 record 必须由 canonical owner 产生，不能由 RAG 或 session prose 伪造。
 - RAG 只读、可解释、带 provenance/freshness；历史记录与 current code/tests 冲突时以
   current executable truth 为准。
@@ -94,5 +117,8 @@ skill，不应假设 record 已存在。
   Production writer ownership；这需要单独 implementation scope，不由本记录批准。
 - 实现 hybrid continuity evaluator 后，再把其 raw evidence 接入现有 P6 seam；不要让
   evaluator 自报 verdict。
-- 如需自动 session-close hook、自动 Q0 capture、远程 vision backend、credential 或
-  budget/egress，需要独立 contract/spec 与用户授权。
+- 自动 Q0 capture、远程 vision backend、credential 或budget/egress仍需要独立
+  contract/spec与用户授权；当前session-close hook不授权这些操作。
+- hook对modified/untracked regular file做content hashing；若出现异常大的unignored media，
+  可能超过5秒hook timeout并按设计fail open。生成媒体应继续留在既有ignored/output paths；
+  后续如实际观测到timeout，再为hashing增加独立bounded policy与回归证据。

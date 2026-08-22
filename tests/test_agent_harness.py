@@ -901,6 +901,23 @@ def test_project_skill_installation_routes_to_control_plane_harness(path: str) -
     assert "harness_tests" in report["check_ids"]
 
 
+def test_session_record_hook_routes_to_control_plane_harness() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        ".codex/hooks.json",
+        ".agents/skills/record-ai-video-session/scripts/session_record_hook.py",
+        "tests/test_record_ai_video_session_hook.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == []
+        assert "control_plane" in report["categories"]
+        assert "harness_tests" in report["check_ids"]
+
+    harness_argv = policy["checks"]["harness_tests"]["argv"]
+    assert "tests/test_record_ai_video_session_hook.py" in harness_argv
+
+
 @pytest.mark.parametrize(
     ("path", "expected_categories"),
     [

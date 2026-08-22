@@ -1,0 +1,43 @@
+{
+  "description": "AI-VIDEO project lifecycle hooks.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.agents/skills/record-ai-video-session/scripts/session_record_hook.py\"",
+            "timeout": 5,
+            "statusMessage": "Baselining AI-VIDEO session record state"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.agents/skills/record-ai-video-session/scripts/session_record_hook.py\"",
+            "timeout": 5,
+            "statusMessage": "Checking AI-VIDEO pre-compact record boundary"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/.agents/skills/record-ai-video-session/scripts/session_record_hook.py\"",
+            "timeout": 5,
+            "statusMessage": "Checking AI-VIDEO session record boundary"
+          }
+        ]
+      }
+    ]
+  }
+}

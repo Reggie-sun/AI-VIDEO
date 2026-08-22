@@ -11,6 +11,22 @@ Record history only after meaningful work reaches a stable checkpoint, completio
 
 This skill writes a project record; it does not authorize new implementation, local generation, live Provider calls, paid actions, releases, or changes to `sub-agents`.
 
+## Handle Project Hook Requests
+
+The project-local Codex hook may inject a request containing a
+`capture_request_id`. Treat it as a one-time request to evaluate this skill's
+stable-boundary rule, not as proof that a record is required.
+
+- If substantial work reached a stable checkpoint, completion, or genuine
+  blocker, run this skill normally and create or update the single relevant
+  record.
+- If the boundary is not stable or the repository change is trivial or
+  unrelated, do not create a record; finish the current response normally.
+- Check the current topic, commits, and existing records before writing so a
+  repeated hook request cannot create duplicate records.
+- The hook does not authorize Provider calls, tests, network access, Git writes,
+  or any scope beyond the current user request and repository rules.
+
 ## Gather Verified Truth
 
 1. Resolve the AI-VIDEO repository root and read `../../../AGENTS.md`.

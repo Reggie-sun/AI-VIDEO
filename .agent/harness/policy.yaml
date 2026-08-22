@@ -79,7 +79,7 @@ checks:
     cwd: .
     description: Verify Product Runtime isolation from Development Governance composition tooling.
   harness_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_record_ai_video_session_hook.py, -q]
     cwd: .
     description: Verify Harness scope, routing, isolation, receipts, and Make targets.
   architecture_tests:
@@ -554,6 +554,7 @@ categories:
     patterns:
       - AGENTS.md
       - .gitattributes
+      - .codex/hooks.json
       - .agents/skills/**
       - skills-lock.json
       - docs/agent-primary-contract-matrix.md
@@ -561,5 +562,6 @@ categories:
       - .agent/context/session-handoff.md
       - .agent/bug-memory/**
       - .agent/harness/policy.yaml
+      - tests/test_record_ai_video_session_hook.py
     check_ids:
       - harness_tests
