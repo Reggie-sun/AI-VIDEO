@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -9,11 +10,22 @@ import pytest
 
 from ai_video.errors import AiVideoError
 from ai_video.manifest import RunManifest, ShotRecord
-from ai_video import provider_console
+from ai_video import provider_console, provider_console_continuity
+from ai_video.production._video_continuity import (
+    ContinuityArtifactIdentity,
+    ContinuityConstraintSet,
+)
+from ai_video.production.models import (
+    StateCommitStatus,
+    ToolIdentity,
+    VideoAttemptPhase,
+)
 
 
 ZERO = "0" * 64
 ONE = "1" * 64
+AUTOMATIC = ToolIdentity(name="continuity-cuda", version="1")
+HUMAN = ToolIdentity(name="continuity-human", version="1")
 
 
 def _write(path: Path, data: bytes = b"{}") -> Path:
@@ -622,6 +634,157 @@ def test_invalid_video_request_receipt_fails_closed_instead_of_hiding_attempt(
     }
     assert result["attempts"] == []
     assert "private" not in json.dumps(result)
+
+
+def test_continuity_review_projection_is_exact_sanitized_and_read_only(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, "continuity/project")
+    artifact_bytes = b"exact-fetched-video"
+    artifact_sha256 = hashlib.sha256(artifact_bytes).hexdigest()
+    artifact_path = Path(
+        f"state/video-generation/fetch/files/{artifact_sha256}.mp4"
+    )
+    _write(project_path.parent / artifact_path, artifact_bytes)
+    constraints = ContinuityConstraintSet.create(
+        scene_identity=ContinuityArtifactIdentity(
+            artifact_id="scene-cafe", revision=1, content_hash="2" * 64
+        ),
+        character_identities=(
+            ContinuityArtifactIdentity(
+                artifact_id="character-alice", revision=1, content_hash="3" * 64
+            ),
+        ),
+        camera_axis="screen left to right",
+        framing="medium shot",
+        lighting="warm practical light",
+        color="amber and teal",
+        motion_direction="Alice exits frame right",
+        exit_state="Alice is outside the source frame",
+        entrance_state="Alice enters target frame from left",
+    )
+    binding = _ns(
+        terminal_frame=_ns(source_shot_id="shot-source"),
+        target_shot_id="shot-target",
+        target_shot_content_hash="4" * 64,
+        constraints=constraints,
+    )
+    request = _ns(
+        continuity_binding=binding,
+        activation_scope=_ns(
+            request=_ns(
+                target_shot_id="shot-target",
+                target_shot_content_hash="4" * 64,
+            )
+        ),
+        resolved_generation_hash="5" * 64,
+    )
+    pointer = _ns(
+        artifact_path=artifact_path,
+        artifact_sha256=artifact_sha256,
+        artifact_size_bytes=len(artifact_bytes),
+    )
+    state = _ns(
+        phase=VideoAttemptPhase.VALIDATE,
+        request=object(),
+        local_fetch_receipt=pointer,
+        fetch_receipt=None,
+        continuity_evaluation=None,
+    )
+    attempt = _ns(
+        attempt_id="attempt-1",
+        operation="video_generation",
+        status=StateCommitStatus.RUNNING,
+        video_generation_state=state,
+    )
+    policy_pointer = _ns(
+        policy_id="continuity-policy",
+        policy_version="1",
+        content_hash="6" * 64,
+    )
+    policy = _ns(
+        policy_id=policy_pointer.policy_id,
+        policy_version=policy_pointer.policy_version,
+        content_hash=policy_pointer.content_hash,
+        semantic_authorities=(AUTOMATIC, HUMAN),
+    )
+    shots = (
+        _ns(
+            shot_id="shot-source", scene_id="scene-cafe", intent="Alice exits",
+            visual_strategy=_ns(value="generated_video"), duration_policy=None,
+            revision=1, content_hash="7" * 64,
+        ),
+        _ns(
+            shot_id="shot-target", scene_id="scene-cafe", intent="Alice enters",
+            visual_strategy=_ns(value="generated_video"), duration_policy=None,
+            revision=2, content_hash="4" * 64,
+        ),
+    )
+    loaded = _ns(
+        root=project_path.parent,
+        manifest=_ns(attempts=(attempt,), active_qa_policy=policy_pointer),
+        shots=shots,
+    )
+    monkeypatch.setattr(provider_console, "load_production_project", lambda _path: loaded)
+    monkeypatch.setattr(
+        provider_console_continuity,
+        "load_video_request_receipt",
+        lambda _root, _pointer: request,
+    )
+    monkeypatch.setattr(
+        provider_console_continuity,
+        "load_local_video_fetch_receipt",
+        lambda _root, _pointer: _ns(
+            artifact_sha256=artifact_sha256, size_bytes=len(artifact_bytes)
+        ),
+    )
+    monkeypatch.setattr(
+        provider_console_continuity, "load_qa_policy", lambda _root, _pointer: policy
+    )
+    before = {
+        path: (path.stat().st_size, path.stat().st_mtime_ns)
+        for path in runs.rglob("*") if path.is_file()
+    }
+
+    result = provider_console.project_continuity_review(
+        runs,
+        "continuity/project/project.yaml",
+        "attempt-1",
+        automatic_evaluator=AUTOMATIC,
+        required_reviewer=HUMAN,
+    )
+
+    after = {
+        path: (path.stat().st_size, path.stat().st_mtime_ns)
+        for path in runs.rglob("*") if path.is_file()
+    }
+    assert before == after
+    assert result["review_request"]["attempt_id"] == "attempt-1"
+    assert result["review_request"]["required_reviewer"] == HUMAN.model_dump(mode="json")
+    assert result["review_request"]["continuity_constraints_hash"] == constraints.content_hash
+    assert result["constraints"]["motion_direction"] == "Alice exits frame right"
+    assert result["media"]["sha256"] == artifact_sha256
+    assert result["media"]["token"] in result["_media"]
+    public = json.dumps(
+        {key: value for key, value in result.items() if key != "_media"},
+        ensure_ascii=False,
+    )
+    assert str(tmp_path) not in public
+    assert "source_path" not in public
+
+
+def test_continuity_review_projection_rejects_symlinked_media(
+    tmp_path: Path
+):
+    root = tmp_path / "workspace"
+    root.mkdir()
+    outside = _write(tmp_path / "outside.mp4", b"outside")
+    linked = root / "candidate.mp4"
+    linked.symlink_to(outside)
+
+    with pytest.raises(ValueError, match="contained"):
+        provider_console_continuity.measure_contained_file(linked, root=root)
 
 
 @pytest.mark.parametrize("workspace", ["../project.yaml", "/tmp/project.yaml", "demo\\project.yaml", "demo/state/manifest.json"])

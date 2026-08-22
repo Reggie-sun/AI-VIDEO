@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import { constants } from "node:fs";
-import { lstat, open, realpath } from "node:fs/promises";
+import { open, realpath } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 
@@ -46,12 +47,67 @@ function publicProjection(value) {
   return safe;
 }
 
+function canonicalJson(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function canonicalSha256(value) {
+  return createHash("sha256").update(canonicalJson(value), "utf8").digest("hex");
+}
+
+function validateContinuityProjection(result) {
+  const request = result?.review_request;
+  const media = result?.media;
+  if (!request || !media || typeof request !== "object" || typeof media !== "object") {
+    throw new RunsApiError(503, "CONTINUITY_REVIEW_INVALID");
+  }
+  const sha = /^[0-9a-f]{64}$/;
+  const identity = request.required_reviewer;
+  const automatic = request.automatic_evaluator;
+  const { content_hash: contentHash, ...semantic } = request;
+  const expected = canonicalSha256({ schema: "human-continuity-review-request/1", ...semantic });
+  if (
+    !sha.test(contentHash || "")
+    || contentHash !== expected
+    || !sha.test(request.artifact_sha256 || "")
+    || request.media_identity !== `sha256:${request.artifact_sha256}`
+    || media.sha256 !== request.artifact_sha256
+    || typeof media.token !== "string"
+    || !/^[A-Za-z0-9_-]{6,128}$/.test(media.token)
+    || !identity?.name?.trim() || !identity?.version?.trim()
+    || !automatic?.name?.trim() || !automatic?.version?.trim()
+  ) {
+    throw new RunsApiError(503, "CONTINUITY_REVIEW_INVALID");
+  }
+  return result;
+}
+
+function continuityIdentityArgs() {
+  const values = {
+    "--automatic-evaluator-name": process.env.AI_VIDEO_CONTINUITY_AUTOMATIC_EVALUATOR_NAME,
+    "--automatic-evaluator-version": process.env.AI_VIDEO_CONTINUITY_AUTOMATIC_EVALUATOR_VERSION,
+    "--reviewer-name": process.env.AI_VIDEO_CONTINUITY_HUMAN_REVIEWER_NAME,
+    "--reviewer-version": process.env.AI_VIDEO_CONTINUITY_HUMAN_REVIEWER_VERSION,
+  };
+  if (Object.values(values).some((value) => !value?.trim())) {
+    throw new RunsApiError(503, "CONTINUITY_REVIEW_CONFIG_UNAVAILABLE");
+  }
+  return Object.entries(values).flatMap(([flag, value]) => [flag, value]);
+}
+
 function createPythonProjector(repoRoot) {
   const runsRoot = path.join(repoRoot, "runs");
   const python = process.env.AI_VIDEO_PYTHON || "python";
-  return async (command, workspace) => {
+  return async (command, workspace, attemptId) => {
     const args = ["-m", "ai_video.provider_console", command, "--runs-root", runsRoot];
     if (workspace) args.push("--workspace", workspace);
+    if (command === "continuity-review") {
+      args.push("--attempt-id", attemptId, ...continuityIdentityArgs());
+    }
     const env = {
       PATH: process.env.PATH,
       LANG: process.env.LANG || "C.UTF-8",
@@ -64,7 +120,7 @@ function createPythonProjector(repoRoot) {
     } catch (cause) {
       let code = "RUNS_SOURCE_UNAVAILABLE";
       try { code = JSON.parse(cause?.stdout || "{}").error?.code || code; } catch { /* sanitized below */ }
-      const status = code === "WORKSPACE_NOT_FOUND" ? 404 : code === "INVALID_WORKSPACE" ? 400 : 503;
+      const status = code === "WORKSPACE_NOT_FOUND" ? 404 : code === "INVALID_WORKSPACE" ? 400 : code === "CONTINUITY_REVIEW_UNAVAILABLE" ? 409 : 503;
       throw new RunsApiError(status, code);
     }
   };
@@ -76,18 +132,37 @@ async function validatedMedia(entry, runsRoot) {
   const source = path.resolve(entry.source_path);
   const root = await realpath(runsRoot);
   if (source !== root && !source.startsWith(`${root}${path.sep}`)) return null;
-  const resolved = await realpath(source);
-  if (resolved !== source || (resolved !== root && !resolved.startsWith(`${root}${path.sep}`))) return null;
-  const stat = await lstat(source, { bigint: true });
-  if (!stat.isFile() || stat.isSymbolicLink()) return null;
-  if (Number.isSafeInteger(entry.bytes) && BigInt(entry.bytes) !== stat.size) return null;
-  return {
-    source,
-    root,
-    mimeType: entry.mime_type,
-    size: Number(stat.size),
-    identity: [stat.dev, stat.ino, stat.mtimeNs, stat.ctimeNs].map(String),
-  };
+  const file = await open(source, constants.O_RDONLY | constants.O_NOFOLLOW);
+  try {
+    const [stat, openedPath] = await Promise.all([
+      file.stat({ bigint: true }),
+      realpath(`/proc/self/fd/${file.fd}`),
+    ]);
+    if (!stat.isFile() || openedPath !== source || (openedPath !== root && !openedPath.startsWith(`${root}${path.sep}`))) return null;
+    if (Number.isSafeInteger(entry.bytes) && BigInt(entry.bytes) !== stat.size) return null;
+    if (entry.sha256 !== undefined) {
+      if (!/^[0-9a-f]{64}$/.test(entry.sha256)) return null;
+      const digest = createHash("sha256");
+      let position = 0;
+      while (position < Number(stat.size)) {
+        const chunk = Buffer.alloc(Math.min(1024 * 1024, Number(stat.size) - position));
+        const { bytesRead } = await file.read(chunk, 0, chunk.length, position);
+        if (!bytesRead) return null;
+        digest.update(chunk.subarray(0, bytesRead));
+        position += bytesRead;
+      }
+      if (digest.digest("hex") !== entry.sha256) return null;
+    }
+    return {
+      source,
+      root,
+      mimeType: entry.mime_type,
+      size: Number(stat.size),
+      identity: [stat.dev, stat.ino, stat.mtimeNs, stat.ctimeNs].map(String),
+    };
+  } finally {
+    await file.close();
+  }
 }
 
 function parseRange(header, size) {
@@ -195,6 +270,53 @@ export function createRunsApiHandler({ repoRoot, runProjector = createPythonProj
           if (!/^[A-Za-z0-9_-]{6,128}$/.test(token)) continue;
           const media = await validatedMedia(entry, runsRoot);
           if (media) mediaCache.set(token, media);
+        }
+        send(res, 200, publicProjection(result));
+        return;
+      }
+
+      if (parsed.pathname === "/api/runs/continuity-review") {
+        if (req.method !== "GET") return methodNotAllowed(res, "GET");
+        const workspace = parsed.searchParams.get("workspace");
+        const attemptId = parsed.searchParams.get("attempt");
+        if (!isSafeWorkspace(workspace) || !/^[A-Za-z0-9._:/-]{1,256}$/.test(attemptId || "")) {
+          send(res, 400, { error: { code: "INVALID_REVIEW_TARGET", message: "review target 参数无效。" } });
+          return;
+        }
+        let result;
+        try {
+          result = validateContinuityProjection(
+            await runProjector("continuity-review", workspace, attemptId)
+          );
+          if (
+            result.workspace !== workspace
+            || result.attempt_id !== attemptId
+            || result.review_request.attempt_id !== attemptId
+          ) throw new RunsApiError(503, "CONTINUITY_REVIEW_INVALID");
+        } catch (cause) {
+          const status = cause instanceof RunsApiError ? cause.status : 503;
+          const code = cause instanceof RunsApiError ? cause.code : "CONTINUITY_REVIEW_UNAVAILABLE";
+          const message = status === 404 ? "workspace 不存在。" : status === 409 ? "该 attempt 当前不可人工 review。" : "continuity review 投影不可用。";
+          send(res, status, { error: { code, message } });
+          return;
+        }
+        const entries = result?._media && typeof result._media === "object" ? Object.entries(result._media) : [];
+        let exactMediaRegistered = false;
+        for (const [token, entry] of entries) {
+          if (!/^[A-Za-z0-9_-]{6,128}$/.test(token)) continue;
+          if (
+            token === result.media.token
+            && entry?.sha256 !== result.media.sha256
+          ) continue;
+          const media = await validatedMedia(entry, runsRoot);
+          if (media) {
+            mediaCache.set(token, media);
+            if (token === result.media.token) exactMediaRegistered = true;
+          }
+        }
+        if (!exactMediaRegistered) {
+          send(res, 503, { error: { code: "CONTINUITY_REVIEW_INVALID", message: "continuity review 投影不可用。" } });
+          return;
         }
         send(res, 200, publicProjection(result));
         return;

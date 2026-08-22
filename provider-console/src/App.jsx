@@ -19,6 +19,7 @@ import {
   WarningCircle,
   X,
 } from "@phosphor-icons/react";
+import { ContinuityReviewPanel, projectionMatchesTarget } from "./continuity-review.js";
 
 const NAV_ITEMS = [
   ["projects", "项目", FolderSimple],
@@ -332,7 +333,7 @@ function WorkspaceOverview({ detail }) {
   );
 }
 
-function DetailPane({ detail, attempt, onEvidence }) {
+function DetailPane({ detail, attempt, onEvidence, continuityContent }) {
   const provider = providerOf(attempt);
   const output = outputOf(attempt);
   const shot = shotFor(detail, attempt);
@@ -356,6 +357,7 @@ function DetailPane({ detail, attempt, onEvidence }) {
             <li className="sequence-step sequence-step--media"><div className="sequence-marker sequence-marker--ready"><StatusIcon tone="ready" size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>3. 生成输入与输出</h4><span className="ready-tag">本机</span></div><MediaCard attempt={attempt} /></div></li>
             <li className="sequence-step"><div className={`sequence-marker sequence-marker--${tone}`}><StatusIcon tone={tone} size={24} /></div><div className="sequence-content"><div className="sequence-title-row"><h4>4. Attempt 状态</h4><span className={`ready-tag ready-tag--${tone}`}>{attempt?.status || attempt?.phase || "已记录"}</span></div><p className="step-description">只展示已存在状态；控制台不会推进 lifecycle。</p><div className="intent-box is-ready"><Info size={20} /><div><strong>只读观察边界</strong><p>不写 Manifest、不创建 intent、不调用 Provider、不访问云端。</p></div></div></div></li>
           </ol>
+          {continuityContent}
         </div>
         <aside className="detail-aside">
           <section className="detail-section"><h3>Provider 身份</h3><dl className="identity-list"><Fact label="生成类型" value={generationTypeOf(attempt)} /><Fact label="原始 mode" value={attempt?.mode || provider.mode} /><Fact label="名称" value={provider.name || attempt?.provider_name} /><Fact label="Kind" value={provider.kind || attempt?.provider_kind} /><Fact label="Model" value={provider.model || attempt?.model} /><Fact label="Profile" value={provider.profile || attempt?.profile} /><Fact label="Capability" value={provider.capability || attempt?.capability} /></dl></section>
@@ -417,6 +419,10 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [evidenceOpen, setEvidenceOpen] = useState(false);
+  const [continuityProjection, setContinuityProjection] = useState(null);
+  const [continuityLoading, setContinuityLoading] = useState(false);
+  const [continuityError, setContinuityError] = useState("");
+  const continuityRequestEpoch = useRef(0);
 
   const loadDetail = useCallback(async (key) => {
     const response = await fetch(`/api/runs/detail?workspace=${encodeURIComponent(key)}`, { cache: "no-store" });
@@ -466,13 +472,49 @@ export function App() {
 
   const attempts = detail?.attempts || detail?.video_generation_attempts || [];
   const attempt = useMemo(() => attempts.find((item, index) => attemptId(item, index) === selectedId) || attempts[0], [attempts, selectedId]);
+  const continuityEligible = Boolean(
+    attempt?.continuity_role && String(attempt?.phase || "").toLowerCase() === "validate"
+  );
+
+  const loadContinuityReview = useCallback(async () => {
+    const epoch = ++continuityRequestEpoch.current;
+    if (!continuityEligible || !workspace || !attempt) {
+      setContinuityProjection(null);
+      setContinuityError("");
+      setContinuityLoading(false);
+      return;
+    }
+    setContinuityLoading(true);
+    setContinuityError("");
+    setContinuityProjection(null);
+    try {
+      const id = attemptId(attempt, 0);
+      const response = await fetch(
+        `/api/runs/continuity-review?workspace=${encodeURIComponent(workspace)}&attempt=${encodeURIComponent(id)}`,
+        { cache: "no-store" },
+      );
+      const body = await response.json();
+      if (!response.ok || body?.error) throw new Error(body?.error?.message || "continuity review 投影不可用。");
+      if (!projectionMatchesTarget(body, workspace, id)) throw new Error("continuity review 投影已过期。");
+      if (epoch !== continuityRequestEpoch.current) return;
+      setContinuityProjection(body);
+    } catch (cause) {
+      if (epoch !== continuityRequestEpoch.current) return;
+      setContinuityProjection(null);
+      setContinuityError(cause instanceof Error ? cause.message : "continuity review 投影不可用。");
+    } finally {
+      if (epoch === continuityRequestEpoch.current) setContinuityLoading(false);
+    }
+  }, [attempt, continuityEligible, workspace]);
+
+  useEffect(() => { loadContinuityReview(); }, [loadContinuityReview]);
 
   return (
     <div className="app-shell">
       <Sidebar />
       <AttemptRail catalog={catalog} workspace={workspace} attempts={attempts} selectedId={selectedId} loading={loading} error={error} onWorkspace={selectWorkspace} onRefresh={refresh} onSelect={setSelectedId} />
       <main className="provider-console">
-        {loading && !detail ? <EmptyState title="正在读取 runs" detail="正在通过 canonical reader 打开本机工作区…" /> : error ? <EmptyState title="工作区不可用" detail={error} retry={refresh} /> : !detail ? <EmptyState title="没有 runs 工作区" detail="repository/runs 下没有可读取的 Production 或 Legacy 工作区。" retry={refresh} /> : !attempt ? <><ShotSummary detail={detail} /><WorkspaceOverview detail={detail} /></> : <><ShotSummary detail={detail} attempt={attempt} /><DetailPane detail={detail} attempt={attempt} onEvidence={() => setEvidenceOpen(true)} /></>}
+        {loading && !detail ? <EmptyState title="正在读取 runs" detail="正在通过 canonical reader 打开本机工作区…" /> : error ? <EmptyState title="工作区不可用" detail={error} retry={refresh} /> : !detail ? <EmptyState title="没有 runs 工作区" detail="repository/runs 下没有可读取的 Production 或 Legacy 工作区。" retry={refresh} /> : !attempt ? <><ShotSummary detail={detail} /><WorkspaceOverview detail={detail} /></> : <><ShotSummary detail={detail} attempt={attempt} /><DetailPane detail={detail} attempt={attempt} onEvidence={() => setEvidenceOpen(true)} continuityContent={<>{continuityEligible && continuityLoading && <section className="continuity-review-loading" aria-live="polite">正在严格打开 continuity review request…</section>}{continuityEligible && continuityError && <section className="continuity-review-error"><WarningCircle size={20} weight="fill" /><div><strong>Human continuity review 不可用</strong><p>{continuityError}</p><button type="button" onClick={loadContinuityReview}>重新读取</button></div></section>}{continuityProjection && <ContinuityReviewPanel key={continuityProjection.review_request.content_hash} projection={continuityProjection} />}</>} /></>}
       </main>
       <EvidenceDialog open={evidenceOpen} detail={detail || {}} attempt={attempt || {}} onClose={() => setEvidenceOpen(false)} />
     </div>

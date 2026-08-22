@@ -18,7 +18,11 @@ from typing import Any
 
 from ai_video.manifest import load_manifest
 from ai_video.production._video_project_reader import load_video_request_receipt
+from ai_video.production.models import ToolIdentity
 from ai_video.production.project import load_production_project
+from ai_video.provider_console_continuity import (
+    project_continuity_review as _project_continuity_review,
+)
 
 
 _BOUNDARY = {"read_only": True, "local_only": True, "network": False}
@@ -559,14 +563,45 @@ def project_workspace_detail(runs_root: str | Path, workspace: str) -> dict[str,
     return _legacy_detail(entry, workspace)
 
 
+def project_continuity_review(
+    runs_root: str | Path,
+    workspace: str,
+    attempt_id: str,
+    *,
+    automatic_evaluator: ToolIdentity,
+    required_reviewer: ToolIdentity,
+) -> dict[str, object]:
+    """Project one exact VALIDATE attempt without creating Production state."""
+
+    root = _runs_root(runs_root)
+    entry, kind = _selected_workspace(root, workspace)
+    if kind != "production":
+        raise ValueError("continuity review requires a Production workspace")
+    return _project_continuity_review(
+        root=root,
+        entry=entry,
+        workspace=workspace,
+        attempt_id=attempt_id,
+        automatic_evaluator=automatic_evaluator,
+        required_reviewer=required_reviewer,
+        project_loader=load_production_project,
+    )
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m ai_video.provider_console")
     subparsers = parser.add_subparsers(dest="command", required=True)
-    for command in ("catalog", "detail"):
+    for command in ("catalog", "detail", "continuity-review"):
         child = subparsers.add_parser(command)
         child.add_argument("--runs-root", required=True, type=Path)
-        if command == "detail":
+        if command in {"detail", "continuity-review"}:
             child.add_argument("--workspace", required=True)
+        if command == "continuity-review":
+            child.add_argument("--attempt-id", required=True)
+            child.add_argument("--automatic-evaluator-name", required=True)
+            child.add_argument("--automatic-evaluator-version", required=True)
+            child.add_argument("--reviewer-name", required=True)
+            child.add_argument("--reviewer-version", required=True)
     return parser
 
 
@@ -575,8 +610,22 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "catalog":
             result = catalog_runs(args.runs_root)
-        else:
+        elif args.command == "detail":
             result = project_workspace_detail(args.runs_root, args.workspace)
+        else:
+            result = project_continuity_review(
+                args.runs_root,
+                args.workspace,
+                args.attempt_id,
+                automatic_evaluator=ToolIdentity(
+                    name=args.automatic_evaluator_name,
+                    version=args.automatic_evaluator_version,
+                ),
+                required_reviewer=ToolIdentity(
+                    name=args.reviewer_name,
+                    version=args.reviewer_version,
+                ),
+            )
     except FileNotFoundError:
         result = {"error": {"code": "WORKSPACE_NOT_FOUND", "message": "workspace 不存在。"}}
         print(json.dumps(result, ensure_ascii=False, separators=(",", ":")))
@@ -585,6 +634,14 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "detail":
             result = {"error": {"code": "INVALID_WORKSPACE", "message": "workspace 参数无效。"}}
             status = 3
+        elif args.command == "continuity-review":
+            result = {
+                "error": {
+                    "code": "CONTINUITY_REVIEW_UNAVAILABLE",
+                    "message": "continuity review 当前不可用。",
+                }
+            }
+            status = 6
         else:
             result = {"error": {"code": "RUNS_SOURCE_UNAVAILABLE", "message": "本地 runs 数据源不可用。"}}
             status = 5

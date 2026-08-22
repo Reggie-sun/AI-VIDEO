@@ -133,9 +133,9 @@ checks:
     cwd: .
     description: Verify bounded local-only runs discovery, canonical read projection, sanitization, and no-write contracts.
   provider_console_node_tests:
-    argv: [node, --test, provider-console/tests/runs-api.test.mjs]
+    argv: [node, --test, provider-console/tests/runs-api.test.mjs, provider-console/tests/continuity-review-contract.test.mjs]
     cwd: .
-    description: Verify the loopback-only runs bridge, typed errors, opaque media tokens, and descriptor-bound media reads.
+    description: Verify the loopback-only runs bridge, exact-bound human decision authoring, opaque media tokens, and descriptor-bound media reads.
   full_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, -q]
     cwd: .
@@ -475,6 +475,7 @@ categories:
   provider_console:
     patterns:
       - src/ai_video/provider_console.py
+      - src/ai_video/provider_console_continuity.py
       - tests/test_provider_console.py
       - provider-console/**
     check_ids:

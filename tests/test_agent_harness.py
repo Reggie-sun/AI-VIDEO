@@ -291,10 +291,14 @@ def test_provider_console_routes_to_local_runs_observer_suites() -> None:
 
     for path in (
         "src/ai_video/provider_console.py",
+        "src/ai_video/provider_console_continuity.py",
         "tests/test_provider_console.py",
         "provider-console/src/App.jsx",
+        "provider-console/src/continuity-review.js",
         "provider-console/scripts/runs-api.mjs",
         "provider-console/tests/runs-api.test.mjs",
+        "provider-console/tests/continuity-review-contract.test.mjs",
+        "provider-console/tests/continuity-review.test.mjs",
     ):
         report = agent_harness.inspect_paths([path], policy)
         assert report["categories"] == ["provider_console"]
@@ -313,6 +317,7 @@ def test_provider_console_routes_to_local_runs_observer_suites() -> None:
         "node",
         "--test",
         "provider-console/tests/runs-api.test.mjs",
+        "provider-console/tests/continuity-review-contract.test.mjs",
     ]
 
 
