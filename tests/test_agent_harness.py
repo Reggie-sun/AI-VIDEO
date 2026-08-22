@@ -519,6 +519,95 @@ def test_production_policy_declares_only_complete_cross_check_coverage() -> None
         assert "covered_by_check_ids" not in policy["checks"][check_id]
 
 
+def test_repository_production_coverage_executes_only_uncovered_checks(
+    tmp_path: Path,
+) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+    selected_check_ids = [
+        "production_contract_tests",
+        "cli_config_tests",
+        "production_reader_tests",
+        "production_state_tests",
+        "production_composition_audio_tests",
+        "production_dependency_tests",
+        "production_review_tests",
+        "production_image_tests",
+        "production_video_provider_tests",
+        "provider_neutral_video_requirement_tests",
+        "production_shot_router_tests",
+    ]
+    inspection = {
+        "changed_paths": ["src/ai_video/production/models.py"],
+        "ignored_paths": [],
+        "sensitive_paths": [],
+        "categories": ["production_shared_contracts"],
+        "fallback_paths": [],
+        "check_ids": selected_check_ids,
+    }
+    scope = {
+        "mode": "commit_range",
+        "changed_paths": inspection["changed_paths"],
+        "head_oid": "b" * 40,
+        "closure_eligible": True,
+    }
+    executed_check_ids: list[str] = []
+    argv_to_check_id = {
+        tuple(
+            agent_harness._check_argv(policy["checks"][check_id], scope, None)
+        ): check_id
+        for check_id in selected_check_ids
+    }
+
+    def recording_runner(
+        argv: tuple[str, ...],
+        _cwd: Path,
+        _timeout_seconds: float,
+        _env: dict[str, str],
+    ) -> agent_harness.CommandResult:
+        argv_without_junit = tuple(
+            argument for argument in argv if not argument.startswith("--junitxml=")
+        )
+        executed_check_ids.append(argv_to_check_id[argv_without_junit])
+        return agent_harness.CommandResult(
+            status="passed", exit_code=0, stdout="ok\n", stderr=""
+        )
+
+    receipt_path, passed = agent_harness.verify_inspection(
+        inspection,
+        policy,
+        scope=scope,
+        source_snapshot={"scope_sha256": "c" * 64},
+        project_root=tmp_path,
+        execution_root=tmp_path,
+        runs_dir=tmp_path / "runs",
+        run_id="repository-coverage-run",
+        runner=recording_runner,
+    )
+
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert passed is True
+    assert receipt["selected_check_ids"] == selected_check_ids
+    assert executed_check_ids == [
+        "production_contract_tests",
+        "cli_config_tests",
+        "production_review_tests",
+        "production_image_tests",
+        "provider_neutral_video_requirement_tests",
+    ]
+    assert {
+        check["check_id"]
+        for check in receipt["checks"]
+        if check["status"] == "skipped"
+    } == {
+        "production_reader_tests",
+        "production_state_tests",
+        "production_composition_audio_tests",
+        "production_dependency_tests",
+        "production_video_provider_tests",
+        "production_shot_router_tests",
+    }
+
+
 def test_minimax_speech_adapter_routes_to_composition_audio_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
