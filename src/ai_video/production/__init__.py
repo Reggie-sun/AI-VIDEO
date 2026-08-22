@@ -172,6 +172,7 @@ from ai_video.production.video import (
 )
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.video_execution_stack import (
+    ExecutionStackMaterialization,
     GenerationExecutionStackIdentity,
     RuntimeSeal,
     StackComponentIdentity,
@@ -300,6 +301,7 @@ __all__ = [
     "ContinuityTransitionPolicy",
     "CreativeArtifactIdentity",
     "GenerationExecutionStackIdentity",
+    "ExecutionStackMaterialization",
     "P0QualificationInput",
     "P0QualificationPreparedReceipt",
     "RealShotValidationSet",

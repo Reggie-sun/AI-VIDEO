@@ -236,10 +236,21 @@ class P0QualificationInput(_TransitionModel):
     ]
     input_id: str = Field(min_length=1)
     payload: dict[str, JsonValue] = Field(min_length=1)
+    execution_stack_hashes: tuple[str, ...] = ()
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    def _content_hash_payload(self) -> dict[str, object]:
+        payload = self.model_dump(mode="json", exclude={"content_hash"})
+        if not self.execution_stack_hashes:
+            payload.pop("execution_stack_hashes", None)
+        return payload
 
     @model_validator(mode="after")
     def _validate_input(self) -> "P0QualificationInput":
+        if self.execution_stack_hashes != tuple(sorted(set(self.execution_stack_hashes))):
+            raise ValueError("P0 qualification stack hashes must be unique and ordered")
+        if any(len(item) != 64 or any(char not in "0123456789abcdef" for char in item) for item in self.execution_stack_hashes):
+            raise ValueError("P0 qualification stack hash is invalid")
         serialized = json.dumps(
             self.payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
         ).lower()
@@ -249,9 +260,7 @@ class P0QualificationInput(_TransitionModel):
         ):
             raise ValueError("P0 qualification input cannot contain secret or local-path material")
         self._validate_kind_payload()
-        expected = canonical_sha256(
-            self.model_dump(mode="json", exclude={"content_hash"})
-        )
+        expected = canonical_sha256(self._content_hash_payload())
         if self.content_hash != expected:
             raise ValueError("content_hash does not match P0 qualification input")
         return self
@@ -422,9 +431,7 @@ class P0QualificationInput(_TransitionModel):
         data.setdefault("schema_version", "1")
         data.pop("content_hash", None)
         provisional = cls.model_construct(**data, content_hash="0" * 64)
-        data["content_hash"] = canonical_sha256(
-            provisional.model_dump(mode="json", exclude={"content_hash"})
-        )
+        data["content_hash"] = canonical_sha256(provisional._content_hash_payload())
         return cls.model_validate(data)
 
 

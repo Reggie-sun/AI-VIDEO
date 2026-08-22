@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from typing import Literal
 
 from pydantic import ConfigDict, Field, model_validator
@@ -42,6 +43,48 @@ class RuntimeSeal(_ExecutionStackModel):
         if any(token in self.version for token in ("/", "\\", "api_key=", "secret=")):
             raise ValueError("runtime seal version cannot contain paths or secret material")
         return self
+
+
+class ExecutionStackMaterialization(_ExecutionStackModel):
+    """Exact, candidate-neutral artifact hashes supplied by local preflight."""
+
+    candidate_label: Literal["m0", "m1"]
+    profile_bytes: bytes = Field(min_length=1)
+    compiler_bytes: bytes = Field(min_length=1)
+    workflow_bytes: bytes = Field(min_length=1)
+    profile_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    compiler_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    workflow_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_artifact_hashes(self) -> "ExecutionStackMaterialization":
+        expected = (
+            hashlib.sha256(self.profile_bytes).hexdigest(),
+            hashlib.sha256(self.compiler_bytes).hexdigest(),
+            hashlib.sha256(self.workflow_bytes).hexdigest(),
+        )
+        if (self.profile_hash, self.compiler_hash, self.workflow_hash) != expected:
+            raise ValueError("execution stack materialization hashes do not match artifact bytes")
+        return self
+
+    @classmethod
+    def from_bytes(
+        cls,
+        *,
+        candidate_label: Literal["m0", "m1"],
+        profile_bytes: bytes,
+        compiler_bytes: bytes,
+        workflow_bytes: bytes,
+    ) -> "ExecutionStackMaterialization":
+        return cls(
+            candidate_label=candidate_label,
+            profile_bytes=profile_bytes,
+            compiler_bytes=compiler_bytes,
+            workflow_bytes=workflow_bytes,
+            profile_hash=hashlib.sha256(profile_bytes).hexdigest(),
+            compiler_hash=hashlib.sha256(compiler_bytes).hexdigest(),
+            workflow_hash=hashlib.sha256(workflow_bytes).hexdigest(),
+        )
 
 
 class GenerationExecutionStackIdentity(_ExecutionStackModel):
@@ -114,3 +157,40 @@ class GenerationExecutionStackIdentity(_ExecutionStackModel):
             provisional.model_dump(mode="json", exclude={"execution_stack_hash"})
         )
         return cls.model_validate(data)
+
+    def materialize(
+        self,
+        materialization: ExecutionStackMaterialization,
+    ) -> "GenerationExecutionStackIdentity":
+        if self.materialization_status == "materialized":
+            if (
+                self.profile_hash,
+                self.compiler_hash,
+                self.workflow_hash,
+            ) == (
+                materialization.profile_hash,
+                materialization.compiler_hash,
+                materialization.workflow_hash,
+            ):
+                return self
+            raise ValueError("materialized execution stack cannot drift")
+        values = {
+            "schema_version": self.schema_version,
+            "status": self.status,
+            "materialization_status": "materialized",
+            "candidate_id": self.candidate_id,
+            "contract_version": self.contract_version,
+            "provider_kind": self.provider_kind,
+            "deployment_identity": self.deployment_identity,
+            "model_id": self.model_id,
+            "capability_id": self.capability_id,
+            "profile_hash": materialization.profile_hash,
+            "compiler_hash": materialization.compiler_hash,
+            "workflow_hash": materialization.workflow_hash,
+            "components": self.components,
+            "sampler_identity": self.sampler_identity,
+            "scheduler_identity": self.scheduler_identity,
+            "runtime_seals": self.runtime_seals,
+            "output_contract_hash": self.output_contract_hash,
+        }
+        return self.create(**values)
