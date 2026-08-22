@@ -139,7 +139,7 @@ class _FakeCommitter:
     def _reopen_local_video_fetch(self, _pointer):
         return SimpleNamespace(
             artifact_sha256=self.fetch_pointer.artifact_sha256,
-            artifact_size_bytes=self.fetch_pointer.artifact_size_bytes,
+            size_bytes=self.fetch_pointer.artifact_size_bytes,
         )
 
 

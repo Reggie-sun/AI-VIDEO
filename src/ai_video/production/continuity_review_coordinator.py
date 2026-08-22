@@ -327,7 +327,7 @@ class ContinuityReviewCoordinator:
         fetch_receipt = reopen_fetch(fetch_pointer)
         if (
             fetch_receipt.artifact_sha256 != fetch_pointer.artifact_sha256
-            or fetch_receipt.artifact_size_bytes != fetch_pointer.artifact_size_bytes
+            or fetch_receipt.size_bytes != fetch_pointer.artifact_size_bytes
         ):
             raise _state_error("Fetched continuity receipt does not match its pointer.")
         expected_artifact_path = Path(
