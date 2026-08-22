@@ -408,7 +408,10 @@ def _human_metadata(*, reject_motion: bool = False) -> PostQaHumanReviewMetadata
     )
 
 
-def test_capture_continuity_pass_reopens_and_writes_score_one(tmp_path: Path) -> None:
+@pytest.mark.parametrize("manifest_schema", ("2.10", "2.11"))
+def test_capture_continuity_pass_reopens_and_writes_score_one(
+    tmp_path: Path, manifest_schema: str
+) -> None:
     project_root = tmp_path / "project"
     inputs, provider, _, committer = _reach_fetch(project_root, continuity=True)
     service = VideoGenerationService(committer=committer, provider=provider)
@@ -423,6 +426,12 @@ def test_capture_continuity_pass_reopens_and_writes_score_one(tmp_path: Path) ->
         attempt_id=ATTEMPT_ID,
         continuity_reviewer=_CountingDurableContinuityReviewer(),
     )
+    if manifest_schema == "2.11":
+        loaded = load_production_project(project_root / "project.yaml")
+        ProductionStateCommitter(project_root).upgrade_manifest_schema(
+            "2.11",
+            expected_manifest_revision=loaded.manifest.manifest_revision,
+        )
     pilot_root = tmp_path / "pilot"
 
     pointer = capture_post_qa_quality_experience(

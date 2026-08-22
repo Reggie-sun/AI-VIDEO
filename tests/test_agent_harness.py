@@ -777,6 +777,29 @@ def test_t8_native_turbo_v2_code_workflows_and_tests_route_to_provider_suite() -
     assert "tests/test_production_comfy_t8_native_turbo_video.py" in provider_argv
 
 
+def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+    paths = (
+        "scripts/prepare_shot_continuity_p0.py",
+        "src/ai_video/production/video_execution_stack.py",
+        "src/ai_video/production/video_transition.py",
+        "tests/test_prepare_shot_continuity_p0.py",
+        "tests/test_production_p0_qualification.py",
+        "tests/test_production_video_transition.py",
+    )
+
+    for path in paths:
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == []
+        assert report["categories"] == ["shot_continuity_p0"]
+        assert "shot_continuity_p0_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
+
+    argv = policy["checks"]["shot_continuity_p0_tests"]["argv"]
+    for path in paths[3:]:
+        assert path in argv
+
+
 def test_seedance_adapter_and_extended_contracts_route_to_video_provider_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

@@ -13,6 +13,11 @@ Production records加载fresh truth，再决定哪些milestones已满足、仍�
 Plan本身不授权runtime implementation、模型安装/融合、ComfyUI升级、local live generation、remote/paid
 preview/POST、permit、activation、push或release。
 
+Execution checkpoint (2026-08-23): 用户已单独批准完整 P0 contracts 与所需 Manifest/artifact migration。
+P0 已实现为 Manifest `2.11` 的 qualification-prepared pointer、truthful automated-browser image imports、
+immutable stack/policy/validation/input artifacts与 exact recovery；该授权和状态不扩展到 M0/M1 generation、
+winner selection、capability activation、P6 verdict、push或release。
+
 已接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
 Implementation lane与Validation lane。Validation必须绑定immutable checkpoint，不得在同一次attempt期间
 读取正在变化的source/workflow/profile；并行执行不会放宽Provider、permit、P6或same-file ownership gates。
@@ -393,14 +398,25 @@ boundary/continuity obligation、references、prompt、Stock20参数、rubric、
 budget。P0是
 两个lane的共同前置条件；冻结前不得启动M0 generation，也不得创建final Production capability identity。
 
+Status (2026-08-23): persistence checkpoint complete as `qualification_prepared`; execution gate remains open。
+Selected rainy-station bundle固定四个 canonical Shots、
+三个 adjacent hard-cut policies、M0/M1 candidate stacks、fresh inventory、rubric/effect budget/human freeze与
+model-facing `1344x768` / `BHWC [1,768,1344,3]` calibration contract。两个candidate stack都是
+`unmaterialized`；没有真实profile/compiler/workflow freeze、没有生成视频、没有 winner、没有active
+capability，也没有 P6 或 Final Acceptance claim。
+
+Frozen video prompt使用 OpenVideo/H3 official three-field structure和显式 conditioning instruction，固定 visible
+subject/wardrobe/action、camera type/amplitude/speed、physical soundscape与无配乐选择；普通 prose或 prompt-only
+identity不能替代 exact four anchors。
+
 ### Phase P1 — Qualification and Safe Implementation in Parallel
 
-P0完成后并行推进：
+P0 persistence checkpoint完成后先推进candidate-neutral I1；V1仍受materialization gate阻断：
 
 | Lane | Allowed work | Forbidden work |
 | --- | --- | --- |
-| Implementation I1 | Milestone 1 C4 regression；Milestone 2 Seedance base-only isolation；execution-stack RED contract；Milestone 5的candidate-neutral child/family denial tests与fake transport seam | 不确定winner前不得封最终`execution_stack_hash`或active capability；不得修改Validation正在消费的sealed candidate bundle |
-| Validation V1 | Milestone 4 M0 single-boundary attempt；M0失败时按gate执行conditional M1；保存exact technical与human evidence | 不修改source/tests/workflow/profile；不重试、不fallback、不边看结果边改阈值 |
+| Implementation I1 | Milestone 1 C4 regression；Milestone 2 Seedance base-only isolation；candidate-neutral execution-stack materialization/reseal owner与RED contract；Milestone 5的candidate-neutral child/family denial tests与fake transport seam | 不确定winner前不得封最终active capability；不得修改Validation正在消费的sealed materialized candidate bundle |
+| Validation V1 | 只在candidate-neutral I1已将真实profile/compiler/applicable workflow物化、产生新stack hash并重新seal/reopen依赖evidence后，执行Milestone 4 M0 single-boundary attempt；M0失败时按gate执行conditional M1；保存exact technical与human evidence | 未物化或reseal不完整时submit count为零；不修改source/tests/workflow/profile；不重试、不fallback、不边看结果边改阈值 |
 
 I1可以先写winner-independent tests和interfaces，但所有包含`ref2va-stock20`或`hybrid-stock20`的Production
 files/exports/active snapshot必须等Join Gate J1。
@@ -563,8 +579,19 @@ motion；临时占位图、synthetic-only assets或prompt-only identity不能进
 ### Exit Criteria
 
 形成content-addressed qualification inputs、`RealShotValidationSet`、boundary policies、两个明确candidate
-stack payloads与P0 freeze receipt；尚未生成媒体时只能报告`qualification prepared`。P0关闭后可同时启动
-Implementation I1与Validation V1。
+stack payloads与P0 freeze receipt；尚未生成媒体时只能报告`qualification prepared`。若candidate
+stack尚未物化，P0 receipt必须明确`unmaterialized`，不得当作executable stack freeze；M0 submit前必须
+绑定真实profile/compiler/applicable workflow、生成新stack hash并重新seal所有依赖该hash的policy/
+receipt。当前persistence checkpoint允许启动candidate-neutral Implementation I1来实现这一物化/
+reseal owner；该materialization gate关闭前不得启动Validation V1或M0 submit。
+
+Current evidence: P0 receipt
+`da932addfaf01310b69a8287093ad1fac734487d7916620c209d0885132b8a2e`，validation set
+`d2da773a6df7b750001bd1ccb424f6e15238052b9118a9fc7cacf533b6b9ac28`；M0/M1 candidate stacks为
+`unmaterialized`，分别绑定hash `101a5df4f76c570f378939875e52b724ad61d63ceb71d81c9a6c2f1fc9e9a965`
+与`4d08741636647fbb29f9cf69a69a2c81d62156cef128f619d26a17b72e94c01b`。M1 Hybrid component使用显式
+`presence=absent`与`content_hash=none`；这些identity只证明P0 candidate contract已准备，不证明真实
+profile/compiler/workflow已物化或可执行。Exact paths与dynamic status仍以Production Manifest/runtime baseline为准。
 
 ## Milestone 4: Execute M0, Then Conditional M1
 
@@ -983,16 +1010,18 @@ boundary-aware Provider portability”。
 
 ```text
 P0 / Milestone 3
-freeze inventory + RealShotValidationSet + policies + stack payloads + rubric
+freeze inventory + RealShotValidationSet + policies + unmaterialized stack payloads + rubric
                      |
-          +----------+----------+
-          |                     |
-Implementation I1          Validation V1
-Milestone 1               Milestone 4
-Milestone 2               M0 single edge
-Milestone 5 RED/common     conditional M1
-          |                     |
-          +----------+----------+
+          Implementation I1
+          Milestone 1 / Milestone 2 / Milestone 5 RED/common
+          materialize real profile/compiler/workflow + reseal policies/receipt
+                     |
+             materialization gate
+                     |
+              Validation V1
+              Milestone 4
+              M0 single edge
+              conditional M1
                      |
               Join Gate J1
               select one winner
@@ -1038,7 +1067,8 @@ ownership或顺序。
   `SUBSTANTIAL_RESET`逃避失败gate。
 - Qualification tamper/stale/out-of-envelope：Router在effect前拒绝；attempt evidence tamper拒绝本次claim，
   两者都不影响canonical source/destination lifecycle truth。
-- Persistence需要migration：在schema/layout edit前停止并请求Decision Gate。
+- P0 preparation persistence migration 已由本轮 Decision Gate批准并实现；未来 qualification/attempt routing若需
+  新的 schema/layout，仍须在对应 edit 前另行通过 Decision Gate。
 - Reviewer/Harness失败：修复并重新验证exact snapshot，不用旧receipt覆盖。
 
 ## Final Definition of Done

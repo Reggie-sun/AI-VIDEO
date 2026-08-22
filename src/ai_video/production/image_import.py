@@ -26,6 +26,7 @@ from ai_video.production.models import (
     ToolIdentity,
 )
 from ai_video.production.paths import (
+    canonical_automated_browser_image_import_receipt_path,
     canonical_human_image_import_receipt_path,
     canonical_image_asset_path,
 )
@@ -36,6 +37,11 @@ from ._state_commit_contracts import PreparedArtifact, StateCommitRequest
 
 HUMAN_IMAGE_IMPORT_TOOL = ToolIdentity(
     name="chatgpt-images-2-web-import",
+    version="1",
+)
+
+AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL = ToolIdentity(
+    name="gpt-image-2-mcp-chatgpt-web-import",
     version="1",
 )
 
@@ -128,6 +134,96 @@ class HumanImageImportReceipt(StrictModel):
         return cls.model_validate(data)
 
 
+class AutomatedBrowserImageImportReceipt(StrictModel):
+    model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
+
+    schema_version: Literal["1"]
+    source_surface: Literal["gpt_image_2_mcp_chatgpt_web"]
+    declared_ui_product_label: str = Field(min_length=1)
+    backend_model_id: None = None
+    provider_request_id: None = None
+    original_filename: str = Field(min_length=1)
+    output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    output_size_bytes: int = Field(strict=True, gt=0)
+    output_width: int = Field(strict=True, gt=0)
+    output_height: int = Field(strict=True, gt=0)
+    generated_at: str = Field(min_length=1)
+    approved_at: str = Field(min_length=1)
+    imported_at: str = Field(min_length=1)
+    prompt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    references: tuple[ImageReferenceBinding, ...]
+    target_kind: Literal[
+        "character_master", "scene_reference", "key_shot", "repair_replacement"
+    ]
+    target_artifact_id: str = Field(min_length=1)
+    target_asset_role: str = Field(min_length=1)
+    automation_actor: ActorIdentity
+    human_approval_actor: ActorIdentity
+    approved: Literal[True]
+    license_source_note: str = Field(min_length=1)
+    source_generation_remote: Literal[True] = True
+    durable_submit_intent_present: Literal[False] = False
+    automated_browser: Literal[True] = True
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_truthful_receipt(self) -> "AutomatedBrowserImageImportReceipt":
+        if self.automation_actor.actor_kind != "automation":
+            raise ValueError("automated browser import requires an automation actor")
+        if self.human_approval_actor.actor_kind != "human":
+            raise ValueError("automated browser import requires a human approval actor")
+        if Path(self.original_filename).name != self.original_filename:
+            raise ValueError("original image filename must be a basename")
+        if Path(self.original_filename).suffix.lower() != ".png":
+            raise ValueError("automated browser image import requires an original PNG")
+        try:
+            generated_at = datetime.fromisoformat(self.generated_at)
+            approved_at = datetime.fromisoformat(self.approved_at)
+            imported_at = datetime.fromisoformat(self.imported_at)
+        except ValueError as exc:
+            raise ValueError("automated browser timestamps must be RFC 3339") from exc
+        if any(item.tzinfo is None for item in (generated_at, approved_at, imported_at)):
+            raise ValueError("automated browser timestamps require explicit offsets")
+        if not generated_at <= approved_at <= imported_at:
+            raise ValueError("automated browser generation, approval, and import are out of order")
+        expected = canonical_sha256(
+            self.model_dump(mode="json", exclude={"content_hash"})
+        )
+        if self.content_hash != expected:
+            raise ValueError("content_hash does not match automated browser import receipt")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "AutomatedBrowserImageImportReceipt":
+        data = dict(values)
+        data.setdefault("schema_version", "1")
+        data.setdefault("source_surface", "gpt_image_2_mcp_chatgpt_web")
+        data.setdefault("backend_model_id", None)
+        data.setdefault("provider_request_id", None)
+        data.setdefault("source_generation_remote", True)
+        data.setdefault("durable_submit_intent_present", False)
+        data.setdefault("automated_browser", True)
+        data.pop("content_hash", None)
+        if (
+            data["backend_model_id"] is not None
+            or data["provider_request_id"] is not None
+            or data["source_generation_remote"] is not True
+            or data["durable_submit_intent_present"] is not False
+            or data["automated_browser"] is not True
+        ):
+            raise ValueError(
+                "automated browser import cannot invent backend, request, or runtime submit evidence"
+            )
+        provisional = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            provisional.model_dump(mode="json", exclude={"content_hash"})
+        )
+        return cls.model_validate(data)
+
+
+ImageImportReceipt = HumanImageImportReceipt | AutomatedBrowserImageImportReceipt
+
+
 def validate_human_image_import(
     receipt: HumanImageImportReceipt,
     image_bytes: bytes,
@@ -150,6 +246,42 @@ def validate_human_image_import(
 
 
 def human_image_import_asset(receipt: HumanImageImportReceipt) -> AssetRecord:
+    return _image_import_asset(receipt, HUMAN_IMAGE_IMPORT_TOOL)
+
+
+def validate_automated_browser_image_import(
+    receipt: AutomatedBrowserImageImportReceipt,
+    image_bytes: bytes,
+) -> None:
+    try:
+        checked = AutomatedBrowserImageImportReceipt.model_validate(
+            receipt.model_dump(mode="python")
+        )
+        measured = _measure_png(image_bytes)
+    except (AttributeError, ValueError, AiVideoError) as exc:
+        detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
+        raise _invalid(
+            "Automated browser image import receipt or PNG is invalid.", detail
+        ) from exc
+    if checked != receipt or (
+        measured.sha256 != receipt.output_sha256
+        or measured.size_bytes != receipt.output_size_bytes
+        or measured.width != receipt.output_width
+        or measured.height != receipt.output_height
+    ):
+        raise _invalid("Automated browser image import PNG does not match its receipt.")
+
+
+def automated_browser_image_import_asset(
+    receipt: AutomatedBrowserImageImportReceipt,
+) -> AssetRecord:
+    return _image_import_asset(receipt, AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL)
+
+
+def _image_import_asset(
+    receipt: ImageImportReceipt,
+    tool: ToolIdentity,
+) -> AssetRecord:
     inputs = tuple(
         identity
         for reference in receipt.references
@@ -165,7 +297,7 @@ def human_image_import_asset(receipt: HumanImageImportReceipt) -> AssetRecord:
         width=receipt.output_width,
         height=receipt.output_height,
         source_kind=AssetSourceKind.IMPORTED,
-        tool=HUMAN_IMAGE_IMPORT_TOOL,
+        tool=tool,
         input_artifact_ids=inputs,
         input_fingerprint=receipt.prompt_fingerprint,
         creation_receipt_id=receipt.content_hash,
@@ -174,7 +306,7 @@ def human_image_import_asset(receipt: HumanImageImportReceipt) -> AssetRecord:
     )
 
 
-def _selected_target(base: LoadedProductionProject, receipt: HumanImageImportReceipt):
+def _selected_target(base: LoadedProductionProject, receipt: ImageImportReceipt):
     if receipt.target_kind == "character_master":
         return next(
             (item for item in base.characters if item.artifact_id == receipt.target_artifact_id),
@@ -194,11 +326,11 @@ def _selected_target(base: LoadedProductionProject, receipt: HumanImageImportRec
 def _validate_target_revision(
     base_target: Character | Scene | Shot,
     candidate_target: Character | Scene | Shot,
-    receipt: HumanImageImportReceipt,
+    receipt: ImageImportReceipt,
     asset: AssetRecord,
 ) -> None:
     if type(candidate_target) is not type(base_target):
-        raise _invalid("Human image import target kind changed unexpectedly.")
+        raise _invalid("Image import target kind changed unexpectedly.")
     if isinstance(base_target, Character):
         expected = base_target.model_copy(
             update={
@@ -225,7 +357,7 @@ def _validate_target_revision(
             for role in base_target.required_asset_roles
         )
         if roles == base_target.required_asset_roles:
-            raise _invalid("Human image import Shot role does not exist.")
+            raise _invalid("Image import Shot role does not exist.")
         expected = base_target.model_copy(
             update={
                 "revision": base_target.revision + 1,
@@ -235,25 +367,24 @@ def _validate_target_revision(
             }
         )
     if expected != candidate_target or canonical_sha256(candidate_target) != candidate_target.content_hash:
-        raise _invalid("Human image import changed more than its declared target binding.")
+        raise _invalid("Image import changed more than its declared target binding.")
 
 
-def prepare_human_image_import_commit(
+def _prepare_image_import_commit(
     *,
     base: LoadedProductionProject,
-    receipt: HumanImageImportReceipt,
+    receipt: ImageImportReceipt,
     image_bytes: bytes,
     candidate_target: Character | Scene | Shot,
     candidate_project: ProductionProject,
     base_commit: StateCommitRequest,
+    asset: AssetRecord,
+    receipt_path: Path,
 ) -> StateCommitRequest:
-    """Add honest import evidence to one already prepared P5 project/registry commit."""
-
-    validate_human_image_import(receipt, image_bytes)
-    asset = human_image_import_asset(receipt)
+    """Add exact import evidence to one already prepared P5 project/registry commit."""
     base_target = _selected_target(base, receipt)
     if base_target is None:
-        raise _invalid("Human image import target is absent from the active project.")
+        raise _invalid("Image import target is absent from the active project.")
     _validate_target_revision(base_target, candidate_target, receipt, asset)
     assets_by_id = {item.asset_id: item for item in base.registry.assets}
     characters = {item.artifact_id: item for item in base.characters}
@@ -282,7 +413,7 @@ def prepare_human_image_import_commit(
             or selected_asset is None
             or selected_asset.sha256 != reference.asset_sha256
         ):
-            raise _invalid("Human image import reference identity is not active and exact.")
+            raise _invalid("Image import reference identity is not active and exact.")
     if (
         base_commit.operation != "commit_project_registry"
         or base_commit.dependency_graph_transition is None
@@ -290,7 +421,7 @@ def prepare_human_image_import_commit(
         or candidate_project.content_hash != base_commit.next_project.content_hash
         or canonical_sha256(candidate_project) != candidate_project.content_hash
     ):
-        raise _invalid("Human image import must reuse one exact P5 project/registry commit.")
+        raise _invalid("Image import must reuse one exact P5 project/registry commit.")
 
     registry_artifact = next(
         (
@@ -301,7 +432,7 @@ def prepare_human_image_import_commit(
         None,
     )
     if registry_artifact is None:
-        raise _invalid("Human image import candidate Registry bytes are missing.")
+        raise _invalid("Image import candidate Registry bytes are missing.")
     from ai_video.production.models import AssetRegistrySnapshot
 
     candidate_registry = AssetRegistrySnapshot.model_validate_json(
@@ -311,7 +442,7 @@ def prepare_human_image_import_commit(
         candidate_registry.assets != (*base.registry.assets, asset)
         or base_commit.next_registry.content_hash != candidate_registry.content_hash
     ):
-        raise _invalid("Human image import Registry must append exactly one imported asset.")
+        raise _invalid("Image import Registry must append exactly one imported asset.")
 
     target_reference_sets = {
         "character_master": candidate_project.artifacts.characters,
@@ -324,7 +455,7 @@ def prepare_human_image_import_commit(
         item for item in references if item.artifact_id == receipt.target_artifact_id
     )
     if len(selected) != 1 or selected[0].content_hash != candidate_target.content_hash:
-        raise _invalid("Human image import Project does not select the declared target revision.")
+        raise _invalid("Image import Project does not select the declared target revision.")
     field = {
         "character_master": "characters",
         "scene_reference": "scenes",
@@ -346,7 +477,7 @@ def prepare_human_image_import_commit(
         }
     )
     if expected_project != candidate_project:
-        raise _invalid("Human image import Project changed outside its declared target.")
+        raise _invalid("Image import Project changed outside its declared target.")
     target_artifact = next(
         (
             item
@@ -361,12 +492,12 @@ def prepare_human_image_import_commit(
         or target_artifact.payload != target_payload
         or target_artifact.file_sha256 != hashlib.sha256(target_payload).hexdigest()
     ):
-        raise _invalid("Human image import target artifact bytes are not exact.")
+        raise _invalid("Image import target artifact bytes are not exact.")
 
     receipt_payload = _canonical_json_bytes(receipt)
     additions = (
         PreparedArtifact(
-            canonical_human_image_import_receipt_path(receipt.content_hash),
+            receipt_path,
             receipt_payload,
             hashlib.sha256(receipt_payload).hexdigest(),
         ),
@@ -378,10 +509,60 @@ def prepare_human_image_import_commit(
     )
     paths = {item.relative_path for item in base_commit.artifacts}
     if any(item.relative_path in paths for item in additions):
-        raise _invalid("Human image import evidence collides with candidate artifacts.")
+        raise _invalid("Image import evidence collides with candidate artifacts.")
     return replace(
         base_commit,
         artifacts=tuple(
             sorted((*base_commit.artifacts, *additions), key=lambda item: item.relative_path.as_posix())
+        ),
+    )
+
+
+def prepare_human_image_import_commit(
+    *,
+    base: LoadedProductionProject,
+    receipt: HumanImageImportReceipt,
+    image_bytes: bytes,
+    candidate_target: Character | Scene | Shot,
+    candidate_project: ProductionProject,
+    base_commit: StateCommitRequest,
+) -> StateCommitRequest:
+    """Add honest human-import evidence to one prepared P5 commit."""
+
+    validate_human_image_import(receipt, image_bytes)
+    return _prepare_image_import_commit(
+        base=base,
+        receipt=receipt,
+        image_bytes=image_bytes,
+        candidate_target=candidate_target,
+        candidate_project=candidate_project,
+        base_commit=base_commit,
+        asset=human_image_import_asset(receipt),
+        receipt_path=canonical_human_image_import_receipt_path(receipt.content_hash),
+    )
+
+
+def prepare_automated_browser_image_import_commit(
+    *,
+    base: LoadedProductionProject,
+    receipt: AutomatedBrowserImageImportReceipt,
+    image_bytes: bytes,
+    candidate_target: Character | Scene | Shot,
+    candidate_project: ProductionProject,
+    base_commit: StateCommitRequest,
+) -> StateCommitRequest:
+    """Add truthful MCP/browser-import evidence to one prepared P5 commit."""
+
+    validate_automated_browser_image_import(receipt, image_bytes)
+    return _prepare_image_import_commit(
+        base=base,
+        receipt=receipt,
+        image_bytes=image_bytes,
+        candidate_target=candidate_target,
+        candidate_project=candidate_project,
+        base_commit=base_commit,
+        asset=automated_browser_image_import_asset(receipt),
+        receipt_path=canonical_automated_browser_image_import_receipt_path(
+            receipt.content_hash
         ),
     )

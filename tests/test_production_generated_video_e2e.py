@@ -1003,6 +1003,9 @@ def test_continuity_evidence_checkpoint_prevents_repeat_after_candidate_failure(
     ].pop("probe")
     with pytest.raises(ValueError, match="exact probe and provenance"):
         ProductionManifest.model_validate(incomplete_210)
+    manifest_211 = activated.model_dump(mode="json")
+    manifest_211["schema_version"] = "2.11"
+    assert ProductionManifest.model_validate(manifest_211).schema_version == "2.11"
     historical_shape = activated.model_dump(mode="json")
     historical_shape["schema_version"] = "2.8"
     with pytest.raises(ValueError, match="Manifest 2.9 is required"):

@@ -135,9 +135,13 @@ from ai_video.production.local_video import (
     LocalVideoTaskObservation,
 )
 from ai_video.production.image_import import (
+    AutomatedBrowserImageImportReceipt,
     HumanImageImportReceipt,
+    automated_browser_image_import_asset,
     human_image_import_asset,
+    prepare_automated_browser_image_import_commit,
     prepare_human_image_import_commit,
+    validate_automated_browser_image_import,
     validate_human_image_import,
 )
 from ai_video.production.seedance_asset import (
@@ -167,6 +171,25 @@ from ai_video.production.video import (
     VideoTaskState,
 )
 from ai_video.production.video_generation import VideoGenerationService
+from ai_video.production.video_execution_stack import (
+    GenerationExecutionStackIdentity,
+    RuntimeSeal,
+    StackComponentIdentity,
+)
+from ai_video.production.video_transition import (
+    BoundaryKind,
+    CandidateStackBinding,
+    ContinuityAnchorBinding,
+    ContinuityAnchorRole,
+    ContinuityObligation,
+    ContinuityTransitionPolicy,
+    CreativeArtifactIdentity,
+    MotionCoverage,
+    P0QualificationInput,
+    P0QualificationPreparedReceipt,
+    RealShotValidationSet,
+    ValidationEdgeBinding,
+)
 from ai_video.production.shot_router import (
     ContinuityMode,
     MotionRequirement,
@@ -266,7 +289,23 @@ __all__ = [
     "LocalVideoSubmitResult",
     "LocalVideoTaskObservation",
     "MotionRequirement",
+    "MotionCoverage",
     "HumanImageImportReceipt",
+    "AutomatedBrowserImageImportReceipt",
+    "BoundaryKind",
+    "CandidateStackBinding",
+    "ContinuityAnchorBinding",
+    "ContinuityAnchorRole",
+    "ContinuityObligation",
+    "ContinuityTransitionPolicy",
+    "CreativeArtifactIdentity",
+    "GenerationExecutionStackIdentity",
+    "P0QualificationInput",
+    "P0QualificationPreparedReceipt",
+    "RealShotValidationSet",
+    "RuntimeSeal",
+    "StackComponentIdentity",
+    "ValidationEdgeBinding",
     "ProductionBrief",
     "ProductionManifest",
     "ProductionStateCommitter",
@@ -345,7 +384,10 @@ __all__ = [
     "load_t8_turbo_video_execution_profile",
     "load_t8_native_turbo_execution_profile",
     "human_image_import_asset",
+    "automated_browser_image_import_asset",
+    "prepare_automated_browser_image_import_commit",
     "prepare_human_image_import_commit",
+    "validate_automated_browser_image_import",
     "validate_human_image_import",
     "prepare_project_registry_commit",
     "prepare_dependency_graph_transition",

@@ -41,6 +41,7 @@ _MANIFEST_SCHEMA_ORDER = (
     "2.8",
     "2.9",
     "2.10",
+    "2.11",
 )
 
 
@@ -146,6 +147,28 @@ class _StateCommitBootstrapMixin:
             *(item.path for item in project.artifacts.shots),
             *(item.artifact_path for item in registry.assets),
         }
+        from ai_video.production.image_import import (
+            AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL,
+            HUMAN_IMAGE_IMPORT_TOOL,
+        )
+        from ai_video.production.models import AssetSourceKind, AssetType
+        from ai_video.production.paths import (
+            canonical_automated_browser_image_import_receipt_path,
+            canonical_human_image_import_receipt_path,
+        )
+
+        required_paths.update(
+            canonical_human_image_import_receipt_path(item.creation_receipt_id)
+            if item.tool == HUMAN_IMAGE_IMPORT_TOOL
+            else canonical_automated_browser_image_import_receipt_path(
+                item.creation_receipt_id
+            )
+            for item in registry.assets
+            if item.source_kind is AssetSourceKind.IMPORTED
+            and item.asset_type is AssetType.IMAGE
+            and item.tool
+            in {HUMAN_IMAGE_IMPORT_TOOL, AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL}
+        )
         supplied_paths = tuple(item.relative_path for item in artifacts)
         supplied_path_set = set(supplied_paths)
         if len(supplied_paths) != len(supplied_path_set):

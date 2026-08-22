@@ -296,7 +296,7 @@ def _build_record(request: PostQaQ0CaptureRequest) -> QualityExperienceRecordV1:
         raise _reject(CaptureErrorCode.BINDING_INVALID)
     attempt = matching[0]
     state = attempt.video_generation_state
-    if state is None or bundle.manifest.schema_version != "2.10":
+    if state is None or bundle.manifest.schema_version not in {"2.10", "2.11"}:
         raise _reject(CaptureErrorCode.NOT_READY)
     evaluation = state.continuity_evaluation
     if (

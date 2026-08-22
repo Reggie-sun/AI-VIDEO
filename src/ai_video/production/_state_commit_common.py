@@ -240,9 +240,15 @@ def _handle_cleanup_errors(
 def _validated_transition(
     model: ProductionManifest | StateCommitAttempt, update: dict[str, object]
 ) -> ProductionManifest | StateCommitAttempt:
+    if isinstance(model, ProductionManifest) and model.schema_version == "2.11":
+        if any(
+            field in update and update[field] != getattr(model, field)
+            for field in ("active_project", "active_registry")
+        ):
+            update = {**update, "active_p0_qualification_prepared": None}
     if isinstance(model, ProductionManifest) and (
         model.schema_version == "2.4"
-        or (model.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10"} and has_p6_state(model))
+        or (model.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"} and has_p6_state(model))
     ):
         identity_fields = (
             "active_project",

@@ -656,6 +656,28 @@ def write_and_load_two_shot_project(
     decodable_pngs: bool = False,
 ):
     """Build a valid two-Shot raster project through the public P2 loader."""
+    return write_and_load_multi_shot_project(
+        root,
+        filenames=filenames,
+        seconds=seconds,
+        fps=fps,
+        decodable_pngs=decodable_pngs,
+    )
+
+
+def write_and_load_multi_shot_project(
+    root: Path,
+    *,
+    filenames: tuple[str, ...],
+    seconds: tuple[float, ...],
+    fps: int = 24,
+    decodable_pngs: bool = False,
+    asset_role: str = "still",
+    content_addressed_receipts: bool = False,
+):
+    """Build a valid ordered raster project through the public P2 loader."""
+    if len(filenames) < 2 or len(filenames) != len(seconds):
+        raise ValueError("multi-Shot fixture requires matching filenames and durations")
     write_production_project(root)
     project, registry = load_initial_models(root)
 
@@ -697,7 +719,7 @@ def write_and_load_two_shot_project(
                     ),
                     "required_asset_roles": (
                         AssetRoleRequirement(
-                            role="still",
+                            role=asset_role,
                             asset_ids=(f"image-shot-{index}",),
                             allowed_asset_types=(AssetType.IMAGE,),
                         ),
@@ -705,7 +727,7 @@ def write_and_load_two_shot_project(
                 }
             )
         )
-        for index in (1, 2)
+        for index in range(1, len(filenames) + 1)
     )
     storyboard = Storyboard.model_validate(
         yaml.safe_load((root / "creative/storyboard.yaml").read_text(encoding="utf-8"))
@@ -716,7 +738,12 @@ def write_and_load_two_shot_project(
                 "content_hash": ZERO_HASH,
                 "beats": (
                     storyboard.beats[0].model_copy(
-                        update={"shot_ids": ("shot-1", "shot-2")}
+                        update={
+                            "shot_ids": tuple(
+                                f"shot-{index}"
+                                for index in range(1, len(filenames) + 1)
+                            )
+                        }
                     ),
                 ),
             }
@@ -732,7 +759,14 @@ def write_and_load_two_shot_project(
             _p7_png(
                 width=1,
                 height=1,
-                rgba=bytes((0x20 * index, 0x30 * index, 0x40 * index, 0xFF)),
+                rgba=bytes(
+                    (
+                        (0x20 * index) % 0x100,
+                        (0x30 * index) % 0x100,
+                        (0x40 * index) % 0x100,
+                        0xFF,
+                    )
+                ),
             )
             if decodable_pngs
             else b"\x89PNG\r\n\x1a\n" + f"fixture-raster-{index}".encode()
@@ -748,7 +782,13 @@ def write_and_load_two_shot_project(
                     "mime_type": "image/png",
                     "input_artifact_ids": (character.artifact_id,),
                     "input_fingerprint": character.content_hash,
-                    "creation_receipt_id": f"receipt-image-shot-{index}",
+                    "creation_receipt_id": (
+                        hashlib.sha256(
+                            f"receipt-image-shot-{index}".encode("utf-8")
+                        ).hexdigest()
+                        if content_addressed_receipts
+                        else f"receipt-image-shot-{index}"
+                    ),
                 }
             )
         )

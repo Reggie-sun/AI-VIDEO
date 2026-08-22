@@ -10,10 +10,15 @@ from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.image_import import (
+    AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL,
     HUMAN_IMAGE_IMPORT_TOOL,
+    AutomatedBrowserImageImportReceipt,
     HumanImageImportReceipt,
+    automated_browser_image_import_asset,
     human_image_import_asset,
+    prepare_automated_browser_image_import_commit,
     prepare_human_image_import_commit,
+    validate_automated_browser_image_import,
     validate_human_image_import,
 )
 from ai_video.production.dependency import (
@@ -31,6 +36,7 @@ from ai_video.production.models import (
     RegistrySnapshotPointer,
 )
 from ai_video.production.paths import (
+    canonical_automated_browser_image_import_receipt_path,
     canonical_dependency_graph_snapshot_path,
     canonical_human_image_import_receipt_path,
     canonical_image_shot_revision_path,
@@ -71,6 +77,37 @@ def _receipt(image_bytes: bytes, **overrides: object) -> HumanImageImportReceipt
     return HumanImageImportReceipt.create(**values)
 
 
+def _automated_receipt(
+    image_bytes: bytes, **overrides: object
+) -> AutomatedBrowserImageImportReceipt:
+    values: dict[str, object] = {
+        "declared_ui_product_label": "GPT Image 2",
+        "original_filename": "image-01.png",
+        "output_sha256": hashlib.sha256(image_bytes).hexdigest(),
+        "output_size_bytes": len(image_bytes),
+        "output_width": 2,
+        "output_height": 1,
+        "generated_at": "2026-08-23T01:23:28+08:00",
+        "approved_at": "2026-08-23T01:25:00+08:00",
+        "imported_at": "2026-08-23T01:30:00+08:00",
+        "prompt_fingerprint": "2" * 64,
+        "references": (),
+        "target_kind": "key_shot",
+        "target_artifact_id": "shot-artifact-1",
+        "target_asset_role": "still",
+        "automation_actor": ActorIdentity(
+            actor_id="gpt-image-2-mcp", actor_kind="automation"
+        ),
+        "human_approval_actor": ActorIdentity(
+            actor_id="human-operator", actor_kind="human"
+        ),
+        "approved": True,
+        "license_source_note": "User-approved generated reference; rights not inferred.",
+    }
+    values.update(overrides)
+    return AutomatedBrowserImageImportReceipt.create(**values)
+
+
 def test_human_import_receipt_is_truthful_sealed_and_builds_imported_asset() -> None:
     png = project_factory._p7_png()
     receipt = _receipt(png)
@@ -86,6 +123,22 @@ def test_human_import_receipt_is_truthful_sealed_and_builds_imported_asset() -> 
     assert asset.source_kind is AssetSourceKind.IMPORTED
     assert asset.tool == HUMAN_IMAGE_IMPORT_TOOL
     assert asset.creation_receipt_id == receipt.content_hash
+
+
+def test_automated_browser_import_is_truthful_sealed_and_distinct() -> None:
+    png = project_factory._p7_png()
+    receipt = _automated_receipt(png)
+
+    validate_automated_browser_image_import(receipt, png)
+    asset = automated_browser_image_import_asset(receipt)
+
+    assert receipt.source_surface == "gpt_image_2_mcp_chatgpt_web"
+    assert receipt.backend_model_id is None
+    assert receipt.provider_request_id is None
+    assert receipt.automated_browser
+    assert receipt.source_generation_remote
+    assert asset.tool == AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL
+    assert asset.tool != HUMAN_IMAGE_IMPORT_TOOL
 
 
 @pytest.mark.parametrize(
@@ -148,9 +201,11 @@ def test_human_import_requires_ordered_offset_timestamps(
     "target_kind",
     ["character_master", "scene_reference", "key_shot", "repair_replacement"],
 )
+@pytest.mark.parametrize("import_kind", ["human", "automated_browser"])
 def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
     tmp_path: Path,
     target_kind: str,
+    import_kind: str,
 ) -> None:
     project_factory.write_production_project(tmp_path)
     base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
@@ -166,13 +221,24 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
         base_target.required_asset_roles[0].role if field == "shots" else "reference"
     )
     png = project_factory._p7_png()
-    receipt = _receipt(
+    receipt_factory = _receipt if import_kind == "human" else _automated_receipt
+    asset_factory = (
+        human_image_import_asset
+        if import_kind == "human"
+        else automated_browser_image_import_asset
+    )
+    commit_preparer = (
+        prepare_human_image_import_commit
+        if import_kind == "human"
+        else prepare_automated_browser_image_import_commit
+    )
+    receipt = receipt_factory(
         png,
         target_kind=target_kind,
         target_artifact_id=base_target.artifact_id,
         target_asset_role=target_role,
     )
-    asset = human_image_import_asset(receipt)
+    asset = asset_factory(receipt)
 
     candidate_registry = base.registry.model_copy(
         update={
@@ -329,7 +395,7 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
             )
         ),
     )
-    request = prepare_human_image_import_commit(
+    request = commit_preparer(
         base=base,
         receipt=receipt,
         image_bytes=png,
@@ -348,7 +414,11 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
     assert final.dependency_states == resolution.states
 
     decoy = receipt.model_copy(update={"content_hash": "f" * 64})
-    decoy_path = tmp_path / canonical_human_image_import_receipt_path("f" * 64)
+    decoy_path = tmp_path / (
+        canonical_human_image_import_receipt_path("f" * 64)
+        if import_kind == "human"
+        else canonical_automated_browser_image_import_receipt_path("f" * 64)
+    )
     decoy_path.parent.mkdir(parents=True, exist_ok=True)
     decoy_path.write_text(
         json.dumps(decoy.model_dump(mode="json"), sort_keys=True) + "\n",

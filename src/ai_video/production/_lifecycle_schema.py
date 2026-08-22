@@ -96,6 +96,21 @@ class PaidProviderSubmitReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class P0QualificationPreparedReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "P0QualificationPreparedReceiptPointer":
+        expected = Path(
+            f"state/video-qualification/prepared-receipts/{self.content_hash}.json"
+        )
+        if self.path.is_absolute() or ".." in self.path.parts or self.path != expected:
+            raise ValueError("P0 qualification prepared receipt path must be canonical")
+        return self
+
+
 class PaidProviderAttemptPhase(str, Enum):
     SUBMIT_INTENT = "submit_intent"
     ACCEPTED = "accepted"
@@ -928,7 +943,7 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
         isinstance(attempt, Mapping) and "paid_provider_state" in attempt
         for attempt in value.get("attempts", ())
     )
-    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10"} and (
+    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11"} and (
         "active_paid_provider_budget" in value or has_paid_attempt
     ):
         raise ValueError(
@@ -986,7 +1001,7 @@ def reject_explicit_p8_video_fields(value: object) -> object:
                     "checkpoint fields; Manifest 2.10 is required"
                 )
         return value
-    if manifest_version == "2.10":
+    if manifest_version in {"2.10", "2.11"}:
         for attempt in value.get("attempts", ()):
             if not isinstance(attempt, Mapping):
                 continue
@@ -1005,7 +1020,7 @@ def reject_explicit_p8_video_fields(value: object) -> object:
                 )
             ):
                 raise ValueError(
-                    "Production Manifest 2.10 evidenced continuity requires "
+                    "Production Manifest 2.10 or later evidenced continuity requires "
                     "exact probe and provenance checkpoints"
                 )
         return value
@@ -1025,7 +1040,7 @@ def reject_explicit_p7_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}:
+    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
         return value
     image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
     for attempt in value.get("attempts", ()):
@@ -1036,6 +1051,19 @@ def reject_explicit_p7_fields(value: object) -> object:
             raise ValueError(
                 f"Production Manifest {manifest_version} cannot contain explicit P7 image fields"
             )
+    return value
+
+
+def reject_explicit_p0_fields(value: object) -> object:
+    if not isinstance(value, Mapping):
+        return value
+    if (
+        value.get("schema_version", "2.0") != "2.11"
+        and "active_p0_qualification_prepared" in value
+    ):
+        raise ValueError(
+            "Only Production Manifest 2.11 can select P0 qualification evidence"
+        )
     return value
 
 

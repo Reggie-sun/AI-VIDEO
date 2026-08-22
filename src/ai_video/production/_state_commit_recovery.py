@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 from typing import Literal
 
@@ -23,7 +24,11 @@ from ai_video.production.models import (
 )
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
+    canonical_continuity_transition_policy_path,
     canonical_dependency_graph_snapshot_path,
+    canonical_execution_stack_identity_path,
+    canonical_p0_qualification_input_path,
+    canonical_real_shot_validation_set_path,
     canonical_repair_request_path,
 )
 from ai_video.production.project import (
@@ -35,6 +40,7 @@ from ai_video.production.registry import registry_semantic_sha256
 
 from ._state_commit_common import (
     _candidate_artifacts_hash,
+    _canonical_json_bytes,
     _dependency_states_hash,
     _owned_temp_name,
     _state_invalid,
@@ -101,7 +107,7 @@ class _StateCommitRecoveryMixin:
         registry_hash = self._require_recovery_file_hash(
             registry_path, manifest.active_registry.file_sha256
         )
-        if manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}:
+        if manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
             loaded = self._load_production_project(
                 self._project_root / "project.yaml"
             )
@@ -195,7 +201,7 @@ class _StateCommitRecoveryMixin:
                 )
             )
         if manifest.active_render_state is not None:
-            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}:
+            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
                 bundle = load_production_project_candidate(
                     self._project_root,
                     manifest,
@@ -220,6 +226,7 @@ class _StateCommitRecoveryMixin:
                 )
             )
         items.extend(self._p6_active_recovery_items(manifest))
+        items.extend(self._p0_active_recovery_items(manifest))
         if manifest.active_paid_provider_budget is not None:
             budget = self._reopen_paid_budget(manifest.active_paid_provider_budget)
             items.append(
@@ -255,11 +262,57 @@ class _StateCommitRecoveryMixin:
                     )
         return tuple(items)
 
+    def _p0_active_recovery_items(
+        self, manifest: ProductionManifest
+    ) -> tuple[RecoveryItem, ...]:
+        pointer = manifest.active_p0_qualification_prepared
+        if manifest.schema_version != "2.11" or pointer is None:
+            return ()
+        receipt, stacks, policies, validation_set, inputs = (
+            self.reopen_p0_qualification_prepared()
+        )
+        paths = {
+            pointer.path: pointer.file_sha256,
+            canonical_real_shot_validation_set_path(validation_set.content_hash): (
+                hashlib.sha256(_canonical_json_bytes(validation_set)).hexdigest()
+            ),
+            **{
+                canonical_execution_stack_identity_path(item.execution_stack_hash): (
+                    hashlib.sha256(_canonical_json_bytes(item)).hexdigest()
+                )
+                for item in stacks
+            },
+            **{
+                canonical_continuity_transition_policy_path(item.policy_hash): (
+                    hashlib.sha256(_canonical_json_bytes(item)).hexdigest()
+                )
+                for item in policies
+            },
+            **{
+                canonical_p0_qualification_input_path(
+                    item.input_kind, item.content_hash
+                ): hashlib.sha256(_canonical_json_bytes(item)).hexdigest()
+                for item in inputs
+            },
+        }
+        if receipt.content_hash != pointer.content_hash:
+            raise _state_invalid("P0 qualification recovery pointer is inconsistent.")
+        return tuple(
+            RecoveryItem(
+                path=path,
+                disposition=RecoveryDisposition.ACTIVE,
+                sha256=self._require_recovery_file_hash(
+                    self._project_root / path, expected_hash
+                ),
+            )
+            for path, expected_hash in sorted(paths.items())
+        )
+
     def _p6_active_recovery_items(
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
         if (
-            manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}
+            manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
             or manifest.active_qa_policy is None
         ):
             return ()
@@ -326,7 +379,7 @@ class _StateCommitRecoveryMixin:
             return "legacy"
         if (
             manifest.schema_version
-            not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}
+            not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
             or attempt.candidate_dependency_graph is None
             or attempt.candidate_dependency_states_hash is None
         ):

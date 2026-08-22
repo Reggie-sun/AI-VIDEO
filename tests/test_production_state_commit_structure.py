@@ -207,6 +207,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         owner.__name__ for owner in facade.ProductionStateCommitter.__mro__[1:-1]
     ) == (
         "_StateCommitBootstrapMixin",
+        "_StateCommitP0QualificationMixin",
         "_StateCommitVideoMixin",
         "_StateCommitVideoCandidateMixin",
         "_StateCommitVideoActivationMixin",

@@ -42,6 +42,12 @@ from ai_video.production.paths import (
     canonical_dependency_graph_snapshot_path,
     canonical_render_attempt_root,
 )
+from ai_video.production.video_execution_stack import GenerationExecutionStackIdentity
+from ai_video.production.video_transition import (
+    ContinuityTransitionPolicy, P0QualificationInput,
+    P0QualificationPreparedReceipt,
+    RealShotValidationSet,
+)
 from ai_video.production.project import load_production_project_candidate
 
 from ._state_commit_common import (
@@ -277,9 +283,72 @@ class _StateCommitRecoveryFsMixin:
             items.setdefault(item.path, item)
         for item in self._p6_orphan_items(manifest):
             items.setdefault(item.path, item)
+        for item in self._p0_orphan_items(manifest):
+            items.setdefault(item.path, item)
         for item in self._paid_provider_orphan_items(manifest):
             items.setdefault(item.path, item)
         return tuple(items[path] for path in sorted(items))
+
+    def _p0_orphan_items(self, manifest: ProductionManifest) -> tuple[RecoveryItem, ...]:
+        active = {item.path for item in self._p0_active_recovery_items(manifest)}
+        namespaces = (
+            (
+                self._project_root / "state/video-qualification/execution-stacks",
+                re.compile(r"^(?P<hash>[0-9a-f]{64})\.json$"),
+                GenerationExecutionStackIdentity,
+                "execution_stack_hash",
+            ),
+            (
+                self._project_root / "state/video-qualification/transition-policies",
+                re.compile(r"^(?P<hash>[0-9a-f]{64})\.json$"),
+                ContinuityTransitionPolicy,
+                "policy_hash",
+            ),
+            (
+                self._project_root / "state/video-qualification/validation-sets",
+                re.compile(r"^(?P<hash>[0-9a-f]{64})\.json$"),
+                RealShotValidationSet,
+                "content_hash",
+            ),
+            (
+                self._project_root / "state/video-qualification/prepared-receipts",
+                re.compile(r"^(?P<hash>[0-9a-f]{64})\.json$"),
+                P0QualificationPreparedReceipt,
+                "content_hash",
+            ),
+            (
+                self._project_root / "state/video-qualification/inputs",
+                re.compile(
+                    r"^(?:inventory|calibration_fixture|rubric|effect_budget|human_freeze)\."
+                    r"(?P<hash>[0-9a-f]{64})\.json$"
+                ),
+                P0QualificationInput,
+                "content_hash",
+            ),
+        )
+        items: list[RecoveryItem] = []
+        for directory, pattern, model_type, identity_field in namespaces:
+            for path, match in self._recovery_namespace_entries(directory, pattern):
+                relative = path.relative_to(self._project_root)
+                if relative in active:
+                    continue
+                try:
+                    snapshot = _read_regular_file_nofollow(
+                        path, contained_by=self._project_root / "state"
+                    )
+                    model = model_type.model_validate_json(snapshot.data)
+                    if getattr(model, identity_field) != match.group("hash"):
+                        continue
+                except (OSError, ValidationError, ValueError):
+                    continue
+                items.append(
+                    RecoveryItem(
+                        path=relative,
+                        disposition=RecoveryDisposition.ORPHAN_PRESERVED,
+                        sha256=snapshot.file_sha256,
+                    )
+                )
+        return tuple(items)
 
     def _paid_provider_orphan_items(
         self, manifest: ProductionManifest

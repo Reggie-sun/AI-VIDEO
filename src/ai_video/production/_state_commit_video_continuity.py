@@ -67,14 +67,14 @@ def checkpoint_generated_shot_continuity(
     if evaluation_state is None:
         create_intent = getattr(continuity_reviewer, "create_intent", None)
         if (
-            manifest.schema_version != "2.10"
+            manifest.schema_version not in {"2.10", "2.11"}
             or continuity_reviewer is None
             or create_intent is None
             or continuity_policy_content_hash is None
             or not continuity_authorities
         ):
             raise _state_invalid(
-                "Continuity evaluation requires Manifest 2.10 and a durable evaluator intent."
+                "Continuity evaluation requires Manifest 2.10 or later and a durable evaluator intent."
             )
         intent = create_intent(request, measured, continuity_policy_content_hash)
         binding = request.continuity_binding

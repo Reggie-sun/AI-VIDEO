@@ -221,6 +221,7 @@ from ._state_commit_paid_provider import (
     PaidProviderAuthorizer,
     _StateCommitPaidProviderMixin,
 )
+from ._state_commit_p0_qualification import _StateCommitP0QualificationMixin
 from ._state_commit_repair import _StateCommitRepairMixin
 from ._state_commit_render_lifecycle import _StateCommitRenderLifecycleMixin
 from ._state_commit_render_support import _StateCommitRenderSupportMixin
@@ -256,6 +257,7 @@ except ImportError:  # pragma: no cover - exercised through platform injection
 
 class ProductionStateCommitter(
     _StateCommitBootstrapMixin,
+    _StateCommitP0QualificationMixin,
     _StateCommitVideoMixin,
     _StateCommitVideoCandidateMixin,
     _StateCommitVideoActivationMixin,

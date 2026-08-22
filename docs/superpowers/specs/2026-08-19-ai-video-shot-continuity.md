@@ -102,7 +102,8 @@ Provider-specific payload、model naming、duration/resolution 限制不得进�
   exact references并过普通QA，只有显式`SUBSTANTIAL_RESET`才允许近似自由Provider portability。
 - 不修改P8 provider contract，不把target Provider child、qualification或semantic capability写成已实现
   runtime truth。
-- 默认不增加 dependency、CLI、Manifest schema 或 artifact layout。
+- 除已批准的 P0 qualification-prepared persistence seam 外，不增加 dependency、CLI、Manifest schema 或
+  artifact layout；该 seam 只选择 immutable preparation evidence，不表达 winner、capability activation 或 verdict。
 - 不把三张静态图、prompt中的identity/camera描述、adapter可序列化字段、另一个mode的reference能力或多个capability的并集伪装成C4 motion continuity。
 - 不把historical reviewer verdict、SSIM、Provider success或fetched artifact重新解释为C4 acceptance。
 
@@ -309,6 +310,7 @@ GenerationExecutionStackIdentity
 ├── provider_kind / deployment identity
 ├── model_id
 ├── capability_id
+├── materialization_status        # unmaterialized | materialized
 ├── profile_hash
 ├── compiler_hash
 ├── workflow_hash                 # if applicable
@@ -319,13 +321,40 @@ GenerationExecutionStackIdentity
 └── execution_stack_hash
 ```
 
-不适用字段必须使用versioned canonical empty representation；secret、local path和credential不得进入hash。
+尚未物化的candidate必须使用`materialization_status=unmaterialized`，并将`profile_hash`、
+`compiler_hash`与`workflow_hash`统一记为`none`；这个identity只能封存P0 candidate contract，不得解释为
+executable stack。首次真实执行前必须绑定reopenable profile/compiler以及applicable workflow identity，
+更新为`materialized`并产生新`execution_stack_hash`，同时重新seal依赖该hash的policy与receipt。
+其他不适用字段必须使用versioned canonical empty representation；secret、local path和credential不得进入hash。
 Remote Provider无法暴露checkpoint等内部状态时，stack必须绑定可验证的deployment/model/profile/API contract，
 并把opaque service drift记录为qualification limitation，而不是伪造内部seal。
 
 `execution_stack_hash`必须进入resolved request、attempt intent、Provider provenance、qualification与replay
 validation。Checkpoint、LoRA、artifact、compiler、workflow、sampler/scheduler、plugin/runtime或output
 contract任一有效identity变化都产生新stack；“仍是同一个Provider”不得绕过该变化。
+
+### P0 Qualification-Prepared Persistence
+
+P0 使用 Manifest `2.11` 的单一 optional `active_p0_qualification_prepared` pointer 选择一份 immutable、
+content-addressed preparation bundle。Bundle 只允许包含 exact Project/Registry pointers、两个有序 candidate
+stack identities、`ContinuityTransitionPolicy` 集合、`RealShotValidationSet`、inventory、calibration fixture、
+rubric、effect budget、human freeze evidence 与明确 limitations。`ProductionStateCommitter` 是唯一 writer；
+exact replay 必须 zero-write，recovery 必须 reopen 全部 selected artifacts，Project 或 Registry identity 变化必须
+使 selected pointer 失效。
+
+Calibration fixture 必须封存 source image geometry 与 model-facing tensor contract。当前 Local T8 P0 fixture
+固定 exact `7:4` source、`1344x768` canvas、32-pixel dimension multiple、`BHWC [1,768,1344,3]`、normalized
+float image tensor与确定性等比 resize semantics；source 与 target aspect ratio 不一致时 fail closed，不得隐式
+拉伸或裁切后继续。该 contract 只证明输入可确定性表达，不证明模型输出质量。
+
+H3 prompt必须使用 current OpenVideo/H3 three-field grammar：conditioning instruction（存在 first/last/reference/
+reference-video 时）、`integrated_multimodal_description`、`overall_soundscape` 与
+`non_diegetic_music`。画面字段必须 style-first，并明确 camera type/amplitude/speed与可见动作；prompt不得替代
+任何 exact anchor binding，也不得只用抽象氛围词声称 continuity。
+
+GPT Image 2 MCP/browser output 通过独立 `AutomatedBrowserImageImportReceipt` 记录 automation actor、human approval
+actor、exact PNG bytes/dimensions、timestamps 与 prompt fingerprint；未知 backend model/request ID 必须保持
+`None`，不得复用 `HumanImageImportReceipt` 或持久化 signed source URL。
 
 ### Boundary Kinds and Provider Affinity
 
@@ -861,13 +890,13 @@ effects。若未使用automatic evidence，完整human/P6 evidence可按同一ac
 
 - C4 provider-neutral contract、Router grammar与canonical lifecycle owners视为本实现slice的unchanged
   contract；只有concrete child接入测试证明真实缺口时，才允许最小core修正。
-- `GenerationExecutionStackIdentity`、`ProviderTransitionQualification`与`TransitionAttemptEvidence`的exact
-  persisted schema/layout尚未决定。Implementation plan必须先证明它们能复用现有immutable evidence与
-  Manifest pointer patterns；若需要Manifest/artifact layout migration，必须单独通过对应Decision Gate。
-- `ContinuityTransitionPolicy`当前冻结的是logical contract；exact persisted schema/layout尚未决定。实现必须
-  首先证明可由现有approved Shot/sequence intent、ResolvedTimeline identity与immutable evidence seam表达。
-  若需要Project、Manifest或artifact migration，必须另过Decision Gate。实现不得把`SCENE_BOUNDARY`硬编码成
-  `SUBSTANTIAL_RESET`，也不得在policy缺失时由Router或adapter猜测carryover dimensions。
+- P0 已通过单独 Decision Gate，采用 Manifest `2.11` + immutable evidence layout 持久化
+  `GenerationExecutionStackIdentity`、P0 `ContinuityTransitionPolicy`、`RealShotValidationSet` 与
+  qualification-prepared receipt。`ProviderTransitionQualification`、`TransitionAttemptEvidence` 及它们的
+  active routing/persistence仍未决定，也未获 P0 receipt 授权。
+- `ContinuityTransitionPolicy`的 P0 logical/persistence contract已冻结；Router applicability、ResolvedTimeline
+  boundary binding与普通 Production attempt integration仍待后续 milestones。实现不得把`SCENE_BOUNDARY`
+  硬编码成`SUBSTANTIAL_RESET`，也不得在policy缺失时由Router或adapter猜测carryover dimensions。
 - 任一Provider的frame/reference cross-mode union只有formal exact model/profile evidence或bounded live
   proof才能进入active capability；serializer field coexistence或一次2xx不能改变grade。
 - Boundary、identity与motion的numerical thresholds、fixture和human rubric必须在live smoke前由

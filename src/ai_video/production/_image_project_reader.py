@@ -24,9 +24,13 @@ from ai_video.production.image import (
     validate_image_result,
 )
 from ai_video.production.image_import import (
+    AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL,
     HUMAN_IMAGE_IMPORT_TOOL,
+    AutomatedBrowserImageImportReceipt,
     HumanImageImportReceipt,
+    automated_browser_image_import_asset,
     human_image_import_asset,
+    validate_automated_browser_image_import,
     validate_human_image_import,
 )
 from ai_video.production.models import (
@@ -48,6 +52,7 @@ from ai_video.production.models import (
 )
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
+    canonical_automated_browser_image_import_receipt_path,
     canonical_dependency_graph_snapshot_path,
     canonical_image_asset_path,
     canonical_image_authorization_path,
@@ -859,7 +864,7 @@ def verify_hard_cut_keyframe_evidence(
 
 
 def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
-    if bundle.manifest.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10"}:
+    if bundle.manifest.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
         return
     attempts = tuple(
         item
@@ -939,23 +944,39 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
             for item in bundle.registry.assets
             if item.source_kind is AssetSourceKind.IMPORTED
             and item.asset_type is AssetType.IMAGE
-            and item.tool == HUMAN_IMAGE_IMPORT_TOOL
+            and item.tool
+            in {HUMAN_IMAGE_IMPORT_TOOL, AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL}
         )
         for asset in imported:
-            receipt_path = canonical_human_image_import_receipt_path(
-                asset.creation_receipt_id
+            automated = asset.tool == AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL
+            receipt_path = (
+                canonical_automated_browser_image_import_receipt_path(
+                    asset.creation_receipt_id
+                )
+                if automated
+                else canonical_human_image_import_receipt_path(
+                    asset.creation_receipt_id
+                )
             )
             receipt_value, _ = _read_canonical_json(
-                bundle.root, receipt_path, label="human image import receipt"
+                bundle.root, receipt_path, label="image import receipt"
             )
-            receipt = HumanImageImportReceipt.model_validate(receipt_value)
             image = _read_regular_file_nofollow(
                 bundle.root / asset.artifact_path,
                 contained_by=bundle.root / "assets/files",
             )
-            validate_human_image_import(receipt, image.data)
-            if human_image_import_asset(receipt) != asset:
-                raise ValueError("selected human image import AssetRecord is inconsistent")
+            if automated:
+                receipt = AutomatedBrowserImageImportReceipt.model_validate(
+                    receipt_value
+                )
+                validate_automated_browser_image_import(receipt, image.data)
+                expected_asset = automated_browser_image_import_asset(receipt)
+            else:
+                receipt = HumanImageImportReceipt.model_validate(receipt_value)
+                validate_human_image_import(receipt, image.data)
+                expected_asset = human_image_import_asset(receipt)
+            if expected_asset != asset:
+                raise ValueError("selected image import AssetRecord is inconsistent")
             if receipt.target_kind == "character_master":
                 targets = tuple(
                     item

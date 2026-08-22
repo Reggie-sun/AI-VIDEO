@@ -183,6 +183,56 @@ def canonical_human_image_import_receipt_path(content_hash: str) -> Path:
     )
 
 
+def canonical_automated_browser_image_import_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/images/automated-browser-import-receipts/"
+        f"{_require_sha256(content_hash, 'automated browser image import receipt hash')}.json"
+    )
+
+
+def canonical_execution_stack_identity_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-qualification/execution-stacks/"
+        f"{_require_sha256(content_hash, 'execution stack identity hash')}.json"
+    )
+
+
+def canonical_continuity_transition_policy_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-qualification/transition-policies/"
+        f"{_require_sha256(content_hash, 'continuity transition policy hash')}.json"
+    )
+
+
+def canonical_real_shot_validation_set_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-qualification/validation-sets/"
+        f"{_require_sha256(content_hash, 'real Shot validation set hash')}.json"
+    )
+
+
+def canonical_p0_qualification_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-qualification/prepared-receipts/"
+        f"{_require_sha256(content_hash, 'P0 qualification prepared receipt hash')}.json"
+    )
+
+
+def canonical_p0_qualification_input_path(kind: str, content_hash: str) -> Path:
+    if kind not in {
+        "inventory",
+        "calibration_fixture",
+        "rubric",
+        "effect_budget",
+        "human_freeze",
+    }:
+        raise ValueError("P0 qualification input kind is unsupported")
+    return Path(
+        "state/video-qualification/inputs/"
+        f"{kind}.{_require_sha256(content_hash, 'P0 qualification input hash')}.json"
+    )
+
+
 def canonical_paid_provider_budget_path(content_hash: str) -> Path:
     return Path(
         "state/paid-provider/budgets/"
