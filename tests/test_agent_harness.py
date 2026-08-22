@@ -429,7 +429,9 @@ def test_continuity_evaluator_routes_to_review_and_video_provider_suites() -> No
 
     for path in (
         "src/ai_video/production/continuity_evaluator.py",
+        "src/ai_video/production/local_continuity_reviewer.py",
         "tests/test_production_continuity_evaluator.py",
+        "tests/test_production_local_continuity_reviewer.py",
     ):
         report = agent_harness.inspect_paths([path], policy)
         assert set(report["categories"]) == {
@@ -441,10 +443,9 @@ def test_continuity_evaluator_routes_to_review_and_video_provider_suites() -> No
         assert "task_architecture_gate" in report["check_ids"]
 
     for check_id in ("production_review_tests", "production_video_provider_tests"):
-        assert (
-            "tests/test_production_continuity_evaluator.py"
-            in policy["checks"][check_id]["argv"]
-        )
+        argv = policy["checks"][check_id]["argv"]
+        assert "tests/test_production_continuity_evaluator.py" in argv
+        assert "tests/test_production_local_continuity_reviewer.py" in argv
 
 
 def test_minimax_adapters_route_to_video_provider_suite() -> None:
