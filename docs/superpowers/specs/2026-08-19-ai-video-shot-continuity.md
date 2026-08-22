@@ -758,6 +758,90 @@ frame-integrity和side-by-side artifacts。具体PSNR/SSIM、resolution、frame 
 runtime baseline或exact record，不在本normative spec固化；任何该类evidence都只满足technical
 live-local proof，不能替代blinded human rubric或宣称subjective quality accepted。
 
+### Single-Provider 30-Second Six-Shot Baseline
+
+跨Provider试验前必须先完成一条single-Provider/model baseline。该baseline只回答：在允许正常
+hard cut的前提下，一个exact generation stack能否产出一条用户真正愿意保留的30秒作品。
+它不测试跨Provider，也不用跨Provider失败解释单模型质量问题。
+
+执行前必须一次性冻结下列experiment contract，生成后不得临时降低门槛：
+
+| Frozen surface | Contract |
+| --- | --- |
+| Provider/model/checkpoint/profile | 六个Shots使用同一exact identity；profile同时封存applicable runtime/plugin/workflow identity |
+| Canonical reference | 一张approved canonical character reference，六个Shots全部复用exact bytes/hash |
+| Prompt | 本节global contract + 每个Shot的frozen H3 three-field prompt |
+| Shot contract | 固定Shot order、shot type、boundary/policy、动作、camera language与endpoint intent |
+| Seed | 首轮六个Shots共用exact seed `20260823`；不得生成后挑seed替换 |
+| Resolution/timing | `1344x768`、`24 fps`、每镜原生`124 frames`；final timeline每镜取前`120 frames`，总计`720 frames = 30.000s` |
+| Sampling | 冻结selected profile的exact sampler/scheduler/steps/quant与conditioning settings；Provider不暴露的字段记为canonical `not_exposed` |
+| Rubric | 冻结本节PASS/FAIL rubric及“不允许临时降低门槛”；不使用平均分掩盖任一hard-gate failure |
+
+Model-native `124 frames @ 24 fps` 等于约`5.167s`，不得伪称为exact 5-second generation。
+`ResolvedTimeline`仍是source trim与final duration的唯一owner；continuity terminal evidence必须使用
+timeline实际选中的frame 119，不得使用被trim掉的frame 120–123。
+
+Global continuity contract固定为：
+
+```text
+Character:
+A 25-year-old East Asian woman with a short straight black bob haircut,
+oval face, natural makeup, wearing a beige trench coat over a white shirt,
+dark straight-leg trousers and white sneakers.
+She carries one distinctive small red leather satchel with a brass buckle.
+
+Visual style:
+cinematic realistic photography, natural skin texture, subtle filmic contrast,
+soft overcast daylight, realistic proportions, physically plausible motion,
+consistent wardrobe, consistent hairstyle, consistent facial identity,
+consistent red satchel.
+
+Camera language:
+natural live-action cinematography, restrained camera movement,
+realistic handheld or stabilized camera inertia,
+no exaggerated AI camera movement.
+
+Continuity rules:
+The woman's face, hairstyle, beige trench coat, white shirt, dark trousers,
+white sneakers and red satchel must remain unchanged.
+Preserve screen direction, body scale, lighting direction and spatial layout
+across adjacent shots unless explicitly changed.
+
+Avoid:
+identity drift, wardrobe changes, disappearing props, duplicated people,
+extra limbs, abrupt pose resets, teleportation, sudden camera acceleration,
+unmotivated zooms, style changes, text, subtitles, logos.
+```
+
+Baseline Shot order与canonical policy mapping固定为：
+
+| Shot | Type | Canonical boundary/policy | Primary test |
+| --- | --- | --- | --- |
+| S1 | `ESTABLISHING_WIDE` | opening Shot | single-Shot quality、full-body motion、screen direction、red satchel |
+| S2 | `MEDIUM_TRACKING` | `HARD_CUT + FULL_CONTINUITY` | S1 exit → S2 entrance motion handoff |
+| S3 | `INSERT_CLOSE_UP` | `HARD_CUT + IDENTITY_STYLE_CARRYOVER` with required prop/wardrobe dimensions | red satchel、hand anatomy、walking-to-stop settle |
+| S4 | `MEDIUM_CHARACTER_ACTION` | `HARD_CUT + FULL_CONTINUITY` | face、head rotation、medium-framing identity、slow push-in |
+| S5 | `CLOSE_UP_REACTION` | `HARD_CUT + IDENTITY_STYLE_CARRYOVER` with identity priority | facial identity gate、skin/hair/age stability |
+| S6 | `SCENE_BOUNDARY_WIDE` | `SCENE_BOUNDARY + IDENTITY_STYLE_CARRYOVER` | hall → platform scene carryover、identity/wardrobe/prop/style |
+
+`IDENTITY/PROP_CARRYOVER`与`IDENTITY_PRIORITY`是实验观察标签，不新增canonical obligation enum；
+runtime policy继续使用`IDENTITY_STYLE_CARRYOVER`，并在required dimensions中显式列出identity、
+wardrobe、prop、lighting与scene requirements。
+
+Baseline只有在下列全部成立时才能PASS：
+
+1. 六个Shot分别达到可保留的single-Shot画面与动作质量；
+2. S1、S2、S4、S5在原速观看时明确为同一角色，不像四个人；
+3. S1 → S2的screen direction、walking velocity、gait/action phase与camera inertia不出现明显断裂；
+4. red satchel的颜色、材质、尺寸、brass buckle与持有关系在所有可见Shots中稳定；
+5. S4转头与S5 close-up不改变face geometry、age、hair、makeup或skin tone；
+6. S6明确换到platform，但identity、wardrobe、prop、style与lighting family仍连续；
+7. 用raw hard cuts播放30秒final sequence时，用户明确回答“这是一条我愿意留下的作品”。
+
+任一hard gate明显失败或用户不愿保留成片，baseline即FAIL。失败后先归因single-stack/model/
+prompt/reference/Shot contract，不得启动跨Provider实验。只有baseline PASS后，才可从六个Shots中选择
+一个具有真实业务价值且明确为hard cut的boundary，建立一个directed pair实验；不建全矩阵。
+
 ### Acceptance Tiers
 
 1. `technical acceptance`：Fake/offline executable contracts、local artifact verification、replay/recovery/P5 tests 和 composition invariants 全部通过。
@@ -783,8 +867,9 @@ multi-provider claim。`C4_DESTINATION_READY`及其以上层级必须消费真�
 - 使用一个明确selected的`ProductionProject` revision及其中canonical Character、Scene、Shot artifacts；每个
   input必须来自exact Asset Registry revision、materialization/provenance receipt与approved Shot intent，不能
   用临时未登记图片、prompt-only角色描述或合成占位素材代替；
-- destination promotion至少生成3–4个叙事连续的真实Shots和至少2个continuity edges，固定同一canonical
-  主角与场景，并至少覆盖一个可见subject-motion handoff和一个camera-motion handoff；单个四锚点smoke不
+- destination promotion必须完成本spec固定的6-Shot / 30-second single-stack baseline，包含5个adjoining
+  edges、同一canonical主角、hall → platform换场，并覆盖subject motion、camera motion、prop、
+  hard-cut continuity与scene carryover；单个四锚点smoke不
   足以证明跨Shot累计稳定性；
 - 每个generation只使用一个exact selected `execution_stack_hash`、一次submit、no blind retry、
   no fallback；生成结果在P6/human acceptance前保持candidate/unactivated；
@@ -815,8 +900,9 @@ Completion与产品声明必须按以下层级报告，不能用较低层替代�
 
 1. `C4_CORE_READY`：provider-neutral binding/request/resolved/hash/Router exact grammar与negative tests通过。
 2. `C4_DESTINATION_READY`：一个exact destination child通过profile preflight、fake lifecycle、full
-   four-anchor local/live smoke、activation/reopen/replay，并对同一sealed snapshot完成3–4个canonical real
-   Shots、至少2个edges的原速Pilot、boundary/identity/motion和P6/human acceptance。
+   four-anchor local/live smoke、activation/reopen/replay，并对同一sealed snapshot完成本spec固定的
+   6-Shot / 30-second single-stack baseline、5个edges、raw hard-cut原速观感、boundary/identity/
+   motion/prop/scene-carryover和P6/human acceptance。
 3. `DIRECTED_TRANSITION_READY`：一个source/destination `execution_stack_hash` pair拥有fresh
    `ProviderTransitionQualification`，其real-Shot validation set覆盖声明的visible
    `HARD_CUT + FULL_CONTINUITY` content/risk envelope，且qualification seal后至少一个匹配的真实
@@ -847,7 +933,7 @@ Completion与产品声明必须按以下层级报告，不能用较低层替代�
 | Lifecycle | applicable permit、submit/status/fetch、unknown-outcome recovery、candidate activation、reopen与exact replay zero effects |
 | Four-anchor smoke | one request、one selected execution stack、one submit、no retry、no fallback，记录全部input/output/request/stack hashes |
 | Boundary policy | `WITHIN_CONTINUOUS_TAKE`跨stack zero-effect denial；hard-cut full continuity缺applicable qualification拒绝；scene carryover缺reference/QA拒绝；scene reset缺approved reset evidence拒绝 |
-| Real Shot Pilot | selected ProductionProject revision中的3–4个canonical Shots、至少2 edges、同一sealed snapshot、逐edge evidence与raw full-speed cumulative-drift review |
+| Real Shot Pilot | selected ProductionProject revision中的6个canonical Shots、5 edges、同一sealed snapshot、逐edge evidence与exact 30-second raw hard-cut full-speed review |
 | Boundary | decoded frame 0与terminal frame分别对比native first/last；报告measurement，不把native role夸大为pixel identity |
 | Identity | first/middle/last windows检查face/subject、hair、clothes、props、body scale与multi-frame drift；不足时`NOT_EVALUATED` |
 | Motion | subject/camera direction与velocity、action phase、entrance/exit、unexpected stop/re-entry；单帧SSIM不得代替 |

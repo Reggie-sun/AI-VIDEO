@@ -57,7 +57,7 @@ destination。Adapter只解决
 - four-anchor technical smoke、decoded boundary、identity、motion 与 P6/human evidence；
 - `ContinuityTransitionPolicy` logical contract、boundary/obligation组合与zero-effect Router gates；
 - `GenerationExecutionStackIdentity` canonical hashing、resolved/provenance/replay binding与drift denial；
-- 真实`ProductionProject`中的3–4 Shot Pilot、逐edge evidence、raw full-speed sequence review与累计漂移验收；
+- 真实`ProductionProject`中的6 Shot / 30-second single-stack baseline、5个edges、逐edge evidence、raw hard-cut full-speed review与最终剪辑观感验收；
 - directed `ProviderTransitionQualification` persistence/applicability seam与per-edge
   `TransitionAttemptEvidence`；
 - Seedance 2.0 base/Fast/Mini 的 catalog、active inventory、profile、pricing、endpoint 与 response identity
@@ -191,7 +191,7 @@ winner；失败时不得自动切换 candidate。候选 identities 固定为：
 Technical smoke之外，promotion必须选择一个exact `ProductionProject` revision和其中canonical Character、
 Scene、Shot artifacts，冻结`RealShotValidationSet`：
 
-- 3–4个叙事连续Shots、至少2个continuity edges；固定同一canonical主角与场景；
+- 固定6个叙事连续Shots、5个continuity edges与exact 30-second final timeline；固定同一canonical主角、主要场景与一次hall → platform scene boundary；
 - 至少一个subject-motion handoff和一个camera-motion handoff；
 - 每个input来自exact Registry revision及provenance/materialization receipt；
 - 每个generation为one exact `execution_stack_hash`、one submit、no retry、no fallback；
@@ -281,7 +281,7 @@ Qualification回答“该stack pair在bounded class下是否有资格”；attem
 | Transition reuse | fresh validation evidence | bounded `ProviderTransitionQualification` |
 | Per-edge truth | exact Production attempt | independent `TransitionAttemptEvidence` + P6/human verdict |
 | Boundary policy | approved Shot/Timeline intent | continuous-take stack lock、carryover references、reset evidence均fail closed |
-| Real Shot verification | frozen project/revision/rubric | canonical 3–4 Shot Pilot、至少2 edges、raw full-speed累计漂移与P6 evidence |
+| Real Shot verification | frozen project/revision/rubric | canonical 6 Shot / 30-second single-stack baseline、5 edges、raw hard-cut full-speed观感与P6 evidence |
 
 ## Compatibility
 
@@ -440,7 +440,7 @@ Milestone 5形成一个task-only checkpoint，并通过focused tests、preflight
 | Lane | Allowed work | Snapshot rule |
 | --- | --- | --- |
 | Implementation I2 | Milestone 6 fake lifecycle、recovery、replay、P5与documentation preparation | 可在与selected stack components不重叠的files继续；若修改validation snapshot或stack payload中的任何bytes，必须产生新checkpoint并使旧Pilot不具备promotion资格 |
-| Validation V2 | Milestone 7先复核single boundary，再用selected ProductionProject中的3–4个canonical real Shots、至少2个continuity edges做single-stack raw full-speed Pilot | 全程固定commit/execution_stack_hash/RealShotValidationSet/policies/rubric；one submit per generation，no retry，no fallback；synthetic-only fixture不得promotion |
+| Validation V2 | Milestone 7先复核single boundary，再执行本spec固定的6 Shot / 30-second single-stack raw hard-cut baseline | 全程固定commit/execution_stack_hash/RealShotValidationSet/policies/rubric；one frozen seed，one submit per generation，no retry，no fallback；synthetic-only fixture不得promotion |
 
 Validation V2不得在I2尚未commit的working tree上运行，也不得把later code changes与earlier media receipts拼成
 同一acceptance bundle。
@@ -570,11 +570,13 @@ task_type        -> literal Hybrid
 
 ### Real Shot Validation Set
 
-Technical fixture之外，同时从一个selected `ProductionProject` revision冻结3–4个canonical narrative Shots，
-至少形成2个`FULL_CONTINUITY` edges。记录exact Character、Scene、Shot revisions、Registry/materialization
+Technical fixture之外，同时从一个selected `ProductionProject` revision冻结本spec定义的6个canonical
+narrative Shots与5个adjoining edges。记录exact Character、Scene、Shot revisions、Registry/materialization
 identities、每个edge的`ContinuityTransitionPolicy`、terminal/identity/endpoint/motion-tail来源、prompt、output
-geometry与predeclared rubric。Validation set必须固定同一主角与scene，并分别覆盖subject motion与camera
-motion；临时占位图、synthetic-only assets或prompt-only identity不能进入promotion set。
+geometry与predeclared rubric。Validation set必须固定同一主角、hall主场景与platform scene boundary，并
+覆盖single-Shot quality、multi-Shot identity、subject/camera motion、prop、hard-cut continuity、scene
+carryover与final edit watchability；临时占位图、synthetic-only assets或prompt-only identity不能进入
+promotion set。
 
 ### Exit Criteria
 
@@ -724,7 +726,7 @@ python -m pytest -p no:cacheprovider \
   tests/test_production_selective_rebuild.py -q
 ```
 
-## Milestone 7: Full Four-Anchor Local Acceptance
+## Milestone 7: Full Four-Anchor Local Acceptance And 30-Second Baseline
 
 本milestone属于Validation V2，可以与Milestone 6中不修改`validation_snapshot` bytes的work并行。
 
@@ -747,19 +749,126 @@ no fallback
 保存exact input SHA-256、Registry identities、request/resolved/fingerprint、`execution_stack_hash`、
 submit/status/fetch receipts、output/probe、decoded first/last frame hashes与replay counters。
 
-Single-boundary technical smoke通过后，使用同一sealed snapshot和Milestone 3冻结的
-`RealShotValidationSet`继续3–4 Shot single-stack Pilot：
+Single-boundary technical smoke通过后，使用同一sealed snapshot执行6 Shot / 30-second
+single-stack baseline。该baseline不得包含跨Provider；如果成片不值得保留，先归因selected model/
+checkpoint/profile、canonical reference、prompt、Shot contract或sampling，不得启动Milestone 8。
 
-- 所有Shots来自同一selected `ProductionProject` revision中的canonical Character/Scene/Shot artifacts；
-- 至少3个Shots与2个continuity edges，同一canonical character与scene，包含一次明显subject motion和一次
-  明显camera motion；
-- inputs全部来自exact Registry revision与provenance/materialization receipts，不接受临时未登记或
-  synthetic-only素材；
-- 每个generation各自one submit、no retry、no fallback；
-- 每个edge分别记录exact anchors、boundary/identity/motion evidence，不用平均分掩盖单edge失败；
-- 最终以raw cuts按full-speed sequence review累计identity、wardrobe、style、camera velocity、action phase与
-  空间叙事连续性；crossfade、optical flow、interpolation、retime或重构图只能出现在标明用途的derivative，
-  不得进入acceptance evidence。
+### Six-Shot Baseline Freeze
+
+在任何generation前一次性冻结：
+
+- 一个exact Provider/model/checkpoint/profile/execution stack，六个Shots全部共用；
+- 一张approved canonical character reference image，六个Shots复用exact bytes/hash；
+- global continuity contract与下列六个H3 three-field prompts；
+- exact seed `20260823`，六个Shots共用，不在看完结果后挑seed；
+- `1344x768`、`24 fps`、每镜model-native `124 frames`；
+- selected profile的exact sampler、scheduler、steps、quant、conditioning与output contract；
+- spec中的PASS/FAIL rubric与“不允许临时降低门槛”。
+
+每镜原生124帧约5.167秒。Final `ResolvedTimeline`对每镜使用frames 0–119，得到exact
+`120 frames / 5.000s`；六镜总计`720 frames / 30.000s`。每个adjoining edge的terminal evidence使用
+trim后的frame 119。
+
+### Frozen Shot Prompts
+
+六个prompts均继承spec中的global Character、Visual style、Camera language、Continuity rules与Avoid
+blocks。`<Picture 1>`在六个Shots中始终指向同一canonical reference image。
+
+#### Shot 1 — Establishing Wide
+
+```text
+For the target video, <Picture 1> is fully referenced for the exact character identity, hairstyle, wardrobe and red satchel.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic realistic photography. Wide establishing shot inside a modern quiet railway station concourse with modern concrete and glass architecture and soft overcast daylight entering through large windows. The same 25-year-old East Asian woman enters from frame left and walks naturally toward frame right, carrying the distinctive small red leather satchel with a brass buckle in her right hand. Her speed is calm and steady. Full-body framing. The camera is mostly static with a very subtle push forward, restrained inertia, natural walking gait and realistic cloth movement. End while she is still walking toward frame right, with her right leg moving forward and the satchel swinging naturally. Maintain exact identity, wardrobe, hairstyle, prop and lighting.
+overall_soundscape: Quiet railway-station ambience, soft room ventilation and distant restrained platform activity. Natural footsteps, cloth movement and the small leather satchel swing remain synchronized with her walk.
+non_diegetic_music: No non-diegetic music.
+```
+
+Primary checks：single-Shot quality、full-body motion、red satchel stability与explicit screen-right direction。
+
+#### Shot 2 — Medium Side Tracking
+
+Canonical policy：`HARD_CUT + FULL_CONTINUITY`。
+
+```text
+For the target video, <Picture 1> is fully referenced for the exact character identity, hairstyle, wardrobe and red satchel. Continue the action state established by Shot 1.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic realistic photography. Medium side-tracking shot of the same woman continuing the exact same walk toward frame right inside the same railway-station concourse. Preserve the same face, short straight black bob, beige trench coat, white shirt, dark trousers, white sneakers and red leather satchel. Continue naturally from the previous shot with the same screen direction, similar walking velocity and no pose reset. The camera tracks parallel at waist-to-chest height with smooth restrained stabilized motion. The satchel swings with her walking rhythm; architecture and daylight remain consistent. During the final second she begins slowing after noticing a departure information display ahead. No sudden camera acceleration.
+overall_soundscape: Continue the same quiet concourse ambience and acoustic space. Footsteps decelerate naturally; coat and satchel movement remain synchronized.
+non_diegetic_music: No non-diegetic music.
+```
+
+S1 exit → S2 entrance是baseline的primary motion handoff gate；screen direction、walking velocity、gait phase与camera
+inertia任一明显断裂即失败。
+
+#### Shot 3 — Insert / Prop Close-up
+
+Canonical policy：`HARD_CUT + IDENTITY_STYLE_CARRYOVER`，required dimensions包含wardrobe、prop、lighting与scene。
+
+```text
+For the target video, <Picture 1> is fully referenced for the exact wardrobe and distinctive red leather satchel identity.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic realistic photography. Close-up insert of the same woman's right hand gently lifting the same small red leather satchel with its distinctive brass buckle while she comes to a stop. The visible beige trench-coat sleeve matches the previous shots exactly. The camera focuses on the satchel and her hand with shallow but realistic depth of field; the same railway-station concourse remains softly recognizable. Her body motion settles naturally from walking into standing still. The satchel completes one final small swing and comes to rest. Preserve the satchel design, red color, leather material and brass buckle. No extra hands or fingers.
+overall_soundscape: The same concourse room tone continues. A final soft footstep, subtle coat movement and a small leather-and-buckle sound settle naturally.
+non_diegetic_music: No non-diegetic music.
+```
+
+该Shot故意降低motion continuity难度，主要验证prop continuity与可复用的低成本insert lane。
+
+#### Shot 4 — Medium Three-Quarter Character Action
+
+Canonical policy：`HARD_CUT + FULL_CONTINUITY`。
+
+```text
+For the target video, <Picture 1> is fully referenced for the exact character identity, hairstyle, wardrobe and red satchel. Continue from the standing state reached in Shot 3.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic realistic photography. Medium three-quarter frontal shot of the same woman standing in the same railway-station concourse after she has stopped walking. The same red satchel hangs naturally from her right hand. She briefly looks upward toward the departure board, then turns her eyes slightly toward frame right as if locating her platform. Preserve exact facial identity, hairstyle, clothing and body proportions. The camera performs a very slow subtle push-in. Facial and body movement remain natural and restrained, with no dramatic expression. Preserve the same soft daylight, scene geometry and cinematic realism. Her face must not change as she turns her head.
+overall_soundscape: Stable concourse ambience continues with subtle breathing, quiet fabric movement and distant restrained station activity.
+non_diegetic_music: No non-diegetic music.
+```
+
+Primary checks：face consistency、head-rotation stability、medium-framing identity与restrained camera motion。
+
+#### Shot 5 — Character Close-up
+
+Canonical policy：`HARD_CUT + IDENTITY_STYLE_CARRYOVER`，required dimensions将identity设为hard priority。
+
+```text
+For the target video, <Picture 1> is fully referenced for the exact facial identity, short straight black bob haircut, natural makeup and skin tone.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic realistic photography. Natural close-up of the same woman's face in the same railway station. She calmly looks toward frame right after finding her platform, then gives a very subtle relaxed expression. Preserve the exact same oval facial structure, eyes, nose, mouth, short straight black bob and natural makeup from all previous shots. Soft station daylight falls from the same direction; the same concourse remains softly out of focus. The camera performs a very slow controlled push-in with minimal natural breathing and micro head movement. Do not beautify or redesign the face. Do not change age, facial proportions, hairstyle, makeup or skin tone. No sudden expression change.
+overall_soundscape: Quiet station ambience remains continuous and restrained, with subtle natural breathing and no emphasized foreground effect.
+non_diegetic_music: No non-diegetic music.
+```
+
+S1、S2、S4、S5若在原速播放时像四个人，identity gate直接失败。
+
+#### Shot 6 — Scene Boundary / Final Wide
+
+Canonical policy：`SCENE_BOUNDARY + IDENTITY_STYLE_CARRYOVER`。
+
+```text
+For the target video, <Picture 1> is fully referenced for the exact character identity, hairstyle, wardrobe and red satchel across the scene change.
+
+integrated_multimodal_description: [Shot 1] Live-action, cinematic realistic photography. Wide shot on the railway platform moments later. The exact same woman enters from frame left and walks slowly toward frame right, still wearing the same beige trench coat, white shirt, dark trousers and white sneakers and carrying the exact same red leather satchel. This is clearly a new area of the same railway station; its architectural style and soft overcast daylight remain visually related. A train is visible in the background but remains secondary. She takes several natural steps toward frame right, stops and looks down the platform. The camera remains mostly static with subtle natural cinematic movement. Preserve exact character identity, wardrobe, prop and visual style. End on a composed wide frame suitable as the final shot.
+overall_soundscape: Platform ambience replaces the enclosed concourse room tone while retaining the same restrained realism. Distant train and platform sounds remain secondary; footsteps and clothing movement stay physically synchronized.
+non_diegetic_music: No non-diegetic music.
+```
+
+Scene boundary不重置identity、wardrobe、prop或style。Hall → platform换场成立，但任一required
+carryover dimension明显改变即失败。
+
+### Baseline Assembly And Verdict
+
+Final sequence固定为`S1 → S2 → S3 → S4 → S5 → S6`，仅使用raw hard cuts。不使用
+crossfade、optical flow、interpolation、retime或重构图隐藏生成问题。每个Shot与每个edge分判后，
+必须原速播放exact 30.000-second final sequence，并记录用户对“这是否是一条真正愿意留下的
+作品”的明确答案。
+
+任一single-Shot quality、multi-Shot identity、motion continuity、prop continuity、hard-cut continuity、
+scene carryover或final-edit watchability hard gate失败，baseline即FAIL，不临时改阈值、换seed或换更容易
+Shot。只有baseline PASS后，才进入Milestone 8，并且只从这六个Shots中挑选一个真实有业务价值的
+hard-cut boundary建立一个directed pair，不建全矩阵。
 
 ### Quality Gates
 
@@ -955,8 +1064,9 @@ Harness不执行Provider、paid call、media generation或P6；receipt只能证�
 ### `C4_DESTINATION_READY`
 
 - 一个winner-specific Local T8 child完成stack/profile preflight、fake lifecycle、full four-anchor local smoke、
-  selected ProductionProject中的3–4个canonical real Shots、至少2 edges的raw full-speed single-stack Pilot、
-  activation/reopen/replay、boundary/identity/motion与P6/human acceptance；
+  selected ProductionProject中的6个canonical real Shots、5 edges的exact 30-second raw hard-cut single-stack
+  baseline、activation/reopen/replay、boundary/identity/motion/prop/scene-carryover/final-edit与P6/human
+  acceptance；
 - Implementation与Validation evidence绑定same/byte-identical sealed snapshot，Join Gate J2关闭。
 
 ### `DIRECTED_TRANSITION_READY`
@@ -997,7 +1107,7 @@ boundary-aware Provider portability”。
 | P5 | four exact inputs的precise closure；unrelated assets保持fresh |
 | Local live | one request、one submit、no retry、no fallback，全部input/output hashes |
 | Boundary policy | continuous-take stack lock；unqualified hard-cut denial；scene carryover reference/QA denial；scene reset evidence/tamper denial |
-| Real Shot Pilot | selected ProductionProject的3–4 canonical Shots、至少2 edges、same snapshot、raw cuts、逐edge evidence与full-speed cumulative drift review |
+| Real Shot Pilot | selected ProductionProject的6 canonical Shots、5 edges、same snapshot、exact 30-second raw hard cuts、逐edge evidence与full-speed final-edit review |
 | Boundary | decoded frame 0/terminal evidence，native role与pixel equality分开 |
 | Identity | multi-window subject/appearance/drift；不足为`NOT_EVALUATED` |
 | Motion | direction、velocity、phase、entrance/exit、stop/re-entry |
@@ -1033,7 +1143,7 @@ freeze inventory + RealShotValidationSet + policies + unmaterialized stack paylo
           |                     |
 Implementation I2          Validation V2
 Milestone 6               Milestone 7
-lifecycle/replay/P5       3-4 real Shot Pilot + P6
+lifecycle/replay/P5       6-Shot / 30s baseline + P6
           |                     |
           +----------+----------+
                      |
@@ -1080,7 +1190,7 @@ ownership或顺序。
 - `GenerationExecutionStackIdentity`贯穿resolve、intent、provenance、qualification、attempt与replay；
 - boundary kind与continuity obligation分离，continuous-take lock、scene carryover与substantial-reset gates均有
   executable zero-effect tests；
-- Local T8一个winner-specific C4 destination通过canonical 3–4 real Shot Pilot并达到
+- Local T8一个winner-specific C4 destination通过canonical 6-Shot / 30-second single-stack baseline并达到
   `C4_DESTINATION_READY`；
 - 至少一个source/destination stack pair完成bounded real-Shot qualification，并由一个matching Production
   edge的`TransitionAttemptEvidence`达到`DIRECTED_TRANSITION_READY`；
