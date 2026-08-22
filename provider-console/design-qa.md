@@ -37,6 +37,18 @@
 - 所有 interactive controls 保留 visible focus；motion 遵守 `prefers-reduced-motion`。
 - registered image/video 有 accessible name；原生 video controls 可键盘访问。
 
+## Mode-Specific Input QA — 2026-08-22
+
+- Visual source：用户提供的 `Provider Console` 原图；本轮以同一深色三栏 anatomy、compact density、violet selection 与 green verified state 为视觉 truth。
+- Browser states：在真实 `runs/` 上分别检查 `T2V`、`I2V` 与 `FL2V`。T2V 显示 sealed prompt 和 text-only 说明；I2V 显示 prompt 与首帧；FL2V 显示 prompt、首帧、尾帧和 registered output。
+- R2V：当前 `runs/` catalog 没有可用于浏览器检查的 R2V workspace；projection contract 由 parameterized executable test 覆盖，不伪造 browser fixture。
+- Full-view comparison：将用户原图与 `/tmp/provider-console-mode-input-fl2v-responsive-final.png` 放入同一视觉比较输入；三栏 hierarchy、typography scale、border density、colors、CTA placement 和中文 copy 保持一致。
+- Focused input region：mode badge、raw mode、scrollable prompt、role-labeled binding cards 和 output card 均位于记录链 step 3；没有新增平行 panel 或假 Provider lane。
+- Responsive：`1180 × 820` 下 `documentScrollWidth = documentClientWidth = 1180`，console `scrollWidth = clientWidth = 858`；修复 header status 在窄列溢入更新时间的问题。
+- Console / network：0 条 console error；observed requests 仅为本机 Vite、`/api/runs*` 和 browser `data:` media controls，无 external request 或 Provider call。
+- Evidence boundary：selected detail 显示 sealed prompt；effective negative prompt、Provider raw response、signed URL、secret、absolute path 与 raw error 不进入 Browser projection。
+- Screenshots：`/tmp/provider-console-mode-input-t2v.png`、`/tmp/provider-console-mode-input-i2v.png`、`/tmp/provider-console-mode-input-fl2v.png`、`/tmp/provider-console-mode-input-fl2v-responsive-final.png`。
+
 ## Remaining P3 Polish
 
 - 极长 evidence hashes 在窄右栏按字符换行，信息完整但视觉密度较高。

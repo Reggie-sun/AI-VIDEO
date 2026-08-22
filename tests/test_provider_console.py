@@ -235,7 +235,8 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
         image_bindings=(binding,), continuity_binding=None, activation_scope=_ns(request=original_request),
         generation_id="generation-1", request_input_hash=ZERO, resolved_generation_hash=ONE,
         desired_generation_fingerprint=ONE, output_asset_id="video-output",
-        prompt_text="DO NOT LEAK PROMPT", effective_negative_prompt_text="DO NOT LEAK NEGATIVE",
+        prompt_text="Alice walks into the cafe.",
+        effective_negative_prompt_text="DO NOT LEAK NEGATIVE",
         provider_task_binding=_ns(provider_task_id="signed-url-secret"),
     )
     calls: list[object] = []
@@ -257,6 +258,13 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
     }
     assert result["attempts"][0]["provider"]["name"] == "comfy-local-h3"
     assert result["attempts"][0]["target_shot_id"] == "shot-12"
+    assert result["attempts"][0]["mode"] == "image_to_video"
+    assert result["attempts"][0]["generation_type"] == "I2V"
+    assert result["attempts"][0]["prompt_text"] == "Alice walks into the cafe."
+    assert [item["role"] for item in result["attempts"][0]["input_bindings"]] == [
+        "first_frame"
+    ]
+    assert result["attempts"][0]["input_bindings"][0]["media"]["token"]
     assert result["attempts"][0]["first_frame_media"]["token"]
     assert result["attempts"][0]["candidate_media"]["token"]
     assert [item["asset_id"] for item in result["workspace_media"]] == [
@@ -273,9 +281,174 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
     }
     serialized_public = json.dumps({key: value for key, value in result.items() if key != "_media"})
     assert str(tmp_path) not in serialized_public
-    assert "DO NOT LEAK" not in serialized_public
+    assert "DO NOT LEAK NEGATIVE" not in serialized_public
     assert "signed-url-secret" not in serialized_public
     assert "raw secret error" not in serialized_public
+
+
+@pytest.mark.parametrize(
+    ("mode", "roles", "media_roles", "expected_generation_type"),
+    [
+        ("text_to_video", (), (), "T2V"),
+        ("image_to_video", ("first_frame",), (), "I2V"),
+        ("image_to_video", ("first_frame", "last_frame"), (), "FL2V"),
+        (
+            "reference_to_video",
+            ("reference",),
+            (("video", "reference_video"),),
+            "R2V",
+        ),
+    ],
+)
+def test_production_detail_projects_mode_specific_prompt_and_image_inputs(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+    roles: tuple[str, ...],
+    media_roles: tuple[tuple[str, str], ...],
+    expected_generation_type: str,
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, f"mode-{expected_generation_type.lower()}")
+    assets = []
+    asset_paths = {}
+    bindings = []
+    media_bindings = []
+    for index, role in enumerate(roles):
+        asset_id = f"{role}-{index}"
+        payload = f"{role}-{index}".encode()
+        asset_path = _write(project_path.parent / "assets" / f"{asset_id}.png", payload)
+        assets.append(
+            _ns(
+                asset_id=asset_id,
+                asset_type=_ns(value="image"),
+                mime_type="image/png",
+                size_bytes=len(payload),
+                width=1280,
+                height=720,
+                duration_seconds=None,
+                video_metadata=None,
+                sha256=f"{index + 2:064x}",
+                egress=_ns(remote=False),
+            )
+        )
+        asset_paths[asset_id] = asset_path
+        bindings.append(_ns(role=role, asset_id=asset_id, mime_type="image/png"))
+    for index, (kind, role) in enumerate(media_roles, start=len(roles)):
+        asset_id = f"{role}-{index}"
+        payload = f"{role}-{index}".encode()
+        asset_path = _write(project_path.parent / "assets" / f"{asset_id}.mp4", payload)
+        assets.append(
+            _ns(
+                asset_id=asset_id,
+                asset_type=_ns(value="video"),
+                mime_type="video/mp4",
+                size_bytes=len(payload),
+                width=1280,
+                height=720,
+                duration_seconds=5,
+                video_metadata=_ns(
+                    frame_count=120,
+                    fps_numerator=24,
+                    fps_denominator=1,
+                ),
+                sha256=f"{index + 2:064x}",
+                egress=_ns(remote=False),
+            )
+        )
+        asset_paths[asset_id] = asset_path
+        media_bindings.append(
+            _ns(kind=kind, role=role, asset_id=asset_id, mime_type="video/mp4")
+        )
+    state = _ns(
+        request=_ns(path=Path("state/video-generation/requests/request.json")),
+        phase=_ns(value="submit_intent"),
+        generation_id=f"generation-{expected_generation_type.lower()}",
+        candidate_video_asset_ids=(),
+    )
+    attempt = _ns(
+        attempt_id=f"attempt-{expected_generation_type.lower()}",
+        operation="video_generation",
+        status=_ns(value="running"),
+        started_at="2026-08-22T01:00:00+00:00",
+        finished_at=None,
+        video_generation_state=state,
+    )
+    loaded = _ns(
+        root=project_path.parent,
+        project=_ns(
+            project_id=f"mode-{expected_generation_type.lower()}",
+            title=f"Mode {expected_generation_type}",
+            revision=1,
+            content_hash=ZERO,
+        ),
+        manifest=_ns(schema_version="2.8", manifest_revision=1, attempts=(attempt,)),
+        shots=(_ns(shot_id="shot-mode"),),
+        registry=_ns(assets=tuple(assets)),
+        asset_paths=asset_paths,
+    )
+    request = _ns(
+        provider_name="provider-mode-test",
+        provider_kind="provider-mode-test",
+        model_id="model-mode-test",
+        provider_profile=_ns(
+            profile_id="profile-mode-test",
+            profile_version="v1",
+            profile_sha256=ZERO,
+        ),
+        capability_id="capability-mode-test",
+        execution_kind=_ns(value="local"),
+        billing_kind=_ns(value="local_unmetered"),
+        mode=_ns(value=mode),
+        prompt_text=f"Prompt for {expected_generation_type}",
+        image_bindings=tuple(bindings),
+        media_bindings=tuple(media_bindings),
+        effective_output=_ns(
+            model_dump=lambda **_: {
+                "duration_seconds": 5,
+                "width": 1280,
+                "height": 720,
+                "container": "mp4",
+                "mime_type": "video/mp4",
+                "native_audio": False,
+            }
+        ),
+        continuity_binding=None,
+        activation_scope=None,
+        output_asset_id="generated-output",
+    )
+    monkeypatch.setattr(provider_console, "load_production_project", lambda _path: loaded)
+    monkeypatch.setattr(
+        provider_console,
+        "load_video_request_receipt",
+        lambda _root, _pointer: request,
+    )
+
+    result = provider_console.project_workspace_detail(
+        runs, f"mode-{expected_generation_type.lower()}/project.yaml"
+    )
+    projected = result["attempts"][0]
+
+    assert projected["mode"] == mode
+    assert projected["generation_type"] == expected_generation_type
+    assert projected["prompt_text"] == f"Prompt for {expected_generation_type}"
+    assert [item["role"] for item in projected["input_bindings"]] == [
+        *roles,
+        *(role for _kind, role in media_roles),
+    ]
+    assert [item["kind"] for item in projected["input_bindings"]] == [
+        *("image" for _role in roles),
+        *(kind for kind, _role in media_roles),
+    ]
+    assert [item["mime_type"] for item in projected["input_bindings"]] == [
+        *("image/png" for _role in roles),
+        *("video/mp4" for _kind, _role in media_roles),
+    ]
+    assert all(item["media"]["token"] for item in projected["input_bindings"])
+    assert [item["media"]["mime_type"] for item in projected["input_bindings"]] == [
+        *("image/png" for _role in roles),
+        *("video/mp4" for _kind, _role in media_roles),
+    ]
 
 
 def test_production_detail_keeps_valid_workspace_readable_without_video_attempts(

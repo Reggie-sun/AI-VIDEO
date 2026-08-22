@@ -292,6 +292,57 @@ def _asset_by_id(assets: dict[str, object], asset_id: str | None) -> object | No
     return assets.get(asset_id) if asset_id else None
 
 
+def _generation_type(mode: object, image_bindings: tuple[object, ...]) -> str:
+    value = _enum_value(mode)
+    roles = {_enum_value(getattr(binding, "role", None)) for binding in image_bindings}
+    if value == "text_to_video":
+        return "T2V"
+    if value == "reference_to_video":
+        return "R2V"
+    if value == "image_to_video":
+        return "FL2V" if {"first_frame", "last_frame"}.issubset(roles) else "I2V"
+    return str(value).upper()
+
+
+def _input_bindings_projection(
+    *,
+    workspace: str,
+    request: object,
+    assets: dict[str, object],
+    asset_paths: dict[str, Path],
+    root: Path,
+    media_map: dict[str, dict[str, object]],
+) -> tuple[list[dict[str, object]], bool]:
+    projected: list[dict[str, object]] = []
+    bindings = (
+        ("image", binding) for binding in tuple(getattr(request, "image_bindings", ()))
+    )
+    media_bindings = (
+        (str(getattr(binding, "kind", "media")), binding)
+        for binding in tuple(getattr(request, "media_bindings", ()))
+    )
+    for kind, binding in (*bindings, *media_bindings):
+        if len(projected) >= _MAX_WORKSPACE_MEDIA:
+            return projected, True
+        asset_id = getattr(binding, "asset_id", None)
+        media = _media_projection(
+            workspace=workspace,
+            asset=_asset_by_id(assets, asset_id),
+            asset_paths=asset_paths,
+            root=root,
+            media_map=media_map,
+        )
+        item = {
+            "role": _enum_value(getattr(binding, "role", None)),
+            "kind": kind,
+            "asset_id": asset_id,
+            "mime_type": getattr(binding, "mime_type", None),
+            "media": media,
+        }
+        projected.append({key: value for key, value in item.items() if value is not None})
+    return projected, False
+
+
 def _workspace_media_projection(
     *,
     workspace: str,
@@ -375,6 +426,14 @@ def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, obj
         bindings = tuple(getattr(request, "image_bindings", ()))
         first_binding = next((item for item in bindings if _enum_value(getattr(item, "role", None)) == "first_frame"), None)
         first_asset = _asset_by_id(assets, getattr(first_binding, "asset_id", None))
+        input_bindings, input_bindings_truncated = _input_bindings_projection(
+            workspace=workspace,
+            request=request,
+            assets=assets,
+            asset_paths=loaded.asset_paths,
+            root=loaded.root,
+            media_map=media_map,
+        )
         candidate_ids = tuple(getattr(state, "candidate_video_asset_ids", ()))
         candidate_asset = _asset_by_id(assets, candidate_ids[-1] if candidate_ids else getattr(request, "output_asset_id", None))
         output = request.effective_output.model_dump(mode="json", exclude_none=True)
@@ -396,6 +455,11 @@ def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, obj
                 "target_shot_id": target_shot_id,
                 "target_asset_role": target_asset_role,
                 "generation_id": state.generation_id,
+                "mode": _enum_value(request.mode),
+                "generation_type": _generation_type(request.mode, bindings),
+                "prompt_text": request.prompt_text,
+                "input_bindings": input_bindings,
+                "input_bindings_truncated": input_bindings_truncated,
                 "provider": {
                     "name": request.provider_name,
                     "kind": request.provider_kind,

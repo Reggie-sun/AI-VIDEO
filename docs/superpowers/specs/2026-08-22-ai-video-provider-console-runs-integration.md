@@ -62,14 +62,17 @@ Registry、dependency、Provider evidence 与 registered bytes 的现有 strict 
 - Shot ID、intent、visual strategy、duration、Scene identity；
 - ordered `video_generation` attempts 的 attempt ID/status/phase/timestamps；
 - 通过 `load_video_request_receipt()` reopen 的 target Shot、Provider name/kind、model、profile、
-  capability、execution/billing kind、mode、effective output、continuity role 与 hashes；
+  capability、execution/billing kind、mode、sealed `prompt_text`、effective output、continuity role 与 hashes；
+- ordered image/media bindings 的 role、registered asset identity 与 opaque media token；Browser 显示的
+  `T2V / I2V / R2V / FL2V` 必须由 canonical mode + binding roles 推导，其中 FL2V 是
+  `image_to_video + first_frame + last_frame`，不得按 Provider/model 名称猜测；
 - Manifest pointer paths、file/content hashes、Registry asset identity、MIME、bytes、measured dimensions/
   fps/frame count/duration、egress remote bool；
 - registered first-frame/image 与 generated video 的 opaque media token。
 - bounded Manifest operation counts，以及最多 32 个 canonical Registry 中已验证的
   `image/*` / `video/*` workspace media；它们只表示 workspace 内容，不得暗示绑定到某个 attempt。
 
-禁止把 raw prompt/negative prompt、Provider response、signed URL、credential、absolute path、raw error
+禁止把 effective negative prompt、Provider response、signed URL、credential、absolute path、raw error
 traceback 或 arbitrary evidence JSON 返回 Browser。
 
 ## Local API Contract
@@ -91,6 +94,9 @@ traceback 或 arbitrary evidence JSON 返回 Browser。
   Local H3/Hailuo/Seedance lanes，也不得把合法的非视频 workspace 表述为读取失败。
 - 选择 lane 后，header、Shot、Provider、capability、readiness/evidence、首帧和 output media 全部来自
   projection。
+- Shot header 与 attempt rail 必须显示 `T2V / I2V / R2V / FL2V`。T2V 显示 sealed prompt；I2V 与
+  R2V 显示 prompt 和全部已投影输入图片；FL2V 显示 prompt、首帧和尾帧。若 R2V 包含 registered
+  reference video，则按其 exact binding role 显示，不得伪装成 image。
 - 主 CTA 改为只读动作（查看输出/证据）；不得生成持久化意图或暗示已授权执行。
 - loading、invalid workspace、API unavailable、empty attempts 和 media unavailable 都必须有中文状态。
 
@@ -106,7 +112,8 @@ Router、Provider、P6/P7、QualityExperienceRecord、ResolvedTimeline、HyperFr
 2. selected detail 的 Project/Shot/Provider/output 与 exact Manifest/request/Registry evidence 一致。
 3. 首帧或 registered image、generated video 可以从 local media endpoint 预览。
 4. invalid historical workspace fail closed，不回退到 hard-coded demo data。
-5. API 只接受 GET/HEAD；path traversal、symlink、unknown token、raw prompt/secret exposure tests 通过。
+5. API 只接受 GET/HEAD；path traversal、symlink、unknown token、negative prompt/secret exposure tests
+   通过；sealed prompt 仅在 selected local detail 中按白名单返回。
 6. focused Python/Node tests、frontend build、Chrome integrated QA 与 exact Harness receipt 通过。
 7. 验证前后 `runs/` tree snapshot无写入变化；无 Provider/network call。
 

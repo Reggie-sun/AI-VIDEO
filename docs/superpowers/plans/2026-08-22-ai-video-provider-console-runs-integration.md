@@ -10,6 +10,10 @@ Executable。Governing spec：
 `video_generation` attempt，仍有 canonical Shots、operations 与 Registry media。本计划据此增加
 nested Legacy reopen 和 workspace overview，strict Production invalid contract 不变。
 
+2026-08-22 mode-input follow-up：selected `video_generation` attempt 必须显示 canonical
+`T2V / I2V / R2V / FL2V`、sealed prompt 与 mode-required registered inputs。FL2V 由
+`image_to_video + first_frame + last_frame` 推导；不修改 Production schema/request receipt。
+
 ## Contract Checkpoint Before Code
 
 - **Problem boundary:** 当前 Provider Console 是硬编码 demo，没有消费 `runs/`。
@@ -18,6 +22,9 @@ nested Legacy reopen 和 workspace overview，strict Production invalid contract
   `load_video_request_receipt()`；Legacy `load_manifest()`。
 - **Old path to retire:** `App.jsx` 的 static `LANES`、Alice Project/Shot/evidence 和 prototype intent。
 - **Unchanged contract:** no Production/Legacy mutation、no Provider/network、no fallback、no raw payload。
+- **Mode/input projection:** strict `ResolvedVideoGenerationRequest.mode`、`prompt_text`、
+  `image_bindings` / `media_bindings` 是唯一 truth；effective negative prompt、Provider raw response、
+  signed URL、secret 与 absolute path 继续不进入 Browser。
 - **Focused verification:**
   `python -m pytest -p no:cacheprovider tests/test_provider_console.py -q`。
 
@@ -62,6 +69,10 @@ no-store 与 static fallback。实现 dependency-free Vite middleware；不修�
 把静态 constants 替换为 fetch state：workspace selector、refresh、real attempt rail、real Project/Shot header、
 real capability/evidence、registered image/video preview、loading/empty/invalid/unavailable states。保留选定视觉
 source的布局与中文层级；CTA保持只读。
+
+Mode-specific extension：rail/header 显示 `T2V / I2V / R2V / FL2V`；T2V 显示 prompt，I2V/R2V
+显示 prompt + registered input bindings，FL2V 显示 prompt + first/last frame。所有媒体继续走 opaque
+token endpoint。
 
 ### T4 — Verification And Review
 
