@@ -10,6 +10,13 @@ Implementation complete and committed locally on `main`. No push or release was 
 - Related continuity spec: `docs/superpowers/specs/2026-08-19-ai-video-shot-continuity.md`
 - This file is an implementation recap, not a new runtime specification or lifecycle contract.
 
+## When To Start
+
+- Phase 1（Product caller and bound decision）在现有 local CUDA reviewer、P6 adjudicator、`VideoGenerationService.fetch_and_activate(...)` 和 `ProductionStateCommitter` seam 已存在且计划状态为 `Ready for bounded implementation` 时开始；本轮已完成。
+- Phase 2（read-only Human Evidence UI）必须在 Phase 1 通过 focused verification 并提交后开始；本轮已完成。
+- Deferred Phase（`HUMAN_PENDING`、后台队列、多人 review 或 automatic measurement overlay）只有在计划列出的产品需求至少有一项被确认后才开始，不能由当前 UI 实现自动触发。
+- 真实 live/paid Provider、媒体生成、real-shot calibration 和 Final Acceptance 不属于本计划的启动条件，必须另行批准和验证。
+
 ## Delivered
 
 - Added `src/ai_video/production/continuity_review_coordinator.py` and focused tests.
