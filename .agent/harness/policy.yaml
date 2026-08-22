@@ -128,6 +128,14 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_quality_experience_models.py, tests/test_quality_experience_store.py, tests/test_quality_experience_dataset.py, tests/test_quality_experience_rag_projection.py, tests/test_agent_memory.py, -q]
     cwd: .
     description: Verify passive Quality Experience schemas, immutable closure, exact lookup, sanitized projection, and Agent Memory isolation without live Provider or index rebuild.
+  provider_console_python_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_provider_console.py, -q]
+    cwd: .
+    description: Verify bounded local-only runs discovery, canonical read projection, sanitization, and no-write contracts.
+  provider_console_node_tests:
+    argv: [node, --test, provider-console/tests/runs-api.test.mjs]
+    cwd: .
+    description: Verify the loopback-only runs bridge, typed errors, opaque media tokens, and descriptor-bound media reads.
   full_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, -q]
     cwd: .
@@ -455,6 +463,15 @@ categories:
       - tests/fixtures/quality_experience/**
     check_ids:
       - quality_intelligence_tests
+      - task_architecture_gate
+  provider_console:
+    patterns:
+      - src/ai_video/provider_console.py
+      - tests/test_provider_console.py
+      - provider-console/**
+    check_ids:
+      - provider_console_python_tests
+      - provider_console_node_tests
       - task_architecture_gate
   agent_memory_dev_tool:
     # Local, read-only RAG over docs/record_for_agent/. Dev / Codex

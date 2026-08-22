@@ -1,0 +1,331 @@
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+
+from ai_video.errors import AiVideoError
+from ai_video.manifest import RunManifest, ShotRecord
+from ai_video import provider_console
+
+
+ZERO = "0" * 64
+ONE = "1" * 64
+
+
+def _write(path: Path, data: bytes = b"{}") -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(data)
+    return path
+
+
+def _production_workspace(root: Path, relative: str) -> Path:
+    project = _write(root / relative / "project.yaml", b"project_id: demo\n")
+    _write(project.parent / "state" / "manifest.json")
+    return project
+
+
+def _ns(**values):
+    return SimpleNamespace(**values)
+
+
+def test_catalog_is_bounded_deterministic_and_does_not_follow_symlinks(tmp_path: Path):
+    runs = tmp_path / "runs"
+    older = _production_workspace(runs, "run-b/project")
+    newer = _production_workspace(runs, "run-a/project")
+    legacy_path = runs / "legacy" / "manifest.json"
+    _write(
+        legacy_path,
+        RunManifest(run_id="legacy", updated_at="2026-08-21T01:02:03+00:00").model_dump_json().encode(),
+    )
+    os.utime(older, ns=(1_000_000_000, 1_000_000_000))
+    os.utime(older.parent / "state" / "manifest.json", ns=(1_000_000_000, 1_000_000_000))
+    os.utime(newer, ns=(2_000_000_000, 2_000_000_000))
+    os.utime(newer.parent / "state" / "manifest.json", ns=(2_000_000_000, 2_000_000_000))
+    os.utime(legacy_path, ns=(3_000_000_000, 3_000_000_000))
+    outside = _production_workspace(tmp_path, "outside")
+    (runs / "linked").symlink_to(outside.parent, target_is_directory=True)
+    _production_workspace(runs, "too/deep/for/the/catalog/limit")
+
+    result = provider_console.catalog_runs(runs, max_workspaces=2, max_depth=4)
+
+    assert result["boundary"] == {
+        "read_only": True,
+        "local_only": True,
+        "network": False,
+    }
+    assert [item["workspace"] for item in result["workspaces"]] == [
+        "legacy/manifest.json",
+        "run-a/project/project.yaml",
+    ]
+    assert all("linked" not in item["workspace"] for item in result["workspaces"])
+
+
+def test_catalog_rejects_missing_or_symlink_runs_root(tmp_path: Path):
+    with pytest.raises(ValueError, match="runs root"):
+        provider_console.catalog_runs(tmp_path / "missing")
+    real = tmp_path / "real"
+    real.mkdir()
+    alias = tmp_path / "alias"
+    alias.symlink_to(real, target_is_directory=True)
+    with pytest.raises(ValueError, match="runs root"):
+        provider_console.catalog_runs(alias)
+
+
+def test_catalog_enforces_workspace_and_entry_scan_budgets(tmp_path: Path):
+    runs = tmp_path / "runs"
+    for index in range(6):
+        _production_workspace(runs, f"run-{index}/project")
+
+    workspace_limited = provider_console.catalog_runs(
+        runs, max_workspaces=10, max_scanned_workspaces=2, max_entries=100,
+    )
+    assert workspace_limited["scan"]["workspaces"] <= 2
+    assert workspace_limited["truncated"] is True
+
+    entry_limited = provider_console.catalog_runs(
+        runs, max_workspaces=10, max_scanned_workspaces=10, max_entries=2,
+    )
+    assert entry_limited["scan"]["entries"] <= 2
+    assert entry_limited["truncated"] is True
+
+
+def test_catalog_entry_budget_limits_scandir_consumption(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    for index in range(20):
+        (runs / f"directory-{index}").mkdir(parents=True)
+    real_scandir = os.scandir
+    consumed = 0
+
+    class CountingScandir:
+        def __init__(self, path):
+            self._iterator = real_scandir(path)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            self._iterator.close()
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            nonlocal consumed
+            consumed += 1
+            return next(self._iterator)
+
+    monkeypatch.setattr(provider_console.os, "scandir", CountingScandir)
+
+    result = provider_console.catalog_runs(runs, max_entries=2)
+
+    assert result["truncated"] is True
+    assert result["scan"]["entries"] == 2
+    assert consumed <= 3
+
+
+def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, "demo/project")
+    first_frame = _write(project_path.parent / "assets" / "first.png", b"image")
+    candidate = _write(project_path.parent / "assets" / "candidate.mp4", b"video-bytes")
+    first_record = _ns(
+        asset_id="first-frame", asset_type=_ns(value="image"), mime_type="image/png",
+        size_bytes=5, width=1280, height=720, duration_seconds=None, video_metadata=None,
+        sha256=ZERO, egress=_ns(remote=False), artifact_path=Path("assets/first.png"),
+    )
+    video_metadata = _ns(
+        frame_count=124, fps_numerator=24, fps_denominator=1,
+        duration_milliseconds=5167, codec_name="h264", container_name="mp4",
+    )
+    video_record = _ns(
+        asset_id="video-output", asset_type=_ns(value="video"), mime_type="video/mp4",
+        size_bytes=11, width=1344, height=672, duration_seconds=5.167,
+        video_metadata=video_metadata, sha256=ONE, egress=_ns(remote=False),
+        artifact_path=Path("assets/candidate.mp4"),
+    )
+    request_pointer = _ns(
+        path=Path("state/video-generation/requests/request.json"), file_sha256=ZERO,
+        request_receipt_fingerprint=ONE, generation_id="generation-1",
+        request_input_hash=ZERO, resolved_generation_hash=ONE, output_asset_id="video-output",
+    )
+    state = _ns(
+        request=request_pointer, phase=_ns(value="activate"), generation_id="generation-1",
+        candidate_video_asset_ids=("video-output",), terminal_frame_evidence=None,
+        paid_submit_receipt=None, local_submit_receipt=_ns(path=Path("state/local.json")),
+    )
+    attempt = _ns(
+        attempt_id="attempt-1", operation="video_generation", status=_ns(value="succeeded"),
+        started_at="2026-08-21T01:00:00+00:00", finished_at="2026-08-21T01:01:00+00:00",
+        video_generation_state=state, error_code=None, error_message="raw secret error",
+    )
+    shot = _ns(
+        shot_id="shot-12", scene_id="cafe", intent="Alice enters", visual_strategy=_ns(value="generated_video"),
+        duration_policy=_ns(model_dump=lambda **_: {"mode": "fixed", "seconds": 5.0}), revision=3,
+        content_hash=ZERO,
+    )
+    loaded = _ns(
+        root=project_path.parent,
+        project=_ns(project_id="demo", title="Demo", revision=7, content_hash=ZERO),
+        manifest=_ns(schema_version="2.8", manifest_revision=34, attempts=(attempt,)),
+        shots=(shot,), scenes=(_ns(scene_id="cafe", title="Cafe"),),
+        registry=_ns(assets=(first_record, video_record)),
+        asset_paths={"first-frame": first_frame, "video-output": candidate},
+    )
+    binding = _ns(
+        role="first_frame", asset_id="first-frame", mime_type="image/png", width=1280,
+        height=720, size_bytes=5, sha256=ZERO,
+    )
+    original_request = _ns(target_shot_id="shot-12", target_asset_role="generated_video")
+    request = _ns(
+        provider_name="comfy-local-h3", provider_kind="minimax_h3_fl2va", model_id="minimax-h3-fl2va",
+        provider_profile=_ns(profile_id="quality", profile_version="v1", profile_sha256=ZERO),
+        capability_id="minimax-h3-local-v1", execution_kind=_ns(value="local"),
+        billing_kind=_ns(value="local_unmetered"), mode=_ns(value="image_to_video"),
+        effective_output=_ns(model_dump=lambda **_: {
+            "duration_seconds": 5, "width": 1344, "height": 672, "fps": 24,
+            "container": "mp4", "mime_type": "video/mp4", "native_audio": True,
+        }),
+        image_bindings=(binding,), continuity_binding=None, activation_scope=_ns(request=original_request),
+        generation_id="generation-1", request_input_hash=ZERO, resolved_generation_hash=ONE,
+        desired_generation_fingerprint=ONE, output_asset_id="video-output",
+        prompt_text="DO NOT LEAK PROMPT", effective_negative_prompt_text="DO NOT LEAK NEGATIVE",
+        provider_task_binding=_ns(provider_task_id="signed-url-secret"),
+    )
+    calls: list[object] = []
+    monkeypatch.setattr(provider_console, "load_production_project", lambda path: calls.append(path) or loaded)
+    monkeypatch.setattr(
+        provider_console, "load_video_request_receipt",
+        lambda root, pointer: calls.append((root, pointer)) or request,
+    )
+
+    before = {path: (path.stat().st_size, path.stat().st_mtime_ns) for path in runs.rglob("*") if path.is_file()}
+    result = provider_console.project_workspace_detail(runs, "demo/project/project.yaml")
+    after = {path: (path.stat().st_size, path.stat().st_mtime_ns) for path in runs.rglob("*") if path.is_file()}
+
+    assert calls[0] == project_path
+    assert calls[1] == (project_path.parent, request_pointer)
+    assert before == after
+    assert result["project"] == {
+        "project_id": "demo", "title": "Demo", "revision": 7, "content_hash": ZERO,
+    }
+    assert result["attempts"][0]["provider"]["name"] == "comfy-local-h3"
+    assert result["attempts"][0]["target_shot_id"] == "shot-12"
+    assert result["attempts"][0]["first_frame_media"]["token"]
+    assert result["attempts"][0]["candidate_media"]["token"]
+    assert set(result["_media"]) == {
+        result["attempts"][0]["first_frame_media"]["token"],
+        result["attempts"][0]["candidate_media"]["token"],
+    }
+    serialized_public = json.dumps({key: value for key, value in result.items() if key != "_media"})
+    assert str(tmp_path) not in serialized_public
+    assert "DO NOT LEAK" not in serialized_public
+    assert "signed-url-secret" not in serialized_public
+    assert "raw secret error" not in serialized_public
+
+
+def test_invalid_selected_production_fails_closed_with_sanitized_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    _production_workspace(runs, "broken")
+
+    def fail(_path):
+        raise AiVideoError(code="manifest_invalid", user_message="unsafe /private/path", technical_detail="secret", retryable=False)
+
+    monkeypatch.setattr(provider_console, "load_production_project", fail)
+    result = provider_console.project_workspace_detail(runs, "broken/project.yaml")
+    assert result["status"] == "invalid"
+    assert result["error"] == {
+        "code": "PRODUCTION_PROJECT_INVALID",
+        "message": "该 Production workspace 无法通过严格校验。",
+    }
+    assert "private" not in json.dumps(result)
+
+
+def test_invalid_video_request_receipt_fails_closed_instead_of_hiding_attempt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, "broken-request")
+    request_pointer = _ns(path=Path("state/video-generation/requests/missing.json"))
+    state = _ns(request=request_pointer)
+    attempt = _ns(operation="video_generation", video_generation_state=state)
+    loaded = _ns(
+        root=project_path.parent,
+        registry=_ns(assets=()),
+        manifest=_ns(attempts=(attempt,)),
+        asset_paths={},
+    )
+    monkeypatch.setattr(provider_console, "load_production_project", lambda _path: loaded)
+    monkeypatch.setattr(
+        provider_console,
+        "load_video_request_receipt",
+        lambda _root, _pointer: (_ for _ in ()).throw(ValueError("raw /private/request failure")),
+    )
+
+    result = provider_console.project_workspace_detail(runs, "broken-request/project.yaml")
+
+    assert result["status"] == "invalid"
+    assert result["error"] == {
+        "code": "VIDEO_REQUEST_INVALID",
+        "message": "该 workspace 的 video request evidence 无法通过严格校验。",
+    }
+    assert result["attempts"] == []
+    assert "private" not in json.dumps(result)
+
+
+@pytest.mark.parametrize("workspace", ["../project.yaml", "/tmp/project.yaml", "demo\\project.yaml", "demo/state/manifest.json"])
+def test_detail_rejects_unsafe_or_non_workspace_keys(tmp_path: Path, workspace: str):
+    runs = tmp_path / "runs"
+    runs.mkdir()
+    with pytest.raises(ValueError, match="workspace"):
+        provider_console.project_workspace_detail(runs, workspace)
+
+
+def test_legacy_detail_uses_canonical_manifest_and_never_exposes_paths_or_errors(tmp_path: Path):
+    runs = tmp_path / "runs"
+    manifest_path = runs / "legacy" / "manifest.json"
+    manifest = RunManifest(
+        run_id="legacy", status="failed", project_config_path="/private/project.yaml",
+        final_output="/private/final.mp4",
+        shots=[ShotRecord(shot_id="shot-1", status="failed", error={"secret": "raw"})],
+    )
+    _write(manifest_path, manifest.model_dump_json().encode())
+
+    result = provider_console.project_workspace_detail(runs, "legacy/manifest.json")
+
+    assert result["kind"] == "legacy"
+    assert result["run_id"] == "legacy"
+    assert result["shots"] == [{"shot_id": "shot-1", "status": "failed", "active_attempt": 0}]
+    assert "private" not in json.dumps(result)
+    assert "raw" not in json.dumps(result)
+
+
+def test_cli_writes_one_json_document(tmp_path: Path, capsys: pytest.CaptureFixture[str]):
+    runs = tmp_path / "runs"
+    runs.mkdir()
+    assert provider_console.main(["catalog", "--runs-root", str(runs)]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["workspaces"] == []
+
+
+def test_cli_returns_sanitized_json_for_unknown_workspace(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+):
+    runs = tmp_path / "runs"
+    runs.mkdir()
+
+    assert provider_console.main([
+        "detail", "--runs-root", str(runs), "--workspace", "missing/project.yaml",
+    ]) == 4
+    assert json.loads(capsys.readouterr().out) == {
+        "error": {"code": "WORKSPACE_NOT_FOUND", "message": "workspace 不存在。"}
+    }

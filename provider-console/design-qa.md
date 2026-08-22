@@ -1,58 +1,45 @@
 # Design QA
 
-**Comparison target**
+## Current Target
 
-- Source visual truth: `design/provider-console-source.png`
-- Final implementation screenshot: `design/implementation-main-final.png`
-- Combined comparison evidence: `design/qa-comparison-final.png`
-- Local evidence dialog: `design/implementation-evidence-final.png`
-- Cloud gated state: `design/implementation-cloud-gated-final.png`
-- Collapsed gates state: `design/implementation-gates-collapsed-final.png`
-- Local intent success state: `design/implementation-interactions-final.png`
-- Viewport and state: desktop, default Local H3 T8 Quality lane, gates expanded, `1487 × 1058` CSS px, `deviceScaleFactor = 1`
-- Pixel normalization: source `1487 × 1058`; implementation `1487 × 1058`; no resizing or density conversion. The combined comparison is `2974 × 1058` with source on the left and implementation on the right.
+- Source visual truth：`design/provider-console-source.png`。
+- Current runtime target：保留 source 的深色三栏 Provider Console anatomy，同时以本机 `runs/` 的真实 Project、Shot、attempt、registered media 与 evidence 替换静态 Alice / Shot 12 demo。
+- Historical `design/implementation-*.png` 和 `design/qa-comparison-final.png` 只记录旧 demo 的视觉验收，不再作为当前 runtime-data acceptance evidence。
 
-**Findings**
+## Chrome Integrated QA
 
-- No actionable P0, P1, or P2 differences remain.
-- Fonts and typography: the implementation uses the available Inter / CJK system stack with matching hierarchy, compact control text, and readable dense metadata. Minor platform rasterization and weight differences are acceptable P3 variation.
-- Spacing and layout rhythm: the `160 px` global nav, `260 px` lane rail, project summary, readiness sequence, `352 px` identity column, action row, and other-lane gate panel preserve the source composition. The final `1487 × 1058` render has no document overflow.
-- Colors and visual tokens: deep ink surfaces, violet selected/primary states, green readiness, amber authorization, and red blocked states match the source intent. No gradients were introduced.
-- Image quality and asset fidelity: the supplied Alice Café image is used for both the project thumbnail and first-frame evidence card with source-appropriate crops. No placeholder image, custom SVG, CSS illustration, emoji, or div art replaces a visible asset.
-- Copy and content: all product UI is Simplified Chinese while Provider/model identifiers remain original. The passive/no-network wording is explicit, and no automatic recommendation or fallback is implied.
-- Icons: visible controls use one Phosphor icon family with consistent stroke/filled state treatment.
-- Accessibility: semantic buttons with pressed state, dialog labeling, visible keyboard focus, a two-control dialog focus trap, Escape-to-close with opener-focus restoration, disabled cloud CTAs, and `prefers-reduced-motion` are present.
-- Responsiveness: a second Chrome pass at `1180 × 820` reported `scrollWidth = clientWidth = 1180` and `scrollHeight = clientHeight = 820`; the desktop console remains usable without page-level overflow.
+2026-08-22 使用 Google Chrome + `chrome-devtools` CLI 对 `http://127.0.0.1:4173` 做了 fresh integrated pass。
 
-**Interaction and runtime evidence**
+- Catalog：页面列出 69 个当时可发现的真实 Production / Legacy workspaces；重复 `run_id` 使用相对 workspace suffix 区分。
+- Default latest workspace：`t8-h3-seedance-3shot-continuity-20260822-v7/projects/shot-01-take-01/project.yaml` strict reopen 成功，显示真实 `comfy-local-h3` running attempt 和已注册首帧。
+- Local H3：切换到 `c2-alice-local-h3-t10-regression-20260821-001/project/project.yaml`，显示 3 个真实 attempts、真实 request evidence 和可播放的 registered `video/mp4`。
+- Hailuo：切换到 `c2-hailuo23-live-20260820-001/production-recovered/project.yaml`，再选择 `minimax_hailuo`，显示真实 `MiniMax-Hailuo-2.3` capability、remote execution identity、registered output 和可播放媒体。
+- Seedance：切换到 `seedance-anime-grand-action-continuity-20260820-001/production-shot1/project.yaml`，显示真实 `seedance` / `volcengine_ark_seedance` attempt；没有补造 output 或 fallback lane。
+- Evidence dialog：打开后具有 `role=dialog`、modal label 和初始 close focus；`Escape` 关闭成功并恢复页面状态。
+- Responsive：`1180 × 820` 下 `scrollWidth = clientWidth = 1180`、`scrollHeight = clientHeight = 820`，无 page-level overflow。
+- Console：0 条 error message。
+- Network：所有 37 个 observed requests 均为 `127.0.0.1`、Vite `data:` controls 或 `/api/runs*`；HTTP 状态均为 `200` / `206`，无 external request、failed response 或 Provider call。
+- Media：opaque token endpoint 对真实 output 返回 `video/mp4`，byte-range 返回 `206` 和正确 `Content-Range`。
 
-- Local Quality → Local Turbo selection: passed.
-- Cloud Hailuo selection with non-executable primary CTA: passed.
-- Evidence dialog open and Escape close: passed.
-- Other-lane gates collapse and re-expand: passed.
-- Local primary CTA produces a visible prototype-only intent success state: passed.
-- Cloud evidence copy and dialog stay gated/lane-specific instead of showing Local H3 capability: passed.
-- Browser console errors: none.
-- Page errors: none.
-- Failed HTTP responses: none.
-- External network requests: none.
+## Visual Findings
 
-**Comparison history**
+- 三栏层级、compact density、深墨色 surfaces、violet selection、green recorded-success tone 和 source 的 desktop composition 保持一致。
+- workspace selector 进入 Provider rail 顶部，attempt rail 不再展示 invented lanes；相同 `run_id` 的多个 nested projects 可清楚区分。
+- Header、record chain、registered media、Provider identity、effective output、evidence 与 read-only action bar 均从 selected projection 更新。
+- 主 CTA 为“查看已注册输出”，不再生成 prototype intent；无 output 时为 disabled read-only state。
+- 中文 UI 保持一致，Provider / model / API / evidence identifier 保持原始名称。
+- 本地边界始终可见：不写 Manifest、不创建 intent、不调用 Provider、不访问云端、不自动回退。
 
-- Iteration 1 found a source-layout mismatch, cramped stage copy, a React `key` spread warning, a missing intent-success assertion, and a missing favicon response.
-- Fixes: rebuilt the page around the source anatomy, removed the `key` spread path, added a local supplied favicon, restored the explicit intent state, and retained only local static behavior.
-- Iteration 2 found the project label/title collision and action-note alignment drift.
-- Fixes: made the project metadata a real vertical flex group and placed the manual-selection note beneath the primary action.
-- Review iteration found insufficient state screenshots, an overly high right-column start, and contradictory Local H3 evidence when a cloud lane was selected.
-- Fixes: added state-specific browser captures, aligned the right column with the readiness section, made evidence tone/content lane-specific, and added dialog focus containment/restoration.
-- Final evidence: `design/qa-comparison-final.png` shows the corrected default state at equal pixels; the four state screenshots cover dialog, cloud-disabled, gates-collapsed, and local-success views. The final browser pass has no console, page, response, network, or interaction failures.
+## Accessibility
 
-**Focused region comparison**
+- workspace 使用原生 labeled `select`；attempts 使用 `button` + `aria-pressed`。
+- dialog 有 label、Escape close、focus containment 和 opener focus restoration。
+- 所有 interactive controls 保留 visible focus；motion 遵守 `prefers-reduced-motion`。
+- registered image/video 有 accessible name；原生 video controls 可键盘访问。
 
-- A separate crop was not required because the equal-density combined image keeps the project summary, readiness labels, asset metadata, right-column facts, action controls, and gate rows legible at original height. Relevant non-default regions are captured as full-size, equal-density state screenshots: evidence dialog, cloud gate, collapsed gate panel, and local success.
+## Remaining P3 Polish
 
-**Follow-up Polish**
-
-- P3: exact font antialiasing and a few label widths may vary by the user's installed CJK fonts.
+- 极长 evidence hashes 在窄右栏按字符换行，信息完整但视觉密度较高。
+- 字体 rasterization 与 CJK weight 会随本机字体栈产生轻微差异。
 
 final result: passed

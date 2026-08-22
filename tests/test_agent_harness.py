@@ -286,6 +286,36 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
     assert "tests/test_agent_memory.py" in argv
 
 
+def test_provider_console_routes_to_local_runs_observer_suites() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/provider_console.py",
+        "tests/test_provider_console.py",
+        "provider-console/src/App.jsx",
+        "provider-console/scripts/runs-api.mjs",
+        "provider-console/tests/runs-api.test.mjs",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["provider_console"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "provider_console_python_tests",
+            "provider_console_node_tests",
+            "task_architecture_gate",
+        ]
+
+    python_argv = policy["checks"]["provider_console_python_tests"]["argv"]
+    assert "tests/test_provider_console.py" in python_argv
+    node_argv = policy["checks"]["provider_console_node_tests"]["argv"]
+    assert node_argv == [
+        "node",
+        "--test",
+        "provider-console/tests/runs-api.test.mjs",
+    ]
+
+
 def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
