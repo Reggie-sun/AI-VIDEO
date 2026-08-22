@@ -64,6 +64,45 @@ def test_catalog_is_bounded_deterministic_and_does_not_follow_symlinks(tmp_path:
     assert all("linked" not in item["workspace"] for item in result["workspaces"])
 
 
+def test_catalog_and_detail_support_nested_legacy_output_manifests(tmp_path: Path):
+    runs = tmp_path / "runs"
+    manifest_path = runs / "legacy-capture" / "output" / "take-r2" / "manifest.json"
+    production_state = runs / "legacy-capture" / "output" / "state" / "manifest.json"
+    _write(
+        manifest_path,
+        RunManifest(
+            run_id="legacy-run",
+            status="failed",
+            shots=[ShotRecord(shot_id="shot-1", status="failed")],
+        ).model_dump_json().encode(),
+    )
+    _write(
+        production_state,
+        RunManifest(run_id="not-a-legacy-workspace").model_dump_json().encode(),
+    )
+
+    catalog = provider_console.catalog_runs(runs)
+
+    assert [item["workspace"] for item in catalog["workspaces"]] == [
+        "legacy-capture/output/take-r2/manifest.json"
+    ]
+    detail = provider_console.project_workspace_detail(
+        runs, "legacy-capture/output/take-r2/manifest.json"
+    )
+    assert detail["kind"] == "legacy"
+    assert detail["run_id"] == "legacy-run"
+    assert detail["shots"] == [
+        {"shot_id": "shot-1", "status": "failed", "active_attempt": 0}
+    ]
+    assert "legacy-capture/output/state/manifest.json" not in {
+        item["workspace"] for item in catalog["workspaces"]
+    }
+    with pytest.raises(ValueError, match="workspace"):
+        provider_console.project_workspace_detail(
+            runs, "legacy-capture/output/state/manifest.json"
+        )
+
+
 def test_catalog_rejects_missing_or_symlink_runs_root(tmp_path: Path):
     with pytest.raises(ValueError, match="runs root"):
         provider_console.catalog_runs(tmp_path / "missing")
@@ -220,6 +259,14 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
     assert result["attempts"][0]["target_shot_id"] == "shot-12"
     assert result["attempts"][0]["first_frame_media"]["token"]
     assert result["attempts"][0]["candidate_media"]["token"]
+    assert [item["asset_id"] for item in result["workspace_media"]] == [
+        "first-frame",
+        "video-output",
+    ]
+    assert result["workspace_media_truncated"] is False
+    assert result["operation_summary"] == [
+        {"operation": "video_generation", "count": 1}
+    ]
     assert set(result["_media"]) == {
         result["attempts"][0]["first_frame_media"]["token"],
         result["attempts"][0]["candidate_media"]["token"],
@@ -229,6 +276,128 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
     assert "DO NOT LEAK" not in serialized_public
     assert "signed-url-secret" not in serialized_public
     assert "raw secret error" not in serialized_public
+
+
+def test_production_detail_keeps_valid_workspace_readable_without_video_attempts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, "still-images/project")
+    image_path = _write(project_path.parent / "assets" / "scene.png", b"scene-image")
+    image_record = _ns(
+        asset_id="scene-image",
+        asset_type=_ns(value="image"),
+        mime_type="image/png",
+        size_bytes=11,
+        width=1280,
+        height=720,
+        duration_seconds=None,
+        video_metadata=None,
+        sha256=ZERO,
+        egress=_ns(remote=False),
+    )
+    image_attempt = _ns(operation="image_generation")
+    loaded = _ns(
+        root=project_path.parent,
+        project=_ns(
+            project_id="still-images",
+            title="Still Images",
+            revision=2,
+            content_hash=ZERO,
+        ),
+        manifest=_ns(
+            schema_version="2.8",
+            manifest_revision=4,
+            attempts=(image_attempt,),
+        ),
+        shots=(_ns(shot_id="shot-1"),),
+        registry=_ns(assets=(image_record,)),
+        asset_paths={"scene-image": image_path},
+    )
+    monkeypatch.setattr(provider_console, "load_production_project", lambda _path: loaded)
+
+    result = provider_console.project_workspace_detail(
+        runs, "still-images/project/project.yaml"
+    )
+
+    assert result["status"] == "valid"
+    assert result["attempts"] == []
+    assert result["operation_summary"] == [
+        {"operation": "image_generation", "count": 1}
+    ]
+    assert [item["asset_id"] for item in result["workspace_media"]] == [
+        "scene-image"
+    ]
+    assert result["workspace_media_truncated"] is False
+    serialized_public = json.dumps(
+        {key: value for key, value in result.items() if key != "_media"}
+    )
+    assert str(tmp_path) not in serialized_public
+
+
+def test_production_workspace_media_projection_is_bounded_and_sanitized(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, "large-registry/project")
+    assets = []
+    asset_paths = {}
+    for index in range(33):
+        asset_id = f"image-{index:02d}"
+        payload = f"asset-{index:02d}".encode()
+        asset_path = _write(project_path.parent / "assets" / f"{asset_id}.png", payload)
+        assets.append(
+            _ns(
+                asset_id=asset_id,
+                asset_type=_ns(value="image"),
+                mime_type="image/png",
+                size_bytes=len(payload),
+                width=640,
+                height=360,
+                duration_seconds=None,
+                video_metadata=None,
+                sha256=f"{index:064x}",
+                egress=_ns(remote=False),
+            )
+        )
+        asset_paths[asset_id] = asset_path
+    loaded = _ns(
+        root=project_path.parent,
+        project=_ns(
+            project_id="large-registry",
+            title="Large Registry",
+            revision=1,
+            content_hash=ONE,
+        ),
+        manifest=_ns(
+            schema_version="2.8",
+            manifest_revision=9,
+            attempts=(_ns(operation="asset_registration"),),
+        ),
+        shots=(),
+        registry=_ns(assets=tuple(reversed(assets))),
+        asset_paths=asset_paths,
+    )
+    monkeypatch.setattr(provider_console, "load_production_project", lambda _path: loaded)
+
+    result = provider_console.project_workspace_detail(
+        runs, "large-registry/project/project.yaml"
+    )
+
+    assert result["status"] == "valid"
+    assert result["attempts"] == []
+    assert result["operation_summary"] == [
+        {"operation": "asset_registration", "count": 1}
+    ]
+    assert len(result["workspace_media"]) == 32
+    assert [item["asset_id"] for item in result["workspace_media"]] == [
+        f"image-{index:02d}" for index in range(32)
+    ]
+    assert result["workspace_media_truncated"] is True
+    serialized_public = json.dumps(
+        {key: value for key, value in result.items() if key != "_media"}
+    )
+    assert str(tmp_path) not in serialized_public
 
 
 def test_invalid_selected_production_fails_closed_with_sanitized_error(

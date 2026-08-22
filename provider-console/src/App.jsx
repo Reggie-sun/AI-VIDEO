@@ -122,7 +122,7 @@ function WorkspaceSelector({ catalog, selected, loading, onSelect, onRefresh }) 
   );
 }
 
-function AttemptRail({ catalog, workspace, attempts, selectedId, loading, onWorkspace, onRefresh, onSelect }) {
+function AttemptRail({ catalog, workspace, attempts, selectedId, loading, error, onWorkspace, onRefresh, onSelect }) {
   return (
     <aside className="lane-rail" aria-label="真实生成尝试">
       <header className="lane-rail-header"><h2>Provider 记录</h2><p>来自已选 runs 工作区</p></header>
@@ -140,7 +140,9 @@ function AttemptRail({ catalog, workspace, attempts, selectedId, loading, onWork
             </button>
           );
         })}
-        {!loading && !attempts.length && <div className="rail-empty"><Info size={18} /><span>这个工作区没有 video generation attempt。</span></div>}
+        {!loading && !attempts.length && (error
+          ? <div className="rail-empty rail-empty--error"><WarningCircle size={18} weight="fill" /><span>该工作区未通过 strict reopen；右侧显示稳定错误码。</span></div>
+          : <div className="rail-empty"><CheckCircle size={18} weight="fill" /><span>工作区已读取；没有 video generation attempt。右侧仍可查看 Shots、operations 与 Registry 媒体。</span></div>)}
       </div>
       <div className="lane-rail-note"><Info size={17} /><p>只读查看真实记录。<br />不提交、不重试、不自动回退。</p></div>
       <div className="local-status"><span className="local-dot" /><span>本地 runs 数据源<br />只读连接</span></div>
@@ -159,7 +161,7 @@ function ShotSummary({ detail, attempt }) {
         <div><span>项目</span><strong>{project.title || project.name || project.project_id || detail?.run_id || "未命名项目"}</strong></div>
       </div>
       <div className="summary-field"><span>镜头</span><strong>{shot.shot_id || shot.id || attempt?.target_shot_id || "—"}</strong></div>
-      <div className="summary-field summary-field--wide"><span>类型</span><strong>{shot.visual_strategy || attempt?.mode || "Video Generation"}</strong></div>
+      <div className="summary-field summary-field--wide"><span>类型</span><strong>{shot.visual_strategy || attempt?.mode || (detail?.kind === "legacy" ? "Legacy" : "Production")}</strong></div>
       <div className="summary-field"><span>状态</span><strong>{attempt?.status || attempt?.phase || detail?.status || "—"}</strong></div>
       <div className="summary-field summary-field--updated"><span>更新时间</span><strong>{formatTime(attempt?.finished_at || attempt?.started_at || detail?.updated_at)}</strong></div>
     </header>
@@ -189,6 +191,78 @@ function MediaCard({ attempt }) {
         <p className="asset-ok"><CheckCircle size={15} weight="fill" />Registry bytes 已 strict reopen</p>
       </div>
     </div>
+  );
+}
+
+function WorkspaceMediaThumb({ item }) {
+  const [failed, setFailed] = useState(false);
+  const url = mediaUrl(item);
+  const video = (item.mime_type || "").startsWith("video/");
+  if (failed) return <div className="workspace-media-unavailable"><ImageSquare size={22} /><span>浏览器无法解码</span></div>;
+  return video
+    ? <video src={url} controls preload="none" aria-label={`已注册视频 ${item.asset_id || ""}`} onError={() => setFailed(true)} />
+    : <img src={url} alt={`已注册图片 ${item.asset_id || ""}`} onError={() => setFailed(true)} />;
+}
+
+function WorkspaceMediaGrid({ media = [], limit = 12 }) {
+  const visible = media.slice(0, limit);
+  if (!visible.length) return <div className="workspace-media-empty"><ImageSquare size={22} /><span>没有可预览的 canonical Registry image/video。</span></div>;
+  return (
+    <div className="workspace-media-grid">
+      {visible.map((item) => {
+        return (
+          <article className="workspace-media-item" key={item.token || item.asset_id}>
+            <WorkspaceMediaThumb item={item} />
+            <div><strong title={item.asset_id}>{item.asset_id || "已注册媒体"}</strong><span>{item.mime_type || "MIME 未标注"}{item.width && item.height ? ` · ${item.width} × ${item.height}` : ""}</span></div>
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
+function WorkspaceOverview({ detail }) {
+  const shots = detail?.shots || [];
+  const operations = detail?.operation_summary || [];
+  const media = detail?.workspace_media || [];
+  const firstMediaUrl = mediaUrl(media[0]);
+  return (
+    <>
+      <section className="workspace-overview">
+        <header className="workspace-overview-heading">
+          <div><CheckCircle size={28} weight="fill" /><div><h1>工作区已严格读取</h1><p>这里没有 video generation attempt，但 Project、Shots、Manifest operations 与已注册媒体仍可查看。</p></div></div>
+          <span className="ready-tag">只读</span>
+        </header>
+        <div className="workspace-overview-stats">
+          <div><span>工作区类型</span><strong>{text(detail?.kind)}</strong></div>
+          <div><span>Manifest 版本</span><strong>{text(detail?.manifest?.revision)}</strong></div>
+          <div><span>镜头</span><strong>{shots.length}</strong></div>
+          <div><span>Registry 媒体</span><strong>{media.length}{detail?.workspace_media_truncated ? "+" : ""}</strong></div>
+        </div>
+        <section className="workspace-overview-section">
+          <h2>Manifest 操作</h2>
+          <div className="operation-list">
+            {operations.length ? operations.map((item) => <span key={item.operation}><code>{item.operation}</code><b>{item.count}</b></span>) : <p>该 Manifest 尚未记录 lifecycle operation。</p>}
+          </div>
+        </section>
+        <section className="workspace-overview-section">
+          <h2>镜头</h2>
+          <div className="workspace-shot-list">
+            {shots.length ? shots.slice(0, 12).map((shot) => <article key={shot.shot_id || shot.id}><strong>{shot.shot_id || shot.id || "未命名 Shot"}</strong><span>{shot.intent || shot.visual_strategy || shot.status || "未标注内容"}</span></article>) : <p>该工作区没有 Shot 记录。</p>}
+          </div>
+        </section>
+        <section className="workspace-overview-section">
+          <h2>Registry 已注册媒体</h2>
+          <WorkspaceMediaGrid media={media} limit={32} />
+          {detail?.workspace_media_truncated && <p className="workspace-media-note">仅展示前 32 个已验证 image/video；其余项目保持未加载。</p>}
+        </section>
+      </section>
+      <section className="action-bar workspace-action-bar">
+        <div className="action-note">已读取 · 未创建 Provider intent <Info size={16} /></div>
+        <a className={`primary-action${firstMediaUrl ? "" : " is-disabled"}`} href={firstMediaUrl || undefined} target="_blank" rel="noreferrer" aria-disabled={!firstMediaUrl}><Play size={20} weight="fill" />查看首个已注册媒体</a>
+        <div className="secondary-action workspace-read-state"><CheckCircle size={18} weight="fill" />{detail?.status === "valid" ? "Strict reopen 通过" : text(detail?.status)}</div>
+      </section>
+    </>
   );
 }
 
@@ -281,7 +355,11 @@ export function App() {
   const loadDetail = useCallback(async (key) => {
     const response = await fetch(`/api/runs/detail?workspace=${encodeURIComponent(key)}`, { cache: "no-store" });
     const body = await response.json();
-    if (!response.ok || body?.status === "invalid" || body?.error) throw new Error(body?.error?.message || body?.message || "工作区 strict reopen 失败。");
+    if (!response.ok || body?.status === "invalid" || body?.error) {
+      const message = body?.error?.message || body?.message || "工作区 strict reopen 失败。";
+      const code = body?.error?.code;
+      throw new Error(code ? `${message} · ${code}` : message);
+    }
     setWorkspace(key);
     setDetail(body);
     const attempts = body.attempts || body.video_generation_attempts || [];
@@ -326,9 +404,9 @@ export function App() {
   return (
     <div className="app-shell">
       <Sidebar />
-      <AttemptRail catalog={catalog} workspace={workspace} attempts={attempts} selectedId={selectedId} loading={loading} onWorkspace={selectWorkspace} onRefresh={refresh} onSelect={setSelectedId} />
+      <AttemptRail catalog={catalog} workspace={workspace} attempts={attempts} selectedId={selectedId} loading={loading} error={error} onWorkspace={selectWorkspace} onRefresh={refresh} onSelect={setSelectedId} />
       <main className="provider-console">
-        {loading && !detail ? <EmptyState title="正在读取 runs" detail="正在通过 canonical reader 打开本机工作区…" /> : error ? <EmptyState title="工作区不可用" detail={error} retry={refresh} /> : !detail ? <EmptyState title="没有 runs 工作区" detail="repository/runs 下没有可读取的 Production 或 Legacy 工作区。" retry={refresh} /> : !attempt ? <><ShotSummary detail={detail} /><EmptyState title="没有 Provider 生成记录" detail="这个真实工作区尚未记录 video generation attempt；控制台不会补造 demo lane。" /></> : <><ShotSummary detail={detail} attempt={attempt} /><DetailPane detail={detail} attempt={attempt} onEvidence={() => setEvidenceOpen(true)} /></>}
+        {loading && !detail ? <EmptyState title="正在读取 runs" detail="正在通过 canonical reader 打开本机工作区…" /> : error ? <EmptyState title="工作区不可用" detail={error} retry={refresh} /> : !detail ? <EmptyState title="没有 runs 工作区" detail="repository/runs 下没有可读取的 Production 或 Legacy 工作区。" retry={refresh} /> : !attempt ? <><ShotSummary detail={detail} /><WorkspaceOverview detail={detail} /></> : <><ShotSummary detail={detail} attempt={attempt} /><DetailPane detail={detail} attempt={attempt} onEvidence={() => setEvidenceOpen(true)} /></>}
       </main>
       <EvidenceDialog open={evidenceOpen} detail={detail || {}} attempt={attempt || {}} onClose={() => setEvidenceOpen(false)} />
     </div>

@@ -5,6 +5,11 @@
 Executable。Governing spec：
 `docs/superpowers/specs/2026-08-22-ai-video-provider-console-runs-integration.md`。
 
+2026-08-22 compatibility follow-up：真实 tree 证明 historical Legacy manifests 存在于
+`runs/<capture>/output/<attempt>/manifest.json`，且多个合法 Production workspace 虽无
+`video_generation` attempt，仍有 canonical Shots、operations 与 Registry media。本计划据此增加
+nested Legacy reopen 和 workspace overview，strict Production invalid contract 不变。
+
 ## Contract Checkpoint Before Code
 
 - **Problem boundary:** 当前 Provider Console 是硬编码 demo，没有消费 `runs/`。

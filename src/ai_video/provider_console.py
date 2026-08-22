@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 import stat
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -22,6 +23,7 @@ from ai_video.production.project import load_production_project
 
 _BOUNDARY = {"read_only": True, "local_only": True, "network": False}
 _MEDIA_MIME_PREFIXES = ("image/", "video/")
+_MAX_WORKSPACE_MEDIA = 32
 
 
 def _enum_value(value: object) -> object:
@@ -49,6 +51,14 @@ def _is_regular_nofollow(path: Path) -> bool:
         return stat.S_ISREG(path.stat(follow_symlinks=False).st_mode) and not path.is_symlink()
     except OSError:
         return False
+
+
+def _is_legacy_workspace(relative: PurePosixPath) -> bool:
+    parts = relative.parts
+    return relative.name == "manifest.json" and (
+        len(parts) == 2
+        or (len(parts) == 4 and parts[1] == "output" and parts[2] != "state")
+    )
 
 
 def _walk_files(
@@ -120,7 +130,7 @@ def catalog_runs(
             kind = "production"
             manifest = path.parent / "state" / "manifest.json"
             marker = max((path, manifest), key=lambda item: item.stat(follow_symlinks=False).st_mtime_ns)
-        elif path.name == "manifest.json" and len(relative.parts) == 2:
+        elif _is_legacy_workspace(PurePosixPath(relative.as_posix())):
             kind = "legacy"
         if kind is None:
             continue
@@ -157,7 +167,7 @@ def _selected_workspace(root: Path, workspace: str) -> tuple[Path, str]:
         raise ValueError("workspace key is invalid")
     if relative.name == "project.yaml":
         kind = "production"
-    elif relative.name == "manifest.json" and len(relative.parts) == 2:
+    elif _is_legacy_workspace(relative):
         kind = "legacy"
     else:
         raise ValueError("workspace key is not a supported workspace")
@@ -282,6 +292,40 @@ def _asset_by_id(assets: dict[str, object], asset_id: str | None) -> object | No
     return assets.get(asset_id) if asset_id else None
 
 
+def _workspace_media_projection(
+    *,
+    workspace: str,
+    assets: dict[str, object],
+    asset_paths: dict[str, Path],
+    root: Path,
+    media_map: dict[str, dict[str, object]],
+) -> tuple[list[dict[str, object]], bool]:
+    projected: list[dict[str, object]] = []
+    truncated = False
+    for asset in sorted(assets.values(), key=lambda item: str(getattr(item, "asset_id", ""))):
+        mime_type = getattr(asset, "mime_type", "")
+        asset_id = getattr(asset, "asset_id", "")
+        if (
+            not isinstance(mime_type, str)
+            or not mime_type.startswith(_MEDIA_MIME_PREFIXES)
+            or asset_id not in asset_paths
+        ):
+            continue
+        if len(projected) >= _MAX_WORKSPACE_MEDIA:
+            truncated = True
+            break
+        media = _media_projection(
+            workspace=workspace,
+            asset=asset,
+            asset_paths=asset_paths,
+            root=root,
+            media_map=media_map,
+        )
+        if media is not None:
+            projected.append(media)
+    return projected, truncated
+
+
 def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, object]:
     try:
         loaded = load_production_project(entry)
@@ -381,6 +425,17 @@ def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, obj
                 ),
             }
         )
+    workspace_media, workspace_media_truncated = _workspace_media_projection(
+        workspace=workspace,
+        assets=assets,
+        asset_paths=loaded.asset_paths,
+        root=loaded.root,
+        media_map=media_map,
+    )
+    operation_counts = Counter(
+        str(getattr(attempt, "operation", "unknown"))
+        for attempt in loaded.manifest.attempts
+    )
     project = loaded.project
     return {
         "boundary": dict(_BOUNDARY),
@@ -401,6 +456,12 @@ def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, obj
         },
         "shots": [_shot_projection(shot) for shot in loaded.shots],
         "attempts": attempts,
+        "operation_summary": [
+            {"operation": operation, "count": count}
+            for operation, count in sorted(operation_counts.items())
+        ],
+        "workspace_media": workspace_media,
+        "workspace_media_truncated": workspace_media_truncated,
         "_media": media_map,
     }
 

@@ -42,8 +42,9 @@ evidence pointers。
   repository `runs/`。
 - Production workspace 是 `runs/**/project.yaml` 且同目录存在 `state/manifest.json`；最多扫描
   256 个 workspaces、relative depth 最多 6。
-- Legacy workspace 只接受 `runs/<run_id>/manifest.json`，不把 Production `state/manifest.json`
-  当成 Legacy。
+- Legacy workspace 接受 canonical `runs/<run_id>/manifest.json`，并兼容已存在的
+  `runs/<capture>/output/<attempt>/manifest.json` 历史布局；不得把 Production
+  `state/manifest.json` 当成 Legacy。
 - symlink、absolute relative key、`..`、越界、非 regular file、重复 workspace key 全部拒绝或作为
   typed invalid entry 隔离，不能 follow。
 - catalog 按 manifest/project mtime 降序，再按 workspace key 排序；列表阶段不声称 Project 已 strict
@@ -65,6 +66,8 @@ Registry、dependency、Provider evidence 与 registered bytes 的现有 strict 
 - Manifest pointer paths、file/content hashes、Registry asset identity、MIME、bytes、measured dimensions/
   fps/frame count/duration、egress remote bool；
 - registered first-frame/image 与 generated video 的 opaque media token。
+- bounded Manifest operation counts，以及最多 32 个 canonical Registry 中已验证的
+  `image/*` / `video/*` workspace media；它们只表示 workspace 内容，不得暗示绑定到某个 attempt。
 
 禁止把 raw prompt/negative prompt、Provider response、signed URL、credential、absolute path、raw error
 traceback 或 arbitrary evidence JSON 返回 Browser。
@@ -83,8 +86,9 @@ traceback 或 arbitrary evidence JSON 返回 Browser。
 
 - 初始加载真实 catalog；默认选择最新可加载 workspace，而非静态 Alice record。
 - 保留 Provider Console layout；增加 workspace selector 与 refresh。
-- lane rail 展示 selected workspace 中真实 video generation attempts。没有 attempt 时显示明确 empty
-  state；不得补造 Local H3/Hailuo/Seedance lanes。
+- lane rail 展示 selected workspace 中真实 video generation attempts。没有 attempt 时必须明确显示
+  “工作区已读取”，并继续展示 Project、Shots、Manifest operations 与 Registry media；不得补造
+  Local H3/Hailuo/Seedance lanes，也不得把合法的非视频 workspace 表述为读取失败。
 - 选择 lane 后，header、Shot、Provider、capability、readiness/evidence、首帧和 output media 全部来自
   projection。
 - 主 CTA 改为只读动作（查看输出/证据）；不得生成持久化意图或暗示已授权执行。
