@@ -720,7 +720,7 @@ Completion与产品声明必须按以下层级报告，不能用较低层替代�
    four-anchor local/live smoke、activation/reopen/replay、boundary/identity/motion和P6/human acceptance。
    Local T8 Hybrid是首个target，但当前尚未达到。
 3. `DIRECTED_TRANSITION_READY`：一个source与一个不同destination provider的exact pair拥有fresh
-   `ProviderTransitionCertification`，可声明该具体方向，例如`Seedance 2.0 Mini -> Local T8 C4`。
+   `ProviderTransitionCertification`，可声明该具体方向，例如`Seedance 2.0 -> Local T8 C4`。
 4. `SAME_GRADE_MULTI_DESTINATION_READY`：同一provider-neutral grade至少有两个不同destination
    providers的sealed capabilities，使用同一fixture/rubric分别通过，并完成deterministic selection、
    denial、reopen与no-fallback tests。只有达到此层才能声称“同等级多Provider可流畅切换”。
