@@ -6,6 +6,8 @@
 
 当前已实现frame-accurate composition与显式Local H3 terminal-to-first-frame continuity lane：generated MP4仍进入唯一的`CompositionSpec -> ResolvedTimeline -> HyperFrames`路径并保持P4 audio/caption/final mux语义。该lane不会让任意三个独立生成的Shot自动共享场景、角色、镜头轴线、光线或运动状态；只有带exact continuity binding并逐Shot生成的edge获得技术保证，语义质量仍需独立人工验收。
 
+2026-08-22本规范继续作为唯一Shot Continuity canonical owner，并冻结新的`C4_MULTI_ANCHOR_MOTION_CONTINUITY` target contract；不创建平行spec。该C4 contract的documentation状态为`frozen target / implementation pending`，不是当前runtime truth、Provider capability acceptance或live authorization。`runs/t8-h3-seedance-3shot-continuity-20260822-v7/`保留为失败证据：用户在full-speed viewing后明确拒绝人物identity与camera-motion continuity，Seedance result保持fetched但unactivated。历史native reviewer的`accept with concerns`、junction SSIM与MCP empty issue list均不得覆盖该user rejection或升级为Final Acceptance。
+
 ## Goal
 
 Shot Continuity 的目标是让 Shot N 已 sealed 的 terminal-frame/reference state 成为 Shot N+1 的显式 generation input，而不是隐含 prompt 约定。该输入必须同时绑定：
@@ -19,6 +21,8 @@ Shot Continuity 的目标是让 Shot N 已 sealed 的 terminal-frame/reference s
 - Shot N 的 exit state 与 Shot N+1 的 entrance state。
 
 成功标准不是“切点准确”或“转场平滑”，而是下一 Shot 的生成请求可证明消费了 exact upstream continuity state，并能由 executable evidence、local visual evidence 和人工 review 分层验收。
+
+对于`C4_MULTI_ANCHOR_MOTION_CONTINUITY`，成功标准进一步要求同一个resolved capability在同一次generation中同时消费exact terminal、独立canonical identity reference、approved exact future endpoint与exact upstream motion tail。静态frame anchors只能证明边界像素、identity和目标姿态约束；只有motion tail才能携带upstream gait phase、subject velocity、camera direction与camera velocity。Prompt不得代替上述任一binding。
 
 ## Current Runtime Truth
 
@@ -37,6 +41,15 @@ Shot Continuity 的目标是让 Shot N 已 sealed 的 terminal-frame/reference s
 - `LocalVideoSubmitIntent`、submit/status/fetch receipts与one-use local permit形成独立于Paid Provider Gate的durable local evidence chain；local与remote evidence不得混合。
 - `ComfyUIVideoProvider`只接受sealed profile列出的literal loopback endpoint，在R+1前验证ComfyUI commit、四个model components、native node inventory、template/binding/profile hashes与output bounds；任何mismatch均在上传或submit前fail closed，且无remote fallback。
 - Hailuo 2.3 continuity payload现已有Alice C2 adaptive one-submit canonical technical acceptance；Seedance 2.0 Mini仍只有offline acceptance和一次current-task pre-submit fail-closed evidence。Hailuo的结果不能外推为Seedance、three-lane或Router acceptance。
+
+当前代码对C4仍存在可执行缺口：
+
+- exact-terminal Router projection固定为`("first_frame",)`，没有投影独立identity、approved endpoint或motion tail；
+- `VideoGenerationRequest` continuity validator只接受exact terminal `first_frame`加至多一个`last_frame`，因此会拒绝同一request中的独立`reference`；
+- `ProviderNeutralVideoRequirement`能够列出identity、terminal、last-frame与generic video evidence，但尚无exact motion-tail derivation/acceptance binding；
+- `VideoBindingCardinalityConstraint`能够区分I2VA、FL2VA与Ref2VA cardinality，但当前Seedance Mini I2V seal只声明`first_frame + last_frame`，Seedance reference/media bindings属于另一mode；
+- `SeedanceVideoProvider`能够把普通`reference`序列化为`reference_image`，但serializer reachability不是formal capability evidence；
+- `SeedanceAssetMaterializationReceipt`与`SeedanceAssetReferenceResolver`能seal exact Ark asset identity，却尚未证明四个C4 anchors在同一capability、egress preview与permit fingerprint中的完整闭包。
 
 ## Scope
 
@@ -60,6 +73,8 @@ Provider-specific payload、model naming、duration/resolution 限制不得进�
 - 不调用cloud video Provider，不产生新的付费行为，也不增加local失败后的cloud fallback；本slice只执行用户明确授权的bounded Local H3 two-Shot proof。
 - 不修改 P8 provider spec，不把 proposed continuity fields 写成已实现 runtime truth。
 - 默认不增加 dependency、CLI、Manifest schema 或 artifact layout。
+- 不把三张静态图、prompt中的identity/camera描述、adapter可序列化字段、另一个mode的reference能力或多个capability的并集伪装成C4 motion continuity。
+- 不把v7历史reviewer verdict、SSIM、Provider success或fetched artifact重新解释为C4 acceptance。
 
 ## Ownership and Invariants
 
@@ -133,6 +148,97 @@ Continuity request 必须在 submit 前完成 provider-neutral capability resolu
 - capability 不满足时返回 typed `VIDEO_CAPABILITY_UNSUPPORTED`，Provider submit call count 必须为零。
 - 不得从 continuity-enabled I2V 静默退化为 T2V、独立生成、仅 prompt conditioning 或远程 fallback。
 - Provider adapter 只能翻译已经 resolved 的 request；不得自行删除 continuity binding、替换 reference 或降低 constraint。
+
+## C4 Multi-Anchor Motion Continuity Contract
+
+`C4_MULTI_ANCHOR_MOTION_CONTINUITY`是现有C1 terminal continuation、C2 hard-cut keyframe和future C3 reference-to-video之上的additive continuity tier。C1/C2/C3历史request、hash、reopen与acceptance边界保持不变；只有显式声明C4的new attempt使用本节contract。
+
+### Static and Motion Tiers
+
+C4必须分别通过两个不可合并的验收层：
+
+1. `C4_STATIC_BOUNDARY`：同一次generation严格包含exact upstream terminal `first_frame`、独立canonical identity `reference`与approved exact future `last_frame`。该层约束切点像素/站位、人物/发型/服装/关键prop identity以及目标停止姿态，但不证明motion continuity。
+2. `C4_MOTION_BOUNDARY`：在完整`C4_STATIC_BOUNDARY`上再增加exact upstream motion tail `reference_video`。只有该层通过才可称`C4_MULTI_ANCHOR_MOTION_CONTINUITY`完成；三张静态图即使都存在也不能满足该层。
+
+任一anchor缺失、重复、role错误、排序非canonical、bytes tampered、lineage stale、materialization不完整或capability无法同时表达全部bindings时，resolution必须fail closed且external-effect count为零。
+
+### Semantic Boundary State
+
+C4 attempt只有在target Shot已达到`contract_ready`时才可构造。其semantic continuity snapshot必须明确：
+
+- `open_state`：exact terminal pixels/站位，加motion tail末段的gait/action phase、subject velocity、camera direction与camera velocity；
+- `must_hold`：canonical face/hair/body identity、服装、关键prop（本lane包括red satchel）、scene/light/color、camera axis与screen direction；
+- `changes_here`：只允许Shot contract批准的继续运动、可见减速与停止，不得以frame reset、无因果转身或camera jump完成；
+- `close_state`：approved endpoint中的主体姿态、接触关系、screen position/scale、camera endpoint、FOV与停止后的inertia/prop state。
+
+v7应按`F-ID-DRIFT`、`F-CAMERA-PATH`/`F-CONTINUITY`归因到asset/reference、Shot contract、platform capability与motion conditioning layers；不得默认通过堆叠prompt同义词修复。Skill建议只帮助形成上述semantic snapshot，不能成为anchor或acceptance evidence。
+
+### Exact Anchor Set
+
+每个C4 input必须由一个strict anchor binding同时记录semantic role与provider-native role：
+
+| Semantic role | Native binding role | Required identity |
+| --- | --- | --- |
+| `continuity_terminal` | `first_frame` | accepted upstream video的exact `TerminalFrameEvidence`与extracted PNG |
+| `identity` | `reference` | 独立canonical Character identity asset，不能由terminal、endpoint或scene plate兼任 |
+| `approved_endpoint` | `last_frame` | exact target-Shot future stop-pose asset与human approval/feasibility evidence |
+| `continuity_motion_tail` | `reference_video` | 从同一accepted upstream video精确派生的content-addressed尾段MP4/MOV |
+
+每个anchor都必须seal：
+
+- exact Asset Registry `asset_id`、selected Registry revision/pointer、asset SHA-256、MIME、byte size与measured dimensions；video tail另含duration、FPS与frame count；
+- semantic role、native role、target Shot revision/content hash与canonical ordering position；
+- source provenance receipt identity/hash；identity anchor另含canonical Character ID/revision/content hash；
+- provider materialization receipt identity/hash，绑定exact provider/profile/capability、local asset identity与provider materialized identity；不得持久化signed URL或raw credential；
+- anchor binding schema/version与canonical content hash，并进入requirement、provider-bound request、egress preview、one-use permit和resolved generation fingerprint。
+
+Remote Provider必须为四个inputs分别提供exact materialization receipt；Seedance只能通过`SeedanceAssetMaterializationReceipt`和`SeedanceAssetReferenceResolver`或后续同等严格、单一canonical owner的compatible extension导出`asset://`identity。Local Registry ID、filename、prompt handle或adapter-local path不得伪装成Provider materialization。
+
+### Motion Tail Evidence
+
+`continuity_motion_tail`必须从已经activated且由P6接受的upstream generated-video artifact派生，不能来自review derivative、unactivated fetch、prompt preview或另一个take。其content-addressed evidence至少绑定：
+
+- exact source Shot revision/content hash、source video asset ID/SHA-256、Registry revision、generation/resolved/provenance identity与P6 acceptance evidence；
+- selection rule/version、start/end rational timestamps、inclusive start/end frame indices、source FPS与selected frame count；
+- tail必须以`TerminalFrameEvidence.frame_index`结束，并与terminal anchor共享同一source video SHA-256；
+- deterministic extractor/tool identity、canonical arguments、extraction receipt hash；
+- extracted tail bytes SHA-256、MIME、size、measured width/height/FPS/duration/frame count；
+- target Shot、continuity constraint snapshot与motion-tail evidence canonical hash。
+
+Tail duration不由Skill heuristic固定；它必须在selected Provider正式duration bounds内，并长到足以包含至少两个连续motion transitions。Selection range任何变化都必须改变requirement/permit fingerprints并触发真实P5 downstream closure；exact replay不得重复tail extraction、materialization或Provider effect。
+
+### Approved Endpoint Feasibility
+
+`approved_endpoint`不是普通storyboard still。它必须绑定target Shot、exact output duration、C4 terminal/identity/motion-tail identities和一个content-addressed feasibility receipt，并在Provider preview前逐项通过：
+
+- `camera axis`：endpoint保持accepted axis/camera side，或显式声明由Shot contract批准的可见轴线变化；不得镜像或猜测；
+- `screen direction`：subject displacement与upstream motion tail的signed direction一致，除非Shot contract明确要求可见减速、转身或反向；
+- `subject scale`与`FOV`：endpoint occupancy、camera distance/angle与sealed FOV policy相容，不能通过无解释的scale jump实现构图；
+- `reachable displacement`：根据tail末段measured subject/camera velocity envelope、target duration与sealed acceleration/deceleration bounds，endpoint位置可达；
+- `no teleport`：不存在单帧位置跳变、unmotivated camera translation/zoom或超出reachable envelope的姿态切换。
+
+自动backend无法可信评估axis、identity、FOV或reachable displacement时必须返回`NOT_EVALUATED`并要求exact-bound human feasibility evidence；不得把prompt、bounding-box相似或SSIM猜成PASS。只有全部required checks有`PASS`或policy-allowed human conclusion时，endpoint才可成为C4 input。
+
+### Provider Capability and Router Gate
+
+Router只能选择一个exact capability variant；不得把I2V、FL2VA、Ref2VA或V2V几个variants的能力做并集。完整C4 motion variant至少必须同时声明：
+
+- selected mode可以在一个native request中同时表达`first_frame`、`last_frame`、`reference`与`reference_video`；
+- `allowed_image_roles`包含上述三个image roles，`VideoMediaCapability`显式允许一个motion-tail video；
+- static boundary capability的`VideoBindingCardinalityConstraint`必须对`first_frame=1`、`last_frame=1`、`reference=1`、`reference_video=0`、`reference_audio=0`和all-role total `=3`形成exact grammar；motion boundary capability必须在同一semantic contract上要求`reference_video=1`和all-role total `=4`；
+- capability seal明确证明native `reference_video`在该mode中承载continuity motion tail，而不是仅style/reference advisory；
+- image/video MIME、size、geometry、duration、output、audio与materialization bounds全部满足。
+
+`requirement_bindings()`必须保持semantic role与exact asset的一一对应，Router provider-bound projection必须deterministic且prompt-free；`VideoGenerationRequest`仍按唯一canonical image/media ordering序列化。缺失/重复/错序或capability cardinality mismatch必须在adapter compiler、paid preview、permit mint/consume和POST之前拒绝，不允许T2V fallback、prompt fallback、Provider fallback或伪造mixed capability。
+
+当前`doubao-seedance-2-0-mini-260615` sealed profile只分别证明I2V的`first_frame + last_frame`和reference-mode的reference/media surfaces，尚未证明一个native request中的完整C4组合。`SeedanceVideoProvider._payload()`能输出`reference_image`不构成formal evidence。只有dated official API contract、exact request schema/example与offline compiler tests共同证明完整组合后，才可新增独立C4 capability seal；若formal contract不能证明，必须保留现有seal并在Paid Provider preview/POST前fail closed。
+
+### Ownership and Compatibility
+
+- Skill只提供continuity/prompt/camera advisory；AI-VIDEO继续独占Character/Shot artifacts、capability、Registry identity、materialization、paid lifecycle、review/repair与acceptance truth，`runtime_skill_calls = 0`保持不变。
+- `ProductionStateCommitter`、Production Manifest、Asset Registry、Dependency Graph、`ResolvedTimeline`、HyperFrames与existing Paid Provider recovery ownership保持不变；C4不得新增writer、timeline、activation owner、automatic recovery或Provider fallback。
+- New C4 requirement/request/evidence schema必须additive；C1/C2/C3与legacy T2V/I2V/R2V requests在C4 fields缺失时保持bit-for-bit historical hash/reopen semantics。
+- P5只沿四个exact input asset/evidence edges传播到target generation与真实composition/render closure；unlinked Shots、voice、captions与无关assets保持fresh。
 
 ## Provider-Specific Profiles
 
@@ -302,6 +408,13 @@ P5 graph 必须表达一个 typed continuity dependency：Shot N 的 exact activ
 
 三层必须分别报告。Technical acceptance 不等于 live proof，live proof 也不等于 subjective quality acceptance。
 
+C4在上述三层之外还必须把static boundary与motion boundary拆开报告：
+
+1. `static boundary acceptance`逐项检查exact terminal-to-first-frame、canonical identity、approved endpoint、axis、screen direction、subject scale/FOV与stop-pose feasibility；
+2. `motion boundary acceptance`逐项检查upstream gait/action phase、subject velocity、camera direction、camera velocity、deceleration/stop behavior以及cut前后full-speed playback。
+
+SSIM/PSNR只可作为边界像素相似度evidence，不能替代identity或motion视觉判断。Reviewer verdict、automatic analyzer与human/user review必须保留各自来源；用户对identity或camera continuity的明确rejection使对应C4 subjective dimension失败，即使technical tests、Provider lifecycle或其他reviewer通过。
+
 ## Bounded Hybrid Continuity Evaluator V1
 
 2026-08-22 的 Option A 授权增加一个 local/no-network evaluator slice。该 slice 可以把
@@ -354,6 +467,8 @@ artifact/constraints/evaluator binding 后，其 content-addressed evidence 必�
 ## Authorization Boundary
 
 2026-08-19 Local MiniMax H3 `fl2va` two-Shot proof由当时任务单独授权并完成。2026-08-20用户先对Alice C2 Hailuo 2.3与Seedance 2.0 Mini各最多一次remote submit作出独立task-scoped authorization，随后以“全部授权继续”批准解决已报告blocker所需的新bounded adaptive Hailuo request。该request已消费一次submit并完成canonical lifecycle；Seedance fresh budget已满足但仍因egress materialization gate保持零submit。两项lane都不扩展为blind retry、其他model/provider、`ref2va`、Shot Router或额外benchmark；任何后续live execution仍必须重新满足exact provider/model、预算、Cloud Egress与Paid Provider one-use permit。
+
+2026-08-22 v7 Seedance paid submit已经被该attempt消费，且result被用户拒绝并保持unactivated。本轮只授权canonical spec/plan更新，不授权runtime implementation、local/cloud generation、paid preview/POST、permit mint/consume或media quality claim。未来C4 live smoke必须在implementation、tests、formal capability evidence、fresh Harness与native independent review全部完成后，取得新的task-scoped paid authorization、fresh budget/egress decision和新的one-use permit；旧v7 authorization/permit/receipt不得复用。
 
 ## Rollback
 
