@@ -675,6 +675,28 @@ def test_video_recovery_change_routes_to_video_provider_suite() -> None:
     assert "tests/test_production_generated_video_e2e.py" in provider_argv
 
 
+def test_video_execution_control_paths_route_to_complete_provider_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/production/video_candidate.py",
+        "src/ai_video/production/video_generation.py",
+        "tests/test_video_candidate.py",
+        "tests/test_video_generation.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == []
+        assert "production_video_provider" in report["categories"]
+        assert "production_video_provider_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
+
+    provider_argv = policy["checks"]["production_video_provider_tests"]["argv"]
+    production_argv = policy["checks"]["production_contract_tests"]["argv"]
+    for path in ("tests/test_video_candidate.py", "tests/test_video_generation.py"):
+        assert path in provider_argv
+    assert "production or video_candidate or video_generation" in production_argv
+
+
 def test_continuity_evaluator_routes_to_review_and_video_provider_suites() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
