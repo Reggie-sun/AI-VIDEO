@@ -1,0 +1,272 @@
+{
+  "$defs": {
+    "ContinuityMode": {
+      "enum": [
+        "exact_terminal",
+        "reference",
+        "semantic",
+        "none"
+      ],
+      "title": "ContinuityMode",
+      "type": "string"
+    },
+    "EvidenceRequirement": {
+      "enum": [
+        "target_shot_identity",
+        "shot_intent_evidence",
+        "motion_requirement",
+        "previous_terminal_bytes",
+        "character_identity_references",
+        "scene_reference",
+        "approved_keyframe",
+        "continuity_state",
+        "narration_timing",
+        "human_continuity_review"
+      ],
+      "title": "EvidenceRequirement",
+      "type": "string"
+    },
+    "ExpectedFailureMode": {
+      "enum": [
+        "identity_drift",
+        "pose_discontinuity",
+        "spatial_discontinuity",
+        "camera_angle_mismatch",
+        "multi_character_occlusion",
+        "framing_mismatch",
+        "static_feel",
+        "motion_artifact",
+        "cost_overuse",
+        "reference_leakage",
+        "timing_mismatch"
+      ],
+      "title": "ExpectedFailureMode",
+      "type": "string"
+    },
+    "ForbiddenFallback": {
+      "enum": [
+        "unanchored_text_to_video",
+        "silent_static_substitution",
+        "silent_image_motion_substitution",
+        "reuse_reference_as_final_visual",
+        "all_shots_generated_video",
+        "automatic_provider_fallback",
+        "provider_specific_hard_binding"
+      ],
+      "title": "ForbiddenFallback",
+      "type": "string"
+    },
+    "GenerationMode": {
+      "enum": [
+        "static_image",
+        "image_motion",
+        "text_to_video",
+        "image_to_video",
+        "first_last_frame_video",
+        "reference_to_video",
+        "video_edit",
+        "video_extend",
+        "hybrid"
+      ],
+      "title": "GenerationMode",
+      "type": "string"
+    },
+    "RepairAction": {
+      "enum": [
+        "recheck_terminal_lineage",
+        "request_shot_specific_keyframe",
+        "strengthen_identity_references",
+        "reduce_reference_set",
+        "split_occluded_characters",
+        "relax_exact_terminal_to_reference",
+        "reassess_motion_need",
+        "downgrade_to_image_motion",
+        "downgrade_to_static_image",
+        "escalate_hero_shot_to_generated_video",
+        "require_human_review"
+      ],
+      "title": "RepairAction",
+      "type": "string"
+    },
+    "RequiredInput": {
+      "enum": [
+        "target_shot",
+        "shot_intent",
+        "motion_requirement",
+        "previous_shot_terminal",
+        "character_references",
+        "scene_reference",
+        "approved_keyframe",
+        "continuity_state",
+        "narration_track",
+        "caption_track"
+      ],
+      "title": "RequiredInput",
+      "type": "string"
+    },
+    "ReviewRequirement": {
+      "enum": [
+        "continuity",
+        "identity",
+        "pose",
+        "spatial_layout",
+        "camera_axis",
+        "framing",
+        "occlusion",
+        "motion_need",
+        "cost_fit",
+        "voice_caption_timeline"
+      ],
+      "title": "ReviewRequirement",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Strict advisory schema mirrored by ``schema.json``.",
+  "properties": {
+    "applicable_when": {
+      "items": {
+        "maxLength": 500,
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Applicable When",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "continuity_preferences": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ContinuityMode"
+      },
+      "title": "Continuity Preferences",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "description": {
+      "maxLength": 500,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "evidence_required": {
+      "items": {
+        "$ref": "#/$defs/EvidenceRequirement"
+      },
+      "minItems": 1,
+      "title": "Evidence Required",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "expected_failure_modes": {
+      "items": {
+        "$ref": "#/$defs/ExpectedFailureMode"
+      },
+      "minItems": 1,
+      "title": "Expected Failure Modes",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "forbidden_fallbacks": {
+      "items": {
+        "$ref": "#/$defs/ForbiddenFallback"
+      },
+      "minItems": 1,
+      "title": "Forbidden Fallbacks",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "known_limitations": {
+      "items": {
+        "maxLength": 500,
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Known Limitations",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "name": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "playbook_id": {
+      "pattern": "^[a-z][a-z0-9_]{2,63}$",
+      "title": "Playbook Id",
+      "type": "string"
+    },
+    "preferred_strategies": {
+      "items": {
+        "$ref": "#/$defs/GenerationMode"
+      },
+      "minItems": 1,
+      "title": "Preferred Strategies",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "quality_notes": {
+      "default": [],
+      "items": {
+        "maxLength": 500,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Quality Notes",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "repair_playbook": {
+      "items": {
+        "$ref": "#/$defs/RepairAction"
+      },
+      "minItems": 1,
+      "title": "Repair Playbook",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "required_inputs": {
+      "items": {
+        "$ref": "#/$defs/RequiredInput"
+      },
+      "minItems": 1,
+      "title": "Required Inputs",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "review_requirements": {
+      "items": {
+        "$ref": "#/$defs/ReviewRequirement"
+      },
+      "minItems": 1,
+      "title": "Review Requirements",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "version": {
+      "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$",
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "version",
+    "playbook_id",
+    "description",
+    "applicable_when",
+    "required_inputs",
+    "preferred_strategies",
+    "forbidden_fallbacks",
+    "evidence_required",
+    "known_limitations",
+    "expected_failure_modes",
+    "review_requirements",
+    "repair_playbook"
+  ],
+  "title": "PlaybookDocument",
+  "type": "object"
+}

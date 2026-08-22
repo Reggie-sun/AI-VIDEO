@@ -1,0 +1,58 @@
+name: Character Consistent Dialogue Scene
+version: 1.0.0
+playbook_id: character_consistent_dialogue_scene
+description: Advisory strategy for dialogue coverage where character identity outranks seamless pixel continuity.
+applicable_when:
+  - One or more recurring characters appear across Shot changes in the same dialogue scene.
+  - Identity, wardrobe, and scene continuity have higher priority than exact terminal pixels.
+required_inputs:
+  - target_shot
+  - shot_intent
+  - motion_requirement
+  - character_references
+  - scene_reference
+  - continuity_state
+preferred_strategies:
+  - reference_to_video
+  - image_to_video
+  - image_motion
+forbidden_fallbacks:
+  - unanchored_text_to_video
+  - reuse_reference_as_final_visual
+  - silent_static_substitution
+  - automatic_provider_fallback
+evidence_required:
+  - target_shot_identity
+  - shot_intent_evidence
+  - character_identity_references
+  - scene_reference
+  - continuity_state
+  - human_continuity_review
+known_limitations:
+  - Exact terminal pixels and identity references solve different continuity problems.
+  - Strong angle changes can require a Shot-specific keyframe even with good references.
+  - Occlusion and multiple similar characters can weaken identity binding.
+expected_failure_modes:
+  - identity_drift
+  - camera_angle_mismatch
+  - multi_character_occlusion
+  - reference_leakage
+  - framing_mismatch
+review_requirements:
+  - identity
+  - continuity
+  - camera_axis
+  - framing
+  - occlusion
+repair_playbook:
+  - strengthen_identity_references
+  - reduce_reference_set
+  - split_occluded_characters
+  - request_shot_specific_keyframe
+  - require_human_review
+continuity_preferences:
+  - reference
+  - exact_terminal
+  - semantic
+quality_notes:
+  - Do not treat a reference image as the approved final visual for the target Shot.

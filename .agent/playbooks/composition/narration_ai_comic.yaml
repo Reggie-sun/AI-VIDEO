@@ -1,0 +1,53 @@
+name: Narration AI Comic
+version: 1.0.0
+playbook_id: narration_ai_comic
+description: Advisory cost-aware strategy for narrated AI comics where only selected Shots require generated motion.
+applicable_when:
+  - Narration and editorial rhythm carry the sequence without continuous generated motion.
+  - Static or image-motion Shots can satisfy intent while hero or action Shots need generated video.
+required_inputs:
+  - target_shot
+  - shot_intent
+  - motion_requirement
+  - narration_track
+  - caption_track
+preferred_strategies:
+  - static_image
+  - image_motion
+  - reference_to_video
+  - hybrid
+forbidden_fallbacks:
+  - all_shots_generated_video
+  - reuse_reference_as_final_visual
+  - automatic_provider_fallback
+  - provider_specific_hard_binding
+evidence_required:
+  - target_shot_identity
+  - shot_intent_evidence
+  - motion_requirement
+  - narration_timing
+known_limitations:
+  - Static sequences can feel inert when editorial pacing and image motion are both weak.
+  - Action or hero Shots may need generated video despite the default cost-aware treatment.
+  - Voice, captions, and timing remain owned by their canonical timeline contracts.
+expected_failure_modes:
+  - static_feel
+  - timing_mismatch
+  - cost_overuse
+  - motion_artifact
+review_requirements:
+  - motion_need
+  - cost_fit
+  - voice_caption_timeline
+  - framing
+repair_playbook:
+  - reassess_motion_need
+  - downgrade_to_static_image
+  - downgrade_to_image_motion
+  - escalate_hero_shot_to_generated_video
+  - require_human_review
+continuity_preferences:
+  - semantic
+  - none
+quality_notes:
+  - Generated video is reserved for Shots whose approved intent genuinely requires subject motion.

@@ -1,0 +1,56 @@
+name: Hard Cut Continuation
+version: 1.0.0
+playbook_id: hard_cut_continuation
+description: Advisory strategy for adjacent Shots that continue action or space across an explicit cut.
+applicable_when:
+  - The previous and target Shots share a continuous action or continuous space.
+  - Entrance, pose, screen direction, or spatial continuity should survive the cut.
+required_inputs:
+  - target_shot
+  - shot_intent
+  - motion_requirement
+  - previous_shot_terminal
+  - continuity_state
+preferred_strategies:
+  - image_to_video
+  - first_last_frame_video
+  - reference_to_video
+forbidden_fallbacks:
+  - unanchored_text_to_video
+  - silent_static_substitution
+  - automatic_provider_fallback
+  - provider_specific_hard_binding
+evidence_required:
+  - target_shot_identity
+  - shot_intent_evidence
+  - motion_requirement
+  - previous_terminal_bytes
+  - continuity_state
+  - human_continuity_review
+known_limitations:
+  - Large camera or angle changes may make exact terminal pixels a poor opening frame.
+  - Multi-character occlusion can make pose and identity continuity ambiguous.
+  - A new Shot-specific keyframe may be safer than reusing the terminal as final visual truth.
+expected_failure_modes:
+  - pose_discontinuity
+  - spatial_discontinuity
+  - camera_angle_mismatch
+  - multi_character_occlusion
+  - framing_mismatch
+review_requirements:
+  - continuity
+  - identity
+  - pose
+  - spatial_layout
+  - camera_axis
+  - occlusion
+repair_playbook:
+  - recheck_terminal_lineage
+  - request_shot_specific_keyframe
+  - relax_exact_terminal_to_reference
+  - require_human_review
+continuity_preferences:
+  - exact_terminal
+  - reference
+quality_notes:
+  - Review the decoded boundary and the target Shot opening, not only lineage hashes.
