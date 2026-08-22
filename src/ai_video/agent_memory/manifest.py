@@ -9,7 +9,11 @@ from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
-from ai_video.agent_memory.corpus import CorpusSpec, iter_markdown_files
+from ai_video.agent_memory.corpus import (
+    CorpusSpec,
+    iter_markdown_files,
+    load_run_summary_documents,
+)
 from ai_video.agent_memory.embeddings import EmbeddingIdentity, embedding_identity
 
 
@@ -66,6 +70,18 @@ def corpus_digest(root: Path) -> tuple[str, int]:
     return digest.hexdigest(), len(paths)
 
 
+def run_summary_digest(root: Path) -> tuple[str, int]:
+    """Digest only of the run summaries that will actually be indexed.
+
+    Distinct from :func:`corpus_digest` so that the separate derived index
+    manifest for ``run_summaries`` binds exactly to the bytes that survive
+    the highest-version-per-family filter, not to every file under
+    ``runs/``.  Missing or empty roots return an empty digest.
+    """
+    _, source_sha256, count = load_run_summary_documents(root)
+    return source_sha256, count
+
+
 def _library_versions() -> dict[str, str]:
     output: dict[str, str] = {}
     for package in (
@@ -95,7 +111,10 @@ def create_manifest(
     corpus_items: list[CorpusManifest] = []
     for corpus in corpora:
         if corpus_identities is None:
-            source_sha256, document_count = corpus_digest(corpus.root)
+            if corpus.kind == "run_summaries":
+                source_sha256, document_count = run_summary_digest(corpus.root)
+            else:
+                source_sha256, document_count = corpus_digest(corpus.root)
         else:
             source_sha256, document_count = corpus_identities[corpus.kind]
         corpus_items.append(
@@ -181,8 +200,15 @@ def validate_manifest(
             raise IndexMismatchError(
                 f"corpus contract mismatch for {corpus.kind!r}; rebuild required"
             )
-        digest, _ = corpus_digest(corpus.root)
-        if item.source_sha256 != digest or item.root != _display_root(corpus.root):
+        if corpus.kind == "run_summaries":
+            digest, document_count = run_summary_digest(corpus.root)
+        else:
+            digest, document_count = corpus_digest(corpus.root)
+        if (
+            item.source_sha256 != digest
+            or item.document_count != document_count
+            or item.root != _display_root(corpus.root)
+        ):
             raise IndexMismatchError(
                 f"stale corpus {corpus.kind!r}; rebuild the Agent Memory index"
             )

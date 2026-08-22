@@ -6,15 +6,22 @@ and recovery notes and returns source + score + excerpt for Codex to read.
 
 The retrieved records are advisory evidence only and never override
 current code, tests, or runtime truth.
+
+Auto-generated ``runs/<run_id>/SUMMARY.md`` files are picked up into a
+separate derived index via the ``run_summaries`` corpus kind; they never
+piggyback on the main experience/superpowers index.
 """
 
 from ai_video.agent_memory.config import (
     DEFAULT_COLLECTION,
     DEFAULT_CORPUS_ROOT,
     DEFAULT_INDEX_PATH,
+    DEFAULT_RUNS_INDEX_PATH,
+    DEFAULT_RUNS_ROOT,
     DEFAULT_SCOPE,
     DEFAULT_SUPERPOWERS_ROOT,
     DEFAULT_TOP_K,
+    RUN_SUMMARIES_COLLECTION,
 )
 from ai_video.agent_memory.corpus import CorpusSpec
 from ai_video.agent_memory.embeddings import (
@@ -36,10 +43,13 @@ __all__ = [
     # config
     "DEFAULT_CORPUS_ROOT",
     "DEFAULT_SUPERPOWERS_ROOT",
-    "DEFAULT_SCOPE",
+    "DEFAULT_RUNS_ROOT",
     "DEFAULT_INDEX_PATH",
+    "DEFAULT_RUNS_INDEX_PATH",
+    "DEFAULT_SCOPE",
     "DEFAULT_TOP_K",
     "DEFAULT_COLLECTION",
+    "RUN_SUMMARIES_COLLECTION",
     "CorpusSpec",
     # embeddings
     "LocalOnnxMiniLMEmbeddings",

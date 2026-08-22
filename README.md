@@ -42,8 +42,20 @@ Requirements:
 ## Agent Memory RAG
 
 Agent Memory 是独立于 Production runtime 的本地 advisory retrieval tool。默认
-`experience` scope 只检索 `docs/record_for_agent/`；`superpowers` scope 检索
-`docs/superpowers/` 中的历史 specs/plans，结果不得当作当前 runtime truth。
+`experience` scope 检索 `docs/record_for_agent/`，并自动合并 eligible run
+summaries；`superpowers` scope 只检索 `docs/superpowers/` 中的历史
+specs/plans。所有结果都不得当作当前 runtime truth。
+
+`runs/<run_id>/SUMMARY.md`（auto-generated run summaries）通过独立的 derived
+index `.agent/memory/run-summaries`（collection `agent_memory_run_summaries`，
+authority `auto_generated_run_summary_advisory`）被发现；无需手动复制或单独
+build，experience 与 all 检索会在 corpus digest 变化时自动重建；schema
+仍然保持 v1。只有精确的一层 `runs/<run_id>/SUMMARY.md` regular non-symlink
+文件，且带 `Status` 行，trailing `-vN` 解析为 `run_family`/`run_version` 且只
+保留同 family 的最高版本。`superpowers` scope 不会触达 runs；缺失的 runs
+root 不会产生 hit。Run-summary 检索会返回带 `document_kind=run_summary`、
+`run_id`/`run_family`/`run_version`/`summary_sha256` 与显式 formatted
+authority 标签的 `Hit`。
 
 安装 optional dependencies，并显式下载 pinned multilingual E5 ONNX 模型：
 
@@ -73,7 +85,7 @@ snapshot_download(
 PY
 ```
 
-Runtime 不会自动下载模型或联网 fallback。构建两个 named corpora 并检索：
+Runtime 不会自动下载模型或联网 fallback。构建 named corpora 并检索：
 
 ```bash
 python -m scripts.agent_memory --scope all build
@@ -83,8 +95,11 @@ python -m scripts.agent_memory --scope superpowers search \
   "镜头连续性 contract"
 ```
 
-Index manifest 会绑定 corpus digest、chunking、embedding identity 与 library
+主 index manifest 会绑定 corpus digest、chunking、embedding identity 与 library
 versions；source 或 model 不匹配时 search 会 fail closed 并要求 rebuild。
+Run-summary derived index 使用相同的完整 identity 校验，但 missing/stale 时由
+`experience` / `all` search 自动重建。它与主 index 都保持 schema v1，且
+collection、authority 与 index 目录相互独立。
 
 ## Architecture Gate
 

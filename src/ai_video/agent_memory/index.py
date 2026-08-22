@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import gc
 import hashlib
 import logging
 import os
@@ -13,18 +12,23 @@ from pathlib import Path
 from typing import Sequence
 
 import chromadb
+from chromadb.api.client import SharedSystemClient
 from chromadb.config import Settings
 from langchain_core.embeddings import Embeddings
 
 from ai_video.agent_memory.chunking import chunk_documents
 from ai_video.agent_memory.config import DEFAULT_EMBED_BATCH_SIZE
-from ai_video.agent_memory.corpus import CorpusSpec, load_document_snapshot
+from ai_video.agent_memory.corpus import (
+    CorpusSpec,
+    load_document_snapshot,
+)
 from ai_video.agent_memory.manifest import (
     IndexManifest,
     IndexMismatchError,
     create_manifest,
     corpus_digest,
     read_manifest,
+    run_summary_digest,
     validate_manifest,
     write_manifest,
 )
@@ -39,6 +43,17 @@ def _client(index_path: Path):
         path=str(index_path),
         settings=Settings(anonymized_telemetry=False),
     )
+
+
+def _release_cached_client(index_path: Path) -> None:
+    """Stop Chroma's path-scoped system before replacing its SQLite directory."""
+    identifier = str(Path(index_path))
+    system = SharedSystemClient._identifier_to_system.get(identifier)
+    if system is not None:
+        try:
+            system.stop()
+        finally:
+            SharedSystemClient._identifier_to_system.pop(identifier, None)
 
 
 def index_exists(index_path: Path) -> bool:
@@ -62,6 +77,25 @@ def _chunk_id(corpus: CorpusSpec, chunk) -> str:
     return hashlib.sha256(seed.encode("utf-8")).hexdigest()
 
 
+def validate_index_path(
+    index_path: Path,
+    protected_paths: Sequence[Path],
+    *,
+    label: str = "index",
+) -> None:
+    """Reject index directories that overlap source or sibling index paths."""
+    resolved_index = Path(index_path).resolve()
+    for protected_path in protected_paths:
+        resolved_protected = Path(protected_path).resolve()
+        if (
+            resolved_index == resolved_protected
+            or resolved_index in resolved_protected.parents
+            or resolved_protected in resolved_index.parents
+        ):
+            raise ValueError(
+                f"{label} path must not overlap protected path: "
+                f"{resolved_index} vs {resolved_protected}"
+            )
 def _build_staging_index(
     corpora: Sequence[CorpusSpec],
     staging_path: Path,
@@ -95,7 +129,11 @@ def _build_staging_index(
                 embeddings=embedding.embed_documents(texts),
             )
     for corpus in corpora:
-        if corpus_digest(corpus.root) != corpus_identities[corpus.kind]:
+        if corpus.kind == "run_summaries":
+            current = run_summary_digest(corpus.root)
+        else:
+            current = corpus_digest(corpus.root)
+        if current != corpus_identities[corpus.kind]:
             raise IndexMismatchError(
                 f"corpus {corpus.kind!r} changed during index build; retry required"
             )
@@ -106,8 +144,6 @@ def _build_staging_index(
         corpus_identities=corpus_identities,
     )
     write_manifest(staging_path, manifest)
-    del client
-    gc.collect()
     return total, manifest
 
 
@@ -123,6 +159,11 @@ def build_scoped_index(
         raise ValueError("at least one corpus is required")
     if batch_size < 1:
         raise ValueError("index batch_size must be positive")
+    index_path = Path(index_path)
+    validate_index_path(
+        index_path,
+        tuple(corpus.root for corpus in corpora),
+    )
     kinds = [item.kind for item in corpora]
     if len(kinds) != len(set(kinds)):
         raise ValueError("corpus kinds must be unique")
@@ -130,7 +171,6 @@ def build_scoped_index(
         if not Path(corpus.root).is_dir():
             raise FileNotFoundError(f"corpus not found: {corpus.root}")
 
-    index_path = Path(index_path)
     index_path.parent.mkdir(parents=True, exist_ok=True)
     staging_path = Path(
         tempfile.mkdtemp(
@@ -147,6 +187,7 @@ def build_scoped_index(
             embedding,
             batch_size,
         )
+        _release_cached_client(staging_path)
         if index_path.exists():
             os.replace(index_path, backup_path)
             old_moved = True
@@ -159,6 +200,7 @@ def build_scoped_index(
             os.replace(backup_path, index_path)
         raise
     finally:
+        _release_cached_client(staging_path)
         if staging_path.exists():
             shutil.rmtree(staging_path)
 
@@ -197,12 +239,87 @@ def load_index(
     return _client(Path(index_path))
 
 
+def validate_run_summary_index(
+    runs_index_path: Path,
+    runs_corpus: CorpusSpec,
+    embedding: Embeddings,
+) -> IndexManifest:
+    """Validate run-summary identity plus the physical Chroma collection."""
+    runs_index_path = Path(runs_index_path)
+    if not index_exists(runs_index_path):
+        raise IndexMismatchError("run-summary index is missing")
+    manifest = read_index_manifest(runs_index_path)
+    validate_manifest(manifest, (runs_corpus,), embedding)
+    if [item.kind for item in manifest.corpora] != ["run_summaries"]:
+        raise IndexMismatchError("run-summary index contains unexpected corpora")
+    item = manifest.corpora[0]
+    try:
+        collection = _client(runs_index_path).get_collection(item.collection_name)
+        actual_chunks = collection.count()
+    except Exception as exc:
+        raise IndexMismatchError("run-summary collection is unavailable") from exc
+    if actual_chunks != item.chunk_count:
+        raise IndexMismatchError("run-summary collection chunk count mismatch")
+    return manifest
+
+
+def ensure_run_summary_index(
+    runs_corpus: CorpusSpec,
+    runs_index_path: Path,
+    embedding: Embeddings,
+) -> None:
+    """Rebuild the derived run-summary index when missing or stale.
+
+    Experience / all searches call this transparently so the user never
+    has to run a separate ``build`` for the run-summary collection.
+    Missing ``runs/`` roots contribute no index and no hits.
+    """
+    if runs_corpus.kind != "run_summaries":
+        raise ValueError(
+            f"ensure_run_summary_index requires a run_summaries corpus; "
+            f"got {runs_corpus.kind!r}"
+        )
+    if not runs_corpus.root.is_dir():
+        return
+    runs_index_path = Path(runs_index_path)
+    validate_index_path(
+        runs_index_path,
+        (runs_corpus.root,),
+        label="run-summary index",
+    )
+    if index_exists(runs_index_path):
+        try:
+            validate_run_summary_index(
+                runs_index_path,
+                runs_corpus,
+                embedding,
+            )
+        except IndexMismatchError:
+            pass
+        else:
+            return
+    _release_cached_client(runs_index_path)
+    build_scoped_index(
+        (runs_corpus,),
+        runs_index_path,
+        embedding,
+    )
+    try:
+        validate_run_summary_index(runs_index_path, runs_corpus, embedding)
+    except Exception:
+        _release_cached_client(runs_index_path)
+        raise
+
+
 __all__ = [
     "IndexMismatchError",
     "build_index",
     "build_scoped_index",
+    "ensure_run_summary_index",
     "index_exists",
     "load_index",
     "read_index_manifest",
+    "validate_index_path",
     "validate_manifest",
+    "validate_run_summary_index",
 ]

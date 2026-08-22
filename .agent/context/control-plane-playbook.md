@@ -154,6 +154,17 @@ Agent Memory 是 scoped、local、advisory knowledge source。`experience` scope
 中的历史 specs/plans。后者必须标记为 historical design/plan，不能升级为
 current runtime truth、implementation authorization 或 accepted contract。
 
+`runs/<run_id>/SUMMARY.md`（auto-generated run summaries）通过独立的 derived
+index `.agent/memory/run-summaries`（collection `agent_memory_run_summaries`，
+authority `auto_generated_run_summary_advisory`）被发现，无需手动复制或单独
+build。experience / all 检索会在 corpus digest 变化时自动重建该 derived
+index；schema 仍然保持 v1；缺失的 `runs/` root 不会产生 hit。只有精确的一层
+`runs/<run_id>/SUMMARY.md` regular non-symlink 文件才参与；带 `Status` 行；
+trailing `-vN` 解析为 `run_family`/`run_version`，同 family 只保留最高版本。
+`superpowers` scope 不会触达 runs。Run-summary `Hit` 显式包含 source、
+status、`document_kind=run_summary`、`run_id` / `run_family` / `run_version`、
+`summary_sha256` 与 formatted authority 标签。
+
 Use `scripts/agent_memory.py search` before substantial execution when
 the task involves:
 
@@ -170,10 +181,11 @@ The Agent SHOULD NOT query memory for trivial changes such as formatting,
 typo fixes, isolated refactors, or tests with no relation to previous
 production experience.
 
-默认只使用 `experience`。只有 task 需要历史 architecture/spec/plan evidence 时
-才使用 `--scope superpowers` 或 `--scope all`。Runtime 不得自动下载 embedding
-model、联网 fallback 或把 Agent Memory 接入 Production state；index manifest
-identity mismatch 或 stale corpus 必须 fail closed 并显式 rebuild。
+默认只使用 `experience`；它会自动合并 eligible run summaries。只有 task 需要
+历史 architecture/spec/plan evidence 时才使用 `--scope superpowers` 或
+`--scope all`。Runtime 不得自动下载 embedding model、联网 fallback 或把
+Agent Memory 接入 Production state；主 index identity mismatch 或 stale corpus
+必须 fail closed 并显式 rebuild，独立的 run-summary derived index 则自动重建。
 
 Retrieved memories are advisory only. They MUST NOT override:
 

@@ -38,6 +38,8 @@ from ai_video.agent_memory.config import (
     DEFAULT_EMBEDDING,
     DEFAULT_EMBED_BATCH_SIZE,
     DEFAULT_INDEX_PATH,
+    DEFAULT_RUNS_INDEX_PATH,
+    DEFAULT_RUNS_ROOT,
     DEFAULT_SCOPE,
     DEFAULT_SUPERPOWERS_ROOT,
     DEFAULT_TOP_K,
@@ -45,7 +47,10 @@ from ai_video.agent_memory.config import (
 )
 from ai_video.agent_memory.corpus import CorpusSpec
 from ai_video.agent_memory.embeddings import build_embedding
-from ai_video.agent_memory.index import IndexMismatchError, build_scoped_index
+from ai_video.agent_memory.index import (
+    IndexMismatchError,
+    build_scoped_index,
+)
 from ai_video.agent_memory.retrieval import format_text, search
 
 
@@ -103,7 +108,11 @@ def cmd_build(args: argparse.Namespace) -> int:
 
 def cmd_search(args: argparse.Namespace) -> int:
     idx = _resolve(args.index)
+    runs_idx = _resolve(args.runs_index)
     corpora = _resolve_corpora(args)
+    runs_corpus: CorpusSpec | None = None
+    if args.scope in {"experience", "all"}:
+        runs_corpus = CorpusSpec.run_summaries(_resolve(args.runs_root))
     try:
         embedding = build_embedding(backend=args.embedding)
         hits = search(
@@ -111,6 +120,8 @@ def cmd_search(args: argparse.Namespace) -> int:
             top_k=args.top_k,
             corpora=corpora,
             index_path=idx,
+            runs_index_path=runs_idx,
+            runs_corpus=runs_corpus,
             embedding=embedding,
             scope=args.scope,
         )
@@ -132,9 +143,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="agent_memory",
         description=(
-            "Agent project knowledge: scoped local RAG over experience records "
-            "and optional docs/superpowers/. Advisory evidence only; never "
-            "overrides current code, tests, or runtime truth."
+            "Agent project knowledge: scoped local RAG over experience records, "
+            "Superpowers plans/specs, and auto-generated runs/<run_id>/SUMMARY.md "
+            "summaries. Advisory evidence only; never overrides current code, "
+            "tests, or runtime truth."
         ),
     )
     parser.add_argument(
@@ -146,6 +158,22 @@ def main(argv: list[str] | None = None) -> int:
         "--superpowers-corpus",
         default=DEFAULT_SUPERPOWERS_ROOT,
         help="Path to the Superpowers plans/specs corpus (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--runs-root",
+        default=DEFAULT_RUNS_ROOT,
+        help=(
+            "Path to the auto-generated runs/ root. Only exact one-level "
+            "runs/<run_id>/SUMMARY.md files with a Status line are indexed "
+            "into the separate run-summary index."
+        ),
+    )
+    parser.add_argument(
+        "--runs-index",
+        default=DEFAULT_RUNS_INDEX_PATH,
+        help=(
+            "Path to the separate run-summary index directory (default: %(default)s)."
+        ),
     )
     parser.add_argument(
         "--scope",

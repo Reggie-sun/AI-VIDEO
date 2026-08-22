@@ -6,16 +6,25 @@ from __future__ import annotations
 # Superpowers plans/specs are opt-in because they have a different authority.
 DEFAULT_CORPUS_ROOT: str = "docs/record_for_agent"
 DEFAULT_SUPERPOWERS_ROOT: str = "docs/superpowers"
+# Auto-generated runs/<run_id>/SUMMARY.md files live alongside the Legacy
+# runtime. They are indexed into a *separate* derived collection so they
+# never piggyback on the experience corpus or change the main index.
+DEFAULT_RUNS_ROOT: str = "runs"
 DEFAULT_SCOPE: str = "experience"
 VALID_SCOPES: tuple[str, ...] = ("experience", "superpowers", "all")
 
 # Default local vector index directory. Treated as a derived artifact;
 # never committed to Git (see .gitignore).
 DEFAULT_INDEX_PATH: str = ".agent/memory/index"
+# Separate derived index for auto-generated run summaries. It is rebuilt
+# on demand by the main search when the corpus digest changes; no CLI
+# ``build`` invocation is required for it to surface hits.
+DEFAULT_RUNS_INDEX_PATH: str = ".agent/memory/run-summaries"
 
 # Chroma collection name. Stable across rebuilds.
 DEFAULT_COLLECTION: str = "agent_memory_experience"
 SUPERPOWERS_COLLECTION: str = "agent_memory_superpowers"
+RUN_SUMMARIES_COLLECTION: str = "agent_memory_run_summaries"
 
 # Default top-K for retrieval. Configurable via CLI flag.
 DEFAULT_TOP_K: int = 5
