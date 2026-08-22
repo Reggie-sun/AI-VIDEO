@@ -2,11 +2,14 @@
 
 ## Status
 
-Partial offline implementation of the accepted plan for
+Implemented with local technical acceptance for the accepted plan
 `docs/superpowers/specs/2026-08-22-ai-video-t8-native-turbo-v2.md`。
-四条capability的adapter/workflow/profile offline foundation与generic cardinality已经实现，
-但Gate 0A仍阻塞全部V2，Gate 0B另阻塞Ref2VA；它们未进入production family snapshot，
-也未完成local ComfyUI smoke、媒体质量验收或替代现有Quality / hybrid Turbo v1 lane。
+四条capability的adapter/workflow/profile、generic cardinality、Gate 0A/0B和独立loopback
+technical smoke均已完成；T2VA、I2VA、FL2VA、Ref2VA全部为profile-level
+`live-ready`，six-child family snapshot固定为
+`d3b8e5cc31570763aae6f7454ca794737634c345ec3ea6bbbcaadc36196381dd`。T2VA受控对比支持
+V2作为additive speed-first / experimental lane，但不支持主观质量优越、default promotion、
+Quality / hybrid Turbo v1替代或P6 Final Acceptance。
 
 四条 required lane 均在本计划内：
 
@@ -125,50 +128,67 @@ historical Turbo v1 provider-bound lineage 能 reopen/replay。
 
 T2VA、I2VA、FL2VA 都依赖这个 gate；Ref2VA 还需通过 Gate 0B。
 
-已观察的 converted artifact：
+2026-08-22关闭Gate 0A的exact source与converted artifact：
 
 ```text
-filename: minimax_h3_turbo_4步加速ema_comfyui.safetensors
-size: 779858752
-sha256: b07ab477437c6a525dfdaf11107722aad609975ac172f3b577a7a87b228ff7b3
-tensor count: 518 BF16
-metadata source filename: minimax_h3_turbo_4步加速ema.safetensors
-metadata source sha256: 8a1265e81e5368ab0e52cbb990aee3cb59b28b91fdfa415ef8dbabf81aef890e
+source repository: DARK-MING/MiniMax-H3-Turbo-Lora
+source revision: dff52016c06373336893f94e64b6dfea9a4d2db0
+source filename: minimax_h3_turbo_4step_ema.safetensors
+source size: 779849872
+source sha256: 8d645b67e606874e9179b277cea721c1f1e75830532fcc2206e23353cb33edc5
+converted filename: minimax_h3_turbo_4step_ema_comfyui.safetensors
+converted size: 779858632
+converted sha256: 5b8ad6cb7ac206852006f4efa3ce2d679cd6ffb5d5b8a4edce8e981393289df5
+converter commit: 977df788fcf8b971dc3d0fc7d6baa79a0edfaf40
+converter file sha256: bf4d9a0d32c528ca9cfe6712f1cc3eae782060be6286337f6a7e77d8030e850d
+conversion evidence: 259 modules / 518 BF16 tensors; exact key/shape/value identity
 ```
 
-当前本机另一个 Larry raw file 的 SHA-256 是
-`5f3a626cd72c93a8b9318d6760c510bc5092d2ab13aaba1f932c5bab07a416d3`，
-不等于 converted artifact metadata 中的 source hash。它不能作为 conversion proof。
+旧中文命名converted artifact声明的source SHA-256
+`8a1265e81e5368ab0e52cbb990aee3cb59b28b91fdfa415ef8dbabf81aef890e`
+不匹配official repository中的任何已检查4-step checkpoint；该旧artifact保留在本机但不再进入
+V2 seal、workflow或live proof。重复转换产生相同key/metadata/value而非相同file SHA，因为
+safetensors metadata serialization order不稳定；runtime只seal本次已安装的exact output bytes。
 
-Implementation 必须先完成以下一次性 offline evidence：
+Implementation 已完成以下一次性offline evidence：
 
-1. 重新取得或定位 exact source bytes
-   `minimax_h3_turbo_4步加速ema.safetensors`，验证 size、SHA-256 与来源 revision。
-2. 用 pinned T8 converter 对 exact source 做 isolated conversion，或对已有 converted file
-   完成同等强度的 key-set、tensor count、dtype、shape、value-identity 与 metadata audit。
-3. 证明输出为 518 个 BF16 tensor，source/output value identity 成立，converted keys 符合
+1. 从pinned official revision取得exact source
+   `minimax_h3_turbo_4step_ema.safetensors`，验证size、SHA-256与来源revision；旧中文命名candidate
+   因source identity不可信被拒绝。
+2. 用pinned T8 converter对exact source做isolated conversion，并对installed converted file完成
+   key-set、tensor count、dtype、shape、value-identity与metadata audit。
+3. 证明输出为518个BF16 tensor，source/output value identity成立，converted keys符合
    native ComfyUI layout，并记录 converter commit/file hash。
 4. 将 converted filename、size/hash、source identity、converter identity、schema version、
    tensor evidence写入 shared V2 asset seal。
 5. Profile load与每次 preflight只验证 sealed converted result，不在 submit path重新转换，
    也不要求 source file永久留在 runtime tree。
 
-Gate 0A 未通过时，任何 V2 capability 都不得进入 live-ready capability snapshot。
+Gate 0A现已通过；profile load与每次preflight验证exact installed SHA、metadata与518个tensor的
+canonical key/dtype/shape，且workflow固定bypass loader、strength `1.0`。这不替代每条lane自己的
+local technical smoke。
 
 ### Gate 0B — Ref2VA Base And Compatibility
 
-当前本机缺少 required non-pruned
-`minimax_h3_ref2va_int8_convrot.safetensors`。Ref2VA implementation 可以先完成
-offline profile/workflow/parser tests，但 capability 必须保持 unavailable，直到：
+required non-pruned `minimax_h3_ref2va_int8_convrot.safetensors`已从
+`Comfy-Org/MiniMax-H3@0f7fb980293fcc4d55c1158cbda920806682ed5d`的public exact mirror path
+安装；本机size `34038894550`、SHA-256
+`9eef934046a0671bc8a5daf87100705e1478419c574cfde70c50fbe6885f76a9`与official identity一致。
+Ref2VA现已完成：
 
 1. 安装 exact non-pruned Ref2VA base；
 2. 记录 filename、size、SHA-256 和来源；
 3. 单独验证 converted Turbo LoRA 与该 Ref2VA base 兼容；
 4. 证明没有退回 `pruned_*` model；
-5. 完成 Ref2VA local technical smoke。
+5. 完成 Ref2VA local technical smoke：provider request
+   `de9e0337-7919-433e-81a2-44663577d919`，artifact SHA-256
+   `3f068b69c122be33e7a0c2641dc2de6e1d9fbb2aa2ade0a70e8152868cf22145`，
+   `155.391s`，peak GPU `26797 MiB`，peak RSS `58233732 KiB`。
 
-如果 Ref2VA 需要不同 LoRA/conversion artifact，则必须建立独立 exact seal，不能继承
-FL2VA-family 的 compatibility evidence。
+本次smoke证明shared converted LoRA与non-pruned Ref2VA base在当前sealed runtime兼容，
+不需要第二个LoRA/conversion artifact。首次known terminal failure的root cause是API workflow
+使用了错误的裸`ref_image_1` key；修复为T8/ComfyUI autogrow contract的
+`ref_images.ref_image_0`后，新attempt通过。失败attempt没有sampler/output，不是unknown outcome。
 
 ## Target File Map
 
@@ -575,7 +595,7 @@ unmapped owned path仍fail safe。
 
 ## Milestone 9 — Local Technical Smokes And Controlled Comparison
 
-这一步在implementation window执行；当前plan-only任务不启动ComfyUI、不生成媒体。
+这一步已在implementation window执行。
 当前repository rule允许已配置loopback local ComfyUI generation无需额外task-scoped授权，
 但profile/preflight/local permit/recovery/media verification gates全部仍然mandatory。
 
@@ -596,12 +616,39 @@ unmapped owned path仍fail safe。
 
 Ref2VA Gate 0B未通过时不得用pruned model或FL2VA model代替；报告blocked即可。
 
+2026-08-22的fresh four-step technical evidence（peak GPU为整卡采样的
+`memory.used`，peak RSS为ComfyUI process RSS）：
+
+| Lane | Profile SHA-256 | Output SHA-256 | Bytes | Wall time | Peak GPU | Peak RSS |
+| --- | --- | --- | ---: | ---: | ---: | ---: |
+| T2VA | `ff374a645eb15112b4c9d4341d1c61bcb80f32bdc55f7325cfe1c8153db5d6bf` | `43c6133f240af118598a52f8348e1558d41eec4134d7b648ca3e09ff33c27000` | `1009896` | `124.531s` | `19932 MiB` | `57988484 KiB` |
+| I2VA | `f73fe4a9adef3275ba4b6c9b3bd0307bed39a40542f80747867f2cb46df3e667` | `090082556e24bb3309ba01c55eaafabff622277cf1a903b305cec5d0767844ef` | `1015850` | `119.068s` | `26236 MiB` | `57960876 KiB` |
+| FL2VA | `5fbb4b367eec6854c23d98600d96e366053da07e7635a9e920a6d856172b7a4f` | `fcc4125e00ffc9a97319bc7e4478dd933b12f0c7e127d6d4b769725fea01d6d5` | `1388091` | `123.274s` | `24828 MiB` | `58056384 KiB` |
+| Ref2VA | `0bb8ebf9688369f89d959d8273a81f73dcc6e02e96c1a20a52110583ace7db9d` | `3f068b69c122be33e7a0c2641dc2de6e1d9fbb2aa2ade0a70e8152868cf22145` | `843120` | `155.391s` | `26797 MiB` | `58233732 KiB` |
+
+四条artifact都是H.264 `1344x768@24fps`、124 frames、5.167s，含32 kHz stereo AAC；
+submit/status/fetch effect count均为`1/1/1`，exact replay没有重复Provider effect。
+
 ### Controlled V1/V2/Quality Comparison
 
 T2VA至少做一次固定prompt、seed、resolution、frames、runtime launch与output checks的
 Quality v1 / hybrid Turbo v1 / T8-native Turbo v2 comparison。独立review记录motion smear、
 细节、audio、wall time、VRAM/RAM和artifact hashes。结果只支持promotion decision，
 不自动改变Router default或授权v1 retirement。
+
+2026-08-22已使用同prompt、seed `220828`、`1344x768`、124 frames、24fps和native audio
+完成request-controlled comparison。由于model/sampling stack不同，这不是pixel-paired对比：
+
+| Lane | Artifact SHA-256 | Wall time | Peak GPU | Peak RSS | Independent media finding |
+| --- | --- | ---: | ---: | ---: | --- |
+| T8-native Turbo V2 | `43c6133f240af118598a52f8348e1558d41eec4134d7b648ca3e09ff33c27000` | `124.531s` | `19932 MiB` | `57988484 KiB` | 速度最快，但lantern运动实现偏弱、细节较软，约`-52.5 LUFS`的audio可能功能性不可闻 |
+| hybrid Turbo v1 | `89400ad24925a8e469716447f9b44edebe2fcb0ab4db67d944561fb5f7d74942` | `152.301s` | `25726 MiB` | `58027460 KiB` | 摆动更明显，细节好于V2，audio约`-29.3 LUFS` |
+| Quality v1 | `9a369039e65d2463542a8a59584eca81ab18b03231fd794f1b005f0bf62ef13c` | `361.914s` | `26334 MiB` | `45286780 KiB` | 运动与纸质/边缘细节最强，audio约`-14.9 LUFS` |
+
+独立reviewer verdict为`accept with concerns`。V2相对Turbo v1减少`18.2%`
+wall time，相对Quality v1减少`65.6%`；该evidence只支持将V2保持为
+additive speed-first / experimental lane，不支持default promotion、v1 retirement、主观质量优越
+或P6 Final Acceptance。
 
 ## Test Sequence
 
@@ -756,12 +803,13 @@ path集合。Review verdict必须为`accept`或所有blocking issue修复并re-r
 
 ## Remaining Risks
 
-- Converted LoRA的metadata source bytes当前未在本机得到同hash复核；Gate 0A是所有lane的
-  live-ready blocker。
-- Non-pruned Ref2VA base当前缺失；Gate 0B是Ref2VA和整份Spec completion blocker。
+- Gate 0A已关闭；旧中文命名LoRA不能重新进入V2 seal或作为fallback。
+- Gate 0B已通过exact non-pruned Ref2VA base SHA、autogrow-key runtime fix、local technical
+  smoke、artifact probe与exact replay；不得退回pruned/FL2VA base或旧裸ordinal keys。
 - ComfyUI upload route虽可传任意input bytes，video/audio loader对uploaded filename的实际行为
   仍需local smoke验证，offline mock不能替代。
-- Four-step T8-native Turbo的实际质量、wall time和VRAM/RAM尚无fresh受控证据；架构正确
-  不等于质量优于hybrid Turbo v1或Quality v1。
+- T2VA、I2VA、FL2VA已有fresh four-step technical wall-time、peak GPU/RSS与artifact
+  evidence；T2VA受控v1/Quality comparison也已完成，但其结论明确不支持
+  质量优越、default promotion或v1 retirement。
 - Local technical smoke不等于Production Final Acceptance；continuity与跨shot观感仍由后续
   composition/review流程判定。

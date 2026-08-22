@@ -1,8 +1,27 @@
+---
+surface_id: t8_native_turbo_v2
+canonical: true
+spec_status: accepted
+implementation_status: implemented_offline
+live_status: not_run
+quality_status: not_evaluated
+release_status: unreleased
+runtime_status_owner: docs/v0.2-runtime-baseline.md
+roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+---
+
 # AI-VIDEO T8-Native H3 Turbo V2 Provider Specification
 
 ## Status
 
-Partial implementation。T2VA、I2VA、FL2VA 与 Ref2VA 的offline adapter、workflow/profile seal、generic cardinality与compatibility tests已实现；四条profile仍因Gate 0A blocked，Ref2VA另受Gate 0B阻塞，均未进入production family snapshot。当前没有local live smoke、media quality acceptance、push或release truth；offline code acceptance仍以本轮fresh Harness receipt为准。
+Implementation complete with local technical acceptance。Shared Gate 0A已用official revision
+source、pinned T8 converter、518 BF16 tensor key/shape/value identity与exact installed bytes关闭；
+Gate 0B已用non-pruned Ref2VA base exact SHA与独立loopback smoke关闭。T2VA、I2VA、
+FL2VA、Ref2VA均完成sealed submit/status/fetch、artifact probe与exact replay并标记为
+`live-ready`，six-child family snapshot为
+`d3b8e5cc31570763aae6f7454ca794737634c345ec3ea6bbbcaadc36196381dd`。
+受控T2VA对比只支持V2作为additive speed-first / experimental lane；不构成主观
+media quality、default promotion、v1 retirement、P6 Final Acceptance、push或release truth。
 
 本 Spec 是 `2026-08-21-ai-video-local-h3-t8-provider-family.md` 的 provider-specific child。现有 `comfy-local-h3-t8` Quality lane 与 hybrid Turbo v1 仍是当前 runtime truth；本文不得被引用为它们已经迁移或退役的证据。
 
@@ -134,11 +153,20 @@ minimax_h3_ref2va_int8_convrot.safetensors
 
 T8 upstream mode examples明确区分 FL2VA-family 与 Ref2VA model。Ref2VA capability不得未经evidence复用FL2VA model，也不得回退到本机现有`minimax_h3_ref2va_pruned_int8_convrot.safetensors`。若non-pruned Ref2VA asset尚未安装或Turbo LoRA compatibility尚未验证，Ref2VA capability必须保持unavailable，整份Spec实施状态仍为partial。
 
-V2 baseline LoRA必须是 T8 converter输出的 native ComfyUI-key artifact，当前本机候选 filename 为：
+V2 baseline LoRA是已通过Gate 0A的T8 converter native ComfyUI-key artifact：
 
 ```text
-minimax_h3_turbo_4步加速ema_comfyui.safetensors
+source: DARK-MING/MiniMax-H3-Turbo-Lora@dff52016c06373336893f94e64b6dfea9a4d2db0
+source filename: minimax_h3_turbo_4step_ema.safetensors
+source size: 779849872
+source sha256: 8d645b67e606874e9179b277cea721c1f1e75830532fcc2206e23353cb33edc5
+converted filename: minimax_h3_turbo_4step_ema_comfyui.safetensors
+converted size: 779858632
+converted sha256: 5b8ad6cb7ac206852006f4efa3ce2d679cd6ffb5d5b8a4edce8e981393289df5
 ```
+
+旧中文命名converted artifact因其声明的source SHA不匹配official repository中的已检查4-step
+checkpoint而被拒绝；它不属于V2 seal、workflow或live proof。
 
 Conversion/build verification 必须 seal：
 
@@ -405,15 +433,22 @@ Exact sealed environment完成一次loopback submit/status/fetch/materialize，�
 
 只有V2完成recovery兼容、live technical proof、受控质量/性能评审，并有单独用户授权时，才可提出v1 deprecation/retirement。Historical manifests与attempts仍必须保持可reopen/recover。
 
-## Open Questions For The Implementation Window
+## Resolved And Remaining Implementation Evidence
 
-这些问题必须通过本机bytes、T8 `object_info`和可执行evidence回答，不能凭filename推断：
+以下问题已由本机bytes、T8 `object_info`和可执行evidence回答：
 
-1. `minimax_h3_turbo_4步加速ema_comfyui.safetensors` 对应的exact Larry source filename、source SHA-256、converted SHA-256和metadata是否完整匹配T8 converter contract？
-2. 当前ComfyUI commit对 `LoraLoaderBypassModelOnly` 与 `MiniMaxH3DualClockSamplerT8` 暴露的exact input schema是什么，是否与upstream Stable 4V4A UI graph一致？
-3. Non-pruned INT8 ConvRot base在RTX 5090、1344x768、124 frames、native audio、4 steps下的实际VRAM/RAM和wall time是多少？
-4. V2与hybrid v1在相同prompt/seed下的motion smear、细节、音频稳定性和failure rate是否有material差异？
-5. 在本Spec已固定的mode grammar与T8上限内，I2VA、FL2VA、Ref2VA各自还需要哪些更窄的production size/MIME/audio-mode bounds，才能在不修改neutral schema的前提下形成稳定profile？
-6. Ref2VA non-pruned INT8 model的local asset identity与Turbo LoRA compatibility如何证明；若需要不同LoRA/conversion artifact，其source和converted seals是什么？
+- Gate 0A exact source、converted bytes、metadata、518-tensor key/dtype/shape与value identity；
+- 当前runtime node schemas、required launch capability与four-step dual-clock graph；
+- 四条mode grammar及profile-level production size/MIME/audio/reference bounds；
+- T2VA、I2VA、FL2VA在RTX 5090、`1344x768`、124 frames、native audio、4 steps下的
+  wall time、peak GPU/RSS、exact artifact与`1/1/1` effect/replay evidence；
+- T2VA V2、hybrid Turbo v1和Quality v1的same-request受控对比：V2有明确速度收益，
+  但该sample的运动实现、细节与audio loudness都不支持质量优越、default promotion
+  或v1 retirement。
 
-上述未决项不阻塞spec acceptance，但阻塞对应capability的implementation/live-ready或promotion claim。
+以下证据仍未完成：
+
+1. 跨更广prompt/input cohort的failure rate、主观audio可闻性与continuity/P6 review evidence。
+
+上述未决项不阻塞spec acceptance、四条profile-level implementation或local technical
+`live-ready`；它阻塞更广cohort的质量结论、default/P6 promotion与v1 retirement claim。

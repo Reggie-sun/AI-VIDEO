@@ -85,6 +85,19 @@ _TASK_IDENTITIES = {
     ),
 }
 
+_LORA_MAIN_SHAPES = {
+    "adaln_proj.linear": ((16, 2688), (96768, 16)),
+    "attn.qkv_proj": ((64, 5376), (21504, 64)),
+    "attn.out_proj": ((64, 7168), (5376, 64)),
+    "mlp.fc1": ((64, 5376), (28672, 64)),
+    "mlp.fc2": ((64, 14336), (5376, 64)),
+}
+_LORA_REFINER_SHAPES = {
+    key: value for key, value in _LORA_MAIN_SHAPES.items() if key != "adaln_proj.linear"
+}
+_LORA_FINAL_SHAPES = ((16, 2688), (10752, 16))
+_MAX_SAFETENSORS_HEADER_BYTES = 1024 * 1024
+
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
     return AiVideoError(
@@ -123,16 +136,25 @@ class T8NativeTurboComponent(StrictModel):
 
 
 class T8NativeTurboLoraSeal(StrictModel):
-    filename: Literal["minimax_h3_turbo_4步加速ema_comfyui.safetensors"]
+    filename: Literal["minimax_h3_turbo_4step_ema_comfyui.safetensors"]
     size_bytes: int = Field(strict=True, gt=0)
     sha256: str = Field(pattern=_SHA256)
     strength: Literal[1.0]
+    source_repository_id: Literal["DARK-MING/MiniMax-H3-Turbo-Lora"]
+    source_repository_revision: str = Field(pattern=_REVISION)
     tensor_count: Literal[518]
     tensor_dtype: Literal["BF16"]
-    source_filename: Literal["minimax_h3_turbo_4步加速ema.safetensors"]
+    module_count: Literal[259]
+    source_filename: Literal["minimax_h3_turbo_4step_ema.safetensors"]
+    source_size_bytes: int = Field(strict=True, gt=0)
     source_sha256: str = Field(pattern=_SHA256)
+    converter_repository: Literal[
+        "https://github.com/T8mars/comfyui-minimax-h3-audio-T8"
+    ]
     converter_commit: str = Field(pattern=_REVISION)
     converter_sha256: str = Field(pattern=_SHA256)
+    conversion_contract: Literal["t8-h3-lora-conversion/1"]
+    value_identity_verified: bool
     conversion_verified: bool
 
 
@@ -306,6 +328,7 @@ class T8NativeTurboExecutionProfile(StrictModel):
         if self.availability == "live-ready" and (
             self.availability_blockers
             or not self.lora.conversion_verified
+            or not self.lora.value_identity_verified
             or not self.components
         ):
             raise ValueError("live-ready profile still has unresolved asset gates")
@@ -357,6 +380,67 @@ class T8NativeTurboExecutionProfile(StrictModel):
             provisional.model_dump(mode="json", exclude={"profile_content_hash"})
         )
         return cls.model_validate(data)
+
+
+def _expected_lora_tensor_shapes() -> dict[str, tuple[int, ...]]:
+    modules: dict[str, tuple[tuple[int, ...], tuple[int, ...]]] = {}
+    for block in range(50):
+        for name, shapes in _LORA_MAIN_SHAPES.items():
+            modules[f"blocks.{block}.{name}"] = shapes
+    for block in range(2):
+        for name, shapes in _LORA_REFINER_SHAPES.items():
+            modules[f"token_refiner.blocks.{block}.{name}"] = shapes
+    modules["final_layer.adaln_proj.linear"] = _LORA_FINAL_SHAPES
+    return {
+        f"diffusion_model.{module}.lora_{side}.weight": shape
+        for module, shapes in modules.items()
+        for side, shape in zip(("A", "B"), shapes, strict=True)
+    }
+
+
+def validate_t8_native_turbo_lora(
+    path: str | Path, seal: T8NativeTurboLoraSeal
+) -> None:
+    """Validate the bounded safetensors schema sealed by Gate 0A."""
+    try:
+        with Path(path).open("rb") as handle:
+            header_size = int.from_bytes(handle.read(8), "little")
+            if not 0 < header_size <= _MAX_SAFETENSORS_HEADER_BYTES:
+                raise ValueError("safetensors header size is outside the bounded contract")
+            header = json.loads(handle.read(header_size))
+    except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
+        raise _invalid("The sealed V2 LoRA header is invalid.", str(exc)) from exc
+    if not isinstance(header, dict):
+        raise _invalid("The sealed V2 LoRA header is invalid.")
+    metadata = header.pop("__metadata__", None)
+    expected_metadata = {
+        "application": "W_eff = W + lora_B @ lora_A",
+        "base_model": "MiniMax-H3",
+        "comfyui_key_prefix": "diffusion_model.",
+        "comfyui_loader": "Load LoRA (Bypass, Model Only) (for debugging)",
+        "compatible_base": "MiniMax-H3 non-pruned bf16 or int8_convrot",
+        "conversion_source_file": seal.source_filename,
+        "conversion_source_sha256": seal.source_sha256,
+        "conversion_tool": "convert_minimax_h3_lora_for_comfyui.py",
+        "dtype": "bfloat16",
+        "format": "pt",
+        "incompatible_base": (
+            "MiniMax-H3 pruned_* (AdaLN input is 8, LoRA input is 2688)"
+        ),
+        "sampler_steps": "4",
+    }
+    if metadata != expected_metadata:
+        raise _invalid("The sealed V2 LoRA conversion metadata changed.")
+    expected = _expected_lora_tensor_shapes()
+    if len(header) != seal.tensor_count or set(header) != set(expected):
+        raise _invalid("The sealed V2 LoRA tensor inventory changed.")
+    for key, shape in expected.items():
+        descriptor = header[key]
+        if not isinstance(descriptor, dict) or (
+            descriptor.get("dtype") != seal.tensor_dtype
+            or descriptor.get("shape") != list(shape)
+        ):
+            raise _invalid("The sealed V2 LoRA tensor schema changed.", key)
 
 
 def node_schema_seals(
@@ -440,11 +524,15 @@ def validate_native_turbo_workflow(
         "FL2VA": {"first_frame", "last_frame"},
         "Ref2VA": set(),
     }[profile.task_type]
+    has_video_audio_linkage = any(
+        key == "ref_video_audios" or key.startswith("ref_video_audios.")
+        for key in conditioning
+    )
     if (
         conditioning.get("task_type") != profile.task_type
         or conditioning.get("audio_mode") != "native"
         or {key for key in media_keys if key in conditioning} != expected_media
-        or "ref_video_audios" in conditioning
+        or has_video_audio_linkage
         or not isinstance(unet, str)
         or "_pruned_" in unet
         or profile.components
@@ -513,5 +601,6 @@ __all__ = [
     "load_t8_native_turbo_execution_profile",
     "load_t8_native_turbo_binding",
     "node_schema_seals",
+    "validate_t8_native_turbo_lora",
     "validate_native_turbo_workflow",
 ]

@@ -294,16 +294,24 @@ _NODE_CLASSES = {
 
 
 def t8_node_input_schema_sha256(
-    object_info: dict[str, Any], required_t8_nodes: tuple[str, ...]
+    object_info: dict[str, Any],
+    required_t8_nodes: tuple[str, ...],
+    *,
+    frozen_file_chooser_inventory: dict[
+        str, dict[str, tuple[str, ...]]
+    ] | None = None,
 ) -> str:
     """Hash the exact T8 node input/output schema without executing a workflow."""
 
+    frozen_inventory = frozen_file_chooser_inventory or {}
+    if not set(frozen_inventory).issubset(required_t8_nodes):
+        raise _invalid("A frozen T8 file chooser references an unsealed node.")
     projection: dict[str, object] = {}
     for node_name in required_t8_nodes:
         node = object_info.get(node_name)
         if not isinstance(node, dict):
             raise _invalid("ComfyUI is missing a sealed T8 node.", node_name)
-        input_schema = node.get("input")
+        input_schema = json.loads(json.dumps(node.get("input")))
         input_order = node.get("input_order")
         output_name = node.get("output_name")
         if (
@@ -312,6 +320,27 @@ def t8_node_input_schema_sha256(
             or not isinstance(output_name, list)
         ):
             raise _invalid("A sealed T8 node schema is malformed.", node_name)
+        required = input_schema.get("required")
+        for field, frozen_choices in frozen_inventory.get(node_name, {}).items():
+            if (
+                not isinstance(required, dict)
+                or not isinstance(required.get(field), list)
+                or not required[field]
+                or not isinstance(required[field][0], list)
+                or not required[field][0]
+                or not all(
+                    isinstance(item, str) and item for item in required[field][0]
+                )
+                or len(set(required[field][0])) != len(required[field][0])
+                or not frozen_choices
+                or not all(isinstance(item, str) and item for item in frozen_choices)
+                or len(set(frozen_choices)) != len(frozen_choices)
+            ):
+                raise _invalid(
+                    "A sealed T8 runtime file chooser is malformed.",
+                    f"{node_name}.{field}",
+                )
+            required[field][0] = list(frozen_choices)
         projection[node_name] = {
             "input": input_schema,
             "input_order": input_order,

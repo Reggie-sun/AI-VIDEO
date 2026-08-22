@@ -16,6 +16,7 @@ from ai_video.production.comfy_t8_turbo_video import (
     T8TurboExecutionProfile,
     T8TurboLoraComponent,
     T8TurboRuntimeInspection,
+    _TURBO_V1_FROZEN_FILE_CHOOSER_INVENTORY,
     load_t8_turbo_video_execution_profile,
     t8_turbo_capabilities,
 )
@@ -371,6 +372,51 @@ def test_turbo_preflight_and_submit_render_the_exact_six_step_graph(
     receipt = provider.fetch_local(request, submission, observation, sink)
     assert receipt.artifact_sha256 == hashlib.sha256(MP4.read_bytes()).hexdigest()
     assert sink.getvalue() == MP4.read_bytes()
+
+
+def test_turbo_schema_projection_ignores_only_dynamic_lora_inventory() -> None:
+    template = json.loads(
+        (REPO_ROOT / "workflows/templates/minimax_h3_t8_t2va_turbo_api.json").read_text()
+    )
+    profile = load_t8_turbo_video_execution_profile(
+        PROFILE_PATH, artifact_root=REPO_ROOT
+    )
+    object_info = _object_info(template)
+    lora = object_info["MiniMaxH3TurboLoRA"]["input"]["required"]["lora_name"]
+    lora[0] = list(
+        _TURBO_V1_FROZEN_FILE_CHOOSER_INVENTORY["MiniMaxH3TurboLoRA"][
+            "lora_name"
+        ]
+    )
+    expected = t8_node_input_schema_sha256(
+        object_info, profile.required_turbo_nodes
+    )
+    lora[0].append("minimax_h3_turbo_4step_ema_comfyui.safetensors")
+
+    assert (
+        t8_node_input_schema_sha256(object_info, profile.required_turbo_nodes)
+        != expected
+    )
+    assert (
+        t8_node_input_schema_sha256(
+            object_info,
+            profile.required_turbo_nodes,
+            frozen_file_chooser_inventory=_TURBO_V1_FROZEN_FILE_CHOOSER_INVENTORY,
+        )
+        == expected
+    )
+
+    object_info["MiniMaxH3TurboLoRA"]["input"]["required"]["strength"][1][
+        "max"
+    ] = 11.0
+    assert (
+        t8_node_input_schema_sha256(
+            object_info,
+            profile.required_turbo_nodes,
+            frozen_file_chooser_inventory=_TURBO_V1_FROZEN_FILE_CHOOSER_INVENTORY,
+        )
+        != expected
+    )
 
 
 def test_turbo_preflight_rejects_lora_drift_before_permit_or_submit(

@@ -28,6 +28,12 @@ from ai_video.production.comfy_t8_turbo_video import (
     load_t8_turbo_video_execution_profile,
     t8_turbo_capabilities,
 )
+from ai_video.production.comfy_t8_native_turbo_profile import (
+    load_t8_native_turbo_execution_profile,
+)
+from ai_video.production.comfy_t8_native_turbo_video import (
+    t8_native_turbo_capabilities,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -212,6 +218,52 @@ def test_real_v1_capability_and_two_child_family_fingerprints_are_frozen() -> No
     family = LocalH3VideoProviderFamily((_Child(quality.variants[0]), _Child(turbo.variants[0])))
     assert family.capabilities().capabilities_fingerprint == (
         "fe029252f59553434aeb23cfc0576ef5d6d476f27fb0bce57ed17ca0d7d68210"
+    )
+
+
+def test_live_v2_profiles_form_one_deterministic_six_child_snapshot() -> None:
+    quality_profile = load_t8_video_execution_profile(
+        REPO_ROOT / "workflows/profiles/minimax_h3_t8_t2va_quality.json",
+        artifact_root=REPO_ROOT,
+    )
+    quality_provider = object.__new__(ComfyUIT8VideoProvider)
+    quality_provider.profile = quality_profile
+    turbo_profile = load_t8_turbo_video_execution_profile(
+        REPO_ROOT / "workflows/profiles/minimax_h3_t8_t2va_turbo.json",
+        artifact_root=REPO_ROOT,
+    )
+    native_profiles = tuple(
+        load_t8_native_turbo_execution_profile(
+            REPO_ROOT
+            / f"workflows/profiles/minimax_h3_t8_{task}_turbo_native_v2.json",
+            artifact_root=REPO_ROOT,
+        )
+        for task in ("t2va", "i2va", "fl2va", "ref2va")
+    )
+
+    assert all(profile.availability == "live-ready" for profile in native_profiles)
+    variants = (
+        quality_provider.capabilities().variants[0],
+        t8_turbo_capabilities(turbo_profile).variants[0],
+        *(
+            t8_native_turbo_capabilities(profile).variants[0]
+            for profile in native_profiles
+        ),
+    )
+    family = LocalH3VideoProviderFamily(tuple(_Child(variant) for variant in variants))
+
+    assert tuple(
+        variant.capability_id for variant in family.capabilities().variants
+    ) == (
+        "minimax-h3-t8-fl2va-turbo-native-v2",
+        "minimax-h3-t8-i2va-turbo-native-v2",
+        "minimax-h3-t8-ref2va-turbo-native-v2",
+        "minimax-h3-t8-t2va-quality-v1",
+        "minimax-h3-t8-t2va-turbo-native-v2",
+        "minimax-h3-t8-t2va-turbo-v1",
+    )
+    assert family.capabilities().capabilities_fingerprint == (
+        "d3b8e5cc31570763aae6f7454ca794737634c345ec3ea6bbbcaadc36196381dd"
     )
 
 

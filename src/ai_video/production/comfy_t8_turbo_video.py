@@ -296,6 +296,17 @@ _NODE_CLASSES = {
     "12": "MiniMaxH3AVDecodeT8",
     "13": "VHS_VideoCombine",
 }
+_TURBO_V1_FROZEN_NODE_SCHEMA_SHA256 = (
+    "76b696b1b6550558893c0a2ab611f73b66bff34681a0aee518afcca37c364071"
+)
+_TURBO_V1_FROZEN_FILE_CHOOSER_INVENTORY = {
+    "MiniMaxH3TurboLoRA": {
+        "lora_name": (
+            "minimax_h3_turbo_4步加速ema_comfyui.safetensors",
+            "minimax_h3_turbo_v4_step600_ema.safetensors",
+        )
+    }
+}
 
 
 def _load_binding(payload: bytes) -> T8TurboBinding:
@@ -689,12 +700,37 @@ class ComfyUIT8TurboVideoProvider(ComfyUIT8VideoProvider):
             raise _invalid(
                 "ComfyUI T8 Turbo node inputs changed.", ", ".join(required_inputs)
             )
+        schema_sha256 = t8_node_input_schema_sha256(
+            object_info, self.profile.required_turbo_nodes
+        )
         if (
-            t8_node_input_schema_sha256(
-                object_info, self.profile.required_turbo_nodes
-            )
-            != self.profile.turbo_node_input_schema_sha256
+            schema_sha256 != self.profile.turbo_node_input_schema_sha256
+            and self.profile.turbo_node_input_schema_sha256
+            == _TURBO_V1_FROZEN_NODE_SCHEMA_SHA256
         ):
+            try:
+                lora_choices = object_info["MiniMaxH3TurboLoRA"]["input"][
+                    "required"
+                ]["lora_name"][0]
+            except (KeyError, TypeError, IndexError) as exc:
+                raise _invalid(
+                    "ComfyUI T8 Turbo LoRA chooser is malformed."
+                ) from exc
+            if (
+                not isinstance(lora_choices, list)
+                or self.profile.lora.filename not in lora_choices
+            ):
+                raise _invalid(
+                    "ComfyUI T8 Turbo LoRA chooser omits the sealed artifact."
+                )
+            schema_sha256 = t8_node_input_schema_sha256(
+                object_info,
+                self.profile.required_turbo_nodes,
+                frozen_file_chooser_inventory=(
+                    _TURBO_V1_FROZEN_FILE_CHOOSER_INVENTORY
+                ),
+            )
+        if schema_sha256 != self.profile.turbo_node_input_schema_sha256:
             raise _invalid(
                 "ComfyUI T8 Turbo input schema does not match the sealed profile."
             )

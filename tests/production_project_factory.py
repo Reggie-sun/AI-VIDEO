@@ -1437,7 +1437,7 @@ def make_p5_selective_rebuild_fixture(root: Path):
     return inputs, applied
 
 
-def make_manifest_23_project(root: Path):
+def make_manifest_23_project(root: Path, *, decodable_pngs: bool = False):
     """Materialize a deterministic pre-render Manifest 2.3 graph fixture."""
 
     from ai_video.production.dependency import (
@@ -1448,7 +1448,7 @@ def make_manifest_23_project(root: Path):
     from ai_video.production.models import DependencyGraphSnapshotPointer
     from ai_video.production.paths import canonical_dependency_graph_snapshot_path
 
-    inputs = make_p5_dependency_inputs(root)
+    inputs = make_p5_dependency_inputs(root, decodable_pngs=decodable_pngs)
     graph = build_production_dependency_graph(inputs)
     applied = build_applied_dependency_evidence(inputs, None)
     states = resolve_dependency_state(graph, applied).states
@@ -4193,14 +4193,16 @@ def make_base_ai_comic_e2e_runtime(root: Path) -> "BaseAiComicE2ERuntime":
     )
 
 
-def make_p8_video_generation_base(root: Path, *, schema_version: str = "2.7"):
+def make_p8_video_generation_base(
+    root: Path, *, schema_version: str = "2.7", decodable_pngs: bool = False
+):
     """Materialize a fresh video-generation / Registry 2.2 graph base."""
 
     from ai_video.production.models import RegistryDependencyEvidence
 
     write_production_project(root)
-    base_inputs = make_p5_dependency_inputs(root)
-    make_manifest_23_project(root)
+    base_inputs = make_p5_dependency_inputs(root, decodable_pngs=decodable_pngs)
+    make_manifest_23_project(root, decodable_pngs=decodable_pngs)
     loaded = load_production_project(root / "project.yaml")
     registry = loaded.registry.model_copy(
         update={

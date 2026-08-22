@@ -1,16 +1,16 @@
 {
   "schema_version": "2", "capability_id": "minimax-h3-t8-i2va-turbo-native-v2", "provider_kind": "minimax_h3_t8_i2va_turbo_native", "model_id": "minimax-h3-t8-i2va-turbo-native", "profile_version": "v2", "lane_id": "minimax_h3_t8_i2va_turbo_native_v2_local",
-  "task_type": "I2VA", "neutral_mode": "image_to_video", "provider_mode": "image_to_video", "availability": "blocked", "availability_blockers": ["converted_lora_source_bytes_unverified"],
+  "task_type": "I2VA", "neutral_mode": "image_to_video", "provider_mode": "image_to_video", "availability": "live-ready", "availability_blockers": [],
   "t8_repository": "https://github.com/T8mars/comfyui-minimax-h3-audio-T8", "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40", "t8_version": "1.36.2", "t8_license_id": "GPL-3.0-or-later", "adapter_implementation_origin": "AI-VIDEO",
   "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa", "videohelpersuite_commit": "4ee72c065db22c9d96c2427954dc69e7b908444b", "sageattention_version": "2.2.0", "sageattention_source_commit": "d1a57a546c3d395b1ffcbeecc66d81db76f3b4b5", "required_launch_capabilities": ["sage_attention"],
-  "model_repository_id": "Comfy-Org/MiniMax-H3", "model_repository_revision": "dc559027db79c174125df4d827db55cd11178860",
+  "model_repository_id": "Comfy-Org/MiniMax-H3", "model_repository_revision": "0f7fb980293fcc4d55c1158cbda920806682ed5d",
   "components": [
     {"role": "diffusion", "filename": "minimax_h3_fl2va_int8_convrot.safetensors", "size_bytes": 34038892334, "sha256": "7ad4c73e6e378b822ffd1629f27f632d3787d95f5e468e3af958f98c58df96a5", "precision": "int8_convrot"},
     {"role": "text_encoder", "filename": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors", "size_bytes": 15687142551, "sha256": "35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6", "precision": "nvfp4_awq"},
     {"role": "video_vae", "filename": "minimax_h3_video_vae_fp16.safetensors", "size_bytes": 5207808496, "sha256": "7c1f131492e7eddacaac9069a61b81bdd39de5cc96561e677c5eab1cdce5e522", "precision": "fp16"},
     {"role": "audio_vae", "filename": "minimax_h3_audio_vae_fp32.safetensors", "size_bytes": 605254808, "sha256": "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48", "precision": "fp32"}
   ],
-  "lora": {"filename": "minimax_h3_turbo_4步加速ema_comfyui.safetensors", "size_bytes": 779858752, "sha256": "b07ab477437c6a525dfdaf11107722aad609975ac172f3b577a7a87b228ff7b3", "strength": 1.0, "tensor_count": 518, "tensor_dtype": "BF16", "source_filename": "minimax_h3_turbo_4步加速ema.safetensors", "source_sha256": "8a1265e81e5368ab0e52cbb990aee3cb59b28b91fdfa415ef8dbabf81aef890e", "converter_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40", "converter_sha256": "bf4d9a0d32c528ca9cfe6712f1cc3eae782060be6286337f6a7e77d8030e850d", "conversion_verified": false},
+  "lora": {"filename": "minimax_h3_turbo_4step_ema_comfyui.safetensors", "size_bytes": 779858632, "sha256": "5b8ad6cb7ac206852006f4efa3ce2d679cd6ffb5d5b8a4edce8e981393289df5", "strength": 1.0, "source_repository_id": "DARK-MING/MiniMax-H3-Turbo-Lora", "source_repository_revision": "dff52016c06373336893f94e64b6dfea9a4d2db0", "tensor_count": 518, "tensor_dtype": "BF16", "module_count": 259, "source_filename": "minimax_h3_turbo_4step_ema.safetensors", "source_size_bytes": 779849872, "source_sha256": "8d645b67e606874e9179b277cea721c1f1e75830532fcc2206e23353cb33edc5", "converter_repository": "https://github.com/T8mars/comfyui-minimax-h3-audio-T8", "converter_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40", "converter_sha256": "bf4d9a0d32c528ca9cfe6712f1cc3eae782060be6286337f6a7e77d8030e850d", "conversion_contract": "t8-h3-lora-conversion/1", "value_identity_verified": true, "conversion_verified": true},
   "required_nodes": ["UNETLoader", "LoraLoaderBypassModelOnly", "CLIPLoader", "VAELoader", "MiniMaxH3AudioConditioningT8", "MiniMaxH3DualClockSamplerT8", "RandomNoise", "BasicGuider", "SamplerCustomAdvanced", "MiniMaxH3AVDecodeT8", "VHS_VideoCombine", "LoadImage"],
   "forbidden_nodes": ["MiniMaxH3TurboLoRA", "MiniMaxH3TurboSampler", "BasicScheduler", "KSamplerSelect", "LoraLoader", "LoraLoaderModelOnly"],
   "node_schema_seals": [
@@ -21,12 +21,12 @@
     {"node_name": "SamplerCustomAdvanced", "schema_sha256": "261a495a933da3a3ffd113e1f909c0d714a60e4643eac6a057a1c488ffa19716"}, {"node_name": "MiniMaxH3AVDecodeT8", "schema_sha256": "3856b31ab00fbf3f02d53589c18fd1487a272fe6d0be870fcb5dab93febc2930"},
     {"node_name": "VHS_VideoCombine", "schema_sha256": "d718d775baa3c3e3e0f3323f3d82ffc6eedf79c5a2b8df721abe1b52f0f8c231"}, {"node_name": "LoadImage", "schema_sha256": "ecf1b0bb9558c1a84dea6e1fcf4f9a9d79ac5d09ed557092f1c062abcef4ead6"}
   ],
-  "workflow_path": "workflows/templates/minimax_h3_t8_i2va_turbo_native_v2_api.json", "workflow_sha256": "10f38136b82aa72b2a57ffdbaf057c1a37fc76fbcbcce414533f06fdb6dfb432",
+  "workflow_path": "workflows/templates/minimax_h3_t8_i2va_turbo_native_v2_api.json", "workflow_sha256": "a2de56895642582481ab4ebe4a92aa356c908e2d7475159a77a1ffb9c06131df",
   "binding_path": "workflows/bindings/minimax_h3_t8_i2va_turbo_native_v2_binding.yaml", "binding_sha256": "54058425b9212023d640cfbfe7a346b42dab9be76a8e58b9558d076470dba8de",
   "loopback_endpoints": ["http://127.0.0.1:8188"], "width": 1344, "height": 768, "frame_count": 124, "fps": 24, "native_audio_required": true, "output_container": "mp4", "output_mime_type": "video/mp4",
   "sampler": "dual_clock_euler", "scheduler": "native_flow", "steps": 4, "shift_video": 12.0, "shift_audio": 3.0, "output_crf": 17, "output_node_id": "12", "final_av_filename_suffix": "-audio.mp4", "reject_video_only_sibling": true,
   "remote_provider_enabled": false, "cloud_fallback_enabled": false, "image_mime_types": ["image/png"], "max_image_bytes": 67108864,
   "reference_video_mime_types": ["video/mp4"], "max_reference_video_bytes": 2147483648, "reference_video_min_duration_millis": 2000, "reference_video_max_duration_millis": 15000, "reference_video_fps": 24,
   "reference_audio_mime_types": ["audio/wav", "audio/mpeg", "audio/mp4"], "max_reference_audio_bytes": 536870912,
-  "profile_content_hash": "ff0b9be0297704416abef8694561cf936403973c7083a4a523c1af12f4c8ecb7"
+  "profile_content_hash": "f73fe4a9adef3275ba4b6c9b3bd0307bed39a40542f80747867f2cb46df3e667"
 }

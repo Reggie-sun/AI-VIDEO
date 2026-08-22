@@ -16,9 +16,11 @@ from ai_video.production.comfy_t8_native_turbo_profile import (
     T8NativeTurboComponent,
     T8NativeTurboLoraSeal,
     T8NativeTurboRuntimeInspection,
+    _expected_lora_tensor_shapes,
     load_t8_native_turbo_binding,
     load_t8_native_turbo_execution_profile,
     node_schema_seals,
+    validate_t8_native_turbo_lora,
     validate_native_turbo_workflow,
 )
 from ai_video.production.comfy_t8_native_turbo_video import (
@@ -88,7 +90,7 @@ def _load(task: str):
     )
 
 
-def test_four_mode_specific_profiles_are_distinct_and_truthfully_blocked() -> None:
+def test_four_mode_specific_profiles_are_distinct_and_truthfully_available() -> None:
     profiles = tuple(_load(task) for task in PROFILE_PATHS)
 
     assert tuple(profile.task_type for profile in profiles) == (
@@ -101,15 +103,13 @@ def test_four_mode_specific_profiles_are_distinct_and_truthfully_blocked() -> No
     assert len({profile.provider_kind for profile in profiles}) == 4
     assert len({profile.model_id for profile in profiles}) == 4
     assert len({profile.profile_content_hash for profile in profiles}) == 4
-    assert all(profile.availability == "blocked" for profile in profiles)
-    assert all(
-        "converted_lora_source_bytes_unverified" in profile.availability_blockers
-        for profile in profiles
-    )
-    assert _load("Ref2VA").availability_blockers == (
-        "converted_lora_source_bytes_unverified",
-        "non_pruned_ref2va_base_missing",
-    )
+    assert _load("T2VA").availability == "live-ready"
+    assert _load("I2VA").availability == "live-ready"
+    assert _load("FL2VA").availability == "live-ready"
+    assert _load("Ref2VA").availability == "live-ready"
+    assert all(profile.lora.conversion_verified for profile in profiles)
+    assert all(profile.lora.value_identity_verified for profile in profiles)
+    assert all(not profile.availability_blockers for profile in profiles)
 
 
 @pytest.mark.parametrize(
@@ -153,6 +153,15 @@ def test_profiles_seal_one_native_sampler_and_converted_lora(task: str) -> None:
     assert workflow["7"]["inputs"]["sampler_name"] == "dual_clock_euler"
     assert workflow["7"]["inputs"]["scheduler"] == "native_flow"
     assert "_pruned_" not in workflow["1"]["inputs"]["unet_name"]
+    assert profile.lora.filename == "minimax_h3_turbo_4step_ema_comfyui.safetensors"
+    assert profile.lora.source_repository_id == "DARK-MING/MiniMax-H3-Turbo-Lora"
+    assert profile.lora.source_repository_revision == (
+        "dff52016c06373336893f94e64b6dfea9a4d2db0"
+    )
+    assert profile.lora.source_sha256 == (
+        "8d645b67e606874e9179b277cea721c1f1e75830532fcc2206e23353cb33edc5"
+    )
+    assert profile.lora.module_count == 259
 
 
 def test_ref2va_profile_seals_standalone_reference_audio_only() -> None:
@@ -164,6 +173,23 @@ def test_ref2va_profile_seals_standalone_reference_audio_only() -> None:
     assert profile.reference_video_fps == 24
     assert profile.reference_video_min_duration_millis == 2000
     assert profile.reference_video_max_duration_millis == 15000
+
+
+def test_ref2va_profile_rejects_group_qualified_video_audio_linkage() -> None:
+    profile = _load("Ref2VA")
+    workflow = json.loads((REPO_ROOT / profile.workflow_path).read_text())
+    workflow["6"]["inputs"]["ref_video_audios.ref_video_audio_0"] = ["14", 1]
+
+    with pytest.raises(AiVideoError) as exc_info:
+        validate_native_turbo_workflow(
+            profile,
+            workflow,
+            T8NativeTurboBinding.model_validate(
+                yaml.safe_load((REPO_ROOT / profile.binding_path).read_bytes())
+            ),
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
 
 
 def test_profile_loader_rejects_larry_sampler_topology() -> None:
@@ -185,10 +211,10 @@ def test_profile_loader_rejects_larry_sampler_topology() -> None:
 
 def test_profile_files_pin_current_workflow_and_binding_bytes() -> None:
     expected = {
-        "T2VA": "535d31c5c135021b5f8a335c46ed4b42a719f93ac08994392c6a636ffd661309",
-        "I2VA": "ff0b9be0297704416abef8694561cf936403973c7083a4a523c1af12f4c8ecb7",
-        "FL2VA": "ee8c0951b483fa12318d2d084a3785c7372abce51cba48bc8de6ebf76f4fc288",
-        "Ref2VA": "8e53598c1b325dd98f3817a93d4cf6e186d3db13432720c60e46068d558e5f99",
+        "T2VA": "ff374a645eb15112b4c9d4341d1c61bcb80f32bdc55f7325cfe1c8153db5d6bf",
+        "I2VA": "f73fe4a9adef3275ba4b6c9b3bd0307bed39a40542f80747867f2cb46df3e667",
+        "FL2VA": "5fbb4b367eec6854c23d98600d96e366053da07e7635a9e920a6d856172b7a4f",
+        "Ref2VA": "0bb8ebf9688369f89d959d8273a81f73dcc6e02e96c1a20a52110583ace7db9d",
     }
 
     assert {task: _load(task).profile_content_hash for task in PROFILE_PATHS} == expected
@@ -503,10 +529,16 @@ def _request(
     )
 
 
-def test_blocked_canonical_profile_fails_before_runtime_or_transport_effect(
+def test_explicitly_blocked_profile_fails_before_runtime_or_transport_effect(
     tmp_path: Path,
 ) -> None:
-    profile = _load("T2VA")
+    canonical = _load("Ref2VA")
+    values = canonical.model_dump(mode="python", exclude={"profile_content_hash"})
+    values.update(
+        availability="blocked",
+        availability_blockers=("test-blocker",),
+    )
+    profile = type(canonical).create(**values)
     transport = _NoEffectTransport()
     comfy_root = tmp_path / "ComfyUI"
     input_root = tmp_path / "inputs"
@@ -529,7 +561,13 @@ def test_blocked_canonical_profile_fails_before_runtime_or_transport_effect(
         transport=transport,
         clock=lambda: datetime(2026, 8, 22, tzinfo=UTC),
     )
-    resolved = _resolved(profile, _request(profile))
+    resolved = _resolved(
+        profile,
+        _request(
+            profile,
+            image_bindings=(_image("reference", "blocked-reference", "a"),),
+        ),
+    )
 
     with pytest.raises(AiVideoError, match="unavailable for production routing"):
         provider.capabilities()
@@ -645,9 +683,9 @@ def test_ref2va_maps_canonical_ordinals_without_video_audio_linkage() -> None:
         "class_type": "VHS_LoadAudioUpload",
         "inputs": {"audio": "reference.wav"},
     }
-    assert conditioning["ref_image_1"] == ["13", 0]
-    assert conditioning["ref_video_1"] == ["14", 0]
-    assert conditioning["ref_audio_1"] == ["15", 0]
+    assert conditioning["ref_images.ref_image_0"] == ["13", 0]
+    assert conditioning["ref_videos.ref_video_0"] == ["14", 0]
+    assert conditioning["ref_audios.ref_audio_0"] == ["15", 0]
     assert "ref_video_audios" not in conditioning
 
 
@@ -666,6 +704,93 @@ class _Permit:
         )
         self.consumed = valid
         return valid
+
+
+def _synthetic_lora_payload(seal: T8NativeTurboLoraSeal) -> bytes:
+    header = {
+        "__metadata__": {
+            "application": "W_eff = W + lora_B @ lora_A",
+            "base_model": "MiniMax-H3",
+            "comfyui_key_prefix": "diffusion_model.",
+            "comfyui_loader": "Load LoRA (Bypass, Model Only) (for debugging)",
+            "compatible_base": "MiniMax-H3 non-pruned bf16 or int8_convrot",
+            "conversion_source_file": seal.source_filename,
+            "conversion_source_sha256": seal.source_sha256,
+            "conversion_tool": "convert_minimax_h3_lora_for_comfyui.py",
+            "dtype": "bfloat16",
+            "format": "pt",
+            "incompatible_base": (
+                "MiniMax-H3 pruned_* (AdaLN input is 8, LoRA input is 2688)"
+            ),
+            "sampler_steps": "4",
+        },
+        **{
+            key: {"dtype": "BF16", "shape": list(shape), "data_offsets": [0, 0]}
+            for key, shape in _expected_lora_tensor_shapes().items()
+        },
+    }
+    encoded = json.dumps(header, separators=(",", ":")).encode()
+    return len(encoded).to_bytes(8, "little") + encoded
+
+
+def test_lora_header_audit_rejects_conversion_metadata_drift(tmp_path: Path) -> None:
+    seal = _load("T2VA").lora
+    payload = _synthetic_lora_payload(seal)
+    path = tmp_path / seal.filename
+    path.write_bytes(payload)
+    validate_t8_native_turbo_lora(path, seal)
+    header_size = int.from_bytes(payload[:8], "little")
+    header = json.loads(payload[8 : 8 + header_size])
+    header["__metadata__"]["conversion_source_sha256"] = "0" * 64
+    encoded = json.dumps(header, separators=(",", ":")).encode()
+    path.write_bytes(len(encoded).to_bytes(8, "little") + encoded)
+
+    with pytest.raises(AiVideoError, match="conversion metadata changed"):
+        validate_t8_native_turbo_lora(path, seal)
+
+
+@pytest.mark.parametrize("drift", ("inventory", "dtype", "shape"))
+def test_lora_header_audit_rejects_tensor_schema_drift(
+    tmp_path: Path, drift: str
+) -> None:
+    seal = _load("T2VA").lora
+    payload = _synthetic_lora_payload(seal)
+    header_size = int.from_bytes(payload[:8], "little")
+    header = json.loads(payload[8 : 8 + header_size])
+    key = next(key for key in header if key != "__metadata__")
+    if drift == "inventory":
+        del header[key]
+        message = "tensor inventory changed"
+    elif drift == "dtype":
+        header[key]["dtype"] = "F16"
+        message = "tensor schema changed"
+    else:
+        header[key]["shape"] = [1]
+        message = "tensor schema changed"
+    encoded = json.dumps(header, separators=(",", ":")).encode()
+    path = tmp_path / seal.filename
+    path.write_bytes(len(encoded).to_bytes(8, "little") + encoded)
+
+    with pytest.raises(AiVideoError, match=message):
+        validate_t8_native_turbo_lora(path, seal)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    (
+        (1024 * 1024 + 1).to_bytes(8, "little"),
+        (32).to_bytes(8, "little") + b'{"truncated":true',
+    ),
+)
+def test_lora_header_audit_rejects_unbounded_or_truncated_header(
+    tmp_path: Path, payload: bytes
+) -> None:
+    seal = _load("T2VA").lora
+    path = tmp_path / seal.filename
+    path.write_bytes(payload)
+
+    with pytest.raises(AiVideoError, match="LoRA header is invalid"):
+        validate_t8_native_turbo_lora(path, seal)
 
 
 def _live_ready_sandbox(tmp_path: Path, task: str):
@@ -699,7 +824,7 @@ def _live_ready_sandbox(tmp_path: Path, task: str):
                 precision=source.precision,
             )
         )
-    lora_payload = b"verified-native-v2-lora"
+    lora_payload = _synthetic_lora_payload(canonical.lora)
     lora_path = comfy_root / "models/loras" / canonical.lora.filename
     lora_path.parent.mkdir(parents=True, exist_ok=True)
     lora_path.write_bytes(lora_payload)
@@ -809,6 +934,7 @@ def test_i2va_preflight_then_consumes_permit_before_upload_and_prompt(
     permit = _Permit(intent.intent_fingerprint, resolved.resolved_generation_hash)
 
     lora_path = comfy_root / "models/loras" / profile.lora.filename
+    original_lora = lora_path.read_bytes()
     lora_path.write_bytes(b"drift-after-intent")
     with pytest.raises(AiVideoError) as exc_info:
         provider.submit_local(resolved, preview, intent, permit)
@@ -816,7 +942,7 @@ def test_i2va_preflight_then_consumes_permit_before_upload_and_prompt(
     assert permit.consumed is False
     assert transport.uploads == []
     assert transport.posts == []
-    lora_path.write_bytes(b"verified-native-v2-lora")
+    lora_path.write_bytes(original_lora)
 
     result = provider.submit_local(resolved, preview, intent, permit)
 

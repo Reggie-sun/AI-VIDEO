@@ -22,6 +22,7 @@ from ai_video.production.comfy_t8_native_turbo_profile import (
     T8NativeTurboRuntimeInspection,
     load_t8_native_turbo_binding,
     node_schema_seals,
+    validate_t8_native_turbo_lora,
 )
 from ai_video.production.comfy_t8_video import ComfyUIT8VideoProvider
 from ai_video.production.local_video import (
@@ -318,12 +319,18 @@ def render_t8_native_turbo_workflow(
         conditioning = rendered[binding.conditioning_node_id]["inputs"]
         next_id = binding.dynamic_node_start
         groups = (
-            ("ref_image", "LoadImage", "image", uploaded_images),
-            ("ref_video", "VHS_LoadVideo", "video", uploaded_videos),
-            ("ref_audio", "VHS_LoadAudioUpload", "audio", uploaded_audios),
+            ("ref_images", "ref_image", "LoadImage", "image", uploaded_images),
+            ("ref_videos", "ref_video", "VHS_LoadVideo", "video", uploaded_videos),
+            (
+                "ref_audios",
+                "ref_audio",
+                "VHS_LoadAudioUpload",
+                "audio",
+                uploaded_audios,
+            ),
         )
-        for prefix, class_type, input_name, names in groups:
-            for ordinal, name in enumerate(names, start=1):
+        for group, prefix, class_type, input_name, names in groups:
+            for ordinal, name in enumerate(names):
                 node_id = str(next_id)
                 next_id += 1
                 inputs: dict[str, Any] = {input_name: name}
@@ -337,7 +344,7 @@ def render_t8_native_turbo_workflow(
                         select_every_nth=1,
                     )
                 rendered[node_id] = {"class_type": class_type, "inputs": inputs}
-                conditioning[f"{prefix}_{ordinal}"] = [node_id, 0]
+                conditioning[f"{group}.{prefix}_{ordinal}"] = [node_id, 0]
         conditioning.pop("ref_video_audios", None)
     return rendered
 
@@ -520,6 +527,10 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
                 raise _invalid("A sealed V2 component could not be reopened.", str(exc)) from exc
             if resolved.stat().st_size != size or _sha256_file(resolved) != sha256:
                 raise _invalid("A sealed V2 component identity changed.", path.name)
+        validate_t8_native_turbo_lora(
+            self._comfy_root / "models/loras" / self.profile.lora.filename,
+            self.profile.lora,
+        )
         object_info = self._transport.get_object_info()
         if _missing_required_node_inputs(self._workflow, object_info):
             raise _invalid("ComfyUI V2 required node inputs changed.")
