@@ -169,7 +169,10 @@ def test_ref2va_profile_seals_standalone_reference_audio_only() -> None:
     workflow = load_workflow_template(REPO_ROOT / profile.workflow_path)
     conditioning = workflow["6"]["inputs"]
 
-    assert "ref_video_audios" not in conditioning
+    assert not any(
+        key == "ref_video_audios" or key.startswith("ref_video_audios.")
+        for key in conditioning
+    )
     assert profile.reference_video_fps == 24
     assert profile.reference_video_min_duration_millis == 2000
     assert profile.reference_video_max_duration_millis == 15000
@@ -695,7 +698,10 @@ def test_ref2va_maps_canonical_ordinals_without_video_audio_linkage() -> None:
     assert conditioning["ref_images.ref_image_0"] == ["13", 0]
     assert conditioning["ref_videos.ref_video_0"] == ["14", 0]
     assert conditioning["ref_audios.ref_audio_0"] == ["15", 0]
-    assert "ref_video_audios" not in conditioning
+    assert not any(
+        key == "ref_video_audios" or key.startswith("ref_video_audios.")
+        for key in conditioning
+    )
 
 
 class _Permit:

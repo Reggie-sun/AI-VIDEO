@@ -106,12 +106,22 @@ Final Acceptance。
 
 ## Verification And Publication
 
-当前focused evidence：V2 + family promotion `49 passed`；修复前的更广
-production provider/router/state/E2E surface `224 passed, 1 deselected`，其中deselected six-child test已在
-Ref2VA完成后单独运行并通过。`ruff check --no-cache`已通过task-owned Python files。
+Implementation checkpoint为`3949f25fe60cfc1c7c22cbe8e2926dc7e8a70d2e`；Harness policy
+blocker closure为`1060bac411b4b7e151ebc7f2b5c64d7bd21856c9`。Ref2VA禁止
+`ref_video_audios` exact/group-qualified/future group-qualified形态的red-green regression在
+`716f407a9d49113595e3dd4e598f478bfb921ab1`与`dfcf01fddd7a64086321bc0a4b59a00a495aae36`
+形成独立test checkpoints。
 
-Final exact commit-range Harness receipt、implementation commit和publication state在Gate 0B与final diff完成后
-补记。当前没有push或release。
+Fresh focused verification在final validator change后为`330 passed`，task-owned Python的
+`ruff check --no-cache`通过。一次exact closure run的所有routed checks均通过：
+production video provider `1041 passed`、provider-neutral requirement `284 passed`、
+task Architecture Gate `0 errors / 0 warnings / 0 info`；由于run期间共享`main`被另一个
+session推进，该receipt按Harness contract正确标为`workspace_stable=false`，不作为final passing receipt。
+
+Final authoritative receipt target为
+`.agent/harness/runs/t8-native-turbo-v2-authoritative-20260822/receipt.json`；receipt自身保存exact
+base/head、routed checks、freshness与integrity truth。本任务只在本地`main`形成commits，当前没有
+push、release、default promotion、v1 retirement或P6 Final Acceptance。
 
 ## Remaining Risks
 
