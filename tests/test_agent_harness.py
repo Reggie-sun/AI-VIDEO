@@ -331,6 +331,58 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
     assert "tests/test_agent_memory.py" in argv
 
 
+def test_composition_strategy_shadow_routes_to_focused_dev_checks() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        ".agent/playbooks/composition/schema.json",
+        ".agent/playbooks/composition/hard_cut_continuation.yaml",
+        "scripts/composition_playbooks.py",
+        "scripts/composition_shadow.py",
+        "tests/test_composition_playbooks.py",
+        "tests/test_composition_strategy_proposal.py",
+        "tests/test_composition_architecture.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["composition_strategy_shadow"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"][0] == "scope_diff_check"
+        assert {
+            "composition_playbook_tests",
+            "composition_strategy_proposal_tests",
+            "composition_architecture_tests",
+            "task_architecture_gate",
+        }.issubset(report["check_ids"])
+
+    assert policy["checks"]["composition_playbook_tests"]["argv"] == [
+        "python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_composition_playbooks.py",
+        "-q",
+    ]
+    assert policy["checks"]["composition_strategy_proposal_tests"]["argv"] == [
+        "python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_composition_strategy_proposal.py",
+        "-q",
+    ]
+    assert policy["checks"]["composition_architecture_tests"]["argv"] == [
+        "python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_composition_architecture.py",
+        "-q",
+    ]
+
+
 def test_provider_console_routes_to_local_runs_observer_suites() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

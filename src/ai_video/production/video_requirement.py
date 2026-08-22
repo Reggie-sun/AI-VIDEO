@@ -550,6 +550,19 @@ class ProviderNeutralVideoRequirement(StrictModel):
             or boundary.target_shot_content_hash != self.target_shot.content_hash
         ):
             raise ValueError("C4 requirement target does not match the exact Shot")
+        identity = c4_binding.identity_anchor
+        exact_characters = {
+            (item.artifact_id, item.revision, item.content_hash)
+            for item in self.characters
+        }
+        if (
+            identity.character_artifact_id,
+            identity.character_revision,
+            identity.character_content_hash,
+        ) not in exact_characters:
+            raise ValueError(
+                "C4 identity anchor does not match an exact requirement Character"
+            )
         expected = {
             SemanticReferenceRole.CONTINUITY_TERMINAL: (
                 c4_binding.terminal.extracted_asset_id,

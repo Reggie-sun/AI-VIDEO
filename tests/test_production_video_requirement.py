@@ -295,7 +295,13 @@ def test_c4_requirement_seals_exact_motion_anchors_under_v2_contract():
             "artifact_id": "shot-001-artifact",
             "revision": 3,
             "content_hash": "a" * 64,
-            "character_ids": (),
+        }
+    )
+    character = _character().model_copy(
+        update={
+            "artifact_id": "character-001",
+            "revision": 3,
+            "content_hash": "c" * 64,
         }
     )
     tail = binding.motion_tail
@@ -349,7 +355,7 @@ def test_c4_requirement_seals_exact_motion_anchors_under_v2_contract():
         ),
         target_shot=target,
         scene=_scene(),
-        characters=(),
+        characters=(character,),
         asset_evidence=evidence,
         c4_multi_anchor_binding=binding,
         generation_mode=GenerationMode.IMAGE_TO_VIDEO,
@@ -362,6 +368,15 @@ def test_c4_requirement_seals_exact_motion_anchors_under_v2_contract():
     assert requirement.contract_version == "provider-neutral-video-requirement/2"
     assert requirement.c4_multi_anchor_binding == binding
     assert requirement.requirement_hash == canonical_sha256(requirement._hash_payload())
+
+    payload = requirement.model_dump(
+        mode="python", exclude={"requirement_id", "requirement_hash"}
+    )
+    payload["characters"] = (
+        character.model_copy(update={"artifact_id": "different-character-artifact"}),
+    )
+    with pytest.raises(ValidationError, match="identity anchor"):
+        ProviderNeutralVideoRequirement.create(**payload)
 
 
 def test_t1_requirement_hash_is_deterministic_for_same_input():

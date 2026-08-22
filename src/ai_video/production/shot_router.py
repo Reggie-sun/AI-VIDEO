@@ -93,6 +93,7 @@ class MotionRequirement(str, Enum):
 
 
 class RouterReasonCode(str, Enum):
+    MULTI_ANCHOR_REQUIREMENT_REQUIRED = "MULTI_ANCHOR_REQUIREMENT_REQUIRED"
     APPROVED_EXISTING_VIDEO = "APPROVED_EXISTING_VIDEO"
     NO_MOTION_REQUIRED = "NO_MOTION_REQUIRED"
     LIGHT_MOTION_FROM_KEYFRAME = "LIGHT_MOTION_FROM_KEYFRAME"
@@ -788,6 +789,14 @@ class ShotVisualResolver:
         context: ShotRoutingContext,
         policy: VideoRoutingPolicy,
     ) -> ShotVisualRoutingProposal:
+        if context.continuity_mode is ContinuityMode.MULTI_ANCHOR:
+            return self._blocked(
+                context,
+                policy,
+                RoutingOutcome.BLOCKED_MISSING_INPUT,
+                RouterReasonCode.MULTI_ANCHOR_REQUIREMENT_REQUIRED,
+                "Multi-anchor continuity requires one sealed provider-neutral C4 requirement.",
+            )
         if context.continuity_mode is ContinuityMode.EXACT_TERMINAL:
             if context.upstream_terminal is None:
                 return self._blocked(
@@ -1065,6 +1074,16 @@ class VideoGenerationResolver:
             "output_requirement": output_requirement,
             "policy": policy.identity,
         }
+        if (
+            context.continuity_mode is ContinuityMode.MULTI_ANCHOR
+            and requirement_mode is None
+        ):
+            return self._blocked(
+                base,
+                RoutingOutcome.BLOCKED_CAPABILITY,
+                RouterReasonCode.MULTI_ANCHOR_REQUIREMENT_REQUIRED,
+                "Multi-anchor continuity cannot route without one sealed C4 requirement.",
+            )
         if (
             context.continuity_mode
             in {ContinuityMode.EXACT_TERMINAL, ContinuityMode.REFERENCE}

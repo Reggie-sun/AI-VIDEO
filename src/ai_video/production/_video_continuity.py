@@ -87,6 +87,13 @@ class C4FeasibilityReceipt(_C4SealedModel):
 
     receipt_id: str = Field(pattern=_SAFE_ID)
     human_approval_receipt_id: str = Field(pattern=_SAFE_ID)
+    target_shot_id: str = Field(pattern=_SAFE_ID)
+    target_shot_revision: int = Field(strict=True, ge=1)
+    target_shot_content_hash: str = Field(pattern=_SHA256)
+    output_duration_milliseconds: int = Field(strict=True, gt=0)
+    terminal_anchor_content_hash: str = Field(pattern=_SHA256)
+    identity_anchor_content_hash: str = Field(pattern=_SHA256)
+    motion_tail_content_hash: str | None = Field(default=None, pattern=_SHA256)
     feasibility_decision: Literal["PASS"]
     axis_check: Literal["PASS"]
     screen_direction_check: Literal["PASS"]
@@ -113,7 +120,9 @@ class C4IdentityAnchorEvidence(_C4SealedModel):
     asset_width: int = Field(strict=True, gt=0)
     asset_height: int = Field(strict=True, gt=0)
     source_provenance_receipt_id: str = Field(pattern=_SAFE_ID)
+    source_provenance_receipt_sha256: str = Field(pattern=_SHA256)
     materialization_receipt_id: str = Field(pattern=_SAFE_ID)
+    materialization_receipt_sha256: str = Field(pattern=_SHA256)
 
 
 class C4ApprovedEndpointEvidence(_C4SealedModel):
@@ -133,7 +142,9 @@ class C4ApprovedEndpointEvidence(_C4SealedModel):
     asset_width: int = Field(strict=True, gt=0)
     asset_height: int = Field(strict=True, gt=0)
     source_provenance_receipt_id: str = Field(pattern=_SAFE_ID)
+    source_provenance_receipt_sha256: str = Field(pattern=_SHA256)
     materialization_receipt_id: str = Field(pattern=_SAFE_ID)
+    materialization_receipt_sha256: str = Field(pattern=_SHA256)
     duration_milliseconds: int = Field(strict=True, gt=0)
     feasibility_receipt: C4FeasibilityReceipt
 
@@ -154,10 +165,14 @@ class C4MotionTailEvidence(_C4SealedModel):
     source_request_input_hash: str = Field(pattern=_SHA256)
     source_resolved_generation_hash: str = Field(pattern=_SHA256)
     source_provenance_receipt_id: str = Field(pattern=_SAFE_ID)
+    source_provenance_receipt_sha256: str = Field(pattern=_SHA256)
     source_p6_acceptance_evidence_id: str = Field(pattern=_SAFE_ID)
+    source_p6_acceptance_evidence_sha256: str = Field(pattern=_SHA256)
     registry_revision_id: str = Field(pattern=_SHA256)
     extraction_receipt_id: str = Field(pattern=_SAFE_ID)
+    extraction_receipt_sha256: str = Field(pattern=_SHA256)
     materialization_receipt_id: str = Field(pattern=_SAFE_ID)
+    materialization_receipt_sha256: str = Field(pattern=_SHA256)
     selection_rule_version: str = Field(pattern=_SAFE_ID)
     start_timestamp_numerator: int = Field(strict=True, ge=0)
     start_timestamp_denominator: int = Field(strict=True, gt=0)
@@ -237,6 +252,8 @@ class C4MultiAnchorBinding(_ContinuityStrictModel):
     tier: C4ContinuityTier
     selected_registry_revision_id: str = Field(pattern=_SHA256)
     terminal_materialization_receipt_id: str = Field(pattern=_SAFE_ID)
+    terminal_materialization_receipt_sha256: str = Field(pattern=_SHA256)
+    terminal_source_provenance_receipt_sha256: str = Field(pattern=_SHA256)
     terminal: "TerminalFrameEvidence"
     identity_anchor: C4IdentityAnchorEvidence
     approved_endpoint: C4ApprovedEndpointEvidence
@@ -287,6 +304,25 @@ class C4MultiAnchorBinding(_ContinuityStrictModel):
             != self.constraints.content_hash
         ):
             raise ValueError("C4 motion tail does not match binding target or terminal")
+        feasibility = self.approved_endpoint.feasibility_receipt
+        if (
+            (
+                feasibility.target_shot_id,
+                feasibility.target_shot_revision,
+                feasibility.target_shot_content_hash,
+            )
+            != target
+            or feasibility.output_duration_milliseconds
+            != self.approved_endpoint.duration_milliseconds
+            or feasibility.terminal_anchor_content_hash != self.terminal.content_hash
+            or feasibility.identity_anchor_content_hash
+            != self.identity_anchor.content_hash
+            or feasibility.motion_tail_content_hash
+            != (self.motion_tail.content_hash if self.motion_tail is not None else None)
+        ):
+            raise ValueError(
+                "C4 endpoint feasibility does not bind the exact target and anchors"
+            )
         asset_ids = (
             self.terminal.extracted_asset_id,
             self.identity_anchor.asset_id,

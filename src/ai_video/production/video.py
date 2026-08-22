@@ -379,9 +379,19 @@ class VideoGenerationRequest(_VideoStrictModel):
                 boundary.target_shot_content_hash,
             ):
                 raise ValueError("C4 multi-anchor binding does not match target Shot")
+            if c4_binding.selected_registry_revision_id != self.base_registry.revision_id:
+                raise ValueError("C4 binding does not match the selected Registry revision")
             terminal = c4_binding.terminal
             identity = c4_binding.identity_anchor
             endpoint = c4_binding.approved_endpoint
+            duration_seconds = getattr(
+                self.output_requirement, "duration_seconds", None
+            )
+            if (
+                duration_seconds is None
+                or duration_seconds * 1000 != endpoint.duration_milliseconds
+            ):
+                raise ValueError("C4 endpoint does not match the exact output duration")
             expected_images = (
                 VideoImageReferenceBinding(
                     role="first_frame",
@@ -439,12 +449,31 @@ class VideoGenerationRequest(_VideoStrictModel):
             ):
                 raise ValueError("C4 static boundary cannot contain motion media")
             required_inputs = {
+                boundary.target_shot_id,
                 terminal.source_shot_id,
                 terminal.source_video_asset_id,
                 terminal.extracted_asset_id,
+                terminal.source_provenance_receipt_id,
+                terminal.extraction_receipt_id,
+                c4_binding.terminal_materialization_receipt_id,
                 identity.asset_id,
+                identity.source_provenance_receipt_id,
+                identity.materialization_receipt_id,
                 endpoint.asset_id,
-                *((tail.extracted_asset_id,) if tail is not None else ()),
+                endpoint.source_provenance_receipt_id,
+                endpoint.materialization_receipt_id,
+                endpoint.feasibility_receipt.receipt_id,
+                endpoint.feasibility_receipt.human_approval_receipt_id,
+                *(
+                    (
+                        tail.extracted_asset_id,
+                        tail.source_p6_acceptance_evidence_id,
+                        tail.extraction_receipt_id,
+                        tail.materialization_receipt_id,
+                    )
+                    if tail is not None
+                    else ()
+                ),
             }
             if not required_inputs.issubset(self.input_artifact_ids):
                 raise ValueError("C4 input artifact identity is incomplete")
@@ -952,6 +981,40 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                 "Video media bindings do not satisfy the selected capability variant.",
             )
+        c4_binding = request.c4_multi_anchor_binding
+        if c4_binding is not None:
+            all_roles = (
+                "first_frame",
+                "last_frame",
+                "reference",
+                "reference_video",
+                "reference_audio",
+            )
+            expected_cardinality = {
+                (("first_frame",), 1, 1),
+                (("last_frame",), 1, 1),
+                (("reference",), 1, 1),
+                (
+                    ("reference_video",),
+                    1 if c4_binding.tier is C4ContinuityTier.MOTION_BOUNDARY else 0,
+                    1 if c4_binding.tier is C4ContinuityTier.MOTION_BOUNDARY else 0,
+                ),
+                (("reference_audio",), 0, 0),
+                (
+                    all_roles,
+                    4 if c4_binding.tier is C4ContinuityTier.MOTION_BOUNDARY else 3,
+                    4 if c4_binding.tier is C4ContinuityTier.MOTION_BOUNDARY else 3,
+                ),
+            }
+            selected_cardinality = {
+                (constraint.roles, constraint.min_count, constraint.max_count)
+                for constraint in capability.binding_cardinality_constraints
+            }
+            if selected_cardinality != expected_cardinality:
+                raise _video_error(
+                    ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                    "C4 requires one exact complete capability cardinality grammar.",
+                )
         if capability.binding_cardinality_constraints:
             _validate_cardinality_against_request(
                 capability.binding_cardinality_constraints,

@@ -1866,29 +1866,51 @@ def _c4_identity_anchor(**changes: object):
         "asset_width": 1280,
         "asset_height": 720,
         "source_provenance_receipt_id": "c4-identity-provenance",
+        "source_provenance_receipt_sha256": "2" * 64,
         "materialization_receipt_id": "c4-identity-mat",
+        "materialization_receipt_sha256": "3" * 64,
     }
     values.update(changes)
     return C4IdentityAnchorEvidence.create(**values)
 
 
-def _c4_endpoint(**changes: object):
+def _c4_endpoint(
+    *, feasibility_changes: dict[str, object] | None = None, **changes: object
+):
     from ai_video.production._video_continuity import (
         C4ApprovedEndpointEvidence,
         C4FeasibilityReceipt,
     )
 
-    feasibility = C4FeasibilityReceipt.create(
-        receipt_id="c4-feasibility-static",
-        human_approval_receipt_id="c4-human-approval",
-        feasibility_decision="PASS",
-        axis_check="PASS",
-        screen_direction_check="PASS",
-        subject_scale_check="PASS",
-        fov_check="PASS",
-        reachable_displacement_check="PASS",
-        no_teleport_check="PASS",
+    endpoint_target = {
+        "target_shot_id": "shot-001",
+        "target_shot_revision": 3,
+        "target_shot_content_hash": HASH_A,
+        "duration_milliseconds": 6_000,
+    }
+    endpoint_target.update(
+        {key: value for key, value in changes.items() if key in endpoint_target}
     )
+    feasibility_values: dict[str, object] = {
+        "receipt_id": "c4-feasibility-static",
+        "human_approval_receipt_id": "c4-human-approval",
+        "target_shot_id": endpoint_target["target_shot_id"],
+        "target_shot_revision": endpoint_target["target_shot_revision"],
+        "target_shot_content_hash": endpoint_target["target_shot_content_hash"],
+        "output_duration_milliseconds": endpoint_target["duration_milliseconds"],
+        "terminal_anchor_content_hash": _terminal_frame().content_hash,
+        "identity_anchor_content_hash": _c4_identity_anchor().content_hash,
+        "motion_tail_content_hash": None,
+        "feasibility_decision": "PASS",
+        "axis_check": "PASS",
+        "screen_direction_check": "PASS",
+        "subject_scale_check": "PASS",
+        "fov_check": "PASS",
+        "reachable_displacement_check": "PASS",
+        "no_teleport_check": "PASS",
+    }
+    feasibility_values.update(feasibility_changes or {})
+    feasibility = C4FeasibilityReceipt.create(**feasibility_values)
     values: dict[str, object] = {
         "target_shot_id": "shot-001",
         "target_shot_revision": 3,
@@ -1901,8 +1923,10 @@ def _c4_endpoint(**changes: object):
         "asset_width": 1280,
         "asset_height": 720,
         "source_provenance_receipt_id": "c4-endpoint-provenance",
+        "source_provenance_receipt_sha256": "4" * 64,
         "materialization_receipt_id": "c4-endpoint-mat",
-        "duration_milliseconds": 5_000,
+        "materialization_receipt_sha256": "5" * 64,
+        "duration_milliseconds": 6_000,
         "feasibility_receipt": feasibility,
     }
     values.update(changes)
@@ -1924,10 +1948,14 @@ def _c4_motion_tail(**changes: object):
         "source_request_input_hash": terminal.source_request_input_hash,
         "source_resolved_generation_hash": terminal.source_resolved_generation_hash,
         "source_provenance_receipt_id": terminal.source_provenance_receipt_id,
+        "source_provenance_receipt_sha256": "6" * 64,
         "source_p6_acceptance_evidence_id": "c4-source-p6-evidence",
+        "source_p6_acceptance_evidence_sha256": "7" * 64,
         "registry_revision_id": HASH_B,
         "extraction_receipt_id": "c4-motion-tail-extract-receipt",
+        "extraction_receipt_sha256": "8" * 64,
         "materialization_receipt_id": "c4-motion-tail-mat",
+        "materialization_receipt_sha256": "9" * 64,
         "selection_rule_version": "c4-tail-v1",
         "start_timestamp_numerator": terminal.frame_index - 4,
         "start_timestamp_denominator": terminal.timestamp_denominator,
@@ -1960,19 +1988,46 @@ def _c4_motion_tail(**changes: object):
     return C4MotionTailEvidence.create(**values)
 
 
-def _c4_binding(*, tier: str = "static_boundary", **changes: object):
+def _c4_binding(
+    *,
+    tier: str = "static_boundary",
+    identity_changes: dict[str, object] | None = None,
+    endpoint_changes: dict[str, object] | None = None,
+    **changes: object,
+):
     from ai_video.production._video_continuity import (
         C4MultiAnchorBinding,
         C4SemanticBoundaryState,
     )
 
+    terminal = changes.pop("terminal", _terminal_frame())
+    identity = changes.pop("identity_anchor", _c4_identity_anchor(**(identity_changes or {})))
+    motion_tail = changes.pop("motion_tail", None)
+    if tier == "motion_boundary" and motion_tail is None:
+        motion_tail = _c4_motion_tail(**(endpoint_changes or {}))
+    endpoint_values = dict(endpoint_changes or {})
+    endpoint = changes.pop(
+        "approved_endpoint",
+        _c4_endpoint(
+            feasibility_changes={
+                "terminal_anchor_content_hash": terminal.content_hash,
+                "identity_anchor_content_hash": identity.content_hash,
+                "motion_tail_content_hash": (
+                    motion_tail.content_hash if motion_tail is not None else None
+                ),
+            },
+            **endpoint_values,
+        ),
+    )
     anchor_kwargs: dict[str, object] = {
         "tier": tier,
-        "terminal": _terminal_frame(),
-        "identity_anchor": _c4_identity_anchor(),
-        "approved_endpoint": _c4_endpoint(),
+        "terminal": terminal,
+        "identity_anchor": identity,
+        "approved_endpoint": endpoint,
         "selected_registry_revision_id": HASH_B,
         "terminal_materialization_receipt_id": "c4-terminal-mat",
+        "terminal_materialization_receipt_sha256": "a" * 64,
+        "terminal_source_provenance_receipt_sha256": "b" * 64,
         "constraints": _continuity_constraints(),
         "semantic_boundary": C4SemanticBoundaryState.create(
             target_shot_id="shot-001",
@@ -1984,10 +2039,45 @@ def _c4_binding(*, tier: str = "static_boundary", **changes: object):
             close_state=("approved endpoint pose, scale, FOV, and camera endpoint",),
         ),
     }
-    if tier == "motion_boundary":
-        anchor_kwargs["motion_tail"] = _c4_motion_tail()
+    if motion_tail is not None:
+        anchor_kwargs["motion_tail"] = motion_tail
     anchor_kwargs.update(changes)
     return C4MultiAnchorBinding.create(**anchor_kwargs)
+
+
+def _c4_cardinality(*, motion: bool):
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+
+    return (
+        VideoBindingCardinalityConstraint(
+            roles=("first_frame",), min_count=1, max_count=1
+        ),
+        VideoBindingCardinalityConstraint(
+            roles=("last_frame",), min_count=1, max_count=1
+        ),
+        VideoBindingCardinalityConstraint(
+            roles=("reference",), min_count=1, max_count=1
+        ),
+        VideoBindingCardinalityConstraint(
+            roles=("reference_video",),
+            min_count=1 if motion else 0,
+            max_count=1 if motion else 0,
+        ),
+        VideoBindingCardinalityConstraint(
+            roles=("reference_audio",), min_count=0, max_count=0
+        ),
+        VideoBindingCardinalityConstraint(
+            roles=(
+                "first_frame",
+                "last_frame",
+                "reference",
+                "reference_video",
+                "reference_audio",
+            ),
+            min_count=4 if motion else 3,
+            max_count=4 if motion else 3,
+        ),
+    )
 
 
 def _c4_request(
@@ -2059,14 +2149,29 @@ def _c4_request(
 
     if input_artifact_ids is None:
         input_artifact_ids = (
+            binding.semantic_boundary.target_shot_id,
             terminal.source_shot_id,
             terminal.source_video_asset_id,
             terminal.extracted_asset_id,
+            terminal.source_provenance_receipt_id,
+            terminal.extraction_receipt_id,
+            binding.terminal_materialization_receipt_id,
             identity.asset_id,
+            identity.source_provenance_receipt_id,
+            identity.materialization_receipt_id,
             endpoint.asset_id,
+            endpoint.source_provenance_receipt_id,
+            endpoint.materialization_receipt_id,
+            endpoint.feasibility_receipt.receipt_id,
+            endpoint.feasibility_receipt.human_approval_receipt_id,
         )
         if motion_tail is not None:
-            input_artifact_ids = input_artifact_ids + (motion_tail.extracted_asset_id,)
+            input_artifact_ids = input_artifact_ids + (
+                motion_tail.extracted_asset_id,
+                motion_tail.source_p6_acceptance_evidence_id,
+                motion_tail.extraction_receipt_id,
+                motion_tail.materialization_receipt_id,
+            )
 
     return _request(
         mode=mode,
@@ -2303,6 +2408,17 @@ def test_c4_endpoint_requires_human_feasibility_receipt() -> None:
         C4FeasibilityReceipt.create(
             receipt_id="c4-feasibility-missing",
             human_approval_receipt_id="c4-human",
+            target_shot_id=binding.semantic_boundary.target_shot_id,
+            target_shot_revision=binding.semantic_boundary.target_shot_revision,
+            target_shot_content_hash=(
+                binding.semantic_boundary.target_shot_content_hash
+            ),
+            output_duration_milliseconds=(
+                binding.approved_endpoint.duration_milliseconds
+            ),
+            terminal_anchor_content_hash=binding.terminal.content_hash,
+            identity_anchor_content_hash=binding.identity_anchor.content_hash,
+            motion_tail_content_hash=None,
             feasibility_decision="NOT_EVALUATED",
             axis_check="PASS",
             screen_direction_check="PASS",
@@ -2310,6 +2426,35 @@ def test_c4_endpoint_requires_human_feasibility_receipt() -> None:
             fov_check="PASS",
             reachable_displacement_check="PASS",
             no_teleport_check="PASS",
+        )
+
+
+def test_c4_endpoint_feasibility_cannot_be_reused_for_different_anchors() -> None:
+    from pydantic import ValidationError as PydValidationError
+
+    binding = _c4_binding()
+    stale_endpoint = _c4_endpoint(
+        feasibility_changes={"terminal_anchor_content_hash": "0" * 64}
+    )
+
+    with pytest.raises(PydValidationError, match="feasibility"):
+        type(binding).create(
+            tier=binding.tier,
+            selected_registry_revision_id=binding.selected_registry_revision_id,
+            terminal_materialization_receipt_id=(
+                binding.terminal_materialization_receipt_id
+            ),
+            terminal_materialization_receipt_sha256=(
+                binding.terminal_materialization_receipt_sha256
+            ),
+            terminal_source_provenance_receipt_sha256=(
+                binding.terminal_source_provenance_receipt_sha256
+            ),
+            terminal=binding.terminal,
+            identity_anchor=binding.identity_anchor,
+            approved_endpoint=stale_endpoint,
+            semantic_boundary=binding.semantic_boundary,
+            constraints=binding.constraints,
         )
 
 
@@ -2351,6 +2496,26 @@ def test_c4_input_artifact_ids_must_include_every_selected_anchor() -> None:
                 terminal.extracted_asset_id,
                 binding.identity_anchor.asset_id,
                 # Missing endpoint + motion tail
+            ),
+        )
+
+
+def test_c4_request_binds_exact_output_duration_and_registry_revision() -> None:
+    binding = _c4_binding()
+
+    with pytest.raises(ValidationError, match="output duration"):
+        _c4_request(
+            binding=binding,
+            output_requirement=_output(duration_seconds=5),
+        )
+    with pytest.raises(ValidationError, match="Registry revision"):
+        _c4_request(
+            binding=binding,
+            base_registry=RegistrySnapshotPointer(
+                path=Path(f"assets/registry.{HASH_C}.json"),
+                revision_id=HASH_C,
+                content_hash=HASH_C,
+                file_sha256=HASH_D,
             ),
         )
 
@@ -2424,17 +2589,11 @@ def test_c4_motion_capability_requires_reference_video_in_same_capability() -> N
     assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
 
 
-def test_c4_resolved_request_fingerprint_includes_c4_binding_identity() -> None:
-    """RED gate: resolved/desired fingerprint must change when C4 binding changes."""
+def test_c4_static_capability_requires_complete_exact_cardinality_grammar() -> None:
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
 
-    binding_a = _c4_binding()
-    binding_b = _c4_binding(tier="motion_boundary")
-    from ai_video.production.video_contracts import (
-        VideoBindingCardinalityConstraint,
-        VideoMediaCapability,
-    )
-
-    static_variant = _variant(
+    incomplete = _variant(
+        capability_id="c4-incomplete-cardinality",
         allowed_image_roles=("first_frame", "last_frame", "reference"),
         binding_cardinality_constraints=(
             VideoBindingCardinalityConstraint(
@@ -2442,12 +2601,27 @@ def test_c4_resolved_request_fingerprint_includes_c4_binding_identity() -> None:
                 min_count=3,
                 max_count=3,
             ),
-            VideoBindingCardinalityConstraint(
-                roles=("reference_video", "reference_audio"),
-                min_count=0,
-                max_count=0,
-            ),
         ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        _resolved(_c4_request(), variant=incomplete)
+
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
+
+def test_c4_resolved_request_fingerprint_includes_c4_binding_identity() -> None:
+    """RED gate: resolved/desired fingerprint must change when C4 binding changes."""
+
+    binding_a = _c4_binding()
+    binding_b = _c4_binding(tier="motion_boundary")
+    from ai_video.production.video_contracts import (
+        VideoMediaCapability,
+    )
+
+    static_variant = _variant(
+        allowed_image_roles=("first_frame", "last_frame", "reference"),
+        binding_cardinality_constraints=_c4_cardinality(motion=False),
     )
     motion_variant = _variant(
         allowed_image_roles=("first_frame", "last_frame", "reference"),
@@ -2463,21 +2637,7 @@ def test_c4_resolved_request_fingerprint_includes_c4_binding_identity() -> None:
                 max_duration_millis=1_000,
             ),
         ),
-        binding_cardinality_constraints=(
-            VideoBindingCardinalityConstraint(
-                roles=(
-                    "first_frame",
-                    "last_frame",
-                    "reference",
-                    "reference_video",
-                ),
-                min_count=4,
-                max_count=4,
-            ),
-            VideoBindingCardinalityConstraint(
-                roles=("reference_audio",), min_count=0, max_count=0
-            ),
-        ),
+        binding_cardinality_constraints=_c4_cardinality(motion=True),
     )
     resolved_a = _resolved(_c4_request(binding=binding_a), variant=static_variant)
     resolved_b = _resolved(_c4_request(binding=binding_b), variant=motion_variant)

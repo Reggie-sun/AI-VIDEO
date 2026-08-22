@@ -60,7 +60,6 @@ from ai_video.production.video import (
     VideoProviderCapabilities,
 )
 from ai_video.production.video_contracts import (
-    VideoBindingCardinalityConstraint,
     VideoFlexibleOutputRequirement,
     VideoOutputCapability,
 )
@@ -322,12 +321,32 @@ def test_c4_requirement_bindings_use_exact_native_multi_anchor_order():
     )
 
 
+def test_multi_anchor_context_fails_closed_without_sealed_c4_requirement():
+    context = _context(continuity=ContinuityMode.MULTI_ANCHOR)
+
+    visual = ShotVisualResolver().resolve(context, _policy())
+    routed = VideoGenerationResolver().resolve(
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=_capabilities(_variant(VideoGenerationMode.IMAGE_TO_VIDEO)),
+        selected_capability_id="capability-image_to_video",
+        output_requirement=_output(),
+    )
+
+    assert visual.outcome is RoutingOutcome.BLOCKED_MISSING_INPUT
+    assert routed.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert visual.reason_codes == (
+        RouterReasonCode.MULTI_ANCHOR_REQUIREMENT_REQUIRED,
+    )
+    assert routed.reason_codes == visual.reason_codes
+
+
 def test_c4_static_requirement_routes_and_compiles_exact_request():
     from ai_video.production._video_continuity import C4SemanticBoundaryState
     from test_production_video import (
         _c4_binding,
-        _c4_endpoint,
-        _c4_identity_anchor,
+        _c4_cardinality,
     )
 
     context = _context(
@@ -340,13 +359,14 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
     )
     binding = _c4_binding(
         selected_registry_revision_id=HASH_F,
-        identity_anchor=_c4_identity_anchor(registry_revision_id=HASH_F),
-        approved_endpoint=_c4_endpoint(
-            target_shot_id=context.target_shot_id,
-            target_shot_revision=context.target_shot_revision,
-            target_shot_content_hash=context.target_shot_content_hash,
-            registry_revision_id=HASH_F,
-        ),
+        identity_changes={"registry_revision_id": HASH_F},
+        endpoint_changes={
+            "target_shot_id": context.target_shot_id,
+            "target_shot_revision": context.target_shot_revision,
+            "target_shot_content_hash": context.target_shot_content_hash,
+            "registry_revision_id": HASH_F,
+            "duration_milliseconds": 4_000,
+        },
         semantic_boundary=C4SemanticBoundaryState.create(
             target_shot_id=context.target_shot_id,
             target_shot_revision=context.target_shot_revision,
@@ -467,13 +487,7 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         update={
             "allowed_image_roles": ("first_frame", "last_frame", "reference"),
             "max_reference_count": 1,
-            "binding_cardinality_constraints": (
-                VideoBindingCardinalityConstraint(
-                    roles=("first_frame", "last_frame", "reference"),
-                    min_count=3,
-                    max_count=3,
-                ),
-            ),
+            "binding_cardinality_constraints": _c4_cardinality(motion=False),
         }
     )
     lifecycle = _lifecycle(context).model_copy(
@@ -483,8 +497,19 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
                 binding.terminal.source_shot_id,
                 binding.terminal.source_video_asset_id,
                 terminal_asset.asset_id,
+                binding.terminal.source_provenance_receipt_id,
+                binding.terminal.extraction_receipt_id,
+                binding.terminal_materialization_receipt_id,
                 identity_asset.asset_id,
+                binding.identity_anchor.source_provenance_receipt_id,
+                binding.identity_anchor.materialization_receipt_id,
                 endpoint_asset.asset_id,
+                binding.approved_endpoint.source_provenance_receipt_id,
+                binding.approved_endpoint.materialization_receipt_id,
+                binding.approved_endpoint.feasibility_receipt.receipt_id,
+                (
+                    binding.approved_endpoint.feasibility_receipt.human_approval_receipt_id
+                ),
             )
         }
     )

@@ -3108,16 +3108,17 @@ def test_seedance_2_0_mini_continuity_binds_exact_terminal_frame_payload():
 
 def test_seedance_mini_c4_mixed_anchors_fail_closed_before_preview_or_submit():
     from ai_video.production._video_continuity import C4SemanticBoundaryState
-    from test_production_video import _c4_binding, _c4_endpoint
+    from test_production_video import _c4_binding
 
     profile = _profile()
     transport = _FakeTransport()
     binding = _c4_binding(
-        approved_endpoint=_c4_endpoint(
-            target_shot_id="shot-1",
-            target_shot_revision=1,
-            target_shot_content_hash=HASH_A,
-        ),
+        endpoint_changes={
+            "target_shot_id": "shot-1",
+            "target_shot_revision": 1,
+            "target_shot_content_hash": HASH_A,
+            "duration_milliseconds": 5_000,
+        },
         semantic_boundary=C4SemanticBoundaryState.create(
             target_shot_id="shot-1",
             target_shot_revision=1,
@@ -3178,8 +3179,17 @@ def test_seedance_mini_c4_mixed_anchors_fail_closed_before_preview_or_submit():
             terminal.source_shot_id,
             terminal.source_video_asset_id,
             terminal.extracted_asset_id,
+            terminal.source_provenance_receipt_id,
+            terminal.extraction_receipt_id,
+            binding.terminal_materialization_receipt_id,
             identity.asset_id,
+            identity.source_provenance_receipt_id,
+            identity.materialization_receipt_id,
             endpoint.asset_id,
+            endpoint.source_provenance_receipt_id,
+            endpoint.materialization_receipt_id,
+            endpoint.feasibility_receipt.receipt_id,
+            endpoint.feasibility_receipt.human_approval_receipt_id,
         ),
         output=VideoFlexibleOutputRequirement(
             timing_mode="exact_seconds",
