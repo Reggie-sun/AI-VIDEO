@@ -29,6 +29,8 @@ from ai_video.production.paid_provider import (
     validate_paid_provider_authorization,
 )
 from ai_video.production._video_continuity import (
+    C4ContinuityTier,
+    C4MultiAnchorBinding,
     ContinuityArtifactIdentity,
     ContinuityConstraintSet,
     ContinuityReferenceBinding,
@@ -206,6 +208,7 @@ class VideoGenerationRequest(_VideoStrictModel):
     prompt_text: str = Field(min_length=1)
     negative_prompt_text: str
     image_bindings: tuple[VideoImageReferenceBinding, ...]
+    c4_multi_anchor_binding: C4MultiAnchorBinding | None = None
     continuity_binding: ContinuityReferenceBinding | None = None
     hard_cut_keyframe_binding: HardCutKeyframeBinding | None = None
     seal_terminal_frame: bool = Field(default=False, strict=True)
@@ -234,6 +237,7 @@ class VideoGenerationRequest(_VideoStrictModel):
         image_bindings = data.get("image_bindings")
         continuity = data.get("continuity_binding")
         hard_cut = data.get("hard_cut_keyframe_binding")
+        c4_binding = data.get("c4_multi_anchor_binding")
         seal_terminal_frame = data.get("seal_terminal_frame", False)
         lineage_fields = (
             "requirement_hash",
@@ -267,6 +271,8 @@ class VideoGenerationRequest(_VideoStrictModel):
             selected.pop("media_bindings", None)
         if continuity is None:
             selected.pop("continuity_binding", None)
+        if c4_binding is None:
+            selected.pop("c4_multi_anchor_binding", None)
         if hard_cut is None:
             selected.pop("hard_cut_keyframe_binding", None)
         if not seal_terminal_frame:
@@ -276,7 +282,9 @@ class VideoGenerationRequest(_VideoStrictModel):
                 selected.pop(field, None)
         return {
             "schema": (
-                "ai-video-generation-request/5"
+                "ai-video-generation-request/6"
+                if c4_binding is not None
+                else "ai-video-generation-request/5"
                 if uses_provider_neutral_lineage
                 else "ai-video-generation-request/4"
                 if hard_cut is not None
@@ -306,10 +314,14 @@ class VideoGenerationRequest(_VideoStrictModel):
             raise ValueError("text-to-video requests cannot contain image bindings")
         if self.mode is VideoGenerationMode.TEXT_TO_VIDEO and self.media_bindings:
             raise ValueError("text-to-video requests cannot contain media bindings")
-        if self.mode is VideoGenerationMode.IMAGE_TO_VIDEO and (
-            not self.image_bindings or self.media_bindings
-        ):
+        if self.mode is VideoGenerationMode.IMAGE_TO_VIDEO and not self.image_bindings:
             raise ValueError("image-to-video requests require image bindings")
+        if (
+            self.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+            and self.media_bindings
+            and self.c4_multi_anchor_binding is None
+        ):
+            raise ValueError("image-to-video requests cannot contain media bindings")
         if self.mode is VideoGenerationMode.REFERENCE_TO_VIDEO and not (
             self.image_bindings or self.media_bindings
         ):
@@ -343,10 +355,99 @@ class VideoGenerationRequest(_VideoStrictModel):
             raise ValueError("video input artifact IDs must be unique")
         continuity = self.continuity_binding
         hard_cut = self.hard_cut_keyframe_binding
+        c4_binding = self.c4_multi_anchor_binding
+        if c4_binding is not None and (continuity is not None or hard_cut is not None):
+            raise ValueError(
+                "c4_multi_anchor_binding cannot combine with legacy continuity bindings"
+            )
         if continuity is not None and hard_cut is not None:
             raise ValueError(
                 "video request cannot combine continuation and hard-cut bindings"
             )
+        if c4_binding is not None:
+            if self.mode is not VideoGenerationMode.IMAGE_TO_VIDEO:
+                raise ValueError("C4 multi-anchor requests must use image-to-video mode")
+            target = (
+                self.target_shot_id,
+                self.target_shot_revision,
+                self.target_shot_content_hash,
+            )
+            boundary = c4_binding.semantic_boundary
+            if target != (
+                boundary.target_shot_id,
+                boundary.target_shot_revision,
+                boundary.target_shot_content_hash,
+            ):
+                raise ValueError("C4 multi-anchor binding does not match target Shot")
+            terminal = c4_binding.terminal
+            identity = c4_binding.identity_anchor
+            endpoint = c4_binding.approved_endpoint
+            expected_images = (
+                VideoImageReferenceBinding(
+                    role="first_frame",
+                    asset_id=terminal.extracted_asset_id,
+                    asset_sha256=terminal.extracted_sha256,
+                    mime_type=terminal.extracted_mime_type,
+                    width=terminal.extracted_width,
+                    height=terminal.extracted_height,
+                    size_bytes=terminal.extracted_size_bytes,
+                ),
+                VideoImageReferenceBinding(
+                    role="last_frame",
+                    asset_id=endpoint.asset_id,
+                    asset_sha256=endpoint.asset_sha256,
+                    mime_type=endpoint.asset_mime_type,
+                    width=endpoint.asset_width,
+                    height=endpoint.asset_height,
+                    size_bytes=endpoint.asset_size_bytes,
+                ),
+                VideoImageReferenceBinding(
+                    role="reference",
+                    asset_id=identity.asset_id,
+                    asset_sha256=identity.asset_sha256,
+                    mime_type=identity.asset_mime_type,
+                    width=identity.asset_width,
+                    height=identity.asset_height,
+                    size_bytes=identity.asset_size_bytes,
+                ),
+            )
+            if self.image_bindings != expected_images:
+                raise ValueError("C4 request does not bind the exact canonical anchors")
+            tail = c4_binding.motion_tail
+            expected_media = ()
+            if tail is not None:
+                expected_media = (
+                    VideoMediaReferenceBinding(
+                        kind="video",
+                        role="reference_video",
+                        asset_id=tail.extracted_asset_id,
+                        asset_sha256=tail.extracted_sha256,
+                        mime_type=tail.extracted_mime_type,
+                        duration_millis=tail.extracted_duration_milliseconds,
+                        size_bytes=tail.extracted_size_bytes,
+                        width=tail.extracted_width,
+                        height=tail.extracted_height,
+                        fps=tail.extracted_fps_numerator
+                        // tail.extracted_fps_denominator,
+                    ),
+                )
+            if self.media_bindings != expected_media:
+                raise ValueError("C4 request media does not match the selected tier")
+            if (
+                c4_binding.tier is C4ContinuityTier.STATIC_BOUNDARY
+                and self.media_bindings
+            ):
+                raise ValueError("C4 static boundary cannot contain motion media")
+            required_inputs = {
+                terminal.source_shot_id,
+                terminal.source_video_asset_id,
+                terminal.extracted_asset_id,
+                identity.asset_id,
+                endpoint.asset_id,
+                *((tail.extracted_asset_id,) if tail is not None else ()),
+            }
+            if not required_inputs.issubset(self.input_artifact_ids):
+                raise ValueError("C4 input artifact identity is incomplete")
         if continuity is not None:
             terminal = continuity.terminal_frame
             if self.mode is not VideoGenerationMode.IMAGE_TO_VIDEO:
@@ -553,6 +654,7 @@ class VideoActivationScope(_VideoStrictModel):
             request.continuity_binding is not None or request.seal_terminal_frame
         )
         uses_hard_cut = request.hard_cut_keyframe_binding is not None
+        uses_c4 = request.c4_multi_anchor_binding is not None
         uses_provider_neutral_lineage = request.requirement_hash is not None
         if not uses_provider_neutral_lineage:
             for field in (
@@ -568,9 +670,13 @@ class VideoActivationScope(_VideoStrictModel):
             request_payload.pop("seal_terminal_frame", None)
         if not uses_hard_cut:
             request_payload.pop("hard_cut_keyframe_binding", None)
+        if not uses_c4:
+            request_payload.pop("c4_multi_anchor_binding", None)
         return {
             "schema": (
-                "ai-video-activation-scope/4"
+                "ai-video-activation-scope/5"
+                if uses_c4
+                else "ai-video-activation-scope/4"
                 if uses_provider_neutral_lineage
                 else "ai-video-activation-scope/3"
                 if uses_hard_cut
@@ -632,6 +738,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     mode: VideoGenerationMode
     prompt_text: str = Field(min_length=1)
     image_bindings: tuple[VideoImageReferenceBinding, ...]
+    c4_multi_anchor_binding: C4MultiAnchorBinding | None = None
     continuity_binding: ContinuityReferenceBinding | None = None
     hard_cut_keyframe_binding: HardCutKeyframeBinding | None = None
     seal_terminal_frame: bool = Field(default=False, strict=True)
@@ -676,7 +783,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             },
         )
         schema = (
-            "ai-video-resolved-request/6"
+            "ai-video-resolved-request/7"
+            if self.c4_multi_anchor_binding is not None
+            else "ai-video-resolved-request/6"
             if uses_provider_neutral_lineage
             else "ai-video-resolved-request/5"
             if self.hard_cut_keyframe_binding is not None
@@ -693,6 +802,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 data.pop(field, None)
         if self.continuity_binding is None:
             data.pop("continuity_binding", None)
+        if self.c4_multi_anchor_binding is None:
+            data.pop("c4_multi_anchor_binding", None)
         if self.hard_cut_keyframe_binding is None:
             data.pop("hard_cut_keyframe_binding", None)
         if not self.seal_terminal_frame:
@@ -724,6 +835,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 or request.mode is not self.mode
                 or request.prompt_text != self.prompt_text
                 or request.image_bindings != self.image_bindings
+                or request.c4_multi_anchor_binding
+                != self.c4_multi_anchor_binding
                 or request.continuity_binding != self.continuity_binding
                 or request.hard_cut_keyframe_binding != self.hard_cut_keyframe_binding
                 or request.seal_terminal_frame != self.seal_terminal_frame
@@ -746,6 +859,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             or isinstance(self.effective_output, VideoFlexibleOutputRequirement)
             or self.provider_task_binding is not None
             or any(binding.role == "last_frame" for binding in self.image_bindings)
+            or self.c4_multi_anchor_binding is not None
         )
 
     @classmethod
@@ -861,6 +975,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             "mode": request.mode,
             "prompt_text": request.prompt_text,
             "image_bindings": request.image_bindings,
+            "c4_multi_anchor_binding": request.c4_multi_anchor_binding,
             "continuity_binding": request.continuity_binding,
             "hard_cut_keyframe_binding": request.hard_cut_keyframe_binding,
             "seal_terminal_frame": request.seal_terminal_frame,
@@ -887,7 +1002,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             warnings=False,
         )
         schema = (
-            "ai-video-resolved-request/6"
+            "ai-video-resolved-request/7"
+            if candidate.c4_multi_anchor_binding is not None
+            else "ai-video-resolved-request/6"
             if candidate.requirement_hash is not None
             else "ai-video-resolved-request/5"
             if candidate.hard_cut_keyframe_binding is not None
@@ -910,6 +1027,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 fingerprint_data.pop(field, None)
         if candidate.continuity_binding is None:
             fingerprint_data.pop("continuity_binding", None)
+        if candidate.c4_multi_anchor_binding is None:
+            fingerprint_data.pop("c4_multi_anchor_binding", None)
         if candidate.hard_cut_keyframe_binding is None:
             fingerprint_data.pop("hard_cut_keyframe_binding", None)
         if not candidate.seal_terminal_frame:

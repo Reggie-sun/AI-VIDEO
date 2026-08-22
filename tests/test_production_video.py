@@ -10,6 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
     ActorIdentity,
     DependencyGraphSnapshotPointer,
@@ -632,6 +633,7 @@ def test_provider_neutral_lineage_uses_noncolliding_request_resolved_and_scope_s
     )
     expected_payload.pop("continuity_binding")
     expected_payload.pop("hard_cut_keyframe_binding")
+    expected_payload.pop("c4_multi_anchor_binding")
     expected_payload.pop("seal_terminal_frame")
     expected_payload.pop("provider_task_binding")
     expected = video_contracts.canonical_sha256(
@@ -1180,6 +1182,7 @@ def test_historical_activation_scope_reopens_without_continuity_defaults():
         scope_request.pop(field)
     scope_request.pop("continuity_binding")
     scope_request.pop("hard_cut_keyframe_binding")
+    scope_request.pop("c4_multi_anchor_binding")
     scope_request.pop("seal_terminal_frame")
     scope["scope_fingerprint"] = video_contracts.canonical_sha256(
         {
@@ -1840,3 +1843,687 @@ def test_resolved_request_defense_in_depth_rejects_cardinality_violation_after_c
     with pytest.raises(AiVideoError) as exc_info:
         _resolved(_request(), variant=constrained_variant)
     assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
+
+# ---------------------------------------------------------------------------
+# C4 Multi-Anchor Motion Continuity (Milestone 12.1-12.3) provider-neutral
+# strict additive contract — RED contract suite.
+# ---------------------------------------------------------------------------
+
+
+def _c4_identity_anchor(**changes: object):
+    from ai_video.production._video_continuity import C4IdentityAnchorEvidence
+
+    values: dict[str, object] = {
+        "character_artifact_id": "character-001",
+        "character_revision": 3,
+        "character_content_hash": HASH_C,
+        "registry_revision_id": HASH_B,
+        "asset_id": "asset-c4-identity",
+        "asset_sha256": "e" * 64,
+        "asset_mime_type": "image/png",
+        "asset_size_bytes": 4096,
+        "asset_width": 1280,
+        "asset_height": 720,
+        "source_provenance_receipt_id": "c4-identity-provenance",
+        "materialization_receipt_id": "c4-identity-mat",
+    }
+    values.update(changes)
+    return C4IdentityAnchorEvidence.create(**values)
+
+
+def _c4_endpoint(**changes: object):
+    from ai_video.production._video_continuity import (
+        C4ApprovedEndpointEvidence,
+        C4FeasibilityReceipt,
+    )
+
+    feasibility = C4FeasibilityReceipt.create(
+        receipt_id="c4-feasibility-static",
+        human_approval_receipt_id="c4-human-approval",
+        feasibility_decision="PASS",
+        axis_check="PASS",
+        screen_direction_check="PASS",
+        subject_scale_check="PASS",
+        fov_check="PASS",
+        reachable_displacement_check="PASS",
+        no_teleport_check="PASS",
+    )
+    values: dict[str, object] = {
+        "target_shot_id": "shot-001",
+        "target_shot_revision": 3,
+        "target_shot_content_hash": HASH_A,
+        "registry_revision_id": HASH_B,
+        "asset_id": "asset-c4-endpoint",
+        "asset_sha256": "f" * 64,
+        "asset_mime_type": "image/png",
+        "asset_size_bytes": 5000,
+        "asset_width": 1280,
+        "asset_height": 720,
+        "source_provenance_receipt_id": "c4-endpoint-provenance",
+        "materialization_receipt_id": "c4-endpoint-mat",
+        "duration_milliseconds": 5_000,
+        "feasibility_receipt": feasibility,
+    }
+    values.update(changes)
+    return C4ApprovedEndpointEvidence.create(**values)
+
+
+def _c4_motion_tail(**changes: object):
+    from ai_video.production._video_continuity import C4MotionTailEvidence
+
+    terminal = _terminal_frame()
+    values: dict[str, object] = {
+        "source_shot_id": terminal.source_shot_id,
+        "source_shot_revision": terminal.source_shot_revision,
+        "source_shot_content_hash": terminal.source_shot_content_hash,
+        "source_video_asset_id": terminal.source_video_asset_id,
+        "source_video_sha256": terminal.source_video_sha256,
+        "source_registry_revision_id": terminal.source_registry.revision_id,
+        "source_generation_id": terminal.source_generation_id,
+        "source_request_input_hash": terminal.source_request_input_hash,
+        "source_resolved_generation_hash": terminal.source_resolved_generation_hash,
+        "source_provenance_receipt_id": terminal.source_provenance_receipt_id,
+        "source_p6_acceptance_evidence_id": "c4-source-p6-evidence",
+        "registry_revision_id": HASH_B,
+        "extraction_receipt_id": "c4-motion-tail-extract-receipt",
+        "materialization_receipt_id": "c4-motion-tail-mat",
+        "selection_rule_version": "c4-tail-v1",
+        "start_timestamp_numerator": terminal.frame_index - 4,
+        "start_timestamp_denominator": terminal.timestamp_denominator,
+        "end_timestamp_numerator": terminal.timestamp_numerator,
+        "end_timestamp_denominator": terminal.timestamp_denominator,
+        "start_frame_index": terminal.frame_index - 4,
+        "end_frame_index": terminal.frame_index,
+        "source_fps_numerator": terminal.source_fps_numerator,
+        "source_fps_denominator": terminal.source_fps_denominator,
+        "source_frame_count": terminal.source_frame_count,
+        "extracted_asset_id": "asset-c4-motion-tail",
+        "extracted_sha256": "1" * 64,
+        "extracted_mime_type": "video/mp4",
+        "extracted_size_bytes": 65536,
+        "extracted_width": terminal.source_width,
+        "extracted_height": terminal.source_height,
+        "extracted_fps_numerator": terminal.source_fps_numerator,
+        "extracted_fps_denominator": terminal.source_fps_denominator,
+        "extracted_duration_milliseconds": 250,
+        "extracted_frame_count": 5,
+        "extractor_name": "ffmpeg",
+        "extractor_version": "7.1",
+        "terminal_frame_evidence": terminal,
+        "target_shot_id": "shot-001",
+        "target_shot_revision": 3,
+        "target_shot_content_hash": HASH_A,
+        "continuity_constraint_snapshot_hash": _continuity_constraints().content_hash,
+    }
+    values.update(changes)
+    return C4MotionTailEvidence.create(**values)
+
+
+def _c4_binding(*, tier: str = "static_boundary", **changes: object):
+    from ai_video.production._video_continuity import (
+        C4MultiAnchorBinding,
+        C4SemanticBoundaryState,
+    )
+
+    anchor_kwargs: dict[str, object] = {
+        "tier": tier,
+        "terminal": _terminal_frame(),
+        "identity_anchor": _c4_identity_anchor(),
+        "approved_endpoint": _c4_endpoint(),
+        "selected_registry_revision_id": HASH_B,
+        "terminal_materialization_receipt_id": "c4-terminal-mat",
+        "constraints": _continuity_constraints(),
+        "semantic_boundary": C4SemanticBoundaryState.create(
+            target_shot_id="shot-001",
+            target_shot_revision=3,
+            target_shot_content_hash=HASH_A,
+            open_state=("terminal pixels and upstream motion phase",),
+            must_hold=("canonical identity, red satchel, axis, screen direction",),
+            changes_here=("visible deceleration into an approved stop",),
+            close_state=("approved endpoint pose, scale, FOV, and camera endpoint",),
+        ),
+    }
+    if tier == "motion_boundary":
+        anchor_kwargs["motion_tail"] = _c4_motion_tail()
+    anchor_kwargs.update(changes)
+    return C4MultiAnchorBinding.create(**anchor_kwargs)
+
+
+def _c4_request(
+    *,
+    binding=None,
+    image_bindings=None,
+    media_bindings=None,
+    mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+    input_artifact_ids=None,
+    **request_changes: object,
+):
+    if binding is None:
+        binding = _c4_binding()
+    terminal = binding.terminal
+    endpoint = binding.approved_endpoint
+    identity = binding.identity_anchor
+    motion_tail = (
+        binding.motion_tail if binding.tier.value == "motion_boundary" else None
+    )
+
+    first_frame = VideoImageReferenceBinding(
+        role="first_frame",
+        asset_id=terminal.extracted_asset_id,
+        asset_sha256=terminal.extracted_sha256,
+        mime_type=terminal.extracted_mime_type,
+        width=terminal.extracted_width,
+        height=terminal.extracted_height,
+        size_bytes=terminal.extracted_size_bytes,
+    )
+    last_frame = VideoImageReferenceBinding(
+        role="last_frame",
+        asset_id=endpoint.asset_id,
+        asset_sha256=endpoint.asset_sha256,
+        mime_type=endpoint.asset_mime_type,
+        width=endpoint.asset_width,
+        height=endpoint.asset_height,
+        size_bytes=endpoint.asset_size_bytes,
+    )
+    reference = VideoImageReferenceBinding(
+        role="reference",
+        asset_id=identity.asset_id,
+        asset_sha256=identity.asset_sha256,
+        mime_type=identity.asset_mime_type,
+        width=identity.asset_width,
+        height=identity.asset_height,
+        size_bytes=identity.asset_size_bytes,
+    )
+    if image_bindings is None:
+        image_bindings = (first_frame, last_frame, reference)
+    selected_media_bindings = media_bindings
+    if selected_media_bindings is None and motion_tail is not None:
+        from ai_video.production.video_contracts import VideoMediaReferenceBinding
+
+        selected_media_bindings = (
+            VideoMediaReferenceBinding(
+                kind="video",
+                role="reference_video",
+                asset_id=motion_tail.extracted_asset_id,
+                asset_sha256=motion_tail.extracted_sha256,
+                mime_type=motion_tail.extracted_mime_type,
+                duration_millis=motion_tail.extracted_duration_milliseconds,
+                size_bytes=motion_tail.extracted_size_bytes,
+                width=motion_tail.extracted_width,
+                height=motion_tail.extracted_height,
+                fps=motion_tail.extracted_fps_numerator
+                // motion_tail.extracted_fps_denominator,
+            ),
+        )
+
+    if input_artifact_ids is None:
+        input_artifact_ids = (
+            terminal.source_shot_id,
+            terminal.source_video_asset_id,
+            terminal.extracted_asset_id,
+            identity.asset_id,
+            endpoint.asset_id,
+        )
+        if motion_tail is not None:
+            input_artifact_ids = input_artifact_ids + (motion_tail.extracted_asset_id,)
+
+    return _request(
+        mode=mode,
+        image_bindings=image_bindings,
+        media_bindings=selected_media_bindings or (),
+        c4_multi_anchor_binding=binding,
+        input_artifact_ids=input_artifact_ids,
+        **request_changes,
+    )
+
+
+def test_c4_module_exposes_strict_additive_binding_models() -> None:
+    """RED gate: provider-neutral C4 models exist as additive strict modules."""
+
+    from ai_video.production import _video_continuity as continuity_module
+
+    for name in (
+        "C4MultiAnchorBinding",
+        "C4IdentityAnchorEvidence",
+        "C4ApprovedEndpointEvidence",
+        "C4MotionTailEvidence",
+        "C4FeasibilityReceipt",
+        "C4ContinuityTier",
+    ):
+        assert hasattr(continuity_module, name), (
+            f"_video_continuity must expose strict additive C4 type {name}"
+        )
+
+
+def test_c4_video_request_exposes_additive_binding_field() -> None:
+    """RED gate: VideoGenerationRequest accepts C4 binding without mutating C1 hash."""
+
+    annotations = getattr(VideoGenerationRequest, "model_fields", {})
+    assert "c4_multi_anchor_binding" in annotations
+
+
+def test_c4_static_binding_seals_three_anchors_and_terminal_first_frame_is_required() -> None:
+    """RED gate: provider-neutral C4 static binding must seal terminal as first_frame."""
+
+    binding = _c4_binding()
+    request = _c4_request(binding=binding)
+    assert request.c4_multi_anchor_binding == binding
+    assert request.image_bindings[0].role == "first_frame"
+    assert (
+        request.image_bindings[0].asset_id == binding.terminal.extracted_asset_id
+    )
+
+
+def test_c4_motion_binding_requires_reference_video_and_motion_tail_evidence() -> None:
+    """RED gate: motion tier must include motion_tail evidence and reference_video."""
+
+    binding = _c4_binding(tier="motion_boundary")
+    request = _c4_request(binding=binding)
+    assert request.media_bindings
+    assert request.media_bindings[0].role == "reference_video"
+    assert binding.motion_tail is not None
+    assert binding.motion_tail.end_frame_index == binding.terminal.frame_index
+
+
+def test_c4_binding_rejects_when_combined_with_continuity_binding() -> None:
+    """RED gate: C4 must not coexist with legacy continuity binding."""
+
+    binding = _c4_binding()
+    legacy = _continuity_binding()
+    with pytest.raises(ValidationError, match="c4_multi_anchor_binding"):
+        _request(
+            c4_multi_anchor_binding=binding,
+            continuity_binding=legacy,
+            image_bindings=(
+                VideoImageReferenceBinding(
+                    role="first_frame",
+                    asset_id=binding.terminal.extracted_asset_id,
+                    asset_sha256=binding.terminal.extracted_sha256,
+                    mime_type=binding.terminal.extracted_mime_type,
+                    width=binding.terminal.extracted_width,
+                    height=binding.terminal.extracted_height,
+                    size_bytes=binding.terminal.extracted_size_bytes,
+                ),
+                VideoImageReferenceBinding(
+                    role="last_frame",
+                    asset_id=binding.approved_endpoint.asset_id,
+                    asset_sha256=binding.approved_endpoint.asset_sha256,
+                    mime_type=binding.approved_endpoint.asset_mime_type,
+                    width=binding.approved_endpoint.asset_width,
+                    height=binding.approved_endpoint.asset_height,
+                    size_bytes=binding.approved_endpoint.asset_size_bytes,
+                ),
+                VideoImageReferenceBinding(
+                    role="reference",
+                    asset_id=binding.identity_anchor.asset_id,
+                    asset_sha256=binding.identity_anchor.asset_sha256,
+                    mime_type=binding.identity_anchor.asset_mime_type,
+                    width=binding.identity_anchor.asset_width,
+                    height=binding.identity_anchor.asset_height,
+                    size_bytes=binding.identity_anchor.asset_size_bytes,
+                ),
+            ),
+            input_artifact_ids=(
+                binding.terminal.source_shot_id,
+                binding.terminal.source_video_asset_id,
+                binding.terminal.extracted_asset_id,
+                binding.identity_anchor.asset_id,
+                binding.approved_endpoint.asset_id,
+            ),
+        )
+
+
+def test_c4_binding_rejects_when_combined_with_hard_cut_binding() -> None:
+    binding = _c4_binding()
+    legacy = _hard_cut_keyframe_binding()
+    with pytest.raises(ValidationError, match="c4_multi_anchor_binding"):
+        _c4_request(
+            binding=binding,
+            hard_cut_keyframe_binding=legacy,
+            image_bindings=(
+                VideoImageReferenceBinding(
+                    role="first_frame",
+                    asset_id=binding.terminal.extracted_asset_id,
+                    asset_sha256=binding.terminal.extracted_sha256,
+                    mime_type=binding.terminal.extracted_mime_type,
+                    width=binding.terminal.extracted_width,
+                    height=binding.terminal.extracted_height,
+                    size_bytes=binding.terminal.extracted_size_bytes,
+                ),
+                VideoImageReferenceBinding(
+                    role="last_frame",
+                    asset_id=binding.approved_endpoint.asset_id,
+                    asset_sha256=binding.approved_endpoint.asset_sha256,
+                    mime_type=binding.approved_endpoint.asset_mime_type,
+                    width=binding.approved_endpoint.asset_width,
+                    height=binding.approved_endpoint.asset_height,
+                    size_bytes=binding.approved_endpoint.asset_size_bytes,
+                ),
+                VideoImageReferenceBinding(
+                    role="reference",
+                    asset_id=binding.identity_anchor.asset_id,
+                    asset_sha256=binding.identity_anchor.asset_sha256,
+                    mime_type=binding.identity_anchor.asset_mime_type,
+                    width=binding.identity_anchor.asset_width,
+                    height=binding.identity_anchor.asset_height,
+                    size_bytes=binding.identity_anchor.asset_size_bytes,
+                ),
+            ),
+            input_artifact_ids=(
+                binding.terminal.source_shot_id,
+                binding.terminal.source_video_asset_id,
+                binding.terminal.extracted_asset_id,
+                binding.identity_anchor.asset_id,
+                binding.approved_endpoint.asset_id,
+            ),
+        )
+
+
+def test_c4_static_binding_rejects_motion_tier_or_motion_tail() -> None:
+    """RED gate: motion tail is forbidden in static tier."""
+
+    from pydantic import ValidationError as PydValidationError
+
+    from ai_video.production._video_continuity import C4MultiAnchorBinding
+
+    binding_with_tail = _c4_binding()
+    motion_tail = _c4_motion_tail()
+    with pytest.raises(PydValidationError):
+        C4MultiAnchorBinding.create(
+            tier="static_boundary",
+            selected_registry_revision_id=HASH_B,
+            terminal_materialization_receipt_id="c4-terminal-mat",
+            terminal=binding_with_tail.terminal,
+            identity_anchor=binding_with_tail.identity_anchor,
+            approved_endpoint=binding_with_tail.approved_endpoint,
+            motion_tail=motion_tail,
+            semantic_boundary=binding_with_tail.semantic_boundary,
+            constraints=binding_with_tail.constraints,
+        )
+
+
+def test_c4_binding_rejects_duplicate_or_wrong_role_or_extra_anchor() -> None:
+    """RED gate: C4 binding must reject duplicate identity asset ids or extra anchor."""
+
+    from pydantic import ValidationError as PydValidationError
+
+    from ai_video.production._video_continuity import C4MultiAnchorBinding
+
+    binding = _c4_binding()
+    duplicate_identity = _c4_identity_anchor(
+        asset_id=binding.terminal.extracted_asset_id,
+        asset_sha256=binding.terminal.extracted_sha256,
+    )
+    with pytest.raises(PydValidationError):
+        C4MultiAnchorBinding.create(
+            tier=binding.tier,
+            selected_registry_revision_id=HASH_B,
+            terminal_materialization_receipt_id="c4-terminal-mat",
+            terminal=binding.terminal,
+            identity_anchor=duplicate_identity,
+            approved_endpoint=binding.approved_endpoint,
+            semantic_boundary=binding.semantic_boundary,
+            constraints=binding.constraints,
+        )
+
+
+def test_c4_identity_anchor_must_be_distinct_from_terminal_endpoint() -> None:
+    """RED gate: identity must not be terminal, endpoint or scene plate."""
+
+    from pydantic import ValidationError as PydValidationError
+
+    binding = _c4_binding()
+    duplicate_identity = _c4_identity_anchor(
+        asset_id=binding.terminal.extracted_asset_id,
+        asset_sha256=binding.terminal.extracted_sha256,
+    )
+    with pytest.raises(PydValidationError):
+        type(binding).create(
+            tier=binding.tier,
+            selected_registry_revision_id=HASH_B,
+            terminal_materialization_receipt_id="c4-terminal-mat",
+            terminal=binding.terminal,
+            identity_anchor=duplicate_identity,
+            approved_endpoint=binding.approved_endpoint,
+            semantic_boundary=binding.semantic_boundary,
+            constraints=binding.constraints,
+        )
+
+
+def test_c4_endpoint_requires_human_feasibility_receipt() -> None:
+    """RED gate: feasibility receipt is mandatory and all checks must be PASS."""
+
+    from pydantic import ValidationError as PydValidationError
+
+    from ai_video.production._video_continuity import C4FeasibilityReceipt
+
+    binding = _c4_binding()
+    with pytest.raises(PydValidationError):
+        C4FeasibilityReceipt.create(
+            receipt_id="c4-feasibility-missing",
+            human_approval_receipt_id="c4-human",
+            feasibility_decision="NOT_EVALUATED",
+            axis_check="PASS",
+            screen_direction_check="PASS",
+            subject_scale_check="PASS",
+            fov_check="PASS",
+            reachable_displacement_check="PASS",
+            no_teleport_check="PASS",
+        )
+
+
+def test_c4_motion_tail_must_share_source_video_sha256_with_terminal() -> None:
+    """RED gate: motion tail source sha must equal terminal source video sha."""
+
+    from pydantic import ValidationError as PydValidationError
+
+    binding = _c4_binding()
+    with pytest.raises(PydValidationError):
+        _c4_motion_tail(source_video_sha256="0" * 64)
+
+
+def test_c4_motion_tail_must_end_on_terminal_frame_index() -> None:
+    """RED gate: motion tail end frame index must equal terminal frame index."""
+
+    from pydantic import ValidationError as PydValidationError
+
+    binding = _c4_binding(tier="motion_boundary")
+    with pytest.raises(PydValidationError):
+        _c4_motion_tail(
+            end_frame_index=binding.motion_tail.end_frame_index - 1
+            if binding.motion_tail is not None
+            else 0
+        )
+
+
+def test_c4_input_artifact_ids_must_include_every_selected_anchor() -> None:
+    """RED gate: input_artifact_ids must include terminal, identity, endpoint, tail."""
+
+    binding = _c4_binding(tier="motion_boundary")
+    terminal = binding.terminal
+    with pytest.raises(ValidationError, match="input artifact"):
+        _c4_request(
+            binding=binding,
+            input_artifact_ids=(
+                terminal.source_shot_id,
+                terminal.source_video_asset_id,
+                terminal.extracted_asset_id,
+                binding.identity_anchor.asset_id,
+                # Missing endpoint + motion tail
+            ),
+        )
+
+
+def test_c4_capability_subset_or_union_must_fail_closed_before_provider_bind() -> None:
+    """RED gate: capability that supports only a subset of anchors must reject."""
+
+    from ai_video.production.video_contracts import (
+        VideoBindingCardinalityConstraint,
+        VideoMediaCapability,
+    )
+
+    only_first_frame = _variant(
+        capability_id="only-first-frame",
+        allowed_image_roles=("first_frame",),
+        binding_cardinality_constraints=(
+            VideoBindingCardinalityConstraint(
+                roles=("first_frame",), min_count=1, max_count=1
+            ),
+        ),
+    )
+    binding = _c4_binding()
+    request = _c4_request(binding=binding)
+    with pytest.raises(AiVideoError) as exc_info:
+        _resolved(request, variant=only_first_frame)
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
+
+def test_c4_motion_capability_requires_reference_video_in_same_capability() -> None:
+    """RED gate: capability that lacks motion-tail video must reject motion tier."""
+
+    from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+
+    static_only_variant = _variant(
+        capability_id="c4-static-only",
+        allowed_image_roles=("first_frame", "last_frame", "reference"),
+        media_capabilities=(),
+        binding_cardinality_constraints=(
+            VideoBindingCardinalityConstraint(
+                roles=("first_frame",), min_count=1, max_count=1
+            ),
+            VideoBindingCardinalityConstraint(
+                roles=("last_frame",), min_count=1, max_count=1
+            ),
+            VideoBindingCardinalityConstraint(
+                roles=("reference",), min_count=1, max_count=1
+            ),
+            VideoBindingCardinalityConstraint(
+                roles=("reference_video",), min_count=0, max_count=0
+            ),
+            VideoBindingCardinalityConstraint(
+                roles=("reference_audio",), min_count=0, max_count=0
+            ),
+            VideoBindingCardinalityConstraint(
+                roles=(
+                    "first_frame",
+                    "last_frame",
+                    "reference",
+                    "reference_video",
+                    "reference_audio",
+                ),
+                min_count=3,
+                max_count=3,
+            ),
+        ),
+    )
+    binding = _c4_binding(tier="motion_boundary")
+    request = _c4_request(binding=binding)
+    with pytest.raises(AiVideoError) as exc_info:
+        _resolved(request, variant=static_only_variant)
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
+
+def test_c4_resolved_request_fingerprint_includes_c4_binding_identity() -> None:
+    """RED gate: resolved/desired fingerprint must change when C4 binding changes."""
+
+    binding_a = _c4_binding()
+    binding_b = _c4_binding(tier="motion_boundary")
+    from ai_video.production.video_contracts import (
+        VideoBindingCardinalityConstraint,
+        VideoMediaCapability,
+    )
+
+    static_variant = _variant(
+        allowed_image_roles=("first_frame", "last_frame", "reference"),
+        binding_cardinality_constraints=(
+            VideoBindingCardinalityConstraint(
+                roles=("first_frame", "last_frame", "reference"),
+                min_count=3,
+                max_count=3,
+            ),
+            VideoBindingCardinalityConstraint(
+                roles=("reference_video", "reference_audio"),
+                min_count=0,
+                max_count=0,
+            ),
+        ),
+    )
+    motion_variant = _variant(
+        allowed_image_roles=("first_frame", "last_frame", "reference"),
+        media_capabilities=(
+            VideoMediaCapability(
+                kind="video",
+                roles=("reference_video",),
+                min_count=1,
+                max_count=1,
+                allowed_mime_types=("video/mp4",),
+                max_size_bytes=1_000_000,
+                min_duration_millis=1,
+                max_duration_millis=1_000,
+            ),
+        ),
+        binding_cardinality_constraints=(
+            VideoBindingCardinalityConstraint(
+                roles=(
+                    "first_frame",
+                    "last_frame",
+                    "reference",
+                    "reference_video",
+                ),
+                min_count=4,
+                max_count=4,
+            ),
+            VideoBindingCardinalityConstraint(
+                roles=("reference_audio",), min_count=0, max_count=0
+            ),
+        ),
+    )
+    resolved_a = _resolved(_c4_request(binding=binding_a), variant=static_variant)
+    resolved_b = _resolved(_c4_request(binding=binding_b), variant=motion_variant)
+    assert (
+        resolved_a.resolved_generation_hash != resolved_b.resolved_generation_hash
+    )
+
+
+def test_c4_binding_absence_preserves_legacy_request_resolved_activation_hashes() -> None:
+    """RED gate: legacy request/resolved/activation hashes stay bit-for-bit."""
+
+    legacy = _request()
+    legacy_resolved = _resolved(legacy)
+    legacy_scope = VideoActivationScope.create(legacy)
+    expected_request_hash = canonical_sha256(
+        VideoGenerationRequest._fingerprint_payload(legacy.model_dump(mode="json"))
+    )
+    assert legacy.request_input_hash == expected_request_hash
+    expected_resolved_hash = canonical_sha256(
+        {
+            "schema": "ai-video-resolved-request/2",
+            **legacy_resolved.model_dump(
+                mode="json",
+                exclude={
+                    "activation_scope",
+                    "resolved_generation_hash",
+                    "desired_generation_fingerprint",
+                    "continuity_binding",
+                    "hard_cut_keyframe_binding",
+                    "seal_terminal_frame",
+                    "media_bindings",
+                    "provider_task_binding",
+                    "c4_multi_anchor_binding",
+                    "requirement_hash",
+                    "provider_bound_request_hash",
+                    "adapter_compiler_id",
+                    "adapter_compiler_version",
+                    "adapter_compiler_hash",
+                },
+            ),
+        }
+    )
+    assert legacy_resolved.resolved_generation_hash == expected_resolved_hash
+    expected_scope_hash = video_contracts.canonical_sha256(
+        VideoActivationScope._fingerprint_payload(
+            legacy, legacy_scope.usage_license
+        )
+    )
+    assert legacy_scope.scope_fingerprint == expected_scope_hash

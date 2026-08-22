@@ -9,9 +9,11 @@ from pydantic import Field, ValidationInfo, field_validator, model_validator
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import Character, Scene, Shot, StrictModel
+from ai_video.production._video_continuity import C4MultiAnchorBinding
 
 
 _REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/1"
+_C4_REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/2"
 _UNSEALED_HASH = "0" * 64
 _SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
 _SHA256 = r"^[0-9a-f]{64}$"
@@ -39,6 +41,7 @@ class GenerationOperation(str, Enum):
 
 
 class ContinuityMode(str, Enum):
+    MULTI_ANCHOR = "multi_anchor"
     EXACT_TERMINAL = "exact_terminal"
     REFERENCE = "reference"
     SEMANTIC = "semantic"
@@ -89,6 +92,8 @@ class SemanticReferenceRole(str, Enum):
     FIRST_FRAME = "first_frame"
     LAST_FRAME = "last_frame"
     CONTINUITY_TERMINAL = "continuity_terminal"
+    APPROVED_ENDPOINT = "approved_endpoint"
+    CONTINUITY_MOTION_TAIL = "continuity_motion_tail"
     VIDEO_REFERENCE = "video_reference"
     AUDIO_REFERENCE = "audio_reference"
 
@@ -398,7 +403,10 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
 
 
 class ProviderNeutralVideoRequirement(StrictModel):
-    contract_version: Literal[_REQUIREMENT_CONTRACT_VERSION] = (
+    contract_version: Literal[
+        _REQUIREMENT_CONTRACT_VERSION,
+        _C4_REQUIREMENT_CONTRACT_VERSION,
+    ] = (
         _REQUIREMENT_CONTRACT_VERSION
     )
     requirement_id: str = Field(pattern=_SAFE_ID)
@@ -411,6 +419,7 @@ class ProviderNeutralVideoRequirement(StrictModel):
     characters: tuple[Character, ...] = ()
     review_evidence: ReviewEvidenceLink | None = None
     asset_evidence: tuple[AssetEvidence, ...] = Field(default_factory=tuple)
+    c4_multi_anchor_binding: C4MultiAnchorBinding | None = None
     generation_mode: GenerationMode
     continuity_mode: ContinuityMode
     motion_requirement: MotionRequirement
@@ -422,18 +431,26 @@ class ProviderNeutralVideoRequirement(StrictModel):
     quality_need: QualityNeed = Field(default_factory=QualityNeed)
 
     def _hash_payload(self) -> dict[str, object]:
+        payload = self.model_dump(
+            mode="json",
+            exclude={"contract_version", "requirement_id", "requirement_hash"},
+        )
+        if self.c4_multi_anchor_binding is None:
+            payload.pop("c4_multi_anchor_binding", None)
         return {
-            "schema": _REQUIREMENT_CONTRACT_VERSION,
-            **self.model_dump(
-                mode="json",
-                exclude={"contract_version", "requirement_id", "requirement_hash"},
-            ),
+            "schema": self.contract_version,
+            **payload,
         }
 
     @classmethod
     def create(cls, **values: object) -> "ProviderNeutralVideoRequirement":
         payload: dict[str, object] = dict(values)
-        payload.setdefault("contract_version", _REQUIREMENT_CONTRACT_VERSION)
+        payload.setdefault(
+            "contract_version",
+            _C4_REQUIREMENT_CONTRACT_VERSION
+            if payload.get("c4_multi_anchor_binding") is not None
+            else _REQUIREMENT_CONTRACT_VERSION,
+        )
         payload["requirement_id"] = "video-requirement-unsealed"
         payload["requirement_hash"] = _UNSEALED_HASH
 
@@ -513,6 +530,51 @@ class ProviderNeutralVideoRequirement(StrictModel):
         declared_characters = tuple(sorted(intent.identity_continuity.character_ids))
         if declared_characters and declared_characters != character_ids:
             raise ValueError("typed identity continuity must match requirement Characters")
+        c4_binding = self.c4_multi_anchor_binding
+        if c4_binding is None:
+            if self.contract_version != _REQUIREMENT_CONTRACT_VERSION:
+                raise ValueError("C4 requirement contract requires a C4 binding")
+            if self.continuity_mode is ContinuityMode.MULTI_ANCHOR:
+                raise ValueError("multi-anchor continuity requires a C4 binding")
+            return self
+        if (
+            self.contract_version != _C4_REQUIREMENT_CONTRACT_VERSION
+            or self.continuity_mode is not ContinuityMode.MULTI_ANCHOR
+            or self.generation_mode is not GenerationMode.IMAGE_TO_VIDEO
+        ):
+            raise ValueError("C4 binding requires the v2 I2V multi-anchor contract")
+        boundary = c4_binding.semantic_boundary
+        if (
+            boundary.target_shot_id != self.target_shot.shot_id
+            or boundary.target_shot_revision != self.target_shot.revision
+            or boundary.target_shot_content_hash != self.target_shot.content_hash
+        ):
+            raise ValueError("C4 requirement target does not match the exact Shot")
+        expected = {
+            SemanticReferenceRole.CONTINUITY_TERMINAL: (
+                c4_binding.terminal.extracted_asset_id,
+                c4_binding.terminal.extracted_sha256,
+            ),
+            SemanticReferenceRole.IDENTITY: (
+                c4_binding.identity_anchor.asset_id,
+                c4_binding.identity_anchor.asset_sha256,
+            ),
+            SemanticReferenceRole.APPROVED_ENDPOINT: (
+                c4_binding.approved_endpoint.asset_id,
+                c4_binding.approved_endpoint.asset_sha256,
+            ),
+        }
+        if c4_binding.motion_tail is not None:
+            expected[SemanticReferenceRole.CONTINUITY_MOTION_TAIL] = (
+                c4_binding.motion_tail.extracted_asset_id,
+                c4_binding.motion_tail.extracted_sha256,
+            )
+        selected = {
+            item.role: (item.asset_id, item.asset_sha256)
+            for item in self.asset_evidence
+        }
+        if len(self.asset_evidence) != len(expected) or selected != expected:
+            raise ValueError("C4 requirement evidence does not match exact anchors")
         return self
 
     @model_validator(mode="after")

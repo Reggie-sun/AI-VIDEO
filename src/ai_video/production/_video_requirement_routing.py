@@ -56,10 +56,12 @@ def native_binding_role(
     return {
         SemanticReferenceRole.FIRST_FRAME: "first_frame",
         SemanticReferenceRole.CONTINUITY_TERMINAL: "first_frame",
+        SemanticReferenceRole.APPROVED_ENDPOINT: "last_frame",
         SemanticReferenceRole.LAST_FRAME: "last_frame",
         SemanticReferenceRole.IDENTITY: "reference",
         SemanticReferenceRole.SCENE: "reference",
         SemanticReferenceRole.VIDEO_REFERENCE: "reference_video",
+        SemanticReferenceRole.CONTINUITY_MOTION_TAIL: "reference_video",
         SemanticReferenceRole.AUDIO_REFERENCE: "reference_audio",
     }[role]
 
@@ -68,10 +70,12 @@ def context_asset_role(role: SemanticReferenceRole) -> str:
     return {
         SemanticReferenceRole.FIRST_FRAME: "first_frame",
         SemanticReferenceRole.CONTINUITY_TERMINAL: "continuity_terminal",
+        SemanticReferenceRole.APPROVED_ENDPOINT: "last_frame",
         SemanticReferenceRole.LAST_FRAME: "last_frame",
         SemanticReferenceRole.IDENTITY: "character_reference",
         SemanticReferenceRole.SCENE: "scene_reference",
         SemanticReferenceRole.VIDEO_REFERENCE: "reference_video",
+        SemanticReferenceRole.CONTINUITY_MOTION_TAIL: "reference_video",
         SemanticReferenceRole.AUDIO_REFERENCE: "reference_audio",
     }[role]
 
@@ -107,6 +111,20 @@ def requirement_bindings(
             return None
         roles.append(native_binding_role(evidence.role))
         assets.append(matches[0])
+    if requirement.c4_multi_anchor_binding is not None:
+        native_order = {
+            "first_frame": 0,
+            "last_frame": 1,
+            "reference": 2,
+            "reference_video": 3,
+            "reference_audio": 4,
+        }
+        ordered = sorted(
+            zip(roles, assets, strict=True),
+            key=lambda item: (native_order[item[0]], item[1].asset_id),
+        )
+        roles = [item[0] for item in ordered]
+        assets = [item[1] for item in ordered]
     return tuple(roles), tuple(assets)
 
 

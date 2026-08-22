@@ -40,6 +40,7 @@ from ai_video.production._state_commit_contracts import (
     _PAID_PROVIDER_PERMIT_TOKEN,
     _DurablePaidProviderSubmitPermit,
 )
+from ai_video.production._video_continuity import C4MultiAnchorBinding
 from ai_video.production.video import (
     ContinuityConstraintSet,
     ContinuityReferenceBinding,
@@ -223,6 +224,7 @@ def _request(
     output: VideoFlexibleOutputRequirement | None = None,
     seed: int | None = None,
     continuity_binding: ContinuityReferenceBinding | None = None,
+    c4_multi_anchor_binding: C4MultiAnchorBinding | None = None,
     input_artifact_ids: tuple[str, ...] | None = None,
     base_registry: RegistrySnapshotPointer | None = None,
 ) -> VideoGenerationRequest:
@@ -254,6 +256,7 @@ def _request(
         prompt_text=PROMPT,
         negative_prompt_text="",
         image_bindings=image_bindings,
+        c4_multi_anchor_binding=c4_multi_anchor_binding,
         continuity_binding=continuity_binding,
         media_bindings=media_bindings,
         output_requirement=selected_output,
@@ -3101,6 +3104,103 @@ def test_seedance_2_0_mini_continuity_binds_exact_terminal_frame_payload():
         "image_url": {"url": "asset://asset-test-0-bbbbbbbbbbbbbbbb"},
         "role": "first_frame",
     }
+
+
+def test_seedance_mini_c4_mixed_anchors_fail_closed_before_preview_or_submit():
+    from ai_video.production._video_continuity import C4SemanticBoundaryState
+    from test_production_video import _c4_binding, _c4_endpoint
+
+    profile = _profile()
+    transport = _FakeTransport()
+    binding = _c4_binding(
+        approved_endpoint=_c4_endpoint(
+            target_shot_id="shot-1",
+            target_shot_revision=1,
+            target_shot_content_hash=HASH_A,
+        ),
+        semantic_boundary=C4SemanticBoundaryState.create(
+            target_shot_id="shot-1",
+            target_shot_revision=1,
+            target_shot_content_hash=HASH_A,
+            open_state=("exact terminal",),
+            must_hold=("canonical identity and axis",),
+            changes_here=("decelerate into approved endpoint",),
+            close_state=("approved endpoint",),
+        ),
+    )
+    terminal = binding.terminal
+    endpoint = binding.approved_endpoint
+    identity = binding.identity_anchor
+    image_bindings = (
+        VideoImageReferenceBinding(
+            role="first_frame",
+            asset_id=terminal.extracted_asset_id,
+            asset_sha256=terminal.extracted_sha256,
+            mime_type=terminal.extracted_mime_type,
+            width=terminal.extracted_width,
+            height=terminal.extracted_height,
+            size_bytes=terminal.extracted_size_bytes,
+        ),
+        VideoImageReferenceBinding(
+            role="last_frame",
+            asset_id=endpoint.asset_id,
+            asset_sha256=endpoint.asset_sha256,
+            mime_type=endpoint.asset_mime_type,
+            width=endpoint.asset_width,
+            height=endpoint.asset_height,
+            size_bytes=endpoint.asset_size_bytes,
+        ),
+        VideoImageReferenceBinding(
+            role="reference",
+            asset_id=identity.asset_id,
+            asset_sha256=identity.asset_sha256,
+            mime_type=identity.asset_mime_type,
+            width=identity.asset_width,
+            height=identity.asset_height,
+            size_bytes=identity.asset_size_bytes,
+        ),
+    )
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "must-not-be-read",
+        input_reference=_sealed_asset_resolver(*image_bindings),
+        now=lambda: FIXED_NOW,
+    )
+    request = _request(
+        profile,
+        model_id="doubao-seedance-2-0-mini-260615",
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        image_bindings=image_bindings,
+        c4_multi_anchor_binding=binding,
+        input_artifact_ids=(
+            "shot-1",
+            terminal.source_shot_id,
+            terminal.source_video_asset_id,
+            terminal.extracted_asset_id,
+            identity.asset_id,
+            endpoint.asset_id,
+        ),
+        output=VideoFlexibleOutputRequirement(
+            timing_mode="exact_seconds",
+            duration_seconds=5,
+            dimension_mode="exact",
+            width=864,
+            height=496,
+            resolution_label="480p",
+            ratio="16:9",
+            fps=24,
+            container="mp4",
+            mime_type="video/mp4",
+            native_audio=False,
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(request)
+
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.requests == []
 
 
 @pytest.mark.parametrize(

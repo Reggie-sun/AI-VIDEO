@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 from pydantic import ValidationError
 import pytest
 
-from ai_video.production.hashing import seal_artifact
+from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
     DurationPolicy,
@@ -28,7 +30,9 @@ from ai_video.production.shot_router import (
     VideoGenerationResolver,
     VideoRoutingPolicy,
 )
+from ai_video.production._video_requirement_routing import requirement_bindings
 from ai_video.production.video_requirement import (
+    AssetEvidence,
     AudioNeed,
     CapabilityNeed,
     ContinuityMode as RequirementContinuityMode,
@@ -39,9 +43,11 @@ from ai_video.production.video_requirement import (
     OutputNeed,
     ProviderNeutralVideoRequirement,
     QualityNeed,
+    SemanticReferenceRole,
     VerifiedGenerationRequirementProjection,
 )
-from tests.fixtures.planning_factory import make_scene
+from tests.fixtures.planning_factory import make_character, make_scene
+from ai_video.production.video_compiler import compile_provider_video_request
 from ai_video.production.video import (
     BillingKind,
     ProviderProfilePointer,
@@ -54,6 +60,7 @@ from ai_video.production.video import (
     VideoProviderCapabilities,
 )
 from ai_video.production.video_contracts import (
+    VideoBindingCardinalityConstraint,
     VideoFlexibleOutputRequirement,
     VideoOutputCapability,
 )
@@ -236,6 +243,282 @@ def _policy(
         local_resources_available=local_resources,
         remote_authorized=remote_authorized,
         budget_authorized=budget_authorized,
+    )
+
+
+def test_c4_requirement_bindings_use_exact_native_multi_anchor_order():
+    terminal = _asset("continuity_terminal", "terminal", HASH_A)
+    endpoint = _asset("last_frame", "endpoint", HASH_B)
+    identity = _asset("character_reference", "identity", HASH_C)
+    motion_tail = _asset(
+        "reference_video",
+        "motion-tail",
+        HASH_D,
+        mime_type="video/mp4",
+        duration_millis=500,
+        fps=24,
+    )
+    requirement = SimpleNamespace(
+        c4_multi_anchor_binding=object(),
+        asset_evidence=(
+            AssetEvidence(
+                role=SemanticReferenceRole.APPROVED_ENDPOINT,
+                asset_id=endpoint.asset_id,
+                asset_sha256=endpoint.asset_sha256,
+                mime_type=endpoint.mime_type,
+                width=endpoint.width,
+                height=endpoint.height,
+                size_bytes=endpoint.size_bytes,
+            ),
+            AssetEvidence(
+                role=SemanticReferenceRole.CONTINUITY_MOTION_TAIL,
+                asset_id=motion_tail.asset_id,
+                asset_sha256=motion_tail.asset_sha256,
+                mime_type=motion_tail.mime_type,
+                width=motion_tail.width,
+                height=motion_tail.height,
+                size_bytes=motion_tail.size_bytes,
+                duration_millis=motion_tail.duration_millis,
+                fps=motion_tail.fps,
+            ),
+            AssetEvidence(
+                role=SemanticReferenceRole.CONTINUITY_TERMINAL,
+                asset_id=terminal.asset_id,
+                asset_sha256=terminal.asset_sha256,
+                mime_type=terminal.mime_type,
+                width=terminal.width,
+                height=terminal.height,
+                size_bytes=terminal.size_bytes,
+            ),
+            AssetEvidence(
+                role=SemanticReferenceRole.IDENTITY,
+                asset_id=identity.asset_id,
+                asset_sha256=identity.asset_sha256,
+                mime_type=identity.mime_type,
+                width=identity.width,
+                height=identity.height,
+                size_bytes=identity.size_bytes,
+            ),
+        ),
+    )
+    context = SimpleNamespace(
+        canonical_character_references=(identity,),
+        canonical_scene_reference=None,
+        shot_keyframe=None,
+        upstream_terminal=terminal,
+        last_frame=endpoint,
+        reference_videos=(motion_tail,),
+        reference_audios=(),
+    )
+
+    roles, assets = requirement_bindings(requirement, context) or ((), ())
+
+    assert roles == ("first_frame", "last_frame", "reference", "reference_video")
+    assert tuple(asset.asset_id for asset in assets) == (
+        terminal.asset_id,
+        endpoint.asset_id,
+        identity.asset_id,
+        motion_tail.asset_id,
+    )
+
+
+def test_c4_static_requirement_routes_and_compiles_exact_request():
+    from ai_video.production._video_continuity import C4SemanticBoundaryState
+    from test_production_video import (
+        _c4_binding,
+        _c4_endpoint,
+        _c4_identity_anchor,
+    )
+
+    context = _context(
+        continuity=ContinuityMode.MULTI_ANCHOR,
+        terminal=_asset("continuity_terminal", "terminal", "7" * 64),
+        last_frame=_asset("last_frame", "endpoint", "f" * 64),
+        character_references=(
+            _asset("character_reference", "c4-identity", "e" * 64),
+        ),
+    )
+    binding = _c4_binding(
+        selected_registry_revision_id=HASH_F,
+        identity_anchor=_c4_identity_anchor(registry_revision_id=HASH_F),
+        approved_endpoint=_c4_endpoint(
+            target_shot_id=context.target_shot_id,
+            target_shot_revision=context.target_shot_revision,
+            target_shot_content_hash=context.target_shot_content_hash,
+            registry_revision_id=HASH_F,
+        ),
+        semantic_boundary=C4SemanticBoundaryState.create(
+            target_shot_id=context.target_shot_id,
+            target_shot_revision=context.target_shot_revision,
+            target_shot_content_hash=context.target_shot_content_hash,
+            open_state=("exact terminal",),
+            must_hold=("canonical identity and axis",),
+            changes_here=("decelerate into approved endpoint",),
+            close_state=("approved endpoint",),
+        ),
+    )
+    terminal_asset = context.upstream_terminal.model_copy(
+        update={
+            "asset_id": binding.terminal.extracted_asset_id,
+            "asset_sha256": binding.terminal.extracted_sha256,
+            "mime_type": binding.terminal.extracted_mime_type,
+            "size_bytes": binding.terminal.extracted_size_bytes,
+            "width": binding.terminal.extracted_width,
+            "height": binding.terminal.extracted_height,
+        }
+    )
+    endpoint_asset = context.last_frame.model_copy(
+        update={
+            "asset_id": binding.approved_endpoint.asset_id,
+            "asset_sha256": binding.approved_endpoint.asset_sha256,
+            "mime_type": binding.approved_endpoint.asset_mime_type,
+            "size_bytes": binding.approved_endpoint.asset_size_bytes,
+            "width": binding.approved_endpoint.asset_width,
+            "height": binding.approved_endpoint.asset_height,
+        }
+    )
+    identity_asset = context.canonical_character_references[0].model_copy(
+        update={
+            "asset_id": binding.identity_anchor.asset_id,
+            "asset_sha256": binding.identity_anchor.asset_sha256,
+            "mime_type": binding.identity_anchor.asset_mime_type,
+            "size_bytes": binding.identity_anchor.asset_size_bytes,
+            "width": binding.identity_anchor.asset_width,
+            "height": binding.identity_anchor.asset_height,
+        }
+    )
+    context = context.model_copy(
+        update={
+            "upstream_terminal": terminal_asset,
+            "last_frame": endpoint_asset,
+            "canonical_character_references": (identity_asset,),
+        }
+    )
+    evidence = (
+        AssetEvidence(
+            role=SemanticReferenceRole.CONTINUITY_TERMINAL,
+            asset_id=terminal_asset.asset_id,
+            asset_sha256=terminal_asset.asset_sha256,
+            mime_type=terminal_asset.mime_type,
+            width=terminal_asset.width,
+            height=terminal_asset.height,
+            size_bytes=terminal_asset.size_bytes,
+        ),
+        AssetEvidence(
+            role=SemanticReferenceRole.APPROVED_ENDPOINT,
+            asset_id=endpoint_asset.asset_id,
+            asset_sha256=endpoint_asset.asset_sha256,
+            mime_type=endpoint_asset.mime_type,
+            width=endpoint_asset.width,
+            height=endpoint_asset.height,
+            size_bytes=endpoint_asset.size_bytes,
+        ),
+        AssetEvidence(
+            role=SemanticReferenceRole.IDENTITY,
+            asset_id=identity_asset.asset_id,
+            asset_sha256=identity_asset.asset_sha256,
+            mime_type=identity_asset.mime_type,
+            width=identity_asset.width,
+            height=identity_asset.height,
+            size_bytes=identity_asset.size_bytes,
+        ),
+    )
+    intent = GenerationIntent()
+    character = make_character().model_copy(
+        update={
+            "artifact_id": "character-001",
+            "revision": 3,
+            "content_hash": HASH_C,
+        }
+    )
+    requirement = ProviderNeutralVideoRequirement.create(
+        source_request_content_hash=HASH_A,
+        intent_evidence_hash=HASH_B,
+        generation_intent_hash=canonical_sha256(intent.model_dump(mode="json")),
+        target_shot=context.activated_shot,
+        scene=make_scene(scene_id=context.activated_shot.scene_id),
+        characters=(character,),
+        asset_evidence=evidence,
+        c4_multi_anchor_binding=binding,
+        generation_mode=RequirementGenerationMode.IMAGE_TO_VIDEO,
+        continuity_mode=RequirementContinuityMode.MULTI_ANCHOR,
+        motion_requirement=RequirementMotionRequirement.CHARACTER_ACTION,
+        generation_intent=intent,
+        semantic_reference_roles=tuple(item.role for item in evidence),
+        output_need=OutputNeed(
+            duration_seconds=4,
+            width=1024,
+            height=576,
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.FORBIDDEN,
+        quality_need=QualityNeed(objective_tier="production"),
+    )
+    projection = VerifiedGenerationRequirementProjection.create(
+        requirement=requirement,
+        plan_hash=HASH_D,
+        verified_source_request_content_hash=HASH_A,
+        target_shot_id=context.target_shot_id,
+        target_shot_revision=context.target_shot_revision,
+        target_shot_content_hash=context.target_shot_content_hash,
+    )
+    variant = _variant(VideoGenerationMode.IMAGE_TO_VIDEO).model_copy(
+        update={
+            "allowed_image_roles": ("first_frame", "last_frame", "reference"),
+            "max_reference_count": 1,
+            "binding_cardinality_constraints": (
+                VideoBindingCardinalityConstraint(
+                    roles=("first_frame", "last_frame", "reference"),
+                    min_count=3,
+                    max_count=3,
+                ),
+            ),
+        }
+    )
+    lifecycle = _lifecycle(context).model_copy(
+        update={
+            "input_artifact_ids": (
+                context.target_shot_id,
+                binding.terminal.source_shot_id,
+                binding.terminal.source_video_asset_id,
+                terminal_asset.asset_id,
+                identity_asset.asset_id,
+                endpoint_asset.asset_id,
+            )
+        }
+    )
+    compiler = AdapterCompilerContract.create(
+        compiler_id="test-c4-compiler",
+        compiler_version="1",
+    )
+
+    routed = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=_capabilities(variant),
+        selected_capability_id=variant.capability_id,
+        output_requirement=_output(),
+        lifecycle=lifecycle,
+        compiler_contract=compiler,
+    )
+
+    assert routed.decision.outcome is RoutingOutcome.SELECTED
+    assert routed.provider_bound_request is not None
+    compiled = compile_provider_video_request(
+        provider_bound=routed.provider_bound_request,
+        requirement=requirement,
+        compiler_id=compiler.compiler_id,
+        compiler_version=compiler.compiler_version,
+        capabilities=_capabilities(variant),
+    )
+    assert compiled.request.c4_multi_anchor_binding == binding
+    assert tuple(item.role for item in compiled.request.image_bindings) == (
+        "first_frame",
+        "last_frame",
+        "reference",
     )
 
 

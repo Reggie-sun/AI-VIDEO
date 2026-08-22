@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import unicodedata
-from typing import TYPE_CHECKING, Literal
+from enum import Enum
+from typing import TYPE_CHECKING, ClassVar, Literal
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
@@ -27,6 +28,306 @@ _SHA256 = r"^[0-9a-f]{64}$"
 
 class _ContinuityStrictModel(StrictModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
+
+
+class _C4SealedModel(_ContinuityStrictModel):
+    content_hash: str = Field(pattern=_SHA256)
+
+    _content_schema: ClassVar[str]
+
+    def _content_payload(self) -> dict[str, object]:
+        return {
+            "schema": self._content_schema,
+            **self.model_dump(mode="json", exclude={"content_hash"}),
+        }
+
+    @model_validator(mode="after")
+    def _validate_content_hash(self) -> "_C4SealedModel":
+        if self.content_hash != canonical_sha256(self._content_payload()):
+            raise ValueError("C4 evidence hash does not match content")
+        return self
+
+    @classmethod
+    def create(cls, **values: object):
+        data = dict(values)
+        data.pop("content_hash", None)
+        candidate = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(candidate._content_payload())
+        return cls.model_validate(data)
+
+
+class C4ContinuityTier(str, Enum):
+    STATIC_BOUNDARY = "static_boundary"
+    MOTION_BOUNDARY = "motion_boundary"
+
+
+class C4SemanticBoundaryState(_C4SealedModel):
+    _content_schema = "ai-video-c4-semantic-boundary-state/1"
+
+    target_shot_id: str = Field(pattern=_SAFE_ID)
+    target_shot_revision: int = Field(strict=True, ge=1)
+    target_shot_content_hash: str = Field(pattern=_SHA256)
+    open_state: tuple[str, ...] = Field(min_length=1)
+    must_hold: tuple[str, ...] = Field(min_length=1)
+    changes_here: tuple[str, ...] = Field(min_length=1)
+    close_state: tuple[str, ...] = Field(min_length=1)
+
+    @field_validator("open_state", "must_hold", "changes_here", "close_state")
+    @classmethod
+    def _canonical_state_items(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        if any(not item or unicodedata.normalize("NFC", item) != item for item in value):
+            raise ValueError("C4 semantic boundary state must use non-empty NFC text")
+        if len(set(value)) != len(value):
+            raise ValueError("C4 semantic boundary state items must be unique")
+        return value
+
+
+class C4FeasibilityReceipt(_C4SealedModel):
+    _content_schema = "ai-video-c4-endpoint-feasibility/1"
+
+    receipt_id: str = Field(pattern=_SAFE_ID)
+    human_approval_receipt_id: str = Field(pattern=_SAFE_ID)
+    feasibility_decision: Literal["PASS"]
+    axis_check: Literal["PASS"]
+    screen_direction_check: Literal["PASS"]
+    subject_scale_check: Literal["PASS"]
+    fov_check: Literal["PASS"]
+    reachable_displacement_check: Literal["PASS"]
+    no_teleport_check: Literal["PASS"]
+
+
+class C4IdentityAnchorEvidence(_C4SealedModel):
+    _content_schema = "ai-video-c4-identity-anchor/1"
+
+    semantic_role: Literal["identity"] = "identity"
+    native_role: Literal["reference"] = "reference"
+    canonical_order: Literal[1] = 1
+    character_artifact_id: str = Field(pattern=_SAFE_ID)
+    character_revision: int = Field(strict=True, ge=1)
+    character_content_hash: str = Field(pattern=_SHA256)
+    registry_revision_id: str = Field(pattern=_SHA256)
+    asset_id: str = Field(pattern=_SAFE_ID)
+    asset_sha256: str = Field(pattern=_SHA256)
+    asset_mime_type: str = Field(pattern=r"^image/[A-Za-z0-9.+-]+$")
+    asset_size_bytes: int = Field(strict=True, gt=0)
+    asset_width: int = Field(strict=True, gt=0)
+    asset_height: int = Field(strict=True, gt=0)
+    source_provenance_receipt_id: str = Field(pattern=_SAFE_ID)
+    materialization_receipt_id: str = Field(pattern=_SAFE_ID)
+
+
+class C4ApprovedEndpointEvidence(_C4SealedModel):
+    _content_schema = "ai-video-c4-approved-endpoint/1"
+
+    semantic_role: Literal["approved_endpoint"] = "approved_endpoint"
+    native_role: Literal["last_frame"] = "last_frame"
+    canonical_order: Literal[2] = 2
+    target_shot_id: str = Field(pattern=_SAFE_ID)
+    target_shot_revision: int = Field(strict=True, ge=1)
+    target_shot_content_hash: str = Field(pattern=_SHA256)
+    registry_revision_id: str = Field(pattern=_SHA256)
+    asset_id: str = Field(pattern=_SAFE_ID)
+    asset_sha256: str = Field(pattern=_SHA256)
+    asset_mime_type: str = Field(pattern=r"^image/[A-Za-z0-9.+-]+$")
+    asset_size_bytes: int = Field(strict=True, gt=0)
+    asset_width: int = Field(strict=True, gt=0)
+    asset_height: int = Field(strict=True, gt=0)
+    source_provenance_receipt_id: str = Field(pattern=_SAFE_ID)
+    materialization_receipt_id: str = Field(pattern=_SAFE_ID)
+    duration_milliseconds: int = Field(strict=True, gt=0)
+    feasibility_receipt: C4FeasibilityReceipt
+
+
+class C4MotionTailEvidence(_C4SealedModel):
+    _content_schema = "ai-video-c4-motion-tail-evidence/1"
+
+    semantic_role: Literal["continuity_motion_tail"] = "continuity_motion_tail"
+    native_role: Literal["reference_video"] = "reference_video"
+    canonical_order: Literal[3] = 3
+    source_shot_id: str = Field(pattern=_SAFE_ID)
+    source_shot_revision: int = Field(strict=True, ge=1)
+    source_shot_content_hash: str = Field(pattern=_SHA256)
+    source_video_asset_id: str = Field(pattern=_SAFE_ID)
+    source_video_sha256: str = Field(pattern=_SHA256)
+    source_registry_revision_id: str = Field(pattern=_SHA256)
+    source_generation_id: str = Field(pattern=_SAFE_ID)
+    source_request_input_hash: str = Field(pattern=_SHA256)
+    source_resolved_generation_hash: str = Field(pattern=_SHA256)
+    source_provenance_receipt_id: str = Field(pattern=_SAFE_ID)
+    source_p6_acceptance_evidence_id: str = Field(pattern=_SAFE_ID)
+    registry_revision_id: str = Field(pattern=_SHA256)
+    extraction_receipt_id: str = Field(pattern=_SAFE_ID)
+    materialization_receipt_id: str = Field(pattern=_SAFE_ID)
+    selection_rule_version: str = Field(pattern=_SAFE_ID)
+    start_timestamp_numerator: int = Field(strict=True, ge=0)
+    start_timestamp_denominator: int = Field(strict=True, gt=0)
+    end_timestamp_numerator: int = Field(strict=True, ge=0)
+    end_timestamp_denominator: int = Field(strict=True, gt=0)
+    start_frame_index: int = Field(strict=True, ge=0)
+    end_frame_index: int = Field(strict=True, ge=0)
+    source_fps_numerator: int = Field(strict=True, gt=0)
+    source_fps_denominator: int = Field(strict=True, gt=0)
+    source_frame_count: int = Field(strict=True, gt=0)
+    extracted_asset_id: str = Field(pattern=_SAFE_ID)
+    extracted_sha256: str = Field(pattern=_SHA256)
+    extracted_mime_type: Literal["video/mp4", "video/quicktime"]
+    extracted_size_bytes: int = Field(strict=True, gt=0)
+    extracted_width: int = Field(strict=True, gt=0)
+    extracted_height: int = Field(strict=True, gt=0)
+    extracted_fps_numerator: int = Field(strict=True, gt=0)
+    extracted_fps_denominator: int = Field(strict=True, gt=0)
+    extracted_duration_milliseconds: int = Field(strict=True, gt=0)
+    extracted_frame_count: int = Field(strict=True, ge=3)
+    extractor_name: str = Field(pattern=_SAFE_ID)
+    extractor_version: str = Field(pattern=_SAFE_ID)
+    terminal_frame_evidence: "TerminalFrameEvidence"
+    target_shot_id: str = Field(pattern=_SAFE_ID)
+    target_shot_revision: int = Field(strict=True, ge=1)
+    target_shot_content_hash: str = Field(pattern=_SHA256)
+    continuity_constraint_snapshot_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_tail_lineage(self) -> "C4MotionTailEvidence":
+        terminal = self.terminal_frame_evidence
+        if (
+            self.source_shot_id != terminal.source_shot_id
+            or self.source_shot_revision != terminal.source_shot_revision
+            or self.source_shot_content_hash != terminal.source_shot_content_hash
+            or self.source_video_asset_id != terminal.source_video_asset_id
+            or self.source_video_sha256 != terminal.source_video_sha256
+            or self.source_registry_revision_id != terminal.source_registry.revision_id
+            or self.source_generation_id != terminal.source_generation_id
+            or self.source_request_input_hash != terminal.source_request_input_hash
+            or self.source_resolved_generation_hash
+            != terminal.source_resolved_generation_hash
+            or self.source_provenance_receipt_id
+            != terminal.source_provenance_receipt_id
+        ):
+            raise ValueError("C4 motion tail does not match exact terminal source")
+        if (
+            self.end_frame_index != terminal.frame_index
+            or self.end_timestamp_numerator * terminal.timestamp_denominator
+            != terminal.timestamp_numerator * self.end_timestamp_denominator
+        ):
+            raise ValueError("C4 motion tail must end at the exact terminal frame")
+        if (
+            self.start_frame_index >= self.end_frame_index
+            or self.end_frame_index >= self.source_frame_count
+            or self.extracted_frame_count
+            != self.end_frame_index - self.start_frame_index + 1
+            or self.start_timestamp_numerator * self.end_timestamp_denominator
+            >= self.end_timestamp_numerator * self.start_timestamp_denominator
+        ):
+            raise ValueError("C4 motion tail range is not canonical")
+        if (
+            self.source_fps_numerator != terminal.source_fps_numerator
+            or self.source_fps_denominator != terminal.source_fps_denominator
+            or self.source_frame_count != terminal.source_frame_count
+            or self.extracted_width != terminal.source_width
+            or self.extracted_height != terminal.source_height
+            or self.extracted_fps_numerator != terminal.source_fps_numerator
+            or self.extracted_fps_denominator != terminal.source_fps_denominator
+            or self.target_shot_id == self.source_shot_id
+        ):
+            raise ValueError("C4 motion tail measurements or target are inconsistent")
+        return self
+
+
+class C4MultiAnchorBinding(_ContinuityStrictModel):
+    tier: C4ContinuityTier
+    selected_registry_revision_id: str = Field(pattern=_SHA256)
+    terminal_materialization_receipt_id: str = Field(pattern=_SAFE_ID)
+    terminal: "TerminalFrameEvidence"
+    identity_anchor: C4IdentityAnchorEvidence
+    approved_endpoint: C4ApprovedEndpointEvidence
+    motion_tail: C4MotionTailEvidence | None = None
+    semantic_boundary: C4SemanticBoundaryState
+    constraints: "ContinuityConstraintSet"
+    binding_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_binding(self) -> "C4MultiAnchorBinding":
+        target = (
+            self.semantic_boundary.target_shot_id,
+            self.semantic_boundary.target_shot_revision,
+            self.semantic_boundary.target_shot_content_hash,
+        )
+        endpoint_target = (
+            self.approved_endpoint.target_shot_id,
+            self.approved_endpoint.target_shot_revision,
+            self.approved_endpoint.target_shot_content_hash,
+        )
+        if target != endpoint_target or target[0] == self.terminal.source_shot_id:
+            raise ValueError("C4 anchors must bind one exact downstream target Shot")
+        if (
+            self.identity_anchor.registry_revision_id
+            != self.selected_registry_revision_id
+            or self.approved_endpoint.registry_revision_id
+            != self.selected_registry_revision_id
+            or self.motion_tail is not None
+            and self.motion_tail.registry_revision_id
+            != self.selected_registry_revision_id
+        ):
+            raise ValueError("C4 anchors must use the selected Registry revision")
+        if self.tier is C4ContinuityTier.STATIC_BOUNDARY:
+            if self.motion_tail is not None:
+                raise ValueError("C4 static boundary cannot contain a motion tail")
+        elif self.motion_tail is None:
+            raise ValueError("C4 motion boundary requires exact motion-tail evidence")
+        elif (
+            (
+                self.motion_tail.target_shot_id,
+                self.motion_tail.target_shot_revision,
+                self.motion_tail.target_shot_content_hash,
+            )
+            != target
+            or self.motion_tail.terminal_frame_evidence.content_hash
+            != self.terminal.content_hash
+            or self.motion_tail.continuity_constraint_snapshot_hash
+            != self.constraints.content_hash
+        ):
+            raise ValueError("C4 motion tail does not match binding target or terminal")
+        asset_ids = (
+            self.terminal.extracted_asset_id,
+            self.identity_anchor.asset_id,
+            self.approved_endpoint.asset_id,
+            *((self.motion_tail.extracted_asset_id,) if self.motion_tail else ()),
+        )
+        if len(set(asset_ids)) != len(asset_ids):
+            raise ValueError("C4 anchors must use distinct exact assets")
+        constraint_characters = {
+            item.artifact_id: (item.revision, item.content_hash)
+            for item in self.constraints.character_identities
+        }
+        if constraint_characters.get(self.identity_anchor.character_artifact_id) != (
+            self.identity_anchor.character_revision,
+            self.identity_anchor.character_content_hash,
+        ):
+            raise ValueError("C4 identity anchor is not an exact canonical Character")
+        expected = canonical_sha256(
+            {
+                "schema": "ai-video-c4-multi-anchor-binding/1",
+                **self.model_dump(mode="json", exclude={"binding_hash"}),
+            }
+        )
+        if self.binding_hash != expected:
+            raise ValueError("C4 multi-anchor binding hash does not match content")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "C4MultiAnchorBinding":
+        data = dict(values)
+        data.pop("binding_hash", None)
+        candidate = cls.model_construct(**data, binding_hash="0" * 64)
+        data["binding_hash"] = canonical_sha256(
+            {
+                "schema": "ai-video-c4-multi-anchor-binding/1",
+                **candidate.model_dump(
+                    mode="json", exclude={"binding_hash"}, warnings=False
+                ),
+            }
+        )
+        return cls.model_validate(data)
 
 
 class ContinuityArtifactIdentity(_ContinuityStrictModel):
@@ -168,6 +469,10 @@ class TerminalFrameEvidence(_ContinuityStrictModel):
             }
         )
         return cls.model_validate(data)
+
+
+C4MotionTailEvidence.model_rebuild()
+C4MultiAnchorBinding.model_rebuild()
 
 
 def validate_terminal_frame_evidence_against_project(

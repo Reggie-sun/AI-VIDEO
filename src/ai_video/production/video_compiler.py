@@ -182,6 +182,20 @@ def compile_provider_video_request(
         (native_binding_role(item.role), item.asset_id, item.asset_sha256)
         for item in requirement.asset_evidence
     )
+    if requirement.c4_multi_anchor_binding is not None:
+        native_order = {
+            "first_frame": 0,
+            "last_frame": 1,
+            "reference": 2,
+            "reference_video": 3,
+            "reference_audio": 4,
+        }
+        expected_bindings = tuple(
+            sorted(
+                expected_bindings,
+                key=lambda item: (native_order[item[0]], item[1]),
+            )
+        )
     actual_bindings = tuple(
         (role, item.asset_id, item.asset_sha256)
         for role, item in zip(
@@ -349,6 +363,7 @@ def compile_provider_video_request(
         prompt_text=prompt,
         negative_prompt_text="",
         image_bindings=bindings,
+        c4_multi_anchor_binding=requirement.c4_multi_anchor_binding,
         continuity_binding=lifecycle.continuity_binding,
         hard_cut_keyframe_binding=lifecycle.hard_cut_keyframe_binding,
         seal_terminal_frame=lifecycle.seal_terminal_frame,

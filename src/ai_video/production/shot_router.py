@@ -76,6 +76,7 @@ class RoutingOutcome(str, Enum):
 
 
 class ContinuityMode(str, Enum):
+    MULTI_ANCHOR = "multi_anchor"
     EXACT_TERMINAL = "exact_terminal"
     REFERENCE = "reference"
     SEMANTIC = "semantic"
@@ -1132,7 +1133,13 @@ class VideoGenerationResolver:
         inputs: tuple[RouterAssetIdentity, ...]
         reason: RouterReasonCode
         rationale: str
-        if context.continuity_mode is ContinuityMode.EXACT_TERMINAL:
+        if requirement_mode is not None:
+            required_mode = requirement_mode
+            required_roles = requirement_binding_roles or ()
+            inputs = requirement_input_assets or ()
+            reason = RouterReasonCode.CANONICAL_REFERENCES_ENABLE_R2V
+            rationale = "Bind the verified neutral requirement to the exact capability."
+        elif context.continuity_mode is ContinuityMode.EXACT_TERMINAL:
             assert context.upstream_terminal is not None
             required_mode = VideoGenerationMode.IMAGE_TO_VIDEO
             required_roles = ("first_frame",)
@@ -1235,13 +1242,6 @@ class VideoGenerationResolver:
         if context.continuity_mode is ContinuityMode.SEMANTIC:
             reason = RouterReasonCode.SEMANTIC_CONTINUITY_USES_STATE_ONLY
             rationale = "Use typed continuity state without consuming upstream terminal pixels."
-
-        if requirement_mode is not None:
-            required_mode = requirement_mode
-            required_roles = requirement_binding_roles or ()
-            inputs = requirement_input_assets or ()
-            reason = RouterReasonCode.CANONICAL_REFERENCES_ENABLE_R2V
-            rationale = "Bind the verified neutral requirement to the exact capability."
 
         if (
             required_mode not in context.allowed_generation_modes

@@ -270,6 +270,100 @@ def test_t1_requirement_models_are_frozen_and_hash_typed():
         ProviderNeutralVideoRequirement.model_validate(unsealed)
 
 
+def test_c4_absence_preserves_v1_requirement_contract_and_hash_payload():
+    requirement = ProviderNeutralVideoRequirement.create(**_requirement_kwargs())
+
+    assert requirement.contract_version == "provider-neutral-video-requirement/1"
+    assert "c4_multi_anchor_binding" not in requirement._hash_payload()
+
+
+def test_multi_anchor_requirement_fails_closed_without_c4_binding():
+    payload = _requirement_kwargs()
+    payload["continuity_mode"] = ContinuityMode.MULTI_ANCHOR
+
+    with pytest.raises(ValidationError, match="multi-anchor continuity"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+
+def test_c4_requirement_seals_exact_motion_anchors_under_v2_contract():
+    from test_production_video import _c4_binding
+
+    binding = _c4_binding(tier="motion_boundary")
+    target = _shot().model_copy(
+        update={
+            "shot_id": "shot-001",
+            "artifact_id": "shot-001-artifact",
+            "revision": 3,
+            "content_hash": "a" * 64,
+            "character_ids": (),
+        }
+    )
+    tail = binding.motion_tail
+    assert tail is not None
+    evidence = (
+        AssetEvidence(
+            role=SemanticReferenceRole.CONTINUITY_TERMINAL,
+            asset_id=binding.terminal.extracted_asset_id,
+            asset_sha256=binding.terminal.extracted_sha256,
+            mime_type=binding.terminal.extracted_mime_type,
+            width=binding.terminal.extracted_width,
+            height=binding.terminal.extracted_height,
+            size_bytes=binding.terminal.extracted_size_bytes,
+        ),
+        AssetEvidence(
+            role=SemanticReferenceRole.IDENTITY,
+            asset_id=binding.identity_anchor.asset_id,
+            asset_sha256=binding.identity_anchor.asset_sha256,
+            mime_type=binding.identity_anchor.asset_mime_type,
+            width=binding.identity_anchor.asset_width,
+            height=binding.identity_anchor.asset_height,
+            size_bytes=binding.identity_anchor.asset_size_bytes,
+        ),
+        AssetEvidence(
+            role=SemanticReferenceRole.APPROVED_ENDPOINT,
+            asset_id=binding.approved_endpoint.asset_id,
+            asset_sha256=binding.approved_endpoint.asset_sha256,
+            mime_type=binding.approved_endpoint.asset_mime_type,
+            width=binding.approved_endpoint.asset_width,
+            height=binding.approved_endpoint.asset_height,
+            size_bytes=binding.approved_endpoint.asset_size_bytes,
+        ),
+        AssetEvidence(
+            role=SemanticReferenceRole.CONTINUITY_MOTION_TAIL,
+            asset_id=tail.extracted_asset_id,
+            asset_sha256=tail.extracted_sha256,
+            mime_type=tail.extracted_mime_type,
+            width=tail.extracted_width,
+            height=tail.extracted_height,
+            size_bytes=tail.extracted_size_bytes,
+            duration_millis=tail.extracted_duration_milliseconds,
+            fps=tail.extracted_fps_numerator // tail.extracted_fps_denominator,
+        ),
+    )
+
+    requirement = ProviderNeutralVideoRequirement.create(
+        source_request_content_hash="f" * 64,
+        intent_evidence_hash="e" * 64,
+        generation_intent_hash=canonical_sha256(
+            GenerationIntent().model_dump(mode="json")
+        ),
+        target_shot=target,
+        scene=_scene(),
+        characters=(),
+        asset_evidence=evidence,
+        c4_multi_anchor_binding=binding,
+        generation_mode=GenerationMode.IMAGE_TO_VIDEO,
+        continuity_mode=ContinuityMode.MULTI_ANCHOR,
+        motion_requirement=MotionRequirement.CHARACTER_ACTION,
+        generation_intent=GenerationIntent(),
+        semantic_reference_roles=tuple(item.role for item in evidence),
+    )
+
+    assert requirement.contract_version == "provider-neutral-video-requirement/2"
+    assert requirement.c4_multi_anchor_binding == binding
+    assert requirement.requirement_hash == canonical_sha256(requirement._hash_payload())
+
+
 def test_t1_requirement_hash_is_deterministic_for_same_input():
     first = ProviderNeutralVideoRequirement.create(**_requirement_kwargs())
     second = ProviderNeutralVideoRequirement.create(**_requirement_kwargs())
