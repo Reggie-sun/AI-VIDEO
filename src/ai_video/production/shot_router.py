@@ -18,6 +18,7 @@ from ai_video.production._video_requirement_routing import (
 )
 from ai_video.production._video_capability_fingerprint import (
     binding_roles_satisfy_variant,
+    c4_exact_cardinality_grammar_satisfies_variant,
     capability_variant_fingerprint,
 )
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
@@ -94,6 +95,7 @@ class MotionRequirement(str, Enum):
 
 class RouterReasonCode(str, Enum):
     MULTI_ANCHOR_REQUIREMENT_REQUIRED = "MULTI_ANCHOR_REQUIREMENT_REQUIRED"
+    C4_REGISTRY_REVISION_MISMATCH = "C4_REGISTRY_REVISION_MISMATCH"
     APPROVED_EXISTING_VIDEO = "APPROVED_EXISTING_VIDEO"
     NO_MOTION_REQUIRED = "NO_MOTION_REQUIRED"
     LIGHT_MOTION_FROM_KEYFRAME = "LIGHT_MOTION_FROM_KEYFRAME"
@@ -1385,6 +1387,30 @@ class VideoGenerationResolver:
             requirement_binding_roles=native_roles,
             requirement_input_assets=input_assets,
         )
+        c4_binding = requirement.c4_multi_anchor_binding
+        if (
+            c4_binding is not None
+            and c4_binding.selected_registry_revision_id
+            != context.selected_registry_revision_id
+        ):
+            if decision.outcome is RoutingOutcome.SELECTED:
+                decision = as_capability_blocked(
+                    decision,
+                    reason_code=RouterReasonCode.C4_REGISTRY_REVISION_MISMATCH,
+                    outcome=RoutingOutcome.BLOCKED_MISSING_INPUT,
+                    rationale=(
+                        "The sealed C4 requirement does not use the selected Registry revision."
+                    ),
+                )
+            return RequirementRoutingResult(decision=decision)
+        selected_variant = next(
+            (
+                variant
+                for variant in capabilities.variants
+                if variant.capability_id == selected_capability_id
+            ),
+            None,
+        )
         unsupported = (
             requirement.continuity_mode.value != context.continuity_mode.value
             or expected_mode is not decision.required_mode
@@ -1394,6 +1420,16 @@ class VideoGenerationResolver:
             )
             or requirement.generation_intent.camera_intent.expression_strength
             is ExpressionStrength.NATIVE_CONTROL_REQUIRED
+            or c4_binding is not None
+            and (
+                selected_variant is None
+                or not c4_exact_cardinality_grammar_satisfies_variant(
+                    selected_variant,
+                    motion=(
+                        c4_binding.tier.value == "motion_boundary"
+                    ),
+                )
+            )
         )
         if unsupported and decision.outcome is RoutingOutcome.SELECTED:
             decision = as_capability_blocked(
@@ -1407,11 +1443,8 @@ class VideoGenerationResolver:
         if decision.outcome is not RoutingOutcome.SELECTED:
             return RequirementRoutingResult(decision=decision)
 
-        selected = next(
-            variant
-            for variant in capabilities.variants
-            if variant.capability_id == selected_capability_id
-        )
+        assert selected_variant is not None
+        selected = selected_variant
         assert decision.selected_capability_fingerprint is not None
         assert decision.selected_mode is not None
         assert decision.execution_kind is not None

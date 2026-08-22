@@ -102,9 +102,37 @@ def binding_roles_satisfy_variant(
     return binding_counts_satisfy_constraints(constraints, counts)
 
 
+def c4_exact_cardinality_grammar_satisfies_variant(
+    variant: Any, *, motion: bool
+) -> bool:
+    """Require the complete C4 per-role and all-role grammar on one variant."""
+
+    all_roles = (
+        "first_frame",
+        "last_frame",
+        "reference",
+        "reference_video",
+        "reference_audio",
+    )
+    expected = {
+        (("first_frame",), 1, 1),
+        (("last_frame",), 1, 1),
+        (("reference",), 1, 1),
+        (("reference_video",), 1 if motion else 0, 1 if motion else 0),
+        (("reference_audio",), 0, 0),
+        (all_roles, 4 if motion else 3, 4 if motion else 3),
+    }
+    selected = {
+        (constraint.roles, constraint.min_count, constraint.max_count)
+        for constraint in getattr(variant, "binding_cardinality_constraints", ())
+    }
+    return selected == expected
+
+
 __all__ = [
     "project_capability_variant",
     "project_provider_capabilities",
     "capability_variant_fingerprint",
     "binding_roles_satisfy_variant",
+    "c4_exact_cardinality_grammar_satisfies_variant",
 ]

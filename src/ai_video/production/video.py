@@ -39,6 +39,9 @@ from ai_video.production._video_continuity import (
     validate_hard_cut_keyframe_binding_against_project as validate_hard_cut_keyframe_binding_against_project,
     validate_terminal_frame_evidence_against_project as validate_terminal_frame_evidence_against_project,
 )
+from ai_video.production._video_capability_fingerprint import (
+    c4_exact_cardinality_grammar_satisfies_variant,
+)
 from ai_video.production.video_contracts import (
     VideoBindingCardinalityConstraint,
     VideoFlexibleOutputRequirement,
@@ -982,39 +985,17 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 "Video media bindings do not satisfy the selected capability variant.",
             )
         c4_binding = request.c4_multi_anchor_binding
-        if c4_binding is not None:
-            all_roles = (
-                "first_frame",
-                "last_frame",
-                "reference",
-                "reference_video",
-                "reference_audio",
+        if (
+            c4_binding is not None
+            and not c4_exact_cardinality_grammar_satisfies_variant(
+                capability,
+                motion=c4_binding.tier is C4ContinuityTier.MOTION_BOUNDARY,
             )
-            expected_cardinality = {
-                (("first_frame",), 1, 1),
-                (("last_frame",), 1, 1),
-                (("reference",), 1, 1),
-                (
-                    ("reference_video",),
-                    1 if c4_binding.tier is C4ContinuityTier.MOTION_BOUNDARY else 0,
-                    1 if c4_binding.tier is C4ContinuityTier.MOTION_BOUNDARY else 0,
-                ),
-                (("reference_audio",), 0, 0),
-                (
-                    all_roles,
-                    4 if c4_binding.tier is C4ContinuityTier.MOTION_BOUNDARY else 3,
-                    4 if c4_binding.tier is C4ContinuityTier.MOTION_BOUNDARY else 3,
-                ),
-            }
-            selected_cardinality = {
-                (constraint.roles, constraint.min_count, constraint.max_count)
-                for constraint in capability.binding_cardinality_constraints
-            }
-            if selected_cardinality != expected_cardinality:
-                raise _video_error(
-                    ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
-                    "C4 requires one exact complete capability cardinality grammar.",
-                )
+        ):
+            raise _video_error(
+                ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                "C4 requires one exact complete capability cardinality grammar.",
+            )
         if capability.binding_cardinality_constraints:
             _validate_cardinality_against_request(
                 capability.binding_cardinality_constraints,

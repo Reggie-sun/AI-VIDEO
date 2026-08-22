@@ -517,6 +517,62 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         compiler_id="test-c4-compiler",
         compiler_version="1",
     )
+    incomplete_variant = variant.model_copy(
+        update={"binding_cardinality_constraints": ()}
+    )
+    incomplete = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=_capabilities(incomplete_variant),
+        selected_capability_id=incomplete_variant.capability_id,
+        output_requirement=_output(),
+        lifecycle=lifecycle,
+        compiler_contract=compiler,
+    )
+    stale_binding = _c4_binding(
+        endpoint_changes={
+            "target_shot_id": context.target_shot_id,
+            "target_shot_revision": context.target_shot_revision,
+            "target_shot_content_hash": context.target_shot_content_hash,
+            "duration_milliseconds": 4_000,
+        },
+        semantic_boundary=binding.semantic_boundary,
+    )
+    stale_requirement = ProviderNeutralVideoRequirement.create(
+        **{
+            **requirement.model_dump(
+                mode="python",
+                exclude={
+                    "requirement_id",
+                    "requirement_hash",
+                    "c4_multi_anchor_binding",
+                },
+            ),
+            "c4_multi_anchor_binding": stale_binding,
+        }
+    )
+    stale_projection = VerifiedGenerationRequirementProjection.create(
+        requirement=stale_requirement,
+        plan_hash=HASH_D,
+        verified_source_request_content_hash=HASH_A,
+        target_shot_id=context.target_shot_id,
+        target_shot_revision=context.target_shot_revision,
+        target_shot_content_hash=context.target_shot_content_hash,
+    )
+
+    stale = VideoGenerationResolver().resolve_requirement(
+        projection=stale_projection,
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(),
+        capabilities=_capabilities(variant),
+        selected_capability_id=variant.capability_id,
+        output_requirement=_output(),
+        lifecycle=lifecycle,
+        compiler_contract=compiler,
+    )
 
     routed = VideoGenerationResolver().resolve_requirement(
         projection=projection,
@@ -530,6 +586,13 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         compiler_contract=compiler,
     )
 
+    assert incomplete.decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert incomplete.provider_bound_request is None
+    assert stale.decision.outcome is RoutingOutcome.BLOCKED_MISSING_INPUT
+    assert stale.decision.reason_codes == (
+        RouterReasonCode.C4_REGISTRY_REVISION_MISMATCH,
+    )
+    assert stale.provider_bound_request is None
     assert routed.decision.outcome is RoutingOutcome.SELECTED
     assert routed.provider_bound_request is not None
     compiled = compile_provider_video_request(
