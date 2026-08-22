@@ -51,6 +51,18 @@ checks:
     cwd: .
     scope_diff: true
     description: Check exact staged or commit-range patch whitespace and conflict markers.
+  composition_playbook_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_composition_playbooks.py, -q]
+    cwd: .
+    description: Verify strict deterministic Composition Playbook schema and advisory boundaries.
+  composition_strategy_proposal_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_composition_strategy_proposal.py, -q]
+    cwd: .
+    description: Verify typed shadow proposal sealing and pure planner comparison semantics.
+  composition_architecture_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_composition_architecture.py, -q]
+    cwd: .
+    description: Verify Product Runtime isolation from Development Governance composition tooling.
   harness_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_agent_harness.py, -q]
     cwd: .
@@ -471,6 +483,21 @@ categories:
       - tests/fixtures/quality_experience/**
     check_ids:
       - quality_intelligence_tests
+      - task_architecture_gate
+  composition_strategy_shadow:
+    # Decision C-lite development-side knowledge and experiment evidence only.
+    # Product Runtime never reads these Playbooks or proposal helpers.
+    patterns:
+      - .agent/playbooks/composition/**
+      - scripts/composition_playbooks.py
+      - scripts/composition_shadow.py
+      - tests/test_composition_playbooks.py
+      - tests/test_composition_strategy_proposal.py
+      - tests/test_composition_architecture.py
+    check_ids:
+      - composition_playbook_tests
+      - composition_strategy_proposal_tests
+      - composition_architecture_tests
       - task_architecture_gate
   provider_console:
     patterns:
