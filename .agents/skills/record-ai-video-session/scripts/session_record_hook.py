@@ -264,8 +264,9 @@ def process_event(
         "reason": (
             "AI-VIDEO session record checkpoint detected "
             f"(capture_request_id={request_id}). Before finishing, evaluate the "
-            "current window with $record-ai-video-session. If substantial work "
-            "reached a stable checkpoint, completion, or genuine blocker, invoke "
+            "current window with $record-ai-video-session. This is an expected "
+            "one-time continuation, not a hook execution failure. If substantial "
+            "work reached a stable checkpoint, completion, or genuine blocker, invoke "
             "the skill now. Otherwise do not create a record and finish normally. "
             "Preserve unrelated dirty/index work and do not run Provider, media, "
             "network, or extra tests merely for the record."

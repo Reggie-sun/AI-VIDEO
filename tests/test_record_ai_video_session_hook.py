@@ -119,6 +119,10 @@ def test_stop_requests_record_once_after_repository_change(tmp_path: Path) -> No
     )
 
     assert first["decision"] == "block"
+    assert (
+        "expected one-time continuation, not a hook execution failure"
+        in first["reason"]
+    )
     assert "$record-ai-video-session" in first["reason"]
     assert "capture_request_id=ai-video-record-" in first["reason"]
     assert recursive == {"continue": True}
