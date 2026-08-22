@@ -17,17 +17,18 @@ roadmap_owner: docs/v0.2-agentic-production-roadmap.md
 Accepted with implemented offline foundations and partial live/quality evidence。Provider-neutral
 request/evidence、activation/recovery、P5 precise invalidation、offline adapter mapping及local continuity
 seams已有实现；具体live attempts、human decisions与dynamic branch状态由runtime baseline和exact records/
-receipts记录，不由本normative spec固定。Seedance live、`ref2va`和blinded comparative acceptance仍未
-完成；既有P8 remote/Paid Provider contract不被改写。
+receipts记录，不由本normative spec固定。既有P8 remote/Paid Provider contract不被改写。
 
 当前已实现frame-accurate composition与显式Local H3 terminal-to-first-frame continuity lane：generated MP4仍进入唯一的`CompositionSpec -> ResolvedTimeline -> HyperFrames`路径并保持P4 audio/caption/final mux语义。该lane不会让任意三个独立生成的Shot自动共享场景、角色、镜头轴线、光线或运动状态；只有带exact continuity binding并逐Shot生成的edge获得技术保证，语义质量仍需独立人工验收。
 
 本规范继续作为唯一Shot Continuity canonical owner，并冻结
-`C4_MULTI_ANCHOR_MOTION_CONTINUITY` target contract；不创建平行spec。该C4 contract为
-`frozen target / implementation pending`，不是current runtime truth、Provider capability acceptance
-或live authorization。具体失败run、artifact hashes、automatic metrics与human decisions只进入runtime
-baseline、exact receipts或`docs/record_for_agent/`；任何单次review或similarity metric都不得升级为
-Final Acceptance。
+`C4_MULTI_ANCHOR_MOTION_CONTINUITY`与controlled multi-provider transition target contract；不创建
+平行spec。C4 provider-neutral binding、requirement/request/resolved hashing、exact cardinality grammar与
+Router fail-closed gate已实现offline；但当前仍没有一个concrete Provider child完成四锚点capability seal、
+full local smoke、continuity/identity quality acceptance和P6 Final Acceptance。因此当前只能声明
+`C4 core contract implemented offline`，不能声明`four-anchor Production support`或“任意Provider无缝切换”。
+具体失败run、artifact hashes、automatic metrics与human decisions只进入runtime baseline、exact receipts或
+`docs/record_for_agent/`；任何单次review或similarity metric都不得升级为Final Acceptance。
 
 ## Goal
 
@@ -45,6 +46,11 @@ Shot Continuity 的目标是让 Shot N 已 sealed 的 terminal-frame/reference s
 
 对于`C4_MULTI_ANCHOR_MOTION_CONTINUITY`，成功标准进一步要求同一个resolved capability在同一次generation中同时消费exact terminal、独立canonical identity reference、approved exact future endpoint与exact upstream motion tail。静态frame anchors只能证明边界像素、identity和目标姿态约束；只有motion tail才能携带upstream gait phase、subject velocity、camera direction与camera velocity。Prompt不得代替上述任一binding。
 
+多Provider切换的成功标准是：Planner/Router可以在不改变provider-neutral continuity semantics、canonical
+state owner或recovery contract的前提下，显式选择一个已经对该continuity grade完成认证的destination
+capability。认证按有向`source capability -> destination capability`组合记录；一个方向或一个destination
+通过，不得外推为反向、其他model/profile或全局“无缝切换”。
+
 ## Current Runtime Truth
 
 当前代码已经提供以下可复用边界：
@@ -61,26 +67,51 @@ Shot Continuity 的目标是让 Shot N 已 sealed 的 terminal-frame/reference s
 - P5 graph只在显式terminal-image input存在时建立typed asset-to-generation edge，并沿真实closure做precise invalidation。
 - `LocalVideoSubmitIntent`、submit/status/fetch receipts与one-use local permit形成独立于Paid Provider Gate的durable local evidence chain；local与remote evidence不得混合。
 - `ComfyUIVideoProvider`只接受sealed profile列出的literal loopback endpoint，在R+1前验证ComfyUI commit、四个model components、native node inventory、template/binding/profile hashes与output bounds；任何mismatch均在上传或submit前fail closed，且无remote fallback。
-- Hailuo 2.3 continuity payload现已有Alice C2 adaptive one-submit canonical technical acceptance；Seedance 2.0 Mini仍只有offline acceptance和一次current-task pre-submit fail-closed evidence。Hailuo的结果不能外推为Seedance、three-lane或Router acceptance。
+- `C4MultiAnchorBinding`、`ContinuityMode.MULTI_ANCHOR`、C4 requirement contract v2、request/resolved
+  C4 fields与activation scope已把exact terminal、identity、approved endpoint和optional/exact motion tail
+  纳入canonical hash、Registry lineage与reopen validation。
+- C4 Router已将`continuity_terminal`、`approved_endpoint`、`identity`、
+  `continuity_motion_tail`分别投影为`first_frame`、`last_frame`、`reference`、
+  `reference_video`，并要求同一个selected capability满足static三角色或motion四角色exact grammar；
+  不允许组合FL2VA与Ref2VA子能力。
+- Hailuo 2.3 continuity payload现已有Alice C2 adaptive one-submit canonical technical acceptance；Seedance
+  2.0 Mini已有一次first-frame I2V paid attempt，但结果被用户因identity与camera continuity拒绝并保持
+  unactivated。任一结果都不能外推为C4、其他Provider或multi-provider transition acceptance。
 
-当前代码对C4仍存在可执行缺口：
+当前C4缺口集中在Provider implementation与live/quality evidence：
 
-- exact-terminal Router projection固定为`("first_frame",)`，没有投影独立identity、approved endpoint或motion tail；
-- `VideoGenerationRequest` continuity validator只接受exact terminal `first_frame`加至多一个`last_frame`，因此会拒绝同一request中的独立`reference`；
-- `ProviderNeutralVideoRequirement`能够列出identity、terminal、last-frame与generic video evidence，但尚无exact motion-tail derivation/acceptance binding；
-- `VideoBindingCardinalityConstraint`能够区分I2VA、FL2VA与Ref2VA cardinality，但当前Seedance Mini I2V seal只声明`first_frame + last_frame`，Seedance reference/media bindings属于另一mode；
-- `SeedanceVideoProvider`能够把普通`reference`序列化为`reference_image`，但serializer reachability不是formal capability evidence；
-- `SeedanceAssetMaterializationReceipt`与`SeedanceAssetReferenceResolver`能seal exact Ark asset identity，却尚未证明四个C4 anchors在同一capability、egress preview与permit fingerprint中的完整闭包。
+- Local T8-native V2只提供互斥的`T2VA`、`I2VA`、`FL2VA`与`Ref2VA`children；没有独立
+  `Hybrid` C4 child、workflow/binding/profile或Production capability seal。
+- T8 Hybrid conditioning能够在packing层同时表达first、last、reference image与reference video，但
+  尚无AI-VIDEO full four-anchor local generation、decoded boundary、identity、motion或P6 evidence。
+- stock Ref2VA能否可靠消费first/last conditioning尚未证明；existing Hybrid artifact builder验证的是
+  exact pruned FL2VA/Ref2VA pair，而当前本机库存为non-pruned pair且没有sealed Hybrid artifact。
+- 当前pinned ComfyUI没有upstream `MiniMaxH3AddGuide`；即使未来受控升级，conditioning placement也不
+  证明selected checkpoint同时遵循四类anchors。
+- Seedance 2.0、2.0 Fast与2.0 Mini分别声明frame I2V和multimodal reference task family，但
+  没有formal evidence证明`first_frame + last_frame + reference_image + reference_video`cross-mode union。
+- Hailuo 2.3只声明first-frame I2V，不能成为C4 destination。
 
 ## Scope
 
-本规范覆盖 provider-neutral continuity request、terminal-frame artifact/provenance、capability denial、durable activation/recovery、P5 precise invalidation，以及 technical/provider/subjective acceptance 的分层边界。
+本规范覆盖 provider-neutral continuity request、terminal/motion-tail artifact与provenance、capability
+denial、durable activation/recovery、P5 precise invalidation、controlled multi-provider transition以及
+technical/provider/subjective acceptance的分层边界。
 
-本contract面向三个彼此隔离的provider lane；Local H3已实现，Hailuo 2.3已有Alice C2 adaptive one-submit canonical technical evidence，Seedance仍只有offline mapping与pre-submit fail-closed evidence，三lane/Router gate未完成：
+本次增量冻结以下target scope：
 
-1. `local continuity lane`：用户称为“MiniMax 本地”的目标必须先解析为 exact local engine、model、workflow/profile 和 loopback endpoint。若实际执行器是 Wan + ComfyUI，应按其真实 identity 命名；若仍调用 MiniMax cloud，则它不是 local lane。未完成 identity resolution 前不得 submit。
-2. `MiniMax cloud Hailuo 2.3 lane`：目标 model 为 `MiniMax-Hailuo-2.3`，只在 adapter 显式支持并验证 I2V `first_frame` 后进入 continuity flow。
-3. `Seedance 2.0 Mini lane`：目标 model 为 `doubao-seedance-2-0-mini-260615`，继续受 exact model/profile capability 和 paid Provider gates 约束。
+1. 建立`C4_NATIVE_BOUNDARY_MOTION`与`C4_SEMANTIC_MULTI_REFERENCE`两个不可互换的产品等级。
+2. 为Local T8 Hybrid定义独立C4 destination child、exact four-role grammar、profile/artifact seals和
+   Stock20 qualification gates；不扩宽现有FL2VA或Ref2VA identity。
+3. 定义有向pair certification，使任意已P6接受、可派生exact terminal/motion evidence的source lane，
+   只有在destination capability通过对应grade时才可进入该destination。
+4. 保留Hailuo 2.3 first-frame continuity和Seedance 2.0 family的model-specific边界；当前accepted
+   Seedance target只包含已购买的base `doubao-seedance-2-0-260128`。Fast/Mini只保留compatibility
+   comparison，除非fresh entitlement/inventory明确纳入，不得进入active capability snapshot。在formal
+   cross-mode evidence缺失时全部继续fail closed。
+5. 允许未来优先为已购买的base `doubao-seedance-2-0-260128`建立独立semantic multi-reference
+   capability，但不得把semantic opening/ending references描述为native first/last boundary，也不得
+   作为C4失败后的自动降级。
 
 Provider-specific payload、model naming、duration/resolution 限制不得进入 provider-neutral core model。
 
@@ -91,8 +122,13 @@ Provider-specific payload、model naming、duration/resolution 限制不得进�
 - 不新增第二 timeline、第二 renderer、第二 state writer 或通用 Agent runtime。
 - 不把 crossfade、插帧、optical flow、prompt 文案复用或剪辑遮挡描述为完整 continuity solution。
 - 不改变 Legacy CLI、Legacy layout、public CLI commands、default no-network 或 local-first policy。
-- 不调用cloud video Provider，不产生新的付费行为，也不增加local失败后的cloud fallback；本slice只执行用户明确授权的bounded Local H3 two-Shot proof。
-- 不修改 P8 provider spec，不把 proposed continuity fields 写成已实现 runtime truth。
+- 本spec task不实施runtime、不调用local/cloud video Provider、不产生付费行为、不mint/consume permit，
+  也不增加local失败后的cloud fallback。
+- 不把“多Provider切换”实现为runtime ranking、automatic retry、model substitution或best-effort fallback。
+- 不声称任意source/destination组合、反向组合或未认证profile已经可流畅切换。
+- 不升级ComfyUI、不安装/融合checkpoint、不构建Hybrid artifact，也不在第一版启用Turbo LoRA。
+- 不修改P8 provider contract，不把target Provider child、transition certification或semantic capability写成
+  已实现runtime truth。
 - 默认不增加 dependency、CLI、Manifest schema 或 artifact layout。
 - 不把三张静态图、prompt中的identity/camera描述、adapter可序列化字段、另一个mode的reference能力或多个capability的并集伪装成C4 motion continuity。
 - 不把v7历史reviewer verdict、SSIM、Provider success或fetched artifact重新解释为C4 acceptance。
@@ -252,7 +288,12 @@ Router只能选择一个exact capability variant；不得把I2V、FL2VA、Ref2VA
 
 `requirement_bindings()`必须保持semantic role与exact asset的一一对应，Router provider-bound projection必须deterministic且prompt-free；`VideoGenerationRequest`仍按唯一canonical image/media ordering序列化。缺失/重复/错序或capability cardinality mismatch必须在adapter compiler、paid preview、permit mint/consume和POST之前拒绝，不允许T2V fallback、prompt fallback、Provider fallback或伪造mixed capability。
 
-当前`doubao-seedance-2-0-mini-260615` sealed profile只分别证明I2V的`first_frame + last_frame`和reference-mode的reference/media surfaces，尚未证明一个native request中的完整C4组合。`SeedanceVideoProvider._payload()`能输出`reference_image`不构成formal evidence。只有dated official API contract、exact request schema/example与offline compiler tests共同证明完整组合后，才可新增独立C4 capability seal；若formal contract不能证明，必须保留现有seal并在Paid Provider preview/POST前fail closed。
+当前Seedance 2.0 family model-specific profiles只分别证明I2V的`first_frame + last_frame`和
+reference-mode的reference/media surfaces，尚未证明一个native request中的完整C4组合。
+`SeedanceVideoProvider._payload()`能输出`reference_image`不构成formal evidence。只有exact
+model/profile的dated official API contract、request schema/example与offline compiler tests共同证明完整
+组合后，才可新增独立C4 capability seal；若formal contract不能证明，必须保留现有seal并在Paid
+Provider preview/POST前fail closed。
 
 ### Ownership and Compatibility
 
@@ -260,6 +301,74 @@ Router只能选择一个exact capability variant；不得把I2V、FL2VA、Ref2VA
 - `ProductionStateCommitter`、Production Manifest、Asset Registry、Dependency Graph、`ResolvedTimeline`、HyperFrames与existing Paid Provider recovery ownership保持不变；C4不得新增writer、timeline、activation owner、automatic recovery或Provider fallback。
 - New C4 requirement/request/evidence schema必须additive；C1/C2/C3与legacy T2V/I2V/R2V requests在C4 fields缺失时保持bit-for-bit historical hash/reopen semantics。
 - P5只沿四个exact input asset/evidence edges传播到target generation与真实composition/render closure；unlinked Shots、voice、captions与无关assets保持fresh。
+
+## Controlled Multi-Provider Transition Contract
+
+### Source and Destination Responsibilities
+
+多Provider continuity transition是有向关系，不是Provider名称列表。Source lane只负责产出已经activated、
+由P6接受且可派生exact `TerminalFrameEvidence`与`C4MotionTailEvidence`的upstream video；它不需要原生
+支持C4 input grammar。Destination lane必须由一个selected capability在同一次native generation中完整
+消费所选continuity grade的全部bindings，并独立完成自身output、lifecycle与quality gates。
+
+因此首个Local T8 C4 child完成后，可以认证：
+
+```text
+accepted H3 / Hailuo / Seedance / future source
+    -> exact terminal + motion-tail derivation
+    -> Local T8 C4 destination
+```
+
+这不会自动认证`Local T8 -> Seedance`、`Local T8 -> Hailuo`、任意反向路径或任意provider-to-provider
+组合。只有destination自身拥有相同grade的sealed capability并通过独立证据时，对应方向才成立。
+
+### Continuity Product Grades
+
+Provider切换必须显式选择以下grade之一：
+
+| Grade | Required native request semantics | Allowed claim |
+| --- | --- | --- |
+| Grade E — `C4_NATIVE_BOUNDARY_MOTION` | exact `first_frame=1`、`last_frame=1`、`reference=1`、`reference_video=1`，由同一selected capability消费 | native exact-role boundary + identity/motion reference，仍需decoded output与P6 evidence |
+| Grade S — `C4_SEMANTIC_MULTI_REFERENCE` | opening、ending、identity与motion作为semantic reference roles；Provider可以把它们映射为多个reference images/video | semantic opening/ending/identity/motion guidance，不保证native first/last roles或pixel-exact boundary |
+
+`native exact-role boundary`只证明exact input bytes进入Provider的native boundary role，不等于decoded
+frame 0或terminal frame与输入pixel-identical。Pixel similarity、identity adherence和motion adherence必须
+分别测量并由P6/human evidence裁决。Grade E失败时不得自动改为Grade S；二者必须使用不同capability
+ID、request contract、UI/product label、acceptance rubric与quality record。
+
+### Pairwise Certification
+
+每个可声明的有向transition必须拥有immutable、content-addressed
+`ProviderTransitionCertification` evidence。其逻辑内容至少绑定：
+
+- exact source provider、model、profile、capability与accepted output provenance；
+- exact destination provider、model、profile、capability、workflow/binding及artifact identities；
+- selected continuity grade、canonical anchor contract/version与exact cardinality；
+- input derivation/materialization policy、output normalization/probe contract与composition compatibility；
+- technical、live smoke、boundary、identity、motion、human/P6 rubric和evidence identities；
+- certification status、actor/policy identity、created time与canonical content hash。
+
+该evidence只证明一个directed pair和一个exact profile snapshot。它不是Provider router、mutable lifecycle、
+capability registry或第二acceptance owner；Production Manifest、`ProductionStateCommitter`、selected
+capability snapshot和P6继续拥有各自canonical truth。Model、workflow、binding、artifact、node schema、
+sampler、output contract或rubric任一identity变化，都必须生成新的certification，不得原地改写。
+
+在没有全部directed pairs的独立certification前，产品只能显示具体已认证路径，例如
+`Seedance 2.0 -> Local T8 C4`，不得显示笼统的“All Providers Seamless”。
+
+### Selection, Downgrade, and Failure
+
+- Planner/Router必须显式接收destination capability或由已批准policy做deterministic selection；selected
+  provider/model/profile/capability与grade必须进入resolved identity。
+- Router只能从fresh capability snapshot中选择单个、完整满足当前grade的variant。它不得根据OOM、
+  latency、artifact缺失、previous success或quality score在attempt中换child。
+- capability denial、profile drift、materialization failure、unknown outcome或quality rejection都保持当前
+  attempt blocked/failed；不得自动选择另一个Provider、较低grade、Turbo/Stock alternative或cloud lane。
+- 用户或Planner可以创建一个新的显式attempt选择其他已认证lane；新attempt必须拥有自己的intent、
+  budget/egress（如适用）、permit、provenance与acceptance evidence，不能复用失败attempt的effect token。
+- “流畅”指provider-neutral semantics、exact evidence、deterministic routing、durable lifecycle、recovery与
+  composition contract在显式切换时保持稳定；它不承诺零等待、零成本、相同视觉风格或未经P6验收的
+  主观连续性。
 
 ## Provider-Specific Profiles
 
@@ -305,6 +414,80 @@ Local H3的profile边界如下：
 
 仅提高现有smoke workflow的`length`只会生成一个更长的单Shot，不构成跨Shot continuity。H3 node虽然允许更长frame count，但其文档训练区间约为124-362 frames；超出该范围必须作为独立quality/performance risk报告，不能因为schema允许而宣称已支持。
 
+### Local T8 Hybrid C4 Destination
+
+首个`C4_NATIVE_BOUNDARY_MOTION` destination必须作为Local H3 provider family下的独立child实现，不能
+扩宽现有`FL2VA`或`Ref2VA`capability。Provider-neutral request继续使用：
+
+```text
+generation_mode = IMAGE_TO_VIDEO
+continuity_mode = MULTI_ANCHOR
+```
+
+`task_type = Hybrid`只属于T8 provider-native compiler/profile，不得新增模糊的通用`HYBRID`
+generation mode。Family只聚合capabilities并按exact selected child dispatch，不拥有durable state、quality
+selection或runtime fallback；`VideoGenerationService`与`ProductionStateCommitter`继续拥有intent、
+permit、submit/status/fetch、candidate、activation、recovery与replay。
+
+第一版motion child的binding grammar固定为：
+
+| Role | Cardinality | T8 native mapping |
+| --- | ---: | --- |
+| `first_frame` | exactly 1 | Hybrid conditioning `first_frame` |
+| `last_frame` | exactly 1 | Hybrid conditioning `last_frame` |
+| `reference` | exactly 1 | `ref_images.ref_image_0` |
+| `reference_video` | exactly 1 | `ref_videos.ref_video_0` |
+| `reference_audio` | exactly 0 | absent |
+| all roles | exactly 4 | one selected capability |
+
+第一版`reference_video`只承载visual motion/action reference，不隐式携带soundtrack；
+`ref_video_audios`与`ref_audios`必须为空。Static C4如未来需要，必须使用独立capability ID和exact
+three-role grammar，不能让同一个variant同时接受模糊的三/四角色shape。
+
+#### Model Qualification Gates
+
+Model strategy必须以两个sequential、offline qualification gates收敛；它们不是production runtime
+fallback，也不能同时出现在一个active capability snapshot：
+
+1. `M0 — stock Ref2VA control`：以stock Ref2VA、T8 Hybrid conditioning、Stock20、
+   `dual_clock_euler`、`native_flow`、Turbo off执行完整四锚点control，回答stock checkpoint是否能在
+   保留reference adherence时可靠消费first/last conditioning。
+2. `M1 — sealed FL2VA×Ref2VA Hybrid artifact`：只有M0未通过预先冻结的technical/boundary/identity/
+   motion gates时才进入。Artifact必须由exact validated model pair和content-addressed recipe构建；现有
+   builder的validated pruned-pair边界不得静默扩宽到当前non-pruned inventory。
+
+只有一个candidate通过full local smoke与quality gates后，才可进入Production capability snapshot。
+Candidate identity必须揭示真实model treatment，例如：
+
+```text
+minimax-h3-t8-c4-motion-ref2va-stock20-v1
+minimax-h3-t8-c4-motion-hybrid-stock20-v1
+```
+
+不得在同一capability ID下从stock Ref2VA替换为Hybrid artifact。第一版固定Stock20并关闭Turbo LoRA；
+Turbo只能在Stock20完整通过后以独立profile、独立capability ID和same-input controlled comparison重新
+验收，不能静默改变sampling trajectory或quality variable。
+
+#### Profile and Artifact Seals
+
+Production profile至少seal exact T8/ComfyUI commit与license、required node inventory/input schema、
+source model pair、selected checkpoint或Hybrid artifact及sidecar/recipe identity、CLIP/text encoder、
+video/audio VAE、workflow/binding/profile hashes、Stock20 sampler/shift/frame grid、resolution、frame count、
+FPS、native audio/output node/final filename rule、literal loopback endpoint，以及
+`remote_provider_enabled=false`、`cloud_fallback_enabled=false`。
+
+Hybrid artifact build属于显式Provider inventory preparation，不属于每次generation attempt。Build
+receipt必须绑定source model hashes、builder/recipe/version、tensor contract、output artifact/sidecar hashes
+与license/provenance；runtime只允许reopen、rehash、verify和consume。Missing/tampered artifact不得触发
+auto-build、auto-repair、stock substitution、cloud fallback或第二套Production recovery。Artifact recovery
+不改变`ProductionStateCommitter`对attempt lifecycle的唯一ownership。
+
+以下任一条件必须在permit consumption与ComfyUI POST之前fail closed：role缺失/重复/多余或错序、
+anchor/Registry/provenance/materialization mismatch、endpoint approval/feasibility不完整、motion tail没有以
+exact terminal结束、task type不是literal `Hybrid`、reference audio意外连接、model/artifact/node schema/
+workflow/binding/profile drift、Stock20参数漂移、output ambiguity、非loopback endpoint或任何remote/cloud/
+fallback配置。
+
 ### Cost Control and Provider Portability
 
 Shot Continuity必须保持“一个provider-neutral lifecycle，多个显式provider lanes”。以下contract在Local H3、Hailuo、Seedance与未来Provider之间复用，不得在adapter内复制：
@@ -349,20 +532,93 @@ References:
 - [MiniMax Video Generation Guide](https://platform.minimax.io/docs/guides/video-generation)
 - [MiniMax Models](https://platform.minimax.io/docs/guides/models-intro)
 
-### Seedance 2.0 Mini
+### Seedance 2.0 Family
 
-当前capability table与adapter已对`doubao-seedance-2-0-mini-260615`的I2V first-frame、optional
-last-frame、audio opt out、response/fetch与permit mapping完成offline executable acceptance；这不等于
-continuity live、billing settlement、activation或quality acceptance。单次price、preview与task状态只由
-runtime baseline/records拥有。`SeedanceAssetMaterializationReceipt`与
-`SeedanceAssetReferenceResolver`独占already-materialized Ark identity导出并拒绝local Registry ID
-伪装`asset://`；缺少exact active materialization evidence时必须在authorization/permit/submit前fail
-closed。Synthetic/illustrated proposal不得用于photorealistic person，也不得猜测upload endpoint、使用
-第三方临时URL或绕过sealed capability identity。
+当前capability table分别覆盖`doubao-seedance-2-0-260128`、
+`doubao-seedance-2-0-fast-260128`与`doubao-seedance-2-0-mini-260615`的model-specific modes。官方
+capability matrix分别声明first/last-frame
+I2V和image/video/audio multimodal reference，但没有给出一个exact model-specific schema/example/receipt
+证明frame roles与reference roles可在同一native request中cross-mode union。因此三个型号当前均不得注册
+`C4_NATIVE_BOUNDARY_MOTION` capability：
 
-此前 Seedance Mini diagnostic 只证明一次 cloud connectivity 和 fetched MP4；它不证明 tracked continuity payload、billing settlement、activation 或 quality acceptance。
+Code中的default capability matrix表示adapter理解的provider maximum，不证明当前account已购买、已部署
+或已授权全部model。当前accepted inventory只包含base `doubao-seedance-2-0-260128`；Fast与Mini即使
+接口文档存在，也必须在fresh entitlement、pricing与exact endpoint/profile evidence齐全后才可进入active
+capability snapshot。Capability discovery不得把“官方支持”或“代码中有entry”误写成“本账户可用”。
 
-Reference: [Volcengine Doubao Seedance 2.0 Series Tutorial](https://www.volcengine.com/docs/82379/2291680?lang=zh&sessionid=)
+#### Shared Transport, Separate Model Contracts
+
+三者可以复用同一类Ark async task transport和AI-VIDEO `SeedanceVideoProvider` adapter：相同的submit/
+status/fetch lifecycle、`model + content[]` request envelope、image/video/audio role serialization、Paid
+Provider Gate、materialization与unknown-outcome recovery seam。这里的“shared interface”只表示transport
+shape和adapter code path可以复用，不表示三个model是drop-in interchangeable capability。
+
+每个model/mode必须拥有独立`SeedanceCapabilityProfile`与capability ID，至少分别seal：
+
+- exact logical `model_id`、actual `api_model_id`或endpoint deployment identity、expected response model；
+- exact mode与allowed role grammar，不能使用`seedance-2.0`family wildcard；
+- output resolution/ratio/raster、duration/timing mode、FPS、container与native audio bounds；
+- reference image/video/audio counts、individual/aggregate duration与materialization bounds；
+- profile version、pricing snapshot/upper bound、egress preview、one-use permit与resolved request hash；
+- model-specific offline compiler tests、live receipt和quality/P6 evidence。
+
+当前代码与官方matrix显示的主要差异如下；future provider drift必须通过fresh matrix/profile update重新seal，
+不能静默沿用本表：
+
+| Exact model | Service class | Output contract | Reference bounds in current profile | Interchange rule |
+| --- | --- | --- | --- | --- |
+| `doubao-seedance-2-0-260128` | enhanced/base | 480p/720p/1080p/4k, 4–15s, 24fps, MP4 | up to 9 images, 3 videos, 3 audios, 15s family media limit | primary purchased 2.0 target; owns independent profile/pricing/evidence |
+| `doubao-seedance-2-0-fast-260128` | basic/fast | 480p/720p, 4–15s, 24fps, MP4 | up to 9 images, 3 videos, 3 audios, 15s family media limit | cannot inherit base output, price, capability or quality acceptance |
+| `doubao-seedance-2-0-mini-260615` | basic/mini | 480p/720p, 4–15s, 24fps, MP4 | up to 9 images, 3 videos, 3 audios, 15s family media limit | cannot inherit base/Fast acceptance; historical rejection remains model-specific |
+
+Provider selection切换这三个model时必须创建新的resolved identity和attempt。Request若不满足selected exact
+profile，必须在paid preview/permit/POST前拒绝；adapter不得因为另一个2.0 family profile接受该shape就
+改写model ID、删减roles、改变resolution/duration或使用另一份pricing。Response返回的model identity必须
+与submission binding一致，否则按provider mismatch fail closed。
+
+Model isolation acceptance至少覆盖：
+
+- capability snapshot在entitlement不包含Fast/Mini时只暴露base 2.0 target；discovery不得因default
+  matrix存在而自动启用其他models；
+- base、Fast与Mini的capability/profile/request hashes互不相同，family alias和cross-model profile reuse
+  必须拒绝；
+- base-only 1080p/4k request绑定Fast/Mini时在preview/permit/POST前拒绝，effect count为零；
+- missing/stale model-specific pricing、wrong endpoint deployment或response model mismatch均fail closed；
+- 一个model的offline/live/quality acceptance不能满足另一个model的certification或transition matrix entry；
+- 切换exact model必须创建新attempt，重新完成pricing、egress、permit、provenance与P6 evidence。
+
+| Model | Native first+last task | Image+video reference task | Exact four-role union | Semantic grade |
+| --- | --- | --- | --- | --- |
+| Seedance 2.0 | separately declared | separately declared | not proven; fail closed | future explicit capability |
+| Seedance 2.0 Fast | separately declared | separately declared | not proven; fail closed | future explicit capability |
+| Seedance 2.0 Mini | separately declared | separately declared | not proven; fail closed | future explicit capability |
+
+Adapter能够序列化`first_frame`、`last_frame`、`reference_image`或`reference_video`只证明字段mapping，
+不证明selected model/mode接受它们的union。现有I2V profiles继续保持`first_frame + optional last_frame`且
+`max_reference_count=0`；reference/edit/extend profiles继续保持reference media contract，不得由Router
+拼接成虚假的combined capability。
+
+已购买的base Seedance 2.0可以未来新增独立`C4_SEMANTIC_MULTI_REFERENCE` capability，将opening
+composition、ending composition和canonical identity分别作为semantic image references，将motion作为
+`reference_video`。该contract必须明确opening/ending不是native `first_frame`/`last_frame`，不得宣称
+pixel-exact boundary，也不得作为Grade E失败后的fallback。Seedance 2.0 Fast与2.0 Mini只有在各自exact
+profile被显式纳入available inventory并完成相同formal evidence与quality gates后，才可获得独立semantic
+capability；Fast或Mini identity本身不扩大binding grammar。
+
+`SeedanceAssetMaterializationReceipt`与`SeedanceAssetReferenceResolver`继续独占already-materialized
+Ark identity导出并拒绝local Registry ID伪装`asset://`；缺少exact active materialization evidence时
+必须在authorization/permit/submit前fail closed。此前Seedance 2.0 Mini paid attempt只证明一次
+first-frame I2V submit/fetch lifecycle，且用户因identity与camera continuity拒绝、candidate保持
+unactivated；它不能外推为四锚点technical或quality proof。
+
+任何bounded cross-mode discovery probe必须是未来独立授权的single POST、lowest valid cost、no retry、
+no fallback attempt。HTTP/schema acceptance最多证明transport/schema reachability；仍需检查roles是否被
+实际遵循，并重新完成boundary、identity、motion与P6 gates后才能seal capability。
+
+References:
+
+- [BytePlus LAS Enhanced Video Generation](https://docs.byteplus.com/en/docs/Byteplus_LAS/video_gen_enhanced)
+- [Volcengine Doubao Seedance 2.0 Series Tutorial](https://www.volcengine.com/docs/82379/2291680?lang=zh&sessionid=)
 
 ## Artifact and Provenance Lifecycle
 
@@ -454,6 +710,48 @@ C4在上述三层之外还必须把static boundary与motion boundary拆开报告
 
 SSIM/PSNR只可作为边界像素相似度evidence，不能替代identity或motion视觉判断。Reviewer verdict、automatic analyzer与human/user review必须保留各自来源；用户对identity或camera continuity的明确rejection使对应C4 subjective dimension失败，即使technical tests、Provider lifecycle或其他reviewer通过。
 
+### Multi-Provider Claim Levels
+
+Completion与产品声明必须按以下层级报告，不能用较低层替代较高层：
+
+1. `C4_CORE_READY`：provider-neutral binding/request/resolved/hash/Router exact grammar与negative tests通过。
+   当前代码已达到该offline层级。
+2. `C4_DESTINATION_READY`：一个exact destination child通过profile preflight、fake lifecycle、full
+   four-anchor local/live smoke、activation/reopen/replay、boundary/identity/motion和P6/human acceptance。
+   Local T8 Hybrid是首个target，但当前尚未达到。
+3. `DIRECTED_TRANSITION_READY`：一个source与一个不同destination provider的exact pair拥有fresh
+   `ProviderTransitionCertification`，可声明该具体方向，例如`Seedance 2.0 Mini -> Local T8 C4`。
+4. `SAME_GRADE_MULTI_DESTINATION_READY`：同一provider-neutral grade至少有两个不同destination
+   providers的sealed capabilities，使用同一fixture/rubric分别通过，并完成deterministic selection、
+   denial、reopen与no-fallback tests。只有达到此层才能声称“同等级多Provider可流畅切换”。
+5. `FULL_MATRIX_READY`：每个对外声称支持的directed pair都拥有独立certification。没有完整矩阵时不得
+   声称“任意Provider双向无缝切换”。
+
+Local T8 C4 child完成只会把系统推进到`C4_DESTINATION_READY`；加入至少一个不同source pair后可达到
+`DIRECTED_TRANSITION_READY`。它不会单独达到`SAME_GRADE_MULTI_DESTINATION_READY`，因为Seedance
+2.0 family和Hailuo当前都没有已证明的Grade E destination capability。
+
+### C4 Destination Verification Matrix
+
+首个destination至少必须完成以下gates：
+
+| Gate | Required evidence |
+| --- | --- |
+| Inventory | exact plugin/ComfyUI/model/artifact/node/profile hashes与license/provenance |
+| Cardinality | exact 1 first + 1 last + 1 identity image + 1 motion video；缺失、重复、多余、错序和sub-capability union全部拒绝且effect count为零 |
+| Workflow/compiler | literal `Hybrid`、exact node bindings、empty reference audio、deterministic payload order与output mapping |
+| Lifecycle | one-use local permit、submit/status/fetch、unknown-outcome recovery、candidate activation、reopen与exact replay zero effects |
+| Four-anchor smoke | one request、one selected model/profile、one submit、no retry、no fallback，记录全部input/output/request/profile/artifact hashes |
+| Boundary | decoded frame 0与terminal frame分别对比native first/last；报告measurement，不把native role夸大为pixel identity |
+| Identity | first/middle/last windows检查face/subject、hair、clothes、props、body scale与multi-frame drift；不足时`NOT_EVALUATED` |
+| Motion | subject/camera direction与velocity、action phase、entrance/exit、unexpected stop/re-entry；单帧SSIM不得代替 |
+| P6/Human | exact request/output/anchors、technical/strategy/semantic evidence与human verdict共同形成Final Acceptance |
+| Harness | task-owned exact staged snapshot或commit range的fresh passing receipt；Harness不替代live media或P6 |
+
+所有阈值、fixture、rubric与candidate identities必须在观看结果前冻结。同一candidate未通过full matrix时
+保持`experimental / unavailable`；quality rejection不得因transport success、hash closure或单一metric
+改写为accepted。
+
 ## Bounded Hybrid Continuity Evaluator V1
 
 2026-08-22 的 Option A 授权增加一个 local/no-network evaluator slice。该 slice 可以把
@@ -503,12 +801,40 @@ artifact/constraints/evaluator binding 后，其 content-addressed evidence 必�
 全部 fail closed。历史 Manifest 2.8 与历史无 raw-measurement evidence 必须保持可读；只有包含新 pointer
 的 attempt 才要求下一 compatible Manifest schema。
 
+## Assumptions and Unresolved Decisions
+
+- C4 provider-neutral contract、Router grammar与canonical lifecycle owners视为本实现slice的unchanged
+  contract；只有concrete child接入测试证明真实缺口时，才允许最小core修正。
+- M0 stock Ref2VA与M1 Hybrid artifact谁成为Production candidate尚未决定，只能由同一fixture、预先冻结
+  rubric和full four-anchor evidence决定，不能由payload unit tests或主观预期决定。
+- `ProviderTransitionCertification`的exact persisted schema/layout尚未决定。Implementation plan必须先
+  证明它能复用现有immutable evidence与Manifest pointer patterns；若需要Manifest/artifact layout migration，
+  必须单独通过对应Decision Gate，不得由本spec暗含授权。
+- Seedance frame/reference cross-mode union仍是unknown/unsupported-for-seal。只有formal Provider
+  evidence或未来bounded probe能改变该model/profile结论；一次2xx不能直接改变grade。
+- T8 `MiniMaxH3AddGuide`迁移、non-pruned Hybrid builder研究与Turbo qualification均属于后续独立
+  scope；它们不是首个Stock20 C4 destination的隐含dependency。
+- Boundary、identity与motion的numerical thresholds、fixture和human rubric必须在live smoke前由
+  implementation plan/QA policy冻结；本spec不允许看到candidate后再降低门槛。
+
 ## Authorization Boundary
 
 2026-08-19 Local MiniMax H3 `fl2va` two-Shot proof由当时任务单独授权并完成。2026-08-20用户先对Alice C2 Hailuo 2.3与Seedance 2.0 Mini各最多一次remote submit作出独立task-scoped authorization，随后以“全部授权继续”批准解决已报告blocker所需的新bounded adaptive Hailuo request。该request已消费一次submit并完成canonical lifecycle；Seedance fresh budget已满足但仍因egress materialization gate保持零submit。两项lane都不扩展为blind retry、其他model/provider、`ref2va`、Shot Router或额外benchmark；任何后续live execution仍必须重新满足exact provider/model、预算、Cloud Egress与Paid Provider one-use permit。
 
-2026-08-22 v7 Seedance paid submit已经被该attempt消费，且result被用户拒绝并保持unactivated。本轮只授权canonical spec/plan更新，不授权runtime implementation、local/cloud generation、paid preview/POST、permit mint/consume或media quality claim。未来C4 live smoke必须在implementation、tests、formal capability evidence、fresh Harness与native independent review全部完成后，取得新的task-scoped paid authorization、fresh budget/egress decision和新的one-use permit；旧v7 authorization/permit/receipt不得复用。
+2026-08-22 v7 Seedance paid submit已经被该attempt消费，且result被用户拒绝并保持unactivated。本轮只授权
+canonical spec更新，不授权runtime implementation、local/cloud generation、paid preview/POST、permit
+mint/consume或media quality claim。未来loopback local ComfyUI C4 smoke按repository local-unmetered
+execution contract无需重复请求task-scoped authorization，但仍必须通过sealed profile、preflight、local
+permit、唯一committer、recovery与media verification gates；任何remote/paid C4 probe仍必须在
+implementation、tests、formal capability evidence、fresh Harness与native independent review完成后，取得
+新的task-scoped authorization、fresh budget/egress decision和新的one-use permit。旧v7 authorization/
+permit/receipt不得复用。
 
 ## Rollback
 
-未来 continuity implementation 必须可按 provider lane 删除：移除 continuity-specific adapter capability/payload mapping、terminal evidence reader/writer seam 和 typed P5 edge后，旧 P8 T2V/I2V request、candidate activation、static-image path、generated-MP4 composition和 P3/P4/P5 ownership必须恢复到当前行为。已存在的 continuity artifacts 应保持 immutable、可审计但不再被 active graph 选择；不得通过删除历史 receipts 完成 rollback。
+未来 continuity implementation 必须可按 provider lane 删除：移除continuity-specific child capability/
+payload mapping与active pair certification后，旧P8 T2V/I2V/R2V request、candidate activation、
+static-image path、generated-MP4 composition和P3/P4/P5 ownership必须恢复到当前行为。移除一个
+destination child不得改变其他lane identity、自动选择replacement或把Grade E request降为Grade S。
+已存在的terminal/motion/transition/provider artifacts应保持immutable、可审计但不再被active graph/
+capability snapshot选择；不得通过删除历史receipts完成rollback。
