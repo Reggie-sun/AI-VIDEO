@@ -22,7 +22,8 @@ receipts记录，不由本normative spec固定。既有P8 remote/Paid Provider c
 当前已实现frame-accurate composition与显式Local H3 terminal-to-first-frame continuity lane：generated MP4仍进入唯一的`CompositionSpec -> ResolvedTimeline -> HyperFrames`路径并保持P4 audio/caption/final mux语义。该lane不会让任意三个独立生成的Shot自动共享场景、角色、镜头轴线、光线或运动状态；只有带exact continuity binding并逐Shot生成的edge获得技术保证，语义质量仍需独立人工验收。
 
 本规范继续作为唯一Shot Continuity canonical owner，并冻结
-`C4_MULTI_ANCHOR_MOTION_CONTINUITY`与controlled multi-provider transition target contract；不创建
+`C4_MULTI_ANCHOR_MOTION_CONTINUITY`与boundary-aware controlled multi-provider transition target
+contract；不创建
 平行spec。C4 provider-neutral binding、requirement/request/resolved hashing、exact cardinality grammar与
 Router fail-closed gate已实现offline；但当前仍没有一个concrete Provider child完成四锚点capability seal、
 full local smoke、continuity/identity quality acceptance和P6 Final Acceptance。因此当前只能声明
@@ -46,10 +47,15 @@ Shot Continuity 的目标是让 Shot N 已 sealed 的 terminal-frame/reference s
 
 对于`C4_MULTI_ANCHOR_MOTION_CONTINUITY`，成功标准进一步要求同一个resolved capability在同一次generation中同时消费exact terminal、独立canonical identity reference、approved exact future endpoint与exact upstream motion tail。静态frame anchors只能证明边界像素、identity和目标姿态约束；只有motion tail才能携带upstream gait phase、subject velocity、camera direction与camera velocity。Prompt不得代替上述任一binding。
 
-多Provider切换的成功标准是：Planner/Router可以在不改变provider-neutral continuity semantics、canonical
-state owner或recovery contract的前提下，显式选择一个已经对该continuity grade完成认证的destination
-capability。认证按有向`source capability -> destination capability`组合记录；一个方向或一个destination
-通过，不得外推为反向、其他model/profile或全局“无缝切换”。
+多Provider能力的成功标准是boundary-aware portability，而不是任意位置换模型。没有visible editorial cut的
+`WITHIN_CONTINUOUS_TAKE`必须锁定exact provider/model/profile/capability，并由single generation或该exact
+identity正式支持的native extension完成；adapter不得把另一个Provider接到take中间。只有显式
+`HARD_CUT` continuity edge才允许使用已经对exact grade与directed pair完成认证的destination capability。
+`SCENE_BOUNDARY`只表示叙事或剪辑结构已经换场，不能自动推导continuity reset：若新场景仍延续同一主角、
+服装、道具或强视觉风格，policy必须保留exact identity/style carryover references并通过普通QA；只有
+scene/time/state已经由approved intent显著重置、且没有残余carryover义务的boundary，才可标记为
+`SUBSTANTIAL_RESET`并获得近似自由的显式Provider portability。一个方向、一个boundary kind、一个reset
+classification或一个destination通过，不得外推为反向、其他model/profile或全局“无缝切换”。
 
 ## Current Runtime Truth
 
@@ -88,28 +94,22 @@ capability。认证按有向`source capability -> destination capability`组合�
   exact pruned FL2VA/Ref2VA pair，而当前本机库存为non-pruned pair且没有sealed Hybrid artifact。
 - 当前pinned ComfyUI没有upstream `MiniMaxH3AddGuide`；即使未来受控升级，conditioning placement也不
   证明selected checkpoint同时遵循四类anchors。
-- Seedance 2.0、2.0 Fast与2.0 Mini分别声明frame I2V和multimodal reference task family，但
-  没有formal evidence证明`first_frame + last_frame + reference_image + reference_video`cross-mode union。
-- Hailuo 2.3只声明first-frame I2V，不能成为C4 destination。
-
-## Scope
-
-本规范覆盖 provider-neutral continuity request、terminal/motion-tail artifact与provenance、capability
-denial、durable activation/recovery、P5 precise invalidation、controlled multi-provider transition以及
-technical/provider/subjective acceptance的分层边界。
-
+- Seedance 2.0、2.0 Fast与2.0 Mini分别声明frame I2V和multimodal reference task family，但啊
 本次增量冻结以下target scope：
 
 1. 建立`C4_NATIVE_BOUNDARY_MOTION`与`C4_SEMANTIC_MULTI_REFERENCE`两个不可互换的产品等级。
 2. 为Local T8 Hybrid定义独立C4 destination child、exact four-role grammar、profile/artifact seals和
    Stock20 qualification gates；不扩宽现有FL2VA或Ref2VA identity。
-3. 定义有向pair certification，使任意已P6接受、可派生exact terminal/motion evidence的source lane，
+3. 建立provider-neutral `ContinuityTransitionPolicy`逻辑合同，区分`WITHIN_CONTINUOUS_TAKE`、
+   `HARD_CUT`与`SCENE_BOUNDARY`，再独立绑定`FULL_CONTINUITY`、`IDENTITY_STYLE_CARRYOVER`或
+   `SUBSTANTIAL_RESET`义务，冻结每种有效组合的Provider affinity、reference、QA与failure behavior。
+4. 定义有向pair certification，使任意已P6接受、可派生exact terminal/motion evidence的source lane，
    只有在destination capability通过对应grade时才可进入该destination。
-4. 保留Hailuo 2.3 first-frame continuity和Seedance 2.0 family的model-specific边界；当前accepted
+5. 保留Hailuo 2.3 first-frame continuity和Seedance 2.0 family的model-specific边界；当前accepted
    Seedance target只包含已购买的base `doubao-seedance-2-0-260128`。Fast/Mini只保留compatibility
    comparison，除非fresh entitlement/inventory明确纳入，不得进入active capability snapshot。在formal
    cross-mode evidence缺失时全部继续fail closed。
-5. 允许未来优先为已购买的base `doubao-seedance-2-0-260128`建立独立semantic multi-reference
+6. 允许未来优先为已购买的base `doubao-seedance-2-0-260128`建立独立semantic multi-reference
    capability，但不得把semantic opening/ending references描述为native first/last boundary，也不得
    作为C4失败后的自动降级。
 
@@ -126,6 +126,12 @@ Provider-specific payload、model naming、duration/resolution 限制不得进�
   也不增加local失败后的cloud fallback。
 - 不把“多Provider切换”实现为runtime ranking、automatic retry、model substitution或best-effort fallback。
 - 不声称任意source/destination组合、反向组合或未认证profile已经可流畅切换。
+- 不把adapter的field mapping、codec/FPS normalization或shared transport描述为不同模型的identity、motion、
+  camera dynamics、style或latent-state等价。
+- 不允许在`WITHIN_CONTINUOUS_TAKE`中途替换Provider；失败时只能显式重生成整个take，或先由authoring
+  revision增加visible hard cut再按新boundary contract创建attempt。
+- 不把`SCENE_BOUNDARY`本身解释为continuity清零；仍延续的主角、服装、道具、palette或强style必须携带
+  exact references并过普通QA，只有显式`SUBSTANTIAL_RESET`才允许近似自由Provider portability。
 - 不升级ComfyUI、不安装/融合checkpoint、不构建Hybrid artifact，也不在第一版启用Turbo LoRA。
 - 不修改P8 provider contract，不把target Provider child、transition certification或semantic capability写成
   已实现runtime truth。
@@ -150,6 +156,16 @@ Provider-specific payload、model naming、duration/resolution 限制不得进�
 ### Render Ownership
 
 继续使用唯一 HyperFrames renderer。Continuity conditioning 在 Provider generation 之前完成；renderer 只消费已激活 visual assets 和唯一 `ResolvedTimeline`，不负责修补生成素材的语义跳变。
+
+### Transition Boundary Ownership
+
+Approved Shot/sequence intent定义是否要求unbroken take或visible editorial cut，并逐项声明跨边界仍需保留
+或已经显著重置的identity、wardrobe、props、style、scene/time/state与motion义务；`ResolvedTimeline`继续
+独占actual Shot boundary timing。Planner只把该approved intent投影为provider-neutral
+`ContinuityTransitionPolicy`，Router只执行其中的provider affinity、carryover reference与certification
+gate。Provider adapter、family aggregator、analyzer与renderer不得推断、放宽或改写boundary kind、
+continuity obligation或reset classification，也不得因为某个Provider失败而自行插入cut、重分Shot、改变
+take范围或宣称换场已经清零continuity。
 
 ## Provider-Neutral Continuity Contract
 
@@ -304,9 +320,60 @@ Provider preview/POST前fail closed。
 
 ## Controlled Multi-Provider Transition Contract
 
+### Adapter Boundary and Model Non-Equivalence
+
+Provider adapter只负责把provider-neutral requirement deterministic投影到一个exact native capability，并
+统一transport、lifecycle、provenance、output probe/normalization与typed failure。它不能证明两个模型共享
+conditioning interpretation、identity representation、motion/camera priors、color/style distribution或
+hidden generation state。即使provider/model/profile相同，独立generation attempts也必须通过exact media
+bindings与P6 evidence重新证明continuity；provider affinity只能减少一个drift来源，不能单独产生quality
+PASS。
+
+公开Provider API目前交换的是text、image、video、audio、task/profile与encoded output等observable
+artifacts。Native last-frame chaining或video extension可以把observable upstream state交给同一exact model，
+但不得描述为跨模型latent-state transfer。Output resolution、FPS、codec、color或audio normalization只能解决
+composition compatibility，不能修复identity、pose、camera velocity或style discontinuity。
+
+### Boundary Kinds and Provider Affinity
+
+每个可能改变Provider的edge必须由immutable、provider-neutral `ContinuityTransitionPolicy`绑定approved
+authoring intent、exact source/target Shots、resolved boundary identity、一个结构性`boundary_kind`与一个
+独立的`continuity_obligation`。结构换场和连续性重置是两个不同事实：
+
+| Boundary kind | Required continuity obligation | Provider rule | Allowed strategy and claim |
+| --- | --- | --- | --- |
+| `WITHIN_CONTINUOUS_TAKE` | `FULL_CONTINUITY` | exact provider/model/profile/capability锁定 | single generation，或该exact identity formal capability支持的native extension；不得cross-provider |
+| `HARD_CUT` | 通常为`FULL_CONTINUITY`；若approved intent只保留较弱义务，必须显式降为`IDENTITY_STYLE_CARRYOVER` | full continuity的cross-provider必须有fresh directed pair certification；carryover仍需exact references与普通QA | C4 handoff只声明该exact cut与direction；较弱carryover不得冒充C4 |
+| `SCENE_BOUNDARY` | 必须显式选择`IDENTITY_STYLE_CARRYOVER`或`SUBSTANTIAL_RESET` | 不能因换场自动解除affinity；carryover必须验证destination reference能力，reset才允许ordinary explicit selection | carryover只声明identity/style continuity；reset只声明近似Provider portability，不产生motion continuity claim |
+
+`IDENTITY_STYLE_CARRYOVER`必须列出非空`required_carryover_dimensions`，其允许值至少覆盖
+`character_identity`、`wardrobe`、`hero_props`、`visual_style`与`palette`，并为每个维度绑定exact Registry
+reference/materialization identity及普通QA rubric。它不要求C4 motion tail，但不得只靠prompt复述替代
+reference binding。`SUBSTANTIAL_RESET`必须绑定approved scene/time/state reset evidence，并要求
+`required_carryover_dimensions`为空；只要同一主角、同一服装、hero prop、强style或其他显著状态仍被要求
+延续，就不能使用该classification。
+
+Logical policy至少绑定`boundary_kind`、`continuity_obligation`、`required_carryover_dimensions`、对应exact
+reference identities、source/target Shot与revision、source exact provider identity、requested destination
+identity、continuity grade、visible-cut/reset authoring evidence、allowed continuation strategy、QA policy、
+policy version与canonical content hash。`WITHIN_CONTINUOUS_TAKE`还必须绑定整个take的exact Shot/span
+membership；只修改take membership、visible-cut/reset decision、carryover dimension/reference、
+provider/model/profile/capability、QA policy或strategy任一项都必须改变hash。
+
+Router enforcement必须发生在adapter compiler、preview、permit mint/consume与Provider effect之前：
+
+- `WITHIN_CONTINUOUS_TAKE`收到不同destination identity时zero-effect denial；
+- `HARD_CUT + FULL_CONTINUITY`跨Provider但缺fresh exact pair certification时zero-effect denial；
+- `SCENE_BOUNDARY + IDENTITY_STYLE_CARRYOVER`缺少任一required exact reference、destination不支持对应role或
+  普通QA未通过时不得activation，也不得伪造C4 transition certification；
+- `SCENE_BOUNDARY + SUBSTANTIAL_RESET`仍有非空carryover dimension、缺reset evidence或与approved
+  Character/Scene/Shot intent冲突时zero-effect denial；
+- boundary kind、continuity obligation或reset classification缺失、组合无效、与approved Shot/timeline
+  evidence冲突或被tamper时fail closed。
+
 ### Source and Destination Responsibilities
 
-多Provider continuity transition是有向关系，不是Provider名称列表。Source lane只负责产出已经activated、
+`HARD_CUT` multi-provider continuity transition是有向关系，不是Provider名称列表。Source lane只负责产出已经activated、
 由P6接受且可派生exact `TerminalFrameEvidence`与`C4MotionTailEvidence`的upstream video；它不需要原生
 支持C4 input grammar。Destination lane必须由一个selected capability在同一次native generation中完整
 消费所选continuity grade的全部bindings，并独立完成自身output、lifecycle与quality gates。
@@ -319,8 +386,9 @@ accepted H3 / Hailuo / Seedance / future source
     -> Local T8 C4 destination
 ```
 
-这不会自动认证`Local T8 -> Seedance`、`Local T8 -> Hailuo`、任意反向路径或任意provider-to-provider
-组合。只有destination自身拥有相同grade的sealed capability并通过独立证据时，对应方向才成立。
+这只适用于approved `HARD_CUT`。它不会自动认证`Local T8 -> Seedance`、`Local T8 -> Hailuo`、任意反向
+路径、`WITHIN_CONTINUOUS_TAKE`或任意provider-to-provider组合。只有destination自身拥有相同grade的
+sealed capability并通过独立证据时，对应hard-cut direction才成立。
 
 ### Continuity Product Grades
 
@@ -343,6 +411,10 @@ ID、request contract、UI/product label、acceptance rubric与quality record。
 
 - exact source provider、model、profile、capability与accepted output provenance；
 - exact destination provider、model、profile、capability、workflow/binding及artifact identities；
+- exact `ContinuityTransitionPolicy`、`boundary_kind=HARD_CUT`、
+  `continuity_obligation=FULL_CONTINUITY`、visible-cut authoring evidence与source/target real Shot identities；
+- source/destination continuation strategies；`WITHIN_CONTINUOUS_TAKE`与`SCENE_BOUNDARY`不得使用该
+  certification冒充hard-cut continuity；
 - selected continuity grade、canonical anchor contract/version与exact cardinality；
 - input derivation/materialization policy、output normalization/probe contract与composition compatibility；
 - technical、live smoke、boundary、identity、motion、human/P6 rubric和evidence identities；
@@ -366,9 +438,12 @@ sampler、output contract或rubric任一identity变化，都必须生成新的ce
   attempt blocked/failed；不得自动选择另一个Provider、较低grade、Turbo/Stock alternative或cloud lane。
 - 用户或Planner可以创建一个新的显式attempt选择其他已认证lane；新attempt必须拥有自己的intent、
   budget/egress（如适用）、permit、provenance与acceptance evidence，不能复用失败attempt的effect token。
-- “流畅”指provider-neutral semantics、exact evidence、deterministic routing、durable lifecycle、recovery与
-  composition contract在显式切换时保持稳定；它不承诺零等待、零成本、相同视觉风格或未经P6验收的
-  主观连续性。
+- 若失败发生在`WITHIN_CONTINUOUS_TAKE`，new attempt只能使用一个exact identity重生成整个sealed take，
+  或先由approved authoring revision把take拆出visible `HARD_CUT`再创建新attempt；不得从失败frame开始换
+  Provider续接，也不得由runtime自动改变take membership。
+- “boundary-aware portability”只表示provider-neutral semantics、exact evidence、deterministic routing、
+  durable lifecycle、recovery与composition contract在approved boundary上保持稳定；它不承诺零等待、
+  零成本、跨模型视觉等价或未经真实Shot/P6验收的主观连续性。
 
 ## Provider-Specific Profiles
 
@@ -710,6 +785,38 @@ C4在上述三层之外还必须把static boundary与motion boundary拆开报告
 
 SSIM/PSNR只可作为边界像素相似度evidence，不能替代identity或motion视觉判断。Reviewer verdict、automatic analyzer与human/user review必须保留各自来源；用户对identity或camera continuity的明确rejection使对应C4 subjective dimension失败，即使technical tests、Provider lifecycle或其他reviewer通过。
 
+### Real Shot Generation Verification
+
+Fixture/unit tests、fake transport、synthetic color cards、isolated calibration anchors、workflow load与一次
+single-boundary smoke只能关闭各自technical gate，不能关闭live、continuity quality、destination promotion或
+multi-provider claim。`C4_DESTINATION_READY`及其以上层级必须消费真实项目Shot generation evidence：
+
+- 使用一个明确selected的`ProductionProject` revision及其中canonical Character、Scene、Shot artifacts；每个
+  input必须来自exact Asset Registry revision、materialization/provenance receipt与approved Shot intent，不能
+  用临时未登记图片、prompt-only角色描述或合成占位素材代替；
+- destination promotion至少生成3–4个叙事连续的真实Shots和至少2个continuity edges，固定同一canonical
+  主角与场景，并至少覆盖一个可见subject-motion handoff和一个camera-motion handoff；单个四锚点smoke不
+  足以证明跨Shot累计稳定性；
+- 每个generation只使用一个exact selected provider/model/profile/capability、一次submit、no blind retry、
+  no fallback；生成结果在P6/human acceptance前保持candidate/unactivated；
+- 每个edge分别绑定exact terminal、identity、endpoint、motion-tail、decoded output与policy hashes；逐edge
+  评估后还必须以原速连续播放整段，检查identity、wardrobe、style、camera velocity、action phase与空间关系的
+  累积漂移；
+- review素材必须保留raw hard cuts，不得用crossfade、optical flow、frame interpolation、速度变化、重构图或
+  其他后期处理隐藏generation discontinuity；可另行制作comparison derivative，但不能替代raw evidence；
+- `SCENE_BOUNDARY + IDENTITY_STYLE_CARRYOVER`必须在真实换场Shot上证明所有required dimensions均有exact
+  references且通过普通QA；`SUBSTANTIAL_RESET`必须由真实scene/time/state变化与approved intent证明，而不是
+  因为换了Provider或模型效果差而事后标记；
+- 首个`ProviderTransitionCertification`必须来自两个canonical real Shots之间的visible `HARD_CUT +
+  FULL_CONTINUITY`，并使用真实accepted source output派生anchors；synthetic-only pair、历史rejected或
+  unactivated output不能满足；
+- `SAME_GRADE_MULTI_DESTINATION_READY`必须让各destination消费同一real-Shot validation set与同一frozen
+  rubric；不同故事、不同角色或更容易的fixture不能用于横向替代。
+
+Implementation、Provider media与P6 evidence必须绑定同一或可证明byte-identical的sealed
+`validation_snapshot`。任何model/artifact、workflow、binding、profile、policy、reference set、fixture或
+rubric变化都会使受影响的真实Shot evidence失去promotion资格并要求重跑；Harness receipt不能替代该gate。
+
 ### Multi-Provider Claim Levels
 
 Completion与产品声明必须按以下层级报告，不能用较低层替代较高层：
@@ -717,15 +824,19 @@ Completion与产品声明必须按以下层级报告，不能用较低层替代�
 1. `C4_CORE_READY`：provider-neutral binding/request/resolved/hash/Router exact grammar与negative tests通过。
    当前代码已达到该offline层级。
 2. `C4_DESTINATION_READY`：一个exact destination child通过profile preflight、fake lifecycle、full
-   four-anchor local/live smoke、activation/reopen/replay、boundary/identity/motion和P6/human acceptance。
-   Local T8 Hybrid是首个target，但当前尚未达到。
+   four-anchor local/live smoke、activation/reopen/replay，并对同一sealed snapshot完成3–4个canonical real
+   Shots、至少2个edges的原速Pilot、boundary/identity/motion和P6/human acceptance。Local T8 Hybrid是首个
+   target，但当前尚未达到。
 3. `DIRECTED_TRANSITION_READY`：一个source与一个不同destination provider的exact pair拥有fresh
-   `ProviderTransitionCertification`，可声明该具体方向，例如`Seedance 2.0 -> Local T8 C4`。
+   `ProviderTransitionCertification`，且证据来自canonical real Shots之间的visible
+   `HARD_CUT + FULL_CONTINUITY`；可声明该具体方向，例如`Seedance 2.0 -> Local T8 C4`。
 4. `SAME_GRADE_MULTI_DESTINATION_READY`：同一provider-neutral grade至少有两个不同destination
-   providers的sealed capabilities，使用同一fixture/rubric分别通过，并完成deterministic selection、
-   denial、reopen与no-fallback tests。只有达到此层才能声称“同等级多Provider可流畅切换”。
+   providers的sealed capabilities，使用同一real-Shot validation set与frozen rubric分别通过，并完成
+   deterministic selection、denial、reopen与no-fallback tests。只有达到此层才能声称“在已认证visible
+   hard-cut directions上具备同等级boundary-aware Provider portability”。
 5. `FULL_MATRIX_READY`：每个对外声称支持的directed pair都拥有独立certification。没有完整矩阵时不得
-   声称“任意Provider双向无缝切换”。
+   声称“任意Provider双向无缝切换”；即使完整矩阵通过，`WITHIN_CONTINUOUS_TAKE`仍禁止cross-provider，
+   `SCENE_BOUNDARY`仍必须根据carryover或reset classification执行对应reference与QA合同。
 
 Local T8 C4 child完成只会把系统推进到`C4_DESTINATION_READY`；加入至少一个不同source pair后可达到
 `DIRECTED_TRANSITION_READY`。它不会单独达到`SAME_GRADE_MULTI_DESTINATION_READY`，因为Seedance
@@ -742,6 +853,8 @@ Local T8 C4 child完成只会把系统推进到`C4_DESTINATION_READY`；加入�
 | Workflow/compiler | literal `Hybrid`、exact node bindings、empty reference audio、deterministic payload order与output mapping |
 | Lifecycle | one-use local permit、submit/status/fetch、unknown-outcome recovery、candidate activation、reopen与exact replay zero effects |
 | Four-anchor smoke | one request、one selected model/profile、one submit、no retry、no fallback，记录全部input/output/request/profile/artifact hashes |
+| Boundary policy | `WITHIN_CONTINUOUS_TAKE`跨Providerzero-effect denial；hard-cut full continuity缺pair certification拒绝；scene carryover缺reference/QA拒绝；scene reset缺approved reset evidence拒绝 |
+| Real Shot Pilot | selected ProductionProject revision中的3–4个canonical Shots、至少2 edges、同一sealed snapshot、逐edge evidence与raw full-speed cumulative-drift review |
 | Boundary | decoded frame 0与terminal frame分别对比native first/last；报告measurement，不把native role夸大为pixel identity |
 | Identity | first/middle/last windows检查face/subject、hair、clothes、props、body scale与multi-frame drift；不足时`NOT_EVALUATED` |
 | Motion | subject/camera direction与velocity、action phase、entrance/exit、unexpected stop/re-entry；单帧SSIM不得代替 |
@@ -810,6 +923,10 @@ artifact/constraints/evaluator binding 后，其 content-addressed evidence 必�
 - `ProviderTransitionCertification`的exact persisted schema/layout尚未决定。Implementation plan必须先
   证明它能复用现有immutable evidence与Manifest pointer patterns；若需要Manifest/artifact layout migration，
   必须单独通过对应Decision Gate，不得由本spec暗含授权。
+- `ContinuityTransitionPolicy`当前冻结的是logical contract；exact persisted schema/layout尚未决定。实现必须
+  首先证明可由现有approved Shot/sequence intent、ResolvedTimeline identity与immutable evidence seam表达。
+  若需要Project、Manifest或artifact migration，必须另过Decision Gate。实现不得把`SCENE_BOUNDARY`硬编码成
+  `SUBSTANTIAL_RESET`，也不得在policy缺失时由Router或adapter猜测carryover dimensions。
 - Seedance frame/reference cross-mode union仍是unknown/unsupported-for-seal。只有formal Provider
   evidence或未来bounded probe能改变该model/profile结论；一次2xx不能直接改变grade。
 - T8 `MiniMaxH3AddGuide`迁移、non-pruned Hybrid builder研究与Turbo qualification均属于后续独立
@@ -822,7 +939,7 @@ artifact/constraints/evaluator binding 后，其 content-addressed evidence 必�
 2026-08-19 Local MiniMax H3 `fl2va` two-Shot proof由当时任务单独授权并完成。2026-08-20用户先对Alice C2 Hailuo 2.3与Seedance 2.0 Mini各最多一次remote submit作出独立task-scoped authorization，随后以“全部授权继续”批准解决已报告blocker所需的新bounded adaptive Hailuo request。该request已消费一次submit并完成canonical lifecycle；Seedance fresh budget已满足但仍因egress materialization gate保持零submit。两项lane都不扩展为blind retry、其他model/provider、`ref2va`、Shot Router或额外benchmark；任何后续live execution仍必须重新满足exact provider/model、预算、Cloud Egress与Paid Provider one-use permit。
 
 2026-08-22 v7 Seedance paid submit已经被该attempt消费，且result被用户拒绝并保持unactivated。本轮只授权
-canonical spec更新，不授权runtime implementation、local/cloud generation、paid preview/POST、permit
+canonical spec与plan更新，不授权runtime implementation、local/cloud generation、paid preview/POST、permit
 mint/consume或media quality claim。未来loopback local ComfyUI C4 smoke按repository local-unmetered
 execution contract无需重复请求task-scoped authorization，但仍必须通过sealed profile、preflight、local
 permit、唯一committer、recovery与media verification gates；任何remote/paid C4 probe仍必须在

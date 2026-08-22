@@ -15,7 +15,7 @@ certification。
 Hailuo 与 Seedance Mini attempts 继续作为 runtime record；它们不再决定 future capability target，也不
 构成 C4 或多 Provider acceptance。
 
-本轮只更新 plan。Plan 本身不授权 runtime implementation、模型安装/融合、ComfyUI 升级、local live
+本轮只更新 canonical spec 与 plan。Plan 本身不授权 runtime implementation、模型安装/融合、ComfyUI 升级、local live
 generation、remote/paid preview/POST、permit、activation、push 或 release。
 
 2026-08-22进一步接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
@@ -32,11 +32,14 @@ Implementation lane与Validation lane。Validation必须绑定immutable checkpoi
    inventory 默认只暴露 base；
 4. 用 immutable directed certification 表达具体的
    `source provider/model/profile/capability -> destination provider/model/profile/capability` transition；
-5. 只有至少两个不同 destination Providers 在同一 grade 上分别通过全部 gates，才允许声明
-   `SAME_GRADE_MULTI_DESTINATION_READY`。
+5. 用`ContinuityTransitionPolicy`把结构边界与残余连续性义务分开：continuous take锁定exact identity，
+   full-continuity hard cut只走已认证direction，scene boundary仍按identity/style carryover或显著reset执行；
+6. 只有至少两个不同 destination Providers 在同一 grade、同一real-Shot validation set上分别通过全部
+   gates，才允许声明`SAME_GRADE_MULTI_DESTINATION_READY`。
 
 目标不是 runtime 自动选模、失败降级或“任意 Provider 一键互换”。Planner/Router 只可显式选择已经
-sealed 且对 exact grade、model、profile 与 direction 完成认证的 destination。
+sealed 且对 exact grade、model、profile、boundary policy 与direction完成认证的destination。Adapter只解决
+协议、lifecycle与composition compatibility，不承诺跨模型identity、motion、camera或style等价。
 
 ## Scope
 
@@ -48,6 +51,8 @@ sealed 且对 exact grade、model、profile 与 direction 完成认证的 destin
 - `LocalH3VideoProviderFamily` additive child registration 与 exact dispatch；
 - local lifecycle、recovery、activation、reopen、replay 与 P5 closure；
 - four-anchor technical smoke、decoded boundary、identity、motion 与 P6/human evidence；
+- `ContinuityTransitionPolicy` logical contract、boundary/obligation组合与zero-effect Router gates；
+- 真实`ProductionProject`中的3–4 Shot Pilot、逐edge evidence、raw full-speed sequence review与累计漂移验收；
 - directed `ProviderTransitionCertification` persistence seam 与 exact pair certification；
 - Seedance 2.0 base/Fast/Mini 的 catalog、active inventory、profile、pricing、endpoint 与 response identity
   isolation；
@@ -69,6 +74,12 @@ sealed 且对 exact grade、model、profile 与 direction 完成认证的 destin
 - 不改变 Legacy CLI、default no-network、HyperFrames 或 `ResolvedTimeline` ownership；
 - 不把 transport success、hash closure、SSIM、reviewer verdict 或 fetched artifact当作 P6 Final
   Acceptance；
+- 不允许在`WITHIN_CONTINUOUS_TAKE`中途切换Provider；失败后只能以一个exact identity重生成整个take，或由
+  approved authoring revision先插入visible hard cut；
+- 不把`SCENE_BOUNDARY`自动解释为continuity reset。仍延续主角、服装、hero props、palette或强style时，
+  必须携带exact references并过普通QA；只有approved `SUBSTANTIAL_RESET`才允许近似自由portability；
+- 不用synthetic fixture、fake transport、single-boundary smoke或Harness receipt替代真实Shot generation、
+  full-speed human review与P6 acceptance；
 - 不承诺 `FULL_MATRIX_READY`，除非所有对外声明的有向 pair 都有独立 certification。
 
 ## Contract Surfaces
@@ -101,6 +112,28 @@ provider-native compiler/workflow。
 Grade E 失败不得自动改成 Grade S。两者必须使用不同 capability ID、request contract、product label、
 acceptance rubric 与 quality evidence。
 
+### Boundary-Aware Provider Portability Contract
+
+`ContinuityTransitionPolicy`必须把`boundary_kind`与`continuity_obligation`作为正交字段封存，不能用“换场”
+推断“连续性清零”：
+
+| Boundary kind | Continuity obligation | Execution rule |
+| --- | --- | --- |
+| `WITHIN_CONTINUOUS_TAKE` | only `FULL_CONTINUITY` | exact provider/model/profile/capability锁定；single generation或该exact identity正式支持的native extension；cross-provider effect为零 |
+| `HARD_CUT` | `FULL_CONTINUITY`或approved `IDENTITY_STYLE_CARRYOVER` | full continuity跨Provider要求fresh directed certification与C4；carryover要求exact references与普通QA，不得冒充C4 |
+| `SCENE_BOUNDARY` | explicit `IDENTITY_STYLE_CARRYOVER`或`SUBSTANTIAL_RESET` | carryover仍验证identity/wardrobe/props/style/palette references；只有显著scene/time/state reset才回到ordinary explicit selection |
+
+Policy至少绑定exact source/target Shots与revisions、resolved boundary identity、take membership（如适用）、
+source/destination exact identities、continuity grade、visible-cut/reset authoring evidence、
+`required_carryover_dimensions`及其Registry/materialization references、QA policy、allowed strategy、version与
+canonical hash。`IDENTITY_STYLE_CARRYOVER`的dimensions必须非空；`SUBSTANTIAL_RESET`的dimensions必须为空，
+且必须有approved reset evidence。任何字段漂移都产生新policy identity。
+
+Router必须在compiler/preview/permit/POST前拒绝：continuous-take cross-provider、uncertified full-continuity
+hard cut、缺reference或destination role的scene carryover、仍有carryover却标记reset、无效组合、tamper或与
+approved Shot/Timeline evidence冲突。`SUBSTANTIAL_RESET`只表示continuity obligation显著降低，不跳过普通
+capability、materialization、budget/egress（如适用）、output probe与QA。
+
 ### Local T8 Qualification Contract
 
 资格顺序固定为：
@@ -126,6 +159,24 @@ winner；失败时不得自动切换 candidate。候选 identities 固定为：
 
 同一 capability ID 后续不得替换 model bytes、artifact recipe 或 sampling profile。
 
+### Real Shot Generation Verification Contract
+
+Technical smoke之外，promotion必须选择一个exact `ProductionProject` revision和其中canonical Character、
+Scene、Shot artifacts，冻结`RealShotValidationSet`：
+
+- 3–4个叙事连续Shots、至少2个continuity edges；固定同一canonical主角与场景；
+- 至少一个subject-motion handoff和一个camera-motion handoff；
+- 每个input来自exact Registry revision及provenance/materialization receipt；
+- 每个generation为one exact identity、one submit、no retry、no fallback；
+- raw cuts原速整段观看，不用crossfade、optical flow、interpolation、retime或重构图隐藏跳变；
+- 逐edge保存terminal/identity/endpoint/motion-tail/policy/output hashes，再审查sequence-level identity、
+  wardrobe、style、camera velocity、action phase与spatial-storytelling累计漂移；
+- Implementation、media与P6 evidence绑定同一或byte-identical sealed `validation_snapshot`。
+
+Synthetic fixture、fake transport和single-boundary smoke可以在RED/technical gate中使用，但不能关闭
+`C4_DESTINATION_READY`。Directed certification必须来自canonical real Shots之间的visible
+`HARD_CUT + FULL_CONTINUITY`；same-grade destinations必须使用同一real-Shot set与frozen rubric。
+
 ### Seedance 2.0 Model Isolation Contract
 
 base、Fast 与 Mini 复用 Ark async task transport 和 `SeedanceVideoProvider` submit/status/fetch lifecycle，
@@ -148,6 +199,8 @@ active `SeedanceProviderProfile.capabilities` 或 Router snapshot。
 
 - exact source provider/model/profile/capability、accepted output与P6 evidence；
 - exact destination provider/model/profile/capability；
+- exact `ContinuityTransitionPolicy`、`boundary_kind=HARD_CUT`、
+  `continuity_obligation=FULL_CONTINUITY`、visible-cut evidence与real source/target Shot identities；
 - selected continuity grade 与 exact anchor contract hash；
 - terminal/motion-tail derivation与materialization receipts；
 - output normalization contract；
@@ -164,6 +217,10 @@ Certification 是 evidence，不是第二 lifecycle owner。Active pointer、can
 - Dependency Graph 独占 dependency、fingerprint、invalidation 与 rebuild frontier。
 - HyperFrames 是唯一默认 Production renderer。
 - Router 只选择一个 exact capability；family 只聚合和 exact dispatch，不保存 last-selected state。
+- `WITHIN_CONTINUOUS_TAKE`锁定一个exact provider/model/profile/capability；runtime不得中途替换或从失败frame
+  续接其他Provider。
+- `SCENE_BOUNDARY`不是reset证明；identity/style carryover必须有exact references与普通QA，只有approved
+  `SUBSTANTIAL_RESET`才允许近似自由的显式Provider selection。
 - Missing、duplicate、extra、wrong-order、tampered、stale 或 unsupported inputs必须在 compiler、preview、
   permit consume 与 Provider POST 前 fail closed，effect count 为零。
 - Local/paid attempt lifecycle、permit 与 evidence不得混合。
@@ -171,6 +228,8 @@ Certification 是 evidence，不是第二 lifecycle owner。Active pointer、can
 - Exact replay 不重复 Provider、artifact build、motion-tail extraction、activation 或 render effects。
 - C1/C2/C3、Legacy T2V/I2V/R2V、historical request/resolved hashes在 C4 fields缺失时保持兼容。
 - Technical PASS、live connectivity、quality acceptance 与 P6 Final Acceptance 分层报告。
+- Fixture、fake transport、synthetic anchors、single-edge smoke与Harness receipt不能替代canonical real-Shot
+  Pilot、raw full-speed review或P6/human acceptance。
 
 ## Current and Target Behavior
 
@@ -184,7 +243,10 @@ Certification 是 evidence，不是第二 lifecycle owner。Active pointer、can
 | Seedance exact C4 | cross-mode union未证明 | 继续fail closed；formal evidence不足不注册Grade E |
 | Seedance semantic C4 | 未注册 | optional base-only Grade S capability，独立授权与验收 |
 | Transition truth | provider/lane evidence分散 | immutable directed pair certification + Manifest-owned pointer |
-| Multi-provider claim | 不可声称流畅切换 | 达到相应claim level后只声明已认证grade与directions |
+| Boundary policy | 未形成provider-switch runtime contract | structural boundary与continuity obligation分离；continuous take锁定、carryover引用、reset证明均fail closed |
+| Adapter semantics | shared transport/字段mapping容易被误读为可互换 | 明确只提供protocol/lifecycle portability，不证明model-state或视觉等价 |
+| Real Shot verification | single edges与历史attempt不能证明sequence稳定性 | canonical 3–4 Shot Pilot、至少2 edges、raw full-speed累计漂移与P6 evidence |
+| Multi-provider claim | 不可声称流畅切换 | 只声明已认证hard-cut grade/directions；scene carryover/reset按policy单独标注 |
 
 ## Compatibility
 
@@ -195,8 +257,10 @@ Certification 是 evidence，不是第二 lifecycle owner。Active pointer、can
 - Existing `SeedanceVideoProvider` transport envelope保持；model isolation发生在 profile construction、
   capability selection、pricing、permit fingerprint与response validation。
 - Existing local child APIs 与 `LocalH3VideoProviderFamily` protocol保持；新child additive注册。
-- Schema/layout默认不变。若 transition certification 无法复用现有 immutable evidence + Manifest pointer seam，
-  必须触发 Decision Gate，先更新 spec/plan并取得 migration authorization。
+- `ContinuityTransitionPolicy`先作为logical contract验证现有approved Shot/sequence intent、Timeline identity与
+  immutable evidence seam；不得把scene boundary默认映射为reset，也不得由adapter猜测carryover。
+- Schema/layout默认不变。若 transition policy/certification 无法复用现有 immutable evidence + Manifest
+  pointer seam，必须触发 Decision Gate，先更新 spec/plan并取得 migration authorization。
 
 ## File and Ownership Map
 
@@ -248,8 +312,9 @@ Production child。
 
 - First inspect/reuse `src/ai_video/production/video_artifact.py`、lifecycle schema、Manifest pointer与
   `ProductionStateCommitter` seams。
-- If compatible without migration，create `src/ai_video/production/video_transition.py` for immutable model、
-  hash validation与pair adjudication，and create `tests/test_production_video_transition.py`。
+- If compatible without migration，create `src/ai_video/production/video_transition.py` for immutable
+  `ContinuityTransitionPolicy`、hash validation、boundary/obligation enforcement与pair adjudication，and create
+  `tests/test_production_video_transition.py`。
 - Modify committer/lifecycle tests only for the existing pointer seam proven by RED。
 - If persistence requires schema version、Manifest layout或artifact layout migration，stop before production edits；
   this plan does not authorize that branch。
@@ -292,9 +357,9 @@ Production child。
 
 ### Phase P0 — Shared Freeze
 
-Milestone 3先冻结inventory、four-anchor fixture、prompt、Stock20参数、rubric、candidate identities与effect
-budget。P0是两个lane的共同前置条件；冻结前不得启动M0 generation，也不得创建final Production
-capability identity。
+Milestone 3先冻结inventory、calibration fixture、exact `RealShotValidationSet`、每个edge的boundary/
+continuity obligation、references、prompt、Stock20参数、rubric、candidate identities与effect budget。P0是
+两个lane的共同前置条件；冻结前不得启动M0 generation，也不得创建final Production capability identity。
 
 ### Phase P1 — Qualification and Safe Implementation in Parallel
 
@@ -327,7 +392,7 @@ Milestone 5形成一个task-only checkpoint，并通过focused tests、preflight
 | Lane | Allowed work | Snapshot rule |
 | --- | --- | --- |
 | Implementation I2 | Milestone 6 fake lifecycle、recovery、replay、P5与documentation preparation | 可在与provider/profile/workflow不重叠的files继续；若修改validation snapshot中的任何bytes，必须产生新checkpoint并使旧Pilot不具备promotion资格 |
-| Validation V2 | Milestone 7先复核single boundary，再做3–4 Shot、至少2个continuity edges的single-Provider full-speed Pilot | 全程固定commit/profile/workflow/model/artifact/fixture/rubric；one submit per generation，no retry，no fallback |
+| Validation V2 | Milestone 7先复核single boundary，再用selected ProductionProject中的3–4个canonical real Shots、至少2个continuity edges做single-Provider raw full-speed Pilot | 全程固定commit/profile/workflow/model/artifact/RealShotValidationSet/policies/rubric；one submit per generation，no retry，no fallback；synthetic-only fixture不得promotion |
 
 Validation V2不得在I2尚未commit的working tree上运行，也不得把later code changes与earlier media receipts拼成
 同一acceptance bundle。
@@ -340,8 +405,8 @@ execution identity，必须重跑受影响的V2 gates。
 
 ### Phase P3 — Transition Work
 
-J2关闭后才开始Milestone 8 directed certification。Milestone 9 Seedance semantic lane可独立准备formal
-evidence，但不得作为Local失败fallback，也不得在J2前被用来声称multi-provider readiness。
+J2关闭后才开始Milestone 8 boundary policy与directed certification。Milestone 9 Seedance semantic lane可独立
+准备formal evidence，但不得作为Local失败fallback，也不得在J2前被用来声称multi-provider readiness。
 
 ## Milestone 1: Reconfirm C4 Core Closure
 
@@ -443,10 +508,19 @@ ref_audios       -> empty
 task_type        -> literal Hybrid
 ```
 
+### Real Shot Validation Set
+
+Technical fixture之外，同时从一个selected `ProductionProject` revision冻结3–4个canonical narrative Shots，
+至少形成2个`FULL_CONTINUITY` edges。记录exact Character、Scene、Shot revisions、Registry/materialization
+identities、每个edge的`ContinuityTransitionPolicy`、terminal/identity/endpoint/motion-tail来源、prompt、output
+geometry与predeclared rubric。Validation set必须固定同一主角与scene，并分别覆盖subject motion与camera
+motion；临时占位图、synthetic-only assets或prompt-only identity不能进入promotion set。
+
 ### Exit Criteria
 
-形成content-addressed qualification inputs、两个明确candidate states与P0 freeze receipt；尚未生成媒体
-时只能报告`qualification prepared`。P0关闭后可同时启动Implementation I1与Validation V1。
+形成content-addressed qualification inputs、`RealShotValidationSet`、boundary policies、两个明确candidate
+states与P0 freeze receipt；尚未生成媒体时只能报告`qualification prepared`。P0关闭后可同时启动
+Implementation I1与Validation V1。
 
 ## Milestone 4: Execute M0, Then Conditional M1
 
@@ -596,13 +670,19 @@ no fallback
 保存exact input SHA-256、Registry identities、request/resolved/fingerprint、workflow/profile/model/artifact
 hashes、submit/status/fetch receipts、output/probe、decoded first/last frame hashes与replay counters。
 
-Single-boundary technical smoke通过后，使用同一sealed snapshot继续3–4 Shot single-Provider Pilot：
+Single-boundary technical smoke通过后，使用同一sealed snapshot和Milestone 3冻结的
+`RealShotValidationSet`继续3–4 Shot single-Provider Pilot：
 
-- 至少3个Shots与2个continuity edges；
-- 同一canonical character与scene，包含一次明显subject motion和一次明显camera motion；
+- 所有Shots来自同一selected `ProductionProject` revision中的canonical Character/Scene/Shot artifacts；
+- 至少3个Shots与2个continuity edges，同一canonical character与scene，包含一次明显subject motion和一次
+  明显camera motion；
+- inputs全部来自exact Registry revision与provenance/materialization receipts，不接受临时未登记或
+  synthetic-only素材；
 - 每个generation各自one submit、no retry、no fallback；
 - 每个edge分别记录exact anchors、boundary/identity/motion evidence，不用平均分掩盖单edge失败；
-- 最终按full-speed sequence review累计identity drift、camera velocity drift、action phase与空间叙事连续性。
+- 最终以raw cuts按full-speed sequence review累计identity、wardrobe、style、camera velocity、action phase与
+  空间叙事连续性；crossfade、optical flow、interpolation、retime或重构图只能出现在标明用途的derivative，
+  不得进入acceptance evidence。
 
 ### Quality Gates
 
@@ -617,19 +697,41 @@ Single-boundary technical smoke通过后，使用同一sealed snapshot继续3–
 
 ### Exit Criteria
 
-全部通过后达到`C4_DESTINATION_READY`。任何quality dimension rejection、`NOT_EVALUATED`缺human fallback、
+只有technical smoke和真实Shot Pilot全部通过后达到`C4_DESTINATION_READY`。任何quality dimension
+rejection、`NOT_EVALUATED`缺human fallback、synthetic-only或临时素材、
 unknown outcome或incomplete evidence都保持`experimental / unavailable`。Promotion bundle必须同时包含
 Milestone 6的I2 evidence与本milestone的V2 evidence，并证明二者绑定same/byte-identical
 `validation_snapshot`，从而关闭Join Gate J2。
 
 ## Milestone 8: Establish Directed Transition Certification
 
+### Boundary Policy RED
+
+先固定`ContinuityTransitionPolicy` behavior，所有denial均发生在compiler/preview/permit/POST之前且effect count
+为零：
+
+1. `WITHIN_CONTINUOUS_TAKE`只能使用一个exact provider/model/profile/capability；identity或take membership
+   漂移即拒绝；失败后从中间frame换Provider也拒绝；
+2. `HARD_CUT + FULL_CONTINUITY`跨Provider但缺fresh exact directed certification时拒绝；
+3. `HARD_CUT + IDENTITY_STYLE_CARRYOVER`只消费approved exact references与普通QA，不能获得C4 claim；
+4. `SCENE_BOUNDARY + IDENTITY_STYLE_CARRYOVER`必须有非空dimensions、逐项Registry/materialization
+   references、destination role capability与QA policy；缺任一项拒绝；
+5. `SCENE_BOUNDARY + SUBSTANTIAL_RESET`必须有approved scene/time/state reset evidence且dimensions为空；只凭
+   structural scene change、Provider change或事后质量失败标记reset时拒绝；
+6. policy kind/obligation无效组合、tamper、wrong Shot/Timeline或changed reference/QA hash均拒绝；
+7. approved whole-take regeneration或新authoring revision插入visible hard cut会形成新policy/attempt identity，
+   不复用失败attempt effect token。
+
+若logical contract无法在现有Project/Shot intent、ResolvedTimeline与immutable evidence seam内表达，必须在
+schema/layout edit前触发Decision Gate；不得先把`SCENE_BOUNDARY`硬编码成reset。
+
 ### Persistence Seam Spike
 
 先用tests验证existing immutable evidence + Manifest pointer能否表达certification，且不新增writer或mutable
 lifecycle：
 
-- content hash覆盖source/destination exact identities、grade、anchors、normalization与全部evidence；
+- content hash覆盖exact boundary policy、source/destination identities、real Shot identities、grade、anchors、
+  normalization与全部evidence；
 - reverse direction、不同model/profile、不同grade或changed output normalization产生不同identity；
 - pointer tamper、missing evidence、source未activated/P6未接受、destination未ready全部fail closed；
 - replay只reopen/revalidate，不重复Provider或committer effect。
@@ -639,13 +741,15 @@ Manifest/artifact migration，在任何production schema edit前停止并触发D
 
 ### First Directed Pairs
 
-只对已有accepted source output、exact terminal/motion-tail derivation与ready Local destination建立pair。
-每个direction独立运行：
+只对已有accepted source output、exact terminal/motion-tail derivation与ready Local destination建立pair。首个
+pair必须来自selected `ProductionProject`中两个canonical real Shots之间的visible
+`HARD_CUT + FULL_CONTINUITY`，使用Milestone 7同一或byte-identical sealed snapshot和frozen rubric；
+synthetic-only、rejected或unactivated source不合格。每个direction独立运行：
 
 1. source evidence reopen；
 2. exact anchor derivation/materialization；
-3. Local C4 destination generation；
-4. normalization、boundary、identity、motion与P6；
+3. one-submit/no-retry/no-fallback Local C4 destination generation；
+4. raw-cut full-speed normalization、boundary、identity、wardrobe/style、motion与P6；
 5. immutable certification seal与reopen/replay。
 
 Reverse direction不自动成立。历史failed/unactivated Seedance result不能作为accepted source。
@@ -653,7 +757,8 @@ Reverse direction不自动成立。历史failed/unactivated Seedance result不�
 ### Exit Criteria
 
 至少一个不同source Provider到Local T8的pair通过后达到`DIRECTED_TRANSITION_READY`，声明必须写出exact
-direction；仍不能说“多个destination可流畅切换”。
+direction、hard-cut policy与real Shot evidence；仍不能说“多个destination可流畅切换”，也不能把该结果
+外推到continuous take、scene carryover或scene reset。
 
 ## Milestone 9: Optional Base Seedance 2.0 Semantic Destination
 
@@ -680,15 +785,18 @@ exact Grade E seal。
 `C4_SEMANTIC_MULTI_REFERENCE` destination ready。它与Local Grade E不是同一grade，不能合并为
 `SAME_GRADE_MULTI_DESTINATION_READY`。
 
-## Milestone 10: Same-Grade Multi-Destination Gate
+## Milestone 10: Same-Grade Boundary-Aware Multi-Destination Gate
 
-达到“同等级多 Provider 可流畅切换”前必须存在至少两个不同destination Providers，各自：
+达到“在已认证visible hard-cut directions上具备同等级boundary-aware Provider portability”前，必须存在
+至少两个不同destination Providers，各自：
 
-- 使用同一provider-neutral grade、fixture与frozen rubric；
+- 使用同一provider-neutral grade、同一canonical `RealShotValidationSet`与frozen rubric；
 - 拥有独立exact capability/profile/model/pricing/evidence；
 - 通过compile、denial、lifecycle、live、boundary、identity、motion、P6与replay；
 - 通过deterministic explicit selection与no-fallback tests；
-- 对每个声明的source direction拥有独立certification。
+- 对每个声明的source direction拥有独立real-Shot hard-cut certification；
+- 保持`WITHIN_CONTINUOUS_TAKE` cross-provider denial，并分别验证scene carryover references/QA与
+  `SUBSTANTIAL_RESET` evidence；不得把本milestone解释为任意边界自由切换。
 
 当前已知Provider evidence不足以安排第二个Grade E destination，因此本milestone是hard claim gate，不是
 可以由Local T8或Seedance Grade S单独关闭的implementation checklist。第二个same-grade destination出现
@@ -743,25 +851,30 @@ Harness不执行Provider、paid call、media generation或P6；receipt只能证�
 ### `C4_DESTINATION_READY`
 
 - 一个winner-specific Local T8 child完成profile/preflight、fake lifecycle、full four-anchor local smoke、
-  3–4 Shot single-Provider Pilot、activation/reopen/replay、boundary/identity/motion与P6/human acceptance；
+  selected ProductionProject中的3–4个canonical real Shots、至少2 edges的raw full-speed single-Provider Pilot、
+  activation/reopen/replay、boundary/identity/motion与P6/human acceptance；
 - Implementation与Validation evidence绑定same/byte-identical sealed snapshot，Join Gate J2关闭。
 
 ### `DIRECTED_TRANSITION_READY`
 
-- 至少一个source与不同destination Provider的exact direction拥有fresh immutable certification。
+- 至少一个source与不同destination Provider的exact direction拥有fresh immutable certification；该证据必须
+  来自canonical real Shots之间的visible `HARD_CUT + FULL_CONTINUITY`。
 
 ### `SAME_GRADE_MULTI_DESTINATION_READY`
 
-- 同一grade至少两个不同destination Providers完成独立sealed capability与全部acceptance；
+- 同一grade至少两个不同destination Providers使用同一canonical `RealShotValidationSet`与frozen rubric完成
+  独立sealed capability与全部acceptance；
 - explicit selection、denial、reopen、replay与no-fallback tests通过。
 
 ### `FULL_MATRIX_READY`
 
 - 每个对外声明支持的directed pair都拥有独立fresh certification。
+- `WITHIN_CONTINUOUS_TAKE`仍保持cross-provider denial；`SCENE_BOUNDARY`仍分别执行carryover references/QA或
+  approved `SUBSTANTIAL_RESET` contract。
 
 低层级不得代替高层级。Local T8 child完成后最多升级到`C4_DESTINATION_READY`；加一个跨Provider source
 pair后最多升级到`DIRECTED_TRANSITION_READY`。在第二个same-grade destination通过前，最终交付必须明确
-写“尚不能声称多 Provider 同等级流畅切换”。
+写“尚不能声称在已认证hard-cut directions上具备同等级boundary-aware Provider portability”。
 
 ## Verification Matrix
 
@@ -774,19 +887,20 @@ pair后最多升级到`DIRECTED_TRANSITION_READY`。在第二个same-grade desti
 | Lifecycle | permit、submit/status/fetch、unknown recovery、candidate/activation/reopen/replay |
 | P5 | four exact inputs的precise closure；unrelated assets保持fresh |
 | Local live | one request、one submit、no retry、no fallback，全部input/output hashes |
-| Multi-shot Pilot | 3–4 Shots、至少2 edges、same snapshot、逐edge evidence与full-speed cumulative drift review |
+| Boundary policy | continuous-take provider lock；uncertified hard-cut denial；scene carryover reference/QA denial；scene reset evidence/tamper denial |
+| Real Shot Pilot | selected ProductionProject的3–4 canonical Shots、至少2 edges、same snapshot、raw cuts、逐edge evidence与full-speed cumulative drift review |
 | Boundary | decoded frame 0/terminal evidence，native role与pixel equality分开 |
 | Identity | multi-window subject/appearance/drift；不足为`NOT_EVALUATED` |
 | Motion | direction、velocity、phase、entrance/exit、stop/re-entry |
 | P6/Human | exact evidence + human verdict，由P6唯一给Final Acceptance |
-| Transition | exact directed pair、grade、normalization、evidence hash、tamper/reverse denial |
+| Transition | exact real-Shot hard-cut directed pair、policy、grade、normalization、evidence hash、tamper/reverse denial |
 | Harness | exact staged snapshot或commit range的fresh passing receipt |
 
 ## Execution Order
 
 ```text
 P0 / Milestone 3
-freeze inventory + fixture + candidates + rubric
+freeze inventory + RealShotValidationSet + policies + candidates + rubric
                      |
           +----------+----------+
           |                     |
@@ -807,7 +921,7 @@ Milestone 5 RED/common     conditional M1
           |                     |
 Implementation I2          Validation V2
 Milestone 6               Milestone 7
-lifecycle/replay/P5       3-4 Shot Pilot + P6
+lifecycle/replay/P5       3-4 real Shot Pilot + P6
           |                     |
           +----------+----------+
                      |
@@ -815,7 +929,7 @@ lifecycle/replay/P5       3-4 Shot Pilot + P6
               C4_DESTINATION_READY
                      |
               Milestone 8
-              directed certification
+              boundary policy + real hard-cut certification
 
 Milestone 9  optional base Seedance semantic lane
 Milestone 10 same-grade second-destination claim gate
@@ -835,6 +949,10 @@ ownership或顺序。
 - Seedance entitlement/profile/pricing不完整：active snapshot不暴露model；preview/POST effect count为零。
 - Provider response model mismatch：fail closed，不接受family-compatible替代。
 - Grade E quality失败：不自动改为Grade S。
+- Continuous-take attempt失败：只允许一个exact identity重生成整个sealed take，或由approved authoring
+  revision新增visible hard cut后创建新policy/attempt；不得中途换Provider。
+- Scene boundary仍有identity/style carryover：保留exact references并过普通QA；不得事后改标
+  `SUBSTANTIAL_RESET`逃避失败gate。
 - Certification tamper/stale：拒绝transition claim，不影响canonical source/destination lifecycle truth。
 - Persistence需要migration：在schema/layout edit前停止并请求Decision Gate。
 - Reviewer/Harness失败：修复并重新验证exact snapshot，不用旧receipt覆盖。
@@ -844,15 +962,20 @@ ownership或顺序。
 本计划的第一可交付终点是：
 
 - Seedance 2.0 shared transport与base/Fast/Mini exact model isolation已实现，active inventory为base only；
-- Local T8一个winner-specific C4 destination达到`C4_DESTINATION_READY`；
-- 至少一个不同source Provider到Local T8的exact direction达到`DIRECTED_TRANSITION_READY`；
+- boundary kind与continuity obligation分离，continuous-take lock、scene carryover与substantial-reset gates均有
+  executable zero-effect tests；
+- Local T8一个winner-specific C4 destination通过canonical 3–4 real Shot Pilot并达到
+  `C4_DESTINATION_READY`；
+- 至少一个不同source Provider到Local T8的real-Shot visible hard-cut exact direction达到
+  `DIRECTED_TRANSITION_READY`；
 - canonical docs、independent review与exact Harness receipts完成；
 - 未购买、未授权、未验证或不同grade的routes继续fail closed。
 
 并行执行本身不构成acceptance。Final evidence必须证明Implementation I2与Validation V2绑定同一或
-byte-identical `validation_snapshot`；若candidate source、workflow、profile、model/artifact、fixture或
-rubric在Pilot期间漂移，相关Pilot必须重新运行。
+byte-identical `validation_snapshot`；若candidate source、workflow、profile、model/artifact、
+RealShotValidationSet、boundary policy、references或rubric在Pilot期间漂移，相关Pilot必须重新运行。
 
-这仍不等于“多 Provider destination可以同等级流畅切换”。只有Milestone 10的第二个same-grade destination
-和对应directed certifications真正完成后，才能升级该产品声明；只有完整声明矩阵逐项认证后，才能称
-`FULL_MATRIX_READY`。
+这仍不等于“多 Provider destination可以任意流畅切换”。只有Milestone 10的第二个same-grade destination
+和对应real-Shot hard-cut certifications真正完成后，才能升级为已认证boundary-aware portability；只有完整
+声明矩阵逐项认证后，才能称`FULL_MATRIX_READY`。任何层级都不授权continuous-take cross-provider，换场也
+必须先区分carryover与approved reset。
