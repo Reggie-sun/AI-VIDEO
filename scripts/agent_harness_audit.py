@@ -7,6 +7,11 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+try:
+    from scripts import docs_contract_gate
+except ModuleNotFoundError:  # Direct ``python scripts/agent_harness.py`` execution.
+    import docs_contract_gate  # type: ignore[no-redef]
+
 
 NON_BEHAVIORAL_CHECK_IDS = {"scope_diff_check", "task_architecture_gate"}
 
@@ -57,9 +62,16 @@ def audit_policy_coverage(
     missing = sorted(
         path for path in referenced_test_paths if not (project_root / path).is_file()
     )
+    docs_contract_diagnostics = []
+    if "docs_contract_check" in policy["checks"]:
+        result = docs_contract_gate.check_repository(project_root)
+        docs_contract_diagnostics = [
+            item.render() for item in result.diagnostics
+        ]
     return {
         "candidate_count": len(candidates),
         "unmapped_paths": sorted(unmapped),
         "unverified_paths": sorted(unverified),
         "missing_check_test_paths": missing,
+        "docs_contract_diagnostics": docs_contract_diagnostics,
     }

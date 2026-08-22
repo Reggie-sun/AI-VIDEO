@@ -1,16 +1,26 @@
+---
+surface_id: quality_experience_record_v1
+canonical: true
+spec_status: accepted
+implementation_status: implemented_offline
+live_status: not_applicable
+quality_status: not_evaluated
+release_status: unreleased
+runtime_status_owner: docs/v0.2-runtime-baseline.md
+roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+contract_version: quality-experience-record/1.0
+---
+
 # AI-VIDEO QualityExperienceRecord v1 Specification
 
 ## Status
 
-Proposed docs-only contract。本文定义 `Q0 passive capture` 的数据边界，尚未实现
-schema、validator、serializer、store、Pilot dataset、exact lookup 或 RAG projection。
-它不授权 Provider execution、media generation、Agent Memory rebuild、Pilot GO、自动学习、
-自动选参、automatic Provider selection、repair、activation、P6 verdict 或 Final Acceptance。
-
-Planning base 是 local `main` commit `33beb13d5b8ae68ee109e41d2df7f186ea1f1b1b`。
-该 commit 已包含 `7c22cae` 的 Quality Intelligence start gate 与后续 Local H3 Provider
-family runtime change。本文只描述 proposed additive data contract；current code/tests/runtime
-truth 仍以 repository 和 fresh execution evidence 为准。
+Accepted and implemented offline for Q0。Strict schema/validation、content-addressed store、immutable
+dataset closure、exact lookup、historical import与sanitized deterministic RAG projection已有source/test
+evidence。Pilot尚未执行；Q0 implementation不授权Provider execution、media generation、Agent Memory
+rebuild、Pilot GO、Q1/Q2、自动学习、自动选参、automatic Provider selection、repair、activation、P6
+verdict、quality acceptance或Final Acceptance。动态实现与evidence状态由
+`docs/v0.2-runtime-baseline.md`记录。
 
 ## Decision
 
@@ -64,7 +74,7 @@ index不引用Markdown或RAG collection。这样不会形成lifecycle或content-
 
 ### Single owner
 
-Future implementation 的 single writer 是 top-level advisory module
+Implemented Q0 single writer 是 top-level advisory module
 `ai_video.quality_intelligence.QualityExperienceStore`。它只拥有显式传入的
 `pilot_dataset_root/quality-experience/v1/`，不属于 `ai_video.production`，也不获得
 Production project root、Manifest、Registry、P6 receipt 或 activation 的 write authority。
@@ -287,7 +297,7 @@ Q0 不额外复制。Error、repr、fixture、projection与Harness receipt使用
 
 ### Q0 passive capture
 
-Future minimum implementation slice只实现strict schema、validator、serializer/store、cohort/roster、
+Current minimum Q0 implementation只实现strict schema、validator、serializer/store、cohort/roster、
 legacy import、Pilot index、exact lookup、sanitized projection和fake/no-network tests。它不改变任何
 generation或acceptance decision。
 
@@ -316,7 +326,7 @@ Automatic Provider selection、automatic repair和Final Acceptance当前没有st
 - Legacy CLI/Manifest/layout不变；不新增public CLI、database、service、dependency、training job、
   Provider fallback或remote/paid path。
 
-## Acceptance Criteria For The Future Runtime Slice
+## Acceptance Criteria For The Q0 Runtime Slice
 
 1. Prospective success、failure、outcome-unknown和repair/new-attempt fixtures strict validate。
 2. Records/indexes canonical serialize、content/file hash、no-follow reopen和zero-write replay可证明。
@@ -327,6 +337,6 @@ Automatic Provider selection、automatic repair和Final Acceptance当前没有st
    全部被拒绝。
 6. Legacy imports只迁移evidence-backed fields，unknown/incomplete保持typed且不能进入Pilot index。
 7. Tests证明Q0不写Production root、不调用Provider/analyzer/recovery/activation、不修改P6 state。
-8. Harness为future source/tests路由focused Quality Intelligence tests和task Architecture Gate。
-9. 只有上述implementation取得fresh passing exact-snapshot receipt后，下一次Pilot才可作为
-   prospective Q0 dataset开始；本docs-only Spec不满足该gate。
+8. Harness为source/tests路由focused Quality Intelligence tests和task Architecture Gate。
+9. Q0 source/test closure本身不启动Pilot；仍需独立授权和fresh runtime evidence后才能开始
+   prospective Q0 dataset。

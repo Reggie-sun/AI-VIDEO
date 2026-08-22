@@ -1,12 +1,33 @@
+---
+surface_id: shot_continuity
+canonical: true
+spec_status: accepted
+implementation_status: implemented_offline
+live_status: partial
+quality_status: partial
+release_status: unreleased
+runtime_status_owner: docs/v0.2-runtime-baseline.md
+roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+---
+
 # AI-VIDEO Shot Continuity Specification
 
 ## Status
 
-本文档最初是独立的 docs-only proposed contract。2026-08-19后续task-scoped implementation已完成provider-neutral request/evidence、Manifest 2.8 activation/recovery、P5 precise invalidation、Hailuo 2.3与Seedance 2.0 Mini offline adapter mapping，以及Local MiniMax H3 `fl2va` sealed workflow/profile、loopback-only `ComfyUIVideoProvider`和durable local submit/status/fetch/activation/recovery evidence。一次获授权的two-Shot live-local proof已证明Shot A exact terminal PNG进入Shot B `first_frame`，两段MP4均完成measured validation、activation、reopen与zero-call replay。2026-08-20后续bounded authorizations生成并激活Alice咖啡厅C2 shared terminal/keyframe，并以新的adaptive Hailuo 2.3 request完成one-submit、fetch、canonical activation/recovery/replay与人工review；Seedance 2.0 Mini已得到fresh `3 CNY` preview，但因缺少exact Ark registered asset materialization仍在POST前fail closed。Local H3 C2 Shot 2、Seedance live、`ref2va`和blinded comparative acceptance仍未完成；既有P8 remote/Paid Provider contract不被改写。
+Accepted with implemented offline foundations and partial live/quality evidence。Provider-neutral
+request/evidence、activation/recovery、P5 precise invalidation、offline adapter mapping及local continuity
+seams已有实现；具体live attempts、human decisions与dynamic branch状态由runtime baseline和exact records/
+receipts记录，不由本normative spec固定。Seedance live、`ref2va`和blinded comparative acceptance仍未
+完成；既有P8 remote/Paid Provider contract不被改写。
 
 当前已实现frame-accurate composition与显式Local H3 terminal-to-first-frame continuity lane：generated MP4仍进入唯一的`CompositionSpec -> ResolvedTimeline -> HyperFrames`路径并保持P4 audio/caption/final mux语义。该lane不会让任意三个独立生成的Shot自动共享场景、角色、镜头轴线、光线或运动状态；只有带exact continuity binding并逐Shot生成的edge获得技术保证，语义质量仍需独立人工验收。
 
-2026-08-22本规范继续作为唯一Shot Continuity canonical owner，并冻结新的`C4_MULTI_ANCHOR_MOTION_CONTINUITY` target contract；不创建平行spec。该C4 contract的documentation状态为`frozen target / implementation pending`，不是当前runtime truth、Provider capability acceptance或live authorization。`runs/t8-h3-seedance-3shot-continuity-20260822-v7/`保留为失败证据：用户在full-speed viewing后明确拒绝人物identity与camera-motion continuity，Seedance result保持fetched但unactivated。历史native reviewer的`accept with concerns`、junction SSIM与MCP empty issue list均不得覆盖该user rejection或升级为Final Acceptance。
+本规范继续作为唯一Shot Continuity canonical owner，并冻结
+`C4_MULTI_ANCHOR_MOTION_CONTINUITY` target contract；不创建平行spec。该C4 contract为
+`frozen target / implementation pending`，不是current runtime truth、Provider capability acceptance
+或live authorization。具体失败run、artifact hashes、automatic metrics与human decisions只进入runtime
+baseline、exact receipts或`docs/record_for_agent/`；任何单次review或similarity metric都不得升级为
+Final Acceptance。
 
 ## Goal
 
@@ -272,7 +293,10 @@ Local H3 `fl2va` lane 的 reviewed upstream baseline 是 Comfy-Org 官方 I2V wo
 
 Local H3 `fl2va` production lane现由`workflows/templates/minimax_h3_fl2va_api.json`、`workflows/bindings/minimax_h3_fl2va_binding.yaml`与`workflows/profiles/minimax_h3_fl2va.json`固定。Profile seal official upstream provenance、derived workflow SHA-256 `c736a12f35fd89f10a8db86f0769a85ca7bceb80d16feab62a1666cfd078737b`、binding SHA-256 `e0ae28bdaaa81ac70578b11e97f95cacab826273ec09f82bfcf430176fb05a4c`、ComfyUI commit `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、四个model component hashes、native node inventory、literal loopback endpoint、24fps、17k+5 frame-grid、124-362 trained frame boundary、native audio与MP4 output bounds；profile content hash为`456b59c7a907d4b07c7d951d63ec03cbd0fb5c64638dbc8dad870aca09e2b604`。
 
-2026-08-19获授权的live-local proof位于`runs/h3-shot-continuity-live-20260819-v3/`。它在`http://127.0.0.1:8188`上完成两次proof submit和零次remote call：Shot A MP4 SHA-256为`c06eb0c4a89fdb3837ef4111b3ddf945b5c5dca00750762f2eb91163b19b1448`，其frame 123 exact terminal PNG SHA-256为`cb5bbc17ad361b4b8445657608e245c179446efb68a5976b4df09eb0ecbaf42c`；Shot B `first_frame`绑定同一asset与SHA-256，输出MP4 SHA-256为`e2a54e9cbced71ff4eb2fe1afb6485e1591741af59ef80ecb9874f12373a7946`，replay新增submit为零。两段均为608x352、24fps、124 frames、5.167秒、H.264 + AAC，并完成candidate/terminal activation与Manifest revision 21 reopen。此前一次diagnostic submit在fixture activation阶段fail closed，不计入accepted proof且未blind retry。
+Local live proof的exact run path、artifact hashes、probe measurements、Manifest revision与replay receipt
+由runtime baseline和durable records拥有。本normative spec只保留约束：Shot B必须消费Shot A exact
+terminal bytes，candidate/terminal activation与reopen必须成功，exact replay不得增加submit，失败的
+diagnostic attempt不得计入accepted proof或blind retry。
 
 Local H3的profile边界如下：
 
@@ -312,7 +336,12 @@ Local H3的成本控制角色是低边际成本draft lane，而不是自动替�
 
 ### MiniMax Cloud Hailuo 2.3
 
-MiniMax 官方 I2V contract 当前列出 `MiniMax-Hailuo-2.3`，以 `first_frame_image` 接收首帧图像；官方 model guide 同时把 Hailuo 2.3列为 T2V/I2V model。当前仓库adapter已增加并offline验证独立I2V capability/payload mapping；它不声明`last_frame`。首个Alice C2 result把I2V `768P` geometry收敛为adaptive；其non-canonical receipt migration继续只作为失败证据保留。用户随后授权的新adaptive request消费同一exact activated keyframe，唯一一次POST产生task `432581080539416`，8次poll后fetch MP4 SHA-256 `90b4fc1842b4a74332ebcae7e20c1e0cc1cdd7166037702e4dd1b37d2ed0bdca`；真实输出为H.264 `1326x768@24fps`、141 frames、5.875s、无音轨，并完成canonical activation、reopen、recovery与zero-effect exact replay。首帧与shared keyframe SSIM `0.941854`，black/freeze检测为零。人工review接受本Hailuo lane并保留轻微facial variation concern；官方 first/last-frame示例属于其他明确model时，仍不得推断Hailuo 2.3支持未声明的`last_frame`。
+MiniMax 官方 I2V contract当前列出`MiniMax-Hailuo-2.3`，以`first_frame_image`接收首帧；
+adapter已offline验证独立I2V mapping且不声明`last_frame`。Representative adaptive request的task ID、
+artifact hash、probe、similarity metric与human review结论只记录在runtime baseline、exact receipts和
+experiment records；本spec只约束exact activated keyframe consumption、canonical
+activation/reopen/recovery与zero-effect replay。其它model的first/last-frame示例不得外推为Hailuo
+2.3支持未声明的`last_frame`。
 
 References:
 
@@ -322,7 +351,14 @@ References:
 
 ### Seedance 2.0 Mini
 
-当前仓库capability table与adapter已对`doubao-seedance-2-0-mini-260615`的I2V first-frame、optional last-frame、audio opt out、response/fetch与permit mapping完成offline executable acceptance；这不等于continuity live、billing settlement、activation或quality acceptance。2026-08-20 Alice C2 preflight完成exact model/capability resolution并seal `generate_audio=false`。Fresh pricing以官方无视频输入单价`23 CNY / million tokens`和仓库公式估算2.484 CNY，seal保守`3 CNY` upper bound并成功生成preview。同日后续bugfix已增加`SeedanceAssetMaterializationReceipt`与`SeedanceAssetReferenceResolver`，补齐already-materialized Ark identity的可信导入owner，并拒绝local Registry ID伪装为`asset://`。shared local PNG仍尚未在Ark Console materialize为真实`asset-...`且没有exact confirmation evidence，因此Paid Provider authorization/permit仍未创建、remote submit为零。P8 Seedance spec另有一个尚未实现的inline-Base64 synthetic/illustrated proposal；它只适用于有sealed provenance与human attestation的明确非真人/非受保护角色或普通非角色图片，不能用于Alice这类photorealistic person、不能改变本lane现有blocker，也不能猜测upload endpoint、使用第三方临时URL或让upstream变化绕过sealed capability identity。
+当前capability table与adapter已对`doubao-seedance-2-0-mini-260615`的I2V first-frame、optional
+last-frame、audio opt out、response/fetch与permit mapping完成offline executable acceptance；这不等于
+continuity live、billing settlement、activation或quality acceptance。单次price、preview与task状态只由
+runtime baseline/records拥有。`SeedanceAssetMaterializationReceipt`与
+`SeedanceAssetReferenceResolver`独占already-materialized Ark identity导出并拒绝local Registry ID
+伪装`asset://`；缺少exact active materialization evidence时必须在authorization/permit/submit前fail
+closed。Synthetic/illustrated proposal不得用于photorealistic person，也不得猜测upload endpoint、使用
+第三方临时URL或绕过sealed capability identity。
 
 此前 Seedance Mini diagnostic 只证明一次 cloud connectivity 和 fetched MP4；它不证明 tracked continuity payload、billing settlement、activation 或 quality acceptance。
 
@@ -398,7 +434,10 @@ P5 graph 必须表达一个 typed continuity dependency：Shot N 的 exact activ
 
 自动 `video-analysis` 与人工 review 是不同 gate。两者分别检查 scene/character identity、camera axis/direction、motion direction、lighting/color、entrance/exit state和叙事空间关系；任何单一 similarity score 不得替代逐项 verdict。
 
-当前Local H3 evidence已确认Shot A最后解码帧与terminal PNG byte-identical；Shot B首个解码帧相对该terminal PNG为PSNR `33.73 dB`、SSIM `0.791`，无转场side-by-side显示主体、构图、光线与屏幕方向连续。Project-local `video-analysis`确认两段均为单一scene且124个视频帧没有重复，同时将608x352标记为低于其1024x576 iteration review建议基线。因此该证据只满足本lane的technical live-local proof，不能替代blinded human rubric或宣称subjective quality accepted。
+Local H3 measured evidence必须证明terminal extraction与next-Shot input exact binding，并保留probe、
+frame-integrity和side-by-side artifacts。具体PSNR/SSIM、resolution、frame count与analyzer output进入
+runtime baseline或exact record，不在本normative spec固化；任何该类evidence都只满足technical
+live-local proof，不能替代blinded human rubric或宣称subjective quality accepted。
 
 ### Acceptance Tiers
 

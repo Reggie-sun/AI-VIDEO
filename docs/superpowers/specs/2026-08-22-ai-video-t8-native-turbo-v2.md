@@ -2,9 +2,9 @@
 surface_id: t8_native_turbo_v2
 canonical: true
 spec_status: accepted
-implementation_status: implemented_offline
-live_status: not_run
-quality_status: not_evaluated
+implementation_status: implemented
+live_status: accepted
+quality_status: partial
 release_status: unreleased
 runtime_status_owner: docs/v0.2-runtime-baseline.md
 roadmap_owner: docs/v0.2-agentic-production-roadmap.md

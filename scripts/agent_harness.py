@@ -808,6 +808,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "unmapped_paths",
                 "unverified_paths",
                 "missing_check_test_paths",
+                "docs_contract_diagnostics",
             )
         ) else 1
 

@@ -25,7 +25,15 @@ sensitive_patterns:
   - "**/*secret*"
 
 audit_patterns:
+  - AGENTS.md
+  - README.md
   - .github/workflows/**
+  - .agent/harness/docs-contracts.yaml
+  - docs/agent-primary-contract-matrix.md
+  - docs/v0.2-runtime-baseline.md
+  - docs/v0.2-agentic-production-roadmap.md
+  - docs/superpowers/specs/**
+  - docs/superpowers/plans/**
   - src/**/*.py
   - scripts/*.py
   - scripts/**/*.py
@@ -40,6 +48,7 @@ audit_exempt_patterns:
 
 always_check_ids:
   - scope_diff_check
+  - docs_contract_check
 
 fallback_check_ids:
   - full_tests
@@ -51,6 +60,10 @@ checks:
     cwd: .
     scope_diff: true
     description: Check exact staged or commit-range patch whitespace and conflict markers.
+  docs_contract_check:
+    argv: [python, -m, scripts.docs_contract_gate, check]
+    cwd: .
+    description: Verify canonical documentation metadata and repository contract coherence.
   composition_playbook_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_composition_playbooks.py, -q]
     cwd: .
@@ -64,7 +77,7 @@ checks:
     cwd: .
     description: Verify Product Runtime isolation from Development Governance composition tooling.
   harness_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_agent_harness.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, -q]
     cwd: .
     description: Verify Harness scope, routing, isolation, receipts, and Make targets.
   architecture_tests:
@@ -170,12 +183,14 @@ categories:
       - AGENTS.md
       - Makefile
       - docs/agent-primary-contract-matrix.md
+      - scripts/docs_contract_gate.py
       - scripts/agent_harness_audit.py
       - scripts/agent_harness.py
       - scripts/agent_harness_receipt.py
       - scripts/agent_harness_runtime.py
       - scripts/harness_pytest_guard.py
       - tests/test_agent_harness.py
+      - tests/test_docs_contract_gate.py
       - .agent/harness/**
     check_ids:
       - harness_tests
@@ -184,7 +199,8 @@ categories:
       - README.md
       - docs/**
       - "*.md"
-    check_ids: []
+    check_ids:
+      - docs_contract_check
   architecture_tooling:
     patterns:
       - architecture_gate.toml

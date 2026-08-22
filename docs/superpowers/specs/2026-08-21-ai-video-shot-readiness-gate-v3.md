@@ -1,17 +1,30 @@
+---
+surface_id: shot_readiness_gate
+canonical: true
+spec_status: accepted
+implementation_status: implemented_offline
+live_status: not_applicable
+quality_status: not_applicable
+release_status: unreleased
+runtime_status_owner: docs/v0.2-runtime-baseline.md
+roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+contract_version: shot-readiness-gate/1
+---
+
 # AI-VIDEO Shot Readiness Gate Specification
 
 ## Status
 
-Implemented and offline-accepted on local `main`；not pushed or released。本文件对齐
+Accepted and implemented offline；not released。本文件对齐
 `video-planner/3`、plan 内嵌 `ProviderNeutralVideoRequirement` 与
 `VerifiedGenerationRequirementProjection` truth。Implementation包含pure Planning verifier、
 strict Gate models、唯一structural readiness decision、typed STOP、shared asset owner、
 compatibility façade与Harness routing；没有运行Provider、生成或分析媒体，也不构成
 generation、activation、Review、quality或Final Acceptance evidence。
 
-当前executable evidence为focused Gate/Planner/Router/P8 seam `241 passed`、Harness与
-Architecture tests `89 passed`、Architecture Gate PASS。最终completion仍以本task exact staged
-snapshot receipt、independent review和commit-range verification为准。
+`READY`只表示current plan具备进入既有下游gates的structural pre-submit条件；不表示Provider
+可用、live smoke、媒体质量、candidate activation、Review或Final Acceptance。动态实现与evidence
+状态由`docs/v0.2-runtime-baseline.md`记录。
 
 本 repository 只有这一份 canonical `ShotReadinessGate` Spec。本次修改是在该文件中
 原地修订 contract，不存在另一份“旧 QA Gate Spec”、并行 gate spec 或基于实验失败新建

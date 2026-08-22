@@ -1,0 +1,231 @@
+schema_version: 1
+
+# Development Governance registry only. It is not Product Runtime state, a
+# release database, a Provider cache, or a substitute for runtime evidence.
+surfaces:
+  - surface_id: video_planner
+    canonical_spec: docs/superpowers/specs/2026-08-21-ai-video-video-planner-subagent.md
+    canonical: true
+    spec_status: accepted
+    implementation_status: implemented_offline
+    live_status: not_applicable
+    quality_status: not_evaluated
+    release_status: unreleased
+    runtime_status_owner: docs/v0.2-runtime-baseline.md
+    roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+    contract_version: video-planner/3
+    implementation_paths:
+      - src/ai_video/planning/video_planner.py
+      - src/ai_video/planning/_planner_models.py
+    test_paths:
+      - tests/test_planning_video_planner.py
+    harness_check_ids:
+      - video_planner_tests
+    assertions:
+      - type: python_literal_equals
+        path: src/ai_video/planning/video_planner.py
+        symbol: VideoPlanner.CONTRACT_VERSION
+        expected: video-planner/3
+      - type: python_symbol_exists
+        path: src/ai_video/planning/_planner_models.py
+        symbol: VideoPlanningRequest.generation_intent
+      - type: python_symbol_exists
+        path: src/ai_video/planning/_planner_models.py
+        symbol: VideoGenerationPlan.generation_requirement
+      - type: python_symbol_absent
+        path: src/ai_video/planning/_planner_models.py
+        symbol: VideoGenerationPlan.plan_hint
+      - type: text_not_contains
+        path: src/ai_video/planning/video_planner.py
+        text: plan_hint=
+
+  - surface_id: provider_neutral_generation_requirement
+    canonical_spec: docs/superpowers/specs/2026-08-21-ai-video-provider-neutral-generation-requirement.md
+    canonical: true
+    spec_status: accepted
+    implementation_status: implemented_offline
+    live_status: not_applicable
+    quality_status: not_evaluated
+    release_status: unreleased
+    runtime_status_owner: docs/v0.2-runtime-baseline.md
+    roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+    contract_version: provider-neutral-video-requirement/1
+    implementation_paths:
+      - src/ai_video/production/video_requirement.py
+    test_paths:
+      - tests/test_production_video_requirement.py
+      - tests/test_production_provider_neutral_adapters.py
+    harness_check_ids:
+      - provider_neutral_video_requirement_tests
+    assertions:
+      - type: python_literal_equals
+        path: src/ai_video/production/video_requirement.py
+        symbol: _REQUIREMENT_CONTRACT_VERSION
+        expected: provider-neutral-video-requirement/1
+      - type: python_symbol_exists
+        path: src/ai_video/production/video_requirement.py
+        symbol: ProviderNeutralVideoRequirement
+
+  - surface_id: shot_readiness_gate
+    canonical_spec: docs/superpowers/specs/2026-08-21-ai-video-shot-readiness-gate-v3.md
+    canonical: true
+    spec_status: accepted
+    implementation_status: implemented_offline
+    live_status: not_applicable
+    quality_status: not_applicable
+    release_status: unreleased
+    runtime_status_owner: docs/v0.2-runtime-baseline.md
+    roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+    contract_version: shot-readiness-gate/1
+    implementation_paths:
+      - src/ai_video/quality_gates/shot_readiness_gate.py
+      - src/ai_video/quality_gates/_readiness_models.py
+    test_paths:
+      - tests/test_shot_readiness_gate.py
+    harness_check_ids:
+      - shot_readiness_gate_tests
+    assertions:
+      - type: python_symbol_exists
+        path: src/ai_video/quality_gates/shot_readiness_gate.py
+        symbol: ShotReadinessGate
+      - type: python_literal_equals
+        path: src/ai_video/quality_gates/_readiness_models.py
+        symbol: ShotReadinessRequest.contract_version
+        expected: shot-readiness-gate/1
+
+  - surface_id: local_h3_t8_provider_family
+    canonical_spec: docs/superpowers/specs/2026-08-21-ai-video-local-h3-t8-provider-family.md
+    canonical: true
+    spec_status: accepted
+    implementation_status: implemented_offline
+    live_status: not_run
+    quality_status: not_evaluated
+    release_status: unreleased
+    runtime_status_owner: docs/v0.2-runtime-baseline.md
+    roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+    implementation_paths:
+      - src/ai_video/production/local_h3_provider_family.py
+    test_paths:
+      - tests/test_production_local_h3_provider_family.py
+    harness_check_ids:
+      - production_video_provider_tests
+    assertions:
+      - type: python_symbol_exists
+        path: src/ai_video/production/local_h3_provider_family.py
+        symbol: LocalH3VideoProviderFamily
+
+  - surface_id: quality_experience_record_v1
+    canonical_spec: docs/superpowers/specs/2026-08-21-ai-video-quality-experience-record-v1.md
+    canonical: true
+    spec_status: accepted
+    implementation_status: implemented_offline
+    live_status: not_applicable
+    quality_status: not_evaluated
+    release_status: unreleased
+    runtime_status_owner: docs/v0.2-runtime-baseline.md
+    roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+    contract_version: quality-experience-record/1.0
+    implementation_paths:
+      - src/ai_video/quality_intelligence/models.py
+      - src/ai_video/quality_intelligence/store.py
+      - src/ai_video/quality_intelligence/dataset.py
+      - src/ai_video/quality_intelligence/rag_projection.py
+    test_paths:
+      - tests/test_quality_experience_models.py
+      - tests/test_quality_experience_store.py
+      - tests/test_quality_experience_dataset.py
+      - tests/test_quality_experience_rag_projection.py
+    harness_check_ids:
+      - quality_intelligence_tests
+    assertions:
+      - type: python_literal_equals
+        path: src/ai_video/quality_intelligence/models.py
+        symbol: QualityExperienceRecordV1.schema_version
+        expected: "1.0"
+      - type: python_symbol_exists
+        path: src/ai_video/quality_intelligence/store.py
+        symbol: QualityExperienceStore
+      - type: python_symbol_exists
+        path: src/ai_video/quality_intelligence/models.py
+        symbol: PilotDatasetIndexV1
+      - type: python_symbol_exists
+        path: src/ai_video/quality_intelligence/models.py
+        symbol: HistoricalQualityExperienceImportV1
+
+  - surface_id: shot_continuity
+    canonical_spec: docs/superpowers/specs/2026-08-19-ai-video-shot-continuity.md
+    canonical: true
+    spec_status: accepted
+    implementation_status: implemented_offline
+    live_status: partial
+    quality_status: partial
+    release_status: unreleased
+    runtime_status_owner: docs/v0.2-runtime-baseline.md
+    roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+    implementation_paths:
+      - src/ai_video/production/_video_continuity.py
+      - src/ai_video/production/review.py
+    test_paths:
+      - tests/test_production_review.py
+      - tests/test_production_continuity_evaluator.py
+    harness_check_ids:
+      - production_review_tests
+    assertions:
+      - type: python_symbol_exists
+        path: src/ai_video/production/_video_continuity.py
+        symbol: ContinuityConstraintSet
+      - type: python_symbol_exists
+        path: src/ai_video/production/_video_continuity.py
+        symbol: TerminalFrameEvidence
+      - type: python_symbol_exists
+        path: src/ai_video/production/review.py
+        symbol: ContinuityEvaluationIntent
+      - type: python_symbol_exists
+        path: src/ai_video/production/review.py
+        symbol: adjudicate_generated_shot_continuity
+
+  - surface_id: t8_native_turbo_v2
+    canonical_spec: docs/superpowers/specs/2026-08-22-ai-video-t8-native-turbo-v2.md
+    canonical: true
+    spec_status: accepted
+    implementation_status: implemented
+    live_status: accepted
+    quality_status: partial
+    release_status: unreleased
+    runtime_status_owner: docs/v0.2-runtime-baseline.md
+    roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+    implementation_paths:
+      - src/ai_video/production/comfy_t8_native_turbo_profile.py
+      - src/ai_video/production/comfy_t8_native_turbo_video.py
+      - src/ai_video/production/video_contracts.py
+      - workflows/profiles/minimax_h3_t8_t2va_turbo_native_v2.json
+      - workflows/profiles/minimax_h3_t8_i2va_turbo_native_v2.json
+      - workflows/profiles/minimax_h3_t8_fl2va_turbo_native_v2.json
+      - workflows/profiles/minimax_h3_t8_ref2va_turbo_native_v2.json
+    test_paths:
+      - tests/test_production_comfy_t8_native_turbo_video.py
+      - tests/test_production_local_h3_provider_family.py
+    harness_check_ids:
+      - production_video_provider_tests
+    assertions:
+      - type: python_symbol_exists
+        path: src/ai_video/production/comfy_t8_native_turbo_profile.py
+        symbol: T8NativeTurboExecutionProfile
+      - type: python_symbol_exists
+        path: src/ai_video/production/comfy_t8_native_turbo_video.py
+        symbol: ComfyUIT8NativeTurboVideoProvider
+      - type: python_symbol_exists
+        path: src/ai_video/production/video_contracts.py
+        symbol: VideoBindingCardinalityConstraint
+      - type: text_contains
+        path: workflows/profiles/minimax_h3_t8_t2va_turbo_native_v2.json
+        text: '"availability": "live-ready"'
+      - type: text_contains
+        path: workflows/profiles/minimax_h3_t8_i2va_turbo_native_v2.json
+        text: '"availability": "live-ready"'
+      - type: text_contains
+        path: workflows/profiles/minimax_h3_t8_fl2va_turbo_native_v2.json
+        text: '"availability": "live-ready"'
+      - type: text_contains
+        path: workflows/profiles/minimax_h3_t8_ref2va_turbo_native_v2.json
+        text: '"availability": "live-ready"'

@@ -1,20 +1,29 @@
+---
+surface_id: local_h3_t8_provider_family
+canonical: true
+spec_status: accepted
+implementation_status: implemented_offline
+live_status: not_run
+quality_status: not_evaluated
+release_status: unreleased
+runtime_status_owner: docs/v0.2-runtime-baseline.md
+roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+---
+
 # AI-VIDEO Local H3 T8 Quality/Turbo Provider Family Specification
 
 ## Status
 
-Implemented source/test target in the current local change。Local `main` commit
-`15ef1d510a59cc9d46445b1fafff2ac2b34a1473` 提供最初的capability aggregation、
-`compile_request()`与`resolve()`；本slice在其上补全stateless `LocalVideoProvider` façade、
-request-aware restart dispatch与pure multi-provider Registry coexistence regression。Exact commit-range
-Harness closure仍以本slice最终receipt为准。
+Accepted and implemented offline。Current family已完成capability aggregation、
+`compile_request()`、`resolve()`、stateless `LocalVideoProvider` façade、request-aware restart
+dispatch与pure multi-provider Registry coexistence regression。
 
 本文件只描述`provider_name = "comfy-local-h3-t8"`的local child slice，不是全局Provider
 selector、registry owner或lifecycle owner。Target family即使实现完整local seam，也只在该exact
 provider name内按durable identity委托，不选择Seedance、Hailuo或其它Provider。
 
-Canonical matrix 与 runtime baseline同步记录本slice的source/test behavior。该实现不证明live media、
-quality acceptance、Final Acceptance、push或release truth；contract closure必须以exact implementation
-commit range的fresh passing Harness receipt为准。
+Canonical matrix 与 runtime baseline记录本surface的动态source/test evidence。该实现不证明live
+media、quality acceptance、Final Acceptance或release；concrete product caller也仍不由本spec证明。
 
 本 Spec 是
 `2026-08-21-ai-video-provider-neutral-generation-requirement.md` 的 provider-specific child spec。

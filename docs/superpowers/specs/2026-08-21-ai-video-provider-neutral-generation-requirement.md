@@ -1,26 +1,29 @@
+---
+surface_id: provider_neutral_generation_requirement
+canonical: true
+spec_status: accepted
+implementation_status: implemented_offline
+live_status: not_applicable
+quality_status: not_evaluated
+release_status: unreleased
+runtime_status_owner: docs/v0.2-runtime-baseline.md
+roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+contract_version: provider-neutral-video-requirement/1
+---
+
 # AI-VIDEO Provider-Neutral Generation Requirement Specification
 
 ## Status
 
-Implemented and offline-accepted at commit
-`007e99cb1d79f9c2b91a909b15db1f9360f65236`，该commit也是current cached
-`origin/main`；尚未release。T1–T9已落地`video-planner/3` requirement、verified
-projection、Router-owned exact selection、provider-bound request、deterministic compilers、new
-request/resolved/activation lineage、old-path retirement、focused tests与Harness routing。
+Accepted and implemented offline。Current `video-planner/3` plan内嵌sealed provider-neutral
+requirement；verified projection、Router-owned exact selection、provider-bound request、deterministic
+compilers与request/resolved/activation lineage均已有source/test evidence。Historical top-level
+generation fields只保留read-only compatibility projection，不是current serialized truth。
 
-Exact implementation snapshot的passing Harness receipt位于
-`.agent/harness/runs/20260820T223106358086Z/receipt.json`。该offline slice未调用Provider、
-ComfyUI或credential，也未生成媒体；后续Local H3 technical regression属于独立授权的runtime
-evidence，不把本slice升级为Shot Quality Gate、subjective quality acceptance、activation、Final
-Acceptance或release truth。
-
-后续local `main` commit `15ef1d510a59cc9d46445b1fafff2ac2b34a1473` additive加入
-`comfy-local-h3-t8` Quality/Turbo partial family；current implementation slice在其上补全provider-name-
-scoped stateless `LocalVideoProvider` pass-through。Status/fetch由`VideoGenerationService`同时传入committer
-重开的resolved request和durable submission，family不保存last-selected/cache；pure regression证明该
-family与Seedance、Hailuo、MiniMax H3等distinct-name objects可在同一Registry exact coexist。该变化不
-改变本Spec的cross-provider selection、Registry lookup、local/remote lifecycle ownership，也不由本Spec
-历史receipt替代其exact target snapshot所需的fresh Harness closure。
+该offline status不证明Provider、ComfyUI、credential或media execution，也不升级为Shot Quality
+Gate、subjective quality acceptance、activation、Final Acceptance或release truth。Local H3 T8
+family当前已完成provider-name-scoped stateless local pass-through；concrete product caller和各lane的
+live/quality evidence仍由runtime baseline分层记录。
 
 ## Problem Boundary
 
@@ -77,7 +80,8 @@ Canonical Shot + Intent Evidence + Continuity
   name，不做selection、ranking或fallback。
 - `VideoGenerationService`每个实例只接收一个exact `VideoProvider | LocalVideoProvider`；它不查询
   Registry，也不在remote/local Providers之间自动dispatch。
-- `comfy-local-h3-t8` family只合并Quality/Turbo capabilities并委托compile/resolve；Seedance、
+- `comfy-local-h3-t8` family合并Quality/Turbo capabilities，并按durable exact identity无状态委托
+  compile/resolve/preview/preflight/submit/status/fetch完整local seam；Seedance、
   Hailuo与MiniMax cloud H3使用distinct provider names和各自adapter，不进入该family。
 - `VideoGenerationRequest` 当前混合 Provider/model/profile、prompt、bindings、output、base snapshot与lifecycle identity；request `/1`–`/4`、resolved request `/2`–`/5`与activation scope `/1`–`/3` hashes已有兼容契约。
 - Provider adapters当前在 `resolve()` 验证 request/capability，并在 submit boundary构造 provider payload；它们不得成为 state writer或activation owner。
@@ -339,7 +343,7 @@ Adapter可应用 sealed profile中不改变semantic requirement的mechanical def
 | Lane | Current capability expression | Neutral mapping | Must return unsupported when |
 | --- | --- | --- | --- |
 | Local H3 `comfy-local-h3` `fl2va` | I2V；required `first_frame`；optional `last_frame`；`max_reference_count=0`；PNG；exact dimensions within sealed bounds/multiple；24fps；native audio；seed supported；loopback-only | open endpoint -> `first_frame`；close endpoint可在requirement明确时 -> `last_frame`；camera/action/pacing只按reviewed deterministic H3 grammar表达；output必须匹配sealed profile | requirement需要identity/scene/continuity reference slots、reference media、negative prompt、unsupported native camera control、超出profile geometry/timing，或只靠prompt不能满足native enforcement |
-| Local H3 T8 `comfy-local-h3-t8` family | T2V；Quality与Turbo为两个exact local/unmetered capabilities；current family聚合/compile/resolve，target补完整stateless local pass-through | Router必须显式选择Quality或Turbo；family按durable capability/identity委托，不产生第二次选择 | missing/wrong capability、duplicate/foreign identity、unsupported output，或任何需要remote/reference/edit/extend的requirement；不得改选sibling或remote Provider |
+| Local H3 T8 `comfy-local-h3-t8` family | T2V；Quality与Turbo为两个exact local/unmetered capabilities；current family已完成stateless local pass-through | Router必须显式选择Quality或Turbo；family按durable capability/identity委托，不产生第二次选择 | missing/wrong capability、duplicate/foreign identity、unsupported output，或任何需要remote/reference/edit/extend的requirement；不得改选sibling或remote Provider |
 | MiniMax cloud H3 | T2V only；fixed 4s/1366x768；no image/media refs；native audio；no seed/negative prompt | 仅适合无reference且允许T2V的requirement；semantic fields可编译进prompt | any exact first/last/reference role、seed、negative prompt、different output或native structured control required |
 | `MiniMax-Hailuo-2.3` I2V | exactly one `first_frame`；no `last_frame`/reference；adaptive `768P`；141 frames@24fps；MP4；no native audio；no seed/negative prompt | open endpoint -> `first_frame`；output必须保留adaptive geometry；neutral action/camera/pacing编译为Hailuo prompt | close endpoint必须由last-frame control保证、任何reference slot/native audio/seed/negative prompt、fixed pixel claim或native control requirement无法表达 |
 | Seedance 2.0 Mini I2V | required `first_frame`；supports `last_frame`；480p/720p exact or adaptive family mapping；provider-selected/exact duration；MP4；native audio false/true | first/last endpoints映射为role；audio/output由exact capability选择；Ark asset identity由existing sealed materialization resolver提供，不进入requirement | required asset无sealed Active Ark identity、output/audio不匹配、reference semantics被错误压成I2V role、或native control在selected capability不存在 |

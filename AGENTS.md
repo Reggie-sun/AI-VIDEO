@@ -23,6 +23,7 @@
 | Agent authority、routing、ownership、change 与 completion rules | `AGENTS.md` |
 | Surface owner、invariant、禁止旁路与 focused verification | `docs/agent-primary-contract-matrix.md` |
 | Changed-path category、mandatory checks 与 receipt routing | `.agent/harness/policy.yaml`、`scripts/agent_harness.py` |
+| Canonical spec metadata、static repository anchors 与 Harness check ownership | `.agent/harness/docs-contracts.yaml`、`scripts/docs_contract_gate.py` |
 | Low-frequency creative、provider、module、pilot 与 memory execution details | `.agent/context/control-plane-playbook.md` |
 | 当前已实现行为、local/origin/release truth、已验证与未验证边界 | `docs/v0.2-runtime-baseline.md` |
 | Phase dependency、status、future gates 与 slice direction | `docs/v0.2-agentic-production-roadmap.md` |
@@ -97,8 +98,9 @@ Durable specs 写入 `docs/superpowers/specs/YYYY-MM-DD-<slug>.md`，durable pla
 
 ### Development Governance And Product Runtime
 
-- Development Governance 包括 Codex、`AGENTS.md`、`.agent/`、`.agents/`、`.codex/`、`.workflow/`、Development Verification Harness、Architecture Gate 与 developer-only Agent Memory。它们可以检查、验证或辅助修改 Product Runtime，但不是 Production state、asset、Provider lifecycle、review 或 delivery truth。
+- Development Governance 包括 Codex、`AGENTS.md`、`.agent/`、`.agents/`、`.codex/`、`.workflow/`、Development Verification Harness、Documentation Contract Gate、Architecture Gate 与 developer-only Agent Memory。它们可以检查、验证或辅助修改 Product Runtime，但不是 Production state、asset、Provider lifecycle、review 或 delivery truth。
 - AI-VIDEO Product Runtime 包括 Legacy runtime、`src/ai_video/production/**`、planning、quality gates、Provider adapters、Manifest、Registry、Dependency Graph、ResolvedTimeline、review/repair 与 delivery lifecycle。Product Runtime MUST NOT import、执行或以其他方式依赖 Development Governance artifacts；`.workflow/` 中的 `session`、role 或 brainstorming state 不得解释为 product session。
+- Documentation Contract Gate只验证受控spec metadata、路径、有限状态词汇、contract/version static anchors与Harness check ownership。它不能证明任意自然语言叙述语义正确，也不能替代human/Codex architecture review；runtime baseline继续拥有动态实现与evidence状态。
 - 当前不存在通用 Product Agent Loop、Product Tool Registry 或 event-sourced Product Session。`VideoPlanner`、Shot Router 与 quality gates 是 deterministic domain logic，不得仅因带有 planner、router、reviewer 或 agent-facing 名称就迁入通用 Agent Framework。
 - 未来若引入 Product Agent Session，其 append-only events 只能拥有 model-visible conversation、decision context 或 non-authoritative telemetry。它不得成为 Project、Asset Registry、Production Manifest、Provider external-effect、activation、review、repair 或 delivery 的第二事实源；Production Manifest 继续独占 mutable lifecycle 与 active pointers，`ProductionStateCommitter` 继续独占 durable write、activation 与 recovery。
 
@@ -161,6 +163,7 @@ Creative skill selection、Agent-side image generation preference、mandatory pr
 ## Verification Contract
 
 - `.agent/harness/policy.yaml` 是 changed-path routing 与 mandatory checks 的 machine-readable truth；`docs/agent-primary-contract-matrix.md` 提供 human-readable focused verification。两者的 routing 变更必须同步并测试。
+- `docs_contract_check`必须是Harness always check，且documentation category必须显式拥有该behavioral check；code-only delta也必须验证`.agent/harness/docs-contracts.yaml`、canonical spec metadata与static anchors。Product Runtime不得import或执行该gate。
 - Harness inspection 后，完成验证必须针对 non-empty exact staged snapshot 或 exact commit range，并在 detached temporary worktree 中运行，使 unrelated dirty changes 不进入 execution tree。
 - Code 或 executable tooling change 必须有 fresh passing receipt；documentation/control-plane change 也必须执行 policy 路由的真实 checks。详细 receipt、Pilot、media acceptance 与 delivery boundary 见 `.agent/context/control-plane-playbook.md` 第 4 节。
 - Unmapped owned paths 必须 fail safe 到 full tests 与 task-delta Architecture Gate；未实际执行不得声称 passing。Harness 不调度 Agent、不修改产品 state、不读取 Provider secret，也不执行 live Provider、ComfyUI、paid smoke 或媒体生成。

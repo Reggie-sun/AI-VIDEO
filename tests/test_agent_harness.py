@@ -68,6 +68,13 @@ def test_repository_policy_v2_loads_and_references_known_checks() -> None:
 
     assert policy["version"] == 2
     assert policy["runs_dir"] == ".agent/harness/runs"
+    assert policy["always_check_ids"] == [
+        "scope_diff_check",
+        "docs_contract_check",
+    ]
+    assert policy["categories"]["documentation"]["check_ids"] == [
+        "docs_contract_check"
+    ]
     assert "full_tests" in policy["fallback_check_ids"]
     assert "task_architecture_gate" in policy["fallback_check_ids"]
     assert "repository_architecture_gate" in policy["checks"]
@@ -101,7 +108,39 @@ def test_github_workflow_routes_to_harness_control_suite() -> None:
 
     assert report["categories"] == ["harness_control"]
     assert report["fallback_paths"] == []
-    assert report["check_ids"] == ["scope_diff_check", "harness_tests"]
+    assert report["check_ids"] == [
+        "scope_diff_check",
+        "docs_contract_check",
+        "harness_tests",
+    ]
+
+
+def test_docs_only_change_routes_to_behavioral_contract_gate() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths(
+        ["docs/superpowers/specs/example.md"], policy
+    )
+
+    assert report["categories"] == ["documentation"]
+    assert report["fallback_paths"] == []
+    assert report["check_ids"] == [
+        "scope_diff_check",
+        "docs_contract_check",
+    ]
+
+
+def test_code_only_change_still_routes_to_docs_contract_gate() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths(
+        ["src/ai_video/planning/video_planner.py"], policy
+    )
+
+    assert report["changed_paths"] == [
+        "src/ai_video/planning/video_planner.py"
+    ]
+    assert "docs_contract_check" in report["check_ids"]
 
 
 def test_mandatory_gate_workflow_preserves_server_check_contract() -> None:
@@ -159,6 +198,7 @@ def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
     assert report["fallback_paths"] == []
     assert report["check_ids"] == [
         "scope_diff_check",
+        "docs_contract_check",
         "production_contract_tests",
         "cli_config_tests",
         "task_architecture_gate",
@@ -177,6 +217,7 @@ def test_shot_router_routes_to_exact_contract_suite() -> None:
         assert report["fallback_paths"] == []
         assert report["check_ids"] == [
             "scope_diff_check",
+            "docs_contract_check",
             "production_shot_router_tests",
             "provider_neutral_video_requirement_tests",
             "task_architecture_gate",
@@ -205,6 +246,7 @@ def test_video_planner_routes_to_exact_contract_suite() -> None:
         assert report["fallback_paths"] == []
         assert report["check_ids"] == [
             "scope_diff_check",
+            "docs_contract_check",
             "video_planner_tests",
             "provider_neutral_video_requirement_tests",
             "shot_readiness_gate_tests",
@@ -228,6 +270,7 @@ def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
         assert report["fallback_paths"] == []
         assert report["check_ids"] == [
             "scope_diff_check",
+            "docs_contract_check",
             "shot_readiness_gate_tests",
             "task_architecture_gate",
         ]
@@ -242,6 +285,7 @@ def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
     assert helper_report["fallback_paths"] == []
     assert helper_report["check_ids"] == [
         "scope_diff_check",
+        "docs_contract_check",
         "video_planner_tests",
         "provider_neutral_video_requirement_tests",
         "shot_readiness_gate_tests",
@@ -271,6 +315,7 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
         assert report["fallback_paths"] == []
         assert report["check_ids"] == [
             "scope_diff_check",
+            "docs_contract_check",
             "quality_intelligence_tests",
             "task_architecture_gate",
         ]
@@ -305,6 +350,7 @@ def test_provider_console_routes_to_local_runs_observer_suites() -> None:
         assert report["fallback_paths"] == []
         assert report["check_ids"] == [
             "scope_diff_check",
+            "docs_contract_check",
             "provider_console_python_tests",
             "provider_console_node_tests",
             "task_architecture_gate",
@@ -332,6 +378,7 @@ def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
     assert report["fallback_paths"] == []
     assert report["check_ids"] == [
         "scope_diff_check",
+        "docs_contract_check",
         "production_composition_audio_tests",
         "task_architecture_gate",
     ]
@@ -666,6 +713,7 @@ def test_inspection_falls_back_to_full_tests_and_task_architecture_gate() -> Non
     assert report["fallback_paths"] == ["src/ai_video/new_surface.py"]
     assert report["check_ids"] == [
         "scope_diff_check",
+        "docs_contract_check",
         "full_tests",
         "task_architecture_gate",
     ]
@@ -1263,6 +1311,18 @@ def test_repository_policy_audit_has_no_unmapped_owned_files() -> None:
     assert report["unmapped_paths"] == []
     assert report["unverified_paths"] == []
     assert report["missing_check_test_paths"] == []
+    assert report["docs_contract_diagnostics"] == []
+
+    canonical_docs = {
+        "README.md",
+        "docs/agent-primary-contract-matrix.md",
+        "docs/v0.2-runtime-baseline.md",
+        "docs/v0.2-agentic-production-roadmap.md",
+        "docs/superpowers/specs/2026-08-21-ai-video-video-planner-subagent.md",
+        "docs/superpowers/plans/2026-08-21-ai-video-shot-readiness-gate-v3.md",
+    }
+    assert canonical_docs.isdisjoint(report["unmapped_paths"])
+    assert canonical_docs.isdisjoint(report["unverified_paths"])
 
 
 def test_policy_audit_rejects_code_mapped_without_executable_check(

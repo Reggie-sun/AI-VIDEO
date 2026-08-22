@@ -1,19 +1,29 @@
+---
+surface_id: video_planner
+canonical: true
+spec_status: accepted
+implementation_status: implemented_offline
+live_status: not_applicable
+quality_status: not_evaluated
+release_status: unreleased
+runtime_status_owner: docs/v0.2-runtime-baseline.md
+roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+contract_version: video-planner/3
+---
+
 # AI-VIDEO Video Planner Subagent Specification
 
 ## Status
 
-Implemented and offline-accepted。Initial provider-neutral Planner runtime由commit
-`779d40d9f7426f82d2dac72a73adee3b22d283bb`引入，Harness/architecture closure由
-`a232d151f0ca3d1b33588e05db4c2dc2545aeaf5`完成；passing completion receipt为
-`.agent/harness/runs/video-planner-complete-20aeeff-a232d15/receipt.json`。Commit `007e99c`
-将new-attempt contract升级到`video-planner/3`并内嵌provider-neutral requirement；commit
-`404facd`再把current projection verification与structural readiness decision分别收敛到Planning
-verifier和`ShotReadinessGate`。Planner v3 core已进入current cached `origin/main`，后续Gate
-compatibility refinement仍只在local `main`；均尚未release。
+Accepted and implemented offline。Current new-attempt contract是`video-planner/3`：request包含
+typed `generation_intent`，plan内嵌`generation_requirement`；Planning verifier验证current
+projection，`ShotReadinessGate`独占structural pre-submit STOP decision。Historical
+`video-planner/2`仅保留parse/reopen compatibility，不得进入new-attempt path。
 
-本spec没有独立同名`docs/superpowers/plans/`文件；这是保留的documentation organization gap，
-不是runtime未实现证据。本status不证明Provider调用、media generation、activation、creative
-quality、Review或Final Acceptance。
+`Video Planner Subagent`是历史名称；runtime owner是pure deterministic domain planner，不是LLM、
+Agent session或可调用subagent。本status不证明Provider调用、media generation、activation、
+creative quality、Review、Final Acceptance或release；动态实现与evidence状态由
+`docs/v0.2-runtime-baseline.md`记录。
 
 The planner is a provider-neutral, plan-only per-Shot preflight. It audits the coherence of approved Shot intent, continuity evidence, motion requirements, available references, and the declared visual strategy before AI-VIDEO generation or composition. It does not own Production state, select a Provider, render media, or accept creative quality.
 
@@ -97,9 +107,13 @@ class VideoPlanningRequest(StrictModel):
     shot_intent_evidence: ShotIntentEvidence
     review_decision: ReviewDecisionProjection | None
     production_policy: ProductionPolicyInput
-    planning_contract_version: Literal["video-planner/2"]
+    generation_intent: ProviderNeutralGenerationIntentProjection
+    planning_contract_version: Literal["video-planner/3"]
     request_content_hash: str
 ```
+
+Historical `video-planner/2` bytes remain readable without `generation_intent`; this snippet defines
+the current new-attempt contract only.
 
 `ShotIntentEvidence` is a typed, ephemeral projection. It may identify open/close state, character action, continuous action, spatial change, state change, subject-motion directives, and unresolved evidence. Natural-language keyword matching MUST NOT set motion booleans; unresolved prose is a human-review condition.
 
@@ -111,15 +125,17 @@ class VideoPlanningRequest(StrictModel):
 
 ## Plan Contract
 
-`VideoGenerationPlan` contains:
+Current `VideoGenerationPlan` contains:
 
 - deterministic `plan_id`, `source_request_content_hash`, and `plan_hash`;
 - target Shot id, revision, and content hash;
-- `GenerationMode`: `STATIC_IMAGE`, `IMAGE_MOTION`, `TEXT_TO_VIDEO`, `IMAGE_TO_VIDEO`, `FIRST_LAST_FRAME_VIDEO`, `REFERENCE_TO_VIDEO`, or `HYBRID`;
-- `ContinuityMode`: `EXACT_TERMINAL`, `REFERENCE`, `SEMANTIC`, or `NONE`;
-- `MotionRequirement`: `NONE`, `LIGHT_TRANSFORM`, `GRAPHIC`, `CHARACTER_ACTION`, `FREE_COMPLEX`, or `HERO_OR_REPAIR`;
-- ordered `RequiredAssetRole` entries and provider-neutral `CapabilityRequirements`;
+- embedded sealed `ProviderNeutralVideoRequirement`，其中拥有`GenerationMode`、
+  `ContinuityMode`、`MotionRequirement`、ordered `RequiredAssetRole`与
+  `CapabilityRequirements`；
 - typed reason codes, warnings, bounded confidence, deterministic rationale, outcome, and contract version.
+
+Historical top-level generation fields只用于`video-planner/2` reopen compatibility；v3 serialization、
+hash和downstream handoff只消费nested `generation_requirement`。
 
 `PlanOutcome` is only `PROPOSED | BLOCKED`. `PROPOSED` means eligible to enter existing Production gates; it does not mean generated, reviewed, selected, locked, activated, human creative PASS, or Final Acceptance. Forbidden fields include Provider/profile selection, paths, Manifest/timeline state, output assets, activation, repair, acceptance, or Review receipt payloads.
 
