@@ -141,7 +141,7 @@ def _stack(label: str, component_hash: str) -> GenerationExecutionStackIdentity:
     )
 
 
-def _bundle(root: Path):
+def _bundle(root: Path, *, m1_hybrid_present: bool = False):
     loaded = project_factory.write_and_load_multi_shot_project(
         root,
         filenames=("a1.png", "a2.png", "a3.png", "a4.png"),
@@ -178,8 +178,8 @@ def _bundle(root: Path):
                 ordinal=1,
                 kind="artifact",
                 component_id="hybrid-artifact-candidate-v1",
-                presence="absent",
-                content_hash="none",
+                presence="present" if m1_hybrid_present else "absent",
+                content_hash=HASHES[6] if m1_hybrid_present else "none",
             ),
         ),
         sampler_identity=m1.sampler_identity,
@@ -320,11 +320,11 @@ def _bundle(root: Path):
                     },
                     {
                         "id": "hybrid-artifact-candidate-v1",
-                        "presence": "absent",
-                        "sha256": "none",
+                        "presence": "present" if m1_hybrid_present else "absent",
+                        "sha256": HASHES[6] if m1_hybrid_present else "none",
                     },
                 ],
-                "hybrid_artifact_present": False,
+                "hybrid_artifact_present": m1_hybrid_present,
                 "remote_provider_enabled": False,
                 "cloud_fallback_enabled": False,
             },
@@ -643,7 +643,9 @@ def test_recovery_reopens_all_selected_p0_evidence_and_rejects_tamper(
 
 
 def test_recovery_tracks_and_rehashes_materialized_source_artifacts(tmp_path: Path):
-    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
     writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),
@@ -694,7 +696,9 @@ def test_recovery_preserves_source_promoted_before_materialization_manifest(
             if phase is CommitPhase.AFTER_ARTIFACT_PROMOTION:
                 raise RuntimeError("fixture crash after first artifact promotion")
 
-    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
     prepared = writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),
@@ -987,10 +991,194 @@ def test_unmaterialized_p0_denies_execution_stack_use(tmp_path: Path):
     )
     with pytest.raises(AiVideoError, match="materialized"):
         writer.reopen_p0_qualification_prepared(require_materialized=True)
+    with pytest.raises(AiVideoError, match="unmaterialized"):
+        writer.reopen_p0_qualification_prepared(
+            required_materialized_candidates=("m0",)
+        )
 
 
-def test_materialization_reseals_all_stack_dependents_and_keeps_m1_absent(tmp_path: Path):
-    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+def test_m0_only_materialization_reseals_dependents_and_keeps_m1_unmaterialized(
+    tmp_path: Path,
+):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path
+    )
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-m0-only-base",
+    )
+
+    committed = writer.materialize_p0_qualification(
+        materializations=(_materialization("m0", 6),),
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id="p0-m0-only-materialize",
+    )
+    reopened = writer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    new_receipt, new_stacks, new_policies, new_set, new_inputs = reopened
+
+    assert committed.manifest_revision == loaded.manifest.manifest_revision + 2
+    assert new_stacks[0].materialization_status == "materialized"
+    assert new_stacks[0].execution_stack_hash != m0.execution_stack_hash
+    assert new_stacks[1] == m1
+    assert new_stacks[1].components[1].presence == "absent"
+    assert new_stacks[1].components[1].content_hash == "none"
+    assert tuple(item.policy_hash for item in new_policies) != tuple(
+        item.policy_hash for item in policies
+    )
+    assert new_set.content_hash != validation_set.content_hash
+    assert new_receipt.content_hash != receipt.content_hash
+    assert all(
+        item.execution_stack_hashes == (new_stacks[0].execution_stack_hash,)
+        for item in new_inputs
+    )
+    with pytest.raises(AiVideoError, match="unmaterialized"):
+        writer.reopen_p0_qualification_prepared(require_materialized=True)
+
+
+def test_m0_only_materialization_detects_source_tamper_and_stack_drift(
+    tmp_path: Path,
+):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path
+    )
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-m0-tamper-base",
+    )
+    materialization = _materialization("m0", 6)
+    writer.materialize_p0_qualification(
+        materializations=(materialization,),
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id="p0-m0-tamper-materialize",
+    )
+
+    with pytest.raises(AiVideoError, match="drift"):
+        writer.materialize_p0_qualification(
+            materializations=(_materialization("m0", 7),),
+            expected_manifest_revision=loaded.manifest.manifest_revision + 2,
+            attempt_id="p0-m0-drift",
+        )
+
+    _materialization_source_path(
+        tmp_path, "profile", materialization.profile_hash
+    ).write_bytes(b"tampered-profile")
+    with pytest.raises(AiVideoError, match="source"):
+        writer.reopen_p0_qualification_prepared()
+
+
+def test_m0_only_materialization_exact_replay_is_zero_write(tmp_path: Path):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path
+    )
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-m0-replay-base",
+    )
+    materialization = _materialization("m0", 6)
+    committed = writer.materialize_p0_qualification(
+        materializations=(materialization,),
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id="p0-m0-replay-materialize",
+    )
+    snapshot = {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+    replayed = writer.materialize_p0_qualification(
+        materializations=(materialization,),
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id="p0-m0-replay-again",
+    )
+
+    assert replayed == committed
+    assert snapshot == {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+
+@pytest.mark.parametrize(
+    "materializations, message",
+    (
+        ((), "non-empty"),
+        ((_materialization("m0", 6), _materialization("m0", 6)), "unique"),
+        ((_materialization("m1", 9), _materialization("m0", 6)), "ordered"),
+    ),
+)
+def test_partial_materialization_rejects_invalid_candidate_selection(
+    tmp_path: Path,
+    materializations,
+    message: str,
+):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path
+    )
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-invalid-partial-base",
+    )
+    with pytest.raises(AiVideoError, match=message):
+        writer.materialize_p0_qualification(
+            materializations=materializations,
+            expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+            attempt_id="p0-invalid-partial",
+        )
+
+
+def test_m1_materialization_is_denied_while_hybrid_artifact_is_absent(
+    tmp_path: Path,
+):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path
+    )
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-m1-absent-base",
+    )
+    with pytest.raises(AiVideoError, match="absent component"):
+        writer.materialize_p0_qualification(
+            materializations=(_materialization("m1", 9),),
+            expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+            attempt_id="p0-m1-absent-materialize",
+        )
+    reopened = writer.reopen_p0_qualification_prepared()
+    assert reopened[1][1] == m1
+
+
+def test_materialization_reseals_all_stack_dependents(tmp_path: Path):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
     writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),
@@ -1020,12 +1208,14 @@ def test_materialization_reseals_all_stack_dependents_and_keeps_m1_absent(tmp_pa
     assert new_receipt.content_hash != before[0].content_hash
     assert all(item.execution_stack_hashes == tuple(sorted(item.execution_stack_hashes)) for item in new_inputs)
     assert all(item.execution_stack_hashes == tuple(sorted(stack.execution_stack_hash for stack in new_stacks)) for item in new_inputs)
-    assert new_stacks[1].components[1].presence == "absent"
-    assert new_stacks[1].components[1].content_hash == "none"
+    assert new_stacks[1].components[1].presence == "present"
+    assert new_stacks[1].components[1].content_hash == HASHES[6]
 
 
 def test_materialization_persists_exact_content_addressed_source_bytes(tmp_path: Path):
-    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
     writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),
@@ -1056,7 +1246,9 @@ def test_materialized_source_artifact_damage_fails_closed(
     tmp_path: Path,
     damage: str,
 ):
-    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
     writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),
@@ -1092,7 +1284,9 @@ def test_materialized_source_artifact_damage_fails_closed(
 
 
 def test_materialized_stack_drift_and_stale_dependents_are_denied(tmp_path: Path):
-    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
     writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),
@@ -1126,7 +1320,9 @@ def test_materialized_stack_drift_and_stale_dependents_are_denied(tmp_path: Path
 
 
 def test_materialized_bundle_cannot_be_written_through_preparation_owner(tmp_path: Path):
-    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
     writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),
@@ -1184,7 +1380,9 @@ def test_materialization_rejects_fabricated_artifact_hashes():
 
 @pytest.mark.parametrize("dependency", ("stack", "policy", "validation", "input"))
 def test_materialized_dependency_tamper_fails_closed(tmp_path: Path, dependency: str):
-    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
     writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),
@@ -1215,7 +1413,9 @@ def test_materialized_dependency_tamper_fails_closed(tmp_path: Path, dependency:
 
 
 def test_materialization_tamper_and_exact_replay(tmp_path: Path):
-    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
     writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),

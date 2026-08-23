@@ -1,0 +1,11 @@
+task_type: ["6", "inputs", "task_type"]
+prompt: ["6", "inputs", "prompt"]
+seed: ["8", "inputs", "noise_seed"]
+first_frame: ["13", "inputs", "image"]
+last_frame: ["14", "inputs", "image"]
+reference: ["15", "inputs", "image"]
+reference_video: ["16", "inputs", "video"]
+output_prefix: ["12", "inputs", "filename_prefix"]
+conditioning_node_id: "6"
+sampler_node_id: "7"
+output_node_id: "12"

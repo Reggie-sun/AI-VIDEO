@@ -780,19 +780,29 @@ def test_t8_native_turbo_v2_code_workflows_and_tests_route_to_provider_suite() -
 def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
     paths = (
+        "scripts/materialize_shot_continuity_m0.py",
         "scripts/prepare_shot_continuity_p0.py",
         "src/ai_video/production/execution_stack_materialization.py",
+        "src/ai_video/production/shot_continuity_m0_qualification.py",
         "src/ai_video/production/video_execution_stack.py",
         "src/ai_video/production/video_transition.py",
         "tests/test_prepare_shot_continuity_p0.py",
         "tests/test_production_p0_qualification.py",
         "tests/test_production_video_transition.py",
+        "tests/test_shot_continuity_m0_materialization.py",
+        "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_api.json",
+        "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_binding.yaml",
+        "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_profile.json",
     )
 
     for path in paths:
         report = agent_harness.inspect_paths([path], policy)
         assert report["fallback_paths"] == []
-        assert report["categories"] == ["shot_continuity_p0"]
+        assert "shot_continuity_p0" in report["categories"]
+        if path.startswith("workflows/qualification/"):
+            assert "workflow" in report["categories"]
+        else:
+            assert report["categories"] == ["shot_continuity_p0"]
         assert "shot_continuity_p0_tests" in report["check_ids"]
         assert "task_architecture_gate" in report["check_ids"]
 
@@ -801,6 +811,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_prepare_shot_continuity_p0.py",
         "tests/test_production_p0_qualification.py",
         "tests/test_production_video_transition.py",
+        "tests/test_shot_continuity_m0_materialization.py",
     ):
         assert path in argv
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import TypeVar
+from typing import Literal, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
@@ -204,6 +204,7 @@ class _StateCommitP0QualificationMixin:
         self,
         *,
         require_materialized: bool = False,
+        required_materialized_candidates: tuple[Literal["m0", "m1"], ...] = (),
     ) -> tuple[
         P0QualificationPreparedReceipt,
         tuple[GenerationExecutionStackIdentity, GenerationExecutionStackIdentity],
@@ -211,6 +212,14 @@ class _StateCommitP0QualificationMixin:
         RealShotValidationSet,
         tuple[P0QualificationInput, ...],
     ]:
+        if required_materialized_candidates != tuple(
+            label
+            for label in ("m0", "m1")
+            if label in required_materialized_candidates
+        ):
+            raise _state_invalid(
+                "Required P0 materialized candidates must be unique and ordered."
+            )
         manifest = self._read_manifest()
         pointer = manifest.active_p0_qualification_prepared
         if manifest.schema_version != "2.11" or pointer is None:
@@ -222,24 +231,28 @@ class _StateCommitP0QualificationMixin:
             policies=reopened[2],
             validation_set=reopened[3],
             require_materialized=require_materialized,
+            required_materialized_candidates=required_materialized_candidates,
         )
         return reopened
 
     def materialize_p0_qualification(
         self,
         *,
-        materializations: tuple[
-            ExecutionStackMaterialization, ExecutionStackMaterialization
-        ],
+        materializations: tuple[ExecutionStackMaterialization, ...],
         expected_manifest_revision: int,
         attempt_id: str,
     ) -> ProductionManifest:
-        """Materialize both P0 candidates and atomically reseal their evidence graph."""
+        """Materialize selected P0 candidates and atomically reseal their evidence graph."""
 
         if not attempt_id:
             raise _state_invalid("P0 stack materialization attempt ID is required.")
-        if tuple(item.candidate_label for item in materializations) != ("m0", "m1"):
-            raise _state_invalid("P0 stack materialization requires ordered m0 and m1 inputs.")
+        labels = tuple(item.candidate_label for item in materializations)
+        if not labels:
+            raise _state_invalid("P0 stack materialization requires a non-empty selection.")
+        if len(labels) != len(set(labels)):
+            raise _state_invalid("P0 stack materialization candidate labels must be unique.")
+        if labels != tuple(label for label in ("m0", "m1") if label in labels):
+            raise _state_invalid("P0 stack materialization candidates must be ordered m0 then m1.")
         with self._exclusive_lock():
             manifest = self._read_manifest()
             pointer = manifest.active_p0_qualification_prepared
@@ -247,10 +260,24 @@ class _StateCommitP0QualificationMixin:
                 raise _state_invalid("No active P0 qualification prepared receipt exists.")
             current = self._reopen_p0_pointer(pointer)
             receipt, stacks, policies, validation_set, inputs = current
+            materializations_by_label = {
+                item.candidate_label: item for item in materializations
+            }
+            if any(
+                component.presence == "absent"
+                for label, stack in zip(("m0", "m1"), stacks, strict=True)
+                if label in materializations_by_label
+                for component in stack.components
+            ):
+                raise _state_invalid(
+                    "Selected P0 execution stack has an absent component and cannot be materialized."
+                )
             try:
                 materialized_stacks = tuple(
-                    stack.materialize(materialization)
-                    for stack, materialization in zip(stacks, materializations, strict=True)
+                    stack.materialize(materializations_by_label[label])
+                    if label in materializations_by_label
+                    else stack
+                    for label, stack in zip(("m0", "m1"), stacks, strict=True)
                 )
             except ValueError as exc:
                 raise _state_invalid(
@@ -258,10 +285,17 @@ class _StateCommitP0QualificationMixin:
                 ) from exc
             if any(
                 stack.materialization_status != "materialized"
-                for stack in materialized_stacks
+                for label, stack in zip(("m0", "m1"), materialized_stacks, strict=True)
+                if label in materializations_by_label
             ):
-                raise _state_invalid("P0 execution stack materialization is incomplete.")
-            stack_hashes = tuple(sorted(stack.execution_stack_hash for stack in materialized_stacks))
+                raise _state_invalid("P0 selected execution stack materialization is incomplete.")
+            stack_hashes = tuple(
+                sorted(
+                    stack.execution_stack_hash
+                    for stack in materialized_stacks
+                    if stack.materialization_status == "materialized"
+                )
+            )
             old_to_new = dict(
                 zip(
                     (stack.execution_stack_hash for stack in stacks),
@@ -354,7 +388,7 @@ class _StateCommitP0QualificationMixin:
                     materialized_receipt,
                     policies=materialized_policies,
                     validation_set=materialized_validation_set,
-                    require_materialized=True,
+                    required_materialized_candidates=labels,
                 )
                 return manifest
             if manifest.manifest_revision != expected_manifest_revision:
@@ -446,7 +480,7 @@ class _StateCommitP0QualificationMixin:
                 final_bundle[0],
                 policies=final_bundle[2],
                 validation_set=final_bundle[3],
-                require_materialized=True,
+                required_materialized_candidates=labels,
             )
             return reopened
 
@@ -458,6 +492,7 @@ class _StateCommitP0QualificationMixin:
         policies: tuple[ContinuityTransitionPolicy, ...],
         validation_set: RealShotValidationSet,
         require_materialized: bool = False,
+        required_materialized_candidates: tuple[Literal["m0", "m1"], ...] = (),
     ) -> None:
         if (
             receipt.project != manifest.active_project
@@ -480,11 +515,23 @@ class _StateCommitP0QualificationMixin:
         )
         if require_materialized and not all(materialized):
             raise _state_invalid("P0 execution stack is unmaterialized and cannot execute.")
-        if all(materialized):
+        required_indexes = tuple(
+            ("m0", "m1").index(label) for label in required_materialized_candidates
+        )
+        if any(not materialized[index] for index in required_indexes):
+            raise _state_invalid(
+                "Required P0 candidate execution stack is unmaterialized and cannot execute."
+            )
+        materialized_stacks = tuple(
+            stack
+            for stack in reopened[1]
+            if stack.materialization_status == "materialized"
+        )
+        if materialized_stacks:
             try:
                 verify_execution_stack_source_artifacts(
                     self._project_root,
-                    reopened[1],
+                    materialized_stacks,
                 )
             except ValueError as exc:
                 raise _state_invalid(
@@ -661,10 +708,6 @@ class _StateCommitP0QualificationMixin:
             raise _state_invalid(
                 "P0 inventory Hybrid artifact presence is inconsistent."
             )
-        statuses = {stack.materialization_status for stack in candidate_stacks}
-        if len(statuses) != 1:
-            raise _state_invalid("P0 candidate stacks must share one materialization state.")
-        stack_hashes = tuple(sorted(stack.execution_stack_hash for stack in candidate_stacks))
         for stack in candidate_stacks:
             if (
                 stack.materialization_status == "unmaterialized"
@@ -737,9 +780,15 @@ class _StateCommitP0QualificationMixin:
             )
         ):
             raise _state_invalid("P0 qualification evidence bindings are inconsistent.")
+        materialized_stack_hashes = tuple(
+            sorted(
+                stack.execution_stack_hash
+                for stack in candidate_stacks
+                if stack.materialization_status == "materialized"
+            )
+        )
         if any(
-            item.execution_stack_hashes
-            != (stack_hashes if statuses == {"materialized"} else ())
+            item.execution_stack_hashes != materialized_stack_hashes
             for item in qualification_inputs
         ):
             raise _state_invalid("P0 qualification inputs are stale for execution stacks.")
