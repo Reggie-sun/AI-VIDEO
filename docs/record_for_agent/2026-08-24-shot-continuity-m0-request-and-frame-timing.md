@@ -79,6 +79,13 @@ identity，不能在观看结果后选择或修改seed。
 fetch、decoded boundary review或P6/human verdict。当前用户边界仍禁止Provider/ComfyUI generation、媒体生成、
 M0 submit、T8 seed `320001`与六Shot baseline；所有external effect count保持零。
 
+caller preflight另有一个当前可执行证据缺口：M0 qualification profile与resealed inventory绑定了ComfyUI/T8/
+VideoHelperSuite commits和workflow topology，但没有绑定live ComfyUI `object_info`的exact node-input schema
+seals。仓内其他T8 profiles虽包含同plugin-era seals，也不能作为M0 stack的cross-profile替代证据。要继续实现
+可提交的qualification-only caller，必须先获准执行一次loopback read-only `object_info` preflight，将exact
+seals加入M0-owned profile，并重新materialize/reseal所有依赖stack identity的evidence；这一步本身仍不授权
+generation或M0 submit。
+
 ## Agent Guardrails
 
 - 不得用P0 image assets、旧H3视频或其他run的MP4冒充same accepted upstream motion-tail。
