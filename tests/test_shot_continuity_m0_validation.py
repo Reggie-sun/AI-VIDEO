@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -11,11 +12,13 @@ import pytest
 from PIL import Image
 
 from ai_video.errors import AiVideoError
+from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
 from ai_video.production.paths import (
     canonical_execution_stack_materialization_source_path,
     canonical_p0_qualification_input_path,
 )
 from ai_video.production.state_commit import ProductionStateCommitter
+from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.video_execution_stack import (
     GenerationExecutionStackIdentity,
     StackComponentIdentity,
@@ -110,6 +113,76 @@ def _bundle(sources):
         ),
     )
     return receipt, (m0, m1), policies, validation_set, inputs
+
+
+def _resolved_m0_request(sources, stack_hash: str):
+    profile = sources.profile
+    return SimpleNamespace(
+        execution_stack_hash=stack_hash,
+        provider_name=profile.provider_kind,
+        provider_kind=profile.provider_kind,
+        model_id=profile.model_id,
+        capability_id=profile.capability_id,
+        provider_profile=SimpleNamespace(
+            profile_id=profile.candidate_id,
+            profile_version=f"v{profile.contract_version}",
+            profile_sha256=sources.profile_document_hash,
+        ),
+        adapter_compiler_hash=sources.materialization.compiler_hash,
+        execution_kind=SimpleNamespace(value="local"),
+        billing_kind=SimpleNamespace(value="local_unmetered"),
+        mode=SimpleNamespace(value="image_to_video"),
+        prompt_text=(
+            "For the target video, at 0.00 seconds into the target video, "
+            "<Picture 1> (from [Shot 1]) is fully referenced as the exact first "
+            "frame; the ending frame aligns with <Picture 2>; <Picture 3> fully "
+            "defines identity and wardrobe; <Video 1> supplies the opening gait "
+            "phase and parallel camera velocity.\n\n"
+            "integrated_multimodal_description: [Shot 1] Live-action, "
+            "photorealistic cinematic medium right-facing side-profile shot on "
+            "the same rain-soaked railway platform at blue hour. The exact same "
+            "lone adult East Asian woman with a short blunt black bob, "
+            "mustard-yellow hooded raincoat, black trousers, black boots and the "
+            "same red cross-body leather satchel walks steadily screen-right "
+            "toward the clock. A chest-height 50mm-equivalent camera tracks "
+            "parallel with small amplitude at slow constant speed, keeping a "
+            "level horizon and stable body scale. She preserves the supplied "
+            "gait phase, decelerates naturally, and arrives at the exact approved "
+            "last-frame pose. Exactly one person; no cut, zoom, axis reversal, "
+            "teleport, text, logo, wardrobe change or unmotivated camera "
+            "movement.\n"
+            "overall_soundscape: Steady rain strikes the platform roof and wet "
+            "concrete. Measured boot footsteps and a small physical leather-"
+            "satchel movement remain synchronized with the walk; distant station "
+            "ambience stays restrained.\n"
+            "non_diegetic_music: No non-diegetic music."
+        ),
+        effective_seed=20260823,
+        effective_negative_prompt_text="",
+        image_bindings=tuple(
+            SimpleNamespace(role=role)
+            for role in ("first_frame", "last_frame", "reference")
+        ),
+        media_bindings=(
+            SimpleNamespace(kind="video", role="reference_video"),
+        ),
+        c4_multi_anchor_binding=SimpleNamespace(
+            tier=SimpleNamespace(value="motion_boundary"),
+            motion_tail=SimpleNamespace(content_hash="1" * 64),
+        ),
+        effective_output=SimpleNamespace(
+            timing_mode="frame_count",
+            frame_count=profile.frame_count,
+            duration_seconds=None,
+            dimension_mode="exact",
+            width=profile.width,
+            height=profile.height,
+            fps=profile.fps,
+            container=profile.output_container,
+            mime_type="video/mp4",
+            native_audio=profile.native_audio,
+        ),
+    )
 
 
 class _ReadOnlyCommitter:
@@ -260,15 +333,188 @@ def test_m0_pre_submit_guard_requires_request_to_bind_reopened_stack() -> None:
         artifact_root=REPO_ROOT,
     )
 
-    guard(
-        SimpleNamespace(
-            execution_stack_hash=committer.bundle[1][0].execution_stack_hash
-        )
+    valid = _resolved_m0_request(
+        sources,
+        committer.bundle[1][0].execution_stack_hash,
     )
+    guard(valid)
     with pytest.raises(AiVideoError, match="execution stack"):
-        guard(SimpleNamespace(execution_stack_hash="0" * 64))
+        guard(SimpleNamespace(**{**vars(valid), "execution_stack_hash": "0" * 64}))
 
     assert committer.reopen_calls == [("m0",), ("m0",)]
+
+
+@pytest.mark.parametrize(
+    ("drift", "message"),
+    (
+        ("candidate", "candidate identity"),
+        ("profile", "profile identity"),
+        ("compiler", "compiler"),
+        ("mode", "local motion-boundary"),
+        ("anchors", "four-anchor"),
+        ("motion_tail", "four-anchor"),
+        ("prompt", "prompt"),
+        ("seed", "seed"),
+        ("output", "output"),
+        ("timing_mode", "output"),
+        ("frame_count", "output"),
+        ("missing_frame_count", "output"),
+    ),
+)
+def test_m0_pre_submit_guard_denies_request_drift_before_effect(
+    drift: str,
+    message: str,
+) -> None:
+    sources = m0_qualification.load_m0_qualification_execution_sources(
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+    committer = _ReadOnlyCommitter(_bundle(sources))
+    guard = m0_qualification.M0ValidationPreSubmitGuard(
+        committer=committer,
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+    request = _resolved_m0_request(
+        sources,
+        committer.bundle[1][0].execution_stack_hash,
+    )
+    if drift == "candidate":
+        request = SimpleNamespace(**{**vars(request), "model_id": "other-model"})
+    elif drift == "profile":
+        request.provider_profile.profile_sha256 = "0" * 64
+    elif drift == "compiler":
+        request.adapter_compiler_hash = "0" * 64
+    elif drift == "mode":
+        request.mode = SimpleNamespace(value="reference_to_video")
+    elif drift == "anchors":
+        request.image_bindings = request.image_bindings[:2]
+    elif drift == "motion_tail":
+        request.c4_multi_anchor_binding.motion_tail = None
+    elif drift == "prompt":
+        request.prompt_text += " drift"
+    elif drift == "seed":
+        request.effective_seed = None
+    elif drift == "output":
+        request.effective_output.width += 32
+    elif drift == "timing_mode":
+        request.effective_output.timing_mode = "exact_seconds"
+        request.effective_output.frame_count = None
+        request.effective_output.duration_seconds = 5
+    elif drift == "frame_count":
+        request.effective_output.frame_count = 125
+    else:
+        del request.effective_output.frame_count
+
+    with pytest.raises(AiVideoError, match=message):
+        guard(request)
+
+    assert committer.reopen_calls == [("m0",)]
+
+
+def test_m0_request_drift_denies_before_preview_intent_or_submit() -> None:
+    sources = m0_qualification.load_m0_qualification_execution_sources(
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+    qualification = _ReadOnlyCommitter(_bundle(sources))
+    request = _resolved_m0_request(
+        sources,
+        qualification.bundle[1][0].execution_stack_hash,
+    )
+    request.effective_output.frame_count = 125
+    provider = SimpleNamespace(
+        preview=lambda _request: pytest.fail("preview must remain zero effect"),
+        submit_local=lambda *_args: pytest.fail("submit must remain zero effect"),
+    )
+
+    class _SubmitCommitter:
+        def __init__(self) -> None:
+            self.intent_calls = 0
+            self.attempt = SimpleNamespace(
+                status=StateCommitStatus.RUNNING,
+                paid_provider_state=None,
+                video_generation_state=SimpleNamespace(
+                    phase=VideoAttemptPhase.REQUEST,
+                    request=SimpleNamespace(),
+                ),
+            )
+
+        def _read_manifest(self):
+            return SimpleNamespace()
+
+        def _video_attempt(self, _manifest, _attempt_id):
+            return self.attempt
+
+        def _reopen_video_request(self, _pointer):
+            return request
+
+        def record_local_video_submit_intent(self, **_kwargs):
+            self.intent_calls += 1
+            pytest.fail("intent must remain zero effect")
+
+    submit_committer = _SubmitCommitter()
+    service = VideoGenerationService(
+        committer=submit_committer,
+        provider=provider,
+    )
+    guard = m0_qualification.M0ValidationPreSubmitGuard(
+        committer=qualification,
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+
+    with pytest.raises(AiVideoError, match="output"):
+        service.submit_local_once(
+            attempt_id="m0-validation-v1",
+            pre_submit_guard=guard,
+        )
+
+    assert submit_committer.intent_calls == 0
+
+
+def test_m0_guard_denies_execution_source_drift_after_reopen(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original = m0_qualification.load_m0_qualification_execution_sources
+    stable = original(profile_path=PROFILE_PATH, artifact_root=REPO_ROOT)
+    committer = _ReadOnlyCommitter(_bundle(stable))
+    calls = 0
+
+    def drifting_load(**kwargs):
+        nonlocal calls
+        calls += 1
+        sources = original(**kwargs)
+        if calls == 2:
+            drifted = sources.materialization.from_bytes(
+                candidate_label="m0",
+                profile_bytes=sources.materialization.profile_bytes,
+                compiler_bytes=sources.materialization.compiler_bytes,
+                workflow_bytes=sources.materialization.workflow_bytes + b"drift",
+            )
+            return replace(sources, materialization=drifted)
+        return sources
+
+    monkeypatch.setattr(
+        m0_qualification,
+        "load_m0_qualification_execution_sources",
+        drifting_load,
+    )
+    guard = m0_qualification.M0ValidationPreSubmitGuard(
+        committer=committer,
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+
+    with pytest.raises(AiVideoError, match="drifted after the guarded reopen"):
+        guard(
+            _resolved_m0_request(
+                stable,
+                committer.bundle[1][0].execution_stack_hash,
+            )
+        )
+
+    assert calls == 2
 
 
 @pytest.mark.parametrize(

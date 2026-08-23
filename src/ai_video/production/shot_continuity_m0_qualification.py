@@ -167,6 +167,7 @@ class M0QualificationCompileInputs(StrictModel):
 @dataclass(frozen=True)
 class M0QualificationExecutionSources:
     profile: M0QualificationProfile
+    profile_document_hash: str
     binding: M0QualificationBinding
     workflow: dict[str, Any]
     materialization: ExecutionStackMaterialization
@@ -199,10 +200,100 @@ class M0ValidationPreSubmitGuard:
             profile_path=self.profile_path,
             artifact_root=self.artifact_root,
         )
+        sources = load_m0_qualification_execution_sources(
+            profile_path=self.profile_path,
+            artifact_root=self.artifact_root,
+        )
         if request.execution_stack_hash != snapshot.execution_stack_hash:
             raise _invalid(
                 "M0 resolved request does not bind the reopened execution stack."
             )
+        if (
+            sources.materialization.profile_hash != snapshot.profile_hash
+            or sources.materialization.compiler_hash != snapshot.compiler_hash
+            or sources.materialization.workflow_hash != snapshot.workflow_hash
+        ):
+            raise _invalid("M0 execution sources drifted after the guarded reopen.")
+        _validate_m0_resolved_request(request, sources)
+
+
+def _value(value: object) -> object:
+    return getattr(value, "value", value)
+
+
+def _validate_m0_resolved_request(
+    request: ResolvedVideoGenerationRequest,
+    sources: M0QualificationExecutionSources,
+) -> None:
+    """Reject any M0 request drift before preview, intent, permit, or POST."""
+
+    profile = sources.profile
+    try:
+        provider_profile = request.provider_profile
+        if (
+            request.provider_name != profile.provider_kind
+            or request.provider_kind != profile.provider_kind
+            or request.model_id != profile.model_id
+            or request.capability_id != profile.capability_id
+        ):
+            raise _invalid("M0 resolved request candidate identity does not match.")
+        if (
+            provider_profile.profile_id != profile.candidate_id
+            or provider_profile.profile_version != f"v{profile.contract_version}"
+            or provider_profile.profile_sha256 != sources.profile_document_hash
+        ):
+            raise _invalid("M0 resolved request profile identity does not match.")
+        if request.adapter_compiler_hash != sources.materialization.compiler_hash:
+            raise _invalid("M0 resolved request compiler hash does not match.")
+
+        c4 = request.c4_multi_anchor_binding
+        if (
+            _value(request.execution_kind) != "local"
+            or _value(request.billing_kind) != "local_unmetered"
+            or _value(request.mode) != "image_to_video"
+            or c4 is None
+            or _value(c4.tier) != "motion_boundary"
+        ):
+            raise _invalid(
+                "M0 resolved request must use the local motion-boundary contract."
+            )
+        if (
+            tuple(item.role for item in request.image_bindings)
+            != ("first_frame", "last_frame", "reference")
+            or tuple((item.kind, item.role) for item in request.media_bindings)
+            != (("video", "reference_video"),)
+            or c4.motion_tail is None
+        ):
+            raise _invalid("M0 resolved request does not contain exact four-anchor input.")
+        if (
+            hashlib.sha256(request.prompt_text.encode("utf-8")).hexdigest()
+            != profile.prompt_sha256
+            or request.effective_negative_prompt_text
+        ):
+            raise _invalid("M0 resolved request prompt does not match.")
+        if (
+            isinstance(request.effective_seed, bool)
+            or not isinstance(request.effective_seed, int)
+            or request.effective_seed < 0
+        ):
+            raise _invalid("M0 resolved request requires one exact non-negative seed.")
+
+        output = request.effective_output
+        if (
+            getattr(output, "timing_mode", None) != "frame_count"
+            or getattr(output, "frame_count", None) != profile.frame_count
+            or getattr(output, "duration_seconds", None) is not None
+            or getattr(output, "dimension_mode", None) != "exact"
+            or output.width != profile.width
+            or output.height != profile.height
+            or output.fps != profile.fps
+            or output.container != profile.output_container
+            or output.mime_type != "video/mp4"
+            or output.native_audio is not profile.native_audio
+        ):
+            raise _invalid("M0 resolved request output contract does not match.")
+    except AttributeError as exc:
+        raise _invalid("M0 resolved request is incomplete.", str(exc)) from exc
 
 
 def _profile_source_bundle(profile_bytes: bytes, binding_bytes: bytes) -> bytes:
@@ -403,6 +494,7 @@ def load_m0_qualification_execution_sources(
     )
     return M0QualificationExecutionSources(
         profile=profile,
+        profile_document_hash=profile_snapshot.file_sha256,
         binding=binding,
         workflow=workflow,
         materialization=materialization,
