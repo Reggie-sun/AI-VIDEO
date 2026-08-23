@@ -2,9 +2,12 @@
 
 ## Status
 
-Ready for explicit implementation authorization。本文是durable execution plan；本次用户只授权写spec与plan，
-没有授权安装/启动Comfy MCP、修改host/project config、运行ComfyUI、submit workflow、调用Provider、读取
-credential、生成媒体、付费、push或release。
+Deferred；当前明确结论是`DO NOT START NOW`。现有direct/sealed adapters已经满足Production execution，
+当前没有证据证明ComfyUI discovery或临时HTTP/Python实验摩擦正在阻塞后续工作。本文保留event-driven start
+gate，只有下文条件全部满足时才进入Milestone 0。
+
+本文是durable execution plan；spec/plan及本status更新都不授权安装/启动Comfy MCP、修改host/project config、
+运行ComfyUI、submit workflow、调用Provider、读取credential、生成媒体、付费、push或release。
 
 ## Goal
 
@@ -65,6 +68,105 @@ routing与host-local environment。
 - remote/partner/paid workflow；
 - ComfyUI/custom-node/model/workflow upgrade；
 - Provider benchmark、quality acceptance、Pilot或release。
+
+## Execution Start Gate
+
+### Current Answer
+
+当前不应开始实施。Spec、plan和architecture record已经足以保存决策；在没有真实重复摩擦前安装MCP只会增加
+host dependency、license/version维护和新的tool/retry/state surface，不会改善Production correctness。
+
+### Required Start Conditions
+
+只有以下条件全部满足，才可以开始Milestone 0；任何一项不满足都继续`DEFERRED`：
+
+1. 用户在新的current task中明确授权“开始实现Comfy MCP Agent control plane”，而不只是要求查看、讨论、
+   更新spec/plan或询问必要性。
+2. 已出现以下任一可验证需求信号：
+   - 两个独立、已授权的Local Comfy开发任务都需要重复手工查询live server/nodes/models/workflows、临时写
+     HTTP/Python或手工定位output；或
+   - 一个当前Local Comfy开发任务因缺少Agent-readable discovery/tool surface而真实blocked，且现有
+     AI-VIDEO adapter/CLI不能提供同等低成本的只读信息。
+3. 目标收益明确是Development discovery/experiment ergonomics，不是减少Production adapter代码、修复
+   Production replay/recovery或替换Seedance direct Ark path。
+4. Local ComfyUI与现有AI-VIDEO direct path已经独立可用；不得用安装MCP同时诊断或修复ComfyUI、custom node、
+   model、workflow或Provider问题。
+5. 当前没有更高优先级的continuity、quality、Provider lifecycle或Pilot acceptance工作因本adoption被延迟；
+   MCP若不是其直接blocker，就不得插队实施。
+6. `.codex/config.toml`与`.agent/context/control-plane-playbook.md`没有same-file live writer或uncommitted ownership
+   conflict；unrelated dirty files本身不阻塞，但必须保持不动。
+7. Milestone 0重新确认pinned source、entrypoint、license、`comfy-cli` compatibility、tool categories、retry行为与
+   single-loopback configuration仍与governing spec一致。
+8. implementation scope仍能停在Milestone 0-2，不需要Product Runtime、Seedance、remote/Partner、paid、schema、
+   Manifest或artifact-layout change。
+
+当第2项首次满足时，执行Agent必须在过程更新中列出构成trigger的exact tasks/blocker；不得只写“以后可能方便”。
+
+### Do Not Start Conditions
+
+以下情况即使用户正在使用ComfyUI，也不构成启动理由：
+
+- 偶尔运行一个已经sealed并可由现有adapter执行的workflow；
+- 仅希望删除`ComfyUIVideoProvider`、`LocalVideoTransport`或`comfy_client.py`代码；
+- 需要Production one-use permit、exact replay、unknown-outcome recovery、activation或P6；
+- 需要Seedance、Comfy Partner node、remote ComfyUI、paid workflow或Provider credential；
+- 只是因为MCP“更先进”、plan已经存在或host支持MCP；
+- external version/license/entrypoint发生drift，但尚未完成重新审计；
+- same-file writer conflict尚未由用户决定ownership或执行顺序。
+
+## Completion And Stop Gates
+
+### Minimal Adoption Complete
+
+本plan的推荐最小完成点是Milestone 0-2全部通过，不要求运行generation。只有同时满足以下条件才可声明
+`Comfy MCP Agent discovery adopted`：
+
+1. exact external commit、resolved package versions、license与entrypoint已记录；
+2. isolated host environment与project `.codex/config.toml` routing已完成，single target严格解析为同一loopback
+   ComfyUI；
+3. Codex完成真实MCP initialize/list-tools handshake；
+4. read-only server/node/schema/model/workflow metadata discovery成功；
+5. mutating、submit、install/update/restart、cancel/delete、Partner/paid tools均未调用；
+6. 调用前后证据证明zero Comfy submit/upload/queue mutation、zero `runs/**`/Product state writes；
+7. Product Runtime没有新增MCP/Codex/.codex dependency，existing direct adapters保持可用；
+8. task-owned config/docs delta通过exact staged与commit-range Harness并形成fresh receipt；
+9. local commit与origin publication分别报告，未push时不得声称published。
+
+达到该点后应停止并交付，不得仅为“把plan全部跑完”自动进入Milestone 3。
+
+### Optional Experiment Complete
+
+Milestone 3不是minimal adoption的完成条件。只有新的current task明确授权一次local development experiment时才
+执行；完成定义是exactly one submit、prompt ID/status/output identity可复核、unknown outcome no retry、zero
+Product writes以及明确的`development_experiment`标记。成功生成媒体仍不构成Production、quality、P6或Final
+Acceptance。
+
+### Plan Closure Complete
+
+Milestone 4在以下任一结果下都可以关闭本plan：
+
+- `Agent-only retained`：Milestone 0-2通过，MCP作为Development discovery tool稳定使用；
+- `Adoption rejected/rolled back`：license、version、security、target isolation或operational cost不合适，routing和
+  host environment按Rollback清理；
+- `Experiment not needed`：read-only discovery已经解决真实摩擦，Milestone 3明确标记`not_evaluated`；
+- `Future executor gate failed`：缺caller effect token、crash reconciliation、raw error或strict zero retry，继续
+  direct Production adapters。
+
+“MCP-backed Product executor完成”与“Seedance MCP完成”不是本plan的closure条件；若未来十项eligibility gates
+全部成立，必须另写spec/plan并获得新的implementation authorization。
+
+### Immediate Stop Conditions
+
+implementation期间命中以下任一项必须停止，不得自动扩大scope或换路线：
+
+- target解析为非loopback、多个environment keys指向不同ComfyUI或出现remote fallback；
+- installer/server需要network-on-start、unbounded latest或未审计dependency；
+- license或`comfy-cli` compatibility无法确定；
+- read-only discovery触发upload、submit、queue mutation、workflow modification或credential lookup；
+- error/timeout触发隐式submit retry，或无法区分是否已经产生external effect；
+- 需要修改`src/ai_video/production/**`、workflow/profile/binding、Manifest/Registry/schema或Seedance lane；
+- target-file ownership与其它writer发生same-file overlap；
+- 无法证明rollback不会删除ComfyUI、models、workflows、runs或Production state。
 
 ## Acceptance Criteria
 
