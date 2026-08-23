@@ -790,6 +790,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_production_p0_qualification.py",
         "tests/test_production_video_transition.py",
         "tests/test_shot_continuity_m0_materialization.py",
+        "tests/test_shot_continuity_m0_validation.py",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_api.json",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_binding.yaml",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_profile.json",
@@ -812,6 +813,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_production_p0_qualification.py",
         "tests/test_production_video_transition.py",
         "tests/test_shot_continuity_m0_materialization.py",
+        "tests/test_shot_continuity_m0_validation.py",
     ):
         assert path in argv
 

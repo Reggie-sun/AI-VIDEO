@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from ai_video.errors import AiVideoError
+import ai_video.production.shot_continuity_m0_qualification as m0_qualification
 from ai_video.production.shot_continuity_m0_qualification import (
     M0QualificationCompileInputs,
     compile_m0_qualification_workflow,
@@ -135,6 +136,50 @@ def test_m0_source_loader_rejects_profile_or_workflow_drift(tmp_path: Path) -> N
 
     with pytest.raises(AiVideoError, match="hash"):
         load_m0_qualification_execution_sources(
+            profile_path=profile_path,
+            artifact_root=tmp_path,
+        )
+
+
+def test_m0_source_loader_rejects_resealed_node_id_class_swap(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
+    workflow = json.loads(
+        (REPO_ROOT / profile["workflow_path"]).read_text(encoding="utf-8")
+    )
+    workflow["13"]["class_type"], workflow["16"]["class_type"] = (
+        workflow["16"]["class_type"],
+        workflow["13"]["class_type"],
+    )
+    workflow_path = tmp_path / "workflow.json"
+    workflow_bytes = json.dumps(
+        workflow,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    workflow_path.write_bytes(workflow_bytes)
+    binding_path = tmp_path / "binding.yaml"
+    binding_bytes = (REPO_ROOT / profile["binding_path"]).read_bytes()
+    binding_path.write_bytes(binding_bytes)
+    compiler_path = tmp_path / "compiler.py"
+    compiler_path.write_text("# test compiler identity\n", encoding="utf-8")
+    monkeypatch.setattr(m0_qualification, "__file__", str(compiler_path))
+    profile.update(
+        {
+            "workflow_path": workflow_path.name,
+            "workflow_sha256": hashlib.sha256(workflow_bytes).hexdigest(),
+            "binding_path": binding_path.name,
+            "binding_sha256": hashlib.sha256(binding_bytes).hexdigest(),
+        }
+    )
+    profile_path = tmp_path / "profile.json"
+    profile_path.write_text(json.dumps(profile), encoding="utf-8")
+
+    with pytest.raises(AiVideoError, match="sealed contract"):
+        m0_qualification.load_m0_qualification_execution_sources(
             profile_path=profile_path,
             artifact_root=tmp_path,
         )

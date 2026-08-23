@@ -141,7 +141,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
   shot_continuity_p0_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_prepare_shot_continuity_p0.py, tests/test_production_p0_qualification.py, tests/test_production_video_transition.py, tests/test_shot_continuity_m0_materialization.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_prepare_shot_continuity_p0.py, tests/test_production_p0_qualification.py, tests/test_production_video_transition.py, tests/test_shot_continuity_m0_materialization.py, tests/test_shot_continuity_m0_validation.py, -q]
     cwd: .
     description: Verify deterministic Shot Continuity P0 preparation, immutable stack/policy evidence, and fail-closed persistence.
   production_shot_router_tests:
@@ -409,6 +409,7 @@ categories:
       - tests/test_production_p0_qualification.py
       - tests/test_production_video_transition.py
       - tests/test_shot_continuity_m0_materialization.py
+      - tests/test_shot_continuity_m0_validation.py
       - workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_*
     check_ids:
       - shot_continuity_p0_tests

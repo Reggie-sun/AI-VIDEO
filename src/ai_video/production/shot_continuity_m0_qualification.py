@@ -8,7 +8,7 @@ import json
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import yaml
 from pydantic import Field, field_validator
@@ -23,6 +23,9 @@ from ai_video.production.video_execution_stack import (
     RuntimeSeal,
 )
 from ai_video.workflow_renderer import _set_path
+
+if TYPE_CHECKING:
+    from ai_video.production.state_commit import ProductionStateCommitter
 
 
 _SHA256 = r"^[0-9a-f]{64}$"
@@ -166,6 +169,19 @@ class M0QualificationExecutionSources:
     binding: M0QualificationBinding
     workflow: dict[str, Any]
     materialization: ExecutionStackMaterialization
+
+
+@dataclass(frozen=True)
+class M0ValidationPreflightSnapshot:
+    candidate_label: Literal["m0"]
+    qualification_receipt_hash: str
+    execution_stack_hash: str
+    profile_hash: str
+    compiler_hash: str
+    workflow_hash: str
+    validation_set_hash: str
+    policy_hashes: tuple[str, ...]
+    qualification_input_hashes: tuple[tuple[str, str], ...]
 
 
 def _profile_source_bundle(profile_bytes: bytes, binding_bytes: bytes) -> bytes:
@@ -419,6 +435,75 @@ def validate_m0_sources_against_stack(
         raise _invalid("M0 qualification sources do not match the selected stack identity.")
 
 
+def reopen_m0_validation_preflight(
+    *,
+    committer: ProductionStateCommitter,
+    profile_path: str | Path,
+    artifact_root: str | Path,
+) -> M0ValidationPreflightSnapshot:
+    """Reopen the exact M0 qualification bundle immediately before any effect."""
+
+    sources = load_m0_qualification_execution_sources(
+        profile_path=profile_path,
+        artifact_root=artifact_root,
+    )
+    receipt, stacks, policies, validation_set, inputs = (
+        committer.reopen_p0_qualification_prepared(
+            required_materialized_candidates=("m0",)
+        )
+    )
+    m0, m1 = stacks
+    validate_m0_sources_against_stack(sources, m0)
+    profile = sources.profile
+    try:
+        calibration = next(
+            item.payload
+            for item in inputs
+            if item.input_kind == "calibration_fixture"
+        )
+        hybrid = next(
+            item
+            for item in m1.components
+            if item.component_id == "hybrid-artifact-candidate-v1"
+        )
+    except StopIteration as exc:
+        raise _invalid("M0 validation target is incomplete.") from exc
+    if (
+        receipt.project.content_hash != profile.project_content_hash
+        or receipt.registry.content_hash != profile.registry_content_hash
+        or m1.execution_stack_hash != profile.m1_execution_stack_hash
+        or m1.materialization_status != "unmaterialized"
+        or hybrid.presence != "absent"
+        or hybrid.content_hash != "none"
+        or calibration.get("prompt_sha256") != profile.prompt_sha256
+        or calibration.get("task_type") != profile.task_type
+        or calibration.get("steps") != profile.steps
+        or calibration.get("sampler") != profile.sampler
+        or calibration.get("scheduler") != profile.scheduler
+        or calibration.get("turbo_lora") is not profile.turbo_lora
+        or any(
+            item.execution_stack_hashes != (m0.execution_stack_hash,)
+            for item in inputs
+        )
+    ):
+        raise _invalid(
+            "M0 validation target does not match the frozen qualification bundle."
+        )
+    return M0ValidationPreflightSnapshot(
+        candidate_label="m0",
+        qualification_receipt_hash=receipt.content_hash,
+        execution_stack_hash=m0.execution_stack_hash,
+        profile_hash=m0.profile_hash,
+        compiler_hash=m0.compiler_hash,
+        workflow_hash=m0.workflow_hash,
+        validation_set_hash=validation_set.content_hash,
+        policy_hashes=tuple(item.policy_hash for item in policies),
+        qualification_input_hashes=tuple(
+            (item.input_kind, item.content_hash) for item in inputs
+        ),
+    )
+
+
 def compile_m0_qualification_workflow(
     *,
     sources: M0QualificationExecutionSources,
@@ -454,7 +539,9 @@ __all__ = [
     "M0QualificationCompileInputs",
     "M0QualificationExecutionSources",
     "M0QualificationProfile",
+    "M0ValidationPreflightSnapshot",
     "compile_m0_qualification_workflow",
     "load_m0_qualification_execution_sources",
+    "reopen_m0_validation_preflight",
     "validate_m0_sources_against_stack",
 ]
