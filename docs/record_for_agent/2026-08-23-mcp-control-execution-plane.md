@@ -28,6 +28,56 @@ docs: specify MCP control execution plane
 该commit已进入local `main`，尚未进入`origin/main`，未push/release。创建spec/plan时local `main`相对
 `origin/main`为ahead状态；不得仅由local ancestry推断remote publication。
 
+## Execution Timing Follow-Up
+
+用户随后要求plan必须明确记录“什么时候应该开始、做到什么程度算完成”。Plan已从
+`Ready for explicit implementation authorization`更新为：
+
+```text
+Deferred
+Current answer: DO NOT START NOW
+```
+
+对应local commit：
+
+```text
+717f81c7f7331de33c75d12b21b0585050a89616
+docs: define MCP adoption gates
+```
+
+该commit只修改：
+
+```text
+docs/superpowers/plans/2026-08-23-ai-video-mcp-control-execution-plane.md
+```
+
+当前没有证据证明ComfyUI discovery或临时HTTP/Python实验摩擦正在阻塞后续工作，因此不得仅因plan存在、
+MCP看起来更先进或希望减少Production adapter代码而开始实施。
+
+Start gate要求全部满足：
+
+1. 新的current task明确授权开始实现Comfy MCP Agent control plane；
+2. 两个独立Local Comfy开发任务均出现重复手工discovery/临时HTTP/Python/output定位摩擦，或一个当前任务
+   因缺Agent-readable discovery surface而真实blocked；
+3. 收益仍限定为Development discovery/experiment ergonomics；
+4. existing Local ComfyUI与direct AI-VIDEO path已独立可用；
+5. adoption不会延迟更高优先级continuity、quality、Provider lifecycle或Pilot acceptance；
+6. `.codex/config.toml`与playbook没有same-file ownership conflict；
+7. pinned source、entrypoint、license、`comfy-cli` compatibility、tools、retry与single-loopback配置重新审计通过；
+8. scope可以停在Milestone 0-2，不需要Product Runtime、Seedance、remote/Partner、paid或schema/layout change。
+
+推荐最小完成点是Milestone 0-2：pinned isolated installation、project routing、真实MCP handshake与read-only
+discovery、zero submit/upload/queue/Product mutation、Product Runtime zero dependency、exact staged/commit-range
+Harness及local/publication truth分层报告。达到该点必须停止；Milestone 3 generation不是minimal adoption的完成
+条件。
+
+Milestone 3只可由新的task单独授权一次`development_experiment`。Plan可以在Agent-only retained、adoption
+rejected/rolled back、experiment not needed或future executor gate failed四种结果下正常closure；MCP-backed
+Product executor与Seedance MCP不属于本plan的completion definition。
+
+本follow-up只更新durable plan/status，没有安装或启动MCP、运行ComfyUI、调用Provider、生成媒体或改变
+Production Runtime。
+
 ## Architecture Decision
 
 Accepted direction是：
@@ -179,6 +229,12 @@ Fresh commit-range receipt：
 
 ```text
 .agent/harness/runs/20260823-mcp-control-execution-plane-commit/receipt.json
+```
+
+Execution timing follow-up的fresh commit-range receipt：
+
+```text
+.agent/harness/runs/20260823-mcp-plan-start-completion-gates-commit/receipt.json
 ```
 
 Receipt verification结果：`passed=true`、`fresh=true`、`integrity=true`、`artifact_integrity=true`、
