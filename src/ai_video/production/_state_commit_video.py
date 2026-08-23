@@ -7,7 +7,7 @@ import tempfile
 from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import BinaryIO
+from typing import BinaryIO, Callable
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._lifecycle_schema import (
@@ -334,8 +334,11 @@ class _StateCommitVideoMixin:
         *,
         attempt_id: str,
         preview,
+        pre_submit_guard: (
+            Callable[[ResolvedVideoGenerationRequest], None] | None
+        ) = None,
     ) -> tuple[LocalVideoSubmitIntent, _DurableLocalVideoSubmitPermit]:
-        """Persist the exact local call intent before submitting to ComfyUI."""
+        """Persist intent; the optional in-lock guard must be read-only/non-reentrant."""
 
         with self._exclusive_lock():
             manifest = self._read_manifest()
@@ -349,6 +352,12 @@ class _StateCommitVideoMixin:
             ):
                 raise _state_invalid("Local video submit is not the next durable action.")
             request = self._reopen_video_request(state.request)
+            if request.execution_stack_hash is not None and pre_submit_guard is None:
+                raise _state_invalid(
+                    "Stack-bound local video submit requires a pre-submit guard."
+                )
+            if pre_submit_guard is not None:
+                pre_submit_guard(request)
             try:
                 intent = LocalVideoSubmitIntent.create(
                     attempt_id=attempt_id,

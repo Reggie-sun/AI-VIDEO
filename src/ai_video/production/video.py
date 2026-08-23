@@ -202,6 +202,7 @@ class VideoGenerationRequest(_VideoStrictModel):
         pattern=_SAFE_ID.pattern,
     )
     adapter_compiler_hash: str | None = Field(default=None, pattern=_SHA256)
+    execution_stack_hash: str | None = Field(default=None, pattern=_SHA256)
     target_shot_id: str = Field(pattern=_SAFE_ID.pattern)
     target_shot_revision: int = Field(strict=True, ge=1)
     target_shot_content_hash: str = Field(pattern=_SHA256)
@@ -241,6 +242,7 @@ class VideoGenerationRequest(_VideoStrictModel):
         continuity = data.get("continuity_binding")
         hard_cut = data.get("hard_cut_keyframe_binding")
         c4_binding = data.get("c4_multi_anchor_binding")
+        execution_stack_hash = data.get("execution_stack_hash")
         seal_terminal_frame = data.get("seal_terminal_frame", False)
         lineage_fields = (
             "requirement_hash",
@@ -278,6 +280,8 @@ class VideoGenerationRequest(_VideoStrictModel):
             selected.pop("c4_multi_anchor_binding", None)
         if hard_cut is None:
             selected.pop("hard_cut_keyframe_binding", None)
+        if execution_stack_hash is None:
+            selected.pop("execution_stack_hash", None)
         if not seal_terminal_frame:
             selected.pop("seal_terminal_frame", None)
         if not uses_provider_neutral_lineage:
@@ -285,7 +289,9 @@ class VideoGenerationRequest(_VideoStrictModel):
                 selected.pop(field, None)
         return {
             "schema": (
-                "ai-video-generation-request/6"
+                "ai-video-generation-request/7"
+                if execution_stack_hash is not None
+                else "ai-video-generation-request/6"
                 if c4_binding is not None
                 else "ai-video-generation-request/5"
                 if uses_provider_neutral_lineage
@@ -688,6 +694,7 @@ class VideoActivationScope(_VideoStrictModel):
         uses_hard_cut = request.hard_cut_keyframe_binding is not None
         uses_c4 = request.c4_multi_anchor_binding is not None
         uses_provider_neutral_lineage = request.requirement_hash is not None
+        uses_execution_stack = request.execution_stack_hash is not None
         if not uses_provider_neutral_lineage:
             for field in (
                 "requirement_hash",
@@ -704,9 +711,13 @@ class VideoActivationScope(_VideoStrictModel):
             request_payload.pop("hard_cut_keyframe_binding", None)
         if not uses_c4:
             request_payload.pop("c4_multi_anchor_binding", None)
+        if not uses_execution_stack:
+            request_payload.pop("execution_stack_hash", None)
         return {
             "schema": (
-                "ai-video-activation-scope/5"
+                "ai-video-activation-scope/6"
+                if uses_execution_stack
+                else "ai-video-activation-scope/5"
                 if uses_c4
                 else "ai-video-activation-scope/4"
                 if uses_provider_neutral_lineage
@@ -764,6 +775,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
         pattern=_SAFE_ID.pattern,
     )
     adapter_compiler_hash: str | None = Field(default=None, pattern=_SHA256)
+    execution_stack_hash: str | None = Field(default=None, pattern=_SHA256)
     capability_id: str = Field(pattern=_SAFE_ID.pattern)
     execution_kind: VideoExecutionKind
     billing_kind: BillingKind
@@ -815,7 +827,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             },
         )
         schema = (
-            "ai-video-resolved-request/7"
+            "ai-video-resolved-request/8"
+            if self.execution_stack_hash is not None
+            else "ai-video-resolved-request/7"
             if self.c4_multi_anchor_binding is not None
             else "ai-video-resolved-request/6"
             if uses_provider_neutral_lineage
@@ -832,6 +846,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
         if not uses_provider_neutral_lineage:
             for field in lineage_fields:
                 data.pop(field, None)
+        if self.execution_stack_hash is None:
+            data.pop("execution_stack_hash", None)
         if self.continuity_binding is None:
             data.pop("continuity_binding", None)
         if self.c4_multi_anchor_binding is None:
@@ -864,6 +880,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 or request.adapter_compiler_version
                 != self.adapter_compiler_version
                 or request.adapter_compiler_hash != self.adapter_compiler_hash
+                or request.execution_stack_hash != self.execution_stack_hash
                 or request.mode is not self.mode
                 or request.prompt_text != self.prompt_text
                 or request.image_bindings != self.image_bindings
@@ -1013,6 +1030,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             "adapter_compiler_id": request.adapter_compiler_id,
             "adapter_compiler_version": request.adapter_compiler_version,
             "adapter_compiler_hash": request.adapter_compiler_hash,
+            "execution_stack_hash": request.execution_stack_hash,
             "capability_id": capability.capability_id,
             "execution_kind": capability.execution_kind,
             "billing_kind": capability.billing_kind,
@@ -1046,7 +1064,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             warnings=False,
         )
         schema = (
-            "ai-video-resolved-request/7"
+            "ai-video-resolved-request/8"
+            if candidate.execution_stack_hash is not None
+            else "ai-video-resolved-request/7"
             if candidate.c4_multi_anchor_binding is not None
             else "ai-video-resolved-request/6"
             if candidate.requirement_hash is not None
@@ -1069,6 +1089,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 "adapter_compiler_hash",
             ):
                 fingerprint_data.pop(field, None)
+        if candidate.execution_stack_hash is None:
+            fingerprint_data.pop("execution_stack_hash", None)
         if candidate.continuity_binding is None:
             fingerprint_data.pop("continuity_binding", None)
         if candidate.c4_multi_anchor_binding is None:

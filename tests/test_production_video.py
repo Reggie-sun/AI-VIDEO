@@ -636,11 +636,43 @@ def test_provider_neutral_lineage_uses_noncolliding_request_resolved_and_scope_s
     expected_payload.pop("c4_multi_anchor_binding")
     expected_payload.pop("seal_terminal_frame")
     expected_payload.pop("provider_task_binding")
+    expected_payload.pop("execution_stack_hash")
     expected = video_contracts.canonical_sha256(
         {"schema": "ai-video-resolved-request/6", **expected_payload}
     )
     assert resolved.resolved_generation_hash == expected
     assert resolved.desired_generation_fingerprint == expected
+
+
+def test_execution_stack_hash_is_sealed_through_request_resolved_and_scope() -> None:
+    baseline = _request()
+    request = _request(execution_stack_hash=HASH_D)
+
+    request_payload = VideoGenerationRequest._fingerprint_payload(
+        request.model_dump(mode="json")
+    )
+    assert request_payload["schema"] == "ai-video-generation-request/7"
+    assert request_payload["execution_stack_hash"] == HASH_D
+    assert request.request_input_hash != baseline.request_input_hash
+
+    scope = VideoActivationScope.create(request)
+    scope_payload = VideoActivationScope._fingerprint_payload(
+        request,
+        scope.usage_license,
+    )
+    assert scope_payload["schema"] == "ai-video-activation-scope/6"
+    assert scope.request.execution_stack_hash == HASH_D
+
+    resolved = _resolved(request)
+    assert resolved.execution_stack_hash == HASH_D
+    assert resolved.activation_scope is not None
+    assert resolved.activation_scope.request.execution_stack_hash == HASH_D
+    assert resolved.resolved_generation_hash != _resolved().resolved_generation_hash
+
+    tampered = resolved.model_dump(mode="json")
+    tampered["execution_stack_hash"] = HASH_A
+    with pytest.raises(ValidationError, match="resolved_generation_hash"):
+        ResolvedVideoGenerationRequest.model_validate(tampered)
 
 
 def test_provider_neutral_lineage_is_all_or_none_and_each_identity_is_sealed():
@@ -1180,6 +1212,7 @@ def test_historical_activation_scope_reopens_without_continuity_defaults():
         "adapter_compiler_hash",
     ):
         scope_request.pop(field)
+    scope_request.pop("execution_stack_hash")
     scope_request.pop("continuity_binding")
     scope_request.pop("hard_cut_keyframe_binding")
     scope_request.pop("c4_multi_anchor_binding")
@@ -2676,6 +2709,7 @@ def test_c4_binding_absence_preserves_legacy_request_resolved_activation_hashes(
                     "adapter_compiler_id",
                     "adapter_compiler_version",
                     "adapter_compiler_hash",
+                    "execution_stack_hash",
                 },
             ),
         }

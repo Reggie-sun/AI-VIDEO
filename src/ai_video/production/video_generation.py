@@ -153,7 +153,14 @@ class VideoGenerationService:
             receipt=receipt,
         )
 
-    def submit_local_once(self, *, attempt_id: str) -> LocalVideoSubmission:
+    def submit_local_once(
+        self,
+        *,
+        attempt_id: str,
+        pre_submit_guard: (
+            Callable[[ResolvedVideoGenerationRequest], None] | None
+        ) = None,
+    ) -> LocalVideoSubmission:
         """Submit exactly once after the committer persists a local intent."""
 
         attempt, state = self._state(attempt_id)
@@ -168,11 +175,28 @@ class VideoGenerationService:
                 retryable=False,
             )
         request = self._committer._reopen_video_request(state.request)
+        if request.execution_stack_hash is not None and pre_submit_guard is None:
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message=(
+                    "Stack-bound local video submit requires a pre-submit guard."
+                ),
+                retryable=False,
+            )
+        if pre_submit_guard is not None:
+            pre_submit_guard(request)
         preview = self._provider.preview(request)
-        intent, permit = self._committer.record_local_video_submit_intent(
-            attempt_id=attempt_id,
-            preview=preview,
-        )
+        if pre_submit_guard is None:
+            intent, permit = self._committer.record_local_video_submit_intent(
+                attempt_id=attempt_id,
+                preview=preview,
+            )
+        else:
+            intent, permit = self._committer.record_local_video_submit_intent(
+                attempt_id=attempt_id,
+                preview=preview,
+                pre_submit_guard=pre_submit_guard,
+            )
         try:
             result = self._provider.submit_local(
                 request,

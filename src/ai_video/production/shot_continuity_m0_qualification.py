@@ -26,6 +26,7 @@ from ai_video.workflow_renderer import _set_path
 
 if TYPE_CHECKING:
     from ai_video.production.state_commit import ProductionStateCommitter
+    from ai_video.production.video import ResolvedVideoGenerationRequest
 
 
 _SHA256 = r"^[0-9a-f]{64}$"
@@ -182,6 +183,26 @@ class M0ValidationPreflightSnapshot:
     validation_set_hash: str
     policy_hashes: tuple[str, ...]
     qualification_input_hashes: tuple[tuple[str, str], ...]
+
+
+@dataclass(frozen=True)
+class M0ValidationPreSubmitGuard:
+    """Bind one durable resolved request to the freshly reopened M0 stack."""
+
+    committer: ProductionStateCommitter
+    profile_path: str | Path
+    artifact_root: str | Path
+
+    def __call__(self, request: ResolvedVideoGenerationRequest) -> None:
+        snapshot = reopen_m0_validation_preflight(
+            committer=self.committer,
+            profile_path=self.profile_path,
+            artifact_root=self.artifact_root,
+        )
+        if request.execution_stack_hash != snapshot.execution_stack_hash:
+            raise _invalid(
+                "M0 resolved request does not bind the reopened execution stack."
+            )
 
 
 def _profile_source_bundle(profile_bytes: bytes, binding_bytes: bytes) -> bytes:
@@ -539,6 +560,7 @@ __all__ = [
     "M0QualificationCompileInputs",
     "M0QualificationExecutionSources",
     "M0QualificationProfile",
+    "M0ValidationPreSubmitGuard",
     "M0ValidationPreflightSnapshot",
     "compile_m0_qualification_workflow",
     "load_m0_qualification_execution_sources",

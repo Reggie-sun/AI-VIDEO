@@ -1,17 +1,27 @@
 from __future__ import annotations
 
 import copy
+import hashlib
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
 import ai_video.production.shot_continuity_m0_qualification as m0_qualification
 import pytest
+from PIL import Image
 
 from ai_video.errors import AiVideoError
+from ai_video.production.paths import (
+    canonical_execution_stack_materialization_source_path,
+    canonical_p0_qualification_input_path,
+)
+from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video_execution_stack import (
     GenerationExecutionStackIdentity,
     StackComponentIdentity,
 )
+from scripts.materialize_shot_continuity_m0 import materialize
+from scripts.prepare_shot_continuity_p0 import prepare
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -114,6 +124,87 @@ class _ReadOnlyCommitter:
         return self.bundle
 
 
+def _tree_snapshot(root: Path) -> dict[str, tuple[int, int, str]]:
+    return {
+        path.relative_to(root).as_posix(): (
+            path.stat().st_size,
+            path.stat().st_mtime_ns,
+            hashlib.sha256(path.read_bytes()).hexdigest(),
+        )
+        for path in sorted(root.rglob("*"))
+        if path.is_file()
+    }
+
+
+def _real_materialized_committer(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> tuple[ProductionStateCommitter, Path, Path]:
+    source_root = tmp_path / "sources"
+    source_root.mkdir()
+    image_paths = tuple(source_root / f"a{index}.png" for index in range(1, 5))
+    for index, path in enumerate(image_paths, start=1):
+        Image.new("RGB", (1659, 948), (index * 20, index * 30, index * 40)).save(path)
+    (source_root / "metadata.json").write_text(
+        json.dumps(
+            {
+                "backend": "chatgpt-web",
+                "mode": "direct-typescript-browser",
+                "prompt": "Frozen rainy-station qualification reference.",
+                "created_at": "2026-08-23T00:00:00+00:00",
+            }
+        ),
+        encoding="utf-8",
+    )
+    root = tmp_path / "project"
+    prepare(
+        SimpleNamespace(
+            root=root,
+            a1=image_paths[0],
+            a2=image_paths[1],
+            a3=image_paths[2],
+            a4=image_paths[3],
+            approved_at="2026-08-23T00:01:00+00:00",
+            imported_at="2026-08-23T00:02:00+00:00",
+        )
+    )
+    committer = ProductionStateCommitter(root)
+    receipt, _, _, _, _ = committer.reopen_p0_qualification_prepared()
+    profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
+    profile.update(
+        {
+            "project_content_hash": receipt.project.content_hash,
+            "registry_content_hash": receipt.registry.content_hash,
+            "prepared_receipt_hash": receipt.content_hash,
+        }
+    )
+    artifact_root = tmp_path / "artifacts"
+    profile_path = artifact_root / "workflows/qualification/profile.json"
+    profile_path.parent.mkdir(parents=True)
+    profile_path.write_text(
+        json.dumps(profile, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
+    for relative in (profile["workflow_path"], profile["binding_path"]):
+        copied = artifact_root / relative
+        copied.parent.mkdir(parents=True, exist_ok=True)
+        copied.write_bytes((REPO_ROOT / relative).read_bytes())
+    compiler_path = (
+        artifact_root
+        / "src/ai_video/production/shot_continuity_m0_qualification.py"
+    )
+    compiler_path.parent.mkdir(parents=True)
+    compiler_path.write_bytes(Path(m0_qualification.__file__).read_bytes())
+    monkeypatch.setattr(m0_qualification, "__file__", str(compiler_path))
+    materialize(
+        root=root,
+        artifact_root=artifact_root,
+        profile_path=profile_path,
+        attempt_id="test-real-m0-materialization-v1",
+    )
+    return ProductionStateCommitter(root), profile_path, artifact_root
+
+
 def test_m0_validation_preflight_reopens_and_consumes_exact_materialized_hashes() -> None:
     sources = m0_qualification.load_m0_qualification_execution_sources(
         profile_path=PROFILE_PATH,
@@ -154,6 +245,29 @@ def test_m0_validation_preflight_reopens_and_consumes_exact_materialized_hashes(
     assert first.qualification_input_hashes == tuple(
         (item.input_kind, item.content_hash) for item in committer.bundle[4]
     )
+    assert committer.reopen_calls == [("m0",), ("m0",)]
+
+
+def test_m0_pre_submit_guard_requires_request_to_bind_reopened_stack() -> None:
+    sources = m0_qualification.load_m0_qualification_execution_sources(
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+    committer = _ReadOnlyCommitter(_bundle(sources))
+    guard = m0_qualification.M0ValidationPreSubmitGuard(
+        committer=committer,
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+
+    guard(
+        SimpleNamespace(
+            execution_stack_hash=committer.bundle[1][0].execution_stack_hash
+        )
+    )
+    with pytest.raises(AiVideoError, match="execution stack"):
+        guard(SimpleNamespace(execution_stack_hash="0" * 64))
+
     assert committer.reopen_calls == [("m0",), ("m0",)]
 
 
@@ -228,3 +342,64 @@ def test_m0_validation_preflight_denies_incomplete_target(missing: str) -> None:
         )
 
     assert committer.reopen_calls == [("m0",)]
+
+
+def test_real_m0_validation_preflight_replay_is_project_tree_zero_write(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path, monkeypatch
+    )
+    root = committer._project_root
+    before = _tree_snapshot(root)
+
+    first = m0_qualification.reopen_m0_validation_preflight(
+        committer=committer,
+        profile_path=profile_path,
+        artifact_root=artifact_root,
+    )
+    replay = m0_qualification.reopen_m0_validation_preflight(
+        committer=committer,
+        profile_path=profile_path,
+        artifact_root=artifact_root,
+    )
+
+    assert replay == first
+    assert _tree_snapshot(root) == before
+
+
+@pytest.mark.parametrize("tamper", ("persisted_source", "dependent_evidence"))
+def test_real_m0_validation_preflight_tamper_fails_without_additional_write(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    tamper: str,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path, monkeypatch
+    )
+    root = committer._project_root
+    _, stacks, _, _, inputs = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    if tamper == "persisted_source":
+        target = root / canonical_execution_stack_materialization_source_path(
+            "workflow", stacks[0].workflow_hash
+        )
+    else:
+        dependent = next(item for item in inputs if item.input_kind == "effect_budget")
+        target = root / canonical_p0_qualification_input_path(
+            dependent.input_kind,
+            dependent.content_hash,
+        )
+    target.write_bytes(target.read_bytes() + b"tamper")
+    after_tamper = _tree_snapshot(root)
+
+    with pytest.raises(AiVideoError):
+        m0_qualification.reopen_m0_validation_preflight(
+            committer=committer,
+            profile_path=profile_path,
+            artifact_root=artifact_root,
+        )
+
+    assert _tree_snapshot(root) == after_tamper

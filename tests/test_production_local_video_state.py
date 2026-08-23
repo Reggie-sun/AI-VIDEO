@@ -148,6 +148,7 @@ def _runtime(
     root: Path,
     *,
     t8_t2va: bool = False,
+    execution_stack_hash: str | None = None,
     submit_error: ErrorCode | None = None,
     status_state: VideoTaskState = VideoTaskState.SUCCEEDED,
     status_error: ErrorCode | None = None,
@@ -186,6 +187,7 @@ def _runtime(
             profile_path=Path(f"provider-profiles/{profile_sha}.json"),
             profile_sha256=profile_sha,
         ),
+        execution_stack_hash=execution_stack_hash,
         target_shot_id=shot.shot_id,
         target_shot_revision=shot.revision,
         target_shot_content_hash=shot.content_hash,
@@ -342,6 +344,78 @@ def test_t8_t2va_reuses_local_intent_permit_and_state_lifecycle(tmp_path: Path) 
     assert service.resume_next_action(attempt_id=ATTEMPT_ID) == "fetch"
     assert provider.submit_calls == 1
     assert provider.status_calls == 1
+
+
+def test_stack_bound_local_intent_requires_guard_inside_committer(
+    tmp_path: Path,
+) -> None:
+    stack_hash = "e" * 64
+    _, provider, resolved, committer = _runtime(
+        tmp_path,
+        execution_stack_hash=stack_hash,
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    before = committer._read_manifest()
+    preview = provider.preview(resolved)
+
+    with pytest.raises(AiVideoError, match="requires a pre-submit guard"):
+        committer.record_local_video_submit_intent(
+            attempt_id=ATTEMPT_ID,
+            preview=preview,
+        )
+
+    assert committer._read_manifest() == before
+    calls: list[str] = []
+
+    def guard(request) -> None:
+        calls.append(request.execution_stack_hash)
+
+    intent, _ = committer.record_local_video_submit_intent(
+        attempt_id=ATTEMPT_ID,
+        preview=preview,
+        pre_submit_guard=guard,
+    )
+
+    assert calls == [stack_hash]
+    assert intent.request_fingerprint == resolved.resolved_generation_hash
+    assert provider.submit_calls == 0
+
+
+def test_stack_drift_after_preview_denies_intent_permit_and_submit(
+    tmp_path: Path,
+) -> None:
+    stack_hash = "e" * 64
+    _, provider, resolved, committer = _runtime(
+        tmp_path,
+        execution_stack_hash=stack_hash,
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    before = committer._read_manifest()
+    guard_calls = 0
+
+    def drifting_guard(request) -> None:
+        nonlocal guard_calls
+        guard_calls += 1
+        assert request.execution_stack_hash == stack_hash
+        if guard_calls == 2:
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="M0 execution stack drifted after preview.",
+                retryable=False,
+            )
+
+    with pytest.raises(AiVideoError, match="drifted after preview"):
+        service.submit_local_once(
+            attempt_id=ATTEMPT_ID,
+            pre_submit_guard=drifting_guard,
+        )
+
+    assert guard_calls == 2
+    assert provider._delegate.call_counts.preview == 1
+    assert provider.submit_calls == 0
+    assert committer._read_manifest() == before
 
 
 def test_t8_family_registry_assembly_restarts_without_last_selected_state(

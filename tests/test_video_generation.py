@@ -239,6 +239,48 @@ def test_fetch_and_activate_legacy_path_remains_present() -> None:
     assert "probe" in sig.parameters
 
 
+def test_local_submit_pre_submit_guard_denies_before_preview_or_intent() -> None:
+    committer = _FakeCommitter(phase=VideoAttemptPhase.REQUEST)
+    committer.attempt.paid_provider_state = None
+    request = SimpleNamespace(execution_stack_hash="a" * 64)
+    committer._reopen_video_request = MagicMock(return_value=request)
+    committer.record_local_video_submit_intent = MagicMock()
+    provider = MagicMock()
+    guard_error = AiVideoError(
+        code=ErrorCode.PRODUCTION_STATE_INVALID,
+        user_message="M0 execution stack drifted.",
+        retryable=False,
+    )
+    guard = MagicMock(side_effect=guard_error)
+    service = VideoGenerationService(committer=committer, provider=provider)
+
+    with pytest.raises(AiVideoError, match="execution stack"):
+        service.submit_local_once(
+            attempt_id="attempt-1",
+            pre_submit_guard=guard,
+        )
+
+    guard.assert_called_once_with(request)
+    provider.preview.assert_not_called()
+    committer.record_local_video_submit_intent.assert_not_called()
+
+
+def test_stack_bound_local_submit_cannot_omit_pre_submit_guard() -> None:
+    committer = _FakeCommitter(phase=VideoAttemptPhase.REQUEST)
+    committer.attempt.paid_provider_state = None
+    request = SimpleNamespace(execution_stack_hash="a" * 64)
+    committer._reopen_video_request = MagicMock(return_value=request)
+    committer.record_local_video_submit_intent = MagicMock()
+    provider = MagicMock()
+    service = VideoGenerationService(committer=committer, provider=provider)
+
+    with pytest.raises(AiVideoError, match="requires a pre-submit guard"):
+        service.submit_local_once(attempt_id="attempt-1")
+
+    provider.preview.assert_not_called()
+    committer.record_local_video_submit_intent.assert_not_called()
+
+
 def test_validate_once_does_not_invoke_legacy_fetch_and_activate() -> None:
     """validate_once must call the canonical preparer, never fetch_and_activate."""
 
