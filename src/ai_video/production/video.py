@@ -393,13 +393,13 @@ class VideoGenerationRequest(_VideoStrictModel):
             terminal = c4_binding.terminal
             identity = c4_binding.identity_anchor
             endpoint = c4_binding.approved_endpoint
-            duration_seconds = getattr(
-                self.output_requirement, "duration_seconds", None
+            output = self.output_requirement
+            duration_milliseconds = (
+                output.duration_seconds * 1000
+                if isinstance(output, VideoOutputRequirement)
+                else output.exact_duration_milliseconds()
             )
-            if (
-                duration_seconds is None
-                or duration_seconds * 1000 != endpoint.duration_milliseconds
-            ):
+            if duration_milliseconds != endpoint.duration_milliseconds:
                 raise ValueError("C4 endpoint does not match the exact output duration")
             expected_images = (
                 VideoImageReferenceBinding(

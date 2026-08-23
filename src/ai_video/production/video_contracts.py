@@ -272,6 +272,13 @@ class VideoFlexibleOutputRequirement(_VideoContractModel):
             raise ValueError("video container and MIME type must match")
         return self
 
+    def exact_duration_milliseconds(self) -> int | None:
+        if self.duration_seconds is not None:
+            return self.duration_seconds * 1000
+        if self.frame_count is not None:
+            return round(self.frame_count * 1000 / self.fps)
+        return None
+
 
 class VideoOutputCapability(_VideoContractModel):
     min_duration_seconds: int = Field(strict=True, gt=0, le=600)

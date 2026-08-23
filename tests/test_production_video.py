@@ -2264,6 +2264,78 @@ def test_c4_motion_binding_requires_reference_video_and_motion_tail_evidence() -
     assert binding.motion_tail.end_frame_index == binding.terminal.frame_index
 
 
+def test_c4_frame_count_output_binds_exact_rounded_milliseconds() -> None:
+    output = video_contracts.VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=124,
+        dimension_mode="exact",
+        width=1280,
+        height=720,
+        resolution_label="h3-native",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=True,
+    )
+    binding = _c4_binding(
+        endpoint_changes={"duration_milliseconds": 5_167},
+    )
+
+    request = _c4_request(binding=binding, output_requirement=output)
+
+    assert request.output_requirement == output
+    assert request.c4_multi_anchor_binding == binding
+
+
+@pytest.mark.parametrize(
+    "output, endpoint_milliseconds",
+    (
+        (
+            video_contracts.VideoFlexibleOutputRequirement(
+                timing_mode="frame_count",
+                frame_count=124,
+                dimension_mode="exact",
+                width=1280,
+                height=720,
+                resolution_label="h3-native",
+                ratio="16:9",
+                fps=24,
+                container="mp4",
+                mime_type="video/mp4",
+                native_audio=True,
+            ),
+            5_166,
+        ),
+        (
+            video_contracts.VideoFlexibleOutputRequirement(
+                timing_mode="provider_selected",
+                dimension_mode="exact",
+                width=1280,
+                height=720,
+                resolution_label="h3-native",
+                ratio="16:9",
+                fps=24,
+                container="mp4",
+                mime_type="video/mp4",
+                native_audio=True,
+            ),
+            5_167,
+        ),
+    ),
+)
+def test_c4_rejects_non_exact_frame_timing(
+    output,
+    endpoint_milliseconds: int,
+) -> None:
+    binding = _c4_binding(
+        endpoint_changes={"duration_milliseconds": endpoint_milliseconds},
+    )
+
+    with pytest.raises(ValidationError, match="exact output duration"):
+        _c4_request(binding=binding, output_requirement=output)
+
+
 def test_c4_binding_rejects_when_combined_with_continuity_binding() -> None:
     """RED gate: C4 must not coexist with legacy continuity binding."""
 
