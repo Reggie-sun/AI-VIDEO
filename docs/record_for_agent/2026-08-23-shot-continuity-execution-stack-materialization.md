@@ -10,11 +10,12 @@ Date: 2026-08-23
 
 - `ExecutionStackMaterialization` 以 candidate-neutral 的 profile/compiler/workflow bytes 计算并验证 exact SHA-256；claimed hash 与 supplied bytes 不一致时 fail closed。
 - `GenerationExecutionStackIdentity.materialize()` 只允许 unmaterialized → materialized transition，生成新的 `execution_stack_hash`；已 materialized stack 发生 hash drift 时拒绝。
-- `materialize_p0_qualification()` 是唯一 materialization/reseal owner。它会 reseal execution-stack-dependent qualification inputs、transition policies、validation set 与 prepared receipt，并重新建立 Manifest pointer。
+- `materialize_p0_qualification()` 是唯一 materialization/reseal owner。它允许按candidate逐个materialize，将qualification inputs绑定到当前materialized stack hashes，reseal execution-stack-dependent transition policies、validation set与prepared receipt，并重新建立Manifest pointer；selected stack含absent component时fail closed。
 - materialization source bytes 先以 `state/video-qualification/execution-stack-sources/{profile,compiler,workflow}/<sha256>.bin` content-addressed immutable artifacts 持久化，再推进 Manifest pointer；普通 materialized reopen、guarded reopen 与 recovery 都会 no-follow reopen 并重新计算 exact SHA-256。
 - Recovery 将 selected source artifacts 报告为 `ACTIVE`，将 Manifest 推进前已完整 promotion 的 source artifacts 保留为 `ORPHAN_PRESERVED`；缺失、tamper、swapped bytes 与 symlink 都 fail closed。
 - `record_p0_qualification_prepared()` 拒绝任何包含 materialized candidate stack 的输入，避免绕过 materialization owner。
-- M1 Hybrid artifact 仍显式为 `presence="absent"`、`content_hash="none"`；没有 winner-specific child、fallback、final capability 或 activation。
+- Qualification-only M0 sources由`src/ai_video/production/shot_continuity_m0_qualification.py`与`workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_*`拥有：profile source bundle包含exact profile与binding bytes，compiler固定literal `Hybrid`四锚点mapping、frozen prompt hash、Stock20 `dual_clock_euler/native_flow`、20 steps与no-LoRA exact graph。
+- Ignored rainy-station run root当前Manifest revision为`4`；active P0 receipt为`6a3c5516aa0b8dfdc70ee4660893c1a0e449742d719187dad965bf629d7c8cb2`，M0 stack为`2acf7e7843923460c503b6c9f3f53ca9c0bed627d21d8ca2cabe2e8e5b1a45f9`。M1保持原stack `4d08741636647fbb29f9cf69a69a2c81d62156cef128f619d26a17b72e94c01b`、`unmaterialized`与Hybrid artifact `presence="absent"`、`content_hash="none"`；没有 winner-specific child、fallback、final capability 或 activation。
 
 ## Session Work And Decisions
 
@@ -37,6 +38,14 @@ Commit `79ce66a` 继续关闭 source-byte durability 与 recovery seam：
 
 该 commit 仍未提供真实 M0 Hybrid Stock20 profile/compiler/applicable workflow，也未接入 V1 effect-bound caller；因此它关闭的是 candidate-neutral owner 实现，不是 M0 submit gate 的 runtime evidence。
 
+Commit `bc088e9` 完成并实际执行M0-only qualification materialization：
+
+- 新增offline-only `scripts/materialize_shot_continuity_m0.py`，只对frozen Project/Registry/P0 receipt/M0+M1 identities与calibration contract执行exact preflight和committer materialization；模块不包含transport、Provider submit或capability registration。
+- M0 exact profile/compiler/workflow hashes分别为`0bbd8ff2e9976d91c0b7250512942c662ce551b4676cca4504734aff65b86491`、`d4af4843e5548a353e01a794d3752020c624be2d6012c4ba52bd5f5a91f85ecc`与`963bd91ad81ca102053deb08b29a7aa8fb6849a6256a78ccbfbc6138d7a855d2`；dependent qualification inputs、三个transition policies、validation set与receipt全部reseal并strict reopen。
+- 同一canonical run上的第二次materialization返回完全相同hashes与Manifest revision `4`，证明actual exact replay没有重复Manifest advancement；tests另外验证file mtime/bytes zero-write。
+- `.agent/harness/policy.yaml`、`tests/test_agent_harness.py`与`docs/agent-primary-contract-matrix.md`将新script/module/test/workflow paths收敛到既有`shot_continuity_p0` owner，没有建立第二category或fallback control plane。
+- `docs/v0.2-runtime-baseline.md`只把上述动态runtime evidence写为M0 materialization gate closure，明确没有把它升级为Validation V1、generation、winner、activation或acceptance。
+
 ## Verification And Evidence
 
 - Focused Shot Continuity suite：38 passed。
@@ -47,18 +56,20 @@ Commit `79ce66a` 继续关闭 source-byte durability 与 recovery seam：
 - 第一份 exact staged Harness receipt `.agent/harness/runs/20260822T213443433929Z/receipt.json` 正确 fail closed：new source owner 未映射 policy，full suite 结果为 `1 failed, 3255 passed, 4 skipped`，唯一 failure 是 repository policy audit 的 unmapped path。
 - Policy routing RED/green 后，Harness/docs focused tests `114 passed`；最终 exact staged Harness receipt `.agent/harness/runs/20260822T215623603457Z/receipt.json` 为 `passed`：Harness `127 passed`，Production contracts `2577 passed, 3 skipped, 680 deselected`，CLI/config `13 passed`，Shot Continuity P0 `45 passed`，Architecture Gate `PASS`（0 errors，2 个 oversized-growth warnings）。Receipt 在 commit 前验证为 fresh、integrity、policy match、snapshot match、scope worktree clean；receipt `index_tree` 与 commit `79ce66a` tree 均为 `2033c8bc476b76c7e146e00169e049e4b01b3d38`。
 - Native `gpt-5.6-sol` high reviewer 对 source persistence/recovery verdict 为 `accept with concerns`、blocking issues 0；补充 interrupted-promotion orphan regression 后 scoped re-review 为 `accept`。剩余 concern 属于 V1：typed semantic/preflight validation 与 exact-hash immediate pre-effect consumption 尚未实现。
-- MiniMax external CLI `MiniMax-M3` read-only explorer 首次返回了可用 findings，但 runner 原始 outcome 为 `status=error` / `PROTOCOL_ERROR`（`DONE_WITH_CONCERNS` 携带 non-empty questions）；bounded fresh retry 为 `status=success` / `DONE_WITH_CONCERNS`。Bounded writer 首次与 fresh retry 都因 permission-denial loop / exact grant policy denial 返回 `BLOCKED`，没有修改文件，随后按规则 fallback 到 main thread。自动诊断 capture：`/home/reggie/.codex/session-diagnostics/minimax/01a02b2a-befa-7a43-8426-801a9bce5697-e8b37295a8c49a97.md`。
+- M0 real-materialization focused/structure matrix最终为`77 passed`。Exact staged Harness receipt `.agent/harness/runs/shot-continuity-m0-materialization-20260823-v1/receipt.json`为`passed`，SHA-256 `f5875bf9b4a64d0afba1fdf593445b58dad8e214ca57496fe4e89e4152e5e596`：Harness `127 passed`、workflow `9 passed`、production state `950 passed`、Shot Continuity P0 `60 passed`，Architecture Gate `PASS`（0 errors，1个atomic owner oversized-growth warning）。Receipt在commit前验证artifact integrity、freshness、policy、snapshot、scope worktree clean、cleanup与closure全部为true；index tree `d6d47c0fff8ff131acf09edc9e0e7cd570c898ca`与reviewed snapshot一致。
+- Native `gpt-5.6-sol` high reviewer首次发现M1 absent materialization bypass与target identity绑定不足并给出`reject`；修复M1-only denial、frozen target、binding durability、prompt与exact node/edge checks后scoped re-review和final exact-staged review均为`accept with concerns`、blocking issues 0。剩余non-blocking concern是为exact node swap/script target-negative branches补更直接的独立regression，以及atomic owner LOC warning。
+- MiniMax external CLI `MiniMax-M3` read-only explorer本窗口首次因`NEEDS_CONTEXT`携带non-empty concerns返回`status=error` / `PROTOCOL_ERROR`；parent用pinned plugin `977df788fcf8b971dc3d0fc7d6baa79a0edfaf40`的literal `Hybrid`证据与M0-only/M1-absent contract完成bounded fresh retry，最终`status=success` / `DONE_WITH_CONCERNS`。它正确定位committer与missing qualification sources，但误读了unmaterialized source verifier，parent按代码证据修正。Sanitized captures：`/home/reggie/.codex/session-diagnostics/minimax/01a02b2a-befa-7a43-8426-801a9bce5697-e8b37295a8c49a97.md`与`/home/reggie/.codex/session-diagnostics/minimax/01a02b2a-befa-7a43-8426-801a9bce5697-b3dbe91ccbad6257.md`。
 
 ## Assessment
 
-I1 已关闭 candidate-neutral materialization/reseal owner 及其 exact source-byte durability/recovery 实现缺口，并证明 dependent evidence closure、normal/recovery rehash、tamper denial、orphan preservation 与 exact replay。它没有把 owner implementation 误报为真实 M0 materialization、submit-ready、Provider success、visual quality 或 Final Acceptance。
+I1 已关闭 candidate-neutral materialization/reseal owner、exact source-byte durability/recovery与真实M0 qualification source freeze，并在canonical rainy-station run上完成M0-only materialization、dependent evidence closure与exact replay。该evidence只关闭M0 submit之前的execution-stack materialization gate，不是Provider success、视觉质量、winner、P6或Final Acceptance。
 
 ## Remaining Risks Or Next Work
 
-- 真实 M0 non-Turbo Hybrid Stock20 profile/compiler/applicable workflow 仍不存在，当前 active P0 bundle 仍为 `unmaterialized`；M0 pre-submit gate 继续阻断 Validation V1。
-- V1 submit 前必须完成 typed semantic/preflight validation、绑定 guarded reopen，并在 effect boundary 消费同一批 exact profile/compiler/workflow hashes；不能只信 opaque bytes 或 persisted hashes。
-- 当前没有执行真实 materialization、M0 submit、T8 seed `320001` 或六 Shot baseline；这些仍按冻结实验顺序保持未执行。
-- 本地 `main` 已提交但未 push；unrelated dirty/index work 保留且未纳入 I1 implementation commit。
+- Validation V1仍未启动；下一步必须在pre-effect boundary使用`required_materialized_candidates=("m0",)`重开同一bundle并消费上述exact profile/compiler/workflow hashes，任何source、Project/Registry、candidate、prompt/calibration或workflow drift都必须在submit前拒绝。
+- 当前没有执行M0 submit、M1 build/materialization、T8 seed `320001`、六 Shot baseline或任何视觉验收；M1只有在M0按frozen gates失败且exact Hybrid artifact存在后才可能进入独立materialization/validation。
+- 未来修改qualification workflow或materialization entrypoint时应补exact node-ID/class swap与script prepared-receipt/Project/Registry/M1/calibration drift的直接negative regressions。
+- 本地 `main`包含implementation commit `bc088e9`但未push；unrelated dirty/index work保留且未纳入该commit。
 
 ## Agent Guardrails
 
