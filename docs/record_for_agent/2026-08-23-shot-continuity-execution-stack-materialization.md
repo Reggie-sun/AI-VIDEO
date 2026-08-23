@@ -15,6 +15,7 @@ Date: 2026-08-23
 - Recovery 将 selected source artifacts 报告为 `ACTIVE`，将 Manifest 推进前已完整 promotion 的 source artifacts 保留为 `ORPHAN_PRESERVED`；缺失、tamper、swapped bytes 与 symlink 都 fail closed。
 - `record_p0_qualification_prepared()` 拒绝任何包含 materialized candidate stack 的输入，避免绕过 materialization owner。
 - `reopen_m0_validation_preflight()` 是 candidate-neutral 的 M0 V1 pre-effect reopen owner：它从 canonical Project、Registry 与 prepared receipt 重载同一 bundle，要求 M0 已 materialized、M1 仍为 `unmaterialized` 且 Hybrid artifact 为 `absent` / `none`，重新验证 exact profile/compiler/workflow、frozen calibration 与全部 dependent evidence 的 stack binding，然后只返回 immutable `M0ValidationPreflightSnapshot`。该 snapshot 不写 durable intent、不 mint permit、不调用 Provider，也不授权 submit。
+- Provider-neutral video request、resolved request与activation scope现在可以optional seal同一`execution_stack_hash`；字段存在时使用request `/7`、resolved `/8`与activation scope `/6`，字段缺失时历史payload/hash保持bit-for-bit。`M0ValidationPreSubmitGuard`在preview前重开并比对exact M0 stack，唯一committer在同一intent write lock内再次执行read-only/non-reentrant guard并紧接着持久化intent/permit；stack-bound local caller省略guard、两次检查间发生drift或direct committer绕过时都fail closed且submit effect为零。
 - Qualification-only M0 sources由`src/ai_video/production/shot_continuity_m0_qualification.py`与`workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_*`拥有：profile source bundle包含exact profile与binding bytes，compiler固定literal `Hybrid`四锚点mapping、frozen prompt hash、Stock20 `dual_clock_euler/native_flow`、20 steps与no-LoRA exact graph。
 - Ignored rainy-station run root当前Manifest revision为`4`；active P0 receipt为`6a3c5516aa0b8dfdc70ee4660893c1a0e449742d719187dad965bf629d7c8cb2`，M0 stack为`2acf7e7843923460c503b6c9f3f53ca9c0bed627d21d8ca2cabe2e8e5b1a45f9`。M1保持原stack `4d08741636647fbb29f9cf69a69a2c81d62156cef128f619d26a17b72e94c01b`、`unmaterialized`与Hybrid artifact `presence="absent"`、`content_hash="none"`；没有 winner-specific child、fallback、final capability 或 activation。
 
@@ -54,6 +55,13 @@ Commit `c8eeb51` 关闭 Validation V1 在 M0 submit 之前缺失的 pre-effect r
 - RED/green regressions覆盖 unmaterialized denial、materialized reopen、stack/source/dependent-evidence drift、reopen、tamper、exact replay，以及 workflow node ID/class swap；所有失败都发生在 durable intent、permit 或 Provider effect 之前。
 - `.agent/harness/policy.yaml`、`docs/agent-primary-contract-matrix.md` 与 `docs/v0.2-runtime-baseline.md` 同步 owner、routing 和动态证据边界；frozen Shot Continuity spec、plan、prompt 与 rubric 未修改。
 
+Commit `0efabdf` 将M0 stack identity绑定到通用video lifecycle并关闭effect-bound guard seam：
+
+- `VideoGenerationRequest`、`ResolvedVideoGenerationRequest`与`VideoActivationScope`以additive schema封存同一`execution_stack_hash`，因此durable intent、permit、provenance、candidate/recovery通过既有`resolved_generation_hash`继承exact stack identity；历史未绑定请求继续使用原schema和原hash。
+- `M0ValidationPreSubmitGuard`消费fresh `M0ValidationPreflightSnapshot`并要求durable resolved request绑定同一stack；`VideoGenerationService.submit_local_once()`在preview前拒绝省略或失败的guard，`ProductionStateCommitter.record_local_video_submit_intent()`再在唯一写锁内重复检查，direct committer caller不能通过省略guard进入intent。
+- Real-committer regressions覆盖exact replay的project tree bytes/mtime zero-write、persisted source/dependent evidence tamper、service omission、direct committer omission，以及第一次guard通过、preview后第二次guard因drift失败时Manifest不变、intent/permit未持久化、submit为零。
+- Frozen spec、plan、prompt与rubric未修改；M1继续保持`unmaterialized`及Hybrid artifact显式`absent`，没有winner、fallback、final active capability或generation。
+
 ## Verification And Evidence
 
 - Focused Shot Continuity suite：38 passed。
@@ -71,21 +79,22 @@ Commit `c8eeb51` 关闭 Validation V1 在 M0 submit 之前缺失的 pre-effect r
 - Exact staged Harness receipt `.agent/harness/runs/shot-continuity-m0-v1-preflight-20260823-v1/receipt.json` 为 `passed`，SHA-256 `eef4d9ab714aac99a9c6c2f1a8b81da2795aa573f4b02174becb9c4497706df3`；其index tree `8ec2cc055e2a9972f534d9b1c10a7453738a7dd9`与commit `c8eeb51` tree一致。Exact commit-range receipt `.agent/harness/runs/shot-continuity-m0-v1-preflight-commit-20260823-v1/receipt.json` 为 `passed`，SHA-256 `e40906548d4d4abdcdde5f7bec33f42022fd11095cf9dd3eeffedbd137275f0b`；创建时artifact integrity、freshness、policy、snapshot、scope cleanliness、cleanup与closure均为true。后续其他session推进local `HEAD`后重新验证该固定receipt会正确显示`fresh=false` / `snapshot_matches=false`，不改变其对exact commit range的历史证据边界。
 - Native `gpt-5.6-sol` high reviewer verdict为`accept with concerns`，blocking issues 0。唯一material non-blocking concern是新增owner的直接测试使用duck-typed committer且只构造两个qualification inputs；既有real `ProductionStateCommitter` tests已覆盖bundle closure与tamper，但后续可补一个直接owner integration regression证明real reopen失败透传并保持filesystem byte/mtime zero-write。
 - 本窗口 MiniMax external read-only explorer的Role为`explorer`、Scope为V1 pre-effect guarded reopen mapping、runner model为`MiniMax-M3` high、Claude-compatible transport，最终`status=success` / `DONE_WITH_CONCERNS`。它正确定位generic submit、committer和source seams，但建议把M0 guard无条件放入generic `VideoGenerationService.submit_once()` / `submit_local_once()`；parent根据callers与request schema证据拒绝该建议并建立M0-specific read-only owner。Sanitized capture：`/home/reggie/.codex/session-diagnostics/minimax/01a02b2a-befa-7a43-8426-801a9bce5697-7dcb1f9ab61750e0.md`。
+- Request-stack guard focused matrix最终为`249 passed`。Exact staged Harness receipt `.agent/harness/runs/shot-continuity-m0-request-stack-guard-20260823-v3/receipt.json` 为`passed`，SHA-256 `17be84be87583a7b91bd710ac648c22b3acf8bacee5867e37c24bb8c869c7ef6`；Harness `127 passed`、production state `950 passed`、Shot Continuity P0 `75 passed`、production video/provider `1091 passed`、provider-neutral requirement `289 passed`，Architecture Gate `PASS`（0 errors，2个oversized-growth warnings）。Receipt的artifact integrity、closure eligibility、freshness、policy、snapshot、scope cleanliness与cleanup全部为true；index tree `1a080844999cb0c5dbf66c8bf95a55c4b38d1f63`与commit `0efabdf` tree一致。
+- Native `gpt-5.6-sol` high reviewer首次因stack-bound caller可以省略guard给出`reject`；修复service与committer双层omission denial及under-lock recheck后给出`accept with concerns`。补充preview-window drift regression与read-only/non-reentrant contract后，最终exact-staged re-review为`accept`，blocking与non-blocking issues均为0。
 
 ## Assessment
 
-I1 已关闭 candidate-neutral materialization/reseal owner、exact source-byte durability/recovery、真实M0 qualification source freeze与M0-specific pre-effect reopen owner，并在canonical rainy-station run上完成M0-only materialization、dependent evidence closure与exact replay。该evidence关闭的是M0 submit之前的execution-stack materialization和read-only preflight implementation gates，不是Provider success、视觉质量、winner、P6或Final Acceptance。
+I1 已关闭 candidate-neutral materialization/reseal owner、exact source-byte durability/recovery、真实M0 qualification source freeze、M0-specific pre-effect reopen owner以及request-to-intent的exact stack binding，并在canonical rainy-station run上完成M0-only materialization、dependent evidence closure与exact replay。该evidence关闭的是M0 submit之前的execution-stack materialization与guard implementation gates，不是Provider success、视觉质量、winner、P6或Final Acceptance。
 
 ## Remaining Risks Or Next Work
 
-- Validation V1仍未启动；下一步的effect-bound M0 caller必须在durable intent和submit之前调用`reopen_m0_validation_preflight()`并消费其exact snapshot。任何source、Project/Registry、candidate、prompt/calibration、dependent evidence或workflow drift都必须在submit前拒绝；仅成功构造snapshot不能被解释为submit authorization。
+- Validation V1仍未启动；request/guard/committer seam已实现并验证，但实际M0 caller尚未构造或执行。后续caller必须向stack-bound resolved request提供`M0ValidationPreSubmitGuard`，并保持one local permit、one submit、no retry、no fallback；仅成功构造snapshot或intent不能被解释为submit authorization。
 - 当前没有执行M0 submit、M1 build/materialization、T8 seed `320001`、六 Shot baseline或任何视觉验收；M1只有在M0按frozen gates失败且exact Hybrid artifact存在后才可能进入独立materialization/validation。
-- 后续可补一个real `ProductionStateCommitter`直连的preflight regression，记录project tree bytes/mtime，证明exact replay zero-write并验证persisted source或dependent-evidence tamper通过该owner原样fail closed；这是review concern，不是当前blocking issue。
-- 本地 `main`包含implementation commits `bc088e9`与`c8eeb51`，当前 `c8eeb51`已成为后续local commits的ancestor但尚未push；unrelated dirty/index work保留且未纳入这些commits。
+- 本地 `main`包含implementation commits `bc088e9`、`c8eeb51`与`0efabdf`；`0efabdf`落地时分支相对cached `origin/main`为ahead 29，随后本记录仍只是local-only documentation checkpoint，均未push。Unrelated dirty/index work保留且未纳入这些commits。
 
 ## Agent Guardrails
 
 - 不得通过 `record_p0_qualification_prepared()` 直接写入 materialized bundle。
 - 不得以 Harness、hash、Provider capability 或 reviewer technical acceptance 替代 human visual acceptance。
-- 不得绕过`reopen_m0_validation_preflight()`直接把prepared receipt或stack hash交给未来M0 effect owner；该read-only owner必须在durable intent之前执行，且其返回值本身不是permit。
+- 不得绕过`M0ValidationPreSubmitGuard`直接把prepared receipt或stack hash交给M0 effect owner，也不得以no-op callback冒充该guard；它必须在preview前执行，并由唯一committer在intent write lock内重新执行，其返回值本身不是permit。
 - 不得把当前 record、plan 或 receipt 解释为 generation、activation、publication 或 release authorization。
