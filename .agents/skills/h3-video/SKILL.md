@@ -96,16 +96,21 @@ python -m open_video recommend-quant
 ```
 
 - Weights incomplete → `python -m open_video pull h3` (or `OPEN_VIDEO_MODELS=… pull`)
-- ComfyUI down → start lab server:
+- ComfyUI down → start the explicit user-systemd service. This keeps the server out of a
+  transient Agent command lifecycle; it never auto-starts or auto-restarts:
 
 ```bash
-cd "${H3_LAB:-$OPEN_VIDEO_ROOT/../lab}"
-curl -sf http://127.0.0.1:8188/system_stats || (
-  mkdir -p logs && cd ComfyUI && nohup ../venv/bin/python main.py \
-    --listen 127.0.0.1 --port 8188 --lowvram --use-sage-attention \
-    > ../logs/comfy_server.log 2>&1 &
-)
+export COMFYUI_ROOT="${COMFYUI_ROOT:-${H3_LAB:-$OPEN_VIDEO_ROOT/../lab}/ComfyUI}"
+python "$OPEN_VIDEO_ROOT/scripts/comfyui_supervisor.py" status
+python "$OPEN_VIDEO_ROOT/scripts/comfyui_supervisor.py" start
+# explicit controls only:
+# python "$OPEN_VIDEO_ROOT/scripts/comfyui_supervisor.py" logs --lines 100
+# python "$OPEN_VIDEO_ROOT/scripts/comfyui_supervisor.py" stop
 ```
+
+If ComfyUI uses a dedicated interpreter outside `$COMFYUI_ROOT/.venv`, set
+`COMFYUI_PYTHON=/absolute/path/to/python` before `start`. The supervisor binds only
+`127.0.0.1`, refuses an occupied port, and does not read or mutate long-video job state.
 
 ### B. Mode
 

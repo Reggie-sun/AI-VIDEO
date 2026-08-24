@@ -263,6 +263,34 @@ def test_code_only_change_still_routes_to_docs_contract_gate() -> None:
     assert "docs_contract_check" in report["check_ids"]
 
 
+def test_local_comfyui_supervisor_routes_to_focused_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    assert policy["checks"]["local_comfyui_supervisor_tests"]["argv"] == [
+        "python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_comfyui_supervisor.py",
+        "-q",
+    ]
+    for path in (
+        "scripts/comfyui_supervisor.py",
+        "tests/test_comfyui_supervisor.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+
+        assert report["categories"] == ["local_comfyui_supervisor"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "docs_contract_check",
+            "policy_audit_check",
+            "local_comfyui_supervisor_tests",
+        ]
+
+
 def test_mandatory_gate_workflow_preserves_server_check_contract() -> None:
     workflow_path = ROOT / ".github/workflows/mandatory-gate.yml"
     workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))

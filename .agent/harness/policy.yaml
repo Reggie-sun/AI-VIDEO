@@ -120,6 +120,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_record_ai_video_session_hook.py, -q]
     cwd: .
     description: Verify Harness scope, routing, isolation, receipts, and Make targets.
+  local_comfyui_supervisor_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_comfyui_supervisor.py, -q]
+    cwd: .
+    description: Verify explicit user-systemd ownership, loopback health checks, and scoped local ComfyUI lifecycle controls.
   architecture_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_architecture_gate.py, tests/test_architecture_gate_cli.py, -q]
     cwd: .
@@ -241,6 +245,7 @@ checks:
       - composition_strategy_proposal_tests
       - composition_architecture_tests
       - harness_tests
+      - local_comfyui_supervisor_tests
       - architecture_tests
       - cli_config_tests
       - workflow_tests
@@ -275,6 +280,13 @@ checks:
     description: Report repository health against the version-controlled architecture baseline.
 
 categories:
+  local_comfyui_supervisor:
+    patterns:
+      - .agents/skills/h3-video/SKILL.md
+      - scripts/comfyui_supervisor.py
+      - tests/test_comfyui_supervisor.py
+    check_ids:
+      - local_comfyui_supervisor_tests
   harness_control:
     patterns:
       - .github/workflows/**
