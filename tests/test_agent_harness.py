@@ -122,7 +122,15 @@ def test_repository_policy_v2_loads_and_references_known_checks() -> None:
     assert policy["always_check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
+        "policy_audit_check",
     ]
+    assert policy["checks"]["policy_audit_check"]["argv"] == [
+        "python",
+        "-m",
+        "scripts.agent_harness",
+        "policy-audit",
+    ]
+    assert policy["checks"]["policy_audit_check"]["execution_priority"] == 15
     assert policy["categories"]["documentation"]["check_ids"] == [
         "docs_contract_check"
     ]
@@ -221,6 +229,7 @@ def test_github_workflow_routes_to_harness_control_suite() -> None:
     assert report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
+        "policy_audit_check",
         "harness_tests",
     ]
 
@@ -237,6 +246,7 @@ def test_docs_only_change_routes_to_behavioral_contract_gate() -> None:
     assert report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
+        "policy_audit_check",
     ]
 
 
@@ -336,6 +346,7 @@ def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
     assert report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
+        "policy_audit_check",
         "task_architecture_gate",
         "production_contract_tests",
         "cli_config_tests",
@@ -357,6 +368,7 @@ def test_shot_router_routes_to_exact_contract_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "policy_audit_check",
             "task_architecture_gate",
             "production_shot_router_tests",
             "provider_neutral_video_requirement_tests",
@@ -386,6 +398,7 @@ def test_video_planner_routes_to_exact_contract_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "policy_audit_check",
             "task_architecture_gate",
             "video_planner_tests",
             "provider_neutral_video_requirement_tests",
@@ -410,6 +423,7 @@ def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "policy_audit_check",
             "task_architecture_gate",
             "shot_readiness_gate_tests",
         ]
@@ -425,6 +439,7 @@ def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
     assert helper_report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
+        "policy_audit_check",
         "task_architecture_gate",
         "video_planner_tests",
         "provider_neutral_video_requirement_tests",
@@ -460,6 +475,7 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "policy_audit_check",
             "task_architecture_gate",
             "quality_intelligence_tests",
         ]
@@ -490,6 +506,7 @@ def test_agent_memory_routes_to_its_focused_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "policy_audit_check",
             "task_architecture_gate",
             "agent_memory_tests",
         ]
@@ -574,6 +591,7 @@ def test_provider_console_bridge_routes_to_python_and_node_contracts() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "policy_audit_check",
             "task_architecture_gate",
             "provider_console_python_tests",
             "provider_console_node_tests",
@@ -599,6 +617,7 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "policy_audit_check",
             "task_architecture_gate",
             "provider_console_node_tests",
             "provider_console_web_build",
@@ -617,6 +636,7 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "policy_audit_check",
             "task_architecture_gate",
             "provider_console_node_tests",
         ]
@@ -662,6 +682,7 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "policy_audit_check",
             "task_architecture_gate",
             "provider_console_sites_build",
             "provider_console_sites_tests",
@@ -713,6 +734,7 @@ def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
     assert report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
+        "policy_audit_check",
         "task_architecture_gate",
         "production_composition_audio_tests",
     ]
@@ -791,9 +813,10 @@ def test_fail_fast_order_and_full_suite_reverse_coverage(tmp_path: Path) -> None
         ["src/ai_video/production/seedance.py", "unmapped.task"], policy
     )
 
-    assert inspection["check_ids"][:4] == [
+    assert inspection["check_ids"][:5] == [
         "scope_diff_check",
         "docs_contract_check",
+        "policy_audit_check",
         "task_architecture_gate",
         "full_tests",
     ]
@@ -844,6 +867,7 @@ def test_fail_fast_order_and_full_suite_reverse_coverage(tmp_path: Path) -> None
     assert executed == [
         "scope_diff_check",
         "docs_contract_check",
+        "policy_audit_check",
         "task_architecture_gate",
         "full_tests",
     ]
@@ -857,6 +881,74 @@ def test_fail_fast_order_and_full_suite_reverse_coverage(tmp_path: Path) -> None
         "production_video_provider_tests",
         "provider_neutral_video_requirement_tests",
     }
+
+
+def test_policy_audit_failure_stops_before_expensive_checks(tmp_path: Path) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+    inspection = agent_harness.inspect_paths(
+        ["src/ai_video/production/seedance.py", "unmapped.task"], policy
+    )
+    scope = {
+        "mode": "commit_range",
+        "changed_paths": inspection["changed_paths"],
+        "base_oid": "a" * 40,
+        "head_oid": "b" * 40,
+        "closure_eligible": True,
+    }
+    argv_to_check_id = {
+        tuple(agent_harness._check_argv(policy["checks"][check_id], scope, None)): check_id
+        for check_id in inspection["check_ids"]
+    }
+    executed: list[str] = []
+
+    def failing_audit_runner(
+        argv: tuple[str, ...],
+        _cwd: Path,
+        _timeout_seconds: float,
+        _env: dict[str, str],
+    ) -> agent_harness.CommandResult:
+        argv_without_junit = tuple(
+            argument for argument in argv if not argument.startswith("--junitxml=")
+        )
+        check_id = argv_to_check_id[argv_without_junit]
+        executed.append(check_id)
+        if check_id == "policy_audit_check":
+            return agent_harness.CommandResult(
+                status="failed", exit_code=1, stdout="unmapped\n", stderr=""
+            )
+        return agent_harness.CommandResult(
+            status="passed", exit_code=0, stdout="ok\n", stderr=""
+        )
+
+    receipt_path, passed = agent_harness.verify_inspection(
+        inspection,
+        policy,
+        scope=scope,
+        source_snapshot={"scope_sha256": "c" * 64},
+        project_root=tmp_path,
+        execution_root=tmp_path,
+        runs_dir=tmp_path / "runs",
+        run_id="policy-audit-fail-fast",
+        runner=failing_audit_runner,
+    )
+
+    assert passed is False
+    assert executed == [
+        "scope_diff_check",
+        "docs_contract_check",
+        "policy_audit_check",
+    ]
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert receipt["status"] == "failed"
+    assert receipt["checks"][2]["check_id"] == "policy_audit_check"
+    assert receipt["checks"][2]["status"] == "failed"
+    assert all(
+        check["status"] == "skipped" for check in receipt["checks"][3:]
+    )
+    assert all(
+        check["reason"] == "blocked by failed check policy_audit_check"
+        for check in receipt["checks"][3:]
+    )
 
 
 def test_repository_production_coverage_executes_only_uncovered_checks(
@@ -1361,6 +1453,7 @@ def test_inspection_falls_back_to_full_tests_and_task_architecture_gate() -> Non
     assert report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
+        "policy_audit_check",
         "task_architecture_gate",
         "full_tests",
     ]

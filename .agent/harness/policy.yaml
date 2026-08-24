@@ -81,6 +81,7 @@ audit_unreferenced_test_exempt_patterns:
 always_check_ids:
   - scope_diff_check
   - docs_contract_check
+  - policy_audit_check
 
 fallback_check_ids:
   - full_tests
@@ -98,6 +99,11 @@ checks:
     cwd: .
     execution_priority: 10
     description: Verify canonical documentation metadata and repository contract coherence.
+  policy_audit_check:
+    argv: [python, -m, scripts.agent_harness, policy-audit]
+    cwd: .
+    execution_priority: 15
+    description: Fail fast on unmapped, unverified, missing, or unreferenced owned paths before expensive suites.
   composition_playbook_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_composition_playbooks.py, -q]
     cwd: .
