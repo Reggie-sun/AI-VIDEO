@@ -17,12 +17,11 @@ DEFAULT_RUNS_ROOT: str = "runs"
 DEFAULT_SCOPE: str = "experience"
 VALID_SCOPES: tuple[str, ...] = ("experience", "superpowers", "all")
 
-# Default local vector index directory. Treated as a derived artifact;
-# never committed to Git (see .gitignore).
+# Default project index root. Each main corpus is materialized in its own
+# contained Chroma shard. The root is derived local state and is never
+# committed to Git (see .gitignore).
 DEFAULT_INDEX_PATH: str = ".agent/memory/index"
-# Separate derived index for auto-generated run summaries. It is rebuilt
-# on demand by the main search when the corpus digest changes; no CLI
-# ``build`` invocation is required for it to surface hits.
+# Run summaries remain a separate one-corpus shard for CLI compatibility.
 DEFAULT_RUNS_INDEX_PATH: str = ".agent/memory/run-summaries"
 
 # Chroma collection name. Stable across rebuilds.

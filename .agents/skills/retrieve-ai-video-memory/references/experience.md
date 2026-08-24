@@ -31,10 +31,11 @@ python -m scripts.agent_memory --scope experience search \
   "<task-specific query>" --top-k 8 --json
 ```
 
-This command only validates and queries materialized indexes. If it reports a
-missing, stale, partial, or identity-mismatched index, return to the parent
-skill's explicit `--scope all build` recovery rule; do not rebuild inside the
-search timeout.
+This command queries the canonical per-corpus shards. Stale last-good fragments
+are explicitly tagged and their exact shards are queued for detached refresh;
+missing or legacy layout returns exit `3` after queueing materialization.
+Follow the parent skill's non-blocking result rules and never run a foreground
+recovery build.
 
 Prefer one precise query. A second query is justified only when the first
 reveals a distinct historical term, owner, or failure signature needed by the

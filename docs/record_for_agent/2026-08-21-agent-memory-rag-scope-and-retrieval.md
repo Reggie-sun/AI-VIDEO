@@ -42,8 +42,9 @@ python -m scripts.agent_memory --scope superpowers search "state commit recovery
 python -m scripts.agent_memory --scope all search "provider-neutral planning"
 ```
 
-它没有 background trigger、Production runtime hook、Provider submit、网络 fallback
-或 automatic model download。
+它没有 automatic query trigger、Production runtime hook、Provider submit、网络 fallback
+或 automatic model download。显式 `search` 只在 stale/missing derived index 时调度本地
+detached maintenance worker。
 
 ## Agent Trigger Rules
 
@@ -150,22 +151,27 @@ current_docs、research、deferred 的 null excess 分别为 `-0.003528`、`0.00
 ## Freshness And Maintenance
 
 Index manifest 绑定 exact corpus digest、chunking configuration、embedding identity、
-collection identity 与 library versions。Materialization 与 query 是两个独立 phase：
-`build` 是唯一能够通过 staging 构建并替换 derived index 的 owner；`experience` / `all`
-build 也会同步 materialize eligible run-summary index。`search` 只校验并查询，绝不创建、
-刷新或修复 index。主 index 或 run-summary index 缺失、corpus bytes/digest 改变、requested
-scope 尚未 materialize、schema / embedding / chunking / metric / library identity / corpus
-authority / collection contract 不匹配，或 physical collection partial/corrupt 时，search
-均 fail closed，并提示对 shared index 做 explicit build：
+collection identity 与 library versions。五个 main corpus 分别 materialize 到
+`.agent/memory/index/<corpus_kind>/`；run summaries 保持独立 leaf。Low-level retrieval
+只读，detached maintenance queue 与 shard builder 是独立 owner。
 
-```bash
-python -m scripts.agent_memory --scope all build
-```
+`CORPUS_STALE` 仅表示 exact root identity 已匹配，但 source digest/document count
+落后：在 schema、embedding、chunking、library、authority、manifest 和 physical chunk
+count 全部通过后，CLI 可返回带
+`index_freshness=stale` 的 last-good 片段，并 queue exact stale shards。Build 在独立
+staging 完成 embedding，只在 atomic activation 时与 search 共享短时 read/write lock；
+因此前台 query 不等待数分钟 build。Missing/legacy layout queue materialization 并以
+exit `3` 返回；identity 或 physical corruption 属于 `BROKEN`，以 exit `2` fail closed，
+绝不 last-good 或自动修复。旧 shared `.agent/memory/index` 不再读取；one-time migration
+从 authoritative corpus bytes 重建 per-corpus shards。
 
-Index 位于 `.agent/memory/index/`，是 local derived state，不是 repository runtime
-truth 或 committed evidence。新增或修改五个 corpus 拥有的 Markdown 或 eligible
-run summary 后，必须先显式运行 build，再执行 search。这样耗时的 embedding / Chroma
-写入不会占用 query timeout，也不会让一次只读检索产生 workspace-local derived writes。
+Queue 位于 worktree-local Git path `.git/agent-memory-refresh/`，只保存 sanitized corpus
+root/index configuration、corpus kinds 与 exact desired source identities，不保存 query、
+credential 或 Provider payload。同 kind/same identity 的 in-flight request 会 dedupe；
+source identity 在 build 期间变化时保留一个 follow-up refresh，而不是误丢或无限重复。
+它使用 `fcntl` dedupe/worker locks、argv-only detached process 与 restricted environment；
+worker failure只记录 sanitized status，不 blind retry。该 queue 不是 lifecycle hook，
+不进入 Product Runtime，不运行 Provider/媒体/网络操作。
 
 ## 2026-08-24 Build And Search Phase Split
 
@@ -198,6 +204,34 @@ index 误报为 `[]`，修复并补 regression test 后 scoped re-review 为 `ac
 
 该提交仅存在于 local `main`，未 push 或 release。本轮没有 Provider、媒体、网络或 Product
 Runtime 操作；Project RAG 仍由 prompt-aware skill 显式调用，不注册 runtime hook。
+
+## 2026-08-24 Non-Blocking Sharded Refresh
+
+后续 current implementation 用 per-corpus shards 替换了上一 checkpoint 的 shared main
+index 与 foreground recovery UX。`retrieval.search()` 继续作为 strict leaf-level
+compatibility API；project CLI 改用只读 `retrieve_project()`，维护由
+`agent_memory.maintenance` detached queue 单独拥有。旧 shared index 不作为 dual read
+fallback，首次使用会 queue all-scope migration 并快速返回。
+
+日常 source drift 只分类为 `CORPUS_STALE`：CLI 可返回明确 tagged 的 last-good fragments，
+再 queue exact stale kinds。所有 identity/contract/physical corruption 保持 `BROKEN` 严格
+拒绝。Query embedding 与 null calibration 每次 query 只计算一组，并跨 shards 复用；
+Top-30、Top-8、0.7、quota 与 lane-aware admission 不变。Skill 不再要求 Agent 执行
+foreground `--scope all build` 或在当前任务内等待、poll、retry。
+
+本轮 executable evidence 包括：完整 `tests/test_agent_memory.py` 为 `96 passed`；final
+queue/locking/PID hardening focused tests 为 `7 passed`；Skill `quick_validate.py` 返回
+`Skill is valid!`；`git diff --check` 通过。Native `reviewer_xhigh` 未发现 blocking issue，
+其提出的 root-identity stale classification、partial-layout aggregation、failure lost wakeup、
+in-flight duplicate build、same-process Chroma client 与 reused PID concerns 均补了 focused
+regression 和 minimal fix。
+
+Review 期间实际触发了一次 local derived migration，超出了 assigned read-only review
+boundary，但没有修改 tracked 或 Production state。当前 `.agent/memory/index/layout.json`
+与五个 leaf manifest 均存在，status 为 `ready`；measured chunk counts 为
+`current_docs=216`、`deferred=58`、`experience=595`、`research=94`、
+`superpowers=3703`。这是本机 derived cache evidence，不是 committed/runtime/release truth；
+旧 shared cache 已被 per-corpus layout 替换。没有运行 Provider、媒体或网络操作。
 
 ## Guardrails
 

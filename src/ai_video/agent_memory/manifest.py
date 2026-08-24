@@ -25,6 +25,10 @@ class IndexMismatchError(RuntimeError):
     """Raised when an index does not match its requested corpus/model identity."""
 
 
+class StaleIndexError(IndexMismatchError):
+    """Raised only when a valid materialized index trails source corpus bytes."""
+
+
 @dataclass(frozen=True)
 class CorpusManifest:
     kind: str
@@ -211,11 +215,12 @@ def validate_manifest(
             digest, document_count = run_summary_digest(corpus.root)
         else:
             digest, document_count = corpus_digest(corpus.root, corpus)
-        if (
-            item.source_sha256 != digest
-            or item.document_count != document_count
-            or item.root != _display_root(corpus.root)
-        ):
+        if item.root != _display_root(corpus.root):
             raise IndexMismatchError(
+                f"corpus root identity mismatch for {corpus.kind!r}; "
+                "rebuild required"
+            )
+        if item.source_sha256 != digest or item.document_count != document_count:
+            raise StaleIndexError(
                 f"stale corpus {corpus.kind!r}; rebuild the Agent Memory index"
             )

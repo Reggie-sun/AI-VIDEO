@@ -1385,8 +1385,19 @@ def test_cli_builds_and_searches_all_scopes(
     output = capsys.readouterr().out
     assert '"corpus_kind": "experience"' in output
     assert '"corpus_kind": "superpowers"' in output
+    from ai_video.agent_memory.layout import shard_path
+
     assert {
-        item.kind for item in index_module.read_index_manifest(idx).corpora
+        kind
+        for kind in (
+            "experience",
+            "superpowers",
+            "current_docs",
+            "research",
+            "deferred",
+        )
+        if index_module.read_index_manifest(shard_path(idx, kind)).corpora[0].kind
+        == kind
     } == {
         "experience",
         "superpowers",
@@ -1530,14 +1541,21 @@ def test_cli_build_reports_changed_corpus_without_traceback(
 
 
 def test_cli_search_fails_closed_when_collection_is_missing(
-    scoped_corpora, tmp_path: Path, capsys
+    scoped_corpora, tmp_path: Path, capsys, monkeypatch
 ) -> None:
     experience, _ = scoped_corpora
     idx = tmp_path / "idx"
     embedding = DeterministicFakeEmbeddings()
-    index_module.build_scoped_index((experience,), idx, embedding)
-    client = index_module.load_index(idx, embedding)
+    from ai_video.agent_memory.layout import build_project_indexes, shard_path
+
+    build_project_indexes((experience,), idx, embedding)
+    client = index_module.load_index(shard_path(idx, "experience"), embedding)
     client.delete_collection(experience.collection_name)
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: pytest.fail("BROKEN index must not enqueue refresh"),
+    )
 
     result = agent_memory_main(
         [
@@ -1549,6 +1567,8 @@ def test_cli_search_fails_closed_when_collection_is_missing(
             str(experience.root),
             "--index",
             str(idx),
+            "--runs-root",
+            str(tmp_path / "missing-runs"),
             "search",
             "continuity",
         ]
@@ -2290,3 +2310,891 @@ def test_run_summary_validation_rejects_embedding_identity_until_explicit_build(
     index_module.build_scoped_index((spec,), runs_idx, replacement)
 
     assert index_module.read_index_manifest(runs_idx).embedding.dimension == 32
+
+
+# ---------------------------------------------------------------------------
+# non-blocking sharded project retrieval + refresh maintenance
+# ---------------------------------------------------------------------------
+
+
+def test_scoped_validation_classifies_source_drift_as_stale(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    from ai_video.agent_memory.manifest import StaleIndexError
+
+    experience, _ = scoped_corpora
+    idx = tmp_path / "idx"
+    index_module.build_scoped_index((experience,), idx, fake_embedding)
+    (experience.root / "continuity.md").write_text(
+        "# Fresh source bytes\n\nChanged after materialization.\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(StaleIndexError, match="stale corpus"):
+        index_module.validate_scoped_index((experience,), idx, fake_embedding)
+
+
+def test_stale_fallback_rejects_different_corpus_root_identity(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes
+    from ai_video.agent_memory.retrieval import retrieve_project
+
+    experience, _ = scoped_corpora
+    root = tmp_path / "project-index"
+    build_project_indexes((experience,), root, fake_embedding)
+    replacement_root = tmp_path / "replacement-experience"
+    shutil.copytree(experience.root, replacement_root)
+    replacement = corpus_module.CorpusSpec.experience(replacement_root)
+
+    with pytest.raises(index_module.IndexMismatchError, match="root identity"):
+        retrieve_project(
+            "exact terminal frame",
+            scope="experience",
+            corpora=(replacement,),
+            index_root=root,
+            embedding=fake_embedding,
+            allow_stale=True,
+        )
+
+
+def test_project_layout_materializes_one_leaf_per_corpus(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+    fake_embedding,
+) -> None:
+    from ai_video.agent_memory.layout import (
+        build_project_indexes,
+        read_project_layout,
+        shard_path,
+    )
+
+    _, project_corpora = project_docs_corpora
+    corpora = (*scoped_corpora, *project_corpora)
+    root = tmp_path / "project-index"
+
+    counts = build_project_indexes(corpora, root, fake_embedding)
+
+    assert set(counts) == {item.kind for item in corpora}
+    assert read_project_layout(root).schema_version == 1
+    for corpus in corpora:
+        manifest = index_module.read_index_manifest(shard_path(root, corpus.kind))
+        assert [item.kind for item in manifest.corpora] == [corpus.kind]
+
+
+def test_project_layout_narrow_refresh_preserves_unrelated_shard(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes, shard_path
+
+    experience, superpowers = scoped_corpora
+    root = tmp_path / "project-index"
+    build_project_indexes(scoped_corpora, root, fake_embedding)
+    untouched = shard_path(root, superpowers.kind) / "manifest.json"
+    untouched_before = untouched.read_bytes()
+    (experience.root / "continuity.md").write_text(
+        "# Refreshed continuity\n\nUse the exact terminal frame.\n",
+        encoding="utf-8",
+    )
+
+    counts = build_project_indexes((experience,), root, fake_embedding)
+
+    assert set(counts) == {"experience"}
+    assert untouched.read_bytes() == untouched_before
+
+
+def test_activation_lock_serializes_same_process_chroma_readers(
+    tmp_path: Path,
+) -> None:
+    import threading
+
+    leaf = tmp_path / "index" / "experience"
+    first_entered = threading.Event()
+    release_first = threading.Event()
+    second_entered = threading.Event()
+
+    def first_reader() -> None:
+        with index_module.index_activation_lock(leaf, exclusive=False):
+            first_entered.set()
+            assert release_first.wait(timeout=2)
+
+    def second_reader() -> None:
+        with index_module.index_activation_lock(leaf, exclusive=False):
+            second_entered.set()
+
+    first = threading.Thread(target=first_reader)
+    second = threading.Thread(target=second_reader)
+    first.start()
+    assert first_entered.wait(timeout=1)
+    second.start()
+    assert not second_entered.wait(timeout=0.05)
+    release_first.set()
+    first.join(timeout=2)
+    second.join(timeout=2)
+
+    assert not first.is_alive()
+    assert not second.is_alive()
+    assert second_entered.is_set()
+
+
+def test_project_retrieval_returns_tagged_last_good_for_stale_shard(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes, shard_path
+    from ai_video.agent_memory.retrieval import retrieve_project
+
+    experience, _ = scoped_corpora
+    root = tmp_path / "project-index"
+    build_project_indexes((experience,), root, fake_embedding)
+    manifest_path = shard_path(root, "experience") / "manifest.json"
+    manifest_before = manifest_path.read_bytes()
+    (experience.root / "continuity.md").write_text(
+        "# New unrelated source\n\nThe old exact terminal frame text is gone.\n",
+        encoding="utf-8",
+    )
+
+    result = retrieve_project(
+        "exact terminal frame",
+        top_k=8,
+        scope="experience",
+        corpora=(experience,),
+        index_root=root,
+        embedding=fake_embedding,
+        allow_stale=True,
+    )
+
+    assert result.stale_kinds == ("experience",)
+    assert result.hits
+    assert {hit.index_freshness for hit in result.hits} == {"stale"}
+    assert manifest_path.read_bytes() == manifest_before
+
+
+def test_project_retrieval_never_hides_corruption_behind_stale_fallback(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes, shard_path
+    from ai_video.agent_memory.retrieval import retrieve_project
+
+    experience, _ = scoped_corpora
+    root = tmp_path / "project-index"
+    build_project_indexes((experience,), root, fake_embedding)
+    leaf = shard_path(root, "experience")
+    collection = index_module.load_index(leaf, fake_embedding).get_collection(
+        experience.collection_name
+    )
+    collection.delete(ids=[collection.get(limit=1)["ids"][0]])
+    (experience.root / "continuity.md").write_text(
+        "# Stale and corrupt\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(index_module.IndexMismatchError, match="chunk count mismatch"):
+        retrieve_project(
+            "continuity",
+            scope="experience",
+            corpora=(experience,),
+            index_root=root,
+            embedding=fake_embedding,
+            allow_stale=True,
+        )
+
+
+def test_project_retrieval_embeds_query_once_across_shards(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+    fake_embedding,
+    monkeypatch,
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes
+    from ai_video.agent_memory.retrieval import retrieve_project
+
+    _, project_corpora = project_docs_corpora
+    corpora = (*scoped_corpora, *project_corpora)
+    root = tmp_path / "project-index"
+    build_project_indexes(corpora, root, fake_embedding)
+    original = fake_embedding.embed_query
+    calls: list[str] = []
+
+    def record_query(text: str):
+        calls.append(text)
+        return original(text)
+
+    monkeypatch.setattr(fake_embedding, "embed_query", record_query)
+
+    retrieve_project(
+        "project recovery",
+        scope="all",
+        corpora=corpora,
+        index_root=root,
+        embedding=fake_embedding,
+    )
+
+    assert len(calls) == 2
+
+
+def test_refresh_queue_merges_kinds_and_avoids_duplicate_worker(
+    tmp_path: Path,
+) -> None:
+    from ai_video.agent_memory.maintenance import RefreshRequest, enqueue_refresh
+
+    queue_root = tmp_path / "queue"
+    request = RefreshRequest(
+        index_root=str(tmp_path / "index"),
+        runs_index_path=str(tmp_path / "runs-index"),
+        corpus_roots={
+            "experience": str(tmp_path / "experience"),
+            "superpowers": str(tmp_path / "superpowers"),
+        },
+        desired_sources={"experience": "v1", "superpowers": "v1"},
+        embedding_backend="fake",
+        batch_size=8,
+    )
+    launches: list[tuple[str, ...]] = []
+
+    class Process:
+        pid = 4242
+
+    def launch(command):
+        launches.append(tuple(command))
+        return Process()
+
+    first = enqueue_refresh(
+        request,
+        ("experience",),
+        queue_root=queue_root,
+        launch=launch,
+        process_alive=lambda pid: pid == 4242,
+    )
+    second = enqueue_refresh(
+        request,
+        ("superpowers",),
+        queue_root=queue_root,
+        launch=launch,
+        process_alive=lambda pid: pid == 4242,
+    )
+
+    assert first.worker_started is True
+    assert second.worker_started is False
+    assert launches and len(launches) == 1
+    pending = json.loads((queue_root / first.queue_key / "pending.json").read_text())
+    assert pending["kinds"] == ["experience", "superpowers"]
+
+
+def test_refresh_worker_health_checks_exact_worker_argv(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import os
+
+    from ai_video.agent_memory.maintenance import _pid_alive
+
+    queue_dir = (tmp_path / "queue").resolve()
+    assert _pid_alive(os.getpid()) is True
+    assert _pid_alive(os.getpid(), queue_dir) is False
+
+    worker_argv = b"\0".join(
+        (
+            b"python",
+            b"-m",
+            b"scripts.agent_memory",
+            b"_refresh-worker",
+            b"--queue-dir",
+            str(queue_dir).encode("utf-8"),
+            b"",
+        )
+    )
+    monkeypatch.setattr(Path, "read_bytes", lambda path: worker_argv)
+    assert _pid_alive(os.getpid(), queue_dir) is True
+    assert _pid_alive(os.getpid(), tmp_path / "other-queue") is False
+
+    def unreadable(path):
+        raise OSError("proc unavailable")
+
+    monkeypatch.setattr(Path, "read_bytes", unreadable)
+    assert _pid_alive(os.getpid(), queue_dir) is False
+
+
+def test_refresh_worker_drains_pending_and_records_sanitized_status(
+    tmp_path: Path,
+) -> None:
+    from ai_video.agent_memory.maintenance import (
+        RefreshRequest,
+        enqueue_refresh,
+        run_refresh_worker,
+    )
+
+    queue_root = tmp_path / "queue"
+    request = RefreshRequest(
+        index_root=str(tmp_path / "index"),
+        runs_index_path=str(tmp_path / "runs-index"),
+        corpus_roots={"experience": str(tmp_path / "experience")},
+        desired_sources={"experience": "v1"},
+        embedding_backend="fake",
+        batch_size=8,
+    )
+
+    class Process:
+        pid = 4242
+
+    queued = enqueue_refresh(
+        request,
+        ("experience",),
+        queue_root=queue_root,
+        launch=lambda command: Process(),
+        process_alive=lambda pid: False,
+    )
+    queue_dir = queue_root / queued.queue_key
+    observed: list[tuple[str, ...]] = []
+
+    result = run_refresh_worker(
+        queue_dir,
+        lambda queued_request, kinds: observed.append(kinds) or {"experience": 3},
+    )
+
+    assert result == 0
+    assert observed == [("experience",)]
+    assert not (queue_dir / "pending.json").exists()
+    assert not (queue_dir / "worker.json").exists()
+    status = json.loads((queue_dir / "status.json").read_text())
+    assert status == {
+        "counts": {"experience": 3},
+        "kinds": ["experience"],
+        "status": "ready",
+    }
+
+
+def test_refresh_worker_failure_drains_request_enqueued_during_build(
+    tmp_path: Path,
+) -> None:
+    import os
+
+    from ai_video.agent_memory.maintenance import (
+        RefreshRequest,
+        enqueue_refresh,
+        run_refresh_worker,
+    )
+
+    queue_root = tmp_path / "queue"
+    request = RefreshRequest(
+        index_root=str(tmp_path / "index"),
+        runs_index_path=str(tmp_path / "runs-index"),
+        corpus_roots={
+            "experience": str(tmp_path / "experience"),
+            "superpowers": str(tmp_path / "superpowers"),
+        },
+        desired_sources={"experience": "v1", "superpowers": "v1"},
+        embedding_backend="fake",
+        batch_size=8,
+    )
+
+    class Process:
+        pid = 4242
+
+    queued = enqueue_refresh(
+        request,
+        ("experience",),
+        queue_root=queue_root,
+        launch=lambda command: Process(),
+        process_alive=lambda pid: False,
+    )
+    queue_dir = queue_root / queued.queue_key
+    observed: list[tuple[str, ...]] = []
+
+    def build(queued_request, kinds):
+        observed.append(kinds)
+        if kinds == ("experience",):
+            enqueue_refresh(
+                request,
+                ("superpowers",),
+                queue_root=queue_root,
+                launch=lambda command: pytest.fail("active worker must be reused"),
+                process_alive=lambda pid: pid == os.getpid(),
+            )
+            raise RuntimeError("sensitive provider payload must not be recorded")
+        return {"superpowers": 2}
+
+    result = run_refresh_worker(queue_dir, build)
+
+    assert result == 0
+    assert observed == [("experience",), ("superpowers",)]
+    assert not (queue_dir / "pending.json").exists()
+    assert not (queue_dir / "worker.json").exists()
+    status_text = (queue_dir / "status.json").read_text(encoding="utf-8")
+    assert "sensitive provider payload" not in status_text
+    assert json.loads(status_text) == {
+        "counts": {"superpowers": 2},
+        "kinds": ["superpowers"],
+        "status": "ready",
+    }
+
+
+def test_refresh_worker_dedupes_same_identity_enqueued_while_in_flight(
+    tmp_path: Path,
+) -> None:
+    import os
+
+    from ai_video.agent_memory.maintenance import (
+        RefreshRequest,
+        enqueue_refresh,
+        run_refresh_worker,
+    )
+
+    queue_root = tmp_path / "queue"
+    request = RefreshRequest(
+        index_root=str(tmp_path / "index"),
+        runs_index_path=str(tmp_path / "runs-index"),
+        corpus_roots={"experience": str(tmp_path / "experience")},
+        desired_sources={"experience": "v1"},
+        embedding_backend="fake",
+        batch_size=8,
+    )
+
+    class Process:
+        pid = 4242
+
+    queued = enqueue_refresh(
+        request,
+        ("experience",),
+        queue_root=queue_root,
+        launch=lambda command: Process(),
+        process_alive=lambda pid: False,
+    )
+    queue_dir = queue_root / queued.queue_key
+    observed: list[tuple[str, ...]] = []
+
+    def build(queued_request, kinds):
+        observed.append(kinds)
+        enqueue_refresh(
+            request,
+            ("experience",),
+            queue_root=queue_root,
+            launch=lambda command: pytest.fail("active worker must be reused"),
+            process_alive=lambda pid: pid == os.getpid(),
+        )
+        return {"experience": 3}
+
+    result = run_refresh_worker(queue_dir, build)
+
+    assert result == 0
+    assert observed == [("experience",)]
+    assert not (queue_dir / "pending.json").exists()
+
+
+def test_refresh_worker_keeps_new_source_identity_enqueued_while_in_flight(
+    tmp_path: Path,
+) -> None:
+    import os
+    from dataclasses import replace
+
+    from ai_video.agent_memory.maintenance import (
+        RefreshRequest,
+        enqueue_refresh,
+        run_refresh_worker,
+    )
+
+    queue_root = tmp_path / "queue"
+    request = RefreshRequest(
+        index_root=str(tmp_path / "index"),
+        runs_index_path=str(tmp_path / "runs-index"),
+        corpus_roots={"experience": str(tmp_path / "experience")},
+        desired_sources={"experience": "v1"},
+        embedding_backend="fake",
+        batch_size=8,
+    )
+    request_v2 = replace(request, desired_sources={"experience": "v2"})
+
+    class Process:
+        pid = 4242
+
+    queued = enqueue_refresh(
+        request,
+        ("experience",),
+        queue_root=queue_root,
+        launch=lambda command: Process(),
+        process_alive=lambda pid: False,
+    )
+    queue_dir = queue_root / queued.queue_key
+    observed: list[str] = []
+
+    def build(queued_request, kinds):
+        observed.append(queued_request.desired_sources["experience"])
+        if observed == ["v1"]:
+            follow_up = enqueue_refresh(
+                request_v2,
+                ("experience",),
+                queue_root=queue_root,
+                launch=lambda command: pytest.fail("active worker must be reused"),
+                process_alive=lambda pid: pid == os.getpid(),
+            )
+            assert follow_up.queue_key == queued.queue_key
+        return {"experience": 3}
+
+    result = run_refresh_worker(queue_dir, build)
+
+    assert result == 0
+    assert observed == ["v1", "v2"]
+    assert not (queue_dir / "pending.json").exists()
+
+
+def test_cli_refresh_worker_materializes_only_queued_project_shard(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+) -> None:
+    from types import SimpleNamespace
+
+    from ai_video.agent_memory.layout import shard_path
+    from ai_video.agent_memory.maintenance import enqueue_refresh
+
+    experience, superpowers = scoped_corpora
+    docs_root, _ = project_docs_corpora
+    index_root = tmp_path / "index"
+    args = SimpleNamespace(
+        corpus=str(experience.root),
+        superpowers_corpus=str(superpowers.root),
+        docs_root=str(docs_root),
+        runs_root=str(tmp_path / "missing-runs"),
+        index=str(index_root),
+        runs_index=str(tmp_path / "runs-index"),
+        embedding="fake",
+        batch_size=8,
+    )
+    request = agent_memory_script._refresh_request(args)
+
+    class Process:
+        pid = 4242
+
+    queued = enqueue_refresh(
+        request,
+        ("experience",),
+        queue_root=tmp_path / "queue",
+        launch=lambda command: Process(),
+        process_alive=lambda pid: False,
+    )
+
+    result = agent_memory_script.cmd_refresh_worker(
+        SimpleNamespace(queue_dir=str(tmp_path / "queue" / queued.queue_key))
+    )
+
+    assert result == 0
+    assert index_module.index_exists(shard_path(index_root, "experience"))
+    assert not shard_path(index_root, "superpowers").exists()
+
+
+def test_cli_stale_search_returns_last_good_and_queues_refresh(
+    scoped_corpora, tmp_path: Path, capsys, monkeypatch
+) -> None:
+    experience, _ = scoped_corpora
+    idx = tmp_path / "idx"
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "experience",
+        "--corpus",
+        str(experience.root),
+        "--index",
+        str(idx),
+        "--runs-root",
+        str(tmp_path / "missing-runs"),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+    capsys.readouterr()
+    (experience.root / "continuity.md").write_text(
+        "# Changed source\n\nNew bytes after the last-good index.\n",
+        encoding="utf-8",
+    )
+    queued: list[tuple[str, ...]] = []
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: queued.append(tuple(kinds)),
+    )
+    result = agent_memory_main(
+        [*common, "search", "exact terminal frame", "--json"]
+    )
+
+    captured = capsys.readouterr()
+    assert result == 0
+    assert '"index_freshness": "stale"' in captured.out
+    assert "tagged last-good" in captured.err
+    assert queued == [("experience",)]
+
+
+def test_cli_missing_layout_queues_without_foreground_build(
+    scoped_corpora, tmp_path: Path, capsys, monkeypatch
+) -> None:
+    experience, _ = scoped_corpora
+    idx = tmp_path / "missing-index"
+    queued: list[tuple[str, ...]] = []
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: queued.append(tuple(kinds)),
+    )
+    monkeypatch.setattr(
+        agent_memory_script,
+        "build_embedding",
+        lambda **kwargs: pytest.fail("missing layout must queue before model load"),
+    )
+
+    result = agent_memory_main(
+        [
+            "--embedding",
+            "fake",
+            "--scope",
+            "experience",
+            "--corpus",
+            str(experience.root),
+            "--index",
+            str(idx),
+            "--runs-root",
+            str(tmp_path / "missing-runs"),
+            "search",
+            "continuity",
+        ]
+    )
+
+    assert result == 3
+    assert queued == [("experience",)]
+    assert not idx.exists()
+    assert "continue with current repository evidence" in capsys.readouterr().err
+
+
+def test_cli_missing_embedding_is_broken_and_never_queued(
+    scoped_corpora, tmp_path: Path, capsys, monkeypatch, fake_embedding
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes
+
+    experience, _ = scoped_corpora
+    idx = tmp_path / "index"
+    build_project_indexes((experience,), idx, fake_embedding)
+    monkeypatch.setattr(
+        agent_memory_script,
+        "build_embedding",
+        lambda **kwargs: (_ for _ in ()).throw(FileNotFoundError("model missing")),
+    )
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: pytest.fail("missing embedding must not enqueue"),
+    )
+
+    result = agent_memory_main(
+        [
+            "--embedding",
+            "local",
+            "--scope",
+            "experience",
+            "--corpus",
+            str(experience.root),
+            "--index",
+            str(idx),
+            "--runs-root",
+            str(tmp_path / "missing-runs"),
+            "search",
+            "continuity",
+        ]
+    )
+
+    assert result == 2
+    assert "model missing" in capsys.readouterr().err
+
+
+def test_cli_missing_run_shard_queues_only_run_summaries(
+    scoped_corpora,
+    sample_runs_root: Path,
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+    fake_embedding,
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes
+
+    experience, _ = scoped_corpora
+    idx = tmp_path / "index"
+    build_project_indexes((experience,), idx, fake_embedding)
+    queued: list[tuple[str, ...]] = []
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: queued.append(tuple(kinds)),
+    )
+    monkeypatch.setattr(
+        agent_memory_script,
+        "build_embedding",
+        lambda **kwargs: pytest.fail("missing run shard must queue before model load"),
+    )
+
+    result = agent_memory_main(
+        [
+            "--embedding",
+            "fake",
+            "--scope",
+            "experience",
+            "--corpus",
+            str(experience.root),
+            "--index",
+            str(idx),
+            "--runs-root",
+            str(sample_runs_root),
+            "--runs-index",
+            str(tmp_path / "missing-runs-index"),
+            "search",
+            "continuity",
+        ]
+    )
+
+    assert result == 3
+    assert queued == [("run_summaries",)]
+    assert "continue with current repository evidence" in capsys.readouterr().err
+
+
+def test_cli_partial_all_layout_queues_all_missing_shards_before_model_load(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+    fake_embedding,
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes
+
+    experience, superpowers = scoped_corpora
+    docs_root, _ = project_docs_corpora
+    idx = tmp_path / "index"
+    build_project_indexes((experience,), idx, fake_embedding)
+    queued: list[tuple[str, ...]] = []
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: queued.append(tuple(kinds)),
+    )
+    monkeypatch.setattr(
+        agent_memory_script,
+        "build_embedding",
+        lambda **kwargs: pytest.fail("partial layout must queue before model load"),
+    )
+
+    result = agent_memory_main(
+        [
+            "--embedding",
+            "fake",
+            "--scope",
+            "all",
+            "--corpus",
+            str(experience.root),
+            "--superpowers-corpus",
+            str(superpowers.root),
+            "--docs-root",
+            str(docs_root),
+            "--index",
+            str(idx),
+            "--runs-root",
+            str(tmp_path / "missing-runs"),
+            "search",
+            "recovery",
+        ]
+    )
+
+    assert result == 3
+    assert queued == [
+        ("superpowers", "current_docs", "research", "deferred")
+    ]
+    assert "continue with current repository evidence" in capsys.readouterr().err
+
+
+def test_cli_legacy_migration_also_queues_missing_eligible_runs(
+    scoped_corpora,
+    project_docs_corpora,
+    sample_runs_root: Path,
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+    fake_embedding,
+) -> None:
+    experience, superpowers = scoped_corpora
+    docs_root, project_corpora = project_docs_corpora
+    idx = tmp_path / "legacy"
+    index_module.build_scoped_index(
+        (*scoped_corpora, *project_corpora),
+        idx,
+        fake_embedding,
+    )
+    queued: list[tuple[str, ...]] = []
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: queued.append(tuple(kinds)),
+    )
+    monkeypatch.setattr(
+        agent_memory_script,
+        "build_embedding",
+        lambda **kwargs: pytest.fail("legacy migration must queue before model load"),
+    )
+
+    result = agent_memory_main(
+        [
+            "--embedding",
+            "fake",
+            "--scope",
+            "experience",
+            "--corpus",
+            str(experience.root),
+            "--superpowers-corpus",
+            str(superpowers.root),
+            "--docs-root",
+            str(docs_root),
+            "--index",
+            str(idx),
+            "--runs-root",
+            str(sample_runs_root),
+            "--runs-index",
+            str(tmp_path / "missing-runs-index"),
+            "search",
+            "continuity",
+        ]
+    )
+
+    assert result == 3
+    assert queued == [
+        (
+            "experience",
+            "superpowers",
+            "current_docs",
+            "research",
+            "deferred",
+            "run_summaries",
+        )
+    ]
+    assert "continue with current repository evidence" in capsys.readouterr().err
+
+
+def test_legacy_shared_index_requires_full_migration(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+    fake_embedding,
+) -> None:
+    from ai_video.agent_memory.layout import (
+        LegacyProjectIndexError,
+        build_project_indexes,
+        read_project_layout,
+        shard_path,
+    )
+
+    experience, _ = scoped_corpora
+    _, project_corpora = project_docs_corpora
+    all_corpora = (*scoped_corpora, *project_corpora)
+    root = tmp_path / "legacy"
+    index_module.build_scoped_index(all_corpora, root, fake_embedding)
+
+    with pytest.raises(LegacyProjectIndexError, match="all-scope"):
+        build_project_indexes((experience,), root, fake_embedding)
+
+    build_project_indexes(all_corpora, root, fake_embedding)
+
+    assert read_project_layout(root).layout == "per_corpus"
+    assert not (root / "manifest.json").exists()
+    assert index_module.index_exists(shard_path(root, "experience"))

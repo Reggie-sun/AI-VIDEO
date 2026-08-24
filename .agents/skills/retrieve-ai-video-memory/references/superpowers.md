@@ -29,10 +29,10 @@ python -m scripts.agent_memory --scope superpowers search \
   "<task-specific query>" --top-k 8 --json
 ```
 
-This command only validates and queries the materialized main index. If it
-reports a missing, stale, partial, or identity-mismatched index, return to the
-parent skill's explicit `--scope all build` recovery rule; search itself must
-not rebuild.
+This command queries the dedicated `superpowers` shard. Stale last-good
+fragments are tagged and queue only that shard for detached refresh. Missing or
+legacy layout returns exit `3` after queueing materialization. Follow the parent
+skill's non-blocking result rules and never run a foreground recovery build.
 
 ## Interpretation
 

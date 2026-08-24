@@ -38,7 +38,19 @@ from ai_video.agent_memory.index import (
     load_index,
     read_index_manifest,
 )
-from ai_video.agent_memory.retrieval import Hit, format_text, search
+from ai_video.agent_memory.layout import (
+    MissingProjectIndexError,
+    build_project_indexes,
+    shard_path,
+)
+from ai_video.agent_memory.manifest import StaleIndexError
+from ai_video.agent_memory.retrieval import (
+    Hit,
+    RetrievalResult,
+    format_text,
+    retrieve_project,
+    search,
+)
 
 __all__ = [
     # config
@@ -64,8 +76,14 @@ __all__ = [
     "index_exists",
     "read_index_manifest",
     "IndexMismatchError",
+    "StaleIndexError",
+    "MissingProjectIndexError",
+    "build_project_indexes",
+    "shard_path",
     # retrieval
     "Hit",
+    "RetrievalResult",
+    "retrieve_project",
     "search",
     "format_text",
 ]

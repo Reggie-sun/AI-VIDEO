@@ -106,14 +106,22 @@ python -m scripts.agent_memory --scope superpowers search \
   "镜头连续性 contract"
 ```
 
-主 index manifest 会绑定 corpus digest、chunking、embedding identity 与 library
-versions。CLI 的 materialization 与 query 已拆开：`build` 是唯一会在 staging 构建并
-替换 derived index 的命令；`experience` / `all` build 也会同步构建 eligible
-run-summary index。`search` 只校验并查询，不创建、不刷新、不修复任何 index。首次缺少
-index、文档 bytes/digest 变化、requested scope 尚未 materialize，或 schema、embedding、
-chunking/metric、library identity、corpus authority/collection contract、physical
-collection 不匹配时，search 都会快速 fail closed，提示先显式运行 build。两个 index
-保持 schema v1，且 collection、authority 与 index 目录相互独立。
+每个 main corpus 现在拥有 `.agent/memory/index/<corpus_kind>/` 独立 Chroma shard；
+manifest 分别绑定该 corpus 的 digest、chunking、embedding identity 与 library versions。
+`build` 在 staging materialize 后只短暂锁住 activation，narrow scope 只替换自己的 shard；
+`experience` / `all` build 也会显式构建 eligible run-summary shard。
+
+Project-level retrieval core 保持 read-only。CLI `search` 遇到 corpus bytes drift 时会先
+返回通过 schema、embedding、authority 与 physical collection 完整性校验的 last-good
+片段，并标记 `index_freshness=stale`，随后只把 stale shard 放入 `.git/agent-memory-refresh/`
+detached queue；前台不等待 corpus re-embedding 或 Chroma materialization，正常 query/null
+embedding 仍在本地查询内执行。首次缺失 sharded layout 或旧 shared layout 需要
+migration 时，CLI queue materialization 后以 exit `3` 快速返回。Schema、embedding、
+chunking/metric、library identity、authority/collection contract 或 physical collection
+损坏仍以 exit `2` strict fail closed，不自动修复。Queue 不是 lifecycle hook，不读取
+Provider secret、不联网，也不改变 Production state。
+
+Leaf manifest 保持 schema v1，且 collection、authority 与 index 目录相互独立。
 `all` 在默认 `top_n=8` 时为五个 main corpora 分配稳定的 `2/2/2/1/1`
 candidate quota，再与 eligible run-summary hits 统一排序并截取最终 8 个片段；
 每个 collection 的 dense 与 lexical candidate `top_k` 仍为 30。

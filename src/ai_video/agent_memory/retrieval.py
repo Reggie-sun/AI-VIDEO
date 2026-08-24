@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import ExitStack
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence
@@ -25,13 +26,20 @@ from ai_video.agent_memory.hybrid import (
 )
 from ai_video.agent_memory.index import (
     IndexMismatchError,
+    index_activation_lock,
     load_index,
+    release_index_client,
     validate_index_path,
     validate_materialized_index,
     validate_run_summary_index,
     validate_scoped_index,
 )
-from ai_video.agent_memory.manifest import IndexManifest
+from ai_video.agent_memory.layout import (
+    MissingProjectIndexError,
+    read_project_layout,
+    shard_path,
+)
+from ai_video.agent_memory.manifest import IndexManifest, StaleIndexError
 
 
 @dataclass
@@ -68,9 +76,18 @@ class Hit:
     dense_null_excess: float = 0.0
     dense_top1_margin: float = 0.0
     admission_lane: str = ""
+    index_freshness: str = "fresh"
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class RetrievalResult:
+    """Project retrieval outcome, including per-shard freshness diagnostics."""
+
+    hits: tuple[Hit, ...]
+    stale_kinds: tuple[str, ...] = ()
 
 
 def _format_excerpt(text: str, max_len: int = 240) -> str:
@@ -146,7 +163,249 @@ def _allocate_scope_limits(kinds: set[str], top_k: int) -> dict[str, int]:
     return allocations
 
 
+def _query_leaf(
+    *,
+    query: str,
+    query_vector: Sequence[float],
+    null_query_vector: Sequence[float],
+    index_path: Path,
+    embedding,
+    manifest: IndexManifest,
+    corpus_kind: str,
+    limit: int,
+    freshness: str,
+) -> list[Hit]:
+    try:
+        store = load_index(index_path, embedding)
+    except Exception as exc:
+        raise IndexMismatchError(
+            f"cannot open Agent Memory shard {corpus_kind!r} at {index_path}"
+        ) from exc
+    if store is None:
+        raise FileNotFoundError(f"Agent Memory shard disappeared: {index_path}")
+    indexed = {item.kind: item for item in manifest.corpora}
+    item = indexed[corpus_kind]
+    try:
+        collection = store.get_collection(item.collection_name)
+        available = collection.count()
+        if available != item.chunk_count:
+            raise IndexMismatchError(
+                f"index collection for scope {corpus_kind!r} "
+                "chunk count mismatch"
+            )
+        if available == 0:
+            return []
+        hits = _search_collection(
+            query=query,
+            query_vector=query_vector,
+            null_query_vector=null_query_vector,
+            collection=collection,
+            available=available,
+            limit=limit,
+            corpus_kind=corpus_kind,
+            default_authority=item.authority,
+        )
+        for hit in hits:
+            hit.index_freshness = freshness
+        return hits
+    except IndexMismatchError:
+        raise
+    except Exception as exc:
+        raise IndexMismatchError(
+            f"index collection for scope {corpus_kind!r} is unavailable"
+        ) from exc
+
+
+def retrieve_project(
+    query: str,
+    top_k: int = DEFAULT_TOP_N,
+    *,
+    scope: str,
+    corpora: Sequence[CorpusSpec],
+    index_root: Path,
+    embedding=None,
+    allow_stale: bool = False,
+    runs_corpus: Optional[CorpusSpec] = None,
+    runs_index_path: Optional[Path] = None,
+) -> RetrievalResult:
+    """Search canonical per-corpus shards without materializing or enqueueing."""
+    if top_k < 1:
+        raise ValueError("top_k must be positive")
+    if scope not in {"experience", "superpowers", "all"}:
+        raise ValueError(f"unknown Agent Memory scope: {scope!r}")
+    allowed = set(_ALL_SCOPE_ORDER) if scope == "all" else {scope}
+    selected = tuple(item for item in corpora if item.kind in allowed)
+    requested = {item.kind for item in selected}
+    if requested != allowed:
+        raise IndexMismatchError(
+            f"missing corpus specifications for scope(s) {sorted(allowed - requested)}"
+        )
+    validate_index_path(
+        Path(index_root),
+        tuple(item.root for item in selected),
+        label="index root",
+    )
+    read_project_layout(index_root)
+    leaves = {item.kind: shard_path(index_root, item.kind) for item in selected}
+    missing_kinds = [
+        corpus.kind
+        for corpus in selected
+        if not leaves[corpus.kind].exists()
+    ]
+    run_spec = (
+        runs_corpus
+        if runs_corpus is not None
+        and scope in {"experience", "all"}
+        and runs_corpus.root.is_dir()
+        else None
+    )
+    run_leaf: Path | None = None
+    if run_spec is not None:
+        run_leaf = Path(runs_index_path or ".agent/memory/run-summaries")
+        validate_index_path(
+            run_leaf,
+            (Path(index_root), run_spec.root, *(item.root for item in selected)),
+            label="run-summary index",
+        )
+        if not run_leaf.exists():
+            missing_kinds.append("run_summaries")
+    if missing_kinds:
+        raise MissingProjectIndexError(
+            f"Missing Agent Memory shard(s): {', '.join(missing_kinds)}",
+            kinds=tuple(missing_kinds),
+        )
+    embedding = embedding or build_embedding()
+    allocations = _allocate_scope_limits(requested, top_k)
+    query_vector = embedding.embed_query(query)
+    null_query_vector = embedding.embed_query(select_dense_null_query(query))
+    hits: list[Hit] = []
+    stale_kinds: list[str] = []
+
+    for corpus in selected:
+        leaf = leaves[corpus.kind]
+        with index_activation_lock(leaf, exclusive=False):
+            freshness = "fresh"
+            try:
+                manifest = validate_scoped_index((corpus,), leaf, embedding)
+            except StaleIndexError:
+                if not allow_stale:
+                    raise
+                manifest = validate_materialized_index(
+                    leaf,
+                    embedding,
+                    (corpus.kind,),
+                )
+                freshness = "stale"
+                stale_kinds.append(corpus.kind)
+            try:
+                hits.extend(
+                    _query_leaf(
+                        query=query,
+                        query_vector=query_vector,
+                        null_query_vector=null_query_vector,
+                        index_path=leaf,
+                        embedding=embedding,
+                        manifest=manifest,
+                        corpus_kind=corpus.kind,
+                        limit=allocations[corpus.kind],
+                        freshness=freshness,
+                    )
+                )
+            finally:
+                release_index_client(leaf)
+
+    if run_spec is not None:
+        assert run_leaf is not None
+        with index_activation_lock(run_leaf, exclusive=False):
+            freshness = "fresh"
+            try:
+                manifest = validate_run_summary_index(run_leaf, run_spec, embedding)
+            except StaleIndexError:
+                if not allow_stale:
+                    raise
+                manifest = validate_materialized_index(
+                    run_leaf,
+                    embedding,
+                    ("run_summaries",),
+                )
+                freshness = "stale"
+                stale_kinds.append("run_summaries")
+            try:
+                run_hits = _query_leaf(
+                    query=query,
+                    query_vector=query_vector,
+                    null_query_vector=null_query_vector,
+                    index_path=run_leaf,
+                    embedding=embedding,
+                    manifest=manifest,
+                    corpus_kind="run_summaries",
+                    limit=top_k,
+                    freshness=freshness,
+                )
+                hits.extend(run_hits)
+            finally:
+                release_index_client(run_leaf)
+
+    ordered = sorted(hits, key=_hit_sort_key, reverse=True)[:top_k]
+    return RetrievalResult(
+        hits=tuple(ordered),
+        stale_kinds=tuple(dict.fromkeys(stale_kinds)),
+    )
+
+
 def search(
+    query: str,
+    top_k: int = DEFAULT_TOP_N,
+    corpus_root: Optional[Path] = None,
+    index_path: Optional[Path] = None,
+    embedding=None,
+    scope: str = "experience",
+    corpora: Optional[Sequence[CorpusSpec]] = None,
+    *,
+    runs_corpus: Optional[CorpusSpec] = None,
+    runs_index_path: Optional[Path] = None,
+) -> List[Hit]:
+    """Run the strict leaf-index API under shared activation locks."""
+    idx_path = Path(index_path or ".agent/memory/index")
+    run_path = Path(runs_index_path or ".agent/memory/run-summaries")
+    lock_runs = (
+        runs_corpus is not None
+        and scope in {"experience", "all"}
+        and runs_corpus.root.is_dir()
+    )
+    if lock_runs:
+        protected = [
+            idx_path,
+            runs_corpus.root,
+            *(item.root for item in (corpora or ())),
+        ]
+        if corpus_root is not None:
+            protected.append(Path(corpus_root))
+        validate_index_path(run_path, tuple(protected), label="run-summary index")
+    resolved_embedding = embedding or build_embedding()
+    with ExitStack() as locks:
+        locks.enter_context(index_activation_lock(idx_path, exclusive=False))
+        if lock_runs:
+            locks.enter_context(index_activation_lock(run_path, exclusive=False))
+        try:
+            return _search_unlocked(
+                query,
+                top_k=top_k,
+                corpus_root=corpus_root,
+                index_path=idx_path,
+                embedding=resolved_embedding,
+                scope=scope,
+                corpora=corpora,
+                runs_corpus=runs_corpus,
+                runs_index_path=run_path,
+            )
+        finally:
+            release_index_client(idx_path)
+            if lock_runs:
+                release_index_client(run_path)
+
+
+def _search_unlocked(
     query: str,
     top_k: int = DEFAULT_TOP_N,
     corpus_root: Optional[Path] = None,
@@ -553,6 +812,8 @@ def format_text(hits: Iterable[Hit]) -> str:
         lines.append(f"   score: {h.score:.4f}")
         if h.admission_lane:
             lines.append(f"   admission_lane: {h.admission_lane}")
+        if h.index_freshness != "fresh":
+            lines.append(f"   index_freshness: {h.index_freshness}")
         lines.append(f"   {_authority_label(h.corpus_kind, h.authority)}")
         if h.status:
             lines.append(f"   document status: {h.status}")

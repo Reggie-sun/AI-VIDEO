@@ -54,22 +54,28 @@ From the AI-VIDEO repository root, distill the task into a short query with the
 domain, failure or decision, and important exact identifiers. Do not put
 credentials, raw Provider responses, signed URLs, or private data in the query.
 
-Run the exact command in the selected scope reference. `search` is
-validation/query-only: it never builds, refreshes, or repairs an index. Exit
-code `0` with `[]` is a valid answerability abstention. Exit code `2` with an
-error on stderr is a retrieval failure, not an empty result.
+Run the exact command in the selected scope reference. The retrieval core is
+read-only. The CLI may enqueue local derived-index maintenance after the query,
+but it never waits for corpus re-embedding or Chroma materialization in the
+foreground; normal query/null embeddings still run locally for retrieval.
 
-If and only if that error explicitly says an index is missing, stale, partial,
-or identity-mismatched,
-run `python -m scripts.agent_memory --scope all build` once with the pinned
-local backend, then retry the original selected-scope search once. Treat build
-as a separate potentially long-running phase; do not include it in the search
-timeout. The `all` build materializes all five collections in the shared main
-index plus eligible run summaries; it does not broaden the retry query or the
-authority of its results. Otherwise report the
-fail-closed error and continue from current repository evidence. Never download
-a model, use the fake embedding backend, enable a network fallback, or broaden
-the search scope to force a result.
+- Exit code `0` with fresh hits or `[]` is a normal result; `[]` is a valid
+  answerability abstention.
+- Exit code `0` with `index_freshness=stale` returns only physically valid,
+  tagged last-good fragments and queues the exact stale corpus shards for a
+  detached refresh. Use those fragments as stale advisory context and continue;
+  do not wait, poll, or retry in the same task merely to obtain fresh results.
+- Exit code `3` means the local sharded layout is missing or needs one-time
+  migration. The CLI has queued the required materialization; continue from
+  current repository evidence without retrying in this task.
+- Exit code `2` is a strict failure such as schema, embedding, authority,
+  manifest, or physical collection corruption. Report it and continue from
+  current repository evidence; do not enqueue, rebuild, or weaken validation.
+
+Never run a foreground recovery build from this skill. Never download a model,
+use the fake embedding backend, enable a network fallback, or broaden the
+search scope to force a result. The detached queue writes only local derived
+Agent Memory state and is not a lifecycle hook or Product Runtime dependency.
 
 ## Use The Results
 

@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import hashlib
+import fcntl
 import logging
 import os
 import shutil
 import tempfile
+import threading
 import uuid
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterable, Sequence
 
@@ -34,6 +37,55 @@ from ai_video.agent_memory.manifest import (
 )
 
 
+_IN_PROCESS_ACTIVATION_LOCKS: dict[str, threading.RLock] = {}
+_IN_PROCESS_ACTIVATION_LOCKS_GUARD = threading.Lock()
+
+
+def _in_process_activation_lock(index_path: Path) -> threading.RLock:
+    identifier = str(Path(index_path).resolve())
+    with _IN_PROCESS_ACTIVATION_LOCKS_GUARD:
+        return _IN_PROCESS_ACTIVATION_LOCKS.setdefault(
+            identifier,
+            threading.RLock(),
+        )
+
+
+@contextmanager
+def index_activation_lock(index_path: Path, *, exclusive: bool):
+    """Coordinate short index activation with validation/query readers."""
+    index_path = Path(index_path)
+    index_path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = index_path.parent / f".{index_path.name}.activation.lock"
+    # Chroma caches one SharedSystem per path inside a process. Serializing
+    # same-process readers prevents one caller from stopping that shared client
+    # while another reader is still querying it; cross-process readers retain
+    # shared flock semantics.
+    with _in_process_activation_lock(index_path):
+        with lock_path.open("a+b") as handle:
+            fcntl.flock(
+                handle.fileno(),
+                fcntl.LOCK_EX if exclusive else fcntl.LOCK_SH,
+            )
+            try:
+                yield
+            finally:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+@contextmanager
+def _index_build_lock(index_path: Path):
+    """Serialize builders without blocking readers during staging work."""
+    index_path = Path(index_path)
+    index_path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = index_path.parent / f".{index_path.name}.build.lock"
+    with lock_path.open("a+b") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
 def _client(index_path: Path):
     # chromadb 0.5.x still calls its disabled Posthog client and logs a local
     # signature error. Settings below prevents egress; disabling that logger
@@ -54,6 +106,11 @@ def _release_cached_client(index_path: Path) -> None:
             system.stop()
         finally:
             SharedSystemClient._identifier_to_system.pop(identifier, None)
+
+
+def release_index_client(index_path: Path) -> None:
+    """Release a path-scoped Chroma client before another process activates it."""
+    _release_cached_client(Path(index_path))
 
 
 def index_exists(index_path: Path) -> bool:
@@ -171,39 +228,44 @@ def build_scoped_index(
         if not Path(corpus.root).is_dir():
             raise FileNotFoundError(f"corpus not found: {corpus.root}")
 
-    index_path.parent.mkdir(parents=True, exist_ok=True)
-    staging_path = Path(
-        tempfile.mkdtemp(
-            prefix=f".{index_path.name}.staging-",
-            dir=index_path.parent,
+    with _index_build_lock(index_path):
+        index_path.parent.mkdir(parents=True, exist_ok=True)
+        staging_path = Path(
+            tempfile.mkdtemp(
+                prefix=f".{index_path.name}.staging-",
+                dir=index_path.parent,
+            )
         )
-    )
-    backup_path = index_path.parent / f".{index_path.name}.backup-{uuid.uuid4().hex}"
-    old_moved = False
-    try:
-        total, _ = _build_staging_index(
-            corpora,
-            staging_path,
-            embedding,
-            batch_size,
+        backup_path = (
+            index_path.parent / f".{index_path.name}.backup-{uuid.uuid4().hex}"
         )
-        _release_cached_client(staging_path)
-        if index_path.exists():
-            _release_cached_client(index_path)
-            os.replace(index_path, backup_path)
-            old_moved = True
-        os.replace(staging_path, index_path)
-        if old_moved:
-            shutil.rmtree(backup_path, ignore_errors=True)
-        return total
-    except Exception:
-        if old_moved and not index_path.exists() and backup_path.exists():
-            os.replace(backup_path, index_path)
-        raise
-    finally:
-        _release_cached_client(staging_path)
-        if staging_path.exists():
-            shutil.rmtree(staging_path)
+        old_moved = False
+        try:
+            total, _ = _build_staging_index(
+                corpora,
+                staging_path,
+                embedding,
+                batch_size,
+            )
+            _release_cached_client(staging_path)
+            with index_activation_lock(index_path, exclusive=True):
+                if index_path.exists():
+                    _release_cached_client(index_path)
+                    os.replace(index_path, backup_path)
+                    old_moved = True
+                os.replace(staging_path, index_path)
+            if old_moved:
+                shutil.rmtree(backup_path, ignore_errors=True)
+            return total
+        except Exception:
+            with index_activation_lock(index_path, exclusive=True):
+                if old_moved and not index_path.exists() and backup_path.exists():
+                    os.replace(backup_path, index_path)
+            raise
+        finally:
+            _release_cached_client(staging_path)
+            if staging_path.exists():
+                shutil.rmtree(staging_path)
 
 
 def build_index(
