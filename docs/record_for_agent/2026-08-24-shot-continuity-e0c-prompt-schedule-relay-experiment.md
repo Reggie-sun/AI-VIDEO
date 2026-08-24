@@ -5,7 +5,7 @@
 - `experiment_id`: `shot_continuity_e0c_prompt_schedule_relay_v1`
 - `classification`: `development_experiment`
 - `execution_status`: `COMPLETED_RESUMED_ATTEMPT_AFTER_EXPLICIT_RECOVERY`
-- `empirical_status`: full 770-frame schedule completed; motion preservation improved, but final stop adherence failed and seam pulses remain measurable
+- `empirical_status`: `HUMAN_REJECT_STOP`; full 770-frame schedule completed and motion preservation improved, but final stop adherence failed and seam pulses remain measurable
 - `production_status`: no Production qualification、activation、Manifest / Registry mutation、P6 verdict、release 或 canonical-reference promotion
 
 本次只验证 E0-B STOP 后冻结的单变量：把每个 continuation 重复使用的 stop-oriented global prompt 改为 `segment_prompts_json` 驱动的 per-segment motion-state schedule。其余 generation surfaces 保持冻结。E0-C 没有启用 Prompt Relay Advanced attention patch；只使用现有 long-video orchestrator 的逐段 prompt override。
@@ -239,6 +239,8 @@ Canonical assembled development artifact：
 - full temporal schedule / final-stop adherence: `FAIL`；
 - Production qualification、P6、Final Acceptance: not evaluated and not authorized。
 
+用户随后完成 human review，并明确判定“最后没有停下来”不可接受。因此该 exact 770-frame development candidate 的 human verdict 为 `REJECT / STOP`。这个 verdict 不撤销 motion-preservation 子假设的 evidence，但禁止把完整 Shot 描述为 creative PASS、可交付成片或 Final Acceptance output。
+
 7 个 visual seam 的 boundary frame-pair 相对局部 median motion/MAD 仍高约 `1.28--1.45x` / `1.34--1.47x`。Project-local scene detection 没有把它们判为 hard cut，逐 seam frame pairs 也保持 identity、wardrobe、satchel、scene 与 screen direction；但 17.9167 s、22.1667 s、26.4167 s 与 30.6667 s 仍有可量化 motion pulse，不能声称 visual seams 已消失。
 
 `cosine_bridge` 明显降低了音频边界的单样本 discontinuity：7 个 seam 的 decoded single-sample step 均不高于局部常态，后四个只处于局部 derivative 的约 `2--9` percentile。但 20 ms seam 前后 RMS 仍改变约 `1.2--1.56x`，说明 bridge 去除了 click，却没有统一各 segment 的 ambience texture / loudness；人工仍可能听出段落变化。
@@ -249,4 +251,4 @@ Repository effect：只更新本 experiment record；没有 Production code、qu
 
 Provider / media effect：一次 explicit Local ComfyUI resumed submit，接受 segments 6 / 7 并生成一个完整 770-frame development artifact；remote submit `0`、paid effect `0`、fallback `0`、retry `0`。它不是 activated Production candidate 或 Final Acceptance output。
 
-Next One Thing：对上述 exact final MP4 做一次 human full-speed playback，重点判定 final 2 秒未停步是否为不可接受的 Shot-intent failure，以及 17.9167 s、22.1667 s、26.4167 s、30.6667 s 的 visual/audio seam 是否仍可感知。在获得该 human verdict 前不自动重跑 seed、不改变第二个 generation surface，也不把 motion-preservation `PASS` 扩写成整条 Shot `PASS`。
+Next One Thing：若继续实验，只冻结一个仍属于 `prompt_temporal_allocation` 的后续合同——把 decelerate / stop conditioning 提前，使 stop state 不再只获得最后 34 frames，并让 final segment 表达 settled hold；seed、reference strategy、interval、context、steps、resolution、sampler 与其他 surfaces 全部保持不变。在获得新的 execution authorization 前不重跑，也不把 motion-preservation `PASS` 扩写成整条 Shot `PASS`。
