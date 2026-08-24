@@ -251,6 +251,84 @@ test("media endpoint serves only cached registered tokens and supports HEAD and 
   assert.equal(sameSizeReplacement.res.statusCode, 503);
 });
 
+test("media endpoint serves an HTML wrapper when client accepts text/html", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-html-"));
+  const image = path.join(root, "runs", "demo", "still.png");
+  await mkdir(path.dirname(image), { recursive: true });
+  const imageBytes = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  await writeFile(image, imageBytes);
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({
+      workspace: "demo/project.yaml",
+      attempts: [],
+      _media: { stilltoken: { source_path: image, mime_type: "image/png", bytes: imageBytes.length } },
+    }),
+  });
+  await invoke(handler, request("GET", "/api/runs/detail?workspace=demo%2Fproject.yaml"));
+
+  const html = await invoke(handler, request("GET", "/api/runs/media/stilltoken", { accept: "text/html,application/xhtml+xml" }));
+  assert.equal(html.res.statusCode, 200);
+  assert.equal(html.res.headers.get("content-type"), "text/html; charset=utf-8");
+  const body = html.res.body.toString("utf8");
+  assert.equal(body.includes("<!doctype html>"), true);
+  assert.equal(body.includes("返回 Console"), true);
+  assert.equal(body.includes('href="/"'), true);
+  assert.equal(body.includes('<img class="frame" src="/api/runs/media/stilltoken" alt="已注册图片" />'), true);
+  assert.equal(body.includes("image/png"), true);
+  assert.equal(body.includes(`${imageBytes.length.toLocaleString("en-US")} bytes`), true);
+  assert.equal(body.includes(image), false);
+});
+
+test("media endpoint keeps serving bytes when client omits Accept", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-bytes-"));
+  const media = path.join(root, "runs", "demo", "clip.mp4");
+  await mkdir(path.dirname(media), { recursive: true });
+  const bytes = Buffer.from("0123456789");
+  await writeFile(media, bytes);
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({
+      workspace: "demo/project.yaml",
+      attempts: [],
+      _media: { bytetoken: { source_path: media, mime_type: "video/mp4", bytes: bytes.length } },
+    }),
+  });
+  await invoke(handler, request("GET", "/api/runs/detail?workspace=demo%2Fproject.yaml"));
+
+  const plain = await invoke(handler, request("GET", "/api/runs/media/bytetoken"));
+  assert.equal(plain.res.statusCode, 200);
+  assert.equal(plain.res.headers.get("content-type"), "video/mp4");
+  assert.equal(plain.res.body.equals(bytes), true);
+
+  const ranged = await invoke(handler, request("GET", "/api/runs/media/bytetoken", { range: "bytes=0-3" }));
+  assert.equal(ranged.res.statusCode, 206);
+  assert.equal(ranged.res.headers.get("content-type"), "video/mp4");
+  assert.equal(ranged.res.body.equals(bytes.subarray(0, 4)), true);
+});
+
+test("HEAD on media endpoint skips HTML wrapper and returns media headers", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-head-"));
+  const media = path.join(root, "runs", "demo", "video.mp4");
+  await mkdir(path.dirname(media), { recursive: true });
+  await writeFile(media, "0123456789");
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({
+      workspace: "demo/project.yaml",
+      attempts: [],
+      _media: { headtoken: { source_path: media, mime_type: "video/mp4", bytes: 10 } },
+    }),
+  });
+  await invoke(handler, request("GET", "/api/runs/detail?workspace=demo%2Fproject.yaml"));
+
+  const head = await invoke(handler, request("HEAD", "/api/runs/media/headtoken", { accept: "text/html" }));
+  assert.equal(head.res.statusCode, 200);
+  assert.equal(head.res.headers.get("content-type"), "video/mp4");
+  assert.equal(head.res.headers.get("content-length"), 10);
+  assert.equal(head.res.body.length, 0);
+});
+
 test("non-api requests pass through to Vite", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "provider-console-api-"));
   const handler = createRunsApiHandler({ repoRoot: root, runProjector: async () => ({}) });

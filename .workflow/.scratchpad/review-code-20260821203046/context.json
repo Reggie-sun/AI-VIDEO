@@ -1,0 +1,49 @@
+{
+  "review_id": "review-code-20260821203046",
+  "target_path": "T8 H3 provider-family implementation/test diff",
+  "target_files": [
+    "src/ai_video/production/comfy_t8_video.py",
+    "src/ai_video/production/comfy_video.py",
+    "src/ai_video/production/local_h3_provider_family.py",
+    "src/ai_video/production/local_video.py",
+    "src/ai_video/production/video_generation.py",
+    "tests/test_production_comfy_t8_turbo_video.py",
+    "tests/test_production_comfy_t8_video.py",
+    "tests/test_production_comfy_video.py",
+    "tests/test_production_local_h3_provider_family.py",
+    "tests/test_production_local_video_state.py"
+  ],
+  "excluded_paths": [
+    ".agent/harness/policy.yaml",
+    "docs/agent-primary-contract-matrix.md",
+    "docs/v0.2-runtime-baseline.md",
+    "docs/superpowers/",
+    "src/ai_video/production/seedance_asset.py"
+  ],
+  "language": "Python",
+  "framework": "pytest, Pydantic",
+  "git": {
+    "branch": "main",
+    "head": "33beb13d5b8ae68ee109e41d2df7f186ea1f1b1b feat: complete local H3 provider family",
+    "working_tree": "HEAD contains the target implementation/test change; seedance_asset.py remains unrelated dirty work"
+  },
+  "risk_areas": [
+    {
+      "file": "src/ai_video/production/local_h3_provider_family.py",
+      "reason": "exact child dispatch and reopened submission/observation identity checks",
+      "priority": "high"
+    },
+    {
+      "file": "tests/test_production_local_video_state.py",
+      "reason": "restart and registry assembly coverage for durable local lifecycle",
+      "priority": "high"
+    },
+    {
+      "file": "src/ai_video/production/comfy_t8_video.py",
+      "reason": "preflight-gated local submit and provider side effects",
+      "priority": "medium"
+    }
+  ],
+  "scope_note": "Review covers the implementation/test paths in commit 33beb13. Concurrent policy, baseline, spec/plan, and Seedance changes were not evaluated or modified.",
+  "spec_load": "ccw spec load --category review returned no matching project specs"
+}

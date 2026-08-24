@@ -545,6 +545,111 @@ def default_seedance_capabilities() -> tuple[SeedanceCapabilityProfile, ...]:
     return tuple(entries)
 
 
+def select_seedance_capabilities(
+    *model_ids: str,
+) -> tuple[SeedanceCapabilityProfile, ...]:
+    """Return a deterministic non-empty subset of authoritative Seedance capabilities.
+
+    The selection filters official catalog entries by the supplied ``model_ids``.
+    Every supplied identifier must be a member of :data:`SEEDANCE_MODEL_IDS`; family
+    aliases (e.g. ``"doubao-seedance-2-0"``), marketing aliases (``"seedance-2.5"``)
+    and unknown identifiers are rejected. Duplicate identifiers are rejected. The
+    returned tuple preserves the deterministic ordering of
+    :func:`default_seedance_capabilities` and each entry is byte/field-exact to
+    its official counterpart (apart from the optional ``api_model_id`` endpoint
+    binding).
+    """
+
+    if not model_ids:
+        raise ValueError("Selected Seedance capability subset must be non-empty")
+    requested = tuple(model_ids)
+    if len(set(requested)) != len(requested):
+        raise ValueError(
+            "Selected Seedance capability subset must not contain duplicate Model IDs"
+        )
+    allowed = set(SEEDANCE_MODEL_IDS)
+    unknown = set(requested) - allowed
+    if unknown:
+        raise ValueError(
+            "Selected Seedance capability subset contains unknown Model IDs: "
+            + ", ".join(sorted(unknown))
+        )
+    selected = set(requested)
+    official = default_seedance_capabilities()
+    subset = tuple(
+        entry for entry in official if entry.variant.model_id in selected
+    )
+    if not subset:
+        raise ValueError("Selected Seedance capability subset must be non-empty")
+    return subset
+
+
+def validate_seedance_capability_subset(
+    entries: tuple[SeedanceCapabilityProfile, ...],
+) -> None:
+    """Validate that ``entries`` form a non-empty subset of official capabilities.
+
+    Each (model_id, mode) pair must map to an official catalog entry. Exact
+    equality is required for each variant and its output rasters, and every
+    selected model must retain its complete official mode set. Provider execution
+    fields and an ``ep-*`` endpoint binding remain governed by
+    :class:`SeedanceCapabilityProfile`. Duplicates and unknown pairs are rejected.
+    This validator never enforces the full seven-model matrix, so entitled
+    Production assemblies may isolate an exact model subset while still rejecting
+    capability mutations, expansions and aliases.
+    """
+
+    if not entries:
+        raise ValueError("Selected Seedance capability subset must be non-empty")
+    official_by_key = {
+        (entry.variant.model_id, entry.variant.mode): entry
+        for entry in default_seedance_capabilities()
+    }
+    official_modes_by_model: dict[str, set[VideoGenerationMode]] = {}
+    for model_id, mode in official_by_key:
+        official_modes_by_model.setdefault(model_id, set()).add(mode)
+    expected_order = tuple(
+        key for key in official_by_key if key[0] in {entry.variant.model_id for entry in entries}
+    )
+    actual_order = tuple(
+        (entry.variant.model_id, entry.variant.mode) for entry in entries
+    )
+    if actual_order != expected_order:
+        raise ValueError(
+            "Selected Seedance capabilities must preserve official catalog order"
+        )
+    seen: set[tuple[str, VideoGenerationMode]] = set()
+    for entry in entries:
+        key = (entry.variant.model_id, entry.variant.mode)
+        if key in seen:
+            raise ValueError(
+                "Selected Seedance capability subset must not contain duplicate Model/mode entries"
+            )
+        seen.add(key)
+        official = official_by_key.get(key)
+        if official is None:
+            raise ValueError(
+                "Selected Seedance capability must bind an official Model ID and mode"
+            )
+        if entry.variant != official.variant:
+            raise ValueError(
+                "Selected Seedance capability must remain variant-exact to the official matrix"
+            )
+        if entry.output_rasters != official.output_rasters:
+            raise ValueError(
+                "Selected Seedance capability must remain output-rasters-exact to the official matrix"
+            )
+    selected_models = {model_id for model_id, _ in seen}
+    for model_id in selected_models:
+        selected_modes = {
+            mode for selected_model, mode in seen if selected_model == model_id
+        }
+        if selected_modes != official_modes_by_model[model_id]:
+            raise ValueError(
+                "Selected Seedance capability subset must cover every official mode for each selected Model ID"
+            )
+
+
 def validate_seedance_capability_matrix(
     entries: tuple[SeedanceCapabilityProfile, ...],
 ) -> None:
@@ -675,5 +780,7 @@ __all__ = [
     "SeedanceCapabilityProfile",
     "SeedanceOutputRaster",
     "default_seedance_capabilities",
+    "select_seedance_capabilities",
     "validate_seedance_capability_matrix",
+    "validate_seedance_capability_subset",
 ]

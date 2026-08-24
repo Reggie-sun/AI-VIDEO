@@ -15,7 +15,8 @@ from ai_video.production.seedance_capabilities import (
     SEEDANCE_MODEL_IDS,
     SeedanceCapabilityProfile,
     default_seedance_capabilities,
-    validate_seedance_capability_matrix,
+    select_seedance_capabilities,
+    validate_seedance_capability_subset,
 )
 from ai_video.production.video import ProviderProfilePointer
 
@@ -23,6 +24,7 @@ from ai_video.production.video import ProviderProfilePointer
 SEEDANCE_ORIGIN = "https://ark.cn-beijing.volces.com"
 _PROFILE_ID = "seedance-official-full-models"
 _PROFILE_VERSION = "seedance-2026-08-19"
+_ACTIVE_MODEL_ID = "doubao-seedance-2-0-260128"
 _MAX_DOWNLOAD_BYTES = 512 * 1024 * 1024
 _SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
 
@@ -156,15 +158,29 @@ class SeedanceProviderProfile(_SeedanceProfileModel):
     @model_validator(mode="after")
     def _validate_profile(self) -> "SeedanceProviderProfile":
         variants = tuple(entry.variant for entry in self.capabilities)
-        validate_seedance_capability_matrix(self.capabilities)
+        validate_seedance_capability_subset(self.capabilities)
         if len({variant.capability_id for variant in variants}) != len(variants):
             raise ValueError("Seedance capability IDs must be unique")
-        if {entry.model_id for entry in self.pricing.model_upper_bounds} != set(
-            SEEDANCE_MODEL_IDS
-        ):
-            raise ValueError("Seedance pricing must cover the exact included Model IDs")
-        if {variant.model_id for variant in variants} != set(SEEDANCE_MODEL_IDS):
-            raise ValueError("Seedance capabilities must cover the exact included Model IDs")
+        pricing_model_ids = {
+            entry.model_id for entry in self.pricing.model_upper_bounds
+        }
+        capability_model_ids = {variant.model_id for variant in variants}
+        if pricing_model_ids != capability_model_ids:
+            raise ValueError(
+                "Seedance pricing must cover the exact selected capability Model IDs"
+            )
+        unknown_pricing = pricing_model_ids - set(SEEDANCE_MODEL_IDS)
+        if unknown_pricing:
+            raise ValueError("Seedance pricing must reference official Model IDs")
+        endpoint_by_model: dict[str, str] = {}
+        for entry in self.capabilities:
+            bound_endpoint = endpoint_by_model.setdefault(
+                entry.variant.model_id, entry.api_model_id
+            )
+            if entry.api_model_id != bound_endpoint:
+                raise ValueError(
+                    "Seedance capability modes must bind one exact deployment per Model ID"
+                )
         if self.profile_sha256 != canonical_sha256(
             self.model_dump(mode="json", exclude={"profile_sha256"})
         ):
@@ -208,6 +224,21 @@ class SeedanceProviderProfile(_SeedanceProfileModel):
             pricing=pricing,
             result_origins=result_origins,
             capabilities=default_seedance_capabilities(),
+        )
+
+    @classmethod
+    def create_active_base(
+        cls,
+        *,
+        pricing: SeedancePricingSnapshot,
+        result_origins: tuple[str, ...],
+    ) -> "SeedanceProviderProfile":
+        """Build the current entitled Production inventory for base Seedance 2.0."""
+
+        return cls.create(
+            pricing=pricing,
+            result_origins=result_origins,
+            capabilities=select_seedance_capabilities(_ACTIVE_MODEL_ID),
         )
 
     def pointer(self) -> ProviderProfilePointer:

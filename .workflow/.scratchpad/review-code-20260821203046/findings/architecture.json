@@ -1,0 +1,25 @@
+{
+  "dimension": "architecture",
+  "findings": [
+    {
+      "id": "ARCH-001",
+      "severity": "medium",
+      "dimension": "architecture",
+      "category": "layer-violation",
+      "file": "src/ai_video/production/local_h3_provider_family.py",
+      "line": 101,
+      "description": "The family facade and registry type are implemented, but no concrete production assembly under src/ builds a VideoProviderRegistry containing LocalH3VideoProviderFamily and injects it into the runtime caller; current registry/family assembly evidence is test-only.",
+      "recommendation": "Track a separate bounded integration/assembly slice. Until that caller exists, describe T8 family runtime closure as partial and do not add a second global selector or lifecycle owner."
+    },
+    {
+      "id": "ARCH-002",
+      "severity": "info",
+      "dimension": "architecture",
+      "category": "srp-violation",
+      "file": "src/ai_video/production/comfy_t8_video.py",
+      "line": 1,
+      "description": "The architecture gate reports this module at 808 LOC as a new oversized-module warning. This is an existing structural debt signal around the T8 adapter, not a blocking defect in the family dispatch change.",
+      "recommendation": "Track module extraction or an explicit reviewed exception separately; do not mix that refactor into the provider-family slice."
+    }
+  ]
+}

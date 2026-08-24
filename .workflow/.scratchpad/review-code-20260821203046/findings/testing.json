@@ -1,0 +1,25 @@
+{
+  "dimension": "testing",
+  "findings": [
+    {
+      "id": "TEST-001",
+      "severity": "medium",
+      "dimension": "testing",
+      "category": "coverage",
+      "file": "tests/test_production_local_video_state.py",
+      "line": 347,
+      "description": "The restart/registry test exercises LocalH3VideoProviderFamily with LocalVideoProviderDouble, whose preflight() is a no-op, and the test submits without calling family.preflight(). Real Comfy T8 and T8 Turbo adapters require an exact preflight marker before submit, while VideoGenerationService.submit_local_once() does not call preflight automatically.",
+      "recommendation": "Use a preflight-enforcing child double or a focused adapter seam, call family.preflight() before submit, and assert the restarted path preserves the preflight/permit/submit contract without a second submit."
+    },
+    {
+      "id": "TEST-002",
+      "severity": "low",
+      "dimension": "testing",
+      "category": "boundary-test",
+      "file": "tests/test_production_local_h3_provider_family.py",
+      "line": 200,
+      "description": "Most family dispatch tests use SimpleNamespace requests, submissions, observations, and permissive duck-typed children. They prove routing branches but bypass Pydantic sealed request/submission/observation validation and permit the child to accept values that production adapters reject.",
+      "recommendation": "Keep the lightweight routing tests, then add a small typed fixture set covering sealed requests and submissions plus tampered-but-resealed cross-generation and cross-submission negatives."
+    }
+  ]
+}

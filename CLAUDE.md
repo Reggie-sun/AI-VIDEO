@@ -1,4 +1,3 @@
-
 # AI-VIDEO Agent Guide
 
 适用于在本仓库中工作的 Codex、Claude 以及其他编码 Agent。本文件只保存长期稳定的 repository constitution、routing policy、canonical ownership、change rules 与 verification contract；不作为 runtime status dashboard、phase ledger、live-provider evidence log、commit history 或 benchmark report。
@@ -77,6 +76,13 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 - Exact replay 不重复 Provider、renderer、analyzer、materializer 或 Manifest write 等外部副作用，也不得无证据推进 state。
 - Unknown outcome 必须 fail closed；recovery 必须显式，不能 blind retry、remint permit、猜测 mixed state、自动激活或删除完整 orphan evidence。
 - Typed cross-module failures使用 `AiVideoError` 与 `ErrorCode`；retryability 由 typed metadata 决定，常规 CLI 输出不得泄露 raw traceback。
+
+### Empirical Validation Priority
+
+- 对 video、image、audio、continuity、identity、motion、camera、prompt adherence、lip sync 与 perceptual quality 等不能仅由 code、tests、static analysis、review 或 Harness 证明的能力，Agent 必须区分 Engineering / Deterministic Uncertainty 与 Empirical / Model-Quality Uncertainty。
+- 当 Empirical / Model-Quality Uncertainty 是最大的 remaining uncertainty，且存在 safe、bounded、authorized、affordable/local、technically executable、可隔离且可归因的最小真实媒体实验时，在继续扩大仅服务未来验证的 Production qualification、schema、lifecycle、Harness 或 integration 之前，下一关键动作 SHOULD 优先获取该实验的 evidence。只有真实阻塞实验的 safety、authorization、credential、exact model/workflow、output destination、isolation、minimum repeatability/attribution prerequisite，或用户明确要求先完成 contract 时，才继续优先 engineering。
+- Development experiment evidence 不是 Production evidence。PASS 不自动产生 active capability、Production qualification、P6 / Final Acceptance、live-ready、release 或 replay truth；FAIL 不授权降低 Production contract、改变 frozen rubric、fallback、blind retry，或绕过 safety、budget、egress、permit、lifecycle 与 recovery。
+- Pure schema migration、deterministic bug、state corruption、replay bug、security fix 与 no-media backend refactor 不触发本优先级；本规则也不把“先生成再写代码”或“媒体生成永远优先”设为默认。
 
 ## Canonical Ownership
 
@@ -227,7 +233,7 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 - 不要在测试中用裸 YAML/JSON parsing 绕过标准 `load_workflow_template()` 或 Production loader。
 - Production invalidation 不得退化为 Shot-order blanket stale；只沿 canonical typed dependency edges 传播。
 - 不要让 native media audio 绕过 canonical P4 mixer，也不要让 graph、Provider 或 Skill 重算 `ResolvedTimeline`。
-- Project-local `video-analysis` 是本仓库默认视频检查工具；全局 `videoscan` 只可作为 metadata/frame helper，不能成为 Production QA owner。
+- Project-local `video-analysis` 是本仓库默认视频检查工具
 - 交付 generated-video 时只提供真实 live/fetched/validated output；不得把 preflight、fake fixture、smoke artifact、technical evidence 或 fetch success冒充 activated、quality-accepted 或 final delivery truth。
 
 ## Completion Standard

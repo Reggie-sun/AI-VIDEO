@@ -184,6 +184,76 @@ function parseRange(header, size) {
   return { start, end: Math.min(end, size - 1) };
 }
 
+function acceptsHtml(req) {
+  const raw = req.headers?.accept;
+  if (typeof raw !== "string") return false;
+  return raw.split(",").some((token) => token.trim().toLowerCase().startsWith("text/html"));
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (ch) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#39;",
+  })[ch]);
+}
+
+function mediaHtml(token, media) {
+  const mime = media.mimeType || "application/octet-stream";
+  const isVideo = mime.startsWith("video/");
+  const safeToken = escapeHtml(token);
+  const safeMime = escapeHtml(mime);
+  const mediaSrc = `/api/runs/media/${token}`;
+  const mediaTag = isVideo
+    ? `<video class="frame" src="${mediaSrc}" controls preload="metadata" aria-label="已注册视频"></video>`
+    : `<img class="frame" src="${mediaSrc}" alt="已注册图片" />`;
+  const shortToken = token.length > 16 ? `${token.slice(0, 8)}…${token.slice(-4)}` : token;
+  return `<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="referrer" content="no-referrer" />
+<title>已注册媒体 · Provider Console</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: #0b1218; color: #d6dee5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+  header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid #1c2730; gap: 12px; }
+  header .meta { font-size: 13px; color: #9aa7b0; }
+  header .meta code { color: #d6dee5; font-size: 12px; margin-left: 4px; }
+  a.back { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #1c2730; color: #d6dee5; border-radius: 6px; text-decoration: none; font-size: 13px; }
+  a.back:hover, a.back:focus { background: #283542; outline: none; }
+  main { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 56px - 44px); padding: 24px; }
+  video.frame, img.frame { max-width: 100%; max-height: calc(100vh - 56px - 44px - 48px); background: #020508; border: 1px solid #283542; border-radius: 6px; object-fit: contain; }
+  footer { padding: 10px 20px; font-size: 12px; color: #7d8a93; border-top: 1px solid #1c2730; display: flex; gap: 16px; flex-wrap: wrap; }
+  footer code { color: #9aa7b0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="meta">已注册媒体<code>${escapeHtml(shortToken)}</code></div>
+  <a class="back" href="/" rel="noopener">← 返回 Console</a>
+</header>
+<main>${mediaTag}</main>
+<footer>
+  <span>MIME：<code>${safeMime}</code></span>
+  <span>大小：<code>${media.size.toLocaleString("en-US")} bytes</code></span>
+  <span>关闭此标签或点“返回 Console”回到工作区。</span>
+</footer>
+</body>
+</html>`;
+}
+
+function sendMediaHtml(res, token, media) {
+  res.statusCode = 200;
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.end(mediaHtml(token, media));
+}
+
 async function sendMedia(req, res, media) {
   const range = parseRange(req.headers?.range, media.size);
   if (range === false) {
@@ -325,9 +395,14 @@ export function createRunsApiHandler({ repoRoot, runProjector = createPythonProj
       const mediaMatch = /^\/api\/runs\/media\/([A-Za-z0-9_-]{6,128})$/.exec(parsed.pathname);
       if (mediaMatch) {
         if (req.method !== "GET" && req.method !== "HEAD") return methodNotAllowed(res, "GET, HEAD");
-        const media = mediaCache.get(mediaMatch[1]);
+        const token = mediaMatch[1];
+        const media = mediaCache.get(token);
         if (!media) {
           send(res, 404, { error: { code: "MEDIA_NOT_FOUND", message: "媒体不存在或尚未验证。" } });
+          return;
+        }
+        if (req.method === "GET" && acceptsHtml(req)) {
+          sendMediaHtml(res, token, media);
           return;
         }
         await sendMedia(req, res, media);

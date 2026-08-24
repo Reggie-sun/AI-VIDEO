@@ -3681,6 +3681,406 @@ def test_fetch_fails_closed_for_origin_redirect_and_non_video(
     assert exc_info.value.code is expected_code
 
 
+# ---------------------------------------------------------------------------
+# Milestone 2: Seedance 2.0 active-inventory isolation
+# ---------------------------------------------------------------------------
+
+
+def _base_only_pricing() -> SeedancePricingSnapshot:
+    return SeedancePricingSnapshot.create(
+        snapshot_id="seedance-base-only-price",
+        observed_at=FIXED_NOW - timedelta(hours=1),
+        expires_at=FIXED_NOW + timedelta(days=1),
+        model_upper_bounds_microunits={"doubao-seedance-2-0-260128": 8_000_000},
+    )
+
+
+def _active_profile(model_id: str) -> SeedanceProviderProfile:
+    from ai_video.production.seedance_capabilities import select_seedance_capabilities
+
+    return SeedanceProviderProfile.create(
+        pricing=SeedancePricingSnapshot.create(
+            snapshot_id=f"seedance-active-price-{model_id}",
+            observed_at=FIXED_NOW - timedelta(hours=1),
+            expires_at=FIXED_NOW + timedelta(days=1),
+            model_upper_bounds_microunits={model_id: 8_000_000},
+        ),
+        result_origins=("https://media.example",),
+        capabilities=select_seedance_capabilities(model_id),
+    )
+
+
+def test_select_seedance_capabilities_returns_official_base_subset_byte_exact():
+    from ai_video.production.seedance_capabilities import (
+        default_seedance_capabilities,
+        select_seedance_capabilities,
+    )
+
+    base_subset = select_seedance_capabilities("doubao-seedance-2-0-260128")
+    official_base = tuple(
+        entry
+        for entry in default_seedance_capabilities()
+        if entry.variant.model_id == "doubao-seedance-2-0-260128"
+    )
+
+    assert base_subset == official_base
+    assert {entry.variant.model_id for entry in base_subset} == {
+        "doubao-seedance-2-0-260128"
+    }
+
+
+def test_select_seedance_capabilities_rejects_empty_alias_family_and_unknown():
+    from ai_video.production.seedance_capabilities import select_seedance_capabilities
+
+    with pytest.raises(ValueError, match="non-empty"):
+        select_seedance_capabilities()
+
+    with pytest.raises(ValueError, match="unknown"):
+        select_seedance_capabilities("seedance-2.5")
+
+    with pytest.raises(ValueError, match="unknown"):
+        select_seedance_capabilities("doubao-seedance-2-0")
+
+    with pytest.raises(ValueError, match="unknown"):
+        select_seedance_capabilities("doubao-seedance-2-0-fast")
+
+    with pytest.raises(ValueError, match="unknown"):
+        select_seedance_capabilities("not-a-real-model")
+
+
+def test_select_seedance_capabilities_rejects_duplicate_model_ids():
+    from ai_video.production.seedance_capabilities import select_seedance_capabilities
+
+    with pytest.raises(ValueError, match="duplicate"):
+        select_seedance_capabilities(
+            "doubao-seedance-2-0-260128",
+            "doubao-seedance-2-0-260128",
+        )
+
+
+def test_active_profile_accepts_official_base_only_capability_subset():
+    from ai_video.production.seedance_capabilities import select_seedance_capabilities
+
+    base_profile = SeedanceProviderProfile.create(
+        pricing=_base_only_pricing(),
+        result_origins=("https://media.example",),
+        capabilities=select_seedance_capabilities("doubao-seedance-2-0-260128"),
+    )
+
+    selected_ids = {entry.variant.model_id for entry in base_profile.capabilities}
+    assert selected_ids == {"doubao-seedance-2-0-260128"}
+    assert {entry.model_id for entry in base_profile.pricing.model_upper_bounds} == {
+        "doubao-seedance-2-0-260128"
+    }
+
+
+def test_production_active_assembly_is_base_only_and_uses_logical_model_id():
+    profile = SeedanceProviderProfile.create_active_base(
+        pricing=_base_only_pricing(),
+        result_origins=("https://media.example",),
+    )
+
+    assert {entry.variant.model_id for entry in profile.capabilities} == {
+        "doubao-seedance-2-0-260128"
+    }
+    assert {entry.api_model_id for entry in profile.capabilities} == {
+        "doubao-seedance-2-0-260128"
+    }
+
+
+def test_active_subset_rejects_noncanonical_mode_order_and_mixed_deployment():
+    from ai_video.production.seedance_capabilities import select_seedance_capabilities
+
+    base_capabilities = select_seedance_capabilities("doubao-seedance-2-0-260128")
+    with pytest.raises(ValueError, match="official catalog order"):
+        SeedanceProviderProfile.create(
+            pricing=_base_only_pricing(),
+            result_origins=("https://media.example",),
+            capabilities=tuple(reversed(base_capabilities)),
+        )
+
+    mixed_deployment = tuple(
+        SeedanceCapabilityProfile(
+            **{
+                **entry.model_dump(),
+                "api_model_id": "ep-seedance-base"
+                if index == 0
+                else entry.api_model_id,
+            }
+        )
+        for index, entry in enumerate(base_capabilities)
+    )
+    with pytest.raises(ValueError, match="one exact deployment"):
+        SeedanceProviderProfile.create(
+            pricing=_base_only_pricing(),
+            result_origins=("https://media.example",),
+            capabilities=mixed_deployment,
+        )
+
+
+def test_active_profile_rejects_missing_pricing_for_selected_capabilities():
+    from ai_video.production.seedance_capabilities import select_seedance_capabilities
+
+    empty_pricing = SeedancePricingSnapshot.create(
+        snapshot_id="empty-price",
+        observed_at=FIXED_NOW - timedelta(hours=1),
+        expires_at=FIXED_NOW + timedelta(days=1),
+        model_upper_bounds_microunits={},
+    )
+
+    with pytest.raises(ValueError):
+        SeedanceProviderProfile.create(
+            pricing=empty_pricing,
+            result_origins=("https://media.example",),
+            capabilities=select_seedance_capabilities("doubao-seedance-2-0-260128"),
+        )
+
+
+def test_active_profile_rejects_extra_pricing_models_not_in_capability_subset():
+    from ai_video.production.seedance_capabilities import select_seedance_capabilities
+
+    extra_pricing = SeedancePricingSnapshot.create(
+        snapshot_id="extra-price",
+        observed_at=FIXED_NOW - timedelta(hours=1),
+        expires_at=FIXED_NOW + timedelta(days=1),
+        model_upper_bounds_microunits={
+            "doubao-seedance-2-0-260128": 8_000_000,
+            "doubao-seedance-2-0-fast-260128": 6_000_000,
+        },
+    )
+
+    with pytest.raises(ValueError):
+        SeedanceProviderProfile.create(
+            pricing=extra_pricing,
+            result_origins=("https://media.example",),
+            capabilities=select_seedance_capabilities("doubao-seedance-2-0-260128"),
+        )
+
+
+def test_fast_and_mini_catalog_entries_remain_but_do_not_enter_base_active_subset():
+    from ai_video.production.seedance_capabilities import (
+        SEEDANCE_MODEL_IDS as CAPABILITY_MODEL_IDS,
+        default_seedance_capabilities,
+        select_seedance_capabilities,
+    )
+
+    catalog_ids = {entry.variant.model_id for entry in default_seedance_capabilities()}
+    assert "doubao-seedance-2-0-fast-260128" in CAPABILITY_MODEL_IDS
+    assert "doubao-seedance-2-0-mini-260615" in CAPABILITY_MODEL_IDS
+    assert "doubao-seedance-2-0-fast-260128" in catalog_ids
+    assert "doubao-seedance-2-0-mini-260615" in catalog_ids
+
+    base_profile = SeedanceProviderProfile.create(
+        pricing=_base_only_pricing(),
+        result_origins=("https://media.example",),
+        capabilities=select_seedance_capabilities("doubao-seedance-2-0-260128"),
+    )
+
+    active_ids = {entry.variant.model_id for entry in base_profile.capabilities}
+    assert "doubao-seedance-2-0-fast-260128" not in active_ids
+    assert "doubao-seedance-2-0-mini-260615" not in active_ids
+    assert base_profile.pricing.upper_bound_for("doubao-seedance-2-0-fast-260128") is None
+    assert base_profile.pricing.upper_bound_for("doubao-seedance-2-0-mini-260615") is None
+
+
+@pytest.mark.parametrize(
+    "unentitled_model_id",
+    (
+        "doubao-seedance-2-0-fast-260128",
+        "doubao-seedance-2-0-mini-260615",
+    ),
+)
+def test_base_active_profile_rejects_cross_model_request_before_any_effect(
+    unentitled_model_id: str,
+):
+    profile = _active_profile("doubao-seedance-2-0-260128")
+    transport = _FakeTransport()
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "must-not-be-read",
+        input_reference=_provider_asset_reference,
+        now=lambda: FIXED_NOW,
+    )
+    request = _request(
+        profile,
+        model_id=unentitled_model_id,
+        output=VideoFlexibleOutputRequirement(
+            timing_mode="exact_seconds",
+            duration_seconds=5,
+            dimension_mode="exact",
+            width=3840,
+            height=2160,
+            resolution_label="4k",
+            ratio="16:9",
+            fps=24,
+            container="mp4",
+            mime_type="video/mp4",
+            native_audio=True,
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(request)
+
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.requests == []
+
+
+@pytest.mark.parametrize(
+    ("model_id", "resolution_label", "width", "height"),
+    (
+        ("doubao-seedance-2-0-fast-260128", "1080p", 1920, 1080),
+        ("doubao-seedance-2-0-mini-260615", "4k", 3840, 2160),
+    ),
+)
+def test_fast_and_mini_profiles_reject_base_only_output_bounds_before_effect(
+    model_id: str,
+    resolution_label: str,
+    width: int,
+    height: int,
+):
+    profile = _active_profile(model_id)
+    transport = _FakeTransport()
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "must-not-be-read",
+        input_reference=_provider_asset_reference,
+        now=lambda: FIXED_NOW,
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.resolve(
+            _request(
+                profile,
+                model_id=model_id,
+                output=VideoFlexibleOutputRequirement(
+                    timing_mode="exact_seconds",
+                    duration_seconds=5,
+                    dimension_mode="exact",
+                    width=width,
+                    height=height,
+                    resolution_label=resolution_label,
+                    ratio="16:9",
+                    fps=24,
+                    container="mp4",
+                    mime_type="video/mp4",
+                    native_audio=True,
+                ),
+            )
+        )
+
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.requests == []
+
+
+def test_cross_model_active_profiles_have_distinct_sealed_request_identities():
+    base_profile = _active_profile("doubao-seedance-2-0-260128")
+    fast_profile = _active_profile("doubao-seedance-2-0-fast-260128")
+    assert base_profile.profile_sha256 != fast_profile.profile_sha256
+
+    base_provider = SeedanceVideoProvider(
+        profile=base_profile,
+        transport=_FakeTransport(),
+        credential=lambda: "must-not-be-read",
+        input_reference=_provider_asset_reference,
+        now=lambda: FIXED_NOW,
+    )
+    fast_provider = SeedanceVideoProvider(
+        profile=fast_profile,
+        transport=_FakeTransport(),
+        credential=lambda: "must-not-be-read",
+        input_reference=_provider_asset_reference,
+        now=lambda: FIXED_NOW,
+    )
+    base_resolved = base_provider.resolve(
+        _request(base_profile, model_id="doubao-seedance-2-0-260128")
+    )
+    fast_resolved = fast_provider.resolve(
+        _request(fast_profile, model_id="doubao-seedance-2-0-fast-260128")
+    )
+
+    assert base_resolved.capability_id != fast_resolved.capability_id
+    assert base_resolved.resolved_generation_hash != fast_resolved.resolved_generation_hash
+    assert base_resolved.provider_task_binding != fast_resolved.provider_task_binding
+
+    base_video_preview = base_provider.preview(base_resolved)
+    fast_video_preview = fast_provider.preview(fast_resolved)
+    base_paid_preview = _paid_preview(base_resolved, base_video_preview)
+    fast_paid_preview = _paid_preview(fast_resolved, fast_video_preview)
+    assert base_paid_preview.preview_fingerprint != fast_paid_preview.preview_fingerprint
+    base_authorization = _authorization(base_paid_preview)
+    base_permit = _permit(
+        base_resolved,
+        base_video_preview,
+        base_paid_preview,
+        base_authorization,
+    )
+    fast_authorization = _authorization(fast_paid_preview)
+    assert not base_permit._validate_paid_provider_operation_permit(
+        **build_video_paid_permit_binding(
+            fast_resolved,
+            fast_video_preview,
+            fast_paid_preview,
+            fast_authorization,
+        )
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        fast_provider.resolve(
+            _request(base_profile, model_id="doubao-seedance-2-0-fast-260128")
+        )
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
+
+def test_base_active_subset_yields_distinct_profile_identity_from_full_default_profile():
+    from ai_video.production.seedance_capabilities import select_seedance_capabilities
+
+    base_profile = SeedanceProviderProfile.create(
+        pricing=_base_only_pricing(),
+        result_origins=("https://media.example",),
+        capabilities=select_seedance_capabilities("doubao-seedance-2-0-260128"),
+    )
+    full_profile = SeedanceProviderProfile.create_default(
+        pricing=_pricing(),
+        result_origins=("https://media.example",),
+    )
+
+    assert base_profile.profile_id == full_profile.profile_id
+    assert base_profile.profile_version == full_profile.profile_version
+    assert base_profile.profile_sha256 != full_profile.profile_sha256
+    assert base_profile.capabilities != full_profile.capabilities
+    assert base_profile.pricing != full_profile.pricing
+
+
+def test_active_subset_rejects_mutation_of_an_official_capability_entry():
+    from ai_video.production.seedance_capabilities import select_seedance_capabilities
+
+    base_subset = select_seedance_capabilities("doubao-seedance-2-0-260128")
+    original_output = base_subset[0].variant.output_capability
+    assert original_output is not None
+    mutated_output = type(original_output)(
+        **{**original_output.model_dump(), "max_duration_seconds": 600}
+    )
+    mutated_variant = VideoCapabilityVariant(
+        **{
+            **base_subset[0].variant.model_dump(),
+            "output_capability": mutated_output,
+        }
+    )
+    mutated = SeedanceCapabilityProfile(
+        **{**base_subset[0].model_dump(), "variant": mutated_variant}
+    )
+
+    with pytest.raises(ValueError):
+        SeedanceProviderProfile.create(
+            pricing=_base_only_pricing(),
+            result_origins=("https://media.example",),
+            capabilities=(mutated, *base_subset[1:]),
+        )
+
+
 class _FakeWriteSink:
     def write(self, data: bytes):
         return len(data)

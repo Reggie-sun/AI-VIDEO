@@ -1,0 +1,15 @@
+{
+  "dimension": "correctness",
+  "findings": [
+    {
+      "id": "CORR-001",
+      "severity": "medium",
+      "dimension": "correctness",
+      "category": "boundary",
+      "file": "src/ai_video/production/local_h3_provider_family.py",
+      "line": 231,
+      "description": "LocalH3VideoProviderFamily.get_local_status() and fetch_local() bind a reopened submission to the request using resolved_generation_hash, but do not also compare LocalVideoSubmission.generation_id. A separately sealed submission can therefore retain the request hash while carrying a different generation_id/provider request identity and still reach the child adapter.",
+      "recommendation": "Fail closed on both generation_id and resolved_generation_hash in status and fetch, and add a forged-but-valid submission regression test. The normal VideoGenerationService reconstruction reduces exposure but does not replace the public family boundary check."
+    }
+  ]
+}

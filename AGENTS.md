@@ -5,16 +5,9 @@
 ## Purpose
 
 - 保持 Legacy `0.1.x` local-first CLI 与 v0.2 Production Python APIs 的边界清晰。
-- 保持 Development Governance 与 AI-VIDEO Product Runtime 的依赖方向清晰；Product Runtime 不得依赖 Codex、Skills、`.agent/`、`.agents/`、`.codex/`、`.workflow/` 或 Agent Memory control plane。
 - 维护 manifest-first、content-addressed evidence、explicit recovery、precise invalidation 与 deterministic composition 等长期产品契约。
 - 让每项变更先找到唯一 owner，再按真实 changed paths 完成可复现验证。
 - 默认使用中文沟通；`command`、`path`、API、schema、class 与 Skill 名保持原文。过程更新应简短、具体、基于当前仓库证据；review 先报告问题与风险。
-
-## Rule Layers
-
-`AGENTS.md` 是入口合同，负责长期 constitution、ownership、不可绕过的 gates 与 completion contract。低频执行细节下沉到 `.agent/context/control-plane-playbook.md`；该 playbook 只补充执行方法，不定义新的 workflow 或 canonical state。`.agent/harness/policy.yaml` 是 changed-path routing 与 mandatory checks 的 machine-readable truth。
-
-下位文档不得静默覆盖用户指令、当前 code/tests/runtime evidence、`AGENTS.md`、`docs/agent-primary-contract-matrix.md` 或 Harness policy。发现职责重复时，优先收敛到现有 owner，不新增平行 control plane。
 
 ## Runtime Truth Sources
 
@@ -23,8 +16,6 @@
 | Agent authority、routing、ownership、change 与 completion rules | `AGENTS.md` |
 | Surface owner、invariant、禁止旁路与 focused verification | `docs/agent-primary-contract-matrix.md` |
 | Changed-path category、mandatory checks 与 receipt routing | `.agent/harness/policy.yaml`、`scripts/agent_harness.py` |
-| Canonical spec metadata、static repository anchors 与 Harness check ownership | `.agent/harness/docs-contracts.yaml`、`scripts/docs_contract_gate.py` |
-| Low-frequency creative、provider、module、pilot 与 memory execution details | `.agent/context/control-plane-playbook.md` |
 | 当前已实现行为、local/origin/release truth、已验证与未验证边界 | `docs/v0.2-runtime-baseline.md` |
 | Phase dependency、status、future gates 与 slice direction | `docs/v0.2-agentic-production-roadmap.md` |
 | 单个 slice 的 accepted scope、tradeoff 与 implementation detail | active spec / plan |
@@ -38,13 +29,12 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 2. 本 `AGENTS.md`。
 3. `docs/agent-primary-contract-matrix.md`。
 4. `.agent/harness/policy.yaml`，确认 task-owned paths 的 mandatory checks。
-5. `.agent/context/control-plane-playbook.md`，仅在 task 命中其低频执行主题时按需读取；命中 creative、Provider、media quality 或历史 failure 时必须读取相关章节。
-6. `docs/v0.2-runtime-baseline.md`，确认当前实现与证据边界。
-7. `docs/v0.2-agentic-production-roadmap.md`，确认 phase 状态与 gate。
-8. `README.md`、active spec 与当前 slice plan。
-9. 相关源码与测试。
-10. `.agent/context/session-handoff.md`（若存在）和 `.agent/bug-memory/` 中与当前问题直接相关的记录，仅作为上下文或案例证据。
-11. `.workflow/` 草稿或 brainstorming 产物，仅作为可选上下文。
+5. `docs/v0.2-runtime-baseline.md`，确认当前实现与证据边界。
+6. `docs/v0.2-agentic-production-roadmap.md`，确认 phase 状态与 gate。
+7. `README.md`、active spec 与当前 slice plan。
+8. 相关源码与测试。
+9. `.agent/context/session-handoff.md`（若存在）和 `.agent/bug-memory/` 中与当前问题直接相关的记录，仅作为上下文或案例证据。
+10. `.workflow/` 草稿或 brainstorming 产物，仅作为可选上下文。
 
 ## Conflict Resolution
 
@@ -58,23 +48,6 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 
 如果用户请求有意改变既有契约，必须在同一任务中同步更新代码、测试与对应 canonical 文档。不得只改文档就把 proposed behavior 描述成 runtime truth。
 
-## Spec And Plan Routing
-
-Agent 必须根据当前 task 的 uncertainty、contract impact、execution complexity、handoff need 与 verification risk，自主选择 `neither`、`spec only`、`plan only` 或 `spec + plan`。除非用户明确限定 artifact scope，否则不得仅为询问“是否需要写 spec / plan”而暂停；应在过程更新中简短说明选择及依据，然后继续到自然停止点。用户明确要求或禁止 spec / plan 时，以用户指令为准。
-
-- `neither`：需求、owner、边界和验证方式已清晰，且工作是 narrow bug fix、局部 documentation/configuration、mechanical change 或可在单次连续执行中安全完成的 bounded implementation。此类 task 使用 thread 内的 lightweight contract / plan 即可，不创建重复 artifact。
-- `spec only`：目标行为、public contract、schema/data model、canonical owner、lifecycle/state、compatibility、safety gate 或关键 tradeoff 尚需形成 durable target，但尚未获准实施、暂不需要 execution sequencing，或 implementation plan 会过早固化未知细节。
-- `plan only`：已有 accepted spec、canonical contract 或足够明确的用户要求，但 implementation 跨多个 modules/milestones、存在 ordering/migration/recovery concern、需要 delegated handoff、预计跨 session，或 verification matrix 需要 durable sequencing。
-- `spec + plan`：既需要稳定新的或显著变化的 target contract，又需要组织 non-trivial execution。必须先收敛 spec，再让 plan 引用该 spec；不得用 plan 偷带未解决的 product/architecture 决策。
-
-下列情况默认提高到 durable spec：开始新的 runtime slice；改变 public API/CLI、schema、Manifest、artifact layout、canonical owner、Provider/renderer/timeline selection、activation/recovery、paid/cloud/secret/safety contract；或存在多个合理方案且选择会影响 compatibility 或后续 slices。下列情况默认提高到 durable plan：改动跨越多个 canonical owners、需要 migration 或 rollback、包含多个有依赖关系的 implementation units、需要跨 session / agent handoff，或无法用一个 focused verification command可信覆盖。
-
-Agent 不得仅因 file count、task 被称为 feature、使用了 Skill、存在历史 spec/plan，或“先写文档更完整”而创建 artifact。Root cause 尚未确定的 diagnosis 应先收集 evidence；除非 investigation 本身需要 durable multi-session coordination，否则不得用 prospective spec / plan 代替 diagnosis。已有 active artifact 能被安全更新时，优先更新唯一 owner，不创建并行 spec / plan。
-
-Durable specs 写入 `docs/superpowers/specs/YYYY-MM-DD-<slug>.md`，durable plans 写入 `docs/superpowers/plans/YYYY-MM-DD-<slug>.md`；这些路径只是 artifact storage，不会自动启用 Superpowers 或其他 workflow。Artifact 必须记录 `Status`、accepted scope、out-of-scope、contracts/invariants、acceptance criteria、verification，以及 relevant assumptions / unresolved decisions；plan 还必须引用 governing spec 或明确写明其直接依据的 canonical contract。若关键选择会扩大用户 scope、触发 `Decision Gates` 或产生 materially different outcomes，必须先向用户提问，不能由 Agent 借写 spec / plan 自行批准。
-
-创建或更新 spec / plan 属于 task preparation，不代表 implementation、remote/paid call、quality acceptance、push 或 release 已获授权，也不改变 Runtime Truth Sources。若用户请求 implementation 且上述关键选择均已解决，Agent 可在同一 task 内先写必要 artifact 再继续实施，无需为 lifecycle transition 重复请求确认。
-
 ## Product Invariants
 
 ### Legacy `0.1.x`
@@ -86,7 +59,7 @@ Durable specs 写入 `docs/superpowers/specs/YYYY-MM-DD-<slug>.md`，durable pla
 - Legacy Manifest、flat artifact layout 与既有 config/workflow/ffmpeg semantics 保持兼容，除非明确批准 migration。
 - Workflow 保持 template + binding，不得在 CLI、pipeline 或 transport 中写死 node IDs。
 
-### v0.2 Production Runtime
+### v0.2 Production Harness
 
 - `ProductionProject` 与 Asset Registry 读取必须 strict、read-only、no-network，并验证 selected revision、semantic/content identity、path containment 与 registered bytes。
 - `ProductionStateCommitter` 是唯一 v2 write、activation 与 explicit recovery owner；mutation 不得扩散到 reader、registry、validation、dependency 或 Legacy Manifest/pipeline。
@@ -95,14 +68,6 @@ Durable specs 写入 `docs/superpowers/specs/YYYY-MM-DD-<slug>.md`，durable pla
 - HyperFrames 是默认 Production renderer。只有显式批准的 adapter contract 才能改变 renderer selection；不得出现隐式 fallback 或第二条 canonical timeline。
 - Image、video、voice 与其他 Providers 是 optional capabilities。基础 Production path 在没有 Video Provider 时仍必须能够完成 image、motion graphics、voice、captions 与 deterministic composition。
 - Remote/paid execution 必须 explicit opt-in，并通过既有 budget、cloud-egress、secret、durable intent、one-use permit、provenance、activation 与 recovery gates。
-
-### Development Governance And Product Runtime
-
-- Development Governance 包括 Codex、`AGENTS.md`、`.agent/`、`.agents/`、`.codex/`、`.workflow/`、Development Verification Harness、Documentation Contract Gate、Architecture Gate 与 developer-only Agent Memory。它们可以检查、验证或辅助修改 Product Runtime，但不是 Production state、asset、Provider lifecycle、review 或 delivery truth。
-- AI-VIDEO Product Runtime 包括 Legacy runtime、`src/ai_video/production/**`、planning、quality gates、Provider adapters、Manifest、Registry、Dependency Graph、ResolvedTimeline、review/repair 与 delivery lifecycle。Product Runtime MUST NOT import、执行或以其他方式依赖 Development Governance artifacts；`.workflow/` 中的 `session`、role 或 brainstorming state 不得解释为 product session。
-- Documentation Contract Gate只验证受控spec metadata、路径、有限状态词汇、contract/version static anchors与Harness check ownership。它不能证明任意自然语言叙述语义正确，也不能替代human/Codex architecture review；runtime baseline继续拥有动态实现与evidence状态。
-- 当前不存在通用 Product Agent Loop、Product Tool Registry 或 event-sourced Product Session。`VideoPlanner`、Shot Router 与 quality gates 是 deterministic domain logic，不得仅因带有 planner、router、reviewer 或 agent-facing 名称就迁入通用 Agent Framework。
-- 未来若引入 Product Agent Session，其 append-only events 只能拥有 model-visible conversation、decision context 或 non-authoritative telemetry。它不得成为 Project、Asset Registry、Production Manifest、Provider external-effect、activation、review、repair 或 delivery 的第二事实源；Production Manifest 继续独占 mutable lifecycle 与 active pointers，`ProductionStateCommitter` 继续独占 durable write、activation 与 recovery。
 
 ### Cross-Cutting Safety
 
@@ -124,11 +89,11 @@ Durable specs 写入 `docs/superpowers/specs/YYYY-MM-DD-<slug>.md`，durable pla
 | Concern | Canonical Owner |
 | --- | --- |
 | Creative intent | Codex + approved AI-VIDEO Character / Scene / Shot artifacts |
-| Project schema and canonical Character / Scene / Shot artifacts | AI-VIDEO `ProductionProject` |
+| Project schema and selected revision | AI-VIDEO `ProductionProject` |
 | Asset identity and provenance | Asset Registry |
-| v2 mutable lifecycle and active pointers | Production Manifest |
+| Mutable lifecycle and active pointers | Production Manifest |
 | v2 writes, activation, and recovery | `ProductionStateCommitter` |
-| Dependency semantics, desired fingerprint computation, invalidation, rebuild frontier | Dependency Graph / resolver |
+| Dependency, desired state, invalidation, rebuild frontier | Dependency Graph / resolver |
 | Timing, order, frame, sample, and source trim | `ResolvedTimeline` |
 | Default render execution | HyperFrames adapter |
 | Provider-specific generation | Selected AI-VIDEO Provider adapter behind AI-VIDEO gates |
@@ -139,21 +104,79 @@ Reader、registry、validation、dependency、Provider adapter、renderer 与 an
 
 ## Creative Skill Routing
 
-Creative skill selection、Agent-side image generation preference、mandatory preflight evidence、Skill routing precedence 与 `runtime_skill_calls = 0` boundary 见 `.agent/context/control-plane-playbook.md` 第 1 节。
+AI-VIDEO remains the sole owner of production truth. External Skills provide advisory knowledge only unless an explicitly approved project contract says otherwise. Skill guidance MUST be translated into AI-VIDEO domain contracts before execution and MUST NOT mutate or own canonical state.
 
-这些规则在命中对应 creative task 时是 mandatory，但 playbook 只承接低频执行细节；AI-VIDEO、其 canonical artifacts、Manifest、Registry、Dependency Graph、ResolvedTimeline、HyperFrames、Provider lifecycle、review/repair 与 delivery truth 的 ownership 仍由本文件和 `docs/agent-primary-contract-matrix.md` 定义。
+Use the minimum matching Skill set. Installation、description matching 或“本仓库生产视频”本身不构成触发条件。纯 production-state、asset、schema、dependency、timeline、render、activation、recovery 或 Provider-lifecycle 工作只使用 AI-VIDEO code 与 accepted contracts。
+
+### `hell-grind-aigc-skill`
+
+SHOULD proactively use for semantic Shot design、open/close state、cross-Shot continuity、identity/state/spatial/axis/action/light/environment/audio continuity、image/video prompt structure、generation failure diagnosis、iteration 与 candidate reasoning。
+
+优先用于“Shots 之间什么必须保持或改变？”以及“generated Shot 为什么失败？”。AI-VIDEO Character、Scene、Shot 与 asset records 始终是 source of truth。MUST NOT 创建或维护平行的 Hell-Grind project schema、asset registry、generation ledger、review state 或 delivery truth。
+
+### `higgsfield`
+
+SHOULD proactively use for provider/model-specific prompt adaptation、Seedance/Hailuo/Kling/Veo guidance、T2V/I2V/reference/continuation/extension mode guidance、provider-specific camera vocabulary 与 generation troubleshooting。
+
+只在 AI-VIDEO semantic Shot / continuity intent 已建立后使用。Model/mode 推荐不得选择或切换 active Provider、读取 credential、提交 generation，或绕过 AI-VIDEO Provider Router、Paid Provider Gate、budget、cloud egress、provenance、lifecycle、activation 与 recovery。Higgsfield CLI、MCP、account、workspace、memory 或 ledger 不是 AI-VIDEO owner。
+
+### `video-shotcraft`
+
+SHOULD proactively use for motion design、image motion、motion graphics、shot language、camera movement、pacing、transition、SFX、beat sync 与 visual QA ideas。
+
+其 Remotion implementation、recipe、timeline 与 renderer 只作为 creative / implementation reference。选定方案必须翻译成 AI-VIDEO composition directives；不得创建第二套 canonical timeline/renderer、替代 `ResolvedTimeline` / HyperFrames，或绕过 AI-VIDEO QA / Repair lifecycle。
 
 ### `ecommerce-ad-workflow`
 
-SHOULD use for ecommerce、SKU、product advertising、direct-response product video 或 commercial product brief authoring。它独占 Development-side Product Truth、claim ledger、Hook、ad beats、product presentation、advertising copy/audio intent、CTA、creative variants 与 capability-aware handoff contract；AI comic、episode、serial 与 cliffhanger request 不得路由到该 Skill。
+SHOULD use for ecommerce、SKU、product advertising、direct-response product video或commercial product brief authoring。它独占Development-side Product Truth、claim ledger、Hook、ad beats、product presentation、advertising copy/audio intent、CTA、creative variants与capability-aware handoff contract；AI comic、episode、serial与cliffhanger request不得路由到该 Skill。
 
-该 Skill 只产出 offline authoring package 与 existing Runtime proposals/requirements/gaps。它不得安装或调用 external ad system，不得读取 credential、选择 Provider、生成媒体、写 Project/Registry/Manifest、重算 `ResolvedTimeline`、选择 renderer 或给出 P6/Final Acceptance；advertising graphics 与 physical interaction 缺口必须保持显式 capability classification。
+该 Skill只产出offline authoring package与existing Runtime proposals/requirements/gaps。它不得安装或调用external ad system，不得读取credential、选择Provider、生成媒体、写Project/Registry/Manifest、重算`ResolvedTimeline`、选择renderer或给出P6/Final Acceptance；advertising graphics与physical interaction缺口必须保持显式capability classification。
 
-Ecommerce / SKU / product advertising authoring 优先路由到 `ecommerce-ad-workflow`；具体 Shot continuity、Provider prompt adaptation 或 deterministic motion treatment 仍按 control-plane playbook 的既有 owner 顺序作为 advisory input，Production execution ownership 保持不变。
+### Routing Precedence
+
+- Ecommerce / SKU / product advertising authoring -> `ecommerce-ad-workflow`；其中具体Shot continuity、Provider prompt adaptation或deterministic motion treatment仍按下列owner顺序作为advisory input。
+- Semantic continuity / Shot-state problem -> `hell-grind-aigc-skill`。
+- Specific generative model / Provider prompting problem -> `higgsfield`。
+- Deterministic motion design / graphics / pacing problem -> `video-shotcraft`。
+- Production state / assets / dependency / timeline / render / Provider execution / activation / recovery -> AI-VIDEO code and contracts。
+
+多 Skill 组合必须按依赖顺序调用；后续 Skill 可以适配前序 advisory result，但不能重定义上游 semantic contract 或下游 production truth。
+
+```text
+generated-video continuity:
+AI-VIDEO Shot intent
+  -> hell-grind-aigc-skill: establish semantic continuity
+  -> higgsfield: adapt the approved contract to Provider prompt/mode guidance
+  -> AI-VIDEO Provider Request: provenance, lifecycle, activation, recovery
+
+image motion / motion graphics:
+AI-VIDEO Shot intent
+  -> hell-grind-aigc-skill when semantic state needs clarification
+  -> video-shotcraft: motion, pacing, transition, SFX, beat treatment
+  -> AI-VIDEO CompositionSpec -> ResolvedTimeline -> HyperFrames
+```
+
+External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、Asset Registry、Manifest、Dependency Graph、timeline、renderer selection、Provider lifecycle、review/repair 或 delivery state。
 
 ## Module Boundaries
 
-稳定 module owner、禁止旁路与 focused-test routing 见 `.agent/context/control-plane-playbook.md` 第 2 节；surface owner 与 invariant 以 `docs/agent-primary-contract-matrix.md` 为准。
+- `src/ai_video/cli.py`：CLI parsing 与用户命令编排。
+- `src/ai_video/config.py`：YAML/config validation、本地策略与路径解析。
+- `src/ai_video/workflow_loader.py` / `workflow_renderer.py`：标准 workflow loading、UI-to-API conversion 与 pure binding/rendering。
+- `src/ai_video/comfy_client.py`：ComfyUI transport、polling、artifact download 与 typed transport failure。
+- `src/ai_video/pipeline.py` / `manifest.py`：Legacy Shot orchestration、resume 与 atomic Legacy Manifest persistence。
+- `src/ai_video/ffmpeg_tools.py`：probe、clip validation、frame extraction、normalization 与 stitching。
+- `src/ai_video/production/models.py` / `hashing.py` / `paths.py` / `validation.py`：strict schemas、sealing、containment 与 static validation。
+- `src/ai_video/production/registry.py` / `project.py` / `_*project_reader.py`：read-only selected Asset Registry / Production Project evidence loading；不得写入、恢复或激活。
+- `src/ai_video/production/state_commit.py` / `_state_commit_*`：唯一 public v2 writer、activation、commit 与 recovery boundary；private modules不得形成第二 writer。
+- `src/ai_video/production/dependency.py`：pure immutable graph、desired fingerprint、precise invalidation 与 rebuild decisions；不得写文件、Manifest、Registry 或 runtime status。
+- `src/ai_video/production/composition.py` / `hyperframes.py` / `visual_media.py`：canonical composition resolution、media validation 与 selected HyperFrames execution；不得另造 timeline。
+- `src/ai_video/production/audio.py` / `captions.py` / voice adapters：audio、voice、caption contracts；timing仍归 `ResolvedTimeline`，durable mutation仍归 committer。
+- `src/ai_video/production/review.py` 与 `src/ai_video_mcp/**`：pure review contracts或 raw analysis evidence；不得自判或写入 Production acceptance。
+- `src/ai_video/production/image.py` / `video.py` / Provider adapters：provider-neutral contracts与显式 adapter execution；不得成为 writer、resolver、Provider selector 或 activation owner。
+- `src/ai_video/production/__init__.py`：只暴露 approved public imports，不承载 implementation。
+
+更细的 surface owner、forbidden alternate path 与 focused tests 以 `docs/agent-primary-contract-matrix.md` 为准。
 
 ## Coding Standards
 
@@ -178,19 +201,24 @@ Ecommerce / SKU / product advertising authoring 优先路由到 `ecommerce-ad-wo
 ## Verification Contract
 
 - `.agent/harness/policy.yaml` 是 changed-path routing 与 mandatory checks 的 machine-readable truth；`docs/agent-primary-contract-matrix.md` 提供 human-readable focused verification。两者的 routing 变更必须同步并测试。
-- `docs_contract_check`必须是Harness always check，且documentation category必须显式拥有该behavioral check；code-only delta也必须验证`.agent/harness/docs-contracts.yaml`、canonical spec metadata与static anchors。Product Runtime不得import或执行该gate。
-- Harness inspection 后，完成验证必须针对 non-empty exact staged snapshot 或 exact commit range，并在 detached temporary worktree 中运行，使 unrelated dirty changes 不进入 execution tree。
-- Code 或 executable tooling change 必须有 fresh passing receipt；documentation/control-plane change 也必须执行 policy 路由的真实 checks。详细 receipt、Pilot、media acceptance 与 delivery boundary 见 `.agent/context/control-plane-playbook.md` 第 4 节。
-- Unmapped owned paths 必须 fail safe 到 full tests 与 task-delta Architecture Gate；未实际执行不得声称 passing。Harness 不调度 Agent、不修改产品 state、不读取 Provider secret，也不执行 live Provider、ComfyUI、paid smoke 或媒体生成。
+- 开始时使用 Harness inspection 确认真实 scope；完成验证必须针对 non-empty exact staged snapshot 或 exact commit range，并在 detached temporary worktree 中运行，使 unrelated dirty changes 不进入 execution tree。
+- Code 或 executable tooling change 在完成前必须有 fresh passing receipt，并验证 scope、policy、artifact hashes 与 freshness。Documentation/control-plane change按真实 policy 执行对应 checks。
+- Unmapped owned paths 必须 fail safe 到 full tests 与 task-delta Architecture Gate；历史 repository debt 不得伪装成当前 task regression，反之也不得通过刷新 baseline 隐藏 regression。
+- Behavioral change 必须有覆盖 public behavior、boundary 与 failure path 的 executable evidence；优先 targeted checks，结束前运行 policy 要求的完整组合。未实际执行不得声称 passing。
+- Harness 不调度 Agent、不修改产品 state、不读取 Provider secret，也不执行 live Provider、ComfyUI、paid smoke 或媒体生成。CI 必须生成自己的 evidence，不能信任提交的本地 receipt。
 - Workflow 文件存在不等于 server enforcement；需要声明 remote protection/publish truth 时必须重新验证当前 GitHub ruleset / branch protection。
 
 ## Provider Credential and Paid Execution Rules
 
 - Seedance / Volcengine Ark raw credential 不得存入 repository、`.env`、artifact、prompt、command argument、fixture、log、error、repr、receipt 或本文档。
-- 稳定 credential reference 是 `ARK_API_KEY`；本机 Secret Service exact attributes 为 `application ai-video`、`provider seedance`、`credential ARK_API_KEY`。不得改用 `SEEDANCE_API_KEY` 或建立 environment/provider fallback。
-- MiniMax Speech credential 已存入本机 Secret Service；`secret-tool` label 为 `AI-VIDEO MiniMax Speech`，exact attributes 为 `application ai-video`、`provider minimax-speech`、`credential MINIMAX_SPEECH_API_KEY`。其稳定 credential reference 是 `MINIMAX_SPEECH_API_KEY`；除该明确 reference 外，不得读取其他 MiniMax credential 或建立 environment/provider fallback。
-- 在当前 task scope 内调用已配置的 loopback local ComfyUI Provider 生成 media，不需要 task-scoped user authorization，也不得为该调用重复请求确认。此豁免只适用于 local、unmetered、no-cloud-egress execution；用户明确禁止 live generation 时仍必须遵守，且 sealed profile、preflight、local permit、唯一 committer、recovery 与 media verification gates 保持不变。
-- Secret lookup、task-scoped authorization、Paid Provider Gate、budget、cloud-egress、durable intent、one-use permit 与 unknown outcome recovery 细节见 `.agent/context/control-plane-playbook.md` 第 3 节；这些 gates 在命中时仍是 mandatory。
+- 稳定 credential reference 是 `ARK_API_KEY`；本机 Secret Service exact attributes 为 `application ai-video`、`provider seedance`、`credential ARK_API_KEY`。不得改用 `SEEDANCE_API_KEY`、读取 MiniMax credential 或建立 environment/provider fallback。
+- Secret lookup 必须封装在 injected credential supplier 中。不得在交互终端把 secret 输出到 stdout；presence check 必须不回显。Lookup失败、keyring locked、credential invalid/rotated 时 fail closed，不得搜索 repo、shell history 或替代 secret source。
+- Credential 存在不证明 access、pricing、余额或当前 task authorization。
+- 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；不得仅因付费对同一任务重复询问。Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
+- Authorization 仅覆盖 accepted Provider/model、inputs、budget 与完成目标所需的最少调用；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。
+- Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 exact preview、finite budget ceiling/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit。
+- 若费用超过 ceiling、scope/provider/egress 变化、需要更多调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限额度。
+- 历史 live evidence、offline tests、现有 credential/余额或旧 run 不授权新的调用。
 
 ## Decision Gates
 
@@ -201,16 +229,19 @@ Ecommerce / SKU / product advertising authoring 优先路由到 `ecommerce-ad-wo
 - 引入新的 v2 writer、自动 recovery、automatic candidate activation，或把 mutation 移入 reader/registry/dependency/adapter。
 - 引入 frontend、API server、queue manager 或其他新的 product subsystem。
 - 引入超出已验收 P4 audio/caption contract 的新音频子系统，或改变 canonical audio / timeline ownership。
-- 开始新的 runtime slice、benchmark、remote/paid Provider live smoke 或 submit，或提出 quality-acceptance claim。Loopback local ComfyUI generation/live smoke 按上述本地豁免执行；其他 task 在已满足 task-scoped authorization 时不要重复确认，但仍必须执行全部技术 gates。
+- 开始新的 runtime slice、live smoke、benchmark、remote/paid Provider submit 或 quality-acceptance claim。当前 task 已满足 task-scoped authorization 时不要重复确认，但仍必须执行全部技术 gates。
 - 放宽 crash safety、secret handling、Budget Guard、Cloud Egress、provenance、replay、recovery 或 QA acceptance contract。
 
-## Operational Detail Routing
+## Repository-Specific Don't Repeat This
 
-- Repository-specific failure boundaries、Legacy/Production 易错项与 generated-video delivery 约束见 `.agent/context/control-plane-playbook.md` 第 5 节。
-
-## Agent Experience Memory (Advisory)
-
-Agent Memory 的 scope、检索触发条件与 final relevant search 规则见 `.agent/context/control-plane-playbook.md` 第 6 节。Memory 始终是 advisory，不能覆盖当前 code、tests、runtime evidence 或 current architecture contracts。
+- 不要对同一 `run_id` 再次调用 `run()` 来实现 resume；从持久化 Manifest 恢复。
+- 不要将包含 `..` 的相对 artifact path 写入 Manifest 或 resolved config；持久化路径必须是干净绝对路径。
+- 不要在更新 `final_output` 等 terminal state 后绕过 atomic Manifest write。
+- 不要在测试中用裸 YAML/JSON parsing 绕过标准 `load_workflow_template()` 或 Production loader。
+- Production invalidation 不得退化为 Shot-order blanket stale；只沿 canonical typed dependency edges 传播。
+- 不要让 native media audio 绕过 canonical P4 mixer，也不要让 graph、Provider 或 Skill 重算 `ResolvedTimeline`。
+- Project-local `video-analysis` 是本仓库默认视频检查工具
+- 交付 generated-video 时只提供真实 live/fetched/validated output；不得把 preflight、fake fixture、smoke artifact、technical evidence 或 fetch success冒充 activated、quality-accepted 或 final delivery truth。
 
 ## Completion Standard
 
