@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed，documentation-only。本轮只授权创建本 spec 与配套 implementation plan；不授权安装外部 Skill、创建 repo Skill、修改 Product Runtime、调用 Provider、生成媒体、读取 credential、付费、写 Production state、push 或 release。
+`ecommerce-ad-workflow/1` authoring contract 已进入 current local implementation，并保持 offline Development / authoring boundary。本文新增的 `AdCreativePlan` Runtime bridge 仍为 **Proposed / not implemented**；它不授权修改 Product Runtime、调用 Provider、生成媒体、读取 credential、付费、写 Production state、push 或 release。
 
 本文定义独立的 `ecommerce-ad-workflow`。它只服务电商商品广告，不承担 AI 漫剧、episodic fiction、Character-driven serial drama 或 cliffhanger production。此前把“AI 漫剧广告”作为该 Workflow 核心形态的方向被本文明确否决：AI 漫剧与电商广告必须是两条独立 Workflow，互不调用、互不依赖、没有共享上层业务 schema。
 
@@ -321,6 +321,73 @@ Hook 不是单句 copy。`hook_contract` 至少包含：
 - `BLOCKED_BY_TRUTH_OR_RIGHTS`。
 
 Workflow 不得把 creative desire 自动翻译为 unsupported `CompositionSpec` 字段，也不得建立第二 renderer/timeline path。
+
+## Proposed Runtime Follow-up: `AdCreativePlan`
+
+### Decision
+
+广告 Runtime 缺口不需要十个新 service，也不需要替换现有生产链。批准进入后续设计的最小集合只有一个 versioned `AdCreativePlan`，位于通用 brief 与 Shot planning 之间：
+
+```text
+ProductionBrief
+  -> AdCreativePlan
+  -> Shot proposals + typed product / graphic / sound treatments
+  -> CompositionSpec
+  -> ResolvedTimeline
+  -> HyperFrames
+```
+
+`AdCreativePlan` 是广告语义的单一上层 contract，不是第二条 timeline、renderer、writer、Registry、Manifest 或 lifecycle。它只把已经通过 Product Truth / claim / rights gates 的广告意图编译到现有 Shot 与 composition path；exact frame/sample timing 继续只由 `ResolvedTimeline` 计算，durable mutation 继续只由 `ProductionStateCommitter` 执行，render selection 继续由 HyperFrames owner 决定。
+
+### Minimal Contract
+
+V1 最小字段为：
+
+- `creative_concept`：全片唯一广告机制，不是每个 Shot 各自重新发明 concept；
+- `protagonist_continuity_policy`：主角、montage mechanism、talent identity 与允许变化；
+- `ad_arc`：typed beat roles，至少覆盖 problem / product introduction / demonstration-or-proof / payoff / hero / CTA / brand closure 中适用的节点；
+- `product_presentations`：嵌套 typed `product_presentation`；
+- `graphic_treatments`：嵌套 typed `graphic_treatment`；
+- `sound_cues`：嵌套 typed advertising sound cue；
+- `visual_motif`：跨 Shot 的品牌色、形状、节奏或 recurring device；
+- `hero_shot`、`end_card` 与 `cta`：必须绑定 beat、Shot intent、商品 identity 与 claim boundary。
+
+`product_presentation.mode` 至少区分：
+
+- `IN_SCENE_PROVIDER`：商品属于 source generation；必须由 Provider/source evidence证明真实存在，不得用平面 PNG 冒充人物手持、接触或遮挡；
+- `GRAPHIC_REVEAL`：商品明确属于商业 graphic layer，可使用受限 2D entry / position / scale / rotation / opacity / shadow / clip treatment，不伪装成物理融合；
+- `HERO_ASSET`：独立、清晰、品牌化的商品 hero shot / end-card asset。
+
+每项 `product_presentation` 必须绑定 `role`、`mode`、source asset identity、beat / Shot、entry / exit intent、transform intent、occlusion / tracking / lighting needs、graphic / sound cue，以及 capability classification。需要真实手持、contact、tracking、mask、depth、occlusion、perspective、cast shadow、lighting 或 camera matching 时，必须保持 `REQUIRES_SOURCE_GENERATION_STRATEGY` 或 `REQUIRES_RUNTIME_CAPABILITY`；普通 2D overlay 不得把它升级为 supported。
+
+`graphic_treatment.role` 至少区分 `DIALOGUE_SUBTITLE`、`HEADLINE`、`BENEFIT_CALLOUT`、`PRODUCT_LABEL`、`PROOF_LABEL`、`CTA` 与 `BRAND_END_CARD`。除 `DIALOGUE_SUBTITLE` 外，不得投影到 `CaptionTrack`。每项 commercial graphic 必须保留 placement、safe area、subject/product avoidance、entrance、exit、keyword emphasis、brand token 与 product/audio synchronization intent。
+
+`sound_cue.role` 至少区分 `DIALOGUE`、`VOICE_OVER`、`MUSIC`、`SFX`、`REVEAL_HIT` 与 `INTENTIONAL_SILENCE`。它表达 advertising event 与同步关系，不拥有 samples、mix result 或 loudness truth；这些仍投影到 P4 audio authoring request，并由同一 `ResolvedTimeline` 与 render invocation完成。
+
+### Projection And Capability Boundary
+
+`AdCreativePlan` compiler 必须产生 typed Shot proposals 与 composition requirements，并在当前 `CompositionSpec` / HyperFrames expression surface不足时 fail closed。后续 Runtime slice可以最小扩展现有 `CompositionSpec` 和受审计的 HyperFrames source generator，以表达 constrained 2D product graphics与 commercial typography；不得开放任意 HTML、JavaScript、external CSS/font 或 event handler，也不得绕过 source audit。
+
+当前能力判断固定为：
+
+| Intent | Current classification |
+| --- | --- |
+| Dialogue / accessibility subtitle | `SUPPORTED_CURRENTLY` through `CaptionTrack` |
+| Fixed 2D transform / opacity / z-order | `SUPPORTED_CURRENTLY` only where current composition layer accepts the asset type |
+| Commercial text hierarchy / kinetic typography | `REQUIRES_RUNTIME_CAPABILITY` |
+| Image-on-generated-video graphic reveal | `REQUIRES_RUNTIME_CAPABILITY` until the canonical layer/type gate and adapter support it |
+| Provider-native in-scene product | `REQUIRES_SOURCE_GENERATION_STRATEGY` plus evidence / review |
+| Tracked or masked physical product interaction | `REQUIRES_RUNTIME_CAPABILITY` or a separately approved source strategy |
+
+HyperFrames 本身足以承载受限 2D graphics，不代表 AI-VIDEO adapter 已经表达这些能力。历史或 repo 外 FFmpeg 成片中的静音、固定黑底字幕、hard-cut product card 与 finalization bypass 也不得归因为 HyperFrames；只有 canonical `CompositionSpec -> ResolvedTimeline -> HyperFrames` execution与receipts才能证明正式链路行为。
+
+### Explicit Non-Goals
+
+本 follow-up 不建设第二 timeline、第二 renderer、第二 durable writer、新 Asset Registry、通用大型 Motion Engine、复杂 3D/AR tracking 系统、十几个广告 service/Agent，也不把 `CaptionTrack` 扩张成万能广告排版层。Composition Playbook 保持 Development Governance advisory surface，不成为 Runtime owner；任何 repo 外 finalization script 也不得成为 Production escape hatch。
+
+### Acceptance Boundary
+
+只有在 versioned `AdCreativePlan` schema、validator/compiler、typed projection、focused tests、canonical HyperFrames adapter evidence与 exact-snapshot Harness receipt全部存在后，才能声明该 bridge implemented。即使实现完成，真实手持/遮挡/光照匹配仍需独立 source或compositing evidence；technical render PASS 仍不等于 P6、human Final Acceptance或广告效果。
 
 ## Workflow State Machine
 

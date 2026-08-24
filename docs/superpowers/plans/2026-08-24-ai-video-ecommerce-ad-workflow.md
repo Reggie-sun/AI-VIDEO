@@ -2,7 +2,7 @@
 
 ## Status
 
-Not started。本文是 implementation handoff，不授权当前窗口安装外部 Skill、创建 repo Skill、修改 Runtime、运行 Provider、生成媒体、读取 credential、付费、写 Production state、push 或 release。执行必须由后续明确 implementation request 启动。
+Authoring V1 complete in current local implementation。Milestone 0–6 的 `ecommerce-ad-workflow/1` offline authoring package 已实现；本文新增的 `AdCreativePlan` Runtime bridge 为 **follow-up slice / not started**。该记录不授权当前窗口修改 Runtime、运行 Provider、生成媒体、读取 credential、付费、写 Production state、push 或 release。
 
 ## Goal
 
@@ -75,6 +75,8 @@ Codex discovery `ecommerce-ad-workflow` 后，按 Product Truth -> Strategy -> H
 - runtime Product Integration、Advertising Typography 或 Motion Graphics implementation；
 - live ComfyUI、T8、H3、Seedance或paid smoke；
 - second timeline、renderer、writer、QC lifecycle或asset registry。
+
+上述 V1 out-of-scope boundary 保持不变。`AdCreativePlan` 不回填为 V1 已完成项；只有用户另行批准 Runtime slice 后，才按下文 follow-up 执行。
 
 ## Acceptance Criteria
 
@@ -362,3 +364,51 @@ Receipt path必须以实际 Harness output为准，不得猜测；上例只规�
 ## Completion Decision
 
 达到 Milestone 6 后只能声明：`ecommerce-ad-workflow/1 authoring contract implemented and offline-verified`。在没有真实媒体、P6 / human review与投放数据时，不得声明 product compositing、commercial typography、audio completeness、watchability、Final Acceptance、live-ready、published、released或 advertising performance。
+
+## Follow-up Runtime Slice: Minimal `AdCreativePlan` Bridge
+
+### Problem Boundary
+
+- **Single owner:** versioned `AdCreativePlan` owns whole-ad creative semantics before per-Shot planning。
+- **Old path to retire:** advertising copy、product cards与sound decisions不得继续仅存在于repo外 FFmpeg finalization script或每个Shot的自由文本；这种路径不能产生canonical Runtime evidence。
+- **Unchanged contracts:** `ProductionStateCommitter`仍是唯一writer，`ResolvedTimeline`仍是唯一timing owner，HyperFrames仍是默认renderer，`CaptionTrack`仍只服务dialogue/accessibility subtitle，P4/P6 ownership不变。
+- **Focused verification intent:** schema/compiler tests + composition resolver tests + HyperFrames source audit/render tests + Harness exact-snapshot receipt；不以历史成片、contact sheet或`video-analysis`代替Runtime evidence。
+
+### Contract Surface
+
+新增一个轻量、可编译的 `AdCreativePlan`，不新增独立 service。其最小字段为 `creative_concept`、`protagonist_continuity_policy`、typed `ad_arc`、typed `product_presentations`、typed `graphic_treatments`、typed `sound_cues`、`visual_motif`、`hero_shot`、`end_card` 与 `cta`。
+
+`product_presentation.mode` 固定至少包含：
+
+- `IN_SCENE_PROVIDER`；
+- `GRAPHIC_REVEAL`；
+- `HERO_ASSET`。
+
+`graphic_treatment.role` 固定至少包含 `DIALOGUE_SUBTITLE`、`HEADLINE`、`BENEFIT_CALLOUT`、`PRODUCT_LABEL`、`PROOF_LABEL`、`CTA` 与 `BRAND_END_CARD`。只有 `DIALOGUE_SUBTITLE` 可以请求现有 `CaptionTrack`；其他 role 必须进入独立、受审计的 commercial graphic projection。
+
+`sound_cue.role` 固定至少包含 `DIALOGUE`、`VOICE_OVER`、`MUSIC`、`SFX`、`REVEAL_HIT` 与 `INTENTIONAL_SILENCE`，并只表达广告事件与同步 intent。Exact sample timing、mix与loudness仍由P4、`ResolvedTimeline`、HyperFrames render与P6负责。
+
+### Implementation Tasks
+
+1. **Schema and validation:** 在现有 cohesive model boundary增加 versioned `AdCreativePlan` 与 nested typed treatments；验证 claim/source lineage、beat/Shot bindings、single protagonist/montage policy、CTA/end-card closure，以及 unsupported physical interaction classification。
+2. **Compiler:** 新增 pure compiler，将 `EcommerceAdProductionPackage` / accepted authoring proposals编译为 `AdCreativePlan`，再投影为 existing Shot proposals与 composition requirements；compiler不读取credential、不选择Provider、不写Project/Registry/Manifest。
+3. **Composition projection:** 最小扩展现有 `CompositionSpec` expression surface，使受支持的 `GRAPHIC_REVEAL`、`HERO_ASSET` 与 commercial text可以进入同一 composition；不建立第二timeline，generated-video上的image layer在明确更新canonical asset/type gate之前继续fail closed。
+4. **HyperFrames adapter:** 只在受审计source generator内支持必要的2D entry/exit、position/scale/rotation/opacity、shadow/clip与text hierarchy；继续拒绝任意script、event handler、external CSS/font/import与network。
+5. **Capability gates:** `IN_SCENE_PROVIDER` 必须绑定source-generation evidence；tracking、mask、occlusion、depth、perspective、lighting、camera matching与真实hand-held product继续返回typed gap，不允许flat PNG fallback冒充physical interaction。
+6. **Review extension:** 为product integration credibility、commercial typography hierarchy、ad arc、sound synchronization、hero shot、CTA与brand closure增加pure review evidence/requirements；不得自动写P6 acceptance。
+7. **Verification:** 添加schema/compiler/resolver/source-audit/render/failure-path tests，并按`.agent/harness/policy.yaml`对exact staged snapshot运行mandatory checks与fresh receipt verification。
+
+### Acceptance Criteria
+
+1. 一个schema-valid `AdCreativePlan`可以稳定表达统一主角/continuity policy、typed ad arc、三类product presentation、commercial graphic roles、sound cues、hero/end-card/CTA。
+2. `AdCreativePlan`只投影到现有Shot/composition path；没有第二timeline、renderer、writer、Registry、Manifest或activation owner。
+3. `HEADLINE`、`BENEFIT_CALLOUT`、`PRODUCT_LABEL`、`PROOF_LABEL`、`CTA`与`BRAND_END_CARD`不经过`CaptionTrack`。
+4. `GRAPHIC_REVEAL`和`HERO_ASSET`在受支持的2D范围内由canonical HyperFrames path执行并产生durable receipts；unsupported layer/type、tracking或physical interaction fail closed。
+5. `IN_SCENE_PROVIDER`没有source-generation evidence时不能materialize；flat overlay不能伪造手持、接触、遮挡或光照融合。
+6. 所有frame/sample timing仍来自同一sealed `ResolvedTimeline`；audio cues只投影到P4 inputs，不创建advertising audio timeline。
+7. Source audit继续拒绝arbitrary HTML/JavaScript/CSS/network capability。
+8. Focused tests与policy-required exact-snapshot Harness receipt通过后，只能声明`AdCreativePlan bridge implemented`；不得由此声明P6、Final Acceptance、真实商品融合质量或广告效果。
+
+### Explicit Non-Goals
+
+不建设第二条timeline、第二renderer、第二durable writer、通用Motion Engine、复杂3D/AR商品追踪、新Asset Registry、campaign runtime或多个广告service/Agent；不删除`ResolvedTimeline`、`ProductionStateCommitter`或HyperFrames，也不把所有广告能力塞进Composition Playbook。
