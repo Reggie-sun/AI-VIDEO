@@ -25,12 +25,15 @@ import pytest
 
 import ai_video.agent_memory.corpus as corpus_module
 import ai_video.agent_memory.index as index_module
+import ai_video.agent_memory.retrieval as retrieval_module
 import scripts.agent_memory as agent_memory_script
 from ai_video.agent_memory.chunking import chunk_documents
 from ai_video.agent_memory.config import (
     DEFAULT_CORPUS_ROOT,
     DEFAULT_INDEX_PATH,
     DEFAULT_MODEL_DIR,
+    DEFAULT_TOP_N,
+    HYBRID_CANDIDATE_TOP_K,
     VALID_SCOPES,
 )
 from ai_video.agent_memory.corpus import (
@@ -46,6 +49,11 @@ from ai_video.agent_memory.embeddings import (
     build_embedding,
 )
 from ai_video.agent_memory.index import build_index, index_exists, load_index
+from ai_video.agent_memory.hybrid import (
+    lexical_relevance_score,
+    rank_bm25,
+    reciprocal_rank_fusion,
+)
 from ai_video.agent_memory.retrieval import Hit, format_text, search
 from scripts.agent_memory import main as agent_memory_main
 
@@ -278,6 +286,285 @@ def test_search_returns_expected_record_for_seedance(
     assert any("seedance-credential" in s for s in sources), (
         f"expected seedance credential record in top-k, got: {sources}"
     )
+
+
+def test_search_keeps_score_at_threshold_and_drops_lower(
+    sample_corpus: Path, tmp_path: Path, fake_embedding, monkeypatch
+) -> None:
+    idx = tmp_path / "idx"
+    build_index(
+        corpus_root=sample_corpus,
+        index_path=idx,
+        embedding=fake_embedding,
+    )
+
+    class BoundaryCollection:
+        def count(self) -> int:
+            return 2
+
+        def query(self, **kwargs):
+            assert kwargs["n_results"] == 2
+            return {
+                "ids": [["exact", "below"]],
+                "documents": [["first candidate", "second candidate"]],
+                "metadatas": [[
+                    {
+                        "source": "docs/exact.md",
+                        "title": "Exact",
+                        "section": "Boundary",
+                        "chunk_index": 0,
+                    },
+                    {
+                        "source": "docs/below.md",
+                        "title": "Below",
+                        "section": "Boundary",
+                        "chunk_index": 0,
+                    },
+                ]],
+                "distances": [[0.3, 0.3001]],
+            }
+
+        def get(self, **kwargs):
+            return {
+                "ids": ["exact", "below"],
+                "documents": ["first candidate", "second candidate"],
+                "metadatas": [
+                    {
+                        "source": "docs/exact.md",
+                        "title": "Exact",
+                        "section": "Boundary",
+                        "chunk_index": 0,
+                    },
+                    {
+                        "source": "docs/below.md",
+                        "title": "Below",
+                        "section": "Boundary",
+                        "chunk_index": 0,
+                    },
+                ],
+            }
+
+    class BoundaryStore:
+        def get_collection(self, name: str) -> BoundaryCollection:
+            assert name == "agent_memory_experience"
+            return BoundaryCollection()
+
+    monkeypatch.setattr(retrieval_module, "load_index", lambda *_: BoundaryStore())
+
+    hits = search(
+        "threshold boundary",
+        top_k=2,
+        index_path=idx,
+        embedding=fake_embedding,
+    )
+
+    assert [hit.source for hit in hits] == ["docs/exact.md"]
+    assert hits[0].score == 0.7
+
+
+def test_search_hybrid_fusion_rescues_exact_lexical_hit(
+    sample_corpus: Path, tmp_path: Path, fake_embedding, monkeypatch
+) -> None:
+    idx = tmp_path / "idx"
+    build_index(
+        corpus_root=sample_corpus,
+        index_path=idx,
+        embedding=fake_embedding,
+    )
+
+    metadatas = [
+        {
+            "source": "docs/general.md",
+            "title": "General",
+            "section": "Production",
+            "chunk_index": 0,
+        },
+        {
+            "source": "docs/credential.md",
+            "title": "Credential",
+            "section": "Provider",
+            "chunk_index": 0,
+        },
+        *(
+            {
+                "source": f"docs/decoy-{index}.md",
+                "title": f"Decoy {index}",
+                "section": "Other",
+                "chunk_index": 0,
+            }
+            for index in range(18)
+        ),
+    ]
+    ids = ["general", "credential", *(f"decoy-{index}" for index in range(18))]
+    documents = [
+        "general production note",
+        "ARK_API_KEY credential reference",
+        *(f"unrelated material {index}" for index in range(18)),
+    ]
+
+    class HybridCollection:
+        def count(self) -> int:
+            return 20
+
+        def query(self, **kwargs):
+            assert kwargs["n_results"] == 20
+            return {
+                "ids": [ids],
+                "documents": [documents],
+                "metadatas": [metadatas],
+                "distances": [[0.1, 0.4, *([0.8] * 18)]],
+            }
+
+        def get(self, **kwargs):
+            return {
+                "ids": ids,
+                "documents": documents,
+                "metadatas": metadatas,
+            }
+
+    class HybridStore:
+        def get_collection(self, name: str) -> HybridCollection:
+            assert name == "agent_memory_experience"
+            return HybridCollection()
+
+    monkeypatch.setattr(retrieval_module, "load_index", lambda *_: HybridStore())
+
+    hits = search(
+        "ARK_API_KEY",
+        top_k=2,
+        index_path=idx,
+        embedding=fake_embedding,
+    )
+
+    assert [hit.source for hit in hits] == [
+        "docs/credential.md",
+        "docs/general.md",
+    ]
+    assert hits[0].dense_score == pytest.approx(0.6)
+    assert hits[0].lexical_score > 0
+    assert hits[0].lexical_relevance_score >= 0.7
+    assert hits[0].fusion_score > hits[1].fusion_score
+    assert hits[0].score >= 0.7
+    assert all(hit.score >= 0.7 for hit in hits)
+
+    path_hits = search(
+        "docs/credential.md",
+        top_k=2,
+        index_path=idx,
+        embedding=fake_embedding,
+    )
+
+    assert path_hits[0].source == "docs/credential.md"
+    assert path_hits[0].lexical_relevance_score >= 0.7
+
+
+def test_hybrid_primitives_match_identifiers_and_chinese_bigrams() -> None:
+    identifier_matches = rank_bm25(
+        "ARK_API_KEY",
+        {
+            "credential": "Use the ARK_API_KEY credential reference.",
+            "general": "General production guidance.",
+        },
+        2,
+    )
+    chinese_matches = rank_bm25(
+        "连续性",
+        {
+            "continuity": "镜头连续性检查",
+            "render": "渲染输出",
+        },
+        2,
+    )
+    fusion = reciprocal_rank_fusion(
+        ((["dense-only", "both"], 1.0), (["both"], 1.0)),
+        rank_constant=60,
+    )
+
+    assert [match.chunk_id for match in identifier_matches] == ["credential"]
+    assert [match.chunk_id for match in chinese_matches] == ["continuity"]
+    assert fusion["both"] > fusion["dense-only"]
+    assert lexical_relevance_score(0.182322) < 0.7
+
+
+def test_weak_common_lexical_match_does_not_bypass_threshold() -> None:
+    class CommonTermCollection:
+        def query(self, **kwargs):
+            return {
+                "ids": [["first", "second"]],
+                "documents": [["the first", "the second"]],
+                "metadatas": [[
+                    {"source": "docs/first.md", "chunk_index": 0},
+                    {"source": "docs/second.md", "chunk_index": 0},
+                ]],
+                "distances": [[0.9, 0.9]],
+            }
+
+        def get(self, **kwargs):
+            return {
+                "ids": ["first", "second"],
+                "documents": ["the first", "the second"],
+                "metadatas": [
+                    {"source": "docs/first.md", "chunk_index": 0},
+                    {"source": "docs/second.md", "chunk_index": 0},
+                ],
+            }
+
+    hits = retrieval_module._search_collection(
+        query="the",
+        query_vector=[0.0],
+        collection=CommonTermCollection(),
+        available=2,
+        limit=2,
+        corpus_kind="experience",
+        default_authority="advisory_experience",
+    )
+
+    assert hits == []
+
+
+def test_hybrid_uses_top_k_30_and_returns_top_n_8() -> None:
+    assert HYBRID_CANDIDATE_TOP_K == 30
+    assert DEFAULT_TOP_N == 8
+
+    ids = [f"chunk-{index:02d}" for index in range(40)]
+    documents = [f"needle candidate {index}" for index in range(40)]
+    metadatas = [
+        {
+            "source": f"docs/{index}.md",
+            "title": f"Candidate {index}",
+            "chunk_index": 0,
+        }
+        for index in range(40)
+    ]
+
+    class SizedCollection:
+        def query(self, **kwargs):
+            assert kwargs["n_results"] == 30
+            return {
+                "ids": [ids[:30]],
+                "documents": [documents[:30]],
+                "metadatas": [metadatas[:30]],
+                "distances": [[0.1] * 30],
+            }
+
+        def get(self, **kwargs):
+            return {
+                "ids": ids,
+                "documents": documents,
+                "metadatas": metadatas,
+            }
+
+    hits = retrieval_module._search_collection(
+        query="needle",
+        query_vector=[0.0],
+        collection=SizedCollection(),
+        available=40,
+        limit=8,
+        corpus_kind="experience",
+        default_authority="advisory_experience",
+    )
+
+    assert len(hits) == 8
 
 
 def test_search_missing_index_raises(tmp_path: Path, fake_embedding) -> None:
@@ -1421,7 +1708,7 @@ def test_run_summaries_missing_root_returns_no_hits(
     runs_idx = tmp_path / "runs_idx"
     index_module.build_scoped_index((experience,), main_idx, fake_embedding)
     hits = search(
-        "anything",
+        "terminal frames",
         top_k=3,
         scope="experience",
         corpora=(experience,),

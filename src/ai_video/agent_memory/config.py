@@ -26,8 +26,19 @@ DEFAULT_COLLECTION: str = "agent_memory_experience"
 SUPERPOWERS_COLLECTION: str = "agent_memory_superpowers"
 RUN_SUMMARIES_COLLECTION: str = "agent_memory_run_summaries"
 
-# Default top-K for retrieval. Configurable via CLI flag.
-DEFAULT_TOP_K: int = 5
+# Agent-facing Top-N. ``DEFAULT_TOP_K`` remains the public CLI compatibility
+# name for the existing ``--top-k`` option.
+DEFAULT_TOP_N: int = 8
+DEFAULT_TOP_K: int = DEFAULT_TOP_N
+
+# Inclusive relevance gate applied to the final merged retrieval candidates.
+MINIMUM_RELEVANCE_SCORE: float = 0.7
+
+# Hybrid retrieval keeps the existing dense index and adds a local lexical
+# lane over the same indexed chunks. Reciprocal-rank fusion only determines
+# ordering; the relevance gate above remains the Agent-facing admission rule.
+HYBRID_CANDIDATE_TOP_K: int = 30
+HYBRID_RRF_K: int = 60
 
 # Default embedding backend. Choices:
 #   "local" -> LocalOnnxMiniLMEmbeddings (offline, requires the local model dir).

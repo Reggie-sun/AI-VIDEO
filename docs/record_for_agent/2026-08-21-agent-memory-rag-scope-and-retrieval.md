@@ -54,20 +54,31 @@ trivial test 不应触发检索。
 ## Matching Pipeline
 
 1. **Scope selection**：`experience` 与 `superpowers` 使用独立 Chroma collection；
-   `all` 会先为两个 corpus 分配近似均分的 candidate quota（`top_k=5` 时为 3/2）。
+   `all` 会先为两个 corpus 分配近似均分的 result quota（默认 `top_n=8` 时为 4/4）。
 2. **Document chunking**：Markdown 先按 `#`、`##`、`###` 标题切分；过长 section
    再按约 800 characters 切分，80 characters overlap。每个 chunk 保留 source、title、
    heading path、status、corpus kind 与 authority metadata。
 3. **Embedding**：本地 pinned `intfloat/multilingual-e5-small` ONNX 生成 384-dim
    normalized vectors；query 加 `query:` 前缀，document 加 `passage:` 前缀。
-4. **Retrieval**：每个 selected collection 以 cosine nearest-neighbor 查询。
-   result score 为 `1 - cosine_distance`；它只用于当前 result ordering，不是可信的
-   confidence 或 quality threshold。
-5. **Merge**：`all` 的两个 corpus candidates 合并后按 score 降序排列，最终截取
-   `top_k`；因此 quota 保证两边都有召回机会，但不保证 final result 严格交替。
+4. **Candidate retrieval**：每个 selected collection 从同一批 indexed chunks 走两条
+   local lane。Dense lane 使用现有 Chroma cosine nearest-neighbor；lexical lane 使用
+   dependency-free BM25（`k1=1.5`、`b=0.75`），保留 identifier/路径 token，并为中文
+   连续文本增加 bigram。两条 lane 的 candidate `top_k` 都是 30。
+5. **Fusion**：两条 lane 用 stable Chroma chunk ID 去重，再以 equal-weight weighted RRF
+   （`k=60`）排序。每个 hit 分别保留 `dense_score`、raw `lexical_score` 与
+   `lexical_relevance_score`、`fusion_score`；lexical representation 包含 chunk body、
+   canonical source、title 与 heading metadata。不会把 Enterprise RAG 的 ACL、department
+   scope、query router、answerability fallback 或 citation policy 搬入本仓库。
+6. **Relevance gate**：raw BM25 通过固定函数 `1 - exp(-BM25 / 0.2)` 映射为 bounded
+   lexical relevance，Agent-facing `score` 取它与 dense cosine score 的较大值。只保留
+   `score >= 0.7` 的命中；`score == 0.7` 通过，低于 `0.7` 不返回。这个固定 admission
+   heuristic 不会因 candidate set 的第一名而自动归一化为 1，也不是事实可信度或质量证明。
+7. **Merge**：先在各 corpus quota 内按 `fusion_score` 排序，再合并 experience、
+   superpowers 与可选 run-summary hits，按 fusion、relevance 与 lane score 稳定排序并截取
+   Agent-facing `top_n`（默认 8）；quota 保证不同 scope 都有召回机会，但不保证 final
+   result 严格交替。现有 CLI `--top-k` 保留为 `top_n` 的兼容覆盖参数。
 
-当前没有 query rewriting、metadata filter、BM25/lexical retrieval、RRF、reranker 或
-minimum-score abstention。
+当前没有 query rewriting、metadata filter、reranker 或动态 query-specific threshold。
 
 ## Fitness And Limits
 
@@ -75,10 +86,10 @@ minimum-score abstention。
 H3 continuity?”、“是否有关于 StateCommitter recovery 的旧设计？”或“哪些计划讨论过
 该架构取舍？”。
 
-它不适合作为精确 symbol/path/commit/error-code 搜索器，也不应单独作为回答、执行、
-Provider authorization、quality acceptance 或 durable state mutation 的依据。若真实使用
-中持续出现精确术语漏召回或语义排序错误，应基于具体 failure case 再评估增加 lexical
-retrieval + dense retrieval 的 RRF，而不是提前扩大实现。
+Hybrid retrieval 改善了 exact symbol、path、commit 与 error-code 的召回，同时保留中英文
+语义查询能力；它仍不应单独作为回答、执行、Provider authorization、quality acceptance
+或 durable state mutation 的依据。固定 BM25 映射提供稳定 admission scale，但仍不是
+跨语料可比较的 calibrated confidence。
 
 ## Freshness And Maintenance
 

@@ -6,8 +6,19 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence
 
-from ai_video.agent_memory.embeddings import build_embedding
+from ai_video.agent_memory.config import (
+    DEFAULT_TOP_N,
+    HYBRID_CANDIDATE_TOP_K,
+    HYBRID_RRF_K,
+    MINIMUM_RELEVANCE_SCORE,
+)
 from ai_video.agent_memory.corpus import CorpusSpec
+from ai_video.agent_memory.embeddings import build_embedding
+from ai_video.agent_memory.hybrid import (
+    lexical_relevance_score,
+    rank_bm25,
+    reciprocal_rank_fusion,
+)
 from ai_video.agent_memory.index import (
     IndexMismatchError,
     ensure_scoped_index,
@@ -44,6 +55,11 @@ class Hit:
     run_family: str = ""
     run_version: int = 0
     summary_sha256: str = ""
+    chunk_id: str = ""
+    dense_score: Optional[float] = None
+    lexical_score: float = 0.0
+    lexical_relevance_score: float = 0.0
+    fusion_score: float = 0.0
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -67,7 +83,7 @@ def _authority_label(corpus_kind: str) -> str:
 
 def search(
     query: str,
-    top_k: int = 5,
+    top_k: int = DEFAULT_TOP_N,
     corpus_root: Optional[Path] = None,
     index_path: Optional[Path] = None,
     embedding=None,
@@ -77,7 +93,7 @@ def search(
     runs_corpus: Optional[CorpusSpec] = None,
     runs_index_path: Optional[Path] = None,
 ) -> List[Hit]:
-    """Return the top-K hits for ``query`` against the local Chroma index.
+    """Return up to top-K hits meeting the inclusive relevance threshold.
 
     The index manifest binds corpus bytes, embedding identity and collection
     scope. When callers provide corpus roots, missing indexes and changed
@@ -179,38 +195,21 @@ def search(
             available = collection.count()
             if available == 0:
                 continue
-            raw = collection.query(
-                query_embeddings=[query_vector],
-                n_results=min(limit, available),
-                include=["documents", "metadatas", "distances"],
+            hits.extend(
+                _search_collection(
+                    query=query,
+                    query_vector=query_vector,
+                    collection=collection,
+                    available=available,
+                    limit=limit,
+                    corpus_kind=kind,
+                    default_authority=item.authority,
+                )
             )
         except Exception as exc:
             raise IndexMismatchError(
                 f"index collection for scope {kind!r} is unavailable; rebuild required"
             ) from exc
-        documents = raw.get("documents", [[]])[0] or []
-        metadatas = raw.get("metadatas", [[]])[0] or []
-        distances = raw.get("distances", [[]])[0] or []
-        for text, md, distance in zip(documents, metadatas, distances):
-            md = md or {}
-            hits.append(
-                Hit(
-                    source=str(md.get("source", "?")),
-                    title=str(md.get("title", "?")),
-                    section=str(md.get("section", "")),
-                    score=1.0 - float(distance),
-                    excerpt=_format_excerpt(text or ""),
-                    chunk_index=int(md.get("chunk_index", -1)),
-                    h1=str(md.get("h1", "")),
-                    h2=str(md.get("h2", "")),
-                    h3=str(md.get("h3", "")),
-                    date=md.get("date"),
-                    corpus_kind=str(md.get("corpus_kind", kind)),
-                    authority=str(md.get("authority", item.authority)),
-                    document_kind=str(md.get("document_kind", "")),
-                    status=str(md.get("status", "")),
-                )
-            )
 
     # When the caller opted into run-summary inclusion, query the
     # separate run-summary index so auto-generated run notes surface
@@ -226,7 +225,147 @@ def search(
             )
         )
 
-    return sorted(hits, key=lambda hit: hit.score, reverse=True)[:top_k]
+    return sorted(hits, key=_hit_sort_key, reverse=True)[:top_k]
+
+
+def _hit_sort_key(hit: Hit) -> tuple[float, float, float, float]:
+    """Order admitted hits by fusion, then deterministic lane scores."""
+    return (
+        hit.fusion_score,
+        hit.score,
+        hit.lexical_score,
+        hit.dense_score if hit.dense_score is not None else -1.0,
+    )
+
+
+def _lexical_document(text: str, metadata: dict) -> str:
+    """Combine chunk body and canonical locator metadata for lexical search."""
+    fields = (
+        text,
+        metadata.get("source", ""),
+        metadata.get("title", ""),
+        metadata.get("section", ""),
+        metadata.get("h1", ""),
+        metadata.get("h2", ""),
+        metadata.get("h3", ""),
+    )
+    return "\n".join(str(field) for field in fields if field)
+
+
+def _search_collection(
+    *,
+    query: str,
+    query_vector: Sequence[float],
+    collection,
+    available: int,
+    limit: int,
+    corpus_kind: str,
+    default_authority: str,
+) -> List[Hit]:
+    """Fuse dense and lexical candidates from one validated collection."""
+    candidate_limit = min(HYBRID_CANDIDATE_TOP_K, available)
+    dense_raw = collection.query(
+        query_embeddings=[query_vector],
+        n_results=candidate_limit,
+        include=["documents", "metadatas", "distances"],
+    )
+    lexical_raw = collection.get(include=["documents", "metadatas"])
+
+    dense_ids = dense_raw.get("ids", [[]])[0] or []
+    dense_documents = dense_raw.get("documents", [[]])[0] or []
+    dense_metadatas = dense_raw.get("metadatas", [[]])[0] or []
+    dense_distances = dense_raw.get("distances", [[]])[0] or []
+    if not (
+        len(dense_ids)
+        == len(dense_documents)
+        == len(dense_metadatas)
+        == len(dense_distances)
+    ):
+        raise ValueError("dense retrieval result fields have inconsistent lengths")
+
+    lexical_ids = lexical_raw.get("ids", []) or []
+    lexical_documents = lexical_raw.get("documents", []) or []
+    lexical_metadatas = lexical_raw.get("metadatas", []) or []
+    if not (
+        len(lexical_ids) == len(lexical_documents) == len(lexical_metadatas)
+    ):
+        raise ValueError("lexical retrieval corpus fields have inconsistent lengths")
+
+    records = {
+        str(chunk_id): (text or "", metadata or {})
+        for chunk_id, text, metadata in zip(
+            lexical_ids,
+            lexical_documents,
+            lexical_metadatas,
+        )
+    }
+    for chunk_id, text, metadata in zip(
+        dense_ids,
+        dense_documents,
+        dense_metadatas,
+    ):
+        records.setdefault(str(chunk_id), (text or "", metadata or {}))
+
+    dense_ranking = [str(chunk_id) for chunk_id in dense_ids]
+    dense_scores = {
+        str(chunk_id): 1.0 - float(distance)
+        for chunk_id, distance in zip(dense_ids, dense_distances)
+    }
+    lexical_matches = rank_bm25(
+        query,
+        {
+            chunk_id: _lexical_document(text, metadata)
+            for chunk_id, (text, metadata) in records.items()
+        },
+        min(HYBRID_CANDIDATE_TOP_K, available),
+    )
+    lexical_ranking = [match.chunk_id for match in lexical_matches]
+    lexical_scores = {match.chunk_id: match.score for match in lexical_matches}
+    fusion_scores = reciprocal_rank_fusion(
+        ((dense_ranking, 1.0), (lexical_ranking, 1.0)),
+        rank_constant=HYBRID_RRF_K,
+    )
+
+    hits: List[Hit] = []
+    for chunk_id in fusion_scores:
+        text, md = records[chunk_id]
+        dense_score = dense_scores.get(chunk_id)
+        lexical_score = lexical_scores.get(chunk_id, 0.0)
+        bounded_lexical_score = lexical_relevance_score(lexical_score)
+        score = max(
+            dense_score if dense_score is not None else 0.0,
+            bounded_lexical_score,
+        )
+        if score < MINIMUM_RELEVANCE_SCORE:
+            continue
+        hits.append(
+            Hit(
+                source=str(md.get("source", "?")),
+                title=str(md.get("title", "?")),
+                section=str(md.get("section", "")),
+                score=score,
+                excerpt=_format_excerpt(text),
+                chunk_index=int(md.get("chunk_index", -1)),
+                h1=str(md.get("h1", "")),
+                h2=str(md.get("h2", "")),
+                h3=str(md.get("h3", "")),
+                date=md.get("date"),
+                corpus_kind=str(md.get("corpus_kind", corpus_kind)),
+                authority=str(md.get("authority", default_authority)),
+                document_kind=str(md.get("document_kind", "")),
+                status=str(md.get("status", "")),
+                run_id=str(md.get("run_id", "")),
+                run_family=str(md.get("run_family", "")),
+                run_version=int(md.get("run_version", 0) or 0),
+                summary_sha256=str(md.get("summary_sha256", "")),
+                chunk_id=chunk_id,
+                dense_score=dense_score,
+                lexical_score=lexical_score,
+                lexical_relevance_score=bounded_lexical_score,
+                fusion_score=fusion_scores[chunk_id],
+            )
+        )
+    return sorted(hits, key=_hit_sort_key, reverse=True)[:limit]
 
 
 def _search_runs(
@@ -266,44 +405,19 @@ def _search_runs(
             raise IndexMismatchError("run-summary collection changed during search")
         if available == 0:
             return []
-        raw = collection.query(
-            query_embeddings=[embedding.embed_query(query)],
-            n_results=min(top_k, available),
-            include=["documents", "metadatas", "distances"],
+        return _search_collection(
+            query=query,
+            query_vector=embedding.embed_query(query),
+            collection=collection,
+            available=available,
+            limit=top_k,
+            corpus_kind="run_summaries",
+            default_authority=item.authority,
         )
     except Exception as exc:
         raise IndexMismatchError(
             "run-summary index collection is unavailable"
         ) from exc
-    documents = raw.get("documents", [[]])[0] or []
-    metadatas = raw.get("metadatas", [[]])[0] or []
-    distances = raw.get("distances", [[]])[0] or []
-    hits: List[Hit] = []
-    for text, md, distance in zip(documents, metadatas, distances):
-        md = md or {}
-        hits.append(
-            Hit(
-                source=str(md.get("source", "?")),
-                title=str(md.get("title", "?")),
-                section=str(md.get("section", "")),
-                score=1.0 - float(distance),
-                excerpt=_format_excerpt(text or ""),
-                chunk_index=int(md.get("chunk_index", -1)),
-                h1=str(md.get("h1", "")),
-                h2=str(md.get("h2", "")),
-                h3=str(md.get("h3", "")),
-                date=md.get("date"),
-                corpus_kind=str(md.get("corpus_kind", "run_summaries")),
-                authority=str(md.get("authority", item.authority)),
-                document_kind=str(md.get("document_kind", "run_summary")),
-                status=str(md.get("status", "")),
-                run_id=str(md.get("run_id", "")),
-                run_family=str(md.get("run_family", "")),
-                run_version=int(md.get("run_version", 0) or 0),
-                summary_sha256=str(md.get("summary_sha256", "")),
-            )
-        )
-    return hits
 
 
 def format_text(hits: Iterable[Hit]) -> str:
