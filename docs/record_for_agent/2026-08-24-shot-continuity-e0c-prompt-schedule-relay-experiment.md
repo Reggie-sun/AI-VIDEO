@@ -235,23 +235,6 @@ Receipt verification 报告 `passed=true`、`fresh=true`、`snapshot_matches=tru
 
 Independent `reviewer_xhigh` 多轮 review 先后拒绝了：unmapped Harness routing、跨进程 recovery lease 缺失、requeue bypass、可复用 systemd unit 的 stop race、宽松 unit namespace、并发 start、post-create cleanup leak 与共享-port health 误归属。Parent 随后补上 per-fd volatile `/proc` handling、direct inode/port fixture 与 typed mutex failure coverage，并重新运行上述 focused checks；reviewer 对 exact commit `f9b580d` 的最终 delta-only verdict 为 `accept`，无 blocking issue。
 
-### MiniMax Diagnostic Capture
-
-本轮 external MiniMax delegation 已由 automatic sanitized capture 保存：
-
-```text
-/home/reggie/.codex/session-diagnostics/minimax/01a03356-47e3-7780-ace7-b56ea5769dd2-35e25a9c7d181d56.md
-```
-
-Capture metadata：session `01a03356-47e3-7780-ace7-b56ea5769dd2`、fingerprint `35e25a9c7d181d56`、report schema `7`、malformed JSONL lines `0`。Terminal truth 将原始 subagent outcome 分开记录：
-
-- read-only explorer 首次 invocation 为 transport `1`、CLI `0`、`dialogue_protocol_error` / `PROTOCOL_ERROR`，没有 evidence 或 blocker claim。
-- 修正 dialogue 后的两次 read-only explorer invocation 均为 transport `0`、CLI `0`、`DONE_WITH_CONCERNS`；concerns 分别覆盖 architecture uncertainty、evidence gap 与 test gap，没有 blocker。它们只提供 code mapping / hypothesis evidence，不拥有最终实现决定。
-- safe-edit writer invocation 为 transport `1`、CLI `-9`、`tool_error_loop` / `BLOCKED`，blocker 为 `permission_denial_loop`；没有 evidence，也没有修改文件。
-- bounded fresh retry 在 backend 前被 `runner_validation` 拒绝，未获得新的 agent outcome，也没有修改文件。最终 implementation、verification、commits 与 reviewer acceptance 均由 parent / native reviewer 完成。
-
-该 capture 省略 raw prompts、exact commands、Provider result prose、environment values 与 credentials。它证明 delegation transport/status 与 failure classification，不证明 code correctness、Harness PASS、ComfyUI runtime readiness、媒体质量或 E0-C completion；这些 truth 仍分别由 exact commits、tests、Harness receipts、read-only runtime status 与既有 empirical evidence 所有。
-
 ### Publication And Acceptance Boundary
 
 两个 commit 都只存在于本机 `main`；没有 push、release 或 remote deployment。`index.json` 与 AI-VIDEO checkout 中其他 unrelated dirty changes均未 stage、commit、reset 或覆盖。
