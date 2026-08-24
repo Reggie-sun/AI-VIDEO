@@ -179,7 +179,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
   shot_continuity_p0_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_prepare_shot_continuity_p0.py, tests/test_production_p0_qualification.py, tests/test_production_video_transition.py, tests/test_shot_continuity_m0_materialization.py, tests/test_shot_continuity_m0_validation.py, tests/test_shot_continuity_m0_caller.py, tests/test_video_generation.py, tests/test_production_local_video_state.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_prepare_shot_continuity_p0.py, tests/test_production_p0_qualification.py, tests/test_production_video_transition.py, tests/test_shot_continuity_source_runtime.py, tests/test_shot_continuity_source_qualification.py, tests/test_shot_continuity_m0_materialization.py, tests/test_shot_continuity_m0_validation.py, tests/test_shot_continuity_m0_caller.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_local_video_state.py, -q]
     cwd: .
     description: Verify deterministic Shot Continuity P0 preparation, immutable stack/policy evidence, and fail-closed persistence.
   production_shot_router_tests:
@@ -509,6 +509,11 @@ categories:
       - src/ai_video/production/execution_stack_materialization.py
       - src/ai_video/production/shot_continuity_m0_caller.py
       - src/ai_video/production/shot_continuity_m0_qualification.py
+      - src/ai_video/production/shot_continuity_source_qualification.py
+      - src/ai_video/production/shot_continuity_source_contracts.py
+      - src/ai_video/production/shot_continuity_source_runtime.py
+      - src/ai_video/production/shot_continuity_source_schema.py
+      - src/ai_video/production/video_candidate_composition.py
       - src/ai_video/production/shot_continuity_source_stack.py
       - src/ai_video/production/video_execution_stack.py
       - src/ai_video/production/video_transition.py
@@ -518,6 +523,9 @@ categories:
       - tests/test_shot_continuity_m0_materialization.py
       - tests/test_shot_continuity_m0_caller.py
       - tests/test_shot_continuity_m0_validation.py
+      - tests/test_shot_continuity_source_qualification.py
+      - tests/test_shot_continuity_source_runtime.py
+      - workflows/qualification/minimax_h3_fl2va_rainy_station_source_v1_profile.json
       - workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_*
     check_ids:
       - shot_continuity_p0_tests
@@ -559,6 +567,7 @@ categories:
       - src/ai_video/production/video_compiler.py
       - src/ai_video/production/video_fake.py
       - src/ai_video/production/video_candidate.py
+      - src/ai_video/production/video_candidate_composition.py
       - src/ai_video/production/video_generation.py
       - src/ai_video/production/local_video.py
       - src/ai_video/production/comfy_video.py
@@ -567,6 +576,10 @@ categories:
       - src/ai_video/production/comfy_t8_native_turbo_profile.py
       - src/ai_video/production/comfy_t8_native_turbo_video.py
       - src/ai_video/production/local_h3_provider_family.py
+      - src/ai_video/production/shot_continuity_source_qualification.py
+      - src/ai_video/production/shot_continuity_source_contracts.py
+      - src/ai_video/production/shot_continuity_source_runtime.py
+      - src/ai_video/production/shot_continuity_source_schema.py
       - src/ai_video/production/_paid_provider_project_reader.py
       - src/ai_video/production/_video_project_reader.py
       - src/ai_video/production/_state_commit_paid_provider.py
@@ -593,6 +606,8 @@ categories:
       - tests/test_production_comfy_t8_turbo_video.py
       - tests/test_production_comfy_t8_native_turbo_video.py
       - tests/test_production_local_h3_provider_family.py
+      - tests/test_shot_continuity_source_qualification.py
+      - tests/test_shot_continuity_source_runtime.py
       - tests/paid_provider_support.py
       - tests/video_provider_contract.py
     check_ids:

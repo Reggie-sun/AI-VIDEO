@@ -41,6 +41,9 @@ from ai_video.production.paths import (
     canonical_image_shot_revision_path,
 )
 from ai_video.production.registry import registry_semantic_sha256
+from ai_video.production.video_candidate_composition import (
+    build_video_candidate_composition_spec,
+)
 
 if TYPE_CHECKING:
     from ai_video.production.dependency import ProductionDependencyInputs
@@ -224,7 +227,17 @@ def make_video_candidate_preparer(
             }
         )
 
-        candidate_inputs = replace(live_base_inputs, project=candidate_project)
+        candidate_spec = build_video_candidate_composition_spec(
+            live_base_inputs.composition_spec,
+            target_shot_id=original.target_shot_id,
+            target_asset_role=original.target_asset_role,
+            output_asset_id=request.output_asset_id,
+        )
+        candidate_inputs = replace(
+            live_base_inputs,
+            project=candidate_project,
+            composition_spec=candidate_spec,
+        )
         candidate_graph = build_production_dependency_graph(candidate_inputs)
         graph_bytes = _canonical_json_bytes(candidate_graph.model_dump(mode="json"))
         graph_pointer = DependencyGraphSnapshotPointer(

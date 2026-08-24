@@ -1216,6 +1216,11 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "scripts/prepare_shot_continuity_p0.py",
         "src/ai_video/production/execution_stack_materialization.py",
         "src/ai_video/production/shot_continuity_m0_qualification.py",
+        "src/ai_video/production/shot_continuity_source_qualification.py",
+        "src/ai_video/production/shot_continuity_source_contracts.py",
+        "src/ai_video/production/shot_continuity_source_runtime.py",
+        "src/ai_video/production/shot_continuity_source_schema.py",
+        "src/ai_video/production/video_candidate_composition.py",
         "src/ai_video/production/video_execution_stack.py",
         "src/ai_video/production/video_transition.py",
         "tests/test_prepare_shot_continuity_p0.py",
@@ -1223,10 +1228,22 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_production_video_transition.py",
         "tests/test_shot_continuity_m0_materialization.py",
         "tests/test_shot_continuity_m0_validation.py",
+        "tests/test_shot_continuity_source_qualification.py",
+        "tests/test_shot_continuity_source_runtime.py",
+        "workflows/qualification/minimax_h3_fl2va_rainy_station_source_v1_profile.json",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_api.json",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_binding.yaml",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_profile.json",
     )
+    provider_lifecycle_paths = {
+        "src/ai_video/production/shot_continuity_source_qualification.py",
+        "src/ai_video/production/shot_continuity_source_contracts.py",
+        "src/ai_video/production/shot_continuity_source_runtime.py",
+        "src/ai_video/production/shot_continuity_source_schema.py",
+        "src/ai_video/production/video_candidate_composition.py",
+        "tests/test_shot_continuity_source_qualification.py",
+        "tests/test_shot_continuity_source_runtime.py",
+    }
 
     for path in paths:
         report = agent_harness.inspect_paths([path], policy)
@@ -1234,6 +1251,12 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         assert "shot_continuity_p0" in report["categories"]
         if path.startswith("workflows/qualification/"):
             assert "workflow" in report["categories"]
+        elif path in provider_lifecycle_paths:
+            assert set(report["categories"]) == {
+                "production_video_provider",
+                "shot_continuity_p0",
+            }
+            assert "production_video_provider_tests" in report["check_ids"]
         else:
             assert report["categories"] == ["shot_continuity_p0"]
         assert "shot_continuity_p0_tests" in report["check_ids"]
@@ -1246,6 +1269,9 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_production_video_transition.py",
         "tests/test_shot_continuity_m0_materialization.py",
         "tests/test_shot_continuity_m0_validation.py",
+        "tests/test_shot_continuity_source_qualification.py",
+        "tests/test_shot_continuity_source_runtime.py",
+        "tests/test_video_candidate.py",
     ):
         assert path in argv
 

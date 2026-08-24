@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Protocol
 
@@ -63,6 +63,7 @@ from ai_video.production.video_artifact import (
     extract_terminal_frame_candidate,
     probe_generated_video_candidate,
 )
+from ai_video.production.video_candidate_composition import video_candidate_dependency_inputs_are_exact
 
 from ._state_commit_common import (
     _candidate_artifacts_hash,
@@ -306,12 +307,13 @@ def validate_video_activation_candidate(
     ):
         raise _state_invalid("Video candidate project does not select the target Shot.")
 
-    if (
-        prepared.candidate_inputs.project != candidate
-        or replace(prepared.candidate_inputs, project=base_project)
-        != prepared.base_inputs
+    if not video_candidate_dependency_inputs_are_exact(
+        candidate_inputs=prepared.candidate_inputs, base_inputs=prepared.base_inputs,
+        candidate_project=candidate, base_project=base_project,
+        target_shot_id=original.target_shot_id, target_asset_role=original.target_asset_role,
+        output_asset_id=request.output_asset_id,
     ):
-        raise _state_invalid("Video candidate changed non-project dependency inputs.")
+        raise _state_invalid("Video candidate dependency inputs are not exact.")
     expected_graph = build_production_dependency_graph(prepared.candidate_inputs)
     expected_resolution = resolve_video_activation_dependency_state(
         graph=expected_graph,

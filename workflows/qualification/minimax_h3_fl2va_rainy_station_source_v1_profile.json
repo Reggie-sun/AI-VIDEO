@@ -1,0 +1,86 @@
+{
+  "schema_version": "1",
+  "status": "qualification_only",
+  "provider_name": "comfy-local-h3",
+  "provider_kind": "minimax_h3_fl2va",
+  "deployment_identity": "loopback-127.0.0.1-8188",
+  "loopback_endpoint": "http://127.0.0.1:8188",
+  "model_id": "minimax-h3-fl2va",
+  "capability_id": "minimax-h3-fl2va-local-v1",
+  "candidate_id": "minimax-h3-fl2va-rainy-station-source-v1",
+  "contract_version": "1",
+  "provider_profile_sha256": "a154259fa9530e7c2df8865539eaeeef1886c0da51385a61d02c5c93fdb1ad6d",
+  "adapter_compiler_id": "comfy-local-h3-video-compiler",
+  "adapter_compiler_version": "1",
+  "source_execution_stack_hash": "482da299c4e3c434ae3f92fbac88982cf989d2ff333799e3ddba3e4073b17093",
+  "source_profile_hash": "e06df40e01c25aac2ab4287d57dc861320fdc5e917349b4d3a915e442cbc64ab",
+  "source_compiler_hash": "989b04221b7b886a194724461f7ce93967c3518ff78bdba983d6386db1680d20",
+  "source_workflow_hash": "8b6c338279d8af768fae8106034f9f26e8e9d59583e95a8ca8b16d36a930ad65",
+  "source_node_schema_status": "unsealed",
+  "source_node_schema_seals": [],
+  "p0_qualification_receipt_hash": "25145d177de07384bb4594e53023563e809a3f1bdcdb7ff294acd1cff5ae1e91",
+  "m0_execution_stack_hash": "8f9661c358162544a3cefd0f7ff4483063658fcb37de09f301ef7fe2500039d2",
+  "m0_profile_hash": "9bf6588c04712887b117a8fd3c7496c15b5667b112d8cea750047928ccc36517",
+  "m0_compiler_hash": "e2ba38bb110e26a5221a5582ea19f777752a1946ffacbe31b1445073d1530d19",
+  "m0_workflow_hash": "963bd91ad81ca102053deb08b29a7aa8fb6849a6256a78ccbfbc6138d7a855d2",
+  "p0_validation_set_hash": "6685f2661de2e0415bd42241cc6efec1c23127717c0a96e353509659e4569ab4",
+  "p0_policy_hashes": [
+    "8f8033495b92a4f234279e6f6da587f039fdc087c44312e04884ae4ded924d28",
+    "f82a280d9b9a9d050e92b9b7e12ad5c13ab365ee7e7113717800a163b93d8fd8",
+    "3b3623932abbe5edfcb6307c4750798402a7858e61b7e75babfe30e2d229531b"
+  ],
+  "p0_input_hashes": [
+    [
+      "inventory",
+      "4238c5f19589fac49c78481e2e1a5b996a0680019e907ed1eac5f95d2c64add1"
+    ],
+    [
+      "calibration_fixture",
+      "0c03c4e59122a3331860b890eecf1af9b99a003b1fb24c3c2787235d6ba20cdb"
+    ],
+    [
+      "rubric",
+      "25cd722cffe804273a797a947d60d5c7530a85d1f4f30f4754261b4586243364"
+    ],
+    [
+      "effect_budget",
+      "e5ac6842f1c0b35744f8df90994986b37e22ee033047d1c667e0abccca562200"
+    ],
+    [
+      "human_freeze",
+      "53435443c6a17c201f41029026c568ab1bb7f23ae4f0ca0c1e7d5d45e71b2d9e"
+    ]
+  ],
+  "project_content_hash": "b89c1e18f1085c6dab85d070e363fe39eb2e60b3fdd84c4e73738ebae9a1a3ca",
+  "registry_content_hash": "b292cb0b35226f6201228dbc0caa62d54823f4d03040af9fa218f9666af732e9",
+  "target_shot_id": "rainy-station-3",
+  "target_shot_revision": 1,
+  "target_shot_content_hash": "5ae7704ac1b2b048da8f97f1c5f07535480ea77e0ac0e96c513c81814eb083d1",
+  "target_asset_role": "approved_endpoint",
+  "output_asset_id": "video-shot-rainy-station-3-source-v1",
+  "first_frame_asset_id": "image-import-e8b1d85d4e599d584ca63fb503b86515fd4b8dd8174ac0a6c304ad3c167d3163",
+  "first_frame_sha256": "c50517a17313402ef271694ea058d6c92b0b750c4b854e39858bdaf5d73c5768",
+  "first_frame_size_bytes": 1984532,
+  "first_frame_width": 1659,
+  "first_frame_height": 948,
+  "last_frame_asset_id": "image-import-550b07e0ee96c4d8889b906292ad76f41c66adfbfd1dc80bbe9b9cf6ba290a5f",
+  "last_frame_sha256": "03f4c5ebd177486dd65b21d61901f2296ef7255f12819c66099ef93815a7fc7c",
+  "last_frame_size_bytes": 1966518,
+  "last_frame_width": 1659,
+  "last_frame_height": 948,
+  "prompt": "For the target video, <Picture 1> is fully referenced as the exact first frame and <Picture 2> is fully referenced as the exact last frame.\n\nintegrated_multimodal_description: [Shot 1] One continuous live-action, photorealistic cinematic medium right-facing side-profile shot on the same rain-soaked railway platform at blue hour. The exact same lone adult East Asian woman with a short blunt black bob, mustard-yellow hooded raincoat, black trousers, black boots and the same red cross-body leather satchel walks steadily screen-right toward the clock. A chest-height natural-perspective camera tracks parallel at slow constant speed, preserving a level horizon and stable body scale. Begin at the exact supplied first frame and finish at the exact supplied last frame while she remains mid-stride with continuing gait and satchel motion. Exactly one person; no cut, extra person, axis reversal, teleport, wardrobe change, random zoom, jitter, text or logo.\noverall_soundscape: Steady rain, measured synchronized boot footsteps, restrained station ambience and small physical leather-satchel movement.\nnon_diegetic_music: No non-diegetic music.",
+  "prompt_sha256": "f9d0f7492af21bbfd52e6affa8e1f93bc8b73982152ed046a38c0011d12e9e7a",
+  "seed_derivation": "source-qualification-closure-sha256-low63-v1",
+  "sealed_seed": 6623081611478359059,
+  "width": 1344,
+  "height": 768,
+  "frame_count": 124,
+  "fps": 24,
+  "native_audio": true,
+  "output_container": "mp4",
+  "output_contract_hash": "243fbb745baa317d15800fe2eced31d305e95dc22d10607d9d204362c96533ef",
+  "remote_provider_enabled": false,
+  "cloud_fallback_enabled": false,
+  "retry_enabled": false,
+  "profile_content_hash": "16fb1566c7e333f61ae73c36ab27204ad788ba735e668913be601253bfc46a8c"
+}

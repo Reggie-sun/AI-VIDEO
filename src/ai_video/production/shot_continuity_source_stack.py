@@ -12,6 +12,7 @@ from pathlib import Path
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production import comfy_video
 from ai_video.production.comfy_video import (
+    LocalVideoBinding,
     LocalVideoQualityExecutionProfile,
     load_local_video_execution_profile_bytes,
 )
@@ -45,6 +46,8 @@ def _invalid(message: str, detail: str | None = None) -> AiVideoError:
 @dataclass(frozen=True)
 class ShotContinuitySourceExecutionSources:
     profile: LocalVideoQualityExecutionProfile
+    binding: LocalVideoBinding
+    workflow: dict[str, object]
     initial_stack: GenerationExecutionStackIdentity
     materialized_stack: GenerationExecutionStackIdentity
     materialization: ExecutionStackMaterialization
@@ -122,12 +125,13 @@ def _build_execution_sources(
             raise _invalid("Shot Continuity source workflow hash does not match.")
         if hashlib.sha256(binding_bytes).hexdigest() != profile.binding_sha256:
             raise _invalid("Shot Continuity source binding hash does not match.")
-        comfy_video.validate_local_video_execution_sources(
+        workflow = load_workflow_template_bytes(
+            workflow_bytes,
+            source=str(profile.workflow_path),
+        )
+        binding = comfy_video.validate_local_video_execution_sources(
             profile=profile,
-            workflow=load_workflow_template_bytes(
-                workflow_bytes,
-                source=str(profile.workflow_path),
-            ),
+            workflow=workflow,
             binding_payload=binding_bytes,
         )
     except AiVideoError:
@@ -211,6 +215,8 @@ def _build_execution_sources(
     )
     return ShotContinuitySourceExecutionSources(
         profile=profile,
+        binding=binding,
+        workflow=workflow,
         initial_stack=initial_stack,
         materialized_stack=initial_stack.materialize(materialization),
         materialization=materialization,

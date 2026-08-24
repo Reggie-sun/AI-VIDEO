@@ -58,6 +58,9 @@ from ai_video.production.state_commit import (
     _canonical_json_bytes,
     _canonical_yaml_bytes,
 )
+from ai_video.production.shot_continuity_source_runtime import (
+    bootstrap_source_dependency_graph,
+)
 from ai_video.production.shot_continuity_source_stack import (
     load_shot_continuity_source_execution_sources,
 )
@@ -89,6 +92,7 @@ TARGET_WIDTH = 1344
 TARGET_HEIGHT = 768
 FRAME_COUNT = 124
 FPS = 24
+SHOT_DURATION_SECONDS = 5.166666666666666
 STOCK_REF2VA_SHA256 = (
     "9eef934046a0671bc8a5daf87100705e1478419c574cfde70c50fbe6885f76a9"
 )
@@ -367,7 +371,10 @@ def _build_project(
                 scene_id=scene.scene_id,
                 storyboard_beat_id="platform-walk",
                 intent=intent,
-                duration_policy=DurationPolicy(mode="fixed", seconds=FRAME_COUNT / FPS),
+                duration_policy=DurationPolicy(
+                    mode="fixed",
+                    seconds=SHOT_DURATION_SECONDS,
+                ),
                 character_ids=(character.character_id,),
                 continuity_constraints=(
                     "same exact traveler identity and wardrobe",
@@ -758,6 +765,18 @@ def _record_p0(
 ):
     writer = ProductionStateCommitter(root)
     loaded = load_production_project(root / "project.yaml")
+    graph, _ = bootstrap_source_dependency_graph(
+        writer,
+        loaded,
+        attempt_id="rainy-station-source-dependency-graph-v1",
+    )
+    loaded = load_production_project(root / "project.yaml")
+    if (
+        loaded.manifest.active_dependency_graph is None
+        or loaded.manifest.active_dependency_graph.revision_id
+        != graph.revision_id
+    ):
+        raise ValueError("Source dependency graph did not become active")
     upgraded = writer.upgrade_manifest_schema(
         "2.11", expected_manifest_revision=loaded.manifest.manifest_revision
     )
@@ -986,6 +1005,8 @@ def prepare(args: argparse.Namespace) -> dict[str, object]:
         shot_receipts=shot_receipts,
         approved_at=args.approved_at,
     )
+    if manifest.active_dependency_graph is None:
+        raise ValueError("Prepared source bundle has no active dependency graph")
     return {
         "root": root.as_posix(),
         "manifest_schema_version": manifest.schema_version,
@@ -996,6 +1017,7 @@ def prepare(args: argparse.Namespace) -> dict[str, object]:
         "source_execution_stack_hash": source.execution_stack_hash,
         "m0_execution_stack_hash": m0.execution_stack_hash,
         "m1_execution_stack_hash": m1.execution_stack_hash,
+        "dependency_graph_content_hash": manifest.active_dependency_graph.content_hash,
         "qualification_input_hashes": {
             item.input_kind: item.content_hash for item in inputs
         },
