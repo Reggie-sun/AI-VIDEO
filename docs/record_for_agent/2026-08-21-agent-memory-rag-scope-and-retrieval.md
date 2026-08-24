@@ -167,6 +167,38 @@ truth 或 committed evidence。新增或修改五个 corpus 拥有的 Markdown �
 run summary 后，必须先显式运行 build，再执行 search。这样耗时的 embedding / Chroma
 写入不会占用 query timeout，也不会让一次只读检索产生 workspace-local derived writes。
 
+## 2026-08-24 Build And Search Phase Split
+
+Local commit `c72906e fix: split agent memory build and search` 完成了 phase ownership
+收敛：
+
+- `scripts.agent_memory cmd_build()` 是唯一 materialization owner。`experience` / `all`
+  build 在同一显式 phase 中分别构建 main index 与 eligible run-summary index；
+  `superpowers` 不触达 run summaries。
+- `retrieval.search()` 只执行 index identity、requested scope、physical collection、source
+  freshness（调用方提供 corpus roots 时）与 query validation。它不调用任何 build、refresh、
+  repair 或 compatibility fallback。
+- 无 corpus roots 的 legacy/public direct call 仍会用 manifest 检查 schema、embedding、
+  chunking、library identity、requested scopes，以及 physical collection presence/count；
+  因为没有 authoritative source roots，它不会伪称已验证 source freshness。
+- missing、stale、partial、corrupt 或 identity-mismatched index 均 fail closed，并要求显式
+  build。旧 `ensure_scoped_index()` 与 `ensure_run_summary_index()` 路径已删除。
+- build 在任何写入前验证 main/run index path 隔离；替换已打开的 Chroma index 前释放
+  path-scoped cached client。missing `runs/` 仍贡献零 run hit，且不创建 run index。
+- public scopes、schema v1、dense/lexical candidate `top_k=30`、Agent-facing `top_n=8`、
+  inclusive `0.7` lane-aware answerability、hit metadata 与 authority ordering 保持不变。
+
+Exact commit-range Harness receipt：
+`.agent/harness/runs/20260824T131220193543Z/receipt.json`。该 run 对
+`c72906e^..c72906e` 得到 Agent Memory `74 passed`、Harness `177 passed`，documentation、
+policy audit 与 task Architecture Gate 全部 PASS；receipt integrity、freshness、snapshot 与
+scope checks 全部为 true。Native `reviewer_xhigh` 首轮发现 root-free direct call 会把 partial
+index 误报为 `[]`，修复并补 regression test 后 scoped re-review 为 `accept with concerns`；
+其唯一 concern 是 docstring 应明确 root-free freshness 边界，已在同一提交前修正。
+
+该提交仅存在于 local `main`，未 push 或 release。本轮没有 Provider、媒体、网络或 Product
+Runtime 操作；Project RAG 仍由 prompt-aware skill 显式调用，不注册 runtime hook。
+
 ## Guardrails
 
 - `experience` 记录是 advisory experience，不等于 code/runtime truth。
