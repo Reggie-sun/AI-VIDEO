@@ -344,3 +344,93 @@ staged changes仍属于真实in-progress work；依照same-file ownership contra
 明确交给当前窗口；或者保留现有M0 route、后续只增加fail-fast audit。此checkpoint没有实施policy、
 tests或matrix修改，没有生成passing Harness receipt，也没有运行额外pytest、Provider、ComfyUI、媒体、
 网络或付费调用。
+
+## P0 Fail-Fast Implementation Closure
+
+用户选择先完成既有 M0 owner work、随后只增加 fail-fast audit。M0 caller seam 与既有
+`shot_continuity_p0` route 已由 commit
+`76c6d9577f42b64d5efab34e4cf8120d909bcb06` 落地；本窗口没有接管或重写该实现。
+其 staged receipt
+`.agent/harness/runs/shot-continuity-m0-qualification-caller-20260824-v4/receipt.json`
+显示 `scope_diff_check=2 ms`、`docs_contract_check=118 ms`、
+`task_architecture_gate=582 ms`、`harness_tests=3344 ms` 与
+`shot_continuity_p0_tests=14867 ms`，合计约 `18.9 s`。因此原计划中的独立
+`shot_continuity_m0_submit_tests` 会形成重复 owner/route，本轮没有新增它。
+
+### Implemented contract
+
+local `main` commit `6521046e4e7731177bc811cf8771246c48fe8e8b`
+只修改以下三个 task-owned files：
+
+- `.agent/harness/policy.yaml`：把复用现有 CLI 的 `policy_audit_check` 加入
+  `always_check_ids`，argv 为
+  `python -m scripts.agent_harness policy-audit`，`execution_priority=15`。
+- `tests/test_agent_harness.py`：更新 representative route expectations，并新增 audit
+  failure 后 expensive checks 不执行、后续 receipt records 全部以明确 reason 标记
+  `skipped` 的 regression test。
+- `docs/agent-primary-contract-matrix.md`：同步 Harness fail-fast invariant，并补齐已经落地的
+  `shot_continuity_m0_caller.py` owner 与 `tests/test_shot_continuity_m0_caller.py`
+  focused verification。
+
+新的顺序是：
+
+```text
+scope_diff_check (0)
+  -> docs_contract_check (10)
+  -> policy_audit_check (15)
+  -> task_architecture_gate (20, when selected)
+  -> full_tests (30, when selected)
+  -> domain suites (default 100)
+```
+
+该 change 没有新增 executor、receipt schema、routing owner 或 lifecycle owner。
+`ordered_check_ids()` 仍是唯一排序 seam，`verify_inspection()` 仍是唯一 execution、
+stop-on-failure 与 receipt writer。Policy audit 在同一个 detached exact snapshot 中运行；
+发现 unmapped、unverified、missing 或 unreferenced owned/test path 时 fail closed，而不是在
+expensive suite 结束后才暴露 mapping drift。
+
+### Verification evidence
+
+- focused TDD：policy 修改前相关 assertions 为 `4 failed, 105 deselected`；修改后为
+  `4 passed, 105 deselected`。
+- 完整 `tests/test_agent_harness.py`：`109 passed in 2.60s`。
+- `python -m scripts.docs_contract_gate check`：passed。
+- `python -m scripts.agent_harness policy-audit`：`candidate_count=445`，
+  `docs_contract_diagnostics`、`missing_check_test_paths`、`unmapped_paths`、
+  `unreferenced_test_paths` 与 `unverified_paths` 全部为空。
+- Representative Seedance route 为
+  `scope -> docs -> policy-audit -> task Architecture -> provider suites`；unknown path
+  fallback 为 `scope -> docs -> policy-audit -> task Architecture -> full tests`。
+- exact staged receipt：
+  `.agent/harness/runs/harness-policy-audit-fail-fast-20260824-v1/receipt.json`，
+  `155 passed`；receipt verifier 确认 artifact integrity、check completeness、policy、scope、
+  snapshot、workspace cleanup/stability 与 freshness 全部成立。
+- exact commit-range receipt：
+  `.agent/harness/runs/harness-policy-audit-fail-fast-20260824-v2/receipt.json`，绑定
+  base `0bbc2621275ba19f882577d5b3b92a746a1f38ed` 与 head
+  `6521046e4e7731177bc811cf8771246c48fe8e8b`，`155 passed`，同样验证为 fresh、
+  complete 且 snapshot-matched。该 run 中 audit 实测 `186 ms`，整组 selected checks
+  约 `3.6 s`。
+- independent native `reviewer_xhigh` verdict 为 `accept`，无 blocking issue；唯一
+  non-blocking concern 是 commit 同时补齐 M0 caller 的 matrix mapping，本节已明确记录。
+
+shared working tree 上的 combined docs/Harness/hook test 曾得到 `1 failed, 154 passed`；
+唯一 failure 来自本任务开始前已存在的 `.codex/hooks.json` dirty 内容将 hook command 改成
+absolute path，与 committed test contract 不一致。该 file 不属于本任务且未被修改、stage 或
+commit；detached exact staged/commit snapshot 均为 `155 passed`，所以没有把 unrelated dirty
+failure 隐藏成 task PASS，也没有把它误报为本 task regression。
+
+### Completion boundaries
+
+- 本轮只改变 Development Verification Harness routing；没有改变 Product Runtime、
+  `ProductionStateCommitter`、Provider、Manifest、permit、activation、recovery、replay 或 QA
+  ownership。
+- 没有创建第二套 fast Harness；unknown-path fallback、same-run coverage closure 与 exact
+  receipt semantics 保持不变。
+- 没有安装 dependency，没有运行 Provider、ComfyUI、Seedance、媒体生成、网络调查或付费调用。
+- commit 只存在于 local `main`；本轮未 push、未 release。record-time branch 为
+  `main...origin/main [ahead 45]`。
+- `.agent/context/session-handoff.md`、`.codex/hooks.json`、`AGENTS.md`、`index.json`、
+  Seedance files 与 `.workflow/.scratchpad/` 的 unrelated dirty/untracked work 全部保留。
+- P1 shared state/domain lifecycle suite 进一步拆分仍是 future work；本次没有用减少测试数量
+  换取较弱的 recovery、permit、provenance 或 lifecycle evidence。
