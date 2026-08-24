@@ -4,20 +4,17 @@
 from __future__ import annotations
 
 import argparse
-import fnmatch
 import json
 import re
 import subprocess
 import sys
 import tempfile
 import time
-from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-
-import yaml
 
 try:
     from scripts import agent_harness_audit as audit_io
@@ -28,6 +25,38 @@ try:
     from scripts import agent_harness_receipt as receipt_io
 except ModuleNotFoundError:  # Direct ``python scripts/agent_harness.py`` execution.
     import agent_harness_receipt as receipt_io  # type: ignore[no-redef]
+
+try:
+    from scripts.agent_harness_policy import (
+        coverage_groups as _coverage_groups,
+        inspect_paths,
+        load_policy as _load_policy,
+        load_policy_bytes as _load_policy_bytes,
+        relative_repository_path as _relative_repository_path,
+        unique as _unique,
+    )
+except ModuleNotFoundError:  # Direct ``python scripts/agent_harness.py`` execution.
+    from agent_harness_policy import (  # type: ignore[no-redef]
+        coverage_groups as _coverage_groups,
+        inspect_paths,
+        load_policy as _load_policy,
+        load_policy_bytes as _load_policy_bytes,
+        relative_repository_path as _relative_repository_path,
+        unique as _unique,
+    )
+
+try:
+    from scripts.agent_harness_proof import (
+        completion_scope_is_well_formed,
+        inspection_matches_receipt,
+        validate_execution_records,
+    )
+except ModuleNotFoundError:  # Direct ``python scripts/agent_harness.py`` execution.
+    from agent_harness_proof import (  # type: ignore[no-redef]
+        completion_scope_is_well_formed,
+        inspection_matches_receipt,
+        validate_execution_records,
+    )
 
 try:
     from scripts.agent_harness_runtime import (
@@ -54,6 +83,15 @@ except ModuleNotFoundError:  # Direct ``python scripts/agent_harness.py`` execut
         verify_receipt_integrity,
     )
 
+try:
+    from scripts.agent_harness_workspace import (
+        materialize_npm_workspace_dependencies,
+    )
+except ModuleNotFoundError:  # Direct ``python scripts/agent_harness.py`` execution.
+    from agent_harness_workspace import (  # type: ignore[no-redef]
+        materialize_npm_workspace_dependencies,
+    )
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = PROJECT_ROOT / ".agent/harness/policy.yaml"
@@ -63,193 +101,8 @@ verify_receipt_artifacts = receipt_io.verify_receipt_artifacts
 seal_receipt = receipt_io.seal_receipt
 
 
-def _unique(items: Iterable[str]) -> list[str]:
-    seen: set[str] = set()
-    result: list[str] = []
-    for item in items:
-        if item not in seen:
-            seen.add(item)
-            result.append(item)
-    return result
-
-
-def _relative_repository_path(raw_path: str | Path) -> str:
-    path = Path(raw_path)
-    if path.is_absolute():
-        try:
-            path = path.resolve().relative_to(PROJECT_ROOT)
-        except ValueError as exc:
-            raise ValueError(f"path is outside repository: {raw_path}") from exc
-    normalized = path.as_posix()
-    while normalized.startswith("./"):
-        normalized = normalized[2:]
-    if normalized in {"", "."} or normalized == ".." or normalized.startswith("../"):
-        raise ValueError(f"invalid repository-relative path: {raw_path}")
-    return normalized
-
-
-def _matches(path: str, pattern: str) -> bool:
-    if pattern.endswith("/**"):
-        candidates = [pattern, pattern[:-3].rstrip("/")]
-        if pattern.startswith("**/"):
-            candidates.extend(candidate[3:] for candidate in list(candidates))
-        return any(fnmatch.fnmatchcase(path, candidate) for candidate in candidates)
-    return fnmatch.fnmatchcase(path, pattern)
-
-
-def _matches_any(path: str, patterns: Iterable[str]) -> bool:
-    return any(_matches(path, pattern) for pattern in patterns)
-
-
-def _string_list(mapping: Mapping[str, Any], key: str) -> list[str]:
-    value = mapping.get(key, [])
-    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
-        raise ValueError(f"{key} must be a list[str]")
-    return value
-
-
 def load_policy(path: Path = POLICY_PATH) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        policy = yaml.safe_load(handle) or {}
-    if not isinstance(policy, dict) or policy.get("version") != 2:
-        raise ValueError(f"Harness policy version must be 2: {path}")
-
-    runs_dir = policy.get("runs_dir")
-    if not isinstance(runs_dir, str) or Path(runs_dir).is_absolute():
-        raise ValueError("runs_dir must be repository-relative")
-    timeout = policy.get("default_timeout_seconds")
-    if not isinstance(timeout, (int, float)) or timeout <= 0:
-        raise ValueError("default_timeout_seconds must be positive")
-
-    checks = policy.get("checks")
-    if not isinstance(checks, dict) or not checks:
-        raise ValueError("checks must be a non-empty mapping")
-    coverage_dependencies: dict[str, list[str]] = {}
-    for check_id, config in checks.items():
-        if not isinstance(check_id, str) or not isinstance(config, dict):
-            raise ValueError("each check must be a named mapping")
-        if not RUN_ID_PATTERN.fullmatch(check_id):
-            raise ValueError(f"unsafe check id: {check_id!r}")
-        argv = config.get("argv")
-        cwd = config.get("cwd", ".")
-        if not isinstance(argv, list) or not argv or not all(
-            isinstance(item, str) for item in argv
-        ):
-            raise ValueError(f"check {check_id!r} argv must be a non-empty list[str]")
-        if not isinstance(cwd, str) or Path(cwd).is_absolute() or ".." in Path(cwd).parts:
-            raise ValueError(f"check {check_id!r} cwd must stay inside repository")
-        check_timeout = config.get("timeout_seconds", timeout)
-        if not isinstance(check_timeout, (int, float)) or check_timeout <= 0:
-            raise ValueError(f"check {check_id!r} timeout_seconds must be positive")
-        for flag in ("scope_diff", "task_architecture"):
-            if not isinstance(config.get(flag, False), bool):
-                raise ValueError(f"check {check_id!r} {flag} must be boolean")
-        covered_by_check_ids = _string_list(config, "covered_by_check_ids")
-        if check_id in covered_by_check_ids:
-            raise ValueError(f"check {check_id!r} cannot cover itself")
-        coverage_dependencies[check_id] = covered_by_check_ids
-
-    known_check_ids = set(checks)
-    referenced = [
-        *_string_list(policy, "always_check_ids"),
-        *_string_list(policy, "fallback_check_ids"),
-        *(
-            dependency
-            for dependencies in coverage_dependencies.values()
-            for dependency in dependencies
-        ),
-    ]
-    categories = policy.get("categories")
-    if not isinstance(categories, dict):
-        raise ValueError("categories must be a mapping")
-    for category_name, category in categories.items():
-        if not isinstance(category_name, str) or not isinstance(category, dict):
-            raise ValueError("each category must be a named mapping")
-        patterns = category.get("patterns")
-        if not isinstance(patterns, list) or not patterns or not all(
-            isinstance(item, str) for item in patterns
-        ):
-            raise ValueError(f"category {category_name!r} patterns must be list[str]")
-        referenced.extend(_string_list(category, "check_ids"))
-    unknown = sorted(set(referenced) - known_check_ids)
-    if unknown:
-        raise ValueError(f"policy references unknown checks: {unknown}")
-
-    visiting: set[str] = set()
-    visited: set[str] = set()
-
-    def visit_coverage_dependencies(check_id: str) -> None:
-        if check_id in visited:
-            return
-        if check_id in visiting:
-            raise ValueError(f"check coverage contains a cycle at {check_id!r}")
-        visiting.add(check_id)
-        for dependency in coverage_dependencies[check_id]:
-            visit_coverage_dependencies(dependency)
-        visiting.remove(check_id)
-        visited.add(check_id)
-
-    for check_id in checks:
-        visit_coverage_dependencies(check_id)
-
-    for key in (
-        "ignored_patterns",
-        "sensitive_patterns",
-        "audit_patterns",
-        "audit_exempt_patterns",
-    ):
-        _string_list(policy, key)
-    if not isinstance(policy.get("capture_pytest_junit", False), bool):
-        raise ValueError("capture_pytest_junit must be boolean")
-    return policy
-
-
-def inspect_paths(paths: Iterable[str | Path], policy: Mapping[str, Any]) -> dict[str, Any]:
-    normalized_paths = sorted(_unique(_relative_repository_path(path) for path in paths))
-    sensitive_patterns = [
-        pattern.casefold() for pattern in policy["sensitive_patterns"]
-    ]
-    sensitive_paths = [
-        path
-        for path in normalized_paths
-        if _matches_any(path.casefold(), sensitive_patterns)
-    ]
-    ignored_paths = [
-        path
-        for path in normalized_paths
-        if path not in sensitive_paths and _matches_any(path, policy["ignored_patterns"])
-    ]
-    active_paths = [
-        path
-        for path in normalized_paths
-        if path not in ignored_paths and path not in sensitive_paths
-    ]
-
-    categories: list[str] = []
-    category_checks: list[str] = []
-    matched_paths: set[str] = set()
-    for category_name, category in policy["categories"].items():
-        patterns = category["patterns"]
-        category_matches = [
-            path for path in active_paths if _matches_any(path, patterns)
-        ]
-        if category_matches:
-            categories.append(category_name)
-            category_checks.extend(category.get("check_ids", []))
-            matched_paths.update(category_matches)
-
-    fallback_paths = [path for path in active_paths if path not in matched_paths]
-    selected = [*policy.get("always_check_ids", []), *category_checks]
-    if fallback_paths or sensitive_paths:
-        selected.extend(policy.get("fallback_check_ids", []))
-    return {
-        "changed_paths": active_paths,
-        "ignored_paths": ignored_paths,
-        "sensitive_paths": sensitive_paths,
-        "categories": categories,
-        "fallback_paths": fallback_paths,
-        "check_ids": _unique(selected),
-    }
+    return _load_policy(path)
 
 
 def parse_name_status_z(payload: bytes) -> list[str]:
@@ -589,6 +442,9 @@ def verify_inspection(
         "categories": list(inspection["categories"]),
         "fallback_paths": list(inspection["fallback_paths"]),
         "selected_check_ids": list(inspection["check_ids"]),
+        "npm_workspace_dependency_paths": list(
+            inspection.get("npm_workspace_dependency_paths", [])
+        ),
         "source_snapshot_before": dict(source_snapshot),
         "source_snapshot_after": None,
         "workspace_stable": None,
@@ -605,17 +461,24 @@ def verify_inspection(
     check_ids = list(inspection["check_ids"])
     for check_index, check_id in enumerate(check_ids, start=1):
         config = policy["checks"][check_id]
-        covered_by_check_ids = list(config.get("covered_by_check_ids", []))
-        if covered_by_check_ids and all(
-            covering_check_id in passed_check_ids
-            for covering_check_id in covered_by_check_ids
-        ):
+        passed_covering_group = next(
+            (
+                group
+                for group in _coverage_groups(policy, check_id)
+                if all(
+                    covering_check_id in passed_check_ids
+                    for covering_check_id in group
+                )
+            ),
+            None,
+        )
+        if passed_covering_group is not None:
             receipt["checks"].append(
                 {
                     "check_id": check_id,
                     "status": "skipped",
                     "reason": "covered by passed checks",
-                    "covered_by_check_ids": covered_by_check_ids,
+                    "covered_by_check_ids": passed_covering_group,
                 }
             )
             receipt_io.write_receipt(receipt_path, receipt)
@@ -742,74 +605,152 @@ def receipt_freshness(
     workspace_cleanup_confirmed = receipt.get(
         "workspace_cleanup_status", "not_required"
     ) in {"passed", "not_required"}
-    scope = receipt.get("scope", {})
+    raw_scope = receipt.get("scope", {})
+    scope = dict(raw_scope) if isinstance(raw_scope, Mapping) else {}
+    scope_well_formed = completion_scope_is_well_formed(scope)
+    policy: dict[str, Any] | None = None
+    policy_loaded = False
     policy_matches = False
+    scope_paths_match = False
+    inspection_matches = False
     try:
-        if scope.get("mode") == "commit_range" and isinstance(
-            scope.get("head_oid"), str
-        ):
-            if not GIT_OID_PATTERN.fullmatch(scope["head_oid"]):
+        if not scope_well_formed:
+            raise ValueError("receipt has malformed completion scope")
+        mode = scope.get("mode")
+        if mode == "commit_range":
+            base_oid = scope.get("base_oid")
+            head_oid = scope.get("head_oid")
+            if not isinstance(base_oid, str) or not GIT_OID_PATTERN.fullmatch(base_oid):
+                raise ValueError("receipt has invalid base_oid")
+            if not isinstance(head_oid, str) or not GIT_OID_PATTERN.fullmatch(head_oid):
                 raise ValueError("receipt has invalid head_oid")
             policy_bytes = _git_bytes(
                 project_root,
-                ["show", f"{scope['head_oid']}:.agent/harness/policy.yaml"],
+                ["show", f"{head_oid}:.agent/harness/policy.yaml"],
             )
+            recomputed_scope_paths = _git_name_status(
+                project_root, [f"{base_oid}...{head_oid}"]
+            )
+        elif mode == "staged":
+            policy_bytes = _git_bytes(
+                project_root, ["show", ":.agent/harness/policy.yaml"]
+            )
+            recomputed_scope_paths = _git_name_status(project_root, ["--cached"])
         else:
-            policy_bytes = (project_root / ".agent/harness/policy.yaml").read_bytes()
+            raise ValueError("receipt has unsupported completion scope")
         policy_matches = receipt.get("policy_sha256") == _sha256(policy_bytes)
-    except (OSError, subprocess.CalledProcessError, ValueError):
+        policy = _load_policy_bytes(policy_bytes, source="receipt-bound policy")
+        policy_loaded = True
+        scope_paths_match = sorted(scope.get("changed_paths", [])) == sorted(
+            recomputed_scope_paths
+        )
+        expected_inspection = inspect_paths(recomputed_scope_paths, policy)
+        inspection_matches = (
+            scope_paths_match
+            and inspection_matches_receipt(receipt, expected_inspection)
+        )
+    except (KeyError, OSError, subprocess.CalledProcessError, TypeError, ValueError):
+        policy = None
+        policy_loaded = False
         policy_matches = False
+        scope_paths_match = False
+        inspection_matches = False
     snapshot_matches = False
     scope_worktree_clean = False
     try:
+        if not scope_well_formed:
+            raise ValueError("receipt has malformed completion scope")
         working_paths = set(_unstaged_or_untracked_paths(project_root))
         if scope.get("mode") == "commit_range":
             working_paths.update(_git_name_status(project_root, ["--cached"]))
         scope_worktree_clean = not working_paths.intersection(
             scope.get("changed_paths", [])
         )
-        if scope.get("mode") == "staged":
-            current_snapshot = _scope_snapshot(project_root, scope)
-            snapshot_matches = (
-                dict(receipt.get("source_snapshot_after") or {}) == current_snapshot
-                and current_snapshot.get("git_head") == scope.get("head_oid")
-            )
-        elif scope.get("mode") == "commit_range":
+        current_snapshot = _scope_snapshot(project_root, scope)
+        snapshot_matches = (
+            dict(receipt.get("source_snapshot_after") or {}) == current_snapshot
+            and current_snapshot.get("git_head") == scope.get("head_oid")
+        )
+        if scope.get("mode") == "commit_range":
             head_oid = scope.get("head_oid")
             head_ref = scope.get("head_ref")
-            snapshot_matches = (
+            snapshot_matches = snapshot_matches and (
                 isinstance(head_oid, str)
                 and GIT_OID_PATTERN.fullmatch(head_oid) is not None
                 and isinstance(head_ref, str)
                 and _resolve_commit(project_root, "HEAD") == head_oid
                 and _resolve_commit(project_root, head_ref) == head_oid
             )
-    except (OSError, subprocess.CalledProcessError, ValueError):
+    except (KeyError, OSError, subprocess.CalledProcessError, TypeError, ValueError):
         snapshot_matches = False
         scope_worktree_clean = False
-    fresh = all(
+    execution_report = {
+        "check_records_complete": False,
+        "check_records_valid": False,
+        "coverage_closed_same_run": False,
+    }
+    if policy is not None:
+        execution_report = validate_execution_records(
+            receipt,
+            policy,
+            scope,
+            receipt_dir=receipt_dir,
+            argv_builder=_check_argv,
+        )
+    passed = receipt.get("status") == "passed"
+    closure_eligible = (
+        receipt.get("closure_eligible") is True
+        and scope.get("closure_eligible") is True
+    )
+    workspace_stable_confirmed = (
+        receipt.get("workspace_stable") is True
+        and isinstance(receipt.get("source_snapshot_before"), Mapping)
+        and dict(receipt["source_snapshot_before"])
+        == dict(receipt.get("source_snapshot_after") or {})
+    )
+    self_consistent = integrity and artifact_integrity and schema_supported
+    fresh_for_snapshot = all(
         (
-            integrity,
-            artifact_integrity,
-            schema_supported,
-            workspace_cleanup_confirmed,
-            receipt.get("status") == "passed",
-            receipt.get("closure_eligible") is True,
+            scope_well_formed,
+            policy_loaded,
             policy_matches,
+            scope_paths_match,
             snapshot_matches,
             scope_worktree_clean,
         )
     )
+    complete_completion_proof = all(
+        (
+            workspace_cleanup_confirmed,
+            workspace_stable_confirmed,
+            passed,
+            closure_eligible,
+            inspection_matches,
+            execution_report["check_records_complete"],
+            execution_report["check_records_valid"],
+            execution_report["coverage_closed_same_run"],
+        )
+    )
+    fresh = self_consistent and fresh_for_snapshot and complete_completion_proof
     return {
         "integrity": integrity,
         "artifact_integrity": artifact_integrity,
         "schema_supported": schema_supported,
         "workspace_cleanup_confirmed": workspace_cleanup_confirmed,
-        "passed": receipt.get("status") == "passed",
-        "closure_eligible": receipt.get("closure_eligible") is True,
+        "workspace_stable_confirmed": workspace_stable_confirmed,
+        "passed": passed,
+        "closure_eligible": closure_eligible,
+        "scope_well_formed": scope_well_formed,
+        "policy_loaded": policy_loaded,
         "policy_matches": policy_matches,
+        "scope_paths_match": scope_paths_match,
+        "inspection_matches": inspection_matches,
+        **execution_report,
         "snapshot_matches": snapshot_matches,
         "scope_worktree_clean": scope_worktree_clean,
+        "self_consistent": self_consistent,
+        "fresh_for_snapshot": fresh_for_snapshot,
+        "complete_completion_proof": complete_completion_proof,
         "fresh": fresh,
     }
 
@@ -852,6 +793,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "unmapped_paths",
                 "unverified_paths",
                 "missing_check_test_paths",
+                "unreferenced_test_paths",
                 "docs_contract_diagnostics",
             )
         ) else 1
@@ -884,6 +826,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             execution_policy_path = execution_root / ".agent/harness/policy.yaml"
             execution_policy = load_policy(execution_policy_path)
             inspection = inspect_paths(scope["changed_paths"], execution_policy)
+            materialize_npm_workspace_dependencies(
+                PROJECT_ROOT,
+                execution_root,
+                execution_policy,
+                inspection["check_ids"],
+            )
             receipt_path, passed = verify_inspection(
                 inspection,
                 execution_policy,

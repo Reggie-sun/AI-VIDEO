@@ -57,10 +57,27 @@ def audit_policy_coverage(
         argument
         for check in policy["checks"].values()
         for argument in check["argv"]
-        if argument.startswith("tests/") and argument.endswith(".py")
+        if "/tests/" in f"/{argument}"
+        and argument.endswith((".py", ".js", ".mjs"))
     }
     missing = sorted(
         path for path in referenced_test_paths if not (project_root / path).is_file()
+    )
+    explicit_test_patterns = policy.get("audit_explicit_test_patterns", [])
+    explicit_tests = [
+        path
+        for path in tracked
+        if _matches_any(path, explicit_test_patterns)
+        and not _matches_any(path, policy["audit_exempt_patterns"])
+    ]
+    unreferenced_test_exempt_patterns = policy.get(
+        "audit_unreferenced_test_exempt_patterns", []
+    )
+    unreferenced_tests = sorted(
+        path
+        for path in explicit_tests
+        if path not in referenced_test_paths
+        and not _matches_any(path, unreferenced_test_exempt_patterns)
     )
     docs_contract_diagnostics = []
     if "docs_contract_check" in policy["checks"]:
@@ -73,5 +90,6 @@ def audit_policy_coverage(
         "unmapped_paths": sorted(unmapped),
         "unverified_paths": sorted(unverified),
         "missing_check_test_paths": missing,
+        "unreferenced_test_paths": unreferenced_tests,
         "docs_contract_diagnostics": docs_contract_diagnostics,
     }

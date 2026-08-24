@@ -63,6 +63,57 @@ def _minimal_policy() -> dict[str, object]:
     }
 
 
+def _complete_receipt_fixture(
+    tmp_path: Path, *, mode: str = "commit_range"
+) -> tuple[Path, Path, Path, dict[str, object]]:
+    tracked = _committed_repository(tmp_path)
+    policy = _minimal_policy()
+    policy["checks"]["covered"] = {
+        "argv": [sys.executable, "-c", "raise SystemExit('must not run')"],
+        "cwd": ".",
+        "covered_by_check_ids": ["unit"],
+    }
+    policy["categories"] = {
+        "example": {
+            "patterns": ["tracked.txt"],
+            "check_ids": ["unit", "covered"],
+        }
+    }
+    policy_path = tmp_path / ".agent/harness/policy.yaml"
+    policy_path.parent.mkdir(parents=True)
+    policy_path.write_text(yaml.safe_dump(policy, sort_keys=False), encoding="utf-8")
+    _git(tmp_path, "add", ".agent/harness/policy.yaml")
+    _git(tmp_path, "commit", "-qm", "add policy")
+    base_oid = _git(tmp_path, "rev-parse", "HEAD").stdout.strip()
+    tracked.write_text(f"{mode} task\n", encoding="utf-8")
+    _git(tmp_path, "add", "tracked.txt")
+    if mode == "commit_range":
+        _git(tmp_path, "commit", "-qm", "task")
+        scope = agent_harness.discover_scope(
+            tmp_path, base_ref=base_oid, head_ref="HEAD"
+        )
+    elif mode == "staged":
+        scope = agent_harness.discover_scope(tmp_path, staged=True)
+    else:
+        raise ValueError(f"unsupported receipt fixture mode: {mode}")
+    loaded_policy = agent_harness.load_policy(policy_path)
+    inspection = agent_harness.inspect_paths(scope["changed_paths"], loaded_policy)
+    snapshot = agent_harness._scope_snapshot(tmp_path, scope)
+    receipt_path, passed = agent_harness.verify_inspection(
+        inspection,
+        loaded_policy,
+        scope=scope,
+        source_snapshot=snapshot,
+        project_root=tmp_path,
+        execution_root=tmp_path,
+        runs_dir=tmp_path / "runs",
+        run_id=f"complete-{mode}",
+        policy_sha256=hashlib.sha256(policy_path.read_bytes()).hexdigest(),
+    )
+    assert passed is True
+    return receipt_path, tracked, policy_path, scope
+
+
 def test_repository_policy_v2_loads_and_references_known_checks() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
@@ -110,6 +161,40 @@ def test_policy_rejects_cyclic_check_coverage(tmp_path: Path) -> None:
     policy_path.write_text(yaml.safe_dump(policy), encoding="utf-8")
 
     with pytest.raises(ValueError, match="coverage contains a cycle"):
+        agent_harness.load_policy(policy_path)
+
+
+def test_policy_rejects_invalid_execution_priority(tmp_path: Path) -> None:
+    policy = _minimal_policy()
+    policy["checks"]["unit"]["execution_priority"] = "fast"
+    policy_path = tmp_path / "policy.yaml"
+    policy_path.write_text(yaml.safe_dump(policy), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="execution_priority must be an integer"):
+        agent_harness.load_policy(policy_path)
+
+
+def test_policy_rejects_unsafe_npm_workspace_dependency_path(
+    tmp_path: Path,
+) -> None:
+    policy = _minimal_policy()
+    policy["checks"]["unit"]["npm_workspace_dependency_paths"] = [
+        "../node_modules"
+    ]
+    policy_path = tmp_path / "policy.yaml"
+    policy_path.write_text(yaml.safe_dump(policy), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="npm workspace dependency path"):
+        agent_harness.load_policy(policy_path)
+
+
+def test_policy_rejects_unknown_reverse_coverage_target(tmp_path: Path) -> None:
+    policy = _minimal_policy()
+    policy["checks"]["unit"]["covers_check_ids"] = ["missing"]
+    policy_path = tmp_path / "policy.yaml"
+    policy_path.write_text(yaml.safe_dump(policy), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="unknown checks.*missing"):
         agent_harness.load_policy(policy_path)
 
 
@@ -186,6 +271,33 @@ def test_mandatory_gate_workflow_preserves_server_check_contract() -> None:
         ),
     }
     steps = {step["name"]: step for step in verify_job["steps"]}
+    setup_node = steps["Set up Node"]
+    assert setup_node["uses"] == (
+        "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020"
+    )
+    assert setup_node["with"] == {
+        "node-version": "22.21.0",
+        "package-manager-cache": False,
+    }
+    node_condition = "steps.harness-routes.outputs.npm_dependencies == 'true'"
+    assert setup_node["if"] == node_condition
+    install_node = steps["Install Provider Console test dependencies"]
+    assert install_node["if"] == node_condition
+    assert install_node["run"] == (
+        "npm ci --ignore-scripts --prefix provider-console"
+    )
+    step_names = [step["name"] for step in verify_job["steps"]]
+    assert step_names.index("Install test dependencies") < step_names.index(
+        "Inspect exact PR routes"
+    )
+    assert step_names.index("Install Provider Console test dependencies") < (
+        step_names.index("Audit Harness policy")
+    )
+    inspect_routes = steps["Inspect exact PR routes"]
+    assert inspect_routes["id"] == "harness-routes"
+    assert "npm_workspace_dependency_paths" in inspect_routes["run"]
+    assert '--base-ref "${BASE_SHA}"' in inspect_routes["run"]
+    assert '--head-ref "${HEAD_SHA}"' in inspect_routes["run"]
     checkout = steps["Check out exact PR head"]
     assert checkout["uses"] == (
         "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"
@@ -224,9 +336,9 @@ def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
     assert report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
+        "task_architecture_gate",
         "production_contract_tests",
         "cli_config_tests",
-        "task_architecture_gate",
     ]
 
 
@@ -245,9 +357,9 @@ def test_shot_router_routes_to_exact_contract_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "task_architecture_gate",
             "production_shot_router_tests",
             "provider_neutral_video_requirement_tests",
-            "task_architecture_gate",
         ]
 
     argv = policy["checks"]["production_shot_router_tests"]["argv"]
@@ -274,10 +386,10 @@ def test_video_planner_routes_to_exact_contract_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "task_architecture_gate",
             "video_planner_tests",
             "provider_neutral_video_requirement_tests",
             "shot_readiness_gate_tests",
-            "task_architecture_gate",
         ]
 
     argv = policy["checks"]["video_planner_tests"]["argv"]
@@ -298,8 +410,8 @@ def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
-            "shot_readiness_gate_tests",
             "task_architecture_gate",
+            "shot_readiness_gate_tests",
         ]
 
     helper_report = agent_harness.inspect_paths(
@@ -313,10 +425,10 @@ def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
     assert helper_report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
+        "task_architecture_gate",
         "video_planner_tests",
         "provider_neutral_video_requirement_tests",
         "shot_readiness_gate_tests",
-        "task_architecture_gate",
     ]
 
     argv = policy["checks"]["shot_readiness_gate_tests"]["argv"]
@@ -348,8 +460,8 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
-            "quality_intelligence_tests",
             "task_architecture_gate",
+            "quality_intelligence_tests",
         ]
 
     argv = policy["checks"]["quality_intelligence_tests"]["argv"]
@@ -362,6 +474,36 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
     ):
         assert path in argv
     assert "tests/test_agent_memory.py" in argv
+
+
+def test_agent_memory_routes_to_its_focused_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/agent_memory/indexer.py",
+        "scripts/agent_memory.py",
+        "tests/test_agent_memory.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["agent_memory_dev_tool"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "docs_contract_check",
+            "task_architecture_gate",
+            "agent_memory_tests",
+        ]
+        assert report["npm_workspace_dependency_paths"] == []
+
+    assert policy["checks"]["agent_memory_tests"]["argv"] == [
+        "python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_agent_memory.py",
+        "-q",
+    ]
 
 
 def test_composition_strategy_shadow_routes_to_focused_dev_checks() -> None:
@@ -416,19 +558,15 @@ def test_composition_strategy_shadow_routes_to_focused_dev_checks() -> None:
     ]
 
 
-def test_provider_console_routes_to_local_runs_observer_suites() -> None:
+def test_provider_console_bridge_routes_to_python_and_node_contracts() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
     for path in (
         "src/ai_video/provider_console.py",
         "src/ai_video/provider_console_continuity.py",
         "tests/test_provider_console.py",
-        "provider-console/src/App.jsx",
-        "provider-console/src/continuity-review.js",
         "provider-console/scripts/runs-api.mjs",
         "provider-console/tests/runs-api.test.mjs",
-        "provider-console/tests/continuity-review-contract.test.mjs",
-        "provider-console/tests/continuity-review.test.mjs",
     ):
         report = agent_harness.inspect_paths([path], policy)
         assert report["categories"] == ["provider_console"]
@@ -436,20 +574,131 @@ def test_provider_console_routes_to_local_runs_observer_suites() -> None:
         assert report["check_ids"] == [
             "scope_diff_check",
             "docs_contract_check",
+            "task_architecture_gate",
             "provider_console_python_tests",
             "provider_console_node_tests",
-            "task_architecture_gate",
+        ]
+        assert report["npm_workspace_dependency_paths"] == [
+            "provider-console/node_modules"
         ]
 
     python_argv = policy["checks"]["provider_console_python_tests"]["argv"]
     assert "tests/test_provider_console.py" in python_argv
+
+
+def test_provider_console_web_routes_to_node_contracts() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "provider-console/src/App.jsx",
+        "provider-console/src/continuity-review.js",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["provider_console_web"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "docs_contract_check",
+            "task_architecture_gate",
+            "provider_console_node_tests",
+            "provider_console_web_build",
+        ]
+        assert report["npm_workspace_dependency_paths"] == [
+            "provider-console/node_modules"
+        ]
+
+    for path in (
+        "provider-console/tests/continuity-review-contract.test.mjs",
+        "provider-console/tests/continuity-review.test.mjs",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["provider_console_web_tests"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "docs_contract_check",
+            "task_architecture_gate",
+            "provider_console_node_tests",
+        ]
+        assert report["npm_workspace_dependency_paths"] == [
+            "provider-console/node_modules"
+        ]
+
     node_argv = policy["checks"]["provider_console_node_tests"]["argv"]
     assert node_argv == [
         "node",
         "--test",
         "provider-console/tests/runs-api.test.mjs",
         "provider-console/tests/continuity-review-contract.test.mjs",
+        "provider-console/tests/continuity-review.test.mjs",
     ]
+    assert policy["checks"]["provider_console_web_build"]["argv"] == [
+        "npm",
+        "exec",
+        "--offline",
+        "--",
+        "vite",
+        "build",
+    ]
+    assert policy["checks"]["provider_console_web_build"]["cwd"] == (
+        "provider-console"
+    )
+
+    for path in (
+        "provider-console/.npmrc",
+        "provider-console/worker/index.js",
+        "provider-console/scripts/prepare-sites-build.mjs",
+        "provider-console/tests/sites-worker.test.mjs",
+        "provider-console/.openai/hosting.json",
+        "provider-console/index.html",
+        "provider-console/package.json",
+        "provider-console/package-lock.json",
+        "provider-console/public/assets/alice-cafe-first-frame.png",
+        "provider-console/vite.config.mjs",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == []
+        assert report["categories"] == ["provider_console_sites"]
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "docs_contract_check",
+            "task_architecture_gate",
+            "provider_console_sites_build",
+            "provider_console_sites_tests",
+        ]
+        assert report["npm_workspace_dependency_paths"] == [
+            "provider-console/node_modules"
+        ]
+
+    assert policy["checks"]["provider_console_sites_build"]["argv"] == [
+        "npm",
+        "--prefix",
+        "provider-console",
+        "run",
+        "build",
+    ]
+    assert policy["checks"]["provider_console_sites_tests"]["argv"] == [
+        "node",
+        "--test",
+        "provider-console/tests/sites-worker.test.mjs",
+    ]
+
+
+def test_every_tracked_provider_console_path_has_an_explicit_route() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+    tracked_paths = subprocess.run(
+        ["git", "ls-files", "-z", "provider-console"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    ).stdout.split(b"\0")
+
+    for raw_path in tracked_paths:
+        if not raw_path:
+            continue
+        path = raw_path.decode("utf-8", "surrogateescape")
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == [], path
 
 
 def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
@@ -464,8 +713,8 @@ def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
     assert report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
-        "production_composition_audio_tests",
         "task_architecture_gate",
+        "production_composition_audio_tests",
     ]
 
 
@@ -476,6 +725,8 @@ def test_production_policy_commands_cover_repository_mandatory_contract_tests() 
     composition_audio_argv = policy["checks"][
         "production_composition_audio_tests"
     ]["argv"]
+    video_provider_argv = policy["checks"]["production_video_provider_tests"]["argv"]
+    state_argv = policy["checks"]["production_state_tests"]["argv"]
 
     for path in (
         "tests/test_production_models.py",
@@ -492,6 +743,12 @@ def test_production_policy_commands_cover_repository_mandatory_contract_tests() 
     ):
         assert path in image_argv
     assert "tests/test_production_minimax_speech.py" in composition_audio_argv
+    for path in (
+        "tests/test_production_state_commit.py",
+        "tests/test_production_state_recovery.py",
+    ):
+        assert path in state_argv
+        assert path not in video_provider_argv
 
 
 def test_production_policy_declares_only_complete_cross_check_coverage() -> None:
@@ -517,6 +774,89 @@ def test_production_policy_declares_only_complete_cross_check_coverage() -> None
         "provider_neutral_video_requirement_tests",
     ):
         assert "covered_by_check_ids" not in policy["checks"][check_id]
+
+    python_pytest_check_ids = {
+        check_id
+        for check_id, check in policy["checks"].items()
+        if check_id != "full_tests" and "pytest" in check["argv"]
+    }
+    assert set(policy["checks"]["full_tests"]["covers_check_ids"]) == (
+        python_pytest_check_ids
+    )
+
+
+def test_fail_fast_order_and_full_suite_reverse_coverage(tmp_path: Path) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+    inspection = agent_harness.inspect_paths(
+        ["src/ai_video/production/seedance.py", "unmapped.task"], policy
+    )
+
+    assert inspection["check_ids"][:4] == [
+        "scope_diff_check",
+        "docs_contract_check",
+        "task_architecture_gate",
+        "full_tests",
+    ]
+    assert inspection["check_ids"].index("full_tests") < inspection["check_ids"].index(
+        "production_video_provider_tests"
+    )
+
+    scope = {
+        "mode": "commit_range",
+        "changed_paths": inspection["changed_paths"],
+        "base_oid": "a" * 40,
+        "head_oid": "b" * 40,
+        "closure_eligible": True,
+    }
+    argv_to_check_id = {
+        tuple(agent_harness._check_argv(policy["checks"][check_id], scope, None)): check_id
+        for check_id in inspection["check_ids"]
+    }
+    executed: list[str] = []
+
+    def recording_runner(
+        argv: tuple[str, ...],
+        _cwd: Path,
+        _timeout_seconds: float,
+        _env: dict[str, str],
+    ) -> agent_harness.CommandResult:
+        argv_without_junit = tuple(
+            argument for argument in argv if not argument.startswith("--junitxml=")
+        )
+        executed.append(argv_to_check_id[argv_without_junit])
+        return agent_harness.CommandResult(
+            status="passed", exit_code=0, stdout="ok\n", stderr=""
+        )
+
+    receipt_path, passed = agent_harness.verify_inspection(
+        inspection,
+        policy,
+        scope=scope,
+        source_snapshot={"scope_sha256": "c" * 64},
+        project_root=tmp_path,
+        execution_root=tmp_path,
+        runs_dir=tmp_path / "runs",
+        run_id="fail-fast-full-coverage",
+        runner=recording_runner,
+    )
+
+    assert passed is True
+    assert executed == [
+        "scope_diff_check",
+        "docs_contract_check",
+        "task_architecture_gate",
+        "full_tests",
+    ]
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert receipt["npm_workspace_dependency_paths"] == []
+    assert {
+        check["check_id"]
+        for check in receipt["checks"]
+        if check["status"] == "skipped"
+    } >= {
+        "production_video_provider_tests",
+        "provider_neutral_video_requirement_tests",
+    }
 
 
 def test_repository_production_coverage_executes_only_uncovered_checks(
@@ -912,6 +1252,11 @@ def test_shared_committer_helpers_route_to_full_production_suite() -> None:
             "production_composition_audio",
             "production_composition_audio_tests",
         ),
+        (
+            "src/ai_video/production/_state_commit_video.py",
+            "production_video_provider",
+            "production_video_provider_tests",
+        ),
     ],
 )
 def test_domain_committer_helpers_route_to_their_domain_suite(
@@ -923,6 +1268,8 @@ def test_domain_committer_helpers_route_to_their_domain_suite(
 
     assert category in report["categories"]
     assert check_id in report["check_ids"]
+    assert "production_state" in report["categories"]
+    assert "production_state_tests" in report["check_ids"]
 
 
 @pytest.mark.parametrize(
@@ -1014,9 +1361,58 @@ def test_inspection_falls_back_to_full_tests_and_task_architecture_gate() -> Non
     assert report["check_ids"] == [
         "scope_diff_check",
         "docs_contract_check",
-        "full_tests",
         "task_architecture_gate",
+        "full_tests",
     ]
+
+
+@pytest.mark.parametrize(
+    ("path", "expected_category"),
+    [
+        (".architecture/architecture-baseline.json", "architecture_tooling"),
+        (".codex/config.toml", "control_plane"),
+        (".mcp.json", "control_plane"),
+        ("configs/example.project.yaml", "legacy_cli_config"),
+        ("package.json", "renderer_toolchain"),
+        ("package-lock.json", "renderer_toolchain"),
+        ("pyproject.toml", "python_toolchain"),
+        ("tests/fixtures/generated_video/fake-video.mp4", "production_video_provider"),
+        (
+            "tests/fixtures/hyperframes/silent_image/timeline.json",
+            "production_composition_audio",
+        ),
+        ("tests/fixtures/p7_1/flux_profile.json", "production_image"),
+        (
+            "tests/fixtures/voice_captions/elevenlabs-with-timestamps.json",
+            "production_composition_audio",
+        ),
+        ("tests/fixtures/wan22_i2v_ui.json", "workflow"),
+    ],
+)
+def test_previously_broad_fallback_paths_have_explicit_owners(
+    path: str, expected_category: str
+) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths([path], policy)
+
+    assert expected_category in report["categories"]
+    assert report["fallback_paths"] == []
+
+
+def test_non_authoritative_workflow_and_codegraph_artifacts_are_ignored() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths(
+        [".workflow/active/example/workflow-session.json", "index.json"], policy
+    )
+
+    assert report["changed_paths"] == []
+    assert report["ignored_paths"] == [
+        ".workflow/active/example/workflow-session.json",
+        "index.json",
+    ]
+    assert report["fallback_paths"] == []
 
 
 def test_name_status_parser_keeps_both_sides_of_rename() -> None:
@@ -1153,6 +1549,68 @@ def test_staged_verification_workspace_excludes_unstaged_changes(tmp_path: Path)
     with agent_harness.isolated_verification_workspace(tmp_path, scope) as checkout:
         assert (checkout / "tracked.txt").read_text(encoding="utf-8") == "staged task\n"
         assert (checkout / "unrelated.txt").read_text(encoding="utf-8") == "baseline\n"
+
+
+def test_materialize_npm_workspace_dependencies_links_lock_matched_tree(
+    tmp_path: Path,
+) -> None:
+    project_root = tmp_path / "source"
+    execution_root = tmp_path / "checkout"
+    source_modules = project_root / "provider-console/node_modules"
+    target_package = execution_root / "provider-console"
+    source_modules.mkdir(parents=True)
+    target_package.mkdir(parents=True)
+    locked_package = {
+        "version": "1.0.0",
+        "resolved": "https://registry.example.invalid/react.tgz",
+        "integrity": "sha512-example",
+    }
+    repository_lock = {
+        "lockfileVersion": 3,
+        "packages": {
+            "": {"dependencies": {"react": "1.0.0"}},
+            "node_modules/react": locked_package,
+        },
+    }
+    installed_lock = {
+        "lockfileVersion": 3,
+        "packages": {"node_modules/react": locked_package},
+    }
+    (target_package / "package-lock.json").write_text(
+        json.dumps(repository_lock), encoding="utf-8"
+    )
+    (source_modules / ".package-lock.json").write_text(
+        json.dumps(installed_lock), encoding="utf-8"
+    )
+    policy = _minimal_policy()
+    policy["checks"]["unit"]["npm_workspace_dependency_paths"] = [
+        "provider-console/node_modules"
+    ]
+
+    linked = agent_harness.materialize_npm_workspace_dependencies(
+        project_root,
+        execution_root,
+        policy,
+        ["unit"],
+    )
+
+    target_modules = execution_root / "provider-console/node_modules"
+    assert linked == ["provider-console/node_modules"]
+    assert target_modules.is_symlink()
+    assert target_modules.resolve() == source_modules.resolve()
+
+    installed_lock["packages"]["node_modules/react"]["version"] = "2.0.0"
+    target_modules.unlink()
+    (source_modules / ".package-lock.json").write_text(
+        json.dumps(installed_lock), encoding="utf-8"
+    )
+    with pytest.raises(ValueError, match="does not match exact package-lock"):
+        agent_harness.materialize_npm_workspace_dependencies(
+            project_root,
+            execution_root,
+            policy,
+            ["unit"],
+        )
 
 
 def test_verification_workspace_surfaces_cleanup_failure(
@@ -1527,97 +1985,176 @@ def test_receipt_integrity_detects_tampering() -> None:
     assert agent_harness.verify_receipt_integrity(receipt) is False
 
 
-def test_receipt_freshness_uses_the_selected_repository_policy(tmp_path: Path) -> None:
-    _committed_repository(tmp_path)
-    policy_path = tmp_path / ".agent/harness/policy.yaml"
-    policy_path.parent.mkdir(parents=True)
-    policy_path.write_text("version: 2\n", encoding="utf-8")
-    _git(tmp_path, "add", ".agent/harness/policy.yaml")
-    _git(tmp_path, "commit", "-qm", "add policy")
-    head_oid = _git(tmp_path, "rev-parse", "HEAD").stdout.strip()
+def test_legacy_receipt_dependency_field_only_defaults_for_empty_route() -> None:
     receipt = {
-        "schema": "ai-video-agent-harness-run/2",
-        "status": "passed",
-        "closure_eligible": True,
-        "policy_sha256": hashlib.sha256(policy_path.read_bytes()).hexdigest(),
-        "scope": {
-            "mode": "commit_range",
-            "head_ref": "HEAD",
-            "head_oid": head_oid,
-        },
+        "changed_paths": ["tracked.txt"],
+        "ignored_paths": [],
+        "sensitive_paths": [],
+        "categories": ["example"],
+        "fallback_paths": [],
+        "selected_check_ids": ["unit"],
     }
-    agent_harness.seal_receipt(receipt)
+    inspection = {
+        "changed_paths": ["tracked.txt"],
+        "ignored_paths": [],
+        "sensitive_paths": [],
+        "categories": ["example"],
+        "fallback_paths": [],
+        "check_ids": ["unit"],
+        "npm_workspace_dependency_paths": ["provider-console/node_modules"],
+    }
 
-    report = agent_harness.receipt_freshness(receipt, tmp_path)
+    assert agent_harness.inspection_matches_receipt(receipt, inspection) is False
+
+
+def test_receipt_freshness_requires_complete_routing_and_execution_proof(
+    tmp_path: Path,
+) -> None:
+    receipt_path, _tracked, _policy_path, _scope = _complete_receipt_fixture(tmp_path)
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+
+    report = agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )
+
+    assert report["self_consistent"] is True
+    assert report["fresh_for_snapshot"] is True
+    assert report["complete_completion_proof"] is True
+    assert report["scope_well_formed"] is True
+    assert report["scope_paths_match"] is True
+    assert report["inspection_matches"] is True
+    assert report["check_records_complete"] is True
+    assert report["check_records_valid"] is True
+    assert report["coverage_closed_same_run"] is True
+    assert report["fresh"] is True
+
+    legacy_receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    legacy_receipt.pop("npm_workspace_dependency_paths")
+    agent_harness.seal_receipt(legacy_receipt)
+    legacy_report = agent_harness.receipt_freshness(
+        legacy_receipt, tmp_path, receipt_dir=receipt_path.parent
+    )
+    assert legacy_report["inspection_matches"] is True
+    assert legacy_report["fresh"] is True
+
+    mutations = (
+        (lambda value: value.__setitem__("changed_paths", ["wrong.txt"]), "inspection_matches"),
+        (lambda value: value.__setitem__("categories", []), "inspection_matches"),
+        (
+            lambda value: value.__setitem__("selected_check_ids", ["unit"]),
+            "inspection_matches",
+        ),
+        (
+            lambda value: value.__setitem__(
+                "npm_workspace_dependency_paths",
+                ["provider-console/node_modules"],
+            ),
+            "inspection_matches",
+        ),
+        (
+            lambda value: value.__setitem__(
+                "npm_workspace_dependency_paths", None
+            ),
+            "inspection_matches",
+        ),
+        (lambda value: value.__setitem__("checks", []), "check_records_complete"),
+        (
+            lambda value: value["checks"][0].__setitem__("argv", ["tampered"]),
+            "check_records_valid",
+        ),
+        (
+            lambda value: value["checks"][0].pop("stdout"),
+            "check_records_valid",
+        ),
+        (
+            lambda value: value["checks"][0].__setitem__("duration_ms", True),
+            "check_records_valid",
+        ),
+        (
+            lambda value: value["checks"][1].__setitem__(
+                "covered_by_check_ids", ["missing"]
+            ),
+            "coverage_closed_same_run",
+        ),
+    )
+    for mutate, failed_key in mutations:
+        tampered = json.loads(receipt_path.read_text(encoding="utf-8"))
+        mutate(tampered)
+        agent_harness.seal_receipt(tampered)
+
+        tampered_report = agent_harness.receipt_freshness(
+            tampered, tmp_path, receipt_dir=receipt_path.parent
+        )
+
+        assert tampered_report["integrity"] is True
+        assert tampered_report[failed_key] is False
+        assert tampered_report["complete_completion_proof"] is False
+        assert tampered_report["fresh"] is False
+
+
+def test_receipt_freshness_fails_closed_on_malformed_scope(tmp_path: Path) -> None:
+    receipt_path, _tracked, _policy_path, _scope = _complete_receipt_fixture(tmp_path)
+
+    for malformed_paths in (None, 17, [None], []):
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        receipt["scope"]["changed_paths"] = malformed_paths
+        agent_harness.seal_receipt(receipt)
+
+        report = agent_harness.receipt_freshness(
+            receipt, tmp_path, receipt_dir=receipt_path.parent
+        )
+
+        assert report["scope_well_formed"] is False
+        assert report["fresh"] is False
+
+
+def test_receipt_freshness_uses_the_selected_repository_policy(tmp_path: Path) -> None:
+    receipt_path, _tracked, _policy_path, _scope = _complete_receipt_fixture(tmp_path)
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+
+    report = agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )
 
     assert report["policy_matches"] is True
     assert report["snapshot_matches"] is True
+    assert report["complete_completion_proof"] is True
     assert report["fresh"] is True
 
 
 def test_staged_receipt_becomes_stale_when_scope_gets_unstaged_edits(
     tmp_path: Path,
 ) -> None:
-    tracked = _committed_repository(tmp_path)
-    policy_path = tmp_path / ".agent/harness/policy.yaml"
-    policy_path.parent.mkdir(parents=True)
-    policy_path.write_text("version: 2\n", encoding="utf-8")
-    _git(tmp_path, "add", ".agent/harness/policy.yaml")
-    _git(tmp_path, "commit", "-qm", "add policy")
-    tracked.write_text("staged task\n", encoding="utf-8")
-    _git(tmp_path, "add", "tracked.txt")
-    scope = agent_harness.discover_scope(tmp_path, staged=True)
-    snapshot = agent_harness.capture_scope_snapshot(tmp_path, mode="staged")
-    receipt = {
-        "schema": "ai-video-agent-harness-run/2",
-        "status": "passed",
-        "closure_eligible": True,
-        "policy_sha256": hashlib.sha256(policy_path.read_bytes()).hexdigest(),
-        "scope": scope,
-        "source_snapshot_after": snapshot,
-    }
-    agent_harness.seal_receipt(receipt)
-    assert agent_harness.receipt_freshness(receipt, tmp_path)["fresh"] is True
+    receipt_path, tracked, _policy_path, _scope = _complete_receipt_fixture(
+        tmp_path, mode="staged"
+    )
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )["fresh"] is True
 
     tracked.write_text("new unstaged edit\n", encoding="utf-8")
 
-    report = agent_harness.receipt_freshness(receipt, tmp_path)
+    report = agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )
     assert report["scope_worktree_clean"] is False
     assert report["fresh"] is False
 
 
 def test_staged_receipt_rejects_snapshot_from_different_head(tmp_path: Path) -> None:
-    tracked = _committed_repository(tmp_path)
-    policy_path = tmp_path / ".agent/harness/policy.yaml"
-    policy_path.parent.mkdir(parents=True)
-    policy_path.write_text("version: 2\n", encoding="utf-8")
-    _git(tmp_path, "add", ".agent/harness/policy.yaml")
-    _git(tmp_path, "commit", "-qm", "add policy")
-    scope_head = _git(tmp_path, "rev-parse", "HEAD").stdout.strip()
+    receipt_path, _tracked, _policy_path, _scope = _complete_receipt_fixture(
+        tmp_path, mode="staged"
+    )
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     unrelated = tmp_path / "unrelated.txt"
     unrelated.write_text("moves head\n", encoding="utf-8")
     _git(tmp_path, "add", "unrelated.txt")
-    _git(tmp_path, "commit", "-qm", "move head")
-    tracked.write_text("staged task\n", encoding="utf-8")
-    _git(tmp_path, "add", "tracked.txt")
-    scope = {
-        "mode": "staged",
-        "head_oid": scope_head,
-        "changed_paths": ["tracked.txt"],
-        "closure_eligible": True,
-    }
-    snapshot = agent_harness.capture_scope_snapshot(tmp_path, mode="staged")
-    receipt = {
-        "schema": "ai-video-agent-harness-run/2",
-        "status": "passed",
-        "closure_eligible": True,
-        "policy_sha256": hashlib.sha256(policy_path.read_bytes()).hexdigest(),
-        "scope": scope,
-        "source_snapshot_after": snapshot,
-    }
-    agent_harness.seal_receipt(receipt)
+    _git(tmp_path, "commit", "--only", "-qm", "move head", "--", "unrelated.txt")
 
-    report = agent_harness.receipt_freshness(receipt, tmp_path)
+    report = agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )
 
     assert report["snapshot_matches"] is False
     assert report["fresh"] is False
@@ -1626,69 +2163,30 @@ def test_staged_receipt_rejects_snapshot_from_different_head(tmp_path: Path) -> 
 def test_commit_range_receipt_becomes_stale_after_new_staged_edit(
     tmp_path: Path,
 ) -> None:
-    tracked = _committed_repository(tmp_path)
-    policy_path = tmp_path / ".agent/harness/policy.yaml"
-    policy_path.parent.mkdir(parents=True)
-    policy_path.write_text("version: 2\n", encoding="utf-8")
-    _git(tmp_path, "add", ".agent/harness/policy.yaml")
-    _git(tmp_path, "commit", "-qm", "add policy")
-    tracked.write_text("committed task\n", encoding="utf-8")
-    _git(tmp_path, "add", "tracked.txt")
-    _git(tmp_path, "commit", "-qm", "task")
-    head_oid = _git(tmp_path, "rev-parse", "HEAD").stdout.strip()
-    receipt = {
-        "schema": "ai-video-agent-harness-run/2",
-        "status": "passed",
-        "closure_eligible": True,
-        "policy_sha256": hashlib.sha256(policy_path.read_bytes()).hexdigest(),
-        "scope": {
-            "mode": "commit_range",
-            "head_ref": "HEAD",
-            "head_oid": head_oid,
-            "changed_paths": ["tracked.txt"],
-        },
-    }
-    agent_harness.seal_receipt(receipt)
-    assert agent_harness.receipt_freshness(receipt, tmp_path)["fresh"] is True
+    receipt_path, tracked, _policy_path, _scope = _complete_receipt_fixture(tmp_path)
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )["fresh"] is True
 
     tracked.write_text("new staged edit\n", encoding="utf-8")
     _git(tmp_path, "add", "tracked.txt")
 
-    report = agent_harness.receipt_freshness(receipt, tmp_path)
+    report = agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )
     assert report["scope_worktree_clean"] is False
     assert report["fresh"] is False
 
 
 def test_commit_range_freshness_uses_committed_policy_bytes(tmp_path: Path) -> None:
-    tracked = _committed_repository(tmp_path)
-    policy_path = tmp_path / ".agent/harness/policy.yaml"
-    policy_path.parent.mkdir(parents=True)
-    policy_path.write_text("version: 2\n", encoding="utf-8")
-    _git(tmp_path, "add", ".agent/harness/policy.yaml")
-    _git(tmp_path, "commit", "-qm", "add policy")
-    base_oid = _git(tmp_path, "rev-parse", "HEAD").stdout.strip()
-    tracked.write_text("committed task\n", encoding="utf-8")
-    _git(tmp_path, "add", "tracked.txt")
-    _git(tmp_path, "commit", "-qm", "task")
-    head_oid = _git(tmp_path, "rev-parse", "HEAD").stdout.strip()
-    scope = {
-        "mode": "commit_range",
-        "base_oid": base_oid,
-        "head_ref": "HEAD",
-        "head_oid": head_oid,
-        "changed_paths": ["tracked.txt"],
-    }
-    receipt = {
-        "schema": "ai-video-agent-harness-run/2",
-        "status": "passed",
-        "closure_eligible": True,
-        "policy_sha256": hashlib.sha256(policy_path.read_bytes()).hexdigest(),
-        "scope": scope,
-    }
-    agent_harness.seal_receipt(receipt)
+    receipt_path, _tracked, policy_path, _scope = _complete_receipt_fixture(tmp_path)
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     policy_path.write_text("version: 999\n", encoding="utf-8")
 
-    report = agent_harness.receipt_freshness(receipt, tmp_path)
+    report = agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )
 
     assert report["policy_matches"] is True
     assert report["scope_worktree_clean"] is True
@@ -1696,31 +2194,19 @@ def test_commit_range_freshness_uses_committed_policy_bytes(tmp_path: Path) -> N
 
 
 def test_commit_range_freshness_rejects_moved_head_ref(tmp_path: Path) -> None:
-    tracked = _committed_repository(tmp_path)
-    policy_path = tmp_path / ".agent/harness/policy.yaml"
-    policy_path.parent.mkdir(parents=True)
-    policy_path.write_text("version: 2\n", encoding="utf-8")
-    _git(tmp_path, "add", ".agent/harness/policy.yaml")
-    _git(tmp_path, "commit", "-qm", "add policy")
-    base_oid = _git(tmp_path, "rev-parse", "HEAD").stdout.strip()
-    tracked.write_text("committed task\n", encoding="utf-8")
-    _git(tmp_path, "add", "tracked.txt")
-    _git(tmp_path, "commit", "-qm", "task")
-    _git(tmp_path, "branch", "receipt-head")
-    scope = agent_harness.discover_scope(
-        tmp_path, base_ref=base_oid, head_ref="receipt-head"
-    )
-    receipt = {
-        "schema": "ai-video-agent-harness-run/2",
-        "status": "passed",
-        "closure_eligible": True,
-        "policy_sha256": hashlib.sha256(policy_path.read_bytes()).hexdigest(),
-        "scope": scope,
-    }
+    receipt_path, _tracked, _policy_path, scope = _complete_receipt_fixture(tmp_path)
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    _git(tmp_path, "branch", "receipt-head", scope["head_oid"])
+    receipt["scope"]["head_ref"] = "receipt-head"
     agent_harness.seal_receipt(receipt)
-    _git(tmp_path, "branch", "-f", "receipt-head", base_oid)
+    assert agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )["fresh"] is True
+    _git(tmp_path, "branch", "-f", "receipt-head", scope["base_oid"])
 
-    report = agent_harness.receipt_freshness(receipt, tmp_path)
+    report = agent_harness.receipt_freshness(
+        receipt, tmp_path, receipt_dir=receipt_path.parent
+    )
 
     assert report["snapshot_matches"] is False
     assert report["fresh"] is False
@@ -1734,6 +2220,7 @@ def test_repository_policy_audit_has_no_unmapped_owned_files() -> None:
     assert report["unmapped_paths"] == []
     assert report["unverified_paths"] == []
     assert report["missing_check_test_paths"] == []
+    assert report["unreferenced_test_paths"] == []
     assert report["docs_contract_diagnostics"] == []
 
     canonical_docs = {
@@ -1746,6 +2233,18 @@ def test_repository_policy_audit_has_no_unmapped_owned_files() -> None:
     }
     assert canonical_docs.isdisjoint(report["unmapped_paths"])
     assert canonical_docs.isdisjoint(report["unverified_paths"])
+
+    for path in (
+        "provider-console/tests/continuity-review.test.mjs",
+        "provider-console/tests/sites-worker.test.mjs",
+        "provider-console/package-lock.json",
+        "pyproject.toml",
+        "package-lock.json",
+        ".codex/config.toml",
+        ".mcp.json",
+    ):
+        assert path not in report["unmapped_paths"]
+        assert path not in report["unverified_paths"]
 
 
 def test_policy_audit_rejects_code_mapped_without_executable_check(
@@ -1767,6 +2266,57 @@ def test_policy_audit_rejects_code_mapped_without_executable_check(
 
     assert report["unmapped_paths"] == []
     assert report["unverified_paths"] == ["src/example.py"]
+
+
+def test_policy_audit_rejects_unreferenced_explicit_node_test(tmp_path: Path) -> None:
+    _committed_repository(tmp_path)
+    node_test = tmp_path / "provider-console/tests/missing.test.mjs"
+    node_test.parent.mkdir(parents=True)
+    node_test.write_text("export {};\n", encoding="utf-8")
+    _git(tmp_path, "add", "provider-console/tests/missing.test.mjs")
+    _git(tmp_path, "commit", "-qm", "add node test")
+    policy = _minimal_policy()
+    policy["audit_patterns"] = ["provider-console/tests/**"]
+    policy["audit_explicit_test_patterns"] = ["provider-console/tests/*.test.mjs"]
+    policy["categories"] = {
+        "provider_console": {
+            "patterns": ["provider-console/**"],
+            "check_ids": ["unit"],
+        }
+    }
+
+    report = agent_harness.audit_policy_coverage(policy, tmp_path)
+
+    assert report["unmapped_paths"] == []
+    assert report["unverified_paths"] == []
+    assert report["unreferenced_test_paths"] == [
+        "provider-console/tests/missing.test.mjs"
+    ]
+
+
+def test_policy_audit_requires_explicit_python_test_or_named_exemption(
+    tmp_path: Path,
+) -> None:
+    _committed_repository(tmp_path)
+    python_test = tmp_path / "tests/test_missing.py"
+    python_test.parent.mkdir(parents=True)
+    python_test.write_text("def test_missing():\n    assert True\n", encoding="utf-8")
+    _git(tmp_path, "add", "tests/test_missing.py")
+    _git(tmp_path, "commit", "-qm", "add Python test")
+    policy = _minimal_policy()
+    policy["audit_patterns"] = ["tests/**"]
+    policy["audit_explicit_test_patterns"] = ["tests/test_*.py"]
+    policy["categories"] = {
+        "tests": {"patterns": ["tests/**"], "check_ids": ["unit"]}
+    }
+
+    report = agent_harness.audit_policy_coverage(policy, tmp_path)
+
+    assert report["unreferenced_test_paths"] == ["tests/test_missing.py"]
+
+    policy["audit_unreferenced_test_exempt_patterns"] = ["tests/test_missing.py"]
+    exempt_report = agent_harness.audit_policy_coverage(policy, tmp_path)
+    assert exempt_report["unreferenced_test_paths"] == []
 
 
 def test_makefile_exposes_completion_and_repository_harness_targets() -> None:

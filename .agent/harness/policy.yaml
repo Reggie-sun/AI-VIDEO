@@ -15,6 +15,9 @@ ignored_patterns:
   - .pytest_cache/**
   - __pycache__/**
   - "**/__pycache__/**"
+  - .workflow/**
+  - index.json
+  - runs/.gitkeep
 
 sensitive_patterns:
   - .env
@@ -29,8 +32,22 @@ sensitive_patterns:
 audit_patterns:
   - AGENTS.md
   - README.md
+  - Makefile
+  - .gitattributes
+  - .gitignore
   - .github/workflows/**
-  - .agent/harness/docs-contracts.yaml
+  - .agent/harness/*.yaml
+  - .architecture/architecture-baseline.json
+  - .claude/settings/*.json
+  - .codex/*.toml
+  - .codex/hooks.json
+  - .mcp.json
+  - architecture_gate.toml
+  - skills-lock.json
+  - pyproject.toml
+  - package.json
+  - package-lock.json
+  - configs/**
   - docs/agent-primary-contract-matrix.md
   - docs/v0.2-runtime-baseline.md
   - docs/v0.2-agentic-production-roadmap.md
@@ -43,10 +60,23 @@ audit_patterns:
   - tests/**/*.py
   - tests/test_*.py
   - tests/conftest.py
+  - tests/fixtures/**
+  - provider-console/**
   - workflows/**
 
 audit_exempt_patterns:
   - scripts/__init__.py
+  - provider-console/dist/**
+  - provider-console/node_modules/**
+
+audit_explicit_test_patterns:
+  - tests/test_*.py
+  - provider-console/tests/*.test.mjs
+
+audit_unreferenced_test_exempt_patterns:
+  # Included by production_contract_tests through pytest's node-id-aware
+  # `tests -k production` selector and intentionally kept as a full E2E.
+  - tests/test_production_base_ai_comic_e2e.py
 
 always_check_ids:
   - scope_diff_check
@@ -61,10 +91,12 @@ checks:
     argv: [git, diff, --check]
     cwd: .
     scope_diff: true
+    execution_priority: 0
     description: Check exact staged or commit-range patch whitespace and conflict markers.
   docs_contract_check:
     argv: [python, -m, scripts.docs_contract_gate, check]
     cwd: .
+    execution_priority: 10
     description: Verify canonical documentation metadata and repository contract coherence.
   composition_playbook_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_composition_playbooks.py, -q]
@@ -136,7 +168,7 @@ checks:
     cwd: .
     description: Verify image contracts, local adapter, truthful import, activation, and recovery.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, -q]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
@@ -170,18 +202,66 @@ checks:
     cwd: .
     description: Verify bounded local-only runs discovery, canonical read projection, sanitization, and no-write contracts.
   provider_console_node_tests:
-    argv: [node, --test, provider-console/tests/runs-api.test.mjs, provider-console/tests/continuity-review-contract.test.mjs]
+    argv: [node, --test, provider-console/tests/runs-api.test.mjs, provider-console/tests/continuity-review-contract.test.mjs, provider-console/tests/continuity-review.test.mjs]
     cwd: .
+    npm_workspace_dependency_paths: [provider-console/node_modules]
     description: Verify the loopback-only runs bridge, exact-bound human decision authoring, opaque media tokens, and descriptor-bound media reads.
+  provider_console_web_build:
+    argv: [npm, exec, --offline, --, vite, build]
+    cwd: provider-console
+    npm_workspace_dependency_paths: [provider-console/node_modules]
+    description: Compile the Provider Console client bundle with only installed local dependencies.
+  provider_console_sites_build:
+    argv: [npm, --prefix, provider-console, run, build]
+    cwd: .
+    npm_workspace_dependency_paths: [provider-console/node_modules]
+    description: Build the Provider Console Sites bundle in the isolated verification worktree.
+  provider_console_sites_tests:
+    argv: [node, --test, provider-console/tests/sites-worker.test.mjs]
+    cwd: .
+    npm_workspace_dependency_paths: [provider-console/node_modules]
+    description: Verify Sites worker fallback and required build artifacts without network access.
+  agent_memory_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_agent_memory.py, -q]
+    cwd: .
+    description: Verify the read-only developer Agent Memory index and retrieval boundaries.
   full_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, -q]
     cwd: .
     timeout_seconds: 1800
+    execution_priority: 30
+    covers_check_ids:
+      - composition_playbook_tests
+      - composition_strategy_proposal_tests
+      - composition_architecture_tests
+      - harness_tests
+      - architecture_tests
+      - cli_config_tests
+      - workflow_tests
+      - legacy_runtime_tests
+      - mcp_tests
+      - production_contract_tests
+      - production_reader_tests
+      - production_state_tests
+      - production_composition_audio_tests
+      - production_dependency_tests
+      - production_review_tests
+      - production_image_tests
+      - production_video_provider_tests
+      - shot_continuity_p0_tests
+      - production_shot_router_tests
+      - video_planner_tests
+      - provider_neutral_video_requirement_tests
+      - shot_readiness_gate_tests
+      - quality_intelligence_tests
+      - provider_console_python_tests
+      - agent_memory_tests
     description: Fail-safe full suite with credentials removed and pytest non-loopback sockets blocked.
   task_architecture_gate:
     argv: [python, -m, scripts.architecture_gate, check]
     cwd: .
     task_architecture: true
+    execution_priority: 20
     description: Reject architecture regressions introduced by the exact task delta.
   repository_architecture_gate:
     argv: [python, -m, scripts.architecture_gate, check]
@@ -198,8 +278,7 @@ categories:
       - scripts/docs_contract_gate.py
       - scripts/agent_harness_audit.py
       - scripts/agent_harness.py
-      - scripts/agent_harness_receipt.py
-      - scripts/agent_harness_runtime.py
+      - scripts/agent_harness_*.py
       - scripts/harness_pytest_guard.py
       - tests/test_agent_harness.py
       - tests/test_docs_contract_gate.py
@@ -211,16 +290,31 @@ categories:
       - README.md
       - docs/**
       - "*.md"
+      - provider-console/design/**
     check_ids:
       - docs_contract_check
   architecture_tooling:
     patterns:
       - architecture_gate.toml
+      - .architecture/architecture-baseline.json
       - scripts/architecture_gate/**
       - tests/test_architecture_gate.py
       - tests/test_architecture_gate_cli.py
     check_ids:
       - architecture_tests
+      - task_architecture_gate
+  python_toolchain:
+    patterns:
+      - pyproject.toml
+    check_ids:
+      - full_tests
+      - task_architecture_gate
+  renderer_toolchain:
+    patterns:
+      - package.json
+      - package-lock.json
+    check_ids:
+      - production_composition_audio_tests
       - task_architecture_gate
   test_infrastructure:
     patterns:
@@ -229,6 +323,7 @@ categories:
       - full_tests
   legacy_cli_config:
     patterns:
+      - configs/**
       - src/ai_video/__init__.py
       - src/ai_video/cli.py
       - src/ai_video/config.py
@@ -247,6 +342,7 @@ categories:
       - workflows/**
       - tests/test_workflow_loader.py
       - tests/test_workflow_renderer.py
+      - tests/fixtures/wan22_i2v_ui.json
     check_ids:
       - workflow_tests
       - task_architecture_gate
@@ -339,6 +435,8 @@ categories:
       - tests/test_production_minimax_speech.py
       - tests/test_production_voice_captions_e2e.py
       - tests/production_voice_e2e_support.py
+      - tests/fixtures/hyperframes/**
+      - tests/fixtures/voice_captions/**
     check_ids:
       - production_composition_audio_tests
       - task_architecture_gate
@@ -394,6 +492,7 @@ categories:
       - tests/test_production_comfy_image.py
       - tests/test_production_image_import.py
       - tests/test_production_p7_1_local_image_e2e.py
+      - tests/fixtures/p7_1/**
     check_ids:
       - production_image_tests
       - task_architecture_gate
@@ -416,6 +515,7 @@ categories:
       - task_architecture_gate
   production_video_provider:
     patterns:
+      - tests/fixtures/generated_video/**
       - workflows/bindings/minimax_h3_fl2va*
       - workflows/profiles/minimax_h3_fl2va*
       - workflows/templates/minimax_h3_fl2va*
@@ -556,10 +656,41 @@ categories:
       - src/ai_video/provider_console.py
       - src/ai_video/provider_console_continuity.py
       - tests/test_provider_console.py
-      - provider-console/**
+      - provider-console/scripts/runs-api.mjs
+      - provider-console/tests/runs-api.test.mjs
     check_ids:
       - provider_console_python_tests
       - provider_console_node_tests
+      - task_architecture_gate
+  provider_console_web:
+    patterns:
+      - provider-console/src/**
+    check_ids:
+      - provider_console_node_tests
+      - provider_console_web_build
+      - task_architecture_gate
+  provider_console_web_tests:
+    patterns:
+      - provider-console/tests/continuity-review-contract.test.mjs
+      - provider-console/tests/continuity-review.test.mjs
+    check_ids:
+      - provider_console_node_tests
+      - task_architecture_gate
+  provider_console_sites:
+    patterns:
+      - provider-console/.npmrc
+      - provider-console/.openai/**
+      - provider-console/index.html
+      - provider-console/package.json
+      - provider-console/package-lock.json
+      - provider-console/public/**
+      - provider-console/vite.config.mjs
+      - provider-console/scripts/prepare-sites-build.mjs
+      - provider-console/tests/sites-worker.test.mjs
+      - provider-console/worker/**
+    check_ids:
+      - provider_console_sites_build
+      - provider_console_sites_tests
       - task_architecture_gate
   agent_memory_dev_tool:
     # Local, read-only RAG over docs/record_for_agent/. Dev / Codex
@@ -569,20 +700,27 @@ categories:
       - scripts/agent_memory.py
       - tests/test_agent_memory.py
     check_ids:
-      - full_tests
+      - agent_memory_tests
       - task_architecture_gate
   control_plane:
     patterns:
       - AGENTS.md
       - .gitattributes
+      - .gitignore
+      - .claude/settings/*.json
+      - .codex/.gitignore
+      - .codex/config.toml
       - .codex/hooks.json
+      - .mcp.json
       - .agents/skills/**
       - skills-lock.json
+      - provider-console/.gitignore
       - docs/agent-primary-contract-matrix.md
       - .agent/context/control-plane-playbook.md
       - .agent/context/session-handoff.md
       - .agent/bug-memory/**
       - .agent/harness/policy.yaml
+      - scripts/__init__.py
       - tests/test_record_ai_video_session_hook.py
     check_ids:
       - harness_tests

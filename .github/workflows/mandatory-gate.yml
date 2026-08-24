@@ -34,6 +34,40 @@ jobs:
       - name: Install test dependencies
         run: python -m pip install -e ".[dev]"
 
+      - name: Inspect exact PR routes
+        id: harness-routes
+        shell: bash
+        run: |
+          set -o pipefail
+          python scripts/agent_harness.py inspect \
+            --base-ref "${BASE_SHA}" \
+            --head-ref "${HEAD_SHA}" \
+            | tee "${RUNNER_TEMP}/harness-inspection.json"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report = json.loads(
+              (Path(os.environ["RUNNER_TEMP"]) / "harness-inspection.json")
+              .read_text(encoding="utf-8")
+          )
+          required = bool(report["npm_workspace_dependency_paths"])
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              print(f"npm_dependencies={'true' if required else 'false'}", file=output)
+          PY
+
+      - name: Set up Node
+        if: steps.harness-routes.outputs.npm_dependencies == 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22.21.0"
+          package-manager-cache: false
+
+      - name: Install Provider Console test dependencies
+        if: steps.harness-routes.outputs.npm_dependencies == 'true'
+        run: npm ci --ignore-scripts --prefix provider-console
+
       - name: Audit Harness policy
         shell: bash
         run: |

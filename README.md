@@ -131,7 +131,7 @@ make harness-verify
 # 已提交后验证 exact commit range；HEAD_REF 默认且必须解析到当前 HEAD
 make harness-verify-range BASE_REF=HEAD^
 
-# 校验 receipt self-hash、policy hash 与当前 commit/snapshot freshness
+# 校验 receipt self-hash、artifacts、exact policy/scope/routing/check records 与当前 snapshot freshness
 make harness-receipt RECEIPT=.agent/harness/runs/<run_id>/receipt.json
 
 # 检查 owned source/test/workflow 是否存在 policy 漏路由
@@ -152,9 +152,11 @@ python scripts/agent_harness.py inspect \
   --path tests/test_cli.py
 ```
 
-Harness 按 changed-path category 合并 required checks；shared Production owners 路由到完整 Production suite + Legacy CLI/config isolation，任何未映射路径 fail safe 到完整 pytest suite与task-delta Architecture Gate。Check subprocess 使用 argv + `shell=False` 和 timeout；credential/proxy/tool-injection env 不继承，pytest Python process拒绝 non-loopback address-bearing socket/DNS API。这个 guard不隔离 pytest 启动的 subprocess，policy因此不得把可能联网的 child executable列为默认 check。Repository historical Architecture Gate baseline是单独 health signal，不污染 task receipt。P6 Review/Repair是产品 runtime QA surface，与这个开发 Harness不同。
+Harness 按 changed-path category 合并 required checks，并按显式 priority 先运行scope diff、documentation contract与task-delta Architecture Gate，再运行较昂贵的behavioral suites。Shared Production owners仍路由到完整Production suite + Legacy CLI/config isolation；任何未映射路径fail safe到完整pytest suite与task-delta Architecture Gate。完整pytest在同一exact-snapshot run通过后，可以显式覆盖并跳过其真正包含的focused Python suites；Node/build等非pytest checks不被该coverage吞并，所有selected checks与same-run skip依据仍写入receipt。Provider Console按bridge、web与Sites/Worker分路由：bridge运行Python + Node contracts，web source运行Node contracts及`npm exec --offline` client compile，只有bundle/package/Worker/Sites相关路径运行完整Sites build及worker test。
 
-`.github/workflows/mandatory-gate.yml` 定义 targeting `main` 的 pull request gate，稳定 check context 为 `mandatory-gate / verify`。它以 `permissions: contents: read` checkout exact PR head、保留 full history 且不持久化 credential，然后用 GitHub event 提供的 exact base/head SHA 运行 `make harness-audit` 与 `make harness-verify-range`。Receipt、每个 check 的 stdout/stderr、pytest JUnit 和 workflow logs 都由 GitHub runner 本轮生成并上传；CI 不读取 Provider secret，也不运行 live Provider、ComfyUI 或付费 smoke，开发者提交的本地 receipt不构成 CI proof。
+`verify-receipt`不会只相信`status=passed`：它从receipt绑定的commit或staged index重新加载exact policy、重算changed paths、categories、fallback与ordered check selection，并逐项验证record order、argv、cwd、result、same-run coverage、artifact bytes、workspace stability与current snapshot。Check subprocess使用argv + `shell=False`和timeout；credential/proxy/tool-injection env不继承，pytest Python process拒绝non-loopback address-bearing socket/DNS API。这个guard不为pytest child process或Node/npm command提供OS级network namespace，policy因此不得把可能联网的executable列为默认check；当前Provider Console checks只消费repository code/fixtures。Node checks需要source checkout已有`npm ci`生成的`provider-console/node_modules`；Harness验证其installed lock与exact snapshot `package-lock.json`一致后，只在detached checkout创建临时symlink，Harness本身不安装依赖。Repository historical Architecture Gate baseline是单独health signal，不污染task receipt。P6 Review/Repair是产品runtime QA surface，与这个开发Harness不同。
+
+`.github/workflows/mandatory-gate.yml` 定义 targeting `main` 的 pull request gate，稳定 check context 为 `mandatory-gate / verify`。它以 `permissions: contents: read` checkout exact PR head、保留 full history 且不持久化 credential，安装Python dev dependencies，并先inspect exact base/head routing；只有selected checks声明Node workspace dependency时，才以pinned Node `22.21.0`执行lockfile-bound `npm ci --ignore-scripts`。随后用GitHub event提供的exact base/head SHA运行`make harness-audit`与`make harness-verify-range`。Receipt、每个check的stdout/stderr、pytest JUnit和workflow logs都由GitHub runner本轮生成并上传；CI不读取Provider secret，也不运行live Provider、ComfyUI或付费smoke，开发者提交的本地receipt不构成CI proof。
 
 Workflow 文件本身或 workflow-only push 不是 server enforcement。真正保护 `main` 还要求 active GitHub ruleset：必须通过 pull request、required status `mandatory-gate / verify`、branch up to date、禁止 force push 与 deletion，且没有普通 bypass。远端完成状态应通过 GitHub API 同时验证 successful workflow run/check、ruleset enforcement 以及 `main` protection/ruleset truth。
 
