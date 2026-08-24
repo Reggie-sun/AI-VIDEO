@@ -57,6 +57,7 @@ class M0AcceptedUpstreamSnapshot:
     source_generation_id: str
     source_request_input_hash: str
     source_resolved_generation_hash: str
+    source_execution_stack_hash: str
     source_provenance_receipt_id: str
     source_provenance_receipt_sha256: str
     source_p6_acceptance_evidence_id: str
@@ -71,7 +72,11 @@ class M0AcceptedUpstreamSnapshot:
 
 
 class M0AcceptedUpstreamReopener(Protocol):
-    """Reopen canonical P6/extraction/materialization evidence without writing."""
+    """Reopen canonical generation/P6/derivation evidence without writing.
+
+    The returned source execution stack must come from the reopened canonical
+    source generation request, not from the destination request or P0 policy.
+    """
 
     def __call__(
         self,
@@ -284,6 +289,8 @@ class M0QualificationOutcome:
 
 def _expected_upstream_snapshot(
     request: ResolvedVideoGenerationRequest | Any,
+    *,
+    source_execution_stack_hash: str,
 ) -> M0AcceptedUpstreamSnapshot:
     terminal = request.c4_multi_anchor_binding.terminal
     tail = request.c4_multi_anchor_binding.motion_tail
@@ -299,6 +306,7 @@ def _expected_upstream_snapshot(
             source_generation_id=tail.source_generation_id,
             source_request_input_hash=tail.source_request_input_hash,
             source_resolved_generation_hash=tail.source_resolved_generation_hash,
+            source_execution_stack_hash=source_execution_stack_hash,
             source_provenance_receipt_id=tail.source_provenance_receipt_id,
             source_provenance_receipt_sha256=(
                 tail.source_provenance_receipt_sha256
@@ -545,7 +553,10 @@ class M0QualificationCaller:
                 source_video_asset_id=binding.terminal.source_video_asset_id,
                 motion_tail_asset_id=binding.motion_tail.extracted_asset_id,
             )
-            expected_upstream = _expected_upstream_snapshot(request)
+            expected_upstream = _expected_upstream_snapshot(
+                request,
+                source_execution_stack_hash=snapshot.source_execution_stack_hash,
+            )
         except (AiVideoError, AttributeError, KeyError, OSError, ValueError) as exc:
             raise _invalid(
                 "M0 accepted upstream source video lineage is not active or exact.",

@@ -293,6 +293,7 @@ class _Case:
     payloads: dict[str, bytes]
     upstream_snapshot: M0AcceptedUpstreamSnapshot
     sources: Any
+    project: Any
 
 
 def _make_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Case:
@@ -360,6 +361,7 @@ def _make_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Case:
         source_generation_id=tail.source_generation_id,
         source_request_input_hash=tail.source_request_input_hash,
         source_resolved_generation_hash=tail.source_resolved_generation_hash,
+        source_execution_stack_hash=source_stack.execution_stack_hash,
         source_provenance_receipt_id=tail.source_provenance_receipt_id,
         source_provenance_receipt_sha256=tail.source_provenance_receipt_sha256,
         source_p6_acceptance_evidence_id=tail.source_p6_acceptance_evidence_id,
@@ -523,6 +525,7 @@ def _make_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Case:
         payloads,
         upstream_snapshot,
         sources,
+        active_project,
     )
 
 
@@ -618,6 +621,7 @@ def test_upload_uses_pre_permit_immutable_validated_bytes(
         "order",
         "anchor_lineage",
         "source_lineage",
+        "source_generation_stack",
         "missing_p6",
         "p6_evidence",
         "extraction_evidence",
@@ -678,6 +682,11 @@ def test_pre_effect_denials_are_zero_write(
         case.request.image_bindings[0].asset_sha256 = "9" * 64
     elif drift == "source_lineage":
         case.request.c4_multi_anchor_binding.motion_tail.source_video_sha256 = "9" * 64
+    elif drift == "source_generation_stack":
+        case.project.accepted_upstream = replace(
+            case.project.accepted_upstream,
+            source_execution_stack_hash="9" * 64,
+        )
     elif drift == "missing_p6":
         del case.request.c4_multi_anchor_binding.motion_tail.source_p6_acceptance_evidence_id
     elif drift == "p6_evidence":

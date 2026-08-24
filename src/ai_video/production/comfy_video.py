@@ -276,21 +276,33 @@ def load_local_video_execution_profile(
     path: str | Path, *, artifact_root: str | Path
 ) -> LocalVideoExecutionProfile | LocalVideoQualityExecutionProfile:
     try:
-        payload = json.loads(Path(path).read_bytes())
-        if not isinstance(payload, dict):
-            raise ValueError("profile payload must be a JSON object")
-        profile_type = (
-            LocalVideoQualityExecutionProfile
-            if payload.get("schema_version") == "2"
-            else LocalVideoExecutionProfile
-        )
-        profile = profile_type.model_validate(payload)
-    except (OSError, ValueError) as exc:
+        payload = Path(path).read_bytes()
+    except OSError as exc:
         raise _invalid("Local video execution profile is invalid.", str(exc)) from exc
+    profile = load_local_video_execution_profile_bytes(payload)
     root = Path(artifact_root).resolve(strict=True)
     _read_exact(root, profile.workflow_path, profile.workflow_sha256, "H3 workflow")
     _read_exact(root, profile.binding_path, profile.binding_sha256, "H3 binding")
     return profile
+
+
+def load_local_video_execution_profile_bytes(
+    payload: bytes,
+) -> LocalVideoExecutionProfile | LocalVideoQualityExecutionProfile:
+    """Parse and validate one immutable local-profile byte snapshot."""
+
+    try:
+        raw = json.loads(payload)
+        if not isinstance(raw, dict):
+            raise ValueError("profile payload must be a JSON object")
+        profile_type = (
+            LocalVideoQualityExecutionProfile
+            if raw.get("schema_version") == "2"
+            else LocalVideoExecutionProfile
+        )
+        return profile_type.model_validate(raw)
+    except (UnicodeError, ValueError) as exc:
+        raise _invalid("Local video execution profile is invalid.", str(exc)) from exc
 
 
 def _load_binding(payload: bytes) -> LocalVideoBinding:
@@ -355,6 +367,19 @@ def _validate_workflow(
         )
     ):
         raise _invalid("Local H3 workflow bindings or native settings changed.")
+
+
+def validate_local_video_execution_sources(
+    *,
+    profile: LocalVideoExecutionProfile,
+    workflow: dict[str, Any],
+    binding_payload: bytes,
+) -> LocalVideoBinding:
+    """Purely validate the sealed local workflow and binding semantics."""
+
+    binding = _load_binding(binding_payload)
+    _validate_workflow(profile, workflow, binding)
+    return binding
 
 
 def render_h3_workflow(
@@ -501,8 +526,11 @@ class ComfyUIVideoProvider:
         if not workflow_payload:
             raise _invalid("Local H3 workflow is empty.")
         self._workflow = load_workflow_template(self._root / profile.workflow_path)
-        self._binding = _load_binding(binding_payload)
-        _validate_workflow(profile, self._workflow, self._binding)
+        self._binding = validate_local_video_execution_sources(
+            profile=profile,
+            workflow=self._workflow,
+            binding_payload=binding_payload,
+        )
         self._poll_interval_seconds = poll_interval_seconds
         self._timeout_seconds = timeout_seconds
         self._preflighted: set[str] = set()

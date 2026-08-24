@@ -130,11 +130,23 @@ def _fail(message: str, detail: str | None = None) -> AiVideoError:
 def load_workflow_template(path: str | Path) -> dict[str, Any]:
     template_path = Path(path)
     try:
-        raw = json.loads(template_path.read_text(encoding="utf-8"))
+        payload = template_path.read_bytes()
     except OSError as exc:
         raise _fail(f"Could not read workflow template: {template_path}", str(exc)) from exc
-    except json.JSONDecodeError as exc:
-        raise _fail(f"Workflow template is not valid JSON: {template_path}", str(exc)) from exc
+    return load_workflow_template_bytes(payload, source=str(template_path))
+
+
+def load_workflow_template_bytes(
+    payload: bytes,
+    *,
+    source: str = "<bytes>",
+) -> dict[str, Any]:
+    """Parse one immutable workflow byte snapshot through the standard loader."""
+
+    try:
+        raw = json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise _fail(f"Workflow template is not valid JSON: {source}", str(exc)) from exc
 
     if _looks_like_api_workflow(raw):
         return raw

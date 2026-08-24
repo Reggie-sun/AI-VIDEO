@@ -9,6 +9,8 @@ import pytest
 
 from ai_video.errors import AiVideoError
 import ai_video.production.shot_continuity_m0_qualification as m0_qualification
+import ai_video.production.shot_continuity_source_stack as source_stack_module
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production.shot_continuity_m0_qualification import (
     M0QualificationCompileInputs,
     compile_m0_qualification_workflow,
@@ -135,6 +137,107 @@ def test_source_stack_rejects_profile_or_identity_drift(tmp_path: Path) -> None:
     )
     with pytest.raises(AiVideoError, match="exact execution sources"):
         validate_shot_continuity_source_stack(sources, changed)
+
+
+@pytest.mark.parametrize("drift", ("workflow", "binding"))
+def test_source_stack_rejects_internally_resealed_semantic_drift(
+    tmp_path: Path,
+    drift: str,
+) -> None:
+    profile = json.loads(
+        (REPO_ROOT / "workflows/profiles/minimax_h3_fl2va_quality.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    workflow = json.loads((REPO_ROOT / profile["workflow_path"]).read_text())
+    binding = (REPO_ROOT / profile["binding_path"]).read_text(encoding="utf-8")
+    if drift == "workflow":
+        workflow["8"]["inputs"]["sampler_name"] = "euler"
+    else:
+        binding = binding.replace(
+            'prompt: ["5", "inputs", "prompt"]',
+            'prompt: ["6", "inputs", "noise_seed"]',
+        )
+
+    workflow_path = tmp_path / profile["workflow_path"]
+    binding_path = tmp_path / profile["binding_path"]
+    profile_path = tmp_path / "workflows/profiles/source.json"
+    workflow_path.parent.mkdir(parents=True)
+    binding_path.parent.mkdir(parents=True)
+    profile_path.parent.mkdir(parents=True)
+    workflow_payload = json.dumps(workflow).encode()
+    binding_payload = binding.encode()
+    workflow_path.write_bytes(workflow_payload)
+    binding_path.write_bytes(binding_payload)
+    profile["workflow_sha256"] = hashlib.sha256(workflow_payload).hexdigest()
+    profile["binding_sha256"] = hashlib.sha256(binding_payload).hexdigest()
+    profile["profile_content_hash"] = canonical_sha256(
+        {key: value for key, value in profile.items() if key != "profile_content_hash"}
+    )
+    profile_path.write_text(json.dumps(profile), encoding="utf-8")
+
+    with pytest.raises(AiVideoError, match="topology|bindings|settings"):
+        load_shot_continuity_source_execution_sources(
+            artifact_root=tmp_path,
+            profile_path=profile_path,
+        )
+
+
+def test_source_stack_validates_and_seals_the_same_reopened_bytes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile_relative = Path("workflows/profiles/minimax_h3_fl2va_quality.json")
+    profile_path = tmp_path / profile_relative
+    profile_bytes = (REPO_ROOT / profile_relative).read_bytes()
+    profile = json.loads(profile_bytes)
+    workflow_path = tmp_path / profile["workflow_path"]
+    binding_path = tmp_path / profile["binding_path"]
+    compiler_path = tmp_path / "compiler.py"
+    workflow_bytes = (REPO_ROOT / profile["workflow_path"]).read_bytes()
+    binding_bytes = (REPO_ROOT / profile["binding_path"]).read_bytes()
+    for path, payload in (
+        (profile_path, profile_bytes),
+        (workflow_path, workflow_bytes),
+        (binding_path, binding_bytes),
+    ):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(payload)
+    compiler_path.write_bytes(Path(source_stack_module.comfy_video.__file__).read_bytes())
+    monkeypatch.setattr(
+        source_stack_module.comfy_video,
+        "__file__",
+        str(compiler_path),
+    )
+
+    original_read = source_stack_module._read_regular_file_nofollow
+    replaced: set[Path] = set()
+
+    def replace_after_read(path: Path, **kwargs: object) -> object:
+        snapshot = original_read(path, **kwargs)
+        resolved = Path(path).resolve()
+        if resolved == profile_path.resolve() and resolved not in replaced:
+            profile_path.write_text("{}", encoding="utf-8")
+            replaced.add(resolved)
+        elif resolved == workflow_path.resolve() and resolved not in replaced:
+            workflow_path.write_text("{}", encoding="utf-8")
+            replaced.add(resolved)
+        return snapshot
+
+    monkeypatch.setattr(
+        source_stack_module,
+        "_read_regular_file_nofollow",
+        replace_after_read,
+    )
+
+    sources = load_shot_continuity_source_execution_sources(
+        artifact_root=tmp_path,
+        profile_path=profile_path,
+    )
+
+    assert sources.materialization.workflow_bytes == workflow_bytes
+    assert sources.profile.profile_content_hash == profile["profile_content_hash"]
+    assert replaced == {profile_path.resolve(), workflow_path.resolve()}
 
 
 def test_m0_profile_seals_exact_live_node_schemas() -> None:

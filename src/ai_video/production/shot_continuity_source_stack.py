@@ -11,7 +11,7 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production import comfy_video
 from ai_video.production.comfy_video import (
     LocalVideoQualityExecutionProfile,
-    load_local_video_execution_profile,
+    load_local_video_execution_profile_bytes,
 )
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.paths import _read_regular_file_nofollow
@@ -21,6 +21,7 @@ from ai_video.production.video_execution_stack import (
     RuntimeSeal,
     StackComponentIdentity,
 )
+from ai_video.workflow_loader import load_workflow_template_bytes
 
 
 SOURCE_PROFILE_PATH = Path("workflows/profiles/minimax_h3_fl2va_quality.json")
@@ -83,10 +84,7 @@ def load_shot_continuity_source_execution_sources(
             requested_profile.resolve(strict=True),
             contained_by=root,
         )
-        profile = load_local_video_execution_profile(
-            requested_profile,
-            artifact_root=root,
-        )
+        profile = load_local_video_execution_profile_bytes(profile_snapshot.data)
         if not isinstance(profile, LocalVideoQualityExecutionProfile):
             raise ValueError("source profile must be the quality FL2VA lane")
         workflow_bytes = _read_exact(
@@ -100,6 +98,14 @@ def load_shot_continuity_source_execution_sources(
             profile.binding_path,
             profile.binding_sha256,
             "binding",
+        )
+        comfy_video.validate_local_video_execution_sources(
+            profile=profile,
+            workflow=load_workflow_template_bytes(
+                workflow_bytes,
+                source=str(profile.workflow_path),
+            ),
+            binding_payload=binding_bytes,
         )
         compiler_snapshot = _read_regular_file_nofollow(
             Path(comfy_video.__file__).resolve(strict=True),
