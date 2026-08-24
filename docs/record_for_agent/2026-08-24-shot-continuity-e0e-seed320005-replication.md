@@ -1,15 +1,18 @@
-# Shot Continuity E0-E Seed Replication And E0-F Turbo4 Quick Validation Record
+# Shot Continuity E0-E, E0-F And E0-G Seed Replication Record
 
 Date: 2026-08-24
 
+Updated: 2026-08-25
+
 ## Purpose
 
-本文记录两项必须分开的 Local MiniMax H3 T8 development effects：
+本文记录三项必须分开的 Local MiniMax H3 T8 development effects：
 
 1. E0-E 原计划只把 E0-D seed 从 `320001` 改为 `320005`，用于验证 early-stop schedule 的 seed-to-seed reproducibility；
 2. E0-E 运行中，用户明确改为“把画质调低一点快速验证”，因此 E0-E 被 targeted cancel，随后以独立 E0-F identity 运行 T8 upstream 4-step Turbo quick mode。
+3. 用户确认继续后，以新的 E0-G identity 重新执行 Stock20、no-LoRA、`1344x768`、seed `320005` strict replication，避免 blind resume 已取消的 E0-E。
 
-E0-E 没有完成 seed-only replication，不能给出 replication PASS/STOP。E0-F 只提供低分辨率 Turbo4 的方向性 schedule evidence；它不是 E0-D replication、Production qualification、P6、Final Acceptance、active capability、canonical reference 或 release evidence。
+E0-E 没有完成 seed-only replication，不能给出 replication PASS/STOP。E0-F 只提供低分辨率 Turbo4 的方向性 schedule evidence。E0-G 才是对 E0-D frozen generation surfaces 的 seed-only replication；其 PASS 仍不是 Production qualification、P6、Final Acceptance、active capability、canonical reference 或 release evidence。
 
 ## Preflight And Evidence Boundary
 
@@ -194,6 +197,121 @@ Decoded audio 的 7 个 seam single-sample derivative percentiles依次为约：
 
 `cosine_bridge` 没有产生异常 single-sample click；最后一个 RMS ratio 同样受 quiet hold window 放大。Ambience texture/loudness 是否在原速试听中暴露分段，仍需用户判断。
 
+## E0-G Strict Stock20 Seed Replication
+
+用户以 `go` 明确授权继续严格 replication 后，本轮没有 resume 或 retry 已取消的 E0-E，而是创建新的 E0-G development identity：
+
+- chain ID: `shot_continuity_e0g_seed_replication_v1_seed320005_20260825`
+- client ID: `shot-continuity-e0g-seed-replication-v1-seed320005-20260825`
+- filename prefix: `development_experiment/shot_continuity_e0g_seed_replication_v1_seed320005_20260825`
+- compact request SHA-256: `78311e598bda492a3bf89c1dfce49d224151b0bc8652f1f7f73995420a27d2f3`
+- initial prompt ID: `a7b27755-0f69-4557-b48c-a88ebfc5b08e`
+- background job ID: `80a4d815-93f7-46f6-8e3c-5df57ec7f54b`
+
+相对 E0-D compact request 的 structural diff 精确只有：
+
+- `client_id`
+- `prompt["6"].inputs.chain_id`
+- `prompt["7"].inputs.base_seed`: `320001 -> 320005`
+- `prompt["17"].inputs.filename_prefix`
+
+删除这四个允许变化的 fields 后，两份 request逐字节相同；四类 prompt UTF-8 bytes SHA-256 仍分别为 `f2e18a...884d`、`ad5b90...bfb7ee`、`417589...fe7a8d` 与 `bbf3e4...39fa37`。因此 resolution、steps、sampler/scheduler、shift、reference、identity strategy、persistent interval、latent context、duration、CRF、schedule、composition与 no-retry/no-fallback surfaces 均保持 E0-D frozen contract。
+
+本次 supervised ComfyUI unit 为：
+
+```text
+ai-video-comfyui-d152065c31c445f98b3a5aed2dae77a5.service
+```
+
+submit 前 chain filesystem 不存在、runtime state 为 `idle`、queue 为 `0/0`。唯一 submit 后，全部后续 prompts均由同一 background job确定性推进；没有 second submit、retry、fallback、resume 或 selective repair。完成验证后 queue 再次为 `0/0`，unit 已停止且 `127.0.0.1:8188` 不再监听。
+
+### Runtime Result
+
+- state: `completed`
+- accepted segments: `8`
+- accepted frames: `770`
+- retry: `0`
+- fallback: `0`
+- video span: `32.083333 s`
+- container/audio duration: `32.084 s`
+- submit-to-completed elapsed: about `55m05s`
+
+Exact assembled artifact：
+
+```text
+/home/reggie/ComfyUI/output/minimax_h3_t8_long_video/shot_continuity_e0g_seed_replication_v1_seed320005_20260825/assembled/development_experiment_shot_continuity_e0g_seed_replication_v1_s_7371f6709d0f_r0008_cosine_bridge.mp4
+```
+
+- file SHA-256: `321a3bdcdd2c028eb554e130e7b0c6904b7e69b92b547204e7f04784d5aafc74`
+- file size: `18,345,451` bytes
+- Manifest SHA-256: `faa1f810995b89927755b503f986e2e5a042b158d425ffbaee694a3b91f34995`
+- H.264 High、`1344x768`、24 fps、exact `770` decoded frames
+- AAC LC、32 kHz、stereo
+- Manifest audio samples: `1,026,667`
+
+final video/audio full decode 均通过。Manifest 中 8 个 accepted MP4 与 7 个 non-final context artifacts 的 SHA-256 全部重验一致。Project-local `video-analysis` 返回 17 个 2-second samples、audio present、single scene、无 detected hard cut。
+
+### Motion And Replication Verdict
+
+Farneback implementation 先用 E0-D segment 0 复算得到 exact recorded denominator `1.2522561546`，确认使用 `336x192`、`INTER_LINEAR`、grayscale与原 parameters；随后对 E0-G 全部 accepted segments 使用同一 measurement：
+
+| Segment | Frames | MAD mean | Median-flow mean | P90 | Third means | Scheduled state |
+| ---: | ---: | ---: | ---: | ---: | --- | --- |
+| 0 | 124 | `10.2555` | `1.5840` | `2.1593` | `1.8680 / 1.6904 / 1.1935` | steady |
+| 1 | 102 | `8.8776` | `0.9969` | `1.3144` | `1.0678 / 0.9482 / 0.9741` | steady |
+| 2 | 102 | `8.5474` | `0.8890` | `1.2296` | `0.9374 / 0.8742 / 0.8544` | steady |
+| 3 | 102 | `9.2240` | `0.8492` | `1.1768` | `0.8649 / 0.8446 / 0.8377` | steady |
+| 4 | 102 | `12.0975` | `1.2852` | `2.0383` | `0.9109 / 1.2976 / 1.6581` | steady |
+| 5 | 102 | `13.1415` | `1.3544` | `1.7754` | `1.5102 / 1.3583 / 1.1899` | decelerate early |
+| 6 | 102 | `7.7558` | `0.5995` | `1.2364` | `1.1109 / 0.5888 / 0.0837` | stop and hold |
+| 7 | 34 | `0.7051` | `0.0199` | `0.0405` | `0.0294 / 0.0145 / 0.0157` | settled hold |
+
+Early retention relative to同一次 E0-G segment 0：
+
+- segment 1: `0.6294`
+- segment 2: `0.5613`
+
+两者均超过 `0.50`。1 fps contact sheet显示同一 East Asian woman、short black bob、beige trench coat、red satchel与screen-right gait；背景从立柱/信息屏持续推进至开放站台轨道区，early gate `PASS`。
+
+Stop/hold evidence：
+
+- segment 5 thirds `1.5102 -> 1.3583 -> 1.1899`，后段开始减速。
+- segment 6 halves为 `0.9972 / 0.1939`，最后 10 frame-pairs为 `0.0140`。
+- segment 7 halves为 `0.0248 / 0.0146`，最后 10 frame-pairs为 `0.0162`。
+- 24--32 s、2 fps strip显示最后一步在 segment 6 中点附近完成；随后人物保持同一 screen-right朝向与站定位置，segment 7未见步态重启、滑移或重新跟拍。
+
+E0-D segment 6 thirds为 `0.6511 / 0.3439 / 0.0525`、segment 7为 `0.0119 / 0.0079 / 0.0049`；E0-G absolute motion不是 byte-equivalent，但复现了相同的“walking retained -> mid-segment stop -> settled hold”shape。因此 E0-G technical / automated replication verdict 为 `PASS`。逐帧/strip AI visual assessment同样为 `PASS`；用户 full-speed subjective acceptance仍独立 pending。
+
+### Seam And Audio Evidence
+
+Visual boundary pair相对前后各 20 个 non-boundary pairs median：
+
+| Seam time | Absolute flow | Flow ratio | Absolute MAD | MAD ratio |
+| ---: | ---: | ---: | ---: | ---: |
+| `5.1667 s` | `1.3858` | `1.2406x` | `11.5751` | `1.4610x` |
+| `9.4167 s` | `1.1994` | `1.2280x` | `11.4106` | `1.3550x` |
+| `13.6667 s` | `1.1704` | `1.3946x` | `11.5133` | `1.4479x` |
+| `17.9167 s` | `1.0073` | `1.2262x` | `11.6134` | `1.2375x` |
+| `22.1667 s` | `2.3936` | `1.5670x` | `20.5983` | `1.5261x` |
+| `26.4167 s` | `1.2869` | `1.1101x` | `13.9499` | `1.1275x` |
+| `30.6667 s` | `0.0624` | `2.8543x` | `3.2458` | `5.3133x` |
+
+最后一条 ratio仍由近零 hold baseline放大。七组 paired frames保持人物、wardrobe、satchel、station family与screen direction，没有 hard cut、teleport、pose reset或gross identity regression；`22.1667 s` boundary pulse最大，原速是否可感知仍需用户判断。
+
+Decoded audio seam single-sample derivative local-percentiles为：
+
+```text
+18.13 / 8.47 / 0.16 / 2.06 / 3.09 / 5.27 / 0.31
+```
+
+20 ms前后 RMS ratios为：
+
+```text
+1.3447x / 1.2580x / 1.0603x / 1.3327x / 1.0504x / 1.0561x / 1.0589x
+```
+
+没有 click-like single-sample discontinuity；ambience texture是否在原速听感中暴露分段，仍属于 subjective review。
+
 ## Why E0-D Evidence Is Unchanged
 
 E0-D exact MP4 在本轮结束时重新哈希，仍为：
@@ -202,25 +320,26 @@ E0-D exact MP4 在本轮结束时重新哈希，仍为：
 246dff16575421bbf1ab702ff1989d1c7de265935fb3a4ceeefe2903593dd480
 ```
 
-E0-E 与 E0-F 使用独立 chain IDs、Manifests、accepted artifacts 与 assembled outputs；没有读取 E0-D accepted segments进行补拼，没有修改、重命名或重新解释 E0-D bytes。E0-F 改变 resolution、LoRA、steps与CRF，所以它不能证明或推翻 E0-D Stock20 schedule 的 seed reproducibility。
+E0-E、E0-F 与 E0-G 均使用独立 chain IDs、Manifests、accepted artifacts 与 assembled outputs；没有读取 E0-D accepted segments进行补拼，没有修改、重命名或重新解释 E0-D bytes。E0-F 改变 resolution、LoRA、steps与CRF，所以它不能证明或推翻 E0-D Stock20 schedule 的 seed reproducibility；E0-G则以 seed-only frozen contract提供独立 replication evidence，但不改变 E0-D自身历史 verdict或bytes。
 
 ## Repository And Provider Effects
 
-Repository effect：只新增本 record。没有修改 E0-D record、Production code、runtime baseline、spec、plan、Harness policy、Manifest / Registry、canonical reference、push或release。运行期间其他窗口推进了 local `main` 并保留大量 staged/dirty work；这些 bytes 未被本记录修改、stage或认领。
+Repository effect：只新增并更新本 record。没有修改 E0-D record、Production code、runtime baseline、spec、plan、Harness policy、Manifest / Registry、canonical reference、push或release。运行期间其他窗口推进了 local `main` 并保留 unrelated dirty work；这些 bytes 未被本记录修改、stage或认领。
 
 Provider/media effects：
 
 - E0-E：一次 unique Local ComfyUI submit，1 个 accepted segment，1 个 targeted-interrupted segment，124-frame accepted-prefix partial；retry/fallback `0/0`。
 - E0-F：一次 unique Local ComfyUI submit，8 个 accepted segments与完整 770-frame Turbo4 quick-validation MP4；retry/fallback `0/0`。
+- E0-G：一次 unique Local ComfyUI submit，8 个 accepted segments与完整 770-frame Stock20 strict-replication MP4；retry/fallback `0/0`。
 - remote submit、paid effect、Production mutation与activation均为 `0`。
 
 ## Human Verdict And Next One Thing
 
-Human full-speed verdict仍为 pending。下一件事只有一项：用户以支持硬解和display-resample的播放器原速完整观看 exact E0-F MP4，重点判断：
+E0-F 与 E0-G 的 automated / sampled AI visual verdict均为 `PASS`；human full-speed subjective verdict仍为 pending。下一件事只有一项：用户原速完整观看 exact E0-G MP4，并在必要时与 E0-D 并排比较，重点判断：
 
-1. Turbo4 / `736x416` 的脸部、衣物、手脚与背景细节损失是否仍足以做方向性验证；
-2. segment 6 最后一步是否自然，而不是突然刹停或滑停；
-3. segment 7 是自然站定还是明显 frozen-image artifact；
-4. 七个 visual pulses 与 ambience changes 是否可接受。
+1. segment 6 最后一步是否自然，而不是突然刹停或滑停；
+2. segment 7 是自然站定还是明显 frozen-image artifact；
+3. `22.1667 s` boundary pulse与其他六个 visual seams是否在播放中可感知；
+4. ambience changes是否暴露分段。
 
-在该 human verdict 前，不把 E0-F 升级为 E0-E replication、Production qualification、P6、Final Acceptance、active capability或final delivery。若仍需要严格回答 E0-D schedule 的 seed reproducibility，必须在新的明确授权下创建新的 Stock20/no-LoRA/full-resolution chain；不得把已取消的 E0-E blind resume/retry，也不得用 E0-F 替代。
+当前技术证据支持 E0-G replication `PASS`，无需再 blind resume/retry E0-E，也不得用 E0-F替代该结论。在 human verdict 与独立 Production gates完成前，不把任何 development result升级为 Production qualification、P6、Final Acceptance、active capability、canonical reference或final delivery。
