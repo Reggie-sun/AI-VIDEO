@@ -31,3 +31,6 @@ args = [
     "/home/reggie/vscode_folder/AI-VIDEO",
 ]
 cwd = "/home/reggie/vscode_folder/MCP/mcp-server-codegraph"
+
+[mcp_servers.codegraph.env]
+CODEGRAPH_INDEX_PATH = "/home/reggie/vscode_folder/AI-VIDEO/.codegraph-cache/index.json"

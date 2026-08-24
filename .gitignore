@@ -14,5 +14,6 @@ runs/*
 node_modules/
 .hyperframes/
 .gstack/
+.codegraph-cache/
 # Local Agent Experience Memory index (rebuilt by scripts/agent_memory.py).
 .agent/memory/
