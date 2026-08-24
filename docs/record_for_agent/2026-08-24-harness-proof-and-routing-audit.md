@@ -224,3 +224,89 @@ Receipt environment fingerprint 也尚未绑定 Python dependency set、Node/npm
 - 本次没有安装dependency，没有运行live Provider、ComfyUI、Seedance、媒体生成或付费
   调用，也没有执行browser/manual visual QA。因此这些receipt只证明Harness自身的
   routing/proof correctness，不证明Production或creative acceptance。
+
+## Granularity Follow-up (Analysis Only)
+
+同日对当前 Harness 的进一步只读评估表明，策略仍值得按 canonical owner 与 failure
+mode 细分；目标不是建立第二套“快速 Harness”，而是让 exact scope 在进入 expensive
+suite 前先完成 mapping closure，并避免不同 domain 重复承担同一组 global lifecycle
+tests。本节只记录 proposed direction，尚未修改 policy、Harness implementation 或 tests。
+
+### Current bottleneck evidence
+
+- 对当前 staged scope
+  `src/ai_video/production/shot_continuity_m0_caller.py` 与
+  `tests/test_shot_continuity_m0_caller.py` 的 inspection 未命中 category，两条 path 均
+  fallback，最终选择 `scope_diff_check`、`docs_contract_check`、
+  `task_architecture_gate` 与 `full_tests`。
+- receipt
+  `.agent/harness/runs/shot-continuity-m0-qualification-caller-20260824-v1/receipt.json`
+  中，前三个 cheap gates 合计约 `695 ms`；`full_tests` 用时 `619852 ms`，结果为
+  `1 failed, 3357 passed, 4 skipped in 617.63s`。唯一 failure 是
+  `tests/test_agent_harness.py::test_repository_policy_audit_has_no_unmapped_owned_files`，
+  即 scope mapping 问题直到完整 Python suite 结束后才被发现。
+- 因而当前最明确的浪费不是“测试太多”本身，而是 completion scope 的 unmapped
+  failure 没有在 expensive checks 前 fail fast。
+
+### Proposed refinement order
+
+1. **P0 — mapping preflight first.** 在 expensive suite 前执行 exact
+   `scope_mapping_check`，或等价的 policy-audit preflight；只要 owned path 未映射就立即
+   fail closed。现有对应 audit testcase 约 `0.139 s`，但这是历史 JUnit timing，不是
+   本节新跑出的 benchmark。
+2. **P0 — add an owner-based M0 caller route.** 最小 focused bundle 应覆盖 caller 本身、
+   M0 validation、provider-neutral generation、local durable submit lifecycle 与 P0
+   qualification，候选 tests 为：
+   `tests/test_shot_continuity_m0_caller.py`、
+   `tests/test_shot_continuity_m0_validation.py`、
+   `tests/test_video_generation.py`、
+   `tests/test_production_local_video_state.py` 与
+   `tests/test_production_p0_qualification.py`。已有 JUnit timings 合计约 `13.6 s`；据此
+   估算 Harness wall time 可低于 `20 s`，相对 `619.852 s` 约减少 `97%`。这只是待用
+   fresh exact-snapshot receipt 验证的 estimate，不是已实现结果。
+3. **P1 — split shared state core from domain lifecycle owners.** 当前 composition/audio、
+   dependency、review 与 image routes 仍各自包含
+   `tests/test_production_state_commit.py`（约 `31.993 s`）和
+   `tests/test_production_state_recovery.py`（约 `223.413 s`）。建议由独立
+   `production_state_core_tests` 持有 generic transaction、schema 与 recovery invariants，
+   再由 video、image、review/repair、render/voice、dependency 与 P0 domain suites 各自覆盖
+   对应 lifecycle seam。按现有 JUnit 数据估算，composition、dependency、review、image
+   routes 可分别从约 `304/271/296/307 s` 降到约 `49/16-20/41/52 s`；这些同样是静态
+   timing projection，不是 fresh benchmark。
+4. **P2/P3 — refine Provider and quality lanes only after P0/P1.** Provider 可再区分 paid
+   remote、local Comfy/T8/H3 与 generated-video lifecycle；Seedance capability/profile
+   可成为 focused contract lane。Quality Intelligence 可区分 capture 与 passive
+   model/store/dataset/RAG/isolation。continuity evaluator/reviewer 仍属于 review owner，
+   不应复制整套 Provider suite。
+
+### Required guardrails
+
+- 细分单位必须是 canonical owner、contract seam 与 failure mode，不是单个 model、workflow
+  或任意文件名；fallback 对未知 owned path 必须保留。
+- 不使用易漂移的 `pytest -k` 猜测来证明 completion，不建立可绕过完整 proof 的第二个
+  fast Harness。
+- shared schema、generic transaction/recovery 或真正跨 domain 的变更仍需运行 state core
+  heavy suite；移除 global lifecycle tests 前，必须先有 domain-equivalent failure-path
+  coverage。
+- 每次 policy refinement 都必须通过 exact staged/commit-range inspection、policy audit、
+  representative path matrix 与同一 run 的 coverage closure 验证；历史 timing 只用于选择
+  优先级，不能替代 fresh receipt。
+
+### External exploration outcome
+
+- 本轮 external explorer 使用 `Role=explorer`、read-only Harness granularity scope，runner
+  为 `MiniMax-M3` high，transport 为 external Claude CLI via MiniMax。
+- 原始 runner status 为 `error`，`agent_status=PROTOCOL_ERROR`；其内嵌报告尝试返回
+  `DONE_WITH_CONCERNS`，但同时给出 non-empty `questions`，违反 runner protocol。一次 bounded
+  fresh retry 在修正该要求后仍以 `error_max_structured_output_retries` 结束。Parent 仅采用
+  自己能由 receipt、JUnit timing、policy/source 与 codegraph 复核的 evidence，没有把该
+  subagent output 当作 completion proof，也没有再做 native duplicate fallback。
+- 自动诊断 capture 位于
+  `/home/reggie/.codex/session-diagnostics/minimax/01a02ed6-36fe-7923-bc1e-4f1aa6bc6d3d-f9e27f42d5896320.md`。
+
+### Follow-up non-claims
+
+- 本节没有实施上述 P0/P1/P2/P3，没有改变任何 runtime、Harness、policy、test 或 Provider
+  contract，也没有创建 spec / plan。
+- 本节没有为写记录而追加 pytest、Harness、Provider、ComfyUI、Seedance、媒体、网络或付费
+  调用；所有数字均来自已存在的 exact receipt / JUnit evidence 与静态分析。
