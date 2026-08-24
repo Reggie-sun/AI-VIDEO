@@ -4,32 +4,35 @@ Date: 2026-08-24
 
 ## Purpose
 
-本文记录 Shot Continuity Phase P1 的五个 candidate-neutral checkpoint：M0 request-level
+本文记录 Shot Continuity Phase P1 的六个 candidate-neutral checkpoint：M0 request-level
 pre-submit identity guard、C4对model-native exact frame-count timing的provider-neutral表达、
 live node-schema materialization与execution-stack reseal closure，以及qualification-only caller的
-完整pre-effect denial seam与content-addressed M0 seed seal。
+完整pre-effect denial seam、content-addressed M0 seed seal与independent source execution stack closure。
 
 本记录不证明 M0 已提交、视频已生成、candidate winner、active capability、P6 verdict、creative PASS、
 Final Acceptance、push或release。
 
 ## Current Runtime Truth
 
-selected rainy-station bundle位于
-`runs/shot-continuity-rainy-station-p0-20260823-v5/production`。Manifest revision `7`现在选择
-M0 stack `a3711dbfee67be30549ec3d787bd76cd750eb36b5580955ed69368dcdd302230`与receipt
-`d1af93a23feceab1bb88c6988bf14cd768a5ddf12c2514c743ff4eb80645d981`。profile/compiler/workflow
-hashes分别为`87871386bc0481569586eee5d7822d5ba0d204ac1a69e73d714d6ac6926b9956`、
-`04403cfcedfc2032d0a0eb8f7c9aea17492e948a39559851bab9ff84799d4016`与
+selected rainy-station bundle已由旧v5 supersede为
+`runs/shot-continuity-rainy-station-p0-20260824-v6/production`。Manifest revision `4`现在选择
+source stack `1635abc300b33e94c513b2c92b6b99b770944b51d88a2689c69d619d861db2b4`、M0 stack
+`8f9661c358162544a3cefd0f7ff4483063658fcb37de09f301ef7fe2500039d2`与receipt
+`286991af1b8c08ef213af794f353d4ad84becad69b117b15a9836a6a53487937`。M0
+profile/compiler/workflow hashes分别为`9bf6588c04712887b117a8fd3c7496c15b5667b112d8cea750047928ccc36517`、
+`e2ba38bb110e26a5221a5582ea19f777752a1946ffacbe31b1445073d1530d19`与
 `963bd91ad81ca102053deb08b29a7aa8fb6849a6256a78ccbfbc6138d7a855d2`。M1保持原stack
 `4d08741636647fbb29f9cf69a69a2c81d62156cef128f619d26a17b72e94c01b`与
 `materialization_status=unmaterialized`，Hybrid artifact仍显式为`presence=absent` /
 `content_hash=none`。
 
-M0 profile现在将seed seal为`186510892520232452`，derivation contract为
+M0 profile现在将seed seal为`6369959770063611369`，derivation contract为
 `content-addressed-m0-closure-sha256-low63-v1`。该值只消费candidate、initial M0/M1、prepared
 receipt、Project、Registry与prompt hashes，不观察generation output或human verdict；profile load会重算并
-拒绝missing/tampered seed，request guard与caller会拒绝任何不同seed。offline reseal后exact replay保持
-Manifest revision `7`与88个project files的size/mtime/SHA-256全量不变，Provider effect count仍为零。
+拒绝missing/tampered seed，request guard与caller会拒绝任何不同seed。offline reseal后actual exact replay保持
+Manifest revision `4`，project tree metadata hash
+`b71ef90b420da8e5ae63c7a51558fdaf3a9a4019d7ab1524aef7a737abc04707`与bytes hash
+`d3a7a632243c569448ba8f534e0bd8756729adbf645773cf5bde9a482227bde3`不变，Provider effect count仍为零。
 
 一次明确授权的loopback read-only `GET /object_info`观测到1177个已注册node，并将M0
 workflow所需12个exact node-input schema seals写入M0-owned profile。对runtime file chooser的当前文件
@@ -77,6 +80,11 @@ immutable bytes，并且仍只能消费一个committer-issued permit、执行一
 - 本checkpoint：为M0 profile建立content-addressed exact seed owner，并以同一materialization owner
   reseal current stack与全部dependent P0 evidence；本checkpoint的exact staged Harness与task commit
   由本轮final delivery报告。
+- Commit `2d232b9`：为P0增加独立local FL2VA quality source stack的persist、materialize、reopen、
+  recovery与source/M0 joint reseal，并把v6 bundle推进到上述exact runtime hashes。
+- Commit `cb45198`：要求accepted upstream canonical generation request显式绑定sealed source
+  `execution_stack_hash`；同时让profile/workflow/binding的语义校验与materialization消费同一次no-follow
+  reopen bytes，关闭internally resealed semantic drift与path re-read TOCTOU。
 - 未新增winner-specific Production child、export、family registration、active capability、fallback或第二writer。
 - 未修改frozen prompt、rubric、workflow topology、spec或plan；M0-owned profile仅增加上述12个
   exact node-input schema seals，并在本checkpoint增加`seed_derivation`与`sealed_seed`。
@@ -109,6 +117,10 @@ transport=Claude-compatible。首次dispatch因`DONE_WITH_CONCERNS`携带未关�
 `PROTOCOL_ERROR`；一次bounded fresh retry补充现有`C4MotionTailEvidence` context后，runner status=`success` /
 agent status=`DONE_WITH_CONCERNS`。其“current M0仍unmaterialized”结论与runtime evidence冲突而被parent拒绝；
 其余mapping作为只读线索使用。两次均未修改workspace或触发live effect。
+
+该mapping的后续automatic sanitized capture为
+`/home/reggie/.codex/session-diagnostics/minimax/01a0312f-4ddf-7c23-b3ec-1246f8c90e3c-035a49bdbe991613.md`；
+原始runner status=`success`，agent status=`DONE_WITH_CONCERNS`。本轮未因该capture重复大范围exploration。
 
 caller checkpoint保持candidate-neutral且qualification-only：它消费
 `M0ValidationPreSubmitGuard`与existing `VideoGenerationService` / committer-owned local intent seam，使用
@@ -200,11 +212,29 @@ M0 content-addressed seed checkpoint：
 - 本checkpoint的exact staged Harness receipt与local task commit由本轮final delivery报告；未push、release
   或publish。
 
+Independent source execution-stack checkpoint：
+
+- focused loader/workflow/caller tests `78 passed`；P0、recovery、workflow、Comfy source、caller与validation
+  宽回归`419 passed`；`git diff --check`通过；
+- exact commit-range Harness覆盖`00c5d7194afb893d6938b1e4fcdeca9d76fcd2d0..cb45198f780c214c0146a7e3a3e61981b8b22831`，
+  receipt为`.agent/harness/runs/shot-continuity-independent-source-stack-20260824-v4/receipt.json`，
+  file SHA-256为`3e7bd9dd61f8e349fd0cb6da6a705dccb64f28228514d8faab73a66021d188fb`；
+- Harness记录control `176 passed`、workflow `9 passed`、production contracts
+  `2604 passed, 3 skipped`、CLI/config `13 passed`、Shot Continuity P0 `176 passed`与
+  provider-neutral requirement `292 passed`；receipt integrity、freshness、policy、snapshot、workspace
+  stability、cleanup与closure self-verification全部为true；
+- native `reviewer_xhigh`先后拒绝未绑定source generation stack、未验证workflow/binding语义，以及
+  profile/workflow path二次读取TOCTOU。三个blocking defects各自修复并加入zero-effect、internally resealed
+  semantic drift与replace-after-read regressions后，同tier最终verdict=`accept`，无blocking issue；
+- 上述证据全部为offline/local technical qualification evidence；没有ComfyUI POST、input upload、prompt
+  queue、Provider submit、媒体生成、P6/human verdict或creative acceptance。
+
 ## Remaining Gates
 
-selected rainy-station bundle当前仍没有accepted upstream video bytes。P0的terminal frame与motion-tail只是
-`planned_derivation`，run root内没有可用于`reference_video`的exact MP4/MOV，因此不能构造真实四锚点M0
-request。M0 seed缺口已由上述profile seal关闭，不再允许观看结果后选择或修改seed。
+selected rainy-station v6 bundle当前仍没有accepted upstream video bytes。P0的terminal frame与motion-tail
+仍是`planned_derivation`，run root内没有可用于`reference_video`的exact MP4/MOV，因此不能构造真实四锚点
+M0 request。M0 seed与independent source-stack bootstrap缺口均已关闭，不再允许观看结果后选择seed，或
+把source与destination stack混为一谈。
 
 qualification-only caller与zero-effect executable contracts已经通过policy-closed Harness、native
 `reviewer_xhigh`并commit，但它只证明injected/fake pre-effect seam。尚未执行live input upload、one-use
@@ -214,15 +244,16 @@ local permit、M0 submit、poll、fetch、decoded boundary review或P6/human ver
 winner/active registration与越过exact gates的P6或Final Acceptance claim仍不在授权范围内。
 
 前序live `object_info`与sealed seed evidence缺口均已关闭，不再是M0 submit的materialization blocker。
-但P0当前仍把policy的source stack绑定到M0/M1 destination candidate集合，而M0本身需要四锚点，不能作为
-首个upstream Shot的无锚点bootstrap；直接使用既有H3媒体或其他stack又会违反sealed source lineage。
-在独立materialized source stack、对应generated-video authoring/P6 path、motion-tail materialization与
-concrete read-only upstream reopener进入同一P0 closure前，真实submit继续保持blocked与零effect。
+下一真实gate是仅通过已sealed的FL2VA source stack形成A2→A3 upstream Shot 3 request、执行一次bounded
+local generation、走existing generated-video lifecycle与P6/human acceptance，再从同一accepted MP4/MOV
+派生terminal与motion-tail。只有这些canonical evidence和concrete read-only upstream reopener全部exact后，
+才允许一次M0 edge 3→4 submit。当前真实M0 submit仍保持blocked与零effect。
 
 ## Agent Guardrails
 
 - 不得用P0 image assets、旧H3视频或其他run的MP4冒充same accepted upstream motion-tail。
 - 不得把request guard/Harness PASS当作live-ready、quality PASS或winner evidence。
 - Join Gate J1关闭前不得创建包含M0/M1 winner identity的Production child、export或active snapshot。
-- 下一步若继续实现caller，必须保持qualification-only、single writer、exact four-anchor input、one permit、
-  one submit、no retry、no fallback；缺少sealed source video/anchor lineage时仍须在任何effect前拒绝。
+- 下一步实现source request/execution时必须绑定上述independent materialized source stack、presealed seed与
+  exact A2/A3 assets，并保持single writer、one permit、one submit、no retry、no fallback；缺少canonical
+  source video/P6/derivation/anchor lineage时，M0仍须在任何effect前拒绝。
