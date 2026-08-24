@@ -48,7 +48,7 @@ class RuntimeSeal(_ExecutionStackModel):
 class ExecutionStackMaterialization(_ExecutionStackModel):
     """Exact, candidate-neutral artifact hashes supplied by local preflight."""
 
-    candidate_label: Literal["m0", "m1"]
+    candidate_label: Literal["source", "m0", "m1"]
     profile_bytes: bytes = Field(min_length=1)
     compiler_bytes: bytes = Field(min_length=1)
     workflow_bytes: bytes = Field(min_length=1)
@@ -71,7 +71,7 @@ class ExecutionStackMaterialization(_ExecutionStackModel):
     def from_bytes(
         cls,
         *,
-        candidate_label: Literal["m0", "m1"],
+        candidate_label: Literal["source", "m0", "m1"],
         profile_bytes: bytes,
         compiler_bytes: bytes,
         workflow_bytes: bytes,

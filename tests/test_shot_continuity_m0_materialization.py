@@ -16,6 +16,10 @@ from ai_video.production.shot_continuity_m0_qualification import (
     load_m0_qualification_execution_sources,
     validate_m0_sources_against_stack,
 )
+from ai_video.production.shot_continuity_source_stack import (
+    load_shot_continuity_source_execution_sources,
+    validate_shot_continuity_source_stack,
+)
 from ai_video.production.video_execution_stack import (
     GenerationExecutionStackIdentity,
     StackComponentIdentity,
@@ -74,6 +78,63 @@ def _object_info() -> dict[str, object]:
             "output_name": ["OUTPUT"],
         }
     return result
+
+
+def test_source_stack_seals_exact_local_fl2va_quality_sources() -> None:
+    sources = load_shot_continuity_source_execution_sources(
+        artifact_root=REPO_ROOT,
+    )
+
+    assert sources.materialization.candidate_label == "source"
+    assert sources.initial_stack.materialization_status == "unmaterialized"
+    assert sources.materialized_stack.materialization_status == "materialized"
+    assert sources.materialized_stack.execution_stack_hash != (
+        sources.initial_stack.execution_stack_hash
+    )
+    assert sources.materialized_stack.profile_hash == hashlib.sha256(
+        sources.materialization.profile_bytes
+    ).hexdigest()
+    assert tuple(item.component_id for item in sources.initial_stack.components) == (
+        "pruned-fl2va",
+        "qwen-clip",
+        "video-vae",
+        "audio-vae",
+    )
+    validate_shot_continuity_source_stack(sources, sources.initial_stack)
+    validate_shot_continuity_source_stack(sources, sources.materialized_stack)
+
+
+def test_source_stack_rejects_profile_or_identity_drift(tmp_path: Path) -> None:
+    canonical = json.loads(
+        (REPO_ROOT / "workflows/profiles/minimax_h3_fl2va_quality.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    canonical["cloud_fallback_enabled"] = True
+    profile_path = tmp_path / "profile.json"
+    profile_path.write_text(json.dumps(canonical), encoding="utf-8")
+
+    with pytest.raises(AiVideoError, match="profile"):
+        load_shot_continuity_source_execution_sources(
+            artifact_root=tmp_path,
+            profile_path=profile_path,
+        )
+
+    sources = load_shot_continuity_source_execution_sources(
+        artifact_root=REPO_ROOT,
+    )
+    changed = GenerationExecutionStackIdentity.create(
+        **{
+            **{
+                name: getattr(sources.initial_stack, name)
+                for name in type(sources.initial_stack).model_fields
+                if name != "execution_stack_hash"
+            },
+            "candidate_id": "different-source",
+        }
+    )
+    with pytest.raises(AiVideoError, match="exact execution sources"):
+        validate_shot_continuity_source_stack(sources, changed)
 
 
 def test_m0_profile_seals_exact_live_node_schemas() -> None:

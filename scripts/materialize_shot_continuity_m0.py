@@ -24,6 +24,10 @@ from ai_video.production.shot_continuity_m0_qualification import (
     load_m0_qualification_execution_sources,
     validate_m0_sources_against_stack,
 )
+from ai_video.production.shot_continuity_source_stack import (
+    load_shot_continuity_source_execution_sources,
+    validate_shot_continuity_source_stack,
+)
 from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video_execution_stack import GenerationExecutionStackIdentity
 
@@ -75,30 +79,39 @@ def materialize(
     profile = profile_path
     if not profile.is_absolute():
         profile = source_root / profile
-    sources = load_m0_qualification_execution_sources(
+    m0_sources = load_m0_qualification_execution_sources(
         profile_path=profile,
         artifact_root=source_root,
+    )
+    source_sources = load_shot_continuity_source_execution_sources(
+        artifact_root=REPO_ROOT,
     )
     writer = ProductionStateCommitter(project_root)
     before_manifest = load_production_project(project_root / "project.yaml").manifest
     before = writer.reopen_p0_qualification_prepared()
+    current_sources = writer.reopen_p0_qualification_source_stacks()
+    if len(current_sources) > 1:
+        raise ValueError("P0 qualification has more than one independent source stack")
+    current_source = current_sources[0] if current_sources else None
+    if current_source is not None:
+        validate_shot_continuity_source_stack(source_sources, current_source)
     current_m0 = before[1][0]
     if current_m0.materialization_status == "materialized" and (
         _reopen_materialized_m0_seed_roots(project_root, current_m0)
         != (
-            sources.profile.initial_execution_stack_hash,
-            sources.profile.prepared_receipt_hash,
+            m0_sources.profile.initial_execution_stack_hash,
+            m0_sources.profile.prepared_receipt_hash,
         )
     ):
         raise ValueError("M0 materialized seed derivation roots cannot be replaced")
     validate_m0_sources_against_stack(
-        sources,
+        m0_sources,
         current_m0,
         allow_materialized_source_reseal=(
             current_m0.materialization_status == "materialized"
         ),
     )
-    profile = sources.profile
+    profile = m0_sources.profile
     calibration = next(
         item for item in before[4] if item.input_kind == "calibration_fixture"
     ).payload
@@ -126,13 +139,29 @@ def materialize(
     if hybrid.presence != "absent" or hybrid.content_hash != "none":
         raise ValueError("M1 Hybrid artifact must remain explicit absent/none")
 
+    materializations = (
+        ((source_sources.materialization,) if current_source is not None else ())
+        + (m0_sources.materialization,)
+    )
+    expected_hashes = (
+        (
+            (
+                (current_source.execution_stack_hash,)
+                if current_source is not None
+                else ()
+            )
+            + (current_m0.execution_stack_hash,)
+        )
+        if current_m0.materialization_status == "materialized"
+        and (
+            current_source is None
+            or current_source.materialization_status == "materialized"
+        )
+        else ()
+    )
     committed = writer.materialize_p0_qualification(
-        materializations=(sources.materialization,),
-        expected_materialized_stack_hashes=(
-            (current_m0.execution_stack_hash,)
-            if current_m0.materialization_status == "materialized"
-            else ()
-        ),
+        materializations=materializations,
+        expected_materialized_stack_hashes=expected_hashes,
         expected_manifest_revision=before_manifest.manifest_revision,
         attempt_id=attempt_id,
     )
@@ -141,7 +170,15 @@ def materialize(
             required_materialized_candidates=("m0",)
         )
     )
-    validate_m0_sources_against_stack(sources, stacks[0])
+    validate_m0_sources_against_stack(m0_sources, stacks[0])
+    materialized_sources = writer.reopen_p0_qualification_source_stacks(
+        require_materialized=current_source is not None
+    )
+    if current_source is not None:
+        validate_shot_continuity_source_stack(
+            source_sources,
+            materialized_sources[0],
+        )
     if stacks[1] != before[1][1]:
         raise ValueError("M1 changed during M0-only materialization")
     return {
@@ -155,6 +192,16 @@ def materialize(
         "qualification_input_hashes": {
             item.input_kind: item.content_hash for item in inputs
         },
+        "source_execution_stack_hash": (
+            materialized_sources[0].execution_stack_hash
+            if materialized_sources
+            else None
+        ),
+        "source_materialization_status": (
+            materialized_sources[0].materialization_status
+            if materialized_sources
+            else "legacy_alias"
+        ),
         "m0_execution_stack_hash": stacks[0].execution_stack_hash,
         "m0_profile_hash": stacks[0].profile_hash,
         "m0_compiler_hash": stacks[0].compiler_hash,

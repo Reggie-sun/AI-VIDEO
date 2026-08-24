@@ -86,9 +86,21 @@ def _bundle(sources):
         registry=SimpleNamespace(content_hash=profile.registry_content_hash),
     )
     policies = (
-        SimpleNamespace(policy_hash="b" * 64),
-        SimpleNamespace(policy_hash="c" * 64),
-        SimpleNamespace(policy_hash="d" * 64),
+        SimpleNamespace(
+            policy_hash="b" * 64,
+            source_execution_stack_hash=m0.execution_stack_hash,
+            destination_execution_stack_hash=m0.execution_stack_hash,
+        ),
+        SimpleNamespace(
+            policy_hash="c" * 64,
+            source_execution_stack_hash=m0.execution_stack_hash,
+            destination_execution_stack_hash=m0.execution_stack_hash,
+        ),
+        SimpleNamespace(
+            policy_hash="d" * 64,
+            source_execution_stack_hash=m0.execution_stack_hash,
+            destination_execution_stack_hash=m0.execution_stack_hash,
+        ),
     )
     validation_set = SimpleNamespace(content_hash="e" * 64)
     calibration = SimpleNamespace(
@@ -196,6 +208,11 @@ class _ReadOnlyCommitter:
     ):
         self.reopen_calls.append(required_materialized_candidates)
         return self.bundle
+
+    def reopen_p0_qualification_source_stacks(
+        self, *, require_materialized: bool = False
+    ):
+        return ()
 
 
 def _tree_snapshot(root: Path) -> dict[str, tuple[int, int, str]]:
@@ -357,8 +374,14 @@ def test_m0_materialization_owner_reseals_source_drift_and_replays_exactly(
         item.policy_hash for item in before[2]
     )
     assert after[3].content_hash != before[3].content_hash
+    source_stack = committer.reopen_p0_qualification_source_stacks(
+        require_materialized=True
+    )[0]
+    expected_stack_hashes = tuple(
+        sorted((source_stack.execution_stack_hash, after[1][0].execution_stack_hash))
+    )
     assert all(
-        item.execution_stack_hashes == (after[1][0].execution_stack_hash,)
+        item.execution_stack_hashes == expected_stack_hashes
         for item in after[4]
     )
     assert resealed["claims"]["provider_effects"] == 0

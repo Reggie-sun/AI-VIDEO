@@ -978,6 +978,363 @@ def _materialization_source_path(
     )
 
 
+def _bundle_with_independent_source(root: Path):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(root)
+    source = _stack("source", HASHES[7])
+    inventory, *remaining_inputs = inputs
+    source_inventory = P0QualificationInput.create(
+        **{
+            **inventory.model_dump(mode="python", exclude={"content_hash"}),
+            "payload": {
+                **inventory.payload,
+                "components": [
+                    *inventory.payload["components"],
+                    {
+                        "id": source.components[0].component_id,
+                        "presence": "present",
+                        "sha256": source.components[0].content_hash,
+                    },
+                ],
+            },
+        }
+    )
+    source_policies = tuple(
+        ContinuityTransitionPolicy.create(
+            **{
+                **{
+                    name: getattr(policy, name)
+                    for name in type(policy).model_fields
+                    if name != "policy_hash"
+                },
+                "source_execution_stack_hash": source.execution_stack_hash,
+            }
+        )
+        for policy in policies
+    )
+    source_validation_set = RealShotValidationSet.create(
+        **{
+            **{
+                name: getattr(validation_set, name)
+                for name in type(validation_set).model_fields
+                if name != "content_hash"
+            },
+            "edges": tuple(
+                edge.model_copy(update={"policy_hash": policy.policy_hash})
+                for edge, policy in zip(
+                    validation_set.edges,
+                    source_policies,
+                    strict=True,
+                )
+            ),
+        }
+    )
+    source_receipt = P0QualificationPreparedReceipt.create(
+        **{
+            **{
+                name: getattr(receipt, name)
+                for name in type(receipt).model_fields
+                if name != "content_hash"
+            },
+            "inventory_receipt_hash": source_inventory.content_hash,
+            "validation_set_hash": source_validation_set.content_hash,
+            "policy_hashes": tuple(
+                sorted(policy.policy_hash for policy in source_policies)
+            ),
+        }
+    )
+    return (
+        writer,
+        loaded,
+        source,
+        m0,
+        m1,
+        source_policies,
+        source_validation_set,
+        (source_inventory, *remaining_inputs),
+        source_receipt,
+    )
+
+
+def test_independent_source_stack_materializes_and_reopens_exactly(
+    tmp_path: Path,
+) -> None:
+    (
+        writer,
+        loaded,
+        source,
+        m0,
+        m1,
+        policies,
+        validation_set,
+        inputs,
+        receipt,
+    ) = _bundle_with_independent_source(tmp_path)
+    prepared = writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        source_stacks=(source,),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-independent-source-prepare",
+    )
+
+    assert writer.reopen_p0_qualification_source_stacks() == (source,)
+    source_materialization = _materialization("source", 10)
+    committed = writer.materialize_p0_qualification(
+        materializations=(source_materialization, _materialization("m0", 6)),
+        expected_manifest_revision=prepared.manifest_revision,
+        attempt_id="p0-independent-source-materialize",
+    )
+    reopened = writer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    materialized_source = writer.reopen_p0_qualification_source_stacks(
+        require_materialized=True
+    )[0]
+
+    assert materialized_source.materialization_status == "materialized"
+    assert materialized_source.execution_stack_hash != source.execution_stack_hash
+    assert all(
+        policy.source_execution_stack_hash
+        == materialized_source.execution_stack_hash
+        for policy in reopened[2]
+    )
+    assert all(
+        policy.destination_execution_stack_hash
+        == reopened[1][0].execution_stack_hash
+        for policy in reopened[2]
+    )
+    expected_hashes = tuple(
+        sorted(
+            (
+                materialized_source.execution_stack_hash,
+                reopened[1][0].execution_stack_hash,
+            )
+        )
+    )
+    assert all(item.execution_stack_hashes == expected_hashes for item in reopened[4])
+
+    active_paths = {
+        item.path
+        for item in writer.recover().items
+        if item.disposition is RecoveryDisposition.ACTIVE
+    }
+    assert canonical_execution_stack_identity_path(
+        materialized_source.execution_stack_hash
+    ) in active_paths
+    for kind in ("profile", "compiler", "workflow"):
+        assert Path(
+            "state/video-qualification/execution-stack-sources",
+            kind,
+            f"{getattr(materialized_source, f'{kind}_hash')}.bin",
+        ) in active_paths
+
+    snapshot = {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+    replayed = writer.materialize_p0_qualification(
+        materializations=(source_materialization, _materialization("m0", 6)),
+        expected_materialized_stack_hashes=(
+            materialized_source.execution_stack_hash,
+            reopened[1][0].execution_stack_hash,
+        ),
+        expected_manifest_revision=committed.manifest_revision,
+        attempt_id="p0-independent-source-replay",
+    )
+    assert replayed == committed
+    assert snapshot == {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+    _materialization_source_path(
+        tmp_path,
+        "profile",
+        source_materialization.profile_hash,
+    ).write_bytes(b"tampered-source-profile")
+    with pytest.raises(AiVideoError, match="source"):
+        writer.reopen_p0_qualification_prepared()
+
+
+def test_independent_source_stack_is_required_before_any_p0_write(
+    tmp_path: Path,
+) -> None:
+    (
+        writer,
+        loaded,
+        _,
+        m0,
+        m1,
+        policies,
+        validation_set,
+        inputs,
+        receipt,
+    ) = _bundle_with_independent_source(tmp_path)
+    snapshot = {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+    with pytest.raises(AiVideoError, match="bindings"):
+        writer.record_p0_qualification_prepared(
+            receipt,
+            candidate_stacks=(m0, m1),
+            policies=policies,
+            validation_set=validation_set,
+            qualification_inputs=inputs,
+            expected_manifest_revision=loaded.manifest.manifest_revision,
+            attempt_id="p0-independent-source-missing",
+        )
+
+    assert snapshot == {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+
+def test_independent_source_stack_cannot_be_unreferenced_before_any_p0_write(
+    tmp_path: Path,
+) -> None:
+    (
+        writer,
+        loaded,
+        source,
+        m0,
+        m1,
+        policies,
+        validation_set,
+        inputs,
+        receipt,
+    ) = _bundle_with_independent_source(tmp_path)
+    aliased_policies = tuple(
+        ContinuityTransitionPolicy.create(
+            **{
+                **{
+                    name: getattr(policy, name)
+                    for name in type(policy).model_fields
+                    if name != "policy_hash"
+                },
+                "source_execution_stack_hash": m0.execution_stack_hash,
+            }
+        )
+        for policy in policies
+    )
+    aliased_validation_set = RealShotValidationSet.create(
+        **{
+            **{
+                name: getattr(validation_set, name)
+                for name in type(validation_set).model_fields
+                if name != "content_hash"
+            },
+            "edges": tuple(
+                edge.model_copy(update={"policy_hash": policy.policy_hash})
+                for edge, policy in zip(
+                    validation_set.edges,
+                    aliased_policies,
+                    strict=True,
+                )
+            ),
+        }
+    )
+    aliased_receipt = P0QualificationPreparedReceipt.create(
+        **{
+            **{
+                name: getattr(receipt, name)
+                for name in type(receipt).model_fields
+                if name != "content_hash"
+            },
+            "validation_set_hash": aliased_validation_set.content_hash,
+            "policy_hashes": tuple(
+                sorted(policy.policy_hash for policy in aliased_policies)
+            ),
+        }
+    )
+    snapshot = {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+    with pytest.raises(AiVideoError, match="bindings"):
+        writer.record_p0_qualification_prepared(
+            aliased_receipt,
+            candidate_stacks=(m0, m1),
+            source_stacks=(source,),
+            policies=aliased_policies,
+            validation_set=aliased_validation_set,
+            qualification_inputs=inputs,
+            expected_manifest_revision=loaded.manifest.manifest_revision,
+            attempt_id="p0-independent-source-unreferenced",
+        )
+
+    assert snapshot == {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+
+def test_materialized_independent_source_cannot_be_replaced_by_prepare(
+    tmp_path: Path,
+) -> None:
+    (
+        writer,
+        loaded,
+        source,
+        m0,
+        m1,
+        policies,
+        validation_set,
+        inputs,
+        receipt,
+    ) = _bundle_with_independent_source(tmp_path)
+    prepared = writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        source_stacks=(source,),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-independent-source-prepare",
+    )
+    materialized = writer.materialize_p0_qualification(
+        materializations=(_materialization("source", 10),),
+        expected_manifest_revision=prepared.manifest_revision,
+        attempt_id="p0-independent-source-only-materialize",
+    )
+    snapshot = {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+    with pytest.raises(AiVideoError, match="materialization owner"):
+        writer.record_p0_qualification_prepared(
+            receipt,
+            candidate_stacks=(m0, m1),
+            source_stacks=(source,),
+            policies=policies,
+            validation_set=validation_set,
+            qualification_inputs=inputs,
+            expected_manifest_revision=materialized.manifest_revision,
+            attempt_id="p0-independent-source-replace",
+        )
+
+    assert snapshot == {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+
 def test_unmaterialized_p0_denies_execution_stack_use(tmp_path: Path):
     writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(tmp_path)
     writer.record_p0_qualification_prepared(

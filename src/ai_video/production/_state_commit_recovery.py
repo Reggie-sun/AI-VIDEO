@@ -272,6 +272,8 @@ class _StateCommitRecoveryMixin:
         receipt, stacks, policies, validation_set, inputs = (
             self.reopen_p0_qualification_prepared()
         )
+        source_stacks = self.reopen_p0_qualification_source_stacks()
+        all_stacks = (*source_stacks, *stacks)
         paths = {
             pointer.path: pointer.file_sha256,
             canonical_real_shot_validation_set_path(validation_set.content_hash): (
@@ -281,14 +283,14 @@ class _StateCommitRecoveryMixin:
                 canonical_execution_stack_identity_path(item.execution_stack_hash): (
                     hashlib.sha256(_canonical_json_bytes(item)).hexdigest()
                 )
-                for item in stacks
+                for item in all_stacks
             },
             **{
                 canonical_execution_stack_materialization_source_path(
                     kind,
                     getattr(item, f"{kind}_hash"),
                 ): getattr(item, f"{kind}_hash")
-                for item in stacks
+                for item in all_stacks
                 if item.materialization_status == "materialized"
                 for kind in ("profile", "compiler", "workflow")
             },

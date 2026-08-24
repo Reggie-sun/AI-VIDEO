@@ -58,6 +58,9 @@ from ai_video.production.state_commit import (
     _canonical_json_bytes,
     _canonical_yaml_bytes,
 )
+from ai_video.production.shot_continuity_source_stack import (
+    load_shot_continuity_source_execution_sources,
+)
 from ai_video.production.video_execution_stack import (
     GenerationExecutionStackIdentity,
     RuntimeSeal,
@@ -793,6 +796,9 @@ def _record_p0(
             ("artifact", "audio-vae", "present", AUDIO_VAE_SHA256),
         ),
     )
+    source_stack = load_shot_continuity_source_execution_sources(
+        artifact_root=REPO_ROOT,
+    ).initial_stack
     shot_identities = tuple(
         CreativeArtifactIdentity(
             artifact_id=shot.artifact_id,
@@ -804,14 +810,14 @@ def _record_p0(
     character = loaded.characters[0]
     scene = loaded.scenes[0]
     policies = []
-    for index, (source, target) in enumerate(
+    for index, (source_shot, target) in enumerate(
         zip(shot_identities, shot_identities[1:])
     ):
         terminal_hash = canonical_sha256(
-            {"derivation": "exact-terminal-frame/1", "source_shot": source.model_dump(mode="json")}
+            {"derivation": "exact-terminal-frame/1", "source_shot": source_shot.model_dump(mode="json")}
         )
         motion_tail_hash = canonical_sha256(
-            {"derivation": "exact-motion-tail/1", "source_shot": source.model_dump(mode="json")}
+            {"derivation": "exact-motion-tail/1", "source_shot": source_shot.model_dump(mode="json")}
         )
         endpoint_asset = shot_assets[index + 1]
         endpoint_receipt = shot_receipts[index + 1]
@@ -819,10 +825,10 @@ def _record_p0(
             ContinuityAnchorBinding(
                 role=ContinuityAnchorRole.FIRST_FRAME,
                 source_kind="planned_derivation",
-                source_identity=f"{source.artifact_id}:terminal-frame",
+                source_identity=f"{source_shot.artifact_id}:terminal-frame",
                 content_hash=terminal_hash,
                 evidence_fingerprint=canonical_sha256(
-                    {"kind": "terminal", "source": source.content_hash}
+                    {"kind": "terminal", "source": source_shot.content_hash}
                 ),
             ),
             ContinuityAnchorBinding(
@@ -844,10 +850,10 @@ def _record_p0(
             ContinuityAnchorBinding(
                 role=ContinuityAnchorRole.REFERENCE_VIDEO,
                 source_kind="planned_derivation",
-                source_identity=f"{source.artifact_id}:motion-tail",
+                source_identity=f"{source_shot.artifact_id}:motion-tail",
                 content_hash=motion_tail_hash,
                 evidence_fingerprint=canonical_sha256(
-                    {"kind": "motion-tail", "source": source.content_hash}
+                    {"kind": "motion-tail", "source": source_shot.content_hash}
                 ),
             ),
         )
@@ -856,12 +862,12 @@ def _record_p0(
                 policy_id=f"rainy-station-edge-{index + 1}-{index + 2}",
                 project=loaded.manifest.active_project,
                 registry=loaded.manifest.active_registry,
-                source_shot=source,
+                source_shot=source_shot,
                 target_shot=target,
                 boundary_kind=BoundaryKind.HARD_CUT,
                 continuity_obligation=ContinuityObligation.FULL_CONTINUITY,
                 take_id=None,
-                source_execution_stack_hash=m0.execution_stack_hash,
+                source_execution_stack_hash=source_stack.execution_stack_hash,
                 destination_execution_stack_hash=m0.execution_stack_hash,
                 continuity_grade="c4_native_boundary_motion",
                 required_carryover_dimensions=(
@@ -941,6 +947,7 @@ def _record_p0(
     manifest = writer.record_p0_qualification_prepared(
         receipt,
         candidate_stacks=(m0, m1),
+        source_stacks=(source_stack,),
         policies=policies_tuple,
         validation_set=validation_set,
         qualification_inputs=inputs,
@@ -950,7 +957,9 @@ def _record_p0(
     reopened = writer.reopen_p0_qualification_prepared()
     if reopened != (receipt, (m0, m1), policies_tuple, validation_set, inputs):
         raise ValueError("P0 qualification bundle did not reopen exactly")
-    return manifest, receipt, validation_set, m0, m1, inputs
+    if writer.reopen_p0_qualification_source_stacks() != (source_stack,):
+        raise ValueError("P0 source execution stack did not reopen exactly")
+    return manifest, receipt, validation_set, source_stack, m0, m1, inputs
 
 
 def prepare(args: argparse.Namespace) -> dict[str, object]:
@@ -971,7 +980,7 @@ def prepare(args: argparse.Namespace) -> dict[str, object]:
         registry=registry,
         artifacts=artifacts,
     )
-    manifest, receipt, validation_set, m0, m1, inputs = _record_p0(
+    manifest, receipt, validation_set, source, m0, m1, inputs = _record_p0(
         root=root,
         shot_assets=shot_assets,
         shot_receipts=shot_receipts,
@@ -984,6 +993,7 @@ def prepare(args: argparse.Namespace) -> dict[str, object]:
         "p0_status": receipt.status,
         "p0_receipt_hash": receipt.content_hash,
         "validation_set_hash": validation_set.content_hash,
+        "source_execution_stack_hash": source.execution_stack_hash,
         "m0_execution_stack_hash": m0.execution_stack_hash,
         "m1_execution_stack_hash": m1.execution_stack_hash,
         "qualification_input_hashes": {

@@ -240,6 +240,7 @@ class M0ValidationPreflightSnapshot:
     candidate_label: Literal["m0"]
     qualification_receipt_hash: str
     execution_stack_hash: str
+    source_execution_stack_hash: str
     profile_hash: str
     compiler_hash: str
     workflow_hash: str
@@ -680,7 +681,17 @@ def reopen_m0_validation_preflight(
             required_materialized_candidates=("m0",)
         )
     )
+    source_stacks = committer.reopen_p0_qualification_source_stacks()
+    if source_stacks:
+        source_stacks = committer.reopen_p0_qualification_source_stacks(
+            require_materialized=True
+        )
     m0, m1 = stacks
+    source_stack_hash = (
+        source_stacks[0].execution_stack_hash
+        if source_stacks
+        else m0.execution_stack_hash
+    )
     validate_m0_sources_against_stack(sources, m0)
     profile = sources.profile
     try:
@@ -710,7 +721,13 @@ def reopen_m0_validation_preflight(
         or calibration.get("scheduler") != profile.scheduler
         or calibration.get("turbo_lora") is not profile.turbo_lora
         or any(
-            item.execution_stack_hashes != (m0.execution_stack_hash,)
+            policy.source_execution_stack_hash != source_stack_hash
+            or policy.destination_execution_stack_hash != m0.execution_stack_hash
+            for policy in policies
+        )
+        or any(
+            item.execution_stack_hashes
+            != tuple(sorted({source_stack_hash, m0.execution_stack_hash}))
             for item in inputs
         )
     ):
@@ -721,6 +738,7 @@ def reopen_m0_validation_preflight(
         candidate_label="m0",
         qualification_receipt_hash=receipt.content_hash,
         execution_stack_hash=m0.execution_stack_hash,
+        source_execution_stack_hash=source_stack_hash,
         profile_hash=m0.profile_hash,
         compiler_hash=m0.compiler_hash,
         workflow_hash=m0.workflow_hash,

@@ -23,6 +23,9 @@ from ai_video.production.shot_continuity_m0_caller import (
 from ai_video.production.shot_continuity_m0_qualification import (
     load_m0_qualification_execution_sources,
 )
+from ai_video.production.shot_continuity_source_stack import (
+    load_shot_continuity_source_execution_sources,
+)
 from ai_video.production.video import (
     BillingKind,
     VideoExecutionKind,
@@ -89,7 +92,7 @@ def _materialized_m0(sources: Any) -> GenerationExecutionStackIdentity:
     return initial.materialize(sources.materialization)
 
 
-def _bundle(sources: Any) -> tuple[Any, ...]:
+def _bundle(sources: Any, source_stack: GenerationExecutionStackIdentity) -> tuple[Any, ...]:
     profile = sources.profile
     m0 = _materialized_m0(sources)
     m1 = SimpleNamespace(
@@ -109,13 +112,21 @@ def _bundle(sources: Any) -> tuple[Any, ...]:
         registry=SimpleNamespace(content_hash=profile.registry_content_hash),
     )
     policies = tuple(
-        SimpleNamespace(policy_hash=token * 64) for token in ("b", "c", "d")
+        SimpleNamespace(
+            policy_hash=token * 64,
+            source_execution_stack_hash=source_stack.execution_stack_hash,
+            destination_execution_stack_hash=m0.execution_stack_hash,
+        )
+        for token in ("b", "c", "d")
+    )
+    stack_hashes = tuple(
+        sorted((source_stack.execution_stack_hash, m0.execution_stack_hash))
     )
     inputs = (
         SimpleNamespace(
             input_kind="calibration_fixture",
             content_hash="e" * 64,
-            execution_stack_hashes=(m0.execution_stack_hash,),
+            execution_stack_hashes=stack_hashes,
             payload={
                 "prompt_sha256": profile.prompt_sha256,
                 "task_type": profile.task_type,
@@ -128,7 +139,7 @@ def _bundle(sources: Any) -> tuple[Any, ...]:
         SimpleNamespace(
             input_kind="effect_budget",
             content_hash="f" * 64,
-            execution_stack_hashes=(m0.execution_stack_hash,),
+            execution_stack_hashes=stack_hashes,
             payload={},
         ),
     )
@@ -186,10 +197,16 @@ class _Transport:
 
 
 class _Committer:
-    def __init__(self, bundle: tuple[Any, ...], request: Any) -> None:
+    def __init__(
+        self,
+        bundle: tuple[Any, ...],
+        request: Any,
+        source_stack: GenerationExecutionStackIdentity,
+    ) -> None:
         self.bundle = bundle
         self.bundle_after_first_reopen: tuple[Any, ...] | None = None
         self.request = request
+        self.source_stack = source_stack
         self.qualification_reopens = 0
         self.intent_writes = 0
         self.result_writes = 0
@@ -208,6 +225,15 @@ class _Committer:
         ):
             return self.bundle_after_first_reopen
         return self.bundle
+
+    def reopen_p0_qualification_source_stacks(
+        self,
+        *,
+        require_materialized: bool = False,
+    ) -> tuple[GenerationExecutionStackIdentity, ...]:
+        if require_materialized:
+            assert self.source_stack.materialization_status == "materialized"
+        return (self.source_stack,)
 
     def _read_manifest(self) -> object:
         return object()
@@ -274,6 +300,9 @@ def _make_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Case:
         profile_path=PROFILE_PATH,
         artifact_root=REPO_ROOT,
     )
+    source_stack = load_shot_continuity_source_execution_sources(
+        artifact_root=REPO_ROOT,
+    ).materialized_stack
     input_root = tmp_path / "inputs"
     input_root.mkdir()
     payloads = {
@@ -427,8 +456,8 @@ def _make_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Case:
             native_audio=profile.native_audio,
         ),
     )
-    bundle = _bundle(sources)
-    committer = _Committer(bundle, request)
+    bundle = _bundle(sources, source_stack)
+    committer = _Committer(bundle, request, source_stack)
     transport = _Transport()
     active_project = SimpleNamespace(accepted_upstream=upstream_snapshot)
 
@@ -583,6 +612,7 @@ def test_upload_uses_pre_permit_immutable_validated_bytes(
         "schema",
         "transport_identity",
         "stack",
+        "source_stack",
         "dependent_evidence",
         "cardinality",
         "order",
@@ -629,6 +659,10 @@ def test_pre_effect_denials_are_zero_write(
             policies,
             validation,
             inputs,
+        )
+    elif drift == "source_stack":
+        case.committer.source_stack = case.committer.source_stack.model_copy(
+            update={"execution_stack_hash": "9" * 64}
         )
     elif drift == "dependent_evidence":
         receipt, stacks, policies, validation, inputs = case.committer.bundle
