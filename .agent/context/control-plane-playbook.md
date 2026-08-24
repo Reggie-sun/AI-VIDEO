@@ -136,6 +136,29 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 - Real media 或 rough-cut 批量生产前，必须先完成约 30～60 秒、连续 4～8 Shots 的真实 Pilot，包含 task 所需的主要角色、static/image-motion、generated-video、voice、captions 与最终 HyperFrames composition；Pilot 必须由人实际观看并给出明确 GO/NO-GO，NO-GO 时不得继续扩量。
 - Character / Scene reference asset 默认只提供 identity、state、space 或 style guidance，不得自动成为观众最终看到的 Shot visual。Final Shot Visual 必须绑定 Shot-specific visual intent；跨非连续 Shots 复用同一 final asset 时必须有明确导演理由并进入人工 review。
 
+### Empirical Uncertainty Triage
+
+当 task 涉及新视频/图像/音频模型或 Provider、新 ComfyUI workflow、LoRA / Turbo、continuity / identity / reference strategy、long-video、lip sync、motion / camera control、multi-character、upscaling / refine、prompt strategy或音频感知质量时，在最小技术前置条件关闭后记录：
+
+```text
+next_empirical_question: <当前最影响继续/停止/选路的真实媒体问题>
+cheapest_valid_experiment: <能证伪或支持该问题的最小安全实验>
+blocking_prerequisite: <真实 blocker；没有则写 none>
+```
+
+若 `blocking_prerequisite = none`，下一关键动作默认执行 `cheapest_valid_experiment`，而不是继续增加非必要 qualification infrastructure、schema、lifecycle、Harness 或 integration。推荐顺序是：
+
+```text
+Safety / User Authorization
+  -> Minimum Technical Prerequisite
+  -> Cheap Empirical Falsification
+  -> Production Qualification
+  -> Lifecycle / Replay / Recovery Closure
+  -> Promotion
+```
+
+`development_experiment` 只是 evidence / reporting classification 与 sequencing policy，不是新的 execution plane、API、schema enum、registry record 或 persistent lifecycle state。实验复用所选工具当前已批准的 execution seam：AI-VIDEO local video Provider 仍必须经 `VideoGenerationService`、sealed profile、preflight、local permit、唯一 committer、recovery 与 media verification，禁止直接调用 Comfy transport或Provider `submit()`；remote / paid experiment仍须满足当前用户授权、budget、cloud-egress、secret、durable intent、one-use permit与unknown-outcome rules。实验 output / metadata 必须与 active Production truth隔离，结果只接受bounded technical / human triage，不得直接产生active capability、Production qualification、Manifest / Registry activation、P6 / Final Acceptance或release truth。Development experiment PASS / FAIL 均不得偷换frozen rubric或Production contract。
+
 ## 5. Repository-Specific Don't Repeat This
 
 - 不要对同一 `run_id` 再次调用 `run()` 来实现 resume；从持久化 Manifest 恢复。

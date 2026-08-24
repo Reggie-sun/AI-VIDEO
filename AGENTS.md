@@ -112,6 +112,13 @@ Durable specs 写入 `docs/superpowers/specs/YYYY-MM-DD-<slug>.md`，durable pla
 - Unknown outcome 必须 fail closed；recovery 必须显式，不能 blind retry、remint permit、猜测 mixed state、自动激活或删除完整 orphan evidence。
 - Typed cross-module failures使用 `AiVideoError` 与 `ErrorCode`；retryability 由 typed metadata 决定，常规 CLI 输出不得泄露 raw traceback。
 
+### Empirical Validation Priority
+
+- 对 video、image、audio、continuity、identity、motion、camera、prompt adherence、lip sync 与 perceptual quality 等不能仅由 code、tests、static analysis、review 或 Harness 证明的能力，Agent 必须区分 Engineering / Deterministic Uncertainty 与 Empirical / Model-Quality Uncertainty。
+- 当 Empirical / Model-Quality Uncertainty 是最大的 remaining uncertainty，且存在 safe、bounded、authorized、affordable/local、technically executable、可隔离且可归因的最小真实媒体实验时，在继续扩大仅服务未来验证的 Production qualification、schema、lifecycle、Harness 或 integration 之前，下一关键动作 SHOULD 优先获取该实验的 evidence。只有真实阻塞实验的 safety、authorization、credential、exact model/workflow、output destination、isolation、minimum repeatability/attribution prerequisite，或用户明确要求先完成 contract 时，才继续优先 engineering。
+- Development experiment evidence 不是 Production evidence。PASS 不自动产生 active capability、Production qualification、P6 / Final Acceptance、live-ready、release 或 replay truth；FAIL 不授权降低 Production contract、改变 frozen rubric、fallback、blind retry，或绕过 safety、budget、egress、permit、lifecycle 与 recovery。
+- Pure schema migration、deterministic bug、state corruption、replay bug、security fix 与 no-media backend refactor 不触发本优先级；本规则也不把“先生成再写代码”或“媒体生成永远优先”设为默认。
+
 ## Canonical Ownership
 
 | Concern | Canonical Owner |
