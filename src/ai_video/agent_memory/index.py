@@ -239,6 +239,92 @@ def load_index(
     return _client(Path(index_path))
 
 
+def _validate_scoped_collections(
+    index_path: Path,
+    corpora: Sequence[CorpusSpec],
+    manifest: IndexManifest,
+) -> None:
+    indexed = {item.kind: item for item in manifest.corpora}
+    client = _client(Path(index_path))
+    for corpus in corpora:
+        item = indexed[corpus.kind]
+        try:
+            actual_chunks = client.get_collection(item.collection_name).count()
+        except Exception as exc:
+            raise IndexMismatchError(
+                f"index collection for scope {corpus.kind!r} is unavailable"
+            ) from exc
+        if actual_chunks != item.chunk_count:
+            raise IndexMismatchError(
+                f"index collection for scope {corpus.kind!r} chunk count mismatch"
+            )
+
+
+def ensure_scoped_index(
+    corpora: Sequence[CorpusSpec],
+    index_path: Path,
+    embedding: Embeddings,
+    *,
+    batch_size: int = DEFAULT_EMBED_BATCH_SIZE,
+) -> None:
+    """Build or refresh the derived project index for requested corpora.
+
+    Missing indexes and corpus-only changes are rebuilt through staging. Index
+    identity mismatches (schema, embedding, chunking, metric, or libraries),
+    malformed/partial indexes, and corpus contract changes remain fail-closed.
+    """
+    if not corpora:
+        raise ValueError("at least one corpus is required")
+    index_path = Path(index_path)
+    validate_index_path(index_path, tuple(corpus.root for corpus in corpora))
+    for corpus in corpora:
+        if not corpus.root.is_dir():
+            raise FileNotFoundError(f"corpus not found: {corpus.root}")
+
+    refresh_required = not index_path.exists()
+    if index_path.exists():
+        if not index_exists(index_path):
+            raise IndexMismatchError(
+                f"Agent project RAG index at {index_path} is incomplete; "
+                "explicit rebuild required"
+            )
+        manifest = read_index_manifest(index_path)
+        # Validate non-corpus identity first. These mismatches must not be
+        # silently rewritten as if a markdown document had merely changed.
+        validate_manifest(manifest, (), embedding)
+        indexed = {item.kind: item for item in manifest.corpora}
+        for corpus in corpora:
+            item = indexed.get(corpus.kind)
+            if item is not None and (
+                item.collection_name != corpus.collection_name
+                or item.authority != corpus.authority
+            ):
+                validate_manifest(manifest, (corpus,), embedding)
+        present_corpora = tuple(
+            corpus for corpus in corpora if corpus.kind in indexed
+        )
+        _validate_scoped_collections(index_path, present_corpora, manifest)
+        try:
+            validate_manifest(manifest, corpora, embedding)
+        except IndexMismatchError:
+            refresh_required = True
+        else:
+            return
+
+    if not refresh_required:
+        return
+    _release_cached_client(index_path)
+    build_scoped_index(
+        corpora,
+        index_path,
+        embedding,
+        batch_size=batch_size,
+    )
+    manifest = read_index_manifest(index_path)
+    validate_manifest(manifest, corpora, embedding)
+    _validate_scoped_collections(index_path, corpora, manifest)
+
+
 def validate_run_summary_index(
     runs_index_path: Path,
     runs_corpus: CorpusSpec,
@@ -315,6 +401,7 @@ __all__ = [
     "IndexMismatchError",
     "build_index",
     "build_scoped_index",
+    "ensure_scoped_index",
     "ensure_run_summary_index",
     "index_exists",
     "load_index",

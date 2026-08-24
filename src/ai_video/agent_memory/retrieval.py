@@ -10,6 +10,7 @@ from ai_video.agent_memory.embeddings import build_embedding
 from ai_video.agent_memory.corpus import CorpusSpec
 from ai_video.agent_memory.index import (
     IndexMismatchError,
+    ensure_scoped_index,
     ensure_run_summary_index,
     load_index,
     read_index_manifest,
@@ -79,7 +80,8 @@ def search(
     """Return the top-K hits for ``query`` against the local Chroma index.
 
     The index manifest binds corpus bytes, embedding identity and collection
-    scope. When callers provide corpus roots, stale source bytes fail closed.
+    scope. When callers provide corpus roots, missing indexes and changed
+    source bytes are refreshed automatically before retrieval.
 
     Experience / all scopes transparently ensure the separate
     ``run_summaries`` derived index is current so users never need a
@@ -96,6 +98,16 @@ def search(
     runs_index_path = Path(
         runs_index_path or ".agent/memory/run-summaries"
     )
+    if scope == "all":
+        requested_kinds = {"experience", "superpowers"}
+    else:
+        requested_kinds = {scope}
+    expected = tuple(corpora or ())
+    if not expected and corpus_root is not None:
+        expected = (CorpusSpec.experience(Path(corpus_root)),)
+    expected = tuple(item for item in expected if item.kind in requested_kinds)
+    if expected:
+        ensure_scoped_index(expected, idx_path, embedding)
 
     # Run-summary inclusion is opt-in via an explicit ``runs_corpus``.
     # When the caller does not provide one we leave the search scoped to
@@ -142,14 +154,6 @@ def search(
             "Run `python -m scripts.agent_memory build` first."
         )
     manifest = read_index_manifest(idx_path)
-    expected = tuple(corpora or ())
-    if not expected and corpus_root is not None:
-        expected = (CorpusSpec.experience(Path(corpus_root)),)
-    if scope == "all":
-        requested_kinds = {"experience", "superpowers"}
-    else:
-        requested_kinds = {scope}
-    expected = tuple(item for item in expected if item.kind in requested_kinds)
     validate_manifest(manifest, expected, embedding)
 
     indexed = {item.kind: item for item in manifest.corpora}

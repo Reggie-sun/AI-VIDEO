@@ -39,9 +39,11 @@ Requirements:
 - Local ComfyUI already running
 - `ffmpeg` and `ffprobe` on PATH
 
-## Agent Memory RAG
+## Project RAG (`agent_memory` CLI)
 
-Agent Memory 是独立于 Production runtime 的本地 advisory retrieval tool。默认
+这里的 `agent_memory` 是历史 CLI/module 名；它是独立于 Codex host memory 和
+Production runtime 的本地 advisory project RAG。索引只是可删除、可重建的 derived
+cache，不保存 canonical project state。默认
 `experience` scope 检索 `docs/record_for_agent/`，并自动合并 eligible run
 summaries；`superpowers` scope 只检索 `docs/superpowers/` 中的历史
 specs/plans。所有结果都不得当作当前 runtime truth。
@@ -96,10 +98,14 @@ python -m scripts.agent_memory --scope superpowers search \
 ```
 
 主 index manifest 会绑定 corpus digest、chunking、embedding identity 与 library
-versions；source 或 model 不匹配时 search 会 fail closed 并要求 rebuild。
-Run-summary derived index 使用相同的完整 identity 校验，但 missing/stale 时由
-`experience` / `all` search 自动重建。它与主 index 都保持 schema v1，且
-collection、authority 与 index 目录相互独立。
+versions。CLI search 会在首次缺少主 index、文档 bytes/digest 变化或 requested scope
+尚未 materialize 时，于检索前先在 staging 完整构建，再替换 derived index；已捕获的
+构建/替换失败会保留或恢复旧 index。因此正常文档更新后无需手动运行 `build`。
+schema、embedding、chunking/metric、library identity、corpus
+authority/collection contract 或不完整 index 不匹配时仍 fail closed，并要求显式
+rebuild，避免把环境或契约漂移误判为普通文档更新。Run-summary derived index 使用
+相同 identity 校验，并继续在 missing/stale 时由 `experience` / `all` search 自动重建。
+两个 index 都保持 schema v1，且 collection、authority 与 index 目录相互独立。
 
 ## Architecture Gate
 

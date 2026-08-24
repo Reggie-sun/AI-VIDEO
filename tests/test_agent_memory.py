@@ -467,12 +467,11 @@ def test_scoped_index_manifest_binds_corpora_and_embedding(
     assert all(item.source_sha256 for item in manifest.corpora)
 
 
-def test_scoped_search_rejects_stale_corpus(
+def test_scoped_search_refreshes_stale_corpus(
     scoped_corpora, tmp_path: Path, fake_embedding
 ) -> None:
     idx = tmp_path / "idx"
     build_scoped_index = getattr(index_module, "build_scoped_index", None)
-    IndexMismatchError = getattr(index_module, "IndexMismatchError", RuntimeError)
     assert build_scoped_index is not None
     build_scoped_index(
         corpora=scoped_corpora,
@@ -481,18 +480,140 @@ def test_scoped_search_rejects_stale_corpus(
     )
     experience, _ = scoped_corpora
     (experience.root / "continuity.md").write_text(
-        "# Changed after index build\n",
+        "# Changed after index build\n\nThe refreshed index contains relay motion.\n",
         encoding="utf-8",
     )
 
-    with pytest.raises(IndexMismatchError, match="stale corpus"):
+    hits = search(
+        "relay motion",
+        scope="experience",
+        corpora=scoped_corpora,
+        index_path=idx,
+        embedding=fake_embedding,
+    )
+
+    assert hits
+    assert hits[0].title == "Changed after index build"
+    manifest = index_module.read_index_manifest(idx)
+    indexed = {item.kind: item for item in manifest.corpora}
+    assert indexed["experience"].source_sha256 == index_module.corpus_digest(
+        experience.root
+    )[0]
+
+
+def test_scoped_search_builds_missing_project_index(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    idx = tmp_path / "missing"
+
+    hits = search(
+        "terminal frame continuity",
+        scope="experience",
+        corpora=scoped_corpora,
+        index_path=idx,
+        embedding=fake_embedding,
+    )
+
+    assert hits
+    assert index_module.index_exists(idx)
+
+
+def test_scoped_search_materializes_requested_scope_missing_from_index(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    experience, superpowers = scoped_corpora
+    idx = tmp_path / "idx"
+    index_module.build_scoped_index((experience,), idx, fake_embedding)
+
+    hits = search(
+        "ProductionStateCommitter recovery",
+        scope="superpowers",
+        corpora=scoped_corpora,
+        index_path=idx,
+        embedding=fake_embedding,
+    )
+
+    assert hits
+    assert {hit.corpus_kind for hit in hits} == {"superpowers"}
+    assert {
+        item.kind for item in index_module.read_index_manifest(idx).corpora
+    } == {"superpowers"}
+
+
+def test_scoped_search_keeps_embedding_identity_mismatch_fail_closed(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    idx = tmp_path / "idx"
+    index_module.build_scoped_index(scoped_corpora, idx, fake_embedding)
+    replacement = DeterministicFakeEmbeddings(size=32)
+    IndexMismatchError = getattr(index_module, "IndexMismatchError", RuntimeError)
+
+    with pytest.raises(IndexMismatchError, match="embedding identity mismatch"):
         search(
             "terminal frame continuity",
             scope="experience",
             corpora=scoped_corpora,
             index_path=idx,
+            embedding=replacement,
+        )
+
+    assert index_module.read_index_manifest(idx).embedding.dimension == 64
+
+
+def test_scoped_search_keeps_partial_collection_fail_closed(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    experience, _ = scoped_corpora
+    idx = tmp_path / "idx"
+    index_module.build_scoped_index((experience,), idx, fake_embedding)
+    collection = index_module.load_index(idx, fake_embedding).get_collection(
+        experience.collection_name
+    )
+    collection.delete(ids=[collection.get()["ids"][0]])
+    IndexMismatchError = getattr(index_module, "IndexMismatchError", RuntimeError)
+
+    with pytest.raises(IndexMismatchError, match="chunk count mismatch"):
+        search(
+            "terminal frame continuity",
+            scope="experience",
+            corpora=(experience,),
+            index_path=idx,
             embedding=fake_embedding,
         )
+
+
+def test_scoped_search_does_not_hide_corruption_behind_stale_corpus_refresh(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    experience, _ = scoped_corpora
+    idx = tmp_path / "idx"
+    index_module.build_scoped_index((experience,), idx, fake_embedding)
+    original_digest = index_module.read_index_manifest(
+        idx
+    ).corpora[0].source_sha256
+    collection = index_module.load_index(idx, fake_embedding).get_collection(
+        experience.collection_name
+    )
+    collection.delete(ids=[collection.get()["ids"][0]])
+    (experience.root / "continuity.md").write_text(
+        "# Changed while index is corrupt\n\nNew corpus bytes.\n",
+        encoding="utf-8",
+    )
+    IndexMismatchError = getattr(index_module, "IndexMismatchError", RuntimeError)
+
+    with pytest.raises(IndexMismatchError, match="chunk count mismatch"):
+        search(
+            "new corpus bytes",
+            scope="experience",
+            corpora=(experience,),
+            index_path=idx,
+            embedding=fake_embedding,
+        )
+
+    assert (
+        index_module.read_index_manifest(idx).corpora[0].source_sha256
+        == original_digest
+    )
 
 
 def test_build_rejects_corpus_changed_while_embedding(
