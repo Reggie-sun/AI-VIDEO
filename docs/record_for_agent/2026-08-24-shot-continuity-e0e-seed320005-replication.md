@@ -335,7 +335,7 @@ Provider/media effects：
 
 ## Human Verdict And Closure
 
-E0-F 与 E0-G 的 automated / sampled AI visual verdict均为 `PASS`。2026-08-25，用户在收到 E0-G exact output、motion、stop/hold、seam与audio evidence 后明确回复“通过”；因此 E0-G human full-speed subjective verdict更新为 `PASS`。该回复是本次 development experiment的human verdict evidence；用户没有附加新的 defect或条件。
+E0-F 与 E0-G 的 automated / sampled AI visual verdict均为 `PASS`。2026-08-25，用户在收到 E0-G exact output、motion、stop/hold、seam与audio evidence 后明确回复“通过”，随后进一步说明“我接受，这一版本人走得很快”；因此 E0-G human full-speed subjective verdict保持为 `PASS`，同时记录一项 non-blocking observation：人物步速明显偏快。该观察不构成 rejection、rerun authorization或 seed-only contract change；若未来需要调整步速，应作为独立 prompt/schedule variable另行授权和验证，不能回写本次 replication verdict。
 
 E0-G seed-only development replication现以 technical、sampled AI visual与human verdict全部 `PASS`关闭。无需再 blind resume/retry E0-E，也不得用 E0-F替代该结论。这仍不执行或授权 Production qualification、P6、Final Acceptance、active capability、canonical reference、Production Manifest/Registry mutation、push或release。
 
