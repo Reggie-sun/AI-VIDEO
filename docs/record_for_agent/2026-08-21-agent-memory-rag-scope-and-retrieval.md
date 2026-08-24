@@ -36,6 +36,7 @@ design/plan 身份，不能被当成 current runtime truth、implementation auth
 CLI 是显式、local-only 的：
 
 ```bash
+python -m scripts.agent_memory --scope all build
 python -m scripts.agent_memory --scope experience search "H3 continuity"
 python -m scripts.agent_memory --scope superpowers search "state commit recovery"
 python -m scripts.agent_memory --scope all search "provider-neutral planning"
@@ -149,19 +150,22 @@ current_docs、research、deferred 的 null excess 分别为 `-0.003528`、`0.00
 ## Freshness And Maintenance
 
 Index manifest 绑定 exact corpus digest、chunking configuration、embedding identity、
-collection identity 与 library versions。主 index 首次缺失、corpus bytes/digest 改变或
-requested scope 尚未 materialize 时，search 会先通过 staging rebuild 自动刷新并替换 derived
-index。schema、embedding、chunking/metric、library identity、corpus authority/collection
-contract 或 partial index 不匹配时仍 fail closed，并提示对 shared main index 做 explicit rebuild：
+collection identity 与 library versions。Materialization 与 query 是两个独立 phase：
+`build` 是唯一能够通过 staging 构建并替换 derived index 的 owner；`experience` / `all`
+build 也会同步 materialize eligible run-summary index。`search` 只校验并查询，绝不创建、
+刷新或修复 index。主 index 或 run-summary index 缺失、corpus bytes/digest 改变、requested
+scope 尚未 materialize、schema / embedding / chunking / metric / library identity / corpus
+authority / collection contract 不匹配，或 physical collection partial/corrupt 时，search
+均 fail closed，并提示对 shared index 做 explicit build：
 
 ```bash
 python -m scripts.agent_memory --scope all build
 ```
 
 Index 位于 `.agent/memory/index/`，是 local derived state，不是 repository runtime
-truth 或 committed evidence。新增或修改五个 corpus 拥有的 Markdown 后，下一次
-对应 scope search 会自动刷新 corpus-only stale index；不需要仅因文档 bytes 变化手动
-build。Run-summary derived index 也会在 `experience` / `all` search 时按 digest 自动刷新。
+truth 或 committed evidence。新增或修改五个 corpus 拥有的 Markdown 或 eligible
+run summary 后，必须先显式运行 build，再执行 search。这样耗时的 embedding / Chroma
+写入不会占用 query timeout，也不会让一次只读检索产生 workspace-local derived writes。
 
 ## Guardrails
 

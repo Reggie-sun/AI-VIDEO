@@ -59,8 +59,8 @@ generic current-project advisory；research 与 when-to-do 则分别保持
 
 `runs/<run_id>/SUMMARY.md`（auto-generated run summaries）通过独立的 derived
 index `.agent/memory/run-summaries`（collection `agent_memory_run_summaries`，
-authority `auto_generated_run_summary_advisory`）被发现；无需手动复制或单独
-build，experience 与 all 检索会在 corpus digest 变化时自动重建；schema
+authority `auto_generated_run_summary_advisory`）被发现；无需手动复制，
+`experience` / `all` 的显式 `build` 会同时 materialize 该 index；schema
 仍然保持 v1。只有精确的一层 `runs/<run_id>/SUMMARY.md` regular non-symlink
 文件，且带 `Status` 行，trailing `-vN` 解析为 `run_family`/`run_version` 且只
 保留同 family 的最高版本。`superpowers` scope 不会触达 runs；缺失的 runs
@@ -107,14 +107,13 @@ python -m scripts.agent_memory --scope superpowers search \
 ```
 
 主 index manifest 会绑定 corpus digest、chunking、embedding identity 与 library
-versions。CLI search 会在首次缺少主 index、文档 bytes/digest 变化或 requested scope
-尚未 materialize 时，于检索前先在 staging 完整构建，再替换 derived index；已捕获的
-构建/替换失败会保留或恢复旧 index。因此正常文档更新后无需手动运行 `build`。
-schema、embedding、chunking/metric、library identity、corpus
-authority/collection contract 或不完整 index 不匹配时仍 fail closed，并要求显式
-rebuild，避免把环境或契约漂移误判为普通文档更新。Run-summary derived index 使用
-相同 identity 校验，并继续在 missing/stale 时由 `experience` / `all` search 自动重建。
-两个 index 都保持 schema v1，且 collection、authority 与 index 目录相互独立。
+versions。CLI 的 materialization 与 query 已拆开：`build` 是唯一会在 staging 构建并
+替换 derived index 的命令；`experience` / `all` build 也会同步构建 eligible
+run-summary index。`search` 只校验并查询，不创建、不刷新、不修复任何 index。首次缺少
+index、文档 bytes/digest 变化、requested scope 尚未 materialize，或 schema、embedding、
+chunking/metric、library identity、corpus authority/collection contract、physical
+collection 不匹配时，search 都会快速 fail closed，提示先显式运行 build。两个 index
+保持 schema v1，且 collection、authority 与 index 目录相互独立。
 `all` 在默认 `top_n=8` 时为五个 main corpora 分配稳定的 `2/2/2/1/1`
 candidate quota，再与 eligible run-summary hits 统一排序并截取最终 8 个片段；
 每个 collection 的 dense 与 lexical candidate `top_k` 仍为 30。

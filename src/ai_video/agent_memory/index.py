@@ -9,7 +9,7 @@ import shutil
 import tempfile
 import uuid
 from pathlib import Path
-from typing import Sequence
+from typing import Iterable, Sequence
 
 import chromadb
 from chromadb.api.client import SharedSystemClient
@@ -189,6 +189,7 @@ def build_scoped_index(
         )
         _release_cached_client(staging_path)
         if index_path.exists():
+            _release_cached_client(index_path)
             os.replace(index_path, backup_path)
             old_moved = True
         os.replace(staging_path, index_path)
@@ -239,40 +240,65 @@ def load_index(
     return _client(Path(index_path))
 
 
-def _validate_scoped_collections(
+def _validate_index_collections(
     index_path: Path,
-    corpora: Sequence[CorpusSpec],
+    corpus_kinds: Iterable[str],
     manifest: IndexManifest,
 ) -> None:
     indexed = {item.kind: item for item in manifest.corpora}
     client = _client(Path(index_path))
-    for corpus in corpora:
-        item = indexed[corpus.kind]
+    for kind in corpus_kinds:
+        item = indexed[kind]
         try:
             actual_chunks = client.get_collection(item.collection_name).count()
         except Exception as exc:
             raise IndexMismatchError(
-                f"index collection for scope {corpus.kind!r} is unavailable"
+                f"index collection for scope {kind!r} is unavailable; "
+                "explicit build required"
             ) from exc
         if actual_chunks != item.chunk_count:
             raise IndexMismatchError(
-                f"index collection for scope {corpus.kind!r} chunk count mismatch"
+                f"index collection for scope {kind!r} chunk count mismatch; "
+                "explicit build required"
             )
 
 
-def ensure_scoped_index(
+def validate_materialized_index(
+    index_path: Path,
+    embedding: Embeddings,
+    corpus_kinds: Iterable[str],
+) -> IndexManifest:
+    """Validate manifest identity and physical collections without source roots."""
+    index_path = Path(index_path)
+    if not index_path.exists():
+        raise FileNotFoundError(
+            f"No Agent Memory index at {index_path}. "
+            "Run `python -m scripts.agent_memory --scope <scope> build` first."
+        )
+    if not index_exists(index_path):
+        raise IndexMismatchError(
+            f"Agent project RAG index at {index_path} is incomplete; "
+            "explicit build required"
+        )
+    manifest = read_index_manifest(index_path)
+    validate_manifest(manifest, (), embedding)
+    kinds = tuple(dict.fromkeys(corpus_kinds))
+    indexed = {item.kind: item for item in manifest.corpora}
+    missing = set(kinds) - indexed.keys()
+    if missing:
+        raise IndexMismatchError(
+            f"scope(s) {sorted(missing)} not present in index; rebuild required"
+        )
+    _validate_index_collections(index_path, kinds, manifest)
+    return manifest
+
+
+def validate_scoped_index(
     corpora: Sequence[CorpusSpec],
     index_path: Path,
     embedding: Embeddings,
-    *,
-    batch_size: int = DEFAULT_EMBED_BATCH_SIZE,
-) -> None:
-    """Build or refresh the derived project index for requested corpora.
-
-    Missing indexes and corpus-only changes are rebuilt through staging. Index
-    identity mismatches (schema, embedding, chunking, metric, or libraries),
-    malformed/partial indexes, and corpus contract changes remain fail-closed.
-    """
+) -> IndexManifest:
+    """Validate a materialized project index without rebuilding it."""
     if not corpora:
         raise ValueError("at least one corpus is required")
     index_path = Path(index_path)
@@ -280,49 +306,40 @@ def ensure_scoped_index(
     for corpus in corpora:
         if not corpus.root.is_dir():
             raise FileNotFoundError(f"corpus not found: {corpus.root}")
-
-    refresh_required = not index_path.exists()
-    if index_path.exists():
-        if not index_exists(index_path):
-            raise IndexMismatchError(
-                f"Agent project RAG index at {index_path} is incomplete; "
-                "explicit rebuild required"
-            )
-        manifest = read_index_manifest(index_path)
-        # Validate non-corpus identity first. These mismatches must not be
-        # silently rewritten as if a markdown document had merely changed.
-        validate_manifest(manifest, (), embedding)
-        indexed = {item.kind: item for item in manifest.corpora}
-        for corpus in corpora:
-            item = indexed.get(corpus.kind)
-            if item is not None and (
-                item.collection_name != corpus.collection_name
-                or item.authority != corpus.authority
-            ):
-                validate_manifest(manifest, (corpus,), embedding)
-        present_corpora = tuple(
-            corpus for corpus in corpora if corpus.kind in indexed
+    if not index_path.exists():
+        raise FileNotFoundError(
+            f"No Agent Memory index at {index_path}. "
+            "Run `python -m scripts.agent_memory --scope <scope> build` first."
         )
-        _validate_scoped_collections(index_path, present_corpora, manifest)
-        try:
-            validate_manifest(manifest, corpora, embedding)
-        except IndexMismatchError:
-            refresh_required = True
-        else:
-            return
-
-    if not refresh_required:
-        return
-    _release_cached_client(index_path)
-    build_scoped_index(
-        corpora,
-        index_path,
-        embedding,
-        batch_size=batch_size,
-    )
+    if not index_exists(index_path):
+        raise IndexMismatchError(
+            f"Agent project RAG index at {index_path} is incomplete; "
+            "explicit rebuild required"
+        )
     manifest = read_index_manifest(index_path)
+    # Validate the immutable index identity before touching Chroma, but inspect
+    # physical collections before reporting corpus freshness. A stale source
+    # must not hide a missing or truncated collection.
+    validate_manifest(manifest, (), embedding)
+    indexed = {item.kind: item for item in manifest.corpora}
+    present_corpora: list[CorpusSpec] = []
+    for corpus in corpora:
+        item = indexed.get(corpus.kind)
+        if item is None:
+            continue
+        if (
+            item.collection_name != corpus.collection_name
+            or item.authority != corpus.authority
+        ):
+            validate_manifest(manifest, (corpus,), embedding)
+        present_corpora.append(corpus)
+    _validate_index_collections(
+        index_path,
+        (corpus.kind for corpus in present_corpora),
+        manifest,
+    )
     validate_manifest(manifest, corpora, embedding)
-    _validate_scoped_collections(index_path, corpora, manifest)
+    return manifest
 
 
 def validate_run_summary_index(
@@ -333,7 +350,9 @@ def validate_run_summary_index(
     """Validate run-summary identity plus the physical Chroma collection."""
     runs_index_path = Path(runs_index_path)
     if not index_exists(runs_index_path):
-        raise IndexMismatchError("run-summary index is missing")
+        raise IndexMismatchError(
+            "run-summary index is missing; explicit build required"
+        )
     manifest = read_index_manifest(runs_index_path)
     validate_manifest(manifest, (runs_corpus,), embedding)
     if [item.kind for item in manifest.corpora] != ["run_summaries"]:
@@ -343,70 +362,26 @@ def validate_run_summary_index(
         collection = _client(runs_index_path).get_collection(item.collection_name)
         actual_chunks = collection.count()
     except Exception as exc:
-        raise IndexMismatchError("run-summary collection is unavailable") from exc
+        raise IndexMismatchError(
+            "run-summary collection is unavailable; explicit build required"
+        ) from exc
     if actual_chunks != item.chunk_count:
-        raise IndexMismatchError("run-summary collection chunk count mismatch")
-    return manifest
-
-
-def ensure_run_summary_index(
-    runs_corpus: CorpusSpec,
-    runs_index_path: Path,
-    embedding: Embeddings,
-) -> None:
-    """Rebuild the derived run-summary index when missing or stale.
-
-    Experience / all searches call this transparently so the user never
-    has to run a separate ``build`` for the run-summary collection.
-    Missing ``runs/`` roots contribute no index and no hits.
-    """
-    if runs_corpus.kind != "run_summaries":
-        raise ValueError(
-            f"ensure_run_summary_index requires a run_summaries corpus; "
-            f"got {runs_corpus.kind!r}"
+        raise IndexMismatchError(
+            "run-summary collection chunk count mismatch; explicit build required"
         )
-    if not runs_corpus.root.is_dir():
-        return
-    runs_index_path = Path(runs_index_path)
-    validate_index_path(
-        runs_index_path,
-        (runs_corpus.root,),
-        label="run-summary index",
-    )
-    if index_exists(runs_index_path):
-        try:
-            validate_run_summary_index(
-                runs_index_path,
-                runs_corpus,
-                embedding,
-            )
-        except IndexMismatchError:
-            pass
-        else:
-            return
-    _release_cached_client(runs_index_path)
-    build_scoped_index(
-        (runs_corpus,),
-        runs_index_path,
-        embedding,
-    )
-    try:
-        validate_run_summary_index(runs_index_path, runs_corpus, embedding)
-    except Exception:
-        _release_cached_client(runs_index_path)
-        raise
+    return manifest
 
 
 __all__ = [
     "IndexMismatchError",
     "build_index",
     "build_scoped_index",
-    "ensure_scoped_index",
-    "ensure_run_summary_index",
     "index_exists",
     "load_index",
     "read_index_manifest",
     "validate_index_path",
+    "validate_materialized_index",
     "validate_manifest",
     "validate_run_summary_index",
+    "validate_scoped_index",
 ]

@@ -29,6 +29,11 @@ python -m scripts.agent_memory --scope superpowers search \
   "<task-specific query>" --top-k 8 --json
 ```
 
+This command only validates and queries the materialized main index. If it
+reports a missing, stale, partial, or identity-mismatched index, return to the
+parent skill's explicit `--scope all build` recovery rule; search itself must
+not rebuild.
+
 ## Interpretation
 
 - Every hit has historical design/plan authority. It is evidence of what was

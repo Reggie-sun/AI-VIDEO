@@ -25,14 +25,13 @@ from ai_video.agent_memory.hybrid import (
 )
 from ai_video.agent_memory.index import (
     IndexMismatchError,
-    ensure_scoped_index,
-    ensure_run_summary_index,
     load_index,
-    read_index_manifest,
     validate_index_path,
-    validate_manifest,
+    validate_materialized_index,
     validate_run_summary_index,
+    validate_scoped_index,
 )
+from ai_video.agent_memory.manifest import IndexManifest
 
 
 @dataclass
@@ -162,13 +161,12 @@ def search(
     """Return up to top-K hits meeting the inclusive relevance threshold.
 
     The index manifest binds corpus bytes, embedding identity and collection
-    scope. When callers provide corpus roots, missing indexes and changed
-    source bytes are refreshed automatically before retrieval.
-
-    Experience / all scopes transparently ensure the separate
-    ``run_summaries`` derived index is current so users never need a
-    manual copy or build to surface auto-generated run summaries.
-    Superpowers-only scope never opens the run-summary index.
+    scope. Search is validation/query-only: missing, partial, or
+    identity-mismatched indexes fail closed and require an explicit build.
+    Corpus freshness is also validated when the caller supplies ``corpora`` or
+    ``corpus_root``; root-free legacy calls can validate only manifest identity
+    and physical completeness. Superpowers-only scope never opens the
+    run-summary index.
     """
     if top_k < 1:
         raise ValueError("top_k must be positive")
@@ -191,19 +189,23 @@ def search(
         {item.kind for item in expected} if expected else allowed_kinds
     )
     if expected:
-        ensure_scoped_index(expected, idx_path, embedding)
+        validated_manifest = validate_scoped_index(expected, idx_path, embedding)
+    else:
+        validated_manifest = validate_materialized_index(
+            idx_path,
+            embedding,
+            requested_kinds,
+        )
 
     # Run-summary inclusion is opt-in via an explicit ``runs_corpus``.
     # When the caller does not provide one we leave the search scoped to
     # experience / superpowers so historical callers that never asked
     # for run-summary retrieval keep their previous behaviour.  The CLI
     # passes the default ``runs_corpus`` explicitly so end users still
-    # benefit from automatic retrieval; missing roots contribute zero hits.
-    # Experience and all scopes transparently ensure the run-summary
-    # derived index is current *only when* the caller opted in by
-    # providing an explicit runs corpus.  This avoids silently indexing
-    # the repository's real ``runs/`` directory for callers that
-    # intentionally kept their search run-free.
+    # benefit from retrieval when an explicit build has materialized that
+    # index; missing roots contribute zero hits. This avoids silently indexing
+    # the repository's real ``runs/`` directory for callers that intentionally
+    # kept their search run-free.
     run_spec = (
         runs_corpus
         if runs_corpus is not None
@@ -211,6 +213,7 @@ def search(
         and runs_corpus.root.is_dir()
         else None
     )
+    runs_manifest: IndexManifest | None = None
     if run_spec is not None:
         protected_paths = [
             idx_path,
@@ -224,7 +227,11 @@ def search(
             tuple(protected_paths),
             label="run-summary index",
         )
-        ensure_run_summary_index(run_spec, runs_index_path, embedding)
+        runs_manifest = validate_run_summary_index(
+            runs_index_path,
+            run_spec,
+            embedding,
+        )
 
     try:
         store = load_index(idx_path, embedding)
@@ -237,8 +244,7 @@ def search(
             f"No Agent Experience Memory index at {idx_path}. "
             "Run `python -m scripts.agent_memory build` first."
         )
-    manifest = read_index_manifest(idx_path)
-    validate_manifest(manifest, expected, embedding)
+    manifest = validated_manifest
 
     indexed = {item.kind: item for item in manifest.corpora}
     missing = requested_kinds - indexed.keys()
@@ -280,13 +286,14 @@ def search(
     # separate run-summary index so auto-generated run notes surface
     # in the same ranked hit list without manual copying.
     if run_spec is not None:
+        assert runs_manifest is not None
         hits.extend(
             _search_runs(
                 query,
                 top_k,
-                run_spec,
                 runs_index_path,
                 embedding,
+                manifest=runs_manifest,
                 query_vector=query_vector,
                 null_query_vector=null_query_vector,
             )
@@ -486,10 +493,10 @@ def _search_collection(
 def _search_runs(
     query: str,
     top_k: int,
-    runs_corpus: CorpusSpec,
     runs_index_path: Path,
     embedding,
     *,
+    manifest: IndexManifest,
     query_vector: Sequence[float],
     null_query_vector: Sequence[float],
 ) -> List[Hit]:
@@ -501,11 +508,6 @@ def _search_runs(
         raise IndexMismatchError("run-summary index disappeared during search")
     try:
         store = load_index(runs_index_path, embedding)
-        manifest = validate_run_summary_index(
-            runs_index_path,
-            runs_corpus,
-            embedding,
-        )
     except Exception as exc:
         raise IndexMismatchError(
             "cannot open the current run-summary index"

@@ -54,16 +54,19 @@ From the AI-VIDEO repository root, distill the task into a short query with the
 domain, failure or decision, and important exact identifiers. Do not put
 credentials, raw Provider responses, signed URLs, or private data in the query.
 
-Run the exact command in the selected scope reference. `search` refreshes
-ordinary missing/stale derived indexes when corpus bytes change. Exit code `0`
-with `[]` is a valid answerability abstention. Exit code `2` with an error on
-stderr is a retrieval failure, not an empty result.
+Run the exact command in the selected scope reference. `search` is
+validation/query-only: it never builds, refreshes, or repairs an index. Exit
+code `0` with `[]` is a valid answerability abstention. Exit code `2` with an
+error on stderr is a retrieval failure, not an empty result.
 
-If and only if that error explicitly says the main index requires rebuild,
+If and only if that error explicitly says an index is missing, stale, partial,
+or identity-mismatched,
 run `python -m scripts.agent_memory --scope all build` once with the pinned
-local backend, then retry the original selected-scope search once. The `all`
-build preserves all five collections in the shared main index; it does not broaden
-the retry query or the authority of its results. Otherwise report the
+local backend, then retry the original selected-scope search once. Treat build
+as a separate potentially long-running phase; do not include it in the search
+timeout. The `all` build materializes all five collections in the shared main
+index plus eligible run summaries; it does not broaden the retry query or the
+authority of its results. Otherwise report the
 fail-closed error and continue from current repository evidence. Never download
 a model, use the fake embedding backend, enable a network fallback, or broaden
 the search scope to force a result.

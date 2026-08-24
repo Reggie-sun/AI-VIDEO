@@ -1075,7 +1075,7 @@ def test_scoped_index_manifest_binds_corpora_and_embedding(
     assert all(item.source_sha256 for item in manifest.corpora)
 
 
-def test_scoped_search_refreshes_stale_corpus(
+def test_scoped_search_rejects_stale_corpus_without_rebuild(
     scoped_corpora, tmp_path: Path, fake_embedding
 ) -> None:
     idx = tmp_path / "idx"
@@ -1087,65 +1087,60 @@ def test_scoped_search_refreshes_stale_corpus(
         embedding=fake_embedding,
     )
     experience, _ = scoped_corpora
+    manifest_before = (idx / "manifest.json").read_bytes()
     (experience.root / "continuity.md").write_text(
-        "# Changed after index build\n\nThe refreshed index contains relay motion.\n",
+        "# Changed after index build\n\nThe stale corpus contains relay motion.\n",
         encoding="utf-8",
     )
 
-    hits = search(
-        "relay motion",
-        scope="experience",
-        corpora=scoped_corpora,
-        index_path=idx,
-        embedding=fake_embedding,
-    )
+    with pytest.raises(index_module.IndexMismatchError, match="stale corpus"):
+        search(
+            "relay motion",
+            scope="experience",
+            corpora=scoped_corpora,
+            index_path=idx,
+            embedding=fake_embedding,
+        )
 
-    assert hits
-    assert hits[0].title == "Changed after index build"
-    manifest = index_module.read_index_manifest(idx)
-    indexed = {item.kind: item for item in manifest.corpora}
-    assert indexed["experience"].source_sha256 == index_module.corpus_digest(
-        experience.root
-    )[0]
+    assert (idx / "manifest.json").read_bytes() == manifest_before
 
 
-def test_scoped_search_builds_missing_project_index(
+def test_scoped_search_does_not_build_missing_project_index(
     scoped_corpora, tmp_path: Path, fake_embedding
 ) -> None:
     idx = tmp_path / "missing"
 
-    hits = search(
-        "terminal frame continuity",
-        scope="experience",
-        corpora=scoped_corpora,
-        index_path=idx,
-        embedding=fake_embedding,
-    )
+    with pytest.raises(FileNotFoundError, match="build.*first"):
+        search(
+            "terminal frame continuity",
+            scope="experience",
+            corpora=scoped_corpora,
+            index_path=idx,
+            embedding=fake_embedding,
+        )
 
-    assert hits
-    assert index_module.index_exists(idx)
+    assert not idx.exists()
 
 
-def test_scoped_search_materializes_requested_scope_missing_from_index(
+def test_scoped_search_rejects_requested_scope_missing_from_index(
     scoped_corpora, tmp_path: Path, fake_embedding
 ) -> None:
     experience, superpowers = scoped_corpora
     idx = tmp_path / "idx"
     index_module.build_scoped_index((experience,), idx, fake_embedding)
 
-    hits = search(
-        "ProductionStateCommitter recovery",
-        scope="superpowers",
-        corpora=scoped_corpora,
-        index_path=idx,
-        embedding=fake_embedding,
-    )
+    with pytest.raises(index_module.IndexMismatchError, match="not present"):
+        search(
+            "ProductionStateCommitter recovery",
+            scope="superpowers",
+            corpora=scoped_corpora,
+            index_path=idx,
+            embedding=fake_embedding,
+        )
 
-    assert hits
-    assert {hit.corpus_kind for hit in hits} == {"superpowers"}
     assert {
         item.kind for item in index_module.read_index_manifest(idx).corpora
-    } == {"superpowers"}
+    } == {"experience"}
 
 
 def test_scoped_search_keeps_embedding_identity_mismatch_fail_closed(
@@ -1222,6 +1217,24 @@ def test_scoped_search_does_not_hide_corruption_behind_stale_corpus_refresh(
         index_module.read_index_manifest(idx).corpora[0].source_sha256
         == original_digest
     )
+
+
+def test_search_without_corpus_roots_rejects_partial_index(
+    sample_corpus: Path, tmp_path: Path, fake_embedding
+) -> None:
+    idx = tmp_path / "idx"
+    index_module.build_index(sample_corpus, idx, fake_embedding)
+    collection = index_module.load_index(idx, fake_embedding).get_collection(
+        "agent_memory_experience"
+    )
+    collection.delete(ids=[collection.get(limit=1)["ids"][0]])
+
+    with pytest.raises(index_module.IndexMismatchError, match="chunk count mismatch"):
+        search(
+            "continuity",
+            index_path=idx,
+            embedding=fake_embedding,
+        )
 
 
 def test_build_rejects_corpus_changed_while_embedding(
@@ -1348,6 +1361,7 @@ def test_cli_builds_and_searches_all_scopes(
     experience, superpowers = scoped_corpora
     docs_root, _ = project_docs_corpora
     idx = tmp_path / "idx"
+    runs_idx = tmp_path / "runs_idx"
     common = [
         "--embedding",
         "fake",
@@ -1361,6 +1375,10 @@ def test_cli_builds_and_searches_all_scopes(
         str(docs_root),
         "--index",
         str(idx),
+        "--runs-root",
+        str(tmp_path / "missing_runs"),
+        "--runs-index",
+        str(runs_idx),
     ]
     assert agent_memory_main([*common, "build"]) == 0
     assert agent_memory_main([*common, "search", "recovery", "--json"]) == 0
@@ -1378,7 +1396,7 @@ def test_cli_builds_and_searches_all_scopes(
     }
 
 
-def test_cli_experience_search_auto_indexes_run_summaries(
+def test_cli_build_materializes_run_summaries_before_search(
     sample_runs_root: Path, tmp_path: Path, capsys
 ) -> None:
     experience = tmp_path / "record_for_agent"
@@ -1405,7 +1423,7 @@ def test_cli_experience_search_auto_indexes_run_summaries(
     ]
     assert agent_memory_main([*common, "build"]) == 0
     capsys.readouterr()
-    assert not runs_idx.exists()
+    assert runs_idx.is_dir()
 
     assert agent_memory_main(
         [*common, "search", "continuity failure", "--top-k", "8", "--json"]
@@ -1414,6 +1432,68 @@ def test_cli_experience_search_auto_indexes_run_summaries(
 
     assert any(hit["document_kind"] == "run_summary" for hit in hits)
     assert runs_idx.is_dir()
+
+
+def test_cli_build_validates_run_index_path_before_main_index_write(
+    sample_runs_root: Path, tmp_path: Path, capsys
+) -> None:
+    experience = tmp_path / "record_for_agent"
+    experience.mkdir()
+    (experience / "continuity.md").write_text(
+        "# Continuity\n\nUse exact terminal frames.\n",
+        encoding="utf-8",
+    )
+    main_idx = tmp_path / "idx"
+
+    assert agent_memory_main(
+        [
+            "--embedding",
+            "fake",
+            "--scope",
+            "experience",
+            "--corpus",
+            str(experience),
+            "--runs-root",
+            str(sample_runs_root),
+            "--index",
+            str(main_idx),
+            "--runs-index",
+            str(main_idx),
+            "build",
+        ]
+    ) == 2
+
+    assert "must not overlap" in capsys.readouterr().err
+    assert not main_idx.exists()
+
+
+def test_search_rejects_missing_run_summary_index_without_build(
+    sample_runs_root: Path, tmp_path: Path, fake_embedding
+) -> None:
+    experience_root = tmp_path / "record_for_agent"
+    experience_root.mkdir()
+    (experience_root / "continuity.md").write_text(
+        "# Continuity\n\nUse exact terminal frames.\n",
+        encoding="utf-8",
+    )
+    experience = corpus_module.CorpusSpec.experience(experience_root)
+    runs = corpus_module.CorpusSpec.run_summaries(sample_runs_root)
+    main_idx = tmp_path / "idx"
+    runs_idx = tmp_path / "runs_idx"
+    index_module.build_scoped_index((experience,), main_idx, fake_embedding)
+
+    with pytest.raises(index_module.IndexMismatchError, match="run-summary index"):
+        search(
+            "continuity failure",
+            scope="experience",
+            corpora=(experience,),
+            runs_corpus=runs,
+            index_path=main_idx,
+            runs_index_path=runs_idx,
+            embedding=fake_embedding,
+        )
+
+    assert not runs_idx.exists()
 
 
 def test_cli_build_reports_changed_corpus_without_traceback(
@@ -1775,6 +1855,11 @@ def test_run_summaries_search_returns_run_summary_hit(
         index_path=main_idx,
         embedding=fake_embedding,
     )
+    build_scoped_index(
+        corpora=(spec,),
+        index_path=runs_idx,
+        embedding=fake_embedding,
+    )
     hits = search(
         "continuity failure",
         top_k=5,
@@ -1822,8 +1907,12 @@ def test_experience_search_includes_run_summary_hits(
         index_path=main_idx,
         embedding=fake_embedding,
     )
-    # Now perform an experience search. It must auto-ensure the runs
-    # index is built so that run-summary hits surface.
+    build_scoped_index(
+        corpora=(runs,),
+        index_path=runs_idx,
+        embedding=fake_embedding,
+    )
+    # Search only queries the run-summary index materialized by build.
     hits = search(
         "shot failure continuity",
         top_k=4,
@@ -1932,7 +2021,7 @@ def test_scoped_index_path_must_not_overlap_its_corpus(
     assert summary_path.read_bytes() == summary_before
 
 
-def test_experience_search_refreshes_when_newer_run_version_appears(
+def test_experience_search_rejects_newer_run_version_until_explicit_build(
     sample_runs_root: Path, tmp_path: Path, fake_embedding
 ) -> None:
     experience_root = tmp_path / "record_for_agent"
@@ -1946,17 +2035,8 @@ def test_experience_search_refreshes_when_newer_run_version_appears(
     main_idx = tmp_path / "idx"
     runs_idx = tmp_path / "runs_idx"
     index_module.build_scoped_index((experience,), main_idx, fake_embedding)
-
-    search(
-        "continuity failure",
-        top_k=8,
-        scope="experience",
-        corpora=(experience,),
-        runs_corpus=runs,
-        index_path=main_idx,
-        runs_index_path=runs_idx,
-        embedding=fake_embedding,
-    )
+    index_module.build_scoped_index((runs,), runs_idx, fake_embedding)
+    manifest_before = (runs_idx / "manifest.json").read_bytes()
     (sample_runs_root / "shot-failure-20260820-v3").mkdir()
     (sample_runs_root / "shot-failure-20260820-v3" / "SUMMARY.md").write_text(
         "# Shot Failure Run v3\n\n"
@@ -1965,6 +2045,20 @@ def test_experience_search_refreshes_when_newer_run_version_appears(
         encoding="utf-8",
     )
 
+    with pytest.raises(index_module.IndexMismatchError, match="stale corpus"):
+        search(
+            "gimbal yaw correction accepted",
+            top_k=8,
+            scope="experience",
+            corpora=(experience,),
+            runs_corpus=runs,
+            index_path=main_idx,
+            runs_index_path=runs_idx,
+            embedding=fake_embedding,
+        )
+
+    assert (runs_idx / "manifest.json").read_bytes() == manifest_before
+    index_module.build_scoped_index((runs,), runs_idx, fake_embedding)
     refreshed = search(
         "gimbal yaw correction accepted",
         top_k=8,
@@ -1987,7 +2081,7 @@ def test_experience_search_refreshes_when_newer_run_version_appears(
 
 
 @pytest.mark.parametrize("corruption", ("missing_collection", "chunk_count"))
-def test_experience_search_repairs_corrupt_run_summary_index(
+def test_experience_search_rejects_corrupt_run_summary_index(
     sample_runs_root: Path,
     tmp_path: Path,
     fake_embedding,
@@ -2004,15 +2098,8 @@ def test_experience_search_repairs_corrupt_run_summary_index(
     main_idx = tmp_path / "idx"
     runs_idx = tmp_path / "runs_idx"
     index_module.build_scoped_index((experience,), main_idx, fake_embedding)
-    search(
-        "continuity failure",
-        scope="experience",
-        corpora=(experience,),
-        runs_corpus=runs,
-        index_path=main_idx,
-        runs_index_path=runs_idx,
-        embedding=fake_embedding,
-    )
+    index_module.build_scoped_index((runs,), runs_idx, fake_embedding)
+    manifest_before = (runs_idx / "manifest.json").read_bytes()
     client = index_module.load_index(runs_idx, fake_embedding)
     collection = client.get_collection(runs.collection_name)
     if corruption == "missing_collection":
@@ -2021,6 +2108,25 @@ def test_experience_search_repairs_corrupt_run_summary_index(
         first_id = collection.get(limit=1)["ids"][0]
         collection.delete(ids=[first_id])
 
+    message = (
+        "run-summary collection is unavailable"
+        if corruption == "missing_collection"
+        else "run-summary collection chunk count mismatch"
+    )
+    with pytest.raises(index_module.IndexMismatchError, match=message):
+        search(
+            "continuity failure",
+            top_k=8,
+            scope="experience",
+            corpora=(experience,),
+            runs_corpus=runs,
+            index_path=main_idx,
+            runs_index_path=runs_idx,
+            embedding=fake_embedding,
+        )
+
+    assert (runs_idx / "manifest.json").read_bytes() == manifest_before
+    index_module.build_scoped_index((runs,), runs_idx, fake_embedding)
     repaired = search(
         "continuity failure",
         top_k=8,
@@ -2168,15 +2274,19 @@ def test_public_scopes_remain_backward_compatible(fake_embedding) -> None:
         search("run only", scope="run_summaries", embedding=fake_embedding)
 
 
-def test_run_summary_auto_index_rebuilds_for_embedding_identity(
+def test_run_summary_validation_rejects_embedding_identity_until_explicit_build(
     sample_runs_root: Path, tmp_path: Path, fake_embedding
 ) -> None:
     spec = corpus_module.CorpusSpec.run_summaries(sample_runs_root)
     runs_idx = tmp_path / "runs_idx"
-    index_module.ensure_run_summary_index(spec, runs_idx, fake_embedding)
+    index_module.build_scoped_index((spec,), runs_idx, fake_embedding)
     assert index_module.read_index_manifest(runs_idx).embedding.dimension == 64
 
     replacement = DeterministicFakeEmbeddings(size=32)
-    index_module.ensure_run_summary_index(spec, runs_idx, replacement)
+    with pytest.raises(index_module.IndexMismatchError, match="embedding"):
+        index_module.validate_run_summary_index(runs_idx, spec, replacement)
+
+    assert index_module.read_index_manifest(runs_idx).embedding.dimension == 64
+    index_module.build_scoped_index((spec,), runs_idx, replacement)
 
     assert index_module.read_index_manifest(runs_idx).embedding.dimension == 32

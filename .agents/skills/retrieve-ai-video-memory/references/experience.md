@@ -31,6 +31,11 @@ python -m scripts.agent_memory --scope experience search \
   "<task-specific query>" --top-k 8 --json
 ```
 
+This command only validates and queries materialized indexes. If it reports a
+missing, stale, partial, or identity-mismatched index, return to the parent
+skill's explicit `--scope all build` recovery rule; do not rebuild inside the
+search timeout.
+
 Prefer one precise query. A second query is justified only when the first
 reveals a distinct historical term, owner, or failure signature needed by the
 task. Do not broaden merely because the result abstains.

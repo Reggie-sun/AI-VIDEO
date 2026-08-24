@@ -51,6 +51,7 @@ from ai_video.agent_memory.embeddings import build_embedding
 from ai_video.agent_memory.index import (
     IndexMismatchError,
     build_scoped_index,
+    validate_index_path,
 )
 from ai_video.agent_memory.retrieval import format_text, search
 
@@ -95,12 +96,24 @@ def _resolve_corpora(args: argparse.Namespace) -> tuple[CorpusSpec, ...]:
 
 def cmd_build(args: argparse.Namespace) -> int:
     idx = _resolve(args.index)
+    runs_idx = _resolve(args.runs_index)
     corpora = _resolve_corpora(args)
     for corpus in corpora:
         if not corpus.root.is_dir():
             print(f"corpus not found: {corpus.root}", file=sys.stderr)
             return 2
+    runs_corpus: CorpusSpec | None = None
+    if args.scope in {"experience", "all"}:
+        candidate = CorpusSpec.run_summaries(_resolve(args.runs_root))
+        if candidate.root.is_dir():
+            runs_corpus = candidate
     try:
+        if runs_corpus is not None:
+            validate_index_path(
+                runs_idx,
+                (idx, runs_corpus.root, *(item.root for item in corpora)),
+                label="run-summary index",
+            )
         embedding = build_embedding(backend=args.embedding)
         n = build_scoped_index(
             corpora=corpora,
@@ -108,11 +121,24 @@ def cmd_build(args: argparse.Namespace) -> int:
             embedding=embedding,
             batch_size=args.batch_size,
         )
+        runs_count = 0
+        if runs_corpus is not None:
+            runs_count = build_scoped_index(
+                corpora=(runs_corpus,),
+                index_path=runs_idx,
+                embedding=embedding,
+                batch_size=args.batch_size,
+            )
     except (FileNotFoundError, IndexMismatchError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
     roots = ", ".join(f"{item.kind}={item.root}" for item in corpora)
     print(f"Indexed {n} chunks from {roots} into {idx}")
+    if runs_corpus is not None:
+        print(
+            f"Indexed {runs_count} run-summary chunks from "
+            f"{runs_corpus.root} into {runs_idx}"
+        )
     return 0
 
 

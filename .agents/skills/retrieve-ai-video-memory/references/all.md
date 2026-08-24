@@ -33,6 +33,11 @@ python -m scripts.agent_memory --scope all search \
   "<task-specific query>" --top-k 8 --json
 ```
 
+This command only validates and queries the materialized main and run-summary
+indexes. If either is missing, stale, partial, or identity-mismatched, return
+to the parent skill's explicit `--scope all build` recovery rule; do not
+rebuild inside the search timeout.
+
 ## Interpretation
 
 - Group the result by `authority` and `corpus_kind` before drawing a
