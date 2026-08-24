@@ -1440,6 +1440,56 @@ def test_project_skill_installation_routes_to_control_plane_harness(path: str) -
     assert "harness_tests" in report["check_ids"]
 
 
+@pytest.mark.parametrize(
+    "path",
+    [
+        ".agents/skills/ecommerce-ad-workflow/SKILL.md",
+        ".agents/skills/ecommerce-ad-workflow/references/hooks.md",
+        ".agents/skills/ecommerce-ad-workflow/schemas/ecommerce-ad-input.schema.json",
+        ".agents/skills/ecommerce-ad-workflow/templates/30s-vertical-product-ad.package.example.json",
+        ".agents/skills/ecommerce-ad-workflow/scripts/validate_contract.py",
+    ],
+)
+def test_ecommerce_ad_skill_paths_route_to_focused_and_control_plane_checks(
+    path: str,
+) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths([path], policy)
+
+    assert report["fallback_paths"] == []
+    assert {"control_plane", "ecommerce_ad_workflow"}.issubset(
+        report["categories"]
+    )
+    assert {
+        "ecommerce_ad_workflow_skill_tests",
+        "harness_tests",
+    }.issubset(report["check_ids"])
+    assert "production_contract_tests" not in report["check_ids"]
+    assert "production_video_provider_tests" not in report["check_ids"]
+
+
+def test_ecommerce_ad_contract_test_has_an_exact_focused_route() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths(
+        ["tests/test_ecommerce_ad_workflow_skill.py"], policy
+    )
+
+    assert report["fallback_paths"] == []
+    assert "ecommerce_ad_workflow" in report["categories"]
+    assert "ecommerce_ad_workflow_skill_tests" in report["check_ids"]
+    assert policy["checks"]["ecommerce_ad_workflow_skill_tests"]["argv"] == [
+        "python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_ecommerce_ad_workflow_skill.py",
+        "-q",
+    ]
+
+
 def test_session_record_hook_routes_to_control_plane_harness() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

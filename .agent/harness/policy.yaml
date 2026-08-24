@@ -116,6 +116,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_composition_architecture.py, -q]
     cwd: .
     description: Verify Product Runtime isolation from Development Governance composition tooling.
+  ecommerce_ad_workflow_skill_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_ecommerce_ad_workflow_skill.py, -q]
+    cwd: .
+    description: Verify the ecommerce advertising authoring Skill, schemas, validator, fixtures, and no-I/O boundaries.
   harness_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_record_ai_video_session_hook.py, -q]
     cwd: .
@@ -244,6 +248,7 @@ checks:
       - composition_playbook_tests
       - composition_strategy_proposal_tests
       - composition_architecture_tests
+      - ecommerce_ad_workflow_skill_tests
       - harness_tests
       - local_comfyui_supervisor_tests
       - architecture_tests
@@ -741,6 +746,13 @@ categories:
       - tests/test_agent_memory.py
     check_ids:
       - agent_memory_tests
+      - task_architecture_gate
+  ecommerce_ad_workflow:
+    patterns:
+      - .agents/skills/ecommerce-ad-workflow/**
+      - tests/test_ecommerce_ad_workflow_skill.py
+    check_ids:
+      - ecommerce_ad_workflow_skill_tests
       - task_architecture_gate
   control_plane:
     patterns:
