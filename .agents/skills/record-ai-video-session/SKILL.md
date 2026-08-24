@@ -19,11 +19,29 @@ stable-boundary rule, not as proof that a record is required.
 
 - If substantial work reached a stable checkpoint, completion, or genuine
   blocker, run this skill normally and create or update the single relevant
-  record.
+  record, then acknowledge the request with outcome `recorded`.
 - If the boundary is not stable or the repository change is trivial or
-  unrelated, do not create a record; finish the current response normally.
+  unrelated, do not create a record; acknowledge the request with outcome
+  `no_record` and finish the current response normally.
+- Acknowledge exactly once after the evaluation using the request's exact ID:
+
+  ```bash
+  python3 .agents/skills/record-ai-video-session/scripts/session_record_hook.py \
+    acknowledge \
+    --capture-request-id <capture_request_id> \
+    --outcome recorded
+  ```
+
+  Use `--outcome no_record` when no durable record was created. Require the
+  command to return `{"acknowledged": true}`; if it returns false, report the
+  stale or unknown request instead of guessing another ID.
 - Check the current topic, commits, and existing records before writing so a
   repeated hook request cannot create duplicate records.
+- Hook state follows `ACKED -> PENDING -> ACKED`. `PostToolUse` only attributes
+  paths from this session's `apply_patch` calls or a simple exact
+  `git add <specific-files>` adoption command; unrelated HEAD, index, dirty, or
+  untracked changes do not reopen an acknowledged checkpoint. Files under
+  `docs/record_for_agent/` are excluded so the record cannot trigger itself.
 - The hook does not authorize Provider calls, tests, network access, Git writes,
   or any scope beyond the current user request and repository rules.
 

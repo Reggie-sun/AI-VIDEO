@@ -72,13 +72,15 @@ advisory experience，不能写 Manifest、Registry、Planner、Router、Provide
    和 current runtime 验证，不把 record/RAG 当成更高 authority。
 
 项目现已注册Development Governance范围内的project-local Codex hook作为漏记保护：
-`SessionStart`保存Git-internal baseline；`PreCompact`在存在尚未处理的repository变化时注入
-context；`Stop`对每个changed fingerprint最多阻止一次，并请求Agent用
+`SessionStart`初始化session-local `ACKED`空scope；`PostToolUse`只从该session的`apply_patch`
+或simple exact `git add <specific-files>`登记task-owned paths；`PreCompact`对同一pending
+checkpoint注入一次strong reminder；
+`Stop`在checkpoint未ACK时用同一`capture_request_id`请求Agent调用
 `record-ai-video-session`评估stable boundary。hook本身不写`docs/record_for_agent/`，也不决定
-是否应记录；若skill判断尚未稳定、变化trivial或与当前session无关，就正常结束且不创建
-record。因此它提高触发可靠性，但仍不是“完美自动记录”。
+是否应记录；skill创建记录后以`recorded` ACK，不创建记录时以`no_record` ACK。两种结果都使
+checkpoint回到`ACKED`。
 
-## Session-Close Hook Implementation Evidence
+## Session-Close Hook V1 Historical Evidence
 
 2026-08-22已实现project-local hook：`.codex/hooks.json`注册`SessionStart`、`PreCompact`
 与`Stop`，实际逻辑由
@@ -111,6 +113,46 @@ commit-range Harness receipt路径为
 - 当前 workspace 另有并行 dirty/staged changes；本 record 不包含、不 stage、不 commit
   其他 files。
 
+## Session-Owned Checkpoint V2
+
+2026-08-24将hook从whole-repository fingerprint升级为session-owned checkpoint state machine：
+
+```text
+ACKED
+  -> 本session的apply_patch写入task-owned path
+  -> PENDING
+  -> PreCompact strong reminder / Stop block（同一capture_request_id）
+  -> record-ai-video-session evaluation
+  -> recorded或no_record显式ACK
+  -> ACKED
+```
+
+v2 fingerprint只绑定state中登记的repository-relative path及其当前bytes/type；不绑定全仓
+`HEAD`、index、porcelain status或unrelated untracked bytes。因此其他Agent在不同path的commit、
+stage、dirty或untracked变化不会创建新的request。Parent通过simple exact
+`git add <specific-files>`采用bounded writer结果时，这些exact paths进入同一session scope；
+chained command、broad add与glob不会被解析为ownership。`docs/record_for_agent/`被明确排除，
+session record自身的写入与commit不会递归开启checkpoint。`stop_hook_active=true`只解除当前
+recursive Stop，不再把pending checkpoint偷标为handled；若尚未显式ACK，后续普通Stop仍使用
+同一ID阻止。
+
+同一session的state load/update/write与ACK由state目录中的mode-`600` per-session lock串行化，
+避免并发`PostToolUse` last-write-wins。显式`owned_paths`保持bounded；达到cap后不会静默丢弃，
+而是把超限path的每次归因事件折叠进bounded overflow digest。ACK绑定该combined fingerprint；
+后续overflow path再次被本session归因时仍会生成新的PENDING checkpoint。
+
+兼容边界保持fail open：旧v1 state首次读取时重置为v2 `ACKED`空scope，不把历史whole-repo
+fingerprint迁移成phantom session ownership。Hook仍只写
+`.git/ai-video-session-record-hook/`，不读取transcript/prompt/secret，不运行Provider、media、
+network或tests。非`apply_patch`写入若需要纳入checkpoint，必须由未来独立、可归因的tool-path
+contract扩展；当前实现不会退回全仓fingerprint猜测。
+
+本轮strict RED/GREEN回归覆盖unrelated shared-checkout变化、显式ACK、stale request、cwd
+归因、并发callback、overflow重新开启checkpoint与state-size bound。focused hook/Harness suite为
+`143 passed`，Documentation Contract Gate通过；native `reviewer_xhigh` scoped re-review
+verdict为`accept`。exact current-commit Harness receipt路径为
+`.agent/harness/runs/session-owned-checkpoint-v2-final-current-head-20260824/receipt.json`。
+
 ## Remaining Work
 
 - 为每次生成 Shot 建立可选但明确授权的 Q0 capture hook，仍保持 dataset-root-only 和
@@ -119,6 +161,6 @@ commit-range Harness receipt路径为
   evaluator 自报 verdict。
 - 自动 Q0 capture、远程 vision backend、credential 或budget/egress仍需要独立
   contract/spec与用户授权；当前session-close hook不授权这些操作。
-- hook对modified/untracked regular file做content hashing；若出现异常大的unignored media，
-  可能超过5秒hook timeout并按设计fail open。生成媒体应继续留在既有ignored/output paths；
-  后续如实际观测到timeout，再为hashing增加独立bounded policy与回归证据。
+- hook对已登记的owned regular path做content hashing；若task-owned path是异常大的media，可能
+  超过5秒hook timeout并按设计fail open。生成媒体应继续留在既有ignored/output paths；后续
+  如实际观测到timeout，再为hashing增加独立bounded policy与回归证据。
