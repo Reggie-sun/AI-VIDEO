@@ -4,8 +4,8 @@
 
 - `experiment_id`: `shot_continuity_e0c_prompt_schedule_relay_v1`
 - `classification`: `development_experiment`
-- `execution_status`: `INCOMPLETE_INFRASTRUCTURE_INTERRUPTION`
-- `empirical_status`: early route-kill gate passed; full 770-frame schedule not evaluated
+- `execution_status`: `COMPLETED_RESUMED_ATTEMPT_AFTER_EXPLICIT_RECOVERY`
+- `empirical_status`: full 770-frame schedule completed; motion preservation improved, but final stop adherence failed and seam pulses remain measurable
 - `production_status`: no Production qualification、activation、Manifest / Registry mutation、P6 verdict、release 或 canonical-reference promotion
 
 本次只验证 E0-B STOP 后冻结的单变量：把每个 continuation 重复使用的 stop-oriented global prompt 改为 `segment_prompts_json` 驱动的 per-segment motion-state schedule。其余 generation surfaces 保持冻结。E0-C 没有启用 Prompt Relay Advanced attention patch；只使用现有 long-video orchestrator 的逐段 prompt override。
@@ -47,7 +47,7 @@ Prompt SHA-256（exact UTF-8 bytes，末尾一个 LF）：
 
 Compact POST request SHA-256：`271642ad69f6a48eaa00984a73da6ac785fb168abd2ff8977e44d5af60789f7b`。初始 prompt id：`fcf5fbaf-d551-4d9e-bfb6-7fcbbae872fb`。只提交一次，没有 retry、fallback 或第二 seed。
 
-## Runtime Receipt
+## Original Interrupted Attempt Runtime Receipt
 
 - ComfyUI commit: `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`
 - MiniMax H3 T8 plugin commit: `977df788fcf8b971dc3d0fc7d6baa79a0edfaf40`
@@ -80,7 +80,7 @@ Frozen route-kill 要求 segment 1 和 segment 2 相对 segment 0 的 retention 
 
 后续 steady segments 出现 `0.7869 -> 0.7017 -> 0.6526` 的缓慢衰减，但没有重现 E0-B 在约 10--14 秒接近原地步态的 collapse。由于 segment 6 / 7 未接受，decelerate 与 stop schedule 没有 empirical result。
 
-## Incremental Shot Analysis
+## Original Interrupted Attempt Shot Analysis
 
 生成后续 segments 的同时，对 durable accepted media 做了增量只读分析，而不是等到链尾：
 
@@ -112,13 +112,13 @@ Exact incomplete preview：
 
 E0-B 的 exact bytes、328-frame partial、motion-collapse measurements 与 STOP verdict 都没有改变。E0-C 是新的单变量 development experiment：它提供了反事实 evidence，说明 E0-B 的 global prompt temporal allocation 是重要 root-cause surface，但没有让 E0-B output 变成合格成片，也没有重新分类作者的上游 EXP/default-off 路线。E0-C 自身也因 infrastructure interruption 没有完整 770-frame verdict。
 
-## Effects
+## Original Interrupted Attempt Effects
 
 Repository effects：只新增本 record；没有 Production code、qualification contract、Manifest / Registry、canonical reference 或 Harness policy change。
 
 Provider / media effects：一次 Local ComfyUI T8 submit；6 个 accepted segments、634-frame incomplete preview 和只读 analysis artifacts。remote submit `0`、paid effect `0`、fallback `0`、retry `0`。ComfyUI 已停止；server 不可达，不能声称 queue-empty receipt。
 
-## Next One Thing
+## Historical Next One Thing (Completed)
 
 先做一次 bounded、read-only infrastructure interruption reassessment，确认 ComfyUI host process 为什么收到 `SIGTERM`，以及在不重解释 retry-0 contract 的前提下应如何处理 stale background state。只有形成新的明确授权/contract 后，才可决定是否从 accepted segment 5 继续相同 segment 6/7 schedule；不得 blind restart、把 resume 记作原实验无中断完成，或用另一 seed / 参数补考。
 
@@ -183,4 +183,70 @@ AI-VIDEO Production code、Manifest / Registry、qualification、Provider contra
 
 通用 ComfyUI lifecycle、user-systemd supervision、stale / unreadable `background_job.json` 与 explicit Recover contract 已迁移到独立记录：[`2026-08-24-comfyui-supervision-and-explicit-background-recovery.md`](2026-08-24-comfyui-supervision-and-explicit-background-recovery.md)。
 
-对 E0-C 而言，`SIGTERM` 来源仍然未知；没有补交 segment 6/7、generation、retry、fallback、remote/paid Provider 或新媒体，也没有改变 634-frame partial、Manifest revision 6、P6 或 Final Acceptance truth。下一次继续仍需新的明确 execution authorization，并必须把 historical infrastructure interruption 与新的 resumed attempt 分开记录。
+对 E0-C 而言，`SIGTERM` 来源仍然未知；该 engineering closure 记录时没有补交 segment 6/7、generation、retry、fallback、remote/paid Provider 或新媒体，也没有改变 634-frame partial、Manifest revision 6、P6 或 Final Acceptance truth。随后获得的新 execution authorization 与 resumed attempt 证据记录如下；它不回写或抹除 historical infrastructure interruption。
+
+## Resumed Attempt Completion
+
+2026-08-24 的新用户授权允许继续同一 Local T8 chain。执行前重新验证 exact request bytes、accepted Manifest revision `6`、segment `5` context、ComfyUI/plugin commits 与 empty queue。没有重新生成 segments `0..5`，也没有将 resume 伪装成原始 submit 从未中断。
+
+恢复过程使用已实现的 explicit recovery contract：
+
+- ComfyUI commit: `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`
+- MiniMax H3 T8 plugin commit: `28cb160827c245b2d6a37539df30c1d7c5e7aecd`
+- supervised unit: `ai-video-comfyui-782ca50952d940a59ff413af1d917414.service`
+- supervisor invocation id: `b24a6450d8a8450fbafe0e9b22b71f3b`
+- recovered background job id: `ef160057-95e4-41e1-b21d-02e7f1286575`
+- resumed segment 6 prompt id: `47be3a14-45f2-4862-9f7d-64a90934319f`
+- auto-queued segment 7 prompt id: `659a5000-414e-48a0-b8b5-f747ed69d734`
+
+先将 stale state 显式转换为 durable `detached` recovery state，再对 exact frozen request 做唯一一次新 submit。segment 6 接受后只由 existing background orchestrator 自动排入 segment 7。最终 `background_job.json` 为 `state=completed`、`accepted_count=8`、`retry_count=0`、`last_error=""`；queue 在验证时为 running `0` / pending `0`。没有 second manual submit、retry、fallback、parallel execution、remote 或 paid effect。验证完成后通过 supervisor 显式停止 ComfyUI，unit 为 `inactive`，`127.0.0.1:8188` 不再监听。
+
+## Completed Media Evidence
+
+Canonical assembled development artifact：
+
+```text
+/home/reggie/ComfyUI/output/minimax_h3_t8_long_video/shot_continuity_e0c_prompt_schedule_relay_v1_seed320001_20260824/assembled/development_experiment_shot_continuity_e0c_prompt_schedule_relay_62f0f369564f_r0008_cosine_bridge.mp4
+```
+
+- final MP4 SHA-256: `907757a3b0b8f1da71d4a5d2237cd6dc8804f1445f06215014e1aa42a368a047`
+- final Manifest SHA-256: `71ac60ad466ece4d94b591e98213c1c4588f4932039ea31301416d8e7889cf31`
+- Manifest revision: `8`
+- accepted frames: `124 + 102 + 102 + 102 + 102 + 102 + 102 + 34 = 770`
+- video: H.264 High、`1344x768`、24 fps、exact `770` frames、`32.083333 s`
+- audio: AAC、32 kHz、stereo；Manifest PCM boundary 为 exact `1,026,667` samples，container duration `32.084 s`
+- file size: `18,675,848` bytes
+- segment 6 video SHA-256: `7b6937d3207d8e46a40d6a33118344ca7e533f8ff0dcd0fbd88e705cc7c84f8a`
+- segment 6 context SHA-256: `ff927420593a4593b126b444c50c0af89f7fa78d9c57791b23ca5990f8fa7ce1`
+- segment 7 video SHA-256: `cc407f3acbddc07d7a1d25bba14ecc3bc54e3c0dd45699fd3aaeebc49675c63e`
+
+所有 8 个 accepted MP4 与 7 个 non-final context artifacts 均按 Manifest SHA-256 重新校验通过。`ffmpeg` 对 final video/audio 的完整 decode 通过。Project-local `video-analysis` 确认 `770` frames、单一 scene、audio present；这些是 technical evidence，不是 P6 或 human acceptance。
+
+## Full-Schedule Motion And Seam Assessment
+
+沿用前述 exact Farneback measurement，新增 segments 6 / 7：
+
+| Segment | Frames | MAD mean | Median-flow mean | P90 | Retention vs segment 0 | Scheduled state |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 6 | 102 | 11.8131 | 0.7882 | 1.0887 | 0.6294 | decelerate |
+| 7 | 34 | 11.5088 | 0.7330 | 0.9736 | 0.5853 | stop |
+
+完整链的 segment retention 约为 `1.0000 -> 1.2228 -> 1.0554 -> 0.7869 -> 0.7017 -> 0.6526 -> 0.6294 -> 0.5853`。因此 per-segment prompt schedule relay 明显避免了 E0-B 在 segments 1 / 2 的急剧 motion collapse，并将可见 forward gait 保持到 32 秒附近。
+
+但 near-end control 没有按 prompt 完成：segment 6 的最后三分之一 flow 没有下降，segment 7 的三个 thirds 为约 `0.703 -> 0.722 -> 0.775`；最后 10 个 frame-pair flow 仍呈步态式交替。0.5 秒采样 strip 显示人物在 final frame 仍向 screen-right 跨步，未形成 one natural stop。结论必须拆开：
+
+- motion-preservation hypothesis: `PASS` for this single-seed development experiment；
+- full temporal schedule / final-stop adherence: `FAIL`；
+- Production qualification、P6、Final Acceptance: not evaluated and not authorized。
+
+7 个 visual seam 的 boundary frame-pair 相对局部 median motion/MAD 仍高约 `1.28--1.45x` / `1.34--1.47x`。Project-local scene detection 没有把它们判为 hard cut，逐 seam frame pairs 也保持 identity、wardrobe、satchel、scene 与 screen direction；但 17.9167 s、22.1667 s、26.4167 s 与 30.6667 s 仍有可量化 motion pulse，不能声称 visual seams 已消失。
+
+`cosine_bridge` 明显降低了音频边界的单样本 discontinuity：7 个 seam 的 decoded single-sample step 均不高于局部常态，后四个只处于局部 derivative 的约 `2--9` percentile。但 20 ms seam 前后 RMS 仍改变约 `1.2--1.56x`，说明 bridge 去除了 click，却没有统一各 segment 的 ambience texture / loudness；人工仍可能听出段落变化。
+
+## Resumed Attempt Effects And Next One Thing
+
+Repository effect：只更新本 experiment record；没有 Production code、qualification contract、Manifest / Registry、canonical reference、Harness policy、push 或 release change。E0-B 的 exact partial、measurements 与 `STOP` verdict 不变；E0-C resumed attempt 是独立的新 runtime evidence。
+
+Provider / media effect：一次 explicit Local ComfyUI resumed submit，接受 segments 6 / 7 并生成一个完整 770-frame development artifact；remote submit `0`、paid effect `0`、fallback `0`、retry `0`。它不是 activated Production candidate 或 Final Acceptance output。
+
+Next One Thing：对上述 exact final MP4 做一次 human full-speed playback，重点判定 final 2 秒未停步是否为不可接受的 Shot-intent failure，以及 17.9167 s、22.1667 s、26.4167 s、30.6667 s 的 visual/audio seam 是否仍可感知。在获得该 human verdict 前不自动重跑 seed、不改变第二个 generation surface，也不把 motion-preservation `PASS` 扩写成整条 Shot `PASS`。
