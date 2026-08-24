@@ -1078,6 +1078,191 @@ def test_m0_only_materialization_detects_source_tamper_and_stack_drift(
         writer.reopen_p0_qualification_prepared()
 
 
+def test_materialized_m0_can_be_resealed_from_exact_current_stack(
+    tmp_path: Path,
+):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path
+    )
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-m0-reseal-base",
+    )
+    writer.materialize_p0_qualification(
+        materializations=(_materialization("m0", 6),),
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id="p0-m0-reseal-first",
+    )
+    before = writer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    old_m0 = before[1][0]
+    replacement = _materialization("m0", 7)
+
+    committed = writer.materialize_p0_qualification(
+        materializations=(replacement,),
+        expected_materialized_stack_hashes=(old_m0.execution_stack_hash,),
+        expected_manifest_revision=loaded.manifest.manifest_revision + 2,
+        attempt_id="p0-m0-reseal-second",
+    )
+    reopened = writer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+
+    assert committed.manifest_revision == loaded.manifest.manifest_revision + 3
+    assert reopened[1][0].execution_stack_hash != old_m0.execution_stack_hash
+    assert reopened[1][0].profile_hash == replacement.profile_hash
+    assert reopened[1][1] == before[1][1] == m1
+    assert reopened[0].content_hash != before[0].content_hash
+    assert tuple(item.policy_hash for item in reopened[2]) != tuple(
+        item.policy_hash for item in before[2]
+    )
+    assert reopened[3].content_hash != before[3].content_hash
+    assert all(
+        item.execution_stack_hashes == (reopened[1][0].execution_stack_hash,)
+        for item in reopened[4]
+    )
+
+    with pytest.raises(AiVideoError, match="current stack"):
+        writer.materialize_p0_qualification(
+            materializations=(replacement,),
+            expected_materialized_stack_hashes=(old_m0.execution_stack_hash,),
+            expected_manifest_revision=committed.manifest_revision,
+            attempt_id="p0-m0-reseal-stale",
+        )
+
+    snapshot = {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+    replayed = writer.materialize_p0_qualification(
+        materializations=(replacement,),
+        expected_materialized_stack_hashes=(
+            reopened[1][0].execution_stack_hash,
+        ),
+        expected_manifest_revision=committed.manifest_revision,
+        attempt_id="p0-m0-reseal-replay",
+    )
+    assert replayed == committed
+    assert snapshot == {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+
+def test_materialized_m0_reseal_denies_tampered_current_source_zero_write(
+    tmp_path: Path,
+):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path
+    )
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-m0-reseal-tamper-base",
+    )
+    materialization = _materialization("m0", 6)
+    writer.materialize_p0_qualification(
+        materializations=(materialization,),
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id="p0-m0-reseal-tamper-first",
+    )
+    current = writer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    current_m0 = current[1][0]
+    _materialization_source_path(
+        tmp_path, "profile", current_m0.profile_hash
+    ).write_bytes(b"tampered-current-profile")
+    manifest_before = load_production_project(tmp_path / "project.yaml").manifest
+    snapshot = {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+    with pytest.raises(AiVideoError, match="source"):
+        writer.materialize_p0_qualification(
+            materializations=(_materialization("m0", 7),),
+            expected_materialized_stack_hashes=(
+                current_m0.execution_stack_hash,
+            ),
+            expected_manifest_revision=manifest_before.manifest_revision,
+            attempt_id="p0-m0-reseal-tampered-current-source",
+        )
+
+    assert load_production_project(tmp_path / "project.yaml").manifest == manifest_before
+    assert snapshot == {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+
+def test_materialized_m0_reseal_denies_tampered_non_target_stack_zero_write(
+    tmp_path: Path,
+):
+    writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
+        tmp_path, m1_hybrid_present=True
+    )
+    writer.record_p0_qualification_prepared(
+        receipt,
+        candidate_stacks=(m0, m1),
+        policies=policies,
+        validation_set=validation_set,
+        qualification_inputs=inputs,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="p0-m0-reseal-non-target-tamper-base",
+    )
+    writer.materialize_p0_qualification(
+        materializations=(
+            _materialization("m0", 6),
+            _materialization("m1", 9),
+        ),
+        expected_manifest_revision=loaded.manifest.manifest_revision + 1,
+        attempt_id="p0-m0-reseal-non-target-tamper-first",
+    )
+    current = writer.reopen_p0_qualification_prepared(require_materialized=True)
+    current_m0, current_m1 = current[1]
+    _materialization_source_path(
+        tmp_path, "compiler", current_m1.compiler_hash
+    ).write_bytes(b"tampered-non-target-compiler")
+    manifest_before = load_production_project(tmp_path / "project.yaml").manifest
+    snapshot = {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+    with pytest.raises(AiVideoError, match="source"):
+        writer.materialize_p0_qualification(
+            materializations=(_materialization("m0", 7),),
+            expected_materialized_stack_hashes=(
+                current_m0.execution_stack_hash,
+            ),
+            expected_manifest_revision=manifest_before.manifest_revision,
+            attempt_id="p0-m0-reseal-tampered-non-target-stack",
+        )
+
+    assert load_production_project(tmp_path / "project.yaml").manifest == manifest_before
+    assert snapshot == {
+        path.relative_to(tmp_path): (path.stat().st_mtime_ns, path.read_bytes())
+        for path in tmp_path.rglob("*")
+        if path.is_file()
+    }
+
+
 def test_m0_only_materialization_exact_replay_is_zero_write(tmp_path: Path):
     writer, loaded, m0, m1, policies, validation_set, inputs, receipt = _bundle(
         tmp_path

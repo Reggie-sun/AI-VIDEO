@@ -26,6 +26,20 @@
     {"name": "minimax-h3-audio-t8", "version": "1.36.2+977df788fcf8", "content_hash": "6974cc17969e7b829a44e177c85a60d6545389f0dbc5331e2a92329165200016"},
     {"name": "videohelpersuite", "version": "4ee72c065db2", "content_hash": "911ab0ec2c2e163af08af50821f9ceb0d2c7bf021a637871c1451bd588bca721"}
   ],
+  "node_schema_seals": [
+    {"node_name": "UNETLoader", "schema_sha256": "0803bca8808c9e196cac6a5029c01943786166ec1c643e00389b8bdc1396c8ee"},
+    {"node_name": "CLIPLoader", "schema_sha256": "e9f485efa1b625aed932d738f4bd78e1770f573acbe551c2a800972d92ee1385"},
+    {"node_name": "VAELoader", "schema_sha256": "437f9bf7258fa818125a864fb43fdefa5f1fdc5b80a4f6f318a76bc9d21a9f4e"},
+    {"node_name": "MiniMaxH3AudioConditioningT8", "schema_sha256": "26bc55ff0ef05087f4f0b79b23b2e6a06988bc46325e0bb46114f8ffedf714ca"},
+    {"node_name": "MiniMaxH3DualClockSamplerT8", "schema_sha256": "3543e78f8adea01f8b80f154206c80ced606675f74be70ad624baedf30045b34"},
+    {"node_name": "RandomNoise", "schema_sha256": "41d9d603f14caf9196ebc80c5b5a5f68d4c303341b307a3a1230c461d64eebcc"},
+    {"node_name": "BasicGuider", "schema_sha256": "c561c18f4ab40c62009ced56fce369d4cdcbc5fbc3b8f2e0cbb654b475c0940b"},
+    {"node_name": "SamplerCustomAdvanced", "schema_sha256": "261a495a933da3a3ffd113e1f909c0d714a60e4643eac6a057a1c488ffa19716"},
+    {"node_name": "MiniMaxH3AVDecodeT8", "schema_sha256": "3856b31ab00fbf3f02d53589c18fd1487a272fe6d0be870fcb5dab93febc2930"},
+    {"node_name": "VHS_VideoCombine", "schema_sha256": "d718d775baa3c3e3e0f3323f3d82ffc6eedf79c5a2b8df721abe1b52f0f8c231"},
+    {"node_name": "LoadImage", "schema_sha256": "ecf1b0bb9558c1a84dea6e1fcf4f9a9d79ac5d09ed557092f1c062abcef4ead6"},
+    {"node_name": "VHS_LoadVideo", "schema_sha256": "59389f8b463b29fd0571e4fe2dc99f2cea8ee7ad6fe8752d171411b10ca12b34"}
+  ],
   "workflow_path": "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_api.json",
   "workflow_sha256": "963bd91ad81ca102053deb08b29a7aa8fb6849a6256a78ccbfbc6138d7a855d2",
   "binding_path": "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_binding.yaml",

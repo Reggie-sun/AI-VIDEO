@@ -68,6 +68,43 @@ def _reseal_model(
     return model_type.model_validate(values)
 
 
+def _reseal_materialized_stack(
+    stack: GenerationExecutionStackIdentity,
+    materialization: ExecutionStackMaterialization,
+) -> GenerationExecutionStackIdentity:
+    if stack.materialization_status != "materialized":
+        raise ValueError("P0 execution stack reseal requires a materialized stack")
+    if (
+        stack.profile_hash,
+        stack.compiler_hash,
+        stack.workflow_hash,
+    ) == (
+        materialization.profile_hash,
+        materialization.compiler_hash,
+        materialization.workflow_hash,
+    ):
+        return stack
+    return GenerationExecutionStackIdentity.create(
+        schema_version=stack.schema_version,
+        status=stack.status,
+        materialization_status="materialized",
+        candidate_id=stack.candidate_id,
+        contract_version=stack.contract_version,
+        provider_kind=stack.provider_kind,
+        deployment_identity=stack.deployment_identity,
+        model_id=stack.model_id,
+        capability_id=stack.capability_id,
+        profile_hash=materialization.profile_hash,
+        compiler_hash=materialization.compiler_hash,
+        workflow_hash=materialization.workflow_hash,
+        components=stack.components,
+        sampler_identity=stack.sampler_identity,
+        scheduler_identity=stack.scheduler_identity,
+        runtime_seals=stack.runtime_seals,
+        output_contract_hash=stack.output_contract_hash,
+    )
+
+
 class _StateCommitP0QualificationMixin:
     def record_p0_qualification_prepared(
         self,
@@ -239,6 +276,7 @@ class _StateCommitP0QualificationMixin:
         self,
         *,
         materializations: tuple[ExecutionStackMaterialization, ...],
+        expected_materialized_stack_hashes: tuple[str, ...] = (),
         expected_manifest_revision: int,
         attempt_id: str,
     ) -> ProductionManifest:
@@ -253,6 +291,12 @@ class _StateCommitP0QualificationMixin:
             raise _state_invalid("P0 stack materialization candidate labels must be unique.")
         if labels != tuple(label for label in ("m0", "m1") if label in labels):
             raise _state_invalid("P0 stack materialization candidates must be ordered m0 then m1.")
+        if expected_materialized_stack_hashes and len(
+            expected_materialized_stack_hashes
+        ) != len(labels):
+            raise _state_invalid(
+                "P0 reseal expected current stack hashes must match the selection."
+            )
         with self._exclusive_lock():
             manifest = self._read_manifest()
             pointer = manifest.active_p0_qualification_prepared
@@ -263,6 +307,39 @@ class _StateCommitP0QualificationMixin:
             materializations_by_label = {
                 item.candidate_label: item for item in materializations
             }
+            selected_stacks = tuple(
+                stack
+                for label, stack in zip(("m0", "m1"), stacks, strict=True)
+                if label in materializations_by_label
+            )
+            if expected_materialized_stack_hashes and (
+                any(
+                    stack.materialization_status != "materialized"
+                    for stack in selected_stacks
+                )
+                or tuple(
+                    stack.execution_stack_hash for stack in selected_stacks
+                )
+                != expected_materialized_stack_hashes
+            ):
+                raise _state_invalid(
+                    "P0 reseal target does not match the exact current stack."
+                )
+            if expected_materialized_stack_hashes:
+                try:
+                    verify_execution_stack_source_artifacts(
+                        self._project_root,
+                        tuple(
+                            stack
+                            for stack in stacks
+                            if stack.materialization_status == "materialized"
+                        ),
+                    )
+                except ValueError as exc:
+                    raise _state_invalid(
+                        "P0 current execution stack source artifacts are invalid.",
+                        str(exc),
+                    ) from exc
             if any(
                 component.presence == "absent"
                 for label, stack in zip(("m0", "m1"), stacks, strict=True)
@@ -274,7 +351,14 @@ class _StateCommitP0QualificationMixin:
                 )
             try:
                 materialized_stacks = tuple(
-                    stack.materialize(materializations_by_label[label])
+                    (
+                        _reseal_materialized_stack(
+                            stack,
+                            materializations_by_label[label],
+                        )
+                        if expected_materialized_stack_hashes
+                        else stack.materialize(materializations_by_label[label])
+                    )
                     if label in materializations_by_label
                     else stack
                     for label, stack in zip(("m0", "m1"), stacks, strict=True)

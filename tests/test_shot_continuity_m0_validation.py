@@ -17,6 +17,7 @@ from ai_video.production.paths import (
     canonical_execution_stack_materialization_source_path,
     canonical_p0_qualification_input_path,
 )
+from ai_video.production.project import load_production_project
 from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.video_execution_stack import (
@@ -319,6 +320,62 @@ def test_m0_validation_preflight_reopens_and_consumes_exact_materialized_hashes(
         (item.input_kind, item.content_hash) for item in committer.bundle[4]
     )
     assert committer.reopen_calls == [("m0",), ("m0",)]
+
+
+def test_m0_materialization_owner_reseals_source_drift_and_replays_exactly(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path,
+        monkeypatch,
+    )
+    before = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    manifest_before = load_production_project(
+        committer._project_root / "project.yaml"
+    ).manifest
+    compiler_path = Path(m0_qualification.__file__)
+    compiler_path.write_bytes(compiler_path.read_bytes() + b"\n# resealed compiler\n")
+
+    resealed = materialize(
+        root=committer._project_root,
+        artifact_root=artifact_root,
+        profile_path=profile_path,
+        attempt_id="test-real-m0-reseal-v2",
+    )
+    after = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+
+    assert resealed["m0_execution_stack_hash"] != before[1][0].execution_stack_hash
+    assert after[1][1] == before[1][1]
+    assert after[0].content_hash != before[0].content_hash
+    assert tuple(item.policy_hash for item in after[2]) != tuple(
+        item.policy_hash for item in before[2]
+    )
+    assert after[3].content_hash != before[3].content_hash
+    assert all(
+        item.execution_stack_hashes == (after[1][0].execution_stack_hash,)
+        for item in after[4]
+    )
+    assert resealed["claims"]["provider_effects"] == 0
+    assert resealed["claims"]["video_generated"] is False
+
+    tree_before_replay = _tree_snapshot(committer._project_root)
+    replayed = materialize(
+        root=committer._project_root,
+        artifact_root=artifact_root,
+        profile_path=profile_path,
+        attempt_id="test-real-m0-reseal-replay",
+    )
+    manifest_after = load_production_project(
+        committer._project_root / "project.yaml"
+    ).manifest
+    assert replayed == resealed
+    assert manifest_after.manifest_revision == manifest_before.manifest_revision + 1
+    assert _tree_snapshot(committer._project_root) == tree_before_replay
 
 
 def test_m0_pre_submit_guard_requires_request_to_bind_reopened_stack() -> None:

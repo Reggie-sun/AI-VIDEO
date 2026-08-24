@@ -44,7 +44,14 @@ def materialize(
     writer = ProductionStateCommitter(project_root)
     before_manifest = load_production_project(project_root / "project.yaml").manifest
     before = writer.reopen_p0_qualification_prepared()
-    validate_m0_sources_against_stack(sources, before[1][0])
+    current_m0 = before[1][0]
+    validate_m0_sources_against_stack(
+        sources,
+        current_m0,
+        allow_materialized_source_reseal=(
+            current_m0.materialization_status == "materialized"
+        ),
+    )
     profile = sources.profile
     calibration = next(
         item for item in before[4] if item.input_kind == "calibration_fixture"
@@ -75,6 +82,11 @@ def materialize(
 
     committed = writer.materialize_p0_qualification(
         materializations=(sources.materialization,),
+        expected_materialized_stack_hashes=(
+            (current_m0.execution_stack_hash,)
+            if current_m0.materialization_status == "materialized"
+            else ()
+        ),
         expected_manifest_revision=before_manifest.manifest_revision,
         attempt_id=attempt_id,
     )

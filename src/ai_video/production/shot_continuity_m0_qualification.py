@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 import yaml
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
@@ -38,7 +38,7 @@ _FORBIDDEN_WORKFLOW_CLASSES = {
     "MiniMaxH3TurboLoRA",
     "MiniMaxH3TurboSampler",
 }
-_REQUIRED_WORKFLOW_CLASSES = {
+_REQUIRED_WORKFLOW_CLASSES = (
     "UNETLoader",
     "CLIPLoader",
     "VAELoader",
@@ -51,6 +51,13 @@ _REQUIRED_WORKFLOW_CLASSES = {
     "VHS_VideoCombine",
     "LoadImage",
     "VHS_LoadVideo",
+)
+_RUNTIME_FILE_CHOOSERS = {
+    "UNETLoader": ("unet_name",),
+    "CLIPLoader": ("clip_name",),
+    "VAELoader": ("vae_name",),
+    "LoadImage": ("image",),
+    "VHS_LoadVideo": ("video",),
 }
 
 
@@ -78,6 +85,11 @@ class M0QualificationComponent(StrictModel):
         return value
 
 
+class M0QualificationNodeSchemaSeal(StrictModel):
+    node_name: str = Field(min_length=1)
+    schema_sha256: str = Field(pattern=_SHA256)
+
+
 class M0QualificationProfile(StrictModel):
     schema_version: Literal["1"]
     status: Literal["qualification_candidate"]
@@ -97,6 +109,10 @@ class M0QualificationProfile(StrictModel):
     task_type: Literal["Hybrid"]
     components: tuple[M0QualificationComponent, ...] = Field(min_length=4, max_length=4)
     runtime_seals: tuple[RuntimeSeal, ...] = Field(min_length=3, max_length=3)
+    node_schema_seals: tuple[M0QualificationNodeSchemaSeal, ...] = Field(
+        min_length=12,
+        max_length=12,
+    )
     workflow_path: Path
     workflow_sha256: str = Field(pattern=_SHA256)
     binding_path: Path
@@ -124,6 +140,16 @@ class M0QualificationProfile(StrictModel):
         if value.is_absolute() or ".." in value.parts:
             raise ValueError("M0 qualification sources require contained relative paths")
         return value
+
+    @model_validator(mode="after")
+    def _exact_node_schema_coverage(self) -> "M0QualificationProfile":
+        if tuple(item.node_name for item in self.node_schema_seals) != (
+            _REQUIRED_WORKFLOW_CLASSES
+        ):
+            raise ValueError(
+                "M0 node schema seals must cover every required node exactly"
+            )
+        return self
 
 
 class M0QualificationBinding(StrictModel):
@@ -319,6 +345,53 @@ def _read_exact(root: Path, relative: Path, expected_hash: str, label: str) -> b
     return reopened.data
 
 
+def m0_node_schema_seals(
+    object_info: dict[str, Any],
+) -> tuple[M0QualificationNodeSchemaSeal, ...]:
+    """Seal exact M0 node schemas without mutable runtime file inventories."""
+
+    result = []
+    for node_name in _REQUIRED_WORKFLOW_CLASSES:
+        node = object_info.get(node_name)
+        if not isinstance(node, dict):
+            raise _invalid("M0 ComfyUI node schema is incomplete.", node_name)
+        input_schema = json.loads(json.dumps(node.get("input")))
+        if not isinstance(input_schema, dict):
+            raise _invalid("M0 ComfyUI node schema is malformed.", node_name)
+        for section in ("required", "optional"):
+            fields = input_schema.get(section)
+            if not isinstance(fields, dict):
+                continue
+            for field in _RUNTIME_FILE_CHOOSERS.get(node_name, ()):
+                spec = fields.get(field)
+                if isinstance(spec, list) and spec and isinstance(spec[0], list):
+                    spec[0] = ["<runtime-file-inventory>"]
+        projection = {
+            "input": input_schema,
+            "input_order": node.get("input_order"),
+            "output_name": node.get("output_name"),
+        }
+        if not all(projection.values()):
+            raise _invalid("M0 ComfyUI node schema is malformed.", node_name)
+        result.append(
+            M0QualificationNodeSchemaSeal(
+                node_name=node_name,
+                schema_sha256=canonical_sha256(projection),
+            )
+        )
+    return tuple(result)
+
+
+def validate_m0_live_node_schemas(
+    object_info: dict[str, Any],
+    sources: M0QualificationExecutionSources,
+) -> None:
+    """Reject live ComfyUI schema drift before any M0 submit effect."""
+
+    if m0_node_schema_seals(object_info) != sources.profile.node_schema_seals:
+        raise _invalid("M0 live ComfyUI node schema does not match the sealed profile.")
+
+
 def _validate_workflow(
     profile: M0QualificationProfile,
     workflow: dict[str, Any],
@@ -390,7 +463,7 @@ def _validate_workflow(
         "16": "VHS_LoadVideo",
     }
     if (
-        set(classes) != _REQUIRED_WORKFLOW_CLASSES
+        set(classes) != set(_REQUIRED_WORKFLOW_CLASSES)
         or Counter(classes) != expected_class_counts
         or {
             node_id: node.get("class_type")
@@ -504,6 +577,8 @@ def load_m0_qualification_execution_sources(
 def validate_m0_sources_against_stack(
     sources: M0QualificationExecutionSources,
     stack: GenerationExecutionStackIdentity,
+    *,
+    allow_materialized_source_reseal: bool = False,
 ) -> None:
     profile = sources.profile
     components = tuple(
@@ -544,6 +619,7 @@ def validate_m0_sources_against_stack(
         )
         or stack.materialization_status == "materialized"
         and materialized_hashes != expected_hashes
+        and not allow_materialized_source_reseal
     ):
         raise _invalid("M0 qualification sources do not match the selected stack identity.")
 

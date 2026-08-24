@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -28,6 +29,21 @@ integrated_multimodal_description: [Shot 1] Live-action, photorealistic cinemati
 overall_soundscape: Steady rain strikes the platform roof and wet concrete. Measured boot footsteps and a small physical leather-satchel movement remain synchronized with the walk; distant station ambience stays restrained.
 non_diegetic_music: No non-diegetic music."""
 
+EXPECTED_NODE_SCHEMA_SEALS = (
+    ("UNETLoader", "0803bca8808c9e196cac6a5029c01943786166ec1c643e00389b8bdc1396c8ee"),
+    ("CLIPLoader", "e9f485efa1b625aed932d738f4bd78e1770f573acbe551c2a800972d92ee1385"),
+    ("VAELoader", "437f9bf7258fa818125a864fb43fdefa5f1fdc5b80a4f6f318a76bc9d21a9f4e"),
+    ("MiniMaxH3AudioConditioningT8", "26bc55ff0ef05087f4f0b79b23b2e6a06988bc46325e0bb46114f8ffedf714ca"),
+    ("MiniMaxH3DualClockSamplerT8", "3543e78f8adea01f8b80f154206c80ced606675f74be70ad624baedf30045b34"),
+    ("RandomNoise", "41d9d603f14caf9196ebc80c5b5a5f68d4c303341b307a3a1230c461d64eebcc"),
+    ("BasicGuider", "c561c18f4ab40c62009ced56fce369d4cdcbc5fbc3b8f2e0cbb654b475c0940b"),
+    ("SamplerCustomAdvanced", "261a495a933da3a3ffd113e1f909c0d714a60e4643eac6a057a1c488ffa19716"),
+    ("MiniMaxH3AVDecodeT8", "3856b31ab00fbf3f02d53589c18fd1487a272fe6d0be870fcb5dab93febc2930"),
+    ("VHS_VideoCombine", "d718d775baa3c3e3e0f3323f3d82ffc6eedf79c5a2b8df721abe1b52f0f8c231"),
+    ("LoadImage", "ecf1b0bb9558c1a84dea6e1fcf4f9a9d79ac5d09ed557092f1c062abcef4ead6"),
+    ("VHS_LoadVideo", "59389f8b463b29fd0571e4fe2dc99f2cea8ee7ad6fe8752d171411b10ca12b34"),
+)
+
 
 def _inputs(**updates: object) -> M0QualificationCompileInputs:
     values = {
@@ -40,6 +56,78 @@ def _inputs(**updates: object) -> M0QualificationCompileInputs:
     }
     values.update(updates)
     return M0QualificationCompileInputs(**values)
+
+
+def _object_info() -> dict[str, object]:
+    result: dict[str, object] = {}
+    for node_name, _ in EXPECTED_NODE_SCHEMA_SEALS:
+        required = {"value": ["INT", {"default": 1}]}
+        if node_name == "LoadImage":
+            required = {"image": [["before.png"], {"image_upload": True}]}
+        elif node_name == "VHS_LoadVideo":
+            required = {"video": [["before.mp4"], {"video_upload": True}]}
+        result[node_name] = {
+            "input": {"required": required},
+            "input_order": {"required": list(required)},
+            "output_name": ["OUTPUT"],
+        }
+    return result
+
+
+def test_m0_profile_seals_exact_live_node_schemas() -> None:
+    sources = load_m0_qualification_execution_sources(
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+
+    assert tuple(
+        (item.node_name, item.schema_sha256)
+        for item in sources.profile.node_schema_seals
+    ) == EXPECTED_NODE_SCHEMA_SEALS
+
+
+def test_m0_profile_rejects_incomplete_node_schema_seals() -> None:
+    profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
+    profile["node_schema_seals"] = profile["node_schema_seals"][:-1]
+
+    with pytest.raises(ValueError, match="node_schema_seals"):
+        m0_qualification.M0QualificationProfile.model_validate(profile)
+
+
+def test_m0_live_node_schema_preflight_replays_and_denies_drift() -> None:
+    sources = load_m0_qualification_execution_sources(
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+    object_info = _object_info()
+    sealed = m0_qualification.m0_node_schema_seals(object_info)
+    test_sources = replace(
+        sources,
+        profile=sources.profile.model_copy(update={"node_schema_seals": sealed}),
+    )
+
+    m0_qualification.validate_m0_live_node_schemas(object_info, test_sources)
+
+    drifted = json.loads(json.dumps(object_info))
+    drifted["UNETLoader"]["input"]["required"]["value"][1]["default"] = 2
+    with pytest.raises(AiVideoError, match="node schema"):
+        m0_qualification.validate_m0_live_node_schemas(drifted, test_sources)
+
+    missing = dict(object_info)
+    missing.pop("VHS_LoadVideo")
+    with pytest.raises(AiVideoError, match="node schema"):
+        m0_qualification.validate_m0_live_node_schemas(missing, test_sources)
+
+
+def test_m0_node_schema_seals_ignore_runtime_file_inventory() -> None:
+    before = _object_info()
+    after = json.loads(json.dumps(before))
+    after["LoadImage"]["input"]["required"]["image"][0] = ["after.png"]
+    after["VHS_LoadVideo"]["input"]["required"]["video"][0] = ["after.mp4"]
+
+    assert m0_qualification.m0_node_schema_seals(
+        before
+    ) == m0_qualification.m0_node_schema_seals(after)
 
 
 def test_m0_sources_are_exact_and_compile_literal_hybrid_stock20() -> None:
