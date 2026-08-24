@@ -74,6 +74,22 @@ model=`MiniMax-M3`，reasoning=`high`，transport=Claude-compatible，runner sta
 agent status=`DONE_WITH_CONCERNS`。它没有nested delegation，也没有修改workspace。sanitized capture：
 `/home/reggie/.codex/session-diagnostics/minimax/01a02b2a-befa-7a43-8426-801a9bce5697-09294cf38e430041.md`。
 
+qualification-only caller实现使用MiniMax external writer，Role=`writer`，Scope严格限制为
+`src/ai_video/production/shot_continuity_m0_caller.py`与
+`tests/test_shot_continuity_m0_caller.py`，model=`MiniMax-M3`，reasoning=`high`，
+transport=`Claude-compatible safe-edit`。首次dispatch与一次bounded fresh retry均因生成的verification
+command不匹配exact `--allow-command`而以runner status=`error`、agent status=`BLOCKED`、
+reason=`tool_error_loop`结束；parent没有继续扩大command grants或第三次retry，而是保留两文件ownership并
+完成bounded implementation。sanitized automatic capture：
+`/home/reggie/.codex/session-diagnostics/minimax/01a0312f-4ddf-7c23-b3ec-1246f8c90e3c-d7b578c1cdbd9a62.md`。
+
+当前caller checkpoint保持candidate-neutral且qualification-only：它消费
+`M0ValidationPreSubmitGuard`与existing `VideoGenerationService` / committer-owned local intent seam，使用
+injected transport与asset resolver重开sealed source video及exact four anchors，重验live node schemas、
+same-video terminal/motion-tail lineage与non-negative sealed seed，并只允许one permit、one submit、
+no retry、no fallback。该实现与tests当前仅为staged、尚未commit；未创建winner-specific child、family
+registration、active capability、第二writer或新的durable lifecycle owner。
+
 ## Verification And Evidence
 
 M0 live-schema materialization/reseal exact staged Harness：
@@ -112,6 +128,26 @@ reseal掩盖”与“tampered non-target materialized source在post-write才被�
 RED regression分别证明原路径错误，修复后为它们增加typed denial、Manifest unchanged与whole-tree
 zero-write证据；最终scoped re-review为`accept`，无remaining concern。
 
+qualification-only caller当前verification：
+
+- caller tests：`15 passed`，覆盖missing source/seed、schema、stack、dependent evidence、source、
+  cardinality/order/lineage/bytes drift、permit replay、single-submit与unknown-outcome no-retry/no-fallback；
+- caller + adjacent lifecycle/validation focused tests：`92 passed`；
+- Shot Continuity P0组合：`112 passed`；
+- `git diff --check`通过；
+- exact staged Harness receipt：
+  `.agent/harness/runs/shot-continuity-m0-qualification-caller-20260824-v1/receipt.json`，SHA-256
+  `9978915181092f85aa1325020712d1f3fbe738688df8515f217875f8c61dcd67`；
+- Harness的Documentation Contract与Architecture Gate为PASS，full suite为`3357 passed, 4 skipped`，
+  唯一failure是policy audit发现两个新增owned paths尚未映射；receipt integrity、snapshot match、
+  `fresh_for_snapshot`与cleanup均为true，但`passed`、coverage closure与complete completion proof为false。
+
+`.agent/harness/policy.yaml`属于当前用户明确禁止修改、stage或commit的unrelated work，因此本窗口没有用
+policy edit掩盖audit failure。当前checkpoint是genuine blocker：需要用户明确授权最小policy mapping后重新
+运行exact staged Harness；只有passing receipt之后才执行要求的native `reviewer_xhigh`并提交caller。
+当前没有caller commit，也没有push或release。共享`main`期间由另一工作推进到`4ba2615`，ahead
+`origin/main` 39 commits；`e648728`与`4ba2615`不属于本caller实现。
+
 ## Remaining Gates
 
 selected rainy-station bundle当前仍没有accepted upstream video bytes。P0的terminal frame与motion-tail只是
@@ -119,14 +155,17 @@ selected rainy-station bundle当前仍没有accepted upstream video bytes。P0�
 request。calibration artifact也没有预先固定M0 seed；真实Validation V1开始前必须先形成一个sealed request
 identity，不能在观看结果后选择或修改seed。
 
-尚未实现或执行qualification-only live transport caller、input upload、one-use local permit、M0 submit、poll、
-fetch、decoded boundary review或P6/human verdict。当前用户边界仍禁止Provider/ComfyUI generation、媒体生成、
-M0 submit、T8 seed `320001`与六Shot baseline；所有external effect count保持零。
+qualification-only caller与zero-effect executable contracts已经形成staged checkpoint，但尚未通过policy-
+closed Harness、native `reviewer_xhigh`或commit，因此不能作为committed runtime truth。尚未执行live input
+upload、one-use local permit、M0 submit、poll、fetch、decoded boundary review或P6/human verdict。当前用户
+边界仍禁止Provider/ComfyUI generation、媒体生成、M0 submit、T8 seed `320001`与六Shot baseline；所有
+external effect count保持零。
 
 前序live `object_info` evidence缺口已关闭，不再是M0 submit的materialization blocker。但这只证明
-profile的exact node-schema identity，不证明qualification-only caller已实现或live request已通过。下一实现
-边界是将live-schema validation、sealed source-video lineage、one-use local permit与single-submit/no-retry语义
-接入qualification-only caller；在accepted upstream MP4/MOV与sealed M0 seed缺失时仍必须保持零effect。
+profile的exact node-schema identity，不证明staged caller已完成acceptance或live request已通过。下一步先在
+明确授权后最小映射两个新增paths，获得fresh passing Harness receipt、完成native `reviewer_xhigh`并commit；
+不得借此提前进入Validation V1。accepted upstream MP4/MOV与sealed M0 seed仍缺失，真实submit继续保持
+blocked与零effect。
 
 ## Agent Guardrails
 
