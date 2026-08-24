@@ -1,0 +1,501 @@
+{
+  "$defs": {
+    "AllowedClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "claim_type": {
+          "$ref": "#/$defs/ClaimType"
+        },
+        "fact_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Fact Ids",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "text",
+        "claim_type",
+        "fact_ids",
+        "source_ids"
+      ],
+      "title": "AllowedClaim",
+      "type": "object"
+    },
+    "AudienceInput": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Context",
+          "type": "string"
+        },
+        "desired_outcome": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Desired Outcome",
+          "type": "string"
+        },
+        "pain_point": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Pain Point",
+          "type": "string"
+        },
+        "target_consumer": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Target Consumer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_consumer",
+        "context",
+        "pain_point",
+        "desired_outcome"
+      ],
+      "title": "AudienceInput",
+      "type": "object"
+    },
+    "ClaimType": {
+      "enum": [
+        "FACT",
+        "BENEFIT",
+        "COMPARISON",
+        "MEDICAL_OR_THERAPEUTIC"
+      ],
+      "title": "ClaimType",
+      "type": "string"
+    },
+    "PlatformInput": {
+      "additionalProperties": false,
+      "properties": {
+        "constraints": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "placement": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Placement",
+          "type": "string"
+        },
+        "platform": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Platform",
+          "type": "string"
+        }
+      },
+      "required": [
+        "platform",
+        "placement",
+        "constraints"
+      ],
+      "title": "PlatformInput",
+      "type": "object"
+    },
+    "ProductFact": {
+      "additionalProperties": false,
+      "properties": {
+        "fact_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "statement": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fact_id",
+        "statement",
+        "source_ids"
+      ],
+      "title": "ProductFact",
+      "type": "object"
+    },
+    "ProductInput": {
+      "additionalProperties": false,
+      "properties": {
+        "landing_page_reference": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Landing Page Reference"
+        },
+        "name": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "sku_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Sku Id",
+          "type": "string"
+        },
+        "source_assets": {
+          "items": {
+            "$ref": "#/$defs/ProductSourceAsset"
+          },
+          "minItems": 1,
+          "title": "Source Assets",
+          "type": "array"
+        }
+      },
+      "required": [
+        "sku_id",
+        "name",
+        "source_assets",
+        "landing_page_reference"
+      ],
+      "title": "ProductInput",
+      "type": "object"
+    },
+    "ProductSourceAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "reference": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Reference",
+          "type": "string"
+        },
+        "rights_status": {
+          "$ref": "#/$defs/RightsStatus"
+        },
+        "source_kind": {
+          "enum": [
+            "IMAGE",
+            "VIDEO",
+            "BRAND_GUIDE",
+            "PAGE_SNAPSHOT"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id",
+        "source_kind",
+        "reference",
+        "rights_status"
+      ],
+      "title": "ProductSourceAsset",
+      "type": "object"
+    },
+    "ProductTruthInput": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_claims": {
+          "items": {
+            "$ref": "#/$defs/AllowedClaim"
+          },
+          "minItems": 1,
+          "title": "Allowed Claims",
+          "type": "array"
+        },
+        "facts": {
+          "items": {
+            "$ref": "#/$defs/ProductFact"
+          },
+          "minItems": 1,
+          "title": "Facts",
+          "type": "array"
+        },
+        "prohibited_claims": {
+          "items": {
+            "$ref": "#/$defs/ProhibitedClaim"
+          },
+          "minItems": 1,
+          "title": "Prohibited Claims",
+          "type": "array"
+        },
+        "required_disclaimers": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Required Disclaimers",
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/TruthSource"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "sources",
+        "facts",
+        "allowed_claims",
+        "prohibited_claims",
+        "required_disclaimers"
+      ],
+      "title": "ProductTruthInput",
+      "type": "object"
+    },
+    "ProhibitedClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "claim_type": {
+          "$ref": "#/$defs/ClaimType"
+        },
+        "reason": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "text",
+        "claim_type",
+        "reason"
+      ],
+      "title": "ProhibitedClaim",
+      "type": "object"
+    },
+    "RightsStatus": {
+      "enum": [
+        "CONFIRMED",
+        "RESTRICTED",
+        "UNKNOWN"
+      ],
+      "title": "RightsStatus",
+      "type": "string"
+    },
+    "TruthSource": {
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Reference",
+          "type": "string"
+        },
+        "rights_status": {
+          "$ref": "#/$defs/RightsStatus"
+        },
+        "source_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_kind": {
+          "enum": [
+            "PRODUCT_ASSET",
+            "PRODUCT_PAGE",
+            "BRAND_DOCUMENT",
+            "USER_ATTESTATION"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_kind",
+        "reference",
+        "rights_status"
+      ],
+      "title": "TruthSource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "ad_format": {
+      "enum": [
+        "product_demo",
+        "presenter_spokesperson",
+        "lifestyle_use_case",
+        "comparison",
+        "problem_solution",
+        "motion_graphics_product"
+      ],
+      "title": "Ad Format",
+      "type": "string"
+    },
+    "aspect_ratio": {
+      "const": "9:16",
+      "title": "Aspect Ratio",
+      "type": "string"
+    },
+    "audience": {
+      "$ref": "#/$defs/AudienceInput"
+    },
+    "constraints": {
+      "items": {
+        "maxLength": 1000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Constraints",
+      "type": "array"
+    },
+    "delivery_intent": {
+      "const": "video",
+      "title": "Delivery Intent",
+      "type": "string"
+    },
+    "duration_seconds": {
+      "maximum": 60.0,
+      "minimum": 6.0,
+      "title": "Duration Seconds",
+      "type": "number"
+    },
+    "language": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Language",
+      "type": "string"
+    },
+    "objective": {
+      "enum": [
+        "AWARENESS",
+        "CONSIDERATION",
+        "CONVERSION"
+      ],
+      "title": "Objective",
+      "type": "string"
+    },
+    "platform": {
+      "$ref": "#/$defs/PlatformInput"
+    },
+    "product": {
+      "$ref": "#/$defs/ProductInput"
+    },
+    "product_truth": {
+      "$ref": "#/$defs/ProductTruthInput"
+    },
+    "references": {
+      "items": {
+        "maxLength": 1000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "References",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "ecommerce-ad-workflow/input/1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "style": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Style",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "delivery_intent",
+    "product",
+    "product_truth",
+    "audience",
+    "platform",
+    "objective",
+    "duration_seconds",
+    "aspect_ratio",
+    "language",
+    "style",
+    "ad_format",
+    "references",
+    "constraints"
+  ],
+  "title": "EcommerceAdInput",
+  "type": "object"
+}

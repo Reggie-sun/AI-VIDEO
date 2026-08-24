@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL_ROOT = ROOT / ".agents" / "skills" / "ecommerce-ad-workflow"
 SKILL_PATH = SKILL_ROOT / "SKILL.md"
 SCRIPT_PATH = SKILL_ROOT / "scripts" / "validate_contract.py"
+MODEL_PATH = SKILL_ROOT / "scripts" / "contract_models.py"
+GATES_PATH = SKILL_ROOT / "scripts" / "contract_gates.py"
 INPUT_SCHEMA_PATH = SKILL_ROOT / "schemas" / "ecommerce-ad-input.schema.json"
 PACKAGE_SCHEMA_PATH = (
     SKILL_ROOT / "schemas" / "ecommerce-ad-production-package.schema.json"
@@ -124,10 +126,32 @@ def _assert_invalid_package(
     return document
 
 
+def _assert_invalid_input(
+    tmp_path: Path,
+    mutate: Callable[[dict[str, object]], None],
+    expected_code: str,
+) -> dict[str, object]:
+    payload = _load_json(INPUT_EXAMPLE_PATH)
+    mutate(payload)
+    path = tmp_path / f"invalid-input-{expected_code}.json"
+    _write_payload(path, payload)
+
+    result = _run_cli("input", path)
+
+    assert result.returncode == 2, result.stdout
+    assert result.stderr == ""
+    document = json.loads(result.stdout)
+    assert document["status"] == "invalid"
+    assert expected_code in _diagnostic_codes(result)
+    return document
+
+
 def test_expected_skill_package_files_exist() -> None:
     expected = {
         SKILL_PATH,
         SCRIPT_PATH,
+        MODEL_PATH,
+        GATES_PATH,
         INPUT_SCHEMA_PATH,
         PACKAGE_SCHEMA_PATH,
         INPUT_EXAMPLE_PATH,
@@ -169,6 +193,27 @@ def test_checked_in_schemas_are_exact_pydantic_contract_views() -> None:
     )
     assert _load_json(INPUT_SCHEMA_PATH)["additionalProperties"] is False
     assert _load_json(PACKAGE_SCHEMA_PATH)["additionalProperties"] is False
+
+    package_schema = _load_json(PACKAGE_SCHEMA_PATH)
+    definitions = package_schema["$defs"]
+    assert "objection_handling" in definitions["AdStrategy"]["required"]
+    assert "promise_boundary" in definitions["HookContract"]["required"]
+    assert "bound_ids" in definitions["HookComponent"]["required"]
+    assert set(
+        definitions["CreativeVariant"]["properties"]["held_constants"]["items"][
+            "enum"
+        ]
+    ) == {
+        "claim_ledger",
+        "cta_destination",
+        "delivery_intent",
+        "objective",
+        "platform_constraints",
+        "product_identity",
+        "product_truth",
+        "rights",
+        "unchanged_strategy_fields",
+    }
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
@@ -253,6 +298,56 @@ def test_medical_claim_is_rejected_even_with_source_and_disclaimer(
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+@pytest.mark.parametrize("rights_status", ["UNKNOWN", "RESTRICTED"])
+def test_input_requires_confirmed_asset_and_truth_source_rights(
+    tmp_path: Path, rights_status: str
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        payload["product"]["source_assets"][0]["rights_status"] = rights_status
+        payload["product_truth"]["sources"][0]["rights_status"] = rights_status
+
+    _assert_invalid_input(tmp_path, mutate, "rights_not_confirmed")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_claim_sources_must_exactly_support_the_referenced_facts(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        payload["product_truth"]["allowed_claims"][0]["source_ids"] = [
+            "source-product-image"
+        ]
+
+    _assert_invalid_input(tmp_path, mutate, "claim_lineage")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_package_snapshot_revalidates_rights_and_claim_sources(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        payload["product_truth"]["source_assets"][0]["rights_status"] = "UNKNOWN"
+        payload["product_truth"]["allowed_claims"][0]["source_ids"] = [
+            "source-product-image"
+        ]
+
+    _assert_invalid_package(tmp_path, mutate, "rights_not_confirmed")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_package_snapshot_revalidates_exact_claim_source_lineage(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        payload["product_truth"]["allowed_claims"][0]["source_ids"] = [
+            "source-product-image"
+        ]
+        payload["claim_ledger"][1]["source_ids"] = ["source-product-image"]
+
+    _assert_invalid_package(tmp_path, mutate, "claim_lineage")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 def test_used_claim_requires_exact_fact_and_source_lineage(tmp_path: Path) -> None:
     def mutate(payload: dict[str, object]) -> None:
         payload["claim_ledger"][0]["fact_ids"] = ["fact-does-not-exist"]
@@ -260,6 +355,32 @@ def test_used_claim_requires_exact_fact_and_source_lineage(tmp_path: Path) -> No
     document = _assert_invalid_package(tmp_path, mutate, "claim_lineage")
 
     assert any(item["path"].startswith("$.claim_ledger") for item in document["diagnostics"])
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+@pytest.mark.parametrize("defect", ["unknown_usage", "missing_form"])
+def test_used_claim_requires_real_usage_and_a_declared_form(
+    tmp_path: Path, defect: str
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        entry = payload["claim_ledger"][0]
+        if defect == "unknown_usage":
+            entry["used_at"] = ["copy-does-not-exist"]
+        else:
+            entry["spoken_form"] = None
+            entry["visual_form"] = None
+
+    _assert_invalid_package(tmp_path, mutate, "claim_lineage")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_hook_component_claims_must_bind_used_claims(tmp_path: Path) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        payload["hook_contract"]["components"][0]["claim_ids"] = [
+            "claim-does-not-exist"
+        ]
+
+    _assert_invalid_package(tmp_path, mutate, "claim_lineage")
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
@@ -284,6 +405,20 @@ def test_hook_requires_an_observable_first_second_component(tmp_path: Path) -> N
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_hook_requires_visual_dialogue_copy_and_audio_components(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        payload["hook_contract"]["components"] = [
+            item
+            for item in payload["hook_contract"]["components"]
+            if item["kind"] != "AUDIO"
+        ]
+
+    _assert_invalid_package(tmp_path, mutate, "hook_contract")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 def test_beats_shots_presentations_copy_and_audio_are_traceable(
     tmp_path: Path,
 ) -> None:
@@ -291,6 +426,69 @@ def test_beats_shots_presentations_copy_and_audio_are_traceable(
         payload["ad_beats"][0]["shot_ids"] = ["shot-missing"]
 
     _assert_invalid_package(tmp_path, mutate, "traceability")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+@pytest.mark.parametrize("relation", ["presentation", "copy", "audio", "storyboard"])
+def test_traceability_requires_exact_bidirectional_membership(
+    tmp_path: Path, relation: str
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        if relation == "presentation":
+            payload["ad_beats"][0]["presentation_ids"] = []
+        elif relation == "copy":
+            payload["shot_intents"][1]["copy_ids"] = []
+        elif relation == "audio":
+            payload["ad_beats"][2]["audio_event_ids"] = ["audio-music"]
+        else:
+            payload["storyboard"][0]["shot_ids"] = ["shot-intro"]
+
+    _assert_invalid_package(tmp_path, mutate, "traceability")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+@pytest.mark.parametrize("relation", ["presentation", "copy", "audio"])
+def test_traceability_rejects_cross_beat_and_shot_pairs(
+    tmp_path: Path, relation: str
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        if relation == "presentation":
+            payload["product_presentation"][0]["shot_id"] = "shot-demo"
+            payload["shot_intents"][0]["presentation_ids"] = []
+            payload["shot_intents"][2]["presentation_ids"].append(
+                "presentation-intro"
+            )
+        elif relation == "copy":
+            product_label = next(
+                item
+                for item in payload["copy_graphics_plan"]
+                if item["copy_id"] == "copy-product-label"
+            )
+            product_label["shot_id"] = "shot-demo"
+            payload["shot_intents"][1]["copy_ids"] = []
+            payload["shot_intents"][2]["copy_ids"].append("copy-product-label")
+        else:
+            demo_hit = next(
+                item
+                for item in payload["audio_plan"]["events"]
+                if item["event_id"] == "audio-demo-hit"
+            )
+            demo_hit["shot_ids"] = ["shot-proof"]
+            payload["shot_intents"][2]["audio_event_ids"] = ["audio-music"]
+            payload["shot_intents"][3]["audio_event_ids"].append("audio-demo-hit")
+
+    _assert_invalid_package(tmp_path, mutate, "traceability")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_product_presentation_requires_intro_demo_hero_and_cta_roles(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        for item in payload["product_presentation"]:
+            item["role"] = "INTRO"
+
+    _assert_invalid_package(tmp_path, mutate, "product_presentation_roles")
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
@@ -304,6 +502,87 @@ def test_physical_interaction_without_source_or_runtime_capability_is_blocked(
         item["capability_requirement_ids"] = []
 
     _assert_invalid_package(tmp_path, mutate, "blocked_capability_gap")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+@pytest.mark.parametrize(
+    "classification",
+    ["REQUIRES_SOURCE_GENERATION_STRATEGY", "REQUIRES_RUNTIME_CAPABILITY"],
+)
+def test_physical_interaction_with_only_a_missing_capability_is_blocked(
+    tmp_path: Path, classification: str
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        item = payload["product_presentation"][0]
+        item["mode"] = "PHYSICAL_INTERACTION_REQUIRED"
+        item["talent_interaction"] = "PHYSICAL_CONTACT"
+        item["capability_requirement_ids"] = ["req-physical"]
+        payload["runtime_handoff"]["requirements"].append(
+            {
+                "requirement_id": "req-physical",
+                "capability": "physical_product_interaction",
+                "classification": classification,
+                "rationale": "The required physical interaction is not available.",
+            }
+        )
+        payload["runtime_handoff"]["classified_gaps"].append(
+            {
+                "gap_id": "gap-physical",
+                "classification": classification,
+                "requirement_ids": ["req-physical"],
+                "blocker_code": "blocked_capability_gap",
+                "rationale": "Physical interaction remains unavailable.",
+            }
+        )
+
+    _assert_invalid_package(tmp_path, mutate, "blocked_capability_gap")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_physical_interaction_rejects_self_asserted_supported_capability(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        item = payload["product_presentation"][0]
+        item["mode"] = "PHYSICAL_INTERACTION_REQUIRED"
+        item["talent_interaction"] = "PHYSICAL_CONTACT"
+        item["capability_requirement_ids"] = ["req-physical"]
+        payload["runtime_handoff"]["requirements"].append(
+            {
+                "requirement_id": "req-physical",
+                "capability": "physical_product_interaction",
+                "classification": "SUPPORTED_CURRENTLY",
+                "rationale": "This self-assertion has no authoritative evidence.",
+            }
+        )
+        payload["runtime_handoff"]["classified_gaps"].append(
+            {
+                "gap_id": "gap-physical",
+                "classification": "SUPPORTED_CURRENTLY",
+                "requirement_ids": ["req-physical"],
+                "blocker_code": None,
+                "rationale": "This self-assertion is not Runtime evidence.",
+            }
+        )
+
+    _assert_invalid_package(tmp_path, mutate, "blocked_capability_gap")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_runtime_requirements_require_exact_classified_gap_closure(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        payload["runtime_handoff"]["requirements"].append(
+            {
+                "requirement_id": "req-unclassified",
+                "capability": "advertising_copy_graphics",
+                "classification": "REQUIRES_RUNTIME_CAPABILITY",
+                "rationale": "This requirement is not classified by a gap.",
+            }
+        )
+
+    _assert_invalid_package(tmp_path, mutate, "runtime_handoff")
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
@@ -355,6 +634,16 @@ def test_noisy_native_lead_in_cannot_be_kept_without_measurement_policy(
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_source_audio_policy_must_be_unique_per_shot(tmp_path: Path) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        payload["audio_plan"]["source_audio_policies"].append(
+            copy.deepcopy(payload["audio_plan"]["source_audio_policies"][0])
+        )
+
+    _assert_invalid_package(tmp_path, mutate, "source_audio_policy")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 def test_cta_and_brand_end_card_must_bind_the_final_beat_and_shot(
     tmp_path: Path,
 ) -> None:
@@ -369,6 +658,18 @@ def test_cta_and_brand_end_card_must_bind_the_final_beat_and_shot(
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_cta_copy_and_end_card_must_both_bind_the_final_shot(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        for item in payload["copy_graphics_plan"]:
+            if item["role"] in {"CTA", "BRAND_END_CARD"}:
+                item["shot_id"] = "shot-proof"
+
+    _assert_invalid_package(tmp_path, mutate, "cta_brand_closure")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 def test_creative_variant_changes_exactly_one_variable_and_holds_truth_constant(
     tmp_path: Path,
 ) -> None:
@@ -376,6 +677,14 @@ def test_creative_variant_changes_exactly_one_variable_and_holds_truth_constant(
         variant = payload["creative_variant_matrix"]["variants"][0]
         variant["changed_variable"] = ["HOOK", "CTA"]
         variant["held_constants"] = ["delivery_intent"]
+
+    _assert_invalid_package(tmp_path, mutate, "variant_isolation")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_variant_matrix_binds_the_exact_master_strategy(tmp_path: Path) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        payload["creative_variant_matrix"]["master_strategy_id"] = "strategy-missing"
 
     _assert_invalid_package(tmp_path, mutate, "variant_isolation")
 
@@ -435,6 +744,21 @@ def test_same_commercial_typography_treatment_across_every_shot_is_rejected(
             for item in payload["copy_graphics_plan"]
             if item["role"] in {"CTA", "BRAND_END_CARD", "PRODUCT_LABEL"}
         ]
+        payload["claim_ledger"][0]["used_at"] = [
+            "hook-visual",
+            "beat-hook",
+            "copy-mechanical-0",
+        ]
+        payload["claim_ledger"][1]["used_at"] = [
+            "beat-proof",
+            "copy-mechanical-3",
+        ]
+        hook_copy = next(
+            item
+            for item in payload["hook_contract"]["components"]
+            if item["kind"] == "COPY"
+        )
+        hook_copy["bound_ids"] = ["copy-mechanical-0"]
 
     _assert_invalid_package(tmp_path, mutate, "mechanical_typography")
 
@@ -487,13 +811,17 @@ def test_validator_is_local_read_only_and_does_not_consume_credentials(
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 def test_validator_imports_no_runtime_network_provider_or_ai_comic_dependency() -> None:
-    tree = ast.parse(SCRIPT_PATH.read_text(encoding="utf-8"))
     imported_roots: set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            imported_roots.update(alias.name.split(".")[0] for alias in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module:
-            imported_roots.add(node.module.split(".")[0])
+    sources: list[str] = []
+    for script_path in (SCRIPT_PATH, MODEL_PATH, GATES_PATH):
+        source = script_path.read_text(encoding="utf-8")
+        sources.append(source)
+        tree = ast.parse(source)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imported_roots.update(alias.name.split(".")[0] for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module:
+                imported_roots.add(node.module.split(".")[0])
 
     assert imported_roots.isdisjoint(
         {
@@ -506,9 +834,8 @@ def test_validator_imports_no_runtime_network_provider_or_ai_comic_dependency() 
             "urllib",
         }
     )
-    source = SCRIPT_PATH.read_text(encoding="utf-8")
-    assert "../ai-comic-workflow" not in source
-    assert "skills-lock.json" not in source
+    assert all("../ai-comic-workflow" not in source for source in sources)
+    assert all("skills-lock.json" not in source for source in sources)
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")

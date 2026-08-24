@@ -1,0 +1,117 @@
+{
+  "schema_version": "ecommerce-ad-workflow/input/1",
+  "delivery_intent": "video",
+  "product": {
+    "sku_id": "blendgo-mini-450",
+    "name": "BlendGo Mini 450ml",
+    "source_assets": [
+      {
+        "asset_id": "asset-product-front",
+        "source_kind": "IMAGE",
+        "reference": "assets/product/blendgo-mini-front.png",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-brand-guide",
+        "source_kind": "BRAND_GUIDE",
+        "reference": "brand/blendgo-mini-guide-v1.pdf",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "landing_page_reference": "snapshots/blendgo-mini-product-page-2026-08-24.pdf"
+  },
+  "product_truth": {
+    "sources": [
+      {
+        "source_id": "source-brand-sheet",
+        "source_kind": "BRAND_DOCUMENT",
+        "reference": "brand/blendgo-mini-facts-v1.pdf",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-product-image",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "assets/product/blendgo-mini-front.png",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "facts": [
+      {
+        "fact_id": "fact-capacity",
+        "statement": "The cup capacity is 450 ml.",
+        "source_ids": [
+          "source-brand-sheet"
+        ]
+      },
+      {
+        "fact_id": "fact-portable",
+        "statement": "The product is designed as a portable blender.",
+        "source_ids": [
+          "source-brand-sheet",
+          "source-product-image"
+        ]
+      }
+    ],
+    "allowed_claims": [
+      {
+        "claim_id": "claim-capacity",
+        "text": "450 ml capacity",
+        "claim_type": "FACT",
+        "fact_ids": [
+          "fact-capacity"
+        ],
+        "source_ids": [
+          "source-brand-sheet"
+        ]
+      },
+      {
+        "claim_id": "claim-portable",
+        "text": "Blend wherever the day takes you",
+        "claim_type": "BENEFIT",
+        "fact_ids": [
+          "fact-portable"
+        ],
+        "source_ids": [
+          "source-brand-sheet",
+          "source-product-image"
+        ]
+      }
+    ],
+    "prohibited_claims": [
+      {
+        "claim_id": "claim-detox",
+        "text": "Clinically proven detox",
+        "claim_type": "MEDICAL_OR_THERAPEUTIC",
+        "reason": "Medical and therapeutic claims are forbidden in V1."
+      }
+    ],
+    "required_disclaimers": []
+  },
+  "audience": {
+    "target_consumer": "Urban commuters who make single-serve drinks",
+    "context": "Morning commute and desk-side preparation",
+    "pain_point": "Full-size blenders are inconvenient outside the kitchen",
+    "desired_outcome": "A compact, clearly demonstrated preparation option"
+  },
+  "platform": {
+    "platform": "short-form-social",
+    "placement": "vertical-feed",
+    "constraints": [
+      "Keep key text inside a centered mobile safe area",
+      "No unsupported health claims"
+    ]
+  },
+  "objective": "CONVERSION",
+  "duration_seconds": 30,
+  "aspect_ratio": "9:16",
+  "language": "en-US",
+  "style": "Bright daylight product demo with restrained kinetic graphic accents",
+  "ad_format": "product_demo",
+  "references": [
+    "brand/blendgo-mini-guide-v1.pdf"
+  ],
+  "constraints": [
+    "Use only confirmed Product Truth",
+    "Final deliverable intent is video"
+  ]
+}

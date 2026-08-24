@@ -1,0 +1,1101 @@
+{
+  "schema_version": "ecommerce-ad-workflow/package/1",
+  "package_id": "f6f0f33385c4bab53a5ef51c2919b028f6e365d66f6b4724d53d619359ff4cd3",
+  "source_input_hash": "a93a64baf8e66baf3309923cb61e65b737c7d17d5b67b272ddb8ff6b8f6875ed",
+  "duration_seconds": 30,
+  "aspect_ratio": "9:16",
+  "product_truth": {
+    "sku_id": "blendgo-mini-450",
+    "product_name": "BlendGo Mini 450ml",
+    "source_assets": [
+      {
+        "asset_id": "asset-product-front",
+        "source_kind": "IMAGE",
+        "reference": "assets/product/blendgo-mini-front.png",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-brand-guide",
+        "source_kind": "BRAND_GUIDE",
+        "reference": "brand/blendgo-mini-guide-v1.pdf",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "sources": [
+      {
+        "source_id": "source-brand-sheet",
+        "source_kind": "BRAND_DOCUMENT",
+        "reference": "brand/blendgo-mini-facts-v1.pdf",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-product-image",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "assets/product/blendgo-mini-front.png",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "facts": [
+      {
+        "fact_id": "fact-capacity",
+        "statement": "The cup capacity is 450 ml.",
+        "source_ids": [
+          "source-brand-sheet"
+        ]
+      },
+      {
+        "fact_id": "fact-portable",
+        "statement": "The product is designed as a portable blender.",
+        "source_ids": [
+          "source-brand-sheet",
+          "source-product-image"
+        ]
+      }
+    ],
+    "allowed_claims": [
+      {
+        "claim_id": "claim-capacity",
+        "text": "450 ml capacity",
+        "claim_type": "FACT",
+        "fact_ids": [
+          "fact-capacity"
+        ],
+        "source_ids": [
+          "source-brand-sheet"
+        ]
+      },
+      {
+        "claim_id": "claim-portable",
+        "text": "Blend wherever the day takes you",
+        "claim_type": "BENEFIT",
+        "fact_ids": [
+          "fact-portable"
+        ],
+        "source_ids": [
+          "source-brand-sheet",
+          "source-product-image"
+        ]
+      }
+    ],
+    "prohibited_claims": [
+      {
+        "claim_id": "claim-detox",
+        "text": "Clinically proven detox",
+        "claim_type": "MEDICAL_OR_THERAPEUTIC",
+        "reason": "Medical and therapeutic claims are forbidden in V1."
+      }
+    ],
+    "required_disclaimers": []
+  },
+  "claim_ledger": [
+    {
+      "claim_id": "claim-portable",
+      "status": "USED",
+      "fact_ids": [
+        "fact-portable"
+      ],
+      "source_ids": [
+        "source-brand-sheet",
+        "source-product-image"
+      ],
+      "used_at": [
+        "hook-visual",
+        "beat-hook",
+        "copy-headline"
+      ],
+      "spoken_form": "Blend wherever the day takes you",
+      "visual_form": "Blend anywhere"
+    },
+    {
+      "claim_id": "claim-capacity",
+      "status": "USED",
+      "fact_ids": [
+        "fact-capacity"
+      ],
+      "source_ids": [
+        "source-brand-sheet"
+      ],
+      "used_at": [
+        "beat-proof",
+        "copy-proof"
+      ],
+      "spoken_form": "A 450 ml cup",
+      "visual_form": "450 ml"
+    },
+    {
+      "claim_id": "claim-detox",
+      "status": "PROHIBITED",
+      "fact_ids": [],
+      "source_ids": [],
+      "used_at": [],
+      "spoken_form": null,
+      "visual_form": null
+    }
+  ],
+  "ad_strategy": {
+    "strategy_id": "strategy-portable-proof",
+    "audience": "Urban commuters who make single-serve drinks",
+    "pain_point": "Full-size blenders are inconvenient outside the kitchen",
+    "angle": "Show a compact product moving from bag to desk",
+    "promise": "Portable preparation without inventing performance claims",
+    "proof_boundary": "Only portability and 450 ml capacity are asserted",
+    "objection_handling": "Address portability concerns only with the approved compact-form and capacity evidence.",
+    "objective": "CONVERSION"
+  },
+  "hook_contract": {
+    "components": [
+      {
+        "component_id": "hook-visual",
+        "kind": "VISUAL",
+        "cue_seconds": 0,
+        "content": "Bag opens to reveal the compact product silhouette",
+        "claim_ids": [
+          "claim-portable"
+        ],
+        "bound_ids": [
+          "beat-hook",
+          "shot-hook"
+        ]
+      },
+      {
+        "component_id": "hook-dialogue",
+        "kind": "DIALOGUE_OR_VO",
+        "cue_seconds": 0.2,
+        "content": "Meet BlendGo Mini 450ml",
+        "claim_ids": [
+          "claim-portable"
+        ],
+        "bound_ids": [
+          "audio-dialogue-hook"
+        ]
+      },
+      {
+        "component_id": "hook-copy",
+        "kind": "COPY",
+        "cue_seconds": 0.4,
+        "content": "Blend anywhere",
+        "claim_ids": [
+          "claim-portable"
+        ],
+        "bound_ids": [
+          "copy-headline"
+        ]
+      },
+      {
+        "component_id": "hook-audio",
+        "kind": "AUDIO",
+        "cue_seconds": 0,
+        "content": "Short zip and reveal hit",
+        "claim_ids": [],
+        "bound_ids": [
+          "audio-music"
+        ]
+      }
+    ],
+    "product_presence": "TEASE",
+    "promise_claim_ids": [
+      "claim-portable"
+    ],
+    "promise_boundary": "Only approved portability and capacity claims may be expressed.",
+    "first_payoff_deadline_seconds": 8,
+    "platform_constraints": [
+      "First readable message lands before one second"
+    ]
+  },
+  "ad_beats": [
+    {
+      "beat_id": "beat-hook",
+      "role": "HOOK",
+      "start_seconds": 0,
+      "end_seconds": 3,
+      "duration_seconds": 3,
+      "duration_basis": "HOOK_DENSITY",
+      "pacing_rationale": "A short opening earns attention before explanation.",
+      "message": "Reveal portable use context.",
+      "shot_ids": [
+        "shot-hook"
+      ],
+      "presentation_ids": [
+        "presentation-intro"
+      ],
+      "copy_ids": [
+        "copy-headline",
+        "copy-subtitle"
+      ],
+      "audio_event_ids": [
+        "audio-dialogue-hook",
+        "audio-music"
+      ]
+    },
+    {
+      "beat_id": "beat-intro",
+      "role": "PRODUCT_INTRO",
+      "start_seconds": 3,
+      "end_seconds": 8,
+      "duration_seconds": 5,
+      "duration_basis": "PROOF_READABILITY",
+      "pacing_rationale": "Five seconds establishes the exact product identity.",
+      "message": "Name and frame the product clearly.",
+      "shot_ids": [
+        "shot-intro"
+      ],
+      "presentation_ids": [],
+      "copy_ids": [
+        "copy-product-label"
+      ],
+      "audio_event_ids": [
+        "audio-music"
+      ]
+    },
+    {
+      "beat_id": "beat-demo",
+      "role": "DEMONSTRATION",
+      "start_seconds": 8,
+      "end_seconds": 16,
+      "duration_seconds": 8,
+      "duration_basis": "DEMO_COMPLEXITY",
+      "pacing_rationale": "The graphic demonstration needs time for cause and result.",
+      "message": "Show the portable preparation sequence without fake hand contact.",
+      "shot_ids": [
+        "shot-demo"
+      ],
+      "presentation_ids": [
+        "presentation-demo"
+      ],
+      "copy_ids": [
+        "copy-benefit"
+      ],
+      "audio_event_ids": [
+        "audio-music",
+        "audio-demo-hit"
+      ]
+    },
+    {
+      "beat_id": "beat-proof",
+      "role": "BENEFIT_PROOF",
+      "start_seconds": 16,
+      "end_seconds": 23,
+      "duration_seconds": 7,
+      "duration_basis": "PROOF_READABILITY",
+      "pacing_rationale": "Capacity proof remains readable before the close.",
+      "message": "Present the verified 450 ml fact.",
+      "shot_ids": [
+        "shot-proof"
+      ],
+      "presentation_ids": [
+        "presentation-hero"
+      ],
+      "copy_ids": [
+        "copy-proof"
+      ],
+      "audio_event_ids": [
+        "audio-music"
+      ]
+    },
+    {
+      "beat_id": "beat-close",
+      "role": "CTA_CLOSE",
+      "start_seconds": 23,
+      "end_seconds": 30,
+      "duration_seconds": 7,
+      "duration_basis": "CTA_DWELL",
+      "pacing_rationale": "The brand end card holds long enough for action.",
+      "message": "Close on product identity and action.",
+      "shot_ids": [
+        "shot-close"
+      ],
+      "presentation_ids": [
+        "presentation-cta"
+      ],
+      "copy_ids": [
+        "copy-cta",
+        "copy-end-card"
+      ],
+      "audio_event_ids": [
+        "audio-music",
+        "audio-close-hit"
+      ]
+    }
+  ],
+  "product_presentation": [
+    {
+      "presentation_id": "presentation-intro",
+      "role": "INTRO",
+      "mode": "GRAPHIC_REVEAL",
+      "beat_id": "beat-hook",
+      "shot_id": "shot-hook",
+      "start_seconds": 0.5,
+      "duration_seconds": 2,
+      "product_source_asset_id": "asset-product-front",
+      "talent_interaction": "NONE",
+      "occlusion_required": false,
+      "lighting_shadow_required": false,
+      "copy_cue_ids": [
+        "copy-headline"
+      ],
+      "audio_cue_ids": [
+        "audio-dialogue-hook"
+      ],
+      "fallback_policy": "NONE",
+      "capability_requirement_ids": [
+        "req-product-asset"
+      ]
+    },
+    {
+      "presentation_id": "presentation-demo",
+      "role": "DEMONSTRATION",
+      "mode": "GRAPHIC_REVEAL",
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "start_seconds": 8,
+      "duration_seconds": 8,
+      "product_source_asset_id": "asset-product-front",
+      "talent_interaction": "POINTS_NEAR",
+      "occlusion_required": false,
+      "lighting_shadow_required": false,
+      "copy_cue_ids": [
+        "copy-benefit"
+      ],
+      "audio_cue_ids": [
+        "audio-demo-hit"
+      ],
+      "fallback_policy": "REQUIRE_REAPPROVAL_HERO",
+      "capability_requirement_ids": [
+        "req-ad-graphics"
+      ]
+    },
+    {
+      "presentation_id": "presentation-hero",
+      "role": "HERO_SHOT",
+      "mode": "DEDICATED_HERO_SHOT",
+      "beat_id": "beat-proof",
+      "shot_id": "shot-proof",
+      "start_seconds": 16,
+      "duration_seconds": 7,
+      "product_source_asset_id": "asset-product-front",
+      "talent_interaction": "NONE",
+      "occlusion_required": false,
+      "lighting_shadow_required": true,
+      "copy_cue_ids": [
+        "copy-proof"
+      ],
+      "audio_cue_ids": [
+        "audio-music"
+      ],
+      "fallback_policy": "NONE",
+      "capability_requirement_ids": [
+        "req-product-asset"
+      ]
+    },
+    {
+      "presentation_id": "presentation-cta",
+      "role": "CTA_SUPPORT",
+      "mode": "GRAPHIC_REVEAL",
+      "beat_id": "beat-close",
+      "shot_id": "shot-close",
+      "start_seconds": 23,
+      "duration_seconds": 7,
+      "product_source_asset_id": "asset-product-front",
+      "talent_interaction": "NONE",
+      "occlusion_required": false,
+      "lighting_shadow_required": false,
+      "copy_cue_ids": [
+        "copy-cta",
+        "copy-end-card"
+      ],
+      "audio_cue_ids": [
+        "audio-close-hit"
+      ],
+      "fallback_policy": "NONE",
+      "capability_requirement_ids": [
+        "req-ad-graphics"
+      ]
+    }
+  ],
+  "talent_plan": [
+    {
+      "talent_id": "talent-presenter",
+      "role": "Desk-side presenter",
+      "appearance": "Adult presenter with a friendly practical demeanor",
+      "wardrobe": "Solid teal overshirt without competing logos",
+      "performance": "Direct, concise demonstration gestures that never fake product contact",
+      "continuity_anchors": [
+        "teal overshirt",
+        "right-side desk position"
+      ]
+    }
+  ],
+  "set_plan": [
+    {
+      "set_id": "set-daylight-desk",
+      "location": "Bright desk beside a commuter bag",
+      "lighting": "Soft daylight with a controlled product key",
+      "brand_palette": [
+        "teal",
+        "white",
+        "charcoal"
+      ],
+      "product_surface": "Clean matte white desk pad",
+      "continuity_anchors": [
+        "bag remains frame left",
+        "product pad remains center"
+      ]
+    }
+  ],
+  "copy_graphics_plan": [
+    {
+      "copy_id": "copy-headline",
+      "role": "HEADLINE",
+      "text": "Blend anywhere",
+      "priority": 1,
+      "beat_id": "beat-hook",
+      "shot_id": "shot-hook",
+      "safe_area_intent": "Centered upper safe area",
+      "avoidance_intent": "Clear of face and product silhouette",
+      "entrance_intent": "Fast two-beat rise",
+      "exit_intent": "Clear before product label",
+      "keyword_emphasis": [
+        "anywhere"
+      ],
+      "brand_token_reference": "brand-heading-primary",
+      "synchronized_event_ids": [
+        "audio-dialogue-hook"
+      ],
+      "treatment_id": "treatment-hook"
+    },
+    {
+      "copy_id": "copy-subtitle",
+      "role": "DIALOGUE_SUBTITLE",
+      "text": "Meet BlendGo Mini 450ml",
+      "priority": 3,
+      "beat_id": "beat-hook",
+      "shot_id": "shot-hook",
+      "safe_area_intent": "Lower subtitle safe area",
+      "avoidance_intent": "Clear of product silhouette",
+      "entrance_intent": "Audio-aligned reveal",
+      "exit_intent": "End with spoken line",
+      "keyword_emphasis": [],
+      "brand_token_reference": "caption-default",
+      "synchronized_event_ids": [
+        "audio-dialogue-hook"
+      ],
+      "treatment_id": "treatment-caption"
+    },
+    {
+      "copy_id": "copy-product-label",
+      "role": "PRODUCT_LABEL",
+      "text": "BlendGo Mini 450ml",
+      "priority": 1,
+      "beat_id": "beat-intro",
+      "shot_id": "shot-intro",
+      "safe_area_intent": "Center beside product",
+      "avoidance_intent": "Do not cover product",
+      "entrance_intent": "Resolve after reveal",
+      "exit_intent": "Fade before demo",
+      "keyword_emphasis": [
+        "BlendGo Mini",
+        "450ml"
+      ],
+      "brand_token_reference": "brand-product-label",
+      "synchronized_event_ids": [
+        "audio-music"
+      ],
+      "treatment_id": "treatment-product-label"
+    },
+    {
+      "copy_id": "copy-benefit",
+      "role": "BENEFIT_CALLOUT",
+      "text": "Portable by design",
+      "priority": 2,
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "safe_area_intent": "Upper-left safe area",
+      "avoidance_intent": "Leave presenter hands and product clear",
+      "entrance_intent": "Cue on presenter point",
+      "exit_intent": "Clear before proof",
+      "keyword_emphasis": [
+        "Portable"
+      ],
+      "brand_token_reference": "brand-callout",
+      "synchronized_event_ids": [
+        "audio-demo-hit"
+      ],
+      "treatment_id": "treatment-benefit"
+    },
+    {
+      "copy_id": "copy-proof",
+      "role": "PROOF_LABEL",
+      "text": "450 ml capacity",
+      "priority": 2,
+      "beat_id": "beat-proof",
+      "shot_id": "shot-proof",
+      "safe_area_intent": "Lower third beside hero product",
+      "avoidance_intent": "Do not overlap product edge",
+      "entrance_intent": "Settle with hero frame",
+      "exit_intent": "Hold into transition",
+      "keyword_emphasis": [
+        "450 ml"
+      ],
+      "brand_token_reference": "brand-proof",
+      "synchronized_event_ids": [
+        "presentation-hero"
+      ],
+      "treatment_id": "treatment-proof"
+    },
+    {
+      "copy_id": "copy-cta",
+      "role": "CTA",
+      "text": "See the product details",
+      "priority": 1,
+      "beat_id": "beat-close",
+      "shot_id": "shot-close",
+      "safe_area_intent": "Centered CTA safe area",
+      "avoidance_intent": "Clear of product and brand mark",
+      "entrance_intent": "Reveal with close hit",
+      "exit_intent": "Hold to final frame",
+      "keyword_emphasis": [
+        "product details"
+      ],
+      "brand_token_reference": "brand-cta",
+      "synchronized_event_ids": [
+        "audio-close-hit"
+      ],
+      "treatment_id": "treatment-cta"
+    },
+    {
+      "copy_id": "copy-end-card",
+      "role": "BRAND_END_CARD",
+      "text": "BlendGo Mini 450ml",
+      "priority": 1,
+      "beat_id": "beat-close",
+      "shot_id": "shot-close",
+      "safe_area_intent": "Centered brand end card",
+      "avoidance_intent": "Keep product packshot fully visible",
+      "entrance_intent": "Resolve after CTA",
+      "exit_intent": "Hold through final frame",
+      "keyword_emphasis": [
+        "BlendGo"
+      ],
+      "brand_token_reference": "brand-end-card",
+      "synchronized_event_ids": [
+        "presentation-cta"
+      ],
+      "treatment_id": "treatment-end-card"
+    }
+  ],
+  "audio_plan": {
+    "events": [
+      {
+        "event_id": "audio-dialogue-hook",
+        "kind": "DIALOGUE",
+        "start_seconds": 0,
+        "end_seconds": 3,
+        "beat_ids": [
+          "beat-hook"
+        ],
+        "shot_ids": [
+          "shot-hook"
+        ],
+        "source_requirement": "Record exact presenter line",
+        "speaker_id": "talent-presenter",
+        "verbatim_line": "Meet BlendGo Mini 450ml",
+        "on_camera": true,
+        "lip_sync_required": true,
+        "energy": "Bright and immediate",
+        "ducking_required": true,
+        "synchronized_event_ids": [
+          "hook-visual",
+          "copy-headline"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-music",
+        "kind": "MUSIC",
+        "start_seconds": 0,
+        "end_seconds": 30,
+        "beat_ids": [
+          "beat-hook",
+          "beat-intro",
+          "beat-demo",
+          "beat-proof",
+          "beat-close"
+        ],
+        "shot_ids": [
+          "shot-hook",
+          "shot-intro",
+          "shot-demo",
+          "shot-proof",
+          "shot-close"
+        ],
+        "source_requirement": "License-cleared upbeat instrumental bed",
+        "speaker_id": null,
+        "verbatim_line": null,
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "Rises through demo and settles under CTA",
+        "ducking_required": true,
+        "synchronized_event_ids": [
+          "presentation-intro",
+          "presentation-demo",
+          "presentation-hero",
+          "presentation-cta"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-demo-hit",
+        "kind": "SFX",
+        "start_seconds": 8,
+        "end_seconds": 8.5,
+        "beat_ids": [
+          "beat-demo"
+        ],
+        "shot_ids": [
+          "shot-demo"
+        ],
+        "source_requirement": "Designed product demonstration accent",
+        "speaker_id": null,
+        "verbatim_line": null,
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "Short clean reveal hit",
+        "ducking_required": false,
+        "synchronized_event_ids": [
+          "presentation-demo",
+          "copy-benefit"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-close-hit",
+        "kind": "SFX",
+        "start_seconds": 23,
+        "end_seconds": 23.5,
+        "beat_ids": [
+          "beat-close"
+        ],
+        "shot_ids": [
+          "shot-close"
+        ],
+        "source_requirement": "Designed brand closure accent",
+        "speaker_id": null,
+        "verbatim_line": null,
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "Soft confident closure",
+        "ducking_required": false,
+        "synchronized_event_ids": [
+          "presentation-cta",
+          "copy-cta"
+        ],
+        "silence_rationale": null
+      }
+    ],
+    "source_audio_policies": [
+      {
+        "shot_id": "shot-hook",
+        "source_type": "GENERATED",
+        "policy": "TRIM_THEN_MIX",
+        "trim_start_seconds": 0.2,
+        "lead_in_noise_risk": true,
+        "p6_measurement_required": true,
+        "measurement_requirement": "Measure opening noise before accepting the mixed Shot."
+      },
+      {
+        "shot_id": "shot-intro",
+        "source_type": "NONE",
+        "policy": "MUTE",
+        "trim_start_seconds": null,
+        "lead_in_noise_risk": false,
+        "p6_measurement_required": false,
+        "measurement_requirement": null
+      },
+      {
+        "shot_id": "shot-demo",
+        "source_type": "GENERATED",
+        "policy": "REPLACE",
+        "trim_start_seconds": null,
+        "lead_in_noise_risk": false,
+        "p6_measurement_required": true,
+        "measurement_requirement": "Confirm native audio is absent from the final P4 mix."
+      },
+      {
+        "shot_id": "shot-proof",
+        "source_type": "NONE",
+        "policy": "MUTE",
+        "trim_start_seconds": null,
+        "lead_in_noise_risk": false,
+        "p6_measurement_required": false,
+        "measurement_requirement": null
+      },
+      {
+        "shot_id": "shot-close",
+        "source_type": "NONE",
+        "policy": "MUTE",
+        "trim_start_seconds": null,
+        "lead_in_noise_risk": false,
+        "p6_measurement_required": false,
+        "measurement_requirement": null
+      }
+    ]
+  },
+  "storyboard": [
+    {
+      "group_id": "group-hook",
+      "beat_id": "beat-hook",
+      "shot_ids": [
+        "shot-hook"
+      ],
+      "commercial_intent": "Earn attention and establish portable context."
+    },
+    {
+      "group_id": "group-intro",
+      "beat_id": "beat-intro",
+      "shot_ids": [
+        "shot-intro"
+      ],
+      "commercial_intent": "Establish exact product identity."
+    },
+    {
+      "group_id": "group-demo",
+      "beat_id": "beat-demo",
+      "shot_ids": [
+        "shot-demo"
+      ],
+      "commercial_intent": "Demonstrate the product without unsupported contact."
+    },
+    {
+      "group_id": "group-proof",
+      "beat_id": "beat-proof",
+      "shot_ids": [
+        "shot-proof"
+      ],
+      "commercial_intent": "Show verified capacity proof and hero framing."
+    },
+    {
+      "group_id": "group-close",
+      "beat_id": "beat-close",
+      "shot_ids": [
+        "shot-close"
+      ],
+      "commercial_intent": "Close with CTA and brand identity."
+    }
+  ],
+  "shot_intents": [
+    {
+      "shot_id": "shot-hook",
+      "beat_id": "beat-hook",
+      "purpose": "Open on commuter context and a product tease.",
+      "start_seconds": 0,
+      "end_seconds": 3,
+      "duration_basis": "HOOK_DENSITY",
+      "product_state": "Product silhouette begins inside the bag and resolves as a graphic reveal.",
+      "talent_action": "Presenter opens the bag without touching the composited product.",
+      "camera_intent": "Tight vertical push toward the bag opening.",
+      "presentation_ids": [
+        "presentation-intro"
+      ],
+      "copy_ids": [
+        "copy-headline",
+        "copy-subtitle"
+      ],
+      "audio_event_ids": [
+        "audio-dialogue-hook",
+        "audio-music"
+      ],
+      "visual_strategy_need": "Source plate plus explicitly graphic product reveal."
+    },
+    {
+      "shot_id": "shot-intro",
+      "beat_id": "beat-intro",
+      "purpose": "Name the product and establish its compact scale.",
+      "start_seconds": 3,
+      "end_seconds": 8,
+      "duration_basis": "PROOF_READABILITY",
+      "product_state": "Product remains centered and unobstructed.",
+      "talent_action": "Presenter gestures beside the label.",
+      "camera_intent": "Stable medium product frame.",
+      "presentation_ids": [],
+      "copy_ids": [
+        "copy-product-label"
+      ],
+      "audio_event_ids": [
+        "audio-music"
+      ],
+      "visual_strategy_need": "Registered static product asset with clear labeling."
+    },
+    {
+      "shot_id": "shot-demo",
+      "beat_id": "beat-demo",
+      "purpose": "Explain the portable use sequence.",
+      "start_seconds": 8,
+      "end_seconds": 16,
+      "duration_basis": "DEMO_COMPLEXITY",
+      "product_state": "Product is a declared graphic layer, not a hand-held object.",
+      "talent_action": "Presenter points near the graphic demonstration path.",
+      "camera_intent": "Medium desk view with room for callout.",
+      "presentation_ids": [
+        "presentation-demo"
+      ],
+      "copy_ids": [
+        "copy-benefit"
+      ],
+      "audio_event_ids": [
+        "audio-music",
+        "audio-demo-hit"
+      ],
+      "visual_strategy_need": "Advertising graphics capability requirement; no fake occlusion."
+    },
+    {
+      "shot_id": "shot-proof",
+      "beat_id": "beat-proof",
+      "purpose": "Hold a dedicated hero frame and verified capacity fact.",
+      "start_seconds": 16,
+      "end_seconds": 23,
+      "duration_basis": "PROOF_READABILITY",
+      "product_state": "Product is isolated on the approved surface.",
+      "talent_action": "No talent interaction.",
+      "camera_intent": "Controlled hero close-up.",
+      "presentation_ids": [
+        "presentation-hero"
+      ],
+      "copy_ids": [
+        "copy-proof"
+      ],
+      "audio_event_ids": [
+        "audio-music"
+      ],
+      "visual_strategy_need": "Dedicated registered product hero visual."
+    },
+    {
+      "shot_id": "shot-close",
+      "beat_id": "beat-close",
+      "purpose": "Bind CTA and brand closure to the final product frame.",
+      "start_seconds": 23,
+      "end_seconds": 30,
+      "duration_basis": "CTA_DWELL",
+      "product_state": "Product packshot remains fully visible.",
+      "talent_action": "No talent interaction.",
+      "camera_intent": "Locked end-card composition.",
+      "presentation_ids": [
+        "presentation-cta"
+      ],
+      "copy_ids": [
+        "copy-cta",
+        "copy-end-card"
+      ],
+      "audio_event_ids": [
+        "audio-music",
+        "audio-close-hit"
+      ],
+      "visual_strategy_need": "Advertising copy graphics requirement over approved product asset."
+    }
+  ],
+  "cta": {
+    "spoken_text": null,
+    "visual_text": "See the product details",
+    "destination_action": "Open the approved product detail destination",
+    "beat_id": "beat-close",
+    "shot_id": "shot-close",
+    "cta_copy_id": "copy-cta",
+    "end_card_copy_id": "copy-end-card"
+  },
+  "creative_variant_matrix": {
+    "master_strategy_id": "strategy-portable-proof",
+    "variants": [
+      {
+        "variant_id": "variant-hook-question",
+        "changed_variable": "HOOK",
+        "baseline_value": "Bag reveal with direct introduction",
+        "variant_value": "Bag reveal with a commuter problem question",
+        "held_constants": [
+          "claim_ledger",
+          "cta_destination",
+          "delivery_intent",
+          "objective",
+          "platform_constraints",
+          "product_identity",
+          "product_truth",
+          "rights",
+          "unchanged_strategy_fields"
+        ],
+        "hypothesis": "A question-led Hook may improve first-second attention without changing truth.",
+        "required_new_assets": []
+      }
+    ]
+  },
+  "runtime_handoff": {
+    "delivery_intent": "video",
+    "proposals": [
+      {
+        "proposal_id": "proposal-brief",
+        "target": "ProductionBrief",
+        "source_ids": [
+          "strategy-portable-proof"
+        ],
+        "summary": "Project the approved objective, audience, format, language, and constraints without dropping Product Truth attachments."
+      },
+      {
+        "proposal_id": "proposal-talent",
+        "target": "Character",
+        "source_ids": [
+          "talent-presenter"
+        ],
+        "summary": "Create a presenter Character proposal with wardrobe and continuity anchors."
+      },
+      {
+        "proposal_id": "proposal-set",
+        "target": "Scene",
+        "source_ids": [
+          "set-daylight-desk"
+        ],
+        "summary": "Create a desk Scene proposal with lighting and placement anchors."
+      },
+      {
+        "proposal_id": "proposal-storyboard",
+        "target": "Storyboard",
+        "source_ids": [
+          "group-hook",
+          "group-intro",
+          "group-demo",
+          "group-proof",
+          "group-close"
+        ],
+        "summary": "Project ordered ad beats as Storyboard proposals."
+      },
+      {
+        "proposal_id": "proposal-shots",
+        "target": "Shot",
+        "source_ids": [
+          "shot-hook",
+          "shot-intro",
+          "shot-demo",
+          "shot-proof",
+          "shot-close"
+        ],
+        "summary": "Project each traceable Shot intent through existing authoring owners."
+      },
+      {
+        "proposal_id": "proposal-audio",
+        "target": "AudioTrackSpec",
+        "source_ids": [
+          "audio-dialogue-hook",
+          "audio-music",
+          "audio-demo-hit",
+          "audio-close-hit"
+        ],
+        "summary": "Request canonical P4 audio authoring; exact timing remains ResolvedTimeline-owned."
+      },
+      {
+        "proposal_id": "proposal-caption",
+        "target": "CaptionTrack",
+        "source_ids": [
+          "copy-subtitle",
+          "audio-dialogue-hook"
+        ],
+        "summary": "Only the dialogue subtitle is eligible for CaptionTrack projection."
+      }
+    ],
+    "requirements": [
+      {
+        "requirement_id": "req-product-asset",
+        "capability": "product_source_asset",
+        "classification": "SUPPORTED_CURRENTLY",
+        "rationale": "The exact registered raster product asset can support static spans and explicit graphic layers."
+      },
+      {
+        "requirement_id": "req-ad-graphics",
+        "capability": "advertising_copy_graphics",
+        "classification": "REQUIRES_RUNTIME_CAPABILITY",
+        "rationale": "Commercial text roles remain distinct authoring requirements and must not be downgraded to captions."
+      },
+      {
+        "requirement_id": "req-audio",
+        "capability": "audio_authoring",
+        "classification": "SUPPORTED_CURRENTLY",
+        "rationale": "P4 can author canonical audio tracks after explicit Runtime materialization."
+      },
+      {
+        "requirement_id": "req-caption",
+        "capability": "dialogue_caption_binding",
+        "classification": "SUPPORTED_CURRENTLY",
+        "rationale": "The exact spoken line may request an audio-aligned CaptionTrack."
+      }
+    ],
+    "classified_gaps": [
+      {
+        "gap_id": "gap-product-asset",
+        "classification": "SUPPORTED_CURRENTLY",
+        "requirement_ids": [
+          "req-product-asset"
+        ],
+        "blocker_code": null,
+        "rationale": "Static registered product imagery is supported."
+      },
+      {
+        "gap_id": "gap-ad-graphics",
+        "classification": "REQUIRES_RUNTIME_CAPABILITY",
+        "requirement_ids": [
+          "req-ad-graphics"
+        ],
+        "blocker_code": null,
+        "rationale": "The workflow records the missing advertising graphics expression surface without claiming execution."
+      },
+      {
+        "gap_id": "gap-audio",
+        "classification": "SUPPORTED_CURRENTLY",
+        "requirement_ids": [
+          "req-audio",
+          "req-caption"
+        ],
+        "blocker_code": null,
+        "rationale": "Authoring requests can target P4 owners; actual mix and captions remain Runtime work."
+      }
+    ]
+  },
+  "ad_qc_report": {
+    "ready": true,
+    "findings": [
+      {
+        "code": "truth-lineage-pass",
+        "status": "PASS",
+        "related_ids": [
+          "claim-portable",
+          "claim-capacity"
+        ],
+        "message": "Every used claim binds exact Product Truth facts and sources."
+      },
+      {
+        "code": "product-presentation-pass",
+        "status": "PASS",
+        "related_ids": [
+          "presentation-intro",
+          "presentation-demo",
+          "presentation-hero",
+          "presentation-cta"
+        ],
+        "message": "Every product appearance has a typed role, mode, source identity, and cue binding."
+      },
+      {
+        "code": "copy-audio-closure-pass",
+        "status": "PASS",
+        "related_ids": [
+          "copy-cta",
+          "copy-end-card",
+          "audio-music"
+        ],
+        "message": "Commercial copy roles, full audio intent, CTA, and brand closure are present."
+      },
+      {
+        "code": "runtime-gap-classified",
+        "status": "PASS",
+        "related_ids": [
+          "gap-ad-graphics"
+        ],
+        "message": "Missing advertising graphics execution is classified without a Runtime claim."
+      }
+    ]
+  },
+  "unresolved_items": []
+}

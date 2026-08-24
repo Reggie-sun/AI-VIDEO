@@ -1,0 +1,2101 @@
+{
+  "$defs": {
+    "AdBeat": {
+      "additionalProperties": false,
+      "properties": {
+        "audio_event_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Audio Event Ids",
+          "type": "array"
+        },
+        "beat_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "copy_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Copy Ids",
+          "type": "array"
+        },
+        "duration_basis": {
+          "enum": [
+            "HOOK_DENSITY",
+            "DEMO_COMPLEXITY",
+            "PROOF_READABILITY",
+            "CTA_DWELL",
+            "INTENTIONAL_EQUAL_RHYTHM"
+          ],
+          "title": "Duration Basis",
+          "type": "string"
+        },
+        "duration_seconds": {
+          "exclusiveMinimum": 0.0,
+          "title": "Duration Seconds",
+          "type": "number"
+        },
+        "end_seconds": {
+          "exclusiveMinimum": 0.0,
+          "title": "End Seconds",
+          "type": "number"
+        },
+        "message": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "pacing_rationale": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Pacing Rationale",
+          "type": "string"
+        },
+        "presentation_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Presentation Ids",
+          "type": "array"
+        },
+        "role": {
+          "enum": [
+            "HOOK",
+            "PROBLEM",
+            "PRODUCT_INTRO",
+            "DEMONSTRATION",
+            "BENEFIT_PROOF",
+            "HERO",
+            "CTA_CLOSE"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "shot_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Shot Ids",
+          "type": "array"
+        },
+        "start_seconds": {
+          "minimum": 0.0,
+          "title": "Start Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "beat_id",
+        "role",
+        "start_seconds",
+        "end_seconds",
+        "duration_seconds",
+        "duration_basis",
+        "pacing_rationale",
+        "message",
+        "shot_ids",
+        "presentation_ids",
+        "copy_ids",
+        "audio_event_ids"
+      ],
+      "title": "AdBeat",
+      "type": "object"
+    },
+    "AdQCFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "related_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Related Ids",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "BLOCKER"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "status",
+        "related_ids",
+        "message"
+      ],
+      "title": "AdQCFinding",
+      "type": "object"
+    },
+    "AdQCReport": {
+      "additionalProperties": false,
+      "properties": {
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/AdQCFinding"
+          },
+          "minItems": 1,
+          "title": "Findings",
+          "type": "array"
+        },
+        "ready": {
+          "title": "Ready",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ready",
+        "findings"
+      ],
+      "title": "AdQCReport",
+      "type": "object"
+    },
+    "AdStrategy": {
+      "additionalProperties": false,
+      "properties": {
+        "angle": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Angle",
+          "type": "string"
+        },
+        "audience": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Audience",
+          "type": "string"
+        },
+        "objection_handling": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Objection Handling",
+          "type": "string"
+        },
+        "objective": {
+          "enum": [
+            "AWARENESS",
+            "CONSIDERATION",
+            "CONVERSION"
+          ],
+          "title": "Objective",
+          "type": "string"
+        },
+        "pain_point": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Pain Point",
+          "type": "string"
+        },
+        "promise": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Promise",
+          "type": "string"
+        },
+        "proof_boundary": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Proof Boundary",
+          "type": "string"
+        },
+        "strategy_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Strategy Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "strategy_id",
+        "audience",
+        "pain_point",
+        "angle",
+        "promise",
+        "proof_boundary",
+        "objection_handling",
+        "objective"
+      ],
+      "title": "AdStrategy",
+      "type": "object"
+    },
+    "AllowedClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "claim_type": {
+          "$ref": "#/$defs/ClaimType"
+        },
+        "fact_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Fact Ids",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "text",
+        "claim_type",
+        "fact_ids",
+        "source_ids"
+      ],
+      "title": "AllowedClaim",
+      "type": "object"
+    },
+    "AudioEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "beat_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Beat Ids",
+          "type": "array"
+        },
+        "ducking_required": {
+          "title": "Ducking Required",
+          "type": "boolean"
+        },
+        "end_seconds": {
+          "exclusiveMinimum": 0.0,
+          "title": "End Seconds",
+          "type": "number"
+        },
+        "energy": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Energy",
+          "type": "string"
+        },
+        "event_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "DIALOGUE",
+            "VOICE_OVER",
+            "MUSIC",
+            "SFX",
+            "INTENTIONAL_SILENCE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "lip_sync_required": {
+          "title": "Lip Sync Required",
+          "type": "boolean"
+        },
+        "on_camera": {
+          "title": "On Camera",
+          "type": "boolean"
+        },
+        "shot_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Shot Ids",
+          "type": "array"
+        },
+        "silence_rationale": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Silence Rationale"
+        },
+        "source_requirement": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Source Requirement",
+          "type": "string"
+        },
+        "speaker_id": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Speaker Id"
+        },
+        "start_seconds": {
+          "minimum": 0.0,
+          "title": "Start Seconds",
+          "type": "number"
+        },
+        "synchronized_event_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Synchronized Event Ids",
+          "type": "array"
+        },
+        "verbatim_line": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verbatim Line"
+        }
+      },
+      "required": [
+        "event_id",
+        "kind",
+        "start_seconds",
+        "end_seconds",
+        "beat_ids",
+        "shot_ids",
+        "source_requirement",
+        "speaker_id",
+        "verbatim_line",
+        "on_camera",
+        "lip_sync_required",
+        "energy",
+        "ducking_required",
+        "synchronized_event_ids",
+        "silence_rationale"
+      ],
+      "title": "AudioEvent",
+      "type": "object"
+    },
+    "AudioPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "events": {
+          "items": {
+            "$ref": "#/$defs/AudioEvent"
+          },
+          "minItems": 1,
+          "title": "Events",
+          "type": "array"
+        },
+        "source_audio_policies": {
+          "items": {
+            "$ref": "#/$defs/SourceAudioPolicy"
+          },
+          "minItems": 1,
+          "title": "Source Audio Policies",
+          "type": "array"
+        }
+      },
+      "required": [
+        "events",
+        "source_audio_policies"
+      ],
+      "title": "AudioPlan",
+      "type": "object"
+    },
+    "CTAPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "beat_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "cta_copy_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Cta Copy Id",
+          "type": "string"
+        },
+        "destination_action": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Destination Action",
+          "type": "string"
+        },
+        "end_card_copy_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "End Card Copy Id",
+          "type": "string"
+        },
+        "shot_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "spoken_text": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Spoken Text"
+        },
+        "visual_text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Visual Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "spoken_text",
+        "visual_text",
+        "destination_action",
+        "beat_id",
+        "shot_id",
+        "cta_copy_id",
+        "end_card_copy_id"
+      ],
+      "title": "CTAPlan",
+      "type": "object"
+    },
+    "ClaimLedgerEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "fact_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Fact Ids",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "spoken_form": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Spoken Form"
+        },
+        "status": {
+          "enum": [
+            "USED",
+            "NOT_USED",
+            "PROHIBITED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "used_at": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Used At",
+          "type": "array"
+        },
+        "visual_form": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Visual Form"
+        }
+      },
+      "required": [
+        "claim_id",
+        "status",
+        "fact_ids",
+        "source_ids",
+        "used_at",
+        "spoken_form",
+        "visual_form"
+      ],
+      "title": "ClaimLedgerEntry",
+      "type": "object"
+    },
+    "ClaimType": {
+      "enum": [
+        "FACT",
+        "BENEFIT",
+        "COMPARISON",
+        "MEDICAL_OR_THERAPEUTIC"
+      ],
+      "title": "ClaimType",
+      "type": "string"
+    },
+    "ClassifiedGap": {
+      "additionalProperties": false,
+      "properties": {
+        "blocker_code": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Blocker Code"
+        },
+        "classification": {
+          "enum": [
+            "SUPPORTED_CURRENTLY",
+            "REQUIRES_SOURCE_GENERATION_STRATEGY",
+            "REQUIRES_RUNTIME_CAPABILITY",
+            "REQUIRES_HUMAN_DECISION",
+            "BLOCKED_BY_TRUTH_OR_RIGHTS"
+          ],
+          "title": "Classification",
+          "type": "string"
+        },
+        "gap_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "rationale": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "requirement_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Requirement Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "gap_id",
+        "classification",
+        "requirement_ids",
+        "blocker_code",
+        "rationale"
+      ],
+      "title": "ClassifiedGap",
+      "type": "object"
+    },
+    "CopyGraphic": {
+      "additionalProperties": false,
+      "properties": {
+        "avoidance_intent": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Avoidance Intent",
+          "type": "string"
+        },
+        "beat_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "brand_token_reference": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Brand Token Reference",
+          "type": "string"
+        },
+        "copy_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Copy Id",
+          "type": "string"
+        },
+        "entrance_intent": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Entrance Intent",
+          "type": "string"
+        },
+        "exit_intent": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Exit Intent",
+          "type": "string"
+        },
+        "keyword_emphasis": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Keyword Emphasis",
+          "type": "array"
+        },
+        "priority": {
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "role": {
+          "enum": [
+            "DIALOGUE_SUBTITLE",
+            "HEADLINE",
+            "BENEFIT_CALLOUT",
+            "PRODUCT_LABEL",
+            "PROOF_LABEL",
+            "CTA",
+            "BRAND_END_CARD"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "safe_area_intent": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Safe Area Intent",
+          "type": "string"
+        },
+        "shot_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "synchronized_event_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Synchronized Event Ids",
+          "type": "array"
+        },
+        "text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "treatment_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Treatment Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "copy_id",
+        "role",
+        "text",
+        "priority",
+        "beat_id",
+        "shot_id",
+        "safe_area_intent",
+        "avoidance_intent",
+        "entrance_intent",
+        "exit_intent",
+        "keyword_emphasis",
+        "brand_token_reference",
+        "synchronized_event_ids",
+        "treatment_id"
+      ],
+      "title": "CopyGraphic",
+      "type": "object"
+    },
+    "CreativeVariant": {
+      "additionalProperties": false,
+      "properties": {
+        "baseline_value": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Baseline Value",
+          "type": "string"
+        },
+        "changed_variable": {
+          "enum": [
+            "HOOK",
+            "OPENING_VISUAL",
+            "ADVERTISING_ANGLE",
+            "PROOF_ORDER",
+            "CTA",
+            "PRESENTER_PROFILE",
+            "PACING",
+            "DURATION_CUT"
+          ],
+          "title": "Changed Variable",
+          "type": "string"
+        },
+        "held_constants": {
+          "items": {
+            "enum": [
+              "claim_ledger",
+              "cta_destination",
+              "delivery_intent",
+              "objective",
+              "platform_constraints",
+              "product_identity",
+              "product_truth",
+              "rights",
+              "unchanged_strategy_fields"
+            ],
+            "type": "string"
+          },
+          "maxItems": 9,
+          "minItems": 9,
+          "title": "Held Constants",
+          "type": "array"
+        },
+        "hypothesis": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Hypothesis",
+          "type": "string"
+        },
+        "required_new_assets": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Required New Assets",
+          "type": "array"
+        },
+        "variant_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Variant Id",
+          "type": "string"
+        },
+        "variant_value": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Variant Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "variant_id",
+        "changed_variable",
+        "baseline_value",
+        "variant_value",
+        "held_constants",
+        "hypothesis",
+        "required_new_assets"
+      ],
+      "title": "CreativeVariant",
+      "type": "object"
+    },
+    "CreativeVariantMatrix": {
+      "additionalProperties": false,
+      "properties": {
+        "master_strategy_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Master Strategy Id",
+          "type": "string"
+        },
+        "variants": {
+          "items": {
+            "$ref": "#/$defs/CreativeVariant"
+          },
+          "minItems": 1,
+          "title": "Variants",
+          "type": "array"
+        }
+      },
+      "required": [
+        "master_strategy_id",
+        "variants"
+      ],
+      "title": "CreativeVariantMatrix",
+      "type": "object"
+    },
+    "HookComponent": {
+      "additionalProperties": false,
+      "properties": {
+        "bound_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Bound Ids",
+          "type": "array"
+        },
+        "claim_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Claim Ids",
+          "type": "array"
+        },
+        "component_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Component Id",
+          "type": "string"
+        },
+        "content": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Content",
+          "type": "string"
+        },
+        "cue_seconds": {
+          "minimum": 0.0,
+          "title": "Cue Seconds",
+          "type": "number"
+        },
+        "kind": {
+          "enum": [
+            "VISUAL",
+            "DIALOGUE_OR_VO",
+            "COPY",
+            "AUDIO"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "component_id",
+        "kind",
+        "cue_seconds",
+        "content",
+        "claim_ids",
+        "bound_ids"
+      ],
+      "title": "HookComponent",
+      "type": "object"
+    },
+    "HookContract": {
+      "additionalProperties": false,
+      "properties": {
+        "components": {
+          "items": {
+            "$ref": "#/$defs/HookComponent"
+          },
+          "minItems": 1,
+          "title": "Components",
+          "type": "array"
+        },
+        "first_payoff_deadline_seconds": {
+          "exclusiveMinimum": 0.0,
+          "title": "First Payoff Deadline Seconds",
+          "type": "number"
+        },
+        "platform_constraints": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Platform Constraints",
+          "type": "array"
+        },
+        "product_presence": {
+          "enum": [
+            "NONE",
+            "TEASE",
+            "EXPLICIT"
+          ],
+          "title": "Product Presence",
+          "type": "string"
+        },
+        "promise_boundary": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Promise Boundary",
+          "type": "string"
+        },
+        "promise_claim_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Promise Claim Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "components",
+        "product_presence",
+        "promise_claim_ids",
+        "promise_boundary",
+        "first_payoff_deadline_seconds",
+        "platform_constraints"
+      ],
+      "title": "HookContract",
+      "type": "object"
+    },
+    "ProductFact": {
+      "additionalProperties": false,
+      "properties": {
+        "fact_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "statement": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fact_id",
+        "statement",
+        "source_ids"
+      ],
+      "title": "ProductFact",
+      "type": "object"
+    },
+    "ProductPresentation": {
+      "additionalProperties": false,
+      "properties": {
+        "audio_cue_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Audio Cue Ids",
+          "type": "array"
+        },
+        "beat_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "capability_requirement_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Capability Requirement Ids",
+          "type": "array"
+        },
+        "copy_cue_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Copy Cue Ids",
+          "type": "array"
+        },
+        "duration_seconds": {
+          "exclusiveMinimum": 0.0,
+          "title": "Duration Seconds",
+          "type": "number"
+        },
+        "fallback_policy": {
+          "enum": [
+            "NONE",
+            "REQUIRE_REAPPROVAL_GRAPHIC",
+            "REQUIRE_REAPPROVAL_HERO"
+          ],
+          "title": "Fallback Policy",
+          "type": "string"
+        },
+        "lighting_shadow_required": {
+          "title": "Lighting Shadow Required",
+          "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "IN_SCENE_GENERATED",
+            "GRAPHIC_REVEAL",
+            "DEDICATED_HERO_SHOT",
+            "PHYSICAL_INTERACTION_REQUIRED"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "occlusion_required": {
+          "title": "Occlusion Required",
+          "type": "boolean"
+        },
+        "presentation_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Presentation Id",
+          "type": "string"
+        },
+        "product_source_asset_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Product Source Asset Id",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "INTRO",
+            "DEMONSTRATION",
+            "BENEFIT_PROOF",
+            "HERO_SHOT",
+            "CTA_SUPPORT"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "shot_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "start_seconds": {
+          "minimum": 0.0,
+          "title": "Start Seconds",
+          "type": "number"
+        },
+        "talent_interaction": {
+          "enum": [
+            "NONE",
+            "POINTS_NEAR",
+            "PHYSICAL_CONTACT"
+          ],
+          "title": "Talent Interaction",
+          "type": "string"
+        }
+      },
+      "required": [
+        "presentation_id",
+        "role",
+        "mode",
+        "beat_id",
+        "shot_id",
+        "start_seconds",
+        "duration_seconds",
+        "product_source_asset_id",
+        "talent_interaction",
+        "occlusion_required",
+        "lighting_shadow_required",
+        "copy_cue_ids",
+        "audio_cue_ids",
+        "fallback_policy",
+        "capability_requirement_ids"
+      ],
+      "title": "ProductPresentation",
+      "type": "object"
+    },
+    "ProductSourceAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "reference": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Reference",
+          "type": "string"
+        },
+        "rights_status": {
+          "$ref": "#/$defs/RightsStatus"
+        },
+        "source_kind": {
+          "enum": [
+            "IMAGE",
+            "VIDEO",
+            "BRAND_GUIDE",
+            "PAGE_SNAPSHOT"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id",
+        "source_kind",
+        "reference",
+        "rights_status"
+      ],
+      "title": "ProductSourceAsset",
+      "type": "object"
+    },
+    "ProductTruthSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_claims": {
+          "items": {
+            "$ref": "#/$defs/AllowedClaim"
+          },
+          "minItems": 1,
+          "title": "Allowed Claims",
+          "type": "array"
+        },
+        "facts": {
+          "items": {
+            "$ref": "#/$defs/ProductFact"
+          },
+          "minItems": 1,
+          "title": "Facts",
+          "type": "array"
+        },
+        "product_name": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Product Name",
+          "type": "string"
+        },
+        "prohibited_claims": {
+          "items": {
+            "$ref": "#/$defs/ProhibitedClaim"
+          },
+          "minItems": 1,
+          "title": "Prohibited Claims",
+          "type": "array"
+        },
+        "required_disclaimers": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Required Disclaimers",
+          "type": "array"
+        },
+        "sku_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Sku Id",
+          "type": "string"
+        },
+        "source_assets": {
+          "items": {
+            "$ref": "#/$defs/ProductSourceAsset"
+          },
+          "minItems": 1,
+          "title": "Source Assets",
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/TruthSource"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "sku_id",
+        "product_name",
+        "source_assets",
+        "sources",
+        "facts",
+        "allowed_claims",
+        "prohibited_claims",
+        "required_disclaimers"
+      ],
+      "title": "ProductTruthSnapshot",
+      "type": "object"
+    },
+    "ProhibitedClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "claim_type": {
+          "$ref": "#/$defs/ClaimType"
+        },
+        "reason": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "text",
+        "claim_type",
+        "reason"
+      ],
+      "title": "ProhibitedClaim",
+      "type": "object"
+    },
+    "RightsStatus": {
+      "enum": [
+        "CONFIRMED",
+        "RESTRICTED",
+        "UNKNOWN"
+      ],
+      "title": "RightsStatus",
+      "type": "string"
+    },
+    "RuntimeHandoff": {
+      "additionalProperties": false,
+      "properties": {
+        "classified_gaps": {
+          "items": {
+            "$ref": "#/$defs/ClassifiedGap"
+          },
+          "minItems": 1,
+          "title": "Classified Gaps",
+          "type": "array"
+        },
+        "delivery_intent": {
+          "const": "video",
+          "title": "Delivery Intent",
+          "type": "string"
+        },
+        "proposals": {
+          "items": {
+            "$ref": "#/$defs/RuntimeProposal"
+          },
+          "minItems": 1,
+          "title": "Proposals",
+          "type": "array"
+        },
+        "requirements": {
+          "items": {
+            "$ref": "#/$defs/RuntimeRequirement"
+          },
+          "minItems": 1,
+          "title": "Requirements",
+          "type": "array"
+        }
+      },
+      "required": [
+        "delivery_intent",
+        "proposals",
+        "requirements",
+        "classified_gaps"
+      ],
+      "title": "RuntimeHandoff",
+      "type": "object"
+    },
+    "RuntimeProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "proposal_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Proposal Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "summary": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "target": {
+          "enum": [
+            "ProductionBrief",
+            "Character",
+            "Scene",
+            "Storyboard",
+            "Shot",
+            "AudioTrackSpec",
+            "CaptionTrack"
+          ],
+          "title": "Target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "proposal_id",
+        "target",
+        "source_ids",
+        "summary"
+      ],
+      "title": "RuntimeProposal",
+      "type": "object"
+    },
+    "RuntimeRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "capability": {
+          "enum": [
+            "product_source_asset",
+            "product_source_generation",
+            "physical_product_interaction",
+            "advertising_copy_graphics",
+            "audio_authoring",
+            "dialogue_caption_binding"
+          ],
+          "title": "Capability",
+          "type": "string"
+        },
+        "classification": {
+          "enum": [
+            "SUPPORTED_CURRENTLY",
+            "REQUIRES_SOURCE_GENERATION_STRATEGY",
+            "REQUIRES_RUNTIME_CAPABILITY",
+            "REQUIRES_HUMAN_DECISION",
+            "BLOCKED_BY_TRUTH_OR_RIGHTS"
+          ],
+          "title": "Classification",
+          "type": "string"
+        },
+        "rationale": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "requirement_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Requirement Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "capability",
+        "classification",
+        "rationale"
+      ],
+      "title": "RuntimeRequirement",
+      "type": "object"
+    },
+    "SetPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "brand_palette": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Brand Palette",
+          "type": "array"
+        },
+        "continuity_anchors": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Continuity Anchors",
+          "type": "array"
+        },
+        "lighting": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Lighting",
+          "type": "string"
+        },
+        "location": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Location",
+          "type": "string"
+        },
+        "product_surface": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Product Surface",
+          "type": "string"
+        },
+        "set_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Set Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "set_id",
+        "location",
+        "lighting",
+        "brand_palette",
+        "product_surface",
+        "continuity_anchors"
+      ],
+      "title": "SetPlan",
+      "type": "object"
+    },
+    "ShotIntent": {
+      "additionalProperties": false,
+      "properties": {
+        "audio_event_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Audio Event Ids",
+          "type": "array"
+        },
+        "beat_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "camera_intent": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Camera Intent",
+          "type": "string"
+        },
+        "copy_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Copy Ids",
+          "type": "array"
+        },
+        "duration_basis": {
+          "enum": [
+            "HOOK_DENSITY",
+            "DEMO_COMPLEXITY",
+            "PROOF_READABILITY",
+            "CTA_DWELL",
+            "INTENTIONAL_EQUAL_RHYTHM"
+          ],
+          "title": "Duration Basis",
+          "type": "string"
+        },
+        "end_seconds": {
+          "exclusiveMinimum": 0.0,
+          "title": "End Seconds",
+          "type": "number"
+        },
+        "presentation_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "title": "Presentation Ids",
+          "type": "array"
+        },
+        "product_state": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Product State",
+          "type": "string"
+        },
+        "purpose": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Purpose",
+          "type": "string"
+        },
+        "shot_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "start_seconds": {
+          "minimum": 0.0,
+          "title": "Start Seconds",
+          "type": "number"
+        },
+        "talent_action": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Talent Action",
+          "type": "string"
+        },
+        "visual_strategy_need": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Visual Strategy Need",
+          "type": "string"
+        }
+      },
+      "required": [
+        "shot_id",
+        "beat_id",
+        "purpose",
+        "start_seconds",
+        "end_seconds",
+        "duration_basis",
+        "product_state",
+        "talent_action",
+        "camera_intent",
+        "presentation_ids",
+        "copy_ids",
+        "audio_event_ids",
+        "visual_strategy_need"
+      ],
+      "title": "ShotIntent",
+      "type": "object"
+    },
+    "SourceAudioPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "lead_in_noise_risk": {
+          "title": "Lead In Noise Risk",
+          "type": "boolean"
+        },
+        "measurement_requirement": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Measurement Requirement"
+        },
+        "p6_measurement_required": {
+          "title": "P6 Measurement Required",
+          "type": "boolean"
+        },
+        "policy": {
+          "enum": [
+            "KEEP",
+            "MUTE",
+            "REPLACE",
+            "TRIM_THEN_MIX"
+          ],
+          "title": "Policy",
+          "type": "string"
+        },
+        "shot_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "source_type": {
+          "enum": [
+            "NATIVE",
+            "GENERATED",
+            "NONE"
+          ],
+          "title": "Source Type",
+          "type": "string"
+        },
+        "trim_start_seconds": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Trim Start Seconds"
+        }
+      },
+      "required": [
+        "shot_id",
+        "source_type",
+        "policy",
+        "trim_start_seconds",
+        "lead_in_noise_risk",
+        "p6_measurement_required",
+        "measurement_requirement"
+      ],
+      "title": "SourceAudioPolicy",
+      "type": "object"
+    },
+    "StoryboardGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "beat_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "commercial_intent": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Commercial Intent",
+          "type": "string"
+        },
+        "group_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Group Id",
+          "type": "string"
+        },
+        "shot_ids": {
+          "items": {
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Shot Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "group_id",
+        "beat_id",
+        "shot_ids",
+        "commercial_intent"
+      ],
+      "title": "StoryboardGroup",
+      "type": "object"
+    },
+    "TalentPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "appearance": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Appearance",
+          "type": "string"
+        },
+        "continuity_anchors": {
+          "items": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Continuity Anchors",
+          "type": "array"
+        },
+        "performance": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Performance",
+          "type": "string"
+        },
+        "role": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "talent_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Talent Id",
+          "type": "string"
+        },
+        "wardrobe": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Wardrobe",
+          "type": "string"
+        }
+      },
+      "required": [
+        "talent_id",
+        "role",
+        "appearance",
+        "wardrobe",
+        "performance",
+        "continuity_anchors"
+      ],
+      "title": "TalentPlan",
+      "type": "object"
+    },
+    "TruthSource": {
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Reference",
+          "type": "string"
+        },
+        "rights_status": {
+          "$ref": "#/$defs/RightsStatus"
+        },
+        "source_id": {
+          "maxLength": 120,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_kind": {
+          "enum": [
+            "PRODUCT_ASSET",
+            "PRODUCT_PAGE",
+            "BRAND_DOCUMENT",
+            "USER_ATTESTATION"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_kind",
+        "reference",
+        "rights_status"
+      ],
+      "title": "TruthSource",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "ad_beats": {
+      "items": {
+        "$ref": "#/$defs/AdBeat"
+      },
+      "minItems": 1,
+      "title": "Ad Beats",
+      "type": "array"
+    },
+    "ad_qc_report": {
+      "$ref": "#/$defs/AdQCReport"
+    },
+    "ad_strategy": {
+      "$ref": "#/$defs/AdStrategy"
+    },
+    "aspect_ratio": {
+      "const": "9:16",
+      "title": "Aspect Ratio",
+      "type": "string"
+    },
+    "audio_plan": {
+      "$ref": "#/$defs/AudioPlan"
+    },
+    "claim_ledger": {
+      "items": {
+        "$ref": "#/$defs/ClaimLedgerEntry"
+      },
+      "minItems": 1,
+      "title": "Claim Ledger",
+      "type": "array"
+    },
+    "copy_graphics_plan": {
+      "items": {
+        "$ref": "#/$defs/CopyGraphic"
+      },
+      "minItems": 1,
+      "title": "Copy Graphics Plan",
+      "type": "array"
+    },
+    "creative_variant_matrix": {
+      "$ref": "#/$defs/CreativeVariantMatrix"
+    },
+    "cta": {
+      "$ref": "#/$defs/CTAPlan"
+    },
+    "duration_seconds": {
+      "maximum": 60.0,
+      "minimum": 6.0,
+      "title": "Duration Seconds",
+      "type": "number"
+    },
+    "hook_contract": {
+      "$ref": "#/$defs/HookContract"
+    },
+    "package_id": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Package Id",
+      "type": "string"
+    },
+    "product_presentation": {
+      "items": {
+        "$ref": "#/$defs/ProductPresentation"
+      },
+      "minItems": 1,
+      "title": "Product Presentation",
+      "type": "array"
+    },
+    "product_truth": {
+      "$ref": "#/$defs/ProductTruthSnapshot"
+    },
+    "runtime_handoff": {
+      "$ref": "#/$defs/RuntimeHandoff"
+    },
+    "schema_version": {
+      "const": "ecommerce-ad-workflow/package/1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "set_plan": {
+      "items": {
+        "$ref": "#/$defs/SetPlan"
+      },
+      "minItems": 1,
+      "title": "Set Plan",
+      "type": "array"
+    },
+    "shot_intents": {
+      "items": {
+        "$ref": "#/$defs/ShotIntent"
+      },
+      "minItems": 1,
+      "title": "Shot Intents",
+      "type": "array"
+    },
+    "source_input_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Input Hash",
+      "type": "string"
+    },
+    "storyboard": {
+      "items": {
+        "$ref": "#/$defs/StoryboardGroup"
+      },
+      "minItems": 1,
+      "title": "Storyboard",
+      "type": "array"
+    },
+    "talent_plan": {
+      "items": {
+        "$ref": "#/$defs/TalentPlan"
+      },
+      "minItems": 1,
+      "title": "Talent Plan",
+      "type": "array"
+    },
+    "unresolved_items": {
+      "items": {
+        "maxLength": 1000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Unresolved Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "package_id",
+    "source_input_hash",
+    "duration_seconds",
+    "aspect_ratio",
+    "product_truth",
+    "claim_ledger",
+    "ad_strategy",
+    "hook_contract",
+    "ad_beats",
+    "product_presentation",
+    "talent_plan",
+    "set_plan",
+    "copy_graphics_plan",
+    "audio_plan",
+    "storyboard",
+    "shot_intents",
+    "cta",
+    "creative_variant_matrix",
+    "runtime_handoff",
+    "ad_qc_report",
+    "unresolved_items"
+  ],
+  "title": "EcommerceAdProductionPackage",
+  "type": "object"
+}

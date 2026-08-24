@@ -143,6 +143,14 @@ Creative skill selection、Agent-side image generation preference、mandatory pr
 
 这些规则在命中对应 creative task 时是 mandatory，但 playbook 只承接低频执行细节；AI-VIDEO、其 canonical artifacts、Manifest、Registry、Dependency Graph、ResolvedTimeline、HyperFrames、Provider lifecycle、review/repair 与 delivery truth 的 ownership 仍由本文件和 `docs/agent-primary-contract-matrix.md` 定义。
 
+### `ecommerce-ad-workflow`
+
+SHOULD use for ecommerce、SKU、product advertising、direct-response product video 或 commercial product brief authoring。它独占 Development-side Product Truth、claim ledger、Hook、ad beats、product presentation、advertising copy/audio intent、CTA、creative variants 与 capability-aware handoff contract；AI comic、episode、serial 与 cliffhanger request 不得路由到该 Skill。
+
+该 Skill 只产出 offline authoring package 与 existing Runtime proposals/requirements/gaps。它不得安装或调用 external ad system，不得读取 credential、选择 Provider、生成媒体、写 Project/Registry/Manifest、重算 `ResolvedTimeline`、选择 renderer 或给出 P6/Final Acceptance；advertising graphics 与 physical interaction 缺口必须保持显式 capability classification。
+
+Ecommerce / SKU / product advertising authoring 优先路由到 `ecommerce-ad-workflow`；具体 Shot continuity、Provider prompt adaptation 或 deterministic motion treatment 仍按 control-plane playbook 的既有 owner 顺序作为 advisory input，Production execution ownership 保持不变。
+
 ## Module Boundaries
 
 稳定 module owner、禁止旁路与 focused-test routing 见 `.agent/context/control-plane-playbook.md` 第 2 节；surface owner 与 invariant 以 `docs/agent-primary-contract-matrix.md` 为准。
