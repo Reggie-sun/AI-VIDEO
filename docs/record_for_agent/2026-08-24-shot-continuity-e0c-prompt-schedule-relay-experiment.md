@@ -178,3 +178,65 @@ AI-VIDEO Production code、Manifest / Registry、qualification、Provider contra
 ### Updated Next One Thing
 
 在下一次明确授权的 long-video execution 前，先让 ComfyUI 加载包含 `5ad62dc` 的 plugin build；首次发生 targeted cancel 时核对 response 中的 `partial_video_path`、`partial_compose_report`、Manifest revision 与 exact frame/sample totals，并对该新 partial 做人工听感检查。不得为验证本 routing fix 重跑 E0-C seed `320001`、补交 segments 6/7 或把历史 v2 rescue artifact 当作自动 route evidence。
+
+## Follow-up Engineering Closure: Durable Supervision And Explicit Recovery
+
+E0-C 的 `SIGTERM` 来源仍然未知；本次 closure 不把未知 termination 重新分类为已定位 root cause。它关闭的是两个可复用的 infrastructure hazards：Agent command lifecycle 持有 ComfyUI 长进程，以及 stale / unreadable `background_job.json` 可以在 read 或直接 requeue 时隐式改变 recovery truth。
+
+AI-VIDEO local commit：
+
+```text
+f9b580d fix: supervise local ComfyUI lifecycle
+```
+
+该 commit 新增 `scripts/comfyui_supervisor.py` 并替换 `h3-video` skill 中的手工 `nohup` launcher：
+
+- 每次 explicit `start` 创建不可复用的 `ai-video-comfyui-<32-lowercase-hex>.service` user-systemd transient unit，固定 `127.0.0.1`、`Restart=no` 与 journal output。
+- User runtime advisory mutex 覆盖完整 preflight、`systemd-run`、health 与 final ownership confirmation；它只提供互斥，不保存 owner pointer 或第二套 job state。
+- unit discovery 只接受 exact lowercase-hex namespace；多个 owner、已有 owner 或端口占用均 fail closed，`stop` 不使用 broad pattern。
+- HTTP `/system_stats` 成功后仍必须确认同一 `InvocationID`、active state、positive `MainPID`，并从 `/proc/net/tcp` 与该 PID 的 fd table 证明 exact loopback listener ownership。
+- post-creation failure 只清理本次 unique unit；若 `systemctl stop` 失败，则报告 cleanup unconfirmed 与 bounded detail，不把未知结果冒充 unit 已消失。
+- `status` 与 `logs` 是只读 control；没有 auto-start、auto-restart、workflow submit、generation retry 或 stale-job recovery。
+
+MiniMax H3 T8 plugin local commit：
+
+```text
+28cb160 fix: require explicit long-video recovery
+```
+
+该 commit 将 restart recovery 改为 explicit、fail-closed state transition：
+
+- GET status 对 stale active 或 unreadable auxiliary state 只返回 ephemeral `detached` view 与 `recovery_persisted=false`，保持 `background_job.json` byte-exact。
+- POST `recover` 在读取、quarantine 与写入期间持有 chain 的 OS advisory lease；另一 ComfyUI process 持有 lease 时，readable 与 unreadable 两种状态都拒绝 recovery 且不改 bytes。
+- Recover 只持久化 `detached` classification；不 queue、release、compose、增加 retry 或改变 accepted Manifest truth。
+- readable stale-active 与 unreadable state 都不能通过直接 requeue / `attach_prompt()` 绕过 Recover。Recover 成功后，用户才可 queue workflow once 重新附着 incomplete accepted Manifest，或对 complete Manifest 运行 Compose Accepted。
+- 前端增加显式 Recover control，route 使用 `asyncio.to_thread()`，不会在 recover path 隐式调用 composer。
+
+### Verification And Evidence
+
+Plugin focused suite：
+
+```text
+PYTHONPATH=/home/reggie/ComfyUI python -m pytest -p no:cacheprovider \
+  tests/test_long_video_background.py tests/test_long_video_routes.py \
+  tests/test_preflight_and_registration.py -q
+57 passed
+```
+
+AI-VIDEO parent focused verification 最终为 `193 passed`，覆盖 supervisor、Harness routing、Documentation Contract Gate 与 session-record hook；`python -m scripts.docs_contract_gate check`、read-only `python scripts/comfyui_supervisor.py status` 与 `git diff --check` 均通过。真实 status 为 inactive / not-found；本次没有启动或停止 ComfyUI。
+
+Exact staged Harness receipt：
+
+```text
+.agent/harness/runs/20260824T114936417333Z/receipt.json
+```
+
+Receipt verification 报告 `passed=true`、`fresh=true`、`snapshot_matches=true`、`scope_paths_match=true`、`policy_matches=true`、`artifact_integrity=true`、`workspace_cleanup_confirmed=true`。同一 detached snapshot 中 `local_comfyui_supervisor_tests` 为 `16 passed`，`harness_tests` 为 `177 passed`；policy audit 无 unmapped、unverified、missing 或 unreferenced paths。
+
+Independent `reviewer_xhigh` 多轮 review 先后拒绝了：unmapped Harness routing、跨进程 recovery lease 缺失、requeue bypass、可复用 systemd unit 的 stop race、宽松 unit namespace、并发 start、post-create cleanup leak 与共享-port health 误归属。Parent 随后补上 per-fd volatile `/proc` handling、direct inode/port fixture 与 typed mutex failure coverage，并重新运行上述 focused checks；reviewer 对 exact commit `f9b580d` 的最终 delta-only verdict 为 `accept`，无 blocking issue。
+
+### Publication And Acceptance Boundary
+
+两个 commit 都只存在于本机 `main`；没有 push、release 或 remote deployment。`index.json` 与 AI-VIDEO checkout 中其他 unrelated dirty changes均未 stage、commit、reset 或覆盖。
+
+本 closure 是 engineering lifecycle / recovery PASS，不是 E0-C empirical completion。没有补交 segment 6/7、没有 generation、retry、fallback、remote/paid Provider 或新媒体，也没有改变 634-frame partial、Manifest revision 6、P6 或 Final Acceptance truth。下一次继续 E0-C 仍需要新的明确 execution authorization，并必须把 historical infrastructure interruption 与新的 resumed attempt 分开记录。
