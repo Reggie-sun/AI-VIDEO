@@ -121,3 +121,60 @@ Provider / media effects：一次 Local ComfyUI T8 submit；6 个 accepted segme
 ## Next One Thing
 
 先做一次 bounded、read-only infrastructure interruption reassessment，确认 ComfyUI host process 为什么收到 `SIGTERM`，以及在不重解释 retry-0 contract 的前提下应如何处理 stale background state。只有形成新的明确授权/contract 后，才可决定是否从 accepted segment 5 继续相同 segment 6/7 schedule；不得 blind restart、把 resume 记作原实验无中断完成，或用另一 seed / 参数补考。
+
+## Follow-up Engineering Closure: Cancelled Accepted-Prefix Composition
+
+该 experiment 之后完成了一个 bounded local regression fix，目标不是重新生成或手工修复单个 E0-C artifact，而是关闭 cancelled/incomplete accepted prefix 绕过 canonical composer 的长期 routing 缺口。
+
+人工预览此前直接拼接各 accepted segment 的 MP4/AAC，因此保留每段 AAC codec padding，并在 E0-C 的五个 segment seams 处报告可听断点。`long_video_delivery.py::compose_accepted_long_video()` 已经具备正确能力：按 Manifest absolute frame/sample boundaries 解码每段 exact PCM、丢弃 codec padding，并可用 `audio_seam_policy="cosine_bridge"` 与 `bridge_ms=5.0` 处理边界。缺失的是 cancelled background control path；它只 durable 写入 `cancelled` 后返回，没有把 non-final accepted Manifest prefix 送入该 composer。
+
+MiniMax H3 T8 plugin local commit：
+
+```text
+5ad62dcefdb238cf4fb58711ea8107552392a71d Fix cancelled prefix composition routing
+```
+
+该 commit 的 exact implementation boundary：
+
+- `long_video_routes.py` 在 `BACKGROUND_JOBS.cancel()` 返回后才读取 canonical accepted Manifest，保证 cancel transition 先 durable 完成。
+- 仅 non-empty、non-final accepted prefix 自动调用 `compose_accepted_long_video()`；zero accepted 与 final chain 均不走 partial composition。
+- 调用固定为 `require_final_segment=False`、`audio_seam_policy="cosine_bridge"`、`bridge_ms=5.0`，filename prefix 明确使用 `H3_Long_Video_Accepted_Prefix_Partial`。
+- 成功 response 返回 `partial_preview_kind="accepted_prefix"`、`partial_video_path` 与 parsed `partial_compose_report`；失败返回 `partial_compose_error`，保持 durable `cancelled`，不 rollback cancel、不 retry/fallback generation。
+- `long_video_delivery.py::compose_accepted_long_video()` 新增 backward-compatible、keyword-only `expected_manifest_revision`。Route 将第一次 non-final Manifest read 的 revision 传入 composer；composer 在自己的 authoritative Manifest load 后、创建 `assembled/` 或临时输出前 fail closed。这样关闭了两次 Manifest read 之间接受 final segment、再把完整链误命名为 partial 的 TOCTOU。
+- 未传 `expected_manifest_revision` 的既有 callers 保持原行为；completed-chain `compose_when_complete` path、codec trimming、cosine bridge 算法、frame/sample accounting 与 BackgroundJobManager architecture 均未重写。
+
+### Verification And Review
+
+对 plugin commit 对应 tree 实际运行：
+
+```text
+PYTHONPATH=/home/reggie/ComfyUI PYTHONDONTWRITEBYTECODE=1 \
+pytest -q -p no:cacheprovider \
+  tests/test_long_video_routes.py \
+  tests/test_long_video_background.py \
+  tests/test_long_video_delivery.py \
+  tests/test_preflight_and_registration.py
+```
+
+结果为 `79 passed`，另有 2 个既有 SWIG deprecation warnings。Focused coverage 包括：
+
+- cancel 先于 compose；
+- non-final accepted prefix 使用 exact partial composer options；
+- zero accepted 与 final chain 不 compose；
+- Manifest loader failure 与 composer failure 均保留 cancelled response，不 retry/fallback；
+- Manifest revision mismatch 在任何 assembled output 写入前失败；
+- existing exact frame/sample accounting 与 completed-chain composition tests 继续通过。
+
+`ruff check`、focused `compileall` 与 `git diff --check` 均通过。Independent native review 首轮发现 Manifest TOCTOU 并给出 `reject`；加入 revision precondition 与 loader-failure coverage 后，同 tier scoped re-review 为 `accept`，无 blocking 或 non-blocking concern。
+
+### Evidence And Publication Boundary
+
+该 engineering closure 只存在于 MiniMax H3 T8 plugin local `main` commit `5ad62dc`；记录时相对 plugin `origin/main` 为 `ahead 1`，没有 push 或 release。Plugin checkout 在该 commit 之后已有其他 uncommitted work；这些后续 bytes 不属于 `5ad62dc`，本记录不认领也不用于上述 verification claim。
+
+AI-VIDEO Production code、Manifest / Registry、qualification、Provider contract、seed、prompt schedule、identity strategy、resolution、steps 与 model 均未改变。没有重跑 seed `320001` 或其他 seed，没有启动模型 generation、remote/paid Provider、fallback 或 retry，也没有覆盖既有 v1/v2 media。
+
+该 closure 是 engineering/runtime routing PASS，不是 empirical audio-quality PASS。现有 634-frame E0-C partial 没有因该 commit 自动重新合成；没有新的 full-speed listening evidence，不能声称五个 audible seams 已在该历史 artifact 上关闭，也不能把它升级为 770-frame / 32-second completion、P6 或 Final Acceptance。
+
+### Updated Next One Thing
+
+在下一次明确授权的 long-video execution 前，先让 ComfyUI 加载包含 `5ad62dc` 的 plugin build；首次发生 targeted cancel 时核对 response 中的 `partial_video_path`、`partial_compose_report`、Manifest revision 与 exact frame/sample totals，并对该新 partial 做人工听感检查。不得为验证本 routing fix 重跑 E0-C seed `320001`、补交 segments 6/7 或把历史 v2 rescue artifact 当作自动 route evidence。
