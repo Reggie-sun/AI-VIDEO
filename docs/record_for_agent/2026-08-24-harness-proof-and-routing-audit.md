@@ -153,3 +153,74 @@ Receipt environment fingerprint 也尚未绑定 Python dependency set、Node/npm
 - 本记录没有生成 fresh passing Harness receipt；本轮严格审计没有运行那些 checks。
 - 本记录不改变 `ProductionStateCommitter`、Provider、Manifest、activation、recovery、QA 或 release ownership。
 - 本记录不证明任何 live Provider、ComfyUI、Seedance、媒体或 creative result。
+
+## Implementation Closure
+
+同日后续修复已在 local `main` commit
+`e648728080168489bc6107666f379c5f0dea9365` 落地。该 commit 未 push、未 release，
+也没有创建 implementation spec / plan。它保持 Harness 为 Development Governance，
+没有改变 `ProductionStateCommitter` 或任何 Product Runtime owner。
+
+### Completion proof
+
+- `verify-receipt` 现在从 receipt 绑定的 exact commit / staged index policy 重新计算
+  changed paths、categories、fallback、ordered check selection 与
+  `npm_workspace_dependency_paths`，并逐条验证 check record order、argv、cwd、
+  passed result、artifact descriptor 和 same-run coverage closure。
+- 输出明确区分 `self_consistent`、`fresh_for_snapshot` 与
+  `complete_completion_proof`；三者与 workspace cleanup/stability 都成立时才会给出
+  `fresh=true`。
+- legacy schema-2 receipt 只有在 exact policy 推导的 Node dependency list 为空时，
+  才允许缺少新增字段；显式 `null`、mismatch，以及 missing + non-empty expected
+  均 fail closed。
+
+### Routing and validation weight
+
+- checks 使用显式 execution priority，使 scope diff、docs contract 与被选中的 task
+  Architecture Gate 先于 expensive suites 执行。
+- `full_tests` 只覆盖它真实包含的 Python pytest checks；Node tests 与 build checks
+  不会被吞并。Production video Provider route 不再重复 global
+  `test_production_state_commit.py` / `test_production_state_recovery.py`，这些仍由
+  canonical Production state route 持有。
+- Agent Memory 改为 focused test route；policy audit 扩展到 tracked toolchain、config、
+  fixtures、Python tests 与 JS/MJS tests，并对唯一 broad pytest selector exemption
+  做显式记录。
+- Provider Console 拆为 bridge、web source、web test-only 与 Sites/Worker routes：
+  ordinary web source运行完整 Node contracts与offline Vite compile；package、Worker、
+  bundle和Sites surfaces才运行完整Sites build与worker test。
+- Harness 不安装 Node dependency。它只会在 source checkout 已存在、且 installed
+  lock metadata 与 exact snapshot `package-lock.json` 一致时，将
+  `provider-console/node_modules` 临时链接进detached checkout。PR gate先inspect exact
+  base/head；只有selected route声明该dependency时才运行pinned Node setup与
+  `npm ci --ignore-scripts`。
+
+### Verification evidence
+
+- focused Harness tests：`108 passed`。
+- combined docs-contract + Harness tests：`140 passed`（追加最后一条compatibility
+  regression前）以及随后exact staged/commit-range Harness中的`154 passed`。
+- `python scripts/agent_harness.py policy-audit`：`candidate_count=440`，
+  `unmapped_paths`、`unverified_paths`、`missing_check_test_paths`、
+  `unreferenced_test_paths`与`docs_contract_diagnostics`均为空。
+- exact staged receipt：
+  `.agent/harness/runs/harness-strategy-fix-staged-20260824-v2/receipt.json`，在对应
+  staged snapshot验证时全部freshness/completeness字段为true。
+- exact code-commit receipt：
+  `.agent/harness/runs/harness-strategy-fix-commit-20260824-v1/receipt.json`，在
+  `e648728080168489bc6107666f379c5f0dea9365` 为HEAD时验证为`fresh=true`。
+- independent native `reviewer_xhigh` 最终 verdict 为 `accept with concerns`，无
+  blocking issue。External MiniMax explorer的原始status仍为
+  `DONE_WITH_CONCERNS`；其定位出的receipt、Provider Console、重复suite、ordering和
+  audit gaps均由parent复核后进入本次minimal修复。
+
+### Remaining boundaries
+
+- `pytest` Python process仍只有socket/DNS API guard；child process与Node/npm没有
+  OS-level network namespace。不得把sanitized environment描述成hard no-network
+  sandbox。
+- source checkout的`node_modules`是mutable external execution input。当前只验证
+  installed lock metadata，不哈希实际package bytes；CI fresh `npm ci`降低风险，但本地
+  receipt尚未封存Node/npm version、installed-lock hash或dependency bytes。
+- 本次没有安装dependency，没有运行live Provider、ComfyUI、Seedance、媒体生成或付费
+  调用，也没有执行browser/manual visual QA。因此这些receipt只证明Harness自身的
+  routing/proof correctness，不证明Production或creative acceptance。
