@@ -53,6 +53,7 @@ from ai_video.agent_memory.hybrid import (
     lexical_relevance_score,
     rank_bm25,
     reciprocal_rank_fusion,
+    select_dense_null_query,
 )
 from ai_video.agent_memory.retrieval import Hit, format_text, search
 from scripts.agent_memory import main as agent_memory_main
@@ -303,6 +304,8 @@ def test_search_keeps_score_at_threshold_and_drops_lower(
             return 2
 
         def query(self, **kwargs):
+            if kwargs["n_results"] == 1:
+                return {"distances": [[0.32]]}
             assert kwargs["n_results"] == 2
             return {
                 "ids": [["exact", "below"]],
@@ -321,7 +324,7 @@ def test_search_keeps_score_at_threshold_and_drops_lower(
                         "chunk_index": 0,
                     },
                 ]],
-                "distances": [[0.3, 0.3001]],
+                "distances": [[0.3, 0.31]],
             }
 
         def get(self, **kwargs):
@@ -407,6 +410,8 @@ def test_search_hybrid_fusion_rescues_exact_lexical_hit(
             return 20
 
         def query(self, **kwargs):
+            if kwargs["n_results"] == 1:
+                return {"distances": [[0.05]]}
             assert kwargs["n_results"] == 20
             return {
                 "ids": [ids],
@@ -436,14 +441,11 @@ def test_search_hybrid_fusion_rescues_exact_lexical_hit(
         embedding=fake_embedding,
     )
 
-    assert [hit.source for hit in hits] == [
-        "docs/credential.md",
-        "docs/general.md",
-    ]
+    assert [hit.source for hit in hits] == ["docs/credential.md"]
     assert hits[0].dense_score == pytest.approx(0.6)
     assert hits[0].lexical_score > 0
     assert hits[0].lexical_relevance_score >= 0.7
-    assert hits[0].fusion_score > hits[1].fusion_score
+    assert hits[0].admission_lane == "lexical"
     assert hits[0].score >= 0.7
     assert all(hit.score >= 0.7 for hit in hits)
 
@@ -486,9 +488,18 @@ def test_hybrid_primitives_match_identifiers_and_chinese_bigrams() -> None:
     assert lexical_relevance_score(0.182322) < 0.7
 
 
+def test_dense_null_probe_matches_query_writing_system() -> None:
+    assert select_dense_null_query("recovery contract") == (
+        "zzzxqv_nonexistent_74291"
+    )
+    assert select_dense_null_query("如何恢复状态") == "无相关项目知识_68243"
+
+
 def test_weak_common_lexical_match_does_not_bypass_threshold() -> None:
     class CommonTermCollection:
         def query(self, **kwargs):
+            if kwargs["query_embeddings"] == [[1.0]]:
+                return {"distances": [[0.9]]}
             return {
                 "ids": [["first", "second"]],
                 "documents": [["the first", "the second"]],
@@ -512,9 +523,173 @@ def test_weak_common_lexical_match_does_not_bypass_threshold() -> None:
     hits = retrieval_module._search_collection(
         query="the",
         query_vector=[0.0],
+        null_query_vector=[1.0],
         collection=CommonTermCollection(),
         available=2,
         limit=2,
+        corpus_kind="experience",
+        default_authority="advisory_experience",
+    )
+
+    assert hits == []
+
+
+@pytest.mark.parametrize(
+    ("dense_scores", "null_score", "expected_sources"),
+    [
+        ([0.85, 0.83], 0.86, []),
+        ([0.90, 0.898], 0.84, []),
+        ([0.894879, 0.891401], 0.888775, ["docs/first.md"]),
+        ([0.90, 0.83], 0.84, ["docs/first.md"]),
+    ],
+    ids=[
+        "below-null",
+        "weak-top1-margin",
+        "project-corpus-positive",
+        "answerable",
+    ],
+)
+def test_dense_lane_requires_null_excess_and_top1_margin(
+    dense_scores: list[float],
+    null_score: float,
+    expected_sources: list[str],
+) -> None:
+    class DenseGateCollection:
+        def query(self, **kwargs):
+            if kwargs["query_embeddings"] == [[0.0]]:
+                return {"distances": [[1.0 - null_score]]}
+            return {
+                "ids": [["first", "second"]],
+                "documents": [["first candidate", "second candidate"]],
+                "metadatas": [[
+                    {"source": "docs/first.md", "chunk_index": 0},
+                    {"source": "docs/second.md", "chunk_index": 0},
+                ]],
+                "distances": [[1.0 - score for score in dense_scores]],
+            }
+
+        def get(self, **kwargs):
+            return {
+                "ids": ["first", "second"],
+                "documents": ["first candidate", "second candidate"],
+                "metadatas": [
+                    {"source": "docs/first.md", "chunk_index": 0},
+                    {"source": "docs/second.md", "chunk_index": 0},
+                ],
+            }
+
+    hits = retrieval_module._search_collection(
+        query="unseen-query",
+        query_vector=[1.0],
+        null_query_vector=[0.0],
+        collection=DenseGateCollection(),
+        available=2,
+        limit=2,
+        corpus_kind="experience",
+        default_authority="advisory_experience",
+    )
+
+    assert [hit.source for hit in hits] == expected_sources
+    if hits:
+        assert hits[0].admission_lane == "dense"
+        assert hits[0].dense_null_score == pytest.approx(null_score)
+        assert hits[0].dense_null_excess == pytest.approx(
+            dense_scores[0] - null_score
+        )
+        assert hits[0].dense_top1_margin == pytest.approx(
+            dense_scores[0] - dense_scores[1]
+        )
+        assert hits[0].score == pytest.approx(dense_scores[0])
+
+
+@pytest.mark.parametrize(
+    ("dense_score", "null_score", "expected_sources"),
+    [
+        (0.82, 0.81, ["docs/only.md"]),
+        (0.814, 0.81, []),
+    ],
+    ids=["clears-null-excess", "below-null-excess"],
+)
+def test_dense_single_candidate_uses_null_excess_without_fabricated_margin(
+    dense_score: float,
+    null_score: float,
+    expected_sources: list[str],
+) -> None:
+    class SingleCandidateCollection:
+        def query(self, **kwargs):
+            if kwargs["query_embeddings"] == [[0.0]]:
+                return {"distances": [[1.0 - null_score]]}
+            return {
+                "ids": [["only"]],
+                "documents": [["only candidate"]],
+                "metadatas": [[
+                    {"source": "docs/only.md", "chunk_index": 0},
+                ]],
+                "distances": [[1.0 - dense_score]],
+            }
+
+        def get(self, **kwargs):
+            return {
+                "ids": ["only"],
+                "documents": ["only candidate"],
+                "metadatas": [
+                    {"source": "docs/only.md", "chunk_index": 0},
+                ],
+            }
+
+    hits = retrieval_module._search_collection(
+        query="unseen-query",
+        query_vector=[1.0],
+        null_query_vector=[0.0],
+        collection=SingleCandidateCollection(),
+        available=1,
+        limit=1,
+        corpus_kind="experience",
+        default_authority="advisory_experience",
+    )
+
+    assert [hit.source for hit in hits] == expected_sources
+    if hits:
+        assert hits[0].dense_null_excess == pytest.approx(
+            dense_score - null_score
+        )
+        assert hits[0].dense_top1_margin == 0.0
+        assert hits[0].admission_lane == "dense"
+
+
+def test_partial_cjk_bigram_does_not_admit_lexical_lane() -> None:
+    ids = ["partial", *(f"decoy-{index}" for index in range(19))]
+    documents = ["存在", *(f"无关材料{index}" for index in range(19))]
+    metadatas = [
+        {"source": f"docs/{chunk_id}.md", "chunk_index": 0}
+        for chunk_id in ids
+    ]
+
+    class PartialBigramCollection:
+        def query(self, **kwargs):
+            if kwargs["query_embeddings"] == [[0.0]]:
+                return {"distances": [[0.16]]}
+            return {
+                "ids": [ids],
+                "documents": [documents],
+                "metadatas": [metadatas],
+                "distances": [[0.15, 0.151, *([0.2] * 18)]],
+            }
+
+        def get(self, **kwargs):
+            return {
+                "ids": ids,
+                "documents": documents,
+                "metadatas": metadatas,
+            }
+
+    hits = retrieval_module._search_collection(
+        query="不存在的紫色大象量子果园",
+        query_vector=[1.0],
+        null_query_vector=[0.0],
+        collection=PartialBigramCollection(),
+        available=20,
+        limit=8,
         corpus_kind="experience",
         default_authority="advisory_experience",
     )
@@ -539,12 +714,14 @@ def test_hybrid_uses_top_k_30_and_returns_top_n_8() -> None:
 
     class SizedCollection:
         def query(self, **kwargs):
+            if kwargs["query_embeddings"] == [[1.0]]:
+                return {"distances": [[0.5]]}
             assert kwargs["n_results"] == 30
             return {
                 "ids": [ids[:30]],
                 "documents": [documents[:30]],
                 "metadatas": [metadatas[:30]],
-                "distances": [[0.1] * 30],
+                "distances": [[0.1, *([0.12] * 29)]],
             }
 
         def get(self, **kwargs):
@@ -557,6 +734,7 @@ def test_hybrid_uses_top_k_30_and_returns_top_n_8() -> None:
     hits = retrieval_module._search_collection(
         query="needle",
         query_vector=[0.0],
+        null_query_vector=[1.0],
         collection=SizedCollection(),
         available=40,
         limit=8,
@@ -602,6 +780,7 @@ def test_format_text_includes_sources_and_excerpt() -> None:
             h2="Symptom",
             h3="",
             date="2026-08-20",
+            admission_lane="lexical",
         )
     ]
     out = format_text(hits)
@@ -609,6 +788,7 @@ def test_format_text_includes_sources_and_excerpt() -> None:
     assert "docs/record_for_agent/x.md" in out
     assert "Symptom" in out
     assert "some body text" in out
+    assert "admission_lane: lexical" in out
 
 
 # ---------------------------------------------------------------------------
@@ -1173,6 +1353,45 @@ def test_local_multilingual_retrieval_ranks_chinese_contract(tmp_path: Path) -> 
         embedding=embedding,
     )
     assert hits[0].title == "镜头连续性"
+
+
+def test_local_multilingual_project_corpus_answerability_calibration(
+    tmp_path: Path,
+) -> None:
+    if not Path(DEFAULT_MODEL_DIR).expanduser().is_dir():
+        pytest.skip("local multilingual E5 cache not present on this machine")
+    corpus = corpus_module.CorpusSpec.experience(Path(DEFAULT_CORPUS_ROOT))
+    idx = tmp_path / "project-corpus-index"
+    embedding = LocalOnnxMiniLMEmbeddings()
+    index_module.build_scoped_index((corpus,), idx, embedding)
+
+    relevant = search(
+        "怎样保持跨镜头角色连续性和首尾帧衔接？",
+        top_k=8,
+        scope="experience",
+        corpora=(corpus,),
+        index_path=idx,
+        embedding=embedding,
+    )
+    assert relevant
+    assert any(
+        "continuity" in hit.source
+        and hit.admission_lane in {"dense", "hybrid"}
+        for hit in relevant
+    )
+
+    for noise_query in (
+        "不存在的紫色大象量子果园",
+        "zzzxqv_nonexistent_74291",
+    ):
+        assert search(
+            noise_query,
+            top_k=8,
+            scope="experience",
+            corpora=(corpus,),
+            index_path=idx,
+            embedding=embedding,
+        ) == []
 
 
 # ---------------------------------------------------------------------------

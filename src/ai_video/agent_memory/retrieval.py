@@ -8,8 +8,11 @@ from typing import Iterable, List, Optional, Sequence
 
 from ai_video.agent_memory.config import (
     DEFAULT_TOP_N,
+    DENSE_MIN_NULL_EXCESS,
+    DENSE_MIN_TOP1_MARGIN,
     HYBRID_CANDIDATE_TOP_K,
     HYBRID_RRF_K,
+    LEXICAL_MIN_QUERY_COVERAGE,
     MINIMUM_RELEVANCE_SCORE,
 )
 from ai_video.agent_memory.corpus import CorpusSpec
@@ -18,6 +21,7 @@ from ai_video.agent_memory.hybrid import (
     lexical_relevance_score,
     rank_bm25,
     reciprocal_rank_fusion,
+    select_dense_null_query,
 )
 from ai_video.agent_memory.index import (
     IndexMismatchError,
@@ -59,7 +63,12 @@ class Hit:
     dense_score: Optional[float] = None
     lexical_score: float = 0.0
     lexical_relevance_score: float = 0.0
+    lexical_query_coverage: float = 0.0
     fusion_score: float = 0.0
+    dense_null_score: float = 0.0
+    dense_null_excess: float = 0.0
+    dense_top1_margin: float = 0.0
+    admission_lane: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -188,6 +197,7 @@ def search(
 
     hits: List[Hit] = []
     query_vector = embedding.embed_query(query)
+    null_query_vector = embedding.embed_query(select_dense_null_query(query))
     for kind, limit in allocations.items():
         item = indexed[kind]
         try:
@@ -199,6 +209,7 @@ def search(
                 _search_collection(
                     query=query,
                     query_vector=query_vector,
+                    null_query_vector=null_query_vector,
                     collection=collection,
                     available=available,
                     limit=limit,
@@ -222,6 +233,8 @@ def search(
                 run_spec,
                 runs_index_path,
                 embedding,
+                query_vector=query_vector,
+                null_query_vector=null_query_vector,
             )
         )
 
@@ -256,6 +269,7 @@ def _search_collection(
     *,
     query: str,
     query_vector: Sequence[float],
+    null_query_vector: Sequence[float],
     collection,
     available: int,
     limit: int,
@@ -268,6 +282,11 @@ def _search_collection(
         query_embeddings=[query_vector],
         n_results=candidate_limit,
         include=["documents", "metadatas", "distances"],
+    )
+    null_raw = collection.query(
+        query_embeddings=[null_query_vector],
+        n_results=1,
+        include=["distances"],
     )
     lexical_raw = collection.get(include=["documents", "metadatas"])
 
@@ -282,6 +301,9 @@ def _search_collection(
         == len(dense_distances)
     ):
         raise ValueError("dense retrieval result fields have inconsistent lengths")
+    null_distances = null_raw.get("distances", [[]])[0] or []
+    if len(null_distances) != 1:
+        raise ValueError("dense null calibration must return exactly one distance")
 
     lexical_ids = lexical_raw.get("ids", []) or []
     lexical_documents = lexical_raw.get("documents", []) or []
@@ -311,6 +333,17 @@ def _search_collection(
         str(chunk_id): 1.0 - float(distance)
         for chunk_id, distance in zip(dense_ids, dense_distances)
     }
+    ordered_dense_scores = [dense_scores[chunk_id] for chunk_id in dense_ranking]
+    dense_top1_margin = (
+        ordered_dense_scores[0] - ordered_dense_scores[1]
+        if len(ordered_dense_scores) > 1
+        else 0.0
+    )
+    dense_margin_admitted = (
+        len(ordered_dense_scores) == 1
+        or dense_top1_margin >= DENSE_MIN_TOP1_MARGIN
+    )
+    dense_null_score = 1.0 - float(null_distances[0])
     lexical_matches = rank_bm25(
         query,
         {
@@ -321,6 +354,9 @@ def _search_collection(
     )
     lexical_ranking = [match.chunk_id for match in lexical_matches]
     lexical_scores = {match.chunk_id: match.score for match in lexical_matches}
+    lexical_coverages = {
+        match.chunk_id: match.query_coverage for match in lexical_matches
+    }
     fusion_scores = reciprocal_rank_fusion(
         ((dense_ranking, 1.0), (lexical_ranking, 1.0)),
         rank_constant=HYBRID_RRF_K,
@@ -331,13 +367,33 @@ def _search_collection(
         text, md = records[chunk_id]
         dense_score = dense_scores.get(chunk_id)
         lexical_score = lexical_scores.get(chunk_id, 0.0)
+        lexical_query_coverage = lexical_coverages.get(chunk_id, 0.0)
         bounded_lexical_score = lexical_relevance_score(lexical_score)
-        score = max(
-            dense_score if dense_score is not None else 0.0,
-            bounded_lexical_score,
+        dense_null_excess = (
+            dense_score - dense_null_score if dense_score is not None else 0.0
         )
-        if score < MINIMUM_RELEVANCE_SCORE:
+        lexical_admitted = (
+            bounded_lexical_score >= MINIMUM_RELEVANCE_SCORE
+            and lexical_query_coverage >= LEXICAL_MIN_QUERY_COVERAGE
+        )
+        dense_admitted = (
+            dense_score is not None
+            and dense_score >= MINIMUM_RELEVANCE_SCORE
+            and dense_null_excess >= DENSE_MIN_NULL_EXCESS
+            and dense_margin_admitted
+        )
+        if not lexical_admitted and not dense_admitted:
             continue
+        if lexical_admitted and dense_admitted:
+            admission_lane = "hybrid"
+        elif lexical_admitted:
+            admission_lane = "lexical"
+        else:
+            admission_lane = "dense"
+        score = max(
+            bounded_lexical_score if lexical_admitted else 0.0,
+            dense_score if dense_admitted and dense_score is not None else 0.0,
+        )
         hits.append(
             Hit(
                 source=str(md.get("source", "?")),
@@ -362,7 +418,12 @@ def _search_collection(
                 dense_score=dense_score,
                 lexical_score=lexical_score,
                 lexical_relevance_score=bounded_lexical_score,
+                lexical_query_coverage=lexical_query_coverage,
                 fusion_score=fusion_scores[chunk_id],
+                dense_null_score=dense_null_score,
+                dense_null_excess=dense_null_excess,
+                dense_top1_margin=dense_top1_margin,
+                admission_lane=admission_lane,
             )
         )
     return sorted(hits, key=_hit_sort_key, reverse=True)[:limit]
@@ -374,6 +435,9 @@ def _search_runs(
     runs_corpus: CorpusSpec,
     runs_index_path: Path,
     embedding,
+    *,
+    query_vector: Sequence[float],
+    null_query_vector: Sequence[float],
 ) -> List[Hit]:
     """Search the validated run-summary index or fail closed."""
     runs_index_path = Path(runs_index_path)
@@ -407,7 +471,8 @@ def _search_runs(
             return []
         return _search_collection(
             query=query,
-            query_vector=embedding.embed_query(query),
+            query_vector=query_vector,
+            null_query_vector=null_query_vector,
             collection=collection,
             available=available,
             limit=top_k,
@@ -430,6 +495,8 @@ def format_text(hits: Iterable[Hit]) -> str:
     for i, h in enumerate(hits, 1):
         lines.append(f"{i}. {h.source}")
         lines.append(f"   score: {h.score:.4f}")
+        if h.admission_lane:
+            lines.append(f"   admission_lane: {h.admission_lane}")
         lines.append(f"   {_authority_label(h.corpus_kind)}")
         if h.status:
             lines.append(f"   document status: {h.status}")

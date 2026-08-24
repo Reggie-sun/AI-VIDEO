@@ -40,6 +40,17 @@ MINIMUM_RELEVANCE_SCORE: float = 0.7
 HYBRID_CANDIDATE_TOP_K: int = 30
 HYBRID_RRF_K: int = 60
 
+# Dense-only admission is calibrated against a language-matched nonsense
+# query over the same collection. A candidate must clear both the null
+# baseline and, when Top-2 exists, the real query's Top-1 separation before
+# its cosine score can satisfy the public relevance gate. These values are
+# calibrated against the checked-in project corpus and pinned local E5 model.
+DENSE_NULL_QUERY_ASCII: str = "zzzxqv_nonexistent_74291"
+DENSE_NULL_QUERY_CJK: str = "无相关项目知识_68243"
+DENSE_MIN_NULL_EXCESS: float = 0.005
+DENSE_MIN_TOP1_MARGIN: float = 0.003
+LEXICAL_MIN_QUERY_COVERAGE: float = 0.3
+
 # Default embedding backend. Choices:
 #   "local" -> LocalOnnxMiniLMEmbeddings (offline, requires the local model dir).
 #   "fake"  -> DeterministicFakeEmbeddings (deterministic, no model needed).

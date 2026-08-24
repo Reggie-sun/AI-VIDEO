@@ -66,19 +66,27 @@ trivial test 不应触发检索。
    连续文本增加 bigram。两条 lane 的 candidate `top_k` 都是 30。
 5. **Fusion**：两条 lane 用 stable Chroma chunk ID 去重，再以 equal-weight weighted RRF
    （`k=60`）排序。每个 hit 分别保留 `dense_score`、raw `lexical_score` 与
-   `lexical_relevance_score`、`fusion_score`；lexical representation 包含 chunk body、
-   canonical source、title 与 heading metadata。不会把 Enterprise RAG 的 ACL、department
-   scope、query router、answerability fallback 或 citation policy 搬入本仓库。
-6. **Relevance gate**：raw BM25 通过固定函数 `1 - exp(-BM25 / 0.2)` 映射为 bounded
-   lexical relevance，Agent-facing `score` 取它与 dense cosine score 的较大值。只保留
-   `score >= 0.7` 的命中；`score == 0.7` 通过，低于 `0.7` 不返回。这个固定 admission
-   heuristic 不会因 candidate set 的第一名而自动归一化为 1，也不是事实可信度或质量证明。
+   `lexical_relevance_score`、`lexical_query_coverage`、`fusion_score`、
+   `dense_null_score`、`dense_null_excess`、`dense_top1_margin` 与 `admission_lane`；
+   lexical representation 包含 chunk body、canonical source、title 与 heading metadata。
+   RRF 只决定 ordering，不决定 admission。
+6. **Lane-aware answerability**：lexical lane 将 raw BM25 通过固定函数
+   `1 - exp(-BM25 / 0.2)` 映射，并要求 exact token/bigram 覆盖至少 30% query terms；
+   relevance 达到 `0.7` 后才可独立放行，单个偶然中文 bigram 不足以通过。Dense lane
+   针对同一 collection 运行与 query writing system 匹配的固定 nonsense probe；candidate 必须同时满足
+   `dense_score >= 0.7`、相对 null Top-1 的 excess `>= 0.005`，且真实 query 的
+   Top-1/Top-2 margin `>= 0.003`。只有一个 candidate 时没有可定义的 Top-2 margin，
+   因而仅使用 score 与 null excess fail-closed 判定。最终 `score` 只取已放行 lane 的 score，标记为
+   `lexical`、`dense` 或 `hybrid`；两条 lane 都不通过时返回空。该 gate 不会把 dense
+   cosine 的整体高分误当 answerability，也不会把 lexical 第一名自动归一化为 1。
 7. **Merge**：先在各 corpus quota 内按 `fusion_score` 排序，再合并 experience、
    superpowers 与可选 run-summary hits，按 fusion、relevance 与 lane score 稳定排序并截取
    Agent-facing `top_n`（默认 8）；quota 保证不同 scope 都有召回机会，但不保证 final
    result 严格交替。现有 CLI `--top-k` 保留为 `top_n` 的兼容覆盖参数。
 
-当前没有 query rewriting、metadata filter、reranker 或动态 query-specific threshold。
+当前没有 query rewriting、metadata filter、reranker、learned answerability model 或
+answerability fallback；也没有搬入 Enterprise RAG 的 ACL、department scope、query router
+或 citation policy。
 
 ## Fitness And Limits
 
@@ -87,9 +95,12 @@ H3 continuity?”、“是否有关于 StateCommitter recovery 的旧设计？�
 该架构取舍？”。
 
 Hybrid retrieval 改善了 exact symbol、path、commit 与 error-code 的召回，同时保留中英文
-语义查询能力；它仍不应单独作为回答、执行、Provider authorization、quality acceptance
+语义查询能力；项目语料 calibration 覆盖跨镜头角色连续性正例与中英文 nonsense 负例。
+它仍不应单独作为回答、执行、Provider authorization、quality acceptance
 或 durable state mutation 的依据。固定 BM25 映射提供稳定 admission scale，但仍不是
-跨语料可比较的 calibrated confidence。
+跨语料可比较的 calibrated confidence。Dense null probes 与 margin 是基于当前真实 E5
+语料分布的 precision-first conservative heuristic；缺少 lexical anchor 且没有清晰 dense
+separation 的自由改写会主动 abstain。语料或 embedding identity 变化后仍需重新实测。
 
 ## Freshness And Maintenance
 

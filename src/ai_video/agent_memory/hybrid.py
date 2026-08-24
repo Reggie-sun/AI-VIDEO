@@ -8,9 +8,15 @@ import math
 import re
 from typing import Mapping, Sequence
 
+from ai_video.agent_memory.config import (
+    DENSE_NULL_QUERY_ASCII,
+    DENSE_NULL_QUERY_CJK,
+)
+
 
 _TOKEN_RE = re.compile(r"[A-Za-z0-9_./:-]+|[\u3400-\u4dbf\u4e00-\u9fff]+")
 _CJK_RE = re.compile(r"^[\u3400-\u4dbf\u4e00-\u9fff]+$")
+_CJK_CHAR_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
 LEXICAL_RELEVANCE_SCALE = 0.2
 
 
@@ -20,6 +26,7 @@ class LexicalMatch:
 
     chunk_id: str
     score: float
+    query_coverage: float
 
 
 def tokenize(text: str) -> list[str]:
@@ -65,10 +72,12 @@ def rank_bm25(
         frequencies = Counter(tokens)
         document_length = len(tokens)
         score = 0.0
+        matched_query_terms = 0
         for term in query_terms:
             frequency = frequencies.get(term, 0)
             if frequency == 0:
                 continue
+            matched_query_terms += 1
             frequency_in_corpus = document_frequency[term]
             inverse_document_frequency = math.log(
                 1.0
@@ -80,7 +89,13 @@ def rank_bm25(
             )
             score += inverse_document_frequency * frequency * (k1 + 1.0) / denominator
         if score > 0:
-            matches.append(LexicalMatch(chunk_id=chunk_id, score=score))
+            matches.append(
+                LexicalMatch(
+                    chunk_id=chunk_id,
+                    score=score,
+                    query_coverage=matched_query_terms / len(query_terms),
+                )
+            )
 
     matches.sort(key=lambda match: (-match.score, match.chunk_id))
     return matches[:limit]
@@ -91,6 +106,13 @@ def lexical_relevance_score(raw_bm25_score: float) -> float:
     return 1.0 - math.exp(
         -max(raw_bm25_score, 0.0) / LEXICAL_RELEVANCE_SCALE
     )
+
+
+def select_dense_null_query(query: str) -> str:
+    """Choose the fixed null probe matching the query's writing system."""
+    if _CJK_CHAR_RE.search(query):
+        return DENSE_NULL_QUERY_CJK
+    return DENSE_NULL_QUERY_ASCII
 
 
 def reciprocal_rank_fusion(
