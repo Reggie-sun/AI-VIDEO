@@ -1220,6 +1220,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "src/ai_video/production/shot_continuity_source_contracts.py",
         "src/ai_video/production/shot_continuity_source_runtime.py",
         "src/ai_video/production/shot_continuity_source_schema.py",
+        "src/ai_video/production/shot_continuity_source_transport.py",
         "src/ai_video/production/video_candidate_composition.py",
         "src/ai_video/production/video_execution_stack.py",
         "src/ai_video/production/video_transition.py",
@@ -1230,6 +1231,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_shot_continuity_m0_validation.py",
         "tests/test_shot_continuity_source_qualification.py",
         "tests/test_shot_continuity_source_runtime.py",
+        "tests/test_shot_continuity_source_transport.py",
         "workflows/qualification/minimax_h3_fl2va_rainy_station_source_v1_profile.json",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_api.json",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_binding.yaml",
@@ -1240,9 +1242,11 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "src/ai_video/production/shot_continuity_source_contracts.py",
         "src/ai_video/production/shot_continuity_source_runtime.py",
         "src/ai_video/production/shot_continuity_source_schema.py",
+        "src/ai_video/production/shot_continuity_source_transport.py",
         "src/ai_video/production/video_candidate_composition.py",
         "tests/test_shot_continuity_source_qualification.py",
         "tests/test_shot_continuity_source_runtime.py",
+        "tests/test_shot_continuity_source_transport.py",
     }
 
     for path in paths:
@@ -1271,6 +1275,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_shot_continuity_m0_validation.py",
         "tests/test_shot_continuity_source_qualification.py",
         "tests/test_shot_continuity_source_runtime.py",
+        "tests/test_shot_continuity_source_transport.py",
         "tests/test_video_candidate.py",
     ):
         assert path in argv

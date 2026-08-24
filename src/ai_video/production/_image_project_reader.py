@@ -939,6 +939,22 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
         ) from exc
 
     try:
+        active_imported_asset_ids = {
+            asset_id
+            for character in bundle.characters
+            for asset_id in character.reference_asset_ids
+        }
+        active_imported_asset_ids.update(
+            asset_id
+            for scene in bundle.scenes
+            for asset_id in scene.visual_reference_asset_ids
+        )
+        active_imported_asset_ids.update(
+            asset_id
+            for shot in bundle.shots
+            for role in shot.required_asset_roles
+            for asset_id in role.asset_ids
+        )
         imported = tuple(
             item
             for item in bundle.registry.assets
@@ -977,6 +993,8 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
                 expected_asset = human_image_import_asset(receipt)
             if expected_asset != asset:
                 raise ValueError("selected image import AssetRecord is inconsistent")
+            if asset.asset_id not in active_imported_asset_ids:
+                continue
             if receipt.target_kind == "character_master":
                 targets = tuple(
                     item

@@ -174,12 +174,12 @@ checks:
     cwd: .
     description: Verify image contracts, local adapter, truthful import, activation, and recovery.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_shot_continuity_source_transport.py, -q]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
   shot_continuity_p0_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_prepare_shot_continuity_p0.py, tests/test_production_p0_qualification.py, tests/test_production_video_transition.py, tests/test_shot_continuity_source_runtime.py, tests/test_shot_continuity_source_qualification.py, tests/test_shot_continuity_m0_materialization.py, tests/test_shot_continuity_m0_validation.py, tests/test_shot_continuity_m0_caller.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_local_video_state.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_prepare_shot_continuity_p0.py, tests/test_production_p0_qualification.py, tests/test_production_video_transition.py, tests/test_shot_continuity_source_runtime.py, tests/test_shot_continuity_source_qualification.py, tests/test_shot_continuity_source_transport.py, tests/test_shot_continuity_m0_materialization.py, tests/test_shot_continuity_m0_validation.py, tests/test_shot_continuity_m0_caller.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_local_video_state.py, -q]
     cwd: .
     description: Verify deterministic Shot Continuity P0 preparation, immutable stack/policy evidence, and fail-closed persistence.
   production_shot_router_tests:
@@ -513,6 +513,7 @@ categories:
       - src/ai_video/production/shot_continuity_source_contracts.py
       - src/ai_video/production/shot_continuity_source_runtime.py
       - src/ai_video/production/shot_continuity_source_schema.py
+      - src/ai_video/production/shot_continuity_source_transport.py
       - src/ai_video/production/video_candidate_composition.py
       - src/ai_video/production/shot_continuity_source_stack.py
       - src/ai_video/production/video_execution_stack.py
@@ -525,6 +526,7 @@ categories:
       - tests/test_shot_continuity_m0_validation.py
       - tests/test_shot_continuity_source_qualification.py
       - tests/test_shot_continuity_source_runtime.py
+      - tests/test_shot_continuity_source_transport.py
       - workflows/qualification/minimax_h3_fl2va_rainy_station_source_v1_profile.json
       - workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_*
     check_ids:
@@ -580,6 +582,7 @@ categories:
       - src/ai_video/production/shot_continuity_source_contracts.py
       - src/ai_video/production/shot_continuity_source_runtime.py
       - src/ai_video/production/shot_continuity_source_schema.py
+      - src/ai_video/production/shot_continuity_source_transport.py
       - src/ai_video/production/_paid_provider_project_reader.py
       - src/ai_video/production/_video_project_reader.py
       - src/ai_video/production/_state_commit_paid_provider.py
@@ -608,6 +611,7 @@ categories:
       - tests/test_production_local_h3_provider_family.py
       - tests/test_shot_continuity_source_qualification.py
       - tests/test_shot_continuity_source_runtime.py
+      - tests/test_shot_continuity_source_transport.py
       - tests/paid_provider_support.py
       - tests/video_provider_contract.py
     check_ids:

@@ -74,20 +74,36 @@ class ComfyClient:
         input_path = Path(path)
         try:
             with input_path.open("rb") as handle:
-                response = self.http.post(
-                    self._url("/upload/image"),
-                    files={"image": (input_path.name, handle)},
-                )
-            response.raise_for_status()
-        except (OSError, httpx.HTTPError) as exc:
+                return self._upload_input_payload(input_path.name, handle)
+        except OSError as exc:
             raise retryable_error(
                 ErrorCode.COMFY_SUBMISSION_FAILED,
                 f"Could not upload ComfyUI input: {input_path}",
                 str(exc),
-                exc if isinstance(exc, BaseException) else None,
+                exc,
+            ) from exc
+
+    def upload_input_bytes(self, filename: str, payload: bytes) -> str:
+        """Upload an immutable in-memory input through the canonical route."""
+
+        return self._upload_input_payload(filename, bytes(payload))
+
+    def _upload_input_payload(self, filename: str, payload: Any) -> str:
+        try:
+            response = self.http.post(
+                self._url("/upload/image"),
+                files={"image": (filename, payload)},
+            )
+            response.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise retryable_error(
+                ErrorCode.COMFY_SUBMISSION_FAILED,
+                f"Could not upload ComfyUI input: {filename}",
+                str(exc),
+                exc,
             ) from exc
         data = response.json()
-        return data.get("name") or data.get("filename") or input_path.name
+        return data.get("name") or data.get("filename") or filename
 
     def upload_image(self, path: str | Path) -> str:
         return self.upload_input(path)

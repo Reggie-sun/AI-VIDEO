@@ -26,6 +26,25 @@ def test_upload_input_reuses_loopback_image_route_for_generic_bytes(tmp_path):
     assert client.upload_input(source) == "server-reference.mp4"
 
 
+def test_upload_input_bytes_reuses_the_same_upload_route_without_a_tempfile():
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = request.read()
+        assert request.url.path == "/upload/image"
+        assert b'filename="source-frame.png"' in body
+        assert b"immutable-frame" in body
+        return httpx.Response(200, json={"name": "server-source-frame.png"})
+
+    client = ComfyClient(
+        "http://127.0.0.1:8188",
+        http_client=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+
+    assert (
+        client.upload_input_bytes("source-frame.png", b"immutable-frame")
+        == "server-source-frame.png"
+    )
+
+
 def test_upload_image_remains_a_compatible_upload_input_wrapper(
     tmp_path, monkeypatch
 ):

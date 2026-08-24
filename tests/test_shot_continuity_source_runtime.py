@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from argparse import Namespace
+from datetime import UTC, datetime
 import hashlib
 import json
 from pathlib import Path
@@ -10,7 +11,13 @@ from PIL import Image
 import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.local_video import LocalVideoSubmitIntent
+from ai_video.production.local_video import (
+    LocalVideoFetchReceipt,
+    LocalVideoSubmission,
+    LocalVideoSubmitIntent,
+    LocalVideoSubmitResult,
+    LocalVideoTaskObservation,
+)
 from ai_video.production.composition import resolve_composition
 from ai_video.production.dependency import (
     build_applied_dependency_evidence,
@@ -40,6 +47,7 @@ from ai_video.production.video import (
     VideoGenerationPreview,
     VideoGenerationRequest,
     VideoImageReferenceBinding,
+    VideoTaskState,
 )
 from ai_video.production.video_contracts import (
     VideoFlexibleOutputRequirement,
@@ -240,7 +248,70 @@ class _UnknownSourceProvider:
         )
 
 
-def _resolved_source_request(project) -> ResolvedVideoGenerationRequest:
+class _RecordedSourceProvider:
+    def __init__(self, artifact_bytes: bytes) -> None:
+        self.artifact_bytes = bytes(artifact_bytes)
+        self.submit_calls = 0
+        self.status_calls = 0
+        self.fetch_calls = 0
+
+    def preview(
+        self, request: ResolvedVideoGenerationRequest
+    ) -> VideoGenerationPreview:
+        return VideoGenerationPreview.create(
+            resolved=request,
+            estimated_cost_upper_bound_microunits=None,
+            currency=None,
+            destination=None,
+            egress_item_ids=(),
+        )
+
+    def submit_local(self, request, preview, intent, permit):
+        assert isinstance(intent, LocalVideoSubmitIntent)
+        assert preview == self.preview(request)
+        assert permit._consume_local_video_submit_permit(
+            intent_fingerprint=intent.intent_fingerprint,
+            request_fingerprint=request.resolved_generation_hash,
+        )
+        self.submit_calls += 1
+        return LocalVideoSubmitResult.create(
+            resolved=request,
+            provider_request_id="source-prompt-activate-1",
+            submitted_at=datetime(2026, 8, 24, 5, tzinfo=UTC),
+        )
+
+    def get_local_status(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        submission: LocalVideoSubmission,
+    ) -> LocalVideoTaskObservation:
+        assert submission.resolved_generation_hash == request.resolved_generation_hash
+        self.status_calls += 1
+        return LocalVideoTaskObservation.create(
+            submission=submission,
+            state=VideoTaskState.SUCCEEDED,
+            observed_at=datetime(2026, 8, 24, 5, 1, tzinfo=UTC),
+            progress_milli=1000,
+            provider_file_id="source-output-activate-1",
+        )
+
+    def fetch_local(self, request, submission, observation, sink):
+        assert submission.resolved_generation_hash == request.resolved_generation_hash
+        self.fetch_calls += 1
+        sink.write(self.artifact_bytes)
+        return LocalVideoFetchReceipt.create(
+            submission=submission,
+            observation=observation,
+            content_type="video/mp4",
+            size_bytes=len(self.artifact_bytes),
+            artifact_sha256=hashlib.sha256(self.artifact_bytes).hexdigest(),
+            fetched_at=datetime(2026, 8, 24, 5, 2, tzinfo=UTC),
+        )
+
+
+def _resolved_source_request(
+    project, *, seal_terminal_frame: bool = True
+) -> ResolvedVideoGenerationRequest:
     target = next(item for item in project.shots if item.shot_id == "rainy-station-3")
     frames = tuple(
         next(
@@ -307,7 +378,7 @@ def _resolved_source_request(project) -> ResolvedVideoGenerationRequest:
             )
             for role, asset in zip(("first_frame", "last_frame"), frames, strict=True)
         ),
-        seal_terminal_frame=True,
+        seal_terminal_frame=seal_terminal_frame,
         output_requirement=output,
         seed=17,
         base_project=project.manifest.active_project,
@@ -401,3 +472,87 @@ def test_source_request_uses_real_committer_unknown_outcome_without_resubmit(
             pre_submit_guard=lambda current: None,
         )
     assert provider.submit_calls == 1
+
+
+def test_source_activation_reloads_the_exact_durable_closure_without_effect_replay(
+    tmp_path: Path,
+) -> None:
+    root, _, project = _prepare_project(tmp_path)
+    request = _resolved_source_request(project, seal_terminal_frame=False)
+    artifact_bytes = (
+        b"\x00\x00\x00\x14ftypisom\x00\x00\x00\x00isom"
+        b"\x00\x00\x00\x08moov"
+    )
+    provider = _RecordedSourceProvider(artifact_bytes)
+    committer = make_source_production_committer(root, project)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    attempt_id = "source-activate-equivalence"
+
+    service.start(attempt_id=attempt_id, request=request)
+    service.submit_local_once(
+        attempt_id=attempt_id,
+        pre_submit_guard=lambda current: current.resolved_generation_hash
+        == request.resolved_generation_hash
+        or pytest.fail("resolved source request drifted"),
+    )
+    service.refresh_local_once(attempt_id=attempt_id)
+    service.fetch_local_once(attempt_id=attempt_id)
+    candidate_manifest = committer.prepare_video_activation_candidate(
+        attempt_id=attempt_id,
+        probe=lambda _fd: {
+            "streams": [
+                {
+                    "codec_type": "video",
+                    "codec_name": "h264",
+                    "width": 1344,
+                    "height": 768,
+                    "avg_frame_rate": "24/1",
+                    "duration": "5.166667",
+                    "nb_frames": "124",
+                },
+                {"codec_type": "audio", "codec_name": "aac"},
+            ],
+            "format": {"format_name": "mov,mp4", "duration": "5.166667"},
+        },
+    )
+    candidate_attempt = candidate_manifest.attempts[-1]
+    candidate_pointers = (
+        candidate_attempt.candidate_project,
+        candidate_attempt.candidate_registry,
+        candidate_attempt.candidate_dependency_graph,
+    )
+
+    activated = committer.activate_video_candidate(attempt_id=attempt_id)
+    reopened = load_production_project(root / "project.yaml")
+    closure = build_source_closure(reopened)
+
+    assert (
+        activated.active_project,
+        activated.active_registry,
+        activated.active_dependency_graph,
+    ) == candidate_pointers
+    assert reopened.manifest == activated
+    assert reopened.dependency_graph == closure.graph
+    assert reopened.manifest.active_dependency_graph is not None
+    assert (
+        reopened.manifest.active_dependency_graph.content_hash
+        == closure.graph.content_hash
+    )
+    target_layer = next(
+        layer
+        for layer in closure.inputs.composition_spec.layers
+        if layer.shot_id == "rainy-station-3"
+    )
+    assert target_layer.asset_id == request.output_asset_id
+
+    effect_counts = (
+        provider.submit_calls,
+        provider.status_calls,
+        provider.fetch_calls,
+    )
+    assert committer.replay_active_video_generation(attempt_id=attempt_id) == activated
+    assert (
+        provider.submit_calls,
+        provider.status_calls,
+        provider.fetch_calls,
+    ) == effect_counts == (1, 1, 1)
