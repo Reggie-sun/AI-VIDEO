@@ -104,6 +104,7 @@ def test_hook_files_register_session_lifecycle_and_apply_patch_tracking() -> Non
         for registrations in config["hooks"].values()
         for registration in registrations
         for hook in registration["hooks"]
+        if "session_record_hook.py" in hook["command"]
     }
     assert len(commands) == 1
     command = commands.pop()

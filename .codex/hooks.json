@@ -25,6 +25,17 @@
             "statusMessage": "Tracking AI-VIDEO session-owned paths"
           }
         ]
+      },
+      {
+        "matcher": "^(Bash|.*[Vv]ideo.*)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env PYTHONPATH=\"/home/reggie/vscode_folder/AI-VIDEO/src\" \"/home/reggie/.local/share/ai-video/video-analysis-mcp/bin/python\" -m ai_video_mcp.analysis_hook post-tool-use",
+            "timeout": 2,
+            "statusMessage": "Queueing generated-video analysis"
+          }
+        ]
       }
     ],
     "PreCompact": [

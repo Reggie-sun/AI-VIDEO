@@ -276,9 +276,11 @@ Shot Continuity现在能把一个activated generated-video candidate的exact ter
 
 ## Development MCP
 
-Project-local MCP configuration exposes `video-analysis` as the default video inspection server for this repository.
+Project-local MCP configuration exposes `video-analysis` as the default video inspection server for this repository. `.mcp.json` registers the same local stdio server for Claude Code, while `.codex/config.toml` registers it for Codex; other MCP-capable Claude-compatible clients, including clients routed to domestic models, can reuse the same command. Model endpoint and credential selection remain client-owned and are not stored in this MCP or its hooks.
 
 If you also have a global `videoscan` MCP installed, treat it as optional helper tooling for metadata lookup or raw frame extraction only. For repo work here, use `video-analysis` for probing, scene detection, frame extraction, transcription, and technical evidence collection. Its legacy optimization helpers remain outside the Production control plane; Production review requires committer-issued durable intent and a one-use analysis permit, and Production repair/final acceptance remain owned by `ProductionStateCommitter`.
+
+Codex `.codex/hooks.json` and Claude Code `.claude/settings.json` both register the same project-local `PostToolUse` queue. It automatically starts a bounded background `video_analyze` pass when a successful structured tool result returns a fresh local MP4 inside this repository, including Claude MCP `content[].text` JSON responses. Relative output paths are resolved from the tool event's cwd; one event queues up to 64 new exact outputs after existing queue identities are skipped, launches them as one detached batch, and serializes media analysis per repository. Queue and advisory result files live under `.git/ai-video-analysis-hook/`; the hook ignores plain-text path mentions, failed/stale/outside/symlink outputs, and `video-analysis` tool results to prevent recursion. Each worker analyzes a private read-only snapshot, revalidates both snapshot and source bytes, and keys cached evidence by the source SHA-256 plus the automatic analysis-profile fingerprint. The automatic profile samples at most four frames, detects scenes, and leaves Whisper transcription to an explicit MCP call. This development convenience never writes Production state or supplies a P6 verdict.
 
 ## Validate Example Files
 
