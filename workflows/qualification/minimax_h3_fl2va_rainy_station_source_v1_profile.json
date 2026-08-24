@@ -16,8 +16,65 @@
   "source_profile_hash": "e06df40e01c25aac2ab4287d57dc861320fdc5e917349b4d3a915e442cbc64ab",
   "source_compiler_hash": "989b04221b7b886a194724461f7ce93967c3518ff78bdba983d6386db1680d20",
   "source_workflow_hash": "8b6c338279d8af768fae8106034f9f26e8e9d59583e95a8ca8b16d36a930ad65",
-  "source_node_schema_status": "unsealed",
-  "source_node_schema_seals": [],
+  "source_node_schema_status": "sealed",
+  "source_node_schema_seals": [
+    {
+      "node_name": "UNETLoader",
+      "schema_sha256": "0803bca8808c9e196cac6a5029c01943786166ec1c643e00389b8bdc1396c8ee"
+    },
+    {
+      "node_name": "CLIPLoader",
+      "schema_sha256": "e9f485efa1b625aed932d738f4bd78e1770f573acbe551c2a800972d92ee1385"
+    },
+    {
+      "node_name": "VAELoader",
+      "schema_sha256": "437f9bf7258fa818125a864fb43fdefa5f1fdc5b80a4f6f318a76bc9d21a9f4e"
+    },
+    {
+      "node_name": "MiniMaxH3ImageToVideo",
+      "schema_sha256": "195f056570e0629062ad01c6a1a5efcabae8462a1ee63f278a4afcb98d89c6c0"
+    },
+    {
+      "node_name": "RandomNoise",
+      "schema_sha256": "41d9d603f14caf9196ebc80c5b5a5f68d4c303341b307a3a1230c461d64eebcc"
+    },
+    {
+      "node_name": "BasicGuider",
+      "schema_sha256": "c561c18f4ab40c62009ced56fce369d4cdcbc5fbc3b8f2e0cbb654b475c0940b"
+    },
+    {
+      "node_name": "KSamplerSelect",
+      "schema_sha256": "c1fa5850e2f75ca74bd92c29a817caf63e12049bf1a8fe49e7dca656a33abfab"
+    },
+    {
+      "node_name": "BasicScheduler",
+      "schema_sha256": "4890f0552783fc47c37a445202b713a47e9c83cb85049fa78310fc3124c23931"
+    },
+    {
+      "node_name": "SamplerCustomAdvanced",
+      "schema_sha256": "261a495a933da3a3ffd113e1f909c0d714a60e4643eac6a057a1c488ffa19716"
+    },
+    {
+      "node_name": "VAEDecode",
+      "schema_sha256": "6a87f3e8b7b30130af981b39248eb9bb84707428707b282a2496b33423b14024"
+    },
+    {
+      "node_name": "VAEDecodeAudio",
+      "schema_sha256": "3080368e30dd0e77d6339b115d7d239d3a226254072f5077f1eac7a121e9d1e2"
+    },
+    {
+      "node_name": "CreateVideo",
+      "schema_sha256": "b4fdcd28df18e20b430f8978dbcd2865a650e0a0d68efc85b2bc4a5425d07f11"
+    },
+    {
+      "node_name": "SaveVideo",
+      "schema_sha256": "8f2f8c8755675c5d0572b6c6c9ab033e85611a0bd7aebfac8f3fab31d74f5f8a"
+    },
+    {
+      "node_name": "LoadImage",
+      "schema_sha256": "ecf1b0bb9558c1a84dea6e1fcf4f9a9d79ac5d09ed557092f1c062abcef4ead6"
+    }
+  ],
   "p0_qualification_receipt_hash": "25145d177de07384bb4594e53023563e809a3f1bdcdb7ff294acd1cff5ae1e91",
   "m0_execution_stack_hash": "8f9661c358162544a3cefd0f7ff4483063658fcb37de09f301ef7fe2500039d2",
   "m0_profile_hash": "9bf6588c04712887b117a8fd3c7496c15b5667b112d8cea750047928ccc36517",
@@ -82,5 +139,5 @@
   "remote_provider_enabled": false,
   "cloud_fallback_enabled": false,
   "retry_enabled": false,
-  "profile_content_hash": "16fb1566c7e333f61ae73c36ab27204ad788ba735e668913be601253bfc46a8c"
+  "profile_content_hash": "0c7bfb22fb5ec660a649366715617bf92b90e4fab2418ac29774192f2ff7fb58"
 }

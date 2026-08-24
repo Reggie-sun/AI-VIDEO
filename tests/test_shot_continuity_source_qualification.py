@@ -29,6 +29,7 @@ from ai_video.production.shot_continuity_source_qualification import (
     derive_source_qualification_seed,
     load_source_qualification_profile,
 )
+from ai_video.production.shot_continuity_source_schema import SOURCE_REQUIRED_NODES
 from ai_video.production.shot_continuity_source_stack import (
     load_shot_continuity_source_execution_sources,
 )
@@ -909,8 +910,28 @@ def test_repository_source_qualification_profile_is_canonical_and_sealed() -> No
     assert profile.cloud_fallback_enabled is False
     assert profile.retry_enabled is False
     assert profile.loopback_endpoint == "http://127.0.0.1:8188"
-    assert profile.source_node_schema_status == "unsealed"
-    assert profile.source_node_schema_seals == ()
+    assert profile.source_node_schema_status == "sealed"
+    assert tuple(
+        item.node_name for item in profile.source_node_schema_seals
+    ) == SOURCE_REQUIRED_NODES
+    assert tuple(
+        item.schema_sha256 for item in profile.source_node_schema_seals
+    ) == (
+        "0803bca8808c9e196cac6a5029c01943786166ec1c643e00389b8bdc1396c8ee",
+        "e9f485efa1b625aed932d738f4bd78e1770f573acbe551c2a800972d92ee1385",
+        "437f9bf7258fa818125a864fb43fdefa5f1fdc5b80a4f6f318a76bc9d21a9f4e",
+        "195f056570e0629062ad01c6a1a5efcabae8462a1ee63f278a4afcb98d89c6c0",
+        "41d9d603f14caf9196ebc80c5b5a5f68d4c303341b307a3a1230c461d64eebcc",
+        "c561c18f4ab40c62009ced56fce369d4cdcbc5fbc3b8f2e0cbb654b475c0940b",
+        "c1fa5850e2f75ca74bd92c29a817caf63e12049bf1a8fe49e7dca656a33abfab",
+        "4890f0552783fc47c37a445202b713a47e9c83cb85049fa78310fc3124c23931",
+        "261a495a933da3a3ffd113e1f909c0d714a60e4643eac6a057a1c488ffa19716",
+        "6a87f3e8b7b30130af981b39248eb9bb84707428707b282a2496b33423b14024",
+        "3080368e30dd0e77d6339b115d7d239d3a226254072f5077f1eac7a121e9d1e2",
+        "b4fdcd28df18e20b430f8978dbcd2865a650e0a0d68efc85b2bc4a5425d07f11",
+        "8f2f8c8755675c5d0572b6c6c9ab033e85611a0bd7aebfac8f3fab31d74f5f8a",
+        "ecf1b0bb9558c1a84dea6e1fcf4f9a9d79ac5d09ed557092f1c062abcef4ead6",
+    )
 
 
 def test_profile_seed_tamper_is_rejected(tmp_path: Path) -> None:
