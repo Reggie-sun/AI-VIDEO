@@ -333,13 +333,10 @@ Provider/media effects：
 - E0-G：一次 unique Local ComfyUI submit，8 个 accepted segments与完整 770-frame Stock20 strict-replication MP4；retry/fallback `0/0`。
 - remote submit、paid effect、Production mutation与activation均为 `0`。
 
-## Human Verdict And Next One Thing
+## Human Verdict And Closure
 
-E0-F 与 E0-G 的 automated / sampled AI visual verdict均为 `PASS`；human full-speed subjective verdict仍为 pending。下一件事只有一项：用户原速完整观看 exact E0-G MP4，并在必要时与 E0-D 并排比较，重点判断：
+E0-F 与 E0-G 的 automated / sampled AI visual verdict均为 `PASS`。2026-08-25，用户在收到 E0-G exact output、motion、stop/hold、seam与audio evidence 后明确回复“通过”；因此 E0-G human full-speed subjective verdict更新为 `PASS`。该回复是本次 development experiment的human verdict evidence；用户没有附加新的 defect或条件。
 
-1. segment 6 最后一步是否自然，而不是突然刹停或滑停；
-2. segment 7 是自然站定还是明显 frozen-image artifact；
-3. `22.1667 s` boundary pulse与其他六个 visual seams是否在播放中可感知；
-4. ambience changes是否暴露分段。
+E0-G seed-only development replication现以 technical、sampled AI visual与human verdict全部 `PASS`关闭。无需再 blind resume/retry E0-E，也不得用 E0-F替代该结论。这仍不执行或授权 Production qualification、P6、Final Acceptance、active capability、canonical reference、Production Manifest/Registry mutation、push或release。
 
-当前技术证据支持 E0-G replication `PASS`，无需再 blind resume/retry E0-E，也不得用 E0-F替代该结论。在 human verdict 与独立 Production gates完成前，不把任何 development result升级为 Production qualification、P6、Final Acceptance、active capability、canonical reference或final delivery。
+Next One Thing：不再生成 development media。若未来要把该结果推进到 Production，必须以新的明确授权进入独立 Production qualification / P6 gate，不能从本记录自动升级。
