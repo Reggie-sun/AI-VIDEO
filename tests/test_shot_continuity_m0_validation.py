@@ -8,6 +8,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import ai_video.production.shot_continuity_m0_qualification as m0_qualification
+import ai_video.production.shot_continuity_source_stack as source_stack_module
+import scripts.materialize_shot_continuity_m0 as materialize_script
 import pytest
 from PIL import Image
 
@@ -288,6 +290,37 @@ def _real_materialized_committer(
     compiler_path.parent.mkdir(parents=True)
     compiler_path.write_bytes(Path(m0_qualification.__file__).read_bytes())
     monkeypatch.setattr(m0_qualification, "__file__", str(compiler_path))
+    source_compiler_path = (
+        artifact_root / "src/ai_video/production/comfy_video.py"
+    )
+    source_compiler_path.parent.mkdir(parents=True, exist_ok=True)
+    source_compiler_path.write_bytes(
+        Path(source_stack_module.comfy_video.__file__).read_bytes()
+    )
+    monkeypatch.setattr(
+        source_stack_module.comfy_video,
+        "__file__",
+        str(source_compiler_path),
+    )
+    source_profile_path = artifact_root / source_stack_module.SOURCE_PROFILE_PATH
+    source_profile = json.loads(
+        (REPO_ROOT / source_stack_module.SOURCE_PROFILE_PATH).read_text(
+            encoding="utf-8"
+        )
+    )
+    source_profile_path.parent.mkdir(parents=True, exist_ok=True)
+    source_profile_path.write_text(
+        json.dumps(source_profile, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
+    for relative in (
+        source_profile["workflow_path"],
+        source_profile["binding_path"],
+    ):
+        copied = artifact_root / relative
+        copied.parent.mkdir(parents=True, exist_ok=True)
+        copied.write_bytes((REPO_ROOT / relative).read_bytes())
+    monkeypatch.setattr(materialize_script, "REPO_ROOT", artifact_root)
     materialize(
         root=root,
         artifact_root=artifact_root,
@@ -399,6 +432,56 @@ def test_m0_materialization_owner_reseals_source_drift_and_replays_exactly(
     ).manifest
     assert replayed == resealed
     assert manifest_after.manifest_revision == manifest_before.manifest_revision + 1
+    assert _tree_snapshot(committer._project_root) == tree_before_replay
+
+
+def test_m0_materialization_owner_reseals_independent_source_compiler_drift(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path,
+        monkeypatch,
+    )
+    before = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    source_before = committer.reopen_p0_qualification_source_stacks(
+        require_materialized=True
+    )[0]
+    source_compiler = Path(source_stack_module.comfy_video.__file__)
+    source_compiler.write_bytes(
+        source_compiler.read_bytes() + b"\n# source compiler reseal\n"
+    )
+
+    resealed = materialize(
+        root=committer._project_root,
+        artifact_root=artifact_root,
+        profile_path=profile_path,
+        attempt_id="test-real-source-reseal-v2",
+    )
+    after = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    source_after = committer.reopen_p0_qualification_source_stacks(
+        require_materialized=True
+    )[0]
+
+    assert source_after.execution_stack_hash != source_before.execution_stack_hash
+    assert after[1] == before[1]
+    assert after[0].content_hash != before[0].content_hash
+    assert after[3].content_hash != before[3].content_hash
+    assert resealed["claims"]["provider_effects"] == 0
+    assert resealed["claims"]["video_generated"] is False
+
+    tree_before_replay = _tree_snapshot(committer._project_root)
+    replayed = materialize(
+        root=committer._project_root,
+        artifact_root=artifact_root,
+        profile_path=profile_path,
+        attempt_id="test-real-source-reseal-replay",
+    )
+    assert replayed == resealed
     assert _tree_snapshot(committer._project_root) == tree_before_replay
 
 

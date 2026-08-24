@@ -11,6 +11,9 @@ from ai_video.errors import AiVideoError
 import ai_video.production.shot_continuity_m0_qualification as m0_qualification
 import ai_video.production.shot_continuity_source_stack as source_stack_module
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.paths import (
+    canonical_execution_stack_materialization_source_path,
+)
 from ai_video.production.shot_continuity_m0_qualification import (
     M0QualificationCompileInputs,
     compile_m0_qualification_workflow,
@@ -104,6 +107,140 @@ def test_source_stack_seals_exact_local_fl2va_quality_sources() -> None:
     )
     validate_shot_continuity_source_stack(sources, sources.initial_stack)
     validate_shot_continuity_source_stack(sources, sources.materialized_stack)
+
+
+def _persist_source_materialization(
+    root: Path,
+    materialization: object,
+) -> None:
+    for kind in ("profile", "compiler", "workflow"):
+        content_hash = getattr(materialization, f"{kind}_hash")
+        path = root / canonical_execution_stack_materialization_source_path(
+            kind,
+            content_hash,
+        )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(getattr(materialization, f"{kind}_bytes"))
+
+
+def test_source_stack_reopens_exact_materialized_sources(tmp_path: Path) -> None:
+    sources = load_shot_continuity_source_execution_sources(
+        artifact_root=REPO_ROOT,
+    )
+    _persist_source_materialization(tmp_path, sources.materialization)
+
+    reopened = source_stack_module.reopen_materialized_shot_continuity_source_execution_sources(
+        project_root=tmp_path,
+        stack=sources.materialized_stack,
+    )
+
+    assert reopened == sources
+
+
+@pytest.mark.parametrize("kind", ("profile", "compiler", "workflow"))
+def test_source_stack_reopen_rejects_materialized_source_tamper(
+    tmp_path: Path,
+    kind: str,
+) -> None:
+    sources = load_shot_continuity_source_execution_sources(
+        artifact_root=REPO_ROOT,
+    )
+    _persist_source_materialization(tmp_path, sources.materialization)
+    path = tmp_path / canonical_execution_stack_materialization_source_path(
+        kind,
+        getattr(sources.materialized_stack, f"{kind}_hash"),
+    )
+    path.write_bytes(path.read_bytes() + b"tamper")
+
+    with pytest.raises(AiVideoError, match=f"{kind}.*hash"):
+        source_stack_module.reopen_materialized_shot_continuity_source_execution_sources(
+            project_root=tmp_path,
+            stack=sources.materialized_stack,
+        )
+
+
+def test_source_stack_reopen_rejects_internally_resealed_semantic_drift(
+    tmp_path: Path,
+) -> None:
+    sources = load_shot_continuity_source_execution_sources(
+        artifact_root=REPO_ROOT,
+    )
+    envelope = json.loads(sources.materialization.profile_bytes)
+    profile = json.loads(
+        source_stack_module.base64.b64decode(envelope["profile_bytes_base64"])
+    )
+    workflow = json.loads(sources.materialization.workflow_bytes)
+    workflow["8"]["inputs"]["sampler_name"] = "euler"
+    workflow_bytes = json.dumps(workflow).encode()
+    profile["workflow_sha256"] = hashlib.sha256(workflow_bytes).hexdigest()
+    profile["profile_content_hash"] = canonical_sha256(
+        {key: value for key, value in profile.items() if key != "profile_content_hash"}
+    )
+    profile_bytes = json.dumps(profile).encode()
+    binding_bytes = source_stack_module.base64.b64decode(
+        envelope["binding_bytes_base64"]
+    )
+    materialization = source_stack_module.ExecutionStackMaterialization.from_bytes(
+        candidate_label="source",
+        profile_bytes=source_stack_module._profile_source_bundle(
+            profile_bytes,
+            binding_bytes,
+        ),
+        compiler_bytes=sources.materialization.compiler_bytes,
+        workflow_bytes=workflow_bytes,
+    )
+    stack = sources.initial_stack.materialize(materialization)
+    _persist_source_materialization(tmp_path, materialization)
+
+    with pytest.raises(AiVideoError, match="bindings|settings"):
+        source_stack_module.reopen_materialized_shot_continuity_source_execution_sources(
+            project_root=tmp_path,
+            stack=stack,
+        )
+
+
+@pytest.mark.parametrize("malformation", ("missing", "non_mapping"))
+def test_source_stack_reopen_normalizes_malformed_workflow_failure(
+    tmp_path: Path,
+    malformation: str,
+) -> None:
+    sources = load_shot_continuity_source_execution_sources(
+        artifact_root=REPO_ROOT,
+    )
+    envelope = json.loads(sources.materialization.profile_bytes)
+    profile = json.loads(
+        source_stack_module.base64.b64decode(envelope["profile_bytes_base64"])
+    )
+    workflow = json.loads(sources.materialization.workflow_bytes)
+    if malformation == "missing":
+        del workflow["1"]["inputs"]
+    else:
+        workflow["1"]["inputs"] = []
+    workflow_bytes = json.dumps(workflow).encode()
+    profile["workflow_sha256"] = hashlib.sha256(workflow_bytes).hexdigest()
+    profile["profile_content_hash"] = canonical_sha256(
+        {key: value for key, value in profile.items() if key != "profile_content_hash"}
+    )
+    materialization = source_stack_module.ExecutionStackMaterialization.from_bytes(
+        candidate_label="source",
+        profile_bytes=source_stack_module._profile_source_bundle(
+            json.dumps(profile).encode(),
+            source_stack_module.base64.b64decode(
+                envelope["binding_bytes_base64"]
+            ),
+        ),
+        compiler_bytes=sources.materialization.compiler_bytes,
+        workflow_bytes=workflow_bytes,
+    )
+    stack = sources.initial_stack.materialize(materialization)
+    _persist_source_materialization(tmp_path, materialization)
+
+    with pytest.raises(AiVideoError, match="semantics") as raised:
+        source_stack_module.reopen_materialized_shot_continuity_source_execution_sources(
+            project_root=tmp_path,
+            stack=stack,
+        )
+    assert raised.value.retryable is False
 
 
 def test_source_stack_rejects_profile_or_identity_drift(tmp_path: Path) -> None:

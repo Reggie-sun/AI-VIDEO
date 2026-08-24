@@ -26,6 +26,7 @@ from ai_video.production.shot_continuity_m0_qualification import (
 )
 from ai_video.production.shot_continuity_source_stack import (
     load_shot_continuity_source_execution_sources,
+    reopen_materialized_shot_continuity_source_execution_sources,
     validate_shot_continuity_source_stack,
 )
 from ai_video.production.state_commit import ProductionStateCommitter
@@ -94,7 +95,13 @@ def materialize(
         raise ValueError("P0 qualification has more than one independent source stack")
     current_source = current_sources[0] if current_sources else None
     if current_source is not None:
-        validate_shot_continuity_source_stack(source_sources, current_source)
+        if current_source.materialization_status == "materialized":
+            reopen_materialized_shot_continuity_source_execution_sources(
+                project_root=project_root,
+                stack=current_source,
+            )
+        else:
+            validate_shot_continuity_source_stack(source_sources, current_source)
     current_m0 = before[1][0]
     if current_m0.materialization_status == "materialized" and (
         _reopen_materialized_m0_seed_roots(project_root, current_m0)
