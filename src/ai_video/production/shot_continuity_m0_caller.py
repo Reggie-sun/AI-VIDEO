@@ -181,8 +181,11 @@ def _validate_request(
             isinstance(request.effective_seed, bool)
             or not isinstance(request.effective_seed, int)
             or request.effective_seed < 0
+            or request.effective_seed != profile.sealed_seed
         ):
-            raise _invalid("M0 qualification requires a sealed non-negative seed.")
+            raise _invalid(
+                "M0 qualification requires the exact content-addressed sealed seed."
+            )
         try:
             M0QualificationCompileInputs(
                 prompt=request.prompt_text,

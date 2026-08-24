@@ -158,7 +158,7 @@ def _resolved_m0_request(sources, stack_hash: str):
             "ambience stays restrained.\n"
             "non_diegetic_music: No non-diegetic music."
         ),
-        effective_seed=20260823,
+        effective_seed=profile.sealed_seed,
         effective_negative_prompt_text="",
         image_bindings=tuple(
             SimpleNamespace(role=role)
@@ -252,6 +252,7 @@ def _real_materialized_committer(
             "prepared_receipt_hash": receipt.content_hash,
         }
     )
+    profile["sealed_seed"] = m0_qualification.derive_m0_qualification_seed(profile)
     artifact_root = tmp_path / "artifacts"
     profile_path = artifact_root / "workflows/qualification/profile.json"
     profile_path.parent.mkdir(parents=True)
@@ -378,6 +379,40 @@ def test_m0_materialization_owner_reseals_source_drift_and_replays_exactly(
     assert _tree_snapshot(committer._project_root) == tree_before_replay
 
 
+@pytest.mark.parametrize(
+    "field",
+    ("initial_execution_stack_hash", "prepared_receipt_hash"),
+)
+def test_m0_materialized_reseal_rejects_seed_root_reselection(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    field: str,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path,
+        monkeypatch,
+    )
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    original_seed = profile["sealed_seed"]
+    profile[field] = "1" * 64
+    profile["sealed_seed"] = m0_qualification.derive_m0_qualification_seed(profile)
+    assert profile["sealed_seed"] != original_seed
+    profile_path.write_text(
+        json.dumps(profile, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
+    tree_before = _tree_snapshot(committer._project_root)
+
+    with pytest.raises(ValueError, match="seed derivation roots"):
+        materialize(
+            root=committer._project_root,
+            artifact_root=artifact_root,
+            profile_path=profile_path,
+            attempt_id=f"test-m0-reseal-{field}-drift",
+        )
+    assert _tree_snapshot(committer._project_root) == tree_before
+
+
 def test_m0_pre_submit_guard_requires_request_to_bind_reopened_stack() -> None:
     sources = m0_qualification.load_m0_qualification_execution_sources(
         profile_path=PROFILE_PATH,
@@ -451,7 +486,7 @@ def test_m0_pre_submit_guard_denies_request_drift_before_effect(
     elif drift == "prompt":
         request.prompt_text += " drift"
     elif drift == "seed":
-        request.effective_seed = None
+        request.effective_seed = sources.profile.sealed_seed + 1
     elif drift == "output":
         request.effective_output.width += 32
     elif drift == "timing_mode":

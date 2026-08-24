@@ -6,6 +6,7 @@ import base64
 import hashlib
 import json
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
@@ -59,6 +60,15 @@ _RUNTIME_FILE_CHOOSERS = {
     "LoadImage": ("image",),
     "VHS_LoadVideo": ("video",),
 }
+_M0_SEED_FIELDS = (
+    "candidate_id",
+    "initial_execution_stack_hash",
+    "m1_execution_stack_hash",
+    "prepared_receipt_hash",
+    "project_content_hash",
+    "registry_content_hash",
+    "prompt_sha256",
+)
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -106,6 +116,10 @@ class M0QualificationProfile(StrictModel):
     project_content_hash: str = Field(pattern=_SHA256)
     registry_content_hash: str = Field(pattern=_SHA256)
     prompt_sha256: str = Field(pattern=_SHA256)
+    seed_derivation: Literal[
+        "content-addressed-m0-closure-sha256-low63-v1"
+    ]
+    sealed_seed: int = Field(strict=True, ge=0, le=(1 << 63) - 1)
     task_type: Literal["Hybrid"]
     components: tuple[M0QualificationComponent, ...] = Field(min_length=4, max_length=4)
     runtime_seals: tuple[RuntimeSeal, ...] = Field(min_length=3, max_length=3)
@@ -149,7 +163,29 @@ class M0QualificationProfile(StrictModel):
             raise ValueError(
                 "M0 node schema seals must cover every required node exactly"
             )
+        if self.sealed_seed != derive_m0_qualification_seed(
+            self.model_dump(mode="python")
+        ):
+            raise ValueError(
+                "M0 sealed seed does not match the content-addressed closure"
+            )
         return self
+
+
+def derive_m0_qualification_seed(values: Mapping[str, object]) -> int:
+    """Derive one stable non-negative seed without inspecting generated media."""
+
+    try:
+        payload = {field: values[field] for field in _M0_SEED_FIELDS}
+    except KeyError as exc:
+        raise ValueError("M0 seed derivation closure is incomplete") from exc
+    digest = canonical_sha256(
+        {
+            "schema": "ai-video-m0-sealed-seed/1",
+            **payload,
+        }
+    )
+    return int(digest[:16], 16) & ((1 << 63) - 1)
 
 
 class M0QualificationBinding(StrictModel):
@@ -301,8 +337,11 @@ def _validate_m0_resolved_request(
             isinstance(request.effective_seed, bool)
             or not isinstance(request.effective_seed, int)
             or request.effective_seed < 0
+            or request.effective_seed != profile.sealed_seed
         ):
-            raise _invalid("M0 resolved request requires one exact non-negative seed.")
+            raise _invalid(
+                "M0 resolved request requires the exact content-addressed sealed seed."
+            )
 
         output = request.effective_output
         if (
@@ -728,6 +767,7 @@ __all__ = [
     "M0QualificationCompileInputs",
     "M0QualificationExecutionSources",
     "M0QualificationProfile",
+    "derive_m0_qualification_seed",
     "M0ValidationPreSubmitGuard",
     "M0ValidationPreflightSnapshot",
     "compile_m0_qualification_workflow",

@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import binascii
 import json
 import sys
 from pathlib import Path
@@ -12,17 +14,53 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
+from ai_video.production.paths import (
+    _read_regular_file_nofollow,
+    canonical_execution_stack_materialization_source_path,
+)
 from ai_video.production.project import load_production_project
 from ai_video.production.shot_continuity_m0_qualification import (
+    M0QualificationProfile,
     load_m0_qualification_execution_sources,
     validate_m0_sources_against_stack,
 )
 from ai_video.production.state_commit import ProductionStateCommitter
+from ai_video.production.video_execution_stack import GenerationExecutionStackIdentity
 
 
 DEFAULT_PROFILE = Path(
     "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_profile.json"
 )
+
+
+def _reopen_materialized_m0_seed_roots(
+    project_root: Path,
+    stack: GenerationExecutionStackIdentity,
+) -> tuple[str, str]:
+    if stack.materialization_status != "materialized" or stack.profile_hash == "none":
+        raise ValueError("M0 seed derivation roots require a materialized stack")
+    source_path = project_root / canonical_execution_stack_materialization_source_path(
+        "profile",
+        stack.profile_hash,
+    )
+    try:
+        snapshot = _read_regular_file_nofollow(
+            source_path,
+            contained_by=project_root,
+        )
+        if snapshot.file_sha256 != stack.profile_hash:
+            raise ValueError("materialized M0 profile source hash does not match")
+        envelope = json.loads(snapshot.data)
+        if not isinstance(envelope, dict) or envelope.get("schema_version") != "1":
+            raise ValueError("materialized M0 profile source envelope is invalid")
+        profile_bytes = base64.b64decode(
+            envelope["profile_bytes_base64"],
+            validate=True,
+        )
+        profile = M0QualificationProfile.model_validate_json(profile_bytes)
+    except (OSError, KeyError, TypeError, ValueError, binascii.Error) as exc:
+        raise ValueError("materialized M0 seed derivation roots could not be reopened") from exc
+    return profile.initial_execution_stack_hash, profile.prepared_receipt_hash
 
 
 def materialize(
@@ -45,6 +83,14 @@ def materialize(
     before_manifest = load_production_project(project_root / "project.yaml").manifest
     before = writer.reopen_p0_qualification_prepared()
     current_m0 = before[1][0]
+    if current_m0.materialization_status == "materialized" and (
+        _reopen_materialized_m0_seed_roots(project_root, current_m0)
+        != (
+            sources.profile.initial_execution_stack_hash,
+            sources.profile.prepared_receipt_hash,
+        )
+    ):
+        raise ValueError("M0 materialized seed derivation roots cannot be replaced")
     validate_m0_sources_against_stack(
         sources,
         current_m0,
@@ -113,6 +159,7 @@ def materialize(
         "m0_profile_hash": stacks[0].profile_hash,
         "m0_compiler_hash": stacks[0].compiler_hash,
         "m0_workflow_hash": stacks[0].workflow_hash,
+        "m0_sealed_seed": profile.sealed_seed,
         "m1_execution_stack_hash": stacks[1].execution_stack_hash,
         "m1_materialization_status": stacks[1].materialization_status,
         "m1_hybrid_artifact": {

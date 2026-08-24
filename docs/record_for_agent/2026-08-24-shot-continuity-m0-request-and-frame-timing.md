@@ -4,10 +4,10 @@ Date: 2026-08-24
 
 ## Purpose
 
-本文记录 Shot Continuity Phase P1 的四个 candidate-neutral checkpoint：M0 request-level
+本文记录 Shot Continuity Phase P1 的五个 candidate-neutral checkpoint：M0 request-level
 pre-submit identity guard、C4对model-native exact frame-count timing的provider-neutral表达、
 live node-schema materialization与execution-stack reseal closure，以及qualification-only caller的
-完整pre-effect denial seam。
+完整pre-effect denial seam与content-addressed M0 seed seal。
 
 本记录不证明 M0 已提交、视频已生成、candidate winner、active capability、P6 verdict、creative PASS、
 Final Acceptance、push或release。
@@ -15,15 +15,21 @@ Final Acceptance、push或release。
 ## Current Runtime Truth
 
 selected rainy-station bundle位于
-`runs/shot-continuity-rainy-station-p0-20260823-v5/production`。Manifest revision `5`现在选择
-M0 stack `dc6917b7d8e810a11e075160b5b6cffacc0028aa5781c6d6103adec5838be293`与receipt
-`0259f88407889d3653c78ce073456e81f3b8f6f519d29acf8e984615f5502515`。profile/compiler/workflow
-hashes分别为`022d84f550f397d51ed511579029298aca86b03db5a8c61ab306f43e825d9dbc`、
-`d0c711475ce2484e2d1dae158ecfcf209bc3cbbcb1f420689da57a6dc1239885`与
+`runs/shot-continuity-rainy-station-p0-20260823-v5/production`。Manifest revision `7`现在选择
+M0 stack `a3711dbfee67be30549ec3d787bd76cd750eb36b5580955ed69368dcdd302230`与receipt
+`d1af93a23feceab1bb88c6988bf14cd768a5ddf12c2514c743ff4eb80645d981`。profile/compiler/workflow
+hashes分别为`87871386bc0481569586eee5d7822d5ba0d204ac1a69e73d714d6ac6926b9956`、
+`04403cfcedfc2032d0a0eb8f7c9aea17492e948a39559851bab9ff84799d4016`与
 `963bd91ad81ca102053deb08b29a7aa8fb6849a6256a78ccbfbc6138d7a855d2`。M1保持原stack
 `4d08741636647fbb29f9cf69a69a2c81d62156cef128f619d26a17b72e94c01b`与
 `materialization_status=unmaterialized`，Hybrid artifact仍显式为`presence=absent` /
 `content_hash=none`。
+
+M0 profile现在将seed seal为`186510892520232452`，derivation contract为
+`content-addressed-m0-closure-sha256-low63-v1`。该值只消费candidate、initial M0/M1、prepared
+receipt、Project、Registry与prompt hashes，不观察generation output或human verdict；profile load会重算并
+拒绝missing/tampered seed，request guard与caller会拒绝任何不同seed。offline reseal后exact replay保持
+Manifest revision `7`与88个project files的size/mtime/SHA-256全量不变，Provider effect count仍为零。
 
 一次明确授权的loopback read-only `GET /object_info`观测到1177个已注册node，并将M0
 workflow所需12个exact node-input schema seals写入M0-owned profile。对runtime file chooser的当前文件
@@ -68,9 +74,12 @@ immutable bytes，并且仍只能消费一个committer-issued permit、执行一
   execution-stack reseal、cross-candidate tamper denial与dependent evidence closure。
 - Commit `76c6d95`：实现candidate-neutral qualification-only caller、zero-effect denial contracts与
   exact Harness policy routing。
+- 本checkpoint：为M0 profile建立content-addressed exact seed owner，并以同一materialization owner
+  reseal current stack与全部dependent P0 evidence；本checkpoint的exact staged Harness与task commit
+  由本轮final delivery报告。
 - 未新增winner-specific Production child、export、family registration、active capability、fallback或第二writer。
 - 未修改frozen prompt、rubric、workflow topology、spec或plan；M0-owned profile仅增加上述12个
-  exact node-input schema seals。
+  exact node-input schema seals，并在本checkpoint增加`seed_derivation`与`sealed_seed`。
 
 implementation前使用一个MiniMax external read-only explorer：Role=`explorer`，Scope=实际M0 Validation V1
 caller与Hybrid workflow reuse boundary，model=`MiniMax-M3`，reasoning=`high`，transport=Claude-compatible，
@@ -94,6 +103,13 @@ reason=`tool_error_loop`结束；parent没有继续扩大command grants或第三
 完成bounded implementation。sanitized automatic capture：
 `/home/reggie/.codex/session-diagnostics/minimax/01a0312f-4ddf-7c23-b3ec-1246f8c90e3c-d7b578c1cdbd9a62.md`。
 
+本checkpoint另使用一个MiniMax external read-only explorer，Role=`explorer`，Scope仅为upstream accepted
+video、terminal/motion-tail与canonical source-stack bootstrap seam，model=`MiniMax-M3`，reasoning=`high`，
+transport=Claude-compatible。首次dispatch因`DONE_WITH_CONCERNS`携带未关闭questions而被runner判为
+`PROTOCOL_ERROR`；一次bounded fresh retry补充现有`C4MotionTailEvidence` context后，runner status=`success` /
+agent status=`DONE_WITH_CONCERNS`。其“current M0仍unmaterialized”结论与runtime evidence冲突而被parent拒绝；
+其余mapping作为只读线索使用。两次均未修改workspace或触发live effect。
+
 caller checkpoint保持candidate-neutral且qualification-only：它消费
 `M0ValidationPreSubmitGuard`与existing `VideoGenerationService` / committer-owned local intent seam，使用
 injected transport、asset resolver与accepted-upstream reopener重开sealed source video及exact four anchors，
@@ -113,8 +129,8 @@ M0 live-schema materialization/reseal exact staged Harness：
 - receipt integrity、artifact、freshness、policy、exact scope、snapshot、cleanup与closure全部为true；
 - Architecture Gate PASS，仅有已存在oversized committer owner的growth warning，没有error或第二writer。
 
-actual rainy-station reseal产生上述revision/hash closure；随后exact replay证明63个files zero-write。
-Provider effect count为`0`，没有video output。
+该checkpoint当时的actual rainy-station reseal与63-file exact replay已被下述seed-seal checkpoint的
+revision `7` / 88-file closure supersede；两个checkpoint的Provider effect count均为`0`，没有video output。
 
 M0 request guard exact staged Harness：
 
@@ -168,23 +184,40 @@ qualification-only caller final verification：
 `tests/test_production_local_video_state.py`。早期v1 policy-audit failure与v3 receipt均已被上述v4 exact
 snapshot supersede。commit与receipt仍仅存在于local repository，没有push、release或publish。
 
+M0 content-addressed seed checkpoint：
+
+- profile load会从pre-generation closure重算`sealed_seed`；compiler、request guard与caller只接受exact
+  `186510892520232452`，different valid non-negative seed也在任何effect前拒绝；
+- 首次native `reviewer_xhigh`发现materialized reseal可替换`initial_execution_stack_hash`或
+  `prepared_receipt_hash`并重算seed，verdict=`reject`；两项RED均真实复现原缺陷；
+- 修复后materialization owner先从current stack的content-addressed immutable profile source重开这两个
+  roots，再允许reseal。两项exploit现均在writer/effect前拒绝，且whole project tree保持exact；同tier
+  scoped re-review verdict=`accept`，无blocking或non-blocking concern；
+- focused seed/materialization/caller tests `75 passed`；policy-routed workflow tests `9 passed`，Shot
+  Continuity P0与adjacent lifecycle tests `165 passed`；`git diff --check`通过；
+- actual rainy-station offline exact replay保持Manifest revision `7`、M0 stack/profile/compiler/workflow与
+  dependent receipt hashes不变，并明确返回`provider_effects=0`、`video_generated=false`；
+- 本checkpoint的exact staged Harness receipt与local task commit由本轮final delivery报告；未push、release
+  或publish。
+
 ## Remaining Gates
 
 selected rainy-station bundle当前仍没有accepted upstream video bytes。P0的terminal frame与motion-tail只是
 `planned_derivation`，run root内没有可用于`reference_video`的exact MP4/MOV，因此不能构造真实四锚点M0
-request。calibration artifact也没有预先固定M0 seed；真实Validation V1开始前必须先形成一个sealed request
-identity，不能在观看结果后选择或修改seed。
+request。M0 seed缺口已由上述profile seal关闭，不再允许观看结果后选择或修改seed。
 
 qualification-only caller与zero-effect executable contracts已经通过policy-closed Harness、native
 `reviewer_xhigh`并commit，但它只证明injected/fake pre-effect seam。尚未执行live input upload、one-use
-local permit、M0 submit、poll、fetch、decoded boundary review或P6/human verdict。当前用户边界仍禁止
-Provider/ComfyUI generation、媒体生成、M0 submit、T8 seed `320001`与六Shot baseline；所有external
-effect count保持零。
+local permit、M0 submit、poll、fetch、decoded boundary review或P6/human verdict。用户已授权在全部前置
+契约关闭后执行bounded local upstream prerequisite与一次M0，但当前technical source-stack、P6、motion-tail
+与reopener gates仍使submit保持为零；remote/paid execution、T8 seed `320001`、六Shot baseline、自动M1、
+winner/active registration与越过exact gates的P6或Final Acceptance claim仍不在授权范围内。
 
-前序live `object_info` evidence缺口已关闭，不再是M0 submit的materialization blocker。但这只证明
-profile的exact node-schema identity，也不证明live request已通过。caller implementation lane已经关闭；
-不得借此提前进入Validation V1。accepted upstream MP4/MOV与sealed M0 seed仍缺失，injected upstream
-reopener也没有live registration，真实submit继续保持blocked与零effect。
+前序live `object_info`与sealed seed evidence缺口均已关闭，不再是M0 submit的materialization blocker。
+但P0当前仍把policy的source stack绑定到M0/M1 destination candidate集合，而M0本身需要四锚点，不能作为
+首个upstream Shot的无锚点bootstrap；直接使用既有H3媒体或其他stack又会违反sealed source lineage。
+在独立materialized source stack、对应generated-video authoring/P6 path、motion-tail materialization与
+concrete read-only upstream reopener进入同一P0 closure前，真实submit继续保持blocked与零effect。
 
 ## Agent Guardrails
 

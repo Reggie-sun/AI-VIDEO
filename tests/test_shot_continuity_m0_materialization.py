@@ -12,6 +12,7 @@ import ai_video.production.shot_continuity_m0_qualification as m0_qualification
 from ai_video.production.shot_continuity_m0_qualification import (
     M0QualificationCompileInputs,
     compile_m0_qualification_workflow,
+    derive_m0_qualification_seed,
     load_m0_qualification_execution_sources,
     validate_m0_sources_against_stack,
 )
@@ -46,9 +47,10 @@ EXPECTED_NODE_SCHEMA_SEALS = (
 
 
 def _inputs(**updates: object) -> M0QualificationCompileInputs:
+    profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
     values = {
         "prompt": FROZEN_PROMPT,
-        "seed": 1234,
+        "seed": profile["sealed_seed"],
         "first_frame": "a1.png",
         "last_frame": "a2.png",
         "reference": "identity.png",
@@ -84,6 +86,21 @@ def test_m0_profile_seals_exact_live_node_schemas() -> None:
         (item.node_name, item.schema_sha256)
         for item in sources.profile.node_schema_seals
     ) == EXPECTED_NODE_SCHEMA_SEALS
+    assert sources.profile.sealed_seed == derive_m0_qualification_seed(
+        sources.profile.model_dump(mode="python")
+    )
+
+
+@pytest.mark.parametrize("mutation", ("missing", "drift"))
+def test_m0_profile_rejects_missing_or_drifted_sealed_seed(mutation: str) -> None:
+    profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
+    if mutation == "missing":
+        profile.pop("sealed_seed")
+    else:
+        profile["sealed_seed"] += 1
+
+    with pytest.raises(ValueError, match="sealed_seed|sealed seed"):
+        m0_qualification.M0QualificationProfile.model_validate(profile)
 
 
 def test_m0_profile_rejects_incomplete_node_schema_seals() -> None:
@@ -177,6 +194,7 @@ def test_m0_sources_are_exact_and_compile_literal_hybrid_stock20() -> None:
     assert workflow["14"]["inputs"]["image"] == "a2.png"
     assert workflow["15"]["inputs"]["image"] == "identity.png"
     assert workflow["16"]["inputs"]["video"] == "motion.mp4"
+    assert workflow["8"]["inputs"]["noise_seed"] == sources.profile.sealed_seed
     assert all(
         node["class_type"] not in {"LoraLoaderBypassModelOnly", "LoraLoader"}
         for node in workflow.values()

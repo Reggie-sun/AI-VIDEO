@@ -366,7 +366,7 @@ def _make_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Case:
         billing_kind=BillingKind.LOCAL_UNMETERED,
         mode=VideoGenerationMode.IMAGE_TO_VIDEO,
         prompt_text=FROZEN_PROMPT,
-        effective_seed=20260824,
+        effective_seed=profile.sealed_seed,
         effective_negative_prompt_text="",
         image_bindings=(
             SimpleNamespace(
@@ -539,7 +539,9 @@ def test_qualification_caller_submits_once_with_exact_four_anchor_order(
         for item in case.transport.uploads
     )
     assert len(case.transport.workflows) == 1
-    assert case.transport.workflows[0]["8"]["inputs"]["noise_seed"] == 20260824
+    assert case.transport.workflows[0]["8"]["inputs"]["noise_seed"] == (
+        case.sources.profile.sealed_seed
+    )
     assert case.transport.object_info_calls == 4
     assert case.committer.intent_writes == 1
     assert case.committer.result_writes == 1
@@ -577,6 +579,7 @@ def test_upload_uses_pre_permit_immutable_validated_bytes(
         "negative_seed",
         "boolean_seed",
         "oversized_seed",
+        "different_valid_seed",
         "schema",
         "transport_identity",
         "stack",
@@ -609,6 +612,8 @@ def test_pre_effect_denials_are_zero_write(
         case.request.effective_seed = True
     elif drift == "oversized_seed":
         case.request.effective_seed = 1 << 63
+    elif drift == "different_valid_seed":
+        case.request.effective_seed += 1
     elif drift == "schema":
         case.transport.object_info = {"schemas": "drifted"}
     elif drift == "transport_identity":
