@@ -51,6 +51,30 @@ trivial test 不应触发检索。
 涉及 production quality、Provider behavior 或 known failure domain 的 task 在完成前
 应再次做 relevant search，避免重复已知错误。
 
+## Project Skill Routing
+
+Project-level routing skill 位于 `.agents/skills/retrieve-ai-video-memory/`。其
+`agents/openai.yaml` 保持 `allow_implicit_invocation: true`，让 Agent 在命中上述
+substantial-task trigger 时加载 routing instructions；它不会在 background 自动运行 RAG。
+
+Skill 先选择一个 scope，再只读取对应的一份 reference：
+
+- `references/experience.md`：经验记录、真实 failure/recovery、Provider/model、continuity、
+  media quality 与 eligible run summaries；
+- `references/superpowers.md`：历史 specs/plans、architecture intent 与 rejected approaches；
+- `references/all.md`：确实需要同时对照 lived experience 与 historical design evidence。
+
+三个 reference 分别拥有 query shape 与 authority interpretation。Skill 不注册 lifecycle
+hook，不进入 Product Runtime，不把 retrieval 结果升级为 implementation、Provider、activation、
+quality acceptance、push 或 release authorization。
+
+该 Skill 由 local commit `db5edc5 feat: add AI-VIDEO memory retrieval skill` 引入。
+`quick_validate.py` 返回 `Skill is valid!`；native `reviewer_xhigh` 最终 verdict 为 `accept`；
+exact staged Harness receipt 位于
+`.agent/harness/runs/20260824T103450748348Z/receipt.json`，documentation/control-plane
+checks 为 `176 passed`，receipt integrity/freshness/snapshot checks 全部通过。没有执行 Project
+RAG search、Provider、媒体或网络操作。
+
 ## Matching Pipeline
 
 1. **Scope selection**：`experience` 与 `superpowers` 使用独立 Chroma collection；
