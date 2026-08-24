@@ -233,6 +233,29 @@ boundary，但没有修改 tracked 或 Production state。当前 `.agent/memory/
 `superpowers=3703`。这是本机 derived cache evidence，不是 committed/runtime/release truth；
 旧 shared cache 已被 per-corpus layout 替换。没有运行 Provider、媒体或网络操作。
 
+## 2026-08-25 Completion And Local Query Evidence
+
+Local commit `ba3c396 feat: make project RAG refresh non-blocking` 完成上述 sharded
+refresh implementation。Exact staged Harness receipt 位于
+`.agent/harness/runs/20260824T155336653635Z/receipt.json`：Agent Memory tests 为
+`96 passed`，Harness tests 为 `183 passed`，Documentation Contract、Policy Audit 与
+Architecture Gate 全部 PASS；`verify-receipt` 的 integrity、freshness、snapshot、scope 与
+closure checks 全部为 true。该 commit 仅存在于 local `main`，未 push 或 release。
+
+提交后进行了一次 local-only 真实调用验证。旧 `.agent/memory/run-summaries` manifest 的
+embedding backend 被精确确认为历史 `fake` identity，因此先移入系统回收站，再由正常
+query path 将 missing `run_summaries` 排入 detached queue；前台在 `0.51s` 返回 exit `3`，
+没有加载模型或等待 build。Worker 随后生成 local
+`intfloat/multilingual-e5-small` shard，measured state 为 `1` document、`7` chunks、
+status `ready`。
+
+下一次真实 `experience` query 在 `3.77s` 返回 exit `0` 和 `8` 个 fragments。由于本轮
+record bytes 已改变，existing experience shard 被准确分类为 `CORPUS_STALE`；所有返回项
+带 `index_freshness=stale`，CLI 只 queue `experience` refresh 后立即结束。该验证没有等待、
+poll 或 retry 后台 refresh；因此它证明 non-blocking last-good path 与 exact-shard queue
+行为，不把尚未复核的新 experience shard 状态描述为 `ready`。本 session 未使用 MiniMax，
+也没有运行 Provider、媒体或网络操作。
+
 ## Guardrails
 
 - `experience` 记录是 advisory experience，不等于 code/runtime truth。
