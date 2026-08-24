@@ -1,0 +1,6 @@
+interface:
+  display_name: "Retrieve AI-VIDEO Memory"
+  short_description: "Retrieve scoped advisory history for AI-VIDEO tasks"
+  default_prompt: "Use $retrieve-ai-video-memory to retrieve relevant AI-VIDEO project experience before substantial work."
+policy:
+  allow_implicit_invocation: true

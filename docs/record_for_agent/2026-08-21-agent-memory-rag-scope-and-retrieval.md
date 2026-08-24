@@ -105,8 +105,10 @@ separation 的自由改写会主动 abstain。语料或 embedding identity 变�
 ## Freshness And Maintenance
 
 Index manifest 绑定 exact corpus digest、chunking configuration、embedding identity、
-collection identity 与 library versions。语料、模型或 collection 不匹配时 search 必须
-fail closed，并提示 explicit rebuild：
+collection identity 与 library versions。主 index 首次缺失、corpus bytes/digest 改变或
+requested scope 尚未 materialize 时，search 会先通过 staging rebuild 自动刷新并替换 derived
+index。schema、embedding、chunking/metric、library identity、corpus authority/collection
+contract 或 partial index 不匹配时仍 fail closed，并提示对 shared main index 做 explicit rebuild：
 
 ```bash
 python -m scripts.agent_memory --scope all build
@@ -114,8 +116,8 @@ python -m scripts.agent_memory --scope all build
 
 Index 位于 `.agent/memory/index/`，是 local derived state，不是 repository runtime
 truth 或 committed evidence。新增或修改 `docs/record_for_agent/` / `docs/superpowers/`
-后，旧 index 会因 source digest mismatch 变 stale；需要在本机显式 rebuild 后才可继续
-检索。本文新增本身也触发该要求。
+后，下一次 search 会自动刷新 corpus-only stale index；不需要仅因文档 bytes 变化手动
+build。Run-summary derived index 也会在 `experience` / `all` search 时按 digest 自动刷新。
 
 ## Guardrails
 
