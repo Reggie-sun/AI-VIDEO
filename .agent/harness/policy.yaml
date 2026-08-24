@@ -173,7 +173,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
   shot_continuity_p0_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_prepare_shot_continuity_p0.py, tests/test_production_p0_qualification.py, tests/test_production_video_transition.py, tests/test_shot_continuity_m0_materialization.py, tests/test_shot_continuity_m0_validation.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_prepare_shot_continuity_p0.py, tests/test_production_p0_qualification.py, tests/test_production_video_transition.py, tests/test_shot_continuity_m0_materialization.py, tests/test_shot_continuity_m0_validation.py, tests/test_shot_continuity_m0_caller.py, tests/test_video_generation.py, tests/test_production_local_video_state.py, -q]
     cwd: .
     description: Verify deterministic Shot Continuity P0 preparation, immutable stack/policy evidence, and fail-closed persistence.
   production_shot_router_tests:
@@ -501,6 +501,7 @@ categories:
       - scripts/materialize_shot_continuity_m0.py
       - scripts/prepare_shot_continuity_p0.py
       - src/ai_video/production/execution_stack_materialization.py
+      - src/ai_video/production/shot_continuity_m0_caller.py
       - src/ai_video/production/shot_continuity_m0_qualification.py
       - src/ai_video/production/video_execution_stack.py
       - src/ai_video/production/video_transition.py
@@ -508,6 +509,7 @@ categories:
       - tests/test_production_p0_qualification.py
       - tests/test_production_video_transition.py
       - tests/test_shot_continuity_m0_materialization.py
+      - tests/test_shot_continuity_m0_caller.py
       - tests/test_shot_continuity_m0_validation.py
       - workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_*
     check_ids:
