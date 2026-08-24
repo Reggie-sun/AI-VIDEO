@@ -77,9 +77,27 @@ Agent 对 12 个按时间排序的代表帧做了直接视觉检查，并使用 
 
 代表帧中 character face、short black bob、mustard-yellow raincoat、black trousers 与 red satchel 保持可辨识稳定；screen-right direction 与 wet platform geometry 连续，没有看到 duplicated person、extra limb、hard cut、teleport、gross pose collapse 或 obvious segment seam。短烟测中的 framing 变化渐进，整体达到继续核查长路线的门槛。
 
-E0-A verdict：`PASS_TO_E0_B`。
+初始 Agent triage 为 `PASS_TO_E0_B`。随后用户直接观看 exact MP4，指出约4秒后画面进入近静止；frame-level复核确认该初始 verdict 过于乐观。修正后的 E0-A 结论为：technical execution `PASS`、motion quality `BORDERLINE`，不得直接进入 E0-B。
 
-这只是 Agent 的粗粒度 experiment triage，不是用户 human GO、P6 verdict、blinded review 或 subjective Final Acceptance。
+124个 decoded frames 的hash均不同，因此不是 repeated-frame export padding。Exact local source mapping确认 `length=124` 直接创建 video latent `T=37`，sampler保持该 temporal shape，VAE直接解码为124帧；不存在先采样107帧再补17帧的路径。Baseline在frames 105–119的 consecutive-frame MAD mean仅为`0.248160`，median optical-flow mean仅为`0.008383`；frames 120–123进一步降至`0.069485`与`0.002880`。这说明最后一个17-frame temporal block虽然被真实采样，但显著收敛到 explicit A3 last-frame anchor。
+
+## Follow-up Single-Variable Prompt A/B
+
+为区分 prompt interaction 与强 endpoint conditioning，2026-08-24执行一次单变量 local prompt A/B。必须先纠正一个事实：baseline exact prompt并不包含“gradually slows down”或“comes to a stop”，而是已经要求“mid-stride with continuing gait and satchel motion”。因此该A/B测试的是普通持续运动指令与显式 anti-freeze指令的差异，而不是删除实际不存在的stop语义。
+
+A/B保持以下内容exact不变：model、seed `6623081611478359059`、A2/A3 bytes、workflow、`1344x768`、124 frames、24 fps、20 steps、`res_multistep/simple`、Turbo off、native audio与H.264 CRF 17。唯一改变是将endpoint-motion句加强为：角色必须持续自然步行并保持可见前进运动直到最后一刻，不得 pause、freeze、hold pose或在final frame前提前settle。新prompt SHA-256为`4cbb034a207964854465c0250975383975a105f6f65ef50c70912f36251920c5`。
+
+唯一A/B submit prompt ID为`e15897e1-de22-4fb6-8198-9b189b3c5023`，terminal status为`success`，wall time `379.80s`。输出：
+
+- path：`/home/reggie/ComfyUI/output/development_experiment/shot_continuity_e0a_prompt_ab_motion_20260824_00001_.mp4`；
+- SHA-256：`163a79d5e697dc44fd7f8fbe3ea99ed4602200c089e218ff7709de07aeb665f0`；
+- `3,408,858` bytes，H.264 `1344x768` yuv420p、24 fps、124 frames、`5.167s`，AAC 32 kHz stereo；
+- isolated metadata：`/home/reggie/ComfyUI/output/development_experiment/shot_continuity_e0a_prompt_ab_motion_20260824_metadata.json`，SHA-256 `57f46163afab853ec517e786ac126281e53024c12150d05cb7810a62aa302ebe`；
+- baseline/A-B tail contact sheet：`/home/reggie/ComfyUI/output/development_experiment/shot_continuity_e0a_prompt_ab_tail_compare_20260824.jpg`，SHA-256 `261d24a821988e86bf67294e258d72de94db80f7c32e713d26118a3eebeccd58`。
+
+结果没有改善。A/B在frames 105–119的 consecutive-frame MAD mean为`0.125685`，median optical-flow mean为`0.004082`；frames 120–123为`0.046602`与`0.001623`，均低于baseline。并排视觉检查同样显示A/B约在frames 100–105快速落到A3，随后保持近静止。结论为`STRONG_LAST_FRAME_ENDPOINT_CONDITIONING_DOMINATES`：更强的prompt语言不足以抵抗当前A3 endpoint conditioning，prompt interaction不是主要解释。
+
+在该A/B前曾按上一条用户指令提交一次141-frame overshoot experiment；用户随后明确改为124-frame clean A/B，因此该prompt在sampler step 4/20时被显式interrupt，terminal status为`execution_interrupted`，没有output。它不是retry、fallback或A/B evidence。本follow-up共发生2次local prompt effect：1次superseded/interrupted、1次A/B success；remote submit、paid effect、fallback与input upload均为0。
 
 ## Why E0-B Was Not Submitted
 
@@ -98,15 +116,17 @@ E0-A verdict：`PASS_TO_E0_B`。
 
 ## Assessment And Next Boundary
 
-新的 empirical evidence 是：current RTX 5090、current ComfyUI/T8/model bytes 与 frozen rainy-station A2/A3 能用 20-step local FL2VA quality route在约6.5分钟内生成一段技术完整、初步视觉稳定且值得继续看的 5.167-second H.264/AAC video。此前“尚无真实视频”的关键未知已被关闭，但证据只覆盖这一个 short FL2VA case。
+新的 empirical evidence 是：current RTX 5090、current ComfyUI/T8/model bytes 与 frozen rainy-station A2/A3 能用20-step local FL2VA quality route稳定完成技术执行，但当前strong A3 last-frame conditioning会吞掉最后约一个17-frame block的可见运动。显式anti-freeze prompt没有改善，反而得到更低的tail motion measurements。此前“能否真实运行”的未知已关闭；“该FL2VA endpoint strategy能否提供可接受的motion tail”仍未关闭。
 
 Production Qualification gates 仍保持 open，包括 exact E0-B stack/reference freeze、M0/M1 qualification、one-use Production permit、lifecycle/replay/recovery、winner selection、P6 与 Final Acceptance。`PASS_TO_E0_B` 不自动关闭任何这些 gates。
 
-Next One Thing：先 materialize 一份不改变 frozen prompt/rubric 的 exact E0-B canonical reference 与 Stock20/Turbo-off `ScenePlusIdentity` 770-frame experiment workflow/profile，再决定是否提交唯一 seed `320001`。在这两项 identity 关闭前不得以当前 short FL2VA output 冒充 long-video route evidence。
+Next One Thing：先将A3替换或重新设计为真正 motion-compatible 的 endpoint，并做一次新的single-variable endpoint A/B；在短片最后一个temporal block恢复可见步态前，不直接进入32-second E0-B。该变化属于新的experiment contract，不得把本次失败A/B自动重跑或改写为Production evidence。
 
 ## Agent Guardrails
 
 - 本输出只能称为 `development_experiment`，不能导入或激活为 Production evidence。
+- 当前E0-A只能称为technical `PASS` / motion-quality `BORDERLINE`；不得沿用初始`PASS_TO_E0_B`描述。
+- explicit anti-freeze prompt没有关闭motion-tail问题；后续优先检查motion-compatible A3，而不是继续堆叠prompt措辞。
 - 任何后续 E0-B submit 必须继续保持 local-only、seed `320001`、`1344x768`、24 fps、770 frames、22-frame context、no retry、no fallback，并先关闭 exact reference/stack identity。
 - 不得因 E0-A 好看而跳过 materialization、permit、lifecycle、replay、recovery、qualification 或 P6。
 - 不得用 E0-A 的 mustard-raincoat frames 偷换 E0-B frozen beige-trench prompt/reference，也不得用 installed Turbo example 代替 frozen Stock20/Turbo-off route。
