@@ -310,3 +310,37 @@ tests。本节只记录 proposed direction，尚未修改 policy、Harness imple
   contract，也没有创建 spec / plan。
 - 本节没有为写记录而追加 pytest、Harness、Provider、ComfyUI、Seedance、媒体、网络或付费
   调用；所有数字均来自已存在的 exact receipt / JUnit evidence 与静态分析。
+
+## P0 Implementation Ownership Checkpoint
+
+用户随后明确要求修改，当前窗口据此把 authorized implementation scope 收敛为 P0：复用现有
+`policy-audit` CLI 形成 always-selected fail-fast check，并为 M0 caller 建立 owner-based
+focused route；P1 shared-state/domain lifecycle 拆分仍不在本轮范围。
+
+实施前的 external read-only explorer 已完整检查 `.agent/harness/policy.yaml`、
+`scripts/agent_harness.py`、`scripts/agent_harness_policy.py`、
+`scripts/agent_harness_audit.py`、`scripts/agent_harness_proof.py`、
+`tests/test_agent_harness.py`、contract matrix 与 M0 caller source/test。它确认现有
+`always_check_ids`、`execution_priority`、stop-on-failure、receipt policy hash 与 exact-snapshot
+freshness recomputation可以原样复用，不需要第二套 Harness executor 或 receipt owner。
+
+该 explorer 的 Role=`explorer`，Scope=Harness P0 granularity mapping，Authority=`read-only`，
+runner=`MiniMax-M3` high，transport=external Claude CLI via MiniMax，最终
+status=`success`、agent status=`DONE_WITH_CONCERNS`；concerns只涉及 priority、audit argv、
+focused-check归属与尚未运行executable timing proof。它没有修改workspace或运行commands/tests。
+sanitized automatic capture：
+`/home/reggie/.codex/session-diagnostics/minimax/01a02ed6-36fe-7923-bc1e-4f1aa6bc6d3d-bf6c74be43a2f389.md`。
+
+在任何写入前，`.agent/harness/policy.yaml` 从clean变为另一工作流已经staged的同文件变更；exact
+staged delta把 `src/ai_video/production/shot_continuity_m0_caller.py` 与
+`tests/test_shot_continuity_m0_caller.py` 加入现有 `shot_continuity_p0` category，并把caller test
+加入现有 `shot_continuity_p0_tests` argv。它与本轮计划新增always-on audit及独立
+`shot_continuity_m0_submit_tests`的目标文件完全重叠。当前没有可观察live writer process，但unknown
+staged changes仍属于真实in-progress work；依照same-file ownership contract，本窗口没有在其上继续
+写入、重排index、stage或commit Harness files。
+
+因此 P0 implementation 当前为genuine ownership blocker，而不是技术设计 blocker。恢复执行必须先由
+用户选择：先让现有M0三文件共同完成并提交后再做Harness P0；将这些staged files及policy ownership
+明确交给当前窗口；或者保留现有M0 route、后续只增加fail-fast audit。此checkpoint没有实施policy、
+tests或matrix修改，没有生成passing Harness receipt，也没有运行额外pytest、Provider、ComfyUI、媒体、
+网络或付费调用。
