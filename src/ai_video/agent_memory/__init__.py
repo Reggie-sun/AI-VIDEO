@@ -1,4 +1,4 @@
-"""Scoped local RAG over experience records and Superpowers plans/specs.
+"""Scoped local RAG over authority-separated AI-VIDEO project knowledge.
 
 This module is a developer / Codex authoring tool, not a Production runtime.
 It performs semantic retrieval over a small Markdown corpus of prior failure
@@ -9,12 +9,13 @@ current code, tests, or runtime truth.
 
 Auto-generated ``runs/<run_id>/SUMMARY.md`` files are picked up into a
 separate derived index via the ``run_summaries`` corpus kind; they never
-piggyback on the main experience/superpowers index.
+piggyback on the main project-docs index.
 """
 
 from ai_video.agent_memory.config import (
     DEFAULT_COLLECTION,
     DEFAULT_CORPUS_ROOT,
+    DEFAULT_DOCS_ROOT,
     DEFAULT_INDEX_PATH,
     DEFAULT_RUNS_INDEX_PATH,
     DEFAULT_RUNS_ROOT,
@@ -42,6 +43,7 @@ from ai_video.agent_memory.retrieval import Hit, format_text, search
 __all__ = [
     # config
     "DEFAULT_CORPUS_ROOT",
+    "DEFAULT_DOCS_ROOT",
     "DEFAULT_SUPERPOWERS_ROOT",
     "DEFAULT_RUNS_ROOT",
     "DEFAULT_INDEX_PATH",

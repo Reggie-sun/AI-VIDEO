@@ -19,6 +19,7 @@ present; the remaining tests intentionally use the deterministic fake backend.
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 import pytest
@@ -30,8 +31,10 @@ import scripts.agent_memory as agent_memory_script
 from ai_video.agent_memory.chunking import chunk_documents
 from ai_video.agent_memory.config import (
     DEFAULT_CORPUS_ROOT,
+    DEFAULT_DOCS_ROOT,
     DEFAULT_INDEX_PATH,
     DEFAULT_MODEL_DIR,
+    DEFAULT_SUPERPOWERS_ROOT,
     DEFAULT_TOP_N,
     HYBRID_CANDIDATE_TOP_K,
     VALID_SCOPES,
@@ -492,7 +495,7 @@ def test_dense_null_probe_matches_query_writing_system() -> None:
     assert select_dense_null_query("recovery contract") == (
         "zzzxqv_nonexistent_74291"
     )
-    assert select_dense_null_query("如何恢复状态") == "无相关项目知识_68243"
+    assert select_dense_null_query("如何恢复状态") == "与输入无关的随机问题_68243"
 
 
 def test_weak_common_lexical_match_does_not_bypass_threshold() -> None:
@@ -538,7 +541,7 @@ def test_weak_common_lexical_match_does_not_bypass_threshold() -> None:
     ("dense_scores", "null_score", "expected_sources"),
     [
         ([0.85, 0.83], 0.86, []),
-        ([0.90, 0.898], 0.84, []),
+        ([0.90, 0.899], 0.84, []),
         ([0.894879, 0.891401], 0.888775, ["docs/first.md"]),
         ([0.90, 0.83], 0.84, ["docs/first.md"]),
     ],
@@ -872,6 +875,51 @@ def scoped_corpora(tmp_path: Path) -> tuple[object, object]:
     )
 
 
+@pytest.fixture
+def project_docs_corpora(tmp_path: Path) -> tuple[Path, tuple[object, object, object]]:
+    CorpusSpec = getattr(corpus_module, "CorpusSpec", None)
+    assert CorpusSpec is not None, "CorpusSpec contract is not implemented"
+    docs_root = tmp_path / "docs"
+    docs_root.mkdir()
+    (docs_root / "agent-primary-contract-matrix.md").write_text(
+        "# Contract Matrix\n\nCurrent single-owner routing.\n",
+        encoding="utf-8",
+    )
+    (docs_root / "v0.2-runtime-baseline.md").write_text(
+        "# Runtime Baseline\n\nCurrent executable runtime evidence.\n",
+        encoding="utf-8",
+    )
+    (docs_root / "v0.2-agentic-production-roadmap.md").write_text(
+        "# Roadmap\n\nFuture dependency gates.\n",
+        encoding="utf-8",
+    )
+    (docs_root / "ignored.html").write_text("not markdown", encoding="utf-8")
+    nested = docs_root / "unclassified"
+    nested.mkdir()
+    (nested / "not-current.md").write_text(
+        "# Nested document\n\nMust not inherit current authority.\n",
+        encoding="utf-8",
+    )
+    research_root = docs_root / "research"
+    research_root.mkdir()
+    (research_root / "provider.md").write_text(
+        "---\nauthority: current_runtime_truth\n---\n"
+        "# Provider Research\n\nExternal provider assessment.\n",
+        encoding="utf-8",
+    )
+    deferred_root = docs_root / "when_to_do"
+    deferred_root.mkdir()
+    (deferred_root / "later.md").write_text(
+        "# Deferred Decision\n\nStart only after the named gate passes.\n",
+        encoding="utf-8",
+    )
+    return docs_root, (
+        CorpusSpec.current_docs(docs_root),
+        CorpusSpec.research(research_root),
+        CorpusSpec.deferred(deferred_root),
+    )
+
+
 def test_scoped_documents_preserve_authority_and_status(scoped_corpora) -> None:
     experience, superpowers = scoped_corpora
     exp_doc = load_documents(experience.root, corpus=experience)[0]
@@ -884,6 +932,99 @@ def test_scoped_documents_preserve_authority_and_status(scoped_corpora) -> None:
     assert spec_doc.metadata["authority"] == "historical_design_plan"
     assert spec_doc.metadata["document_kind"] == "spec"
     assert spec_doc.metadata["status"] == "Superseded"
+
+
+def test_project_docs_are_partitioned_by_path_and_authority(
+    project_docs_corpora,
+) -> None:
+    _, (current_docs, research, deferred) = project_docs_corpora
+
+    current = load_documents(current_docs.root, corpus=current_docs)
+    research_docs = load_documents(research.root, corpus=research)
+    deferred_docs = load_documents(deferred.root, corpus=deferred)
+
+    assert {doc.metadata["document_kind"] for doc in current} == {
+        "contract_matrix",
+        "runtime_baseline",
+        "roadmap",
+    }
+    assert {doc.metadata["authority"] for doc in current} == {
+        "current_project_contract",
+        "current_runtime_baseline",
+        "current_roadmap",
+    }
+    assert all(doc.metadata["corpus_kind"] == "current_docs" for doc in current)
+    assert {doc.metadata["source"] for doc in current} == {
+        str(current_docs.root / "agent-primary-contract-matrix.md"),
+        str(current_docs.root / "v0.2-runtime-baseline.md"),
+        str(current_docs.root / "v0.2-agentic-production-roadmap.md"),
+    }
+    assert research_docs[0].metadata["authority"] == "advisory_research"
+    assert research_docs[0].metadata["document_kind"] == "research_note"
+    assert deferred_docs[0].metadata["authority"] == "deferred_decision_advisory"
+    assert deferred_docs[0].metadata["document_kind"] == "deferred_decision"
+
+
+def test_current_docs_digest_excludes_nested_authority_lanes(
+    project_docs_corpora,
+) -> None:
+    docs_root, (current_docs, _, _) = project_docs_corpora
+    before = index_module.corpus_digest(current_docs.root, current_docs)
+
+    (docs_root / "research" / "second.md").write_text(
+        "# More Research\n\nMust stay outside current docs.\n",
+        encoding="utf-8",
+    )
+    assert index_module.corpus_digest(current_docs.root, current_docs) == before
+
+    (docs_root / "v0.2-runtime-baseline.md").write_text(
+        "# Runtime Baseline\n\nFresh current evidence.\n",
+        encoding="utf-8",
+    )
+    assert index_module.corpus_digest(current_docs.root, current_docs) != before
+
+
+def test_all_scope_uses_stable_five_corpus_quota(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+    fake_embedding,
+    monkeypatch,
+) -> None:
+    _, project_corpora = project_docs_corpora
+    corpora = (*scoped_corpora, *project_corpora)
+    idx = tmp_path / "idx"
+    index_module.build_scoped_index(corpora, idx, fake_embedding)
+    observed: dict[str, int] = {}
+
+    def record_search_collection(**kwargs):
+        observed[kwargs["corpus_kind"]] = kwargs["limit"]
+        return []
+
+    monkeypatch.setattr(
+        retrieval_module,
+        "_search_collection",
+        record_search_collection,
+    )
+
+    assert search(
+        "project decision",
+        top_k=8,
+        scope="all",
+        corpora=corpora,
+        index_path=idx,
+        embedding=fake_embedding,
+    ) == []
+    assert observed == {
+        "experience": 2,
+        "superpowers": 2,
+        "current_docs": 2,
+        "research": 1,
+        "deferred": 1,
+    }
+    manifest = index_module.read_index_manifest(idx)
+    assert manifest.schema_version == 1
+    assert {item.kind for item in manifest.corpora} == set(observed)
 
 
 def test_frontmatter_cannot_override_corpus_authority(tmp_path: Path) -> None:
@@ -1202,9 +1343,10 @@ def test_local_embedding_batches_and_uses_e5_prefixes(monkeypatch, tmp_path) -> 
 
 
 def test_cli_builds_and_searches_all_scopes(
-    scoped_corpora, tmp_path: Path, capsys
+    scoped_corpora, project_docs_corpora, tmp_path: Path, capsys
 ) -> None:
     experience, superpowers = scoped_corpora
+    docs_root, _ = project_docs_corpora
     idx = tmp_path / "idx"
     common = [
         "--embedding",
@@ -1215,6 +1357,8 @@ def test_cli_builds_and_searches_all_scopes(
         str(experience.root),
         "--superpowers-corpus",
         str(superpowers.root),
+        "--docs-root",
+        str(docs_root),
         "--index",
         str(idx),
     ]
@@ -1223,6 +1367,15 @@ def test_cli_builds_and_searches_all_scopes(
     output = capsys.readouterr().out
     assert '"corpus_kind": "experience"' in output
     assert '"corpus_kind": "superpowers"' in output
+    assert {
+        item.kind for item in index_module.read_index_manifest(idx).corpora
+    } == {
+        "experience",
+        "superpowers",
+        "current_docs",
+        "research",
+        "deferred",
+    }
 
 
 def test_cli_experience_search_auto_indexes_run_summaries(
@@ -1360,16 +1513,30 @@ def test_local_multilingual_project_corpus_answerability_calibration(
 ) -> None:
     if not Path(DEFAULT_MODEL_DIR).expanduser().is_dir():
         pytest.skip("local multilingual E5 cache not present on this machine")
-    corpus = corpus_module.CorpusSpec.experience(Path(DEFAULT_CORPUS_ROOT))
+    docs_root = tmp_path / "docs-snapshot"
+    shutil.copytree(Path(DEFAULT_DOCS_ROOT), docs_root)
+    corpora = (
+        corpus_module.CorpusSpec.experience(
+            docs_root
+            / Path(DEFAULT_CORPUS_ROOT).relative_to(DEFAULT_DOCS_ROOT)
+        ),
+        corpus_module.CorpusSpec.superpowers(
+            docs_root
+            / Path(DEFAULT_SUPERPOWERS_ROOT).relative_to(DEFAULT_DOCS_ROOT)
+        ),
+        corpus_module.CorpusSpec.current_docs(docs_root),
+        corpus_module.CorpusSpec.research(docs_root / "research"),
+        corpus_module.CorpusSpec.deferred(docs_root / "when_to_do"),
+    )
     idx = tmp_path / "project-corpus-index"
     embedding = LocalOnnxMiniLMEmbeddings()
-    index_module.build_scoped_index((corpus,), idx, embedding)
+    index_module.build_scoped_index(corpora, idx, embedding)
 
     relevant = search(
         "怎样保持跨镜头角色连续性和首尾帧衔接？",
         top_k=8,
-        scope="experience",
-        corpora=(corpus,),
+        scope="all",
+        corpora=corpora,
         index_path=idx,
         embedding=embedding,
     )
@@ -1387,8 +1554,8 @@ def test_local_multilingual_project_corpus_answerability_calibration(
         assert search(
             noise_query,
             top_k=8,
-            scope="experience",
-            corpora=(corpus,),
+            scope="all",
+            corpora=corpora,
             index_path=idx,
             embedding=embedding,
         ) == []

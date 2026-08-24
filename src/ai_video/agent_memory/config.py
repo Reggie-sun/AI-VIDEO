@@ -6,6 +6,10 @@ from __future__ import annotations
 # Superpowers plans/specs are opt-in because they have a different authority.
 DEFAULT_CORPUS_ROOT: str = "docs/record_for_agent"
 DEFAULT_SUPERPOWERS_ROOT: str = "docs/superpowers"
+# ``all`` additionally covers the remaining project Markdown under ``docs/``
+# through three authority-separated collections.  Current docs are limited to
+# top-level Markdown; research and deferred decisions use their named folders.
+DEFAULT_DOCS_ROOT: str = "docs"
 # Auto-generated runs/<run_id>/SUMMARY.md files live alongside the Legacy
 # runtime. They are indexed into a *separate* derived collection so they
 # never piggyback on the experience corpus or change the main index.
@@ -40,15 +44,15 @@ MINIMUM_RELEVANCE_SCORE: float = 0.7
 HYBRID_CANDIDATE_TOP_K: int = 30
 HYBRID_RRF_K: int = 60
 
-# Dense-only admission is calibrated against a language-matched nonsense
-# query over the same collection. A candidate must clear both the null
+# Dense-only admission is calibrated against a language-matched irrelevant
+# control query over the same collection. A candidate must clear both the null
 # baseline and, when Top-2 exists, the real query's Top-1 separation before
 # its cosine score can satisfy the public relevance gate. These values are
 # calibrated against the checked-in project corpus and pinned local E5 model.
 DENSE_NULL_QUERY_ASCII: str = "zzzxqv_nonexistent_74291"
-DENSE_NULL_QUERY_CJK: str = "无相关项目知识_68243"
+DENSE_NULL_QUERY_CJK: str = "与输入无关的随机问题_68243"
 DENSE_MIN_NULL_EXCESS: float = 0.005
-DENSE_MIN_TOP1_MARGIN: float = 0.003
+DENSE_MIN_TOP1_MARGIN: float = 0.0015
 LEXICAL_MIN_QUERY_COVERAGE: float = 0.3
 
 # Default embedding backend. Choices:

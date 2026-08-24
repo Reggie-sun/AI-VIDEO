@@ -11,10 +11,10 @@ LangChain ``Document`` objects carrying file-level metadata:
 Frontmatter (YAML between leading ``---`` fences) is parsed best-effort and
 merged into metadata when present, but its absence is tolerated.
 
-Auto-generated ``runs/<run_id>/SUMMARY.md`` files are picked up via a
-separate ``run_summaries`` corpus kind that lives next to the existing
-``experience`` and ``superpowers`` corpora.  They never piggyback on the
-main index and never override Production runtime authority.
+Top-level current project docs, advisory research, and deferred decisions use
+separate corpus kinds so expanding retrieval across ``docs/`` never flattens
+their authority into experience or historical design. Auto-generated
+``runs/<run_id>/SUMMARY.md`` files remain in a separate derived index.
 """
 
 from __future__ import annotations
@@ -72,6 +72,33 @@ class CorpusSpec:
         )
 
     @classmethod
+    def current_docs(cls, root: Path) -> "CorpusSpec":
+        return cls(
+            kind="current_docs",
+            root=Path(root),
+            collection_name="agent_memory_current_docs",
+            authority="path_classified_current_project_document",
+        )
+
+    @classmethod
+    def research(cls, root: Path) -> "CorpusSpec":
+        return cls(
+            kind="research",
+            root=Path(root),
+            collection_name="agent_memory_research",
+            authority="advisory_research",
+        )
+
+    @classmethod
+    def deferred(cls, root: Path) -> "CorpusSpec":
+        return cls(
+            kind="deferred",
+            root=Path(root),
+            collection_name="agent_memory_deferred",
+            authority="deferred_decision_advisory",
+        )
+
+    @classmethod
     def run_summaries(cls, root: Path) -> "CorpusSpec":
         """Auto-generated ``runs/<run_id>/SUMMARY.md`` corpus.
 
@@ -94,6 +121,30 @@ def iter_markdown_files(root: Path) -> Iterator[Path]:
         return
     resolved_root = root.resolve()
     for path in sorted(root.rglob("*.md")):
+        if path.is_symlink() or not path.is_file():
+            continue
+        try:
+            path.resolve().relative_to(resolved_root)
+        except ValueError:
+            continue
+        yield path
+
+
+def iter_corpus_markdown_files(corpus: CorpusSpec) -> Iterator[Path]:
+    """Yield only Markdown owned by ``corpus``.
+
+    ``current_docs`` intentionally owns only top-level ``docs/*.md`` files;
+    nested Markdown is classified by the experience, superpowers, research,
+    or deferred corpus rooted at its owning directory.
+    """
+    if corpus.kind != "current_docs":
+        yield from iter_markdown_files(corpus.root)
+        return
+    root = Path(corpus.root)
+    if not root.is_dir():
+        return
+    resolved_root = root.resolve()
+    for path in sorted(root.glob("*.md")):
         if path.is_symlink() or not path.is_file():
             continue
         try:
@@ -155,11 +206,31 @@ def _document_kind(path: Path, corpus_kind: str) -> str:
         return "experience_record"
     if corpus_kind == "run_summaries":
         return "run_summary"
+    if corpus_kind == "current_docs":
+        return {
+            "agent-primary-contract-matrix.md": "contract_matrix",
+            "v0.2-runtime-baseline.md": "runtime_baseline",
+            "v0.2-agentic-production-roadmap.md": "roadmap",
+        }.get(path.name, "project_document")
+    if corpus_kind == "research":
+        return "research_note"
+    if corpus_kind == "deferred":
+        return "deferred_decision"
     if "specs" in path.parts:
         return "spec"
     if "plans" in path.parts:
         return "plan"
     return "design_note"
+
+
+def _document_authority(path: Path, corpus: CorpusSpec) -> str:
+    if corpus.kind != "current_docs":
+        return corpus.authority
+    return {
+        "agent-primary-contract-matrix.md": "current_project_contract",
+        "v0.2-runtime-baseline.md": "current_runtime_baseline",
+        "v0.2-agentic-production-roadmap.md": "current_roadmap",
+    }.get(path.name, "current_project_document_advisory")
 
 
 def parse_run_id(run_id: str) -> tuple[str, int] | None:
@@ -321,7 +392,7 @@ def load_document_snapshot(
     docs: list[Document] = []
     digest = hashlib.sha256()
     resolved_root = root.resolve()
-    for idx, path in enumerate(iter_markdown_files(root)):
+    for idx, path in enumerate(iter_corpus_markdown_files(corpus)):
         payload = path.read_bytes()
         relative = path.resolve().relative_to(resolved_root).as_posix()
         digest.update(relative.encode("utf-8"))
@@ -338,7 +409,7 @@ def load_document_snapshot(
             "status": parse_status(text),
             "doc_index": idx,
             "corpus_kind": corpus.kind,
-            "authority": corpus.authority,
+            "authority": _document_authority(path, corpus),
             "document_kind": _document_kind(path, corpus.kind),
         })
         # Chroma rejects None values in metadata; coerce absent fields to "".

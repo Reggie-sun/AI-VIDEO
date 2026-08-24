@@ -1,4 +1,4 @@
-"""Search interface and result formatting for Agent Experience Memory."""
+"""Search and formatting for authority-separated Agent project knowledge."""
 
 from __future__ import annotations
 
@@ -82,12 +82,69 @@ def _format_excerpt(text: str, max_len: int = 240) -> str:
     return text[:max_len].rstrip() + "..."
 
 
-def _authority_label(corpus_kind: str) -> str:
+def _authority_label(corpus_kind: str, authority: str) -> str:
+    if authority == "current_project_contract":
+        return "authority: current project contract; re-open source before use"
+    if authority == "current_runtime_baseline":
+        return "authority: current runtime baseline; verify freshness"
+    if authority == "current_roadmap":
+        return "authority: current roadmap; not runtime truth"
+    if corpus_kind == "research":
+        return "authority: advisory research; not runtime truth"
+    if corpus_kind == "deferred":
+        return "authority: deferred decision advisory; not current authorization"
+    if corpus_kind == "current_docs":
+        return "authority: current project document advisory; re-open source"
     if corpus_kind == "superpowers":
         return "authority: historical design/plan; not runtime truth"
     if corpus_kind == "run_summaries":
         return "authority: auto-generated run summary advisory (not runtime truth)"
     return "authority: advisory experience"
+
+
+_ALL_SCOPE_ORDER = (
+    "experience",
+    "superpowers",
+    "current_docs",
+    "research",
+    "deferred",
+)
+_ALL_SCOPE_WEIGHTS = {
+    "experience": 2,
+    "superpowers": 2,
+    "current_docs": 2,
+    "research": 1,
+    "deferred": 1,
+}
+
+
+def _allocate_scope_limits(kinds: set[str], top_k: int) -> dict[str, int]:
+    """Allocate stable per-corpus quotas while keeping every corpus visible."""
+    ordered = [kind for kind in _ALL_SCOPE_ORDER if kind in kinds]
+    if not ordered:
+        return {}
+    if len(ordered) == 1:
+        return {ordered[0]: top_k}
+    allocations = {kind: 1 for kind in ordered}
+    remaining = max(0, top_k - len(ordered))
+    if not remaining:
+        return allocations
+    weight_total = sum(_ALL_SCOPE_WEIGHTS[kind] for kind in ordered)
+    raw = {
+        kind: remaining * _ALL_SCOPE_WEIGHTS[kind] / weight_total
+        for kind in ordered
+    }
+    for kind in ordered:
+        extra = int(raw[kind])
+        allocations[kind] += extra
+        remaining -= extra
+    for kind in sorted(
+        ordered,
+        key=lambda item: (raw[item] - int(raw[item]), -ordered.index(item)),
+        reverse=True,
+    )[:remaining]:
+        allocations[kind] += 1
+    return allocations
 
 
 def search(
@@ -123,14 +180,16 @@ def search(
     runs_index_path = Path(
         runs_index_path or ".agent/memory/run-summaries"
     )
-    if scope == "all":
-        requested_kinds = {"experience", "superpowers"}
-    else:
-        requested_kinds = {scope}
+    allowed_kinds = (
+        set(_ALL_SCOPE_ORDER) if scope == "all" else {scope}
+    )
     expected = tuple(corpora or ())
     if not expected and corpus_root is not None:
         expected = (CorpusSpec.experience(Path(corpus_root)),)
-    expected = tuple(item for item in expected if item.kind in requested_kinds)
+    expected = tuple(item for item in expected if item.kind in allowed_kinds)
+    requested_kinds = (
+        {item.kind for item in expected} if expected else allowed_kinds
+    )
     if expected:
         ensure_scoped_index(expected, idx_path, embedding)
 
@@ -188,12 +247,7 @@ def search(
             f"scope(s) {sorted(missing)} not present in index; rebuild required"
         )
 
-    if scope == "all":
-        experience_k = max(1, (top_k + 1) // 2)
-        superpowers_k = max(1, top_k // 2)
-        allocations = {"experience": experience_k, "superpowers": superpowers_k}
-    else:
-        allocations = {scope: top_k}
+    allocations = _allocate_scope_limits(requested_kinds, top_k)
 
     hits: List[Hit] = []
     query_vector = embedding.embed_query(query)
@@ -497,7 +551,7 @@ def format_text(hits: Iterable[Hit]) -> str:
         lines.append(f"   score: {h.score:.4f}")
         if h.admission_lane:
             lines.append(f"   admission_lane: {h.admission_lane}")
-        lines.append(f"   {_authority_label(h.corpus_kind)}")
+        lines.append(f"   {_authority_label(h.corpus_kind, h.authority)}")
         if h.status:
             lines.append(f"   document status: {h.status}")
         if h.corpus_kind == "run_summaries":

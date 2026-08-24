@@ -14,10 +14,20 @@ contracts。
 
 ## Current Implementation
 
-`285757a feat: add scoped multilingual agent memory retrieval` 引入 named corpora：
+`285757a feat: add scoped multilingual agent memory retrieval` 引入 named corpora；
+当前实现把 `docs/` 的有效 Markdown 扩展为五个 main-index corpora：
 
 - `experience`：`docs/record_for_agent/`，authority 为 `advisory_experience`；
-- `superpowers`：`docs/superpowers/`，authority 为 `historical_design_plan`。
+- `superpowers`：`docs/superpowers/`，authority 为 `historical_design_plan`；
+- `current_docs`：仅 top-level `docs/*.md`，按 exact path 标记 current contract、
+  runtime baseline、roadmap 或 generic current-project advisory；
+- `research`：`docs/research/`，authority 为 `advisory_research`；
+- `deferred`：`docs/when_to_do/`，authority 为
+  `deferred_decision_advisory`。
+
+这样覆盖了 `docs/` 下全部 Markdown，同时避免 nested corpus 重复摄入。HTML、TXT
+与其他非 Markdown 文件不会进入索引。Auto-generated run summaries 继续使用独立
+derived index 和独立 authority。
 
 默认 scope 是 `experience`。`superpowers` 的命中必须显示其 historical
 design/plan 身份，不能被当成 current runtime truth、implementation authorization
@@ -62,7 +72,8 @@ Skill 先选择一个 scope，再只读取对应的一份 reference：
 - `references/experience.md`：经验记录、真实 failure/recovery、Provider/model、continuity、
   media quality 与 eligible run summaries；
 - `references/superpowers.md`：历史 specs/plans、architecture intent 与 rejected approaches；
-- `references/all.md`：确实需要同时对照 lived experience 与 historical design evidence。
+- `references/all.md`：需要跨 current docs、experience、historical design、research
+  或 deferred decision evidence。
 
 三个 reference 分别拥有 query shape 与 authority interpretation。Skill 不注册 lifecycle
 hook，不进入 Product Runtime，不把 retrieval 结果升级为 implementation、Provider、activation、
@@ -77,8 +88,10 @@ RAG search、Provider、媒体或网络操作。
 
 ## Matching Pipeline
 
-1. **Scope selection**：`experience` 与 `superpowers` 使用独立 Chroma collection；
-   `all` 会先为两个 corpus 分配近似均分的 result quota（默认 `top_n=8` 时为 4/4）。
+1. **Scope selection**：五个 main corpora 使用独立 Chroma collection；narrow
+   `experience` 与 `superpowers` 行为保持不变。`all` 在默认 `top_n=8` 时按
+   `2/2/2/1/1` 为 experience、superpowers、current_docs、research、deferred
+   分配 quota。
 2. **Document chunking**：Markdown 先按 `#`、`##`、`###` 标题切分；过长 section
    再按约 800 characters 切分，80 characters overlap。每个 chunk 保留 source、title、
    heading path、status、corpus kind 与 authority metadata。
@@ -97,14 +110,16 @@ RAG search、Provider、媒体或网络操作。
 6. **Lane-aware answerability**：lexical lane 将 raw BM25 通过固定函数
    `1 - exp(-BM25 / 0.2)` 映射，并要求 exact token/bigram 覆盖至少 30% query terms；
    relevance 达到 `0.7` 后才可独立放行，单个偶然中文 bigram 不足以通过。Dense lane
-   针对同一 collection 运行与 query writing system 匹配的固定 nonsense probe；candidate 必须同时满足
+   针对同一 collection 运行与 query writing system 匹配的固定 irrelevant control query；candidate 必须同时满足
    `dense_score >= 0.7`、相对 null Top-1 的 excess `>= 0.005`，且真实 query 的
-   Top-1/Top-2 margin `>= 0.003`。只有一个 candidate 时没有可定义的 Top-2 margin，
+   Top-1/Top-2 margin `>= 0.0015`。CJK null probe 使用语法自然但明确与输入无关、且不含
+   项目 domain 词的固定 control query；罕见乱码会把 baseline 人为压低，使自然中文离题句虚假通过。
+   只有一个 candidate 时没有可定义的 Top-2 margin，
    因而仅使用 score 与 null excess fail-closed 判定。最终 `score` 只取已放行 lane 的 score，标记为
    `lexical`、`dense` 或 `hybrid`；两条 lane 都不通过时返回空。该 gate 不会把 dense
    cosine 的整体高分误当 answerability，也不会把 lexical 第一名自动归一化为 1。
-7. **Merge**：先在各 corpus quota 内按 `fusion_score` 排序，再合并 experience、
-   superpowers 与可选 run-summary hits，按 fusion、relevance 与 lane score 稳定排序并截取
+7. **Merge**：先在各 corpus quota 内按 `fusion_score` 排序，再合并五个 main
+   corpora 与可选 run-summary hits，按 fusion、relevance 与 lane score 稳定排序并截取
    Agent-facing `top_n`（默认 8）；quota 保证不同 scope 都有召回机会，但不保证 final
    result 严格交替。现有 CLI `--top-k` 保留为 `top_n` 的兼容覆盖参数。
 
@@ -125,6 +140,11 @@ Hybrid retrieval 改善了 exact symbol、path、commit 与 error-code 的召回
 跨语料可比较的 calibrated confidence。Dense null probes 与 margin 是基于当前真实 E5
 语料分布的 precision-first conservative heuristic；缺少 lexical anchor 且没有清晰 dense
 separation 的自由改写会主动 abstain。语料或 embedding identity 变化后仍需重新实测。
+五 corpus 扩展后的真实 local E5 实测中，experience continuity 正例为 null excess
+`0.014398`、Top-1 margin `0.001826`；同一中文离题句在 experience、superpowers、
+current_docs、research、deferred 的 null excess 分别为 `-0.003528`、`0.001106`、
+`-0.007325`、`0.000066`、`-0.002329`，全部低于 `0.005`。因此五个 collection 均拒答，
+同时正例保留 dense admission。
 
 ## Freshness And Maintenance
 
@@ -139,14 +159,18 @@ python -m scripts.agent_memory --scope all build
 ```
 
 Index 位于 `.agent/memory/index/`，是 local derived state，不是 repository runtime
-truth 或 committed evidence。新增或修改 `docs/record_for_agent/` / `docs/superpowers/`
-后，下一次 search 会自动刷新 corpus-only stale index；不需要仅因文档 bytes 变化手动
+truth 或 committed evidence。新增或修改五个 corpus 拥有的 Markdown 后，下一次
+对应 scope search 会自动刷新 corpus-only stale index；不需要仅因文档 bytes 变化手动
 build。Run-summary derived index 也会在 `experience` / `all` search 时按 digest 自动刷新。
 
 ## Guardrails
 
 - `experience` 记录是 advisory experience，不等于 code/runtime truth。
 - `superpowers` 记录是 historical design/plan，不等于 accepted current contract。
+- `current_docs` 命中必须 reopen exact source；baseline 与 roadmap 的 freshness/authority
+  仍不同，RAG score 不得提升它们的权威。
+- `research` 是 advisory evidence，`deferred` 是 conditional timing guidance；两者都不
+  构成当前 implementation 或 execution authorization。
 - score 高不等于事实已验证；使用命中前必须回到当前 code、tests、runtime evidence 与
   canonical docs。
 - index build/search 不读取 Provider secret、不调用 remote Provider、不改变

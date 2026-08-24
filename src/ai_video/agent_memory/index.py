@@ -132,7 +132,7 @@ def _build_staging_index(
         if corpus.kind == "run_summaries":
             current = run_summary_digest(corpus.root)
         else:
-            current = corpus_digest(corpus.root)
+            current = corpus_digest(corpus.root, corpus)
         if current != corpus_identities[corpus.kind]:
             raise IndexMismatchError(
                 f"corpus {corpus.kind!r} changed during index build; retry required"

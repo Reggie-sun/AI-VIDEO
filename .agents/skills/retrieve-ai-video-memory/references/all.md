@@ -1,13 +1,16 @@
 # All Scope
 
-Use `all` only when one decision genuinely needs both lived project experience
-and historical architecture/spec/plan evidence. If either source family alone
+Use `all` when one decision genuinely needs cross-category project evidence.
+It covers all project Markdown under `docs/` through authority-separated
+collections: top-level current docs, experience records, Superpowers history,
+research, and deferred when-to-do decisions. If experience or Superpowers alone
 answers the question, select its narrower scope instead.
 
-At the default Agent-facing Top-N of 8, retrieval allocates an approximate 4/4
-quota between `experience` and `superpowers` before the final merge. Eligible
-run summaries participate through the experience side. The quota preserves
-visibility; it does not make the two authority classes equivalent.
+At the default Agent-facing Top-N of 8, the five main collections receive a
+stable `2/2/2/1/1` quota for `experience`, `superpowers`, `current_docs`,
+`research`, and `deferred` before the final merge. Eligible run summaries are
+queried through their separate index. The quota preserves visibility; it does
+not make the authority classes equivalent.
 
 ## Query Shape
 
@@ -32,10 +35,14 @@ python -m scripts.agent_memory --scope all search \
 
 ## Interpretation
 
-- Group the result mentally by `authority` and `corpus_kind` before drawing a
+- Group the result by `authority` and `corpus_kind` before drawing a
   conclusion. Do not flatten experience and historical plans into one truth.
+- Use current contract and runtime-baseline hits only after reopening the exact
+  source and checking freshness; roadmap hits describe direction, not runtime.
 - Use experience hits to understand observed outcomes and failure history.
 - Use superpowers hits to understand historical intent and tradeoffs.
+- Use research as advisory external evidence and deferred hits as conditional
+  timing guidance, never as current execution authorization.
 - Reopen important sources, then reconcile both groups against current code,
   tests, contracts, receipts, and runtime evidence.
 - If the two groups disagree, preserve the disagreement explicitly; do not let

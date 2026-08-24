@@ -43,10 +43,19 @@ Requirements:
 
 这里的 `agent_memory` 是历史 CLI/module 名；它是独立于 Codex host memory 和
 Production runtime 的本地 advisory project RAG。索引只是可删除、可重建的 derived
-cache，不保存 canonical project state。默认
-`experience` scope 检索 `docs/record_for_agent/`，并自动合并 eligible run
-summaries；`superpowers` scope 只检索 `docs/superpowers/` 中的历史
-specs/plans。所有结果都不得当作当前 runtime truth。
+cache，不保存 canonical project state。默认 `experience` scope 检索
+`docs/record_for_agent/`，并自动合并 eligible run summaries；`superpowers`
+scope 只检索 `docs/superpowers/` 中的历史 specs/plans；`all` 额外检索
+top-level `docs/*.md`、`docs/research/` 与 `docs/when_to_do/`。因此 `docs/`
+下的有效 Markdown 都可检索，但不会被压成同一种 authority；HTML、纯文本与
+其他非 Markdown 文件不会进入 corpus。
+
+`all` 的五个 main-index corpus 分别是 `experience`、`superpowers`、
+`current_docs`、`research` 与 `deferred`。Current docs 会进一步按路径标记
+`current_project_contract`、`current_runtime_baseline`、`current_roadmap` 或
+generic current-project advisory；research 与 when-to-do 则分别保持
+`advisory_research` 与 `deferred_decision_advisory`。这些标签帮助 Agent 解读
+命中，但结果仍必须回到 exact source、current code/tests 与 runtime evidence 核验。
 
 `runs/<run_id>/SUMMARY.md`（auto-generated run summaries）通过独立的 derived
 index `.agent/memory/run-summaries`（collection `agent_memory_run_summaries`，
@@ -106,6 +115,9 @@ authority/collection contract 或不完整 index 不匹配时仍 fail closed，�
 rebuild，避免把环境或契约漂移误判为普通文档更新。Run-summary derived index 使用
 相同 identity 校验，并继续在 missing/stale 时由 `experience` / `all` search 自动重建。
 两个 index 都保持 schema v1，且 collection、authority 与 index 目录相互独立。
+`all` 在默认 `top_n=8` 时为五个 main corpora 分配稳定的 `2/2/2/1/1`
+candidate quota，再与 eligible run-summary hits 统一排序并截取最终 8 个片段；
+每个 collection 的 dense 与 lexical candidate `top_k` 仍为 30。
 
 ## Architecture Gate
 

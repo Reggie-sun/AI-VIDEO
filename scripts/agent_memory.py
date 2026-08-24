@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CLI entry: build / search Agent Experience Memory.
+"""CLI entry: build / search authority-separated Agent project knowledge.
 
 This is a developer / Codex authoring tool, not a Production runtime.
 Retrieved records are advisory evidence only and never override
@@ -35,6 +35,7 @@ for _path in (str(_REPO_ROOT), str(_SRC_DIR)):
 
 from ai_video.agent_memory.config import (
     DEFAULT_CORPUS_ROOT,
+    DEFAULT_DOCS_ROOT,
     DEFAULT_EMBEDDING,
     DEFAULT_EMBED_BATCH_SIZE,
     DEFAULT_INDEX_PATH,
@@ -80,6 +81,15 @@ def _resolve_corpora(args: argparse.Namespace) -> tuple[CorpusSpec, ...]:
         corpora.append(CorpusSpec.experience(_resolve(args.corpus)))
     if args.scope in {"superpowers", "all"}:
         corpora.append(CorpusSpec.superpowers(_resolve(args.superpowers_corpus)))
+    if args.scope == "all":
+        docs_root = _resolve(args.docs_root)
+        corpora.extend(
+            (
+                CorpusSpec.current_docs(docs_root),
+                CorpusSpec.research(docs_root / "research"),
+                CorpusSpec.deferred(docs_root / "when_to_do"),
+            )
+        )
     return tuple(corpora)
 
 
@@ -144,9 +154,9 @@ def main(argv: list[str] | None = None) -> int:
         prog="agent_memory",
         description=(
             "Agent project knowledge: scoped local RAG over experience records, "
-            "Superpowers plans/specs, and auto-generated runs/<run_id>/SUMMARY.md "
-            "summaries. Advisory evidence only; never overrides current code, "
-            "tests, or runtime truth."
+            "current project docs, advisory research, deferred decisions, "
+            "experience records, Superpowers plans/specs, and auto-generated "
+            "runs/<run_id>/SUMMARY.md summaries. Authority is preserved per hit."
         ),
     )
     parser.add_argument(
@@ -158,6 +168,14 @@ def main(argv: list[str] | None = None) -> int:
         "--superpowers-corpus",
         default=DEFAULT_SUPERPOWERS_ROOT,
         help="Path to the Superpowers plans/specs corpus (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--docs-root",
+        default=DEFAULT_DOCS_ROOT,
+        help=(
+            "Path to docs/ for all-scope current, research, and deferred "
+            "collections (default: %(default)s)."
+        ),
     )
     parser.add_argument(
         "--runs-root",

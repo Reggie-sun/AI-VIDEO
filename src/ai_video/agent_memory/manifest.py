@@ -11,7 +11,7 @@ from typing import Iterable, Mapping, Sequence
 
 from ai_video.agent_memory.corpus import (
     CorpusSpec,
-    iter_markdown_files,
+    iter_corpus_markdown_files,
     load_run_summary_documents,
 )
 from ai_video.agent_memory.embeddings import EmbeddingIdentity, embedding_identity
@@ -57,9 +57,13 @@ def _display_root(root: Path) -> str:
     return str(root.resolve())
 
 
-def corpus_digest(root: Path) -> tuple[str, int]:
+def corpus_digest(
+    root: Path,
+    corpus: CorpusSpec | None = None,
+) -> tuple[str, int]:
     digest = hashlib.sha256()
-    paths = list(iter_markdown_files(root))
+    corpus = corpus or CorpusSpec.experience(root)
+    paths = list(iter_corpus_markdown_files(corpus))
     resolved_root = root.resolve()
     for path in paths:
         relative = path.resolve().relative_to(resolved_root).as_posix()
@@ -114,7 +118,10 @@ def create_manifest(
             if corpus.kind == "run_summaries":
                 source_sha256, document_count = run_summary_digest(corpus.root)
             else:
-                source_sha256, document_count = corpus_digest(corpus.root)
+                source_sha256, document_count = corpus_digest(
+                    corpus.root,
+                    corpus,
+                )
         else:
             source_sha256, document_count = corpus_identities[corpus.kind]
         corpus_items.append(
@@ -203,7 +210,7 @@ def validate_manifest(
         if corpus.kind == "run_summaries":
             digest, document_count = run_summary_digest(corpus.root)
         else:
-            digest, document_count = corpus_digest(corpus.root)
+            digest, document_count = corpus_digest(corpus.root, corpus)
         if (
             item.source_sha256 != digest
             or item.document_count != document_count
