@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Any
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import (
+    Field,
+    SerializerFunctionWrapHandler,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.production._immutable_models import ImmutableDict
 from ai_video.production.artifact_contracts import StrictModel
@@ -19,6 +26,14 @@ def _deep_immutable_json(value: object) -> object:
     if isinstance(value, list | tuple):
         return tuple(_deep_immutable_json(item) for item in value)
     return value
+
+
+class QaLayer(str, Enum):
+    TECHNICAL = "technical"
+    LAYOUT = "layout"
+    STRATEGY = "strategy"
+    SEMANTIC = "semantic"
+    FINAL_ACCEPTANCE = "final_acceptance"
 
 
 class DomainAcceptancePolicy(StrictModel):
@@ -62,3 +77,28 @@ class DomainAcceptancePolicy(StrictModel):
         if tuple(self.profile_payload.get("required_requirement_ids", ())) != requirement_ids:
             raise ValueError("Domain acceptance requirement coverage does not match profile")
         return self
+
+
+class DomainAcceptanceQaPolicyMixin:
+    """Pydantic mixin that keeps the generic QA model domain-neutral."""
+
+    domain_acceptance: DomainAcceptancePolicy | None = None
+
+    @model_validator(mode="after")
+    def _validate_domain_acceptance_policy(self):
+        if self.domain_acceptance is None:
+            return self
+        if self.semantic_requirement != "required":
+            raise ValueError("Domain acceptance requires semantic QA")
+        if QaLayer.SEMANTIC not in self.required_layers:
+            raise ValueError("Domain acceptance requires the semantic layer")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_domain_acceptance(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.domain_acceptance is None:
+            data.pop("domain_acceptance", None)
+        return data

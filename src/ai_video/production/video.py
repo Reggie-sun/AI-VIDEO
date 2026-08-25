@@ -6,21 +6,27 @@ import re
 import unicodedata
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
 from typing import BinaryIO, Iterable, Literal, Protocol
 from urllib.parse import urlsplit
 
 from pydantic import (
     ConfigDict,
     Field,
-    SerializerFunctionWrapHandler,
     field_validator,
-    model_serializer,
     model_validator,
 )
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.commercial_video_contracts import (
+    CommercialVideoBindingMixin,
+    GeneratedCommercialShotBinding as GeneratedCommercialShotBinding,
+)
+from ai_video.production.video_request_models import (
+    ProviderProfilePointer as ProviderProfilePointer,
+    VideoImageReferenceBinding as VideoImageReferenceBinding,
+    VideoOutputRequirement as VideoOutputRequirement,
+)
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
@@ -63,7 +69,6 @@ from ai_video.production.video_contracts import (
 
 _SAFE_ID = re.compile(r"^[A-Za-z0-9._:/-]{1,256}$")
 _SHA256 = r"^[0-9a-f]{64}$"
-_MIME_TYPE = r"^[A-Za-z0-9.+-]+/[A-Za-z0-9.+-]+$"
 _ROLE_ORDER = {"first_frame": 0, "last_frame": 1, "reference": 2}
 _MEDIA_ROLE_ORDER = {"reference_video": 0, "reference_audio": 1}
 
@@ -157,112 +162,7 @@ class VideoTaskState(str, Enum):
     FAILED = "failed"
 
 
-class VideoOutputRequirement(_VideoStrictModel):
-    duration_seconds: int = Field(strict=True, gt=0, le=600)
-    width: int = Field(strict=True, gt=0, le=16384)
-    height: int = Field(strict=True, gt=0, le=16384)
-    fps: int | None = Field(default=None, strict=True, gt=0, le=240)
-    container: Literal["mp4"]
-    mime_type: Literal["video/mp4"]
-    native_audio: bool
-
-
-class VideoImageReferenceBinding(_VideoStrictModel):
-    role: Literal["first_frame", "last_frame", "reference"]
-    asset_id: str = Field(pattern=_SAFE_ID.pattern)
-    asset_sha256: str = Field(pattern=_SHA256)
-    mime_type: str = Field(pattern=_MIME_TYPE)
-    width: int = Field(strict=True, gt=0)
-    height: int = Field(strict=True, gt=0)
-    size_bytes: int | None = Field(default=None, strict=True, ge=0)
-
-
-class ProviderProfilePointer(_VideoStrictModel):
-    profile_id: str = Field(pattern=_SAFE_ID.pattern)
-    profile_version: str = Field(pattern=_SAFE_ID.pattern)
-    profile_path: Path
-    profile_sha256: str = Field(pattern=_SHA256)
-
-    @model_validator(mode="after")
-    def _canonical_path(self) -> "ProviderProfilePointer":
-        if (
-            self.profile_path.is_absolute()
-            or ".." in self.profile_path.parts
-            or self.profile_path
-            != Path(f"provider-profiles/{self.profile_sha256}.json")
-        ):
-            raise ValueError("provider profile path must be canonical and content-addressed")
-        return self
-
-
-class GeneratedCommercialShotBinding(_VideoStrictModel):
-    """Pre-resolve commercial identities sealed into one generated Shot request."""
-
-    schema_version: Literal["generated-commercial-shot-binding/1"] = (
-        "generated-commercial-shot-binding/1"
-    )
-    ad_creative_plan_id: str = Field(pattern=_SAFE_ID.pattern)
-    ad_creative_plan_hash: str = Field(pattern=_SHA256)
-    commercial_execution_projection_hash: str = Field(pattern=_SHA256)
-    target_shot_id: str = Field(pattern=_SAFE_ID.pattern)
-    profile_content_hash: str = Field(pattern=_SHA256)
-    applicable_requirement_ids: tuple[str, ...] = Field(min_length=1)
-    product_truth_hashes: tuple[str, ...] = ()
-    product_reference_hashes: tuple[str, ...] = ()
-    source_approval_hashes: tuple[str, ...] = ()
-    expected_actor_ids: tuple[str, ...] = Field(min_length=1)
-    output_asset_id: str = Field(pattern=_SAFE_ID.pattern)
-    content_hash: str = Field(pattern=_SHA256)
-
-    @field_validator(
-        "product_truth_hashes",
-        "product_reference_hashes",
-        "source_approval_hashes",
-    )
-    @classmethod
-    def _canonical_hashes(cls, value: tuple[str, ...]) -> tuple[str, ...]:
-        if any(re.fullmatch(_SHA256, item) is None for item in value):
-            raise ValueError("Commercial binding hashes must be lowercase SHA-256")
-        if value != tuple(sorted(set(value))):
-            raise ValueError("Commercial binding hashes must be unique and ordered")
-        return value
-
-    @model_validator(mode="after")
-    def _validate_binding(self) -> "GeneratedCommercialShotBinding":
-        if (
-            len(set(self.applicable_requirement_ids))
-            != len(self.applicable_requirement_ids)
-            or any(not item.startswith("shot.") for item in self.applicable_requirement_ids)
-        ):
-            raise ValueError("Commercial binding requirement IDs must be unique Shot IDs")
-        if len(set(self.expected_actor_ids)) != len(self.expected_actor_ids):
-            raise ValueError("Commercial binding actor IDs must be unique")
-        has_product_requirement = any(
-            item.startswith("shot.product.")
-            for item in self.applicable_requirement_ids
-        )
-        if has_product_requirement and not (
-            self.product_truth_hashes and self.product_reference_hashes
-        ):
-            raise ValueError("Commercial product binding requires exact product truth")
-        if (
-            "shot.product.interaction" in self.applicable_requirement_ids
-            and not self.source_approval_hashes
-        ):
-            raise ValueError("Commercial product interaction requires source approval")
-        if self.content_hash != canonical_sha256(self):
-            raise ValueError("Commercial binding content hash is invalid")
-        return self
-
-    @classmethod
-    def create(cls, **values: object) -> "GeneratedCommercialShotBinding":
-        provisional = cls.model_construct(**values, content_hash="0" * 64)
-        return cls.model_validate(
-            {**values, "content_hash": canonical_sha256(provisional)}
-        )
-
-
-class VideoGenerationRequest(_VideoStrictModel):
+class VideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictModel):
     generation_id: str = Field(pattern=_SAFE_ID.pattern)
     provider_name: str = Field(pattern=_SAFE_ID.pattern)
     provider_kind: str = Field(pattern=_SAFE_ID.pattern)
@@ -289,7 +189,6 @@ class VideoGenerationRequest(_VideoStrictModel):
     c4_multi_anchor_binding: C4MultiAnchorBinding | None = None
     continuity_binding: ContinuityReferenceBinding | None = None
     hard_cut_keyframe_binding: HardCutKeyframeBinding | None = None
-    commercial_binding: GeneratedCommercialShotBinding | None = None
     seal_terminal_frame: bool = Field(default=False, strict=True)
     media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
     output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement
@@ -445,7 +344,6 @@ class VideoGenerationRequest(_VideoStrictModel):
         continuity = self.continuity_binding
         hard_cut = self.hard_cut_keyframe_binding
         c4_binding = self.c4_multi_anchor_binding
-        commercial_binding = self.commercial_binding
         if c4_binding is not None and (continuity is not None or hard_cut is not None):
             raise ValueError(
                 "c4_multi_anchor_binding cannot combine with legacy continuity bindings"
@@ -454,11 +352,6 @@ class VideoGenerationRequest(_VideoStrictModel):
             raise ValueError(
                 "video request cannot combine continuation and hard-cut bindings"
             )
-        if commercial_binding is not None and (
-            commercial_binding.target_shot_id != self.target_shot_id
-            or commercial_binding.output_asset_id != self.output_asset_id
-        ):
-            raise ValueError("commercial binding does not match request target")
         if c4_binding is not None:
             if self.mode is not VideoGenerationMode.IMAGE_TO_VIDEO:
                 raise ValueError("C4 multi-anchor requests must use image-to-video mode")
@@ -644,15 +537,6 @@ class VideoGenerationRequest(_VideoStrictModel):
         ):
             raise ValueError("request_input_hash does not match video request")
         return self
-
-    @model_serializer(mode="wrap")
-    def _serialize_optional_commercial_binding(
-        self, handler: SerializerFunctionWrapHandler
-    ) -> dict[str, object]:
-        data = handler(self)
-        if self.commercial_binding is None:
-            data.pop("commercial_binding", None)
-        return data
 
     @classmethod
     def create(cls, **values: object) -> "VideoGenerationRequest":
@@ -858,7 +742,7 @@ class VideoActivationScope(_VideoStrictModel):
         )
 
 
-class ResolvedVideoGenerationRequest(_VideoStrictModel):
+class ResolvedVideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictModel):
     generation_id: str = Field(pattern=_SAFE_ID.pattern)
     request_input_hash: str = Field(pattern=_SHA256)
     provider_name: str = Field(pattern=_SAFE_ID.pattern)
@@ -883,7 +767,6 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     c4_multi_anchor_binding: C4MultiAnchorBinding | None = None
     continuity_binding: ContinuityReferenceBinding | None = None
     hard_cut_keyframe_binding: HardCutKeyframeBinding | None = None
-    commercial_binding: GeneratedCommercialShotBinding | None = None
     seal_terminal_frame: bool = Field(default=False, strict=True)
     media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
     effective_output: VideoOutputRequirement | VideoFlexibleOutputRequirement
@@ -999,15 +882,6 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             ):
                 raise ValueError("activation scope does not match resolved request")
         return self
-
-    @model_serializer(mode="wrap")
-    def _serialize_optional_commercial_binding(
-        self, handler: SerializerFunctionWrapHandler
-    ) -> dict[str, object]:
-        data = handler(self)
-        if self.commercial_binding is None:
-            data.pop("commercial_binding", None)
-        return data
 
     def _uses_extended_contract(self) -> bool:
         return bool(

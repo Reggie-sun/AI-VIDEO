@@ -42,7 +42,7 @@ from ai_video.production.composition_contracts import (
     TransitionKind,
     TransitionSpec,
 )
-from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+from ai_video.production.domain_acceptance import DomainAcceptanceQaPolicyMixin, QaLayer as QaLayer
 
 from ai_video.production._asset_registry_validation import (
     reject_explicit_p4_registry_fields,
@@ -73,11 +73,7 @@ from ai_video.production._lifecycle_schema import (
     VideoFetchReceiptPointer as VideoFetchReceiptPointer,
     VideoGenerationAttemptState as VideoGenerationAttemptState, ContinuityEvaluationPhase as ContinuityEvaluationPhase, GeneratedShotContinuityEvidencePointer as GeneratedShotContinuityEvidencePointer,
     VideoRequestReceiptPointer as VideoRequestReceiptPointer, TerminalFrameEvidencePointer as TerminalFrameEvidencePointer, ContinuityEvaluationState as ContinuityEvaluationState, VideoProbeReceiptPointer as VideoProbeReceiptPointer, VideoProvenanceReceiptPointer as VideoProvenanceReceiptPointer,
-    VideoStatusReceiptPointer as VideoStatusReceiptPointer, TerminalFrameExtractionReceiptPointer as TerminalFrameExtractionReceiptPointer, ContinuityEvaluationIntentPointer as ContinuityEvaluationIntentPointer,
-    CommercialShotEvaluationIntentPointer as CommercialShotEvaluationIntentPointer,
-    CommercialShotEvaluationPhase as CommercialShotEvaluationPhase,
-    CommercialShotEvaluationState as CommercialShotEvaluationState,
-    GeneratedCommercialShotEvidencePointer as GeneratedCommercialShotEvidencePointer,
+    VideoStatusReceiptPointer as VideoStatusReceiptPointer, TerminalFrameExtractionReceiptPointer as TerminalFrameExtractionReceiptPointer, ContinuityEvaluationIntentPointer as ContinuityEvaluationIntentPointer, CommercialShotEvaluationIntentPointer as CommercialShotEvaluationIntentPointer, CommercialShotEvaluationPhase as CommercialShotEvaluationPhase, CommercialShotEvaluationState as CommercialShotEvaluationState, GeneratedCommercialShotEvidencePointer as GeneratedCommercialShotEvidencePointer,
     has_p6_state,
     prune_attempt_fields,
     reject_explicit_p7_fields,
@@ -295,14 +291,6 @@ class VisualStrategy(str, Enum):
     GENERATED_VIDEO = "generated_video"
     EXISTING_VIDEO = "existing_video"
     HYBRID = "hybrid"
-
-
-class QaLayer(str, Enum):
-    TECHNICAL = "technical"
-    LAYOUT = "layout"
-    STRATEGY = "strategy"
-    SEMANTIC = "semantic"
-    FINAL_ACCEPTANCE = "final_acceptance"
 
 
 class QaVerdict(str, Enum):
@@ -2369,7 +2357,7 @@ class DependencyGraphTransition(StrictModel):
 # ---------------------------------------------------------------------------
 
 
-class QaPolicy(VersionedArtifact):
+class QaPolicy(DomainAcceptanceQaPolicyMixin, VersionedArtifact):
     policy_id: str = Field(min_length=1)
     policy_version: str = Field(min_length=1)
     required_layers: tuple[QaLayer, ...] = Field(min_length=1)
@@ -2379,29 +2367,12 @@ class QaPolicy(VersionedArtifact):
     semantic_requirement: Literal["optional", "required"]
     semantic_authorities: tuple[ToolIdentity, ...] = ()
     repair_authorities: tuple[ActorIdentity, ...] = ()
-    domain_acceptance: DomainAcceptancePolicy | None = None
 
     @model_validator(mode="after")
     def _require_semantic_authority(self) -> "QaPolicy":
         if self.semantic_requirement == "required" and not self.semantic_authorities:
             raise ValueError("required semantic QA needs a policy-selected authority")
-        if self.domain_acceptance is not None and self.semantic_requirement != "required":
-            raise ValueError("Domain acceptance requires semantic QA")
-        if (
-            self.domain_acceptance is not None
-            and QaLayer.SEMANTIC not in self.required_layers
-        ):
-            raise ValueError("Domain acceptance requires the semantic layer")
         return self
-
-    @model_serializer(mode="wrap")
-    def _serialize_optional_domain_acceptance(
-        self, handler: SerializerFunctionWrapHandler
-    ) -> dict[str, object]:
-        data = handler(self)
-        if self.domain_acceptance is None:
-            data.pop("domain_acceptance", None)
-        return data
 
 
 class ReviewRequest(VersionedArtifact):
