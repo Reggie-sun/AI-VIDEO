@@ -2,6 +2,14 @@
 
 Date: 2026-08-25
 
+> **Supersession notice (2026-08-25):** The interrupted portrait attempt described
+> below remains historical and still has unknown outcome. A later, separate
+> seven-shot portrait batch is recorded in
+> `2026-08-25-qingyan-miao-t8-portrait-batch-diagnosis.md`. That newer record
+> supersedes only the next-work/status implication that no portrait clips had
+> landed; it does not turn the new development clips into Production,
+> P6, Final Acceptance, or a smoothness PASS.
+
 ## Purpose
 
 本文记录青颜苗家女孩广告在继续制作前的 Local MiniMax H3 T8 `Stock20`
