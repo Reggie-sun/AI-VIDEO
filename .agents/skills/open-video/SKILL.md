@@ -71,24 +71,33 @@ Confirm the server is up first (§3). H3 defaults: 1344×768, 20 steps, `res_mul
 scheduler, `shift_video=12.0` / `shift_audio=3.0`, INT8 ConvRot quants, engine flags
 `--lowvram --use-sage-attention`. `length` snaps to the 17k+5 grid.
 
-**Step 6 — Judge the output** (`core/judge.py`). Activate the real judge with env:
+**Step 6 — Run the mandatory per-Shot post-media Gate.** After each exact MP4 lands, fix its
+SHA-256 and immediately call the project-local `video-analysis` MCP. Map raw MCP evidence to the
+sealed Shot intent as requirement-level `PASS` / `FAIL` / `NOT_EVALUATED`; from Shot 2 onward,
+include previous accepted end-state evidence when continuity applies. Only all-required `PASS`
+allows generation of the next Shot. `FAIL`, `NOT_EVALUATED`, missing/stale evidence, identity
+drift, or unavailable MCP stops before the next submit. The asynchronous analysis hook does not
+satisfy this Gate. Follow `.agent/context/control-plane-playbook.md` `Per-Shot Post-Media Gate`.
+
+The OpenVideo judge (`core/judge.py`) is supplemental. Activate the real judge with env:
 `OPEN_VIDEO_VLM_URL` + `OPEN_VIDEO_VLM_MODEL` (+ `OPEN_VIDEO_VLM_KEY`) — the pipeline then
 extracts frames and assesses vs prompt intent + quality bar automatically
 (`QualityJudge.from_env()` is the entry point; explicit `QualityJudge(vision_fn=…)` also works).
 Verdict: **PASS / REFINE / FAIL**, with score + issues in the receipt (`run --json` exposes them).
-With the env unset the judge auto-PASSes — then you must manually review frames.
+With the env unset the judge auto-PASSes; that stub is never evidence for the mandatory Gate.
 
-**Step 7 — Refine if REFINE or FAIL.** Diagnose the *specific* issue, apply a *targeted* fix (prompt
-tweak / +steps / different mode / ref-pack for identity lock / different seed), regenerate. Strategy
-is **refine-primary, not best-of-N**: H3 raw quality is already at parity — the loop fixes
-adherence, length, and consistency, which is where the gap actually lives. Best-of-N is an optional
-escape hatch, not the default.
+**Step 7 — Stop and diagnose on REFINE / FAIL / NOT_EVALUATED.** Do not submit another Shot or
+silently regenerate. If the accepted task scope and Provider gates authorize a new attempt, apply
+one targeted fix (prompt tweak / +steps / different mode / ref-pack for identity lock / different
+seed), then run that attempt through the same mandatory MCP Gate. Best-of-N is an optional,
+separately authorized escape hatch, not the default.
 
-**Step 8 — Stitch multi-shot** (`core/pipeline.py` `LongFilmPipeline.make_film`). Each subsequent
-shot's `first_frame` = the previous shot's last frame (ffmpeg-extracted at `-sseof -0.1`); a `t2v`
-shot is auto-upgraded to `i2v` when a handoff frame exists. Then ffmpeg concat (`-f concat -c copy`)
-+ cross-shot audio continuity (music theme / dialogue language / ambient crossfade). Optional 2K
-upscale via API as a final step.
+**Step 8 — Stitch accepted multi-shot media.** Each subsequent shot's `first_frame` = the previous
+accepted shot's last frame (ffmpeg-extracted at `-sseof -0.1`); a `t2v` shot is auto-upgraded to
+`i2v` when a handoff frame exists. Current `LongFilmPipeline.make_film()` must not be used as an
+unattended multi-Shot generator when it cannot synchronously wait for the required external MCP
+Gate. Invoke one Shot at a time, Gate it, then stitch only accepted shots with ffmpeg concat
+(`-f concat -c copy`) and cross-shot audio continuity. Optional 2K upscale remains a final step.
 
 **Step 9 — Deliver.** One coherent film + per-shot receipts (prompt, seed, settings, judge verdict,
 extracted frames). Persist receipts under `artifacts/verify/`.
@@ -122,11 +131,14 @@ result = backend.generate(req, engine=engine)   # → ShotResult(ok, video_path,
     (use `--prompt "<full 3-field prompt>"` for best quality; `--first-frame`/`--last-frame` for I2V/FL2VA).
   - Validate: `scripts/validate_prompt.py` (exit 0 = clean, 1 = issues).
 
-**Multishot / long film — `core/pipeline.py` `LongFilmPipeline.make_film(plan, out_path)`:**
-`plan` is a `list[Shot(scene_id, prompt, mode, duration_s, seed, …)]`. The pipeline generates each
-shot → judges → extracts last frame → chains (FL2VA handoff) → stitches → writes `output/film.mp4`
-and returns `(film_path, plan_with_receipts)`.
-- Proven baseline: `scripts/h3_multishot.py --plan library/plans/multishot_demo.json --out output/long_demo.mp4`
+**Multishot / long film — one-Shot-at-a-time AI-VIDEO orchestration:**
+`plan` is a `list[Shot(scene_id, prompt, mode, duration_s, seed, …)]`. For AI-VIDEO work, invoke one
+Shot, wait for the external MCP Gate, and only then extract the accepted last frame and continue.
+`core/pipeline.py` `LongFilmPipeline.make_film(plan, out_path)` does not currently own that external
+MCP stop point, so it is not an authorized unattended generation path; it may only stitch inputs
+that have already passed the per-Shot Gate.
+- Proven baseline only, not an AI-VIDEO Gate-compliant unattended path:
+  `scripts/h3_multishot.py --plan library/plans/multishot_demo.json --out output/long_demo.mp4`
   (a ready example plan ships at `library/plans/multishot_demo.json`; plan JSON =
   `{"shots": [{"prompt_file": "...", "duration": 10, "first_frame": null}, …]}`).
 

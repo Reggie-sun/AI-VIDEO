@@ -180,18 +180,32 @@ python -m open_video run "$(cat prompts/my_shot.txt)" \
 **Optional lab path** (only when a lab tree exists — `$H3_LAB` set, with its own venv):
 `cd "$H3_LAB" && ./venv/bin/python "$OPEN_VIDEO_ROOT/scripts/h3_agent.py" --prompt … --width 1344 --height 768 --duration 8 --seed 42` (mp4 → output/, receipt → artifacts/verify/agent_*.json).
 
-### F. Review & iterate
+### F. Mandatory per-Shot post-media Gate
 
-0. **Automatic VLM judge:** set `OPEN_VIDEO_VLM_URL` + `OPEN_VIDEO_VLM_MODEL`
-   (+ `OPEN_VIDEO_VLM_KEY`) to any OpenAI-compatible vision endpoint and the
-   pipeline judges every shot for real (score + issues in the `--json` output).
-   Without these env vars the judge auto-PASSes — then the manual review below
-   is mandatory, not optional.
-1. Play the mp4 (native audio matters).
-2. Extract a contact sheet:  
-   `ffmpeg -y -i out.mp4 -vf "fps=1,scale=320:-1,tile=4x2" contact.png`
-3. If weak: fix **prompt** first (specificity, camera, continuity), then seed, then duration.
-4. Shipping / public claim: dual visual review per org rules if required.
+For AI-VIDEO multi-Shot work, generation is an atomic loop, never an unattended batch:
+
+1. Set `OPEN_VIDEO_JUDGE_RETRIES=0`, generate exactly one Shot, and fix the exact output path +
+   SHA-256. Internal judge retries must not create un-Gated extra takes.
+2. Immediately call the project-local `video-analysis` MCP on that exact MP4. At minimum use
+   media probe plus sampled visual review; add audio, scene, lip-sync, or continuity analysis when
+   the Shot requires it.
+3. Map the raw MCP evidence to the sealed Shot intent and emit requirement-level
+   `PASS` / `FAIL` / `NOT_EVALUATED` findings. From Shot 2 onward, include the previous accepted
+   end-state evidence when continuity applies.
+4. Submit the next Shot only when every required finding for the current Shot is `PASS`.
+   `FAIL`, `NOT_EVALUATED`, missing/stale evidence, identity drift, or unavailable MCP stops the
+   sequence before any next submit.
+
+The background analysis hook, command exit code, file existence, OpenVideo judge score, and the
+env-unset auto-PASS stub do not satisfy this Gate. Do not collapse identity, action, product/object,
+camera, prompt adherence, audio, and continuity into one score. Follow the canonical procedure in
+`.agent/context/control-plane-playbook.md` `Per-Shot Post-Media Gate`; MCP evidence remains advisory
+raw evidence and cannot write Manifest, P6, activation, or Final Acceptance.
+
+After a stopped Shot, diagnose a targeted repair. Re-run only when the accepted task scope and
+Provider gates authorize that new attempt; never silently retry, fallback, or continue the batch.
+For a single-Shot delivery, the same Gate runs before delivery. Shipping/public claims may still
+require the separate human or Production acceptance gates.
 
 ### G. Deliver
 

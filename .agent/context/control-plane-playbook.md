@@ -165,6 +165,38 @@ Safety / User Authorization
 - Project-local `video-analysis` 是本仓库默认视频检查工具；全局 `videoscan` 只可作为 metadata/frame helper，不能成为 Production QA owner。
 - 交付 generated-video 时只提供真实 live/fetched/validated output；不得把 preflight、fake fixture、smoke artifact、technical evidence 或 fetch success冒充 activated、quality-accepted 或 final delivery truth。
 
+### Per-Shot Post-Media Gate
+
+该 Gate 属于 Agent-controlled sequential generation 的 synchronous stop condition，不是
+background hook、Provider callback、Product Runtime writer 或新的 P6 lifecycle。执行顺序固定为：
+
+```text
+generate Shot N once
+  -> exact MP4 exists and SHA-256 is fixed
+  -> call project-local video-analysis MCP on that exact path
+  -> map raw evidence to exact Shot requirements
+  -> PASS: allow submit of Shot N+1
+  -> FAIL / NOT_EVALUATED: stop before any next submit
+```
+
+- 多 Shot task 必须按 one-Shot-at-a-time orchestration 执行；不得先提交整个 batch，再补分析。
+- 显式 MCP 调用至少覆盖 exact media probe 与 sampled visual review；需要 audio、scene-change、
+  lip-sync 或 continuity evidence 时，调用对应 MCP capability。异步 Generated-Video Analysis
+  Hook只用于advisory background capture，queue/result均不能满足本 Gate。
+- Gate input必须绑定`shot_id`、exact output path、output SHA-256、selected Shot intent/rubric、
+  applicable requirement IDs，以及从Shot 2开始所需的前序accepted end-state evidence。
+- Gate output必须逐项记录`requirement_id`、evidence reference、`PASS` / `FAIL` /
+  `NOT_EVALUATED`与简洁reason。不得用一个quality score覆盖identity、action、product/object、
+  camera、duration、prompt adherence、audio或continuity等独立required findings。
+- 只有全部required findings为`PASS`时，Agent才可提交下一Shot。MCP unavailable/error、
+  output identity drift、missing/stale evidence或任何required finding无法可靠判断都必须
+  `NOT_EVALUATED`并fail closed。
+- `FAIL`或`NOT_EVALUATED`后只允许报告诊断与建议的targeted repair；除非accepted task scope
+  已明确覆盖该retry且全部Provider gates仍有效，否则不得自动重生成、fallback或继续batch。
+- MCP raw evidence与Agent verdict不得直接写Manifest、Registry、activation、P6 receipt或
+  Final Acceptance。进入Production acceptance时，仍须由existing review contract与
+  `ProductionStateCommitter`重新绑定、adjudicate和持久化。
+
 ## 6. Agent Experience Memory Routing
 
 Agent Memory 是 scoped、local、advisory knowledge source。调用入口与 authoritative

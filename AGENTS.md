@@ -85,6 +85,12 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 - Development experiment evidence 不是 Production evidence。PASS 不自动产生 active capability、Production qualification、P6 / Final Acceptance、live-ready、release 或 replay truth；FAIL 不授权降低 Production contract、改变 frozen rubric、fallback、blind retry，或绕过 safety、budget、egress、permit、lifecycle 与 recovery。
 - Pure schema migration、deterministic bug、state corruption、replay bug、security fix 与 no-media backend refactor 不触发本优先级；本规则也不把“先生成再写代码”或“媒体生成永远优先”设为默认。
 
+### Per-Shot Post-Media Gate
+
+- Agent 控制 sequential multi-Shot generation 时，每个 Shot 的 exact MP4 落盘后，必须在提交下一 Shot 前显式调用 project-local `video-analysis` MCP，并按该 Shot 的 sealed intent、applicable requirements 与前序已接受状态给出 requirement-level `PASS` / `FAIL` / `NOT_EVALUATED`。
+- 只有 exact current Shot 的全部 required findings 为 `PASS` 才允许下一次 Provider submit。MCP 不可用、证据缺失或陈旧、文件 identity 不匹配、required requirement 无法判定均为 `NOT_EVALUATED` 并立即停止；不得等待整个 batch 完成、依赖用户提醒、用 background analysis hook、tool success、单一总分或自动 VLM stub 代替该阻断 Gate。
+- `video-analysis` MCP 只提供绑定 exact bytes 的 raw evidence；Agent-side Gate 不得写 Manifest、激活 candidate、签发 P6 / Final Acceptance 或自动 retry。详细顺序与 evidence contract 由 `.agent/context/control-plane-playbook.md` 的 `Per-Shot Post-Media Gate` 独占。
+
 ## Canonical Ownership
 
 | Concern | Canonical Owner |
