@@ -51,6 +51,7 @@ from ai_video.production.project import load_qa_policy
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.video import ResolvedVideoGenerationRequest
 from ai_video.production.video_artifact import (
+    GeneratedCommercialShotReviewer,
     GeneratedShotContinuityReviewer,
     MeasuredVideoMetadata,
     TerminalFrameExtractor,
@@ -74,6 +75,7 @@ from ._state_commit_common import (
 )
 from ._state_commit_contracts import PreparedArtifact
 from ._state_commit_video_continuity import checkpoint_generated_shot_continuity
+from ._state_commit_video_commercial import checkpoint_generated_commercial_shot
 
 
 @dataclass(frozen=True)
@@ -369,6 +371,7 @@ class _StateCommitVideoCandidateMixin:
         probe: Callable[[int], dict] | None = None,
         terminal_frame_extractor: TerminalFrameExtractor | None = None,
         continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
+        commercial_reviewer: GeneratedCommercialShotReviewer | None = None,
     ):
         """Measure fetched bytes and persist an inactive exact bundle candidate."""
 
@@ -389,10 +392,15 @@ class _StateCommitVideoCandidateMixin:
             request = self._reopen_video_request(state.request)
             continuity_policy_content_hash = None
             continuity_authorities = ()
-            if request.continuity_binding is not None:
+            commercial_policy_content_hash = None
+            commercial_authorities = ()
+            if (
+                request.continuity_binding is not None
+                or request.commercial_binding is not None
+            ):
                 if manifest.active_qa_policy is None:
                     raise _state_invalid(
-                        "Continuity-bound video validation requires an active QA policy."
+                        "Evaluated video validation requires an active QA policy."
                     )
                 policy = load_qa_policy(
                     self._project_root,
@@ -403,10 +411,34 @@ class _StateCommitVideoCandidateMixin:
                     or not policy.semantic_authorities
                 ):
                     raise _state_invalid(
-                        "Continuity-bound video validation requires semantic authorities."
+                        "Evaluated video validation requires semantic authorities."
                     )
-                continuity_policy_content_hash = policy.content_hash
-                continuity_authorities = policy.semantic_authorities
+                if request.continuity_binding is not None:
+                    continuity_policy_content_hash = policy.content_hash
+                    continuity_authorities = policy.semantic_authorities
+                if request.commercial_binding is not None:
+                    domain_policy = policy.domain_acceptance
+                    shot_requirement_ids = (
+                        tuple(domain_policy.profile_payload.get("shot_requirement_ids", ()))
+                        if domain_policy is not None
+                        else ()
+                    )
+                    if (
+                        manifest.schema_version != "2.13"
+                        or domain_policy is None
+                        or domain_policy.domain_id != "ecommerce"
+                        or domain_policy.profile_content_hash
+                        != request.commercial_binding.profile_content_hash
+                        or any(
+                            item not in shot_requirement_ids
+                            for item in request.commercial_binding.applicable_requirement_ids
+                        )
+                    ):
+                        raise _state_invalid(
+                            "Commercial-bound video validation requires the exact active Ecommerce profile."
+                        )
+                    commercial_policy_content_hash = policy.content_hash
+                    commercial_authorities = policy.semantic_authorities
             if local_lane:
                 if (
                     state.local_latest_observation is None
@@ -478,6 +510,7 @@ class _StateCommitVideoCandidateMixin:
             terminal_frame_bytes = None
             terminal_extraction = None
             provenance = None
+            commercial_evidence = None
             with _open_regular_file_nofollow(
                 self._project_root / fetch_pointer.artifact_path,
                 contained_by=(
@@ -492,6 +525,7 @@ class _StateCommitVideoCandidateMixin:
                         probe=probe,
                     )
                     if request.continuity_binding is not None
+                    or request.commercial_binding is not None
                     else probe_generated_video_candidate(
                         held_fd,
                         request,
@@ -502,6 +536,24 @@ class _StateCommitVideoCandidateMixin:
                         continuity_authorities=continuity_authorities,
                     )
                 )
+                if request.commercial_binding is not None:
+                    manifest, attempt, state, commercial_evidence = (
+                        checkpoint_generated_commercial_shot(
+                            self,
+                            attempt_id=attempt_id,
+                            manifest=manifest,
+                            attempt=attempt,
+                            state=state,
+                            held_fd=held_fd,
+                            request=request,
+                            measured=measured,
+                            commercial_reviewer=commercial_reviewer,
+                            commercial_policy_content_hash=(
+                                commercial_policy_content_hash
+                            ),
+                            commercial_authorities=commercial_authorities,
+                        )
+                    )
                 if request.continuity_binding is not None:
                     manifest, attempt, state, probe_receipt, provenance = (
                         checkpoint_generated_shot_continuity(
@@ -521,7 +573,15 @@ class _StateCommitVideoCandidateMixin:
                                 continuity_policy_content_hash
                             ),
                             continuity_authorities=continuity_authorities,
+                            commercial_evidence=commercial_evidence,
                         )
+                    )
+                elif commercial_evidence is not None:
+                    probe_receipt = VideoProbeReceipt.create(
+                        request=request,
+                        fetch_receipt=fetch_receipt,
+                        measured=measured,
+                        commercial_evidence=commercial_evidence,
                     )
             if provenance is None:
                 provenance = (

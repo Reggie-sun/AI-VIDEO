@@ -701,8 +701,10 @@ def test_commercial_source_explicit_reopen_verifies_all_durable_bytes(tmp_path) 
             path.write_bytes(payload)
 
 
+@pytest.mark.parametrize("schema_version", ["2.12", "2.13"])
 def test_only_exact_semantic_pass_is_selected_and_approval_replay_is_zero_write(
     tmp_path,
+    schema_version: str,
 ) -> None:
     reference_set, import_receipt = _make_commercial_state_project(tmp_path)
     committer = ProductionStateCommitter(
@@ -716,7 +718,7 @@ def test_only_exact_semantic_pass_is_selected_and_approval_replay_is_zero_write(
         attempt_id="activate-commercial-source-policy",
     )
     committer.upgrade_manifest_schema(
-        "2.12", expected_manifest_revision=with_policy.manifest_revision
+        schema_version, expected_manifest_revision=with_policy.manifest_revision
     )
     request = _state_request(tmp_path, reference_set)
     committer.begin_commercial_source_preparation(request)

@@ -314,6 +314,31 @@ def make_state_manifest(**overrides: object) -> ProductionManifest:
     return ProductionManifest(**data)
 
 
+@pytest.mark.parametrize("schema_version", ["2.10", "2.11", "2.12", "2.13"])
+def test_manifest_213_is_an_additive_superset_of_210_to_212(
+    schema_version: str,
+) -> None:
+    manifest = make_state_manifest(schema_version=schema_version)
+
+    reopened = ProductionManifest.model_validate_json(manifest.model_dump_json())
+
+    assert reopened == manifest
+    assert reopened.model_dump(mode="json")["schema_version"] == schema_version
+
+
+@pytest.mark.parametrize("schema_version", ["2.10", "2.11"])
+def test_pre_212_manifest_rejects_explicit_commercial_source_state(
+    schema_version: str,
+) -> None:
+    payload = make_state_manifest(schema_version=schema_version).model_dump(
+        mode="python"
+    )
+    payload["commercial_source_attempts"] = ()
+
+    with pytest.raises(ValidationError, match="commercial source state"):
+        ProductionManifest.model_validate(payload)
+
+
 def versioned_fields(artifact_id: str, content_hash: str) -> dict[str, object]:
     return {
         "artifact_id": artifact_id,

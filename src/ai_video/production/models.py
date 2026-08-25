@@ -74,6 +74,10 @@ from ai_video.production._lifecycle_schema import (
     VideoGenerationAttemptState as VideoGenerationAttemptState, ContinuityEvaluationPhase as ContinuityEvaluationPhase, GeneratedShotContinuityEvidencePointer as GeneratedShotContinuityEvidencePointer,
     VideoRequestReceiptPointer as VideoRequestReceiptPointer, TerminalFrameEvidencePointer as TerminalFrameEvidencePointer, ContinuityEvaluationState as ContinuityEvaluationState, VideoProbeReceiptPointer as VideoProbeReceiptPointer, VideoProvenanceReceiptPointer as VideoProvenanceReceiptPointer,
     VideoStatusReceiptPointer as VideoStatusReceiptPointer, TerminalFrameExtractionReceiptPointer as TerminalFrameExtractionReceiptPointer, ContinuityEvaluationIntentPointer as ContinuityEvaluationIntentPointer,
+    CommercialShotEvaluationIntentPointer as CommercialShotEvaluationIntentPointer,
+    CommercialShotEvaluationPhase as CommercialShotEvaluationPhase,
+    CommercialShotEvaluationState as CommercialShotEvaluationState,
+    GeneratedCommercialShotEvidencePointer as GeneratedCommercialShotEvidencePointer,
     has_p6_state,
     prune_attempt_fields,
     reject_explicit_p7_fields,
@@ -1707,7 +1711,7 @@ class FinalAcceptanceState(StrictModel):
 
 class ProductionManifest(StrictModel):
     schema_version: Literal[
-        "2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"
+        "2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"
     ] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
@@ -1754,7 +1758,7 @@ class ProductionManifest(StrictModel):
             "final_acceptance_state",
         }
         manifest_version = value.get("schema_version", "2.0")
-        if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and p6_fields.intersection(value):
+        if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"} and p6_fields.intersection(value):
             if value.get("active_qa_policy") is None:
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_qa_policy"
@@ -1763,7 +1767,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_dependency_graph"
                 )
-        if manifest_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
+        if manifest_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}:
             return value
         if p6_fields.intersection(value):
             raise ValueError(
@@ -1788,7 +1792,7 @@ class ProductionManifest(StrictModel):
         if (
             not isinstance(value, Mapping)
             or value.get("schema_version", "2.0")
-            in {"2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
+            in {"2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}
         ):
             return value
         for attempt in value.get("attempts", ()):
@@ -1812,7 +1816,7 @@ class ProductionManifest(StrictModel):
     ) -> object:
         if not isinstance(value, Mapping):
             return value
-        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
+        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}:
             return value
         manifest_version = value.get("schema_version", "2.0")
         if {
@@ -1862,13 +1866,13 @@ class ProductionManifest(StrictModel):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain voice attempts"
             )
-        if self.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and any(
+        if self.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"} and any(
             item.operation == "image_generation" for item in self.attempts
         ):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain P7 image attempts"
             )
-        if self.schema_version not in {"2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and any(
+        if self.schema_version not in {"2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"} and any(
             item.operation == "video_generation"
             or item.video_generation_state is not None
             for item in self.attempts
@@ -1889,7 +1893,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "running render_state attempt base must match active identity"
                 )
-        if self.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
+        if self.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}:
             self._validate_manifest_23_graph_lifecycle()
         else:
             for attempt in self.attempts:
@@ -1903,7 +1907,7 @@ class ProductionManifest(StrictModel):
                         "cannot contain P5 graph attempt fields"
                     )
         if self.schema_version == "2.4" or (
-            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and has_p6_state(self)
+            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"} and has_p6_state(self)
         ):
             if self.active_qa_policy is None:
                 raise ValueError(
@@ -1979,13 +1983,13 @@ class ProductionManifest(StrictModel):
         data = handler(self)
         if self.schema_version == "2.0" and self.active_render_state is None: data.pop("active_render_state", None)
         if (
-            self.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
+            self.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}
             or self.active_dependency_graph is None
         ):
             data.pop("active_dependency_graph", None)
             data.pop("dependency_states", None)
         if self.schema_version != "2.4" and not (
-            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
+            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}
             and self.active_qa_policy is not None
         ):
             data.pop("active_qa_policy", None)
@@ -1994,9 +1998,9 @@ class ProductionManifest(StrictModel):
             data.pop("active_approved_repair", None)
             data.pop("repair_outcome_receipts", None)
             data.pop("final_acceptance_state", None)
-        if self.schema_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
+        if self.schema_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}:
             data.pop("active_paid_provider_budget", None)
-        if self.schema_version not in {"2.11", "2.12"} or self.active_p0_qualification_prepared is None: data.pop("active_p0_qualification_prepared", None)
+        if self.schema_version not in {"2.11", "2.12", "2.13"} or self.active_p0_qualification_prepared is None: data.pop("active_p0_qualification_prepared", None)
         serialize_commercial_source_manifest(data, self.schema_version)
         return data
 

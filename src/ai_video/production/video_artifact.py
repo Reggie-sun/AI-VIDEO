@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from fractions import Fraction
 from pathlib import Path
-from typing import Callable, Literal
+from typing import Callable, Literal, Protocol
 
 from pydantic import (
     ConfigDict,
@@ -23,6 +23,11 @@ from pydantic import (
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.ecommerce_media_acceptance import (
+    CommercialShotEvaluationIntent,
+    GeneratedCommercialShotEvidence,
+    adjudicate_generated_commercial_shot_evidence,
+)
 from ai_video.production.image import MeasuredPng, measure_png_bytes
 from ai_video.production.local_video import (
     LocalVideoFetchReceipt,
@@ -328,6 +333,7 @@ class VideoProbeReceipt(_VideoArtifactStrictModel):
     fetch_fingerprint: str = Field(pattern=_SHA256)
     measured: MeasuredVideoMetadata
     continuity_evidence: GeneratedShotContinuityEvidence | None = None
+    commercial_evidence: GeneratedCommercialShotEvidence | None = None
     content_hash: str = Field(pattern=_SHA256)
 
     @model_validator(mode="after")
@@ -345,6 +351,8 @@ class VideoProbeReceipt(_VideoArtifactStrictModel):
         data = handler(self)
         if self.continuity_evidence is None:
             data.pop("continuity_evidence", None)
+        if self.commercial_evidence is None:
+            data.pop("commercial_evidence", None)
         return data
 
     @classmethod
@@ -355,6 +363,7 @@ class VideoProbeReceipt(_VideoArtifactStrictModel):
         fetch_receipt: VideoFetchReceipt | LocalVideoFetchReceipt,
         measured: MeasuredVideoMetadata,
         continuity_evidence: GeneratedShotContinuityEvidence | None = None,
+        commercial_evidence: GeneratedCommercialShotEvidence | None = None,
     ) -> "VideoProbeReceipt":
         data = {
             "request_receipt_fingerprint": request.desired_generation_fingerprint,
@@ -362,6 +371,7 @@ class VideoProbeReceipt(_VideoArtifactStrictModel):
             "fetch_fingerprint": fetch_receipt.fetch_fingerprint,
             "measured": measured,
             "continuity_evidence": continuity_evidence,
+            "commercial_evidence": commercial_evidence,
         }
         candidate = cls.model_construct(**data, content_hash="0" * 64)
         return cls.model_validate(
@@ -378,6 +388,159 @@ GeneratedShotContinuityReviewer = Callable[
     [int, ResolvedVideoGenerationRequest, MeasuredVideoMetadata, str],
     GeneratedShotContinuityEvidence,
 ]
+
+
+class GeneratedCommercialShotReviewer(Protocol):
+    def create_intent(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        measured: MeasuredVideoMetadata,
+        policy_content_hash: str,
+    ) -> CommercialShotEvaluationIntent: ...
+
+    def __call__(
+        self,
+        held_fd: int,
+        request: ResolvedVideoGenerationRequest,
+        measured: MeasuredVideoMetadata,
+        intent: CommercialShotEvaluationIntent,
+    ) -> GeneratedCommercialShotEvidence: ...
+
+
+def validate_generated_commercial_shot_intent(
+    intent: CommercialShotEvaluationIntent,
+    *,
+    request: ResolvedVideoGenerationRequest,
+    measured: MeasuredVideoMetadata,
+    policy_content_hash: str,
+    authorities: tuple[ToolIdentity, ...],
+) -> CommercialShotEvaluationIntent:
+    binding = request.commercial_binding
+    if (
+        binding is None
+        or not isinstance(intent, CommercialShotEvaluationIntent)
+        or intent.binding_content_hash != binding.content_hash
+        or intent.resolved_generation_hash != request.resolved_generation_hash
+        or intent.artifact_sha256 != measured.artifact_sha256
+        or intent.measured_metadata_hash != canonical_sha256(measured)
+        or intent.qa_policy_content_hash != policy_content_hash
+        or intent.evaluator not in authorities
+    ):
+        raise AiVideoError(
+            code=ErrorCode.REVIEW_EVIDENCE_INVALID,
+            user_message=(
+                "Commercial Shot review intent does not bind the exact request and MP4."
+            ),
+            retryable=False,
+        )
+    return intent
+
+
+def validate_generated_commercial_shot_evidence(
+    evidence: GeneratedCommercialShotEvidence,
+    *,
+    request: ResolvedVideoGenerationRequest,
+    measured: MeasuredVideoMetadata,
+    policy_content_hash: str,
+    authorities: tuple[ToolIdentity, ...],
+    require_pass: bool,
+    intent: CommercialShotEvaluationIntent | None = None,
+) -> GeneratedCommercialShotEvidence:
+    binding = request.commercial_binding
+    if intent is not None:
+        validate_generated_commercial_shot_intent(
+            intent,
+            request=request,
+            measured=measured,
+            policy_content_hash=policy_content_hash,
+            authorities=authorities,
+        )
+    if (
+        binding is None
+        or not isinstance(evidence, GeneratedCommercialShotEvidence)
+        or evidence.binding_content_hash != binding.content_hash
+        or evidence.resolved_generation_hash != request.resolved_generation_hash
+        or evidence.artifact_sha256 != measured.artifact_sha256
+        or evidence.measured_metadata_hash != canonical_sha256(measured)
+        or evidence.qa_policy_content_hash != policy_content_hash
+        or evidence.evaluator not in authorities
+        or intent is not None
+        and (
+            evidence.intent_content_hash != intent.content_hash
+            or evidence.evaluation_fingerprint != intent.evaluation_fingerprint
+            or evidence.evaluator_profile_content_hash
+            != intent.evaluator_profile_content_hash
+        )
+    ):
+        raise AiVideoError(
+            code=ErrorCode.REVIEW_EVIDENCE_INVALID,
+            user_message=(
+                "Commercial Shot review evidence does not bind the exact request and MP4."
+            ),
+            retryable=False,
+        )
+    verdict = adjudicate_generated_commercial_shot_evidence(
+        evidence,
+        binding=binding,
+    )
+    if require_pass and verdict is not QaVerdict.PASS:
+        raise AiVideoError(
+            code=ErrorCode.REVIEW_EVIDENCE_INVALID,
+            user_message=(
+                "Commercial Shot review did not produce a complete passing verdict."
+            ),
+            technical_detail=f"verdict={verdict.value}",
+            retryable=False,
+        )
+    return evidence
+
+
+def invoke_generated_commercial_shot_reviewer(
+    held_fd: int,
+    request: ResolvedVideoGenerationRequest,
+    measured: MeasuredVideoMetadata,
+    intent: CommercialShotEvaluationIntent,
+    reviewer: GeneratedCommercialShotReviewer,
+    policy_content_hash: str,
+    authorities: tuple[ToolIdentity, ...],
+) -> GeneratedCommercialShotEvidence:
+    validate_generated_commercial_shot_intent(
+        intent,
+        request=request,
+        measured=measured,
+        policy_content_hash=policy_content_hash,
+        authorities=authorities,
+    )
+    position = os.lseek(held_fd, 0, os.SEEK_CUR)
+    review_fd = os.dup(held_fd)
+    try:
+        os.lseek(review_fd, 0, os.SEEK_SET)
+        evidence = reviewer(review_fd, request, measured, intent)
+    except AiVideoError:
+        raise
+    except Exception as exc:
+        raise AiVideoError(
+            code=ErrorCode.REVIEW_EVIDENCE_INVALID,
+            user_message="Commercial Shot evaluator failed.",
+            technical_detail=str(exc),
+            retryable=False,
+            cause=exc,
+        ) from exc
+    finally:
+        try:
+            os.close(review_fd)
+        except OSError:
+            pass
+        os.lseek(held_fd, position, os.SEEK_SET)
+    return validate_generated_commercial_shot_evidence(
+        evidence,
+        request=request,
+        measured=measured,
+        policy_content_hash=policy_content_hash,
+        authorities=authorities,
+        require_pass=False,
+        intent=intent,
+    )
 
 
 def _review_generated_shot_continuity(
@@ -885,6 +1048,7 @@ def build_generated_video_asset_record(
 
 
 __all__ = [
+    "GeneratedCommercialShotReviewer",
     "MeasuredVideoMetadata",
     "GeneratedShotContinuityReviewer",
     "TerminalFrameExtractionReceipt",
@@ -895,5 +1059,8 @@ __all__ = [
     "build_generated_video_asset_record",
     "build_terminal_frame_asset_record",
     "extract_terminal_frame_candidate",
+    "invoke_generated_commercial_shot_reviewer",
     "probe_generated_video_candidate",
+    "validate_generated_commercial_shot_evidence",
+    "validate_generated_commercial_shot_intent",
 ]

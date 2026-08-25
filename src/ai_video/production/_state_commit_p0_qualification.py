@@ -216,7 +216,7 @@ class _StateCommitP0QualificationMixin:
                 return manifest
             if manifest.manifest_revision != expected_manifest_revision:
                 raise _state_invalid("P0 qualification base Manifest revision changed.")
-            if manifest.schema_version not in {"2.11", "2.12"}:
+            if manifest.schema_version not in {"2.11", "2.12", "2.13"}:
                 raise _state_invalid("P0 qualification requires Production Manifest 2.11 or later.")
             bundle = load_production_project(self._project_root / "project.yaml")
             if (
@@ -271,7 +271,7 @@ class _StateCommitP0QualificationMixin:
             )
         manifest = self._read_manifest()
         pointer = manifest.active_p0_qualification_prepared
-        if manifest.schema_version not in {"2.11", "2.12"} or pointer is None:
+        if manifest.schema_version not in {"2.11", "2.12", "2.13"} or pointer is None:
             raise _state_invalid("No active P0 qualification prepared receipt exists.")
         reopened = self._reopen_p0_pointer(pointer)
         self._validate_p0_selection_current(
@@ -293,7 +293,7 @@ class _StateCommitP0QualificationMixin:
 
         manifest = self._read_manifest()
         pointer = manifest.active_p0_qualification_prepared
-        if manifest.schema_version not in {"2.11", "2.12"} or pointer is None:
+        if manifest.schema_version not in {"2.11", "2.12", "2.13"} or pointer is None:
             raise _state_invalid("No active P0 qualification prepared receipt exists.")
         receipt, candidates, policies, validation_set, _ = self._reopen_p0_pointer(
             pointer
@@ -343,7 +343,7 @@ class _StateCommitP0QualificationMixin:
         with self._exclusive_lock():
             manifest = self._read_manifest()
             pointer = manifest.active_p0_qualification_prepared
-            if manifest.schema_version not in {"2.11", "2.12"} or pointer is None:
+            if manifest.schema_version not in {"2.11", "2.12", "2.13"} or pointer is None:
                 raise _state_invalid("No active P0 qualification prepared receipt exists.")
             current = self._reopen_p0_pointer(pointer)
             receipt, stacks, policies, validation_set, inputs = current

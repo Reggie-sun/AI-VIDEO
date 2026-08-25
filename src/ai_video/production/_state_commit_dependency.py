@@ -310,7 +310,7 @@ class _StateCommitDependencyMixin:
                     "schema_version": (
                         manifest.schema_version
                         if manifest.schema_version
-                        in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
+                        in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}
                         else "2.3"
                     ),
                     "active_project": project_pointer,
@@ -341,7 +341,7 @@ class _StateCommitDependencyMixin:
                                 else active_commercial_source_approvals
                             ),
                         }
-                        if manifest.schema_version == "2.12"
+                        if manifest.schema_version in {"2.12", "2.13"}
                         else {}
                     ),
                 },
@@ -402,7 +402,7 @@ class _StateCommitDependencyMixin:
             "2.9",
             "2.10",
             "2.11",
-            "2.12",
+            "2.12", "2.13",
         }:
             if transition is not None:
                 raise _state_invalid(
@@ -637,7 +637,7 @@ class _StateCommitDependencyMixin:
             "2.9",
             "2.10",
             "2.11",
-            "2.12",
+            "2.12", "2.13",
         }:
             raise _state_invalid("Dependency results require Manifest 2.3.")
         if manifest.manifest_revision != expected_manifest_revision:

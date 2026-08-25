@@ -31,6 +31,7 @@ from ai_video.production.video import (
 if TYPE_CHECKING:
     from ai_video.production.state_commit import ProductionStateCommitter
     from ai_video.production.video_artifact import (
+        GeneratedCommercialShotReviewer,
         GeneratedShotContinuityReviewer,
         TerminalFrameExtractor,
     )
@@ -396,6 +397,7 @@ class VideoGenerationService:
         probe: Callable[[int], dict] | None = None,
         terminal_frame_extractor: TerminalFrameExtractor | None = None,
         continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
+        commercial_reviewer: GeneratedCommercialShotReviewer | None = None,
     ):
         """Finish only the durable next post-submit phases, replaying no effect."""
 
@@ -419,6 +421,7 @@ class VideoGenerationService:
                 probe=probe,
                 terminal_frame_extractor=terminal_frame_extractor,
                 continuity_reviewer=continuity_reviewer,
+                commercial_reviewer=commercial_reviewer,
             )
             _, state = self._state(attempt_id)
         if state.phase is VideoAttemptPhase.CANDIDATE:
@@ -438,6 +441,7 @@ class VideoGenerationService:
         probe: Callable[[int], dict] | None = None,
         terminal_frame_extractor: TerminalFrameExtractor | None = None,
         continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
+        commercial_reviewer: GeneratedCommercialShotReviewer | None = None,
     ):
         """Perform exactly one canonical prepare action without any activation."""
 
@@ -458,6 +462,7 @@ class VideoGenerationService:
             probe=probe,
             terminal_frame_extractor=terminal_frame_extractor,
             continuity_reviewer=continuity_reviewer,
+            commercial_reviewer=commercial_reviewer,
         )
 
     def activate_once(self, *, attempt_id: str):

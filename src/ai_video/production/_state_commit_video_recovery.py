@@ -74,6 +74,27 @@ class _StateCommitVideoRecoveryMixin:
                             raise _state_invalid(
                                 "Recoverable continuity evidence does not match its intent."
                             )
+                if state.commercial_evaluation is not None:
+                    commercial_intent = (
+                        self._reopen_commercial_shot_evaluation_intent(
+                            state.commercial_evaluation.intent
+                        )
+                    )
+                    if state.commercial_evaluation.evidence is not None:
+                        commercial_evidence = (
+                            self._reopen_generated_commercial_shot_evidence(
+                                state.commercial_evaluation.evidence
+                            )
+                        )
+                        if (
+                            commercial_evidence.intent_content_hash
+                            != commercial_intent.content_hash
+                            or commercial_evidence.evaluation_fingerprint
+                            != commercial_intent.evaluation_fingerprint
+                        ):
+                            raise _state_invalid(
+                                "Recoverable commercial Shot evidence does not match its intent."
+                            )
                 protected_validate[attempt.attempt_id] = attempt
                 # The generic recovery owner must not reinterpret a safely
                 # persisted post-fetch phase.  Restore this exact attempt below.
@@ -104,6 +125,35 @@ class _StateCommitVideoRecoveryMixin:
                 )
             graph = self._reopen_dependency_graph(attempt.candidate_dependency_graph)
             request = self._reopen_video_request(state.request)
+            if (request.commercial_binding is None) != (
+                state.commercial_evaluation is None
+            ):
+                raise _state_invalid(
+                    "Interrupted commercial Shot candidate checkpoint is incomplete."
+                )
+            if state.commercial_evaluation is not None:
+                commercial_intent = self._reopen_commercial_shot_evaluation_intent(
+                    state.commercial_evaluation.intent
+                )
+                if state.commercial_evaluation.evidence is None:
+                    raise _state_invalid(
+                        "Interrupted commercial Shot candidate has no evidence."
+                    )
+                commercial_evidence = (
+                    self._reopen_generated_commercial_shot_evidence(
+                        state.commercial_evaluation.evidence
+                    )
+                )
+                if (
+                    request.commercial_binding is None
+                    or commercial_intent.binding_content_hash
+                    != request.commercial_binding.content_hash
+                    or commercial_evidence.intent_content_hash
+                    != commercial_intent.content_hash
+                ):
+                    raise _state_invalid(
+                        "Interrupted commercial Shot candidate evidence is not exact."
+                    )
             scope = request.activation_scope
             if scope is None:
                 raise _state_invalid(

@@ -5,6 +5,8 @@ from pydantic import ValidationError
 
 from ai_video.production.domain_acceptance import DomainAcceptancePolicy
 from ai_video.production.models import QaVerdict
+from ai_video.production.models import EvidenceStrength, ToolIdentity
+from ai_video.production.video import GeneratedCommercialShotBinding
 
 
 def _api() -> tuple[object, ...]:
@@ -168,3 +170,110 @@ def test_ecommerce_evidence_with_wrong_profile_hash_is_not_evaluated() -> None:
     _, _, adjudicate, _ = _api()
 
     assert adjudicate(policy, payload) is QaVerdict.NOT_EVALUATED
+
+
+def _shot_binding() -> GeneratedCommercialShotBinding:
+    return GeneratedCommercialShotBinding.create(
+        ad_creative_plan_id="qingyan-ad-plan",
+        ad_creative_plan_hash="1" * 64,
+        commercial_execution_projection_hash="2" * 64,
+        target_shot_id="shot-03",
+        profile_content_hash="3" * 64,
+        applicable_requirement_ids=(
+            "shot.identity.main_character",
+            "shot.product.interaction",
+            "shot.motion.required",
+        ),
+        product_truth_hashes=("4" * 64,),
+        product_reference_hashes=("5" * 64,),
+        source_approval_hashes=("6" * 64,),
+        expected_actor_ids=("qingyan-miao-girl", "qingyan-elder"),
+        output_asset_id="generated-shot-03",
+    )
+
+
+def _shot_evidence(*, verdict: QaVerdict = QaVerdict.PASS):
+    from ai_video.production.ecommerce_media_acceptance import (
+        CommercialShotEvaluationIntent,
+        EcommerceRequirementFinding,
+        GeneratedCommercialShotEvidence,
+    )
+
+    binding = _shot_binding()
+    evaluator = ToolIdentity(name="commercial-shot-evaluator", version="1")
+    intent = CommercialShotEvaluationIntent.create(
+        binding=binding,
+        resolved_generation_hash="7" * 64,
+        artifact_sha256="8" * 64,
+        measured_metadata_hash="9" * 64,
+        qa_policy_content_hash="a" * 64,
+        evaluator=evaluator,
+        evaluator_profile_content_hash="b" * 64,
+    )
+    evidence = GeneratedCommercialShotEvidence.create(
+        intent=intent,
+        strength=EvidenceStrength.EXPLICIT_EVALUATOR,
+        findings=tuple(
+            EcommerceRequirementFinding(
+                requirement_id=requirement_id,
+                verdict=verdict if index == 0 else QaVerdict.PASS,
+                rationale=f"observed {requirement_id}",
+            )
+            for index, requirement_id in enumerate(
+                binding.applicable_requirement_ids
+            )
+        ),
+    )
+    return binding, intent, evidence
+
+
+@pytest.mark.parametrize(
+    ("finding_verdict", "expected"),
+    [
+        (QaVerdict.PASS, QaVerdict.PASS),
+        (QaVerdict.FAIL, QaVerdict.FAIL),
+        (QaVerdict.NOT_EVALUATED, QaVerdict.NOT_EVALUATED),
+    ],
+)
+def test_generated_commercial_shot_evidence_aggregates_exact_requirements(
+    finding_verdict: QaVerdict,
+    expected: QaVerdict,
+) -> None:
+    from ai_video.production.ecommerce_media_acceptance import (
+        adjudicate_generated_commercial_shot_evidence,
+    )
+
+    binding, _, evidence = _shot_evidence(verdict=finding_verdict)
+    assert adjudicate_generated_commercial_shot_evidence(
+        evidence,
+        binding=binding,
+    ) is expected
+
+
+def test_generated_commercial_shot_evidence_rejects_drift_and_partial_coverage() -> None:
+    from ai_video.production.ecommerce_media_acceptance import (
+        GeneratedCommercialShotEvidence,
+        adjudicate_generated_commercial_shot_evidence,
+    )
+
+    binding, intent, evidence = _shot_evidence()
+    partial = GeneratedCommercialShotEvidence.create(
+        intent=intent,
+        strength=EvidenceStrength.EXPLICIT_EVALUATOR,
+        findings=evidence.findings[:-1],
+    )
+    assert adjudicate_generated_commercial_shot_evidence(
+        partial,
+        binding=binding,
+    ) is QaVerdict.NOT_EVALUATED
+
+    changed_binding = GeneratedCommercialShotBinding.create(
+        **{
+            **binding.model_dump(mode="python", exclude={"content_hash"}),
+            "profile_content_hash": "f" * 64,
+        }
+    )
+    assert adjudicate_generated_commercial_shot_evidence(
+        evidence,
+        binding=changed_binding,
+    ) is QaVerdict.NOT_EVALUATED

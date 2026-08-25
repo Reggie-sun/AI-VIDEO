@@ -108,7 +108,7 @@ class _StateCommitRecoveryMixin:
         registry_hash = self._require_recovery_file_hash(
             registry_path, manifest.active_registry.file_sha256
         )
-        if manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
+        if manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}:
             loaded = self._load_production_project(
                 self._project_root / "project.yaml"
             )
@@ -202,7 +202,7 @@ class _StateCommitRecoveryMixin:
                 )
             )
         if manifest.active_render_state is not None:
-            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
+            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}:
                 bundle = load_production_project_candidate(
                     self._project_root,
                     manifest,
@@ -268,7 +268,7 @@ class _StateCommitRecoveryMixin:
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
         pointer = manifest.active_p0_qualification_prepared
-        if manifest.schema_version not in {"2.11", "2.12"} or pointer is None:
+        if manifest.schema_version not in {"2.11", "2.12", "2.13"} or pointer is None:
             return ()
         receipt, stacks, policies, validation_set, inputs = (
             self.reopen_p0_qualification_prepared()
@@ -325,7 +325,7 @@ class _StateCommitRecoveryMixin:
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
         if (
-            manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
+            manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}
             or manifest.active_qa_policy is None
         ):
             return ()
@@ -392,7 +392,7 @@ class _StateCommitRecoveryMixin:
             return "legacy"
         if (
             manifest.schema_version
-            not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
+            not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}
             or attempt.candidate_dependency_graph is None
             or attempt.candidate_dependency_states_hash is None
         ):

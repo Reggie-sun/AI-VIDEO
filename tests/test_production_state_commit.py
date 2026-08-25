@@ -961,6 +961,23 @@ def test_manifest_schema_upgrade_is_monotonic_exact_and_replayable(
     assert read_manifest(tmp_path) == upgraded
 
 
+def test_manifest_schema_upgrade_from_212_to_213_is_reopenable(tmp_path: Path) -> None:
+    project_factory.write_production_project(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+    initial = read_manifest(tmp_path)
+    previous = writer.upgrade_manifest_schema(
+        "2.12", expected_manifest_revision=initial.manifest_revision
+    )
+
+    upgraded = writer.upgrade_manifest_schema(
+        "2.13", expected_manifest_revision=previous.manifest_revision
+    )
+
+    assert upgraded.schema_version == "2.13"
+    assert upgraded.manifest_revision == previous.manifest_revision + 1
+    assert load_production_project(tmp_path / "project.yaml").manifest == upgraded
+
+
 def test_recovery_reports_active_and_historical_p6_policy(tmp_path: Path) -> None:
     project_factory.write_production_project(tmp_path)
     project_factory.make_manifest_23_project(tmp_path)

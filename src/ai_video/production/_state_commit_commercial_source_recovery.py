@@ -192,7 +192,7 @@ class _StateCommitCommercialSourceRecoveryMixin:
     ) -> CommercialSourceAttemptState:
         with self._exclusive_lock():
             manifest = self._read_manifest()
-            if manifest.schema_version != "2.12":
+            if manifest.schema_version not in {"2.12", "2.13"}:
                 raise _state_invalid("Commercial source recovery requires Manifest 2.12.")
             attempt = next(
                 (
@@ -224,7 +224,7 @@ class _StateCommitCommercialSourceRecoveryMixin:
     def _active_commercial_source_recovery_items(
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
-        if manifest.schema_version != "2.12":
+        if manifest.schema_version not in {"2.12", "2.13"}:
             return ()
         items: list[RecoveryItem] = []
         for attempt in manifest.commercial_source_attempts:

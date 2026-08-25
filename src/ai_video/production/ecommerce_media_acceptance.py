@@ -9,7 +9,8 @@ from pydantic import Field, ValidationError, model_validator
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.domain_acceptance import DomainAcceptancePolicy
 from ai_video.production.hashing import canonical_sha256
-from ai_video.production.models import QaVerdict
+from ai_video.production.models import EvidenceStrength, QaVerdict, ToolIdentity
+from ai_video.production.video import GeneratedCommercialShotBinding
 
 
 MEASUREMENT_CONTRACT_VERSION = "ecommerce-media-acceptance/1"
@@ -187,6 +188,160 @@ def adjudicate_ecommerce_acceptance(
 
     finding_ids = tuple(item.requirement_id for item in measured.findings)
     if finding_ids != selected_policy.required_requirement_ids:
+        return QaVerdict.NOT_EVALUATED
+    if any(item.verdict is QaVerdict.FAIL for item in measured.findings):
+        return QaVerdict.FAIL
+    if any(item.verdict is not QaVerdict.PASS for item in measured.findings):
+        return QaVerdict.NOT_EVALUATED
+    return QaVerdict.PASS
+
+
+class CommercialShotEvaluationIntent(StrictModel):
+    schema_version: Literal["commercial-shot-evaluation-intent/1"] = (
+        "commercial-shot-evaluation-intent/1"
+    )
+    binding_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    measured_metadata_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluator: ToolIdentity
+    evaluator_profile_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_intent_seal(self) -> "CommercialShotEvaluationIntent":
+        fingerprint = canonical_sha256(
+            self.model_dump(
+                mode="json",
+                exclude={"evaluation_fingerprint", "content_hash"},
+            )
+        )
+        if self.evaluation_fingerprint != fingerprint:
+            raise ValueError("Commercial Shot evaluation fingerprint is invalid")
+        if self.content_hash != canonical_sha256(self):
+            raise ValueError("Commercial Shot evaluation intent hash is invalid")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        binding: GeneratedCommercialShotBinding,
+        resolved_generation_hash: str,
+        artifact_sha256: str,
+        measured_metadata_hash: str,
+        qa_policy_content_hash: str,
+        evaluator: ToolIdentity,
+        evaluator_profile_content_hash: str,
+    ) -> "CommercialShotEvaluationIntent":
+        selected_binding = GeneratedCommercialShotBinding.model_validate(
+            binding.model_dump(mode="json")
+        )
+        data = {
+            "binding_content_hash": selected_binding.content_hash,
+            "resolved_generation_hash": resolved_generation_hash,
+            "artifact_sha256": artifact_sha256,
+            "measured_metadata_hash": measured_metadata_hash,
+            "qa_policy_content_hash": qa_policy_content_hash,
+            "evaluator": evaluator,
+            "evaluator_profile_content_hash": evaluator_profile_content_hash,
+        }
+        provisional = cls.model_construct(
+            **data,
+            evaluation_fingerprint="0" * 64,
+            content_hash="0" * 64,
+        )
+        data["evaluation_fingerprint"] = canonical_sha256(
+            provisional.model_dump(
+                mode="json",
+                exclude={"evaluation_fingerprint", "content_hash"},
+                warnings=False,
+            )
+        )
+        provisional = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(provisional)
+        return cls.model_validate(data)
+
+
+class GeneratedCommercialShotEvidence(StrictModel):
+    schema_version: Literal["generated-commercial-shot-evidence/1"] = (
+        "generated-commercial-shot-evidence/1"
+    )
+    intent_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    binding_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    measured_metadata_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    qa_policy_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluator: ToolIdentity
+    evaluator_profile_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    strength: EvidenceStrength
+    findings: tuple[EcommerceRequirementFinding, ...] = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_evidence_seal(self) -> "GeneratedCommercialShotEvidence":
+        if self.strength not in {
+            EvidenceStrength.EXPLICIT_EVALUATOR,
+            EvidenceStrength.HUMAN,
+        }:
+            raise ValueError("Commercial Shot evidence requires evaluator authority")
+        if self.content_hash != canonical_sha256(self):
+            raise ValueError("Generated commercial Shot evidence hash is invalid")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        intent: CommercialShotEvaluationIntent,
+        strength: EvidenceStrength,
+        findings: tuple[EcommerceRequirementFinding, ...],
+    ) -> "GeneratedCommercialShotEvidence":
+        selected_intent = CommercialShotEvaluationIntent.model_validate(
+            intent.model_dump(mode="json")
+        )
+        data = {
+            "intent_content_hash": selected_intent.content_hash,
+            "binding_content_hash": selected_intent.binding_content_hash,
+            "resolved_generation_hash": selected_intent.resolved_generation_hash,
+            "artifact_sha256": selected_intent.artifact_sha256,
+            "measured_metadata_hash": selected_intent.measured_metadata_hash,
+            "qa_policy_content_hash": selected_intent.qa_policy_content_hash,
+            "evaluator": selected_intent.evaluator,
+            "evaluator_profile_content_hash": (
+                selected_intent.evaluator_profile_content_hash
+            ),
+            "evaluation_fingerprint": selected_intent.evaluation_fingerprint,
+            "strength": strength,
+            "findings": findings,
+        }
+        provisional = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(provisional)
+        return cls.model_validate(data)
+
+
+def adjudicate_generated_commercial_shot_evidence(
+    evidence: GeneratedCommercialShotEvidence,
+    *,
+    binding: GeneratedCommercialShotBinding,
+) -> QaVerdict:
+    try:
+        measured = GeneratedCommercialShotEvidence.model_validate(
+            evidence.model_dump(mode="json")
+        )
+        selected_binding = GeneratedCommercialShotBinding.model_validate(
+            binding.model_dump(mode="json")
+        )
+    except ValidationError:
+        return QaVerdict.NOT_EVALUATED
+    if measured.binding_content_hash != selected_binding.content_hash:
+        return QaVerdict.NOT_EVALUATED
+    finding_ids = tuple(item.requirement_id for item in measured.findings)
+    if finding_ids != selected_binding.applicable_requirement_ids:
         return QaVerdict.NOT_EVALUATED
     if any(item.verdict is QaVerdict.FAIL for item in measured.findings):
         return QaVerdict.FAIL

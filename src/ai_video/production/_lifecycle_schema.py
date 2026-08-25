@@ -375,6 +375,50 @@ class GeneratedShotContinuityEvidencePointer(_PaidLifecycleModel):
         return self
 
 
+class CommercialShotEvaluationIntentPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    binding_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluator_profile_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "CommercialShotEvaluationIntentPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/commercial-evaluation/intents/"
+                f"{self.content_hash}.json"
+            ),
+            "commercial Shot evaluation intent",
+        )
+        return self
+
+
+class GeneratedCommercialShotEvidencePointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    intent_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    binding_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "GeneratedCommercialShotEvidencePointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/commercial-evaluation/evidence/"
+                f"{self.content_hash}.json"
+            ),
+            "generated commercial Shot evidence",
+        )
+        return self
+
+
 class VideoProbeReceiptPointer(_PaidLifecycleModel):
     path: Path
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -478,6 +522,43 @@ class ContinuityEvaluationState(_PaidLifecycleModel):
         return self
 
 
+class CommercialShotEvaluationPhase(str, Enum):
+    INTENT = "intent"
+    EVIDENCED = "evidenced"
+
+
+class CommercialShotEvaluationState(_PaidLifecycleModel):
+    phase: CommercialShotEvaluationPhase
+    intent: CommercialShotEvaluationIntentPointer
+    evidence: GeneratedCommercialShotEvidencePointer | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_variant(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.evidence is None:
+            data.pop("evidence", None)
+        return data
+
+    @model_validator(mode="after")
+    def _validate_phase(self) -> "CommercialShotEvaluationState":
+        if self.phase is CommercialShotEvaluationPhase.INTENT:
+            if self.evidence is not None:
+                raise ValueError("commercial Shot evaluation intent cannot contain evidence")
+        elif self.evidence is None or (
+            self.evidence.intent_content_hash != self.intent.content_hash
+            or self.evidence.evaluation_fingerprint
+            != self.intent.evaluation_fingerprint
+            or self.evidence.binding_content_hash != self.intent.binding_content_hash
+            or self.evidence.artifact_sha256 != self.intent.artifact_sha256
+        ):
+            raise ValueError(
+                "commercial Shot evaluation evidence does not match its intent"
+            )
+        return self
+
+
 class VideoAttemptPhase(str, Enum):
     REQUEST = "request"
     SUBMIT_INTENT = "submit_intent"
@@ -522,6 +603,7 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
     terminal_frame_evidence: TerminalFrameEvidencePointer | None = None
     terminal_frame_extraction: TerminalFrameExtractionReceiptPointer | None = None
     continuity_evaluation: ContinuityEvaluationState | None = None
+    commercial_evaluation: CommercialShotEvaluationState | None = None
     candidate_video_asset_ids: tuple[str, ...] = ()
     candidate_continuity_asset_ids: tuple[str, ...] = ()
 
@@ -536,6 +618,8 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             data.pop("terminal_frame_extraction", None)
         if self.continuity_evaluation is None:
             data.pop("continuity_evaluation", None)
+        if self.commercial_evaluation is None:
+            data.pop("commercial_evaluation", None)
         if not self.candidate_continuity_asset_ids:
             data.pop("candidate_continuity_asset_ids", None)
         for field in (
@@ -642,6 +726,21 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
                 and self.phase is not VideoAttemptPhase.VALIDATE
             ):
                 raise ValueError("incomplete continuity evaluation must remain in validate")
+        if self.commercial_evaluation is not None:
+            if self.phase not in {
+                VideoAttemptPhase.VALIDATE,
+                VideoAttemptPhase.CANDIDATE,
+                VideoAttemptPhase.ACTIVATE,
+            }:
+                raise ValueError("commercial Shot evaluation requires a post-fetch phase")
+            if (
+                self.commercial_evaluation.phase
+                is CommercialShotEvaluationPhase.INTENT
+                and self.phase is not VideoAttemptPhase.VALIDATE
+            ):
+                raise ValueError(
+                    "incomplete commercial Shot evaluation must remain in validate"
+                )
         if self.phase in _VIDEO_CANDIDATE_PHASES:
             if self.candidate_video_asset_ids != (self.request.output_asset_id,):
                 raise ValueError("video candidate asset ID must match request output")
@@ -943,7 +1042,7 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
         isinstance(attempt, Mapping) and "paid_provider_state" in attempt
         for attempt in value.get("attempts", ())
     )
-    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and (
+    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"} and (
         "active_paid_provider_budget" in value or has_paid_attempt
     ):
         raise ValueError(
@@ -956,6 +1055,17 @@ def reject_explicit_p8_video_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
+    if manifest_version != "2.13":
+        for attempt in value.get("attempts", ()):
+            state = (
+                attempt.get("video_generation_state")
+                if isinstance(attempt, Mapping)
+                else None
+            )
+            if isinstance(state, Mapping) and "commercial_evaluation" in state:
+                raise ValueError(
+                    "Commercial Shot evaluation state requires Production Manifest 2.13"
+                )
     if manifest_version == "2.7":
         continuity_fields = {
             "terminal_frame_evidence",
@@ -1001,7 +1111,7 @@ def reject_explicit_p8_video_fields(value: object) -> object:
                     "checkpoint fields; Manifest 2.10 is required"
                 )
         return value
-    if manifest_version in {"2.10", "2.11", "2.12"}:
+    if manifest_version in {"2.10", "2.11", "2.12", "2.13"}:
         for attempt in value.get("attempts", ()):
             if not isinstance(attempt, Mapping):
                 continue
@@ -1040,7 +1150,7 @@ def reject_explicit_p7_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
+    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}:
         return value
     image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
     for attempt in value.get("attempts", ()):
@@ -1058,7 +1168,7 @@ def reject_explicit_p0_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     if (
-        value.get("schema_version", "2.0") not in {"2.11", "2.12"}
+        value.get("schema_version", "2.0") not in {"2.11", "2.12", "2.13"}
         and "active_p0_qualification_prepared" in value
     ):
         raise ValueError(

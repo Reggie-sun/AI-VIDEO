@@ -7,6 +7,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
@@ -17,12 +18,20 @@ from ai_video.production.models import (
     QaPolicy,
     QaPolicyPointer,
     QaTechnicalThresholds,
+    QaVerdict,
     ProductionManifest,
     RegistryDependencyEvidence,
     SourceReference,
     StateCommitStatus,
     ToolIdentity,
     VideoAttemptPhase,
+)
+from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+from ai_video.production.ecommerce_media_acceptance import (
+    CommercialShotEvaluationIntent,
+    EcommerceRequirementFinding,
+    GeneratedCommercialShotEvidence,
+    create_qingyan_ecommerce_acceptance_profile,
 )
 from ai_video.production._video_project_reader import (
     load_terminal_frame_evidence,
@@ -44,7 +53,7 @@ from ai_video.production.paths import (
     canonical_image_request_path,
     canonical_qa_policy_path,
 )
-from ai_video.production.hashing import seal_artifact
+from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.review import (
     ContinuityEvaluationIntent,
     GeneratedShotContinuityEvidence,
@@ -59,6 +68,7 @@ from ai_video.production.video import (
     VideoExecutionKind,
     VideoGenerationMode,
     VideoGenerationRequest,
+    GeneratedCommercialShotBinding,
     VideoImageReferenceBinding,
     VideoOutputRequirement,
     VideoProviderCapabilities,
@@ -71,6 +81,7 @@ from ai_video.production.video_fake import (
 from ai_video.production.video_artifact import (
     _default_terminal_frame_extractor,
     probe_generated_video_candidate,
+    VideoProbeReceipt,
 )
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.project import load_production_project
@@ -94,6 +105,10 @@ ATTEMPT_ID = "p8-generated-video-e2e"
 CONTINUITY_EVALUATOR = ToolIdentity(
     name="fixture-durable-continuity-evaluator", version="1"
 )
+COMMERCIAL_EVALUATOR = ToolIdentity(
+    name="fixture-commercial-shot-evaluator",
+    version="1",
+)
 
 
 def _durable_tree_snapshot(root: Path) -> dict[Path, bytes]:
@@ -106,16 +121,51 @@ def _durable_tree_snapshot(root: Path) -> dict[Path, bytes]:
 
 
 def _runtime(
-    root: Path, *, seal_terminal_frame: bool = False, continuity: bool = False
+    root: Path,
+    *,
+    seal_terminal_frame: bool = False,
+    continuity: bool = False,
+    commercial: bool = False,
 ):
     inputs = make_p8_video_generation_base(
         root,
         schema_version=(
-            "2.10" if continuity else "2.8" if seal_terminal_frame else "2.7"
+            "2.13"
+            if commercial
+            else "2.10"
+            if continuity
+            else "2.8"
+            if seal_terminal_frame
+            else "2.7"
         ),
     )
     loaded = inputs.project
-    if continuity:
+    commercial_profile = (
+        create_qingyan_ecommerce_acceptance_profile() if commercial else None
+    )
+    if continuity or commercial:
+        semantic_authorities = tuple(
+            item
+            for item in (CONTINUITY_EVALUATOR if continuity else None, COMMERCIAL_EVALUATOR if commercial else None)
+            if item is not None
+        )
+        domain_acceptance = (
+            DomainAcceptancePolicy(
+                domain_id="ecommerce",
+                profile_id=commercial_profile.profile_id,
+                profile_version=commercial_profile.profile_version,
+                profile_content_hash=commercial_profile.content_hash,
+                profile_payload=commercial_profile.model_dump(mode="json"),
+                measurement_contract_version=(
+                    commercial_profile.measurement_contract_version
+                ),
+                required_requirement_ids=(
+                    commercial_profile.required_requirement_ids
+                ),
+            )
+            if commercial_profile is not None
+            else None
+        )
         policy = seal_artifact(
             QaPolicy(
                 artifact_id="qa-policy-continuity-evaluator-v1",
@@ -139,7 +189,8 @@ def _runtime(
                 ),
                 strategy_rules_version="1",
                 semantic_requirement="required",
-                semantic_authorities=(CONTINUITY_EVALUATOR,),
+                semantic_authorities=semantic_authorities,
+                domain_acceptance=domain_acceptance,
             )
         )
         policy_bytes = policy.model_dump_json().encode("utf-8")
@@ -214,6 +265,26 @@ def _runtime(
             terminal.source_video_asset_id,
             source.asset_id,
         )
+    commercial_binding = (
+        GeneratedCommercialShotBinding.create(
+            ad_creative_plan_id="qingyan-ad-plan",
+            ad_creative_plan_hash="a" * 64,
+            commercial_execution_projection_hash="b" * 64,
+            target_shot_id=shot.shot_id,
+            profile_content_hash=commercial_profile.content_hash,
+            applicable_requirement_ids=(
+                commercial_profile.shot_requirement_ids[0],
+                commercial_profile.shot_requirement_ids[1],
+            ),
+            product_truth_hashes=(),
+            product_reference_hashes=(),
+            source_approval_hashes=(),
+            expected_actor_ids=("qingyan-miao-girl", "qingyan-elder"),
+            output_asset_id="video-output-p8-001",
+        )
+        if commercial_profile is not None
+        else None
+    )
     request = VideoGenerationRequest.create(
         generation_id="p8-generation-001",
         provider_name="fake-video",
@@ -235,6 +306,7 @@ def _runtime(
         negative_prompt_text="flicker",
         image_bindings=image_bindings,
         continuity_binding=continuity_binding,
+        commercial_binding=commercial_binding,
         seal_terminal_frame=seal_terminal_frame,
         output_requirement=output,
         seed=17,
@@ -305,9 +377,13 @@ def _reach_fetch(
     settle: bool = True,
     seal_terminal_frame: bool = False,
     continuity: bool = False,
+    commercial: bool = False,
 ):
     inputs, provider, resolved, paid_preview, committer = _runtime(
-        root, seal_terminal_frame=seal_terminal_frame, continuity=continuity
+        root,
+        seal_terminal_frame=seal_terminal_frame,
+        continuity=continuity,
+        commercial=commercial,
     )
     service = VideoGenerationService(committer=committer, provider=provider)
     service.start(attempt_id=ATTEMPT_ID, request=resolved)
@@ -844,6 +920,262 @@ class _CountingDurableContinuityReviewer:
             evaluation_fingerprint=self.intent.evaluation_fingerprint,
             rationale="Fixture human reviewed every exact continuity dimension.",
         )
+
+
+class _CountingCommercialShotReviewer:
+    def __init__(
+        self,
+        *,
+        verdict: QaVerdict = QaVerdict.PASS,
+        fail_during_evaluation: bool = False,
+    ) -> None:
+        self.calls = 0
+        self.verdict = verdict
+        self.fail_during_evaluation = fail_during_evaluation
+        self.intent: CommercialShotEvaluationIntent | None = None
+
+    def create_intent(self, request, measured, qa_policy_content_hash):
+        binding = request.commercial_binding
+        assert binding is not None
+        self.intent = CommercialShotEvaluationIntent.create(
+            binding=binding,
+            resolved_generation_hash=request.resolved_generation_hash,
+            artifact_sha256=measured.artifact_sha256,
+            measured_metadata_hash=canonical_sha256(measured),
+            qa_policy_content_hash=qa_policy_content_hash,
+            evaluator=COMMERCIAL_EVALUATOR,
+            evaluator_profile_content_hash=binding.profile_content_hash,
+        )
+        return self.intent
+
+    def __call__(self, held_fd, request, measured, intent):
+        del held_fd, measured
+        self.calls += 1
+        if self.fail_during_evaluation:
+            raise RuntimeError("commercial evaluator interrupted")
+        assert self.intent == intent
+        binding = request.commercial_binding
+        assert binding is not None
+        return GeneratedCommercialShotEvidence.create(
+            intent=intent,
+            strength=EvidenceStrength.HUMAN,
+            findings=tuple(
+                EcommerceRequirementFinding(
+                    requirement_id=requirement_id,
+                    verdict=self.verdict if index == 0 else QaVerdict.PASS,
+                    rationale=f"reviewed {requirement_id}",
+                )
+                for index, requirement_id in enumerate(
+                    binding.applicable_requirement_ids
+                )
+            ),
+        )
+
+
+def test_commercial_shot_pass_checkpoints_before_activation_and_reopens(
+    tmp_path: Path,
+) -> None:
+    _, provider, resolved, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    reviewer = _CountingCommercialShotReviewer()
+
+    activated = service.fetch_and_activate(
+        attempt_id=ATTEMPT_ID,
+        commercial_reviewer=reviewer,
+    )
+
+    assert reviewer.calls == 1
+    state = activated.attempts[-1].video_generation_state
+    assert state is not None
+    assert state.phase is VideoAttemptPhase.ACTIVATE
+    assert state.commercial_evaluation is not None
+    assert state.commercial_evaluation.evidence is not None
+    loaded = load_production_project(tmp_path / "project.yaml")
+    asset = next(
+        item for item in loaded.registry.assets if item.asset_id == resolved.output_asset_id
+    )
+    assert asset.video_metadata is not None
+    probe = VideoProbeReceipt.model_validate_json(
+        (
+            tmp_path
+            / "state/video-generation/probes"
+            / f"{asset.video_metadata.probe_receipt_id}.json"
+        ).read_bytes()
+    )
+    assert probe.commercial_evidence is not None
+    assert probe.commercial_evidence.content_hash == (
+        state.commercial_evaluation.evidence.content_hash
+    )
+    downgraded = activated.model_dump(mode="python")
+    downgraded["schema_version"] = "2.12"
+    with pytest.raises(ValidationError, match="Commercial Shot evaluation state"):
+        ProductionManifest.model_validate(downgraded)
+
+
+@pytest.mark.parametrize("verdict", (QaVerdict.FAIL, QaVerdict.NOT_EVALUATED))
+def test_commercial_shot_nonpass_is_durable_and_never_reruns_reviewer(
+    tmp_path: Path,
+    verdict: QaVerdict,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    reviewer = _CountingCommercialShotReviewer(verdict=verdict)
+
+    with pytest.raises(AiVideoError) as first:
+        service.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=reviewer,
+        )
+    assert first.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert reviewer.calls == 1
+
+    with pytest.raises(AiVideoError) as replay:
+        service.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=reviewer,
+        )
+    assert replay.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert reviewer.calls == 1
+
+
+def test_commercial_shot_intent_only_requires_explicit_recovery(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    reviewer = _CountingCommercialShotReviewer(fail_during_evaluation=True)
+
+    with pytest.raises(AiVideoError) as interrupted:
+        service.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=reviewer,
+        )
+    assert interrupted.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert reviewer.calls == 1
+
+    with pytest.raises(AiVideoError) as replay:
+        service.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=reviewer,
+        )
+    assert replay.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert reviewer.calls == 1
+
+
+def test_commercial_shot_validate_once_cannot_bypass_missing_reviewer(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+
+    with pytest.raises(AiVideoError) as rejected:
+        service.validate_once(attempt_id=ATTEMPT_ID)
+
+    assert rejected.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    state = committer._read_manifest().attempts[-1].video_generation_state
+    assert state is not None and state.phase is VideoAttemptPhase.VALIDATE
+    assert state.commercial_evaluation is None
+
+
+def test_continuity_and_commercial_share_one_authoritative_probe(
+    tmp_path: Path,
+) -> None:
+    _, provider, resolved, committer = _reach_fetch(
+        tmp_path,
+        continuity=True,
+        commercial=True,
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    activated = service.fetch_and_activate(
+        attempt_id=ATTEMPT_ID,
+        continuity_reviewer=_CountingDurableContinuityReviewer(),
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+    )
+
+    state = activated.attempts[-1].video_generation_state
+    assert state is not None and state.continuity_evaluation is not None
+    assert state.commercial_evaluation is not None
+    assert state.continuity_evaluation.probe is not None
+    probe = VideoProbeReceipt.model_validate_json(
+        (tmp_path / state.continuity_evaluation.probe.path).read_bytes()
+    )
+    assert probe.continuity_evidence is not None
+    assert probe.commercial_evidence is not None
+    loaded = load_production_project(tmp_path / "project.yaml")
+    asset = next(
+        item for item in loaded.registry.assets if item.asset_id == resolved.output_asset_id
+    )
+    assert asset.video_metadata is not None
+    assert asset.video_metadata.probe_receipt_id == probe.content_hash
+
+
+def test_new_commercial_attempt_rejects_manifest_212_before_provider_submit(
+    tmp_path: Path,
+) -> None:
+    _, provider, resolved, _, committer = _runtime(tmp_path, commercial=True)
+    manifest_path = tmp_path / "state/manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["schema_version"] = "2.12"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    before = provider.call_counts
+
+    with pytest.raises(AiVideoError) as rejected:
+        VideoGenerationService(committer=committer, provider=provider).start(
+            attempt_id=ATTEMPT_ID,
+            request=resolved,
+        )
+
+    assert rejected.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert provider.call_counts == before
+    assert provider.call_counts.submit == 0
+
+
+def test_commercial_evidence_checkpoint_prevents_repeat_after_candidate_failure(
+    tmp_path: Path,
+) -> None:
+    inputs, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    VideoGenerationService(committer=committer, provider=provider).fetch_once(
+        attempt_id=ATTEMPT_ID
+    )
+    reviewer = _CountingCommercialShotReviewer()
+
+    def failing_preparer(*_args):
+        raise RuntimeError("candidate preparation interrupted")
+
+    interrupted = VideoGenerationService(
+        committer=ProductionStateCommitter(
+            tmp_path,
+            video_candidate_preparer=failing_preparer,
+        ),
+        provider=provider,
+    )
+    with pytest.raises(RuntimeError, match="interrupted"):
+        interrupted.fetch_and_activate(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=reviewer,
+        )
+    assert reviewer.calls == 1
+    checkpointed = ProductionStateCommitter(tmp_path)._read_manifest()
+    state = checkpointed.attempts[-1].video_generation_state
+    assert state is not None and state.commercial_evaluation is not None
+    assert state.commercial_evaluation.evidence is not None
+    ProductionStateCommitter(tmp_path).recover()
+
+    resumed = VideoGenerationService(
+        committer=ProductionStateCommitter(
+            tmp_path,
+            video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
+        ),
+        provider=provider,
+    )
+    resumed.fetch_and_activate(attempt_id=ATTEMPT_ID)
+
+    assert reviewer.calls == 1
 
 
 def test_continuity_fail_checkpoints_probe_and_provenance_before_adjudication(

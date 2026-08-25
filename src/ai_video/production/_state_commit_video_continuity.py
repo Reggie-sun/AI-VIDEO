@@ -58,6 +58,7 @@ def checkpoint_generated_shot_continuity(
     continuity_reviewer,
     continuity_policy_content_hash,
     continuity_authorities,
+    commercial_evidence=None,
 ):
     """Checkpoint intent/evidence once, then return exact reopened state and receipt."""
 
@@ -67,7 +68,7 @@ def checkpoint_generated_shot_continuity(
     if evaluation_state is None:
         create_intent = getattr(continuity_reviewer, "create_intent", None)
         if (
-            manifest.schema_version not in {"2.10", "2.11", "2.12"}
+            manifest.schema_version not in {"2.10", "2.11", "2.12", "2.13"}
             or continuity_reviewer is None
             or create_intent is None
             or continuity_policy_content_hash is None
@@ -172,6 +173,7 @@ def checkpoint_generated_shot_continuity(
             fetch_receipt=fetch_receipt,
             measured=measured,
             continuity_evidence=evidence,
+            commercial_evidence=commercial_evidence,
         )
         provenance = (
             VideoProvenanceReceipt.create_local(
@@ -277,6 +279,7 @@ def checkpoint_generated_shot_continuity(
                 fetch_receipt=fetch_receipt,
                 measured=measured,
                 continuity_evidence=evidence,
+                commercial_evidence=commercial_evidence,
             )
             provenance = (
                 VideoProvenanceReceipt.create_local(
@@ -311,6 +314,7 @@ def checkpoint_generated_shot_continuity(
     )
     if (
         probe_receipt.continuity_evidence != evidence
+        or probe_receipt.commercial_evidence != commercial_evidence
         or probe_receipt.fetch_fingerprint != fetch_receipt.fetch_fingerprint
         or provenance.probe_receipt_id != probe_receipt.content_hash
         or provenance.artifact_sha256 != measured.artifact_sha256

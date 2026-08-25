@@ -406,6 +406,20 @@ def canonical_generated_shot_continuity_evidence_path(content_hash: str) -> Path
     )
 
 
+def canonical_commercial_shot_evaluation_intent_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/commercial-evaluation/intents/"
+        f"{_require_sha256(content_hash, 'commercial Shot evaluation intent hash')}.json"
+    )
+
+
+def canonical_generated_commercial_shot_evidence_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/commercial-evaluation/evidence/"
+        f"{_require_sha256(content_hash, 'generated commercial Shot evidence hash')}.json"
+    )
+
+
 def canonical_terminal_frame_extraction_receipt_path(content_hash: str) -> Path:
     return Path(
         "state/video-generation/terminal-extractions/"

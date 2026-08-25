@@ -7,6 +7,8 @@ from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._lifecycle_schema import (
+    CommercialShotEvaluationIntentPointer,
+    GeneratedCommercialShotEvidencePointer,
     LocalVideoFetchReceiptPointer,
     LocalVideoStatusReceiptPointer,
     LocalVideoSubmitIntentPointer,
@@ -26,6 +28,7 @@ from ai_video.production.models import (
     AssetSourceKind,
     AssetType,
     LoadedProductionProject,
+    CommercialShotEvaluationPhase,
     PaidProviderAttemptPhase,
     ProductionManifest,
     StateCommitStatus,
@@ -53,6 +56,8 @@ from ai_video.production.paths import (
     canonical_terminal_frame_extraction_receipt_path,
     canonical_continuity_evaluation_intent_path,
     canonical_generated_shot_continuity_evidence_path,
+    canonical_commercial_shot_evaluation_intent_path,
+    canonical_generated_commercial_shot_evidence_path,
     resolve_contained_path,
 )
 from ai_video.production.video import (
@@ -68,6 +73,10 @@ from ai_video.production.video_artifact import (
     VideoProbeReceipt,
     VideoProvenanceReceipt,
     bind_terminal_frame_evidence,
+)
+from ai_video.production.ecommerce_media_acceptance import (
+    CommercialShotEvaluationIntent,
+    GeneratedCommercialShotEvidence,
 )
 from ai_video.production.review import (
     ContinuityEvaluationIntent,
@@ -114,6 +123,59 @@ def load_video_request_receipt(
     ):
         raise _invalid("Video generation request pointer identity is invalid.")
     return request
+
+
+def load_commercial_shot_evaluation_intent(
+    root: str | Path,
+    pointer: CommercialShotEvaluationIntentPointer,
+) -> CommercialShotEvaluationIntent:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        if pointer.path != canonical_commercial_shot_evaluation_intent_path(
+            pointer.content_hash
+        ):
+            raise ValueError("noncanonical commercial Shot intent path")
+        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        intent = CommercialShotEvaluationIntent.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen commercial Shot evaluation intent.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or intent.content_hash != pointer.content_hash
+        or intent.evaluation_fingerprint != pointer.evaluation_fingerprint
+        or intent.binding_content_hash != pointer.binding_content_hash
+        or intent.artifact_sha256 != pointer.artifact_sha256
+        or intent.evaluator_profile_content_hash
+        != pointer.evaluator_profile_content_hash
+    ):
+        raise _invalid("Commercial Shot evaluation intent pointer identity is invalid.")
+    return intent
+
+
+def load_generated_commercial_shot_evidence(
+    root: str | Path,
+    pointer: GeneratedCommercialShotEvidencePointer,
+) -> GeneratedCommercialShotEvidence:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        if pointer.path != canonical_generated_commercial_shot_evidence_path(
+            pointer.content_hash
+        ):
+            raise ValueError("noncanonical commercial Shot evidence path")
+        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        evidence = GeneratedCommercialShotEvidence.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen commercial Shot evidence.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or evidence.content_hash != pointer.content_hash
+        or evidence.intent_content_hash != pointer.intent_content_hash
+        or evidence.evaluation_fingerprint != pointer.evaluation_fingerprint
+        or evidence.binding_content_hash != pointer.binding_content_hash
+        or evidence.artifact_sha256 != pointer.artifact_sha256
+    ):
+        raise _invalid("Commercial Shot evidence pointer identity is invalid.")
+    return evidence
 
 
 def load_video_status_receipt(
@@ -453,6 +515,11 @@ def _verify_continuity_capture_checkpoint(
         raise _invalid("Continuity capture checkpoint is incomplete.")
     probe = load_video_probe_receipt(root, evaluation.probe)
     provenance = load_video_provenance_receipt(root, evaluation.provenance)
+    commercial_pointer = (
+        state.commercial_evaluation.evidence
+        if state.commercial_evaluation is not None
+        else None
+    )
     if (
         probe.request_receipt_fingerprint
         != request.desired_generation_fingerprint
@@ -461,6 +528,10 @@ def _verify_continuity_capture_checkpoint(
         or probe.measured.artifact_sha256 != fetch.artifact_sha256
         or probe.continuity_evidence is None
         or probe.continuity_evidence.content_hash != evaluation.evidence.content_hash
+        or (probe.commercial_evidence is None) != (commercial_pointer is None)
+        or commercial_pointer is not None
+        and probe.commercial_evidence is not None
+        and probe.commercial_evidence.content_hash != commercial_pointer.content_hash
         or provenance.request_receipt_fingerprint
         != request.desired_generation_fingerprint
         or provenance.resolved_generation_hash != request.resolved_generation_hash
@@ -472,11 +543,42 @@ def _verify_continuity_capture_checkpoint(
 
 
 def verify_video_evidence(
-    root: str | Path, states: Iterable[VideoGenerationAttemptState]
+    root: str | Path,
+    states: Iterable[VideoGenerationAttemptState],
+    *,
+    schema_version: str | None = None,
 ) -> None:
     request_owners: list[str] = []
     for state in states:
         request = load_video_request_receipt(root, state.request)
+        if (
+            (request.commercial_binding is not None or state.commercial_evaluation is not None)
+            and schema_version is not None
+            and schema_version != "2.13"
+        ):
+            raise _invalid(
+                "Commercial-bound video state requires Production Manifest 2.13."
+            )
+        if (request.commercial_binding is None) != (
+            state.commercial_evaluation is None
+        ) and state.phase in {
+            VideoAttemptPhase.CANDIDATE,
+            VideoAttemptPhase.ACTIVATE,
+        }:
+            raise _invalid("Commercial Shot candidate checkpoint is incomplete.")
+        if (
+            request.commercial_binding is not None
+            and state.phase in {
+                VideoAttemptPhase.CANDIDATE,
+                VideoAttemptPhase.ACTIVATE,
+            }
+            and (
+                state.commercial_evaluation is None
+                or state.commercial_evaluation.phase
+                is not CommercialShotEvaluationPhase.EVIDENCED
+            )
+        ):
+            raise _invalid("Commercial Shot candidate has no evidenced checkpoint.")
         request_owners.append(state.request.request_receipt_fingerprint)
         if (
             request.generation_id != state.generation_id
@@ -502,6 +604,30 @@ def verify_video_evidence(
                 )
                 if evidence.evaluation_fingerprint != intent.evaluation_fingerprint:
                     raise _invalid("Continuity evaluation evidence is not exact.")
+        if state.commercial_evaluation is not None:
+            intent = load_commercial_shot_evaluation_intent(
+                root, state.commercial_evaluation.intent
+            )
+            if (
+                request.commercial_binding is None
+                or intent.binding_content_hash
+                != request.commercial_binding.content_hash
+                or intent.resolved_generation_hash
+                != request.resolved_generation_hash
+                or intent.artifact_sha256
+                != state.commercial_evaluation.intent.artifact_sha256
+            ):
+                raise _invalid("Commercial Shot evaluation intent is not exact.")
+            if state.commercial_evaluation.evidence is not None:
+                evidence = load_generated_commercial_shot_evidence(
+                    root, state.commercial_evaluation.evidence
+                )
+                if (
+                    evidence.intent_content_hash != intent.content_hash
+                    or evidence.evaluation_fingerprint
+                    != intent.evaluation_fingerprint
+                ):
+                    raise _invalid("Commercial Shot evaluation evidence is not exact.")
         if state.local_submit_intent is not None:
             intent = load_local_video_submit_intent(root, state.local_submit_intent)
             if intent.request_fingerprint != request.resolved_generation_hash:
@@ -740,6 +866,11 @@ def _verify_active_generated_video(
             request,
             require_active_base=False,
         )
+    commercial_pointer = (
+        state.commercial_evaluation.evidence
+        if state.commercial_evaluation is not None
+        else None
+    )
     if (
         attempt.status is not StateCommitStatus.SUCCEEDED
         or state.phase is not VideoAttemptPhase.ACTIVATE
@@ -831,6 +962,10 @@ def _verify_active_generated_video(
         or probe.measured.fps_denominator != metadata.fps_denominator
         or probe.measured.duration_milliseconds != metadata.duration_milliseconds
         or probe.measured.frame_count != metadata.frame_count
+        or (probe.commercial_evidence is None) != (commercial_pointer is None)
+        or commercial_pointer is not None
+        and probe.commercial_evidence is not None
+        and probe.commercial_evidence.content_hash != commercial_pointer.content_hash
         or provenance.content_hash != metadata.provenance_receipt_id
         or provenance.generation_id != request.generation_id
         or provenance.request_receipt_fingerprint
@@ -934,4 +1069,8 @@ def verify_manifest_video_evidence(
             == manifest.active_dependency_graph
         ):
             _verify_active_generated_video(bundle, attempt, request)
-    verify_video_evidence(root, states)
+    verify_video_evidence(
+        root,
+        states,
+        schema_version=manifest.schema_version,
+    )
