@@ -124,6 +124,21 @@ matrix/baseline增加了另一slice的unstaged内容，因此live verifier的fre
 `workspace_stable_confirmed=false`、`snapshot_matches=false`并将receipt status标为failed。
 该receipt只证明各check结果，不是completion proof。
 
+在共享writer完成`3323a2d`且本记录首次提交为`6d25adb`后，最终stable-HEAD cumulative range
+`95045eb..6d25adb`取得fresh completion proof：
+
+```text
+.agent/harness/runs/quality-gate-cumulative-head-6d25adb-20260825-v1/receipt.json
+```
+
+该run状态PASS：Harness tests `185 passed`、Production Review tests `606 passed`、Shot Continuity
+P0 tests `240 passed`、Production Video Provider contract tests `659 passed`、Provider-neutral Video
+Requirement tests `292 passed`；Architecture Gate为PASS，仅报告中间`3323a2d`所涉
+`shot_continuity_source_operator.py` fan-out的1个INFO，无warning/error。Verifier确认
+`complete_completion_proof=true`、`fresh=true`、`snapshot_matches=true`与
+`workspace_stable_confirmed=true`。该cumulative receipt包含本Gate 1 commit及中间的Shot Continuity
+ownership-fix commit；它不是后者媒体质量、Provider live或P6 acceptance证明。
+
 ## Verification And Evidence
 
 Parent/shared-checkout focused verification：
@@ -186,6 +201,8 @@ Gate 1-only current checkpoint evidence：
   PASS；Harness tests `185 passed`、Production Review tests `606 passed`、Architecture Gate PASS。
 - `.agent/harness/runs/quality-gate-one-commit-eba888f-20260825-v1/receipt.json`：全部check
   records PASS，但并发`HEAD`移动导致overall status failed；不得描述为complete completion proof。
+- `.agent/harness/runs/quality-gate-cumulative-head-6d25adb-20260825-v1/receipt.json`：stable
+  cumulative range的fresh complete completion proof；全部9个required checks PASS。
 
 ## Concurrent Workspace Divergence
 
