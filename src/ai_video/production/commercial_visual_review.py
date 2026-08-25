@@ -7,6 +7,7 @@ from pydantic import Field, model_validator
 
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import (
+    ActorIdentity,
     EvidenceStrength,
     QaLayer,
     QaPolicy,
@@ -65,9 +66,11 @@ class CommercialVisualMeasurement(StrictModel):
     rationale: str = Field(min_length=1)
 
 
-class CommercialVisualEvidence(StrictModel):
-    schema_version: Literal["commercial-visual-evidence/1"] = "commercial-visual-evidence/1"
-    evidence_id: str = Field(min_length=1)
+class CommercialSourceReviewIntent(StrictModel):
+    schema_version: Literal["commercial-source-review-intent/1"] = (
+        "commercial-source-review-intent/1"
+    )
+    intent_id: str = Field(min_length=1)
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_request_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     target_shot_id: str = Field(min_length=1)
@@ -77,11 +80,59 @@ class CommercialVisualEvidence(StrictModel):
     product_reference_set_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     policy_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     authority_kind: Literal["human", "calibrated_automatic", "automatic"]
+    actor_identity: ActorIdentity
+    tool_identity: ToolIdentity
+    target_kind: Literal["source_image"] = "source_image"
+
+    @model_validator(mode="after")
+    def _validate_actor_and_seal(self) -> "CommercialSourceReviewIntent":
+        if (self.authority_kind == "human") != (
+            self.actor_identity.actor_kind == "human"
+        ):
+            raise ValueError("Commercial human review requires an exact human actor")
+        expected = canonical_sha256(
+            self.model_dump(mode="json", exclude={"content_hash"})
+        )
+        if self.content_hash != expected:
+            raise ValueError("Commercial source review intent content_hash does not match")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "CommercialSourceReviewIntent":
+        data = dict(values)
+        data.setdefault("schema_version", "commercial-source-review-intent/1")
+        data.setdefault("target_kind", "source_image")
+        data.pop("content_hash", None)
+        provisional = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            provisional.model_dump(mode="json", exclude={"content_hash"})
+        )
+        return cls.model_validate(data)
+
+
+class CommercialVisualEvidence(StrictModel):
+    schema_version: Literal["commercial-visual-evidence/1"] = "commercial-visual-evidence/1"
+    evidence_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    review_intent_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_request_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    target_shot_id: str = Field(min_length=1)
+    target_shot_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    candidate_asset_id: str = Field(min_length=1)
+    candidate_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    product_reference_set_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    policy_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    authority_kind: Literal["human", "calibrated_automatic", "automatic"]
+    observed_by: ActorIdentity
     tool_identity: ToolIdentity
     measurements: tuple[CommercialVisualMeasurement, ...] = Field(min_length=1)
 
     @model_validator(mode="after")
     def _validate_complete_dimensions_and_seal(self) -> "CommercialVisualEvidence":
+        if (self.authority_kind == "human") != (
+            self.observed_by.actor_kind == "human"
+        ):
+            raise ValueError("Commercial human evidence requires an exact human actor")
         dimensions = tuple(item.dimension for item in self.measurements)
         if dimensions != tuple(CommercialVisualDimension):
             raise ValueError("Commercial visual evidence must evaluate every dimension in canonical order")
@@ -117,6 +168,7 @@ class CommercialFailureClassification(StrictModel):
 class CommercialSourceReviewReceipt(StrictModel):
     receipt_id: str = Field(min_length=1)
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    review_intent_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_request_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     target_shot_id: str = Field(min_length=1)
     target_shot_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -126,6 +178,7 @@ class CommercialSourceReviewReceipt(StrictModel):
     policy_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     evidence_id: str = Field(min_length=1)
     evidence_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    observed_by: ActorIdentity
     authority: ToolIdentity
     verdict: QaVerdict
     target_kind: Literal["source_image"] = "source_image"
@@ -254,6 +307,7 @@ def adjudicate_commercial_visual_evidence(
         if verdict is not QaVerdict.FAIL:
             failure = None
     receipt_payload = {
+        "review_intent_hash": checked.review_intent_hash,
         "source_request_hash": checked.source_request_hash,
         "target_shot_id": checked.target_shot_id,
         "target_shot_content_hash": checked.target_shot_content_hash,
@@ -263,6 +317,7 @@ def adjudicate_commercial_visual_evidence(
         "policy_hash": selected_policy.content_hash,
         "evidence_id": checked.evidence_id,
         "evidence_hash": checked.content_hash,
+        "observed_by": checked.observed_by,
         "authority": checked.tool_identity,
         "verdict": verdict,
         "target_kind": "source_image",

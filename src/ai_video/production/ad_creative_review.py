@@ -62,6 +62,20 @@ def _diagnostic_artifact_id(value: object, *, fallback: str) -> str:
     return fallback
 
 
+def _commercial_approval_cardinality_is_unique(
+    approvals: tuple[ApprovedCommercialSourceBinding, ...],
+) -> bool:
+    return all(
+        len(values) == len(set(values))
+        for values in (
+            tuple(item.approval_id for item in approvals),
+            tuple(item.content_hash for item in approvals),
+            tuple(item.execution_projection_hash for item in approvals),
+            tuple(item.target_shot_id for item in approvals),
+        )
+    )
+
+
 def review_ad_creative_plan(
     plan: AdCreativePlan,
     composition: CompositionSpec,
@@ -289,12 +303,14 @@ def review_ad_creative_plan(
             for item in project_commercial_executions(plan)
             if item.primary_class.value == "product_interaction"
         }
+        approval_items = tuple(approved_commercial_sources)
         approvals = {
             item.execution_projection_hash: item
-            for item in approved_commercial_sources
+            for item in approval_items
         }
         source_preparation_ready = bool(
-            set(interactions) == set(approvals)
+            _commercial_approval_cardinality_is_unique(approval_items)
+            and set(interactions) == set(approvals)
             and all(
                 approval.ad_creative_plan_hash == plan.content_hash
                 and approval.target_shot_id

@@ -5,6 +5,7 @@ import pytest
 import ai_video.production as production
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import (
+    ActorIdentity,
     QaLayoutRules,
     QaLayer,
     QaPolicy,
@@ -90,6 +91,7 @@ def _evidence(
     )
     return production.CommercialVisualEvidence.create(
         evidence_id="commercial-evidence-1",
+        review_intent_hash="0" * 64,
         source_request_hash="1" * 64,
         target_shot_id="shot-04",
         target_shot_content_hash="2" * 64,
@@ -98,6 +100,9 @@ def _evidence(
         product_reference_set_hash="4" * 64,
         policy_hash=_policy().content_hash,
         authority_kind="human",
+        observed_by=ActorIdentity(
+            actor_id="commercial-human-reviewer", actor_kind="human"
+        ),
         tool_identity=REVIEW_TOOL,
         measurements=measurements,
     )

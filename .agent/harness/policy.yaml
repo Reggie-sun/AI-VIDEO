@@ -177,6 +177,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, tests/test_production_review.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify durable review, authorization, repair, and final acceptance.
+  commercial_source_preparation_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_commercial_execution.py, tests/test_production_commercial_reference.py, tests/test_production_commercial_source_preparation.py, tests/test_production_commercial_visual_review.py, tests/test_production_ecommerce_product_interaction_e2e.py, tests/test_production_ad_creative.py, tests/test_planning_video_planner.py, tests/test_shot_readiness_gate.py, tests/test_production_video_requirement.py, tests/test_production_shot_router.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_image_import.py, tests/test_production_review.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_production_state_commit_structure.py, -q]
+    cwd: .
+    description: Verify product-aware commercial source projection, registered import, semantic approval, planner routing, scoped repair, replay, and recovery without Provider effects.
   production_image_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_image.py, tests/test_production_image_e2e.py, tests/test_production_comfy_image.py, tests/test_production_image_import.py, tests/test_production_p7_1_local_image_e2e.py, tests/test_production_models.py, tests/test_production_registry.py, tests/test_production_validation.py, tests/test_production_project.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_comfy_client.py, tests/test_workflow_loader.py, -q]
     cwd: .
@@ -245,6 +249,7 @@ checks:
     timeout_seconds: 1800
     execution_priority: 30
     covers_check_ids:
+      - commercial_source_preparation_tests
       - composition_playbook_tests
       - composition_strategy_proposal_tests
       - composition_architecture_tests
@@ -505,6 +510,26 @@ categories:
       - tests/test_mcp_apply_optimization.py
     check_ids:
       - production_review_tests
+      - task_architecture_gate
+  commercial_source_preparation:
+    patterns:
+      - src/ai_video/planning/_commercial_video_planning.py
+      - src/ai_video/production/_commercial_project_reader.py
+      - src/ai_video/production/commercial_execution.py
+      - src/ai_video/production/commercial_dependency.py
+      - src/ai_video/production/commercial_image_import.py
+      - src/ai_video/production/commercial_reference.py
+      - src/ai_video/production/commercial_source_preparation.py
+      - src/ai_video/production/commercial_visual_review.py
+      - src/ai_video/production/_state_commit_commercial_source.py
+      - src/ai_video/production/_state_commit_commercial_source_recovery.py
+      - tests/test_production_commercial_execution.py
+      - tests/test_production_commercial_reference.py
+      - tests/test_production_commercial_source_preparation.py
+      - tests/test_production_commercial_visual_review.py
+      - tests/test_production_ecommerce_product_interaction_e2e.py
+    check_ids:
+      - commercial_source_preparation_tests
       - task_architecture_gate
   production_image:
     patterns:

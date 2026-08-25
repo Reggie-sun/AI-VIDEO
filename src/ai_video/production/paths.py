@@ -119,6 +119,13 @@ def canonical_commercial_source_candidate_path(content_hash: str) -> Path:
     )
 
 
+def canonical_commercial_source_review_intent_path(content_hash: str) -> Path:
+    return Path(
+        "state/commercial-source/"
+        f"review-intent.{_require_sha256(content_hash, 'commercial source review intent hash')}.json"
+    )
+
+
 def canonical_commercial_source_evidence_path(content_hash: str) -> Path:
     return Path(
         f"state/commercial-source/evidence.{_require_sha256(content_hash, 'commercial source evidence hash')}.json"

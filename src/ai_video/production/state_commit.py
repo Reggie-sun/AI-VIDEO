@@ -189,6 +189,7 @@ from ._state_commit_contracts import (
     ActivateRenderStateRequest,
     BeginRenderAttemptRequest,
     CommitPhase,
+    CommercialSourceReviewAuthorizer,
     CrashInjector,
     NoopCrashInjector,
     PreparedArtifact,
@@ -202,8 +203,10 @@ from ._state_commit_contracts import (
     VoiceDependencyTransitionPreparer,
     ImageCandidatePreparer,
     _REVIEW_PERMIT_TOKEN,
+    _COMMERCIAL_SOURCE_REVIEW_PERMIT_TOKEN,
     _VOICE_PERMIT_TOKEN,
     _DurableReviewAnalysisPermit,
+    _DurableCommercialSourceReviewPermit,
     _DurableImageSubmitPermit,
     _DurablePaidProviderSubmitPermit,
     _DurableVoiceSubmitPermit,
@@ -299,6 +302,8 @@ class ProductionStateCommitter(
         image_candidate_preparer: ImageCandidatePreparer | None = None,
         video_candidate_preparer: VideoCandidatePreparer | None = None,
         repair_authorizer: Callable[[RepairRequest], ActorIdentity | None] | None = None,
+        commercial_source_review_authorizer: CommercialSourceReviewAuthorizer
+        | None = None,
         paid_provider_authorizer: PaidProviderAuthorizer | None = None,
         paid_provider_clock: Callable[[], datetime] | None = None,
     ) -> None:
@@ -314,6 +319,9 @@ class ProductionStateCommitter(
         self._image_candidate_preparer = image_candidate_preparer
         self._video_candidate_preparer = video_candidate_preparer
         self._repair_authorizer = repair_authorizer
+        self._commercial_source_review_authorizer = (
+            commercial_source_review_authorizer
+        )
         self._paid_provider_authorizer = paid_provider_authorizer
         self._paid_provider_clock = paid_provider_clock or (
             lambda: datetime.now(timezone.utc)

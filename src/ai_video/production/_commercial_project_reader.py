@@ -11,8 +11,9 @@ from ai_video.production.commercial_source_preparation import (
     CommercialSourceCandidate,
     CommercialSourcePreparationRequest,
 )
-from ai_video.production.commercial_visual_review import CommercialSourceReviewReceipt
 from ai_video.production.commercial_visual_review import (
+    CommercialSourceReviewIntent,
+    CommercialSourceReviewReceipt,
     CommercialVisualEvidence,
     adjudicate_commercial_visual_evidence,
 )
@@ -44,6 +45,7 @@ from ai_video.production.paths import (
     canonical_commercial_source_evidence_path,
     canonical_commercial_image_import_receipt_path,
     canonical_commercial_source_request_path,
+    canonical_commercial_source_review_intent_path,
     canonical_commercial_source_review_path,
     resolve_contained_path,
 )
@@ -104,6 +106,7 @@ def verify_active_commercial_source_approvals(
         tuple[
             CommercialSourcePreparationRequest,
             CommercialSourceCandidate | None,
+            CommercialSourceReviewIntent | None,
             CommercialSourceReviewReceipt | None,
         ],
     ] = {}
@@ -190,6 +193,7 @@ def verify_active_commercial_source_approvals(
             ):
                 raise _invalid("Current commercial creative lineage is stale.")
         candidate: CommercialSourceCandidate | None = None
+        intent: CommercialSourceReviewIntent | None = None
         receipt: CommercialSourceReviewReceipt | None = None
         if attempt.candidate_record_hash is not None:
             candidate, _ = _read_model(
@@ -239,8 +243,42 @@ def verify_active_commercial_source_approvals(
                     raise _invalid(
                         "Current commercial import evidence is invalid.", detail
                     ) from exc
+        if attempt.review_intent_hash is not None:
+            if candidate is None:
+                raise _invalid("Commercial review intent is missing its candidate.")
+            intent, _ = _read_model(
+                root,
+                canonical_commercial_source_review_intent_path(
+                    attempt.review_intent_hash
+                ),
+                CommercialSourceReviewIntent,
+            )
+            if (
+                not verify_artifact_hash(intent)
+                or intent.content_hash != attempt.review_intent_hash
+                or intent.source_request_hash != request.request_fingerprint
+                or intent.target_shot_id != request.target_shot_id
+                or intent.target_shot_content_hash
+                != request.target_shot_content_hash
+                or intent.candidate_asset_id != candidate.asset_id
+                or intent.candidate_sha256 != candidate.asset_sha256
+                or intent.product_reference_set_hash
+                != request.product_reference_set_hash
+            ):
+                raise _invalid("Commercial review intent lineage is inconsistent.")
+            if attempt.lifecycle is not CommercialSourceLifecycle.STALE and (
+                bundle.qa_policy is None
+                or intent.policy_hash != bundle.qa_policy.content_hash
+                or intent.tool_identity
+                not in bundle.qa_policy.semantic_authorities
+            ):
+                raise _invalid("Current commercial review intent authority is stale.")
         if attempt.review_receipt_hash is not None:
-            if attempt.review_evidence_hash is None or candidate is None:
+            if (
+                attempt.review_evidence_hash is None
+                or candidate is None
+                or intent is None
+            ):
                 raise _invalid("Commercial review is missing candidate evidence.")
             evidence, _ = _read_model(
                 root,
@@ -259,7 +297,13 @@ def verify_active_commercial_source_approvals(
             if (
                 not verify_artifact_hash(evidence)
                 or evidence.content_hash != attempt.review_evidence_hash
+                or evidence.review_intent_hash != intent.content_hash
+                or evidence.observed_by != intent.actor_identity
+                or evidence.authority_kind != intent.authority_kind
+                or evidence.tool_identity != intent.tool_identity
                 or receipt.content_hash != attempt.review_receipt_hash
+                or receipt.review_intent_hash != intent.content_hash
+                or receipt.observed_by != intent.actor_identity
             ):
                 raise _invalid("Commercial review evidence seal is invalid.")
             if attempt.lifecycle is not CommercialSourceLifecycle.STALE:
@@ -271,7 +315,7 @@ def verify_active_commercial_source_approvals(
                 )
                 if receipt != expected_receipt:
                     raise _invalid("Current commercial review verdict is stale.")
-        reopened[attempt.attempt_id] = (request, candidate, receipt)
+        reopened[attempt.attempt_id] = (request, candidate, intent, receipt)
     for pointer in manifest.active_commercial_source_approvals:
         approval, approval_file_hash = _read_model(
             root, pointer.path, ApprovedCommercialSourceBinding
@@ -294,7 +338,7 @@ def verify_active_commercial_source_approvals(
         )
         if attempt is None or attempt.lifecycle is not CommercialSourceLifecycle.APPROVED:
             raise _invalid("Active commercial source approval has no approved attempt.")
-        request, candidate, receipt = reopened[attempt.attempt_id]
+        request, candidate, _, receipt = reopened[attempt.attempt_id]
         if (
             approval.source_request_hash != request.request_fingerprint
             or approval.ad_creative_plan_hash != request.ad_creative_plan_hash

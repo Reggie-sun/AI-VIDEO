@@ -797,6 +797,41 @@ def test_ad_creative_runtime_routes_to_composition_audio_suite() -> None:
     assert "production_contract_tests" in artifact_report["check_ids"]
 
 
+def test_commercial_source_preparation_routes_to_focused_cross_owner_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/planning/_commercial_video_planning.py",
+        "src/ai_video/production/_commercial_project_reader.py",
+        "src/ai_video/production/commercial_execution.py",
+        "src/ai_video/production/commercial_dependency.py",
+        "src/ai_video/production/commercial_image_import.py",
+        "src/ai_video/production/commercial_reference.py",
+        "src/ai_video/production/commercial_source_preparation.py",
+        "src/ai_video/production/commercial_visual_review.py",
+        "src/ai_video/production/_state_commit_commercial_source.py",
+        "src/ai_video/production/_state_commit_commercial_source_recovery.py",
+        "tests/test_production_commercial_execution.py",
+        "tests/test_production_commercial_reference.py",
+        "tests/test_production_commercial_source_preparation.py",
+        "tests/test_production_commercial_visual_review.py",
+        "tests/test_production_ecommerce_product_interaction_e2e.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == [], path
+        assert "commercial_source_preparation_tests" in report["check_ids"], path
+
+    command = policy["checks"]["commercial_source_preparation_tests"]["argv"]
+    for path in (
+        "tests/test_production_commercial_execution.py",
+        "tests/test_production_commercial_reference.py",
+        "tests/test_production_commercial_source_preparation.py",
+        "tests/test_production_commercial_visual_review.py",
+        "tests/test_production_ecommerce_product_interaction_e2e.py",
+    ):
+        assert path in command
+
+
 def test_production_policy_commands_cover_repository_mandatory_contract_tests() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
     dependency_argv = policy["checks"]["production_dependency_tests"]["argv"]

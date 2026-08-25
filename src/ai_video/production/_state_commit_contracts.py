@@ -36,6 +36,7 @@ from ai_video.production.image import (
     MeasuredPng,
 )
 from ai_video.production.models import (
+    ActorIdentity,
     ApprovedRepairReceiptPointer,
     AssetRecord,
     AssetRegistrySnapshot,
@@ -47,6 +48,7 @@ from ai_video.production.models import (
     RegistrySnapshotPointer,
     RendererSelectionReceipt,
     RenderStateSnapshotPointer,
+    ToolIdentity,
 )
 
 
@@ -230,6 +232,18 @@ class CrashInjector(Protocol):
     def checkpoint(self, phase: CommitPhase) -> None: ...
 
 
+class CommercialSourceReviewAuthorizer(Protocol):
+    def __call__(
+        self,
+        *,
+        request_hash: str,
+        candidate_sha256: str,
+        policy_hash: str,
+        authority_kind: str,
+        tool_identity: ToolIdentity,
+    ) -> ActorIdentity | None: ...
+
+
 class NoopCrashInjector:
     def checkpoint(self, phase: CommitPhase) -> None:
         return None
@@ -237,6 +251,7 @@ class NoopCrashInjector:
 
 _VOICE_PERMIT_TOKEN = object()
 _REVIEW_PERMIT_TOKEN = object()
+_COMMERCIAL_SOURCE_REVIEW_PERMIT_TOKEN = object()
 _IMAGE_PERMIT_TOKEN = object()
 _PAID_PROVIDER_PERMIT_TOKEN = object()
 _LOCAL_VIDEO_PERMIT_TOKEN = object()
@@ -271,6 +286,43 @@ class _DurableReviewAnalysisPermit:
                 return False
             self._consumed = True
             return True
+
+
+class _DurableCommercialSourceReviewPermit:
+    """Process-local one-use proof of a durable commercial source review intent."""
+
+    __slots__ = ("_binding", "_durability_validator", "_consumed", "_lock")
+
+    def __init__(
+        self,
+        token: object,
+        *,
+        binding: dict[str, str],
+        durability_validator: Callable[[], bool],
+    ) -> None:
+        if token is not _COMMERCIAL_SOURCE_REVIEW_PERMIT_TOKEN:
+            raise TypeError(
+                "Commercial source review permits are minted only by ProductionStateCommitter."
+            )
+        self._binding = dict(binding)
+        self._durability_validator = durability_validator
+        self._consumed = False
+        self._lock = threading.Lock()
+
+    def _consume_commercial_source_review_permit(self, **binding: str) -> bool:
+        with self._lock:
+            if (
+                self._consumed
+                or binding != self._binding
+                or not self._durability_validator()
+            ):
+                return False
+            self._consumed = True
+            return True
+
+    def _was_commercial_source_review_permit_consumed(self) -> bool:
+        with self._lock:
+            return self._consumed
 
 
 class _DurableVoiceSubmitPermit:

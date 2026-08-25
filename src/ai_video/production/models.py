@@ -1762,6 +1762,8 @@ class CommercialSourceAttemptState(StrictModel):
     candidate_asset_id: str | None = Field(default=None, min_length=1)
     candidate_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     candidate_record_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    review_intent_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    review_phase: ReviewAttemptPhase | None = None
     review_evidence_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     review_receipt_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     active_approval: CommercialSourceApprovalPointer | None = None
@@ -1790,6 +1792,39 @@ class CommercialSourceAttemptState(StrictModel):
             CommercialSourceLifecycle.STALE,
         } and not has_candidate:
             raise ValueError("Commercial source lifecycle requires candidate identity")
+        if (self.review_intent_hash is None) != (self.review_phase is None):
+            raise ValueError(
+                "Commercial source review intent identity and phase must be all-or-none"
+            )
+        has_review_result = (
+            self.review_evidence_hash is not None
+            and self.review_receipt_hash is not None
+        )
+        if (self.review_evidence_hash is None) != (self.review_receipt_hash is None):
+            raise ValueError(
+                "Commercial source review evidence and receipt must be all-or-none"
+            )
+        reviewed_lifecycles = {
+            CommercialSourceLifecycle.EVIDENCED,
+            CommercialSourceLifecycle.REJECTED,
+            CommercialSourceLifecycle.NOT_EVALUATED,
+            CommercialSourceLifecycle.APPROVED,
+        }
+        if self.lifecycle in reviewed_lifecycles and (
+            self.review_phase is not ReviewAttemptPhase.ACTIVATE
+            or not has_review_result
+        ):
+            raise ValueError(
+                "Commercial source reviewed lifecycle requires activated evidence"
+            )
+        if (
+            self.review_phase is ReviewAttemptPhase.ACTIVATE
+            and self.lifecycle is not CommercialSourceLifecycle.STALE
+            and self.lifecycle not in reviewed_lifecycles
+        ):
+            raise ValueError(
+                "Activated commercial review requires a reviewed lifecycle"
+            )
         if self.lifecycle is CommercialSourceLifecycle.APPROVED:
             if self.active_approval is None or self.review_receipt_hash is None:
                 raise ValueError("Approved commercial source requires receipt and pointer")

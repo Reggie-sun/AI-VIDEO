@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import hashlib
+from typing import Callable, Literal
 
-from ai_video.errors import AiVideoError
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.commercial_dependency import (
     extend_commercial_source_dependency_graph,
     resolve_commercial_source_approval_states,
@@ -14,6 +15,7 @@ from ai_video.production.commercial_source_preparation import (
     CommercialSourcePreparationRequest,
 )
 from ai_video.production.commercial_visual_review import (
+    CommercialSourceReviewIntent,
     CommercialSourceReviewReceipt,
     CommercialVisualEvidence,
     adjudicate_commercial_visual_evidence,
@@ -33,6 +35,8 @@ from ai_video.production.models import (
     CommercialSourceLifecycle,
     ProductionManifest,
     QaVerdict,
+    ReviewAttemptPhase,
+    ToolIdentity,
 )
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
@@ -40,6 +44,7 @@ from ai_video.production.paths import (
     canonical_commercial_source_candidate_path,
     canonical_commercial_source_evidence_path,
     canonical_commercial_source_request_path,
+    canonical_commercial_source_review_intent_path,
     canonical_commercial_source_review_path,
 )
 
@@ -50,7 +55,11 @@ from ._state_commit_common import (
     _validated_transition,
     prepare_dependency_graph_transition,
 )
-from ._state_commit_contracts import PreparedArtifact
+from ._state_commit_contracts import (
+    PreparedArtifact,
+    _COMMERCIAL_SOURCE_REVIEW_PERMIT_TOKEN,
+    _DurableCommercialSourceReviewPermit,
+)
 
 
 class _StateCommitCommercialSourceMixin:
@@ -147,6 +156,18 @@ class _StateCommitCommercialSourceMixin:
                 raise _outcome_unknown(exc) from exc
             raise
 
+    def _reopen_current_commercial_source_attempt(
+        self,
+        manifest: ProductionManifest,
+        attempt: CommercialSourceAttemptState,
+    ) -> None:
+        loaded = self._load_production_project(self._project_root / "project.yaml")
+        if loaded.manifest != manifest:
+            raise _state_invalid(
+                "Commercial source replay Manifest identity changed."
+            )
+        self._reopen_commercial_source_attempt(manifest, attempt)
+
     def begin_commercial_source_preparation(
         self, request: CommercialSourcePreparationRequest
     ) -> ProductionManifest:
@@ -159,7 +180,7 @@ class _StateCommitCommercialSourceMixin:
             if existing is not None:
                 if existing.request_fingerprint != checked.request_fingerprint:
                     raise _state_invalid("Commercial source attempt ID was reused with different request.")
-                self._reopen_commercial_source_attempt(manifest, existing)
+                self._reopen_current_commercial_source_attempt(manifest, existing)
                 return manifest
             self._commercial_source_base(manifest, checked)
             request_path = canonical_commercial_source_request_path(checked.request_fingerprint)
@@ -186,12 +207,13 @@ class _StateCommitCommercialSourceMixin:
             )
             return self._write_commercial_manifest(updated)
 
-    def record_commercial_source_review(
+    def begin_commercial_source_review(
         self,
         request: CommercialSourcePreparationRequest,
         candidate: CommercialSourceCandidate,
-        evidence: CommercialVisualEvidence,
-        receipt: CommercialSourceReviewReceipt,
+        *,
+        authority_kind: Literal["human", "calibrated_automatic", "automatic"],
+        tool_identity: ToolIdentity,
     ) -> ProductionManifest:
         checked_request = CommercialSourcePreparationRequest.model_validate(
             request.model_dump(mode="python")
@@ -199,12 +221,264 @@ class _StateCommitCommercialSourceMixin:
         checked_candidate = CommercialSourceCandidate.model_validate(
             candidate.model_dump(mode="python")
         )
-        checked_evidence = CommercialVisualEvidence.model_validate(
-            evidence.model_dump(mode="python")
+        checked_tool = ToolIdentity.model_validate(tool_identity.model_dump(mode="python"))
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            attempt = self._commercial_source_attempt(
+                manifest, checked_request.attempt_id
+            )
+            candidate_hash = canonical_sha256(checked_candidate.model_dump(mode="json"))
+            if attempt is not None and attempt.review_intent_hash is not None:
+                if (
+                    attempt.request_fingerprint
+                    != checked_request.request_fingerprint
+                ):
+                    raise _state_invalid(
+                        "Commercial source review replay request is not exact."
+                    )
+                intent, _ = self._read_commercial_model(
+                    canonical_commercial_source_review_intent_path(
+                        attempt.review_intent_hash
+                    ),
+                    CommercialSourceReviewIntent,
+                )
+                if (
+                    attempt.candidate_record_hash != candidate_hash
+                    or intent.authority_kind != authority_kind
+                    or intent.tool_identity != checked_tool
+                ):
+                    raise _state_invalid(
+                        "Commercial source review intent already binds different inputs."
+                    )
+                self._reopen_current_commercial_source_attempt(manifest, attempt)
+                return manifest
+            loaded = self._commercial_source_base(manifest, checked_request)
+            if (
+                loaded.qa_policy is None
+                or checked_tool not in loaded.qa_policy.semantic_authorities
+            ):
+                raise _state_invalid(
+                    "Commercial source review requires a policy-selected P6 authority."
+                )
+            if (
+                attempt is None
+                or attempt.lifecycle
+                is not CommercialSourceLifecycle.MATERIALIZED_CANDIDATE
+                or attempt.candidate_record_hash != candidate_hash
+            ):
+                raise _state_invalid(
+                    "Commercial source review requires the exact durable candidate."
+                )
+            if self._commercial_source_review_authorizer is None:
+                raise _state_invalid(
+                    "Commercial source review authority is unavailable."
+                )
+            actor = self._commercial_source_review_authorizer(
+                request_hash=checked_request.request_fingerprint,
+                candidate_sha256=checked_candidate.asset_sha256,
+                policy_hash=loaded.qa_policy.content_hash,
+                authority_kind=authority_kind,
+                tool_identity=checked_tool,
+            )
+            if actor is None:
+                raise _state_invalid("Commercial source review was not authorized.")
+            intent = CommercialSourceReviewIntent.create(
+                intent_id=f"commercial-source-review-{checked_request.attempt_id}",
+                source_request_hash=checked_request.request_fingerprint,
+                target_shot_id=checked_request.target_shot_id,
+                target_shot_content_hash=checked_request.target_shot_content_hash,
+                candidate_asset_id=checked_candidate.asset_id,
+                candidate_sha256=checked_candidate.asset_sha256,
+                product_reference_set_hash=checked_request.product_reference_set_hash,
+                policy_hash=loaded.qa_policy.content_hash,
+                authority_kind=authority_kind,
+                actor_identity=actor,
+                tool_identity=checked_tool,
+            )
+            self._write_commercial_source_artifact(
+                attempt_id=checked_request.attempt_id,
+                path=canonical_commercial_source_review_intent_path(
+                    intent.content_hash
+                ),
+                model=intent,
+            )
+            replacement = attempt.model_copy(
+                update={
+                    "review_intent_hash": intent.content_hash,
+                    "review_phase": ReviewAttemptPhase.REQUESTED,
+                }
+            )
+            updated = ProductionManifest.model_validate(
+                manifest.model_copy(
+                    update={
+                        "manifest_revision": manifest.manifest_revision + 1,
+                        "commercial_source_attempts": self._replace_commercial_source_attempt(
+                            manifest, replacement
+                        ),
+                    }
+                ).model_dump(mode="python")
+            )
+            return self._write_commercial_manifest(updated)
+
+    def _commercial_source_review_intent_is_consumed(
+        self, *, attempt_id: str, intent_hash: str
+    ) -> bool:
+        manifest = self._read_manifest()
+        attempt = self._commercial_source_attempt(manifest, attempt_id)
+        return bool(
+            attempt is not None
+            and attempt.review_intent_hash == intent_hash
+            and attempt.review_phase is ReviewAttemptPhase.EVIDENCE
         )
-        checked_receipt = CommercialSourceReviewReceipt.model_validate(
-            receipt.model_dump(mode="python")
+
+    def run_commercial_source_review_analysis(
+        self,
+        request: CommercialSourcePreparationRequest,
+        candidate: CommercialSourceCandidate,
+        *,
+        expected_manifest_revision: int,
+        analyzer: Callable[
+            [CommercialSourceReviewIntent, _DurableCommercialSourceReviewPermit],
+            CommercialVisualEvidence,
+        ],
+    ) -> tuple[ProductionManifest, CommercialSourceReviewReceipt]:
+        checked_request = CommercialSourcePreparationRequest.model_validate(
+            request.model_dump(mode="python")
         )
+        checked_candidate = CommercialSourceCandidate.model_validate(
+            candidate.model_dump(mode="python")
+        )
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            attempt = self._commercial_source_attempt(
+                manifest, checked_request.attempt_id
+            )
+            if (
+                attempt is not None
+                and attempt.review_phase is ReviewAttemptPhase.ACTIVATE
+                and attempt.review_receipt_hash is not None
+            ):
+                candidate_hash = canonical_sha256(
+                    checked_candidate.model_dump(mode="json")
+                )
+                if (
+                    attempt.request_fingerprint
+                    != checked_request.request_fingerprint
+                    or attempt.candidate_record_hash != candidate_hash
+                ):
+                    raise _state_invalid(
+                        "Commercial source review replay inputs are not exact."
+                    )
+                self._reopen_current_commercial_source_attempt(manifest, attempt)
+                intent, _ = self._read_commercial_model(
+                    canonical_commercial_source_review_intent_path(
+                        attempt.review_intent_hash
+                    ),
+                    CommercialSourceReviewIntent,
+                )
+                receipt, _ = self._read_commercial_model(
+                    canonical_commercial_source_review_path(
+                        attempt.review_receipt_hash
+                    ),
+                    CommercialSourceReviewReceipt,
+                )
+                if (
+                    intent.source_request_hash
+                    != checked_request.request_fingerprint
+                    or intent.candidate_asset_id != checked_candidate.asset_id
+                    or intent.candidate_sha256 != checked_candidate.asset_sha256
+                    or receipt.review_intent_hash != intent.content_hash
+                    or receipt.source_request_hash
+                    != checked_request.request_fingerprint
+                    or receipt.candidate_asset_id != checked_candidate.asset_id
+                    or receipt.candidate_sha256 != checked_candidate.asset_sha256
+                ):
+                    raise _state_invalid(
+                        "Commercial source review replay lineage is not exact."
+                    )
+                return manifest, receipt
+            if (
+                manifest.manifest_revision != expected_manifest_revision
+                or attempt is None
+                or attempt.review_intent_hash is None
+                or attempt.review_phase is not ReviewAttemptPhase.REQUESTED
+                or attempt.candidate_record_hash
+                != canonical_sha256(checked_candidate.model_dump(mode="json"))
+            ):
+                raise AiVideoError(
+                    ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN,
+                    "Commercial source review analysis was already consumed or has unknown outcome; do not rerun blindly.",
+                    retryable=False,
+                )
+            self._commercial_source_base(manifest, checked_request)
+            intent, _ = self._read_commercial_model(
+                canonical_commercial_source_review_intent_path(
+                    attempt.review_intent_hash
+                ),
+                CommercialSourceReviewIntent,
+            )
+            consumed_attempt = attempt.model_copy(
+                update={"review_phase": ReviewAttemptPhase.EVIDENCE}
+            )
+            consumed = ProductionManifest.model_validate(
+                manifest.model_copy(
+                    update={
+                        "manifest_revision": manifest.manifest_revision + 1,
+                        "commercial_source_attempts": self._replace_commercial_source_attempt(
+                            manifest, consumed_attempt
+                        ),
+                    }
+                ).model_dump(mode="python")
+            )
+            consumed = self._write_commercial_manifest(consumed)
+            permit_binding = {
+                "intent_hash": intent.content_hash,
+                "request_hash": intent.source_request_hash,
+                "candidate_sha256": intent.candidate_sha256,
+                "policy_hash": intent.policy_hash,
+            }
+            permit = _DurableCommercialSourceReviewPermit(
+                _COMMERCIAL_SOURCE_REVIEW_PERMIT_TOKEN,
+                binding=permit_binding,
+                durability_validator=lambda: self._commercial_source_review_intent_is_consumed(
+                    attempt_id=checked_request.attempt_id,
+                    intent_hash=intent.content_hash,
+                ),
+            )
+        try:
+            evidence = CommercialVisualEvidence.model_validate(
+                analyzer(intent, permit).model_dump(mode="python")
+            )
+        except Exception as exc:
+            raise AiVideoError(
+                ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN,
+                "Commercial source review analysis outcome is unknown; recover explicitly.",
+                technical_detail=str(exc),
+                retryable=False,
+            ) from exc
+        if not permit._was_commercial_source_review_permit_consumed():
+            raise AiVideoError(
+                ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN,
+                "Commercial source review analyzer did not consume its one-use permit.",
+                retryable=False,
+            )
+        return self._record_commercial_source_review(
+            checked_request,
+            checked_candidate,
+            intent,
+            evidence,
+            expected_manifest_revision=consumed.manifest_revision,
+        )
+
+    def _record_commercial_source_review(
+        self,
+        checked_request: CommercialSourcePreparationRequest,
+        checked_candidate: CommercialSourceCandidate,
+        intent: CommercialSourceReviewIntent,
+        checked_evidence: CommercialVisualEvidence,
+        *,
+        expected_manifest_revision: int,
+    ) -> tuple[ProductionManifest, CommercialSourceReviewReceipt]:
         with self._exclusive_lock():
             manifest = self._read_manifest()
             attempt = self._commercial_source_attempt(
@@ -213,26 +487,22 @@ class _StateCommitCommercialSourceMixin:
             candidate_hash = canonical_sha256(
                 checked_candidate.model_dump(mode="json")
             )
-            if (
-                attempt is not None
-                and attempt.review_receipt_hash == checked_receipt.content_hash
-                and attempt.review_evidence_hash == checked_evidence.content_hash
-                and attempt.candidate_record_hash == candidate_hash
-            ):
-                self._reopen_commercial_source_attempt(manifest, attempt)
-                return manifest
             loaded = self._commercial_source_base(manifest, checked_request)
             if loaded.qa_policy is None:
                 raise _state_invalid(
                     "Commercial source review requires the active P6 QA policy."
                 )
-            expected_receipt = adjudicate_commercial_visual_evidence(
+            checked_receipt = adjudicate_commercial_visual_evidence(
                 checked_evidence,
                 policy=loaded.qa_policy,
             )
             if (
-                attempt is None
+                manifest.manifest_revision != expected_manifest_revision
+                or attempt is None
+                or attempt.review_intent_hash != intent.content_hash
+                or attempt.review_phase is not ReviewAttemptPhase.EVIDENCE
                 or attempt.candidate_record_hash != candidate_hash
+                or checked_evidence.review_intent_hash != intent.content_hash
                 or checked_evidence.source_request_hash
                 != checked_request.request_fingerprint
                 or checked_evidence.target_shot_id != checked_request.target_shot_id
@@ -242,7 +512,11 @@ class _StateCommitCommercialSourceMixin:
                 or checked_evidence.candidate_sha256 != checked_candidate.asset_sha256
                 or checked_evidence.product_reference_set_hash
                 != checked_request.product_reference_set_hash
-                or checked_receipt != expected_receipt
+                or checked_evidence.policy_hash != intent.policy_hash
+                or checked_evidence.authority_kind != intent.authority_kind
+                or checked_evidence.observed_by != intent.actor_identity
+                or checked_evidence.tool_identity != intent.tool_identity
+                or checked_receipt.review_intent_hash != intent.content_hash
                 or checked_receipt.source_request_hash
                 != checked_request.request_fingerprint
                 or checked_receipt.candidate_asset_id != checked_candidate.asset_id
@@ -250,6 +524,7 @@ class _StateCommitCommercialSourceMixin:
                 != checked_candidate.asset_sha256
                 or checked_receipt.product_reference_set_hash
                 != checked_request.product_reference_set_hash
+                or checked_receipt.observed_by != intent.actor_identity
                 or checked_receipt.content_hash
                 != canonical_sha256(
                     checked_receipt.model_dump(
@@ -258,11 +533,6 @@ class _StateCommitCommercialSourceMixin:
                 )
             ):
                 raise _state_invalid("Commercial source review lineage is inconsistent.")
-            if attempt.review_receipt_hash is not None:
-                if attempt.review_receipt_hash == checked_receipt.content_hash:
-                    self._reopen_commercial_source_attempt(manifest, attempt)
-                    return manifest
-                raise _state_invalid("Commercial source review attempt already has different evidence.")
             self._write_commercial_source_artifact(
                 attempt_id=checked_request.attempt_id,
                 path=canonical_commercial_source_evidence_path(checked_evidence.content_hash),
@@ -283,6 +553,7 @@ class _StateCommitCommercialSourceMixin:
             replacement = attempt.model_copy(
                 update={
                     "lifecycle": lifecycle,
+                    "review_phase": ReviewAttemptPhase.ACTIVATE,
                     "review_evidence_hash": checked_evidence.content_hash,
                     "review_receipt_hash": checked_receipt.content_hash,
                 }
@@ -297,7 +568,7 @@ class _StateCommitCommercialSourceMixin:
                     }
                 ).model_dump(mode="python")
             )
-            return self._write_commercial_manifest(updated)
+            return self._write_commercial_manifest(updated), checked_receipt
 
     def approve_commercial_source(
         self,
@@ -330,7 +601,16 @@ class _StateCommitCommercialSourceMixin:
                 and existing is not None
                 and existing.content_hash == checked_binding.content_hash
             ):
-                self._reopen_commercial_source_attempt(manifest, attempt)
+                if (
+                    attempt.request_fingerprint
+                    != checked_request.request_fingerprint
+                    or checked_binding.source_request_hash
+                    != checked_request.request_fingerprint
+                ):
+                    raise _state_invalid(
+                        "Commercial source approval replay request is not exact."
+                    )
+                self._reopen_current_commercial_source_attempt(manifest, attempt)
                 if manifest.active_dependency_graph is None:
                     raise _state_invalid("Commercial source approval graph is missing.")
                 graph = self._reopen_dependency_graph(
@@ -373,7 +653,7 @@ class _StateCommitCommercialSourceMixin:
                 raise _state_invalid("Commercial source approval is not current and exact.")
             if existing is not None:
                 if existing.content_hash == checked_binding.content_hash:
-                    self._reopen_commercial_source_attempt(manifest, attempt)
+                    self._reopen_current_commercial_source_attempt(manifest, attempt)
                     return manifest
                 raise _state_invalid("Commercial source Shot already selects another approval.")
             path = canonical_commercial_source_approval_path(
@@ -486,11 +766,13 @@ class _StateCommitCommercialSourceMixin:
             candidate_hash = canonical_sha256(checked_candidate.model_dump(mode="json"))
             if (
                 attempt is not None
+                and attempt.request_fingerprint
+                == checked_request.request_fingerprint
                 and attempt.candidate_asset_id == checked_candidate.asset_id
                 and attempt.candidate_sha256 == checked_candidate.asset_sha256
                 and attempt.candidate_record_hash == candidate_hash
             ):
-                self._reopen_commercial_source_attempt(manifest, attempt)
+                self._reopen_current_commercial_source_attempt(manifest, attempt)
                 return manifest
             loaded = self._commercial_source_base(manifest, checked_request)
             if attempt is None or attempt.request_fingerprint != checked_request.request_fingerprint:
@@ -544,7 +826,7 @@ class _StateCommitCommercialSourceMixin:
                     and attempt.candidate_sha256 == checked_candidate.asset_sha256
                     and attempt.candidate_record_hash == candidate_hash
                 ):
-                    self._reopen_commercial_source_attempt(manifest, attempt)
+                    self._reopen_current_commercial_source_attempt(manifest, attempt)
                     return manifest
                 raise _state_invalid("Commercial source attempt already selected a different candidate.")
             self._write_commercial_source_artifact(

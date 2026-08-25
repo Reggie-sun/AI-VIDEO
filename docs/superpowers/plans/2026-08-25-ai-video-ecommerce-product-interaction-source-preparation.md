@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed；implementation not started。
+Implemented in current local `main`；offline structural verification complete，exact immutable commit-range Harness与final independent re-review收口中，未push/release，未执行Provider/media/network/paid effects。
 
 本计划基于 `main@3c9dc852969ac0bc3ae3cb6427d31fc1ba4d580b` 的 current source、tests、canonical docs 与 fresh AI-VIDEO RAG 结果编写。它只授权后续实现一个 P0 vertical slice；本文档本身不证明 Runtime 已实现、不授权 Provider submit、不生成媒体、不读取 credential、不产生付费调用，也不构成 P6 PASS、Final Acceptance、release 或 production readiness。
 
@@ -342,7 +342,7 @@ Required behavior：
 12. Product/Character/Interaction source failure产生不同 typed failure codes和 exact P5 root-node proposal；commercial graphics/audio/pacing不被一并 invalidated。
 13. Shot 07 / Shot 08 classifier明确 `invoke_video_provider = false`，继续由 deterministic compositor处理中文功效文字、百分比和 CTA。
 14. Existing ad creative、P7 image、P6 review/repair、Planner、Shot Router、video compiler、Manifest migration和 Legacy tests全部通过。
-15. Exact staged delta通过 Harness mandatory checks；fresh receipt可验证且 scope仅包含 task-owned files。
+15. Exact immutable commit range通过 Harness mandatory checks；fresh receipt可验证且 scope仅包含 task-owned files。
 16. Engineering acceptance明确不声称真实苗家女孩/青颜媒体质量、喷雾动作成功、Provider live readiness、P6 generated-video PASS或 Final Acceptance。
 
 ## File Map
@@ -596,7 +596,7 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest -p no:cacheprovider \
 - roadmap把 temporal interaction QA、post-video product fidelity、concrete product-aware image materializer和 empirical Provider proof保留为未完成 gates；
 - 运行 `reviewer_xhigh` 做一次 independent architecture review，因为 change跨 Ad contract、Manifest/P6 lifecycle、Planner、Router和 Repair semantics；review不能替代 tests/Harness。
 
-**Acceptance:** all targeted and policy-routed tests pass；independent review无 blocking issue；exact staged Harness receipt fresh且可验证；没有 Provider/media/network/paid effects。
+**Acceptance:** all targeted and policy-routed tests pass；independent review无 blocking issue；exact immutable commit-range Harness receipt fresh且可验证；没有 Provider/media/network/paid effects。
 
 **Verification:**
 
@@ -673,11 +673,13 @@ git add \
   docs/v0.2-runtime-baseline.md \
   docs/v0.2-agentic-production-roadmap.md
 
-PYTHONDONTWRITEBYTECODE=1 python scripts/agent_harness.py inspect --staged
-PYTHONDONTWRITEBYTECODE=1 python scripts/agent_harness.py verify --staged \
-  --run-id ecommerce-product-interaction-source-preparation-staged-20260825
+PYTHONDONTWRITEBYTECODE=1 python scripts/agent_harness.py inspect \
+  --base-ref <final-task-commit-parent> --head-ref <final-task-commit>
+PYTHONDONTWRITEBYTECODE=1 python scripts/agent_harness.py verify \
+  --base-ref <final-task-commit-parent> --head-ref <final-task-commit> \
+  --run-id ecommerce-product-interaction-source-preparation-final-20260825
 PYTHONDONTWRITEBYTECODE=1 python scripts/agent_harness.py verify-receipt \
-  .agent/harness/runs/ecommerce-product-interaction-source-preparation-staged-20260825/receipt.json
+  .agent/harness/runs/ecommerce-product-interaction-source-preparation-final-20260825/receipt.json
 ```
 
 ## Delivery Boundary

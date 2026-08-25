@@ -25,7 +25,10 @@ from ai_video.production.models import (
     RegistrySnapshotPointer,
     canonical_project_snapshot_path,
 )
-from ai_video.production.paths import canonical_dependency_graph_snapshot_path
+from ai_video.production.paths import (
+    canonical_commercial_image_import_receipt_path,
+    canonical_dependency_graph_snapshot_path,
+)
 from ai_video.production.project import load_production_project
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.state_commit import (
@@ -39,6 +42,15 @@ from ai_video.production.state_commit import (
 from ai_video.production._state_commit_common import _validated_transition
 import production_project_factory as project_factory
 from test_production_commercial_visual_review import REVIEW_TOOL, _policy
+
+
+REVIEW_ACTOR = ActorIdentity(
+    actor_id="commercial-source-test-reviewer", actor_kind="human"
+)
+
+
+def _review_authorizer(**_: object) -> ActorIdentity:
+    return REVIEW_ACTOR
 
 
 def _synthetic_reference_set() -> production.ProductReferenceSet:
@@ -345,6 +357,63 @@ def _candidate(
     )
 
 
+def _review_candidate(
+    committer: ProductionStateCommitter,
+    request: production.CommercialSourcePreparationRequest,
+    candidate: production.CommercialSourceCandidate,
+    *,
+    evidence_id: str = "commercial-evidence-04",
+) -> tuple[production.ProductionManifest, production.CommercialSourceReviewReceipt]:
+    begun = committer.begin_commercial_source_review(
+        request,
+        candidate,
+        authority_kind="human",
+        tool_identity=REVIEW_TOOL,
+    )
+
+    def analyze(intent, permit):
+        binding = {
+            "intent_hash": intent.content_hash,
+            "request_hash": intent.source_request_hash,
+            "candidate_sha256": intent.candidate_sha256,
+            "policy_hash": intent.policy_hash,
+        }
+        assert permit._consume_commercial_source_review_permit(**binding)
+        assert not permit._consume_commercial_source_review_permit(**binding)
+        return production.CommercialVisualEvidence.create(
+            evidence_id=evidence_id,
+            review_intent_hash=intent.content_hash,
+            source_request_hash=intent.source_request_hash,
+            target_shot_id=intent.target_shot_id,
+            target_shot_content_hash=intent.target_shot_content_hash,
+            candidate_asset_id=intent.candidate_asset_id,
+            candidate_sha256=intent.candidate_sha256,
+            product_reference_set_hash=intent.product_reference_set_hash,
+            policy_hash=intent.policy_hash,
+            authority_kind=intent.authority_kind,
+            observed_by=intent.actor_identity,
+            tool_identity=intent.tool_identity,
+            measurements=tuple(
+                production.CommercialVisualMeasurement(
+                    dimension=dimension,
+                    status=production.CommercialMatchStatus.MATCH,
+                    expected=f"expected-{dimension.value}",
+                    observed=f"observed-{dimension.value}",
+                    confidence_milli=950,
+                    rationale="exact authorized human source-image observation",
+                )
+                for dimension in production.CommercialVisualDimension
+            ),
+        )
+
+    return committer.run_commercial_source_review_analysis(
+        request,
+        candidate,
+        expected_manifest_revision=begun.manifest_revision,
+        analyzer=analyze,
+    )
+
+
 def test_generation_lane_blocks_before_effect_without_product_aware_capability() -> None:
     reference_set = _synthetic_reference_set()
     request = production.CommercialSourcePreparationRequest.create(
@@ -375,22 +444,12 @@ def test_generation_lane_blocks_before_effect_without_product_aware_capability()
         wardrobe_requirement_hash="8" * 64,
         accessory_requirement_hash="9" * 64,
     )
-    effects = 0
-
-    def forbidden_effect(_: production.CommercialSourcePreparationRequest) -> None:
-        nonlocal effects
-        effects += 1
-
-    coordinator = production.CommercialSourcePreparationCoordinator(
-        generated_materializer=forbidden_effect,
-        product_aware_generation_capability=False,
-    )
+    coordinator = production.CommercialSourcePreparationCoordinator()
 
     with pytest.raises(AiVideoError) as caught:
         coordinator.prepare(request)
 
     assert caught.value.code is ErrorCode.PLANNING_PREFLIGHT_BLOCKED
-    assert effects == 0
 
 
 def test_approved_binding_requires_exact_pass_receipt() -> None:
@@ -429,6 +488,7 @@ def test_approved_binding_requires_exact_pass_receipt() -> None:
         asset_sha256="3" * 64,
     )
     receipt = production.CommercialSourceReviewReceipt.create(
+        review_intent_hash="0" * 64,
         source_request_hash="1" * 64,
         target_shot_id="shot-04",
         target_shot_content_hash="2" * 64,
@@ -438,6 +498,7 @@ def test_approved_binding_requires_exact_pass_receipt() -> None:
         policy_hash="7" * 64,
         evidence_id="commercial-evidence-not-evaluated",
         evidence_hash="8" * 64,
+        observed_by=REVIEW_ACTOR,
         authority=REVIEW_TOOL,
         verdict=production.QaVerdict.NOT_EVALUATED,
         target_kind="source_image",
@@ -616,20 +677,38 @@ def test_commercial_source_explicit_reopen_verifies_all_durable_bytes(tmp_path) 
     assert reopened == committed.commercial_source_attempts[0]
     assert load_production_project(tmp_path / "project.yaml").manifest == committed
 
-    (tmp_path / reopened.request_path).write_text("{}", encoding="utf-8")
-    with pytest.raises(AiVideoError) as load_caught:
-        load_production_project(tmp_path / "project.yaml")
-    assert load_caught.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
-    with pytest.raises(AiVideoError) as caught:
-        committer.recover_commercial_source_attempt(request.attempt_id)
-    assert caught.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    tamper_paths = (
+        tmp_path / reopened.request_path,
+        tmp_path
+        / canonical_commercial_image_import_receipt_path(
+            candidate.import_receipt_hash
+        ),
+        loaded.asset_paths[candidate.asset_id],
+        tmp_path / committed.active_qa_policy.path,
+        tmp_path / committed.active_dependency_graph.path,
+    )
+    for path in tamper_paths:
+        payload = path.read_bytes()
+        path.write_text("{}", encoding="utf-8")
+        try:
+            with pytest.raises(AiVideoError) as load_caught:
+                load_production_project(tmp_path / "project.yaml")
+            assert load_caught.value.retryable is False
+            with pytest.raises(AiVideoError) as caught:
+                committer.recover_commercial_source_attempt(request.attempt_id)
+            assert caught.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+        finally:
+            path.write_bytes(payload)
 
 
 def test_only_exact_semantic_pass_is_selected_and_approval_replay_is_zero_write(
     tmp_path,
 ) -> None:
     reference_set, import_receipt = _make_commercial_state_project(tmp_path)
-    committer = ProductionStateCommitter(tmp_path)
+    committer = ProductionStateCommitter(
+        tmp_path,
+        commercial_source_review_authorizer=_review_authorizer,
+    )
     initial = load_production_project(tmp_path / "project.yaml").manifest
     with_policy = committer.activate_qa_policy(
         _policy(),
@@ -658,36 +737,17 @@ def test_only_exact_semantic_pass_is_selected_and_approval_replay_is_zero_write(
         import_receipt=import_receipt,
     )
     committer.record_commercial_source_candidate(request, candidate)
-    evidence = production.CommercialVisualEvidence.create(
-        evidence_id="commercial-evidence-04",
-        source_request_hash=request.request_fingerprint,
-        target_shot_id=request.target_shot_id,
-        target_shot_content_hash=request.target_shot_content_hash,
-        candidate_asset_id=candidate.asset_id,
-        candidate_sha256=candidate.asset_sha256,
-        product_reference_set_hash=request.product_reference_set_hash,
-        policy_hash=_policy().content_hash,
-        authority_kind="human",
-        tool_identity=REVIEW_TOOL,
-        measurements=tuple(
-            production.CommercialVisualMeasurement(
-                dimension=dimension,
-                status=production.CommercialMatchStatus.MATCH,
-                expected=f"expected-{dimension.value}",
-                observed=f"observed-{dimension.value}",
-                confidence_milli=950,
-                rationale="exact human source-image observation",
-            )
-            for dimension in production.CommercialVisualDimension
-        ),
-    )
-    receipt = production.adjudicate_commercial_visual_evidence(
-        evidence,
-        policy=_policy(),
-    )
-    evidenced = committer.record_commercial_source_review(
-        request, candidate, evidence, receipt
-    )
+    unauthorized = ProductionStateCommitter(tmp_path)
+    before_unauthorized = load_production_project(tmp_path / "project.yaml").manifest
+    with pytest.raises(AiVideoError, match="authority is unavailable"):
+        unauthorized.begin_commercial_source_review(
+            request,
+            candidate,
+            authority_kind="human",
+            tool_identity=REVIEW_TOOL,
+        )
+    assert load_production_project(tmp_path / "project.yaml").manifest == before_unauthorized
+    evidenced, receipt = _review_candidate(committer, request, candidate)
     binding = production.ApprovedCommercialSourceBinding.create(
         approval_id="approved-source-04",
         ad_creative_plan_hash=request.ad_creative_plan_hash,
@@ -707,8 +767,19 @@ def test_only_exact_semantic_pass_is_selected_and_approval_replay_is_zero_write(
     candidate_replay = committer.record_commercial_source_candidate(
         request, candidate
     )
-    review_replay = committer.record_commercial_source_review(
-        request, candidate, evidence, receipt
+    replay_analyzer_called = False
+
+    def forbidden_replay_analyzer(intent, permit):
+        del intent, permit
+        nonlocal replay_analyzer_called
+        replay_analyzer_called = True
+        raise AssertionError("exact replay must not invoke analyzer")
+
+    review_replay, replay_receipt = committer.run_commercial_source_review_analysis(
+        request,
+        candidate,
+        expected_manifest_revision=evidenced.manifest_revision,
+        analyzer=forbidden_replay_analyzer,
     )
 
     assert evidenced.commercial_source_attempts[0].lifecycle is production.CommercialSourceLifecycle.EVIDENCED
@@ -734,6 +805,62 @@ def test_only_exact_semantic_pass_is_selected_and_approval_replay_is_zero_write(
     assert request_replay.manifest_revision == approved.manifest_revision
     assert candidate_replay.manifest_revision == approved.manifest_revision
     assert review_replay.manifest_revision == approved.manifest_revision
+    assert replay_receipt == receipt
+    assert replay_analyzer_called is False
+
+    mismatched_request_payload = request.model_dump(
+        mode="python", exclude={"request_fingerprint"}
+    )
+    mismatched_request_payload["ad_creative_plan_hash"] = "f" * 64
+    mismatched_request = production.CommercialSourcePreparationRequest.create(
+        **mismatched_request_payload
+    )
+    mismatched_candidate = production.CommercialSourceCandidate.model_validate(
+        candidate.model_copy(update={"request_hash": "f" * 64}).model_dump(
+            mode="python"
+        )
+    )
+    before_mismatch = load_production_project(tmp_path / "project.yaml").manifest
+
+    with pytest.raises(AiVideoError, match="different request"):
+        committer.begin_commercial_source_preparation(mismatched_request)
+    with pytest.raises(AiVideoError):
+        committer.record_commercial_source_candidate(mismatched_request, candidate)
+    with pytest.raises(AiVideoError):
+        committer.record_commercial_source_candidate(request, mismatched_candidate)
+    with pytest.raises(AiVideoError, match="replay request is not exact"):
+        committer.begin_commercial_source_review(
+            mismatched_request,
+            candidate,
+            authority_kind="human",
+            tool_identity=REVIEW_TOOL,
+        )
+    with pytest.raises(AiVideoError, match="different inputs"):
+        committer.begin_commercial_source_review(
+            request,
+            mismatched_candidate,
+            authority_kind="human",
+            tool_identity=REVIEW_TOOL,
+        )
+    with pytest.raises(AiVideoError, match="replay inputs are not exact"):
+        committer.run_commercial_source_review_analysis(
+            mismatched_request,
+            candidate,
+            expected_manifest_revision=evidenced.manifest_revision,
+            analyzer=forbidden_replay_analyzer,
+        )
+    with pytest.raises(AiVideoError, match="replay inputs are not exact"):
+        committer.run_commercial_source_review_analysis(
+            request,
+            mismatched_candidate,
+            expected_manifest_revision=evidenced.manifest_revision,
+            analyzer=forbidden_replay_analyzer,
+        )
+    with pytest.raises(AiVideoError, match="replay request is not exact"):
+        committer.approve_commercial_source(mismatched_request, binding)
+
+    assert load_production_project(tmp_path / "project.yaml").manifest == before_mismatch
+    assert replay_analyzer_called is False
 
     changed_registry = RegistrySnapshotPointer(
         path=approved.active_registry.path.parent / f"registry.{'f' * 64}.json",

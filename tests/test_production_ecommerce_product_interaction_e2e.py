@@ -49,6 +49,8 @@ from test_production_commercial_execution import _plan as _commercial_plan
 from test_production_commercial_source_preparation import (
     _candidate,
     _make_commercial_state_project,
+    _review_authorizer,
+    _review_candidate,
     _state_request,
 )
 from test_production_commercial_visual_review import (
@@ -136,7 +138,10 @@ def _interaction_projection(
 
 def _approved_commercial_project(root, *, source_plan_shot_id: str):
     reference_set, import_receipt = _make_commercial_state_project(root)
-    committer = ProductionStateCommitter(root)
+    committer = ProductionStateCommitter(
+        root,
+        commercial_source_review_authorizer=_review_authorizer,
+    )
     initial = load_production_project(root / "project.yaml").manifest
     with_policy = committer.activate_qa_policy(
         _commercial_policy(),
@@ -171,38 +176,11 @@ def _approved_commercial_project(root, *, source_plan_shot_id: str):
         import_receipt=import_receipt,
     )
     committer.record_commercial_source_candidate(request, candidate)
-    evidence = production.CommercialVisualEvidence.create(
-        evidence_id=f"commercial-source-review-{source_plan_shot_id}",
-        source_request_hash=request.request_fingerprint,
-        target_shot_id=request.target_shot_id,
-        target_shot_content_hash=request.target_shot_content_hash,
-        candidate_asset_id=candidate.asset_id,
-        candidate_sha256=candidate.asset_sha256,
-        product_reference_set_hash=reference_set.content_hash,
-        policy_hash=_commercial_policy().content_hash,
-        authority_kind="human",
-        tool_identity=REVIEW_TOOL,
-        measurements=tuple(
-            production.CommercialVisualMeasurement(
-                dimension=dimension,
-                status=production.CommercialMatchStatus.MATCH,
-                expected=f"expected-{dimension.value}",
-                observed=f"observed-{dimension.value}",
-                confidence_milli=950,
-                rationale="offline exact source-image observation",
-            )
-            for dimension in production.CommercialVisualDimension
-        ),
-    )
-    receipt = production.adjudicate_commercial_visual_evidence(
-        evidence,
-        policy=_commercial_policy(),
-    )
-    committer.record_commercial_source_review(
+    _, receipt = _review_candidate(
+        committer,
         request,
         candidate,
-        evidence,
-        receipt,
+        evidence_id=f"commercial-source-review-{source_plan_shot_id}",
     )
     binding = production.ApprovedCommercialSourceBinding.create(
         approval_id=f"approved-commercial-source-{source_plan_shot_id}",
@@ -531,7 +509,7 @@ def test_product_reference_change_invalidates_only_source_and_generated_shot_cha
 
 
 def test_commercial_handoff_rejects_duplicate_approval_cardinality(tmp_path) -> None:
-    _, projection, approval = _approved_commercial_project(
+    _, projection, durable_approval = _approved_commercial_project(
         tmp_path,
         source_plan_shot_id="shot-04",
     )
@@ -551,5 +529,114 @@ def test_commercial_handoff_rejects_duplicate_approval_cardinality(tmp_path) -> 
                 shot_ids=(projection.target_shot_id,)
             ),
             commercial_execution_projections=(projection,),
-            approved_commercial_sources=(approval, approval),
+            approved_commercial_sources=(durable_approval, durable_approval),
         )
+
+    plan = _commercial_plan()
+    interaction_projections = tuple(
+        item
+        for item in production.project_commercial_executions(plan)
+        if item.primary_class is production.CommercialShotClass.PRODUCT_INTERACTION
+    )
+
+    def approval_for(
+        interaction: production.CommercialExecutionProjection,
+    ) -> production.ApprovedCommercialSourceBinding:
+        request_hash = canonical_sha256(
+            {"plan": plan.content_hash, "projection": interaction.projection_hash}
+        )
+        observed_by = ActorIdentity(
+            actor_id="commercial-cardinality-test-observer",
+            actor_kind="human",
+        )
+        import_receipt = production.CommercialImageImportReceipt.create(
+            source_kind="human_observed_import",
+            original_filename=f"{interaction.target_shot_id}.png",
+            output_asset_id=f"keyframe-{interaction.target_shot_id}",
+            output_sha256=canonical_sha256(
+                {"keyframe": interaction.target_shot_id}
+            ),
+            output_size_bytes=1,
+            output_width=1,
+            output_height=1,
+            imported_at="2026-08-25T10:00:00+08:00",
+            prompt_fingerprint=canonical_sha256(
+                {"prompt": interaction.target_shot_id}
+            ),
+            target_kind="commercial_interaction_keyframe",
+            target_id=f"request-{interaction.target_shot_id}",
+            product_reference_set=durable_approval.product_reference_set,
+            product_reference_set_id=durable_approval.product_reference_set_id,
+            product_reference_set_hash=durable_approval.product_reference_set_hash,
+            product_reference_asset_hashes=(
+                durable_approval.product_source_asset_hashes
+            ),
+            target_shot_id=interaction.target_shot_id,
+            target_shot_content_hash=canonical_sha256(
+                {"shot": interaction.target_shot_id}
+            ),
+            character_reference_ids=durable_approval.character_reference_ids,
+            scene_reference_ids=durable_approval.scene_reference_ids,
+            observed_by=observed_by,
+            provenance_note="Synthetic exact approval cardinality fixture.",
+            usage_license="test-only",
+        )
+        candidate = production.CommercialSourceCandidate(
+            request_hash=request_hash,
+            target_shot_id=interaction.target_shot_id,
+            target_shot_content_hash=import_receipt.target_shot_content_hash,
+            asset_id=import_receipt.output_asset_id,
+            asset_sha256=import_receipt.output_sha256,
+            import_receipt_hash=import_receipt.content_hash,
+            import_receipt=import_receipt,
+        )
+        receipt = production.CommercialSourceReviewReceipt.create(
+            review_intent_hash=canonical_sha256(
+                {"review": interaction.projection_hash}
+            ),
+            source_request_hash=request_hash,
+            target_shot_id=interaction.target_shot_id,
+            target_shot_content_hash=candidate.target_shot_content_hash,
+            candidate_asset_id=candidate.asset_id,
+            candidate_sha256=candidate.asset_sha256,
+            product_reference_set_hash=durable_approval.product_reference_set_hash,
+            policy_hash="7" * 64,
+            evidence_id=f"evidence-{interaction.target_shot_id}",
+            evidence_hash=canonical_sha256(
+                {"evidence": interaction.target_shot_id}
+            ),
+            observed_by=observed_by,
+            authority=REVIEW_TOOL,
+            verdict=production.QaVerdict.PASS,
+            target_kind="source_image",
+        )
+        return production.ApprovedCommercialSourceBinding.create(
+            approval_id=f"approval-{interaction.target_shot_id}",
+            ad_creative_plan_hash=plan.content_hash,
+            execution_projection_hash=interaction.projection_hash,
+            product_reference_set=durable_approval.product_reference_set,
+            character_references=durable_approval.character_references,
+            scene_references=durable_approval.scene_references,
+            wardrobe_requirement_hash=interaction.wardrobe_requirement_fingerprint,
+            accessory_requirement_hash=interaction.accessory_requirement_fingerprint,
+            candidate=candidate,
+            review_receipt=receipt,
+        )
+
+    exact_approvals = tuple(approval_for(item) for item in interaction_projections)
+    composition = make_composition_spec(
+        shot_ids=("shot-03", "shot-04", "shot-06", "shot-07", "shot-08")
+    )
+    baseline = production.review_ad_creative_plan(
+        plan,
+        composition,
+        approved_commercial_sources=exact_approvals,
+    )
+    duplicate = production.review_ad_creative_plan(
+        plan,
+        composition,
+        approved_commercial_sources=(exact_approvals[0], exact_approvals[0]),
+    )
+
+    assert baseline.source_preparation_ready is True
+    assert duplicate.source_preparation_ready is False

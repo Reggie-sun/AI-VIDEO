@@ -8,6 +8,7 @@ from ai_video.production.commercial_source_preparation import (
     CommercialSourcePreparationRequest,
 )
 from ai_video.production.commercial_visual_review import (
+    CommercialSourceReviewIntent,
     CommercialSourceReviewReceipt,
     CommercialVisualEvidence,
 )
@@ -24,6 +25,7 @@ from ai_video.production.paths import (
     canonical_commercial_source_approval_path,
     canonical_commercial_source_candidate_path,
     canonical_commercial_source_evidence_path,
+    canonical_commercial_source_review_intent_path,
     canonical_commercial_source_review_path,
 )
 
@@ -92,6 +94,33 @@ class _StateCommitCommercialSourceRecoveryMixin:
                     sha256=candidate_file_hash,
                 )
             )
+        intent: CommercialSourceReviewIntent | None = None
+        if attempt.review_intent_hash is not None:
+            intent_path = canonical_commercial_source_review_intent_path(
+                attempt.review_intent_hash
+            )
+            intent, intent_file_hash = self._read_commercial_model(
+                intent_path, CommercialSourceReviewIntent
+            )
+            if (
+                intent.content_hash != attempt.review_intent_hash
+                or intent.source_request_hash != attempt.request_fingerprint
+                or intent.target_shot_id != attempt.target_shot_id
+                or intent.target_shot_content_hash
+                != attempt.target_shot_content_hash
+                or intent.candidate_asset_id != attempt.candidate_asset_id
+                or intent.candidate_sha256 != attempt.candidate_sha256
+            ):
+                raise _state_invalid(
+                    "Commercial source review intent is inconsistent."
+                )
+            items.append(
+                RecoveryItem(
+                    path=intent_path,
+                    disposition=RecoveryDisposition.ACTIVE,
+                    sha256=intent_file_hash,
+                )
+            )
         if attempt.review_evidence_hash is not None:
             evidence_path = canonical_commercial_source_evidence_path(
                 attempt.review_evidence_hash
@@ -99,7 +128,13 @@ class _StateCommitCommercialSourceRecoveryMixin:
             evidence, evidence_file_hash = self._read_commercial_model(
                 evidence_path, CommercialVisualEvidence
             )
-            if evidence.content_hash != attempt.review_evidence_hash:
+            if (
+                evidence.content_hash != attempt.review_evidence_hash
+                or intent is None
+                or evidence.review_intent_hash != intent.content_hash
+                or evidence.observed_by != intent.actor_identity
+                or evidence.tool_identity != intent.tool_identity
+            ):
                 raise _state_invalid("Commercial source review evidence hash is inconsistent.")
             items.append(
                 RecoveryItem(
@@ -169,6 +204,20 @@ class _StateCommitCommercialSourceRecoveryMixin:
             )
             if attempt is None:
                 raise _state_invalid("Commercial source recovery attempt is absent.")
+            try:
+                loaded = self._load_production_project(
+                    self._project_root / "project.yaml"
+                )
+            except Exception as exc:
+                detail = getattr(exc, "technical_detail", None) or str(exc)
+                raise _state_invalid(
+                    "Commercial source recovery could not reopen current Production state.",
+                    detail,
+                ) from exc
+            if loaded.manifest != manifest:
+                raise _state_invalid(
+                    "Commercial source recovery Manifest identity changed."
+                )
             reopened, _ = self._reopen_commercial_source_attempt(manifest, attempt)
             return reopened
 

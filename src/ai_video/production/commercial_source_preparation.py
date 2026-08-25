@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Callable, Literal
+from typing import Literal
 
 from pydantic import Field, field_validator, model_validator
 
@@ -328,31 +328,14 @@ class ApprovedCommercialSourceBinding(StrictModel):
 
 
 class CommercialSourcePreparationCoordinator:
-    def __init__(
-        self,
-        *,
-        generated_materializer: Callable[[CommercialSourcePreparationRequest], object] | None = None,
-        product_aware_generation_capability: bool = False,
-    ) -> None:
-        self._generated_materializer = generated_materializer
-        self._product_aware_generation_capability = product_aware_generation_capability
-
     def prepare(self, request: CommercialSourcePreparationRequest) -> object | None:
         checked = CommercialSourcePreparationRequest.model_validate(
             request.model_dump(mode="python")
         )
         if checked.acquisition_kind is CommercialSourceAcquisitionKind.P7_GENERATION:
-            if not self._product_aware_generation_capability:
-                raise AiVideoError(
-                    ErrorCode.PLANNING_PREFLIGHT_BLOCKED,
-                    "Commercial source generation requires an explicit product-aware Image Provider capability.",
-                    retryable=False,
-                )
-            if self._generated_materializer is None:
-                raise AiVideoError(
-                    ErrorCode.PLANNING_PREFLIGHT_BLOCKED,
-                    "Commercial source generation materializer is unavailable.",
-                    retryable=False,
-                )
-            return self._generated_materializer(checked)
+            raise AiVideoError(
+                ErrorCode.PLANNING_PREFLIGHT_BLOCKED,
+                "Commercial source P7 generation is not implemented; only exact registered import is supported.",
+                retryable=False,
+            )
         return None
