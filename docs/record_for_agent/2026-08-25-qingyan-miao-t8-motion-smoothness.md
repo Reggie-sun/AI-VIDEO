@@ -156,7 +156,7 @@ Douyin UI safe area 与完整商业成片均未由本轮验证。
 ## Agent Guardrails
 
 - 不把 124 个唯一帧、constant 24fps 或 one-scene 当作动作流畅 PASS。
-- 不把两次 development `ComfyClient` submit 描述成 Production Provider lifecycle evidence。
+- 不把这些 development `ComfyClient` submit 描述成 Production Provider lifecycle evidence。
 - 不覆盖或删除失败样片；两次结果分别保留，供后续 root-cause 对比。
 - 不把当前相关性证据升级为 T8 内部 root-cause 定论。
 - 不在没有新假设时 blind retry、批量换 seed、fallback 或用后期时序处理掩盖跳变。
