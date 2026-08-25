@@ -15,6 +15,7 @@ Date: 2026-08-25
 - V1 materialization 仅支持 registered local/human-observed PNG import。`P7_GENERATION` 固定 typed BLOCKED，没有 caller callback、Provider submit 或 fallback。
 - Manifest `2.12` 保存 request、candidate、review intent/evidence/receipt 和 active approval；`ProductionStateCommitter` 仍是唯一 writer、activation 和 explicit recovery owner。
 - Commercial source enum/model/invariants 位于 cohesive `_commercial_source_state.py`，通用 state/review phase enum 位于 `_state_lifecycle.py`；`models.py` 只保留既有 public import path re-export 和 Manifest schema composition，避免继续扩张 oversized shared model owner。
+- 为满足 oversized owner 的 zero-growth contract，通用 immutable mapping 容器移入 `_immutable_models.py`，canonical voice artifact reader 移入既有 `_voice_project_reader.py`；public imports、Manifest JSON bytes、strict reopen 和 voice canonical-read semantics 保持不变。
 - Commercial source review 复用 active P6 `QaPolicy`。Injected authorizer 选择 exact actor，committer 先持久化 content-addressed intent，再 durable consume 并签发 process-local one-use permit；analyzer 不能自行选择 durable PASS 或写 Manifest。
 - Exact semantic PASS 才可选择 `ApprovedCommercialSourceBinding`。Approval 与 commercial dependency graph/states 在同一个 final Manifest replace 中 co-activate；Project/Registry/QA policy 变化会清理 active approval 并把 attempt 标为 `STALE`。
 - Preparation、candidate、review-intent、analysis 和 approval 的 exact replay 都绑定 caller-supplied request/candidate/approval identity，经 standard loader 重验 full current chain，并保持零 revision/effect。
@@ -48,17 +49,22 @@ AdCreativePlan product-interaction intent
 
 ## Verification And Evidence
 
-Implementation checkpoint 为 local commit `7cc4ee6`；后续 review-authority/recovery/replay closure 与 canonical docs 由 final task commit 补齐。Fresh executable evidence：
+Implementation checkpoint 为 local commit `7cc4ee6`；review-authority/recovery/replay closure、canonical docs 与 cumulative architecture closure 分别由 `679fad9`、`a98567f` 和 `50f6f91` 补齐。最终 implementation snapshot 为 `50f6f9125ff8ebd220d613b8f2b15779709dd308`。Fresh executable evidence：
 
 - Commercial/ad/image/P0/paid/structure focused matrix：`190 passed in 30.88s`。
 - Review/recovery/Shot 03/04 core：`31 passed in 16.20s`。
 - Plan implementation matrix（不含被 unrelated concurrent uncommitted files 污染的 repository-wide policy audit）：`831 passed in 346.02s`。
-- Replay/cardinality focused group：`152 passed`；唯一失败是 unrelated staged quality-gate files 导致 current-tree repository-wide policy audit 报告两个 unmapped paths，不属于本 slice。Final exact detached commit snapshot 必须重新通过该 audit。
-- Final closure 由 exact immutable commit-range Harness receipt `.agent/harness/runs/ecommerce-product-interaction-source-preparation-final-20260825/receipt.json` 独占；receipt 必须验证 scope、policy、artifact hashes 和 freshness。
+- Replay/cardinality focused group：`152 passed`；当时唯一失败是 unrelated staged quality-gate files 导致 current-tree repository-wide policy audit 报告两个 unmapped paths，不属于本 slice。该 audit 随后在 final exact detached commit snapshot 通过，`unmapped_paths=[]`、`unverified_paths=[]`。
+- `reviewer_xhigh` final verdict 为 `accept with concerns`，没有 blocking issue；fresh review evidence 包括 `490 passed` focused suite、`463 passed` state commit/recovery、Manifest `2.0`–`2.11` JSON bytes 与双向 strict reopen、Manifest `2.12` discriminator/reopen、4,096 个 commercial lifecycle invariant combinations，以及 public import/pickle/voice reader comparator。
+- Final closure 由 exact immutable commit-range Harness receipt `.agent/harness/runs/ecommerce-product-interaction-source-preparation-final-20260825/receipt.json` 独占。Scope 为 `f41c84b686531e6cdf131b38df58d62fb7ef386e..50f6f9125ff8ebd220d613b8f2b15779709dd308`；receipt status 为 `passed`，且 `closure_eligible`、artifact integrity、freshness、snapshot/policy/scope match、workspace cleanup/stability 自验证全部成立。
+- Final Harness 的主要 executable results：Harness tests `185 passed`；Production contracts `2690 passed, 3 skipped, 1033 deselected`；CLI `13 passed`；review/recovery `583 passed`；commercial source matrix `831 passed`；image lifecycle `1251 passed`；Shot Continuity P0 `233 passed`；provider-neutral requirement `292 passed`；Planner `113 passed`；readiness `159 passed`；ecommerce Skill `83 passed`。
+- Architecture Gate 对 cumulative scope 为 `PASS (0 errors, 2 warnings)`。Warnings 是 `paths.py` 相对 base 增长 30 LOC，以及 cohesive commercial request→candidate→review→approval transaction owner `_state_commit_commercial_source.py` 为 837 LOC；二者不阻塞本 snapshot，但继续增长前必须重新评估边界。
 
 AI-VIDEO RAG query `ecommerce product interaction source materialization approved keyframe commercial visual QA` 只作为 discovery/advisory evidence；关键结论均重新核对 current files 和 tests。
 
 本轮没有运行 Provider、ComfyUI、媒体生成、renderer、paid API、credential lookup 或 network research。Tests/Harness 只证明 structural and deterministic behavior，不证明视觉质量、喷雾动作、P6 generated-video PASS 或 Final Acceptance。
+
+Implementation snapshot 和 receipt 均只存在于 local repository；本轮未 push、release 或声明 remote availability。Record capture 未刷新 project RAG index，先前 advisory query 的 freshness 状态不因本记录改变。
 
 ## Remaining Work
 
