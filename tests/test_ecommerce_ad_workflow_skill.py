@@ -245,6 +245,32 @@ def test_valid_30_second_vertical_examples_validate_and_are_hash_bound() -> None
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_authoring_readiness_cannot_encode_production_acceptance() -> None:
+    module = _validator_module()
+    package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    package = module.EcommerceAdProductionPackage.model_validate_json(
+        PACKAGE_EXAMPLE_PATH.read_text(encoding="utf-8")
+    )
+
+    report_model = type(package.ad_qc_report)
+    handoff_model = type(package.runtime_handoff)
+    assert package.ad_qc_report.ready is True
+    assert set(report_model.model_fields) == {"ready", "findings"}
+    assert set(handoff_model.model_fields) == {
+        "delivery_intent",
+        "proposals",
+        "requirements",
+        "classified_gaps",
+    }
+    assert {
+        "production_verdict",
+        "review_receipt",
+        "final_acceptance",
+        "manifest_revision",
+        "activation",
+    }.isdisjoint(package_payload["runtime_handoff"])
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 @pytest.mark.parametrize(
     "forbidden_field",
     [

@@ -532,6 +532,41 @@ def test_semantic_cannot_self_upgrade_without_policy_selected_authority():
     ) is QaVerdict.NOT_EVALUATED
 
 
+def test_unqualified_authoring_readiness_is_not_semantic_acceptance_evidence():
+    authoring_only = evidence(
+        QaLayer.SEMANTIC,
+        EvidenceStrength.MEASURED,
+        ready=True,
+        is_ready=True,
+        production_verdict=None,
+    )
+
+    assert adjudicate_review_evidence(
+        policy(), QaLayer.SEMANTIC, (authoring_only,)
+    ) is QaVerdict.NOT_EVALUATED
+
+
+def test_strategy_layer_only_consumes_reported_visual_strategy_result():
+    incomplete = evidence(
+        QaLayer.STRATEGY,
+        EvidenceStrength.MEASURED,
+        strategy_mismatch=False,
+    )
+    reported_match = evidence(
+        QaLayer.STRATEGY,
+        EvidenceStrength.MEASURED,
+        evaluated_strategy_ids=("static_image",),
+        strategy_mismatch=False,
+    )
+
+    assert adjudicate_review_evidence(
+        policy(), QaLayer.STRATEGY, (incomplete,)
+    ) is QaVerdict.NOT_EVALUATED
+    assert adjudicate_review_evidence(
+        policy(), QaLayer.STRATEGY, (reported_match,)
+    ) is QaVerdict.PASS
+
+
 @pytest.mark.parametrize(
     "payload",
     [

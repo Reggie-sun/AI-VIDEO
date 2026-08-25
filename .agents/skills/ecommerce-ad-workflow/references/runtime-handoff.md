@@ -14,6 +14,12 @@
 
 `blocked_capability_gap` 是 validator diagnostic code，不是第六个 classification。出现该 blocker时保持 package not-ready，并用上述 source-generation / Runtime-capability classification描述缺口。
 
+## Quality Boundary
+
+`AdQCReport.ready`只证明authoring package readiness；`AdCreativeReviewReport.is_ready`只证明sealed plan到composition的deterministic projection integrity，且`production_verdict`保持`None`。两者都不是post-media Ecommerce acceptance、P6 evidence或Final Acceptance。
+
+Future Runtime-facing domain media evidence只能由独立accepted spec/plan接入：AI-VIDEO必须预选并hash-bind exact domain/rubric/requirement profile与sealed authoring truth，再把exact project/graph/render/output/timeline/policy/media evidence交给existing `ReviewRequest -> ReviewEvidence -> ReviewReceipt -> FinalAcceptanceReceipt` lifecycle重新验证和adjudicate。Handoff本身不得选择rubric subset、签发Production PASS或写Manifest。
+
 ## Forbidden Fields and Stop Conditions
 
 - handoff 不得包含 Provider name/profile、credential、permit、task ID、Manifest revision、timeline frames/samples、render path、P6 PASS、Final Acceptance、activation 或 execution instruction。

@@ -419,6 +419,10 @@ def test_base_ai_comic_failed_layout_review_repairs_exact_closure_and_accepts(
     assert len(stable_media.image_receipt_evidence) == 2
 
     failed = runtime.review_initial_render()
+    selected_policy = load_production_project(tmp_path / "project.yaml").qa_policy
+    assert selected_policy is not None
+    assert selected_policy.required_layers == (QaLayer.LAYOUT,)
+    assert selected_policy.semantic_requirement == "optional"
     approval = runtime.approve_exact_layout_repair(failed)
     before_repair = runtime.load_manifest()
     repaired_state = runtime.commit_layout_repair(approval)

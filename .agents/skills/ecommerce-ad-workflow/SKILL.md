@@ -15,6 +15,8 @@ description: Use when an ecommerce, SKU, product advertising, direct-response pr
 - 不抓取未授权页面，不读取 credential，不联网，不调用 Provider，不生成媒体，不写 Project、Registry、Manifest 或 activation。
 - 不选择 renderer/timeline/Provider，也不把 `DIALOGUE_SUBTITLE` 当作 commercial graphics fallback。
 - Valid package 不证明 compositing、typography、audio stream、watchability、P6、Final Acceptance、live-ready 或 advertising performance。
+- `AdQCReport.ready`只表示 Ecommerce authoring readiness；它不能创建`ReviewReceipt`、`FinalAcceptanceReceipt`、Production verdict或Manifest mutation。`AdCreativeReviewReport.is_ready`只表示deterministic handoff integrity，且`production_verdict`必须保持`None`。Whole-ad post-media Ecommerce acceptance尚未实现。
+- CTR、CVR、CPA、ROAS、hold rate、retention与其他market outcome属于future empirical feedback，不得由package validity、Ad QC或Production Final Acceptance预测。
 
 ## Decision Sequence
 
