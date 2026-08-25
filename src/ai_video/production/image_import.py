@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
@@ -43,6 +43,11 @@ HUMAN_IMAGE_IMPORT_TOOL = ToolIdentity(
     version="1",
 )
 
+CODEX_IMAGEGEN_IMPORT_TOOL = ToolIdentity(
+    name="codex-imagegen-import",
+    version="1",
+)
+
 AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL = ToolIdentity(
     name="gpt-image-2-mcp-chatgpt-web-import",
     version="1",
@@ -57,11 +62,39 @@ def _invalid(message: str, detail: str | None = None) -> AiVideoError:
         retryable=False,
     )
 
+
+class ShotEndpointImageImportReferenceBinding(StrictModel):
+    """Exact source Shot endpoint used to create one imported image."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
+
+    role: Literal["shot_endpoint"]
+    creative_artifact_id: str = Field(min_length=1)
+    creative_revision: int = Field(strict=True, ge=1)
+    creative_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    creative_artifact_path: Path
+    asset_role: str = Field(min_length=1)
+    asset_id: str = Field(min_length=1)
+    asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("creative_artifact_path")
+    @classmethod
+    def _require_safe_relative_path(cls, value: Path) -> Path:
+        if value.is_absolute() or any(part in {"", ".", ".."} for part in value.parts):
+            raise ValueError("source Shot artifact path must be safe and relative")
+        return value
+
+
+ImageImportReferenceBinding = (
+    ImageReferenceBinding | ShotEndpointImageImportReferenceBinding
+)
+
+
 class HumanImageImportReceipt(StrictModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
     schema_version: Literal["1"]
-    source_surface: Literal["chatgpt_images_2_web"]
+    source_surface: Literal["chatgpt_images_2_web", "codex_imagegen_tool"]
     declared_ui_product_label: str = Field(min_length=1)
     backend_model_id: None = None
     original_filename: str = Field(min_length=1)
@@ -71,7 +104,7 @@ class HumanImageImportReceipt(StrictModel):
     output_height: int = Field(strict=True, gt=0)
     imported_at: str = Field(min_length=1)
     prompt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
-    references: tuple[ImageReferenceBinding, ...]
+    references: tuple[ImageImportReferenceBinding, ...]
     target_kind: Literal[
         "character_master", "scene_reference", "key_shot", "repair_replacement"
     ]
@@ -431,7 +464,12 @@ def validate_human_image_import(
 
 
 def human_image_import_asset(receipt: HumanImageImportReceipt) -> AssetRecord:
-    return _image_import_asset(receipt, HUMAN_IMAGE_IMPORT_TOOL)
+    tool = (
+        CODEX_IMAGEGEN_IMPORT_TOOL
+        if receipt.source_surface == "codex_imagegen_tool"
+        else HUMAN_IMAGE_IMPORT_TOOL
+    )
+    return _image_import_asset(receipt, tool)
 
 
 def validate_automated_browser_image_import(
@@ -574,12 +612,18 @@ def _prepare_image_import_commit(
     assets_by_id = {item.asset_id: item for item in base.registry.assets}
     characters = {item.artifact_id: item for item in base.characters}
     scenes = {item.artifact_id: item for item in base.scenes}
+    shots = {item.artifact_id: item for item in base.shots}
+    shot_references = {
+        item.artifact_id: item for item in base.project.artifacts.shots
+    }
     for reference in receipt.references:
         creative = (
             characters.get(reference.creative_artifact_id)
             if reference.role == "character"
             else scenes.get(reference.creative_artifact_id)
             if reference.role == "scene"
+            else shots.get(reference.creative_artifact_id)
+            if reference.role == "shot_endpoint"
             else None
         )
         selected_asset_ids = (
@@ -587,13 +631,40 @@ def _prepare_image_import_commit(
             if isinstance(creative, Character)
             else creative.visual_reference_asset_ids
             if isinstance(creative, Scene)
+            else next(
+                (
+                    role.asset_ids
+                    for role in creative.required_asset_roles
+                    if role.role == reference.asset_role
+                ),
+                (),
+            )
+            if isinstance(creative, Shot)
+            and isinstance(reference, ShotEndpointImageImportReferenceBinding)
             else ()
         )
         selected_asset = assets_by_id.get(reference.asset_id)
+        selected_shot_reference = (
+            shot_references.get(reference.creative_artifact_id)
+            if isinstance(reference, ShotEndpointImageImportReferenceBinding)
+            else None
+        )
         if (
             creative is None
             or creative.revision != reference.creative_revision
             or creative.content_hash != reference.creative_content_hash
+            or (
+                isinstance(reference, ShotEndpointImageImportReferenceBinding)
+                and (
+                    selected_shot_reference is None
+                    or selected_shot_reference.revision
+                    != reference.creative_revision
+                    or selected_shot_reference.content_hash
+                    != reference.creative_content_hash
+                    or selected_shot_reference.path
+                    != reference.creative_artifact_path
+                )
+            )
             or reference.asset_id not in selected_asset_ids
             or selected_asset is None
             or selected_asset.sha256 != reference.asset_sha256

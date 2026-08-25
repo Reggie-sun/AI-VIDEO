@@ -25,9 +25,11 @@ from ai_video.production.image import (
 )
 from ai_video.production.image_import import (
     AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL,
+    CODEX_IMAGEGEN_IMPORT_TOOL,
     HUMAN_IMAGE_IMPORT_TOOL,
     AutomatedBrowserImageImportReceipt,
     HumanImageImportReceipt,
+    ShotEndpointImageImportReferenceBinding,
     automated_browser_image_import_asset,
     human_image_import_asset,
     validate_automated_browser_image_import,
@@ -66,6 +68,8 @@ from ai_video.production.paths import (
     canonical_image_submit_intent_path,
 )
 from ai_video.production.registry import registry_semantic_sha256
+
+from ._state_commit_common import _canonical_yaml_bytes
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -961,7 +965,11 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
             if item.source_kind is AssetSourceKind.IMPORTED
             and item.asset_type is AssetType.IMAGE
             and item.tool
-            in {HUMAN_IMAGE_IMPORT_TOOL, AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL}
+            in {
+                HUMAN_IMAGE_IMPORT_TOOL,
+                CODEX_IMAGEGEN_IMPORT_TOOL,
+                AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL,
+            }
         )
         for asset in imported:
             automated = asset.tool == AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL
@@ -993,6 +1001,44 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
                 expected_asset = human_image_import_asset(receipt)
             if expected_asset != asset:
                 raise ValueError("selected image import AssetRecord is inconsistent")
+            registry_assets = {
+                item.asset_id: item for item in bundle.registry.assets
+            }
+            for reference in receipt.references:
+                if not isinstance(
+                    reference, ShotEndpointImageImportReferenceBinding
+                ):
+                    continue
+                source_shot_snapshot = _read_regular_file_nofollow(
+                    bundle.root / reference.creative_artifact_path,
+                    contained_by=bundle.root,
+                )
+                source_shot = Shot.model_validate(
+                    yaml.safe_load(source_shot_snapshot.data.decode("utf-8"))
+                )
+                source_asset = registry_assets.get(reference.asset_id)
+                selected_asset_ids = next(
+                    (
+                        role.asset_ids
+                        for role in source_shot.required_asset_roles
+                        if role.role == reference.asset_role
+                    ),
+                    (),
+                )
+                if (
+                    source_shot.artifact_id != reference.creative_artifact_id
+                    or source_shot.revision != reference.creative_revision
+                    or source_shot.content_hash
+                    != reference.creative_content_hash
+                    or not verify_artifact_hash(source_shot)
+                    or source_shot_snapshot.data != _canonical_yaml_bytes(source_shot)
+                    or reference.asset_id not in selected_asset_ids
+                    or source_asset is None
+                    or source_asset.sha256 != reference.asset_sha256
+                ):
+                    raise ValueError(
+                        "image import Shot endpoint reference is not exact"
+                    )
             if asset.asset_id not in active_imported_asset_ids:
                 continue
             if receipt.target_kind == "character_master":

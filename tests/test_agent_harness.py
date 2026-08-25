@@ -1308,6 +1308,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
     paths = (
         "scripts/materialize_shot_continuity_m0.py",
+        "scripts/prepare_shot_continuity_endpoint_repair.py",
         "scripts/prepare_shot_continuity_p0.py",
         "scripts/execute_shot_continuity_source.py",
         "src/ai_video/production/execution_stack_materialization.py",
@@ -1321,6 +1322,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "src/ai_video/production/video_candidate_composition.py",
         "src/ai_video/production/video_execution_stack.py",
         "src/ai_video/production/video_transition.py",
+        "tests/test_prepare_shot_continuity_endpoint_repair.py",
         "tests/test_prepare_shot_continuity_p0.py",
         "tests/test_production_p0_qualification.py",
         "tests/test_production_video_transition.py",
@@ -1369,6 +1371,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
 
     argv = policy["checks"]["shot_continuity_p0_tests"]["argv"]
     for path in (
+        "tests/test_prepare_shot_continuity_endpoint_repair.py",
         "tests/test_prepare_shot_continuity_p0.py",
         "tests/test_production_p0_qualification.py",
         "tests/test_production_video_transition.py",

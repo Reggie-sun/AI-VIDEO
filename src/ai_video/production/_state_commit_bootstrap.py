@@ -150,7 +150,11 @@ class _StateCommitBootstrapMixin:
         }
         from ai_video.production.image_import import (
             AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL,
+            CODEX_IMAGEGEN_IMPORT_TOOL,
             HUMAN_IMAGE_IMPORT_TOOL,
+            AutomatedBrowserImageImportReceipt,
+            HumanImageImportReceipt,
+            ShotEndpointImageImportReferenceBinding,
         )
         from ai_video.production.models import AssetSourceKind, AssetType
         from ai_video.production.paths import (
@@ -158,18 +162,59 @@ class _StateCommitBootstrapMixin:
             canonical_human_image_import_receipt_path,
         )
 
-        required_paths.update(
-            canonical_human_image_import_receipt_path(item.creation_receipt_id)
-            if item.tool == HUMAN_IMAGE_IMPORT_TOOL
-            else canonical_automated_browser_image_import_receipt_path(
-                item.creation_receipt_id
+        artifacts_by_path = {item.relative_path: item for item in artifacts}
+        for item in registry.assets:
+            if (
+                item.source_kind is not AssetSourceKind.IMPORTED
+                or item.asset_type is not AssetType.IMAGE
+                or item.tool
+                not in {
+                    HUMAN_IMAGE_IMPORT_TOOL,
+                    CODEX_IMAGEGEN_IMPORT_TOOL,
+                    AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL,
+                }
+            ):
+                continue
+            automated = item.tool == AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL
+            receipt_path = (
+                canonical_automated_browser_image_import_receipt_path(
+                    item.creation_receipt_id
+                )
+                if automated
+                else canonical_human_image_import_receipt_path(
+                    item.creation_receipt_id
+                )
             )
-            for item in registry.assets
-            if item.source_kind is AssetSourceKind.IMPORTED
-            and item.asset_type is AssetType.IMAGE
-            and item.tool
-            in {HUMAN_IMAGE_IMPORT_TOOL, AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL}
-        )
+            required_paths.add(receipt_path)
+            receipt_artifact = artifacts_by_path.get(receipt_path)
+            if receipt_artifact is None:
+                continue
+            try:
+                receipt = (
+                    AutomatedBrowserImageImportReceipt.model_validate_json(
+                        receipt_artifact.payload
+                    )
+                    if automated
+                    else HumanImageImportReceipt.model_validate_json(
+                        receipt_artifact.payload
+                    )
+                )
+            except ValueError as exc:
+                raise _state_invalid(
+                    "Production bootstrap image import receipt is invalid.",
+                    str(exc),
+                ) from exc
+            if receipt.content_hash != item.creation_receipt_id:
+                raise _state_invalid(
+                    "Production bootstrap image import receipt identity is invalid."
+                )
+            required_paths.update(
+                reference.creative_artifact_path
+                for reference in receipt.references
+                if isinstance(
+                    reference, ShotEndpointImageImportReferenceBinding
+                )
+            )
         supplied_paths = tuple(item.relative_path for item in artifacts)
         supplied_path_set = set(supplied_paths)
         if len(supplied_paths) != len(supplied_path_set):

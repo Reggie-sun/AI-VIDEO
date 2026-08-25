@@ -132,6 +132,26 @@ def test_human_import_receipt_is_truthful_sealed_and_builds_imported_asset() -> 
     assert asset.creation_receipt_id == receipt.content_hash
 
 
+def test_codex_imagegen_import_keeps_its_truthful_source_tool_identity() -> None:
+    png = project_factory._p7_png()
+    receipt = _receipt(
+        png,
+        source_surface="codex_imagegen_tool",
+        declared_ui_product_label="OpenAI imagegen",
+        original_filename="approved-endpoint.png",
+    )
+
+    validate_human_image_import(receipt, png)
+    asset = human_image_import_asset(receipt)
+
+    assert receipt.source_surface == "codex_imagegen_tool"
+    assert receipt.backend_model_id is None
+    assert receipt.provider_request_id is None
+    assert not receipt.automated_browser
+    assert asset.tool.name == "codex-imagegen-import"
+    assert asset.tool.version == "1"
+
+
 def test_automated_browser_import_is_truthful_sealed_and_distinct() -> None:
     png = project_factory._p7_png()
     receipt = _automated_receipt(png)
@@ -286,7 +306,9 @@ def test_human_import_requires_ordered_offset_timestamps(
     "target_kind",
     ["character_master", "scene_reference", "key_shot", "repair_replacement"],
 )
-@pytest.mark.parametrize("import_kind", ["human", "automated_browser"])
+@pytest.mark.parametrize(
+    "import_kind", ["human", "automated_browser", "codex_imagegen"]
+)
 def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
     tmp_path: Path,
     target_kind: str,
@@ -294,6 +316,10 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
 ) -> None:
     project_factory.write_production_project(tmp_path)
     base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
+    initial = load_production_project(tmp_path / "project.yaml")
+    ProductionStateCommitter(tmp_path).upgrade_manifest_schema(
+        "2.5", expected_manifest_revision=initial.manifest.manifest_revision
+    )
     base = load_production_project(tmp_path / "project.yaml")
     field = {
         "character_master": "characters",
@@ -306,22 +332,33 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
         base_target.required_asset_roles[0].role if field == "shots" else "reference"
     )
     png = project_factory._p7_png()
-    receipt_factory = _receipt if import_kind == "human" else _automated_receipt
+    receipt_factory = (
+        _automated_receipt if import_kind == "automated_browser" else _receipt
+    )
     asset_factory = (
         human_image_import_asset
-        if import_kind == "human"
+        if import_kind != "automated_browser"
         else automated_browser_image_import_asset
     )
     commit_preparer = (
         prepare_human_image_import_commit
-        if import_kind == "human"
+        if import_kind != "automated_browser"
         else prepare_automated_browser_image_import_commit
+    )
+    receipt_overrides = (
+        {
+            "source_surface": "codex_imagegen_tool",
+            "declared_ui_product_label": "OpenAI imagegen",
+        }
+        if import_kind == "codex_imagegen"
+        else {}
     )
     receipt = receipt_factory(
         png,
         target_kind=target_kind,
         target_artifact_id=base_target.artifact_id,
         target_asset_role=target_role,
+        **receipt_overrides,
     )
     asset = asset_factory(receipt)
 
@@ -498,10 +535,24 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
     assert final.attempts[-1].operation == "commit_project_registry"
     assert final.dependency_states == resolution.states
 
+    if import_kind == "codex_imagegen":
+        active_receipt_path = tmp_path / canonical_human_image_import_receipt_path(
+            receipt.content_hash
+        )
+        original_receipt = active_receipt_path.read_bytes()
+        tampered_receipt = json.loads(original_receipt)
+        tampered_receipt["declared_ui_product_label"] = "tampered"
+        active_receipt_path.write_text(
+            json.dumps(tampered_receipt, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        with pytest.raises(AiVideoError):
+            load_production_project(tmp_path / "project.yaml")
+        active_receipt_path.write_bytes(original_receipt)
+
     decoy = receipt.model_copy(update={"content_hash": "f" * 64})
     decoy_path = tmp_path / (
         canonical_human_image_import_receipt_path("f" * 64)
-        if import_kind == "human"
+        if import_kind != "automated_browser"
         else canonical_automated_browser_image_import_receipt_path("f" * 64)
     )
     decoy_path.parent.mkdir(parents=True, exist_ok=True)
