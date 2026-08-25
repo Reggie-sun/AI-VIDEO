@@ -256,6 +256,30 @@ poll 或 retry 后台 refresh；因此它证明 non-blocking last-good path 与 
 行为，不把尚未复核的新 experience shard 状态描述为 `ready`。本 session 未使用 MiniMax，
 也没有运行 Provider、媒体或网络操作。
 
+## 2026-08-25 Mandatory Matching-Task Preflight
+
+一次 ecommerce/media task 漏调暴露出 `allow_implicit_invocation: true` 只是 host permission，
+不是 retrieval 已执行的证据。用户选择保持 prompt-aware、matching-task routing，不增加
+lifecycle hook，也不要求每个 session 都调用。`AGENTS.md` 因此新增 mandatory advisory
+preflight：real media/quality、Provider/model、continuity/identity、regression/repeated
+failure/incident/recovery、prior architecture decision，以及明确请求 earlier AI-VIDEO
+experience/decision/spec/plan 时，必须先调用 `retrieve-ai-video-memory`，再进入 ecommerce、
+continuity、Provider prompting 或 motion-design owner。
+
+Formatting、typo、unrelated trivial test、isolated mechanical refactor，以及只需 current
+symbol/path/call chain/file contents 的 task 保持不触发。该规则继续引用 Skill 的单 scope/
+reference、stale/missing/BROKEN 与 authority contract；RAG 仍不授权 implementation、Provider、
+activation、quality acceptance、push 或 release。
+
+Local commit `e3451db docs: require RAG preflight for matching tasks` 只修改 `AGENTS.md`。
+Exact staged Harness receipt 位于
+`.agent/harness/runs/20260825T022732591352Z/receipt.json`：Documentation Contract 与 Policy
+Audit PASS，Harness tests 为 `184 passed`；receipt integrity、freshness、snapshot 与 scope
+checks 全部为 true。Native `reviewer_xhigh` 初审发现 `incident`、explicit historical request
+与 exact `file contents` exclusion 漏项；minimal fix 后 scoped re-review verdict 为 `accept`，
+无 blocking issue 或 concern。该 commit 仅存在于 local `main`，未 push 或 release；本次
+routing-rule change 没有运行新的 RAG query、Provider、媒体或网络操作。
+
 ## Guardrails
 
 - `experience` 记录是 advisory experience，不等于 code/runtime truth。
