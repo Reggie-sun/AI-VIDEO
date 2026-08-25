@@ -142,10 +142,7 @@ def _state_reference_set(loaded) -> production.ProductReferenceSet:
     )
 
 
-def _make_commercial_state_project(root) -> tuple[
-    production.ProductReferenceSet,
-    production.CommercialImageImportReceipt,
-]:
+def _make_commercial_state_project(root, *, include_inputs: bool = False):
     inputs = project_factory.make_p5_dependency_inputs(root, decodable_pngs=True)
     project_payload = _canonical_yaml_bytes(inputs.project.project)
     project_path = canonical_project_snapshot_path(
@@ -305,6 +302,8 @@ def _make_commercial_state_project(root) -> tuple[
         base_commit=base_commit,
     )
     ProductionStateCommitter(root).commit(request)
+    if include_inputs:
+        return inputs, reference_set, receipt
     return reference_set, receipt
 
 

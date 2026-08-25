@@ -1633,7 +1633,6 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     _verify_active_voice_evidence(bundle)
     verify_active_image_evidence(bundle)
     verify_paid_provider_evidence(root, manifest)
-    verify_manifest_video_evidence(bundle, manifest)
     if manifest.active_dependency_graph is not None:
         dependency_graph = _load_active_dependency_graph(
             root, manifest.active_dependency_graph
@@ -1711,6 +1710,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
             ):
                 raise _invalid("Final Acceptance Receipt is stale.")
         bundle = bundle.model_copy(update={"qa_policy": qa_policy})
+    verify_manifest_video_evidence(bundle, manifest)
     verify_commercial_source_project_state(bundle)
     if manifest.active_render_state is not None:
         render_state = (

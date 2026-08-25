@@ -38,6 +38,8 @@ from ai_video.production.models import (
     LoadedProductionProject,
     QaVerdict,
     AssetRegistrySnapshot,
+    StateCommitStatus,
+    VideoAttemptPhase,
     canonical_registry_snapshot_path,
 )
 from ai_video.production.paths import (
@@ -434,6 +436,25 @@ def verify_commercial_source_project_state(
         return
     node_by_id = {node.node_id: node for node in graph.nodes}
     approvals = bundle.manifest.active_commercial_source_approvals
+    consumed_approval_hashes: set[str] = set()
+    from ai_video.production._video_project_reader import (
+        load_video_request_receipt,
+    )
+
+    for attempt in bundle.manifest.attempts:
+        state = attempt.video_generation_state
+        if (
+            attempt.status is not StateCommitStatus.SUCCEEDED
+            or state is None
+            or state.phase is not VideoAttemptPhase.ACTIVATE
+            or state.commercial_evaluation is None
+        ):
+            continue
+        request = load_video_request_receipt(bundle.root, state.request)
+        if request.commercial_binding is not None:
+            consumed_approval_hashes.update(
+                request.commercial_binding.source_approval_hashes
+            )
     for state in commercial_states:
         evidence = state.applied_evidence
         assert isinstance(evidence, CommercialSourceDependencyEvidence)
@@ -445,7 +466,11 @@ def verify_commercial_source_project_state(
                     DependencyNodeKind.CREATIVE_ARTIFACT,
                     DependencyNodeKind.ASSET,
                 }
-                or evidence.pointer not in approvals
+                or (
+                    evidence.pointer not in approvals
+                    and evidence.pointer.content_hash
+                    not in consumed_approval_hashes
+                )
             ):
                 raise _invalid(
                     "Commercial source dependency evidence has an invalid owner."

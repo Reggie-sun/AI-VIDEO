@@ -68,6 +68,8 @@ class ActivatedCommercialShotCheckpoint(StrictModel):
 
 
 class EcommerceShotExecutionFacade(Protocol):
+    def bound_commercial_identity(self) -> tuple[str, str, str]: ...
+
     def next_action(self) -> EcommerceShotNextAction: ...
 
     def start(self) -> None: ...
@@ -114,6 +116,15 @@ class EcommerceVideoGenerationFacade:
             self.paid_preview is None or self.reservation_id is None
         ):
             raise ValueError("Paid Ecommerce facade requires preview and reservation")
+
+    def bound_commercial_identity(self) -> tuple[str, str, str]:
+        binding = self.request.commercial_binding
+        assert binding is not None
+        return (
+            binding.ad_creative_plan_hash,
+            binding.commercial_execution_projection_hash,
+            binding.target_shot_id,
+        )
 
     def next_action(self) -> EcommerceShotNextAction:
         try:
@@ -268,6 +279,23 @@ def run_ecommerce_ad_generation(
     )
     if set(facades) != set(provider_shot_ids):
         raise ValueError("Preselected Shot service facades do not match Provider Shots")
+
+    for shot_id in provider_shot_ids:
+        projection = projection_by_shot[shot_id]
+        try:
+            identity = facades[shot_id].bound_commercial_identity()
+        except (AttributeError, TypeError, ValueError):
+            identity = None
+        if identity != (
+            selected.plan_content_hash,
+            projection.projection_hash,
+            shot_id,
+        ):
+            return _stopped(
+                [],
+                shot_id=shot_id,
+                reason=EcommerceStopReason.CHECKPOINT_INVALID,
+            )
 
     should_stop = stop_requested or (lambda: False)
     activated: list[ActivatedCommercialShotCheckpoint] = []

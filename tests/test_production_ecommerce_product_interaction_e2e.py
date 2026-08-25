@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from dataclasses import replace
+from pathlib import Path
+
 import pytest
 
 import ai_video.production as production
 import ai_video.planning as planning
-from ai_video.errors import AiVideoError
+from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.domain_acceptance import DomainAcceptancePolicy
 from ai_video.production import dependency as dependency
 from ai_video.planning import (
     PlanOutcome,
@@ -14,7 +18,7 @@ from ai_video.planning import (
     VideoPlanningRequest,
     require_current_video_plan,
 )
-from ai_video.production.hashing import canonical_sha256
+from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.commercial_execution import (
     project_generated_commercial_shot_binding,
 )
@@ -38,7 +42,20 @@ from ai_video.production.shot_router import (
     RoutingOutcome,
     VideoGenerationResolver,
 )
-from ai_video.production.video import VideoGenerationMode
+from ai_video.production.video import (
+    BillingKind,
+    ProviderProfilePointer,
+    VideoCapabilityVariant,
+    VideoExecutionKind,
+    VideoGenerationMode,
+    VideoGenerationRequest,
+    VideoImageReferenceBinding,
+    VideoOutputRequirement,
+    VideoProviderCapabilities,
+    VideoTaskState,
+)
+from ai_video.production.video_fake import FakeVideoScenario, ScriptedFakeVideoProvider
+from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.video_compiler import (
     CompiledProviderVideoRequest,
     compile_provider_video_request,
@@ -51,7 +68,7 @@ from ai_video.production.video_requirement import (
     ProviderNeutralGenerationIntentProjection,
     SubjectAction,
 )
-from production_project_factory import make_composition_spec
+from production_project_factory import make_composition_spec, make_p8_video_candidate_preparer
 from test_production_commercial_execution import _plan as _commercial_plan
 from test_production_commercial_source_preparation import (
     _candidate,
@@ -65,6 +82,13 @@ from test_production_commercial_visual_review import (
     _policy as _commercial_policy,
 )
 from test_production_ecommerce_ad_coordinator import _Facade
+from test_production_generated_video_e2e import (
+    COMMERCIAL_EVALUATOR,
+    FIXTURE,
+    _CountingCommercialShotReviewer,
+    _paid_authorization,
+    _paid_preview,
+)
 from test_production_shot_router import (
     HASH_F,
     _asset as _router_asset,
@@ -144,15 +168,44 @@ def _interaction_projection(
     return production.CommercialExecutionProjection.model_validate(payload)
 
 
-def _approved_commercial_project(root, *, source_plan_shot_id: str):
-    reference_set, import_receipt = _make_commercial_state_project(root)
+def _approved_commercial_project(
+    root, *, source_plan_shot_id: str, post_media: bool = False
+):
+    inputs, reference_set, import_receipt = _make_commercial_state_project(
+        root, include_inputs=True
+    )
     committer = ProductionStateCommitter(
         root,
         commercial_source_review_authorizer=_review_authorizer,
     )
     initial = load_production_project(root / "project.yaml").manifest
+    policy = _commercial_policy()
+    if post_media:
+        profile = create_qingyan_ecommerce_acceptance_profile()
+        policy = seal_artifact(
+            policy.model_copy(
+                update={
+                    "artifact_id": "qa-policy-commercial-post-media",
+                    "revision": policy.revision + 1,
+                    "content_hash": "0" * 64,
+                    "creation_receipt_id": "qa-policy-commercial-post-media",
+                    "semantic_authorities": (REVIEW_TOOL, COMMERCIAL_EVALUATOR),
+                    "domain_acceptance": DomainAcceptancePolicy(
+                        domain_id="ecommerce",
+                        profile_id=profile.profile_id,
+                        profile_version=profile.profile_version,
+                        profile_content_hash=profile.content_hash,
+                        profile_payload=profile.model_dump(mode="json"),
+                        measurement_contract_version=(
+                            profile.measurement_contract_version
+                        ),
+                        required_requirement_ids=profile.required_requirement_ids,
+                    ),
+                }
+            )
+        )
     with_policy = committer.activate_qa_policy(
-        _commercial_policy(),
+        policy,
         expected_manifest_revision=initial.manifest_revision,
         attempt_id="activate-commercial-e2e-policy",
     )
@@ -203,7 +256,209 @@ def _approved_commercial_project(root, *, source_plan_shot_id: str):
         review_receipt=receipt,
     )
     committer.approve_commercial_source(request, binding)
-    return load_production_project(root / "project.yaml"), projection, binding
+    loaded = load_production_project(root / "project.yaml")
+    return loaded, projection, binding, replace(inputs, project=loaded)
+
+
+def _product_video_runtime(root):
+    loaded, projection, approved_source, inputs = _approved_commercial_project(
+        root,
+        source_plan_shot_id="shot-04",
+        post_media=True,
+    )
+    schema_committer = ProductionStateCommitter(root)
+    upgraded = schema_committer.upgrade_manifest_schema(
+        "2.13",
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+    )
+    loaded = load_production_project(root / "project.yaml")
+    assert loaded.manifest == upgraded
+    inputs = replace(inputs, project=loaded)
+    target_shot = loaded.shots[0]
+    keyframe = next(
+        item
+        for item in loaded.registry.assets
+        if item.asset_id == approved_source.keyframe_asset_id
+    )
+    profile = create_qingyan_ecommerce_acceptance_profile()
+    commercial_binding = project_generated_commercial_shot_binding(
+        projection,
+        profile=profile,
+        applicable_requirement_ids=(
+            "shot.product.packaging_identity",
+            "shot.product.interaction",
+        ),
+        approved_source=approved_source,
+        expected_actor_ids=projection.character_requirement_ids,
+        output_asset_id="generated-product-shot",
+    )
+    output = VideoOutputRequirement(
+        duration_seconds=1,
+        width=64,
+        height=64,
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+    profile_hash = "e" * 64
+    request = VideoGenerationRequest.create(
+        generation_id="qingyan-product-shot-generation",
+        provider_name="fake-product-video",
+        provider_kind="fake_video",
+        model_id="fake-h264",
+        provider_profile=ProviderProfilePointer(
+            profile_id="fake-product-video-profile",
+            profile_version="v1",
+            profile_path=Path(f"provider-profiles/{profile_hash}.json"),
+            profile_sha256=profile_hash,
+        ),
+        target_shot_id=target_shot.shot_id,
+        target_shot_revision=target_shot.revision,
+        target_shot_content_hash=target_shot.content_hash,
+        target_asset_role=target_shot.required_asset_roles[0].role,
+        target_visual_strategy="generated_video",
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        prompt_text="The elder hands the approved Qingyan spray to the Miao girl.",
+        negative_prompt_text="wrong package, missing hand contact",
+        image_bindings=(
+            VideoImageReferenceBinding(
+                role="first_frame",
+                asset_id=keyframe.asset_id,
+                asset_sha256=keyframe.sha256,
+                mime_type=keyframe.mime_type,
+                width=keyframe.width,
+                height=keyframe.height,
+                size_bytes=keyframe.size_bytes,
+            ),
+        ),
+        commercial_binding=commercial_binding,
+        output_requirement=output,
+        seed=41,
+        base_project=loaded.manifest.active_project,
+        base_registry=loaded.manifest.active_registry,
+        base_dependency_graph=loaded.manifest.active_dependency_graph,
+        input_artifact_ids=(target_shot.artifact_id, keyframe.asset_id),
+        output_asset_id="generated-product-shot",
+    )
+    variant = VideoCapabilityVariant(
+        capability_id="fake-product-i2v",
+        provider_kind="fake_video",
+        model_id="fake-h264",
+        profile_version="v1",
+        execution_kind=VideoExecutionKind.REMOTE,
+        billing_kind=BillingKind.METERED,
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        output=output,
+        allowed_image_roles=("first_frame",),
+        required_first_frame=True,
+        max_reference_count=0,
+        allowed_image_mime_types=(keyframe.mime_type,),
+        max_image_bytes=keyframe.size_bytes,
+        min_image_width=1,
+        min_image_height=1,
+        negative_prompt_supported=True,
+        seed_supported=True,
+        fps_supported=True,
+        idempotent_submit=False,
+        lookup_supported=False,
+    )
+    provider = ScriptedFakeVideoProvider(
+        capabilities=VideoProviderCapabilities.create(
+            provider_name="fake-product-video",
+            variants=(variant,),
+        ),
+        artifact_bytes=FIXTURE.read_bytes(),
+        scenario=FakeVideoScenario(status_events=(VideoTaskState.SUCCEEDED,)),
+    )
+    resolved = provider.resolve(request)
+    attempt_id = "qingyan-product-shot-attempt"
+    preview = _paid_preview(
+        resolved,
+        attempt_id=attempt_id,
+        video_preview=provider.preview(resolved),
+    )
+    authorization = _paid_authorization(preview)
+    committer = ProductionStateCommitter(
+        root,
+        video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
+        paid_provider_authorizer=(
+            lambda exact: authorization if exact == preview else None
+        ),
+        paid_provider_clock=lambda: authorization.issued_at,
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.start(attempt_id=attempt_id, request=resolved)
+    service.submit_once(
+        attempt_id=attempt_id,
+        paid_preview=preview,
+        reservation_id="qingyan-product-video-reservation",
+    )
+    service.refresh_once(attempt_id=attempt_id)
+    committer.settle_paid_provider_reservation(
+        attempt_id=attempt_id,
+        actual_cost_microunits=1_000_000,
+    )
+    service.fetch_once(attempt_id=attempt_id)
+    return attempt_id, service, committer, provider
+
+
+def test_product_bound_candidate_rechecks_source_approval_before_evaluator(
+    tmp_path,
+) -> None:
+    attempt_id, service, committer, _ = _product_video_runtime(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.qa_policy is not None
+    replacement = seal_artifact(
+        loaded.qa_policy.model_copy(
+            update={
+                "artifact_id": "qa-policy-commercial-post-media-replacement",
+                "revision": loaded.qa_policy.revision + 1,
+                "content_hash": "0" * 64,
+                "creation_receipt_id": (
+                    "qa-policy-commercial-post-media-replacement"
+                ),
+            }
+        )
+    )
+    revoked = committer.activate_qa_policy(
+        replacement,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="replace-product-video-policy",
+    )
+    assert committer._read_manifest() == revoked
+    assert revoked.active_commercial_source_approvals == ()
+    reviewer = _CountingCommercialShotReviewer()
+
+    with pytest.raises(AiVideoError) as rejected:
+        service.validate_once(
+            attempt_id=attempt_id,
+            commercial_reviewer=reviewer,
+        )
+
+    assert rejected.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert reviewer.calls == 0
+
+
+def test_product_bound_activation_reopens_after_source_approval_is_consumed(
+    tmp_path,
+) -> None:
+    attempt_id, service, _, provider = _product_video_runtime(tmp_path)
+    reviewer = _CountingCommercialShotReviewer()
+    service.validate_once(
+        attempt_id=attempt_id,
+        commercial_reviewer=reviewer,
+    )
+
+    activated = service.activate_once(attempt_id=attempt_id)
+    reopened = load_production_project(tmp_path / "project.yaml")
+    replayed = service.fetch_and_activate(attempt_id=attempt_id)
+
+    assert reviewer.calls == 1
+    assert reopened.manifest == activated == replayed
+    assert activated.active_commercial_source_approvals == ()
+    assert provider.call_counts.submit == 1
+    assert provider.call_counts.fetch == 1
 
 
 def _base_commercial_planning_request(loaded) -> VideoPlanningRequest:
@@ -260,7 +515,7 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
     tmp_path,
     source_plan_shot_id: str,
 ) -> None:
-    loaded, projection, approved_binding = _approved_commercial_project(
+    loaded, projection, approved_binding, _ = _approved_commercial_project(
         tmp_path,
         source_plan_shot_id=source_plan_shot_id,
     )
@@ -458,7 +713,7 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
 def test_product_reference_change_invalidates_only_source_and_generated_shot_chain(
     tmp_path,
 ) -> None:
-    _, _, approval = _approved_commercial_project(
+    _, _, approval, _ = _approved_commercial_project(
         tmp_path,
         source_plan_shot_id="shot-04",
     )
@@ -536,7 +791,7 @@ def test_product_reference_change_invalidates_only_source_and_generated_shot_cha
 
 
 def test_commercial_handoff_rejects_duplicate_approval_cardinality(tmp_path) -> None:
-    _, projection, durable_approval = _approved_commercial_project(
+    _, projection, durable_approval, _ = _approved_commercial_project(
         tmp_path,
         source_plan_shot_id="shot-04",
     )
@@ -563,7 +818,7 @@ def test_commercial_handoff_rejects_duplicate_approval_cardinality(tmp_path) -> 
 def test_product_interaction_nonpass_stops_at_sequential_coordinator(
     tmp_path,
 ) -> None:
-    _, projection, durable_approval = _approved_commercial_project(
+    _, projection, durable_approval, _ = _approved_commercial_project(
         tmp_path,
         source_plan_shot_id="shot-04",
     )
@@ -587,6 +842,7 @@ def test_product_interaction_nonpass_stops_at_sequential_coordinator(
         projection.target_shot_id,
         projection.projection_hash,
         verdict=QaVerdict.FAIL,
+        plan_hash=projection.ad_creative_plan_hash,
     )
 
     result = production.run_ecommerce_ad_generation(

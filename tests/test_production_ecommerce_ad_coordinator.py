@@ -106,6 +106,7 @@ class _Facade:
     shot_id: str
     projection_hash: str
     verdict: QaVerdict = QaVerdict.PASS
+    plan_hash: str = "a" * 64
     actions: list[EcommerceShotNextAction] = field(
         default_factory=lambda: [
             EcommerceShotNextAction.START,
@@ -120,6 +121,9 @@ class _Facade:
     effects: list[str] = field(default_factory=list)
     checkpoint: ActivatedCommercialShotCheckpoint | None = None
     validated_verdict: QaVerdict | None = None
+
+    def bound_commercial_identity(self):
+        return (self.plan_hash, self.projection_hash, self.shot_id)
 
     def next_action(self):
         return self.actions[0]
@@ -245,4 +249,16 @@ def test_done_resume_reuses_checkpoint_without_duplicate_effects() -> None:
     result = run_ecommerce_ad_generation(handoff, facades=facades)
 
     assert result.complete is True
+    assert all(facade.effects == [] for facade in facades.values())
+
+
+def test_facade_identity_mismatch_stops_before_any_service_effect() -> None:
+    handoff, facades = _facades()
+    facades["shot-b"], facades["shot-a"] = facades["shot-a"], facades["shot-b"]
+
+    result = run_ecommerce_ad_generation(handoff, facades=facades)
+
+    assert result.complete is False
+    assert result.stopped_shot_id == "shot-b"
+    assert result.stop_reason is EcommerceStopReason.CHECKPOINT_INVALID
     assert all(facade.effects == [] for facade in facades.values())

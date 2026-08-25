@@ -11,6 +11,7 @@ from ai_video.production.models import (
     CommercialShotEvaluationState,
     GeneratedCommercialShotEvidencePointer,
     QaVerdict,
+    VideoAttemptPhase,
 )
 from ai_video.production.paths import (
     canonical_commercial_shot_evaluation_intent_path,
@@ -26,7 +27,9 @@ from ai_video.production.video_artifact import (
 )
 from ai_video.production.project import load_qa_policy
 from ai_video.production.commercial_video_validation import (
+    bound_commercial_source_approval,
     current_commercial_source_approval,
+    validate_commercial_source_binding,
     validate_current_commercial_checkpoint,
 )
 
@@ -44,6 +47,49 @@ def _prepared_artifact(relative_path, payload: bytes) -> PreparedArtifact:
         payload,
         hashlib.sha256(payload).hexdigest(),
     )
+
+
+def commercial_evaluation_authority(committer, *, manifest, request):
+    """Resolve the exact current policy and source approval before evaluation."""
+
+    binding = request.commercial_binding
+    if binding is None:
+        return None, ()
+    if manifest.schema_version != "2.13" or manifest.active_qa_policy is None:
+        raise _state_invalid(
+            "Commercial-bound video validation requires Manifest 2.13 and an active QA policy."
+        )
+    policy = load_qa_policy(committer._project_root, manifest.active_qa_policy)
+    domain = policy.domain_acceptance
+    requirement_ids = (
+        tuple(domain.profile_payload.get("shot_requirement_ids", ()))
+        if domain is not None
+        else ()
+    )
+    if (
+        domain is None
+        or domain.domain_id != "ecommerce"
+        or domain.profile_content_hash != binding.profile_content_hash
+        or any(item not in requirement_ids for item in binding.applicable_requirement_ids)
+        or not policy.semantic_authorities
+    ):
+        raise _state_invalid(
+            "Commercial-bound video validation requires the exact active Ecommerce profile."
+        )
+    try:
+        loaded = committer._load_production_project(
+            committer._project_root / "project.yaml"
+        )
+        if loaded.manifest != manifest:
+            raise ValueError("active commercial Manifest changed")
+        approval = current_commercial_source_approval(loaded, binding)
+        validate_commercial_source_binding(binding, approval)
+    except (AiVideoError, OSError, ValueError) as exc:
+        raise _state_invalid(
+            "Commercial-bound video validation requires its exact current source approval.",
+            str(exc),
+        ) from exc
+    return policy.content_hash, policy.semantic_authorities
 
 
 def validate_current_commercial_video_state(
@@ -86,8 +132,10 @@ def validate_current_commercial_video_state(
         )
         if loaded.manifest != manifest:
             raise ValueError("active commercial Manifest changed")
-        approval = current_commercial_source_approval(
-            loaded, request.commercial_binding
+        approval = bound_commercial_source_approval(
+            loaded,
+            request.commercial_binding,
+            require_current=state.phase is not VideoAttemptPhase.ACTIVATE,
         )
         validate_current_commercial_checkpoint(
             request=request,

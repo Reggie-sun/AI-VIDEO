@@ -79,7 +79,7 @@ from ai_video.production.ecommerce_media_acceptance import (
     GeneratedCommercialShotEvidence,
 )
 from ai_video.production.commercial_video_validation import (
-    current_commercial_source_approval,
+    bound_commercial_source_approval,
     validate_current_commercial_checkpoint,
 )
 from ai_video.production.review import (
@@ -583,8 +583,11 @@ def _verify_commercial_capture_checkpoint(
         policy = load_qa_policy(
             bundle.root, bundle.manifest.active_qa_policy
         )
-        approval = current_commercial_source_approval(
-            bundle, request.commercial_binding
+        evaluation_bundle = bundle.model_copy(update={"qa_policy": policy})
+        approval = bound_commercial_source_approval(
+            evaluation_bundle,
+            request.commercial_binding,
+            require_current=state.phase is not VideoAttemptPhase.ACTIVATE,
         )
         validate_current_commercial_checkpoint(
             request=request,

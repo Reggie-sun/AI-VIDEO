@@ -12,8 +12,13 @@ from ai_video.production.ecommerce_media_acceptance import (
     CommercialShotEvaluationIntent,
     GeneratedCommercialShotEvidence,
 )
-from ai_video.production.models import QaPolicy, QaVerdict
+from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.models import CommercialSourceLifecycle, QaPolicy, QaVerdict
 from ai_video.production.models import LoadedProductionProject
+from ai_video.production.paths import (
+    _read_regular_file_nofollow,
+    canonical_commercial_source_approval_path,
+)
 from ai_video.production.video import ResolvedVideoGenerationRequest
 from ai_video.production.video_artifact import (
     VideoProbeReceipt,
@@ -60,6 +65,50 @@ def current_commercial_source_approval(
     )
     if binding.source_approval_hashes != (approval.content_hash,):
         raise ValueError("Commercial request source approval is no longer active")
+    return approval
+
+
+def bound_commercial_source_approval(
+    bundle: LoadedProductionProject,
+    binding: GeneratedCommercialShotBinding,
+    *,
+    require_current: bool,
+) -> ApprovedCommercialSourceBinding | None:
+    """Reopen current approval before activation, or its consumed immutable seal after."""
+
+    if not binding.source_approval_hashes:
+        validate_commercial_source_binding(binding, None)
+        return None
+    if require_current:
+        return current_commercial_source_approval(bundle, binding)
+
+    from ai_video.production._commercial_project_reader import (
+        verify_active_commercial_source_approvals,
+    )
+
+    verify_active_commercial_source_approvals(bundle)
+    content_hash = binding.source_approval_hashes[0]
+    path = canonical_commercial_source_approval_path(content_hash)
+    snapshot = _read_regular_file_nofollow(
+        bundle.root / path,
+        contained_by=bundle.root / "state" / "commercial-source",
+    )
+    approval = ApprovedCommercialSourceBinding.model_validate_json(snapshot.data)
+    if (
+        approval.content_hash != content_hash
+        or not verify_artifact_hash(approval)
+        or not any(
+            item.lifecycle is CommercialSourceLifecycle.STALE
+            and item.request_fingerprint == approval.source_request_hash
+            and item.target_shot_id == approval.target_shot_id
+            and item.candidate_asset_id == approval.keyframe_asset_id
+            and item.candidate_sha256 == approval.keyframe_sha256
+            and item.review_receipt_hash == approval.review_receipt_hash
+            for item in bundle.manifest.commercial_source_attempts
+        )
+    ):
+        raise ValueError("Consumed commercial source approval lineage is not exact")
+    validate_commercial_source_binding(binding, approval)
     return approval
 
 
