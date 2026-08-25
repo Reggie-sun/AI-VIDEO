@@ -7,6 +7,7 @@ from pydantic import Field, model_validator
 
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import StrictModel
+from ai_video.production.video import GeneratedCommercialShotBinding
 
 if TYPE_CHECKING:
     from ai_video.production.ad_creative_types import AdCreativePlan
@@ -204,3 +205,55 @@ def project_commercial_executions(
         base["projection_hash"] = canonical_sha256(base)
         projections.append(CommercialExecutionProjection.model_validate(base))
     return tuple(projections)
+
+
+def project_generated_commercial_shot_binding(
+    projection: CommercialExecutionProjection,
+    *,
+    profile,
+    applicable_requirement_ids: tuple[str, ...],
+    product_truth_hashes: tuple[str, ...],
+    product_reference_hashes: tuple[str, ...],
+    source_approval_hashes: tuple[str, ...],
+    expected_actor_ids: tuple[str, ...],
+    output_asset_id: str,
+) -> GeneratedCommercialShotBinding:
+    """Project exact authoring/profile identities into one video request binding."""
+
+    from ai_video.production.ecommerce_media_acceptance import (
+        EcommerceAcceptanceProfile,
+    )
+
+    selected_projection = CommercialExecutionProjection.model_validate(
+        projection.model_dump(mode="json")
+    )
+    selected_profile = EcommerceAcceptanceProfile.model_validate(
+        profile.model_dump(mode="json")
+    )
+    selected = set(applicable_requirement_ids)
+    canonical_requirements = tuple(
+        requirement_id
+        for requirement_id in selected_profile.shot_requirement_ids
+        if requirement_id in selected
+    )
+    if canonical_requirements != applicable_requirement_ids:
+        raise ValueError(
+            "Commercial Shot requirements must be exact and ordered by selected profile"
+        )
+    if not set(selected_projection.character_requirement_ids).issubset(
+        expected_actor_ids
+    ):
+        raise ValueError("Commercial binding omits an expected authoring actor")
+    return GeneratedCommercialShotBinding.create(
+        ad_creative_plan_id=selected_projection.ad_creative_plan_id,
+        ad_creative_plan_hash=selected_projection.ad_creative_plan_hash,
+        commercial_execution_projection_hash=selected_projection.projection_hash,
+        target_shot_id=selected_projection.target_shot_id,
+        profile_content_hash=selected_profile.content_hash,
+        applicable_requirement_ids=applicable_requirement_ids,
+        product_truth_hashes=tuple(sorted(product_truth_hashes)),
+        product_reference_hashes=tuple(sorted(product_reference_hashes)),
+        source_approval_hashes=tuple(sorted(source_approval_hashes)),
+        expected_actor_ids=expected_actor_ids,
+        output_asset_id=output_asset_id,
+    )

@@ -332,6 +332,27 @@ def _request(**changes: object) -> VideoGenerationRequest:
     return VideoGenerationRequest.create(**values)
 
 
+def _commercial_binding(**changes: object):
+    values: dict[str, object] = {
+        "ad_creative_plan_id": "qingyan-ad-plan",
+        "ad_creative_plan_hash": HASH_A,
+        "commercial_execution_projection_hash": HASH_B,
+        "target_shot_id": "shot-001",
+        "profile_content_hash": HASH_C,
+        "applicable_requirement_ids": (
+            "shot.identity.main_character",
+            "shot.product.presence_window",
+        ),
+        "product_truth_hashes": (HASH_A,),
+        "product_reference_hashes": (HASH_B,),
+        "source_approval_hashes": (),
+        "expected_actor_ids": ("qingyan-miao-girl",),
+        "output_asset_id": "video-output-001",
+    }
+    values.update(changes)
+    return video_contracts.GeneratedCommercialShotBinding.create(**values)
+
+
 def _variant(**changes: object) -> VideoCapabilityVariant:
     values: dict[str, object] = {
         "capability_id": "hailuo-i2v-6s-720p",
@@ -596,6 +617,46 @@ def test_request_input_hash_seals_caller_intent_but_excludes_generation_id():
     )
     for change in changes:
         assert _request(**change).request_input_hash != baseline.request_input_hash
+
+
+def test_commercial_binding_is_part_of_request_and_resolved_identity() -> None:
+    baseline_request = _request()
+    commercial_request = _request(commercial_binding=_commercial_binding())
+    resolved = _resolved(commercial_request)
+
+    assert commercial_request.request_input_hash != baseline_request.request_input_hash
+    assert resolved.commercial_binding == commercial_request.commercial_binding
+    assert resolved.resolved_generation_hash != _resolved().resolved_generation_hash
+    assert "resolved_generation_hash" not in type(_commercial_binding()).model_fields
+
+    changed_profile = _request(
+        commercial_binding=_commercial_binding(profile_content_hash=HASH_D)
+    )
+    assert changed_profile.request_input_hash != commercial_request.request_input_hash
+
+
+def test_commercial_binding_rejects_request_target_or_output_mismatch() -> None:
+    with pytest.raises(ValidationError, match="commercial binding"):
+        _request(
+            commercial_binding=_commercial_binding(target_shot_id="shot-other")
+        )
+    with pytest.raises(ValidationError, match="commercial binding"):
+        _request(
+            commercial_binding=_commercial_binding(output_asset_id="video-other")
+        )
+
+
+def test_product_interaction_binding_requires_exact_product_and_source_truth() -> None:
+    with pytest.raises(ValidationError, match="source approval"):
+        _commercial_binding(
+            applicable_requirement_ids=("shot.product.interaction",),
+            source_approval_hashes=(),
+        )
+    binding = _commercial_binding(
+        applicable_requirement_ids=("shot.product.interaction",),
+        source_approval_hashes=(HASH_C,),
+    )
+    assert binding.source_approval_hashes == (HASH_C,)
 
 
 def test_provider_neutral_lineage_uses_noncolliding_request_resolved_and_scope_schemas():

@@ -10,7 +10,14 @@ from pathlib import Path
 from typing import BinaryIO, Iterable, Literal, Protocol
 from urllib.parse import urlsplit
 
-from pydantic import ConfigDict, Field, field_validator, model_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
@@ -188,6 +195,73 @@ class ProviderProfilePointer(_VideoStrictModel):
         return self
 
 
+class GeneratedCommercialShotBinding(_VideoStrictModel):
+    """Pre-resolve commercial identities sealed into one generated Shot request."""
+
+    schema_version: Literal["generated-commercial-shot-binding/1"] = (
+        "generated-commercial-shot-binding/1"
+    )
+    ad_creative_plan_id: str = Field(pattern=_SAFE_ID.pattern)
+    ad_creative_plan_hash: str = Field(pattern=_SHA256)
+    commercial_execution_projection_hash: str = Field(pattern=_SHA256)
+    target_shot_id: str = Field(pattern=_SAFE_ID.pattern)
+    profile_content_hash: str = Field(pattern=_SHA256)
+    applicable_requirement_ids: tuple[str, ...] = Field(min_length=1)
+    product_truth_hashes: tuple[str, ...] = ()
+    product_reference_hashes: tuple[str, ...] = ()
+    source_approval_hashes: tuple[str, ...] = ()
+    expected_actor_ids: tuple[str, ...] = Field(min_length=1)
+    output_asset_id: str = Field(pattern=_SAFE_ID.pattern)
+    content_hash: str = Field(pattern=_SHA256)
+
+    @field_validator(
+        "product_truth_hashes",
+        "product_reference_hashes",
+        "source_approval_hashes",
+    )
+    @classmethod
+    def _canonical_hashes(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        if any(re.fullmatch(_SHA256, item) is None for item in value):
+            raise ValueError("Commercial binding hashes must be lowercase SHA-256")
+        if value != tuple(sorted(set(value))):
+            raise ValueError("Commercial binding hashes must be unique and ordered")
+        return value
+
+    @model_validator(mode="after")
+    def _validate_binding(self) -> "GeneratedCommercialShotBinding":
+        if (
+            len(set(self.applicable_requirement_ids))
+            != len(self.applicable_requirement_ids)
+            or any(not item.startswith("shot.") for item in self.applicable_requirement_ids)
+        ):
+            raise ValueError("Commercial binding requirement IDs must be unique Shot IDs")
+        if len(set(self.expected_actor_ids)) != len(self.expected_actor_ids):
+            raise ValueError("Commercial binding actor IDs must be unique")
+        has_product_requirement = any(
+            item.startswith("shot.product.")
+            for item in self.applicable_requirement_ids
+        )
+        if has_product_requirement and not (
+            self.product_truth_hashes and self.product_reference_hashes
+        ):
+            raise ValueError("Commercial product binding requires exact product truth")
+        if (
+            "shot.product.interaction" in self.applicable_requirement_ids
+            and not self.source_approval_hashes
+        ):
+            raise ValueError("Commercial product interaction requires source approval")
+        if self.content_hash != canonical_sha256(self):
+            raise ValueError("Commercial binding content hash is invalid")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "GeneratedCommercialShotBinding":
+        provisional = cls.model_construct(**values, content_hash="0" * 64)
+        return cls.model_validate(
+            {**values, "content_hash": canonical_sha256(provisional)}
+        )
+
+
 class VideoGenerationRequest(_VideoStrictModel):
     generation_id: str = Field(pattern=_SAFE_ID.pattern)
     provider_name: str = Field(pattern=_SAFE_ID.pattern)
@@ -215,6 +289,7 @@ class VideoGenerationRequest(_VideoStrictModel):
     c4_multi_anchor_binding: C4MultiAnchorBinding | None = None
     continuity_binding: ContinuityReferenceBinding | None = None
     hard_cut_keyframe_binding: HardCutKeyframeBinding | None = None
+    commercial_binding: GeneratedCommercialShotBinding | None = None
     seal_terminal_frame: bool = Field(default=False, strict=True)
     media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
     output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement
@@ -243,6 +318,7 @@ class VideoGenerationRequest(_VideoStrictModel):
         hard_cut = data.get("hard_cut_keyframe_binding")
         c4_binding = data.get("c4_multi_anchor_binding")
         execution_stack_hash = data.get("execution_stack_hash")
+        commercial_binding = data.get("commercial_binding")
         seal_terminal_frame = data.get("seal_terminal_frame", False)
         lineage_fields = (
             "requirement_hash",
@@ -282,6 +358,8 @@ class VideoGenerationRequest(_VideoStrictModel):
             selected.pop("hard_cut_keyframe_binding", None)
         if execution_stack_hash is None:
             selected.pop("execution_stack_hash", None)
+        if commercial_binding is None:
+            selected.pop("commercial_binding", None)
         if not seal_terminal_frame:
             selected.pop("seal_terminal_frame", None)
         if not uses_provider_neutral_lineage:
@@ -289,7 +367,9 @@ class VideoGenerationRequest(_VideoStrictModel):
                 selected.pop(field, None)
         return {
             "schema": (
-                "ai-video-generation-request/7"
+                "ai-video-generation-request/8"
+                if commercial_binding is not None
+                else "ai-video-generation-request/7"
                 if execution_stack_hash is not None
                 else "ai-video-generation-request/6"
                 if c4_binding is not None
@@ -365,6 +445,7 @@ class VideoGenerationRequest(_VideoStrictModel):
         continuity = self.continuity_binding
         hard_cut = self.hard_cut_keyframe_binding
         c4_binding = self.c4_multi_anchor_binding
+        commercial_binding = self.commercial_binding
         if c4_binding is not None and (continuity is not None or hard_cut is not None):
             raise ValueError(
                 "c4_multi_anchor_binding cannot combine with legacy continuity bindings"
@@ -373,6 +454,11 @@ class VideoGenerationRequest(_VideoStrictModel):
             raise ValueError(
                 "video request cannot combine continuation and hard-cut bindings"
             )
+        if commercial_binding is not None and (
+            commercial_binding.target_shot_id != self.target_shot_id
+            or commercial_binding.output_asset_id != self.output_asset_id
+        ):
+            raise ValueError("commercial binding does not match request target")
         if c4_binding is not None:
             if self.mode is not VideoGenerationMode.IMAGE_TO_VIDEO:
                 raise ValueError("C4 multi-anchor requests must use image-to-video mode")
@@ -559,6 +645,15 @@ class VideoGenerationRequest(_VideoStrictModel):
             raise ValueError("request_input_hash does not match video request")
         return self
 
+    @model_serializer(mode="wrap")
+    def _serialize_optional_commercial_binding(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.commercial_binding is None:
+            data.pop("commercial_binding", None)
+        return data
+
     @classmethod
     def create(cls, **values: object) -> "VideoGenerationRequest":
         data = dict(values)
@@ -695,6 +790,7 @@ class VideoActivationScope(_VideoStrictModel):
         uses_c4 = request.c4_multi_anchor_binding is not None
         uses_provider_neutral_lineage = request.requirement_hash is not None
         uses_execution_stack = request.execution_stack_hash is not None
+        uses_commercial_binding = request.commercial_binding is not None
         if not uses_provider_neutral_lineage:
             for field in (
                 "requirement_hash",
@@ -715,7 +811,9 @@ class VideoActivationScope(_VideoStrictModel):
             request_payload.pop("execution_stack_hash", None)
         return {
             "schema": (
-                "ai-video-activation-scope/6"
+                "ai-video-activation-scope/7"
+                if uses_commercial_binding
+                else "ai-video-activation-scope/6"
                 if uses_execution_stack
                 else "ai-video-activation-scope/5"
                 if uses_c4
@@ -785,6 +883,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
     c4_multi_anchor_binding: C4MultiAnchorBinding | None = None
     continuity_binding: ContinuityReferenceBinding | None = None
     hard_cut_keyframe_binding: HardCutKeyframeBinding | None = None
+    commercial_binding: GeneratedCommercialShotBinding | None = None
     seal_terminal_frame: bool = Field(default=False, strict=True)
     media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
     effective_output: VideoOutputRequirement | VideoFlexibleOutputRequirement
@@ -827,7 +926,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             },
         )
         schema = (
-            "ai-video-resolved-request/8"
+            "ai-video-resolved-request/9"
+            if self.commercial_binding is not None
+            else "ai-video-resolved-request/8"
             if self.execution_stack_hash is not None
             else "ai-video-resolved-request/7"
             if self.c4_multi_anchor_binding is not None
@@ -854,6 +955,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             data.pop("c4_multi_anchor_binding", None)
         if self.hard_cut_keyframe_binding is None:
             data.pop("hard_cut_keyframe_binding", None)
+        if self.commercial_binding is None:
+            data.pop("commercial_binding", None)
         if not self.seal_terminal_frame:
             data.pop("seal_terminal_frame", None)
         if self.provider_task_binding is None:
@@ -888,6 +991,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
                 != self.c4_multi_anchor_binding
                 or request.continuity_binding != self.continuity_binding
                 or request.hard_cut_keyframe_binding != self.hard_cut_keyframe_binding
+                or request.commercial_binding != self.commercial_binding
                 or request.seal_terminal_frame != self.seal_terminal_frame
                 or request.media_bindings != self.media_bindings
                 or request.output_requirement != self.effective_output
@@ -895,6 +999,15 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             ):
                 raise ValueError("activation scope does not match resolved request")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_commercial_binding(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.commercial_binding is None:
+            data.pop("commercial_binding", None)
+        return data
 
     def _uses_extended_contract(self) -> bool:
         return bool(
@@ -1040,6 +1153,7 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             "c4_multi_anchor_binding": request.c4_multi_anchor_binding,
             "continuity_binding": request.continuity_binding,
             "hard_cut_keyframe_binding": request.hard_cut_keyframe_binding,
+            "commercial_binding": request.commercial_binding,
             "seal_terminal_frame": request.seal_terminal_frame,
             "media_bindings": request.media_bindings,
             "effective_output": effective_output,
@@ -1064,7 +1178,9 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             warnings=False,
         )
         schema = (
-            "ai-video-resolved-request/8"
+            "ai-video-resolved-request/9"
+            if candidate.commercial_binding is not None
+            else "ai-video-resolved-request/8"
             if candidate.execution_stack_hash is not None
             else "ai-video-resolved-request/7"
             if candidate.c4_multi_anchor_binding is not None
@@ -1097,6 +1213,8 @@ class ResolvedVideoGenerationRequest(_VideoStrictModel):
             fingerprint_data.pop("c4_multi_anchor_binding", None)
         if candidate.hard_cut_keyframe_binding is None:
             fingerprint_data.pop("hard_cut_keyframe_binding", None)
+        if candidate.commercial_binding is None:
+            fingerprint_data.pop("commercial_binding", None)
         if not candidate.seal_terminal_frame:
             fingerprint_data.pop("seal_terminal_frame", None)
         if provider_task_binding is None:
