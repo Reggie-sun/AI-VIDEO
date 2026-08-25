@@ -27,6 +27,20 @@ from ai_video.production.models import (
     VideoAttemptPhase,
 )
 from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+from ai_video.production.ad_creative_types import (
+    AdCompositionRequirements,
+    AdShotProposal,
+    CompiledAdCreativeHandoff,
+)
+from ai_video.production.commercial_execution import (
+    CommercialExecutionDisposition,
+    CommercialExecutionProjection,
+    CommercialShotClass,
+)
+from ai_video.production.ecommerce_ad_coordinator import (
+    EcommerceVideoGenerationFacade,
+    run_ecommerce_ad_generation,
+)
 from ai_video.production.ecommerce_media_acceptance import (
     CommercialShotEvaluationIntent,
     EcommerceRequirementFinding,
@@ -90,6 +104,7 @@ from production_project_factory import (
     make_p7_image_candidate_preparer,
     make_p8_video_candidate_preparer,
     make_p8_video_generation_base,
+    make_composition_spec,
 )
 from test_production_state_commit import make_image_provider_result
 from test_production_video import (
@@ -111,6 +126,48 @@ COMMERCIAL_EVALUATOR = ToolIdentity(
 )
 
 
+def _commercial_projection(shot_id: str) -> CommercialExecutionProjection:
+    values = {
+        "schema_version": "commercial-execution-projection/1",
+        "ad_creative_plan_id": "qingyan-ad-plan",
+        "ad_creative_plan_revision": 1,
+        "ad_creative_plan_hash": "a" * 64,
+        "target_shot_id": shot_id,
+        "primary_class": CommercialShotClass.CHARACTER_PERFORMANCE,
+        "product_id": None,
+        "product_reference_requirement_id": None,
+        "source_requirement_id": None,
+        "character_requirement_ids": (
+            "qingyan-miao-girl",
+            "qingyan-elder",
+        ),
+        "scene_requirement_fingerprint": "b" * 64,
+        "wardrobe_requirement_fingerprint": "c" * 64,
+        "accessory_requirement_fingerprint": "d" * 64,
+        "recommended_disposition": (
+            CommercialExecutionDisposition.EXISTING_CHARACTER_SCENE_PLANNING
+        ),
+        "requires_source_materialization": False,
+        "requires_source_review": False,
+        "invoke_video_provider": True,
+        "graphic_ids": (),
+        "sound_cue_ids": (),
+    }
+    values["projection_hash"] = canonical_sha256(values)
+    return CommercialExecutionProjection.model_validate(values)
+
+
+def _commercial_handoff(shot_id: str) -> CompiledAdCreativeHandoff:
+    return CompiledAdCreativeHandoff(
+        plan_id="qingyan-ad-plan",
+        plan_content_hash="a" * 64,
+        shot_proposals=(AdShotProposal(shot_id=shot_id, beat_ids=("beat-1",)),),
+        composition_requirements=AdCompositionRequirements(),
+        composition_spec=make_composition_spec(shot_ids=(shot_id,)),
+        commercial_execution_projections=(_commercial_projection(shot_id),),
+    )
+
+
 def _durable_tree_snapshot(root: Path) -> dict[Path, bytes]:
     return {
         path.relative_to(root): path.read_bytes()
@@ -126,6 +183,8 @@ def _runtime(
     seal_terminal_frame: bool = False,
     continuity: bool = False,
     commercial: bool = False,
+    commercial_unapproved_product: bool = False,
+    status_events: tuple[VideoTaskState | str, ...] | None = None,
 ):
     inputs = make_p8_video_generation_base(
         root,
@@ -269,16 +328,31 @@ def _runtime(
         GeneratedCommercialShotBinding.create(
             ad_creative_plan_id="qingyan-ad-plan",
             ad_creative_plan_hash="a" * 64,
-            commercial_execution_projection_hash="b" * 64,
+            commercial_execution_projection_hash=(
+                _commercial_projection(shot.shot_id).projection_hash
+            ),
             target_shot_id=shot.shot_id,
             profile_content_hash=commercial_profile.content_hash,
             applicable_requirement_ids=(
-                commercial_profile.shot_requirement_ids[0],
-                commercial_profile.shot_requirement_ids[1],
+                (
+                    "shot.product.packaging_identity",
+                    "shot.product.interaction",
+                )
+                if commercial_unapproved_product
+                else (
+                    commercial_profile.shot_requirement_ids[0],
+                    commercial_profile.shot_requirement_ids[1],
+                )
             ),
-            product_truth_hashes=(),
-            product_reference_hashes=(),
-            source_approval_hashes=(),
+            product_truth_hashes=(
+                ("1" * 64,) if commercial_unapproved_product else ()
+            ),
+            product_reference_hashes=(
+                ("2" * 64,) if commercial_unapproved_product else ()
+            ),
+            source_approval_hashes=(
+                ("3" * 64,) if commercial_unapproved_product else ()
+            ),
             expected_actor_ids=("qingyan-miao-girl", "qingyan-elder"),
             output_asset_id="video-output-p8-001",
         )
@@ -344,12 +418,13 @@ def _runtime(
         ),
         artifact_bytes=FIXTURE.read_bytes(),
         scenario=FakeVideoScenario(
-            status_events=(
+            status_events=status_events
+            or (
                 VideoTaskState.QUEUED,
                 "transient_error",
                 VideoTaskState.RUNNING,
                 VideoTaskState.SUCCEEDED,
-            )
+            ),
         ),
     )
     resolved = provider.resolve(request)
@@ -1011,6 +1086,102 @@ def test_commercial_shot_pass_checkpoints_before_activation_and_reopens(
     downgraded["schema_version"] = "2.12"
     with pytest.raises(ValidationError, match="Commercial Shot evaluation state"):
         ProductionManifest.model_validate(downgraded)
+
+
+def test_commercial_candidate_rejects_current_policy_replacement(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    service.validate_once(
+        attempt_id=ATTEMPT_ID,
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+    )
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.qa_policy is not None
+    replacement = seal_artifact(
+        loaded.qa_policy.model_copy(
+            update={
+                "artifact_id": "qa-policy-commercial-replacement",
+                "revision": loaded.qa_policy.revision + 1,
+                "content_hash": "0" * 64,
+                "semantic_authorities": (
+                    ToolIdentity(name="replacement-evaluator", version="1"),
+                ),
+            }
+        )
+    )
+    current = committer._read_manifest()
+    committer.activate_qa_policy(
+        replacement,
+        expected_manifest_revision=current.manifest_revision,
+        attempt_id="replace-commercial-policy",
+    )
+
+    with pytest.raises(AiVideoError) as stale:
+        service.activate_once(attempt_id=ATTEMPT_ID)
+
+    assert stale.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+
+
+def test_commercial_start_rejects_caller_supplied_unapproved_product_hashes(
+    tmp_path: Path,
+) -> None:
+    _, provider, resolved, _, committer = _runtime(
+        tmp_path,
+        commercial=True,
+        commercial_unapproved_product=True,
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+
+    with pytest.raises(AiVideoError) as rejected:
+        service.start(attempt_id=ATTEMPT_ID, request=resolved)
+
+    assert rejected.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert provider.call_counts.submit == 0
+
+
+def test_paid_ecommerce_facade_enforces_real_service_barrier_and_replay(
+    tmp_path: Path,
+) -> None:
+    _, provider, resolved, paid_preview, committer = _runtime(
+        tmp_path,
+        commercial=True,
+        status_events=(VideoTaskState.SUCCEEDED,),
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    facade = EcommerceVideoGenerationFacade(
+        service=service,
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        lane="paid",
+        paid_preview=paid_preview,
+        reservation_id="p8-video-reservation-1",
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+        before_validate=lambda: committer.settle_paid_provider_reservation(
+            attempt_id=ATTEMPT_ID,
+            actual_cost_microunits=1_000_000,
+        ),
+    )
+    handoff = _commercial_handoff(resolved.commercial_binding.target_shot_id)
+
+    result = run_ecommerce_ad_generation(
+        handoff,
+        facades={resolved.commercial_binding.target_shot_id: facade},
+    )
+    first_counts = provider.call_counts
+    replay = run_ecommerce_ad_generation(
+        handoff,
+        facades={resolved.commercial_binding.target_shot_id: facade},
+    )
+
+    assert result.complete is True
+    assert replay.complete is True
+    assert provider.call_counts == first_counts
+    assert first_counts.submit == 1
+    assert first_counts.status == 1
+    assert first_counts.fetch == 1
 
 
 @pytest.mark.parametrize("verdict", (QaVerdict.FAIL, QaVerdict.NOT_EVALUATED))

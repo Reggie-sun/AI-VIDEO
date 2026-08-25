@@ -13,6 +13,9 @@ from ai_video.production.ecommerce_media_acceptance import (
     GeneratedCommercialShotEvidence,
 )
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.commercial_video_validation import (
+    validate_commercial_source_binding,
+)
 from ai_video.production.models import (
     CommercialShotEvaluationIntentPointer,
     CommercialShotEvaluationPhase,
@@ -155,6 +158,11 @@ def test_commercial_intent_rejects_evaluator_profile_drift() -> None:
         )
 
     assert rejected.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+
+
+def test_commercial_product_hashes_require_reopened_source_approval() -> None:
+    with pytest.raises(ValueError, match="no current source approval"):
+        validate_commercial_source_binding(_commercial_binding(), None)
 
 
 @pytest.mark.parametrize("verdict", (QaVerdict.FAIL, QaVerdict.NOT_EVALUATED))

@@ -17,6 +17,9 @@ from ._state_commit_common import (
     _validated_transition,
 )
 from ._state_commit_video_candidate import resolve_video_activation_dependency_state
+from ._state_commit_video_commercial import (
+    validate_current_commercial_video_state,
+)
 
 
 class _StateCommitVideoRecoveryMixin:
@@ -125,35 +128,9 @@ class _StateCommitVideoRecoveryMixin:
                 )
             graph = self._reopen_dependency_graph(attempt.candidate_dependency_graph)
             request = self._reopen_video_request(state.request)
-            if (request.commercial_binding is None) != (
-                state.commercial_evaluation is None
-            ):
-                raise _state_invalid(
-                    "Interrupted commercial Shot candidate checkpoint is incomplete."
-                )
-            if state.commercial_evaluation is not None:
-                commercial_intent = self._reopen_commercial_shot_evaluation_intent(
-                    state.commercial_evaluation.intent
-                )
-                if state.commercial_evaluation.evidence is None:
-                    raise _state_invalid(
-                        "Interrupted commercial Shot candidate has no evidence."
-                    )
-                commercial_evidence = (
-                    self._reopen_generated_commercial_shot_evidence(
-                        state.commercial_evaluation.evidence
-                    )
-                )
-                if (
-                    request.commercial_binding is None
-                    or commercial_intent.binding_content_hash
-                    != request.commercial_binding.content_hash
-                    or commercial_evidence.intent_content_hash
-                    != commercial_intent.content_hash
-                ):
-                    raise _state_invalid(
-                        "Interrupted commercial Shot candidate evidence is not exact."
-                    )
+            validate_current_commercial_video_state(
+                self, manifest=manifest, state=state, request=request
+            )
             scope = request.activation_scope
             if scope is None:
                 raise _state_invalid(

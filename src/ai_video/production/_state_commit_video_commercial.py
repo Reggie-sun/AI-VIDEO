@@ -24,6 +24,11 @@ from ai_video.production.video_artifact import (
     validate_generated_commercial_shot_evidence,
     validate_generated_commercial_shot_intent,
 )
+from ai_video.production.project import load_qa_policy
+from ai_video.production.commercial_video_validation import (
+    current_commercial_source_approval,
+    validate_current_commercial_checkpoint,
+)
 
 from ._state_commit_common import (
     _canonical_json_bytes,
@@ -39,6 +44,71 @@ def _prepared_artifact(relative_path, payload: bytes) -> PreparedArtifact:
         payload,
         hashlib.sha256(payload).hexdigest(),
     )
+
+
+def validate_current_commercial_video_state(
+    committer,
+    *,
+    manifest,
+    state,
+    request,
+):
+    """Reopen one PASS checkpoint against the exact current Manifest owners."""
+
+    evaluation = state.commercial_evaluation
+    if request.commercial_binding is None and evaluation is None:
+        return None
+    if (
+        request.commercial_binding is None
+        or evaluation is None
+        or evaluation.evidence is None
+        or evaluation.probe is None
+        or evaluation.provenance is None
+        or manifest.active_qa_policy is None
+    ):
+        raise _state_invalid("Commercial Shot checkpoint is incomplete.")
+    try:
+        intent = committer._reopen_commercial_shot_evaluation_intent(
+            evaluation.intent
+        )
+        evidence = committer._reopen_generated_commercial_shot_evidence(
+            evaluation.evidence
+        )
+        probe = committer._reopen_video_probe_receipt(evaluation.probe)
+        provenance = committer._reopen_video_provenance_receipt(
+            evaluation.provenance
+        )
+        policy = load_qa_policy(
+            committer._project_root, manifest.active_qa_policy
+        )
+        loaded = committer._load_production_project(
+            committer._project_root / "project.yaml"
+        )
+        if loaded.manifest != manifest:
+            raise ValueError("active commercial Manifest changed")
+        approval = current_commercial_source_approval(
+            loaded, request.commercial_binding
+        )
+        validate_current_commercial_checkpoint(
+            request=request,
+            intent=intent,
+            evidence=evidence,
+            probe=probe,
+            policy=policy,
+            approval=approval,
+        )
+        if (
+            provenance.probe_receipt_id != probe.content_hash
+            or provenance.artifact_sha256 != evidence.artifact_sha256
+            or provenance.resolved_generation_hash
+            != request.resolved_generation_hash
+        ):
+            raise ValueError("commercial provenance is not exact")
+    except (AiVideoError, OSError, ValueError) as exc:
+        raise _state_invalid(
+            "Commercial Shot checkpoint is not current exact PASS.", str(exc)
+        ) from exc
+    return evidence
 
 
 def checkpoint_generated_commercial_shot(

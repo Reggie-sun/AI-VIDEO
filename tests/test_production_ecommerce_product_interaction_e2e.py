@@ -15,6 +15,12 @@ from ai_video.planning import (
     require_current_video_plan,
 )
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.commercial_execution import (
+    project_generated_commercial_shot_binding,
+)
+from ai_video.production.ecommerce_media_acceptance import (
+    create_qingyan_ecommerce_acceptance_profile,
+)
 from ai_video.production.models import (
     ActorIdentity,
     DependencyNode,
@@ -254,7 +260,7 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
     tmp_path,
     source_plan_shot_id: str,
 ) -> None:
-    loaded, projection, _ = _approved_commercial_project(
+    loaded, projection, approved_binding = _approved_commercial_project(
         tmp_path,
         source_plan_shot_id=source_plan_shot_id,
     )
@@ -266,6 +272,25 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
         item
         for item in loaded.manifest.active_commercial_source_approvals
         if item.target_shot_id == selected_shot.shot_id
+    )
+    generated_binding = project_generated_commercial_shot_binding(
+        projection,
+        profile=create_qingyan_ecommerce_acceptance_profile(),
+        applicable_requirement_ids=(
+            "shot.identity.main_character",
+            "shot.product.packaging_identity",
+            "shot.product.interaction",
+            "shot.motion.required",
+        ),
+        approved_source=approved_binding,
+        expected_actor_ids=projection.character_requirement_ids,
+        output_asset_id=f"generated-{selected_shot.shot_id}",
+    )
+    assert generated_binding.source_approval_hashes == (
+        selected_approval.content_hash,
+    )
+    assert generated_binding.product_reference_hashes == tuple(
+        sorted(approved_binding.product_source_asset_hashes)
     )
     selected_asset = next(
         item

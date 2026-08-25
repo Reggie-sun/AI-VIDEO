@@ -168,34 +168,27 @@ def test_qingyan_commercial_execution_projection_uses_distinct_primary_lanes() -
     assert production.project_commercial_executions(_plan()) == projections
 
 
-def test_interaction_projection_builds_exact_generated_commercial_binding() -> None:
+def test_interaction_projection_rejects_unapproved_hash_lineage() -> None:
     projection = next(
         item
         for item in production.project_commercial_executions(_plan())
         if item.target_shot_id == "shot-03"
     )
     profile = create_qingyan_ecommerce_acceptance_profile()
-    binding = commercial_execution.project_generated_commercial_shot_binding(
-        projection,
-        profile=profile,
-        applicable_requirement_ids=(
-            "shot.identity.main_character",
-            "shot.product.packaging_identity",
-            "shot.product.interaction",
-            "shot.motion.required",
-        ),
-        product_truth_hashes=("a" * 64,),
-        product_reference_hashes=("b" * 64,),
-        source_approval_hashes=("c" * 64,),
-        expected_actor_ids=("character-qingyan", "elder-qingyan"),
-        output_asset_id="generated-shot-03",
-    )
-
-    assert binding.ad_creative_plan_hash == _plan().content_hash
-    assert binding.commercial_execution_projection_hash == projection.projection_hash
-    assert binding.target_shot_id == "shot-03"
-    assert binding.profile_content_hash == profile.content_hash
-    assert binding.expected_actor_ids == ("character-qingyan", "elder-qingyan")
+    with pytest.raises(ValueError, match="approved source"):
+        commercial_execution.project_generated_commercial_shot_binding(
+            projection,
+            profile=profile,
+            applicable_requirement_ids=(
+                "shot.identity.main_character",
+                "shot.product.packaging_identity",
+                "shot.product.interaction",
+                "shot.motion.required",
+            ),
+            approved_source=None,
+            expected_actor_ids=("character-qingyan", "elder-qingyan"),
+            output_asset_id="generated-shot-03",
+        )
 
 
 def test_generated_commercial_binding_rejects_requirement_outside_profile() -> None:
@@ -209,9 +202,7 @@ def test_generated_commercial_binding_rejects_requirement_outside_profile() -> N
             projection,
             profile=create_qingyan_ecommerce_acceptance_profile(),
             applicable_requirement_ids=("shot.unselected",),
-            product_truth_hashes=(),
-            product_reference_hashes=(),
-            source_approval_hashes=(),
+            approved_source=None,
             expected_actor_ids=("character-qingyan",),
             output_asset_id="generated-shot-03",
         )

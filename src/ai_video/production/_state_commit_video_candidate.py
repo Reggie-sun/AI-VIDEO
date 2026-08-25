@@ -35,6 +35,8 @@ from ai_video.production.models import (
     TerminalFrameEvidencePointer,
     TerminalFrameExtractionReceiptPointer,
     VideoAttemptPhase,
+    VideoProbeReceiptPointer,
+    VideoProvenanceReceiptPointer,
 )
 from ai_video.production.paid_provider import BudgetReservationStatus
 from ai_video.production.paths import (
@@ -691,6 +693,14 @@ class _StateCommitVideoCandidateMixin:
                 raise _state_invalid(
                     "Terminal extraction checkpoint does not match exact source evidence."
                 )
+            probe_artifact = _prepared_artifact(
+                canonical_video_probe_receipt_path(probe_receipt.content_hash),
+                _canonical_json_bytes(probe_receipt),
+            )
+            provenance_artifact = _prepared_artifact(
+                canonical_video_provenance_receipt_path(provenance.content_hash),
+                _canonical_json_bytes(provenance),
+            )
             asset_record = build_generated_video_asset_record(
                 request=request,
                 measured=measured,
@@ -790,18 +800,8 @@ class _StateCommitVideoCandidateMixin:
                         and state.continuity_evaluation.probe is not None
                     )
                     else (
-                        _prepared_artifact(
-                            canonical_video_probe_receipt_path(
-                                probe_receipt.content_hash
-                            ),
-                            _canonical_json_bytes(probe_receipt),
-                        ),
-                        _prepared_artifact(
-                            canonical_video_provenance_receipt_path(
-                                provenance.content_hash
-                            ),
-                            _canonical_json_bytes(provenance),
-                        ),
+                        probe_artifact,
+                        provenance_artifact,
                     )
                 ),
                 *(
@@ -840,9 +840,56 @@ class _StateCommitVideoCandidateMixin:
                     ),
                 )
                 reopened.append(self._reopen_exact_video_artifact(artifact))
+            commercial_evaluation = state.commercial_evaluation
+            if commercial_evaluation is not None:
+                continuity_capture = state.continuity_evaluation
+                probe_pointer = (
+                    continuity_capture.probe
+                    if continuity_capture is not None
+                    and continuity_capture.probe is not None
+                    else VideoProbeReceiptPointer(
+                        path=probe_artifact.relative_path,
+                        content_hash=probe_receipt.content_hash,
+                        request_receipt_fingerprint=(
+                            probe_receipt.request_receipt_fingerprint
+                        ),
+                        resolved_generation_hash=(
+                            probe_receipt.resolved_generation_hash
+                        ),
+                        fetch_fingerprint=probe_receipt.fetch_fingerprint,
+                        artifact_sha256=probe_receipt.measured.artifact_sha256,
+                        file_sha256=probe_artifact.file_sha256,
+                    )
+                )
+                provenance_pointer = (
+                    continuity_capture.provenance
+                    if continuity_capture is not None
+                    and continuity_capture.provenance is not None
+                    else VideoProvenanceReceiptPointer(
+                        path=provenance_artifact.relative_path,
+                        content_hash=provenance.content_hash,
+                        request_receipt_fingerprint=(
+                            provenance.request_receipt_fingerprint
+                        ),
+                        resolved_generation_hash=(
+                            provenance.resolved_generation_hash
+                        ),
+                        fetch_fingerprint=provenance.fetch_fingerprint,
+                        artifact_sha256=provenance.artifact_sha256,
+                        probe_receipt_id=provenance.probe_receipt_id,
+                        file_sha256=provenance_artifact.file_sha256,
+                    )
+                )
+                commercial_evaluation = commercial_evaluation.model_copy(
+                    update={
+                        "probe": probe_pointer,
+                        "provenance": provenance_pointer,
+                    }
+                )
             candidate_state = state.model_copy(
                 update={
                     "phase": VideoAttemptPhase.CANDIDATE,
+                    "commercial_evaluation": commercial_evaluation,
                     "terminal_frame_extraction": state.terminal_frame_extraction,
                     "terminal_frame_evidence": terminal_pointer,
                     "candidate_video_asset_ids": (request.output_asset_id,),

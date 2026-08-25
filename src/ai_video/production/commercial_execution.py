@@ -8,6 +8,10 @@ from pydantic import Field, model_validator
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import StrictModel
 from ai_video.production.video import GeneratedCommercialShotBinding
+from ai_video.production.commercial_source_preparation import (
+    ApprovedCommercialSourceBinding,
+)
+from ai_video.production.commercial_video_validation import commercial_source_hashes
 
 if TYPE_CHECKING:
     from ai_video.production.ad_creative_types import AdCreativePlan
@@ -212,9 +216,7 @@ def project_generated_commercial_shot_binding(
     *,
     profile,
     applicable_requirement_ids: tuple[str, ...],
-    product_truth_hashes: tuple[str, ...],
-    product_reference_hashes: tuple[str, ...],
-    source_approval_hashes: tuple[str, ...],
+    approved_source: ApprovedCommercialSourceBinding | None,
     expected_actor_ids: tuple[str, ...],
     output_asset_id: str,
 ) -> GeneratedCommercialShotBinding:
@@ -244,6 +246,28 @@ def project_generated_commercial_shot_binding(
         expected_actor_ids
     ):
         raise ValueError("Commercial binding omits an expected authoring actor")
+    checked_approval = (
+        ApprovedCommercialSourceBinding.model_validate(
+            approved_source.model_dump(mode="python")
+        )
+        if approved_source is not None
+        else None
+    )
+    if selected_projection.requires_source_review and checked_approval is None:
+        raise ValueError("Commercial interaction binding requires approved source")
+    product_truth_hashes, product_reference_hashes, source_approval_hashes = (
+        commercial_source_hashes(checked_approval)
+        if checked_approval is not None
+        else ((), (), ())
+    )
+    if checked_approval is not None and (
+        checked_approval.ad_creative_plan_hash
+        != selected_projection.ad_creative_plan_hash
+        or checked_approval.execution_projection_hash
+        != selected_projection.projection_hash
+        or checked_approval.target_shot_id != selected_projection.target_shot_id
+    ):
+        raise ValueError("Approved source does not match commercial projection")
     return GeneratedCommercialShotBinding.create(
         ad_creative_plan_id=selected_projection.ad_creative_plan_id,
         ad_creative_plan_hash=selected_projection.ad_creative_plan_hash,
@@ -251,9 +275,9 @@ def project_generated_commercial_shot_binding(
         target_shot_id=selected_projection.target_shot_id,
         profile_content_hash=selected_profile.content_hash,
         applicable_requirement_ids=applicable_requirement_ids,
-        product_truth_hashes=tuple(sorted(product_truth_hashes)),
-        product_reference_hashes=tuple(sorted(product_reference_hashes)),
-        source_approval_hashes=tuple(sorted(source_approval_hashes)),
+        product_truth_hashes=product_truth_hashes,
+        product_reference_hashes=product_reference_hashes,
+        source_approval_hashes=source_approval_hashes,
         expected_actor_ids=expected_actor_ids,
         output_asset_id=output_asset_id,
     )

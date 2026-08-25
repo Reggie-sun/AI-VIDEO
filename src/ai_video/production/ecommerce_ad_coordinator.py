@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from dataclasses import dataclass
 from enum import Enum
-from typing import Literal, Protocol
+from typing import Any, Literal, Protocol
 
 from pydantic import Field, model_validator
 
@@ -13,6 +14,9 @@ from ai_video.production.ad_creative_types import CompiledAdCreativeHandoff
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import QaVerdict
+from ai_video.production.paid_provider import PaidProviderCallPreview
+from ai_video.production.video import ResolvedVideoGenerationRequest
+from ai_video.production.video_generation import VideoGenerationService
 
 
 class EcommerceShotNextAction(str, Enum):
@@ -83,6 +87,107 @@ class EcommerceShotExecutionFacade(Protocol):
     def current_activation_checkpoint(
         self,
     ) -> ActivatedCommercialShotCheckpoint | None: ...
+
+
+@dataclass
+class EcommerceVideoGenerationFacade:
+    """Production adapter over one preselected local or paid video service."""
+
+    service: VideoGenerationService
+    attempt_id: str
+    request: ResolvedVideoGenerationRequest
+    lane: Literal["local", "paid"]
+    commercial_reviewer: Any
+    paid_preview: PaidProviderCallPreview | None = None
+    reservation_id: str | None = None
+    probe: Callable[[int], dict] | None = None
+    terminal_frame_extractor: Any = None
+    continuity_reviewer: Any = None
+    pre_submit_guard: Callable[[ResolvedVideoGenerationRequest], None] | None = None
+    before_validate: Callable[[], None] | None = None
+    _started: bool = False
+
+    def __post_init__(self) -> None:
+        if self.request.commercial_binding is None:
+            raise ValueError("Ecommerce facade requires a commercial-bound request")
+        if self.lane == "paid" and (
+            self.paid_preview is None or self.reservation_id is None
+        ):
+            raise ValueError("Paid Ecommerce facade requires preview and reservation")
+
+    def next_action(self) -> EcommerceShotNextAction:
+        try:
+            return EcommerceShotNextAction(
+                self.service.resume_next_action(attempt_id=self.attempt_id)
+            )
+        except AiVideoError:
+            return (
+                EcommerceShotNextAction.STOP
+                if self._started
+                else EcommerceShotNextAction.START
+            )
+
+    def start(self) -> None:
+        self.service.start(attempt_id=self.attempt_id, request=self.request)
+        self._started = True
+
+    def submit(self) -> None:
+        if self.lane == "local":
+            self.service.submit_local_once(
+                attempt_id=self.attempt_id,
+                pre_submit_guard=self.pre_submit_guard,
+            )
+            return
+        assert self.paid_preview is not None and self.reservation_id is not None
+        self.service.submit_once(
+            attempt_id=self.attempt_id,
+            paid_preview=self.paid_preview,
+            reservation_id=self.reservation_id,
+        )
+
+    def poll(self) -> None:
+        if self.lane == "local":
+            self.service.refresh_local_once(attempt_id=self.attempt_id)
+        else:
+            self.service.refresh_once(attempt_id=self.attempt_id)
+
+    def fetch(self) -> None:
+        if self.lane == "local":
+            self.service.fetch_local_once(attempt_id=self.attempt_id)
+        else:
+            self.service.fetch_once(attempt_id=self.attempt_id)
+
+    def validate(self) -> QaVerdict:
+        if self.before_validate is not None:
+            self.before_validate()
+        self.service.validate_once(
+            attempt_id=self.attempt_id,
+            probe=self.probe,
+            terminal_frame_extractor=self.terminal_frame_extractor,
+            continuity_reviewer=self.continuity_reviewer,
+            commercial_reviewer=self.commercial_reviewer,
+        )
+        verdict = self.current_validation_verdict()
+        return QaVerdict.NOT_EVALUATED if verdict is None else verdict
+
+    def activate(self) -> ActivatedCommercialShotCheckpoint:
+        self.service.activate_once(attempt_id=self.attempt_id)
+        checkpoint = self.current_activation_checkpoint()
+        if checkpoint is None:
+            raise ValueError("Commercial activation checkpoint is missing")
+        return checkpoint
+
+    def current_validation_verdict(self) -> QaVerdict | None:
+        return self.service.current_commercial_validation_verdict(
+            attempt_id=self.attempt_id
+        )
+
+    def current_activation_checkpoint(
+        self,
+    ) -> ActivatedCommercialShotCheckpoint | None:
+        return self.service.current_activated_commercial_checkpoint(
+            attempt_id=self.attempt_id
+        )
 
 
 class EcommerceAdGenerationResult(StrictModel):
@@ -261,6 +366,7 @@ __all__ = [
     "ActivatedCommercialShotCheckpoint",
     "EcommerceAdGenerationResult",
     "EcommerceShotExecutionFacade",
+    "EcommerceVideoGenerationFacade",
     "EcommerceShotNextAction",
     "EcommerceStopReason",
     "run_ecommerce_ad_generation",

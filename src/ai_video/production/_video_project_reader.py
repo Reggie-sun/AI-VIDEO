@@ -78,6 +78,10 @@ from ai_video.production.ecommerce_media_acceptance import (
     CommercialShotEvaluationIntent,
     GeneratedCommercialShotEvidence,
 )
+from ai_video.production.commercial_video_validation import (
+    current_commercial_source_approval,
+    validate_current_commercial_checkpoint,
+)
 from ai_video.production.review import (
     ContinuityEvaluationIntent,
     GeneratedShotContinuityEvidence,
@@ -542,11 +546,73 @@ def _verify_continuity_capture_checkpoint(
         raise _invalid("Continuity capture checkpoint is not exact.")
 
 
+def _verify_commercial_capture_checkpoint(
+    bundle: LoadedProductionProject,
+    state: VideoGenerationAttemptState,
+    request: ResolvedVideoGenerationRequest,
+    fetch: VideoFetchReceipt | LocalVideoFetchReceipt | None,
+) -> None:
+    evaluation = state.commercial_evaluation
+    if evaluation is None:
+        return
+    if evaluation.probe is None:
+        if state.phase in {VideoAttemptPhase.CANDIDATE, VideoAttemptPhase.ACTIVATE}:
+            raise _invalid("Commercial capture checkpoint is incomplete.")
+        return
+    if (
+        evaluation.provenance is None
+        or evaluation.evidence is None
+        or fetch is None
+        or bundle.manifest.active_qa_policy is None
+        or request.commercial_binding is None
+    ):
+        raise _invalid("Commercial capture checkpoint is incomplete.")
+    try:
+        from ai_video.production.project import load_qa_policy
+
+        intent = load_commercial_shot_evaluation_intent(
+            bundle.root, evaluation.intent
+        )
+        evidence = load_generated_commercial_shot_evidence(
+            bundle.root, evaluation.evidence
+        )
+        probe = load_video_probe_receipt(bundle.root, evaluation.probe)
+        provenance = load_video_provenance_receipt(
+            bundle.root, evaluation.provenance
+        )
+        policy = load_qa_policy(
+            bundle.root, bundle.manifest.active_qa_policy
+        )
+        approval = current_commercial_source_approval(
+            bundle, request.commercial_binding
+        )
+        validate_current_commercial_checkpoint(
+            request=request,
+            intent=intent,
+            evidence=evidence,
+            probe=probe,
+            policy=policy,
+            approval=approval,
+        )
+        if (
+            probe.fetch_fingerprint != fetch.fetch_fingerprint
+            or probe.measured.artifact_sha256 != fetch.artifact_sha256
+            or provenance.probe_receipt_id != probe.content_hash
+            or provenance.artifact_sha256 != fetch.artifact_sha256
+        ):
+            raise ValueError("Commercial capture bytes are not exact")
+    except (AiVideoError, OSError, ValidationError, ValueError) as exc:
+        raise _invalid(
+            "Commercial capture checkpoint is not current exact PASS.", str(exc)
+        ) from exc
+
+
 def verify_video_evidence(
     root: str | Path,
     states: Iterable[VideoGenerationAttemptState],
     *,
     schema_version: str | None = None,
+    bundle: LoadedProductionProject | None = None,
 ) -> None:
     request_owners: list[str] = []
     for state in states:
@@ -686,6 +752,10 @@ def verify_video_evidence(
                 ):
                     raise _invalid("Local video fetch evidence is not exact.")
                 _verify_continuity_capture_checkpoint(root, state, request, fetch)
+                if bundle is not None:
+                    _verify_commercial_capture_checkpoint(
+                        bundle, state, request, fetch
+                    )
             elif state.continuity_evaluation is not None:
                 _verify_continuity_capture_checkpoint(root, state, request, None)
             continue
@@ -749,6 +819,10 @@ def verify_video_evidence(
                     "Video fetch evidence does not match its exact submission."
                 )
             _verify_continuity_capture_checkpoint(root, state, request, fetch)
+            if bundle is not None:
+                _verify_commercial_capture_checkpoint(
+                    bundle, state, request, fetch
+                )
         elif state.continuity_evaluation is not None:
             _verify_continuity_capture_checkpoint(root, state, request, None)
     if len(request_owners) != len(set(request_owners)):
@@ -1073,4 +1147,5 @@ def verify_manifest_video_evidence(
         root,
         states,
         schema_version=manifest.schema_version,
+        bundle=bundle,
     )

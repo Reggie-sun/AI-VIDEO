@@ -531,6 +531,8 @@ class CommercialShotEvaluationState(_PaidLifecycleModel):
     phase: CommercialShotEvaluationPhase
     intent: CommercialShotEvaluationIntentPointer
     evidence: GeneratedCommercialShotEvidencePointer | None = None
+    probe: VideoProbeReceiptPointer | None = None
+    provenance: VideoProvenanceReceiptPointer | None = None
 
     @model_serializer(mode="wrap")
     def _serialize_compatible_variant(
@@ -539,12 +541,19 @@ class CommercialShotEvaluationState(_PaidLifecycleModel):
         data = handler(self)
         if self.evidence is None:
             data.pop("evidence", None)
+        if self.probe is None:
+            data.pop("probe", None)
+        if self.provenance is None:
+            data.pop("provenance", None)
         return data
 
     @model_validator(mode="after")
     def _validate_phase(self) -> "CommercialShotEvaluationState":
         if self.phase is CommercialShotEvaluationPhase.INTENT:
-            if self.evidence is not None:
+            if any(
+                item is not None
+                for item in (self.evidence, self.probe, self.provenance)
+            ):
                 raise ValueError("commercial Shot evaluation intent cannot contain evidence")
         elif self.evidence is None or (
             self.evidence.intent_content_hash != self.intent.content_hash
@@ -555,6 +564,23 @@ class CommercialShotEvaluationState(_PaidLifecycleModel):
         ):
             raise ValueError(
                 "commercial Shot evaluation evidence does not match its intent"
+            )
+        if (self.probe is None) != (self.provenance is None):
+            raise ValueError(
+                "commercial capture checkpoint requires probe and provenance together"
+            )
+        if self.probe is not None and self.provenance is not None and (
+            self.probe.resolved_generation_hash
+            != self.provenance.resolved_generation_hash
+            or self.probe.artifact_sha256 != self.intent.artifact_sha256
+            or self.probe.request_receipt_fingerprint
+            != self.provenance.request_receipt_fingerprint
+            or self.probe.fetch_fingerprint != self.provenance.fetch_fingerprint
+            or self.probe.artifact_sha256 != self.provenance.artifact_sha256
+            or self.provenance.probe_receipt_id != self.probe.content_hash
+        ):
+            raise ValueError(
+                "commercial capture checkpoint does not bind exact video evidence"
             )
         return self
 

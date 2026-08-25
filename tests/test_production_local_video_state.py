@@ -16,10 +16,28 @@ from ai_video.production.local_video import (
     LocalVideoSubmitResult,
     LocalVideoTaskObservation,
 )
-from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
+from ai_video.production.models import (
+    QaLayer,
+    QaLayoutRules,
+    QaPolicy,
+    QaTechnicalThresholds,
+    SourceReference,
+    StateCommitStatus,
+    VideoAttemptPhase,
+)
+from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+from ai_video.production.ecommerce_media_acceptance import (
+    create_qingyan_ecommerce_acceptance_profile,
+)
+from ai_video.production.ecommerce_ad_coordinator import (
+    EcommerceVideoGenerationFacade,
+    run_ecommerce_ad_generation,
+)
+from ai_video.production.hashing import seal_artifact
 from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video import (
     BillingKind,
+    GeneratedCommercialShotBinding,
     ProviderProfilePointer,
     VideoCapabilityVariant,
     VideoExecutionKind,
@@ -152,8 +170,11 @@ def _runtime(
     submit_error: ErrorCode | None = None,
     status_state: VideoTaskState = VideoTaskState.SUCCEEDED,
     status_error: ErrorCode | None = None,
+    commercial: bool = False,
 ):
-    inputs = make_p8_video_generation_base(root, schema_version="2.8")
+    inputs = make_p8_video_generation_base(
+        root, schema_version="2.13" if commercial else "2.8"
+    )
     shot = inputs.project.shots[0]
     source = inputs.project.registry.assets[0]
     output = VideoOutputRequirement(
@@ -174,6 +195,32 @@ def _runtime(
         if t8_t2va
         else VideoGenerationMode.IMAGE_TO_VIDEO
     )
+    commercial_profile = (
+        create_qingyan_ecommerce_acceptance_profile() if commercial else None
+    )
+    if commercial:
+        from test_production_generated_video_e2e import (
+            COMMERCIAL_EVALUATOR,
+            _commercial_projection,
+        )
+
+        commercial_binding = GeneratedCommercialShotBinding.create(
+            ad_creative_plan_id="qingyan-ad-plan",
+            ad_creative_plan_hash="a" * 64,
+            commercial_execution_projection_hash=(
+                _commercial_projection(shot.shot_id).projection_hash
+            ),
+            target_shot_id=shot.shot_id,
+            profile_content_hash=commercial_profile.content_hash,
+            applicable_requirement_ids=(
+                commercial_profile.shot_requirement_ids[0],
+                commercial_profile.shot_requirement_ids[1],
+            ),
+            expected_actor_ids=("qingyan-miao-girl", "qingyan-elder"),
+            output_asset_id="local-h3-video-1",
+        )
+    else:
+        commercial_binding = None
     request = VideoGenerationRequest.create(
         generation_id="local-h3-generation-1",
         provider_name=provider_name,
@@ -211,6 +258,7 @@ def _runtime(
                 ),
             )
         ),
+        commercial_binding=commercial_binding,
         seal_terminal_frame=not t8_t2va,
         output_requirement=output,
         seed=19,
@@ -261,6 +309,52 @@ def _runtime(
         video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
         paid_provider_clock=lambda: datetime(2026, 8, 19, tzinfo=UTC),
     )
+    if commercial_profile is not None:
+        policy = seal_artifact(
+            QaPolicy(
+                artifact_id="qa-policy-local-commercial",
+                revision=1,
+                content_hash="0" * 64,
+                creation_receipt_id="qa-policy-local-commercial",
+                source_provenance=(
+                    SourceReference(kind="derived", reference="local-fixture"),
+                ),
+                policy_id="qa-policy-local-commercial",
+                policy_version="1",
+                required_layers=(QaLayer.SEMANTIC,),
+                technical_thresholds=QaTechnicalThresholds(
+                    black_luma_max_milli=10,
+                    silence_peak_max_millidb=-60_000,
+                    clipping_peak_min_millidb=-100,
+                ),
+                layout_rules=QaLayoutRules(
+                    safe_area_inset_milli=50,
+                    caption_overflow_tolerance_milli=0,
+                ),
+                strategy_rules_version="1",
+                semantic_requirement="required",
+                semantic_authorities=(COMMERCIAL_EVALUATOR,),
+                domain_acceptance=DomainAcceptancePolicy(
+                    domain_id="ecommerce",
+                    profile_id=commercial_profile.profile_id,
+                    profile_version=commercial_profile.profile_version,
+                    profile_content_hash=commercial_profile.content_hash,
+                    profile_payload=commercial_profile.model_dump(mode="json"),
+                    measurement_contract_version=(
+                        commercial_profile.measurement_contract_version
+                    ),
+                    required_requirement_ids=(
+                        commercial_profile.required_requirement_ids
+                    ),
+                ),
+            )
+        )
+        current = committer._read_manifest()
+        committer.activate_qa_policy(
+            policy,
+            expected_manifest_revision=current.manifest_revision,
+            attempt_id="activate-local-commercial-policy",
+        )
     return inputs, provider, resolved, committer
 
 
@@ -319,6 +413,40 @@ def test_local_video_lifecycle_never_claims_paid_authority_and_replays_exactly(
         service.submit_local_once(attempt_id=ATTEMPT_ID)
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
     assert provider.submit_calls == 1
+
+
+def test_local_ecommerce_facade_uses_real_service_and_replays_zero_effect(
+    tmp_path: Path,
+) -> None:
+    from test_production_generated_video_e2e import (
+        _CountingCommercialShotReviewer,
+        _commercial_handoff,
+    )
+
+    _, provider, resolved, committer = _runtime(tmp_path, commercial=True)
+    facade = EcommerceVideoGenerationFacade(
+        service=VideoGenerationService(committer=committer, provider=provider),
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        lane="local",
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+    )
+    binding = resolved.commercial_binding
+    assert binding is not None
+    handoff = _commercial_handoff(binding.target_shot_id)
+
+    result = run_ecommerce_ad_generation(
+        handoff, facades={binding.target_shot_id: facade}
+    )
+    first_counts = (provider.submit_calls, provider.status_calls, provider.fetch_calls)
+    replay = run_ecommerce_ad_generation(
+        handoff, facades={binding.target_shot_id: facade}
+    )
+
+    assert result.complete is True
+    assert replay.complete is True
+    assert first_counts == (1, 1, 1)
+    assert (provider.submit_calls, provider.status_calls, provider.fetch_calls) == first_counts
 
 
 def test_t8_t2va_reuses_local_intent_permit_and_state_lifecycle(tmp_path: Path) -> None:

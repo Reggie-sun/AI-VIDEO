@@ -67,6 +67,11 @@ from ai_video.production.local_video import (
     LocalVideoSubmitResult,
     LocalVideoTaskObservation,
 )
+from ai_video.production.project import load_qa_policy
+from ai_video.production.commercial_video_validation import (
+    current_commercial_source_approval,
+    validate_commercial_source_binding,
+)
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
@@ -260,6 +265,38 @@ class _StateCommitVideoMixin:
                 raise _state_invalid(
                     "Commercial-bound video generation requires Production Manifest 2.13."
                 )
+            if request.commercial_binding is not None:
+                try:
+                    loaded = self._load_production_project(
+                        self._project_root / "project.yaml"
+                    )
+                    if (
+                        loaded.manifest != manifest
+                        or manifest.active_qa_policy is None
+                    ):
+                        raise ValueError("active commercial context changed")
+                    policy = load_qa_policy(
+                        self._project_root, manifest.active_qa_policy
+                    )
+                    domain = policy.domain_acceptance
+                    if (
+                        domain is None
+                        or domain.domain_id != "ecommerce"
+                        or domain.profile_content_hash
+                        != request.commercial_binding.profile_content_hash
+                    ):
+                        raise ValueError("active Ecommerce policy does not match")
+                    approval = current_commercial_source_approval(
+                        loaded, request.commercial_binding
+                    )
+                    validate_commercial_source_binding(
+                        request.commercial_binding, approval
+                    )
+                except (AiVideoError, OSError, ValueError) as exc:
+                    raise _state_invalid(
+                        "Commercial video request lineage is not current and exact.",
+                        str(exc),
+                    ) from exc
             if (
                 request.activation_scope is not None
                 and (

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from ai_video.production.models import (
-    QaVerdict,
     StateCommitStatus,
     VideoAttemptPhase,
 )
-from ai_video.production.ecommerce_media_acceptance import (
-    adjudicate_generated_commercial_shot_evidence,
+from ._state_commit_video_commercial import (
+    validate_current_commercial_video_state,
 )
 from ._state_commit_video_candidate import resolve_video_activation_dependency_state
 
@@ -16,30 +15,6 @@ from ._state_commit_common import (
     _timestamp,
     _validated_transition,
 )
-
-
-def _validate_commercial_activation_checkpoint(committer, state, request) -> None:
-    evaluation = state.commercial_evaluation
-    binding = request.commercial_binding
-    if binding is None and evaluation is None:
-        return
-    if binding is None or evaluation is None or evaluation.evidence is None:
-        raise _state_invalid("Commercial Shot activation checkpoint is incomplete.")
-    intent = committer._reopen_commercial_shot_evaluation_intent(evaluation.intent)
-    evidence = committer._reopen_generated_commercial_shot_evidence(
-        evaluation.evidence
-    )
-    if (
-        intent.binding_content_hash != binding.content_hash
-        or evidence.intent_content_hash != intent.content_hash
-        or evidence.evaluation_fingerprint != intent.evaluation_fingerprint
-        or adjudicate_generated_commercial_shot_evidence(
-            evidence,
-            binding=binding,
-        )
-        is not QaVerdict.PASS
-    ):
-        raise _state_invalid("Commercial Shot activation checkpoint is not exact PASS.")
 
 
 class _StateCommitVideoActivationMixin:
@@ -76,7 +51,9 @@ class _StateCommitVideoActivationMixin:
                 attempt.candidate_dependency_graph
             )
             request = self._reopen_video_request(state.request)
-            _validate_commercial_activation_checkpoint(self, state, request)
+            validate_current_commercial_video_state(
+                self, manifest=manifest, state=state, request=request
+            )
             scope = request.activation_scope
             if scope is None:
                 raise _state_invalid("Video activation request has no durable scope.")
@@ -176,7 +153,9 @@ class _StateCommitVideoActivationMixin:
         ):
             raise _state_invalid("Video generation success is not exact active evidence.")
         request = self._reopen_video_request(state.request)
-        _validate_commercial_activation_checkpoint(self, state, request)
+        validate_current_commercial_video_state(
+            self, manifest=manifest, state=state, request=request
+        )
         scope = request.activation_scope
         if scope is None:
             raise _state_invalid("Video generation success has no durable scope.")

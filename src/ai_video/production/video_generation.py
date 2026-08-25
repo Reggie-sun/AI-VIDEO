@@ -390,6 +390,77 @@ class VideoGenerationService:
     def resume_next_action(self, *, attempt_id: str) -> str:
         return self._committer.video_resume_next_action(attempt_id=attempt_id)
 
+    def current_commercial_validation_verdict(self, *, attempt_id: str):
+        """Reopen current commercial PASS evidence without running its evaluator."""
+
+        from ai_video.production._state_commit_video_commercial import (
+            validate_current_commercial_video_state,
+        )
+
+        manifest = self._committer._read_manifest()
+        attempt = self._committer._video_attempt(manifest, attempt_id)
+        state = attempt.video_generation_state
+        if (
+            state is None
+            or state.phase
+            not in {VideoAttemptPhase.CANDIDATE, VideoAttemptPhase.ACTIVATE}
+        ):
+            return None
+        request = self._committer._reopen_video_request(state.request)
+        evidence = validate_current_commercial_video_state(
+            self._committer,
+            manifest=manifest,
+            state=state,
+            request=request,
+        )
+        from ai_video.production.models import QaVerdict
+
+        return None if evidence is None else QaVerdict.PASS
+
+    def current_activated_commercial_checkpoint(self, *, attempt_id: str):
+        """Project one exact active Manifest checkpoint for the Ecommerce barrier."""
+
+        from ai_video.production._state_commit_video_commercial import (
+            validate_current_commercial_video_state,
+        )
+        from ai_video.production.ecommerce_ad_coordinator import (
+            ActivatedCommercialShotCheckpoint,
+        )
+
+        manifest = self._committer._read_manifest()
+        attempt = self._committer._video_attempt(manifest, attempt_id)
+        state = attempt.video_generation_state
+        if (
+            attempt.status is not StateCommitStatus.SUCCEEDED
+            or state is None
+            or state.phase is not VideoAttemptPhase.ACTIVATE
+        ):
+            return None
+        request = self._committer._reopen_video_request(state.request)
+        evidence = validate_current_commercial_video_state(
+            self._committer,
+            manifest=manifest,
+            state=state,
+            request=request,
+        )
+        binding = request.commercial_binding
+        if evidence is None or binding is None:
+            return None
+        from ai_video.production.models import QaVerdict
+
+        return ActivatedCommercialShotCheckpoint.create(
+            ad_creative_plan_hash=binding.ad_creative_plan_hash,
+            commercial_execution_projection_hash=(
+                binding.commercial_execution_projection_hash
+            ),
+            shot_id=binding.target_shot_id,
+            resolved_generation_hash=request.resolved_generation_hash,
+            artifact_sha256=evidence.artifact_sha256,
+            commercial_evidence_content_hash=evidence.content_hash,
+            verdict=QaVerdict.PASS,
+            activated=True,
+        )
+
     def fetch_and_activate(
         self,
         *,
