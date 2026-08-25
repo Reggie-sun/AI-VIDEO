@@ -26,6 +26,7 @@ from ai_video.production._video_capability_fingerprint import (
 )
 from ai_video.production._video_requirement_routing import (
     as_capability_blocked,
+    commercial_requirement_context_is_current,
     effective_policy_for_requirement,
     enforce_c4_requirement_gate,
     requirement_bindings,
@@ -69,6 +70,8 @@ class VideoGenerationResolver:
         requirement_mode: VideoGenerationMode | None = None,
         requirement_binding_roles: tuple[str, ...] | None = None,
         requirement_input_assets: tuple[RouterAssetIdentity, ...] | None = None,
+        requirement_lineage_current: bool = True,
+        commercial_source_preparation: bool = False,
     ) -> VideoGenerationRoutingDecision:
         base: dict[str, object] = {
             "target_shot_id": context.target_shot_id,
@@ -93,6 +96,16 @@ class VideoGenerationResolver:
             "output_requirement": output_requirement,
             "policy": policy.identity,
         }
+        if not requirement_lineage_current:
+            return self._blocked(
+                base,
+                RoutingOutcome.BLOCKED_MISSING_INPUT,
+                RouterReasonCode.COMMERCIAL_SOURCE_LINEAGE_MISMATCH,
+                "The commercial approval, Product fidelity, or first-frame lineage is stale.",
+                required_mode=requirement_mode,
+                required_binding_roles=requirement_binding_roles or (),
+                input_assets=requirement_input_assets or (),
+            )
         if (
             context.continuity_mode is ContinuityMode.MULTI_ANCHOR
             and requirement_mode is None
@@ -152,7 +165,7 @@ class VideoGenerationResolver:
         if context.activated_shot.visual_strategy not in {
             VisualStrategy.GENERATED_VIDEO,
             VisualStrategy.HYBRID,
-        }:
+        } and not commercial_source_preparation:
             return self._blocked(
                 base,
                 RoutingOutcome.BLOCKED_POLICY,
@@ -373,6 +386,15 @@ class VideoGenerationResolver:
 
         expected_mode = requirement_mode(requirement.generation_mode)
         binding_projection = requirement_bindings(requirement, context)
+        commercial_current = commercial_requirement_context_is_current(
+            requirement, context
+        )
+        commercial_source_preparation = bool(
+            commercial_current
+            and requirement.contract_version
+            == "provider-neutral-video-requirement/3"
+            and requirement.capability_need.needs_product_fidelity
+        )
         if expected_mode is None or binding_projection is None:
             decision = self.resolve(
                 context=context,
@@ -382,6 +404,8 @@ class VideoGenerationResolver:
                 selected_capability_id=selected_capability_id,
                 output_requirement=output_requirement,
                 requirement_hash=requirement.requirement_hash,
+                requirement_lineage_current=commercial_current,
+                commercial_source_preparation=commercial_source_preparation,
             )
             if decision.outcome is RoutingOutcome.SELECTED:
                 decision = as_capability_blocked(
@@ -403,6 +427,8 @@ class VideoGenerationResolver:
             requirement_mode=expected_mode,
             requirement_binding_roles=native_roles,
             requirement_input_assets=input_assets,
+            requirement_lineage_current=commercial_current,
+            commercial_source_preparation=commercial_source_preparation,
         )
         decision = enforce_c4_requirement_gate(
             requirement, context, capabilities, selected_capability_id, decision

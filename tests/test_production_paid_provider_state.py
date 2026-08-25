@@ -124,6 +124,22 @@ def test_manifest_26_round_trips_exact_paid_intent_and_submit_pointers():
     assert accepted_manifest.attempts[0].paid_provider_state.submit_receipt == _submit()
 
 
+def test_manifest_212_preserves_paid_submit_intent_contract() -> None:
+    intent = PaidProviderAttemptState(
+        gate_receipt=_gate(),
+        reservation_id="reservation-1",
+        phase=PaidProviderAttemptPhase.SUBMIT_INTENT,
+    )
+    current = ProductionManifest.model_validate(
+        {
+            **_manifest(attempt=_attempt(state=intent)).model_dump(mode="python"),
+            "schema_version": "2.12",
+        }
+    )
+
+    assert current.attempts[0].paid_provider_state == intent
+
+
 def test_paid_fields_are_rejected_before_manifest_26():
     payload = _manifest().model_dump(mode="json")
     payload["schema_version"] = "2.5"

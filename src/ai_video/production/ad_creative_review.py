@@ -17,6 +17,10 @@ from ai_video.production.commercial_graphics import (
 )
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import CompositionSpec
+from ai_video.production.commercial_execution import project_commercial_executions
+from ai_video.production.commercial_source_preparation import (
+    ApprovedCommercialSourceBinding,
+)
 
 
 class _StrictModel(BaseModel):
@@ -43,6 +47,8 @@ class AdCreativeReviewReport(_StrictModel):
     checked_dimensions: tuple[AdCreativeReviewDimension, ...] = Field(min_length=1)
     findings: tuple[AdCreativeReviewFinding, ...]
     is_ready: bool
+    requires_source_preparation: bool = False
+    source_preparation_ready: bool = True
     production_verdict: Literal[None] = None
 
 
@@ -59,6 +65,8 @@ def _diagnostic_artifact_id(value: object, *, fallback: str) -> str:
 def review_ad_creative_plan(
     plan: AdCreativePlan,
     composition: CompositionSpec,
+    *,
+    approved_commercial_sources: tuple[ApprovedCommercialSourceBinding, ...] = (),
 ) -> AdCreativeReviewReport:
     findings: list[AdCreativeReviewFinding] = []
 
@@ -181,7 +189,7 @@ def review_ad_creative_plan(
     product_projection_mismatch = False
     for item in plan.product_presentations:
         if item.mode is ProductPresentationMode.IN_SCENE_PROVIDER:
-            if not any(
+            if plan.schema_version == "ad-creative-plan/1" and not any(
                 layer.shot_id == item.shot_id and layer.asset_id == item.asset_id
                 for layer in composition.layers
             ):
@@ -267,11 +275,40 @@ def review_ad_creative_plan(
             "Advertising sound cue semantics do not match AdCreativePlan.",
         )
 
+    requires_source_preparation = bool(
+        plan.schema_version == "ad-creative-plan/2"
+        and any(
+            item.mode is ProductPresentationMode.IN_SCENE_PROVIDER
+            for item in plan.product_presentations
+        )
+    )
+    source_preparation_ready = not requires_source_preparation
+    if requires_source_preparation:
+        interactions = {
+            item.projection_hash: item
+            for item in project_commercial_executions(plan)
+            if item.primary_class.value == "product_interaction"
+        }
+        approvals = {
+            item.execution_projection_hash: item
+            for item in approved_commercial_sources
+        }
+        source_preparation_ready = bool(
+            set(interactions) == set(approvals)
+            and all(
+                approval.ad_creative_plan_hash == plan.content_hash
+                and approval.target_shot_id
+                == interactions[projection_hash].target_shot_id
+                for projection_hash, approval in approvals.items()
+            )
+        )
     return AdCreativeReviewReport(
         plan_id=plan.artifact_id,
         composition_id=composition.artifact_id,
         checked_dimensions=_DIMENSIONS,
         findings=tuple(findings),
         is_ready=not findings,
+        requires_source_preparation=requires_source_preparation,
+        source_preparation_ready=source_preparation_ready,
         production_verdict=None,
     )

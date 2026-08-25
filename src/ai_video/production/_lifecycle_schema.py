@@ -943,7 +943,7 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
         isinstance(attempt, Mapping) and "paid_provider_state" in attempt
         for attempt in value.get("attempts", ())
     )
-    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11"} and (
+    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and (
         "active_paid_provider_budget" in value or has_paid_attempt
     ):
         raise ValueError(
@@ -1001,7 +1001,7 @@ def reject_explicit_p8_video_fields(value: object) -> object:
                     "checkpoint fields; Manifest 2.10 is required"
                 )
         return value
-    if manifest_version in {"2.10", "2.11"}:
+    if manifest_version in {"2.10", "2.11", "2.12"}:
         for attempt in value.get("attempts", ()):
             if not isinstance(attempt, Mapping):
                 continue
@@ -1040,7 +1040,7 @@ def reject_explicit_p7_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
+    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
         return value
     image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
     for attempt in value.get("attempts", ()):
@@ -1058,11 +1058,11 @@ def reject_explicit_p0_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     if (
-        value.get("schema_version", "2.0") != "2.11"
+        value.get("schema_version", "2.0") not in {"2.11", "2.12"}
         and "active_p0_qualification_prepared" in value
     ):
         raise ValueError(
-            "Only Production Manifest 2.11 can select P0 qualification evidence"
+            "Only Production Manifest 2.11 or later can select P0 qualification evidence"
         )
     return value
 

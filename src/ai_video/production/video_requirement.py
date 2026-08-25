@@ -5,7 +5,14 @@ import unicodedata
 from enum import Enum
 from typing import Any, Literal
 
-from pydantic import Field, ValidationInfo, field_validator, model_validator
+from pydantic import (
+    Field,
+    SerializerFunctionWrapHandler,
+    ValidationInfo,
+    field_validator,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import Character, Scene, Shot, StrictModel
@@ -14,6 +21,7 @@ from ai_video.production._video_continuity import C4MultiAnchorBinding
 
 _REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/1"
 _C4_REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/2"
+_COMMERCIAL_REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/3"
 _UNSEALED_HASH = "0" * 64
 _SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
 _SHA256 = r"^[0-9a-f]{64}$"
@@ -289,6 +297,73 @@ class QualityNeed(StrictModel):
     native_enforcement_required: bool = False
 
 
+class ProductFidelityStrategy(str, Enum):
+    APPROVED_FIRST_FRAME = "approved_first_frame"
+
+
+class ProductFidelityRequirement(StrictModel):
+    schema_version: Literal["product-fidelity-requirement/1"] = (
+        "product-fidelity-requirement/1"
+    )
+    product_id: str = Field(pattern=_SAFE_ID)
+    sku_id: str = Field(pattern=_SAFE_ID)
+    product_reference_set_id: str = Field(pattern=_SAFE_ID)
+    product_reference_set_hash: str = Field(pattern=_SHA256)
+    product_source_asset_hashes: tuple[str, ...] = Field(min_length=1)
+    strategy: ProductFidelityStrategy = ProductFidelityStrategy.APPROVED_FIRST_FRAME
+    packaging_form: str = Field(min_length=1)
+    bottle_silhouette: str = Field(min_length=1)
+    dominant_color: str = Field(min_length=1)
+    cap_color: str = Field(min_length=1)
+    logo_label_identity: str = Field(min_length=1)
+    protected_text_zones: tuple[str, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _validate_canonical_product_truth(self) -> "ProductFidelityRequirement":
+        if (
+            self.product_source_asset_hashes
+            != tuple(sorted(set(self.product_source_asset_hashes)))
+            or any(re.fullmatch(_SHA256, item) is None for item in self.product_source_asset_hashes)
+        ):
+            raise ValueError("Product source hashes must be unique, ordered SHA-256 values")
+        if self.protected_text_zones != tuple(sorted(set(self.protected_text_zones))):
+            raise ValueError("Product protected text zones must be unique and ordered")
+        return self
+
+
+class ApprovedCommercialSourceLink(StrictModel):
+    schema_version: Literal["approved-commercial-source-link/1"] = (
+        "approved-commercial-source-link/1"
+    )
+    approval_id: str = Field(pattern=_SAFE_ID)
+    approval_content_hash: str = Field(pattern=_SHA256)
+    source_request_hash: str = Field(pattern=_SHA256)
+    target_shot_id: str = Field(pattern=_SAFE_ID)
+    target_shot_content_hash: str = Field(pattern=_SHA256)
+    keyframe_asset_id: str = Field(pattern=_SAFE_ID)
+    keyframe_sha256: str = Field(pattern=_SHA256)
+    product_reference_set_id: str = Field(pattern=_SAFE_ID)
+    product_reference_set_hash: str = Field(pattern=_SHA256)
+    product_source_asset_hashes: tuple[str, ...] = Field(min_length=1)
+    character_reference_ids: tuple[str, ...] = Field(min_length=1)
+    scene_reference_ids: tuple[str, ...] = Field(min_length=1)
+    wardrobe_requirement_hash: str = Field(pattern=_SHA256)
+    accessory_requirement_hash: str = Field(pattern=_SHA256)
+    review_receipt_id: str = Field(pattern=_SAFE_ID)
+    review_receipt_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_canonical_identities(self) -> "ApprovedCommercialSourceLink":
+        for values, label in (
+            (self.product_source_asset_hashes, "product source hashes"),
+            (self.character_reference_ids, "Character reference IDs"),
+            (self.scene_reference_ids, "Scene reference IDs"),
+        ):
+            if values != tuple(sorted(set(values))):
+                raise ValueError(f"{label} must be unique and ordered")
+        return self
+
+
 class CapabilityNeed(StrictModel):
     needs_identity_reference: bool = False
     needs_scene_reference: bool = False
@@ -297,9 +372,19 @@ class CapabilityNeed(StrictModel):
     needs_terminal_reference: bool = False
     needs_native_audio: bool = False
     needs_continuity_state: bool = False
+    needs_product_fidelity: bool = False
     max_reference_count: int | None = Field(default=None, ge=0, le=30)
     accepts_local_execution: bool = True
     accepts_remote_execution: bool = True
+
+    @model_serializer(mode="wrap")
+    def _serialize_additive_product_need(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if not self.needs_product_fidelity:
+            data.pop("needs_product_fidelity", None)
+        return data
 
 
 class AssetEvidence(StrictModel):
@@ -406,6 +491,7 @@ class ProviderNeutralVideoRequirement(StrictModel):
     contract_version: Literal[
         _REQUIREMENT_CONTRACT_VERSION,
         _C4_REQUIREMENT_CONTRACT_VERSION,
+        _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION,
     ] = (
         _REQUIREMENT_CONTRACT_VERSION
     )
@@ -429,6 +515,25 @@ class ProviderNeutralVideoRequirement(StrictModel):
     output_need: OutputNeed = Field(default_factory=OutputNeed)
     audio_need: AudioNeed = AudioNeed.OPTIONAL
     quality_need: QualityNeed = Field(default_factory=QualityNeed)
+    commercial_execution_class: Literal["product_interaction"] | None = None
+    product_fidelity_requirement: ProductFidelityRequirement | None = None
+    approved_commercial_source: ApprovedCommercialSourceLink | None = None
+    source_strategy: ProductFidelityStrategy | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_additive_commercial_contract(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.contract_version != _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION:
+            for field in (
+                "commercial_execution_class",
+                "product_fidelity_requirement",
+                "approved_commercial_source",
+                "source_strategy",
+            ):
+                data.pop(field, None)
+        return data
 
     def _hash_payload(self) -> dict[str, object]:
         payload = self.model_dump(
@@ -532,11 +637,14 @@ class ProviderNeutralVideoRequirement(StrictModel):
             raise ValueError("typed identity continuity must match requirement Characters")
         c4_binding = self.c4_multi_anchor_binding
         if c4_binding is None:
-            if self.contract_version != _REQUIREMENT_CONTRACT_VERSION:
+            if self.contract_version not in {
+                _REQUIREMENT_CONTRACT_VERSION,
+                _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION,
+            }:
                 raise ValueError("C4 requirement contract requires a C4 binding")
             if self.continuity_mode is ContinuityMode.MULTI_ANCHOR:
                 raise ValueError("multi-anchor continuity requires a C4 binding")
-            return self
+            return self._validate_commercial_product_fidelity()
         if (
             self.contract_version != _C4_REQUIREMENT_CONTRACT_VERSION
             or self.continuity_mode is not ContinuityMode.MULTI_ANCHOR
@@ -588,6 +696,62 @@ class ProviderNeutralVideoRequirement(StrictModel):
         }
         if len(self.asset_evidence) != len(expected) or selected != expected:
             raise ValueError("C4 requirement evidence does not match exact anchors")
+        return self
+
+    def _validate_commercial_product_fidelity(
+        self,
+    ) -> "ProviderNeutralVideoRequirement":
+        commercial_values = (
+            self.commercial_execution_class,
+            self.product_fidelity_requirement,
+            self.approved_commercial_source,
+            self.source_strategy,
+        )
+        if self.contract_version != _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION:
+            if any(value is not None for value in commercial_values):
+                raise ValueError("Historical requirement contracts cannot carry commercial fields")
+            if self.capability_need.needs_product_fidelity:
+                raise ValueError("Historical requirement contracts cannot require product fidelity")
+            return self
+        if any(value is None for value in commercial_values):
+            raise ValueError("Commercial v3 requirement requires complete product lineage")
+        fidelity = self.product_fidelity_requirement
+        approval = self.approved_commercial_source
+        assert fidelity is not None and approval is not None
+        if (
+            self.commercial_execution_class != "product_interaction"
+            or self.generation_mode is not GenerationMode.IMAGE_TO_VIDEO
+            or self.source_strategy is not ProductFidelityStrategy.APPROVED_FIRST_FRAME
+            or fidelity.strategy is not ProductFidelityStrategy.APPROVED_FIRST_FRAME
+            or not self.capability_need.needs_product_fidelity
+        ):
+            raise ValueError("Commercial product interaction requires approved-first-frame I2V")
+        first_frames = tuple(
+            item
+            for item in self.asset_evidence
+            if item.role is SemanticReferenceRole.FIRST_FRAME
+        )
+        if (
+            len(self.asset_evidence) != 1
+            or len(first_frames) != 1
+            or first_frames[0].asset_id != approval.keyframe_asset_id
+            or first_frames[0].asset_sha256 != approval.keyframe_sha256
+            or self.semantic_reference_roles != (SemanticReferenceRole.FIRST_FRAME,)
+        ):
+            raise ValueError("Commercial v3 Provider input must be the exact approved first frame")
+        if (
+            approval.target_shot_id != self.target_shot.shot_id
+            or approval.target_shot_content_hash != self.target_shot.content_hash
+            or approval.product_reference_set_id != fidelity.product_reference_set_id
+            or approval.product_reference_set_hash != fidelity.product_reference_set_hash
+            or approval.product_source_asset_hashes != fidelity.product_source_asset_hashes
+            or approval.character_reference_ids
+            != tuple(sorted(item.artifact_id for item in self.characters))
+            or approval.scene_reference_ids != (self.scene.artifact_id,)
+            or fidelity.product_id in set(approval.character_reference_ids)
+            or fidelity.product_id in set(approval.scene_reference_ids)
+        ):
+            raise ValueError("Commercial v3 product, Shot, Character, or Scene lineage is inconsistent")
         return self
 
     @model_validator(mode="after")

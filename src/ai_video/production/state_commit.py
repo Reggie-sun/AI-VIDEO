@@ -213,6 +213,10 @@ from ._state_commit_recovery import _StateCommitRecoveryMixin
 from ._state_commit_recovery_attempts import _StateCommitRecoveryAttemptsMixin
 from ._state_commit_recovery_fs import _StateCommitRecoveryFsMixin
 from ._state_commit_dependency import _StateCommitDependencyMixin
+from ._state_commit_commercial_source import _StateCommitCommercialSourceMixin
+from ._state_commit_commercial_source_recovery import (
+    _StateCommitCommercialSourceRecoveryMixin,
+)
 from ._state_commit_image_activation import _StateCommitImageActivationMixin
 from ._state_commit_image_candidate import _StateCommitImageCandidateMixin
 from ._state_commit_image_intent import _StateCommitImageIntentMixin
@@ -258,6 +262,8 @@ except ImportError:  # pragma: no cover - exercised through platform injection
 class ProductionStateCommitter(
     _StateCommitBootstrapMixin,
     _StateCommitP0QualificationMixin,
+    _StateCommitCommercialSourceMixin,
+    _StateCommitCommercialSourceRecoveryMixin,
     _StateCommitVideoMixin,
     _StateCommitVideoCandidateMixin,
     _StateCommitVideoActivationMixin,

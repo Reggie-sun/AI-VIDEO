@@ -32,6 +32,9 @@ from ai_video.production.captions import (
     caption_style_fingerprint,
     validate_caption_track_timeline_binding,
 )
+from ai_video.production._commercial_project_reader import (
+    verify_active_commercial_source_approvals,
+)
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.dependency import (
     _asset_role,
@@ -48,6 +51,7 @@ from ai_video.production.models import (
     CaptionTrack,
     CaptionStyleReference,
     Character,
+    CommercialSourceDependencyEvidence,
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
     DependencyLifecycle,
@@ -1549,6 +1553,19 @@ def _verify_manifest_dependency_states(
                 graph=graph,
                 require_current=state.lifecycle is DependencyLifecycle.FRESH,
             )
+        elif isinstance(evidence, CommercialSourceDependencyEvidence):
+            if (
+                node.kind
+                not in {
+                    DependencyNodeKind.CREATIVE_ARTIFACT,
+                    DependencyNodeKind.ASSET,
+                }
+                or evidence.pointer
+                not in bundle.manifest.active_commercial_source_approvals
+            ):
+                raise _invalid(
+                    "Commercial source dependency evidence has an invalid owner."
+                )
 
     render_domain_ids = {
         node.node_id
@@ -1591,6 +1608,11 @@ def _verify_manifest_dependency_states(
             _verify_dependency_registry_evidence(bundle, evidence)
         elif isinstance(evidence, RenderDependencyEvidence):
             _verify_dependency_render_evidence(bundle, evidence)
+        elif isinstance(evidence, CommercialSourceDependencyEvidence):
+            if evidence.pointer in bundle.manifest.active_commercial_source_approvals:
+                raise _invalid(
+                    "Superseded commercial dependency evidence cannot remain active."
+                )
 
     try:
         resolved = resolve_dependency_state(graph, states)
@@ -1679,7 +1701,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         _verify_manifest_dependency_states(bundle, dependency_graph)
         bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
     if manifest.schema_version == "2.4" or (
-        manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+        manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
         and manifest.active_qa_policy is not None
     ):
         if manifest.active_qa_policy is None:
@@ -1748,10 +1770,11 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
             ):
                 raise _invalid("Final Acceptance Receipt is stale.")
         bundle = bundle.model_copy(update={"qa_policy": qa_policy})
+    verify_active_commercial_source_approvals(bundle)
     if manifest.active_render_state is not None:
         render_state = (
             _load_exact_render_state(bundle, manifest.active_render_state)
-            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
             else load_verified_render_state(
                 root,
                 manifest.active_render_state,

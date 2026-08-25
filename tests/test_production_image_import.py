@@ -13,13 +13,20 @@ from ai_video.production.image_import import (
     AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL,
     HUMAN_IMAGE_IMPORT_TOOL,
     AutomatedBrowserImageImportReceipt,
+    CommercialImageImportReceipt,
     HumanImageImportReceipt,
     automated_browser_image_import_asset,
+    commercial_image_import_asset,
     human_image_import_asset,
     prepare_automated_browser_image_import_commit,
     prepare_human_image_import_commit,
     validate_automated_browser_image_import,
+    validate_commercial_image_import,
     validate_human_image_import,
+)
+from ai_video.production.commercial_reference import (
+    ProductReferenceAssetBinding,
+    ProductReferenceSet,
 )
 from ai_video.production.dependency import (
     build_production_dependency_graph,
@@ -139,6 +146,84 @@ def test_automated_browser_import_is_truthful_sealed_and_distinct() -> None:
     assert receipt.source_generation_remote
     assert asset.tool == AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL
     assert asset.tool != HUMAN_IMAGE_IMPORT_TOOL
+
+
+def test_commercial_interaction_import_binds_product_character_scene_and_exact_png() -> None:
+    png = project_factory._p7_png()
+    reference_set = ProductReferenceSet.create(
+        artifact_id="product-reference-qingyan",
+        revision=1,
+        product_id="qingyan-spray",
+        sku_id="qingyan-yellow-50ml",
+        formal_name="青颜净味喷雾",
+        truth_reference_ids=("truth-packaging",),
+        registry_revision_id="8" * 64,
+        registry_content_hash="8" * 64,
+        assets=(
+            ProductReferenceAssetBinding(
+                asset_id="product-front",
+                asset_sha256="5" * 64,
+                mime_type="image/png",
+                width=2,
+                height=1,
+                view="front",
+                purpose="product_truth",
+            ),
+            ProductReferenceAssetBinding(
+                asset_id="product-label",
+                asset_sha256="6" * 64,
+                mime_type="image/png",
+                width=2,
+                height=1,
+                view="label",
+                purpose="label",
+            ),
+        ),
+        packaging_form="yellow carton and spray bottle",
+        bottle_silhouette="slender bottle",
+        dominant_color="yellow",
+        cap_color="white",
+        logo_label_identity="青颜 yellow label",
+        protected_text_zones=("front-label",),
+    )
+    receipt = CommercialImageImportReceipt.create(
+        source_kind="human_observed_import",
+        original_filename="qingyan-interaction-04.png",
+        output_asset_id="interaction-keyframe-04",
+        output_sha256=hashlib.sha256(png).hexdigest(),
+        output_size_bytes=len(png),
+        output_width=2,
+        output_height=1,
+        imported_at="2026-08-25T10:00:00+08:00",
+        prompt_fingerprint="3" * 64,
+        target_kind="commercial_interaction_keyframe",
+        target_id="source-request-04",
+        product_reference_set=reference_set,
+        target_shot_id="shot-04",
+        target_shot_content_hash="7" * 64,
+        character_reference_ids=("character-qingyan",),
+        scene_reference_ids=("scene-bedroom",),
+        observed_by=ActorIdentity(actor_id="human-operator", actor_kind="human"),
+        provenance_note="Human-observed local import; no Provider submit claimed.",
+        usage_license="test-only",
+    )
+
+    validate_commercial_image_import(receipt, png)
+    asset = commercial_image_import_asset(receipt)
+
+    assert asset.asset_id == "interaction-keyframe-04"
+    assert asset.sha256 == receipt.output_sha256
+    assert asset.source_kind is AssetSourceKind.IMPORTED
+    assert asset.input_artifact_ids == (
+        "product-label",
+        "product-front",
+        "character-qingyan",
+        "scene-bedroom",
+        "shot-04",
+    )
+    with pytest.raises(AiVideoError) as caught:
+        validate_commercial_image_import(receipt, png + b"tampered")
+    assert caught.value.code is ErrorCode.IMAGE_ASSET_INVALID
 
 
 @pytest.mark.parametrize(

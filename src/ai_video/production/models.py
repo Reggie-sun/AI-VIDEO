@@ -1721,9 +1721,86 @@ class FinalAcceptanceState(StrictModel):
     active_receipt: FinalAcceptanceReceiptPointer | None = None
 
 
+class CommercialSourceLifecycle(str, Enum):
+    REQUESTED = "requested"
+    MATERIALIZED_CANDIDATE = "materialized_candidate"
+    EVIDENCED = "evidenced"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    NOT_EVALUATED = "not_evaluated"
+    STALE = "stale"
+    OUTCOME_UNKNOWN = "outcome_unknown"
+
+
+class CommercialSourceApprovalPointer(StrictModel):
+    path: Path
+    approval_id: str = Field(min_length=1)
+    target_shot_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "CommercialSourceApprovalPointer":
+        _require_content_addressed_pointer_path(
+            self.path,
+            content_hash=self.content_hash,
+            prefix="state/commercial-source/approval.",
+            label="commercial source approval",
+        )
+        return self
+
+
+class CommercialSourceAttemptState(StrictModel):
+    attempt_id: str = Field(min_length=1)
+    request_id: str = Field(min_length=1)
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_path: Path
+    target_shot_id: str = Field(min_length=1)
+    target_shot_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    product_reference_set_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    lifecycle: CommercialSourceLifecycle
+    candidate_asset_id: str | None = Field(default=None, min_length=1)
+    candidate_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    candidate_record_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    review_evidence_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    review_receipt_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    active_approval: CommercialSourceApprovalPointer | None = None
+
+    @model_validator(mode="after")
+    def _validate_lifecycle_fields(self) -> "CommercialSourceAttemptState":
+        has_candidate = all(
+            item is not None
+            for item in (
+                self.candidate_asset_id,
+                self.candidate_sha256,
+                self.candidate_record_hash,
+            )
+        )
+        if any(
+            item is not None
+            for item in (
+                self.candidate_asset_id,
+                self.candidate_sha256,
+                self.candidate_record_hash,
+            )
+        ) != has_candidate:
+            raise ValueError("Commercial source candidate identity must be all-or-none")
+        if self.lifecycle not in {
+            CommercialSourceLifecycle.REQUESTED,
+            CommercialSourceLifecycle.STALE,
+        } and not has_candidate:
+            raise ValueError("Commercial source lifecycle requires candidate identity")
+        if self.lifecycle is CommercialSourceLifecycle.APPROVED:
+            if self.active_approval is None or self.review_receipt_hash is None:
+                raise ValueError("Approved commercial source requires receipt and pointer")
+        elif self.active_approval is not None:
+            raise ValueError("Only approved commercial source lifecycle selects an approval")
+        return self
+
+
 class ProductionManifest(StrictModel):
     schema_version: Literal[
-        "2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"
+        "2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"
     ] = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
@@ -1741,7 +1818,27 @@ class ProductionManifest(StrictModel):
     )
     final_acceptance_state: FinalAcceptanceState | None = None
     active_paid_provider_budget: PaidProviderBudgetSnapshotPointer | None = None; active_p0_qualification_prepared: P0QualificationPreparedReceiptPointer | None = None
+    active_commercial_source_approvals: tuple[CommercialSourceApprovalPointer, ...] = ()
+    commercial_source_attempts: tuple[CommercialSourceAttemptState, ...] = ()
     attempts: tuple[StateCommitAttempt, ...] = ()
+
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_explicit_commercial_source_fields_in_old_versions(
+        cls, value: object
+    ) -> object:
+        if not isinstance(value, Mapping):
+            return value
+        fields = {
+            "active_commercial_source_approvals",
+            "commercial_source_attempts",
+        }
+        if value.get("schema_version", "2.0") != "2.12" and fields.intersection(value):
+            raise ValueError(
+                f"Production Manifest {value.get('schema_version', '2.0')} "
+                "cannot contain commercial source state"
+            )
+        return value
 
     @model_validator(mode="before")
     @classmethod
@@ -1764,7 +1861,7 @@ class ProductionManifest(StrictModel):
             "final_acceptance_state",
         }
         manifest_version = value.get("schema_version", "2.0")
-        if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"} and p6_fields.intersection(value):
+        if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and p6_fields.intersection(value):
             if value.get("active_qa_policy") is None:
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_qa_policy"
@@ -1773,7 +1870,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_dependency_graph"
                 )
-        if manifest_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
+        if manifest_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
             return value
         if p6_fields.intersection(value):
             raise ValueError(
@@ -1798,7 +1895,7 @@ class ProductionManifest(StrictModel):
         if (
             not isinstance(value, Mapping)
             or value.get("schema_version", "2.0")
-            in {"2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+            in {"2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
         ):
             return value
         for attempt in value.get("attempts", ()):
@@ -1822,7 +1919,7 @@ class ProductionManifest(StrictModel):
     ) -> object:
         if not isinstance(value, Mapping):
             return value
-        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
+        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
             return value
         manifest_version = value.get("schema_version", "2.0")
         if {
@@ -1860,6 +1957,16 @@ class ProductionManifest(StrictModel):
         attempt_ids = [item.attempt_id for item in self.attempts]
         if len(attempt_ids) != len(set(attempt_ids)):
             raise ValueError("Production Manifest attempt IDs must be unique")
+        commercial_attempt_ids = [item.attempt_id for item in self.commercial_source_attempts]
+        if len(commercial_attempt_ids) != len(set(commercial_attempt_ids)):
+            raise ValueError("Commercial source attempt IDs must be unique")
+        commercial_shot_ids = [item.target_shot_id for item in self.active_commercial_source_approvals]
+        if len(commercial_shot_ids) != len(set(commercial_shot_ids)):
+            raise ValueError("Active commercial source approvals must be unique per Shot")
+        if self.active_commercial_source_approvals != tuple(
+            sorted(self.active_commercial_source_approvals, key=lambda item: item.target_shot_id)
+        ):
+            raise ValueError("Active commercial source approvals must be ordered by Shot")
         if self.schema_version == "2.0":
             if self.active_render_state is not None or any(
                 item.operation == "render_state" for item in self.attempts
@@ -1871,13 +1978,13 @@ class ProductionManifest(StrictModel):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain voice attempts"
             )
-        if self.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"} and any(
+        if self.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and any(
             item.operation == "image_generation" for item in self.attempts
         ):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain P7 image attempts"
             )
-        if self.schema_version not in {"2.7", "2.8", "2.9", "2.10", "2.11"} and any(
+        if self.schema_version not in {"2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and any(
             item.operation == "video_generation"
             or item.video_generation_state is not None
             for item in self.attempts
@@ -1898,7 +2005,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "running render_state attempt base must match active identity"
                 )
-        if self.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
+        if self.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
             self._validate_manifest_23_graph_lifecycle()
         else:
             for attempt in self.attempts:
@@ -1912,7 +2019,7 @@ class ProductionManifest(StrictModel):
                         "cannot contain P5 graph attempt fields"
                     )
         if self.schema_version == "2.4" or (
-            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"} and has_p6_state(self)
+            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and has_p6_state(self)
         ):
             if self.active_qa_policy is None:
                 raise ValueError(
@@ -1988,13 +2095,13 @@ class ProductionManifest(StrictModel):
         data = handler(self)
         if self.schema_version == "2.0" and self.active_render_state is None: data.pop("active_render_state", None)
         if (
-            self.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+            self.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
             or self.active_dependency_graph is None
         ):
             data.pop("active_dependency_graph", None)
             data.pop("dependency_states", None)
         if self.schema_version != "2.4" and not (
-            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
             and self.active_qa_policy is not None
         ):
             data.pop("active_qa_policy", None)
@@ -2003,9 +2110,12 @@ class ProductionManifest(StrictModel):
             data.pop("active_approved_repair", None)
             data.pop("repair_outcome_receipts", None)
             data.pop("final_acceptance_state", None)
-        if self.schema_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
+        if self.schema_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
             data.pop("active_paid_provider_budget", None)
-        if self.schema_version != "2.11" or self.active_p0_qualification_prepared is None: data.pop("active_p0_qualification_prepared", None)
+        if self.schema_version not in {"2.11", "2.12"} or self.active_p0_qualification_prepared is None: data.pop("active_p0_qualification_prepared", None)
+        if self.schema_version != "2.12":
+            data.pop("active_commercial_source_approvals", None)
+            data.pop("commercial_source_attempts", None)
         return data
 
 
@@ -2232,10 +2342,18 @@ class RenderDependencyEvidence(StrictModel):
     artifact_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
+class CommercialSourceDependencyEvidence(StrictModel):
+    owner: Literal["commercial_source_approval"]
+    pointer: CommercialSourceApprovalPointer
+    artifact_id: str = Field(min_length=1)
+    artifact_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
 DependencyAppliedEvidence = Union[
     ProjectDependencyEvidence,
     RegistryDependencyEvidence,
     RenderDependencyEvidence,
+    CommercialSourceDependencyEvidence,
 ]
 
 

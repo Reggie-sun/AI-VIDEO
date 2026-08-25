@@ -504,6 +504,14 @@ def test_manifest_211_alone_can_select_p0_prepared_pointer():
         }
     )
     assert selected.active_p0_qualification_prepared == pointer
+    current = ProductionManifest.model_validate(
+        {
+            **base.model_dump(mode="python"),
+            "schema_version": "2.12",
+            "active_p0_qualification_prepared": pointer,
+        }
+    )
+    assert current.active_p0_qualification_prepared == pointer
 
 
 def test_p0_prepared_commit_is_reopenable_and_exact_replay_is_zero_write(tmp_path: Path):

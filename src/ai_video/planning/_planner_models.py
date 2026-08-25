@@ -6,7 +6,25 @@ from typing import Literal
 from pydantic import AliasChoices, Field, model_validator
 
 from ai_video.production.hashing import canonical_sha256
-from ai_video.production.models import Character, Scene, Shot, StrictModel
+from ai_video.production.commercial_execution import (
+    CommercialExecutionProjection,
+    CommercialShotClass,
+)
+from ai_video.production.commercial_reference import (
+    ProductReferenceSet,
+    validate_product_reference_set_against_registry,
+)
+from ai_video.production.commercial_source_preparation import (
+    ApprovedCommercialSourceBinding,
+)
+from ai_video.production.models import (
+    AssetRegistrySnapshot,
+    Character,
+    CommercialSourceApprovalPointer,
+    Scene,
+    Shot,
+    StrictModel,
+)
 from ai_video.production.video_requirement import (
     ProviderNeutralGenerationIntentProjection,
     ProviderNeutralVideoRequirement,
@@ -97,6 +115,7 @@ class ReasonCode(str, Enum):
     REVIEW_EVIDENCE_NOT_CURRENT = "review_evidence_not_current"
     REQUEST_NOT_CURRENT = "request_not_current"
     EXISTING_VIDEO_UNSUPPORTED = "existing_video_unsupported"
+    PRODUCT_FIDELITY_APPROVED_FIRST_FRAME = "product_fidelity_approved_first_frame"
 
 
 class PlanWarning(str, Enum):
@@ -243,6 +262,11 @@ class VideoPlanningRequest(StrictModel):
     review_decision: ReviewDecisionProjection | None
     production_policy: ProductionPolicyInput
     generation_intent: ProviderNeutralGenerationIntentProjection | None = None
+    commercial_execution_projection: CommercialExecutionProjection | None = None
+    approved_commercial_source: ApprovedCommercialSourceBinding | None = None
+    product_reference_set: ProductReferenceSet | None = None
+    selected_commercial_registry: AssetRegistrySnapshot | None = None
+    active_commercial_source_approval: CommercialSourceApprovalPointer | None = None
     planning_contract_version: Literal["video-planner/2", "video-planner/3"]
     request_content_hash: str = Field(pattern=_SHA256)
 
@@ -253,10 +277,69 @@ class VideoPlanningRequest(StrictModel):
                 raise ValueError("video-planner/3 requires typed generation intent")
         elif self.generation_intent is not None:
             raise ValueError("video-planner/2 cannot carry generation intent")
+        commercial = (
+            self.commercial_execution_projection,
+            self.approved_commercial_source,
+            self.product_reference_set,
+            self.selected_commercial_registry,
+            self.active_commercial_source_approval,
+        )
+        if not any(item is not None for item in commercial):
+            return self
+        if any(item is None for item in commercial):
+            raise ValueError("Commercial Planner input must provide one complete exact handoff")
+        if self.planning_contract_version != "video-planner/3":
+            raise ValueError("Commercial Planner input requires video-planner/3")
+        projection = self.commercial_execution_projection
+        approval = self.approved_commercial_source
+        references = self.product_reference_set
+        registry = self.selected_commercial_registry
+        active_approval = self.active_commercial_source_approval
+        assert (
+            projection is not None
+            and approval is not None
+            and references is not None
+            and registry is not None
+            and active_approval is not None
+        )
+        validate_product_reference_set_against_registry(
+            references,
+            registry,
+            require_registry_identity=False,
+        )
+        if (
+            projection.primary_class is not CommercialShotClass.PRODUCT_INTERACTION
+            or projection.target_shot_id != self.target_shot.shot_id
+            or projection.product_id != references.product_id
+            or approval.ad_creative_plan_hash != projection.ad_creative_plan_hash
+            or approval.execution_projection_hash != projection.projection_hash
+            or approval.target_shot_id != self.target_shot.shot_id
+            or approval.target_shot_content_hash != self.target_shot.content_hash
+            or approval.product_reference_set_id != references.artifact_id
+            or approval.product_reference_set_hash != references.content_hash
+            or approval.product_source_asset_hashes
+            != tuple(sorted(item.asset_sha256 for item in references.assets))
+            or approval.character_reference_ids
+            != tuple(sorted(item.artifact_id for item in self.character_context))
+            or approval.scene_reference_ids != (self.scene_context.artifact_id,)
+            or active_approval.approval_id != approval.approval_id
+            or active_approval.target_shot_id != approval.target_shot_id
+            or active_approval.content_hash != approval.content_hash
+        ):
+            raise ValueError("Commercial Planner input lineage is not exact")
         return self
 
     def model_dump(self, *args: object, **kwargs: object) -> dict[str, object]:
         payload = super().model_dump(*args, **kwargs)
+        for field in (
+            "commercial_execution_projection",
+            "approved_commercial_source",
+            "product_reference_set",
+            "selected_commercial_registry",
+            "active_commercial_source_approval",
+        ):
+            if payload.get(field) is None:
+                payload.pop(field, None)
         if self.planning_contract_version == "video-planner/2":
             payload.pop("generation_intent", None)
             for asset in payload.get("available_assets", ()):

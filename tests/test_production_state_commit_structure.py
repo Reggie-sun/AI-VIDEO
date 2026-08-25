@@ -208,6 +208,8 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
     ) == (
         "_StateCommitBootstrapMixin",
         "_StateCommitP0QualificationMixin",
+        "_StateCommitCommercialSourceMixin",
+        "_StateCommitCommercialSourceRecoveryMixin",
         "_StateCommitVideoMixin",
         "_StateCommitVideoCandidateMixin",
         "_StateCommitVideoActivationMixin",

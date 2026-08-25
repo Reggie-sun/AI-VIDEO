@@ -107,6 +107,43 @@ def canonical_review_receipt_path(content_hash: str) -> Path:
     )
 
 
+def canonical_commercial_source_request_path(content_hash: str) -> Path:
+    return Path(
+        f"state/commercial-source/request.{_require_sha256(content_hash, 'commercial source request hash')}.json"
+    )
+
+
+def canonical_commercial_source_candidate_path(content_hash: str) -> Path:
+    return Path(
+        f"state/commercial-source/candidate.{_require_sha256(content_hash, 'commercial source candidate hash')}.json"
+    )
+
+
+def canonical_commercial_source_evidence_path(content_hash: str) -> Path:
+    return Path(
+        f"state/commercial-source/evidence.{_require_sha256(content_hash, 'commercial source evidence hash')}.json"
+    )
+
+
+def canonical_commercial_source_review_path(content_hash: str) -> Path:
+    return Path(
+        f"state/commercial-source/review.{_require_sha256(content_hash, 'commercial source review hash')}.json"
+    )
+
+
+def canonical_commercial_source_approval_path(content_hash: str) -> Path:
+    return Path(
+        f"state/commercial-source/approval.{_require_sha256(content_hash, 'commercial source approval hash')}.json"
+    )
+
+
+def canonical_commercial_image_import_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/commercial-source/import-receipts/"
+        f"{_require_sha256(content_hash, 'commercial image import receipt hash')}.json"
+    )
+
+
 def canonical_repair_request_path(content_hash: str) -> Path:
     return Path(
         f"state/repairs/request.{_require_sha256(content_hash, 'repair request hash')}.json"

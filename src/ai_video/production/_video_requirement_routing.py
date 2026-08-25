@@ -224,6 +224,27 @@ def validate_requirement_asset_lineage(
         )
 
 
+def commercial_requirement_context_is_current(
+    requirement: ProviderNeutralVideoRequirement,
+    context: Any,
+) -> bool:
+    if requirement.contract_version != "provider-neutral-video-requirement/3":
+        return not requirement.capability_need.needs_product_fidelity
+    approval = requirement.approved_commercial_source
+    keyframe = context.shot_keyframe
+    return bool(
+        approval is not None
+        and requirement.capability_need.needs_product_fidelity
+        and requirement.generation_mode is GenerationMode.IMAGE_TO_VIDEO
+        and keyframe is not None
+        and keyframe.role == "first_frame"
+        and keyframe.asset_id == approval.keyframe_asset_id
+        and keyframe.asset_sha256 == approval.keyframe_sha256
+        and keyframe.source_registry_revision_id
+        == context.selected_registry_revision_id
+    )
+
+
 def validate_provider_bound_projection(bound: Any) -> None:
     if len(bound.binding_roles) != len(bound.input_assets):
         raise ValueError("provider-bound roles and assets must have equal length")

@@ -405,7 +405,7 @@ def _capability_fingerprint(capability: VideoCapabilityVariant) -> str:
 def _compile_neutral_prompt(requirement: ProviderNeutralVideoRequirement) -> str:
     intent = requirement.generation_intent
     scene = intent.scene_continuity
-    fields = (
+    fields: tuple[tuple[str, str], ...] = (
         ("generation_mode", requirement.generation_mode.value),
         ("continuity_mode", requirement.continuity_mode.value),
         ("motion_requirement", requirement.motion_requirement.value),
@@ -474,6 +474,35 @@ def _compile_neutral_prompt(requirement: ProviderNeutralVideoRequirement) -> str
         ),
         ("quality_objective", requirement.quality_need.objective_tier),
     )
+    fidelity = requirement.product_fidelity_requirement
+    approval = requirement.approved_commercial_source
+    if fidelity is not None and approval is not None:
+        fields = (
+            *fields,
+            ("commercial_execution_class", requirement.commercial_execution_class or "unspecified"),
+            ("product_id", fidelity.product_id),
+            ("product_sku_id", fidelity.sku_id),
+            ("product_reference_set_id", fidelity.product_reference_set_id),
+            ("product_reference_set_hash", fidelity.product_reference_set_hash),
+            (
+                "product_source_asset_hashes",
+                _tuple_value(fidelity.product_source_asset_hashes),
+            ),
+            ("product_source_strategy", fidelity.strategy.value),
+            ("product_packaging_form", fidelity.packaging_form),
+            ("product_bottle_silhouette", fidelity.bottle_silhouette),
+            ("product_dominant_color", fidelity.dominant_color),
+            ("product_cap_color", fidelity.cap_color),
+            ("product_logo_label_identity", fidelity.logo_label_identity),
+            (
+                "product_protected_text_zones",
+                _tuple_value(fidelity.protected_text_zones),
+            ),
+            ("commercial_source_approval_id", approval.approval_id),
+            ("commercial_source_approval_hash", approval.approval_content_hash),
+            ("approved_first_frame_asset_id", approval.keyframe_asset_id),
+            ("approved_first_frame_sha256", approval.keyframe_sha256),
+        )
     return unicodedata.normalize(
         "NFC",
         "; ".join(f"{name}={value}" for name, value in fields),

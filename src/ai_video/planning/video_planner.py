@@ -12,6 +12,7 @@ from ai_video.planning._asset_readiness import (
 from ai_video.planning._current_plan_projection import (
     verify_current_generation_requirement_projection,
 )
+from ai_video.planning._commercial_video_planning import commercial_requirement_values
 from ai_video.planning._planner_models import (
     AssetRole,
     CapabilityRequirements,
@@ -216,6 +217,22 @@ def _dynamic_decision(
     reasons: list[ReasonCode],
     warnings: list[PlanWarning],
 ) -> tuple[GenerationMode, PlanOutcome, tuple[RequiredAssetRole, ...]]:
+    if request.commercial_execution_projection is not None:
+        required = (
+            RequiredAssetRole(
+                role=AssetRole.APPROVED_KEYFRAME,
+                reason_code=ReasonCode.PRODUCT_FIDELITY_APPROVED_FIRST_FRAME,
+            ),
+        )
+        if _available_role(request, AssetRole.APPROVED_KEYFRAME):
+            _append_unique(
+                reasons,
+                ReasonCode.PRODUCT_FIDELITY_APPROVED_FIRST_FRAME,
+            )
+            return GenerationMode.IMAGE_TO_VIDEO, PlanOutcome.PROPOSED, required
+        _append_unique(reasons, ReasonCode.MISSING_REFERENCES)
+        _append_unique(warnings, PlanWarning.REQUIRES_HUMAN_REVIEW)
+        return GenerationMode.IMAGE_TO_VIDEO, PlanOutcome.BLOCKED, required
     if request.target_shot.visual_strategy is VisualStrategy.EXISTING_VIDEO:
         _append_unique(reasons, ReasonCode.EXISTING_VIDEO_UNSUPPORTED)
         _append_unique(warnings, PlanWarning.REQUIRES_HUMAN_REVIEW)
@@ -483,6 +500,7 @@ def _build_generation_requirement(
         if review is not None
         else None
     )
+    commercial_values = commercial_requirement_values(request)
     return ProviderNeutralVideoRequirement.create(
         source_request_content_hash=request.request_content_hash,
         intent_evidence_hash=canonical_sha256(
@@ -516,6 +534,9 @@ def _build_generation_requirement(
             ),
             needs_native_audio=projection.audio_need.value == "required",
             needs_continuity_state=continuity is not ContinuityMode.NONE,
+            needs_product_fidelity=(
+                request.commercial_execution_projection is not None
+            ),
             max_reference_count=(
                 sum(
                     item.role
@@ -538,6 +559,7 @@ def _build_generation_requirement(
         output_need=projection.output_need,
         audio_need=projection.audio_need,
         quality_need=projection.quality_need,
+        **commercial_values,
     )
 
 
@@ -598,9 +620,12 @@ class VideoPlanner:
         camera_only = not request.target_shot.motion_directives or _camera_only_directives(
             request
         )
-        static_lane = request.target_shot.visual_strategy is VisualStrategy.STATIC_IMAGE or (
-            request.target_shot.visual_strategy is VisualStrategy.IMAGE_MOTION
-            and camera_only
+        static_lane = request.commercial_execution_projection is None and (
+            request.target_shot.visual_strategy is VisualStrategy.STATIC_IMAGE
+            or (
+                request.target_shot.visual_strategy is VisualStrategy.IMAGE_MOTION
+                and camera_only
+            )
         )
         if static_lane:
             mode, outcome, required = _static_lane_decision(

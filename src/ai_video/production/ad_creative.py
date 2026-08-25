@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
@@ -18,6 +20,10 @@ from ai_video.production.commercial_graphics import (
     GraphicLayerAnimation,
     GraphicRole,
 )
+from ai_video.production.commercial_execution import project_commercial_executions
+from ai_video.production.commercial_source_preparation import (
+    ApprovedCommercialSourceBinding,
+)
 from ai_video.production.hashing import seal_artifact, verify_artifact_hash
 from ai_video.production.models import CompositionSpec, SourceReference
 
@@ -30,6 +36,14 @@ def _invalid(message: str) -> AiVideoError:
     )
 
 
+def _preflight_blocked(message: str) -> AiVideoError:
+    return AiVideoError(
+        ErrorCode.PLANNING_PREFLIGHT_BLOCKED,
+        message,
+        retryable=False,
+    )
+
+
 def create_ad_creative_plan(
     proposal: AdCreativePlanProposal,
     *,
@@ -37,6 +51,7 @@ def create_ad_creative_plan(
     revision: int,
     creation_receipt_id: str,
     source_provenance: tuple[SourceReference, ...],
+    schema_version: Literal["ad-creative-plan/1", "ad-creative-plan/2"] = "ad-creative-plan/2",
 ) -> AdCreativePlan:
     try:
         proposal = AdCreativePlanProposal.model_validate(
@@ -44,6 +59,7 @@ def create_ad_creative_plan(
         )
         provisional = AdCreativePlan(
             **proposal.model_dump(mode="python"),
+            schema_version=schema_version,
             artifact_id=artifact_id,
             revision=revision,
             content_hash="0" * 64,
@@ -105,14 +121,15 @@ def compile_ad_creative_plan(
                 CapabilityClassification.REQUIRES_SOURCE_GENERATION_STRATEGY
             ):
                 raise _invalid("In-scene product source strategy is unresolved.")
-            if not any(
-                layer.shot_id == presentation.shot_id
-                and layer.asset_id == presentation.asset_id
-                for layer in base_composition.layers
-            ):
-                raise _invalid(
-                    "In-scene product source evidence does not match a Shot source asset."
-                )
+            if plan.schema_version == "ad-creative-plan/1":
+                if not any(
+                    layer.shot_id == presentation.shot_id
+                    and layer.asset_id == presentation.asset_id
+                    for layer in base_composition.layers
+                ):
+                    raise _invalid(
+                        "In-scene product source evidence does not match a Shot source asset."
+                    )
             continue
         if presentation.capability_classification is not (
             CapabilityClassification.SUPPORTED_CURRENTLY
@@ -212,8 +229,59 @@ def compile_ad_creative_plan(
 def compile_ad_creative_handoff(
     plan: AdCreativePlan,
     base_composition: CompositionSpec,
+    *,
+    approved_commercial_sources: tuple[ApprovedCommercialSourceBinding, ...] = (),
 ) -> CompiledAdCreativeHandoff:
     composition = compile_ad_creative_plan(plan, base_composition)
+    projections = (
+        project_commercial_executions(plan)
+        if plan.schema_version == "ad-creative-plan/2"
+        else ()
+    )
+    approvals = tuple(
+        sorted(
+            (
+                ApprovedCommercialSourceBinding.model_validate(
+                    item.model_dump(mode="python")
+                )
+                for item in approved_commercial_sources
+            ),
+            key=lambda item: item.target_shot_id,
+        )
+    )
+    if any(
+        len(values) != len(set(values))
+        for values in (
+            tuple(item.approval_id for item in approvals),
+            tuple(item.content_hash for item in approvals),
+            tuple(item.execution_projection_hash for item in approvals),
+            tuple(item.target_shot_id for item in approvals),
+        )
+    ):
+        raise _preflight_blocked(
+            "Commercial source approvals must be unique per identity, projection, and Shot."
+        )
+    interaction_by_hash = {
+        item.projection_hash: item
+        for item in projections
+        if item.primary_class.value == "product_interaction"
+    }
+    approval_by_projection = {
+        item.execution_projection_hash: item for item in approvals
+    }
+    if set(interaction_by_hash) != set(approval_by_projection):
+        raise _preflight_blocked(
+            "Current product-interaction handoff requires one exact approved commercial source per Shot."
+        )
+    if any(
+        approval.ad_creative_plan_hash != plan.content_hash
+        or approval.target_shot_id
+        != interaction_by_hash[projection_hash].target_shot_id
+        for projection_hash, approval in approval_by_projection.items()
+    ):
+        raise _preflight_blocked(
+            "Commercial source approval does not bind the exact current AdCreativePlan projection."
+        )
     shot_proposals: list[AdShotProposal] = []
     for shot_id in composition.shot_ids:
         beat_ids = tuple(
@@ -272,4 +340,6 @@ def compile_ad_creative_handoff(
             ),
         ),
         composition_spec=composition,
+        commercial_execution_projections=projections,
+        approved_commercial_sources=approvals,
     )

@@ -4,6 +4,9 @@ from ai_video.production.models import (
     AudioKind,
     AssetRecord,
     AssetRegistrySnapshot,
+    CommercialSourceApprovalPointer,
+    CommercialSourceAttemptState,
+    CommercialSourceLifecycle,
     Character,
     CaptionAssetMetadata,
     CaptionTrack,
@@ -43,6 +46,7 @@ from ai_video.production.models import (
     StateCommitStatus,
     Story,
     Storyboard,
+    QaVerdict,
     VisualStrategy,
 )
 from ai_video.production.ad_creative_types import (
@@ -62,10 +66,21 @@ from ai_video.production.ad_creative_types import (
     ProductPresentationMode,
     ProductPresentationRole,
     ProductPresentation,
+    ProductReferenceRequirement,
     ProductTransformIntent,
     ProtagonistContinuityMode,
     ProtagonistContinuityPolicy,
     SourceGenerationEvidencePointer,
+)
+from ai_video.production.commercial_execution import (
+    CommercialExecutionDisposition,
+    CommercialExecutionProjection,
+    CommercialShotClass,
+    project_commercial_executions,
+)
+from ai_video.production.commercial_dependency import (
+    extend_commercial_source_dependency_graph,
+    validate_commercial_source_dependency_graph,
 )
 from ai_video.production.ad_creative import (
     compile_ad_creative_handoff,
@@ -77,6 +92,30 @@ from ai_video.production.ad_creative_review import (
     AdCreativeReviewFinding,
     AdCreativeReviewReport,
     review_ad_creative_plan,
+)
+from ai_video.production.commercial_reference import (
+    ProductReferenceAssetBinding,
+    ProductReferenceSet,
+    validate_product_reference_set_against_registry,
+)
+from ai_video.production.commercial_source_preparation import (
+    ApprovedCommercialSourceBinding,
+    CommercialCreativeReference,
+    CommercialSourceAcquisitionKind,
+    CommercialSourceCandidate,
+    CommercialSourcePreparationCoordinator,
+    CommercialSourcePreparationRequest,
+)
+from ai_video.production.commercial_visual_review import (
+    CommercialFailureClassification,
+    CommercialFailureType,
+    CommercialMatchStatus,
+    CommercialSourceReviewReceipt,
+    CommercialVisualDimension,
+    CommercialVisualEvidence,
+    CommercialVisualMeasurement,
+    adjudicate_commercial_visual_evidence,
+    classify_commercial_failure,
 )
 from ai_video.production.commercial_graphics import (
     GraphicKeywordEmphasis,
@@ -163,6 +202,12 @@ from ai_video.production.comfy_t8_native_turbo_video import (
     ComfyUIT8NativeTurboVideoProvider,
 )
 from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
+from ai_video.production.video_requirement import (
+    ApprovedCommercialSourceLink,
+    ProductFidelityRequirement,
+    ProductFidelityStrategy,
+    QualityNeed,
+)
 from ai_video.production.local_h3_provider_family import LocalH3VideoProviderFamily
 from ai_video.production.local_video import (
     LocalVideoFetchReceipt,
@@ -174,13 +219,19 @@ from ai_video.production.local_video import (
 )
 from ai_video.production.image_import import (
     AutomatedBrowserImageImportReceipt,
+    CommercialImageImportReceipt,
     HumanImageImportReceipt,
     automated_browser_image_import_asset,
+    commercial_image_import_asset,
     human_image_import_asset,
     prepare_automated_browser_image_import_commit,
     prepare_human_image_import_commit,
     validate_automated_browser_image_import,
+    validate_commercial_image_import,
     validate_human_image_import,
+)
+from ai_video.production.commercial_image_import import (
+    prepare_commercial_image_import_commit,
 )
 from ai_video.production.seedance_asset import (
     SeedanceAssetMaterializationReceipt,
@@ -280,12 +331,37 @@ __all__ = [
     "CaptionAssetMetadata",
     "CaptionTrack",
     "CapabilityClassification",
+    "CommercialExecutionDisposition",
+    "CommercialExecutionProjection",
+    "CommercialCreativeReference",
+    "CommercialFailureClassification",
+    "CommercialFailureType",
+    "CommercialMatchStatus",
+    "CommercialShotClass",
+    "CommercialSourceAcquisitionKind",
+    "CommercialSourceApprovalPointer",
+    "CommercialSourceAttemptState",
+    "CommercialSourceCandidate",
+    "CommercialSourceLifecycle",
+    "CommercialSourcePreparationCoordinator",
+    "CommercialSourcePreparationRequest",
+    "CommercialSourceReviewReceipt",
+    "CommercialVisualDimension",
+    "CommercialVisualEvidence",
+    "CommercialVisualMeasurement",
     "CompiledAdCreativeHandoff",
     "ContinuityMode",
     "CompositionSpec",
     "compile_ad_creative_plan",
     "compile_ad_creative_handoff",
     "create_ad_creative_plan",
+    "ApprovedCommercialSourceBinding",
+    "ApprovedCommercialSourceLink",
+    "project_commercial_executions",
+    "extend_commercial_source_dependency_graph",
+    "validate_commercial_source_dependency_graph",
+    "adjudicate_commercial_visual_evidence",
+    "classify_commercial_failure",
     "GraphicKeywordEmphasis",
     "GraphicTreatment",
     "GraphicLayerAnimation",
@@ -353,6 +429,7 @@ __all__ = [
     "MotionCoverage",
     "HumanImageImportReceipt",
     "AutomatedBrowserImageImportReceipt",
+    "CommercialImageImportReceipt",
     "BoundaryKind",
     "CandidateStackBinding",
     "ContinuityAnchorBinding",
@@ -373,6 +450,15 @@ __all__ = [
     "ProductPresentationMode",
     "ProductPresentationRole",
     "ProductTransformIntent",
+    "ProductFidelityRequirement",
+    "ProductFidelityStrategy",
+    "ProductReferenceAssetBinding",
+    "ProductReferenceRequirement",
+    "ProductReferenceSet",
+    "QualityNeed",
+    "validate_product_reference_set_against_registry",
+    "commercial_image_import_asset",
+    "validate_commercial_image_import",
     "ProtagonistContinuityMode",
     "ProtagonistContinuityPolicy",
     "SourceGenerationEvidencePointer",
@@ -455,6 +541,7 @@ __all__ = [
     "human_image_import_asset",
     "automated_browser_image_import_asset",
     "prepare_automated_browser_image_import_commit",
+    "prepare_commercial_image_import_commit",
     "prepare_human_image_import_commit",
     "validate_automated_browser_image_import",
     "validate_human_image_import",

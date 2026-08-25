@@ -66,6 +66,34 @@ def _is_shot_bound_final_visual(
         request.target_shot.content_hash,
     ):
         return False
+    approval = request.approved_commercial_source
+    registry = request.selected_commercial_registry
+    if asset.role is AssetRole.APPROVED_KEYFRAME and approval is not None:
+        registered = (
+            next(
+                (
+                    item
+                    for item in registry.assets
+                    if item.asset_id == approval.keyframe_asset_id
+                ),
+                None,
+            )
+            if registry is not None
+            else None
+        )
+        return bool(
+            approval.target_shot_id == request.target_shot.shot_id
+            and approval.target_shot_content_hash == request.target_shot.content_hash
+            and asset.asset_id == approval.keyframe_asset_id
+            and asset.asset_sha256 == approval.keyframe_sha256
+            and registered is not None
+            and registered.asset_id == asset.asset_id
+            and registered.sha256 == asset.asset_sha256
+            and registered.mime_type == asset.mime_type
+            and registered.width == asset.width
+            and registered.height == asset.height
+            and registered.size_bytes == asset.size_bytes
+        )
     if not _has_exact_image_binding(request, asset.asset_id):
         return False
     if asset.role is AssetRole.APPROVED_KEYFRAME:

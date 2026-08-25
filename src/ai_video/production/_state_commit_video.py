@@ -241,7 +241,7 @@ class _StateCommitVideoMixin:
         )
         with self._exclusive_lock():
             manifest = self._read_manifest()
-            if manifest.schema_version not in {"2.7", "2.8", "2.9", "2.10", "2.11"}:
+            if manifest.schema_version not in {"2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
                 raise _state_invalid(
                     "Video generation requires Production Manifest 2.7 or later."
                 )
@@ -253,7 +253,7 @@ class _StateCommitVideoMixin:
                     or request.hard_cut_keyframe_binding is not None
                 )
                 and request.continuity_binding is not None
-                and manifest.schema_version not in {"2.10", "2.11"}
+                and manifest.schema_version not in {"2.10", "2.11", "2.12"}
             ):
                 raise _state_invalid(
                     "Evaluated Shot continuity requires Production Manifest 2.10 or later."
@@ -265,7 +265,7 @@ class _StateCommitVideoMixin:
                     or request.hard_cut_keyframe_binding is not None
                 )
                 and request.continuity_binding is None
-                and manifest.schema_version not in {"2.8", "2.9", "2.10", "2.11"}
+                and manifest.schema_version not in {"2.8", "2.9", "2.10", "2.11", "2.12"}
             ):
                 raise _state_invalid("Shot continuity artifacts require Manifest 2.8 or later.")
             if request.hard_cut_keyframe_binding is not None:

@@ -17,6 +17,7 @@ from production_project_factory import make_composition_spec
 
 def _make_plan(**changes: object) -> production.AdCreativePlan:
     plan = production.AdCreativePlan(
+        schema_version="ad-creative-plan/1",
         artifact_id="ad-plan-qingyan",
         revision=1,
         content_hash="0" * 64,
@@ -405,6 +406,16 @@ def test_typed_authoring_proposal_compiles_shot_and_composition_handoff() -> Non
         _make_base_composition(),
     )
 
+    assert rebuilt.schema_version == "ad-creative-plan/2"
+    expected_payload = plan.model_copy(
+        update={
+            "schema_version": "ad-creative-plan/2",
+            "artifact_id": "ad-plan-from-authoring",
+            "creation_receipt_id": "accept-authoring-proposal",
+            "content_hash": rebuilt.content_hash,
+        }
+    )
+    assert rebuilt.model_dump(mode="json") == expected_payload.model_dump(mode="json")
     assert handoff.plan_id == rebuilt.artifact_id
     assert handoff.plan_content_hash == rebuilt.content_hash
     assert tuple(item.shot_id for item in handoff.shot_proposals) == (
@@ -417,6 +428,44 @@ def test_typed_authoring_proposal_compiles_shot_and_composition_handoff() -> Non
         "layer-product-packshot",
     )
     assert handoff.composition_spec.ad_creative_plan_hash == rebuilt.content_hash
+
+
+def test_typed_authoring_proposal_can_explicitly_reopen_legacy_plan_exactly() -> None:
+    plan = _make_plan()
+    proposal = production.AdCreativePlanProposal.model_validate(
+        {
+            key: value
+            for key, value in plan.model_dump(mode="python").items()
+            if key
+            not in {
+                "schema_version",
+                "artifact_id",
+                "revision",
+                "content_hash",
+                "creation_receipt_id",
+                "source_provenance",
+            }
+        }
+    )
+
+    rebuilt = production.create_ad_creative_plan(
+        proposal,
+        artifact_id="ad-plan-from-authoring",
+        revision=1,
+        creation_receipt_id="accept-authoring-proposal",
+        source_provenance=plan.source_provenance,
+        schema_version="ad-creative-plan/1",
+    )
+
+    assert rebuilt.schema_version == "ad-creative-plan/1"
+    expected_payload = plan.model_copy(
+        update={
+            "artifact_id": "ad-plan-from-authoring",
+            "creation_receipt_id": "accept-authoring-proposal",
+            "content_hash": rebuilt.content_hash,
+        }
+    )
+    assert rebuilt.model_dump(mode="json") == expected_payload.model_dump(mode="json")
 
 
 def test_shot_handoff_preserves_ordered_union_of_explicit_and_synchronized_sounds() -> None:

@@ -10,6 +10,9 @@ from pydantic import ConfigDict, Field, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.commercial_reference import (
+    ProductReferenceSet,
+)
 from ai_video.production.image import ImageReferenceBinding, _measure_png
 from ai_video.production.models import (
     ActorIdentity,
@@ -53,7 +56,6 @@ def _invalid(message: str, detail: str | None = None) -> AiVideoError:
         detail,
         retryable=False,
     )
-
 
 class HumanImageImportReceipt(StrictModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
@@ -222,6 +224,189 @@ class AutomatedBrowserImageImportReceipt(StrictModel):
 
 
 ImageImportReceipt = HumanImageImportReceipt | AutomatedBrowserImageImportReceipt
+
+
+COMMERCIAL_IMAGE_IMPORT_TOOL = ToolIdentity(
+    name="commercial-image-import",
+    version="1",
+)
+
+
+class CommercialImageImportReceipt(StrictModel):
+    """Truthful local import evidence without mutating Character/Scene/Shot truth."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
+
+    schema_version: Literal["commercial-image-import/1"] = "commercial-image-import/1"
+    source_kind: Literal["human_observed_import", "browser_observed_import"]
+    original_filename: str = Field(min_length=1)
+    output_asset_id: str = Field(min_length=1)
+    output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    output_size_bytes: int = Field(strict=True, gt=0)
+    output_width: int = Field(strict=True, gt=0)
+    output_height: int = Field(strict=True, gt=0)
+    imported_at: str = Field(min_length=1)
+    prompt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    target_kind: Literal[
+        "product_reference", "commercial_interaction_keyframe"
+    ]
+    target_id: str = Field(min_length=1)
+    product_reference_set: ProductReferenceSet
+    product_reference_set_id: str = Field(min_length=1)
+    product_reference_set_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    product_reference_asset_hashes: tuple[str, ...] = Field(min_length=1)
+    target_shot_id: str | None = Field(default=None, min_length=1)
+    target_shot_content_hash: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    character_reference_ids: tuple[str, ...] = ()
+    scene_reference_ids: tuple[str, ...] = ()
+    observed_by: ActorIdentity
+    provenance_note: str = Field(min_length=1)
+    usage_license: str = Field(min_length=1)
+    provider_request_id: None = None
+    durable_submit_intent_present: Literal[False] = False
+    remote_effect_claimed: Literal[False] = False
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_truthful_commercial_import(self) -> "CommercialImageImportReceipt":
+        if Path(self.original_filename).name != self.original_filename:
+            raise ValueError("Commercial image import filename must be a basename")
+        if Path(self.original_filename).suffix.lower() != ".png":
+            raise ValueError("Commercial image import requires PNG bytes")
+        try:
+            imported_at = datetime.fromisoformat(self.imported_at)
+        except ValueError as exc:
+            raise ValueError("Commercial image import timestamp must be RFC 3339") from exc
+        if imported_at.tzinfo is None:
+            raise ValueError("Commercial image import timestamp requires an offset")
+        if self.observed_by.actor_kind not in {"human", "automation"}:
+            raise ValueError("Commercial image import requires a truthful observer")
+        if self.product_reference_asset_hashes != tuple(
+            sorted(set(self.product_reference_asset_hashes))
+        ) or any(
+            len(item) != 64
+            or any(character not in "0123456789abcdef" for character in item)
+            for item in self.product_reference_asset_hashes
+        ):
+            raise ValueError("Product reference hashes must be unique ordered SHA-256 values")
+        if (
+            self.product_reference_set_id != self.product_reference_set.artifact_id
+            or self.product_reference_set_hash
+            != self.product_reference_set.content_hash
+            or self.product_reference_asset_hashes
+            != tuple(
+                sorted(
+                    item.asset_sha256 for item in self.product_reference_set.assets
+                )
+            )
+        ):
+            raise ValueError("Commercial import ProductReferenceSet is not exact")
+        if self.character_reference_ids != tuple(
+            sorted(set(self.character_reference_ids))
+        ) or self.scene_reference_ids != tuple(sorted(set(self.scene_reference_ids))):
+            raise ValueError("Commercial Character/Scene reference IDs must be unique and ordered")
+        interaction = self.target_kind == "commercial_interaction_keyframe"
+        has_shot = self.target_shot_id is not None and self.target_shot_content_hash is not None
+        if interaction != has_shot:
+            raise ValueError("Commercial interaction import requires exact target Shot identity")
+        if interaction and (not self.character_reference_ids or not self.scene_reference_ids):
+            raise ValueError("Commercial interaction import requires Character and Scene identities")
+        if not interaction and (
+            self.character_reference_ids or self.scene_reference_ids
+        ):
+            raise ValueError("Product reference import cannot borrow Character or Scene identity")
+        expected = canonical_sha256(
+            self.model_dump(mode="json", exclude={"content_hash"})
+        )
+        if self.content_hash != expected:
+            raise ValueError("Commercial image import receipt content_hash does not match")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "CommercialImageImportReceipt":
+        data = dict(values)
+        data.setdefault("schema_version", "commercial-image-import/1")
+        data.setdefault("provider_request_id", None)
+        data.setdefault("durable_submit_intent_present", False)
+        data.setdefault("remote_effect_claimed", False)
+        reference_set = data.get("product_reference_set")
+        if isinstance(reference_set, dict):
+            reference_set = ProductReferenceSet.model_validate(reference_set)
+            data["product_reference_set"] = reference_set
+        if isinstance(reference_set, ProductReferenceSet):
+            data.setdefault("product_reference_set_id", reference_set.artifact_id)
+            data.setdefault("product_reference_set_hash", reference_set.content_hash)
+            data.setdefault(
+                "product_reference_asset_hashes",
+                tuple(item.asset_sha256 for item in reference_set.assets),
+            )
+        for field in (
+            "product_reference_asset_hashes",
+            "character_reference_ids",
+            "scene_reference_ids",
+        ):
+            if field in data:
+                data[field] = tuple(sorted(set(data[field])))  # type: ignore[arg-type]
+        data.pop("content_hash", None)
+        provisional = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            provisional.model_dump(mode="json", exclude={"content_hash"})
+        )
+        return cls.model_validate(data)
+
+
+def validate_commercial_image_import(
+    receipt: CommercialImageImportReceipt,
+    image_bytes: bytes,
+) -> None:
+    try:
+        checked = CommercialImageImportReceipt.model_validate(
+            receipt.model_dump(mode="python")
+        )
+        measured = _measure_png(image_bytes)
+    except (AttributeError, ValueError, AiVideoError) as exc:
+        detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
+        raise _invalid("Commercial image import receipt or PNG is invalid.", detail) from exc
+    if checked != receipt or (
+        measured.sha256 != checked.output_sha256
+        or measured.size_bytes != checked.output_size_bytes
+        or measured.width != checked.output_width
+        or measured.height != checked.output_height
+    ):
+        raise _invalid("Commercial image import PNG does not match its receipt.")
+
+
+def commercial_image_import_asset(
+    receipt: CommercialImageImportReceipt,
+) -> AssetRecord:
+    checked = CommercialImageImportReceipt.model_validate(
+        receipt.model_dump(mode="python")
+    )
+    input_ids = (
+        *(item.asset_id for item in checked.product_reference_set.assets),
+        *checked.character_reference_ids,
+        *checked.scene_reference_ids,
+        *((checked.target_shot_id,) if checked.target_shot_id is not None else ()),
+    )
+    return AssetRecord(
+        asset_id=checked.output_asset_id,
+        asset_type=AssetType.IMAGE,
+        artifact_path=canonical_image_asset_path(checked.output_sha256),
+        sha256=checked.output_sha256,
+        size_bytes=checked.output_size_bytes,
+        mime_type="image/png",
+        width=checked.output_width,
+        height=checked.output_height,
+        source_kind=AssetSourceKind.IMPORTED,
+        tool=COMMERCIAL_IMAGE_IMPORT_TOOL,
+        input_artifact_ids=input_ids,
+        input_fingerprint=checked.prompt_fingerprint,
+        creation_receipt_id=checked.content_hash,
+        usage_license=checked.usage_license,
+        egress=EgressMetadata(remote=False),
+    )
 
 
 def validate_human_image_import(

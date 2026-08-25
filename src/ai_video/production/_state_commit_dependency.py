@@ -12,7 +12,13 @@ from ai_video.production.dependency import (
     resolve_dependency_state,
 )
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production._commercial_project_reader import (
+    verify_active_commercial_source_approvals,
+)
 from ai_video.production.models import (
+    CommercialSourceApprovalPointer,
+    CommercialSourceAttemptState,
+    CommercialSourceDependencyEvidence,
     DependencyAppliedEvidence,
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
@@ -38,6 +44,7 @@ from ai_video.production.project import (
     _verify_dependency_project_evidence,
     _verify_dependency_registry_evidence,
     _verify_manifest_dependency_states,
+    load_qa_policy,
     load_production_project_candidate,
 )
 
@@ -282,6 +289,11 @@ class _StateCommitDependencyMixin:
         registry_pointer: RegistrySnapshotPointer | None = None,
         render_pointer: RenderStateSnapshotPointer | None = None,
         attempts: tuple[StateCommitAttempt, ...] | None = None,
+        commercial_source_attempts: tuple[CommercialSourceAttemptState, ...] | None = None,
+        active_commercial_source_approvals: tuple[
+            CommercialSourceApprovalPointer, ...
+        ]
+        | None = None,
     ) -> None:
         project_pointer = project_pointer or manifest.active_project
         registry_pointer = registry_pointer or manifest.active_registry
@@ -292,13 +304,13 @@ class _StateCommitDependencyMixin:
                 project_pointer.path,
                 registry_pointer.path,
             )
-            candidate_manifest = ProductionManifest.model_validate(
+            candidate_manifest = _validated_transition(
+                manifest,
                 {
-                    **manifest.model_dump(mode="python"),
                     "schema_version": (
                         manifest.schema_version
                         if manifest.schema_version
-                        in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+                        in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
                         else "2.3"
                     ),
                     "active_project": project_pointer,
@@ -316,8 +328,25 @@ class _StateCommitDependencyMixin:
                     ),
                     "dependency_states": states,
                     "attempts": manifest.attempts if attempts is None else attempts,
-                }
+                    **(
+                        {
+                            "commercial_source_attempts": (
+                                manifest.commercial_source_attempts
+                                if commercial_source_attempts is None
+                                else commercial_source_attempts
+                            ),
+                            "active_commercial_source_approvals": (
+                                manifest.active_commercial_source_approvals
+                                if active_commercial_source_approvals is None
+                                else active_commercial_source_approvals
+                            ),
+                        }
+                        if manifest.schema_version == "2.12"
+                        else {}
+                    ),
+                },
             )
+            assert isinstance(candidate_manifest, ProductionManifest)
             candidate_bundle = bundle.model_copy(
                 update={
                     "manifest": candidate_manifest,
@@ -325,6 +354,16 @@ class _StateCommitDependencyMixin:
                 }
             )
             _verify_manifest_dependency_states(candidate_bundle, graph)
+            if candidate_manifest.active_qa_policy is not None:
+                candidate_bundle = candidate_bundle.model_copy(
+                    update={
+                        "qa_policy": load_qa_policy(
+                            self._project_root,
+                            candidate_manifest.active_qa_policy,
+                        )
+                    }
+                )
+            verify_active_commercial_source_approvals(candidate_bundle)
         except (AiVideoError, ValidationError, ValueError) as exc:
             detail = exc.technical_detail if isinstance(exc, AiVideoError) else str(exc)
             raise _state_invalid(
@@ -363,6 +402,7 @@ class _StateCommitDependencyMixin:
             "2.9",
             "2.10",
             "2.11",
+            "2.12",
         }:
             if transition is not None:
                 raise _state_invalid(
@@ -500,6 +540,10 @@ class _StateCommitDependencyMixin:
                 raise _state_invalid(
                     "Render-domain dependency nodes require atomic render activation."
                 )
+            elif isinstance(evidence, CommercialSourceDependencyEvidence):
+                raise _state_invalid(
+                    "Commercial source dependency evidence requires atomic source approval."
+                )
             else:  # pragma: no cover - Pydantic union is exhaustive
                 raise _state_invalid("Dependency applied evidence type is invalid.")
             if evidence.artifact_fingerprint != desired_fingerprint:
@@ -593,6 +637,7 @@ class _StateCommitDependencyMixin:
             "2.9",
             "2.10",
             "2.11",
+            "2.12",
         }:
             raise _state_invalid("Dependency results require Manifest 2.3.")
         if manifest.manifest_revision != expected_manifest_revision:

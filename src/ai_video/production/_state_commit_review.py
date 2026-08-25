@@ -50,6 +50,7 @@ from ._state_commit_common import (
     _canonical_json_bytes,
     _state_invalid,
     _timestamp,
+    _validated_transition,
 )
 from ._state_commit_contracts import (
     PreparedArtifact,
@@ -82,17 +83,17 @@ class _StateCommitReviewMixin:
             manifest = self._read_manifest()
             if manifest.manifest_revision != expected_manifest_revision:
                 if (
-                    manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+                    manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
                     and manifest.active_qa_policy == pointer
                 ):
                     return manifest
                 raise _state_invalid("QA policy base Manifest revision changed.")
-            if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}:
+            if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
                 raise _state_invalid("P6 requires a P5 Manifest 2.3, 2.4, or 2.5 base.")
             if manifest.active_dependency_graph is None:
                 raise _state_invalid("P6 requires an active dependency graph.")
             if (
-                manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+                manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
                 and manifest.active_qa_policy == pointer
             ):
                 return manifest
@@ -115,8 +116,9 @@ class _StateCommitReviewMixin:
                         "active_receipt": None,
                     }
                 )
-            updated = manifest.model_copy(
-                update={
+            updated = _validated_transition(
+                manifest,
+                {
                     "schema_version": (
                         "2.4" if manifest.schema_version == "2.3" else manifest.schema_version
                     ),
@@ -125,9 +127,9 @@ class _StateCommitReviewMixin:
                     "active_review_receipts": (),
                     "review_states": stale_states,
                     "final_acceptance_state": final_state,
-                }
+                },
             )
-            updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
+            assert isinstance(updated, ProductionManifest)
             self._write_p6_manifest_atomic(updated)
             return self._read_manifest()
 
@@ -224,7 +226,7 @@ class _StateCommitReviewMixin:
                 render_output_sha256=current_render.output.file_sha256,
             )
             if (
-                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
                 or bundle.manifest != manifest
                 or manifest.active_qa_policy != receipt.qa_policy
                 or manifest.active_dependency_graph is None
@@ -354,7 +356,7 @@ class _StateCommitReviewMixin:
                 render_output_sha256=current_render.output.file_sha256,
             )
             if (
-                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"}
+                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
                 or bundle.manifest != manifest
                 or manifest.manifest_revision != request.base_manifest_revision
                 or manifest.active_dependency_graph != request.dependency_graph

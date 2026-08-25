@@ -32,6 +32,7 @@ from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     AssetRegistrySnapshot,
     AssetType,
+    CommercialSourceLifecycle,
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
     DependencyGraphTransition,
@@ -240,7 +241,47 @@ def _handle_cleanup_errors(
 def _validated_transition(
     model: ProductionManifest | StateCommitAttempt, update: dict[str, object]
 ) -> ProductionManifest | StateCommitAttempt:
-    if isinstance(model, ProductionManifest) and model.schema_version == "2.11":
+    if isinstance(model, ProductionManifest) and model.schema_version == "2.12":
+        commercial_owner_changed = any(
+            field in update and update[field] != getattr(model, field)
+            for field in ("active_project", "active_registry", "active_qa_policy")
+        )
+        if commercial_owner_changed:
+            update = {
+                **update,
+                "active_commercial_source_approvals": (),
+                "commercial_source_attempts": tuple(
+                    item.model_copy(
+                        update={
+                            "lifecycle": CommercialSourceLifecycle.STALE,
+                            "active_approval": None,
+                        }
+                    )
+                    for item in model.commercial_source_attempts
+                ),
+            }
+        elif (
+            "active_dependency_graph" in update
+            and update["active_dependency_graph"] != model.active_dependency_graph
+        ):
+            commercial_attempts = update.get(
+                "commercial_source_attempts", model.commercial_source_attempts
+            )
+            update = {
+                **update,
+                "commercial_source_attempts": tuple(
+                    item
+                    if item.lifecycle is CommercialSourceLifecycle.APPROVED
+                    else item.model_copy(
+                        update={
+                            "lifecycle": CommercialSourceLifecycle.STALE,
+                            "active_approval": None,
+                        }
+                    )
+                    for item in commercial_attempts
+                ),
+            }
+    if isinstance(model, ProductionManifest) and model.schema_version in {"2.11", "2.12"}:
         if any(
             field in update and update[field] != getattr(model, field)
             for field in ("active_project", "active_registry")
@@ -248,7 +289,7 @@ def _validated_transition(
             update = {**update, "active_p0_qualification_prepared": None}
     if isinstance(model, ProductionManifest) and (
         model.schema_version == "2.4"
-        or (model.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11"} and has_p6_state(model))
+        or (model.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"} and has_p6_state(model))
     ):
         identity_fields = (
             "active_project",
@@ -273,7 +314,9 @@ def _validated_transition(
                     )
                     for item in model.review_states
                 ),
-                "final_acceptance_state": None,
+                "final_acceptance_state": update.get(
+                    "final_acceptance_state", None
+                ),
             }
     return type(model).model_validate({**model.model_dump(mode="python"), **update})
 
