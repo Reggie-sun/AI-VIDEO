@@ -33,8 +33,9 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 6. `docs/v0.2-agentic-production-roadmap.md`，确认 phase 状态与 gate。
 7. `README.md`、active spec 与当前 slice plan。
 8. 相关源码与测试。
-9. `.agent/context/session-handoff.md`（若存在）和 `.agent/bug-memory/` 中与当前问题直接相关的记录，仅作为上下文或案例证据。
-10. `.workflow/` 草稿或 brainstorming 产物，仅作为可选上下文。
+9. task 涉及本机 MiniMax H3 T8、LatentSync、SyncNet 或硬字幕运行时，读取 `.agent/context/t8-latentsync-local-runtime.md`；它只提供 host-specific 环境与启动操作参考，使用前必须重新核对当前 checkout、dependency、GPU、exact submitted graph 与 runtime state。
+10. `.agent/context/session-handoff.md`（若存在）和 `.agent/bug-memory/` 中与当前问题直接相关的记录，仅作为上下文或案例证据。
+11. `.workflow/` 草稿或 brainstorming 产物，仅作为可选上下文。
 
 ## Conflict Resolution
 
