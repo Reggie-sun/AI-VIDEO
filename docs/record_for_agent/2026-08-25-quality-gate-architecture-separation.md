@@ -20,7 +20,9 @@ Gate 1: Universal Production QA
   -> Final Acceptance rollup
 ```
 
-以上是accepted target architecture，不是current automatic Runtime flow。只有两个top-level
+以上仍不是完整automatic Runtime flow。当前已新增显式、non-persistent、Gate 1-only的
+`UniversalQualityGateCoordinator.run_once()`；它不会被background或产品入口自动触发。
+Gate 2仍没有accepted typed Domain profile/evidence seam，因此尚不可执行。只有两个top-level
 post-media gates；Ecommerce、Drama、AI Comic与future domains是Gate 2 profiles，Final Acceptance
 是explicit durable rollup而不是第三个evaluator gate。`ShotReadinessGate`、Ecommerce G0-G7与
 `AdCreativeReviewReport`仍是preflight，均不属于这两个post-media gates。
@@ -72,9 +74,55 @@ docs: define two-stage quality gate contract
 
 Amendment固定只有两个top-level post-media quality gates：Gate 1 `Universal Production QA`与Gate 2 `Domain-Specific Acceptance`。Ecommerce、Drama、AI Comic与future domains是Gate 2 profiles；`Final Acceptance`是explicit durable rollup，不是第三个quality evaluator gate。Current owner APIs中的hard validators只在对应显式action内自动执行，当前没有product-level automatic coordinator。Target coordinator仍须显式调用，按Gate 1再exactly one Gate 2 profile的顺序执行；不得background/watch、自动repair、自动activation、自动`Final Acceptance`或profile fallback。
 
-Future coordinator还必须使用preselected、content-addressed Universal profile，并验证`QaPolicy.required_layers`覆盖applicable universal minimum；缺失、无效或coverage不完整时必须在任何Gate 2 effect前fail closed。该约束是target contract，current Runtime尚未强制。
+Future full coordinator还必须在Gate 1 PASS后消费一个preselected、content-addressed Domain
+profile；缺失、无效或coverage不完整时必须在任何Gate 2 effect前fail closed。Gate 1的
+Universal profile minimum与`QaPolicy.required_layers`coverage现已在下述显式one-shot slice中强制。
 
 本次`reviewer_xhigh`首次re-review为`reject`：plan中的domain headings仍可能被读成额外top-level gates，且future selected `QaPolicy`可以省略universal minimum。修正profile terminology、two-gate assertions与Universal profile coverage约束后，scoped re-review verdict为`accept`，无blocking或non-blocking concerns。
+
+### Gate 1 Runtime Checkpoint
+
+本轮在不触碰其他writer占用的Production integration files前提下，新增：
+
+- `src/ai_video/production/quality_gate_coordinator.py`：content-addressed
+  `UniversalQaProfile`、exact `UniversalQaContext`、fail-closed coverage preflight与显式
+  `UniversalQualityGateCoordinator.run_once()`；
+- `tests/test_production_quality_gate_coordinator.py`：profile minimum、tamper、policy coverage、
+  ordering、stale/unknown outcome、STOP与identity binding regressions；
+- Spec、plan与`.agent/harness/docs-contracts.yaml`同步current Gate 1-only Runtime边界。
+
+该coordinator只执行preselected Gate 1 hard checks与required P6 review layers。它在任何effect
+前strict reopen profile、context与policy；runner只收到reopened profile/context；失败、stale、
+unknown outcome或coverage缺失立即STOP且不retry。PASS只产生
+`eligible_for_domain_gate=true`的in-memory result，不写Manifest、不自动repair、activation、
+Gate 2或Final Acceptance。Result分别绑定profile/context、selected QaPolicy与
+context-expected QaPolicy identity；invalid declared hash返回`NOT_EVALUATED`而不是令错误路径失败。
+
+Strict red-green evidence包括：最初module missing的6个失败、profile minimum的7个失败、
+unknown-outcome的2个失败、unsealed policy的1个失败、reviewer提出的4个identity/tamper失败、
+最后3个fail-closed失败，以及domain eligibility detached-construction的1个失败。最终focused
+suite为`60 passed`；最终`reviewer_xhigh` verdict为`accept`，无blocking或non-blocking concern。
+
+原`.agent/harness/policy.yaml`ownership blocker在其writer提交并释放后解除。本session随后把
+coordinator source/test映射到`production_review`，同步contract matrix、runtime baseline与roadmap，
+并提交exact 9-file implementation：
+
+```text
+eba888f80b630cab3a5cd487027e2a9cc4e6d9b4
+feat: add universal quality gate one-shot
+```
+
+Exact staged Harness `.agent/harness/runs/quality-gate-one-staged-20260825-v4/receipt.json`
+状态为PASS：Architecture Gate 0 findings、Harness tests `185 passed`、Production Review tests
+`606 passed`。Receipt的scope、policy、artifacts与snapshot均匹配；共享checkout在run期间对
+matrix/baseline增加了另一slice的unstaged内容，因此live verifier的freshness为false，但这些内容
+未进入`eba888f`且未被覆盖。
+
+随后exact commit-range run
+`.agent/harness/runs/quality-gate-one-commit-eba888f-20260825-v1/receipt.json`的全部6个checks也
+实际PASS，但另一个session在run期间将`HEAD`推进到`3323a2d`，使Harness meta-check记录
+`workspace_stable_confirmed=false`、`snapshot_matches=false`并将receipt status标为failed。
+该receipt只证明各check结果，不是completion proof。
 
 ## Verification And Evidence
 
@@ -124,6 +172,21 @@ fd163be12db3a0b1ad500d20c9512380952fff5f..
 
 结果PASS：Documentation Contract Gate与policy audit通过，Harness tests `184 passed`。Receipt verifier确认`artifact_integrity=true`、`complete_completion_proof=true`、`fresh=true`、`fresh_for_snapshot=true`、`scope_paths_match=true`、`snapshot_matches=true`与`cleanup_verified=true`。
 
+Gate 1-only current checkpoint evidence：
+
+- `tests/test_production_quality_gate_coordinator.py`与`tests/test_production_review.py`：
+  `60 passed`；
+- Documentation Contract Gate：PASS；
+- scoped staged `git diff --check`：PASS；
+- independent `reviewer_xhigh`：`accept`；
+- `.agent/harness/runs/quality-gate-one-staged-20260825-v3/receipt.json`：integrity与exact
+  snapshot binding有效，但`passed=false`、`complete_completion_proof=false`，原因是上述
+  `policy_audit_check` blocker。该failed receipt不是completion proof。
+- `.agent/harness/runs/quality-gate-one-staged-20260825-v4/receipt.json`：全部required checks
+  PASS；Harness tests `185 passed`、Production Review tests `606 passed`、Architecture Gate PASS。
+- `.agent/harness/runs/quality-gate-one-commit-eba888f-20260825-v1/receipt.json`：全部check
+  records PASS，但并发`HEAD`移动导致overall status failed；不得描述为complete completion proof。
+
 ## Concurrent Workspace Divergence
 
 在`3914044`提交并完成immutable commit-range Harness期间，另一个writer继续修改了：
@@ -137,10 +200,14 @@ fd163be12db3a0b1ad500d20c9512380952fff5f..
 ## Remaining Risks Or Next Work
 
 - Future Ecommerce post-media acceptance若要进入P6，必须另建active spec/plan，增加preselected content-addressed domain profile、rubric/version、stable requirement IDs、sealed authoring-truth hash binding、exact target/coverage与required `FAIL` / `NOT_EVALUATED` fail-closed aggregation。
-- Future Universal one-shot coordinator必须先建立content-addressed Universal profile，并把applicable universal minimum与selected `QaPolicy.required_layers`做fail-closed coverage校验；current Runtime尚无该coordinator或coverage enforcement。
+- Gate 1 one-shot coordinator与policy mapping已提交为`eba888f`，但完整two-stage product caller、
+  durable Gate profile/evidence binding与Gate 2 typed Domain seam仍需独立accepted slice。
+- Product-level automatic caller、durable profile/evidence binding与Gate 2 typed Domain seam仍未实现；
+  当前Gate 1必须由caller显式调用，不能声称会自动触发完整two-stage flow。
 - Future Drama adapter必须等formal Drama workflow、authoring artifact与rubric被独立接受；不得复用Ecommerce rubric或physical continuity冒充narrative continuity。
 - 当前generic `SEMANTIC` envelope仍可能接受policy-authorized `semantic_match`，所以本slice只证明authoring outputs不直接编码Production acceptance及当前无canonical bridge，不证明typed misuse prevention已实现。
 - Current working tree的post-commit same-file divergence需要其owner自行完成、commit或清理；不得为刷新本receipt而覆盖或暂存该work。
+- 本轮Gate 1 implementation、policy与canonical docs已提交到local `main`；未push、未release。
 - `1ab95e4`仅存在于local `main`，未push、未release、未publish；本session没有live/paid/Provider/media call。
 - 本轮`retrieve-ai-video-memory --scope all`返回fresh current-contract hits与stale last-good Superpowers fragments，并只排队local derived-index refresh；retrieval是advisory，不属于Runtime或acceptance evidence。
 
