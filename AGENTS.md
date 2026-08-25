@@ -209,6 +209,7 @@ state write、typed dependency、`ResolvedTimeline` 或 truthful delivery bounda
 
 在宣称完成前确认：
 
+- substantial AI-VIDEO implementation、documentation、live proof、media diagnosis、architecture decision 或 recovery work 达到 stable checkpoint、completion、genuine blocker、handoff 或 compaction boundary 后，必须在 final response 前评估并按 `record-ai-video-session` 执行；repository 外的 authorized media/artifact effects 也计入，不得因没有 tracked diff、hook request 或 `capture_request_id` 而跳过主动评估。Unfinished或trivial work按Skill边界明确判定为no record。
 - 最终 diff 仅包含 task-owned changes，且未覆盖 unrelated user work。
 - Canonical owner、禁止旁路与 unchanged contracts 已复核。
 - 行为变化已在代码和测试中体现；公共契约变化已同步 canonical docs。

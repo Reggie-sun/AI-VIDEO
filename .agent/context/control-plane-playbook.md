@@ -227,3 +227,27 @@ Retrieved memories are advisory only. They MUST NOT override:
 
 只有 implementation findings materially 改变原 query 并暴露 distinct term/owner/failure
 signature 时，完成前才允许一次 focused follow-up；不得把重复检索当作 completion ceremony。
+
+## 7. Durable Session Record Gate
+
+`record-ai-video-session` 是 substantial AI-VIDEO work 的 completion-time durable capture
+owner。它不是只在 hook 注入 `capture_request_id` 时才生效；hook只是backstop，主动评估由
+当前Agent负责。
+
+在 final response、handoff 或 compaction 前按以下顺序判断：
+
+1. 当前 task 是否包含 substantial implementation、documentation、local/remote live proof、
+   real media generation或diagnosis、architecture decision、recovery或independently reusable
+   runtime lesson。
+2. 工作是否已达到 stable checkpoint、completion或genuine blocker；尚未完成时先继续工作，
+   不得为了写record打断主任务。
+3. 检查repository内外effects。`/home/reggie/ComfyUI/output/`、`/tmp/`、Provider artifacts、
+   fetched media与analysis derivatives即使没有tracked diff，也属于record trigger evidence。
+4. 若1与2成立，主动读取并执行`.agents/skills/record-ai-video-session/SKILL.md`；不得因
+   PostToolUse未归属path、没有hook request或没有`capture_request_id`而跳过。
+5. Formatting、trivial conversation、unfinished work或没有durable value的status question明确
+   判定为`no_record`。不要创建空泛session note，也不要让record触发另一份record。
+
+Record只能保存verified evidence与边界，不能授权新实现、generation、Provider call、push、
+release或Production mutation。若hook提供exact `capture_request_id`，仍按Skill要求只acknowledge
+一次；没有ID时不运行acknowledgement command。
