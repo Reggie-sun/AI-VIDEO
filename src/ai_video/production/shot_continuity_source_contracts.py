@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Protocol
 
+from ai_video.comfy_client import JobResult
+
 from ai_video.production.shot_continuity_m0_qualification import (
     M0ValidationPreflightSnapshot,
 )
@@ -53,6 +55,22 @@ class SourceQualificationTransport(Protocol):
     def upload_input(self, item: SourceQualificationInput) -> str: ...
 
     def submit_prompt(self, workflow: dict[str, Any]) -> str: ...
+
+    def poll_job(
+        self,
+        prompt_id: str,
+        *,
+        poll_interval_seconds: float,
+        timeout_seconds: float,
+    ) -> JobResult: ...
+
+    def fetch_artifact_bytes(
+        self,
+        *,
+        filename: str,
+        subfolder: str,
+        type_: str,
+    ) -> bytes: ...
 
 
 __all__ = [

@@ -6,7 +6,7 @@ import hashlib
 import os
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Literal, Mapping
+from typing import Any, BinaryIO, Callable, Literal, Mapping
 
 from pydantic import Field, model_validator
 
@@ -19,8 +19,11 @@ from ai_video.production.comfy_video import render_h3_workflow
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.local_video import (
     DurableLocalVideoSubmitPermit,
+    LocalVideoFetchReceipt,
+    LocalVideoSubmission,
     LocalVideoSubmitIntent,
     LocalVideoSubmitResult,
+    LocalVideoTaskObservation,
 )
 from ai_video.production.models import StrictModel
 from ai_video.production.paths import (
@@ -37,6 +40,10 @@ from ai_video.production.shot_continuity_m0_qualification import (
 from ai_video.production.shot_continuity_source_stack import (
     ShotContinuitySourceExecutionSources,
     reopen_materialized_shot_continuity_source_execution_sources,
+)
+from ai_video.production.shot_continuity_source_transport import (
+    fetch_source_qualification_output,
+    poll_source_qualification_output,
 )
 from ai_video.production.shot_continuity_source_contracts import (
     ShotContinuitySourceQualificationOutcome,
@@ -732,6 +739,57 @@ class ShotContinuitySourceQualificationProvider:
                 retryable=False,
                 cause=exc,
             ) from exc
+
+    def get_local_status(
+        self,
+        request: ResolvedVideoGenerationRequest | Any,
+        submission: LocalVideoSubmission,
+    ) -> LocalVideoTaskObservation:
+        profile, _ = self._profile()
+        source_stacks = self._committer.reopen_p0_qualification_source_stacks(
+            require_materialized=True
+        )
+        if len(source_stacks) != 1:
+            raise _invalid("Source qualification source stack is not exact.")
+        sources = reopen_materialized_shot_continuity_source_execution_sources(
+            project_root=self._project_root,
+            stack=source_stacks[0],
+        )
+        _validate_request(request, profile, sources)
+        return poll_source_qualification_output(
+            transport=self._transport,
+            resolved_generation_hash=request.resolved_generation_hash,
+            submission=submission,
+            output_node_id=sources.binding.output_node_id,
+            clock=self._clock,
+        )
+
+    def fetch_local(
+        self,
+        request: ResolvedVideoGenerationRequest | Any,
+        submission: LocalVideoSubmission,
+        observation: LocalVideoTaskObservation,
+        sink: BinaryIO,
+    ) -> LocalVideoFetchReceipt:
+        profile, _ = self._profile()
+        source_stacks = self._committer.reopen_p0_qualification_source_stacks(
+            require_materialized=True
+        )
+        if len(source_stacks) != 1:
+            raise _invalid("Source qualification source stack is not exact.")
+        sources = reopen_materialized_shot_continuity_source_execution_sources(
+            project_root=self._project_root,
+            stack=source_stacks[0],
+        )
+        _validate_request(request, profile, sources)
+        return fetch_source_qualification_output(
+            transport=self._transport,
+            resolved_generation_hash=request.resolved_generation_hash,
+            submission=submission,
+            observation=observation,
+            sink=sink,
+            clock=self._clock,
+        )
 
 
 class ShotContinuitySourceQualificationCaller:

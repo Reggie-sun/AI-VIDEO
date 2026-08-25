@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
@@ -9,8 +10,14 @@ from typing import Any, Callable
 
 import pytest
 
+from ai_video.comfy_client import JobResult, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.local_video import LocalVideoSubmitIntent
+from ai_video.production.local_video import (
+    LocalVideoSubmission,
+    LocalVideoSubmitIntent,
+    LocalVideoSubmitResult,
+    LocalVideoTaskObservation,
+)
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
@@ -42,6 +49,7 @@ from ai_video.production.video import (
     VideoGenerationMode,
     VideoGenerationRequest,
     VideoImageReferenceBinding,
+    VideoTaskState,
 )
 from ai_video.production.video_contracts import (
     VideoFlexibleOutputRequirement,
@@ -383,6 +391,26 @@ class _Transport:
         self.uploads = []
         self.workflows = []
         self.submit_error: Exception | None = None
+        self.job_result = JobResult(
+            JobStatus.COMPLETED,
+            "source-prompt-1",
+            history={
+                "outputs": {
+                    "14": {
+                        "videos": [
+                            {
+                                "filename": "source-output.mp4",
+                                "subfolder": "video",
+                                "type": "output",
+                            }
+                        ]
+                    }
+                }
+            },
+        )
+        self.artifact_bytes = b"\x00\x00\x00\x14ftypisomsource-video"
+        self.poll_calls: list[str] = []
+        self.fetch_calls: list[dict[str, str]] = []
         self.before_first_upload: Callable[[], None] | None = None
         self.permit_probe: Callable[[], bool] | None = None
 
@@ -405,6 +433,14 @@ class _Transport:
         if self.submit_error is not None:
             raise self.submit_error
         return "source-prompt-1"
+
+    def poll_job(self, prompt_id: str, **_: object) -> JobResult:
+        self.poll_calls.append(prompt_id)
+        return self.job_result
+
+    def fetch_artifact_bytes(self, **locator: str) -> bytes:
+        self.fetch_calls.append(locator)
+        return self.artifact_bytes
 
 
 class _Committer:
@@ -703,6 +739,32 @@ def _qualify(case: _Case) -> Any:
     )
 
 
+def _submission(case: _Case) -> LocalVideoSubmission:
+    result = LocalVideoSubmitResult.create(
+        resolved=case.request,
+        provider_request_id="source-prompt-1",
+        submitted_at=NOW,
+    )
+    return LocalVideoSubmission.from_submit_result(
+        resolved=case.request,
+        result=result,
+    )
+
+
+def _submission_for_hash(case: _Case, resolved_hash: str) -> LocalVideoSubmission:
+    request = SimpleNamespace(**vars(case.request))
+    request.resolved_generation_hash = resolved_hash
+    result = LocalVideoSubmitResult.create(
+        resolved=request,
+        provider_request_id="source-prompt-other",
+        submitted_at=NOW,
+    )
+    return LocalVideoSubmission.from_submit_result(
+        resolved=request,
+        result=result,
+    )
+
+
 def _assert_zero_effect(case: _Case) -> None:
     assert case.committer.start_writes == 0
     assert case.committer.intent_writes == 0
@@ -732,6 +794,191 @@ def test_source_qualification_submits_once_after_permit_with_exact_a2_a3(
     assert (case.committer.start_writes, case.committer.intent_writes) == (1, 1)
     assert (case.committer.result_writes, case.committer.failure_writes) == (1, 0)
     assert case.transport.object_info_calls == 4
+
+
+def test_source_qualification_real_provider_polls_and_fetches_exact_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    submission = _submission(case)
+
+    observation = case.provider.get_local_status(case.request, submission)
+    sink = io.BytesIO()
+    receipt = case.provider.fetch_local(
+        case.request,
+        submission,
+        observation,
+        sink,
+    )
+
+    assert observation.state is VideoTaskState.SUCCEEDED
+    assert observation.progress_milli == 1000
+    assert observation.provider_file_id == "video:source-output.mp4:output"
+    assert case.transport.poll_calls == ["source-prompt-1"]
+    assert case.transport.fetch_calls == [
+        {
+            "filename": "source-output.mp4",
+            "subfolder": "video",
+            "type_": "output",
+        }
+    ]
+    assert sink.getvalue() == case.transport.artifact_bytes
+    assert receipt.artifact_sha256 == _sha(case.transport.artifact_bytes)
+    assert receipt.size_bytes == len(case.transport.artifact_bytes)
+
+
+def test_source_qualification_real_provider_rejects_submission_before_poll(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    submission = _submission_for_hash(case, "b" * 64)
+
+    with pytest.raises(AiVideoError) as caught:
+        case.provider.get_local_status(case.request, submission)
+
+    assert caught.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert case.transport.poll_calls == []
+
+
+def test_source_qualification_real_provider_rejects_observation_before_fetch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    submission = _submission(case)
+    other_submission = _submission_for_hash(case, "b" * 64)
+    observation = LocalVideoTaskObservation.create(
+        submission=other_submission,
+        state=VideoTaskState.SUCCEEDED,
+        observed_at=NOW,
+        progress_milli=1000,
+        provider_file_id="video:other.mp4:output",
+    )
+    sink = io.BytesIO()
+
+    with pytest.raises(AiVideoError) as caught:
+        case.provider.fetch_local(
+            case.request,
+            submission,
+            observation,
+            sink,
+        )
+
+    assert caught.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert case.transport.fetch_calls == []
+    assert sink.getvalue() == b""
+
+
+def test_source_qualification_real_provider_rejects_submission_before_fetch(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    submission = _submission_for_hash(case, "b" * 64)
+    observation = LocalVideoTaskObservation.create(
+        submission=submission,
+        state=VideoTaskState.SUCCEEDED,
+        observed_at=NOW,
+        progress_milli=1000,
+        provider_file_id="video:other.mp4:output",
+    )
+    sink = io.BytesIO()
+
+    with pytest.raises(AiVideoError) as caught:
+        case.provider.fetch_local(
+            case.request,
+            submission,
+            observation,
+            sink,
+        )
+
+    assert caught.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert case.transport.fetch_calls == []
+    assert sink.getvalue() == b""
+
+
+def test_source_qualification_real_provider_records_terminal_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    submission = _submission(case)
+    case.transport.job_result = JobResult(
+        JobStatus.FAILED,
+        "source-prompt-1",
+        error=AiVideoError(
+            code=ErrorCode.COMFY_JOB_FAILED,
+            user_message="source generation failed",
+            retryable=False,
+        ),
+    )
+
+    observation = case.provider.get_local_status(case.request, submission)
+
+    assert observation.state is VideoTaskState.FAILED
+    assert observation.provider_file_id is None
+    assert case.transport.poll_calls == ["source-prompt-1"]
+
+
+def test_source_qualification_real_provider_classifies_invalid_completed_output(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    submission = _submission(case)
+    case.transport.job_result = JobResult(
+        JobStatus.COMPLETED,
+        "source-prompt-1",
+        history={"outputs": {}},
+    )
+
+    with pytest.raises(AiVideoError) as caught:
+        case.provider.get_local_status(case.request, submission)
+
+    assert caught.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
+    assert caught.value.retryable is False
+    assert case.transport.poll_calls == ["source-prompt-1"]
+
+
+def test_source_qualification_real_provider_fails_closed_on_unknown_outcome(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    submission = _submission(case)
+    case.transport.job_result = JobResult(
+        JobStatus.TIMEOUT,
+        "source-prompt-1",
+        error=AiVideoError(
+            code=ErrorCode.COMFY_JOB_TIMEOUT,
+            user_message="source status timed out",
+            retryable=False,
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as caught:
+        case.provider.get_local_status(case.request, submission)
+
+    assert caught.value.code is ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
+    assert caught.value.retryable is False
+    assert case.transport.poll_calls == ["source-prompt-1"]
+    assert case.transport.fetch_calls == []
+
+
+def test_source_qualification_real_provider_rejects_non_mp4_without_writing_sink(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    submission = _submission(case)
+    observation = case.provider.get_local_status(case.request, submission)
+    case.transport.artifact_bytes = b"not-a-video"
+    sink = io.BytesIO()
+
+    with pytest.raises(AiVideoError) as caught:
+        case.provider.fetch_local(
+            case.request,
+            submission,
+            observation,
+            sink,
+        )
+
+    assert caught.value.code is ErrorCode.VIDEO_REQUEST_INVALID
+    assert sink.getvalue() == b""
 
 
 def test_source_upload_uses_pre_permit_immutable_bytes(

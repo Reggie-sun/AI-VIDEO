@@ -10,6 +10,7 @@ from types import SimpleNamespace
 from PIL import Image
 import pytest
 
+from ai_video.comfy_client import JobResult, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.local_video import (
     LocalVideoFetchReceipt,
@@ -36,6 +37,9 @@ from ai_video.production.shot_continuity_source_runtime import (
     build_source_closure,
     make_source_production_committer,
     make_source_video_candidate_preparer,
+)
+from ai_video.production.shot_continuity_source_qualification import (
+    ShotContinuitySourceQualificationProvider,
 )
 from ai_video.production.video import (
     BillingKind,
@@ -472,6 +476,91 @@ def test_source_request_uses_real_committer_unknown_outcome_without_resubmit(
             pre_submit_guard=lambda current: None,
         )
     assert provider.submit_calls == 1
+
+
+def test_real_source_provider_invalid_completed_output_is_durable_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import ai_video.production.shot_continuity_source_qualification as module
+
+    class InvalidCompletedTransport:
+        def __init__(self) -> None:
+            self.poll_calls = 0
+
+        def poll_job(self, prompt_id: str, **_: object) -> JobResult:
+            assert prompt_id == "source-prompt-activate-1"
+            self.poll_calls += 1
+            return JobResult(
+                JobStatus.COMPLETED,
+                prompt_id,
+                history={"outputs": {}},
+            )
+
+    root, _, project = _prepare_project(tmp_path)
+    request = _resolved_source_request(project)
+    committer = make_source_production_committer(root, project)
+    submit_provider = _RecordedSourceProvider(b"unused")
+    transport = InvalidCompletedTransport()
+    repo_root = Path(__file__).resolve().parents[1]
+    provider = ShotContinuitySourceQualificationProvider(
+        committer=committer,
+        qualification_profile_path=repo_root / (
+            "workflows/qualification/"
+            "minimax_h3_fl2va_rainy_station_source_v1_profile.json"
+        ),
+        m0_profile_path=repo_root / (
+            "workflows/qualification/"
+            "minimax_h3_t8_c4_m0_candidate_v1_profile.json"
+        ),
+        artifact_root=repo_root,
+        project_root=root,
+        comfy_root=root,
+        transport=transport,
+        project_loader=lambda: project,
+        commit_resolver=lambda: "unused",
+        clock=lambda: datetime(2026, 8, 24, 5, 1, tzinfo=UTC),
+    )
+    provider._profile = lambda: (SimpleNamespace(), "unused")
+    provider.preview = submit_provider.preview
+    provider.submit_local = submit_provider.submit_local
+    monkeypatch.setattr(
+        committer,
+        "reopen_p0_qualification_source_stacks",
+        lambda *, require_materialized: (SimpleNamespace(),),
+    )
+    monkeypatch.setattr(module, "_validate_request", lambda *args: None)
+    monkeypatch.setattr(
+        module,
+        "reopen_materialized_shot_continuity_source_execution_sources",
+        lambda **kwargs: SimpleNamespace(
+            binding=SimpleNamespace(output_node_id="14")
+        ),
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    attempt_id = "source-invalid-completed-output"
+
+    service.start(attempt_id=attempt_id, request=request)
+    service.submit_local_once(
+        attempt_id=attempt_id,
+        pre_submit_guard=lambda current: current.resolved_generation_hash
+        == request.resolved_generation_hash
+        or pytest.fail("resolved source request drifted"),
+    )
+    with pytest.raises(AiVideoError) as caught:
+        service.refresh_local_once(attempt_id=attempt_id)
+
+    assert caught.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
+    attempt = committer._read_manifest().attempts[-1]
+    assert attempt.status is StateCommitStatus.FAILED
+    assert attempt.video_generation_state is not None
+    assert attempt.video_generation_state.phase is VideoAttemptPhase.SUBMITTED
+    assert service.resume_next_action(attempt_id=attempt_id) == "stop"
+    assert transport.poll_calls == 1
+
+    with pytest.raises(AiVideoError):
+        service.refresh_local_once(attempt_id=attempt_id)
+    assert transport.poll_calls == 1
 
 
 def test_source_activation_reloads_the_exact_durable_closure_without_effect_replay(
