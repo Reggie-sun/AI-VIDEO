@@ -105,102 +105,45 @@ Reader、registry、validation、dependency、Provider adapter、renderer 与 an
 
 ## Agent Memory Retrieval Routing
 
-`retrieve-ai-video-memory` 是 substantial AI-VIDEO work 的 mandatory advisory preflight。
-当 task 涉及 real media production 或 quality、Provider/model behavior、continuity 或
-identity drift、known regression/repeated failure/incident/recovery、需要复用 prior
-architecture decision，或用户明确要求查找 earlier AI-VIDEO experience、decision、spec 或
-plan 时，Agent MUST 在 substantial execution 以及其他 matching domain Skill 之前调用该
-Skill。Ecommerce、continuity、Provider prompting 与 motion-design task 只要命中上述条件，
-也必须先完成这一步，再进入各自 owner；不得因为已经调用另一个 Skill、读取 current files
-或运行 `rg` 就跳过。
+`retrieve-ai-video-memory` 是 substantial AI-VIDEO work 的 mandatory advisory preflight；
+real media/quality、Provider/model behavior、continuity/identity、known regression/incident/
+recovery、prior architecture decision 或用户明确要求 earlier evidence 时，必须在 matching
+domain Skill 与 substantial execution 前调用。Formatting、typo、unrelated trivial test、
+isolated mechanical refactor 与 exact current source lookup 不触发。
 
-Formatting、typo、unrelated trivial test、isolated mechanical refactor，以及只需确认 current
-source symbol/path/call chain/file contents 的 task 不触发该 preflight；这些情况直接使用
-current code、tests、`rg` 或 codegraph。`allow_implicit_invocation: true` 只允许 host 选择
-Skill，不是已执行证据，也不能替代本 routing requirement。
-
-调用时按 `.agents/skills/retrieve-ai-video-memory/SKILL.md` 只选择一个 matching scope/reference，
-并遵守其 stale、missing、BROKEN 与 authority boundary。该 requirement 不注册 lifecycle hook，
-不要求每个 session 都运行 RAG，也不把 retrieval result 升级为 implementation、Provider、
-activation、quality acceptance、push 或 release authorization。
+Scope selection、stale/missing/strict-failure handling 与 provenance 细节由
+`.agents/skills/retrieve-ai-video-memory/SKILL.md` 和
+`.agent/context/control-plane-playbook.md` 的 `Agent Experience Memory Routing` 独占；
+retrieval 永远只是 advisory evidence，不产生 implementation、Provider、activation、quality
+acceptance、push 或 release authorization。
 
 ## Creative Skill Routing
 
-AI-VIDEO remains the sole owner of production truth. External Skills provide advisory knowledge only unless an explicitly approved project contract says otherwise. Skill guidance MUST be translated into AI-VIDEO domain contracts before execution and MUST NOT mutate or own canonical state.
+AI-VIDEO remains the sole owner of production truth. External Skills are advisory only；
+use the minimum matching set and translate guidance into AI-VIDEO contracts。
 
-Use the minimum matching Skill set. Installation、description matching 或“本仓库生产视频”本身不构成触发条件。纯 production-state、asset、schema、dependency、timeline、render、activation、recovery 或 Provider-lifecycle 工作只使用 AI-VIDEO code 与 accepted contracts。
+| Concern | Route |
+| --- | --- |
+| Prior experience / decision trigger | `retrieve-ai-video-memory` first |
+| Ecommerce / SKU / product advertising authoring | `ecommerce-ad-workflow` |
+| Director coverage / ordered multi-Shot planning | `open-video` |
+| Semantic continuity / Shot-state problem | `hell-grind-aigc-skill` |
+| Approved Shot + selected MiniMax H3 guidance | `h3-video` |
+| Other model / Provider prompt adaptation | `higgsfield` |
+| Deterministic motion / graphics / pacing | `video-shotcraft` |
+| Production state / assets / timeline / execution / activation / recovery | AI-VIDEO code and contracts |
 
-### `hell-grind-aigc-skill`
-
-SHOULD proactively use for semantic Shot design、open/close state、cross-Shot continuity、identity/state/spatial/axis/action/light/environment/audio continuity、image/video prompt structure、generation failure diagnosis、iteration 与 candidate reasoning。
-
-优先用于“Shots 之间什么必须保持或改变？”以及“generated Shot 为什么失败？”。AI-VIDEO Character、Scene、Shot 与 asset records 始终是 source of truth。MUST NOT 创建或维护平行的 Hell-Grind project schema、asset registry、generation ledger、review state 或 delivery truth。
-
-### `higgsfield`
-
-SHOULD proactively use for provider/model-specific prompt adaptation、Seedance/Hailuo/Kling/Veo guidance、T2V/I2V/reference/continuation/extension mode guidance、provider-specific camera vocabulary 与 generation troubleshooting。
-
-只在 AI-VIDEO semantic Shot / continuity intent 已建立后使用。Model/mode 推荐不得选择或切换 active Provider、读取 credential、提交 generation，或绕过 AI-VIDEO Provider Router、Paid Provider Gate、budget、cloud egress、provenance、lifecycle、activation 与 recovery。Higgsfield CLI、MCP、account、workspace、memory 或 ledger 不是 AI-VIDEO owner。
-
-### `video-shotcraft`
-
-SHOULD proactively use for motion design、image motion、motion graphics、shot language、camera movement、pacing、transition、SFX、beat sync 与 visual QA ideas。
-
-其 Remotion implementation、recipe、timeline 与 renderer 只作为 creative / implementation reference。选定方案必须翻译成 AI-VIDEO composition directives；不得创建第二套 canonical timeline/renderer、替代 `ResolvedTimeline` / HyperFrames，或绕过 AI-VIDEO QA / Repair lifecycle。
-
-### `ecommerce-ad-workflow`
-
-SHOULD use for ecommerce、SKU、product advertising、direct-response product video或commercial product brief authoring。它独占Development-side Product Truth、claim ledger、Hook、ad beats、product presentation、advertising copy/audio intent、CTA、creative variants与capability-aware handoff contract；AI comic、episode、serial与cliffhanger request不得路由到该 Skill。
-
-该 Skill只产出offline authoring package与existing Runtime proposals/requirements/gaps。它不得安装或调用external ad system，不得读取credential、选择Provider、生成媒体、写Project/Registry/Manifest、重算`ResolvedTimeline`、选择renderer或给出P6/Final Acceptance；advertising graphics与physical interaction缺口必须保持显式capability classification。
-
-### Routing Precedence
-
-- 命中 `Agent Memory Retrieval Routing` -> 先调用 `retrieve-ai-video-memory`，再进入下列
-  matching domain owner；retrieval 只提供 advisory evidence，不重定义其 contract。
-- Ecommerce / SKU / product advertising authoring -> `ecommerce-ad-workflow`；其中具体Shot continuity、Provider prompt adaptation或deterministic motion treatment仍按下列owner顺序作为advisory input。
-- Semantic continuity / Shot-state problem -> `hell-grind-aigc-skill`。
-- Specific generative model / Provider prompting problem -> `higgsfield`。
-- Deterministic motion design / graphics / pacing problem -> `video-shotcraft`。
-- Production state / assets / dependency / timeline / render / Provider execution / activation / recovery -> AI-VIDEO code and contracts。
-
-多 Skill 组合必须按依赖顺序调用；后续 Skill 可以适配前序 advisory result，但不能重定义上游 semantic contract 或下游 production truth。
-
-```text
-generated-video continuity:
-AI-VIDEO Shot intent
-  -> hell-grind-aigc-skill: establish semantic continuity
-  -> higgsfield: adapt the approved contract to Provider prompt/mode guidance
-  -> AI-VIDEO Provider Request: provenance, lifecycle, activation, recovery
-
-image motion / motion graphics:
-AI-VIDEO Shot intent
-  -> hell-grind-aigc-skill when semantic state needs clarification
-  -> video-shotcraft: motion, pacing, transition, SFX, beat treatment
-  -> AI-VIDEO CompositionSpec -> ResolvedTimeline -> HyperFrames
-```
-
-External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、Asset Registry、Manifest、Dependency Graph、timeline、renderer selection、Provider lifecycle、review/repair 或 delivery state。
+Detailed trigger、preflight evidence、ordering、provider preference 与 forbidden Skill runtime
+behavior 只在 `.agent/context/control-plane-playbook.md` 的 `Creative Skill Routing And
+Preflight` 维护。External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、
+Asset Registry、Manifest、Dependency Graph、timeline、renderer、Provider lifecycle、review、
+repair 或 delivery state。
 
 ## Module Boundaries
 
-- `src/ai_video/cli.py`：CLI parsing 与用户命令编排。
-- `src/ai_video/config.py`：YAML/config validation、本地策略与路径解析。
-- `src/ai_video/workflow_loader.py` / `workflow_renderer.py`：标准 workflow loading、UI-to-API conversion 与 pure binding/rendering。
-- `src/ai_video/comfy_client.py`：ComfyUI transport、polling、artifact download 与 typed transport failure。
-- `src/ai_video/pipeline.py` / `manifest.py`：Legacy Shot orchestration、resume 与 atomic Legacy Manifest persistence。
-- `src/ai_video/ffmpeg_tools.py`：probe、clip validation、frame extraction、normalization 与 stitching。
-- `src/ai_video/production/models.py` / `hashing.py` / `paths.py` / `validation.py`：strict schemas、sealing、containment 与 static validation。
-- `src/ai_video/production/registry.py` / `project.py` / `_*project_reader.py`：read-only selected Asset Registry / Production Project evidence loading；不得写入、恢复或激活。
-- `src/ai_video/production/state_commit.py` / `_state_commit_*`：唯一 public v2 writer、activation、commit 与 recovery boundary；private modules不得形成第二 writer。
-- `src/ai_video/production/dependency.py`：pure immutable graph、desired fingerprint、precise invalidation 与 rebuild decisions；不得写文件、Manifest、Registry 或 runtime status。
-- `src/ai_video/production/composition.py` / `hyperframes.py` / `visual_media.py`：canonical composition resolution、media validation 与 selected HyperFrames execution；不得另造 timeline。
-- `src/ai_video/production/audio.py` / `captions.py` / voice adapters：audio、voice、caption contracts；timing仍归 `ResolvedTimeline`，durable mutation仍归 committer。
-- `src/ai_video/production/review.py` 与 `src/ai_video_mcp/**`：pure review contracts或 raw analysis evidence；不得自判或写入 Production acceptance。
-- `src/ai_video/production/image.py` / `video.py` / Provider adapters：provider-neutral contracts与显式 adapter execution；不得成为 writer、resolver、Provider selector 或 activation owner。
-- `src/ai_video/production/__init__.py`：只暴露 approved public imports，不承载 implementation。
-
-更细的 surface owner、forbidden alternate path 与 focused tests 以 `docs/agent-primary-contract-matrix.md` 为准。
+`docs/agent-primary-contract-matrix.md` 是 detailed surface owner、module boundary、forbidden
+alternate path 与 focused verification 的唯一 human-readable owner。实现必须遵守上方
+`Canonical Ownership`，不得在 `AGENTS.md` 或 `.agent/context/` 复制第二份 file-to-owner catalog。
 
 ## Coding Standards
 
@@ -235,8 +178,7 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 ## Provider Credential and Paid Execution Rules
 
 - Seedance / Volcengine Ark raw credential 不得存入 repository、`.env`、artifact、prompt、command argument、fixture、log、error、repr、receipt 或本文档。
-- 稳定 credential reference 是 `ARK_API_KEY`；本机 Secret Service exact attributes 为 `application ai-video`、`provider seedance`、`credential ARK_API_KEY`。不得改用 `SEEDANCE_API_KEY`、读取 MiniMax credential 或建立 environment/provider fallback。
-- Secret lookup 必须封装在 injected credential supplier 中。不得在交互终端把 secret 输出到 stdout；presence check 必须不回显。Lookup失败、keyring locked、credential invalid/rotated 时 fail closed，不得搜索 repo、shell history 或替代 secret source。
+- Secret lookup 必须封装在 injected credential supplier 中，presence check 不得回显；lookup失败、keyring locked、credential invalid/rotated 时 fail closed，不得搜索 repo、shell history 或替代 secret source。本机 credential reference、Secret Service attributes 与 lookup detail 只在 `.agent/context/control-plane-playbook.md` 维护。
 - Credential 存在不证明 access、pricing、余额或当前 task authorization。
 - 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；不得仅因付费对同一任务重复询问。Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
 - Authorization 仅覆盖 accepted Provider/model、inputs、budget 与完成目标所需的最少调用；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。
@@ -258,14 +200,10 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 
 ## Repository-Specific Don't Repeat This
 
-- 不要对同一 `run_id` 再次调用 `run()` 来实现 resume；从持久化 Manifest 恢复。
-- 不要将包含 `..` 的相对 artifact path 写入 Manifest 或 resolved config；持久化路径必须是干净绝对路径。
-- 不要在更新 `final_output` 等 terminal state 后绕过 atomic Manifest write。
-- 不要在测试中用裸 YAML/JSON parsing 绕过标准 `load_workflow_template()` 或 Production loader。
-- Production invalidation 不得退化为 Shot-order blanket stale；只沿 canonical typed dependency edges 传播。
-- 不要让 native media audio 绕过 canonical P4 mixer，也不要让 graph、Provider 或 Skill 重算 `ResolvedTimeline`。
-- Project-local `video-analysis` 是本仓库默认视频检查工具
-- 交付 generated-video 时只提供真实 live/fetched/validated output；不得把 preflight、fake fixture、smoke artifact、technical evidence 或 fetch success冒充 activated、quality-accepted 或 final delivery truth。
+具体 implementation pitfalls、standard loader、resume/path、media-analysis tool 与交付案例只在
+`.agent/context/control-plane-playbook.md` 的同名 section 维护；已经真实发生且可复现的 regression
+才进入 `.agent/bug-memory/`。任何实现仍不得绕过 canonical owner、standard loader、atomic
+state write、typed dependency、`ResolvedTimeline` 或 truthful delivery boundary。
 
 ## Completion Standard
 

@@ -52,8 +52,12 @@ Within AI-VIDEO, the operational sections of upstream `h3-video` are reference-o
 
 `video-shotcraft` MUST use when the task includes motion design、image motion、motion graphics、shot language、camera movement、pacing、transition、SFX、beat sync 或 visual QA ideas。其 Remotion implementation、recipe、timeline 与 renderer 只是 creative / implementation reference；选定方案必须翻译成 AI-VIDEO composition directives。
 
+`ecommerce-ad-workflow` MUST use for ecommerce、SKU、product advertising、direct-response product video 或 commercial product brief authoring。它只产出 Development-side Product Truth、claim ledger、Hook、ad beats、copy/audio intent、CTA、creative variants 与 capability-aware handoff；不得安装或调用 external ad system、读取 credential、选择 Provider、生成媒体、写 Project/Registry/Manifest、重算 `ResolvedTimeline`、选择 renderer 或给出 P6 / Final Acceptance。AI comic、episode、serial 与 cliffhanger request 不得路由到该 Skill。
+
 Routing precedence：
 
+- 命中 `Agent Memory Retrieval Routing` -> 先调用 `retrieve-ai-video-memory`；retrieval 只提供 advisory evidence，不重定义下游 contract。
+- Ecommerce / SKU / product advertising authoring -> `ecommerce-ad-workflow`；具体 continuity、Provider prompt 或 deterministic motion concern 再进入对应下游 Skill。
 - Concept/script -> ordered Director coverage / Shot plan -> `open-video`。
 - Semantic continuity / Shot-state problem -> `hell-grind-aigc-skill`。
 - Approved Shot + Generation Requirement + selected MiniMax H3 target -> `h3-video`。
@@ -93,28 +97,15 @@ External Skills MUST NOT invent or own canonical Character/Scene/Shot truth、As
 
 ## 2. Module Boundaries And Focused Owners
 
-- `src/ai_video/cli.py`：CLI parsing 与用户命令编排。
-- `src/ai_video/config.py`：YAML/config validation、本地策略与路径解析。
-- `src/ai_video/workflow_loader.py` / `workflow_renderer.py`：标准 workflow loading、UI-to-API conversion 与 pure binding/rendering。
-- `src/ai_video/comfy_client.py`：ComfyUI transport、polling、artifact download 与 typed transport failure。
-- `src/ai_video/pipeline.py` / `manifest.py`：Legacy Shot orchestration、resume 与 atomic Legacy Manifest persistence。
-- `src/ai_video/ffmpeg_tools.py`：probe、clip validation、frame extraction、normalization 与 stitching。
-- `src/ai_video/production/models.py` / `hashing.py` / `paths.py` / `validation.py`：strict schemas、sealing、containment 与 static validation。
-- `src/ai_video/production/registry.py` / `project.py` / `_*project_reader.py`：read-only selected Asset Registry / Production Project evidence loading；不得写入、恢复或激活。
-- `src/ai_video/production/state_commit.py` / `_state_commit_*`：唯一 public v2 writer、activation、commit 与 recovery boundary；private modules不得形成第二 writer。
-- `src/ai_video/production/dependency.py`：pure immutable graph、desired fingerprint、precise invalidation 与 rebuild decisions；不得写文件、Manifest、Registry 或 runtime status。
-- `src/ai_video/production/composition.py` / `hyperframes.py` / `visual_media.py`：canonical composition resolution、media validation 与 selected HyperFrames execution；不得另造 timeline。
-- `src/ai_video/production/audio.py` / `captions.py` / voice adapters：audio、voice、caption contracts；timing仍归 `ResolvedTimeline`，durable mutation仍归 committer。
-- `src/ai_video/production/review.py` 与 `src/ai_video_mcp/**`：pure review contracts或 raw analysis evidence；不得自判或写入 Production acceptance。
-- `src/ai_video/production/image.py` / `video.py` / Provider adapters：provider-neutral contracts与显式 adapter execution；不得成为 writer、resolver、Provider selector 或 activation owner。
-- `src/ai_video/production/__init__.py`：只暴露 approved public imports，不承载 implementation。
-
-更细的 surface owner、forbidden alternate path 与 focused tests 以 `docs/agent-primary-contract-matrix.md` 为准。
+`docs/agent-primary-contract-matrix.md` 独占 detailed surface owner、file/module mapping、
+invariant、forbidden alternate path 与 focused verification。本 playbook 只保存低频执行细节，
+不得复制完整 catalog 或形成第二 owner。需要 structural mapping 时直接读取 matrix 与当前
+code/tests；`AGENTS.md` 的 `Canonical Ownership` 继续提供顶层 durable boundary。
 
 ## 3. Provider Credential And Paid Execution Details
 
 - Seedance / Volcengine Ark raw credential 不得存入 repository、`.env`、artifact、prompt、command argument、fixture、log、error、repr、receipt 或任何 durable doc。
-- 稳定 credential reference 与本机 Secret Service exact attributes 以 `AGENTS.md` 为准；不得改用未声明的 environment key、读取其他 Provider credential 或建立 environment/provider fallback。
+- 稳定 credential reference 是 `ARK_API_KEY`；本机 Secret Service exact attributes 为 `application ai-video`、`provider seedance`、`credential ARK_API_KEY`。不得改用 `SEEDANCE_API_KEY`、读取 MiniMax credential 或建立 environment/provider fallback。
 - Secret lookup 必须封装在 injected credential supplier 中。不得在交互终端把 secret 输出到 stdout；presence check 必须不回显。Lookup失败、keyring locked、credential invalid/rotated 时 fail closed，不得搜索 repo、shell history 或替代 secret source。
 - Credential 存在不证明 access、pricing、余额或当前 task authorization。
 - 当前 task scope 内的 loopback local ComfyUI Provider generation 是 local、unmetered、no-cloud-egress execution，不适用 remote/paid task-scoped authorization，也不需要额外 user confirmation。用户明确禁止 live generation 时仍必须停止；sealed profile、preflight、local permit、唯一 committer、recovery 与 media verification gates 不因该豁免而放宽。
@@ -161,6 +152,10 @@ Safety / User Authorization
 
 ## 5. Repository-Specific Don't Repeat This
 
+本 section 保存可复用的 implementation pitfall 与工具选择；已经真实发生、可复现且值得
+防止重犯的独立 regression/incident 才进入 `.agent/bug-memory/`。普通操作手册、环境说明、
+设计建议或未发生风险不得放入 bug memory。
+
 - 不要对同一 `run_id` 再次调用 `run()` 来实现 resume；从持久化 Manifest 恢复。
 - 不要将包含 `..` 的相对 artifact path 写入 Manifest 或 resolved config；持久化路径必须是干净绝对路径。
 - 不要在更新 `final_output` 等 terminal state 后绕过 atomic Manifest write。
@@ -172,10 +167,16 @@ Safety / User Authorization
 
 ## 6. Agent Experience Memory Routing
 
-Agent Memory 是 scoped、local、advisory knowledge source。`experience` scope
-检索 `docs/record_for_agent/`；`superpowers` scope 检索 `docs/superpowers/`
-中的历史 specs/plans。后者必须标记为 historical design/plan，不能升级为
-current runtime truth、implementation authorization 或 accepted contract。
+Agent Memory 是 scoped、local、advisory knowledge source。调用入口与 authoritative
+failure behavior 以 `.agents/skills/retrieve-ai-video-memory/SKILL.md` 为准；本 section
+只保存 repo-local routing detail。
+
+- 默认使用 `experience`，检索 `docs/record_for_agent/` 并合并 eligible run summaries。
+- 只有明确需要 historical specs/plans 时使用 `superpowers`。
+- 需要 current top-level docs、research、deferred decisions、experience 与 historical
+  plans 的 cross-category evidence 时使用 `all`；必须保留各 hit 的 authority distinction。
+- 每次只读取一个 matching scope reference，并执行一个 focused query；不得为了强行命中
+  而降低 admission gate、重复等价查询或无依据扩大 scope。
 
 `runs/<run_id>/SUMMARY.md`（auto-generated run summaries）通过独立的 derived
 index `.agent/memory/run-summaries`（collection `agent_memory_run_summaries`，
@@ -188,8 +189,7 @@ trailing `-vN` 解析为 `run_family`/`run_version`，同 family 只保留最高
 status、`document_kind=run_summary`、`run_id` / `run_family` / `run_version`、
 `summary_sha256` 与 formatted authority 标签。
 
-Use `scripts/agent_memory.py search` before substantial execution when
-the task involves:
+Use `retrieve-ai-video-memory` before substantial execution when the task involves:
 
 - real media production;
 - rough-cut or final output quality;
@@ -204,11 +204,19 @@ The Agent SHOULD NOT query memory for trivial changes such as formatting,
 typo fixes, isolated refactors, or tests with no relation to previous
 production experience.
 
-默认只使用 `experience`；它会自动合并 eligible run summaries。只有 task 需要
-历史 architecture/spec/plan evidence 时才使用 `--scope superpowers` 或
-`--scope all`。Runtime 不得自动下载 embedding model、联网 fallback 或把
-Agent Memory 接入 Production state；主 index identity mismatch 或 stale corpus
-必须 fail closed 并显式 rebuild，独立的 run-summary derived index 则自动重建。
+Result handling 必须 fail closed 且 non-blocking：
+
+- exit `0` + fresh hits 或 `[]` 是正常结果；`[]` 是有效 abstention。
+- exit `0` + `index_freshness=stale` 只返回 physically valid、tagged last-good fragments，
+  并异步 queue exact stale shards；继续使用当前文件证据，不等待、不轮询、不重复检索。
+- exit `3` 表示 local sharded layout missing 或需要 one-time migration；CLI 已 queue
+  materialization，本 task 继续使用当前 repository evidence，不在前台重试。
+- exit `2` 是 schema、embedding、authority、manifest 或 physical collection strict
+  failure；显式报告并继续当前文件证据，不 enqueue/rebuild、不降低 validation。
+
+Runtime 不得自动下载 embedding model、使用 fake embedding、联网 fallback 或把 Agent
+Memory 接入 Production state。Derived-index maintenance 不是 lifecycle hook，也不授权
+Product Runtime mutation。
 
 Retrieved memories are advisory only. They MUST NOT override:
 
@@ -217,6 +225,5 @@ Retrieved memories are advisory only. They MUST NOT override:
 3. runtime evidence;
 4. current architecture contracts。
 
-Before completing a task involving production quality, Provider behavior,
-or known failure domains, perform a final relevant memory search to check
-for repeated mistakes。
+只有 implementation findings materially 改变原 query 并暴露 distinct term/owner/failure
+signature 时，完成前才允许一次 focused follow-up；不得把重复检索当作 completion ceremony。
