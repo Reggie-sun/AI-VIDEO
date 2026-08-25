@@ -16,6 +16,7 @@ G7 是 authoring preflight：检查 package 的真相、广告逻辑和 handoff 
 8. audio coverage、on-camera binding、source-audio policy、lead-in P6 requirement 是否完整？
 9. Shot duration 是否由 beat rationale 驱动，而非机械等长？
 10. Runtime capability gap 是否已分类，未被 fallback 或 prose 隐藏？
+11. Package `ad_format`是否与source input一致，且对应Gate Profile已经闭合？
 
 ## Decision
 

@@ -77,14 +77,7 @@
         ]
       }
     ],
-    "prohibited_claims": [
-      {
-        "claim_id": "claim-detox",
-        "text": "Clinically proven detox",
-        "claim_type": "MEDICAL_OR_THERAPEUTIC",
-        "reason": "Medical and therapeutic claims are forbidden in V1."
-      }
-    ],
+    "prohibited_claims": [],
     "required_disclaimers": []
   },
   "audience": {

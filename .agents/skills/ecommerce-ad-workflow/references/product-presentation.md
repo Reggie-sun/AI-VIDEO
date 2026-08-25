@@ -12,8 +12,8 @@
 
 ## Gates and Stop Conditions
 
-- 首次出现、demo/payoff、hero/CTA 任一无 typed role/mode 时阻止 G3。
-- `PHYSICAL_INTERACTION_REQUIRED` 若缺 source-generation strategy 或 verified Runtime capability，validator 返回 blocker code `blocked_capability_gap`；handoff requirement仍分别使用合法 classification `REQUIRES_SOURCE_GENERATION_STRATEGY` 或 `REQUIRES_RUNTIME_CAPABILITY`。V1 没有可独立重开的 authoritative evidence seam，且 current Runtime 未实现 verified physical interaction，因此即使 package 自称 `SUPPORTED_CURRENTLY` 也必须 fail closed；未来放行需要独立 contract/evidence slice。不得把 blocker code写成 classification，也不得降级为假装手持、遮挡、透视、shadow 或 tracking 的 flat overlay。
+- 所有格式都需要intro、hero与CTA support；demo、proof、talent interaction与graphic reveal按`ad_format` profile决定，缺少该格式的定义性证据时阻止G3。不得为了统一schema给talent-free格式编造人物。
+- `PHYSICAL_INTERACTION_REQUIRED` 若缺 source-generation strategy 或 verified Runtime capability，validator 返回 blocker code `blocked_capability_gap`；handoff requirement仍分别使用合法 classification `REQUIRES_SOURCE_GENERATION_STRATEGY` 或 `REQUIRES_RUNTIME_CAPABILITY`。Current contract 没有可独立重开的 authoritative evidence seam，且 current Runtime 未实现 verified physical interaction，因此即使 package 自称 `SUPPORTED_CURRENTLY` 也必须 fail closed；未来放行需要独立 contract/evidence slice。不得把 blocker code写成 classification，也不得降级为假装手持、遮挡、透视、shadow 或 tracking 的 flat overlay。
 - fallback 仅可切换成明确 graphic treatment 或 dedicated hero shot，并须重新批准 creative intent；不能静默改变。
 
 ## Quick Reference

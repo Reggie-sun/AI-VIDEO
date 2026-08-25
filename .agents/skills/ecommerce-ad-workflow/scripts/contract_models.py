@@ -23,6 +23,25 @@ Identifier = Annotated[
         pattern=r"^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
     ),
 ]
+AdFormat = Literal[
+    "product_demo",
+    "presenter_spokesperson",
+    "lifestyle_use_case",
+    "comparison",
+    "problem_solution",
+    "motion_graphics_product",
+]
+VariantConstant = Literal[
+    "claim_ledger",
+    "cta_destination",
+    "delivery_intent",
+    "objective",
+    "platform_constraints",
+    "product_identity",
+    "product_truth",
+    "rights",
+    "unchanged_strategy_fields",
+]
 
 
 class StrictModel(BaseModel):
@@ -95,7 +114,7 @@ class ProductTruthInput(StrictModel):
     sources: tuple[TruthSource, ...] = Field(min_length=1)
     facts: tuple[ProductFact, ...] = Field(min_length=1)
     allowed_claims: tuple[AllowedClaim, ...] = Field(min_length=1)
-    prohibited_claims: tuple[ProhibitedClaim, ...] = Field(min_length=1)
+    prohibited_claims: tuple[ProhibitedClaim, ...]
     required_disclaimers: tuple[NonEmptyText, ...]
 
 
@@ -124,14 +143,7 @@ class EcommerceAdInput(StrictModel):
     aspect_ratio: Literal["9:16"]
     language: NonEmptyText
     style: NonEmptyText
-    ad_format: Literal[
-        "product_demo",
-        "presenter_spokesperson",
-        "lifestyle_use_case",
-        "comparison",
-        "problem_solution",
-        "motion_graphics_product",
-    ]
+    ad_format: AdFormat
     references: tuple[NonEmptyText, ...]
     constraints: tuple[NonEmptyText, ...]
 
@@ -143,7 +155,7 @@ class ProductTruthSnapshot(StrictModel):
     sources: tuple[TruthSource, ...] = Field(min_length=1)
     facts: tuple[ProductFact, ...] = Field(min_length=1)
     allowed_claims: tuple[AllowedClaim, ...] = Field(min_length=1)
-    prohibited_claims: tuple[ProhibitedClaim, ...] = Field(min_length=1)
+    prohibited_claims: tuple[ProhibitedClaim, ...]
     required_disclaimers: tuple[NonEmptyText, ...]
 
 
@@ -337,7 +349,7 @@ class ShotIntent(StrictModel):
         "INTENTIONAL_EQUAL_RHYTHM",
     ]
     product_state: NonEmptyText
-    talent_action: NonEmptyText
+    talent_action: NonEmptyText | None
     camera_intent: NonEmptyText
     presentation_ids: tuple[Identifier, ...]
     copy_ids: tuple[Identifier, ...]
@@ -369,17 +381,7 @@ class CreativeVariant(StrictModel):
     ]
     baseline_value: NonEmptyText
     variant_value: NonEmptyText
-    held_constants: tuple[Literal[
-        "claim_ledger",
-        "cta_destination",
-        "delivery_intent",
-        "objective",
-        "platform_constraints",
-        "product_identity",
-        "product_truth",
-        "rights",
-        "unchanged_strategy_fields",
-    ], ...] = Field(min_length=9, max_length=9)
+    held_constants: tuple[VariantConstant, ...] = Field(min_length=9, max_length=9)
     hypothesis: NonEmptyText
     required_new_assets: tuple[NonEmptyText, ...]
 
@@ -458,25 +460,26 @@ class AdQCReport(StrictModel):
 
 
 class EcommerceAdProductionPackage(StrictModel):
-    schema_version: Literal["ecommerce-ad-workflow/package/1"]
+    schema_version: Literal["ecommerce-ad-workflow/package/2"]
     package_id: str = Field(pattern=SHA256_PATTERN)
     source_input_hash: str = Field(pattern=SHA256_PATTERN)
     duration_seconds: float = Field(ge=6.0, le=60.0)
     aspect_ratio: Literal["9:16"]
+    ad_format: AdFormat
     product_truth: ProductTruthSnapshot
     claim_ledger: tuple[ClaimLedgerEntry, ...] = Field(min_length=1)
     ad_strategy: AdStrategy
     hook_contract: HookContract
     ad_beats: tuple[AdBeat, ...] = Field(min_length=1)
     product_presentation: tuple[ProductPresentation, ...] = Field(min_length=1)
-    talent_plan: tuple[TalentPlan, ...] = Field(min_length=1)
-    set_plan: tuple[SetPlan, ...] = Field(min_length=1)
+    talent_plan: tuple[TalentPlan, ...]
+    set_plan: tuple[SetPlan, ...]
     copy_graphics_plan: tuple[CopyGraphic, ...] = Field(min_length=1)
     audio_plan: AudioPlan
     storyboard: tuple[StoryboardGroup, ...] = Field(min_length=1)
     shot_intents: tuple[ShotIntent, ...] = Field(min_length=1)
     cta: CTAPlan
-    creative_variant_matrix: CreativeVariantMatrix
+    creative_variant_matrix: CreativeVariantMatrix | None = None
     runtime_handoff: RuntimeHandoff
     ad_qc_report: AdQCReport
     unresolved_items: tuple[NonEmptyText, ...]

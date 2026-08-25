@@ -3,30 +3,17 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import get_args
 
 from contract_models import (
     ClaimType,
     EcommerceAdInput,
     EcommerceAdProductionPackage,
+    VariantConstant,
 )
 
 
-_REQUIRED_VARIANT_CONSTANTS = frozenset(
-    {
-        "claim_ledger",
-        "cta_destination",
-        "delivery_intent",
-        "objective",
-        "platform_constraints",
-        "product_identity",
-        "product_truth",
-        "rights",
-        "unchanged_strategy_fields",
-    }
-)
-_REQUIRED_HOOK_COMPONENT_KINDS = frozenset(
-    {"VISUAL", "DIALOGUE_OR_VO", "COPY", "AUDIO"}
-)
+REQUIRED_VARIANT_CONSTANTS = frozenset(get_args(VariantConstant))
 
 
 def validate_input_contract(document: EcommerceAdInput) -> None:
@@ -51,6 +38,7 @@ def validate_package_contract(document: EcommerceAdProductionPackage) -> None:
     _validate_product_name(document)
     _validate_hook(document)
     _validate_product_presentation_roles(document)
+    _validate_ad_format_profile(document)
     _validate_runtime_handoff(document)
     _validate_physical_interaction(document)
     _validate_commercial_copy(document)
@@ -70,6 +58,7 @@ def validate_package_contract(document: EcommerceAdProductionPackage) -> None:
         raise ValueError(
             "ad_qc_blocked: blocking Ad QC findings prevent package readiness"
         )
+
 
 def _require_unique(label: str, values: Iterable[str]) -> None:
     materialized = tuple(values)
@@ -100,9 +89,7 @@ def _validate_product_truth(
     allowed_ids = {item.claim_id for item in allowed_claims}
     prohibited_ids = {item.claim_id for item in prohibited_claims}
     if allowed_ids & prohibited_ids:
-        raise ValueError(
-            "claim_lineage: a claim cannot be both allowed and prohibited"
-        )
+        raise ValueError("claim_lineage: a claim cannot be both allowed and prohibited")
     if any(item.rights_status != "CONFIRMED" for item in source_assets) or any(
         item.rights_status != "CONFIRMED" for item in sources
     ):
@@ -117,13 +104,11 @@ def _validate_product_truth(
             fact.source_ids,
         )
         if not set(fact.source_ids).issubset(source_ids):
-            raise ValueError(
-                "claim_lineage: product fact references an unknown source"
-            )
+            raise ValueError("claim_lineage: product fact references an unknown source")
     for claim in allowed_claims:
         if claim.claim_type is ClaimType.MEDICAL_OR_THERAPEUTIC:
             raise ValueError(
-                "medical_claim_forbidden: medical or therapeutic claims are forbidden in V1"
+                "medical_claim_forbidden: medical or therapeutic claims are forbidden"
             )
         _require_unique(f"fact_id in claim {claim.claim_id}", claim.fact_ids)
         _require_unique(f"source_id in claim {claim.claim_id}", claim.source_ids)
@@ -145,7 +130,9 @@ def _validate_product_truth(
 def _validate_claim_ledger(package: EcommerceAdProductionPackage) -> None:
     allowed = {item.claim_id: item for item in package.product_truth.allowed_claims}
     prohibited = {item.claim_id for item in package.product_truth.prohibited_claims}
-    _require_unique("claim ledger claim_id", (item.claim_id for item in package.claim_ledger))
+    _require_unique(
+        "claim ledger claim_id", (item.claim_id for item in package.claim_ledger)
+    )
     if {item.claim_id for item in package.claim_ledger} != set(allowed) | prohibited:
         raise ValueError(
             "claim_lineage: claim ledger must cover every allowed and prohibited claim exactly once"
@@ -225,11 +212,6 @@ def _validate_hook(package: EcommerceAdProductionPackage) -> None:
         "Hook component_id",
         (item.component_id for item in package.hook_contract.components),
     )
-    kinds = {item.kind for item in package.hook_contract.components}
-    if kinds != _REQUIRED_HOOK_COMPONENT_KINDS:
-        raise ValueError(
-            "hook_contract: Hook requires visual, dialogue or voice-over, copy, and audio components"
-        )
     if not any(item.cue_seconds < 1.0 for item in package.hook_contract.components):
         raise ValueError(
             "hook_first_second: at least one Hook component must be observable before one second"
@@ -273,23 +255,100 @@ def _validate_product_presentation_roles(
     package: EcommerceAdProductionPackage,
 ) -> None:
     roles = {item.role for item in package.product_presentation}
-    if not {"INTRO", "HERO_SHOT", "CTA_SUPPORT"}.issubset(roles) or not roles & {
-        "DEMONSTRATION",
-        "BENEFIT_PROOF",
-    }:
+    if not {"INTRO", "HERO_SHOT", "CTA_SUPPORT"}.issubset(roles):
         raise ValueError(
-            "product_presentation_roles: product presentation requires intro, demonstration or proof, hero, and CTA support"
+            "product_presentation_roles: product presentation requires intro, hero, and CTA support"
         )
 
 
+def _validate_ad_format_profile(package: EcommerceAdProductionPackage) -> None:
+    roles = {item.role for item in package.product_presentation}
+    modes = {item.mode for item in package.product_presentation}
+    beat_roles = {item.role for item in package.ad_beats}
+    used_claim_ids = {
+        item.claim_id for item in package.claim_ledger if item.status == "USED"
+    }
+    used_claim_types = {
+        item.claim_type
+        for item in package.product_truth.allowed_claims
+        if item.claim_id in used_claim_ids
+    }
+    has_value_presentation = bool(roles & {"DEMONSTRATION", "BENEFIT_PROOF"})
+    shots = {item.shot_id: item for item in package.shot_intents}
+    talent_ids = {item.talent_id for item in package.talent_plan}
+    has_bound_presenter_line = any(
+        item.kind == "DIALOGUE"
+        and item.on_camera
+        and item.verbatim_line is not None
+        and item.speaker_id in talent_ids
+        and item.lip_sync_required
+        and len(item.shot_ids) == 1
+        and item.shot_ids[0] in shots
+        and shots[item.shot_ids[0]].talent_action is not None
+        for item in package.audio_plan.events
+    )
+    has_talent_use = any(
+        item.talent_interaction != "NONE" for item in package.product_presentation
+    ) or any(item.talent_action is not None for item in package.shot_intents)
+
+    if not package.talent_plan and has_talent_use:
+        raise ValueError(
+            "ad_format_profile: talent-free packages cannot declare talent actions or interaction"
+        )
+    if package.ad_format == "presenter_spokesperson":
+        if (
+            not package.talent_plan
+            or not has_bound_presenter_line
+            or not has_value_presentation
+        ):
+            raise ValueError(
+                "ad_format_profile: presenter spokesperson requires talent, a bound on-camera line, and demonstration or proof"
+            )
+    elif package.ad_format == "product_demo":
+        if "DEMONSTRATION" not in roles:
+            raise ValueError(
+                "ad_format_profile: product demo requires a demonstration presentation"
+            )
+    elif package.ad_format == "comparison":
+        if ClaimType.COMPARISON not in used_claim_types or "BENEFIT_PROOF" not in roles:
+            raise ValueError(
+                "ad_format_profile: comparison requires a used comparison claim and benefit-proof presentation"
+            )
+    elif package.ad_format == "problem_solution":
+        if "PROBLEM" not in beat_roles or not has_value_presentation:
+            raise ValueError(
+                "ad_format_profile: problem-solution requires a problem beat and demonstration or proof"
+            )
+    elif package.ad_format == "lifestyle_use_case":
+        if not package.set_plan or not has_value_presentation:
+            raise ValueError(
+                "ad_format_profile: lifestyle use case requires a set and demonstration or proof"
+            )
+    elif package.ad_format == "motion_graphics_product":
+        if "GRAPHIC_REVEAL" not in modes or not has_value_presentation:
+            raise ValueError(
+                "ad_format_profile: motion graphics product requires a graphic reveal and demonstration or proof"
+            )
+
+
 def _validate_runtime_handoff(package: EcommerceAdProductionPackage) -> None:
+    if not package.talent_plan and any(
+        item.target == "Character" for item in package.runtime_handoff.proposals
+    ):
+        raise ValueError(
+            "runtime_handoff: talent-free packages cannot propose a Character"
+        )
+    if not package.set_plan and any(
+        item.target == "Scene" for item in package.runtime_handoff.proposals
+    ):
+        raise ValueError("runtime_handoff: set-free packages cannot propose a Scene")
     requirements = {
         item.requirement_id: item for item in package.runtime_handoff.requirements
     }
     gaps = {item.gap_id: item for item in package.runtime_handoff.classified_gaps}
-    if len(requirements) != len(package.runtime_handoff.requirements) or len(gaps) != len(
-        package.runtime_handoff.classified_gaps
-    ):
+    if len(requirements) != len(package.runtime_handoff.requirements) or len(
+        gaps
+    ) != len(package.runtime_handoff.classified_gaps):
         raise ValueError(
             "runtime_handoff: requirement and classified-gap IDs must be unique"
         )
@@ -298,10 +357,9 @@ def _validate_runtime_handoff(package: EcommerceAdProductionPackage) -> None:
         for gap in package.runtime_handoff.classified_gaps
         for requirement_id in gap.requirement_ids
     )
-    if (
-        len(classified_requirement_ids) != len(set(classified_requirement_ids))
-        or set(classified_requirement_ids) != set(requirements)
-    ):
+    if len(classified_requirement_ids) != len(set(classified_requirement_ids)) or set(
+        classified_requirement_ids
+    ) != set(requirements):
         raise ValueError(
             "runtime_handoff: every requirement must appear in exactly one classified gap"
         )
@@ -313,6 +371,16 @@ def _validate_runtime_handoff(package: EcommerceAdProductionPackage) -> None:
             raise ValueError(
                 "runtime_handoff: gap classification must match every bound requirement"
             )
+    if any(
+        item.classification == "BLOCKED_BY_TRUTH_OR_RIGHTS"
+        for item in package.runtime_handoff.requirements
+    ) or any(
+        item.classification == "BLOCKED_BY_TRUTH_OR_RIGHTS"
+        for item in package.runtime_handoff.classified_gaps
+    ):
+        raise ValueError(
+            "runtime_handoff_blocked: truth or rights blockers prevent authoring readiness"
+        )
 
 
 def _validate_physical_interaction(package: EcommerceAdProductionPackage) -> None:
@@ -320,7 +388,7 @@ def _validate_physical_interaction(package: EcommerceAdProductionPackage) -> Non
         if item.mode != "PHYSICAL_INTERACTION_REQUIRED":
             continue
         raise ValueError(
-            "blocked_capability_gap: V1 has no authoritative evidence seam for source-generated or Runtime physical interaction"
+            "blocked_capability_gap: current contract has no authoritative evidence seam for source-generated or Runtime physical interaction"
         )
 
 
@@ -363,9 +431,7 @@ def _validate_audio_coverage(package: EcommerceAdProductionPackage) -> None:
         )
     for item in package.audio_plan.events:
         if item.end_seconds > package.duration_seconds + 1e-6:
-            raise ValueError(
-                "audio_coverage_gap: audio event exceeds the ad duration"
-            )
+            raise ValueError("audio_coverage_gap: audio event exceeds the ad duration")
         if item.kind == "INTENTIONAL_SILENCE" and item.silence_rationale is None:
             raise ValueError(
                 "audio_coverage_gap: intentional silence requires a commercial rationale"
@@ -435,6 +501,8 @@ def _validate_cta_brand_closure(package: EcommerceAdProductionPackage) -> None:
 
 
 def _validate_variants(package: EcommerceAdProductionPackage) -> None:
+    if package.creative_variant_matrix is None:
+        return
     if (
         package.creative_variant_matrix.master_strategy_id
         != package.ad_strategy.strategy_id
@@ -443,7 +511,7 @@ def _validate_variants(package: EcommerceAdProductionPackage) -> None:
             "variant_isolation: variant matrix must bind the exact master strategy"
         )
     for item in package.creative_variant_matrix.variants:
-        if set(item.held_constants) != _REQUIRED_VARIANT_CONSTANTS:
+        if set(item.held_constants) != REQUIRED_VARIANT_CONSTANTS:
             raise ValueError(
                 "variant_isolation: every creative variant must hold complete master truth constants"
             )
@@ -477,11 +545,16 @@ def _validate_traceability(package: EcommerceAdProductionPackage) -> None:
     _require_unique("beat_id", (item.beat_id for item in package.ad_beats))
     _require_unique("shot_id", (item.shot_id for item in package.shot_intents))
     _require_unique(
-        "presentation_id", (item.presentation_id for item in package.product_presentation)
+        "presentation_id",
+        (item.presentation_id for item in package.product_presentation),
     )
     _require_unique("copy_id", (item.copy_id for item in package.copy_graphics_plan))
-    _require_unique("audio event_id", (item.event_id for item in package.audio_plan.events))
-    _require_unique("storyboard group_id", (item.group_id for item in package.storyboard))
+    _require_unique(
+        "audio event_id", (item.event_id for item in package.audio_plan.events)
+    )
+    _require_unique(
+        "storyboard group_id", (item.group_id for item in package.storyboard)
+    )
     _require_unique("storyboard beat_id", (item.beat_id for item in package.storyboard))
     _require_unique(
         "Runtime requirement_id",
@@ -497,9 +570,7 @@ def _validate_traceability(package: EcommerceAdProductionPackage) -> None:
     hook_components = {
         item.component_id: item for item in package.hook_contract.components
     }
-    product_assets = {
-        item.asset_id for item in package.product_truth.source_assets
-    }
+    product_assets = {item.asset_id for item in package.product_truth.source_assets}
     requirements = {
         item.requirement_id for item in package.runtime_handoff.requirements
     }
@@ -518,7 +589,11 @@ def _validate_traceability(package: EcommerceAdProductionPackage) -> None:
         _require_exact_membership(
             f"beat {beat.beat_id} Shot IDs",
             beat.shot_ids,
-            {item.shot_id for item in package.shot_intents if item.beat_id == beat.beat_id},
+            {
+                item.shot_id
+                for item in package.shot_intents
+                if item.beat_id == beat.beat_id
+            },
         )
         _require_exact_membership(
             f"beat {beat.beat_id} presentation IDs",
@@ -551,9 +626,7 @@ def _validate_traceability(package: EcommerceAdProductionPackage) -> None:
         raise ValueError("traceability: ad beat budgets must equal target duration")
     for shot in package.shot_intents:
         if shot.beat_id not in beats:
-            raise ValueError(
-                "traceability: every Shot must bind one existing beat"
-            )
+            raise ValueError("traceability: every Shot must bind one existing beat")
         _require_exact_membership(
             f"Shot {shot.shot_id} presentation IDs",
             shot.presentation_ids,
@@ -592,10 +665,9 @@ def _validate_traceability(package: EcommerceAdProductionPackage) -> None:
             raise ValueError(
                 "traceability: product presentation must bind existing product, beat, Shot, and capability evidence"
             )
-        if (
-            not set(item.copy_cue_ids).issubset(copies)
-            or not set(item.audio_cue_ids).issubset(audio)
-        ):
+        if not set(item.copy_cue_ids).issubset(copies) or not set(
+            item.audio_cue_ids
+        ).issubset(audio):
             raise ValueError(
                 "traceability: product presentation references an unknown cue"
             )
@@ -653,9 +725,7 @@ def _validate_traceability(package: EcommerceAdProductionPackage) -> None:
             raise ValueError(
                 "traceability: audio event references an unknown beat or Shot"
             )
-        if {
-            shots[shot_id].beat_id for shot_id in item.shot_ids
-        } != set(item.beat_ids):
+        if {shots[shot_id].beat_id for shot_id in item.shot_ids} != set(item.beat_ids):
             raise ValueError(
                 "traceability: audio event beat IDs must exactly match its Shot beats"
             )

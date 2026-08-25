@@ -277,7 +277,6 @@
           "items": {
             "$ref": "#/$defs/ProhibitedClaim"
           },
-          "minItems": 1,
           "title": "Prohibited Claims",
           "type": "array"
         },

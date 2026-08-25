@@ -20,7 +20,11 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from contract_gates import validate_input_contract, validate_package_contract
+from contract_gates import (
+    REQUIRED_VARIANT_CONSTANTS,
+    validate_input_contract,
+    validate_package_contract,
+)
 from contract_models import (
     EcommerceAdInput,
     EcommerceAdProductionPackage,
@@ -31,9 +35,7 @@ from contract_models import (
 SKILL_ROOT = SCRIPT_DIR.parent
 SCHEMA_PATHS = {
     "input": SKILL_ROOT / "schemas" / "ecommerce-ad-input.schema.json",
-    "package": SKILL_ROOT
-    / "schemas"
-    / "ecommerce-ad-production-package.schema.json",
+    "package": SKILL_ROOT / "schemas" / "ecommerce-ad-production-package.schema.json",
 }
 _MODELS = {
     "input": EcommerceAdInput,
@@ -77,21 +79,9 @@ _RUNTIME_EXECUTION_FIELDS = frozenset(
         "timeline_samples",
     }
 )
-_REQUIRED_VARIANT_CONSTANTS = frozenset(
-    {
-        "claim_ledger",
-        "cta_destination",
-        "delivery_intent",
-        "objective",
-        "platform_constraints",
-        "product_identity",
-        "product_truth",
-        "rights",
-        "unchanged_strategy_fields",
-    }
-)
 _ROOT_DIAGNOSTIC_PATHS = {
     "ad_qc_blocked": "$.ad_qc_report",
+    "ad_format_profile": "$.ad_format",
     "audio_coverage_gap": "$.audio_plan",
     "blocked_capability_gap": "$.product_presentation",
     "claim_lineage": "$.claim_ledger",
@@ -107,7 +97,11 @@ _ROOT_DIAGNOSTIC_PATHS = {
     "product_presentation_roles": "$.product_presentation",
     "rights_not_confirmed": "$.product_truth",
     "runtime_handoff": "$.runtime_handoff",
+    "runtime_handoff_blocked": "$.runtime_handoff",
     "source_audio_policy": "$.audio_plan.source_audio_policies",
+    "source_input_hash": "$.source_input_hash",
+    "source_input_mismatch": "$.ad_format",
+    "source_input_required": "$.source_input_hash",
     "traceability": "$.ad_beats",
     "variant_isolation": "$.creative_variant_matrix",
 }
@@ -165,6 +159,53 @@ def validate_checked_in_schema(kind: Literal["input", "package"]) -> None:
         raise SchemaParityFailure(
             f"checked-in {kind} schema does not match the Pydantic contract"
         )
+
+
+def _read_payload(path: Path) -> tuple[str, Mapping[str, object]]:
+    if not path.is_file() or path.is_symlink():
+        raise ContractFailure(
+            [
+                Diagnostic(
+                    path="$",
+                    code="input_file_invalid",
+                    message="file must be an existing regular non-symlink JSON file",
+                )
+            ]
+        )
+    try:
+        raw_text = path.read_text(encoding="utf-8")
+        payload = json.loads(raw_text)
+    except (json.JSONDecodeError, UnicodeError):
+        raise ContractFailure(
+            [
+                Diagnostic(
+                    path="$",
+                    code="malformed_json",
+                    message="file is not valid JSON",
+                )
+            ]
+        ) from None
+    except OSError as exc:
+        raise ContractFailure(
+            [
+                Diagnostic(
+                    path="$",
+                    code="input_file_invalid",
+                    message="file could not be read",
+                )
+            ]
+        ) from exc
+    if not isinstance(payload, Mapping):
+        raise ContractFailure(
+            [
+                Diagnostic(
+                    path="$",
+                    code="contract_invalid",
+                    message="document root must be a JSON object",
+                )
+            ]
+        )
+    return raw_text, payload
 
 
 def _iter_mapping_items(
@@ -228,7 +269,7 @@ def _preflight_document(
                 if (
                     not isinstance(changed, str)
                     or not held_is_sequence
-                    or set(held) != _REQUIRED_VARIANT_CONSTANTS
+                    or set(held) != REQUIRED_VARIANT_CONSTANTS
                 ):
                     diagnostics.append(
                         Diagnostic(
@@ -272,7 +313,9 @@ def _split_coded_message(message: str) -> tuple[str, str]:
     return "contract_invalid", message
 
 
-def _diagnostics_from_validation_error(error: ValidationError) -> tuple[Diagnostic, ...]:
+def _diagnostics_from_validation_error(
+    error: ValidationError,
+) -> tuple[Diagnostic, ...]:
     diagnostics: list[Diagnostic] = []
     for item in error.errors(include_input=False, include_url=False):
         code, message = _split_coded_message(
@@ -294,53 +337,40 @@ def _diagnostic_from_gate_error(error: ValueError) -> Diagnostic:
     )
 
 
-def validate_file(
-    kind: Literal["input", "package"], path: Path
+def _matches_source_product_truth(
+    package: EcommerceAdProductionPackage,
+    source: EcommerceAdInput,
+) -> bool:
+    snapshot = package.product_truth
+    truth = source.product_truth
+    return (
+        snapshot.sku_id == source.product.sku_id
+        and snapshot.product_name == source.product.name
+        and snapshot.source_assets == source.product.source_assets
+        and snapshot.sources == truth.sources
+        and snapshot.facts == truth.facts
+        and snapshot.allowed_claims == truth.allowed_claims
+        and snapshot.prohibited_claims == truth.prohibited_claims
+        and snapshot.required_disclaimers == truth.required_disclaimers
+    )
+
+
+def _matches_source_strategy(
+    package: EcommerceAdProductionPackage,
+    source: EcommerceAdInput,
+) -> bool:
+    return (
+        package.ad_strategy.audience == source.audience.target_consumer
+        and package.ad_strategy.pain_point == source.audience.pain_point
+        and package.ad_strategy.objective == source.objective
+    )
+
+
+def _validate_payload(
+    kind: Literal["input", "package"],
+    raw_text: str,
+    payload: Mapping[str, object],
 ) -> StrictModel:
-    validate_checked_in_schema(kind)
-    if not path.is_file() or path.is_symlink():
-        raise ContractFailure(
-            [
-                Diagnostic(
-                    path="$",
-                    code="input_file_invalid",
-                    message="file must be an existing regular non-symlink JSON file",
-                )
-            ]
-        )
-    try:
-        raw_text = path.read_text(encoding="utf-8")
-        payload = json.loads(raw_text)
-    except (json.JSONDecodeError, UnicodeError):
-        raise ContractFailure(
-            [
-                Diagnostic(
-                    path="$",
-                    code="malformed_json",
-                    message="file is not valid JSON",
-                )
-            ]
-        ) from None
-    except OSError as exc:
-        raise ContractFailure(
-            [
-                Diagnostic(
-                    path="$",
-                    code="input_file_invalid",
-                    message="file could not be read",
-                )
-            ]
-        ) from exc
-    if not isinstance(payload, Mapping):
-        raise ContractFailure(
-            [
-                Diagnostic(
-                    path="$",
-                    code="contract_invalid",
-                    message="document root must be a JSON object",
-                )
-            ]
-        )
     _preflight_document(kind, payload)
     try:
         document = _MODELS[kind].model_validate_json(raw_text)
@@ -350,6 +380,76 @@ def validate_file(
         _GATE_VALIDATORS[kind](document)
     except ValueError as exc:
         raise ContractFailure([_diagnostic_from_gate_error(exc)]) from None
+    return document
+
+
+def validate_file(
+    kind: Literal["input", "package"],
+    path: Path,
+    *,
+    source_input_path: Path | None = None,
+) -> StrictModel:
+    validate_checked_in_schema(kind)
+    raw_text, payload = _read_payload(path)
+    document = _validate_payload(kind, raw_text, payload)
+    if kind == "package":
+        if source_input_path is None:
+            raise ContractFailure(
+                [
+                    Diagnostic(
+                        path="$.source_input_hash",
+                        code="source_input_required",
+                        message="package validation requires the exact source input file",
+                    )
+                ]
+            )
+        validate_checked_in_schema("input")
+        source_raw_text, source_payload = _read_payload(source_input_path)
+        source_document = _validate_payload("input", source_raw_text, source_payload)
+        if document.source_input_hash != _canonical_sha256(source_payload):
+            raise ContractFailure(
+                [
+                    Diagnostic(
+                        path="$.source_input_hash",
+                        code="source_input_hash",
+                        message="source_input_hash must bind the exact canonical input",
+                    )
+                ]
+            )
+        if (
+            document.ad_format != source_document.ad_format
+            or document.duration_seconds != source_document.duration_seconds
+            or document.aspect_ratio != source_document.aspect_ratio
+        ):
+            raise ContractFailure(
+                [
+                    Diagnostic(
+                        path="$.ad_format",
+                        code="source_input_mismatch",
+                        message="package format, duration, and aspect ratio must match the source input",
+                    )
+                ]
+            )
+        if not _matches_source_product_truth(document, source_document):
+            raise ContractFailure(
+                [
+                    Diagnostic(
+                        path="$.product_truth",
+                        code="source_input_mismatch",
+                        message="package Product Truth must match the source input exactly",
+                    )
+                ]
+            )
+        if not _matches_source_strategy(document, source_document):
+            raise ContractFailure(
+                [
+                    Diagnostic(
+                        path="$.ad_strategy",
+                        code="source_input_mismatch",
+                        message="package audience, pain point, and objective must match the source input",
+                    )
+                ]
+            )
     return document
 
 
@@ -376,13 +476,18 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
     )
     parser.add_argument("--kind", choices=tuple(_MODELS), required=True)
     parser.add_argument("--file", type=Path, required=True)
+    parser.add_argument("--source-input-file", type=Path)
     return parser.parse_args(argv)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parse_args(argv)
     try:
-        validate_file(args.kind, args.file)
+        validate_file(
+            args.kind,
+            args.file,
+            source_input_path=args.source_input_file,
+        )
     except ContractFailure as exc:
         _emit(kind=args.kind, status="invalid", diagnostics=exc.diagnostics)
         return 2

@@ -8,7 +8,9 @@
 
 每个 `ad_beat` 记录 ordered role、message、duration budget、进入/离开因果、product expectation、copy expectation、audio expectation，以及至少一个 Shot binding。总 duration budget 必须与 `duration_seconds` 在 schema 定义的容差内相等；每个 Shot 也必须反向绑定一个 beat。
 
-格式可以采用 `product_demo`、`presenter_spokesperson`、`lifestyle_use_case`、`comparison`、`problem_solution` 或 `motion_graphics_product`。人物与场景仍以 `talent_plan` 和 `set_plan` 服务广告目的，不产生 episode、serial 或 narrative cliffhanger。
+格式可以采用 `product_demo`、`presenter_spokesperson`、`lifestyle_use_case`、`comparison`、`problem_solution` 或 `motion_graphics_product`。Package必须保留exact `ad_format`并应用shared Gate加format profile：`product_demo`需要demonstration；`presenter_spokesperson`需要talent、spoken audio与demo/proof；`comparison`需要used comparison claim与proof；`problem_solution`需要problem beat与demo/proof；`lifestyle_use_case`需要set与demo/proof；`motion_graphics_product`需要graphic reveal与demo/proof，但允许无talent、无dialogue Hook。人物与场景只在格式确实需要时服务广告目的，不产生 episode、serial 或 narrative cliffhanger。
+
+G5为每个`ShotIntent`声明purpose、beat、time window、duration basis、product state、可空talent action、camera intent、presentation/copy/audio bindings与visual strategy need；storyboard必须覆盖每个beat，且beat、Shot与cue双向一致。不要用这些字段重复Runtime timeline或execution state。
 
 ## Gates and Stop Conditions
 

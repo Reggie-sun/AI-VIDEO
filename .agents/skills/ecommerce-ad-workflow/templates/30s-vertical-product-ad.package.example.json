@@ -1,9 +1,10 @@
 {
-  "schema_version": "ecommerce-ad-workflow/package/1",
-  "package_id": "f6f0f33385c4bab53a5ef51c2919b028f6e365d66f6b4724d53d619359ff4cd3",
-  "source_input_hash": "a93a64baf8e66baf3309923cb61e65b737c7d17d5b67b272ddb8ff6b8f6875ed",
+  "schema_version": "ecommerce-ad-workflow/package/2",
+  "package_id": "d712f4f8510222bca9920ffdb99e0d863b4e9617f83a9a59f4b1ebd8a22c3459",
+  "source_input_hash": "4a4e2e6775e0ee4d3edb70c658300f230e89d6d8987fe1d62717bce25a882ecd",
   "duration_seconds": 30,
   "aspect_ratio": "9:16",
+  "ad_format": "product_demo",
   "product_truth": {
     "sku_id": "blendgo-mini-450",
     "product_name": "BlendGo Mini 450ml",
@@ -77,14 +78,7 @@
         ]
       }
     ],
-    "prohibited_claims": [
-      {
-        "claim_id": "claim-detox",
-        "text": "Clinically proven detox",
-        "claim_type": "MEDICAL_OR_THERAPEUTIC",
-        "reason": "Medical and therapeutic claims are forbidden in V1."
-      }
-    ],
+    "prohibited_claims": [],
     "required_disclaimers": []
   },
   "claim_ledger": [
@@ -121,15 +115,6 @@
       ],
       "spoken_form": "A 450 ml cup",
       "visual_form": "450 ml"
-    },
-    {
-      "claim_id": "claim-detox",
-      "status": "PROHIBITED",
-      "fact_ids": [],
-      "source_ids": [],
-      "used_at": [],
-      "spoken_form": null,
-      "visual_form": null
     }
   ],
   "ad_strategy": {
@@ -900,30 +885,6 @@
     "shot_id": "shot-close",
     "cta_copy_id": "copy-cta",
     "end_card_copy_id": "copy-end-card"
-  },
-  "creative_variant_matrix": {
-    "master_strategy_id": "strategy-portable-proof",
-    "variants": [
-      {
-        "variant_id": "variant-hook-question",
-        "changed_variable": "HOOK",
-        "baseline_value": "Bag reveal with direct introduction",
-        "variant_value": "Bag reveal with a commuter problem question",
-        "held_constants": [
-          "claim_ledger",
-          "cta_destination",
-          "delivery_intent",
-          "objective",
-          "platform_constraints",
-          "product_identity",
-          "product_truth",
-          "rights",
-          "unchanged_strategy_fields"
-        ],
-        "hypothesis": "A question-led Hook may improve first-second attention without changing truth.",
-        "required_new_assets": []
-      }
-    ]
   },
   "runtime_handoff": {
     "delivery_intent": "video",

@@ -6,7 +6,7 @@
 
 ## Required Components
 
-`hook_contract` 必须包含 `visual_hook`、`dialogue_or_vo_hook`、`copy_hook`、`audio_hook`、`product_presence`（`none`、`tease` 或 `explicit`）、`promise_boundary`、`first_payoff_deadline_seconds` 与 `platform_constraints`。至少一个 component 在第一秒出现，并绑定 beat、Shot 或 audio/copy cue。
+`hook_contract` 必须包含至少一个typed component，可从`VISUAL`、`DIALOGUE_OR_VO`、`COPY`、`AUDIO`中按创意选择；不得为了凑齐modality编造旁白、字幕或音效。另需`product_presence`（`none`、`tease` 或 `explicit`）、`promise_boundary`、`first_payoff_deadline_seconds` 与 `platform_constraints`。至少一个 component 在第一秒出现，并绑定 beat、Shot 或 audio/copy cue。
 
 visual Hook 可用场景变化、product tease 或可观察问题；dialogue/VO 与 copy 必须逐字或可复核地表达；audio Hook 必须指定 reveal hit、voice entry、music change 或 intentional silence。所有 promise 回指 claim ledger。
 

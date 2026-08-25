@@ -77,9 +77,17 @@ def _validator_module() -> ModuleType:
     return module
 
 
-def _run_cli(kind: str, path: Path) -> subprocess.CompletedProcess[str]:
+def _run_cli(
+    kind: str,
+    path: Path,
+    *,
+    source_input_path: Path | None = None,
+) -> subprocess.CompletedProcess[str]:
+    command = [sys.executable, str(SCRIPT_PATH), "--kind", kind, "--file", str(path)]
+    if source_input_path is not None:
+        command.extend(["--source-input-file", str(source_input_path)])
     return subprocess.run(
-        [sys.executable, str(SCRIPT_PATH), "--kind", kind, "--file", str(path)],
+        command,
         cwd=ROOT,
         check=False,
         capture_output=True,
@@ -96,6 +104,33 @@ def _rehash_package(payload: dict[str, object]) -> None:
     identity_payload = copy.deepcopy(payload)
     identity_payload.pop("package_id", None)
     payload["package_id"] = _canonical_sha256(identity_payload)
+
+
+def _creative_variant_matrix() -> dict[str, object]:
+    return {
+        "master_strategy_id": "strategy-portable-proof",
+        "variants": [
+            {
+                "variant_id": "variant-hook-question",
+                "changed_variable": "HOOK",
+                "baseline_value": "Bag reveal with direct introduction",
+                "variant_value": "Bag reveal with a commuter problem question",
+                "held_constants": [
+                    "claim_ledger",
+                    "cta_destination",
+                    "delivery_intent",
+                    "objective",
+                    "platform_constraints",
+                    "product_identity",
+                    "product_truth",
+                    "rights",
+                    "unchanged_strategy_fields",
+                ],
+                "hypothesis": "A question-led Hook may improve attention.",
+                "required_new_assets": [],
+            }
+        ],
+    }
 
 
 def _write_payload(path: Path, payload: dict[str, object]) -> None:
@@ -116,7 +151,7 @@ def _assert_invalid_package(
     path = tmp_path / f"invalid-{expected_code}.json"
     _write_payload(path, payload)
 
-    result = _run_cli("package", path)
+    result = _run_cli("package", path, source_input_path=INPUT_EXAMPLE_PATH)
 
     assert result.returncode == 2, result.stdout
     assert result.stderr == ""
@@ -185,9 +220,7 @@ def test_skill_frontmatter_is_discoverable_and_routes_progressively() -> None:
 def test_checked_in_schemas_are_exact_pydantic_contract_views() -> None:
     module = _validator_module()
 
-    assert INPUT_SCHEMA_PATH.read_text(encoding="utf-8") == module.schema_text(
-        "input"
-    )
+    assert INPUT_SCHEMA_PATH.read_text(encoding="utf-8") == module.schema_text("input")
     assert PACKAGE_SCHEMA_PATH.read_text(encoding="utf-8") == module.schema_text(
         "package"
     )
@@ -200,9 +233,7 @@ def test_checked_in_schemas_are_exact_pydantic_contract_views() -> None:
     assert "promise_boundary" in definitions["HookContract"]["required"]
     assert "bound_ids" in definitions["HookComponent"]["required"]
     assert set(
-        definitions["CreativeVariant"]["properties"]["held_constants"]["items"][
-            "enum"
-        ]
+        definitions["CreativeVariant"]["properties"]["held_constants"]["items"]["enum"]
     ) == {
         "claim_ledger",
         "cta_destination",
@@ -222,7 +253,11 @@ def test_valid_30_second_vertical_examples_validate_and_are_hash_bound() -> None
     package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
 
     input_result = _run_cli("input", INPUT_EXAMPLE_PATH)
-    package_result = _run_cli("package", PACKAGE_EXAMPLE_PATH)
+    package_result = _run_cli(
+        "package",
+        PACKAGE_EXAMPLE_PATH,
+        source_input_path=INPUT_EXAMPLE_PATH,
+    )
 
     assert input_result.returncode == 0
     assert json.loads(input_result.stdout) == {
@@ -242,6 +277,252 @@ def test_valid_30_second_vertical_examples_validate_and_are_hash_bound() -> None
     identity_payload = copy.deepcopy(package_payload)
     identity_payload.pop("package_id")
     assert package_payload["package_id"] == _canonical_sha256(identity_payload)
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_master_package_does_not_require_creative_variants(tmp_path: Path) -> None:
+    payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    payload.pop("creative_variant_matrix", None)
+    _rehash_package(payload)
+    path = tmp_path / "master-without-variants.json"
+    _write_payload(path, payload)
+
+    result = _run_cli("package", path, source_input_path=INPUT_EXAMPLE_PATH)
+
+    assert result.returncode == 0, result.stdout
+    assert json.loads(result.stdout)["status"] == "valid"
+    assert result.stderr == ""
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_empty_input_prohibited_claims_are_valid(tmp_path: Path) -> None:
+    payload = _load_json(INPUT_EXAMPLE_PATH)
+    payload["product_truth"]["prohibited_claims"] = []
+    path = tmp_path / "input-with-no-product-specific-prohibitions.json"
+    _write_payload(path, payload)
+
+    result = _run_cli("input", path)
+
+    assert result.returncode == 0, result.stdout
+    assert json.loads(result.stdout)["status"] == "valid"
+    assert result.stderr == ""
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_empty_package_prohibited_claims_are_valid(tmp_path: Path) -> None:
+    input_payload = _load_json(INPUT_EXAMPLE_PATH)
+    input_payload["product_truth"]["prohibited_claims"] = []
+    input_path = tmp_path / "source-input-with-no-product-specific-prohibitions.json"
+    _write_payload(input_path, input_payload)
+
+    package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    package_payload["product_truth"]["prohibited_claims"] = []
+    package_payload["claim_ledger"] = [
+        item
+        for item in package_payload["claim_ledger"]
+        if item["status"] != "PROHIBITED"
+    ]
+    package_payload["source_input_hash"] = _canonical_sha256(input_payload)
+    _rehash_package(package_payload)
+    package_path = tmp_path / "package-with-no-product-specific-prohibitions.json"
+    _write_payload(package_path, package_payload)
+
+    result = _run_cli("package", package_path, source_input_path=input_path)
+
+    assert result.returncode == 0, result.stdout
+    assert json.loads(result.stdout)["status"] == "valid"
+    assert result.stderr == ""
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_motion_graphics_product_can_be_talent_free_with_no_dialogue_hook(
+    tmp_path: Path,
+) -> None:
+    input_payload = _load_json(INPUT_EXAMPLE_PATH)
+    input_payload["ad_format"] = "motion_graphics_product"
+    input_path = tmp_path / "motion-graphics-input.json"
+    _write_payload(input_path, input_payload)
+
+    package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    package_payload["ad_format"] = "motion_graphics_product"
+    package_payload["talent_plan"] = []
+    package_payload["set_plan"] = []
+    package_payload["hook_contract"]["components"] = [
+        item
+        for item in package_payload["hook_contract"]["components"]
+        if item["kind"] != "DIALOGUE_OR_VO"
+    ]
+    dialogue = next(
+        item
+        for item in package_payload["audio_plan"]["events"]
+        if item["kind"] == "DIALOGUE"
+    )
+    dialogue["kind"] = "VOICE_OVER"
+    dialogue["speaker_id"] = None
+    dialogue["on_camera"] = False
+    dialogue["lip_sync_required"] = False
+    for shot in package_payload["shot_intents"]:
+        shot["talent_action"] = None
+    for presentation in package_payload["product_presentation"]:
+        presentation["talent_interaction"] = "NONE"
+    package_payload["runtime_handoff"]["proposals"] = [
+        item
+        for item in package_payload["runtime_handoff"]["proposals"]
+        if item["target"] not in {"Character", "Scene"}
+    ]
+    package_payload["source_input_hash"] = _canonical_sha256(input_payload)
+    _rehash_package(package_payload)
+    package_path = tmp_path / "motion-graphics-package.json"
+    _write_payload(package_path, package_payload)
+
+    result = _run_cli("package", package_path, source_input_path=input_path)
+
+    assert result.returncode == 0, result.stdout
+    assert json.loads(result.stdout)["status"] == "valid"
+    assert result.stderr == ""
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_presenter_spokesperson_requires_talent(tmp_path: Path) -> None:
+    input_payload = _load_json(INPUT_EXAMPLE_PATH)
+    input_payload["ad_format"] = "presenter_spokesperson"
+    input_path = tmp_path / "presenter-input.json"
+    _write_payload(input_path, input_payload)
+
+    package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    package_payload["ad_format"] = "presenter_spokesperson"
+    package_payload["talent_plan"] = []
+    package_payload["source_input_hash"] = _canonical_sha256(input_payload)
+    _rehash_package(package_payload)
+    package_path = tmp_path / "presenter-without-talent.json"
+    _write_payload(package_path, package_payload)
+
+    result = _run_cli("package", package_path, source_input_path=input_path)
+
+    assert result.returncode == 2, result.stdout
+    assert "ad_format_profile" in _diagnostic_codes(result)
+    assert result.stderr == ""
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_presenter_spokesperson_requires_bound_on_camera_line(tmp_path: Path) -> None:
+    input_payload = _load_json(INPUT_EXAMPLE_PATH)
+    input_payload["ad_format"] = "presenter_spokesperson"
+    input_path = tmp_path / "presenter-source-input.json"
+    _write_payload(input_path, input_payload)
+
+    package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    package_payload["ad_format"] = "presenter_spokesperson"
+    dialogue = next(
+        item
+        for item in package_payload["audio_plan"]["events"]
+        if item["kind"] == "DIALOGUE"
+    )
+    dialogue["on_camera"] = False
+    dialogue["speaker_id"] = None
+    dialogue["verbatim_line"] = None
+    dialogue["lip_sync_required"] = False
+    package_payload["source_input_hash"] = _canonical_sha256(input_payload)
+    _rehash_package(package_payload)
+    package_path = tmp_path / "presenter-without-bound-line.json"
+    _write_payload(package_path, package_payload)
+
+    result = _run_cli("package", package_path, source_input_path=input_path)
+
+    assert result.returncode == 2, result.stdout
+    assert "ad_format_profile" in _diagnostic_codes(result)
+    assert result.stderr == ""
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_package_source_input_hash_is_verified_against_explicit_input(
+    tmp_path: Path,
+) -> None:
+    input_payload = _load_json(INPUT_EXAMPLE_PATH)
+    input_payload["style"] = "A different authorized source style"
+    input_path = tmp_path / "different-input.json"
+    _write_payload(input_path, input_payload)
+
+    result = _run_cli(
+        "package",
+        PACKAGE_EXAMPLE_PATH,
+        source_input_path=input_path,
+    )
+
+    assert result.returncode == 2, result.stdout
+    assert "source_input_hash" in _diagnostic_codes(result)
+    assert result.stderr == ""
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_package_ad_format_must_match_source_input(tmp_path: Path) -> None:
+    package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    package_payload["ad_format"] = "presenter_spokesperson"
+    _rehash_package(package_payload)
+    package_path = tmp_path / "format-mismatch-package.json"
+    _write_payload(package_path, package_payload)
+
+    result = _run_cli(
+        "package",
+        package_path,
+        source_input_path=INPUT_EXAMPLE_PATH,
+    )
+
+    assert result.returncode == 2, result.stdout
+    assert "source_input_mismatch" in _diagnostic_codes(result)
+    assert result.stderr == ""
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_package_product_truth_must_match_source_input(tmp_path: Path) -> None:
+    package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    package_payload["product_truth"]["facts"][0]["statement"] = (
+        "A different unsupported product fact snapshot."
+    )
+    _rehash_package(package_payload)
+    package_path = tmp_path / "truth-mismatch-package.json"
+    _write_payload(package_path, package_payload)
+
+    result = _run_cli(
+        "package",
+        package_path,
+        source_input_path=INPUT_EXAMPLE_PATH,
+    )
+
+    assert result.returncode == 2, result.stdout
+    assert "source_input_mismatch" in _diagnostic_codes(result)
+    assert result.stderr == ""
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("audience", "A different target consumer"),
+        ("pain_point", "A different customer problem"),
+        ("objective", "AWARENESS"),
+    ],
+)
+def test_package_strategy_source_fields_must_match_input(
+    tmp_path: Path,
+    field: str,
+    value: str,
+) -> None:
+    package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    package_payload["ad_strategy"][field] = value
+    _rehash_package(package_payload)
+    package_path = tmp_path / f"strategy-{field}-mismatch.json"
+    _write_payload(package_path, package_payload)
+
+    result = _run_cli(
+        "package",
+        package_path,
+        source_input_path=INPUT_EXAMPLE_PATH,
+    )
+
+    assert result.returncode == 2, result.stdout
+    assert "source_input_mismatch" in _diagnostic_codes(result)
+    assert result.stderr == ""
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
@@ -269,6 +550,7 @@ def test_authoring_readiness_cannot_encode_production_acceptance() -> None:
         "manifest_revision",
         "activation",
     }.isdisjoint(package_payload["runtime_handoff"])
+
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 @pytest.mark.parametrize(
@@ -380,7 +662,9 @@ def test_used_claim_requires_exact_fact_and_source_lineage(tmp_path: Path) -> No
 
     document = _assert_invalid_package(tmp_path, mutate, "claim_lineage")
 
-    assert any(item["path"].startswith("$.claim_ledger") for item in document["diagnostics"])
+    assert any(
+        item["path"].startswith("$.claim_ledger") for item in document["diagnostics"]
+    )
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
@@ -431,15 +715,16 @@ def test_hook_requires_an_observable_first_second_component(tmp_path: Path) -> N
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
-def test_hook_requires_visual_dialogue_copy_and_audio_components(
+def test_hook_component_binding_must_match_its_declared_kind(
     tmp_path: Path,
 ) -> None:
     def mutate(payload: dict[str, object]) -> None:
-        payload["hook_contract"]["components"] = [
+        audio_hook = next(
             item
             for item in payload["hook_contract"]["components"]
-            if item["kind"] != "AUDIO"
-        ]
+            if item["kind"] == "AUDIO"
+        )
+        audio_hook["bound_ids"] = ["copy-headline"]
 
     _assert_invalid_package(tmp_path, mutate, "hook_contract")
 
@@ -481,9 +766,7 @@ def test_traceability_rejects_cross_beat_and_shot_pairs(
         if relation == "presentation":
             payload["product_presentation"][0]["shot_id"] = "shot-demo"
             payload["shot_intents"][0]["presentation_ids"] = []
-            payload["shot_intents"][2]["presentation_ids"].append(
-                "presentation-intro"
-            )
+            payload["shot_intents"][2]["presentation_ids"].append("presentation-intro")
         elif relation == "copy":
             product_label = next(
                 item
@@ -507,7 +790,7 @@ def test_traceability_rejects_cross_beat_and_shot_pairs(
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
-def test_product_presentation_requires_intro_demo_hero_and_cta_roles(
+def test_product_presentation_requires_core_intro_hero_and_cta_roles(
     tmp_path: Path,
 ) -> None:
     def mutate(payload: dict[str, object]) -> None:
@@ -515,6 +798,65 @@ def test_product_presentation_requires_intro_demo_hero_and_cta_roles(
             item["role"] = "INTRO"
 
     _assert_invalid_package(tmp_path, mutate, "product_presentation_roles")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_product_demo_format_requires_a_demonstration_presentation(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        demo = next(
+            item
+            for item in payload["product_presentation"]
+            if item["role"] == "DEMONSTRATION"
+        )
+        demo["role"] = "BENEFIT_PROOF"
+
+    _assert_invalid_package(tmp_path, mutate, "ad_format_profile")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+@pytest.mark.parametrize(
+    "ad_format",
+    [
+        "comparison",
+        "problem_solution",
+        "lifestyle_use_case",
+        "motion_graphics_product",
+    ],
+)
+def test_each_ad_format_requires_its_defining_evidence(
+    tmp_path: Path,
+    ad_format: str,
+) -> None:
+    input_payload = _load_json(INPUT_EXAMPLE_PATH)
+    input_payload["ad_format"] = ad_format
+    input_path = tmp_path / f"{ad_format}-input.json"
+    _write_payload(input_path, input_payload)
+
+    package_payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    package_payload["ad_format"] = ad_format
+    if ad_format == "lifestyle_use_case":
+        package_payload["set_plan"] = []
+        package_payload["runtime_handoff"]["proposals"] = [
+            item
+            for item in package_payload["runtime_handoff"]["proposals"]
+            if item["target"] != "Scene"
+        ]
+    elif ad_format == "motion_graphics_product":
+        for presentation in package_payload["product_presentation"]:
+            if presentation["mode"] == "GRAPHIC_REVEAL":
+                presentation["mode"] = "DEDICATED_HERO_SHOT"
+    package_payload["source_input_hash"] = _canonical_sha256(input_payload)
+    _rehash_package(package_payload)
+    package_path = tmp_path / f"{ad_format}-missing-evidence.json"
+    _write_payload(package_path, package_payload)
+
+    result = _run_cli("package", package_path, source_input_path=input_path)
+
+    assert result.returncode == 2, result.stdout
+    assert "ad_format_profile" in _diagnostic_codes(result)
+    assert result.stderr == ""
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
@@ -612,6 +954,18 @@ def test_runtime_requirements_require_exact_classified_gap_closure(
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_truth_or_rights_blocked_handoff_cannot_be_ready(tmp_path: Path) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        requirement = payload["runtime_handoff"]["requirements"][0]
+        requirement["classification"] = "BLOCKED_BY_TRUTH_OR_RIGHTS"
+        gap = payload["runtime_handoff"]["classified_gaps"][0]
+        gap["classification"] = "BLOCKED_BY_TRUTH_OR_RIGHTS"
+        gap["blocker_code"] = "truth_or_rights_blocked"
+
+    _assert_invalid_package(tmp_path, mutate, "runtime_handoff_blocked")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 def test_commercial_copy_cannot_be_serialized_only_as_dialogue_subtitles(
     tmp_path: Path,
 ) -> None:
@@ -700,6 +1054,7 @@ def test_creative_variant_changes_exactly_one_variable_and_holds_truth_constant(
     tmp_path: Path,
 ) -> None:
     def mutate(payload: dict[str, object]) -> None:
+        payload["creative_variant_matrix"] = _creative_variant_matrix()
         variant = payload["creative_variant_matrix"]["variants"][0]
         variant["changed_variable"] = ["HOOK", "CTA"]
         variant["held_constants"] = ["delivery_intent"]
@@ -710,6 +1065,7 @@ def test_creative_variant_changes_exactly_one_variable_and_holds_truth_constant(
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 def test_variant_matrix_binds_the_exact_master_strategy(tmp_path: Path) -> None:
     def mutate(payload: dict[str, object]) -> None:
+        payload["creative_variant_matrix"] = _creative_variant_matrix()
         payload["creative_variant_matrix"]["master_strategy_id"] = "strategy-missing"
 
     _assert_invalid_package(tmp_path, mutate, "variant_isolation")
@@ -747,6 +1103,15 @@ def test_delivery_intent_cannot_be_changed_to_a_product_still(tmp_path: Path) ->
         payload["runtime_handoff"]["delivery_intent"] = "static_image"
 
     _assert_invalid_package(tmp_path, mutate, "delivery_intent")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_package_validation_requires_the_exact_source_input() -> None:
+    result = _run_cli("package", PACKAGE_EXAMPLE_PATH)
+
+    assert result.returncode == 2
+    assert "source_input_required" in _diagnostic_codes(result)
+    assert result.stderr == ""
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
@@ -825,7 +1190,11 @@ def test_validator_is_local_read_only_and_does_not_consume_credentials(
     monkeypatch.setattr(Path, "rename", forbidden)
     monkeypatch.setenv("ARK_API_KEY", "PRIVATE-CREDENTIAL-MARKER")
 
-    module.validate_file("package", PACKAGE_EXAMPLE_PATH)
+    module.validate_file(
+        "package",
+        PACKAGE_EXAMPLE_PATH,
+        source_input_path=INPUT_EXAMPLE_PATH,
+    )
 
     after = {
         path.relative_to(SKILL_ROOT).as_posix(): path.read_bytes()
@@ -833,6 +1202,31 @@ def test_validator_is_local_read_only_and_does_not_consume_credentials(
         if path.is_file()
     }
     assert after == before
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_package_validation_reads_source_input_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _validator_module()
+    original_read_text = Path.read_text
+    source_reads = 0
+
+    def tracked_read_text(path: Path, *args: object, **kwargs: object) -> str:
+        nonlocal source_reads
+        if path == INPUT_EXAMPLE_PATH:
+            source_reads += 1
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", tracked_read_text)
+
+    module.validate_file(
+        "package",
+        PACKAGE_EXAMPLE_PATH,
+        source_input_path=INPUT_EXAMPLE_PATH,
+    )
+
+    assert source_reads == 1
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
@@ -899,9 +1293,7 @@ def test_internal_failure_is_exit_3_with_sanitized_stable_json(
         raise RuntimeError("PRIVATE-INTERNAL-BODY")
 
     monkeypatch.setattr(module, "validate_file", fail)
-    exit_code = module.main(
-        ["--kind", "input", "--file", str(INPUT_EXAMPLE_PATH)]
-    )
+    exit_code = module.main(["--kind", "input", "--file", str(INPUT_EXAMPLE_PATH)])
     captured = capsys.readouterr()
 
     assert exit_code == 3

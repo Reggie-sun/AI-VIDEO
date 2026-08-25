@@ -1319,7 +1319,6 @@
           "items": {
             "$ref": "#/$defs/ProhibitedClaim"
           },
-          "minItems": 1,
           "title": "Prohibited Claims",
           "type": "array"
         },
@@ -1702,10 +1701,17 @@
           "type": "number"
         },
         "talent_action": {
-          "maxLength": 1000,
-          "minLength": 1,
-          "title": "Talent Action",
-          "type": "string"
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Talent Action"
         },
         "visual_strategy_need": {
           "maxLength": 1000,
@@ -1956,6 +1962,18 @@
       "title": "Ad Beats",
       "type": "array"
     },
+    "ad_format": {
+      "enum": [
+        "product_demo",
+        "presenter_spokesperson",
+        "lifestyle_use_case",
+        "comparison",
+        "problem_solution",
+        "motion_graphics_product"
+      ],
+      "title": "Ad Format",
+      "type": "string"
+    },
     "ad_qc_report": {
       "$ref": "#/$defs/AdQCReport"
     },
@@ -1987,7 +2005,15 @@
       "type": "array"
     },
     "creative_variant_matrix": {
-      "$ref": "#/$defs/CreativeVariantMatrix"
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CreativeVariantMatrix"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "cta": {
       "$ref": "#/$defs/CTAPlan"
@@ -2021,7 +2047,7 @@
       "$ref": "#/$defs/RuntimeHandoff"
     },
     "schema_version": {
-      "const": "ecommerce-ad-workflow/package/1",
+      "const": "ecommerce-ad-workflow/package/2",
       "title": "Schema Version",
       "type": "string"
     },
@@ -2029,7 +2055,6 @@
       "items": {
         "$ref": "#/$defs/SetPlan"
       },
-      "minItems": 1,
       "title": "Set Plan",
       "type": "array"
     },
@@ -2058,7 +2083,6 @@
       "items": {
         "$ref": "#/$defs/TalentPlan"
       },
-      "minItems": 1,
       "title": "Talent Plan",
       "type": "array"
     },
@@ -2078,6 +2102,7 @@
     "source_input_hash",
     "duration_seconds",
     "aspect_ratio",
+    "ad_format",
     "product_truth",
     "claim_ledger",
     "ad_strategy",
@@ -2091,7 +2116,6 @@
     "storyboard",
     "shot_intents",
     "cta",
-    "creative_variant_matrix",
     "runtime_handoff",
     "ad_qc_report",
     "unresolved_items"
