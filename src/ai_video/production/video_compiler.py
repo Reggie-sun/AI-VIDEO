@@ -15,14 +15,30 @@ from ai_video.production._video_requirement_routing import (
     requirement_output_matches,
 )
 from ai_video.production.hashing import canonical_sha256
-from ai_video.production.models import StrictModel
+from ai_video.production.models import (
+    DependencyGraphSnapshotPointer,
+    ProjectSnapshotPointer,
+    RegistrySnapshotPointer,
+    StrictModel,
+)
 from ai_video.production.shot_router import ProviderBoundVideoRequest
+from ai_video.production._video_continuity import (
+    C4MultiAnchorBinding,
+    ContinuityReferenceBinding,
+    HardCutKeyframeBinding,
+)
 from ai_video.production.video import (
+    ProviderProfilePointer,
     VideoGenerationRequest,
+    VideoGenerationMode,
     VideoImageReferenceBinding,
+    VideoOutputRequirement,
     VideoProviderCapabilities,
 )
-from ai_video.production.video_contracts import VideoMediaReferenceBinding
+from ai_video.production.video_contracts import (
+    VideoFlexibleOutputRequirement,
+    VideoMediaReferenceBinding,
+)
 from ai_video.production.video_requirement import (
     ActionEndpoint,
     ExpressionStrength,
@@ -147,6 +163,112 @@ def require_compiled_provider_request(
             retryable=False,
         )
     return result
+
+
+class VideoGenerationRequestCompilation(_CompilerModel):
+    """Typed, hash-bound input to the sole request constructor owner."""
+
+    compilation_kind: Literal["provider_neutral", "qualification"]
+    generation_id: str = Field(pattern=_SAFE_ID)
+    provider_name: str = Field(pattern=_SAFE_ID)
+    provider_kind: str = Field(pattern=_SAFE_ID)
+    model_id: str = Field(pattern=_SAFE_ID)
+    provider_profile: ProviderProfilePointer
+    requirement_hash: str = Field(pattern=_SHA256)
+    provider_bound_request_hash: str = Field(pattern=_SHA256)
+    adapter_compiler_id: str = Field(pattern=_SAFE_ID)
+    adapter_compiler_version: str = Field(pattern=_SAFE_ID)
+    adapter_compiler_hash: str = Field(pattern=_SHA256)
+    execution_stack_hash: str | None = Field(default=None, pattern=_SHA256)
+    target_shot_id: str = Field(pattern=_SAFE_ID)
+    target_shot_revision: int = Field(strict=True, ge=1)
+    target_shot_content_hash: str = Field(pattern=_SHA256)
+    target_asset_role: str = Field(pattern=_SAFE_ID)
+    mode: VideoGenerationMode
+    prompt_text: str = Field(min_length=1)
+    negative_prompt_text: str = ""
+    image_bindings: tuple[VideoImageReferenceBinding, ...]
+    c4_multi_anchor_binding: C4MultiAnchorBinding | None = None
+    continuity_binding: ContinuityReferenceBinding | None = None
+    hard_cut_keyframe_binding: HardCutKeyframeBinding | None = None
+    seal_terminal_frame: bool = Field(default=False, strict=True)
+    media_bindings: tuple[VideoMediaReferenceBinding, ...] = ()
+    output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement
+    seed: int | None = Field(default=None, strict=True, ge=-1)
+    base_project: ProjectSnapshotPointer
+    base_registry: RegistrySnapshotPointer
+    base_dependency_graph: DependencyGraphSnapshotPointer
+    input_artifact_ids: tuple[str, ...] = Field(min_length=1)
+    output_asset_id: str = Field(pattern=_SAFE_ID)
+    compilation_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_compilation(self) -> "VideoGenerationRequestCompilation":
+        if self.compilation_kind == "qualification" and (
+            self.execution_stack_hash is None
+            or self.mode is not VideoGenerationMode.IMAGE_TO_VIDEO
+            or tuple(item.role for item in self.image_bindings)
+            != ("first_frame", "last_frame")
+            or self.c4_multi_anchor_binding is not None
+            or self.continuity_binding is not None
+            or self.hard_cut_keyframe_binding is not None
+            or not self.seal_terminal_frame
+            or self.media_bindings
+            or self.negative_prompt_text
+            or self.seed is None
+            or self.seed < 0
+        ):
+            raise ValueError(
+                "qualification compilation requires one exact sealed FL2VA shape"
+            )
+        expected = canonical_sha256(
+            {
+                "schema": "video-generation-request-compilation/1",
+                **self.model_dump(mode="json", exclude={"compilation_hash"}),
+            }
+        )
+        if self.compilation_hash != expected:
+            raise ValueError("compilation_hash does not match request compilation")
+        return self
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        compilation_kind: Literal["provider_neutral", "qualification"],
+        **values: object,
+    ) -> "VideoGenerationRequestCompilation":
+        data = {"compilation_kind": compilation_kind, **values}
+        candidate = cls.model_construct(**data, compilation_hash="0" * 64)
+        data["compilation_hash"] = canonical_sha256(
+            {
+                "schema": "video-generation-request-compilation/1",
+                **candidate.model_dump(
+                    mode="json",
+                    exclude={"compilation_hash"},
+                    warnings=False,
+                ),
+            }
+        )
+        return cls.model_validate(data)
+
+
+def compile_video_generation_request(
+    projection: VideoGenerationRequestCompilation,
+) -> VideoGenerationRequest:
+    """Construct one request only from a validated, hash-bound projection."""
+
+    reopened = VideoGenerationRequestCompilation.model_validate(
+        projection.model_dump(mode="python")
+    )
+    values = reopened.model_dump(
+        mode="python",
+        exclude={"compilation_kind", "compilation_hash"},
+    )
+    return VideoGenerationRequest.create(
+        target_visual_strategy="generated_video",
+        **values,
+    )
 
 
 def compile_provider_video_request(
@@ -343,7 +465,8 @@ def compile_provider_video_request(
     )
     lifecycle = provider_bound.lifecycle
     prompt = _compile_neutral_prompt(requirement)
-    request = VideoGenerationRequest.create(
+    projection = VideoGenerationRequestCompilation.create(
+        compilation_kind="provider_neutral",
         generation_id=lifecycle.generation_id,
         provider_name=provider_bound.provider_name,
         provider_kind=provider_bound.provider_kind,
@@ -354,11 +477,11 @@ def compile_provider_video_request(
         adapter_compiler_id=contract.compiler_id,
         adapter_compiler_version=contract.compiler_version,
         adapter_compiler_hash=contract.compiler_hash,
+        execution_stack_hash=None,
         target_shot_id=provider_bound.target_shot_id,
         target_shot_revision=provider_bound.target_shot_revision,
         target_shot_content_hash=provider_bound.target_shot_content_hash,
         target_asset_role=lifecycle.target_asset_role,
-        target_visual_strategy="generated_video",
         mode=provider_bound.mode,
         prompt_text=prompt,
         negative_prompt_text="",
@@ -376,6 +499,7 @@ def compile_provider_video_request(
         input_artifact_ids=lifecycle.input_artifact_ids,
         output_asset_id=lifecycle.output_asset_id,
     )
+    request = compile_video_generation_request(projection)
     payload_hash = canonical_sha256(
         {
             "schema": "provider-video-payload-projection/1",
@@ -550,6 +674,8 @@ __all__ = [
     "ProviderRequirementUnsupported",
     "ProviderRequirementUnsupportedReason",
     "ProviderVideoRequestCompiler",
+    "VideoGenerationRequestCompilation",
     "compile_provider_video_request",
+    "compile_video_generation_request",
     "require_compiled_provider_request",
 ]

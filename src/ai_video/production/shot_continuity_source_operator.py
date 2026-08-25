@@ -35,6 +35,10 @@ from ai_video.production.shot_continuity_source_transport import (
 from ai_video.production.shot_continuity_source_contracts import (
     SourceQualificationTransport,
 )
+from ai_video.production.video_compiler import (
+    VideoGenerationRequestCompilation,
+    compile_video_generation_request,
+)
 from ai_video.production.video import (
     BillingKind,
     ProviderProfilePointer,
@@ -42,7 +46,6 @@ from ai_video.production.video import (
     VideoCapabilityVariant,
     VideoExecutionKind,
     VideoGenerationMode,
-    VideoGenerationRequest,
     VideoImageReferenceBinding,
 )
 from ai_video.production.video_contracts import (
@@ -218,7 +221,8 @@ def build_source_qualification_request(
         mime_type="video/mp4",
         native_audio=profile.native_audio,
     )
-    request = VideoGenerationRequest.create(
+    projection = VideoGenerationRequestCompilation.create(
+        compilation_kind="qualification",
         generation_id=generation_id,
         provider_name=profile.provider_name,
         provider_kind=profile.provider_kind,
@@ -241,7 +245,6 @@ def build_source_qualification_request(
         target_shot_revision=profile.target_shot_revision,
         target_shot_content_hash=profile.target_shot_content_hash,
         target_asset_role=profile.target_asset_role,
-        target_visual_strategy="generated_video",
         mode=VideoGenerationMode.IMAGE_TO_VIDEO,
         prompt_text=profile.prompt,
         negative_prompt_text="",
@@ -271,6 +274,7 @@ def build_source_qualification_request(
         ),
         output_asset_id=profile.output_asset_id,
     )
+    request = compile_video_generation_request(projection)
     capability = VideoCapabilityVariant(
         capability_id=profile.capability_id,
         provider_kind=profile.provider_kind,

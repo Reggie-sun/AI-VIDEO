@@ -244,8 +244,18 @@ class _RecordedProvider:
 
 def test_builder_uses_exact_active_lineage_without_fixture_hashes(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     module = _operator_module()
+    compiler = importlib.import_module("ai_video.production.video_compiler")
+    captured = []
+    real_compile = compiler.compile_video_generation_request
+
+    def _compile(projection):
+        captured.append(projection)
+        return real_compile(projection)
+
+    monkeypatch.setattr(module, "compile_video_generation_request", _compile)
     _, project = _prepare_project(tmp_path)
     profile, document_hash = _profile_for(project)
 
@@ -263,6 +273,21 @@ def test_builder_uses_exact_active_lineage_without_fixture_hashes(
     )
 
     assert first == second
+    assert len(captured) == 2
+    assert all(
+        isinstance(item, compiler.VideoGenerationRequestCompilation)
+        and item.compilation_kind == "qualification"
+        for item in captured
+    )
+    tampered = captured[0].model_dump(mode="python")
+    tampered["prompt_text"] = "drifted after compilation"
+    with pytest.raises(ValueError, match="compilation_hash"):
+        compiler.VideoGenerationRequestCompilation.model_validate(tampered)
+    copied_without_validation = captured[0].model_copy(
+        update={"prompt_text": "model-copy drift"}
+    )
+    with pytest.raises(ValueError, match="compilation_hash"):
+        real_compile(copied_without_validation)
     assert first.activation_scope is not None
     assert (
         first.activation_scope.request.base_project
