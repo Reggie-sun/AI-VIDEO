@@ -26,6 +26,11 @@ generation、activation、Review、quality或Final Acceptance evidence。
 可用、live smoke、媒体质量、candidate activation、Review或Final Acceptance。动态实现与evidence
 状态由`docs/v0.2-runtime-baseline.md`记录。
 
+本Gate是pre-submit structural preflight，不属于
+`quality-gate-architecture/1`定义的两个top-level post-media gates（Universal Production QA与
+Domain-Specific Acceptance）。其`READY`不能替代任一post-media Gate；canonical taxonomy见
+`docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md`。
+
 本 repository 只有这一份 canonical `ShotReadinessGate` Spec。本次修改是在该文件中
 原地修订 contract，不存在另一份“旧 QA Gate Spec”、并行 gate spec 或基于实验失败新建
 Spec 的路径；“QA Gate”仅是对本 pre-submit structural gate 的口语称呼。

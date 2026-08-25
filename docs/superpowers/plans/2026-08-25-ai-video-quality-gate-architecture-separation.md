@@ -2,7 +2,10 @@
 
 ## Status
 
-Implemented in documentation/contract-test scope；final completion仍以本任务的exact-snapshot Harness receipt为准。后续 Runtime seam 与 Drama integration必须各自创建新的active spec/plan并获得独立授权。
+Implemented in boundary documentation/contract-test scope，并已补充accepted canonical
+`quality-gate-architecture/1` Spec；two-stage Product Runtime orchestration仍未实现。后续
+Runtime coordinator、typed Domain seam与具体Domain profile必须各自按本plan的future slice
+边界获得独立implementation authorization。
 
 本计划基于 `main@2500bbb7254ed5fb2ca936437f636df9e626e44f` 的 tracked source、tests、canonical docs、`ecommerce-ad-workflow` contracts 与 fresh AI-VIDEO memory retrieval 编写。它只规划 Quality Gate architecture separation；本文档不证明 Runtime 已实现，不授权 Provider、媒体生成、Runtime mutation、P6 PASS、Final Acceptance、market-performance prediction、commit、push 或 release。
 
@@ -10,16 +13,23 @@ Implemented in documentation/contract-test scope；final completion仍以本任�
 
 ## Goal
 
-建立一个不重复 Production QA、也不混淆业务 acceptance 的 Quality architecture：
+建立一个不重复 Production QA、也不混淆业务 acceptance 的两层post-media Quality
+architecture：
 
 ```text
-Universal Production QA
-  + Ecommerce Advertising Domain Gate
-  + future AI Drama / Short Drama Domain Gate
-  -> existing P6 Review / Repair / Final Acceptance lifecycle
+Gate 1: Universal Production QA
+  -> Gate 2: Domain-Specific Acceptance
+       -> selected Ecommerce / Drama / AI Comic / future profile
+  -> existing P6 Review / Repair lifecycle
+  -> Final Acceptance rollup
 ```
 
-目标是先把 boundary 固定为 durable contract：Ecommerce 与 future Drama 使用各自的 authoring、semantic、creative 和 media-acceptance rubric，同时继续复用 AI-VIDEO 对 media、timeline、composition、continuity evidence、provenance、review freshness、repair 和 durable Final Acceptance 的唯一 owner。本 slice 不实现 Runtime-facing domain evidence schema。
+只有两个top-level post-media gates。Ecommerce、Drama、AI Comic与future domains只是Gate 2
+下显式选择的profiles，不是额外top-level gates或lifecycle owners；Final Acceptance只是existing
+committer的durable rollup，不是第三个quality evaluator gate。目标是先把boundary固定为durable
+contract，同时继续复用AI-VIDEO对media、timeline、composition、continuity evidence、
+provenance、review freshness、repair和durable Final Acceptance的唯一owner。本slice不实现
+Runtime-facing domain evidence schema或automatic caller。
 
 ## Non-Goals
 
@@ -28,6 +38,9 @@ Universal Production QA
 - 不增加新的 Manifest、Timeline、Dependency Graph、renderer、QA lifecycle、repair lifecycle 或 Final Acceptance owner；
 - 不新增 `ECOMMERCE`、`DRAMA` 或 `FORMAT` 类型的 `QaLayer`；
 - 不把现有 generic `SEMANTIC` 直接改名后当作完整 domain framework；
+- 不把Ecommerce、Drama或AI Comic profiles描述为额外top-level gates；
+- 不把Final Acceptance描述为第三个quality evaluator gate；
+- 不实现background watcher、automatic repair、automatic activation或automatic Final Acceptance；
 - 不实现 campaign、publishing、analytics、attribution、ROAS optimization 或 audience-retention prediction；
 - 不调用 Provider，不生成或修改图片、视频、音频，不读取 credential；
 - 不改变 Legacy `0.1.x` CLI、Manifest、artifact layout 或 local-first contracts。
@@ -112,31 +125,29 @@ Production continuity 与 narrative continuity 必须保持不同 owner：
 ## Target Architecture
 
 ```text
-Domain Authoring
-  Ecommerce Ad QC                       future Drama Authoring QC
-  truth / claims / hook / CTA           causality / motivation / conflict / payoff
-              \                         /
-               sealed intent and requirements
-                            |
-                            v
-AI-VIDEO Production Runtime
-  hard media + timeline + composition validation
-  universal/policy-driven review evidence
-  physical/perceptual continuity evidence
-                            |
-                            v
-Domain Media Acceptance
-  Ecommerce media rubric                future Drama media rubric
-  product/claim/hook/CTA presentation   acting/emotion/pacing/dialogue/payoff
-              \                         /
-               typed evidence for current P6 lifecycle
-                            |
-                            v
-ProductionStateCommitter
-  ReviewReceipt -> Repair -> FinalAcceptanceReceipt
+Rendered Media
+  -> Gate 1: Universal Production QA
+       hard media/timeline/composition/audio/caption validation
+       selected universal/shared P6 evidence
+  -> Gate 2: Domain-Specific Acceptance
+       exactly one selected Ecommerce / Drama / AI Comic / future profile
+       typed rubric + requirement coverage + exact media evidence
+  -> existing P6 Review / Repair lifecycle
+  -> ProductionStateCommitter Final Acceptance rollup
 ```
 
 Domain Workflow 可以拥有 authoring verdict、rubric 和 evidence proposal，但不得直接写 Manifest、激活 candidate、签发 Production PASS 或创建 durable Final Acceptance。AI-VIDEO 必须重新绑定 exact selected project/graph/render/output/timeline/policy/evaluator evidence，并由现有 committer adjudicate 和持久化。
+
+### Trigger Semantics
+
+- Universal hard validators是在caller显式进入load/resolve/render/import/validate owner API后
+  内嵌强制执行，不是background automation；fetch本身不自动validate或activate。
+- `ShotReadinessGate`、Ecommerce G0-G7与`AdCreativeReviewReport`是preflight，均不属于上述
+  两个post-media gates。
+- P6 `begin_review() -> run_review_analysis() -> record_review_receipt()`由orchestration显式
+  发起；committer内部重新adjudicate，但当前没有product-level automatic caller。
+- 最后一层required PASS不会自动触发`record_final_acceptance()`。
+- Base AI Comic E2E中的显式layout-only串联是test orchestration，不是Product Runtime自动化。
 
 ## Gate Taxonomy
 
@@ -185,9 +196,12 @@ Domain Workflow 可以拥有 authoring verdict、rubric 和 evidence proposal，
 | narrative continuity | future Drama workflow/rubric | Drama only | required 时阻塞；不得由 physical continuity receipt替代 |
 | market metrics | future analytics/empirical feedback owner, outside this plan | outcome evidence only | 默认不得阻塞 Production Final Acceptance，也不得反推 Gate PASS |
 
-## Pre-Generation And Post-Generation Gates
+## Gate 2 Domain Profile Requirement Examples
 
-### Ecommerce
+本节中的pre-generation checks是Gate 2 profile的sealed authoring inputs，仍属于authoring
+preflight；只有post-generation media checks进入Gate 2。它们不是额外top-level gates。
+
+### Ecommerce Profile Example
 
 Pre-generation authoring checks：
 
@@ -206,7 +220,7 @@ Post-generation media checks：
 - commercial typography/readability、product occlusion、audio/graphics synchronization；
 - product integration、hero presentation、brand closure、pacing 和 delivery quality。
 
-### Future Drama
+### Future Drama Profile Example
 
 Pre-generation authoring checks：
 
@@ -248,7 +262,11 @@ Engineering/deterministic PASS 不能替代 empirical/model-quality evidence。�
 
 ### Authorized Slice: Boundary Contract Only
 
-本 plan 唯一授权的 implementation slice 不修改 Production Runtime schema。durable boundary 由现有 `docs/agent-primary-contract-matrix.md` 继续拥有；不新建 active canonical spec，因此不新增 `.agent/harness/docs-contracts.yaml` surface。该 slice 把以下边界变为可验证 invariant：
+本 plan 已完成的boundary slice不修改Production Runtime schema。Durable surface boundary继续由
+`docs/agent-primary-contract-matrix.md`拥有；two-gate taxonomy与trigger contract由accepted
+`docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md`拥有，并登记为
+`.agent/harness/docs-contracts.yaml`中的`quality_gate_architecture` governance surface。该slice把
+以下边界变为可验证 invariant：
 
 - `ShotReadinessGate.READY` 不等于 post-media quality/P6/activation；
 - `AdQCReport.ready` 只等于 Ecommerce authoring readiness；
@@ -256,6 +274,9 @@ Engineering/deterministic PASS 不能替代 empirical/model-quality evidence。�
 - `AdCreativeReviewReport.production_verdict` 继续为 `None`；
 - Base AI Comic Final Acceptance 只表示 exact selected policy 的 durable closure，不表示 Drama semantic acceptance；
 - domain authoring result 不得写 Manifest 或产生 `FinalAcceptanceReceipt`。
+- 只有Universal Production QA与Domain-Specific Acceptance两个top-level post-media gates；
+- Ecommerce、Drama与AI Comic只能作为Gate 2 profiles；
+- Final Acceptance是explicit durable rollup，current Runtime无automatic caller。
 
 本 slice 的 contract changes 限定为：
 
@@ -298,6 +319,7 @@ future Drama 只有在正式 workflow/spec、owner、authoring artifact 和 rubr
 
 ### Exact Owner
 
+- two-gate taxonomy与trigger contract：`docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md`；
 - durable quality boundary：`docs/agent-primary-contract-matrix.md`；
 - current implementation truth：`docs/v0.2-runtime-baseline.md`；
 - future slice routing：`docs/v0.2-agentic-production-roadmap.md`；
@@ -357,6 +379,9 @@ Domain Skill 不执行 Runtime review，不持久化 Production verdict；它只
 
 以下只列本 plan 唯一授权 slice 的 expected paths：
 
+- `docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md`；
+- `docs/superpowers/specs/2026-08-21-ai-video-shot-readiness-gate-v3.md`；
+- `.agent/harness/docs-contracts.yaml`；
 - `docs/agent-primary-contract-matrix.md`；
 - `docs/v0.2-runtime-baseline.md`；
 - `docs/v0.2-agentic-production-roadmap.md`；
@@ -369,7 +394,7 @@ Domain Skill 不执行 Runtime review，不持久化 Production verdict；它只
 ### Must Not Create Or Modify For This Architecture
 
 - any `src/ai_video/**` Runtime file in this slice；
-- a new active canonical spec or docs-contract registry surface；
+- any second canonical quality-gate architecture spec或未登记的parallel docs-contract surface；
 - a second Manifest or state directory；
 - a second timeline/composition engine；
 - a domain-owned Final Acceptance writer；
@@ -382,11 +407,13 @@ Domain Skill 不执行 Runtime review，不持久化 Production verdict；它只
 ### Universal Gate Regression
 
 - existing hard media/timeline/audio/caption/render validators仍阻塞 invalid artifacts；
+- future selected Universal profile定义applicable minimum，且`QaPolicy.required_layers`缺少其任一
+  required review layer时必须在Gate 2前fail closed；
 - P6 required `FAIL`、`NOT_EVALUATED`、missing 或 stale receipt仍阻塞 Final Acceptance；
 - exact graph/render/output/timeline/policy/evidence identity仍被重新验证；
 - repair后必须 fresh review；replay不得重复 analyzer/committer side effects。
 
-### Ecommerce-Specific Gate
+### Ecommerce Gate 2 Profile Boundary
 
 - Product Truth、rights、claim lineage、prohibited claim、Hook/beat/product presentation/CTA/brand/variant failures只由 Ecommerce authoring rubric解释；
 - `AdQCReport.ready` 和 `AdCreativeReviewReport.is_ready` 永远不生成 Production verdict、Manifest mutation 或 Final Acceptance；
@@ -453,8 +480,18 @@ Convergence criteria：tests、contract matrix、baseline、roadmap和 Ecommerce
 
 以下只是 sequencing direction，均不属于本 plan 的 executable scope：
 
-1. Runtime-facing typed domain profile/evidence seam：先为 Ecommerce post-media acceptance创建独立 active spec/plan，包含 exact preselected profile和 authoring-truth hash binding、migration、rollback及 full P6 tests。
-2. Future Drama adapter：只有 formal Drama workflow/spec存在后，再创建另一份独立 plan；复用 approved seam，但保持 narrative rubric与 Ecommerce rubric不可互换。
+1. Universal one-shot orchestration：显式caller先验证preselected Universal profile的applicable
+   minimum，并要求`QaPolicy.required_layers`完整覆盖其required review layers；缺profile或coverage
+   不完整立即STOP。只有coverage成立后才运行Gate 1 checks；`FAIL`、`NOT_EVALUATED`、stale或
+   unknown outcome同样STOP，不watch filesystem、不自动repair、activate或Final Acceptance。
+2. Runtime-facing typed Domain profile/evidence seam：支持exact preselected profile、rubric、stable
+   requirement IDs、authoring-truth hash与complete target coverage；没有selected applicable profile时
+   Gate 2 fail closed，不默认选择Ecommerce、Drama或AI Comic。
+3. Two-stage one-shot coordinator：按Gate 1 -> exactly one Gate 2顺序执行，只返回
+   `eligible_for_final_acceptance`；第一版不自动调用`record_final_acceptance()`。
+4. Concrete Domain profiles：Ecommerce、Drama、AI Comic分别由自己的accepted workflow/spec与
+   implementation plan接入同一Gate 2 seam，rubric不可互换，任何一个profile都不得成为第二
+   Manifest/P6/Final Acceptance owner。
 
 ## Risks And Mitigations
 
@@ -471,6 +508,9 @@ Convergence criteria：tests、contract matrix、baseline、roadmap和 Ecommerce
 
 ## Acceptance Criteria
 
+- 只有Universal Production QA与Domain-Specific Acceptance两个top-level post-media gates；
+- Ecommerce、Drama、AI Comic只作为Gate 2 profiles，Final Acceptance只作为explicit durable rollup；
+- current owner-API内嵌validation与product-level automatic orchestration被明确区分；
 - existing canonical owner明确选择 Option B，并说明拒绝 A、暂缓 C 的 current-code理由；
 - `TECHNICAL`、`LAYOUT`、`STRATEGY`、`SEMANTIC`、`FINAL_ACCEPTANCE` 的 current executable semantics有源码/测试依据；
 - Universal、shared-policy、Ecommerce、future Drama和 market metrics分类无 duplicate owner；
@@ -495,4 +535,7 @@ Convergence criteria：tests、contract matrix、baseline、roadmap和 Ecommerce
 
 ## Delivery Boundary
 
-完成本计划文件只表示 architecture analysis 与 implementation sequencing 已稳定。它不表示 Quality Gate separation 已实现，不表示 Ecommerce media acceptance 或 Drama QC 已存在，也不表示任何项目、Shot、广告或剧集通过 P6、Final Acceptance 或市场验证。
+完成本Spec/plan同步只表示two-gate architecture、ownership、trigger semantics与implementation
+sequencing已稳定，boundary contract foundation已实现。它不表示two-stage Product Runtime
+orchestration、typed Domain Gate、Ecommerce media acceptance、Drama/AI Comic QC或automatic
+Final Acceptance已存在，也不表示任何项目、Shot、广告或剧集通过P6、Final Acceptance或市场验证。

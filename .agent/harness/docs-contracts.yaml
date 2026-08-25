@@ -93,6 +93,41 @@ surfaces:
         symbol: ShotReadinessRequest.contract_version
         expected: shot-readiness-gate/1
 
+  - surface_id: quality_gate_architecture
+    canonical_spec: docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md
+    canonical: true
+    spec_status: accepted
+    implementation_status: foundation_only
+    live_status: not_applicable
+    quality_status: not_evaluated
+    release_status: unreleased
+    runtime_status_owner: docs/v0.2-runtime-baseline.md
+    roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+    contract_version: quality-gate-architecture/1
+    implementation_paths:
+      - docs/agent-primary-contract-matrix.md
+    test_paths:
+      - tests/test_ecommerce_ad_workflow_skill.py
+      - tests/test_production_review.py
+      - tests/test_production_base_ai_comic_e2e.py
+    harness_check_ids:
+      - ecommerce_ad_workflow_skill_tests
+      - production_review_tests
+      - production_contract_tests
+    assertions:
+      - type: text_contains
+        path: docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md
+        text: "本Spec只定义两个top-level post-media quality gates"
+      - type: text_contains
+        path: docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md
+        text: "`Final Acceptance`不是第三个quality evaluator gate"
+      - type: text_contains
+        path: docs/agent-primary-contract-matrix.md
+        text: "Quality architecture 采用 **Universal Production QA + Domain-Specific Acceptance Gate**"
+      - type: text_contains
+        path: docs/agent-primary-contract-matrix.md
+        text: "`FINAL_ACCEPTANCE`只由committer汇总exact fresh required receipts"
+
   - surface_id: local_h3_t8_provider_family
     canonical_spec: docs/superpowers/specs/2026-08-21-ai-video-local-h3-t8-provider-family.md
     canonical: true
