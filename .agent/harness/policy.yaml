@@ -514,6 +514,7 @@ categories:
   commercial_source_preparation:
     patterns:
       - src/ai_video/planning/_commercial_video_planning.py
+      - src/ai_video/production/_commercial_source_state.py
       - src/ai_video/production/_commercial_project_reader.py
       - src/ai_video/production/commercial_execution.py
       - src/ai_video/production/commercial_dependency.py

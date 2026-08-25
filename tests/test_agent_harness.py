@@ -802,6 +802,7 @@ def test_commercial_source_preparation_routes_to_focused_cross_owner_suite() -> 
 
     for path in (
         "src/ai_video/planning/_commercial_video_planning.py",
+        "src/ai_video/production/_commercial_source_state.py",
         "src/ai_video/production/_commercial_project_reader.py",
         "src/ai_video/production/commercial_execution.py",
         "src/ai_video/production/commercial_dependency.py",
