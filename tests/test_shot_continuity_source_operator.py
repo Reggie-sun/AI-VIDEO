@@ -120,6 +120,7 @@ def _profile_for(project) -> tuple[ShotContinuitySourceQualificationProfile, str
         {
             "project_content_hash": project.project.content_hash,
             "registry_content_hash": project.registry.content_hash,
+            "target_shot_revision": target.revision,
             "target_shot_content_hash": target.content_hash,
             "first_frame_asset_id": frames[0].asset_id,
             "first_frame_sha256": frames[0].sha256,

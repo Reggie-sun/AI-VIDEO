@@ -142,7 +142,7 @@ class ShotContinuitySourceQualificationProfile(StrictModel):
     project_content_hash: str = Field(pattern=_SHA256)
     registry_content_hash: str = Field(pattern=_SHA256)
     target_shot_id: Literal["rainy-station-3"]
-    target_shot_revision: Literal[1]
+    target_shot_revision: int = Field(strict=True, ge=1)
     target_shot_content_hash: str = Field(pattern=_SHA256)
     target_asset_role: Literal["approved_endpoint"]
     output_asset_id: Literal["video-shot-rainy-station-3-source-v1"]

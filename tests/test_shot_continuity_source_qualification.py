@@ -214,6 +214,35 @@ def _profile(
     )
 
 
+def test_source_profile_accepts_exact_revised_target_shot_identity() -> None:
+    sources = load_shot_continuity_source_execution_sources(artifact_root=REPO_ROOT)
+    base = _profile(
+        sources,
+        _p0(sources.materialized_stack.execution_stack_hash),
+    )
+    values = base.model_dump(mode="python")
+    values.update(
+        project_content_hash="8" * 64,
+        target_shot_revision=2,
+        target_shot_content_hash="7" * 64,
+    )
+    for key in (
+        "prompt_sha256",
+        "sealed_seed",
+        "output_contract_hash",
+        "profile_content_hash",
+    ):
+        values.pop(key, None)
+
+    revised = ShotContinuitySourceQualificationProfile.create(**values)
+
+    assert revised.target_shot_revision == 2
+    assert revised.target_shot_content_hash == "7" * 64
+    assert revised.project_content_hash == "8" * 64
+    assert revised.sealed_seed != base.sealed_seed
+    assert revised.profile_content_hash != base.profile_content_hash
+
+
 def test_typed_resolved_request_uses_canonical_shot_scope_identity() -> None:
     import ai_video.production.shot_continuity_source_qualification as module
 
@@ -1003,7 +1032,8 @@ def test_source_upload_uses_pre_permit_immutable_bytes(
         "missing_source", "missing_seed", "negative_seed", "boolean_seed",
         "different_seed", "schema", "stack", "source_stack", "p0_receipt",
         "dependent_evidence", "cardinality", "lineage", "project",
-        "registry", "missing_graph", "component", "endpoint",
+        "registry", "request_revision", "active_revision", "missing_graph",
+        "component", "endpoint",
     ),
 )
 def test_source_qualification_denials_are_zero_write_and_zero_effect(
@@ -1046,6 +1076,12 @@ def test_source_qualification_denials_are_zero_write_and_zero_effect(
         case.project.manifest.active_project.content_hash = "0" * 64
     elif drift == "registry":
         case.project.registry.content_hash = "0" * 64
+    elif drift == "request_revision":
+        case.request.activation_scope.request.target_shot_revision = (
+            case.profile.target_shot_revision + 1
+        )
+    elif drift == "active_revision":
+        case.project.shots[0].revision = case.profile.target_shot_revision + 1
     elif drift == "missing_graph":
         case.project.manifest.active_dependency_graph = None
     elif drift == "component":

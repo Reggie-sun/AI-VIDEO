@@ -75,44 +75,44 @@
       "schema_sha256": "ecf1b0bb9558c1a84dea6e1fcf4f9a9d79ac5d09ed557092f1c062abcef4ead6"
     }
   ],
-  "p0_qualification_receipt_hash": "4227b7a032dfb10cee7e84637c543be530159cb24012ca926c9f5473eae6614f",
-  "m0_execution_stack_hash": "b58597090ba9c630b21ef3691905a9728da1e2bcdf9a9e89531386c31a904573",
-  "m0_profile_hash": "377330590b7727140baf4ac2fcef196f85a8572848736b9e1d316b78748fce72",
+  "p0_qualification_receipt_hash": "80149ed5e866572b9bd10e4ea37c7ebe452e8cd4497e4ab5ebc9387b75e11fc2",
+  "m0_execution_stack_hash": "073f0f429f49d828538b12fce6d7616a7834ebb53dbe31efe43c22fda41d0a24",
+  "m0_profile_hash": "808f688e62131653d0d3e2b0ffa877645a684b4011bc680dfa42a653c98f975a",
   "m0_compiler_hash": "e2ba38bb110e26a5221a5582ea19f777752a1946ffacbe31b1445073d1530d19",
   "m0_workflow_hash": "963bd91ad81ca102053deb08b29a7aa8fb6849a6256a78ccbfbc6138d7a855d2",
-  "p0_validation_set_hash": "ffc9f6b903f1c5e8e43669427027b1c2d0f02a77634b7a13aa0d8a943864ef77",
+  "p0_validation_set_hash": "8ae0f13f9686ca99c2a24130657ecfc675da204b8875b656b0c2421eb2c808ba",
   "p0_policy_hashes": [
-    "121814ed2ff75d88022b96cf31212a1ddf187df856756f5dfbfac1bffa898a61",
-    "c6f9c7633cc5d219bf7f02d20b2cd954e9ffd1a690534479c67a6e44d374065d",
-    "b7f39ac92031b7f197be04e6d39aace69fac6a510815b3ce7fef966a4a543bb3"
+    "20ebc5b788ead0aff50780afe46bb4b01c4a113c7967f50fc93246f3ceb11ee7",
+    "6fdf79868af049be62ce4ab33efbd66768bdbdd73691e6ce3a809066d07529d6",
+    "32263cc49d394e560d962c575981831cb799dfde51c404aac73ad89ff108ca56"
   ],
   "p0_input_hashes": [
     [
       "inventory",
-      "c3b714b1e5127fc61f890dab5416a3a0352f434424cbfb8a62acea71f282c2fc"
+      "f035bc5915c73a18b905812b7a8ce8000a2532f1e5285acb19f0e75b324ef99f"
     ],
     [
       "calibration_fixture",
-      "7a7ead71f84853fb6da714747cd2eb8c931432468a90502c87aede64062fdfd9"
+      "978cef8280da8cf63d2746e2156d389357e0e3ffdc2124b163bf4ba92b3505f9"
     ],
     [
       "rubric",
-      "f5ec50073e54cb2b41fca732f693ec95e99a4f3f852d4b82d617030134a52794"
+      "2663060189f5e2acb42622aec242e7533ffe2a80fb8db36363cf1002c39d52e5"
     ],
     [
       "effect_budget",
-      "38ad0c9f98bb8d983daecb6b77f1f90dddab6d5cd51eca19e44fa03be0132b84"
+      "1f2a994f06ecc035d7814951c4490a82ccc80402b9346d2356e35ff0f546efe4"
     ],
     [
       "human_freeze",
-      "6f0898b6186afcdc4ae9e95936ffb43c4fb41b9996571233c5d97bfd1016bc83"
+      "63ee3f895908784cfb71266d201e66b551c6f2aad38d46e231b6ef178f4c0f4b"
     ]
   ],
-  "project_content_hash": "b019affa15219377984643889555fe1c7c27f5479c6d0f72147de64632704f60",
-  "registry_content_hash": "b292cb0b35226f6201228dbc0caa62d54823f4d03040af9fa218f9666af732e9",
+  "project_content_hash": "4f53877b9e437c2cec5161c966dc9c6a9e1c4c5a4ba7af43951a5b696cd2bbab",
+  "registry_content_hash": "8902beaf6540759faab80a4efe6acef00d8a118d4437ef16abba9e8709847256",
   "target_shot_id": "rainy-station-3",
-  "target_shot_revision": 1,
-  "target_shot_content_hash": "1b76a750056bfc197dd40d8ad78442e1fecd3de0fe2f58c09d3a2ba3cbbe02a7",
+  "target_shot_revision": 2,
+  "target_shot_content_hash": "691dd13ec05b9ef19910649e89c38b7be50235fb5a4c5215ea21c3ff37f3ffe8",
   "target_asset_role": "approved_endpoint",
   "output_asset_id": "video-shot-rainy-station-3-source-v1",
   "first_frame_asset_id": "image-import-e8b1d85d4e599d584ca63fb503b86515fd4b8dd8174ac0a6c304ad3c167d3163",
@@ -120,15 +120,15 @@
   "first_frame_size_bytes": 1984532,
   "first_frame_width": 1659,
   "first_frame_height": 948,
-  "last_frame_asset_id": "image-import-550b07e0ee96c4d8889b906292ad76f41c66adfbfd1dc80bbe9b9cf6ba290a5f",
-  "last_frame_sha256": "03f4c5ebd177486dd65b21d61901f2296ef7255f12819c66099ef93815a7fc7c",
-  "last_frame_size_bytes": 1966518,
+  "last_frame_asset_id": "image-import-ff896c4d23cfd1b0d426e64f6243c4c5cca3f9ed2e95a3dfb5b08821e98e2322",
+  "last_frame_sha256": "347e1208215f2d2a4a0b37ec60dbed62daed19dd62ac2a776ab1b308f9fb9c1c",
+  "last_frame_size_bytes": 1934164,
   "last_frame_width": 1659,
   "last_frame_height": 948,
   "prompt": "For the target video, <Picture 1> is fully referenced as the exact first frame and <Picture 2> is fully referenced as the exact last frame.\n\nintegrated_multimodal_description: [Shot 1] One continuous live-action, photorealistic cinematic medium right-facing side-profile shot on the same rain-soaked railway platform at blue hour. The exact same lone adult East Asian woman with a short blunt black bob, mustard-yellow hooded raincoat, black trousers, black boots and the same red cross-body leather satchel walks steadily screen-right toward the clock. A chest-height natural-perspective camera tracks parallel at slow constant speed, preserving a level horizon and stable body scale. Begin at the exact supplied first frame and finish at the exact supplied last frame while she remains mid-stride with continuing gait and satchel motion. Exactly one person; no cut, extra person, axis reversal, teleport, wardrobe change, random zoom, jitter, text or logo.\noverall_soundscape: Steady rain, measured synchronized boot footsteps, restrained station ambience and small physical leather-satchel movement.\nnon_diegetic_music: No non-diegetic music.",
   "prompt_sha256": "f9d0f7492af21bbfd52e6affa8e1f93bc8b73982152ed046a38c0011d12e9e7a",
   "seed_derivation": "source-qualification-closure-sha256-low63-v1",
-  "sealed_seed": 3625644815483226956,
+  "sealed_seed": 3742455256126004804,
   "width": 1344,
   "height": 768,
   "frame_count": 124,
@@ -139,5 +139,5 @@
   "remote_provider_enabled": false,
   "cloud_fallback_enabled": false,
   "retry_enabled": false,
-  "profile_content_hash": "369295e1906307bb94b7a30a81672a767e2f95e41929cb45cd3d57cd51e04ffc"
+  "profile_content_hash": "20d44f05ec0ab695224adf5db4948d828c9e04ef64d4710229eb67b875ebf7a5"
 }
