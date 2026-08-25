@@ -1309,9 +1309,11 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
     paths = (
         "scripts/materialize_shot_continuity_m0.py",
         "scripts/prepare_shot_continuity_p0.py",
+        "scripts/execute_shot_continuity_source.py",
         "src/ai_video/production/execution_stack_materialization.py",
         "src/ai_video/production/shot_continuity_m0_qualification.py",
         "src/ai_video/production/shot_continuity_source_qualification.py",
+        "src/ai_video/production/shot_continuity_source_operator.py",
         "src/ai_video/production/shot_continuity_source_contracts.py",
         "src/ai_video/production/shot_continuity_source_runtime.py",
         "src/ai_video/production/shot_continuity_source_schema.py",
@@ -1325,6 +1327,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_shot_continuity_m0_materialization.py",
         "tests/test_shot_continuity_m0_validation.py",
         "tests/test_shot_continuity_source_qualification.py",
+        "tests/test_shot_continuity_source_operator.py",
         "tests/test_shot_continuity_source_runtime.py",
         "tests/test_shot_continuity_source_transport.py",
         "workflows/qualification/minimax_h3_fl2va_rainy_station_source_v1_profile.json",
@@ -1334,12 +1337,15 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
     )
     provider_lifecycle_paths = {
         "src/ai_video/production/shot_continuity_source_qualification.py",
+        "src/ai_video/production/shot_continuity_source_operator.py",
         "src/ai_video/production/shot_continuity_source_contracts.py",
         "src/ai_video/production/shot_continuity_source_runtime.py",
         "src/ai_video/production/shot_continuity_source_schema.py",
         "src/ai_video/production/shot_continuity_source_transport.py",
         "src/ai_video/production/video_candidate_composition.py",
+        "scripts/execute_shot_continuity_source.py",
         "tests/test_shot_continuity_source_qualification.py",
+        "tests/test_shot_continuity_source_operator.py",
         "tests/test_shot_continuity_source_runtime.py",
         "tests/test_shot_continuity_source_transport.py",
     }
@@ -1369,6 +1375,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_shot_continuity_m0_materialization.py",
         "tests/test_shot_continuity_m0_validation.py",
         "tests/test_shot_continuity_source_qualification.py",
+        "tests/test_shot_continuity_source_operator.py",
         "tests/test_shot_continuity_source_runtime.py",
         "tests/test_shot_continuity_source_transport.py",
         "tests/test_video_candidate.py",
