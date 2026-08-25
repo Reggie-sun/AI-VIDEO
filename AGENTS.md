@@ -102,6 +102,27 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 
 Reader、registry、validation、dependency、Provider adapter、renderer 与 analyzer 可以验证或消费 canonical state，但不得直接决定 durable activation。Fetch、render、analysis 或 generation success 本身不等于 candidate activation、QA acceptance 或 delivery truth。
 
+## Agent Memory Retrieval Routing
+
+`retrieve-ai-video-memory` 是 substantial AI-VIDEO work 的 mandatory advisory preflight。
+当 task 涉及 real media production 或 quality、Provider/model behavior、continuity 或
+identity drift、known regression/repeated failure/incident/recovery、需要复用 prior
+architecture decision，或用户明确要求查找 earlier AI-VIDEO experience、decision、spec 或
+plan 时，Agent MUST 在 substantial execution 以及其他 matching domain Skill 之前调用该
+Skill。Ecommerce、continuity、Provider prompting 与 motion-design task 只要命中上述条件，
+也必须先完成这一步，再进入各自 owner；不得因为已经调用另一个 Skill、读取 current files
+或运行 `rg` 就跳过。
+
+Formatting、typo、unrelated trivial test、isolated mechanical refactor，以及只需确认 current
+source symbol/path/call chain/file contents 的 task 不触发该 preflight；这些情况直接使用
+current code、tests、`rg` 或 codegraph。`allow_implicit_invocation: true` 只允许 host 选择
+Skill，不是已执行证据，也不能替代本 routing requirement。
+
+调用时按 `.agents/skills/retrieve-ai-video-memory/SKILL.md` 只选择一个 matching scope/reference，
+并遵守其 stale、missing、BROKEN 与 authority boundary。该 requirement 不注册 lifecycle hook，
+不要求每个 session 都运行 RAG，也不把 retrieval result 升级为 implementation、Provider、
+activation、quality acceptance、push 或 release authorization。
+
 ## Creative Skill Routing
 
 AI-VIDEO remains the sole owner of production truth. External Skills provide advisory knowledge only unless an explicitly approved project contract says otherwise. Skill guidance MUST be translated into AI-VIDEO domain contracts before execution and MUST NOT mutate or own canonical state.
@@ -134,6 +155,8 @@ SHOULD use for ecommerce、SKU、product advertising、direct-response product v
 
 ### Routing Precedence
 
+- 命中 `Agent Memory Retrieval Routing` -> 先调用 `retrieve-ai-video-memory`，再进入下列
+  matching domain owner；retrieval 只提供 advisory evidence，不重定义其 contract。
 - Ecommerce / SKU / product advertising authoring -> `ecommerce-ad-workflow`；其中具体Shot continuity、Provider prompt adaptation或deterministic motion treatment仍按下列owner顺序作为advisory input。
 - Semantic continuity / Shot-state problem -> `hell-grind-aigc-skill`。
 - Specific generative model / Provider prompting problem -> `higgsfield`。
