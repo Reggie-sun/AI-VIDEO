@@ -454,8 +454,10 @@ def test_local_ecommerce_facade_uses_real_service_and_replays_zero_effect(
     assert (provider.submit_calls, provider.status_calls, provider.fetch_calls) == first_counts
 
 
+@pytest.mark.parametrize("preexisting_attempt", (True, False))
 def test_local_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
     tmp_path: Path,
+    preexisting_attempt: bool,
 ) -> None:
     from test_production_generated_video_e2e import (
         _CountingCommercialShotReviewer,
@@ -471,7 +473,8 @@ def test_local_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
         commercial_plan_hash="b" * 64,
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=durable_request)
+    if preexisting_attempt:
+        service.start(attempt_id=ATTEMPT_ID, request=durable_request)
     binding = expected_request.commercial_binding
     assert binding is not None
     facade = EcommerceVideoGenerationFacade(
@@ -481,13 +484,26 @@ def test_local_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
         lane="local",
         commercial_reviewer=_CountingCommercialShotReviewer(),
     )
+    competing_start_done = preexisting_attempt
+
+    def start_competing_request_after_preflight() -> bool:
+        nonlocal competing_start_done
+        if not competing_start_done:
+            service.start(attempt_id=ATTEMPT_ID, request=durable_request)
+            competing_start_done = True
+        return False
 
     result = run_ecommerce_ad_generation(
         _commercial_handoff(binding.target_shot_id),
         facades={binding.target_shot_id: facade},
+        stop_requested=start_competing_request_after_preflight,
     )
 
-    assert result.stop_reason is EcommerceStopReason.CHECKPOINT_INVALID
+    assert result.stop_reason is (
+        EcommerceStopReason.CHECKPOINT_INVALID
+        if preexisting_attempt
+        else EcommerceStopReason.SERVICE_STOP
+    )
     assert (provider.submit_calls, provider.status_calls, provider.fetch_calls) == (
         0,
         0,

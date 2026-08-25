@@ -117,15 +117,20 @@ class EcommerceVideoGenerationFacade:
         ):
             raise ValueError("Paid Ecommerce facade requires preview and reservation")
 
-    def bound_commercial_identity(self) -> tuple[str, str, str]:
+    def _declared_commercial_request_identity(
+        self,
+    ) -> tuple[str, str, str, str]:
         binding = self.request.commercial_binding
         assert binding is not None
-        declared = (
+        return (
             self.request.resolved_generation_hash,
             binding.ad_creative_plan_hash,
             binding.commercial_execution_projection_hash,
             binding.target_shot_id,
         )
+
+    def bound_commercial_identity(self) -> tuple[str, str, str]:
+        declared = self._declared_commercial_request_identity()
         durable = self.service.current_bound_commercial_request_identity(
             attempt_id=self.attempt_id
         )
@@ -134,6 +139,15 @@ class EcommerceVideoGenerationFacade:
                 "Ecommerce facade request does not match the durable attempt"
             )
         return declared[1:]
+
+    def _require_durable_request_identity(self) -> None:
+        durable = self.service.current_bound_commercial_request_identity(
+            attempt_id=self.attempt_id
+        )
+        if durable != self._declared_commercial_request_identity():
+            raise ValueError(
+                "Ecommerce facade request does not match the durable attempt"
+            )
 
     def next_action(self) -> EcommerceShotNextAction:
         try:
@@ -152,6 +166,7 @@ class EcommerceVideoGenerationFacade:
         self._started = True
 
     def submit(self) -> None:
+        self._require_durable_request_identity()
         if self.lane == "local":
             self.service.submit_local_once(
                 attempt_id=self.attempt_id,
@@ -166,18 +181,21 @@ class EcommerceVideoGenerationFacade:
         )
 
     def poll(self) -> None:
+        self._require_durable_request_identity()
         if self.lane == "local":
             self.service.refresh_local_once(attempt_id=self.attempt_id)
         else:
             self.service.refresh_once(attempt_id=self.attempt_id)
 
     def fetch(self) -> None:
+        self._require_durable_request_identity()
         if self.lane == "local":
             self.service.fetch_local_once(attempt_id=self.attempt_id)
         else:
             self.service.fetch_once(attempt_id=self.attempt_id)
 
     def validate(self) -> QaVerdict:
+        self._require_durable_request_identity()
         if self.before_validate is not None:
             self.before_validate()
         self.service.validate_once(
@@ -191,6 +209,7 @@ class EcommerceVideoGenerationFacade:
         return QaVerdict.NOT_EVALUATED if verdict is None else verdict
 
     def activate(self) -> ActivatedCommercialShotCheckpoint:
+        self._require_durable_request_identity()
         self.service.activate_once(attempt_id=self.attempt_id)
         checkpoint = self.current_activation_checkpoint()
         if checkpoint is None:
