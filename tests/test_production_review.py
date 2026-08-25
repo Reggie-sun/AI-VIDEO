@@ -7,6 +7,12 @@ from pathlib import Path
 import pytest
 
 from ai_video.errors import AiVideoError
+from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+from ai_video.production.ecommerce_media_acceptance import (
+    EcommerceAcceptanceEvidencePayload,
+    EcommerceRequirementFinding,
+    create_qingyan_ecommerce_acceptance_profile,
+)
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
     ActorIdentity,
@@ -93,6 +99,121 @@ def _qa_policy(
             repair_authorities=repair_authorities,
         )
     )
+
+
+def test_qa_policy_accepts_optional_sealed_domain_acceptance_binding():
+    profile_payload = {
+        "domain_id": "ecommerce",
+        "profile_id": "qingyan-ecommerce",
+        "profile_version": "1",
+        "measurement_contract_version": "ecommerce-media-acceptance/1",
+        "required_requirement_ids": ["ad.hook.first_second"],
+    }
+    profile_payload["content_hash"] = canonical_sha256(profile_payload)
+    selected = QaPolicy.model_validate(
+        {
+            **_qa_policy(required_layers=(QaLayer.SEMANTIC,)).model_dump(
+                mode="json"
+            ),
+            "semantic_requirement": "required",
+            "semantic_authorities": (
+                {"name": "fixture-evaluator", "version": "1"},
+            ),
+            "domain_acceptance": {
+                "domain_id": "ecommerce",
+                "profile_id": "qingyan-ecommerce",
+                "profile_version": "1",
+                "profile_content_hash": profile_payload["content_hash"],
+                "profile_payload": profile_payload,
+                "measurement_contract_version": "ecommerce-media-acceptance/1",
+                "required_requirement_ids": ("ad.hook.first_second",),
+            },
+        }
+    )
+
+    assert selected.domain_acceptance is not None
+    assert selected.domain_acceptance.domain_id == "ecommerce"
+
+
+def _domain_qa_policy() -> QaPolicy:
+    profile = create_qingyan_ecommerce_acceptance_profile()
+    domain_policy = DomainAcceptancePolicy(
+        domain_id="ecommerce",
+        profile_id=profile.profile_id,
+        profile_version=profile.profile_version,
+        profile_content_hash=profile.content_hash,
+        profile_payload=profile.model_dump(mode="json"),
+        measurement_contract_version="ecommerce-media-acceptance/1",
+        required_requirement_ids=profile.required_requirement_ids,
+    )
+    base = _qa_policy(required_layers=(QaLayer.SEMANTIC,))
+    return seal_artifact(
+        QaPolicy.model_validate(
+            {
+                **base.model_dump(mode="json"),
+                "semantic_requirement": "required",
+                "semantic_authorities": (
+                    {"name": "fixture-evaluator", "version": "1"},
+                ),
+                "domain_acceptance": domain_policy.model_dump(mode="json"),
+            }
+        )
+    )
+
+
+def _passing_domain_payload() -> EcommerceAcceptanceEvidencePayload:
+    profile = create_qingyan_ecommerce_acceptance_profile()
+    return EcommerceAcceptanceEvidencePayload.create(
+        profile_id=profile.profile_id,
+        profile_version=profile.profile_version,
+        profile_content_hash=profile.content_hash,
+        findings=tuple(
+            EcommerceRequirementFinding(
+                requirement_id=requirement_id,
+                verdict=QaVerdict.PASS,
+                rationale=f"observed {requirement_id}",
+            )
+            for requirement_id in profile.required_requirement_ids
+        ),
+    )
+
+
+def test_domain_acceptance_policy_requires_semantic_layer_in_final_rollup():
+    domain_policy = _domain_qa_policy().domain_acceptance
+    assert domain_policy is not None
+    with pytest.raises(ValueError, match="semantic layer"):
+        QaPolicy.model_validate(
+            {
+                **_domain_qa_policy().model_dump(mode="json"),
+                "required_layers": (QaLayer.TECHNICAL,),
+            }
+        )
+
+
+def test_selected_ecommerce_policy_delegates_semantic_requirement_adjudication():
+    selected = _domain_qa_policy()
+    asserted = evidence(
+        QaLayer.SEMANTIC,
+        EvidenceStrength.EXPLICIT_EVALUATOR,
+        evaluator_identity="fixture-evaluator@1",
+        domain_acceptance=_passing_domain_payload().model_dump(mode="json"),
+    )
+
+    assert adjudicate_review_evidence(
+        selected, QaLayer.SEMANTIC, (asserted,)
+    ) is QaVerdict.PASS
+    assert adjudicate_review_evidence(
+        selected,
+        QaLayer.SEMANTIC,
+        (
+            evidence(
+                QaLayer.SEMANTIC,
+                EvidenceStrength.EXPLICIT_EVALUATOR,
+                evaluator_identity="fixture-evaluator@1",
+                semantic_match=True,
+            ),
+        ),
+    ) is QaVerdict.NOT_EVALUATED
 
 
 @dataclass(frozen=True)

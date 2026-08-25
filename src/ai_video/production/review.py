@@ -696,6 +696,36 @@ def adjudicate_review_evidence(
         ]
         if not authorized:
             return QaVerdict.NOT_EVALUATED
+        if policy.domain_acceptance is not None:
+            if policy.domain_acceptance.domain_id != "ecommerce":
+                return QaVerdict.NOT_EVALUATED
+            from ai_video.production.ecommerce_media_acceptance import (
+                EcommerceAcceptanceEvidencePayload,
+                adjudicate_ecommerce_acceptance,
+            )
+
+            verdicts: list[QaVerdict] = []
+            for item in authorized:
+                payload = item.measured_payload.get("domain_acceptance")
+                if not isinstance(payload, Mapping):
+                    return QaVerdict.NOT_EVALUATED
+                try:
+                    typed_payload = EcommerceAcceptanceEvidencePayload.model_validate(
+                        dict(payload)
+                    )
+                except ValueError:
+                    return QaVerdict.NOT_EVALUATED
+                verdicts.append(
+                    adjudicate_ecommerce_acceptance(
+                        policy.domain_acceptance,
+                        typed_payload,
+                    )
+                )
+            if any(verdict is QaVerdict.FAIL for verdict in verdicts):
+                return QaVerdict.FAIL
+            if any(verdict is not QaVerdict.PASS for verdict in verdicts):
+                return QaVerdict.NOT_EVALUATED
+            return QaVerdict.PASS
         return (
             QaVerdict.PASS
             if all(item.measured_payload.get("semantic_match") is True for item in authorized)

@@ -42,6 +42,7 @@ from ai_video.production.composition_contracts import (
     TransitionKind,
     TransitionSpec,
 )
+from ai_video.production.domain_acceptance import DomainAcceptancePolicy
 
 from ai_video.production._asset_registry_validation import (
     reject_explicit_p4_registry_fields,
@@ -2374,12 +2375,29 @@ class QaPolicy(VersionedArtifact):
     semantic_requirement: Literal["optional", "required"]
     semantic_authorities: tuple[ToolIdentity, ...] = ()
     repair_authorities: tuple[ActorIdentity, ...] = ()
+    domain_acceptance: DomainAcceptancePolicy | None = None
 
     @model_validator(mode="after")
     def _require_semantic_authority(self) -> "QaPolicy":
         if self.semantic_requirement == "required" and not self.semantic_authorities:
             raise ValueError("required semantic QA needs a policy-selected authority")
+        if self.domain_acceptance is not None and self.semantic_requirement != "required":
+            raise ValueError("Domain acceptance requires semantic QA")
+        if (
+            self.domain_acceptance is not None
+            and QaLayer.SEMANTIC not in self.required_layers
+        ):
+            raise ValueError("Domain acceptance requires the semantic layer")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_domain_acceptance(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.domain_acceptance is None:
+            data.pop("domain_acceptance", None)
+        return data
 
 
 class ReviewRequest(VersionedArtifact):
