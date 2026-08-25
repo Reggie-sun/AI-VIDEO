@@ -6,7 +6,14 @@ import subprocess
 from pathlib import Path, PurePosixPath
 from typing import Mapping
 
-from scripts.architecture_gate.models import ArchitectureSnapshot, FileMetric, Policy
+from scripts.architecture_gate.models import (
+    ArchitectureSnapshot,
+    FileMetric,
+    ImportContext,
+    ImportEdge,
+    Policy,
+    SyntaxErrorEvidence,
+)
 
 
 def effective_loc(source: str) -> int:
@@ -64,6 +71,13 @@ def build_snapshot(sources: Mapping[str, str], policy: Policy) -> ArchitectureSn
     path_by_module = {module: path for path, module in module_by_path.items()}
     known_modules = frozenset(path_by_module)
     graph: dict[str, set[str]] = {module: set() for module in known_modules}
+    retained_target_prefixes = frozenset(
+        target
+        for rule in policy.dependency_rules
+        for target in rule.forbidden_targets
+    )
+    import_edges: list[ImportEdge] = []
+    syntax_errors: list[SyntaxErrorEvidence] = []
 
     for path, module in module_by_path.items():
         graph[module].update(
@@ -75,6 +89,17 @@ def build_snapshot(sources: Mapping[str, str], policy: Policy) -> ArchitectureSn
             )
         )
         graph[module].discard(module)
+        edges, syntax_error = _collect_import_edges(
+            source_path=path,
+            source_module=module,
+            is_package=path.endswith("/__init__.py"),
+            source=sources[path],
+            known_modules=known_modules,
+            retained_target_prefixes=retained_target_prefixes,
+        )
+        import_edges.extend(edges)
+        if syntax_error is not None:
+            syntax_errors.append(syntax_error)
 
     cycles = _strongly_connected_cycles(graph)
     files = {
@@ -94,6 +119,18 @@ def build_snapshot(sources: Mapping[str, str], policy: Policy) -> ArchitectureSn
         files=files,
         cycles=cycles,
         size_exempt_paths=size_exempt_paths,
+        import_edges=tuple(
+            sorted(
+                import_edges,
+                key=lambda item: (
+                    item.source_path,
+                    item.lineno,
+                    item.target_module,
+                    item.context.value,
+                ),
+            )
+        ),
+        syntax_errors=tuple(sorted(syntax_errors, key=lambda item: item.path)),
     )
 
 
@@ -153,6 +190,125 @@ def _module_imports(
                 if target:
                     dependencies.add(target)
     return dependencies
+
+
+def _collect_import_edges(
+    *,
+    source_path: str,
+    source_module: str,
+    is_package: bool,
+    source: str,
+    known_modules: frozenset[str],
+    retained_target_prefixes: frozenset[str],
+) -> tuple[list[ImportEdge], SyntaxErrorEvidence | None]:
+    try:
+        tree = ast.parse(source)
+    except SyntaxError as exc:
+        return [], SyntaxErrorEvidence(
+            path=source_path,
+            lineno=exc.lineno or 1,
+            detail=exc.msg,
+        )
+
+    edges: list[ImportEdge] = []
+
+    class ImportVisitor(ast.NodeVisitor):
+        def __init__(self) -> None:
+            self.type_checking_depth = 0
+
+        @property
+        def context(self) -> ImportContext:
+            if self.type_checking_depth:
+                return ImportContext.TYPE_CHECKING
+            return ImportContext.RUNTIME
+
+        def visit_If(self, node: ast.If) -> None:
+            if _is_type_checking_guard(node.test):
+                self.type_checking_depth += 1
+                for child in node.body:
+                    self.visit(child)
+                self.type_checking_depth -= 1
+                for child in node.orelse:
+                    self.visit(child)
+                return
+            self.generic_visit(node)
+
+        def visit_Import(self, node: ast.Import) -> None:
+            for alias in node.names:
+                target = _retained_target(
+                    alias.name,
+                    known_modules,
+                    retained_target_prefixes,
+                )
+                if target is not None:
+                    edges.append(
+                        ImportEdge(
+                            source_path=source_path,
+                            source_module=source_module,
+                            target_module=target,
+                            lineno=node.lineno,
+                            context=self.context,
+                        )
+                    )
+
+        def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
+            base = _import_from_base(source_module, is_package, node)
+            for alias in node.names:
+                candidate = (
+                    f"{base}.{alias.name}" if base and alias.name != "*" else base
+                )
+                target = _known_target(candidate, known_modules) or _known_target(
+                    base, known_modules
+                )
+                if target is None:
+                    target = _retained_external_target(
+                        candidate or base,
+                        retained_target_prefixes,
+                    ) or _retained_external_target(base, retained_target_prefixes)
+                if target is not None:
+                    edges.append(
+                        ImportEdge(
+                            source_path=source_path,
+                            source_module=source_module,
+                            target_module=target,
+                            lineno=node.lineno,
+                            context=self.context,
+                            import_from_base=base or None,
+                        )
+                    )
+
+    ImportVisitor().visit(tree)
+    return edges, None
+
+
+def _is_type_checking_guard(node: ast.expr) -> bool:
+    return (
+        isinstance(node, ast.Name)
+        and node.id == "TYPE_CHECKING"
+        or isinstance(node, ast.Attribute)
+        and isinstance(node.value, ast.Name)
+        and node.value.id == "typing"
+        and node.attr == "TYPE_CHECKING"
+    )
+
+
+def _retained_target(
+    name: str,
+    known_modules: frozenset[str],
+    retained_target_prefixes: frozenset[str],
+) -> str | None:
+    return _known_target(name, known_modules) or _retained_external_target(
+        name, retained_target_prefixes
+    )
+
+
+def _retained_external_target(
+    name: str,
+    retained_target_prefixes: frozenset[str],
+) -> str | None:
+    if any(name == prefix or name.startswith(f"{prefix}.") for prefix in retained_target_prefixes):
+        return name
+    return None
 
 
 def _import_from_base(module: str, is_package: bool, node: ast.ImportFrom) -> str:

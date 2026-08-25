@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from enum import Enum
 from typing import Any
 
@@ -11,6 +12,11 @@ class Severity(str, Enum):
     ERROR = "ERROR"
 
 
+class ImportContext(str, Enum):
+    RUNTIME = "runtime"
+    TYPE_CHECKING = "type_checking"
+
+
 @dataclass(frozen=True)
 class ExceptionRule:
     pattern: str
@@ -18,7 +24,34 @@ class ExceptionRule:
 
 
 @dataclass(frozen=True)
+class ModuleSet:
+    name: str
+    patterns: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class DependencyRule:
+    id: str
+    source_module_set: str
+    forbidden_targets: tuple[str, ...]
+    target_match: str
+    contract_ref: str
+    severity: Severity
+
+
+@dataclass(frozen=True)
+class DependencyException:
+    rule_id: str
+    source_path: str
+    target_module: str
+    owner_ref: str
+    reason: str
+    review_by: date
+
+
+@dataclass(frozen=True)
 class Policy:
+    schema_version: int
     source_roots: tuple[str, ...]
     baseline: str
     normal_loc: int
@@ -27,6 +60,9 @@ class Policy:
     fan_out_warning: int
     exclude: tuple[str, ...]
     exceptions: tuple[ExceptionRule, ...]
+    module_sets: tuple[ModuleSet, ...]
+    dependency_rules: tuple[DependencyRule, ...]
+    dependency_exceptions: tuple[DependencyException, ...]
 
 
 @dataclass(frozen=True)
@@ -44,10 +80,29 @@ class FileMetric:
 
 
 @dataclass(frozen=True)
+class ImportEdge:
+    source_path: str
+    source_module: str
+    target_module: str
+    lineno: int
+    context: ImportContext
+    import_from_base: str | None = None
+
+
+@dataclass(frozen=True)
+class SyntaxErrorEvidence:
+    path: str
+    lineno: int
+    detail: str
+
+
+@dataclass(frozen=True)
 class ArchitectureSnapshot:
     files: dict[str, FileMetric]
     cycles: tuple[tuple[str, ...], ...]
     size_exempt_paths: frozenset[str] = frozenset()
+    import_edges: tuple[ImportEdge, ...] = ()
+    syntax_errors: tuple[SyntaxErrorEvidence, ...] = ()
 
 
 @dataclass(frozen=True)

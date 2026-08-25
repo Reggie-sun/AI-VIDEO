@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -66,3 +67,71 @@ def test_architecture_gate_cli_updates_then_checks_a_repository(tmp_path):
     assert updated.returncode == 0, updated.stderr
     assert checked.returncode == 0, checked.stderr
     assert "Architecture gate: PASS" in checked.stdout
+
+
+def test_architecture_gate_cli_reports_dependency_failure_as_json(tmp_path):
+    (tmp_path / "src/app").mkdir(parents=True)
+    (tmp_path / "src/app/module.py").write_text(
+        "import scripts.tool\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "architecture_gate.toml").write_text(
+        "schema_version = 2\n"
+        'source_roots = ["src"]\n'
+        'baseline = ".architecture/architecture-baseline.json"\n'
+        "normal_loc = 800\nblocking_loc = 1500\nsevere_loc = 3000\n"
+        "fan_out_warning = 14\nexclude = []\n"
+        "[[module_sets]]\n"
+        'name = "application"\n'
+        'patterns = ["src/app/*.py"]\n'
+        "[[dependency_rules]]\n"
+        'id = "ARCH101"\n'
+        'source_module_set = "application"\n'
+        'forbidden_targets = ["scripts"]\n'
+        'target_match = "prefix"\n'
+        'contract_ref = "matrix#governance"\n'
+        'severity = "error"\n',
+        encoding="utf-8",
+    )
+    updated = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "scripts.architecture_gate",
+            "update-baseline",
+            "--root",
+            str(tmp_path),
+        ],
+        cwd=REPOSITORY_ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    checked = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "scripts.architecture_gate",
+            "check",
+            "--root",
+            str(tmp_path),
+            "--format",
+            "json",
+        ],
+        cwd=REPOSITORY_ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert updated.returncode == 0, updated.stderr
+    assert checked.returncode == 1, checked.stderr
+    payload = json.loads(checked.stdout)
+    assert payload["status"] == "FAIL"
+    assert payload["findings"][0]["code"] == "ARCH101"
+    assert payload["findings"][0]["measurements"] == {
+        "contract_ref": "matrix#governance",
+        "line": 1,
+        "source_module": "app.module",
+        "target_module": "scripts.tool",
+    }

@@ -1,4 +1,4 @@
-schema_version = 1
+schema_version = 2
 source_roots = ["src"]
 baseline = ".architecture/architecture-baseline.json"
 
@@ -22,3 +22,62 @@ exclude = [
 # [[exceptions]]
 # pattern = "src/example/declarative_mapping.py"
 # reason = "Intentionally declarative data module; no runtime responsibilities."
+
+[[module_sets]]
+name = "ai_video_product_source"
+patterns = ["src/ai_video/*.py", "src/ai_video/**/*.py"]
+
+[[module_sets]]
+name = "legacy_core"
+patterns = [
+  "src/ai_video/cli.py",
+  "src/ai_video/manifest.py",
+  "src/ai_video/pipeline.py",
+]
+
+[[module_sets]]
+name = "production_runtime"
+patterns = [
+  "src/ai_video/production/*.py",
+  "src/ai_video/production/**/*.py",
+]
+
+[[module_sets]]
+name = "state_commit_private_modules"
+patterns = ["src/ai_video/production/_state_commit_*.py"]
+
+[[dependency_rules]]
+id = "ARCH101"
+source_module_set = "ai_video_product_source"
+forbidden_targets = ["scripts"]
+target_match = "prefix"
+contract_ref = "docs/agent-primary-contract-matrix.md#cross-cutting-contracts"
+severity = "error"
+
+[[dependency_rules]]
+id = "ARCH102"
+source_module_set = "legacy_core"
+forbidden_targets = ["ai_video.production"]
+target_match = "prefix"
+contract_ref = "docs/agent-primary-contract-matrix.md#cross-cutting-contracts"
+severity = "error"
+
+[[dependency_rules]]
+id = "ARCH103"
+source_module_set = "production_runtime"
+forbidden_targets = [
+  "ai_video.planning",
+  "ai_video.quality_gates",
+  "ai_video.quality_intelligence",
+]
+target_match = "prefix"
+contract_ref = "docs/agent-primary-contract-matrix.md#cross-cutting-contracts"
+severity = "error"
+
+[[dependency_rules]]
+id = "ARCH104"
+source_module_set = "state_commit_private_modules"
+forbidden_targets = ["ai_video.production.state_commit"]
+target_match = "exact"
+contract_ref = "docs/agent-primary-contract-matrix.md#cross-cutting-contracts"
+severity = "error"

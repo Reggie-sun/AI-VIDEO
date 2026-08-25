@@ -49,6 +49,43 @@ def _write_config(
     )
 
 
+def _write_v2_config(root: Path, contract: str = "") -> None:
+    (root / "architecture_gate.toml").write_text(
+        "schema_version = 2\n"
+        'source_roots = ["src"]\n'
+        'baseline = ".architecture/architecture-baseline.json"\n'
+        "normal_loc = 800\n"
+        "blocking_loc = 1500\n"
+        "severe_loc = 3000\n"
+        "fan_out_warning = 14\n"
+        "exclude = []\n"
+        + contract,
+        encoding="utf-8",
+    )
+
+
+def _single_dependency_rule(
+    *,
+    source_pattern: str = "src/app/*.py",
+    forbidden_target: str = "scripts",
+    target_match: str = "prefix",
+    exception: str = "",
+) -> str:
+    return (
+        "\n[[module_sets]]\n"
+        'name = "application"\n'
+        f'patterns = ["{source_pattern}"]\n'
+        "\n[[dependency_rules]]\n"
+        'id = "ARCH101"\n'
+        'source_module_set = "application"\n'
+        f'forbidden_targets = ["{forbidden_target}"]\n'
+        f'target_match = "{target_match}"\n'
+        'contract_ref = "docs/agent-primary-contract-matrix.md#development-governance-isolation"\n'
+        'severity = "error"\n'
+        + exception
+    )
+
+
 def _write_module(root: Path, relative_path: str, lines: list[str]) -> Path:
     path = root / relative_path
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -84,6 +121,227 @@ def test_existing_oversized_file_is_grandfathered_when_unchanged(
 
     assert not result.has_errors
     assert "ARCH001" not in _codes(result)
+
+
+def test_schema_v2_without_dependency_rules_preserves_metrics_behavior(tmp_path: Path):
+    _write_v2_config(
+        tmp_path,
+        "\n[[module_sets]]\n"
+        'name = "application"\n'
+        'patterns = ["src/app/**/*.py"]\n',
+    )
+    _sized_module(tmp_path, "src/app/legacy.py", 1601)
+
+    update_baseline(tmp_path)
+    with (tmp_path / "src/app/legacy.py").open("a", encoding="utf-8") as handle:
+        handle.write("new_responsibility = 1\n")
+
+    result = check_architecture(tmp_path)
+
+    assert result.has_errors
+    assert "ARCH001" in _codes(result)
+
+
+def test_schema_v1_preserves_metrics_only_syntax_behavior(tmp_path: Path):
+    _write_config(tmp_path)
+    _write_module(tmp_path, "src/app/broken.py", ["def broken(:"])
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    assert not result.has_errors
+    assert "ARCH100" not in _codes(result)
+
+
+@pytest.mark.parametrize(
+    ("contract", "expected_detail"),
+    [
+        (
+            "\n[[dependency_rules]]\n"
+            'id = "ARCH101"\n'
+            'source_module_set = "missing"\n'
+            'forbidden_targets = ["scripts"]\n'
+            'target_match = "prefix"\n'
+            'contract_ref = "matrix#governance"\n'
+            'severity = "error"\n',
+            "unknown module set",
+        ),
+        (
+            "\n[[module_sets]]\n"
+            'name = "application"\n'
+            'patterns = ["src/app/**/*.py"]\n'
+            "\n[[dependency_rules]]\n"
+            'id = "ARCH101"\n'
+            'source_module_set = "application"\n'
+            'forbidden_targets = ["scripts"]\n'
+            'target_match = "prefix"\n'
+            'contract_ref = "matrix#governance"\n'
+            'severity = "warn"\n',
+            "severity",
+        ),
+        (
+            "\n[[module_sets]]\n"
+            'name = "application"\n'
+            'patterns = ["src/app/**/*.py"]\n'
+            "\n[[dependency_rules]]\n"
+            'id = "ARCH101"\n'
+            'source_module_set = "application"\n'
+            'forbidden_targets = ["scripts"]\n'
+            'target_match = "prefix"\n'
+            'contract_ref = "matrix#governance"\n'
+            'severity = "error"\n'
+            "\n[[dependency_rules]]\n"
+            'id = "ARCH101"\n'
+            'source_module_set = "application"\n'
+            'forbidden_targets = ["ai_video.production"]\n'
+            'target_match = "prefix"\n'
+            'contract_ref = "matrix#legacy"\n'
+            'severity = "error"\n',
+            "duplicate dependency rule id",
+        ),
+        (
+            "\n[[module_sets]]\n"
+            'name = "application"\n'
+            'patterns = ["src/app/**/*.py"]\n'
+            "\n[[dependency_rules]]\n"
+            'id = "ARCH101"\n'
+            'source_module_set = "application"\n'
+            'forbidden_targets = [""]\n'
+            'target_match = "prefix"\n'
+            'contract_ref = "matrix#governance"\n'
+            'severity = "error"\n',
+            "forbidden target",
+        ),
+        (
+            "\n[[module_sets]]\n"
+            'name = "application"\n'
+            'patterns = ["src/app/**/*.py"]\n'
+            "\n[[dependency_rules]]\n"
+            'id = "ARCH101"\n'
+            'source_module_set = "application"\n'
+            'forbidden_targets = "scripts"\n'
+            'target_match = "prefix"\n'
+            'contract_ref = "matrix#governance"\n'
+            'severity = "error"\n',
+            "forbidden targets must be a list",
+        ),
+        (
+            "\n[[module_sets]]\n"
+            'name = "application"\n'
+            'patterns = ["src/app/**/*.py"]\n'
+            "\n[[dependency_rules]]\n"
+            'id = "ARCH001"\n'
+            'source_module_set = "application"\n'
+            'forbidden_targets = ["scripts"]\n'
+            'target_match = "prefix"\n'
+            'contract_ref = "matrix#governance"\n'
+            'severity = "error"\n',
+            "ARCH101 or higher",
+        ),
+        (
+            "\n[[module_sets]]\n"
+            'name = "application"\n'
+            'patterns = ["src/app/**/*.py"]\n'
+            "\n[[dependency_rules]]\n"
+            'id = "ARCH101"\n'
+            'source_module_set = "application"\n'
+            'forbidden_targets = ["scripts"]\n'
+            'target_match = "prefix"\n'
+            'contract_ref = "matrix#governance"\n'
+            'severity = "error"\n'
+            "\n[[dependency_exceptions]]\n"
+            'rule_id = "ARCH101"\n'
+            'source_path = "src/app/consumer.py"\n'
+            'target_module = "scripts.tool"\n'
+            'owner_ref = "matrix#governance"\n'
+            'reason = "temporary"\n'
+            'review_by = "not-a-date"\n',
+            "review_by",
+        ),
+        (
+            "\n[[module_sets]]\n"
+            'name = "application"\n'
+            'patterns = ["src/app/**/*.py"]\n'
+            "\n[[dependency_rules]]\n"
+            'id = "ARCH101"\n'
+            'source_module_set = "application"\n'
+            'forbidden_targets = ["scripts"]\n'
+            'target_match = "prefix"\n'
+            'contract_ref = "matrix#governance"\n'
+            'severity = "error"\n'
+            "\n[[dependency_exceptions]]\n"
+            'rule_id = "ARCH101"\n'
+            'source_path = "src/app/*.py"\n'
+            'target_module = "scripts.tool"\n'
+            'owner_ref = "matrix#governance"\n'
+            'reason = "temporary"\n'
+            'review_by = "2099-01-01"\n',
+            "exact source path",
+        ),
+    ],
+)
+def test_schema_v2_rejects_invalid_dependency_contract(
+    tmp_path: Path,
+    contract: str,
+    expected_detail: str,
+):
+    _write_v2_config(tmp_path, contract)
+
+    result = check_architecture(tmp_path)
+
+    assert result.has_errors
+    assert result.findings[0].code == "ARCH004"
+    assert expected_detail in result.findings[0].reason
+
+
+def test_schema_v2_rejects_non_table_module_set_entry(tmp_path: Path):
+    _write_v2_config(tmp_path, '\nmodule_sets = ["application"]\n')
+
+    result = check_architecture(tmp_path)
+
+    assert result.has_errors
+    assert result.findings[0].code == "ARCH004"
+    assert "module sets must contain tables" in result.findings[0].reason
+
+
+def test_schema_v2_rejects_unknown_top_level_contract_tables(tmp_path: Path):
+    _write_v2_config(tmp_path, _single_dependency_rule())
+    _write_module(tmp_path, "src/app/consumer.py", ["import scripts.tool"])
+    update_baseline(tmp_path)
+    config_path = tmp_path / "architecture_gate.toml"
+    config_path.write_text(
+        config_path.read_text(encoding="utf-8")
+        .replace("[[module_sets]]", "[[module_set]]")
+        .replace("[[dependency_rules]]", "[[dependency_rule]]"),
+        encoding="utf-8",
+    )
+
+    result = check_architecture(tmp_path)
+
+    assert result.has_errors
+    assert result.findings[0].code == "ARCH004"
+    assert "unknown top-level field" in result.findings[0].reason
+
+
+@pytest.mark.parametrize("invalid_version", ["2.0", "true"])
+def test_schema_version_requires_an_exact_integer(
+    tmp_path: Path,
+    invalid_version: str,
+):
+    _write_v2_config(tmp_path, _single_dependency_rule())
+    config_path = tmp_path / "architecture_gate.toml"
+    config_path.write_text(
+        config_path.read_text(encoding="utf-8").replace(
+            "schema_version = 2", f"schema_version = {invalid_version}"
+        ),
+        encoding="utf-8",
+    )
+
+    result = check_architecture(tmp_path)
+
+    assert result.has_errors
+    assert result.findings[0].code == "ARCH004"
+    assert "schema_version must be an integer" in result.findings[0].reason
 
 
 def test_existing_oversized_file_can_shrink_without_a_finding(
@@ -315,6 +573,285 @@ def test_nested_and_type_checking_imports_do_not_create_false_cycles(
 
     assert "ARCH003" not in _codes(result)
     assert not result.has_errors
+
+
+def test_dependency_rule_checks_nested_runtime_but_not_type_checking_imports(
+    tmp_path: Path,
+):
+    _write_v2_config(tmp_path, _single_dependency_rule())
+    _write_module(
+        tmp_path,
+        "src/app/consumer.py",
+        [
+            "from typing import TYPE_CHECKING",
+            "if TYPE_CHECKING:",
+            "    import scripts.type_only",
+            "def load_tool():",
+            "    import scripts.runtime_tool",
+            "if True:",
+            "    import scripts.control_flow_tool",
+            "import other.scripts.tool",
+        ],
+    )
+    _write_module(tmp_path, "src/other/scripts/tool.py", ["VALUE = 1"])
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    findings = [item for item in result.findings if item.code == "ARCH101"]
+    assert result.has_errors
+    assert [item.path for item in findings] == [
+        "src/app/consumer.py",
+        "src/app/consumer.py",
+    ]
+    assert [item.measurements["line"] for item in findings] == [5, 7]
+    assert [item.measurements["target_module"] for item in findings] == [
+        "scripts.runtime_tool",
+        "scripts.control_flow_tool",
+    ]
+
+
+def test_dependency_rule_normalizes_relative_imports(tmp_path: Path):
+    _write_v2_config(
+        tmp_path,
+        _single_dependency_rule(
+            source_pattern="src/app/private/*.py",
+            forbidden_target="app.forbidden",
+            target_match="exact",
+        ),
+    )
+    _write_module(tmp_path, "src/app/forbidden.py", ["VALUE = 1"])
+    _write_module(
+        tmp_path,
+        "src/app/private/consumer.py",
+        ["from .. import forbidden"],
+    )
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    finding = next(item for item in result.findings if item.code == "ARCH101")
+    assert finding.measurements["target_module"] == "app.forbidden"
+    assert finding.measurements["line"] == 1
+
+
+def test_dependency_parser_syntax_error_fails_closed(tmp_path: Path):
+    _write_v2_config(tmp_path, _single_dependency_rule())
+    _write_module(tmp_path, "src/app/broken.py", ["def broken(:"])
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    finding = next(item for item in result.findings if item.code == "ARCH100")
+    assert result.has_errors
+    assert finding.slug == "dependency-source-syntax-error"
+    assert finding.path == "src/app/broken.py"
+    assert finding.measurements["line"] == 1
+
+
+def test_dependency_rule_is_not_grandfathered_or_written_to_baseline(tmp_path: Path):
+    _write_v2_config(tmp_path, _single_dependency_rule())
+    _write_module(tmp_path, "src/app/consumer.py", ["import scripts.tool"])
+
+    baseline_path = update_baseline(tmp_path)
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    result = check_architecture(tmp_path)
+
+    assert result.has_errors
+    assert "ARCH101" in _codes(result)
+    assert "dependency_rules" not in baseline
+    assert "dependency_exceptions" not in baseline
+
+
+def test_exact_dependency_exception_waives_only_the_matching_edge(tmp_path: Path):
+    exception = (
+        "\n[[dependency_exceptions]]\n"
+        'rule_id = "ARCH101"\n'
+        'source_path = "src/app/consumer.py"\n'
+        'target_module = "scripts.allowed"\n'
+        'owner_ref = "docs/agent-primary-contract-matrix.md#development-governance-isolation"\n'
+        'reason = "bounded migration"\n'
+        'review_by = "2099-01-01"\n'
+    )
+    _write_v2_config(tmp_path, _single_dependency_rule(exception=exception))
+    _write_module(
+        tmp_path,
+        "src/app/consumer.py",
+        ["import scripts.allowed", "import scripts.blocked"],
+    )
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    findings = [item for item in result.findings if item.code == "ARCH101"]
+    assert [item.measurements["target_module"] for item in findings] == [
+        "scripts.blocked"
+    ]
+
+
+def test_exact_dependency_exception_distinguishes_from_import_targets(tmp_path: Path):
+    exception = (
+        "\n[[dependency_exceptions]]\n"
+        'rule_id = "ARCH101"\n'
+        'source_path = "src/app/consumer.py"\n'
+        'target_module = "scripts.allowed"\n'
+        'owner_ref = "docs/agent-primary-contract-matrix.md#development-governance-isolation"\n'
+        'reason = "bounded migration"\n'
+        'review_by = "2099-01-01"\n'
+    )
+    _write_v2_config(tmp_path, _single_dependency_rule(exception=exception))
+    _write_module(
+        tmp_path,
+        "src/app/consumer.py",
+        ["from scripts import allowed, blocked"],
+    )
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    findings = [item for item in result.findings if item.code == "ARCH101"]
+    assert [item.measurements["target_module"] for item in findings] == [
+        "scripts.blocked"
+    ]
+    assert not any(
+        item.slug == "stale-dependency-exception" for item in result.findings
+    )
+
+
+def test_external_exact_rule_blocks_from_import_base_module(tmp_path: Path):
+    _write_v2_config(
+        tmp_path,
+        _single_dependency_rule(
+            forbidden_target="scripts.tool",
+            target_match="exact",
+        ),
+    )
+    _write_module(
+        tmp_path,
+        "src/app/consumer.py",
+        ["from scripts.tool import value"],
+    )
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    finding = next(item for item in result.findings if item.code == "ARCH101")
+    assert finding.measurements["target_module"] == "scripts.tool"
+
+
+def test_dependency_rule_fails_when_source_module_set_matches_no_files(
+    tmp_path: Path,
+):
+    _write_v2_config(
+        tmp_path,
+        _single_dependency_rule(source_pattern="src/appp/*.py"),
+    )
+    _write_module(tmp_path, "src/app/consumer.py", ["import scripts.tool"])
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    finding = next(
+        item
+        for item in result.findings
+        if item.slug == "empty-dependency-module-set"
+    )
+    assert result.has_errors
+    assert finding.code == "ARCH100"
+    assert finding.measurements["module_set"] == "application"
+
+
+def test_stale_dependency_exception_fails_closed(tmp_path: Path):
+    exception = (
+        "\n[[dependency_exceptions]]\n"
+        'rule_id = "ARCH101"\n'
+        'source_path = "src/app/consumer.py"\n'
+        'target_module = "scripts.removed"\n'
+        'owner_ref = "docs/agent-primary-contract-matrix.md#development-governance-isolation"\n'
+        'reason = "bounded migration"\n'
+        'review_by = "2099-01-01"\n'
+    )
+    _write_v2_config(tmp_path, _single_dependency_rule(exception=exception))
+    _write_module(tmp_path, "src/app/consumer.py", ["VALUE = 1"])
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    finding = next(item for item in result.findings if item.code == "ARCH100")
+    assert result.has_errors
+    assert finding.slug == "stale-dependency-exception"
+
+
+def test_expired_dependency_exception_is_invalid_configuration(tmp_path: Path):
+    exception = (
+        "\n[[dependency_exceptions]]\n"
+        'rule_id = "ARCH101"\n'
+        'source_path = "src/app/consumer.py"\n'
+        'target_module = "scripts.tool"\n'
+        'owner_ref = "docs/agent-primary-contract-matrix.md#development-governance-isolation"\n'
+        'reason = "bounded migration"\n'
+        'review_by = "2000-01-01"\n'
+    )
+    _write_v2_config(tmp_path, _single_dependency_rule(exception=exception))
+    _write_module(tmp_path, "src/app/consumer.py", ["import scripts.tool"])
+
+    result = check_architecture(tmp_path)
+
+    assert result.has_errors
+    assert result.findings[0].code == "ARCH004"
+    assert "expired" in result.findings[0].reason
+
+
+@pytest.mark.parametrize(
+    ("source_path", "import_statement", "expected_code"),
+    [
+        ("src/ai_video/product.py", "import scripts.tool", "ARCH101"),
+        (
+            "src/ai_video/cli.py",
+            "import ai_video.production.project",
+            "ARCH102",
+        ),
+        (
+            "src/ai_video/production/service.py",
+            "import ai_video.planning.video_planner",
+            "ARCH103",
+        ),
+        (
+            "src/ai_video/production/service.py",
+            "import ai_video.quality_gates.shot_readiness_gate",
+            "ARCH103",
+        ),
+        (
+            "src/ai_video/production/service.py",
+            "import ai_video.quality_intelligence.capture",
+            "ARCH103",
+        ),
+        (
+            "src/ai_video/production/_state_commit_example.py",
+            "import ai_video.production.state_commit",
+            "ARCH104",
+        ),
+    ],
+)
+def test_repository_dependency_rules_block_representative_imports(
+    tmp_path: Path,
+    source_path: str,
+    import_statement: str,
+    expected_code: str,
+):
+    repository_root = Path(__file__).resolve().parents[1]
+    shutil.copyfile(
+        repository_root / "architecture_gate.toml",
+        tmp_path / "architecture_gate.toml",
+    )
+    _write_module(tmp_path, source_path, [import_statement])
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    finding = next(item for item in result.findings if item.code == expected_code)
+    assert finding.path == source_path
+    assert finding.measurements["line"] == 1
 
 
 def test_new_high_fan_out_is_reviewer_information(tmp_path: Path):
