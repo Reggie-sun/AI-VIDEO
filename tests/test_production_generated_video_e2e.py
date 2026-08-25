@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import threading
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
@@ -1250,6 +1251,77 @@ def test_paid_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
     assert provider.call_counts.submit == 0
     assert provider.call_counts.status == 0
     assert provider.call_counts.fetch == 0
+
+
+def test_paid_ecommerce_duplicate_coordinator_claims_poll_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _, provider, resolved, paid_preview, committer = _runtime(
+        tmp_path,
+        commercial=True,
+        status_events=(VideoTaskState.SUCCEEDED,),
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.submit_once(
+        attempt_id=ATTEMPT_ID,
+        paid_preview=paid_preview,
+        reservation_id="p8-video-reservation-1",
+    )
+    facade = EcommerceVideoGenerationFacade(
+        service=service,
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        lane="paid",
+        paid_preview=paid_preview,
+        reservation_id="p8-video-reservation-1",
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+        before_validate=lambda: committer.settle_paid_provider_reservation(
+            attempt_id=ATTEMPT_ID,
+            actual_cost_microunits=1_000_000,
+        ),
+    )
+    binding = resolved.commercial_binding
+    assert binding is not None
+    handoff = _commercial_handoff(binding.target_shot_id)
+    first_poll_entered = threading.Event()
+    release_first_poll = threading.Event()
+    poll_invocations = 0
+    original_get_status = provider.get_status
+
+    def blocking_get_status(*args, **kwargs):
+        nonlocal poll_invocations
+        poll_invocations += 1
+        if poll_invocations == 1:
+            first_poll_entered.set()
+            assert release_first_poll.wait(timeout=10)
+        return original_get_status(*args, **kwargs)
+
+    monkeypatch.setattr(provider, "get_status", blocking_get_status)
+    results = []
+
+    first = threading.Thread(
+        target=lambda: results.append(
+            run_ecommerce_ad_generation(
+                handoff,
+                facades={binding.target_shot_id: facade},
+            )
+        )
+    )
+    first.start()
+    assert first_poll_entered.wait(timeout=10)
+    duplicate = run_ecommerce_ad_generation(
+        handoff,
+        facades={binding.target_shot_id: facade},
+    )
+    release_first_poll.set()
+    first.join(timeout=10)
+
+    assert first.is_alive() is False
+    assert poll_invocations == 1
+    assert duplicate.stop_reason is EcommerceStopReason.SERVICE_STOP
+    assert results[0].complete is True
 
 
 @pytest.mark.parametrize("verdict", (QaVerdict.FAIL, QaVerdict.NOT_EVALUATED))

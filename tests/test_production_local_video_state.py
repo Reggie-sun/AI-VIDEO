@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import threading
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -509,6 +510,74 @@ def test_local_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
         0,
         0,
     )
+
+
+def test_local_ecommerce_duplicate_coordinator_claims_fetch_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from test_production_generated_video_e2e import (
+        _CountingCommercialShotReviewer,
+        _commercial_handoff,
+    )
+
+    _, provider, resolved, committer = _runtime(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.submit_local_once(attempt_id=ATTEMPT_ID)
+    service.refresh_local_once(attempt_id=ATTEMPT_ID)
+    facade = EcommerceVideoGenerationFacade(
+        service=service,
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        lane="local",
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+    )
+    binding = resolved.commercial_binding
+    assert binding is not None
+    handoff = _commercial_handoff(binding.target_shot_id)
+    first_fetch_entered = threading.Event()
+    release_first_fetch = threading.Event()
+    fetch_invocations = 0
+    original_fetch_local = provider.fetch_local
+
+    def blocking_fetch_local(*args, **kwargs):
+        nonlocal fetch_invocations
+        fetch_invocations += 1
+        if fetch_invocations == 1:
+            first_fetch_entered.set()
+            assert release_first_fetch.wait(timeout=10)
+        return original_fetch_local(*args, **kwargs)
+
+    monkeypatch.setattr(provider, "fetch_local", blocking_fetch_local)
+    results = []
+    first = threading.Thread(
+        target=lambda: results.append(
+            run_ecommerce_ad_generation(
+                handoff,
+                facades={binding.target_shot_id: facade},
+            )
+        )
+    )
+    first.start()
+    assert first_fetch_entered.wait(timeout=10)
+    duplicate = run_ecommerce_ad_generation(
+        handoff,
+        facades={binding.target_shot_id: facade},
+    )
+    release_first_fetch.set()
+    first.join(timeout=10)
+
+    assert first.is_alive() is False
+    assert fetch_invocations == 1
+    assert provider.fetch_calls == 1
+    assert duplicate.stop_reason is EcommerceStopReason.SERVICE_STOP
+    assert results[0].complete is True
+    assert tuple(
+        (tmp_path / "state/video-generation/fetch").glob(
+            f"{ATTEMPT_ID}.*.mp4"
+        )
+    ) == ()
 
 
 def test_t8_t2va_reuses_local_intent_permit_and_state_lifecycle(tmp_path: Path) -> None:

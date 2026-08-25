@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import fcntl
+import hashlib
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Iterator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
@@ -65,6 +68,45 @@ class VideoGenerationService:
             attempt_id=attempt_id,
             request=request,
         )
+
+    @contextmanager
+    def commercial_execution_guard(self, *, attempt_id: str) -> Iterator[None]:
+        """Serialize one commercial Shot coordinator across service instances."""
+
+        digest = hashlib.sha256(attempt_id.encode("utf-8")).hexdigest()
+        lock_path = (
+            self._committer._state_directory()
+            / f".ecommerce-video-execution-{digest}.lock"
+        )
+        self._committer._reject_symlink(lock_path)
+        try:
+            handle = lock_path.open("a+b")
+        except OSError as exc:
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_COMMIT_FAILED,
+                user_message="Could not open Ecommerce video execution lock.",
+                technical_detail=str(exc),
+                retryable=False,
+            ) from exc
+        acquired = False
+        try:
+            try:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except (BlockingIOError, OSError) as exc:
+                raise AiVideoError(
+                    code=ErrorCode.PRODUCTION_STATE_BUSY,
+                    user_message=(
+                        "Ecommerce video Shot execution is already in progress."
+                    ),
+                    technical_detail=str(exc),
+                    retryable=False,
+                ) from exc
+            acquired = True
+            yield
+        finally:
+            if acquired:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+            handle.close()
 
     def _state(self, attempt_id: str):
         manifest = self._committer._read_manifest()

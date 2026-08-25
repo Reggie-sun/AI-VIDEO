@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from contextlib import nullcontext
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Literal, Protocol
@@ -161,6 +162,9 @@ class EcommerceVideoGenerationFacade:
                 else EcommerceShotNextAction.START
             )
 
+    def execution_guard(self):
+        return self.service.commercial_execution_guard(attempt_id=self.attempt_id)
+
     def start(self) -> None:
         self.service.start(attempt_id=self.attempt_id, request=self.request)
         self._started = True
@@ -282,6 +286,91 @@ def _checkpoint_is_exact(
     )
 
 
+def _run_claimed_shot(
+    *,
+    plan_hash: str,
+    projection_hash: str,
+    shot_id: str,
+    facade: EcommerceShotExecutionFacade,
+    should_stop: Callable[[], bool],
+    activated: list[ActivatedCommercialShotCheckpoint],
+) -> EcommerceAdGenerationResult | ActivatedCommercialShotCheckpoint:
+    dispatch = {
+        EcommerceShotNextAction.START: "start",
+        EcommerceShotNextAction.SUBMIT: "submit",
+        EcommerceShotNextAction.POLL: "poll",
+        EcommerceShotNextAction.FETCH: "fetch",
+    }
+    while True:
+        if should_stop():
+            return _stopped(
+                activated,
+                shot_id=shot_id,
+                reason=EcommerceStopReason.USER_STOP,
+            )
+        try:
+            action = EcommerceShotNextAction(facade.next_action())
+            if action is EcommerceShotNextAction.STOP:
+                return _stopped(
+                    activated,
+                    shot_id=shot_id,
+                    reason=EcommerceStopReason.SERVICE_STOP,
+                )
+            if action is EcommerceShotNextAction.DONE:
+                checkpoint = facade.current_activation_checkpoint()
+                if not _checkpoint_is_exact(
+                    checkpoint,
+                    plan_hash=plan_hash,
+                    projection_hash=projection_hash,
+                    shot_id=shot_id,
+                ):
+                    return _stopped(
+                        activated,
+                        shot_id=shot_id,
+                        reason=EcommerceStopReason.CHECKPOINT_INVALID,
+                    )
+                return checkpoint
+            method_name = dispatch.get(action)
+            if method_name is not None:
+                getattr(facade, method_name)()
+                continue
+            if action is EcommerceShotNextAction.VALIDATE:
+                verdict = facade.validate()
+                if verdict is not QaVerdict.PASS:
+                    return _stopped(
+                        activated,
+                        shot_id=shot_id,
+                        reason=EcommerceStopReason.SHOT_NOT_PASS,
+                    )
+                continue
+            if action is EcommerceShotNextAction.ACTIVATE:
+                if facade.current_validation_verdict() is not QaVerdict.PASS:
+                    return _stopped(
+                        activated,
+                        shot_id=shot_id,
+                        reason=EcommerceStopReason.SHOT_NOT_PASS,
+                    )
+                checkpoint = facade.activate()
+                if not _checkpoint_is_exact(
+                    checkpoint,
+                    plan_hash=plan_hash,
+                    projection_hash=projection_hash,
+                    shot_id=shot_id,
+                ):
+                    return _stopped(
+                        activated,
+                        shot_id=shot_id,
+                        reason=EcommerceStopReason.CHECKPOINT_INVALID,
+                    )
+                continue
+        except (AiVideoError, ValueError):
+            return _stopped(
+                activated,
+                shot_id=shot_id,
+                reason=EcommerceStopReason.SERVICE_STOP,
+            )
+
+
 def run_ecommerce_ad_generation(
     handoff: CompiledAdCreativeHandoff,
     *,
@@ -327,12 +416,6 @@ def run_ecommerce_ad_generation(
 
     should_stop = stop_requested or (lambda: False)
     activated: list[ActivatedCommercialShotCheckpoint] = []
-    dispatch = {
-        EcommerceShotNextAction.START: "start",
-        EcommerceShotNextAction.SUBMIT: "submit",
-        EcommerceShotNextAction.POLL: "poll",
-        EcommerceShotNextAction.FETCH: "fetch",
-    }
     for shot_id in provider_shot_ids:
         projection = projection_by_shot[shot_id]
         facade = facades[shot_id]
@@ -342,75 +425,27 @@ def run_ecommerce_ad_generation(
                 shot_id=shot_id,
                 reason=EcommerceStopReason.USER_STOP,
             )
-        while True:
-            if should_stop():
-                return _stopped(
-                    activated,
+        guard_factory = getattr(facade, "execution_guard", None)
+        guard = nullcontext() if guard_factory is None else guard_factory()
+        try:
+            with guard:
+                outcome = _run_claimed_shot(
+                    plan_hash=selected.plan_content_hash,
+                    projection_hash=projection.projection_hash,
                     shot_id=shot_id,
-                    reason=EcommerceStopReason.USER_STOP,
+                    facade=facade,
+                    should_stop=should_stop,
+                    activated=activated,
                 )
-            try:
-                action = EcommerceShotNextAction(facade.next_action())
-                if action is EcommerceShotNextAction.STOP:
-                    return _stopped(
-                        activated,
-                        shot_id=shot_id,
-                        reason=EcommerceStopReason.SERVICE_STOP,
-                    )
-                if action is EcommerceShotNextAction.DONE:
-                    checkpoint = facade.current_activation_checkpoint()
-                    if not _checkpoint_is_exact(
-                        checkpoint,
-                        plan_hash=selected.plan_content_hash,
-                        projection_hash=projection.projection_hash,
-                        shot_id=shot_id,
-                    ):
-                        return _stopped(
-                            activated,
-                            shot_id=shot_id,
-                            reason=EcommerceStopReason.CHECKPOINT_INVALID,
-                        )
-                    activated.append(checkpoint)
-                    break
-                method_name = dispatch.get(action)
-                if method_name is not None:
-                    getattr(facade, method_name)()
-                    continue
-                if action is EcommerceShotNextAction.VALIDATE:
-                    verdict = facade.validate()
-                    if verdict is not QaVerdict.PASS:
-                        return _stopped(
-                            activated,
-                            shot_id=shot_id,
-                            reason=EcommerceStopReason.SHOT_NOT_PASS,
-                        )
-                    continue
-                if action is EcommerceShotNextAction.ACTIVATE:
-                    if facade.current_validation_verdict() is not QaVerdict.PASS:
-                        return _stopped(
-                            activated,
-                            shot_id=shot_id,
-                            reason=EcommerceStopReason.SHOT_NOT_PASS,
-                        )
-                    checkpoint = facade.activate()
-                    if not _checkpoint_is_exact(
-                        checkpoint,
-                        plan_hash=selected.plan_content_hash,
-                        projection_hash=projection.projection_hash,
-                        shot_id=shot_id,
-                    ):
-                        return _stopped(
-                            activated,
-                            shot_id=shot_id,
-                            reason=EcommerceStopReason.CHECKPOINT_INVALID,
-                        )
-                    continue
-            except (AiVideoError, ValueError):
-                return _stopped(
-                    activated,
-                    shot_id=shot_id,
-                    reason=EcommerceStopReason.SERVICE_STOP,
-                )
+        except AiVideoError:
+            return _stopped(
+                activated,
+                shot_id=shot_id,
+                reason=EcommerceStopReason.SERVICE_STOP,
+            )
+        if isinstance(outcome, EcommerceAdGenerationResult):
+            return outcome
+        activated.append(outcome)
 
     return EcommerceAdGenerationResult(
         complete=True,
