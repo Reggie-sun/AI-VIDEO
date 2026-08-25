@@ -33,6 +33,7 @@ from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import (
     CommercialSourceDependencyEvidence,
     CommercialSourceLifecycle,
+    DependencyNodeKind,
     DependencyLifecycle,
     LoadedProductionProject,
     QaVerdict,
@@ -413,6 +414,46 @@ def verify_active_commercial_source_approvals(
                 raise _invalid(
                     "Active commercial dependency evidence is not fresh and exact."
                 )
+
+
+def verify_commercial_source_project_state(
+    bundle: LoadedProductionProject,
+) -> None:
+    verify_active_commercial_source_approvals(bundle)
+    graph = bundle.dependency_graph
+    commercial_states = tuple(
+        state
+        for state in bundle.manifest.dependency_states
+        if isinstance(state.applied_evidence, CommercialSourceDependencyEvidence)
+    )
+    if graph is None:
+        if commercial_states:
+            raise _invalid(
+                "Commercial source dependency evidence requires an active graph."
+            )
+        return
+    node_by_id = {node.node_id: node for node in graph.nodes}
+    approvals = bundle.manifest.active_commercial_source_approvals
+    for state in commercial_states:
+        evidence = state.applied_evidence
+        assert isinstance(evidence, CommercialSourceDependencyEvidence)
+        node = node_by_id.get(state.node_id)
+        if node is not None:
+            if (
+                node.kind
+                not in {
+                    DependencyNodeKind.CREATIVE_ARTIFACT,
+                    DependencyNodeKind.ASSET,
+                }
+                or evidence.pointer not in approvals
+            ):
+                raise _invalid(
+                    "Commercial source dependency evidence has an invalid owner."
+                )
+        elif evidence.pointer in approvals:
+            raise _invalid(
+                "Superseded commercial dependency evidence cannot remain active."
+            )
 
 
 def reopen_active_commercial_source_approval(

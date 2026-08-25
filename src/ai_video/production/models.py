@@ -53,8 +53,15 @@ from ai_video.production._asset_registry_validation import (
     validate_registry_snapshot,
 )
 from ai_video.production._commercial_source_state import (
-    validate_commercial_source_attempt_state,
+    CommercialSourceApprovalPointer,
+    CommercialSourceAttemptState,
+    CommercialSourceDependencyEvidence,
+    CommercialSourceLifecycle,
+    reject_explicit_commercial_source_fields,
+    serialize_commercial_source_manifest,
+    validate_commercial_source_manifest,
 )
+from ai_video.production._immutable_models import ImmutableDict as _ImmutableDict
 from ai_video.production._lifecycle_schema import (
     ImageRequestReceipt,
     PaidProviderAttemptPhase as PaidProviderAttemptPhase, PaidProviderAttemptState as PaidProviderAttemptState,
@@ -74,20 +81,7 @@ from ai_video.production._lifecycle_schema import (
     validate_paid_provider_manifest,
     validate_provider_attempt,
 )
-
-
-class _ImmutableDict(dict):
-    def _reject_mutation(self, *args: object, **kwargs: object) -> None:
-        raise TypeError("Production model mappings are immutable.")
-
-    __setitem__ = _reject_mutation
-    __delitem__ = _reject_mutation
-    clear = _reject_mutation
-    pop = _reject_mutation
-    popitem = _reject_mutation
-    setdefault = _reject_mutation
-    update = _reject_mutation
-    __ior__ = _reject_mutation
+from ai_video.production._state_lifecycle import ReviewAttemptPhase, StateCommitStatus
 
 
 def _immutable_mapping(value: dict) -> _ImmutableDict:
@@ -1289,20 +1283,6 @@ class RenderStateSnapshotPointer(StrictModel):
         return self
 
 
-class StateCommitStatus(str, Enum):
-    RUNNING = "running"
-    SUCCEEDED = "succeeded"
-    FAILED = "failed"
-    INTERRUPTED = "interrupted"
-    OUTCOME_UNKNOWN = "outcome_unknown"
-
-
-class ReviewAttemptPhase(str, Enum):
-    REQUESTED = "requested"
-    EVIDENCE = "evidence"
-    ACTIVATE = "activate"
-
-
 class VoiceRequestReceipt(StrictModel):
     request_id: str = Field(min_length=1)
     attempt_id: str = Field(min_length=1)
@@ -1724,59 +1704,6 @@ class FinalAcceptanceState(StrictModel):
     active_receipt: FinalAcceptanceReceiptPointer | None = None
 
 
-class CommercialSourceLifecycle(str, Enum):
-    REQUESTED = "requested"
-    MATERIALIZED_CANDIDATE = "materialized_candidate"
-    EVIDENCED = "evidenced"
-    APPROVED = "approved"
-    REJECTED = "rejected"
-    NOT_EVALUATED = "not_evaluated"
-    STALE = "stale"
-    OUTCOME_UNKNOWN = "outcome_unknown"
-
-
-class CommercialSourceApprovalPointer(StrictModel):
-    path: Path
-    approval_id: str = Field(min_length=1)
-    target_shot_id: str = Field(min_length=1)
-    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-
-    @model_validator(mode="after")
-    def _canonical_pointer(self) -> "CommercialSourceApprovalPointer":
-        _require_content_addressed_pointer_path(
-            self.path,
-            content_hash=self.content_hash,
-            prefix="state/commercial-source/approval.",
-            label="commercial source approval",
-        )
-        return self
-
-
-class CommercialSourceAttemptState(StrictModel):
-    attempt_id: str = Field(min_length=1)
-    request_id: str = Field(min_length=1)
-    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
-    request_path: Path
-    target_shot_id: str = Field(min_length=1)
-    target_shot_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    product_reference_set_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    lifecycle: CommercialSourceLifecycle
-    candidate_asset_id: str | None = Field(default=None, min_length=1)
-    candidate_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
-    candidate_record_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
-    review_intent_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
-    review_phase: ReviewAttemptPhase | None = None
-    review_evidence_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
-    review_receipt_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
-    active_approval: CommercialSourceApprovalPointer | None = None
-
-    @model_validator(mode="after")
-    def _validate_lifecycle_fields(self) -> "CommercialSourceAttemptState":
-        validate_commercial_source_attempt_state(self)
-        return self
-
-
 class ProductionManifest(StrictModel):
     schema_version: Literal[
         "2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"
@@ -1803,28 +1730,14 @@ class ProductionManifest(StrictModel):
 
     @model_validator(mode="before")
     @classmethod
-    def _reject_explicit_commercial_source_fields_in_old_versions(
-        cls, value: object
-    ) -> object:
-        if not isinstance(value, Mapping):
-            return value
-        fields = {
-            "active_commercial_source_approvals",
-            "commercial_source_attempts",
-        }
-        if value.get("schema_version", "2.0") != "2.12" and fields.intersection(value):
-            raise ValueError(
-                f"Production Manifest {value.get('schema_version', '2.0')} "
-                "cannot contain commercial source state"
-            )
-        return value
-
-    @model_validator(mode="before")
-    @classmethod
     def _reject_explicit_paid_provider_fields_in_old_versions(
         cls, value: object
     ) -> object:
-        return reject_explicit_p0_fields(reject_explicit_paid_provider_fields(value))
+        return reject_explicit_p0_fields(
+            reject_explicit_paid_provider_fields(
+                reject_explicit_commercial_source_fields(value)
+            )
+        )
 
     @model_validator(mode="before")
     @classmethod
@@ -1936,16 +1849,7 @@ class ProductionManifest(StrictModel):
         attempt_ids = [item.attempt_id for item in self.attempts]
         if len(attempt_ids) != len(set(attempt_ids)):
             raise ValueError("Production Manifest attempt IDs must be unique")
-        commercial_attempt_ids = [item.attempt_id for item in self.commercial_source_attempts]
-        if len(commercial_attempt_ids) != len(set(commercial_attempt_ids)):
-            raise ValueError("Commercial source attempt IDs must be unique")
-        commercial_shot_ids = [item.target_shot_id for item in self.active_commercial_source_approvals]
-        if len(commercial_shot_ids) != len(set(commercial_shot_ids)):
-            raise ValueError("Active commercial source approvals must be unique per Shot")
-        if self.active_commercial_source_approvals != tuple(
-            sorted(self.active_commercial_source_approvals, key=lambda item: item.target_shot_id)
-        ):
-            raise ValueError("Active commercial source approvals must be ordered by Shot")
+        validate_commercial_source_manifest(self)
         if self.schema_version == "2.0":
             if self.active_render_state is not None or any(
                 item.operation == "render_state" for item in self.attempts
@@ -2092,9 +1996,7 @@ class ProductionManifest(StrictModel):
         if self.schema_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}:
             data.pop("active_paid_provider_budget", None)
         if self.schema_version not in {"2.11", "2.12"} or self.active_p0_qualification_prepared is None: data.pop("active_p0_qualification_prepared", None)
-        if self.schema_version != "2.12":
-            data.pop("active_commercial_source_approvals", None)
-            data.pop("commercial_source_attempts", None)
+        serialize_commercial_source_manifest(data, self.schema_version)
         return data
 
 
@@ -2317,13 +2219,6 @@ class RegistryDependencyEvidence(StrictModel):
 class RenderDependencyEvidence(StrictModel):
     owner: Literal["render_state"]
     pointer: RenderStateSnapshotPointer
-    artifact_id: str = Field(min_length=1)
-    artifact_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
-
-
-class CommercialSourceDependencyEvidence(StrictModel):
-    owner: Literal["commercial_source_approval"]
-    pointer: CommercialSourceApprovalPointer
     artifact_id: str = Field(min_length=1)
     artifact_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 

@@ -1,16 +1,48 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from enum import Enum
-from typing import Protocol
+from pathlib import Path
+from typing import Any, Literal, Protocol
+
+from pydantic import Field, model_validator
+
+from ai_video.production.artifact_contracts import StrictModel
+
+
+class CommercialSourceLifecycle(str, Enum):
+    REQUESTED = "requested"
+    MATERIALIZED_CANDIDATE = "materialized_candidate"
+    EVIDENCED = "evidenced"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    NOT_EVALUATED = "not_evaluated"
+    STALE = "stale"
+    OUTCOME_UNKNOWN = "outcome_unknown"
+
+
+class CommercialSourceApprovalPointer(StrictModel):
+    path: Path
+    approval_id: str = Field(min_length=1)
+    target_shot_id: str = Field(min_length=1)
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_pointer(self) -> "CommercialSourceApprovalPointer":
+        expected = Path(f"state/commercial-source/approval.{self.content_hash}.json")
+        if self.path != expected:
+            raise ValueError("commercial source approval pointer path must be canonical")
+        return self
 
 
 class _CommercialSourceAttempt(Protocol):
-    lifecycle: Enum
+    lifecycle: CommercialSourceLifecycle
     candidate_asset_id: str | None
     candidate_sha256: str | None
     candidate_record_hash: str | None
     review_intent_hash: str | None
-    review_phase: Enum | None
+    review_phase: str | None
     review_evidence_hash: str | None
     review_receipt_hash: str | None
     active_approval: object | None
@@ -19,7 +51,6 @@ class _CommercialSourceAttempt(Protocol):
 def validate_commercial_source_attempt_state(
     attempt: _CommercialSourceAttempt,
 ) -> None:
-    lifecycle = attempt.lifecycle.value
     candidate_identity = (
         attempt.candidate_asset_id,
         attempt.candidate_sha256,
@@ -28,7 +59,10 @@ def validate_commercial_source_attempt_state(
     has_candidate = all(item is not None for item in candidate_identity)
     if any(item is not None for item in candidate_identity) != has_candidate:
         raise ValueError("Commercial source candidate identity must be all-or-none")
-    if lifecycle not in {"requested", "stale"} and not has_candidate:
+    if attempt.lifecycle not in {
+        CommercialSourceLifecycle.REQUESTED,
+        CommercialSourceLifecycle.STALE,
+    } and not has_candidate:
         raise ValueError("Commercial source lifecycle requires candidate identity")
     if (attempt.review_intent_hash is None) != (attempt.review_phase is None):
         raise ValueError(
@@ -44,24 +78,92 @@ def validate_commercial_source_attempt_state(
         raise ValueError(
             "Commercial source review evidence and receipt must be all-or-none"
         )
-    reviewed_lifecycles = {"evidenced", "rejected", "not_evaluated", "approved"}
-    review_phase = (
-        attempt.review_phase.value if attempt.review_phase is not None else None
-    )
-    if lifecycle in reviewed_lifecycles and (
-        review_phase != "activate" or not has_review_result
+    reviewed_lifecycles = {
+        CommercialSourceLifecycle.EVIDENCED,
+        CommercialSourceLifecycle.REJECTED,
+        CommercialSourceLifecycle.NOT_EVALUATED,
+        CommercialSourceLifecycle.APPROVED,
+    }
+    if attempt.lifecycle in reviewed_lifecycles and (
+        attempt.review_phase != "activate" or not has_review_result
     ):
         raise ValueError(
             "Commercial source reviewed lifecycle requires activated evidence"
         )
     if (
-        review_phase == "activate"
-        and lifecycle != "stale"
-        and lifecycle not in reviewed_lifecycles
+        attempt.review_phase == "activate"
+        and attempt.lifecycle is not CommercialSourceLifecycle.STALE
+        and attempt.lifecycle not in reviewed_lifecycles
     ):
         raise ValueError("Activated commercial review requires a reviewed lifecycle")
-    if lifecycle == "approved":
+    if attempt.lifecycle is CommercialSourceLifecycle.APPROVED:
         if attempt.active_approval is None or attempt.review_receipt_hash is None:
             raise ValueError("Approved commercial source requires receipt and pointer")
     elif attempt.active_approval is not None:
         raise ValueError("Only approved commercial source lifecycle selects an approval")
+
+
+class CommercialSourceAttemptState(StrictModel):
+    attempt_id: str = Field(min_length=1)
+    request_id: str = Field(min_length=1)
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_path: Path
+    target_shot_id: str = Field(min_length=1)
+    target_shot_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    product_reference_set_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    lifecycle: CommercialSourceLifecycle
+    candidate_asset_id: str | None = Field(default=None, min_length=1)
+    candidate_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    candidate_record_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    review_intent_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    review_phase: Literal["requested", "evidence", "activate"] | None = None
+    review_evidence_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    review_receipt_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    active_approval: CommercialSourceApprovalPointer | None = None
+
+    @model_validator(mode="after")
+    def _validate_lifecycle_fields(self) -> "CommercialSourceAttemptState":
+        validate_commercial_source_attempt_state(self)
+        return self
+
+
+class CommercialSourceDependencyEvidence(StrictModel):
+    owner: Literal["commercial_source_approval"]
+    pointer: CommercialSourceApprovalPointer
+    artifact_id: str = Field(min_length=1)
+    artifact_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+def reject_explicit_commercial_source_fields(value: object) -> object:
+    if not isinstance(value, Mapping):
+        return value
+    fields = {
+        "active_commercial_source_approvals",
+        "commercial_source_attempts",
+    }
+    manifest_version = value.get("schema_version", "2.0")
+    if manifest_version != "2.12" and fields.intersection(value):
+        raise ValueError(
+            f"Production Manifest {manifest_version} cannot contain commercial source state"
+        )
+    return value
+
+
+def validate_commercial_source_manifest(manifest: Any) -> None:
+    attempt_ids = [item.attempt_id for item in manifest.commercial_source_attempts]
+    if len(attempt_ids) != len(set(attempt_ids)):
+        raise ValueError("Commercial source attempt IDs must be unique")
+    approvals = manifest.active_commercial_source_approvals
+    shot_ids = [item.target_shot_id for item in approvals]
+    if len(shot_ids) != len(set(shot_ids)):
+        raise ValueError("Active commercial source approvals must be unique per Shot")
+    if approvals != tuple(sorted(approvals, key=lambda item: item.target_shot_id)):
+        raise ValueError("Active commercial source approvals must be ordered by Shot")
+
+
+def serialize_commercial_source_manifest(
+    data: dict[str, object], schema_version: str
+) -> None:
+    if schema_version != "2.12":
+        data.pop("active_commercial_source_approvals", None)
+        data.pop("commercial_source_attempts", None)

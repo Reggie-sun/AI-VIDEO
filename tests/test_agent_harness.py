@@ -365,20 +365,22 @@ def test_mandatory_gate_workflow_preserves_server_check_contract() -> None:
 def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
-    report = agent_harness.inspect_paths(
-        ["src/ai_video/production/models.py"], policy
-    )
-
-    assert report["categories"] == ["production_shared_contracts"]
-    assert report["fallback_paths"] == []
-    assert report["check_ids"] == [
-        "scope_diff_check",
-        "docs_contract_check",
-        "policy_audit_check",
-        "task_architecture_gate",
-        "production_contract_tests",
-        "cli_config_tests",
-    ]
+    for path in (
+        "src/ai_video/production/models.py",
+        "src/ai_video/production/_immutable_models.py",
+        "src/ai_video/production/_state_lifecycle.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["production_shared_contracts"]
+        assert report["fallback_paths"] == []
+        assert report["check_ids"] == [
+            "scope_diff_check",
+            "docs_contract_check",
+            "policy_audit_check",
+            "task_architecture_gate",
+            "production_contract_tests",
+            "cli_config_tests",
+        ]
 
 
 def test_shot_router_routes_to_exact_contract_suite() -> None:

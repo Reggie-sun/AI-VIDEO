@@ -35,7 +35,6 @@ from ai_video.production.models import (
     CommercialSourceLifecycle,
     ProductionManifest,
     QaVerdict,
-    ReviewAttemptPhase,
     ToolIdentity,
 )
 from ai_video.production.paths import (
@@ -305,7 +304,7 @@ class _StateCommitCommercialSourceMixin:
             replacement = attempt.model_copy(
                 update={
                     "review_intent_hash": intent.content_hash,
-                    "review_phase": ReviewAttemptPhase.REQUESTED,
+                    "review_phase": "requested",
                 }
             )
             updated = ProductionManifest.model_validate(
@@ -328,7 +327,7 @@ class _StateCommitCommercialSourceMixin:
         return bool(
             attempt is not None
             and attempt.review_intent_hash == intent_hash
-            and attempt.review_phase is ReviewAttemptPhase.EVIDENCE
+            and attempt.review_phase == "evidence"
         )
 
     def run_commercial_source_review_analysis(
@@ -355,7 +354,7 @@ class _StateCommitCommercialSourceMixin:
             )
             if (
                 attempt is not None
-                and attempt.review_phase is ReviewAttemptPhase.ACTIVATE
+                and attempt.review_phase == "activate"
                 and attempt.review_receipt_hash is not None
             ):
                 candidate_hash = canonical_sha256(
@@ -401,7 +400,7 @@ class _StateCommitCommercialSourceMixin:
                 manifest.manifest_revision != expected_manifest_revision
                 or attempt is None
                 or attempt.review_intent_hash is None
-                or attempt.review_phase is not ReviewAttemptPhase.REQUESTED
+                or attempt.review_phase != "requested"
                 or attempt.candidate_record_hash
                 != canonical_sha256(checked_candidate.model_dump(mode="json"))
             ):
@@ -418,7 +417,7 @@ class _StateCommitCommercialSourceMixin:
                 CommercialSourceReviewIntent,
             )
             consumed_attempt = attempt.model_copy(
-                update={"review_phase": ReviewAttemptPhase.EVIDENCE}
+                update={"review_phase": "evidence"}
             )
             consumed = ProductionManifest.model_validate(
                 manifest.model_copy(
@@ -500,7 +499,7 @@ class _StateCommitCommercialSourceMixin:
                 manifest.manifest_revision != expected_manifest_revision
                 or attempt is None
                 or attempt.review_intent_hash != intent.content_hash
-                or attempt.review_phase is not ReviewAttemptPhase.EVIDENCE
+                or attempt.review_phase != "evidence"
                 or attempt.candidate_record_hash != candidate_hash
                 or checked_evidence.review_intent_hash != intent.content_hash
                 or checked_evidence.source_request_hash
@@ -553,7 +552,7 @@ class _StateCommitCommercialSourceMixin:
             replacement = attempt.model_copy(
                 update={
                     "lifecycle": lifecycle,
-                    "review_phase": ReviewAttemptPhase.ACTIVATE,
+                    "review_phase": "activate",
                     "review_evidence_hash": checked_evidence.content_hash,
                     "review_receipt_hash": checked_receipt.content_hash,
                 }

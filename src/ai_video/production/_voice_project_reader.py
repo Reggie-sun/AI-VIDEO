@@ -3,10 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Callable
+from typing import Callable, TypeVar
 
 import yaml
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
@@ -27,6 +27,51 @@ from ai_video.production.registry import registry_semantic_sha256
 DependencyGraphLoader = Callable[
     [Path, DependencyGraphSnapshotPointer], DependencyGraphSnapshot
 ]
+ModelT = TypeVar("ModelT", bound=BaseModel)
+
+
+def read_canonical_voice_model(
+    root: Path,
+    attempt_id: str,
+    name: str,
+    model_type: type[ModelT],
+) -> tuple[ModelT, bytes]:
+    snapshot = _read_regular_file_nofollow(
+        canonical_voice_attempt_artifact_path(root, attempt_id, name),
+        contained_by=root,
+    )
+    model = model_type.model_validate_json(snapshot.data)
+    canonical = (
+        json.dumps(
+            model.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    ).encode("utf-8")
+    if snapshot.data != canonical:
+        raise ValueError(f"{name} is not canonical")
+    return model, snapshot.data
+
+
+def read_canonical_voice_json(
+    root: Path, attempt_id: str, name: str
+) -> tuple[dict[str, object], bytes]:
+    snapshot = _read_regular_file_nofollow(
+        canonical_voice_attempt_artifact_path(root, attempt_id, name),
+        contained_by=root,
+    )
+    value = json.loads(snapshot.data)
+    if not isinstance(value, dict):
+        raise ValueError(f"{name} must contain an object")
+    canonical = (
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        + "\n"
+    ).encode("utf-8")
+    if snapshot.data != canonical:
+        raise ValueError(f"{name} is not canonical")
+    return value, snapshot.data
 
 
 def _read_voice_registry_pointer(

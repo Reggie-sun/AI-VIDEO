@@ -14,7 +14,7 @@ Date: 2026-08-25
 - `ProductReferenceSet` 独立绑定 exact Product/Registry bytes；Character、Scene、Wardrobe 和 Accessory identity 保持分离。
 - V1 materialization 仅支持 registered local/human-observed PNG import。`P7_GENERATION` 固定 typed BLOCKED，没有 caller callback、Provider submit 或 fallback。
 - Manifest `2.12` 保存 request、candidate、review intent/evidence/receipt 和 active approval；`ProductionStateCommitter` 仍是唯一 writer、activation 和 explicit recovery owner。
-- Commercial attempt lifecycle invariants 位于 cohesive `_commercial_source_state.py`；`models.py` 保留既有 public enum/model identity 和 Manifest schema composition，避免继续扩张 oversized shared model owner。
+- Commercial source enum/model/invariants 位于 cohesive `_commercial_source_state.py`，通用 state/review phase enum 位于 `_state_lifecycle.py`；`models.py` 只保留既有 public import path re-export 和 Manifest schema composition，避免继续扩张 oversized shared model owner。
 - Commercial source review 复用 active P6 `QaPolicy`。Injected authorizer 选择 exact actor，committer 先持久化 content-addressed intent，再 durable consume 并签发 process-local one-use permit；analyzer 不能自行选择 durable PASS 或写 Manifest。
 - Exact semantic PASS 才可选择 `ApprovedCommercialSourceBinding`。Approval 与 commercial dependency graph/states 在同一个 final Manifest replace 中 co-activate；Project/Registry/QA policy 变化会清理 active approval 并把 attempt 标为 `STALE`。
 - Preparation、candidate、review-intent、analysis 和 approval 的 exact replay 都绑定 caller-supplied request/candidate/approval identity，经 standard loader 重验 full current chain，并保持零 revision/effect。

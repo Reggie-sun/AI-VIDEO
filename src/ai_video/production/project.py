@@ -17,7 +17,11 @@ from ai_video.production._paid_provider_project_reader import (
 )
 import ai_video.production._project_dependency_evidence as _project_evidence
 from ai_video.production._video_project_reader import verify_manifest_video_evidence
-from ai_video.production._voice_project_reader import verify_voice_candidate_history
+from ai_video.production._voice_project_reader import (
+    read_canonical_voice_json,
+    read_canonical_voice_model,
+    verify_voice_candidate_history,
+)
 from ai_video.production.audio import (
     VoiceCallAuthorization,
     VoiceCostReceipt,
@@ -33,7 +37,7 @@ from ai_video.production.captions import (
     validate_caption_track_timeline_binding,
 )
 from ai_video.production._commercial_project_reader import (
-    verify_active_commercial_source_approvals,
+    verify_commercial_source_project_state,
 )
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.dependency import (
@@ -51,7 +55,6 @@ from ai_video.production.models import (
     CaptionTrack,
     CaptionStyleReference,
     Character,
-    CommercialSourceDependencyEvidence,
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
     DependencyLifecycle,
@@ -352,51 +355,6 @@ def _verify_manifest_snapshot_identity(
         )
 
 
-def _canonical_model_bytes(model: BaseModel) -> bytes:
-    payload = json.dumps(
-        model.model_dump(mode="json"),
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    return (payload + "\n").encode("utf-8")
-
-
-def _read_voice_model(
-    root: Path,
-    attempt_id: str,
-    name: str,
-    model_type: type[ModelT],
-) -> tuple[ModelT, bytes]:
-    snapshot = _read_regular_file_nofollow(
-        canonical_voice_attempt_artifact_path(root, attempt_id, name),
-        contained_by=root,
-    )
-    model = model_type.model_validate_json(snapshot.data)
-    if snapshot.data != _canonical_model_bytes(model):
-        raise ValueError(f"{name} is not canonical")
-    return model, snapshot.data
-
-
-def _read_voice_json(
-    root: Path, attempt_id: str, name: str
-) -> tuple[dict[str, object], bytes]:
-    snapshot = _read_regular_file_nofollow(
-        canonical_voice_attempt_artifact_path(root, attempt_id, name),
-        contained_by=root,
-    )
-    value = json.loads(snapshot.data)
-    if not isinstance(value, dict):
-        raise ValueError(f"{name} must contain an object")
-    canonical = (
-        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        + "\n"
-    ).encode("utf-8")
-    if snapshot.data != canonical:
-        raise ValueError(f"{name} is not canonical")
-    return value, snapshot.data
-
-
 def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
     attempts = tuple(
         attempt
@@ -444,31 +402,31 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                 "Active generated voice asset requires remote egress evidence."
             )
         try:
-            request, _ = _read_voice_model(
+            request, _ = read_canonical_voice_model(
                 bundle.root, attempt.attempt_id, "request.json", VoiceGenerationRequest
             )
-            preview, _ = _read_voice_model(
+            preview, _ = read_canonical_voice_model(
                 bundle.root, attempt.attempt_id, "preview.json", VoiceGenerationPreview
             )
-            authorization, _ = _read_voice_model(
+            authorization, _ = read_canonical_voice_model(
                 bundle.root,
                 attempt.attempt_id,
                 "authorization.json",
                 VoiceCallAuthorization,
             )
-            cost, cost_bytes = _read_voice_model(
+            cost, cost_bytes = read_canonical_voice_model(
                 bundle.root, attempt.attempt_id, "cost.json", VoiceCostReceipt
             )
-            provenance, provenance_bytes = _read_voice_model(
+            provenance, provenance_bytes = read_canonical_voice_model(
                 bundle.root,
                 attempt.attempt_id,
                 "provenance.json",
                 VoiceProvenanceReceipt,
             )
-            intent, _ = _read_voice_json(
+            intent, _ = read_canonical_voice_json(
                 bundle.root, attempt.attempt_id, "submit-intent.json"
             )
-            outcome, _ = _read_voice_json(
+            outcome, _ = read_canonical_voice_json(
                 bundle.root, attempt.attempt_id, "outcome.json"
             )
             alignment = _read_regular_file_nofollow(
@@ -1299,7 +1257,7 @@ def _verify_dependency_registry_evidence(
     request = None
     if voice_attempts:
         try:
-            request, _ = _read_voice_model(
+            request, _ = read_canonical_voice_model(
                 root,
                 voice_attempts[0].attempt_id,
                 "request.json",
@@ -1553,19 +1511,6 @@ def _verify_manifest_dependency_states(
                 graph=graph,
                 require_current=state.lifecycle is DependencyLifecycle.FRESH,
             )
-        elif isinstance(evidence, CommercialSourceDependencyEvidence):
-            if (
-                node.kind
-                not in {
-                    DependencyNodeKind.CREATIVE_ARTIFACT,
-                    DependencyNodeKind.ASSET,
-                }
-                or evidence.pointer
-                not in bundle.manifest.active_commercial_source_approvals
-            ):
-                raise _invalid(
-                    "Commercial source dependency evidence has an invalid owner."
-                )
 
     render_domain_ids = {
         node.node_id
@@ -1608,11 +1553,6 @@ def _verify_manifest_dependency_states(
             _verify_dependency_registry_evidence(bundle, evidence)
         elif isinstance(evidence, RenderDependencyEvidence):
             _verify_dependency_render_evidence(bundle, evidence)
-        elif isinstance(evidence, CommercialSourceDependencyEvidence):
-            if evidence.pointer in bundle.manifest.active_commercial_source_approvals:
-                raise _invalid(
-                    "Superseded commercial dependency evidence cannot remain active."
-                )
 
     try:
         resolved = resolve_dependency_state(graph, states)
@@ -1701,7 +1641,8 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         _verify_manifest_dependency_states(bundle, dependency_graph)
         bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
     if manifest.schema_version == "2.4" or (
-        manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
+        manifest.schema_version
+        in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12"}
         and manifest.active_qa_policy is not None
     ):
         if manifest.active_qa_policy is None:
@@ -1770,7 +1711,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
             ):
                 raise _invalid("Final Acceptance Receipt is stale.")
         bundle = bundle.model_copy(update={"qa_policy": qa_policy})
-    verify_active_commercial_source_approvals(bundle)
+    verify_commercial_source_project_state(bundle)
     if manifest.active_render_state is not None:
         render_state = (
             _load_exact_render_state(bundle, manifest.active_render_state)
