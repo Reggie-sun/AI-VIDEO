@@ -2,6 +2,14 @@
 
 Date: 2026-08-24
 
+> **Superseded current-facing status (2026-08-25):** 本记录中的 `ZERO submit`
+> 与 historical v6 bundle 事实仍有效，但当时的 graph、Shot identity/role、candidate
+> closure 与 submit-only Provider lifecycle implementation blockers 已由后续 offline
+> commits（含 `34f38ed` 与 `50de0c0`）关闭。当前下一 gate 是 fresh executable
+> bundle、non-test operator/request wiring 与单次 local-live authorization；详见
+> `2026-08-25-shot-continuity-source-local-lifecycle.md`。这不改变本记录的历史
+> zero-effect 证据，也不表示已生成 source MP4、通过 P6 或允许 M0 submit。
+
 ## Purpose
 
 本文记录 rainy-station A2→A3 upstream source attempt 在进入任何 Local ComfyUI effect 前发现的 Production contract blocker。该 checkpoint 的结论是 `ZERO submit`，不是 source qualification implementation、Production candidate、P6 或 M0 已完成。

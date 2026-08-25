@@ -2,6 +2,13 @@
 
 Date: 2026-08-24
 
+> **Superseded current-facing status (2026-08-25):** qualification-only source
+> Provider 已在 `50de0c0` 补齐 canonical local status/fetch lifecycle、pre-effect
+> identity seals 与 terminal bad-output durable failure。下文关于 M0 seed、frame timing、
+> accepted source、P6 与 motion-tail 的 gates 仍有效；尚无 live source MP4，M0 effect
+> 仍为零。当前 source checkpoint 见
+> `2026-08-25-shot-continuity-source-local-lifecycle.md`。
+
 ## Purpose
 
 本文记录 Shot Continuity Phase P1 的六个 candidate-neutral checkpoint：M0 request-level
