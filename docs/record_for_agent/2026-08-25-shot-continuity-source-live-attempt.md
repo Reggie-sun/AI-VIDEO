@@ -74,6 +74,19 @@ Frozen boundary/motion hard gate失败：
 - default及threshold `0.1` scene detector仍报告single scene，说明该detector对本次单帧跳变不敏感，
   不能推翻decoded frame evidence。
 
+用户随后明确授权对existing exact MP4进行真实媒体复核。Codex直接查看从该MP4解码的全片
+12-frame contact sheet、frames 104–111逐帧条带与frames 116–123尾部条带；这不是fixture、历史媒体或
+仅从metric推断。Direct visual review确认frames 107→108间人物、柱列、站台与clock framing同时瞬移到
+另一套终点构图，视觉上呈现hard-cut式discontinuity；frames 116–123则几乎没有可见动作。该直接视觉
+观察与MAD结果一致，因此source hard gate仍为`FAIL`。
+
+本次真实媒体复核没有被伪装成human/P6 verdict。Exact resolved source request的
+`continuity_binding=null`；current `HybridContinuityEvaluatorV1`要求exact continuity binding并对缺失binding
+fail closed，而`VideoGenerationService.validate_once()`进入canonical durable candidate-preparation seam。
+不得为运行evaluator而合成不存在的binding、绕过qualification contract或推进candidate state。因此当前
+proof layer为direct Codex visual review + deterministic frame evidence；automatic P6仍为`NOT_EVALUATED`，
+human/P6 verdict仍未记录。
+
 因此本次结论分层为：technical execution/fetch `PASS`；source boundary/motion quality `FAIL`；automatic
 P6 `NOT_EVALUATED`；human/P6 verdict未记录。由于任一frozen hard gate失败即禁止promotion，本artifact不得作为
 accepted upstream source，也不得派生M0 terminal/motion-tail或触发M0/M1 submit。
