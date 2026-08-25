@@ -75,44 +75,44 @@
       "schema_sha256": "ecf1b0bb9558c1a84dea6e1fcf4f9a9d79ac5d09ed557092f1c062abcef4ead6"
     }
   ],
-  "p0_qualification_receipt_hash": "25145d177de07384bb4594e53023563e809a3f1bdcdb7ff294acd1cff5ae1e91",
-  "m0_execution_stack_hash": "8f9661c358162544a3cefd0f7ff4483063658fcb37de09f301ef7fe2500039d2",
-  "m0_profile_hash": "9bf6588c04712887b117a8fd3c7496c15b5667b112d8cea750047928ccc36517",
+  "p0_qualification_receipt_hash": "4227b7a032dfb10cee7e84637c543be530159cb24012ca926c9f5473eae6614f",
+  "m0_execution_stack_hash": "b58597090ba9c630b21ef3691905a9728da1e2bcdf9a9e89531386c31a904573",
+  "m0_profile_hash": "377330590b7727140baf4ac2fcef196f85a8572848736b9e1d316b78748fce72",
   "m0_compiler_hash": "e2ba38bb110e26a5221a5582ea19f777752a1946ffacbe31b1445073d1530d19",
   "m0_workflow_hash": "963bd91ad81ca102053deb08b29a7aa8fb6849a6256a78ccbfbc6138d7a855d2",
-  "p0_validation_set_hash": "6685f2661de2e0415bd42241cc6efec1c23127717c0a96e353509659e4569ab4",
+  "p0_validation_set_hash": "ffc9f6b903f1c5e8e43669427027b1c2d0f02a77634b7a13aa0d8a943864ef77",
   "p0_policy_hashes": [
-    "8f8033495b92a4f234279e6f6da587f039fdc087c44312e04884ae4ded924d28",
-    "f82a280d9b9a9d050e92b9b7e12ad5c13ab365ee7e7113717800a163b93d8fd8",
-    "3b3623932abbe5edfcb6307c4750798402a7858e61b7e75babfe30e2d229531b"
+    "121814ed2ff75d88022b96cf31212a1ddf187df856756f5dfbfac1bffa898a61",
+    "c6f9c7633cc5d219bf7f02d20b2cd954e9ffd1a690534479c67a6e44d374065d",
+    "b7f39ac92031b7f197be04e6d39aace69fac6a510815b3ce7fef966a4a543bb3"
   ],
   "p0_input_hashes": [
     [
       "inventory",
-      "4238c5f19589fac49c78481e2e1a5b996a0680019e907ed1eac5f95d2c64add1"
+      "c3b714b1e5127fc61f890dab5416a3a0352f434424cbfb8a62acea71f282c2fc"
     ],
     [
       "calibration_fixture",
-      "0c03c4e59122a3331860b890eecf1af9b99a003b1fb24c3c2787235d6ba20cdb"
+      "7a7ead71f84853fb6da714747cd2eb8c931432468a90502c87aede64062fdfd9"
     ],
     [
       "rubric",
-      "25cd722cffe804273a797a947d60d5c7530a85d1f4f30f4754261b4586243364"
+      "f5ec50073e54cb2b41fca732f693ec95e99a4f3f852d4b82d617030134a52794"
     ],
     [
       "effect_budget",
-      "e5ac6842f1c0b35744f8df90994986b37e22ee033047d1c667e0abccca562200"
+      "38ad0c9f98bb8d983daecb6b77f1f90dddab6d5cd51eca19e44fa03be0132b84"
     ],
     [
       "human_freeze",
-      "53435443c6a17c201f41029026c568ab1bb7f23ae4f0ca0c1e7d5d45e71b2d9e"
+      "6f0898b6186afcdc4ae9e95936ffb43c4fb41b9996571233c5d97bfd1016bc83"
     ]
   ],
-  "project_content_hash": "b89c1e18f1085c6dab85d070e363fe39eb2e60b3fdd84c4e73738ebae9a1a3ca",
+  "project_content_hash": "b019affa15219377984643889555fe1c7c27f5479c6d0f72147de64632704f60",
   "registry_content_hash": "b292cb0b35226f6201228dbc0caa62d54823f4d03040af9fa218f9666af732e9",
   "target_shot_id": "rainy-station-3",
   "target_shot_revision": 1,
-  "target_shot_content_hash": "5ae7704ac1b2b048da8f97f1c5f07535480ea77e0ac0e96c513c81814eb083d1",
+  "target_shot_content_hash": "1b76a750056bfc197dd40d8ad78442e1fecd3de0fe2f58c09d3a2ba3cbbe02a7",
   "target_asset_role": "approved_endpoint",
   "output_asset_id": "video-shot-rainy-station-3-source-v1",
   "first_frame_asset_id": "image-import-e8b1d85d4e599d584ca63fb503b86515fd4b8dd8174ac0a6c304ad3c167d3163",
@@ -128,7 +128,7 @@
   "prompt": "For the target video, <Picture 1> is fully referenced as the exact first frame and <Picture 2> is fully referenced as the exact last frame.\n\nintegrated_multimodal_description: [Shot 1] One continuous live-action, photorealistic cinematic medium right-facing side-profile shot on the same rain-soaked railway platform at blue hour. The exact same lone adult East Asian woman with a short blunt black bob, mustard-yellow hooded raincoat, black trousers, black boots and the same red cross-body leather satchel walks steadily screen-right toward the clock. A chest-height natural-perspective camera tracks parallel at slow constant speed, preserving a level horizon and stable body scale. Begin at the exact supplied first frame and finish at the exact supplied last frame while she remains mid-stride with continuing gait and satchel motion. Exactly one person; no cut, extra person, axis reversal, teleport, wardrobe change, random zoom, jitter, text or logo.\noverall_soundscape: Steady rain, measured synchronized boot footsteps, restrained station ambience and small physical leather-satchel movement.\nnon_diegetic_music: No non-diegetic music.",
   "prompt_sha256": "f9d0f7492af21bbfd52e6affa8e1f93bc8b73982152ed046a38c0011d12e9e7a",
   "seed_derivation": "source-qualification-closure-sha256-low63-v1",
-  "sealed_seed": 6623081611478359059,
+  "sealed_seed": 3625644815483226956,
   "width": 1344,
   "height": 768,
   "frame_count": 124,
@@ -139,5 +139,5 @@
   "remote_provider_enabled": false,
   "cloud_fallback_enabled": false,
   "retry_enabled": false,
-  "profile_content_hash": "0c7bfb22fb5ec660a649366715617bf92b90e4fab2418ac29774192f2ff7fb58"
+  "profile_content_hash": "369295e1906307bb94b7a30a81672a767e2f95e41929cb45cd3d57cd51e04ffc"
 }
