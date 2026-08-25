@@ -120,11 +120,20 @@ class EcommerceVideoGenerationFacade:
     def bound_commercial_identity(self) -> tuple[str, str, str]:
         binding = self.request.commercial_binding
         assert binding is not None
-        return (
+        declared = (
+            self.request.resolved_generation_hash,
             binding.ad_creative_plan_hash,
             binding.commercial_execution_projection_hash,
             binding.target_shot_id,
         )
+        durable = self.service.current_bound_commercial_request_identity(
+            attempt_id=self.attempt_id
+        )
+        if durable is not None and durable != declared:
+            raise ValueError(
+                "Ecommerce facade request does not match the durable attempt"
+            )
+        return declared[1:]
 
     def next_action(self) -> EcommerceShotNextAction:
         try:

@@ -30,6 +30,7 @@ from ai_video.production.ecommerce_media_acceptance import (
     create_qingyan_ecommerce_acceptance_profile,
 )
 from ai_video.production.ecommerce_ad_coordinator import (
+    EcommerceStopReason,
     EcommerceVideoGenerationFacade,
     run_ecommerce_ad_generation,
 )
@@ -171,6 +172,7 @@ def _runtime(
     status_state: VideoTaskState = VideoTaskState.SUCCEEDED,
     status_error: ErrorCode | None = None,
     commercial: bool = False,
+    commercial_plan_hash: str = "a" * 64,
 ):
     inputs = make_p8_video_generation_base(
         root, schema_version="2.13" if commercial else "2.8"
@@ -206,9 +208,12 @@ def _runtime(
 
         commercial_binding = GeneratedCommercialShotBinding.create(
             ad_creative_plan_id="qingyan-ad-plan",
-            ad_creative_plan_hash="a" * 64,
+            ad_creative_plan_hash=commercial_plan_hash,
             commercial_execution_projection_hash=(
-                _commercial_projection(shot.shot_id).projection_hash
+                _commercial_projection(
+                    shot.shot_id,
+                    plan_hash=commercial_plan_hash,
+                ).projection_hash
             ),
             target_shot_id=shot.shot_id,
             profile_content_hash=commercial_profile.content_hash,
@@ -447,6 +452,47 @@ def test_local_ecommerce_facade_uses_real_service_and_replays_zero_effect(
     assert replay.complete is True
     assert first_counts == (1, 1, 1)
     assert (provider.submit_calls, provider.status_calls, provider.fetch_calls) == first_counts
+
+
+def test_local_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
+    tmp_path: Path,
+) -> None:
+    from test_production_generated_video_e2e import (
+        _CountingCommercialShotReviewer,
+        _commercial_handoff,
+    )
+
+    expected_root = tmp_path / "expected"
+    durable_root = tmp_path / "durable"
+    _, _, expected_request, _ = _runtime(expected_root, commercial=True)
+    _, provider, durable_request, committer = _runtime(
+        durable_root,
+        commercial=True,
+        commercial_plan_hash="b" * 64,
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.start(attempt_id=ATTEMPT_ID, request=durable_request)
+    binding = expected_request.commercial_binding
+    assert binding is not None
+    facade = EcommerceVideoGenerationFacade(
+        service=service,
+        attempt_id=ATTEMPT_ID,
+        request=expected_request,
+        lane="local",
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+    )
+
+    result = run_ecommerce_ad_generation(
+        _commercial_handoff(binding.target_shot_id),
+        facades={binding.target_shot_id: facade},
+    )
+
+    assert result.stop_reason is EcommerceStopReason.CHECKPOINT_INVALID
+    assert (provider.submit_calls, provider.status_calls, provider.fetch_calls) == (
+        0,
+        0,
+        0,
+    )
 
 
 def test_t8_t2va_reuses_local_intent_permit_and_state_lifecycle(tmp_path: Path) -> None:

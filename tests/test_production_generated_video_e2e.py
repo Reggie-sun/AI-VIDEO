@@ -38,6 +38,7 @@ from ai_video.production.commercial_execution import (
     CommercialShotClass,
 )
 from ai_video.production.ecommerce_ad_coordinator import (
+    EcommerceStopReason,
     EcommerceVideoGenerationFacade,
     run_ecommerce_ad_generation,
 )
@@ -126,12 +127,16 @@ COMMERCIAL_EVALUATOR = ToolIdentity(
 )
 
 
-def _commercial_projection(shot_id: str) -> CommercialExecutionProjection:
+def _commercial_projection(
+    shot_id: str,
+    *,
+    plan_hash: str = "a" * 64,
+) -> CommercialExecutionProjection:
     values = {
         "schema_version": "commercial-execution-projection/1",
         "ad_creative_plan_id": "qingyan-ad-plan",
         "ad_creative_plan_revision": 1,
-        "ad_creative_plan_hash": "a" * 64,
+        "ad_creative_plan_hash": plan_hash,
         "target_shot_id": shot_id,
         "primary_class": CommercialShotClass.CHARACTER_PERFORMANCE,
         "product_id": None,
@@ -157,14 +162,20 @@ def _commercial_projection(shot_id: str) -> CommercialExecutionProjection:
     return CommercialExecutionProjection.model_validate(values)
 
 
-def _commercial_handoff(shot_id: str) -> CompiledAdCreativeHandoff:
+def _commercial_handoff(
+    shot_id: str,
+    *,
+    plan_hash: str = "a" * 64,
+) -> CompiledAdCreativeHandoff:
     return CompiledAdCreativeHandoff(
         plan_id="qingyan-ad-plan",
-        plan_content_hash="a" * 64,
+        plan_content_hash=plan_hash,
         shot_proposals=(AdShotProposal(shot_id=shot_id, beat_ids=("beat-1",)),),
         composition_requirements=AdCompositionRequirements(),
         composition_spec=make_composition_spec(shot_ids=(shot_id,)),
-        commercial_execution_projections=(_commercial_projection(shot_id),),
+        commercial_execution_projections=(
+            _commercial_projection(shot_id, plan_hash=plan_hash),
+        ),
     )
 
 
@@ -184,6 +195,7 @@ def _runtime(
     continuity: bool = False,
     commercial: bool = False,
     commercial_unapproved_product: bool = False,
+    commercial_plan_hash: str = "a" * 64,
     status_events: tuple[VideoTaskState | str, ...] | None = None,
 ):
     inputs = make_p8_video_generation_base(
@@ -327,9 +339,12 @@ def _runtime(
     commercial_binding = (
         GeneratedCommercialShotBinding.create(
             ad_creative_plan_id="qingyan-ad-plan",
-            ad_creative_plan_hash="a" * 64,
+            ad_creative_plan_hash=commercial_plan_hash,
             commercial_execution_projection_hash=(
-                _commercial_projection(shot.shot_id).projection_hash
+                _commercial_projection(
+                    shot.shot_id,
+                    plan_hash=commercial_plan_hash,
+                ).projection_hash
             ),
             target_shot_id=shot.shot_id,
             profile_content_hash=commercial_profile.content_hash,
@@ -1182,6 +1197,43 @@ def test_paid_ecommerce_facade_enforces_real_service_barrier_and_replay(
     assert first_counts.submit == 1
     assert first_counts.status == 1
     assert first_counts.fetch == 1
+
+
+def test_paid_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
+    tmp_path: Path,
+) -> None:
+    expected_root = tmp_path / "expected"
+    durable_root = tmp_path / "durable"
+    _, _, expected_request, _, _ = _runtime(expected_root, commercial=True)
+    _, provider, durable_request, durable_preview, committer = _runtime(
+        durable_root,
+        commercial=True,
+        commercial_plan_hash="b" * 64,
+        status_events=(VideoTaskState.SUCCEEDED,),
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.start(attempt_id=ATTEMPT_ID, request=durable_request)
+    binding = expected_request.commercial_binding
+    assert binding is not None
+    facade = EcommerceVideoGenerationFacade(
+        service=service,
+        attempt_id=ATTEMPT_ID,
+        request=expected_request,
+        lane="paid",
+        paid_preview=durable_preview,
+        reservation_id="p8-video-reservation-1",
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+    )
+
+    result = run_ecommerce_ad_generation(
+        _commercial_handoff(binding.target_shot_id),
+        facades={binding.target_shot_id: facade},
+    )
+
+    assert result.stop_reason is EcommerceStopReason.CHECKPOINT_INVALID
+    assert provider.call_counts.submit == 0
+    assert provider.call_counts.status == 0
+    assert provider.call_counts.fetch == 0
 
 
 @pytest.mark.parametrize("verdict", (QaVerdict.FAIL, QaVerdict.NOT_EVALUATED))

@@ -390,6 +390,43 @@ class VideoGenerationService:
     def resume_next_action(self, *, attempt_id: str) -> str:
         return self._committer.video_resume_next_action(attempt_id=attempt_id)
 
+    def current_bound_commercial_request_identity(
+        self,
+        *,
+        attempt_id: str,
+    ) -> tuple[str, str, str, str] | None:
+        """Reopen an existing attempt's exact commercial request identity."""
+
+        manifest = self._committer._read_manifest()
+        existing = next(
+            (item for item in manifest.attempts if item.attempt_id == attempt_id),
+            None,
+        )
+        if existing is None:
+            return None
+        attempt = self._committer._video_attempt(manifest, attempt_id)
+        state = attempt.video_generation_state
+        if state is None:
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Video generation state is missing.",
+                retryable=False,
+            )
+        request = self._committer._reopen_video_request(state.request)
+        binding = request.commercial_binding
+        if binding is None:
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Commercial video request binding is missing.",
+                retryable=False,
+            )
+        return (
+            request.resolved_generation_hash,
+            binding.ad_creative_plan_hash,
+            binding.commercial_execution_projection_hash,
+            binding.target_shot_id,
+        )
+
     def current_commercial_validation_verdict(self, *, attempt_id: str):
         """Reopen current commercial PASS evidence without running its evaluator."""
 
