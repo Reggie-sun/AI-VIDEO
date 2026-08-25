@@ -619,6 +619,8 @@ categories:
       - src/ai_video/production/seedance_profile.py
       - src/ai_video/production/paid_provider.py
       - src/ai_video/production/video.py
+      - src/ai_video/production/video_request_models.py
+      - src/ai_video/production/commercial_video_contracts.py
       - src/ai_video/production/_video_capability_fingerprint.py
       - src/ai_video/production/_video_continuity.py
       - src/ai_video/production/continuity_evaluator.py
