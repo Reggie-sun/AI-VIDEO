@@ -174,7 +174,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify immutable graph inputs and precise selective rebuild.
   production_review_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, tests/test_production_review.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, tests/test_production_review.py, tests/test_production_quality_gate_coordinator.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify durable review, authorization, repair, and final acceptance.
   commercial_source_preparation_tests:
@@ -496,12 +496,14 @@ categories:
       - src/ai_video/production/continuity_onnx_backend.py
       - src/ai_video/production/local_continuity_reviewer.py
       - src/ai_video/production/continuity_review_coordinator.py
+      - src/ai_video/production/quality_gate_coordinator.py
       - src/ai_video/production/_state_commit_repair.py
       - src/ai_video/production/_state_commit_review.py
       - src/ai_video_mcp/tools/review.py
       - src/ai_video_mcp/tools/optimize_plan.py
       - src/ai_video_mcp/tools/apply_optimization.py
       - tests/test_production_review.py
+      - tests/test_production_quality_gate_coordinator.py
       - tests/test_production_continuity_evaluator.py
       - tests/test_production_continuity_onnx_backend.py
       - tests/test_production_local_continuity_reviewer.py

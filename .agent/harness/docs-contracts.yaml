@@ -97,7 +97,7 @@ surfaces:
     canonical_spec: docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md
     canonical: true
     spec_status: accepted
-    implementation_status: foundation_only
+    implementation_status: implemented_offline
     live_status: not_applicable
     quality_status: not_evaluated
     release_status: unreleased
@@ -106,8 +106,10 @@ surfaces:
     contract_version: quality-gate-architecture/1
     implementation_paths:
       - docs/agent-primary-contract-matrix.md
+      - src/ai_video/production/quality_gate_coordinator.py
     test_paths:
       - tests/test_ecommerce_ad_workflow_skill.py
+      - tests/test_production_quality_gate_coordinator.py
       - tests/test_production_review.py
       - tests/test_production_base_ai_comic_e2e.py
     harness_check_ids:

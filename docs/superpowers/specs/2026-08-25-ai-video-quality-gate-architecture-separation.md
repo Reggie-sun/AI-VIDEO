@@ -2,7 +2,7 @@
 surface_id: quality_gate_architecture
 canonical: true
 spec_status: accepted
-implementation_status: foundation_only
+implementation_status: implemented_offline
 live_status: not_applicable
 quality_status: not_evaluated
 release_status: unreleased
@@ -15,12 +15,27 @@ contract_version: quality-gate-architecture/1
 
 ## Status
 
-Accepted architecture contract；boundary documentation与current-output contract tests已实现，
-two-stage Product Runtime orchestration尚未实现、未live验证、未release。本Spec不授权Provider、
-媒体生成、Manifest/schema migration、automatic repair、candidate activation或Final Acceptance。
+Accepted architecture contract；boundary foundation与Gate 1-only explicit one-shot source/focused
+tests已实现，exact Harness completion evidence以current receipt为准。Typed Domain seam与two-stage
+Product Runtime orchestration尚未实现、未live验证、未release。本Spec不授权Provider、媒体生成、
+Manifest/schema migration、automatic repair、candidate activation或Final Acceptance。
 
 配套implementation plan：
 `docs/superpowers/plans/2026-08-25-ai-video-quality-gate-architecture-separation.md`。
+
+### Authorized Gate 1-Only Runtime Slice
+
+2026-08-25当前用户请求授权实现本Spec的Gate 1-only显式one-shot slice。该slice只能新增：
+
+- preselected、content-addressed `UniversalQaProfile`；
+- exact delivery/applicability/current identity context；
+- `QaPolicy.required_layers`对applicable Universal minimum的superset preflight；
+- hard checks后required review layers的确定顺序、single-pass、fail-closed orchestration；
+- Gate 1 PASS时只返回`eligible_for_domain_gate=true`。
+
+该授权不包含typed Domain profile/evidence seam、Gate 2、two-stage coordinator、durable
+Universal/Domain profile binding migration、repair、activation或`record_final_acceptance()`。
+因此Gate 1-only PASS不得描述为two-gate acceptance或Final Acceptance eligibility。
 
 ## Problem Boundary
 
@@ -99,9 +114,13 @@ superset：
 - missing profile、empty/invalid profile、applicability无法判定或policy coverage不完整均在Gate 2
   前fail closed为`NOT_EVALUATED`。
 
-Current Runtime尚无该Universal profile schema或coverage validator；current
-`QaPolicy.required_layers`仍可选择任意层。以上是future two-stage orchestration的accepted target
-contract，不得从现有Base AI Comic layout-only policy推断已实现。
+Gate 1-only Runtime现提供non-persistent `UniversalQaProfile`与coverage validator，并在任何
+injected runner effect前strict reopen profile、验证exact context及selected QaPolicy coverage。
+Current `QaPolicy.required_layers`本身仍可选择任意层；只有显式调用Gate 1 coordinator时才强制
+该profile minimum。该result只在current call stack中绑定profile/context hash，以及
+selected / context-expected QaPolicy hashes；invalid declared hash以`null`保留fail-closed
+result，而不是令错误路径再次失败。该result不是
+durable P6/Manifest evidence，也不得从现有Base AI Comic layout-only policy推断two-gate acceptance。
 
 ## Gate 2: Domain-Specific Acceptance
 
@@ -183,6 +202,7 @@ spec/plan明确改变该trigger contract。
 | video candidate validation | caller显式调用`validate_once()` | fetch不自动validate/activate |
 | `ShotReadinessGate` | `require_current_video_plan()` façade显式调用 | façade内部自动；无全局Production caller |
 | Ecommerce contract validation | Skill CLI显式调用 | 无Runtime caller |
+| Gate 1-only coordinator | caller显式调用`UniversalQualityGateCoordinator.run_once()` | 调用内profile/coverage preflight与hard-before-review STOP自动；无Gate 2/background caller |
 | P6 review lifecycle | orchestration显式调用`begin_review()`、`run_review_analysis()`、`record_review_receipt()` | committer内部重新adjudicate；无product-level automatic caller |
 | Final Acceptance | orchestration显式调用`record_final_acceptance()` | 不因最后一层PASS自动触发 |
 
@@ -190,10 +210,10 @@ spec/plan明确改变该trigger contract。
 review/repair/final-acceptance是test orchestration evidence，不是Product Runtime background
 automation。
 
-### Future One-Shot Orchestration
+### Future Two-Stage One-Shot Orchestration
 
-后续独立implementation slice MAY实现显式one-shot two-stage coordinator。API名称由该slice
-决定，但behavior必须等价于：
+后续完整two-stage implementation slice MAY在已授权Gate 1-only seam与future accepted typed
+Domain seam之上实现显式one-shot coordinator。API名称由该slice决定，但behavior必须等价于：
 
 ```text
 exact current render + selected QaPolicy + selected Domain profile

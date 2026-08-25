@@ -3,13 +3,30 @@
 ## Status
 
 Implemented in boundary documentation/contract-test scope，并已补充accepted canonical
-`quality-gate-architecture/1` Spec；two-stage Product Runtime orchestration仍未实现。后续
-Runtime coordinator、typed Domain seam与具体Domain profile必须各自按本plan的future slice
-边界获得独立implementation authorization。
+`quality-gate-architecture/1` Spec。2026-08-25当前用户请求已授权Gate 1-only显式one-shot
+Runtime slice；typed Domain seam、two-stage coordinator与具体Domain profiles仍未授权、未实现。
 
 本计划基于 `main@2500bbb7254ed5fb2ca936437f636df9e626e44f` 的 tracked source、tests、canonical docs、`ecommerce-ad-workflow` contracts 与 fresh AI-VIDEO memory retrieval 编写。它只规划 Quality Gate architecture separation；本文档不证明 Runtime 已实现，不授权 Provider、媒体生成、Runtime mutation、P6 PASS、Final Acceptance、market-performance prediction、commit、push 或 release。
 
 共享 checkout 中与 commercial source preparation 有关的 dirty/untracked paths 不属于本计划证据，也不在本计划的 current-state assertions 中。
+
+## Authorized Runtime Slice — Gate 1 Only
+
+本轮只实现`src/ai_video/production/quality_gate_coordinator.py`及其focused tests：
+
+1. caller必须显式提供已选择且content-addressed的`UniversalQaProfile`；
+2. profile必须绑定exact `DeliveryProfile`与audio/caption/layout/continuity applicability；
+3. hard validation至少包含asset/provenance、media decode、timeline与render output；audio、caption
+   或continuity适用时增加对应hard check；
+4. `TECHNICAL`始终required，layout适用时`LAYOUT` required；selected `QaPolicy.required_layers`
+   缺少profile required layer时在任何check effect前返回`NOT_EVALUATED`；
+5. hard/review `FAIL`、`NOT_EVALUATED`、stale或explicit unknown outcome立即STOP且不重试；
+6. PASS只返回`eligible_for_domain_gate=true`，`eligible_for_final_acceptance`固定为`false`。
+
+Single owner只负责preflight与调用顺序。Existing validators仍拥有各自correctness，P6与
+`ProductionStateCommitter`仍拥有durable evidence/lifecycle。Old path retirement为`none`；
+本slice不修改existing persisted schema、Manifest、Registry、Dependency Graph、timeline、
+activation、repair或Final Acceptance。
 
 ## Goal
 
@@ -29,12 +46,12 @@ Gate 1: Universal Production QA
 committer的durable rollup，不是第三个quality evaluator gate。目标是先把boundary固定为durable
 contract，同时继续复用AI-VIDEO对media、timeline、composition、continuity evidence、
 provenance、review freshness、repair和durable Final Acceptance的唯一owner。本slice不实现
-Runtime-facing domain evidence schema或automatic caller。
+Runtime-facing domain evidence schema；Gate 1-only caller也不运行Gate 2。
 
 ## Non-Goals
 
 - 不实现完整 AI Drama / Short Drama workflow、story authoring、episode generator 或 dialogue generator；
-- 不在本计划中实现 Gate、evaluator、review analyzer、repair 或 Runtime state mutation；
+- 不在当前Runtime slice中实现Gate 2、evaluator、review analyzer、repair或Runtime state mutation；
 - 不增加新的 Manifest、Timeline、Dependency Graph、renderer、QA lifecycle、repair lifecycle 或 Final Acceptance owner；
 - 不新增 `ECOMMERCE`、`DRAMA` 或 `FORMAT` 类型的 `QaLayer`；
 - 不把现有 generic `SEMANTIC` 直接改名后当作完整 domain framework；
@@ -328,7 +345,10 @@ future Drama 只有在正式 workflow/spec、owner、authoring artifact 和 rubr
 
 ### Old Path To Retire
 
-`none`。本 slice 不删除或替换 Runtime path，也不迁移 artifact。它只禁止未来把 generic `STRATEGY` / `SEMANTIC` 名称、`AdQCReport.ready` 或 `AdCreativeReviewReport.is_ready` 误解释为 complete cross-domain Production acceptance。
+`none`。Boundary foundation与current Gate 1-only slice都不删除或替换既有Runtime path，也不
+迁移artifact。新coordinator只组合caller显式提供的existing-owner checks，且禁止把generic
+`STRATEGY` / `SEMANTIC`、`AdQCReport.ready`或`AdCreativeReviewReport.is_ready`误解释为
+complete cross-domain Production acceptance。
 
 ### Unchanged Contracts
 
@@ -349,13 +369,17 @@ future Drama 只有在正式 workflow/spec、owner、authoring artifact 和 rubr
 
 ### Rollback
 
-回退本 slice 的 exact task-owned docs和focused tests即可；不需要 state recovery、artifact conversion或 Runtime rollback。Rollback 后 current executable behavior和所有 historical hashes必须保持不变。不得借 rollback修改或清理 concurrent dirty/untracked commercial work。
+回退current Gate 1-only slice时删除新增coordinator/test并回退本Spec/plan的exact task-owned
+changes即可；不需要state recovery、artifact conversion或persisted Runtime rollback。Existing
+executable behavior、persisted schemas与historical hashes保持不变。不得借rollback修改或清理
+concurrent dirty/untracked commercial work。
 
 未来 Runtime seam若需要改变 active-review indexing、Manifest schema、receipt identity或 authoring-artifact persistence，必须由独立 migration spec/plan定义 forward migration、strict reopen和 rollback；本 plan 不授权。
 
 ## Compatibility
 
-- 本 plan 是 docs/tests compatibility slice，无 Runtime artifact migration。
+- Original boundary foundation是docs/tests compatibility slice；current Gate 1-only follow-up新增
+  non-persistent explicit orchestration contract，但无Runtime artifact migration。
 - 现有 Ecommerce skill schema、`AdQCReport.ready` 和 package validation semantics保持兼容；加强的是“不等于 Production acceptance”的 contract。
 - 现有 `AdCreativeReviewReport` API 保持 pure，`production_verdict=None` 不变。
 - historical `QaPolicy`、`ReviewRequest`、`ReviewEvidence`、`ReviewReceipt` 和 `FinalAcceptanceReceipt` bytes 必须 strict reopen，hash 不变。
@@ -363,9 +387,12 @@ future Drama 只有在正式 workflow/spec、owner、authoring artifact 和 rubr
 
 ## Runtime Impact
 
-无 Production Runtime behavior 或 schema change。只稳定 architecture/ownership contract 和 executable boundary tests。
+新增显式`UniversalQualityGateCoordinator.run_once()`、content-addressed `UniversalQaProfile`、
+exact context binding与Gate 1 fail-closed result。它没有background caller，不持久化state，且不
+自动运行Domain Gate、repair、activation或Final Acceptance。Existing persisted schema与artifact
+hash不变。
 
-future Runtime slice 即使被另行批准，也只能扩展 P6 semantic evidence qualification，不得改变：
+Future typed Domain/two-stage slice即使被另行批准，也不得改变：
 
 - `ProductionStateCommitter` 的唯一 write/activation/recovery/final-acceptance ownership；
 - `ResolvedTimeline` 的唯一 timing/order/frame/sample ownership；
@@ -377,7 +404,13 @@ Domain Skill 不执行 Runtime review，不持久化 Production verdict；它只
 
 ## Implementation File Map
 
-以下只列本 plan 唯一授权 slice 的 expected paths：
+Current Gate 1-only Runtime slice只修改：
+
+- `src/ai_video/production/quality_gate_coordinator.py`；
+- `tests/test_production_quality_gate_coordinator.py`；
+- 本Spec与plan。
+
+Original boundary foundation已修改或验证的owner paths为：
 
 - `docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md`；
 - `docs/superpowers/specs/2026-08-21-ai-video-shot-readiness-gate-v3.md`；
@@ -389,11 +422,11 @@ Domain Skill 不执行 Runtime review，不持久化 Production verdict；它只
 - `.agents/skills/ecommerce-ad-workflow/references/ad-qc.md`；
 - `.agents/skills/ecommerce-ad-workflow/references/runtime-handoff.md`。
 
-现有 `tests/test_ecommerce_ad_workflow_skill.py`、`tests/test_production_ad_creative.py`、`tests/test_shot_readiness_gate.py`、`tests/test_production_review.py` 和 `tests/test_production_base_ai_comic_e2e.py` 是 verification owners。只有发现当前 boundary 缺少 executable assertion 时，才在同一授权 slice 内最小补充对应现有 test file；不得顺带改变 Production behavior。所有列出的 paths 已有 policy route，本 slice 不预期修改 `.agent/harness/policy.yaml`。
+现有 `tests/test_ecommerce_ad_workflow_skill.py`、`tests/test_production_ad_creative.py`、`tests/test_shot_readiness_gate.py`、`tests/test_production_review.py` 和 `tests/test_production_base_ai_comic_e2e.py` 继续验证boundary foundation。Current Gate 1 test必须与`tests/test_production_review.py`合跑，并按changed-path policy执行exact-snapshot verification。
 
 ### Must Not Create Or Modify For This Architecture
 
-- any `src/ai_video/**` Runtime file in this slice；
+- 除`src/ai_video/production/quality_gate_coordinator.py`外的`src/ai_video/**` Runtime file；
 - any second canonical quality-gate architecture spec或未登记的parallel docs-contract surface；
 - a second Manifest or state directory；
 - a second timeline/composition engine；
@@ -407,8 +440,13 @@ Domain Skill 不执行 Runtime review，不持久化 Production verdict；它只
 ### Universal Gate Regression
 
 - existing hard media/timeline/audio/caption/render validators仍阻塞 invalid artifacts；
-- future selected Universal profile定义applicable minimum，且`QaPolicy.required_layers`缺少其任一
+- selected Universal profile定义applicable minimum，且`QaPolicy.required_layers`缺少其任一
   required review layer时必须在Gate 2前fail closed；
+- 已实例化profile若经`model_copy()`或其他unchecked path篡改，coordinator必须在任何runner
+  effect前strict reopen并返回`NOT_EVALUATED`；
+- Gate 1 result必须绑定profile、context，以及selected / context-expected QaPolicy content
+  hashes；invalid declared hash必须返回`NOT_EVALUATED`，不得令错误路径自身抛错。continuity runner必须收到
+  exact stable requirement IDs；
 - P6 required `FAIL`、`NOT_EVALUATED`、missing 或 stale receipt仍阻塞 Final Acceptance；
 - exact graph/render/output/timeline/policy/evidence identity仍被重新验证；
 - repair后必须 fresh review；replay不得重复 analyzer/committer side effects。
@@ -441,20 +479,18 @@ Domain Skill 不执行 Runtime review，不持久化 Production verdict；它只
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python -m pytest -p no:cacheprovider \
-  tests/test_ecommerce_ad_workflow_skill.py \
-  tests/test_production_ad_creative.py \
-  tests/test_shot_readiness_gate.py \
+  tests/test_production_quality_gate_coordinator.py \
   tests/test_production_review.py \
-  tests/test_production_base_ai_comic_e2e.py -q
+  -q
 python -m scripts.docs_contract_gate check
 python -m scripts.agent_harness policy-audit
 ```
 
 最终必须执行 changed-path policy要求；若修改 executable tests/tooling，按 policy 对 exact staged snapshot 或 exact commit range 生成 fresh passing Harness receipt。所有测试默认 offline、fake/local、no-provider。
 
-## Execution Sequence
+## Boundary Foundation Execution Sequence — Completed
 
-以下 milestones 属于同一个可独立验收 slice，不是多个 implementation slices。
+以下milestones属于已完成的original docs/tests boundary foundation，不是current Runtime slice。
 
 ### Milestone 1 — Canonical Ownership Text
 
@@ -466,30 +502,35 @@ python -m scripts.agent_harness policy-audit
 
 - 加入/加强focused tests，证明`ShotReadinessGate.READY`、`AdQCReport.ready`和`AdCreativeReviewReport.is_ready`的current output schemas不直接编码P6/Final Acceptance，且没有canonical bridge；不得把这项evidence扩大为generic `SEMANTIC` payload已经具备domain/rubric/coverage enforcement；
 - 保持 current Final Acceptance、candidate activation、timeline和 Manifest owner不变；
-- 不新增 source/runtime contract，只验证 current boundary。
+- 该historical milestone不新增source/runtime contract，只验证当时的current boundary。
 
 ### Milestone 3 — Exact-Snapshot Verification
 
 - 运行 focused offline tests、Documentation Contract Gate和policy audit；
 - 按 changed-path policy验证 exact staged snapshot或 exact commit range；
-- 确认 diff只有 task-owned docs/tests，无 Runtime schema或artifact变化。
+- 确认original foundation diff只有task-owned docs/tests，无Runtime schema或artifact变化。
 
 Convergence criteria：tests、contract matrix、baseline、roadmap和 Ecommerce skill文档对上述 owner/边界只有一套表述；current Runtime behavior和 artifact hashes保持不变。
 
-## Future Follow-Ups — Non-Authorizing
+## Gate 1-Only Runtime Execution Sequence
+
+1. RED：profile tamper、minimum/policy coverage、stale/unknown stop与identity binding tests先失败；
+2. GREEN：新增single-owner coordinator并只复用injected owner check callables；
+3. Review：`reviewer_xhigh`检查minimum bypass、owner duplication与overclaim；
+4. Verification：focused tests后，对exact staged/commit-range snapshot运行policy-required Harness；
+5. Delivery：只声明Gate 1 explicit orchestration，不声明Gate 2、two-stage durable acceptance或
+   automatic Final Acceptance。
+
+## Remaining Future Follow-Ups — Non-Authorizing
 
 以下只是 sequencing direction，均不属于本 plan 的 executable scope：
 
-1. Universal one-shot orchestration：显式caller先验证preselected Universal profile的applicable
-   minimum，并要求`QaPolicy.required_layers`完整覆盖其required review layers；缺profile或coverage
-   不完整立即STOP。只有coverage成立后才运行Gate 1 checks；`FAIL`、`NOT_EVALUATED`、stale或
-   unknown outcome同样STOP，不watch filesystem、不自动repair、activate或Final Acceptance。
-2. Runtime-facing typed Domain profile/evidence seam：支持exact preselected profile、rubric、stable
+1. Runtime-facing typed Domain profile/evidence seam：支持exact preselected profile、rubric、stable
    requirement IDs、authoring-truth hash与complete target coverage；没有selected applicable profile时
    Gate 2 fail closed，不默认选择Ecommerce、Drama或AI Comic。
-3. Two-stage one-shot coordinator：按Gate 1 -> exactly one Gate 2顺序执行，只返回
+2. Two-stage one-shot coordinator：按Gate 1 -> exactly one Gate 2顺序执行，只返回
    `eligible_for_final_acceptance`；第一版不自动调用`record_final_acceptance()`。
-4. Concrete Domain profiles：Ecommerce、Drama、AI Comic分别由自己的accepted workflow/spec与
+3. Concrete Domain profiles：Ecommerce、Drama、AI Comic分别由自己的accepted workflow/spec与
    implementation plan接入同一Gate 2 seam，rubric不可互换，任何一个profile都不得成为第二
    Manifest/P6/Final Acceptance owner。
 
@@ -517,8 +558,9 @@ Convergence criteria：tests、contract matrix、baseline、roadmap和 Ecommerce
 - `AdQCReport.ready`、`AdCreativeReviewReport.is_ready`、`ShotReadinessGate.READY`均有executable evidence证明current outputs不直接编码P6/Final Acceptance；current generic `SEMANTIC` envelope的domain/rubric/coverage gap已明确记录并留给future Runtime seam；
 - Production continuity与 narrative continuity owner分开；
 - score只允许作为 advisory evidence，required `FAIL`/`NOT_EVALUATED`不可被抵消；
-- 本 slice无 Production Runtime schema/artifact hash变化；
-- schema migration、data migration和old path retirement均为 `none`；rollback只涉及 exact task-owned docs/tests；
+- Existing persisted Production schema/artifact hash无变化；
+- schema migration、data migration和old path retirement均为`none`；rollback只涉及新增
+  coordinator/test与exact task-owned spec/plan changes；
 - policy-required docs/tests/Harness checks对 exact snapshot或commit range通过。
 
 ## Stop Conditions
@@ -535,7 +577,7 @@ Convergence criteria：tests、contract matrix、baseline、roadmap和 Ecommerce
 
 ## Delivery Boundary
 
-完成本Spec/plan同步只表示two-gate architecture、ownership、trigger semantics与implementation
-sequencing已稳定，boundary contract foundation已实现。它不表示two-stage Product Runtime
-orchestration、typed Domain Gate、Ecommerce media acceptance、Drama/AI Comic QC或automatic
-Final Acceptance已存在，也不表示任何项目、Shot、广告或剧集通过P6、Final Acceptance或市场验证。
+完成current slice只表示Gate 1的显式、非持久化one-shot orchestration已实现并通过exact
+verification。它不表示product-level background automation、two-stage Runtime orchestration、
+typed Domain Gate、Ecommerce media acceptance、Drama/AI Comic QC或automatic Final Acceptance
+已存在，也不表示任何项目、Shot、广告或剧集通过P6、Final Acceptance或市场验证。
