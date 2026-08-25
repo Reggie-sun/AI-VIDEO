@@ -31,6 +31,7 @@ from ai_video.production.video_artifact import (
     VideoProbeReceipt,
     invoke_generated_commercial_shot_reviewer,
     validate_generated_commercial_shot_evidence,
+    validate_generated_commercial_shot_intent,
 )
 
 from test_production_video import (
@@ -43,7 +44,7 @@ from test_production_video import (
 
 POLICY_HASH = "a" * 64
 EVALUATOR = ToolIdentity(name="commercial-shot-evaluator", version="1")
-PROFILE_HASH = "b" * 64
+PROFILE_HASH = "c" * 64
 
 
 def _commercial_request():
@@ -113,7 +114,6 @@ def test_commercial_evidence_binds_exact_request_mp4_policy_and_authority() -> N
         )
         == evidence
     )
-
     changed = measured.model_copy(update={"artifact_sha256": "f" * 64})
     with pytest.raises(AiVideoError) as replaced:
         validate_generated_commercial_shot_evidence(
@@ -136,6 +136,25 @@ def test_commercial_evidence_binds_exact_request_mp4_policy_and_authority() -> N
             require_pass=True,
         )
     assert unauthorized.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+
+
+def test_commercial_intent_rejects_evaluator_profile_drift() -> None:
+    request = _commercial_request()
+    _, measured = _measured(request, b"commercial-video")
+    changed = _intent(request, measured).model_copy(
+        update={"evaluator_profile_content_hash": "f" * 64}
+    )
+
+    with pytest.raises(AiVideoError) as rejected:
+        validate_generated_commercial_shot_intent(
+            changed,
+            request=request,
+            measured=measured,
+            policy_content_hash=POLICY_HASH,
+            authorities=(EVALUATOR,),
+        )
+
+    assert rejected.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
 
 
 @pytest.mark.parametrize("verdict", (QaVerdict.FAIL, QaVerdict.NOT_EVALUATED))

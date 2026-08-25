@@ -425,6 +425,7 @@ def validate_generated_commercial_shot_intent(
         or intent.measured_metadata_hash != canonical_sha256(measured)
         or intent.qa_policy_content_hash != policy_content_hash
         or intent.evaluator not in authorities
+        or intent.evaluator_profile_content_hash != binding.profile_content_hash
     ):
         raise AiVideoError(
             code=ErrorCode.REVIEW_EVIDENCE_INVALID,
