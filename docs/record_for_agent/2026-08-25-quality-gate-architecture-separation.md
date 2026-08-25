@@ -13,10 +13,17 @@ Date: 2026-08-25
 当前选择的architecture是：
 
 ```text
-Universal Production QA
-  + Domain-specific Acceptance Gate
-  -> existing P6 Review / Repair / Final Acceptance lifecycle
+Gate 1: Universal Production QA
+  -> Gate 2: Domain-Specific Acceptance
+       -> exactly one selected Domain profile
+  -> existing P6 Review / Repair lifecycle
+  -> Final Acceptance rollup
 ```
+
+以上是accepted target architecture，不是current automatic Runtime flow。只有两个top-level
+post-media gates；Ecommerce、Drama、AI Comic与future domains是Gate 2 profiles，Final Acceptance
+是explicit durable rollup而不是第三个evaluator gate。`ShotReadinessGate`、Ecommerce G0-G7与
+`AdCreativeReviewReport`仍是preflight，均不属于这两个post-media gates。
 
 - Existing Registry、media/candidate validators、`ResolvedTimeline`、composition/render、audio/caption owners继续负责universal hard correctness。
 - P6 `TECHNICAL`、`LAYOUT`、`STRATEGY`、`SEMANTIC`继续是policy-selected review envelopes；`FINAL_ACCEPTANCE`只由`ProductionStateCommitter.record_final_acceptance()`汇总exact fresh required receipts。
@@ -46,6 +53,28 @@ docs: separate domain quality gate ownership
 没有修改`src/ai_video/**`、Manifest/schema、`QaLayer`、review artifacts、candidate activation、timeline、renderer、Provider或paid/cloud path。`tests/test_production_ad_creative.py`及commercial source preparation的pre-existing/concurrent changes均未stage或commit。
 
 Independent `reviewer_xhigh`首次verdict为`reject`，指出两个真实问题：plan仍写implementation未开始，以及“authoring outputs绝对不能成为P6 evidence”超出current generic `SEMANTIC` contract能证明的范围。修正Status、plan claims、runtime baseline与test命名后，scoped re-review为`accept with concerns`；唯一concern是必须取得exact commit-range Harness proof。
+
+### Two-Gate Spec Amendment
+
+后续architecture clarification已提交：
+
+```text
+1ab95e4de9e1740cb2fce0ad41344c9fcd5da8f7
+docs: define two-stage quality gate contract
+```
+
+该commit只包含4个task-owned documentation/control-plane files：
+
+- 新增canonical accepted spec：`docs/superpowers/specs/2026-08-25-ai-video-quality-gate-architecture-separation.md`；
+- 更新implementation plan：`docs/superpowers/plans/2026-08-25-ai-video-quality-gate-architecture-separation.md`；
+- 在`docs/superpowers/specs/2026-08-21-ai-video-shot-readiness-gate-v3.md`明确Shot Readiness属于pre-submit、位于两个post-media gates之外；
+- 在`.agent/harness/docs-contracts.yaml`注册canonical surface及spec-targeted assertions。
+
+Amendment固定只有两个top-level post-media quality gates：Gate 1 `Universal Production QA`与Gate 2 `Domain-Specific Acceptance`。Ecommerce、Drama、AI Comic与future domains是Gate 2 profiles；`Final Acceptance`是explicit durable rollup，不是第三个quality evaluator gate。Current owner APIs中的hard validators只在对应显式action内自动执行，当前没有product-level automatic coordinator。Target coordinator仍须显式调用，按Gate 1再exactly one Gate 2 profile的顺序执行；不得background/watch、自动repair、自动activation、自动`Final Acceptance`或profile fallback。
+
+Future coordinator还必须使用preselected、content-addressed Universal profile，并验证`QaPolicy.required_layers`覆盖applicable universal minimum；缺失、无效或coverage不完整时必须在任何Gate 2 effect前fail closed。该约束是target contract，current Runtime尚未强制。
+
+本次`reviewer_xhigh`首次re-review为`reject`：plan中的domain headings仍可能被读成额外top-level gates，且future selected `QaPolicy`可以省略universal minimum。修正profile terminology、two-gate assertions与Universal profile coverage约束后，scoped re-review verdict为`accept`，无blocking或non-blocking concerns。
 
 ## Verification And Evidence
 
@@ -80,6 +109,21 @@ Exact immutable commit-range receipt：
 
 同样PASS：Harness tests `184 passed`、Production contracts `2650 passed, 3 skipped, 1003 deselected`、CLI/config `13 passed`、Production review `583 passed`、Ecommerce skill `63 passed`、Architecture Gate PASS。Post-run verifier确认`artifact_integrity=true`、`complete_completion_proof=true`、`inspection_matches=true`、`policy_matches=true`、`scope_paths_match=true`与`snapshot_matches=true`。
 
+Two-gate amendment的exact immutable commit-range receipt：
+
+```text
+.agent/harness/runs/quality-gate-two-stage-spec-commit-1ab95e4-v1/receipt.json
+```
+
+该run针对exact range：
+
+```text
+fd163be12db3a0b1ad500d20c9512380952fff5f..
+1ab95e4de9e1740cb2fce0ad41344c9fcd5da8f7
+```
+
+结果PASS：Documentation Contract Gate与policy audit通过，Harness tests `184 passed`。Receipt verifier确认`artifact_integrity=true`、`complete_completion_proof=true`、`fresh=true`、`fresh_for_snapshot=true`、`scope_paths_match=true`、`snapshot_matches=true`与`cleanup_verified=true`。
+
 ## Concurrent Workspace Divergence
 
 在`3914044`提交并完成immutable commit-range Harness期间，另一个writer继续修改了：
@@ -93,15 +137,18 @@ Exact immutable commit-range receipt：
 ## Remaining Risks Or Next Work
 
 - Future Ecommerce post-media acceptance若要进入P6，必须另建active spec/plan，增加preselected content-addressed domain profile、rubric/version、stable requirement IDs、sealed authoring-truth hash binding、exact target/coverage与required `FAIL` / `NOT_EVALUATED` fail-closed aggregation。
+- Future Universal one-shot coordinator必须先建立content-addressed Universal profile，并把applicable universal minimum与selected `QaPolicy.required_layers`做fail-closed coverage校验；current Runtime尚无该coordinator或coverage enforcement。
 - Future Drama adapter必须等formal Drama workflow、authoring artifact与rubric被独立接受；不得复用Ecommerce rubric或physical continuity冒充narrative continuity。
 - 当前generic `SEMANTIC` envelope仍可能接受policy-authorized `semantic_match`，所以本slice只证明authoring outputs不直接编码Production acceptance及当前无canonical bridge，不证明typed misuse prevention已实现。
 - Current working tree的post-commit same-file divergence需要其owner自行完成、commit或清理；不得为刷新本receipt而覆盖或暂存该work。
-- `3914044`仅存在于local `main`，未push、未release、未publish；本session没有live/paid/Provider/media call。
+- `1ab95e4`仅存在于local `main`，未push、未release、未publish；本session没有live/paid/Provider/media call。
 - 本轮`retrieve-ai-video-memory --scope all`返回fresh current-contract hits与stale last-good Superpowers fragments，并只排队local derived-index refresh；retrieval是advisory，不属于Runtime或acceptance evidence。
 
 ## Agent Guardrails
 
 - `ShotReadinessGate.READY`不等于post-media quality、P6、activation或Final Acceptance。
+- Ecommerce、Drama、AI Comic与future domains只能作为Gate 2 profiles，不得升级为额外top-level gates或并行canonical owners。
+- `Final Acceptance`是两个Gate之后的explicit durable rollup，不得描述或实现为第三个quality evaluator gate。
 - `AdQCReport.ready`不等于whole-ad media acceptance；`AdCreativeReviewReport.is_ready`不等于Production verdict。
 - Base AI Comic selected-policy closure不等于Drama QC。
 - Domain Skill只能提出authoring artifacts、rubric/requirements或future evidence proposals；不得写Manifest、创建Production receipt或签发Final Acceptance。
