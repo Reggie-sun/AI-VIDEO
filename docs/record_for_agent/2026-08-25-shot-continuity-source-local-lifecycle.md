@@ -2,6 +2,12 @@
 
 Date: 2026-08-25
 
+> **Superseded current-facing status (2026-08-25):** 本记录的offline lifecycle与
+> no-resubmit结论继续有效，但fresh v7、non-test operator、profile reseal与唯一Local
+> A2→A3 attempt已完成。该attempt成功fetch exact MP4，却因frames 107→108明显跳变而未通过
+> frozen boundary/motion gate；没有P6、activation或M0 effect。见
+> `2026-08-25-shot-continuity-source-live-attempt.md`。
+
 ## Purpose
 
 本文记录 rainy-station A2→A3 upstream source qualification 的同一 Provider local

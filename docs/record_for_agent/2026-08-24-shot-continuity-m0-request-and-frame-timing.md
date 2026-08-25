@@ -3,11 +3,10 @@
 Date: 2026-08-24
 
 > **Superseded current-facing status (2026-08-25):** qualification-only source
-> Provider 已在 `50de0c0` 补齐 canonical local status/fetch lifecycle、pre-effect
-> identity seals 与 terminal bad-output durable failure。下文关于 M0 seed、frame timing、
-> accepted source、P6 与 motion-tail 的 gates 仍有效；尚无 live source MP4，M0 effect
-> 仍为零。当前 source checkpoint 见
-> `2026-08-25-shot-continuity-source-local-lifecycle.md`。
+> lifecycle、fresh bundle、non-test operator、profile reseal与唯一Local A2→A3 attempt均已
+> 完成。Exact MP4已fetch，但frames 107→108发生明显跳变，未通过frozen boundary/motion
+> gate；下文关于accepted source、P6与motion-tail的gates仍有效，M0 effect仍为零。见
+> `2026-08-25-shot-continuity-source-live-attempt.md`。
 
 ## Purpose
 

@@ -18,6 +18,14 @@ P0 已实现为 Manifest `2.11` 的 qualification-prepared pointer、truthful au
 immutable stack/policy/validation/input artifacts与 exact recovery；该授权和状态不扩展到 M0/M1 generation、
 winner selection、capability activation、P6 verdict、push或release。
 
+Execution checkpoint (2026-08-25): fresh v7 bundle已通过current preparation/materialization seam重建并
+reseal，且qualification-only non-test source operator完成review、commit-range Harness与zero-effect live
+preflight。用户授权的唯一A2→A3 Local FL2VA attempt完成`submit/poll/fetch = 1/1/1`，但exact MP4在
+frames 107→108出现可复现的构图/时空跳变，随后tail近静止，违反frozen no-cut/no-teleport/continuing-gait
+hard gate。该source output保持fetched/validate、未形成accepted candidate或P6 verdict；没有retry、fallback、
+activation或M0 effect。Current exact evidence见runtime baseline与
+`docs/record_for_agent/2026-08-25-shot-continuity-source-live-attempt.md`。
+
 已接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
 Implementation lane与Validation lane。Validation必须绑定immutable checkpoint，不得在同一次attempt期间
 读取正在变化的source/workflow/profile；并行执行不会放宽Provider、permit、P6或same-file ownership gates。
@@ -409,6 +417,10 @@ Frozen video prompt使用 OpenVideo/H3 official three-field structure和显式 c
 subject/wardrobe/action、camera type/amplitude/speed、physical soundscape与无配乐选择；普通 prose或 prompt-only
 identity不能替代 exact four anchors。
 
+Status update (2026-08-25): current v7已物化并reseal source/M0 stacks，source preflight与唯一local
+A2→A3 attempt均已执行。Technical fetch成功，但source boundary/motion hard gate失败，因此accepted upstream
+source、terminal/motion-tail derivation、M0 submit与Join Gate J1仍保持blocked；不得重用该授权换seed或重试。
+
 ### Phase P1 — Qualification and Safe Implementation in Parallel
 
 P0 persistence checkpoint完成后先推进candidate-neutral I1；V1仍受materialization gate阻断：
@@ -594,6 +606,10 @@ Current evidence: P0 receipt
 与`4d08741636647fbb29f9cf69a69a2c81d62156cef128f619d26a17b72e94c01b`。M1 Hybrid component使用显式
 `presence=absent`与`content_hash=none`；这些identity只证明P0 candidate contract已准备，不证明真实
 profile/compiler/workflow已物化或可执行。Exact paths与dynamic status仍以Production Manifest/runtime baseline为准。
+
+Execution update (2026-08-25): 上述2026-08-23 hashes保留为historical checkpoint。Current v7
+materialized identities与single source-attempt evidence由runtime baseline和session record拥有；source output因
+frame 107→108 discontinuity未获acceptance，故Milestone 4 M0尚未开始，M1 conditional gate也未触发。
 
 ## Milestone 4: Execute M0, Then Conditional M1
 

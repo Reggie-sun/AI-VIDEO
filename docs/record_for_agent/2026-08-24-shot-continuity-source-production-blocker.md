@@ -3,12 +3,11 @@
 Date: 2026-08-24
 
 > **Superseded current-facing status (2026-08-25):** 本记录中的 `ZERO submit`
-> 与 historical v6 bundle 事实仍有效，但当时的 graph、Shot identity/role、candidate
-> closure 与 submit-only Provider lifecycle implementation blockers 已由后续 offline
-> commits（含 `34f38ed` 与 `50de0c0`）关闭。当前下一 gate 是 fresh executable
-> bundle、non-test operator/request wiring 与单次 local-live authorization；详见
-> `2026-08-25-shot-continuity-source-local-lifecycle.md`。这不改变本记录的历史
-> zero-effect 证据，也不表示已生成 source MP4、通过 P6 或允许 M0 submit。
+> 与 historical v6 bundle 事实仍有效，但当时的graph、Shot identity/role、candidate
+> closure、Provider lifecycle、fresh bundle与non-test operator blockers均已关闭。唯一Local
+> A2→A3 attempt随后成功fetch exact MP4，但因frames 107→108明显跳变未通过frozen
+> boundary/motion gate；没有P6、activation或M0 effect。见
+> `2026-08-25-shot-continuity-source-live-attempt.md`。
 
 ## Purpose
 
