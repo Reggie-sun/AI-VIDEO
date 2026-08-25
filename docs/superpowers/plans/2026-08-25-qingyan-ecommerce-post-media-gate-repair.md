@@ -1,126 +1,170 @@
 # Qingyan Ecommerce Post-Media Gate Repair Plan
 
-> **Implementation mode:** 本文只定义修复边界、契约、任务顺序与验收方法；本轮不修改 Runtime、不提交 Provider 请求、不生成媒体。实施者应按 milestone 顺序执行，并在每个 milestone 完成 RED/GREEN verification 后再进入下一阶段。
+**Goal:** 补齐青颜广告从 generated Shot candidate 到 whole-ad Final Acceptance 的 post-media 质量闭环，使失败镜头不能被继续生成、静帧替代或手工拼接掩盖。
 
-## Goal
+**Scope:** Generated Shot commercial review、逐 Shot 同步 stop barrier、Whole-ad Ecommerce Gate 2、P6 `SEMANTIC` evidence bridge、canonical composition/render handoff，以及两阶段真实媒体 pilot。
 
-修复青颜广告链路中“前置 authoring Gate 很强，但最终视频反而更差”的结构性问题：让每个生成 Shot 在下一次 Provider submit 前接受真实媒体检查，让整片在 Universal QA 之后接受 Ecommerce 专属 Gate 2，并保证最终候选只能由 `AdCreativePlan -> CompositionSpec -> ResolvedTimeline -> HyperFrames` 的 canonical path 产生。
+**Contract Surfaces:** `CompiledAdCreativeHandoff`、`ResolvedVideoGenerationRequest`、`VideoGenerationService.validate_once()`、video candidate lifecycle、`QaPolicy`、`ReviewEvidence`/`ReviewReceipt`、`UniversalQaGateResult`、`CompositionSpec`、`ResolvedTimeline`、HyperFrames、`ProductionStateCommitter`。
 
-目标成片为 25–30 秒、9:16、动态视频优先的抖音信息流广告。苗家女孩是主角，但不是唯一人物；必须有老人和女孩的有效互动与推荐话语，产品在合适 Shot 中由人物持有或使用，并保持黄色盒体、黄色瓶身标签、白色瓶盖、瓶型与盒型的一致性。全片必须具备连贯广告弧、可听懂的产品推荐、明确 CTA、人物连续性和可验证的产品包装一致性。
+**Invariants:** `ProductionStateCommitter` 仍是唯一 durable writer；`ResolvedTimeline` 仍是唯一 timing owner；HyperFrames 仍是 default renderer；Gate 不选择 Provider、不自动 retry/repair/activate；任一 required `FAIL`/`NOT_EVALUATED`/stale/unknown outcome 均 fail closed；Final Acceptance 仍只能由 existing P6 lifecycle 产生。
 
-## Problem Statement
+**Current / Target Behavior:** 当前 authoring 和 deterministic handoff 很强，但真实 Shot MP4、整片语义与手工成片旁路未被同一生命周期约束。目标行为是：exact commercial requirements 进入生成请求；candidate validation 持久化并裁决 post-media evidence；只有 PASS Shot 才能激活且允许下一 Shot；whole-ad Gate 2 通过 existing P6 `SEMANTIC` evidence/receipt 进入 Final Acceptance。
 
-当前失败不是“前置 Gate 不够多”，而是 Gate 与真实媒体之间存在三处断裂：
+**Compatibility:** 现有非 Ecommerce 请求、Legacy `0.1.x`、非 commercial video attempts、旧 `QaPolicy` 和既有 Manifest 必须保持可读可执行。新增 commercial candidate checkpoint 采用 additive schema migration；不得原地猜测或改写旧 evidence。
 
-1. `AdCreativePlan`、authoring G0–G7 与 `AdCreativeReviewReport` 只能证明离线创意合同和 deterministic projection；它们不能证明生成后的 MP4 中真的有人物、老人、产品、动作、口播和包装一致性。
-2. 当前逐镜头检查不是 Provider submit 之间的同步阻断条件。一个 Shot 失败后，后续生成仍可能继续；失败动态镜头还可能在后期被静帧、freeze、zoom 或无对白 BGM 替换，导致“技术上完成、观感上退化”。
-3. 当前青颜 T8 成片通过手工 FFmpeg 脚本拼接，绕过 canonical `CompositionSpec -> ResolvedTimeline -> HyperFrames`、P6 与 Final Acceptance。该脚本丢弃原生音频、使用 `anullsrc`，并把大量静帧或 clone freeze 当作视频时长。
+**Out of Scope:** 新 Provider、新 CLI、新 dependency、第二 Manifest writer、第二 timeline/renderer、自动批量 retry、自动 Final Acceptance、市场效果预测，以及本计划修订阶段的任何 Provider 调用或媒体生成。
 
-因此，修复的 single owner 不是 authoring Skill，而是 Production Runtime 中新的 Ecommerce post-media acceptance boundary。它只判断和编排，不获取第二套 timeline、不选择第二个 renderer、不写第二份 lifecycle state。
+**Acceptance Criteria:** Negative artifact 能稳定被 requirement-level evidence 拒绝；每个 failed/unreviewed Shot 阻止后续 submit；Gate 2 的 PASS 被 exact P6 semantic receipt 持久化；canonical render provenance 完整；真实 pilot 经人工 A/B 后才允许扩 batch。
+
+**Verification:** Focused pytest、schema/compatibility tests、Documentation Contract Gate、Architecture Gate、Harness exact staged/commit-range receipt，以及 normal-speed human media review。
+
+## Revision Decisions
+
+本修订版相对初稿锁定四项结构性决定：
+
+1. 不创建平行于 P6 的第二套 durable whole-ad evidence lifecycle。Gate 2 的结果必须投影为 existing `ReviewEvidence(layer=QaLayer.SEMANTIC)`，并由 `ProductionStateCommitter.begin_review()`、`run_review_analysis()`、`record_review_receipt()` 与 `record_final_acceptance()` 管理。
+2. Generated Shot commercial review 复用 `VideoGenerationService.validate_once() -> ProductionStateCommitter.prepare_video_activation_candidate()` seam，并仿照现有 `checkpoint_generated_shot_continuity()` 建立 sibling durable checkpoint。它发生在 candidate activation 前，不在 Provider adapter、FFmpeg 脚本或后置批处理里补审。
+3. `composition.py` 和 `hyperframes.py` 不作为默认修改目标。现有 `compile_ad_creative_handoff() -> CompositionSpec -> resolve_composition() -> HyperFramesAdapter.render()` 已是 canonical path；本修复通过 coordinator 和 integration tests 消费它们。只有 RED test 证明现有 public contract 无法绑定 accepted Shot bytes 时，才另立 scoped change。
+4. 不使用未经校准的全片 optical-flow 总分或任意 freeze 秒数作为 universal quality truth。Technical motion 复用 existing `frozen_required_motion`、window strategy 和 frame diversity；人物互动、动作完成、包装一致性与广告连贯性由 requirement-level evaluator/human evidence 判断。
+
+## Problem Boundary
+
+前置 `ecommerce-ad-workflow` G0–G7、`AdQCReport.ready` 和 `AdCreativeReviewReport.is_ready` 只证明 authoring readiness 与 sealed handoff integrity，不能证明生成后 MP4 中真的存在：
+
+- 苗家女孩与老人有效互动。
+- 老人自然推荐产品、女孩承接卖点和 CTA。
+- 产品在计划时间窗出现且包装一致。
+- 手持/使用动作没有 extra hands、穿模、flat overlay 或错误瓶型。
+- required-motion Shot 真实运动而非静帧、clone freeze 或无意义 zoom。
+- 全片按照问题—推荐—使用—效果—CTA 的广告弧连贯播放。
+
+当前 P6 `SEMANTIC` 只要求 generic `semantic_match`，还不能 type-enforce exact Ecommerce profile、requirements 与 coverage。因此 single repair boundary 是：
+
+```text
+authoring truth
+  -> generated candidate commercial evidence
+  -> canonical accepted Shot set
+  -> canonical render
+  -> Universal Gate 1
+  -> Ecommerce Gate 2
+  -> existing P6 SEMANTIC receipt
+  -> existing Final Acceptance
+```
 
 ## Evidence Baselines
 
-以下两个本地文件只用于本轮人工 A/B 与回归分析，不得成为单元测试、Runtime 配置或发布流程的硬编码依赖：
+以下文件只用于人工 A/B，不得硬编码到 Runtime、tests 或 policy：
 
-- Positive comparison baseline: `/home/reggie/电商图片/青颜/青颜视频_20260825_miaozu/青颜_苗家女孩与老人_30s连续口播广告_candidate.mp4`
-- Negative regression artifact: `/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/final/青颜_苗家女孩T8动态广告_28s_9x16.mp4`
+- Positive comparison: `/home/reggie/电商图片/青颜/青颜视频_20260825_miaozu/青颜_苗家女孩与老人_30s连续口播广告_candidate.mp4`
+- Negative regression: `/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/final/青颜_苗家女孩T8动态广告_28s_9x16.mp4`
 
-Positive baseline 不是自动 PASS 的 golden artifact。它只代表当前人类偏好的相对方向，仍需逐 requirement 评估包装、互动、claim 与连续性。Negative artifact 应稳定暴露至少以下失败：缺少老人互动、缺少连续产品推荐口播、产品使用镜头未进入成片、静帧或 freeze 比例过高、手工 render provenance 不完整。
+Positive comparison 不是 golden PASS。它仍可能在包装小字、claim、lip-sync 或连续性上得到 `FAIL`/`NOT_EVALUATED`。Negative regression 必须至少暴露：老人互动缺失、产品推荐口播缺失、required product-use beat 未进入成片、大量静态替代，以及缺少 canonical render/P6 binding。
 
-## Scope
+## Target Ownership
 
-### In Scope
-
-- Generated Shot video 的 post-media Ecommerce requirement evaluation。
-- Provider submit 之间的同步 stop barrier。
-- Whole-ad Ecommerce Gate 2，位于 Universal QA Gate 1 之后、P6/final acceptance 之前。
-- Ecommerce acceptance profile、stable requirement IDs、exact evidence coverage 与 content-addressed binding。
-- Canonical composition、audio/captions、timeline 与 HyperFrames render handoff。
-- 青颜 profile 的人物、老人互动、产品出现时点、包装一致性、广告语、CTA、动态覆盖和人物连续性要求。
-- Focused tests、Harness policy routing、canonical docs 和一个真实 25–30 秒 pilot 的人工 A/B。
-
-### Out of Scope
-
-- 新 Provider、新模型或 Provider selection path。
-- 新 CLI、新 runtime dependency、新 Manifest writer 或自动 repair/retry。
-- 自动激活 candidate、自动推进 P6、自动 Final Acceptance。
-- 用一个 aggregate quality score 代替 requirement-level verdict。
-- 把 `ecommerce-ad-workflow` G0–G7 扩成媒体验收系统。
-- 把 external Skill、FFmpeg 拼接脚本或本地 artifact 目录变成 production truth。
-- 本计划阶段的任何 paid/remote submit 或媒体生成。
-
-## Ownership and Invariants
-
-| Concern | Owner after repair | Invariant |
+| Concern | Canonical owner | Repair rule |
 | --- | --- | --- |
-| Creative/product/copy intent | `AdCreativePlan` + Ecommerce authoring package | Authoring readiness 不能冒充媒体质量通过 |
-| Generated Shot acceptance | Ecommerce post-media evaluator | Pure、exact-input-bound、requirement-level |
-| Gate ordering | Ecommerce quality coordinator | Gate 1 必须先 PASS/current，Gate 2 才可执行 |
-| Submit sequencing | Ecommerce ad execution orchestrator | Shot N 未 PASS 前不得 submit Shot N+1 |
-| Timing/order/frame/sample | `ResolvedTimeline` | 任何 Gate 或 execution helper 不得重算 timeline |
-| Render | HyperFrames adapter | 不允许手工 FFmpeg 形成第二条 final path |
-| Durable state/P6/activation/recovery | `ProductionStateCommitter` | 新模块不得直接写 Manifest 或 active pointer |
-| Provider lifecycle | Existing Provider router/service | 不 blind retry、不 remint permit、不绕过 budget/egress/provenance |
-| Final human quality judgment | Existing P6/Final Acceptance lifecycle | Domain Gate PASS 不等于人类 watchability PASS |
+| Product/claim/copy intent | Ecommerce authoring package + `AdCreativePlan` | 不扩展为 media verdict |
+| Commercial Shot requirements | `CommercialExecutionProjection` + sealed acceptance profile | 绑定 exact plan/projection/Shot |
+| Generated candidate validation | Existing video candidate lifecycle | 新 commercial checkpoint 是 sibling helper，不是新 writer |
+| Whole-ad hard/universal checks | `UniversalQualityGateCoordinator` | Gate 1 PASS/current 才能进入 Gate 2 |
+| Whole-ad Ecommerce adjudication | Pure Ecommerce Gate 2 | 逐 requirement 输出，不持久化 state |
+| Durable semantic receipt | Existing P6 review lifecycle | Gate 2 evidence进入 `QaLayer.SEMANTIC` |
+| Composition/timing/render | `CompositionSpec` / `ResolvedTimeline` / HyperFrames | 不新增旁路 |
+| Activation/final acceptance | `ProductionStateCommitter` | 只有 existing committer 可写 |
 
-Unchanged public contracts：Legacy `0.1.x` CLI、Provider routing、Budget Guard、Cloud Egress、one-use permit、Registry、Dependency Graph、P4 audio/caption ownership、P6 lifecycle 与 HyperFrames default renderer 全部保持不变。
+## File Map
 
-## Target Architecture
+### New focused modules
 
-```text
-AdCreativePlan + Product Truth + Claim Ledger
-  -> compile_ad_creative_handoff
-  -> sequential Shot execution
-       -> existing Provider submit/fetch once
-       -> bind exact generated MP4 bytes
-       -> Shot post-media Ecommerce requirements
-       -> PASS: next Shot is eligible
-       -> FAIL / NOT_EVALUATED: stop, zero later submits
-  -> accepted Shot set only
-  -> CompositionSpec
-  -> ResolvedTimeline
-  -> HyperFrames candidate render
-  -> Universal QA Gate 1
-  -> Ecommerce Whole-Ad Gate 2
-  -> eligible for existing P6 / ProductionStateCommitter
-  -> human Final Acceptance
-```
+- `src/ai_video/production/domain_acceptance.py`
+  - 定义 generic `DomainAcceptancePolicy`，供 `QaPolicy` 绑定 exact domain/profile/required requirement IDs/evidence contract。
+  - 不包含 Ecommerce 业务判断，不写 state。
+- `src/ai_video/production/ecommerce_media_acceptance.py`
+  - 定义 sealed Ecommerce profile、Shot/whole-ad requirement、finding、evidence payload 与 pure adjudication。
+  - 不调用 Provider、renderer、committer 或 filesystem。
+- `src/ai_video/production/_state_commit_video_commercial.py`
+  - 仿照 `_state_commit_video_continuity.py`，在 held generated-video FD 上建立 durable intent/evidence checkpoint，并返回 exact reopened evidence。
+  - 只由 existing video candidate mixin 调用，不形成 public writer。
+- `src/ai_video/production/ecommerce_quality_gate.py`
+  - 实现 explicit Gate 2 coordinator；消费 current Gate 1 result、sealed profile、exact render context 与 requirement evidence。
+  - 输出 typed Gate result 和可进入 P6 的 `ReviewEvidence`，不自行落盘。
+- `src/ai_video/production/ecommerce_ad_coordinator.py`
+  - 显式、顺序地消费 `CompiledAdCreativeHandoff` 和 existing service APIs。
+  - 负责 stop ordering，不复制 Provider、candidate、composition、timeline、render 或 P6 logic。
 
-Gate 2 只消费 Gate 1 的 current PASS result；它不得调用 Provider、renderer、committer 或 repair。任意 input identity、profile hash、evidence hash、timeline fingerprint、render hash 不匹配时，结果必须 fail closed。
+### Existing modules with bounded changes
 
-## Domain Contract
+- `src/ai_video/production/video.py`
+  - 为 `ResolvedVideoGenerationRequest` 增加 optional sealed commercial acceptance binding。
+- `src/ai_video/production/commercial_execution.py`
+  - 从 exact `CommercialExecutionProjection` 和 selected profile 投影 per-Shot requirement binding；不执行生成。
+- `src/ai_video/production/video_artifact.py`
+  - 定义 reviewer protocol、exact evidence validation，并让 `VideoProbeReceipt` 可选绑定 commercial evidence。
+- `src/ai_video/production/_lifecycle_schema.py`
+  - 增加 commercial evaluation intent/evidence pointer/state 与 additive Manifest compatibility。
+- `src/ai_video/production/_state_commit_video_candidate.py`
+  - 在 candidate preparation 中调用 commercial checkpoint；PASS 前不形成 candidate。
+- `src/ai_video/production/_state_commit_video_recovery.py`
+  - 对 intent-only unknown outcome、evidenced result 和 explicit recovery 建立与 continuity 相同的 fail-closed规则。
+- `src/ai_video/production/_video_project_reader.py`、`src/ai_video/production/paths.py`
+  - 只负责 canonical reopen/path validation。
+- `src/ai_video/production/video_generation.py`
+  - `validate_once()` 与 legacy `fetch_and_activate()` 透传 optional commercial reviewer；两条 public path 必须同样 enforce，不能留下 bypass。
+- `src/ai_video/production/models.py`
+  - `QaPolicy` 增加 optional `domain_acceptance`；legacy policy 未设置时保持现有 generic semantics。
+- `src/ai_video/production/review.py`
+  - `SEMANTIC` adjudication 在 selected policy 含 domain acceptance 时委托 typed domain validator；不把 Ecommerce 规则直接堆进该大模块。
+- `src/ai_video/production/__init__.py`
+  - 只暴露批准的 public profile/result/coordinator types。
 
-### 1. New pure post-media contract
+### Canonical modules not modified by default
 
-Create `src/ai_video/production/ecommerce_media_acceptance.py`，承载以下 cohesive responsibilities：
+- `src/ai_video/production/ad_creative.py`
+- `src/ai_video/production/composition.py`
+- `src/ai_video/production/hyperframes.py`
 
-- `EcommerceMediaRequirementScope`: `SHOT`、`WHOLE_AD`。
-- `EcommerceMediaRequirement`: stable ID、scope、applicability、required evidence kinds、human/evaluator authority。
-- `EcommerceMediaAcceptanceProfile`: versioned、content-addressed requirement set 与 profile parameters。
-- `EcommerceMediaEvidence`: target bytes identity、tool/actor identity、measurement、source artifact identity 与 freshness metadata。
-- `EcommerceMediaFinding`: `PASS`、`FAIL` 或 `NOT_EVALUATED`，并绑定 exact requirement ID 与 evidence IDs。
-- `EcommerceMediaAcceptanceResult`: exact-input summary、all findings、blocking reasons、profile hash、target hash；不得只有一个 score。
+它们由 integration tests 验证。若发现真实 contract gap，先记录 failing test、缺失 binding 和最小 change surface，再单独修改；不得预先扩张这些模块。
 
-Evaluator 必须是 pure function。任何 required requirement 为 `FAIL` 或 `NOT_EVALUATED`，或者 required evidence 缺失、重复、过期、target hash 不匹配时，整体不得 ready。
+## Contract Design
 
-### 2. Reuse existing commercial visual evidence
+### DomainAcceptancePolicy
 
-保留 `src/ai_video/production/commercial_visual_review.py` 作为 source-image visual review owner。不要把 `CommercialSourceReviewReceipt(target_kind="source_image")` 伪装成 generated Shot 或 whole-ad 证据。
+`DomainAcceptancePolicy` 是 `QaPolicy` 内的 optional nested sealed contract：
 
-Generated Shot video 需要 temporal evidence，至少覆盖：
+- `domain_id`: 本计划固定 `ecommerce`。
+- `profile_id` / `profile_version` / `profile_content_hash`。
+- `profile_payload`: deep-immutable canonical JSON snapshot；Ecommerce Gate 必须重新 `model_validate()` 为 `EcommerceAcceptanceProfile`，且其 canonical hash 必须等于 `profile_content_hash`。
+- `measurement_contract_version`: 初始为 `ecommerce-media-acceptance/1`。
+- `required_requirement_ids`: exact ordered unique IDs。
+- `semantic_authorities`: 继续使用 `QaPolicy.semantic_authorities`，不得出现第二份 authority list。
 
-- 人物 identity 与允许 cast count。
-- 产品是否在要求的时间窗出现。
-- 黄色包装盒、黄色瓶身标签、白色瓶盖、瓶型与盒型的一致性。
-- hand-object contact、遮挡、extra fingers/hands、flat overlay 与穿模。
-- 口型/说话人/台词绑定。
-- required motion、camera intent 与入出状态连续性。
+Profile snapshot 内嵌于 selected `QaPolicy`，避免新增第二个 durable profile registry/pointer。`required_requirement_ids` 必须与 typed profile payload 的 required IDs exact 一致；first-appearance window、end-card duration、applicability 等参数也由该 snapshot 冻结，不能只绑定一个无法 reopen 的 hash。
 
-包装小字、真实 contact 与人物语义互动在 evaluator 未校准或证据不足时必须是 `NOT_EVALUATED`，不能靠“画面里有黄色区域”自动 PASS。
+当 `QaPolicy.semantic_requirement="required"` 且 `domain_acceptance` 存在时：
 
-### 3. Qingyan requirement profile
+- P6 `SEMANTIC` evidence 必须匹配 domain/profile/measurement contract。
+- requirement IDs 必须 exact coverage；少一个、多一个、重复或顺序漂移都为 `NOT_EVALUATED`。
+- 任一 required `FAIL` 为 overall `FAIL`；任一 `NOT_EVALUATED` 为 overall `NOT_EVALUATED`。
+- Authoring `ready`、`AdCreativeReviewReport` 或 free-form `semantic_match=true` 不能升级为 PASS。
 
-Shot-level stable IDs：
+Legacy `QaPolicy.domain_acceptance=None` 继续走现有 generic semantic behavior。
+
+### GeneratedCommercialShotBinding
+
+每个需要 post-media commercial review 的 `ResolvedVideoGenerationRequest` 绑定：
+
+- `ad_creative_plan_id` 与 content hash。
+- `commercial_execution_projection_hash` 与 `target_shot_id`。
+- selected profile hash 与 applicable requirement IDs。
+- Product Truth/product reference/source approval hashes；无产品要求的 performance Shot 保留空 product tuple。
+- resolved generation hash、output asset ID 和 expected actor IDs。
+
+Binding 是 request identity 的一部分。替换 plan、projection、source approval、profile 或 Shot requirement 必须改变 request hash并使旧 evidence 失效。
+
+### GeneratedCommercialShotEvidence
+
+Evidence 绑定 held MP4 bytes hash、measured metadata、request binding、evaluator identity/profile 与逐 requirement findings。初始 Shot requirements：
 
 - `shot.identity.main_character`
 - `shot.identity.elder`
@@ -135,7 +179,21 @@ Shot-level stable IDs：
 - `shot.camera.intent`
 - `shot.continuity.in_out`
 
-Whole-ad stable IDs：
+Applicability 来自 exact Shot projection/profile。例如只有 recommendation Shot 强制老人；只有 on-camera speech Shot 强制 lip-sync；product hero/end card 不要求 generated physical interaction。
+
+Evaluator authority 至少为 `EXPLICIT_EVALUATOR` 或 `HUMAN`。包装小字、真实手部接触、人物 identity、说话人和 lip-sync 无可信 evidence 时必须为 `NOT_EVALUATED`。
+
+### Whole-Ad Ecommerce Evidence
+
+Whole-ad evidence 同时绑定：
+
+- exact `AdCreativePlan`/profile hashes。
+- ordered accepted Shot IDs、request hashes、generated bytes hashes 和 commercial evidence hashes。
+- `CompositionSpec` hash、`ResolvedTimeline` fingerprint、HyperFrames render state/output hash。
+- exact Gate 1 profile/context/policy identities。
+- evaluator/human identity 与逐 requirement findings。
+
+Whole-ad requirements：
 
 - `ad.hook.first_second`
 - `ad.arc.problem_recommendation_use_payoff`
@@ -148,237 +206,195 @@ Whole-ad stable IDs：
 - `ad.audio.voice_continuity`
 - `ad.cta.brand_closure`
 - `ad.continuity.character`
-- `ad.motion.dynamic_coverage`
+- `ad.motion.required_windows`
 - `ad.edit.pacing`
 - `ad.copy.claim_compliance`
 - `ad.delivery.duration_aspect`
 
-Applicability 必须来自 profile 与 plan，不是所有 Shot 都必须出现老人、产品或对白。例如：老人只在 recommendation/interchange beat 中 required；产品必须在 3–6 秒内首次清晰出现，并在 recommendation/use/hero/CTA 中按计划重复出现，但不要求每个 Shot 手持。
+Gate 2 PASS 只说明 exact Ecommerce requirements 完整通过；它必须转换为 current P6 `SEMANTIC` ReviewEvidence/Receipt，仍不等于 Final Acceptance 或 human watchability approval。
 
-### 4. Exact identity binding
+## Qingyan Profile Rules
 
-Shot result 至少绑定：
+### Cast and narrative
 
-- sealed `AdCreativePlan` hash。
-- Product Truth/product reference bytes hash。
-- target `shot_id`、Shot intent hash、Provider request provenance。
-- generated video bytes hash、duration、dimensions、stream identity。
-- selected acceptance profile hash。
-- evidence item hashes与 evaluator/actor identity。
+- 苗家女孩为 20–25 岁主角，现代苗族元素，不限定全片只有一个人。
+- 老人必须出现在 recommendation beat，与女孩发生可见的对视、递产品、示范、回应或共同推荐；背景路过不算。
+- 实际成片广告弧必须可识别为：热/汗湿尴尬 -> 老人推荐 -> 女孩拿出/使用 -> 清爽自信 -> product hero + CTA。
 
-Whole-ad result 额外绑定：
+### Product timing and packaging
 
-- ordered accepted Shot IDs 与每个 generated bytes hash。
-- `CompositionSpec` hash。
-- `ResolvedTimeline` fingerprint。
-- HyperFrames render request/output hash。
-- exact final candidate MP4 hash。
-- Gate 1 result identity 与 Gate 2 profile hash。
+- 产品首次清晰出现目标为 3–6 秒；不要求每个 Shot 手持。
+- 人物手持/使用必须通过 generated-video temporal evidence，source image approval 不足以代替。
+- 黄色盒体、黄色瓶身标签、白色瓶盖、瓶型与盒型必须跨所有产品出现保持一致。
+- Hero/CTA 优先使用 registered readable packshot pixels；generated in-hand Shot 不能替代包装真值。
+- Flat overlay、extra hands、穿模、错误比例或错误包装均阻断对应 requirement。
 
-任何 plan re-seal、Shot reorder、media replacement、timeline change、render replacement 或 evidence reuse 导致 hash/fingerprint 不一致时，旧结果必须失效。
+### Copy, audio and CTA
 
-## Media Acceptance Rules
+- 必须有老人推荐产品的可听台词，以及女孩承接卖点或 CTA 的可听台词。
+- Exact copy 走 existing `AudioTrackSpec`、voice asset、CaptionTrack 和 canonical timeline；不依赖生成视频原生音频保证逐字正确。
+- 非 intentional silence 不能用 `anullsrc` 伪造 coverage。
+- On-camera speech 绑定 speaker、verbatim line、Shot timing 与 lip-sync evidence。
+- Claim 只允许 Claim Ledger 内表达，例如“帮助减少汗湿困扰”“抑汗净味”“清爽舒适”；禁止医疗治疗和绝对时效承诺。
 
-### Narrative and cast
+### Motion and static media
 
-- 苗家女孩是 20–25 岁现代苗族气质主角，跨 Shot identity、服装核心元素、发饰与妆容可追踪。
-- 老人必须至少出现在一个完整 recommendation interaction beat 中，与女孩发生可见的对视、递产品、示范、回应或共同推荐动作；仅在背景路过不算互动。
-- 广告弧必须可从实际成片识别为：天气热/汗湿尴尬 -> 老人或同伴推荐 -> 女孩拿出并使用产品 -> 清爽自信 payoff -> product hero + CTA。
-- 计划外主要人物、人物突然替换、年龄/服装/面部 identity 漂移均阻断相关 requirement。
+- `GENERATED_VIDEO`/`EXISTING_VIDEO` required-motion windows 复用 Technical layer 的 `frozen_required_motion`、frame diversity 与 window strategy。
+- Ecommerce semantic evidence判断动作是否完成、互动是否真实、节奏是否服务广告弧；不使用一个 aggregate motion score 抵消失败。
+- Failed required-motion Shot 不得以静帧、clone freeze、Ken Burns zoom 或无关 B-roll 静默替换。
+- Explicit product hero/end card 可使用 deterministic motion graphics；end card duration 上限 2.0 秒，并必须在 plan/timeline 中显式存在。
 
-### Product truth and timing
+## Major Milestones
 
-- 产品首次清晰出现目标为 3–6 秒；开场 0–3 秒优先交代痛点。
-- 人物手持或使用镜头必须由 generated-video temporal review 验证，source image PASS 不足以证明成片 PASS。
-- Product hero/CTA 优先使用已注册、可读的真实 packshot pixels；生成式持有镜头不得替代真实包装 hero truth。
-- 不能通过二维贴图覆盖人物手部来伪造手持，也不能用错误瓶型、错误主色、错误瓶盖或不可辨识标签计为产品出现。
+### Milestone 1: Freeze typed policy and RED boundaries
 
-### Audio, copy and CTA
+**Files:**
 
-- 精确广告文案使用现有 `AudioTrackSpec`/voice asset/caption contract 和 canonical P4 timeline；不要依赖 H3 原生音频承载必须逐字正确的销售台词。
-- 非创意性静默不得用 `anullsrc` 填满。实际 audio coverage 必须覆盖 `[0, duration]`，音乐、对白与 SFX 的职责明确。
-- 老人必须有一句自然的产品推荐或使用建议；女孩必须有 payoff 或 CTA 台词。仅字幕、仅 BGM、仅环境音不满足 `ad.audio.product_recommendation`。
-- On-camera speech 必须绑定 exact speaker、verbatim line、Shot timing 与 lip-sync evidence；未评估 lip-sync 时为 `NOT_EVALUATED`。
-- 文案只能使用 Claim Ledger 已批准表达，例如“帮助减少汗湿困扰”“抑汗净味”“清爽舒适”；不得生成治疗、根治、医学保证或超时效 claim。
-- CTA 必须同时具备可听推荐、品牌/产品可见和清晰落版；只出现产品静物但无行动/记忆文案不算完整 CTA。
-
-### Dynamic-video rules
-
-- Required live-action Shot 失败后，不允许静默替换为静帧、clone freeze、Ken Burns zoom 或无关 B-roll 后继续宣称该 beat 已完成。
-- `source_kind=STATIC_IMAGE` 只允许用于显式 product hero/end card motion treatment；不能计入 live-action motion coverage。
-- 明确 end card 最长 2.0 秒，必须有可见的 entrance/hold/exit deterministic motion，不得是未经处理的 raw still。
-- 除显式 end card 外，每个 live-action beat 必须有测得的主体或镜头运动。Profile 初始阈值：全片 unintended freeze 累计不得超过 0.5 秒，单段不得超过 0.25 秒；超过即 `FAIL`。
-- Threshold 必须 versioned 在 profile 中，后续只能基于标注 pilot 校准；不得把 optical-flow 数值当作人物互动、广告连贯性或 watchability 的替代品。
-
-## Implementation Milestones
-
-### Milestone 1 — Freeze contracts and create RED tests
-
-**Files**
-
-- Create `tests/test_production_ecommerce_media_acceptance.py`
-- Create `tests/test_production_ecommerce_quality_coordinator.py`
-- Create `tests/test_production_ecommerce_ad_execution.py`
-- Modify `tests/test_production_commercial_visual_review.py`
-- Modify `tests/test_ecommerce_ad_workflow_skill.py`
-
-**Steps**
-
-1. 为 requirement profile、exact evidence coverage、hash mismatch、missing/stale evidence 写 RED tests。
-2. 固定 authoring G0–G7、source-image review、Shot post-media review、Gate 1、Gate 2、P6 的边界测试。
-3. 写 effect-counter tests，证明 Shot N 为 `FAIL` 或 `NOT_EVALUATED` 时 Shot N+1 submit count 保持为零。
-4. 写 negative-artifact characteristics 的 deterministic fixtures：missing elder、no dialogue coverage、required product-use beat absent、excess freeze、manual render provenance missing。
-5. 不把两个本地 MP4 复制进 test fixtures；fixture 只表达可复现的 typed evidence 与 identity mismatch。
-
-**Milestone acceptance**
-
-- 新 tests 因缺少 Runtime contracts 而失败，失败原因与预期 boundary 一致。
-- 既有 authoring tests 继续证明 `AdQCReport.ready`/`AdCreativeReviewReport.is_ready` 不等于 media acceptance。
-
-### Milestone 2 — Implement generated-Shot acceptance and synchronous barrier
-
-**Files**
-
+- Create `src/ai_video/production/domain_acceptance.py`
 - Create `src/ai_video/production/ecommerce_media_acceptance.py`
-- Create `src/ai_video/production/ecommerce_ad_execution.py`
-- Modify `src/ai_video/production/__init__.py`
+- Create `tests/test_production_ecommerce_media_acceptance.py`
+- Modify `src/ai_video/production/models.py`
+- Modify `tests/test_production_review.py`
+
+**Contract:** 新 domain policy 是 `QaPolicy` 的 optional additive field；Ecommerce profile、requirements 和 findings sealed 且 exact coverage。Legacy policy behavior不变。
+
+**RED cases:** missing/extra/reordered requirement、wrong profile hash、unauthorized evaluator、authoring-ready masquerading as semantic evidence、required `FAIL`/`NOT_EVALUATED`、render/timeline mismatch。
+
+**Acceptance:** RED tests 精确失败在 typed domain seam 缺失；已有 generic P6 semantic tests 继续通过。
+
+### Milestone 2: Gate generated Shot candidate before activation
+
+**Files:**
+
+- Modify `src/ai_video/production/video.py`
+- Modify `src/ai_video/production/commercial_execution.py`
+- Modify `src/ai_video/production/video_artifact.py`
+- Create `src/ai_video/production/_state_commit_video_commercial.py`
+- Modify `src/ai_video/production/_lifecycle_schema.py`
+- Modify `src/ai_video/production/_state_commit_video_candidate.py`
+- Modify `src/ai_video/production/_state_commit_video_recovery.py`
+- Modify `src/ai_video/production/_video_project_reader.py`
+- Modify `src/ai_video/production/paths.py`
+- Modify `src/ai_video/production/video_generation.py`
+- Create `tests/test_production_ecommerce_shot_candidate_gate.py`
+- Modify `tests/test_production_generated_video_e2e.py`
+
+**Contract:** commercial-bound request 在 `VALIDATE` phase 建立 durable intent，再调用 reviewer，再持久化 exact evidence。PASS 前不得进入 `CANDIDATE`/`ACTIVATE`；unknown outcome 必须 explicit recovery，不得 blind rerun。
+
+**Compatibility:** additive Manifest schema target 为 `2.13`。Readers 继续接受旧 2.10–2.12 attempts；旧 attempt 没有 commercial binding 时不要求新 checkpoint；新 commercial binding 不得降级写回旧 schema。
+
+**Acceptance:** held-FD bytes replacement、profile/request mismatch、reviewer异常、`FAIL`、`NOT_EVALUATED` 和 intent-only recovery 均 fail closed；`validate_once()` 与 legacy `fetch_and_activate()` 都无法绕过。
+
+### Milestone 3: Enforce sequential Shot stop barrier
+
+**Files:**
+
+- Create `src/ai_video/production/ecommerce_ad_coordinator.py`
+- Create `tests/test_production_ecommerce_ad_coordinator.py`
 - Modify `tests/test_production_ecommerce_product_interaction_e2e.py`
 
-**Steps**
+**Contract:** coordinator 只调用 existing public services：start/submit/poll/fetch/validate/activate。它不读取 credential、不选择 Provider、不直接写 Manifest，也不批量预提交。
 
-1. 实现 immutable requirement/profile/evidence/finding/result models 与 sealing validation。
-2. 实现 pure Shot evaluator：exact target binding、applicability、coverage、PASS/FAIL/NOT_EVALUATED 聚合。
-3. 在 execution orchestrator 中注入 existing Provider submit/fetch owner 与 post-media evaluator；禁止直接读取 credential、选择 Provider 或写 Manifest。
-4. 强制顺序为 `submit once -> fetch/validate bytes -> Shot Gate -> next submit`。不得先 batch submit 后补审。
-5. 任何 missing/unknown/timeout/stale review outcome 都停止，保留 evidence，且不 retry、不 remint permit、不继续后续 Shot。
-6. 只有 exact ordered accepted Shot set 可交给 composition compiler；failed、unreviewed 或被替换的 media 不能进入 handoff。
+**Ordering:** Shot N 必须完成 exact commercial validation PASS 和 activation，才可创建/submit Shot N+1 attempt。`FAIL`、`NOT_EVALUATED`、stale、unknown outcome 或用户 STOP 后，later submit counter 必须保持 0。
 
-**Milestone acceptance**
+**Acceptance:** effect-counter tests 覆盖 local/paid service facade、first/ middle/last Shot failure、resume 与 duplicate invocation；replay 不重复 Provider effect。
 
-- Effect-counter tests 证明 barrier 位于两个真实 submit seam 之间。
-- 物理产品互动必须同时有 source truth 和 generated-video temporal evidence；flat overlay、extra hands、穿模或错误包装阻断。
-- 任何 media bytes replacement 都使旧 Shot result 失效。
+### Milestone 4: Run a one-Shot empirical checkpoint
 
-### Milestone 3 — Add Whole-Ad Ecommerce Gate 2
+**Authorization:** 该 milestone 是新的 live/paid execution gate。只有用户在执行时明确授权 exact Provider/model/input/budget/output 后才能运行；代码计划或 credential 存在不构成授权。
 
-**Files**
+**Pilot:** 只生成一个“老人向苗家女孩递出并推荐青颜喷雾”的 product-interaction Shot。固定 product reference、人物 reference、prompt、seed/mode 和 evaluator profile，只检验 post-media Gate 是否能区分：老人互动、产品包装、hand-object contact、台词/说话人和 required motion。
 
-- Create `src/ai_video/production/ecommerce_quality_coordinator.py`
-- Modify `src/ai_video/production/quality_gate_coordinator.py` only to expose/consume stable Gate 1 identity if current public result lacks it
-- Modify `src/ai_video/production/ad_creative_review.py` only if an explicit media-acceptance handoff field is required; keep `production_verdict=None`
+**Acceptance:** evaluator 给出 requirement-level findings，人类 normal-speed review 复核。若 Gate PASS 但人类明显拒绝，先校准 requirement/evaluator，不继续构建 whole-ad Gate；若 Gate FAIL 正确阻断，才进入下一 milestone。
+
+### Milestone 5: Implement Whole-Ad Ecommerce Gate 2 and P6 bridge
+
+**Files:**
+
+- Create `src/ai_video/production/ecommerce_quality_gate.py`
+- Modify `src/ai_video/production/review.py`
+- Modify `src/ai_video/production/_state_commit_review.py` only if exact typed-payload reopen cannot be enforced through existing `record_review_receipt()` contract
+- Create `tests/test_production_ecommerce_quality_gate.py`
 - Modify `tests/test_production_quality_gate_coordinator.py`
 - Modify `tests/test_production_review.py`
 
-**Steps**
+**Contract:** Gate 2 只接受 `UniversalQaGateResult(verdict=PASS, eligible_for_domain_gate=true)` 且 exact context current。它纯计算 findings，并生成与 current `ReviewRequest` identity 一致的 `QaLayer.SEMANTIC` ReviewEvidence；P6 committer负责 durable request、one-use analysis permit、receipt和lifecycle。
 
-1. Gate 2 coordinator 接收 current Gate 1 PASS result、exact whole-ad context 与 evidence；Gate 1 缺失、失败、过期或 identity mismatch 时零副作用退出。
-2. 对全部 required whole-ad IDs 逐项计算 verdict；任何 required `FAIL`/`NOT_EVALUATED` 阻断。
-3. 输出只表示 `eligible_for_existing_p6`，不得写 `production_verdict=PASS`、不得激活 candidate。
-4. 证明一个 project/candidate 只能绑定一个 preselected Ecommerce profile hash；运行中 profile swap 必须失败。
-5. 证明 manual FFmpeg MP4 在缺少 exact `CompositionSpec`、`ResolvedTimeline` 与 HyperFrames render binding 时不能进入 Gate 2 ready state。
+**Exact ordering:** 先运行 Gate 1；再由 `begin_review()` 持久化只请求 `QaLayer.SEMANTIC` 的 current `ReviewRequest`；随后把 Gate 2 coordinator 作为 analyzer 传给 `run_review_analysis()`，让 one-use permit 包围实际 evaluator invocation；最后才调用 `record_review_receipt()`。不得在 durable request 之前预跑 Gate 2 后补写 receipt。
 
-**Milestone acceptance**
+**Acceptance:** Gate 1 missing/failing/stale 时 Gate 2 evaluator call count 为 0；Gate 2 missing coverage不能生成 PASS receipt；profile swap、render replacement、timeline change、Shot evidence replacement均失效；Final Acceptance 必须重新打开 semantic receipt并验证 PASS/current。
 
-- Gate 1 和 Gate 2 均为显式调用、pure assessment boundary。
-- Gate 2 既不能修复媒体，也不能调用 Provider、renderer、committer。
-- Missing coverage 不会被一个总分或其他维度 PASS 抵消。
+### Milestone 6: Canonical composition/render integration without parallel final path
 
-### Milestone 4 — Restore canonical final composition path
+**Files:**
 
-**Files**
-
-- Modify `src/ai_video/production/ad_creative.py`
-- Modify `src/ai_video/production/composition.py`
-- Modify `src/ai_video/production/hyperframes.py`
+- Create `tests/test_production_ecommerce_post_media_e2e.py`
+- Modify `src/ai_video/production/ecommerce_ad_coordinator.py`
 - Modify `tests/test_production_ad_creative.py`
-- Modify `tests/test_production_composition.py`
-- Modify `tests/test_production_hyperframes.py`
-- Modify `tests/test_production_ecommerce_ad_execution.py`
-- Retire or demote `/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/compose_t8_dynamic.sh` as a non-production experiment artifact; do not edit generated artifacts unless separately authorized
+- Modify `tests/test_production_composition.py` and `tests/test_production_hyperframes.py` only for integration coverage
 
-**Steps**
+**Contract:** coordinator 只能使用 `CompiledAdCreativeHandoff.composition_spec`、accepted/activated Shot assets、`resolve_composition()` 和 HyperFrames public adapter。它不能 shell out 到 ad-hoc FFmpeg final script，也不能重算 duration/order/audio。
 
-1. 让 execution orchestrator 只从 accepted Shot handoff 构建 `CompositionSpec`；保留现有 compiler ownership，不在 orchestrator 复制 composition logic。
-2. 由 `ResolvedTimeline` 唯一决定 Shot order、trim、duration、frame/sample boundaries、audio/caption timing。
-3. 由 HyperFrames 输出 candidate，并绑定 exact render bytes；FFmpeg 仅作为 approved adapter 内的 technical primitive，不再作为 parallel final composition owner。
-4. 把对白、旁白、音乐、SFX 与 captions 放入 canonical audio/timeline contract；禁止 `anullsrc` 伪造完整广告音轨。
-5. 对 required motion Shot 禁止隐式 still/freeze fallback。需要 end card 时以 explicit motion-graphics directive 表达，并受 2.0 秒与 dynamic treatment 规则约束。
-6. Render 后先 Gate 1，再 Gate 2；只有两者均 current PASS 才可交给 existing P6 lifecycle。
+**Acceptance:** exact final candidate 可追溯 plan -> projection -> Shot request/evidence -> active assets -> composition -> timeline -> render -> Gate 1 -> Gate 2 -> P6 receipt。缺少任一 binding 的 manual MP4 只能标记 development experiment，不能进入 P6-ready。
 
-**Milestone acceptance**
+### Milestone 7: Docs, policy, full verification and 25–30s pilot
 
-- Final candidate provenance 可以从 MP4 bytes 反查 exact plan、accepted Shot set、composition、timeline、render 与两层 Gate result。
-- 绕过 canonical path 的 MP4 最多是 development experiment，不得被标记为 P6-ready 或 Final。
-- Failed dynamic Shot 不会被静帧拼接掩盖为完成。
-
-### Milestone 5 — Policy, docs, full verification and empirical pilot
-
-**Files**
+**Files:**
 
 - Modify `.agent/harness/policy.yaml`
+- Modify `tests/test_agent_harness_policy.py` if routing changes
 - Modify `docs/agent-primary-contract-matrix.md`
 - Modify `docs/v0.2-runtime-baseline.md`
 - Modify `docs/v0.2-agentic-production-roadmap.md`
-- Modify `tests/test_agent_harness_policy.py` if routing expectations require updates
 
-**Steps**
+**Contract:** 文档只记录 exact verified implementation；Shot Gate、Gate 1、Gate 2、P6 和 human Final Acceptance 的 owner/禁止旁路必须分开。
 
-1. 将新 production files 和 tests 映射到 existing commercial/review/composition/audio mandatory checks；unmapped path 必须继续 fail safe。
-2. Contract matrix 明确：source-image review、Shot post-media Gate、Universal Gate 1、Ecommerce Gate 2、P6/Final Acceptance 各自 owner 与 forbidden bypass。
-3. Runtime baseline 只记录已由 exact staged/commit-range receipt 证明的行为；不要把 pilot 或人工偏好写成 Runtime deterministic truth。
-4. Roadmap 标记 Gate 2 的真实 implementation state，并保留未完成的 evaluator calibration、human acceptance 和 Provider empirical uncertainty。
-5. 通过 existing lifecycle 生成一个 25–30 秒、9:16、4–8 Shot 的真实青颜 pilot；一次只提交当前 eligible Shot，不并行扩大 batch。
-6. 以 normal-speed 完整观看比较 positive baseline、negative artifact 与新 pilot。每项 requirement 给出 PASS/FAIL/NOT_EVALUATED 和时间戳证据，不计算一个总分。
-7. 只有新 pilot 明显击败 negative artifact，且相较 positive baseline 不退化叙事连贯性、老人互动、连续口播、包装可辨识度、动态感与 CTA，才由人类给出继续扩 batch 的 GO。
+**Pilot:** 获得单独授权后，通过 canonical lifecycle 生成 25–30 秒、9:16、4–8 Shot 青颜 candidate。逐 Shot 顺序执行，不提前 batch submit；normal-speed 比较 positive、negative 和新 pilot。
 
-**Milestone acceptance**
-
-- Code、tests、policy、canonical docs 与 receipt 对同一个 exact implementation snapshot 一致。
-- Pilot 保持 candidate 身份，直到 P6 和 human Final Acceptance 真正完成。
-- 未评估的 packaging small text、identity、lip-sync 或 watchability 明确保留为 `NOT_EVALUATED`，不被自动推断。
+**Acceptance:** 新 pilot 明显击败 negative artifact，并且相对 positive comparison 不退化叙事连贯性、老人互动、连续口播、包装可辨识度、真实动态和 CTA。人工 verdict 按 requirement 记录时间戳，不计算 aggregate score；人类 GO 前不得扩 batch或声称 Final。
 
 ## Required Test Matrix
 
-| Scenario | Expected result |
+| Scenario | Expected |
 | --- | --- |
-| Shot N Gate PASS/current | Shot N+1 submit eligible |
-| Shot N FAIL | Stop; later submit count = 0 |
-| Shot N NOT_EVALUATED/timeout | Stop; later submit count = 0 |
-| Source image PASS but generated hand contact missing | Shot product interaction FAIL |
-| Generated media bytes replaced after review | Prior result stale/invalid |
-| Elder required but absent or background-only | `ad.cast.elder_interaction` FAIL |
-| Dialogue/captions exist but audio is silent | Audio coverage/recommendation FAIL |
-| Audio line exists but wrong speaker or timing | Speaker/verbatim requirement FAIL |
-| Product appears after 6s with no approved exception | First-appearance FAIL |
-| Yellow object with wrong bottle/cap/box identity | Packaging requirement FAIL |
-| Required dynamic beat replaced by freeze/static | Motion requirement FAIL |
-| Explicit 2s animated end card | Eligible if all other evidence PASS |
-| Gate 1 missing/failing/stale | Gate 2 not executed; zero side effects |
-| Whole-ad evidence misses one required ID | Gate 2 not ready |
-| Profile hash swapped during execution | Fail closed |
-| Manual FFmpeg MP4 lacks canonical bindings | Not eligible for Gate 2/P6 |
-| All Gates PASS but no human Final Acceptance | Candidate only, never Final |
+| Legacy non-commercial video request | Existing behavior unchanged |
+| Commercial request without selected profile | Fail before reviewer/provider continuation |
+| Candidate bytes replaced after held-FD measurement | Reject exact binding |
+| Shot evidence missing one applicable requirement | `NOT_EVALUATED`; no activation |
+| Product interaction uses flat overlay/extra hands | `FAIL`; no activation |
+| Elder required but absent/background-only | `FAIL`; no next submit |
+| Wrong speaker/verbatim line/lip-sync unevaluated | `FAIL` or `NOT_EVALUATED`; no next submit |
+| Shot N PASS/current/activated | Shot N+1 eligible |
+| Shot N unknown outcome | Explicit recovery required; later submit count 0 |
+| Gate 1 not current PASS | Gate 2 evaluator count 0 |
+| Gate 2 free-form semantic_match only | `NOT_EVALUATED` |
+| Gate 2 exact requirement coverage PASS | Eligible for P6 semantic receipt |
+| Render/timeline/profile/plan changed | Prior Gate 2 evidence stale |
+| Manual FFmpeg MP4 without canonical bindings | Not P6-ready |
+| All receipts PASS but no committer Final Acceptance | Candidate only |
 
-## Focused Verification
+## Verification Commands
 
-Run after each relevant milestone:
+Focused suite during implementation:
 
 ```bash
 python -m pytest -p no:cacheprovider \
   tests/test_production_ecommerce_media_acceptance.py \
-  tests/test_production_ecommerce_quality_coordinator.py \
-  tests/test_production_ecommerce_ad_execution.py \
-  tests/test_production_commercial_visual_review.py \
+  tests/test_production_ecommerce_shot_candidate_gate.py \
+  tests/test_production_ecommerce_ad_coordinator.py \
+  tests/test_production_ecommerce_quality_gate.py \
+  tests/test_production_ecommerce_post_media_e2e.py \
   tests/test_production_ecommerce_product_interaction_e2e.py \
-  tests/test_production_ad_creative.py \
+  tests/test_production_generated_video_e2e.py \
   tests/test_production_quality_gate_coordinator.py \
   tests/test_production_review.py \
+  tests/test_production_ad_creative.py \
   tests/test_production_composition.py \
   tests/test_production_hyperframes.py \
   tests/test_ecommerce_ad_workflow_skill.py -q
 ```
 
-Run canonical control-plane checks before completion:
+Control-plane checks:
 
 ```bash
 python -m scripts.docs_contract_gate check
@@ -386,7 +402,7 @@ python -m scripts.architecture_gate check
 python scripts/agent_harness.py policy-audit
 ```
 
-Run Harness against the exact staged snapshot, then verify the emitted receipt:
+Exact staged verification:
 
 ```bash
 python scripts/agent_harness.py inspect --staged
@@ -394,46 +410,41 @@ python scripts/agent_harness.py verify --staged --run-id qingyan-ecommerce-post-
 python scripts/agent_harness.py verify-receipt .agent/harness/runs/qingyan-ecommerce-post-media-gate/receipt.json
 ```
 
-After committing only task-owned files, run the corresponding exact commit-range verification required by `.agent/harness/policy.yaml`. Do not use unrelated dirty changes as test inputs or proof.
+完成 task-owned commit 后，再按 `.agent/harness/policy.yaml` 对 exact commit range 运行 verify。Receipt、technical tests、Gate PASS 和人工观看结论必须分层报告，不能互相替代。
 
 ## Human Acceptance Checklist
 
-Human review must watch the complete candidate at normal speed and record timestamps for every finding:
-
-- 0–3s clearly communicates heat/sweat/odor embarrassment without vulgar framing.
-- Product first appears clearly within 3–6s.
-- An elder and the Miao girl visibly interact; the elder recommends or introduces the product.
-- The girl visibly holds or uses the product in at least one approved Shot; the product need not appear in every Shot.
-- Yellow box, yellow bottle label, white cap, bottle and box geometry remain recognizable across all product appearances.
-- Spoken copy actually recommends the product; audio is continuous and intelligible.
-- Claim wording stays within Claim Ledger and avoids medical/absolute promises.
-- Character identity, wardrobe logic, direction of movement and lighting remain coherent.
-- Required beats are genuinely dynamic; no disguised photo inserts, long freeze or meaningless zoom.
-- Product hero and CTA are legible, audible and commercially clear.
-- Total duration is 25–30 seconds and delivery aspect ratio is 9:16.
-- New pilot is more coherent and commercially persuasive than the negative artifact and does not regress from the positive baseline on the user-prioritized dimensions.
+- 0–3 秒自然表达热、汗湿或异味顾虑。
+- 3–6 秒内产品首次清晰出现。
+- 老人与苗家女孩有可见互动，且老人真正说出推荐话语。
+- 女孩至少一次自然手持/使用产品，但不要求每个 Shot 都出现产品。
+- 黄色盒体、黄色瓶身标签、白色瓶盖、瓶型盒型跨镜头一致。
+- 全片存在可听、连贯、准确的产品推荐；不是只有 BGM/字幕。
+- Claim 符合 ledger，无治疗、根治或绝对保证。
+- 人物 face/服装/银饰/空间方向/光线连续。
+- Required beats 真实动态，无隐藏静帧、长 freeze 或无意义 zoom。
+- Product hero 与 CTA 同时可见、可听、清晰。
+- 成片 25–30 秒、9:16，并以 normal speed 完整观看。
 
 ## Definition of Done
 
-The repair is complete only when all of the following are true:
+1. Exact commercial requirement binding 进入 generated video request identity。
+2. Post-media Shot review 在 `validate_once()` candidate seam durable checkpoint，PASS 前不能 activation。
+3. Shot N 未 PASS/current/activated 时，Shot N+1 Provider submit effect 为零。
+4. Whole-ad Gate 2 必须消费 current Gate 1 PASS，并逐 requirement fail closed。
+5. Gate 2 evidence 通过 existing P6 `SEMANTIC` ReviewEvidence/Receipt 持久化，不出现第二 evidence lifecycle。
+6. Final candidate 只消费 accepted assets，并走 `CompositionSpec -> ResolvedTimeline -> HyperFrames`。
+7. Existing committer、Provider lifecycle、timeline、renderer、P6/Final Acceptance ownership不变。
+8. Focused/full tests、policy、exact-snapshot Harness 与 independent `reviewer_xhigh` 通过。
+9. One-Shot empirical checkpoint 和 whole-ad pilot 均有 requirement-level human evidence；未验证项保持 `NOT_EVALUATED`。
 
-1. Generated Shot review is a synchronous barrier before the next Provider side effect.
-2. Whole-ad Ecommerce Gate 2 runs only after current Universal Gate 1 PASS and evaluates every required domain requirement separately.
-3. Exact plan/product/Shot/composition/timeline/render/media/profile/evidence identities are bound and stale evidence fails closed.
-4. Final candidates use only accepted Shot media and canonical `CompositionSpec -> ResolvedTimeline -> HyperFrames` execution.
-5. Manual FFmpeg artifacts, source-image receipts, authoring readiness and technical Gate PASS cannot be promoted as whole-ad quality acceptance.
-6. Existing `ProductionStateCommitter`, Provider lifecycle, P6 and human Final Acceptance ownership remain unchanged.
-7. Focused tests、policy checks、exact-snapshot Harness receipt 与 independent review 全部通过。
-8. 一个真实 25–30 秒 pilot 通过 requirement-level human A/B；未验证能力明确标记，不由 tests 或 Gate 自动代替。
+## Recommended Commit Boundaries
 
-## Implementation Order and Commit Boundaries
+1. `test: define typed ecommerce media acceptance policy`
+2. `feat: checkpoint commercial generated-shot review`
+3. `feat: stop ecommerce generation after failed shot`
+4. `feat: bridge ecommerce gate two into p6 semantic review`
+5. `test: prove canonical ecommerce post-media lifecycle`
+6. `docs: record ecommerce post-media acceptance boundary`
 
-建议按以下 commit 边界实施，确保每一步可独立回滚和 review：
-
-1. `test: define ecommerce post-media acceptance failures`
-2. `feat: gate generated ecommerce shots before next submit`
-3. `feat: add whole-ad ecommerce acceptance gate`
-4. `refactor: route ecommerce candidates through canonical composition`
-5. `docs: record ecommerce post-media gate contracts and evidence`
-
-每个 commit 只 stage task-owned paths。若实施时发现任一 target file 已由其他 writer 修改，先停止并重新确认 same-file ownership；不得 reset、覆盖或把 unrelated changes 带入 commit。
+每个 commit 只 stage task-owned files。实施前重新检查 current working tree 和 live writer ownership；same-file overlap 必须先由用户决定顺序，unrelated changes 必须保留。
