@@ -78,6 +78,14 @@ from ai_video.production.commercial_execution import (
     CommercialShotClass,
     project_commercial_executions,
 )
+from ai_video.production.ecommerce_ad_coordinator import (
+    ActivatedCommercialShotCheckpoint,
+    EcommerceAdGenerationResult,
+    EcommerceShotExecutionFacade,
+    EcommerceShotNextAction,
+    EcommerceStopReason,
+    run_ecommerce_ad_generation,
+)
 from ai_video.production.commercial_dependency import (
     extend_commercial_source_dependency_graph,
     validate_commercial_source_dependency_graph,
@@ -351,6 +359,11 @@ __all__ = [
     "CommercialVisualDimension",
     "CommercialVisualEvidence",
     "CommercialVisualMeasurement",
+    "ActivatedCommercialShotCheckpoint",
+    "EcommerceAdGenerationResult",
+    "EcommerceShotExecutionFacade",
+    "EcommerceShotNextAction",
+    "EcommerceStopReason",
     "CompiledAdCreativeHandoff",
     "ContinuityMode",
     "CompositionSpec",
@@ -360,6 +373,7 @@ __all__ = [
     "ApprovedCommercialSourceBinding",
     "ApprovedCommercialSourceLink",
     "project_commercial_executions",
+    "run_ecommerce_ad_generation",
     "extend_commercial_source_dependency_graph",
     "validate_commercial_source_dependency_graph",
     "adjudicate_commercial_visual_evidence",

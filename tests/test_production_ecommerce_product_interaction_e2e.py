@@ -21,6 +21,7 @@ from ai_video.production.models import (
     DependencyNodeKind,
     DependencySemanticRole,
     FingerprintContribution,
+    QaVerdict,
 )
 from ai_video.production.project import load_production_project
 from ai_video.production.review import validate_repair_scope
@@ -57,6 +58,7 @@ from test_production_commercial_visual_review import (
     REVIEW_TOOL,
     _policy as _commercial_policy,
 )
+from test_production_ecommerce_ad_coordinator import _Facade
 from test_production_shot_router import (
     HASH_F,
     _asset as _router_asset,
@@ -531,6 +533,44 @@ def test_commercial_handoff_rejects_duplicate_approval_cardinality(tmp_path) -> 
             commercial_execution_projections=(projection,),
             approved_commercial_sources=(durable_approval, durable_approval),
         )
+
+
+def test_product_interaction_nonpass_stops_at_sequential_coordinator(
+    tmp_path,
+) -> None:
+    _, projection, durable_approval = _approved_commercial_project(
+        tmp_path,
+        source_plan_shot_id="shot-04",
+    )
+    handoff = production.CompiledAdCreativeHandoff(
+        plan_id=projection.ad_creative_plan_id,
+        plan_content_hash=projection.ad_creative_plan_hash,
+        shot_proposals=(
+            production.AdShotProposal(
+                shot_id=projection.target_shot_id,
+                beat_ids=("beat-04",),
+            ),
+        ),
+        composition_requirements=production.AdCompositionRequirements(),
+        composition_spec=make_composition_spec(
+            shot_ids=(projection.target_shot_id,)
+        ),
+        commercial_execution_projections=(projection,),
+        approved_commercial_sources=(durable_approval,),
+    )
+    facade = _Facade(
+        projection.target_shot_id,
+        projection.projection_hash,
+        verdict=QaVerdict.FAIL,
+    )
+
+    result = production.run_ecommerce_ad_generation(
+        handoff,
+        facades={projection.target_shot_id: facade},
+    )
+
+    assert result.stop_reason is production.EcommerceStopReason.SHOT_NOT_PASS
+    assert "activate" not in facade.effects
 
     plan = _commercial_plan()
     interaction_projections = tuple(
