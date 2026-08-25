@@ -164,7 +164,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify the single Production writer, activation, and explicit recovery.
   production_composition_audio_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_composition.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_captions.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ad_creative.py, tests/test_production_composition.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_captions.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify timeline, renderer, audio, voice, and caption contracts.
@@ -393,6 +393,7 @@ categories:
   production_shared_contracts:
     patterns:
       - src/ai_video/production/__init__.py
+      - src/ai_video/production/artifact_contracts.py
       - src/ai_video/production/models.py
       - src/ai_video/production/project.py
       - src/ai_video/production/state_commit.py
@@ -439,6 +440,12 @@ categories:
       - task_architecture_gate
   production_composition_audio:
     patterns:
+      - src/ai_video/production/ad_composition.py
+      - src/ai_video/production/ad_creative.py
+      - src/ai_video/production/ad_creative_review.py
+      - src/ai_video/production/ad_creative_types.py
+      - src/ai_video/production/commercial_graphics.py
+      - src/ai_video/production/composition_contracts.py
       - src/ai_video/production/composition.py
       - src/ai_video/production/hyperframes.py
       - src/ai_video/production/_hyperframes_*.py
@@ -450,6 +457,7 @@ categories:
       - src/ai_video/production/_state_commit_render_*.py
       - src/ai_video/production/_state_commit_voice_*.py
       - src/ai_video/production/_voice_project_reader.py
+      - tests/test_production_ad_creative.py
       - tests/test_production_composition.py
       - tests/test_production_hyperframes.py
       - tests/test_production_audio.py

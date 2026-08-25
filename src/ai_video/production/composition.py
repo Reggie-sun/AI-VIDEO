@@ -6,6 +6,10 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.ad_composition import (
+    classify_composition_layer,
+    resolve_commercial_graphics,
+)
 from ai_video.production.captions import (
     _canonical_track_bytes,
     caption_style_fingerprint,
@@ -113,7 +117,7 @@ def _validated_visual_suffix(
 
 def timeline_fingerprint(timeline: ResolvedTimeline) -> str:
     excluded = {"content_hash", "composition_fingerprint", "source_provenance"}
-    if timeline.schema_version == "2.1":
+    if timeline.schema_version in {"2.1", "2.2"}:
         # P4 fingerprints resolved behavior, not authoring tuple order. The exact
         # input artifact hash remains durable on the timeline itself.
         excluded.update({"composition_spec_hash", "creation_receipt_id"})
@@ -650,6 +654,11 @@ def _resolve_composition(
         transition_by_target[transition.to_shot_id] = transition
 
     spans: list[ResolvedVisualSpan] = []
+    graphic_layer_ids = set(spec.graphic_layer_ids)
+    graphic_animation_by_layer = {
+        item.layer_id: item for item in spec.graphic_layer_animations
+    }
+    shot_start_frames: dict[str, int] = {}
     cursor = 0
     for shot_id in spec.shot_ids:
         shot = shots_by_id.get(shot_id)
@@ -668,12 +677,15 @@ def _resolve_composition(
         duration_frames = duration_frames_by_shot[shot_id]
         incoming = transition_by_target.get(shot_id)
         start_frame = cursor
+        shot_start_frames[shot_id] = start_frame
         shot_layers = layers_by_shot[shot_id]
         if not shot_layers:
             raise _invalid(f"Shot {shot_id} has no CompositionSpec layer.")
         z_values = [item.z_index for item in shot_layers]
         if len(z_values) != len(set(z_values)):
             raise _invalid(f"Shot {shot_id} has duplicate z_index values.")
+        if all(item.layer_id in graphic_layer_ids for item in shot_layers):
+            raise _invalid(f"Shot {shot_id} requires a primary visual layer.")
 
         start_sample = _sample_at_frame(
             start_frame,
@@ -698,11 +710,11 @@ def _resolve_composition(
                 raise _invalid(
                     f"Layer {layer.layer_id} is not bound to its declared Shot asset role."
                 )
-            is_video = shot.visual_strategy in {
-                VisualStrategy.GENERATED_VIDEO,
-                VisualStrategy.EXISTING_VIDEO,
-            }
-            expected_type = AssetType.VIDEO if is_video else AssetType.IMAGE
+            is_video, is_graphic_layer, expected_type = classify_composition_layer(
+                visual_strategy=shot.visual_strategy,
+                layer_id=layer.layer_id,
+                graphic_layer_ids=graphic_layer_ids,
+            )
             if (
                 expected_type not in role.allowed_asset_types
                 or asset.asset_type is not expected_type
@@ -711,7 +723,7 @@ def _resolve_composition(
                     f"Layer {layer.layer_id} must bind a registry "
                     f"{expected_type.value} asset."
                 )
-            if is_video:
+            if is_video and not is_graphic_layer:
                 try:
                     trim_duration_frames = resolved_video_trim_duration(
                         asset,
@@ -771,6 +783,7 @@ def _resolve_composition(
                     opacity_milli=layer.opacity_milli,
                     z_index=layer.z_index,
                     incoming_transition=incoming,
+                    graphic_animation=graphic_animation_by_layer.get(layer.layer_id),
                 )
             )
         cursor = start_frame + duration_frames
@@ -798,6 +811,11 @@ def _resolve_composition(
         total_frames=cursor,
         total_samples=total_samples,
     )
+    commercial_graphics = resolve_commercial_graphics(
+        spec,
+        shot_start_frames=shot_start_frames,
+        duration_frames_by_shot=duration_frames_by_shot,
+    )
 
     timeline_fields = dict(
         artifact_id=f"timeline-{spec.composition_id}",
@@ -821,8 +839,10 @@ def _resolve_composition(
         total_samples=total_samples,
         composition_fingerprint="0" * 64,
     )
-    if spec.schema_version == "2.1":
+    if spec.schema_version in {"2.1", "2.2"}:
         timeline_fields.update(audio_spans=audio_spans, caption_cues=caption_cues)
+    if spec.schema_version == "2.2":
+        timeline_fields.update(commercial_graphics=commercial_graphics)
     provisional = ResolvedTimeline(**timeline_fields)
     fingerprint = timeline_fingerprint(provisional)
     return seal_artifact(

@@ -768,6 +768,35 @@ def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
     ]
 
 
+def test_ad_creative_runtime_routes_to_composition_audio_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        "src/ai_video/production/ad_composition.py",
+        "src/ai_video/production/ad_creative.py",
+        "src/ai_video/production/ad_creative_review.py",
+        "src/ai_video/production/ad_creative_types.py",
+        "src/ai_video/production/commercial_graphics.py",
+        "src/ai_video/production/composition_contracts.py",
+        "tests/test_production_ad_creative.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["production_composition_audio"]
+        assert report["fallback_paths"] == []
+        assert "production_composition_audio_tests" in report["check_ids"]
+
+    assert "tests/test_production_ad_creative.py" in policy["checks"][
+        "production_composition_audio_tests"
+    ]["argv"]
+
+    artifact_report = agent_harness.inspect_paths(
+        ["src/ai_video/production/artifact_contracts.py"], policy
+    )
+    assert artifact_report["categories"] == ["production_shared_contracts"]
+    assert artifact_report["fallback_paths"] == []
+    assert "production_contract_tests" in artifact_report["check_ids"]
+
+
 def test_production_policy_commands_cover_repository_mandatory_contract_tests() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
     dependency_argv = policy["checks"]["production_dependency_tests"]["argv"]

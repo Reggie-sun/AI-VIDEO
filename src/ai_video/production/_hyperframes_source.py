@@ -9,6 +9,10 @@ from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_EVEN
 from html import escape
 
 from ai_video.production.models import RendererAudioBinding, ResolvedTimeline
+from ai_video.production.commercial_graphics import (
+    GraphicAnimation,
+    ResolvedCommercialGraphic,
+)
 from ai_video.production.visual_media import render_visual_element, visual_media_css
 
 
@@ -108,6 +112,14 @@ def _css_animation_name(layer_id: str) -> str:
     return f"p3-layer-{hashlib.sha256(layer_id.encode('utf-8')).hexdigest()}"
 
 
+def _graphic_animation_name(graphic_id: str) -> str:
+    return f"p22-graphic-{hashlib.sha256(graphic_id.encode('utf-8')).hexdigest()}"
+
+
+def _graphic_layer_animation_name(layer_id: str) -> str:
+    return f"p22-layer-{hashlib.sha256(layer_id.encode('utf-8')).hexdigest()}"
+
+
 def css_visibility_keyframes(
     name: str,
     *,
@@ -143,6 +155,169 @@ def css_visibility_keyframes(
             f"{end},100%{{opacity:0}}"
         )
     return f"@keyframes {name}{{{body}}}"
+
+
+def _graphic_keyframes(
+    graphic: ResolvedCommercialGraphic,
+    *,
+    total_frames: int,
+    fps: int,
+    serialized_duration: str,
+) -> str:
+    name = _graphic_animation_name(graphic.graphic_id)
+    start = capture_safe_boundary_percent(
+        graphic.start_frame,
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
+    end = capture_safe_boundary_percent(
+        graphic.end_frame_exclusive,
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
+    duration_frames = graphic.end_frame_exclusive - graphic.start_frame
+    motion_frames = min(6, max(1, duration_frames // 3))
+    entry_frame = min(
+        graphic.end_frame_exclusive,
+        graphic.start_frame + motion_frames,
+    )
+    exit_frame = max(graphic.start_frame, graphic.end_frame_exclusive - motion_frames)
+    entry = capture_safe_boundary_percent(
+        entry_frame,
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
+    exit_start = capture_safe_boundary_percent(
+        exit_frame,
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
+    entrance_transform = {
+        GraphicAnimation.NONE: "none",
+        GraphicAnimation.FADE: "none",
+        GraphicAnimation.SLIDE_UP: "translateY(24px)",
+        GraphicAnimation.SCALE_IN: "scale(.92)",
+    }[graphic.entrance]
+    exit_transform = {
+        GraphicAnimation.NONE: "none",
+        GraphicAnimation.FADE: "none",
+        GraphicAnimation.SLIDE_UP: "translateY(-24px)",
+        GraphicAnimation.SCALE_IN: "scale(.92)",
+    }[graphic.exit]
+    before = "" if graphic.start_frame == 0 else f"0%,{start}{{opacity:0;transform:{entrance_transform}}}"
+    after = (
+        ""
+        if graphic.end_frame_exclusive == total_frames
+        else f"{end},100%{{opacity:0;transform:{exit_transform}}}"
+    )
+    body = (
+        f"{before}{start}{{opacity:{0 if graphic.entrance is not GraphicAnimation.NONE else 1};"
+        f"transform:{entrance_transform}}}"
+        f"{entry},{exit_start}{{opacity:1;transform:none}}"
+        f"{end}{{opacity:{0 if graphic.exit is not GraphicAnimation.NONE else 1};"
+        f"transform:{exit_transform}}}{after}"
+    )
+    return f"@keyframes {name}{{{body}}}"
+
+
+def _graphic_layer_keyframes(
+    *,
+    name: str,
+    start_frame: int,
+    end_frame: int,
+    entrance: GraphicAnimation,
+    exit: GraphicAnimation,
+    target_opacity: str,
+    total_frames: int,
+    fps: int,
+    serialized_duration: str,
+) -> str:
+    start = capture_safe_boundary_percent(
+        start_frame,
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
+    end = capture_safe_boundary_percent(
+        end_frame,
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
+    duration_frames = end_frame - start_frame
+    motion_frames = min(6, max(1, duration_frames // 3))
+    entry = capture_safe_boundary_percent(
+        min(end_frame, start_frame + motion_frames),
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
+    exit_start = capture_safe_boundary_percent(
+        max(start_frame, end_frame - motion_frames),
+        total_frames=total_frames,
+        fps=fps,
+        serialized_duration=serialized_duration,
+    )
+    entrance_transform = {
+        GraphicAnimation.NONE: "none",
+        GraphicAnimation.FADE: "none",
+        GraphicAnimation.SLIDE_UP: "translateY(24px)",
+        GraphicAnimation.SCALE_IN: "scale(.92)",
+    }[entrance]
+    exit_transform = {
+        GraphicAnimation.NONE: "none",
+        GraphicAnimation.FADE: "none",
+        GraphicAnimation.SLIDE_UP: "translateY(-24px)",
+        GraphicAnimation.SCALE_IN: "scale(.92)",
+    }[exit]
+    before = "" if start_frame == 0 else f"0%,{start}{{opacity:0;transform:{entrance_transform}}}"
+    after = (
+        ""
+        if end_frame == total_frames
+        else f"{end},100%{{opacity:0;transform:{exit_transform}}}"
+    )
+    body = (
+        f"{before}{start}{{opacity:{0 if entrance is not GraphicAnimation.NONE else target_opacity};"
+        f"transform:{entrance_transform}}}"
+        f"{entry},{exit_start}{{opacity:{target_opacity};transform:none}}"
+        f"{end}{{opacity:{0 if exit is not GraphicAnimation.NONE else target_opacity};"
+        f"transform:{exit_transform}}}{after}"
+    )
+    return f"@keyframes {name}{{{body}}}"
+
+
+def _commercial_graphic_css(graphic: ResolvedCommercialGraphic, duration: str) -> str:
+    name = _graphic_animation_name(graphic.graphic_id)
+    background = graphic.background_color or "transparent"
+    return (
+        f".{name}{{left:{_decimal_milli(graphic.x_milli * 100)}%;"
+        f"top:{_decimal_milli(graphic.y_milli * 100)}%;"
+        f"width:{_decimal_milli(graphic.width_milli * 100)}%;"
+        f"font-size:{graphic.font_size_px}px;color:{graphic.text_color};"
+        f"background:{background};z-index:{graphic.z_index};"
+        f"animation-name:{name};animation-duration:{duration}s;"
+        "animation-fill-mode:both;animation-play-state:paused;"
+        "animation-timing-function:linear;transform-origin:50% 50%}"
+    )
+
+
+def _commercial_graphic_text(graphic: ResolvedCommercialGraphic) -> str:
+    if not graphic.keyword_emphasis:
+        return escape(graphic.text)
+    emphasis = {item.text: item.brand_token_id for item in graphic.keyword_emphasis}
+    pattern = re.compile("(" + "|".join(re.escape(item) for item in emphasis) + ")")
+    return "".join(
+        (
+            f'<span class="commercial-keyword-emphasis" data-brand-token-id="{escape(emphasis[part])}">{escape(part)}</span>'
+            if part in emphasis
+            else escape(part)
+        )
+        for part in pattern.split(graphic.text)
+    )
 
 
 def _decimal_milli(value: int) -> str:
@@ -252,26 +427,45 @@ def render_source(
     clips: list[str] = []
     audio_elements: list[str] = []
     caption_elements: list[str] = []
+    graphic_elements: list[str] = []
     animations: list[str] = []
     keyframes: list[str] = []
     for track_index, span in enumerate(timeline.visual_spans):
-        name = _css_animation_name(span.layer_id)
+        if span.graphic_animation is None:
+            name = _css_animation_name(span.layer_id)
+        else:
+            name = _graphic_layer_animation_name(span.layer_id)
         animations.append(
             f".{name}{{animation-name:{name};animation-duration:{duration}s;"
             "animation-fill-mode:both;animation-play-state:paused;"
             "animation-timing-function:step-end}"
         )
-        keyframes.append(
-            css_visibility_keyframes(
-                name,
-                start_frame=span.start_frame,
-                end_frame=span.start_frame + span.duration_frames,
-                total_frames=timeline.total_frames,
-                fps=fps,
-                serialized_duration=duration,
-                target_opacity=_decimal_milli(span.opacity_milli),
+        if span.graphic_animation is None:
+            keyframes.append(
+                css_visibility_keyframes(
+                    name,
+                    start_frame=span.start_frame,
+                    end_frame=span.start_frame + span.duration_frames,
+                    total_frames=timeline.total_frames,
+                    fps=fps,
+                    serialized_duration=duration,
+                    target_opacity=_decimal_milli(span.opacity_milli),
+                )
             )
-        )
+        else:
+            keyframes.append(
+                _graphic_layer_keyframes(
+                    name=name,
+                    start_frame=span.start_frame,
+                    end_frame=span.start_frame + span.duration_frames,
+                    entrance=span.graphic_animation.entrance,
+                    exit=span.graphic_animation.exit,
+                    target_opacity=_decimal_milli(span.opacity_milli),
+                    total_frames=timeline.total_frames,
+                    fps=fps,
+                    serialized_duration=duration,
+                )
+            )
         media = render_visual_element(
             span,
             video_id=_stable_dom_id("p3-video", span.layer_id),
@@ -279,6 +473,12 @@ def render_source(
             duration_seconds=seconds(span.duration_frames, fps),
             media_start_seconds=_clip_start_seconds(span.trim_start_frame, fps),
             track_index=track_index,
+        )
+        motion_attributes = (
+            f' data-layer-entrance="{span.graphic_animation.entrance.value}"'
+            f' data-layer-exit="{span.graphic_animation.exit.value}"'
+            if span.graphic_animation is not None
+            else ""
         )
         clips.append(
             "\n".join(
@@ -294,6 +494,7 @@ def render_source(
                         f' data-start-sample="{span.start_sample}"'
                         f' data-duration-samples="{span.duration_samples}"'
                         ' data-transition-kind="cut" data-transition-frames="0"'
+                        f'{motion_attributes}'
                         f' style="z-index:{span.z_index}">'
                     ),
                     media,
@@ -339,6 +540,38 @@ def render_source(
                 f' data-track-index="{track_index}">{escape(cue.text)}</div>'
             )
         )
+    for graphic in timeline.commercial_graphics:
+        name = _graphic_animation_name(graphic.graphic_id)
+        animations.append(_commercial_graphic_css(graphic, duration))
+        keyframes.append(
+            _graphic_keyframes(
+                graphic,
+                total_frames=timeline.total_frames,
+                fps=fps,
+                serialized_duration=duration,
+            )
+        )
+        graphic_elements.append(
+            (
+                f'<div id="{_stable_dom_id("p22-commercial-graphic", graphic.graphic_id)}"'
+                f' class="clip commercial-graphic {name}"'
+                f' data-commercial-graphic-id="{escape(graphic.graphic_id)}"'
+                f' data-commercial-graphic-role="{graphic.role.value}"'
+                f' data-shot-id="{escape(graphic.shot_id)}"'
+                f' data-start-frame="{graphic.start_frame}"'
+                f' data-end-frame-exclusive="{graphic.end_frame_exclusive}"'
+                f' data-start-sample="{graphic.start_sample}"'
+                f' data-end-sample="{graphic.end_sample}"'
+                f' data-claim-reference-ids="{escape(",".join(graphic.claim_reference_ids))}"'
+                f' data-avoidance-target-ids="{escape(",".join(graphic.avoidance_target_ids))}"'
+                f' data-brand-token-ids="{escape(",".join(graphic.brand_token_ids))}"'
+                f' data-synchronized-event-id="{escape(graphic.synchronized_event_id or "")}"'
+                f' data-sound-cue-ids="{escape(",".join(graphic.sound_cue_ids))}"'
+                f' data-safe-area="{graphic.safe_area.top_milli},{graphic.safe_area.right_milli},{graphic.safe_area.bottom_milli},{graphic.safe_area.left_milli}"'
+                f' data-entrance="{graphic.entrance.value}"'
+                f' data-exit="{graphic.exit.value}">{_commercial_graphic_text(graphic)}</div>'
+            )
+        )
     return "\n".join(
         [
             "<!doctype html>",
@@ -349,6 +582,14 @@ def render_source(
             "    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}",
             "    #stage{position:relative;overflow:hidden}",
             "    .clip{position:absolute;inset:0}",
+            *(
+                (
+                    "    .commercial-graphic{inset:auto;box-sizing:border-box;padding:.2em .3em;font-family:sans-serif;font-weight:700;line-height:1.15;white-space:pre-wrap;overflow:hidden}",
+                    "    .commercial-keyword-emphasis{font-weight:900;text-decoration:underline;text-decoration-thickness:.08em}",
+                )
+                if timeline.commercial_graphics
+                else ()
+            ),
             visual_media_css(timeline.visual_spans),
             *(
                 (
@@ -383,6 +624,7 @@ def render_source(
                 f' data-height="{timeline.delivery_profile.height}" data-fps="{fps}">'
             ),
             *clips,
+            *graphic_elements,
             *caption_elements,
             *audio_elements,
             "</div>",

@@ -19,6 +19,14 @@ import ai_video.production as production
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.captions import caption_timing_fingerprint
+from ai_video.production.commercial_graphics import (
+    GraphicAnimation,
+    GraphicKeywordEmphasis,
+    GraphicLayerAnimation,
+    GraphicRole,
+    GraphicSafeAreaInsets,
+    ResolvedCommercialGraphic,
+)
 from ai_video.production.composition import resolve_composition, timeline_fingerprint
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.hyperframes import (
@@ -265,6 +273,61 @@ def _materialize(tmp_path: Path, timeline: ResolvedTimeline | None = None):
         allowed_asset_root=tmp_path,
         staging_root=tmp_path / "staging",
         allowed_staging_parent=tmp_path,
+    )
+
+
+def _with_commercial_graphic(timeline: ResolvedTimeline) -> ResolvedTimeline:
+    graphic = ResolvedCommercialGraphic(
+        graphic_id="headline-hook",
+        role=GraphicRole.HEADLINE,
+        text="尴尬气味？ <测试>",
+        shot_id="shot-1",
+        start_frame=1,
+        end_frame_exclusive=5,
+        start_sample=2_000,
+        end_sample=10_000,
+        x_milli=80,
+        y_milli=120,
+        width_milli=840,
+        font_size_px=64,
+        text_color="#171717",
+        background_color="#F7D000E6",
+        claim_reference_ids=("claim-net-odor",),
+        safe_area=GraphicSafeAreaInsets(
+            top_milli=40,
+            right_milli=40,
+            bottom_milli=40,
+            left_milli=40,
+        ),
+        keyword_emphasis=(
+            GraphicKeywordEmphasis(
+                text="气味",
+                brand_token_id="brand-accent-yellow",
+            ),
+        ),
+        brand_token_ids=("brand-accent-yellow",),
+        synchronized_event_id="beat-hook",
+        sound_cue_ids=("music-bed",),
+        entrance=GraphicAnimation.SLIDE_UP,
+        exit=GraphicAnimation.FADE,
+        z_index=100,
+    )
+    return _reseal_timeline(
+        timeline,
+        schema_version="2.2",
+        visual_spans=(
+            timeline.visual_spans[0],
+            timeline.visual_spans[1].model_copy(
+                update={
+                    "graphic_animation": GraphicLayerAnimation(
+                        layer_id=timeline.visual_spans[1].layer_id,
+                        entrance=GraphicAnimation.SCALE_IN,
+                        exit=GraphicAnimation.FADE,
+                    )
+                }
+            ),
+        ),
+        commercial_graphics=(graphic,),
     )
 
 
@@ -759,6 +822,41 @@ def test_source_is_materialized_only_from_timeline_and_bound_assets(tmp_path):
     assert all("data-duration" not in attrs for attrs in parsed.clip_attributes)
     assert html.count("animation-duration:") == 2
     assert html.count("@keyframes p3-layer-") == 2
+
+
+def test_commercial_graphic_is_materialized_as_audited_timeline_css(tmp_path):
+    timeline = _with_commercial_graphic(make_resolved_timeline())
+
+    result = _materialize(tmp_path, timeline)
+
+    html = result.index_path.read_text(encoding="utf-8")
+    assert 'data-commercial-graphic-id="headline-hook"' in html
+    assert 'data-commercial-graphic-role="headline"' in html
+    assert 'data-claim-reference-ids="claim-net-odor"' in html
+    assert 'data-brand-token-ids="brand-accent-yellow"' in html
+    assert 'data-synchronized-event-id="beat-hook"' in html
+    assert 'data-sound-cue-ids="music-bed"' in html
+    assert 'data-brand-token-id="brand-accent-yellow">气味</span>' in html
+    assert 'data-entrance="slide_up"' in html
+    assert 'data-exit="fade"' in html
+    assert "尴尬" in html
+    assert "？ &lt;测试&gt;" in html
+    assert "left:8%" in html
+    assert "top:12%" in html
+    assert "width:84%" in html
+    assert "font-size:64px" in html
+    assert "#f7d000e6" in html.lower()
+    assert "@keyframes p22-graphic-" in html
+    assert 'data-layer-entrance="scale_in"' in html
+    assert 'data-layer-exit="fade"' in html
+    assert "@keyframes p22-layer-" in html
+    assert "<script" not in html.lower()
+    assert "http://" not in html and "https://" not in html
+    audit_hyperframes_source(
+        result.index_path,
+        expected_timeline=timeline,
+        expected_assets=result.asset_bindings,
+    )
 
 
 def test_mp4_visual_span_is_materialized_as_muted_frame_accurate_media(tmp_path):

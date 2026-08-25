@@ -12,6 +12,12 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.captions import CaptionImportRequest, caption_timing_fingerprint
 from ai_video.production.composition import _sample_at_frame, resolve_composition
 from ai_video.production.hashing import seal_artifact
+from ai_video.production.commercial_graphics import (
+    GraphicAnimation,
+    GraphicLayerAnimation,
+    GraphicRole,
+    GraphicTreatment,
+)
 from ai_video.production.models import (
     AudioKind,
     AudioTrackSpec,
@@ -190,6 +196,143 @@ def _with_video_layer(
         )
     )
     return loaded, spec
+
+
+def _with_video_and_product_graphic(root: Path, loaded, spec):
+    loaded, spec = _with_video_layer(root, loaded, spec)
+    product = loaded.registry.assets[1]
+    product_role = AssetRoleRequirement(
+        role="product_graphic",
+        asset_ids=(product.asset_id,),
+        allowed_asset_types=(AssetType.IMAGE,),
+    )
+    shot = loaded.shots[0].model_copy(
+        update={
+            "required_asset_roles": (
+                *loaded.shots[0].required_asset_roles,
+                product_role,
+            )
+        }
+    )
+    loaded = loaded.model_copy(update={"shots": (shot, loaded.shots[1])})
+    graphic_layer = CompositionLayerSpec(
+        layer_id="layer-product-graphic",
+        shot_id="shot-1",
+        asset_role="product_graphic",
+        asset_id=product.asset_id,
+        z_index=10,
+    )
+    headline = GraphicTreatment(
+        graphic_id="headline-hook",
+        role=GraphicRole.HEADLINE,
+        text="尴尬气味？",
+        shot_id="shot-1",
+        start_frame_offset=3,
+        duration_frames=24,
+        x_milli=80,
+        y_milli=120,
+        width_milli=840,
+        font_size_px=64,
+        text_color="#171717",
+        background_color="#F7D000E6",
+        claim_reference_ids=("claim-net-odor",),
+        entrance=GraphicAnimation.SLIDE_UP,
+        exit=GraphicAnimation.FADE,
+        z_index=100,
+    )
+    spec = CompositionSpec.model_validate(
+        seal_artifact(
+            spec.model_copy(
+                update={
+                    "schema_version": "2.2",
+                    "content_hash": "0" * 64,
+                    "layers": (*spec.layers, graphic_layer),
+                    "graphic_layer_ids": (graphic_layer.layer_id,),
+                    "graphic_layer_animations": (
+                        GraphicLayerAnimation(
+                            layer_id=graphic_layer.layer_id,
+                            entrance=GraphicAnimation.SCALE_IN,
+                            exit=GraphicAnimation.FADE,
+                        ),
+                    ),
+                    "commercial_graphics": (headline,),
+                    "ad_creative_plan_id": "ad-plan-composition-fixture",
+                    "ad_creative_plan_hash": "a" * 64,
+                }
+            )
+        ).model_dump(mode="python")
+    )
+    return loaded, spec
+
+
+def test_composition_22_resolves_image_graphic_over_generated_video_and_text(
+    tmp_path: Path,
+) -> None:
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+
+    assert timeline.schema_version == "2.2"
+    shot_one_spans = tuple(
+        item for item in timeline.visual_spans if item.shot_id == "shot-1"
+    )
+    assert tuple(item.asset_mime_type for item in shot_one_spans) == (
+        "video/mp4",
+        "image/png",
+    )
+    assert shot_one_spans[1].graphic_animation is not None
+    assert shot_one_spans[1].graphic_animation.entrance is GraphicAnimation.SCALE_IN
+    graphic = timeline.commercial_graphics[0]
+    assert graphic.graphic_id == "headline-hook"
+    assert graphic.claim_reference_ids == ("claim-net-odor",)
+    assert (graphic.start_frame, graphic.end_frame_exclusive) == (3, 27)
+    assert (graphic.start_sample, graphic.end_sample) == (6_000, 54_000)
+
+
+def test_composition_22_rejects_commercial_graphic_outside_its_shot(
+    tmp_path: Path,
+) -> None:
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+    graphic = spec.commercial_graphics[0].model_copy(
+        update={"start_frame_offset": 40, "duration_frames": 20}
+    )
+    spec = seal_artifact(
+        spec.model_copy(
+            update={"content_hash": "0" * 64, "commercial_graphics": (graphic,)}
+        )
+    )
+
+    error = _assert_invalid(loaded, spec)
+
+    assert "commercial graphic" in error.user_message.lower()
+    assert "shot" in error.user_message.lower()
+
+
+def test_resolved_timeline_before_22_rejects_nested_graphic_animation(
+    tmp_path: Path,
+) -> None:
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+    animated_span = timeline.visual_spans[0].model_copy(
+        update={
+            "graphic_animation": GraphicLayerAnimation(
+                layer_id=timeline.visual_spans[0].layer_id,
+                entrance=GraphicAnimation.FADE,
+                exit=GraphicAnimation.FADE,
+            )
+        }
+    )
+
+    with pytest.raises(ValueError, match="before 2.2"):
+        type(timeline).model_validate(
+            {
+                **timeline.model_dump(mode="python"),
+                "schema_version": "2.1",
+                "visual_spans": (animated_span,),
+            }
+        )
 
 
 def _with_overlapping_caption_binding(root, loaded, spec):

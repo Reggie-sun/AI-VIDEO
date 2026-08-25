@@ -2,7 +2,7 @@
 
 ## Status
 
-`ecommerce-ad-workflow/1` authoring contract 已进入 current local implementation，并保持 offline Development / authoring boundary。本文新增的 `AdCreativePlan` Runtime bridge 仍为 **Proposed / not implemented**；它不授权修改 Product Runtime、调用 Provider、生成媒体、读取 credential、付费、写 Production state、push 或 release。
+`ecommerce-ad-workflow/1` authoring contract 已进入 current local implementation，并保持 offline Development / authoring boundary。`AdCreativePlan` Runtime bridge 已在 current feature branch形成 additive implementation；完成声明必须绑定当前 exact-snapshot Harness receipt与independent review，不能由本文档自行证明。未调用Provider、未生成媒体、未读取credential、未执行付费、未写Production state，也未push/release。
 
 本文定义独立的 `ecommerce-ad-workflow`。它只服务电商商品广告，不承担 AI 漫剧、episodic fiction、Character-driven serial drama 或 cliffhanger production。此前把“AI 漫剧广告”作为该 Workflow 核心形态的方向被本文明确否决：AI 漫剧与电商广告必须是两条独立 Workflow，互不调用、互不依赖、没有共享上层业务 schema。
 
@@ -322,11 +322,11 @@ Hook 不是单句 copy。`hook_contract` 至少包含：
 
 Workflow 不得把 creative desire 自动翻译为 unsupported `CompositionSpec` 字段，也不得建立第二 renderer/timeline path。
 
-## Proposed Runtime Follow-up: `AdCreativePlan`
+## Implemented Runtime Bridge Contract: `AdCreativePlan`
 
 ### Decision
 
-广告 Runtime 缺口不需要十个新 service，也不需要替换现有生产链。批准进入后续设计的最小集合只有一个 versioned `AdCreativePlan`，位于通用 brief 与 Shot planning 之间：
+广告 Runtime 缺口不需要十个新 service，也不需要替换现有生产链。当前实现的最小集合只有一个 versioned `AdCreativePlan`，位于通用 brief 与 Shot planning 之间：
 
 ```text
 ProductionBrief
@@ -374,9 +374,9 @@ V1 最小字段为：
 | --- | --- |
 | Dialogue / accessibility subtitle | `SUPPORTED_CURRENTLY` through `CaptionTrack` |
 | Fixed 2D transform / opacity / z-order | `SUPPORTED_CURRENTLY` only where current composition layer accepts the asset type |
-| Commercial text hierarchy / kinetic typography | `REQUIRES_RUNTIME_CAPABILITY` |
-| Image-on-generated-video graphic reveal | `REQUIRES_RUNTIME_CAPABILITY` until the canonical layer/type gate and adapter support it |
-| Provider-native in-scene product | `REQUIRES_SOURCE_GENERATION_STRATEGY` plus evidence / review |
+| Commercial text hierarchy / constrained kinetic typography | `SUPPORTED_CURRENTLY` only through typed 2.2 commercial graphics and audited local CSS |
+| Image-on-generated-video graphic reveal | `SUPPORTED_CURRENTLY` only for explicit registered 2.2 graphic layers and constrained entry/exit treatment |
+| Provider-native in-scene product | `REQUIRES_SOURCE_GENERATION_STRATEGY` plus exact content-addressed evidence pointer/provenance and later review |
 | Tracked or masked physical product interaction | `REQUIRES_RUNTIME_CAPABILITY` or a separately approved source strategy |
 
 HyperFrames 本身足以承载受限 2D graphics，不代表 AI-VIDEO adapter 已经表达这些能力。历史或 repo 外 FFmpeg 成片中的静音、固定黑底字幕、hard-cut product card 与 finalization bypass 也不得归因为 HyperFrames；只有 canonical `CompositionSpec -> ResolvedTimeline -> HyperFrames` execution与receipts才能证明正式链路行为。
@@ -387,7 +387,7 @@ HyperFrames 本身足以承载受限 2D graphics，不代表 AI-VIDEO adapter �
 
 ### Acceptance Boundary
 
-只有在 versioned `AdCreativePlan` schema、validator/compiler、typed projection、focused tests、canonical HyperFrames adapter evidence与 exact-snapshot Harness receipt全部存在后，才能声明该 bridge implemented。即使实现完成，真实手持/遮挡/光照匹配仍需独立 source或compositing evidence；technical render PASS 仍不等于 P6、human Final Acceptance或广告效果。
+Current feature branch已具备versioned `AdCreativePlan` schema、accepted authoring proposal builder、typed Shot/composition handoff、public-boundary revalidation/compiler、exact plan/source-evidence binding、full projected-semantic pure review、focused tests与canonical HyperFrames source audit；完成声明仍以fresh exact-snapshot Harness receipt与independent review为gate。真实手持/遮挡/光照匹配仍需独立source或compositing evidence；technical render PASS仍不等于P6、human Final Acceptance或广告效果。
 
 ## Workflow State Machine
 

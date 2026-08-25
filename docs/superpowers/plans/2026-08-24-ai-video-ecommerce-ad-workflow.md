@@ -2,7 +2,7 @@
 
 ## Status
 
-Authoring V1 complete in current local implementation。Milestone 0–6 的 `ecommerce-ad-workflow/1` offline authoring package 已实现；本文新增的 `AdCreativePlan` Runtime bridge 为 **follow-up slice / not started**。该记录不授权当前窗口修改 Runtime、运行 Provider、生成媒体、读取 credential、付费、写 Production state、push 或 release。
+Authoring V1 complete in current local implementation。Milestone 0–6 的 `ecommerce-ad-workflow/1` offline authoring package已实现；`AdCreativePlan` Runtime bridge implementation已在current feature branch完成，完成声明必须引用fresh exact-snapshot Harness与independent review evidence。未运行Provider、未生成媒体、未读取credential、未付费、未写Production state，也未push/release。
 
 ## Goal
 
@@ -76,7 +76,7 @@ Codex discovery `ecommerce-ad-workflow` 后，按 Product Truth -> Strategy -> H
 - live ComfyUI、T8、H3、Seedance或paid smoke；
 - second timeline、renderer、writer、QC lifecycle或asset registry。
 
-上述 V1 out-of-scope boundary 保持不变。`AdCreativePlan` 不回填为 V1 已完成项；只有用户另行批准 Runtime slice 后，才按下文 follow-up 执行。
+上述V1 out-of-scope boundary保持不变；`AdCreativePlan`是用户另行批准并执行的additive Runtime slice，不回填为authoring V1能力。
 
 ## Acceptance Criteria
 
@@ -392,7 +392,7 @@ Receipt path必须以实际 Harness output为准，不得猜测；上例只规�
 
 1. **Schema and validation:** 在现有 cohesive model boundary增加 versioned `AdCreativePlan` 与 nested typed treatments；验证 claim/source lineage、beat/Shot bindings、single protagonist/montage policy、CTA/end-card closure，以及 unsupported physical interaction classification。
 2. **Compiler:** 新增 pure compiler，将 `EcommerceAdProductionPackage` / accepted authoring proposals编译为 `AdCreativePlan`，再投影为 existing Shot proposals与 composition requirements；compiler不读取credential、不选择Provider、不写Project/Registry/Manifest。
-3. **Composition projection:** 最小扩展现有 `CompositionSpec` expression surface，使受支持的 `GRAPHIC_REVEAL`、`HERO_ASSET` 与 commercial text可以进入同一 composition；不建立第二timeline，generated-video上的image layer在明确更新canonical asset/type gate之前继续fail closed。
+3. **Composition projection:** 最小扩展现有 `CompositionSpec` expression surface，使受支持的 `GRAPHIC_REVEAL`、`HERO_ASSET` 与 commercial text可以进入同一composition；不建立第二timeline。Generated/existing-video上的image layer只有显式列入2.2 `graphic_layer_ids`并通过registered asset/role/type gate时才接受，其他overlay继续fail closed。
 4. **HyperFrames adapter:** 只在受审计source generator内支持必要的2D entry/exit、position/scale/rotation/opacity、shadow/clip与text hierarchy；继续拒绝任意script、event handler、external CSS/font/import与network。
 5. **Capability gates:** `IN_SCENE_PROVIDER` 必须绑定source-generation evidence；tracking、mask、occlusion、depth、perspective、lighting、camera matching与真实hand-held product继续返回typed gap，不允许flat PNG fallback冒充physical interaction。
 6. **Review extension:** 为product integration credibility、commercial typography hierarchy、ad arc、sound synchronization、hero shot、CTA与brand closure增加pure review evidence/requirements；不得自动写P6 acceptance。
