@@ -1243,11 +1243,7 @@ def test_paid_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
         stop_requested=start_competing_request_after_preflight,
     )
 
-    assert result.stop_reason is (
-        EcommerceStopReason.CHECKPOINT_INVALID
-        if preexisting_attempt
-        else EcommerceStopReason.SERVICE_STOP
-    )
+    assert result.stop_reason is EcommerceStopReason.CHECKPOINT_INVALID
     assert provider.call_counts.submit == 0
     assert provider.call_counts.status == 0
     assert provider.call_counts.fetch == 0

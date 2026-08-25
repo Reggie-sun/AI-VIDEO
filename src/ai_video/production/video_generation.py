@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import errno
 import fcntl
 import hashlib
 from contextlib import contextmanager
@@ -89,24 +90,69 @@ class VideoGenerationService:
                 retryable=False,
             ) from exc
         acquired = False
+        primary: BaseException | None = None
         try:
             try:
                 fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except (BlockingIOError, OSError) as exc:
-                raise AiVideoError(
+            except BlockingIOError as exc:
+                primary = AiVideoError(
                     code=ErrorCode.PRODUCTION_STATE_BUSY,
                     user_message=(
                         "Ecommerce video Shot execution is already in progress."
                     ),
                     technical_detail=str(exc),
                     retryable=False,
-                ) from exc
+                )
+                raise primary from exc
+            except OSError as exc:
+                code = (
+                    ErrorCode.PRODUCTION_STATE_BUSY
+                    if exc.errno in {errno.EACCES, errno.EAGAIN}
+                    else ErrorCode.PRODUCTION_STATE_UNSUPPORTED
+                )
+                primary = AiVideoError(
+                    code=code,
+                    user_message=(
+                        "Ecommerce video Shot execution is already in progress."
+                        if code is ErrorCode.PRODUCTION_STATE_BUSY
+                        else "POSIX Ecommerce video execution locking failed."
+                    ),
+                    technical_detail=str(exc),
+                    retryable=False,
+                )
+                raise primary from exc
             acquired = True
-            yield
+            try:
+                yield
+            except BaseException as exc:
+                primary = exc
+                raise
         finally:
+            cleanup_errors: list[BaseException] = []
             if acquired:
-                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
-            handle.close()
+                try:
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+                except BaseException as exc:
+                    cleanup_errors.append(exc)
+            try:
+                handle.close()
+            except BaseException as exc:
+                cleanup_errors.append(exc)
+            if cleanup_errors:
+                detail = "; ".join(str(item) for item in cleanup_errors)
+                if primary is not None:
+                    primary.add_note(
+                        f"Ecommerce video execution lock cleanup failed: {detail}"
+                    )
+                else:
+                    raise AiVideoError(
+                        code=ErrorCode.PRODUCTION_STATE_COMMIT_FAILED,
+                        user_message=(
+                            "Ecommerce video execution lock cleanup failed."
+                        ),
+                        technical_detail=detail,
+                        retryable=False,
+                    )
 
     def _state(self, attempt_id: str):
         manifest = self._committer._read_manifest()

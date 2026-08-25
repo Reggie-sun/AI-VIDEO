@@ -429,6 +429,20 @@ def run_ecommerce_ad_generation(
         guard = nullcontext() if guard_factory is None else guard_factory()
         try:
             with guard:
+                try:
+                    guarded_identity = facade.bound_commercial_identity()
+                except (AttributeError, TypeError, ValueError):
+                    guarded_identity = None
+                if guarded_identity != (
+                    selected.plan_content_hash,
+                    projection.projection_hash,
+                    shot_id,
+                ):
+                    return _stopped(
+                        activated,
+                        shot_id=shot_id,
+                        reason=EcommerceStopReason.CHECKPOINT_INVALID,
+                    )
                 outcome = _run_claimed_shot(
                     plan_hash=selected.plan_content_hash,
                     projection_hash=projection.projection_hash,

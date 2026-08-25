@@ -174,6 +174,7 @@ def _runtime(
     status_error: ErrorCode | None = None,
     commercial: bool = False,
     commercial_plan_hash: str = "a" * 64,
+    prompt_text: str = "Continue the camera move from the exact terminal frame.",
 ):
     inputs = make_p8_video_generation_base(
         root, schema_version="2.13" if commercial else "2.8"
@@ -247,7 +248,7 @@ def _runtime(
         target_asset_role=shot.required_asset_roles[0].role,
         target_visual_strategy="generated_video",
         mode=generation_mode,
-        prompt_text="Continue the camera move from the exact terminal frame.",
+        prompt_text=prompt_text,
         negative_prompt_text="",
         image_bindings=(
             ()
@@ -500,11 +501,7 @@ def test_local_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
         stop_requested=start_competing_request_after_preflight,
     )
 
-    assert result.stop_reason is (
-        EcommerceStopReason.CHECKPOINT_INVALID
-        if preexisting_attempt
-        else EcommerceStopReason.SERVICE_STOP
-    )
+    assert result.stop_reason is EcommerceStopReason.CHECKPOINT_INVALID
     assert (provider.submit_calls, provider.status_calls, provider.fetch_calls) == (
         0,
         0,
@@ -578,6 +575,74 @@ def test_local_ecommerce_duplicate_coordinator_claims_fetch_once(
             f"{ATTEMPT_ID}.*.mp4"
         )
     ) == ()
+
+
+def test_local_ecommerce_guard_rechecks_completed_durable_request_identity(
+    tmp_path: Path,
+) -> None:
+    from test_production_generated_video_e2e import (
+        _CountingCommercialShotReviewer,
+        _commercial_handoff,
+    )
+
+    _, _, expected_request, _ = _runtime(
+        tmp_path / "expected",
+        commercial=True,
+        prompt_text="Expected exact Qingyan commercial prompt.",
+    )
+    _, provider, competing_request, committer = _runtime(
+        tmp_path / "durable",
+        commercial=True,
+        prompt_text="Competing prompt with the same commercial binding.",
+    )
+    expected_binding = expected_request.commercial_binding
+    competing_binding = competing_request.commercial_binding
+    assert expected_binding == competing_binding
+    assert (
+        expected_request.resolved_generation_hash
+        != competing_request.resolved_generation_hash
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    expected_facade = EcommerceVideoGenerationFacade(
+        service=service,
+        attempt_id=ATTEMPT_ID,
+        request=expected_request,
+        lane="local",
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+    )
+    competing_facade = EcommerceVideoGenerationFacade(
+        service=service,
+        attempt_id=ATTEMPT_ID,
+        request=competing_request,
+        lane="local",
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+    )
+    assert expected_binding is not None
+    handoff = _commercial_handoff(expected_binding.target_shot_id)
+    competing_complete = False
+
+    def complete_competing_request_after_preflight() -> bool:
+        nonlocal competing_complete
+        if not competing_complete:
+            competing = run_ecommerce_ad_generation(
+                handoff,
+                facades={expected_binding.target_shot_id: competing_facade},
+            )
+            assert competing.complete is True
+            competing_complete = True
+        return False
+
+    result = run_ecommerce_ad_generation(
+        handoff,
+        facades={expected_binding.target_shot_id: expected_facade},
+        stop_requested=complete_competing_request_after_preflight,
+    )
+
+    assert result.complete is False
+    assert result.stop_reason is EcommerceStopReason.CHECKPOINT_INVALID
+    assert provider.submit_calls == 1
+    assert provider.status_calls == 1
+    assert provider.fetch_calls == 1
 
 
 def test_t8_t2va_reuses_local_intent_permit_and_state_lifecycle(tmp_path: Path) -> None:
