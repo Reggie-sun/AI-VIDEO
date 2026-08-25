@@ -2,6 +2,17 @@
 
 Date: 2026-08-25
 
+## Superseded Status (2026-08-25)
+
+本记录保留 E0-K 完成当时的 technical measurements，但下方
+`PASS with human lip-sync pending` 不再是当前 human status。用户随后以正常速度观看并明确判定
+“口形完全没有对上”，因此 E0-K human lip-sync verdict 现为 `FAIL`。后续 cadence-only E0-L
+实验及 replacement evidence 见
+`docs/record_for_agent/2026-08-25-e0l-cadence-only-latentsync-experiment.md`。
+
+SyncNet `offset=0`、confidence `4.34` 等历史 technical evidence 保持有效，但不得再被解释为
+subjective lip-sync PASS 或 pending human acceptance。
+
 ## Purpose
 
 本文补记一个已完成的 Local MiniMax H3 T8 development experiment：先用 T8 自有
@@ -144,9 +155,10 @@ font烧录，并用`-c:a copy`保持corrected audio。固定字幕来自accepted
 
 ## Assessment And Boundaries
 
-Technical verdict为`PASS with human lip-sync pending`：T8-only source真实生成；所有source
+Historical technical verdict为`PASS with human lip-sync pending`：T8-only source真实生成；所有source
 frames保留usable face；LatentSync完成；SyncNet offset归零；字幕版完整解码且音轨保持。
-Human verdict仍需用户以正常速度、开启声音观看最终字幕版，判断：
+这是当时尚未获得human evidence的checkpoint表述，现已由文首`FAIL` verdict supersede。当时要求用户
+以正常速度、开启声音观看最终字幕版，判断：
 
 - 中文音节与嘴唇/下颌形状是否逐字自然；
 - voice clarity、naturalness与台词是否可接受；
@@ -167,8 +179,9 @@ Environment与启动操作细节见：
 .agent/context/t8-latentsync-local-runtime.md
 ```
 
-Next One Thing：用户观看最终burned-subtitle MP4并给出human lip-sync verdict。没有明确
-新缺陷与新授权时，不再生成candidate，也不把本次development result升级为Production。
+Historical Next One Thing（已完成并superseded）：用户观看最终burned-subtitle MP4并给出human
+lip-sync verdict。当前 verdict 与后续 bounded experiment 以文首链接的 E0-L record 为准；本次
+development result仍不得升级为Production。
 
 ## Agent Guardrails
 

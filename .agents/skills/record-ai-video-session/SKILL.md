@@ -1,6 +1,6 @@
 ---
 name: record-ai-video-session
-description: Create or update durable AI-VIDEO session records under docs/record_for_agent from verified repository and runtime evidence. Use proactively when substantial AI-VIDEO implementation, documentation, live proof, media diagnosis, architecture decisions, or recovery work reaches a stable checkpoint or completion; also use before a session handoff or compaction, and whenever the user asks to record, capture, preserve, summarize, or hand off the current session. Do not trigger for trivial conversation, unfinished work without a stable checkpoint, or status questions that do not request a durable record.
+description: Create or update durable AI-VIDEO session records under docs/record_for_agent from verified repository and runtime evidence, including reconciling prior records whose pending status or verdict is superseded by newer evidence. Use proactively when substantial AI-VIDEO implementation, documentation, live proof, media diagnosis, architecture decisions, or recovery work reaches a stable checkpoint or completion; also use before a session handoff or compaction, and whenever the user asks to record, capture, preserve, summarize, or hand off the current session. Do not trigger for trivial conversation, unfinished work without a stable checkpoint, or status questions that do not request a durable record.
 ---
 
 # Record AI-VIDEO Session
@@ -18,8 +18,9 @@ The project-local Codex hook may inject a request containing a
 stable-boundary rule, not as proof that a record is required.
 
 - If substantial work reached a stable checkpoint, completion, or genuine
-  blocker, run this skill normally and create or update the single relevant
-  record, then acknowledge the request with outcome `recorded`.
+  blocker, run this skill normally and create or update the primary relevant
+  record plus any directly required supersession notices, then acknowledge the
+  request with outcome `recorded`. Do not create duplicate narrative records.
 - If the boundary is not stable or the repository change is trivial or
   unrelated, do not create a record; acknowledge the request with outcome
   `no_record` and finish the current response normally.
@@ -53,6 +54,7 @@ stable-boundary rule, not as proof that a record is required.
 4. Read only the task-relevant canonical spec, plan, runtime baseline, roadmap, code, tests, receipts, reports, and media metadata.
 5. Verify important claims from current files or executable evidence. Treat conversation summaries, dated records, handoffs, and Agent prose as secondary context.
 6. When MiniMax/sub-agent behavior matters, reference a sanitized `capture-minimax-session` report if one exists. Never copy raw rollout JSONL, prompts, commands, environment values, credentials, or full Provider output into the record.
+7. Search the task-relevant existing records by exact artifact, run, verdict, or topic identity. Identify any prior `pending`, provisional, blocked, next-work, quality, or runtime claim that the new verified evidence materially changes.
 
 ## Choose The Record File
 
@@ -66,6 +68,33 @@ Use a short topic slug that describes the durable lesson or completed slice, not
 - Update an existing record only when the current work directly extends that same topic and the existing file is not owned by another writer.
 - Never overwrite, rename, or delete an unrelated record.
 - Do not create `references/` copies of canonical project documents. Link to the existing source of truth instead.
+
+## Reconcile Superseded Evidence
+
+When newer verified evidence changes a prior record's current-facing status,
+verdict, blocker, or next action, preserve history without leaving the old file
+misleading when read by itself.
+
+- Use exact artifact/run/topic identity to find directly affected records; do
+  not perform an unbounded rewrite of historical records.
+- Keep one primary record for the current checkpoint. In each directly affected
+  older record, add a concise, prominent supersession notice that names the
+  newer evidence or record, the replacement status/verdict, and the date.
+- Retain the original chronology and measurements as historical evidence. Mark
+  outdated conclusions and next actions as historical or superseded instead of
+  silently rewriting them as though they were never true.
+- A new record that mentions the correction is not sufficient when an older
+  file still independently presents `pending`, provisional PASS, or another
+  displaced claim as current truth.
+- Do not convert a technical metric into a human verdict, or vice versa. State
+  exactly which proof layer changed and which historical measurements remain
+  valid.
+- If an affected old record has a target-file ownership conflict, remain
+  read-only on that file, report the blocker, and do not claim supersession is
+  fully reconciled.
+- This skill updates durable records only. It does not rebuild or refresh a RAG
+  index unless the user separately authorizes the owning retrieval/index
+  workflow; report that distinction when freshness matters.
 
 ## Write The Record
 
@@ -117,12 +146,13 @@ Use exact repository-relative paths, commit IDs, receipt paths, artifact hashes,
 ## Verify And Checkpoint
 
 1. Review every changed line and confirm it traces to the session being recorded.
-2. Run `git diff --check` for the exact record file.
-3. Confirm the task diff contains only the intended record artifact.
+2. Run `git diff --check` for every exact task-owned record and Skill file.
+3. Confirm the task diff contains only the intended primary record, directly
+   required supersession notices, and any explicitly requested Skill update.
 4. Follow current repository policy for documentation-only verification. Do not run the full repository suite solely for an agent record.
-5. Stage with the exact record path. If unrelated files are already staged, use a path-limited commit only when it preserves their index state; otherwise stop and report the conflict.
+5. Stage every task-owned path explicitly. If unrelated files are already staged, use a path-limited commit only when it preserves their index state; otherwise stop and report the conflict.
 6. Never push or release unless the user separately requests it.
 
 ## Report Completion
 
-Return the clickable record path, commit ID if created, verification performed, and any unrecorded or unresolved risk. Explicitly state whether unrelated staged/dirty files remained untouched and whether any live or paid call occurred during recording.
+Return the clickable primary record path, every older record given a supersession notice, commit ID if created, verification performed, and any unrecorded or unresolved risk. Explicitly state whether unrelated staged/dirty files remained untouched, whether any live or paid call occurred during recording, and whether a separate RAG index remains stale or was refreshed by an independently authorized workflow.
