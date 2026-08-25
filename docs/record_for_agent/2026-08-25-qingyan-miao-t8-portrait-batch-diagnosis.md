@@ -2,6 +2,13 @@
 
 Date: 2026-08-25
 
+> **2026-08-26 supersession notice:** 本记录的原批次、拒绝镜头与历史 final candidate 仍是
+> 有效诊断 evidence，但不再是青颜广告的 current-facing delivery。新的严格串行重生成使用
+> 5 条独立 T8 Turbo4 portrait outputs，每条在下一次 submit 前完成 exact-file post-media
+> Gate，且以新的 28 秒成片替换当前交付；见
+> `2026-08-26-qingyan-t8-regeneration-post-media-gate.md`。本 notice 不推翻旧 rejected
+> attempts，也不把新 development candidate 升级为 P6 或 Final Acceptance。
+
 ## Purpose
 
 本文记录 `qingyan-miao-ad-20260825` 的第二次、独立于前一条中断尝试的
