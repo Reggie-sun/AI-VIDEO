@@ -1312,7 +1312,10 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "scripts/prepare_shot_continuity_p0.py",
         "scripts/execute_shot_continuity_source.py",
         "src/ai_video/production/execution_stack_materialization.py",
+        "src/ai_video/production/_state_commit_p0_qualification.py",
         "src/ai_video/production/shot_continuity_m0_qualification.py",
+        "src/ai_video/production/shot_continuity_m0_fast_validation.py",
+        "src/ai_video/production/shot_continuity_m0_policy.py",
         "src/ai_video/production/shot_continuity_source_qualification.py",
         "src/ai_video/production/shot_continuity_source_operator.py",
         "src/ai_video/production/shot_continuity_source_contracts.py",
@@ -1327,6 +1330,9 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_production_p0_qualification.py",
         "tests/test_production_video_transition.py",
         "tests/test_shot_continuity_m0_materialization.py",
+        "tests/test_shot_continuity_m0_fast_validation.py",
+        "tests/test_shot_continuity_m0_policy.py",
+        "tests/test_shot_continuity_m0_policy_preparation.py",
         "tests/test_shot_continuity_m0_validation.py",
         "tests/test_shot_continuity_source_qualification.py",
         "tests/test_shot_continuity_source_operator.py",
@@ -1336,6 +1342,9 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_api.json",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_binding.yaml",
         "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_profile.json",
+        "workflows/qualification/minimax_h3_t8_c4_m0_fast_v1_api.json",
+        "workflows/qualification/minimax_h3_t8_c4_m0_fast_v1_binding.yaml",
+        "workflows/qualification/minimax_h3_t8_c4_m0_fast_v1_profile.json",
     )
     provider_lifecycle_paths = {
         "src/ai_video/production/shot_continuity_source_qualification.py",
@@ -1351,6 +1360,9 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_shot_continuity_source_runtime.py",
         "tests/test_shot_continuity_source_transport.py",
     }
+    production_state_paths = {
+        "src/ai_video/production/_state_commit_p0_qualification.py",
+    }
 
     for path in paths:
         report = agent_harness.inspect_paths([path], policy)
@@ -1364,6 +1376,12 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
                 "shot_continuity_p0",
             }
             assert "production_video_provider_tests" in report["check_ids"]
+        elif path in production_state_paths:
+            assert set(report["categories"]) == {
+                "production_state",
+                "shot_continuity_p0",
+            }
+            assert "production_state_tests" in report["check_ids"]
         else:
             assert report["categories"] == ["shot_continuity_p0"]
         assert "shot_continuity_p0_tests" in report["check_ids"]
@@ -1376,6 +1394,9 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "tests/test_production_p0_qualification.py",
         "tests/test_production_video_transition.py",
         "tests/test_shot_continuity_m0_materialization.py",
+        "tests/test_shot_continuity_m0_fast_validation.py",
+        "tests/test_shot_continuity_m0_policy.py",
+        "tests/test_shot_continuity_m0_policy_preparation.py",
         "tests/test_shot_continuity_m0_validation.py",
         "tests/test_shot_continuity_source_qualification.py",
         "tests/test_shot_continuity_source_operator.py",

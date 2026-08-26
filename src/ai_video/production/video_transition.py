@@ -226,7 +226,7 @@ class CandidateStackBinding(_TransitionModel):
 
 
 class P0QualificationInput(_TransitionModel):
-    schema_version: Literal["1"] = "1"
+    schema_version: Literal["1", "2"] = "1"
     input_kind: Literal[
         "inventory",
         "calibration_fixture",
@@ -247,6 +247,10 @@ class P0QualificationInput(_TransitionModel):
 
     @model_validator(mode="after")
     def _validate_input(self) -> "P0QualificationInput":
+        if self.schema_version == "2" and self.input_kind != "calibration_fixture":
+            raise ValueError(
+                "P0 qualification input schema 2 is reserved for policy-bound calibration"
+            )
         if self.execution_stack_hashes != tuple(sorted(set(self.execution_stack_hashes))):
             raise ValueError("P0 qualification stack hashes must be unique and ordered")
         if any(len(item) != 64 or any(char not in "0123456789abcdef" for char in item) for item in self.execution_stack_hashes):
@@ -310,8 +314,18 @@ class P0QualificationInput(_TransitionModel):
             prompt = payload.get("prompt")
             preprocessing = payload.get("preprocessing")
             role_mapping = payload.get("role_mapping")
+            policy_id = payload.get("m0_validation_policy_id")
+            if self.schema_version == "1":
+                policy_matches = policy_id is None
+                expected_steps = 20
+                expected_turbo_lora = False
+            else:
+                policy_matches = policy_id in {"fast-v1", "quality-v1"}
+                expected_steps = 4 if policy_id == "fast-v1" else 20
+                expected_turbo_lora = policy_id == "fast-v1"
             if (
-                not isinstance(source, list)
+                not policy_matches
+                or not isinstance(source, list)
                 or len(source) != 2
                 or not all(isinstance(item, int) and item > 0 for item in source)
                 or source != [1659, 948]
@@ -347,10 +361,10 @@ class P0QualificationInput(_TransitionModel):
                 or payload.get("task_type") != "Hybrid"
                 or payload.get("frame_count") != 124
                 or payload.get("fps") != 24
-                or payload.get("steps") != 20
+                or payload.get("steps") != expected_steps
                 or payload.get("sampler") != "dual_clock_euler"
                 or payload.get("scheduler") != "native_flow"
-                or payload.get("turbo_lora") is not False
+                or payload.get("turbo_lora") is not expected_turbo_lora
                 or payload.get("output_container") != "mp4"
                 or payload.get("output_crf") != 17
                 or payload.get("native_audio") is not True

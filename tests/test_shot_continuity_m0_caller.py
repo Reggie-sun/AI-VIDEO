@@ -20,8 +20,17 @@ from ai_video.production.shot_continuity_m0_caller import (
     M0QualificationInput,
     M0QualificationProvider,
 )
+from ai_video.production.shot_continuity_m0_fast_validation import (
+    load_m0_fast_qualification_execution_sources,
+)
 from ai_video.production.shot_continuity_m0_qualification import (
     load_m0_qualification_execution_sources,
+)
+from ai_video.production.shot_continuity_m0_policy import (
+    M0ValidationPolicy,
+    M0ValidationPolicyCatalog,
+    M0ValidationPolicyId,
+    M0ValidationSelection,
 )
 from ai_video.production.shot_continuity_source_stack import (
     load_shot_continuity_source_execution_sources,
@@ -41,6 +50,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PROFILE_PATH = REPO_ROOT / (
     "workflows/qualification/"
     "minimax_h3_t8_c4_m0_candidate_v1_profile.json"
+)
+FAST_PROFILE_PATH = REPO_ROOT / (
+    "workflows/qualification/"
+    "minimax_h3_t8_c4_m0_fast_v1_profile.json"
 )
 NOW = datetime(2026, 8, 24, tzinfo=UTC)
 FROZEN_PROMPT = """For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced as the exact first frame; the ending frame aligns with <Picture 2>; <Picture 3> fully defines identity and wardrobe; <Video 1> supplies the opening gait phase and parallel camera velocity.
@@ -94,6 +107,7 @@ def _materialized_m0(sources: Any) -> GenerationExecutionStackIdentity:
 
 def _bundle(sources: Any, source_stack: GenerationExecutionStackIdentity) -> tuple[Any, ...]:
     profile = sources.profile
+    policy_id = getattr(profile, "validation_policy_id", "quality-v1")
     m0 = _materialized_m0(sources)
     m1 = SimpleNamespace(
         execution_stack_hash=profile.m1_execution_stack_hash,
@@ -107,7 +121,9 @@ def _bundle(sources: Any, source_stack: GenerationExecutionStackIdentity) -> tup
         ),
     )
     receipt = SimpleNamespace(
-        content_hash="d" * 64,
+        content_hash=(
+            profile.prepared_receipt_hash if policy_id == "fast-v1" else "d" * 64
+        ),
         project=SimpleNamespace(content_hash=profile.project_content_hash),
         registry=SimpleNamespace(content_hash=profile.registry_content_hash),
     )
@@ -129,12 +145,19 @@ def _bundle(sources: Any, source_stack: GenerationExecutionStackIdentity) -> tup
             execution_stack_hashes=stack_hashes,
             payload={
                 "prompt_sha256": profile.prompt_sha256,
+                "m0_validation_policy_id": policy_id,
                 "task_type": profile.task_type,
                 "steps": profile.steps,
                 "sampler": profile.sampler,
                 "scheduler": profile.scheduler,
                 "turbo_lora": profile.turbo_lora,
             },
+        ),
+        SimpleNamespace(
+            input_kind="rubric",
+            content_hash="a" * 64,
+            execution_stack_hashes=stack_hashes,
+            payload={},
         ),
         SimpleNamespace(
             input_kind="effect_budget",
@@ -296,10 +319,26 @@ class _Case:
     project: Any
 
 
-def _make_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Case:
-    sources = load_m0_qualification_execution_sources(
-        profile_path=PROFILE_PATH,
-        artifact_root=REPO_ROOT,
+def _make_case(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    policy_id: M0ValidationPolicyId = M0ValidationPolicyId.QUALITY_V1,
+) -> _Case:
+    profile_path = (
+        FAST_PROFILE_PATH
+        if policy_id is M0ValidationPolicyId.FAST_V1
+        else PROFILE_PATH
+    )
+    sources = (
+        load_m0_fast_qualification_execution_sources(
+            profile_path=profile_path,
+            artifact_root=REPO_ROOT,
+        )
+        if policy_id is M0ValidationPolicyId.FAST_V1
+        else load_m0_qualification_execution_sources(
+            profile_path=profile_path,
+            artifact_root=REPO_ROOT,
+        )
     )
     source_stack = load_shot_continuity_source_execution_sources(
         artifact_root=REPO_ROOT,
@@ -468,7 +507,15 @@ def _make_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Case:
             raise _error("live node schema drift")
         assert current_sources.profile.node_schema_seals == sources.profile.node_schema_seals
 
-    monkeypatch.setattr(caller_module, "validate_m0_live_node_schemas", validate_schemas)
+    monkeypatch.setattr(
+        caller_module,
+        (
+            "validate_m0_fast_live_node_schemas"
+            if policy_id is M0ValidationPolicyId.FAST_V1
+            else "validate_m0_live_node_schemas"
+        ),
+        validate_schemas,
+    )
     monkeypatch.setattr(
         caller_module,
         "validate_terminal_frame_evidence_against_project",
@@ -498,22 +545,52 @@ def _make_case(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> _Case:
         for asset_id, payload in payloads.items()
     }
     provider = M0QualificationProvider(
-        profile_path=PROFILE_PATH,
+        profile_path=profile_path,
         artifact_root=REPO_ROOT,
         input_root=input_root,
         transport=transport,
         asset_resolver=lambda asset_id, asset_sha256: path_by_identity[
             (asset_id, asset_sha256)
         ],
+        m0_policy_id=policy_id,
         clock=lambda: NOW,
+    )
+    rubric_hash = next(
+        item.content_hash for item in bundle[4] if item.input_kind == "rubric"
+    )
+    selected_policy = M0ValidationPolicy.create(
+        policy_id=policy_id,
+        profile_document_hash=sources.profile_document_hash,
+        execution_stack_hash=bundle[1][0].execution_stack_hash,
+        rubric_hash=rubric_hash,
+        conclusion_scope="m0_qualification",
+        conclusion_capability_id=sources.profile.capability_id,
+    )
+    other_policy_id = (
+        M0ValidationPolicyId.QUALITY_V1
+        if policy_id is M0ValidationPolicyId.FAST_V1
+        else M0ValidationPolicyId.FAST_V1
+    )
+    other_policy = M0ValidationPolicy.create(
+        policy_id=other_policy_id,
+        profile_document_hash="1" * 64,
+        execution_stack_hash="2" * 64,
+        rubric_hash=rubric_hash,
+        conclusion_scope="m0_qualification",
+        conclusion_capability_id="m0-other-capability",
+    )
+    policy_catalog = M0ValidationPolicyCatalog(
+        policies=(selected_policy, other_policy)
     )
     caller = M0QualificationCaller(
         committer=committer,
         provider=provider,
-        profile_path=PROFILE_PATH,
+        profile_path=profile_path,
         artifact_root=REPO_ROOT,
         project_loader=lambda: active_project,
         accepted_upstream_reopener=reopen_accepted_upstream,
+        policy_catalog=policy_catalog,
+        selection=M0ValidationSelection.from_policy(selected_policy),
     )
     return _Case(
         caller,
@@ -544,15 +621,16 @@ def _assert_zero_effect(case: _Case) -> None:
     assert case.transport.workflows == []
 
 
+@pytest.mark.parametrize(
+    "policy_id",
+    (M0ValidationPolicyId.FAST_V1, M0ValidationPolicyId.QUALITY_V1),
+)
 def test_qualification_caller_submits_once_with_exact_four_anchor_order(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    policy_id: M0ValidationPolicyId,
 ) -> None:
-    case = _make_case(tmp_path, monkeypatch)
-    assert (
-        case.committer.bundle[0].content_hash
-        != case.sources.profile.prepared_receipt_hash
-    )
+    case = _make_case(tmp_path, monkeypatch, policy_id)
 
     outcome = _qualify(case)
 
@@ -560,6 +638,8 @@ def test_qualification_caller_submits_once_with_exact_four_anchor_order(
     assert outcome.source_video_sha256 == (
         case.request.c4_multi_anchor_binding.terminal.source_video_sha256
     )
+    assert outcome.m0_validation_policy_id is policy_id
+    assert outcome.candidate_capability_id == case.sources.profile.capability_id
     assert [item.file_name for item in case.transport.uploads] == [
         "terminal-frame.png",
         "approved-endpoint.png",
@@ -600,6 +680,43 @@ def test_upload_uses_pre_permit_immutable_validated_bytes(
     assert uploaded_identity.data == original
     assert uploaded_identity.file_sha256 == _sha(original)
     assert case.paths["identity-anchor"].read_bytes() != uploaded_identity.data
+    assert len(case.transport.workflows) == 1
+
+
+@pytest.mark.parametrize(
+    "policy_id",
+    (M0ValidationPolicyId.FAST_V1, M0ValidationPolicyId.QUALITY_V1),
+)
+def test_submit_compiles_from_the_pre_permit_validated_sources(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    policy_id: M0ValidationPolicyId,
+) -> None:
+    case = _make_case(tmp_path, monkeypatch, policy_id)
+    preview = case.provider.preview(case.request)
+    intent = LocalVideoSubmitIntent.create(
+        attempt_id="m0-attempt",
+        request=case.request,
+        preview=preview,
+        recorded_at=NOW,
+    )
+    permit = _Permit(intent)
+    source_reads = 0
+    original_sources = case.provider._sources
+
+    def one_pre_effect_read() -> Any:
+        nonlocal source_reads
+        source_reads += 1
+        if source_reads > 1:
+            raise AssertionError("execution sources were reopened after validation")
+        return original_sources()
+
+    monkeypatch.setattr(case.provider, "_sources", one_pre_effect_read)
+
+    result = case.provider.submit_local(case.request, preview, intent, permit)
+
+    assert result.provider_request_id == "m0-prompt-1"
+    assert source_reads == 1
     assert len(case.transport.workflows) == 1
 
 

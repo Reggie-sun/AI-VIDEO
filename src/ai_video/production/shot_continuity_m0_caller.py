@@ -15,6 +15,19 @@ from ai_video.production.local_video import (
     LocalVideoSubmitResult,
 )
 from ai_video.production.paths import _read_regular_file_nofollow
+from ai_video.production.shot_continuity_m0_fast_validation import (
+    M0FastQualificationExecutionSources,
+    M0FastValidationPreSubmitGuard,
+    compile_m0_fast_qualification_workflow,
+    load_m0_fast_qualification_execution_sources,
+    reopen_m0_fast_validation_preflight,
+    validate_m0_fast_live_node_schemas,
+)
+from ai_video.production.shot_continuity_m0_policy import (
+    M0ValidationPolicyCatalog,
+    M0ValidationPolicyId,
+    M0ValidationSelection,
+)
 from ai_video.production.shot_continuity_m0_qualification import (
     M0QualificationCompileInputs,
     M0QualificationExecutionSources,
@@ -115,7 +128,7 @@ def _value(value: object) -> object:
 
 def _validate_request(
     request: ResolvedVideoGenerationRequest | Any,
-    sources: M0QualificationExecutionSources,
+    sources: M0QualificationExecutionSources | M0FastQualificationExecutionSources,
 ) -> None:
     profile = sources.profile
     try:
@@ -278,6 +291,7 @@ class _ValidatedInputs:
         M0QualificationInput,
     ]
     source_video_sha256: str
+    sources: M0QualificationExecutionSources | M0FastQualificationExecutionSources
 
 
 @dataclass(frozen=True)
@@ -285,6 +299,8 @@ class M0QualificationOutcome:
     attempt_id: str
     provider_request_id: str
     source_video_sha256: str
+    m0_validation_policy_id: M0ValidationPolicyId
+    candidate_capability_id: str
 
 
 def _expected_upstream_snapshot(
@@ -345,6 +361,7 @@ class M0QualificationProvider:
         input_root: str | Path,
         transport: M0QualificationTransport,
         asset_resolver: M0QualificationAssetResolver,
+        m0_policy_id: M0ValidationPolicyId,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
         self._profile_path = profile_path
@@ -352,9 +369,21 @@ class M0QualificationProvider:
         self._input_root = Path(input_root).resolve(strict=True)
         self._transport = transport
         self._asset_resolver = asset_resolver
+        self._m0_policy_id = M0ValidationPolicyId(m0_policy_id)
         self._clock = clock or (lambda: datetime.now(UTC))
 
-    def _sources(self) -> M0QualificationExecutionSources:
+    @property
+    def m0_policy_id(self) -> M0ValidationPolicyId:
+        return self._m0_policy_id
+
+    def _sources(
+        self,
+    ) -> M0QualificationExecutionSources | M0FastQualificationExecutionSources:
+        if self._m0_policy_id is M0ValidationPolicyId.FAST_V1:
+            return load_m0_fast_qualification_execution_sources(
+                profile_path=self._profile_path,
+                artifact_root=self._artifact_root,
+            )
         return load_m0_qualification_execution_sources(
             profile_path=self._profile_path,
             artifact_root=self._artifact_root,
@@ -369,7 +398,16 @@ class M0QualificationProvider:
             raise _invalid(
                 "M0 qualification transport does not match the sealed deployment."
             )
-        validate_m0_live_node_schemas(self._transport.get_object_info(), sources)
+        if self._m0_policy_id is M0ValidationPolicyId.FAST_V1:
+            validate_m0_fast_live_node_schemas(
+                self._transport.get_object_info(),
+                sources,
+            )
+        else:
+            validate_m0_live_node_schemas(
+                self._transport.get_object_info(),
+                sources,
+            )
         terminal = request.c4_multi_anchor_binding.terminal
         source = _reopen_input(
             root=self._input_root,
@@ -397,12 +435,21 @@ class M0QualificationProvider:
             source_video=source,
             uploads=uploads,
             source_video_sha256=terminal.source_video_sha256,
+            sources=sources,
         )
 
     def preview(
         self, request: ResolvedVideoGenerationRequest | Any
     ) -> VideoGenerationPreview:
-        _validate_request(request, self._sources())
+        return self._preview_from_sources(request, self._sources())
+
+    @staticmethod
+    def _preview_from_sources(
+        request: ResolvedVideoGenerationRequest | Any,
+        sources: M0QualificationExecutionSources
+        | M0FastQualificationExecutionSources,
+    ) -> VideoGenerationPreview:
+        _validate_request(request, sources)
         return VideoGenerationPreview.create(
             resolved=request,
             estimated_cost_upper_bound_microunits=None,
@@ -422,7 +469,7 @@ class M0QualificationProvider:
         permit: DurableLocalVideoSubmitPermit,
     ) -> LocalVideoSubmitResult:
         validated = self.validate_pre_effect(request)
-        if preview != self.preview(request) or (
+        if preview != self._preview_from_sources(request, validated.sources) or (
             intent.request_fingerprint != request.resolved_generation_hash
             or intent.preview_fingerprint != preview.preview_fingerprint
         ):
@@ -436,16 +483,24 @@ class M0QualificationProvider:
             uploaded = tuple(
                 self._transport.upload_input(item) for item in validated.uploads
             )
-            workflow = compile_m0_qualification_workflow(
-                sources=self._sources(),
-                inputs=M0QualificationCompileInputs(
-                    prompt=request.prompt_text,
-                    seed=request.effective_seed,
-                    first_frame=uploaded[0],
-                    last_frame=uploaded[1],
-                    reference=uploaded[2],
-                    reference_video=uploaded[3],
-                ),
+            inputs = M0QualificationCompileInputs(
+                prompt=request.prompt_text,
+                seed=request.effective_seed,
+                first_frame=uploaded[0],
+                last_frame=uploaded[1],
+                reference=uploaded[2],
+                reference_video=uploaded[3],
+            )
+            workflow = (
+                compile_m0_fast_qualification_workflow(
+                    sources=validated.sources,
+                    inputs=inputs,
+                )
+                if self._m0_policy_id is M0ValidationPolicyId.FAST_V1
+                else compile_m0_qualification_workflow(
+                    sources=validated.sources,
+                    inputs=inputs,
+                )
             )
             prompt_id = self._transport.submit_prompt(workflow)
             return LocalVideoSubmitResult.create(
@@ -478,16 +533,31 @@ class M0QualificationCaller:
         artifact_root: str | Path,
         project_loader: Callable[[], Any],
         accepted_upstream_reopener: M0AcceptedUpstreamReopener,
+        policy_catalog: M0ValidationPolicyCatalog,
+        selection: M0ValidationSelection,
     ) -> None:
         self._committer = committer
         self._provider = provider
         self._profile_path = profile_path
         self._artifact_root = artifact_root
-        self._guard = M0ValidationPreSubmitGuard(
-            committer=committer,
-            profile_path=profile_path,
-            artifact_root=artifact_root,
-        )
+        self._selected_policy = policy_catalog.resolve_selection(selection)
+        self._m0_policy_id = self._selected_policy.policy_id
+        if provider.m0_policy_id is not self._m0_policy_id:
+            raise _invalid("M0 caller and Provider policy selections do not match.")
+        if self._m0_policy_id is M0ValidationPolicyId.FAST_V1:
+            self._guard = M0FastValidationPreSubmitGuard(
+                committer=committer,
+                profile_path=profile_path,
+                artifact_root=artifact_root,
+            )
+            self._reopen_preflight = reopen_m0_fast_validation_preflight
+        else:
+            self._guard = M0ValidationPreSubmitGuard(
+                committer=committer,
+                profile_path=profile_path,
+                artifact_root=artifact_root,
+            )
+            self._reopen_preflight = reopen_m0_validation_preflight
         self._project_loader = project_loader
         self._accepted_upstream_reopener = accepted_upstream_reopener
 
@@ -519,6 +589,8 @@ class M0QualificationCaller:
             attempt_id=attempt_id,
             provider_request_id=submission.provider_request_id,
             source_video_sha256=validated.source_video_sha256,
+            m0_validation_policy_id=self._m0_policy_id,
+            candidate_capability_id=resolved_request.capability_id,
         )
 
     def _validate_pre_effect(
@@ -528,7 +600,7 @@ class M0QualificationCaller:
         expected_snapshot: M0ValidationPreflightSnapshot | None = None,
     ) -> tuple[_ValidatedInputs, M0ValidationPreflightSnapshot]:
         self._guard(request)
-        snapshot = reopen_m0_validation_preflight(
+        snapshot = self._reopen_preflight(
             committer=self._committer,
             profile_path=self._profile_path,
             artifact_root=self._artifact_root,
@@ -536,6 +608,20 @@ class M0QualificationCaller:
         if expected_snapshot is not None and snapshot != expected_snapshot:
             raise _invalid(
                 "M0 qualification closure drifted before durable submit intent."
+            )
+        rubric_hash = dict(snapshot.qualification_input_hashes).get("rubric")
+        current_sources = self._provider._sources()
+        if (
+            snapshot.execution_stack_hash
+            != self._selected_policy.execution_stack_hash
+            or current_sources.profile_document_hash
+            != self._selected_policy.profile_document_hash
+            or rubric_hash != self._selected_policy.rubric_hash
+            or request.capability_id
+            != self._selected_policy.conclusion_capability_id
+        ):
+            raise _invalid(
+                "M0 validation selection does not match the reopened execution closure."
             )
         try:
             project = self._project_loader()

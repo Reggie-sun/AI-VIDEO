@@ -28,6 +28,7 @@ from ai_video.production.shot_continuity_source_runtime import (
     APPROVED_ENDPOINT_ROLE,
     make_source_production_committer,
 )
+from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoGenerationPreview,
@@ -87,6 +88,7 @@ def _prepare_project(tmp_path: Path):
             a4=image_paths[3],
             approved_at="2026-08-25T12:00:00+08:00",
             imported_at="2026-08-25T12:01:00+08:00",
+            m0_policy=M0ValidationPolicyId.QUALITY_V1,
         )
     )
     return root, load_production_project(root / "project.yaml")

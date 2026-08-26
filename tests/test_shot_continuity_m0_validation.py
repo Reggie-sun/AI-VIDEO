@@ -8,6 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import ai_video.production.shot_continuity_m0_qualification as m0_qualification
+import ai_video.production.shot_continuity_m0_fast_validation as m0_fast
 import ai_video.production.shot_continuity_source_stack as source_stack_module
 import scripts.materialize_shot_continuity_m0 as materialize_script
 import pytest
@@ -20,6 +21,7 @@ from ai_video.production.paths import (
     canonical_p0_qualification_input_path,
 )
 from ai_video.production.project import load_production_project
+from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.video_execution_stack import (
@@ -34,6 +36,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 PROFILE_PATH = REPO_ROOT / (
     "workflows/qualification/"
     "minimax_h3_t8_c4_m0_candidate_v1_profile.json"
+)
+FAST_PROFILE_PATH = REPO_ROOT / (
+    "workflows/qualification/"
+    "minimax_h3_t8_c4_m0_fast_v1_profile.json"
 )
 
 
@@ -232,7 +238,18 @@ def _tree_snapshot(root: Path) -> dict[str, tuple[int, int, str]]:
 def _real_materialized_committer(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    policy_id: M0ValidationPolicyId = M0ValidationPolicyId.QUALITY_V1,
 ) -> tuple[ProductionStateCommitter, Path, Path]:
+    profile_module = (
+        m0_fast
+        if policy_id is M0ValidationPolicyId.FAST_V1
+        else m0_qualification
+    )
+    canonical_profile_path = (
+        FAST_PROFILE_PATH
+        if policy_id is M0ValidationPolicyId.FAST_V1
+        else PROFILE_PATH
+    )
     source_root = tmp_path / "sources"
     source_root.mkdir()
     image_paths = tuple(source_root / f"a{index}.png" for index in range(1, 5))
@@ -259,11 +276,12 @@ def _real_materialized_committer(
             a4=image_paths[3],
             approved_at="2026-08-23T00:01:00+00:00",
             imported_at="2026-08-23T00:02:00+00:00",
+            m0_policy=policy_id,
         )
     )
     committer = ProductionStateCommitter(root)
     receipt, _, _, _, _ = committer.reopen_p0_qualification_prepared()
-    profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
+    profile = json.loads(canonical_profile_path.read_text(encoding="utf-8"))
     profile.update(
         {
             "project_content_hash": receipt.project.content_hash,
@@ -271,7 +289,11 @@ def _real_materialized_committer(
             "prepared_receipt_hash": receipt.content_hash,
         }
     )
-    profile["sealed_seed"] = m0_qualification.derive_m0_qualification_seed(profile)
+    profile["sealed_seed"] = (
+        m0_fast.derive_m0_fast_qualification_seed(profile)
+        if policy_id is M0ValidationPolicyId.FAST_V1
+        else m0_qualification.derive_m0_qualification_seed(profile)
+    )
     artifact_root = tmp_path / "artifacts"
     profile_path = artifact_root / "workflows/qualification/profile.json"
     profile_path.parent.mkdir(parents=True)
@@ -285,11 +307,11 @@ def _real_materialized_committer(
         copied.write_bytes((REPO_ROOT / relative).read_bytes())
     compiler_path = (
         artifact_root
-        / "src/ai_video/production/shot_continuity_m0_qualification.py"
+        / f"src/ai_video/production/{Path(profile_module.__file__).name}"
     )
     compiler_path.parent.mkdir(parents=True)
-    compiler_path.write_bytes(Path(m0_qualification.__file__).read_bytes())
-    monkeypatch.setattr(m0_qualification, "__file__", str(compiler_path))
+    compiler_path.write_bytes(Path(profile_module.__file__).read_bytes())
+    monkeypatch.setattr(profile_module, "__file__", str(compiler_path))
     source_compiler_path = (
         artifact_root / "src/ai_video/production/comfy_video.py"
     )
@@ -326,6 +348,7 @@ def _real_materialized_committer(
         artifact_root=artifact_root,
         profile_path=profile_path,
         attempt_id="test-real-m0-materialization-v1",
+        m0_policy_id=policy_id,
     )
     return ProductionStateCommitter(root), profile_path, artifact_root
 
@@ -395,6 +418,7 @@ def test_m0_materialization_owner_reseals_source_drift_and_replays_exactly(
         artifact_root=artifact_root,
         profile_path=profile_path,
         attempt_id="test-real-m0-reseal-v2",
+        m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
     )
     after = committer.reopen_p0_qualification_prepared(
         required_materialized_candidates=("m0",)
@@ -426,12 +450,54 @@ def test_m0_materialization_owner_reseals_source_drift_and_replays_exactly(
         artifact_root=artifact_root,
         profile_path=profile_path,
         attempt_id="test-real-m0-reseal-replay",
+        m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
     )
     manifest_after = load_production_project(
         committer._project_root / "project.yaml"
     ).manifest
     assert replayed == resealed
     assert manifest_after.manifest_revision == manifest_before.manifest_revision + 1
+    assert _tree_snapshot(committer._project_root) == tree_before_replay
+
+
+def test_fast_m0_materialization_reopens_and_replays_exactly(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path,
+        monkeypatch,
+        M0ValidationPolicyId.FAST_V1,
+    )
+    prepared = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    tree_before_replay = _tree_snapshot(committer._project_root)
+
+    replayed = materialize(
+        root=committer._project_root,
+        artifact_root=artifact_root,
+        profile_path=profile_path,
+        attempt_id="test-real-fast-m0-materialization-replay",
+        m0_policy_id=M0ValidationPolicyId.FAST_V1,
+    )
+    first_preflight = m0_fast.reopen_m0_fast_validation_preflight(
+        committer=committer,
+        profile_path=profile_path,
+        artifact_root=artifact_root,
+    )
+    replay_preflight = m0_fast.reopen_m0_fast_validation_preflight(
+        committer=committer,
+        profile_path=profile_path,
+        artifact_root=artifact_root,
+    )
+
+    assert replayed["m0_validation_policy_id"] == "fast-v1"
+    assert replayed["m0_execution_stack_hash"] == prepared[1][0].execution_stack_hash
+    assert replayed["claims"]["provider_effects"] == 0
+    assert replayed["claims"]["video_generated"] is False
+    assert first_preflight == replay_preflight
+    assert first_preflight.execution_stack_hash == prepared[1][0].execution_stack_hash
     assert _tree_snapshot(committer._project_root) == tree_before_replay
 
 
@@ -459,6 +525,7 @@ def test_m0_materialization_owner_reseals_independent_source_compiler_drift(
         artifact_root=artifact_root,
         profile_path=profile_path,
         attempt_id="test-real-source-reseal-v2",
+        m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
     )
     after = committer.reopen_p0_qualification_prepared(
         required_materialized_candidates=("m0",)
@@ -480,6 +547,7 @@ def test_m0_materialization_owner_reseals_independent_source_compiler_drift(
         artifact_root=artifact_root,
         profile_path=profile_path,
         attempt_id="test-real-source-reseal-replay",
+        m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
     )
     assert replayed == resealed
     assert _tree_snapshot(committer._project_root) == tree_before_replay
@@ -515,6 +583,7 @@ def test_m0_materialized_reseal_rejects_seed_root_reselection(
             artifact_root=artifact_root,
             profile_path=profile_path,
             attempt_id=f"test-m0-reseal-{field}-drift",
+            m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
         )
     assert _tree_snapshot(committer._project_root) == tree_before
 

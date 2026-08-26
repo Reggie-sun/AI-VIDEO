@@ -19,6 +19,12 @@ from ai_video.production.paths import (
     canonical_execution_stack_materialization_source_path,
 )
 from ai_video.production.project import load_production_project
+from ai_video.production.shot_continuity_m0_fast_validation import (
+    M0FastQualificationProfile,
+    load_m0_fast_qualification_execution_sources,
+    validate_m0_fast_sources_against_stack,
+)
+from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.shot_continuity_m0_qualification import (
     M0QualificationProfile,
     load_m0_qualification_execution_sources,
@@ -33,14 +39,19 @@ from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video_execution_stack import GenerationExecutionStackIdentity
 
 
-DEFAULT_PROFILE = Path(
+QUALITY_PROFILE = Path(
     "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_profile.json"
+)
+FAST_PROFILE = Path(
+    "workflows/qualification/minimax_h3_t8_c4_m0_fast_v1_profile.json"
 )
 
 
 def _reopen_materialized_m0_seed_roots(
     project_root: Path,
     stack: GenerationExecutionStackIdentity,
+    *,
+    policy_id: M0ValidationPolicyId,
 ) -> tuple[str, str]:
     if stack.materialization_status != "materialized" or stack.profile_hash == "none":
         raise ValueError("M0 seed derivation roots require a materialized stack")
@@ -62,7 +73,12 @@ def _reopen_materialized_m0_seed_roots(
             envelope["profile_bytes_base64"],
             validate=True,
         )
-        profile = M0QualificationProfile.model_validate_json(profile_bytes)
+        profile_type = (
+            M0FastQualificationProfile
+            if policy_id is M0ValidationPolicyId.FAST_V1
+            else M0QualificationProfile
+        )
+        profile = profile_type.model_validate_json(profile_bytes)
     except (OSError, KeyError, TypeError, ValueError, binascii.Error) as exc:
         raise ValueError("materialized M0 seed derivation roots could not be reopened") from exc
     return profile.initial_execution_stack_hash, profile.prepared_receipt_hash
@@ -72,18 +88,32 @@ def materialize(
     *,
     root: Path,
     artifact_root: Path,
-    profile_path: Path,
+    profile_path: Path | None,
     attempt_id: str,
+    m0_policy_id: M0ValidationPolicyId,
 ) -> dict[str, object]:
+    selected_policy = M0ValidationPolicyId(m0_policy_id)
     project_root = root.resolve(strict=True)
     source_root = artifact_root.resolve(strict=True)
-    profile = profile_path
+    profile = profile_path or (
+        FAST_PROFILE
+        if selected_policy is M0ValidationPolicyId.FAST_V1
+        else QUALITY_PROFILE
+    )
     if not profile.is_absolute():
         profile = source_root / profile
-    m0_sources = load_m0_qualification_execution_sources(
-        profile_path=profile,
-        artifact_root=source_root,
-    )
+    if selected_policy is M0ValidationPolicyId.FAST_V1:
+        m0_sources = load_m0_fast_qualification_execution_sources(
+            profile_path=profile,
+            artifact_root=source_root,
+        )
+        validate_sources = validate_m0_fast_sources_against_stack
+    else:
+        m0_sources = load_m0_qualification_execution_sources(
+            profile_path=profile,
+            artifact_root=source_root,
+        )
+        validate_sources = validate_m0_sources_against_stack
     source_sources = load_shot_continuity_source_execution_sources(
         artifact_root=REPO_ROOT,
     )
@@ -104,14 +134,18 @@ def materialize(
             validate_shot_continuity_source_stack(source_sources, current_source)
     current_m0 = before[1][0]
     if current_m0.materialization_status == "materialized" and (
-        _reopen_materialized_m0_seed_roots(project_root, current_m0)
+        _reopen_materialized_m0_seed_roots(
+            project_root,
+            current_m0,
+            policy_id=selected_policy,
+        )
         != (
             m0_sources.profile.initial_execution_stack_hash,
             m0_sources.profile.prepared_receipt_hash,
         )
     ):
         raise ValueError("M0 materialized seed derivation roots cannot be replaced")
-    validate_m0_sources_against_stack(
+    validate_sources(
         m0_sources,
         current_m0,
         allow_materialized_source_reseal=(
@@ -123,6 +157,9 @@ def materialize(
         item for item in before[4] if item.input_kind == "calibration_fixture"
     ).payload
     if (
+        calibration.get("m0_validation_policy_id", "quality-v1")
+        != selected_policy.value
+        or
         before[0].project.content_hash != profile.project_content_hash
         or before[0].registry.content_hash != profile.registry_content_hash
         or before[1][1].execution_stack_hash != profile.m1_execution_stack_hash
@@ -177,7 +214,7 @@ def materialize(
             required_materialized_candidates=("m0",)
         )
     )
-    validate_m0_sources_against_stack(m0_sources, stacks[0])
+    validate_sources(m0_sources, stacks[0])
     materialized_sources = writer.reopen_p0_qualification_source_stacks(
         require_materialized=current_source is not None
     )
@@ -210,6 +247,7 @@ def materialize(
             else "legacy_alias"
         ),
         "m0_execution_stack_hash": stacks[0].execution_stack_hash,
+        "m0_validation_policy_id": selected_policy.value,
         "m0_profile_hash": stacks[0].profile_hash,
         "m0_compiler_hash": stacks[0].compiler_hash,
         "m0_workflow_hash": stacks[0].workflow_hash,
@@ -237,7 +275,13 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--artifact-root", type=Path, default=REPO_ROOT)
-    parser.add_argument("--profile", type=Path, default=DEFAULT_PROFILE)
+    parser.add_argument("--profile", type=Path)
+    parser.add_argument(
+        "--m0-policy",
+        type=M0ValidationPolicyId,
+        choices=tuple(M0ValidationPolicyId),
+        required=True,
+    )
     parser.add_argument(
         "--attempt-id",
         default="rainy-station-m0-execution-stack-materialization-v1",
@@ -254,6 +298,7 @@ def main() -> int:
                 artifact_root=args.artifact_root,
                 profile_path=args.profile,
                 attempt_id=args.attempt_id,
+                m0_policy_id=args.m0_policy,
             ),
             ensure_ascii=False,
             sort_keys=True,

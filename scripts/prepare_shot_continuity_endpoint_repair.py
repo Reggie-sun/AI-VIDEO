@@ -54,6 +54,7 @@ from ai_video.production.shot_continuity_source_runtime import (
     build_source_closure,
     build_source_dependency_transition,
 )
+from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.state_commit import (
     PreparedArtifact,
     ProductionStateCommitter,
@@ -439,6 +440,7 @@ def prepare(args: argparse.Namespace) -> dict[str, object]:
         shot_assets=shot_assets,
         shot_receipts=shot_receipts,
         approved_at=args.approved_at,
+        m0_policy_id=args.m0_policy,
     )
     return {
         "root": root.as_posix(),
@@ -453,6 +455,7 @@ def prepare(args: argparse.Namespace) -> dict[str, object]:
         "validation_set_hash": validation_set.content_hash,
         "source_execution_stack_hash": source_stack.execution_stack_hash,
         "m0_execution_stack_hash": m0.execution_stack_hash,
+        "m0_validation_policy_id": args.m0_policy.value,
         "m1_execution_stack_hash": m1.execution_stack_hash,
         "qualification_input_hashes": {
             item.input_kind: item.content_hash for item in inputs
@@ -474,6 +477,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--prompt-fingerprint", required=True)
     parser.add_argument("--imported-at", required=True)
     parser.add_argument("--approved-at", required=True)
+    parser.add_argument(
+        "--m0-policy",
+        type=M0ValidationPolicyId,
+        choices=tuple(M0ValidationPolicyId),
+        required=True,
+    )
     return parser
 
 

@@ -1,0 +1,46 @@
+{
+  "calibration_fixture_hash": "9d6f45a74a0755fc1b8e16577379e0cc716615ee524b5479cd2083d5bc3d0ee8",
+  "candidate_stacks": [
+    {
+      "execution_stack_hash": "d486728c5f8c561bfe1ca2c681fe41736ababfc7223856e7e0f18964abeb40f6",
+      "label": "m0"
+    },
+    {
+      "execution_stack_hash": "4d08741636647fbb29f9cf69a69a2c81d62156cef128f619d26a17b72e94c01b",
+      "label": "m1"
+    }
+  ],
+  "content_hash": "9d2a9fa92b727af4be7cfc1fbc3a8624cf3766a8b741f715cd2fd3c9845cc30d",
+  "effect_budget_hash": "e23d3d9a8b6ef698e601a191e19abfe4a4e242f7e469330ee9624066d5d25252",
+  "human_freeze_evidence_hash": "c40af7ea4dcc2bdcd0362e6b211680f182d0436859a96af7aa4b217f92f42a4e",
+  "inventory_receipt_hash": "1e3102703f866490fcd394612bbd12496568eeb51ac02527ab53c32b49cbec95",
+  "limitations": [
+    "No video media has been generated.",
+    "No candidate winner or active capability has been selected.",
+    "M1 Hybrid artifact is absent and the M1 stack remains unmaterialized.",
+    "Candidate profile, compiler, and workflow identities are canonical empty fields until a real qualification execution stack is materialized and resealed.",
+    "No creative PASS, P6 verdict, Final Acceptance, push, or release is claimed."
+  ],
+  "policy_hashes": [
+    "0079e1cb9d5baa049163e843a27be6a6cc335937666b53ce6e3292668abcae83",
+    "668f554bf4e97be6893e989a17245052a6d9075208079dfc51dd8447550c65df",
+    "87ebfd9d57b4fc5afdba45f4ddfb8a8e23daa094f51840bada8c66622461b324"
+  ],
+  "project": {
+    "content_hash": "4f53877b9e437c2cec5161c966dc9c6a9e1c4c5a4ba7af43951a5b696cd2bbab",
+    "file_sha256": "852aff8dd67e9e9aeba84a63a971129ea2c496947d2aaafabcaa888a3f92d47e",
+    "path": "state/projects/project.2.4f53877b9e437c2cec5161c966dc9c6a9e1c4c5a4ba7af43951a5b696cd2bbab.yaml",
+    "revision": 2
+  },
+  "receipt_id": "rainy-station-p0-qualification-prepared-v1",
+  "registry": {
+    "content_hash": "8902beaf6540759faab80a4efe6acef00d8a118d4437ef16abba9e8709847256",
+    "file_sha256": "1e8ce2a01abafbef695ab128a179d6c5d66225aea829f33935178784d94cafbd",
+    "path": "assets/registry.8902beaf6540759faab80a4efe6acef00d8a118d4437ef16abba9e8709847256.json",
+    "revision_id": "8902beaf6540759faab80a4efe6acef00d8a118d4437ef16abba9e8709847256"
+  },
+  "rubric_hash": "61b65e5320384df9b8560e2cfb51f3b18284ddfefc48d8a6480c1d5cc9324018",
+  "schema_version": "1",
+  "status": "qualification_prepared",
+  "validation_set_hash": "c0dcc3392091c8be7025c63143452bda9d574471ad11e0e371d2d7f67ea9e094"
+}

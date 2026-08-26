@@ -14,6 +14,7 @@ from ai_video.errors import AiVideoError
 from ai_video.production.image_import import HumanImageImportReceipt
 from ai_video.production.paths import canonical_human_image_import_receipt_path
 from ai_video.production.project import load_production_project
+from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.shot_continuity_source_runtime import build_source_closure
 from scripts.prepare_shot_continuity_p0 import prepare as prepare_p0
 
@@ -61,6 +62,7 @@ def _prepare_source_root(tmp_path: Path, name: str = "source") -> Path:
             a4=images[3],
             approved_at="2026-08-23T01:10:00+08:00",
             imported_at="2026-08-23T01:20:00+08:00",
+            m0_policy=M0ValidationPolicyId.QUALITY_V1,
         )
     )
     return source_root
@@ -89,6 +91,8 @@ def _run_repair(
             "2026-08-25T20:43:02+08:00",
             "--approved-at",
             "2026-08-25T20:52:24+08:00",
+            "--m0-policy",
+            "quality-v1",
         ),
         check=False,
         cwd=Path(__file__).parents[1],
@@ -246,6 +250,7 @@ def test_endpoint_repair_clones_creative_bundle_and_changes_only_a3(tmp_path: Pa
         "video_generated": False,
         "winner_selected": False,
     }
+    assert result["m0_validation_policy_id"] == "quality-v1"
 
 
 def test_endpoint_repair_output_can_be_repaired_again(tmp_path: Path) -> None:

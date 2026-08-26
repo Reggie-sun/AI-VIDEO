@@ -33,9 +33,10 @@ Harness。唯一Local FL2VA attempt保持A1/A2/A4、prompt、model、workflow、
 107→108 hard cut，frames 120→123仍有subject/leg motion，支持endpoint root-cause repair；但RGB与grayscale
 SSIM口径给出不同threshold结论。Seed derivation contract虽未变，content closure变化使numeric seed与v7不同，
 所以v9不是strict endpoint-only live A/B；因果claim仍依赖historical isolated A/B。Automatic P6因缺canonical
-continuity binding保持`NOT_EVALUATED`，human/P6
-未记录。因此source仍停在fetched/validate，未形成accepted candidate、terminal/motion-tail、M0 effect或
-activation。Current exact evidence见runtime baseline与
+continuity binding保持`NOT_EVALUATED`；用户对exact v9 MP4的人眼镜头结论为
+`PASS_WITH_PACING_WAIVER`，只豁免其明确接受的偏慢行走观感，不替代automatic P6或boundary contract。
+因此source仍停在fetched/validate，未形成accepted candidate、terminal/motion-tail、M0 effect或activation。
+Current exact evidence见runtime baseline与
 `docs/record_for_agent/2026-08-26-shot-continuity-motion-endpoint-live-attempt.md`。
 
 已接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
@@ -70,7 +71,8 @@ destination。Adapter只解决
 ### Included
 
 - C4 core regression/tamper closure，不重复实现已存在的 owner；
-- Local T8 C4 model qualification：M0 stock Ref2VA，必要时 M1 sealed Hybrid artifact；
+- Local T8 C4 model qualification：P0前显式选择M0 `quality-v1`或`fast-v1` exact policy，必要时再进入
+  M1 sealed Hybrid artifact；
 - winner-specific workflow、binding、profile、capability 与 local child adapter；
 - `LocalH3VideoProviderFamily` additive child registration 与 exact dispatch；
 - local lifecycle、recovery、activation、reopen、replay 与 P5 closure；
@@ -93,7 +95,8 @@ destination。Adapter只解决
 - 不把多个 capability 的并集描述为一个 C4 capability；
 - 不把 Seedance frame mode 与 reference mode 的 serializer 字段共存当作 official cross-mode support；
 - 不把计划target解释为entitlement；任何未被fresh active profile允许的model不得进入snapshot；
-- 不在第一版启用 Turbo LoRA；
+- 不在`quality-v1`、M1或最终active capability中隐式启用 Turbo LoRA；Turbo4只允许存在于显式选择、独立
+  content-addressed且尚未live-ready的`fast-v1` M0 qualification policy，不能成为fallback或替换其他policy bytes；
 - 不自动构建、修复或替换 Hybrid artifact；
 - 不在本计划内升级ComfyUI或引入新的conditioning subsystem；
 - 不引入 remote/cloud fallback，不进行 blind retry；
@@ -183,28 +186,41 @@ capability、materialization、budget/egress（如适用）、output probe与QA�
 
 ### Local T8 Qualification Contract
 
-资格顺序固定为：
+P0 preparation前必须由用户显式选择一个M0 validation policy；没有default、运行时切换或失败fallback：
 
 ```text
-M0: stock Ref2VA + T8 Hybrid conditioning + Stock20
-    sampler=dual_clock_euler
-    flow=native_flow
-    Turbo LoRA=off
+M0 quality-v1: stock Ref2VA + T8 Hybrid conditioning + Stock20
+               sampler=dual_clock_euler
+               flow=native_flow
+               Turbo LoRA=off
 
-       only if M0 fails frozen gates
+M0 fast-v1:    exact same stock Ref2VA checkpoint + sealed Turbo4 LoRA
+               T8 Hybrid conditioning + 4 steps
+               sampler=dual_clock_euler
+               flow=native_flow
+
+                 only if the explicitly selected M0 policy fails frozen gates
 
 M1: exact validated pruned FL2VA/Ref2VA pair
     + sealed T8 Hybrid artifact
     + same Stock20 baseline
 ```
 
+`m0`是Manifest/P0 lifecycle中的primary qualification slot，不等同于Stock20 identity。所选policy必须在P0
+receipt、calibration、profile document、execution stack、rubric、capability与sealed seed中exact绑定；同一P0
+bundle只包含一个selected M0 stack，另一policy不能在materialization、permit或submit期间替换该slot。
+
 M0 与 M1 是 offline qualification candidates，不是 runtime fallback。最终 active snapshot 只能注册一个
-winner；失败时不得自动切换 candidate。候选 identities 固定为：
+winner；失败时不得自动切换 candidate。候选 identities固定为：
 
 - `minimax-h3-t8-c4-motion-ref2va-stock20-v1`；
+- `minimax-h3-t8-c4-motion-ref2va-turbo4-v1`；
 - `minimax-h3-t8-c4-motion-hybrid-stock20-v1`。
 
-同一 capability ID 后续不得替换 model bytes、artifact recipe 或 sampling profile。
+`quality-v1`保持既有Stock20 compiler/workflow bytes；`fast-v1`使用独立capability identity且当前仅为
+`offline_qualification_candidate`。当前T8 checkout与profile runtime seal存在drift，因此任何future fast live
+submit前仍须重新关闭exact runtime/profile preflight。任一policy的PASS只适用于自身capability；同一
+capability ID后续不得替换model bytes、artifact recipe或sampling profile。
 
 ### Real Shot Generation Verification Contract
 
@@ -626,20 +642,22 @@ materialized identities与single motion-endpoint source attempt由runtime baseli
 boundary acceptance与automatic P6仍未关闭，本次human verdict也不构成M0执行授权，故Milestone 4 M0仍未开始，
 M1 conditional gate也未触发。
 
-## Milestone 4: Execute M0, Then Conditional M1
+## Milestone 4: Execute Explicitly Selected M0, Then Conditional M1
 
 本milestone属于Validation V1。它只验证单个continuity boundary的model/conditioning feasibility，不等待
 完整Production child，也不替代Milestone 7的multi-shot Pilot。
 
-### M0 — Stock Ref2VA Control
+### M0 — Explicit Policy Selection
 
-在Local live authority仍有效且preflight全通过时，只提交一次M0：
+在新的Local live authority、accepted source/boundary/P6 prerequisite与preflight全通过时，用户必须先选择
+`quality-v1`或`fast-v1`，然后只提交一次与该selection exact绑定的M0：
 
 - exact four anchors；
 - stock Ref2VA；
 - T8 Hybrid conditioning；
-- Stock20、`dual_clock_euler`、`native_flow`；
-- Turbo off、reference audio empty；
+- `quality-v1`为Stock20/Turbo off；`fast-v1`为sealed Turbo4/4-step；
+- 两者均为`dual_clock_euler`、`native_flow`、reference audio empty；
+- selected policy/profile/receipt/stack/rubric/capability必须exact一致，另一policy不得在effect path出现；
 - one local permit、one submit、no retry、no fallback。
 
 记录M0 `execution_stack_hash`、workflow execution、output/probe、decoded boundaries、identity windows、
@@ -647,7 +665,8 @@ motion windows与P6/human verdict。
 
 ### M0 Decision
 
-- 所有frozen technical、boundary、identity、motion与P6 gates通过：M0是winner，跳过M1。
+- 所有frozen technical、boundary、identity、motion与P6 gates通过：只有selected M0 capability成为winner，
+  跳过M1；不得把该结论转移到另一M0 policy。
 - 任一gate失败：保留exact failure evidence，不调整阈值、不隐式重试；只有满足M1 inventory gate才进入M1。
 - Unknown outcome：走existing explicit recovery，不把它解释为quality failure或重试许可。
 

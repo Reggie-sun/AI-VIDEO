@@ -904,10 +904,49 @@ class _StateCommitP0QualificationMixin:
             raise _state_invalid("P0 qualification input hash is invalid.")
         inputs_by_kind = {item.input_kind: item for item in qualification_inputs}
         inventory_payload = inputs_by_kind["inventory"].payload
-        calibration_payload = inputs_by_kind["calibration_fixture"].payload
+        calibration_input = inputs_by_kind["calibration_fixture"]
+        calibration_payload = calibration_input.payload
         inventory_components = {
             item["id"]: item for item in inventory_payload["components"]
         }
+        if calibration_input.schema_version == "2":
+            selected_policy_id = calibration_payload["m0_validation_policy_id"]
+            m0_stack = candidate_stacks[0]
+            expected_m0_identity = {
+                "fast-v1": (
+                    "minimax-h3-t8-c4-motion-ref2va-turbo4-v1",
+                    "minimax-h3-t8-hybrid-turbo4",
+                    "c4-native-boundary-motion-fast-qualification-candidate",
+                    (
+                        "stock-ref2va",
+                        "qwen-clip",
+                        "video-vae",
+                        "audio-vae",
+                        "turbo-lora",
+                    ),
+                ),
+                "quality-v1": (
+                    "minimax-h3-t8-c4-motion-ref2va-stock20-v1",
+                    "minimax-h3-t8-hybrid-stock20",
+                    "c4-native-boundary-motion-qualification-candidate",
+                    (
+                        "stock-ref2va",
+                        "qwen-clip",
+                        "video-vae",
+                        "audio-vae",
+                    ),
+                ),
+            }[selected_policy_id]
+            actual_m0_identity = (
+                m0_stack.candidate_id,
+                m0_stack.model_id,
+                m0_stack.capability_id,
+                tuple(item.component_id for item in m0_stack.components),
+            )
+            if actual_m0_identity != expected_m0_identity:
+                raise _state_invalid(
+                    "P0 M0 validation policy does not match the selected stack."
+                )
         expected_output_contract_hash = canonical_sha256(
             {
                 "width": calibration_payload["target_canvas"][0],

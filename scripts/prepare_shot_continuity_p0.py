@@ -61,6 +61,7 @@ from ai_video.production.state_commit import (
 from ai_video.production.shot_continuity_source_runtime import (
     bootstrap_source_dependency_graph,
 )
+from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.shot_continuity_source_stack import (
     load_shot_continuity_source_execution_sources,
 )
@@ -110,6 +111,9 @@ VIDEO_VAE_SHA256 = (
 )
 AUDIO_VAE_SHA256 = (
     "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48"
+)
+TURBO_LORA_SHA256 = (
+    "5b8ad6cb7ac206852006f4efa3ce2d679cd6ffb5d5b8a4edce8e981393289df5"
 )
 
 
@@ -539,7 +543,10 @@ def _qualification_inputs(
     shot_assets,
     shot_receipts,
     approved_at: str,
+    m0_policy_id: M0ValidationPolicyId,
 ) -> tuple[P0QualificationInput, ...]:
+    policy_id = M0ValidationPolicyId(m0_policy_id)
+    fast = policy_id is M0ValidationPolicyId.FAST_V1
     source_images = [
         {
             "candidate": f"A{ordinal}",
@@ -575,6 +582,7 @@ def _qualification_inputs(
                 {"id": "qwen-clip", "presence": "present", "size": 15687142551, "sha256": TEXT_ENCODER_SHA256},
                 {"id": "video-vae", "presence": "present", "size": 5207808496, "sha256": VIDEO_VAE_SHA256},
                 {"id": "audio-vae", "presence": "present", "size": 605254808, "sha256": AUDIO_VAE_SHA256},
+                {"id": "turbo-lora", "presence": "present", "size": 779858632, "sha256": TURBO_LORA_SHA256},
             ],
             "hybrid_artifact_present": False,
             "loopback_endpoint": "http://127.0.0.1:8188",
@@ -606,9 +614,11 @@ def _qualification_inputs(
     )
     prompt = validate_h3_prompt_contract(prompt)
     calibration = P0QualificationInput.create(
+        schema_version="2",
         input_kind="calibration_fixture",
-        input_id="rainy-station-c4-stock20-v1",
+        input_id=f"rainy-station-c4-{policy_id.value}-v1",
         payload={
+            "m0_validation_policy_id": policy_id.value,
             "source_images": source_images,
             "source_format": "PNG RGB",
             "source_aspect_ratio": "7:4",
@@ -637,10 +647,10 @@ def _qualification_inputs(
             "prompt_sha256": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
             "frame_count": FRAME_COUNT,
             "fps": FPS,
-            "steps": 20,
+            "steps": 4 if fast else 20,
             "sampler": "dual_clock_euler",
             "scheduler": "native_flow",
-            "turbo_lora": False,
+            "turbo_lora": fast,
             "output_container": "mp4",
             "output_crf": 17,
             "native_audio": True,
@@ -715,6 +725,8 @@ def _stack(
     *,
     candidate_id: str,
     components: tuple[tuple[str, str, str, str], ...],
+    model_id: str = "minimax-h3-t8-hybrid-stock20",
+    capability_id: str = "c4-native-boundary-motion-qualification-candidate",
 ) -> GenerationExecutionStackIdentity:
     return GenerationExecutionStackIdentity.create(
         materialization_status="unmaterialized",
@@ -722,8 +734,8 @@ def _stack(
         contract_version="1",
         provider_kind="comfy-local-h3-t8",
         deployment_identity="loopback-127.0.0.1-8188",
-        model_id="minimax-h3-t8-hybrid-stock20",
-        capability_id="c4-native-boundary-motion-qualification-candidate",
+        model_id=model_id,
+        capability_id=capability_id,
         profile_hash="none",
         compiler_hash="none",
         workflow_hash="none",
@@ -756,12 +768,43 @@ def _stack(
     )
 
 
+def _m0_stack(
+    policy_id: M0ValidationPolicyId,
+) -> GenerationExecutionStackIdentity:
+    selected = M0ValidationPolicyId(policy_id)
+    if selected is M0ValidationPolicyId.FAST_V1:
+        return _stack(
+            candidate_id="minimax-h3-t8-c4-motion-ref2va-turbo4-v1",
+            model_id="minimax-h3-t8-hybrid-turbo4",
+            capability_id=(
+                "c4-native-boundary-motion-fast-qualification-candidate"
+            ),
+            components=(
+                ("checkpoint", "stock-ref2va", "present", STOCK_REF2VA_SHA256),
+                ("artifact", "qwen-clip", "present", TEXT_ENCODER_SHA256),
+                ("artifact", "video-vae", "present", VIDEO_VAE_SHA256),
+                ("artifact", "audio-vae", "present", AUDIO_VAE_SHA256),
+                ("artifact", "turbo-lora", "present", TURBO_LORA_SHA256),
+            ),
+        )
+    return _stack(
+        candidate_id="minimax-h3-t8-c4-motion-ref2va-stock20-v1",
+        components=(
+            ("checkpoint", "stock-ref2va", "present", STOCK_REF2VA_SHA256),
+            ("artifact", "qwen-clip", "present", TEXT_ENCODER_SHA256),
+            ("artifact", "video-vae", "present", VIDEO_VAE_SHA256),
+            ("artifact", "audio-vae", "present", AUDIO_VAE_SHA256),
+        ),
+    )
+
+
 def _record_p0(
     *,
     root: Path,
     shot_assets,
     shot_receipts,
     approved_at: str,
+    m0_policy_id: M0ValidationPolicyId,
 ):
     writer = ProductionStateCommitter(root)
     loaded = load_production_project(root / "project.yaml")
@@ -788,17 +831,10 @@ def _record_p0(
         shot_assets=shot_assets,
         shot_receipts=shot_receipts,
         approved_at=approved_at,
+        m0_policy_id=m0_policy_id,
     )
     by_kind = {item.input_kind: item for item in inputs}
-    m0 = _stack(
-        candidate_id="minimax-h3-t8-c4-motion-ref2va-stock20-v1",
-        components=(
-            ("checkpoint", "stock-ref2va", "present", STOCK_REF2VA_SHA256),
-            ("artifact", "qwen-clip", "present", TEXT_ENCODER_SHA256),
-            ("artifact", "video-vae", "present", VIDEO_VAE_SHA256),
-            ("artifact", "audio-vae", "present", AUDIO_VAE_SHA256),
-        ),
-    )
+    m0 = _m0_stack(m0_policy_id)
     m1 = _stack(
         candidate_id="minimax-h3-t8-c4-motion-hybrid-stock20-v1",
         components=(
@@ -1004,6 +1040,7 @@ def prepare(args: argparse.Namespace) -> dict[str, object]:
         shot_assets=shot_assets,
         shot_receipts=shot_receipts,
         approved_at=args.approved_at,
+        m0_policy_id=args.m0_policy,
     )
     if manifest.active_dependency_graph is None:
         raise ValueError("Prepared source bundle has no active dependency graph")
@@ -1016,6 +1053,7 @@ def prepare(args: argparse.Namespace) -> dict[str, object]:
         "validation_set_hash": validation_set.content_hash,
         "source_execution_stack_hash": source.execution_stack_hash,
         "m0_execution_stack_hash": m0.execution_stack_hash,
+        "m0_validation_policy_id": args.m0_policy.value,
         "m1_execution_stack_hash": m1.execution_stack_hash,
         "dependency_graph_content_hash": manifest.active_dependency_graph.content_hash,
         "qualification_input_hashes": {
@@ -1039,6 +1077,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--a4", type=Path, required=True)
     parser.add_argument("--approved-at", required=True)
     parser.add_argument("--imported-at", required=True)
+    parser.add_argument(
+        "--m0-policy",
+        type=M0ValidationPolicyId,
+        choices=tuple(M0ValidationPolicyId),
+        required=True,
+    )
     return parser
 
 
