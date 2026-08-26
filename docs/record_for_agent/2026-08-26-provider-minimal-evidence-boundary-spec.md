@@ -49,6 +49,35 @@ Spec固定以下决定：
 6. Executable slice止于minimal Provider offline fetch/probe candidate；Gate 2/P6/Final Acceptance E2E
    保持由Quality Gate owner的独立accepted implementation slice验收。
 
+## Implementation Plan Checkpoint
+
+同日新增并提交：
+
+```text
+docs/superpowers/plans/2026-08-26-ai-video-provider-minimal-evidence-boundary.md
+```
+
+Plan将Spec收敛为五个implementation milestones：pure recovery preflight、Seedance/H3 minimal status、
+offline lifecycle到`CANDIDATE`、Gate/T8/compatibility boundary，以及exact-snapshot closure。
+
+Plan self-review纠正了一项重要设计候选：现有`VideoCapabilityVariant.lookup_supported`只能证明
+job/status lookup，不能证明output locator可恢复。仅复用它会错误接纳“状态可查询、但URL只返回一次”
+的Provider。Accepted implementation direction因此是additive、historical-safe的
+`output_recovery_strategy` capability field：
+
+- `DURABLE_FILE_ID`；
+- `REQUERY_BY_EFFECT_ID`；
+- `NON_RECOVERABLE_EPHEMERAL_URL`。
+
+Historical capability/profile payload缺少该字段时以`None`重开，serializer与canonical fingerprint
+projection省略`None`，保留原bytes/hash；但缺少strategy的historical remote profile不得创建new
+attempt。Current Seedance/H3应声明`REQUERY_BY_EFFECT_ID`，Hailuo声明`DURABLE_FILE_ID`，Local
+T8/ComfyUI保持local-specific `None`。Unsupported或missing remote strategy必须在pure compiler、
+`VideoGenerationService.start()`之前返回`OUTPUT_LOCATOR_NOT_RECOVERABLE`。
+
+该Plan不修改observation/fetch/provenance/Manifest schema，不实现Gate 2/P6/Final Acceptance closure，
+也不授权Provider、network、credential、ComfyUI或媒体生成。
+
 ## Verification And Evidence
 
 - Commit：`5ad0fdd`（`docs: specify provider-minimal evidence boundary`）。
@@ -61,21 +90,38 @@ Spec固定以下决定：
 - Native `reviewer_xhigh`初审指出Gate 2 scope expansion、handle contract矛盾、preflight位置错误与
   unnecessary schema migration；修订后scoped re-review为`accept`，无blocking或non-blocking concern。
 
+Plan checkpoint evidence：
+
+- Commit：`905c5fa`（`docs: plan provider-minimal evidence implementation`）。
+- Exact range：`905c5fa^..905c5fa`。
+- Harness receipt：`.agent/harness/runs/provider-minimal-evidence-plan-20260826/receipt.json`。
+- Receipt SHA-256：`fc8577fb95b02b9151816111cc47b66018a52b8e19bf563f7128d74ab99f5379`。
+- Harness checks：`scope_diff_check`、`docs_contract_check`、`policy_audit_check`全部PASS。
+- Receipt verification：artifact integrity、check completeness、policy/scope/snapshot match、freshness、
+  detached worktree cleanliness与cleanup全部为`true`。
+- Plan placeholder scan、spec-to-plan acceptance mapping与`git diff --check`通过。
+
+Plan的独立review已按repository risk routing发起，但reviewer连续无message/tool-output等可观察进度，
+health assessment后被中断；因此不得声称Plan取得independent reviewer verdict。Spec本身先前的accepted
+review仍然有效，但不能替代future implementation的required `reviewer_xhigh`。
+
 没有运行runtime/provider test、Provider、network、credential、media generation或human quality
 acceptance。本checkpoint只能证明documentation contract及其exact commit-range verification。
 
 ## Publication State
 
-- Spec与本记录位于local `main`；
-- Spec commit未push、未release；
-- unrelated dirty/untracked files保持未修改、未stage、未commit；
-- Agent Memory retrieval使用fresh local advisory index，没有生成runtime或acceptance authority。
+- Spec、Plan与本记录位于local `main`；
+- Spec/Plan commits未push、未release；
+- existing unrelated staged/dirty/untracked files保持原位，未进入Spec或Plan exact commits；
+- Plan checkpoint的Agent Memory retrieval返回stale last-good fragments并queued refresh；Plan没有把这些
+  stale fragments当作current source truth，也没有另行刷新index或生成runtime/acceptance authority。
 
 ## Remaining Risks Or Next Work
 
 - Seedance与MiniMax H3 adapter coupling仍存在于current code；
 - output recovery guarantee尚未进入selected sealed pre-start evidence；
 - minimal response fake Provider offline E2E、historical hash compatibility与old-path retirement tests尚未实现；
+- Plan尚无independent reviewer verdict；future implementation必须按Plan使用native `reviewer_xhigh`；
 - live Provider、paid/cloud、media quality、Gate 2/P6/Final Acceptance evidence均未执行。
 
 后续implementation必须以Spec的Acceptance Criteria为准，并在任何Provider effect前保持Paid Provider
