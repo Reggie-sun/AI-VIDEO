@@ -2,6 +2,15 @@
 
 Date: 2026-08-26
 
+> Current-facing quality correction (2026-08-26): this exact 30-second artifact
+> has a user human visual verdict of `FAIL`. The three blocking findings are no
+> dialogue/product recommendation, severe freeze/seam stutter, and visual
+> discontinuity. The earlier project-local `video_review issues: []` remains a
+> valid generic technical-tool result, but it did not run the canonical
+> Ecommerce Gate 2 and cannot override the human verdict. Current status is
+> `HUMAN_VISUAL_FAIL / CANONICAL_GATE_NOT_RUN`; the artifact is blocked from
+> P6, Final Acceptance, publication, or reuse as the current delivery candidate.
+
 ## Purpose
 
 本文记录青颜苗家女孩广告从 28 秒候选修订为 8 个 Shot、30 秒、9:16 开发候选的稳定 checkpoint。
@@ -34,6 +43,45 @@ artifacts/qingyan-miao-ad-20260826-v4/authoring-contract.md
 
 精确时间轴为：0-3 秒痛点、3-6 秒拿取、6-9 秒使用前提示、9-13 秒抽象卖点、13-18 秒状态
 转变、18-22 秒场景扩展、22-26 秒产品 hero、26-30 秒品牌落版，共 `720` frames at `24fps`。
+
+## Human Quality Failure Diagnosis
+
+本 artifact 没有进入 canonical `Universal Gate 1 -> Ecommerce Gate 2 -> P6`。本轮复核确认，上一轮
+只调用了 generic project-local `video_review`；其 `issues: []` 与 unique-frame metric 不能证明
+commercial audio、edit seam 或跨镜头 continuity。
+
+若把当前 exact candidate 交给现有 Qingyan Ecommerce profile，至少以下 whole-ad findings 必须为
+`FAIL`，因此 Gate 2 不得 PASS：
+
+- `ad.audio.product_recommendation`：音轨只有 BGM/SFX，generic review 测得 speaking duration `0.0s`，
+  没有对话或口播推广；
+- `ad.audio.voice_continuity`：不存在可评估的推广 voice，不能标记 PASS；
+- `ad.motion.required_windows`：compositor 主动插入多段 clone-frame padding；
+- `ad.edit.pacing`：冻结尾帧与硬切形成明显 seam/stutter；
+- continuity 相关 acceptance：用户已明确报告画面不连贯，当前 evidence 不支持 PASS。
+
+直接代码证据位于 `artifacts/qingyan-miao-ad-20260826-v4/compose_t8_canvas_v4.sh`：Shot 01–03
+各插入约 `0.667s` clone padding，Shot 05 插入 8 frames，Shot 06 与 Shot 08 各插入约
+`1.667s` clone padding，合计约 `5.67s` 的 deterministic clone padding。FFmpeg
+`freezedetect=n=-45dB:d=0.25` 对 exact final MP4 实测包括：
+
+```text
+2.29167-3.00000s   0.70833s
+5.16667-6.00000s   0.83333s
+8.20833-9.00000s   0.79167s
+20.2500-22.0000s   1.75000s
+```
+
+Shot 05 又在 final timestamp `15.3333s` 将 `04_walk_forward` 与 `05_walk_smile` 直接 concat。
+相邻 frames 中人物尺度、身体姿态、脚步与构图位置发生瞬间跳变；scene-difference scan 也将
+`15.3333s` 识别为 change point。这不是跨镜头 state continuity，也不是可接受的自然运动衔接。
+
+当前 profile 已包含 `ad.audio.product_recommendation`、`ad.audio.voice_continuity`、
+`ad.motion.required_windows`、`ad.edit.pacing` 与 `ad.continuity.character`，但 Runtime Gate 只验证
+evaluator 返回的 sealed requirement findings；它不会自行从 MP4 推导这些 finding。现有 deterministic
+test fixture 甚至用 `has_audio=False` / `expects_audio=False` 并让 fake evaluator 对全部 requirement
+返回 PASS。因此 Gate envelope 的 identity/freshness 能力已经实现，但真实 evaluator coverage 仍是
+经验质量的关键缺口。
 
 ## Portrait Canvas And Source Evidence
 
