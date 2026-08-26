@@ -175,12 +175,33 @@ Exact-range Harness：
 - unrelated staged/dirty/untracked work保持原位，未进入exact implementation range或detached Harness
   execution tree。
 
+## Canonical Closure Checkpoint
+
+先前same-file owner完成并提交其独立工作后，canonical files变为clean；本task随后完成Milestone 5同步：
+
+- Commit：`2c2ee07`（`docs: close provider-minimal evidence boundary`）；
+- 更新`docs/agent-primary-contract-matrix.md`，固定output recovery、optional echo、local probe与
+  requested/selected provenance的single-owner/forbidden-bypass/focused-verification contract；
+- 更新`docs/v0.2-runtime-baseline.md`，只声明offline minimal response到未激活`CANDIDATE`的current
+  runtime truth；
+- 更新`docs/v0.2-agentic-production-roadmap.md`，记录该slice complete以及live/media/Gate 2/P6/Final
+  Acceptance仍未验证；
+- 更新Spec与Plan Status为offline complete；
+- `.agent/harness/policy.yaml`未修改，因为current implementation paths已全部由existing
+  `production_video_provider`与`provider_neutral_video_requirement`categories覆盖，implementation receipt
+  没有unmapped或fallback path。
+
+Canonical documentation exact-range Harness：
+
+- Receipt：`.agent/harness/runs/provider-minimal-evidence-boundary-canonical-closure-20260826/receipt.json`；
+- Receipt SHA-256：`28dd38d3294d6ab150de074ed9c9a647dcd86cecbf40ff1fd1d33f4c0a954a86`；
+- `harness_tests`：`185 passed`；
+- Documentation Contract Gate与policy audit：PASS，无missing、unmapped、unreferenced或unverified paths；
+- integrity、freshness、fresh-for-snapshot、snapshot、policy、scope、cleanup、closure与overall passed均为
+  `true`。
+
 ## Remaining Risks Or Next Work
 
-- `.agent/harness/policy.yaml`、`docs/agent-primary-contract-matrix.md`、
-  `docs/v0.2-runtime-baseline.md`与`docs/v0.2-agentic-production-roadmap.md`在Milestone 5 recheck时仍有
-  其他writer的uncommitted changes；本task没有覆盖它们，canonical truth同步等待用户决定ownership或
-  执行顺序。
 - Live Provider API grammar、account、network、billing、real media、model quality与human visual verdict均
   未验证。
 - Gate 2、P6与Final Acceptance closure仍属于Quality Gate owner的独立slice；validated `CANDIDATE`
