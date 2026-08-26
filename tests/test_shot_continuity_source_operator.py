@@ -7,6 +7,7 @@ import importlib
 from io import BytesIO
 import json
 from pathlib import Path
+import subprocess
 from types import SimpleNamespace
 
 from PIL import Image
@@ -280,7 +281,7 @@ class _RecordedProvider:
         )
 
     def fetch_local(self, request, submission, observation, sink):
-        payload = b"\x00\x00\x00\x14ftypisomsource-operator"
+        payload = _source_video_payload()
         self.fetch_calls += 1
         sink.write(payload)
         return LocalVideoFetchReceipt.create(
@@ -291,6 +292,47 @@ class _RecordedProvider:
             artifact_sha256=hashlib.sha256(payload).hexdigest(),
             fetched_at=datetime(2026, 8, 25, 4, 2, tzinfo=UTC),
         )
+
+
+_SOURCE_VIDEO_PAYLOAD: bytes | None = None
+
+
+def _source_video_payload() -> bytes:
+    global _SOURCE_VIDEO_PAYLOAD
+    if _SOURCE_VIDEO_PAYLOAD is None:
+        completed = subprocess.run(
+            (
+                "ffmpeg",
+                "-nostdin",
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc=size=1344x768:rate=24",
+                "-frames:v",
+                "124",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "ultrafast",
+                "-crf",
+                "35",
+                "-pix_fmt",
+                "yuv420p",
+                "-movflags",
+                "frag_keyframe+empty_moov",
+                "-f",
+                "mp4",
+                "-",
+            ),
+            check=True,
+            capture_output=True,
+            timeout=30,
+        )
+        _SOURCE_VIDEO_PAYLOAD = completed.stdout
+    return _SOURCE_VIDEO_PAYLOAD
 
 
 def _source_probe(_held_fd: int) -> dict[str, object]:

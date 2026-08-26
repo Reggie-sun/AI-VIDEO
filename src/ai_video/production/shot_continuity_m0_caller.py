@@ -6,15 +6,20 @@ import hashlib
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Protocol
+from typing import Any, BinaryIO, Callable, Protocol
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.local_video import (
     DurableLocalVideoSubmitPermit,
+    LocalVideoFetchReceipt,
+    LocalVideoSubmission,
     LocalVideoSubmitIntent,
     LocalVideoSubmitResult,
+    LocalVideoTaskObservation,
 )
-from ai_video.production.paths import _read_regular_file_nofollow
+from ai_video.production.paths import (
+    _read_regular_file_nofollow,
+)
 from ai_video.production.shot_continuity_m0_fast_validation import (
     M0FastQualificationExecutionSources,
     M0FastValidationPreSubmitGuard,
@@ -23,7 +28,11 @@ from ai_video.production.shot_continuity_m0_fast_validation import (
     reopen_m0_fast_validation_preflight,
     validate_m0_fast_live_node_schemas,
 )
+from ai_video.production.shot_continuity_m0_feasibility import (
+    M0EndpointFeasibilityApproval,
+)
 from ai_video.production.shot_continuity_m0_policy import (
+    M0ValidationPolicy,
     M0ValidationPolicyCatalog,
     M0ValidationPolicyId,
     M0ValidationSelection,
@@ -37,6 +46,13 @@ from ai_video.production.shot_continuity_m0_qualification import (
     load_m0_qualification_execution_sources,
     reopen_m0_validation_preflight,
     validate_m0_live_node_schemas,
+)
+from ai_video.production.shot_continuity_m0_runtime import (
+    M0RuntimeClosureValidator,
+)
+from ai_video.production.shot_continuity_source_transport import (
+    fetch_source_qualification_output,
+    poll_source_qualification_output,
 )
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
@@ -100,6 +116,15 @@ class M0AcceptedUpstreamReopener(Protocol):
     ) -> M0AcceptedUpstreamSnapshot: ...
 
 
+class M0FeasibilityApprovalReopener(Protocol):
+    def __call__(
+        self,
+        *,
+        project: Any,
+        content_hash: str,
+    ) -> M0EndpointFeasibilityApproval: ...
+
+
 class M0QualificationTransport(Protocol):
     deployment_identity: str
 
@@ -109,9 +134,27 @@ class M0QualificationTransport(Protocol):
 
     def submit_prompt(self, workflow: dict[str, Any]) -> str: ...
 
+    def poll_job(
+        self,
+        prompt_id: str,
+        *,
+        poll_interval_seconds: float,
+        timeout_seconds: float,
+    ) -> Any: ...
+
+    def fetch_artifact_bytes(
+        self,
+        *,
+        filename: str,
+        subfolder: str,
+        type_: str,
+    ) -> bytes: ...
+
 
 M0QualificationAssetResolver = Callable[[str, str], Path]
-
+M0RuntimeValidator = Callable[
+    [M0QualificationExecutionSources | M0FastQualificationExecutionSources], None
+]
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
     return AiVideoError(
@@ -362,6 +405,9 @@ class M0QualificationProvider:
         transport: M0QualificationTransport,
         asset_resolver: M0QualificationAssetResolver,
         m0_policy_id: M0ValidationPolicyId,
+        comfy_root: str | Path | None = None,
+        runtime_revisions: tuple[tuple[str, str], ...] = (),
+        runtime_validator: M0RuntimeValidator | None = None,
         clock: Callable[[], datetime] | None = None,
     ) -> None:
         self._profile_path = profile_path
@@ -370,6 +416,15 @@ class M0QualificationProvider:
         self._transport = transport
         self._asset_resolver = asset_resolver
         self._m0_policy_id = M0ValidationPolicyId(m0_policy_id)
+        if runtime_validator is None:
+            if comfy_root is None:
+                raise _invalid("M0 qualification requires an exact ComfyUI root.")
+            self._runtime_validator = M0RuntimeClosureValidator(
+                comfy_root=comfy_root,
+                runtime_revisions=runtime_revisions,
+            )
+        else:
+            self._runtime_validator = runtime_validator
         self._clock = clock or (lambda: datetime.now(UTC))
 
     @property
@@ -394,6 +449,7 @@ class M0QualificationProvider:
     ) -> _ValidatedInputs:
         sources = self._sources()
         _validate_request(request, sources)
+        self._runtime_validator(sources)
         if self._transport.deployment_identity != sources.profile.deployment_identity:
             raise _invalid(
                 "M0 qualification transport does not match the sealed deployment."
@@ -520,6 +576,40 @@ class M0QualificationProvider:
                 cause=exc,
             ) from exc
 
+    def get_local_status(
+        self,
+        request: ResolvedVideoGenerationRequest | Any,
+        submission: LocalVideoSubmission,
+    ) -> LocalVideoTaskObservation:
+        sources = self._sources()
+        _validate_request(request, sources)
+        return poll_source_qualification_output(
+            transport=self._transport,
+            resolved_generation_hash=request.resolved_generation_hash,
+            submission=submission,
+            output_node_id=sources.binding.output_node_id,
+            clock=self._clock,
+            qualification_label="M0 qualification",
+        )
+
+    def fetch_local(
+        self,
+        request: ResolvedVideoGenerationRequest | Any,
+        submission: LocalVideoSubmission,
+        observation: LocalVideoTaskObservation,
+        sink: BinaryIO,
+    ) -> LocalVideoFetchReceipt:
+        _validate_request(request, self._sources())
+        return fetch_source_qualification_output(
+            transport=self._transport,
+            resolved_generation_hash=request.resolved_generation_hash,
+            submission=submission,
+            observation=observation,
+            sink=sink,
+            clock=self._clock,
+            qualification_label="M0 qualification",
+        )
+
 
 class M0QualificationCaller:
     """Validate the full pre-effect seam, then delegate one local submit."""
@@ -533,14 +623,27 @@ class M0QualificationCaller:
         artifact_root: str | Path,
         project_loader: Callable[[], Any],
         accepted_upstream_reopener: M0AcceptedUpstreamReopener,
-        policy_catalog: M0ValidationPolicyCatalog,
-        selection: M0ValidationSelection,
+        feasibility_approval_reopener: M0FeasibilityApprovalReopener,
+        policy_catalog: M0ValidationPolicyCatalog | None = None,
+        selection: M0ValidationSelection | None = None,
+        selected_policy: M0ValidationPolicy | None = None,
     ) -> None:
         self._committer = committer
         self._provider = provider
         self._profile_path = profile_path
         self._artifact_root = artifact_root
-        self._selected_policy = policy_catalog.resolve_selection(selection)
+        if selected_policy is not None:
+            if policy_catalog is not None or selection is not None:
+                raise _invalid(
+                    "M0 caller accepts either one exact policy or a catalog selection."
+                )
+            self._selected_policy = M0ValidationPolicy.model_validate(
+                selected_policy.model_dump(mode="json")
+            )
+        else:
+            if policy_catalog is None:
+                raise _invalid("M0 validation policy selection is required.")
+            self._selected_policy = policy_catalog.resolve_selection(selection)
         self._m0_policy_id = self._selected_policy.policy_id
         if provider.m0_policy_id is not self._m0_policy_id:
             raise _invalid("M0 caller and Provider policy selections do not match.")
@@ -560,6 +663,7 @@ class M0QualificationCaller:
             self._reopen_preflight = reopen_m0_validation_preflight
         self._project_loader = project_loader
         self._accepted_upstream_reopener = accepted_upstream_reopener
+        self._feasibility_approval_reopener = feasibility_approval_reopener
 
     def qualify(
         self,
@@ -567,7 +671,10 @@ class M0QualificationCaller:
         attempt_id: str,
         resolved_request: ResolvedVideoGenerationRequest | Any,
     ) -> M0QualificationOutcome:
-        validated, expected_snapshot = self._validate_pre_effect(resolved_request)
+        validated, expected_snapshot = self._validate_pre_effect(
+            resolved_request,
+            attempt_id=attempt_id,
+        )
         expected_hash = resolved_request.resolved_generation_hash
 
         def exact_guard(current: ResolvedVideoGenerationRequest) -> None:
@@ -575,13 +682,19 @@ class M0QualificationCaller:
                 raise _invalid("M0 durable request changed before submit.")
             self._validate_pre_effect(
                 current,
+                attempt_id=attempt_id,
                 expected_snapshot=expected_snapshot,
             )
 
-        submission = VideoGenerationService(
+        service = VideoGenerationService(
             committer=self._committer,
             provider=self._provider,
-        ).submit_local_once(
+        )
+        service.start(
+            attempt_id=attempt_id,
+            request=resolved_request,
+        )
+        submission = service.submit_local_once(
             attempt_id=attempt_id,
             pre_submit_guard=exact_guard,
         )
@@ -593,10 +706,25 @@ class M0QualificationCaller:
             candidate_capability_id=resolved_request.capability_id,
         )
 
+    def validate_pre_effect(
+        self,
+        *,
+        attempt_id: str,
+        resolved_request: ResolvedVideoGenerationRequest | Any,
+    ) -> _ValidatedInputs:
+        """Run the same full caller guard used immediately before permit issuance."""
+
+        validated, _ = self._validate_pre_effect(
+            resolved_request,
+            attempt_id=attempt_id,
+        )
+        return validated
+
     def _validate_pre_effect(
         self,
         request: ResolvedVideoGenerationRequest | Any,
         *,
+        attempt_id: str,
         expected_snapshot: M0ValidationPreflightSnapshot | None = None,
     ) -> tuple[_ValidatedInputs, M0ValidationPreflightSnapshot]:
         self._guard(request)
@@ -626,6 +754,40 @@ class M0QualificationCaller:
         try:
             project = self._project_loader()
             binding = request.c4_multi_anchor_binding
+            approval_hash = (
+                binding.approved_endpoint.feasibility_receipt.human_approval_receipt_id
+            )
+            approval = self._feasibility_approval_reopener(
+                project=project,
+                content_hash=approval_hash,
+            )
+            endpoint = binding.approved_endpoint
+            identity = binding.identity_anchor
+            tail = binding.motion_tail
+            if (
+                approval.content_hash != approval_hash
+                or approval.attempt_id != attempt_id
+                or approval.generation_id != request.generation_id
+                or approval.output_asset_id != request.output_asset_id
+                or approval.validation_policy_id != self._m0_policy_id.value
+                or approval.execution_stack_hash != snapshot.execution_stack_hash
+                or approval.profile_document_hash
+                != current_sources.profile_document_hash
+                or approval.target_shot_id != endpoint.target_shot_id
+                or approval.target_shot_revision != endpoint.target_shot_revision
+                or approval.target_shot_content_hash
+                != endpoint.target_shot_content_hash
+                or approval.terminal_anchor_content_hash
+                != binding.terminal.content_hash
+                or approval.identity_asset_id != identity.asset_id
+                or approval.identity_asset_sha256 != identity.asset_sha256
+                or approval.endpoint_asset_id != endpoint.asset_id
+                or approval.endpoint_asset_sha256 != endpoint.asset_sha256
+                or approval.motion_tail_asset_id != tail.extracted_asset_id
+                or approval.motion_tail_receipt_hash
+                != tail.extraction_receipt_sha256
+            ):
+                raise ValueError("M0 endpoint feasibility approval scope is not exact")
             validate_terminal_frame_evidence_against_project(
                 binding.terminal,
                 project,
@@ -659,6 +821,7 @@ __all__ = [
     "M0QualificationCaller",
     "M0AcceptedUpstreamReopener",
     "M0AcceptedUpstreamSnapshot",
+    "M0FeasibilityApprovalReopener",
     "M0QualificationInput",
     "M0QualificationOutcome",
     "M0QualificationProvider",

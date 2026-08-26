@@ -37,12 +37,13 @@ def poll_source_qualification_output(
     submission: LocalVideoSubmission,
     output_node_id: str,
     clock: Callable[[], datetime],
+    qualification_label: str = "Source qualification",
 ) -> LocalVideoTaskObservation:
     if submission.resolved_generation_hash != resolved_generation_hash:
         raise AiVideoError(
             code=ErrorCode.VIDEO_REQUEST_INVALID,
             user_message=(
-                "Source qualification submission does not match the reopened "
+                f"{qualification_label} submission does not match the reopened "
                 "request."
             ),
             retryable=False,
@@ -62,14 +63,14 @@ def poll_source_qualification_output(
         source = job.error or AiVideoError(
             code=ErrorCode.COMFY_JOB_TIMEOUT,
             user_message=(
-                "Source qualification did not return a terminal job result."
+                f"{qualification_label} did not return a terminal job result."
             ),
             retryable=False,
         )
         raise AiVideoError(
             code=ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
             user_message=(
-                "Source qualification outcome is unknown; explicit recovery "
+                f"{qualification_label} outcome is unknown; explicit recovery "
                 "is required."
             ),
             technical_detail=f"{source.code.value}: {source.user_message}",
@@ -82,7 +83,7 @@ def poll_source_qualification_output(
         raise AiVideoError(
             code=ErrorCode.VIDEO_PROVIDER_FAILED,
             user_message=(
-                "Source qualification completed without one valid MP4 output."
+                f"{qualification_label} completed without one valid MP4 output."
             ),
             technical_detail=f"{exc.code.value}: {exc.user_message}",
             retryable=False,
@@ -105,12 +106,13 @@ def fetch_source_qualification_output(
     observation: LocalVideoTaskObservation,
     sink: BinaryIO,
     clock: Callable[[], datetime],
+    qualification_label: str = "Source qualification",
 ) -> LocalVideoFetchReceipt:
     if submission.resolved_generation_hash != resolved_generation_hash:
         raise AiVideoError(
             code=ErrorCode.VIDEO_REQUEST_INVALID,
             user_message=(
-                "Source qualification submission does not match the reopened "
+                f"{qualification_label} submission does not match the reopened "
                 "request."
             ),
             retryable=False,
@@ -123,7 +125,7 @@ def fetch_source_qualification_output(
         raise AiVideoError(
             code=ErrorCode.VIDEO_REQUEST_INVALID,
             user_message=(
-                "Source qualification observation does not match the durable "
+                f"{qualification_label} observation does not match the durable "
                 "submission."
             ),
             retryable=False,
@@ -135,7 +137,7 @@ def fetch_source_qualification_output(
         raise AiVideoError(
             code=ErrorCode.VIDEO_REQUEST_INVALID,
             user_message=(
-                "Source qualification fetch requires a succeeded observation."
+                f"{qualification_label} fetch requires a succeeded observation."
             ),
             retryable=False,
         )
@@ -144,7 +146,7 @@ def fetch_source_qualification_output(
     except ValueError as exc:
         raise AiVideoError(
             code=ErrorCode.VIDEO_REQUEST_INVALID,
-            user_message="Source qualification output locator is invalid.",
+            user_message=f"{qualification_label} output locator is invalid.",
             technical_detail=str(exc),
             retryable=False,
             cause=exc,
@@ -157,7 +159,7 @@ def fetch_source_qualification_output(
     if not payload or b"ftyp" not in payload[:64]:
         raise AiVideoError(
             code=ErrorCode.VIDEO_REQUEST_INVALID,
-            user_message="Source qualification returned non-MP4 bytes.",
+            user_message=f"{qualification_label} returned non-MP4 bytes.",
             retryable=False,
         )
     sink.write(payload)

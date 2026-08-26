@@ -455,6 +455,34 @@ def canonical_terminal_frame_evidence_path(content_hash: str) -> Path:
     )
 
 
+def canonical_full_source_motion_tail_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/full-source-motion-tails/"
+        f"{_require_sha256(content_hash, 'full-source motion-tail receipt hash')}.json"
+    )
+
+
+def canonical_full_source_motion_analysis_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/full-source-motion-analysis/"
+        f"{_require_sha256(content_hash, 'full-source motion analysis hash')}.json"
+    )
+
+
+def canonical_m0_endpoint_feasibility_approval_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/m0-endpoint-feasibility/"
+        f"{_require_sha256(content_hash, 'M0 endpoint feasibility approval hash')}.json"
+    )
+
+
+def canonical_m0_endpoint_feasibility_human_decision_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/m0-endpoint-feasibility-human-decisions/"
+        f"{_require_sha256(content_hash, 'M0 endpoint human decision hash')}.json"
+    )
+
+
 def canonical_image_shot_revision_path(revision: int, content_hash: str) -> Path:
     if type(revision) is not int or revision < 1:
         raise ValueError("Image Shot revision must be a positive integer.")

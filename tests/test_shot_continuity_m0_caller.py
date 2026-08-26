@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import io
+import subprocess
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
@@ -11,8 +13,13 @@ from typing import Any
 import pytest
 
 import ai_video.production.shot_continuity_m0_caller as caller_module
+from ai_video.comfy_client import JobResult, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.local_video import LocalVideoSubmitIntent
+from ai_video.production.local_video import (
+    LocalVideoSubmission,
+    LocalVideoSubmitIntent,
+    LocalVideoSubmitResult,
+)
 from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
 from ai_video.production.shot_continuity_m0_caller import (
     M0AcceptedUpstreamSnapshot,
@@ -39,6 +46,7 @@ from ai_video.production.video import (
     BillingKind,
     VideoExecutionKind,
     VideoGenerationMode,
+    VideoTaskState,
 )
 from ai_video.production.video_execution_stack import (
     GenerationExecutionStackIdentity,
@@ -199,6 +207,26 @@ class _Transport:
         self.workflows: list[dict[str, Any]] = []
         self.fail_submit = False
         self.before_first_upload: Any = None
+        self.job_result = JobResult(
+            JobStatus.COMPLETED,
+            "m0-prompt-1",
+            history={
+                "outputs": {
+                    "12": {
+                        "videos": [
+                            {
+                                "filename": "m0-output.mp4",
+                                "subfolder": "video",
+                                "type": "output",
+                            }
+                        ]
+                    }
+                }
+            },
+        )
+        self.artifact_bytes = b"\x00\x00\x00\x14ftypisomm0-video"
+        self.poll_calls: list[str] = []
+        self.fetch_calls: list[dict[str, str]] = []
 
     def get_object_info(self) -> dict[str, object]:
         self.object_info_calls += 1
@@ -218,6 +246,14 @@ class _Transport:
             raise RuntimeError("simulated queue uncertainty")
         return "m0-prompt-1"
 
+    def poll_job(self, prompt_id: str, **_: object) -> JobResult:
+        self.poll_calls.append(prompt_id)
+        return self.job_result
+
+    def fetch_artifact_bytes(self, **locator: str) -> bytes:
+        self.fetch_calls.append(locator)
+        return self.artifact_bytes
+
 
 class _Committer:
     def __init__(
@@ -231,6 +267,7 @@ class _Committer:
         self.request = request
         self.source_stack = source_stack
         self.qualification_reopens = 0
+        self.start_writes = 0
         self.intent_writes = 0
         self.result_writes = 0
         self.failure_writes = 0
@@ -259,6 +296,12 @@ class _Committer:
         return (self.source_stack,)
 
     def _read_manifest(self) -> object:
+        return object()
+
+    def begin_video_generation(self, *, attempt_id: str, request: Any) -> object:
+        assert attempt_id == "m0-attempt"
+        assert request is self.request
+        self.start_writes += 1
         return object()
 
     def _video_attempt(self, manifest: object, attempt_id: str) -> Any:
@@ -317,6 +360,7 @@ class _Case:
     upstream_snapshot: M0AcceptedUpstreamSnapshot
     sources: Any
     project: Any
+    approval: Any
 
 
 def _make_case(
@@ -420,6 +464,7 @@ def _make_case(
     profile = sources.profile
     request = SimpleNamespace(
         generation_id="m0-generation",
+        output_asset_id="m0-output",
         resolved_generation_hash="3" * 64,
         execution_stack_hash=_materialized_m0(sources).execution_stack_hash,
         provider_name=profile.provider_kind,
@@ -475,8 +520,14 @@ def _make_case(
             tier=SimpleNamespace(value="motion_boundary"),
             terminal=terminal,
             approved_endpoint=SimpleNamespace(
+                target_shot_id="target-shot",
+                target_shot_revision=3,
+                target_shot_content_hash="d" * 64,
                 asset_id="approved-endpoint",
                 asset_sha256=_sha(payloads["approved-endpoint"]),
+                feasibility_receipt=SimpleNamespace(
+                    human_approval_receipt_id="a" * 64
+                ),
             ),
             identity_anchor=SimpleNamespace(
                 asset_id="identity-anchor",
@@ -501,6 +552,29 @@ def _make_case(
     committer = _Committer(bundle, request, source_stack)
     transport = _Transport()
     active_project = SimpleNamespace(accepted_upstream=upstream_snapshot)
+    approval = SimpleNamespace(
+        content_hash="a" * 64,
+        attempt_id="m0-attempt",
+        generation_id=request.generation_id,
+        output_asset_id=request.output_asset_id,
+        validation_policy_id=policy_id.value,
+        execution_stack_hash=request.execution_stack_hash,
+        profile_document_hash=sources.profile_document_hash,
+        target_shot_id=request.c4_multi_anchor_binding.approved_endpoint.target_shot_id,
+        target_shot_revision=(
+            request.c4_multi_anchor_binding.approved_endpoint.target_shot_revision
+        ),
+        target_shot_content_hash=(
+            request.c4_multi_anchor_binding.approved_endpoint.target_shot_content_hash
+        ),
+        terminal_anchor_content_hash=terminal.content_hash,
+        identity_asset_id="identity-anchor",
+        identity_asset_sha256=_sha(payloads["identity-anchor"]),
+        endpoint_asset_id="approved-endpoint",
+        endpoint_asset_sha256=_sha(payloads["approved-endpoint"]),
+        motion_tail_asset_id="motion-tail",
+        motion_tail_receipt_hash=tail.extraction_receipt_sha256,
+    )
 
     def validate_schemas(object_info: dict[str, object], current_sources: Any) -> None:
         if object_info != {"schemas": "exact"}:
@@ -553,6 +627,7 @@ def _make_case(
             (asset_id, asset_sha256)
         ],
         m0_policy_id=policy_id,
+        runtime_validator=lambda _sources: None,
         clock=lambda: NOW,
     )
     rubric_hash = next(
@@ -589,6 +664,11 @@ def _make_case(
         artifact_root=REPO_ROOT,
         project_loader=lambda: active_project,
         accepted_upstream_reopener=reopen_accepted_upstream,
+        feasibility_approval_reopener=lambda *, project, content_hash: (
+            approval
+            if project is active_project and content_hash == approval.content_hash
+            else (_ for _ in ()).throw(ValueError("approval project changed"))
+        ),
         policy_catalog=policy_catalog,
         selection=M0ValidationSelection.from_policy(selected_policy),
     )
@@ -603,6 +683,7 @@ def _make_case(
         upstream_snapshot,
         sources,
         active_project,
+        approval,
     )
 
 
@@ -619,6 +700,18 @@ def _assert_zero_effect(case: _Case) -> None:
     assert case.committer.failure_writes == 0
     assert case.transport.uploads == []
     assert case.transport.workflows == []
+
+
+def _submission(case: _Case) -> LocalVideoSubmission:
+    result = LocalVideoSubmitResult.create(
+        resolved=case.request,
+        provider_request_id="m0-prompt-1",
+        submitted_at=NOW,
+    )
+    return LocalVideoSubmission.from_submit_result(
+        resolved=case.request,
+        result=result,
+    )
 
 
 @pytest.mark.parametrize(
@@ -651,6 +744,7 @@ def test_qualification_caller_submits_once_with_exact_four_anchor_order(
         for item in case.transport.uploads
     )
     assert len(case.transport.workflows) == 1
+    assert case.committer.start_writes == 1
     assert case.transport.workflows[0]["8"]["inputs"]["noise_seed"] == (
         case.sources.profile.sealed_seed
     )
@@ -658,6 +752,36 @@ def test_qualification_caller_submits_once_with_exact_four_anchor_order(
     assert case.committer.intent_writes == 1
     assert case.committer.result_writes == 1
     assert case.committer.failure_writes == 0
+
+
+def test_qualification_provider_polls_and_fetches_exact_m0_output(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    submission = _submission(case)
+
+    observation = case.provider.get_local_status(case.request, submission)
+    sink = io.BytesIO()
+    receipt = case.provider.fetch_local(
+        case.request,
+        submission,
+        observation,
+        sink,
+    )
+
+    assert observation.state is VideoTaskState.SUCCEEDED
+    assert observation.provider_file_id == "video:m0-output.mp4:output"
+    assert case.transport.poll_calls == ["m0-prompt-1"]
+    assert case.transport.fetch_calls == [
+        {
+            "filename": "m0-output.mp4",
+            "subfolder": "video",
+            "type_": "output",
+        }
+    ]
+    assert sink.getvalue() == case.transport.artifact_bytes
+    assert receipt.artifact_sha256 == _sha(case.transport.artifact_bytes)
 
 
 def test_upload_uses_pre_permit_immutable_validated_bytes(
@@ -743,6 +867,7 @@ def test_submit_compiles_from_the_pre_permit_validated_sources(
         "p6_evidence",
         "extraction_evidence",
         "materialization_evidence",
+        "approval",
         "source_bytes",
         "anchor_bytes",
     ),
@@ -813,6 +938,15 @@ def test_pre_effect_denials_are_zero_write(
         case.request.c4_multi_anchor_binding.motion_tail.extraction_receipt_sha256 = "0" * 64
     elif drift == "materialization_evidence":
         case.request.c4_multi_anchor_binding.motion_tail.materialization_receipt_sha256 = "0" * 64
+    elif drift == "approval":
+        case.caller._feasibility_approval_reopener = lambda **_kwargs: (
+            SimpleNamespace(
+                **{
+                    **vars(case.approval),
+                    "attempt_id": "different-attempt",
+                }
+            )
+        )
     elif drift == "source_bytes":
         case.paths["source-video"].write_bytes(
             b"\x00\x00\x00\x18ftypmp42drifted-source"
@@ -824,6 +958,94 @@ def test_pre_effect_denials_are_zero_write(
         _qualify(case)
 
     _assert_zero_effect(case)
+
+
+def test_runtime_checkout_drift_is_denied_before_live_schema_or_upload(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    revisions = {
+        "comfyui": "a" * 40,
+        "minimax-h3-audio-t8": "b" * 40,
+        "videohelpersuite": "c" * 40,
+    }
+    provider = M0QualificationProvider(
+        profile_path=tmp_path / "profile.json",
+        artifact_root=tmp_path,
+        input_root=tmp_path,
+        transport=SimpleNamespace(),
+        asset_resolver=lambda *_args: tmp_path / "unused",
+        m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
+        comfy_root=tmp_path,
+        runtime_revisions=tuple(revisions.items()),
+    )
+    profile = SimpleNamespace(
+        runtime_seals=tuple(
+            SimpleNamespace(name=name, version=f"test+{revision[:12]}")
+            for name, revision in revisions.items()
+        ),
+        components=(
+            SimpleNamespace(
+                component_id="stock-ref2va",
+                filename="model.safetensors",
+                sha256="d" * 64,
+                size_bytes=123,
+            ),
+        ),
+    )
+    validator = provider._runtime_validator
+    monkeypatch.setattr(
+        validator,
+        "_git_head",
+        lambda path: (
+            revisions["minimax-h3-audio-t8"]
+            if path.name == "minimax-h3-audio-T8"
+            else revisions["videohelpersuite"]
+            if path.name == "ComfyUI-VideoHelperSuite"
+            else revisions["comfyui"]
+        ),
+    )
+    monkeypatch.setattr(
+        validator,
+        "_component_identity",
+        lambda _path, _root: ("d" * 64, 123),
+    )
+    validator(SimpleNamespace(profile=profile))
+
+    monkeypatch.setattr(
+        validator,
+        "_git_head",
+        lambda path: "f" * 40
+        if path.name == "minimax-h3-audio-T8"
+        else revisions["videohelpersuite"]
+        if path.name == "ComfyUI-VideoHelperSuite"
+        else revisions["comfyui"],
+    )
+    with pytest.raises(AiVideoError, match="checkout minimax-h3-audio-t8 changed"):
+        validator(SimpleNamespace(profile=profile))
+
+
+def test_runtime_checkout_rejects_dirty_tracked_code(tmp_path: Path) -> None:
+    checkout = tmp_path / "runtime-checkout"
+    checkout.mkdir()
+    subprocess.run(("git", "init", "-q"), cwd=checkout, check=True)
+    subprocess.run(
+        ("git", "config", "user.email", "runtime-test@example.invalid"),
+        cwd=checkout,
+        check=True,
+    )
+    subprocess.run(
+        ("git", "config", "user.name", "Runtime Test"), cwd=checkout, check=True
+    )
+    tracked = checkout / "node.py"
+    tracked.write_text("VERSION = 1\n", encoding="utf-8")
+    subprocess.run(("git", "add", "node.py"), cwd=checkout, check=True)
+    subprocess.run(("git", "commit", "-qm", "runtime fixture"), cwd=checkout, check=True)
+    assert len(caller_module.M0RuntimeClosureValidator._git_head(checkout)) == 40
+
+    tracked.write_text("VERSION = 2\n", encoding="utf-8")
+    with pytest.raises(AiVideoError, match="dirty or untracked files"):
+        caller_module.M0RuntimeClosureValidator._git_head(checkout)
 
 
 @pytest.mark.parametrize(

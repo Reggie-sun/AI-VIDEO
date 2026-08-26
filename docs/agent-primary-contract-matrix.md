@@ -106,6 +106,13 @@ Quality architecture 采用 **Universal Production QA + Domain-Specific Acceptan
 
 `ShotReadinessGate.READY`只证明pre-submit structural binding/eligibility/assets；它不证明post-media quality、P6、activation或Final Acceptance。Base AI Comic E2E当前只证明exact selected policy（`LAYOUT`）下的durable closure，不证明完整Drama semantic acceptance。Independent Format Gate暂缓：现有`DeliveryProfile`、`CompositionSpec`、`ResolvedTimeline`和policy继续拥有format/timing/layout约束，除非未来出现重复且不可由这些owner表达的stable requirements。
 
+### Shot Continuity M0 Live Qualification
+
+- Primary owner：`shot_continuity_m0_operator.py`只编排显式`quality-v1` lifecycle；`shot_continuity_m0_caller.py`独占full pre-effect/permit-inner guard；`shot_continuity_m0_runtime.py`独占local checkout与model-byte closure；`shot_continuity_motion_analysis.py`和`shot_continuity_motion_tail.py`独占full-source motion evidence；`shot_continuity_m0_feasibility.py`独占exact-bound human endpoint decision/approval；durable write仍只属于`ProductionStateCommitter`。
+- Invariants：M0只接受exact one-submit `attempt/generation/output/policy/stack/profile` approval，且在initial preflight与intent lock内重新打开并逐字段对比current request、active Project/Registry、四锚点和accepted upstream P6。Runtime必须验证sealed inventory对应的clean ComfyUI/T8/VHS checkouts与exact model bytes。Motion analyzer必须通过held no-follow descriptors执行并在前后验证source/tool bytes；每个半段至少包含两个连续nonzero YDIF transitions。Operator `preflight`必须走caller full guard，不得只运行Provider input check。
+- Forbidden alternate path：pathname hash后重新打开source或ffmpeg、允许dirty或untracked runtime code、用两个孤立闪变冒充continuous motion、仅比较approval hash、provider-only preflight、retry/fallback/M1/activation、把technical/Harness PASS当P6或human quality acceptance。
+- Focused verification：`python -m pytest -p no:cacheprovider tests/test_shot_continuity_motion_tail.py tests/test_shot_continuity_m0_feasibility.py tests/test_shot_continuity_m0_operator.py tests/test_shot_continuity_m0_reprepare.py tests/test_shot_continuity_m0_caller.py tests/test_video_compiler_c4_qualification.py -q`。
+
 ## Canonical API Entry Points
 
 本节只约束容易混淆 normal business entry 与 internal seam 的跨 owner、effectful、durable、replay/recovery-sensitive API。`Allowed Caller` 描述谁可以进入该 seam；它不同于上表描述谁拥有 implementation 或 durable truth。Package export、public method、类型可构造或 test 中直接调用均不自动构成 normal Production caller authorization。

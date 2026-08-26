@@ -29,6 +29,7 @@ from ai_video.production._video_continuity import (
 )
 from ai_video.production.video import (
     ProviderProfilePointer,
+    VideoCapabilityVariant,
     VideoExecutionKind,
     VideoGenerationRequest,
     VideoGenerationMode,
@@ -171,7 +172,11 @@ def require_compiled_provider_request(
 class VideoGenerationRequestCompilation(_CompilerModel):
     """Typed, hash-bound input to the sole request constructor owner."""
 
-    compilation_kind: Literal["provider_neutral", "qualification"]
+    compilation_kind: Literal[
+        "provider_neutral",
+        "qualification",
+        "c4_qualification",
+    ]
     generation_id: str = Field(pattern=_SAFE_ID)
     provider_name: str = Field(pattern=_SAFE_ID)
     provider_kind: str = Field(pattern=_SAFE_ID)
@@ -224,6 +229,26 @@ class VideoGenerationRequestCompilation(_CompilerModel):
             raise ValueError(
                 "qualification compilation requires one exact sealed FL2VA shape"
             )
+        if self.compilation_kind == "c4_qualification" and (
+            self.execution_stack_hash is None
+            or self.mode is not VideoGenerationMode.IMAGE_TO_VIDEO
+            or tuple(item.role for item in self.image_bindings)
+            != ("first_frame", "last_frame", "reference")
+            or self.c4_multi_anchor_binding is None
+            or self.c4_multi_anchor_binding.tier.value != "motion_boundary"
+            or self.continuity_binding is not None
+            or self.hard_cut_keyframe_binding is not None
+            or not self.seal_terminal_frame
+            or tuple((item.kind, item.role) for item in self.media_bindings)
+            != (("video", "reference_video"),)
+            or self.negative_prompt_text
+            or self.seed is None
+            or self.seed < 0
+        ):
+            raise ValueError(
+                "C4 qualification compilation requires one exact sealed "
+                "four-anchor motion-boundary shape"
+            )
         expected = canonical_sha256(
             {
                 "schema": "video-generation-request-compilation/1",
@@ -238,7 +263,11 @@ class VideoGenerationRequestCompilation(_CompilerModel):
     def create(
         cls,
         *,
-        compilation_kind: Literal["provider_neutral", "qualification"],
+        compilation_kind: Literal[
+            "provider_neutral",
+            "qualification",
+            "c4_qualification",
+        ],
         **values: object,
     ) -> "VideoGenerationRequestCompilation":
         data = {"compilation_kind": compilation_kind, **values}
