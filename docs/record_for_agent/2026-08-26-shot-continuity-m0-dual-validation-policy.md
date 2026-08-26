@@ -103,9 +103,25 @@ ecommerce edits；该run没有吸收或覆盖这些changes，也不是completion
 本task使用普通`git commit`只提交exact staged snapshot。v5 exact-range Harness随后由policy audit fail closed：
 新增`tests/fixtures/shot_continuity/m0_fast_v1_prepared_receipt.json`尚未映射到既有
 `shot_continuity_p0` category，因此tests未启动且v5也不是completion proof。Routing fix只把该fixture目录加入
-既有M0 category并由`tests/test_agent_harness.py`覆盖；current completion candidate path固定为
-`.agent/harness/runs/m0-dual-validation-policy-20260826-v6/receipt.json`，并必须针对从`592a685`到routing follow-up
-commit的exact range验证status、integrity、scope、artifact hashes与freshness。本文不预宣PASS。
+既有M0 category并由`tests/test_agent_harness.py`覆盖。
+
+Implementation commit为`869a191`，routing follow-up为`2a5d83d`。v6对exact M0 range完成全部10 checks，
+但并发writer在运行期间把shared HEAD推进到两个provider evidence docs commits，导致overall
+`status=failed`、`workspace_stable=false`；v7又因historical head不再closure-eligible而在tests前拒绝。
+最终v8针对current exact committed range `592a685..3de20ec`通过；该range包含M0两commits及并发writer的两个
+docs-only provider evidence commits，不能把后两者归属本task。M0 mandatory results为Harness `185 passed`、
+workflow `9 passed`、Production state `957 passed`、Shot Continuity P0 `276 passed`、Production video provider
+`690 passed`与provider-neutral requirement `295 passed`；Architecture Gate为`PASS`（0 errors，1个既有
+oversized-module-growth warning）。Receipt：
+
+`.agent/harness/runs/m0-dual-validation-policy-20260826-v8/receipt.json`
+
+Receipt SHA-256为`6b71ff608660abd390706ebb59fdae1e7d0114855ba94697acb5eae13f5f14de`。
+`verify-receipt`确认`integrity=true`、`passed=true`、`complete_completion_proof=true`、
+`snapshot_matches=true`与`workspace_stable_confirmed=true`；其live `fresh=false` / `scope_worktree_clean=false`
+只表示current shared worktree在4个overlapping canonical paths仍含本task之外的unstaged ecommerce edits，
+这些bytes没有进入detached exact committed snapshot。Current record-only follow-up completion candidate为
+`.agent/harness/runs/m0-dual-validation-policy-record-20260826-v9/receipt.json`，本文不预宣其status。
 
 ## Remaining Boundary
 
