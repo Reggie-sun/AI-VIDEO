@@ -2,16 +2,15 @@
 
 ## Status
 
-Milestones 1-4 implementation complete；Milestone 5 executable closure complete，canonical truth同步
-blocked by same-file ownership。Exact implementation range `0f73c53..9e999d1` 已通过focused tests、
+Complete。Milestones 1-5的offline implementation、executable closure与canonical truth同步均已完成。
+Exact implementation range `0f73c53..9e999d1` 已通过focused tests、
 native `reviewer_xhigh`与fresh exact-range Harness。Offline minimal Provider到达canonical
 `CANDIDATE`，没有自动activation。
 
-本checkpoint不授权或证明credential lookup、Paid Provider submit、ComfyUI execution、媒体生成、
-Gate 2、P6、Final Acceptance、push或release。`.agent/harness/policy.yaml`、
-`docs/agent-primary-contract-matrix.md`、`docs/v0.2-runtime-baseline.md`与
-`docs/v0.2-agentic-production-roadmap.md`仍有其他writer的uncommitted changes；本task按same-file
-ownership rule停止这些文件的写入，等待用户决定ownership或执行顺序。
+本completion不授权或证明credential lookup、Paid Provider submit、ComfyUI execution、媒体生成、
+Gate 2、P6、Final Acceptance、push或release。Canonical contract matrix、runtime baseline与roadmap只
+记录offline executable evidence；现有Harness policy已完整映射implementation paths，因此没有为本slice
+新增或复制routing owner。
 
 ## Goal
 
@@ -675,8 +674,8 @@ Parent必须验证重要claim。修复blocking issue后以同一tier做scoped re
   `production_review_tests`为`636 passed`，`production_video_provider_tests`为`696 passed`，
   `provider_neutral_video_requirement_tests`为`300 passed`，Architecture Gate PASS。
 - Receipt integrity、freshness、snapshot、policy、scope、cleanup、closure与overall passed验证均为`true`。
-- Milestone 5的canonical documentation update仍受上述same-file ownership blocker约束，因此整个Plan
-  尚未满足Definition Of Done。
+- Milestone 5已同步canonical contract matrix、runtime baseline与roadmap；existing Harness policy无需
+  变化，所有implementation paths均由现有categories覆盖且receipt没有unmapped/fallback path。
 
 ## Test Matrix
 

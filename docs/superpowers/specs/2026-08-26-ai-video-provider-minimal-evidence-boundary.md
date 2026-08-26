@@ -2,16 +2,15 @@
 
 ## Status
 
-Implementation in progress；offline executable checkpoint complete，canonical closure blocked。Exact implementation range
+Offline implementation complete。Exact implementation range
 `0f73c53..9e999d1` 已通过 focused executable verification、native `reviewer_xhigh` 与 fresh
 exact-range Harness；一个只返回 `job_id + status + re-queryable output_url` 的offline fake Provider
 已沿 canonical lifecycle 到达 fetched/probed `CANDIDATE`，且没有自动activation。
 
 本文不是 Provider live proof、quality PASS、Gate 2、P6、Final Acceptance、release或publication
-evidence。`docs/agent-primary-contract-matrix.md`、`docs/v0.2-runtime-baseline.md`、
-`docs/v0.2-agentic-production-roadmap.md` 与 `.agent/harness/policy.yaml` 在checkpoint时仍有其他writer的
-uncommitted changes，因此本task没有覆盖这些canonical owners；对应runtime truth同步仍待ownership
-释放后完成。
+evidence。Canonical contract matrix、runtime baseline与roadmap已同步该offline proof；
+`.agent/harness/policy.yaml`无需变化，因为全部implementation paths已由现有Provider/neutral-requirement
+categories映射到focused suites与Architecture Gate，exact-range receipt没有unmapped或fallback path。
 
 本Spec扩展而不替代以下现有 owner：
 
