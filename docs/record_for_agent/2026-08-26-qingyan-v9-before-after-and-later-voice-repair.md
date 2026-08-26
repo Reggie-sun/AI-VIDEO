@@ -2,6 +2,14 @@
 
 Date: 2026-08-26
 
+> Superseded human-verdict notice (2026-08-26): the exact v9 candidate below now has a
+> user human visual verdict of `FAIL`. The opening expression is wrong, the product appears
+> to spray while its large outer cap is still attached, there is no visible problem reaction
+> before use, and the Shot beginning near 13 seconds is stiff and discontinuous. Its historical
+> technical measurements remain valid, but `TARGETED_AGENT_GATE_PASS` must not be read as
+> current human acceptance. The replacement attempt and its fail-closed post-media blocker are
+> recorded in `2026-08-26-qingyan-v10-cap-mechanics-and-moving-comparison-blocker.md`.
+
 ## Purpose
 
 本文记录用户对 exact v8 的下一轮 human `FAIL` 及 deterministic replacement。四个可观察缺陷为：
