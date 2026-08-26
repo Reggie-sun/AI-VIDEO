@@ -2,6 +2,14 @@
 
 Date: 2026-08-26
 
+> Superseded current-facing composition notice (2026-08-26): the 28-second
+> development composition recorded below remains valid historical evidence, but
+> it is no longer the current local delivery candidate. It is superseded by
+> `2026-08-26-qingyan-t8-portrait-canvas-30s-composition.md` and the exact
+> 30-second artifact recorded there. The five sequential Shot Gate results and
+> their source hashes remain unchanged; no new T8 submit was performed for the
+> newer composition.
+
 ## 2026-08-26 Canonical Rerun Preflight Stop
 
 用户在 current `main` 包含 Ecommerce whole-ad Gate 2 与 canonical
