@@ -215,6 +215,7 @@ def _start_serialized(args: argparse.Namespace) -> int:
 
     unit_name = f"{UNIT_PREFIX}{uuid.uuid4().hex}"
     unit_service = f"{unit_name}.service"
+    memory_mode = "--novram" if args.novram else "--lowvram"
     command = [
         "systemd-run",
         "--user",
@@ -236,7 +237,7 @@ def _start_serialized(args: argparse.Namespace) -> int:
         "--port",
         str(args.port),
         "--disable-auto-launch",
-        "--lowvram",
+        memory_mode,
         "--use-sage-attention",
     ]
     result = _run(command)
@@ -374,6 +375,11 @@ def _parser() -> argparse.ArgumentParser:
     start.add_argument("--python")
     start.add_argument("--port", type=int, default=8188)
     start.add_argument("--health-timeout", type=float, default=60.0)
+    start.add_argument(
+        "--novram",
+        action="store_true",
+        help="use ComfyUI --novram instead of the default --lowvram",
+    )
     start.set_defaults(handler=_start)
 
     status = subparsers.add_parser("status")

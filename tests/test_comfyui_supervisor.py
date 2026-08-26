@@ -89,6 +89,48 @@ def test_start_uses_detached_user_systemd_service(monkeypatch, tmp_path):
     ]
 
 
+def test_start_novram_replaces_lowvram_without_changing_other_runtime_flags(
+    monkeypatch, tmp_path
+):
+    supervisor = _load_supervisor()
+    root = _comfy_root(tmp_path)
+    commands = []
+    states = iter(
+        [
+            {"LoadState": "loaded", "ActiveState": "activating", "InvocationID": "run-1"},
+            {
+                "LoadState": "loaded",
+                "ActiveState": "active",
+                "MainPID": "1234",
+                "InvocationID": "run-1",
+            },
+        ]
+    )
+    monkeypatch.setattr(supervisor, "_list_units", lambda: [])
+    monkeypatch.setattr(supervisor.uuid, "uuid4", lambda: SimpleNamespace(hex="a" * 32))
+    monkeypatch.setenv("XDG_RUNTIME_DIR", str(tmp_path))
+    monkeypatch.setattr(supervisor, "_unit_state", lambda _actual: next(states))
+    monkeypatch.setattr(supervisor, "_port_in_use", lambda _port: False)
+    monkeypatch.setattr(supervisor, "_wait_for_health", lambda _port, _timeout: True)
+    monkeypatch.setattr(
+        supervisor,
+        "_pid_owns_loopback_listener",
+        lambda pid, port: (pid, port) == (1234, 8188),
+    )
+
+    def run(command):
+        commands.append(command)
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    monkeypatch.setattr(supervisor, "_run", run)
+
+    assert supervisor.main(["start", "--comfy-root", str(root), "--novram"]) == 0
+    command = commands[0]
+    assert "--novram" in command
+    assert "--lowvram" not in command
+    assert command[-1] == "--use-sage-attention"
+
+
 def test_start_refuses_occupied_port_without_touching_systemd(monkeypatch, tmp_path):
     supervisor = _load_supervisor()
     root = _comfy_root(tmp_path)

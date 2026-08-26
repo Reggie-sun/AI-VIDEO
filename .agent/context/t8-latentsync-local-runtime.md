@@ -80,6 +80,18 @@ transient unit，固定 `127.0.0.1:8188`、`Restart=no`、`--lowvram` 与
 `--use-sage-attention`。启动后仍需单独检查应用 queue；service active 不能证明
 queue empty、生成成功或媒体质量通过。
 
+`--lowvram`是默认memory mode。只有task明确授权以更高CPU offload换取更低GPU占用时，才在
+`start`后追加`--novram`；supervisor会用ComfyUI `--novram`替换`--lowvram`，不会同时传递两者：
+
+```bash
+python scripts/comfyui_supervisor.py start \
+  --comfy-root /home/reggie/ComfyUI \
+  --python /home/reggie/miniconda3/bin/python \
+  --port 8188 \
+  --health-timeout 60 \
+  --novram
+```
+
 ```bash
 curl --fail --silent http://127.0.0.1:8188/system_stats >/dev/null
 curl --fail --silent http://127.0.0.1:8188/queue | jq .
