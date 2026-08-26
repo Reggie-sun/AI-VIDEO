@@ -2,6 +2,11 @@
 
 Date: 2026-08-26
 
+> **SUPERSEDED / HUMAN FAIL:** 用户观看 exact v8 后明确指出开头仍静止、缺少真正的腋下
+> `使用前 / 使用后`效果对比、约 14 秒处的 optical-retime 换镜诡异，并指出后段推销词只有
+> 字幕没有声音。v8 的历史测量继续保留，但 current candidate 已由
+> `docs/record_for_agent/2026-08-26-qingyan-v9-before-after-and-later-voice-repair.md` 替代。
+
 ## Purpose
 
 本文记录用户对 exact v7 的 human `FAIL` 及其 replacement：把产品定位明确收敛为腋下止汗净味，
