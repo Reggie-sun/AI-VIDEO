@@ -9,6 +9,11 @@ Date: 2026-08-26
 > only the visible sweat-mark surface, not the cause or problem. New Shot 00 control frames and
 > prompt are recorded below. `video-analysis` MCP remains unavailable, so no new T8 submit or
 > v10 final exists.
+>
+> Performance correction (2026-08-27): the user further rejected the sweat-mark-only last frame
+> because it did not visibly perform an odor check. The current Shot 00 close state now requires
+> the woman to lean her head toward the covered underarm, take one short audible sniff, wrinkle
+> her nose slightly, and begin a restrained recoil. The superseded v3 frame remains historical.
 
 ## Purpose
 
@@ -103,13 +108,13 @@ Gate 失败关闭后没有提交 Shot 01B。ComfyUI 已通过 supervisor 停止�
 | Role | Path | SHA-256 |
 | --- | --- | --- |
 | neutral pre-departure first frame | `artifacts/qingyan-miao-ad-20260826-v10/assets/00-problem-discovery-first-v2.png` | `0d5fe47955eb309cb3982fc904edeb58458474b95c5bd3ec782222990404065c` |
-| underarm-sweat discovery last frame | `artifacts/qingyan-miao-ad-20260826-v10/assets/00-underarm-sweat-discovery-last-v3.png` | `d212ae98ddf4fde2481675eff7bdb0c1734a49295ce563e6ed714715a4f67459` |
+| underarm sweat + odor-sniff last frame | `artifacts/qingyan-miao-ad-20260826-v10/assets/00-underarm-odor-sniff-last-v4.png` | `ba578d2a830a21ddd0b4cadc3e818fb83208362a4fd4c020293c97d58a63ad4f` |
 
 新 prompt：
 
 ```text
 artifacts/qingyan-miao-ad-20260826-v10/prompts/00_problem_discovery_v2.txt
-SHA-256 45c68ef0bccba44c1daca8d029ce42a34974e1b253e948e360f917c2b54f54b8
+SHA-256 279b57fe0015f2f908bf50fdf7b307643e44ba6fb223e39b26ccebc59e140c30
 ```
 
 `hell-grind-aigc-skill` 本地 prompt audit 结果为 `PASS`、structural score `100/100`；这只证明 prompt 结构，
@@ -135,7 +140,7 @@ VIDEO_ANALYSIS_UNAVAILABLE / NEW_T8_SUBMIT_BLOCKED / NO_V10_FINAL
 
 恢复条件不是 blind retry H3，而是先恢复 project-local `video-analysis` MCP。随后按新顺序执行：
 
-1. 只提交一次新 Shot 00：上述 neutral first frame → underarm-sweat discovery last frame；
+1. 只提交一次新 Shot 00：上述 neutral first frame → underarm sweat + explicit odor-sniff last frame；
 2. 固定 exact MP4 + SHA，并完成 requirement-level Gate；只有全 `PASS` 才继续；
 3. 对 exact 旧 `01_problem_open_cap_spray.mp4` 重新 Gate；若 content requirements 通过，只允许裁除其前约
    1.6 秒重复 problem 段，从开盖动作起作为 treatment beat 消费；
@@ -155,6 +160,8 @@ finding 的 follow-up query 只返回 stale-tagged Ecommerce sequential Gate fra
 - 不得把控制帧、prompt audit、contact sheet、FFmpeg metadata、successful local submit 或 H3 receipt当作 per-Shot Gate `PASS`。
 - 不得再把 `01_problem_open_cap_spray` 或任何第一帧已手持产品的素材作为 opening Shot。
 - Shot 00 必须表达“腋下出汗导致局部汗印”；不得将问题写成衣料、衣服材质或穿着不适。
+- Shot 00 必须包含可观察的闻腋下动作：头和鼻子主动靠近被衣物遮挡的腋下、短促 sniff、轻微皱鼻；
+  只看汗印或只摸衣服均不满足该 human requirement。
 - 不得在 exact Shot 01A 未完成 Gate 前提交 Shot 01B、合成 v10 final 或宣称 13 秒问题已在成片修复。
 - 不得覆盖或 blind retry exact `01_problem_open_cap_spray` durable state；若内容后来被判为 `FAIL`，必须
   以新 Shot identity和新的 exact receipt处理。
