@@ -56,6 +56,16 @@ attempt，并选择在保留共享`video-analysis` MCP时以explicit `--novram`�
 GPU OOM，Manifest revision `39`为terminal `failed` / `stop`。没有MP4、fetch、retry、fallback、P6、
 activation或M1 effect；这是capacity FAIL，仍非model-quality verdict。
 
+Execution checkpoint (2026-08-26, M0 MCP-released lowvram): 用户选择`A`，授权终止占用`6534 MiB`
+GPU的project-local `video-analysis` MCP并执行第三个独立one-submit attempt。MCP clean exit后、外部ComfyUI
+owner正常停止且queue/8188清空时，GPU free升至约`27.3 GiB`；fresh unit恢复default
+`--lowvram --use-sage-attention`。唯一request
+`168a91ec21c84f1dfc7b539e4d9a7f10e7cf0170ec3f70b429feb645e32cec73`取得Provider request
+`22f4e9d9-5d24-43c2-b16c-799d5b05503f`，约`52.77 seconds`后仍在node `10`
+`SamplerCustomAdvanced` OOM，peak allocated/reserved `23706/25952 MiB`。Manifest revision `45`为terminal
+`failed` / `stop`，submit/poll/fetch=`1/1/0`；没有MP4、retry、fallback、P6、activation或M1。这证明释放
+MCP增加了headroom但当前exact Stock20 Ref2VA/Hybrid route仍受本机capacity阻断，不能形成视频quality verdict。
+
 已接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
 Implementation lane与Validation lane。Validation必须绑定immutable checkpoint，不得在同一次attempt期间
 读取正在变化的source/workflow/profile；并行执行不会放宽Provider、permit、P6或same-file ownership gates。
@@ -682,6 +692,19 @@ fresh unit的`ExecStart`确认无`--lowvram`，queue empty，real preflight通�
 `torch.OutOfMemoryError`终止，peak allocated/reserved为`16007/19424 MiB`。Manifest revision `39`为
 terminal `failed` / `stop`；submit/poll/fetch=`1/1/0`、retry/fallback/activation/M1=`0/0/0/0`。无MP4，
 因此media/P6/human verdict均`NOT_EVALUATED`；清理后8188关闭，T8恢复原clean commit。
+
+Execution update (2026-08-26, MCP-released lowvram attempt): 用户再次选择`A`，授权精确终止project-local
+`video-analysis` MCP PID `3329563`并执行第三个独立one-submit attempt；两个Godot进程未触碰。MCP释放
+`6534 MiB`后，fresh loopback unit使用default `--lowvram --use-sage-attention`，submit前GPU free
+`27492 MiB`。Exact approval
+`a9130be5880bea854e53d65672c438788ace605c9f116e5f3aa14d53a28f568b`绑定no retry/fallback/activation/M1。
+唯一request `168a91ec21c84f1dfc7b539e4d9a7f10e7cf0170ec3f70b429feb645e32cec73`取得Provider request
+`22f4e9d9-5d24-43c2-b16c-799d5b05503f`，约`52.77 seconds`后仍于node `10`
+`SamplerCustomAdvanced`以`torch.OutOfMemoryError`终止，peak allocated/reserved为`23706/25952 MiB`。
+Observation `20e3d685966a4d3b180dca143dbdeab8b64aaee20555b7d738bc390014b31b1a`将Manifest推进到revision
+`45`、terminal `failed` / `stop`；submit/poll/fetch=`1/1/0`。仍无MP4，因此media/P6/human verdict均
+`NOT_EVALUATED`。Cleanup后8188关闭、T8恢复clean原commit；被释放的PID `3329563`保持退出且
+`nvidia-smi`不存在`ai_video_mcp` GPU compute app，其他CPU-only MCP client process不属于本次termination scope。
 
 ## Milestone 4: Execute Explicitly Selected M0, Then Conditional M1
 

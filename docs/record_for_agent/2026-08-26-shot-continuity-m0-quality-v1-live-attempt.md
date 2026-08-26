@@ -4,7 +4,7 @@ Date: 2026-08-26
 
 ## Purpose
 
-本文记录current v9 source-boundary P6关闭后，用户显式选择`quality-v1`并分别授权两个exactly-one-submit
+本文记录current v9 source-boundary P6关闭后，用户显式选择`quality-v1`并分别授权三个exactly-one-submit
 local M0 attempt的完整结果。它区分engineering closure、runtime-capacity failure与尚未发生的media/P6 quality
 acceptance；不把Harness PASS、Provider receipt或terminal OOM解释为M0 quality verdict。
 
@@ -100,8 +100,8 @@ memory-mode flag并保留`--use-sage-attention`。Focused tests为`17 passed`，
 
 - source-boundary prerequisite：`PASS`，沿用existing Manifest `2.14` exact evidence；
 - A4 feasibility与pre-effect closure：`PASS`；
-- M0 `quality-v1` submit discipline：`PASS`，两个独立授权attempt各exactly one submit，no retry/fallback；
-- M0 runtime execution：`FAIL`，`--lowvram`与`--novram`均在sampler GPU OOM；
+- M0 `quality-v1` submit discipline：`PASS`，三个独立授权attempt各exactly one submit，no retry/fallback；
+- M0 runtime execution：`FAIL`，初始`--lowvram`、共享MCP下的`--novram`与释放MCP后的`--lowvram`均在sampler GPU OOM；
 - generated artifact/probe/decode/media analysis：`NOT_EVALUATED`，没有MP4；
 - M0 P6/human quality verdict：`NOT_EVALUATED`；
 - M0 winner/activation：未发生；
@@ -110,7 +110,7 @@ memory-mode flag并保留`--use-sage-attention`。Focused tests为`17 passed`，
 
 ## Remaining Boundary
 
-Milestone 4不再是not started，而是M0 attempted/failed。两个独立授权均已在各自唯一submit中消费，且durable
+Milestone 4不再是not started，而是M0 attempted/failed。三个独立授权均已在各自唯一submit中消费，且durable
 attempt都为terminal `stop`；不得blind retry、remint permit或把OOM解释为可以自动切换`fast-v1`。只有用户新的明确授权才可
 开始新的M0 attempt、改变policy/profile/geometry/runtime capacity strategy，或准备/提交M1。
 
@@ -166,3 +166,51 @@ retry/fallback/remote/paid/activation/M1=`0/0/0/0/0/0`。
 `NOT_EVALUATED`。Queue清空后supervisor已停止，port `8188`关闭；T8恢复到
 `28cb160827c245b2d6a37539df30c1d7c5e7aecd`且checkout clean。这关闭了“只用`novram`是否能在当前共享
 GPU状态完成Stock20 M0”的疑问：结果仍是capacity FAIL，不是model-quality verdict。
+
+## MCP-Released Lowvram Attempt
+
+用户随后选择`A`，授权精确终止持有GPU的project-local `video-analysis` MCP进程并执行一个新的、
+exactly-one-submit `quality-v1` v3 attempt。终止前PID `3329563`的exact command为
+`/home/reggie/.local/share/ai-video/video-analysis-mcp/bin/python -m ai_video_mcp`，占用`6534 MiB`；发送
+`SIGTERM`后该GPU-resident进程clean exit，且generation window内未自动重启。两个不属于本task的Godot桌面进程
+保持不变。外部owner的ComfyUI unit
+完成并正常停止后，`8188`关闭、queue无job、T8 checkout为clean原commit，GPU free约从`21.2 GiB`升至
+`27.3 GiB`。
+
+新的attempt/generation/output为：
+
+- `rainy-station-m0-quality-v1-mcp-released-lowvram-20260826-v3`；
+- `rainy-station-shot-4-m0-quality-v1-mcp-released-lowvram-20260826-v3`；
+- `video-shot-rainy-station-4-m0-quality-v1-mcp-released-lowvram-v3`。
+
+Canonical committer以zero Provider effect写入并strict reopen human decision
+`4917189d62cc65b295a26f4534e0bde6322b6d50fc514797fca8258014e5aaf1`与approval
+`a9130be5880bea854e53d65672c438788ace605c9f116e5f3aa14d53a28f568b`；scope fingerprint为
+`737534a93efb817cb2b160b870da84f5a2e2bfc3c5809665aa3fd096fb5c992c`，evidence SHA-256为
+`80c7eb7a8f675d1e164c4d8917e57d1ccde1b38d17b664f96b5e2e5fcaf349a8`。Approval绑定released MCP、
+default `--lowvram`、exact one submit与no retry/fallback/activation/M1；Manifest revision `41`时attempt仍absent。
+
+T8切到sealed commit后，fresh supervised unit
+`ai-video-comfyui-13d54e9efdfd49dbaf5e5ca4ae0fce43.service`的exact `ExecStart`包含
+`--listen 127.0.0.1 --port 8188 --disable-auto-launch --lowvram --use-sage-attention`。Submit前queue empty、
+GPU free `27492 MiB`；real caller `status/preflight`重验exact stack/model/node/anchor bytes并通过，resolved request hash为
+`168a91ec21c84f1dfc7b539e4d9a7f10e7cf0170ec3f70b429feb645e32cec73`。
+
+唯一submit取得Provider request ID `22f4e9d9-5d24-43c2-b16c-799d5b05503f`；local submit intent/result分别为
+`5eea37f323af5e309d970c9ba859c46ec2aef8e0ed76aa6e58e8f01dbdf70b0e` /
+`606e60d4799d5cb4abeb13c970c5778b8eaf99e9e1186d52e6058fc4d572b553`。唯一canonical poll在约
+`52.77 seconds`后观测到node `10` `SamplerCustomAdvanced`的`torch.OutOfMemoryError: Allocation on device`；
+trace仍经过`comfy_kitchen.int8_linear -> torch.cat(scaled_parts)`，本次位于MLP `self.fc1(x)`路径。
+PyTorch peak allocated/reserved为`23706/25952 MiB`；Comfy history为`status_str=error`、
+`completed=false`、`outputs=[]`。
+
+Observation `20e3d685966a4d3b180dca143dbdeab8b64aaee20555b7d738bc390014b31b1a`将Manifest推进到revision
+`45`，attempt为`video_provider_failed` / `failed` / `next_action=stop`。Submit/poll/fetch=`1/1/0`，
+retry/fallback/remote/paid/activation/M1=`0/0/0/0/0/0`。仍无MP4，所以probe/full decode、project
+`video-analysis`、M0 P6与human quality verdict均为`NOT_EVALUATED`。
+
+Queue清空后该supervisor unit已停止、port `8188`关闭；T8恢复
+`28cb160827c245b2d6a37539df30c1d7c5e7aecd`且clean。被释放的PID `3329563`保持退出；cleanup时
+`nvidia-smi`不存在`ai_video_mcp` GPU compute app，GPU仅保留两个未触碰的Godot进程，free约`28100 MiB`。
+其他CPU-only MCP client process不属于本次termination scope。本次证明释放MCP确实给exact sampler增加了可用headroom，但当前
+Stock20 Ref2VA/Hybrid M0仍超过本机可用或连续显存容量；它仍是capacity FAIL，不是视频quality verdict。
