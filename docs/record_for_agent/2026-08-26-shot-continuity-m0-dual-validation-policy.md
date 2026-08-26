@@ -120,8 +120,10 @@ Receipt SHA-256为`6b71ff608660abd390706ebb59fdae1e7d0114855ba94697acb5eae13f5f1
 `verify-receipt`确认`integrity=true`、`passed=true`、`complete_completion_proof=true`、
 `snapshot_matches=true`与`workspace_stable_confirmed=true`；其live `fresh=false` / `scope_worktree_clean=false`
 只表示current shared worktree在4个overlapping canonical paths仍含本task之外的unstaged ecommerce edits，
-这些bytes没有进入detached exact committed snapshot。Current record-only follow-up completion candidate为
-`.agent/harness/runs/m0-dual-validation-policy-record-20260826-v9/receipt.json`，本文不预宣其status。
+这些bytes没有进入detached exact committed snapshot。Record-only follow-up receipt
+`.agent/harness/runs/m0-dual-validation-policy-record-20260826-v9/receipt.json`随后为`passed`；其SHA-256为
+`ad1f445a998ac17949131a89221955da3417db7a9788c01b653fd446b5f521a7`，且`verify-receipt`的integrity、fresh、
+fresh-for-snapshot、snapshot match、scope cleanliness与complete completion proof均为`true`。
 
 ## Remaining Boundary
 
