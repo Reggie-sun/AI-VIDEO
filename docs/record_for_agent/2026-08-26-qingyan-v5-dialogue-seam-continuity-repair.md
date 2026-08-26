@@ -2,6 +2,15 @@
 
 Date: 2026-08-26
 
+> Human correction and supersession (2026-08-26): the user watched exact v5 and
+> returned `FAIL` for a still-obvious seam/stutter at about 2s and 4s, duplicated
+> product presentation (hand-held bottle plus lower-right packshot), repeated
+> packshot cards, and oscillating still-image motion. V5 remains historical
+> technical evidence but is not the current delivery. The composition-only v6
+> replacement is recorded in
+> `2026-08-26-qingyan-v6-product-exposure-seam-repair.md`; its targeted Agent Gate
+> is `PASS`, while a new user human verdict is still pending.
+
 ## Purpose
 
 本文记录青颜 30 秒竖屏广告在用户明确给出 v4 human `FAIL` 后的 bounded repair。三个 blocker 是：
