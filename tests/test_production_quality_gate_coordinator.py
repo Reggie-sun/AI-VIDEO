@@ -527,6 +527,41 @@ def test_domain_eligibility_requires_complete_consistent_identity() -> None:
         )
 
 
+def test_provider_native_claims_are_absent_from_gate_and_acceptance_models() -> None:
+    from ai_video.production.ecommerce_quality_gate import (
+        EcommerceGateResult,
+        EcommerceWholeAdAcceptanceTarget,
+    )
+    from ai_video.production.quality_gate_coordinator import (
+        UniversalQaContext,
+        UniversalQaGateResult,
+        UniversalQaProfile,
+    )
+    from ai_video.production.models import FinalAcceptanceReceipt
+
+    forbidden = {
+        "provider_name",
+        "provider_kind",
+        "provider_status",
+        "provider_file_id",
+        "model_id",
+        "seed",
+        "scheduler",
+        "workflow_hash",
+        "output_url",
+    }
+
+    for model in (
+        UniversalQaProfile,
+        UniversalQaContext,
+        UniversalQaGateResult,
+        EcommerceWholeAdAcceptanceTarget,
+        EcommerceGateResult,
+        FinalAcceptanceReceipt,
+    ):
+        assert forbidden.isdisjoint(model.model_fields)
+
+
 def test_continuity_runner_receives_exact_profile_requirement_ids() -> None:
     (
         UniversalHardCheck,

@@ -12,7 +12,9 @@ from urllib.parse import urlsplit
 from pydantic import (
     ConfigDict,
     Field,
+    SerializerFunctionWrapHandler,
     field_validator,
+    model_serializer,
     model_validator,
 )
 
@@ -148,6 +150,14 @@ class VideoGenerationMode(str, Enum):
 class VideoExecutionKind(str, Enum):
     LOCAL = "local"
     REMOTE = "remote"
+
+
+class VideoOutputRecoveryStrategy(str, Enum):
+    """Sealed recovery guarantee for an opaque Provider output handle."""
+
+    DURABLE_FILE_ID = "DURABLE_FILE_ID"
+    REQUERY_BY_EFFECT_ID = "REQUERY_BY_EFFECT_ID"
+    NON_RECOVERABLE_EPHEMERAL_URL = "NON_RECOVERABLE_EPHEMERAL_URL"
 
 
 class BillingKind(str, Enum):
@@ -573,7 +583,17 @@ class VideoCapabilityVariant(_VideoStrictModel):
     fps_supported: bool
     idempotent_submit: bool
     lookup_supported: bool
+    output_recovery_strategy: VideoOutputRecoveryStrategy | None = None
     binding_cardinality_constraints: tuple[VideoBindingCardinalityConstraint, ...] = ()
+
+    @model_serializer(mode="wrap")
+    def _serialize_additive_output_recovery_strategy(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.output_recovery_strategy is None:
+            data.pop("output_recovery_strategy", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_variant(self) -> "VideoCapabilityVariant":
@@ -1298,6 +1318,8 @@ class VideoSubmission(_VideoStrictModel):
 
 
 class VideoTaskObservation(_VideoStrictModel):
+    """Durable task observation whose ``provider_file_id`` is an opaque handle."""
+
     submission_fingerprint: str = Field(pattern=_SHA256)
     paid_submit_receipt_fingerprint: str = Field(pattern=_SHA256)
     state: VideoTaskState
@@ -1351,6 +1373,8 @@ class VideoTaskObservation(_VideoStrictModel):
 
 
 class VideoFetchReceipt(_VideoStrictModel):
+    """Exact fetched-byte receipt bound to the observation's opaque handle."""
+
     submission_fingerprint: str = Field(pattern=_SHA256)
     observation_fingerprint: str = Field(pattern=_SHA256)
     paid_submit_receipt_fingerprint: str = Field(pattern=_SHA256)
@@ -1577,6 +1601,7 @@ __all__ = [
     "VideoMediaReferenceBinding",
     "VideoOutputCapability",
     "VideoOutputRequirement",
+    "VideoOutputRecoveryStrategy",
     "VideoProviderTaskBinding",
     "VideoProvider",
     "VideoProviderCapabilities",

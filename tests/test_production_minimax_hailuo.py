@@ -2099,6 +2099,7 @@ def test_fetch_signed_url_is_never_persisted_in_repr_or_receipt(monkeypatch):
         submission, submit_receipt, observation, BytesIO()
     )
     targets = [
+        repr(transport.stream_calls),
         repr(observation),
         repr(submission),
         repr(submit_receipt),

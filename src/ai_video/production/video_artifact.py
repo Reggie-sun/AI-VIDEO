@@ -689,6 +689,8 @@ def invoke_generated_shot_continuity_reviewer(
 
 
 class VideoProvenanceReceipt(_VideoArtifactStrictModel):
+    """AI-VIDEO lineage; model/profile identify the requested selected inputs."""
+
     generation_id: str = Field(pattern=_SAFE_ID.pattern)
     request_receipt_fingerprint: str = Field(pattern=_SHA256)
     resolved_generation_hash: str = Field(pattern=_SHA256)

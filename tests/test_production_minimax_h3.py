@@ -1034,6 +1034,86 @@ def test_status_maps_queued_running_succeeded_and_failed(
         assert observation.provider_file_id is None
 
 
+def test_minimal_status_response_reaches_fetch_without_native_output_echo(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _block_socket(monkeypatch)
+    minimal_body = {
+        "task": {
+            "id": "task-h3-1",
+            "status": "succeeded",
+            "content": {"url": SIGNED_URL},
+            "resolution": "provider-advisory-mismatch",
+            "duration": 999,
+            "ratio": "1:1",
+        }
+    }
+    transport = _FakeTransport(
+        query_response=_query_response(status="succeeded", body=minimal_body),
+        download_response=_download_response(body=b"minimal-mp4-bytes"),
+    )
+    provider = MiniMaxH3VideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        now=_fixed_now,
+    )
+    resolved = provider.resolve(_request())
+    video_preview = _preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview=video_preview)
+    submit_receipt = _paid_submit_receipt(resolved, paid_preview)
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=resolved, receipt=submit_receipt
+    )
+
+    observation = provider.get_status(submission, submit_receipt)
+    receipt = provider.fetch(
+        submission,
+        submit_receipt,
+        observation,
+        BytesIO(),
+    )
+
+    assert observation.state is VideoTaskState.SUCCEEDED
+    assert receipt.provider_file_id == observation.provider_file_id
+    assert SIGNED_URL not in observation.model_dump_json()
+    assert SIGNED_URL not in receipt.model_dump_json()
+
+
+def test_present_conflicting_model_echo_still_fails_closed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _block_socket(monkeypatch)
+    transport = _FakeTransport(
+        query_response=_query_response(
+            status="running",
+            body={
+                "task": {
+                    "id": "task-h3-1",
+                    "model": "different-model",
+                    "status": "running",
+                }
+            },
+        )
+    )
+    provider = MiniMaxH3VideoProvider(
+        transport=transport,
+        credential=_SecretResolver(),
+        now=_fixed_now,
+    )
+    resolved = provider.resolve(_request())
+    video_preview = _preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview=video_preview)
+    submit_receipt = _paid_submit_receipt(resolved, paid_preview)
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=resolved, receipt=submit_receipt
+    )
+
+    with pytest.raises(AiVideoError) as conflict:
+        provider.get_status(submission, submit_receipt)
+
+    assert conflict.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
+
+
 def test_status_cancelled_maps_to_terminal_failed(monkeypatch):
     _block_socket(monkeypatch)
     transport = _FakeTransport(
@@ -1193,6 +1273,7 @@ def test_fetch_signed_url_is_never_persisted_in_repr_or_receipt(monkeypatch):
         submission, submit_receipt, observation, BytesIO()
     )
     targets = [
+        repr(transport.stream_calls),
         repr(observation),
         repr(submission),
         repr(submit_receipt),

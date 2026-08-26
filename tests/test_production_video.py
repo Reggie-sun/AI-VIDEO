@@ -52,6 +52,7 @@ from ai_video.production.video import (
     VideoGenerationRequest,
     VideoImageReferenceBinding,
     VideoOutputRequirement,
+    VideoOutputRecoveryStrategy,
     VideoProviderCapabilities,
     VideoProviderFailure,
     VideoProviderRegistry,
@@ -1892,6 +1893,7 @@ def test_capability_variant_defaults_to_empty_cardinality_constraints_and_legacy
         lookup_supported=False,
     )
     assert variant.binding_cardinality_constraints == ()
+    assert variant.output_recovery_strategy is None
 
     from ai_video.production._video_capability_fingerprint import (
         project_capability_variant,
@@ -1899,9 +1901,55 @@ def test_capability_variant_defaults_to_empty_cardinality_constraints_and_legacy
 
     legacy_dump = project_capability_variant(variant)
     assert "binding_cardinality_constraints" not in legacy_dump
+    assert "output_recovery_strategy" not in legacy_dump
     assert canonical_sha256(legacy_dump) == canonical_sha256(
-        variant.model_dump(mode="json", exclude={"binding_cardinality_constraints"})
+        variant.model_dump(
+            mode="json",
+            exclude={
+                "binding_cardinality_constraints",
+                "output_recovery_strategy",
+            },
+        )
     )
+
+
+def test_output_recovery_strategy_is_additive_and_hash_bound() -> None:
+    from ai_video.production._video_capability_fingerprint import (
+        capability_variant_fingerprint,
+        project_capability_variant,
+    )
+
+    historical_payload = _variant().model_dump(mode="json")
+    historical_payload.pop("binding_cardinality_constraints", None)
+    historical_payload.pop("output_recovery_strategy", None)
+    historical = VideoCapabilityVariant.model_validate(historical_payload)
+    durable = historical.model_copy(
+        update={
+            "output_recovery_strategy": VideoOutputRecoveryStrategy.DURABLE_FILE_ID
+        }
+    )
+    requery = historical.model_copy(
+        update={
+            "output_recovery_strategy": VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID
+        }
+    )
+
+    assert historical.output_recovery_strategy is None
+    assert "output_recovery_strategy" not in project_capability_variant(historical)
+    assert project_capability_variant(durable)["output_recovery_strategy"] == (
+        "DURABLE_FILE_ID"
+    )
+    assert project_capability_variant(requery)["output_recovery_strategy"] == (
+        "REQUERY_BY_EFFECT_ID"
+    )
+    assert len(
+        {
+            capability_variant_fingerprint(historical),
+            capability_variant_fingerprint(durable),
+            capability_variant_fingerprint(requery),
+        }
+    ) == 3
+    assert "VideoOutputRecoveryStrategy" in video_contracts.__all__
 
 
 def test_provider_capabilities_fingerprint_stays_bit_for_bit_for_legacy_empty_constraints():

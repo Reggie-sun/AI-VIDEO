@@ -38,6 +38,7 @@ from ai_video.production.video import (
     VideoGenerationPreview,
     VideoGenerationRequest,
     VideoOutputRequirement,
+    VideoOutputRecoveryStrategy,
     VideoProviderCapabilities,
     VideoSubmission,
     VideoSubmitResult,
@@ -96,7 +97,7 @@ def _unknown_submit() -> AiVideoError:
 @dataclass(frozen=True)
 class MiniMaxH3TransportRequest:
     method: Literal["GET", "POST"]
-    url: str
+    url: str = field(repr=False)
     headers: Mapping[str, str] = field(repr=False)
     body: bytes = field(default=b"", repr=False)
 
@@ -201,6 +202,7 @@ _VARIANT = VideoCapabilityVariant(
     fps_supported=False,
     idempotent_submit=False,
     lookup_supported=True,
+    output_recovery_strategy=VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID,
 )
 _CAPABILITIES = VideoProviderCapabilities.create(
     provider_name=_PROVIDER_NAME,
@@ -432,17 +434,9 @@ class MiniMaxH3VideoProvider:
             raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "MiniMax H3 query task is missing.")
         if _task_id(task.get("id"), surface="query response") != task_id:
             raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "MiniMax H3 query task ID changed.")
-        if task.get("model") != _MODEL_ID:
+        model = task.get("model")
+        if model is not None and model != _MODEL_ID:
             raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "MiniMax H3 query model changed.")
-        if (
-            task.get("resolution") != "768P"
-            or task.get("duration") != 4
-            or task.get("ratio") != "16:9"
-        ):
-            raise _error(
-                ErrorCode.VIDEO_PROVIDER_FAILED,
-                "MiniMax H3 query output profile changed.",
-            )
         status = task.get("status")
         if status == "queued":
             return VideoTaskState.QUEUED, None

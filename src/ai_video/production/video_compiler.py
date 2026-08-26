@@ -29,9 +29,11 @@ from ai_video.production._video_continuity import (
 )
 from ai_video.production.video import (
     ProviderProfilePointer,
+    VideoExecutionKind,
     VideoGenerationRequest,
     VideoGenerationMode,
     VideoImageReferenceBinding,
+    VideoOutputRecoveryStrategy,
     VideoOutputRequirement,
     VideoProviderCapabilities,
 )
@@ -69,6 +71,7 @@ class ProviderRequirementUnsupportedReason(str, Enum):
     PROMPT_EXPRESSION_UNSUPPORTED = "PROMPT_EXPRESSION_UNSUPPORTED"
     COMPILER_VERSION_UNSUPPORTED = "COMPILER_VERSION_UNSUPPORTED"
     LINEAGE_MISMATCH = "LINEAGE_MISMATCH"
+    OUTPUT_LOCATOR_NOT_RECOVERABLE = "OUTPUT_LOCATOR_NOT_RECOVERABLE"
 
 
 class ProviderRequirementUnsupported(_CompilerModel):
@@ -380,6 +383,20 @@ def compile_provider_video_request(
             requirement,
             ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
             ("selection",),
+        )
+    if (
+        capability.execution_kind is VideoExecutionKind.REMOTE
+        and capability.output_recovery_strategy
+        not in {
+            VideoOutputRecoveryStrategy.DURABLE_FILE_ID,
+            VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID,
+        }
+    ):
+        return _unsupported(
+            provider_bound,
+            requirement,
+            ProviderRequirementUnsupportedReason.OUTPUT_LOCATOR_NOT_RECOVERABLE,
+            ("selection.output_recovery_strategy",),
         )
     if (
         requirement.generation_intent.camera_intent.expression_strength

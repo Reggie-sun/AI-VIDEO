@@ -15,6 +15,7 @@ import pytest
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
     ActorIdentity,
     AssetRecord,
@@ -179,6 +180,25 @@ def _profile() -> SeedanceProviderProfile:
         pricing=_pricing(),
         result_origins=("https://media.example",),
     )
+
+
+def test_historical_profile_without_output_recovery_strategy_reopens_with_same_hash():
+    current = _profile()
+    payload = current.model_dump(mode="json")
+    for capability in payload["capabilities"]:
+        capability["variant"].pop("output_recovery_strategy")
+    payload["profile_sha256"] = canonical_sha256(
+        {key: value for key, value in payload.items() if key != "profile_sha256"}
+    )
+
+    reopened = SeedanceProviderProfile.model_validate(payload)
+
+    assert reopened.profile_sha256 == payload["profile_sha256"]
+    assert all(
+        capability.variant.output_recovery_strategy is None
+        for capability in reopened.capabilities
+    )
+    assert "output_recovery_strategy" not in reopened.model_dump_json()
 
 
 def _profile_pointer(profile: SeedanceProviderProfile) -> ProviderProfilePointer:
@@ -3403,6 +3423,59 @@ def test_poll_and_fetch_bind_same_task_and_accept_only_allowed_origin_mp4():
     assert receipt.content_type == "video/mp4"
     assert receipt.size_bytes == len(sink)
     assert all("https://media.example/result.mp4" not in repr(req) for req in transport.requests)
+
+
+def test_minimal_status_and_rotated_output_url_reach_fetch_without_model_echo():
+    profile = _profile()
+    first_url = "https://media.example/result.mp4?token=first"
+    rotated_url = "https://media.example/result.mp4?token=rotated"
+    transport = _FakeTransport()
+    transport.responses.extend(
+        (
+            _json_response(
+                {
+                    "id": "task-seedance-1",
+                    "status": "succeeded",
+                    "content": {"video_url": first_url},
+                }
+            ),
+            _json_response(
+                {
+                    "id": "task-seedance-1",
+                    "status": "succeeded",
+                    "content": {"video_url": rotated_url},
+                }
+            ),
+        )
+    )
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "rotated-test-secret",
+        input_reference=_provider_asset_reference,
+        now=lambda: FIXED_NOW,
+    )
+    resolved = provider.resolve(_request(profile))
+    video_preview = provider.preview(resolved)
+    paid_preview = _paid_preview(resolved, video_preview)
+    paid_receipt = _accepted_receipt(resolved, paid_preview)
+    submission = VideoSubmission.from_paid_submit_receipt(
+        resolved=resolved, receipt=paid_receipt
+    )
+
+    observation = provider.get_status(submission, paid_receipt)
+    receipt = provider.fetch(
+        submission,
+        paid_receipt,
+        observation,
+        _FakeWriteSink(),
+    )
+
+    assert observation.provider_file_id == receipt.provider_file_id
+    assert transport.requests[-1].url == rotated_url
+    for durable in (observation.model_dump_json(), receipt.model_dump_json()):
+        assert first_url not in durable
+        assert rotated_url not in durable
 
 
 def test_poll_rejects_provider_response_for_a_different_task_id():

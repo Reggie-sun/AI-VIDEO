@@ -49,6 +49,7 @@ from ai_video.production.video import (
     VideoGenerationRequest,
     VideoImageReferenceBinding,
     VideoOutputRequirement,
+    VideoOutputRecoveryStrategy,
     VideoProviderCapabilities,
     VideoSubmission,
     VideoSubmitResult,
@@ -123,7 +124,7 @@ def _unknown_submit() -> AiVideoError:
 @dataclass(frozen=True)
 class MiniMaxHailuoTransportRequest:
     method: Literal["GET", "POST"]
-    url: str
+    url: str = field(repr=False)
     headers: Mapping[str, str] = field(repr=False)
     body: bytes = field(default=b"", repr=False)
 
@@ -249,6 +250,7 @@ _VARIANT = VideoCapabilityVariant(
     fps_supported=False,
     idempotent_submit=False,
     lookup_supported=True,
+    output_recovery_strategy=VideoOutputRecoveryStrategy.DURABLE_FILE_ID,
 )
 _I2V_OUTPUT = VideoFlexibleOutputRequirement(
     timing_mode="frame_count",
@@ -284,6 +286,7 @@ _I2V_VARIANT = VideoCapabilityVariant(
     fps_supported=True,
     idempotent_submit=False,
     lookup_supported=True,
+    output_recovery_strategy=VideoOutputRecoveryStrategy.DURABLE_FILE_ID,
 )
 _CAPABILITIES = VideoProviderCapabilities.create(
     provider_name=_PROVIDER_NAME,

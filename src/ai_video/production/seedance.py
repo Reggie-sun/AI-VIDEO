@@ -680,7 +680,7 @@ class SeedanceVideoProvider:
         if _task_id(payload.get("id"), surface="query response") != task_id:
             raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "Seedance query task ID changed.")
         model = payload.get("model")
-        if model != expected_model_id:
+        if model is not None and model != expected_model_id:
             raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "Seedance query model changed.")
         status = payload.get("status")
         if status == "queued":

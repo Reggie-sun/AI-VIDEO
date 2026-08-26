@@ -48,6 +48,8 @@ def project_capability_variant(variant: Any) -> dict[str, Any]:
     """
 
     payload = variant.model_dump(mode="json")
+    if getattr(variant, "output_recovery_strategy", None) is None:
+        payload.pop("output_recovery_strategy", None)
     constraints = getattr(variant, "binding_cardinality_constraints", ()) or ()
     if not constraints:
         payload.pop("binding_cardinality_constraints", None)

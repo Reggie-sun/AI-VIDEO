@@ -15,6 +15,7 @@ from ai_video.production.video import (
     VideoGenerationMode,
     VideoMediaCapability,
     VideoOutputCapability,
+    VideoOutputRecoveryStrategy,
 )
 
 
@@ -514,6 +515,9 @@ def default_seedance_capabilities() -> tuple[SeedanceCapabilityProfile, ...]:
                 fps_supported=True,
                 idempotent_submit=False,
                 lookup_supported=True,
+                output_recovery_strategy=(
+                    VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID
+                ),
             )
             task_type = (
                 {
@@ -631,7 +635,18 @@ def validate_seedance_capability_subset(
             raise ValueError(
                 "Selected Seedance capability must bind an official Model ID and mode"
             )
-        if entry.variant != official.variant:
+        legacy_recovery_compatible = (
+            entry.variant.output_recovery_strategy is None
+            and entry.variant.model_copy(
+                update={
+                    "output_recovery_strategy": (
+                        official.variant.output_recovery_strategy
+                    )
+                }
+            )
+            == official.variant
+        )
+        if entry.variant != official.variant and not legacy_recovery_compatible:
             raise ValueError(
                 "Selected Seedance capability must remain variant-exact to the official matrix"
             )
@@ -683,6 +698,8 @@ def validate_seedance_capability_matrix(
             or variant.output is not None
             or variant.idempotent_submit != official_variant.idempotent_submit
             or variant.lookup_supported != official_variant.lookup_supported
+            or variant.output_recovery_strategy
+            is not official_variant.output_recovery_strategy
             or variant.required_first_frame != official_variant.required_first_frame
             or variant.max_reference_count > official_variant.max_reference_count
             or not set(variant.allowed_image_roles).issubset(

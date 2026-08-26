@@ -8,6 +8,7 @@ import ai_video.production.minimax_h3 as h3_module
 import ai_video.production.minimax_hailuo as hailuo_module
 import pytest
 
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._video_requirement_routing import requirement_output_matches
 from ai_video.production.comfy_video import ComfyUIVideoProvider
 from ai_video.production.comfy_t8_video import (
@@ -22,6 +23,9 @@ from ai_video.production.local_h3_provider_family import LocalH3VideoProviderFam
 from ai_video.production.minimax_h3 import MiniMaxH3VideoProvider
 from ai_video.production.minimax_hailuo import MiniMaxHailuoVideoProvider
 from ai_video.production.seedance import SeedanceVideoProvider
+from ai_video.production.seedance_capabilities import (
+    validate_seedance_capability_matrix,
+)
 from ai_video.production.shot_router import (
     AdapterCompilerContract,
     ContinuityMode,
@@ -32,9 +36,17 @@ from ai_video.production.shot_router import (
 from ai_video.production.video_compiler import (
     CompiledProviderVideoRequest,
     ProviderRequirementUnsupported,
+    ProviderRequirementUnsupportedReason,
     ProviderVideoRequestCompiler,
+    compile_provider_video_request,
+    require_compiled_provider_request,
 )
-from ai_video.production.video import ProviderProfilePointer, VideoGenerationMode
+from ai_video.production.video import (
+    ProviderProfilePointer,
+    VideoGenerationMode,
+    VideoOutputRecoveryStrategy,
+    VideoProviderCapabilities,
+)
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.video_requirement import (
     AssetEvidence,
@@ -90,6 +102,107 @@ def _replace_requirement(
         target_shot_revision=requirement.target_shot.revision,
         target_shot_content_hash=requirement.target_shot.content_hash,
     )
+
+
+@pytest.mark.parametrize(
+    "strategy",
+    (None, VideoOutputRecoveryStrategy.NON_RECOVERABLE_EPHEMERAL_URL),
+)
+def test_remote_output_recovery_is_rejected_purely_before_compilation(
+    strategy: VideoOutputRecoveryStrategy | None,
+) -> None:
+    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+    output = _h3_output()
+    projection = _replace_requirement(
+        _verified_requirement(context),
+        output_need=OutputNeed(
+            duration_seconds=output.duration_seconds,
+            width=output.width,
+            height=output.height,
+            container_mime=output.mime_type,
+        ),
+        audio_need=AudioNeed.OPTIONAL,
+    )
+    variant = h3_module._VARIANT.model_copy(
+        update={"output_recovery_strategy": strategy}
+    )
+    capabilities = VideoProviderCapabilities.create(
+        provider_name=h3_module._PROVIDER_NAME,
+        variants=(variant,),
+    )
+    routing = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(remote_authorized=True, budget_authorized=True),
+        provider_profile=_h3_profile(),
+        capabilities=capabilities,
+        selected_capability_id=h3_module._CAPABILITY_ID,
+        output_requirement=output,
+        lifecycle=_lifecycle(context),
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="minimax-h3-video-compiler",
+            compiler_version="1",
+        ),
+    )
+    assert routing.provider_bound_request is not None
+
+    result = compile_provider_video_request(
+        provider_bound=routing.provider_bound_request,
+        requirement=projection.requirement,
+        compiler_id="minimax-h3-video-compiler",
+        compiler_version="1",
+        capabilities=capabilities,
+    )
+
+    assert isinstance(result, ProviderRequirementUnsupported)
+    assert result.reason is ProviderRequirementUnsupportedReason.OUTPUT_LOCATOR_NOT_RECOVERABLE
+    assert result.unsupported_field_paths == (
+        "selection.output_recovery_strategy",
+    )
+    assert result.prompt_text is None
+    assert result.payload is None
+    assert variant.lookup_supported is True
+    with pytest.raises(AiVideoError) as exc_info:
+        require_compiled_provider_request(result)
+    assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert exc_info.value.retryable is False
+    assert "OUTPUT_LOCATOR_NOT_RECOVERABLE" in (exc_info.value.technical_detail or "")
+
+
+def test_current_remote_adapters_declare_exact_output_recovery_strategy() -> None:
+    seedance_profile = _seedance_profile()
+
+    assert {
+        entry.variant.output_recovery_strategy
+        for entry in seedance_profile.capabilities
+    } == {VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID}
+    assert (
+        h3_module._VARIANT.output_recovery_strategy
+        is VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID
+    )
+    assert {
+        variant.output_recovery_strategy
+        for variant in hailuo_module._CAPABILITIES.variants
+    } == {VideoOutputRecoveryStrategy.DURABLE_FILE_ID}
+
+
+def test_seedance_official_matrix_rejects_output_recovery_strategy_drift() -> None:
+    profile = _seedance_profile()
+    first = profile.capabilities[0]
+    mutated = first.model_copy(
+        update={
+            "variant": first.variant.model_copy(
+                update={
+                    "output_recovery_strategy": (
+                        VideoOutputRecoveryStrategy.NON_RECOVERABLE_EPHEMERAL_URL
+                    )
+                }
+            )
+        }
+    )
+
+    with pytest.raises(ValueError, match="frozen official variant"):
+        validate_seedance_capability_matrix((mutated, *profile.capabilities[1:]))
 
 
 def test_requirement_output_rejects_unproven_duration_and_ratio() -> None:

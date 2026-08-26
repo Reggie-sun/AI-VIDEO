@@ -5,6 +5,7 @@ import json
 import threading
 from copy import deepcopy
 from dataclasses import replace
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -12,8 +13,10 @@ from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
+    AssetRegistrySnapshot,
     DependencyLifecycle,
     EvidenceStrength,
+    HybridLayer,
     QaLayer,
     QaLayoutRules,
     QaPolicy,
@@ -26,8 +29,14 @@ from ai_video.production.models import (
     StateCommitStatus,
     ToolIdentity,
     VideoAttemptPhase,
+    VisualStrategy,
 )
 from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+from ai_video.production.dependency import (
+    build_production_dependency_graph,
+    desired_fingerprints,
+    resolve_dependency_state,
+)
 from ai_video.production.ad_creative_types import (
     AdCompositionRequirements,
     AdShotProposal,
@@ -68,13 +77,27 @@ from ai_video.production.paths import (
     _open_regular_file_nofollow,
     canonical_image_request_path,
     canonical_qa_policy_path,
+    canonical_video_provenance_receipt_path,
 )
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.review import (
     ContinuityEvaluationIntent,
     GeneratedShotContinuityEvidence,
 )
-from ai_video.production.state_commit import ProductionStateCommitter
+from ai_video.production.state_commit import (
+    PreparedArtifact,
+    ProductionStateCommitter,
+    _canonical_json_bytes,
+    _canonical_yaml_bytes,
+    prepare_dependency_graph_transition,
+    prepare_project_registry_commit,
+)
+from ai_video.production.shot_router import (
+    AdapterCompilerContract,
+    ContinuityMode as RouterContinuityMode,
+    RoutingOutcome,
+    VideoGenerationResolver,
+)
 from ai_video.production.video import (
     BillingKind,
     ContinuityConstraintSet,
@@ -82,22 +105,42 @@ from ai_video.production.video import (
     ProviderProfilePointer,
     VideoCapabilityVariant,
     VideoExecutionKind,
+    VideoFetchReceipt,
     VideoGenerationMode,
     VideoGenerationRequest,
     GeneratedCommercialShotBinding,
     VideoImageReferenceBinding,
     VideoOutputRequirement,
+    VideoOutputRecoveryStrategy,
     VideoProviderCapabilities,
+    VideoSubmission,
+    VideoSubmitResult,
+    VideoTaskObservation,
     VideoTaskState,
 )
 from ai_video.production.video_fake import (
     FakeVideoScenario,
     ScriptedFakeVideoProvider,
 )
+from ai_video.production.video_compiler import CompiledProviderVideoRequest
+from ai_video.production.video_requirement import (
+    AssetEvidence,
+    AudioNeed,
+    ContinuityMode as RequirementContinuityMode,
+    GenerationIntent,
+    GenerationMode as RequirementGenerationMode,
+    MotionRequirement as RequirementMotionRequirement,
+    OutputNeed,
+    ProviderNeutralVideoRequirement,
+    QualityNeed,
+    SemanticReferenceRole,
+    VerifiedGenerationRequirementProjection,
+)
 from ai_video.production.video_artifact import (
     _default_terminal_frame_extractor,
     probe_generated_video_candidate,
     VideoProbeReceipt,
+    VideoProvenanceReceipt,
 )
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.project import load_production_project
@@ -114,6 +157,12 @@ from test_production_video import (
     _paid_authorization,
     _paid_preview,
     _terminal_frame,
+)
+from test_production_shot_router import (
+    _asset as _router_asset,
+    _context as _router_context,
+    _lifecycle as _router_lifecycle,
+    _policy as _router_policy,
 )
 
 
@@ -187,6 +236,125 @@ def _durable_tree_snapshot(root: Path) -> dict[Path, bytes]:
         if path.is_file()
         and path.relative_to(root) != Path("state/commit.lock")
     }
+
+
+class _MinimalCloudBackend:
+    """Shared offline remote state with re-queryable, rotating output locators."""
+
+    def __init__(self, artifact_bytes: bytes) -> None:
+        self._artifact_bytes = artifact_bytes
+        self._job_id: str | None = None
+        self._current_output_url: str | None = None
+        self.query_count = 0
+
+    def submit(self, job_id: str) -> dict[str, str]:
+        if self._job_id is not None and self._job_id != job_id:
+            raise AssertionError("minimal backend job identity changed")
+        self._job_id = job_id
+        return {"job_id": job_id}
+
+    def query(self, job_id: str) -> dict[str, str]:
+        if job_id != self._job_id:
+            raise AssertionError("minimal backend query job identity changed")
+        output_url = (
+            "https://offline.invalid/output.mp4?revision=" f"{self.query_count}"
+        )
+        self.query_count += 1
+        self._current_output_url = output_url
+        return {
+            "job_id": job_id,
+            "status": VideoTaskState.SUCCEEDED.value,
+            "output_url": output_url,
+        }
+
+    def download(self, output_url: str) -> bytes:
+        if output_url != self._current_output_url:
+            raise AssertionError("minimal backend output locator is stale")
+        return self._artifact_bytes
+
+
+class _MinimalProviderResponseAdapter(ScriptedFakeVideoProvider):
+    """Offline adapter that parses only job/status/re-queryable output URL."""
+
+    def __init__(self, *, backend: _MinimalCloudBackend, **kwargs: object) -> None:
+        super().__init__(**kwargs)
+        self._backend = backend
+        self.provider_responses: list[dict[str, str]] = []
+
+    def submit(self, *args: object, **kwargs: object) -> VideoSubmitResult:
+        accepted = super().submit(*args, **kwargs)
+        response = self._backend.submit(accepted.external_effect_id)
+        self.provider_responses.append(response)
+        return VideoSubmitResult.create(
+            resolved=args[0],
+            external_effect_id=response["job_id"],
+            submitted_at=accepted.submitted_at,
+        )
+
+    def _query(
+        self,
+        submission: VideoSubmission,
+        submit_receipt: object,
+    ) -> tuple[VideoTaskObservation, str]:
+        if (
+            getattr(submit_receipt, "submit_receipt_fingerprint", None)
+            != submission.paid_submit_receipt_fingerprint
+        ):
+            raise AssertionError("minimal response receipt identity changed")
+        job_id = getattr(submit_receipt, "external_effect_id", None)
+        if not isinstance(job_id, str):
+            raise AssertionError("minimal response job identity is absent")
+        response = self._backend.query(job_id)
+        self.provider_responses.append(response)
+        if response.get("job_id") != job_id:
+            raise AssertionError("minimal response job identity changed")
+        if response.get("status") != VideoTaskState.SUCCEEDED.value:
+            raise AssertionError("minimal response status is not succeeded")
+        output_url = response.get("output_url")
+        if not isinstance(output_url, str):
+            raise AssertionError("minimal response output locator is absent")
+        self._status_calls += 1
+        opaque_handle = "fake-output-" + hashlib.sha256(job_id.encode()).hexdigest()
+        return (
+            VideoTaskObservation.create(
+                submission=submission,
+                state=VideoTaskState.SUCCEEDED,
+                observed_at=datetime(2026, 8, 18, 0, self._status_calls, tzinfo=UTC),
+                progress_milli=1000,
+                provider_file_id=opaque_handle,
+            ),
+            output_url,
+        )
+
+    def get_status(
+        self,
+        submission: VideoSubmission,
+        submit_receipt: object,
+    ) -> VideoTaskObservation:
+        observation, _ = self._query(submission, submit_receipt)
+        return observation
+
+    def fetch(
+        self,
+        submission: VideoSubmission,
+        submit_receipt: object,
+        observation: VideoTaskObservation,
+        sink: object,
+    ) -> VideoFetchReceipt:
+        current, output_url = self._query(submission, submit_receipt)
+        if current.provider_file_id != observation.provider_file_id:
+            raise AssertionError("minimal response opaque handle changed")
+        artifact_bytes = self._backend.download(output_url)
+        sink.write(artifact_bytes)
+        self._fetch_calls += 1
+        return VideoFetchReceipt.create(
+            submission=submission,
+            observation=observation,
+            content_type="video/mp4",
+            size_bytes=len(artifact_bytes),
+            artifact_sha256=hashlib.sha256(artifact_bytes).hexdigest(),
+            fetched_at=datetime(2026, 8, 18, 0, 10, tzinfo=UTC),
+        )
 
 
 def _runtime(
@@ -426,7 +594,10 @@ def _runtime(
         seed_supported=True,
         fps_supported=True,
         idempotent_submit=False,
-        lookup_supported=False,
+        lookup_supported=True,
+        output_recovery_strategy=(
+            VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID
+        ),
     )
     provider = ScriptedFakeVideoProvider(
         capabilities=VideoProviderCapabilities.create(
@@ -460,6 +631,368 @@ def _runtime(
         paid_provider_clock=lambda: authorization.issued_at,
     )
     return inputs, provider, resolved, paid_preview, committer
+
+
+def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
+    tmp_path: Path,
+) -> None:
+    inputs, base_provider, direct_resolved, _, _ = _runtime(
+        tmp_path,
+        status_events=(VideoTaskState.SUCCEEDED,),
+    )
+    initial = inputs.project
+    initial_shot = initial.shots[0]
+    generated_shot = seal_artifact(
+        initial_shot.model_copy(
+            update={
+                "revision": initial_shot.revision + 1,
+                "content_hash": "0" * 64,
+                "visual_strategy": VisualStrategy.HYBRID,
+                "required_asset_roles": (
+                    initial_shot.required_asset_roles[0],
+                    initial.shots[1].required_asset_roles[0].model_copy(
+                        update={"role": "secondary_still"}
+                    ),
+                ),
+                "generated_video_rationale": None,
+                "hybrid_layers": (
+                    HybridLayer(
+                        role="base",
+                        asset_role=initial_shot.required_asset_roles[0].role,
+                        asset_id=initial_shot.required_asset_roles[0].asset_ids[0],
+                        z_index=0,
+                    ),
+                    HybridLayer(
+                        role="secondary",
+                        asset_role="secondary_still",
+                        asset_id=initial.shots[1].required_asset_roles[0].asset_ids[0],
+                        z_index=1,
+                    ),
+                ),
+            }
+        )
+    )
+    generated_shot_ref = initial.project.artifacts.shots[0].model_copy(
+        update={
+            "revision": generated_shot.revision,
+            "content_hash": generated_shot.content_hash,
+            "path": Path("creative/shots/shot-1-minimal-cloud.yaml"),
+        }
+    )
+    generated_project = seal_artifact(
+        initial.project.model_copy(
+            update={
+                "revision": initial.project.revision + 1,
+                "content_hash": "0" * 64,
+                "artifacts": initial.project.artifacts.model_copy(
+                    update={
+                        "shots": (
+                            generated_shot_ref,
+                            *initial.project.artifacts.shots[1:],
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    base_commit = prepare_project_registry_commit(
+        manifest=initial.manifest,
+        project=generated_project,
+        registry=initial.registry,
+        attempt_id="minimal-cloud-generated-shot",
+    )
+    candidate_loaded = initial.model_copy(
+        update={
+            "project": generated_project,
+            "shots": (generated_shot, *initial.shots[1:]),
+            "manifest": initial.manifest.model_copy(
+                update={"active_project": base_commit.next_project}
+            ),
+        }
+    )
+    candidate_graph = build_production_dependency_graph(
+        replace(inputs, project=candidate_loaded)
+    )
+    candidate_states = resolve_dependency_state(
+        candidate_graph,
+        initial.manifest.dependency_states,
+    ).states
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=initial.manifest.manifest_revision,
+        base_dependency_graph=initial.manifest.active_dependency_graph,
+        candidate_graph=candidate_graph,
+        candidate_dependency_states=candidate_states,
+        expected_desired_fingerprints=desired_fingerprints(candidate_graph),
+    )
+    graph_bytes = _canonical_json_bytes(candidate_graph)
+    shot_bytes = _canonical_yaml_bytes(generated_shot)
+    commit_request = replace(
+        base_commit,
+        dependency_graph_transition=transition,
+        artifacts=tuple(
+            sorted(
+                (
+                    *base_commit.artifacts,
+                    PreparedArtifact(
+                        transition.candidate_dependency_graph.path,
+                        graph_bytes,
+                        hashlib.sha256(graph_bytes).hexdigest(),
+                    ),
+                    PreparedArtifact(
+                        generated_shot_ref.path,
+                        shot_bytes,
+                        hashlib.sha256(shot_bytes).hexdigest(),
+                    ),
+                ),
+                key=lambda item: item.relative_path.as_posix(),
+            )
+        ),
+    )
+    ProductionStateCommitter(tmp_path).commit(commit_request)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    inputs = replace(inputs, project=loaded)
+    assert direct_resolved.activation_scope is not None
+    direct_request = direct_resolved.activation_scope.request
+    shot = loaded.shots[0]
+    source = loaded.registry.assets[0]
+    terminal = _router_asset(
+        "continuity_terminal",
+        "minimal-cloud-source",
+        source.sha256,
+        mime_type=source.mime_type,
+        size_bytes=source.size_bytes,
+        width=source.width,
+        height=source.height,
+        registry_revision_id=loaded.manifest.active_registry.revision_id,
+    ).model_copy(update={"asset_id": source.asset_id})
+    context = _router_context(
+        continuity=RouterContinuityMode.EXACT_TERMINAL,
+        terminal=_router_asset(
+            "continuity_terminal",
+            "minimal-cloud-source",
+            source.sha256,
+            mime_type=source.mime_type,
+            size_bytes=source.size_bytes,
+            width=source.width,
+            height=source.height,
+        ),
+        important=False,
+        shot_id=shot.shot_id,
+    ).model_copy(
+        update={
+            "activated_shot": shot,
+            "target_shot_id": shot.shot_id,
+            "target_shot_revision": shot.revision,
+            "target_shot_content_hash": shot.content_hash,
+            "selected_registry_revision_id": (
+                loaded.manifest.active_registry.revision_id
+            ),
+            "upstream_terminal": terminal,
+        }
+    )
+    requirement = ProviderNeutralVideoRequirement.create(
+        source_request_content_hash="a" * 64,
+        intent_evidence_hash="b" * 64,
+        generation_intent_hash="c" * 64,
+        target_shot=shot,
+        scene=next(scene for scene in loaded.scenes if scene.scene_id == shot.scene_id),
+        characters=tuple(
+            character
+            for character in loaded.characters
+            if character.character_id in shot.character_ids
+        ),
+        generation_mode=RequirementGenerationMode.IMAGE_TO_VIDEO,
+        continuity_mode=RequirementContinuityMode.EXACT_TERMINAL,
+        motion_requirement=RequirementMotionRequirement.FREE_COMPLEX,
+        generation_intent=GenerationIntent(),
+        semantic_reference_roles=(SemanticReferenceRole.CONTINUITY_TERMINAL,),
+        asset_evidence=(
+            AssetEvidence(
+                role=SemanticReferenceRole.CONTINUITY_TERMINAL,
+                asset_id=source.asset_id,
+                asset_sha256=source.sha256,
+                mime_type=source.mime_type,
+                width=source.width,
+                height=source.height,
+                size_bytes=source.size_bytes,
+            ),
+        ),
+        output_need=OutputNeed(
+            duration_seconds=direct_resolved.effective_output.duration_seconds,
+            width=direct_resolved.effective_output.width,
+            height=direct_resolved.effective_output.height,
+            fps=direct_resolved.effective_output.fps,
+            container_mime=direct_resolved.effective_output.mime_type,
+        ),
+        audio_need=AudioNeed.FORBIDDEN,
+        quality_need=QualityNeed(objective_tier="production"),
+    )
+    projection = VerifiedGenerationRequirementProjection.create(
+        requirement=requirement,
+        plan_hash="d" * 64,
+        verified_source_request_content_hash=requirement.source_request_content_hash,
+        target_shot_id=shot.shot_id,
+        target_shot_revision=shot.revision,
+        target_shot_content_hash=shot.content_hash,
+    )
+    lifecycle = _router_lifecycle(context).model_copy(
+        update={
+            "generation_id": direct_resolved.generation_id,
+            "target_asset_role": direct_request.target_asset_role,
+            "base_project": loaded.manifest.active_project,
+            "base_registry": loaded.manifest.active_registry,
+            "base_dependency_graph": loaded.manifest.active_dependency_graph,
+            "input_artifact_ids": direct_request.input_artifact_ids,
+            "output_asset_id": direct_resolved.output_asset_id,
+        }
+    )
+    capability = base_provider._capabilities.variants[0]
+    assert (
+        capability.output_recovery_strategy
+        is VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID
+    )
+    routing = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_router_policy(remote_authorized=True, budget_authorized=True),
+        provider_profile=direct_resolved.provider_profile,
+        capabilities=base_provider._capabilities,
+        selected_capability_id=capability.capability_id,
+        output_requirement=direct_resolved.effective_output,
+        lifecycle=lifecycle,
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="fake-video-compiler",
+            compiler_version="1",
+        ),
+    )
+    assert (
+        routing.decision.outcome is RoutingOutcome.SELECTED
+    ), routing.decision.model_dump_json()
+    assert routing.provider_bound_request is not None
+    compiled = base_provider.compile_request(
+        routing.provider_bound_request,
+        projection.requirement,
+    )
+    assert isinstance(compiled, CompiledProviderVideoRequest)
+    resolved = base_provider.resolve(compiled.request)
+    assert resolved.requirement_hash == projection.requirement.requirement_hash
+    video_preview = base_provider.preview(resolved)
+    paid_preview = _paid_preview(
+        resolved,
+        attempt_id=ATTEMPT_ID,
+        video_preview=video_preview,
+    )
+    authorization = _paid_authorization(paid_preview)
+    committer = ProductionStateCommitter(
+        tmp_path,
+        video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
+        paid_provider_authorizer=(
+            lambda exact: authorization if exact == paid_preview else None
+        ),
+        paid_provider_clock=lambda: authorization.issued_at,
+    )
+    scenario = FakeVideoScenario(
+        status_events=(VideoTaskState.SUCCEEDED,),
+        provider_file_id=(
+            "fake-output-"
+            + hashlib.sha256(b"fake-task-1").hexdigest()
+        ),
+    )
+    backend = _MinimalCloudBackend(FIXTURE.read_bytes())
+    provider = _MinimalProviderResponseAdapter(
+        backend=backend,
+        capabilities=base_provider._capabilities,
+        artifact_bytes=FIXTURE.read_bytes(),
+        scenario=scenario,
+    )
+    service = VideoGenerationService(committer=committer, provider=provider)
+    before = committer._read_manifest()
+    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.submit_once(
+        attempt_id=ATTEMPT_ID,
+        paid_preview=paid_preview,
+        reservation_id="p8-video-reservation-1",
+    )
+    service.refresh_once(attempt_id=ATTEMPT_ID)
+    committer.settle_paid_provider_reservation(
+        attempt_id=ATTEMPT_ID,
+        actual_cost_microunits=1_000_000,
+    )
+
+    restarted_provider = _MinimalProviderResponseAdapter(
+        backend=backend,
+        capabilities=base_provider._capabilities,
+        artifact_bytes=FIXTURE.read_bytes(),
+        scenario=scenario,
+    )
+    restarted = VideoGenerationService(
+        committer=ProductionStateCommitter(
+            tmp_path,
+            video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
+        ),
+        provider=restarted_provider,
+    )
+    restarted.fetch_once(attempt_id=ATTEMPT_ID)
+    candidate = restarted.validate_once(attempt_id=ATTEMPT_ID)
+
+    state = candidate.attempts[-1].video_generation_state
+    assert state is not None and state.phase is VideoAttemptPhase.CANDIDATE
+    assert candidate.active_project == before.active_project
+    assert candidate.active_registry == before.active_registry
+    assert candidate.active_dependency_graph == before.active_dependency_graph
+    assert provider.call_counts.submit == 1
+    assert provider.call_counts.status == 1
+    assert restarted_provider.call_counts.status == 1
+    assert restarted_provider.call_counts.fetch == 1
+    assert backend.query_count == 2
+    assert provider.provider_responses == [
+        {"job_id": "fake-task-1"},
+        {
+            "job_id": "fake-task-1",
+            "status": "succeeded",
+            "output_url": "https://offline.invalid/output.mp4?revision=0",
+        },
+    ]
+    assert restarted_provider.provider_responses == [
+        {
+            "job_id": "fake-task-1",
+            "status": "succeeded",
+            "output_url": "https://offline.invalid/output.mp4?revision=1",
+        }
+    ]
+    durable_bytes = b"\n".join(_durable_tree_snapshot(tmp_path).values())
+    assert b"offline.invalid" not in durable_bytes
+    assert b"output_url" not in durable_bytes
+
+    candidate_attempt = candidate.attempts[-1]
+    assert candidate_attempt.candidate_registry is not None
+    candidate_registry = AssetRegistrySnapshot.model_validate_json(
+        (tmp_path / candidate_attempt.candidate_registry.path).read_bytes()
+    )
+    generated = next(
+        asset
+        for asset in candidate_registry.assets
+        if asset.asset_id == resolved.output_asset_id
+    )
+    assert generated.video_metadata is not None
+    provenance = VideoProvenanceReceipt.model_validate_json(
+        (
+            tmp_path
+            / canonical_video_provenance_receipt_path(
+                generated.video_metadata.provenance_receipt_id
+            )
+        ).read_bytes()
+    )
+    assert provenance.model_id == resolved.model_id
+    assert provenance.profile_sha256 == resolved.provider_profile.profile_sha256
+
+    before_replay = restarted_provider.call_counts
+    before_replay_tree = _durable_tree_snapshot(tmp_path)
+    with pytest.raises(AiVideoError) as replay:
+        restarted.validate_once(attempt_id=ATTEMPT_ID)
+    assert replay.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert restarted_provider.call_counts == before_replay
+    assert _durable_tree_snapshot(tmp_path) == before_replay_tree
 
 
 def _reach_fetch(
