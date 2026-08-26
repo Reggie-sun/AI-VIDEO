@@ -11,6 +11,14 @@ Date: 2026-08-26
 > `HUMAN_VISUAL_FAIL / CANONICAL_GATE_NOT_RUN`; the artifact is blocked from
 > P6, Final Acceptance, publication, or reuse as the current delivery candidate.
 
+> Superseded delivery routing (2026-08-26): the v4 artifact and its human `FAIL`
+> remain immutable historical evidence. The current local development candidate
+> is the repaired v5 recorded in
+> `2026-08-26-qingyan-v5-dialogue-seam-continuity-repair.md`. V5 has a new audible
+> product-recommendation Shot, no live-action clone padding, and requirement-level
+> development Gate `PASS`; it has not yet received the user's uninterrupted 1.0x
+> human acceptance and is not P6 or Final Acceptance.
+
 ## Purpose
 
 本文记录青颜苗家女孩广告从 28 秒候选修订为 8 个 Shot、30 秒、9:16 开发候选的稳定 checkpoint。
