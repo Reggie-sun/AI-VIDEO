@@ -59,21 +59,22 @@ current local candidate：
 
 ```text
 artifacts/qingyan-miao-ad-20260826-v6/final/青颜_苗家女孩T8自然转场广告_30s_9x16_v6.mp4
-SHA-256 6ead183b9fa3ba58ca260ee1f41b9090abb8f2223b9dcbbb182cb418ae0ce59b
+SHA-256 cdac1d5c78f0a40735220ad643f1d8ab9f5b6d8bd2bd41d7b9ef2d124432258d
 ```
 
 measured facts：
 
-- file size `16,906,429` bytes；container `30.022s`；video/audio stream均为 `30.000s`；
+- file size `17,341,950` bytes；container `30.022s`；video/audio stream均为 `30.000s`；
 - H.264 High、`1080x1920`、24fps、720 frames、`yuv420p`；AAC 48kHz stereo；
 - full video/audio decode `PASS`；integrated loudness `-20.8 LUFS`；true peak `-7.1 dBFS`；
-- project `video_review`：40 frames extracted，1432/1437 sampled unique ratio `0.997`，`issues: []`；
+- project `video_review`：40 frames extracted，1437/1437 sampled unique ratio `1.0`，`issues: []`；
 - Whisper medium 在 3.30–8.24 秒检出单一推广句；`青颜/清盐` 与 `抑汗/易汗` 仍是同音字
   orthography ambiguity，画面烧录 exact correct Chinese；
 - source-packshot input count `1`；presenter/live-action packshot overlay count `0`；
-- product hero 21.0–24.5 秒 crop 的 85 帧 phase correlation：最大水平漂移 `0.000216px`、垂直漂移
-  `0.000267px`、minimum response `0.999884`，支持“几何固定、无静图抖动”；
-- FFmpeg `freezedetect=-45dB:d=0.25` 的剩余事件全部落在 deliberate static graphic/hero/end-card
+- product hero 21.0–24.5 秒 crop 的 85 帧 phase correlation：最大水平漂移 `0.000544px`、垂直漂移
+  `0.000516px`、minimum response `0.999814`，支持“产品几何固定、无静图抖动”；产品与文字固定，
+  只有背后的大面积浅金光带单向匀速通过，不使用往复、正弦或缩放；
+- FFmpeg `freezedetect=-45dB:d=0.25` 的剩余事件全部落在 deliberate low-motion graphic/hero/end-card
   windows；所有 live-action windows 为 0 events。
 
 targeted evidence：
@@ -94,8 +95,9 @@ v6 已在可验证的 composition 层删除 v5 的错误路径，而不是通过
 current status 为 `TARGETED_AGENT_GATE_PASS / NEW_HUMAN_VERDICT_PENDING`。只有用户重新播放 exact v6
 SHA 后，才能决定这些主观 blocker 是否真正关闭。
 
-intentional static windows 为 neutral bridge、benefit card、scenario bridge、dedicated product hero 与
-text end card。它们是明确的图形卡，不属于 live-action freeze；但其停留节奏是否符合用户口味仍属于
+intentional graphic windows 为 neutral bridge、benefit card、scenario bridge、dedicated product hero 与
+text end card。商品与文字像素保持稳定，后四类卡的背景使用单向线性 light pass；它们不属于
+live-action freeze，但其停留节奏是否符合用户口味仍属于
 human acceptance，不由 freeze metric 或 MCP `issues: []` 替代。
 
 artifacts 保持 repository-untracked、local-only。项目 Agent Memory 第一次 focused query 返回 stale corpus
