@@ -67,7 +67,7 @@ class _StateCommitCommercialSourceMixin:
         manifest: ProductionManifest,
         request: CommercialSourcePreparationRequest,
     ):
-        if manifest.schema_version not in {"2.12", "2.13"}:
+        if manifest.schema_version not in {"2.12", "2.13", "2.14"}:
             raise _state_invalid("Commercial source preparation requires Manifest 2.12.")
         loaded = self._load_production_project(self._project_root / "project.yaml")
         graph = loaded.dependency_graph

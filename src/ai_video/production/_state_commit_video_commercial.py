@@ -55,7 +55,10 @@ def commercial_evaluation_authority(committer, *, manifest, request):
     binding = request.commercial_binding
     if binding is None:
         return None, ()
-    if manifest.schema_version != "2.13" or manifest.active_qa_policy is None:
+    if (
+        manifest.schema_version not in {"2.13", "2.14"}
+        or manifest.active_qa_policy is None
+    ):
         raise _state_invalid(
             "Commercial-bound video validation requires Manifest 2.13 and an active QA policy."
         )
@@ -180,7 +183,7 @@ def checkpoint_generated_commercial_shot(
     if evaluation_state is None:
         create_intent = getattr(commercial_reviewer, "create_intent", None)
         if (
-            manifest.schema_version != "2.13"
+            manifest.schema_version not in {"2.13", "2.14"}
             or request.commercial_binding is None
             or commercial_reviewer is None
             or create_intent is None

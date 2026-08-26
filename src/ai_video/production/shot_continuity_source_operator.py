@@ -1,8 +1,8 @@
 """Explicit qualification-only operator for the rainy-station source attempt.
 
 This module assembles the sealed source request and exposes one durable action at
-a time.  It deliberately does not register an active Provider family, retry,
-fall back, prepare a candidate, or activate fetched media.
+a time.  It deliberately does not register an active Provider family, retry, or
+fall back. Validation may prepare an inactive candidate, but never activates it.
 """
 
 from __future__ import annotations
@@ -12,6 +12,7 @@ import hashlib
 import os
 from pathlib import Path
 import stat
+import subprocess
 from typing import Any, Callable
 
 from ai_video.errors import AiVideoError, ErrorCode
@@ -56,6 +57,13 @@ from ai_video.production.video_generation import (
     FetchedVideoCandidate,
     VideoGenerationService,
 )
+from ai_video.production.continuity_evaluator import FfmpegRgbFrameSampler
+from ai_video.production.shot_continuity_source_review import (
+    SourceBoundaryHumanDecisionV1,
+    SourceBoundaryMeasurementContractV1,
+    SourceBoundaryReviewerV1,
+)
+from ai_video.production.models import ToolIdentity
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -144,9 +152,8 @@ def _qualification_lineage_hashes(
     profile: ShotContinuitySourceQualificationProfile,
     profile_document_hash: str,
 ) -> tuple[str, str]:
-    if (
-        len(profile_document_hash) != 64
-        or any(character not in "0123456789abcdef" for character in profile_document_hash)
+    if len(profile_document_hash) != 64 or any(
+        character not in "0123456789abcdef" for character in profile_document_hash
     ):
         raise _invalid("Source qualification profile document hash is invalid.")
     requirement_hash = canonical_sha256(
@@ -258,9 +265,7 @@ def build_source_qualification_request(
                 height=item.height,
                 size_bytes=item.size_bytes,
             )
-            for role, item in zip(
-                ("first_frame", "last_frame"), frames, strict=True
-            )
+            for role, item in zip(("first_frame", "last_frame"), frames, strict=True)
         ),
         seal_terminal_frame=True,
         output_requirement=output,
@@ -420,6 +425,8 @@ class ShotContinuitySourceOperator:
     provider: Any
     request: ResolvedVideoGenerationRequest
     attempt_id: str
+    profile: ShotContinuitySourceQualificationProfile | None = None
+    artifact_root: Path | None = None
 
     def _attempt_present(self) -> bool:
         manifest = self.committer._read_manifest()
@@ -466,7 +473,9 @@ class ShotContinuitySourceOperator:
         snapshot = self.provider.validate_pre_effect(self.request)
         after = _production_tree_hash(self.project_root)
         if before != after:
-            raise _state_invalid("Source qualification preflight changed durable state.")
+            raise _state_invalid(
+                "Source qualification preflight changed durable state."
+            )
         return {
             **self.status(),
             "durable_state_hash_before": before,
@@ -501,6 +510,127 @@ class ShotContinuitySourceOperator:
             committer=self.committer,
             provider=self.provider,
         ).fetch_local_once(attempt_id=self.attempt_id)
+
+    def upgrade_manifest_214(self):
+        current = self.committer._read_manifest()
+        return self.committer.upgrade_manifest_schema(
+            "2.14", expected_manifest_revision=current.manifest_revision
+        )
+
+    def build_source_boundary_reviewer(
+        self,
+        *,
+        human_decision_path: str | Path,
+        ffmpeg_path: str | Path,
+    ) -> SourceBoundaryReviewerV1:
+        profile = self.profile
+        artifact_root = self.artifact_root
+        if profile is None or artifact_root is None:
+            raise _state_invalid(
+                "Source boundary reviewer requires the sealed qualification profile."
+            )
+        manifest = self.committer._read_manifest()
+        if manifest.schema_version != "2.14":
+            raise _state_invalid(
+                "Source boundary reviewer requires Production Manifest 2.14."
+            )
+        p0_receipt, _, _, _, _ = self.committer.reopen_p0_qualification_prepared()
+        decision_path = Path(human_decision_path).resolve(strict=True)
+        decision_raw = _read_regular_file_nofollow(
+            decision_path, contained_by=artifact_root
+        )
+        try:
+            decision = SourceBoundaryHumanDecisionV1.model_validate_json(
+                decision_raw.data
+            )
+        except ValueError as exc:
+            raise _state_invalid("Source boundary human decision is invalid.") from exc
+        executable = Path(ffmpeg_path).resolve(strict=True)
+        if not executable.is_file():
+            raise _state_invalid("Source boundary ffmpeg executable is invalid.")
+        try:
+            version_line = subprocess.run(
+                [str(executable), "-version"],
+                check=True,
+                capture_output=True,
+                text=True,
+                env={"LANG": "C", "LC_ALL": "C"},
+                timeout=10,
+            ).stdout.splitlines()[0]
+            version = version_line.split()[2]
+        except (IndexError, OSError, subprocess.SubprocessError) as exc:
+            raise _state_invalid(
+                "Source boundary ffmpeg identity is unreadable."
+            ) from exc
+        identity = ToolIdentity(name="ffmpeg", version=version)
+        contract = SourceBoundaryMeasurementContractV1.create(
+            p0_qualification_receipt_hash=p0_receipt.content_hash,
+            p0_rubric_hash=p0_receipt.rubric_hash,
+            first_frame_asset_id=profile.first_frame_asset_id,
+            first_frame_sha256=profile.first_frame_sha256,
+            last_frame_asset_id=profile.last_frame_asset_id,
+            last_frame_sha256=profile.last_frame_sha256,
+            sample_width=profile.width,
+            sample_height=profile.height,
+            decoder=identity,
+        )
+        project = load_production_project(self.project_root / "project.yaml")
+        try:
+            first_path = project.asset_paths[profile.first_frame_asset_id]
+            last_path = project.asset_paths[profile.last_frame_asset_id]
+            first = _read_regular_file_nofollow(
+                first_path, contained_by=self.project_root / "assets"
+            )
+            last = _read_regular_file_nofollow(
+                last_path, contained_by=self.project_root / "assets"
+            )
+        except (KeyError, OSError, ValueError) as exc:
+            raise _state_invalid(
+                "Source boundary anchors could not be reopened."
+            ) from exc
+        return SourceBoundaryReviewerV1(
+            source_profile_content_hash=profile.profile_content_hash,
+            source_execution_stack_hash=profile.source_execution_stack_hash,
+            measurement_contract=contract,
+            human_decision=decision,
+            evaluator=ToolIdentity(name="ai-video-source-boundary-review", version="1"),
+            sampler=FfmpegRgbFrameSampler(
+                executable=executable,
+                identity=identity,
+                sample_width=profile.width,
+                sample_height=profile.height,
+            ),
+            first_anchor_bytes=first.data,
+            last_anchor_bytes=last.data,
+        )
+
+    def validate(
+        self,
+        *,
+        source_boundary_reviewer=None,
+        human_decision_path: str | Path | None = None,
+        ffmpeg_path: str | Path | None = None,
+        probe=None,
+    ):
+        if self.status()["next_action"] != "validate":
+            raise _state_invalid(
+                "Source qualification validate is not the next action."
+            )
+        reviewer = source_boundary_reviewer
+        if reviewer is None:
+            if human_decision_path is None or ffmpeg_path is None:
+                raise _state_invalid(
+                    "Source qualification validate requires exact human decision and ffmpeg inputs."
+                )
+            reviewer = self.build_source_boundary_reviewer(
+                human_decision_path=human_decision_path,
+                ffmpeg_path=ffmpeg_path,
+            )
+        return self.committer.prepare_video_activation_candidate(
+            attempt_id=self.attempt_id,
+            probe=probe,
+            source_boundary_reviewer=reviewer,
+        )
 
 
 def open_source_qualification_operator(
@@ -551,6 +681,8 @@ def open_source_qualification_operator(
         provider=provider,
         request=request,
         attempt_id=attempt_id,
+        profile=profile,
+        artifact_root=artifacts,
     )
 
 

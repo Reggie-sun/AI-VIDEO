@@ -7,6 +7,7 @@ from typing import Callable
 from ai_video.production.models import (
     EgressMetadata,
     PaidProviderAttemptPhase,
+    SourceBoundaryEvaluationPhase,
     StateCommitStatus,
     TerminalFrameEvidencePointer,
     TerminalFrameExtractionReceiptPointer,
@@ -49,14 +50,22 @@ from ._state_commit_common import (
 )
 from ._state_commit_contracts import PreparedArtifact
 from ._state_commit_video_continuity import checkpoint_generated_shot_continuity
+from ._state_commit_video_source_boundary import (
+    checkpoint_source_boundary_review,
+    recover_source_boundary_review as _recover_source_boundary_review,
+)
+from ai_video.production.shot_continuity_source_review import (
+    is_source_boundary_qualification_request,
+    validate_source_boundary_qualification_request,
+)
 from ._state_commit_video_commercial import (
     checkpoint_generated_commercial_shot,
     commercial_evaluation_authority,
 )
 from ._state_commit_video_candidate_validation import (
     PreparedVideoCandidate,
-    VideoCandidatePreparer,
-    resolve_video_activation_dependency_state,
+    VideoCandidatePreparer as VideoCandidatePreparer,
+    resolve_video_activation_dependency_state as resolve_video_activation_dependency_state,
     validate_video_activation_candidate,
 )
 
@@ -75,12 +84,16 @@ class _StateCommitVideoCandidateMixin:
                 contained_by=self._project_root,
             )
         except (OSError, ValueError) as exc:
-            raise _state_invalid("Video candidate artifact could not be reopened.", str(exc)) from exc
+            raise _state_invalid(
+                "Video candidate artifact could not be reopened.", str(exc)
+            ) from exc
         reopened = PreparedArtifact(
             artifact.relative_path, snapshot.data, snapshot.file_sha256
         )
         if reopened != artifact:
-            raise _state_invalid("Video candidate artifact bytes changed during reopen.")
+            raise _state_invalid(
+                "Video candidate artifact bytes changed during reopen."
+            )
         return reopened
 
     def prepare_video_activation_candidate(
@@ -91,6 +104,7 @@ class _StateCommitVideoCandidateMixin:
         terminal_frame_extractor: TerminalFrameExtractor | None = None,
         continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
         commercial_reviewer: GeneratedCommercialShotReviewer | None = None,
+        source_boundary_reviewer=None,
     ):
         """Measure fetched bytes and persist an inactive exact bundle candidate."""
 
@@ -109,6 +123,30 @@ class _StateCommitVideoCandidateMixin:
                     "Video validation requires exact durable fetched evidence."
                 )
             request = self._reopen_video_request(state.request)
+            source_boundary_required = is_source_boundary_qualification_request(request)
+            if source_boundary_required:
+                try:
+                    validate_source_boundary_qualification_request(request)
+                except ValueError as exc:
+                    raise _state_invalid(
+                        "Approved endpoint source validation must not include continuity, "
+                        "commercial, hard-cut, or C4 bindings and requires exact sealed "
+                        "first/last frames.",
+                        str(exc),
+                    ) from exc
+            source_boundary_evaluation = state.source_boundary_evaluation
+            if (
+                source_boundary_required
+                and source_boundary_reviewer is None
+                and (
+                    source_boundary_evaluation is None
+                    or source_boundary_evaluation.phase
+                    is not SourceBoundaryEvaluationPhase.EVIDENCED
+                )
+            ):
+                raise _state_invalid(
+                    "Approved endpoint source validation requires explicit source boundary P6 evidence."
+                )
             continuity_policy_content_hash = None
             continuity_authorities = ()
             commercial_policy_content_hash = None
@@ -166,9 +204,7 @@ class _StateCommitVideoCandidateMixin:
                     raise _state_invalid(
                         "Remote video validation requires exact settled evidence."
                     )
-                budget = self._reopen_paid_budget(
-                    manifest.active_paid_provider_budget
-                )
+                budget = self._reopen_paid_budget(manifest.active_paid_provider_budget)
                 reservation = next(
                     (
                         item
@@ -277,6 +313,23 @@ class _StateCommitVideoCandidateMixin:
                             commercial_evidence=commercial_evidence,
                         )
                     )
+                elif source_boundary_required:
+                    manifest, attempt, state, probe_receipt, provenance = (
+                        checkpoint_source_boundary_review(
+                            self,
+                            attempt_id=attempt_id,
+                            manifest=manifest,
+                            attempt=attempt,
+                            state=state,
+                            held_fd=held_fd,
+                            request=request,
+                            measured=measured,
+                            fetch_receipt=fetch_receipt,
+                            observation=observation,
+                            local_lane=local_lane,
+                            reviewer=source_boundary_reviewer,
+                        )
+                    )
                 elif commercial_evidence is not None:
                     probe_receipt = VideoProbeReceipt.create(
                         request=request,
@@ -343,9 +396,7 @@ class _StateCommitVideoCandidateMixin:
                     terminal_asset_artifact,
                     terminal_extraction_artifact,
                 ):
-                    self._write_immutable_artifact(
-                        artifact, attempt_id=attempt_id
-                    )
+                    self._write_immutable_artifact(artifact, attempt_id=attempt_id)
                     self._reopen_exact_video_artifact(artifact)
                 extraction_pointer = TerminalFrameExtractionReceiptPointer(
                     path=terminal_extraction_artifact.relative_path,
@@ -386,8 +437,7 @@ class _StateCommitVideoCandidateMixin:
                 != request.resolved_generation_hash
                 or terminal_extraction.source_provenance_receipt_id
                 != provenance.content_hash
-                or terminal_extraction.source_video_sha256
-                != measured.artifact_sha256
+                or terminal_extraction.source_video_sha256 != measured.artifact_sha256
             ):
                 raise _state_invalid(
                     "Terminal extraction checkpoint does not match exact source evidence."
@@ -435,7 +485,9 @@ class _StateCommitVideoCandidateMixin:
                 continuity_asset_record,
             )
             if not isinstance(prepared, PreparedVideoCandidate):
-                raise _state_invalid("Video candidate preparer returned an unsafe value.")
+                raise _state_invalid(
+                    "Video candidate preparer returned an unsafe value."
+                )
             accepted = validate_video_activation_candidate(
                 base_project=base_project,
                 request=request,
@@ -494,9 +546,16 @@ class _StateCommitVideoCandidateMixin:
                 *(
                     ()
                     if (
-                        request.continuity_binding is not None
-                        and state.continuity_evaluation is not None
-                        and state.continuity_evaluation.probe is not None
+                        (
+                            request.continuity_binding is not None
+                            and state.continuity_evaluation is not None
+                            and state.continuity_evaluation.probe is not None
+                        )
+                        or (
+                            source_boundary_required
+                            and state.source_boundary_evaluation is not None
+                            and state.source_boundary_evaluation.probe is not None
+                        )
                     )
                     else (
                         probe_artifact,
@@ -504,9 +563,7 @@ class _StateCommitVideoCandidateMixin:
                     )
                 ),
                 *(
-                    (
-                        terminal_evidence_artifact,
-                    )
+                    (terminal_evidence_artifact,)
                     if terminal_extraction is not None
                     and terminal_frame_bytes is not None
                     and terminal_evidence_artifact is not None
@@ -534,8 +591,7 @@ class _StateCommitVideoCandidateMixin:
                     artifact,
                     attempt_id=attempt_id,
                     dependency_graph=(
-                        artifact.relative_path
-                        == accepted.candidate_graph_pointer.path
+                        artifact.relative_path == accepted.candidate_graph_pointer.path
                     ),
                 )
                 reopened.append(self._reopen_exact_video_artifact(artifact))
@@ -570,9 +626,7 @@ class _StateCommitVideoCandidateMixin:
                         request_receipt_fingerprint=(
                             provenance.request_receipt_fingerprint
                         ),
-                        resolved_generation_hash=(
-                            provenance.resolved_generation_hash
-                        ),
+                        resolved_generation_hash=(provenance.resolved_generation_hash),
                         fetch_fingerprint=provenance.fetch_fingerprint,
                         artifact_sha256=provenance.artifact_sha256,
                         probe_receipt_id=provenance.probe_receipt_id,
@@ -626,3 +680,19 @@ class _StateCommitVideoCandidateMixin:
             )
             self._write_manifest_atomic(candidate_manifest)
             return self._read_manifest()
+
+    def recover_source_boundary_review(
+        self,
+        *,
+        attempt_id: str,
+        recovered_evidence,
+        probe: Callable[[int], dict] | None = None,
+    ):
+        """Seal one explicitly recovered source evaluator outcome."""
+
+        return _recover_source_boundary_review(
+            self,
+            attempt_id=attempt_id,
+            recovered_evidence=recovered_evidence,
+            probe=probe,
+        )

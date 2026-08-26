@@ -464,6 +464,138 @@ class VideoProvenanceReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class SourceBoundaryReviewIntentPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "SourceBoundaryReviewIntentPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/source-boundary/intents/"
+                f"{self.content_hash}.json"
+            ),
+            "source boundary review intent",
+        )
+        return self
+
+
+class SourceBoundaryReviewEvidencePointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    intent_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evaluation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "SourceBoundaryReviewEvidencePointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/source-boundary/evidence/"
+                f"{self.content_hash}.json"
+            ),
+            "source boundary review evidence",
+        )
+        return self
+
+
+class SourceBoundaryReviewVerdict(str, Enum):
+    PASS = "pass"
+    FAIL = "fail"
+    NOT_EVALUATED = "not_evaluated"
+
+
+class SourceBoundaryReviewReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    intent_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    verdict: SourceBoundaryReviewVerdict
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "SourceBoundaryReviewReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/source-boundary/receipts/"
+                f"{self.content_hash}.json"
+            ),
+            "source boundary review receipt",
+        )
+        return self
+
+
+class SourceBoundaryEvaluationPhase(str, Enum):
+    INTENT = "intent"
+    EVIDENCED = "evidenced"
+
+
+class SourceBoundaryEvaluationState(_PaidLifecycleModel):
+    phase: SourceBoundaryEvaluationPhase
+    intent: SourceBoundaryReviewIntentPointer
+    evidence: SourceBoundaryReviewEvidencePointer | None = None
+    receipt: SourceBoundaryReviewReceiptPointer | None = None
+    probe: VideoProbeReceiptPointer | None = None
+    provenance: VideoProvenanceReceiptPointer | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_evidence(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        for field in ("evidence", "receipt", "probe", "provenance"):
+            if getattr(self, field) is None:
+                data.pop(field, None)
+        return data
+
+    @model_validator(mode="after")
+    def _validate_phase(self) -> "SourceBoundaryEvaluationState":
+        closure = (self.evidence, self.receipt, self.probe, self.provenance)
+        if self.phase is SourceBoundaryEvaluationPhase.INTENT:
+            if any(item is not None for item in closure):
+                raise ValueError("source boundary intent cannot contain evidence")
+            return self
+        if any(item is None for item in closure):
+            raise ValueError("source boundary evidenced checkpoint is incomplete")
+        assert self.evidence is not None
+        assert self.receipt is not None
+        assert self.probe is not None
+        assert self.provenance is not None
+        if (
+            self.evidence.intent_content_hash != self.intent.content_hash
+            or self.evidence.evaluation_fingerprint
+            != self.intent.evaluation_fingerprint
+            or self.evidence.artifact_sha256 != self.intent.artifact_sha256
+            or self.receipt.intent_content_hash != self.intent.content_hash
+            or self.receipt.evidence_content_hash != self.evidence.content_hash
+            or self.receipt.resolved_generation_hash
+            != self.intent.resolved_generation_hash
+            or self.receipt.artifact_sha256 != self.intent.artifact_sha256
+            or self.probe.resolved_generation_hash
+            != self.intent.resolved_generation_hash
+            or self.probe.artifact_sha256 != self.intent.artifact_sha256
+            or self.provenance.resolved_generation_hash
+            != self.intent.resolved_generation_hash
+            or self.provenance.artifact_sha256 != self.intent.artifact_sha256
+            or self.provenance.probe_receipt_id != self.probe.content_hash
+            or self.provenance.request_receipt_fingerprint
+            != self.probe.request_receipt_fingerprint
+            or self.provenance.fetch_fingerprint != self.probe.fetch_fingerprint
+        ):
+            raise ValueError("source boundary checkpoint does not bind exact evidence")
+        return self
+
+
 class ContinuityEvaluationPhase(str, Enum):
     INTENT = "intent"
     EVIDENCED = "evidenced"
@@ -630,6 +762,7 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
     terminal_frame_extraction: TerminalFrameExtractionReceiptPointer | None = None
     continuity_evaluation: ContinuityEvaluationState | None = None
     commercial_evaluation: CommercialShotEvaluationState | None = None
+    source_boundary_evaluation: SourceBoundaryEvaluationState | None = None
     candidate_video_asset_ids: tuple[str, ...] = ()
     candidate_continuity_asset_ids: tuple[str, ...] = ()
 
@@ -646,6 +779,8 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             data.pop("continuity_evaluation", None)
         if self.commercial_evaluation is None:
             data.pop("commercial_evaluation", None)
+        if self.source_boundary_evaluation is None:
+            data.pop("source_boundary_evaluation", None)
         if not self.candidate_continuity_asset_ids:
             data.pop("candidate_continuity_asset_ids", None)
         for field in (
@@ -767,6 +902,28 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
                 raise ValueError(
                     "incomplete commercial Shot evaluation must remain in validate"
                 )
+        if self.source_boundary_evaluation is not None:
+            if self.phase not in {
+                VideoAttemptPhase.VALIDATE,
+                VideoAttemptPhase.CANDIDATE,
+                VideoAttemptPhase.ACTIVATE,
+            }:
+                raise ValueError("source boundary evaluation requires a post-fetch phase")
+            source_boundary = self.source_boundary_evaluation
+            if (
+                source_boundary.phase is SourceBoundaryEvaluationPhase.INTENT
+                and self.phase is not VideoAttemptPhase.VALIDATE
+            ):
+                raise ValueError("incomplete source boundary evaluation must remain in validate")
+            if (
+                self.phase in _VIDEO_CANDIDATE_PHASES
+                and (
+                    source_boundary.receipt is None
+                    or source_boundary.receipt.verdict
+                    is not SourceBoundaryReviewVerdict.PASS
+                )
+            ):
+                raise ValueError("source boundary candidate requires a pass receipt")
         if self.phase in _VIDEO_CANDIDATE_PHASES:
             if self.candidate_video_asset_ids != (self.request.output_asset_id,):
                 raise ValueError("video candidate asset ID must match request output")
@@ -1068,7 +1225,7 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
         isinstance(attempt, Mapping) and "paid_provider_state" in attempt
         for attempt in value.get("attempts", ())
     )
-    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"} and (
+    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"} and (
         "active_paid_provider_budget" in value or has_paid_attempt
     ):
         raise ValueError(
@@ -1081,7 +1238,7 @@ def reject_explicit_p8_video_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version != "2.13":
+    if manifest_version not in {"2.13", "2.14"}:
         for attempt in value.get("attempts", ()):
             state = (
                 attempt.get("video_generation_state")
@@ -1091,6 +1248,17 @@ def reject_explicit_p8_video_fields(value: object) -> object:
             if isinstance(state, Mapping) and "commercial_evaluation" in state:
                 raise ValueError(
                     "Commercial Shot evaluation state requires Production Manifest 2.13"
+                )
+    if manifest_version != "2.14":
+        for attempt in value.get("attempts", ()):
+            state = (
+                attempt.get("video_generation_state")
+                if isinstance(attempt, Mapping)
+                else None
+            )
+            if isinstance(state, Mapping) and "source_boundary_evaluation" in state:
+                raise ValueError(
+                    "Source boundary evaluation state requires Production Manifest 2.14"
                 )
     if manifest_version == "2.7":
         continuity_fields = {
@@ -1137,7 +1305,7 @@ def reject_explicit_p8_video_fields(value: object) -> object:
                     "checkpoint fields; Manifest 2.10 is required"
                 )
         return value
-    if manifest_version in {"2.10", "2.11", "2.12", "2.13"}:
+    if manifest_version in {"2.10", "2.11", "2.12", "2.13", "2.14"}:
         for attempt in value.get("attempts", ()):
             if not isinstance(attempt, Mapping):
                 continue
@@ -1176,7 +1344,7 @@ def reject_explicit_p7_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}:
+    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
         return value
     image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
     for attempt in value.get("attempts", ()):
@@ -1194,7 +1362,7 @@ def reject_explicit_p0_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     if (
-        value.get("schema_version", "2.0") not in {"2.11", "2.12", "2.13"}
+        value.get("schema_version", "2.0") not in {"2.11", "2.12", "2.13", "2.14"}
         and "active_p0_qualification_prepared" in value
     ):
         raise ValueError(

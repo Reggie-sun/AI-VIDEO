@@ -30,12 +30,12 @@ Execution checkpoint (2026-08-26): 用户批准的independent motion-compatible 
 `codex_imagegen_tool` receipt导入fresh v9，endpoint repair/revision-aware source profile完成review、commit与
 Harness。唯一Local FL2VA attempt保持A1/A2/A4、prompt、model、workflow、seed derivation与sampling contract
 不变，完成`submit/poll/fetch = 1/1/1`且retry/fallback/remote/paid均为0。Exact MP4不再出现v7的frame
-107→108 hard cut，frames 120→123仍有subject/leg motion，支持endpoint root-cause repair；但RGB与grayscale
-SSIM口径给出不同threshold结论。Seed derivation contract虽未变，content closure变化使numeric seed与v7不同，
-所以v9不是strict endpoint-only live A/B；因果claim仍依赖historical isolated A/B。Automatic P6因缺canonical
-continuity binding保持`NOT_EVALUATED`；用户对exact v9 MP4的人眼镜头结论为
-`PASS_WITH_PACING_WAIVER`，只豁免其明确接受的偏慢行走观感，不替代automatic P6或boundary contract。
-因此source仍停在fetched/validate，未形成accepted candidate、terminal/motion-tail、M0 effect或activation。
+107→108 hard cut，frames 120→123仍有subject/leg motion，支持endpoint repair outcome；Seed derivation contract
+虽未变，content closure变化使numeric seed与v7不同，所以v9不是strict endpoint-only live A/B，因果claim仍依赖
+historical isolated A/B。用户对exact v9 MP4的人眼镜头结论为`PASS_WITH_PACING_WAIVER`。Manifest `2.14`
+现以独立source-boundary checkpoint冻结RGB PSNR、BT.709-luma SSIM与exact-bound human evidence；P6 receipt为
+`PASS`并准备inactive candidate。该closure没有伪造`continuity_binding`，也没有调用Provider、activation或M0；
+terminal evidence只属于candidate preparation，Milestone 4仍未开始且需要新的明确M0 authority。
 Current exact evidence见runtime baseline与
 `docs/record_for_agent/2026-08-26-shot-continuity-motion-endpoint-live-attempt.md`。
 
@@ -637,10 +637,12 @@ profile/compiler/workflow已物化或可执行。Exact paths与dynamic status仍
 
 Execution update (2026-08-26): 上述2026-08-23 hashes与v7 failure均保留为historical checkpoint。Current v9
 materialized identities与single motion-endpoint source attempt由runtime baseline和2026-08-26 session record
-拥有；真实MP4已关闭observed hard-cut/tail-freeze outcome，因果归因由historical isolated endpoint A/B支持，
-用户对exact v9 MP4的人眼镜头结论为`PASS_WITH_PACING_WAIVER`，只豁免其明确接受的偏慢行走观感；canonical
-boundary acceptance与automatic P6仍未关闭，本次human verdict也不构成M0执行授权，故Milestone 4 M0仍未开始，
-M1 conditional gate也未触发。
+拥有；真实MP4已关闭observed hard-cut/tail-freeze outcome，因果归因由historical isolated endpoint A/B支持。
+用户对exact v9 MP4的人眼镜头结论为`PASS_WITH_PACING_WAIVER`。Additive Manifest `2.14` source-boundary
+checkpoint绑定exact request/fetch/P0 rubric/A2/A3/profile/stack、frozen measurement contract与human decision；
+两端RGB PSNR与BT.709-luma SSIM均超过`30 dB / 0.9`，P6 verdict为`PASS`，Manifest revision `20`已准备
+inactive candidate与terminal evidence。该状态没有activation/M0/Final Acceptance，也不构成新的Provider或M0
+执行授权；故Milestone 4 M0仍未开始，M1 conditional gate也未触发。
 
 ## Milestone 4: Execute Explicitly Selected M0, Then Conditional M1
 

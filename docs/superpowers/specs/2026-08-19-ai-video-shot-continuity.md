@@ -102,8 +102,9 @@ Provider-specific payload、model naming、duration/resolution 限制不得进�
   exact references并过普通QA，只有显式`SUBSTANTIAL_RESET`才允许近似自由Provider portability。
 - 不修改P8 provider contract，不把target Provider child、qualification或semantic capability写成已实现
   runtime truth。
-- 除已批准的 P0 qualification-prepared persistence seam 外，不增加 dependency、CLI、Manifest schema 或
-  artifact layout；该 seam 只选择 immutable preparation evidence，不表达 winner、capability activation 或 verdict。
+- 除已批准的 P0 qualification-prepared persistence seam与additive Manifest `2.14` qualification-source
+  boundary P6 seam外，不增加 dependency、public CLI、Manifest schema 或 artifact layout；两条seam均不得表达
+  capability activation、M0 winner、Final Acceptance或自动执行授权。
 - 不把三张静态图、prompt中的identity/camera描述、adapter可序列化字段、另一个mode的reference能力或多个capability的并集伪装成C4 motion continuity。
 - 不把historical reviewer verdict、SSIM、Provider success或fetched artifact重新解释为C4 acceptance。
 
@@ -351,6 +352,31 @@ H3 prompt必须使用 current OpenVideo/H3 three-field grammar：conditioning in
 reference-video 时）、`integrated_multimodal_description`、`overall_soundscape` 与
 `non_diegetic_music`。画面字段必须 style-first，并明确 camera type/amplitude/speed与可见动作；prompt不得替代
 任何 exact anchor binding，也不得只用抽象氛围词声称 continuity。
+
+### Qualification Source Boundary P6
+
+Qualification source request以exact `approved_endpoint`、ordered `first_frame/last_frame`与
+`seal_terminal_frame=true`表达source goal；该request的`continuity_binding=null`是canonical truth，不得为复用
+ordinary continuity evaluator而合成binding或改变resolved request hash。Already-fetched source MP4只能通过
+显式source-boundary review进入candidate：generation flow仍在fetch后停于`validate`，operator的独立
+`upgrade-manifest`与`validate` action不得自动串联、后台触发或调用Provider。
+
+Manifest `2.14` additive `source_boundary_evaluation`由`ProductionStateCommitter`唯一持久化。Checkpoint必须：
+
+1. 在任何decoded measurement effect前保存绑定exact request、fetch、artifact、P0 receipt/rubric、A2/A3、
+   source stack、measurement contract、evaluator与human decision的intent；canonical runtime profile由sealed
+   request binding与historical P0 materialized stack/profile bytes重验，qualification-profile content hash仅作audit identity；
+2. 冻结decoded frame `0`与exact terminal、decoder/pixel format、anchor resize、RGB PSNR、BT.709-luma SSIM、
+   thresholds、window/data range与rounding，不得在看到结果后切换grayscale/RGB口径或阈值；
+3. 将raw measurements、exact-bound human continuity dimensions与任何明确pacing waiver分别保存为evidence，
+   再由deterministic P6 adjudicator生成`PASS / FAIL / NOT_EVALUATED`；
+4. 在candidate前原子闭合evidence、receipt、probe与provenance pointers；`FAIL`/`NOT_EVALUATED`必须留在
+   `validate`，crash/replay/recovery不得重复evaluator或human effect；
+5. `PASS`只允许准备inactive candidate及existing terminal evidence，不自动activation、M0、Final Acceptance、
+   Provider call或release。
+
+该source-boundary receipt只关闭该exact qualification-source attempt的boundary/P6 gate，不能外推为future
+destination qualification、M0/M1 media quality、全局continuity capability或Final Acceptance。
 
 GPT Image 2 MCP/browser output 通过独立 `AutomatedBrowserImageImportReceipt` 记录 automation actor、human approval
 actor、exact PNG bytes/dimensions、timestamps 与 prompt fingerprint；未知 backend model/request ID 必须保持

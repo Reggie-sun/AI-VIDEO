@@ -9,7 +9,11 @@ import ai_video.production as production
 import ai_video.production.models as production_models
 import ai_video.production.paths as production_paths
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
+from ai_video.production.hashing import (
+    canonical_sha256,
+    seal_artifact,
+    verify_artifact_hash,
+)
 from ai_video.production.models import (
     AUDIO_KIND_TO_ASSET_TYPE,
     AssetRecord,
@@ -171,7 +175,9 @@ def make_asset_record(
         artifact_path=Path(f"assets/files/{FIVE_HASH}.wav"),
         sha256=FIVE_HASH,
         size_bytes=64,
-        mime_type="audio/wav" if asset_type is not AssetType.CAPTION else "application/json",
+        mime_type="audio/wav"
+        if asset_type is not AssetType.CAPTION
+        else "application/json",
         duration_seconds=2.0 if asset_type is not AssetType.CAPTION else None,
         source_kind=AssetSourceKind.GENERATED,
         tool=ToolIdentity(name="fixture", version="1"),
@@ -294,7 +300,9 @@ def make_alternate_registry_pointer() -> RegistrySnapshotPointer:
     )
 
 
-def make_render_state_pointer(content_hash: str = THREE_HASH) -> RenderStateSnapshotPointer:
+def make_render_state_pointer(
+    content_hash: str = THREE_HASH,
+) -> RenderStateSnapshotPointer:
     return RenderStateSnapshotPointer(
         path=Path(f"state/render/states/{content_hash}.json"),
         revision=1,
@@ -863,9 +871,7 @@ def test_manifest_28_video_state_seals_terminal_frame_candidate_identity():
         {
             "phase": "candidate",
             "fetch_receipt": production_models.VideoFetchReceiptPointer(
-                path=Path(
-                    f"state/video-generation/fetch/receipts/{FIVE_HASH}.json"
-                ),
+                path=Path(f"state/video-generation/fetch/receipts/{FIVE_HASH}.json"),
                 fetch_fingerprint=FIVE_HASH,
                 artifact_path=Path(
                     f"state/video-generation/fetch/files/{SIX_HASH}.mp4"
@@ -895,9 +901,7 @@ def test_manifest_28_validate_phase_can_checkpoint_terminal_extraction():
         update={
             "phase": production_models.VideoAttemptPhase.VALIDATE,
             "fetch_receipt": production_models.VideoFetchReceiptPointer(
-                path=Path(
-                    f"state/video-generation/fetch/receipts/{FIVE_HASH}.json"
-                ),
+                path=Path(f"state/video-generation/fetch/receipts/{FIVE_HASH}.json"),
                 fetch_fingerprint=FIVE_HASH,
                 artifact_path=Path(
                     f"state/video-generation/fetch/files/{SIX_HASH}.mp4"
@@ -914,12 +918,143 @@ def test_manifest_28_validate_phase_can_checkpoint_terminal_extraction():
     assert state.terminal_frame_evidence is None
 
 
+def _make_source_boundary_evaluation_state(verdict="pass"):
+    intent = production_models.SourceBoundaryReviewIntentPointer(
+        path=Path(f"state/video-generation/source-boundary/intents/{ONE_HASH}.json"),
+        content_hash=ONE_HASH,
+        evaluation_fingerprint=TWO_HASH,
+        resolved_generation_hash=TWO_HASH,
+        artifact_sha256=SIX_HASH,
+        file_sha256=THREE_HASH,
+    )
+    evidence = production_models.SourceBoundaryReviewEvidencePointer(
+        path=Path(f"state/video-generation/source-boundary/evidence/{FOUR_HASH}.json"),
+        content_hash=FOUR_HASH,
+        intent_content_hash=ONE_HASH,
+        evaluation_fingerprint=TWO_HASH,
+        artifact_sha256=SIX_HASH,
+        file_sha256=FIVE_HASH,
+    )
+    receipt = production_models.SourceBoundaryReviewReceiptPointer(
+        path=Path(f"state/video-generation/source-boundary/receipts/{SEVEN_HASH}.json"),
+        content_hash=SEVEN_HASH,
+        intent_content_hash=ONE_HASH,
+        evidence_content_hash=FOUR_HASH,
+        resolved_generation_hash=TWO_HASH,
+        artifact_sha256=SIX_HASH,
+        verdict=verdict,
+        file_sha256=EIGHT_HASH,
+    )
+    probe = production_models.VideoProbeReceiptPointer(
+        path=Path(f"state/video-generation/probes/{NINE_HASH}.json"),
+        content_hash=NINE_HASH,
+        request_receipt_fingerprint=ONE_HASH,
+        resolved_generation_hash=TWO_HASH,
+        fetch_fingerprint=FIVE_HASH,
+        artifact_sha256=SIX_HASH,
+        file_sha256=ZERO_HASH,
+    )
+    provenance = production_models.VideoProvenanceReceiptPointer(
+        path=Path(f"state/video-generation/provenance/{ZERO_HASH}.json"),
+        content_hash=ZERO_HASH,
+        request_receipt_fingerprint=ONE_HASH,
+        resolved_generation_hash=TWO_HASH,
+        fetch_fingerprint=FIVE_HASH,
+        artifact_sha256=SIX_HASH,
+        probe_receipt_id=NINE_HASH,
+        file_sha256=ONE_HASH,
+    )
+    return production_models.SourceBoundaryEvaluationState(
+        phase="evidenced",
+        intent=intent,
+        evidence=evidence,
+        receipt=receipt,
+        probe=probe,
+        provenance=provenance,
+    )
+
+
+def test_manifest_214_source_boundary_checkpoint_is_additive_and_fail_closed():
+    base = _make_video_generation_attempt_state()
+    fetch = production_models.VideoFetchReceiptPointer(
+        path=Path(f"state/video-generation/fetch/receipts/{FIVE_HASH}.json"),
+        fetch_fingerprint=FIVE_HASH,
+        artifact_path=Path(f"state/video-generation/fetch/files/{SIX_HASH}.mp4"),
+        artifact_sha256=SIX_HASH,
+        artifact_size_bytes=4096,
+        file_sha256=SEVEN_HASH,
+    )
+    candidate = base.model_copy(
+        update={
+            "phase": production_models.VideoAttemptPhase.CANDIDATE,
+            "fetch_receipt": fetch,
+            "source_boundary_evaluation": _make_source_boundary_evaluation_state(),
+            "candidate_video_asset_ids": ("video-1",),
+        }
+    )
+    assert candidate.source_boundary_evaluation.receipt.verdict.value == "pass"
+
+    with pytest.raises(ValidationError, match="source boundary.*pass"):
+        production_models.VideoGenerationAttemptState.model_validate(
+            candidate.model_dump(mode="python")
+            | {
+                "source_boundary_evaluation": _make_source_boundary_evaluation_state(
+                    "fail"
+                ).model_dump(mode="python")
+            }
+        )
+
+    manifest_state = production_models.VideoGenerationAttemptState.model_validate(
+        candidate.model_dump(mode="python")
+        | {"phase": "validate", "candidate_video_asset_ids": ()}
+    )
+    attempt = StateCommitAttempt(
+        attempt_id="source-boundary-candidate-1",
+        operation="video_generation",
+        status=StateCommitStatus.RUNNING,
+        base_manifest_revision=1,
+        base_project=make_project_pointer(),
+        base_registry=make_registry_pointer(),
+        base_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        candidate_artifacts_hash=ZERO_HASH,
+        video_generation_state=manifest_state,
+        paid_provider_state=production_models.PaidProviderAttemptState(
+            gate_receipt=production_models.PaidProviderGateReceiptPointer(
+                path=Path(f"state/paid-provider/gates/{NINE_HASH}.json"),
+                gate_receipt_fingerprint=NINE_HASH,
+                file_sha256=ZERO_HASH,
+            ),
+            reservation_id="source-boundary-reservation-1",
+            phase="settled",
+            submit_receipt=base.paid_submit_receipt,
+        ),
+        started_at="2026-08-26T00:00:00Z",
+    )
+    manifest = make_state_manifest(
+        schema_version="2.14",
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+        active_paid_provider_budget=production_models.PaidProviderBudgetSnapshotPointer(
+            path=Path(f"state/paid-provider/budgets/{ZERO_HASH}.json"),
+            revision=1,
+            content_hash=ZERO_HASH,
+            file_sha256=ONE_HASH,
+        ),
+        attempts=(attempt,),
+    )
+    assert manifest.schema_version == "2.14"
+
+    old_payload = manifest.model_dump(mode="python")
+    old_payload["schema_version"] = "2.13"
+    with pytest.raises(ValidationError, match="2.14|source boundary"):
+        ProductionManifest.model_validate(old_payload)
+
+
 def test_manifest_27_rejects_explicit_shot_continuity_state():
     payload = make_state_manifest(schema_version="2.0").model_dump(mode="python")
     payload["schema_version"] = "2.7"
     state = _make_video_generation_attempt_state().model_dump(mode="python")
-    state["terminal_frame_evidence"] = _make_terminal_frame_evidence_pointer().model_dump(
-        mode="python"
+    state["terminal_frame_evidence"] = (
+        _make_terminal_frame_evidence_pointer().model_dump(mode="python")
     )
     payload["attempts"] = (
         {
@@ -1011,7 +1146,10 @@ def test_manifest_27_accepts_gate_bound_video_attempt_without_external_task_id()
         attempts=(attempt,),
     )
     dumped = manifest.model_dump(mode="json")
-    assert dumped["attempts"][0]["video_generation_state"]["generation_id"] == "generation-1"
+    assert (
+        dumped["attempts"][0]["video_generation_state"]["generation_id"]
+        == "generation-1"
+    )
     assert "active_dependency_graph" in dumped
     assert "active_paid_provider_budget" in dumped
     assert "external_task_id" not in str(dumped)
@@ -1197,21 +1335,27 @@ def test_manifest_27_rejects_video_phase_mismatched_to_paid_gate_phase(
         )
 
 
-@pytest.mark.parametrize("schema_version", ["2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6"])
+@pytest.mark.parametrize(
+    "schema_version", ["2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6"]
+)
 def test_pre_27_manifest_rejects_explicit_video_attempt_fields(schema_version):
     payload = make_state_manifest(schema_version="2.0").model_dump(mode="python")
     payload["schema_version"] = schema_version
-    payload["attempts"] = ({
-        "attempt_id": "video-attempt-1",
-        "operation": "video_generation",
-        "status": "running",
-        "base_manifest_revision": 1,
-        "base_project": make_project_pointer().model_dump(mode="python"),
-        "base_registry": make_registry_pointer().model_dump(mode="python"),
-        "candidate_artifacts_hash": ZERO_HASH,
-        "video_generation_state": _make_video_generation_attempt_state().model_dump(mode="python"),
-        "started_at": "2026-08-18T00:00:00Z",
-    },)
+    payload["attempts"] = (
+        {
+            "attempt_id": "video-attempt-1",
+            "operation": "video_generation",
+            "status": "running",
+            "base_manifest_revision": 1,
+            "base_project": make_project_pointer().model_dump(mode="python"),
+            "base_registry": make_registry_pointer().model_dump(mode="python"),
+            "candidate_artifacts_hash": ZERO_HASH,
+            "video_generation_state": _make_video_generation_attempt_state().model_dump(
+                mode="python"
+            ),
+            "started_at": "2026-08-18T00:00:00Z",
+        },
+    )
     with pytest.raises(ValidationError, match="2.7|video"):
         ProductionManifest.model_validate(payload)
 
@@ -1413,7 +1557,9 @@ def test_caption_style_binding_contract_requires_three_way_exact_identity():
 
     with pytest.raises(ValidationError, match="three-way"):
         CaptionStyleBindingContract(
-            caption_track=track.model_copy(update={"style_reference_id": "style-other"}),
+            caption_track=track.model_copy(
+                update={"style_reference_id": "style-other"}
+            ),
             caption_metadata=metadata,
             binding=binding,
         )
@@ -1549,15 +1695,20 @@ def test_composition_21_rejects_bound_caption_without_style_reference():
         content_hash=NINE_HASH,
         path=Path(f"assets/styles/{NINE_HASH}.json"),
     )
-    assert CompositionSpec(
-        **versioned_fields("composition-1", THREE_HASH),
-        schema_version="2.1",
-        composition_id="composition-1",
-        shot_ids=("shot-1",),
-        layers=(layer,),
-        delivery_profile=DeliveryProfile(width=320, height=180, fps=24),
-        caption_tracks=(binding.model_copy(update={"style_reference": style}),),
-    ).caption_tracks[0].style_reference == style
+    assert (
+        CompositionSpec(
+            **versioned_fields("composition-1", THREE_HASH),
+            schema_version="2.1",
+            composition_id="composition-1",
+            shot_ids=("shot-1",),
+            layers=(layer,),
+            delivery_profile=DeliveryProfile(width=320, height=180, fps=24),
+            caption_tracks=(binding.model_copy(update={"style_reference": style}),),
+        )
+        .caption_tracks[0]
+        .style_reference
+        == style
+    )
 
 
 def test_resolved_timeline_requires_canonical_unique_audio_span_order():
@@ -1587,7 +1738,10 @@ def test_resolved_timeline_requires_canonical_unique_audio_span_order():
     base["schema_version"] = "2.1"
     base["audio_spans"] = (span_a, span_b)
     timeline = ResolvedTimeline.model_validate(base)
-    assert tuple(item.track_id for item in timeline.audio_spans) == ("a-track", "b-track")
+    assert tuple(item.track_id for item in timeline.audio_spans) == (
+        "a-track",
+        "b-track",
+    )
 
     base["audio_spans"] = (span_b, span_a)
     with pytest.raises(ValidationError, match="canonical"):
@@ -1642,7 +1796,9 @@ def test_render_schema_21_seals_structured_audio_caption_and_measured_evidence()
         asset_id="voice-1",
         asset_sha256=ONE_HASH,
         asset_mime_type="audio/wav",
-        materialized_path=Path(f"state/render/sources/{SIX_HASH}/assets/{ONE_HASH}.wav"),
+        materialized_path=Path(
+            f"state/render/sources/{SIX_HASH}/assets/{ONE_HASH}.wav"
+        ),
         sample_rate_hz=48_000,
         channels=1,
         duration_samples=96_000,
@@ -1651,10 +1807,14 @@ def test_render_schema_21_seals_structured_audio_caption_and_measured_evidence()
     caption_binding = RendererCaptionBinding(
         caption_track_id="caption-track-1",
         caption_asset_sha256=TWO_HASH,
-        materialized_path=Path(f"state/render/sources/{SIX_HASH}/assets/{TWO_HASH}.json"),
+        materialized_path=Path(
+            f"state/render/sources/{SIX_HASH}/assets/{TWO_HASH}.json"
+        ),
         style_reference_id="style-1",
         style_content_hash=THREE_HASH,
-        style_materialized_path=Path(f"state/render/sources/{SIX_HASH}/assets/{THREE_HASH}.json"),
+        style_materialized_path=Path(
+            f"state/render/sources/{SIX_HASH}/assets/{THREE_HASH}.json"
+        ),
         resolved_cue_ids=("segment-1",),
     )
     assert audio_binding.duration_samples == 96_000
@@ -2403,8 +2563,16 @@ def test_production_manifest_has_one_project_and_registry_pointer_owner():
 @pytest.mark.parametrize(
     ("code", "name", "value"),
     [
-        (ErrorCode.PRODUCTION_STATE_INVALID, "PRODUCTION_STATE_INVALID", "production_state_invalid"),
-        (ErrorCode.PRODUCTION_STATE_BUSY, "PRODUCTION_STATE_BUSY", "production_state_busy"),
+        (
+            ErrorCode.PRODUCTION_STATE_INVALID,
+            "PRODUCTION_STATE_INVALID",
+            "production_state_invalid",
+        ),
+        (
+            ErrorCode.PRODUCTION_STATE_BUSY,
+            "PRODUCTION_STATE_BUSY",
+            "production_state_busy",
+        ),
         (
             ErrorCode.PRODUCTION_STATE_COMMIT_FAILED,
             "PRODUCTION_STATE_COMMIT_FAILED",
@@ -2477,7 +2645,9 @@ def test_p3_error_codes_are_typed_and_non_retryable_by_default(code, value):
         Path("."),
     ],
 )
-def test_snapshot_pointers_reject_absolute_or_parent_relative_paths(pointer_type, data, path):
+def test_snapshot_pointers_reject_absolute_or_parent_relative_paths(
+    pointer_type, data, path
+):
     with pytest.raises(ValidationError, match="clean and project-relative"):
         pointer_type(path=path, **data)
 
@@ -2925,15 +3095,20 @@ def make_dependency_graph_snapshot() -> DependencyGraphSnapshot:
 def test_p5_error_codes_are_typed_and_non_retryable_by_default():
     assert ErrorCode.DEPENDENCY_GRAPH_INVALID.value == "dependency_graph_invalid"
     assert (
-        ErrorCode.DEPENDENCY_RESOLUTION_INVALID.value
-        == "dependency_resolution_invalid"
+        ErrorCode.DEPENDENCY_RESOLUTION_INVALID.value == "dependency_resolution_invalid"
     )
-    assert AiVideoError(
-        code=ErrorCode.DEPENDENCY_GRAPH_INVALID, user_message="safe"
-    ).retryable is False
-    assert AiVideoError(
-        code=ErrorCode.DEPENDENCY_RESOLUTION_INVALID, user_message="safe"
-    ).retryable is False
+    assert (
+        AiVideoError(
+            code=ErrorCode.DEPENDENCY_GRAPH_INVALID, user_message="safe"
+        ).retryable
+        is False
+    )
+    assert (
+        AiVideoError(
+            code=ErrorCode.DEPENDENCY_RESOLUTION_INVALID, user_message="safe"
+        ).retryable
+        is False
+    )
 
 
 def test_dependency_node_kind_enum_values_are_exact():
@@ -3134,6 +3309,7 @@ def test_dependency_graph_snapshot_has_no_mutable_status_or_lifecycle_fields():
         "started_at",
         "finished_at",
     }
+
     def nested_keys(value):
         if isinstance(value, dict):
             for key, nested in value.items():
@@ -3644,7 +3820,10 @@ def test_dependency_graph_transition_strict_and_frozen():
     transition = make_dependency_graph_transition()
     assert transition.expected_manifest_revision == 1
     assert transition.base_dependency_graph is None
-    assert transition.candidate_dependency_graph == make_dependency_graph_snapshot_pointer()
+    assert (
+        transition.candidate_dependency_graph
+        == make_dependency_graph_snapshot_pointer()
+    )
     assert transition.candidate_dependency_states == ()
     assert transition.candidate_dependency_states_hash == ZERO_HASH
 
@@ -3659,6 +3838,7 @@ def test_dependency_graph_transition_rejects_zero_expected_manifest_revision():
             candidate_dependency_graph=make_dependency_graph_snapshot_pointer(),
             candidate_dependency_states_hash=ZERO_HASH,
         )
+
 
 def test_dependency_graph_transition_rejects_state_graph_revision_mismatch():
     state = DependencyNodeState(
@@ -4162,7 +4342,9 @@ def test_manifest_24_requires_selected_qa_policy_and_defaults_empty_review_state
 def test_p6_error_codes_are_typed_and_non_retryable():
     assert ErrorCode.REVIEW_EVIDENCE_INVALID.value == "review_evidence_invalid"
     assert ErrorCode.REVIEW_NOT_CURRENT.value == "review_not_current"
-    assert ErrorCode.REPAIR_AUTHORIZATION_REQUIRED.value == "repair_authorization_required"
+    assert (
+        ErrorCode.REPAIR_AUTHORIZATION_REQUIRED.value == "repair_authorization_required"
+    )
     assert ErrorCode.REPAIR_SCOPE_INVALID.value == "repair_scope_invalid"
     assert ErrorCode.FINAL_ACCEPTANCE_INVALID.value == "final_acceptance_invalid"
 
@@ -4338,9 +4520,7 @@ def test_manifest_20_24_rejects_explicit_image_fields(version):
                 "active_qa_policy": make_qa_policy_pointer(),
             }
             if version == "2.4"
-            else {
-                "active_dependency_graph": make_dependency_graph_snapshot_pointer()
-            }
+            else {"active_dependency_graph": make_dependency_graph_snapshot_pointer()}
             if version == "2.3"
             else {}
         ),
@@ -4354,9 +4534,7 @@ def test_manifest_20_24_rejects_explicit_image_fields(version):
 def test_image_attempt_requires_exact_candidate_graph_bundle():
     missing = make_image_attempt_payload(phase="candidate")
     with pytest.raises(ValidationError, match="candidate.*bundle"):
-        ProductionManifest.model_validate(
-            make_manifest_25_payload(attempt=missing)
-        )
+        ProductionManifest.model_validate(make_manifest_25_payload(attempt=missing))
 
     candidate = ProductionManifest.model_validate(
         make_manifest_25_payload(
@@ -4382,9 +4560,7 @@ def test_image_attempt_rejects_candidate_asset_not_sealed_by_request():
     attempt["candidate_image_asset_ids"] = (f"image-{ONE_HASH}",)
 
     with pytest.raises(ValidationError, match="candidate.*request"):
-        ProductionManifest.model_validate(
-            make_manifest_25_payload(attempt=attempt)
-        )
+        ProductionManifest.model_validate(make_manifest_25_payload(attempt=attempt))
 
 
 @pytest.mark.parametrize(
@@ -4410,14 +4586,18 @@ def test_image_attempt_terminal_status_requires_plan_consistent_phase(status, ph
 
 
 def test_image_attempt_serializes_only_image_fields_and_preserves_voice_provider_id():
-    image = ProductionManifest.model_validate(
-        make_manifest_25_payload(
-            attempt={
-                **make_image_attempt_payload(),
-                "provider_request_id": "local-job-1",
-            }
+    image = (
+        ProductionManifest.model_validate(
+            make_manifest_25_payload(
+                attempt={
+                    **make_image_attempt_payload(),
+                    "provider_request_id": "local-job-1",
+                }
+            )
         )
-    ).attempts[0].model_dump(mode="json")
+        .attempts[0]
+        .model_dump(mode="json")
+    )
     assert image["image_request"]["request_fingerprint"] == ZERO_HASH
     assert image["provider_request_id"] == "local-job-1"
     assert "voice_request" not in image

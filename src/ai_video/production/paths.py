@@ -406,6 +406,27 @@ def canonical_generated_shot_continuity_evidence_path(content_hash: str) -> Path
     )
 
 
+def canonical_source_boundary_review_intent_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/source-boundary/intents/"
+        f"{_require_sha256(content_hash, 'source boundary review intent hash')}.json"
+    )
+
+
+def canonical_source_boundary_review_evidence_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/source-boundary/evidence/"
+        f"{_require_sha256(content_hash, 'source boundary review evidence hash')}.json"
+    )
+
+
+def canonical_source_boundary_review_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/source-boundary/receipts/"
+        f"{_require_sha256(content_hash, 'source boundary review receipt hash')}.json"
+    )
+
+
 def canonical_commercial_shot_evaluation_intent_path(content_hash: str) -> Path:
     return Path(
         "state/video-generation/commercial-evaluation/intents/"

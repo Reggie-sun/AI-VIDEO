@@ -8,6 +8,9 @@ from ._state_commit_video_commercial import (
     validate_current_commercial_video_state,
 )
 from ._state_commit_video_candidate import resolve_video_activation_dependency_state
+from ._state_commit_video_source_boundary import (
+    validate_current_source_boundary_video_state,
+)
 
 from ._state_commit_common import (
     _dependency_states_hash,
@@ -26,7 +29,8 @@ class _StateCommitVideoActivationMixin:
             attempt = self._video_attempt(manifest, attempt_id)
             state = attempt.video_generation_state
             if (
-                attempt.status not in {
+                attempt.status
+                not in {
                     StateCommitStatus.RUNNING,
                     StateCommitStatus.INTERRUPTED,
                 }
@@ -38,7 +42,9 @@ class _StateCommitVideoActivationMixin:
                 or attempt.candidate_dependency_states_hash is None
                 or state.candidate_video_asset_ids != (state.request.output_asset_id,)
             ):
-                raise _state_invalid("Video activation candidate identity is incomplete.")
+                raise _state_invalid(
+                    "Video activation candidate identity is incomplete."
+                )
             if (
                 manifest.active_project != attempt.base_project
                 or manifest.active_registry != attempt.base_registry
@@ -47,10 +53,11 @@ class _StateCommitVideoActivationMixin:
                 raise _state_invalid(
                     "Video activation base tuple is no longer current."
                 )
-            graph = self._reopen_dependency_graph(
-                attempt.candidate_dependency_graph
-            )
+            graph = self._reopen_dependency_graph(attempt.candidate_dependency_graph)
             request = self._reopen_video_request(state.request)
+            validate_current_source_boundary_video_state(
+                self, manifest=manifest, state=state, request=request
+            )
             validate_current_commercial_video_state(
                 self, manifest=manifest, state=state, request=request
             )
@@ -80,16 +87,16 @@ class _StateCommitVideoActivationMixin:
                 target_shot_id=scope.request.target_shot_id,
                 output_asset_id=request.output_asset_id,
                 continuity_asset_id=(
-                    expected_continuity_ids[0]
-                    if expected_continuity_ids
-                    else None
+                    expected_continuity_ids[0] if expected_continuity_ids else None
                 ),
             )
             if (
                 _dependency_states_hash(resolution.states)
                 != attempt.candidate_dependency_states_hash
             ):
-                raise _state_invalid("Video candidate dependency state hash is invalid.")
+                raise _state_invalid(
+                    "Video candidate dependency state hash is invalid."
+                )
             active_state = state.model_copy(
                 update={"phase": VideoAttemptPhase.ACTIVATE}
             )
@@ -134,7 +141,9 @@ class _StateCommitVideoActivationMixin:
                 self._project_root / "project.yaml"
             )
             if selected.manifest != final or selected.dependency_graph != graph:
-                raise _state_invalid("Video selected bundle is not the exact candidate.")
+                raise _state_invalid(
+                    "Video selected bundle is not the exact candidate."
+                )
             return reopened
 
     def replay_active_video_generation(self, *, attempt_id: str):
@@ -147,12 +156,16 @@ class _StateCommitVideoActivationMixin:
             or state.phase is not VideoAttemptPhase.ACTIVATE
             or attempt.candidate_project != manifest.active_project
             or attempt.candidate_registry != manifest.active_registry
-            or attempt.candidate_dependency_graph
-            != manifest.active_dependency_graph
+            or attempt.candidate_dependency_graph != manifest.active_dependency_graph
             or state.candidate_video_asset_ids != (state.request.output_asset_id,)
         ):
-            raise _state_invalid("Video generation success is not exact active evidence.")
+            raise _state_invalid(
+                "Video generation success is not exact active evidence."
+            )
         request = self._reopen_video_request(state.request)
+        validate_current_source_boundary_video_state(
+            self, manifest=manifest, state=state, request=request
+        )
         validate_current_commercial_video_state(
             self, manifest=manifest, state=state, request=request
         )
@@ -168,7 +181,9 @@ class _StateCommitVideoActivationMixin:
             (state.terminal_frame_evidence is None)
             != (not scope.request.seal_terminal_frame)
         ):
-            raise _state_invalid("Video continuity success is not exact active evidence.")
+            raise _state_invalid(
+                "Video continuity success is not exact active evidence."
+            )
         self._reopen_terminal_frame_chain(
             state, request, source_registry=manifest.active_registry
         )

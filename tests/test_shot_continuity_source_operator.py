@@ -4,6 +4,7 @@ from argparse import Namespace
 from datetime import UTC, datetime
 import hashlib
 import importlib
+from io import BytesIO
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -19,7 +20,31 @@ from ai_video.production.local_video import (
     LocalVideoSubmitResult,
     LocalVideoTaskObservation,
 )
+from ai_video.production.continuity_evaluator import SampledRgbFrame
+from ai_video.production._video_continuity import (
+    ContinuityArtifactIdentity,
+    ContinuityConstraintSet,
+    ContinuityReferenceBinding,
+    TerminalFrameEvidence,
+)
+from ai_video.production.models import (
+    ProductionManifest,
+    SourceBoundaryEvaluationPhase,
+    ToolIdentity,
+)
+from ai_video.production.paths import (
+    canonical_source_boundary_review_evidence_path,
+    canonical_source_boundary_review_receipt_path,
+)
 from ai_video.production.project import load_production_project
+from ai_video.production.shot_continuity_source_review import (
+    SourceBoundaryHumanDecisionV1,
+    SourceBoundaryMeasurementContractV1,
+    SourceBoundaryReviewEvidence,
+    SourceBoundaryReviewerV1,
+    adjudicate_source_boundary_review,
+    is_source_boundary_qualification_request,
+)
 from ai_video.production.shot_continuity_source_qualification import (
     ShotContinuitySourceQualificationProfile,
     load_source_qualification_profile,
@@ -31,9 +56,11 @@ from ai_video.production.shot_continuity_source_runtime import (
 from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
+    VideoGenerationRequest,
     VideoGenerationPreview,
     VideoTaskState,
 )
+from ai_video.production.video_artifact import TerminalFrameExtractionResult
 from scripts.prepare_shot_continuity_p0 import prepare
 
 
@@ -137,6 +164,27 @@ def _profile_for(project) -> tuple[ShotContinuitySourceQualificationProfile, str
         }
     )
     return ShotContinuitySourceQualificationProfile.create(**values), document_hash
+
+
+def _bind_profile_to_p0(
+    root: Path,
+    profile: ShotContinuitySourceQualificationProfile,
+) -> ShotContinuitySourceQualificationProfile:
+    committer = make_source_production_committer(
+        root,
+        load_production_project(root / "project.yaml"),
+    )
+    source_stack = committer.reopen_p0_qualification_source_stacks()[0]
+    values = profile.model_dump(
+        mode="python",
+        exclude={"profile_content_hash"},
+    )
+    values.update(
+        {
+            "source_execution_stack_hash": source_stack.execution_stack_hash,
+        }
+    )
+    return ShotContinuitySourceQualificationProfile.create(**values)
 
 
 class _RecordedProvider:
@@ -245,6 +293,221 @@ class _RecordedProvider:
         )
 
 
+def _source_probe(_held_fd: int) -> dict[str, object]:
+    return {
+        "streams": [
+            {
+                "codec_type": "video",
+                "codec_name": "h264",
+                "width": 1344,
+                "height": 768,
+                "avg_frame_rate": "24/1",
+                "duration": "5.166667",
+                "nb_frames": "124",
+            },
+            {"codec_type": "audio", "codec_name": "aac"},
+        ],
+        "format": {"format_name": "mov,mp4", "duration": "5.166667"},
+    }
+
+
+class _ExactAnchorSampler:
+    def __init__(self, first: bytes, last: bytes) -> None:
+        self.identity = ToolIdentity(name="ffmpeg", version="test-1")
+        self._pixels = (first, last)
+
+    def sample(self, _held_fd, measured, frame_indices):
+        assert frame_indices == (0, 123)
+        return tuple(
+            SampledRgbFrame(
+                frame_index=frame_index,
+                width=measured.width,
+                height=measured.height,
+                pixels=pixels,
+            )
+            for frame_index, pixels in zip(
+                frame_indices,
+                self._pixels,
+                strict=True,
+            )
+        )
+
+
+def _resized_rgb(payload: bytes) -> bytes:
+    with Image.open(BytesIO(payload)) as image:
+        return image.convert("RGB").resize((1344, 768)).tobytes()
+
+
+def _terminal_png(payload: bytes) -> bytes:
+    with Image.open(BytesIO(payload)) as image:
+        output = BytesIO()
+        image.convert("RGB").resize((1344, 768)).save(output, format="PNG")
+        return output.getvalue()
+
+
+def _fake_continuity_binding(project, profile) -> ContinuityReferenceBinding:
+    scene = ContinuityArtifactIdentity(
+        artifact_id="fake-source-scene",
+        revision=1,
+        content_hash="a" * 64,
+    )
+    character = ContinuityArtifactIdentity(
+        artifact_id="fake-source-character",
+        revision=1,
+        content_hash="b" * 64,
+    )
+    constraints = ContinuityConstraintSet.create(
+        scene_identity=scene,
+        character_identities=(character,),
+        camera_axis="screen-right",
+        framing="medium-wide",
+        lighting="rainy-day",
+        color="cool",
+        motion_direction="screen-right",
+        exit_state="walking",
+        entrance_state="walking",
+    )
+    terminal = TerminalFrameEvidence.create(
+        source_shot_id=profile.last_frame_asset_id,
+        source_shot_revision=1,
+        source_shot_content_hash="c" * 64,
+        source_video_asset_id=profile.last_frame_asset_id,
+        source_video_sha256=profile.last_frame_sha256,
+        source_generation_id="fake-source-generation",
+        source_request_input_hash="d" * 64,
+        source_resolved_generation_hash="e" * 64,
+        source_provenance_receipt_id="fake-source-provenance",
+        extraction_receipt_id="f" * 64,
+        source_registry=project.manifest.active_registry,
+        source_container_name="mp4",
+        source_codec_name="h264",
+        source_width=profile.first_frame_width,
+        source_height=profile.first_frame_height,
+        source_fps_numerator=24,
+        source_fps_denominator=1,
+        source_duration_milliseconds=1000,
+        source_frame_count=2,
+        frame_index=1,
+        timestamp_numerator=1,
+        timestamp_denominator=24,
+        selection_rule="generated_candidate_terminal",
+        extraction_contract_version="1",
+        extractor_name="fake-extractor",
+        extractor_version="1",
+        extracted_asset_id=profile.first_frame_asset_id,
+        extracted_sha256=profile.first_frame_sha256,
+        extracted_mime_type="image/png",
+        extracted_size_bytes=profile.first_frame_size_bytes,
+        extracted_width=profile.first_frame_width,
+        extracted_height=profile.first_frame_height,
+        extracted_color_space="srgb",
+    )
+    return ContinuityReferenceBinding.create(
+        role="first_frame",
+        terminal_frame=terminal,
+        target_shot_id=profile.target_shot_id,
+        target_shot_revision=profile.target_shot_revision,
+        target_shot_content_hash=profile.target_shot_content_hash,
+        constraints=constraints,
+    )
+
+
+def _reach_source_boundary_candidate(tmp_path: Path):
+    module = _operator_module()
+    root, project = _prepare_project(tmp_path)
+    profile, document_hash = _profile_for(project)
+    profile = _bind_profile_to_p0(root, profile)
+    request = module.build_source_qualification_request(
+        project=project,
+        profile=profile,
+        profile_document_hash=document_hash,
+        generation_id="rainy-station-source-boundary-lifecycle-v1",
+    )
+    provider = _RecordedProvider()
+    operator = module.ShotContinuitySourceOperator(
+        project_root=root,
+        committer=make_source_production_committer(root, project),
+        provider=provider,
+        request=request,
+        attempt_id="rainy-station-source-boundary-lifecycle-attempt-v1",
+    )
+    operator.submit(require_new_attempt=True)
+    operator.poll()
+    operator.fetch()
+    operator.upgrade_manifest_214()
+    committer = operator.committer
+    manifest = committer._read_manifest()
+    attempt = next(
+        item for item in manifest.attempts if item.attempt_id == operator.attempt_id
+    )
+    state = attempt.video_generation_state
+    assert state is not None and state.local_fetch_receipt is not None
+    fetch = committer._reopen_local_video_fetch(state.local_fetch_receipt)
+    p0_receipt, _, _, _, _ = committer.reopen_p0_qualification_prepared()
+    current = load_production_project(root / "project.yaml")
+    first_bytes = current.asset_paths[profile.first_frame_asset_id].read_bytes()
+    last_bytes = current.asset_paths[profile.last_frame_asset_id].read_bytes()
+    sampler = _ExactAnchorSampler(
+        _resized_rgb(first_bytes),
+        _resized_rgb(last_bytes),
+    )
+    contract = SourceBoundaryMeasurementContractV1.create(
+        p0_qualification_receipt_hash=p0_receipt.content_hash,
+        p0_rubric_hash=p0_receipt.rubric_hash,
+        first_frame_asset_id=profile.first_frame_asset_id,
+        first_frame_sha256=profile.first_frame_sha256,
+        last_frame_asset_id=profile.last_frame_asset_id,
+        last_frame_sha256=profile.last_frame_sha256,
+        sample_width=1344,
+        sample_height=768,
+        decoder=sampler.identity,
+    )
+    human = SourceBoundaryHumanDecisionV1.create(
+        resolved_generation_hash=request.resolved_generation_hash,
+        artifact_sha256=fetch.artifact_sha256,
+        reviewer=ToolIdentity(name="human-test", version="2026-08-26"),
+        raw_full_speed_reviewed=True,
+        identity_match=True,
+        camera_axis_match=True,
+        framing_match=True,
+        motion_direction_match=True,
+        action_phase_match=True,
+        entrance_exit_match=True,
+        no_unexpected_stop_or_reentry=True,
+        pacing_waiver=True,
+        rationale="Exact fixture output accepted with pacing waiver.",
+    )
+    reviewer = SourceBoundaryReviewerV1(
+        source_profile_content_hash=profile.profile_content_hash,
+        source_execution_stack_hash=profile.source_execution_stack_hash,
+        measurement_contract=contract,
+        human_decision=human,
+        evaluator=ToolIdentity(
+            name="ai-video-source-boundary-review",
+            version="1",
+        ),
+        sampler=sampler,
+        first_anchor_bytes=first_bytes,
+        last_anchor_bytes=last_bytes,
+    )
+    terminal = _terminal_png(last_bytes)
+
+    def terminal_extractor(_source, _index):
+        return TerminalFrameExtractionResult(
+            png_bytes=terminal,
+            extractor_name="fixture-extractor",
+            extractor_version="1",
+        )
+
+    candidate = committer.prepare_video_activation_candidate(
+        attempt_id=operator.attempt_id,
+        probe=_source_probe,
+        source_boundary_reviewer=reviewer,
+        terminal_frame_extractor=terminal_extractor,
+    )
+    return root, committer, operator.attempt_id, reviewer, terminal_extractor, candidate
+
+
 def test_builder_uses_exact_active_lineage_without_fixture_hashes(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -293,12 +556,10 @@ def test_builder_uses_exact_active_lineage_without_fixture_hashes(
         real_compile(copied_without_validation)
     assert first.activation_scope is not None
     assert (
-        first.activation_scope.request.base_project
-        == project.manifest.active_project
+        first.activation_scope.request.base_project == project.manifest.active_project
     )
     assert (
-        first.activation_scope.request.base_registry
-        == project.manifest.active_registry
+        first.activation_scope.request.base_registry == project.manifest.active_registry
     )
     assert (
         first.activation_scope.request.base_dependency_graph
@@ -315,6 +576,70 @@ def test_builder_uses_exact_active_lineage_without_fixture_hashes(
     assert first.effective_output.width == 1344
     assert first.effective_output.height == 768
     assert first.effective_output.fps == 24
+
+
+def test_fake_continuity_binding_cannot_bypass_source_boundary_p6(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _operator_module()
+    root, project = _prepare_project(tmp_path)
+    profile, document_hash = _profile_for(project)
+    profile = _bind_profile_to_p0(root, profile)
+    fake_binding = _fake_continuity_binding(project, profile)
+    resolved_type = ResolvedVideoGenerationRequest
+
+    def create_with_fake_binding(**values):
+        original = values["request"]
+        request_values = original.model_dump(
+            mode="python",
+            exclude={"request_input_hash"},
+        )
+        request_values["continuity_binding"] = fake_binding
+        values["request"] = VideoGenerationRequest.create(**request_values)
+        return resolved_type.create(**values)
+
+    monkeypatch.setattr(
+        module,
+        "ResolvedVideoGenerationRequest",
+        SimpleNamespace(create=create_with_fake_binding),
+    )
+    request = module.build_source_qualification_request(
+        project=project,
+        profile=profile,
+        profile_document_hash=document_hash,
+        generation_id="rainy-station-source-fake-continuity-v1",
+    )
+    assert is_source_boundary_qualification_request(request)
+    operator = module.ShotContinuitySourceOperator(
+        project_root=root,
+        committer=make_source_production_committer(root, project),
+        provider=_RecordedProvider(),
+        request=request,
+        attempt_id="rainy-station-source-fake-continuity-attempt-v1",
+    )
+    operator.submit(require_new_attempt=True)
+    operator.poll()
+    operator.fetch()
+    operator.upgrade_manifest_214()
+    manifest_path = root / "state/manifest.json"
+    before = manifest_path.read_bytes()
+    probe_calls = 0
+
+    def counted_probe(held_fd):
+        nonlocal probe_calls
+        probe_calls += 1
+        return _source_probe(held_fd)
+
+    with pytest.raises(AiVideoError, match="must not include continuity"):
+        operator.committer.prepare_video_activation_candidate(
+            attempt_id=operator.attempt_id,
+            probe=counted_probe,
+            source_boundary_reviewer=object(),
+        )
+
+    assert probe_calls == 0
+    assert manifest_path.read_bytes() == before
 
 
 def test_operator_keeps_preflight_read_only_and_stops_fetch_at_validate(
@@ -376,6 +701,19 @@ def test_operator_keeps_preflight_read_only_and_stops_fetch_at_validate(
         for item in load_production_project(root / "project.yaml").manifest.attempts
         if item.attempt_id == "rainy-station-source-a2-a3-attempt-v1"
     )
+
+    current = operator.committer._read_manifest()
+    operator.committer.upgrade_manifest_schema(
+        "2.14", expected_manifest_revision=current.manifest_revision
+    )
+    before_boundary = operator.committer._read_manifest()
+    with pytest.raises(AiVideoError, match="source boundary P6") as boundary_caught:
+        operator.committer.prepare_video_activation_candidate(
+            attempt_id=operator.attempt_id,
+            probe=lambda _fd: pytest.fail("generic probe must not run before P6"),
+        )
+    assert boundary_caught.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert operator.committer._read_manifest() == before_boundary
 
     replacement_request = module.build_source_qualification_request(
         project=project,
@@ -518,3 +856,274 @@ def test_cli_dispatches_exactly_one_action() -> None:
 
     assert result == {"next_action": "submit"}
     assert calls == [("preflight", True)]
+
+
+def test_source_boundary_candidate_activates_reopens_and_replays(
+    tmp_path: Path,
+) -> None:
+    root, committer, attempt_id, _, _, candidate = _reach_source_boundary_candidate(
+        tmp_path
+    )
+
+    assert candidate.active_project != candidate.attempts[-1].candidate_project
+    assert load_production_project(root / "project.yaml").manifest == candidate
+
+    activated = committer.activate_video_candidate(attempt_id=attempt_id)
+    assert activated.active_p0_qualification_prepared is None
+    assert committer.replay_active_video_generation(attempt_id=attempt_id) == activated
+    assert load_production_project(root / "project.yaml").manifest == activated
+
+
+def test_strict_reader_and_activation_reject_semantic_source_tamper(
+    tmp_path: Path,
+) -> None:
+    root, committer, attempt_id, _, _, candidate = _reach_source_boundary_candidate(
+        tmp_path
+    )
+    attempt = next(item for item in candidate.attempts if item.attempt_id == attempt_id)
+    state = attempt.video_generation_state
+    assert state is not None and state.source_boundary_evaluation is not None
+    evaluation = state.source_boundary_evaluation
+    assert evaluation.evidence is not None and evaluation.receipt is not None
+    evidence = committer._reopen_source_boundary_review_evidence(evaluation.evidence)
+    values = evidence.model_dump(mode="python", exclude={"content_hash"})
+    values["measured_metadata_hash"] = "f" * 64
+    drifted_evidence = SourceBoundaryReviewEvidence.create(**values)
+    drifted_receipt = adjudicate_source_boundary_review(drifted_evidence)
+    evidence_path = canonical_source_boundary_review_evidence_path(
+        drifted_evidence.content_hash
+    )
+    receipt_path = canonical_source_boundary_review_receipt_path(
+        drifted_receipt.content_hash
+    )
+    evidence_bytes = drifted_evidence.model_dump_json().encode("utf-8")
+    receipt_bytes = drifted_receipt.model_dump_json().encode("utf-8")
+    (root / evidence_path).write_bytes(evidence_bytes)
+    (root / receipt_path).write_bytes(receipt_bytes)
+    drifted_evaluation = evaluation.model_copy(
+        update={
+            "evidence": evaluation.evidence.model_copy(
+                update={
+                    "path": evidence_path,
+                    "content_hash": drifted_evidence.content_hash,
+                    "file_sha256": hashlib.sha256(evidence_bytes).hexdigest(),
+                }
+            ),
+            "receipt": evaluation.receipt.model_copy(
+                update={
+                    "path": receipt_path,
+                    "content_hash": drifted_receipt.content_hash,
+                    "evidence_content_hash": drifted_evidence.content_hash,
+                    "file_sha256": hashlib.sha256(receipt_bytes).hexdigest(),
+                }
+            ),
+        }
+    )
+    drifted_state = state.model_copy(
+        update={"source_boundary_evaluation": drifted_evaluation}
+    )
+    drifted_attempt = attempt.model_copy(
+        update={"video_generation_state": drifted_state}
+    )
+    drifted_manifest = ProductionManifest.model_validate(
+        candidate.model_copy(
+            update={
+                "manifest_revision": candidate.manifest_revision + 1,
+                "attempts": tuple(
+                    drifted_attempt if item.attempt_id == attempt_id else item
+                    for item in candidate.attempts
+                ),
+            }
+        ).model_dump(mode="python")
+    )
+    manifest_path = root / "state/manifest.json"
+    manifest_path.write_text(drifted_manifest.model_dump_json(), encoding="utf-8")
+    before_activation = manifest_path.read_bytes()
+
+    with pytest.raises(AiVideoError, match="Source boundary"):
+        load_production_project(root / "project.yaml")
+    with pytest.raises(AiVideoError, match="Source boundary"):
+        committer.activate_video_candidate(attempt_id=attempt_id)
+
+    assert manifest_path.read_bytes() == before_activation
+
+
+@pytest.mark.parametrize(
+    ("motion_direction_match", "expected_verdict"),
+    (
+        (True, "pass"),
+        (False, "fail"),
+        (None, "not_evaluated"),
+    ),
+)
+def test_intent_only_source_review_requires_explicit_evidence_recovery(
+    tmp_path: Path,
+    motion_direction_match: bool | None,
+    expected_verdict: str,
+) -> None:
+    root, project = _prepare_project(tmp_path)
+    profile, document_hash = _profile_for(project)
+    profile = _bind_profile_to_p0(root, profile)
+    module = _operator_module()
+    request = module.build_source_qualification_request(
+        project=project,
+        profile=profile,
+        profile_document_hash=document_hash,
+        generation_id="rainy-station-source-boundary-recovery-v1",
+    )
+    operator = module.ShotContinuitySourceOperator(
+        project_root=root,
+        committer=make_source_production_committer(root, project),
+        provider=_RecordedProvider(),
+        request=request,
+        attempt_id="rainy-station-source-boundary-recovery-attempt-v1",
+    )
+    operator.submit(require_new_attempt=True)
+    operator.poll()
+    operator.fetch()
+    operator.upgrade_manifest_214()
+
+    class _CaptureThenFail:
+        def __init__(self, wrapped) -> None:
+            self.wrapped = wrapped
+            self.recovered = None
+            self.calls = 0
+
+        def __getattr__(self, name):
+            return getattr(self.wrapped, name)
+
+        def create_intent(self, *args):
+            return self.wrapped.create_intent(*args)
+
+        def __call__(self, *args):
+            self.calls += 1
+            self.recovered = self.wrapped(*args)
+            raise RuntimeError("simulated crash after evaluator outcome")
+
+    current = load_production_project(root / "project.yaml")
+    local_profile, _ = _profile_for(current)
+    local_profile = _bind_profile_to_p0(root, local_profile)
+    state = operator.committer._read_manifest().attempts[-1].video_generation_state
+    assert state is not None and state.local_fetch_receipt is not None
+    fetch = operator.committer._reopen_local_video_fetch(state.local_fetch_receipt)
+    p0, _, _, _, _ = operator.committer.reopen_p0_qualification_prepared()
+    first = current.asset_paths[local_profile.first_frame_asset_id].read_bytes()
+    last = current.asset_paths[local_profile.last_frame_asset_id].read_bytes()
+    sampler = _ExactAnchorSampler(_resized_rgb(first), _resized_rgb(last))
+    local_reviewer = SourceBoundaryReviewerV1(
+        source_profile_content_hash=local_profile.profile_content_hash,
+        source_execution_stack_hash=local_profile.source_execution_stack_hash,
+        measurement_contract=SourceBoundaryMeasurementContractV1.create(
+            p0_qualification_receipt_hash=p0.content_hash,
+            p0_rubric_hash=p0.rubric_hash,
+            first_frame_asset_id=local_profile.first_frame_asset_id,
+            first_frame_sha256=local_profile.first_frame_sha256,
+            last_frame_asset_id=local_profile.last_frame_asset_id,
+            last_frame_sha256=local_profile.last_frame_sha256,
+            sample_width=1344,
+            sample_height=768,
+            decoder=sampler.identity,
+        ),
+        human_decision=SourceBoundaryHumanDecisionV1.create(
+            resolved_generation_hash=request.resolved_generation_hash,
+            artifact_sha256=fetch.artifact_sha256,
+            reviewer=ToolIdentity(name="human-test", version="2026-08-26"),
+            raw_full_speed_reviewed=True,
+            identity_match=True,
+            camera_axis_match=True,
+            framing_match=True,
+            motion_direction_match=motion_direction_match,
+            action_phase_match=True,
+            entrance_exit_match=True,
+            no_unexpected_stop_or_reentry=True,
+            pacing_waiver=True,
+            rationale="Exact fixture output accepted with pacing waiver.",
+        ),
+        evaluator=ToolIdentity(
+            name="ai-video-source-boundary-review",
+            version="1",
+        ),
+        sampler=sampler,
+        first_anchor_bytes=first,
+        last_anchor_bytes=last,
+    )
+    failing = _CaptureThenFail(local_reviewer)
+    calls = 0
+
+    def counted_probe(held_fd):
+        nonlocal calls
+        calls += 1
+        return _source_probe(held_fd)
+
+    with pytest.raises(RuntimeError, match="simulated crash"):
+        operator.committer.prepare_video_activation_candidate(
+            attempt_id=operator.attempt_id,
+            probe=counted_probe,
+            source_boundary_reviewer=failing,
+        )
+    assert failing.recovered is not None and calls == 1 and failing.calls == 1
+    intent_state = (
+        operator.committer._read_manifest().attempts[-1].video_generation_state
+    )
+    assert (
+        intent_state is not None
+        and intent_state.source_boundary_evaluation is not None
+        and intent_state.source_boundary_evaluation.phase
+        is SourceBoundaryEvaluationPhase.INTENT
+    )
+    with pytest.raises(AiVideoError) as replay:
+        operator.committer.prepare_video_activation_candidate(
+            attempt_id=operator.attempt_id,
+            probe=counted_probe,
+            source_boundary_reviewer=failing,
+        )
+    assert replay.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert calls == 2 and failing.calls == 1
+
+    operator.committer.recover_source_boundary_review(
+        attempt_id=operator.attempt_id,
+        recovered_evidence=failing.recovered,
+        probe=counted_probe,
+    )
+    assert calls == 3 and failing.calls == 1
+    recovered_manifest = load_production_project(root / "project.yaml").manifest
+    recovered_state = recovered_manifest.attempts[-1].video_generation_state
+    assert (
+        recovered_state is not None
+        and recovered_state.phase.value == "validate"
+        and recovered_state.source_boundary_evaluation is not None
+        and recovered_state.source_boundary_evaluation.receipt is not None
+        and recovered_state.source_boundary_evaluation.receipt.verdict.value
+        == expected_verdict
+    )
+    operator.committer.recover()
+    assert failing.calls == 1
+    terminal = _terminal_png(last)
+
+    def prepare_recovered():
+        return operator.committer.prepare_video_activation_candidate(
+            attempt_id=operator.attempt_id,
+            probe=counted_probe,
+            source_boundary_reviewer=None,
+            terminal_frame_extractor=lambda _source, _index: (
+                TerminalFrameExtractionResult(
+                    png_bytes=terminal,
+                    extractor_name="fixture-extractor",
+                    extractor_version="1",
+                )
+            ),
+        )
+
+    if expected_verdict == "pass":
+        candidate = prepare_recovered()
+        assert candidate.attempts[-1].video_generation_state.phase.value == "candidate"
+    else:
+        with pytest.raises(AiVideoError, match="Source boundary"):
+            prepare_recovered()
+        assert (
+            operator.committer._read_manifest()
+            .attempts[-1]
+            .video_generation_state.phase.value
+            == "validate"
+        )
+    assert calls == 4 and failing.calls == 1

@@ -68,7 +68,7 @@ def checkpoint_generated_shot_continuity(
     if evaluation_state is None:
         create_intent = getattr(continuity_reviewer, "create_intent", None)
         if (
-            manifest.schema_version not in {"2.10", "2.11", "2.12", "2.13"}
+            manifest.schema_version not in {"2.10", "2.11", "2.12", "2.13", "2.14"}
             or continuity_reviewer is None
             or create_intent is None
             or continuity_policy_content_hash is None

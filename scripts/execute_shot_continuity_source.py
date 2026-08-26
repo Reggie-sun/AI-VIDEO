@@ -15,8 +15,8 @@ from typing import Any, Callable
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from ai_video.errors import AiVideoError
-from ai_video.production.shot_continuity_source_operator import (
+from ai_video.errors import AiVideoError  # noqa: E402
+from ai_video.production.shot_continuity_source_operator import (  # noqa: E402
     open_source_qualification_operator,
 )
 
@@ -33,7 +33,16 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "action",
-        choices=("inspect", "preflight", "status", "submit", "poll", "fetch"),
+        choices=(
+            "inspect",
+            "preflight",
+            "status",
+            "submit",
+            "poll",
+            "fetch",
+            "upgrade-manifest",
+            "validate",
+        ),
     )
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--artifact-root", type=Path, required=True)
@@ -47,6 +56,8 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--generation-id", required=True)
     parser.add_argument("--attempt-id", required=True)
     parser.add_argument("--require-new-attempt", action="store_true")
+    parser.add_argument("--human-decision", type=Path)
+    parser.add_argument("--ffmpeg", type=Path)
     return parser
 
 
@@ -56,9 +67,7 @@ def execute(
     opener: Callable[..., Any] = open_source_qualification_operator,
 ) -> object:
     if args.require_new_attempt and args.action not in {"preflight", "submit"}:
-        raise ValueError(
-            "--require-new-attempt is only valid for preflight or submit"
-        )
+        raise ValueError("--require-new-attempt is only valid for preflight or submit")
     operator = opener(
         project_root=args.root,
         artifact_root=args.artifact_root,
@@ -78,6 +87,15 @@ def execute(
         return operator.poll()
     if args.action == "fetch":
         return operator.fetch()
+    if args.action == "upgrade-manifest":
+        return operator.upgrade_manifest_214()
+    if args.action == "validate":
+        if args.human_decision is None or args.ffmpeg is None:
+            raise ValueError("validate requires --human-decision and --ffmpeg")
+        return operator.validate(
+            human_decision_path=args.human_decision,
+            ffmpeg_path=args.ffmpeg,
+        )
     raise AssertionError(f"unhandled action: {args.action}")
 
 
@@ -98,9 +116,7 @@ def _jsonable(value: object) -> object:
         return value.value
     if value is None or isinstance(value, (str, int, float, bool)):
         return value
-    raise ValueError(
-        f"unsupported source operator output type: {type(value).__name__}"
-    )
+    raise ValueError(f"unsupported source operator output type: {type(value).__name__}")
 
 
 def main() -> int:

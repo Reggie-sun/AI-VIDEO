@@ -97,7 +97,7 @@ def verify_active_commercial_source_approvals(
     bundle: LoadedProductionProject,
 ) -> None:
     manifest = bundle.manifest
-    if manifest.schema_version not in {"2.12", "2.13"}:
+    if manifest.schema_version not in {"2.12", "2.13", "2.14"}:
         return
     root = bundle.root
     registry_assets = {item.asset_id: item for item in bundle.registry.assets}

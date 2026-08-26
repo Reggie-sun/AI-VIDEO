@@ -216,8 +216,10 @@ class _StateCommitP0QualificationMixin:
                 return manifest
             if manifest.manifest_revision != expected_manifest_revision:
                 raise _state_invalid("P0 qualification base Manifest revision changed.")
-            if manifest.schema_version not in {"2.11", "2.12", "2.13"}:
-                raise _state_invalid("P0 qualification requires Production Manifest 2.11 or later.")
+            if manifest.schema_version not in {"2.11", "2.12", "2.13", "2.14"}:
+                raise _state_invalid(
+                    "P0 qualification requires Production Manifest 2.11 or later."
+                )
             bundle = load_production_project(self._project_root / "project.yaml")
             if (
                 bundle.manifest != manifest
@@ -245,7 +247,9 @@ class _StateCommitP0QualificationMixin:
             self._write_p6_manifest_atomic(updated)
             reopened = self._read_manifest()
             if reopened != updated:
-                raise _state_invalid("P0 qualification Manifest did not reopen exactly.")
+                raise _state_invalid(
+                    "P0 qualification Manifest did not reopen exactly."
+                )
             self._reopen_p0_pointer(pointer)
             return reopened
 
@@ -262,16 +266,17 @@ class _StateCommitP0QualificationMixin:
         tuple[P0QualificationInput, ...],
     ]:
         if required_materialized_candidates != tuple(
-            label
-            for label in ("m0", "m1")
-            if label in required_materialized_candidates
+            label for label in ("m0", "m1") if label in required_materialized_candidates
         ):
             raise _state_invalid(
                 "Required P0 materialized candidates must be unique and ordered."
             )
         manifest = self._read_manifest()
         pointer = manifest.active_p0_qualification_prepared
-        if manifest.schema_version not in {"2.11", "2.12", "2.13"} or pointer is None:
+        if (
+            manifest.schema_version not in {"2.11", "2.12", "2.13", "2.14"}
+            or pointer is None
+        ):
             raise _state_invalid("No active P0 qualification prepared receipt exists.")
         reopened = self._reopen_p0_pointer(pointer)
         self._validate_p0_selection_current(
@@ -293,7 +298,10 @@ class _StateCommitP0QualificationMixin:
 
         manifest = self._read_manifest()
         pointer = manifest.active_p0_qualification_prepared
-        if manifest.schema_version not in {"2.11", "2.12", "2.13"} or pointer is None:
+        if (
+            manifest.schema_version not in {"2.11", "2.12", "2.13", "2.14"}
+            or pointer is None
+        ):
             raise _state_invalid("No active P0 qualification prepared receipt exists.")
         receipt, candidates, policies, validation_set, _ = self._reopen_p0_pointer(
             pointer
@@ -311,6 +319,58 @@ class _StateCommitP0QualificationMixin:
         )
         return sources
 
+    def reopen_p0_qualification_history(
+        self,
+        content_hash: str,
+    ) -> tuple[
+        P0QualificationPreparedReceipt,
+        tuple[GenerationExecutionStackIdentity, GenerationExecutionStackIdentity],
+        tuple[ContinuityTransitionPolicy, ...],
+        RealShotValidationSet,
+        tuple[P0QualificationInput, ...],
+        tuple[GenerationExecutionStackIdentity, ...],
+    ]:
+        """Reopen one immutable P0 closure without treating it as active state."""
+
+        relative_path = canonical_p0_qualification_receipt_path(content_hash)
+        try:
+            snapshot = _read_regular_file_nofollow(
+                self._project_root / relative_path,
+                contained_by=self._project_root / "state",
+            )
+        except (OSError, ValueError) as exc:
+            raise _state_invalid(
+                "Historical P0 qualification evidence could not be reopened.",
+                str(exc),
+            ) from exc
+        pointer = P0QualificationPreparedReceiptPointer(
+            path=relative_path,
+            content_hash=content_hash,
+            file_sha256=snapshot.file_sha256,
+        )
+        reopened = self._reopen_p0_pointer(pointer)
+        source_stacks = self._read_p0_source_stacks(
+            candidate_stacks=reopened[1],
+            policies=reopened[2],
+        )
+        materialized_stacks = tuple(
+            item
+            for item in (*source_stacks, *reopened[1])
+            if item.materialization_status == "materialized"
+        )
+        if materialized_stacks:
+            try:
+                verify_execution_stack_source_artifacts(
+                    self._project_root,
+                    materialized_stacks,
+                )
+            except ValueError as exc:
+                raise _state_invalid(
+                    "Historical P0 execution stack source artifacts are invalid.",
+                    str(exc),
+                ) from exc
+        return (*reopened, source_stacks)
+
     def materialize_p0_qualification(
         self,
         *,
@@ -325,9 +385,13 @@ class _StateCommitP0QualificationMixin:
             raise _state_invalid("P0 stack materialization attempt ID is required.")
         labels = tuple(item.candidate_label for item in materializations)
         if not labels:
-            raise _state_invalid("P0 stack materialization requires a non-empty selection.")
+            raise _state_invalid(
+                "P0 stack materialization requires a non-empty selection."
+            )
         if len(labels) != len(set(labels)):
-            raise _state_invalid("P0 stack materialization candidate labels must be unique.")
+            raise _state_invalid(
+                "P0 stack materialization candidate labels must be unique."
+            )
         if labels != tuple(
             label for label in ("source", "m0", "m1") if label in labels
         ):
@@ -343,8 +407,13 @@ class _StateCommitP0QualificationMixin:
         with self._exclusive_lock():
             manifest = self._read_manifest()
             pointer = manifest.active_p0_qualification_prepared
-            if manifest.schema_version not in {"2.11", "2.12", "2.13"} or pointer is None:
-                raise _state_invalid("No active P0 qualification prepared receipt exists.")
+            if (
+                manifest.schema_version not in {"2.11", "2.12", "2.13", "2.14"}
+                or pointer is None
+            ):
+                raise _state_invalid(
+                    "No active P0 qualification prepared receipt exists."
+                )
             current = self._reopen_p0_pointer(pointer)
             receipt, stacks, policies, validation_set, inputs = current
             source_stacks = self._read_p0_source_stacks(
@@ -374,9 +443,7 @@ class _StateCommitP0QualificationMixin:
                     stack.materialization_status != "materialized"
                     for stack in selected_stacks
                 )
-                or tuple(
-                    stack.execution_stack_hash for stack in selected_stacks
-                )
+                or tuple(stack.execution_stack_hash for stack in selected_stacks)
                 != expected_materialized_stack_hashes
             ):
                 raise _state_invalid(
@@ -429,11 +496,11 @@ class _StateCommitP0QualificationMixin:
                 for label in labels
                 if label in materializations_by_label
             ):
-                raise _state_invalid("P0 selected execution stack materialization is incomplete.")
+                raise _state_invalid(
+                    "P0 selected execution stack materialization is incomplete."
+                )
             materialized_source_stacks = (
-                (materialized_by_label["source"],)
-                if source_stacks
-                else ()
+                (materialized_by_label["source"],) if source_stacks else ()
             )
             materialized_stacks = (
                 materialized_by_label["m0"],
@@ -448,10 +515,7 @@ class _StateCommitP0QualificationMixin:
             )
             old_to_new = dict(
                 zip(
-                    (
-                        stack.execution_stack_hash
-                        for stack in (*source_stacks, *stacks)
-                    ),
+                    (stack.execution_stack_hash for stack in (*source_stacks, *stacks)),
                     (
                         stack.execution_stack_hash
                         for stack in (*materialized_source_stacks, *materialized_stacks)
@@ -552,12 +616,16 @@ class _StateCommitP0QualificationMixin:
                 )
                 return manifest
             if manifest.manifest_revision != expected_manifest_revision:
-                raise _state_invalid("P0 materialization base Manifest revision changed.")
+                raise _state_invalid(
+                    "P0 materialization base Manifest revision changed."
+                )
             if (
                 receipt.project != manifest.active_project
                 or receipt.registry != manifest.active_registry
             ):
-                raise _state_invalid("P0 materialization evidence is stale for current Production state.")
+                raise _state_invalid(
+                    "P0 materialization evidence is stale for current Production state."
+                )
             bundle = load_production_project(self._project_root / "project.yaml")
             self._validate_p0_against_project(
                 bundle,
@@ -565,7 +633,9 @@ class _StateCommitP0QualificationMixin:
                 validation_set=materialized_validation_set,
             )
             receipt_artifact = _prepared_artifact(
-                canonical_p0_qualification_receipt_path(materialized_receipt.content_hash),
+                canonical_p0_qualification_receipt_path(
+                    materialized_receipt.content_hash
+                ),
                 materialized_receipt,
             )
             source_artifacts = tuple(
@@ -574,7 +644,9 @@ class _StateCommitP0QualificationMixin:
                     payload=artifact.payload,
                     file_sha256=artifact.file_sha256,
                 )
-                for artifact in prepare_execution_stack_source_artifacts(materializations)
+                for artifact in prepare_execution_stack_source_artifacts(
+                    materializations
+                )
             )
             artifacts = tuple(
                 sorted(
@@ -582,14 +654,21 @@ class _StateCommitP0QualificationMixin:
                         *source_artifacts,
                         *(
                             _prepared_artifact(
-                                canonical_execution_stack_identity_path(stack.execution_stack_hash),
+                                canonical_execution_stack_identity_path(
+                                    stack.execution_stack_hash
+                                ),
                                 stack,
                             )
-                            for stack in (*materialized_source_stacks, *materialized_stacks)
+                            for stack in (
+                                *materialized_source_stacks,
+                                *materialized_stacks,
+                            )
                         ),
                         *(
                             _prepared_artifact(
-                                canonical_continuity_transition_policy_path(policy.policy_hash),
+                                canonical_continuity_transition_policy_path(
+                                    policy.policy_hash
+                                ),
                                 policy,
                             )
                             for policy in materialized_policies
@@ -631,7 +710,9 @@ class _StateCommitP0QualificationMixin:
             self._write_p6_manifest_atomic(updated)
             reopened = self._read_manifest()
             if reopened != updated:
-                raise _state_invalid("P0 materialization Manifest did not reopen exactly.")
+                raise _state_invalid(
+                    "P0 materialization Manifest did not reopen exactly."
+                )
             final_bundle = self._reopen_p0_pointer(
                 updated.active_p0_qualification_prepared
             )
@@ -682,7 +763,9 @@ class _StateCommitP0QualificationMixin:
             stack.materialization_status == "materialized" for stack in reopened[1]
         )
         if require_materialized and not all(materialized):
-            raise _state_invalid("P0 execution stack is unmaterialized and cannot execute.")
+            raise _state_invalid(
+                "P0 execution stack is unmaterialized and cannot execute."
+            )
         required_indexes = tuple(
             ("m0", "m1").index(label) for label in required_materialized_candidates
         )
@@ -802,9 +885,7 @@ class _StateCommitP0QualificationMixin:
         ],
         policies: tuple[ContinuityTransitionPolicy, ...],
     ) -> tuple[GenerationExecutionStackIdentity, ...]:
-        candidate_hashes = {
-            stack.execution_stack_hash for stack in candidate_stacks
-        }
+        candidate_hashes = {stack.execution_stack_hash for stack in candidate_stacks}
         source_hashes = tuple(
             sorted(
                 {
@@ -858,7 +939,9 @@ class _StateCommitP0QualificationMixin:
         qualification_inputs: tuple[P0QualificationInput, ...],
     ) -> None:
         if len(candidate_stacks) != 2:
-            raise _state_invalid("P0 qualification requires exactly two candidate stacks.")
+            raise _state_invalid(
+                "P0 qualification requires exactly two candidate stacks."
+            )
         if len(source_stacks) > 1:
             raise _state_invalid(
                 "P0 qualification supports at most one independent source stack."
@@ -877,13 +960,17 @@ class _StateCommitP0QualificationMixin:
             for policy in policies
         ):
             raise _state_invalid("P0 continuity transition policy hash is invalid.")
-        if canonical_sha256(
-            validation_set.model_dump(mode="json", exclude={"content_hash"})
-        ) != validation_set.content_hash:
+        if (
+            canonical_sha256(
+                validation_set.model_dump(mode="json", exclude={"content_hash"})
+            )
+            != validation_set.content_hash
+        ):
             raise _state_invalid("P0 real-Shot validation set hash is invalid.")
-        if canonical_sha256(
-            receipt.model_dump(mode="json", exclude={"content_hash"})
-        ) != receipt.content_hash:
+        if (
+            canonical_sha256(receipt.model_dump(mode="json", exclude={"content_hash"}))
+            != receipt.content_hash
+        ):
             raise _state_invalid("P0 qualification prepared receipt hash is invalid.")
         expected_input_kinds = (
             "inventory",
@@ -892,13 +979,15 @@ class _StateCommitP0QualificationMixin:
             "effect_budget",
             "human_freeze",
         )
-        if tuple(item.input_kind for item in qualification_inputs) != expected_input_kinds:
+        if (
+            tuple(item.input_kind for item in qualification_inputs)
+            != expected_input_kinds
+        ):
             raise _state_invalid(
                 "P0 qualification inputs must contain one canonical ordered set."
             )
         if any(
-            canonical_sha256(item._content_hash_payload())
-            != item.content_hash
+            canonical_sha256(item._content_hash_payload()) != item.content_hash
             for item in qualification_inputs
         ):
             raise _state_invalid("P0 qualification input hash is invalid.")
@@ -969,23 +1058,27 @@ class _StateCommitP0QualificationMixin:
             )
         for stack in candidate_stacks:
             if (
-                stack.materialization_status == "unmaterialized"
-                and (
-                    stack.profile_hash != "none"
-                    or stack.compiler_hash != "none"
-                    or stack.workflow_hash != "none"
+                (
+                    stack.materialization_status == "unmaterialized"
+                    and (
+                        stack.profile_hash != "none"
+                        or stack.compiler_hash != "none"
+                        or stack.workflow_hash != "none"
+                    )
                 )
-            ) or (
-                stack.materialization_status == "materialized"
-                and (
-                    stack.profile_hash == "none"
-                    or stack.compiler_hash == "none"
-                    or stack.workflow_hash == "none"
+                or (
+                    stack.materialization_status == "materialized"
+                    and (
+                        stack.profile_hash == "none"
+                        or stack.compiler_hash == "none"
+                        or stack.workflow_hash == "none"
+                    )
                 )
-            ) or (
-                stack.sampler_identity != calibration_payload["sampler"]
-                or stack.scheduler_identity != calibration_payload["scheduler"]
-                or stack.output_contract_hash != expected_output_contract_hash
+                or (
+                    stack.sampler_identity != calibration_payload["sampler"]
+                    or stack.scheduler_identity != calibration_payload["scheduler"]
+                    or stack.output_contract_hash != expected_output_contract_hash
+                )
             ):
                 raise _state_invalid(
                     "P0 candidate stack is not bound to the frozen calibration contract."
@@ -1002,20 +1095,24 @@ class _StateCommitP0QualificationMixin:
                     )
         for stack in source_stacks:
             if (
-                stack.materialization_status == "unmaterialized"
-                and (
-                    stack.profile_hash != "none"
-                    or stack.compiler_hash != "none"
-                    or stack.workflow_hash != "none"
+                (
+                    stack.materialization_status == "unmaterialized"
+                    and (
+                        stack.profile_hash != "none"
+                        or stack.compiler_hash != "none"
+                        or stack.workflow_hash != "none"
+                    )
                 )
-            ) or (
-                stack.materialization_status == "materialized"
-                and (
-                    stack.profile_hash == "none"
-                    or stack.compiler_hash == "none"
-                    or stack.workflow_hash == "none"
+                or (
+                    stack.materialization_status == "materialized"
+                    and (
+                        stack.profile_hash == "none"
+                        or stack.compiler_hash == "none"
+                        or stack.workflow_hash == "none"
+                    )
                 )
-            ) or stack.output_contract_hash != expected_output_contract_hash:
+                or stack.output_contract_hash != expected_output_contract_hash
+            ):
                 raise _state_invalid(
                     "P0 source stack is not bound to the frozen output contract."
                 )
@@ -1032,17 +1129,14 @@ class _StateCommitP0QualificationMixin:
         candidate_stack_hashes = {
             item.execution_stack_hash for item in candidate_stacks
         }
-        source_stack_hashes = {
-            item.execution_stack_hash for item in source_stacks
-        }
+        source_stack_hashes = {item.execution_stack_hash for item in source_stacks}
         referenced_external_source_hashes = {
             policy.source_execution_stack_hash
             for policy in policies
             if policy.source_execution_stack_hash not in candidate_stack_hashes
         }
         if (
-            receipt.inventory_receipt_hash
-            != inputs_by_kind["inventory"].content_hash
+            receipt.inventory_receipt_hash != inputs_by_kind["inventory"].content_hash
             or receipt.calibration_fixture_hash
             != inputs_by_kind["calibration_fixture"].content_hash
             or receipt.rubric_hash != inputs_by_kind["rubric"].content_hash
@@ -1057,7 +1151,9 @@ class _StateCommitP0QualificationMixin:
             or receipt.rubric_hash != validation_set.rubric_hash
             or receipt.human_freeze_evidence_hash
             != validation_set.human_freeze_evidence_hash
-            or tuple(binding.execution_stack_hash for binding in receipt.candidate_stacks)
+            or tuple(
+                binding.execution_stack_hash for binding in receipt.candidate_stacks
+            )
             != tuple(stack.execution_stack_hash for stack in candidate_stacks)
             or receipt.policy_hashes
             != tuple(sorted(policy.policy_hash for policy in policies))
@@ -1068,8 +1164,7 @@ class _StateCommitP0QualificationMixin:
             or any(
                 policy.source_execution_stack_hash
                 not in candidate_stack_hashes | source_stack_hashes
-                or policy.destination_execution_stack_hash
-                not in candidate_stack_hashes
+                or policy.destination_execution_stack_hash not in candidate_stack_hashes
                 or policy.qa_policy_hash != inputs_by_kind["rubric"].content_hash
                 or policy.authoring_evidence_hash
                 != inputs_by_kind["human_freeze"].content_hash
@@ -1089,7 +1184,9 @@ class _StateCommitP0QualificationMixin:
             item.execution_stack_hashes != materialized_stack_hashes
             for item in qualification_inputs
         ):
-            raise _state_invalid("P0 qualification inputs are stale for execution stacks.")
+            raise _state_invalid(
+                "P0 qualification inputs are stale for execution stacks."
+            )
 
     def _validate_p0_against_project(
         self,
@@ -1099,9 +1196,7 @@ class _StateCommitP0QualificationMixin:
         validation_set: RealShotValidationSet,
     ) -> None:
         shots = {item.artifact_id: item for item in bundle.shots}
-        validation_shots = {
-            item.artifact_id: item for item in validation_set.shots
-        }
+        validation_shots = {item.artifact_id: item for item in validation_set.shots}
         assets = {item.asset_id: item for item in bundle.registry.assets}
         characters = {item.artifact_id: item for item in bundle.characters}
         scenes = {item.artifact_id: item for item in bundle.scenes}
@@ -1114,9 +1209,15 @@ class _StateCommitP0QualificationMixin:
             raise _state_invalid("P0 validation set does not select current artifacts.")
         selected_character = characters[validation_set.character.artifact_id]
         identities = (
-            (validation_set.character, characters[validation_set.character.artifact_id]),
+            (
+                validation_set.character,
+                characters[validation_set.character.artifact_id],
+            ),
             (validation_set.scene, scenes[validation_set.scene.artifact_id]),
-            *((identity, shots.get(identity.artifact_id)) for identity in validation_set.shots),
+            *(
+                (identity, shots.get(identity.artifact_id))
+                for identity in validation_set.shots
+            ),
         )
         if any(
             artifact is None
@@ -1132,15 +1233,16 @@ class _StateCommitP0QualificationMixin:
                 or policy.source_shot != validation_shots.get(edge.source_shot_id)
                 or policy.target_shot != validation_shots.get(edge.target_shot_id)
             ):
-                raise _state_invalid("P0 transition policy does not bind its validation edge.")
+                raise _state_invalid(
+                    "P0 transition policy does not bind its validation edge."
+                )
             for anchor in policy.anchors:
                 if anchor.source_kind == "registered_asset":
                     asset = assets.get(anchor.source_identity)
                     if (
                         asset is None
                         or anchor.content_hash != asset.sha256
-                        or anchor.evidence_fingerprint
-                        != asset.creation_receipt_id
+                        or anchor.evidence_fingerprint != asset.creation_receipt_id
                         or anchor.materialization_receipt_id
                         != asset.creation_receipt_id
                     ):
@@ -1164,8 +1266,7 @@ class _StateCommitP0QualificationMixin:
                         )
                         if (
                             len(endpoint_roles) != 1
-                            or anchor.source_identity
-                            not in endpoint_roles[0].asset_ids
+                            or anchor.source_identity not in endpoint_roles[0].asset_ids
                         ):
                             raise _state_invalid(
                                 "P0 last-frame anchor is not the target Shot approved endpoint."
@@ -1176,7 +1277,10 @@ class _StateCommitP0QualificationMixin:
                         if anchor.role.value == "first_frame"
                         else "motion-tail"
                     )
-                    if anchor.source_identity != f"{policy.source_shot.artifact_id}:{suffix}":
+                    if (
+                        anchor.source_identity
+                        != f"{policy.source_shot.artifact_id}:{suffix}"
+                    ):
                         raise _state_invalid(
                             "P0 planned continuity derivation does not bind its source Shot."
                         )

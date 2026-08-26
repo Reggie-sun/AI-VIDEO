@@ -15,6 +15,9 @@ from ai_video.production._lifecycle_schema import (
     LocalVideoSubmitReceiptPointer,
     ContinuityEvaluationIntentPointer,
     GeneratedShotContinuityEvidencePointer,
+    SourceBoundaryReviewEvidencePointer,
+    SourceBoundaryReviewIntentPointer,
+    SourceBoundaryReviewReceiptPointer,
     VideoProbeReceiptPointer,
     VideoProvenanceReceiptPointer,
 )
@@ -29,6 +32,8 @@ from ai_video.production.models import (
     AssetType,
     LoadedProductionProject,
     CommercialShotEvaluationPhase,
+    SourceBoundaryEvaluationPhase,
+    SourceBoundaryReviewVerdict,
     PaidProviderAttemptPhase,
     ProductionManifest,
     StateCommitStatus,
@@ -50,12 +55,20 @@ from ai_video.production.local_video import (
 from ai_video.production.paid_provider import BudgetReservationStatus
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
+    canonical_continuity_transition_policy_path,
+    canonical_execution_stack_identity_path,
+    canonical_p0_qualification_input_path,
+    canonical_p0_qualification_receipt_path,
+    canonical_real_shot_validation_set_path,
     canonical_video_probe_receipt_path,
     canonical_video_provenance_receipt_path,
     canonical_image_asset_path,
     canonical_terminal_frame_extraction_receipt_path,
     canonical_continuity_evaluation_intent_path,
     canonical_generated_shot_continuity_evidence_path,
+    canonical_source_boundary_review_evidence_path,
+    canonical_source_boundary_review_intent_path,
+    canonical_source_boundary_review_receipt_path,
     canonical_commercial_shot_evaluation_intent_path,
     canonical_generated_commercial_shot_evidence_path,
     resolve_contained_path,
@@ -74,9 +87,30 @@ from ai_video.production.video_artifact import (
     VideoProvenanceReceipt,
     bind_terminal_frame_evidence,
 )
+from ai_video.production.shot_continuity_source_review import (
+    SourceBoundaryMeasurementContractV1,
+    SourceBoundaryReviewEvidence,
+    SourceBoundaryReviewIntent,
+    SourceBoundaryReviewReceipt,
+    is_source_boundary_qualification_request,
+    validate_source_boundary_review_closure,
+    validate_source_boundary_review_intent,
+)
+from ai_video.production.video_execution_stack import (
+    GenerationExecutionStackIdentity,
+)
+from ai_video.production.video_transition import (
+    ContinuityTransitionPolicy,
+    P0QualificationInput,
+    P0QualificationPreparedReceipt,
+    RealShotValidationSet,
+)
 from ai_video.production.ecommerce_media_acceptance import (
     CommercialShotEvaluationIntent,
     GeneratedCommercialShotEvidence,
+)
+from ai_video.production.execution_stack_materialization import (
+    verify_execution_stack_source_artifacts,
 )
 from ai_video.production.commercial_video_validation import (
     bound_commercial_source_approval,
@@ -108,12 +142,154 @@ def _root_and_path(root: str | Path, stored: Path) -> tuple[Path, Path]:
     return resolved_root, resolved
 
 
+def _load_source_boundary_p0_closure(
+    root: str | Path,
+    contract: SourceBoundaryMeasurementContractV1,
+) -> tuple[
+    P0QualificationPreparedReceipt,
+    P0QualificationInput,
+    tuple[str, ...],
+]:
+    """Reopen the immutable P0 subset that gives one source PASS authority."""
+
+    resolved_root = Path(root).resolve(strict=True)
+
+    def _load(relative_path: Path, model_type):
+        resolved = resolve_contained_path(
+            resolved_root,
+            relative_path,
+            allowed_root=resolved_root / "state",
+        )
+        raw = _read_regular_file_nofollow(
+            resolved,
+            contained_by=resolved_root / "state",
+        )
+        return model_type.model_validate_json(raw.data)
+
+    try:
+        receipt = _load(
+            canonical_p0_qualification_receipt_path(
+                contract.p0_qualification_receipt_hash
+            ),
+            P0QualificationPreparedReceipt,
+        )
+        input_hashes = (
+            receipt.inventory_receipt_hash,
+            receipt.calibration_fixture_hash,
+            receipt.rubric_hash,
+            receipt.effect_budget_hash,
+            receipt.human_freeze_evidence_hash,
+        )
+        input_kinds = (
+            "inventory",
+            "calibration_fixture",
+            "rubric",
+            "effect_budget",
+            "human_freeze",
+        )
+        inputs = tuple(
+            _load(
+                canonical_p0_qualification_input_path(kind, content_hash),
+                P0QualificationInput,
+            )
+            for kind, content_hash in zip(input_kinds, input_hashes, strict=True)
+        )
+        validation_set = _load(
+            canonical_real_shot_validation_set_path(receipt.validation_set_hash),
+            RealShotValidationSet,
+        )
+        policies = tuple(
+            _load(
+                canonical_continuity_transition_policy_path(edge.policy_hash),
+                ContinuityTransitionPolicy,
+            )
+            for edge in validation_set.edges
+        )
+        candidate_stacks = tuple(
+            _load(
+                canonical_execution_stack_identity_path(binding.execution_stack_hash),
+                GenerationExecutionStackIdentity,
+            )
+            for binding in receipt.candidate_stacks
+        )
+        candidate_hashes = {item.execution_stack_hash for item in candidate_stacks}
+        source_hashes = tuple(
+            sorted(
+                {
+                    policy.source_execution_stack_hash
+                    for policy in policies
+                    if policy.source_execution_stack_hash not in candidate_hashes
+                }
+            )
+        )
+        source_stacks = tuple(
+            _load(
+                canonical_execution_stack_identity_path(content_hash),
+                GenerationExecutionStackIdentity,
+            )
+            for content_hash in source_hashes
+        )
+        materialized_stacks = tuple(
+            item
+            for item in (*source_stacks, *candidate_stacks)
+            if item.materialization_status == "materialized"
+        )
+        if materialized_stacks:
+            verify_execution_stack_source_artifacts(
+                resolved_root,
+                materialized_stacks,
+            )
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid(
+            "Could not reopen source boundary P0 closure.",
+            str(exc),
+        ) from exc
+
+    inputs_by_kind = {item.input_kind: item for item in inputs}
+    all_stack_hashes = candidate_hashes | set(source_hashes)
+    materialized_hashes = tuple(
+        sorted(item.execution_stack_hash for item in materialized_stacks)
+    )
+    if (
+        receipt.content_hash != contract.p0_qualification_receipt_hash
+        or receipt.rubric_hash != contract.p0_rubric_hash
+        or tuple(item.input_kind for item in inputs) != input_kinds
+        or tuple(item.content_hash for item in inputs) != input_hashes
+        or validation_set.content_hash != receipt.validation_set_hash
+        or validation_set.project != receipt.project
+        or validation_set.registry != receipt.registry
+        or validation_set.rubric_hash != receipt.rubric_hash
+        or validation_set.human_freeze_evidence_hash
+        != receipt.human_freeze_evidence_hash
+        or tuple(edge.policy_hash for edge in validation_set.edges)
+        != tuple(item.policy_hash for item in policies)
+        or receipt.policy_hashes != tuple(sorted(item.policy_hash for item in policies))
+        or tuple(item.execution_stack_hash for item in candidate_stacks)
+        != tuple(item.execution_stack_hash for item in receipt.candidate_stacks)
+        or len(source_stacks) > 1
+        or any(
+            policy.project != receipt.project
+            or policy.registry != receipt.registry
+            or policy.source_execution_stack_hash not in all_stack_hashes
+            or policy.destination_execution_stack_hash not in candidate_hashes
+            or policy.qa_policy_hash != receipt.rubric_hash
+            or policy.authoring_evidence_hash != receipt.human_freeze_evidence_hash
+            for policy in policies
+        )
+        or any(item.execution_stack_hashes != materialized_hashes for item in inputs)
+    ):
+        raise _invalid("Source boundary P0 closure is inconsistent.")
+    return receipt, inputs_by_kind["rubric"], source_hashes
+
+
 def load_video_request_receipt(
     root: str | Path, pointer: VideoRequestReceiptPointer
 ) -> ResolvedVideoGenerationRequest:
     resolved_root, resolved = _root_and_path(root, pointer.path)
     try:
-        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
         request = ResolvedVideoGenerationRequest.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
         raise _invalid("Could not reopen video generation request.", str(exc)) from exc
@@ -139,10 +315,14 @@ def load_commercial_shot_evaluation_intent(
             pointer.content_hash
         ):
             raise ValueError("noncanonical commercial Shot intent path")
-        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
         intent = CommercialShotEvaluationIntent.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
-        raise _invalid("Could not reopen commercial Shot evaluation intent.", str(exc)) from exc
+        raise _invalid(
+            "Could not reopen commercial Shot evaluation intent.", str(exc)
+        ) from exc
     if (
         raw.file_sha256 != pointer.file_sha256
         or intent.content_hash != pointer.content_hash
@@ -166,7 +346,9 @@ def load_generated_commercial_shot_evidence(
             pointer.content_hash
         ):
             raise ValueError("noncanonical commercial Shot evidence path")
-        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
         evidence = GeneratedCommercialShotEvidence.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
         raise _invalid("Could not reopen commercial Shot evidence.", str(exc)) from exc
@@ -187,10 +369,14 @@ def load_video_status_receipt(
 ) -> VideoTaskObservation:
     resolved_root, resolved = _root_and_path(root, pointer.path)
     try:
-        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
         observation = VideoTaskObservation.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
-        raise _invalid("Could not reopen video generation observation.", str(exc)) from exc
+        raise _invalid(
+            "Could not reopen video generation observation.", str(exc)
+        ) from exc
     if (
         raw.file_sha256 != pointer.file_sha256
         or observation.observation_fingerprint != pointer.observation_fingerprint
@@ -239,7 +425,9 @@ def load_local_video_submit_intent(
 ) -> LocalVideoSubmitIntent:
     resolved_root, resolved = _root_and_path(root, pointer.path)
     try:
-        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
         intent = LocalVideoSubmitIntent.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
         raise _invalid("Could not reopen local video submit intent.", str(exc)) from exc
@@ -257,10 +445,14 @@ def load_local_video_submit_receipt(
 ) -> LocalVideoSubmitResult:
     resolved_root, resolved = _root_and_path(root, pointer.path)
     try:
-        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
         result = LocalVideoSubmitResult.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
-        raise _invalid("Could not reopen local video submit receipt.", str(exc)) from exc
+        raise _invalid(
+            "Could not reopen local video submit receipt.", str(exc)
+        ) from exc
     if (
         raw.file_sha256 != pointer.file_sha256
         or result.result_fingerprint != pointer.result_fingerprint
@@ -276,15 +468,16 @@ def load_local_video_status_receipt(
 ) -> LocalVideoTaskObservation:
     resolved_root, resolved = _root_and_path(root, pointer.path)
     try:
-        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
         observation = LocalVideoTaskObservation.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
         raise _invalid("Could not reopen local video observation.", str(exc)) from exc
     if (
         raw.file_sha256 != pointer.file_sha256
         or observation.observation_fingerprint != pointer.observation_fingerprint
-        or observation.submit_result_fingerprint
-        != pointer.submit_result_fingerprint
+        or observation.submit_result_fingerprint != pointer.submit_result_fingerprint
     ):
         raise _invalid("Local video observation pointer identity is invalid.")
     return observation
@@ -295,7 +488,9 @@ def load_local_video_fetch_receipt(
 ) -> LocalVideoFetchReceipt:
     resolved_root, resolved = _root_and_path(root, pointer.path)
     try:
-        raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
         receipt = LocalVideoFetchReceipt.model_validate_json(raw.data)
         artifact_path = resolve_contained_path(
             resolved_root,
@@ -307,7 +502,9 @@ def load_local_video_fetch_receipt(
             contained_by=resolved_root / "state" / "video-generation" / "fetch",
         )
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
-        raise _invalid("Could not reopen local video fetch evidence.", str(exc)) from exc
+        raise _invalid(
+            "Could not reopen local video fetch evidence.", str(exc)
+        ) from exc
     if (
         raw.file_sha256 != pointer.file_sha256
         or receipt.fetch_fingerprint != pointer.fetch_fingerprint
@@ -380,7 +577,9 @@ def load_continuity_evaluation_intent(
         )
         intent = ContinuityEvaluationIntent.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
-        raise _invalid("Could not reopen continuity evaluation intent.", str(exc)) from exc
+        raise _invalid(
+            "Could not reopen continuity evaluation intent.", str(exc)
+        ) from exc
     if (
         pointer.path != canonical_continuity_evaluation_intent_path(intent.content_hash)
         or raw.file_sha256 != pointer.file_sha256
@@ -404,7 +603,9 @@ def load_generated_shot_continuity_evidence(
         )
         evidence = GeneratedShotContinuityEvidence.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
-        raise _invalid("Could not reopen generated Shot continuity evidence.", str(exc)) from exc
+        raise _invalid(
+            "Could not reopen generated Shot continuity evidence.", str(exc)
+        ) from exc
     if (
         pointer.path
         != canonical_generated_shot_continuity_evidence_path(evidence.content_hash)
@@ -413,8 +614,90 @@ def load_generated_shot_continuity_evidence(
         or evidence.evaluation_fingerprint != pointer.evaluation_fingerprint
         or evidence.artifact_sha256 != pointer.artifact_sha256
     ):
-        raise _invalid("Generated Shot continuity evidence pointer identity is invalid.")
+        raise _invalid(
+            "Generated Shot continuity evidence pointer identity is invalid."
+        )
     return evidence
+
+
+def load_source_boundary_review_intent(
+    root: str | Path, pointer: SourceBoundaryReviewIntentPointer
+) -> SourceBoundaryReviewIntent:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
+        intent = SourceBoundaryReviewIntent.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid(
+            "Could not reopen source boundary review intent.", str(exc)
+        ) from exc
+    if (
+        pointer.path
+        != canonical_source_boundary_review_intent_path(intent.content_hash)
+        or raw.file_sha256 != pointer.file_sha256
+        or intent.content_hash != pointer.content_hash
+        or intent.evaluation_fingerprint != pointer.evaluation_fingerprint
+        or intent.resolved_generation_hash != pointer.resolved_generation_hash
+        or intent.artifact_sha256 != pointer.artifact_sha256
+    ):
+        raise _invalid("Source boundary review intent pointer identity is invalid.")
+    return intent
+
+
+def load_source_boundary_review_evidence(
+    root: str | Path, pointer: SourceBoundaryReviewEvidencePointer
+) -> SourceBoundaryReviewEvidence:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
+        evidence = SourceBoundaryReviewEvidence.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid(
+            "Could not reopen source boundary review evidence.", str(exc)
+        ) from exc
+    if (
+        pointer.path
+        != canonical_source_boundary_review_evidence_path(evidence.content_hash)
+        or raw.file_sha256 != pointer.file_sha256
+        or evidence.content_hash != pointer.content_hash
+        or evidence.intent.content_hash != pointer.intent_content_hash
+        or evidence.intent.evaluation_fingerprint != pointer.evaluation_fingerprint
+        or evidence.intent.artifact_sha256 != pointer.artifact_sha256
+    ):
+        raise _invalid("Source boundary review evidence pointer identity is invalid.")
+    return evidence
+
+
+def load_source_boundary_review_receipt(
+    root: str | Path, pointer: SourceBoundaryReviewReceiptPointer
+) -> SourceBoundaryReviewReceipt:
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
+        receipt = SourceBoundaryReviewReceipt.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid(
+            "Could not reopen source boundary review receipt.", str(exc)
+        ) from exc
+    if (
+        pointer.path
+        != canonical_source_boundary_review_receipt_path(receipt.content_hash)
+        or raw.file_sha256 != pointer.file_sha256
+        or receipt.content_hash != pointer.content_hash
+        or receipt.intent_content_hash != pointer.intent_content_hash
+        or receipt.evidence_content_hash != pointer.evidence_content_hash
+        or receipt.resolved_generation_hash != pointer.resolved_generation_hash
+        or receipt.artifact_sha256 != pointer.artifact_sha256
+        or receipt.verdict.value != pointer.verdict.value
+    ):
+        raise _invalid("Source boundary review receipt pointer identity is invalid.")
+    return receipt
 
 
 def load_video_probe_receipt(
@@ -434,8 +717,7 @@ def load_video_probe_receipt(
     if (
         pointer.path != canonical_video_probe_receipt_path(receipt.content_hash)
         or receipt.content_hash != pointer.content_hash
-        or receipt.request_receipt_fingerprint
-        != pointer.request_receipt_fingerprint
+        or receipt.request_receipt_fingerprint != pointer.request_receipt_fingerprint
         or receipt.resolved_generation_hash != pointer.resolved_generation_hash
         or receipt.fetch_fingerprint != pointer.fetch_fingerprint
         or receipt.measured.artifact_sha256 != pointer.artifact_sha256
@@ -460,11 +742,9 @@ def load_video_provenance_receipt(
         contained_by=resolved_root / "state" / "video-generation",
     )
     if (
-        pointer.path
-        != canonical_video_provenance_receipt_path(receipt.content_hash)
+        pointer.path != canonical_video_provenance_receipt_path(receipt.content_hash)
         or receipt.content_hash != pointer.content_hash
-        or receipt.request_receipt_fingerprint
-        != pointer.request_receipt_fingerprint
+        or receipt.request_receipt_fingerprint != pointer.request_receipt_fingerprint
         or receipt.resolved_generation_hash != pointer.resolved_generation_hash
         or receipt.fetch_fingerprint != pointer.fetch_fingerprint
         or receipt.artifact_sha256 != pointer.artifact_sha256
@@ -525,8 +805,7 @@ def _verify_continuity_capture_checkpoint(
         else None
     )
     if (
-        probe.request_receipt_fingerprint
-        != request.desired_generation_fingerprint
+        probe.request_receipt_fingerprint != request.desired_generation_fingerprint
         or probe.resolved_generation_hash != request.resolved_generation_hash
         or probe.fetch_fingerprint != fetch.fetch_fingerprint
         or probe.measured.artifact_sha256 != fetch.artifact_sha256
@@ -570,19 +849,13 @@ def _verify_commercial_capture_checkpoint(
     try:
         from ai_video.production.project import load_qa_policy
 
-        intent = load_commercial_shot_evaluation_intent(
-            bundle.root, evaluation.intent
-        )
+        intent = load_commercial_shot_evaluation_intent(bundle.root, evaluation.intent)
         evidence = load_generated_commercial_shot_evidence(
             bundle.root, evaluation.evidence
         )
         probe = load_video_probe_receipt(bundle.root, evaluation.probe)
-        provenance = load_video_provenance_receipt(
-            bundle.root, evaluation.provenance
-        )
-        policy = load_qa_policy(
-            bundle.root, bundle.manifest.active_qa_policy
-        )
+        provenance = load_video_provenance_receipt(bundle.root, evaluation.provenance)
+        policy = load_qa_policy(bundle.root, bundle.manifest.active_qa_policy)
         evaluation_bundle = bundle.model_copy(update={"qa_policy": policy})
         approval = bound_commercial_source_approval(
             evaluation_bundle,
@@ -621,9 +894,12 @@ def verify_video_evidence(
     for state in states:
         request = load_video_request_receipt(root, state.request)
         if (
-            (request.commercial_binding is not None or state.commercial_evaluation is not None)
+            (
+                request.commercial_binding is not None
+                or state.commercial_evaluation is not None
+            )
             and schema_version is not None
-            and schema_version != "2.13"
+            and schema_version not in {"2.13", "2.14"}
         ):
             raise _invalid(
                 "Commercial-bound video state requires Production Manifest 2.13."
@@ -637,7 +913,8 @@ def verify_video_evidence(
             raise _invalid("Commercial Shot candidate checkpoint is incomplete.")
         if (
             request.commercial_binding is not None
-            and state.phase in {
+            and state.phase
+            in {
                 VideoAttemptPhase.CANDIDATE,
                 VideoAttemptPhase.ACTIVATE,
             }
@@ -648,12 +925,32 @@ def verify_video_evidence(
             )
         ):
             raise _invalid("Commercial Shot candidate has no evidenced checkpoint.")
+        source_boundary_required = is_source_boundary_qualification_request(request)
+        if (
+            state.source_boundary_evaluation is not None
+            and schema_version is not None
+            and schema_version != "2.14"
+        ):
+            raise _invalid("Source boundary state requires Production Manifest 2.14.")
+        if state.phase in {VideoAttemptPhase.CANDIDATE, VideoAttemptPhase.ACTIVATE}:
+            evaluation = state.source_boundary_evaluation
+            if source_boundary_required and (
+                evaluation is None
+                or evaluation.phase is not SourceBoundaryEvaluationPhase.EVIDENCED
+                or evaluation.receipt is None
+                or evaluation.receipt.verdict is not SourceBoundaryReviewVerdict.PASS
+            ):
+                raise _invalid(
+                    "Approved endpoint source candidate has no exact P6 PASS."
+                )
         request_owners.append(state.request.request_receipt_fingerprint)
         if (
             request.generation_id != state.generation_id
             or request.resolved_generation_hash != state.resolved_generation_hash
         ):
-            raise _invalid("Video attempt identity does not match its request evidence.")
+            raise _invalid(
+                "Video attempt identity does not match its request evidence."
+            )
         if state.continuity_evaluation is not None:
             intent = load_continuity_evaluation_intent(
                 root, state.continuity_evaluation.intent
@@ -681,8 +978,7 @@ def verify_video_evidence(
                 request.commercial_binding is None
                 or intent.binding_content_hash
                 != request.commercial_binding.content_hash
-                or intent.resolved_generation_hash
-                != request.resolved_generation_hash
+                or intent.resolved_generation_hash != request.resolved_generation_hash
                 or intent.artifact_sha256
                 != state.commercial_evaluation.intent.artifact_sha256
             ):
@@ -693,19 +989,79 @@ def verify_video_evidence(
                 )
                 if (
                     evidence.intent_content_hash != intent.content_hash
-                    or evidence.evaluation_fingerprint
-                    != intent.evaluation_fingerprint
+                    or evidence.evaluation_fingerprint != intent.evaluation_fingerprint
                 ):
                     raise _invalid("Commercial Shot evaluation evidence is not exact.")
+        if state.source_boundary_evaluation is not None:
+            evaluation = state.source_boundary_evaluation
+            intent = load_source_boundary_review_intent(root, evaluation.intent)
+            fetch = (
+                load_local_video_fetch_receipt(root, state.local_fetch_receipt)
+                if state.local_fetch_receipt is not None
+                else load_video_fetch_receipt(root, state.fetch_receipt)
+                if state.fetch_receipt is not None
+                else None
+            )
+            if fetch is None:
+                raise _invalid("Source boundary checkpoint has no fetch evidence.")
+            try:
+                validate_source_boundary_review_intent(
+                    request=request,
+                    fetch_receipt=fetch,
+                    intent=intent,
+                )
+            except ValueError as exc:
+                raise _invalid(
+                    "Source boundary review intent is not exact.",
+                    str(exc),
+                ) from exc
+            if evaluation.phase is SourceBoundaryEvaluationPhase.EVIDENCED:
+                if (
+                    evaluation.evidence is None
+                    or evaluation.receipt is None
+                    or evaluation.probe is None
+                    or evaluation.provenance is None
+                ):
+                    raise _invalid("Source boundary checkpoint is incomplete.")
+                evidence = load_source_boundary_review_evidence(
+                    root, evaluation.evidence
+                )
+                receipt = load_source_boundary_review_receipt(root, evaluation.receipt)
+                probe = load_video_probe_receipt(root, evaluation.probe)
+                provenance = load_video_provenance_receipt(root, evaluation.provenance)
+                p0_receipt, p0_rubric, source_stack_hashes = (
+                    _load_source_boundary_p0_closure(
+                        root,
+                        evidence.measurement_contract,
+                    )
+                )
+                try:
+                    validate_source_boundary_review_closure(
+                        request=request,
+                        fetch_receipt=fetch,
+                        intent=intent,
+                        evidence=evidence,
+                        receipt=receipt,
+                        probe=probe,
+                        provenance=provenance,
+                        p0_receipt=p0_receipt,
+                        p0_rubric=p0_rubric,
+                        source_execution_stack_hashes=source_stack_hashes,
+                        require_pass=state.phase
+                        in {VideoAttemptPhase.CANDIDATE, VideoAttemptPhase.ACTIVATE},
+                    )
+                except ValueError as exc:
+                    raise _invalid(
+                        "Source boundary checkpoint is not current and exact.",
+                        str(exc),
+                    ) from exc
         if state.local_submit_intent is not None:
             intent = load_local_video_submit_intent(root, state.local_submit_intent)
             if intent.request_fingerprint != request.resolved_generation_hash:
                 raise _invalid("Local video intent does not match its request.")
             if state.local_submit_receipt is None:
                 continue
-            result = load_local_video_submit_receipt(
-                root, state.local_submit_receipt
-            )
+            result = load_local_video_submit_receipt(root, state.local_submit_receipt)
             try:
                 from ai_video.production.local_video import LocalVideoSubmission
 
@@ -723,10 +1079,8 @@ def verify_video_evidence(
                 root, state.local_latest_observation
             )
             if (
-                observation.submission_fingerprint
-                != submission.submission_fingerprint
-                or observation.submit_result_fingerprint
-                != result.result_fingerprint
+                observation.submission_fingerprint != submission.submission_fingerprint
+                or observation.submit_result_fingerprint != result.result_fingerprint
                 or state.provider_file_id != observation.provider_file_id
             ):
                 raise _invalid("Local video observation identity is invalid.")
@@ -742,12 +1096,9 @@ def verify_video_evidence(
             ):
                 raise _invalid("Local video fetch phases require success.")
             if state.local_fetch_receipt is not None:
-                fetch = load_local_video_fetch_receipt(
-                    root, state.local_fetch_receipt
-                )
+                fetch = load_local_video_fetch_receipt(root, state.local_fetch_receipt)
                 if (
-                    fetch.submission_fingerprint
-                    != submission.submission_fingerprint
+                    fetch.submission_fingerprint != submission.submission_fingerprint
                     or fetch.observation_fingerprint
                     != observation.observation_fingerprint
                     or fetch.submit_result_fingerprint != result.result_fingerprint
@@ -756,9 +1107,7 @@ def verify_video_evidence(
                     raise _invalid("Local video fetch evidence is not exact.")
                 _verify_continuity_capture_checkpoint(root, state, request, fetch)
                 if bundle is not None:
-                    _verify_commercial_capture_checkpoint(
-                        bundle, state, request, fetch
-                    )
+                    _verify_commercial_capture_checkpoint(bundle, state, request, fetch)
             elif state.continuity_evaluation is not None:
                 _verify_continuity_capture_checkpoint(root, state, request, None)
             continue
@@ -792,11 +1141,17 @@ def verify_video_evidence(
             and observation.paid_submit_receipt_fingerprint
             != state.paid_submit_receipt.submit_receipt_fingerprint
         ):
-            raise _invalid("Video observation does not match the attempt submit receipt.")
+            raise _invalid(
+                "Video observation does not match the attempt submit receipt."
+            )
         if observation.submission_fingerprint != submission.submission_fingerprint:
-            raise _invalid("Video observation does not match the exact Gate submission.")
+            raise _invalid(
+                "Video observation does not match the exact Gate submission."
+            )
         if state.provider_file_id != observation.provider_file_id:
-            raise _invalid("Video provider file locator does not match its observation.")
+            raise _invalid(
+                "Video provider file locator does not match its observation."
+            )
         if (
             state.phase
             in {
@@ -812,8 +1167,7 @@ def verify_video_evidence(
             fetch = load_video_fetch_receipt(root, state.fetch_receipt)
             if (
                 fetch.submission_fingerprint != submission.submission_fingerprint
-                or fetch.observation_fingerprint
-                != observation.observation_fingerprint
+                or fetch.observation_fingerprint != observation.observation_fingerprint
                 or fetch.paid_submit_receipt_fingerprint
                 != submit_receipt.submit_receipt_fingerprint
                 or fetch.provider_file_id != observation.provider_file_id
@@ -823,9 +1177,7 @@ def verify_video_evidence(
                 )
             _verify_continuity_capture_checkpoint(root, state, request, fetch)
             if bundle is not None:
-                _verify_commercial_capture_checkpoint(
-                    bundle, state, request, fetch
-                )
+                _verify_commercial_capture_checkpoint(bundle, state, request, fetch)
         elif state.continuity_evaluation is not None:
             _verify_continuity_capture_checkpoint(root, state, request, None)
     if len(request_owners) != len(set(request_owners)):
@@ -890,14 +1242,12 @@ def _verify_active_terminal_frame(
         or evidence.source_registry != attempt.candidate_registry
         or evidence.source_shot_id != scope.request.target_shot_id
         or evidence.source_shot_revision != scope.request.target_shot_revision
-        or evidence.source_shot_content_hash
-        != scope.request.target_shot_content_hash
+        or evidence.source_shot_content_hash != scope.request.target_shot_content_hash
         or evidence.source_video_asset_id != request.output_asset_id
         or evidence.source_video_sha256 != video_asset.sha256
         or evidence.source_generation_id != request.generation_id
         or evidence.source_request_input_hash != request.request_input_hash
-        or evidence.source_resolved_generation_hash
-        != request.resolved_generation_hash
+        or evidence.source_resolved_generation_hash != request.resolved_generation_hash
         or evidence.source_provenance_receipt_id != provenance.content_hash
         or evidence.source_container_name != metadata.container_name
         or evidence.source_codec_name != metadata.codec_name
@@ -953,14 +1303,11 @@ def _verify_active_generated_video(
         or state.phase is not VideoAttemptPhase.ACTIVATE
         or attempt.candidate_project != bundle.manifest.active_project
         or attempt.candidate_registry != bundle.manifest.active_registry
-        or attempt.candidate_dependency_graph
-        != bundle.manifest.active_dependency_graph
+        or attempt.candidate_dependency_graph != bundle.manifest.active_dependency_graph
         or state.candidate_video_asset_ids != (request.output_asset_id,)
     ):
         raise _invalid("Active generated video selection is not exact.")
-    assets = {
-        asset.asset_id: asset for asset in bundle.registry.assets
-    }
+    assets = {asset.asset_id: asset for asset in bundle.registry.assets}
     asset = assets.get(request.output_asset_id)
     if (
         asset is None
@@ -980,7 +1327,9 @@ def _verify_active_generated_video(
             contained_by=bundle.root / "assets",
         )
     except (KeyError, OSError, ValueError) as exc:
-        raise _invalid("Could not reopen active generated video asset.", str(exc)) from exc
+        raise _invalid(
+            "Could not reopen active generated video asset.", str(exc)
+        ) from exc
     if artifact.file_sha256 != asset.sha256 or len(artifact.data) != asset.size_bytes:
         raise _invalid("Active generated video bytes do not match the Registry.")
 
@@ -1018,18 +1367,22 @@ def _verify_active_generated_video(
         if asset.cost_receipt_id is not None
         else None
     )
-    reservation = next(
-        (
-            item
-            for item in historical_budget.reservations
-            if paid_state is not None and item.reservation_id == paid_state.reservation_id
-        ),
-        None,
-    ) if historical_budget is not None else None
+    reservation = (
+        next(
+            (
+                item
+                for item in historical_budget.reservations
+                if paid_state is not None
+                and item.reservation_id == paid_state.reservation_id
+            ),
+            None,
+        )
+        if historical_budget is not None
+        else None
+    )
     if (
         probe.content_hash != metadata.probe_receipt_id
-        or probe.request_receipt_fingerprint
-        != request.desired_generation_fingerprint
+        or probe.request_receipt_fingerprint != request.desired_generation_fingerprint
         or probe.resolved_generation_hash != request.resolved_generation_hash
         or probe.measured.artifact_sha256 != asset.sha256
         or probe.measured.size_bytes != asset.size_bytes
@@ -1055,8 +1408,7 @@ def _verify_active_generated_video(
         or provenance.probe_receipt_id != probe.content_hash
         or observation is None
         or fetch is None
-        or provenance.observation_fingerprint
-        != observation.observation_fingerprint
+        or provenance.observation_fingerprint != observation.observation_fingerprint
         or provenance.fetch_fingerprint != fetch.fetch_fingerprint
         or provenance.provider_file_id != fetch.provider_file_id
         or asset.creation_receipt_id != provenance.content_hash
@@ -1142,8 +1494,7 @@ def verify_manifest_video_evidence(
             state.phase is VideoAttemptPhase.ACTIVATE
             and attempt.candidate_project == manifest.active_project
             and attempt.candidate_registry == manifest.active_registry
-            and attempt.candidate_dependency_graph
-            == manifest.active_dependency_graph
+            and attempt.candidate_dependency_graph == manifest.active_dependency_graph
         ):
             _verify_active_generated_video(bundle, attempt, request)
     verify_video_evidence(

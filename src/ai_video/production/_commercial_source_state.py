@@ -142,7 +142,7 @@ def reject_explicit_commercial_source_fields(value: object) -> object:
         "commercial_source_attempts",
     }
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version not in {"2.12", "2.13"} and fields.intersection(value):
+    if manifest_version not in {"2.12", "2.13", "2.14"} and fields.intersection(value):
         raise ValueError(
             f"Production Manifest {manifest_version} cannot contain commercial source state"
         )
@@ -164,6 +164,6 @@ def validate_commercial_source_manifest(manifest: Any) -> None:
 def serialize_commercial_source_manifest(
     data: dict[str, object], schema_version: str
 ) -> None:
-    if schema_version not in {"2.12", "2.13"}:
+    if schema_version not in {"2.12", "2.13", "2.14"}:
         data.pop("active_commercial_source_approvals", None)
         data.pop("commercial_source_attempts", None)

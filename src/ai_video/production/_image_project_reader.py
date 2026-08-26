@@ -868,7 +868,7 @@ def verify_hard_cut_keyframe_evidence(
 
 
 def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
-    if bundle.manifest.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13"}:
+    if bundle.manifest.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
         return
     attempts = tuple(
         item

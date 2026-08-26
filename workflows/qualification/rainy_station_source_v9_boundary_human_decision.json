@@ -1,0 +1,20 @@
+{
+  "schema_version": "1",
+  "resolved_generation_hash": "3dd67dc23cc7e7cd981d0f49e75cfcfb4b23ab3967f3ef9365f4fd9029b055ed",
+  "artifact_sha256": "5324a2b0c65fea658b0ab5267020dbb00ecc080988a50987c46c1f9d21e4bbdf",
+  "reviewer": {
+    "name": "human-user",
+    "version": "2026-08-26"
+  },
+  "raw_full_speed_reviewed": true,
+  "identity_match": true,
+  "camera_axis_match": true,
+  "framing_match": true,
+  "motion_direction_match": true,
+  "action_phase_match": true,
+  "entrance_exit_match": true,
+  "no_unexpected_stop_or_reentry": true,
+  "pacing_waiver": true,
+  "rationale": "Exact v9 media accepted by the user; the observed slow pacing is explicitly waived and no other continuity dimension is waived.",
+  "content_hash": "51d3523e4125d20fd3c0a046f57f202c1ca1a7c0f911be310b45d03b28646a05"
+}

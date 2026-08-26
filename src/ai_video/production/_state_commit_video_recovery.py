@@ -20,6 +20,12 @@ from ._state_commit_video_candidate import resolve_video_activation_dependency_s
 from ._state_commit_video_commercial import (
     validate_current_commercial_video_state,
 )
+from ._state_commit_video_source_boundary import (
+    validate_current_source_boundary_video_state,
+)
+from ai_video.production.shot_continuity_source_review import (
+    validate_source_boundary_review_intent,
+)
 
 
 class _StateCommitVideoRecoveryMixin:
@@ -53,9 +59,11 @@ class _StateCommitVideoRecoveryMixin:
                         "Recoverable video validation has no fetch receipt."
                     )
                 if state.local_fetch_receipt is not None:
-                    self._reopen_local_video_fetch(state.local_fetch_receipt)
+                    fetch_receipt = self._reopen_local_video_fetch(
+                        state.local_fetch_receipt
+                    )
                 else:
-                    self._reopen_video_fetch(state.fetch_receipt)
+                    fetch_receipt = self._reopen_video_fetch(state.fetch_receipt)
                 if state.terminal_frame_extraction is not None:
                     self._reopen_terminal_frame_extraction(
                         state.terminal_frame_extraction
@@ -78,10 +86,8 @@ class _StateCommitVideoRecoveryMixin:
                                 "Recoverable continuity evidence does not match its intent."
                             )
                 if state.commercial_evaluation is not None:
-                    commercial_intent = (
-                        self._reopen_commercial_shot_evaluation_intent(
-                            state.commercial_evaluation.intent
-                        )
+                    commercial_intent = self._reopen_commercial_shot_evaluation_intent(
+                        state.commercial_evaluation.intent
                     )
                     if state.commercial_evaluation.evidence is not None:
                         commercial_evidence = (
@@ -98,6 +104,39 @@ class _StateCommitVideoRecoveryMixin:
                             raise _state_invalid(
                                 "Recoverable commercial Shot evidence does not match its intent."
                             )
+                if state.source_boundary_evaluation is not None:
+                    source_evaluation = state.source_boundary_evaluation
+                    source_intent = self._reopen_source_boundary_review_intent(
+                        source_evaluation.intent
+                    )
+                    request = self._reopen_video_request(state.request)
+                    try:
+                        validate_source_boundary_review_intent(
+                            request=request,
+                            fetch_receipt=fetch_receipt,
+                            intent=source_intent,
+                        )
+                    except ValueError as exc:
+                        raise _state_invalid(
+                            "Recoverable source boundary intent is not exact.",
+                            str(exc),
+                        ) from exc
+                    if source_evaluation.evidence is not None:
+                        if (
+                            source_evaluation.receipt is None
+                            or source_evaluation.probe is None
+                            or source_evaluation.provenance is None
+                        ):
+                            raise _state_invalid(
+                                "Recoverable source boundary checkpoint is incomplete."
+                            )
+                        validate_current_source_boundary_video_state(
+                            self,
+                            manifest=manifest,
+                            state=state,
+                            request=request,
+                            require_pass=False,
+                        )
                 protected_validate[attempt.attempt_id] = attempt
                 # The generic recovery owner must not reinterpret a safely
                 # persisted post-fetch phase.  Restore this exact attempt below.
@@ -128,6 +167,9 @@ class _StateCommitVideoRecoveryMixin:
                 )
             graph = self._reopen_dependency_graph(attempt.candidate_dependency_graph)
             request = self._reopen_video_request(state.request)
+            validate_current_source_boundary_video_state(
+                self, manifest=manifest, state=state, request=request
+            )
             validate_current_commercial_video_state(
                 self, manifest=manifest, state=state, request=request
             )
@@ -159,9 +201,7 @@ class _StateCommitVideoRecoveryMixin:
                 target_shot_id=scope.request.target_shot_id,
                 output_asset_id=request.output_asset_id,
                 continuity_asset_id=(
-                    expected_continuity_ids[0]
-                    if expected_continuity_ids
-                    else None
+                    expected_continuity_ids[0] if expected_continuity_ids else None
                 ),
             )
             if (
@@ -223,7 +263,6 @@ class _StateCommitVideoRecoveryMixin:
         )
         repaired, changed, items = super()._recover_attempts(delegated_manifest)
         repaired = [
-            protected_validate.get(attempt.attempt_id, attempt)
-            for attempt in repaired
+            protected_validate.get(attempt.attempt_id, attempt) for attempt in repaired
         ]
         return repaired, changed or candidate_changed, [*items, *candidate_items]
