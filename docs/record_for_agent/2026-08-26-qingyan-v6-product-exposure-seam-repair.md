@@ -2,6 +2,14 @@
 
 Date: 2026-08-26
 
+> Human supersession (2026-08-26): 用户播放 exact v6 后继续判定为 human `FAIL`。新的 blocking
+> findings 是：product hero 背后移动的浅黄色光带没有必要；golden-fluid benefit 与 source
+> packshot 应各自只出现一次并固定为最后两个 Shot；把 fade-to-white / fade-from-white 用作几乎
+> 每个 seam 的默认处理形成连续白光闪屏。V6 的历史测量仍保留，但不再是 current delivery
+> candidate。替代 local development candidate 是
+> `2026-08-26-qingyan-v7-final-two-shot-hard-cut-repair.md` 记录的 v7；其 targeted Agent Gate
+> 为 `PASS`，新的用户 human verdict 仍为 `PENDING`。
+
 ## Purpose
 
 本文记录用户对 exact v5 进行 human playback 后的第二轮 correction。用户指出：开局约 2 秒从空手状态
