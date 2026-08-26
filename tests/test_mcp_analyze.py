@@ -1,15 +1,26 @@
 from __future__ import annotations
 
+import asyncio
+import ast
 import importlib
 import json
+import multiprocessing
 import os
 import stat
 import threading
+import time
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from ai_video_mcp.tools.analyze import video_analyze
+from ai_video_mcp.serialization import (
+    async_serialized_execution,
+    default_serialization_lock_path,
+    run_serialized,
+    serialized_execution,
+)
 
 from conftest import skip_no_ffmpeg
 
@@ -22,6 +33,21 @@ CLAUDE_MCP_CONFIG_PATH = ROOT / ".mcp.json"
 
 def _analysis_hook():
     return importlib.import_module("ai_video_mcp.analysis_hook")
+
+
+def _hold_serialization_lock(
+    lock_path: str,
+    ready: Any,
+    start: Any,
+    events: Any,
+) -> None:
+    ready.put(os.getpid())
+    if not start.wait(5):
+        raise RuntimeError("timed out waiting for concurrent start")
+    with serialized_execution(Path(lock_path)):
+        events.put(("entered", os.getpid(), time.monotonic()))
+        time.sleep(0.15)
+        events.put(("exited", os.getpid(), time.monotonic()))
 
 
 def _generated_event(video: Path, *, tool_name: str = "Bash") -> dict[str, object]:
@@ -81,6 +107,164 @@ class TestVideoAnalyze:
         assert "has_audio" in s
         assert "scene_count" in s
         assert "frames_extracted" in s
+
+
+def test_explicit_mcp_calls_are_serialized_across_server_processes(
+    tmp_path: Path,
+) -> None:
+    context = multiprocessing.get_context("spawn")
+    lock_path = tmp_path / "state" / "worker.lock"
+    ready = context.Queue()
+    start = context.Event()
+    events = context.Queue()
+    processes = [
+        context.Process(
+            target=_hold_serialization_lock,
+            args=(str(lock_path), ready, start, events),
+        )
+        for _ in range(2)
+    ]
+
+    for process in processes:
+        process.start()
+    for _ in processes:
+        ready.get(timeout=5)
+    start.set()
+
+    recorded = [events.get(timeout=5) for _ in range(4)]
+    for process in processes:
+        process.join(timeout=5)
+        assert process.exitcode == 0
+
+    active = 0
+    peak_active = 0
+    for event, _pid, _timestamp in sorted(recorded, key=lambda item: item[2]):
+        if event == "entered":
+            active += 1
+            peak_active = max(peak_active, active)
+        else:
+            active -= 1
+
+    assert active == 0
+    assert peak_active == 1
+    assert stat.S_IMODE(lock_path.stat().st_mode) == 0o600
+
+
+def test_explicit_calls_and_background_hook_share_one_lock_owner() -> None:
+    hook = _analysis_hook()
+    assert default_serialization_lock_path(ROOT) == (
+        hook.default_state_root(ROOT) / "worker.lock"
+    )
+
+
+def test_cancelled_serialization_waiter_never_starts_its_operation(
+    tmp_path: Path,
+) -> None:
+    lock_path = tmp_path / "state" / "worker.lock"
+    operation_started = False
+
+    async def exercise_cancellation() -> None:
+        nonlocal operation_started
+
+        async def waiting_operation() -> None:
+            nonlocal operation_started
+            async with async_serialized_execution(
+                lock_path, poll_interval_seconds=0.01
+            ):
+                operation_started = True
+
+        with serialized_execution(lock_path):
+            task = asyncio.create_task(waiting_operation())
+            await asyncio.sleep(0.05)
+            task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await task
+
+        await asyncio.sleep(0.05)
+
+    asyncio.run(exercise_cancellation())
+    assert operation_started is False
+
+
+def test_cancelled_running_operation_holds_lock_until_worker_finishes(
+    tmp_path: Path,
+) -> None:
+    lock_path = tmp_path / "state" / "worker.lock"
+    first_started = threading.Event()
+    release_first = threading.Event()
+    second_started = threading.Event()
+
+    def first_operation() -> None:
+        first_started.set()
+        assert release_first.wait(2)
+
+    def second_operation() -> None:
+        second_started.set()
+
+    async def exercise_cancellation() -> None:
+        first_task = asyncio.create_task(
+            run_serialized(
+                first_operation,
+                lock_path=lock_path,
+                poll_interval_seconds=0.01,
+            )
+        )
+        assert await asyncio.to_thread(first_started.wait, 1)
+        first_task.cancel()
+        second_task = asyncio.create_task(
+            run_serialized(
+                second_operation,
+                lock_path=lock_path,
+                poll_interval_seconds=0.01,
+            )
+        )
+
+        await asyncio.sleep(0.05)
+        assert not first_task.done()
+        assert not second_started.is_set()
+        first_task.cancel()
+        await asyncio.sleep(0.05)
+        assert not first_task.done()
+        assert not second_started.is_set()
+        release_first.set()
+
+        with pytest.raises(asyncio.CancelledError):
+            await first_task
+        await second_task
+
+    asyncio.run(exercise_cancellation())
+    assert second_started.is_set()
+
+
+def test_every_public_mcp_tool_uses_the_shared_serialized_entrypoint() -> None:
+    server_path = ROOT / "src" / "ai_video_mcp" / "server.py"
+    tree = ast.parse(server_path.read_text(encoding="utf-8"))
+    public_tool_names = {
+        "video_probe",
+        "video_extract_frames",
+        "video_transcribe",
+        "video_scene_detect",
+        "video_analyze",
+        "video_review",
+        "video_optimize_plan",
+        "video_apply_optimization",
+    }
+    tool_functions = {
+        node.name: node
+        for node in tree.body
+        if isinstance(node, ast.AsyncFunctionDef) and node.name in public_tool_names
+    }
+
+    assert set(tool_functions) == public_tool_names
+    for function in tool_functions.values():
+        serialized_calls = [
+            node
+            for node in ast.walk(function)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "_run_serialized"
+        ]
+        assert len(serialized_calls) == 1, function.name
 
 
 def test_generated_local_mp4_is_queued_once_without_blocking(tmp_path: Path) -> None:

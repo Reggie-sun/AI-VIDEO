@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-import asyncio
-from typing import Optional
+from collections.abc import Callable
+from typing import Any, Optional
 
 from mcp.server.fastmcp import FastMCP, Context
 
 from ai_video_mcp.cache import AnalysisCache
 from ai_video_mcp.config import get_config, ServerConfig
 from ai_video_mcp.errors import McpError
+from ai_video_mcp.serialization import run_serialized
 from ai_video_mcp.tools.analyze import video_analyze as _video_analyze
 from ai_video_mcp.tools.apply_optimization import apply_video_optimization as _apply_video_optimization
 from ai_video_mcp.tools.frames import video_extract_frames as _video_extract_frames
@@ -38,6 +39,12 @@ def _handle_error(e: Exception) -> dict:
     return {"error": "internal", "message": str(e)}
 
 
+async def _run_serialized(
+    operation: Callable[..., dict], *args: Any, **kwargs: Any
+) -> dict:
+    return await run_serialized(operation, *args, **kwargs)
+
+
 @mcp.tool()
 async def video_probe(video_path: str, ctx: Context) -> dict:
     """Extract video metadata: duration, resolution, fps, codec, bitrate, audio info.
@@ -46,7 +53,7 @@ async def video_probe(video_path: str, ctx: Context) -> dict:
         video_path: Absolute path to the video file
     """
     try:
-        return await asyncio.to_thread(_video_probe, video_path, config, cache)
+        return await _run_serialized(_video_probe, video_path, config, cache)
     except Exception as e:
         return _handle_error(e)
 
@@ -72,7 +79,7 @@ async def video_extract_frames(
         format: Image format "jpeg" or "png" (default: "jpeg")
     """
     try:
-        return await asyncio.to_thread(
+        return await _run_serialized(
             _video_extract_frames,
             video_path, config, cache,
             interval_seconds=interval_seconds,
@@ -102,7 +109,7 @@ async def video_transcribe(
         word_timestamps: Include word-level timestamps (default: false)
     """
     try:
-        return await asyncio.to_thread(
+        return await _run_serialized(
             _video_transcribe,
             video_path, config, cache,
             model=model,
@@ -128,7 +135,7 @@ async def video_scene_detect(
         min_scene_length_seconds: Minimum seconds between scenes (default: 1.0)
     """
     try:
-        return await asyncio.to_thread(
+        return await _run_serialized(
             _video_scene_detect,
             video_path, config, cache,
             threshold=threshold,
@@ -163,7 +170,7 @@ async def video_analyze(
         scene_threshold: Scene change threshold (default: 0.4)
     """
     try:
-        return await asyncio.to_thread(
+        return await _run_serialized(
             _video_analyze,
             video_path, config, cache,
             extract_frames=extract_frames,
@@ -197,7 +204,7 @@ async def video_review(
         transcribe_audio: Whether to include Whisper speaking-duration evidence (default: false)
     """
     try:
-        return await asyncio.to_thread(
+        return await _run_serialized(
             _video_review,
             video_path,
             config,
@@ -230,7 +237,7 @@ async def video_optimize_plan(
         manifest_path: Optional absolute path to a run manifest that can provide project and shot paths
     """
     try:
-        return await asyncio.to_thread(
+        return await _run_serialized(
             _video_optimize_plan,
             video_path,
             config,
@@ -263,7 +270,7 @@ async def video_apply_optimization(
         manifest_path: Optional absolute path to a run manifest that can provide project and shot paths
     """
     try:
-        return await asyncio.to_thread(
+        return await _run_serialized(
             _apply_video_optimization,
             video_path,
             config,

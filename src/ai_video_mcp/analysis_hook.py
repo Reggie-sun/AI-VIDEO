@@ -13,6 +13,8 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+from ai_video_mcp.serialization import serialization_state_root, serialized_execution
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 JOB_SCHEMA = "ai-video-analysis-hook/1"
@@ -37,25 +39,8 @@ def _is_relative_to(path: Path, root: Path) -> bool:
     return True
 
 
-def _git_dir(project_root: Path) -> Path:
-    dot_git = project_root / ".git"
-    if dot_git.is_dir():
-        return dot_git.resolve()
-    try:
-        marker = dot_git.read_text(encoding="utf-8")
-    except OSError:
-        return dot_git
-    prefix = "gitdir:"
-    if not marker.lower().startswith(prefix):
-        return dot_git
-    candidate = Path(marker[len(prefix) :].strip())
-    if not candidate.is_absolute():
-        candidate = project_root / candidate
-    return candidate.resolve()
-
-
 def default_state_root(project_root: Path = PROJECT_ROOT) -> Path:
-    return _git_dir(project_root.resolve()) / "ai-video-analysis-hook"
+    return serialization_state_root(project_root)
 
 
 def _ensure_private_directory(path: Path) -> None:
@@ -540,15 +525,7 @@ def process_job(
     payload = _load_job(job_path)
     state_root = job_path.parent.parent
     _ensure_private_directory(state_root)
-    worker_lock_path = state_root / "worker.lock"
-    worker_lock_fd = os.open(
-        worker_lock_path,
-        os.O_RDWR | os.O_CREAT | getattr(os, "O_NOFOLLOW", 0),
-        0o600,
-    )
-    try:
-        os.fchmod(worker_lock_fd, 0o600)
-        fcntl.flock(worker_lock_fd, fcntl.LOCK_EX)
+    with serialized_execution(state_root / "worker.lock"):
         return _process_job_locked(
             job_path,
             payload,
@@ -556,8 +533,6 @@ def process_job(
             analyze,
             analysis_profile_fingerprint or _analysis_profile_fingerprint(),
         )
-    finally:
-        os.close(worker_lock_fd)
 
 
 def _process_job_locked(
