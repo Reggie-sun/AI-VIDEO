@@ -8,8 +8,8 @@ Date: 2026-08-26
 zero-effect preflight、唯一Local FL2VA submit/poll/fetch与真实MP4诊断。它回答两个不同问题：v7 hard cut与
 tail freeze是否由endpoint repair消除，以及该technical repair是否已经足以授权accepted source或M0。
 
-本记录不把successful fetch、Codex direct visual review或单一metric升级为human/P6、accepted candidate、
-terminal/motion-tail、M0 effect、activation、Final Acceptance、push或release。
+本记录不把successful fetch、Codex direct visual review、单一metric或用户的人眼镜头通过结论升级为
+automatic P6、accepted candidate、terminal/motion-tail、M0 effect、activation、Final Acceptance、push或release。
 
 ## Current Runtime Truth
 
@@ -105,6 +105,17 @@ acceptance：frozen rubric声明SSIM minimum `0.9`，本轮grayscale SSIM通过�
 没有冻结哪一口径可作为canonical verdict。Direct visual认为endpoint composition一致，但不能替代该contract
 decision或human/P6。
 
+## Human Verdict
+
+2026-08-26，用户观看上述exact MP4后指出人物行走观感偏慢，并询问这是否为有意生成的slow-motion镜头。
+在本session明确说明没有执行retime、插帧或slowdown，并说明“若排除该pacing问题，镜头的no-cut、no-teleport、identity、scene与screen-direction continuity
+可通过，但不等于automatic P6、M0或Final Acceptance”后，用户回复“通过”。
+
+因此，绑定fetch SHA-256
+`5324a2b0c65fea658b0ab5267020dbb00ecc080988a50987c46c1f9d21e4bbdf`的human visual subjective verdict为
+`PASS_WITH_PACING_WAIVER`。该waiver只表示用户明确不把本镜头的偏慢行走观感作为拒绝项；它不表示视频经过了
+retime，也不改变boundary measurement、automatic P6、candidate、M0、activation或Final Acceptance contract。
+
 ## Assessment
 
 分层结论为：
@@ -115,11 +126,11 @@ decision或human/P6。
 - no-cut/no-teleport/screen-direction/continuing-gait technical continuity：`PASS`；
 - exact boundary threshold：`NOT_EVALUATED`，measurement method尚未canonical冻结；
 - automatic P6：`NOT_EVALUATED`，resolved source request的`continuity_binding=null`，不得合成binding旁路；
-- human full-speed/P6 verdict：未记录；
+- human visual subjective verdict：`PASS_WITH_PACING_WAIVER`，只豁免用户明确接受的偏慢行走观感；
 - accepted source、candidate、terminal/motion-tail、M0、activation、Final Acceptance：均未发生。
 
-因此当前v9不能因repair成功就进入Milestone 4 M0。下一真实gate是用户直接观看exact MP4并给出full-speed
-human verdict，同时由accepted contract明确boundary measurement owner；在此之前不得调用
+Human visual gate已经关闭，但当前v9仍不能仅因该结论进入Milestone 4 M0。下一真实gate是由accepted contract
+明确boundary measurement owner并关闭exact boundary/P6缺口；本次用户“通过”也不是新的M0执行授权。在此之前不得调用
 `VideoGenerationService.validate_once()`推进candidate，也不得派生terminal/motion-tail或触发M0/M1。
 
 ## Verification And Checkpoints
@@ -142,6 +153,7 @@ integrity、freshness、snapshot、scope与workspace flags均为`true`。Native 
 - v7与v9是不同exact artifacts；v9修复不能抹掉v7失败历史。
 - 相同seed derivation不等于相同numeric seed；不得把v7→v9描述为严格endpoint-only live A/B。
 - `technical continuity PASS`不等于`boundary/P6/human acceptance PASS`。
+- `PASS_WITH_PACING_WAIVER`只绑定上述exact MP4与用户明确排除的偏慢观感，不是全局放宽motion rubric。
 - grayscale与RGB SSIM不能任选有利结果；canonical measurement method未冻结时保持`NOT_EVALUATED`。
 - `submit/poll/fetch succeeded`不授权candidate、M0、retry、fallback或activation。
 - 本次one-submit authorization已消耗；不得再次提交同一或不同ID来补做variant。

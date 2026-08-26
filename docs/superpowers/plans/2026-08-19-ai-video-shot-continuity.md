@@ -622,7 +622,9 @@ profile/compiler/workflow已物化或可执行。Exact paths与dynamic status仍
 Execution update (2026-08-26): 上述2026-08-23 hashes与v7 failure均保留为historical checkpoint。Current v9
 materialized identities与single motion-endpoint source attempt由runtime baseline和2026-08-26 session record
 拥有；真实MP4已关闭observed hard-cut/tail-freeze outcome，因果归因由historical isolated endpoint A/B支持，
-但canonical boundary acceptance与human/P6尚未关闭，故Milestone 4 M0仍未开始，M1 conditional gate也未触发。
+用户对exact v9 MP4的人眼镜头结论为`PASS_WITH_PACING_WAIVER`，只豁免其明确接受的偏慢行走观感；canonical
+boundary acceptance与automatic P6仍未关闭，本次human verdict也不构成M0执行授权，故Milestone 4 M0仍未开始，
+M1 conditional gate也未触发。
 
 ## Milestone 4: Execute M0, Then Conditional M1
 
