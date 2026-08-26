@@ -2,6 +2,45 @@
 
 Date: 2026-08-26
 
+## 2026-08-26 Canonical Rerun Preflight Stop
+
+用户在 current `main` 包含 Ecommerce whole-ad Gate 2 与 canonical
+`run_ecommerce_ad_production()` closure 后，明确要求只重新运行一次。本次在任何 ComfyUI / GPU
+submit 前按 Gate 停止；没有生成新的 Shot、voice、composition 或 final MP4，也没有 remote、paid、
+retry 或 fallback effect。
+
+当前代码侧 focused verification 为：
+
+```text
+python -m pytest -p no:cacheprovider \
+  tests/test_production_ecommerce_quality_gate.py \
+  tests/test_production_ecommerce_post_media_e2e.py \
+  tests/test_production_ecommerce_ad_coordinator.py \
+  tests/test_production_review.py \
+  tests/test_shot_continuity_m0_policy.py \
+  tests/test_shot_continuity_m0_fast_validation.py -q
+
+77 passed in 47.59s
+```
+
+该 PASS 只证明 current code contracts；它不使本广告 live-ready。实际 preflight 仍有三个
+blocking gaps：
+
+1. `artifacts/qingyan-miao-ad-20260825/ecommerce-input.json` 的 `input/1` validator 为 valid，
+   但没有对应 `package/2`；同目录 `authoring-contract.md` 仍明确记录 temporal
+   product-fidelity capability 未闭合，不能声明 `PACKAGE_READY`。
+2. current host `/home/reggie/ComfyUI/custom_nodes/minimax-h3-audio-T8` checkout 为
+   `28cb160827c245b2d6a37539df30c1d7c5e7aecd`，而 shipped T8 native/`fast-v1` sealed
+   execution sources要求 `977df788fcf8b971dc3d0fc7d6baa79a0edfaf40`。未修改、更新或切换
+   external checkout，也没有绕过 runtime identity validation。
+3. shipped T8 native和`fast-v1` profiles当前仍封存`1344x768` canvas；它们不能直接冒充
+   用户要求的 native portrait generation contract。旧 development-side `768x1344` runner
+   不属于新的 canonical Production closure，因此没有 fallback 到该路径。
+
+本 checkpoint 的 current verdict 是 `BLOCKED_BEFORE_LOCAL_SUBMIT`，不是 generation failure、
+quality FAIL、P6 或 Final Acceptance。先前五条 Turbo4 portrait Shot 与既有 final candidates 仍保持
+各自历史 evidence identity；本次没有覆盖、删除或重新接受它们。
+
 ## Purpose
 
 本文记录用户在 Ecommerce post-media Gate 代码更新后明确要求“重新生成”的青颜苗家女孩广告
