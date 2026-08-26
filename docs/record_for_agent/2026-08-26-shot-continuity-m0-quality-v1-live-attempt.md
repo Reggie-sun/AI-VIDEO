@@ -4,8 +4,8 @@ Date: 2026-08-26
 
 ## Purpose
 
-本文记录current v9 source-boundary P6关闭后，用户显式选择`quality-v1`并授权exact A4 feasibility与一次
-local M0 submit的完整结果。它区分engineering closure、runtime-capacity failure与尚未发生的media/P6 quality
+本文记录current v9 source-boundary P6关闭后，用户显式选择`quality-v1`并分别授权两个exactly-one-submit
+local M0 attempt的完整结果。它区分engineering closure、runtime-capacity failure与尚未发生的media/P6 quality
 acceptance；不把Harness PASS、Provider receipt或terminal OOM解释为M0 quality verdict。
 
 ## Current Runtime Truth
@@ -90,12 +90,18 @@ provider `718 passed`与provider-neutral requirement `300 passed`；Architecture
 该engineering receipt证明code/contract snapshot可复现，不改变上述live OOM。它不能代替generated MP4、
 media analysis、P6或human verdict。
 
+Explicit `--novram` supervisor support由commit
+`efac4018a5d218b6ce4bfa70cb955e70cdeac921`实现；默认仍为`--lowvram`，显式`--novram`只替换
+memory-mode flag并保留`--use-sage-attention`。Focused tests为`17 passed`，独立native reviewer verdict为
+`accept`；exact-range receipt
+`.agent/harness/runs/comfyui-supervisor-novram-range/receipt.json`已通过`verify-receipt`完整性与freshness验证。
+
 ## Assessment
 
 - source-boundary prerequisite：`PASS`，沿用existing Manifest `2.14` exact evidence；
 - A4 feasibility与pre-effect closure：`PASS`；
-- M0 `quality-v1` submit discipline：`PASS`，exactly one submit、no retry/fallback；
-- M0 runtime execution：`FAIL`，sampler GPU OOM；
+- M0 `quality-v1` submit discipline：`PASS`，两个独立授权attempt各exactly one submit，no retry/fallback；
+- M0 runtime execution：`FAIL`，`--lowvram`与`--novram`均在sampler GPU OOM；
 - generated artifact/probe/decode/media analysis：`NOT_EVALUATED`，没有MP4；
 - M0 P6/human quality verdict：`NOT_EVALUATED`；
 - M0 winner/activation：未发生；
@@ -104,15 +110,15 @@ media analysis、P6或human verdict。
 
 ## Remaining Boundary
 
-Milestone 4不再是not started，而是M0 attempted/failed。当前授权已在唯一submit中消费，且durable attempt为
-terminal `stop`；不得blind retry、remint permit或把OOM解释为可以自动切换`fast-v1`。只有用户新的明确授权才可
+Milestone 4不再是not started，而是M0 attempted/failed。两个独立授权均已在各自唯一submit中消费，且durable
+attempt都为terminal `stop`；不得blind retry、remint permit或把OOM解释为可以自动切换`fast-v1`。只有用户新的明确授权才可
 开始新的M0 attempt、改变policy/profile/geometry/runtime capacity strategy，或准备/提交M1。
 
 如果未来选择继续M1，必须先关闭exact validated pruned pair inventory/build gate；当前`absent/none`不允许把
 M1当作automatic fallback。如果未来选择重试M0，应将GPU capacity作为独立engineering变量处理，同时保持
 frozen quality policy、anchors、rubric与one-submit attribution，除非用户明确批准改变这些contract。
 
-## Isolated Retry Preparation Blocker
+## Isolated Novram Attempt
 
 用户随后授权一个新的、exactly-one-submit `quality-v1` attempt，并选择只在其他ComfyUI job/unit完整退出、
 fresh process且至少`30 GiB` free VRAM时重试。新attempt/generation/output为：
@@ -134,6 +140,29 @@ real `open/status`产生request hash
 上一M0 attempt本来已经使用`--lowvram --use-sage-attention`，因此再次使用lowvram不是新变量；H3经验边界为
 约`22–30 GiB`，不能把21 GiB静默解释为安全阈值。MCP未公开model-unload API，Agent也未kill共享进程。
 
-后续`novram` contract、停止共享MCP或继续等待三种capacity路径均需要明确选择；本次选择请求未返回结果。
-因此v2保持prepared/blocked、submit count=`0`，其one-submit authorization尚未消费。T8 checkout未切换，
-仍保持session前`28cb160827c245b2d6a37539df30c1d7c5e7aecd`。
+用户随后选择`A`，明确授权在不停止共享MCP的条件下以`--novram`执行同一v2 attempt的唯一submit。
+新的human decision
+`6f22bdc42965d7bad7bf2091c465e518fe0c4f69fa0294477aef4da842ba54f5`与approval
+`84912344b7a7e1d23ac808d3a996947d89e26e199df46551ec4bebd11455fade`继续绑定同一scope fingerprint，但以
+`--novram`、submit limit `1`、no retry/fallback/activation/M1的新evidence SHA-256
+`7f9198e1c803bdc464fd16fa175131806cafc4535e09224b55ac83604bd73e1b`替换旧lowvram授权；Manifest先进到revision `35`。
+
+Fresh supervisor unit的exact `ExecStart`为`--novram --use-sage-attention`，不含`--lowvram`；submit前queue为
+`running=[] / pending=[]`，GPU free约`21.1 GiB`。Real caller preflight重验sealed runtime/model/node/anchor bytes后，
+request hash为`af5975ea6ce075b7af7d3b8caeb2851d9188fc3cd929afbf1fc3af5f0f0b286d`。唯一submit取得Provider
+request ID `8a944ae0-ac95-4ea9-9d38-60262ba0d568`；submit intent/result分别为
+`63a6dfa209af05ea43f56c61988a7e4f7e945498b271336120d3e0105da63d73` /
+`b55f155ae2037fe58938078293bf7562784fea2ee9bca7e554ffc52a46036437`。
+
+Exact job在约`10:56`后仍于node `10` `SamplerCustomAdvanced`失败；trace定位到
+`comfy_kitchen.int8_linear -> torch.cat(scaled_parts)`的`torch.OutOfMemoryError: Allocation on device`。
+PyTorch memory summary报告peak allocated `16007 MiB`、reserved `19424 MiB`；Comfy history为
+`status_str=error` / `completed=false` / `outputs={}`。Canonical observation
+`904669db6d980121b9eb6e34962e9e945bc3bbbac0f0f651c70892d5e6dfaa5a`将Manifest推进到revision `39`，
+attempt为`video_provider_failed` / `failed` / `next_action=stop`。Action count为submit/poll/fetch=`1/1/0`，
+retry/fallback/remote/paid/activation/M1=`0/0/0/0/0/0`。
+
+本次仍未生成MP4，所以probe/full decode、project `video-analysis`、M0 P6与human quality verdict依然均为
+`NOT_EVALUATED`。Queue清空后supervisor已停止，port `8188`关闭；T8恢复到
+`28cb160827c245b2d6a37539df30c1d7c5e7aecd`且checkout clean。这关闭了“只用`novram`是否能在当前共享
+GPU状态完成Stock20 M0”的疑问：结果仍是capacity FAIL，不是model-quality verdict。

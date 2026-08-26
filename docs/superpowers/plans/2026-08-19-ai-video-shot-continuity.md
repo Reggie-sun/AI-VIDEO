@@ -49,6 +49,13 @@ effect。Milestone 4现在是M0 attempted/failed，而非not started；M1因exac
 `absent/none`而保持blocked。Current exact evidence见runtime baseline与
 `docs/record_for_agent/2026-08-26-shot-continuity-m0-quality-v1-live-attempt.md`。
 
+Execution checkpoint (2026-08-26, M0 novram): 用户又单独授权同一`quality-v1` scope的一次v2
+attempt，并选择在保留共享`video-analysis` MCP时以explicit `--novram`执行。Supervisor commit
+`efac4018a5d218b6ce4bfa70cb955e70cdeac921`与exact-range Harness通过；real preflight/queue-empty后唯一request
+`af5975ea6ce075b7af7d3b8caeb2851d9188fc3cd929afbf1fc3af5f0f0b286d`在`SamplerCustomAdvanced`再次
+GPU OOM，Manifest revision `39`为terminal `failed` / `stop`。没有MP4、fetch、retry、fallback、P6、
+activation或M1 effect；这是capacity FAIL，仍非model-quality verdict。
+
 已接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
 Implementation lane与Validation lane。Validation必须绑定immutable checkpoint，不得在同一次attempt期间
 读取正在变化的source/workflow/profile；并行执行不会放宽Provider、permit、P6或same-file ownership gates。
@@ -666,13 +673,15 @@ output MP4、probe、decoded-boundary/identity/motion evidence、P6/human verdic
 或M1 effect。M1 exact validated pruned pair仍`absent/none`，因此conditional inventory gate未关闭；任何新的
 M0 attempt、不同policy/profile或M1 preparation/submit都需要新的明确授权。
 
-Execution update (2026-08-26, isolated retry preparation): 用户授权新的one-submit `quality-v1` v2 attempt并
-选择fresh-process/empty-unit/`>=30 GiB` free VRAM gate。Exact approval
-`6e0cf3ea32f2f1d57f950584053e524ae655f3aff77b8608908962517381635e`已由canonical committer写入，
-request `904db7adfbe0d4d5236ab970ec91f32539ebd759a164137d77a850b319d315fc`仍attempt absent且submit count为0。
-外部unit已退出，但共享`video-analysis` MCP使free VRAM稳定约21 GiB；上一失败attempt本来已经使用lowvram，
-所以同条件重试不构成capacity isolation。`novram`、停止共享MCP或继续等待尚未获得明确选择；v2保持blocked，
-不得mint permit或submit。
+Execution update (2026-08-26, isolated novram attempt): 用户选择`A`，授权不停止共享MCP、使用
+explicit `--novram`的同一v2 one-submit attempt。Exact approval
+`84912344b7a7e1d23ac808d3a996947d89e26e199df46551ec4bebd11455fade`在Manifest revision `35`被strict reopen；
+fresh unit的`ExecStart`确认无`--lowvram`，queue empty，real preflight通过。唯一request
+`af5975ea6ce075b7af7d3b8caeb2851d9188fc3cd929afbf1fc3af5f0f0b286d`取得Provider request
+`8a944ae0-ac95-4ea9-9d38-60262ba0d568`，但约`10:56`后仍于node `10` `SamplerCustomAdvanced`以
+`torch.OutOfMemoryError`终止，peak allocated/reserved为`16007/19424 MiB`。Manifest revision `39`为
+terminal `failed` / `stop`；submit/poll/fetch=`1/1/0`、retry/fallback/activation/M1=`0/0/0/0`。无MP4，
+因此media/P6/human verdict均`NOT_EVALUATED`；清理后8188关闭，T8恢复原clean commit。
 
 ## Milestone 4: Execute Explicitly Selected M0, Then Conditional M1
 
