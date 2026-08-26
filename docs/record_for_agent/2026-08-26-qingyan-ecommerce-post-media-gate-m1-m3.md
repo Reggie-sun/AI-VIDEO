@@ -2,6 +2,8 @@
 
 Date: 2026-08-26
 
+> Superseded current-facing status (2026-08-26): Ecommerce whole-ad Gate 2、canonical Production caller、P6 semantic binding与Final Acceptance closure现已实现，见`docs/record_for_agent/2026-08-26-ecommerce-final-media-gate-closure.md`。本文M1–M3历史实现、verification与当时的live-media authorization boundary仍有效；“Milestone 5–7未实现/必须等待Milestone 4”不再代表current deterministic Runtime truth。
+
 ## Purpose
 
 本文记录 `2026-08-25-qingyan-ecommerce-post-media-gate-repair.md` 的 Milestone 1–3 实现 checkpoint。它保存已落地的 runtime truth、verification 和 remaining authorization boundary，不授权 Provider live call、媒体生成、P6 Gate 2、Final Acceptance 或 release claim。

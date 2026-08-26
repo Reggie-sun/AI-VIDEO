@@ -19,9 +19,11 @@ from ai_video.production.ecommerce_ad_coordinator import (
     EcommerceShotNextAction,
     EcommerceStopReason,
     run_ecommerce_ad_generation,
+    run_ecommerce_ad_production,
 )
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import QaVerdict
+from ai_video.production.state_commit import ProductionStateCommitter
 from production_project_factory import make_composition_spec
 
 
@@ -167,8 +169,7 @@ def _facades(
 ):
     handoff = _handoff()
     by_shot = {
-        item.target_shot_id: item
-        for item in handoff.commercial_execution_projections
+        item.target_shot_id: item for item in handoff.commercial_execution_projections
     }
     facades = {
         "shot-b": _Facade("shot-b", by_shot["shot-b"].projection_hash),
@@ -261,4 +262,30 @@ def test_facade_identity_mismatch_stops_before_any_service_effect() -> None:
     assert result.complete is False
     assert result.stopped_shot_id == "shot-b"
     assert result.stop_reason is EcommerceStopReason.CHECKPOINT_INVALID
+    assert all(facade.effects == [] for facade in facades.values())
+
+
+def test_production_path_rejects_protocol_facades_before_any_effect(tmp_path) -> None:
+    handoff, facades = _facades()
+    render_effects: list[str] = []
+
+    with pytest.raises(ValueError, match="not owned"):
+        run_ecommerce_ad_production(
+            handoff,
+            facades=facades,  # type: ignore[arg-type]
+            activate_final_render=lambda *_: render_effects.append("render"),
+            committer=ProductionStateCommitter(tmp_path),
+            universal_profile=None,  # type: ignore[arg-type]
+            run_hard_check=lambda *_: None,  # type: ignore[arg-type]
+            run_review_layer=lambda *_: None,  # type: ignore[arg-type]
+            tool_identity=None,  # type: ignore[arg-type]
+            evaluate=lambda *_: None,  # type: ignore[arg-type]
+            review_attempt_id="unused-attempt",
+            review_request_id="unused-request",
+            evidence_id="unused-evidence",
+            review_id="unused-review",
+            final_acceptance_id="unused-final",
+        )
+
+    assert render_effects == []
     assert all(facade.effects == [] for facade in facades.values())

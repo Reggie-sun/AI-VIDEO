@@ -255,7 +255,10 @@ class _StateCommitReviewMixin:
                     raise _state_invalid("Review evidence identity does not match receipt.")
             policy = load_qa_policy(self._project_root, receipt.qa_policy)
             expected_verdict = adjudicate_review_evidence(
-                policy, receipt.layer, evidence
+                policy,
+                receipt.layer,
+                evidence,
+                review_request_content_hash=durable_request.content_hash,
             )
             if receipt.verdict is not expected_verdict:
                 raise _state_invalid("Review Receipt verdict does not match durable evidence.")

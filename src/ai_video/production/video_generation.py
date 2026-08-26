@@ -59,6 +59,12 @@ class VideoGenerationService:
         self._committer = committer
         self._provider = provider
 
+    @property
+    def project_root(self) -> Path:
+        """Return the canonical Production state root owned by this service."""
+
+        return self._committer.project_root
+
     def start(
         self,
         *,

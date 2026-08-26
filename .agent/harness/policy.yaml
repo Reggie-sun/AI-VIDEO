@@ -174,11 +174,11 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify immutable graph inputs and precise selective rebuild.
   production_review_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, tests/test_production_review.py, tests/test_production_quality_gate_coordinator.py, tests/test_production_ecommerce_media_acceptance.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, tests/test_production_review.py, tests/test_production_quality_gate_coordinator.py, tests/test_production_ecommerce_media_acceptance.py, tests/test_production_ecommerce_quality_gate.py, tests/test_production_ecommerce_post_media_e2e.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify durable review, authorization, repair, and final acceptance.
   commercial_source_preparation_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_commercial_execution.py, tests/test_production_commercial_reference.py, tests/test_production_commercial_source_preparation.py, tests/test_production_commercial_visual_review.py, tests/test_production_ecommerce_ad_coordinator.py, tests/test_production_ecommerce_product_interaction_e2e.py, tests/test_production_ad_creative.py, tests/test_planning_video_planner.py, tests/test_shot_readiness_gate.py, tests/test_production_video_requirement.py, tests/test_production_shot_router.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_image_import.py, tests/test_production_review.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_production_state_commit_structure.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_commercial_execution.py, tests/test_production_commercial_reference.py, tests/test_production_commercial_source_preparation.py, tests/test_production_commercial_visual_review.py, tests/test_production_ecommerce_ad_coordinator.py, tests/test_production_ecommerce_post_media_e2e.py, tests/test_production_ecommerce_product_interaction_e2e.py, tests/test_production_ad_creative.py, tests/test_planning_video_planner.py, tests/test_shot_readiness_gate.py, tests/test_production_video_requirement.py, tests/test_production_shot_router.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_image_import.py, tests/test_production_review.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_production_state_commit_structure.py, -q]
     cwd: .
     description: Verify product-aware commercial source projection, registered import, semantic approval, planner routing, scoped repair, replay, and recovery without Provider effects.
   production_image_tests:
@@ -492,6 +492,8 @@ categories:
     patterns:
       - src/ai_video/production/domain_acceptance.py
       - src/ai_video/production/ecommerce_media_acceptance.py
+      - src/ai_video/production/ecommerce_quality_gate.py
+      - src/ai_video/production/_ecommerce_quality_gate_p6.py
       - src/ai_video/production/_repair_freshness.py
       - src/ai_video/production/review.py
       - src/ai_video/production/continuity_evaluator.py
@@ -506,6 +508,8 @@ categories:
       - src/ai_video_mcp/tools/apply_optimization.py
       - tests/test_production_review.py
       - tests/test_production_ecommerce_media_acceptance.py
+      - tests/test_production_ecommerce_quality_gate.py
+      - tests/test_production_ecommerce_post_media_e2e.py
       - tests/test_production_quality_gate_coordinator.py
       - tests/test_production_continuity_evaluator.py
       - tests/test_production_continuity_onnx_backend.py
@@ -538,6 +542,7 @@ categories:
       - tests/test_production_commercial_visual_review.py
       - tests/test_production_ecommerce_product_interaction_e2e.py
       - tests/test_production_ecommerce_ad_coordinator.py
+      - tests/test_production_ecommerce_post_media_e2e.py
     check_ids:
       - commercial_source_preparation_tests
       - task_architecture_gate

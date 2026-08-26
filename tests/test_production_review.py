@@ -190,7 +190,7 @@ def test_domain_acceptance_policy_requires_semantic_layer_in_final_rollup():
         )
 
 
-def test_selected_ecommerce_policy_delegates_semantic_requirement_adjudication():
+def test_ecommerce_semantic_payload_without_exact_gate_target_is_not_evaluated():
     selected = _domain_qa_policy()
     asserted = evidence(
         QaLayer.SEMANTIC,
@@ -201,7 +201,7 @@ def test_selected_ecommerce_policy_delegates_semantic_requirement_adjudication()
 
     assert adjudicate_review_evidence(
         selected, QaLayer.SEMANTIC, (asserted,)
-    ) is QaVerdict.PASS
+    ) is QaVerdict.NOT_EVALUATED
     assert adjudicate_review_evidence(
         selected,
         QaLayer.SEMANTIC,

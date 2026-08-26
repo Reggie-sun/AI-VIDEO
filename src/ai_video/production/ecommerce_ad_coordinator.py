@@ -14,10 +14,35 @@ from ai_video.errors import AiVideoError
 from ai_video.production.ad_creative_types import CompiledAdCreativeHandoff
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.hashing import canonical_sha256
-from ai_video.production.models import QaVerdict
+from ai_video.production.models import (
+    FinalAcceptanceReceipt,
+    QaLayer,
+    QaVerdict,
+    SourceReference,
+    ToolIdentity,
+)
+from ai_video.production.ecommerce_quality_gate import (
+    EcommerceAcceptedShotIdentity,
+    EcommerceGateResult,
+    EcommerceWholeAdEvaluator,
+)
+from ai_video.production._ecommerce_quality_gate_p6 import (
+    _record_ecommerce_gate_review,
+)
+from ai_video.production.hashing import seal_artifact
+from ai_video.production.project import load_production_project
+from ai_video.production.quality_gate_coordinator import (
+    HardCheckRunner,
+    ReviewLayerRunner,
+    UniversalQaApplicability,
+    UniversalQaContext,
+    UniversalQaProfile,
+    UniversalQualityGateCoordinator,
+)
 from ai_video.production.paid_provider import PaidProviderCallPreview
 from ai_video.production.video import ResolvedVideoGenerationRequest
 from ai_video.production.video_generation import VideoGenerationService
+from ai_video.production.state_commit import ProductionStateCommitter
 
 
 class EcommerceShotNextAction(str, Enum):
@@ -234,6 +259,8 @@ class EcommerceVideoGenerationFacade:
 
 
 class EcommerceAdGenerationResult(StrictModel):
+    """Provider Shot-stage result only; never composition or delivery acceptance."""
+
     complete: bool
     activated_shots: tuple[ActivatedCommercialShotCheckpoint, ...]
     stopped_shot_id: str | None = None
@@ -246,6 +273,55 @@ class EcommerceAdGenerationResult(StrictModel):
         if (self.stopped_shot_id is None) != (self.stop_reason is None):
             raise ValueError("Ecommerce generation stop identity is incomplete")
         return self
+
+
+class EcommercePostMediaAcceptanceResult(StrictModel):
+    """Closure status for one exact active canonical Ecommerce render."""
+
+    shot_stage_complete: bool
+    gate_two: EcommerceGateResult
+    p6_semantic_receipt_recorded: bool = False
+    final_acceptance_recorded: bool = False
+    render_output_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    final_acceptance_content_hash: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+
+    @model_validator(mode="after")
+    def _validate_closure(self) -> "EcommercePostMediaAcceptanceResult":
+        if self.final_acceptance_recorded and (
+            not self.shot_stage_complete
+            or not self.p6_semantic_receipt_recorded
+            or self.gate_two.verdict is not QaVerdict.PASS
+            or self.render_output_sha256 is None
+            or self.final_acceptance_content_hash is None
+        ):
+            raise ValueError(
+                "Final Acceptance requires the complete exact Gate closure"
+            )
+        return self
+
+
+class EcommerceAdProductionResult(StrictModel):
+    """End-to-end result whose completion means exact Final Acceptance."""
+
+    shot_generation: EcommerceAdGenerationResult
+    post_media_acceptance: EcommercePostMediaAcceptanceResult | None = None
+
+    @model_validator(mode="after")
+    def _validate_production_result(self) -> "EcommerceAdProductionResult":
+        if self.shot_generation.complete != (self.post_media_acceptance is not None):
+            raise ValueError(
+                "Complete Ecommerce Shot execution must enter post-media acceptance"
+            )
+        return self
+
+    @property
+    def complete(self) -> bool:
+        return bool(
+            self.post_media_acceptance is not None
+            and self.post_media_acceptance.final_acceptance_recorded
+        )
 
 
 def _stopped(
@@ -374,7 +450,7 @@ def _run_claimed_shot(
 def run_ecommerce_ad_generation(
     handoff: CompiledAdCreativeHandoff,
     *,
-    facades: Mapping[str, EcommerceShotExecutionFacade],
+    facades: Mapping[str, EcommerceVideoGenerationFacade],
     stop_requested: Callable[[], bool] | None = None,
 ) -> EcommerceAdGenerationResult:
     """Run Provider Shots strictly in proposal order with a synchronous PASS barrier."""
@@ -384,8 +460,7 @@ def run_ecommerce_ad_generation(
     )
     proposal_ids = tuple(item.shot_id for item in selected.shot_proposals)
     projection_by_shot = {
-        item.target_shot_id: item
-        for item in selected.commercial_execution_projections
+        item.target_shot_id: item for item in selected.commercial_execution_projections
     }
     if set(projection_by_shot) != set(proposal_ids):
         raise ValueError("Commercial projections must cover exact proposed Shot IDs")
@@ -467,12 +542,307 @@ def run_ecommerce_ad_generation(
     )
 
 
+def _close_ecommerce_post_media_candidate(
+    *,
+    committer: ProductionStateCommitter,
+    handoff: CompiledAdCreativeHandoff,
+    shot_facades: Mapping[str, EcommerceVideoGenerationFacade],
+    universal_profile: UniversalQaProfile,
+    run_hard_check: HardCheckRunner,
+    run_review_layer: ReviewLayerRunner,
+    tool_identity: ToolIdentity,
+    evaluate: EcommerceWholeAdEvaluator,
+    review_attempt_id: str,
+    review_request_id: str,
+    evidence_id: str,
+    review_id: str,
+    final_acceptance_id: str,
+) -> EcommercePostMediaAcceptanceResult:
+    """Close an already-active canonical render through Gate 2, P6, and Final Acceptance.
+
+    This function never accepts a file path or arbitrary MP4. The exact bytes must
+    already be the current Production render bound by ``timeline`` and Gate 1.
+    """
+
+    bundle, timeline = committer.current_final_media_target()
+    policy = bundle.qa_policy
+    render_state = bundle.render_state
+    if (
+        policy is None
+        or render_state is None
+        or bundle.manifest.active_dependency_graph is None
+        or bundle.manifest.active_render_state is None
+    ):
+        raise ValueError(
+            "Ecommerce closure requires current canonical Production state"
+        )
+
+    actual_applicability = UniversalQaApplicability(
+        has_audio=bool(timeline.audio_spans),
+        has_captions=bool(timeline.caption_cues),
+        has_graphics=bool(timeline.commercial_graphics)
+        or any(item.graphic_animation is not None for item in timeline.visual_spans),
+        has_safe_area_requirements=(
+            universal_profile.applicability.has_safe_area_requirements
+        ),
+        has_transitions=any(
+            item.incoming_transition is not None for item in timeline.visual_spans
+        ),
+        requires_continuity=universal_profile.applicability.requires_continuity,
+    )
+    universal_context = UniversalQaContext(
+        delivery_profile=timeline.delivery_profile,
+        applicability=actual_applicability,
+        project_content_hash=bundle.manifest.active_project.content_hash,
+        registry_content_hash=bundle.manifest.active_registry.content_hash,
+        dependency_graph_revision_id=(
+            bundle.manifest.active_dependency_graph.revision_id
+        ),
+        render_state_content_hash=bundle.manifest.active_render_state.content_hash,
+        render_output_sha256=render_state.output.file_sha256,
+        timeline_fingerprint=render_state.timeline_fingerprint,
+        qa_policy_content_hash=policy.content_hash,
+    )
+    universal_result = UniversalQualityGateCoordinator().run_once(
+        profile=universal_profile,
+        context=universal_context,
+        policy=policy,
+        run_hard_check=run_hard_check,
+        run_review_layer=run_review_layer,
+    )
+
+    projection_by_shot = {
+        item.target_shot_id: item for item in handoff.commercial_execution_projections
+    }
+    provider_shot_ids = tuple(
+        item.shot_id
+        for item in handoff.shot_proposals
+        if projection_by_shot[item.shot_id].invoke_video_provider
+    )
+    if set(shot_facades) != set(provider_shot_ids):
+        raise ValueError(
+            "Current Provider Shot sources do not match the Ecommerce plan"
+        )
+
+    checkpoints: list[ActivatedCommercialShotCheckpoint] = []
+    for shot_id in provider_shot_ids:
+        facade = shot_facades[shot_id]
+        projection = projection_by_shot[shot_id]
+        if (
+            not isinstance(facade, EcommerceVideoGenerationFacade)
+            or facade.service.project_root.resolve() != committer.project_root.resolve()
+            or facade.bound_commercial_identity()
+            != (handoff.plan_content_hash, projection.projection_hash, shot_id)
+        ):
+            raise ValueError(
+                "Ecommerce Shot source is not bound to current Production state"
+            )
+        checkpoint = facade.current_activation_checkpoint()
+        if not _checkpoint_is_exact(
+            checkpoint,
+            plan_hash=handoff.plan_content_hash,
+            projection_hash=projection.projection_hash,
+            shot_id=shot_id,
+        ):
+            raise ValueError("Ecommerce Shot checkpoint is not current and activated")
+        assert checkpoint is not None
+        checkpoints.append(checkpoint)
+
+    accepted_shots = tuple(
+        EcommerceAcceptedShotIdentity.create(
+            ad_creative_plan_hash=item.ad_creative_plan_hash,
+            commercial_execution_projection_hash=(
+                item.commercial_execution_projection_hash
+            ),
+            shot_id=item.shot_id,
+            resolved_generation_hash=item.resolved_generation_hash,
+            artifact_sha256=item.artifact_sha256,
+            commercial_evidence_content_hash=item.commercial_evidence_content_hash,
+            checkpoint_content_hash=item.content_hash,
+        )
+        for item in checkpoints
+    )
+    review = _record_ecommerce_gate_review(
+        committer=committer,
+        universal_profile=universal_profile,
+        universal_context=universal_context,
+        universal_result=universal_result,
+        policy=policy,
+        handoff=handoff,
+        accepted_shots=accepted_shots,
+        tool_identity=tool_identity,
+        evaluate=evaluate,
+        attempt_id=review_attempt_id,
+        request_id=review_request_id,
+        evidence_id=evidence_id,
+        review_id=review_id,
+    )
+    if (
+        review.gate.result.verdict is not QaVerdict.PASS
+        or not review.p6_receipt_recorded
+    ):
+        return EcommercePostMediaAcceptanceResult(
+            shot_stage_complete=True,
+            gate_two=review.gate.result,
+            p6_semantic_receipt_recorded=review.p6_receipt_recorded,
+        )
+
+    bundle = load_production_project(committer.project_root / "project.yaml")
+    manifest = bundle.manifest
+    render_state = bundle.render_state
+    if (
+        manifest.active_dependency_graph is None
+        or manifest.active_render_state is None
+        or manifest.active_qa_policy is None
+        or render_state is None
+    ):
+        raise ValueError("Final Acceptance requires current canonical Production state")
+    required_layers = {
+        layer
+        for layer in policy.required_layers
+        if layer is not QaLayer.FINAL_ACCEPTANCE
+    }
+    current_receipts = tuple(
+        item
+        for item in manifest.active_review_receipts
+        if item.layer in required_layers
+    )
+    if {item.layer for item in current_receipts} != required_layers:
+        raise ValueError(
+            "Final Acceptance requires all current Gate 1 and Gate 2 receipts"
+        )
+    acceptance = seal_artifact(
+        FinalAcceptanceReceipt(
+            artifact_id=final_acceptance_id,
+            revision=1,
+            content_hash="0" * 64,
+            creation_receipt_id=final_acceptance_id,
+            source_provenance=(
+                SourceReference(
+                    kind="derived", reference=review.gate.result.content_hash
+                ),
+            ),
+            acceptance_id=final_acceptance_id,
+            dependency_graph=manifest.active_dependency_graph,
+            dependency_states_hash=canonical_sha256(
+                {
+                    "dependency_states": [
+                        item.model_dump(mode="json")
+                        for item in manifest.dependency_states
+                    ]
+                }
+            ),
+            render_state=manifest.active_render_state,
+            render_output_sha256=render_state.output.file_sha256,
+            timeline_fingerprint=render_state.timeline_fingerprint,
+            qa_policy=manifest.active_qa_policy,
+            required_review_receipts=current_receipts,
+            verdict=QaVerdict.PASS,
+        )
+    )
+    accepted = committer.record_final_acceptance(
+        acceptance,
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id=final_acceptance_id,
+    )
+    if accepted.final_acceptance_state is None:
+        raise ValueError("Final Acceptance was not recorded")
+    return EcommercePostMediaAcceptanceResult(
+        shot_stage_complete=True,
+        gate_two=review.gate.result,
+        p6_semantic_receipt_recorded=True,
+        final_acceptance_recorded=True,
+        render_output_sha256=render_state.output.file_sha256,
+        final_acceptance_content_hash=acceptance.content_hash,
+    )
+
+
+def run_ecommerce_ad_production(
+    handoff: CompiledAdCreativeHandoff,
+    *,
+    facades: Mapping[str, EcommerceVideoGenerationFacade],
+    activate_final_render: Callable[
+        [CompiledAdCreativeHandoff, EcommerceAdGenerationResult], None
+    ],
+    committer: ProductionStateCommitter,
+    universal_profile: UniversalQaProfile,
+    run_hard_check: HardCheckRunner,
+    run_review_layer: ReviewLayerRunner,
+    tool_identity: ToolIdentity,
+    evaluate: EcommerceWholeAdEvaluator,
+    review_attempt_id: str,
+    review_request_id: str,
+    evidence_id: str,
+    review_id: str,
+    final_acceptance_id: str,
+    stop_requested: Callable[[], bool] | None = None,
+) -> EcommerceAdProductionResult:
+    """Run the canonical Ecommerce Shot-to-Final-Acceptance application path."""
+
+    selected = CompiledAdCreativeHandoff.model_validate(
+        handoff.model_dump(mode="python")
+    )
+    projection_by_shot = {
+        item.target_shot_id: item for item in selected.commercial_execution_projections
+    }
+    provider_shot_ids = tuple(
+        item.shot_id
+        for item in selected.shot_proposals
+        if projection_by_shot[item.shot_id].invoke_video_provider
+    )
+    if set(facades) != set(provider_shot_ids):
+        raise ValueError("Production facades do not match the Ecommerce Provider Shots")
+    for shot_id in provider_shot_ids:
+        facade = facades[shot_id]
+        projection = projection_by_shot[shot_id]
+        if (
+            not isinstance(facade, EcommerceVideoGenerationFacade)
+            or facade.service.project_root.resolve() != committer.project_root.resolve()
+            or facade.bound_commercial_identity()
+            != (selected.plan_content_hash, projection.projection_hash, shot_id)
+        ):
+            raise ValueError(
+                "Production Shot facade is not owned by the current Ecommerce project"
+            )
+    generation = run_ecommerce_ad_generation(
+        selected,
+        facades=facades,
+        stop_requested=stop_requested,
+    )
+    if not generation.complete:
+        return EcommerceAdProductionResult(shot_generation=generation)
+
+    activate_final_render(selected, generation)
+    post_media = _close_ecommerce_post_media_candidate(
+        committer=committer,
+        handoff=selected,
+        shot_facades=facades,
+        universal_profile=universal_profile,
+        run_hard_check=run_hard_check,
+        run_review_layer=run_review_layer,
+        tool_identity=tool_identity,
+        evaluate=evaluate,
+        review_attempt_id=review_attempt_id,
+        review_request_id=review_request_id,
+        evidence_id=evidence_id,
+        review_id=review_id,
+        final_acceptance_id=final_acceptance_id,
+    )
+    return EcommerceAdProductionResult(
+        shot_generation=generation,
+        post_media_acceptance=post_media,
+    )
+
+
 __all__ = [
     "ActivatedCommercialShotCheckpoint",
     "EcommerceAdGenerationResult",
+    "EcommerceAdProductionResult",
+    "EcommercePostMediaAcceptanceResult",
     "EcommerceShotExecutionFacade",
     "EcommerceVideoGenerationFacade",
     "EcommerceShotNextAction",
     "EcommerceStopReason",
     "run_ecommerce_ad_generation",
+    "run_ecommerce_ad_production",
 ]

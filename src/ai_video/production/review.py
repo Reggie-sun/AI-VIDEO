@@ -674,7 +674,11 @@ def adjudicate_layer(
 
 
 def adjudicate_review_evidence(
-    policy: QaPolicy, layer: QaLayer, evidence: Sequence[ReviewEvidence]
+    policy: QaPolicy,
+    layer: QaLayer,
+    evidence: Sequence[ReviewEvidence],
+    *,
+    review_request_content_hash: str | None = None,
 ) -> QaVerdict:
     """Derive verdict from selected policy and typed raw measurements."""
     if not evidence or any(
@@ -703,9 +707,18 @@ def adjudicate_review_evidence(
                 EcommerceAcceptanceEvidencePayload,
                 adjudicate_ecommerce_acceptance,
             )
+            from ai_video.production.ecommerce_quality_gate import (
+                validate_ecommerce_review_evidence_binding,
+            )
 
             verdicts: list[QaVerdict] = []
             for item in authorized:
+                if not validate_ecommerce_review_evidence_binding(
+                    policy=policy,
+                    evidence=item,
+                    review_request_content_hash=review_request_content_hash,
+                ):
+                    return QaVerdict.NOT_EVALUATED
                 payload = item.measured_payload.get("domain_acceptance")
                 if not isinstance(payload, Mapping):
                     return QaVerdict.NOT_EVALUATED

@@ -2,6 +2,8 @@
 
 Date: 2026-08-25
 
+> Superseded current-facing status (2026-08-26): Ecommerce typed Gate 2、canonical Production caller与P6/Final Acceptance closure现已实现，见`docs/record_for_agent/2026-08-26-ecommerce-final-media-gate-closure.md`。本文的architecture decision与historical Gate 1 checkpoint仍有效；“Gate 2/product caller尚未实现”不再代表current Ecommerce Runtime truth。
+
 ## Purpose
 
 本文记录Quality Gate architecture separation的documentation/contract-test checkpoint。它固定Universal Production QA、Domain-specific Acceptance与market outcome的owner边界，避免把pre-submit readiness、Ecommerce authoring readiness或generic P6 layers误解释为完整跨domain acceptance。

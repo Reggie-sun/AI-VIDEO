@@ -338,6 +338,18 @@ class ProductionStateCommitter(
     def project_root(self) -> Path:
         return self._project_root
 
+    def current_final_media_target(
+        self,
+    ) -> tuple[LoadedProductionProject, ResolvedTimeline]:
+        """Reopen the exact active render and its content-addressed timeline."""
+
+        bundle = self._load_production_project(self._project_root / "project.yaml")
+        render_state = self._current_render_state(bundle.manifest)
+        timeline = self._current_resolved_timeline(render_state)
+        if bundle.render_state != render_state:
+            raise _state_invalid("Current render state does not match project loading.")
+        return bundle, timeline
+
 
     def _current_render_state(
         self, manifest: ProductionManifest
