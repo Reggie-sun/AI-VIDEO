@@ -12,9 +12,7 @@ from urllib.parse import urlsplit
 from pydantic import (
     ConfigDict,
     Field,
-    SerializerFunctionWrapHandler,
     field_validator,
-    model_serializer,
     model_validator,
 )
 
@@ -57,6 +55,10 @@ from ai_video.production._video_continuity import (
 from ai_video.production._video_capability_fingerprint import (
     c4_exact_cardinality_grammar_satisfies_variant,
 )
+from ai_video.production._video_capability_contract import (
+    VideoCapabilityContractMixin,
+    VideoOutputRecoveryStrategy,
+)
 from ai_video.production.video_contracts import (
     VideoBindingCardinalityConstraint,
     VideoFlexibleOutputRequirement,
@@ -65,7 +67,6 @@ from ai_video.production.video_contracts import (
     VideoOutputCapability,
     VideoProviderTaskBinding,
     media_bindings_satisfy_capabilities,
-    validate_cardinality_constraints,
 )
 
 
@@ -150,14 +151,6 @@ class VideoGenerationMode(str, Enum):
 class VideoExecutionKind(str, Enum):
     LOCAL = "local"
     REMOTE = "remote"
-
-
-class VideoOutputRecoveryStrategy(str, Enum):
-    """Sealed recovery guarantee for an opaque Provider output handle."""
-
-    DURABLE_FILE_ID = "DURABLE_FILE_ID"
-    REQUERY_BY_EFFECT_ID = "REQUERY_BY_EFFECT_ID"
-    NON_RECOVERABLE_EPHEMERAL_URL = "NON_RECOVERABLE_EPHEMERAL_URL"
 
 
 class BillingKind(str, Enum):
@@ -560,7 +553,7 @@ class VideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictModel):
         return cls.model_validate(data)
 
 
-class VideoCapabilityVariant(_VideoStrictModel):
+class VideoCapabilityVariant(VideoCapabilityContractMixin, _VideoStrictModel):
     capability_id: str = Field(pattern=_SAFE_ID.pattern)
     provider_kind: str = Field(pattern=_SAFE_ID.pattern)
     model_id: str = Field(pattern=_SAFE_ID.pattern)
@@ -583,51 +576,7 @@ class VideoCapabilityVariant(_VideoStrictModel):
     fps_supported: bool
     idempotent_submit: bool
     lookup_supported: bool
-    output_recovery_strategy: VideoOutputRecoveryStrategy | None = None
     binding_cardinality_constraints: tuple[VideoBindingCardinalityConstraint, ...] = ()
-
-    @model_serializer(mode="wrap")
-    def _serialize_additive_output_recovery_strategy(
-        self, handler: SerializerFunctionWrapHandler
-    ) -> dict[str, object]:
-        data = handler(self)
-        if self.output_recovery_strategy is None:
-            data.pop("output_recovery_strategy", None)
-        return data
-
-    @model_validator(mode="after")
-    def _validate_variant(self) -> "VideoCapabilityVariant":
-        if (self.output is None) == (self.output_capability is None):
-            raise ValueError("video capability requires exactly one output contract")
-        if len(set(self.allowed_image_roles)) != len(self.allowed_image_roles):
-            raise ValueError("video capability image roles must be unique")
-        if len(set(self.allowed_image_mime_types)) != len(self.allowed_image_mime_types):
-            raise ValueError("video capability image MIME types must be unique")
-        if self.mode is VideoGenerationMode.TEXT_TO_VIDEO and (
-            self.allowed_image_roles
-            or self.required_first_frame
-            or self.max_reference_count
-            or self.media_capabilities
-        ):
-            raise ValueError("text-to-video capability cannot declare image bindings")
-        if self.required_first_frame and "first_frame" not in self.allowed_image_roles:
-            raise ValueError("required first frame must be an allowed image role")
-        if (
-            self.execution_kind is VideoExecutionKind.LOCAL
-            and self.billing_kind is not BillingKind.LOCAL_UNMETERED
-        ) or (
-            self.execution_kind is VideoExecutionKind.REMOTE
-            and self.billing_kind is not BillingKind.METERED
-        ):
-            raise ValueError(
-                "video capability execution and billing kinds must use a supported pair"
-            )
-        object.__setattr__(
-            self,
-            "binding_cardinality_constraints",
-            validate_cardinality_constraints(self.binding_cardinality_constraints),
-        )
-        return self
 
 
 class VideoProviderCapabilities(_VideoStrictModel):
