@@ -39,6 +39,16 @@ terminal evidence只属于candidate preparation，Milestone 4仍未开始且需�
 Current exact evidence见runtime baseline与
 `docs/record_for_agent/2026-08-26-shot-continuity-motion-endpoint-live-attempt.md`。
 
+Execution checkpoint (2026-08-26, M0): 用户随后显式选择并授权仅一次local M0 `quality-v1`
+Stock20/Turbo-off submit。Current v9先通过zero-copy full-source motion-tail、fixed ffmpeg motion analysis、
+exact A4 feasibility approval、M0 reprepare/materialization与real `open + preflight`，再以one-use permit提交
+request `392e098918b6dfb4aacd05db0e546735a7288e90ad5bfe4d3d5fa8ff96992163`。该唯一attempt在
+`SamplerCustomAdvanced`开始采样后发生`torch.OutOfMemoryError`，Manifest revision `31`以terminal
+`video_provider_failed`/`failed`关闭；没有MP4、fetch、媒体分析、P6、winner、activation、retry、fallback或M1
+effect。Milestone 4现在是M0 attempted/failed，而非not started；M1因exact validated pruned pair仍
+`absent/none`而保持blocked。Current exact evidence见runtime baseline与
+`docs/record_for_agent/2026-08-26-shot-continuity-m0-quality-v1-live-attempt.md`。
+
 已接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
 Implementation lane与Validation lane。Validation必须绑定immutable checkpoint，不得在同一次attempt期间
 读取正在变化的source/workflow/profile；并行执行不会放宽Provider、permit、P6或same-file ownership gates。
@@ -642,7 +652,19 @@ materialized identities与single motion-endpoint source attempt由runtime baseli
 checkpoint绑定exact request/fetch/P0 rubric/A2/A3/profile/stack、frozen measurement contract与human decision；
 两端RGB PSNR与BT.709-luma SSIM均超过`30 dB / 0.9`，P6 verdict为`PASS`，Manifest revision `20`已准备
 inactive candidate与terminal evidence。该状态没有activation/M0/Final Acceptance，也不构成新的Provider或M0
-执行授权；故Milestone 4 M0仍未开始，M1 conditional gate也未触发。
+执行授权；这是M0执行前的historical checkpoint，已由下方M0 live checkpoint supersede。
+
+Execution update (2026-08-26, M0): 用户显式选择`quality-v1`并授权exact A4 feasibility与one local
+submit。M0 stack/profile document为
+`c37f6a594e473a5d73ed6a19a4d3e9892420880a99ed71149e8e525b4c519b4d` /
+`367de2fa959634781849d152932b4fc0ef5cc984218144e00670ad04d5b0b8c1`；full-source zero-copy
+motion-tail receipt为`83d2b14a0b1f23bfdf96edcc211d685cdef9b2b71b143b29f879a81698b3b77e`。
+唯一request `392e098918b6dfb4aacd05db0e546735a7288e90ad5bfe4d3d5fa8ff96992163`取得Provider request
+`1873dc95-b44c-4218-8407-5b2610b31d07`，随后在`SamplerCustomAdvanced`以
+`torch.OutOfMemoryError`终止。Manifest revision `31`记录terminal `failed`，local fetch receipt为空；没有
+output MP4、probe、decoded-boundary/identity/motion evidence、P6/human verdict、winner、activation、retry、fallback
+或M1 effect。M1 exact validated pruned pair仍`absent/none`，因此conditional inventory gate未关闭；任何新的
+M0 attempt、不同policy/profile或M1 preparation/submit都需要新的明确授权。
 
 ## Milestone 4: Execute Explicitly Selected M0, Then Conditional M1
 

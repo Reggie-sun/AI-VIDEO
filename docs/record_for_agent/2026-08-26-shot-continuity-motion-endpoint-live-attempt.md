@@ -9,6 +9,11 @@ Date: 2026-08-26
 candidate与terminal evidence。下文原始live measurements与因果限制继续有效；其中“boundary/P6未关闭、没有
 candidate/terminal”的current-facing结论已由`Source Boundary P6 Closure`与修订后的`Assessment`取代。
 
+2026-08-26后续M0 evidence再次推进了current-facing边界：用户选择的`quality-v1`唯一local M0 attempt已执行，
+但在sampler阶段因GPU OOM terminal failed，未产生MP4、P6、winner或activation。下文“M0尚未发生/仍需首次授权”
+只保留为source-boundary完成时的historical truth；current状态见
+`docs/record_for_agent/2026-08-26-shot-continuity-m0-quality-v1-live-attempt.md`。
+
 ## Purpose
 
 本文记录用户批准的motion-compatible A3进入fresh Production bundle后的exact import、P0/profile reseal、
