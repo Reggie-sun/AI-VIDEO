@@ -111,3 +111,29 @@ terminal `stop`；不得blind retry、remint permit或把OOM解释为可以自�
 如果未来选择继续M1，必须先关闭exact validated pruned pair inventory/build gate；当前`absent/none`不允许把
 M1当作automatic fallback。如果未来选择重试M0，应将GPU capacity作为独立engineering变量处理，同时保持
 frozen quality policy、anchors、rubric与one-submit attribution，除非用户明确批准改变这些contract。
+
+## Isolated Retry Preparation Blocker
+
+用户随后授权一个新的、exactly-one-submit `quality-v1` attempt，并选择只在其他ComfyUI job/unit完整退出、
+fresh process且至少`30 GiB` free VRAM时重试。新attempt/generation/output为：
+
+- `rainy-station-m0-quality-v1-isolated-lowvram-20260826-v2`；
+- `rainy-station-shot-4-m0-quality-v1-isolated-lowvram-20260826-v2`；
+- `video-shot-rainy-station-4-m0-quality-v1-isolated-lowvram-v2`。
+
+Canonical committer以zero Provider effect写入并strict reopen human decision
+`b3fd661d87cd43063757eb0ac5af8b9af9236e00f59ca3fb87ee6aaa555bd4d1`与approval
+`6e0cf3ea32f2f1d57f950584053e524ae655f3aff77b8608908962517381635e`；scope fingerprint为
+`186bca2bb144bb04dbdf3a5dde9311350f8b2f25231e7451fd711d55965d50b0`。Manifest revision到`33`，
+real `open/status`产生request hash
+`904db7adfbe0d4d5236ab970ec91f32539ebd759a164137d77a850b319d315fc`，attempt仍absent、
+`next_action=submit`；没有intent、permit、upload或submit。
+
+外部ComfyUI owner完成其jobs与post-media analysis并正常停止unit，8188随后关闭；但共享常驻
+`video-analysis` MCP持续占约`6.5 GiB` GPU，连同桌面进程使free VRAM稳定在约`21.0 GiB / 32.6 GiB`。
+上一M0 attempt本来已经使用`--lowvram --use-sage-attention`，因此再次使用lowvram不是新变量；H3经验边界为
+约`22–30 GiB`，不能把21 GiB静默解释为安全阈值。MCP未公开model-unload API，Agent也未kill共享进程。
+
+后续`novram` contract、停止共享MCP或继续等待三种capacity路径均需要明确选择；本次选择请求未返回结果。
+因此v2保持prepared/blocked、submit count=`0`，其one-submit authorization尚未消费。T8 checkout未切换，
+仍保持session前`28cb160827c245b2d6a37539df30c1d7c5e7aecd`。

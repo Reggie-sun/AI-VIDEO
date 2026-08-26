@@ -666,6 +666,14 @@ output MP4、probe、decoded-boundary/identity/motion evidence、P6/human verdic
 或M1 effect。M1 exact validated pruned pair仍`absent/none`，因此conditional inventory gate未关闭；任何新的
 M0 attempt、不同policy/profile或M1 preparation/submit都需要新的明确授权。
 
+Execution update (2026-08-26, isolated retry preparation): 用户授权新的one-submit `quality-v1` v2 attempt并
+选择fresh-process/empty-unit/`>=30 GiB` free VRAM gate。Exact approval
+`6e0cf3ea32f2f1d57f950584053e524ae655f3aff77b8608908962517381635e`已由canonical committer写入，
+request `904db7adfbe0d4d5236ab970ec91f32539ebd759a164137d77a850b319d315fc`仍attempt absent且submit count为0。
+外部unit已退出，但共享`video-analysis` MCP使free VRAM稳定约21 GiB；上一失败attempt本来已经使用lowvram，
+所以同条件重试不构成capacity isolation。`novram`、停止共享MCP或继续等待尚未获得明确选择；v2保持blocked，
+不得mint permit或submit。
+
 ## Milestone 4: Execute Explicitly Selected M0, Then Conditional M1
 
 本milestone属于Validation V1。它只验证单个continuity boundary的model/conditioning feasibility，不等待
