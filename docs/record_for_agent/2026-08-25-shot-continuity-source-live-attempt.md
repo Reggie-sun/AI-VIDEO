@@ -2,6 +2,13 @@
 
 Date: 2026-08-25
 
+> Superseded current routing (2026-08-26): 本文件继续作为v7旧endpoint失败的immutable历史证据；fresh v9
+> 使用用户批准的motion-compatible A3重新执行唯一Local attempt，已消除frame 107→108 hard-cut与tail
+> freeze。v9的technical continuity repair通过，但overall source acceptance仍等待canonical boundary口径与
+> human/P6 verdict；详见
+> `docs/record_for_agent/2026-08-26-shot-continuity-motion-endpoint-live-attempt.md`。不得再把本文件的v7 root
+> 或next action当作current execution target。
+
 ## Purpose
 
 本文记录 rainy-station A2→A3 qualification-only source 的fresh Production bundle、profile reseal、

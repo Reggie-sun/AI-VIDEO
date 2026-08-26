@@ -2,6 +2,13 @@
 
 Date: 2026-08-25
 
+> Superseded current gate (2026-08-26): 用户已批准本文件绑定的exact PNG，candidate已通过truthful
+> `codex_imagegen_tool` import进入fresh v9 Project/Registry，并完成一次且仅一次Local FL2VA
+> submit/poll/fetch。真实MP4支持motion-endpoint root-cause repair，但overall source acceptance仍等待
+> canonical boundary口径与human/P6 verdict；详见
+> `docs/record_for_agent/2026-08-26-shot-continuity-motion-endpoint-live-attempt.md`。下方candidate/approval
+> gate保留为历史过程，不再是current next action。
+
 ## Purpose
 
 本文记录 rainy-station A2→A3 source failure 的 root-cause closure、一个新的独立

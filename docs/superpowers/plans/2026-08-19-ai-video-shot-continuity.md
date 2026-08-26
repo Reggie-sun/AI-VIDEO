@@ -26,6 +26,18 @@ hard gate。该source output保持fetched/validate、未形成accepted candidate
 activation或M0 effect。Current exact evidence见runtime baseline与
 `docs/record_for_agent/2026-08-25-shot-continuity-source-live-attempt.md`。
 
+Execution checkpoint (2026-08-26): 用户批准的independent motion-compatible A3已通过exact
+`codex_imagegen_tool` receipt导入fresh v9，endpoint repair/revision-aware source profile完成review、commit与
+Harness。唯一Local FL2VA attempt保持A1/A2/A4、prompt、model、workflow、seed derivation与sampling contract
+不变，完成`submit/poll/fetch = 1/1/1`且retry/fallback/remote/paid均为0。Exact MP4不再出现v7的frame
+107→108 hard cut，frames 120→123仍有subject/leg motion，支持endpoint root-cause repair；但RGB与grayscale
+SSIM口径给出不同threshold结论。Seed derivation contract虽未变，content closure变化使numeric seed与v7不同，
+所以v9不是strict endpoint-only live A/B；因果claim仍依赖historical isolated A/B。Automatic P6因缺canonical
+continuity binding保持`NOT_EVALUATED`，human/P6
+未记录。因此source仍停在fetched/validate，未形成accepted candidate、terminal/motion-tail、M0 effect或
+activation。Current exact evidence见runtime baseline与
+`docs/record_for_agent/2026-08-26-shot-continuity-motion-endpoint-live-attempt.md`。
+
 已接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
 Implementation lane与Validation lane。Validation必须绑定immutable checkpoint，不得在同一次attempt期间
 读取正在变化的source/workflow/profile；并行执行不会放宽Provider、permit、P6或same-file ownership gates。
@@ -607,9 +619,10 @@ Current evidence: P0 receipt
 `presence=absent`与`content_hash=none`；这些identity只证明P0 candidate contract已准备，不证明真实
 profile/compiler/workflow已物化或可执行。Exact paths与dynamic status仍以Production Manifest/runtime baseline为准。
 
-Execution update (2026-08-25): 上述2026-08-23 hashes保留为historical checkpoint。Current v7
-materialized identities与single source-attempt evidence由runtime baseline和session record拥有；source output因
-frame 107→108 discontinuity未获acceptance，故Milestone 4 M0尚未开始，M1 conditional gate也未触发。
+Execution update (2026-08-26): 上述2026-08-23 hashes与v7 failure均保留为historical checkpoint。Current v9
+materialized identities与single motion-endpoint source attempt由runtime baseline和2026-08-26 session record
+拥有；真实MP4已关闭observed hard-cut/tail-freeze outcome，因果归因由historical isolated endpoint A/B支持，
+但canonical boundary acceptance与human/P6尚未关闭，故Milestone 4 M0仍未开始，M1 conditional gate也未触发。
 
 ## Milestone 4: Execute M0, Then Conditional M1
 
