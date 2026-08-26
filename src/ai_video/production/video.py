@@ -55,16 +55,14 @@ from ai_video.production._video_continuity import (
 from ai_video.production._video_capability_fingerprint import (
     c4_exact_cardinality_grammar_satisfies_variant,
 )
-from ai_video.production._video_capability_contract import (
-    VideoCapabilityContractMixin,
-    VideoOutputRecoveryStrategy,
-)
 from ai_video.production.video_contracts import (
     VideoBindingCardinalityConstraint,
+    VideoCapabilityContractMixin,
     VideoFlexibleOutputRequirement,
     VideoMediaCapability,
     VideoMediaReferenceBinding,
     VideoOutputCapability,
+    VideoOutputRecoveryStrategy,
     VideoProviderTaskBinding,
     media_bindings_satisfy_capabilities,
 )
