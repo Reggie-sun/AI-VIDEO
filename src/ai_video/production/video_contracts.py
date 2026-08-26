@@ -505,8 +505,6 @@ class VideoOutputRecoveryStrategy(str, Enum):
 class VideoCapabilityContractMixin:
     """Additive serialization and invariant checks for capability variants."""
 
-    output_recovery_strategy: VideoOutputRecoveryStrategy | None = None
-
     @model_serializer(mode="wrap")
     def _serialize_additive_output_recovery_strategy(
         self, handler: SerializerFunctionWrapHandler

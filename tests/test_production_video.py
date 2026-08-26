@@ -1942,6 +1942,10 @@ def test_output_recovery_strategy_is_additive_and_hash_bound() -> None:
     assert project_capability_variant(requery)["output_recovery_strategy"] == (
         "REQUERY_BY_EFFECT_ID"
     )
+    serialized_keys = tuple(durable.model_dump(mode="json"))
+    assert serialized_keys.index("lookup_supported") < serialized_keys.index(
+        "output_recovery_strategy"
+    ) < serialized_keys.index("binding_cardinality_constraints")
     assert len(
         {
             capability_variant_fingerprint(historical),

@@ -574,6 +574,7 @@ class VideoCapabilityVariant(VideoCapabilityContractMixin, _VideoStrictModel):
     fps_supported: bool
     idempotent_submit: bool
     lookup_supported: bool
+    output_recovery_strategy: VideoOutputRecoveryStrategy | None = None
     binding_cardinality_constraints: tuple[VideoBindingCardinalityConstraint, ...] = ()
 
 
