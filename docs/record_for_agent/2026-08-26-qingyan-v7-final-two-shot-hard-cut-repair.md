@@ -2,6 +2,11 @@
 
 Date: 2026-08-26
 
+> **SUPERSEDED / HUMAN FAIL:** 用户以 1.0x 观看下述 exact v7 后明确判定人物段 seam 仍明显、
+> 开局与约 4 秒处突兀卡顿、产品静图/图标重复且与手持产品冲突，并指出缺少老人参与的真实
+> 对话推广。下述 `TARGETED_AGENT_GATE_PASS` 只保留为历史技术证据，不再代表 current candidate。
+> 替代记录：`docs/record_for_agent/2026-08-26-qingyan-v8-underarm-elder-dialogue-continuity-repair.md`。
+
 ## Purpose
 
 本文记录用户对 exact v6 的第三轮 human correction。用户指出 product hero 背后移动浅黄色光带
