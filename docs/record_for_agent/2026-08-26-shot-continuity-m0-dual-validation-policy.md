@@ -100,9 +100,12 @@ Result: initial snapshot `273 passed in 94.50s`；review blocker修复后的exac
 `.agent/harness/runs/m0-dual-validation-policy-20260826-v3/receipt.json`不是completion proof，也不得描述为fresh。
 随后v4 staged Harness在tests启动前fail closed，因为4个M0 staged paths同时含有本task之外的unstaged
 ecommerce edits；该run没有吸收或覆盖这些changes，也不是completion proof。为保持index与unrelated work隔离，
-本task使用普通`git commit`只提交exact staged snapshot；current completion candidate path固定为
-`.agent/harness/runs/m0-dual-validation-policy-20260826-v5/receipt.json`，并必须针对该exact commit range验证
-status、integrity、scope、artifact hashes与freshness。本文不预宣PASS。
+本task使用普通`git commit`只提交exact staged snapshot。v5 exact-range Harness随后由policy audit fail closed：
+新增`tests/fixtures/shot_continuity/m0_fast_v1_prepared_receipt.json`尚未映射到既有
+`shot_continuity_p0` category，因此tests未启动且v5也不是completion proof。Routing fix只把该fixture目录加入
+既有M0 category并由`tests/test_agent_harness.py`覆盖；current completion candidate path固定为
+`.agent/harness/runs/m0-dual-validation-policy-20260826-v6/receipt.json`，并必须针对从`592a685`到routing follow-up
+commit的exact range验证status、integrity、scope、artifact hashes与freshness。本文不预宣PASS。
 
 ## Remaining Boundary
 

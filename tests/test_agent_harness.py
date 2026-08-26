@@ -1325,6 +1325,7 @@ def test_shot_continuity_p0_surfaces_route_to_exact_offline_suite() -> None:
         "src/ai_video/production/video_candidate_composition.py",
         "src/ai_video/production/video_execution_stack.py",
         "src/ai_video/production/video_transition.py",
+        "tests/fixtures/shot_continuity/m0_fast_v1_prepared_receipt.json",
         "tests/test_prepare_shot_continuity_endpoint_repair.py",
         "tests/test_prepare_shot_continuity_p0.py",
         "tests/test_production_p0_qualification.py",
