@@ -2,6 +2,14 @@
 
 Date: 2026-08-26
 
+> Current-facing human correction (2026-08-27): exact `01_problem_open_cap_spray`
+> remains valid historical local-generation evidence, but the user rejects it as the first
+> Shot because its first frame already places the product in the woman's hand. The opening
+> must first show heat-caused underarm perspiration with `product_presence=none`; clothing is
+> only the visible sweat-mark surface, not the cause or problem. New Shot 00 control frames and
+> prompt are recorded below. `video-analysis` MCP remains unavailable, so no new T8 submit or
+> v10 final exists.
+
 ## Purpose
 
 本文记录 exact v9 的新一轮 human `FAIL`、v10 opening replacement 的已完成本地生成，以及
@@ -22,6 +30,9 @@ v10 删除独立的 5 秒静态 before/after slider。`使用前 / 使用后`应
 5. 喷后由不适表情转为放松，暖黄色不适 haze 转为淡蓝白清爽空气；
 6. 下一连续 Shot 才负责停止喷洒、拿回同一个盖子、重新盖好并让老人自然入场；
 7. 13 秒附近应落在真实双人 dialogue movement，不再落入静态 comparison。
+
+该 contract 现在只保留为第一轮历史修复假设。它仍把 capped bottle 放进 exact first frame，导致
+`problem discovery` 与 `product treatment` 没有真正分镜，已由下方 2026-08-27 Shot 00 boundary 取代。
 
 对应 H3/T8 prompts：
 
@@ -78,27 +89,72 @@ required MCP evidence，也不能将 Gate 改判为 `PASS`。
 
 Gate 失败关闭后没有提交 Shot 01B。ComfyUI 已通过 supervisor 停止，并验证 loopback listener 不再响应。
 
+## 2026-08-27 Shot 00 Boundary Correction
+
+新失败码为 `F-ACTION-ORDER + F-ACTION-OVERLOAD`：旧 opening 从第一帧就手持产品，因此即使表情先皱眉，
+观众仍会读成“已经准备处理”。最小修复是 `split_shot`，而不是继续加重表情或增加负向词。
+
+新 Shot 00 唯一职责是：天气热导致腋下出汗，白色上衣的腋下局部形成真实汗印，女主发现后产生克制尴尬。
+衣物只承担可见证据；不得表述为衣服材质、衣物破损或穿着不适。Shot 00 全程严格
+`product_presence=none`，桌面为空，禁止瓶、盒、盖、喷头、品牌黄色、喷雾、产品贴图和产品声音。
+
+新 built-in `imagegen` 控制帧：
+
+| Role | Path | SHA-256 |
+| --- | --- | --- |
+| neutral pre-departure first frame | `artifacts/qingyan-miao-ad-20260826-v10/assets/00-problem-discovery-first-v2.png` | `0d5fe47955eb309cb3982fc904edeb58458474b95c5bd3ec782222990404065c` |
+| underarm-sweat discovery last frame | `artifacts/qingyan-miao-ad-20260826-v10/assets/00-underarm-sweat-discovery-last-v3.png` | `d212ae98ddf4fde2481675eff7bdb0c1734a49295ce563e6ed714715a4f67459` |
+
+新 prompt：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/prompts/00_problem_discovery_v2.txt
+SHA-256 45c68ef0bccba44c1daca8d029ce42a34974e1b253e948e360f917c2b54f54b8
+```
+
+`hell-grind-aigc-skill` 本地 prompt audit 结果为 `PASS`、structural score `100/100`；这只证明 prompt 结构，
+不证明媒体质量。完整 authoring boundary 位于：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/opening-v2-authoring-contract.md
+```
+
+2026-08-27 preflight 再次调用 exact 旧 MP4 的 project-local `video_probe`，仍返回 `Transport closed`。
+因此没有提交新的 H3/T8 Shot 00。本轮共执行三次 built-in image-generation operation：一个 neutral first
+frame、一个因“衣料问题”语义被 supersede 的 intermediate last frame，以及上表的 underarm-sweat final
+control frame；它们都不构成视频 Gate、Shot acceptance 或 v10 final。
+
 ## Current Assessment And Next Work
 
 current status：
 
 ```text
-OPENING_SOURCE_GENERATED / POST_MEDIA_NOT_EVALUATED /
-NEXT_SHOT_BLOCKED / NO_V10_FINAL / HUMAN_VERDICT_PENDING
+OLD_OPENING_HUMAN_REJECTED / CORRECTED_SHOT00_CONTROL_FRAMES_READY /
+VIDEO_ANALYSIS_UNAVAILABLE / NEW_T8_SUBMIT_BLOCKED / NO_V10_FINAL
 ```
 
-恢复条件不是 blind retry H3，而是先恢复 project-local `video-analysis` MCP；随后必须对上述 exact MP4
-和 exact SHA 重新完成 requirement-level Gate。只有全部 required findings 为 `PASS`，才允许单次提交
-`01b_recap_elder_enters`，然后再次逐 Shot Gate。通过后才可制作新的 720-frame / 30 秒 composition，
-并把 13 秒落在有真实身体与表情运动的 elder dialogue，而非静态 before/after card。
+恢复条件不是 blind retry H3，而是先恢复 project-local `video-analysis` MCP。随后按新顺序执行：
+
+1. 只提交一次新 Shot 00：上述 neutral first frame → underarm-sweat discovery last frame；
+2. 固定 exact MP4 + SHA，并完成 requirement-level Gate；只有全 `PASS` 才继续；
+3. 对 exact 旧 `01_problem_open_cap_spray.mp4` 重新 Gate；若 content requirements 通过，只允许裁除其前约
+   1.6 秒重复 problem 段，从开盖动作起作为 treatment beat 消费；
+4. 再解决 elder entrance/dialogue 连续性并逐 Shot Gate；
+5. 最后才制作新的 720-frame / 30 秒 composition，使约 13 秒落在真实 dialogue movement，而非静态 card。
 
 项目 Agent Memory 初始 symptom query 返回 `[]`并排队 detached refresh；基于最终 blocker 的 focused
 follow-up query命中既有 post-media Gate经验记录，确认 `MCP unavailable -> NOT_EVALUATED -> stop`
 边界。本记录本身不会刷新 RAG index。
 
+2026-08-27 的 opening symptom query 命中本 record 与 v9 supersession evidence；基于最终 `split_shot`
+finding 的 follow-up query 只返回 stale-tagged Ecommerce sequential Gate fragment并排队 detached refresh。
+没有等待、轮询或前台 rebuild；这些 advisory hits 不授权视频提交或 Gate acceptance。
+
 ## Agent Guardrails
 
-- 不得把 contact sheet、FFmpeg metadata、successful local submit 或 H3 receipt当作 per-Shot Gate `PASS`。
+- 不得把控制帧、prompt audit、contact sheet、FFmpeg metadata、successful local submit 或 H3 receipt当作 per-Shot Gate `PASS`。
+- 不得再把 `01_problem_open_cap_spray` 或任何第一帧已手持产品的素材作为 opening Shot。
+- Shot 00 必须表达“腋下出汗导致局部汗印”；不得将问题写成衣料、衣服材质或穿着不适。
 - 不得在 exact Shot 01A 未完成 Gate 前提交 Shot 01B、合成 v10 final 或宣称 13 秒问题已在成片修复。
 - 不得覆盖或 blind retry exact `01_problem_open_cap_spray` durable state；若内容后来被判为 `FAIL`，必须
   以新 Shot identity和新的 exact receipt处理。
