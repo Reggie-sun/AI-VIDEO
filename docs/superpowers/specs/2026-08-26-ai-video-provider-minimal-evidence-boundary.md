@@ -2,13 +2,16 @@
 
 ## Status
 
-Proposed architecture contract。本文基于 2026-08-26 current working-tree source audit，定义
-cloud Provider、AI-VIDEO lineage、post-fetch media proof 与 post-media acceptance 之间的目标边界。
+Implementation in progress；offline executable checkpoint complete，canonical closure blocked。Exact implementation range
+`0f73c53..9e999d1` 已通过 focused executable verification、native `reviewer_xhigh` 与 fresh
+exact-range Harness；一个只返回 `job_id + status + re-queryable output_url` 的offline fake Provider
+已沿 canonical lifecycle 到达 fetched/probed `CANDIDATE`，且没有自动activation。
 
-本文不是 runtime completion、Provider live proof、quality PASS、P6、Final Acceptance、release
-或 publication evidence。Current working tree 中 `review.py`、`_state_commit_review.py` 与
-Ecommerce Gate 2 相关文件存在未提交变化；因此本文只把 current source 作为设计输入，不把
-untracked 或 dirty implementation 描述成 committed baseline。
+本文不是 Provider live proof、quality PASS、Gate 2、P6、Final Acceptance、release或publication
+evidence。`docs/agent-primary-contract-matrix.md`、`docs/v0.2-runtime-baseline.md`、
+`docs/v0.2-agentic-production-roadmap.md` 与 `.agent/harness/policy.yaml` 在checkpoint时仍有其他writer的
+uncommitted changes，因此本task没有覆盖这些canonical owners；对应runtime truth同步仍待ownership
+释放后完成。
 
 本Spec扩展而不替代以下现有 owner：
 

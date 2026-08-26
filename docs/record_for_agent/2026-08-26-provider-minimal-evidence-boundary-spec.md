@@ -9,7 +9,7 @@ Date: 2026-08-26
 以该 Spec 为唯一 owner；本记录不复制字段 catalog，也不构成 runtime implementation、Provider
 调用、media proof、P6、Final Acceptance、push 或 release authorization。
 
-## Current Runtime Truth
+## Pre-Implementation Runtime Truth
 
 Current source 已经由 AI-VIDEO 对 fetched bytes 重新计算 SHA、probe 并构造 media/review evidence；
 neutral requirement、Gate 1 context 与 Final Acceptance rollup没有把 hidden seed、scheduler、workflow
@@ -78,7 +78,7 @@ T8/ComfyUI保持local-specific `None`。Unsupported或missing remote strategy必
 该Plan不修改observation/fetch/provenance/Manifest schema，不实现Gate 2/P6/Final Acceptance closure，
 也不授权Provider、network、credential、ComfyUI或媒体生成。
 
-## Verification And Evidence
+## Specification And Plan Verification Evidence
 
 - Commit：`5ad0fdd`（`docs: specify provider-minimal evidence boundary`）。
 - Exact range：`5ad0fdd^..5ad0fdd`。
@@ -108,7 +108,7 @@ review仍然有效，但不能替代future implementation的required `reviewer_x
 没有运行runtime/provider test、Provider、network、credential、media generation或human quality
 acceptance。本checkpoint只能证明documentation contract及其exact commit-range verification。
 
-## Publication State
+## Specification And Plan Publication State
 
 - Spec、Plan与本记录位于local `main`；
 - Spec/Plan commits未push、未release；
@@ -116,16 +116,75 @@ acceptance。本checkpoint只能证明documentation contract及其exact commit-r
 - Plan checkpoint的Agent Memory retrieval返回stale last-good fragments并queued refresh；Plan没有把这些
   stale fragments当作current source truth，也没有另行刷新index或生成runtime/acceptance authority。
 
+## Offline Implementation Checkpoint
+
+Provider-minimal offline implementation已在以下exact range收敛：
+
+```text
+0f73c53..9e999d1
+```
+
+Task-owned commits：
+
+- `ab58412 feat: support provider-minimal video recovery`；
+- `dc92020 refactor: isolate video capability contract`；
+- `5cb65d1 refactor: reuse video capability boundary`；
+- `9e999d1 fix: preserve capability serialization order`。
+
+Executable runtime truth：
+
+1. `VideoOutputRecoveryStrategy`由既有`video_contracts.py`边界独占，支持
+   `DURABLE_FILE_ID`、`REQUERY_BY_EFFECT_ID`与`NON_RECOVERABLE_EPHEMERAL_URL`。
+2. Historical capability payload缺field时以`None`重开；serializer与fingerprint projection省略
+   `None`，保持historical bytes/hash与field order。
+3. New remote attempt缺少supported strategy或使用one-shot strategy时，pure compiler在
+   `VideoGenerationService.start()`前返回`OUTPUT_LOCATOR_NOT_RECOVERABLE`；`lookup_supported=True`
+   不能旁路该拒绝，且attempt、Manifest、permit、network与Provider side effects为零。
+4. Seedance与MiniMax H3使用`REQUERY_BY_EFFECT_ID`，MiniMax Hailuo使用`DURABLE_FILE_ID`，Local T8
+   保持`None`。
+5. Seedance/H3 optional Provider echoes缺失时允许继续；冲突echo仍fail closed。H3 output profile echo
+   只作advisory，最终SHA/probe以AI-VIDEO local exact bytes为准。
+6. Offline fake Provider只返回`job_id + status + re-queryable output_url`，经过neutral requirement、
+   Router、compiler、resolve与canonical service到达fetched/probed `CANDIDATE`。重开fresh adapter后按
+   effect identity重新查询轮换URL；没有raw signed URL persistence、fallback、blind retry或自动activation。
+7. `VideoProvenanceReceipt.model_id/profile_sha256`只表示requested/selected identity，不表示
+   Provider-observed actual execution。
+
+Strict RED/GREEN覆盖missing enum、minimal metadata、true restart/re-query、matrix drift、historical reopen、
+URL repr、public export、neutral chain与serialization order regression。最终capability-focused复核为
+`202 passed`。
+
+Native `reviewer_xhigh`在发现并修复capability serialization field-order regression后，以同tier scoped
+re-review给出`Verdict: accept`，无blocking或non-blocking concern。
+
+Exact-range Harness：
+
+- Receipt：`.agent/harness/runs/provider-minimal-evidence-boundary-implementation-20260826-v3/receipt.json`；
+- Receipt SHA-256：`c66dad4e3e5c17ca2bac3594b43a74badcca033cd6ff6f2e148c87862072a36e`；
+- `production_review_tests`：`636 passed`；
+- `production_video_provider_tests`：`696 passed`；
+- `provider_neutral_video_requirement_tests`：`300 passed`；
+- Architecture Gate：PASS；
+- integrity、freshness、fresh-for-snapshot、snapshot、policy、scope、cleanup、closure与overall passed均为
+  `true`。
+
+## Implementation Publication State
+
+- Implementation commits与本checkpoint均只在local `main`；未push、未release。
+- 没有调用Provider、network、credential、ComfyUI，也没有生成媒体。
+- unrelated staged/dirty/untracked work保持原位，未进入exact implementation range或detached Harness
+  execution tree。
+
 ## Remaining Risks Or Next Work
 
-- Seedance与MiniMax H3 adapter coupling仍存在于current code；
-- output recovery guarantee尚未进入selected sealed pre-start evidence；
-- minimal response fake Provider offline E2E、historical hash compatibility与old-path retirement tests尚未实现；
-- Plan尚无independent reviewer verdict；future implementation必须按Plan使用native `reviewer_xhigh`；
-- live Provider、paid/cloud、media quality、Gate 2/P6/Final Acceptance evidence均未执行。
-
-后续implementation必须以Spec的Acceptance Criteria为准，并在任何Provider effect前保持Paid Provider
-Gate、unknown-outcome、no-fallback、single committer与explicit recovery contract。
+- `.agent/harness/policy.yaml`、`docs/agent-primary-contract-matrix.md`、
+  `docs/v0.2-runtime-baseline.md`与`docs/v0.2-agentic-production-roadmap.md`在Milestone 5 recheck时仍有
+  其他writer的uncommitted changes；本task没有覆盖它们，canonical truth同步等待用户决定ownership或
+  执行顺序。
+- Live Provider API grammar、account、network、billing、real media、model quality与human visual verdict均
+  未验证。
+- Gate 2、P6与Final Acceptance closure仍属于Quality Gate owner的独立slice；validated `CANDIDATE`
+  不等于activation或acceptance。
 
 ## Agent Guardrails
 

@@ -2,20 +2,16 @@
 
 ## Status
 
-Proposed。本文是
-`docs/superpowers/specs/2026-08-26-ai-video-provider-minimal-evidence-boundary.md`
-的 implementation plan，基于 accepted spec commit `5ad0fdd` 与 2026-08-26 current
-source audit 编写。
+Milestones 1-4 implementation complete；Milestone 5 executable closure complete，canonical truth同步
+blocked by same-file ownership。Exact implementation range `0f73c53..9e999d1` 已通过focused tests、
+native `reviewer_xhigh`与fresh exact-range Harness。Offline minimal Provider到达canonical
+`CANDIDATE`，没有自动activation。
 
-本文只授权未来在明确 implementation task 中完成 offline、no-network、no-media-generation 的
-Provider-minimal fetch/probe slice；它本身不证明 Runtime 已改变，不授权 credential lookup、Paid
-Provider submit、ComfyUI execution、媒体生成、candidate activation、Gate 2、P6、Final Acceptance、
-commit、push 或 release。
-
-当前 shared checkout 中 canonical docs、`video_generation.py`、Review/Ecommerce Gate 相关 source/tests
-存在其他未提交工作。本轮只创建本 plan；implementation 开始前必须重新检查 exact target-file
-ownership。任何 same-file overlap 必须先由用户决定 ownership 或执行顺序，不得用本 plan 覆盖现有
-dirty work。
+本checkpoint不授权或证明credential lookup、Paid Provider submit、ComfyUI execution、媒体生成、
+Gate 2、P6、Final Acceptance、push或release。`.agent/harness/policy.yaml`、
+`docs/agent-primary-contract-matrix.md`、`docs/v0.2-runtime-baseline.md`与
+`docs/v0.2-agentic-production-roadmap.md`仍有其他writer的uncommitted changes；本task按same-file
+ownership rule停止这些文件的写入，等待用户决定ownership或执行顺序。
 
 ## Goal
 
@@ -663,6 +659,24 @@ native `reviewer_xhigh`进行read-only review。Reviewer scope只覆盖exact tas
 - minimal follow-up。
 
 Parent必须验证重要claim。修复blocking issue后以同一tier做scoped re-review，不并行调用其他tier。
+
+### Implementation Checkpoint
+
+- Implementation commits：`ab58412`、`dc92020`、`5cb65d1`、`9e999d1`；exact range
+  `0f73c53..9e999d1`。
+- Milestones 1-4的strict RED/GREEN与focused suites通过；最终capability-focused复核为`202 passed`。
+- Offline E2E从neutral requirement、Router、compiler、resolve与service进入fetched/probed
+  `CANDIDATE`；fresh adapter instance按effect identity重新查询轮换URL，没有process-local URL cache、
+  raw signed URL persistence或automatic activation。
+- Native `reviewer_xhigh`在修复capability serialization order regression后scoped re-review为
+  `Verdict: accept`，无blocking或non-blocking concern。
+- Exact-range Harness receipt：
+  `.agent/harness/runs/provider-minimal-evidence-boundary-implementation-20260826-v3/receipt.json`；
+  `production_review_tests`为`636 passed`，`production_video_provider_tests`为`696 passed`，
+  `provider_neutral_video_requirement_tests`为`300 passed`，Architecture Gate PASS。
+- Receipt integrity、freshness、snapshot、policy、scope、cleanup、closure与overall passed验证均为`true`。
+- Milestone 5的canonical documentation update仍受上述same-file ownership blocker约束，因此整个Plan
+  尚未满足Definition Of Done。
 
 ## Test Matrix
 
