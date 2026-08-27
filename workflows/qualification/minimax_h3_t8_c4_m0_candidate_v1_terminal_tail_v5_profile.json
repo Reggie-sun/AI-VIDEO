@@ -1,0 +1,140 @@
+{
+  "binding_path": "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_binding.yaml",
+  "binding_sha256": "87d68b2912e63ee290df6778faf1767706e736e07c32b8799645c02bb230ed5c",
+  "candidate_id": "minimax-h3-t8-c4-motion-ref2va-stock20-v1",
+  "candidate_label": "m0",
+  "capability_id": "c4-native-boundary-motion-qualification-candidate",
+  "cloud_fallback_enabled": false,
+  "components": [
+    {
+      "component_id": "stock-ref2va",
+      "filename": "minimax_h3_ref2va_int8_convrot.safetensors",
+      "kind": "checkpoint",
+      "sha256": "9eef934046a0671bc8a5daf87100705e1478419c574cfde70c50fbe6885f76a9",
+      "size_bytes": 34038894550
+    },
+    {
+      "component_id": "qwen-clip",
+      "filename": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "kind": "artifact",
+      "sha256": "35a88d51044231fe332301d7a62aa81e3f2cba62febeb446e2c1e3e0ef76f2c6",
+      "size_bytes": 15687142551
+    },
+    {
+      "component_id": "video-vae",
+      "filename": "minimax_h3_video_vae_fp16.safetensors",
+      "kind": "artifact",
+      "sha256": "7c1f131492e7eddacaac9069a61b81bdd39de5cc96561e677c5eab1cdce5e522",
+      "size_bytes": 5207808496
+    },
+    {
+      "component_id": "audio-vae",
+      "filename": "minimax_h3_audio_vae_fp32.safetensors",
+      "kind": "artifact",
+      "sha256": "8e505d95dd1561d47abd43d4238fd40d9bb1ae9e147ed0a4cba778d76ae4db48",
+      "size_bytes": 605254808
+    }
+  ],
+  "contract_version": "1",
+  "deployment_identity": "loopback-127.0.0.1-8188",
+  "fixed_seed_source_execution_stack_hash": "c37f6a594e473a5d73ed6a19a4d3e9892420880a99ed71149e8e525b4c519b4d",
+  "fixed_seed_source_prepared_receipt_hash": "bd69e6f9edcae76d1acb1996215192bf8c0a459f4a7c3b88a7ca86342681497d",
+  "fixed_seed_source_profile_hash": "acef730cd2cab44fe5a0fb50693798eb4958844b2639d1fa9ca1b99b7315bb4a",
+  "fps": 24,
+  "frame_count": 124,
+  "height": 768,
+  "initial_execution_stack_hash": "101a5df4f76c570f378939875e52b724ad61d63ceb71d81c9a6c2f1fc9e9a965",
+  "m1_execution_stack_hash": "4d08741636647fbb29f9cf69a69a2c81d62156cef128f619d26a17b72e94c01b",
+  "model_id": "minimax-h3-t8-hybrid-stock20",
+  "native_audio": true,
+  "node_schema_seals": [
+    {
+      "node_name": "UNETLoader",
+      "schema_sha256": "0803bca8808c9e196cac6a5029c01943786166ec1c643e00389b8bdc1396c8ee"
+    },
+    {
+      "node_name": "CLIPLoader",
+      "schema_sha256": "e9f485efa1b625aed932d738f4bd78e1770f573acbe551c2a800972d92ee1385"
+    },
+    {
+      "node_name": "VAELoader",
+      "schema_sha256": "437f9bf7258fa818125a864fb43fdefa5f1fdc5b80a4f6f318a76bc9d21a9f4e"
+    },
+    {
+      "node_name": "MiniMaxH3AudioConditioningT8",
+      "schema_sha256": "26bc55ff0ef05087f4f0b79b23b2e6a06988bc46325e0bb46114f8ffedf714ca"
+    },
+    {
+      "node_name": "MiniMaxH3DualClockSamplerT8",
+      "schema_sha256": "3543e78f8adea01f8b80f154206c80ced606675f74be70ad624baedf30045b34"
+    },
+    {
+      "node_name": "RandomNoise",
+      "schema_sha256": "41d9d603f14caf9196ebc80c5b5a5f68d4c303341b307a3a1230c461d64eebcc"
+    },
+    {
+      "node_name": "BasicGuider",
+      "schema_sha256": "c561c18f4ab40c62009ced56fce369d4cdcbc5fbc3b8f2e0cbb654b475c0940b"
+    },
+    {
+      "node_name": "SamplerCustomAdvanced",
+      "schema_sha256": "261a495a933da3a3ffd113e1f909c0d714a60e4643eac6a057a1c488ffa19716"
+    },
+    {
+      "node_name": "MiniMaxH3AVDecodeT8",
+      "schema_sha256": "3856b31ab00fbf3f02d53589c18fd1487a272fe6d0be870fcb5dab93febc2930"
+    },
+    {
+      "node_name": "VHS_VideoCombine",
+      "schema_sha256": "d718d775baa3c3e3e0f3323f3d82ffc6eedf79c5a2b8df721abe1b52f0f8c231"
+    },
+    {
+      "node_name": "LoadImage",
+      "schema_sha256": "ecf1b0bb9558c1a84dea6e1fcf4f9a9d79ac5d09ed557092f1c062abcef4ead6"
+    },
+    {
+      "node_name": "VHS_LoadVideo",
+      "schema_sha256": "59389f8b463b29fd0571e4fe2dc99f2cea8ee7ad6fe8752d171411b10ca12b34"
+    }
+  ],
+  "output_container": "mp4",
+  "output_contract_hash": "04d4e93e66bdeae0180fb5c41498186ebaa9a0d7b2032e3df78ac41b265fb61e",
+  "output_crf": 17,
+  "prepared_receipt_hash": "f67ba6309c6dea54803f70c4d213d9053160068b07119a25d9c11dc3e2f6d6f5",
+  "project_content_hash": "f05a3f681bfedcf804e9fb59fb6fa85537aa45ec37e987b8449723f5b05de8f5",
+  "prompt_sha256": "4e6e9510574ee7bb48fc77c78d898291f7c3e304c235d593b6120b7f486653d1",
+  "provider_kind": "comfy-local-h3-t8",
+  "registry_content_hash": "e212390f7852c3a995c4e582c33a950e5c12abd2421a565b651254bd359afc3d",
+  "remote_provider_enabled": false,
+  "runtime_seals": [
+    {
+      "content_hash": "092d741960daf97d7cb5553dab10dbee9e2f0d45487d7fc10c34275e292c05a8",
+      "name": "comfyui",
+      "version": "0.33.2+7cee3ceb1a35"
+    },
+    {
+      "content_hash": "6974cc17969e7b829a44e177c85a60d6545389f0dbc5331e2a92329165200016",
+      "name": "minimax-h3-audio-t8",
+      "version": "1.36.2+977df788fcf8"
+    },
+    {
+      "content_hash": "911ab0ec2c2e163af08af50821f9ceb0d2c7bf021a637871c1451bd588bca721",
+      "name": "videohelpersuite",
+      "version": "4ee72c065db2"
+    }
+  ],
+  "sampler": "dual_clock_euler",
+  "scheduler": "native_flow",
+  "schema_version": "1",
+  "sealed_seed": 5696170359736854830,
+  "seed_derivation": "historical-materialized-m0-fixed-seed-v1",
+  "shift_audio": 3.0,
+  "shift_video": 12.0,
+  "status": "qualification_candidate",
+  "steps": 20,
+  "task_type": "Hybrid",
+  "turbo_lora": false,
+  "width": 1344,
+  "workflow_path": "workflows/qualification/minimax_h3_t8_c4_m0_candidate_v1_api.json",
+  "workflow_sha256": "963bd91ad81ca102053deb08b29a7aa8fb6849a6256a78ccbfbc6138d7a855d2"
+}
