@@ -19,15 +19,22 @@ Date: 2026-08-26
 > analyzed exact new Shot 00 bytes. The single local T8 output is technically continuous and has no
 > product, but its required sniff/reaction closure and audible sniff cue failed the per-Shot Gate.
 > No retry or later Shot was submitted.
+>
+> Replacement update (2026-08-27): after explicit user authorization to redo, a new Shot identity
+> `00_problem_discovery_sniff_recoil_v2` was generated once from a new recoil endpoint. Its visual
+> sniff-to-recoil closure now passes the exact-byte Gate. The audio contains two aligned non-speech
+> events, but project-local MCP cannot classify them as nasal sniffs; the overall Gate therefore
+> remains `NOT_EVALUATED` pending human listening. No later Shot was submitted.
 
 ## Purpose
 
-本文记录 exact v9 的新一轮 human `FAIL`、v10 opening replacement 的已完成本地生成，以及
-`video-analysis` MCP 不可用后触发的 fail-closed checkpoint。用户点名的四个缺陷为：开头人物表情
+本文记录 exact v9 的新一轮 human `FAIL`、v10 opening replacement 的本地生成、MCP恢复，以及
+replacement Shot 00 的逐项 Gate checkpoint。用户点名的四个缺陷为：开头人物表情
 不对；大盖未打开就喷；喷前没有先表现腋下困扰；约 13 秒开始的静态使用前后 Shot 僵硬且不连贯。
 
-本 checkpoint 不是完成的 30 秒 v10 candidate。只有 opening Shot 01A 已生成；后续 re-cap / elder
-entrance Shot、deterministic composition、voice timeline 与 final MP4 均未执行。
+本 checkpoint 不是完成的 30 秒 v10 candidate。opening Shot 01A、第一版 Shot 00 和 replacement
+Shot 00 均为独立历史 artifact；后续 re-cap / elder entrance Shot、deterministic composition、voice
+timeline 与 final MP4 均未执行。
 
 ## Replacement Contract
 
@@ -208,18 +215,75 @@ development artifact，不是 Production、P6、Final Acceptance或 human accept
 
 Gate失败后没有提交 Shot 01、没有 retry。ComfyUI supervisor已停止，`127.0.0.1:8188` listener消失。
 
+## 2026-08-27 Shot 00 Recoil Replacement And Gate
+
+用户明确要求“重做”后，本轮没有覆盖或 blind retry前一 artifact，而是创建新的 endpoint、prompt和
+output identity。built-in `imagegen`只修改末帧人物的头部与上身动作，使其在闻过腋下后出现可读的
+皱鼻和后缩；场景、服装、汗印与零产品约束保持不变：
+
+| Role | Path | SHA-256 |
+| --- | --- | --- |
+| recoil endpoint | `artifacts/qingyan-miao-ad-20260826-v10/assets/00-underarm-odor-recoil-last-v5.png` | `d0b4bf6edc9cb8a8cb1d4a141aef698c60fefafa29e72a48f54888b0f7c3a0e6` |
+| isolated beat prompt | `artifacts/qingyan-miao-ad-20260826-v10/prompts/00_problem_discovery_sniff_recoil_v3.txt` | `78a6ba99b9bac6f7f309ab4a07a1123099417e041bd2ed84e22adeecb0902938` |
+
+prompt将动作拆成明确的 neutral adjustment、汗印出现、抬臂检查、鼻子靠近、两次短促吸气、后缩与
+稳定终点。`hell-grind-aigc-skill`本地 audit为`PASS`、structural score `95/100`，只存在
+`P-NEGATIVE-DUPLICATE` warning；该结果只约束 prompt结构，不构成媒体质量证明。
+
+本机 H3/T8 `FL2VA`只提交一次：`768x1344`、141 frames、24fps、20 steps、
+`res_multistep` + `simple`、seed `104759`、CRF 17、native audio、无 LoRA。ComfyUI commit为
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`，T8 commit为
+`28cb160827c245b2d6a37539df30c1d7c5e7aecd`，prompt id为
+`1f5e2fd9-6b3d-4933-9310-66f7976b5e32`，wall time为`462.373s`。call accounting为
+`local_submit_count=1`、`retry_count=0`、`fallback_count=0`、`remote_submit_count=0`。
+
+exact output：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff_recoil_v2.mp4
+SHA-256 8e1db59cb565f8e348ac79eec75f0531b027d2a3e8ebea78f1253845d711b846
+3,022,191 bytes; H.264; 768x1344; 24fps; 141 frames; 5.875s; AAC stereo
+```
+
+exact runtime evidence：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff_recoil_v2.receipt.json
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff_recoil_v2.submitted-workflow.json
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff_recoil_v2.gate.json
+```
+
+MP4 video/audio full decode均`PASS`。project-local MCP对 exact SHA再次执行`video_analyze`与
+`video_review`；response SHA-256分别为
+`8b5361ea0cb5cee1516c652de07470ede59da09deb64f8d9d6722f6d7e05ece9`与
+`87de6f239959d309de8344602fc54cb8f92d8adfc2882f8b6cf7a0e75d1a07b1`。scene detection为单一
+`5.875s` scene，review采样`189`帧且全部唯一。13张有序 MCP抽帧显示人物在约
+`3.615-4.067s`把鼻子靠近抬起且被衣物覆盖的腋下，并从`4.519s`起逐步皱鼻、后缩至
+`5.423s`；全程没有瓶、盒、盖、喷头、产品缩略图、喷雾或处理动作。
+
+因此以下 requirements为`PASS`：先问题后处理、可见腋下汗印、视觉闻嗅与反应闭环、零产品、连续无
+切镜/静帧/闪白，以及 portrait T8技术契约。音轨在`3.4-5.5s`包含两段与靠近和后缩对齐的独立
+broadband non-speech events，但 MCP不能把呼吸声语义分类为鼻吸气，也不能排除衣料摩擦或呼气；
+`audible-sniff-cue`只能标记`NOT_EVALUATED`并等待 human listening。整体 Gate因此为
+`NOT_EVALUATED`，`next_shot_allowed=false`，不是视觉`FAIL`，也不是全`PASS`。
+
+Gate后没有提交后续 Shot，没有 remote/paid call。ComfyUI已通过 supervisor停止，loopback
+`127.0.0.1:8188`没有 listener。旧失败 artifact与其 Gate作为 immutable历史 evidence保留。
+
 ## Current Gate Status And Next Work
 
 current status：
 
 ```text
-VIDEO_ANALYSIS_STDIO_AVAILABLE / SHOT00_SINGLE_LOCAL_SUBMIT_COMPLETE /
-SHOT00_GATE_FAIL_SNIFF_CLOSURE / NEXT_SHOT_BLOCKED / NO_V10_FINAL
+VIDEO_ANALYSIS_STDIO_AVAILABLE / SHOT00_REPLACEMENT_SINGLE_LOCAL_SUBMIT_COMPLETE /
+VISUAL_SNIFF_RECOIL_PASS / AUDIBLE_SNIFF_NOT_EVALUATED /
+NEXT_SHOT_BLOCKED_PENDING_HUMAN_LISTENING / NO_V10_FINAL
 ```
 
-下次工作必须从新的 Shot identity与新的 accepted motion strategy开始，并先解决 sniff action closure与
-audio cue；不得覆盖或 blind retry当前 exact artifact。只有 replacement Shot 00的全部 required findings
-为`PASS`，才允许重新 Gate treatment Shot并继续老人 dialogue或最终 composition。
+下一步不是继续生成或再改视觉动作，而是由用户试听 exact replacement MP4，并判断两段声音是否清楚读成
+短促鼻吸气。只有该 requirement获得独立 human `PASS`，replacement Shot 00才可闭合为全项`PASS`，随后
+才能重新 Gate treatment Shot并继续老人 dialogue或最终 composition；若 human `FAIL`，必须使用新 Shot
+identity重新设计音频动作，不得覆盖或 blind retry当前 exact artifact。
 
 ## Agent Guardrails
 
@@ -228,8 +292,9 @@ audio cue；不得覆盖或 blind retry当前 exact artifact。只有 replacemen
 - Shot 00 必须表达“腋下出汗导致局部汗印”；不得将问题写成衣料、衣服材质或穿着不适。
 - Shot 00 必须包含可观察的闻腋下动作：头和鼻子主动靠近被衣物遮挡的腋下、短促 sniff、轻微皱鼻；
   只看汗印或只摸衣服均不满足该 human requirement。
-- 当前 exact `00_problem_discovery_sniff.mp4` 已因 sniff/reaction closure与 audible cue失败；不得把单一
-  scene、全 unique frames或技术 decode `PASS`升级为 semantic Gate `PASS`。
+- 当前 exact `00_problem_discovery_sniff.mp4` 已因 sniff/reaction closure与 audible cue失败，继续作为
+  historical evidence；replacement `00_problem_discovery_sniff_recoil_v2.mp4`只获得视觉 requirements
+  `PASS`，不得把两段 non-speech audio energy升级为 `audible-sniff-cue PASS`。
 - 不得在 exact Shot 01A 未完成 Gate 前提交 Shot 01B、合成 v10 final 或宣称 13 秒问题已在成片修复。
 - 不得覆盖或 blind retry exact `01_problem_open_cap_spray` durable state；若内容后来被判为 `FAIL`，必须
   以新 Shot identity和新的 exact receipt处理。
