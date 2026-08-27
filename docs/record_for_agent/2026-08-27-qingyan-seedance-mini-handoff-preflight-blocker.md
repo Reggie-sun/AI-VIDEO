@@ -1,12 +1,12 @@
-# Qingyan Seedance Mini Handoff Preflight Blocker Record
+# Qingyan Seedance Mini Handoff Live Rejection Record
 
 Date: 2026-08-27
 
 ## Purpose
 
-本文记录用户否决 v12 后，为缺失的“老人推荐产品并交给苗家少女”因果桥设计的一次 Seedance Mini 单 Shot 实验，以及当前阻止 remote submit 的 exact credential gate。
+本文记录用户否决 v12 后，为缺失的“老人推荐产品并交给苗家少女”因果桥设计的一次 Seedance Mini 单 Shot 实验，以及唯一一次 remote submit 的 known-no-effect rejection。
 
-本记录是 development experiment preflight，不是 Provider 成功、生成视频、Production candidate、P6、Final Acceptance 或 v12 修复完成的证据。
+本记录是 development experiment failure evidence，不是 Provider 成功、生成视频、Production candidate、P6、Final Acceptance 或 v12 修复完成的证据。
 
 ## Human Verdict And Problem Boundary
 
@@ -78,10 +78,10 @@ PYTHONPATH=src python \
   runs/qingyan-seedance-mini-elder-handoff-20260827-001/preflight.py
 ```
 
-最终输出：
+连接真实 desktop session bus 后的最终输出：
 
 ```json
-{"credential_present":false,"estimated_cost_upper_bound_cny":2.484,"mode":"reference_to_video","model_id":"doubao-seedance-2-0-mini-260615","prompt_lint":"PASS","reference_count":3,"status":"blocked_before_paid_submit","submit_posts":0}
+{"credential_present":true,"estimated_cost_upper_bound_cny":2.484,"mode":"reference_to_video","model_id":"doubao-seedance-2-0-mini-260615","prompt_lint":"PASS","reference_count":3,"status":"ready_for_paid_gates","submit_posts":0}
 ```
 
 verified evidence：
@@ -105,7 +105,7 @@ machine-readable evidence：
 - `runs/qingyan-seedance-mini-elder-handoff-20260827-001/evidence/resolved-request.json`
 - `runs/qingyan-seedance-mini-elder-handoff-20260827-001/evidence/prompt-lint.txt`
 
-## Current Blocker
+## Credential Recovery And Live Attempt
 
 规定的 Secret Service lookup：
 
@@ -115,13 +115,45 @@ provider seedance
 credential ARK_API_KEY
 ```
 
-当前返回 absent，因此状态必须保持 `blocked_before_paid_submit`。本轮没有从 environment、repository、shell history、其他 Provider 或替代 secret source 查找 credential，也没有 mint permit、submit、blind retry 或 fallback。
+历史脱敏记录确认此前使用过 `Secret Service injected ARK_API_KEY supplier`。最初的 lookup exit `1` 不是 item absent evidence；当时 Codex shell 未继承 `DBUS_SESSION_BUS_ADDRESS` 与 `XDG_RUNTIME_DIR`，实际没有连接 desktop Secret Service。连接当前用户 `/run/user/1000/bus` 后：
 
-恢复该 exact secret reference 后，仍需重新验证 pricing freshness、exact refs、task-scoped cloud egress、durable intent 与 one-use permit，才能进行唯一一次 POST；历史 authorization 或 credential presence 本身不能替代这些 gates。
+- `org.freedesktop.secrets` 由 `gnome-keyring-daemon` 提供；
+- exact lookup 与 exact search 均成功；
+- 没有读取 repo、shell history、raw rollout、MiniMax credential 或替代 secret source；
+- credential value 没有写入 stdout、log、record 或 artifact。
+
+重新通过 offline preflight 后，runtime 创建 exact paid preview、`3 CNY` ceiling、durable submit intent 与 one-use permit，并于 `2026-08-27T13:12:40Z` 执行唯一一次 POST。sealed request：
+
+- request fingerprint: `a5e7fe755d725f17e34ec03fa78e30b228585c0f0ac7520e8f47ac75b1ef8ae5`
+- preview fingerprint: `965d20fba91f7d8b565c37125ed5dd6df82634ee3ad31be1c7c6a526bdfa091d`
+- body SHA-256: `899012c53fe1bec87c46733963afb1d6c77ec55f4b4f60849668321040280c9c`
+- exact refs: three sealed PNGs listed above
+- `720p`, `9:16`, `5s`, `generate_audio=true`
+
+Ark 明确返回 `HTTP 400`。canonical runtime 将其落为：
+
+```text
+attempt status: failed
+error_code: paid_provider_known_no_effect
+paid_provider phase: known_no_effect
+external_effect_id: null
+actual_cost_microunits: 0
+submit_posts: 1
+```
+
+submit receipt：
+
+```text
+runs/qingyan-seedance-mini-elder-handoff-20260827-001/production/state/paid-provider/submits/cfa6e83ecb4d1df3d155ed139ba88637daade942bc338c9574b54e15c675a2cc.json
+```
+
+budget reservation 已释放，费用为 `0 CNY`。没有 task ID、poll、fetch、MP4、activation、retry、permit remint 或 Provider fallback。当前 driver 没有持久化 Ark 400 response body，因此不能从现有 evidence 精确判断是 multi-reference、native audio、output geometry、prompt 还是其他 request constraint；不得猜测 root cause 后自动改参重提。
+
+fresh 官方 `CreateContentsGenerationsTasks` 文档列出了多 image `reference_image` 输入示例，并说明 Seedance 2.0 支持 `generate_audio`；但它没有证明本账号、exact Mini model 与本次全部参数组合一定接受，也无法替代丢失的 400 structured response body。因此当前只可排除“通用 API 完全不支持 reference images / audio”这一过宽解释，不能进一步判定 exact rejection cause。文档：`https://api.volcengine.com/api-docs/view?action=CreateContentsGenerationsTasks&serviceCode=ark&version=2024-01-01`。
 
 ## Post-Media Gate
 
-若唯一 submit 以后得到 exact MP4，必须先绑定其 SHA-256 并立即调用 project-local `video-analysis` MCP。以下 requirements 全部为 `PASS` 才能结束实验：
+本次没有得到 MP4，因此没有调用 `video-analysis` MCP，所有媒体 requirements 保持 `NOT_EVALUATED`。若未来另有明确授权的新 submit 得到 exact MP4，必须先绑定其 SHA-256 并立即调用 project-local `video-analysis` MCP。以下 requirements 全部为 `PASS` 才能结束实验：
 
 1. `IDENTITY_AND_COUNT`
 2. `INITIAL_OWNERSHIP`
@@ -136,13 +168,15 @@ credential ARK_API_KEY
 ## Remaining Risks
 
 1. 当前没有 Provider MP4，因此还无法判断双人 identity、手部交接、产品一致性、中文对白和口型是否满足要求。
-2. 即使单 Shot PASS，也只证明桥接镜头本身；首 Shot 问题建立、后续喷雾/效果因果、`11s` / `22s` 节奏与最终收口仍需独立 human review gates。
-3. Seedance native audio 是否进入最终 composition 受现有 P4 contract 限制；raw MP4 有音轨不等于最终成片采用该音轨。
-4. run evidence 为 local generated/untracked runtime artifact；本记录 commit 不会把它变成 Production state、remote publication 或 release truth。
+2. 唯一 permit 已消费；任何 diagnostic submit、参数降级或 variant 都是新的 paid scope，必须先查明 400 constraint 并取得新的明确 authorization。
+3. 即使未来单 Shot PASS，也只证明桥接镜头本身；首 Shot 问题建立、后续喷雾/效果因果、`11s` / `22s` 节奏与最终收口仍需独立 human review gates。
+4. Seedance native audio 是否进入最终 composition 受现有 P4 contract 限制；raw MP4 有音轨不等于最终成片采用该音轨。
+5. run evidence 为 local generated/untracked runtime artifact；本记录 commit 不会把它变成 Production state、remote publication 或 release truth。
 
 ## Agent Guardrails
 
 - 不得把 offline adapter preview 或 prompt lint PASS 描述成 Seedance 生成成功。
 - 不得绕过 exact Secret Service reference，或把一次 task authorization解释成无限调用额度。
 - 不得在 missing/stale/unknown exact MP4 上调用或伪造 post-media PASS。
+- 当前 `HTTP 400` 是 `known_no_effect`，不是 unknown outcome；但它同样不授权自动重试或 permit remint。
 - 不得自动重试或把新桥接 Shot 插入 v12；下一次 remote submit 与任何 composition change 必须保持各自 authorization 和 gate boundary。
