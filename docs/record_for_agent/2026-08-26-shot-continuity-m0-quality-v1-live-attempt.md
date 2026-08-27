@@ -2,6 +2,11 @@
 
 Date: 2026-08-26
 
+> Supersession notice (2026-08-27): 本记录中v1-v3的OOM与capacity FAIL仍是对应exact attempts的历史事实，
+> 但不再代表current runtime结论。后续isolated `--novram` v4与terminal-tail v5均完成local submit/poll/fetch并产生
+> exact MP4；current status、媒体证据与尚未关闭的human speed verdict见
+> `docs/record_for_agent/2026-08-27-shot-continuity-m0-terminal-tail-v5.md`。
+
 ## Purpose
 
 本文记录current v9 source-boundary P6关闭后，用户显式选择`quality-v1`并分别授权三个exactly-one-submit
