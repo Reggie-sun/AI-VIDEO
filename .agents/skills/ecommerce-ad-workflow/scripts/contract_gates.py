@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+import math
 from typing import get_args
 
 from contract_models import (
@@ -467,6 +468,36 @@ def _validate_source_audio(package: EcommerceAdProductionPackage) -> None:
             "source_audio_policy: every Shot requires exactly one source-audio policy"
         )
     for item in policies.values():
+        has_source_audio = item.source_type != "NONE"
+        has_measurement_requirement = item.measurement_requirement is not None
+        if item.p6_measurement_required != has_measurement_requirement:
+            raise ValueError(
+                "source_audio_policy: P6 measurement flag and requirement must agree"
+            )
+        if not has_source_audio:
+            if (
+                item.policy != "MUTE"
+                or item.trim_start_seconds is not None
+                or item.lead_in_noise_risk
+                or item.p6_measurement_required
+            ):
+                raise ValueError(
+                    "source_audio_policy: a Shot without source audio must use the empty MUTE route"
+                )
+            continue
+        if item.policy == "TRIM_THEN_MIX":
+            if (
+                item.trim_start_seconds is None
+                or not math.isfinite(item.trim_start_seconds)
+                or item.trim_start_seconds < 0
+            ):
+                raise ValueError(
+                    "source_audio_policy: trim-then-mix requires a finite non-negative trim start"
+                )
+        elif item.trim_start_seconds is not None:
+            raise ValueError(
+                "source_audio_policy: trim start is only valid for trim-then-mix"
+            )
         if item.lead_in_noise_risk and (
             item.policy == "KEEP"
             or not item.p6_measurement_required

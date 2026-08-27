@@ -8,6 +8,20 @@
 
 `product_truth`/constraints -> `ProductionBrief` proposal + upstream truth attachment；实际存在的talent -> `Character` proposal；实际存在的set -> `Scene` proposal；beats/storyboard -> `Storyboard`/`StoryboardBeat` proposal；shot intents -> `Shot` proposal。product source assets 只提出 Registry import/image-generation request；dialogue/VO 只提出 `AudioTrackSpec` request；`DIALOGUE_SUBTITLE` 只提出 `CaptionTrack`/binding request；audio cues 提出 P4 authoring request。
 
+Source-audio handoff必须保留逐Shot policy而不是统一改成P4 replacement；当前package contract
+只保存authoring intent，没有first-class exact Provider request或generated-audio asset binding，
+因此valid package本身不能证明下列Runtime路线已经闭合：
+
+- `GENERATED + KEEP/TRIM_THEN_MIX`在执行Gate中必须形成Provider output native-audio requirement，
+  以及最终媒体对embedded generated audio的exact identity、measurement与ingestion requirement。
+  已选Provider若不支持native audio，执行Gate必须STOP，不能改写为silent request。
+- `MUTE/REPLACE`只把仍需的dialogue、VO、music、SFX与ambience投影为显式P4 requests；Provider
+  source audio不能被计入coverage。
+- 若最终canonical composition尚不能把generated source audio作为asset送入
+  `CompositionSpec -> ResolvedTimeline -> HyperFrames`，必须分类为
+  `REQUIRES_RUNTIME_CAPABILITY`并阻止final-composition claim。Raw MP4有音轨不能被标成final
+  mixed-audio support，也不得通过direct mux或移除source `muted`建立第二条timeline。
+
 每个 handoff item 必须声明 `classification`：`SUPPORTED_CURRENTLY`、`REQUIRES_SOURCE_GENERATION_STRATEGY`、`REQUIRES_RUNTIME_CAPABILITY`、`REQUIRES_HUMAN_DECISION` 或 `BLOCKED_BY_TRUTH_OR_RIGHTS`，并写明 source package field、requirement/gap、owner 与 unresolved item。
 
 每个 `requirement_id` 必须恰好出现在一个 `classified_gap.requirement_ids` 中，且 gap 与所有 bound requirements 的 `classification` 完全一致。`SUPPORTED_CURRENTLY` 只是 handoff classification，不是可伪造的 Runtime evidence；对 physical interaction，current validator 不接受该自我声明。
@@ -25,6 +39,9 @@ Future Runtime-facing domain media evidence只能由独立accepted spec/plan接�
 - handoff 不得包含 Provider name/profile、credential、permit、task ID、Manifest revision、timeline frames/samples、render path、P6 PASS、Final Acceptance、activation 或 execution instruction。
 - `PHYSICAL_INTERACTION_REQUIRED`、advertising copy graphics 或其他未实现能力必须如实分类；不得写 unsupported `CompositionSpec` 字段、建立第二 timeline/renderer，或以 prose 隐藏 gap。
 - capability/truth/rights owner 或 resolution path 不明确时，不通过 G6。
+- G6不得把silent Provider output加未来P4配音描述成KEEP/TRIM同一路线；但由于当前schema没有
+  first-class exact request/ingestion binding，最终binding与STOP只能由后续Agent Per-Shot及
+  final-composition Gate执行，不能由`PACKAGE_READY`推断。
 - 任一requirement或classified gap为`BLOCKED_BY_TRUTH_OR_RIGHTS`时package不得ready；classification不能只记录在handoff后被Ad QC忽略。
 
 ## Quick Reference

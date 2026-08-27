@@ -171,7 +171,9 @@ Safety / User Authorization
 background hook、Provider callback、Product Runtime writer 或新的 P6 lifecycle。执行顺序固定为：
 
 ```text
-generate Shot N once
+resolve Shot N SourceAudioPolicy against the already-selected Provider capability
+  -> bind the chosen audio route into the exact request
+  -> generate Shot N once
   -> exact MP4 exists and SHA-256 is fixed
   -> call project-local video-analysis MCP on that exact path
   -> map raw evidence to exact Shot requirements
@@ -180,6 +182,20 @@ generate Shot N once
 ```
 
 - 多 Shot task 必须按 one-Shot-at-a-time orchestration 执行；不得先提交整个 batch，再补分析。
+- `SourceAudioPolicy`是逐Shot authoring intent，不选择Provider。Agent必须在submit前将它与
+  已选Provider的exact output capability合并为单一路线，禁止用统一的“先静音、以后P4补音”
+  默认值覆盖已声明的source-audio intent：
+  - `source_type=GENERATED`且`policy=KEEP`或`TRIM_THEN_MIX`时，request必须声明
+    `native_audio=true`；对Seedance adapter即`generate_audio=true`。Capability不支持`true`、
+    request被改成`false`或exact request identity无法证明时，必须在submit前STOP，不得静音降级、
+    更换Provider或把未来P4配音当作等价满足。
+  - `policy=MUTE`或`REPLACE`时，source audio不得满足该Shot的最终audio coverage；所有仍需的
+    dialogue、VO、BGM、SFX或ambience必须由显式P4 audio requirements覆盖。逐Shot raw-MP4
+    Gate只验证exact request/source route和这些P4 coverage requirements已经声明；最终是否真正
+    静音或替换只能在P4 render后的final-composition Gate检查，不得提前伪造PASS或因此阻断下一Shot。
+  - `source_type=NONE`只允许empty `MUTE` route；不得伪造KEEP、trim或measurement intent。
+  - `source_type=NATIVE`的KEEP/TRIM route必须绑定exact existing source-audio identity；不得把它
+    偷换成Provider新生成的音轨。
 - 显式 MCP 调用至少覆盖 exact media probe 与 sampled visual review；需要 audio、scene-change、
   lip-sync 或 continuity evidence 时，调用对应 MCP capability。异步 Generated-Video Analysis
   Hook只用于advisory background capture，queue/result均不能满足本 Gate。
@@ -188,6 +204,15 @@ generate Shot N once
 - Gate output必须逐项记录`requirement_id`、evidence reference、`PASS` / `FAIL` /
   `NOT_EVALUATED`与简洁reason。不得用一个quality score覆盖identity、action、product/object、
   camera、duration、prompt adherence、audio或continuity等独立required findings。
+- `GENERATED + KEEP/TRIM_THEN_MIX`的exact MP4除了audio-stream parity外，还必须逐项检查
+  decoded audio可用、audibility、与画面/动作同步、required dialogue或recommendation语义、
+  speaker/lip-sync binding，以及重复广告词或非预期静音。任一required audio finding缺少可信
+  evidence都必须`NOT_EVALUATED`；有音轨本身不构成audio PASS。
+- Raw Provider MP4的audio PASS只关闭当前Shot barrier，不证明该音轨进入最终成片。若最终路径
+  使用canonical P4 composition，KEEP/TRIM source必须先作为exact generated audio asset进入
+  `CompositionSpec -> ResolvedTimeline -> HyperFrames`；当前lane缺少该能力时必须报告
+  `REQUIRES_RUNTIME_CAPABILITY`并停止final-composition与delivery claim，但不把已经关闭的raw Shot
+  barrier倒退为FAIL；不得移除`muted`或direct mux旁路。
 - 只有全部required findings为`PASS`时，Agent才可提交下一Shot。MCP unavailable/error、
   output identity drift、missing/stale evidence或任何required finding无法可靠判断都必须
   `NOT_EVALUATED`并fail closed。
@@ -196,6 +221,11 @@ generate Shot N once
 - MCP raw evidence与Agent verdict不得直接写Manifest、Registry、activation、P6 receipt或
   Final Acceptance。进入Production acceptance时，仍须由existing review contract与
   `ProductionStateCommitter`重新绑定、adjudicate和持久化。
+
+Final-composition audio Gate在P4 render后独立执行：`KEEP/TRIM_THEN_MIX`必须证明accepted source
+audio按exact trim/mix进入最终`ResolvedTimeline`；`MUTE/REPLACE`必须证明source audio未泄漏且
+replacement coverage存在；intentional silence必须保持预期。该Gate不允许下一Shot submit，也不
+重复生成Provider media，只决定final-media是否可继续进入P6 / Final Acceptance。
 
 ## 6. Agent Experience Memory Routing
 

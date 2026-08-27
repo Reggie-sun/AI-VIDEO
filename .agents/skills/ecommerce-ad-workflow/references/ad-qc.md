@@ -13,7 +13,7 @@ G7 是 authoring preflight：检查 package 的真相、广告逻辑和 handoff 
 5. presentation mode 是否诚实，未把 graphic overlay 冒充 physical interaction？
 6. presenter action、source framing、lighting/occlusion 是否有可执行空间或明确 gap？
 7. `DIALOGUE_SUBTITLE` 是否与 commercial roles 分离，并具 hierarchy/safe-area/avoidance？
-8. audio coverage、on-camera binding、source-audio policy、lead-in P6 requirement 是否完整？
+8. audio coverage、on-camera binding、source-audio policy、lead-in P6 requirement 是否完整，且没有在authoring层把generated KEEP/TRIM意图改写成P4 replacement？
 9. Shot duration 是否由 beat rationale 驱动，而非机械等长？
 10. Runtime capability gap 是否已分类，未被 fallback 或 prose 隐藏？
 11. Package `ad_format`是否与source input一致，且对应Gate Profile已经闭合？

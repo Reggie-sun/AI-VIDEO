@@ -1024,6 +1024,119 @@ def test_source_audio_policy_must_be_unique_per_shot(tmp_path: Path) -> None:
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+@pytest.mark.parametrize(
+    ("source_type", "policy", "trim_start_seconds", "measurement_required"),
+    (
+        ("NONE", "KEEP", None, False),
+        ("GENERATED", "TRIM_THEN_MIX", None, True),
+        ("GENERATED", "KEEP", 0.2, True),
+        ("GENERATED", "TRIM_THEN_MIX", float("nan"), True),
+        ("GENERATED", "TRIM_THEN_MIX", float("inf"), True),
+    ),
+)
+def test_source_audio_policy_rejects_inconsistent_runtime_route(
+    tmp_path: Path,
+    source_type: str,
+    policy: str,
+    trim_start_seconds: float | None,
+    measurement_required: bool,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        item = payload["audio_plan"]["source_audio_policies"][0]
+        item["source_type"] = source_type
+        item["policy"] = policy
+        item["trim_start_seconds"] = trim_start_seconds
+        item["lead_in_noise_risk"] = False
+        item["p6_measurement_required"] = measurement_required
+        item["measurement_requirement"] = (
+            "Measure the exact source-audio route in final media."
+            if measurement_required
+            else None
+        )
+
+    _assert_invalid_package(tmp_path, mutate, "source_audio_policy")
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+@pytest.mark.parametrize(
+    ("source_type", "policy", "trim_start_seconds", "measurement_required"),
+    (
+        ("GENERATED", "KEEP", None, False),
+        ("GENERATED", "TRIM_THEN_MIX", 0.2, True),
+        ("GENERATED", "MUTE", None, False),
+        ("NATIVE", "REPLACE", None, False),
+    ),
+)
+def test_source_audio_policy_accepts_structurally_consistent_authoring_intent(
+    tmp_path: Path,
+    source_type: str,
+    policy: str,
+    trim_start_seconds: float | None,
+    measurement_required: bool,
+) -> None:
+    payload = _load_json(PACKAGE_EXAMPLE_PATH)
+    item = payload["audio_plan"]["source_audio_policies"][0]
+    item["source_type"] = source_type
+    item["policy"] = policy
+    item["trim_start_seconds"] = trim_start_seconds
+    item["lead_in_noise_risk"] = False
+    item["p6_measurement_required"] = measurement_required
+    item["measurement_requirement"] = (
+        "Measure the exact source-audio route in final media."
+        if measurement_required
+        else None
+    )
+    _rehash_package(payload)
+    path = tmp_path / "valid-source-audio-route.json"
+    _write_payload(path, payload)
+
+    result = _run_cli("package", path, source_input_path=INPUT_EXAMPLE_PATH)
+
+    assert result.returncode == 0, result.stdout
+    assert json.loads(result.stdout)["status"] == "valid"
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
+def test_source_audio_measurement_flag_requires_matching_requirement(
+    tmp_path: Path,
+) -> None:
+    def mutate(payload: dict[str, object]) -> None:
+        item = payload["audio_plan"]["source_audio_policies"][0]
+        item["p6_measurement_required"] = False
+        item["measurement_requirement"] = "Stale measurement requirement."
+
+    _assert_invalid_package(tmp_path, mutate, "source_audio_policy")
+
+
+def test_native_audio_gate_documents_provider_capability_branch() -> None:
+    playbook = (ROOT / ".agent/context/control-plane-playbook.md").read_text(
+        encoding="utf-8"
+    )
+    audio_reference = (
+        SKILL_ROOT / "references" / "audio-pacing-and-coverage.md"
+    ).read_text(encoding="utf-8")
+    runtime_reference = (
+        SKILL_ROOT / "references" / "runtime-handoff.md"
+    ).read_text(encoding="utf-8")
+
+    for required in (
+        "SourceAudioPolicy",
+        "native_audio=true",
+        "generate_audio=true",
+        "KEEP",
+        "TRIM_THEN_MIX",
+        "MUTE",
+        "REPLACE",
+        "FAIL / NOT_EVALUATED",
+    ):
+        assert required in playbook
+    assert "Provider capability" in audio_reference
+    assert "REQUIRES_RUNTIME_CAPABILITY" in runtime_reference
+    assert "ResolvedTimeline" in runtime_reference
+    assert "Final-composition audio Gate" in playbook
+
+
+@pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")
 def test_cta_and_brand_end_card_must_bind_the_final_beat_and_shot(
     tmp_path: Path,
 ) -> None:
