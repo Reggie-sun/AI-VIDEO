@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 from dataclasses import replace
 from pathlib import Path
@@ -390,6 +391,20 @@ def test_m0_profile_seals_exact_live_node_schemas() -> None:
     assert sources.profile.sealed_seed == derive_m0_qualification_seed(
         sources.profile.model_dump(mode="python")
     )
+
+
+def test_m0_seed_derivation_is_part_of_sealed_compiler_bytes() -> None:
+    sources = load_m0_qualification_execution_sources(
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+
+    assert inspect.getsource(derive_m0_qualification_seed).encode() in (
+        sources.materialization.compiler_bytes
+    )
+    assert sources.materialization.compiler_hash == hashlib.sha256(
+        sources.materialization.compiler_bytes
+    ).hexdigest()
 
 
 @pytest.mark.parametrize("mutation", ("missing", "drift"))

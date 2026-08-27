@@ -9,6 +9,7 @@ from types import SimpleNamespace
 
 import ai_video.production.shot_continuity_m0_qualification as m0_qualification
 import ai_video.production.shot_continuity_m0_fast_validation as m0_fast
+import ai_video.production.shot_continuity_m0_seed_reseal as m0_seed_reseal
 import ai_video.production.shot_continuity_source_stack as source_stack_module
 import scripts.materialize_shot_continuity_m0 as materialize_script
 import pytest
@@ -394,6 +395,49 @@ def test_m0_validation_preflight_reopens_and_consumes_exact_materialized_hashes(
         (item.input_kind, item.content_hash) for item in committer.bundle[4]
     )
     assert committer.reopen_calls == [("m0",), ("m0",)]
+
+
+def test_m0_validation_preflight_invokes_fixed_seed_reseal_gate(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sources = m0_qualification.load_m0_qualification_execution_sources(
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+    committer = _ReadOnlyCommitter(_bundle(sources))
+    calls: list[tuple[object, object]] = []
+    monkeypatch.setattr(
+        m0_seed_reseal,
+        "validate_m0_fixed_seed_reseal",
+        lambda **values: calls.append((values["committer"], values["profile"])),
+    )
+
+    m0_qualification.reopen_m0_validation_preflight(
+        committer=committer,
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+
+    assert calls == [(committer, sources.profile)]
+
+
+def test_m0_materialization_invokes_fixed_seed_reseal_gate(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[object] = []
+    monkeypatch.setattr(
+        materialize_script,
+        "validate_m0_fixed_seed_reseal",
+        lambda **values: calls.append(values["profile"]),
+    )
+
+    _, profile_path, _ = _real_materialized_committer(tmp_path, monkeypatch)
+
+    expected = m0_qualification.M0QualificationProfile.model_validate_json(
+        profile_path.read_bytes()
+    )
+    assert calls == [expected]
 
 
 def test_m0_materialization_owner_reseals_source_drift_and_replays_exactly(

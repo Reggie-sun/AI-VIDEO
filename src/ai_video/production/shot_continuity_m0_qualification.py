@@ -60,6 +60,15 @@ _RUNTIME_FILE_CHOOSERS = {
     "LoadImage": ("image",),
     "VHS_LoadVideo": ("video",),
 }
+M0_REFERENCE_VIDEO_MIN_DURATION_MILLISECONDS = 2_000
+M0_REFERENCE_VIDEO_MAX_DURATION_MILLISECONDS = 15_000
+M0_REFERENCE_VIDEO_POLICY = "official_2_to_15s"
+M0SeedDerivation = Literal[
+    "content-addressed-m0-closure-sha256-low63-v1",
+    "historical-materialized-m0-fixed-seed-v1",
+]
+CONTENT_ADDRESSED_M0_SEED = "content-addressed-m0-closure-sha256-low63-v1"
+FIXED_M0_SEED_RESEAL = "historical-materialized-m0-fixed-seed-v1"
 _M0_SEED_FIELDS = (
     "candidate_id",
     "initial_execution_stack_hash",
@@ -69,9 +78,6 @@ _M0_SEED_FIELDS = (
     "registry_content_hash",
     "prompt_sha256",
 )
-M0_REFERENCE_VIDEO_MIN_DURATION_MILLISECONDS = 2_000
-M0_REFERENCE_VIDEO_MAX_DURATION_MILLISECONDS = 15_000
-M0_REFERENCE_VIDEO_POLICY = "official_2_to_15s"
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -81,6 +87,46 @@ def _invalid(message: str, detail: str | None = None) -> AiVideoError:
         technical_detail=detail,
         retryable=False,
     )
+
+
+def derive_m0_qualification_seed(values: Mapping[str, object]) -> int:
+    """Derive the default stable non-negative seed from one exact closure."""
+
+    try:
+        payload = {field: values[field] for field in _M0_SEED_FIELDS}
+    except KeyError as exc:
+        raise ValueError("M0 seed derivation closure is incomplete") from exc
+    digest = canonical_sha256(
+        {
+            "schema": "ai-video-m0-sealed-seed/1",
+            **payload,
+        }
+    )
+    return int(digest[:16], 16) & ((1 << 63) - 1)
+
+
+def validate_m0_seed_contract(values: Mapping[str, object]) -> None:
+    """Validate mode-specific fields within the sealed M0 compiler source."""
+
+    mode = values.get("seed_derivation")
+    source_fields = (
+        values.get("fixed_seed_source_prepared_receipt_hash"),
+        values.get("fixed_seed_source_execution_stack_hash"),
+        values.get("fixed_seed_source_profile_hash"),
+    )
+    if mode == CONTENT_ADDRESSED_M0_SEED:
+        if any(item is not None for item in source_fields):
+            raise ValueError(
+                "content-addressed M0 seed must not declare fixed-seed source fields"
+            )
+        if values.get("sealed_seed") != derive_m0_qualification_seed(values):
+            raise ValueError("M0 sealed seed does not match the content-addressed closure")
+        return
+    if mode == FIXED_M0_SEED_RESEAL:
+        if any(item is None for item in source_fields):
+            raise ValueError("fixed M0 seed reseal requires exact historical source fields")
+        return
+    raise ValueError("M0 seed derivation mode is unsupported")
 
 
 class M0QualificationComponent(StrictModel):
@@ -119,9 +165,14 @@ class M0QualificationProfile(StrictModel):
     project_content_hash: str = Field(pattern=_SHA256)
     registry_content_hash: str = Field(pattern=_SHA256)
     prompt_sha256: str = Field(pattern=_SHA256)
-    seed_derivation: Literal[
-        "content-addressed-m0-closure-sha256-low63-v1"
-    ]
+    seed_derivation: M0SeedDerivation
+    fixed_seed_source_prepared_receipt_hash: str | None = Field(
+        default=None, pattern=_SHA256
+    )
+    fixed_seed_source_execution_stack_hash: str | None = Field(
+        default=None, pattern=_SHA256
+    )
+    fixed_seed_source_profile_hash: str | None = Field(default=None, pattern=_SHA256)
     sealed_seed: int = Field(strict=True, ge=0, le=(1 << 63) - 1)
     task_type: Literal["Hybrid"]
     components: tuple[M0QualificationComponent, ...] = Field(min_length=4, max_length=4)
@@ -166,29 +217,8 @@ class M0QualificationProfile(StrictModel):
             raise ValueError(
                 "M0 node schema seals must cover every required node exactly"
             )
-        if self.sealed_seed != derive_m0_qualification_seed(
-            self.model_dump(mode="python")
-        ):
-            raise ValueError(
-                "M0 sealed seed does not match the content-addressed closure"
-            )
+        validate_m0_seed_contract(self.model_dump(mode="python"))
         return self
-
-
-def derive_m0_qualification_seed(values: Mapping[str, object]) -> int:
-    """Derive one stable non-negative seed without inspecting generated media."""
-
-    try:
-        payload = {field: values[field] for field in _M0_SEED_FIELDS}
-    except KeyError as exc:
-        raise ValueError("M0 seed derivation closure is incomplete") from exc
-    digest = canonical_sha256(
-        {
-            "schema": "ai-video-m0-sealed-seed/1",
-            **payload,
-        }
-    )
-    return int(digest[:16], 16) & ((1 << 63) - 1)
 
 
 class M0QualificationBinding(StrictModel):
@@ -681,6 +711,11 @@ def reopen_m0_validation_preflight(
         profile_path=profile_path,
         artifact_root=artifact_root,
     )
+    from ai_video.production.shot_continuity_m0_seed_reseal import (
+        validate_m0_fixed_seed_reseal,
+    )
+
+    validate_m0_fixed_seed_reseal(committer=committer, profile=sources.profile)
     receipt, stacks, policies, validation_set, inputs = (
         committer.reopen_p0_qualification_prepared(
             required_materialized_candidates=("m0",)
@@ -787,6 +822,8 @@ def compile_m0_qualification_workflow(
 
 
 __all__ = [
+    "CONTENT_ADDRESSED_M0_SEED",
+    "FIXED_M0_SEED_RESEAL",
     "M0QualificationCompileInputs",
     "M0QualificationExecutionSources",
     "M0QualificationProfile",
@@ -796,5 +833,6 @@ __all__ = [
     "compile_m0_qualification_workflow",
     "load_m0_qualification_execution_sources",
     "reopen_m0_validation_preflight",
+    "validate_m0_seed_contract",
     "validate_m0_sources_against_stack",
 ]

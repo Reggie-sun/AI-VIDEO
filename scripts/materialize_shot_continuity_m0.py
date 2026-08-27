@@ -30,6 +30,9 @@ from ai_video.production.shot_continuity_m0_qualification import (
     load_m0_qualification_execution_sources,
     validate_m0_sources_against_stack,
 )
+from ai_video.production.shot_continuity_m0_seed_reseal import (
+    validate_m0_fixed_seed_reseal,
+)
 from ai_video.production.shot_continuity_source_stack import (
     load_shot_continuity_source_execution_sources,
     reopen_materialized_shot_continuity_source_execution_sources,
@@ -118,6 +121,11 @@ def materialize(
         artifact_root=REPO_ROOT,
     )
     writer = ProductionStateCommitter(project_root)
+    if selected_policy is M0ValidationPolicyId.QUALITY_V1:
+        validate_m0_fixed_seed_reseal(
+            committer=writer,
+            profile=m0_sources.profile,
+        )
     before_manifest = load_production_project(project_root / "project.yaml").manifest
     before = writer.reopen_p0_qualification_prepared()
     current_sources = writer.reopen_p0_qualification_source_stacks()
