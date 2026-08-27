@@ -58,8 +58,9 @@ Independent `reviewer_xhigh`对最终inventory repair verdict为`accept`，无bl
 - submit/poll/fetch：`1/1/1`；
 - retry/fallback/remote/paid：`0/0/0/0`。
 
-Fetch后Manifest为schema `2.14` revision `74`，attempt保持`running/validate`，candidate asset IDs为空，
-没有activation、M1或P6 effect。ComfyUI supervisor已在fetch与decode核验后停止。
+Fetch后Manifest先到schema `2.14` revision `74`与`running/validate`。Human rejection入账后，canonical
+Manifest revision `75`已将attempt关闭为`video_provider_failed` / `failed/validate` / `next_action=stop`；
+candidate asset IDs为空，没有activation、M1或P6 effect。ComfyUI supervisor已在fetch与decode核验后停止。
 
 Exact fetched artifact：
 
@@ -100,6 +101,34 @@ unique ratio `1.0`、`issues=[]`。该工具以`0.5s`抽样且scene detector没�
 composition，frame `102 -> 123`仅有微小编码/雨景变化。相比v5，layout repair把hard snap从`3.500s`推迟到
 `4.208s`，但没有消除seam或near-static tail。
 
+## Human Verdict And Canonical Closure
+
+用户以exact v6 MP4原速完整观看后选择human verdict `A`：
+
+- motion speed：`FAIL`；
+- latter-segment dynamic continuity：`FAIL`；
+- seam continuity：`FAIL`。
+
+`ProductionStateCommitter.record_video_provider_failure()`已在Manifest revision `75`原子关闭attempt，error exact
+记录上述三项human rejection与frame-level `+0.742706` endpoint SSIM jump。Local fetch receipt、MP4 bytes与
+SHA-256继续保留；没有retry、resubmit、candidate preparation、activation、M1或P6 effect。
+
+## Direction Decision
+
+本轮真实媒体验证方法本身没有失败；它成功区分了execution capacity、deterministic runtime bug与model-quality
+failure。Current evidence支持以下bounded decision：
+
+1. RTX 5090不是当前主要quality blocker。Isolated `--novram`已让v4、v5、v6完整执行；它影响吞吐、offload与
+   等待时间，但不能解释修复layout后仍存在的hard replacement、near-static tail与slow motion。
+2. Current `MiniMax H3 + exact first/last frame + exact A4 endpoint + 2秒reference tail + fixed seed/prompt`
+   profile不再继续作为该no-seam continuous-take requirement的候选路径。不得用v7 prompt/seed tweak、retry、
+   attention swap或更多相同scope generation试图把它调到通过。
+3. 该reject只绑定current exact profile与requirement，不是“RTX 5090无法做商业视频”或“所有local MiniMax H3
+   输出永久不合格”的general capability claim。此前已通过的30秒composition仍属于独立acceptance scope。
+4. 下一设计阶段应先重新稳定endpoint contract，再决定是否生成：可选方向包括让H3只负责自然连续运动并把其
+   真实生成末帧注册为下游continuity anchor、设计motion-compatible endpoint asset，或选择更适合first/last-frame
+   transition的模型。任何方向都会改变当前实验变量或产品contract，必须单独批准，不能由本记录自动实施。
+
 ## Current Assessment
 
 - runtime layout target-origin engineering proof：`PASS`；
@@ -109,7 +138,8 @@ composition，frame `102 -> 123`仅有微小编码/雨景变化。相比v5，lay
 - exact endpoint arrival：`PASS`；
 - no early hard seam：automated frame-level `FAIL`；
 - latter-segment dynamic continuity：automated frame-level `FAIL`；
-- natural full-speed movement：`HUMAN_VERDICT_PENDING`；
+- natural full-speed movement：human `FAIL`；
+- visible seam与near-static tail：human `FAIL`；
 - M0 P6、winner、activation、M1、Final Acceptance：均未发生。
 
 当前证据拒绝“修正packed-layout keyframe origin即可关闭v5 perceptual failure”的hypothesis。它支持更窄的
@@ -118,12 +148,12 @@ composition，frame `102 -> 123`仅有微小编码/雨景变化。相比v5，lay
 
 ## Remaining Work And Guardrails
 
-用户必须以exact MP4原速播放单独判定人物速度、后段静图与visible seam。自动FAIL已经阻断candidate/P6；human
-verdict不能被`video-analysis issues=[]`或final endpoint SSIM覆盖。
+Current profile与attempt已经terminal rejected；不得retry、resubmit、换seed、只改prompt、切policy、自动activation
+或进入M1。后续首先应形成新的endpoint/continuity design decision，而不是继续扩大为当前路径服务的qualification、
+schema或Harness。
 
-在human verdict入账前，attempt保持`running/validate`。若human也拒绝，应由
-`ProductionStateCommitter.record_video_provider_failure()`使用typed video error将该attempt原子关闭，同时保留
-fetch evidence；不得retry、resubmit、换seed、切policy、自动activation或进入M1。
-
-任何新的endpoint-conditioning、prompt pacing、asset redesign或不同attention/runtime实验都是新的变量和新的
-generation scope，需要独立decision与authorization。本记录写入不执行新的Provider/media call，也不刷新RAG index。
+任何新的endpoint-conditioning、soft semantic endpoint、generated-terminal-anchor、asset redesign、替代模型或
+不同attention/runtime实验都是新的变量和新的generation scope，需要独立decision与authorization。本记录写入不
+执行新的Provider/media call，也不刷新RAG index；本轮RAG只返回authority-tagged advisory fragments，其中
+refresh被异步排队，returned fragments同时包含fresh roadmap hit与stale historical-plan hit，不能替代本记录引用的
+current Manifest与exact MP4 evidence。

@@ -76,6 +76,20 @@ SHA-256为`22bdcad0ee2da2614b6781bd8d46ffd478174259557ca96be66614dd61ec49e6`；h
 慢动作”的hypothesis；后续generation或M1仍需新的明确授权。Current exact evidence见
 `docs/record_for_agent/2026-08-27-shot-continuity-m0-terminal-tail-v5.md`。
 
+Execution checkpoint (2026-08-27, M0 layout-repair closure): v5的frame `84` hard snap被定位为legacy
+ComfyUI packed-layout keyframe origin未计入reference span。Commits `ad55c93`与`17fa7c3`分别完成target-origin
+runtime/profile reseal与canonical inventory CAS repair；no-GPU layout proof、focused tests、fresh Harness、
+independent `reviewer_xhigh`和zero-write materialization replay均通过。用户授权的唯一v6 local one-submit保持exact
+v5 prompt、seed、A4、identity、2秒tail、Stock20/no-LoRA与20-step contract，只升级ComfyUI到
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`。Exact MP4
+`dc84a342e11e799e34b56e5257f3b6e7b7ca95205cf54ba2c288b3db8ab03580`成功fetch，但hard snap只从
+`3.500s`推迟到frame `101` / `4.208s`；endpoint SSIM单帧增量`+0.742706`，随后tail近静止。用户原速human
+verdict为速度、后段动态、seam三项`FAIL`。Manifest revision `75`已将attempt关闭为`failed/validate` / `stop`，
+无candidate、retry、activation、M1或P6 effect。Current exact H3/A4 profile停止继续prompt/seed/attention/retry
+迭代；该reject不泛化为RTX 5090或全部local H3能力失败。下一阶段必须先重新稳定endpoint/continuity contract，任何
+soft endpoint、generated-terminal-anchor、motion-compatible asset或替代模型方向均需独立批准。Current exact evidence
+见`docs/record_for_agent/2026-08-27-shot-continuity-m0-layout-repair-v6.md`。
+
 已接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
 Implementation lane与Validation lane。Validation必须绑定immutable checkpoint，不得在同一次attempt期间
 读取正在变化的source/workflow/profile；并行执行不会放宽Provider、permit、P6或same-file ownership gates。

@@ -5,7 +5,8 @@ Date: 2026-08-27
 > Supersession notice (2026-08-27): v5的human `FAIL`与exact measurements仍是有效历史证据；其当时关于
 > 下一步root-cause isolation的current-facing结论已由v6 layout-repair experiment细化。ComfyUI packed-layout
 > keyframe origin修复后，hard snap从frame `84` / `3.500s`推迟到frame `101` / `4.208s`，但没有消除seam或
-> near-static tail；v6自动媒体门已`FAIL`，natural-speed human verdict仍pending。Current evidence见
+> near-static tail；v6自动媒体门与human原速三项 verdict均为`FAIL`，Manifest revision `75`已canonical关闭
+> v6。Current exact profile已停止继续迭代，但该结论不泛化为RTX 5090或全部local H3能力失败。Current evidence见
 > `docs/record_for_agent/2026-08-27-shot-continuity-m0-layout-repair-v6.md`。
 
 ## Purpose
