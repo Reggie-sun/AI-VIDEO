@@ -310,18 +310,22 @@ def _decoded_frame_sha256(
             (
                 f"/proc/self/fd/{ffmpeg_descriptor}", "-nostdin", "-v", "error",
                 "-i", f"/proc/self/fd/{video_descriptor}", "-vf",
-                f"select=eq(n\\,{frame_index})", "-frames:v", "1", "-f", "hash",
-                "-hash", "sha256", "-",
+                f"select=eq(n\\,{frame_index})", "-map", "0:v:0", "-an",
+                "-frames:v", "1", "-f", "framemd5", "-",
             ),
             check=True, capture_output=True, text=True, timeout=120,
             pass_fds=(ffmpeg_descriptor, video_descriptor),
         )
     except (OSError, subprocess.SubprocessError) as exc:
         raise _invalid("Terminal motion-tail frame verification failed.", str(exc)) from exc
-    value = result.stdout.strip()
-    if not value.startswith("SHA256=") or len(value) != 71:
+    hashes = tuple(
+        line.rsplit(",", 1)[-1].strip().lower()
+        for line in result.stdout.splitlines()
+        if line and not line.startswith("#")
+    )
+    if len(hashes) != 1 or len(hashes[0]) != 32:
         raise _invalid("Terminal motion-tail frame hash is invalid.")
-    return value.removeprefix("SHA256=").lower()
+    return hashlib.sha256((hashes[0] + "\n").encode("ascii")).hexdigest()
 
 
 def _decoded_frame_sequence_sha256(

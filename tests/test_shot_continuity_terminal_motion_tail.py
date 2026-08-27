@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import os
+import shutil
+import subprocess
+
 import pytest
 
 from ai_video.production.paths import (
@@ -12,9 +16,77 @@ from ai_video.production.shot_continuity_motion_tail_runtime import (
     validate_motion_tail,
 )
 from ai_video.production.shot_continuity_terminal_motion_tail import (
+    _decoded_frame_sha256,
     prepare_terminal_motion_tail_commit,
     reopen_terminal_motion_tail_receipt,
 )
+
+
+def test_decoded_terminal_hash_ignores_audio_streams(tmp_path) -> None:
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg is None:
+        pytest.skip("ffmpeg is required")
+    source = tmp_path / "source-with-audio.mp4"
+    video_only = tmp_path / "video-only.mp4"
+    subprocess.run(
+        (
+            ffmpeg,
+            "-nostdin",
+            "-v",
+            "error",
+            "-f",
+            "lavfi",
+            "-i",
+            "testsrc2=size=64x64:rate=24:duration=1",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=440:duration=1",
+            "-map",
+            "0:v:0",
+            "-map",
+            "1:a:0",
+            "-c:v",
+            "libx264",
+            "-qp",
+            "0",
+            "-pix_fmt",
+            "yuv420p",
+            "-c:a",
+            "aac",
+            "-shortest",
+            str(source),
+        ),
+        check=True,
+    )
+    subprocess.run(
+        (
+            ffmpeg,
+            "-nostdin",
+            "-v",
+            "error",
+            "-i",
+            str(source),
+            "-map",
+            "0:v:0",
+            "-an",
+            "-c:v",
+            "copy",
+            str(video_only),
+        ),
+        check=True,
+    )
+    ffmpeg_fd = os.open(ffmpeg, os.O_RDONLY)
+    source_fd = os.open(source, os.O_RDONLY)
+    video_fd = os.open(video_only, os.O_RDONLY)
+    try:
+        assert _decoded_frame_sha256(ffmpeg_fd, source_fd, 23) == (
+            _decoded_frame_sha256(ffmpeg_fd, video_fd, 23)
+        )
+    finally:
+        os.close(video_fd)
+        os.close(source_fd)
+        os.close(ffmpeg_fd)
 
 
 def _accepted_source(tmp_path):
