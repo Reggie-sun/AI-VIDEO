@@ -2,6 +2,8 @@
 
 Date: 2026-08-27
 
+> **Superseded current verdict — 2026-08-27:** 用户完成正常观看后否决 v12 作为当前可接受方案：老人推荐与少女取得产品之间仍缺少可见的交接动作，因果桥没有成立；因此本记录下方的 `PASS_FOR_HUMAN_REVIEW` 只保留为当时的技术检查边界，当前 human verdict 已替换为 `NEEDS_REVISION`。新的单 Shot Seedance Mini 交接实验及其 credential blocker 记录在 `docs/record_for_agent/2026-08-27-qingyan-seedance-mini-handoff-preflight-blocker.md`。原有 codec、frame、audio 和 static-analysis 测量仍是 v12 exact bytes 的历史事实，但不再构成创意结构通过。
+
 ## Purpose
 
 本文记录用户对 v10 的第二轮完整观看修正，以及基于 v10 / v8 已接受媒体完成的 v12 本地重剪。用户指出：
