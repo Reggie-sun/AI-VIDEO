@@ -247,11 +247,27 @@ runs/qingyan-seedance-mini-elder-handoff-20260827-003/evidence/handoff-contact-s
 
 因此当前停止：没有自动重试、下一次 Provider submit、composition change、v12 插入、Production activation、P6 或 Final Acceptance。
 
+## 2026-08-28 Runtime Path Retirement
+
+用户明确要求后续不再遇到同类Ark“可能包含真人”远端拒绝。current code evidence显示，原`SeedanceSyntheticImageReferenceReceipt`允许`synthetic_photorealistic_person`在project-owned provenance与human attestation成立后进入inline PNG egress；这只能证明本地来源，不代表Ark像素分类器会接受，因此与本次live evidence冲突。
+
+本轮退役该execution path，同时保持历史receipt读取兼容：
+
+- `src/ai_video/production/seedance_asset.py`新增统一photorealistic person-like egress denial。
+- `SeedanceSyntheticImageAuthorizer`在返回Ark egress authorization前拒绝该classification。
+- `SeedanceSyntheticImageReferenceResolver.validate_submit()`在POST body、credential lookup和one-use permit消费前再次拒绝。
+- 返回typed `PAID_PROVIDER_EGRESS_NOT_AUTHORIZED`；不调用Ark，不自动动漫化，也不fallback到其他Provider。
+- `clearly_illustrated_anime_non_real_character`与`ordinary_non_character_image`保持原行为。
+
+回归测试证明I2V与R2V的valid project-owned photorealistic fictional provenance都会在本地停止，`transport.requests == []`、credential supplier未调用且permit仍有效未消费；clearly illustrated与ordinary non-character两种允许分类均有authorizer、I2V和R2V正向覆盖。focused Seedance为`117 passed`，完整Seedance/Paid Provider/recovery组合为`527 passed`，Architecture Gate为`PASS`。`reviewer_xhigh`初审的测试计数与ordinary正向coverage concerns均已修复，同tier scoped re-review verdict为`accept`。本轮没有新的Provider submit、credential读取、媒体生成、activation或费用。
+
+该Gate保证known inline synthetic photorealistic path不再把person-like bytes送到Ark classifier；它不声称能控制Ark服务端分类器，也不把本地BLOCKED解释成生成成功。若未来仍需要写实虚构人物视频，必须显式选择并验证另一条Provider/local-model路线，禁止silent fallback。
+
 ## Remaining Risks
 
 1. 已有 Provider MP4 证明插画风下的双人交接动作可成立，但无音轨使原 `DIALOGUE_AND_SPEAKER` contract 明确失败。
 2. 插画风与 photorealistic v12 不兼容；这条视频只能作为动作与镜头语言 evidence，不能直接拼入成片。
-3. 前两次 permit 均为 known-no-effect；第三次 permit 已消费并返回 MP4。任何新 submit、音频版本、写实风恢复或 Provider 变化都是新 scope，必须获得新的明确 authorization。
+3. 前两次 permit 均为 known-no-effect；第三次 permit 已消费并返回 MP4。Ark inline写实合成人物现会在本地BLOCKED；任何替代Provider、local model、音频版本或写实风恢复都是新scope，必须获得新的明确authorization。
 4. 即使未来桥接 Shot 全部 PASS，也只证明桥接镜头本身；首 Shot 问题建立、后续喷雾/效果因果、`11s` / `22s` 节奏与最终收口仍需独立 human review gates。
 5. run evidence 为 local generated/untracked runtime artifact；本记录 commit 不会把它变成 Production state、remote publication 或 release truth。
 

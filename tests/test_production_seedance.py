@@ -2427,7 +2427,16 @@ def test_synthetic_authorizer_rejects_unreopenable_policy_evidence():
     assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
 
 
-def test_synthetic_authorizer_independently_reopens_exact_preview_evidence():
+@pytest.mark.parametrize(
+    "classification",
+    [
+        "clearly_illustrated_anime_non_real_character",
+        "ordinary_non_character_image",
+    ],
+)
+def test_synthetic_authorizer_independently_reopens_exact_preview_evidence(
+    classification,
+):
     (
         _,
         _,
@@ -2437,7 +2446,7 @@ def test_synthetic_authorizer_independently_reopens_exact_preview_evidence():
         _,
         receipt,
         aggregate,
-    ) = _synthetic_submit_fixture()
+    ) = _synthetic_submit_fixture(classification=classification)
     authorization = _authorization(
         paid_preview,
         egress_policy_receipt_id=resolver.egress_policy_receipt_id,
@@ -2550,6 +2559,75 @@ def test_photorealistic_fictional_authorizer_reopens_source_evidence(
     assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
 
 
+@pytest.mark.parametrize(
+    ("mode", "binding_role", "permitted_use"),
+    [
+        (
+            VideoGenerationMode.IMAGE_TO_VIDEO,
+            "first_frame",
+            "project-owned-fictional-no-protected-identity:seedance-i2v",
+        ),
+        (
+            VideoGenerationMode.REFERENCE_TO_VIDEO,
+            "reference",
+            "project-owned-fictional-no-protected-identity:seedance-r2v",
+        ),
+    ],
+)
+def test_photorealistic_fictional_authorizer_denies_valid_ark_egress(
+    mode,
+    binding_role,
+    permitted_use,
+):
+    source_record_id = "terminal-frame-extraction-receipt-1"
+    source_evidence = b"canonical-terminal-frame-extraction-receipt"
+    source_tool = ToolIdentity(name="ffmpeg", version="9c33b2f")
+    (
+        _,
+        _,
+        _,
+        paid_preview,
+        resolver,
+        _,
+        receipt,
+        aggregate,
+    ) = _synthetic_submit_fixture(
+        mode=mode,
+        binding_role=binding_role,
+        classification="synthetic_photorealistic_person",
+        permitted_use=permitted_use,
+        registry_record_updates={
+            "source_kind": AssetSourceKind.DERIVED,
+            "tool": source_tool,
+            "creation_receipt_id": source_record_id,
+            "usage_license": "provider-output",
+        },
+        source_record_id=source_record_id,
+        source_tool=source_tool,
+        source_evidence_bytes=source_evidence,
+    )
+    authorization = _authorization(
+        paid_preview,
+        egress_policy_receipt_id=resolver.egress_policy_receipt_id,
+    )
+    asset_module = importlib.import_module("ai_video.production.seedance_asset")
+    authorizer = asset_module.SeedanceSyntheticImageAuthorizer(
+        delegate=lambda exact: authorization if exact == paid_preview else None,
+        evidence_source=_synthetic_evidence_source(
+            asset_module,
+            (receipt,),
+            aggregate,
+            source_records={source_record_id: source_evidence},
+        ),
+    )
+
+    with pytest.raises(AiVideoError) as exc_info:
+        authorizer(paid_preview)
+
+    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
+    assert "photorealistic person-like references are disabled" in str(exc_info.value)
+
+
 def test_synthetic_submit_rejects_registry_snapshot_pointer_mismatch_before_network():
     (
         profile,
@@ -2596,9 +2674,18 @@ def test_synthetic_submit_rejects_registry_snapshot_pointer_mismatch_before_netw
     )
 
 
-def test_synthetic_inline_submit_uses_exact_data_uri_and_audio_opt_out():
+@pytest.mark.parametrize(
+    "classification",
+    [
+        "clearly_illustrated_anime_non_real_character",
+        "ordinary_non_character_image",
+    ],
+)
+def test_synthetic_inline_submit_uses_exact_data_uri_and_audio_opt_out(
+    classification,
+):
     profile, resolved, video_preview, paid_preview, resolver, png, _, _ = (
-        _synthetic_submit_fixture()
+        _synthetic_submit_fixture(classification=classification)
     )
     transport = _FakeTransport()
     transport.responses.append(_json_response({"id": "task-synthetic-inline-1"}))
@@ -2636,11 +2723,21 @@ def test_synthetic_inline_submit_uses_exact_data_uri_and_audio_opt_out():
     assert base64.b64encode(png).decode("ascii") not in repr(transport.requests[0])
 
 
-def test_synthetic_reference_to_video_inline_submit_uses_reference_image_role():
+@pytest.mark.parametrize(
+    "classification",
+    [
+        "clearly_illustrated_anime_non_real_character",
+        "ordinary_non_character_image",
+    ],
+)
+def test_synthetic_reference_to_video_inline_submit_uses_reference_image_role(
+    classification,
+):
     profile, resolved, video_preview, paid_preview, resolver, png, _, _ = (
         _synthetic_submit_fixture(
             mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
             binding_role="reference",
+            classification=classification,
         )
     )
     transport = _FakeTransport()
@@ -2769,16 +2866,35 @@ def test_synthetic_reference_to_video_rejects_media_before_permit_consumption(
     )
 
 
-def test_photorealistic_fictional_inline_submit_uses_attested_derived_provider_output():
+@pytest.mark.parametrize(
+    ("mode", "binding_role", "permitted_use"),
+    [
+        (
+            VideoGenerationMode.IMAGE_TO_VIDEO,
+            "first_frame",
+            "project-owned-fictional-no-protected-identity:seedance-i2v",
+        ),
+        (
+            VideoGenerationMode.REFERENCE_TO_VIDEO,
+            "reference",
+            "project-owned-fictional-no-protected-identity:seedance-r2v",
+        ),
+    ],
+)
+def test_photorealistic_fictional_inline_submit_is_denied_before_network(
+    mode,
+    binding_role,
+    permitted_use,
+):
     source_tool = ToolIdentity(name="ffmpeg", version="9c33b2f")
     source_record_id = "terminal-frame-extraction-receipt-1"
     source_evidence = b"canonical-terminal-frame-extraction-receipt"
-    profile, resolved, video_preview, paid_preview, resolver, png, receipt, _ = (
+    profile, resolved, video_preview, paid_preview, resolver, _, _, _ = (
         _synthetic_submit_fixture(
+            mode=mode,
+            binding_role=binding_role,
             classification="synthetic_photorealistic_person",
-            permitted_use=(
-                "project-owned-fictional-no-protected-identity:seedance-i2v"
-            ),
+            permitted_use=permitted_use,
             registry_record_updates={
                 "source_kind": AssetSourceKind.DERIVED,
                 "tool": source_tool,
@@ -2794,10 +2910,16 @@ def test_photorealistic_fictional_inline_submit_uses_attested_derived_provider_o
     transport.responses.append(
         _json_response({"id": "task-photorealistic-fictional-inline-1"})
     )
+    credential_calls: list[None] = []
+
+    def credential() -> str:
+        credential_calls.append(None)
+        return "rotated-test-secret"
+
     provider = SeedanceVideoProvider(
         profile=profile,
         transport=transport,
-        credential=lambda: "rotated-test-secret",
+        credential=credential,
         input_reference=resolver,
         now=lambda: FIXED_NOW,
     )
@@ -2806,26 +2928,29 @@ def test_photorealistic_fictional_inline_submit_uses_attested_derived_provider_o
         egress_policy_receipt_id=resolver.egress_policy_receipt_id,
     )
 
-    result = provider.submit(
-        resolved,
-        video_preview,
-        paid_preview,
-        authorization,
-        _permit(resolved, video_preview, paid_preview, authorization),
-    )
+    permit = _permit(resolved, video_preview, paid_preview, authorization)
 
-    payload = json.loads(transport.requests[0].body)
-    assert result.external_effect_id == "task-photorealistic-fictional-inline-1"
-    assert receipt.classification == "synthetic_photorealistic_person"
-    assert payload["content"][1] == {
-        "type": "image_url",
-        "image_url": {
-            "url": "data:image/png;base64,"
-            + base64.b64encode(png).decode("ascii")
-        },
-        "role": "first_frame",
-    }
-    assert payload["generate_audio"] is False
+    with pytest.raises(AiVideoError) as exc_info:
+        provider.submit(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+            permit,
+        )
+
+    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
+    assert "photorealistic person-like references are disabled" in str(exc_info.value)
+    assert transport.requests == []
+    assert credential_calls == []
+    assert permit._validate_paid_provider_operation_permit(
+        **build_video_paid_permit_binding(
+            resolved,
+            video_preview,
+            paid_preview,
+            authorization,
+        )
+    )
 
 
 def test_synthetic_submit_rejects_wrong_aggregate_authorization_before_network():

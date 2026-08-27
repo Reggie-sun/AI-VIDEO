@@ -399,6 +399,19 @@ def _validate_photorealistic_source_evidence(
             )
 
 
+def _deny_photorealistic_person_like_egress(
+    receipts: tuple[SeedanceSyntheticImageReferenceReceipt, ...],
+) -> None:
+    if any(
+        receipt.classification == "synthetic_photorealistic_person"
+        for receipt in receipts
+    ):
+        raise _egress_denied(
+            "Seedance photorealistic person-like references are disabled because "
+            "Ark may classify synthetic people as real."
+        )
+
+
 def _reopen_registry_snapshot(payload: bytes) -> AssetRegistrySnapshot:
     if type(payload) is not bytes:
         raise _invalid("Seedance Registry evidence bytes are invalid.")
@@ -485,6 +498,7 @@ class SeedanceSyntheticImageAuthorizer:
             raise _egress_denied(
                 "Seedance synthetic authorization evidence is unavailable."
             ) from None
+        _deny_photorealistic_person_like_egress(receipts)
         _validate_policy_against_preview(policy, receipts, preview)
         return authorization
 
@@ -591,6 +605,7 @@ class SeedanceSyntheticImageReferenceResolver:
         preview: PaidProviderCallPreview,
         authorization: PaidProviderAuthorizationDecision,
     ) -> None:
+        _deny_photorealistic_person_like_egress(tuple(self._by_source.values()))
         policy = self._policy_receipt
         prompt_bytes = request.prompt_text.encode()
         scope = request.activation_scope
