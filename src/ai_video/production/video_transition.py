@@ -5,7 +5,14 @@ import hashlib
 import json
 from typing import Literal
 
-from pydantic import ConfigDict, Field, JsonValue, model_validator
+from pydantic import (
+    ConfigDict,
+    Field,
+    JsonValue,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
@@ -43,6 +50,54 @@ class MotionCoverage(str, Enum):
     CAMERA_MOTION = "camera_motion"
 
 
+class CausalEdgeSemantics(str, Enum):
+    DIRECT_CONTINUITY = "direct_continuity"
+    CAUSAL_ELLIPSIS = "causal_ellipsis"
+    SCENE_RESET = "scene_reset"
+    COMMERCIAL_CUT = "commercial_cut"
+
+
+class CausalTransitionMode(str, Enum):
+    CARRY = "carry"
+    VISIBLE_CHANGE = "visible_change"
+    AUTHORIZED_RELEASE = "authorized_release"
+
+
+class CausalDimension(str, Enum):
+    CHARACTER_PRESENCE = "character_presence"
+    PROP_IDENTITY = "prop_identity"
+    PROP_HOLDER = "prop_holder"
+    HAND_CONTACT = "hand_contact"
+    PROP_FUNCTIONAL_STATE = "prop_functional_state"
+    ACTION_PHASE = "action_phase"
+    GAZE_TARGET = "gaze_target"
+    DIALOGUE_TURN = "dialogue_turn"
+    SCREEN_MOTION_AXIS = "screen_motion_axis"
+    AUDIO_BRIDGE = "audio_bridge"
+
+
+class CausalStateChange(_TransitionModel):
+    dimension: CausalDimension
+    source_close: str = Field(min_length=1)
+    target_open: str = Field(min_length=1)
+    transition_mode: CausalTransitionMode
+    bridge_beat: str | None = None
+
+    @model_validator(mode="after")
+    def _validate_bridge(self) -> "CausalStateChange":
+        if (
+            self.transition_mode is CausalTransitionMode.VISIBLE_CHANGE
+            and not self.bridge_beat
+        ):
+            raise ValueError("visible causal change requires a named bridge beat")
+        if (
+            self.transition_mode is not CausalTransitionMode.VISIBLE_CHANGE
+            and self.bridge_beat is not None
+        ):
+            raise ValueError("bridge beat is reserved for visible causal change")
+        return self
+
+
 class CreativeArtifactIdentity(_TransitionModel):
     artifact_id: str = Field(min_length=1)
     revision: int = Field(strict=True, ge=1)
@@ -68,7 +123,7 @@ class ContinuityAnchorBinding(_TransitionModel):
 
 
 class ContinuityTransitionPolicy(_TransitionModel):
-    schema_version: Literal["1"] = "1"
+    schema_version: Literal["1", "2"] = "1"
     policy_id: str = Field(min_length=1)
     project: ProjectSnapshotPointer
     registry: RegistrySnapshotPointer
@@ -84,7 +139,27 @@ class ContinuityTransitionPolicy(_TransitionModel):
     anchors: tuple[ContinuityAnchorBinding, ...]
     qa_policy_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     authoring_evidence_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_generation_intent_hash: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    target_generation_intent_hash: str | None = Field(
+        default=None, pattern=r"^[0-9a-f]{64}$"
+    )
+    causal_edge_semantics: CausalEdgeSemantics | None = None
+    causal_state_changes: tuple[CausalStateChange, ...] = ()
     policy_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_serializer(mode="wrap")
+    def _serialize_versioned_causality(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.schema_version == "1":
+            data.pop("source_generation_intent_hash", None)
+            data.pop("target_generation_intent_hash", None)
+            data.pop("causal_edge_semantics", None)
+            data.pop("causal_state_changes", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_policy(self) -> "ContinuityTransitionPolicy":
@@ -135,6 +210,75 @@ class ContinuityTransitionPolicy(_TransitionModel):
                     raise ValueError("full continuity requires all four anchor roles")
             elif ContinuityAnchorRole.REFERENCE not in roles:
                 raise ValueError("identity/style carryover requires a reference anchor")
+        if self.schema_version == "1":
+            if (
+                self.source_generation_intent_hash is not None
+                or self.target_generation_intent_hash is not None
+                or self.causal_edge_semantics is not None
+                or self.causal_state_changes
+            ):
+                raise ValueError("v1 transition cannot carry causal state changes")
+        else:
+            if (
+                self.source_generation_intent_hash is None
+                or self.target_generation_intent_hash is None
+                or self.causal_edge_semantics is None
+                or not self.causal_state_changes
+            ):
+                raise ValueError("v2 transition requires typed causal state changes")
+            if (
+                self.boundary_kind is BoundaryKind.WITHIN_CONTINUOUS_TAKE
+                and self.causal_edge_semantics
+                is not CausalEdgeSemantics.DIRECT_CONTINUITY
+            ):
+                raise ValueError(
+                    "continuous take requires direct causal continuity"
+                )
+            if (
+                self.continuity_obligation is ContinuityObligation.FULL_CONTINUITY
+                and self.causal_edge_semantics
+                is not CausalEdgeSemantics.DIRECT_CONTINUITY
+            ):
+                raise ValueError(
+                    "full continuity requires direct causal continuity"
+                )
+            if (
+                self.causal_edge_semantics is CausalEdgeSemantics.SCENE_RESET
+                and (
+                    self.boundary_kind is not BoundaryKind.SCENE_BOUNDARY
+                    or self.continuity_obligation
+                    is not ContinuityObligation.SUBSTANTIAL_RESET
+                )
+            ):
+                raise ValueError(
+                    "scene reset requires a substantial scene boundary reset"
+                )
+            if (
+                self.continuity_obligation is ContinuityObligation.SUBSTANTIAL_RESET
+                and self.causal_edge_semantics
+                is not CausalEdgeSemantics.SCENE_RESET
+            ):
+                raise ValueError(
+                    "substantial reset requires scene_reset causal semantics"
+                )
+            if (
+                self.causal_edge_semantics is CausalEdgeSemantics.COMMERCIAL_CUT
+                and self.boundary_kind is not BoundaryKind.HARD_CUT
+            ):
+                raise ValueError("commercial cut requires a hard-cut boundary")
+            dimensions = tuple(item.dimension for item in self.causal_state_changes)
+            if dimensions != tuple(sorted(set(dimensions), key=lambda item: item.value)):
+                raise ValueError("causal dimensions must be unique and canonically ordered")
+            releases = tuple(
+                item
+                for item in self.causal_state_changes
+                if item.transition_mode is CausalTransitionMode.AUTHORIZED_RELEASE
+            )
+            if (
+                releases
+                and self.causal_edge_semantics is CausalEdgeSemantics.DIRECT_CONTINUITY
+            ):
+                raise ValueError("direct continuity cannot authorize causal release")
         expected = canonical_sha256(
             self.model_dump(mode="json", exclude={"policy_hash"})
         )

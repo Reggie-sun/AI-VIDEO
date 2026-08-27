@@ -1,0 +1,297 @@
+from __future__ import annotations
+
+import hashlib
+
+import pytest
+
+from ai_video.production._h3_prompt import (
+    H3PromptCompilation,
+    H3PromptUnsupported,
+    compile_h3_prompt,
+)
+from ai_video.production.hashing import canonical_sha256
+from ai_video.production.video_requirement import (
+    CameraAmplitudeClass,
+    CameraMotionContract,
+    CameraMovementKind,
+    CameraMotionEndState,
+    CameraMotionStartState,
+    CameraSpeedClass,
+    CameraSubjectRelation,
+    ConditioningLane,
+    DialogueIntent,
+    GenerationMode,
+    MusicIntent,
+    Pacing,
+    ProviderNeutralVideoRequirement,
+)
+from tests.test_production_video_intent_validation import (
+    _compatible_fl2va,
+    _complete_intent,
+)
+from tests.test_production_video_requirement import _requirement_kwargs
+
+
+def _requirement(*, movement: CameraMovementKind = CameraMovementKind.DOLLY_IN):
+    payload = _requirement_kwargs()
+    payload.pop("contract_version")
+    intent = _complete_intent().model_copy(
+        update={
+            "pacing": Pacing(shot_duration_seconds=3.0),
+            "primary_camera_motion": CameraMotionContract(
+                movement_kind=movement,
+                direction="forward" if movement is not CameraMovementKind.LOCKED else "none",
+                amplitude_class=CameraAmplitudeClass.SUBTLE,
+                speed_class=(
+                    CameraSpeedClass.VERY_SLOW
+                    if movement is CameraMovementKind.LOCKED
+                    else CameraSpeedClass.SLOW
+                ),
+                start_motion_state=CameraMotionStartState.STATIONARY,
+                end_motion_state=CameraMotionEndState.SETTLED,
+            )
+        }
+    )
+    payload["generation_intent"] = intent
+    payload["conditioning_compatibility"] = _compatible_fl2va().model_copy(
+        update={
+            "lane": ConditioningLane.I2VA,
+            "first_anchor_id": "frame-shot-1",
+            "last_anchor_id": None,
+            "available_duration_seconds": 3.0,
+        }
+    )
+    payload["generation_mode"] = GenerationMode.IMAGE_TO_VIDEO
+    payload["generation_intent_hash"] = canonical_sha256(
+        {
+            "schema": "provider-neutral-generation-intent/2",
+            "generation_intent": intent.model_dump(mode="json"),
+        }
+    )
+    payload["quality_need"] = payload["quality_need"].model_copy(
+        update={
+            "minimum_raster": None,
+            "minimum_codec": None,
+            "native_enforcement_required": False,
+        }
+    )
+    return ProviderNeutralVideoRequirement.create(**payload)
+
+
+def test_h3_prompt_is_exact_single_take_three_field_grammar() -> None:
+    result = compile_h3_prompt(_requirement())
+
+    assert isinstance(result, H3PromptCompilation)
+    prompt = result.prompt_text
+    assert prompt.count("[Shot 1]") == 1
+    assert "[Shot 2]" not in prompt
+    assert [
+        line.split(":", 1)[0]
+        for line in prompt.splitlines()
+        if line.startswith(
+            (
+                "integrated_multimodal_description:",
+                "overall_soundscape:",
+                "non_diegetic_music:",
+            )
+        )
+    ] == [
+        "integrated_multimodal_description",
+        "overall_soundscape",
+        "non_diegetic_music",
+    ]
+    assert "dolly in with subtle amplitude at slow speed" in prompt
+    assert "terminal motion state settled" in prompt
+    assert prompt.endswith("non_diegetic_music: none")
+    assert result.prompt_sha256 == hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+
+
+def test_h3_prompt_rejects_reserved_multishot_grammar() -> None:
+    requirement = _requirement()
+    target = requirement.target_shot.model_copy(
+        update={"intent": "[Shot 2] At 00:03.000, cut to another angle."}
+    )
+    payload = requirement.model_dump(
+        mode="python",
+        exclude={"requirement_id", "requirement_hash"},
+    )
+    payload["target_shot"] = target
+    invalid = ProviderNeutralVideoRequirement.create(**payload)
+
+    result = compile_h3_prompt(invalid)
+
+    assert isinstance(result, H3PromptUnsupported)
+    assert result.unsupported_field_paths == ("target_shot.intent",)
+
+
+@pytest.mark.parametrize("separator", ("\n", "\u2028", "\u2029", "\x85", "\x0b"))
+def test_h3_prompt_rejects_line_boundary_in_sealed_rich_field(
+    separator: str,
+) -> None:
+    requirement = _requirement()
+    performance = requirement.generation_intent.performance_intent
+    assert performance is not None
+    intent = requirement.generation_intent.model_copy(
+        update={
+            "performance_intent": performance.model_copy(
+                update={
+                    "trigger": f"offer received{separator}"
+                }
+            )
+        }
+    )
+    payload = requirement.model_dump(
+        mode="python",
+        exclude={"requirement_id", "requirement_hash"},
+    )
+    payload["generation_intent"] = intent
+    payload["generation_intent_hash"] = canonical_sha256(
+        {
+            "schema": "provider-neutral-generation-intent/2",
+            "generation_intent": intent.model_dump(mode="json"),
+        }
+    )
+    invalid = ProviderNeutralVideoRequirement.create(**payload)
+
+    result = compile_h3_prompt(invalid)
+
+    assert isinstance(result, H3PromptUnsupported)
+    assert result.unsupported_field_paths == (
+        "generation_intent.performance_intent.trigger",
+    )
+
+
+@pytest.mark.parametrize(
+    "instruction",
+    (
+        "flash transition to another angle",
+        "flash to product packshot",
+        "transition to a dream scene",
+    ),
+)
+def test_h3_prompt_rejects_transition_instruction_in_rich_field(
+    instruction: str,
+) -> None:
+    requirement = _requirement()
+    performance = requirement.generation_intent.performance_intent
+    assert performance is not None
+    intent = requirement.generation_intent.model_copy(
+        update={
+            "performance_intent": performance.model_copy(
+                update={"trigger": instruction}
+            )
+        }
+    )
+    bypassed_requirement = requirement.model_copy(
+        update={"generation_intent": intent}
+    )
+
+    result = compile_h3_prompt(bypassed_requirement)
+
+    assert isinstance(result, H3PromptUnsupported)
+    assert result.unsupported_field_paths == (
+        "generation_intent.performance_intent.trigger",
+    )
+
+
+def test_h3_prompt_rejects_conflicting_legacy_camera_owner() -> None:
+    requirement = _requirement()
+    intent = requirement.generation_intent.model_copy(
+        update={
+            "camera_intent": requirement.generation_intent.camera_intent.model_copy(
+                update={"movement": "orbit_left"}
+            )
+        }
+    )
+    payload = requirement.model_dump(
+        mode="python",
+        exclude={"requirement_id", "requirement_hash"},
+    )
+    payload["generation_intent"] = intent
+    payload["generation_intent_hash"] = canonical_sha256(
+        {
+            "schema": "provider-neutral-generation-intent/2",
+            "generation_intent": intent.model_dump(mode="json"),
+        }
+    )
+    invalid = ProviderNeutralVideoRequirement.create(**payload)
+
+    result = compile_h3_prompt(invalid)
+
+    assert isinstance(result, H3PromptUnsupported)
+    assert result.unsupported_field_paths == (
+        "generation_intent.camera_intent.movement",
+    )
+
+
+def test_h3_prompt_serializes_locked_camera_without_motion_strength() -> None:
+    result = compile_h3_prompt(_requirement(movement=CameraMovementKind.LOCKED))
+
+    assert isinstance(result, H3PromptCompilation)
+    assert "locked-off camera" in result.prompt_text
+    assert "locked with" not in result.prompt_text
+
+
+def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music() -> None:
+    requirement = _requirement()
+    exact_dialogue = 'He said "I\'m ready" — 好。 Cut costs; dissolve one tablet.'
+    intent = requirement.generation_intent.model_copy(
+        update={
+            "dialogue_intent": DialogueIntent(
+                mode="dialogue",
+                speaker_id="hero",
+                verbatim_text=exact_dialogue,
+                start_seconds=0.5,
+                end_seconds=2.0,
+                on_screen=True,
+                response_obligation="elder acknowledges",
+                lip_sync_required=True,
+            ),
+            "music_intent": MusicIntent(
+                mode="music",
+                instrumentation="muted guzheng",
+                tempo_rhythm="72 bpm sparse pulse",
+                dynamics="low under dialogue",
+            ),
+        }
+    )
+    payload = requirement.model_dump(
+        mode="python",
+        exclude={"requirement_id", "requirement_hash"},
+    )
+    payload["generation_intent"] = intent
+    payload["generation_intent_hash"] = canonical_sha256(
+        {
+            "schema": "provider-neutral-generation-intent/2",
+            "generation_intent": intent.model_dump(mode="json"),
+        }
+    )
+
+    result = compile_h3_prompt(ProviderNeutralVideoRequirement.create(**payload))
+
+    assert isinstance(result, H3PromptCompilation)
+    assert exact_dialogue in result.prompt_text
+    assert f"utf8_bytes={len(exact_dialogue.encode('utf-8'))}" in result.prompt_text
+    assert "non_diegetic_music: muted guzheng; 72 bpm sparse pulse; low under dialogue" in result.prompt_text
+
+
+def test_h3_prompt_rejects_secondary_motion_in_bypassed_relation_model() -> None:
+    requirement = _requirement()
+    relation = requirement.generation_intent.camera_subject_relation
+    assert relation is not None
+    relation_payload = relation.model_dump(mode="python")
+    relation_payload["end_relation"] = "orbit left around subject"
+    bypassed = CameraSubjectRelation.model_construct(**relation_payload)
+    intent = requirement.generation_intent.model_copy(
+        update={"camera_subject_relation": bypassed}
+    )
+    bypassed_requirement = requirement.model_copy(
+        update={"generation_intent": intent}
+    )
+
+    result = compile_h3_prompt(bypassed_requirement)
+
+    assert isinstance(result, H3PromptUnsupported)
+    assert result.unsupported_field_paths == (
+        "generation_intent.camera_subject_relation.end_relation",
+    )

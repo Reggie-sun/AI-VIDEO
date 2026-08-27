@@ -16,7 +16,11 @@ from ai_video.planning.video_planner import (
     _verify_current_generation_requirement_projection,
 )
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production._video_intent_validation import (
+    validate_causal_transition_readiness,
+)
 from ai_video.production.video_requirement import (
+    ContinuityMode,
     VerifiedGenerationRequirementProjection,
 )
 from ai_video.quality_gates._readiness_models import (
@@ -121,6 +125,18 @@ class ShotReadinessGate:
         )
 
         binding_reasons: list[ReadinessReason] = []
+        causal_diagnostics: tuple[str, ...] = ()
+        if (
+            requirement is not None
+            and requirement.contract_version
+            == "provider-neutral-video-requirement/4"
+            and requirement.continuity_mode is not ContinuityMode.NONE
+        ):
+            causal_diagnostics = validate_causal_transition_readiness(
+                request.continuity_transition_policy,
+                previous_shot_state=request.current_request.previous_shot_state,
+                requirement=requirement,
+            )
         if not outer_request_seal_valid:
             binding_reasons.append(
                 ReadinessReason.READINESS_REQUEST_SEAL_INVALID
@@ -135,6 +151,8 @@ class ShotReadinessGate:
             binding_reasons.append(
                 ReadinessReason.VERIFIED_PROJECTION_BINDING_INVALID
             )
+        if causal_diagnostics:
+            binding_reasons.append(ReadinessReason.CAUSAL_TRANSITION_INVALID)
         binding_status = (
             ReadinessCheckStatus.BLOCKED
             if binding_reasons
@@ -199,8 +217,15 @@ class ShotReadinessGate:
                     if projection_valid and projection is not None
                     else None
                 ),
-                failure_field_paths=(
-                    failure.field_paths if failure is not None else ()
+                failure_field_paths=tuple(
+                    dict.fromkeys(
+                        (
+                            failure.field_paths
+                            if failure is not None
+                            else ()
+                        )
+                        + causal_diagnostics
+                    )
                 ),
             ),
         )

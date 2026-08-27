@@ -12,9 +12,18 @@ from ai_video.production.video_requirement import (
     AssetEvidence,
     AudioNeed,
     AxisContinuity,
+    CameraAmplitudeClass,
     CameraEndpoint,
     CameraIntent,
+    CameraMotionContract,
+    CameraMovementKind,
+    CameraMotionEndState,
+    CameraMotionStartState,
+    CameraSpeedClass,
+    CameraSubjectRelation,
+    CameraSubjectRelationKind,
     CapabilityNeed,
+    ConditioningLane,
     ContinuityMode,
     ContinuityStateKind,
     ExpressionStrength,
@@ -27,6 +36,7 @@ from ai_video.production.video_requirement import (
     OutputGeometryPolicy,
     OutputNeed,
     Pacing,
+    ProviderNeutralGenerationIntentProjection,
     ProviderNeutralVideoRequirement,
     QualityNeed,
     ReviewEvidenceLink,
@@ -274,7 +284,208 @@ def test_c4_absence_preserves_v1_requirement_contract_and_hash_payload():
     requirement = ProviderNeutralVideoRequirement.create(**_requirement_kwargs())
 
     assert requirement.contract_version == "provider-neutral-video-requirement/1"
+    assert requirement.requirement_hash == (
+        "e4e5efaaf1cc0a493b7484d06233bed3bf499fd1fddca9290f9671aa90b8f272"
+    )
     assert "c4_multi_anchor_binding" not in requirement._hash_payload()
+
+
+def test_historical_generation_intent_projection_hash_stays_bit_for_bit() -> None:
+    requirement = ProviderNeutralVideoRequirement.create(**_requirement_kwargs())
+    projection = ProviderNeutralGenerationIntentProjection.create(
+        generation_intent=requirement.generation_intent,
+        output_need=requirement.output_need,
+        audio_need=requirement.audio_need,
+        quality_need=requirement.quality_need,
+        semantic_reference_roles=requirement.semantic_reference_roles,
+    )
+
+    assert projection.projection_hash == (
+        "178edc3e5fe695df9060b4b4bb06b199eed5e5f6253e2f7bdd2917380d54751e"
+    )
+    assert "camera_motion" not in projection.model_dump(mode="json")[
+        "generation_intent"
+    ]
+
+
+def _v4_requirement_kwargs() -> dict[str, object]:
+    from tests.test_production_video_intent_validation import (
+        _compatible_fl2va,
+        _complete_intent,
+    )
+
+    payload = _requirement_kwargs()
+    payload.pop("contract_version")
+    intent = _complete_intent().model_copy(
+        update={"pacing": Pacing(shot_duration_seconds=3.0)}
+    )
+    payload["generation_intent"] = intent
+    payload["conditioning_compatibility"] = _compatible_fl2va().model_copy(
+        update={
+            "lane": ConditioningLane.I2VA,
+            "first_anchor_id": "frame-shot-1",
+            "last_anchor_id": None,
+            "available_duration_seconds": 3.0,
+        }
+    )
+    payload["generation_mode"] = GenerationMode.IMAGE_TO_VIDEO
+    payload["generation_intent_hash"] = canonical_sha256(
+        {
+            "schema": "provider-neutral-generation-intent/2",
+            "generation_intent": intent.model_dump(mode="json"),
+        }
+    )
+    return payload
+
+
+def test_camera_motion_contract_is_singular_and_versioned_under_v4() -> None:
+    payload = _v4_requirement_kwargs()
+    intent = payload["generation_intent"]
+
+    requirement = ProviderNeutralVideoRequirement.create(**payload)
+
+    assert requirement.contract_version == "provider-neutral-video-requirement/4"
+    assert requirement.generation_intent.primary_camera_motion == (
+        intent.primary_camera_motion
+    )
+    assert requirement.requirement_hash == canonical_sha256(requirement._hash_payload())
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "match"),
+    (
+        ("generation_mode", GenerationMode.TEXT_TO_VIDEO, "generation_mode"),
+        (
+            "conditioning_compatibility",
+            None,
+            "conditioning_compatibility",
+        ),
+    ),
+)
+def test_v4_conditioning_is_bound_to_generation_mode_and_evidence(
+    field: str,
+    value: object,
+    match: str,
+) -> None:
+    payload = _v4_requirement_kwargs()
+    payload[field] = value
+
+    with pytest.raises(ValidationError, match=match):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+
+def test_v4_conditioning_rejects_anchor_identity_or_duration_drift() -> None:
+    payload = _v4_requirement_kwargs()
+    evidence = payload["conditioning_compatibility"]
+    payload["conditioning_compatibility"] = evidence.model_copy(
+        update={"first_anchor_id": "different-anchor"}
+    )
+    with pytest.raises(ValidationError, match="first_anchor_id"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+    payload = _v4_requirement_kwargs()
+    evidence = payload["conditioning_compatibility"]
+    payload["conditioning_compatibility"] = evidence.model_copy(
+        update={"available_duration_seconds": 4.0}
+    )
+    with pytest.raises(ValidationError, match="duration"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+
+def test_locked_camera_requires_stationary_to_settled() -> None:
+    with pytest.raises(ValidationError, match="locked camera"):
+        CameraMotionContract(
+            movement_kind=CameraMovementKind.LOCKED,
+            direction="none",
+            amplitude_class=CameraAmplitudeClass.SUBTLE,
+            speed_class=CameraSpeedClass.VERY_SLOW,
+            start_motion_state=CameraMotionStartState.IN_MOTION,
+            end_motion_state=CameraMotionEndState.SETTLED,
+        )
+
+
+def test_camera_movement_rejects_contradictory_direction() -> None:
+    with pytest.raises(ValidationError, match="pan_left camera requires left"):
+        CameraMotionContract(
+            movement_kind=CameraMovementKind.PAN_LEFT,
+            direction="right",
+            amplitude_class=CameraAmplitudeClass.SUBTLE,
+            speed_class=CameraSpeedClass.SLOW,
+            start_motion_state=CameraMotionStartState.STATIONARY,
+            end_motion_state=CameraMotionEndState.SETTLED,
+        )
+
+
+def test_locked_camera_rejects_noncanonical_motion_strength() -> None:
+    with pytest.raises(ValidationError, match="canonical subtle/very_slow"):
+        CameraMotionContract(
+            movement_kind=CameraMovementKind.LOCKED,
+            direction="none",
+            amplitude_class=CameraAmplitudeClass.PRONOUNCED,
+            speed_class=CameraSpeedClass.FAST,
+            start_motion_state=CameraMotionStartState.STATIONARY,
+            end_motion_state=CameraMotionEndState.SETTLED,
+        )
+
+
+def test_v4_rejects_camera_only_intent_without_rich_upstream_owners() -> None:
+    payload = _requirement_kwargs()
+    payload.pop("contract_version")
+    payload["generation_intent"] = payload["generation_intent"].model_copy(
+        update={
+            "primary_camera_motion": CameraMotionContract(
+                movement_kind=CameraMovementKind.LOCKED,
+                direction="none",
+                amplitude_class=CameraAmplitudeClass.SUBTLE,
+                speed_class=CameraSpeedClass.VERY_SLOW,
+                start_motion_state=CameraMotionStartState.STATIONARY,
+                end_motion_state=CameraMotionEndState.SETTLED,
+            )
+        }
+    )
+
+    with pytest.raises(ValidationError, match="complete rich generation intent"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+
+def test_locked_camera_rejects_reveal_relation_as_second_motion() -> None:
+    with pytest.raises(ValidationError, match="locked camera relation"):
+        GenerationIntent(
+            primary_camera_motion=CameraMotionContract(
+                movement_kind=CameraMovementKind.LOCKED,
+                direction="none",
+                amplitude_class=CameraAmplitudeClass.SUBTLE,
+                speed_class=CameraSpeedClass.VERY_SLOW,
+                start_motion_state=CameraMotionStartState.STATIONARY,
+                end_motion_state=CameraMotionEndState.SETTLED,
+            ),
+            camera_subject_relation=CameraSubjectRelation(
+                subject_id="hero",
+                relation_kind=CameraSubjectRelationKind.REVEAL,
+                start_relation="subject obscured",
+                end_relation="subject revealed",
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    "relation_text",
+    (
+        "orbit left around subject",
+        "pan right while following",
+        "crane upward independently",
+    ),
+)
+def test_camera_subject_relation_rejects_secondary_camera_motion(
+    relation_text: str,
+) -> None:
+    with pytest.raises(ValidationError, match="secondary camera motion"):
+        CameraSubjectRelation(
+            subject_id="hero",
+            relation_kind=CameraSubjectRelationKind.FOLLOW,
+            start_relation="stable medium offset",
+            end_relation=relation_text,
+        )
 
 
 def test_multi_anchor_requirement_fails_closed_without_c4_binding():

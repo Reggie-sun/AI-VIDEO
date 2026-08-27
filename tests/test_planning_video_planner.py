@@ -66,6 +66,14 @@ from tests.fixtures.planning_factory import (
     make_scene,
     make_shot,
 )
+from tests.test_production_video_intent_validation import (
+    _compatible_fl2va,
+    _complete_intent,
+)
+from tests.test_shot_readiness_gate import (
+    _complete_causal_policy,
+    _current_v4_causal_request,
+)
 
 
 def _semantic_hash(model: object, *excluded_fields: str) -> str:
@@ -140,6 +148,25 @@ def test_v3_dynamic_plan_blocks_prose_only_unspecified_generation_semantics():
     with pytest.raises(AiVideoError) as exc:
         require_current_video_plan(current_request=request, plan=plan)
     assert exc.value.code is ErrorCode.PLANNING_PREFLIGHT_BLOCKED
+
+
+def test_v3_projection_blocks_incomplete_rich_intent_before_planner() -> None:
+    with pytest.raises(ValidationError, match="complete rich generation intent"):
+        ProviderNeutralGenerationIntentProjection.create(
+            generation_intent=_complete_intent().model_copy(
+                update={"performance_intent": None}
+            ),
+            conditioning_compatibility=_compatible_fl2va(),
+            output_need=OutputNeed(
+                duration_seconds=5.167,
+                geometry_policy=OutputGeometryPolicy.ADAPTIVE,
+                aspect_ratio="16:9",
+                fps=24,
+                container_mime="video/mp4",
+            ),
+            audio_need=AudioNeed.OPTIONAL,
+            quality_need=QualityNeed(objective_tier="production"),
+        )
 
 
 def test_v3_plan_embeds_one_requirement_and_returns_verified_router_projection():
@@ -1467,6 +1494,7 @@ def test_t11_previous_state_helper_uses_explicit_continuity_evidence():
         is_same_action=True,
         is_angle_change=True,
         has_terminal_frame_asset_id="terminal-shot-0",
+        previous_generation_intent_hash="3" * 64,
     )
 
     assert default is not None
@@ -1475,6 +1503,9 @@ def test_t11_previous_state_helper_uses_explicit_continuity_evidence():
     assert explicit.is_same_action is True
     assert explicit.is_angle_change is True
     assert explicit.has_terminal_frame_asset_id == "terminal-shot-0"
+    assert explicit.previous_shot_artifact_id == previous.artifact_id
+    assert explicit.previous_shot_revision == previous.revision
+    assert explicit.previous_generation_intent_hash == "3" * 64
 
 
 def _current_dynamic_request():
@@ -1714,6 +1745,25 @@ def test_consumer_accepts_current_plan_directly():
     )
     assert isinstance(projection, VerifiedGenerationRequirementProjection)
     assert projection.requirement == plan.generation_requirement
+
+
+def test_canonical_consumer_accepts_v4_only_with_exact_causal_policy() -> None:
+    request = _current_v4_causal_request()
+    plan = VideoPlanner().plan(request)
+    requirement = plan.generation_requirement
+    assert requirement is not None
+    policy = _complete_causal_policy(
+        requirement.generation_intent_hash,
+        requirement.target_shot,
+    )
+
+    projection = require_current_video_plan(
+        current_request=request,
+        plan=plan,
+        continuity_transition_policy=policy,
+    )
+
+    assert projection.requirement == requirement
 
 
 @pytest.mark.parametrize("forged", ["request", "plan", "plan_id"])

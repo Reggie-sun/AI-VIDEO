@@ -31,6 +31,7 @@ from ai_video.planning._planner_models import (
 )
 from ai_video.production.models import Shot, VisualStrategy
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.video_transition import ContinuityTransitionPolicy
 from ai_video.production.video_requirement import (
     AssetEvidence as RequirementAssetEvidence,
     CapabilityNeed,
@@ -520,6 +521,7 @@ def _build_generation_requirement(
         continuity_mode=RequirementContinuityMode(continuity.value),
         motion_requirement=RequirementMotionRequirement(motion.value),
         generation_intent=projection.generation_intent,
+        conditioning_compatibility=projection.conditioning_compatibility,
         semantic_reference_roles=semantic_roles,
         capability_need=CapabilityNeed(
             needs_identity_reference=(SemanticReferenceRole.IDENTITY in semantic_roles),
@@ -573,6 +575,15 @@ def _typed_generation_intent_is_sufficient(
     if projection is None:
         return False
     intent = projection.generation_intent
+    if intent.primary_camera_motion is not None:
+        from ai_video.production._video_intent_validation import (
+            validate_generation_intent_for_continuity,
+        )
+
+        return not validate_generation_intent_for_continuity(
+            intent,
+            audio_need=projection.audio_need,
+        )
     return any(
         value != "unspecified"
         for value in (
@@ -711,12 +722,24 @@ class VideoPlanner:
         is_angle_change: bool = False,
         semantic_jump: bool = False,
         has_terminal_frame_asset_id: str | None = None,
+        previous_generation_intent_hash: str | None = None,
     ) -> PreviousShotState | None:
         if previous_shot is None:
             return None
         return PreviousShotState(
             previous_shot_id=previous_shot.shot_id,
             previous_shot_content_hash=previous_shot.content_hash,
+            previous_shot_artifact_id=(
+                previous_shot.artifact_id
+                if previous_generation_intent_hash is not None
+                else None
+            ),
+            previous_shot_revision=(
+                previous_shot.revision
+                if previous_generation_intent_hash is not None
+                else None
+            ),
+            previous_generation_intent_hash=previous_generation_intent_hash,
             is_same_scene=previous_shot.scene_id == target_shot.scene_id,
             is_same_story_beat=(
                 previous_shot.storyboard_beat_id
@@ -745,6 +768,7 @@ def require_current_video_plan(
     *,
     current_request: VideoPlanningRequest,
     plan: VideoGenerationPlan,
+    continuity_transition_policy: ContinuityTransitionPolicy | None = None,
 ) -> VerifiedGenerationRequirementProjection:
     from ai_video.quality_gates import (
         ShotReadinessGate,
@@ -756,6 +780,12 @@ def require_current_video_plan(
         request_id=f"readiness-{current_request.target_shot.shot_id}",
         current_request=current_request,
         plan=plan,
+        contract_version=(
+            "shot-readiness-gate/2"
+            if continuity_transition_policy is not None
+            else "shot-readiness-gate/1"
+        ),
+        continuity_transition_policy=continuity_transition_policy,
     )
     return require_ready(ShotReadinessGate().evaluate(readiness_request))
 
@@ -765,10 +795,12 @@ def prepare_shot_for_existing_production(
     current_request: VideoPlanningRequest,
     plan: VideoGenerationPlan,
     production_handoff: Callable[..., Any],
+    continuity_transition_policy: ContinuityTransitionPolicy | None = None,
 ) -> Any:
     projection = require_current_video_plan(
         current_request=current_request,
         plan=plan,
+        continuity_transition_policy=continuity_transition_policy,
     )
     return production_handoff(
         current_shot=current_request.target_shot,

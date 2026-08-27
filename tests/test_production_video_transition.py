@@ -19,6 +19,10 @@ from ai_video.production.video_execution_stack import (
 from ai_video.production.video_transition import (
     BoundaryKind,
     CandidateStackBinding,
+    CausalDimension,
+    CausalEdgeSemantics,
+    CausalStateChange,
+    CausalTransitionMode,
     ContinuityAnchorBinding,
     ContinuityAnchorRole,
     ContinuityObligation,
@@ -212,6 +216,121 @@ def _policy(
         qa_policy_hash=HASHES[4],
         authoring_evidence_hash=HASHES[5],
     )
+
+
+def _causal_policy(
+    *,
+    semantics: CausalEdgeSemantics,
+    changes: tuple[CausalStateChange, ...],
+    boundary_kind: BoundaryKind = BoundaryKind.HARD_CUT,
+    obligation: ContinuityObligation = ContinuityObligation.FULL_CONTINUITY,
+) -> ContinuityTransitionPolicy:
+    original = _policy(
+        source=1,
+        target=2,
+        stack_hash=HASHES[0],
+        boundary_kind=boundary_kind,
+        obligation=obligation,
+    )
+    base = {
+        field: getattr(original, field)
+        for field in type(original).model_fields
+        if field
+        not in {
+            "schema_version",
+            "source_generation_intent_hash",
+            "target_generation_intent_hash",
+            "causal_edge_semantics",
+            "causal_state_changes",
+            "policy_hash",
+        }
+    }
+    return ContinuityTransitionPolicy.create(
+        **base,
+        schema_version="2",
+        source_generation_intent_hash=HASHES[6],
+        target_generation_intent_hash=HASHES[7],
+        causal_edge_semantics=semantics,
+        causal_state_changes=changes,
+    )
+
+
+def test_visible_holder_change_requires_named_bridge_beat() -> None:
+    with pytest.raises(ValidationError, match="named bridge beat"):
+        CausalStateChange(
+            dimension=CausalDimension.PROP_HOLDER,
+            source_close="elder",
+            target_open="girl",
+            transition_mode=CausalTransitionMode.VISIBLE_CHANGE,
+        )
+
+
+def test_direct_edge_rejects_unexplained_character_disappearance() -> None:
+    change = CausalStateChange(
+        dimension=CausalDimension.CHARACTER_PRESENCE,
+        source_close="elder present",
+        target_open="elder absent",
+        transition_mode=CausalTransitionMode.AUTHORIZED_RELEASE,
+    )
+
+    with pytest.raises(ValidationError, match="direct continuity cannot authorize"):
+        _causal_policy(
+            semantics=CausalEdgeSemantics.DIRECT_CONTINUITY,
+            changes=(change,),
+        )
+
+
+def test_commercial_cut_can_explicitly_release_character_presence() -> None:
+    change = CausalStateChange(
+        dimension=CausalDimension.CHARACTER_PRESENCE,
+        source_close="elder present",
+        target_open="packshot has no cast",
+        transition_mode=CausalTransitionMode.AUTHORIZED_RELEASE,
+    )
+
+    policy = _causal_policy(
+        semantics=CausalEdgeSemantics.COMMERCIAL_CUT,
+        changes=(change,),
+        obligation=ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
+    )
+
+    assert policy.schema_version == "2"
+    assert policy.causal_state_changes == (change,)
+
+
+def test_continuous_take_rejects_reset_or_commercial_cut_semantics() -> None:
+    change = CausalStateChange(
+        dimension=CausalDimension.CHARACTER_PRESENCE,
+        source_close="elder present",
+        target_open="elder absent",
+        transition_mode=CausalTransitionMode.AUTHORIZED_RELEASE,
+    )
+
+    with pytest.raises(ValidationError, match="continuous take requires direct"):
+        _causal_policy(
+            semantics=CausalEdgeSemantics.COMMERCIAL_CUT,
+            changes=(change,),
+            boundary_kind=BoundaryKind.WITHIN_CONTINUOUS_TAKE,
+        )
+
+
+def test_full_continuity_rejects_commercial_or_ellipsis_release() -> None:
+    change = CausalStateChange(
+        dimension=CausalDimension.CHARACTER_PRESENCE,
+        source_close="elder present",
+        target_open="elder absent",
+        transition_mode=CausalTransitionMode.AUTHORIZED_RELEASE,
+    )
+
+    for semantics in (
+        CausalEdgeSemantics.COMMERCIAL_CUT,
+        CausalEdgeSemantics.CAUSAL_ELLIPSIS,
+    ):
+        with pytest.raises(
+            ValidationError,
+            match="full continuity requires direct",
+        ):
+            _causal_policy(semantics=semantics, changes=(change,))
 
 
 def test_execution_stack_identity_is_content_addressed_and_component_drift_changes_hash():

@@ -6,6 +6,7 @@ from enum import Enum
 from typing import Any, Literal
 
 from pydantic import (
+    AliasChoices,
     Field,
     SerializerFunctionWrapHandler,
     ValidationInfo,
@@ -22,6 +23,7 @@ from ai_video.production._video_continuity import C4MultiAnchorBinding
 _REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/1"
 _C4_REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/2"
 _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/3"
+_CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/4"
 _UNSEALED_HASH = "0" * 64
 _SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
 _SHA256 = r"^[0-9a-f]{64}$"
@@ -92,6 +94,84 @@ class AudioNeed(str, Enum):
 class ExpressionStrength(str, Enum):
     SEMANTIC_PROMPT_ALLOWED = "semantic_prompt_allowed"
     NATIVE_CONTROL_REQUIRED = "native_control_required"
+
+
+class CameraMovementKind(str, Enum):
+    LOCKED = "locked"
+    PAN_LEFT = "pan_left"
+    PAN_RIGHT = "pan_right"
+    TILT_UP = "tilt_up"
+    TILT_DOWN = "tilt_down"
+    DOLLY_IN = "dolly_in"
+    DOLLY_OUT = "dolly_out"
+    TRUCK_LEFT = "truck_left"
+    TRUCK_RIGHT = "truck_right"
+    PEDESTAL_UP = "pedestal_up"
+    PEDESTAL_DOWN = "pedestal_down"
+    ORBIT_LEFT = "orbit_left"
+    ORBIT_RIGHT = "orbit_right"
+    CRANE_UP = "crane_up"
+    CRANE_DOWN = "crane_down"
+
+
+class CameraAmplitudeClass(str, Enum):
+    SUBTLE = "subtle"
+    MODERATE = "moderate"
+    PRONOUNCED = "pronounced"
+
+
+class CameraSpeedClass(str, Enum):
+    VERY_SLOW = "very_slow"
+    SLOW = "slow"
+    MODERATE = "moderate"
+    FAST = "fast"
+
+
+class CameraMotionStartState(str, Enum):
+    STATIONARY = "stationary"
+    IN_MOTION = "in_motion"
+
+
+class CameraMotionEndState(str, Enum):
+    SETTLED = "settled"
+    CONTINUING = "continuing"
+
+
+class CameraSubjectRelationKind(str, Enum):
+    FIXED_FRAME = "fixed_frame"
+    MAINTAIN_OFFSET = "maintain_offset"
+    FOLLOW = "follow"
+    LEAD = "lead"
+    REVEAL = "reveal"
+
+
+class ConditioningLane(str, Enum):
+    I2VA = "i2va"
+    FL2VA = "fl2va"
+
+
+class ConditioningCompatibilityEvidence(StrictModel):
+    lane: ConditioningLane
+    first_anchor_id: str = Field(pattern=_SAFE_ID)
+    last_anchor_id: str | None = Field(default=None, pattern=_SAFE_ID)
+    same_subject_scale: bool | None = None
+    composition_compatible: bool | None = None
+    screen_order_compatible: bool | None = None
+    axis_compatible: bool | None = None
+    camera_path_reachable: bool | None = None
+    character_prop_state_reachable: bool | None = None
+    action_endpoint_reachable: bool | None = None
+    available_duration_seconds: float = Field(gt=0)
+
+    @model_validator(mode="after")
+    def _validate_lane_shape(self) -> "ConditioningCompatibilityEvidence":
+        if self.lane is ConditioningLane.I2VA:
+            if self.last_anchor_id is not None:
+                raise ValueError("I2VA cannot carry a last anchor")
+            return self
+        if self.last_anchor_id is None:
+            raise ValueError("FL2VA requires an approved last anchor")
+        return self
 
 
 class SemanticReferenceRole(str, Enum):
@@ -247,6 +327,156 @@ class CameraEndpoint(StrictModel):
     orientation_lock: bool = False
 
 
+class CameraMotionContract(StrictModel):
+    movement_kind: CameraMovementKind
+    direction: str = Field(min_length=1)
+    amplitude_class: CameraAmplitudeClass
+    speed_class: CameraSpeedClass
+    start_motion_state: CameraMotionStartState
+    end_motion_state: CameraMotionEndState
+
+    @model_validator(mode="after")
+    def _validate_locked_state(self) -> "CameraMotionContract":
+        if self.movement_kind is CameraMovementKind.LOCKED and (
+            self.start_motion_state is not CameraMotionStartState.STATIONARY
+            or self.end_motion_state is not CameraMotionEndState.SETTLED
+            or self.amplitude_class is not CameraAmplitudeClass.SUBTLE
+            or self.speed_class is not CameraSpeedClass.VERY_SLOW
+        ):
+            raise ValueError(
+                "locked camera requires canonical subtle/very_slow stationary-to-settled state"
+            )
+        expected_direction = {
+            CameraMovementKind.LOCKED: "none",
+            CameraMovementKind.PAN_LEFT: "left",
+            CameraMovementKind.PAN_RIGHT: "right",
+            CameraMovementKind.TILT_UP: "up",
+            CameraMovementKind.TILT_DOWN: "down",
+            CameraMovementKind.DOLLY_IN: "forward",
+            CameraMovementKind.DOLLY_OUT: "backward",
+            CameraMovementKind.TRUCK_LEFT: "left",
+            CameraMovementKind.TRUCK_RIGHT: "right",
+            CameraMovementKind.PEDESTAL_UP: "up",
+            CameraMovementKind.PEDESTAL_DOWN: "down",
+            CameraMovementKind.ORBIT_LEFT: "left",
+            CameraMovementKind.ORBIT_RIGHT: "right",
+            CameraMovementKind.CRANE_UP: "up",
+            CameraMovementKind.CRANE_DOWN: "down",
+        }[self.movement_kind]
+        if self.direction != expected_direction:
+            raise ValueError(
+                f"{self.movement_kind.value} camera requires {expected_direction} direction"
+            )
+        return self
+
+
+class CameraSubjectRelation(StrictModel):
+    subject_id: str = Field(pattern=_SAFE_ID)
+    relation_kind: CameraSubjectRelationKind
+    start_relation: str = Field(min_length=1)
+    end_relation: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _reject_secondary_camera_motion(self) -> "CameraSubjectRelation":
+        from ai_video.production._video_intent_validation import (
+            validate_camera_subject_relation,
+        )
+
+        diagnostics = validate_camera_subject_relation(self)
+        if diagnostics:
+            raise ValueError(
+                "camera-subject relation cannot add a secondary camera motion: "
+                + ", ".join(diagnostics)
+            )
+        return self
+
+
+class PerformanceIntent(StrictModel):
+    trigger: str = Field(min_length=1)
+    visible_response: str = Field(min_length=1)
+    gaze_target: str = Field(min_length=1)
+    body_behavior: str = Field(min_length=1)
+    hand_behavior: str = Field(min_length=1)
+    terminal_performance_state: str = Field(min_length=1)
+
+
+class VisualTreatment(StrictModel):
+    medium_look: str = Field(min_length=1)
+    palette: str = Field(min_length=1)
+    material_treatment: str = Field(min_length=1)
+    prohibited_visual_drift: tuple[str, ...] = Field(min_length=1)
+
+
+class LightingIntent(StrictModel):
+    motivated_source: str = Field(min_length=1)
+    direction: str = Field(min_length=1)
+    exposure_priority: str = Field(min_length=1)
+    continuity_state: str = Field(min_length=1)
+
+
+class AmbienceIntent(StrictModel):
+    environment_bed: str = Field(min_length=1)
+    foley_cues: tuple[str, ...] = ()
+    explicitly_silent: bool = False
+
+    @model_validator(mode="after")
+    def _validate_silence(self) -> "AmbienceIntent":
+        if self.explicitly_silent and (
+            self.environment_bed != "none" or self.foley_cues
+        ):
+            raise ValueError("silent ambience cannot carry environment or foley")
+        return self
+
+
+class DialogueIntent(StrictModel):
+    mode: Literal["none", "dialogue"]
+    speaker_id: str | None = Field(default=None, pattern=_SAFE_ID)
+    verbatim_text: str | None = None
+    start_seconds: float | None = Field(default=None, ge=0)
+    end_seconds: float | None = Field(default=None, gt=0)
+    on_screen: bool | None = None
+    response_obligation: str | None = None
+    lip_sync_required: bool = False
+
+    @model_validator(mode="after")
+    def _validate_dialogue_boundary(self) -> "DialogueIntent":
+        payload = (
+            self.speaker_id,
+            self.verbatim_text,
+            self.start_seconds,
+            self.end_seconds,
+            self.on_screen,
+            self.response_obligation,
+        )
+        if self.mode == "none":
+            if any(value is not None for value in payload) or self.lip_sync_required:
+                raise ValueError("none dialogue boundary cannot carry dialogue facts")
+            return self
+        if any(value is None for value in payload):
+            raise ValueError("dialogue mode requires complete sealed dialogue facts")
+        assert self.start_seconds is not None and self.end_seconds is not None
+        if self.end_seconds <= self.start_seconds:
+            raise ValueError("dialogue time window must be positive")
+        return self
+
+
+class MusicIntent(StrictModel):
+    mode: Literal["none", "music"]
+    instrumentation: str | None = None
+    tempo_rhythm: str | None = None
+    dynamics: str | None = None
+
+    @model_validator(mode="after")
+    def _validate_music_boundary(self) -> "MusicIntent":
+        payload = (self.instrumentation, self.tempo_rhythm, self.dynamics)
+        if self.mode == "none":
+            if any(value is not None for value in payload):
+                raise ValueError("none music boundary cannot carry score facts")
+        elif any(value is None for value in payload):
+            raise ValueError("music mode requires complete sealed score facts")
+        return self
+
+
 class GenerationIntent(StrictModel):
     open_state: TypedStateReference = Field(default_factory=TypedStateReference)
     close_state: TypedStateReference = Field(default_factory=TypedStateReference)
@@ -261,6 +491,59 @@ class GenerationIntent(StrictModel):
     pacing: Pacing = Field(default_factory=Pacing)
     camera_intent: CameraIntent = Field(default_factory=CameraIntent)
     camera_endpoint: CameraEndpoint = Field(default_factory=CameraEndpoint)
+    performance_intent: PerformanceIntent | None = None
+    visual_treatment: VisualTreatment | None = None
+    lighting_intent: LightingIntent | None = None
+    ambience_intent: AmbienceIntent | None = None
+    dialogue_intent: DialogueIntent | None = None
+    music_intent: MusicIntent | None = None
+    primary_camera_motion: CameraMotionContract | None = Field(
+        default=None,
+        validation_alias=AliasChoices("primary_camera_motion", "camera_motion"),
+    )
+    camera_subject_relation: CameraSubjectRelation | None = None
+
+    @model_validator(mode="after")
+    def _validate_camera_relation(self) -> "GenerationIntent":
+        motion = self.primary_camera_motion
+        relation = self.camera_subject_relation
+        if (
+            motion is not None
+            and motion.movement_kind is CameraMovementKind.LOCKED
+            and relation is not None
+            and relation.relation_kind
+            not in {
+                CameraSubjectRelationKind.FIXED_FRAME,
+                CameraSubjectRelationKind.MAINTAIN_OFFSET,
+            }
+        ):
+            raise ValueError("locked camera relation cannot add a second motion")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_versioned_camera_contract(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        for field in (
+            "performance_intent",
+            "visual_treatment",
+            "lighting_intent",
+            "ambience_intent",
+            "dialogue_intent",
+            "music_intent",
+            "primary_camera_motion",
+            "camera_subject_relation",
+        ):
+            if getattr(self, field) is None:
+                data.pop(field, None)
+        return data
+
+    @property
+    def camera_motion(self) -> CameraMotionContract | None:
+        """Compatibility accessor for the uncommitted camera-v1 draft."""
+
+        return self.primary_camera_motion
 
 
 class OutputNeed(StrictModel):
@@ -410,6 +693,7 @@ class ReviewEvidenceLink(StrictModel):
 
 class ProviderNeutralGenerationIntentProjection(StrictModel):
     generation_intent: GenerationIntent
+    conditioning_compatibility: ConditioningCompatibilityEvidence | None = None
     generation_operation: GenerationOperation = GenerationOperation.AUTO
     semantic_reference_roles: tuple[SemanticReferenceRole, ...] = ()
     media_reference_asset_ids: tuple[str, ...] = ()
@@ -417,6 +701,15 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
     audio_need: AudioNeed
     quality_need: QualityNeed
     projection_hash: str = Field(pattern=_SHA256)
+
+    @model_serializer(mode="wrap")
+    def _serialize_versioned_conditioning(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.generation_intent.primary_camera_motion is None:
+            data.pop("conditioning_compatibility", None)
+        return data
 
     @field_validator("semantic_reference_roles")
     @classmethod
@@ -448,11 +741,48 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
             raise ValueError(
                 "exact media selection requires a media role or video operation"
             )
+        if (
+            self.generation_intent.primary_camera_motion is not None
+            and self.conditioning_compatibility is None
+        ):
+            raise ValueError("rich generation intent requires conditioning compatibility")
+        if (
+            self.generation_intent.primary_camera_motion is None
+            and self.conditioning_compatibility is not None
+        ):
+            raise ValueError("historical intent cannot carry conditioning compatibility")
+        if self.generation_intent.primary_camera_motion is not None:
+            from ai_video.production._video_intent_validation import (
+                validate_conditioning_compatibility,
+                validate_generation_intent_for_continuity,
+            )
+
+            diagnostics = validate_generation_intent_for_continuity(
+                self.generation_intent,
+                audio_need=self.audio_need,
+            )
+            if diagnostics:
+                raise ValueError(
+                    "projection requires complete rich generation intent: "
+                    + ", ".join(diagnostics)
+                )
+            conditioning_diagnostics = validate_conditioning_compatibility(
+                self.conditioning_compatibility
+            )
+            if conditioning_diagnostics:
+                raise ValueError(
+                    "projection requires compatible conditioning: "
+                    + ", ".join(conditioning_diagnostics)
+                )
         return self
 
     def _hash_payload(self) -> dict[str, object]:
         return {
-            "schema": "provider-neutral-generation-intent/1",
+            "schema": (
+                "provider-neutral-generation-intent/2"
+                if self.generation_intent.primary_camera_motion is not None
+                else "provider-neutral-generation-intent/1"
+            ),
             **self.model_dump(mode="json", exclude={"projection_hash"}),
         }
 
@@ -492,6 +822,7 @@ class ProviderNeutralVideoRequirement(StrictModel):
         _REQUIREMENT_CONTRACT_VERSION,
         _C4_REQUIREMENT_CONTRACT_VERSION,
         _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION,
+        _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION,
     ] = (
         _REQUIREMENT_CONTRACT_VERSION
     )
@@ -510,6 +841,7 @@ class ProviderNeutralVideoRequirement(StrictModel):
     continuity_mode: ContinuityMode
     motion_requirement: MotionRequirement
     generation_intent: GenerationIntent
+    conditioning_compatibility: ConditioningCompatibilityEvidence | None = None
     semantic_reference_roles: tuple[SemanticReferenceRole, ...] = ()
     capability_need: CapabilityNeed = Field(default_factory=CapabilityNeed)
     output_need: OutputNeed = Field(default_factory=OutputNeed)
@@ -525,7 +857,25 @@ class ProviderNeutralVideoRequirement(StrictModel):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
-        if self.contract_version != _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION:
+        if self.contract_version != _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION:
+            data.pop("conditioning_compatibility", None)
+        commercial_present = any(
+            value is not None
+            for value in (
+                self.commercial_execution_class,
+                self.product_fidelity_requirement,
+                self.approved_commercial_source,
+                self.source_strategy,
+            )
+        )
+        if (
+            self.contract_version
+            not in {
+                _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION,
+                _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION,
+            }
+            or not commercial_present
+        ):
             for field in (
                 "commercial_execution_class",
                 "product_fidelity_requirement",
@@ -550,11 +900,28 @@ class ProviderNeutralVideoRequirement(StrictModel):
     @classmethod
     def create(cls, **values: object) -> "ProviderNeutralVideoRequirement":
         payload: dict[str, object] = dict(values)
+        generation_intent = payload.get("generation_intent")
+        primary_camera_motion = (
+            generation_intent.primary_camera_motion
+            if isinstance(generation_intent, GenerationIntent)
+            else (
+                generation_intent.get("primary_camera_motion")
+                or generation_intent.get("camera_motion")
+                if isinstance(generation_intent, dict)
+                else None
+            )
+        )
         payload.setdefault(
             "contract_version",
-            _C4_REQUIREMENT_CONTRACT_VERSION
-            if payload.get("c4_multi_anchor_binding") is not None
-            else _REQUIREMENT_CONTRACT_VERSION,
+            (
+                _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION
+                if primary_camera_motion is not None
+                else (
+                    _C4_REQUIREMENT_CONTRACT_VERSION
+                    if payload.get("c4_multi_anchor_binding") is not None
+                    else _REQUIREMENT_CONTRACT_VERSION
+                )
+            ),
         )
         payload["requirement_id"] = "video-requirement-unsealed"
         payload["requirement_hash"] = _UNSEALED_HASH
@@ -627,6 +994,36 @@ class ProviderNeutralVideoRequirement(StrictModel):
         if tuple(sorted(self.target_shot.character_ids)) != character_ids:
             raise ValueError("requirement Characters must match the exact target Shot")
         intent = self.generation_intent
+        if intent.primary_camera_motion is None:
+            if self.contract_version == _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION:
+                raise ValueError("camera-complete v4 requirement requires camera_motion")
+        elif self.contract_version != _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION:
+            raise ValueError("primary_camera_motion requires the v4 requirement")
+        if self.contract_version == _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION:
+            from ai_video.production._video_intent_validation import (
+                validate_generation_intent_for_continuity,
+                validate_requirement_conditioning_compatibility,
+            )
+
+            diagnostics = validate_generation_intent_for_continuity(
+                intent,
+                audio_need=self.audio_need,
+            )
+            if diagnostics:
+                raise ValueError(
+                    "v4 requires complete rich generation intent: "
+                    + ", ".join(diagnostics)
+                )
+            conditioning_diagnostics = validate_requirement_conditioning_compatibility(
+                self
+            )
+            if conditioning_diagnostics:
+                raise ValueError(
+                    "v4 requires compatible conditioning: "
+                    + ", ".join(conditioning_diagnostics)
+                )
+        elif self.conditioning_compatibility is not None:
+            raise ValueError("conditioning compatibility requires the v4 requirement")
         if (
             intent.scene_continuity is not None
             and intent.scene_continuity.scene_id != self.scene.scene_id
@@ -640,13 +1037,18 @@ class ProviderNeutralVideoRequirement(StrictModel):
             if self.contract_version not in {
                 _REQUIREMENT_CONTRACT_VERSION,
                 _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION,
+                _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION,
             }:
                 raise ValueError("C4 requirement contract requires a C4 binding")
             if self.continuity_mode is ContinuityMode.MULTI_ANCHOR:
                 raise ValueError("multi-anchor continuity requires a C4 binding")
             return self._validate_commercial_product_fidelity()
         if (
-            self.contract_version != _C4_REQUIREMENT_CONTRACT_VERSION
+            self.contract_version
+            not in {
+                _C4_REQUIREMENT_CONTRACT_VERSION,
+                _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION,
+            }
             or self.continuity_mode is not ContinuityMode.MULTI_ANCHOR
             or self.generation_mode is not GenerationMode.IMAGE_TO_VIDEO
         ):
@@ -707,7 +1109,17 @@ class ProviderNeutralVideoRequirement(StrictModel):
             self.approved_commercial_source,
             self.source_strategy,
         )
-        if self.contract_version != _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION:
+        commercial_present = any(value is not None for value in commercial_values)
+        if not commercial_present:
+            if self.contract_version == _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION:
+                raise ValueError("Commercial v3 requirement requires complete product lineage")
+            if self.capability_need.needs_product_fidelity:
+                raise ValueError("Product fidelity requires complete commercial lineage")
+            return self
+        if self.contract_version not in {
+            _COMMERCIAL_REQUIREMENT_CONTRACT_VERSION,
+            _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION,
+        }:
             if any(value is not None for value in commercial_values):
                 raise ValueError("Historical requirement contracts cannot carry commercial fields")
             if self.capability_need.needs_product_fidelity:
@@ -863,23 +1275,38 @@ __all__ = [
     "ActionEndpoint",
     "AssetEvidence",
     "AudioNeed",
+    "AmbienceIntent",
     "AxisContinuity",
+    "CameraAmplitudeClass",
     "CameraEndpoint",
     "CameraIntent",
+    "CameraMotionContract",
+    "CameraMotionEndState",
+    "CameraMotionStartState",
+    "CameraMovementKind",
+    "CameraSpeedClass",
+    "CameraSubjectRelation",
+    "CameraSubjectRelationKind",
     "CapabilityNeed",
+    "ConditioningCompatibilityEvidence",
+    "ConditioningLane",
     "ContinuityMode",
     "ContinuityStateKind",
+    "DialogueIntent",
     "ExpressionStrength",
     "GenerationIntent",
     "GenerationMode",
     "GenerationOperation",
     "IdentityContinuity",
     "IdentityPreservation",
+    "LightingIntent",
+    "MusicIntent",
     "MotionEnvelope",
     "MotionRequirement",
     "OutputGeometryPolicy",
     "OutputNeed",
     "Pacing",
+    "PerformanceIntent",
     "ProviderNeutralGenerationIntentProjection",
     "ProviderNeutralVideoRequirement",
     "QualityNeed",
@@ -889,5 +1316,6 @@ __all__ = [
     "SpaceContinuity",
     "SubjectAction",
     "TypedStateReference",
+    "VisualTreatment",
     "VerifiedGenerationRequirementProjection",
 ]

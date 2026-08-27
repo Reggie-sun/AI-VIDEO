@@ -51,6 +51,7 @@ from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.video_requirement import (
     AssetEvidence,
     AudioNeed,
+    CapabilityNeed,
     ContinuityMode as RequirementContinuityMode,
     GenerationMode as RequirementGenerationMode,
     OutputGeometryPolicy,
@@ -76,7 +77,11 @@ from test_production_shot_router import (
     _policy,
     _verified_requirement,
 )
-from test_production_comfy_video import _profile_and_comfy_root
+from test_production_comfy_video import QUALITY_PROFILE_PATH, _profile_and_comfy_root
+from tests.test_production_video_intent_validation import (
+    _compatible_fl2va,
+    _complete_intent,
+)
 
 
 def _replace_requirement(
@@ -450,6 +455,193 @@ def test_local_h3_compiles_neutral_first_frame_without_runtime_execution(
         int(compiled.request.request_input_hash[:16], 16) & ((1 << 63) - 1)
     )
     assert provider.resolve(compiled.request) == resolved
+
+
+def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
+    tmp_path: Path,
+) -> None:
+    artifact_root, comfy_root, profile = _profile_and_comfy_root(
+        tmp_path, QUALITY_PROFILE_PATH
+    )
+    image_root = tmp_path / "images-v4"
+    image_root.mkdir()
+    first = _asset("continuity_terminal", "v4-first", "8" * 64)
+    last = _asset("last_frame", "v4-last", "9" * 64)
+    context = _context(
+        continuity=ContinuityMode.EXACT_TERMINAL,
+        terminal=first,
+        last_frame=last,
+        important=False,
+    )
+    output = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=124,
+        dimension_mode="exact",
+        width=608,
+        height=352,
+        resolution_label="h3_native",
+        ratio="adaptive",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=True,
+    )
+    projection = _replace_requirement(
+        _verified_requirement(context),
+        contract_version="provider-neutral-video-requirement/4",
+        generation_mode=RequirementGenerationMode.IMAGE_TO_VIDEO,
+        continuity_mode=RequirementContinuityMode.EXACT_TERMINAL,
+        generation_intent=_complete_intent(),
+        conditioning_compatibility=_compatible_fl2va().model_copy(
+            update={
+                "first_anchor_id": first.asset_id,
+                "last_anchor_id": last.asset_id,
+            }
+        ),
+        capability_need=CapabilityNeed(
+            needs_first_frame=True,
+            needs_last_frame=True,
+            needs_continuity_state=True,
+            accepts_local_execution=True,
+            accepts_remote_execution=False,
+        ),
+        semantic_reference_roles=(
+            SemanticReferenceRole.CONTINUITY_TERMINAL,
+            SemanticReferenceRole.LAST_FRAME,
+        ),
+        asset_evidence=(
+            AssetEvidence(
+                role=SemanticReferenceRole.CONTINUITY_TERMINAL,
+                asset_id=first.asset_id,
+                asset_sha256=first.asset_sha256,
+                mime_type=first.mime_type,
+                width=first.width,
+                height=first.height,
+                size_bytes=first.size_bytes,
+            ),
+            AssetEvidence(
+                role=SemanticReferenceRole.LAST_FRAME,
+                asset_id=last.asset_id,
+                asset_sha256=last.asset_sha256,
+                mime_type=last.mime_type,
+                width=last.width,
+                height=last.height,
+                size_bytes=last.size_bytes,
+            ),
+        ),
+        output_need=OutputNeed(
+            timing_mode="frame_count",
+            frame_count=124,
+            geometry_policy=OutputGeometryPolicy.EXACT,
+            width=608,
+            height=352,
+            aspect_ratio="adaptive",
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.OPTIONAL,
+    )
+    provider = ComfyUIVideoProvider(
+        profile,
+        artifact_root=artifact_root,
+        comfy_root=comfy_root,
+        image_root=image_root,
+        image_resolver=lambda *_: image_root / "unused.png",
+        transport=object(),
+    )
+    routing = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(),
+        provider_profile=ProviderProfilePointer(
+            profile_id="minimax-h3-fl2va",
+            profile_version="v1",
+            profile_path=Path(
+                f"provider-profiles/{profile.profile_content_hash}.json"
+            ),
+            profile_sha256=profile.profile_content_hash,
+        ),
+        capabilities=provider.capabilities(),
+        selected_capability_id="minimax-h3-fl2va-local-v1",
+        output_requirement=output,
+        lifecycle=_lifecycle(context).model_copy(
+            update={
+                "input_artifact_ids": (
+                    context.target_shot_id,
+                    first.asset_id,
+                    last.asset_id,
+                )
+            }
+        ),
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="comfy-local-h3-video-compiler",
+            compiler_version="2",
+        ),
+    )
+    assert routing.provider_bound_request is not None, routing.decision.model_dump_json(
+        indent=2
+    )
+
+    compiled = provider.compile_request(
+        routing.provider_bound_request,
+        projection.requirement,
+    )
+
+    assert isinstance(compiled, CompiledProviderVideoRequest)
+    assert compiled.adapter_compiler_version == "2"
+    assert compiled.provider_native_prompt.count("[Shot 1]") == 1
+    assert "integrated_multimodal_description:" in compiled.provider_native_prompt
+    assert "generation_mode=" not in compiled.provider_native_prompt
+
+    performance = projection.requirement.generation_intent.performance_intent
+    assert performance is not None
+    stale_intent = projection.requirement.generation_intent.model_copy(
+        update={
+            "performance_intent": performance.model_copy(
+                update={"trigger": "mutated after sealing"}
+            )
+        }
+    )
+    stale_requirement = projection.requirement.model_copy(
+        update={"generation_intent": stale_intent}
+    )
+    stale = provider.compile_request(
+        routing.provider_bound_request,
+        stale_requirement,
+    )
+    assert isinstance(stale, ProviderRequirementUnsupported)
+    assert stale.reason is ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH
+    assert stale.unsupported_field_paths == ("requirement_hash",)
+
+    generic = compile_provider_video_request(
+        provider_bound=routing.provider_bound_request,
+        requirement=projection.requirement,
+        compiler_id="comfy-local-h3-video-compiler",
+        compiler_version="2",
+        capabilities=provider.capabilities(),
+    )
+    assert isinstance(generic, ProviderRequirementUnsupported)
+    assert generic.reason is ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED
+    assert generic.unsupported_field_paths == ("generation_intent",)
+
+    legacy_artifact_root, legacy_comfy_root, legacy_profile = _profile_and_comfy_root(
+        tmp_path / "legacy"
+    )
+    legacy_provider = ComfyUIVideoProvider(
+        legacy_profile,
+        artifact_root=legacy_artifact_root,
+        comfy_root=legacy_comfy_root,
+        image_root=image_root,
+        image_resolver=lambda *_: image_root / "unused.png",
+        transport=object(),
+    )
+    unsupported = legacy_provider.compile_request(
+        routing.provider_bound_request,
+        projection.requirement,
+    )
+    assert isinstance(unsupported, ProviderRequirementUnsupported)
+    assert unsupported.reason is ProviderRequirementUnsupportedReason.COMPILER_VERSION_UNSUPPORTED
+    assert unsupported.unsupported_field_paths == ("provider_profile",)
 
 
 def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -> None:

@@ -3,7 +3,13 @@ from __future__ import annotations
 from enum import Enum
 from typing import Literal
 
-from pydantic import AliasChoices, Field, model_validator
+from pydantic import (
+    AliasChoices,
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.commercial_execution import (
@@ -214,12 +220,46 @@ class ReviewDecisionProjection(StrictModel):
 class PreviousShotState(StrictModel):
     previous_shot_id: str | None = Field(default=None, pattern=_SAFE_ID)
     previous_shot_content_hash: str | None = Field(default=None, pattern=_SHA256)
+    previous_shot_artifact_id: str | None = Field(default=None, pattern=_SAFE_ID)
+    previous_shot_revision: int | None = Field(default=None, strict=True, ge=1)
+    previous_generation_intent_hash: str | None = Field(
+        default=None, pattern=_SHA256
+    )
     is_same_scene: bool
     is_same_story_beat: bool
     is_same_action: bool
     is_angle_change: bool
     has_terminal_frame_asset_id: str | None = Field(default=None, pattern=_SAFE_ID)
     semantic_jump: bool
+
+    @model_validator(mode="after")
+    def _validate_exact_previous_identity(self) -> "PreviousShotState":
+        exact = (
+            self.previous_shot_artifact_id,
+            self.previous_shot_revision,
+            self.previous_generation_intent_hash,
+        )
+        if any(item is not None for item in exact) and any(
+            item is None for item in exact
+        ):
+            raise ValueError(
+                "exact previous Shot identity requires artifact, revision, and intent hash"
+            )
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_additive_exact_identity(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        for field in (
+            "previous_shot_artifact_id",
+            "previous_shot_revision",
+            "previous_generation_intent_hash",
+        ):
+            if getattr(self, field) is None:
+                data.pop(field, None)
+        return data
 
 
 class ProductionPolicyInput(StrictModel):

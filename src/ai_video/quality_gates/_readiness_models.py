@@ -4,7 +4,12 @@ from enum import Enum
 import re
 from typing import Annotated, Literal
 
-from pydantic import Field, model_validator
+from pydantic import (
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.planning._planner_models import (
     AssetRole,
@@ -15,6 +20,7 @@ from ai_video.planning._planner_models import (
 )
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import StrictModel
+from ai_video.production.video_transition import ContinuityTransitionPolicy
 from ai_video.production.video_requirement import (
     VerifiedGenerationRequirementProjection,
 )
@@ -57,20 +63,22 @@ class ReadinessReason(str, Enum):
     PLAN_BLOCKED = "plan_blocked"
     HUMAN_REVIEW_UNRESOLVED = "human_review_unresolved"
     REQUIRED_ASSET_MISSING = "required_asset_missing"
+    CAUSAL_TRANSITION_INVALID = "causal_transition_invalid"
 
 
 class ShotReadinessRequest(StrictModel):
     request_id: str = Field(pattern=_SAFE_ID)
     current_request: VideoPlanningRequest
     plan: VideoGenerationPlan
-    contract_version: Literal["shot-readiness-gate/1"] = (
+    continuity_transition_policy: ContinuityTransitionPolicy | None = None
+    contract_version: Literal["shot-readiness-gate/1", "shot-readiness-gate/2"] = (
         "shot-readiness-gate/1"
     )
     request_content_hash: str = Field(pattern=_SHA256)
 
     def _hash_payload(self) -> dict[str, object]:
         requirement = self.plan.generation_requirement
-        return {
+        payload = {
             "contract_version": self.contract_version,
             "current_request_content_hash": (
                 self.current_request.request_content_hash
@@ -80,6 +88,20 @@ class ShotReadinessRequest(StrictModel):
                 requirement.requirement_hash if requirement is not None else None
             ),
         }
+        if self.continuity_transition_policy is not None:
+            payload["continuity_transition_policy_hash"] = (
+                self.continuity_transition_policy.policy_hash
+            )
+        return payload
+
+    @model_serializer(mode="wrap")
+    def _serialize_versioned_transition(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.contract_version == "shot-readiness-gate/1":
+            data.pop("continuity_transition_policy", None)
+        return data
 
     @classmethod
     def create(cls, **values: object) -> "ShotReadinessRequest":
@@ -89,6 +111,7 @@ class ShotReadinessRequest(StrictModel):
             "request_id",
             "current_request",
             "plan",
+            "continuity_transition_policy",
             "contract_version",
         }
         if unexpected:
@@ -105,13 +128,28 @@ class ShotReadinessRequest(StrictModel):
             raise TypeError("current_request must be a VideoPlanningRequest")
         if not isinstance(plan, VideoGenerationPlan):
             raise TypeError("plan must be a VideoGenerationPlan")
-        if contract_version != "shot-readiness-gate/1":
+        if contract_version not in {
+            "shot-readiness-gate/1",
+            "shot-readiness-gate/2",
+        }:
             raise ValueError("unsupported readiness request contract")
+        transition_policy = payload.get("continuity_transition_policy")
+        if contract_version == "shot-readiness-gate/1" and transition_policy is not None:
+            raise ValueError("v1 readiness request cannot carry transition policy")
+        if contract_version == "shot-readiness-gate/2" and not isinstance(
+            transition_policy, ContinuityTransitionPolicy
+        ):
+            raise TypeError("v2 readiness request requires transition policy")
+        if isinstance(transition_policy, ContinuityTransitionPolicy):
+            transition_policy = ContinuityTransitionPolicy.model_validate(
+                transition_policy.model_dump(mode="python")
+            )
 
         draft = cls.model_construct(
             request_id=request_id,
             current_request=current_request,
             plan=plan,
+            continuity_transition_policy=transition_policy,
             contract_version=contract_version,
             request_content_hash=_UNSEALED_HASH,
         )
@@ -119,6 +157,7 @@ class ShotReadinessRequest(StrictModel):
             request_id=request_id,
             current_request=current_request,
             plan=plan,
+            continuity_transition_policy=transition_policy,
             contract_version=contract_version,
             request_content_hash=canonical_sha256(
                 draft._hash_payload()

@@ -204,11 +204,11 @@ checks:
     cwd: .
     description: Verify provider-neutral Video Planner proposals and Main Agent STOP semantics.
   provider_neutral_video_requirement_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_video_requirement.py, tests/test_planning_video_planner.py, tests/test_production_shot_router.py, tests/test_production_video_fake.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_video.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_video_requirement.py, tests/test_production_video_intent_validation.py, tests/test_production_h3_prompt.py, tests/test_planning_video_planner.py, tests/test_production_shot_router.py, tests/test_production_video_fake.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_video.py, -q]
     cwd: .
     description: Verify the sealed neutral requirement, Router binding, adapter compiler result, and lifecycle lineage.
   shot_readiness_gate_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_shot_readiness_gate.py, tests/test_planning_video_planner.py, tests/test_production_video_requirement.py, tests/test_errors.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_shot_readiness_gate.py, tests/test_planning_video_planner.py, tests/test_production_video_requirement.py, tests/test_production_video_intent_validation.py, tests/test_production_video_transition.py, tests/test_errors.py, -q]
     cwd: .
     description: Verify exact planning lineage, structural readiness, typed STOP diagnostics, and compatibility handoff.
   quality_intelligence_tests:
@@ -772,9 +772,13 @@ categories:
   provider_neutral_video_requirement:
     patterns:
       - src/ai_video/production/video_requirement.py
+      - src/ai_video/production/_video_intent_validation.py
+      - src/ai_video/production/_h3_prompt.py
       - src/ai_video/production/_video_requirement_routing.py
       - src/ai_video/production/video_compiler.py
       - tests/test_production_video_requirement.py
+      - tests/test_production_video_intent_validation.py
+      - tests/test_production_h3_prompt.py
       - tests/test_production_provider_neutral_adapters.py
       - tests/test_video_compiler_c4_qualification.py
     check_ids:

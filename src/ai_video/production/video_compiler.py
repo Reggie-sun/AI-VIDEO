@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
 import unicodedata
 from enum import Enum
 from typing import Literal, Protocol, runtime_checkable
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, ValidationError, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._video_requirement_routing import (
@@ -85,6 +86,19 @@ class ProviderRequirementUnsupported(_CompilerModel):
     retryable: Literal[False] = False
     prompt_text: None = None
     payload: None = None
+
+
+class ProviderNativePrompt(_CompilerModel):
+    grammar_contract: str = Field(pattern=_SAFE_ID)
+    prompt_text: str = Field(min_length=1)
+    prompt_sha256: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_prompt_hash(self) -> "ProviderNativePrompt":
+        expected = hashlib.sha256(self.prompt_text.encode("utf-8")).hexdigest()
+        if self.prompt_sha256 != expected:
+            raise ValueError("native prompt hash does not match exact UTF-8 bytes")
+        return self
 
 
 class CompiledProviderVideoRequest(_CompilerModel):
@@ -311,8 +325,24 @@ def compile_provider_video_request(
     compiler_version: str,
     capabilities: VideoProviderCapabilities,
     supports_native_control: bool = False,
+    native_prompt: ProviderNativePrompt | None = None,
 ) -> ProviderRequestCompilationResult:
     """Compile mechanical provider grammar without selecting or invoking a Provider."""
+
+    try:
+        ProviderBoundVideoRequest.model_validate(
+            provider_bound.model_dump(mode="python")
+        )
+        ProviderNeutralVideoRequirement.model_validate(
+            requirement.model_dump(mode="python")
+        )
+    except ValidationError:
+        return _unsupported(
+            provider_bound,
+            requirement,
+            ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
+            ("requirement_hash",),
+        )
 
     contract = provider_bound.compiler_contract
     if (
@@ -331,6 +361,16 @@ def compile_provider_video_request(
             requirement,
             ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
             ("requirement_hash",),
+        )
+    if (
+        requirement.contract_version == "provider-neutral-video-requirement/4"
+        and native_prompt is None
+    ):
+        return _unsupported(
+            provider_bound,
+            requirement,
+            ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+            ("generation_intent",),
         )
     expected_bindings = tuple(
         (native_binding_role(item.role), item.asset_id, item.asset_sha256)
@@ -510,7 +550,11 @@ def compile_provider_video_request(
         )
     )
     lifecycle = provider_bound.lifecycle
-    prompt = _compile_neutral_prompt(requirement)
+    prompt = (
+        native_prompt.prompt_text
+        if native_prompt is not None
+        else _compile_neutral_prompt(requirement)
+    )
     projection = VideoGenerationRequestCompilation.create(
         compilation_kind="provider_neutral",
         generation_id=lifecycle.generation_id,
