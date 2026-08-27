@@ -14,6 +14,10 @@ nested Legacy reopen 和 workspace overview，strict Production invalid contract
 `T2V / I2V / R2V / FL2V`、sealed prompt 与 mode-required registered inputs。FL2V 由
 `image_to_video + first_frame + last_frame` 推导；不修改 Production schema/request receipt。
 
+2026-08-28 attempt-detail follow-up：selected attempt 增加 exact-at-time `shot_snapshot`、完整
+storyboard、normalized lifecycle outcome、安全 `error_code`，并把 strict fetched video 与 Registry
+candidate 分层显示。不得用 active Shot 代替历史 Shot，也不得从 Prompt 文本解析伪造 Shots。
+
 ## Contract Checkpoint Before Code
 
 - **Problem boundary:** 当前 Provider Console 是硬编码 demo，没有消费 `runs/`。
@@ -25,6 +29,11 @@ nested Legacy reopen 和 workspace overview，strict Production invalid contract
 - **Mode/input projection:** strict `ResolvedVideoGenerationRequest.mode`、`prompt_text`、
   `image_bindings` / `media_bindings` 是唯一 truth；effective negative prompt、Provider raw response、
   signed URL、secret 与 absolute path 继续不进入 Browser。
+- **Historical Shot owner:** attempt sealed `target_shot_revision` + `target_shot_content_hash` 决定 identity；
+  active Shot 只有完全匹配时可复用，否则必须从 base Project strict reopen。其它 active Project 内容只代表
+  current workspace overview。
+- **Outcome/media separation:** Manifest attempt `status` 决定 lifecycle outcome；fetch receipt 只决定
+  `fetched_media`，Registry identity 只决定 `candidate_media`。两者都不产生 QA/activation truth。
 - **Focused verification:**
   `python -m pytest -p no:cacheprovider tests/test_provider_console.py -q`。
 
@@ -36,6 +45,7 @@ nested Legacy reopen 和 workspace overview，strict Production invalid contract
 - `tests/test_provider_console.py`
 - `provider-console/scripts/runs-api.mjs`
 - `provider-console/tests/runs-api.test.mjs`
+- `provider-console/src/run-detail-contract.js`
 
 ### Modify
 
@@ -73,6 +83,10 @@ source的布局与中文层级；CTA保持只读。
 Mode-specific extension：rail/header 显示 `T2V / I2V / R2V / FL2V`；T2V 显示 prompt，I2V/R2V
 显示 prompt + registered input bindings，FL2V 显示 prompt + first/last frame。所有媒体继续走 opaque
 token endpoint。
+
+Attempt-detail extension：rail 直接显示 outcome/phase/media/prompt 摘要；detail 把 exact Shot storyboard、
+sealed Prompt、inputs、fetched/candidate video 和 lifecycle evidence 分层。`failed`、`interrupted`、
+`outcome_unknown` 与 `running` 使用不同状态语义，且 `failed + fetched_media` 仍可播放用于人工判断。
 
 ### T4 — Verification And Review
 

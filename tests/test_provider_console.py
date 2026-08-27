@@ -44,6 +44,55 @@ def _ns(**values):
     return SimpleNamespace(**values)
 
 
+def _video_request(
+    *,
+    target_shot_id: str = "shot-1",
+    target_shot_revision: int = 1,
+    target_shot_content_hash: str = ZERO,
+    base_project=None,
+    base_registry=None,
+):
+    return _ns(
+        provider_name="provider-test",
+        provider_kind="provider-test",
+        model_id="model-test",
+        provider_profile=_ns(
+            profile_id="profile-test",
+            profile_version="v1",
+            profile_sha256=ZERO,
+        ),
+        capability_id="capability-test",
+        execution_kind=_ns(value="local"),
+        billing_kind=_ns(value="local_unmetered"),
+        mode=_ns(value="text_to_video"),
+        prompt_text="Sealed generation prompt.",
+        image_bindings=(),
+        media_bindings=(),
+        effective_output=_ns(
+            model_dump=lambda **_: {
+                "duration_seconds": 5,
+                "width": 1280,
+                "height": 720,
+                "container": "mp4",
+                "mime_type": "video/mp4",
+                "native_audio": False,
+            }
+        ),
+        continuity_binding=None,
+        activation_scope=_ns(
+            request=_ns(
+                target_shot_id=target_shot_id,
+                target_shot_revision=target_shot_revision,
+                target_shot_content_hash=target_shot_content_hash,
+                target_asset_role="generated_video",
+                base_project=base_project,
+                base_registry=base_registry,
+            )
+        ),
+        output_asset_id="generated-output",
+    )
+
+
 def test_catalog_is_bounded_deterministic_and_does_not_follow_symlinks(tmp_path: Path):
     runs = tmp_path / "runs"
     older = _production_workspace(runs, "run-b/project")
@@ -298,6 +347,481 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
     assert "raw secret error" not in serialized_public
 
 
+def test_production_detail_reopens_exact_historical_shot_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, "historical/project")
+    target_hash = "2" * 64
+    registry_hash = "3" * 64
+    historical_project_path = Path(
+        f"state/projects/project.2.{ONE}.yaml"
+    )
+    historical_registry_path = Path(f"assets/registry.{registry_hash}.json")
+    project_bytes = b"historical-project-snapshot"
+    registry_bytes = b"historical-registry-snapshot"
+    _write(project_path.parent / historical_project_path, project_bytes)
+    _write(project_path.parent / historical_registry_path, registry_bytes)
+    base_project = _ns(
+        path=historical_project_path,
+        revision=2,
+        content_hash=ONE,
+        file_sha256=hashlib.sha256(project_bytes).hexdigest(),
+    )
+    base_registry = _ns(
+        path=historical_registry_path,
+        revision_id=registry_hash,
+        content_hash=registry_hash,
+        file_sha256=hashlib.sha256(registry_bytes).hexdigest(),
+    )
+    state = _ns(
+        request=_ns(path=Path("state/video-generation/requests/request.json")),
+        phase=_ns(value="validate"),
+        generation_id="generation-history",
+        candidate_video_asset_ids=(),
+        local_fetch_receipt=None,
+        fetch_receipt=None,
+    )
+    attempt = _ns(
+        attempt_id="attempt-history",
+        operation="video_generation",
+        status=_ns(value="failed"),
+        started_at="2026-08-28T01:00:00+00:00",
+        finished_at="2026-08-28T01:01:00+00:00",
+        video_generation_state=state,
+        base_project=base_project,
+        base_registry=base_registry,
+        error_code="secret /private/provider failure",
+        error_message="raw /private/provider failure",
+    )
+    active_shot = _ns(
+        shot_id="shot-history",
+        scene_id="active-scene",
+        intent="Current active intent must not replace history.",
+        visual_strategy=_ns(value="generated_video"),
+        duration_policy=None,
+        revision=3,
+        content_hash="4" * 64,
+    )
+    loaded = _ns(
+        root=project_path.parent,
+        project=_ns(project_id="historical", title="Historical", revision=3, content_hash="4" * 64),
+        manifest=_ns(schema_version="2.14", manifest_revision=8, attempts=(attempt,)),
+        shots=(active_shot,),
+        registry=_ns(assets=()),
+        asset_paths={},
+    )
+    historical_shot = _ns(
+        shot_id="shot-history",
+        storyboard_beat_id="beat-arrival",
+        scene_id="cafe-history",
+        intent="Alice enters the cafe in the sealed storyboard.",
+        dialogue="Alice: We made it.",
+        narration="Rain fades behind the glass.",
+        duration_policy=_ns(
+            model_dump=lambda **_: {"mode": "fixed", "seconds": 5.0}
+        ),
+        character_ids=("alice", "bob"),
+        continuity_constraints=("screen-left-to-right", "warm-key-light"),
+        visual_strategy=_ns(value="generated_video"),
+        motion_directives=(
+            _ns(kind="pan", parameters={"direction": "left", "speed": 2}),
+        ),
+        generated_video_rationale="Character motion requires generated video.",
+        revision=2,
+        content_hash=target_hash,
+    )
+    historical = _ns(
+        root=project_path.parent,
+        project=_ns(project_id="historical", revision=2, content_hash=ONE),
+        registry=_ns(revision_id=registry_hash, content_hash=registry_hash),
+        shots=(historical_shot,),
+    )
+    request = _video_request(
+        target_shot_id="shot-history",
+        target_shot_revision=2,
+        target_shot_content_hash=target_hash,
+        base_project=base_project,
+        base_registry=base_registry,
+    )
+    assert not hasattr(request, "base_project")
+    assert request.activation_scope.request.base_project == base_project
+    reopen_calls = []
+    monkeypatch.setattr(provider_console, "load_production_project", lambda _path: loaded)
+    monkeypatch.setattr(provider_console, "load_video_request_receipt", lambda *_: request)
+    monkeypatch.setattr(
+        provider_console,
+        "load_production_project_candidate",
+        lambda root, manifest, project_pointer, registry_pointer: reopen_calls.append(
+            (root, manifest, project_pointer, registry_pointer)
+        )
+        or historical,
+    )
+    before = {
+        path: (path.stat().st_size, path.stat().st_mtime_ns)
+        for path in runs.rglob("*")
+        if path.is_file()
+    }
+
+    result = provider_console.project_workspace_detail(
+        runs, "historical/project/project.yaml"
+    )
+
+    after = {
+        path: (path.stat().st_size, path.stat().st_mtime_ns)
+        for path in runs.rglob("*")
+        if path.is_file()
+    }
+    projected = result["attempts"][0]
+    assert before == after
+    assert reopen_calls == [
+        (
+            project_path.parent,
+            loaded.manifest,
+            historical_project_path,
+            historical_registry_path,
+        )
+    ]
+    assert projected["target_shot_revision"] == 2
+    assert projected["target_shot_content_hash"] == target_hash
+    assert projected["shot_snapshot_status"] == "verified"
+    assert projected["shot_snapshot"] == {
+        "shot_id": "shot-history",
+        "storyboard_beat_id": "beat-arrival",
+        "scene_id": "cafe-history",
+        "intent": "Alice enters the cafe in the sealed storyboard.",
+        "dialogue": "Alice: We made it.",
+        "narration": "Rain fades behind the glass.",
+        "duration_policy": {"mode": "fixed", "seconds": 5.0},
+        "character_ids": ["alice", "bob"],
+        "continuity_constraints": ["screen-left-to-right", "warm-key-light"],
+        "visual_strategy": "generated_video",
+        "motion_directives": [
+            {"kind": "pan", "parameters": {"direction": "left", "speed": 2}}
+        ],
+        "generated_video_rationale": "Character motion requires generated video.",
+        "revision": 2,
+        "content_hash": target_hash,
+    }
+    assert projected["error_code"] == "unclassified_failure"
+    public = json.dumps({key: value for key, value in result.items() if key != "_media"})
+    assert "secret /private/provider failure" not in public
+    assert "raw /private/provider failure" not in public
+    assert result["shots"][0]["intent"] == "Current active intent must not replace history."
+
+
+def test_production_detail_rejects_active_shot_when_sealed_base_mismatches_attempt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, "active-base-mismatch/project")
+    shot = _ns(
+        shot_id="shot-active",
+        revision=1,
+        content_hash=ZERO,
+        intent="Active Shot must not bypass sealed base validation.",
+    )
+    attempt_project = _ns(path=Path("state/projects/attempt.yaml"))
+    attempt_registry = _ns(path=Path("assets/attempt.json"))
+    attempt = _ns(
+        attempt_id="attempt-active",
+        operation="video_generation",
+        status=_ns(value="failed"),
+        started_at="2026-08-28T01:00:00+00:00",
+        finished_at="2026-08-28T01:01:00+00:00",
+        video_generation_state=_ns(
+            request=object(),
+            phase=_ns(value="validate"),
+            generation_id="generation-active",
+            candidate_video_asset_ids=(),
+            local_fetch_receipt=None,
+            fetch_receipt=None,
+        ),
+        base_project=attempt_project,
+        base_registry=attempt_registry,
+        error_code="video_provider_failed",
+    )
+    loaded = _ns(
+        root=project_path.parent,
+        project=_ns(project_id="active", title="Active", revision=1, content_hash=ZERO),
+        manifest=_ns(schema_version="2.14", manifest_revision=1, attempts=(attempt,)),
+        shots=(shot,),
+        registry=_ns(assets=()),
+        asset_paths={},
+    )
+    request = _video_request(
+        target_shot_id="shot-active",
+        target_shot_revision=1,
+        target_shot_content_hash=ZERO,
+        base_project=_ns(path=Path("state/projects/other.yaml")),
+        base_registry=attempt_registry,
+    )
+    monkeypatch.setattr(provider_console, "load_production_project", lambda _path: loaded)
+    monkeypatch.setattr(provider_console, "load_video_request_receipt", lambda *_: request)
+    monkeypatch.setattr(
+        provider_console,
+        "load_production_project_candidate",
+        lambda *_: pytest.fail("mismatched sealed base must fail before historical reopen"),
+    )
+
+    projected = provider_console.project_workspace_detail(
+        runs, "active-base-mismatch/project/project.yaml"
+    )["attempts"][0]
+
+    assert projected["shot_snapshot_status"] == "unavailable"
+    assert projected["shot_snapshot"] is None
+
+
+@pytest.mark.parametrize(
+    "mismatch",
+    [
+        "project_file",
+        "registry_file",
+        "project_identity",
+        "registry_identity",
+        "shot_identity",
+    ],
+)
+def test_production_detail_marks_inexact_historical_shot_snapshot_unavailable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, mismatch: str
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, f"inexact-{mismatch}/project")
+    target_hash = "2" * 64
+    registry_hash = "3" * 64
+    historical_project_path = Path(f"state/projects/project.2.{ONE}.yaml")
+    historical_registry_path = Path(f"assets/registry.{registry_hash}.json")
+    project_bytes = b"historical-project-snapshot"
+    registry_bytes = b"historical-registry-snapshot"
+    _write(project_path.parent / historical_project_path, project_bytes)
+    _write(project_path.parent / historical_registry_path, registry_bytes)
+    base_project = _ns(
+        path=historical_project_path,
+        revision=2,
+        content_hash=ONE,
+        file_sha256=(
+            ZERO
+            if mismatch == "project_file"
+            else hashlib.sha256(project_bytes).hexdigest()
+        ),
+    )
+    base_registry = _ns(
+        path=historical_registry_path,
+        revision_id=registry_hash,
+        content_hash=registry_hash,
+        file_sha256=(
+            ZERO
+            if mismatch == "registry_file"
+            else hashlib.sha256(registry_bytes).hexdigest()
+        ),
+    )
+    state = _ns(
+        request=object(),
+        phase=_ns(value="validate"),
+        generation_id="generation-inexact",
+        candidate_video_asset_ids=(),
+        local_fetch_receipt=None,
+        fetch_receipt=None,
+    )
+    attempt = _ns(
+        attempt_id="attempt-inexact",
+        operation="video_generation",
+        status=_ns(value="failed"),
+        started_at="2026-08-28T01:00:00+00:00",
+        finished_at="2026-08-28T01:01:00+00:00",
+        video_generation_state=state,
+        base_project=base_project,
+        base_registry=base_registry,
+        error_code="video_provider_failed",
+        error_message="must stay private",
+    )
+    loaded = _ns(
+        root=project_path.parent,
+        project=_ns(project_id="inexact", title="Inexact", revision=3, content_hash="4" * 64),
+        manifest=_ns(schema_version="2.14", manifest_revision=8, attempts=(attempt,)),
+        shots=(
+            _ns(
+                shot_id="shot-inexact",
+                revision=3,
+                content_hash="4" * 64,
+            ),
+        ),
+        registry=_ns(assets=()),
+        asset_paths={},
+    )
+    historical = _ns(
+        root=project_path.parent,
+        project=_ns(
+            project_id="inexact",
+            revision=9 if mismatch == "project_identity" else 2,
+            content_hash=ONE,
+        ),
+        registry=_ns(
+            revision_id=("9" * 64 if mismatch == "registry_identity" else registry_hash),
+            content_hash=registry_hash,
+        ),
+        shots=(
+            _ns(
+                shot_id="shot-inexact",
+                revision=9 if mismatch == "shot_identity" else 2,
+                content_hash=target_hash,
+            ),
+        ),
+    )
+    request = _video_request(
+        target_shot_id="shot-inexact",
+        target_shot_revision=2,
+        target_shot_content_hash=target_hash,
+        base_project=base_project,
+        base_registry=base_registry,
+    )
+    monkeypatch.setattr(provider_console, "load_production_project", lambda _path: loaded)
+    monkeypatch.setattr(provider_console, "load_video_request_receipt", lambda *_: request)
+    monkeypatch.setattr(
+        provider_console,
+        "load_production_project_candidate",
+        lambda *_: historical,
+    )
+
+    result = provider_console.project_workspace_detail(
+        runs, f"inexact-{mismatch}/project/project.yaml"
+    )
+
+    projected = result["attempts"][0]
+    assert projected["shot_snapshot_status"] == "unavailable"
+    assert projected["shot_snapshot"] is None
+    assert "must stay private" not in json.dumps(result)
+
+
+@pytest.mark.parametrize(
+    ("fetch_kind", "attempt_status"),
+    [("local", "failed"), ("remote", "running")],
+)
+def test_production_detail_projects_strict_fetched_media_without_candidate(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    fetch_kind: str,
+    attempt_status: str,
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, f"fetched-{fetch_kind}/project")
+    payload = f"exact-{fetch_kind}-fetched-video".encode()
+    artifact_sha256 = hashlib.sha256(payload).hexdigest()
+    artifact_path = Path(
+        f"state/video-generation/fetch/files/{artifact_sha256}.mp4"
+    )
+    _write(project_path.parent / artifact_path, payload)
+    fetch_pointer = _ns(
+        path=Path(f"state/video-generation/{fetch_kind}/fetch-receipt.json"),
+        artifact_path=artifact_path,
+        artifact_sha256=artifact_sha256,
+        artifact_size_bytes=len(payload),
+    )
+    state = _ns(
+        request=object(),
+        phase=_ns(value="validate"),
+        generation_id=f"generation-{fetch_kind}",
+        candidate_video_asset_ids=(),
+        local_fetch_receipt=fetch_pointer if fetch_kind == "local" else None,
+        fetch_receipt=fetch_pointer if fetch_kind == "remote" else None,
+    )
+    attempt = _ns(
+        attempt_id=f"attempt-{fetch_kind}",
+        operation="video_generation",
+        status=_ns(value=attempt_status),
+        started_at="2026-08-28T01:00:00+00:00",
+        finished_at=(
+            "2026-08-28T01:01:00+00:00" if attempt_status == "failed" else None
+        ),
+        video_generation_state=state,
+        error_code=("video_provider_failed" if attempt_status == "failed" else None),
+        error_message="raw fetched failure",
+    )
+    shot = _ns(
+        shot_id="shot-fetched",
+        scene_id="scene-fetched",
+        intent="Inspect the fetched output.",
+        visual_strategy=_ns(value="generated_video"),
+        duration_policy=None,
+        revision=1,
+        content_hash=ZERO,
+    )
+    loaded = _ns(
+        root=project_path.parent,
+        project=_ns(project_id="fetched", title="Fetched", revision=1, content_hash=ZERO),
+        manifest=_ns(schema_version="2.14", manifest_revision=5, attempts=(attempt,)),
+        shots=(shot,),
+        registry=_ns(assets=()),
+        asset_paths={},
+    )
+    request = _video_request(
+        target_shot_id="shot-fetched",
+        target_shot_revision=1,
+        target_shot_content_hash=ZERO,
+    )
+    loader_calls = []
+
+    def reopen_receipt(root, pointer):
+        loader_calls.append((fetch_kind, root, pointer))
+        return _ns(
+            artifact_sha256=artifact_sha256,
+            size_bytes=len(payload),
+            content_type="video/mp4",
+        )
+
+    def wrong_loader(*_args):
+        raise AssertionError("wrong fetch receipt loader")
+
+    monkeypatch.setattr(provider_console, "load_production_project", lambda _path: loaded)
+    monkeypatch.setattr(provider_console, "load_video_request_receipt", lambda *_: request)
+    monkeypatch.setattr(
+        provider_console,
+        "load_local_video_fetch_receipt",
+        reopen_receipt if fetch_kind == "local" else wrong_loader,
+    )
+    monkeypatch.setattr(
+        provider_console,
+        "load_video_fetch_receipt",
+        reopen_receipt if fetch_kind == "remote" else wrong_loader,
+    )
+    before = {
+        path: (path.stat().st_size, path.stat().st_mtime_ns)
+        for path in runs.rglob("*")
+        if path.is_file()
+    }
+
+    result = provider_console.project_workspace_detail(
+        runs, f"fetched-{fetch_kind}/project/project.yaml"
+    )
+
+    after = {
+        path: (path.stat().st_size, path.stat().st_mtime_ns)
+        for path in runs.rglob("*")
+        if path.is_file()
+    }
+    projected = result["attempts"][0]
+    media = projected["fetched_media"]
+    assert before == after
+    assert loader_calls == [(fetch_kind, project_path.parent, fetch_pointer)]
+    assert projected["candidate_media"] is None
+    assert media == {
+        "token": media["token"],
+        "mime_type": "video/mp4",
+        "bytes": len(payload),
+        "sha256": artifact_sha256,
+        "source_kind": "fetched_evidence",
+    }
+    assert result["_media"][media["token"]] == {
+        "source_path": str(project_path.parent / artifact_path),
+        "mime_type": "video/mp4",
+        "bytes": len(payload),
+        "sha256": artifact_sha256,
+    }
+    public = json.dumps({key: value for key, value in result.items() if key != "_media"})
+    assert str(tmp_path) not in public
+    assert "raw fetched failure" not in public
+
+
 @pytest.mark.parametrize(
     ("mode", "roles", "media_roles", "expected_generation_type"),
     [
@@ -461,6 +985,7 @@ def test_production_detail_projects_mode_specific_prompt_and_image_inputs(
         *("image/png" for _role in roles),
         *("video/mp4" for _kind, _role in media_roles),
     ]
+    assert projected["fetched_media"] is None
 
 
 def test_production_detail_keeps_valid_workspace_readable_without_video_attempts(

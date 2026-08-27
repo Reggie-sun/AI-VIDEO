@@ -16,22 +16,32 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
 
+from ai_video.errors import ErrorCode
 from ai_video.manifest import load_manifest
-from ai_video.production._video_project_reader import load_video_request_receipt
-from ai_video.production.models import ToolIdentity
-from ai_video.production.project import load_production_project
-from ai_video.provider_console_continuity import (
-    project_continuity_review as _project_continuity_review,
+from ai_video.production._video_project_reader import (
+    load_local_video_fetch_receipt, load_video_fetch_receipt, load_video_request_receipt,
 )
+from ai_video.production.models import ToolIdentity
+from ai_video.production.project import load_production_project, load_production_project_candidate
+from ai_video.provider_console_continuity import measure_contained_file, project_continuity_review as _project_continuity_review
 
 
 _BOUNDARY = {"read_only": True, "local_only": True, "network": False}
 _MEDIA_MIME_PREFIXES = ("image/", "video/")
 _MAX_WORKSPACE_MEDIA = 32
+_PUBLIC_ERROR_CODES = frozenset(code.value for code in ErrorCode)
+_UNCLASSIFIED_ERROR_CODE = "unclassified_failure"
 
 
 def _enum_value(value: object) -> object:
     return getattr(value, "value", value)
+
+
+def _safe_error_code(value: object) -> str | None:
+    if value is None:
+        return None
+    code = _enum_value(value)
+    return code if isinstance(code, str) and code in _PUBLIC_ERROR_CODES else _UNCLASSIFIED_ERROR_CODE
 
 
 def _iso_mtime(path: Path) -> str:
@@ -270,7 +280,12 @@ def _media_projection(
         "frame_count": getattr(video, "frame_count", None),
         "remote_egress": bool(getattr(getattr(asset, "egress", None), "remote", False)),
     }
-    media_map[token] = {"source_path": str(source), "mime_type": mime_type, "bytes": size}
+    media_map[token] = {
+        "source_path": str(source),
+        "mime_type": mime_type,
+        "bytes": size,
+        "sha256": getattr(asset, "sha256", None),
+    }
     return {key: value for key, value in public.items() if value is not None}
 
 
@@ -281,14 +296,124 @@ def _shot_projection(shot: object) -> dict[str, object]:
         key: value
         for key, value in {
             "shot_id": getattr(shot, "shot_id", None),
+            "storyboard_beat_id": getattr(shot, "storyboard_beat_id", None),
             "scene_id": getattr(shot, "scene_id", None),
             "intent": getattr(shot, "intent", None),
+            "dialogue": getattr(shot, "dialogue", None),
+            "narration": getattr(shot, "narration", None),
+            "character_ids": list(getattr(shot, "character_ids", ())),
+            "continuity_constraints": list(getattr(shot, "continuity_constraints", ())),
             "visual_strategy": _enum_value(getattr(shot, "visual_strategy", None)),
             "duration_policy": duration_data,
+            "motion_directives": [
+                {"kind": _enum_value(getattr(item, "kind", None)),
+                 "parameters": dict(getattr(item, "parameters", {}) or {})}
+                for item in getattr(shot, "motion_directives", ())
+            ],
+            "generated_video_rationale": getattr(shot, "generated_video_rationale", None),
             "revision": getattr(shot, "revision", None),
             "content_hash": getattr(shot, "content_hash", None),
         }.items()
         if value is not None
+    }
+
+
+def _attempt_shot_snapshot(
+    *,
+    loaded: object, attempt: object, sealed_request: object,
+    target_shot_id: str | None,
+    target_shot_revision: int | None,
+    target_shot_content_hash: str | None,
+) -> tuple[str, dict[str, object] | None]:
+    if not (target_shot_id and target_shot_revision and target_shot_content_hash):
+        return "unavailable", None
+    project_pointer = getattr(sealed_request, "base_project", None)
+    registry_pointer = getattr(sealed_request, "base_registry", None)
+    if (
+        project_pointer is None
+        or registry_pointer is None
+        or project_pointer != getattr(attempt, "base_project", None)
+        or registry_pointer != getattr(attempt, "base_registry", None)
+    ):
+        return "unavailable", None
+    active = next((shot for shot in loaded.shots if shot.shot_id == target_shot_id), None)
+    if active is not None and (
+        getattr(active, "revision", None) == target_shot_revision
+        and getattr(active, "content_hash", None) == target_shot_content_hash
+    ):
+        return "verified", _shot_projection(active)
+    try:
+        historical = load_production_project_candidate(
+            loaded.root, loaded.manifest, project_pointer.path, registry_pointer.path
+        )
+        project_sha256, _ = measure_contained_file(loaded.root / project_pointer.path, root=loaded.root)
+        registry_sha256, _ = measure_contained_file(loaded.root / registry_pointer.path, root=loaded.root)
+    except Exception:
+        return "unavailable", None
+    if (
+        Path(historical.root) != Path(loaded.root)
+        or project_sha256 != project_pointer.file_sha256
+        or registry_sha256 != registry_pointer.file_sha256
+        or historical.project.revision != project_pointer.revision
+        or historical.project.content_hash != project_pointer.content_hash
+        or historical.registry.revision_id != registry_pointer.revision_id
+        or historical.registry.content_hash != registry_pointer.content_hash
+    ):
+        return "unavailable", None
+    shot = next((item for item in historical.shots if (
+        item.shot_id == target_shot_id
+        and item.revision == target_shot_revision
+        and item.content_hash == target_shot_content_hash
+    )), None)
+    if shot is None:
+        return "unavailable", None
+    return "verified", _shot_projection(shot)
+
+
+def _fetched_media_projection(
+    *,
+    workspace: str, attempt_id: str, state: object, root: Path,
+    media_map: dict[str, dict[str, object]],
+) -> dict[str, object] | None:
+    local_pointer = getattr(state, "local_fetch_receipt", None)
+    remote_pointer = getattr(state, "fetch_receipt", None)
+    if (local_pointer is None) == (remote_pointer is None):
+        return None
+    pointer = local_pointer or remote_pointer
+    try:
+        loader = load_local_video_fetch_receipt if local_pointer is not None else load_video_fetch_receipt
+        if pointer.artifact_path != Path(
+            f"state/video-generation/fetch/files/{pointer.artifact_sha256}.mp4"
+        ):
+            return None
+        receipt = loader(root, pointer)
+        artifact_path = root / pointer.artifact_path
+        artifact_sha256, artifact_size = measure_contained_file(artifact_path, root=root)
+    except Exception:
+        return None
+    mime_type = getattr(receipt, "content_type", None)
+    if (
+        mime_type not in {"video/mp4", "video/quicktime"}
+        or getattr(receipt, "artifact_sha256", None) != pointer.artifact_sha256
+        or getattr(receipt, "size_bytes", None) != pointer.artifact_size_bytes
+        or artifact_sha256 != pointer.artifact_sha256
+        or artifact_size != pointer.artifact_size_bytes
+    ):
+        return None
+    identity = f"fetched-evidence\0{workspace}\0{attempt_id}\0{artifact_sha256}"
+    token = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:40]
+    media_map[token] = {
+        "source_path": str(artifact_path),
+        "mime_type": mime_type,
+        "bytes": artifact_size,
+        "sha256": artifact_sha256,
+    }
+    return {
+        "token": token,
+        "mime_type": mime_type,
+        "bytes": artifact_size,
+        "sha256": artifact_sha256,
+        "source_kind": "fetched_evidence",
     }
 
 
@@ -425,8 +550,19 @@ def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, obj
             }
         scope = getattr(request, "activation_scope", None)
         original = getattr(scope, "request", None)
-        target_shot_id = getattr(original, "target_shot_id", None)
-        target_asset_role = getattr(original, "target_asset_role", None)
+        target = request if getattr(request, "target_shot_id", None) else original
+        target_shot_id = getattr(target, "target_shot_id", None)
+        target_shot_revision = getattr(target, "target_shot_revision", None)
+        target_shot_content_hash = getattr(target, "target_shot_content_hash", None)
+        target_asset_role = getattr(target, "target_asset_role", None)
+        shot_snapshot_status, shot_snapshot = _attempt_shot_snapshot(
+            loaded=loaded,
+            attempt=attempt,
+            sealed_request=original,
+            target_shot_id=target_shot_id,
+            target_shot_revision=target_shot_revision,
+            target_shot_content_hash=target_shot_content_hash,
+        )
         bindings = tuple(getattr(request, "image_bindings", ()))
         first_binding = next((item for item in bindings if _enum_value(getattr(item, "role", None)) == "first_frame"), None)
         first_asset = _asset_by_id(assets, getattr(first_binding, "asset_id", None))
@@ -439,7 +575,16 @@ def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, obj
             media_map=media_map,
         )
         candidate_ids = tuple(getattr(state, "candidate_video_asset_ids", ()))
-        candidate_asset = _asset_by_id(assets, candidate_ids[-1] if candidate_ids else getattr(request, "output_asset_id", None))
+        candidate_asset = _asset_by_id(
+            assets, candidate_ids[-1] if candidate_ids else None
+        )
+        fetched_media = _fetched_media_projection(
+            workspace=workspace,
+            attempt_id=attempt.attempt_id,
+            state=state,
+            root=loaded.root,
+            media_map=media_map,
+        )
         output = request.effective_output.model_dump(mode="json", exclude_none=True)
         video_metadata = getattr(candidate_asset, "video_metadata", None)
         if video_metadata is not None:
@@ -456,8 +601,13 @@ def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, obj
                 "phase": _enum_value(state.phase),
                 "started_at": attempt.started_at,
                 "finished_at": attempt.finished_at,
+                "error_code": _safe_error_code(getattr(attempt, "error_code", None)),
                 "target_shot_id": target_shot_id,
+                "target_shot_revision": target_shot_revision,
+                "target_shot_content_hash": target_shot_content_hash,
                 "target_asset_role": target_asset_role,
+                "shot_snapshot_status": shot_snapshot_status,
+                "shot_snapshot": shot_snapshot,
                 "generation_id": state.generation_id,
                 "mode": _enum_value(request.mode),
                 "generation_type": _generation_type(request.mode, bindings),
@@ -486,6 +636,7 @@ def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, obj
                     workspace=workspace, asset=candidate_asset, asset_paths=loaded.asset_paths,
                     root=loaded.root, media_map=media_map,
                 ),
+                "fetched_media": fetched_media,
                 "continuity_role": (
                     type(request.continuity_binding).__name__
                     if getattr(request, "continuity_binding", None) is not None

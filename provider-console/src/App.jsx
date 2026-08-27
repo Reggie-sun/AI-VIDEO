@@ -20,6 +20,12 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { ContinuityReviewPanel, projectionMatchesTarget } from "./continuity-review.js";
+import {
+  attemptOutcome,
+  generationTypeOf,
+  outputState,
+  shotForAttempt,
+} from "./run-detail-contract.js";
 
 const NAV_ITEMS = [
   ["projects", "项目", FolderSimple],
@@ -66,18 +72,6 @@ function outputOf(attempt) {
   return attempt?.effective_output || attempt?.output || {};
 }
 
-function generationTypeOf(attempt) {
-  if (attempt?.generation_type) return attempt.generation_type;
-  const mode = attempt?.mode || providerOf(attempt).mode;
-  if (mode === "text_to_video") return "T2V";
-  if (mode === "reference_to_video") return "R2V";
-  if (mode === "image_to_video") {
-    const roles = new Set((attempt?.input_bindings || []).map((item) => item.role));
-    return roles.has("first_frame") && roles.has("last_frame") ? "FL2V" : "I2V";
-  }
-  return text(mode, "未标注").toUpperCase();
-}
-
 const INPUT_ROLE_LABELS = {
   first_frame: "首帧",
   last_frame: "尾帧",
@@ -92,22 +86,8 @@ function inputRoleLabel(binding) {
   return INPUT_ROLE_LABELS[binding?.role] || text(binding?.role, "输入素材");
 }
 
-function shotFor(detail, attempt) {
-  const shots = detail?.shots || [];
-  const target = attempt?.target_shot_id || attempt?.shot_id;
-  if (target) return shots.find((shot) => (shot.shot_id || shot.id) === target) || { shot_id: target };
-  return {};
-}
-
 function projectOf(detail) {
   return detail?.project || {};
-}
-
-function toneFor(attempt) {
-  const value = `${attempt?.status || ""} ${attempt?.phase || ""}`.toLowerCase();
-  if (/fail|error|reject|unknown/.test(value)) return "blocked";
-  if (/active|complete|succeed|ready|deliver/.test(value)) return "ready";
-  return "gated";
 }
 
 function StatusIcon({ tone, size = 18 }) {
@@ -159,11 +139,14 @@ function AttemptRail({ catalog, workspace, attempts, selectedId, loading, error,
           const id = attemptId(attempt, index);
           const provider = providerOf(attempt);
           const selected = id === selectedId;
-          const tone = toneFor(attempt);
+          const outcome = attemptOutcome(attempt);
+          const mediaState = outputState(attempt);
           return (
-            <button key={id} type="button" aria-pressed={selected} className={`lane-option${selected ? " is-selected" : ""}`} onClick={() => onSelect(id)}>
-              <span className="lane-option-top"><strong>{provider.name || attempt.provider_name || provider.kind || attempt.provider_kind || "未标注 Provider"}</strong><span className={`provider-badge provider-badge--${tone}`}>{provider.execution_kind || attempt.execution_kind || "记录"}</span><span className={`lane-radio${selected ? " is-checked" : ""}`} /></span>
-              <span className="lane-option-sub">{generationTypeOf(attempt)} · {attempt.phase || attempt.status || "状态未标注"} · {id.slice(0, 12)}</span>
+            <button key={id} type="button" aria-pressed={selected} className={`lane-option lane-option--${outcome.tone}${selected ? " is-selected" : ""}`} onClick={() => onSelect(id)}>
+              <span className="lane-option-top"><strong>{provider.name || attempt.provider_name || provider.kind || attempt.provider_kind || "未标注 Provider"}</strong><span className={`provider-badge provider-badge--${outcome.tone}`}>{outcome.label}</span><span className={`lane-radio${selected ? " is-checked" : ""}`} /></span>
+              <span className="lane-option-sub">{attempt.target_shot_id || "Shot 未标注"} · {generationTypeOf(attempt)} · phase {attempt.phase || "—"}</span>
+              <span className={`lane-option-media lane-option-media--${mediaState.tone}`}>{mediaState.label}</span>
+              <span className="lane-option-prompt" title={attempt.prompt_text}>{attempt.prompt_text || "该 request 没有可显示的 prompt"}</span>
             </button>
           );
         })}
@@ -179,7 +162,8 @@ function AttemptRail({ catalog, workspace, attempts, selectedId, loading, error,
 
 function ShotSummary({ detail, attempt }) {
   const project = projectOf(detail);
-  const shot = shotFor(detail, attempt);
+  const shot = shotForAttempt(detail, attempt);
+  const outcome = attempt ? attemptOutcome(attempt) : null;
   const imageInputs = (attempt?.input_bindings || []).filter((item) => {
     const mimeType = item?.media?.mime_type || item?.mime_type || "";
     return mimeType.startsWith("image/");
@@ -195,7 +179,7 @@ function ShotSummary({ detail, attempt }) {
       </div>
       <div className="summary-field"><span>镜头</span><strong>{shot.shot_id || shot.id || attempt?.target_shot_id || "—"}</strong></div>
       <div className="summary-field summary-field--wide"><span>生成类型</span><strong>{attempt ? generationTypeOf(attempt) : (detail?.kind === "legacy" ? "Legacy" : "Production")}</strong></div>
-      <div className="summary-field"><span>状态</span><strong>{attempt?.status || attempt?.phase || detail?.status || "—"}</strong></div>
+      <div className={`summary-field summary-field--${outcome?.tone || "gated"}`}><span>结果</span><strong>{outcome ? `${outcome.label} · ${attempt?.status || "—"}` : (detail?.status || "—")}</strong></div>
       <div className="summary-field summary-field--updated"><span>更新时间</span><strong>{formatTime(attempt?.finished_at || attempt?.started_at || detail?.updated_at)}</strong></div>
     </header>
   );
@@ -203,6 +187,55 @@ function ShotSummary({ detail, attempt }) {
 
 function Fact({ label, value }) {
   return <div><dt>{label}</dt><dd>{text(value)}</dd></div>;
+}
+
+function formatDirective(directive) {
+  const parameters = directive?.parameters || {};
+  const values = Object.entries(parameters).map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : text(value)}`);
+  return values.length ? values.join(" · ") : "未记录参数";
+}
+
+function StoryboardList({ label, values }) {
+  if (!values?.length) return null;
+  return <div className="storyboard-list"><span>{label}</span><div>{values.map((value, index) => <code key={`${label}-${index}`}>{text(value)}</code>)}</div></div>;
+}
+
+function ShotStoryboard({ shot, attempt }) {
+  const outcome = attemptOutcome(attempt);
+  const snapshotAvailable = shot?.snapshot_available !== false;
+  const duration = shot?.duration_seconds || shot?.duration_policy?.seconds;
+  const directives = shot?.motion_directives || [];
+  return (
+    <section className={`storyboard-card storyboard-card--${outcome.tone}`} aria-label="生成当时的 Shot 分镜脚本">
+      <header className="storyboard-heading">
+        <div><span>Shot Storyboard</span><h3>{shot?.shot_id || attempt?.target_shot_id || "未命名 Shot"}</h3></div>
+        <div className="storyboard-badges"><span>{generationTypeOf(attempt)}</span><span>{shot?.visual_strategy || "策略未记录"}</span><span className={`storyboard-outcome storyboard-outcome--${outcome.tone}`}>{outcome.label}</span></div>
+      </header>
+      {!snapshotAvailable ? (
+        <div className="storyboard-unavailable"><WarningCircle size={20} weight="fill" /><div><strong>历史 Shot snapshot 无法严格重开</strong><p>仅保留 sealed binding：revision {text(shot?.revision)} · content {text(shot?.content_hash).slice(0, 16)}。下方 Prompt 仍来自 exact request receipt；本页不会用当前 active Shot 冒充生成当时的分镜。</p></div></div>
+      ) : (
+        <>
+          <dl className="storyboard-facts">
+            <Fact label="Scene" value={shot?.scene_id} />
+            <Fact label="Storyboard beat" value={shot?.storyboard_beat_id} />
+            <Fact label="分镜策略" value={shot?.visual_strategy} />
+            <Fact label="时长" value={duration ? `${duration}s` : undefined} />
+            <Fact label="Shot revision" value={shot?.revision} />
+          </dl>
+          <div className="storyboard-copy"><span>画面意图</span><p>{shot?.intent || "未记录画面意图"}</p></div>
+          {(shot?.dialogue || shot?.narration) && <div className="storyboard-script-grid">
+            <div><span>对白</span><p>{shot?.dialogue || "无"}</p></div>
+            <div><span>旁白</span><p>{shot?.narration || "无"}</p></div>
+          </div>}
+          <StoryboardList label="Characters" values={shot?.character_ids} />
+          <StoryboardList label="Continuity" values={shot?.continuity_constraints} />
+          {directives.length > 0 && <div className="storyboard-directives"><span>Motion directives</span><div>{directives.map((directive, index) => <article key={`${directive.kind || "motion"}-${index}`}><strong>{directive.kind || "motion"}</strong><p>{formatDirective(directive)}</p></article>)}</div></div>}
+          {shot?.generated_video_rationale && <div className="storyboard-rationale"><span>生成视频理由</span><p>{shot.generated_video_rationale}</p></div>}
+          <p className="storyboard-schema-note">“分镜策略”与“生成类型”来自结构化 contract；当前 schema 没有独立景别字段，因此不会从 Prompt 猜测近景、广角或跟拍类型。</p>
+        </>
+      )}
+    </section>
+  );
 }
 
 function BindingMediaCard({ binding }) {
@@ -225,17 +258,19 @@ function BindingMediaCard({ binding }) {
   );
 }
 
-function OutputMediaCard({ media }) {
+function OutputMediaCard({ media, state }) {
   const url = mediaUrl(media);
-  if (!url) return <div className="media-empty"><ImageSquare size={24} /><p>该 attempt 尚无可预览的已注册输出。</p></div>;
+  if (!url) return <div className={`media-empty media-empty--${state.tone}`}><ImageSquare size={24} /><p>{state.label}</p></div>;
+  const fetchedOnly = media?.source_kind === "fetched_evidence";
   return (
     <div className="asset-card asset-card--real">
-      <video src={url} controls preload="metadata" aria-label="已注册生成视频" />
+      <video src={url} controls preload="metadata" aria-label={fetchedOnly ? "严格验证的 fetched 生成视频" : "已注册 candidate 生成视频"} />
       <div className="asset-details">
-        <p>输出：<code>{media.asset_id || "已注册视频"}</code></p>
+        <p>视频：<code>{media.asset_id || (fetchedOnly ? "fetched evidence" : "已注册 candidate")}</code></p>
         <p>{media.mime_type || "MIME 未标注"} · {media.bytes ? `${media.bytes.toLocaleString("zh-CN")} bytes` : "大小未标注"}</p>
         <p>{[media.width, media.height].every(Boolean) ? `${media.width} × ${media.height}` : "尺寸未标注"}</p>
-        <p className="asset-ok"><CheckCircle size={15} weight="fill" />Registry bytes 已 strict reopen</p>
+        <p className={`asset-ok asset-ok--${state.tone}`}><StatusIcon tone={state.tone} size={15} />{state.label}</p>
+        {fetchedOnly && <p className="asset-boundary">Exact fetch bytes；不表示 candidate、QA acceptance 或 activation。</p>}
       </div>
     </div>
   );
@@ -257,8 +292,9 @@ function ModeInputPanel({ attempt }) {
 }
 
 function MediaCard({ attempt }) {
-  const output = attempt?.candidate_media || attempt?.output_media || attempt?.video_media;
-  return <div className="attempt-media"><ModeInputPanel attempt={attempt} /><div className="output-media"><span>生成输出</span><OutputMediaCard media={output} /></div></div>;
+  const media = attempt?.candidate_media || attempt?.fetched_media || attempt?.output_media || attempt?.video_media;
+  const state = outputState(attempt);
+  return <div className="attempt-media"><ModeInputPanel attempt={attempt} /><div className="output-media"><span>生成视频</span><OutputMediaCard media={media} state={state} /></div></div>;
 }
 
 function WorkspaceMediaThumb({ item }) {
@@ -336,38 +372,41 @@ function WorkspaceOverview({ detail }) {
 function DetailPane({ detail, attempt, onEvidence, continuityContent }) {
   const provider = providerOf(attempt);
   const output = outputOf(attempt);
-  const shot = shotFor(detail, attempt);
-  const tone = toneFor(attempt);
+  const shot = shotForAttempt(detail, attempt);
+  const outcome = attemptOutcome(attempt);
+  const mediaState = outputState(attempt);
+  const media = attempt?.candidate_media || attempt?.fetched_media || attempt?.output_media || attempt?.video_media;
+  const tone = outcome.tone;
   const title = provider.name || attempt?.provider_name || provider.kind || attempt?.provider_kind || "Provider attempt";
   const evidence = attempt?.evidence || attempt?.request_evidence || {};
-  const duration = shot.duration_seconds || shot.duration_policy?.seconds;
   return (
     <>
       <section className="details-grid">
         <div className="readiness-pane">
           <header className="lane-heading">
-            <div><h1>{title}</h1><span className={`provider-badge provider-badge--${tone}`}>{provider.execution_kind || attempt?.execution_kind || "只读"}</span></div>
+            <div><h1>{title}</h1><span className={`provider-badge provider-badge--${tone}`}>{outcome.label}</span></div>
             <p>{attemptId(attempt, 0)} · 来自 canonical Production/Legacy reader</p>
             <span className="manual-note">真实 runs 记录 · 不自动回退 <Info size={17} /></span>
           </header>
           <div className="readiness-copy"><h2>记录链</h2><p>以下字段来自严格 reopen 后的白名单投影，不代表新的执行授权。</p></div>
           <ol className="sequence-list">
             <li className="sequence-step"><div className="sequence-marker sequence-marker--ready"><StatusIcon tone="ready" size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>1. 工作区已严格打开</h4><span className="ready-tag">只读</span></div><p className="step-description">{detail.workspace} · Manifest revision {text(detail.manifest_revision || detail.manifest?.revision)}</p></div></li>
-            <li className="sequence-step"><div className="sequence-marker sequence-marker--ready"><StatusIcon tone="ready" size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>2. 镜头与请求已绑定</h4><span className="ready-tag">已验证</span></div><p className="step-description">Target Shot：{shot.shot_id || shot.id || attempt?.target_shot_id || "—"}</p><div className="bullet-facts"><span><i />{shot.intent || "未标注意图"}</span><span><i />{duration ? `${duration}s` : "时长未标注"}</span><span><i />{generationTypeOf(attempt)}</span></div></div></li>
-            <li className="sequence-step sequence-step--media"><div className="sequence-marker sequence-marker--ready"><StatusIcon tone="ready" size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>3. 生成输入与输出</h4><span className="ready-tag">本机</span></div><MediaCard attempt={attempt} /></div></li>
-            <li className="sequence-step"><div className={`sequence-marker sequence-marker--${tone}`}><StatusIcon tone={tone} size={24} /></div><div className="sequence-content"><div className="sequence-title-row"><h4>4. Attempt 状态</h4><span className={`ready-tag ready-tag--${tone}`}>{attempt?.status || attempt?.phase || "已记录"}</span></div><p className="step-description">只展示已存在状态；控制台不会推进 lifecycle。</p><div className="intent-box is-ready"><Info size={20} /><div><strong>只读观察边界</strong><p>不写 Manifest、不创建 intent、不调用 Provider、不访问云端。</p></div></div></div></li>
+            <li className="sequence-step sequence-step--storyboard"><div className={`sequence-marker sequence-marker--${shot.snapshot_available === false ? "gated" : "ready"}`}><StatusIcon tone={shot.snapshot_available === false ? "gated" : "ready"} size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>2. 生成当时的 Shot 分镜</h4><span className={`ready-tag ready-tag--${shot.snapshot_available === false ? "gated" : "ready"}`}>{shot.snapshot_available === false ? "历史快照不可用" : "Exact snapshot"}</span></div><p className="step-description">Target Shot：{shot.shot_id || shot.id || attempt?.target_shot_id || "—"}</p><ShotStoryboard shot={shot} attempt={attempt} /></div></li>
+            <li className="sequence-step sequence-step--media"><div className={`sequence-marker sequence-marker--${mediaState.tone}`}><StatusIcon tone={mediaState.tone} size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>3. 实际提交 Prompt 与视频</h4><span className={`ready-tag ready-tag--${mediaState.tone}`}>{mediaState.label}</span></div><MediaCard attempt={attempt} /></div></li>
+            <li className="sequence-step"><div className={`sequence-marker sequence-marker--${tone}`}><StatusIcon tone={tone} size={24} /></div><div className="sequence-content"><div className="sequence-title-row"><h4>4. Attempt lifecycle</h4><span className={`ready-tag ready-tag--${tone}`}>{outcome.label}</span></div><p className="step-description">Raw status：{attempt?.status || "—"} · phase：{attempt?.phase || "—"}{attempt?.error_code ? ` · error code：${attempt.error_code}` : ""}</p><div className={`intent-box intent-box--${tone}`}><Info size={20} /><div><strong>状态不等于质量验收</strong><p>“成功”只表示该 lifecycle 已成功结束；fetched video、candidate、QA acceptance 与 activation 会分别标注。控制台不会推进任何状态。</p></div></div></div></li>
           </ol>
           {continuityContent}
         </div>
         <aside className="detail-aside">
+          <section className="detail-section"><h3>Attempt lifecycle</h3><dl className="identity-list"><Fact label="结果" value={`${outcome.label} · ${attempt?.status || "—"}`} /><Fact label="Phase" value={attempt?.phase} /><Fact label="Error code" value={attempt?.error_code} /><Fact label="Started" value={formatTime(attempt?.started_at)} /><Fact label="Finished" value={formatTime(attempt?.finished_at)} /><Fact label="视频状态" value={mediaState.label} /></dl></section>
           <section className="detail-section"><h3>Provider 身份</h3><dl className="identity-list"><Fact label="生成类型" value={generationTypeOf(attempt)} /><Fact label="原始 mode" value={attempt?.mode || provider.mode} /><Fact label="名称" value={provider.name || attempt?.provider_name} /><Fact label="Kind" value={provider.kind || attempt?.provider_kind} /><Fact label="Model" value={provider.model || attempt?.model} /><Fact label="Profile" value={provider.profile || attempt?.profile} /><Fact label="Capability" value={provider.capability || attempt?.capability} /></dl></section>
-          <section className="detail-section"><h3>有效输出</h3><dl className="identity-list"><Fact label="分辨率" value={output.width && output.height ? `${output.width} × ${output.height}` : output.resolution} /><Fact label="帧数" value={output.frame_count || output.frames} /><Fact label="帧率" value={output.fps ? `${output.fps} fps` : undefined} /><Fact label="时长" value={output.duration_seconds ? `${output.duration_seconds}s` : undefined} /><Fact label="音频" value={output.native_audio === true ? "原生音频" : output.native_audio === false ? "无原生音频" : output.audio} /></dl></section>
+          <section className="detail-section"><h3>请求输出规格</h3><dl className="identity-list"><Fact label="分辨率" value={output.width && output.height ? `${output.width} × ${output.height}` : output.resolution} /><Fact label="帧数" value={output.frame_count || output.frames} /><Fact label="帧率" value={output.fps ? `${output.fps} fps` : undefined} /><Fact label="时长" value={output.duration_seconds ? `${output.duration_seconds}s` : undefined} /><Fact label="音频" value={output.native_audio === true ? "原生音频" : output.native_audio === false ? "无原生音频" : output.audio} /></dl></section>
           <section className="detail-section"><h3>Evidence</h3><dl className="identity-list"><Fact label="Request" value={evidence.path || evidence.request_pointer || attempt?.request_pointer} /><Fact label="Fingerprint" value={evidence.request_receipt_fingerprint || evidence.resolved_generation_hash} /><Fact label="File hash" value={evidence.file_sha256 || evidence.content_hash || attempt?.request_hash} /></dl><button type="button" className="evidence-button" onClick={onEvidence}>查看白名单证据 <ArrowSquareOut size={17} /></button></section>
         </aside>
       </section>
       <section className="action-bar">
         <div className="action-note">本机只读 · 无 Provider 调用 <Info size={16} /></div>
-        <a className={`primary-action${mediaUrl(attempt?.candidate_media || attempt?.output_media || attempt?.video_media) ? "" : " is-disabled"}`} href={mediaUrl(attempt?.candidate_media || attempt?.output_media || attempt?.video_media) || undefined} target="_blank" rel="noreferrer" aria-disabled={!mediaUrl(attempt?.candidate_media || attempt?.output_media || attempt?.video_media)}><Play size={20} weight="fill" />查看已注册输出</a>
+        <a className={`primary-action${mediaUrl(media) ? "" : " is-disabled"}`} href={mediaUrl(media) || undefined} target="_blank" rel="noreferrer" aria-disabled={!mediaUrl(media)}><Play size={20} weight="fill" />查看可播放视频</a>
         <button type="button" className="secondary-action" onClick={onEvidence}>查看证据 <ArrowSquareOut size={18} /></button>
       </section>
     </>

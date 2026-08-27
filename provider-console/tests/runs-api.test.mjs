@@ -6,6 +6,96 @@ import path from "node:path";
 import test from "node:test";
 
 import { createRunsApiHandler, RunsApiError } from "../scripts/runs-api.mjs";
+import {
+  attemptOutcome,
+  generationTypeOf,
+  outputState,
+  shotForAttempt,
+} from "../src/run-detail-contract.js";
+
+test("run detail contract keeps lifecycle outcome separate from phase and media", () => {
+  assert.deepEqual(attemptOutcome({ status: "succeeded", phase: "activate" }), {
+    key: "succeeded", label: "成功", tone: "ready", terminal: true,
+  });
+  assert.deepEqual(attemptOutcome({ status: "failed", phase: "validate" }), {
+    key: "failed", label: "失败", tone: "blocked", terminal: true,
+  });
+  assert.deepEqual(attemptOutcome({ status: "interrupted", phase: "fetch" }), {
+    key: "interrupted", label: "已中断", tone: "interrupted", terminal: true,
+  });
+  assert.deepEqual(attemptOutcome({ status: "outcome_unknown", phase: "submitted" }), {
+    key: "outcome_unknown", label: "结果未知", tone: "unknown", terminal: true,
+  });
+  assert.deepEqual(attemptOutcome({ status: "running", phase: "validate" }), {
+    key: "running", label: "进行中", tone: "gated", terminal: false,
+  });
+
+  assert.deepEqual(outputState({ status: "failed", phase: "validate" }), {
+    key: "missing_after_failure", label: "失败，未登记可播放视频", tone: "blocked",
+  });
+  assert.deepEqual(outputState({ status: "interrupted", phase: "fetch" }), {
+    key: "missing_after_failure", label: "已中断，未登记可播放视频", tone: "interrupted",
+  });
+  assert.deepEqual(outputState({ status: "failed", phase: "validate", fetched_media: { token: "fetched" } }), {
+    key: "fetched_evidence", label: "已获取视频，尚未成为 candidate", tone: "blocked",
+  });
+  assert.deepEqual(outputState({ status: "succeeded", phase: "activate", candidate_media: { token: "candidate" } }), {
+    key: "registered_candidate", label: "Candidate 已注册", tone: "ready",
+  });
+  assert.deepEqual(outputState({ status: "succeeded", phase: "activate" }), {
+    key: "missing_after_success", label: "成功记录缺少已注册输出", tone: "gated",
+  });
+});
+
+test("run detail contract derives generation mode and exact-attempt Shot only", () => {
+  const activeShot = {
+    shot_id: "shot-1", revision: 4, content_hash: "active", intent: "active intent",
+  };
+  const historicalShot = {
+    shot_id: "shot-1", revision: 3, content_hash: "sealed", intent: "historical intent",
+  };
+  const detail = { shots: [activeShot] };
+
+  assert.equal(generationTypeOf({ mode: "text_to_video" }), "T2V");
+  assert.equal(generationTypeOf({ mode: "reference_to_video" }), "R2V");
+  assert.equal(generationTypeOf({
+    mode: "image_to_video",
+    input_bindings: [{ role: "first_frame" }, { role: "last_frame" }],
+  }), "FL2V");
+  assert.equal(generationTypeOf({ mode: "image_to_video", input_bindings: [{ role: "first_frame" }] }), "I2V");
+
+  assert.deepEqual(shotForAttempt(detail, {
+    target_shot_id: "shot-1",
+    target_shot_revision: 3,
+    target_shot_content_hash: "sealed",
+    shot_snapshot_status: "verified",
+    shot_snapshot: historicalShot,
+  }), historicalShot);
+  assert.deepEqual(shotForAttempt(detail, {
+    target_shot_id: "shot-1",
+    target_shot_revision: 3,
+    target_shot_content_hash: "sealed",
+    shot_snapshot_status: "unavailable",
+  }), {
+    shot_id: "shot-1",
+    revision: 3,
+    content_hash: "sealed",
+    snapshot_available: false,
+  });
+  assert.deepEqual(shotForAttempt(detail, {
+    shot_snapshot_status: "unavailable",
+  }), { snapshot_available: false });
+  assert.deepEqual(shotForAttempt(detail, {
+    target_shot_id: "shot-1",
+    shot_snapshot_status: "unavailable",
+  }), {
+    shot_id: "shot-1",
+    snapshot_available: false,
+  });
+  assert.deepEqual(shotForAttempt(detail, {
+    target_shot_id: "shot-1",
+  }), activeShot);
+});
 
 function canonicalJson(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
