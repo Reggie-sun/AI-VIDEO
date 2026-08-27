@@ -25,6 +25,12 @@ Date: 2026-08-26
 > sniff-to-recoil closure now passes the exact-byte Gate. The audio contains two aligned non-speech
 > events, but project-local MCP cannot classify them as nasal sniffs; the overall Gate therefore
 > remains `NOT_EVALUATED` pending human listening. No later Shot was submitted.
+>
+> Human acceptance update (2026-08-27): after receiving the exact replacement MP4 and the explicit
+> request to confirm whether its sniff sound was acceptable, the user replied “可以”. This supplies
+> the missing human listening `PASS` for `audible-sniff-cue`; all Shot 00 requirements are now
+> `PASS` and `next_shot_allowed=true`. This does not authorize or claim Production activation、P6、
+> Final Acceptance、publication or a completed v10 ad.
 
 ## Purpose
 
@@ -270,20 +276,24 @@ broadband non-speech events，但 MCP不能把呼吸声语义分类为鼻吸气�
 Gate后没有提交后续 Shot，没有 remote/paid call。ComfyUI已通过 supervisor停止，loopback
 `127.0.0.1:8188`没有 listener。旧失败 artifact与其 Gate作为 immutable历史 evidence保留。
 
+随后用户在收到 exact replacement MP4与“请试听并确认 sniff sound是否可接受”的明确问题后回复“可以”。
+该回复只补足此前 MCP无法判断的 human listening layer：`audible-sniff-cue=PASS`。技术、视觉与听觉
+requirements因此全部闭合为`PASS`，Gate更新为`overall_verdict=PASS`、
+`next_shot_allowed=true`。媒体 bytes与 SHA-256未改变，也没有因此自动提交下一 Shot。
+
 ## Current Gate Status And Next Work
 
 current status：
 
 ```text
 VIDEO_ANALYSIS_STDIO_AVAILABLE / SHOT00_REPLACEMENT_SINGLE_LOCAL_SUBMIT_COMPLETE /
-VISUAL_SNIFF_RECOIL_PASS / AUDIBLE_SNIFF_NOT_EVALUATED /
-NEXT_SHOT_BLOCKED_PENDING_HUMAN_LISTENING / NO_V10_FINAL
+VISUAL_SNIFF_RECOIL_PASS / AUDIBLE_SNIFF_HUMAN_PASS /
+SHOT00_ALL_REQUIREMENTS_PASS / NEXT_SHOT_ALLOWED / NO_V10_FINAL
 ```
 
-下一步不是继续生成或再改视觉动作，而是由用户试听 exact replacement MP4，并判断两段声音是否清楚读成
-短促鼻吸气。只有该 requirement获得独立 human `PASS`，replacement Shot 00才可闭合为全项`PASS`，随后
-才能重新 Gate treatment Shot并继续老人 dialogue或最终 composition；若 human `FAIL`，必须使用新 Shot
-identity重新设计音频动作，不得覆盖或 blind retry当前 exact artifact。
+Shot 00已完成逐项 Gate，可进入 treatment Shot的重新 Gate或后续 generation planning。该放行只属于
+Agent-side per-Shot sequencing，不自动授权新的生成调用，也不构成 Production、P6、Final Acceptance或
+成片验收。下一次媒体提交仍需用户当前任务授权，并继续执行 exact-byte per-Shot Gate。
 
 ## Agent Guardrails
 
@@ -294,7 +304,8 @@ identity重新设计音频动作，不得覆盖或 blind retry当前 exact artif
   只看汗印或只摸衣服均不满足该 human requirement。
 - 当前 exact `00_problem_discovery_sniff.mp4` 已因 sniff/reaction closure与 audible cue失败，继续作为
   historical evidence；replacement `00_problem_discovery_sniff_recoil_v2.mp4`只获得视觉 requirements
-  `PASS`，不得把两段 non-speech audio energy升级为 `audible-sniff-cue PASS`。
+  的 MCP `PASS`；其 `audible-sniff-cue PASS`来自用户对 exact MP4的独立 human listening verdict，二者
+  不得混为同一个 proof layer。
 - 不得在 exact Shot 01A 未完成 Gate 前提交 Shot 01B、合成 v10 final 或宣称 13 秒问题已在成片修复。
 - 不得覆盖或 blind retry exact `01_problem_open_cap_spray` durable state；若内容后来被判为 `FAIL`，必须
   以新 Shot identity和新的 exact receipt处理。
