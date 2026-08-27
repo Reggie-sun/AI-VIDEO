@@ -2,6 +2,16 @@
 
 Date: 2026-08-26
 
+> Current full-preview update (2026-08-27): the historical `NO_V10_FINAL` and next-Shot
+> restrictions below are superseded. After the user explicitly authorized a full redo,
+> `01_recap_elder_enters_v2` was generated once locally and passed its exact-byte per-Shot
+> Gate. A deterministic 720-frame vertical v10 preview now exists at
+> `artifacts/qingyan-miao-ad-20260826-v10/final/青颜_苗家腋下止汗完整广告_30s_9x16_v10.mp4`
+> with SHA-256 `44e153f748189acffc15951bcf842eea11d2a6a4f00efacd8af1e61ab824b455`.
+> Fresh project-local MCP and decode evidence support `PASS_FOR_HUMAN_REVIEW`; the user's
+> uninterrupted viewing/listening verdict, publication provenance, Production activation,
+> P6 and Final Acceptance remain pending or out of scope.
+
 > Current-facing human correction (2026-08-27): exact `01_problem_open_cap_spray`
 > remains valid historical local-generation evidence, but the user rejects it as the first
 > Shot because its first frame already places the product in the woman's hand. The opening
@@ -281,7 +291,7 @@ Gate后没有提交后续 Shot，没有 remote/paid call。ComfyUI已通过 supe
 requirements因此全部闭合为`PASS`，Gate更新为`overall_verdict=PASS`、
 `next_shot_allowed=true`。媒体 bytes与 SHA-256未改变，也没有因此自动提交下一 Shot。
 
-## Current Gate Status And Next Work
+## Historical Shot 00 Gate Status And Next Work
 
 current status：
 
@@ -295,6 +305,91 @@ Shot 00已完成逐项 Gate，可进入 treatment Shot的重新 Gate或后续 ge
 Agent-side per-Shot sequencing，不自动授权新的生成调用，也不构成 Production、P6、Final Acceptance或
 成片验收。下一次媒体提交仍需用户当前任务授权，并继续执行 exact-byte per-Shot Gate。
 
+## 2026-08-27 Recap Bridge And Full 30-Second Preview
+
+用户随后明确要求生成完整版本。本 checkpoint 只补齐一个缺失的连续动作 Shot，并复用已接受的 v8
+双人 dialogue / leave source；没有重做已通过的 Shot 00、没有 remote/paid Provider、fallback 或 blind
+retry。
+
+新桥接 Shot 的 sealed intent 是：从已完成喷雾的开盖状态开始，女主放下左臂，从右下桌面拿起唯一白色
+大盖并盖回唯一黄色瓶子；老人随后从 screen right 自然入场，镜头收束到 exact v8 dialogue first frame。
+本机 H3/T8 `FL2VA`只提交一次：`768x1344`、124 frames、24fps、20 steps、
+`res_multistep/simple`、seed `104761`、CRF 17、native audio、无 LoRA。wall time为`400.343s`，
+`local_submit_count=1`、`retry_count=0`、`fallback_count=0`、`remote_submit_count=0`。
+
+exact output：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/01_recap_elder_enters_v2.mp4
+SHA-256 e6e54b1c504737d6453056f5f7bbe68ef742d0f186bb3ff02be5c6ec6540a943
+3,952,430 bytes; H.264; 768x1344; 24fps; 124 frames; 5.167s; AAC stereo
+```
+
+project-local `video-analysis`对 exact bytes执行`video_analyze`与`video_review`，两项均成功；逐帧
+contact sheet和首尾 boundary comparison确认：单一 bottle/cap、先 re-cap 后 elder entrance、两人最终
+位置正确、无 spray-after-recap、无硬切、无白闪、无静图插入。exact Gate为`PASS`：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/01_recap_elder_enters_v2.gate.json
+```
+
+deterministic composition删除旧 v9 static before/after slider，不再用 optical retime。`使用前/使用后`
+改由人物状态顺序表达；产品 live-action期间只作为单一实物瓶存在，没有右下角 product icon或 packshot
+overlay。治疗 source 的 near-static frames `141..174`被明确退休，真人段落的 fresh `freezedetect`因此
+在`0-25s`无 freeze interval。exact timeline为：
+
+| Segment | Frames | Time | Contract |
+| --- | ---: | --- | --- |
+| problem sniff/recoil | 141 | `0.000-5.875` | 先问题、闻腋下、零产品 |
+| open cap + underarm spray | 103 | `5.875-10.167` | frames `38..140`；大盖移除后才喷 |
+| recap + elder entrance | 124 | `10.167-15.333` | 单一连续动作；Shot Gate `PASS` |
+| audible elder dialogue | 149 | `15.333-21.542` | 三轮产品推介原生音频 |
+| leave together | 83 | `21.542-25.000` | native timing；无插帧 |
+| golden-fluid benefit | 60 | `25.000-27.500` | 只出现一次，pixel-stable |
+| exact product hero | 60 | `27.500-30.000` | 只出现一次，无黄色条/角标 |
+
+Frame identity为`141 + 103 + 124 + 149 + 83 + 60 + 60 = 720`。成片不使用`xfade`、
+dissolve、white flash、transition overlay、`minterpolate`或 optical retime。最后两张静图合计正好5秒；
+benefit和product hero均复用 accepted dialogue中提取的同一女声，因此后段推介文字有对应声音。
+
+exact local preview：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/final/青颜_苗家腋下止汗完整广告_30s_9x16_v10.mp4
+SHA-256 44e153f748189acffc15951bcf842eea11d2a6a4f00efacd8af1e61ab824b455
+29,148,103 bytes; H.264 High; 1080x1920; 24fps; exactly 720 picture frames;
+AAC stereo 48kHz; container duration 30.022s
+```
+
+fresh full video/audio decode均`PASS`；integrated loudness为`-13.9 LUFS`。项目 MCP内置 transport在
+误并发调用后返回`Transport closed`，该失败没有作为证据。随后按同一`.codex/config.toml` command、
+interpreter、cwd与`PYTHONPATH`启动新的 serial stdio session，实际完成`initialize`、`tools/list`、
+`video_analyze`、`video_review`和`video_transcribe`。server为`video-analysis 1.29.0`，三个 tool result均
+`isError=false`，`video_review`返回`issues=[]`。Whisper在`15.08-21.42s`检出三轮 dialogue，在
+`25.02-26.02s`与`27.66-29.76s`检出末尾两段推介声；品牌的同音字 transcription误写不能替代
+accepted native audio文本权威。
+
+final evidence：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/review/final/final-gate.json
+artifacts/qingyan-miao-ad-20260826-v10/review/final/video-analysis-mcp-receipt.json
+MCP receipt SHA-256 9d926c41793e5935ca44c3c8ee0db4b3dc65908e746fc7dc24fde0d1ed2dc14d
+```
+
+current status：
+
+```text
+SHOT00_HUMAN_SNIFF_PASS / RECAP_BRIDGE_GATE_PASS /
+V10_FULL_LOCAL_PREVIEW_COMPLETE / TECHNICAL_AGENT_GATE_PASS_FOR_HUMAN_REVIEW /
+HUMAN_FINAL_ACCEPTANCE_PENDING / NO_REMOTE_OR_PAID_CALL / NOT_PUBLISHED
+```
+
+ComfyUI已由 supervisor停止，`127.0.0.1:8188`无 listener。当前 artifact是 local-only development
+preview，不是 Production candidate、P6、Final Acceptance或 publication-ready output。BGM rights/
+provenance尚未闭合；项目 Agent Memory search返回 stale-tagged历史记录并排队 detached refresh，本轮
+没有等待、轮询或前台刷新 RAG index。
+
 ## Agent Guardrails
 
 - 不得把控制帧、prompt audit、contact sheet、FFmpeg metadata、successful local submit 或 H3 receipt当作 per-Shot Gate `PASS`。
@@ -307,6 +402,8 @@ Agent-side per-Shot sequencing，不自动授权新的生成调用，也不构�
   的 MCP `PASS`；其 `audible-sniff-cue PASS`来自用户对 exact MP4的独立 human listening verdict，二者
   不得混为同一个 proof layer。
 - 不得在 exact Shot 01A 未完成 Gate 前提交 Shot 01B、合成 v10 final 或宣称 13 秒问题已在成片修复。
+  该 sequencing guardrail已由上述 exact Shot Gate与完整 composition checkpoint满足；保留此条只用于
+  解释早期 fail-closed顺序，不得继续把`NO_V10_FINAL`读成 current status。
 - 不得覆盖或 blind retry exact `01_problem_open_cap_spray` durable state；若内容后来被判为 `FAIL`，必须
   以新 Shot identity和新的 exact receipt处理。
 - v9 技术 measurements保留为历史 evidence，但其 human verdict 已是 `FAIL`。
