@@ -151,6 +151,36 @@ budget reservation 已释放，费用为 `0 CNY`。没有 task ID、poll、fetch
 
 fresh 官方 `CreateContentsGenerationsTasks` 文档列出了多 image `reference_image` 输入示例，并说明 Seedance 2.0 支持 `generate_audio`；但它没有证明本账号、exact Mini model 与本次全部参数组合一定接受，也无法替代丢失的 400 structured response body。因此当前只可排除“通用 API 完全不支持 reference images / audio”这一过宽解释，不能进一步判定 exact rejection cause。文档：`https://api.volcengine.com/api-docs/view?action=CreateContentsGenerationsTasks&serviceCode=ark&version=2024-01-01`。
 
+## Second Authorized Diagnostic And Exact Cause
+
+用户随后明确授权新的生成。为最大化成功概率并隔离 first attempt 的多个变量，第二次请求回到历史已成功的 Mini R2V 形态：
+
+- 新 run: `runs/qingyan-seedance-mini-elder-handoff-20260827-002/`
+- one reference image: 同一画面内包含两位虚构角色、房间和产品
+- `480p`, `9:16`, `5s`, `generate_audio=false`
+- prompt lint: `PASS`, `155` words
+- estimated cost upper bound: `1.155060 CNY`
+- exactly one new submit; no retry or fallback
+
+本次 transport 在不保存 credential、raw image bytes 或完整 response 的前提下，持久化了 Ark structured error：
+
+```text
+HTTP 400
+code: InputImageSensitiveContentDetected.PrivacyInformation
+type: BadRequest
+message summary: input image content[1] may contain real person
+```
+
+evidence：
+
+```text
+runs/qingyan-seedance-mini-elder-handoff-20260827-002/evidence/provider-error.json
+```
+
+这证明 exact failure 是远端 Provider safety classifier 将本项目本地生成视频提取的虚构人物参考图判定为“可能包含真人”。它不证明素材实际包含真人，也不推翻 local source provenance；但 local `synthetic_photorealistic_person` attestation 不能覆盖 Ark remote rejection。
+
+第二次 canonical outcome 同样为 `paid_provider_known_no_effect`：`external_effect_id=null`、实际费用 `0 CNY`、无 task ID、poll、fetch、MP4、activation、retry、permit remint 或 fallback。该 permit 已消费。不得继续提交相同或其他 photorealistic character bytes 试探 classifier。
+
 ## Post-Media Gate
 
 本次没有得到 MP4，因此没有调用 `video-analysis` MCP，所有媒体 requirements 保持 `NOT_EVALUATED`。若未来另有明确授权的新 submit 得到 exact MP4，必须先绑定其 SHA-256 并立即调用 project-local `video-analysis` MCP。以下 requirements 全部为 `PASS` 才能结束实验：
@@ -168,7 +198,7 @@ fresh 官方 `CreateContentsGenerationsTasks` 文档列出了多 image `referenc
 ## Remaining Risks
 
 1. 当前没有 Provider MP4，因此还无法判断双人 identity、手部交接、产品一致性、中文对白和口型是否满足要求。
-2. 唯一 permit 已消费；任何 diagnostic submit、参数降级或 variant 都是新的 paid scope，必须先查明 400 constraint 并取得新的明确 authorization。
+2. 两次 permit 均已消费且均为 known-no-effect；第二次已确认是 remote real-person classifier rejection。任何新 submit、风格化 reference 或 Provider 变化都是新 scope，必须获得新的明确 authorization。
 3. 即使未来单 Shot PASS，也只证明桥接镜头本身；首 Shot 问题建立、后续喷雾/效果因果、`11s` / `22s` 节奏与最终收口仍需独立 human review gates。
 4. Seedance native audio 是否进入最终 composition 受现有 P4 contract 限制；raw MP4 有音轨不等于最终成片采用该音轨。
 5. run evidence 为 local generated/untracked runtime artifact；本记录 commit 不会把它变成 Production state、remote publication 或 release truth。
@@ -179,4 +209,5 @@ fresh 官方 `CreateContentsGenerationsTasks` 文档列出了多 image `referenc
 - 不得绕过 exact Secret Service reference，或把一次 task authorization解释成无限调用额度。
 - 不得在 missing/stale/unknown exact MP4 上调用或伪造 post-media PASS。
 - 当前 `HTTP 400` 是 `known_no_effect`，不是 unknown outcome；但它同样不授权自动重试或 permit remint。
+- local provenance 证明“虚构人物”不代表 Ark classifier 必须接受；不得伪造真人 consent、改写 classification 或重复提交相同 photorealistic bytes 绕过远端 safety gate。
 - 不得自动重试或把新桥接 Shot 插入 v12；下一次 remote submit 与任何 composition change 必须保持各自 authorization 和 gate boundary。
