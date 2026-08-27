@@ -2,6 +2,14 @@
 
 Date: 2026-08-27
 
+> **2026-08-28 follow-up evidence:** 新的 product-only Seedance Mini route 已在一次明确授权的
+> `720p / 15s` live submit 中成功 fetch 写实双人视频，且没有发送人物 reference，因此本记录中
+> “插画是当前唯一已成功返回媒体的 Ark route”只保留为 2026-08-27 历史事实。新媒体证明推荐与可见
+> 交接可成立，但因苗家服饰完全丢失且喷雾错误地横跨胸肩、没有抬臂喷腋下，post-media Gate 为
+> `FAIL`，没有进入完整广告合成。当前边界见
+> `docs/record_for_agent/2026-08-28-qingyan-seedance-mini-complete-ad-gate-stop.md`。本记录的
+> photorealistic person-reference egress retirement 仍保持有效；product-only route 不恢复该旧路径。
+
 ## Purpose
 
 本文记录用户否决 v12 后，为缺失的“老人推荐产品并交给苗家少女”因果桥设计的 Seedance Mini 单 Shot 实验：两次 remote safety rejection，以及用户选择 `B` 后使用 clearly illustrated reference 获得的一个 exact MP4 和逐 requirement Gate 结果。
