@@ -66,6 +66,16 @@ owner正常停止且queue/8188清空时，GPU free升至约`27.3 GiB`；fresh un
 `failed` / `stop`，submit/poll/fetch=`1/1/0`；没有MP4、retry、fallback、P6、activation或M1。这证明释放
 MCP增加了headroom但当前exact Stock20 Ref2VA/Hybrid route仍受本机capacity阻断，不能形成视频quality verdict。
 
+Execution checkpoint (2026-08-27, M0 media-quality closure): isolated `--novram`已证明同一Stock20/no-LoRA、
+20-step T8 route可完成runtime。V4 full-source reference与v5 exact 2秒terminal-tail/fixed-historical-seed各执行一次
+独立授权的one-submit，均成功fetch `1344x768`、24fps、124-frame MP4，但均被human reviewer拒绝。V5 exact artifact
+SHA-256为`22bdcad0ee2da2614b6781bd8d46ffd478174259557ca96be66614dd61ec49e6`；human verdict为“速度不通过、后段
+近静图、seam明显”。Advisory frame analysis将唯一大突变定位在`3.500s`，且随后mean flow相对前2秒下降约
+`91.6%`。Manifest revision `65`已将v5 attempt canonical关闭为`failed/validate`、`next_action=stop`，fetch evidence
+保留、candidate为空；没有activation、retry、fallback、M1或P6 effect。该结果拒绝“只缩短reference tail即可修复
+慢动作”的hypothesis；后续generation或M1仍需新的明确授权。Current exact evidence见
+`docs/record_for_agent/2026-08-27-shot-continuity-m0-terminal-tail-v5.md`。
+
 已接受“验证与实现同时推进”的execution strategy，但并行只发生在明确分离的
 Implementation lane与Validation lane。Validation必须绑定immutable checkpoint，不得在同一次attempt期间
 读取正在变化的source/workflow/profile；并行执行不会放宽Provider、permit、P6或same-file ownership gates。

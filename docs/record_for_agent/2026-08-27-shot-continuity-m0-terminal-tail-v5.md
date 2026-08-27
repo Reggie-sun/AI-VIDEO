@@ -6,8 +6,8 @@ Date: 2026-08-27
 
 本文记录M0 `quality-v1`在full-source reference视频被human reviewer判定为人物移动明显偏慢后，使用exact
 2秒terminal motion tail、固定historical materialized seed并执行一次local one-submit v5 experiment的current
-truth。它区分runtime成功、技术媒体检查与尚未关闭的human原速体感判定；不会把`video-analysis`无冻结或Provider
-成功升级为P6、winner、activation或Final Acceptance。
+truth。它区分runtime成功、技术媒体检查与最终human rejection；不会把`video-analysis`无冻结或Provider成功升级为
+P6、winner、activation或Final Acceptance。
 
 Production root：
 
@@ -144,7 +144,8 @@ Measured facts：
 - full video decode与full audio decode：PASS。
 
 Project `video-analysis` MCP得到：1 scene、11 extracted keyframes、166 sampled frames、166 unique frames、
-unique ratio `1.0`、`issues=[]`。这些证据关闭technical freeze/dropped-static-frame concern，但不能证明自然速度。
+unique ratio `1.0`、`issues=[]`。这些证据只排除literal repeated-frame freeze或decode failure，不能证明自然速度，
+也不能覆盖human观察到的后段近静态内容与visible seam。
 
 一个额外的advisory OpenCV Farneback对比使用同一downsample与123对adjacent frames。相对于v4 full-reference，v5：
 
@@ -156,25 +157,58 @@ unique ratio `1.0`、`issues=[]`。这些证据关闭technical freeze/dropped-st
 “2秒tail使人物整体运动更快”的假设。抽帧检查同样显示后半段较明显变化主要来自composition/camera push，而不是已被
 证明的更快步态。
 
+Human rejection后，以`cv2.INTER_AREA`把BGR frame缩放到`336x192`、转grayscale，再用Farneback参数
+`pyr_scale=0.5, levels=3, winsize=15, iterations=3, poly_n=5, poly_sigma=1.2, flags=0`对v5做分段诊断：
+
+- `0.000-2.000s`：48 pairs，mean flow `0.150535`、mean p90 flow `0.405257`、mean luma absdiff `1.209407`；
+- `2.000-3.500s`：36 pairs，mean flow `0.364727`、mean p90 flow `0.765966`、mean luma absdiff `2.336214`；
+- `3.500-5.167s`：39 pairs，mean flow `0.012688`、mean p90 flow `0.027723`、mean luma absdiff `0.229524`。
+
+唯一异常大转场为frame `83 -> 84`、timestamp `3.500s`：flow `7.440274`、p90 flow `13.151134`、luma
+absdiff `37.967711`。随后尾段mean flow相对前2秒下降约`91.6%`；每0.5秒窗口从`3.5s`起稳定在
+`0.012298..0.014887`，而非正常步态或camera motion。这些数值是对human verdict的advisory corroboration，
+不替代P6或human owner。
+
+## Human Verdict And Canonical Closure
+
+Human reviewer对exact v5 MP4的原速结论为：`速度不通过,并且后面变成静图,seam明显`。因此：
+
+- motion speed：`FAIL`；
+- latter-segment dynamic continuity：`FAIL`；
+- seam continuity：`FAIL`。
+
+`ProductionStateCommitter.record_video_provider_failure()`已将attempt以`video_provider_failed`原子关闭；Manifest
+revision `64 -> 65`，attempt为`failed/validate`、`next_action=stop`，error明确绑定上述human rejection。
+`local_fetch_receipt`仍为`909ebbeaf84b6cc5b904d693fd92a65bad535ae9a5af3907070d5bb81a23e7a9`，artifact SHA-256
+仍为`22bdcad0ee2da2614b6781bd8d46ffd478174259557ca96be66614dd61ec49e6`且size `2325322` bytes；candidate asset
+IDs为空，没有activation、retry、fallback或M1 effect。
+
 ## Current Assessment
 
 - fixed-seed / exact-tail engineering closure：`PASS`；
 - local one-submit / poll / fetch lifecycle：`PASS`；
 - MP4 hash、probe与full decode：`PASS`；
-- no-freeze / no-hard-cut technical evidence：`PASS`；
-- “人物移动速度自然且不再像0.5倍速”：`NOT_EVALUATED`，等待human原速观看v5；
+- literal repeated-frame freeze / decode evidence：`PASS`，但不覆盖perceptual near-static tail；
+- “人物移动速度自然且不再像0.5倍速”：human `FAIL`；
+- latter-segment dynamic continuity：human `FAIL`；
+- seam continuity：human `FAIL`，advisory metric定位在`3.500s`；
 - M0 P6 requirement verdict：未签发；
 - winner / capability activation / M1 / Final Acceptance：均未发生；
 - publication：local commits only，未push、未release。
 
-Manifest当前为schema `2.14` revision `64`。V5 attempt停在`running/validate`，保存exact local fetch receipt与MP4；
-candidate asset IDs为空。Human speed verdict前不得把`issues=[]`升级成PASS，也不得自动激活或进入M1。
+Manifest当前为schema `2.14` revision `65`。V5 attempt已是`failed/validate`、`next_action=stop`，保存exact local
+fetch receipt与MP4；candidate asset IDs为空。不得把`issues=[]`升级成quality PASS，也不得自动激活或进入M1。
 
 ## Remaining Work
 
-唯一当前人类动作是原速观看exact v5 MP4，并对“人物移动速度是否自然”给出明确PASS/FAIL。若FAIL，应先canonical
-关闭该attempt并保留完整fetch evidence；不得blind retry、换seed、改prompt、切fast policy或自动进入M1。若PASS，仍须按
-frozen M0 requirement/P6 lifecycle处理完整continuity、identity、endpoint与quality gates；单一速度PASS不等于M0 winner。
+V5已canonical关闭为human quality FAIL。Exact v5证明缩短到2秒tail没有改善速度，并与`3.500s` discontinuity及
+余下约1.67秒近静态尾段同时出现；reference conditioning、endpoint conditioning与prompt三者的相对因果尚未隔离。
+因此现有证据只拒绝“只缩短reference tail即可修复慢动作”的hypothesis，不应被升级为通用model contract或单一
+root-cause claim。
 
-本记录创建时没有新的Provider/media call；它只沉淀本轮已经完成的authorized local call与分析证据。Agent memory/RAG
-index未刷新，后续检索在独立授权的index owner执行前可能仍缺少本记录。
+下一步必须先重新设计temporal handoff/endpoint contract或停止M0 experiment；不得blind retry、换seed、继续缩短tail、
+切fast policy或自动进入M1。任何新generation、M1 preparation/submit或不同policy都需要新的明确授权。此前已通过的
+30秒成片与本M0 single-edge qualification是不同acceptance scope；本次FAIL不撤销其既有人眼通过结论。
+
+本记录本次更新没有新的Provider/media call；它只沉淀human verdict、canonical closure与已有exact MP4的分段分析。
+Agent memory/RAG index未刷新，后续检索在独立授权的index owner执行前可能仍缺少本记录。
