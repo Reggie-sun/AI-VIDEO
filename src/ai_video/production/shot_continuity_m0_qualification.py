@@ -66,9 +66,13 @@ M0_REFERENCE_VIDEO_POLICY = "official_2_to_15s"
 M0SeedDerivation = Literal[
     "content-addressed-m0-closure-sha256-low63-v1",
     "historical-materialized-m0-fixed-seed-v1",
+    "historical-materialized-m0-runtime-repair-fixed-seed-v1",
 ]
 CONTENT_ADDRESSED_M0_SEED = "content-addressed-m0-closure-sha256-low63-v1"
 FIXED_M0_SEED_RESEAL = "historical-materialized-m0-fixed-seed-v1"
+RUNTIME_REPAIR_M0_SEED_RESEAL = (
+    "historical-materialized-m0-runtime-repair-fixed-seed-v1"
+)
 _M0_SEED_FIELDS = (
     "candidate_id",
     "initial_execution_stack_hash",
@@ -122,7 +126,7 @@ def validate_m0_seed_contract(values: Mapping[str, object]) -> None:
         if values.get("sealed_seed") != derive_m0_qualification_seed(values):
             raise ValueError("M0 sealed seed does not match the content-addressed closure")
         return
-    if mode == FIXED_M0_SEED_RESEAL:
+    if mode in {FIXED_M0_SEED_RESEAL, RUNTIME_REPAIR_M0_SEED_RESEAL}:
         if any(item is None for item in source_fields):
             raise ValueError("fixed M0 seed reseal requires exact historical source fields")
         return
@@ -674,6 +678,20 @@ def validate_m0_sources_against_stack(
         sources.materialization.compiler_hash,
         sources.materialization.workflow_hash,
     )
+    runtime_seals_match = stack.runtime_seals == profile.runtime_seals
+    if (
+        not runtime_seals_match
+        and allow_materialized_source_reseal
+        and profile.seed_derivation == RUNTIME_REPAIR_M0_SEED_RESEAL
+    ):
+        from ai_video.production.shot_continuity_m0_seed_reseal import (
+            is_exact_m0_comfyui_runtime_repair,
+        )
+
+        runtime_seals_match = is_exact_m0_comfyui_runtime_repair(
+            stack.runtime_seals,
+            profile.runtime_seals,
+        )
     if (
         profile.candidate_label != "m0"
         or stack.candidate_id != profile.candidate_id
@@ -683,7 +701,7 @@ def validate_m0_sources_against_stack(
         or stack.model_id != profile.model_id
         or stack.capability_id != profile.capability_id
         or components != expected_components
-        or stack.runtime_seals != profile.runtime_seals
+        or not runtime_seals_match
         or stack.sampler_identity != profile.sampler
         or stack.scheduler_identity != profile.scheduler
         or stack.output_contract_hash != profile.output_contract_hash
@@ -824,6 +842,7 @@ def compile_m0_qualification_workflow(
 __all__ = [
     "CONTENT_ADDRESSED_M0_SEED",
     "FIXED_M0_SEED_RESEAL",
+    "RUNTIME_REPAIR_M0_SEED_RESEAL",
     "M0QualificationCompileInputs",
     "M0QualificationExecutionSources",
     "M0QualificationProfile",

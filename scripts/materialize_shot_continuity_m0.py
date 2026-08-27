@@ -27,6 +27,7 @@ from ai_video.production.shot_continuity_m0_fast_validation import (
 from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.shot_continuity_m0_qualification import (
     M0QualificationProfile,
+    RUNTIME_REPAIR_M0_SEED_RESEAL,
     load_m0_qualification_execution_sources,
     validate_m0_sources_against_stack,
 )
@@ -39,7 +40,10 @@ from ai_video.production.shot_continuity_source_stack import (
     validate_shot_continuity_source_stack,
 )
 from ai_video.production.state_commit import ProductionStateCommitter
-from ai_video.production.video_execution_stack import GenerationExecutionStackIdentity
+from ai_video.production.video_execution_stack import (
+    ExecutionStackRuntimeReseal,
+    GenerationExecutionStackIdentity,
+)
 
 
 QUALITY_PROFILE = Path(
@@ -211,8 +215,32 @@ def materialize(
         )
         else ()
     )
+    runtime_reseals: tuple[ExecutionStackRuntimeReseal, ...] = ()
+    if (
+        selected_policy is M0ValidationPolicyId.QUALITY_V1
+        and m0_sources.profile.seed_derivation == RUNTIME_REPAIR_M0_SEED_RESEAL
+    ):
+        if current_m0.materialization_status != "materialized":
+            raise ValueError("M0 runtime repair requires a materialized current stack")
+        source_seal = next(
+            item for item in current_m0.runtime_seals if item.name == "comfyui"
+        )
+        target_seal = next(
+            item for item in m0_sources.profile.runtime_seals if item.name == "comfyui"
+        )
+        if source_seal != target_seal:
+            runtime_reseals = (
+                ExecutionStackRuntimeReseal(
+                    candidate_label="m0",
+                    source_execution_stack_hash=current_m0.execution_stack_hash,
+                    runtime_name="comfyui",
+                    source_seal=source_seal,
+                    target_seal=target_seal,
+                ),
+            )
     committed = writer.materialize_p0_qualification(
         materializations=materializations,
+        runtime_reseals=runtime_reseals,
         expected_materialized_stack_hashes=expected_hashes,
         expected_manifest_revision=before_manifest.manifest_revision,
         attempt_id=attempt_id,

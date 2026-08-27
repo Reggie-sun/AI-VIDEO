@@ -16,6 +16,7 @@ from ai_video.production.paths import (
 from ai_video.production.shot_continuity_m0_qualification import (
     FIXED_M0_SEED_RESEAL,
     M0QualificationProfile,
+    RUNTIME_REPAIR_M0_SEED_RESEAL,
 )
 from ai_video.production.shot_continuity_m0_seed_reseal import (
     validate_m0_fixed_seed_reseal,
@@ -165,6 +166,81 @@ def test_fixed_seed_reseal_rejects_seed_contract_or_lineage_drift(
 ) -> None:
     committer, values = _profiles(tmp_path)
     values[field] = value
+    profile = M0QualificationProfile.model_validate(values)
+
+    with pytest.raises(AiVideoError, match="fixed-seed"):
+        validate_m0_fixed_seed_reseal(committer=committer, profile=profile)
+
+
+def _replace_runtime(
+    values: dict[str, object],
+    *,
+    name: str,
+    version: str,
+    content_hash: str,
+) -> None:
+    runtime_seals = [dict(item) for item in values["runtime_seals"]]
+    target = next(item for item in runtime_seals if item["name"] == name)
+    target.update(version=version, content_hash=content_hash)
+    values["runtime_seals"] = runtime_seals
+
+
+def test_runtime_repair_fixed_seed_reseal_allows_only_comfyui_runtime_change(
+    tmp_path: Path,
+) -> None:
+    committer, values = _profiles(tmp_path)
+    values["seed_derivation"] = RUNTIME_REPAIR_M0_SEED_RESEAL
+    _replace_runtime(
+        values,
+        name="comfyui",
+        version="0.33.0+e01fb4c56b7a",
+        content_hash="9" * 64,
+    )
+    profile = M0QualificationProfile.model_validate(values)
+
+    validate_m0_fixed_seed_reseal(committer=committer, profile=profile)
+
+
+def test_runtime_repair_fixed_seed_reseal_rejects_non_comfyui_change(
+    tmp_path: Path,
+) -> None:
+    committer, values = _profiles(tmp_path)
+    values["seed_derivation"] = RUNTIME_REPAIR_M0_SEED_RESEAL
+    _replace_runtime(
+        values,
+        name="minimax-h3-audio-t8",
+        version="changed",
+        content_hash="8" * 64,
+    )
+    profile = M0QualificationProfile.model_validate(values)
+
+    with pytest.raises(AiVideoError, match="fixed-seed"):
+        validate_m0_fixed_seed_reseal(committer=committer, profile=profile)
+
+
+def test_runtime_repair_fixed_seed_reseal_requires_exactly_one_runtime_change(
+    tmp_path: Path,
+) -> None:
+    committer, values = _profiles(tmp_path)
+    values["seed_derivation"] = RUNTIME_REPAIR_M0_SEED_RESEAL
+    profile = M0QualificationProfile.model_validate(values)
+
+    with pytest.raises(AiVideoError, match="fixed-seed"):
+        validate_m0_fixed_seed_reseal(committer=committer, profile=profile)
+
+
+def test_runtime_repair_fixed_seed_reseal_rejects_prompt_drift(
+    tmp_path: Path,
+) -> None:
+    committer, values = _profiles(tmp_path)
+    values["seed_derivation"] = RUNTIME_REPAIR_M0_SEED_RESEAL
+    values["prompt_sha256"] = "8" * 64
+    _replace_runtime(
+        values,
+        name="comfyui",
+        version="0.33.0+e01fb4c56b7a",
+        content_hash="9" * 64,
+    )
     profile = M0QualificationProfile.model_validate(values)
 
     with pytest.raises(AiVideoError, match="fixed-seed"):

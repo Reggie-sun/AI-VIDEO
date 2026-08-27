@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import base64
+import binascii
 import hashlib
+import json
 from typing import Literal
 
 from pydantic import ConfigDict, Field, model_validator
@@ -45,6 +48,30 @@ class RuntimeSeal(_ExecutionStackModel):
         return self
 
 
+class ExecutionStackRuntimeReseal(_ExecutionStackModel):
+    """One exact runtime identity replacement for a materialized stack reseal."""
+
+    candidate_label: Literal["m0"]
+    source_execution_stack_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    runtime_name: Literal["comfyui"]
+    source_seal: RuntimeSeal
+    target_seal: RuntimeSeal
+
+    @model_validator(mode="after")
+    def _validate_exact_replacement(self) -> "ExecutionStackRuntimeReseal":
+        if (
+            self.source_seal.name != self.runtime_name
+            or self.target_seal.name != self.runtime_name
+        ):
+            raise ValueError("runtime reseal names must match the selected runtime")
+        if (
+            self.source_seal.version == self.target_seal.version
+            or self.source_seal.content_hash == self.target_seal.content_hash
+        ):
+            raise ValueError("runtime reseal must replace both version and content identity")
+        return self
+
+
 class ExecutionStackMaterialization(_ExecutionStackModel):
     """Exact, candidate-neutral artifact hashes supplied by local preflight."""
 
@@ -85,6 +112,33 @@ class ExecutionStackMaterialization(_ExecutionStackModel):
             compiler_hash=hashlib.sha256(compiler_bytes).hexdigest(),
             workflow_hash=hashlib.sha256(workflow_bytes).hexdigest(),
         )
+
+    def profile_runtime_seals(self) -> tuple[RuntimeSeal, ...]:
+        """Reopen runtime seals from the exact hashed profile source envelope."""
+
+        try:
+            envelope = json.loads(self.profile_bytes)
+            if not isinstance(envelope, dict) or envelope.get("schema_version") != "1":
+                raise ValueError("profile source envelope is invalid")
+            profile_bytes = base64.b64decode(
+                envelope["profile_bytes_base64"],
+                validate=True,
+            )
+            profile = json.loads(profile_bytes)
+            runtime_seals = profile["runtime_seals"]
+            if not isinstance(runtime_seals, list):
+                raise ValueError("profile runtime seals are invalid")
+            return tuple(RuntimeSeal.model_validate(item) for item in runtime_seals)
+        except (
+            binascii.Error,
+            json.JSONDecodeError,
+            KeyError,
+            TypeError,
+            ValueError,
+        ) as exc:
+            raise ValueError(
+                "execution stack profile runtime seals could not be reopened"
+            ) from exc
 
 
 class GenerationExecutionStackIdentity(_ExecutionStackModel):

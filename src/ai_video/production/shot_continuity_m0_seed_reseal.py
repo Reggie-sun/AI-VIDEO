@@ -17,6 +17,7 @@ from ai_video.production.shot_continuity_m0_qualification import (
     CONTENT_ADDRESSED_M0_SEED,
     FIXED_M0_SEED_RESEAL,
     M0QualificationProfile,
+    RUNTIME_REPAIR_M0_SEED_RESEAL,
 )
 
 
@@ -29,17 +30,43 @@ def _invalid(message: str, detail: str | None = None) -> AiVideoError:
     )
 
 
-def _unchanged_profile_contract(profile: Any) -> dict[str, object]:
+def _unchanged_profile_contract(
+    profile: Any,
+    *,
+    exclude_runtime_seals: bool = False,
+) -> dict[str, object]:
+    excluded = {
+        "prepared_receipt_hash",
+        "registry_content_hash",
+        "seed_derivation",
+        "fixed_seed_source_prepared_receipt_hash",
+        "fixed_seed_source_execution_stack_hash",
+        "fixed_seed_source_profile_hash",
+    }
+    if exclude_runtime_seals:
+        excluded.add("runtime_seals")
     return profile.model_dump(
         mode="json",
-        exclude={
-            "prepared_receipt_hash",
-            "registry_content_hash",
-            "seed_derivation",
-            "fixed_seed_source_prepared_receipt_hash",
-            "fixed_seed_source_execution_stack_hash",
-            "fixed_seed_source_profile_hash",
-        },
+        exclude=excluded,
+    )
+
+
+def is_exact_m0_comfyui_runtime_repair(
+    source_runtime_seals: Any,
+    target_runtime_seals: Any,
+) -> bool:
+    """Accept exactly one changed runtime identity: the ComfyUI checkout."""
+
+    source = {item.name: item for item in source_runtime_seals}
+    target = {item.name: item for item in target_runtime_seals}
+    if source.keys() != target.keys() or "comfyui" not in source:
+        return False
+    changed = tuple(name for name in sorted(source) if source[name] != target[name])
+    if changed != ("comfyui",):
+        return False
+    return (
+        source["comfyui"].version != target["comfyui"].version
+        and source["comfyui"].content_hash != target["comfyui"].content_hash
     )
 
 
@@ -48,7 +75,10 @@ def validate_m0_fixed_seed_reseal(*, committer: Any, profile: Any) -> None:
 
     if profile.seed_derivation == CONTENT_ADDRESSED_M0_SEED:
         return
-    if profile.seed_derivation != FIXED_M0_SEED_RESEAL:
+    if profile.seed_derivation not in {
+        FIXED_M0_SEED_RESEAL,
+        RUNTIME_REPAIR_M0_SEED_RESEAL,
+    }:
         raise _invalid("M0 fixed-seed reseal mode is unsupported.")
     try:
         historical = committer.reopen_p0_qualification_history(
@@ -91,13 +121,29 @@ def validate_m0_fixed_seed_reseal(*, committer: Any, profile: Any) -> None:
         if isinstance(exc, AiVideoError) and exc.code is ErrorCode.VIDEO_REQUEST_INVALID:
             raise
         raise _invalid("M0 fixed-seed historical source could not be reopened.", str(exc)) from exc
+    unchanged = _unchanged_profile_contract(source_profile) == (
+        _unchanged_profile_contract(profile)
+    )
+    if profile.seed_derivation == RUNTIME_REPAIR_M0_SEED_RESEAL:
+        unchanged = (
+            _unchanged_profile_contract(
+                source_profile, exclude_runtime_seals=True
+            )
+            == _unchanged_profile_contract(profile, exclude_runtime_seals=True)
+            and is_exact_m0_comfyui_runtime_repair(
+                source_profile.runtime_seals,
+                profile.runtime_seals,
+            )
+        )
     if (
         source_profile.seed_derivation != CONTENT_ADDRESSED_M0_SEED
         or source_profile.sealed_seed != profile.sealed_seed
-        or _unchanged_profile_contract(source_profile)
-        != _unchanged_profile_contract(profile)
+        or not unchanged
     ):
         raise _invalid("M0 fixed-seed reseal changed the execution contract.")
 
 
-__all__ = ["validate_m0_fixed_seed_reseal"]
+__all__ = [
+    "is_exact_m0_comfyui_runtime_repair",
+    "validate_m0_fixed_seed_reseal",
+]

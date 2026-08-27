@@ -14,6 +14,7 @@ import ai_video.production.shot_continuity_source_stack as source_stack_module
 import scripts.materialize_shot_continuity_m0 as materialize_script
 import pytest
 from PIL import Image
+from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError
 from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
@@ -26,7 +27,9 @@ from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.video_execution_stack import (
+    ExecutionStackRuntimeReseal,
     GenerationExecutionStackIdentity,
+    RuntimeSeal,
     StackComponentIdentity,
 )
 from scripts.materialize_shot_continuity_m0 import materialize
@@ -502,6 +505,219 @@ def test_m0_materialization_owner_reseals_source_drift_and_replays_exactly(
     assert replayed == resealed
     assert manifest_after.manifest_revision == manifest_before.manifest_revision + 1
     assert _tree_snapshot(committer._project_root) == tree_before_replay
+
+
+def test_m0_materialization_owner_reseals_exact_comfyui_runtime_repair(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path,
+        monkeypatch,
+    )
+    before = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    source_stack = before[1][0]
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    profile.update(
+        {
+            "seed_derivation": m0_qualification.RUNTIME_REPAIR_M0_SEED_RESEAL,
+            "fixed_seed_source_prepared_receipt_hash": before[0].content_hash,
+            "fixed_seed_source_execution_stack_hash": source_stack.execution_stack_hash,
+            "fixed_seed_source_profile_hash": source_stack.profile_hash,
+        }
+    )
+    comfyui = next(
+        item for item in profile["runtime_seals"] if item["name"] == "comfyui"
+    )
+    comfyui.update(
+        version="0.33.0+e01fb4c56b7a",
+        content_hash="9" * 64,
+    )
+    profile_path.write_text(
+        json.dumps(profile, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
+
+    resealed = materialize(
+        root=committer._project_root,
+        artifact_root=artifact_root,
+        profile_path=profile_path,
+        attempt_id="test-real-m0-runtime-repair-v2",
+        m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
+    )
+    after = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+
+    assert after[1][0].execution_stack_hash != source_stack.execution_stack_hash
+    assert tuple(item.name for item in after[1][0].runtime_seals) == tuple(
+        item.name for item in source_stack.runtime_seals
+    )
+    assert next(
+        item for item in after[1][0].runtime_seals if item.name == "comfyui"
+    ).version == "0.33.0+e01fb4c56b7a"
+    assert after[1][1] == before[1][1]
+    assert after[0].content_hash != before[0].content_hash
+    assert resealed["claims"]["provider_effects"] == 0
+    assert resealed["claims"]["video_generated"] is False
+
+    tree_before_replay = _tree_snapshot(committer._project_root)
+    replayed = materialize(
+        root=committer._project_root,
+        artifact_root=artifact_root,
+        profile_path=profile_path,
+        attempt_id="test-real-m0-runtime-repair-replay",
+        m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
+    )
+    assert replayed == resealed
+    assert _tree_snapshot(committer._project_root) == tree_before_replay
+
+
+@pytest.mark.parametrize(
+    ("candidate_label", "runtime_name"),
+    (
+        ("source", "comfyui"),
+        ("m1", "comfyui"),
+        ("m0", "minimax-h3-audio-t8"),
+        ("m0", "videohelpersuite"),
+    ),
+)
+def test_runtime_reseal_type_rejects_non_m0_or_non_comfyui_targets(
+    candidate_label: str,
+    runtime_name: str,
+) -> None:
+    source_seal = RuntimeSeal(
+        name=runtime_name,
+        version="source",
+        content_hash="1" * 64,
+    )
+    target_seal = RuntimeSeal(
+        name=runtime_name,
+        version="target",
+        content_hash="2" * 64,
+    )
+
+    with pytest.raises(ValidationError):
+        ExecutionStackRuntimeReseal(
+            candidate_label=candidate_label,
+            source_execution_stack_hash="3" * 64,
+            runtime_name=runtime_name,
+            source_seal=source_seal,
+            target_seal=target_seal,
+        )
+
+
+@pytest.mark.parametrize(
+    ("candidate_label", "runtime_name"),
+    (
+        ("source", "comfyui"),
+        ("m1", "comfyui"),
+        ("m0", "minimax-h3-audio-t8"),
+        ("m0", "videohelpersuite"),
+    ),
+)
+def test_runtime_reseal_writer_rejects_forged_non_m0_or_non_comfyui_targets(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    candidate_label: str,
+    runtime_name: str,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path,
+        monkeypatch,
+    )
+    before = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    m0_stack = before[1][0]
+    m0_sources = m0_qualification.load_m0_qualification_execution_sources(
+        profile_path=profile_path,
+        artifact_root=artifact_root,
+    )
+    source_seal = next(
+        item for item in m0_stack.runtime_seals if item.name == runtime_name
+    )
+    forged = ExecutionStackRuntimeReseal.model_construct(
+        candidate_label=candidate_label,
+        source_execution_stack_hash=m0_stack.execution_stack_hash,
+        runtime_name=runtime_name,
+        source_seal=source_seal,
+        target_seal=RuntimeSeal(
+            name=runtime_name,
+            version="forged-target",
+            content_hash="9" * 64,
+        ),
+    )
+    tree_before = _tree_snapshot(committer._project_root)
+    manifest = load_production_project(committer._project_root / "project.yaml").manifest
+
+    with pytest.raises(AiVideoError, match="M0 ComfyUI"):
+        committer.materialize_p0_qualification(
+            materializations=(m0_sources.materialization,),
+            runtime_reseals=(forged,),
+            expected_materialized_stack_hashes=(m0_stack.execution_stack_hash,),
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="test-forged-runtime-target",
+        )
+    assert _tree_snapshot(committer._project_root) == tree_before
+
+
+def test_runtime_reseal_writer_rejects_target_not_declared_by_profile(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path,
+        monkeypatch,
+    )
+    before = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    source_stack = committer.reopen_p0_qualification_source_stacks(
+        require_materialized=True
+    )[0]
+    m0_stack = before[1][0]
+    source_sources = source_stack_module.load_shot_continuity_source_execution_sources(
+        artifact_root=artifact_root,
+    )
+    m0_sources = m0_qualification.load_m0_qualification_execution_sources(
+        profile_path=profile_path,
+        artifact_root=artifact_root,
+    )
+    source_seal = next(
+        item for item in m0_stack.runtime_seals if item.name == "comfyui"
+    )
+    runtime_reseal = ExecutionStackRuntimeReseal(
+        candidate_label="m0",
+        source_execution_stack_hash=m0_stack.execution_stack_hash,
+        runtime_name="comfyui",
+        source_seal=source_seal,
+        target_seal=RuntimeSeal(
+            name="comfyui",
+            version="undeclared-target",
+            content_hash="9" * 64,
+        ),
+    )
+    tree_before = _tree_snapshot(committer._project_root)
+    manifest = load_production_project(committer._project_root / "project.yaml").manifest
+
+    with pytest.raises(AiVideoError, match="runtime seals"):
+        committer.materialize_p0_qualification(
+            materializations=(
+                source_sources.materialization,
+                m0_sources.materialization,
+            ),
+            runtime_reseals=(runtime_reseal,),
+            expected_materialized_stack_hashes=(
+                source_stack.execution_stack_hash,
+                m0_stack.execution_stack_hash,
+            ),
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="test-undeclared-runtime-target",
+        )
+    assert _tree_snapshot(committer._project_root) == tree_before
 
 
 def test_fast_m0_materialization_reopens_and_replays_exactly(

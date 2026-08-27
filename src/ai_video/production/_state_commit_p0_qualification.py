@@ -26,6 +26,7 @@ from ai_video.production.paths import (
 from ai_video.production.project import load_production_project
 from ai_video.production.video_execution_stack import (
     ExecutionStackMaterialization,
+    ExecutionStackRuntimeReseal,
     GenerationExecutionStackIdentity,
 )
 from ai_video.production.video_transition import (
@@ -71,10 +72,11 @@ def _reseal_model(
 def _reseal_materialized_stack(
     stack: GenerationExecutionStackIdentity,
     materialization: ExecutionStackMaterialization,
+    runtime_reseal: ExecutionStackRuntimeReseal | None = None,
 ) -> GenerationExecutionStackIdentity:
     if stack.materialization_status != "materialized":
         raise ValueError("P0 execution stack reseal requires a materialized stack")
-    if (
+    materialization_unchanged = (
         stack.profile_hash,
         stack.compiler_hash,
         stack.workflow_hash,
@@ -82,8 +84,27 @@ def _reseal_materialized_stack(
         materialization.profile_hash,
         materialization.compiler_hash,
         materialization.workflow_hash,
-    ):
+    )
+    if materialization_unchanged and runtime_reseal is None:
         return stack
+    runtime_seals = stack.runtime_seals
+    if runtime_reseal is not None:
+        if (
+            runtime_reseal.source_execution_stack_hash != stack.execution_stack_hash
+            or runtime_reseal.source_seal not in runtime_seals
+        ):
+            raise ValueError("P0 runtime reseal source identity changed")
+        runtime_seals = tuple(
+            sorted(
+                (
+                    runtime_reseal.target_seal
+                    if item == runtime_reseal.source_seal
+                    else item
+                    for item in runtime_seals
+                ),
+                key=lambda item: (item.name, item.version, item.content_hash),
+            )
+        )
     return GenerationExecutionStackIdentity.create(
         schema_version=stack.schema_version,
         status=stack.status,
@@ -100,7 +121,7 @@ def _reseal_materialized_stack(
         components=stack.components,
         sampler_identity=stack.sampler_identity,
         scheduler_identity=stack.scheduler_identity,
-        runtime_seals=stack.runtime_seals,
+        runtime_seals=runtime_seals,
         output_contract_hash=stack.output_contract_hash,
     )
 
@@ -375,6 +396,7 @@ class _StateCommitP0QualificationMixin:
         self,
         *,
         materializations: tuple[ExecutionStackMaterialization, ...],
+        runtime_reseals: tuple[ExecutionStackRuntimeReseal, ...] = (),
         expected_materialized_stack_hashes: tuple[str, ...] = (),
         expected_manifest_revision: int,
         attempt_id: str,
@@ -391,6 +413,24 @@ class _StateCommitP0QualificationMixin:
         if len(labels) != len(set(labels)):
             raise _state_invalid(
                 "P0 stack materialization candidate labels must be unique."
+            )
+        runtime_labels = tuple(item.candidate_label for item in runtime_reseals)
+        if any(
+            item.candidate_label != "m0" or item.runtime_name != "comfyui"
+            for item in runtime_reseals
+        ):
+            raise _state_invalid(
+                "P0 runtime reseal only supports the M0 ComfyUI runtime."
+            )
+        if len(runtime_labels) != len(set(runtime_labels)):
+            raise _state_invalid("P0 runtime reseal candidate labels must be unique.")
+        if any(label not in labels for label in runtime_labels):
+            raise _state_invalid(
+                "P0 runtime reseal must target a selected materialization."
+            )
+        if runtime_reseals and not expected_materialized_stack_hashes:
+            raise _state_invalid(
+                "P0 runtime reseal requires exact current materialized stack hashes."
             )
         if labels != tuple(
             label for label in ("source", "m0", "m1") if label in labels
@@ -422,6 +462,9 @@ class _StateCommitP0QualificationMixin:
             )
             materializations_by_label = {
                 item.candidate_label: item for item in materializations
+            }
+            runtime_reseals_by_label = {
+                item.candidate_label: item for item in runtime_reseals
             }
             if "source" in materializations_by_label and len(source_stacks) != 1:
                 raise _state_invalid(
@@ -479,6 +522,7 @@ class _StateCommitP0QualificationMixin:
                         _reseal_materialized_stack(
                             stack,
                             materializations_by_label[label],
+                            runtime_reseals_by_label.get(label),
                         )
                         if expected_materialized_stack_hashes
                         else stack.materialize(materializations_by_label[label])
@@ -487,6 +531,14 @@ class _StateCommitP0QualificationMixin:
                     else stack
                     for label, stack in labeled_stacks
                 }
+                if any(
+                    materializations_by_label[label].profile_runtime_seals()
+                    != materialized_by_label[label].runtime_seals
+                    for label in runtime_labels
+                ):
+                    raise ValueError(
+                        "materialized runtime seals do not match the exact profile source"
+                    )
             except ValueError as exc:
                 raise _state_invalid(
                     f"P0 execution stack materialization is invalid: {exc}"

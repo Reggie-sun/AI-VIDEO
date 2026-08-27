@@ -27,7 +27,7 @@ PROFILE_PATH = REPO_ROOT / (
     "workflows/qualification/"
     "minimax_h3_t8_c4_m0_fast_v1_profile.json"
 )
-QUALITY_COMPILER_SHA256 = "978d79cfa9d2e890f77a44dc20da3a66daed0197bcb10a5bc20983a1157bdb3f"
+QUALITY_COMPILER_SHA256 = "39d27ed38e93c445b8904f4e4712f2b5c2e233db8652b945d1d5abe495f98a2f"
 FROZEN_PROMPT = """For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced as the exact first frame; the ending frame aligns with <Picture 2>; <Picture 3> fully defines identity and wardrobe; <Video 1> supplies the opening gait phase and parallel camera velocity.
 
 integrated_multimodal_description: [Shot 1] Live-action, photorealistic cinematic medium right-facing side-profile shot on the same rain-soaked railway platform at blue hour. The exact same lone adult East Asian woman with a short blunt black bob, mustard-yellow hooded raincoat, black trousers, black boots and the same red cross-body leather satchel walks steadily screen-right toward the clock. A chest-height 50mm-equivalent camera tracks parallel with small amplitude at slow constant speed, keeping a level horizon and stable body scale. She preserves the supplied gait phase, decelerates naturally, and arrives at the exact approved last-frame pose. Exactly one person; no cut, zoom, axis reversal, teleport, text, logo, wardrobe change or unmotivated camera movement.
