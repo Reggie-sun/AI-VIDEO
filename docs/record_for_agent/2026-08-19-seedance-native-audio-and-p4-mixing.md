@@ -2,6 +2,18 @@
 
 Date: 2026-08-19
 
+## Supersession Notice — 2026-08-28
+
+下方 `Recommended Default Policy` 中“Production Seedance request 默认
+`native_audio=false` / `generate_audio=false`”的 blanket default 已被
+`docs/record_for_agent/2026-08-28-ecommerce-source-audio-gate-routing.md` 部分取代。
+
+Agent-controlled sequential generation 现在必须按逐 Shot `SourceAudioPolicy` 分流：
+`GENERATED + KEEP/TRIM_THEN_MIX` 要求 `native_audio=true`，Seedance 对应
+`generate_audio=true`；Capability 或 exact request 不匹配时 submit 前 STOP，不得静音降级。
+本记录关于最终 P4 仍静音 visual MP4、generated-audio extraction 尚未实现、不得 direct mux 或建立
+第二 timeline 的边界继续有效。
+
 ## Purpose
 
 本文记录 Seedance 视频内嵌音频与当前 P4 audio/composition runtime 的真实边界，供后续 Agent 在继续 Provider、composition、audio 或 renderer 工作时复用。
@@ -115,7 +127,7 @@ Seedance native audio 最有价值的潜在用途是与画面天然同步的 amb
 - loudness metadata 当前不会自动驱动 LUFS normalization。
 - 多轨相加超幅后使用 PCM16 clamp，不是完整 true-peak limiter/mastering chain。
 
-## Recommended Default Policy
+## Historical Recommended Default Policy (Partially Superseded)
 
 在 native-audio extraction slice 落地前：
 

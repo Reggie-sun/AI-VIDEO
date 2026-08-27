@@ -2,6 +2,14 @@
 
 Date: 2026-08-28
 
+## Follow-up Notice — Source-Audio Gate Corrected
+
+本记录的 exact output、`generate_audio=false` request、visual verdict与费用边界保持历史有效；但它不再
+代表下一次 Seedance complete-ad generation 的默认 audio route。根据
+`docs/record_for_agent/2026-08-28-ecommerce-source-audio-gate-routing.md`，若当前 Shot 声明
+`GENERATED + KEEP/TRIM_THEN_MIX`，下次 request 必须使用 `native_audio=true` / Seedance
+`generate_audio=true`，并在 raw-MP4 Gate 检查同步声音。P4 最终 ingestion 仍是独立未实现能力。
+
 ## Purpose
 
 本文记录用户要求“生成完整广告，这次用 Seedance Mini”后的 single-submit development experiment。
