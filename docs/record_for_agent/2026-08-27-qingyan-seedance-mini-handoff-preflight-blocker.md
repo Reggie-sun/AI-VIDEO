@@ -1,12 +1,12 @@
-# Qingyan Seedance Mini Handoff Live Rejection Record
+# Qingyan Seedance Mini Illustrated Handoff Experiment Record
 
 Date: 2026-08-27
 
 ## Purpose
 
-本文记录用户否决 v12 后，为缺失的“老人推荐产品并交给苗家少女”因果桥设计的一次 Seedance Mini 单 Shot 实验，以及唯一一次 remote submit 的 known-no-effect rejection。
+本文记录用户否决 v12 后，为缺失的“老人推荐产品并交给苗家少女”因果桥设计的 Seedance Mini 单 Shot 实验：两次 remote safety rejection，以及用户选择 `B` 后使用 clearly illustrated reference 获得的一个 exact MP4 和逐 requirement Gate 结果。
 
-本记录是 development experiment failure evidence，不是 Provider 成功、生成视频、Production candidate、P6、Final Acceptance 或 v12 修复完成的证据。
+本记录包含一次 Provider fetch 成功，但仍只是 development experiment evidence，不是 Production candidate、P6、Final Acceptance 或 v12 修复完成的证据。
 
 ## Human Verdict And Problem Boundary
 
@@ -181,26 +181,78 @@ runs/qingyan-seedance-mini-elder-handoff-20260827-002/evidence/provider-error.js
 
 第二次 canonical outcome 同样为 `paid_provider_known_no_effect`：`external_effect_id=null`、实际费用 `0 CNY`、无 task ID、poll、fetch、MP4、activation、retry、permit remint 或 fallback。该 permit 已消费。不得继续提交相同或其他 photorealistic character bytes 试探 classifier。
 
+## Third Authorized Illustrated Experiment
+
+用户选择 route `B`：不伪造真人 consent，也不继续试探 photorealistic classifier，而是先把同一双人交接首帧改为明显的手绘二维插画，再进行一次 Seedance Mini 视觉动作实验。
+
+使用 built-in `image_gen` 以 run 002 的双人构图和 run 001 的黄色产品 crop 为输入，生成并人工检查了 clearly illustrated reference：
+
+```text
+runs/qingyan-seedance-mini-elder-handoff-20260827-003/references/01-illustrated-elder-holds-product.png
+SHA-256: b211bb0cc2c46b9f2296a2fb647cba1f4d737068fef9d9d598769630f94b5152
+geometry: 950x1655
+```
+
+reference 中恰好两位虚构插画角色；开头只有深蓝服饰老人持有唯一一瓶带盖黄色产品，白衣少女双手空着。machine-readable provenance 位于：
+
+```text
+runs/qingyan-seedance-mini-elder-handoff-20260827-003/source-evidence.json
+```
+
+第三次 request 保持单变量、单提交边界：
+
+- model: `doubao-seedance-2-0-mini-260615`
+- mode: `REFERENCE_TO_VIDEO`
+- one clearly illustrated reference
+- `480p`, `9:16`, `5s`, `generate_audio=false`
+- prompt lint: `PASS`, `161` words
+- estimated cost upper bound: `1.155060 CNY`；task ceiling: `3 CNY`
+- exactly one POST；无 retry、fallback、variant、permit remint 或 activation
+
+Provider 接受任务并在第 `9` 次状态查询后成功返回，runtime 只执行一次 download。exact output：
+
+```text
+runs/qingyan-seedance-mini-elder-handoff-20260827-003/output/seedance-mini-handoff.mp4
+SHA-256: 3b143e6311006d3540d78d2b5b286df246cc8f83b78b5f8ce5c671a0a944824a
+size: 1881828 bytes
+probe: 5.042s, 496x864, 24fps, H.264 High, 121 frames, no audio stream
+```
+
+`1.155060 CNY` 是预提交上界，不是 Provider invoice 或已确认实际扣费。live counters 与 sanitized request evidence 位于：
+
+```text
+runs/qingyan-seedance-mini-elder-handoff-20260827-003/evidence/live-report.json
+```
+
 ## Post-Media Gate
 
-本次没有得到 MP4，因此没有调用 `video-analysis` MCP，所有媒体 requirements 保持 `NOT_EVALUATED`。若未来另有明确授权的新 submit 得到 exact MP4，必须先绑定其 SHA-256 并立即调用 project-local `video-analysis` MCP。以下 requirements 全部为 `PASS` 才能结束实验：
+exact MP4 落盘后已立即调用 project-local `video-analysis` MCP；`video_analyze` 和 `video_review` 均绑定上述 absolute path，使用 `0.5s` sampling、最多 `12` 帧、scene threshold `0.4`。MCP 报告：单一 scene、无 cut、无音轨；随后基于 exact bytes 生成 contact sheet 进行逐帧人工检查。
 
-1. `IDENTITY_AND_COUNT`
-2. `INITIAL_OWNERSHIP`
-3. `DIALOGUE_AND_SPEAKER`
-4. `HANDOFF_CAUSALITY`
-5. `END_OWNERSHIP`
-6. `NO_PREMATURE_TREATMENT`
-7. `CAMERA_CONTINUITY`
+| Requirement | Verdict | Evidence summary |
+| --- | --- | --- |
+| `IDENTITY_AND_COUNT` | `PASS` | 始终只有同一两位插画角色，服饰、发型与银饰可接受。 |
+| `INITIAL_OWNERSHIP` | `PASS` | 开头只有深蓝服饰老人持瓶，白衣少女双手空着。 |
+| `DIALOGUE_AND_SPEAKER` | `FAIL` | 原 Shot Contract 要求老人只说一次推荐语；exact MP4 没有音轨，视觉口型与手势不能替代对白。 |
+| `HANDOFF_CAUSALITY` | `PASS` | 推荐姿态、递出、共同接触、少女接住、老人松手的顺序清楚。 |
+| `END_OWNERSHIP` | `PASS` | 结尾只有白衣少女在胸前持有带盖产品。 |
+| `NO_PREMATURE_TREATMENT` | `PASS` | 没有开盖、喷洒、湿润或效果展示。 |
+| `CAMERA_CONTINUITY` | `PASS` | 单一稳定 medium two-shot，无推拉摇移、切镜或转场。 |
 
-任何 `FAIL` 或 `NOT_EVALUATED` 都立即停止；不得自动重试、生成 variant、插入 v12 或升级成 quality acceptance。
+overall Gate 为 `FAIL`。视觉因果桥本身成立，但不能把无音轨结果描述成完整通过；而且本实验为绕开 remote classifier 故意采用插画风，`STYLE_COMPATIBILITY` 对直接插入 photorealistic v12 同样为 `FAIL`。完整 evidence：
+
+```text
+runs/qingyan-seedance-mini-elder-handoff-20260827-003/evidence/post-media-gate.md
+runs/qingyan-seedance-mini-elder-handoff-20260827-003/evidence/handoff-contact-sheet.png
+```
+
+因此当前停止：没有自动重试、下一次 Provider submit、composition change、v12 插入、Production activation、P6 或 Final Acceptance。
 
 ## Remaining Risks
 
-1. 当前没有 Provider MP4，因此还无法判断双人 identity、手部交接、产品一致性、中文对白和口型是否满足要求。
-2. 两次 permit 均已消费且均为 known-no-effect；第二次已确认是 remote real-person classifier rejection。任何新 submit、风格化 reference 或 Provider 变化都是新 scope，必须获得新的明确 authorization。
-3. 即使未来单 Shot PASS，也只证明桥接镜头本身；首 Shot 问题建立、后续喷雾/效果因果、`11s` / `22s` 节奏与最终收口仍需独立 human review gates。
-4. Seedance native audio 是否进入最终 composition 受现有 P4 contract 限制；raw MP4 有音轨不等于最终成片采用该音轨。
+1. 已有 Provider MP4 证明插画风下的双人交接动作可成立，但无音轨使原 `DIALOGUE_AND_SPEAKER` contract 明确失败。
+2. 插画风与 photorealistic v12 不兼容；这条视频只能作为动作与镜头语言 evidence，不能直接拼入成片。
+3. 前两次 permit 均为 known-no-effect；第三次 permit 已消费并返回 MP4。任何新 submit、音频版本、写实风恢复或 Provider 变化都是新 scope，必须获得新的明确 authorization。
+4. 即使未来桥接 Shot 全部 PASS，也只证明桥接镜头本身；首 Shot 问题建立、后续喷雾/效果因果、`11s` / `22s` 节奏与最终收口仍需独立 human review gates。
 5. run evidence 为 local generated/untracked runtime artifact；本记录 commit 不会把它变成 Production state、remote publication 或 release truth。
 
 ## Agent Guardrails
