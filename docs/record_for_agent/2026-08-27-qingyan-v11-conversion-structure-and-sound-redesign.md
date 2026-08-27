@@ -2,6 +2,16 @@
 
 Date: 2026-08-27
 
+> Superseded current-facing preview (2026-08-27): a later user request explicitly returned to
+> the v10 narrative and required `problem -> elder recommends -> girl sprays -> result`, audible
+> problem setup, stable motion through `11s`, no cut at `22s`, one moving close and no repeated
+> slogan. The replacement local development preview is v12, recorded in
+> `docs/record_for_agent/2026-08-27-qingyan-v12-causal-recut-and-single-close.md`; exact primary
+> SHA-256 is `94c6b7fc92202f6c7e979bb94b31ecd58aab40e3652113f1e78d66c3535a16a4`.
+> V11's measurements and authoring evidence remain valid historical evidence, but v11 is no
+> longer the current-facing preview. V12 human full-speed watch/listen, P6, Final Acceptance and
+> publication remain pending or out of scope.
+
 ## Purpose
 
 本文记录用户完整观看 v10 后给出的 conversion-oriented human review，以及据此完成的 v11 本地

@@ -2,6 +2,15 @@
 
 Date: 2026-08-26
 
+> Latest current-facing replacement (2026-08-27): the user required a v10-based causal recut in
+> which the elder recommends before the girl sprays, the opening establishes an audible problem,
+> `11s` and `22s` remain inside continuous Shots, and the two static closing cards plus repeated
+> slogan are retired. V12 is recorded in
+> `docs/record_for_agent/2026-08-27-qingyan-v12-causal-recut-and-single-close.md`; exact primary
+> SHA-256 is `94c6b7fc92202f6c7e979bb94b31ecd58aab40e3652113f1e78d66c3535a16a4`.
+> V10 generation and technical Gate remain historical evidence; v12 human full-speed
+> watch/listen, P6, Final Acceptance and publication remain pending or out of scope.
+
 > Superseded current-facing delivery (2026-08-27): the user completed a full v10
 > watch/listen and rejected its conversion structure, product-use credibility, opening density
 > and audio dynamics. V10's exact local-generation and technical evidence below remains valid
