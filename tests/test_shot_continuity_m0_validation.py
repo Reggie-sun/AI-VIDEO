@@ -546,6 +546,7 @@ def test_m0_materialization_owner_reseals_exact_comfyui_runtime_repair(
         profile_path=profile_path,
         attempt_id="test-real-m0-runtime-repair-v2",
         m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
+        comfyui_revision="e01fb4c56b7a88149d469b99cbbfe3223d715054",
     )
     after = committer.reopen_p0_qualification_prepared(
         required_materialized_candidates=("m0",)
@@ -558,6 +559,11 @@ def test_m0_materialization_owner_reseals_exact_comfyui_runtime_repair(
     assert next(
         item for item in after[1][0].runtime_seals if item.name == "comfyui"
     ).version == "0.33.0+e01fb4c56b7a"
+    inventory = next(item for item in after[4] if item.input_kind == "inventory")
+    assert (
+        inventory.payload["comfyui"]["commit"]
+        == "e01fb4c56b7a88149d469b99cbbfe3223d715054"
+    )
     assert after[1][1] == before[1][1]
     assert after[0].content_hash != before[0].content_hash
     assert resealed["claims"]["provider_effects"] == 0
@@ -570,6 +576,7 @@ def test_m0_materialization_owner_reseals_exact_comfyui_runtime_repair(
         profile_path=profile_path,
         attempt_id="test-real-m0-runtime-repair-replay",
         m0_policy_id=M0ValidationPolicyId.QUALITY_V1,
+        comfyui_revision="e01fb4c56b7a88149d469b99cbbfe3223d715054",
     )
     assert replayed == resealed
     assert _tree_snapshot(committer._project_root) == tree_before_replay
@@ -606,6 +613,39 @@ def test_runtime_reseal_type_rejects_non_m0_or_non_comfyui_targets(
             runtime_name=runtime_name,
             source_seal=source_seal,
             target_seal=target_seal,
+            source_revision="1" * 40,
+            target_revision="2" * 40,
+        )
+
+
+def test_runtime_inventory_only_repair_requires_stale_source_and_exact_target() -> None:
+    seal = RuntimeSeal(
+        name="comfyui",
+        version="0.33.0+e01fb4c56b7a",
+        content_hash="9" * 64,
+    )
+    repair = ExecutionStackRuntimeReseal(
+        mode="inventory-only-repair",
+        candidate_label="m0",
+        source_execution_stack_hash="3" * 64,
+        runtime_name="comfyui",
+        source_seal=seal,
+        target_seal=seal,
+        source_revision="7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+        target_revision="e01fb4c56b7a88149d469b99cbbfe3223d715054",
+    )
+    assert repair.target_revision.startswith(seal.version.rsplit("+", 1)[-1])
+
+    with pytest.raises(ValidationError, match="stale source"):
+        ExecutionStackRuntimeReseal(
+            mode="inventory-only-repair",
+            candidate_label="m0",
+            source_execution_stack_hash="3" * 64,
+            runtime_name="comfyui",
+            source_seal=seal,
+            target_seal=seal,
+            source_revision="e01fb4c56b7a88149d469b99cbbfe3223d715054",
+            target_revision="e01fb4c56b7affffffffffffffffffffffffffff",
         )
 
 
@@ -664,6 +704,126 @@ def test_runtime_reseal_writer_rejects_forged_non_m0_or_non_comfyui_targets(
     assert _tree_snapshot(committer._project_root) == tree_before
 
 
+@pytest.mark.parametrize("case", ("arbitrary-target-revision", "mismatched-seal"))
+def test_runtime_reseal_writer_revalidates_forged_inventory_only_contract(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    case: str,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path,
+        monkeypatch,
+    )
+    before = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    m0_stack = before[1][0]
+    m0_sources = m0_qualification.load_m0_qualification_execution_sources(
+        profile_path=profile_path,
+        artifact_root=artifact_root,
+    )
+    source_seal = next(
+        item for item in m0_stack.runtime_seals if item.name == "comfyui"
+    )
+    target_seal = (
+        source_seal
+        if case == "arbitrary-target-revision"
+        else RuntimeSeal(
+            name="comfyui",
+            version="0.33.0+e01fb4c56b7a",
+            content_hash="9" * 64,
+        )
+    )
+    forged = ExecutionStackRuntimeReseal.model_construct(
+        mode="inventory-only-repair",
+        candidate_label="m0",
+        source_execution_stack_hash=m0_stack.execution_stack_hash,
+        runtime_name="comfyui",
+        source_seal=source_seal,
+        target_seal=target_seal,
+        source_revision="7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+        target_revision=(
+            "f" * 40
+            if case == "arbitrary-target-revision"
+            else "e01fb4c56b7a88149d469b99cbbfe3223d715054"
+        ),
+    )
+    tree_before = _tree_snapshot(committer._project_root)
+    manifest = load_production_project(committer._project_root / "project.yaml").manifest
+
+    with pytest.raises(AiVideoError, match="runtime reseal contract"):
+        committer.materialize_p0_qualification(
+            materializations=(m0_sources.materialization,),
+            runtime_reseals=(forged,),
+            expected_materialized_stack_hashes=(m0_stack.execution_stack_hash,),
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="test-forged-inventory-only-contract",
+        )
+    assert _tree_snapshot(committer._project_root) == tree_before
+
+
+def test_runtime_reseal_writer_rejects_inventory_source_revision_drift_zero_write(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    committer, profile_path, artifact_root = _real_materialized_committer(
+        tmp_path,
+        monkeypatch,
+    )
+    before = committer.reopen_p0_qualification_prepared(
+        required_materialized_candidates=("m0",)
+    )
+    m0_stack = before[1][0]
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    profile.update(
+        {
+            "seed_derivation": m0_qualification.RUNTIME_REPAIR_M0_SEED_RESEAL,
+            "fixed_seed_source_prepared_receipt_hash": before[0].content_hash,
+            "fixed_seed_source_execution_stack_hash": m0_stack.execution_stack_hash,
+            "fixed_seed_source_profile_hash": m0_stack.profile_hash,
+        }
+    )
+    target_seal = next(
+        item for item in profile["runtime_seals"] if item["name"] == "comfyui"
+    )
+    target_seal.update(
+        version="0.33.0+e01fb4c56b7a",
+        content_hash="9" * 64,
+    )
+    profile_path.write_text(
+        json.dumps(profile, ensure_ascii=False, sort_keys=True),
+        encoding="utf-8",
+    )
+    m0_sources = m0_qualification.load_m0_qualification_execution_sources(
+        profile_path=profile_path,
+        artifact_root=artifact_root,
+    )
+    source_seal = next(
+        item for item in m0_stack.runtime_seals if item.name == "comfyui"
+    )
+    runtime_reseal = ExecutionStackRuntimeReseal(
+        candidate_label="m0",
+        source_execution_stack_hash=m0_stack.execution_stack_hash,
+        runtime_name="comfyui",
+        source_seal=source_seal,
+        target_seal=m0_sources.profile.runtime_seals[0],
+        source_revision="7cee3ceb1a35ffffffffffffffffffffffffffff",
+        target_revision="e01fb4c56b7a88149d469b99cbbfe3223d715054",
+    )
+    tree_before = _tree_snapshot(committer._project_root)
+    manifest = load_production_project(committer._project_root / "project.yaml").manifest
+
+    with pytest.raises(AiVideoError, match="runtime inventory reseal"):
+        committer.materialize_p0_qualification(
+            materializations=(m0_sources.materialization,),
+            runtime_reseals=(runtime_reseal,),
+            expected_materialized_stack_hashes=(m0_stack.execution_stack_hash,),
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="test-runtime-inventory-source-drift",
+        )
+    assert _tree_snapshot(committer._project_root) == tree_before
+
+
 def test_runtime_reseal_writer_rejects_target_not_declared_by_profile(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -696,9 +856,11 @@ def test_runtime_reseal_writer_rejects_target_not_declared_by_profile(
         source_seal=source_seal,
         target_seal=RuntimeSeal(
             name="comfyui",
-            version="undeclared-target",
+            version="0.33.0+e01fb4c56b7a",
             content_hash="9" * 64,
         ),
+        source_revision="7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+        target_revision="e01fb4c56b7a88149d469b99cbbfe3223d715054",
     )
     tree_before = _tree_snapshot(committer._project_root)
     manifest = load_production_project(committer._project_root / "project.yaml").manifest

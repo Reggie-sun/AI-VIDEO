@@ -51,11 +51,16 @@ class RuntimeSeal(_ExecutionStackModel):
 class ExecutionStackRuntimeReseal(_ExecutionStackModel):
     """One exact runtime identity replacement for a materialized stack reseal."""
 
+    mode: Literal["stack-and-inventory", "inventory-only-repair"] = (
+        "stack-and-inventory"
+    )
     candidate_label: Literal["m0"]
     source_execution_stack_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     runtime_name: Literal["comfyui"]
     source_seal: RuntimeSeal
     target_seal: RuntimeSeal
+    source_revision: str = Field(pattern=r"^[0-9a-f]{40}$")
+    target_revision: str = Field(pattern=r"^[0-9a-f]{40}$")
 
     @model_validator(mode="after")
     def _validate_exact_replacement(self) -> "ExecutionStackRuntimeReseal":
@@ -64,11 +69,26 @@ class ExecutionStackRuntimeReseal(_ExecutionStackModel):
             or self.target_seal.name != self.runtime_name
         ):
             raise ValueError("runtime reseal names must match the selected runtime")
-        if (
-            self.source_seal.version == self.target_seal.version
-            or self.source_seal.content_hash == self.target_seal.content_hash
-        ):
-            raise ValueError("runtime reseal must replace both version and content identity")
+        target_suffix = self.target_seal.version.rsplit("+", 1)[-1]
+        if not target_suffix or not self.target_revision.startswith(target_suffix):
+            raise ValueError("runtime reseal target revision must match the target seal")
+        if self.source_revision == self.target_revision:
+            raise ValueError("runtime reseal must replace the inventory revision")
+        if self.mode == "stack-and-inventory":
+            source_suffix = self.source_seal.version.rsplit("+", 1)[-1]
+            if not source_suffix or not self.source_revision.startswith(source_suffix):
+                raise ValueError("runtime reseal source revision must match the source seal")
+            if (
+                self.source_seal.version == self.target_seal.version
+                or self.source_seal.content_hash == self.target_seal.content_hash
+            ):
+                raise ValueError(
+                    "runtime reseal must replace both version and content identity"
+                )
+        elif self.source_seal != self.target_seal:
+            raise ValueError("inventory-only repair cannot replace the runtime seal")
+        elif self.source_revision.startswith(target_suffix):
+            raise ValueError("inventory-only repair requires a stale source revision")
         return self
 
 

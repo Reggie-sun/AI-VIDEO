@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 from pathlib import Path
 from typing import Literal, TypeVar
@@ -124,6 +125,27 @@ def _reseal_materialized_stack(
         runtime_seals=runtime_seals,
         output_contract_hash=stack.output_contract_hash,
     )
+
+
+def _reseal_runtime_inventory(
+    payload: dict[str, object],
+    runtime_reseal: ExecutionStackRuntimeReseal,
+) -> dict[str, object]:
+    """CAS-replace the one inventory revision owned by an M0 runtime reseal."""
+
+    updated = copy.deepcopy(payload)
+    try:
+        runtime = updated["comfyui"]
+        if (
+            not isinstance(runtime, dict)
+            or runtime.get("commit") != runtime_reseal.source_revision
+        ):
+            raise ValueError("P0 runtime inventory source revision changed")
+        runtime["commit"] = runtime_reseal.target_revision
+        runtime["version"] = runtime_reseal.target_seal.version.split("+", 1)[0]
+    except (KeyError, TypeError) as exc:
+        raise ValueError("P0 runtime inventory is invalid") from exc
+    return updated
 
 
 class _StateCommitP0QualificationMixin:
@@ -422,6 +444,15 @@ class _StateCommitP0QualificationMixin:
             raise _state_invalid(
                 "P0 runtime reseal only supports the M0 ComfyUI runtime."
             )
+        try:
+            runtime_reseals = tuple(
+                ExecutionStackRuntimeReseal.model_validate(
+                    item.model_dump(mode="python")
+                )
+                for item in runtime_reseals
+            )
+        except (AttributeError, ValidationError) as exc:
+            raise _state_invalid("P0 runtime reseal contract is invalid.", str(exc)) from exc
         if len(runtime_labels) != len(set(runtime_labels)):
             raise _state_invalid("P0 runtime reseal candidate labels must be unique.")
         if any(label not in labels for label in runtime_labels):
@@ -575,15 +606,29 @@ class _StateCommitP0QualificationMixin:
                     strict=True,
                 )
             )
-            materialized_inputs = tuple(
-                P0QualificationInput.create(
-                    **{
-                        **item.model_dump(mode="python"),
-                        "execution_stack_hashes": stack_hashes,
-                    }
+            try:
+                materialized_inputs = tuple(
+                    P0QualificationInput.create(
+                        **{
+                            **item.model_dump(mode="python"),
+                            "payload": (
+                                _reseal_runtime_inventory(
+                                    item.payload,
+                                    runtime_reseals_by_label["m0"],
+                                )
+                                if item.input_kind == "inventory"
+                                and "m0" in runtime_reseals_by_label
+                                else item.payload
+                            ),
+                            "execution_stack_hashes": stack_hashes,
+                        }
+                    )
+                    for item in inputs
                 )
-                for item in inputs
-            )
+            except (TypeError, ValueError) as exc:
+                raise _state_invalid(
+                    "P0 runtime inventory reseal is invalid.", str(exc)
+                ) from exc
             input_hashes = {
                 item.input_kind: item.content_hash for item in materialized_inputs
             }

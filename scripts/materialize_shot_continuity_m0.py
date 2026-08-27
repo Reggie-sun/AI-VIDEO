@@ -98,6 +98,7 @@ def materialize(
     profile_path: Path | None,
     attempt_id: str,
     m0_policy_id: M0ValidationPolicyId,
+    comfyui_revision: str | None = None,
 ) -> dict[str, object]:
     selected_policy = M0ValidationPolicyId(m0_policy_id)
     project_root = root.resolve(strict=True)
@@ -228,14 +229,31 @@ def materialize(
         target_seal = next(
             item for item in m0_sources.profile.runtime_seals if item.name == "comfyui"
         )
-        if source_seal != target_seal:
+        inventory = next(
+            item for item in before[4] if item.input_kind == "inventory"
+        ).payload
+        source_revision = inventory["comfyui"]["commit"]
+        if (
+            not isinstance(comfyui_revision, str)
+            or len(comfyui_revision) != 40
+            or any(character not in "0123456789abcdef" for character in comfyui_revision)
+        ):
+            raise ValueError("M0 runtime repair requires an exact ComfyUI revision")
+        if source_seal != target_seal or source_revision != comfyui_revision:
             runtime_reseals = (
                 ExecutionStackRuntimeReseal(
+                    mode=(
+                        "stack-and-inventory"
+                        if source_seal != target_seal
+                        else "inventory-only-repair"
+                    ),
                     candidate_label="m0",
                     source_execution_stack_hash=current_m0.execution_stack_hash,
                     runtime_name="comfyui",
                     source_seal=source_seal,
                     target_seal=target_seal,
+                    source_revision=source_revision,
+                    target_revision=comfyui_revision,
                 ),
             )
     committed = writer.materialize_p0_qualification(
@@ -322,6 +340,7 @@ def _parser() -> argparse.ArgumentParser:
         "--attempt-id",
         default="rainy-station-m0-execution-stack-materialization-v1",
     )
+    parser.add_argument("--comfyui-revision")
     return parser
 
 
@@ -335,6 +354,7 @@ def main() -> int:
                 profile_path=args.profile,
                 attempt_id=args.attempt_id,
                 m0_policy_id=args.m0_policy,
+                comfyui_revision=args.comfyui_revision,
             ),
             ensure_ascii=False,
             sort_keys=True,
