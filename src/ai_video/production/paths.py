@@ -469,6 +469,20 @@ def canonical_full_source_motion_analysis_receipt_path(content_hash: str) -> Pat
     )
 
 
+def canonical_terminal_motion_tail_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/terminal-motion-tails/"
+        f"{_require_sha256(content_hash, 'terminal motion-tail receipt hash')}.json"
+    )
+
+
+def canonical_motion_tail_window_analysis_receipt_path(content_hash: str) -> Path:
+    return Path(
+        "state/video-generation/motion-tail-window-analysis/"
+        f"{_require_sha256(content_hash, 'motion-tail window analysis hash')}.json"
+    )
+
+
 def canonical_m0_endpoint_feasibility_approval_path(content_hash: str) -> Path:
     return Path(
         "state/video-generation/m0-endpoint-feasibility/"

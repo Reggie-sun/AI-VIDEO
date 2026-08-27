@@ -14,8 +14,8 @@ from typing import Any
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import AssetType
 from ai_video.production.project import load_production_project
-from ai_video.production.shot_continuity_motion_tail import (
-    validate_full_source_motion_tail,
+from ai_video.production.shot_continuity_m0_motion_tail import (
+    validate_m0_motion_tail,
 )
 from ai_video.production.video_transition import (
     ContinuityAnchorBinding,
@@ -105,8 +105,9 @@ def reprepare_m0_qualification(
         raise _invalid("M0 reprepare base Manifest revision changed.")
     existing_pointer = manifest.active_p0_qualification_prepared
     registry_by_id = {asset.asset_id: asset for asset in loaded.registry.assets}
+    motion_tail_asset = registry_by_id.get(motion_tail_anchor.asset_id)
     try:
-        tail_receipt = validate_full_source_motion_tail(
+        tail_receipt = validate_m0_motion_tail(
             committer.project_root, loaded, motion_tail_anchor.asset_id
         )
     except AiVideoError as exc:
@@ -115,7 +116,8 @@ def reprepare_m0_qualification(
     if (
         tail_receipt.content_hash != motion_tail_anchor.evidence_fingerprint
         or tail_receipt.content_hash != motion_tail_anchor.materialization_receipt_id
-        or tail_receipt.source_video_sha256 != motion_tail_anchor.asset_sha256
+        or motion_tail_asset is None
+        or motion_tail_asset.sha256 != motion_tail_anchor.asset_sha256
         or terminal.extracted_asset_id != terminal_anchor.asset_id
         or terminal.extracted_sha256 != terminal_anchor.asset_sha256
         or terminal.extraction_receipt_id != terminal_anchor.evidence_fingerprint

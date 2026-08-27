@@ -5,8 +5,8 @@ from ai_video.production.shot_continuity_m0_reprepare import (
     RegisteredContinuityAnchor,
     reprepare_m0_qualification,
 )
-from ai_video.production.shot_continuity_motion_tail import (
-    prepare_full_source_motion_tail_commit,
+from ai_video.production.shot_continuity_terminal_motion_tail import (
+    prepare_terminal_motion_tail_commit,
 )
 from ai_video.production.video_transition import ContinuityAnchorRole
 
@@ -32,7 +32,6 @@ def test_reprepare_binds_current_registry_and_exact_source_derivations(
 ) -> None:
     from test_shot_continuity_motion_tail import (
         _accepted_source,
-        _motion_analysis,
     )
 
     root, committer, source_attempt_id, loaded = _accepted_source(tmp_path)
@@ -46,18 +45,13 @@ def test_reprepare_binds_current_registry_and_exact_source_derivations(
     terminal = committer._reopen_terminal_frame_evidence(
         source_state.terminal_frame_evidence
     )
-    source_asset = next(
-        item
-        for item in loaded.registry.assets
-        if item.asset_id == terminal.source_video_asset_id
-    )
     terminal_asset = next(
         item
         for item in loaded.registry.assets
         if item.asset_id == terminal.extracted_asset_id
     )
     target = next(item for item in loaded.shots if item.shot_id == "rainy-station-4")
-    prepared_tail = prepare_full_source_motion_tail_commit(
+    prepared_tail = prepare_terminal_motion_tail_commit(
         project_root=root,
         committer=committer,
         project=loaded,
@@ -68,9 +62,8 @@ def test_reprepare_binds_current_registry_and_exact_source_derivations(
         target_shot_revision=target.revision,
         target_shot_content_hash=target.content_hash,
         continuity_constraint_snapshot_hash="c" * 64,
-        provider_min_duration_milliseconds=1_000,
-        provider_max_duration_milliseconds=10_000,
-        motion_analysis=_motion_analysis(root, source_asset),
+        provider_min_duration_milliseconds=2_000,
+        provider_max_duration_milliseconds=15_000,
     )
     assert prepared_tail.commit_request is not None
     committer.commit(prepared_tail.commit_request)

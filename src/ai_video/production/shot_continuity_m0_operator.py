@@ -38,11 +38,13 @@ from ai_video.production.shot_continuity_m0_policy import (
     M0ValidationPolicyId,
 )
 from ai_video.production.shot_continuity_m0_qualification import (
+    M0_REFERENCE_VIDEO_MAX_DURATION_MILLISECONDS,
+    M0_REFERENCE_VIDEO_MIN_DURATION_MILLISECONDS,
     M0QualificationExecutionSources,
     load_m0_qualification_execution_sources,
 )
-from ai_video.production.shot_continuity_motion_tail import (
-    validate_full_source_motion_tail,
+from ai_video.production.shot_continuity_m0_motion_tail import (
+    validate_m0_motion_tail,
 )
 from ai_video.production.shot_continuity_source_runtime import (
     make_source_production_committer,
@@ -148,7 +150,7 @@ def build_m0_quality_request(
 
     if hashlib.sha256(prompt.encode("utf-8")).hexdigest() != profile.prompt_sha256:
         raise _invalid("M0 prompt does not match the sealed quality profile.")
-    receipt = validate_full_source_motion_tail(
+    receipt = validate_m0_motion_tail(
         project.root,
         project,
         motion_tail_asset_id,
@@ -458,8 +460,8 @@ def build_m0_quality_request(
                 max_count=1,
                 allowed_mime_types=("video/mp4",),
                 max_size_bytes=tail.extracted_size_bytes,
-                min_duration_millis=receipt.provider_min_duration_milliseconds,
-                max_duration_millis=receipt.provider_max_duration_milliseconds,
+                min_duration_millis=M0_REFERENCE_VIDEO_MIN_DURATION_MILLISECONDS,
+                max_duration_millis=M0_REFERENCE_VIDEO_MAX_DURATION_MILLISECONDS,
             ),
         ),
         negative_prompt_supported=False,
@@ -548,7 +550,8 @@ def _runtime_revisions(inputs: tuple[Any, ...]) -> tuple[tuple[str, str], ...]:
 
 def _accepted_upstream_reopener(root: Path, committer: Any):
     def reopen(*, project, source_video_asset_id: str, motion_tail_asset_id: str):
-        receipt = validate_full_source_motion_tail(root, project, motion_tail_asset_id)
+        receipt = validate_m0_motion_tail(root, project, motion_tail_asset_id)
+        tail_asset = _asset(project, receipt.tail_asset_id)
         source_stacks = committer.reopen_p0_qualification_source_stacks(
             require_materialized=True
         )
@@ -579,7 +582,7 @@ def _accepted_upstream_reopener(root: Path, committer: Any):
             motion_tail_materialization_receipt_id=receipt.content_hash,
             motion_tail_materialization_receipt_sha256=receipt.content_hash,
             motion_tail_asset_id=receipt.tail_asset_id,
-            motion_tail_asset_sha256=receipt.source_video_sha256,
+            motion_tail_asset_sha256=tail_asset.sha256,
         )
 
     return reopen

@@ -115,10 +115,68 @@ class FullSourceMotionAnalysisReceipt(_AnalysisStrictModel):
         return cls.model_validate(data)
 
 
+class MotionTailWindowAnalysisReceipt(_AnalysisStrictModel):
+    """Exact signalstats evidence for the selected terminal source-frame window."""
+
+    source_video_asset_id: str = Field(pattern=_SAFE_ID)
+    source_video_sha256: str = Field(pattern=_SHA256)
+    source_frame_count: int = Field(strict=True, ge=3)
+    start_frame_index: int = Field(strict=True, ge=0)
+    end_frame_index: int = Field(strict=True, ge=0)
+    analyzer: ToolIdentity
+    analyzer_executable_sha256: str = Field(pattern=_SHA256)
+    analyzer_version_output_sha256: str = Field(pattern=_SHA256)
+    analyzer_contract_version: Literal["ffmpeg-signalstats-terminal-window-v1"]
+    canonical_arguments: tuple[str, ...] = Field(min_length=1)
+    span: FullSourceMotionSpanMeasurement
+    content_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_window(self) -> "MotionTailWindowAnalysisReceipt":
+        if (
+            self.start_frame_index != self.span.start_frame_index
+            or self.end_frame_index != self.span.end_frame_index
+            or self.end_frame_index != self.source_frame_count - 1
+            or self.canonical_arguments
+            != _canonical_window_arguments(
+                self.start_frame_index, self.end_frame_index
+            )
+            or self.content_hash
+            != _seal_window(self.model_dump(mode="json", exclude={"content_hash"}))
+        ):
+            raise ValueError("motion-tail window analysis is inconsistent")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "MotionTailWindowAnalysisReceipt":
+        candidate = cls.model_construct(**values, content_hash="0" * 64)
+        return cls.model_validate(
+            {
+                **values,
+                "content_hash": _seal_window(
+                    candidate.model_dump(
+                        mode="json", exclude={"content_hash"}, warnings=False
+                    )
+                ),
+            }
+        )
+
+
 def _seal_analysis(payload: dict[str, object]) -> str:
     return hashlib.sha256(
         json.dumps(
             {"schema": "ai-video-full-source-motion-analysis/1", **payload},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+
+
+def _seal_window(payload: dict[str, object]) -> str:
+    return hashlib.sha256(
+        json.dumps(
+            {"schema": "ai-video-motion-tail-window-analysis/1", **payload},
             ensure_ascii=False,
             sort_keys=True,
             separators=(",", ":"),
@@ -149,6 +207,23 @@ def _canonical_analysis_arguments(frame_count: int) -> tuple[str, ...]:
             values.append("{NEXT_SPAN}")
         values.extend((*common, "-vf", _span_filter(start_frame, end_frame), *suffix))
     return tuple(values)
+
+
+def _canonical_window_arguments(start_frame: int, end_frame: int) -> tuple[str, ...]:
+    return (
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "info",
+        "-i",
+        "{SOURCE}",
+        "-vf",
+        _span_filter(start_frame, end_frame),
+        "-an",
+        "-f",
+        "null",
+        "-",
+    )
 
 
 def _fd_sha256(descriptor: int) -> str:
@@ -315,8 +390,92 @@ def analyze_full_source_motion(
     )
 
 
+def analyze_motion_tail_window(
+    project_root: str | Path,
+    source_asset: AssetRecord,
+    *,
+    start_frame_index: int,
+    end_frame_index: int,
+    ffmpeg_executable: str | Path | None = None,
+) -> MotionTailWindowAnalysisReceipt:
+    """Measure continuous motion inside the exact terminal selection only."""
+
+    root = Path(project_root).resolve(strict=True)
+    metadata = source_asset.video_metadata
+    if (
+        source_asset.asset_type is not AssetType.VIDEO
+        or metadata is None
+        or source_asset.artifact_path != canonical_video_asset_path(source_asset.sha256)
+        or end_frame_index != metadata.frame_count - 1
+        or start_frame_index >= end_frame_index
+    ):
+        raise _invalid("Motion-tail window analyzer requires an exact terminal range.")
+    discovered = shutil.which("ffmpeg") if ffmpeg_executable is None else None
+    if ffmpeg_executable is None and discovered is None:
+        raise _invalid("Motion-tail window analyzer executable is unavailable.")
+    candidate = (
+        Path(ffmpeg_executable)
+        if ffmpeg_executable is not None
+        else Path(discovered or "")
+    )
+    try:
+        selected = candidate.resolve(strict=True)
+    except OSError as exc:
+        raise _invalid("Motion-tail window analyzer executable is unavailable.") from exc
+    try:
+        with _open_regular_file_nofollow(
+            root / source_asset.artifact_path, contained_by=root / "assets"
+        ) as (source_descriptor, source_opened), _open_regular_file_nofollow(
+            selected, contained_by=selected.parent
+        ) as (ffmpeg_descriptor, ffmpeg_opened):
+            source_sha256 = _fd_sha256(source_descriptor)
+            ffmpeg_sha256 = _fd_sha256(ffmpeg_descriptor)
+            if source_sha256 != source_asset.sha256 or source_opened.st_size != source_asset.size_bytes:
+                raise _invalid("Motion-tail window analyzer input bytes are not exact.")
+            version = subprocess.run(
+                (f"/proc/self/fd/{ffmpeg_descriptor}", "-version"),
+                check=True, capture_output=True, text=True, timeout=10,
+                pass_fds=(ffmpeg_descriptor,),
+            )
+            span = _measure_span(
+                ffmpeg_descriptor=ffmpeg_descriptor,
+                source_descriptor=source_descriptor,
+                start_frame=start_frame_index,
+                end_frame=end_frame_index,
+            )
+            if (
+                _fd_sha256(source_descriptor) != source_sha256
+                or _fd_sha256(ffmpeg_descriptor) != ffmpeg_sha256
+                or os.fstat(source_descriptor).st_size != source_opened.st_size
+                or os.fstat(ffmpeg_descriptor).st_size != ffmpeg_opened.st_size
+            ):
+                raise _invalid("Motion-tail window analyzer bytes changed during analysis.")
+    except (OSError, subprocess.SubprocessError, ValueError) as exc:
+        if isinstance(exc, AiVideoError):
+            raise
+        raise _invalid("Motion-tail window analyzer failed.", str(exc)) from exc
+    version_line = version.stdout.splitlines()[0] if version.stdout else ""
+    if not version_line.startswith("ffmpeg version "):
+        raise _invalid("Motion-tail window analyzer identity is not ffmpeg.")
+    return MotionTailWindowAnalysisReceipt.create(
+        source_video_asset_id=source_asset.asset_id,
+        source_video_sha256=source_asset.sha256,
+        source_frame_count=metadata.frame_count,
+        start_frame_index=start_frame_index,
+        end_frame_index=end_frame_index,
+        analyzer=ToolIdentity(name="ffmpeg", version=version_line),
+        analyzer_executable_sha256=ffmpeg_sha256,
+        analyzer_version_output_sha256=hashlib.sha256(version.stdout.encode("utf-8")).hexdigest(),
+        analyzer_contract_version="ffmpeg-signalstats-terminal-window-v1",
+        canonical_arguments=_canonical_window_arguments(start_frame_index, end_frame_index),
+        span=span,
+    )
+
+
 __all__ = [
     "FullSourceMotionAnalysisReceipt",
     "FullSourceMotionSpanMeasurement",
+    "MotionTailWindowAnalysisReceipt",
     "analyze_full_source_motion",
+    "analyze_motion_tail_window",
 ]

@@ -16,27 +16,17 @@ from ai_video.production.shot_continuity_m0_feasibility import (
     prepare_m0_endpoint_feasibility_approval_commit,
     reopen_m0_endpoint_feasibility_approval,
 )
-from ai_video.production.shot_continuity_motion_tail import (
-    prepare_full_source_motion_tail_commit,
+from ai_video.production.shot_continuity_terminal_motion_tail import (
+    prepare_terminal_motion_tail_commit,
 )
 
 
 def _prepared_tail(tmp_path):
-    from test_shot_continuity_motion_tail import _accepted_source, _motion_analysis
+    from test_shot_continuity_motion_tail import _accepted_source
 
     root, committer, source_attempt_id, loaded = _accepted_source(tmp_path)
-    source_state = next(
-        item for item in loaded.manifest.attempts
-        if item.attempt_id == source_attempt_id
-    ).video_generation_state
-    assert source_state is not None
-    source_request = committer._reopen_video_request(source_state.request)
-    source_asset = next(
-        item for item in loaded.registry.assets
-        if item.asset_id == source_request.output_asset_id
-    )
     target = next(item for item in loaded.shots if item.shot_id == "rainy-station-4")
-    prepared = prepare_full_source_motion_tail_commit(
+    prepared = prepare_terminal_motion_tail_commit(
         project_root=root,
         committer=committer,
         project=loaded,
@@ -47,9 +37,8 @@ def _prepared_tail(tmp_path):
         target_shot_revision=target.revision,
         target_shot_content_hash=target.content_hash,
         continuity_constraint_snapshot_hash="c" * 64,
-        provider_min_duration_milliseconds=1_000,
-        provider_max_duration_milliseconds=10_000,
-        motion_analysis=_motion_analysis(root, source_asset),
+        provider_min_duration_milliseconds=2_000,
+        provider_max_duration_milliseconds=15_000,
     )
     assert prepared.commit_request is not None
     committer.commit(prepared.commit_request)

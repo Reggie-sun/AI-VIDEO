@@ -34,8 +34,8 @@ from ai_video.production.paths import (
     canonical_m0_endpoint_feasibility_approval_path,
     canonical_m0_endpoint_feasibility_human_decision_path,
 )
-from ai_video.production.shot_continuity_motion_tail import (
-    validate_full_source_motion_tail,
+from ai_video.production.shot_continuity_m0_motion_tail import (
+    validate_m0_motion_tail,
 )
 
 
@@ -277,7 +277,7 @@ def m0_endpoint_feasibility_scope_fingerprint(
 ) -> str:
     """Compute the exact scope a human must review before approval persistence."""
 
-    tail = validate_full_source_motion_tail(
+    tail = validate_m0_motion_tail(
         project_root, project, motion_tail_asset_id
     )
     target = next(
@@ -310,7 +310,7 @@ def _validate_m0_endpoint_feasibility_approval(
     root = Path(project_root).resolve(strict=True)
     if root != project.root.resolve(strict=True):
         raise _invalid("M0 feasibility project root is not exact.")
-    tail = validate_full_source_motion_tail(
+    tail = validate_m0_motion_tail(
         root, project, approval.motion_tail_asset_id
     )
     target = next(
@@ -449,7 +449,7 @@ def prepare_m0_endpoint_feasibility_approval_commit(
         or committer._read_manifest() != project.manifest
     ):
         raise _invalid("M0 endpoint feasibility approval base project is stale.")
-    tail = validate_full_source_motion_tail(root, project, motion_tail_asset_id)
+    tail = validate_m0_motion_tail(root, project, motion_tail_asset_id)
     target = next(
         (item for item in project.shots if item.shot_id == target_shot_id), None
     )

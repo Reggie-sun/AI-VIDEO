@@ -15,25 +15,15 @@ from ai_video.production.shot_continuity_m0_feasibility import (
     m0_endpoint_feasibility_scope_fingerprint,
     prepare_m0_endpoint_feasibility_approval_commit,
 )
-from ai_video.production.shot_continuity_motion_tail import (
-    prepare_full_source_motion_tail_commit,
+from ai_video.production.shot_continuity_terminal_motion_tail import (
+    prepare_terminal_motion_tail_commit,
 )
 
 
 def _operator_fixture(tmp_path):
-    from test_shot_continuity_motion_tail import _accepted_source, _motion_analysis
+    from test_shot_continuity_motion_tail import _accepted_source
 
     root, committer, source_attempt_id, loaded = _accepted_source(tmp_path)
-    source_state = next(
-        item for item in loaded.manifest.attempts
-        if item.attempt_id == source_attempt_id
-    ).video_generation_state
-    assert source_state is not None
-    source_request = committer._reopen_video_request(source_state.request)
-    source_asset = next(
-        item for item in loaded.registry.assets
-        if item.asset_id == source_request.output_asset_id
-    )
     target = next(item for item in loaded.shots if item.shot_id == "rainy-station-4")
     endpoint_id = next(
         role.asset_ids[0]
@@ -41,7 +31,7 @@ def _operator_fixture(tmp_path):
         if role.role == "approved_endpoint"
     )
     identity_id = loaded.characters[0].reference_asset_ids[0]
-    prepared_tail = prepare_full_source_motion_tail_commit(
+    prepared_tail = prepare_terminal_motion_tail_commit(
         project_root=root,
         committer=committer,
         project=loaded,
@@ -54,9 +44,8 @@ def _operator_fixture(tmp_path):
         continuity_constraint_snapshot_hash=operator_module._m0_constraints(
             loaded
         ).content_hash,
-        provider_min_duration_milliseconds=1_000,
-        provider_max_duration_milliseconds=10_000,
-        motion_analysis=_motion_analysis(root, source_asset),
+        provider_min_duration_milliseconds=2_000,
+        provider_max_duration_milliseconds=15_000,
     )
     assert prepared_tail.commit_request is not None
     committer.commit(prepared_tail.commit_request)
@@ -184,6 +173,8 @@ def test_build_and_open_m0_quality_operator_bind_exact_approval_without_fast_lan
     assert feasibility.human_approval_receipt_id == approval.approval.content_hash
     assert len(request.image_bindings) == 3
     assert len(request.media_bindings) == 1
+    assert tail.tail_asset.sha256 != tail.receipt.source_video_sha256
+    assert request.media_bindings[0].asset_sha256 == tail.tail_asset.sha256
 
     stack = SimpleNamespace(execution_stack_hash="4" * 64)
     inputs = (

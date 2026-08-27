@@ -17,6 +17,12 @@ from ai_video.production.shot_continuity_motion_tail import (
     reopen_full_source_motion_tail_receipt,
     validate_full_source_motion_tail,
 )
+from ai_video.production.shot_continuity_motion_tail_runtime import (
+    validate_motion_tail,
+)
+from ai_video.production.shot_continuity_m0_motion_tail import (
+    validate_m0_motion_tail,
+)
 
 
 def test_motion_span_rejects_two_isolated_nonzero_transitions() -> None:
@@ -73,8 +79,8 @@ def test_full_source_zero_copy_tail_is_a_distinct_registry_asset_and_reopens(
         target_shot_revision=target.revision,
         target_shot_content_hash=target.content_hash,
         continuity_constraint_snapshot_hash="c" * 64,
-        provider_min_duration_milliseconds=1_000,
-        provider_max_duration_milliseconds=10_000,
+        provider_min_duration_milliseconds=2_000,
+        provider_max_duration_milliseconds=15_000,
         motion_analysis=_motion_analysis(root, source_asset),
     )
 
@@ -94,6 +100,9 @@ def test_full_source_zero_copy_tail_is_a_distinct_registry_asset_and_reopens(
     assert committed.active_project == loaded.manifest.active_project
     assert reopened.manifest.active_registry == prepared.commit_request.next_registry
     assert validated == prepared.receipt
+    assert validate_motion_tail(root, reopened, prepared.tail_asset) == prepared.receipt
+    with pytest.raises(Exception, match="48-frame"):
+        validate_m0_motion_tail(root, reopened, prepared.tail_asset)
     assert (
         reopen_full_source_motion_analysis_receipt(
             root, prepared.receipt.motion_analysis_receipt_hash

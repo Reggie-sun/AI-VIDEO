@@ -548,6 +548,22 @@ def test_m0_source_loader_rejects_profile_or_workflow_drift(tmp_path: Path) -> N
         )
 
 
+def test_m0_workflow_rejects_reference_video_policy_drift() -> None:
+    sources = load_m0_qualification_execution_sources(
+        profile_path=PROFILE_PATH,
+        artifact_root=REPO_ROOT,
+    )
+    workflow = json.loads(json.dumps(sources.workflow))
+    workflow["6"]["inputs"]["reference_video_policy"] = "caller-selected"
+
+    with pytest.raises(AiVideoError, match="sealed contract"):
+        m0_qualification._validate_workflow(
+            sources.profile,
+            workflow,
+            sources.binding,
+        )
+
+
 def test_m0_source_loader_rejects_resealed_node_id_class_swap(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

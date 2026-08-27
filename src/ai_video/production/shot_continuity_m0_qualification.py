@@ -69,6 +69,9 @@ _M0_SEED_FIELDS = (
     "registry_content_hash",
     "prompt_sha256",
 )
+M0_REFERENCE_VIDEO_MIN_DURATION_MILLISECONDS = 2_000
+M0_REFERENCE_VIDEO_MAX_DURATION_MILLISECONDS = 15_000
+M0_REFERENCE_VIDEO_POLICY = "official_2_to_15s"
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -526,6 +529,8 @@ def _validate_workflow(
         or conditioning.get("width") != profile.width
         or conditioning.get("height") != profile.height
         or conditioning.get("length") != profile.frame_count
+        or conditioning.get("reference_video_policy")
+        != M0_REFERENCE_VIDEO_POLICY
         or actual_media_keys != media_keys
         or sampler
         != {
