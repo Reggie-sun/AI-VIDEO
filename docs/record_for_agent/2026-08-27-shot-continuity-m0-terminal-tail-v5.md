@@ -2,6 +2,12 @@
 
 Date: 2026-08-27
 
+> Supersession notice (2026-08-27): v5的human `FAIL`与exact measurements仍是有效历史证据；其当时关于
+> 下一步root-cause isolation的current-facing结论已由v6 layout-repair experiment细化。ComfyUI packed-layout
+> keyframe origin修复后，hard snap从frame `84` / `3.500s`推迟到frame `101` / `4.208s`，但没有消除seam或
+> near-static tail；v6自动媒体门已`FAIL`，natural-speed human verdict仍pending。Current evidence见
+> `docs/record_for_agent/2026-08-27-shot-continuity-m0-layout-repair-v6.md`。
+
 ## Purpose
 
 本文记录M0 `quality-v1`在full-source reference视频被human reviewer判定为人物移动明显偏慢后，使用exact
