@@ -2,6 +2,18 @@
 
 Date: 2026-08-26
 
+> Superseded current-facing delivery (2026-08-27): the user completed a full v10
+> watch/listen and rejected its conversion structure, product-use credibility, opening density
+> and audio dynamics. V10's exact local-generation and technical evidence below remains valid
+> historical evidence, but it is no longer the current delivery preview. The replacement v11
+> checkpoint is recorded in
+> `docs/record_for_agent/2026-08-27-qingyan-v11-conversion-structure-and-sound-redesign.md`;
+> its exact primary MP4 SHA-256 is
+> `e4b857cfb00e1300af90dfaea68d82e80c04a3577da70d356471427f90c6bf8e` and its
+> independent technical review verdict is `accept with concerns`. V11 human full-speed
+> watch/listen, packaging-instruction verification, publication provenance, P6 and Final
+> Acceptance remain pending or out of scope.
+
 > Current full-preview update (2026-08-27): the historical `NO_V10_FINAL` and next-Shot
 > restrictions below are superseded. After the user explicitly authorized a full redo,
 > `01_recap_elder_enters_v2` was generated once locally and passed its exact-byte per-Shot
