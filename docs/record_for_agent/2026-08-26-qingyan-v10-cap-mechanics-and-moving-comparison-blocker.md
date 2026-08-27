@@ -7,13 +7,18 @@ Date: 2026-08-26
 > Shot because its first frame already places the product in the woman's hand. The opening
 > must first show heat-caused underarm perspiration with `product_presence=none`; clothing is
 > only the visible sweat-mark surface, not the cause or problem. New Shot 00 control frames and
-> prompt are recorded below. `video-analysis` MCP remains unavailable, so no new T8 submit or
-> v10 final exists.
+> prompt are recorded below. That MCP blocker was later superseded by the exact local submit and
+> post-media Gate update below; no v10 final exists.
 >
 > Performance correction (2026-08-27): the user further rejected the sweat-mark-only last frame
 > because it did not visibly perform an odor check. The current Shot 00 close state now requires
 > the woman to lean her head toward the covered underarm, take one short audible sniff, wrinkle
 > her nose slightly, and begin a restrained recoil. The superseded v3 frame remains historical.
+>
+> Runtime update (2026-08-27): project-local `video-analysis` completed a real stdio handshake and
+> analyzed exact new Shot 00 bytes. The single local T8 output is technically continuous and has no
+> product, but its required sniff/reaction closure and audible sniff cue failed the per-Shot Gate.
+> No retry or later Shot was submitted.
 
 ## Purpose
 
@@ -129,9 +134,9 @@ artifacts/qingyan-miao-ad-20260826-v10/opening-v2-authoring-contract.md
 frame、一个因“衣料问题”语义被 supersede 的 intermediate last frame，以及上表的 underarm-sweat final
 control frame；它们都不构成视频 Gate、Shot acceptance 或 v10 final。
 
-## Current Assessment And Next Work
+## Historical Pre-Submit Assessment And Next Work
 
-current status：
+以下为 MCP恢复与新 Shot 00提交前的历史 status；已由后文 exact runtime update取代：
 
 ```text
 OLD_OPENING_HUMAN_REJECTED / CORRECTED_SHOT00_CONTROL_FRAMES_READY /
@@ -155,6 +160,67 @@ follow-up query命中既有 post-media Gate经验记录，确认 `MCP unavailabl
 finding 的 follow-up query 只返回 stale-tagged Ecommerce sequential Gate fragment并排队 detached refresh。
 没有等待、轮询或前台 rebuild；这些 advisory hits 不授权视频提交或 Gate acceptance。
 
+## 2026-08-27 Shot 00 Local Submit And Gate
+
+用户明确要求启动 MCP 并生成视频后，本轮先对当前项目服务做真实 stdio MCP handshake：
+
+```text
+server: video-analysis 1.29.0
+registered tools: 8
+health operation: video_probe
+health result: PASS
+```
+
+当前 Codex 窗口内原有 MCP tool transport仍返回`Transport closed`，因此本轮使用相同
+`.codex/config.toml` command、interpreter、cwd 与 `PYTHONPATH`，由 direct MCP stdio client启动项目服务并
+调用注册工具。这是实际 MCP protocol call，不是直接调用 analyzer内部函数。
+
+随后只提交一次新 Shot 00：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff.mp4
+SHA-256 b6c471d5a184bd6c8ef325dcec5e5d7bbbfb82a77a88b741fbf4030927552dcb
+2,733,231 bytes; H.264; 768x1344; 24fps; 124 frames; 5.167s; AAC stereo
+```
+
+Generation settings为 H3/T8 `FL2VA`、20 steps、`res_multistep` + `simple`、seed `104759`、
+CRF 17、native audio、无 LoRA。runtime commits为 ComfyUI
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`与 T8
+`28cb160827c245b2d6a37539df30c1d7c5e7aecd`。wall time为`398.595s`；call accounting为
+`local_submit_count=1`、`retry_count=0`、`fallback_count=0`、`remote_submit_count=0`。
+
+exact runtime evidence：
+
+```text
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff.receipt.json
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff.submitted-workflow.json
+artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff.gate.json
+```
+
+MP4 video/audio full decode均`PASS`。project-local MCP对 exact SHA执行`video_analyze`与
+`video_review`：scene detection为单一`5.167s` scene，review采样`166`帧且`166`帧唯一，
+因此无硬切和静图 freeze；11张有序 MCP抽帧显示人物先整理衣服，再抬臂检查逐渐可见的局部腋下汗印，
+全程零产品对象。
+
+requirement-level Gate仍为`FAIL`：末段主要读成持续低头查看腋下，未形成一眼可读的“短促吸气 → 皱鼻 →
+轻微后撤”动作闭环；可解码的 native audio波形也没有独立清楚的 sniff cue。该判定只针对 exact Shot 00
+development artifact，不是 Production、P6、Final Acceptance或 human acceptance。
+
+Gate失败后没有提交 Shot 01、没有 retry。ComfyUI supervisor已停止，`127.0.0.1:8188` listener消失。
+
+## Current Gate Status And Next Work
+
+current status：
+
+```text
+VIDEO_ANALYSIS_STDIO_AVAILABLE / SHOT00_SINGLE_LOCAL_SUBMIT_COMPLETE /
+SHOT00_GATE_FAIL_SNIFF_CLOSURE / NEXT_SHOT_BLOCKED / NO_V10_FINAL
+```
+
+下次工作必须从新的 Shot identity与新的 accepted motion strategy开始，并先解决 sniff action closure与
+audio cue；不得覆盖或 blind retry当前 exact artifact。只有 replacement Shot 00的全部 required findings
+为`PASS`，才允许重新 Gate treatment Shot并继续老人 dialogue或最终 composition。
+
 ## Agent Guardrails
 
 - 不得把控制帧、prompt audit、contact sheet、FFmpeg metadata、successful local submit 或 H3 receipt当作 per-Shot Gate `PASS`。
@@ -162,6 +228,8 @@ finding 的 follow-up query 只返回 stale-tagged Ecommerce sequential Gate fra
 - Shot 00 必须表达“腋下出汗导致局部汗印”；不得将问题写成衣料、衣服材质或穿着不适。
 - Shot 00 必须包含可观察的闻腋下动作：头和鼻子主动靠近被衣物遮挡的腋下、短促 sniff、轻微皱鼻；
   只看汗印或只摸衣服均不满足该 human requirement。
+- 当前 exact `00_problem_discovery_sniff.mp4` 已因 sniff/reaction closure与 audible cue失败；不得把单一
+  scene、全 unique frames或技术 decode `PASS`升级为 semantic Gate `PASS`。
 - 不得在 exact Shot 01A 未完成 Gate 前提交 Shot 01B、合成 v10 final 或宣称 13 秒问题已在成片修复。
 - 不得覆盖或 blind retry exact `01_problem_open_cap_spray` durable state；若内容后来被判为 `FAIL`，必须
   以新 Shot identity和新的 exact receipt处理。
