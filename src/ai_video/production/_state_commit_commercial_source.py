@@ -9,6 +9,9 @@ from ai_video.production.commercial_dependency import (
     resolve_commercial_source_approval_states,
     validate_commercial_source_dependency_graph,
 )
+from ai_video.production.commercial_reference import (
+    validate_product_reference_set_against_registry,
+)
 from ai_video.production.commercial_source_preparation import (
     ApprovedCommercialSourceBinding,
     CommercialSourceCandidate,
@@ -20,15 +23,13 @@ from ai_video.production.commercial_visual_review import (
     CommercialVisualEvidence,
     adjudicate_commercial_visual_evidence,
 )
-from ai_video.production.hashing import canonical_sha256
 from ai_video.production.dependency import desired_fingerprints
-from ai_video.production.commercial_reference import (
-    validate_product_reference_set_against_registry,
-)
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production.image_import import (
     COMMERCIAL_IMAGE_IMPORT_TOOL,
     validate_commercial_image_import,
 )
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     CommercialSourceApprovalPointer,
     CommercialSourceAttemptState,
@@ -55,8 +56,8 @@ from ._state_commit_common import (
     prepare_dependency_graph_transition,
 )
 from ._state_commit_contracts import (
-    PreparedArtifact,
     _COMMERCIAL_SOURCE_REVIEW_PERMIT_TOKEN,
+    PreparedArtifact,
     _DurableCommercialSourceReviewPermit,
 )
 
@@ -67,7 +68,7 @@ class _StateCommitCommercialSourceMixin:
         manifest: ProductionManifest,
         request: CommercialSourcePreparationRequest,
     ):
-        if manifest.schema_version not in {"2.12", "2.13", "2.14"}:
+        if not manifest_supports(manifest.schema_version, ManifestCapability.COMMERCIAL_SOURCE):
             raise _state_invalid("Commercial source preparation requires Manifest 2.12.")
         loaded = self._load_production_project(self._project_root / "project.yaml")
         graph = loaded.dependency_graph

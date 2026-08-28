@@ -31,6 +31,7 @@ def _deep_immutable_json(value: object) -> object:
 class QaLayer(str, Enum):
     TECHNICAL = "technical"
     LAYOUT = "layout"
+    CAPTION = "caption"
     STRATEGY = "strategy"
     SEMANTIC = "semantic"
     FINAL_ACCEPTANCE = "final_acceptance"
@@ -101,4 +102,6 @@ class DomainAcceptanceQaPolicyMixin:
         data = handler(self)
         if self.domain_acceptance is None:
             data.pop("domain_acceptance", None)
+        if data.get("caption_policy") is None:
+            data.pop("caption_policy", None)
         return data

@@ -6,9 +6,15 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Literal
 
-from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
+from pydantic import (
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.caption_quality_contracts import CaptionReviewContext
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
     EvidenceStrength,
@@ -17,8 +23,8 @@ from ai_video.production.models import (
     QaLayer,
     QaPolicy,
     QaVerdict,
-    ReviewEvidence,
     ResolvedTimeline,
+    ReviewEvidence,
     StrictModel,
     TechnicalReviewContext,
     TechnicalReviewWindow,
@@ -679,8 +685,17 @@ def adjudicate_review_evidence(
     evidence: Sequence[ReviewEvidence],
     *,
     review_request_content_hash: str | None = None,
+    caption_context: CaptionReviewContext | None = None,
 ) -> QaVerdict:
     """Derive verdict from selected policy and typed raw measurements."""
+    if layer is QaLayer.CAPTION:
+        from ai_video.production.caption_quality import adjudicate_caption_layer
+
+        return adjudicate_caption_layer(
+            policy=policy,
+            context=caption_context,
+            evidence=evidence,
+        )
     if not evidence or any(
         item.layer is not layer
         or item.measured_payload.get("coverage_complete") is not True
@@ -798,14 +813,17 @@ def adjudicate_review_evidence(
         for item in evidence:
             payload = item.measured_payload
             required = {
-                "caption_overflow_milli",
                 "safe_area_inset_milli",
                 "layer_collision_count",
                 "transition_boundary_violation_count",
             }
+            if policy.schema_version == "2.0":
+                required.add("caption_overflow_milli")
             if not required.issubset(payload):
                 return QaVerdict.NOT_EVALUATED
             if (
+                policy.schema_version == "2.0"
+                and
                 isinstance(payload.get("caption_overflow_milli"), int)
                 and payload["caption_overflow_milli"]
                 > rules.caption_overflow_tolerance_milli

@@ -35,6 +35,7 @@ from ai_video.production.image_import import (
     validate_automated_browser_image_import,
     validate_human_image_import,
 )
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     AssetRecord,
     AssetRegistrySnapshot,
@@ -56,10 +57,10 @@ from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_automated_browser_image_import_receipt_path,
     canonical_dependency_graph_snapshot_path,
+    canonical_human_image_import_receipt_path,
     canonical_image_asset_path,
     canonical_image_authorization_path,
     canonical_image_execution_profile_path,
-    canonical_human_image_import_receipt_path,
     canonical_image_preview_path,
     canonical_image_receipt_path,
     canonical_image_request_path,
@@ -868,7 +869,7 @@ def verify_hard_cut_keyframe_evidence(
 
 
 def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
-    if bundle.manifest.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+    if not manifest_supports(bundle.manifest.schema_version, ManifestCapability.IMAGE_STATE):
         return
     attempts = tuple(
         item

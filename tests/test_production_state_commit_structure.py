@@ -4,7 +4,6 @@ import ast
 import importlib
 from pathlib import Path
 
-
 PRIVATE_MODULES = (
     "_state_commit_bootstrap.py",
     "_state_commit_contracts.py",
@@ -239,6 +238,17 @@ def test_review_and_repair_modules_stay_focused() -> None:
     production = Path(__file__).parents[1] / "src/ai_video/production"
     assert _effective_loc(production / "_state_commit_review.py") <= 800
     assert _effective_loc(production / "_state_commit_repair.py") <= 800
+
+
+def test_manifest_215_literal_is_owned_only_by_manifest_schema() -> None:
+    production = Path(__file__).parents[1] / "src/ai_video/production"
+    owners = tuple(
+        path.name
+        for path in production.glob("*.py")
+        if '"2.15"' in path.read_text(encoding="utf-8")
+    )
+
+    assert owners == ("manifest_schema.py",)
 
 
 def test_render_modules_stay_focused() -> None:

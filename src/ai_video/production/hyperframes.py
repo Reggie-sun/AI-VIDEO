@@ -40,6 +40,7 @@ from ai_video.production.composition import (
     timeline_fingerprint,
 )
 from ai_video.production.hashing import seal_artifact, verify_artifact_hash
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     AudioChannelLayout,
     CaptionTrack,
@@ -1262,11 +1263,9 @@ def _render_with_hyperframes(
     manifest, fresh = committer._begin_render_attempt_with_status(begin_request)
     if not fresh:
         return committer._replay_render_attempt(begin_request, manifest)
+    supports_dependency_graph = manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
     try:
-        if (
-            manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
-            and dependency_transition_preparer is None
-        ):
+        if supports_dependency_graph and dependency_transition_preparer is None:
             raise AiVideoError(
                 ErrorCode.PRODUCTION_STATE_INVALID,
                 "Graph-aware Manifest render requires a dependency transition preparer.",
@@ -1349,7 +1348,7 @@ def _render_with_hyperframes(
         artifacts=durable.artifacts,
         next_render_state=durable.next_render_state,
     )
-    if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+    if supports_dependency_graph:
         assert dependency_transition_preparer is not None
         try:
             prepared_activation = dependency_transition_preparer(activation)

@@ -12,6 +12,7 @@ from ai_video.production.execution_stack_materialization import (
     verify_execution_stack_source_artifacts,
 )
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     P0QualificationPreparedReceiptPointer,
     ProductionManifest,
@@ -20,8 +21,8 @@ from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_continuity_transition_policy_path,
     canonical_execution_stack_identity_path,
-    canonical_p0_qualification_receipt_path,
     canonical_p0_qualification_input_path,
+    canonical_p0_qualification_receipt_path,
     canonical_real_shot_validation_set_path,
 )
 from ai_video.production.project import load_production_project
@@ -40,7 +41,6 @@ from ai_video.production.video_transition import (
 
 from ._state_commit_common import _canonical_json_bytes, _state_invalid
 from ._state_commit_contracts import PreparedArtifact
-
 
 _ModelT = TypeVar("_ModelT", bound=BaseModel)
 
@@ -259,7 +259,7 @@ class _StateCommitP0QualificationMixin:
                 return manifest
             if manifest.manifest_revision != expected_manifest_revision:
                 raise _state_invalid("P0 qualification base Manifest revision changed.")
-            if manifest.schema_version not in {"2.11", "2.12", "2.13", "2.14"}:
+            if not manifest_supports(manifest.schema_version, ManifestCapability.P0_QUALIFICATION):
                 raise _state_invalid(
                     "P0 qualification requires Production Manifest 2.11 or later."
                 )
@@ -317,7 +317,7 @@ class _StateCommitP0QualificationMixin:
         manifest = self._read_manifest()
         pointer = manifest.active_p0_qualification_prepared
         if (
-            manifest.schema_version not in {"2.11", "2.12", "2.13", "2.14"}
+            not manifest_supports(manifest.schema_version, ManifestCapability.P0_QUALIFICATION)
             or pointer is None
         ):
             raise _state_invalid("No active P0 qualification prepared receipt exists.")
@@ -342,7 +342,7 @@ class _StateCommitP0QualificationMixin:
         manifest = self._read_manifest()
         pointer = manifest.active_p0_qualification_prepared
         if (
-            manifest.schema_version not in {"2.11", "2.12", "2.13", "2.14"}
+            not manifest_supports(manifest.schema_version, ManifestCapability.P0_QUALIFICATION)
             or pointer is None
         ):
             raise _state_invalid("No active P0 qualification prepared receipt exists.")
@@ -479,7 +479,7 @@ class _StateCommitP0QualificationMixin:
             manifest = self._read_manifest()
             pointer = manifest.active_p0_qualification_prepared
             if (
-                manifest.schema_version not in {"2.11", "2.12", "2.13", "2.14"}
+                not manifest_supports(manifest.schema_version, ManifestCapability.P0_QUALIFICATION)
                 or pointer is None
             ):
                 raise _state_invalid(

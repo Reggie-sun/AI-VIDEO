@@ -4,7 +4,17 @@ import hashlib
 from typing import Callable
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.caption_quality import (
+    build_caption_review_context,
+    caption_context_hash,
+    reopen_caption_review_chain,
+)
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
+from ai_video.production.manifest_schema import (
+    ManifestCapability,
+    manifest_supports,
+    require_manifest_version_for,
+)
 from ai_video.production.models import (
     DependencyLifecycle,
     DependencyNodeKind,
@@ -53,8 +63,8 @@ from ._state_commit_common import (
     _validated_transition,
 )
 from ._state_commit_contracts import (
-    PreparedArtifact,
     _REVIEW_PERMIT_TOKEN,
+    PreparedArtifact,
     _DurableReviewAnalysisPermit,
 )
 
@@ -81,19 +91,24 @@ class _StateCommitReviewMixin:
         )
         with self._exclusive_lock():
             manifest = self._read_manifest()
+            required_capability = (
+                ManifestCapability.CAPTION_REVIEW
+                if policy.caption_policy is not None
+                else ManifestCapability.P6_REVIEW
+            )
             if manifest.manifest_revision != expected_manifest_revision:
                 if (
-                    manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                    manifest_supports(manifest.schema_version, required_capability)
                     and manifest.active_qa_policy == pointer
                 ):
                     return manifest
                 raise _state_invalid("QA policy base Manifest revision changed.")
-            if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+            if not manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH):
                 raise _state_invalid("P6 requires a P5 Manifest 2.3, 2.4, or 2.5 base.")
             if manifest.active_dependency_graph is None:
                 raise _state_invalid("P6 requires an active dependency graph.")
             if (
-                manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                manifest_supports(manifest.schema_version, required_capability)
                 and manifest.active_qa_policy == pointer
             ):
                 return manifest
@@ -120,7 +135,9 @@ class _StateCommitReviewMixin:
                 manifest,
                 {
                     "schema_version": (
-                        "2.4" if manifest.schema_version == "2.3" else manifest.schema_version
+                        require_manifest_version_for(
+                            manifest.schema_version, required_capability
+                        )
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,
                     "active_qa_policy": pointer,
@@ -225,8 +242,24 @@ class _StateCommitReviewMixin:
                 timeline,
                 render_output_sha256=current_render.output.file_sha256,
             )
+            policy = load_qa_policy(self._project_root, durable_request.qa_policy)
+            if durable_request.caption_context is not None:
+                if (
+                    policy.caption_policy is None
+                    or not manifest_supports(
+                        manifest.schema_version, ManifestCapability.CAPTION_REVIEW
+                    )
+                    or build_caption_review_context(
+                        project=bundle,
+                        caption_policy=policy.caption_policy,
+                    )
+                    != durable_request.caption_context
+                ):
+                    raise _state_invalid(
+                        "Caption ReviewRequest context does not bind current Production state."
+                    )
             if (
-                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                not manifest_supports(manifest.schema_version, ManifestCapability.P6_REVIEW)
                 or bundle.manifest != manifest
                 or manifest.active_qa_policy != receipt.qa_policy
                 or manifest.active_dependency_graph is None
@@ -242,6 +275,11 @@ class _StateCommitReviewMixin:
             ):
                 raise _state_invalid("Review Receipt output or timeline is stale.")
             for item in evidence:
+                measurement_version = (
+                    durable_request.caption_context.measurement_contract_version
+                    if durable_request.caption_context is not None
+                    else durable_request.technical_context.measurement_contract_version
+                )
                 if (
                     item.layer is not receipt.layer
                     or item.render_output_sha256 != receipt.render_output_sha256
@@ -250,7 +288,7 @@ class _StateCommitReviewMixin:
                     != receipt.dependency_graph_revision_id
                     or item.tool_identity not in receipt.tool_identities
                     or item.measurement_contract_version
-                    != durable_request.technical_context.measurement_contract_version
+                    != measurement_version
                 ):
                     raise _state_invalid("Review evidence identity does not match receipt.")
             policy = load_qa_policy(self._project_root, receipt.qa_policy)
@@ -259,6 +297,7 @@ class _StateCommitReviewMixin:
                 receipt.layer,
                 evidence,
                 review_request_content_hash=durable_request.content_hash,
+                caption_context=durable_request.caption_context,
             )
             if receipt.verdict is not expected_verdict:
                 raise _state_invalid("Review Receipt verdict does not match durable evidence.")
@@ -358,8 +397,23 @@ class _StateCommitReviewMixin:
                 timeline,
                 render_output_sha256=current_render.output.file_sha256,
             )
+            policy = load_qa_policy(self._project_root, request.qa_policy)
+            if request.caption_context is not None and (
+                policy.caption_policy is None
+                or not manifest_supports(
+                    manifest.schema_version, ManifestCapability.CAPTION_REVIEW
+                )
+                or build_caption_review_context(
+                    project=bundle,
+                    caption_policy=policy.caption_policy,
+                )
+                != request.caption_context
+            ):
+                raise _state_invalid(
+                    "Caption ReviewRequest context does not bind current Production state."
+                )
             if (
-                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                not manifest_supports(manifest.schema_version, ManifestCapability.P6_REVIEW)
                 or bundle.manifest != manifest
                 or manifest.manifest_revision != request.base_manifest_revision
                 or manifest.active_dependency_graph != request.dependency_graph
@@ -439,15 +493,20 @@ class _StateCommitReviewMixin:
             )
             updated = ProductionManifest.model_validate(updated.model_dump(mode="python"))
             self._write_p6_manifest_atomic(updated)
+            binding = {
+                "request_content_hash": request.content_hash,
+                "render_output_sha256": request.render_output_sha256,
+                "technical_context_hash": canonical_sha256(
+                    request.technical_context.model_dump(mode="json")
+                ),
+            }
+            if request.caption_context is not None:
+                binding["caption_context_hash"] = caption_context_hash(
+                    request.caption_context
+                )
             permit = _DurableReviewAnalysisPermit(
                 _REVIEW_PERMIT_TOKEN,
-                binding={
-                    "request_content_hash": request.content_hash,
-                    "render_output_sha256": request.render_output_sha256,
-                    "technical_context_hash": canonical_sha256(
-                        request.technical_context.model_dump(mode="json")
-                    ),
-                },
+                binding=binding,
                 durability_validator=lambda: self._review_request_is_consumed(
                     review_request
                 ),
@@ -515,6 +574,28 @@ class _StateCommitReviewMixin:
                 load_review_receipt(self._project_root, item)
                 for item in receipt.required_review_receipts
             )
+            caption_pointers = tuple(
+                item
+                for item in receipt.required_review_receipts
+                if item.layer is QaLayer.CAPTION
+            )
+            if caption_pointers:
+                bundle = self._load_production_project(
+                    self._project_root / "project.yaml"
+                )
+                for caption_pointer in caption_pointers:
+                    try:
+                        reopen_caption_review_chain(
+                            project=bundle,
+                            receipt_pointer=caption_pointer,
+                        )
+                    except (OSError, ValueError) as exc:
+                        raise AiVideoError(
+                            ErrorCode.FINAL_ACCEPTANCE_INVALID,
+                            "Final acceptance requires a current CAPTION review chain.",
+                            technical_detail=str(exc),
+                            retryable=False,
+                        ) from exc
             if (
                 manifest.active_dependency_graph != receipt.dependency_graph
                 or manifest.active_render_state != receipt.render_state

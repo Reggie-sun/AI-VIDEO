@@ -7,15 +7,28 @@ from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
+import production_project_factory as project_factory
 import pytest
 import yaml
 from pydantic import ValidationError
 
+import ai_video.production.state_commit as state_commit
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._image_project_reader import (
     _verify_image_activation_chronology,
 )
-from ai_video.production.hashing import canonical_sha256, seal_artifact, verify_artifact_hash
+from ai_video.production.caption_quality_contracts import (
+    CAPTION_REQUIREMENT_GROUPS,
+    CaptionEvidenceAuthority,
+    CaptionEvidenceStrength,
+    CaptionQualityPolicy,
+    CaptionTrackPolicy,
+)
+from ai_video.production.hashing import (
+    canonical_sha256,
+    seal_artifact,
+    verify_artifact_hash,
+)
 from ai_video.production.image import (
     ImageGenerationAuthorization,
     ImageGenerationPreview,
@@ -34,65 +47,44 @@ from ai_video.production.models import (
     DependencyNodeState,
     EvidenceStrength,
     FinalAcceptanceState,
-    ProductionProject,
+    NamedFingerprint,
     ProductionManifest,
+    ProductionProject,
     ProjectSnapshotPointer,
-    QaLayoutRules,
     QaLayer,
+    QaLayoutRules,
     QaPolicy,
     QaTechnicalThresholds,
     QaVerdict,
-    NamedFingerprint,
+    RecoveryDisposition,
+    RegistryDependencyEvidence,
+    RegistrySnapshotPointer,
+    RendererKind,
+    RendererSelectionReceipt,
+    RenderStateSnapshotPointer,
     RepairAction,
     RepairAuthorization,
     RepairRequest,
     ReviewAttemptPhase,
-    ReviewLayerState,
-    ReviewLifecycle,
     ReviewEvidence,
     ReviewEvidencePointer,
+    ReviewLayerState,
+    ReviewLifecycle,
     ReviewReceipt,
     ReviewRequest,
     ReviewRequestPointer,
-    RendererKind,
-    RendererSelectionReceipt,
-    RegistrySnapshotPointer,
-    RegistryDependencyEvidence,
-    RecoveryDisposition,
-    RenderStateSnapshotPointer,
     Shot,
     SourceReference,
-    StateCommitStatus,
     StateCommitAttempt,
+    StateCommitStatus,
     TechnicalReviewContext,
     TechnicalReviewWindow,
     ToolIdentity,
     VisualStrategy,
 )
-from ai_video.production.project import load_production_project, load_production_project_candidate
-from ai_video.production.registry import load_asset_registry
-from ai_video.production.registry import registry_semantic_sha256
-from ai_video.production.review import build_technical_review_context
-import ai_video.production.state_commit as state_commit
-from ai_video.production.state_commit import (
-    ActivateRenderStateRequest,
-    BeginRenderAttemptRequest,
-    CommitPhase,
-    NoopCrashInjector,
-    PreparedArtifact,
-    ProductionStateCommitter,
-    RecordRenderFailureRequest,
-    RenderAttemptPaths,
-    StateCommitRequest,
-    _NativeFileOps,
-    _canonical_json_bytes,
-    _canonical_yaml_bytes,
-    _owned_temp_name,
-    prepare_dependency_graph_transition,
-)
 from ai_video.production.paths import (
-    canonical_image_authorization_path,
     canonical_image_asset_path,
+    canonical_image_authorization_path,
     canonical_image_preview_path,
     canonical_image_receipt_path,
     canonical_image_request_path,
@@ -106,12 +98,32 @@ from ai_video.production.paths import (
     canonical_render_source_root,
     canonical_render_state_path,
     canonical_render_timeline_path,
-    canonical_review_request_path,
-    canonical_review_evidence_path,
     canonical_renderer_source_receipt_path,
+    canonical_review_evidence_path,
+    canonical_review_request_path,
 )
-import production_project_factory as project_factory
-
+from ai_video.production.project import (
+    load_production_project,
+    load_production_project_candidate,
+)
+from ai_video.production.registry import load_asset_registry, registry_semantic_sha256
+from ai_video.production.review import build_technical_review_context
+from ai_video.production.state_commit import (
+    ActivateRenderStateRequest,
+    BeginRenderAttemptRequest,
+    CommitPhase,
+    NoopCrashInjector,
+    PreparedArtifact,
+    ProductionStateCommitter,
+    RecordRenderFailureRequest,
+    RenderAttemptPaths,
+    StateCommitRequest,
+    _canonical_json_bytes,
+    _canonical_yaml_bytes,
+    _NativeFileOps,
+    _owned_temp_name,
+    prepare_dependency_graph_transition,
+)
 
 ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
@@ -420,6 +432,61 @@ def make_qa_policy(
     )
 
 
+def make_caption_qa_policy() -> QaPolicy:
+    caption_policy = CaptionQualityPolicy.create(
+        delivery_profile_fingerprint="a" * 64,
+        measurement_contract_version="caption-measurements/1",
+        track_policies=(
+            CaptionTrackPolicy(
+                caption_track_id="captions-zh",
+                language_tag="zh-Hans",
+                max_lines_per_cue=2,
+                max_graphemes_per_line=18,
+                max_reading_rate_milli_graphemes_per_second=8_000,
+                min_cue_duration_milliseconds=300,
+                max_cue_duration_milliseconds=8_000,
+                max_audio_sync_offset_milliseconds=150,
+                caption_overflow_tolerance_milli=0,
+            ),
+        ),
+        evidence_authorities=(
+            CaptionEvidenceAuthority(
+                tool_name="caption-evaluator",
+                tool_version="1",
+                requirement_groups=CAPTION_REQUIREMENT_GROUPS,
+                allowed_strengths=(CaptionEvidenceStrength.EXPLICIT_EVALUATOR,),
+            ),
+        ),
+    )
+    return seal_artifact(
+        QaPolicy(
+            artifact_id="qa-policy-caption-v1",
+            schema_version="2.1",
+            revision=1,
+            content_hash=ZERO_HASH,
+            creation_receipt_id="qa-policy-caption-v1",
+            source_provenance=(
+                SourceReference(kind="derived", reference="caption-policy-fixture"),
+            ),
+            policy_id="qa-caption",
+            policy_version="1",
+            required_layers=(QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.CAPTION),
+            technical_thresholds=QaTechnicalThresholds(
+                black_luma_max_milli=10,
+                silence_peak_max_millidb=-60_000,
+                clipping_peak_min_millidb=-100,
+            ),
+            layout_rules=QaLayoutRules(
+                safe_area_inset_milli=50,
+                caption_overflow_tolerance_milli=0,
+            ),
+            strategy_rules_version="1",
+            semantic_requirement="optional",
+            caption_policy=caption_policy,
+        )
+    )
+
+
 def test_p6_policy_activation_migrates_23_and_exact_replay_is_noop(
     tmp_path: Path,
 ) -> None:
@@ -447,6 +514,25 @@ def test_p6_policy_activation_migrates_23_and_exact_replay_is_noop(
         attempt_id="qa-policy-1",
     )
     assert replay == committed
+
+
+def test_caption_policy_activation_atomically_migrates_manifest_to_215(
+    tmp_path: Path,
+) -> None:
+    project_factory.write_production_project(tmp_path)
+    project_factory.make_manifest_23_project(tmp_path)
+    before = read_manifest(tmp_path)
+    writer = ProductionStateCommitter(tmp_path)
+
+    committed = writer.activate_qa_policy(
+        make_caption_qa_policy(),
+        expected_manifest_revision=before.manifest_revision,
+        attempt_id="qa-policy-caption-v1",
+    )
+
+    assert committed.schema_version == "2.15"
+    assert committed.manifest_revision == before.manifest_revision + 1
+    assert load_production_project(tmp_path / "project.yaml").qa_policy == make_caption_qa_policy()
 
 
 def test_review_request_is_consumed_once_before_analysis(tmp_path: Path) -> None:

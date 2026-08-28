@@ -5,6 +5,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     AssetRegistrySnapshot,
     DependencyGraphSnapshotPointer,
@@ -176,8 +177,7 @@ class _StateCommitRecoveryAttemptsMixin:
             if attempt.operation == "bootstrap_dependency_graph":
                 if (
                     attempt.base_dependency_graph is None
-                    and manifest.schema_version
-                    in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                    and manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
                     and manifest.active_dependency_graph is not None
                     and manifest.active_dependency_graph
                     != attempt.candidate_dependency_graph

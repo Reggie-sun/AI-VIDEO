@@ -7,14 +7,19 @@ from collections.abc import Callable
 from enum import Enum
 from typing import Literal
 
-from pydantic import Field, ValidationError, model_validator
+from pydantic import (
+    Field,
+    SerializerFunctionWrapHandler,
+    ValidationError,
+    model_serializer,
+    model_validator,
+)
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.composition_contracts import DeliveryProfile
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import QaLayer, QaPolicy, QaVerdict
-
 
 _SHA256 = r"^[0-9a-f]{64}$"
 
@@ -74,6 +79,7 @@ class UniversalQaApplicability(StrictModel):
 
 
 class UniversalQaProfile(StrictModel):
+    profile_contract_version: Literal[1, 2] = 1
     profile_id: str = Field(min_length=1)
     profile_version: str = Field(min_length=1)
     delivery_profile: DeliveryProfile
@@ -103,6 +109,12 @@ class UniversalQaProfile(StrictModel):
             raise ValueError("audio or captions require the audio/caption hard check")
         if self.applicability.layout_required and QaLayer.LAYOUT not in review_layers:
             raise ValueError("applicable layout requirements require the layout layer")
+        if (
+            self.profile_contract_version == 2
+            and self.applicability.has_captions
+            and QaLayer.CAPTION not in review_layers
+        ):
+            raise ValueError("version 2 caption profiles require the caption review layer")
         if self.applicability.requires_continuity:
             if UniversalHardCheck.CONTINUITY_EVIDENCE not in hard_checks:
                 raise ValueError("applicable continuity requires continuity evidence")
@@ -118,7 +130,7 @@ class UniversalQaProfile(StrictModel):
             raise ValueError("continuity requirement IDs must be unique")
         expected_hash = canonical_sha256(
             {
-                "schema": "universal-qa-profile/1",
+                "schema": f"universal-qa-profile/{self.profile_contract_version}",
                 **self.model_dump(mode="json", exclude={"content_hash"}),
             }
         )
@@ -128,13 +140,14 @@ class UniversalQaProfile(StrictModel):
 
     @classmethod
     def create(cls, **values: object) -> "UniversalQaProfile":
-        provisional = cls.model_construct(**values, content_hash="0" * 64)
+        versioned_values = {**values, "profile_contract_version": 2}
+        provisional = cls.model_construct(**versioned_values, content_hash="0" * 64)
         return cls.model_validate(
             {
-                **values,
+                **versioned_values,
                 "content_hash": canonical_sha256(
                     {
-                        "schema": "universal-qa-profile/1",
+                        "schema": "universal-qa-profile/2",
                         **provisional.model_dump(
                             mode="json",
                             exclude={"content_hash"},
@@ -144,6 +157,15 @@ class UniversalQaProfile(StrictModel):
                 ),
             }
         )
+
+    @model_serializer(mode="wrap")
+    def _serialize_legacy_profile(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.profile_contract_version == 1:
+            data.pop("profile_contract_version", None)
+        return data
 
 
 class UniversalQaContext(StrictModel):
@@ -306,6 +328,19 @@ def validate_universal_qa_coverage(
             block_reason=UniversalQaBlockReason.QA_POLICY_NOT_CURRENT,
         )
     selected_layers = set(validated_policy.required_layers)
+    if (
+        validated_profile.profile_contract_version == 2
+        and validated_profile.applicability.has_captions
+        and (
+            validated_policy.caption_policy is None
+            or QaLayer.CAPTION not in selected_layers
+        )
+    ):
+        return UniversalQaCoverageResult(
+            verdict=QaVerdict.NOT_EVALUATED,
+            block_reason=UniversalQaBlockReason.QA_POLICY_COVERAGE_INCOMPLETE,
+            blocked_identifiers=("caption_policy", QaLayer.CAPTION.value),
+        )
     missing_layers = tuple(
         layer.value
         for layer in validated_profile.required_review_layers

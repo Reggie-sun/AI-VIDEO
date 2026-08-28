@@ -14,6 +14,8 @@ from pydantic import (
     model_validator,
 )
 
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
+
 
 class ImageRequestReceipt(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -1225,7 +1227,7 @@ def reject_explicit_paid_provider_fields(value: object) -> object:
         isinstance(attempt, Mapping) and "paid_provider_state" in attempt
         for attempt in value.get("attempts", ())
     )
-    if manifest_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"} and (
+    if not manifest_supports(manifest_version, ManifestCapability.PAID_PROVIDER) and (
         "active_paid_provider_budget" in value or has_paid_attempt
     ):
         raise ValueError(
@@ -1238,7 +1240,7 @@ def reject_explicit_p8_video_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version not in {"2.13", "2.14"}:
+    if not manifest_supports(manifest_version, ManifestCapability.COMMERCIAL_VIDEO):
         for attempt in value.get("attempts", ()):
             state = (
                 attempt.get("video_generation_state")
@@ -1249,7 +1251,7 @@ def reject_explicit_p8_video_fields(value: object) -> object:
                 raise ValueError(
                     "Commercial Shot evaluation state requires Production Manifest 2.13"
                 )
-    if manifest_version != "2.14":
+    if not manifest_supports(manifest_version, ManifestCapability.SOURCE_BOUNDARY):
         for attempt in value.get("attempts", ()):
             state = (
                 attempt.get("video_generation_state")
@@ -1305,7 +1307,7 @@ def reject_explicit_p8_video_fields(value: object) -> object:
                     "checkpoint fields; Manifest 2.10 is required"
                 )
         return value
-    if manifest_version in {"2.10", "2.11", "2.12", "2.13", "2.14"}:
+    if manifest_supports(manifest_version, ManifestCapability.CONTINUITY_REVIEW):
         for attempt in value.get("attempts", ()):
             if not isinstance(attempt, Mapping):
                 continue
@@ -1344,7 +1346,7 @@ def reject_explicit_p7_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+    if manifest_supports(manifest_version, ManifestCapability.IMAGE_STATE):
         return value
     image_fields = {"image_request", "image_phase", "candidate_image_asset_ids"}
     for attempt in value.get("attempts", ()):
@@ -1362,7 +1364,7 @@ def reject_explicit_p0_fields(value: object) -> object:
     if not isinstance(value, Mapping):
         return value
     if (
-        value.get("schema_version", "2.0") not in {"2.11", "2.12", "2.13", "2.14"}
+        not manifest_supports(value.get("schema_version", "2.0"), ManifestCapability.P0_QUALIFICATION)
         and "active_p0_qualification_prepared" in value
     ):
         raise ValueError(

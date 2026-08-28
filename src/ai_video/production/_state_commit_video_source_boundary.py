@@ -6,6 +6,7 @@ import hashlib
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     QaVerdict,
     SourceBoundaryEvaluationPhase,
@@ -138,7 +139,7 @@ def validate_current_source_boundary_video_state(
         return None
     if (
         not required
-        or manifest.schema_version != "2.14"
+        or not manifest_supports(manifest.schema_version, ManifestCapability.SOURCE_BOUNDARY)
         or evaluation is None
         or evaluation.phase is not SourceBoundaryEvaluationPhase.EVIDENCED
         or evaluation.evidence is None
@@ -207,7 +208,7 @@ def checkpoint_source_boundary_review_intent(
 ):
     """Persist the exact source intent before any decoded measurement effect."""
 
-    if manifest.schema_version != "2.14":
+    if not manifest_supports(manifest.schema_version, ManifestCapability.SOURCE_BOUNDARY):
         raise _state_invalid("Source boundary intent requires Manifest 2.14.")
     evaluation = state.source_boundary_evaluation
     if evaluation is not None:
@@ -309,7 +310,7 @@ def checkpoint_source_boundary_review(
 ):
     """Persist intent then evidence; replay never invokes the reviewer again."""
 
-    if manifest.schema_version != "2.14":
+    if not manifest_supports(manifest.schema_version, ManifestCapability.SOURCE_BOUNDARY):
         raise _state_invalid("Source boundary validation requires Manifest 2.14.")
     evaluation = state.source_boundary_evaluation
     if reviewer is None:
@@ -545,7 +546,7 @@ def recover_source_boundary_review(
         attempt = committer._video_attempt(manifest, attempt_id)
         state = attempt.video_generation_state
         if (
-            manifest.schema_version != "2.14"
+            not manifest_supports(manifest.schema_version, ManifestCapability.SOURCE_BOUNDARY)
             or attempt.status
             not in {StateCommitStatus.RUNNING, StateCommitStatus.INTERRUPTED}
             or state is None

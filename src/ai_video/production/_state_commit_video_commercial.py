@@ -5,6 +5,16 @@ from __future__ import annotations
 import hashlib
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.commercial_video_validation import (
+    bound_commercial_source_approval,
+    current_commercial_source_approval,
+    validate_commercial_source_binding,
+    validate_current_commercial_checkpoint,
+)
+from ai_video.production.ecommerce_media_acceptance import (
+    adjudicate_generated_commercial_shot_evidence,
+)
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     CommercialShotEvaluationIntentPointer,
     CommercialShotEvaluationPhase,
@@ -17,20 +27,11 @@ from ai_video.production.paths import (
     canonical_commercial_shot_evaluation_intent_path,
     canonical_generated_commercial_shot_evidence_path,
 )
-from ai_video.production.ecommerce_media_acceptance import (
-    adjudicate_generated_commercial_shot_evidence,
-)
+from ai_video.production.project import load_qa_policy
 from ai_video.production.video_artifact import (
     invoke_generated_commercial_shot_reviewer,
     validate_generated_commercial_shot_evidence,
     validate_generated_commercial_shot_intent,
-)
-from ai_video.production.project import load_qa_policy
-from ai_video.production.commercial_video_validation import (
-    bound_commercial_source_approval,
-    current_commercial_source_approval,
-    validate_commercial_source_binding,
-    validate_current_commercial_checkpoint,
 )
 
 from ._state_commit_common import (
@@ -56,7 +57,7 @@ def commercial_evaluation_authority(committer, *, manifest, request):
     if binding is None:
         return None, ()
     if (
-        manifest.schema_version not in {"2.13", "2.14"}
+        not manifest_supports(manifest.schema_version, ManifestCapability.COMMERCIAL_VIDEO)
         or manifest.active_qa_policy is None
     ):
         raise _state_invalid(
@@ -183,7 +184,7 @@ def checkpoint_generated_commercial_shot(
     if evaluation_state is None:
         create_intent = getattr(commercial_reviewer, "create_intent", None)
         if (
-            manifest.schema_version not in {"2.13", "2.14"}
+            not manifest_supports(manifest.schema_version, ManifestCapability.COMMERCIAL_VIDEO)
             or request.commercial_binding is None
             or commercial_reviewer is None
             or create_intent is None

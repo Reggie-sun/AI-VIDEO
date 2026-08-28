@@ -13,6 +13,7 @@ from ai_video.production.commercial_visual_review import (
     CommercialVisualEvidence,
 )
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     CommercialSourceAttemptState,
     CommercialSourceLifecycle,
@@ -192,7 +193,7 @@ class _StateCommitCommercialSourceRecoveryMixin:
     ) -> CommercialSourceAttemptState:
         with self._exclusive_lock():
             manifest = self._read_manifest()
-            if manifest.schema_version not in {"2.12", "2.13", "2.14"}:
+            if not manifest_supports(manifest.schema_version, ManifestCapability.COMMERCIAL_SOURCE):
                 raise _state_invalid("Commercial source recovery requires Manifest 2.12.")
             attempt = next(
                 (
@@ -224,7 +225,7 @@ class _StateCommitCommercialSourceRecoveryMixin:
     def _active_commercial_source_recovery_items(
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
-        if manifest.schema_version not in {"2.12", "2.13", "2.14"}:
+        if not manifest_supports(manifest.schema_version, ManifestCapability.COMMERCIAL_SOURCE):
             return ()
         items: list[RecoveryItem] = []
         for attempt in manifest.commercial_source_attempts:

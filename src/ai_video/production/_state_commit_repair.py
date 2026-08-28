@@ -5,13 +5,17 @@ import hashlib
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.caption_quality import reopen_caption_review_chain
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     ApprovedRepairReceipt,
     ApprovedRepairReceiptPointer,
     DependencyLifecycle,
     DependencyNodeKind,
     ProductionManifest,
+    QaLayer,
+    QaVerdict,
     RepairOutcomeReceipt,
     RepairOutcomeReceiptPointer,
     RepairRequest,
@@ -106,7 +110,7 @@ class _StateCommitRepairMixin:
                     return manifest
                 raise _state_invalid("Repair authorization base revision changed.")
             if (
-                manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                not manifest_supports(manifest.schema_version, ManifestCapability.P6_REVIEW)
                 or manifest.active_qa_policy is None
             ):
                 raise AiVideoError(
@@ -314,6 +318,32 @@ class _StateCommitRepairMixin:
                     ErrorCode.REPAIR_SCOPE_INVALID,
                     "Repair outcome does not match authorization, rerender, and fresh review state.",
                 )
+            caption_pointers = tuple(
+                item
+                for item in receipt.fresh_review_receipts
+                if item.layer is QaLayer.CAPTION
+            )
+            if caption_pointers:
+                try:
+                    bundle = self._load_production_project(
+                        self._project_root / "project.yaml"
+                    )
+                    for caption_pointer in caption_pointers:
+                        reopened = reopen_caption_review_chain(
+                            project=bundle,
+                            receipt_pointer=caption_pointer,
+                        )
+                        if reopened.verdict is not QaVerdict.PASS:
+                            raise ValueError(
+                                "CAPTION review chain did not recompute to PASS"
+                            )
+                except (AiVideoError, OSError, ValidationError, ValueError) as exc:
+                    raise AiVideoError(
+                        ErrorCode.REPAIR_SCOPE_INVALID,
+                        "Repair outcome requires a current passing CAPTION review chain.",
+                        technical_detail=str(exc),
+                        retryable=False,
+                    ) from exc
             artifact = PreparedArtifact(pointer.path, payload, file_sha256)
             self._write_immutable_artifact(artifact, attempt_id=attempt_id)
             updated = manifest.model_copy(

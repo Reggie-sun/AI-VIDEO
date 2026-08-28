@@ -7,38 +7,41 @@ fall back. Validation may prepare an inactive candidate, but never activates it.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import hashlib
 import os
-from pathlib import Path
 import stat
 import subprocess
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Callable
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.hashing import canonical_sha256
-from ai_video.production.models import LoadedProductionProject
-from ai_video.production.paths import _read_regular_file_nofollow
 from ai_video.production.comfy_image import _git_head
+from ai_video.production.continuity_evaluator import FfmpegRgbFrameSampler
+from ai_video.production.hashing import canonical_sha256
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
+from ai_video.production.models import LoadedProductionProject, ToolIdentity
+from ai_video.production.paths import _read_regular_file_nofollow
 from ai_video.production.project import load_production_project
+from ai_video.production.shot_continuity_source_contracts import (
+    SourceQualificationTransport,
+)
 from ai_video.production.shot_continuity_source_qualification import (
     ShotContinuitySourceQualificationCaller,
     ShotContinuitySourceQualificationProfile,
     ShotContinuitySourceQualificationProvider,
     load_source_qualification_profile,
 )
+from ai_video.production.shot_continuity_source_review import (
+    SourceBoundaryHumanDecisionV1,
+    SourceBoundaryMeasurementContractV1,
+    SourceBoundaryReviewerV1,
+)
 from ai_video.production.shot_continuity_source_runtime import (
     make_source_production_committer,
 )
 from ai_video.production.shot_continuity_source_transport import (
     ComfySourceQualificationTransport,
-)
-from ai_video.production.shot_continuity_source_contracts import (
-    SourceQualificationTransport,
-)
-from ai_video.production.video_compiler import (
-    VideoGenerationRequestCompilation,
-    compile_video_generation_request,
 )
 from ai_video.production.video import (
     BillingKind,
@@ -49,6 +52,10 @@ from ai_video.production.video import (
     VideoGenerationMode,
     VideoImageReferenceBinding,
 )
+from ai_video.production.video_compiler import (
+    VideoGenerationRequestCompilation,
+    compile_video_generation_request,
+)
 from ai_video.production.video_contracts import (
     VideoFlexibleOutputRequirement,
     VideoOutputCapability,
@@ -57,13 +64,6 @@ from ai_video.production.video_generation import (
     FetchedVideoCandidate,
     VideoGenerationService,
 )
-from ai_video.production.continuity_evaluator import FfmpegRgbFrameSampler
-from ai_video.production.shot_continuity_source_review import (
-    SourceBoundaryHumanDecisionV1,
-    SourceBoundaryMeasurementContractV1,
-    SourceBoundaryReviewerV1,
-)
-from ai_video.production.models import ToolIdentity
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -530,7 +530,7 @@ class ShotContinuitySourceOperator:
                 "Source boundary reviewer requires the sealed qualification profile."
             )
         manifest = self.committer._read_manifest()
-        if manifest.schema_version != "2.14":
+        if not manifest_supports(manifest.schema_version, ManifestCapability.SOURCE_BOUNDARY):
             raise _state_invalid(
                 "Source boundary reviewer requires Production Manifest 2.14."
             )

@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 
 from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.manifest_schema import MANIFEST_SCHEMA_ORDER
 from ai_video.production.models import (
     AssetRegistrySnapshot,
     ProductionManifest,
@@ -29,23 +30,6 @@ from ._state_commit_common import (
 from ._state_commit_contracts import PreparedArtifact
 
 
-_MANIFEST_SCHEMA_ORDER = (
-    "2.0",
-    "2.1",
-    "2.2",
-    "2.3",
-    "2.4",
-    "2.5",
-    "2.6",
-    "2.7",
-    "2.8",
-    "2.9",
-    "2.10",
-    "2.11",
-    "2.12", "2.13", "2.14",
-)
-
-
 class _StateCommitBootstrapMixin:
     def upgrade_manifest_schema(
         self,
@@ -55,7 +39,7 @@ class _StateCommitBootstrapMixin:
     ) -> ProductionManifest:
         """Advance only the selected Manifest schema through the canonical writer."""
 
-        if target_schema_version not in _MANIFEST_SCHEMA_ORDER:
+        if target_schema_version not in MANIFEST_SCHEMA_ORDER:
             raise _state_invalid("Target Production Manifest schema is unsupported.")
         manifest_replaced = [False]
         try:
@@ -81,8 +65,8 @@ class _StateCommitBootstrapMixin:
                     raise _state_invalid(
                         "Production Manifest schema upgrade base revision changed."
                     )
-                if _MANIFEST_SCHEMA_ORDER.index(target_schema_version) < (
-                    _MANIFEST_SCHEMA_ORDER.index(current.schema_version)
+                if MANIFEST_SCHEMA_ORDER.index(target_schema_version) < (
+                    MANIFEST_SCHEMA_ORDER.index(current.schema_version)
                 ):
                     raise _state_invalid(
                         "Production Manifest schema cannot be downgraded."

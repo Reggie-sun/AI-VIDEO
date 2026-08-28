@@ -1479,6 +1479,55 @@ def test_approved_repair_freshness_routes_to_state_and_review_suites() -> None:
     assert "task_architecture_gate" in report["check_ids"]
 
 
+@pytest.mark.parametrize(
+    ("path", "categories", "check_ids"),
+    (
+        (
+            "src/ai_video/production/caption_quality_contracts.py",
+            {"production_shared_contracts", "production_review"},
+            {"production_contract_tests", "production_review_tests"},
+        ),
+        (
+            "src/ai_video/production/caption_quality.py",
+            {"production_review"},
+            {"production_review_tests"},
+        ),
+        (
+            "src/ai_video/production/_caption_quality_p6.py",
+            {"production_review", "production_state"},
+            {"production_review_tests", "production_state_tests"},
+        ),
+        (
+            "src/ai_video/production/manifest_schema.py",
+            {"production_shared_contracts", "production_state"},
+            {"production_contract_tests", "production_state_tests"},
+        ),
+        (
+            "src/ai_video/production/_caption_review_models.py",
+            {"production_shared_contracts", "production_review"},
+            {"production_contract_tests", "production_review_tests"},
+        ),
+        (
+            "src/ai_video/production/_review_project_reader.py",
+            {"production_reader", "production_review"},
+            {"production_reader_tests", "production_review_tests"},
+        ),
+    ),
+)
+def test_caption_quality_sources_route_to_exact_contract_owners(
+    path: str,
+    categories: set[str],
+    check_ids: set[str],
+) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths([path], policy)
+
+    assert set(report["categories"]) == categories
+    assert check_ids.issubset(report["check_ids"])
+    assert report["fallback_paths"] == []
+
+
 def test_shared_committer_helpers_route_to_full_production_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

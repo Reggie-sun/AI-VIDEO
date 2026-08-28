@@ -2,10 +2,22 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+import production_project_factory as project_factory
 import pytest
+from production_e2e_support import (
+    make_caption_quality_policy,
+    make_caption_review_execution,
+)
+from test_production_hyperframes import (
+    FakeRunner,
+    _CountingRenderCommitter,
+    _Manifest25RenderFixture,
+    _write_executable,
+)
+from test_production_review import _Manifest25ReviewFixture
 
-from ai_video.errors import AiVideoError
-
+from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._caption_quality_p6 import run_caption_review_transaction
 from ai_video.production.ad_creative_types import (
     AdCompositionRequirements,
     AdShotProposal,
@@ -39,7 +51,11 @@ from ai_video.production.models import (
     SourceReference,
     ToolIdentity,
 )
-from ai_video.production.project import load_production_project
+from ai_video.production.project import (
+    load_production_project,
+    load_review_receipt,
+    load_review_request,
+)
 from ai_video.production.quality_gate_coordinator import (
     UniversalHardCheck,
     UniversalQaApplicability,
@@ -49,16 +65,8 @@ from ai_video.production.quality_gate_coordinator import (
 from ai_video.production.state_commit import (
     BeginRenderAttemptRequest,
     ProductionStateCommitter,
+    recover_production_state,
 )
-import production_project_factory as project_factory
-from test_production_hyperframes import (
-    FakeRunner,
-    _CountingRenderCommitter,
-    _Manifest25RenderFixture,
-    _write_executable,
-)
-from test_production_review import _Manifest25ReviewFixture
-
 
 ZERO_HASH = "0" * 64
 PLAN_HASH = "a" * 64
@@ -91,8 +99,9 @@ def _projection(shot_id: str) -> CommercialExecutionProjection:
     return CommercialExecutionProjection.model_validate(values)
 
 
-def _policy() -> QaPolicy:
+def _policy(tmp_path, timeline) -> QaPolicy:
     profile = create_qingyan_ecommerce_acceptance_profile()
+    loaded = load_production_project(tmp_path / "project.yaml")
     domain = DomainAcceptancePolicy(
         domain_id="ecommerce",
         profile_id=profile.profile_id,
@@ -104,6 +113,7 @@ def _policy() -> QaPolicy:
     )
     return seal_artifact(
         QaPolicy(
+            schema_version="2.1",
             artifact_id="ecommerce-e2e-policy",
             revision=1,
             content_hash=ZERO_HASH,
@@ -111,7 +121,12 @@ def _policy() -> QaPolicy:
             source_provenance=(SourceReference(kind="derived", reference="e2e"),),
             policy_id="ecommerce-e2e-policy",
             policy_version="1",
-            required_layers=(QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.SEMANTIC),
+            required_layers=(
+                QaLayer.TECHNICAL,
+                QaLayer.LAYOUT,
+                QaLayer.CAPTION,
+                QaLayer.SEMANTIC,
+            ),
             technical_thresholds=QaTechnicalThresholds(
                 black_luma_max_milli=10,
                 silence_peak_max_millidb=-60_000,
@@ -125,6 +140,7 @@ def _policy() -> QaPolicy:
             semantic_requirement="required",
             semantic_authorities=(TOOL,),
             domain_acceptance=domain,
+            caption_policy=make_caption_quality_policy(loaded, timeline),
         )
     )
 
@@ -253,7 +269,7 @@ def test_canonical_final_candidate_closes_gate_two_p6_and_final_acceptance(
     tmp_path,
 ) -> None:
     handoff, timeline = _render_canonical_ad(tmp_path)
-    policy = _policy()
+    policy = _policy(tmp_path, timeline)
     committer = ProductionStateCommitter(tmp_path)
     manifest = load_production_project(tmp_path / "project.yaml").manifest
     committer.activate_qa_policy(
@@ -293,7 +309,11 @@ def test_canonical_final_candidate_closes_gate_two_p6_and_final_acceptance(
             UniversalHardCheck.RENDER_OUTPUT,
             UniversalHardCheck.AUDIO_CAPTION_BINDING,
         ),
-        required_review_layers=(QaLayer.TECHNICAL, QaLayer.LAYOUT),
+        required_review_layers=(
+            QaLayer.TECHNICAL,
+            QaLayer.LAYOUT,
+            QaLayer.CAPTION,
+        ),
     )
     gate_one_calls: list[str] = []
     render_activation_calls: list[str] = []
@@ -311,6 +331,7 @@ def test_canonical_final_candidate_closes_gate_two_p6_and_final_acceptance(
             gate_one_calls.append(layer.value)
             or UniversalQaCheckOutcome(verdict=QaVerdict.PASS, current=True)
         ),
+        caption_review_execution=make_caption_review_execution("ecommerce-e2e"),
         tool_identity=TOOL,
         evaluate=lambda *_: _passing_payload(),
         review_attempt_id="ecommerce-e2e-semantic",
@@ -328,10 +349,19 @@ def test_canonical_final_candidate_closes_gate_two_p6_and_final_acceptance(
     assert result.final_acceptance_recorded is True
     assert gate_one_calls == [
         *(item.value for item in profile.required_hard_checks),
-        *(item.value for item in profile.required_review_layers),
+        QaLayer.TECHNICAL.value,
+        QaLayer.LAYOUT.value,
     ]
     assert result.render_output_sha256 == bundle.render_state.output.file_sha256
     assert final.final_acceptance_state is not None
+    before_replay = (tmp_path / "state/manifest.json").read_bytes()
+    replay = run_caption_review_transaction(
+        committer=committer,
+        execution=make_caption_review_execution("ecommerce-e2e-replay"),
+    )
+    assert replay.verdict is QaVerdict.PASS
+    assert replay.current is True
+    assert (tmp_path / "state/manifest.json").read_bytes() == before_replay
 
 
 def test_noncanonical_file_cannot_be_supplied_as_post_media_candidate() -> None:
@@ -344,7 +374,7 @@ def test_noncanonical_file_cannot_be_supplied_as_post_media_candidate() -> None:
 
 def test_changed_active_render_bytes_cannot_enter_gate_closure(tmp_path) -> None:
     handoff, timeline = _render_canonical_ad(tmp_path)
-    policy = _policy()
+    policy = _policy(tmp_path, timeline)
     committer = ProductionStateCommitter(tmp_path)
     manifest = load_production_project(tmp_path / "project.yaml").manifest
     committer.activate_qa_policy(
@@ -400,7 +430,7 @@ def test_changed_active_render_bytes_cannot_enter_gate_closure(tmp_path) -> None
 
 def test_invalid_gate_two_evidence_is_durably_not_evaluated(tmp_path) -> None:
     handoff, timeline = _render_canonical_ad(tmp_path)
-    policy = _policy()
+    policy = _policy(tmp_path, timeline)
     committer = ProductionStateCommitter(tmp_path)
     manifest = load_production_project(tmp_path / "project.yaml").manifest
     committer.activate_qa_policy(
@@ -424,7 +454,11 @@ def test_invalid_gate_two_evidence_is_durably_not_evaluated(tmp_path) -> None:
             UniversalHardCheck.RENDER_OUTPUT,
             UniversalHardCheck.AUDIO_CAPTION_BINDING,
         ),
-        required_review_layers=(QaLayer.TECHNICAL, QaLayer.LAYOUT),
+        required_review_layers=(
+            QaLayer.TECHNICAL,
+            QaLayer.LAYOUT,
+            QaLayer.CAPTION,
+        ),
     )
 
     production = run_ecommerce_ad_production(
@@ -438,6 +472,9 @@ def test_invalid_gate_two_evidence_is_durably_not_evaluated(tmp_path) -> None:
         ),
         run_review_layer=lambda *_: UniversalQaCheckOutcome(
             verdict=QaVerdict.PASS, current=True
+        ),
+        caption_review_execution=make_caption_review_execution(
+            "ecommerce-invalid"
         ),
         tool_identity=TOOL,
         evaluate=lambda *_: object(),
@@ -458,3 +495,187 @@ def test_invalid_gate_two_evidence_is_durably_not_evaluated(tmp_path) -> None:
     assert any(
         item.layer is QaLayer.SEMANTIC for item in current.active_review_receipts
     )
+
+
+def test_captioned_closure_without_caption_execution_stops_before_gate_two(
+    tmp_path,
+) -> None:
+    handoff, timeline = _render_canonical_ad(tmp_path)
+    committer = ProductionStateCommitter(tmp_path)
+    manifest = load_production_project(tmp_path / "project.yaml").manifest
+    policy = _policy(tmp_path, timeline)
+    committer.activate_qa_policy(
+        policy,
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="ecommerce-missing-caption-policy",
+    )
+    profile = UniversalQaProfile.create(
+        profile_id="ecommerce-missing-caption",
+        profile_version="2",
+        delivery_profile=timeline.delivery_profile,
+        applicability=UniversalQaApplicability(
+            has_audio=True,
+            has_captions=True,
+            has_transitions=True,
+        ),
+        required_hard_checks=(
+            UniversalHardCheck.ASSET_PROVENANCE,
+            UniversalHardCheck.MEDIA_DECODE,
+            UniversalHardCheck.TIMELINE_BINDING,
+            UniversalHardCheck.RENDER_OUTPUT,
+            UniversalHardCheck.AUDIO_CAPTION_BINDING,
+        ),
+        required_review_layers=(
+            QaLayer.TECHNICAL,
+            QaLayer.LAYOUT,
+            QaLayer.CAPTION,
+        ),
+    )
+    gate_two_calls: list[str] = []
+
+    production = run_ecommerce_ad_production(
+        handoff,
+        facades={},
+        activate_final_render=lambda *_: None,
+        committer=committer,
+        universal_profile=profile,
+        run_hard_check=lambda *_: UniversalQaCheckOutcome(
+            verdict=QaVerdict.PASS, current=True
+        ),
+        run_review_layer=lambda *_: UniversalQaCheckOutcome(
+            verdict=QaVerdict.PASS, current=True
+        ),
+        tool_identity=TOOL,
+        evaluate=lambda *_: gate_two_calls.append("called"),
+        review_attempt_id="ecommerce-missing-caption-semantic",
+        review_request_id="ecommerce-missing-caption-request",
+        evidence_id="ecommerce-missing-caption-evidence",
+        review_id="ecommerce-missing-caption-review",
+        final_acceptance_id="ecommerce-missing-caption-final",
+    )
+
+    result = production.post_media_acceptance
+    assert result is not None
+    assert result.gate_two.verdict is QaVerdict.NOT_EVALUATED
+    assert result.p6_semantic_receipt_recorded is False
+    assert result.final_acceptance_recorded is False
+    assert gate_two_calls == []
+    assert all(
+        item.layer is not QaLayer.CAPTION
+        for item in load_production_project(
+            tmp_path / "project.yaml"
+        ).manifest.active_review_receipts
+    )
+
+
+def test_tampered_caption_request_chain_blocks_standard_project_reopen(
+    tmp_path,
+) -> None:
+    _, timeline = _render_canonical_ad(tmp_path)
+    committer = ProductionStateCommitter(tmp_path)
+    manifest = load_production_project(tmp_path / "project.yaml").manifest
+    committer.activate_qa_policy(
+        _policy(tmp_path, timeline),
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="ecommerce-caption-tamper-policy",
+    )
+    outcome = run_caption_review_transaction(
+        committer=committer,
+        execution=make_caption_review_execution("ecommerce-caption-tamper"),
+    )
+    assert outcome.verdict is QaVerdict.PASS
+    current = load_production_project(tmp_path / "project.yaml")
+    pointer = next(
+        item
+        for item in current.manifest.active_review_receipts
+        if item.layer is QaLayer.CAPTION
+    )
+    receipt = load_review_receipt(tmp_path, pointer)
+    request_path = tmp_path / receipt.review_request.path
+    request_path.write_bytes(request_path.read_bytes() + b" ")
+
+    with pytest.raises(AiVideoError):
+        load_production_project(tmp_path / "project.yaml")
+
+
+def test_recovered_unknown_caption_attempt_blocks_new_execution(tmp_path) -> None:
+    _, timeline = _render_canonical_ad(tmp_path)
+    committer = ProductionStateCommitter(tmp_path)
+    manifest = load_production_project(tmp_path / "project.yaml").manifest
+    committer.activate_qa_policy(
+        _policy(tmp_path, timeline),
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="ecommerce-caption-unknown-policy",
+    )
+    failing = replace(
+        make_caption_review_execution("ecommerce-caption-unknown"),
+        evaluator=lambda *_: (_ for _ in ()).throw(RuntimeError("interrupted")),
+    )
+    with pytest.raises(RuntimeError, match="interrupted"):
+        run_caption_review_transaction(committer=committer, execution=failing)
+    recover_production_state(tmp_path)
+    before = (tmp_path / "state/manifest.json").read_bytes()
+
+    with pytest.raises(AiVideoError) as exc_info:
+        run_caption_review_transaction(
+            committer=committer,
+            execution=make_caption_review_execution(
+                "ecommerce-caption-after-unknown"
+            ),
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert (tmp_path / "state/manifest.json").read_bytes() == before
+
+
+def test_newer_unknown_caption_attempt_blocks_active_receipt_replay(tmp_path) -> None:
+    _, timeline = _render_canonical_ad(tmp_path)
+    committer = ProductionStateCommitter(tmp_path)
+    manifest = load_production_project(tmp_path / "project.yaml").manifest
+    committer.activate_qa_policy(
+        _policy(tmp_path, timeline),
+        expected_manifest_revision=manifest.manifest_revision,
+        attempt_id="ecommerce-caption-active-unknown-policy",
+    )
+    outcome = run_caption_review_transaction(
+        committer=committer,
+        execution=make_caption_review_execution("ecommerce-caption-active"),
+    )
+    assert outcome.verdict is QaVerdict.PASS
+    current = load_production_project(tmp_path / "project.yaml")
+    pointer = next(
+        item
+        for item in current.manifest.active_review_receipts
+        if item.layer is QaLayer.CAPTION
+    )
+    receipt = load_review_receipt(tmp_path, pointer)
+    original = load_review_request(tmp_path, receipt.review_request)
+    unknown_request = seal_artifact(
+        original.model_copy(
+            update={
+                "artifact_id": "ecommerce-caption-newer-unknown-request",
+                "request_id": "ecommerce-caption-newer-unknown-request",
+                "creation_receipt_id": "ecommerce-caption-newer-unknown-request",
+                "revision": original.revision + 1,
+                "content_hash": ZERO_HASH,
+                "base_manifest_revision": current.manifest.manifest_revision,
+            }
+        )
+    )
+    committer.begin_review(
+        unknown_request,
+        attempt_id="ecommerce-caption-newer-unknown",
+    )
+    recover_production_state(tmp_path)
+    before = (tmp_path / "state/manifest.json").read_bytes()
+
+    with pytest.raises(AiVideoError) as exc_info:
+        run_caption_review_transaction(
+            committer=committer,
+            execution=make_caption_review_execution(
+                "ecommerce-caption-replay-masked"
+            ),
+        )
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
+    assert (tmp_path / "state/manifest.json").read_bytes() == before

@@ -8,13 +8,13 @@ from pydantic import ValidationError
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._lifecycle_schema import (
     CommercialShotEvaluationIntentPointer,
+    ContinuityEvaluationIntentPointer,
     GeneratedCommercialShotEvidencePointer,
+    GeneratedShotContinuityEvidencePointer,
     LocalVideoFetchReceiptPointer,
     LocalVideoStatusReceiptPointer,
     LocalVideoSubmitIntentPointer,
     LocalVideoSubmitReceiptPointer,
-    ContinuityEvaluationIntentPointer,
-    GeneratedShotContinuityEvidencePointer,
     SourceBoundaryReviewEvidencePointer,
     SourceBoundaryReviewIntentPointer,
     SourceBoundaryReviewReceiptPointer,
@@ -26,25 +26,16 @@ from ai_video.production._paid_provider_project_reader import (
     load_paid_provider_gate_receipt,
     load_paid_provider_submit_receipt,
 )
-from ai_video.production.models import (
-    AssetRecord,
-    AssetSourceKind,
-    AssetType,
-    LoadedProductionProject,
-    CommercialShotEvaluationPhase,
-    SourceBoundaryEvaluationPhase,
-    SourceBoundaryReviewVerdict,
-    PaidProviderAttemptPhase,
-    ProductionManifest,
-    StateCommitStatus,
-    StateCommitAttempt,
-    VideoAttemptPhase,
-    VideoFetchReceiptPointer,
-    VideoGenerationAttemptState,
-    VideoRequestReceiptPointer,
-    VideoStatusReceiptPointer,
-    TerminalFrameEvidencePointer,
-    TerminalFrameExtractionReceiptPointer,
+from ai_video.production.commercial_video_validation import (
+    bound_commercial_source_approval,
+    validate_current_commercial_checkpoint,
+)
+from ai_video.production.ecommerce_media_acceptance import (
+    CommercialShotEvaluationIntent,
+    GeneratedCommercialShotEvidence,
+)
+from ai_video.production.execution_stack_materialization import (
+    verify_execution_stack_source_artifacts,
 )
 from ai_video.production.local_video import (
     LocalVideoFetchReceipt,
@@ -52,40 +43,51 @@ from ai_video.production.local_video import (
     LocalVideoSubmitResult,
     LocalVideoTaskObservation,
 )
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
+from ai_video.production.models import (
+    AssetRecord,
+    AssetSourceKind,
+    AssetType,
+    CommercialShotEvaluationPhase,
+    LoadedProductionProject,
+    PaidProviderAttemptPhase,
+    ProductionManifest,
+    SourceBoundaryEvaluationPhase,
+    SourceBoundaryReviewVerdict,
+    StateCommitAttempt,
+    StateCommitStatus,
+    TerminalFrameEvidencePointer,
+    TerminalFrameExtractionReceiptPointer,
+    VideoAttemptPhase,
+    VideoFetchReceiptPointer,
+    VideoGenerationAttemptState,
+    VideoRequestReceiptPointer,
+    VideoStatusReceiptPointer,
+)
 from ai_video.production.paid_provider import BudgetReservationStatus
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
+    canonical_commercial_shot_evaluation_intent_path,
+    canonical_continuity_evaluation_intent_path,
     canonical_continuity_transition_policy_path,
     canonical_execution_stack_identity_path,
+    canonical_generated_commercial_shot_evidence_path,
+    canonical_generated_shot_continuity_evidence_path,
+    canonical_image_asset_path,
     canonical_p0_qualification_input_path,
     canonical_p0_qualification_receipt_path,
     canonical_real_shot_validation_set_path,
-    canonical_video_probe_receipt_path,
-    canonical_video_provenance_receipt_path,
-    canonical_image_asset_path,
-    canonical_terminal_frame_extraction_receipt_path,
-    canonical_continuity_evaluation_intent_path,
-    canonical_generated_shot_continuity_evidence_path,
     canonical_source_boundary_review_evidence_path,
     canonical_source_boundary_review_intent_path,
     canonical_source_boundary_review_receipt_path,
-    canonical_commercial_shot_evaluation_intent_path,
-    canonical_generated_commercial_shot_evidence_path,
+    canonical_terminal_frame_extraction_receipt_path,
+    canonical_video_probe_receipt_path,
+    canonical_video_provenance_receipt_path,
     resolve_contained_path,
 )
-from ai_video.production.video import (
-    ResolvedVideoGenerationRequest,
-    VideoFetchReceipt,
-    VideoSubmission,
-    VideoTaskObservation,
-    VideoTaskState,
-    TerminalFrameEvidence,
-)
-from ai_video.production.video_artifact import (
-    TerminalFrameExtractionReceipt,
-    VideoProbeReceipt,
-    VideoProvenanceReceipt,
-    bind_terminal_frame_evidence,
+from ai_video.production.review import (
+    ContinuityEvaluationIntent,
+    GeneratedShotContinuityEvidence,
 )
 from ai_video.production.shot_continuity_source_review import (
     SourceBoundaryMeasurementContractV1,
@@ -96,6 +98,20 @@ from ai_video.production.shot_continuity_source_review import (
     validate_source_boundary_review_closure,
     validate_source_boundary_review_intent,
 )
+from ai_video.production.video import (
+    ResolvedVideoGenerationRequest,
+    TerminalFrameEvidence,
+    VideoFetchReceipt,
+    VideoSubmission,
+    VideoTaskObservation,
+    VideoTaskState,
+)
+from ai_video.production.video_artifact import (
+    TerminalFrameExtractionReceipt,
+    VideoProbeReceipt,
+    VideoProvenanceReceipt,
+    bind_terminal_frame_evidence,
+)
 from ai_video.production.video_execution_stack import (
     GenerationExecutionStackIdentity,
 )
@@ -104,21 +120,6 @@ from ai_video.production.video_transition import (
     P0QualificationInput,
     P0QualificationPreparedReceipt,
     RealShotValidationSet,
-)
-from ai_video.production.ecommerce_media_acceptance import (
-    CommercialShotEvaluationIntent,
-    GeneratedCommercialShotEvidence,
-)
-from ai_video.production.execution_stack_materialization import (
-    verify_execution_stack_source_artifacts,
-)
-from ai_video.production.commercial_video_validation import (
-    bound_commercial_source_approval,
-    validate_current_commercial_checkpoint,
-)
-from ai_video.production.review import (
-    ContinuityEvaluationIntent,
-    GeneratedShotContinuityEvidence,
 )
 
 
@@ -899,7 +900,7 @@ def verify_video_evidence(
                 or state.commercial_evaluation is not None
             )
             and schema_version is not None
-            and schema_version not in {"2.13", "2.14"}
+            and not manifest_supports(schema_version, ManifestCapability.COMMERCIAL_VIDEO)
         ):
             raise _invalid(
                 "Commercial-bound video state requires Production Manifest 2.13."
@@ -929,7 +930,7 @@ def verify_video_evidence(
         if (
             state.source_boundary_evaluation is not None
             and schema_version is not None
-            and schema_version != "2.14"
+            and not manifest_supports(schema_version, ManifestCapability.SOURCE_BOUNDARY)
         ):
             raise _invalid("Source boundary state requires Production Manifest 2.14.")
         if state.phase in {VideoAttemptPhase.CANDIDATE, VideoAttemptPhase.ACTIVATE}:

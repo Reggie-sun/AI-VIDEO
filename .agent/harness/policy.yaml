@@ -188,7 +188,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify immutable graph inputs and precise selective rebuild.
   production_review_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, tests/test_production_review.py, tests/test_production_quality_gate_coordinator.py, tests/test_production_ecommerce_media_acceptance.py, tests/test_production_ecommerce_quality_gate.py, tests/test_production_ecommerce_post_media_e2e.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, tests/test_production_review.py, tests/test_production_caption_quality.py, tests/test_production_quality_gate_coordinator.py, tests/test_production_ecommerce_media_acceptance.py, tests/test_production_ecommerce_quality_gate.py, tests/test_production_ecommerce_post_media_e2e.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_repair.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     description: Verify durable review, authorization, repair, and final acceptance.
   commercial_source_preparation_tests:
@@ -428,6 +428,9 @@ categories:
       - src/ai_video/production/_state_commit_transaction.py
       - src/ai_video/production/_state_commit_recovery.py
       - src/ai_video/production/_state_commit_recovery_*.py
+      - src/ai_video/production/_caption_review_models.py
+      - src/ai_video/production/caption_quality_contracts.py
+      - src/ai_video/production/manifest_schema.py
       - tests/test_production_models.py
       - tests/test_production_project.py
       - tests/test_production_state_commit.py
@@ -455,6 +458,8 @@ categories:
       - task_architecture_gate
   production_state:
     patterns:
+      - src/ai_video/production/manifest_schema.py
+      - src/ai_video/production/_caption_quality_p6.py
       - src/ai_video/production/_repair_freshness.py
       - src/ai_video/production/_state_commit_*.py
       - tests/helpers/p2a_crash_worker.py
@@ -507,6 +512,11 @@ categories:
       - task_architecture_gate
   production_review:
     patterns:
+      - src/ai_video/production/caption_quality_contracts.py
+      - src/ai_video/production/caption_quality.py
+      - src/ai_video/production/_caption_quality_p6.py
+      - src/ai_video/production/_caption_review_models.py
+      - src/ai_video/production/_review_project_reader.py
       - src/ai_video/production/domain_acceptance.py
       - src/ai_video/production/ecommerce_media_acceptance.py
       - src/ai_video/production/ecommerce_quality_gate.py
@@ -524,6 +534,7 @@ categories:
       - src/ai_video_mcp/tools/optimize_plan.py
       - src/ai_video_mcp/tools/apply_optimization.py
       - tests/test_production_review.py
+      - tests/test_production_caption_quality.py
       - tests/test_production_ecommerce_media_acceptance.py
       - tests/test_production_ecommerce_quality_gate.py
       - tests/test_production_ecommerce_post_media_e2e.py

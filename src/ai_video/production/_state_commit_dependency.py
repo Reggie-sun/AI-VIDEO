@@ -6,15 +6,16 @@ from typing import Mapping
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError
+from ai_video.production._commercial_project_reader import (
+    verify_active_commercial_source_approvals,
+)
 from ai_video.production.dependency import (
     dependency_graph_semantic_sha256,
     desired_fingerprints,
     resolve_dependency_state,
 )
 from ai_video.production.hashing import canonical_sha256
-from ai_video.production._commercial_project_reader import (
-    verify_active_commercial_source_approvals,
-)
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     CommercialSourceApprovalPointer,
     CommercialSourceAttemptState,
@@ -44,8 +45,8 @@ from ai_video.production.project import (
     _verify_dependency_project_evidence,
     _verify_dependency_registry_evidence,
     _verify_manifest_dependency_states,
-    load_qa_policy,
     load_production_project_candidate,
+    load_qa_policy,
 )
 
 from ._state_commit_common import (
@@ -309,8 +310,7 @@ class _StateCommitDependencyMixin:
                 {
                     "schema_version": (
                         manifest.schema_version
-                        if manifest.schema_version
-                        in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                        if manifest_supports(manifest.schema_version, ManifestCapability.P6_REVIEW)
                         else "2.3"
                     ),
                     "active_project": project_pointer,
@@ -341,7 +341,7 @@ class _StateCommitDependencyMixin:
                                 else active_commercial_source_approvals
                             ),
                         }
-                        if manifest.schema_version in {"2.12", "2.13", "2.14"}
+                        if manifest_supports(manifest.schema_version, ManifestCapability.COMMERCIAL_SOURCE)
                         else {}
                     ),
                 },
@@ -392,18 +392,9 @@ class _StateCommitDependencyMixin:
         artifacts: tuple[PreparedArtifact, ...],
         transition: DependencyGraphTransition | None,
     ) -> tuple[DependencyGraphTransition | None, DependencyGraphSnapshot | None]:
-        if manifest.schema_version not in {
-            "2.3",
-            "2.4",
-            "2.5",
-            "2.6",
-            "2.7",
-            "2.8",
-            "2.9",
-            "2.10",
-            "2.11",
-            "2.12", "2.13", "2.14",
-        }:
+        if not manifest_supports(
+            manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH
+        ):
             if transition is not None:
                 raise _state_invalid(
                     "Dependency graph transition requires Manifest 2.3."
@@ -627,18 +618,9 @@ class _StateCommitDependencyMixin:
         desired_fingerprint: str,
     ) -> tuple[ProductionManifest, DependencyGraphSnapshot, object, DependencyNodeState]:
         manifest = self._read_manifest()
-        if manifest.schema_version not in {
-            "2.3",
-            "2.4",
-            "2.5",
-            "2.6",
-            "2.7",
-            "2.8",
-            "2.9",
-            "2.10",
-            "2.11",
-            "2.12", "2.13", "2.14",
-        }:
+        if not manifest_supports(
+            manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH
+        ):
             raise _state_invalid("Dependency results require Manifest 2.3.")
         if manifest.manifest_revision != expected_manifest_revision:
             raise _state_invalid("Production Manifest revision is stale.")

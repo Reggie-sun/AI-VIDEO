@@ -6,6 +6,12 @@ from typing import TypeVar
 from pydantic import BaseModel, ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.commercial_dependency import (
+    validate_commercial_source_dependency_graph,
+)
+from ai_video.production.commercial_reference import (
+    validate_product_reference_set_against_registry,
+)
 from ai_video.production.commercial_source_preparation import (
     ApprovedCommercialSourceBinding,
     CommercialSourceCandidate,
@@ -17,43 +23,37 @@ from ai_video.production.commercial_visual_review import (
     CommercialVisualEvidence,
     adjudicate_commercial_visual_evidence,
 )
-from ai_video.production.commercial_dependency import (
-    validate_commercial_source_dependency_graph,
-)
 from ai_video.production.dependency import asset_node_id, creative_node_id
-from ai_video.production.commercial_reference import (
-    validate_product_reference_set_against_registry,
-)
+from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.image_import import (
     COMMERCIAL_IMAGE_IMPORT_TOOL,
     CommercialImageImportReceipt,
     validate_commercial_image_import,
 )
-from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
+    AssetRegistrySnapshot,
     CommercialSourceDependencyEvidence,
     CommercialSourceLifecycle,
-    DependencyNodeKind,
     DependencyLifecycle,
+    DependencyNodeKind,
     LoadedProductionProject,
     QaVerdict,
-    AssetRegistrySnapshot,
     StateCommitStatus,
     VideoAttemptPhase,
     canonical_registry_snapshot_path,
 )
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
+    canonical_commercial_image_import_receipt_path,
     canonical_commercial_source_candidate_path,
     canonical_commercial_source_evidence_path,
-    canonical_commercial_image_import_receipt_path,
     canonical_commercial_source_request_path,
     canonical_commercial_source_review_intent_path,
     canonical_commercial_source_review_path,
     resolve_contained_path,
 )
 from ai_video.production.registry import registry_semantic_sha256
-
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
@@ -97,7 +97,7 @@ def verify_active_commercial_source_approvals(
     bundle: LoadedProductionProject,
 ) -> None:
     manifest = bundle.manifest
-    if manifest.schema_version not in {"2.12", "2.13", "2.14"}:
+    if not manifest_supports(manifest.schema_version, ManifestCapability.COMMERCIAL_SOURCE):
         return
     root = bundle.root
     registry_assets = {item.asset_id: item for item in bundle.registry.assets}

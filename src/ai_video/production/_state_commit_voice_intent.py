@@ -13,6 +13,7 @@ from ai_video.production.audio import (
     VoiceGenerationRequest,
     VoiceProviderResult,
 )
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     ProductionManifest,
     StateCommitAttempt,
@@ -36,10 +37,10 @@ from ._state_commit_common import (
     _validated_transition,
 )
 from ._state_commit_contracts import (
+    _VOICE_PERMIT_TOKEN,
     CommitPhase,
     PreparedArtifact,
     VoiceAttemptPaths,
-    _VOICE_PERMIT_TOKEN,
     _DurableVoiceSubmitPermit,
 )
 
@@ -158,7 +159,7 @@ class _StateCommitVoiceIntentMixin:
         with self._exclusive_lock():
             manifest = self._read_manifest()
             if (
-                manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
                 and not dependency_transition_preparer_available
             ):
                 raise _state_invalid(
@@ -218,7 +219,7 @@ class _StateCommitVoiceIntentMixin:
                 {
                     "schema_version": (
                         manifest.schema_version
-                        if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                        if manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
                         else "2.2"
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,

@@ -7,7 +7,9 @@ import yaml
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._repair_freshness import approved_repair_is_current
 from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     ApprovedRepairReceipt,
     AssetRegistrySnapshot,
@@ -19,7 +21,6 @@ from ai_video.production.models import (
     require_canonical_registry_snapshot_path,
 )
 from ai_video.production.paths import _read_regular_file_nofollow
-from ai_video.production._repair_freshness import approved_repair_is_current
 from ai_video.production.project import (
     _load_exact_render_state,
     load_production_project_candidate,
@@ -134,14 +135,14 @@ class _StateCommitTransactionMixin:
                 raise _state_invalid("Production Manifest revision is stale.")
 
             retained_render_state = manifest.active_render_state
-            if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"} and (
+            if not manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH) and (
                 request.next_project != manifest.active_project
                 or request.next_registry != manifest.active_registry
             ):
                 retained_render_state = None
             elif retained_render_state is not None:
                 try:
-                    if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+                    if manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH):
                         active_bundle = load_production_project_candidate(
                             self._project_root,
                             manifest,
@@ -196,7 +197,7 @@ class _StateCommitTransactionMixin:
                     "schema_version": (
                         "2.2"
                         if request.operation == "audio_import"
-                        and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                        and not manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
                         else manifest.schema_version
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,
@@ -247,7 +248,7 @@ class _StateCommitTransactionMixin:
                     "schema_version": (
                         "2.2"
                         if request.operation == "audio_import"
-                        and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                        and not manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
                         else manifest.schema_version
                     ),
                     "manifest_revision": manifest.manifest_revision + 2,
@@ -295,7 +296,7 @@ class _StateCommitTransactionMixin:
                         "schema_version": (
                             "2.2"
                             if request.operation == "audio_import"
-                            and manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                            and not manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
                             else manifest.schema_version
                         ),
                         "manifest_revision": manifest.manifest_revision + 2,

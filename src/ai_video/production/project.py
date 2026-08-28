@@ -1,21 +1,25 @@
 from __future__ import annotations
 
 import hashlib
-from io import BytesIO
 import json
+import wave
+from io import BytesIO
 from pathlib import Path
 from typing import TypeVar
-import wave
 
 from pydantic import BaseModel, ValidationError
 
+import ai_video.production._project_dependency_evidence as _project_evidence
 from ai_video.config import load_yaml, sha256_file
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._commercial_project_reader import (
+    verify_commercial_source_project_state,
+)
 from ai_video.production._image_project_reader import verify_active_image_evidence
 from ai_video.production._paid_provider_project_reader import (
     verify_paid_provider_evidence,
 )
-import ai_video.production._project_dependency_evidence as _project_evidence
+from ai_video.production._review_project_reader import load_active_review_state
 from ai_video.production._video_project_reader import verify_manifest_video_evidence
 from ai_video.production._voice_project_reader import (
     read_canonical_voice_json,
@@ -36,10 +40,6 @@ from ai_video.production.captions import (
     caption_style_fingerprint,
     validate_caption_track_timeline_binding,
 )
-from ai_video.production._commercial_project_reader import (
-    verify_commercial_source_project_state,
-)
-from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.dependency import (
     _asset_role,
     _fp,
@@ -48,12 +48,14 @@ from ai_video.production.dependency import (
     resolve_dependency_state,
     voice_semantic_projection_fingerprint,
 )
+from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     ArtifactReference,
     AssetSourceKind,
     AssetType,
-    CaptionTrack,
     CaptionStyleReference,
+    CaptionTrack,
     Character,
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
@@ -67,37 +69,35 @@ from ai_video.production.models import (
     ProductionBrief,
     ProductionManifest,
     ProductionProject,
-    QaPolicy,
-    QaPolicyPointer,
     ProjectDependencyEvidence,
     ProjectSnapshotPointer,
-    RegistrySnapshotPointer,
+    QaPolicy,
+    QaPolicyPointer,
     RegistryDependencyEvidence,
-    RendererSourceReceipt,
+    RegistrySnapshotPointer,
+    RenderDependencyEvidence,
     RendererAudioBinding,
     RendererCaptionBinding,
+    RendererSourceReceipt,
     RenderReceipt,
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
-    ReviewReceipt,
-    ReviewReceiptPointer,
+    ResolvedTimeline,
     ReviewEvidence,
     ReviewEvidencePointer,
+    ReviewReceipt,
+    ReviewReceiptPointer,
     ReviewRequest,
     ReviewRequestPointer,
-    RenderDependencyEvidence,
-    ResolvedTimeline,
     Scene,
     Shot,
     SourceReference,
+    StateCommitStatus,
     Story,
     Storyboard,
-    StateCommitStatus,
-    VoiceRequestReceipt,
     VersionedArtifact,
+    VoiceRequestReceipt,
 )
-from ai_video.production.visual_media import visual_payload_matches
-from ai_video.production.video_dependency import generated_video_semantic_fingerprint
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_audio_asset_path,
@@ -115,6 +115,8 @@ from ai_video.production.paths import (
 )
 from ai_video.production.registry import load_asset_registry
 from ai_video.production.validation import validate_project_references
+from ai_video.production.video_dependency import generated_video_semantic_fingerprint
+from ai_video.production.visual_media import visual_payload_matches
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
 ArtifactT = TypeVar("ArtifactT", bound=VersionedArtifact)
@@ -1639,83 +1641,13 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         )
         _verify_manifest_dependency_states(bundle, dependency_graph)
         bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
-    if manifest.schema_version == "2.4" or (
-        manifest.schema_version
-        in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
-        and manifest.active_qa_policy is not None
-    ):
-        if manifest.active_qa_policy is None:
-            raise _invalid(f"Manifest {manifest.schema_version} requires an active QA policy.")
-        qa_policy = load_qa_policy(root, manifest.active_qa_policy)
-        current_render = (
-            _load_exact_render_state(bundle, manifest.active_render_state)
-            if manifest.active_render_state is not None
-            else None
-        )
-        for receipt_pointer in manifest.active_review_receipts:
-            receipt = load_review_receipt(root, receipt_pointer)
-            if (
-                current_render is None
-                or receipt.qa_policy != manifest.active_qa_policy
-                or receipt.dependency_graph_revision_id
-                != manifest.active_dependency_graph.revision_id
-                or receipt.render_state != manifest.active_render_state
-                or receipt.render_output_sha256
-                != current_render.output.file_sha256
-                or receipt.timeline_fingerprint
-                != current_render.timeline_fingerprint
-            ):
-                raise _invalid("Active Review Receipt is stale.")
-        if (
-            manifest.final_acceptance_state is not None
-            and manifest.final_acceptance_state.active_receipt is not None
-        ):
-            final_receipt = load_final_acceptance_receipt(
-                root, manifest.final_acceptance_state.active_receipt
-            )
-            required_layers = {
-                item
-                for item in qa_policy.required_layers
-                if item.value != "final_acceptance"
-            }
-            selected_layers = {
-                item.layer for item in final_receipt.required_review_receipts
-            }
-            dependency_states_hash = canonical_sha256(
-                {
-                    "dependency_states": [
-                        item.model_dump(mode="json")
-                        for item in manifest.dependency_states
-                    ]
-                }
-            )
-            if (
-                current_render is None
-                or
-                final_receipt.dependency_graph != manifest.active_dependency_graph
-                or final_receipt.render_state != manifest.active_render_state
-                or final_receipt.qa_policy != manifest.active_qa_policy
-                or final_receipt.dependency_states_hash != dependency_states_hash
-                or final_receipt.render_output_sha256
-                != current_render.output.file_sha256
-                or final_receipt.timeline_fingerprint
-                != current_render.timeline_fingerprint
-                or selected_layers != required_layers
-                or set(final_receipt.required_review_receipts)
-                != {
-                    item
-                    for item in manifest.active_review_receipts
-                    if item.layer in required_layers
-                }
-            ):
-                raise _invalid("Final Acceptance Receipt is stale.")
-        bundle = bundle.model_copy(update={"qa_policy": qa_policy})
+    bundle = load_active_review_state(root, bundle)
     verify_manifest_video_evidence(bundle, manifest)
     verify_commercial_source_project_state(bundle)
     if manifest.active_render_state is not None:
         render_state = (
             _load_exact_render_state(bundle, manifest.active_render_state)
-            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+            if manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
             else load_verified_render_state(
                 root,
                 manifest.active_render_state,

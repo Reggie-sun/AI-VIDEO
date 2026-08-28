@@ -6,11 +6,11 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.comfy_image import LocalImageExecutionProfile
 from ai_video.production._video_project_reader import (
     load_terminal_frame_evidence,
     load_video_request_receipt,
 )
+from ai_video.production.comfy_image import LocalImageExecutionProfile
 from ai_video.production.image import (
     ContinuityTerminalImageReferenceBinding,
     ImageGenerationAuthorization,
@@ -18,6 +18,7 @@ from ai_video.production.image import (
     ImageGenerationRequest,
     _validate_continuity_terminal_reference,
 )
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     ImageRequestReceipt,
     ProductionManifest,
@@ -41,9 +42,9 @@ from ._state_commit_common import (
     _validated_transition,
 )
 from ._state_commit_contracts import (
+    _IMAGE_PERMIT_TOKEN,
     PreparedArtifact,
     _DurableImageSubmitPermit,
-    _IMAGE_PERMIT_TOKEN,
 )
 
 
@@ -146,7 +147,7 @@ class _StateCommitImageIntentMixin:
         request: ImageGenerationRequest,
         preview: ImageGenerationPreview,
     ) -> None:
-        if manifest.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+        if not manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH):
             raise _image_invalid(
                 "Image generation requires an active Manifest dependency graph."
             )
@@ -398,7 +399,7 @@ class _StateCommitImageIntentMixin:
                 {
                     "schema_version": (
                         manifest.schema_version
-                        if manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                        if manifest_supports(manifest.schema_version, ManifestCapability.IMAGE_STATE)
                         else "2.5"
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,

@@ -9,6 +9,7 @@ from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     ApprovedRepairReceipt,
     AssetRegistrySnapshot,
@@ -108,7 +109,7 @@ class _StateCommitRecoveryMixin:
         registry_hash = self._require_recovery_file_hash(
             registry_path, manifest.active_registry.file_sha256
         )
-        if manifest.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+        if manifest_supports(manifest.schema_version, ManifestCapability.IMAGE_STATE):
             loaded = self._load_production_project(
                 self._project_root / "project.yaml"
             )
@@ -202,7 +203,7 @@ class _StateCommitRecoveryMixin:
                 )
             )
         if manifest.active_render_state is not None:
-            if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+            if manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH):
                 bundle = load_production_project_candidate(
                     self._project_root,
                     manifest,
@@ -268,7 +269,7 @@ class _StateCommitRecoveryMixin:
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
         pointer = manifest.active_p0_qualification_prepared
-        if manifest.schema_version not in {"2.11", "2.12", "2.13", "2.14"} or pointer is None:
+        if not manifest_supports(manifest.schema_version, ManifestCapability.P0_QUALIFICATION) or pointer is None:
             return ()
         receipt, stacks, policies, validation_set, inputs = (
             self.reopen_p0_qualification_prepared()
@@ -325,7 +326,7 @@ class _StateCommitRecoveryMixin:
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
         if (
-            manifest.schema_version not in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+            not manifest_supports(manifest.schema_version, ManifestCapability.P6_REVIEW)
             or manifest.active_qa_policy is None
         ):
             return ()
@@ -391,8 +392,7 @@ class _StateCommitRecoveryMixin:
         if all(item is None for item in graph_fields):
             return "legacy"
         if (
-            manifest.schema_version
-            not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+            not manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
             or attempt.candidate_dependency_graph is None
             or attempt.candidate_dependency_states_hash is None
         ):

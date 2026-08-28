@@ -8,6 +8,7 @@ from typing import Callable
 from pydantic import ValidationError
 
 from ai_video.errors import ErrorCode
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     PaidProviderAttemptPhase,
     PaidProviderAttemptState,
@@ -45,11 +46,10 @@ from ._state_commit_common import (
     _validated_transition,
 )
 from ._state_commit_contracts import (
-    PreparedArtifact,
     _PAID_PROVIDER_PERMIT_TOKEN,
+    PreparedArtifact,
     _DurablePaidProviderSubmitPermit,
 )
-
 
 PaidProviderAuthorizer = Callable[
     [PaidProviderCallPreview], PaidProviderAuthorizationDecision | None
@@ -149,19 +149,9 @@ class _StateCommitPaidProviderMixin:
                 preview, authorization, now=self._paid_provider_clock()
             )
             manifest = self._read_manifest()
-            if manifest.schema_version not in {
-                "2.2",
-                "2.3",
-                "2.4",
-                "2.5",
-                "2.6",
-                "2.7",
-                "2.8",
-                "2.9",
-                "2.10",
-                "2.11",
-                "2.12", "2.13", "2.14",
-            }:
+            if not manifest_supports(
+                manifest.schema_version, ManifestCapability.VOICE_STATE
+            ):
                 raise _state_invalid("Paid Provider submit intent requires a provider-aware Manifest.")
             attempt = self._paid_attempt(manifest, preview.attempt_id)
             if (
@@ -193,7 +183,7 @@ class _StateCommitPaidProviderMixin:
                     )
                 request = self._reopen_video_request(video_state.request)
                 if (
-                    manifest.schema_version not in {"2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                    not manifest_supports(manifest.schema_version, ManifestCapability.VIDEO_GENERATION)
                     or attempt.operation != "video_generation"
                     or video_state.phase is not VideoAttemptPhase.REQUEST
                     or request.resolved_generation_hash
@@ -267,7 +257,7 @@ class _StateCommitPaidProviderMixin:
                 {
                     "schema_version": (
                         manifest.schema_version
-                        if manifest.schema_version in {"2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                        if manifest_supports(manifest.schema_version, ManifestCapability.VIDEO_GENERATION)
                         else "2.6"
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,
@@ -357,7 +347,7 @@ class _StateCommitPaidProviderMixin:
             attempt = self._paid_attempt(manifest, receipt.attempt_id)
             state = attempt.paid_provider_state
             if (
-                manifest.schema_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                not manifest_supports(manifest.schema_version, ManifestCapability.PAID_PROVIDER)
                 or state is None
                 or state.phase is not PaidProviderAttemptPhase.SUBMIT_INTENT
                 or manifest.active_paid_provider_budget is None

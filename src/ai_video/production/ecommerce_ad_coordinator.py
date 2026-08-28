@@ -11,9 +11,21 @@ from typing import Any, Literal, Protocol
 from pydantic import Field, model_validator
 
 from ai_video.errors import AiVideoError
+from ai_video.production._caption_quality_p6 import (
+    CaptionReviewExecution,
+    caption_aware_review_layer_runner,
+)
+from ai_video.production._ecommerce_quality_gate_p6 import (
+    _record_ecommerce_gate_review,
+)
 from ai_video.production.ad_creative_types import CompiledAdCreativeHandoff
 from ai_video.production.artifact_contracts import StrictModel
-from ai_video.production.hashing import canonical_sha256
+from ai_video.production.ecommerce_quality_gate import (
+    EcommerceAcceptedShotIdentity,
+    EcommerceGateResult,
+    EcommerceWholeAdEvaluator,
+)
+from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
     FinalAcceptanceReceipt,
     QaLayer,
@@ -21,15 +33,7 @@ from ai_video.production.models import (
     SourceReference,
     ToolIdentity,
 )
-from ai_video.production.ecommerce_quality_gate import (
-    EcommerceAcceptedShotIdentity,
-    EcommerceGateResult,
-    EcommerceWholeAdEvaluator,
-)
-from ai_video.production._ecommerce_quality_gate_p6 import (
-    _record_ecommerce_gate_review,
-)
-from ai_video.production.hashing import seal_artifact
+from ai_video.production.paid_provider import PaidProviderCallPreview
 from ai_video.production.project import load_production_project
 from ai_video.production.quality_gate_coordinator import (
     HardCheckRunner,
@@ -39,10 +43,9 @@ from ai_video.production.quality_gate_coordinator import (
     UniversalQaProfile,
     UniversalQualityGateCoordinator,
 )
-from ai_video.production.paid_provider import PaidProviderCallPreview
+from ai_video.production.state_commit import ProductionStateCommitter
 from ai_video.production.video import ResolvedVideoGenerationRequest
 from ai_video.production.video_generation import VideoGenerationService
-from ai_video.production.state_commit import ProductionStateCommitter
 
 
 class EcommerceShotNextAction(str, Enum):
@@ -550,6 +553,7 @@ def _close_ecommerce_post_media_candidate(
     universal_profile: UniversalQaProfile,
     run_hard_check: HardCheckRunner,
     run_review_layer: ReviewLayerRunner,
+    caption_review_execution: CaptionReviewExecution | None,
     tool_identity: ToolIdentity,
     evaluate: EcommerceWholeAdEvaluator,
     review_attempt_id: str,
@@ -603,12 +607,21 @@ def _close_ecommerce_post_media_candidate(
         timeline_fingerprint=render_state.timeline_fingerprint,
         qa_policy_content_hash=policy.content_hash,
     )
+    run_canonical_review_layer = caption_aware_review_layer_runner(
+        committer=committer,
+        profile=universal_profile,
+        context=universal_context,
+        policy=policy,
+        execution=caption_review_execution,
+        fallback=run_review_layer,
+    )
+
     universal_result = UniversalQualityGateCoordinator().run_once(
         profile=universal_profile,
         context=universal_context,
         policy=policy,
         run_hard_check=run_hard_check,
-        run_review_layer=run_review_layer,
+        run_review_layer=run_canonical_review_layer,
     )
 
     projection_by_shot = {
@@ -713,6 +726,9 @@ def _close_ecommerce_post_media_candidate(
         )
     acceptance = seal_artifact(
         FinalAcceptanceReceipt(
+            schema_version=(
+                "2.1" if QaLayer.CAPTION in required_layers else "2.0"
+            ),
             artifact_id=final_acceptance_id,
             revision=1,
             content_hash="0" * 64,
@@ -768,6 +784,7 @@ def run_ecommerce_ad_production(
     universal_profile: UniversalQaProfile,
     run_hard_check: HardCheckRunner,
     run_review_layer: ReviewLayerRunner,
+    caption_review_execution: CaptionReviewExecution | None = None,
     tool_identity: ToolIdentity,
     evaluate: EcommerceWholeAdEvaluator,
     review_attempt_id: str,
@@ -820,6 +837,7 @@ def run_ecommerce_ad_production(
         universal_profile=universal_profile,
         run_hard_check=run_hard_check,
         run_review_layer=run_review_layer,
+        caption_review_execution=caption_review_execution,
         tool_identity=tool_identity,
         evaluate=evaluate,
         review_attempt_id=review_attempt_id,

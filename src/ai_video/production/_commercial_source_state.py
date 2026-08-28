@@ -8,6 +8,7 @@ from typing import Any, Literal, Protocol
 from pydantic import Field, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 
 
 class CommercialSourceLifecycle(str, Enum):
@@ -142,7 +143,7 @@ def reject_explicit_commercial_source_fields(value: object) -> object:
         "commercial_source_attempts",
     }
     manifest_version = value.get("schema_version", "2.0")
-    if manifest_version not in {"2.12", "2.13", "2.14"} and fields.intersection(value):
+    if not manifest_supports(manifest_version, ManifestCapability.COMMERCIAL_SOURCE) and fields.intersection(value):
         raise ValueError(
             f"Production Manifest {manifest_version} cannot contain commercial source state"
         )
@@ -164,6 +165,6 @@ def validate_commercial_source_manifest(manifest: Any) -> None:
 def serialize_commercial_source_manifest(
     data: dict[str, object], schema_version: str
 ) -> None:
-    if schema_version not in {"2.12", "2.13", "2.14"}:
+    if not manifest_supports(schema_version, ManifestCapability.COMMERCIAL_SOURCE):
         data.pop("active_commercial_source_approvals", None)
         data.pop("commercial_source_attempts", None)

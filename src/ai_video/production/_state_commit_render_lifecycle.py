@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     DependencyGraphSnapshot,
     DependencyGraphTransition,
@@ -352,7 +353,7 @@ class _StateCommitRenderLifecycleMixin:
             candidate_graph: DependencyGraphSnapshot | None = None
             if existing.status is StateCommitStatus.SUCCEEDED:
                 transition = request.dependency_graph_transition
-                if manifest.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+                if manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH):
                     if transition is None or (
                         existing.base_dependency_graph
                         != transition.base_dependency_graph
@@ -561,7 +562,7 @@ class _StateCommitRenderLifecycleMixin:
                     ),
                 }
                 if (
-                    manifest.schema_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                    manifest_supports(manifest.schema_version, ManifestCapability.P6_REVIEW)
                     and manifest.active_qa_policy is not None
                 ):
                     final_update.update(

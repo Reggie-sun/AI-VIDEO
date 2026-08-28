@@ -4,9 +4,19 @@ import shutil
 import socket
 from pathlib import Path
 
+import production_project_factory as project_factory
 import pytest
+from production_e2e_support import (
+    BaseAiComicCallCounts,
+    DeterministicHyperFramesRunner,
+    DeterministicReviewAnalyzer,
+    DeterministicVoiceProvider,
+    _install_manifest_write_counter,
+    make_base_ai_comic_reopen_runtime,
+    require_audio_toolchain,
+)
 
-from ai_video.errors import AiVideoError
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.audio import VoiceCallAuthorization
 from ai_video.production.hashing import (
     canonical_sha256,
@@ -15,8 +25,8 @@ from ai_video.production.hashing import (
 )
 from ai_video.production.hyperframes import probe_clip_fd_with_executable
 from ai_video.production.models import (
-    DependencyGraphSnapshotPointer,
     CompositionSpec,
+    DependencyGraphSnapshotPointer,
     QaLayer,
     QaPolicyPointer,
     RenderStateSnapshotPointer,
@@ -27,19 +37,12 @@ from ai_video.production.models import (
     TechnicalReviewWindow,
     VisualStrategy,
 )
+from ai_video.production.paths import canonical_repair_outcome_receipt_path
 from ai_video.production.project import load_production_project
-from ai_video.production.state_commit import ProductionStateCommitter
-from ai_video.production.state_commit import recover_production_state
-from production_e2e_support import (
-    BaseAiComicCallCounts,
-    DeterministicHyperFramesRunner,
-    DeterministicReviewAnalyzer,
-    DeterministicVoiceProvider,
-    _install_manifest_write_counter,
-    make_base_ai_comic_reopen_runtime,
-    require_audio_toolchain,
+from ai_video.production.state_commit import (
+    ProductionStateCommitter,
+    recover_production_state,
 )
-import production_project_factory as project_factory
 
 
 def _forbid_network_and_secret_access(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -60,6 +63,56 @@ def test_base_ai_comic_support_is_deterministic_and_has_no_direct_state_writer(
     assert first.call_counts == BaseAiComicCallCounts()
     assert not hasattr(first, "write_manifest")
     assert not hasattr(first, "activate_registry")
+
+
+@pytest.mark.parametrize("tampered_artifact", ("request", "evidence"))
+def test_repair_outcome_strictly_reopens_caption_review_chain(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    tampered_artifact: str,
+) -> None:
+    runtime = project_factory.make_base_ai_comic_e2e_runtime(tmp_path)
+    _forbid_network_and_secret_access(monkeypatch)
+    initial = runtime.materialize_and_render_initial()
+    failed = runtime.review_initial_render()
+    approval = runtime.approve_exact_layout_repair(failed)
+    repair_commit = runtime.commit_layout_repair(approval)
+    repaired_composition = CompositionSpec.model_validate_json(
+        (tmp_path / repair_commit.composition_path).read_bytes()
+    )
+    repaired = runtime.render_current_composition(
+        composition=repaired_composition
+    )
+    passing = runtime.review_repaired_render()
+    manifest = runtime.load_manifest()
+    repair_outcome = runtime.build_repair_outcome_receipt(
+        approval, repaired, passing
+    )
+    caption = next(item for item in passing if item.pointer.layer is QaLayer.CAPTION)
+    pointer = (
+        caption.receipt.review_request
+        if tampered_artifact == "request"
+        else caption.receipt.evidence[0]
+    )
+    artifact_path = tmp_path / pointer.path
+    artifact_path.write_bytes(artifact_path.read_bytes() + b" ")
+    manifest_before = (tmp_path / "state/manifest.json").read_bytes()
+    outcome_path = tmp_path / canonical_repair_outcome_receipt_path(
+        repair_outcome.content_hash
+    )
+    assert not outcome_path.exists()
+
+    with pytest.raises(AiVideoError) as exc_info:
+        ProductionStateCommitter(tmp_path).record_repair_outcome(
+            repair_outcome,
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="base-ai-comic-tampered-caption-repair-outcome",
+        )
+
+    assert exc_info.value.code is ErrorCode.REPAIR_SCOPE_INVALID
+    assert (tmp_path / "state/manifest.json").read_bytes() == manifest_before
+    assert not outcome_path.exists()
+    assert initial.render_state != repaired.render_state
 
 
 def test_deterministic_voice_provider_consumes_real_permit_once(
@@ -421,7 +474,7 @@ def test_base_ai_comic_failed_layout_review_repairs_exact_closure_and_accepts(
     failed = runtime.review_initial_render()
     selected_policy = load_production_project(tmp_path / "project.yaml").qa_policy
     assert selected_policy is not None
-    assert selected_policy.required_layers == (QaLayer.LAYOUT,)
+    assert selected_policy.required_layers == (QaLayer.LAYOUT, QaLayer.CAPTION)
     assert selected_policy.semantic_requirement == "optional"
     approval = runtime.approve_exact_layout_repair(failed)
     before_repair = runtime.load_manifest()
@@ -514,6 +567,10 @@ def test_base_ai_comic_failed_layout_review_repairs_exact_closure_and_accepts(
         repaired_composition.content_hash,
     )
     assert all(receipt.verdict == "pass" for receipt in passing)
+    assert {receipt.pointer.layer for receipt in passing} == {
+        QaLayer.LAYOUT,
+        QaLayer.CAPTION,
+    }
     assert outcome.actual_invalidation_node_ids == repaired_state.invalidated_node_ids
     assert accepted.render_state == repaired.render_state
     assert accepted.lifecycle == "fresh"

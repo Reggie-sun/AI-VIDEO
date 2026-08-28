@@ -10,7 +10,14 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from production_voice_e2e_support import (
+    make_deterministic_voice_candidate_preparer,
+)
 
+from ai_video.production._caption_quality_p6 import (
+    CaptionReviewExecution,
+    run_caption_review_transaction,
+)
 from ai_video.production.audio import (
     AudioProbeToolchain,
     VoiceCallAuthorization,
@@ -18,9 +25,24 @@ from ai_video.production.audio import (
     VoiceGenerationPreview,
     VoiceGenerationRequest,
     VoicePricingSnapshot,
-    VoiceProviderResult,
     VoiceProvenanceReceipt,
+    VoiceProviderResult,
     build_voice_generation_preview,
+)
+from ai_video.production.caption_quality import (
+    caption_context_hash,
+    reopen_caption_review_chain,
+)
+from ai_video.production.caption_quality_contracts import (
+    CAPTION_REQUIREMENT_GROUPS,
+    CaptionCoverageStatus,
+    CaptionEvidenceAuthority,
+    CaptionEvidencePayload,
+    CaptionEvidenceStrength,
+    CaptionFindingReasonCode,
+    CaptionQualityPolicy,
+    CaptionRequirementFinding,
+    CaptionTrackPolicy,
 )
 from ai_video.production.captions import (
     CaptionImportRequest,
@@ -52,11 +74,11 @@ from ai_video.production.models import (
     QaPolicy,
     QaTechnicalThresholds,
     QaVerdict,
+    RenderStateSnapshot,
     RepairAction,
     RepairAuthorization,
     RepairOutcomeReceipt,
     RepairRequest,
-    RenderStateSnapshot,
     ReviewEvidence,
     ReviewEvidencePointer,
     ReviewLifecycle,
@@ -77,14 +99,102 @@ from ai_video.production.review import (
     adjudicate_review_evidence,
     build_technical_review_context,
 )
-from production_voice_e2e_support import (
-    make_deterministic_voice_candidate_preparer,
-)
-
 
 _VOICE_FIXTURE = (
     Path(__file__).parent / "fixtures/voice_captions/dialogue-mono-48000.wav"
 )
+
+CAPTION_EVALUATOR_TOOL = ToolIdentity(name="caption-evaluator", version="1")
+
+
+def make_caption_quality_policy(
+    loaded,
+    timeline,
+    *,
+    tool_identity: ToolIdentity = CAPTION_EVALUATOR_TOOL,
+) -> CaptionQualityPolicy:
+    records = {
+        item.caption_metadata.caption_track_id: item.caption_metadata
+        for item in loaded.registry.assets
+        if item.caption_metadata is not None
+    }
+    ordered_track_ids = tuple(
+        dict.fromkeys(item.caption_track_id for item in timeline.caption_cues)
+    )
+    return CaptionQualityPolicy.create(
+        delivery_profile_fingerprint=canonical_sha256(
+            timeline.delivery_profile.model_dump(mode="json")
+        ),
+        measurement_contract_version="caption-measurements/1",
+        track_policies=tuple(
+            CaptionTrackPolicy(
+                caption_track_id=track_id,
+                language_tag=records[track_id].language,
+                max_lines_per_cue=2,
+                max_graphemes_per_line=24,
+                max_reading_rate_milli_graphemes_per_second=12_000,
+                min_cue_duration_milliseconds=100,
+                max_cue_duration_milliseconds=10_000,
+                max_audio_sync_offset_milliseconds=200,
+                caption_overflow_tolerance_milli=0,
+            )
+            for track_id in ordered_track_ids
+        ),
+        evidence_authorities=(
+            CaptionEvidenceAuthority(
+                tool_name=tool_identity.name,
+                tool_version=tool_identity.version,
+                requirement_groups=CAPTION_REQUIREMENT_GROUPS,
+                allowed_strengths=(CaptionEvidenceStrength.EXPLICIT_EVALUATOR,),
+            ),
+        ),
+    )
+
+
+def passing_caption_evidence_payload(
+    context,
+    policy: CaptionQualityPolicy,
+) -> CaptionEvidencePayload:
+    return CaptionEvidencePayload(
+        caption_policy_hash=policy.content_hash,
+        caption_context_hash=caption_context_hash(context),
+        findings=tuple(
+            CaptionRequirementFinding(
+                requirement_group=domain.requirement_group,
+                verdict="pass",
+                reason_code=CaptionFindingReasonCode.REQUIREMENT_CONFIRMED,
+                covered_subject_ids=domain.subject_ids,
+                raw_evidence_references=(
+                    f"fixture:{domain.requirement_group.value}",
+                ),
+                coverage_status=CaptionCoverageStatus.COMPLETE,
+                observation_fingerprint=canonical_sha256(
+                    {
+                        "group": domain.requirement_group.value,
+                        "subjects": domain.subject_ids,
+                    }
+                ),
+            )
+            for domain in context.coverage_domains
+        ),
+    )
+
+
+def make_caption_review_execution(
+    label: str,
+    *,
+    evaluator=passing_caption_evidence_payload,
+    tool_identity: ToolIdentity = CAPTION_EVALUATOR_TOOL,
+) -> CaptionReviewExecution:
+    return CaptionReviewExecution(
+        evaluator=evaluator,
+        tool_identity=tool_identity,
+        evidence_strength=CaptionEvidenceStrength.EXPLICIT_EVALUATOR,
+        attempt_id=f"{label}-caption-attempt",
+        request_id=f"{label}-caption-request",
+        evidence_id=f"{label}-caption-evidence",
+        review_id=f"{label}-caption-review",
+    )
 
 
 def _canonical_json_bytes(value) -> bytes:
@@ -822,8 +932,9 @@ class BaseAiComicE2ERuntime:
         return self.image_runtime.generate_all()
 
     def generate_voice_and_captions(self) -> BaseAiComicVoiceResult:
-        from ai_video.production.state_commit import ProductionStateCommitter
         import production_project_factory as project_factory
+
+        from ai_video.production.state_commit import ProductionStateCommitter
 
         toolchain = require_audio_toolchain()
         request = project_factory.make_base_ai_comic_voice_request(self.root)
@@ -893,6 +1004,8 @@ class BaseAiComicE2ERuntime:
         revision: int | None = None,
         composition=None,
     ) -> BaseAiComicInitialRender:
+        import production_project_factory as project_factory
+
         from ai_video.production import render_with_hyperframes
         from ai_video.production.composition import resolve_composition
         from ai_video.production.models import (
@@ -905,7 +1018,6 @@ class BaseAiComicE2ERuntime:
             BeginRenderAttemptRequest,
             ProductionStateCommitter,
         )
-        import production_project_factory as project_factory
 
         if self._voice_request is None:
             raise AssertionError("voice/captions must be generated before render")
@@ -1314,8 +1426,17 @@ class BaseAiComicE2ERuntime:
         )
 
     def _qa_policy(self) -> QaPolicy:
+        from ai_video.production.models import ResolvedTimeline
+
+        loaded = load_production_project(self.root / "project.yaml")
+        if loaded.render_state is None:
+            raise AssertionError("caption-aware QA policy requires active render")
+        timeline = ResolvedTimeline.model_validate_json(
+            (self.root / loaded.render_state.timeline.path).read_bytes()
+        )
         return seal_artifact(
             QaPolicy(
+                schema_version="2.1",
                 artifact_id="qa-policy-base-ai-comic-layout",
                 revision=1,
                 content_hash="0" * 64,
@@ -1327,7 +1448,7 @@ class BaseAiComicE2ERuntime:
                 ),
                 policy_id="base-ai-comic-layout",
                 policy_version="1",
-                required_layers=(QaLayer.LAYOUT,),
+                required_layers=(QaLayer.LAYOUT, QaLayer.CAPTION),
                 technical_thresholds=QaTechnicalThresholds(
                     black_luma_max_milli=10,
                     silence_peak_max_millidb=-60_000,
@@ -1340,7 +1461,34 @@ class BaseAiComicE2ERuntime:
                 strategy_rules_version="1",
                 semantic_requirement="optional",
                 repair_authorities=(self._trusted_repair_authority,),
+                caption_policy=make_caption_quality_policy(loaded, timeline),
             )
+        )
+
+    def _review_current_caption(self, *, label: str) -> BaseAiComicReviewResult:
+        committer = self._committer()
+        outcome = run_caption_review_transaction(
+            committer=committer,
+            execution=make_caption_review_execution(
+                f"base-ai-comic-{label}"
+            ),
+        )
+        if not outcome.current:
+            raise AssertionError("CAPTION review did not produce current evidence")
+        bundle = load_production_project(self.root / "project.yaml")
+        pointer = next(
+            item
+            for item in bundle.manifest.active_review_receipts
+            if item.layer is QaLayer.CAPTION
+        )
+        reopened = reopen_caption_review_chain(
+            project=bundle,
+            receipt_pointer=pointer,
+        )
+        return BaseAiComicReviewResult(
+            reopened.receipt,
+            pointer,
+            reopened.evidence,
         )
 
     def _review_current_render(self, *, label: str) -> BaseAiComicReviewResult:
@@ -1475,8 +1623,9 @@ class BaseAiComicE2ERuntime:
         if current.active_render_state is None:
             raise AssertionError("repaired render is not active")
         self.analyzer.bind_repaired_render_state(current.active_render_state)
-        result = self._review_current_render(label="repaired")
-        return (result,)
+        layout = self._review_current_render(label="repaired")
+        caption = self._review_current_caption(label="repaired")
+        return (layout, caption)
 
     def approve_exact_layout_repair(
         self, failed: BaseAiComicReviewResult
@@ -1598,6 +1747,8 @@ class BaseAiComicE2ERuntime:
         *,
         mutation: str | None = None,
     ):
+        import production_project_factory as project_factory
+
         from ai_video.production.dependency import (
             build_dependency_graph,
             build_production_dependency_graph,
@@ -1608,7 +1759,6 @@ class BaseAiComicE2ERuntime:
             StateCommitRequest,
             prepare_dependency_graph_transition,
         )
-        import production_project_factory as project_factory
 
         if self._voice_request is None:
             raise AssertionError("repair requires generated voice state")
@@ -1770,7 +1920,7 @@ class BaseAiComicE2ERuntime:
         self._repair_commit = result
         return result
 
-    def record_repair_outcome(
+    def build_repair_outcome_receipt(
         self,
         approval: BaseAiComicRepairApproval,
         repaired: BaseAiComicInitialRender,
@@ -1782,6 +1932,7 @@ class BaseAiComicE2ERuntime:
         state_by_id = {item.node_id: item for item in manifest.dependency_states}
         receipt = seal_artifact(
             RepairOutcomeReceipt(
+                schema_version="2.1",
                 artifact_id="repair-outcome-base-ai-comic-layout",
                 revision=1,
                 content_hash="0" * 64,
@@ -1825,6 +1976,16 @@ class BaseAiComicE2ERuntime:
                 fresh_review_receipts=tuple(item.pointer for item in passing),
             )
         )
+        return receipt
+
+    def record_repair_outcome(
+        self,
+        approval: BaseAiComicRepairApproval,
+        repaired: BaseAiComicInitialRender,
+        passing: tuple[BaseAiComicReviewResult, ...],
+    ) -> RepairOutcomeReceipt:
+        manifest = self.load_manifest()
+        receipt = self.build_repair_outcome_receipt(approval, repaired, passing)
         self._committer().record_repair_outcome(
             receipt,
             expected_manifest_revision=manifest.manifest_revision,
@@ -1846,6 +2007,7 @@ class BaseAiComicE2ERuntime:
             raise AssertionError("final acceptance requires current production state")
         receipt = seal_artifact(
             FinalAcceptanceReceipt(
+                schema_version="2.1",
                 artifact_id="final-acceptance-base-ai-comic",
                 revision=1,
                 content_hash="0" * 64,

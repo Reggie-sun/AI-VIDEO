@@ -21,6 +21,7 @@ from ai_video.production.artifact_contracts import (
     StrictModel,
     VersionedArtifact,
 )
+import ai_video.production._caption_review_models as _caption_review
 from ai_video.production.composition_contracts import (
     AUDIO_KIND_PRIORITY,
     AudioKind,
@@ -43,6 +44,7 @@ from ai_video.production.composition_contracts import (
     TransitionSpec,
 )
 from ai_video.production.domain_acceptance import DomainAcceptanceQaPolicyMixin, QaLayer as QaLayer
+from ai_video.production.manifest_schema import ManifestCapability, ManifestVersion, manifest_supports
 
 from ai_video.production._asset_registry_validation import (
     reject_explicit_p4_registry_fields,
@@ -1593,9 +1595,7 @@ class ReviewEvidencePointer(StrictModel):
 class ReviewReceiptPointer(StrictModel):
     path: Path
     review_id: str = Field(min_length=1)
-    layer: Literal[
-        QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.STRATEGY, QaLayer.SEMANTIC
-    ]
+    layer: Literal[QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.CAPTION, QaLayer.STRATEGY, QaLayer.SEMANTIC]
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -1697,10 +1697,8 @@ class FinalAcceptanceState(StrictModel):
     active_receipt: FinalAcceptanceReceiptPointer | None = None
 
 
-class ProductionManifest(StrictModel):
-    schema_version: Literal[
-        "2.0", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"
-    ] = "2.0"
+class ProductionManifest(_caption_review.CaptionManifestMixin, StrictModel):
+    schema_version: ManifestVersion = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
     active_project: ProjectSnapshotPointer
@@ -1746,7 +1744,7 @@ class ProductionManifest(StrictModel):
             "final_acceptance_state",
         }
         manifest_version = value.get("schema_version", "2.0")
-        if manifest_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"} and p6_fields.intersection(value):
+        if manifest_supports(manifest_version, ManifestCapability.IMAGE_STATE) and p6_fields.intersection(value):
             if value.get("active_qa_policy") is None:
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_qa_policy"
@@ -1755,7 +1753,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "Production Manifest 2.5 with P6 fields requires active_dependency_graph"
                 )
-        if manifest_version in {"2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+        if manifest_supports(manifest_version, ManifestCapability.P6_REVIEW):
             return value
         if p6_fields.intersection(value):
             raise ValueError(
@@ -1779,8 +1777,7 @@ class ProductionManifest(StrictModel):
     def _reject_explicit_voice_fields_in_old_versions(cls, value: object) -> object:
         if (
             not isinstance(value, Mapping)
-            or value.get("schema_version", "2.0")
-            in {"2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+            or manifest_supports(value.get("schema_version", "2.0"), ManifestCapability.VOICE_STATE)
         ):
             return value
         for attempt in value.get("attempts", ()):
@@ -1804,7 +1801,7 @@ class ProductionManifest(StrictModel):
     ) -> object:
         if not isinstance(value, Mapping):
             return value
-        if value.get("schema_version", "2.0") in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+        if manifest_supports(value.get("schema_version", "2.0"), ManifestCapability.DEPENDENCY_GRAPH):
             return value
         manifest_version = value.get("schema_version", "2.0")
         if {
@@ -1854,13 +1851,13 @@ class ProductionManifest(StrictModel):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain voice attempts"
             )
-        if self.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"} and any(
+        if not manifest_supports(self.schema_version, ManifestCapability.IMAGE_STATE) and any(
             item.operation == "image_generation" for item in self.attempts
         ):
             raise ValueError(
                 f"Production Manifest {self.schema_version} cannot contain P7 image attempts"
             )
-        if self.schema_version not in {"2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"} and any(
+        if not manifest_supports(self.schema_version, ManifestCapability.VIDEO_GENERATION) and any(
             item.operation == "video_generation"
             or item.video_generation_state is not None
             for item in self.attempts
@@ -1881,7 +1878,7 @@ class ProductionManifest(StrictModel):
                 raise ValueError(
                     "running render_state attempt base must match active identity"
                 )
-        if self.schema_version in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+        if manifest_supports(self.schema_version, ManifestCapability.DEPENDENCY_GRAPH):
             self._validate_manifest_23_graph_lifecycle()
         else:
             for attempt in self.attempts:
@@ -1895,7 +1892,7 @@ class ProductionManifest(StrictModel):
                         "cannot contain P5 graph attempt fields"
                     )
         if self.schema_version == "2.4" or (
-            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"} and has_p6_state(self)
+            manifest_supports(self.schema_version, ManifestCapability.IMAGE_STATE) and has_p6_state(self)
         ):
             if self.active_qa_policy is None:
                 raise ValueError(
@@ -1971,13 +1968,13 @@ class ProductionManifest(StrictModel):
         data = handler(self)
         if self.schema_version == "2.0" and self.active_render_state is None: data.pop("active_render_state", None)
         if (
-            self.schema_version not in {"2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+            not manifest_supports(self.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
             or self.active_dependency_graph is None
         ):
             data.pop("active_dependency_graph", None)
             data.pop("dependency_states", None)
         if self.schema_version != "2.4" and not (
-            self.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+            manifest_supports(self.schema_version, ManifestCapability.IMAGE_STATE)
             and self.active_qa_policy is not None
         ):
             data.pop("active_qa_policy", None)
@@ -1986,9 +1983,9 @@ class ProductionManifest(StrictModel):
             data.pop("active_approved_repair", None)
             data.pop("repair_outcome_receipts", None)
             data.pop("final_acceptance_state", None)
-        if self.schema_version not in {"2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+        if not manifest_supports(self.schema_version, ManifestCapability.PAID_PROVIDER):
             data.pop("active_paid_provider_budget", None)
-        if self.schema_version not in {"2.11", "2.12", "2.13", "2.14"} or self.active_p0_qualification_prepared is None: data.pop("active_p0_qualification_prepared", None)
+        if not manifest_supports(self.schema_version, ManifestCapability.P0_QUALIFICATION) or self.active_p0_qualification_prepared is None: data.pop("active_p0_qualification_prepared", None)
         serialize_commercial_source_manifest(data, self.schema_version)
         return data
 
@@ -2357,7 +2354,7 @@ class DependencyGraphTransition(StrictModel):
 # ---------------------------------------------------------------------------
 
 
-class QaPolicy(DomainAcceptanceQaPolicyMixin, VersionedArtifact):
+class QaPolicy(_caption_review.CaptionQaPolicyMixin, DomainAcceptanceQaPolicyMixin, VersionedArtifact):
     policy_id: str = Field(min_length=1)
     policy_version: str = Field(min_length=1)
     required_layers: tuple[QaLayer, ...] = Field(min_length=1)
@@ -2367,7 +2364,6 @@ class QaPolicy(DomainAcceptanceQaPolicyMixin, VersionedArtifact):
     semantic_requirement: Literal["optional", "required"]
     semantic_authorities: tuple[ToolIdentity, ...] = ()
     repair_authorities: tuple[ActorIdentity, ...] = ()
-
     @model_validator(mode="after")
     def _require_semantic_authority(self) -> "QaPolicy":
         if self.semantic_requirement == "required" and not self.semantic_authorities:
@@ -2375,7 +2371,7 @@ class QaPolicy(DomainAcceptanceQaPolicyMixin, VersionedArtifact):
         return self
 
 
-class ReviewRequest(VersionedArtifact):
+class ReviewRequest(_caption_review.CaptionReviewRequestMixin, VersionedArtifact):
     request_id: str = Field(min_length=1)
     base_manifest_revision: int = Field(ge=1)
     dependency_graph: DependencyGraphSnapshotPointer
@@ -2389,7 +2385,7 @@ class ReviewRequest(VersionedArtifact):
     technical_context: TechnicalReviewContext
 
 
-class ReviewEvidence(VersionedArtifact):
+class ReviewEvidence(_caption_review.CaptionReviewEvidenceMixin, VersionedArtifact):
     evidence_id: str = Field(min_length=1)
     layer: QaLayer
     strength: EvidenceStrength
@@ -2407,11 +2403,10 @@ class ReviewEvidence(VersionedArtifact):
         return _deep_immutable_json(value)  # type: ignore[return-value]
 
 
-class ReviewReceipt(VersionedArtifact):
+
+class ReviewReceipt(_caption_review.CaptionReviewReceiptMixin, VersionedArtifact):
     review_id: str = Field(min_length=1)
-    layer: Literal[
-        QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.STRATEGY, QaLayer.SEMANTIC
-    ]
+    layer: Literal[QaLayer.TECHNICAL, QaLayer.LAYOUT, QaLayer.CAPTION, QaLayer.STRATEGY, QaLayer.SEMANTIC]
     review_request: ReviewRequestPointer
     render_state: RenderStateSnapshotPointer
     render_output_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -2459,7 +2454,7 @@ class ApprovedRepairReceipt(RepairRequest):
     request_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
-class RepairOutcomeReceipt(VersionedArtifact):
+class RepairOutcomeReceipt(_caption_review.CaptionRepairOutcomeMixin, VersionedArtifact):
     repair_id: str = Field(min_length=1)
     approved_receipt: ApprovedRepairReceiptPointer
     review_receipt_ids: tuple[str, ...] = Field(min_length=1)
@@ -2481,7 +2476,8 @@ class RepairOutcomeReceipt(VersionedArtifact):
     fresh_review_receipts: tuple[ReviewReceiptPointer, ...] = Field(min_length=1)
 
 
-class FinalAcceptanceReceipt(VersionedArtifact):
+
+class FinalAcceptanceReceipt(_caption_review.CaptionFinalAcceptanceMixin, VersionedArtifact):
     acceptance_id: str = Field(min_length=1)
     dependency_graph: DependencyGraphSnapshotPointer
     dependency_states_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -2491,7 +2487,6 @@ class FinalAcceptanceReceipt(VersionedArtifact):
     qa_policy: QaPolicyPointer
     required_review_receipts: tuple[ReviewReceiptPointer, ...] = Field(min_length=1)
     verdict: Literal[QaVerdict.PASS]
-
 
 ProductionManifest.model_rebuild()
 LoadedProductionProject.model_rebuild()

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from ai_video.errors import ErrorCode
 from ai_video.production._image_project_reader import verify_image_attempt_evidence
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     ProductionManifest,
     RecoveryDisposition,
@@ -22,7 +23,7 @@ class _StateCommitImageRecoveryMixin:
     def _active_image_recovery_items(
         self, manifest: ProductionManifest
     ) -> tuple[RecoveryItem, ...]:
-        if manifest.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+        if not manifest_supports(manifest.schema_version, ManifestCapability.IMAGE_STATE):
             return ()
         bundle = self._load_production_project(self._project_root / "project.yaml")
         pairs: dict[Path, str] = {}
@@ -50,7 +51,7 @@ class _StateCommitImageRecoveryMixin:
         attempt: StateCommitAttempt,
     ) -> tuple[StateCommitAttempt, tuple[RecoveryItem, ...]]:
         if (
-            manifest.schema_version not in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+            not manifest_supports(manifest.schema_version, ManifestCapability.IMAGE_STATE)
             or attempt.image_request is None
         ):
             raise _state_invalid("Interrupted P7 image attempt identity is incomplete.")

@@ -10,47 +10,59 @@ from pathlib import Path
 from typing import BinaryIO, Callable
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._image_project_reader import (
+    verify_hard_cut_keyframe_evidence,
+)
 from ai_video.production._lifecycle_schema import (
     LocalVideoFetchReceiptPointer,
     LocalVideoStatusReceiptPointer,
     LocalVideoSubmitIntentPointer,
     LocalVideoSubmitReceiptPointer,
 )
-from ai_video.production._image_project_reader import (
-    verify_hard_cut_keyframe_evidence,
-)
 from ai_video.production._video_project_reader import (
+    load_commercial_shot_evaluation_intent,
+    load_continuity_evaluation_intent,
+    load_generated_commercial_shot_evidence,
+    load_generated_shot_continuity_evidence,
     load_local_video_fetch_receipt,
     load_local_video_status_receipt,
     load_local_video_submit_intent,
     load_local_video_submit_receipt,
-    load_video_fetch_receipt,
-    load_video_request_receipt,
-    load_video_status_receipt,
-    load_terminal_frame_evidence,
-    load_terminal_frame_extraction,
-    load_continuity_evaluation_intent,
-    load_generated_shot_continuity_evidence,
-    load_commercial_shot_evaluation_intent,
-    load_generated_commercial_shot_evidence,
     load_source_boundary_review_evidence,
     load_source_boundary_review_intent,
     load_source_boundary_review_receipt,
+    load_terminal_frame_evidence,
+    load_terminal_frame_extraction,
+    load_video_fetch_receipt,
     load_video_probe_receipt,
     load_video_provenance_receipt,
+    load_video_request_receipt,
+    load_video_status_receipt,
 )
+from ai_video.production.commercial_video_validation import (
+    current_commercial_source_approval,
+    validate_commercial_source_binding,
+)
+from ai_video.production.local_video import (
+    LocalVideoFetchReceipt,
+    LocalVideoSubmission,
+    LocalVideoSubmitIntent,
+    LocalVideoSubmitResult,
+    LocalVideoTaskObservation,
+)
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     PaidProviderAttemptPhase,
     ProductionManifest,
     StateCommitAttempt,
     StateCommitStatus,
+    TerminalFrameEvidencePointer,
+    TerminalFrameExtractionReceiptPointer,
     VideoAttemptPhase,
     VideoFetchReceiptPointer,
     VideoGenerationAttemptState,
     VideoRequestReceiptPointer,
     VideoStatusReceiptPointer,
-    TerminalFrameEvidencePointer,
-    TerminalFrameExtractionReceiptPointer,
 )
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
@@ -63,18 +75,7 @@ from ai_video.production.paths import (
     canonical_video_request_receipt_path,
     canonical_video_status_receipt_path,
 )
-from ai_video.production.local_video import (
-    LocalVideoFetchReceipt,
-    LocalVideoSubmission,
-    LocalVideoSubmitIntent,
-    LocalVideoSubmitResult,
-    LocalVideoTaskObservation,
-)
 from ai_video.production.project import load_qa_policy
-from ai_video.production.commercial_video_validation import (
-    current_commercial_source_approval,
-    validate_commercial_source_binding,
-)
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
@@ -91,11 +92,10 @@ from ._state_commit_common import (
     _validated_transition,
 )
 from ._state_commit_contracts import (
+    _LOCAL_VIDEO_PERMIT_TOKEN,
     PreparedArtifact,
     _DurableLocalVideoSubmitPermit,
-    _LOCAL_VIDEO_PERMIT_TOKEN,
 )
-
 
 _SAFE_ATTEMPT_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
@@ -266,13 +266,13 @@ class _StateCommitVideoMixin:
         )
         with self._exclusive_lock():
             manifest = self._read_manifest()
-            if manifest.schema_version not in {"2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}:
+            if not manifest_supports(manifest.schema_version, ManifestCapability.VIDEO_GENERATION):
                 raise _state_invalid(
                     "Video generation requires Production Manifest 2.7 or later."
                 )
             if (
                 request.commercial_binding is not None
-                and manifest.schema_version not in {"2.13", "2.14"}
+                and not manifest_supports(manifest.schema_version, ManifestCapability.COMMERCIAL_VIDEO)
             ):
                 raise _state_invalid(
                     "Commercial-bound video generation requires Production Manifest 2.13."
@@ -317,7 +317,7 @@ class _StateCommitVideoMixin:
                     or request.hard_cut_keyframe_binding is not None
                 )
                 and request.continuity_binding is not None
-                and manifest.schema_version not in {"2.10", "2.11", "2.12", "2.13", "2.14"}
+                and not manifest_supports(manifest.schema_version, ManifestCapability.CONTINUITY_REVIEW)
             ):
                 raise _state_invalid(
                     "Evaluated Shot continuity requires Production Manifest 2.10 or later."
@@ -329,7 +329,7 @@ class _StateCommitVideoMixin:
                     or request.hard_cut_keyframe_binding is not None
                 )
                 and request.continuity_binding is None
-                and manifest.schema_version not in {"2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"}
+                and not manifest_supports(manifest.schema_version, ManifestCapability.VIDEO_RECOVERY)
             ):
                 raise _state_invalid("Shot continuity artifacts require Manifest 2.8 or later.")
             if request.hard_cut_keyframe_binding is not None:

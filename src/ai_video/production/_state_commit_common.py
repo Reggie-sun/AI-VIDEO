@@ -22,13 +22,14 @@ import yaml
 from pydantic import BaseModel, ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._lifecycle_schema import has_p6_state
 from ai_video.production.dependency import (
     dependency_graph_semantic_sha256,
     desired_fingerprints,
     resolve_dependency_state,
 )
-from ai_video.production._lifecycle_schema import has_p6_state
 from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     AssetRegistrySnapshot,
     AssetType,
@@ -41,8 +42,8 @@ from ai_video.production.models import (
     ProductionProject,
     ProjectSnapshotPointer,
     RegistrySnapshotPointer,
-    ReviewLifecycle,
     RenderSourceBundlePointer,
+    ReviewLifecycle,
     StateCommitAttempt,
     StateCommitStatus,
     canonical_project_snapshot_path,
@@ -56,7 +57,6 @@ from ._state_commit_contracts import (
     PreparedArtifact,
     StateCommitRequest,
 )
-
 
 _GRAPH_ARTIFACT_PHASES = {
     CommitPhase.AFTER_ARTIFACT_TEMP_WRITE: CommitPhase.AFTER_GRAPH_CANDIDATE_TEMP_WRITE,
@@ -241,7 +241,7 @@ def _handle_cleanup_errors(
 def _validated_transition(
     model: ProductionManifest | StateCommitAttempt, update: dict[str, object]
 ) -> ProductionManifest | StateCommitAttempt:
-    if isinstance(model, ProductionManifest) and model.schema_version in {"2.12", "2.13", "2.14"}:
+    if isinstance(model, ProductionManifest) and manifest_supports(model.schema_version, ManifestCapability.COMMERCIAL_SOURCE):
         commercial_owner_changed = any(
             field in update and update[field] != getattr(model, field)
             for field in ("active_project", "active_registry", "active_qa_policy")
@@ -281,7 +281,7 @@ def _validated_transition(
                     for item in commercial_attempts
                 ),
             }
-    if isinstance(model, ProductionManifest) and model.schema_version in {"2.11", "2.12", "2.13", "2.14"}:
+    if isinstance(model, ProductionManifest) and manifest_supports(model.schema_version, ManifestCapability.P0_QUALIFICATION):
         if any(
             field in update and update[field] != getattr(model, field)
             for field in ("active_project", "active_registry")
@@ -289,7 +289,7 @@ def _validated_transition(
             update = {**update, "active_p0_qualification_prepared": None}
     if isinstance(model, ProductionManifest) and (
         model.schema_version == "2.4"
-        or (model.schema_version in {"2.5", "2.6", "2.7", "2.8", "2.9", "2.10", "2.11", "2.12", "2.13", "2.14"} and has_p6_state(model))
+        or (manifest_supports(model.schema_version, ManifestCapability.IMAGE_STATE) and has_p6_state(model))
     ):
         identity_fields = (
             "active_project",

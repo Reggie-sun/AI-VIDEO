@@ -29,14 +29,14 @@ from ai_video.production.models import (
     CaptionAssetMetadata,
     CaptionSegment,
     CaptionSegmentationPolicy,
-    CaptionStyleReference,
     CaptionStyleBindingContract,
+    CaptionStyleReference,
     CaptionTrack,
     CaptionTrackBinding,
     CaptionWord,
+    CompositionDirective,
     CompositionLayerSpec,
     CompositionSpec,
-    CompositionDirective,
     DeliveryProfile,
     DependencyEdge,
     DependencyGraphSnapshot,
@@ -49,46 +49,46 @@ from ai_video.production.models import (
     DependencyReason,
     DependencySemanticRole,
     DurationPolicy,
-    FingerprintContribution,
     FinalAcceptanceState,
+    FingerprintContribution,
     LoadedProductionProject,
-    MeasuredRenderMetadata,
     MeasuredAudioRenderMetadata,
+    MeasuredRenderMetadata,
     MotionDirective,
     ProductionManifest,
+    ProjectDependencyEvidence,
+    ProjectSnapshotPointer,
     QaLayer,
     QaPolicyPointer,
     QaVerdict,
-    ProjectDependencyEvidence,
-    ProjectSnapshotPointer,
     RecoveryDisposition,
     RecoveryItem,
     RecoveryReport,
-    ReviewLayerState,
-    ReviewLifecycle,
     RegistryDependencyEvidence,
     RegistrySnapshotPointer,
     RenderArtifactPointer,
     RenderDependencyEvidence,
-    RenderOutputPointer,
-    RenderReceipt,
+    RendererAssetBinding,
     RendererAudioBinding,
     RendererCaptionBinding,
-    RendererAssetBinding,
     RendererCheckReceipt,
     RendererIdentity,
     RendererPolicy,
     RendererSelectionReceipt,
     RendererSourceReceipt,
+    RenderOutputPointer,
+    RenderReceipt,
     RenderSourceBundlePointer,
     RenderSourceFilePointer,
     RenderStateSnapshot,
     RenderStateSnapshotPointer,
-    ResolvedTimeline,
+    ResolvedAudioSpan,
     ResolvedCaptionCue,
     ResolvedDuckingSpec,
-    ResolvedAudioSpan,
+    ResolvedTimeline,
     ResolvedVisualSpan,
+    ReviewLayerState,
+    ReviewLifecycle,
     SourceReference,
     StateCommitAttempt,
     StateCommitStatus,
@@ -97,7 +97,6 @@ from ai_video.production.models import (
     ToolIdentity,
     VoiceRequestReceipt,
 )
-
 
 ZERO_HASH = "0" * 64
 ONE_HASH = "1" * 64
@@ -4277,6 +4276,7 @@ def test_p6_layer_and_verdict_values_are_exact():
     assert {item.value for item in QaLayer} == {
         "technical",
         "layout",
+        "caption",
         "strategy",
         "semantic",
         "final_acceptance",
@@ -4337,6 +4337,27 @@ def test_manifest_24_requires_selected_qa_policy_and_defaults_empty_review_state
             schema_version="2.4",
             active_qa_policy=make_qa_policy_pointer(),
         )
+
+
+def test_manifest_214_rejects_caption_review_state_but_215_accepts_it():
+    state = ReviewLayerState(
+        layer=QaLayer.CAPTION,
+        desired_fingerprint=ZERO_HASH,
+        lifecycle=ReviewLifecycle.NOT_EVALUATED,
+    )
+    base = make_state_manifest(
+        schema_version="2.14",
+        active_qa_policy=make_qa_policy_pointer(),
+        active_dependency_graph=make_dependency_graph_snapshot_pointer(),
+    ).model_dump(mode="json")
+    with pytest.raises(ValidationError, match="CAPTION review state"):
+        ProductionManifest.model_validate({**base, "review_states": (state,)})
+
+    manifest = ProductionManifest.model_validate(
+        {**base, "schema_version": "2.15", "review_states": (state,)}
+    )
+    assert manifest.schema_version == "2.15"
+    assert manifest.review_states == (state,)
 
 
 def test_p6_error_codes_are_typed_and_non_retryable():

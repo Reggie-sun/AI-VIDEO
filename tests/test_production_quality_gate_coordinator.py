@@ -15,7 +15,6 @@ from ai_video.production.models import (
     SourceReference,
 )
 
-
 ZERO_HASH = "0" * 64
 
 
@@ -86,7 +85,7 @@ def _fixture(
     ) = _gate_api()
     applicability = UniversalQaApplicability(
         has_audio=True,
-        has_captions=layout_applicable,
+        has_captions=False,
         has_graphics=layout_applicable,
         has_safe_area_requirements=layout_applicable,
         has_transitions=layout_applicable,
@@ -140,6 +139,70 @@ def test_universal_profile_is_content_addressed_and_rejects_tampering() -> None:
     with pytest.raises(ValidationError, match="content hash"):
         UniversalQaProfile.model_validate(
             {**profile.model_dump(mode="json"), "profile_version": "tampered"}
+        )
+
+
+def test_historical_universal_profile_reopens_without_version_or_hash_drift() -> None:
+    (
+        UniversalHardCheck,
+        UniversalQaApplicability,
+        _,
+        _,
+        _,
+        UniversalQaProfile,
+        _,
+    ) = _gate_api()
+    historical = {
+        "profile_id": "historical-profile",
+        "profile_version": "1",
+        "delivery_profile": DeliveryProfile(
+            width=1080, height=1920, fps=24
+        ).model_dump(mode="json"),
+        "applicability": UniversalQaApplicability().model_dump(mode="json"),
+        "required_hard_checks": [
+            UniversalHardCheck.ASSET_PROVENANCE.value,
+            UniversalHardCheck.MEDIA_DECODE.value,
+            UniversalHardCheck.TIMELINE_BINDING.value,
+            UniversalHardCheck.RENDER_OUTPUT.value,
+        ],
+        "required_review_layers": [QaLayer.TECHNICAL.value],
+        "continuity_requirement_ids": [],
+    }
+    historical["content_hash"] = canonical_sha256(
+        {"schema": "universal-qa-profile/1", **historical}
+    )
+
+    reopened = UniversalQaProfile.model_validate(historical)
+
+    assert reopened.profile_contract_version == 1
+    assert reopened.model_dump(mode="json") == historical
+
+
+def test_new_caption_profile_requires_caption_layer() -> None:
+    (
+        UniversalHardCheck,
+        UniversalQaApplicability,
+        _,
+        _,
+        _,
+        UniversalQaProfile,
+        _,
+    ) = _gate_api()
+
+    with pytest.raises(ValidationError, match="caption review layer"):
+        UniversalQaProfile.create(
+            profile_id="caption-v2",
+            profile_version="2",
+            delivery_profile=DeliveryProfile(width=1080, height=1920, fps=24),
+            applicability=UniversalQaApplicability(has_captions=True),
+            required_hard_checks=(
+                UniversalHardCheck.ASSET_PROVENANCE,
+                UniversalHardCheck.MEDIA_DECODE,
+                UniversalHardCheck.TIMELINE_BINDING,
+                UniversalHardCheck.RENDER_OUTPUT,
+                UniversalHardCheck.AUDIO_CAPTION_BINDING,
+            ),
+            required_review_layers=(QaLayer.TECHNICAL, QaLayer.LAYOUT),
         )
 
 
@@ -350,6 +413,63 @@ def test_policy_coverage_blocks_before_any_gate_effect() -> None:
     assert result.eligible_for_final_acceptance is False
 
 
+def test_caption_profile_requires_caption_policy_before_any_gate_effect() -> None:
+    (
+        UniversalHardCheck,
+        UniversalQaApplicability,
+        UniversalQaBlockReason,
+        _,
+        UniversalQaContext,
+        UniversalQaProfile,
+        UniversalQualityGateCoordinator,
+    ) = _gate_api()
+    applicability = UniversalQaApplicability(has_audio=True, has_captions=True)
+    profile = UniversalQaProfile.create(
+        profile_id="caption-v2",
+        profile_version="2",
+        delivery_profile=DeliveryProfile(width=1080, height=1920, fps=24),
+        applicability=applicability,
+        required_hard_checks=(
+            UniversalHardCheck.ASSET_PROVENANCE,
+            UniversalHardCheck.MEDIA_DECODE,
+            UniversalHardCheck.TIMELINE_BINDING,
+            UniversalHardCheck.RENDER_OUTPUT,
+            UniversalHardCheck.AUDIO_CAPTION_BINDING,
+        ),
+        required_review_layers=(
+            QaLayer.TECHNICAL,
+            QaLayer.LAYOUT,
+            QaLayer.CAPTION,
+        ),
+    )
+    policy = _policy(required_layers=(QaLayer.TECHNICAL, QaLayer.LAYOUT))
+    context = UniversalQaContext(
+        delivery_profile=profile.delivery_profile,
+        applicability=applicability,
+        project_content_hash="1" * 64,
+        registry_content_hash="2" * 64,
+        dependency_graph_revision_id="3" * 64,
+        render_state_content_hash="4" * 64,
+        render_output_sha256="5" * 64,
+        timeline_fingerprint="6" * 64,
+        qa_policy_content_hash=policy.content_hash,
+    )
+    calls: list[str] = []
+
+    result = UniversalQualityGateCoordinator().run_once(
+        profile=profile,
+        context=context,
+        policy=policy,
+        run_hard_check=lambda check, *_: calls.append(check.value),
+        run_review_layer=lambda layer, *_: calls.append(layer.value),
+    )
+
+    assert result.verdict is QaVerdict.NOT_EVALUATED
+    assert result.block_reason is UniversalQaBlockReason.QA_POLICY_COVERAGE_INCOMPLETE
+    assert result.blocked_identifiers == ("caption_policy", QaLayer.CAPTION.value)
+    assert calls == []
+
+
 def test_unsealed_policy_is_rejected_even_when_context_repeats_its_hash() -> None:
     (
         _,
@@ -532,12 +652,12 @@ def test_provider_native_claims_are_absent_from_gate_and_acceptance_models() -> 
         EcommerceGateResult,
         EcommerceWholeAdAcceptanceTarget,
     )
+    from ai_video.production.models import FinalAcceptanceReceipt
     from ai_video.production.quality_gate_coordinator import (
         UniversalQaContext,
         UniversalQaGateResult,
         UniversalQaProfile,
     )
-    from ai_video.production.models import FinalAcceptanceReceipt
 
     forbidden = {
         "provider_name",
