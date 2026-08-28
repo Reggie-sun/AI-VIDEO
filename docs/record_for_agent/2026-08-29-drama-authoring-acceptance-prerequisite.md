@@ -27,11 +27,13 @@ Promotion commit `01483ec1f434661984ca009fffa85960310dedd6`只同步acceptance m
 `239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b`，metadata为`canonical: true`、
 `spec_status: accepted`、`implementation_status: not_started`、`quality_status: not_evaluated`。
 
-该acceptance不扩张到之后产生的artifact bytes。当前candidate状态是：
+Spec acceptance不扩张到之后产生的artifact bytes。用户随后通过exact-bound `fixture_decision`明确接受commit
+`3b436195e939f7bc8fff5999438e9018030a38fe`中SHA-256
+`73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab`的fixture payload。当前状态是：
 
-- fixture selection：`proposed`，未accepted/sealed；
-- baseline selection：`blocked`，`reference_set=[]`，没有exact rights/provenance-qualified cinematic reference；
-- authoring package：authoring content candidate assessment为`PASS`，但整体`seal_readiness=BLOCKER`；
+- fixture selection：exact payload与独立acceptance envelope均已content-addressed，状态`ACCEPTED`；
+- baseline selection v2：`blocked`，`reference_set=[]`，没有exact rights/provenance-qualified cinematic reference；
+- authoring package v2：authoring content assessment为`PASS`，但整体`seal_readiness=BLOCKER`；
 - `B-D0`仍为`BLOCKED_BEFORE_MEDIA`，`M6-D`仍为`NOT_EVALUATED`。
 
 ## Session Work And Decisions
@@ -71,6 +73,22 @@ prop state chain、pairwise transition semantics、payoff与continuation applica
 Candidate review先后发现并修复两类authoring defect：一是prior-context allocation、decision/appearance/prop
 continuity和per-Shot emotion/coverage字段不完整；二是“回答会留下”原本晚于林岚拾取，与decision constraint
 矛盾。修复后same-tier scoped `reviewer_xhigh` verdict为`accept`，无remaining concern。
+
+Exact fixture confirmation通过独立acceptance envelope固化：
+
+- `docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.accepted.json`；
+- envelope绑定immutable candidate payload commit/SHA、byte size、Git blob OID、current-user authority、timestamp与
+  normalized confirmation tuple hash；
+- accepted scope只覆盖fixture Story/Scene/Character/Shot semantics，明确排除baseline、package、Provider、media、
+  B-D0、M6-D、P6与Final Acceptance。
+
+随后新增v2 lineage records，不修改任何已确认的v1 bytes：
+
+- `docs/superpowers/artifacts/drama/b-d0/baseline-selection/missing-cinematic-reference-v2.blocked.json`；
+- `docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v2.blocked.json`。
+
+V2 package只移除`FIXTURE_EXACT_BYTES_NOT_ACCEPTED`；继续保留baseline exact reference、baseline acceptance与
+package-v2 exact acceptance blockers。Independent `reviewer_xhigh`确认全部lineage hash与gate status一致并`accept`。
 
 Baseline record没有把Commercial、fake/test media或文本floor冒充cinematic comparator。它只固定必需dimensions、
 minimum floors、`1.0x` full-audio side-by-side HUMAN procedure与当前missing-reference blocker。
@@ -143,23 +161,50 @@ Candidate exact-range Harness选择`scope_diff_check`、`docs_contract_check`、
 所有JSON通过`python -m json.tool`与focused `jq -e` identity/coverage checks；fixture/baseline实际hash与package
 bindings一致。
 
+Exact fixture acceptance checkpoint：
+
+```text
+3cb778a9dd4fa75a6c610bf8f16160d5de44831d
+docs: accept exact drama fixture
+receipt: .agent/harness/runs/drama-fixture-acceptance-20260829/receipt.json
+```
+
+Acceptance envelope committed SHA-256为
+`e2601e8ac7af4686c3a4290a05d956c87d8bcea73bc146f16bad4ee5fad52e1d`。Receipt status=`passed`且
+`verify-receipt`确认`fresh=true`、exact snapshot/scope/integrity与same-run closure全部成立。
+
+Accepted-fixture v2 lineage checkpoint：
+
+```text
+061df5b0e2427c1fd72c3fd4d21a7443757db1b8
+docs: bind accepted drama fixture lineage
+receipt: .agent/harness/runs/drama-fixture-lineage-v2-20260829/receipt.json
+```
+
+Committed v2 exact bytes：
+
+| Artifact | SHA-256 | Status |
+| --- | --- | --- |
+| baseline blocker v2 | `c22dfb3f95fa58e34d2708d7b89818e63d6e05ca4d25da12b0dfb3b630e6ca27` | `blocked` |
+| authoring package v2 | `7a1009bb221cd8fbe5d30f318acb5ba5c75bc111aacdfb7d0117a603ce058323` | `blocked` |
+
+V2 receipt status=`passed`且`verify-receipt`为fresh exact-snapshot completion proof。
+
 ## Remaining Blockers And Next Work
 
-Spec owner/rubric prerequisite已经满足，但B-D0仍有三个sequential blockers：
+Spec owner/rubric与fixture prerequisite已经满足，但B-D0仍有两个sequential blockers：
 
-1. 用户必须对fixture candidate commit `3b436195e939f7bc8fff5999438e9018030a38fe`与exact fixture SHA-256
-   `73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab`给出明确accept/revise decision；
-2. 必须提供或选择至少一个exact Drama cinematic reference，绑定bytes SHA-256、size、stream identity、
+1. 必须提供或选择至少一个exact Drama cinematic reference，绑定bytes SHA-256、size、stream identity、
    rights/provenance与selection rationale，再形成可确认的baseline-selection candidate；
-3. Fixture与baseline都accepted后，必须重新生成引用其accepted records的authoring package；new bytes/new SHA
+2. Baseline accepted后，必须重新生成引用accepted fixture/baseline records的authoring package；new bytes/new SHA
    需要单独exact acceptance，且package须无`BLOCKER`。
 
-当前baseline blocker本身不能被“accept”为baseline。下一自然动作停在fixture exact-hash decision与baseline
-reference input；不得提前写Provider prompt、选择Provider、生成media、调用`video-analysis`或进入M6-D。
+当前baseline blocker本身不能被“accept”为baseline。下一自然动作停在baseline reference input；不得提前写
+Provider prompt、选择Provider、生成media、调用`video-analysis`或进入M6-D。
 
 ## Agent Guardrails
 
-- Accepted Spec只解除Drama owner/rubric缺失；它不自动接受fixture、baseline、package或产生B-D0 PASS。
+- Accepted Spec与fixture不自动接受baseline/package，也不产生B-D0 PASS。
 - HUMAN evidence必须同时绑定exact media与sealed authoring/profile/rubric/fixture/baseline/authorization identity。
 - Repair、rerender、re-encode、recomposition、retime、transition、audio replacement或任何bytes变化产生new SHA，
   old verdict不得继承。
