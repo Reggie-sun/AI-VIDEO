@@ -29,6 +29,100 @@ Date: 2026-08-28
 检查、project-local `video-analysis`、ASR 与人工 frame-sheet inspection，但没有得到 Production
 CAPTION P6 PASS 或 empirical Final Acceptance。
 
+## Font Contract Fix Update — 2026-08-29
+
+下方 `Production Renderer Gate — FAIL` 保存的是 2026-08-28 修复前的真实失败。其“需要另行
+授权修复”与“任意 selected custom font 都属于同一种 source/font contract 不兼容”的 current-facing
+结论，现已被用户后续“修复”授权、代码提交 `0ed672e` 和新的 exact Production render 证据取代。
+历史 FAIL artifact、错误码与 lint finding 仍然有效，但 root cause 已进一步收敛：fixture 使用了
+不存在于 pinned renderer canonical bundled-family table 的虚构 `Fixture Sans`，同时 Product Runtime
+此前没有在 staging 前约束这一 renderer contract。
+
+### Runtime Fix
+
+`src/ai_video/production/_hyperframes_source.py::_caption_style_css()` 现在只接受
+`hyperframes@0.7.103` 同名 bundled canonical font family 与 renderer 支持的 CSS generic family，比较时
+使用 `casefold()`；任意未知 family、alias-substituted family 或虚构 fixture family 在创建
+`staging_root` 前以 `ErrorCode.RENDERER_SOURCE_INVALID` fail closed。没有引入 `@font-face local()`、
+silent fallback、禁用 lint、第二 renderer path 或新的 Manifest writer。
+
+Production test fixtures 改为真实 canonical family：默认 `Inter`，serif arm 使用 `EB Garamond`。
+`docs/agent-primary-contract-matrix.md` 同步把 `_hyperframes_source.py` 纳入 P3 owner，并记录
+unsupported/alias-substituted font 的禁止旁路。实现 commit 中 exact source、test 与 contract-matrix
+bytes SHA-256 分别为：
+
+- `src/ai_video/production/_hyperframes_source.py`：
+  `cceb6cb88219204a8c5bf674e0357a40b2d97d63eeb434d8e11f19c1637fdde7`
+- `tests/test_production_hyperframes.py`：
+  `3f674ecc96a44a6815aca558d94308ca51a63ea6fd436cc577d1bc5fd827ddcb`
+- `docs/agent-primary-contract-matrix.md`：
+  `42b93365191256ad59bcead88f0d91162e93b860a1201e8625f1e551ce0fa405`
+
+### TDD And Independent Review
+
+- 原 Production renderer gate 先稳定复现 RED：HyperFrames lint
+  `font_family_without_font_face: fixture sans`。
+- 新 public regression 在实现前 RED：`materialize_hyperframes_source()` 对未知 family 没有抛错。
+- 实现后 regression GREEN，并断言 typed `RENDERER_SOURCE_INVALID` 与 `staging_root` 不存在。
+- Mutation 临时移除 runtime allowlist check 后，regression 再次以 `DID NOT RAISE` RED；恢复实现后
+  `1 passed`，证明测试实际覆盖新 boundary。
+- `reviewer_high` 首轮拒绝仅替换 fixture 的 workaround；加入 runtime preflight 后要求 public seam 与
+  effect-before-validation assertion；补齐后最终 verdict 为 `accept`，无 blocking 或 non-blocking
+  concern。
+
+### Exact Production Render — Engineering PASS
+
+新的 bounded local evidence root：
+
+`runs/caption-quality-gate-font-fixture-fix-20260828-v1/`
+
+Production fixture 使用 `Inter`，通过同一个 source materialization、lint、check、render、output
+verification、durable activation、audio 与 frame-boundary gate。Exact evidence：
+
+- final MP4：`media/production-caption-inter.mp4`，SHA-256
+  `e3b319bd2ed6d47ce382a34bef97edd724ddb3a49d40f301e878853e21709ab4`；
+  `2.022s`、H.264 `1280x720`、`24fps`，含 AAC audio。
+- exact source：`production-source/index.html`，SHA-256
+  `dd5c7a7c0056c125a24e9cb10bb704244011b9bdc1fe3f5e8e1fea90b026c01a`。
+- test Manifest：`state/manifest.json`，SHA-256
+  `5477ad6e0e79ff4ed343daebe6fd8e293d6ce14f3d8bc7bc8508400ad145c671`；
+  attempt `p4-production-render` 为 `succeeded`，但这是 P4 test fixture lifecycle，不是 CAPTION P6。
+- exact caption half-open intervals 为 `[0,12)` 与 `[13,24)`；safe-area crop 的 frame
+  `0/11/13/23` 检测到字幕，`12/24` 无字幕。`renderer-evidence/caption-frames.json` SHA-256
+  `a241daac5c5a326de70adfed93270b0b265c4267eb8c98d40db3d804103ac7f1`。
+- audio measurement SHA-256
+  `b184d9b08a964cee576f29f5765b2987cc47a209ba5344a330eae452216f093d`；
+  network audit SHA-256
+  `3de27d39c8f297f4af92f80617d96b0bb1d57617100a2c12eab6abaed4ae7995`，namespace 只有 `lo`。
+- project-local `video-analysis video_review` 绑定 exact MP4，报告 `96/96` unique sampled frames、
+  audio present、`issues=[]`；这是 raw media evidence，不是 Production verdict。
+- consolidated `validation-summary.json` SHA-256
+  `4174a7bd3debece5781a675583fa5869057aa3fe1bfc7097bc4861efa6cc539e`。
+
+Executable verification：
+
+- exact Production renderer gate：`1 passed in 8.58s`。
+- `tests/test_production_hyperframes.py`：`197 passed, 3 skipped in 43.97s`。
+- extended HyperFrames/composition/captions/voice/Base E2E：
+  `332 passed, 3 skipped in 172.11s`。
+- exact commit-range Harness `ad7ce081..0ed672e`：Architecture Gate `PASS`、Harness
+  `204 passed`、Production contract `2900 passed, 3 skipped, 1225 deselected`、CLI/config
+  `13 passed`；`production_composition_audio_tests` 被已通过的 `production_contract_tests` 完整覆盖。
+- fresh receipt：`.agent/harness/runs/caption-font-contract-fix-20260828/receipt.json`；
+  `verify-receipt` 返回 `passed=true`、`fresh=true`、`fresh_for_snapshot=true`、
+  `scope_paths_match=true`、`complete_completion_proof=true`、`snapshot_matches=true`、
+  `workspace_cleanup_confirmed=true` 与 `workspace_stable_confirmed=true`。
+- `python -m ruff` 未执行，因为当前 Python environment 没有 `ruff` module；policy-selected
+  Harness checks 与上述 executable suites 均实际通过。
+
+### Proof Boundary
+
+该修复证明的是当前 pinned local runtime 中，canonical `Inter` Production source 能通过 P3/P4 exact
+renderer gate，且未知字体在 staging 前 fail closed。它不证明 custom content-addressed font asset、
+跨主机字体一致性、中文 glyph coverage、caption semantic correctness、感知可读性、Qingyan V4
+canonical identity、CAPTION P6 或 Final Acceptance。Qingyan V4 的 Production CAPTION Gate 仍为
+`NOT_EVALUATED`；本轮没有 Provider/paid call、外网访问、CAPTION P6 mutation、push 或 release。
+
 ## Real Validation Update — 2026-08-28
 
 本轮按用户“真实验证”请求执行了不含 Provider submit、paid call、外网访问或 Production state
