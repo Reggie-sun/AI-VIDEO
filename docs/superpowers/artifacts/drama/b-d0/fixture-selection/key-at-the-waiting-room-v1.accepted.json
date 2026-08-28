@@ -1,0 +1,56 @@
+{
+  "schema_version": "drama-fixture-selection-acceptance/1",
+  "record_kind": "drama_fixture_selection_acceptance",
+  "fixture_id": "drama.fixture.key-at-the-waiting-room",
+  "fixture_version": 1,
+  "status": "accepted",
+  "domain_id": "drama",
+  "accepted_selection_payload": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.proposed.json",
+    "commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+    "accepted_record_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+    "byte_size": 17350,
+    "git_blob_oid": "d71b9de7411b404c1e62f6169d6955507bd44fc8",
+    "candidate_status_at_acceptance": "proposed",
+    "content_address_semantics": "The immutable candidate payload at the bound commit and SHA-256 is the accepted fixture record; this envelope adds authority and acceptance lineage without changing the accepted payload bytes."
+  },
+  "contract_binding": {
+    "spec_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "spec_commit": "01483ec1f434661984ca009fffa85960310dedd6",
+    "spec_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b",
+    "contract_version": "drama-authoring-and-acceptance/1"
+  },
+  "approval": {
+    "approver_authority_identity": "current_user",
+    "authority_basis": "explicit exact-fixture confirmation in the current task",
+    "accepted_at": "2026-08-29T01:49:36+08:00",
+    "acceptance_source_id": "current-session:fixture_decision",
+    "normalized_decision": "CONFIRM_EXACT_FIXTURE",
+    "canonical_confirmation_tuple": "fixture_decision=CONFIRM;candidate_commit=3b436195e939f7bc8fff5999438e9018030a38fe;candidate_sha256=73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+    "acceptance_source_sha256": "3ea2803c3f76457bcfb71ed8215f6a80b48fb8c71d9e6ecec2eb9d301a38f611"
+  },
+  "accepted_scope": {
+    "includes": [
+      "original Story/Scene/Character/ordered three-Shot fixture semantics",
+      "exact dialogue and causal order",
+      "format, coverage and edit grammar",
+      "blocking, eyeline, performance, emotional progression and prop state chain",
+      "payoff, continuation and requirement applicability"
+    ],
+    "excludes": [
+      "cinematic baseline or baseline-selection acceptance",
+      "authoring-package acceptance or seal readiness",
+      "Provider, model, workflow or native prompt selection",
+      "media generation, analysis or HUMAN media verdict",
+      "B-D0, M6-D, P6 or Final Acceptance PASS"
+    ]
+  },
+  "current_gate_state": {
+    "fixture_selection": "ACCEPTED",
+    "baseline_selection": "BLOCKED",
+    "authoring_package": "BLOCKED",
+    "b_d0": "BLOCKED_BEFORE_MEDIA",
+    "m6_d": "NOT_EVALUATED",
+    "next_required_evidence": "An exact rights/provenance-qualified Drama cinematic reference and an explicitly accepted baseline-selection record."
+  }
+}
