@@ -622,7 +622,7 @@ def _search_collection(
     corpus_kind: str,
     default_authority: str,
 ) -> List[Hit]:
-    """Fuse dense and lexical candidates from one validated collection."""
+    """Fuse candidates with matched ANN budgets for query/null calibration."""
     candidate_limit = min(HYBRID_CANDIDATE_TOP_K, available)
     dense_raw = collection.query(
         query_embeddings=[query_vector],
@@ -631,7 +631,7 @@ def _search_collection(
     )
     null_raw = collection.query(
         query_embeddings=[null_query_vector],
-        n_results=1,
+        n_results=candidate_limit,
         include=["distances"],
     )
     lexical_raw = collection.get(include=["documents", "metadatas"])
@@ -648,8 +648,8 @@ def _search_collection(
     ):
         raise ValueError("dense retrieval result fields have inconsistent lengths")
     null_distances = null_raw.get("distances", [[]])[0] or []
-    if len(null_distances) != 1:
-        raise ValueError("dense null calibration must return exactly one distance")
+    if not null_distances:
+        raise ValueError("dense null calibration must return a distance")
 
     lexical_ids = lexical_raw.get("ids", []) or []
     lexical_documents = lexical_raw.get("documents", []) or []

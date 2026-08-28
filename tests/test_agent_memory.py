@@ -36,6 +36,7 @@ from ai_video.agent_memory.config import (
     DEFAULT_MODEL_DIR,
     DEFAULT_SUPERPOWERS_ROOT,
     DEFAULT_TOP_N,
+    DENSE_NULL_QUERY_ASCII,
     HYBRID_CANDIDATE_TOP_K,
     VALID_SCOPES,
 )
@@ -301,14 +302,16 @@ def test_search_keeps_score_at_threshold_and_drops_lower(
         index_path=idx,
         embedding=fake_embedding,
     )
+    query = "threshold boundary"
+    null_vector = fake_embedding.embed_query(select_dense_null_query(query))
 
     class BoundaryCollection:
         def count(self) -> int:
             return 2
 
         def query(self, **kwargs):
-            if kwargs["n_results"] == 1:
-                return {"distances": [[0.32]]}
+            if kwargs["query_embeddings"] == [null_vector]:
+                return {"distances": [[0.32, 0.33]]}
             assert kwargs["n_results"] == 2
             return {
                 "ids": [["exact", "below"]],
@@ -358,7 +361,7 @@ def test_search_keeps_score_at_threshold_and_drops_lower(
     monkeypatch.setattr(retrieval_module, "load_index", lambda *_: BoundaryStore())
 
     hits = search(
-        "threshold boundary",
+        query,
         top_k=2,
         index_path=idx,
         embedding=fake_embedding,
@@ -407,14 +410,15 @@ def test_search_hybrid_fusion_rescues_exact_lexical_hit(
         "ARK_API_KEY credential reference",
         *(f"unrelated material {index}" for index in range(18)),
     ]
+    null_vector = fake_embedding.embed_query(select_dense_null_query("ARK_API_KEY"))
 
     class HybridCollection:
         def count(self) -> int:
             return 20
 
         def query(self, **kwargs):
-            if kwargs["n_results"] == 1:
-                return {"distances": [[0.05]]}
+            if kwargs["query_embeddings"] == [null_vector]:
+                return {"distances": [[0.05, *([0.8] * 19)]]}
             assert kwargs["n_results"] == 20
             return {
                 "ids": [ids],
@@ -603,6 +607,51 @@ def test_dense_lane_requires_null_excess_and_top1_margin(
             dense_scores[0] - dense_scores[1]
         )
         assert hits[0].score == pytest.approx(dense_scores[0])
+
+
+def test_dense_null_calibration_uses_same_ann_candidate_budget() -> None:
+    ids = [f"chunk-{index:02d}" for index in range(30)]
+    documents = [f"candidate {index}" for index in range(30)]
+    metadatas = [
+        {"source": f"docs/{index}.md", "chunk_index": 0}
+        for index in range(30)
+    ]
+
+    class ApproximateCollection:
+        def query(self, **kwargs):
+            if kwargs["query_embeddings"] == [[0.0]]:
+                if kwargs["n_results"] == 1:
+                    return {"distances": [[0.2]]}
+                assert kwargs["n_results"] == 30
+                return {"distances": [[0.1, *([0.11] * 29)]]}
+            assert kwargs["query_embeddings"] == [[1.0]]
+            assert kwargs["n_results"] == 30
+            return {
+                "ids": [ids],
+                "documents": [documents],
+                "metadatas": [metadatas],
+                "distances": [[0.1, 0.105, *([0.2] * 28)]],
+            }
+
+        def get(self, **kwargs):
+            return {
+                "ids": ids,
+                "documents": documents,
+                "metadatas": metadatas,
+            }
+
+    hits = retrieval_module._search_collection(
+        query="no-match",
+        query_vector=[1.0],
+        null_query_vector=[0.0],
+        collection=ApproximateCollection(),
+        available=30,
+        limit=8,
+        corpus_kind="experience",
+        default_authority="advisory_experience",
+    )
+
+    assert hits == []
 
 
 @pytest.mark.parametrize(
@@ -1863,18 +1912,42 @@ def test_local_multilingual_project_corpus_answerability_calibration(
         for hit in relevant
     )
 
-    for noise_query in (
+    assert search(
         "不存在的紫色大象量子果园",
-        "zzzxqv_nonexistent_74291",
-    ):
-        assert search(
-            noise_query,
-            top_k=8,
-            scope="all",
-            corpora=corpora,
-            index_path=idx,
-            embedding=embedding,
-        ) == []
+        top_k=8,
+        scope="all",
+        corpora=corpora,
+        index_path=idx,
+        embedding=embedding,
+    ) == []
+
+    ascii_null_hits = search(
+        DENSE_NULL_QUERY_ASCII,
+        top_k=8,
+        scope="all",
+        corpora=corpora,
+        index_path=idx,
+        embedding=embedding,
+    )
+    assert not any(
+        hit.admission_lane in {"dense", "hybrid"}
+        for hit in ascii_null_hits
+    )
+    assert any(
+        hit.admission_lane == "lexical"
+        and hit.source.endswith(
+            "2026-08-29-record-evidence-identity-validation.md"
+        )
+        for hit in ascii_null_hits
+    )
+    assert search(
+        "zzzyxqv_absent_memory_topic_98431",
+        top_k=8,
+        scope="all",
+        corpora=corpora,
+        index_path=idx,
+        embedding=embedding,
+    ) == []
 
 
 # ---------------------------------------------------------------------------

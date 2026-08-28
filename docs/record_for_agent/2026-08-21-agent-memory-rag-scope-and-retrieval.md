@@ -102,7 +102,9 @@ RAG search、Provider、媒体或网络操作。
 4. **Candidate retrieval**：每个 selected collection 从同一批 indexed chunks 走两条
    local lane。Dense lane 使用现有 Chroma cosine nearest-neighbor；lexical lane 使用
    dependency-free BM25（`k1=1.5`、`b=0.75`），保留 identifier/路径 token，并为中文
-   连续文本增加 bigram。两条 lane 的 candidate `top_k` 都是 30。
+   连续文本增加 bigram。Dense query、dense irrelevant control 与 lexical lane 的 candidate
+   `top_k` 都是 30；query/control 必须使用相同 ANN candidate budget，不能比较不同
+   `n_results` 所产生的 approximate-neighbor search effort。
 5. **Fusion**：两条 lane 用 stable Chroma chunk ID 去重，再以 equal-weight weighted RRF
    （`k=60`）排序。每个 hit 分别保留 `dense_score`、raw `lexical_score` 与
    `lexical_relevance_score`、`lexical_query_coverage`、`fusion_score`、
@@ -147,6 +149,14 @@ separation 的自由改写会主动 abstain。语料或 embedding identity 变�
 current_docs、research、deferred 的 null excess 分别为 `-0.003528`、`0.001106`、
 `-0.007325`、`0.000066`、`-0.002329`，全部低于 `0.005`。因此五个 collection 均拒答，
 同时正例保留 dense admission。
+
+2026-08-29 corpus growth regression 证明 Chroma HNSW 对同一 vector 使用
+`n_results=1` 与 `n_results=30` 时可能返回不同 Top-1：ASCII null probe 在 experience
+shard 的 distance 分别为 `0.137306` 与 `0.132259`，虚构约 `0.005047` null excess。
+当前实现因此统一 query/control candidate budget。修复后真实 experience continuity 正例仍有
+null excess `0.014156`、Top-1 margin `0.004900`；canonical ASCII null probe 不再获得
+`dense` / `hybrid` admission。若 corpus 中的 durable diagnostic record真实包含该 exact token，
+BM25 `lexical` hit仍是正确 provenance，不得为满足 dense calibration 而屏蔽。
 
 ## Freshness And Maintenance
 
