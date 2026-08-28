@@ -96,6 +96,52 @@ Use a short topic slug that describes the durable lesson or completed slice, not
 - Never overwrite, rename, or delete an unrelated record.
 - Do not create `references/` copies of canonical project documents. Link to the existing source of truth instead.
 
+## Classify Evidence Without Counting It
+
+A session boundary triggers record and learning evaluation; an experiment
+boundary determines evidence grouping. A record file may contain multiple
+attempts or controlled arms, and one attempt may be referenced by multiple
+records or proof layers. File, section, artifact, and RAG chunk counts are not
+evidence independence.
+
+For a new or materially updated empirical record that should enter automatic
+distillation, add this flat scalar frontmatter envelope:
+
+```yaml
+---
+record_kind: media_experiment
+topic_id: stable-topic-id
+learning_eligibility: eligible
+evidence_index_version: "1"
+---
+```
+
+Allowed `record_kind` values are `media_experiment`, `provider_comparison`,
+`architecture_implementation`, `recovery_incident`, `research_note`, and
+`session_summary`. `learning_eligibility` is `eligible`, `ineligible`, or
+`needs_identity`. Classification changes automatic distillation admission
+only; it does not change history, retrieval authority, Product state, or any
+quality/acceptance status.
+
+An `eligible` record must contain one `## Evidence Index` Markdown table with
+these columns:
+
+```text
+evidence_id | independence_key | experiment_id | attempt_id | arm_id |
+artifact_sha256 | proof_layer | verdict | failure_class | relation_kind |
+related_evidence_id | source
+```
+
+Use exact identities and `NONE` / `N/A` sentinels rather than blanks. Preserve
+technical, analyzer, human, and Provider-receipt proof layers separately.
+Records that lack a defensible identity remain `needs_identity` and cannot be
+automatically admitted. Legacy narrative records remain valid and retrievable
+without backfill.
+
+This Skill does not count independent support or counter evidence, decide an
+`admission_basis`, or infer identity from a filename. Those decisions belong
+only to `distill-ai-video-learning` and its read-only validator.
+
 ## Reconcile Superseded Evidence
 
 When newer verified evidence changes a prior record's current-facing status,

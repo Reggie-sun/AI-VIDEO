@@ -1742,8 +1742,11 @@ def test_experience_learning_skill_routes_to_focused_suite() -> None:
     for path in (
         ".agents/skills/distill-ai-video-learning/SKILL.md",
         ".agents/skills/distill-ai-video-learning/templates/learning-claim.md",
+        ".agents/skills/distill-ai-video-learning/scripts/validate_evidence_identity.py",
+        ".agents/skills/record-ai-video-session/SKILL.md",
         "docs/record_for_agent/learning/example-claim.md",
         "tests/test_distill_ai_video_learning_skill.py",
+        "tests/test_experience_evidence_identity.py",
     ):
         report = agent_harness.inspect_paths([path], policy)
         assert report["fallback_paths"] == []
@@ -1758,6 +1761,7 @@ def test_experience_learning_skill_routes_to_focused_suite() -> None:
         "-p",
         "no:cacheprovider",
         "tests/test_distill_ai_video_learning_skill.py",
+        "tests/test_experience_evidence_identity.py",
         "-q",
     ]
 

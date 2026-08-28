@@ -77,6 +77,12 @@ class Hit:
     dense_top1_margin: float = 0.0
     admission_lane: str = ""
     index_freshness: str = "fresh"
+    # Allowlisted record classification projected for advisory discovery only.
+    # These fields never participate in ranking, authority, or evidence counting.
+    record_kind: str = ""
+    topic_id: str = ""
+    learning_eligibility: str = ""
+    evidence_index_version: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -96,6 +102,21 @@ def _format_excerpt(text: str, max_len: int = 240) -> str:
     if len(text) <= max_len:
         return text
     return text[:max_len].rstrip() + "..."
+
+
+def _supplemental_record_metadata(
+    metadata: dict,
+    key: str,
+    *,
+    corpus_kind: str,
+) -> str:
+    """Project one allowlisted experience-record scalar without trusting it."""
+    if corpus_kind != "experience":
+        return ""
+    value = str(metadata.get(key, "")).strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+        value = value[1:-1]
+    return value
 
 
 def _authority_label(corpus_kind: str, authority: str) -> str:
@@ -690,6 +711,7 @@ def _search_collection(
     hits: List[Hit] = []
     for chunk_id in fusion_scores:
         text, md = records[chunk_id]
+        hit_corpus_kind = str(md.get("corpus_kind", corpus_kind))
         dense_score = dense_scores.get(chunk_id)
         lexical_score = lexical_scores.get(chunk_id, 0.0)
         lexical_query_coverage = lexical_coverages.get(chunk_id, 0.0)
@@ -731,7 +753,7 @@ def _search_collection(
                 h2=str(md.get("h2", "")),
                 h3=str(md.get("h3", "")),
                 date=md.get("date"),
-                corpus_kind=str(md.get("corpus_kind", corpus_kind)),
+                corpus_kind=hit_corpus_kind,
                 authority=str(md.get("authority", default_authority)),
                 document_kind=str(md.get("document_kind", "")),
                 status=str(md.get("status", "")),
@@ -749,6 +771,18 @@ def _search_collection(
                 dense_null_excess=dense_null_excess,
                 dense_top1_margin=dense_top1_margin,
                 admission_lane=admission_lane,
+                record_kind=_supplemental_record_metadata(
+                    md, "record_kind", corpus_kind=hit_corpus_kind
+                ),
+                topic_id=_supplemental_record_metadata(
+                    md, "topic_id", corpus_kind=hit_corpus_kind
+                ),
+                learning_eligibility=_supplemental_record_metadata(
+                    md, "learning_eligibility", corpus_kind=hit_corpus_kind
+                ),
+                evidence_index_version=_supplemental_record_metadata(
+                    md, "evidence_index_version", corpus_kind=hit_corpus_kind
+                ),
             )
         )
     return sorted(hits, key=_hit_sort_key, reverse=True)[:limit]
@@ -822,6 +856,19 @@ def format_text(hits: Iterable[Hit]) -> str:
         lines.append(f"   {_authority_label(h.corpus_kind, h.authority)}")
         if h.status:
             lines.append(f"   document status: {h.status}")
+        supplemental = (
+            ("record_kind", h.record_kind),
+            ("topic_id", h.topic_id),
+            ("learning_eligibility", h.learning_eligibility),
+            ("evidence_index_version", h.evidence_index_version),
+        )
+        if any(value for _, value in supplemental):
+            for key, value in supplemental:
+                if value:
+                    lines.append(f"   {key}: {value}")
+            lines.append(
+                "   classification only; not evidence independence or admission"
+            )
         if h.corpus_kind == "run_summaries":
             lines.append(f"   run_id: {h.run_id}")
             if h.run_family:

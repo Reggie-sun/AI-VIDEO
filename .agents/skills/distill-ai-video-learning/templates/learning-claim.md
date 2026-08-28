@@ -1,6 +1,11 @@
 ---
 document_kind: learning_claim
 claim_id: CLAIM_ID
+evidence_index_version: "1"
+admission_basis: ADMISSION_BASIS
+material_update_target_claim:
+material_update_previous_evidence:
+material_update_delta:
 active_claim_version: 0
 active_evidence_status: NONE
 active_adoption_status: NOT_ADOPTED
@@ -40,11 +45,17 @@ Date: YYYY-MM-DD
 
 ### Supporting Evidence
 
-`supporting_evidence`：逐项列出 repository-relative source、exact attempt / artifact / record identity、hash、proof layer，以及每条证据支持本 claim 的原因。
+`supporting_evidence`：下表逐项引用 repository-relative source、exact attempt / artifact / record identity、hash、proof layer，以及每条证据支持本 claim 的原因。相同 `independence_key` 只计一个 support unit。
+
+| evidence_ref | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
 ### Counter Evidence
 
-`counter_evidence`：逐项列出反例、未复现案例、适用范围外的成功或失败，以及后续 supersession。没有已知反例时，也必须说明搜索范围与 coverage limitation。
+`counter_evidence`：下表逐项列出反例、未复现案例、适用范围外的成功或失败，以及后续 supersession。没有已知反例时，保留空表并在正文说明搜索范围与 coverage limitation。
+
+| evidence_ref | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
 ### Scope And Exclusions
 
@@ -55,6 +66,8 @@ Date: YYYY-MM-DD
 ### Evidence Assessment
 
 `pending_evidence_status`：`SINGLE_CASE | SUPPORTED | CONTESTED | REFUTED | RETIRED`。
+
+`admission_basis`：`TWO_INDEPENDENT_ATTEMPTS | CONTROLLED_MULTI_ARM | MATERIAL_EXISTING_CLAIM_UPDATE`。若使用 material update，填写 `material_update_target_claim`、`material_update_previous_evidence` 与 `material_update_delta`；其他 basis 保持这三个字段为空。
 
 说明当前状态成立的理由，以及哪些新证据会改变该状态。RAG score、technical score 与单一 metric 不得充当 epistemic confidence。
 

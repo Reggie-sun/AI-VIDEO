@@ -56,6 +56,71 @@ If provenance, controls, outcome identity, or counter-evidence coverage is too
 weak, return `no_candidate` or update an existing claim to `CONTESTED`; do not
 inflate a single anecdote into a general rule.
 
+Every opted-in candidate declares exactly one machine-checkable
+`admission_basis`:
+
+- `TWO_INDEPENDENT_ATTEMPTS`: at least two distinct supporting
+  `independence_key` values;
+- `CONTROLLED_MULTI_ARM`: one `experiment_id`, at least two distinct non-`N/A`
+  `arm_id` values, and a distinct `independence_key` for every arm;
+- `MATERIAL_EXISTING_CLAIM_UPDATE`: new exact evidence plus
+  `material_update_target_claim`, `material_update_previous_evidence`, and a
+  concrete `material_update_delta`.
+
+Supporting and counter evidence are deduplicated by unique `independence_key`,
+never by document count, record links, RAG hit or chunk
+count, artifact versions, or proof layer count. Multiple proof layers for the
+same attempt remain visible facts but contribute one independence unit. The
+same artifact SHA may support distinct units only when the records establish
+genuinely distinct attempt identities.
+
+## Evidence Identity And Relationship Contract
+
+`distill-ai-video-learning` is the single owner of evidence admission and
+deduplication. `record-ai-video-session` captures the envelope and evidence
+spine; Agent Memory projects classification metadata for discovery only.
+
+- `evidence_id` identifies one proof item within a record.
+- `independence_key` identifies the attempt or controlled arm used for
+  support/counter counting.
+- `experiment_id` groups attempts under one hypothesis and comparison intent.
+- `attempt_id` identifies one execution or observation attempt.
+- `arm_id` identifies a controlled arm; use explicit `N/A` when no arm applies.
+- `artifact_sha256` binds exact bytes. A pre-artifact failure uses
+  `NO_ARTIFACT:<TYPED_REASON>`.
+
+Prefer `q0:<AttemptIdentityKey.identity_hash>` when exact Q0 identity exists.
+Otherwise the record supplies a stable non-Q0 `independence_key` together with
+the runtime/provider/model/workflow boundary, `experiment_id`, `attempt_id`,
+and at least one verifiable request, result, or artifact anchor. A path, Markdown
+heading, document ID, or chunk ID must never be synthesized into an
+independence key. The mapping is bijective within one validation set: one key
+cannot name two experiment/attempt/arm tuples, and one tuple cannot mint two
+keys (including parallel Q0 and non-Q0 aliases) to inflate support. The same
+artifact/source anchor also cannot mint multiple keys; genuinely distinct
+attempts that happen to produce the same bytes must retain distinct exact
+request/result sources.
+
+Opted-in records use `evidence_index_version: "1"` and one canonical
+`Evidence Index`. Typed relationships are:
+
+- `NEW_ATTEMPT`: a new identity and `related_evidence_id: NONE`;
+- `SAME_EVIDENCE_NEW_PROOF_LAYER`: the same independence key, a different
+  proof layer, and an exact local or `path#evidence_id` target;
+- `CONCLUSION_SUPERSEDED`: preserves historical proof while replacing a
+  current-facing interpretation;
+- `INPUT_REUSE_ONLY`: records reused input across distinct attempts and is not
+  itself supporting or counter evidence.
+
+Run
+`.agents/skills/distill-ai-video-learning/scripts/validate_evidence_identity.py`
+on the candidate and every record referenced by its evidence tables before
+checkpointing. The validator is
+read-only and fail closed: `needs_identity`, malformed identity, unresolved
+relations, or ambiguous admission remain readable history but do not count.
+Legacy records without `evidence_index_version: "1"` remain retrievable and
+are not automatically admitted.
+
 ## Learning Claim Contract
 
 Start from [`templates/learning-claim.md`](templates/learning-claim.md). Every
@@ -72,6 +137,11 @@ claim must contain these semantic fields:
 - `adoption_target`
 - `pending_approval_status`
 - `active_adoption_status` and `pending_adoption_status`
+
+Opted-in candidates also contain structured Supporting Evidence and Counter
+Evidence tables. Their rows repeat the exact `evidence_ref`, identity tuple,
+artifact SHA, proof layer, verdict, and source needed for deterministic
+validation; narrative text still owns nuance, held constants, and limitations.
 
 ### Writing Language Contract
 

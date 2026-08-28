@@ -973,6 +973,127 @@ def test_learning_subdirectory_has_distinct_non_spoofable_authority(
     assert claim.metadata["document_kind"] == "learning_claim"
 
 
+def test_experience_record_classification_metadata_survives_all_chunks(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "eligible.md").write_text(
+        "---\n"
+        "record_kind: media_experiment\n"
+        "topic_id: h3-conditioning-attribution\n"
+        "learning_eligibility: eligible\n"
+        'evidence_index_version: "1"\n'
+        "authority: current_runtime_truth\n"
+        "document_kind: runtime_contract\n"
+        "---\n"
+        "# Eligible Record\n\n"
+        "## Attempt A\n\nObserved endpoint replacement.\n\n"
+        "## Attempt B\n\nObserved a distinct controlled arm.\n",
+        encoding="utf-8",
+    )
+    corpus = corpus_module.CorpusSpec.experience(root)
+
+    document = load_documents(root, corpus=corpus)[0]
+    chunks = chunk_documents([document])
+
+    assert len(chunks) >= 2
+    for chunk in chunks:
+        assert chunk.metadata["record_kind"] == "media_experiment"
+        assert chunk.metadata["topic_id"] == "h3-conditioning-attribution"
+        assert chunk.metadata["learning_eligibility"] == "eligible"
+        assert chunk.metadata["evidence_index_version"] == '"1"'
+        assert chunk.metadata["authority"] == "advisory_experience"
+        assert chunk.metadata["document_kind"] == "experience_record"
+
+
+def test_experience_search_projects_allowlisted_record_metadata_without_counting(
+    tmp_path: Path,
+    fake_embedding,
+) -> None:
+    root = tmp_path / "record_for_agent"
+    root.mkdir()
+    (root / "eligible.md").write_text(
+        "---\n"
+        "record_kind: media_experiment\n"
+        "topic_id: h3-conditioning-attribution\n"
+        "learning_eligibility: eligible\n"
+        'evidence_index_version: "1"\n'
+        "authority: current_runtime_truth\n"
+        "document_kind: runtime_contract\n"
+        "---\n"
+        "# H3 Conditioning Attribution\n\n"
+        "## Technical Evidence\n\n"
+        "conditioning attribution endpoint replacement evidence.\n\n"
+        "## Human Evidence\n\n"
+        "conditioning attribution human motion evidence.\n",
+        encoding="utf-8",
+    )
+    (root / "legacy.md").write_text(
+        "# Legacy Record\n\nLegacy unrelated narrative.\n", encoding="utf-8"
+    )
+    corpus = corpus_module.CorpusSpec.experience(root)
+    index_path = tmp_path / "index"
+    index_module.build_scoped_index((corpus,), index_path, fake_embedding)
+
+    hits = search(
+        "conditioning attribution evidence",
+        top_k=8,
+        scope="experience",
+        corpora=(corpus,),
+        index_path=index_path,
+        embedding=fake_embedding,
+    )
+
+    eligible_hits = [hit for hit in hits if hit.source.endswith("eligible.md")]
+    assert len(eligible_hits) >= 2
+    assert {
+        (
+            hit.record_kind,
+            hit.topic_id,
+            hit.learning_eligibility,
+            hit.evidence_index_version,
+        )
+        for hit in eligible_hits
+    } == {("media_experiment", "h3-conditioning-attribution", "eligible", "1")}
+    assert all(hit.authority == "advisory_experience" for hit in eligible_hits)
+    assert all(hit.document_kind == "experience_record" for hit in eligible_hits)
+    rendered = format_text(eligible_hits)
+    assert "record_kind: media_experiment" in rendered
+    assert "learning_eligibility: eligible" in rendered
+    assert "classification only; not evidence independence or admission" in rendered
+    assert "independent evidence count" not in rendered
+    payload = eligible_hits[0].to_dict()
+    assert payload["topic_id"] == "h3-conditioning-attribution"
+    assert payload["evidence_index_version"] == "1"
+
+
+def test_legacy_hit_supplemental_metadata_defaults_preserve_text_output() -> None:
+    hit = Hit(
+        source="docs/record_for_agent/legacy.md",
+        title="Legacy",
+        section="",
+        score=0.91,
+        excerpt="Historical narrative.",
+        chunk_index=0,
+        h1="Legacy",
+        h2="",
+        h3="",
+        date="2026-08-20",
+        admission_lane="lexical",
+    )
+
+    rendered = format_text((hit,))
+    payload = hit.to_dict()
+
+    assert hit.record_kind == ""
+    assert hit.topic_id == ""
+    assert hit.learning_eligibility == ""
+    assert hit.evidence_index_version == ""
+    assert "record_kind:" not in rendered
+    assert payload["record_kind"] == ""
+
+
 def test_learning_authority_is_rendered_as_confirmable_not_executable() -> None:
     hit = Hit(
         source="docs/record_for_agent/learning/h3-anchor.md",

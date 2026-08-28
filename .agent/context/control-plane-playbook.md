@@ -322,6 +322,43 @@ Memory/record 保留 exact historical evidence；Learning Claim 是基于多条e
    再向用户展示support/counter evidence、scope/exclusions、evidence status、recommended action、
    exact target paths、verification、candidate commit与该commit中exact file bytes SHA-256。
 
+Session boundary只触发evaluation；experiment/attempt/controlled-arm boundary才产生evidence identity。
+新建或实质更新、准备进入automatic distillation的empirical record使用flat scalar envelope：
+`record_kind`、`topic_id`、`learning_eligibility`与`evidence_index_version: "1"`。其中
+`learning_eligibility=eligible`要求正文包含`## Evidence Index`，以`evidence_id`引用proof item，
+以`independence_key`作为唯一support/counter计数单位，并同时记录`experiment_id`、`attempt_id`、
+`arm_id`、`artifact_sha256`、`proof_layer`、`verdict`、`failure_class`、`relation_kind`、
+`related_evidence_id`与`source`。Pre-artifact failure使用`NO_ARTIFACT:<TYPED_REASON>`；没有arm或relation
+分别使用`N/A`与`NONE`，不得用空值掩盖identity uncertainty。
+
+Q0 `AttemptIdentityKey.identity_hash`存在时，`independence_key`优先为`q0:<identity_hash>`；否则record
+必须提供stable non-Q0 key，并以runtime/provider/model/workflow boundary、experiment、attempt及至少一个
+request/result/artifact anchor支撑。Document path、Markdown heading、RAG chunk与artifact version均不得自动合成
+key。一个key不得指向两个experiment/attempt/arm tuples，同一tuple也不得同时mint Q0/non-Q0或其他多个keys；
+同一artifact/source anchor也不得mint多个keys；该bijection在本次显式validation set内fail closed。同一个key跨
+records、chunks或proof layers始终只计一个unit；相同SHA但真实attempt identity不同的evidence不得只因bytes相同
+被合并，并必须保留distinct exact request/result source。
+
+`Evidence Index` relation区分`NEW_ATTEMPT`、`SAME_EVIDENCE_NEW_PROOF_LAYER`、
+`CONCLUSION_SUPERSEDED`与`INPUT_REUSE_ONLY`。Technical PASS与后续human FAIL可在同一key下作为不同proof
+layers并存，不能互相擦除或算作两次独立实验；`INPUT_REUSE_ONLY`本身不能进入support/counter threshold。
+Learning Claim的Supporting/Counter tables以`evidence_ref`引用record row，并声明exact identity tuple与proof；
+admission仅允许`TWO_INDEPENDENT_ATTEMPTS`、`CONTROLLED_MULTI_ARM`或
+`MATERIAL_EXISTING_CLAIM_UPDATE`。Material update还必须命名target claim、previous evidence与具体delta。
+
+`.agents/skills/distill-ai-video-learning/scripts/validate_evidence_identity.py`只读取caller显式提供的Markdown
+paths，不扫描corpus、不刷新Agent Memory、不调用Provider/media/network，也不写回文件。它对blank/malformed
+identity、duplicate record-local `evidence_id`、unresolved relation、source-reference mismatch、非法重复计数与
+不满足basis的candidate fail closed，并输出每个document的distinct support/counter keys与admission result。
+Legacy record/claim没有`evidence_index_version: "1"`时仍可检索但不自动admit；`needs_identity`允许人工阅读，
+不得fallback到document/hit count。Forward-only rollout不批量迁移历史record，也不原地改写既有confirmed或
+pending candidate preimage。
+
+Agent Memory只从existing flat frontmatter向`Hit`、JSON与human-readable provenance投影allowlisted
+`record_kind`、`topic_id`、`learning_eligibility`、`evidence_index_version`。这些字段不改变ranking、filter、
+chunk identity、path-owned `authority`/`document_kind`、admission、confidence、confirmation或adoption；同一document
+产生多个hits仍只是retrieval结果，不是independent evidence count。
+
 确认只对previewed candidate commit、hash与bounded target有效。`Confirm`前必须用
 `git show <candidate-commit>:<claim-path>`重开immutable preimage并重算hash，同时要求current pending
 bytes未漂移；确认还必须保存sanitized actor/time与durable evidence pointer，不复制raw transcript。

@@ -23,10 +23,19 @@ def _read(path: Path) -> str:
 
 
 def test_learning_skill_package_is_minimal_and_discoverable() -> None:
-    expected = {SKILL_PATH, TEMPLATE_PATH}
+    expected = {
+        SKILL_PATH,
+        TEMPLATE_PATH,
+        SKILL_ROOT / "scripts" / "validate_evidence_identity.py",
+    }
 
     assert {path for path in expected if not path.is_file()} == set()
-    assert {path for path in SKILL_ROOT.rglob("*") if path.is_file()} == expected
+    package_files = {
+        path
+        for path in SKILL_ROOT.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts
+    }
+    assert package_files == expected
 
     text = _read(SKILL_PATH)
     match = re.match(r"\A---\n(.*?)\n---\n", text, flags=re.DOTALL)
@@ -78,6 +87,25 @@ def test_learning_skill_has_bounded_candidate_and_confirmation_contract() -> Non
     assert "target owner verification" in text
     assert "preserve the active claim" in normalized
     assert "does not replace the active claim" in normalized
+    for identity in (
+        "evidence_id",
+        "independence_key",
+        "experiment_id",
+        "attempt_id",
+        "arm_id",
+        "artifact_sha256",
+    ):
+        assert identity in text
+    for basis in (
+        "TWO_INDEPENDENT_ATTEMPTS",
+        "CONTROLLED_MULTI_ARM",
+        "MATERIAL_EXISTING_CLAIM_UPDATE",
+    ):
+        assert basis in text
+    assert "document count" in normalized
+    assert "RAG hit" in text
+    assert "proof layer" in normalized
+    assert "unique `independence_key`" in text
 
 
 def test_learning_skill_keeps_automatic_work_advisory_and_fail_closed() -> None:
@@ -114,6 +142,10 @@ def test_record_skill_automatically_routes_stable_records_to_learning_evaluation
     assert "must not wait for the user to request distillation" in normalized
     assert "no_candidate" in text
     assert "does not authorize adoption" in text
+    assert "session boundary" in normalized
+    assert "experiment boundary" in normalized
+    assert "Evidence Index" in text
+    assert "does not count" in normalized
 
 
 def test_learning_claim_template_separates_evidence_approval_and_adoption() -> None:
@@ -132,6 +164,12 @@ def test_learning_claim_template_separates_evidence_approval_and_adoption() -> N
     assert "confirmed_by:" in text
     assert "confirmed_at:" in text
     assert "confirmation_evidence:" in text
+    assert 'evidence_index_version: "1"' in text
+    assert "admission_basis:" in text
+    assert "material_update_target_claim:" in text
+    assert "material_update_previous_evidence:" in text
+    assert "material_update_delta:" in text
+    assert "| evidence_ref | independence_key |" in text
     for heading in (
         "## Active Claim",
         "## Pending Candidate",
