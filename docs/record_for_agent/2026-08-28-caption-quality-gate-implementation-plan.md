@@ -2,6 +2,22 @@
 
 Date: 2026-08-28
 
+## Final Acceptance Supersession — 2026-08-29
+
+下方 `Exact Final-Media Re-test — 2026-08-29` 对 V4 的 `SOURCE_INTEGRITY FAIL`、CAPTION overall
+`NOT_EVALUATED` 与缺少 canonical render/policy 的 blocker，仍是 V4 exact bytes 和旧
+`production/` root 的真实历史证据，但不再是当前 Qingyan accepted candidate 状态。
+
+新的 claim-safe / continuity-safe V9 已进入独立 canonical Production root，通过 exact HyperFrames
+render、project-local `video-analysis`、全解码、逐秒与 cue/gap visual evidence，并由
+`ProductionStateCommitter` 持久化 TECHNICAL / LAYOUT / CAPTION / SEMANTIC 四层 PASS 与 fresh
+`Final Acceptance`。Exact V9 SHA-256 为
+`9f3534ce93084a4f9b5e6b70b3d60e0599302202f73ef28d92bc762db1e78bd2`；详见
+`docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md`。
+
+这不反向升级 V4，也不证明 publication、claim substantiation、市场效果或用户主观最终验收；本记录
+关于 Caption Gate implementation、font contract 与 historical V4 blocker 的技术事实继续有效。
+
 ## Current Status — Implementation Supersedes Plan-Only State
 
 本记录最初保存 plan checkpoint；该状态现已被实现提交 `31f365a`

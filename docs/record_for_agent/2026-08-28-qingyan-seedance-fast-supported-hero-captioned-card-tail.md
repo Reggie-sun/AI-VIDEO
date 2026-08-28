@@ -2,6 +2,22 @@
 
 Date: 2026-08-28
 
+## Supersession Notice — 2026-08-29
+
+本记录中的 V4 `PASS_FOR_LOCAL_REVIEW_ONLY`、三张未核验 claim cards 与“未进入 Production / P6 /
+Final Acceptance”仍是该 exact V4 artifact 的历史事实，但不再代表当前 Qingyan accepted candidate。
+
+后续 local canonicalization 保留 V4 bytes，移除未核验 authored claims、修正人物 continuity 与两秒
+end-card cap，并通过标准 `ResolvedTimeline -> HyperFrames -> ProductionStateCommitter` 路径生成
+V9 exact MP4 SHA-256
+`9f3534ce93084a4f9b5e6b70b3d60e0599302202f73ef28d92bc762db1e78bd2`。该 exact V9 已取得
+TECHNICAL / LAYOUT / CAPTION / SEMANTIC 四层 P6 PASS 和 durable `Final Acceptance`；详见
+`docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md`。
+
+V4 的 Provider、字幕修复与 review-only measurements 继续有效，但其 current next action 与
+`Final Acceptance` blocker 已被上述 V9 record supersede。V9 仍不等于 publication、claim
+substantiation 或用户主观最终验收。
+
 ## Caption Repair V4 — 2026-08-28
 
 用户以 exact screenshots 否决 V3 opening captions：源 Shot 1 已烧录模型字幕，V3 又在同一画面
