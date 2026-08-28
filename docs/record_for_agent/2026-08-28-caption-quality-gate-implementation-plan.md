@@ -123,6 +123,66 @@ renderer gate，且未知字体在 staging 前 fail closed。它不证明 custom
 canonical identity、CAPTION P6 或 Final Acceptance。Qingyan V4 的 Production CAPTION Gate 仍为
 `NOT_EVALUATED`；本轮没有 Provider/paid call、外网访问、CAPTION P6 mutation、push 或 release。
 
+## Exact Final-Media Re-test — 2026-08-29
+
+用户再次要求“真实成片测试”后，本轮对同一 exact Qingyan V4 review-only MP4 重新执行 full decode、
+project-local `video-analysis`、中文 ASR、10 个 ASS cue midpoint inspection、9 个 cue-gap inspection，
+并实际调用 canonical `ProductionStateCommitter.current_final_media_target()` Gate entry。没有重新生成或
+修改 MP4，没有 Provider/paid/network call，也没有写 Manifest、P6 或 Final Acceptance state。
+
+Exact artifact 保持不变：
+
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v4-28s-review-only.mp4`
+
+- SHA-256：`087497ae1b4be12b260899706c19698c8d7d88635708528a6b8cf0d1fd7ac4e1`
+- `12,909,584` bytes、`28.065s`、H.264 `720x1280`、`24fps`、`673` decoded frames
+- AAC stereo `44100Hz`
+
+新的 local evidence root：
+
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-quality-gate-retest-20260829/`
+
+- `validation-summary.json` SHA-256：
+  `f780edfedd57168cedf6ffd6a8e262bb13f29a0708dd75a6e4cf034bf52fc977`
+- `cue-midpoints.png` SHA-256：
+  `9b1ddb556c658cfb7410b378d3b028b1e1766b34fc86d9305d5176f688f833a5`；
+  10 个 authored ASS cue 的 midpoint 均可见、可读。
+- `gap-samples.png` SHA-256：
+  `6cd421c9642afe4ee137fd1f54f386088887c81642c4e4db137fbc241281b175`；
+  9 个 sampled cue gap 均无 authored subtitle layer，product/card text 仍按画面存在。
+- `video-analysis video_review`：19 frames extracted、`1236/1236` unique sampled frames、audio
+  present；唯一 `low_resolution` issue 来自通用 landscape-oriented baseline，不构成当前 accepted
+  `720x1280` portrait caption failure。
+- Chinese ASR speech regions 为 `0.0–2.88s`、`2.88–7.64s`、`21.12–24.88s` 与
+  `25.88–28.16s`；大体覆盖 authored cue regions，但 `黏衣`、`长辈递来`、`青颜`、`抑汗净味`
+  等词出现替换，因此不能独立签发 `AUDIO_SEMANTIC_SYNC PASS`。
+
+Canonical Gate entry 实际返回：
+
+`production_state_invalid: Current render state is required.`
+
+阻断发生在 evaluator/P6 effect 前。Current Manifest 仍为 schema `2.8` revision `21`，
+`active_render_state=null`、`active_qa_policy=null`；registered canonical
+`production/assets/files/caption-track-1.json` 仍是英文 `Hello/world`，与中文 `captions.ass` 和 exact
+V4 bytes 不同。
+
+Requirement-level Production verdict 未改变：
+
+- `SOURCE_INTEGRITY`: `FAIL`
+- `TIMING_CONTRACT`: `NOT_EVALUATED`
+- `RENDER_COMPLETENESS`: `NOT_EVALUATED`（10/10 midpoint sampled visible，但不是 whole-render
+  canonical coverage）
+- `LAYOUT_READABILITY`: `NOT_EVALUATED`（sampled visual readable，但无 authorized whole-render
+  evaluator/per-track policy binding）
+- `AUDIO_SEMANTIC_SYNC`: `NOT_EVALUATED`
+- `UNINTENDED_TEXT`: `NOT_EVALUATED`（gap samples clean，但缺 whole-render OCR 与 approved
+  non-caption text roster）
+
+CAPTION Gate overall 继续为 `NOT_EVALUATED`。此外卡片中的 `15%`、`14天`、`96.67%`、`93.33%`
+等 claims 尚未获得 substantiation，Domain Gate 的 `CLAIM_SUBSTANTIATION` 同样为
+`NOT_EVALUATED`；Final Acceptance 未记录。该复测强化了 raw sampled visual evidence，但没有改变
+canonical identity blocker，也不把 `PASS_FOR_LOCAL_REVIEW_ONLY` 升级为 Production PASS。
+
 ## Real Validation Update — 2026-08-28
 
 本轮按用户“真实验证”请求执行了不含 Provider submit、paid call、外网访问或 Production state
@@ -414,6 +474,11 @@ Pending v2 把 claim 收窄为 pinned bundled/generic font contract 与 exact-so
 runtime repair。当前 `0ed672e` 是用户直接授权的修复，不是 Learning Claim automatic adoption。
 按 Skill contract，target adoption 在用户对 v2 exact commit/hash 作出 `Confirm`、`Revise` 或 `Reject`
 前保持停止；candidate 本身不产生 P6、activation、Final Acceptance、push 或 release truth。
+
+2026-08-29 exact V4 re-test 的 automatic evaluation：`no_candidate`。它复测的是同一
+`087497ae...c4e1` bytes 与同一 canonical-identity blocker，不是 independent attempt、controlled
+multi-arm comparison，也没有 materially support/counter/narrow 当前 HyperFrames font-readiness pending
+v2。现有 Learning Claim、candidate commit/hash、confirmation 与 adoption state 均保持不变。
 
 ## Implementation Boundary
 
