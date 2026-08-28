@@ -134,7 +134,7 @@ function ReferenceInputs({ references = [], bindingStatus, bindingReason }) {
       <header><span>GENERATION REFERENCES</span><h4>对应的 Reference 输入</h4></header>
       <div className="external-reference-grid">{references.map((reference, index) => {
         const url = externalReferenceUrl(reference);
-        const body = <><div className="external-reference-preview">{url ? <img src={url} alt={`${reference.role || "reference"} ${reference.asset_id || ""}`} loading="lazy" /> : <FilmStrip size={24} />}</div><figcaption><strong>{reference.role || "reference"}</strong><span>{reference.asset_id || "未标注 asset"}</span><code>{String(reference.sha256 || "").slice(0, 16)}…</code></figcaption></>;
+        const body = <><div className="external-reference-preview">{url ? <img src={url} alt={`${reference.role || "reference"} ${reference.asset_id || ""}`} loading="eager" /> : <FilmStrip size={24} />}</div><figcaption><strong>{reference.role || "reference"}</strong><span>{reference.asset_id || "未标注 asset"}</span><code>{String(reference.sha256 || "").slice(0, 16)}…</code></figcaption></>;
         return url
           ? <button type="button" onClick={() => setSelectedReference(reference)} aria-label={`预览 ${reference.role || "reference"} ${reference.asset_id || ""}`} key={`${reference.role || "reference"}-${reference.sha256 || index}`}>{body}</button>
           : <figure key={`${reference.role || "reference"}-${reference.sha256 || index}`}>{body}</figure>;

@@ -330,6 +330,38 @@ test("external experiment evidence keeps Shot, references, prompt, and result la
   assert.equal(groupMatchesQuery(group, "anchor-first"), true);
 });
 
+test("external reference previews load eagerly inside the nested detail scroller", async () => {
+  const server = await createServer({
+    root: fileURLToPath(new URL("..", import.meta.url)),
+    server: { middlewareMode: true },
+    appType: "custom",
+    optimizeDeps: { noDiscovery: true },
+  });
+  try {
+    const { ExternalShotBreakdown } = await server.ssrLoadModule("/src/shot-breakdown.jsx");
+    const markup = renderToStaticMarkup(React.createElement(ExternalShotBreakdown, {
+      group: {
+        reported_status: "OUTPUT_RECORDED",
+        shot_evidence: [{
+          shot_id: "shot-b",
+          reference_inputs: [{
+            role: "first_frame",
+            asset_id: "anchor-first",
+            sha256: "b".repeat(64),
+            token: "external_ai-video-experiments_reference_first",
+          }],
+        }],
+      },
+    }));
+    const referenceImage = markup.match(/<img[^>]+external_ai-video-experiments_reference_first[^>]*>/)?.[0] || "";
+    assert.match(referenceImage, /src="\/api\/external-media\/media\/external_ai-video-experiments_reference_first"/);
+    assert.match(referenceImage, /loading="eager"/);
+    assert.doesNotMatch(markup, /loading="lazy"/);
+  } finally {
+    await server.close();
+  }
+});
+
 test("external experiment ambiguity stays fail-closed and visible", () => {
   const status = externalStatus({
     association_ambiguity: true,
