@@ -224,6 +224,9 @@ commercial acceptance 与 release 继续 deferred。
 - Automatic learning evaluation remains `no_candidate`：这是同一 exact input set 的单次 deterministic review
   remux，尚无 HUMAN verdict，也没有 independent generative attempt 或 controlled comparison。
 
+Durable `15.5s` exact review assembly output checkpoint:
+`f9c2a410ccfafa53f850e23f3e4705dd19e32d30`。
+
 Durable `15.5s` review assembly preview checkpoint:
 `fdbbf1238ef6114b638d2a01d62670a9694742a0`。
 
