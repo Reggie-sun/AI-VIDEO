@@ -2,6 +2,91 @@
 
 Date: 2026-08-28
 
+## V6 Current Checkpoint — 2026-08-28
+
+本 section 是当前 M6 empirical decision checkpoint；下方 V5/V4/V3/V2/V1 evidence 保留为历史。V5 已修复
+hand assignment 与 terminal close-state，但 exact Shot C 在 `2.1–3.3s` action window 没有 visible mist 或
+其他 discrete discharge event，导致 `causal_state`、`intent/performance` 与 `readability` 继续 `FAIL`。
+V6 read-only preflight 将 smallest owner 收敛到 `generation_intent` 的 prompt action-physics / event-visibility
+contract；anchors、hand assignment、terminal close-state、Provider/profile/workflow/binding、camera 与 output
+contract 均保持不变。
+
+### V6 Smallest-Owner Diagnosis
+
+- Failure code: `F-SPRAY-EVENT-NOT-VISIBLE`。
+- Exact prior video / Gate SHA-256:
+  `1dfc9febee04a45a5ee623cbe26e1b30c0eef790e297c25edbf3920ec2b9628b` /
+  `5a8b4208493f97f5729753fc1cf656a5d3f99400615bd765d65b9f79c848b6ff`。
+- V5 `hand_assignment_repair=PASS`、`terminal_close_state_repair=PASS`；`conditioning` 与 `camera` 也为
+  `PASS`。因此当前没有 evidence 支持修改 first/last anchor、camera、hand ownership 或 terminal state。
+- V3 counterevidence 表明同一 H3 lane 能生成 visible spray trace，但该 trace 提前出现并持续到 terminal；V5
+  则没有 visible discharge。V6 只把一次喷雾写成 explicit onset/stop physics chain：
+  - `2.4–2.8s` anatomical left index finger visibly depresses actuator exactly once；
+  - 仅一条 narrow local fine-white plume，从 nozzle 进入 exposed anatomical right underarm，并利用 underarm
+    shadow / darker blue embroidery 形成可读 contrast；
+  - `2.8–3.1s` finger releases actuator，plume stops at nozzle、fully dissipates，形成 clean no-mist gap；
+  - `3.1–5.167s` both arms/bottle lower、bottle away from underarm、relaxed shoulders、restrained relieved smile，
+    且 no mist returns。
+- Anatomical hand assignment、exactly one bottle、screen-left cap、elder absence、locked camera 与 mist 不穿过
+  face/upper torso 的 contract 不变。当前没有 evidence 指向新 Provider、model component、workflow、binding
+  或 ComfyUI defect。
+
+### V6 Exact H3 Authorization Preview
+
+- Exact preview:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v6/sidecars/h3-submit-exact-preview.json`
+- Preview SHA-256:
+  `b41417146d35a90426be01ab0ede6f45eee0e6c20f4348bcd637f8987e9ff032`
+- 用户的“继续”只授权本轮 read-only diagnosis 与 deterministic offline compile/resolve/preview；它没有显式
+  绑定本 exact preview SHA-256，因此不授权 future H3 submit。
+- Offline canonical route outcome: `selected`；compiler/provider resolver 只进行 deterministic offline
+  projection，未调用 runtime `preflight`、submit、fetch、ComfyUI 或 project-local MCP；current runtime calls
+  为 `0`。
+- Exact first/last anchor SHA-256 继续为
+  `062877fc2c6c09ef10cade29f0baa8fa8f884c5675cb13125f2e627b3d672fd3` /
+  `78cdffccec608b143d63113d7c428b722a1b5772e79a30923d3e699a1a2c6a74`。
+- Accepted Shot B 继续复用，不产生 Provider call；output / Gate SHA-256 为
+  `bd47e8ee13729a1c6bdc3832cc9419907d00460cb00f91ff6f6887aa75c1971c` /
+  `4f8e33349a2e34058112afd88f27000c47f955fcbea1d3b140975bb44db40651`。
+- Provider/profile/model/capability 继续为
+  `comfy-local-h3` / `minimax-h3-fl2va-quality` / `minimax-h3-fl2va` /
+  `minimax-h3-fl2va-local-v1`。
+- Profile content / workflow / binding hashes 继续为
+  `a154259fa9530e7c2df8865539eaeeef1886c0da51385a61d02c5c93fdb1ad6d` /
+  `8b6c338279d8af768fae8106034f9f26e8e9d59583e95a8ca8b16d36a930ad65` /
+  `e0ae28bdaaa81ac70578b11e97f95cacab826273ec09f82bfcf430176fb05a4c`。
+- Source request / intent evidence / plan / generation intent / requirement hashes:
+  `91b31f531a3c967e157465f90978f5c9c4237f343d4172347bf151f5066f20f2` /
+  `b43790adec49c44f0104a8f9e87ced912077a3b9fb97378ae35b9f3c38dd0da7` /
+  `754319d50b5dde14f5754da52c8579f583f5f0b6690366094cf9c3e5e4dd100a` /
+  `de6d8bf6f83a8fc3e63db90ae9e431581e545ddea35b7bcb10ab4e86c4bfd846` /
+  `720f4dfbc84a37e0512d28e8e364a85246a7c0776965f9b05a309754eaefb1c6`。
+- Verified projection / semantic routing / audit decision / provider-bound hashes:
+  `056f54501a28d60975060b4320c3e7af9419e94aa17335cfdf58be53004e60c0` /
+  `bfca8a9b08efa9f9edb91ea696f8cde0731bfa66200a112408531339049dd7a4` /
+  `b385f1cd17e5ed4bce19d111ce3925bb8a55db8d6f40eaf8e140c9dea8a5f181` /
+  `0f72d7b6a16d30adb1d210ab1af6917656f6c56be3d3187e916abb3e23d568dd`。
+- Provider-native prompt / compiled request / request input / resolved generation hashes:
+  `badec81bf2cb104fce4c3805c07f6a596c89bd3a6ef9f385a1d58722874e0410` /
+  `21bf4731026d5c821cdd0413138c6b15e4dec5aa3bfbb57d2e427dd6e0d6ca80` /
+  `6f654dbf4302754ecf5072c5d9d07364311eea2922e0252c4af8b2bafc7074a5` /
+  `c7a5f9100afc3f4f9f693a41fa132ff397c493eb73349576b5ba3df883bfa1da`。
+- Effective seed: `8026907394716104014`；canonical resolver 从新的 request identity 派生，因此 V5/V6
+  不是 strict same-seed prompt-only A/B。该 attribution limit 已写入 exact preview。
+- Future exact output destination:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v6/outputs/shot-c-open-use-effect-v6.mp4`；
+  当前不存在；authorization sidecar 也不存在。
+
+### V6 Current Stop
+
+V6 exact preview 已完成，但 H3 submit 尚未获新授权。若用户明确授权并绑定 preview SHA-256
+`b41417146d35a90426be01ab0ede6f45eee0e6c20f4348bcd637f8987e9ff032`，future scope 仅允许 Shot C 一次
+local H3 submit，以及 MP4 落盘后恰好四次 project-local `video-analysis` barrier calls；image generation/edit、
+Shot B Provider call、retry、variant、fallback、remote/paid 与 assembly call 均为 `0`。任何 required finding
+`FAIL` 或 `NOT_EVALUATED` 立即停止。该预览不预授权 `15.5s` / `30s` assembly、M7–M9、qualification、
+aggregate Gate expansion、HUMAN PASS、P6、Final Acceptance、Production qualification、commercial
+acceptance 或 release。
+
 ## V5 Current Checkpoint — 2026-08-28
 
 本 section 是当前 M6 empirical decision checkpoint；下方 v4/v3/v2/v1 evidence 保留为历史。V4 Shot C
