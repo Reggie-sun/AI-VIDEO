@@ -2,6 +2,74 @@
 
 Date: 2026-08-28
 
+## Current Checkpoint — Mini Exaggerated Hook Rejected At Raw Gate
+
+本节 supersede 下方 V6 作为当前 creative next-action truth，但不替代 V6 的 local review artifact
+identity。用户指出 V6 第一 Shot 的人物出现和痛点表现不够广告化，并进一步否定腋下像直接挖洞的
+服装结构。新方向把夸张限定为：正常短袖上的大块汗印和湿布黏连、闻到后明显后缩、有人靠近时立刻
+夹臂；服装必须保持连续完整，只有使用产品前才允许自然卷袖。
+
+本轮用户只授权一次 Seedance Mini 6 秒生成，硬上限 `4 CNY`，没有授权 variant、retry、fallback
+或第二个 Provider。Run：
+
+`runs/qingyan-seedance2-mini-exaggerated-hook-normal-sleeve-20260828-001/`
+
+### Sealed Request And Provider Effects
+
+- model/mode: `doubao-seedance-2-0-mini-260615` / `REFERENCE_TO_VIDEO`
+- output: 6 秒、720×1280、9:16、24fps、`native_audio=true`
+- egress: 1174-byte exact prompt 与一张 ordinary product-only PNG；person-reference egress 为 `0`
+- prompt egress SHA-256: `9b01b362059aaa779d059981947e43a30c8396a09e7631c0f5c9e7b70418a440`
+- product PNG SHA-256: `3b360e78ba4e2006752ea1b00371d7f24e6a07ef1dc345cf4e065fcb2f43c24d`
+- Prompt audits: `hell-grind-aigc-skill` structural `PASS` / `100/100`；Seedance preflight `PASS`，178 words
+- estimated upper bound: `2.9808 CNY`；finite task ceiling: `4 CNY`
+- Provider effects: 1 submit POST、13 query GET、1 download GET
+- blind retry / permit remint / Provider fallback / activation: `0 / 0 / 0 / 0`
+
+唯一 POST 被接受并成功 fetch：
+
+`runs/qingyan-seedance2-mini-exaggerated-hook-normal-sleeve-20260828-001/output/seedance2-mini-exaggerated-hook-normal-sleeve-native-audio-6s.mp4`
+
+- SHA-256: `1cac23efcc689aa1beeef70abe47b54030ef8d56628dfd843ba070364707a06d`
+- size: 5,642,960 bytes
+- media: 6.080 秒；H.264 High、720×1280、24fps、145 frames；AAC stereo、32kHz
+- audio level: mean `-19.5 dB`、max `-0.9 dB`
+- full ffmpeg decode: `PASS`
+
+外部 Provider 实际账单没有读取，因此 `2.9808 CNY` 只能描述为 pricing-derived estimated upper
+bound，不能描述为 verified charge。
+
+### Exact Post-Media Gate
+
+在任何字幕或 composition 前，project-local `video-analysis` MCP 对上述 exact MP4 执行 0.5 秒
+dense analysis、Whisper medium transcription 与 scene detection；同时生成 2fps contact sheet 并完成
+人工视觉检查。Whisper 恢复 `姑娘试试这个`，强烈后缩表情、夹臂动作、老人进入和产品递交也都可见，
+但两个用户定义的核心项明确失败：
+
+| Requirement | Verdict | Exact evidence |
+| --- | --- | --- |
+| `FIRST_SECOND_HOOK` | `FAIL` | `0.0-0.5s` 直接显示干净裸露腋下；没有大块不规则深色汗印，也没有湿布黏连或抬臂受阻。 |
+| `NORMAL_SLEEVE_GEOMETRY` | `FAIL` | 上衣仍生成异常大的袖窿，卷袖前已经露出腋下；正常连续的短袖筒没有成立。 |
+| `EXAGGERATED_SOCIAL_REACTION` | `PASS` | 闻手臂、明显后缩皱眉和随后夹臂遮挡均可见。 |
+| `PRODUCT_ENTRY_ORDER` | `PASS` | 产品在开场困扰和反应完成后才随老人进入。 |
+| `RECOMMENDATION_AND_HANDOFF` | `NOT_EVALUATED` | ASR 与画面分别支持台词和递交，但不能证明 speaker assignment、单次 utterance 与 secure-before-release 全部成立。 |
+| `SPRAY_ORDER_AND_TARGET` | `NOT_EVALUATED` | 产品靠近腋下，但采样不能建立单次可见无色喷雾、exact target 与 cap lifecycle。 |
+| `RESULT_ORDER` | `NOT_EVALUATED` | 结尾笑容可见，但 required visible spray 没有先被建立。 |
+| `AUDIO_STREAM_PARITY` | `PASS` | Exact MP4 含可解码且有信号的 stereo AAC。 |
+
+完整 requirement-level Gate：
+
+`runs/qingyan-seedance2-mini-exaggerated-hook-normal-sleeve-20260828-001/evidence/post-media-gate.json`
+
+- Gate SHA-256: `cf8cdbd33d46e40e6365ea295a24789d7b28814efb23958738b8c8455880c509`
+- overall verdict: `FAIL`
+- composition / activation / automatic retry permitted: `false / false / false`
+
+因此该 raw Shot 只保留为 rejected development evidence，没有替换 V6 第一 Shot，没有新增字幕，没有
+生成 V7 final，没有 candidate activation、P6、Final Acceptance、publish 或 push。V6 仍是最后一个
+可播放的 local review-only composition，但它的第一 Shot 已被用户拒绝，不能继续称为 creative-current。
+下一步若要继续，必须重新取得新的 Provider submit 授权；本轮失败不授权重试。
+
 ## Current Checkpoint — V6 Old Static Tail Reuse
 
 本节 supersede 下方 V5 作为当前 local review artifact。用户明确要求保留 Mini 衔接与对白，但把最后
