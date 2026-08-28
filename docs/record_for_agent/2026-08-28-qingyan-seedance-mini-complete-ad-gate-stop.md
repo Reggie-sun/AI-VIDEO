@@ -2,6 +2,16 @@
 
 Date: 2026-08-28
 
+## Follow-up Notice — Native-Audio Regeneration Also Stopped
+
+`runs/qingyan-seedance-mini-complete-ad-20260828-002` 已在 2026-08-28 执行本记录建议的下一次
+product-only Seedance Mini experiment，并改用 `generate_audio=true`。新 evidence 由
+`docs/record_for_agent/2026-08-28-qingyan-seedance-mini-native-audio-regeneration-gate-stop.md`
+记录：`CHARACTER_STYLE` 已从 `FAIL` 改善为 `PASS`，但 `SPRAY_ORDER` 仍为 `FAIL`；同时出现
+推荐尚未结束就开始交接、品牌词重复音节以及 required audio SFX/lip-sync 无法判定。旧 run `001`
+的 exact output、visual verdict 与费用边界继续作为历史 evidence 有效，但下方“下一次若继续”的动作已被
+run `002` 部分执行并取代；两个 run 的 overall Gate 都是 `FAIL`，均不得当作完整广告。
+
 ## Follow-up Notice — Source-Audio Gate Corrected
 
 本记录的 exact output、`generate_audio=false` request、visual verdict与费用边界保持历史有效；但它不再
