@@ -5,7 +5,7 @@ evidence_index_version: "1"
 admission_basis: MATERIAL_EXISTING_CLAIM_UPDATE
 material_update_target_claim: hyperframes-caption-exact-source-readiness
 material_update_previous_evidence: docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#caption-readiness-v2-previous
-material_update_delta: V9 exact generic-sans Chinese Production evidence supersedes V4 NOT_EVALUATED and adds CAPTION_P6 plus FINAL_ACCEPTANCE proof
+material_update_delta: V9 exact generic-sans Chinese Production evidence 取代 V4 NOT_EVALUATED，并新增 CAPTION_P6 与 FINAL_ACCEPTANCE proof
 active_claim_version: 3
 active_evidence_status: SUPPORTED
 active_adoption_status: ADOPTED
@@ -31,39 +31,34 @@ Date: 2026-08-29
 
 ## Active Claim
 
-Active v3 was adopted by the Gate owner after exact user confirmation and target verification.
-The earlier unconfirmed v1/v2 preimages remain preserved by their checkpoint commits; they were
-never active or adopted.
+Active v3 已在用户确认 exact candidate、target owner 完成验证后被 Gate 采用。此前未确认的 v1/v2
+preimage 继续由各自 checkpoint commit 保存；它们从未进入 active 或 adopted 状态。
 
 ### Failure Pattern
 
-`failure_pattern`: Raw pinned-HyperFrames caption capability can pass while exact AI-VIDEO
-Production source fails before rendering. After replacing a fictional fixture family with a
-renderer-bundled canonical family, exact Production source can pass; without an early runtime
-font contract, however, arbitrary or alias-substituted families can still reach source lint and
-fail after materialization begins.
+`failure_pattern`：raw pinned-HyperFrames caption capability 可以 PASS，但 exact AI-VIDEO
+Production source 仍可能在 render 前失败。将虚构 fixture family 替换为 renderer bundled canonical
+family 后，exact Production source 可以 PASS；但如果缺少前置 runtime font contract，任意 family 或
+alias-substituted family 仍可能进入 source lint，并在 materialization 开始后才失败。
 
-Therefore renderer readiness cannot be inferred from a raw generic-font arm, a source-string unit
-assertion, or browser availability. It requires both a fail-closed pinned font-family preflight and
-the exact materialized Production source passing the selected renderer's lint/render gate.
+因此，不能根据 raw generic-font arm、source-string unit assertion 或 browser availability 推断
+renderer readiness。必须同时具备 fail-closed pinned font-family preflight，并证明 exact materialized
+Production source 通过 selected renderer 的 lint/render Gate。
 
 ### Hypothesis
 
-`hypothesis`: The observed failure was caused by a fictional `Fixture Sans` family outside the
-same-name canonical bundled/generic tables accepted by `hyperframes@0.7.103`, combined with a
-missing AI-VIDEO preflight. It was not a general failure of the renderer binary, Chrome, local
-audio, caption timing, or network isolation.
+`hypothesis`：已观察到的 failure 来自虚构的 `Fixture Sans` family；它不在
+`hyperframes@0.7.103` 接受的 same-name canonical bundled/generic tables 中，同时 AI-VIDEO 缺少相应
+preflight。这不是 renderer binary、Chrome、local audio、caption timing 或 network isolation 的普遍失败。
 
-Held constants across the fail/pass evidence were the AI-VIDEO P3/P4 source path, pinned
-HyperFrames/Chrome runtime, local isolated execution, deterministic audio/timeline inputs, and
-the same Production renderer gate. The relevant changes were font identity (`Fixture Sans` to
-canonical `Inter`) and the addition of pre-staging validation. A public-seam mutation experiment
-isolated the validation behavior: deleting the allowlist check made the unsupported-font
-regression fail with `DID NOT RAISE`; restoring it made the test pass.
+FAIL/PASS evidence 之间保持不变的条件包括 AI-VIDEO P3/P4 source path、pinned
+HyperFrames/Chrome runtime、local isolated execution、deterministic audio/timeline inputs，以及同一
+Production renderer Gate。实际变量是 font identity（`Fixture Sans` 改为 canonical `Inter`）和新增
+pre-staging validation。public seam mutation experiment 隔离了 validation behavior：删除 allowlist
+check 后，unsupported-font regression 以 `DID NOT RAISE` 失败；恢复检查后 test PASS。
 
-This does not prove that the hard-coded set will remain correct after a HyperFrames upgrade, that
-all bundled families contain every required glyph, or that content-addressed custom font assets
-are supported.
+这些证据不能证明 HyperFrames 升级后 hard-coded set 仍然正确，也不能证明全部 bundled family
+包含所有 required glyph，或已经支持 content-addressed custom font asset。
 
 ### Supporting Evidence
 
@@ -75,47 +70,46 @@ are supported.
 | docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#qingyan-v9-caption-p6 | qingyan-v9-canonical-artifact | qingyan-final-acceptance-canonicalization-20260829 | production-final-v9 | claim-safe-continuity | 9f3534ce93084a4f9b5e6b70b3d60e0599302202f73ef28d92bc762db1e78bd2 | CAPTION_P6 | PASS | `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/production-final-v9/state/reviews/` |
 | docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#qingyan-v9-final-acceptance | qingyan-v9-canonical-artifact | qingyan-final-acceptance-canonicalization-20260829 | production-final-v9 | claim-safe-continuity | 9f3534ce93084a4f9b5e6b70b3d60e0599302202f73ef28d92bc762db1e78bd2 | FINAL_ACCEPTANCE | PASS | `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/production-final-v9/state/acceptance/final.2ac31c13692c47eeca778def2c0a4d6bad2921da2ed64d88a3275c8f91566e90.json` |
 
-1. Stable session record
-   `docs/record_for_agent/2026-08-28-caption-quality-gate-implementation-plan.md` at commit
-   `ccb3e4bd6891552ce8f5a0986bdc9b174bda3ff1`, committed bytes SHA-256
-   `6916c679f2d9e1cf313d68a1d7e4cd3a570fe3939f9d6718deb2b42b2455dadb`. It reconciles the
-   pre-fix FAIL with the post-fix exact Production PASS and preserves proof-layer boundaries.
-2. Pre-fix controlled comparison
+1. 稳定 session record
+   `docs/record_for_agent/2026-08-28-caption-quality-gate-implementation-plan.md`，commit
+   `ccb3e4bd6891552ce8f5a0986bdc9b174bda3ff1` 中的 bytes SHA-256 为
+   `6916c679f2d9e1cf313d68a1d7e4cd3a570fe3939f9d6718deb2b42b2455dadb`。它对齐了 pre-fix
+   FAIL 与 post-fix exact Production PASS，并保留 proof-layer boundary。
+2. 修复前 controlled comparison
    `runs/caption-quality-gate-real-validation-20260828-v1/validation-summary.json`, SHA-256
-   `f4d09142a8dc636f7e23f9a50c5c93eec6085a2ea5cb59236ffe73f71a09247d`: raw generic
-   `sans-serif` PASS versus exact Production `Fixture Sans` lint FAIL
-   `font_family_without_font_face`.
-3. Post-fix validation summary
+   `f4d09142a8dc636f7e23f9a50c5c93eec6085a2ea5cb59236ffe73f71a09247d`：raw generic
+   `sans-serif` PASS，而 exact Production `Fixture Sans` 在 lint 阶段以
+   `font_family_without_font_face` FAIL。
+3. 修复后 validation summary
    `runs/caption-quality-gate-font-fixture-fix-20260828-v1/validation-summary.json`, SHA-256
-   `4174a7bd3debece5781a675583fa5869057aa3fe1bfc7097bc4861efa6cc539e`. The exact
-   Production fixture using `Inter` passed materialization, lint, check, render, verification,
-   test-fixture activation, audio measurement, and caption frame-boundary checks.
-4. Post-fix exact MP4
+   `4174a7bd3debece5781a675583fa5869057aa3fe1bfc7097bc4861efa6cc539e`。使用 `Inter` 的 exact
+   Production fixture 通过 materialization、lint、check、render、verification、test-fixture
+   activation、audio measurement 与 caption frame-boundary checks。
+4. 修复后 exact MP4
    `runs/caption-quality-gate-font-fixture-fix-20260828-v1/media/production-caption-inter.mp4`,
    SHA-256 `e3b319bd2ed6d47ce382a34bef97edd724ddb3a49d40f301e878853e21709ab4`.
-   It is H.264 `1280x720`, `24fps`, `2.022s`, contains AAC audio, and project-local
-   `video-analysis video_review` reported `96/96` unique sampled frames and `issues=[]`.
+   该文件为 H.264 `1280x720`、`24fps`、`2.022s`，包含 AAC audio；project-local
+   `video-analysis video_review` 报告 `96/96` unique sampled frames 与 `issues=[]`。
 5. Exact caption boundary evidence
    `runs/caption-quality-gate-font-fixture-fix-20260828-v1/renderer-evidence/caption-frames.json`,
-   SHA-256 `a241daac5c5a326de70adfed93270b0b265c4267eb8c98d40db3d804103ac7f1`:
-   caption pixels are present on frames `0/11/13/23` and absent on `12/24`, matching `[0,12)`
-   and `[13,24)`.
-6. Runtime fix commit `0ed672e8dcff68ff8e55e9e736f1361611d7783a`; committed
+   SHA-256 `a241daac5c5a326de70adfed93270b0b265c4267eb8c98d40db3d804103ac7f1`：caption pixels
+   在 frames `0/11/13/23` 存在，在 `12/24` 不存在，符合 `[0,12)` 与 `[13,24)`。
+6. Runtime fix commit `0ed672e8dcff68ff8e55e9e736f1361611d7783a`；committed
    `src/ai_video/production/_hyperframes_source.py` SHA-256
-   `cceb6cb88219204a8c5bf674e0357a40b2d97d63eeb434d8e11f19c1637fdde7`. The public
-   materializer regression verifies typed `RENDERER_SOURCE_INVALID` and no `staging_root` for an
-   unsupported family. Mutation removal produced RED before restoration.
+   `cceb6cb88219204a8c5bf674e0357a40b2d97d63eeb434d8e11f19c1637fdde7`。public materializer
+   regression 验证 unsupported family 返回 typed `RENDERER_SOURCE_INVALID`，且不创建
+   `staging_root`；移除 validation 的 mutation 在恢复前产生 RED。
 7. Fresh exact-range Harness receipt
    `.agent/harness/runs/caption-font-contract-fix-20260828/receipt.json` for
-   `ad7ce081..0ed672e`: Architecture Gate PASS, Harness `204 passed`, Production contract
-   `2900 passed, 3 skipped, 1225 deselected`, CLI/config `13 passed`; receipt verification reports
-   complete, fresh, snapshot-matching proof.
-8. Qingyan V9 stable record
-   `docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md` at commit
-   `18c0f9f8ce3de2c8caba56f5727ee501c54ab9d8`, committed bytes SHA-256
-   `b114e9bbad18116ff01d3d77b75b76c873a8373dd9c4d5d6a684d958819ac31a`. It binds the
-   exact generic `sans-serif` Chinese caption source to the V9 MP4, all four PASS review receipts,
-   CAPTION P6, and Final Acceptance without treating those proof layers as independent attempts.
+   `ad7ce081..0ed672e`：Architecture Gate PASS、Harness `204 passed`、Production contract
+   `2900 passed, 3 skipped, 1225 deselected`、CLI/config `13 passed`；receipt verification 为
+   complete、fresh、snapshot-matching。
+8. Qingyan V9 稳定 record
+   `docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md`，commit
+   `18c0f9f8ce3de2c8caba56f5727ee501c54ab9d8` 中的 bytes SHA-256 为
+   `b114e9bbad18116ff01d3d77b75b76c873a8373dd9c4d5d6a684d958819ac31a`。它把 exact generic
+   `sans-serif` Chinese caption source 绑定到 V9 MP4、四层 PASS review receipts、CAPTION P6 与
+   Final Acceptance，同时没有把这些 proof layers 误算为独立 attempts。
 
 ### Counter Evidence
 
@@ -125,90 +119,82 @@ are supported.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#qingyan-v4-production-entry | qingyan-v4-review-only | qingyan-final-acceptance-canonicalization-20260829 | caption-repaired-v4 | review-only-source | 087497ae1b4be12b260899706c19698c8d7d88635708528a6b8cf0d1fd7ac4e1 | PRODUCTION_GATE | NOT_EVALUATED | `docs/record_for_agent/2026-08-28-caption-quality-gate-implementation-plan.md` |
 
-- The raw generic `sans-serif` arm and post-fix canonical `Inter` Production arm both pass. This
-  refutes the broader v1 reading that all selected non-generic families require a new local
-  `@font-face` asset contract or that the pinned renderer cannot render Production captions.
-- The live Production arm exercised only `Inter`; `EB Garamond` is covered by deterministic tests
-  but not a separate real-render arm. No cross-host or renderer-upgrade comparison was executed.
-- A same-name bundled family can still lack a required language glyph. V9 establishes the exact
-  selected Chinese cue set under generic `sans-serif`, not broad Chinese, bilingual, emoji, or
-  rare-glyph coverage, and not a reusable perceptual-readability guarantee.
-- Custom content-addressed font assets remain outside the implemented contract. The fix rejects
-  arbitrary custom family names; it does not add a secure font asset schema or prove that
-  `@font-face local()` would preserve authored identity.
-- Qingyan V4 review-only captions remain outside the canonical active
-  CaptionTrack/ResolvedTimeline/final-media chain. V9 supersedes that NOT_EVALUATED boundary with
-  one separate canonical chain; it does not retroactively upgrade V4.
-- A focused `experience` RAG follow-up returned the pre-fix claim and record as fresh indexed
-  advisory sources; current code, committed record, exact artifacts, and receipt were reopened
-  directly because retrieval excerpts do not establish current runtime truth.
+- Raw generic `sans-serif` arm 与 post-fix canonical `Inter` Production arm 都 PASS。这否定了 v1
+  的过宽解释：不是所有 selected non-generic family 都需要新的 local `@font-face` asset contract，
+  pinned renderer 也不是无法渲染 Production captions。
+- Live Production arm 只实际覆盖 `Inter`；`EB Garamond` 仅有 deterministic tests，没有独立
+  real-render arm。本轮没有执行 cross-host 或 renderer-upgrade comparison。
+- Same-name bundled family 仍可能缺少 required language glyph。V9 只证明 generic `sans-serif`
+  下 exact selected Chinese cue set，不证明 broad Chinese、bilingual、emoji 或 rare-glyph coverage，
+  也不提供可复用的 perceptual-readability guarantee。
+- Custom content-addressed font asset 仍在 implemented contract 之外。当前修复会拒绝任意 custom
+  family name，但没有增加 secure font asset schema，也没有证明 `@font-face local()` 能保留
+  authored identity。
+- Qingyan V4 review-only captions 仍不在 canonical active
+  `CaptionTrack -> ResolvedTimeline -> final media` chain 中。V9 以单独的 canonical chain 取代该
+  `NOT_EVALUATED` boundary，但不会反向升级 V4。
+- Focused `experience` RAG follow-up 返回 pre-fix claim 与 record；由于 retrieval excerpt 不能证明
+  current runtime truth，本轮仍直接重新打开 current code、committed record、exact artifacts 与 receipt。
 
 ### Scope And Exclusions
 
-`scope`: AI-VIDEO's P3/P4 HyperFrames caption source path using `hyperframes@0.7.103`, Chrome
-Headless Shell `152.0.7928.2`, the same-name canonical bundled/generic family contract implemented
-at commit `0ed672e`, and local isolated exact-source lint/render evidence from 2026-08-28 through
-2026-08-29, including Qingyan V9's exact generic `sans-serif` Chinese cue set through CAPTION P6 and
-Final Acceptance.
+`scope`：AI-VIDEO P3/P4 HyperFrames caption source path，固定 `hyperframes@0.7.103`、Chrome
+Headless Shell `152.0.7928.2`、commit `0ed672e` 实现的 same-name canonical bundled/generic family
+contract，以及 2026-08-28 至 2026-08-29 的 local isolated exact-source lint/render evidence；其中
+包含 Qingyan V9 exact generic `sans-serif` Chinese cue set 到 CAPTION P6 与 Final Acceptance 的证据。
 
-`exclusions`: Do not extrapolate to future HyperFrames versions, other renderers, installed OS font
-aliases, custom font assets, cross-host reproducibility, required-language glyph coverage, caption
-semantics outside the accepted V9 cues, reusable perceptual readability, other Provider outputs,
-other CAPTION P6 or Final Acceptance decisions, release, publication, or Qingyan V4 quality. This
-candidate does not authorize Product Runtime changes or reclassify the P4 test Manifest as
-Production acceptance.
+`exclusions`：不得外推到未来 HyperFrames version、其他 renderer、installed OS font alias、custom
+font asset、cross-host reproducibility、required-language glyph coverage、accepted V9 cues 之外的
+caption semantics、可复用 perceptual readability、其他 Provider output、其他 CAPTION P6 或 Final
+Acceptance 决策、release、publication 或 Qingyan V4 quality。本 claim 不授权 Product Runtime 变更，
+也不把 P4 test Manifest 重新分类为 Production acceptance。
 
 ### Evidence Assessment
 
 `active_evidence_status`: `SUPPORTED`.
 
-Admission is satisfied because new exact evidence materially narrows the existing pending claim:
-the original raw/Production comparison identified the boundary, and the fix plus exact Production
-PASS, public fail-closed regression, mutation RED, and fresh Harness receipt distinguish a fictional
-unsupported family from a canonical bundled family. Qingyan V9 additionally supersedes the earlier
-V4 `NOT_EVALUATED` boundary with exact generic `sans-serif` Chinese Production evidence reaching
-CAPTION P6 and Final Acceptance. This is a `MATERIAL_EXISTING_CLAIM_UPDATE`, not a second independent
-attempt: all V9 proof layers share one artifact identity. Evidence remains bounded to the pinned
-runtime and the exact accepted cue/artifact sets. A same-version exact-source failure using `Inter`,
-an allowlisted alias that silently substitutes, or a mismatch between the allowlist and renderer
-tables would make this claim `CONTESTED`.
+Admission 成立，因为新的 exact evidence 对既有 pending claim 形成了实质收窄：原始 raw/Production
+comparison 定位了 boundary；修复、exact Production PASS、public fail-closed regression、mutation
+RED 与 fresh Harness receipt 区分了虚构 unsupported family 和 canonical bundled family。Qingyan V9
+进一步以到达 CAPTION P6 与 Final Acceptance 的 exact generic `sans-serif` Chinese Production
+evidence，取代早期 V4 `NOT_EVALUATED` boundary。这属于
+`MATERIAL_EXISTING_CLAIM_UPDATE`，不是第二个 independent attempt；全部 V9 proof layers 共享同一
+artifact identity。Evidence 仍限定于 pinned runtime 与 exact accepted cue/artifact set。如果同一
+version 的 `Inter` exact source 失败、allowlisted alias 发生 silent substitution，或 allowlist 与
+renderer tables 不一致，本 claim 应改为 `CONTESTED`。
 
 ### Recommended Action
 
-`recommended_action`: Adopt a maintenance Gate rule: any HyperFrames version change must reopen
-the exact renderer bundled/generic font tables, synchronize the AI-VIDEO preflight without admitting
-aliases, and rerun both the public unsupported-font/no-staging regression and the exact Production
-renderer gate. Readiness evidence must continue to distinguish raw capability from exact
-Production-source lint/render evidence. Unknown, alias-substituted, or unverified custom families
-must fail closed and must not be hidden by `@font-face local()`, silent fallback, disabled lint, or
-an alternate renderer path.
+`recommended_action`：采用一条 maintenance Gate rule。任何 HyperFrames version change 都必须重新
+打开 exact renderer bundled/generic font tables，同步 AI-VIDEO preflight 且不得接纳 alias，并重跑
+public unsupported-font/no-staging regression 与 exact Production renderer Gate。Readiness evidence
+必须继续区分 raw capability 和 exact Production-source lint/render evidence。Unknown、
+alias-substituted 或 unverified custom family 必须 fail closed，不得用 `@font-face local()`、silent
+fallback、disabled lint 或 alternate renderer path 隐藏问题。
 
-The current runtime fix was directly authorized by the user and independently verified. Adoption
-of this Learning Claim authorizes only the bounded durable maintenance rule below; it does not
-expand the runtime fix or any Product lifecycle authority.
+当前 runtime fix 已由用户直接授权并独立验证。采用本 Learning Claim 只授权下方 bounded durable
+maintenance rule，不扩大 runtime fix 或任何 Product lifecycle authority。
 
 ### Adoption Target
 
 `adoption_target`: `Gate`.
 
-- Canonical owner and exact target path:
-  `.agent/context/control-plane-playbook.md`, under the existing empirical final-composition /
-  renderer preflight guidance.
-- Expected behavior change: document that a pinned HyperFrames version change must synchronize the
-  same-name font-family contract and rerun the two existing executable seams before claiming caption
-  source readiness.
-- Executable seams remain
+- Canonical owner 与 exact target path：`.agent/context/control-plane-playbook.md`，位于现有
+  empirical final-composition / renderer preflight guidance 下。
+- 预期 behavior change：明确 pinned HyperFrames version change 必须同步 same-name font-family
+  contract，并在声明 caption source readiness 前重跑两条现有 executable seams。
+- Executable seams 保持为
   `tests/test_production_hyperframes.py::test_p4_source_rejects_caption_font_outside_pinned_renderer_contract`
-  and
+  以及
   `tests/test_production_hyperframes.py::test_p4_production_renderer_gate_renders_resolved_audio_and_captions`.
-- Unchanged contracts: `ResolvedTimeline`, HyperFrames selection, `ProductionStateCommitter`,
-  caption truth, activation, CAPTION P6, Final Acceptance, Provider authorization, and current
-  Product Runtime code remain unchanged.
-- Planned verification after confirmation: documentation contract check, policy audit, task-delta
-  Architecture Gate, the public unsupported-font regression, and the exact Production renderer
-  gate with pinned binary/browser paths.
+- Unchanged contracts：`ResolvedTimeline`、HyperFrames selection、`ProductionStateCommitter`、
+  caption truth、activation、CAPTION P6、Final Acceptance、Provider authorization 与 current Product
+  Runtime code 保持不变。
+- 确认后的 planned verification：documentation contract check、policy audit、task-delta Architecture
+  Gate、public unsupported-font regression，以及使用 pinned binary/browser paths 的 exact Production
+  renderer Gate。
 
-The adoption target was modified only after the exact candidate confirmation recorded below.
+Adoption target 仅在下方记录的 exact candidate confirmation 之后修改。
 
 ### Confirmation
 
@@ -240,15 +226,14 @@ evidence、scope、recommendation、target 或 candidate bytes 发生变化时�
 
 ## Pending Candidate
 
-None. Active v3 已完成 target verification 与 adoption；`pending_claim_version: 0`。后续任何
+无。Active v3 已完成 target verification 与 adoption；`pending_claim_version: 0`。后续任何
 evidence、scope、recommendation 或 target 变化都必须创建新的 pending revision 并重新确认。
 
 ## Supersession And Reopen Conditions
 
-Active v3 supersedes the unconfirmed pending v2 preimage at `692e8b2`; no earlier active adopted
-claim required retirement. Reopen or reconfirm if HyperFrames/Chrome changes, the bundled/generic
-tables change, a content-addressed custom-font contract is accepted, required-language glyph
-coverage becomes part of readiness, or exact same-version evidence contradicts the preflight.
-Mark `CONTESTED` for an unresolved exact counterexample, `REFUTED` if the preflight/source
-distinction no longer predicts renderer behavior, and `RETIRED` if HyperFrames or the caption
-source owner changes.
+Active v3 取代 commit `692e8b2` 中未确认的 pending v2 preimage；此前没有 active adopted claim 需要
+retire。HyperFrames/Chrome、bundled/generic tables 发生变化，content-addressed custom-font contract
+获准，required-language glyph coverage 被纳入 readiness，或 exact same-version evidence 与
+preflight 矛盾时，必须 reopen 或 reconfirm。存在未解决的 exact counterexample 时标记
+`CONTESTED`；preflight/source distinction 不再能预测 renderer behavior 时标记 `REFUTED`；
+HyperFrames 或 caption source owner 变更时标记 `RETIRED`。
