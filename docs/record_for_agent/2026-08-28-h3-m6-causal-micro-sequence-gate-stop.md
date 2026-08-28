@@ -2,6 +2,116 @@
 
 Date: 2026-08-28
 
+## V3 Current Checkpoint — 2026-08-28
+
+本 section 是当前 M6 empirical decision checkpoint；下方 v2/v1 evidence 保留为历史。v3 在不重复
+holder-only experiment 的前提下，修正了 v2 的 doorway-path wording，并使用当前 M1–M5 contracts 完成
+Shot B 与 conditional Shot C 的 exact local H3 submit。Shot B 六项 required findings 全部 PASS，因此 executable
+barrier 允许唯一一次 Shot C submit；Shot C 随后触发 required Gate FAIL，sequence 在 review assembly 前停止。
+
+### V3 Authorization And Fixed Scope
+
+- Experiment root: `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v3`
+- Exact preview SHA-256: `176aa45a7c2bf741b83879640a6627296d70038c2878317c06de031338c8f49c`
+- Authorization sidecar SHA-256: `0c2ec6f85560ed7ec2981b8ef0634913ee4228da6de5d6f862414270e9f3ba69`
+- Authorization source: 用户对该 exact preview 选择 `A`；scope 仅覆盖 local H3 Shot B 与 conditional Shot C，
+  Provider submit ceiling 为 `2`。
+- Provider/profile: `comfy-local-h3` / `minimax-h3-fl2va-quality`；model/capability 为
+  `minimax-h3-fl2va` / `minimax-h3-fl2va-local-v1`。
+- Profile content hash: `a154259fa9530e7c2df8865539eaeeef1886c0da51385a61d02c5c93fdb1ad6d`
+- Workflow SHA-256: `8b6c338279d8af768fae8106034f9f26e8e9d59583e95a8ca8b16d36a930ad65`
+- Binding SHA-256: `e0ae28bdaaa81ac70578b11e97f95cacab826273ec09f82bfcf430176fb05a4c`
+- Exact ComfyUI execution / restore commits:
+  `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa` /
+  `e01fb4c56b7a88149d469b99cbbfe3223d715054`。
+- Sequence contract: 3 Shots / `15.500s`；每 Shot `768x768`、`124 frames @ 24 fps`、
+  `5.1667s`。Shot A exact technical PASS bytes 从 v1 复用，不发生 Provider call。
+- Actual calls: local H3 submit `2`；project-local `video-analysis` `8`，即每个新 Shot 固定
+  `video_probe`、`video_scene_detect`、`video_extract_frames`、`video_transcribe` 各一次；image、remote、
+  paid、retry、fallback、best-of-N 与 30s assembly calls 均为 `0`。
+- Attribution limit: prompt change 通过 deterministic request derivation 改变 effective seed，因此 v2/v3
+  不是 strict same-seed A/B；technical verdict 不得被表述为 isolated prompt-only model attribution。
+
+Shot A reuse：
+
+- Path: `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v1/outputs/shot-a-elder-entrance-recommend.mp4`
+- SHA-256: `9ecf69e3a3e22fd6a49a5cd5b1e0bb9ea7b456abfd1944cf4ca87d6c061473f7`
+- Existing technical Gate: `PASS`；本次 Provider submit: `0`。
+
+### V3 Shot B Exact Gate
+
+- Path: `outputs/shot-b-handoff-doorway-depth-v3.mp4`
+- SHA-256: `bd47e8ee13729a1c6bdc3832cc9419907d00460cb00f91ff6f6887aa75c1971c`
+- Size: `1,237,417 bytes`
+- Provider request ID: `d0828ccf-d907-4951-960c-6f1561e9555b`
+- Effective seed: `738567603592176006`
+- Requirement / compiled / resolved hashes:
+  `01fe87e00745d9dd102b240ed28a5e0aa730739713fec83d0ef1ee1a88be0026` /
+  `21bb5814d31a48a0c71f96c47cf216aefe81a1b7602742e1cd2aee46a6ce0375` /
+  `41a4187dd1ec54d59f6ca03028c87524025968152e75f015a64c47e399b2e475`
+- Gate: `sidecars/gates/shot-b-gate.json`
+- Gate SHA-256: `4f8e33349a2e34058112afd88f27000c47f955fcbea1d3b140975bb44db40651`
+- Measured media: H.264 High、`768x768`、`24 fps`、`124 frames`、`5.167s`；AAC
+  `32 kHz` stereo；video/audio full decode PASS；first/last decoded anchor SSIM
+  `0.938035` / `0.944899`。
+
+| Requirement | Verdict | Evidence summary |
+| --- | --- | --- |
+| causal state | PASS | elder sole holder -> shared touch -> girl sole holder -> empty-hand release -> visible doorway threshold crossing -> elder absent；无 duplicate bottle |
+| conditioning | PASS | endpoint adherence、subject scale、doorway/window geometry 与 elder-absent terminal composition 保持 compatible |
+| camera | PASS | one continuous scene；locked geometry 与 subject scale 保持固定，无 cut、pan、push-in 或 terminal reframe |
+| intent/performance | PASS | elder 在 release 后沿 depth axis 进入 visible doorway、跨过 threshold 并清出 doorframe，不再从 extreme frame edge 消失 |
+| dialogue/lip-sync | PASS | exact AAC full decode；Whisper small 对 exact `5.167s` 返回 zero segments 与 empty text |
+| readability | PASS | handoff、release、turn、doorway traversal、threshold clear 与 empty-doorway hold 在 `1.0x` cadence 可区分 |
+
+Shot B 的六项 required findings 均为 PASS，`technical_gate=PASS`、`next_submit_allowed=true`；这只授权
+preview 中已列明的 conditional Shot C，不是 HUMAN PASS 或通用 retry authorization。
+
+### V3 Shot C Exact Gate Stop
+
+- Path: `outputs/shot-c-open-use-effect-v3.mp4`
+- SHA-256: `cc9e19016cd3c6f85222d5f66e8c73480a9a6f96e55b22e3ec8740373dbf4d7c`
+- Size: `1,294,533 bytes`
+- Provider request ID: `6a915a33-cc05-481b-9be3-4cf11e3e3c18`
+- Effective seed: `4089209248844712091`
+- Requirement / compiled / resolved hashes:
+  `09833c46b5a44a475ec30b02df69570f031841e6e8fab2e96dbc3a275f63ff0b` /
+  `037e8505dfa8126c1917d7e452770a42b5d638ef8a7853010f0dcf4fa1501e47` /
+  `c22193ee0c2b72ff2e6382cf8541d06a2f9e6c8a1ed16fc36616b30ed5b8fe53`
+- Gate: `sidecars/gates/shot-c-gate.json`
+- Gate SHA-256: `5d51620c70852e417f7ab2e115eecfe271d1634f5c9ad2bbdabdf38344dc20e5`
+- Measured media: H.264 High、`768x768`、`24 fps`、`124 frames`、`5.167s`；AAC
+  `32 kHz` stereo；video/audio full decode PASS；one continuous scene；first/last decoded anchor SSIM
+  `0.928877` / `0.914874`。
+
+| Requirement | Verdict | Evidence summary |
+| --- | --- | --- |
+| causal state | FAIL | capped start、cap removal、arm raise、single bottle 与 elder absence 均存在，但 spray trace 从约 `2.0s` 持续到 `4.8s` sampled frame 与 exact terminal frame；没有 sealed `2.4-3.1s` short spray 后的 stopped-use terminal state |
+| conditioning | PASS | girl identity、wardrobe、单一 yellow-and-white bottle、subject scale、doorway/window geometry 与 elder-absent endpoints 保持稳定 |
+| camera | PASS | one continuous scene；background geometry 与 girl scale 保持 locked，无 cut、pan、push-in 或 terminal reframe |
+| intent/performance | FAIL | girl 没有在 short spray 后降低 bottle 并 settled；raised arm、aimed nozzle 与 spray trace 持续到 exact terminal frame，relief smile 与 ongoing-use pose 重叠 |
+| dialogue/lip-sync | FAIL | exact AAC full decode，但 Whisper small 返回 `3.76-5.16s` 的非空 in-range segment `1 coats egg`；按预授权 audio rule 不得覆盖为 no-intelligible-speech PASS |
+| readability | FAIL | open、raise、aim 与 relief 可读，但 use 与 effect 没有可分离的先后，terminal 仍是 visible spray pose |
+
+Shot C 的 `technical_gate=FAIL`、`stop_rule_triggered=true`、`next_submit_allowed=false`、
+`retry_authorized=false`，`human_verdict=NOT_EVALUATED`。conditioning PASS 与 endpoint SSIM 不能覆盖 causal、
+performance、audio 或 readability failure。尤其是 Shot C last anchor 本身包含 aimed bottle 与 visible spray trace，
+而 sealed intent 同时要求 spray 已停止、bottle lowered 与 settled relief；v3 output 对 anchor 的高 adherence 反而暴露了
+terminal conditioning 与 causal close-state 的 semantic conflict。
+
+### V3 Cleanup And Current Boundary
+
+Shot C Gate FAIL 后未创建
+`outputs/m6-causal-review-15.500s-v3.mp4`，也没有 retry、fallback 或额外 Provider/MCP call。ComfyUI queue
+在停止前为空；supervisor 已停止，`8188` 无 listener；`/home/reggie/ComfyUI` 已恢复到 clean
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`。
+
+因此 M6 causal micro-sequence 仍没有 uninterrupted `1.0x` causal HUMAN verdict；不得称为 HUMAN PASS 或
+HUMAN FAIL。30s assembly 未获授权且未创建；M7–M9、remaining adapters、qualification 与 aggregate Gate
+expansion 继续 deferred。任何 Shot C anchor/intent repair、new request/seed/variant、additional analysis call 或
+Provider submit 都必须先形成新的 exact preview 并获得新的 task-scoped authorization；本次 ceiling 已终止，不能
+被解释为 retry authorization。
+
 ## V2 Follow-Up — 2026-08-28
 
 本 section 是当前 M6 checkpoint；下方 v1 evidence 保留为历史。v2 已完成 v1 指向的
