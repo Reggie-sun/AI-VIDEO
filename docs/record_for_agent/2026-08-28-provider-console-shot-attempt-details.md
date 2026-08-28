@@ -272,6 +272,55 @@ Independent native `reviewer_xhigh` 最终 verdict 为 `accept with concerns`，
 本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成、Manifest mutation、activation、P6、
 Final Acceptance、push、deploy 或 release。实现与本记录均只形成 local Git checkpoint。
 
+## AI-VIDEO Experiments Source Follow-up — 2026-08-28
+
+用户随后补充 repository 外历史实验目录 `/home/reggie/ai-video-experiments`。本节取代本记录上方将
+external allowlist 描述为三类来源、将 watcher roots 描述为 `runs/` 加三个 external roots 的
+current-facing 枚举；当时的计数继续只作为 historical observation。
+
+当前实现边界：
+
+- `provider-console/vite.config.mjs` 的唯一 external source configuration 新增固定
+  `homedir()/ai-video-experiments` root，source id 为 `ai-video-experiments`，label 为
+  `AI-VIDEO Experiments`，kind 为 `development_artifact`。Browser 不能提交或改变该 root。
+- 新来源与既有 `artifacts`、ComfyUI、青颜目录走同一个 catalog、recursive watcher/SSE、opaque token、
+  no-follow containment、exact-byte revalidation 与 public path sanitization；没有增加第二条 scanner、
+  media service 或 lifecycle owner。
+- selector、source count 与实时状态继续由 server projection 动态生成。当前 watcher roots 为 `runs/`
+  加四个 external roots；external API source count 为 `4`。
+- 该实验目录中的 `shot-*-result.json`、`exact-preview.json` 与 Prompt text 当前没有受支持且完整的
+  metadata schema linkage。UI 可以保留安全 evidence refs，但 Shot、Prompt、generation type 与成功/失败
+  继续显示 `NOT_EVALUATED`；不得因为文件名、`output_path`、相邻 Prompt 或实验结果文件存在就自动推导。
+
+Live Browser/API evidence：
+
+- `/api/external-media` 返回 `4/4` sources available、`400` unique SHA groups、`509` physical locations；
+  `AI-VIDEO Experiments` source 有 `21` 个 physical locations，按 SHA 去重后在 selector 中显示 `15`。
+- 选择该来源后 rail 显示 `15 / 15 unique SHA` 与 `15 videos`；选中的 exact group 可播放，并按 SHA 显示
+  experiment/ComfyUI 重复位置，同时保持 `non_canonical` 与 `NOT_EVALUATED`。
+- public catalog JSON 不包含 `/home/reggie`；SSE `/api/library-events` 为 `200`，页面显示
+  `实时更新已连接`，Chrome console 无 error、warning 或 issue。
+
+Verification：
+
+- Node contract/API/UI tests：`44 passed`。
+- Provider Console Python tests：`32 passed`。
+- Vite/Sites build：`4580 modules transformed`，Sites packaging 通过；Sites tests：`5 passed`。
+- Architecture Gate：PASS；policy inspection 没有 fallback 或 unmapped path。
+- Implementation commit：`29219c90a7bb10a8d35067f697245cc06a968e1e`。
+- Exact commit-range Harness：
+  `e6caec40d36fc69de1d243bd86f33e7649f293ba..29219c90a7bb10a8d35067f697245cc06a968e1e`；
+  receipt：`.agent/harness/runs/provider-console-experiments-source-20260828-v1/receipt.json`；receipt
+  verification 包括 `passed=true`、`fresh=true`、`snapshot_matches=true`、
+  `scope_worktree_clean=true` 与 `complete_completion_proof=true`。
+
+Independent native `reviewer_xhigh` verdict 为 `accept`，无 blocking issue。其唯一建议是未来若
+`vite.config.mjs` 出现启动 side effect，再把 pure configuration helper 移入已有 mapped script；当前不应
+为抽象新增 unmapped module。
+
+本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成、媒体修改、Manifest mutation、
+activation、P6、Final Acceptance、push、deploy 或 release。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
