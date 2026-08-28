@@ -2,6 +2,65 @@
 
 Date: 2026-08-28
 
+## Current Checkpoint — V6 Old Static Tail Reuse
+
+本节 supersede 下方 V5 作为当前 local review artifact。用户明确要求保留 Mini 衔接与对白，但把最后
+一个 Shot 换回旧片的 Fast Hero、三张静态卡和对应声音，并把字幕放到底部。该要求只触发 local
+deterministic re-composition；没有新的 Provider submit、network、paid call、permit、reservation、
+activation 或 publish effect。
+
+用户指定的旧片为：
+
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-captioned-28s-review-only.mp4`
+
+- SHA-256: `e965db27a4f67ce4fcf2258ae83ef67643e8474c170e3c85cced2af1330fd694`
+- 复用范围：旧片 `19.541667-28.041667s` 的 exact audio interval
+- 视觉顺序：Fast Hero 4 秒 -> card 1 1.5 秒 -> card 2 1.5 秒 -> card 3 1.5 秒
+- 为满足新的字幕位置要求，没有复制旧片已经烧录的灰色 caption box 或 disclosure overlay；Hero 和
+  三张卡从相同 accepted/raw visual sources 重新组装，内容和顺序保持不变
+
+新 review-only 成片：
+
+`runs/qingyan-seedance2-mini-linked-ad-v6-old-tail-20260828-001/final/qingyan-seedance2-mini-linked-ad-v6-old-static-tail-36s-review-only.mp4`
+
+- SHA-256: `d0d2f4f621f5536e6db525aec7fc965a16ae63c21ff60ae3e853dfaefe54356f`
+- size: 17,938,537 bytes
+- media: 35.645 秒；H.264 High、720x1280、24fps、854 frames；AAC stereo、44.1kHz
+- audio level: mean `-15.2 dB`、max `-1.0 dB`
+
+Timeline：
+
+| Final time | Advertising role | Source |
+| --- | --- | --- |
+| `0.000-15.041667s` | problem hook -> recommendation -> application -> result | accepted Shot 01 |
+| `15.041667-21.041667s` | product macro -> extended same-couple social payoff | accepted Shot 02 `0.0-6.0s` |
+| `21.041667-27.121667s` | linked product portability proof + two-line dialogue | gated Mini Shot |
+| `27.121667-31.121667s` | old supported product Hero | old Fast Hero source |
+| `31.121667-32.621667s` | old static card 1 | old card source 1 |
+| `32.621667-34.121667s` | old static card 2 | old card source 2 |
+| `34.121667-35.621667s` | old static card 3 | old card source 3 |
+
+品牌尾段字幕全部改为画面底部的白字、黑色描边和阴影，不使用矩形 backing：`青颜`
+`28.70-29.42s`、`抑汗净味` `29.86-30.90s`、`清爽舒适` `31.02-32.18s`、`近距离`
+`33.46-34.26s`、`更从容` `34.62-35.54s`。Mini 两句对白及其字幕保持不变。
+
+Final local review Gate：
+
+`runs/qingyan-seedance2-mini-linked-ad-v6-old-tail-20260828-001/evidence/post-composition-review-gate.json`
+
+- Gate SHA-256: `fda0db4c3928e4b3aff9f1c2c583bb84b82d99144bafbf0246bcc3711e3bbb6a`
+- overall verdict: `PASS_FOR_LOCAL_REVIEW_ONLY`
+- full ffmpeg decode: `PASS`
+- project-local `video-analysis`: exact final MP4 的 H.264/AAC、时长、分辨率、frame count 与对白/尾段
+  speech 均已重新测量
+- exact tail 与 overall contact sheets 已人工检查：旧 Hero、三张卡顺序正确，V5 绿色顶部 callout 已移除，
+  品牌字幕位于底部
+
+三张旧卡仍含 `15%`、`全天`、`14天`、`96.67%`、`93.33%`、机制和 testimonial 类文案；本轮没有
+取得 claim substantiation，所以 `STATIC_CARD_CLAIM_SUBSTANTIATION=NOT_EVALUATED`。因此该文件只能
+用于本地人工 review，不产生 candidate activation、P6、Final Acceptance 或可发布广告结论。V5 保留为
+历史 artifact，不再是当前交付版本。
+
 ## Current Checkpoint — Mini Product Match-Cut V5 Review Artifact
 
 本节 supersede 下方 “Option A Raw Candidate Gate Stop” 作为当前交付状态；Fast raw candidate 的
