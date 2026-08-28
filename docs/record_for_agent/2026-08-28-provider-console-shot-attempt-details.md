@@ -475,6 +475,51 @@ Verification：
 本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成、Manifest mutation、activation、P6、
 Final Acceptance、push、deploy 或 release；implementation 与记录均为 local checkpoint。
 
+## Reference Preview Runtime Recovery — 2026-08-28
+
+用户在 `ComfyUI Output` 来源中选择 `shot-b-handoff-doorway-depth-v3.mp4` 后，两个 exact-bound
+Reference 预览持续为黑色，同时页面随后无法继续打开媒体。本次恢复确认了两个彼此独立的原因：
+
+- 上一次 integrated QA 结束时，Agent 错误停止了当前会话的 Vite dev server。浏览器保留旧 DOM，
+  但后续 API、媒体与 Reference 请求已经没有服务端可响应；这属于运行时交付错误，不是媒体 bytes
+  或 token contract 失效。
+- 服务恢复后，目标视频本身可正常播放，但嵌套滚动容器 `.external-detail-main` 内的 Reference
+  `<img loading="lazy">` 没有发起请求。此时两个 inline 图片均为 `currentSrc=""`、
+  `complete=false`、`naturalWidth=0`；点击 lightbox 后，同一个 exact Reference URL 能立即加载为
+  `768 × 768`，证明 Reference bytes、读取 token 与 identity revalidation 均正常，故障位于原生 lazy
+  loading 与该滚动布局的交互边界。
+
+修复只把当前 active detail 中 exact-bound Reference 的图片加载策略改为 `eager`；没有修改 Reference
+token、allowlist containment、SHA/size revalidation、媒体 bytes、external source dedup、Production state
+或 lifecycle contract。SSR regression test 明确断言 Reference 使用 `loading="eager"` 且不再输出
+`loading="lazy"`。
+
+Live Browser evidence：
+
+- 本地 Vite server 已恢复并在 `127.0.0.1:4173` 保持运行；该进程只属于当前本机会话，不构成 deploy
+  或 release。
+- 重新选择 `ComfyUI Output` 和 exact target 后，两张 Reference 均为 `complete=true`、
+  `naturalWidth=768`、`naturalHeight=768`，对应请求为 HTTP `200`。
+- 目标视频为 `readyState=4`、`error=null`、`duration=5.167`，媒体请求为 HTTP `206`。
+- Chrome console 没有 error、warning 或 issue。
+
+Verification：
+
+- Regression test 先在原实现上因 `loading="lazy"` 失败，修复后 focused Node test `1 passed`。
+- Provider Console focused Node contracts：`34 passed`；Vite production build：`4582 modules transformed`；
+  `git diff --check` 通过。
+- Implementation commit：`948d74bfa3e15ae7036bb7b6b61f4f47118d1343`。
+- Exact commit range：
+  `c378f5be4020e9bf2ef3365902a73cd20408a6f3..948d74bfa3e15ae7036bb7b6b61f4f47118d1343`；
+  receipt：`.agent/harness/runs/provider-console-reference-preview-recovery-20260828-v1/receipt.json`。
+- Receipt 内 Architecture Gate PASS、Provider Console Node `60 passed`、Vite build 通过；freshness
+  verification 为 `passed=true`、`fresh=true`、`snapshot_matches=true`、`scope_paths_match=true`、
+  `scope_worktree_clean=true` 与 `complete_completion_proof=true`。Harness 运行时因当前 Vite server 保持
+  在线出现 dependency-scan / WebSocket port warning，但没有影响 mandatory check 与 receipt verdict。
+
+本恢复没有执行 Provider submit、paid/cloud call、媒体生成或修改、Manifest mutation、activation、P6、
+Final Acceptance、push、deploy 或 release。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
