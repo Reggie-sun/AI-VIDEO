@@ -1,0 +1,56 @@
+{
+  "schema_version": "drama-baseline-selection-blocker/2",
+  "record_kind": "drama_baseline_selection_blocker",
+  "baseline_id": "drama.baseline.key-at-the-waiting-room",
+  "baseline_version": 2,
+  "status": "blocked",
+  "domain_id": "drama",
+  "accepted_fixture_binding": {
+    "fixture_id": "drama.fixture.key-at-the-waiting-room",
+    "fixture_version": 1,
+    "acceptance_record_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.accepted.json",
+    "acceptance_record_commit": "3cb778a9dd4fa75a6c610bf8f16160d5de44831d",
+    "acceptance_record_sha256": "e2601e8ac7af4686c3a4290a05d956c87d8bcea73bc146f16bad4ee5fad52e1d",
+    "accepted_fixture_payload_commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+    "accepted_fixture_payload_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+    "status": "accepted"
+  },
+  "baseline_contract_source": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/baseline-selection/missing-cinematic-reference-v1.blocked.json",
+    "commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+    "sha256": "ea56d3fa597317feb70cdb53ba6be35c9362e10b0d053958fe483792e7508af0",
+    "inherited_content": [
+      "intended genre, aspect ratio, resolution and duration",
+      "required exact-reference identity, rights and provenance fields",
+      "all applicable quality dimensions and minimum floors",
+      "1.0x full-audio side-by-side HUMAN comparison procedure",
+      "no post-hoc reference swap"
+    ]
+  },
+  "reference_set": [],
+  "blocking_reasons": [
+    {
+      "code": "NO_EXACT_DRAMA_CINEMATIC_REFERENCE",
+      "detail": "The accepted fixture still has no selected or provided dramatic reference with exact bytes, rights and provenance."
+    },
+    {
+      "code": "BASELINE_SELECTION_NOT_ACCEPTABLE",
+      "detail": "Without at least one qualified exact reference, no accepted baseline-selection payload can be created or confirmed."
+    }
+  ],
+  "acceptance": {
+    "accepted_record_sha256": null,
+    "approver_authority_identity": null,
+    "accepted_at": null,
+    "acceptance_source_id": null,
+    "acceptance_source_sha256": null
+  },
+  "current_gate_state": {
+    "fixture_selection": "ACCEPTED",
+    "baseline_selection": "BLOCKED",
+    "authoring_package": "BLOCKED",
+    "b_d0": "BLOCKED_BEFORE_MEDIA",
+    "m6_d": "NOT_EVALUATED",
+    "required_next_evidence": "At least one exact Drama cinematic reference with SHA-256, byte size, stream identity, rights/provenance and selection rationale."
+  }
+}

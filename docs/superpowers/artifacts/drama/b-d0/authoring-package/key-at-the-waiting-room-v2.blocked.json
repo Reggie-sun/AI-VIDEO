@@ -1,0 +1,79 @@
+{
+  "schema_version": "drama-authoring-package/2",
+  "record_kind": "drama_authoring_package",
+  "package_id": "drama.package.key-at-the-waiting-room",
+  "package_version": 2,
+  "status": "blocked",
+  "domain_id": "drama",
+  "contract_binding": {
+    "spec_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "spec_commit": "01483ec1f434661984ca009fffa85960310dedd6",
+    "spec_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b",
+    "contract_version": "drama-authoring-and-acceptance/1"
+  },
+  "authoring_payload_source": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v1.blocked.json",
+    "commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+    "sha256": "6f77f095a4c034d50f776c6c8e2b58e744c7e1bd69fd6b6e836f3bcc7251060e",
+    "authoring_content_assessment": "PASS",
+    "inherited_content": [
+      "content-addressed authoring profile and rubric",
+      "Story, Scene, Character and ordered Shot revisions",
+      "prior-context and on-screen allocation",
+      "decision, appearance, wardrobe and prop continuity facts",
+      "exact dialogue, performance, blocking, eyeline and emotional progression",
+      "direct-continuity pair semantics and prop state chain",
+      "all nine DRAMA-AUTH requirement assessments",
+      "per-Shot, pairwise and whole-scene DRAMA-MEDIA requirement instances"
+    ]
+  },
+  "fixture_selection_binding": {
+    "fixture_id": "drama.fixture.key-at-the-waiting-room",
+    "fixture_version": 1,
+    "accepted_payload_commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+    "accepted_payload_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+    "acceptance_record_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.accepted.json",
+    "acceptance_record_commit": "3cb778a9dd4fa75a6c610bf8f16160d5de44831d",
+    "acceptance_record_sha256": "e2601e8ac7af4686c3a4290a05d956c87d8bcea73bc146f16bad4ee5fad52e1d",
+    "status": "accepted"
+  },
+  "baseline_selection_binding": {
+    "baseline_id": "drama.baseline.key-at-the-waiting-room",
+    "baseline_version": 2,
+    "record_path": "docs/superpowers/artifacts/drama/b-d0/baseline-selection/missing-cinematic-reference-v2.blocked.json",
+    "record_sha256": "c22dfb3f95fa58e34d2708d7b89818e63d6e05ca4d25da12b0dfb3b630e6ca27",
+    "record_status": "blocked",
+    "accepted_record_sha256": null
+  },
+  "readiness": {
+    "authoring_content_assessment": "PASS",
+    "fixture_selection": "ACCEPTED",
+    "baseline_selection": "BLOCKER",
+    "seal_readiness": "BLOCKER",
+    "b_d0_status": "BLOCKED_BEFORE_MEDIA",
+    "m6_d_status": "NOT_EVALUATED",
+    "blocking_reasons": [
+      "BASELINE_EXACT_REFERENCE_MISSING",
+      "BASELINE_SELECTION_NOT_ACCEPTED",
+      "AUTHORING_PACKAGE_V2_EXACT_BYTES_NOT_ACCEPTED"
+    ]
+  },
+  "acceptance": {
+    "accepted_package_sha256": null,
+    "approver_authority_identity": null,
+    "accepted_at": null,
+    "acceptance_source_id": null,
+    "acceptance_source_sha256": null
+  },
+  "forbidden_effects": [
+    "provider_selection",
+    "provider_native_prompt_authoring",
+    "comfyui_or_h3_execution",
+    "video_analysis",
+    "media_generation",
+    "automatic_retry_or_repair",
+    "manifest_or_registry_mutation",
+    "p6_or_final_acceptance_claim",
+    "cross_lane_verdict_inheritance"
+  ]
+}
