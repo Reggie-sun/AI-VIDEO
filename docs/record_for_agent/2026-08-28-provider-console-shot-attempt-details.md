@@ -100,7 +100,8 @@ External Media Library。
 - External `reported_status` 与 canonical `status`、`generation_status`、`lifecycle_status` 分离；后三者固定
   `NOT_EVALUATED`。External `succeeded` 不产生 candidate、QA、P6、Final Acceptance 或 activation truth。
 
-本机 live catalog 证据：
+前一 checkpoint 的本机 live catalog 证据（historical；后续数量由下方
+`All-Video Shot And Audio Follow-up` 的新扫描取代）：
 
 - 3 个 allowlisted sources 全部 available；485 个 physical video locations 聚合为 392 个 unique SHA groups。
 - 7 个青颜 groups 通过完整 evidence chain，显示 full Prompt、Shot ID、`text_to_video` 与 external
@@ -129,6 +130,70 @@ Independent native `reviewer_xhigh` 首轮指出 cross-fingerprint 字段双方�
 `undefined === undefined` 错误通过，以及 generic JSON 字段存在语义误读风险。实现改为所有 chain
 identity 非空且相等，并为 generic metadata 增加 schema gate；scoped re-review verdict 为 `accept`，
 无 blocking issue。
+
+## All-Video Shot And Audio Follow-up — 2026-08-28
+
+后续实现把“只看到一个视频或一个 attempt”的操作面扩展为完整 Shot 判断面，同时处理浏览器与主机
+输出设备两层声音问题。该 follow-up 没有改变 Production lifecycle、`ResolvedTimeline`、activation、
+Provider 或媒体 bytes。
+
+当前界面行为：
+
+- 启动后默认进入 External Media Library；来源改为一个可展开的 `<select>`，默认
+  `全部外部来源`。`runs/` 继续作为独立 canonical Project 工作区入口，external selector 覆盖
+  repository `artifacts/`、`/home/reggie/ComfyUI/output` 与 `/home/reggie/电商图片/青颜`。
+- canonical Project 视图按 Project 当前 Shot 数组顺序展示全部 Shots；每个 Shot 下保留所有 attempts，
+  并展示画面脚本、对白、旁白、`visual_strategy`、实际提交 Prompt、generation type、lifecycle
+  outcome、phase 与媒体状态。找不到当前 Project Shot 的 attempt 会进入显式 unmatched 区域，不会丢弃。
+- 每个 attempt 的脚本继续使用 exact-attempt snapshot；Project Shot 顺序明确不是最终成片的
+  `ResolvedTimeline`，前端也不自动选择 winning attempt。
+- External Media Library 只在受支持 schema 且 exact path/SHA evidence 完整时展示 Prompt、Shot、类型与
+  external reported status；无法绑定的字段继续显示 `NOT_EVALUATED`。
+- exact final SHA
+  `94c6b7fc92202f6c7e979bb94b31ecd58aab40e3652113f1e78d66c3535a16a4` 可显示同目录
+  `ecommerce-ad-workflow/package/2` 声明的 6 个 Shots。它只证明 final checksum 与同项目目录声明存在，
+  因缺少 structured composition receipt，不证明 6 个 Shots 构成 exact MP4，也不升级 canonical
+  timeline、candidate、QA、P6 或 Final Acceptance；每个 Shot 状态为
+  `DECLARED_NOT_EVALUATED`。
+- `AudibleVideo` 统一覆盖 external preview、candidate/fetched output、input video、Registry video 与
+  Continuity Review；每个入口都有显式 `开启声音并播放`，在同一 user gesture 中设置
+  `defaultMuted=false`、`muted=false`、`volume=1` 并调用 `play()`。独立媒体 HTML wrapper 同样执行该
+  行为。若 exact 文件没有音轨，界面会明确提示，不能由输出设备绑定制造不存在的声音。
+
+主机声音 runtime evidence：
+
+- PipeWire default sink 当前解析为 node `56`：`HDA NVidia Digital Stereo (HDMI 2)`，对应桌面设置中的
+  `HDMI / DisplayPort 2 - HDA Nvidia`；ALSA route 为 `hdmi-stereo-extra1`，设备 nick 为 `GX271UR`。
+- 本轮重新执行 default-sink binding 与 unmute；当前 read-only observation 为 `Volume: 0.61` 且没有
+  `[MUTED]`。短时 `speaker-test` 与系统测试音已送往该 sink；这证明 routing/action 已执行，不代替用户
+  对显示器实际出声的听觉确认。
+
+当前 live catalog 新扫描：
+
+- `393` 个 unique SHA groups、`486` 个 physical locations；source locations 分别为 repository
+  artifacts `192`、ComfyUI output `251`、青颜目录 `43`。
+- `27` 个 groups 为 `verified_artifact_receipt`，`7` 个为 `verified_evidence_chain`，合计 `34` 个
+  exact-bound structured evidence groups；其余 `359` 个保持 `not_evaluated`。
+- public projection 未发现 absolute `/home/reggie`、`source_path` 或 `source_root` 泄露。
+
+Verification：
+
+- Node contract/API/UI tests：`35 passed`。
+- Provider Console Python tests：`32 passed`。
+- Vite production build 与 Sites packaging：通过。
+- Chrome integrated QA：默认 all-sources selector、canonical multi-Shot/multi-attempt、external 6-Shot
+  declaration、主视图与 HTML wrapper 的 user-gesture unmute/play 均验证通过；主页面无 console
+  error/warning/issue。
+- Implementation commit：`8d0282f3528b9101741ff23d78c965982e767f35`。
+- Exact commit-range Harness：
+  `49638b4d103ab0251bdcce5a052855a2bd315e91..8d0282f3528b9101741ff23d78c965982e767f35`；
+  receipt：`.agent/harness/runs/provider-console-all-video-details-code-20260828/receipt.json`；
+  receipt verification 为 `passed=true`、`fresh=true`、`scope_paths_match=true`、
+  `snapshot_matches=true`、`complete_completion_proof=true`。
+
+Independent native `reviewer_xhigh` scoped re-review verdict 为 `accept with concerns`，无 blocking issue。
+其非阻断风险是：未来同一 SHA 若出现多条合法但语义不同的 verified Shot evidence，当前 grouping 只选择
+首条 metadata association，可能隐藏 ambiguity；当前 393 groups 实扫未发现该冲突。
 
 ## Assessment
 
