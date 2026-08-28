@@ -2,6 +2,31 @@
 
 Date: 2026-08-28
 
+## Learning Adoption Supersession — 2026-08-29
+
+下方 `Automatic Learning Evaluation` 保存的 pending v1/v2、未确认与停止 adoption 状态现在只作为
+历史。Qingyan V9 exact evidence 后形成的 pending v3 已由用户按 exact candidate identity 确认，并
+完成 bounded Gate adoption：
+
+- confirmed candidate commit：`0d01a97f7c340baf350c6681274c0dde9fce5b96`；
+- confirmed candidate bytes SHA-256：
+  `f845f5d1aa589527f6987156cd07f79769220a75c16e372aabca7318574ceb17`；
+- canonical target：`.agent/context/control-plane-playbook.md` 的
+  `HyperFrames Caption Source Readiness`；
+- adoption commit：`9fa65248647bcf5ae07ca15edafeb82b0e69d9bd`；
+- active-claim commit：`4c0a6dc1a1ceae0c124932d97b44245ec5f1bbad`；
+- adoption Harness receipt：
+  `.agent/harness/runs/hyperframes-caption-readiness-adoption-20260829/receipt.json`，已验证
+  complete、fresh、snapshot-matching，Architecture Gate PASS、Learning Skill `27 passed`、
+  Harness `204 passed`；
+- target-owner focused evidence：unsupported-font/no-staging regression PASS；pinned
+  `hyperframes@0.7.103` + Chrome `152.0.7928.2` exact Production renderer Gate PASS。
+
+Active v3 只采用“HyperFrames version change 必须同步 exact bundled/generic font table、preflight
+与两条 executable seams”的维护规则。它不改变 Runtime、`ResolvedTimeline`、renderer selection、
+`ProductionStateCommitter`、CAPTION P6、Final Acceptance 或 Provider authorization，也不授权媒体、
+Product state、push 或 release effect。
+
 ## Final Acceptance Supersession — 2026-08-29
 
 下方 `Exact Final-Media Re-test — 2026-08-29` 对 V4 的 `SOURCE_INTEGRITY FAIL`、CAPTION overall
