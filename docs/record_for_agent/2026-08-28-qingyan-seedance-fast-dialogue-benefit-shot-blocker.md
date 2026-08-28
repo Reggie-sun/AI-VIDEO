@@ -1,6 +1,135 @@
-# Qingyan Seedance Fast Dialogue Benefit Shot Blocker Record
+# Qingyan Dialogue Benefit Shot And Mini Match-Cut Record
 
 Date: 2026-08-28
+
+## Current Checkpoint — Mini Product Match-Cut V5 Review Artifact
+
+本节 supersede 下方 “Option A Raw Candidate Gate Stop” 作为当前交付状态；Fast raw candidate 的
+`NOT_EVALUATED` 与 STOP 仍是有效历史证据，但不再是当前 next action。用户随后明确指出该人物
+Shot “不像广告”且与前一 Shot 断裂，并将新的 live scope 限定为“就调用 mini 就好”。本轮只产生
+一次 Mini Provider submit，没有复用或重试下方 Fast attempt。
+
+### Continuity And Advertising Decision
+
+当前 V4 的人物同行段仅使用 accepted Shot 02 trimmed source 的 `2.0-4.5s`，实际约 2.5 秒；
+`4.5-6.0s` 的人物/持瓶 tail 未进入 V4。旧 Fast dialogue raw Shot 又引入新的女性外观、刘海、
+服装和包，虽然局部技术要求通过，但不能形成“上一镜女主仍拿着同一产品”的广告因果链。
+
+本轮先从 accepted predecessor 精确取出 frame 96 作为同人物 continuation first frame。该方案在
+任何 POST、permit 或 reservation 创建前被 synthetic-person egress policy fail closed：
+
+- run: `runs/qingyan-seedance2-mini-linked-ad-dialogue-20260828-001/`
+- zero-effect report:
+  `runs/qingyan-seedance2-mini-linked-ad-dialogue-20260828-001/evidence/live-report.json`
+- report SHA-256: `d3fe16ca8ba852fa28a5e964117a196f5d07b63a491121851d21b313448de18f`
+- `submit_posts=0`、`paid_provider_outcome=not_submitted`、没有 permit/reservation、没有费用效果
+
+因此没有猜测身份 continuity，也没有绕过 egress policy。最终改为 product-only match cut：先把
+accepted Shot 02 扩展到 `0.0-6.0s`，让同一男女继续走远且女方手中产品保持可见；随后切到同一
+花园色调、ivory/white/brown 服装 palette 下的局部身体和产品动作。该 Shot 不显示脸或嘴，不声称
+演员 identity；continuity 由同一产品、持瓶手位、服装色调、花园方向与动作承接建立。
+
+广告作用从“再走一段”改为可观察的 benefit proof：一瓶产品被举到 label-facing commercial beat，
+再放到右侧裤袋边并保持可见。两句 off-camera 对话为：
+
+- 男：`你出门也带着青颜？`
+- 女：`小小一瓶，随手带着刚刚好。`
+
+后续 commercial close 只使用当前 product truth 支持的
+`青颜 / 抑汗｜净味 / 清爽舒适 / 近距离，更从容`；V4 的三张未核验 claim cards 已从新 composition
+移除。
+
+### Single Mini Submit And Raw Gate
+
+Effective Mini run：
+
+`runs/qingyan-seedance2-mini-product-bridge-dialogue-20260828-002/`
+
+- Provider/model: `volcengine_ark_seedance` / `doubao-seedance-2-0-mini-260615`
+- capability/mode: `seedance-2-0-mini-260615-reference_to_video` / `REFERENCE_TO_VIDEO`
+- ordinary product-only reference SHA-256:
+  `406b36ab8a8531d9a4ea60178f395823cf1ea3e1c642bc78e98463aabf37ba2f`
+- output: 6 秒、720×1280、24fps、native audio
+- exact ceiling: 1 POST；estimated upper bound `2.9808 CNY`，task ceiling `4 CNY`
+- Provider effects: 1 submit POST、9 query GET、1 download GET
+- blind retry / permit remint / fallback / activation: `0 / 0 / 0 / 0`
+
+Fetched raw MP4：
+
+`runs/qingyan-seedance2-mini-product-bridge-dialogue-20260828-002/output/seedance2-mini-product-bridge-dialogue-native-audio-6s.mp4`
+
+- SHA-256: `a7bf49dcbf16f8703eb84331c6de68e1ddfd1ef081c75bd74edd37adbb212c3a`
+- size: 4,168,778 bytes
+- media: 6.080 秒；H.264 High、720×1280、24fps、145 frames；AAC stereo、32kHz
+- audio level: mean `-18.5 dB`、max `-1.1 dB`
+
+在任何字幕或 composition 前，project-local `video-analysis` MCP 对 exact MP4 执行 0.5 秒 dense
+analysis、Whisper small + medium、scene review；同时完成完整 ffmpeg decode 和 predecessor/new-Shot
+match-cut contact sheet。全部 required findings 为 `PASS`：
+
+- 同一产品/服装 palette/花园/动作形成 predecessor association；
+- 恰好一瓶稳定的黄色标签白盖产品；
+- 产品从随行持握进入 label-facing hero，再落到裤袋边；
+- 不显示脸或嘴，因此没有 visible lip-sync requirement；
+- 两句对白各一次、顺序正确且无额外 speech；
+- 单一连续镜头，无生成字幕、graphics 或 unsupported claim。
+
+Whisper 将声音相同的品牌 proper noun 记为 `青言` / `青岩`；medium pass 仍完整恢复
+`你出门也带着青岩 / 小小一瓶 / 随手带着刚刚好`。该 ASR homophone 不等同于错误发音，但最终人耳
+音色和自然度仍属于 human review。
+
+Raw Gate：
+
+`runs/qingyan-seedance2-mini-product-bridge-dialogue-20260828-002/evidence/post-media-gate.json`
+
+- Gate SHA-256: `5342e1dce449a4777fdb1c4fbc220dedef0f3375307f9c263d2cb6f95876e348`
+- overall verdict: `PASS`
+- boundary: 只允许 deterministic local captions/composition；不产生 activation、P6 或 Final Acceptance
+
+### V5 Deterministic Composition
+
+新 review-only 成片：
+
+`runs/qingyan-seedance2-mini-linked-ad-v5-20260828-001/final/qingyan-seedance2-mini-linked-ad-v5-31s-review-only.mp4`
+
+- SHA-256: `632490ed082ea0688a05273884b3516d245b82e4f1f2f7b4219491a2db9c86d7`
+- size: 17,490,218 bytes
+- media: 31.145 秒；H.264 High、720×1280、24fps、746 frames；AAC stereo、44.1kHz
+- final audio level: mean `-16.7 dB`、max `-1.0 dB`
+
+Timeline：
+
+| Final time | Advertising role | Source |
+| --- | --- | --- |
+| `0.000-15.041667s` | problem hook -> recommendation -> application -> result | accepted Shot 01 |
+| `15.041667-21.041667s` | product macro -> extended same-couple social payoff | accepted Shot 02 `0.0-6.0s` |
+| `21.041667-27.121667s` | linked product portability proof + two-line dialogue | gated Mini Shot |
+| `27.121667-31.121667s` | controlled product Hero + supported commercial close | accepted Fast Hero |
+
+最终 MP4 再次通过 project-local `video-analysis`：medium Whisper 只恢复既有 opening voiceover 与新增
+两句对话，新增对白时间为 `22.56-23.76s` 和 `24.40-26.48s`。Authored subtitles 使用正确品牌字形，
+覆盖 `22.46-24.38s` 与 `24.38-26.64s`；Hero 上方 commercial callouts 与底部 dialogue subtitle
+使用不同 role/style。完整 ffmpeg decode 无 error，三张 final contact sheets 验证人物/产品 match cut、
+字幕可读性、便携动作与 Hero close。
+
+Final local review Gate：
+
+`runs/qingyan-seedance2-mini-linked-ad-v5-20260828-001/evidence/post-composition-review-gate.json`
+
+- Gate SHA-256: `fed4f81d1356fce35be26fff26b5b52c96449e75f4287dfba87f9f67b5d4d9e2`
+- overall verdict: `PASS`
+- boundary: review-only；未 activation、未 P6 / Final Acceptance、未 publish、未验证 external actual billing
+
+### Current Assessment And Remaining Human Review
+
+用户提出的技术目标已经在新 review artifact 中实现：人物/产品关联 passage 从约 `17s` 延续到
+`27.12s`，不再于 2.5 秒后断开；产品优势由可见 portability action 和两句对白表达；对白均有字幕；
+结尾回到干净 Hero 和 supported benefits，旧 unverified cards 不再出现。
+
+仍需用户人工确认两项 subjective acceptance：生成男女声是否自然且符合预期，以及 product-action
+match cut / 绿色 commercial callout 是否符合品牌审美。该人工确认不能由 raw Gate、ASR、FFmpeg、
+Harness 或本文记录替代。外部 Provider 实际账单未读取，`2.9808 CNY` 只能描述为 preflight estimated
+upper bound。没有追加 Provider submit、candidate activation、push 或 release。
 
 ## Current Checkpoint — Option A Raw Candidate Gate Stop
 
