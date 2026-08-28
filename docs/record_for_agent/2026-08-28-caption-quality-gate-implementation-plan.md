@@ -125,6 +125,19 @@ Requirement-level verdict：
 ASR 有输出或 `video-analysis` 成功均不能替代 canonical identity、whole-render coverage、P6 receipt 或
 Final Acceptance。
 
+### Real-Validation Record Verification And Publication State
+
+- Exact task commit range 从 `3d6844c` 后开始，只包含本记录与对应 Learning Claim；Harness receipt：
+  `.agent/harness/runs/caption-real-validation-task-only-final-20260828/receipt.json`。
+- Mandatory checks：documentation contract、policy audit、product-runtime Skill boundary `2 passed`、
+  task-delta Architecture Gate `PASS`、experience-learning Skill tests `7 passed`。
+- `verify-receipt` 必须同时返回 `passed=true`、`fresh=true`、`fresh_for_snapshot=true`、
+  `scope_paths_match=true`、`complete_completion_proof=true`、`snapshot_matches=true`、
+  `workspace_cleanup_confirmed=true` 与 `workspace_stable_confirmed=true`，否则本记录不声称完成。
+- Publication state：记录与 pending candidate 仅 commit 到 local `main`；未 push、未 release。
+- 现有 unrelated `.codex/config.toml` dirty state、H3 record staged state、`artifacts/` 与两份
+  2026-08-27 untracked plan/spec 保持原 ownership，未纳入本轮 commits。
+
 ## Purpose
 
 本文记录字幕专项质量 Gate 的 accepted implementation plan checkpoint。计划基于当前代码、
