@@ -73,6 +73,16 @@ claim must contain these semantic fields:
 - `pending_approval_status`
 - `active_adoption_status` and `pending_adoption_status`
 
+### Writing Language Contract
+
+Generated Learning Claim artifacts use English section titles and Chinese
+narrative. Keep `command`, repository `path`, filename, config key, API, schema,
+field name, enum, hash, model/Provider identity, and Skill name in their
+original form, normally wrapped in backticks when embedded in prose. Do not
+translate machine-readable frontmatter keys or enum values. Use English prose
+only when it is exact evidence or a necessary technical term; do not produce
+English-only narrative by default.
+
 Use categorical evidence state rather than fake numeric confidence:
 
 - `SINGLE_CASE`: useful observation that cannot support a new adoption proposal;

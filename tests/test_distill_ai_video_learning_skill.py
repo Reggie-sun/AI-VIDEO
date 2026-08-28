@@ -150,6 +150,32 @@ def test_learning_claim_template_separates_evidence_approval_and_adoption() -> N
         assert heading in text
 
 
+def test_learning_claim_template_uses_english_headings_and_chinese_body() -> None:
+    skill = _read(SKILL_PATH)
+    text = _read(TEMPLATE_PATH)
+    body = text.split("---\n", 2)[2]
+    headings = [
+        line.lstrip("# ")
+        for line in body.splitlines()
+        if line.startswith("#")
+    ]
+    normalized_skill = " ".join(skill.split())
+
+    assert "English section titles" in normalized_skill
+    assert "Chinese narrative" in normalized_skill
+    assert headings
+    assert all(not re.search(r"[\u4e00-\u9fff]", heading) for heading in headings)
+    assert re.search(r"[\u4e00-\u9fff]", body)
+    for field in (
+        "`failure_pattern`",
+        "`hypothesis`",
+        "`supporting_evidence`",
+        "`counter_evidence`",
+        "`adoption_target`",
+    ):
+        assert field in body
+
+
 def test_checked_in_learning_claims_follow_active_pending_contract() -> None:
     learning_root = ROOT / "docs" / "record_for_agent" / "learning"
 
