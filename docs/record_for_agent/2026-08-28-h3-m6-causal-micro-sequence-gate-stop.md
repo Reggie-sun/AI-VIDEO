@@ -138,10 +138,51 @@ V6 task-scoped authorization 已按 exact scope 消耗完毕，未留下 later P
 或 assembly authorization。ComfyUI queue 在 cleanup 前为空；repository supervisor 已停止，listener 已关闭，
 checkout 已恢复为 clean `e01fb4c56b7a88149d469b99cbbfe3223d715054`。
 
-M6 Shot B 与 Shot C technical Gates 均为 `PASS`，但当前没有 assembly authorization。下一可选动作只能是先对
-`15.5s` review assembly 做独立 read-only exact preview，并重新取得 task-scoped authorization；不得从本次
-technical PASS 自动串联 assembly。`30s` assembly、M7–M9、qualification、aggregate Gate expansion、HUMAN
-verdict、P6、Final Acceptance、Production qualification、commercial acceptance 与 release 继续 deferred。
+M6 Shot A、Shot B 与 Shot C technical Gates 均为 `PASS`。`15.5s` review assembly 的独立 read-only exact
+preview 已完成，但尚未获得绑定该 preview SHA-256 的 task-scoped authorization；不得从 per-Shot technical
+PASS 自动串联 assembly。`30s` assembly、M7–M9、qualification、aggregate Gate expansion、HUMAN verdict、
+P6、Final Acceptance、Production qualification、commercial acceptance 与 release 继续 deferred。
+
+### 15.5s Review Assembly Exact Authorization Preview
+
+- Exact preview:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-review-assembly-v1/sidecars/assembly-exact-authorization-preview.json`
+- Preview SHA-256:
+  `3aa952fb81843bf968336b625ad4a6e9d12fb9d63c3b8c18f65f27e1a8ca5226`
+- Ordered exact inputs / Gate hashes:
+  1. Shot A v1 output `9ecf69e3a3e22fd6a49a5cd5b1e0bb9ea7b456abfd1944cf4ca87d6c061473f7`；
+     Gate `6ccb00e31a1d2558305c27a34d60341344e5f07c394d405dc3c2a676ef519c2f`。
+  2. Shot B v3 output `bd47e8ee13729a1c6bdc3832cc9419907d00460cb00f91ff6f6887aa75c1971c`；
+     Gate `4f8e33349a2e34058112afd88f27000c47f955fcbea1d3b140975bb44db40651`。
+  3. Shot C v6 output `b890b8531a676e47be2c7053c7ca14de93950094ed6acc434160ece742b274ad`；
+     Gate `e157258a38c07b7c56ee1ff0f2ee81c635f1073498c0b167035f4096e354706b`。
+- 三条 exact MP4 都是 `H.264 High/yuv420p/768x768/24fps/124 frames` + `AAC LC/32kHz/stereo`；
+  video extradata SHA-256 均为
+  `5da34f9acd67d7b40b75caa870230c89713dd4fb333de09cd93be764357c47c2`，audio extradata SHA-256 均为
+  `53efd1548fcbfdf332ca094f053edac8423b8660a6a265d3c5877e080054c2bf`。因此 preflight 支持一次
+  concat-demuxer stream-copy hard-cut remux，无需 re-encode、xfade、retime、interpolation、padding 或 audio mix。
+- Exact future tool: `/home/reggie/miniconda3/bin/ffmpeg`，binary SHA-256
+  `dd89959487c367363d4813df29f6d0f736ed6c30b5c0dcee75649a434ec56dc0`。Future assembly call limit 为
+  `1`，使用 `-f concat -safe 0 -c copy -movflags +faststart`，且 `-n` 禁止覆盖既有 destination。
+- Future concat-list exact bytes SHA-256:
+  `02fb464b53455fa720a419ca5839030ee594d8172bd09f0a5c6be12bb173ad44`；当前 list 尚未物化。
+- Future output destination:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-review-assembly-v1/outputs/m6-causal-micro-sequence-15.5s-review-v1.mp4`；
+  当前不存在。
+- Future local verification 只允许一次 `ffprobe`、一次 full video/audio decode；project-local
+  `video-analysis`、Provider/H3、ComfyUI、image generation/edit、retry、variant、fallback、remote/paid、30s
+  assembly 与 M7–M9 action 均为 `0`。
+- Stream-copy output 预计为 `372` video frames / `15.5s` video；AAC packet granularity 可能使 container/audio
+  probe 约为 `15.501s`，必须在 future exact output 后实测，不能由 preview 预先宣称。
+- Future HUMAN Gate 绑定 exact assembled SHA，并要求用户 uninterrupted `1.0x` full-speed/full-audio review；
+  A→B、B→C holder/presence/action boundaries、complete causal reachability、conditioning/camera、performance、
+  no-dialogue Dialogue Performance/Lip-sync、readability/pacing 都必须逐项 `PASS`。任何 technical verification
+  不得自动生成 HUMAN PASS。
+- Stop rule: execution 前必须重验 preview/input/Gate/tool/list hashes 与 absent destination；任何 mismatch、
+  missing、non-PASS、existing output 或 unknown outcome 均 fail closed。授权后也只允许 exact one-shot assembly
+  与本地 verification，然后停止并交付用户 HUMAN review；不得自动继续 30s assembly 或 M7–M9。
+- Automatic learning evaluation: `no_candidate`。本 checkpoint 只有 deterministic assembly preview，没有新的
+  independent media attempt、controlled comparison 或 HUMAN verdict，不创建 Learning Claim placeholder。
 
 Durable V6 preview record checkpoint: `92ffb1e2980c887bfcd74833ddf0e0d9db805872`。
 
