@@ -209,7 +209,13 @@ function mediaHtml(token, media) {
   const safeMime = escapeHtml(mime);
   const mediaSrc = `/api/runs/media/${token}`;
   const mediaTag = isVideo
-    ? `<video class="frame" src="${mediaSrc}" controls preload="metadata" aria-label="已注册视频"></video>`
+    ? `<section class="video-frame">
+  <video id="registered-video" class="frame" src="${mediaSrc}" controls preload="metadata" playsinline aria-label="已注册视频"></video>
+  <div class="sound-control">
+    <span id="sound-status">默认未静音；如没有声音，请点击右侧按钮。</span>
+    <button id="enable-sound" type="button">开启声音并播放</button>
+  </div>
+</section>`
     : `<img class="frame" src="${mediaSrc}" alt="已注册图片" />`;
   const shortToken = token.length > 16 ? `${token.slice(0, 8)}…${token.slice(-4)}` : token;
   return `<!doctype html>
@@ -218,6 +224,7 @@ function mediaHtml(token, media) {
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="referrer" content="no-referrer" />
+<link rel="icon" href="data:," />
 <title>已注册媒体 · Provider Console</title>
 <style>
   * { box-sizing: border-box; }
@@ -229,7 +236,11 @@ function mediaHtml(token, media) {
   a.back { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #1c2730; color: #d6dee5; border-radius: 6px; text-decoration: none; font-size: 13px; }
   a.back:hover, a.back:focus { background: #283542; outline: none; }
   main { display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 56px - 44px); padding: 24px; }
-  video.frame, img.frame { max-width: 100%; max-height: calc(100vh - 56px - 44px - 48px); background: #020508; border: 1px solid #283542; border-radius: 6px; object-fit: contain; }
+  .video-frame { max-width: 100%; background: #020508; border: 1px solid #283542; border-radius: 6px; overflow: hidden; }
+  video.frame, img.frame { display: block; max-width: 100%; max-height: calc(100vh - 56px - 44px - 48px); background: #020508; border: 0; object-fit: contain; }
+  .sound-control { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border-top: 1px solid #283542; background: #0c151e; color: #aeb7c1; font-size: 12px; }
+  .sound-control button { min-height: 30px; padding: 0 10px; border: 1px solid #6656c2; border-radius: 4px; background: #29234d; color: #eeeaff; font: inherit; cursor: pointer; }
+  .sound-control button:hover, .sound-control button:focus { background: #342b61; outline: none; }
   footer { padding: 10px 20px; font-size: 12px; color: #7d8a93; border-top: 1px solid #1c2730; display: flex; gap: 16px; flex-wrap: wrap; }
   footer code { color: #9aa7b0; }
 </style>
@@ -245,6 +256,25 @@ function mediaHtml(token, media) {
   <span>大小：<code>${media.size.toLocaleString("en-US")} bytes</code></span>
   <span>关闭此标签或点“返回 Console”回到工作区。</span>
 </footer>
+${isVideo ? `<script>
+  const video = document.getElementById("registered-video");
+  const soundButton = document.getElementById("enable-sound");
+  const soundStatus = document.getElementById("sound-status");
+  video.defaultMuted = false;
+  video.muted = false;
+  video.volume = 1;
+  soundButton.addEventListener("click", async () => {
+    video.defaultMuted = false;
+    video.muted = false;
+    video.volume = 1;
+    try {
+      await video.play();
+      soundStatus.textContent = "声音已开启并开始播放。";
+    } catch {
+      soundStatus.textContent = "浏览器阻止了播放，请再点一次视频播放键。";
+    }
+  });
+</script>` : ""}
 </body>
 </html>`;
 }

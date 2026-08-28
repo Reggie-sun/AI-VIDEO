@@ -1,16 +1,31 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { createServer } from "vite";
 
-import {
-  CONTINUITY_DIMENSIONS,
-  ContinuityReviewPanel,
-  createHumanReviewDecision,
-  projectionMatchesTarget,
-  validateHumanReviewDecision,
-} from "../src/continuity-review.js";
+const providerConsoleRoot = fileURLToPath(new URL("..", import.meta.url));
+let continuityReviewModulePromise;
+
+async function continuityReviewModule() {
+  if (!continuityReviewModulePromise) {
+    continuityReviewModulePromise = (async () => {
+      const server = await createServer({
+        root: providerConsoleRoot,
+        server: { middlewareMode: true },
+        appType: "custom",
+      });
+      try {
+        return await server.ssrLoadModule("/src/continuity-review.js");
+      } finally {
+        await server.close();
+      }
+    })();
+  }
+  return continuityReviewModulePromise;
+}
 
 const request = {
   attempt_id: "attempt-1",
@@ -28,6 +43,7 @@ const request = {
 };
 
 test("decision builder seals all seven values and rejects tampering", async () => {
+  const { CONTINUITY_DIMENSIONS, createHumanReviewDecision, validateHumanReviewDecision } = await continuityReviewModule();
   const values = Object.fromEntries(
     CONTINUITY_DIMENSIONS.map(([key], index) => [key, index === 2 ? "NOT_SURE" : "PASS"]),
   );
@@ -47,7 +63,8 @@ test("decision builder seals all seven values and rejects tampering", async () =
   await assert.rejects(createHumanReviewDecision(request, values, "  "), /rationale/);
 });
 
-test("review panel renders seven locked dimensions, NOT_SURE, rationale, and export boundary", () => {
+test("review panel renders seven locked dimensions, NOT_SURE, rationale, and export boundary", async () => {
+  const { CONTINUITY_DIMENSIONS, ContinuityReviewPanel, projectionMatchesTarget } = await continuityReviewModule();
   const projection = {
     workspace: "demo/project.yaml",
     attempt_id: "attempt-1",
@@ -77,6 +94,9 @@ test("review panel renders seven locked dimensions, NOT_SURE, rationale, and exp
   assert.match(markup, /Rationale（必填）/);
   assert.match(markup, /continuity-human@1/);
   assert.match(markup, new RegExp(request.content_hash));
+  assert.match(markup, /class="audible-video"/);
+  assert.match(markup, /开启声音并播放/);
+  assert.match(markup, /class="audible-video"><video class="continuity-video"/);
   assert.match(markup, /<button[^>]*>导出人工 decision 文件<\/button>/);
   assert.equal(projectionMatchesTarget(projection, "demo/project.yaml", "attempt-1"), true);
   assert.equal(projectionMatchesTarget(projection, "demo/project.yaml", "attempt-2"), false);

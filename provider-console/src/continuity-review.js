@@ -3,6 +3,7 @@ import {
   CONTINUITY_DIMENSIONS,
   createHumanReviewDecision,
 } from "./continuity-review-contract.js";
+import { AudibleVideo } from "./media-player.jsx";
 
 export {
   CONTINUITY_DIMENSIONS,
@@ -99,7 +100,7 @@ export function ContinuityReviewPanel({ projection, onExport }) {
       h("span", { className: "continuity-lock-badge" }, "Exact-bound"),
     ),
     mediaToken
-      ? h("video", { className: "continuity-video", src: `/api/runs/media/${encodeURIComponent(mediaToken)}`, controls: true, preload: "metadata", "aria-label": "待审 continuity fetched video" })
+      ? h(AudibleVideo, { className: "continuity-video", src: `/api/runs/media/${encodeURIComponent(mediaToken)}`, preload: "metadata", "aria-label": "待审 continuity fetched video" })
       : h("p", { className: "continuity-warning" }, "Exact fetched MP4 当前不可预览。"),
     h("div", { className: "continuity-shot-grid" },
       h(ShotCard, { label: "Source Shot", shot: projection.source_shot, fallbackId: request.source_shot_id }),

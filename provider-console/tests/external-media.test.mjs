@@ -201,6 +201,145 @@ test("external project evidence chain joins exact result bytes to sealed prompt,
   assert.equal(rejectedGroup.reported_status, null);
 });
 
+test("development artifact receipt and state bind exact Shot prompt, type, and reported status", async () => {
+  const paths = await fixture();
+  const runtime = path.join(paths.artifacts, "runtime");
+  const prompts = path.join(paths.artifacts, "prompts");
+  const media = path.join(runtime, "shot-problem.mp4");
+  const prompt = path.join(prompts, "shot-problem.txt");
+  const receipt = path.join(runtime, "shot-problem.receipt.json");
+  const state = path.join(runtime, "shot-problem.state.json");
+  const bytes = Buffer.from("artifact receipt media");
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  const promptText = "exact artifact prompt";
+  const promptSha256 = createHash("sha256").update(promptText).digest("hex");
+  await Promise.all([mkdir(runtime), mkdir(prompts)]);
+  await writeFile(media, bytes);
+  await writeFile(prompt, promptText);
+  await writeFile(receipt, JSON.stringify({
+    output: { path: "artifacts/runtime/shot-problem.mp4", sha256, size_bytes: bytes.length },
+    prompt_id: "prompt-1",
+    prompt_path: "artifacts/prompts/shot-problem.txt",
+    prompt_sha256: promptSha256,
+    seed: 42,
+    settings: { mode: "FL2VA" },
+    shot_id: "shot-problem",
+  }));
+  await writeFile(state, JSON.stringify({
+    output_sha256: sha256,
+    prompt_id: "prompt-1",
+    receipt: "artifacts/runtime/shot-problem.receipt.json",
+    seed: 42,
+    shot_id: "shot-problem",
+    status: "completed",
+  }));
+
+  const result = await catalogExternalMedia({ sources: sources(paths) });
+  const group = result.groups.find((item) => item.sha256 === sha256);
+  assert.equal(group.metadata_status, "verified_artifact_receipt");
+  assert.equal(group.shot_id, "shot-problem");
+  assert.equal(group.prompt_text, promptText);
+  assert.equal(group.generation_type, "FL2VA");
+  assert.equal(group.reported_status, "completed");
+  assert.deepEqual(group.evidence_refs.map((item) => item.relative_path), [
+    "prompts/shot-problem.txt",
+    "runtime/shot-problem.receipt.json",
+    "runtime/shot-problem.state.json",
+  ]);
+
+  await writeFile(prompt, "prompt changed after generation");
+  const promptMismatch = await catalogExternalMedia({ sources: sources(paths) });
+  const promptMismatchGroup = promptMismatch.groups.find((item) => item.sha256 === sha256);
+  assert.equal(promptMismatchGroup.metadata_status, "verified_artifact_receipt");
+  assert.equal(promptMismatchGroup.shot_id, "shot-problem");
+  assert.equal(promptMismatchGroup.prompt_text, null);
+  assert.deepEqual(promptMismatchGroup.evidence_refs.map((item) => item.relative_path), [
+    "runtime/shot-problem.receipt.json",
+    "runtime/shot-problem.state.json",
+  ]);
+
+  await writeFile(state, JSON.stringify({
+    output_sha256: "f".repeat(64),
+    prompt_id: "prompt-1",
+    receipt: "artifacts/runtime/shot-problem.receipt.json",
+    seed: 42,
+    shot_id: "shot-problem",
+    status: "completed",
+  }));
+  const rejected = await catalogExternalMedia({ sources: sources(paths) });
+  const rejectedGroup = rejected.groups.find((item) => item.sha256 === sha256);
+  assert.equal(rejectedGroup.metadata_status, "not_evaluated");
+  assert.equal(rejectedGroup.prompt_text, null);
+  assert.equal(rejectedGroup.reported_status, null);
+});
+
+test("an exact final checksum exposes only the colocated declared ecommerce Shot plan", async () => {
+  const paths = await fixture();
+  const project = path.join(paths.artifacts, "ad-project");
+  const final = path.join(project, "final");
+  const media = path.join(final, "ad.mp4");
+  const checksum = path.join(final, "ad.sha256");
+  const bytes = Buffer.from("declared final bytes");
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  await mkdir(final, { recursive: true });
+  await writeFile(media, bytes);
+  await writeFile(checksum, `${sha256}  ad.mp4\n`);
+  await writeFile(path.join(project, "ecommerce-package.json"), JSON.stringify({
+    schema_version: "ecommerce-ad-workflow/package/2",
+    storyboard: [{ shot_ids: ["shot-problem", "shot-close"] }],
+    shot_intents: [
+      { shot_id: "shot-problem", beat_id: "beat-shared", purpose: "建立问题", start_seconds: 0, end_seconds: 3, duration_basis: "HOOK_DENSITY", talent_action: "人物闻到异味", audio_event_ids: ["audio-problem"] },
+      { shot_id: "shot-close", beat_id: "beat-shared", purpose: "产品收口", start_seconds: 3, end_seconds: 5, duration_basis: "CTA_DWELL", talent_action: null, audio_event_ids: ["audio-close"] },
+    ],
+    copy_graphics_plan: [
+      { shot_id: "shot-problem", text: "汗湿黏腻？" },
+      { shot_id: "shot-close", text: "抑汗｜净味" },
+    ],
+    audio_plan: { events: [
+      { event_id: "audio-problem", kind: "DIALOGUE", beat_ids: ["beat-shared"], shot_ids: ["shot-problem"], verbatim_line: "试试青颜" },
+      { event_id: "audio-close", kind: "VOICE_OVER", beat_ids: ["beat-shared"], shot_ids: ["shot-close"], verbatim_line: "抑汗净味" },
+      { event_id: "audio-unrelated", kind: "DIALOGUE", beat_ids: ["beat-shared"], shot_ids: ["shot-other"], verbatim_line: "不得串入其他 Shot" },
+    ] },
+  }));
+
+  const result = await catalogExternalMedia({ sources: sources(paths) });
+  const group = result.groups.find((item) => item.sha256 === sha256);
+  assert.equal(group.composition.composition_status, "declared");
+  assert.equal(group.composition.association_status, "co_located_declared_package");
+  assert.deepEqual(group.composition.ordered_shots, [
+    {
+      shot_id: "shot-problem",
+      duration_basis: "HOOK_DENSITY",
+      reported_status: "DECLARED_NOT_EVALUATED",
+      purpose: "建立问题",
+      talent_action: "人物闻到异味",
+      start_seconds: 0,
+      end_seconds: 3,
+      copy: ["汗湿黏腻？"],
+      dialogue: ["试试青颜"],
+    },
+    {
+      shot_id: "shot-close",
+      duration_basis: "CTA_DWELL",
+      reported_status: "DECLARED_NOT_EVALUATED",
+      purpose: "产品收口",
+      talent_action: null,
+      start_seconds: 3,
+      end_seconds: 5,
+      copy: ["抑汗｜净味"],
+      dialogue: ["抑汗净味"],
+    },
+  ]);
+  assert.deepEqual(group.evidence_refs.map((item) => item.relative_path), [
+    "ad-project/ecommerce-package.json",
+    "ad-project/final/ad.sha256",
+  ]);
+
+  await writeFile(checksum, `${"f".repeat(64)}  ad.mp4\n`);
+  const rejected = await catalogExternalMedia({ sources: sources(paths) });
+  assert.equal(rejected.groups.find((item) => item.sha256 === sha256).composition, null);
+});
+
 test("a direct sha256 sidecar binding is accepted without inferring anything from the filename", async () => {
   const paths = await fixture();
   const media = path.join(paths.raw, "opaque-name.m4v");

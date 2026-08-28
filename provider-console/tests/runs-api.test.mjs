@@ -10,9 +10,11 @@ import {
   attemptOutcome,
   generationTypeOf,
   outputState,
+  projectShotRows,
   shotForAttempt,
 } from "../src/run-detail-contract.js";
 import {
+  externalSourceOptions,
   externalGroupTitle,
   externalMediaUrl,
   externalStatus,
@@ -21,6 +23,10 @@ import {
   preferredExternalLocation,
   readExternalCatalogResponse,
 } from "../src/external-media-contract.js";
+import {
+  enableMediaSound,
+  mediaHasAudioTrack,
+} from "../src/media-player-contract.js";
 
 test("run detail contract keeps lifecycle outcome separate from phase and media", () => {
   assert.deepEqual(attemptOutcome({ status: "succeeded", phase: "activate" }), {
@@ -106,6 +112,28 @@ test("run detail contract derives generation mode and exact-attempt Shot only", 
   }), activeShot);
 });
 
+test("project Shot rows keep Project order, all attempts, and unmatched evidence", () => {
+  const detail = {
+    shots: [
+      { shot_id: "shot-2", intent: "second" },
+      { shot_id: "shot-1", intent: "first" },
+    ],
+    attempts: [
+      { attempt_id: "attempt-1a", target_shot_id: "shot-1" },
+      { attempt_id: "attempt-orphan", target_shot_id: "shot-missing" },
+      { attempt_id: "attempt-1b", target_shot_id: "shot-1" },
+    ],
+  };
+
+  assert.deepEqual(projectShotRows(detail), {
+    rows: [
+      { shot: detail.shots[0], attempts: [] },
+      { shot: detail.shots[1], attempts: [detail.attempts[0], detail.attempts[2]] },
+    ],
+    unmatched: [detail.attempts[1]],
+  });
+});
+
 test("external media UI contract keeps non-canonical unknowns explicit", () => {
   const group = {
     sha256: "a".repeat(64),
@@ -128,11 +156,62 @@ test("external media UI contract keeps non-canonical unknowns explicit", () => {
   assert.equal(groupMatchesSource(group, "all"), true);
   assert.equal(groupMatchesQuery(group, "shot.mp4"), true);
   assert.equal(groupMatchesQuery({ ...group, shot_id: "shot-07", prompt_text: "yellow bottle" }, "YELLOW BOTTLE"), true);
+  assert.equal(groupMatchesQuery({ ...group, composition: { ordered_shots: [{ shot_id: "shot-close", purpose: "产品收口", copy: ["抑汗净味"] }] } }, "产品收口"), true);
+  assert.equal(groupMatchesQuery({ ...group, composition: { ordered_shots: [{ shot_id: "shot-close", purpose: "产品收口", copy: ["抑汗净味"] }] } }, "抑汗净味"), true);
   assert.equal(groupMatchesQuery(group, "missing"), false);
   assert.equal(externalStatus({ status: "succeeded" }).tone, "unknown");
   assert.equal(externalStatus({ status: "failed" }).tone, "unknown");
   assert.equal(externalStatus({ status: "NOT_EVALUATED", reported_status: "succeeded" }).tone, "ready");
   assert.equal(externalStatus({ status: "NOT_EVALUATED", reported_status: false }).tone, "blocked");
+});
+
+test("external source selector stays compact and defaults to all sources", () => {
+  const catalog = {
+    groups: [
+      { locations: [{ source_id: "artifacts" }] },
+      { locations: [{ source_id: "comfyui-output" }] },
+      { locations: [{ source_id: "artifacts" }, { source_id: "comfyui-output" }] },
+    ],
+    sources: [
+      { id: "artifacts", label: "AI-VIDEO Artifacts", status: "available" },
+      { id: "comfyui-output", label: "ComfyUI Output", status: "available" },
+      { id: "missing", label: "Missing", status: "unavailable" },
+    ],
+  };
+
+  assert.deepEqual(externalSourceOptions(catalog), [
+    { id: "all", label: "全部外部来源", count: 3, disabled: false },
+    { id: "artifacts", label: "AI-VIDEO Artifacts", count: 2, disabled: false },
+    { id: "comfyui-output", label: "ComfyUI Output", count: 2, disabled: false },
+    { id: "missing", label: "Missing", count: 0, disabled: true },
+  ]);
+});
+
+test("audible media contract detects tracks and explicitly enables playback", async () => {
+  const stopped = [];
+  const videoWithAudio = {
+    captureStream: () => ({
+      getAudioTracks: () => [{ stop: () => stopped.push("audio") }],
+      getVideoTracks: () => [{ stop: () => stopped.push("video") }],
+    }),
+  };
+  assert.equal(mediaHasAudioTrack(videoWithAudio), true);
+  assert.deepEqual(stopped, ["audio", "video"]);
+  assert.equal(mediaHasAudioTrack({ captureStream: () => ({ getAudioTracks: () => [], getVideoTracks: () => [] }) }), false);
+  assert.equal(mediaHasAudioTrack({}), null);
+
+  let played = false;
+  const playable = {
+    defaultMuted: true,
+    muted: true,
+    volume: 0,
+    play: async () => { played = true; },
+  };
+  await enableMediaSound(playable);
+  assert.equal(playable.defaultMuted, false);
+  assert.equal(playable.muted, false);
+  assert.equal(playable.volume, 1);
+  assert.equal(played, true);
 });
 
 test("external catalog response maps static non-JSON failures to a stable Chinese unavailable state", async () => {
@@ -520,6 +599,36 @@ test("media endpoint serves an HTML wrapper when client accepts text/html", asyn
   assert.equal(body.includes("image/png"), true);
   assert.equal(body.includes(`${imageBytes.length.toLocaleString("en-US")} bytes`), true);
   assert.equal(body.includes(image), false);
+});
+
+test("video HTML wrapper explicitly enables sound inside the user gesture", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-video-html-"));
+  const video = path.join(root, "runs", "demo", "clip.mp4");
+  const bytes = Buffer.from("0123456789");
+  await mkdir(path.dirname(video), { recursive: true });
+  await writeFile(video, bytes);
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({
+      workspace: "demo/project.yaml",
+      attempts: [],
+      _media: { videotoken: { source_path: video, mime_type: "video/mp4", bytes: bytes.length } },
+    }),
+  });
+  await invoke(handler, request("GET", "/api/runs/detail?workspace=demo%2Fproject.yaml"));
+
+  const html = await invoke(handler, request("GET", "/api/runs/media/videotoken", { accept: "text/html" }));
+  assert.equal(html.res.statusCode, 200);
+  const body = html.res.body.toString("utf8");
+  assert.match(body, /<video id="registered-video"[^>]*controls[^>]*playsinline/);
+  assert.match(body, /<link rel="icon" href="data:," \/>/);
+  assert.match(body, /开启声音并播放/);
+  assert.match(body, /video\.defaultMuted = false;/);
+  assert.match(body, /video\.muted = false;/);
+  assert.match(body, /video\.volume = 1;/);
+  assert.match(body, /soundButton\.addEventListener\("click", async \(\) =>/);
+  assert.match(body, /await video\.play\(\);/);
+  assert.equal(body.includes(video), false);
 });
 
 test("media endpoint keeps serving bytes when client omits Accept", async () => {

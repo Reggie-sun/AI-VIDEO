@@ -50,6 +50,22 @@ export function shotForAttempt(detail, attempt) {
     : {};
 }
 
+export function projectShotRows(detail) {
+  const shots = Array.isArray(detail?.shots) ? detail.shots : [];
+  const attempts = Array.isArray(detail?.attempts) ? detail.attempts : [];
+  const shotIds = new Set(shots.map((shot) => shot?.shot_id || shot?.id).filter(Boolean));
+  return {
+    rows: shots.map((shot) => {
+      const shotId = shot?.shot_id || shot?.id;
+      return {
+        shot,
+        attempts: attempts.filter((attempt) => (attempt?.target_shot_id || attempt?.shot_id) === shotId),
+      };
+    }),
+    unmatched: attempts.filter((attempt) => !shotIds.has(attempt?.target_shot_id || attempt?.shot_id)),
+  };
+}
+
 export function outputState(attempt) {
   const outcome = attemptOutcome(attempt);
   if (attempt?.candidate_media) {

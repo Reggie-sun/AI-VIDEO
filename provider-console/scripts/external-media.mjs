@@ -191,6 +191,7 @@ async function metadataForMedia(sidecars, media, limits) {
   const metadata = {};
   const evidenceRefs = [];
   let verifiedChain = null;
+  let composition = null;
   for (const sidecarPath of sidecars) {
     try {
       const parsed = await readSidecarObject(sidecarPath, limits, media.source_root);
@@ -201,6 +202,12 @@ async function metadataForMedia(sidecars, media, limits) {
           verifiedChain = await externalProjectEvidenceChain(sidecarPath, parsed, media, limits) || verifiedChain;
         }
       }
+      if (media.source_kind === "development_artifact" && sidecarPath.endsWith(".receipt.json")) {
+        verifiedChain = await artifactReceiptEvidenceChain(sidecarPath, parsed, media, limits) || verifiedChain;
+      }
+      if (media.source_kind === "development_artifact" && path.basename(sidecarPath) === "ecommerce-package.json") {
+        composition = await declaredEcommerceComposition(sidecarPath, parsed, media, limits) || composition;
+      }
       if (parsed.schema === EXTERNAL_METADATA_SCHEMA) {
         collectMetadata(parsed, sidecarPath, media, false, metadata);
       }
@@ -210,8 +217,9 @@ async function metadataForMedia(sidecars, media, limits) {
   }
   return {
     metadata: { ...metadata, ...(verifiedChain?.metadata || {}) },
-    metadata_status: verifiedChain ? "verified_evidence_chain" : Object.keys(metadata).length ? "bound" : "not_evaluated",
+    metadata_status: verifiedChain?.status || (Object.keys(metadata).length ? "bound" : "not_evaluated"),
     evidence_refs: [...new Set([...evidenceRefs, ...(verifiedChain?.evidence_refs || [])])].sort(),
+    composition,
   };
 }
 
@@ -255,6 +263,7 @@ async function externalProjectEvidenceChain(resultPath, result, media, limits) {
       || !observation.state
     ) return null;
     return {
+      status: "verified_evidence_chain",
       metadata: {
         prompt: resolved.prompt_text,
         shot: request.target_shot_id,
@@ -263,6 +272,174 @@ async function externalProjectEvidenceChain(resultPath, result, media, limits) {
       },
       evidence_refs: [path.basename(resultPath), ...names]
         .map((name) => path.relative(media.source_root, path.join(directory, name)).split(path.sep).join("/")),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function resolveSourceReference(root, reference) {
+  if (typeof reference !== "string" || !reference || reference.includes("\0") || path.isAbsolute(reference)) return null;
+  const normalized = reference.split("\\").join("/");
+  const sourcePrefix = `${path.basename(root)}/`;
+  const rootRelative = normalized.startsWith(sourcePrefix) ? normalized.slice(sourcePrefix.length) : normalized;
+  const parts = rootRelative.split("/");
+  if (!parts.length || parts.some((part) => !part || part === "." || part === "..")) return null;
+  const resolved = path.resolve(root, ...parts);
+  return containedPath(root, resolved) ? resolved : null;
+}
+
+async function readBoundPrompt(promptPath, expectedSha256, limits, root) {
+  if (!/^[a-f0-9]{64}$/i.test(expectedSha256 || "")) return null;
+  const file = await open(promptPath, constants.O_RDONLY | constants.O_NOFOLLOW);
+  try {
+    const [stat, openedPath] = await Promise.all([
+      file.stat(),
+      realpath(`/proc/self/fd/${file.fd}`),
+    ]);
+    if (!stat.isFile() || stat.size > limits.maxSidecarBytes || openedPath !== promptPath || !containedPath(root, openedPath)) return null;
+    const bytes = await file.readFile();
+    if (createHash("sha256").update(bytes).digest("hex") !== expectedSha256.toLowerCase()) return null;
+    const prompt = bytes.toString("utf8").trim();
+    return prompt ? prompt.slice(0, 8_000) : null;
+  } finally {
+    await file.close();
+  }
+}
+
+async function artifactReceiptEvidenceChain(receiptPath, receipt, media, limits) {
+  try {
+    const outputPath = resolveSourceReference(media.source_root, receipt?.output?.path);
+    if (
+      outputPath !== media.source_path
+      || String(receipt?.output?.sha256 || "").toLowerCase() !== media.sha256
+      || Number(receipt?.output?.size_bytes) !== media.bytes
+    ) return null;
+
+    const statePath = receiptPath.replace(/\.receipt\.json$/, ".state.json");
+    if (statePath === receiptPath) return null;
+    const state = await readSidecarObject(statePath, limits, media.source_root);
+    const declaredReceiptPath = resolveSourceReference(media.source_root, state?.receipt);
+    const promptPath = resolveSourceReference(media.source_root, receipt?.prompt_path);
+    const shot = boundedString(receipt?.shot_id);
+    const generationType = boundedString(receipt?.settings?.mode);
+    const reportedStatus = boundedString(state?.status);
+    if (
+      !state
+      || declaredReceiptPath !== receiptPath
+      || String(state.output_sha256 || "").toLowerCase() !== media.sha256
+      || !sameNonEmptyString(state.shot_id, receipt.shot_id)
+      || !sameNonEmptyString(state.prompt_id, receipt.prompt_id)
+      || Number(state.seed) !== Number(receipt.seed)
+      || !shot
+      || !generationType
+      || !reportedStatus
+    ) return null;
+    const prompt = promptPath
+      ? await readBoundPrompt(promptPath, receipt.prompt_sha256, limits, media.source_root)
+      : null;
+    return {
+      status: "verified_artifact_receipt",
+      metadata: {
+        ...(prompt ? { prompt } : {}),
+        shot,
+        generation_type: generationType,
+        status: reportedStatus,
+      },
+      evidence_refs: [...(prompt ? [promptPath] : []), receiptPath, statePath]
+        .map((reference) => path.relative(media.source_root, reference).split(path.sep).join("/")),
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function checksumBindsMedia(checksumPath, media, limits) {
+  const file = await open(checksumPath, constants.O_RDONLY | constants.O_NOFOLLOW);
+  try {
+    const [stat, openedPath] = await Promise.all([
+      file.stat(),
+      realpath(`/proc/self/fd/${file.fd}`),
+    ]);
+    if (!stat.isFile() || stat.size > Math.min(limits.maxSidecarBytes, 4_096) || openedPath !== checksumPath || !containedPath(media.source_root, openedPath)) return false;
+    const match = /^([a-f0-9]{64})(?:\s+[^\r\n]+)?$/i.exec((await file.readFile({ encoding: "utf8" })).trim());
+    return Boolean(match && match[1].toLowerCase() === media.sha256);
+  } finally {
+    await file.close();
+  }
+}
+
+function boundedString(value) {
+  return typeof value === "string" ? value.trim().slice(0, 8_000) || null : null;
+}
+
+function ecommerceShotProjection(shotId, intent, packageValue) {
+  const copy = Array.isArray(packageValue.copy_graphics_plan)
+    ? packageValue.copy_graphics_plan
+      .filter((entry) => entry?.shot_id === shotId)
+      .map((entry) => boundedString(entry?.text))
+      .filter(Boolean)
+    : [];
+  const audioEventIds = new Set(Array.isArray(intent.audio_event_ids) ? intent.audio_event_ids : []);
+  const dialogue = Array.isArray(packageValue.audio_plan?.events)
+    ? packageValue.audio_plan.events
+      .filter((event) => {
+        const kind = String(event?.kind || "").toUpperCase();
+        return (kind === "DIALOGUE" || kind === "VOICE_OVER")
+          && audioEventIds.has(event?.event_id)
+          && Array.isArray(event?.shot_ids)
+          && event.shot_ids.includes(shotId);
+      })
+      .map((event) => boundedString(event?.verbatim_line) || boundedString(event?.text))
+      .filter(Boolean)
+    : [];
+  return {
+    shot_id: shotId,
+    duration_basis: boundedString(intent.duration_basis),
+    reported_status: "DECLARED_NOT_EVALUATED",
+    purpose: boundedString(intent.purpose),
+    talent_action: boundedString(intent.talent_action),
+    ...(boundedString(intent.product_state) ? { product_state: boundedString(intent.product_state) } : {}),
+    ...(boundedString(intent.camera_intent) ? { camera_intent: boundedString(intent.camera_intent) } : {}),
+    ...(boundedString(intent.visual_strategy_need) ? { visual_strategy_need: boundedString(intent.visual_strategy_need) } : {}),
+    start_seconds: Number.isFinite(intent.start_seconds) ? intent.start_seconds : null,
+    end_seconds: Number.isFinite(intent.end_seconds) ? intent.end_seconds : null,
+    copy,
+    dialogue,
+  };
+}
+
+async function declaredEcommerceComposition(packagePath, packageValue, media, limits) {
+  try {
+    if (packageValue?.schema_version !== "ecommerce-ad-workflow/package/2") return null;
+    const projectRoot = path.dirname(packagePath);
+    const relativeMedia = path.relative(projectRoot, media.source_path);
+    const mediaParts = relativeMedia.split(path.sep);
+    if (path.isAbsolute(relativeMedia) || mediaParts[0] !== "final" || mediaParts.length < 2) return null;
+    const extension = path.extname(media.source_path);
+    const checksumPath = `${media.source_path.slice(0, -extension.length)}.sha256`;
+    if (!await checksumBindsMedia(checksumPath, media, limits)) return null;
+    if (!Array.isArray(packageValue.storyboard) || !Array.isArray(packageValue.shot_intents)) return null;
+    const orderedShotIds = packageValue.storyboard.flatMap((group) => Array.isArray(group?.shot_ids) ? group.shot_ids : []);
+    if (
+      !orderedShotIds.length
+      || orderedShotIds.length > 200
+      || orderedShotIds.some((shotId) => !boundedString(shotId))
+      || new Set(orderedShotIds).size !== orderedShotIds.length
+    ) return null;
+    const intents = new Map();
+    for (const intent of packageValue.shot_intents) {
+      const shotId = boundedString(intent?.shot_id);
+      if (!shotId || intents.has(shotId)) return null;
+      intents.set(shotId, intent);
+    }
+    if (orderedShotIds.some((shotId) => !intents.has(shotId))) return null;
+    return {
+      composition_status: "declared",
+      association_status: "co_located_declared_package",
+      ordered_shots: orderedShotIds.map((shotId) => ecommerceShotProjection(shotId, intents.get(shotId), packageValue)),
+      evidence_refs: [packagePath, checksumPath]
+        .map((reference) => path.relative(media.source_root, reference).split(path.sep).join("/")),
     };
   } catch {
     return null;
@@ -303,13 +480,14 @@ async function scanSource(source, limits) {
         mime_type,
         ...inspected,
       };
-      const { metadata, metadata_status, evidence_refs } = await metadataForMedia(sidecars, media, limits);
+      const { metadata, metadata_status, evidence_refs, composition } = await metadataForMedia(sidecars, media, limits);
       records.push({
         ...media,
         source_label: sourceLabel,
         metadata,
         metadata_status,
-        evidence_refs,
+        evidence_refs: [...new Set([...evidence_refs, ...(composition?.evidence_refs || [])])].sort(),
+        composition,
       });
     } catch {
       // A file that changes while being inspected is omitted rather than guessed.
@@ -346,9 +524,10 @@ function groupProjection(records) {
       return compareRecords(left, right);
     });
     const preview = duplicates[0];
-    const metadataSource = duplicates.find((record) => record.metadata_status === "verified_evidence_chain")
+    const metadataSource = duplicates.find((record) => record.metadata_status.startsWith("verified_"))
       || duplicates.find((record) => record.metadata_status === "bound")
       || preview;
+    const compositionSource = duplicates.find((record) => record.composition);
     const token = externalToken(preview);
     const locations = duplicates
       .map((record) => {
@@ -400,6 +579,7 @@ function groupProjection(records) {
         .flatMap((record) => record.evidence_refs.map((relative_path) => ({ source_id: record.source_id, relative_path })))
         .map((reference) => [`${reference.source_id}/${reference.relative_path}`, reference])).values()]
         .sort((left, right) => `${left.source_id}/${left.relative_path}`.localeCompare(`${right.source_id}/${right.relative_path}`)),
+      composition: compositionSource?.composition || null,
       generation_status: "NOT_EVALUATED",
       lifecycle_status: "NOT_EVALUATED",
       evidence_classification: "non_canonical",

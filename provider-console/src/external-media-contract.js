@@ -36,9 +36,36 @@ export function groupMatchesSource(group, sourceId) {
   return (group?.locations || []).some((item) => item?.source_id === sourceId);
 }
 
+export function externalSourceOptions(catalog) {
+  const groups = Array.isArray(catalog?.groups) ? catalog.groups : [];
+  const sources = Array.isArray(catalog?.sources) ? catalog.sources : [];
+  return [
+    { id: "all", label: "全部外部来源", count: groups.length, disabled: false },
+    ...sources.map((source) => ({
+      id: source.id,
+      label: source.label || source.id || "未知来源",
+      count: groups.filter((group) => groupMatchesSource(group, source.id)).length,
+      disabled: source.status !== "available",
+    })),
+  ];
+}
+
 export function groupMatchesQuery(group, query) {
   const needle = String(query || "").trim().toLocaleLowerCase();
   if (!needle) return true;
+  const compositionValues = (group?.composition?.ordered_shots || []).flatMap((shot) => [
+    shot?.shot_id,
+    shot?.shot_type,
+    shot?.purpose,
+    shot?.talent_action,
+    shot?.product_state,
+    shot?.camera_intent,
+    shot?.visual_strategy_need,
+    shot?.prompt_text,
+    shot?.reported_status,
+    ...(shot?.copy || []),
+    ...(shot?.dialogue || []),
+  ]);
   const values = [
     externalGroupTitle(group),
     group?.shot_id,
@@ -46,6 +73,7 @@ export function groupMatchesQuery(group, query) {
     group?.generation_type,
     group?.reported_status,
     group?.prompt_text,
+    ...compositionValues,
     ...(group?.locations || []).flatMap((item) => [item?.relative_path, item?.source_label, item?.source_id]),
   ];
   return values.some((value) => String(value || "").toLocaleLowerCase().includes(needle));
