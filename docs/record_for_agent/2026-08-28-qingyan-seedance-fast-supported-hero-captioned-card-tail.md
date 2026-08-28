@@ -2,6 +2,23 @@
 
 Date: 2026-08-28
 
+## Caption Repair V2 — 2026-08-28
+
+用户随后以 exact screenshots 否决下文初版 `e965db27...fd694` 的字幕视觉：开场两条 opaque backplate 过大，Hero 上的短词 `青颜` 形成孤立方块。该初版的 timeline、audio、card order、Provider call count 与 codec 测量仍是历史事实，但不再作为当前 caption-quality evidence。
+
+当前 local review artifact 改为：
+
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v2-28s-review-only.mp4`
+
+- SHA-256: `2cb2b744e80e445515cf5d75e503347a4cb5f21bd3236a3069ebeade00c130bd`
+- 修复: 所有 dialogue / brand captions 移除矩形底板，统一为白字、黑描边和轻阴影
+- 开场拆分: `出汗黏衣` / `靠近也不自在`
+- 推荐拆分: `长辈递来这瓶` / `喷一下`
+- corrupt-source handling: corrected larger glyphs 放在原字幕 baseline，覆盖 embedded `粘` / `考` / `坤` 错字；不使用 opaque box、blur strip 或第二行重复字幕
+- Provider / network / paid call: `0`；本次仅执行 local deterministic re-composition
+
+本记录后续 `Caption Contract And Repair`、`Final Local Review Composition` 与 `Remaining Risks And Guardrails` 已更新到 V2；初版文件保留在本地，仅作为历史 evidence。
+
 ## Purpose
 
 本文记录用户拒绝旧手持 Hero 中“盒子突然悬浮”后的一次受限修复：保留已接受的因果叙事与原生中文音轨，使用一次 `doubao-seedance-2-0-fast-260128` 生成从首帧到末帧都有物理支撑的桌面产品 Hero，并把用户指定的三张广告图片按顺序作为结尾播放。同时建立字幕 Gate，纠正旧 Shot 1 已烧入的错字字幕，避免双层字幕和重复 slogan。
@@ -103,29 +120,30 @@ Evidence：
 
 1. authored Mandarin copy 是字幕文本 owner；Whisper near-homophones 只用于测量 timing，不能成为最终文案。
 2. clean-source caption 严格跟随 measured speech；final brand line 拆成 `青颜`、`抑汗净味`、`清爽舒适`、`近距离`、`更从容` 五个事件。
-3. 两条 corrupt-source caption 使用 opaque backplate 完全遮住旧字。为防旧字在语音结束后短暂重新出现，只允许 `0.60s` 与 `0.31s` cleanup tail，不增加新文案。
-4. `Noto Sans CJK SC`、最多两行、单行不超过 14 个中文字符；clean-source captions 使用 bottom safe area。
+3. 开场长句按自然语义与 measured audio 拆成 `出汗黏衣` / `靠近也不自在`，推荐句拆成 `长辈递来这瓶` / `喷一下`，避免横向长条字幕。
+4. `Noto Sans CJK SC`、最多两行、单行不超过 14 个中文字符；dialogue / brand captions 统一使用白字、黑描边与轻阴影，禁止 opaque 或 translucent rectangular backing。对 corrupt-source，corrected larger glyphs 必须放在原 baseline 并完全覆盖旧错字，不得出现 box、blur strip 或 duplicate line。
 5. 三张 card 的对白字幕保持在 disclosure 上方，不覆盖 card main copy；不得再次口播或新增未核验数据。
 
-Twenty-four start/inside/end boundary samples 与 8 representative samples 已人工复核；没有双层字幕、旧错字露出、clipping、card body-copy overlap 或 slogan repetition。
+Opening / tail contact sheets 与 exact full-size frames 已人工复核；没有矩形 dialogue backing、双层字幕、旧错字露出、blur strip、clipping、card body-copy overlap 或 slogan repetition。
 
 Evidence：
 
 - `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/shot-contract.md`
 - `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/captions.ass`
-- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/final-caption-boundaries-24.png`
-- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/final-caption-contact-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v2-opening-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v2-tail-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v2-gate.json`
 
 ## Final Local Review Composition
 
 Final review artifact：
 
-`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-captioned-28s-review-only.mp4`
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v2-28s-review-only.mp4`
 
 Measured facts：
 
-- SHA-256: `e965db27a4f67ce4fcf2258ae83ef67643e8474c170e3c85cced2af1330fd694`
-- size: `13,158,494` bytes
+- SHA-256: `2cb2b744e80e445515cf5d75e503347a4cb5f21bd3236a3069ebeade00c130bd`
+- size: `13,473,667` bytes
 - duration: `28.065s`
 - video: H.264 High, `720x1280`, `24fps`, 673 frames
 - audio: AAC stereo, `44.1kHz`, mean `-14.6 dB`, max `-1.3 dB`
@@ -141,17 +159,17 @@ Timeline：
 
 Final audio retains Shot 1 native audio and the existing repaired Shot 2 native audio once. Fast raw AAC was verified as Provider evidence but intentionally not mixed into final，避免双重 ambience 或声场跳变。最终音轨包含一次 problem/recommendation/result narration 与一次 brand line；没有重复 slogan 或 card-claim narration。
 
-Project-local `video-analysis` MCP 对 exact final hash 执行 29-frame comprehensive call 与 Whisper `medium` transcription；`ffmpeg` full decode 无错误。Primary join pairs at `14.98/15.08s`、`19.48/19.58s`、`23.50/23.58s` 均为 clean direct cuts，无 whip、flash、dissolve、morph 或 floating-box reveal。
+Project-local `video-analysis` MCP 对 exact V2 final hash 以 `0.5s` interval 抽取 40 frames；字幕修复 sheets 另覆盖 opening 与 tail。工具只报告 existing `720x1280` review resolution 的 generic `low_resolution` heuristic；该分辨率与初版相同，不是本次 caption-only repair regression。`ffmpeg` full decode 无错误；V2 与初版 audio stream SHA-256 同为 `d145fe969076aa9d04b36cee23fe0d0c50befb5faf067ab90388c15297ba2de0`。
 
 Final Gate：
 
-`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/final-review-gate.json`
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v2-gate.json`
 
 Verdict：`PASS_FOR_LOCAL_REVIEW`。
 
 ## Assessment
 
-本次修复关闭的是旧版本已证实的人眼缺陷：Hero 的瓶与盒从第一帧就接触真实木桌，contact shadow 持续存在，不再通过后入场盒子制造悬浮感。三张指定图片按 exact order 各显示 1.5 秒，字幕从“模型任意生成”提升为有 timing、copy、layout、source-corruption replacement 与 boundary sampling 的明确 Gate。
+本次先关闭旧版本已证实的 Hero 悬浮缺陷，再根据用户 screenshots 关闭初版 caption backing 缺陷。Hero 的瓶与盒从第一帧就接触真实木桌，三张指定图片按 exact order 各显示 1.5 秒；字幕现在具有 timing、semantic split、copy ownership、unboxed style、source-corruption coverage 与 boundary sampling 的明确 Gate。
 
 仍须保持三层 truth：
 
@@ -161,10 +179,11 @@ Verdict：`PASS_FOR_LOCAL_REVIEW`。
 
 ## Remaining Risks And Guardrails
 
-- 新成片仍需要用户对整体节奏、第一段 opaque caption backplate、文化呈现、中文发音和 card readability 做最终人眼/听审。
+- 新成片仍需要用户对整体节奏、V2 无底板字幕的字重与位置、文化呈现、中文发音和 card readability 做最终人眼/听审。
 - 三张 card 含高风险 claims；除非提供 substantiation 并完成独立合规确认，否则不得移除 disclosure 或把 review-only artifact 变成 commercial-ready。
 - 实际 Provider billing 未验证；只有 request count、finite ceiling 与 token-based estimate。
 - 本地 `runs/` artifacts 未 stage、commit、activate、push 或 publish。
+- `retrieve-ai-video-memory` 本次返回 tagged last-good stale fragments 并排队 detached refresh；未等待、轮询或重建索引，当前字幕结论来自 exact media、composition files 与本轮视觉证据。
 - 任何新 variant、retry、不同 model/provider、1080p upgrade、重新生成 audio、移除 disclosure 或 publication 都是新 scope，需新的 current-task authorization 与对应 Gate。
 - `MP4 contains AAC`、local ffmpeg composition、Whisper transcript 与 local Gate 都不等于 canonical P4 ingestion、P6 或 Final Acceptance。
 - 后续若进入 Production，必须走 canonical Asset Registry、`ResolvedTimeline`、Manifest、Review/Repair 与 activation owners；本记录不拥有 production state。
