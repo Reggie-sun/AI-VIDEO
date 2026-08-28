@@ -1,0 +1,317 @@
+{
+  "schema_version": "drama-fixture-selection/1",
+  "record_kind": "drama_fixture_selection",
+  "fixture_id": "drama.fixture.key-at-the-waiting-room",
+  "fixture_version": 1,
+  "status": "proposed",
+  "domain_id": "drama",
+  "contract": {
+    "spec_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "spec_commit": "01483ec1f434661984ca009fffa85960310dedd6",
+    "spec_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b",
+    "rubric_id": "drama-authoring-and-acceptance",
+    "rubric_version": "1",
+    "rubric_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b"
+  },
+  "selection_rationale": "原创、非商业、单场景双角色三镜头微剧情；用一把钥匙的可见交接承载关系、动机、对白反应、blocking、情绪推进与continuation，避免依赖产品、品牌、旧Qingyan assembly或复杂群演。",
+  "rights_and_provenance": {
+    "origin": "original_for_ai_video_b_d0",
+    "external_story_or_character_source": null,
+    "external_media_assets_selected": [],
+    "commercial_or_qingyan_lineage": false,
+    "note": "本record只选择原创authoring fixture，不选择演员肖像、声音、reference image、reference video或Provider。"
+  },
+  "format_contract": {
+    "aspect_ratio": "16:9",
+    "resolution": {
+      "width": 1344,
+      "height": 768
+    },
+    "frame_rate_fps": 24,
+    "scene_duration_seconds": {
+      "minimum": 14.0,
+      "target": 16.0,
+      "maximum": 18.0
+    },
+    "ordered_shot_count": 3,
+    "coverage_grammar": "establish_offer -> question_and_choice -> acceptance_and_continuation",
+    "edit_grammar": "two straight cuts; no montage, time jump, scene reset, transition effect or hidden off-screen state change",
+    "provider_selected": false
+  },
+  "story_revision": {
+    "story_id": "drama.story.return-the-key",
+    "revision": 1,
+    "premise": "母亲去世后，准备离开的姐姐在雨夜候车室与曾经失约的弟弟重逢；弟弟带来旧屋钥匙，但必须让姐姐看见这次留下是承诺而非逼迫。",
+    "dramatic_question": "姐姐会不会相信弟弟这次真的留下，并重新接过共同回家的选择？",
+    "entry_condition": "姐姐已经决定独自离开；弟弟刚找到她并持有旧屋钥匙。",
+    "terminal_state": "姐姐主动拿起钥匙并靠近弟弟半步，关系从戒备转为谨慎信任；两人拥有一起回家开门的明确next-state。",
+    "scene_purpose": "以一个可见、可追踪的物件选择证明关系变化来自互动和决定，而不是镜头顺序。",
+    "context_allocation": {
+      "sealed_prior_context_not_required_on_screen": [
+        "母亲已去世",
+        "林峻过去曾承诺留下但最终离开",
+        "林岚在本scene前已经决定独自离开"
+      ],
+      "must_be_readable_on_screen": [
+        "林峻带着旧屋钥匙进入并提出一起回家",
+        "林岚没有立即接受，而是质疑他是否会留下",
+        "林峻把钥匙放在中立位置并完全松手",
+        "林岚主动拾取钥匙并靠近半步",
+        "两人的terminal eyeline与反应形成谨慎信任和共同回家的continuation"
+      ],
+      "external_exposition_required": false
+    }
+  },
+  "scene_revision": {
+    "scene_id": "drama.scene.rainy-waiting-room",
+    "revision": 1,
+    "time_and_place": "夜间，安静的小站候车室；窗外持续下雨。",
+    "participants": [
+      "drama.character.lin-lan",
+      "drama.character.lin-jun"
+    ],
+    "objective": "林峻想证明自己会留下；林岚要在不被逼迫的情况下判断是否重新信任他。",
+    "conflict_and_stakes": "过去的失约使口头保证不足；若林岚拒绝钥匙，两人仍各自离开。",
+    "spatial_contract": {
+      "screen_axis": "the stable left-right line between the bench and the waiting-room doorway",
+      "lin_lan_screen_side": "left",
+      "lin_jun_screen_side": "right",
+      "neutral_prop_zone": "bench center between both characters",
+      "axis_crossing_authorized": false,
+      "entrance_or_reposition": "林峻从画面右侧门口进入；Shot 3林岚向bench center与林峻方向移动半步。"
+    },
+    "continuous_audio": "steady soft rain ambience across all cuts; no music and no unsealed off-screen dialogue",
+    "causal_chain": [
+      "林峻展示仍保存的钥匙并提出一起回家",
+      "林岚因过去失约而要求他回答是否会留下",
+      "林峻先明确回答会留下，再把钥匙放在两人之间并说明由她决定",
+      "林岚看见选择权被交还，主动拿起钥匙",
+      "林峻承诺等待她开门，形成谨慎信任与继续回家的next-state"
+    ]
+  },
+  "character_revisions": [
+    {
+      "character_id": "drama.character.lin-lan",
+      "revision": 1,
+      "role": "older_sister",
+      "relationship_open": "对弟弟仍有感情，但因他过去失约而戒备，不愿再接受空洞保证。",
+      "scene_goal": "确认弟弟是否把留下变成可选择、可兑现的承诺。",
+      "known_information": "弟弟过去曾答应留下却离开；旧屋钥匙原本由他保管。",
+      "stakes": "重新信任可能再次受伤，拒绝则意味着两人继续分离。",
+      "decision_constraints": [
+        "在林峻明确回应留下这一核心问题前，不接受钥匙",
+        "若钥匙被强行递入手中或林峻越过安全距离施压，则不产生信任变化",
+        "最终选择必须由她主动拾取钥匙完成"
+      ],
+      "emotion_open": "克制、疲惫、戒备",
+      "emotion_terminal": "仍谨慎，但愿意相信并共同继续",
+      "performance_obligation": "先因钥匙微停呼吸并看向弟弟；提问时保持克制；看见他放下钥匙后肩颈松开，最后主动拾取并靠近半步。",
+      "voice_constraint": "低声、直接，不哭喊，不解释背景。",
+      "appearance_and_continuity_facts": {
+        "appearance": "深色直发低束，面部自然、无明显妆饰变化",
+        "wardrobe": "charcoal-gray wool coat fully worn throughout the scene",
+        "carried_props_at_entry": [],
+        "key_interaction": "Shot 3以anatomical left hand拾取并持续持有旧黄铜钥匙"
+      }
+    },
+    {
+      "character_id": "drama.character.lin-jun",
+      "revision": 1,
+      "role": "younger_brother",
+      "relationship_open": "知道自己失去姐姐信任，不要求立即原谅。",
+      "scene_goal": "用不强迫的可见行动证明会留下。",
+      "known_information": "姐姐准备独自离开；旧屋钥匙能触发共同记忆，也可能被误解为施压。",
+      "stakes": "再次只靠口头保证会彻底失去姐姐。",
+      "decision_constraints": [
+        "不得把钥匙直接塞给林岚或要求她立即原谅",
+        "林岚提问时必须完整聆听且不抢话辩解",
+        "放下钥匙后不得取回、越过安全距离或替林岚完成选择"
+      ],
+      "emotion_open": "急切但压住焦虑",
+      "emotion_terminal": "等待被选择，谨慎释然",
+      "performance_obligation": "进入后停在安全距离；展示钥匙但不递到姐姐手边；听完问题后先停顿，再把钥匙放下并松开手；她拾起后只轻微释然。",
+      "voice_constraint": "短句、轻声、无辩解，不催促。",
+      "appearance_and_continuity_facts": {
+        "appearance": "短黑发，外套肩部有连续的轻微雨水湿痕",
+        "wardrobe": "dark navy rain jacket fully worn throughout the scene",
+        "carried_props_at_entry": ["worn brass house key on a small plain metal ring with no tag"],
+        "key_interaction": "Shot 1至Shot 2前段由anatomical right hand持有；Shot 2放至bench center后不再触碰"
+      }
+    }
+  ],
+  "ordered_shot_revisions": [
+    {
+      "shot_id": "drama.shot.waiting-room.001",
+      "revision": 1,
+      "dramatic_function": "establish_offer",
+      "covered_characters": [
+        "drama.character.lin-lan@1",
+        "drama.character.lin-jun@1"
+      ],
+      "duration_seconds": {
+        "minimum": 4.5,
+        "target": 5.0,
+        "maximum": 6.0
+      },
+      "open_state": "林岚坐在画面左侧长椅外端，视线向下；画面右侧门口为空；钥匙尚未可见。",
+      "visible_action": "林峻从画面右侧进入并在安全距离停下，用anatomical right hand举起旧黄铜钥匙；林岚听见他后抬眼，在看清钥匙时出现一次可见呼吸停顿。",
+      "dialogue": {
+        "speaker": "drama.character.lin-jun",
+        "addressee": "drama.character.lin-lan",
+        "verbatim_line": "钥匙还在。回去，一起开门。",
+        "turn_function": "提出共同回家并把旧屋钥匙变成可见setup。",
+        "listener_reaction": "林岚从钥匙移向林峻的眼睛，不伸手。"
+      },
+      "blocking_and_eyeline": "林岚保持screen-left seated；林峻停在screen-right；两人eyeline沿既定axis互指；无人越轴。",
+      "performance_intent": "林峻压住急切，不向前逼近；林岚的反应小而明确，不用夸张惊讶。",
+      "emotional_input": "林岚克制戒备；林峻急切但压住焦虑。",
+      "emotional_trigger": "林岚看见林峻仍保存的旧屋钥匙并听见一起回家的提议。",
+      "visible_emotional_progression": "林岚从封闭转为警觉关注；林峻从进入时的急切转为等待回应。",
+      "emotion_close": "林岚由封闭转为警觉关注；林峻等待回应。",
+      "prop_close_state": "key held visibly in Lin Jun anatomical right hand",
+      "next_shot_obligation": "林岚必须针对留下与否提出问题；钥匙仍由林峻持有。",
+      "camera_and_coverage_intent": "locked medium-wide two-character coverage that clearly establishes doorway, bench, left-right relation and key visibility; no native Provider wording"
+    },
+    {
+      "shot_id": "drama.shot.waiting-room.002",
+      "revision": 1,
+      "dramatic_function": "question_and_choice",
+      "covered_characters": [
+        "drama.character.lin-lan@1",
+        "drama.character.lin-jun@1"
+      ],
+      "duration_seconds": {
+        "minimum": 4.5,
+        "target": 6.0,
+        "maximum": 7.0
+      },
+      "open_state": "林岚screen-left注视林峻；林峻screen-right仍以右手持钥匙；两人空间关系与Shot 1 close一致。",
+      "visible_action": "林岚问出核心问题；林峻完整聆听，短暂停顿并明确回答会留下，随后降低右手，把钥匙放到bench center并完全松手，再说明选择由她决定，始终不越过安全距离。",
+      "dialogue_turns": [
+        {
+          "speaker": "drama.character.lin-lan",
+          "addressee": "drama.character.lin-jun",
+          "verbatim_line": "你这次，会留下吗？",
+          "turn_function": "把冲突从回家提议收窄为承诺是否可信。",
+          "listener_reaction": "林峻保持眼神、吸气并完整听完，不抢话。"
+        },
+        {
+          "speaker": "drama.character.lin-jun",
+          "addressee": "drama.character.lin-lan",
+          "verbatim_line": "会。你来决定。",
+          "turn_function": "在林岚接受钥匙前明确回答会留下，并以放下钥匙把选择权交还。",
+          "listener_reaction": "林岚看着他放下并完全松开钥匙，戒备出现可见松动但尚未拾取。"
+        }
+      ],
+      "blocking_and_eyeline": "林岚screen-left seated；林峻screen-right standing；bench center为中立prop zone；两人eyeline连续且无人越轴。",
+      "performance_intent": "林岚语气克制但停在“这次”；林峻先完整聆听，以简短明确的“会”承担承诺，再放下钥匙，不表现受辱或辩解。",
+      "emotional_input": "林岚警觉关注但不信任；林峻等待她定义真正冲突。",
+      "emotional_trigger": "林岚明确问他是否会留下；林峻明确回答“会”，再放下并松开钥匙说明由她决定。",
+      "visible_emotional_progression": "林岚的戒备因选择权被交还而轻微松动；林峻从焦虑转为承担等待。",
+      "emotion_close": "林岚听见明确承诺并看见选择权被交还，戒备出现松动但尚未决定；林峻承担等待。",
+      "prop_close_state": "key resting alone at bench center; neither character touching it",
+      "next_shot_obligation": "明确承诺已发生；林岚必须可见地选择拿或不拿钥匙；林峻不得先取回或把钥匙递进她手里。",
+      "camera_and_coverage_intent": "locked medium two-shot preserving both faces, listening reaction, right-hand-to-bench prop path and neutral gap; no native Provider wording"
+    },
+    {
+      "shot_id": "drama.shot.waiting-room.003",
+      "revision": 1,
+      "dramatic_function": "acceptance_and_continuation",
+      "covered_characters": [
+        "drama.character.lin-lan@1",
+        "drama.character.lin-jun@1"
+      ],
+      "duration_seconds": {
+        "minimum": 4.5,
+        "target": 5.0,
+        "maximum": 6.0
+      },
+      "open_state": "钥匙独自位于bench center；林岚screen-left看向钥匙；林峻screen-right等待且双手不触碰钥匙。",
+      "visible_action": "林岚用anatomical left hand拾起钥匙，起身并向中间及林峻方向移动半步；林峻不迎上去，只在她完成选择后说话；两人最后保持可见eye contact。",
+      "dialogue": {
+        "speaker": "drama.character.lin-jun",
+        "addressee": "drama.character.lin-lan",
+        "verbatim_line": "等你开门。",
+        "turn_function": "把承诺落在等待姐姐主动开启共同next-state，而非催促她原谅。",
+        "listener_reaction": "林岚握住钥匙并保持眼神，肩颈轻微放松，不额外说台词。"
+      },
+      "blocking_and_eyeline": "林岚从screen-left向neutral center移动半步但不越过两人axis；林峻保持screen-right；最终eyeline互指。",
+      "performance_intent": "拾取前保留一个判断停顿；动作确定但不激动；林峻只出现轻微释然，不庆祝。",
+      "emotional_input": "林岚戒备已松动但尚未决定；林峻承担等待且不施压。",
+      "emotional_trigger": "钥匙独自在中立位置，证明选择权真实属于林岚。",
+      "visible_emotional_progression": "林岚由判断停顿转为主动拾取与靠近；林峻在她完成选择后才轻微释然。",
+      "emotion_close": "关系由戒备转为谨慎信任；两人愿意继续共同回家。",
+      "prop_close_state": "key visibly secured in Lin Lan anatomical left hand",
+      "continuation_state": "两人共享离开候车室并回旧屋开门的明确下一行动；本scene不展示该行动。",
+      "camera_and_coverage_intent": "locked closer two-shot that preserves the complete bench-to-left-hand pickup, half-step reposition, mutual eyeline and terminal reaction; no native Provider wording"
+    }
+  ],
+  "applicability": {
+    "payoff": {
+      "required": true,
+      "rationale": "Shot 1的钥匙setup必须在Shot 3由林岚主动拾取获得visible payoff。"
+    },
+    "continuation": {
+      "required": true,
+      "rationale": "terminal state必须明确指向两人共同回旧屋，但不在本bounded scene内展示。"
+    },
+    "cliffhanger": {
+      "required": false,
+      "rationale": "本scene以关系决定与明确next-state关闭，不以未知reveal悬置。"
+    }
+  },
+  "persistent_prop_facts": [
+    {
+      "prop_id": "drama.prop.old-house-key",
+      "revision": 1,
+      "appearance": "one worn brass house key on a small plain metal ring with no tag",
+      "state_chain": [
+        "Shot 1 open: not visible",
+        "Shot 1 close: visible in Lin Jun anatomical right hand",
+        "Shot 2 close: resting alone at bench center",
+        "Shot 3 close: visibly secured in Lin Lan anatomical left hand"
+      ]
+    }
+  ],
+  "applicable_requirement_ids": [
+    "DRAMA-AUTH-STORY-001",
+    "DRAMA-AUTH-RELATIONSHIP-001",
+    "DRAMA-AUTH-MOTIVATION-001",
+    "DRAMA-AUTH-DIALOGUE-001",
+    "DRAMA-AUTH-PERFORMANCE-001",
+    "DRAMA-AUTH-BLOCKING-001",
+    "DRAMA-AUTH-EMOTION-001",
+    "DRAMA-AUTH-PAYOFF-001",
+    "DRAMA-AUTH-COVERAGE-001",
+    "DRAMA-MEDIA-SHOT-NARRATIVE-001",
+    "DRAMA-MEDIA-SHOT-DIALOGUE-001",
+    "DRAMA-MEDIA-SHOT-PERFORMANCE-001",
+    "DRAMA-MEDIA-SHOT-BLOCKING-001",
+    "DRAMA-MEDIA-SHOT-EMOTION-001",
+    "DRAMA-MEDIA-PAIR-CAUSALITY-001",
+    "DRAMA-MEDIA-PAIR-RELATIONSHIP-001",
+    "DRAMA-MEDIA-PAIR-MOTIVATION-001",
+    "DRAMA-MEDIA-PAIR-DIALOGUE-001",
+    "DRAMA-MEDIA-PAIR-BLOCKING-001",
+    "DRAMA-MEDIA-PAIR-EMOTION-001",
+    "DRAMA-MEDIA-SCENE-NARRATIVE-001",
+    "DRAMA-MEDIA-SCENE-RELATIONSHIP-001",
+    "DRAMA-MEDIA-SCENE-MOTIVATION-001",
+    "DRAMA-MEDIA-SCENE-DIALOGUE-001",
+    "DRAMA-MEDIA-SCENE-EMOTION-001",
+    "DRAMA-MEDIA-SCENE-PAYOFF-001",
+    "DRAMA-MEDIA-SCENE-READABILITY-001",
+    "DRAMA-MEDIA-SCENE-BASELINE-001"
+  ],
+  "acceptance": {
+    "accepted_record_sha256": null,
+    "approver_authority_identity": null,
+    "accepted_at": null,
+    "acceptance_source_id": null,
+    "acceptance_source_sha256": null
+  },
+  "stop_state": {
+    "b_d0_status": "BLOCKED_BEFORE_MEDIA",
+    "reason": "This proposed record has not received explicit acceptance of its exact committed bytes."
+  }
+}

@@ -1,0 +1,355 @@
+{
+  "schema_version": "drama-authoring-package/1",
+  "record_kind": "drama_authoring_package",
+  "package_id": "drama.package.key-at-the-waiting-room",
+  "package_version": 1,
+  "status": "blocked",
+  "domain_id": "drama",
+  "contract": {
+    "spec_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "spec_commit": "01483ec1f434661984ca009fffa85960310dedd6",
+    "spec_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b",
+    "contract_version": "drama-authoring-and-acceptance/1"
+  },
+  "authoring_profile": {
+    "profile_id": "drama-authoring-and-acceptance",
+    "profile_version": "1",
+    "profile_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "profile_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b"
+  },
+  "rubric": {
+    "rubric_id": "drama-authoring-and-acceptance",
+    "rubric_version": "1",
+    "rubric_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "rubric_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b"
+  },
+  "fixture_selection_binding": {
+    "fixture_id": "drama.fixture.key-at-the-waiting-room",
+    "fixture_version": 1,
+    "record_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.proposed.json",
+    "record_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+    "record_status": "proposed",
+    "accepted_record_sha256": null
+  },
+  "baseline_selection_binding": {
+    "baseline_id": "drama.baseline.key-at-the-waiting-room",
+    "baseline_version": 1,
+    "record_path": "docs/superpowers/artifacts/drama/b-d0/baseline-selection/missing-cinematic-reference-v1.blocked.json",
+    "record_sha256": "ea56d3fa597317feb70cdb53ba6be35c9362e10b0d053958fe483792e7508af0",
+    "record_status": "blocked",
+    "accepted_record_sha256": null
+  },
+  "sealed_authoring_truth_candidate": {
+    "source_contract": "The exact fixture-selection record is the immutable source for all Story, Scene, Character and ordered Shot definitions listed here; a SHA mismatch is BLOCKER.",
+    "story": {
+      "story_id": "drama.story.return-the-key",
+      "revision": 1,
+      "dramatic_question": "姐姐会不会相信弟弟这次真的留下，并重新接过共同回家的选择？",
+      "entry_condition": "姐姐准备独自离开；弟弟持有旧屋钥匙并刚找到她。",
+      "terminal_state": "姐姐主动拿起钥匙并靠近半步，关系转为谨慎信任，明确继续共同回家。",
+      "context_allocation": {
+        "sealed_prior_context_not_required_on_screen": [
+          "母亲已去世",
+          "林峻过去曾承诺留下但最终离开",
+          "林岚在本scene前已经决定独自离开"
+        ],
+        "must_be_readable_on_screen": [
+          "钥匙与共同回家提议",
+          "林岚对留下承诺的质疑",
+          "林峻放下钥匙并交还选择权",
+          "林岚主动拾取并靠近",
+          "谨慎信任与共同回家的terminal continuation"
+        ],
+        "external_exposition_required": false
+      }
+    },
+    "scene": {
+      "scene_id": "drama.scene.rainy-waiting-room",
+      "revision": 1,
+      "time_and_place": "夜间，安静的小站候车室；窗外持续下雨。",
+      "scene_objective": "林峻证明会留下；林岚判断是否重新信任他。",
+      "axis_and_zones": "林岚screen-left，林峻screen-right，bench center为neutral prop zone；禁止越轴。",
+      "continuous_audio": "steady soft rain ambience; no music and no unsealed off-screen dialogue",
+      "coverage_grammar": "establish_offer -> question_and_choice -> acceptance_and_continuation",
+      "edit_grammar": "two straight cuts with direct continuity"
+    },
+    "characters": [
+      {
+        "character_id": "drama.character.lin-lan",
+        "revision": 1,
+        "role": "older_sister",
+        "goal": "在不被逼迫的情况下判断弟弟是否真的留下。",
+        "motivation_and_stakes": "过去失约使重新信任可能再次受伤；拒绝则意味着继续分离。",
+        "decision_constraints": [
+          "核心问题未被回应前不接受钥匙",
+          "强行递交或越过安全距离不产生信任变化",
+          "最终选择必须由她主动拾取完成"
+        ],
+        "emotional_progression": "克制戒备 -> 警觉关注 -> 松动 -> 谨慎信任",
+        "voice_and_performance": "低声直接；不哭喊；通过呼吸停顿、克制提问、肩颈放松、主动拾取和半步靠近完成变化。",
+        "appearance_and_continuity_facts": "深色直发低束；charcoal-gray wool coat全程穿着；Shot 3以anatomical left hand拾取并持有钥匙。"
+      },
+      {
+        "character_id": "drama.character.lin-jun",
+        "revision": 1,
+        "role": "younger_brother",
+        "goal": "用不强迫的可见行动证明自己会留下。",
+        "motivation_and_stakes": "再次只靠口头保证会彻底失去姐姐，因此必须交还选择权。",
+        "decision_constraints": [
+          "不得强行递交钥匙或要求立即原谅",
+          "必须完整聆听且不抢话辩解",
+          "放下钥匙后不得取回、逼近或替林岚选择"
+        ],
+        "emotional_progression": "压住焦虑 -> 承担等待 -> 谨慎释然",
+        "voice_and_performance": "短句轻声；不辩解；安全距离停下，完整聆听，放下钥匙并松手，最后只轻微释然。",
+        "appearance_and_continuity_facts": "短黑发；dark navy rain jacket全程穿着且肩部保持轻微雨水湿痕；以anatomical right hand持钥匙并在Shot 2放下后不再触碰。"
+      }
+    ],
+    "ordered_shots": [
+      {
+        "shot_id": "drama.shot.waiting-room.001",
+        "revision": 1,
+        "purpose": "establish_offer",
+        "covered_characters": ["drama.character.lin-lan@1", "drama.character.lin-jun@1"],
+        "open_state": "林岚screen-left坐着；screen-right门口为空；钥匙不可见。",
+        "action_and_performance": "林峻从screen-right进入并停在安全距离，以anatomical right hand展示钥匙；林岚抬眼并在看清钥匙时呼吸微停。",
+        "verbatim_dialogue": "钥匙还在。回去，一起开门。",
+        "speaker": "drama.character.lin-jun",
+        "listener_reaction": "林岚从钥匙看向林峻，不伸手。",
+        "emotional_input_trigger_progression": "林岚克制戒备、林峻压住焦虑 -> 看见钥匙并听见共同回家提议 -> 林岚警觉关注、林峻等待回应。",
+        "close_state": "两人维持左右关系；钥匙仍在林峻右手；林岚由封闭转为警觉关注。",
+        "next_obligation": "林岚必须针对留下与否提问。",
+        "camera_intent": "locked medium-wide two-character establishing coverage"
+      },
+      {
+        "shot_id": "drama.shot.waiting-room.002",
+        "revision": 1,
+        "purpose": "question_and_choice",
+        "covered_characters": ["drama.character.lin-lan@1", "drama.character.lin-jun@1"],
+        "open_state": "林岚screen-left注视林峻；林峻screen-right右手持钥匙。",
+        "action_and_performance": "林岚克制提问；林峻完整聆听、明确回答会留下，再把钥匙放到bench center并完全松手，说明由她决定。",
+        "dialogue_turns": [
+          {
+            "speaker": "drama.character.lin-lan",
+            "verbatim_line": "你这次，会留下吗？",
+            "listener_reaction": "林峻保持眼神、吸气并完整听完，不抢话。"
+          },
+          {
+            "speaker": "drama.character.lin-jun",
+            "verbatim_line": "会。你来决定。",
+            "listener_reaction": "林岚看着他放下并松开钥匙，戒备松动但尚未拾取。"
+          }
+        ],
+        "emotional_input_trigger_progression": "林岚警觉但不信任、林峻等待 -> 留下与否的核心问题、明确承诺及放下钥匙 -> 林岚戒备松动、林峻承担等待。",
+        "close_state": "明确承诺已发生；钥匙独自在bench center；选择权归林岚；她尚未决定。",
+        "next_obligation": "林岚必须可见地选择拿或不拿；林峻不得替她完成。",
+        "camera_intent": "locked medium two-shot preserving faces, listening and full key path"
+      },
+      {
+        "shot_id": "drama.shot.waiting-room.003",
+        "revision": 1,
+        "purpose": "acceptance_and_continuation",
+        "covered_characters": ["drama.character.lin-lan@1", "drama.character.lin-jun@1"],
+        "open_state": "钥匙位于bench center；林岚screen-left看向钥匙；林峻screen-right等待。",
+        "action_and_performance": "林岚判断停顿后以anatomical left hand拾起钥匙，起身靠近半步；林峻等她完成选择后才说话。",
+        "verbatim_dialogue": "等你开门。",
+        "speaker": "drama.character.lin-jun",
+        "listener_reaction": "林岚握住钥匙并保持眼神，肩颈轻微放松。",
+        "emotional_input_trigger_progression": "林岚戒备已松动、林峻不施压 -> 钥匙独自在中立位置 -> 林岚主动选择并靠近、林峻谨慎释然。",
+        "close_state": "钥匙在林岚左手；两人互相注视；关系转为谨慎信任。",
+        "continuation_state": "两人共同离开并回旧屋开门，但不在本scene展示。",
+        "camera_intent": "locked closer two-shot preserving pickup, half-step and terminal reaction"
+      }
+    ],
+    "prop_state_chain": [
+      "One worn brass house key on a small plain metal ring with no tag",
+      "Shot 1 open: key not visible",
+      "Shot 1 close: key in Lin Jun anatomical right hand",
+      "Shot 2 close: key alone at bench center",
+      "Shot 3 close: key in Lin Lan anatomical left hand"
+    ],
+    "transition_semantics": [
+      {
+        "source_shot": "drama.shot.waiting-room.001",
+        "target_shot": "drama.shot.waiting-room.002",
+        "semantic": "direct_continuity",
+        "required_bridge": "rain ambience, stable axis, Lin Lan's gaze and Lin Jun's right-hand key state"
+      },
+      {
+        "source_shot": "drama.shot.waiting-room.002",
+        "target_shot": "drama.shot.waiting-room.003",
+        "semantic": "direct_continuity",
+        "required_bridge": "rain ambience, stable axis and key resting untouched at bench center"
+      }
+    ],
+    "authorized_release_semantics": [],
+    "format": {
+      "aspect_ratio": "16:9",
+      "resolution": "1344x768",
+      "frame_rate_fps": 24,
+      "scene_duration_seconds": "14.0-18.0; target 16.0",
+      "ordered_shot_count": 3
+    },
+    "provider_native_wording": null,
+    "provider_selected": false
+  },
+  "authoring_requirement_assessments": [
+    {
+      "requirement_id": "DRAMA-AUTH-STORY-001",
+      "stage": "authoring",
+      "target_kind": "story_and_scene",
+      "required": true,
+      "coverage": ["drama.story.return-the-key@1", "drama.scene.rainy-waiting-room@1"],
+      "candidate_verdict": "PASS",
+      "rationale": "Premise, dramatic question, entry condition, causal chain and terminal state are explicit."
+    },
+    {
+      "requirement_id": "DRAMA-AUTH-RELATIONSHIP-001",
+      "stage": "authoring",
+      "target_kind": "characters_and_scene",
+      "required": true,
+      "coverage": ["drama.character.lin-lan@1", "drama.character.lin-jun@1", "drama.scene.rainy-waiting-room@1"],
+      "candidate_verdict": "PASS",
+      "rationale": "Guarded separation changes to cautious trust through question, returned choice and voluntary pickup."
+    },
+    {
+      "requirement_id": "DRAMA-AUTH-MOTIVATION-001",
+      "stage": "authoring",
+      "target_kind": "characters_and_ordered_shots",
+      "required": true,
+      "coverage": ["drama.character.lin-lan@1", "drama.character.lin-jun@1", "drama.shot.waiting-room.001@1", "drama.shot.waiting-room.002@1", "drama.shot.waiting-room.003@1"],
+      "candidate_verdict": "PASS",
+      "rationale": "Each key action binds prior failed trust, current goal, known information and stakes."
+    },
+    {
+      "requirement_id": "DRAMA-AUTH-DIALOGUE-001",
+      "stage": "authoring",
+      "target_kind": "ordered_shots",
+      "required": true,
+      "coverage": ["drama.shot.waiting-room.001@1", "drama.shot.waiting-room.002@1", "drama.shot.waiting-room.003@1"],
+      "candidate_verdict": "PASS",
+      "rationale": "Every exact line binds speaker, addressee, turn function and visible listener response."
+    },
+    {
+      "requirement_id": "DRAMA-AUTH-PERFORMANCE-001",
+      "stage": "authoring",
+      "target_kind": "characters_and_ordered_shots",
+      "required": true,
+      "coverage": ["drama.character.lin-lan@1", "drama.character.lin-jun@1", "drama.shot.waiting-room.001@1", "drama.shot.waiting-room.002@1", "drama.shot.waiting-room.003@1"],
+      "candidate_verdict": "PASS",
+      "rationale": "Body, face, pause, listening and reaction obligations are explicit and restrained."
+    },
+    {
+      "requirement_id": "DRAMA-AUTH-BLOCKING-001",
+      "stage": "authoring",
+      "target_kind": "scene_and_ordered_shots",
+      "required": true,
+      "coverage": ["drama.scene.rainy-waiting-room@1", "drama.shot.waiting-room.001@1", "drama.shot.waiting-room.002@1", "drama.shot.waiting-room.003@1"],
+      "candidate_verdict": "PASS",
+      "rationale": "Entrance, stable screen sides, neutral prop zone, half-step and eyelines are sealed; axis crossing is forbidden."
+    },
+    {
+      "requirement_id": "DRAMA-AUTH-EMOTION-001",
+      "stage": "authoring",
+      "target_kind": "characters_scene_and_ordered_shots",
+      "required": true,
+      "coverage": ["drama.character.lin-lan@1", "drama.character.lin-jun@1", "drama.scene.rainy-waiting-room@1", "drama.shot.waiting-room.001@1", "drama.shot.waiting-room.002@1", "drama.shot.waiting-room.003@1"],
+      "candidate_verdict": "PASS",
+      "rationale": "Both character arcs and every trigger/terminal state are ordered without reset."
+    },
+    {
+      "requirement_id": "DRAMA-AUTH-PAYOFF-001",
+      "stage": "authoring",
+      "target_kind": "story_scene_and_ordered_shots",
+      "required": true,
+      "coverage": ["drama.story.return-the-key@1", "drama.scene.rainy-waiting-room@1", "drama.shot.waiting-room.001@1", "drama.shot.waiting-room.003@1"],
+      "candidate_verdict": "PASS",
+      "rationale": "The displayed key is voluntarily taken and establishes a precise continuation; cliffhanger is explicitly non-applicable."
+    },
+    {
+      "requirement_id": "DRAMA-AUTH-COVERAGE-001",
+      "stage": "authoring",
+      "target_kind": "ordered_shots",
+      "required": true,
+      "coverage": ["drama.shot.waiting-room.001@1", "drama.shot.waiting-room.002@1", "drama.shot.waiting-room.003@1"],
+      "candidate_verdict": "PASS",
+      "rationale": "Three non-redundant shots expose offer, trust test, returned choice, pickup and terminal reaction."
+    }
+  ],
+  "media_requirement_instances": {
+    "per_shot": {
+      "shot_ids": [
+        "drama.shot.waiting-room.001@1",
+        "drama.shot.waiting-room.002@1",
+        "drama.shot.waiting-room.003@1"
+      ],
+      "required_ids": [
+        "DRAMA-MEDIA-SHOT-NARRATIVE-001",
+        "DRAMA-MEDIA-SHOT-DIALOGUE-001",
+        "DRAMA-MEDIA-SHOT-PERFORMANCE-001",
+        "DRAMA-MEDIA-SHOT-BLOCKING-001",
+        "DRAMA-MEDIA-SHOT-EMOTION-001"
+      ]
+    },
+    "pairwise": {
+      "ordered_pairs": [
+        ["drama.shot.waiting-room.001@1", "drama.shot.waiting-room.002@1"],
+        ["drama.shot.waiting-room.002@1", "drama.shot.waiting-room.003@1"]
+      ],
+      "required_ids": [
+        "DRAMA-MEDIA-PAIR-CAUSALITY-001",
+        "DRAMA-MEDIA-PAIR-RELATIONSHIP-001",
+        "DRAMA-MEDIA-PAIR-MOTIVATION-001",
+        "DRAMA-MEDIA-PAIR-DIALOGUE-001",
+        "DRAMA-MEDIA-PAIR-BLOCKING-001",
+        "DRAMA-MEDIA-PAIR-EMOTION-001"
+      ]
+    },
+    "whole_scene": {
+      "scene_id": "drama.scene.rainy-waiting-room@1",
+      "required_ids": [
+        "DRAMA-MEDIA-SCENE-NARRATIVE-001",
+        "DRAMA-MEDIA-SCENE-RELATIONSHIP-001",
+        "DRAMA-MEDIA-SCENE-MOTIVATION-001",
+        "DRAMA-MEDIA-SCENE-DIALOGUE-001",
+        "DRAMA-MEDIA-SCENE-EMOTION-001",
+        "DRAMA-MEDIA-SCENE-PAYOFF-001",
+        "DRAMA-MEDIA-SCENE-READABILITY-001",
+        "DRAMA-MEDIA-SCENE-BASELINE-001"
+      ],
+      "payoff_required": true,
+      "continuation_required": true,
+      "cliffhanger_required": false
+    }
+  },
+  "readiness": {
+    "authoring_content_assessment": "PASS",
+    "seal_readiness": "BLOCKER",
+    "b_d0_status": "BLOCKED_BEFORE_MEDIA",
+    "m6_d_status": "NOT_EVALUATED",
+    "blocking_reasons": [
+      "FIXTURE_EXACT_BYTES_NOT_ACCEPTED",
+      "BASELINE_EXACT_REFERENCE_MISSING",
+      "BASELINE_SELECTION_NOT_ACCEPTED",
+      "AUTHORING_PACKAGE_EXACT_BYTES_NOT_ACCEPTED"
+    ]
+  },
+  "acceptance": {
+    "accepted_package_sha256": null,
+    "approver_authority_identity": null,
+    "accepted_at": null,
+    "acceptance_source_id": null,
+    "acceptance_source_sha256": null
+  },
+  "forbidden_effects": [
+    "provider_selection",
+    "provider_native_prompt_authoring",
+    "comfyui_or_h3_execution",
+    "video_analysis",
+    "media_generation",
+    "automatic_retry_or_repair",
+    "manifest_or_registry_mutation",
+    "p6_or_final_acceptance_claim",
+    "cross_lane_verdict_inheritance"
+  ]
+}
