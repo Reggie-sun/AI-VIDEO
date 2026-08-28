@@ -215,7 +215,7 @@ test("development artifact receipt and state bind exact Shot prompt, type, and r
   const promptSha256 = createHash("sha256").update(promptText).digest("hex");
   await Promise.all([mkdir(runtime), mkdir(prompts)]);
   await writeFile(media, bytes);
-  await writeFile(prompt, promptText);
+  await writeFile(prompt, ` \n${promptText}\n\n`);
   await writeFile(receipt, JSON.stringify({
     output: { path: "artifacts/runtime/shot-problem.mp4", sha256, size_bytes: bytes.length },
     prompt_id: "prompt-1",

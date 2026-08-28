@@ -26,9 +26,41 @@ export function preferredExternalLocation(group) {
   return locations.find((item) => item?.token) || null;
 }
 
+export function sourceLabel(source, fallback) {
+  return source?.label || fallback || source?.id || "未知来源";
+}
+
 export function externalMediaUrl(group) {
   const token = preferredExternalLocation(group)?.token;
   return token ? `/api/external-media/media/${encodeURIComponent(token)}` : null;
+}
+
+function evidencePriority(group) {
+  if ((group?.composition?.ordered_shots || []).length > 0) return 4;
+  if (group?.shot_id && group?.prompt_text) return 3;
+  if (group?.shot_id || group?.prompt_text || group?.shot_type || group?.generation_type || group?.reported_status) return 2;
+  return 1;
+}
+
+export function preferredExternalGroup(groups) {
+  const candidates = Array.isArray(groups) ? groups : [];
+  if (!candidates.length) return null;
+  return candidates.reduce((preferred, group) => (
+    evidencePriority(group) > evidencePriority(preferred) ? group : preferred
+  ));
+}
+
+export function externalStoryboardShots(group) {
+  const compositionShots = group?.composition?.ordered_shots;
+  if (Array.isArray(compositionShots) && compositionShots.length > 0) return compositionShots;
+  if (!group?.shot_id) return [];
+  return [{
+    shot_id: group.shot_id,
+    prompt_text: group.prompt_text,
+    shot_type: group.shot_type,
+    generation_type: group.generation_type,
+    reported_status: group.reported_status,
+  }];
 }
 
 export function groupMatchesSource(group, sourceId) {

@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { constants } from "node:fs";
+import { constants, watch } from "node:fs";
 import { open, realpath } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -9,6 +9,92 @@ import { catalogExternalMedia } from "./external-media.mjs";
 
 const execFileAsync = promisify(execFile);
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" };
+
+export function createCatalogChangeFeed({ roots = [], watchFactory = watch, debounceMs = 750 } = {}) {
+  const subscribers = new Set();
+  const watcherRecords = [];
+  const pendingSources = new Set();
+  const expectedSources = new Set();
+  const activeSources = new Set();
+  const unavailableSources = new Set();
+  let timer = null;
+  let sequence = 0;
+  let closed = false;
+
+  const status = () => ({
+    expected_sources: [...expectedSources].sort(),
+    sources: [...activeSources].sort(),
+    unavailable_sources: [...unavailableSources].sort(),
+  });
+  const notify = (event) => {
+    for (const subscriber of subscribers) {
+      try { subscriber(event); } catch { /* One browser must not block other subscribers. */ }
+    }
+  };
+  const closeWatcher = (record) => {
+    if (record.closed) return;
+    record.closed = true;
+    try { record.watcher.close(); } catch { /* Best-effort shutdown. */ }
+  };
+
+  const flush = () => {
+    timer = null;
+    if (closed || !pendingSources.size) return;
+    const event = {
+      sources: [...pendingSources].sort(),
+      sequence: ++sequence,
+      observed_at: new Date().toISOString(),
+    };
+    pendingSources.clear();
+    notify(event);
+  };
+  const enqueue = (sourceId) => {
+    if (closed) return;
+    pendingSources.add(sourceId);
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(flush, Math.max(0, debounceMs));
+  };
+
+  for (const entry of roots) {
+    const sourceId = typeof entry?.id === "string" ? entry.id : "";
+    if (!/^[A-Za-z0-9_-]{1,64}$/.test(sourceId) || typeof entry?.root !== "string" || expectedSources.has(sourceId)) continue;
+    expectedSources.add(sourceId);
+    try {
+      const watcher = watchFactory(entry.root, { recursive: true }, () => enqueue(sourceId));
+      const record = { watcher, sourceId, closed: false };
+      watcherRecords.push(record);
+      activeSources.add(sourceId);
+      watcher.on?.("error", () => {
+        if (closed || !activeSources.delete(sourceId)) return;
+        unavailableSources.add(sourceId);
+        closeWatcher(record);
+        notify({ kind: "source-status", ...status() });
+        enqueue(sourceId);
+      });
+    } catch {
+      unavailableSources.add(sourceId);
+    }
+  }
+
+  return {
+    get sourceIds() { return status().sources; },
+    status,
+    subscribe(subscriber) {
+      if (closed || typeof subscriber !== "function") return () => {};
+      subscribers.add(subscriber);
+      return () => subscribers.delete(subscriber);
+    },
+    close() {
+      if (closed) return;
+      closed = true;
+      if (timer) clearTimeout(timer);
+      timer = null;
+      pendingSources.clear();
+      subscribers.clear();
+      for (const record of watcherRecords) closeWatcher(record);
+    },
+  };
+}
 
 export class RunsApiError extends Error {
   constructor(status, code) {
@@ -267,6 +353,7 @@ ${isVideo ? `<script>
     video.defaultMuted = false;
     video.muted = false;
     video.volume = 1;
+    if (video.ended) video.currentTime = 0;
     try {
       await video.play();
       soundStatus.textContent = "声音已开启并开始播放。";
@@ -332,6 +419,7 @@ export function createRunsApiHandler({
   runProjector = createPythonProjector(repoRoot),
   externalSources = [],
   externalCatalog = catalogExternalMedia,
+  changeFeed = null,
 }) {
   const runsRoot = path.join(repoRoot, "runs");
   const mediaCache = new Map();
@@ -349,7 +437,8 @@ export function createRunsApiHandler({
     const parsed = new URL(req.url || "/", "http://127.0.0.1");
     const isRunsRequest = parsed.pathname.startsWith("/api/runs");
     const isExternalRequest = parsed.pathname.startsWith("/api/external-media");
-    if (!isRunsRequest && !isExternalRequest) {
+    const isEventsRequest = parsed.pathname === "/api/library-events";
+    if (!isRunsRequest && !isExternalRequest && !isEventsRequest) {
       next();
       return;
     }
@@ -359,6 +448,38 @@ export function createRunsApiHandler({
     }
 
     try {
+      if (isEventsRequest) {
+        if (req.method !== "GET") return methodNotAllowed(res, "GET");
+        if (!changeFeed) {
+          send(res, 503, { error: { code: "LIVE_UPDATES_UNAVAILABLE", message: "实时更新服务不可用。" } });
+          return;
+        }
+        res.statusCode = 200;
+        res.setHeader("Cache-Control", "no-store, no-transform");
+        res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+        res.setHeader("Connection", "keep-alive");
+        res.setHeader("X-Accel-Buffering", "no");
+        res.flushHeaders?.();
+        const unsubscribe = changeFeed.subscribe((event) => {
+          if (res.writableEnded || res.destroyed) return;
+          const eventName = event?.kind === "source-status" ? "source-status" : "catalog-change";
+          res.write(`event: ${eventName}\ndata: ${JSON.stringify(event)}\n\n`);
+        });
+        const ready = typeof changeFeed.status === "function"
+          ? changeFeed.status()
+          : { expected_sources: changeFeed.sourceIds || [], sources: changeFeed.sourceIds || [], unavailable_sources: [] };
+        res.write(`event: ready\ndata: ${JSON.stringify(ready)}\n\n`);
+        let cleaned = false;
+        const cleanup = () => {
+          if (cleaned) return;
+          cleaned = true;
+          unsubscribe();
+        };
+        req.on?.("close", cleanup);
+        res.on?.("close", cleanup);
+        return;
+      }
+
       if (parsed.pathname === "/api/external-media") {
         if (req.method !== "GET") return methodNotAllowed(res, "GET");
         const result = await externalCatalog({ sources: configuredExternalSources });
@@ -506,10 +627,28 @@ export function createRunsApiHandler({
 }
 
 export function createRunsApiPlugin(options) {
-  const handler = createRunsApiHandler(options);
+  const feeds = new Set();
+  const install = (server) => {
+    const roots = [
+      { id: "runs", root: path.join(options.repoRoot, "runs") },
+      ...(options.externalSources || []).map((source) => ({ id: source.id, root: source.root })),
+    ];
+    const changeFeed = createCatalogChangeFeed({ roots });
+    feeds.add(changeFeed);
+    const handler = createRunsApiHandler({ ...options, changeFeed });
+    server.middlewares.use(handler);
+    server.httpServer?.once("close", () => {
+      changeFeed.close();
+      feeds.delete(changeFeed);
+    });
+  };
   return {
     name: "ai-video-runs-api",
-    configureServer(server) { server.middlewares.use(handler); },
-    configurePreviewServer(server) { server.middlewares.use(handler); },
+    configureServer: install,
+    configurePreviewServer: install,
+    closeBundle() {
+      for (const feed of feeds) feed.close();
+      feeds.clear();
+    },
   };
 }

@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { EventEmitter } from "node:events";
 import { mkdtemp, mkdir, symlink, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { createRunsApiHandler, RunsApiError } from "../scripts/runs-api.mjs";
+import { createCatalogChangeFeed, createRunsApiHandler, RunsApiError } from "../scripts/runs-api.mjs";
 import {
   attemptOutcome,
   generationTypeOf,
@@ -18,8 +19,10 @@ import {
   externalGroupTitle,
   externalMediaUrl,
   externalStatus,
+  externalStoryboardShots,
   groupMatchesQuery,
   groupMatchesSource,
+  preferredExternalGroup,
   preferredExternalLocation,
   readExternalCatalogResponse,
 } from "../src/external-media-contract.js";
@@ -27,6 +30,11 @@ import {
   enableMediaSound,
   mediaHasAudioTrack,
 } from "../src/media-player-contract.js";
+import {
+  createLatestRequestGuard,
+  createWorkspaceSelectionGuard,
+  libraryLiveStatus,
+} from "../src/library-refresh-contract.js";
 
 test("run detail contract keeps lifecycle outcome separate from phase and media", () => {
   assert.deepEqual(attemptOutcome({ status: "succeeded", phase: "activate" }), {
@@ -60,6 +68,102 @@ test("run detail contract keeps lifecycle outcome separate from phase and media"
   assert.deepEqual(outputState({ status: "succeeded", phase: "activate" }), {
     key: "missing_after_success", label: "成功记录缺少已注册输出", tone: "gated",
   });
+});
+
+test("external selection prefers exact Shot evidence over an unbound newest video", () => {
+  const unbound = { sha256: "a".repeat(64), locations: [{ relative_path: "newest.mp4" }] };
+  const promptBound = {
+    sha256: "b".repeat(64),
+    shot_id: "shot-1",
+    prompt_text: "exact prompt",
+    locations: [{ relative_path: "shot-1.mp4" }],
+  };
+  const composition = {
+    sha256: "c".repeat(64),
+    composition: { ordered_shots: [{ shot_id: "shot-1" }, { shot_id: "shot-2" }] },
+    locations: [{ relative_path: "final.mp4" }],
+  };
+
+  assert.equal(preferredExternalGroup([unbound, promptBound]), promptBound);
+  assert.equal(preferredExternalGroup([unbound, promptBound, composition]), composition);
+  assert.equal(preferredExternalGroup([]), null);
+});
+
+test("external storyboard falls back to exact Shot prompt when composition is empty", () => {
+  const group = {
+    shot_id: "shot-1",
+    prompt_text: "exact prompt",
+    generation_type: "FL2VA",
+    reported_status: "completed",
+    composition: { ordered_shots: [] },
+  };
+
+  assert.deepEqual(externalStoryboardShots(group), [{
+    shot_id: "shot-1",
+    prompt_text: "exact prompt",
+    shot_type: undefined,
+    generation_type: "FL2VA",
+    reported_status: "completed",
+  }]);
+});
+
+test("workspace selection guard rejects a late refresh commit", async () => {
+  const guard = createWorkspaceSelectionGuard();
+  const refreshToken = guard.snapshot();
+  let releaseRefresh;
+  const delayedRefresh = new Promise((resolve) => { releaseRefresh = resolve; });
+  const state = { workspace: "old" };
+  const refresh = delayedRefresh.then(() => {
+    if (guard.canCommit(refreshToken)) state.workspace = "old-refresh";
+  });
+
+  const selectionToken = guard.beginSelection();
+  state.workspace = "new-selection";
+  releaseRefresh();
+  await refresh;
+
+  assert.equal(guard.canCommit(refreshToken), false);
+  assert.equal(guard.canCommit(selectionToken), true);
+  assert.equal(state.workspace, "new-selection");
+});
+
+test("latest detail request guard rejects an older response for the same workspace", async () => {
+  const guard = createLatestRequestGuard();
+  const state = { revision: "initial" };
+  let releaseOld;
+  let releaseNew;
+  const oldResponse = new Promise((resolve) => { releaseOld = resolve; });
+  const newResponse = new Promise((resolve) => { releaseNew = resolve; });
+  const oldToken = guard.beginRequest();
+  const oldCommit = oldResponse.then(() => {
+    if (guard.canCommit(oldToken)) state.revision = "old";
+  });
+  const newToken = guard.beginRequest();
+  const newCommit = newResponse.then(() => {
+    if (guard.canCommit(newToken)) state.revision = "new";
+  });
+
+  releaseNew();
+  await newCommit;
+  releaseOld();
+  await oldCommit;
+
+  assert.equal(guard.canCommit(oldToken), false);
+  assert.equal(guard.canCommit(newToken), true);
+  assert.equal(state.revision, "new");
+});
+
+test("live status reflects selected-source coverage and stale refreshes", () => {
+  const connected = {
+    connectionState: "connected",
+    watchedSources: ["runs", "artifacts"],
+    expectedSources: ["runs", "artifacts", "comfyui-output"],
+  };
+  assert.equal(libraryLiveStatus({ ...connected, selectedSource: "runs" }), "live");
+  assert.equal(libraryLiveStatus({ ...connected, selectedSource: "comfyui-output" }), "unavailable");
+  assert.equal(libraryLiveStatus({ ...connected, selectedSource: "all" }), "partial");
+  assert.equal(libraryLiveStatus({ ...connected, selectedSource: "runs", refreshFailed: true }), "stale");
+  assert.equal(libraryLiveStatus({ ...connected, selectedSource: "runs", connectionState: "reconnecting" }), "reconnecting");
 });
 
 test("run detail contract derives generation mode and exact-attempt Shot only", () => {
@@ -205,12 +309,15 @@ test("audible media contract detects tracks and explicitly enables playback", as
     defaultMuted: true,
     muted: true,
     volume: 0,
+    ended: true,
+    currentTime: 5,
     play: async () => { played = true; },
   };
   await enableMediaSound(playable);
   assert.equal(playable.defaultMuted, false);
   assert.equal(playable.muted, false);
   assert.equal(playable.volume, 1);
+  assert.equal(playable.currentTime, 0);
   assert.equal(played, true);
 });
 
@@ -275,6 +382,107 @@ async function invoke(handler, req) {
   await handler(req, res, () => { nextCalled = true; });
   return { res, nextCalled };
 }
+
+test("catalog change feed batches recursive source events and closes every watcher", async () => {
+  const callbacks = new Map();
+  const closed = [];
+  const watchFactory = (root, options, callback) => {
+    assert.deepEqual(options, { recursive: true });
+    callbacks.set(root, callback);
+    return {
+      on() { return this; },
+      close() { closed.push(root); },
+    };
+  };
+  const feed = createCatalogChangeFeed({
+    roots: [{ id: "runs", root: "/runs" }, { id: "artifacts", root: "/artifacts" }],
+    watchFactory,
+    debounceMs: 1,
+  });
+  const events = [];
+  const unsubscribe = feed.subscribe((event) => events.push(event));
+
+  callbacks.get("/runs")("change", "manifest.json");
+  callbacks.get("/artifacts")("rename", "shot.mp4");
+  await new Promise((resolve) => setTimeout(resolve, 10));
+
+  assert.equal(events.length, 1);
+  assert.deepEqual(events[0].sources, ["artifacts", "runs"]);
+  assert.equal(events[0].sequence, 1);
+  unsubscribe();
+  feed.close();
+  assert.deepEqual(closed.sort(), ["/artifacts", "/runs"]);
+});
+
+test("catalog change feed exposes unavailable watchers and runtime failures", () => {
+  const runtimeWatcher = new EventEmitter();
+  runtimeWatcher.close = () => {};
+  const feed = createCatalogChangeFeed({
+    roots: [{ id: "runs", root: "/runs" }, { id: "artifacts", root: "/artifacts" }],
+    watchFactory(root) {
+      if (root === "/artifacts") throw new Error("unwatchable");
+      return runtimeWatcher;
+    },
+  });
+  const events = [];
+  feed.subscribe((event) => events.push(event));
+
+  assert.deepEqual(feed.status(), {
+    expected_sources: ["artifacts", "runs"],
+    sources: ["runs"],
+    unavailable_sources: ["artifacts"],
+  });
+  runtimeWatcher.emit("error", new Error("watch failed"));
+  assert.deepEqual(feed.status(), {
+    expected_sources: ["artifacts", "runs"],
+    sources: [],
+    unavailable_sources: ["artifacts", "runs"],
+  });
+  assert.equal(events.at(-1).kind, "source-status");
+  feed.close();
+});
+
+test("library events endpoint streams local catalog changes and releases its subscription", async () => {
+  let listener;
+  let unsubscribed = false;
+  const changeFeed = {
+    status: () => ({
+      expected_sources: ["artifacts", "runs"],
+      sources: ["artifacts", "runs"],
+      unavailable_sources: [],
+    }),
+    subscribe(callback) {
+      listener = callback;
+      return () => { unsubscribed = true; };
+    },
+  };
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-events-"));
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({ workspaces: [] }),
+    changeFeed,
+  });
+  const req = Object.assign(new EventEmitter(), request("GET", "/api/library-events"));
+  const streamed = await invoke(handler, req);
+
+  assert.equal(streamed.res.statusCode, 200);
+  assert.equal(streamed.res.headers.get("content-type"), "text/event-stream; charset=utf-8");
+  assert.match(streamed.res.body.toString(), /event: ready/);
+  assert.match(streamed.res.body.toString(), /"expected_sources":\["artifacts","runs"\]/);
+
+  listener({ sources: ["runs"], sequence: 7, observed_at: "2026-08-28T08:00:00.000Z" });
+  assert.match(streamed.res.body.toString(), /event: catalog-change/);
+  assert.match(streamed.res.body.toString(), /"sequence":7/);
+  listener({ kind: "source-status", expected_sources: ["artifacts", "runs"], sources: ["runs"], unavailable_sources: ["artifacts"] });
+  assert.match(streamed.res.body.toString(), /event: source-status/);
+  assert.match(streamed.res.body.toString(), /"unavailable_sources":\["artifacts"\]/);
+  req.emit("close");
+  assert.equal(unsubscribed, true);
+
+  const method = await invoke(handler, request("POST", "/api/library-events"));
+  assert.equal(method.res.statusCode, 405);
+  assert.equal(method.res.headers.get("allow"), "GET");
+});
 
 test("catalog and detail are GET-only, no-store, and sanitize internal media paths", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "provider-console-api-"));
@@ -626,6 +834,7 @@ test("video HTML wrapper explicitly enables sound inside the user gesture", asyn
   assert.match(body, /video\.defaultMuted = false;/);
   assert.match(body, /video\.muted = false;/);
   assert.match(body, /video\.volume = 1;/);
+  assert.match(body, /if \(video\.ended\) video\.currentTime = 0;/);
   assert.match(body, /soundButton\.addEventListener\("click", async \(\) =>/);
   assert.match(body, /await video\.play\(\);/);
   assert.equal(body.includes(video), false);
@@ -695,6 +904,10 @@ test("runs API rejects non-loopback clients before invoking the projector", asyn
   const req = { ...request("GET", "/api/runs"), socket: { remoteAddress: "192.168.1.50" } };
   const result = await invoke(handler, req);
   assert.equal(result.res.statusCode, 403);
+  assert.equal(called, false);
+
+  const events = await invoke(handler, { ...request("GET", "/api/library-events"), socket: { remoteAddress: "192.168.1.50" } });
+  assert.equal(events.res.statusCode, 403);
   assert.equal(called, false);
 
   const missingAddress = await invoke(handler, { ...request("GET", "/api/runs"), socket: {} });

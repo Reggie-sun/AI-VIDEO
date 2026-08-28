@@ -6,6 +6,14 @@ const OUTCOMES = {
   running: { key: "running", label: "进行中", tone: "gated", terminal: false },
 };
 
+export function attemptId(attempt, index) {
+  return String(attempt?.attempt_id || attempt?.id || `attempt-${index + 1}`);
+}
+
+export function providerOf(attempt) {
+  return attempt?.provider || {};
+}
+
 export function attemptOutcome(attempt) {
   const key = String(attempt?.status || "").toLowerCase();
   return OUTCOMES[key] || { key: key || "unrecorded", label: "状态未标注", tone: "gated", terminal: false };

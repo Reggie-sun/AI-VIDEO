@@ -299,8 +299,10 @@ async function readBoundPrompt(promptPath, expectedSha256, limits, root) {
     ]);
     if (!stat.isFile() || stat.size > limits.maxSidecarBytes || openedPath !== promptPath || !containedPath(root, openedPath)) return null;
     const bytes = await file.readFile();
-    if (createHash("sha256").update(bytes).digest("hex") !== expectedSha256.toLowerCase()) return null;
+    // Development artifact receipts bind the producer's stripped prompt text;
+    // the text file's storage whitespace is not part of that receipt identity.
     const prompt = bytes.toString("utf8").trim();
+    if (createHash("sha256").update(prompt, "utf8").digest("hex") !== expectedSha256.toLowerCase()) return null;
     return prompt ? prompt.slice(0, 8_000) : null;
   } finally {
     await file.close();

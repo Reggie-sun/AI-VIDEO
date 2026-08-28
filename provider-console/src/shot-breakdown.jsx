@@ -8,7 +8,7 @@ import {
   projectShotRows,
   shotForAttempt,
 } from "./run-detail-contract.js";
-import { externalStatus } from "./external-media-contract.js";
+import { externalStatus, externalStoryboardShots } from "./external-media-contract.js";
 
 function attemptKey(attempt, index) {
   return attempt?.attempt_id || attempt?.id || `attempt-${index + 1}`;
@@ -81,13 +81,7 @@ export function ProjectShotBreakdown({ detail, selectedAttemptId, onSelectAttemp
 export function ExternalShotBreakdown({ group }) {
   const status = externalStatus(group);
   const coLocatedDeclaration = group?.composition?.association_status === "co_located_declared_package";
-  const shots = group?.composition?.ordered_shots || (group?.shot_id ? [{
-    shot_id: group.shot_id,
-    prompt_text: group.prompt_text,
-    shot_type: group.shot_type,
-    generation_type: group.generation_type,
-    reported_status: group.reported_status,
-  }] : []);
+  const shots = externalStoryboardShots(group);
   return (
     <section className="external-shot-breakdown">
       <header><div><FilmStrip size={22} /><div><span>SHOT EVIDENCE</span><h2>{coLocatedDeclaration ? "同目录声明的 Shot 分镜" : "该视频关联的 Shot 分镜"}</h2></div></div><b>{shots.length} Shots</b></header>
@@ -100,7 +94,7 @@ export function ExternalShotBreakdown({ group }) {
             {shot.duration_basis && <span>时长依据 · {shot.duration_basis}</span>}
             {shot.start_seconds !== undefined && shot.start_seconds !== null && <span>{shot.start_seconds}s – {shot.end_seconds}s</span>}
           </div>
-          <div className="external-shot-breakdown__script"><span>分镜脚本</span><p>{shot.purpose || shot.intent || shot.talent_action || "没有与该视频绑定的 Shot 脚本"}</p></div>
+          <div className="external-shot-breakdown__script"><span>{shot.purpose || shot.intent || shot.talent_action ? "分镜脚本" : shot.prompt_text ? "分镜脚本参考（来自 exact Prompt）" : "分镜脚本"}</span><p>{shot.purpose || shot.intent || shot.talent_action || shot.prompt_text || "没有与该视频绑定的 Shot 脚本"}</p></div>
           {shot.talent_action && <div className="external-shot-breakdown__script"><span>人物动作</span><p>{shot.talent_action}</p></div>}
           {shot.product_state && <div className="external-shot-breakdown__script"><span>产品状态</span><p>{shot.product_state}</p></div>}
           {shot.camera_intent && <div className="external-shot-breakdown__script"><span>镜头意图</span><p>{shot.camera_intent}</p></div>}

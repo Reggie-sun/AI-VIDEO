@@ -23,5 +23,6 @@ export async function enableMediaSound(media) {
   media.defaultMuted = false;
   media.muted = false;
   media.volume = 1;
+  if (media.ended) media.currentTime = 0;
   await media.play();
 }
