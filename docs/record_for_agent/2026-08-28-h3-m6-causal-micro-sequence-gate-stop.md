@@ -2,6 +2,83 @@
 
 Date: 2026-08-28
 
+## V4 Current Checkpoint — 2026-08-28
+
+本 section 是当前 M6 empirical decision checkpoint；下方 v3/v2/v1 evidence 保留为历史。v4 只完成
+Shot C smallest-owner terminal-anchor repair 的 Stage 1：在用户将 authorization 精确绑定到
+`ba9f18dfbe9e7d04456954ffd5a59f59391cdd8d66776eb91c02b66418871ad3` 后，执行一次且仅一次
+`image_gen.imagegen` image-edit，随后进行 deterministic local materialization 与 exact-byte image-level
+Gate。没有 retry、variant、fallback、ComfyUI/H3、`video-analysis` 或 assembly action。
+
+### V4 Stage-1 Authorization And Exact Outputs
+
+- Experiment root:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v4`
+- Stage-1 exact preview:
+  `sidecars/stage-1-shot-c-terminal-anchor-repair-exact-preview.json`
+- Preview SHA-256:
+  `ba9f18dfbe9e7d04456954ffd5a59f59391cdd8d66776eb91c02b66418871ad3`
+- Authorization source: 用户对该 exact preview 选择 `A`；scope 只覆盖恰好一次
+  `image_gen.imagegen` edit call，以及该单一 output 的 local deterministic materialization 与 image-level
+  Gate。Backend model/request identity 未由 tool contract 暴露，因此没有虚构。
+- Exact edit target / Shot C first anchor / supporting girl-product-cap reference SHA-256：
+  `1b4a0ad18aa50304a9c08b3561241f3d0859da0c967716e83bc7a6dd0ad82340` /
+  `062877fc2c6c09ef10cade29f0baa8fa8f884c5675cb13125f2e627b3d672fd3` /
+  `4a9f0e7ceb42c7de0965824808ffb840e2a6005cf5d0835da7c9c18d690fc43e`。
+- Raw output:
+  `inputs/authored/raw/c-terminal-stopped-use-relief-locked.imagegen.png`
+  - SHA-256: `7ce3908c7527ea7ee974c129c20b7094ad41a283020353e1cad946954390c5ed`
+  - Size: `1,645,794 bytes`
+  - Geometry: `1254x1254`、8-bit RGB PNG。
+- Deterministically materialized anchor:
+  `inputs/authored/c-terminal-stopped-use-relief-locked.png`
+  - SHA-256: `78cdffccec608b143d63113d7c428b722a1b5772e79a30923d3e699a1a2c6a74`
+  - Size: `1,067,765 bytes`
+  - Geometry: `768x768`、8-bit RGB PNG。
+- Materialization: exact raw PNG 通过 local `ffmpeg` Lanczos scale 生成 `768x768` RGB PNG；无 crop、
+  padding、rotation、variant、generation 或额外 Provider call。
+- Actual calls: `image_gen.imagegen=1`；retry/variant/ComfyUI/H3 compile/H3 submit/
+  project-local `video-analysis`/assembly 均为 `0`。
+
+### V4 Shot C Terminal Anchor Image Gate
+
+- Gate: `sidecars/gates/shot-c-terminal-anchor-image-gate.json`
+- Gate SHA-256: `117fab03f85abf2933434bd0d2f82bcd3289871be3f458c8eea742334bb9e67c`
+- Exact first-anchor background comparison: SIFT/RANSAC `64` good matches、`53` inliers；homography
+  scale `[1.003714, 1.001485]`、translation `[-0.531, -1.225] px`。
+- Supporting face-scale check: OpenCV Haar main face box 约 `60 -> 70 px`；该值只作 supporting evidence，
+  不替代视觉 requirement Gate。
+
+| Requirement | Verdict | Evidence summary |
+| --- | --- | --- |
+| causal close state | PASS | girl alone、elder absent；双臂与唯一 uncapped yellow-and-white bottle 已降低并远离 underarm，nozzle 不再朝向身体；无 spray/mist；唯一 detached cap 位于 existing screen-left bed edge；relaxed shoulders 与 restrained relieved smile 可读 |
+| identity/product | PASS | girl face、hair、earrings、wardrobe、proportions 与 anatomy 稳定；exactly one bottle + one detached cap，无 duplicate、extra character/limb、logo/color drift、text 或 watermark |
+| conditioning | PASS | exact capped first anchor 到 completed-use last anchor 保持 locked-camera reachable endpoint；无 scene reset、scale discontinuity、forced terminal snap 或 incompatible reframe |
+| camera/composition | PASS | square medium-wide crop、blurred side fill、room perspective、window/curtain、bed edge、doorway、subject placement、negative space 与 lighting 保持 compatible；background homography 接近 identity |
+| readability | PASS | still frame 立即读为 completed-use settled-relief，而非 ongoing spray pose |
+| geometry | PASS | raw/materialized PNG 均 exact decode；materialized anchor 为 `768x768` RGB，hash/size 已绑定 |
+
+`stage_1_gate=PASS` 只证明新的 terminal anchor bytes 满足 image-level causal/conditioning preflight；它不是
+Shot C video technical PASS、M6 causal HUMAN PASS、P6、Final Acceptance、Production qualification 或
+commercial verdict。旧 v3 Shot C MP4 的四项 required FAIL 与 `human_verdict=NOT_EVALUATED` 对旧 exact bytes
+继续有效，不被本次 image Gate 改写。
+
+### V4 Current Stop And Next One Thing
+
+Stage 1 已按 preview stop rule 停在 sealed anchor bytes。没有编译新的 Shot C H3 request、没有派生新 seed，
+也没有预授权 H3 submit。下一项工作只能在后续明确 scope 中，用 exact Shot C first anchor
+`062877fc2c6c09ef10cade29f0baa8fa8f884c5675cb13125f2e627b3d672fd3` 与 repaired last anchor
+`78cdffccec608b143d63113d7c428b722a1b5772e79a30923d3e699a1a2c6a74` 编译新的 Shot C request，展示
+独立 exact H3 submit preview，并在任何 ComfyUI/H3 submit 前重新获得 task-scoped authorization。不得自动
+reuse v3 request/seed、retry、fallback 或串联 15.5s/30s assembly；M7–M9 与 HUMAN verdict 继续 deferred。
+
+V3 preview 曾把 quality hashes 与 non-quality workflow/binding path labels 组合；v4 read-only preflight 已按
+`workflows/profiles/minimax_h3_fl2va_quality.json` 纠正为
+`workflows/templates/minimax_h3_fl2va_quality_api.json` 与
+`workflows/bindings/minimax_h3_fl2va_quality_binding.yaml`。对应 hashes 仍分别为
+`8b6c338279d8af768fae8106034f9f26e8e9d59583e95a8ca8b16d36a930ad65` 与
+`e0ae28bdaaa81ac70578b11e97f95cacab826273ec09f82bfcf430176fb05a4c`；该修正不构成 H3 action 或授权。
+
 ## V3 Current Checkpoint — 2026-08-28
 
 本 section 是当前 M6 empirical decision checkpoint；下方 v2/v1 evidence 保留为历史。v3 在不重复
