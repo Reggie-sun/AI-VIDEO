@@ -9,8 +9,10 @@ Shot C smallest-owner terminal-anchor repair 的 Stage 1：在用户将 authoriz
 `ba9f18dfbe9e7d04456954ffd5a59f59391cdd8d66776eb91c02b66418871ad3` 后，执行一次且仅一次
 `image_gen.imagegen` image-edit，随后进行 deterministic local materialization 与 exact-byte image-level
 Gate。随后在新的明确 scope 中，只通过 canonical local compiler/resolve/preview seam 编译一个 repaired
-Shot C H3 request，并物化独立 submit authorization preview。没有 retry、variant、fallback、ComfyUI runtime、
-H3 submit、`video-analysis` 或 assembly action。
+Shot C H3 request，并物化独立 submit authorization preview。用户将 Stage-2 authorization 精确绑定到该
+preview 后，执行一次且仅一次 local H3 submit，并立即完成四项 project-local `video-analysis` barrier。
+Terminal close-state repair 通过，但 mid-action bottle/underarm hand assignment 与空间因果关系失败，因此
+Shot C technical Gate 为 `FAIL`；没有 retry、variant、fallback、Shot B Provider call 或 assembly action。
 
 ### V4 Stage-1 Authorization And Exact Outputs
 
@@ -71,9 +73,10 @@ commercial verdict。旧 v3 Shot C MP4 的四项 required FAIL 与 `human_verdic
   `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v4/sidecars/h3-submit-exact-preview.json`
 - Preview SHA-256:
   `5d2ee569340e6e22bb40f4d01514a4cc49d0840837f24dff9ff052a0ff316ddb`
-- Current action 只执行 local request compilation、deterministic resolve 与 provider contract preview；未创建
+- 在本 preview checkpoint，current action 只执行 local request compilation、deterministic resolve 与 provider contract preview；未创建
   `sidecars/h3-submit-authorization.json`，未启动 ComfyUI，未调用 runtime preflight/submit/fetch，且 future output
-  `outputs/shot-c-open-use-effect-v4.mp4` 不存在。
+  `outputs/shot-c-open-use-effect-v4.mp4` 不存在。后续 Stage-2 execution evidence 由下一 subsection 独立记录，
+  不回写本 preview 当时的事实。
 - Provider/profile/model/capability:
   `comfy-local-h3` / `minimax-h3-fl2va-quality` / `minimax-h3-fl2va` /
   `minimax-h3-fl2va-local-v1`。
@@ -109,14 +112,63 @@ commercial verdict。旧 v3 Shot C MP4 的四项 required FAIL 与 `human_verdic
   `video_probe`、`video_scene_detect`、`video_extract_frames`、`video_transcribe` 四项 barrier，并给出六项
   requirement-level verdict；任一 `FAIL` / `NOT_EVALUATED` 立即停止且不得 retry 或 assembly。
 
+### V4 Shot C Exact Output And Gate Stop
+
+- Stage-2 authorization source: 用户选择 `A`，精确绑定上方 preview SHA-256
+  `5d2ee569340e6e22bb40f4d01514a4cc49d0840837f24dff9ff052a0ff316ddb`。
+- Authorization sidecar:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v4/sidecars/h3-submit-authorization.json`
+  - SHA-256: `36b8f294cc0d7b28172cd3c7a8e103ccd54f6a4f1ad2cea067c20f1dea99a653`
+  - Ceiling: Shot C local H3 submit `1`、project-local `video-analysis` `4`；image edit、retry、variant、
+    fallback、remote/paid 与 Shot B Provider call 均为 `0`。
+- Provider request ID: `53d67f5a-67e1-42fa-a496-604eeb7f735e`。
+- Exact output:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v4/outputs/shot-c-open-use-effect-v4.mp4`
+  - SHA-256: `d63a0c3498441e33fb2c8a0c1a43d2dcbc5c038ae15c493d8746e9141318db31`
+  - Size: `1,402,852 bytes`。
+- Result sidecar: `sidecars/shot-c-result.json`；SHA-256
+  `b352cb6a4c78df7c97bed0b43a7f06458a15d6bb619f34a134fec3554f63f250`。
+- Submitted request identity 保持 exact preview：effective seed
+  `70747632828882972`、resolved-generation SHA-256
+  `bda27366cc41d90e13402fd92347eccae00581ca79a38c9063cf9375a6a8a79a`；未引入新 Provider、profile、
+  workflow 或 binding。
+- Exact media probe: H.264 High、`768x768`、`24 fps`、`124` frames、`5.167s`；AAC LC、
+  `32 kHz`、stereo。Full video/audio decode 均 `PASS`，scene detect 为 one scene。
+- Anchor support metrics: decoded first/last endpoint SSIM 分别为 `0.929921` / `0.916234`。这些值只证明
+  endpoint conditioning support，不替代 semantic Gate。
+- Exactly four project-local analysis calls 已执行：`video_probe`、`video_scene_detect`、
+  `video_extract_frames`（13 sampled frames）与 `video_transcribe`。Whisper `small` 返回 empty transcript、
+  zero segments；没有额外 analysis call。
+- Gate:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v4/sidecars/gates/shot-c-v4-gate.json`
+  - SHA-256: `3f1450c0a1b94ebab0f1b8984c979a380cd557fc1d7a161d7d321fd8b29d27e8`
+
+| Required finding | Verdict | Exact-byte evidence summary |
+| --- | --- | --- |
+| causal state | FAIL | cap removal、screen-left placement、brief mist、lowered bottle 与 settled terminal relief 均存在；但 central action 中 bottle 被 raised arm 举过头顶，另一只手接触 underarm，nozzle 未朝向 underarm，因果动作不成立 |
+| conditioning | PASS | first/last anchors、room、subject、product identity 与 endpoint transition 保持 compatible；terminal repaired close-state 实际到达 |
+| camera | PASS | locked square medium-wide camera、scale、composition 与 room perspective 保持稳定，无 incompatible reframe |
+| intent / performance | FAIL | 动作表演读为 overhead bottle pose + opposite-hand underarm touch，不是所需的 direct underarm spray-use action |
+| dialogue / lip-sync | PASS | 无 required dialogue；empty transcript、zero segments，未发现 unintended vocalization 或可评估 lip-sync conflict |
+| readability | FAIL | mist 穿过 face/upper torso，bottle/nozzle 与 underarm 的空间关系错误，单次观看不能清楚读为 underarm spray |
+
+`terminal_close_state_repair=PASS` 只说明本轮 smallest-owner endpoint repair 成功；它不能覆盖 central action 的
+semantic failure。Shot C `technical_gate=FAIL`、`human_verdict=NOT_EVALUATED`、`next_submit_allowed=false`、
+`retry_authorized=false`，并已触发 stop rule。Production development attempt 停在 fetched `validate` phase；
+Agent-side per-Shot Gate 没有写 Manifest acceptance、activation、P6 或 Final Acceptance。
+
+本轮实际调用计数为 local H3 submit `1`、project-local `video-analysis` `4`、image generation/edit `0`、
+retry `0`、variant `0`、fallback `0`、remote/paid `0`、Shot B Provider call `0`。没有创建 `15.5s` / `30s`
+assembly。ComfyUI queue 已清空并停止，checkout 已 clean 恢复至
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`。
+
 ### V4 Current Stop And Next One Thing
 
-新的 Shot C request 与 exact preview 已编译并按 stop rule 停止；没有自动预授权 H3 submit。下一项工作只能是
-让用户把新的明确 Stage-2 task-scoped authorization 精确绑定到 preview SHA-256
-`5d2ee569340e6e22bb40f4d01514a4cc49d0840837f24dff9ff052a0ff316ddb`，然后执行 exactly one local Shot C
-submit。不得自动 reuse v3 request/seed、retry、variant、fallback 或串联 15.5s/30s assembly；M7–M9、
-qualification 与 HUMAN verdict 继续 deferred。若未获得该 exact authorization，ComfyUI/H3 runtime、Provider
-preflight/submit 与 `video-analysis` 均必须保持 `0`。
+V4 Shot C Gate `FAIL` 已终止本次 authorization；不得 retry、variant、fallback 或串联 `15.5s` / `30s`
+assembly。下一项工作最多只能是针对 mid-action spatial causality / hand assignment 的新一轮 read-only
+smallest-owner preflight 与 exact authorization preview。任何新的 anchor repair、H3 compile/submit 或
+`video-analysis` 都需要重新界定 scope，并在对应 exact preview 后获得新的明确 authorization；本记录不预授权
+或自动串联后续动作。M7–M9、qualification、aggregate Gate expansion 与 HUMAN verdict 继续 deferred。
 
 V3 preview 曾把 quality hashes 与 non-quality workflow/binding path labels 组合；v4 read-only preflight 已按
 `workflows/profiles/minimax_h3_fl2va_quality.json` 纠正为
