@@ -2,6 +2,18 @@
 
 Date: 2026-08-28
 
+## Authorization Policy Supersession — 2026-08-28
+
+本记录各 V1–V6 section 的 exact preview、authorization sidecar、call ceiling 与实际 call count 继续作为
+对应历史 attempt 的 immutable execution evidence；其“下一次 strict-loopback Local H3 / ComfyUI action
+必须重新获得 user task-scoped authorization”的 current-facing rule 已由
+`docs/record_for_agent/2026-08-28-local-comfyui-authorization-exemption.md` 取代。
+
+后续 task-relevant local ComfyUI lifecycle、generation、repair/retry、variant 与 benchmark 无需 user
+authorization，但仍必须形成新的 exact identity、通过全部适用 Provider / media gates，并在 unknown outcome
+时 fail closed。Per-Shot `FAIL` / `NOT_EVALUATED` 仍终止当前 batch；新 attempt 不得自动串联。V6 technical
+PASS、HUMAN `NOT_EVALUATED`、M7–M9 deferred、P6 / Final Acceptance 与 publication boundary 均未改变。
+
 ## V6 Current Checkpoint — 2026-08-28
 
 本 section 是当前 M6 empirical decision checkpoint；下方 V5/V4/V3/V2/V1 evidence 保留为历史。V5 已修复

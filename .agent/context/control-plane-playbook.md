@@ -116,7 +116,9 @@ code/tests；`AGENTS.md` 的 `Canonical Ownership` 继续提供顶层 durable bo
 - 稳定 credential reference 是 `ARK_API_KEY`；本机 Secret Service exact attributes 为 `application ai-video`、`provider seedance`、`credential ARK_API_KEY`。不得改用 `SEEDANCE_API_KEY`、读取 MiniMax credential 或建立 environment/provider fallback。
 - Secret lookup 必须封装在 injected credential supplier 中。不得在交互终端把 secret 输出到 stdout；presence check 必须不回显。Lookup失败、keyring locked、credential invalid/rotated 时 fail closed，不得搜索 repo、shell history 或替代 secret source。
 - Credential 存在不证明 access、pricing、余额或当前 task authorization。
-- 当前 task scope 内的 loopback local ComfyUI Provider generation 是 local、unmetered、no-cloud-egress execution，不适用 remote/paid task-scoped authorization，也不需要额外 user confirmation。用户明确禁止 live generation 时仍必须停止；sealed profile、preflight、local permit、唯一 committer、recovery 与 media verification gates 不因该豁免而放宽。
+- 严格 loopback、完全 local/unmetered 且无 cloud egress 的 ComfyUI lifecycle 与 media actions 全部适用 `AGENTS.md` 的 `Local ComfyUI Authorization Exemption`：为任务所需的 `status` / `start` / `stop`、image/video generation、retry、variant 与 benchmark 均不需要 user authorization、task-scoped authorization 或额外 confirmation。该规则不要求用户先点名 local ComfyUI，但 action 必须仍与 accepted task 直接相关；用户明确要求 read-only、禁止 live generation / media effects，或 endpoint / effect 无法证明满足 exemption 时必须停止。
+- 豁免只移除 user-approval layer。执行必须使用所涉 surface 的既有 canonical seam；AI-VIDEO local video Provider 仍经 `VideoGenerationService`、sealed profile、preflight、durable local intent、committer-issued one-use permit、唯一 committer、recovery 与 media verification，禁止直接调用 Comfy transport 或 Provider `submit()`。Agent-side local image authoring也不得绕过其既有 tool/provider identity、input/output provenance 与 image-level Gate。Exact preview 在既有 seam 要求时仍是 readiness/provenance evidence，但不是 local ComfyUI 的 user-approval gate。
+- Retry、variant 与 benchmark 可以不询问用户，但必须是 bounded、task-relevant、具有新 exact identity 的 attempt。上一次 outcome unknown 时仍须 fail closed，禁止 blind retry、fallback、permit remint 或重复 side effect；Per-Shot Gate 的 `FAIL` / `NOT_EVALUATED` 仍终止当前 batch，repair attempt 不得自动串联。任何非 loopback、可能 cloud egress、metered、remote 或 paid execution 均回到对应 authorization 与 Provider gates。
 - 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
 - Authorization 仅覆盖 accepted Provider/model、inputs、budget 与完成目标所需的最少调用；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。
 - Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 exact preview、finite budget ceiling/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit。
@@ -148,7 +150,7 @@ blocking_prerequisite: <真实 blocker；没有则写 none>
 若 `blocking_prerequisite = none`，下一关键动作默认执行 `cheapest_valid_experiment`，而不是继续增加非必要 qualification infrastructure、schema、lifecycle、Harness 或 integration。推荐顺序是：
 
 ```text
-Safety / User Authorization
+Safety / Applicable Authorization Or Local Exemption
   -> Minimum Technical Prerequisite
   -> Cheap Empirical Falsification
   -> Production Qualification
@@ -156,7 +158,7 @@ Safety / User Authorization
   -> Promotion
 ```
 
-`development_experiment` 只是 evidence / reporting classification 与 sequencing policy，不是新的 execution plane、API、schema enum、registry record 或 persistent lifecycle state。实验复用所选工具当前已批准的 execution seam：AI-VIDEO local video Provider 仍必须经 `VideoGenerationService`、sealed profile、preflight、local permit、唯一 committer、recovery 与 media verification，禁止直接调用 Comfy transport或Provider `submit()`；remote / paid experiment仍须满足当前用户授权、budget、cloud-egress、secret、durable intent、one-use permit与unknown-outcome rules。实验 output / metadata 必须与 active Production truth隔离，结果只接受bounded technical / human triage，不得直接产生active capability、Production qualification、Manifest / Registry activation、P6 / Final Acceptance或release truth。Development experiment PASS / FAIL 均不得偷换frozen rubric或Production contract。
+`development_experiment` 只是 evidence / reporting classification 与 sequencing policy，不是新的 execution plane、API、schema enum、registry record 或 persistent lifecycle state。实验复用所选工具当前已批准或按`Local ComfyUI Authorization Exemption`免授权的execution seam：AI-VIDEO local video Provider仍必须经`VideoGenerationService`、sealed profile、preflight、local permit、唯一 committer、recovery与media verification，禁止直接调用Comfy transport或Provider `submit()`；remote / paid experiment仍须满足当前用户授权、budget、cloud-egress、secret、durable intent、one-use permit与unknown-outcome rules。实验 output / metadata 必须与 active Production truth隔离，结果只接受bounded technical / human triage，不得直接产生active capability、Production qualification、Manifest / Registry activation、P6 / Final Acceptance或release truth。Development experiment PASS / FAIL 均不得偷换frozen rubric或Production contract。
 
 ## 5. Repository-Specific Don't Repeat This
 
@@ -224,8 +226,10 @@ resolve Shot N SourceAudioPolicy against the already-selected Provider capabilit
 - 只有全部required findings为`PASS`时，Agent才可提交下一Shot。MCP unavailable/error、
   output identity drift、missing/stale evidence或任何required finding无法可靠判断都必须
   `NOT_EVALUATED`并fail closed。
-- `FAIL`或`NOT_EVALUATED`后只允许报告诊断与建议的targeted repair；除非accepted task scope
-  已明确覆盖该retry且全部Provider gates仍有效，否则不得自动重生成、fallback或继续batch。
+- `FAIL`或`NOT_EVALUATED`后只允许报告诊断与建议的targeted repair，当前batch必须停止。符合
+  `Local ComfyUI Authorization Exemption`的后续bounded repair/retry无需用户授权，但必须作为具有
+  新exact identity的独立attempt重新进入全部Provider与media gates；不得自动串联重生成、fallback
+  或继续batch。Remote / paid retry仍须具备适用authorization。
 - MCP raw evidence与Agent verdict不得直接写Manifest、Registry、activation、P6 receipt或
   Final Acceptance。进入Production acceptance时，仍须由existing review contract与
   `ProductionStateCommitter`重新绑定、adjudicate和持久化。

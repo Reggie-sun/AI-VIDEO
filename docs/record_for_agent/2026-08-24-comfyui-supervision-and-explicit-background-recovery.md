@@ -2,6 +2,17 @@
 
 Date: 2026-08-24
 
+## Supersession Notice — 2026-08-28
+
+下方 `Remaining Risks And Next Work` 中“下一次真实 ComfyUI `start` 必须来自明确 lifecycle
+authorization”，以及末尾“local media 不授权新的 Provider / generation”作为当前 local ComfyUI
+user-authorization gate 的表述，已由
+`docs/record_for_agent/2026-08-28-local-comfyui-authorization-exemption.md` 取代。
+
+严格 loopback、完全 local/unmetered、no-cloud-egress 的 ComfyUI lifecycle、generation、retry、variant
+与 benchmark 现在无需 user authorization；本记录关于 unique systemd owner、listener/PID proof、显式
+recovery、unknown outcome、no blind retry 与不把 service health 升级为 media/quality PASS 的工程事实继续有效。
+
 ## Purpose
 
 本文记录 AI-VIDEO 本地 ComfyUI 长进程 supervision 与 long-video background state 显式恢复的当前 implemented truth，供后续 Agent 处理 ComfyUI 启停、process interruption、stale / unreadable `background_job.json`、reattach 与 accepted Manifest continuity 时复用。
@@ -107,7 +118,7 @@ AI-VIDEO commits `f9b580d` 与 ComfyUI plugin commit `28cb160` 只存在于本�
 ## Remaining Risks And Next Work
 
 - 未知 `SIGTERM` 来源仍需独立、bounded、read-only reassessment；supervisor hardening 不能倒推出 termination cause。
-- 下一次真实 ComfyUI `start` 必须来自明确 lifecycle authorization，并核对 returned unique unit、journal、`InvocationID`、MainPID 与 exact loopback listener。
+- 下一次真实 ComfyUI `start` 符合 current local exemption 时无需 user authorization，但仍必须核对 returned unique unit、journal、`InvocationID`、MainPID 与 exact loopback listener。
 - 若下一次需要恢复 E0-C，必须把新的 resumed attempt 与 historical interrupted attempt 分开记录；不得 blind retry 或把 resumed output 冒充 uninterrupted original execution。
 - Recover 前必须确认没有 live process lease；Recover 后只能按 response 的 `queue_workflow_once` 或 `compose_accepted` action 执行。
 
@@ -119,4 +130,4 @@ AI-VIDEO commits `f9b580d` 与 ComfyUI plugin commit `28cb160` 只存在于本�
 - Recover PASS 不等于 queue、resume、retry 或 composition 已执行。
 - accepted Manifest truth 不得被 stale `background_job.json` 覆盖。
 - infrastructure hardening PASS 不等于 E0-C complete、watchable、P6 PASS 或 Final Acceptance。
-- 历史 credential、ComfyUI availability 或 local media 不授权新的 Provider、generation、resume、push 或 release。
+- 历史 credential、ComfyUI availability 或 local media 仍不授权 remote/paid Provider、unrelated scope、push 或 release；符合 current local exemption 的 task-relevant ComfyUI lifecycle/generation无需 user authorization，但仍受全部适用技术 gates 约束。

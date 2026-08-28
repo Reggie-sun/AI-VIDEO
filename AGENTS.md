@@ -81,7 +81,7 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 ### Empirical Validation Priority
 
 - 对 video、image、audio、continuity、identity、motion、camera、prompt adherence、lip sync 与 perceptual quality 等不能仅由 code、tests、static analysis、review 或 Harness 证明的能力，Agent 必须区分 Engineering / Deterministic Uncertainty 与 Empirical / Model-Quality Uncertainty。
-- 当 Empirical / Model-Quality Uncertainty 是最大的 remaining uncertainty，且存在 safe、bounded、authorized、affordable/local、technically executable、可隔离且可归因的最小真实媒体实验时，在继续扩大仅服务未来验证的 Production qualification、schema、lifecycle、Harness 或 integration 之前，下一关键动作 SHOULD 优先获取该实验的 evidence。只有真实阻塞实验的 safety、authorization、credential、exact model/workflow、output destination、isolation、minimum repeatability/attribution prerequisite，或用户明确要求先完成 contract 时，才继续优先 engineering。
+- 当 Empirical / Model-Quality Uncertainty 是最大的 remaining uncertainty，且存在 safe、bounded、已满足适用 authorization（或属于下述 local ComfyUI exemption）、affordable/local、technically executable、可隔离且可归因的最小真实媒体实验时，在继续扩大仅服务未来验证的 Production qualification、schema、lifecycle、Harness 或 integration 之前，下一关键动作 SHOULD 优先获取该实验的 evidence。只有真实阻塞实验的 safety、适用 authorization、credential、exact model/workflow、output destination、isolation、minimum repeatability/attribution prerequisite，或用户明确要求先完成 contract 时，才继续优先 engineering。
 - Development experiment evidence 不是 Production evidence。PASS 不自动产生 active capability、Production qualification、P6 / Final Acceptance、live-ready、release 或 replay truth；FAIL 不授权降低 Production contract、改变 frozen rubric、fallback、blind retry，或绕过 safety、budget、egress、permit、lifecycle 与 recovery。
 - Pure schema migration、deterministic bug、state corruption、replay bug、security fix 与 no-media backend refactor 不触发本优先级；本规则也不把“先生成再写代码”或“媒体生成永远优先”设为默认。
 
@@ -212,6 +212,13 @@ alternate path 与 focused verification 的唯一 human-readable owner。实现�
 - 若费用超过 ceiling、scope/provider/egress 变化、需要更多调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限额度。
 - 历史 live evidence、offline tests、现有 credential/余额或旧 run 不授权新的调用。
 
+## Local ComfyUI Authorization Exemption
+
+- 连接严格限制为 loopback、执行完全 local/unmetered 且无 cloud egress 的 ComfyUI lifecycle 与 media actions 不需要 user authorization、task-scoped authorization 或额外 confirmation；该豁免包括为任务所需的 `status` / `start` / `stop`、image/video generation、retry、variant 与 benchmark。
+- 该豁免只移除 authorization gate，不扩大用户 task scope，也不覆盖用户明确的 read-only、禁止 live generation / media effects 或更高优先级限制。Exact request identity、sealed profile/workflow/binding、preflight、适用的 local intent/one-use permit、canonical execution seam、唯一 committer、content-addressed provenance、recovery 与 media verification gates 保持不变。
+- Retry、variant 与 benchmark 可以无需询问用户，但必须是 bounded、task-relevant 的新 exact attempt；上一次 outcome unknown 时仍须 fail closed，禁止 blind retry、fallback、permit remint 或重复 side effect。Per-Shot Gate 的 `FAIL` / `NOT_EVALUATED` 仍会停止当前 batch，后续 repair attempt 不得被自动串联。
+- Exact preview 在既有 seam 要求时继续作为 readiness/provenance evidence，但不得充当 local ComfyUI 的 user-approval gate。任何非 loopback、可能 cloud egress、metered、remote 或 paid execution 均不适用本豁免。
+
 ## Decision Gates
 
 除非用户的当前明确请求已经批准对应 scope，否则以下变更必须先暂停并确认：
@@ -221,7 +228,7 @@ alternate path 与 focused verification 的唯一 human-readable owner。实现�
 - 引入新的 v2 writer、自动 recovery、automatic candidate activation，或把 mutation 移入 reader/registry/dependency/adapter。
 - 引入 frontend、API server、queue manager 或其他新的 product subsystem。
 - 引入超出已验收 P4 audio/caption contract 的新音频子系统，或改变 canonical audio / timeline ownership。
-- 开始新的 runtime slice、live smoke、benchmark、remote/paid Provider submit 或 quality-acceptance claim。当前 task 已满足 task-scoped authorization 时不要重复确认，但仍必须执行全部技术 gates。
+- 开始新的 runtime slice、非 local-ComfyUI live smoke / benchmark、remote/paid Provider submit 或 quality-acceptance claim。符合 `Local ComfyUI Authorization Exemption` 的 lifecycle、generation、retry、variant 与 benchmark 无需暂停确认，但仍必须执行全部适用技术 gates。
 - 放宽 crash safety、secret handling、Budget Guard、Cloud Egress、provenance、replay、recovery 或 QA acceptance contract。
 
 ## Repository-Specific Don't Repeat This
