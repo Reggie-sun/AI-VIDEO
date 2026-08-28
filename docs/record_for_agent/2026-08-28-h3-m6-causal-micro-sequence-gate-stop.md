@@ -6,10 +6,10 @@ Date: 2026-08-28
 
 本 section 是当前 M6 empirical decision checkpoint；下方 V5/V4/V3/V2/V1 evidence 保留为历史。V5 已修复
 hand assignment 与 terminal close-state，但 exact Shot C 在 `2.1–3.3s` action window 没有 visible mist 或
-其他 discrete discharge event，导致 `causal_state`、`intent/performance` 与 `readability` 继续 `FAIL`。
-V6 read-only preflight 将 smallest owner 收敛到 `generation_intent` 的 prompt action-physics / event-visibility
-contract；anchors、hand assignment、terminal close-state、Provider/profile/workflow/binding、camera 与 output
-contract 均保持不变。
+其他 discrete discharge event。V6 将 smallest owner 收敛到 `generation_intent` 的 prompt action-physics /
+event-visibility contract，并在用户精确绑定 exact preview 后执行一次 local H3 submit。Exact V6 output 的六项
+required findings 全部 `PASS`；这只关闭 Shot C technical Gate，不产生 HUMAN、P6、Final Acceptance、
+Production qualification、commercial acceptance 或 release truth。
 
 ### V6 Smallest-Owner Diagnosis
 
@@ -75,17 +75,73 @@ contract 均保持不变。
   不是 strict same-seed prompt-only A/B。该 attribution limit 已写入 exact preview。
 - Future exact output destination:
   `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v6/outputs/shot-c-open-use-effect-v6.mp4`；
-  当前不存在；authorization sidecar 也不存在。
+  preview checkpoint 时尚不存在；后续 exact execution evidence 由下一 subsection 独立记录。
+
+### V6 Shot C Exact Output And Technical Gate PASS
+
+- Stage-2 authorization source: 用户明确“授权”，精确绑定上方 preview SHA-256
+  `b41417146d35a90426be01ab0ede6f45eee0e6c20f4348bcd637f8987e9ff032`。
+- Authorization sidecar:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v6/sidecars/h3-submit-authorization.json`；
+  SHA-256 `ea00815b1c7457c27d00fb85d991a9af548e369bf594c97826e9b251606715fa`。
+- Exactly one canonical local submit 经
+  `VideoGenerationService.submit_local_once` 完成；Provider request ID
+  `a03ed95c-0557-4e2b-b1f9-d32b3c256b1e`，Provider file ID
+  `video:ai_video_h3_c7a5f9100afc3f4f_00001_.mp4:output`。没有第二次 submit、retry、variant、fallback、
+  new image、Shot B Provider call、remote/paid call 或 assembly call。
+- Exact output:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v6/outputs/shot-c-open-use-effect-v6.mp4`
+  - SHA-256: `b890b8531a676e47be2c7053c7ca14de93950094ed6acc434160ece742b274ad`
+  - Size: `1,403,781 bytes`
+  - Probe: `5.167s`、`124 frames`、`768x768`、`24fps`、H.264 High、AAC `32 kHz` stereo；完整
+    video/audio decode 均通过。
+- Runtime identity 与 exact preview 保持一致：requirement / provider-bound / compiled request / request input /
+  resolved generation hashes 分别为
+  `720f4dfbc84a37e0512d28e8e364a85246a7c0776965f9b05a309754eaefb1c6` /
+  `0f72d7b6a16d30adb1d210ab1af6917656f6c56be3d3187e916abb3e23d568dd` /
+  `21bf4731026d5c821cdd0413138c6b15e4dec5aa3bfbb57d2e427dd6e0d6ca80` /
+  `6f654dbf4302754ecf5072c5d9d07364311eea2922e0252c4af8b2bafc7074a5` /
+  `c7a5f9100afc3f4f9f693a41fa132ff397c493eb73349576b5ba3df883bfa1da`；effective seed
+  `8026907394716104014`。
+- Exact MP4 落盘后立即顺序完成 project-local `video_probe`、`video_scene_detect`、
+  `video_extract_frames`、`video_transcribe` 四项 barrier，call count 恰好为 `4`。结果为 one continuous
+  scene、13 张 `0.4s` sampled frames、empty transcript / zero segments。未再调用 `video-analysis`。
+- Local dense `0.1s` support 显示 spray onset 约 `2.1s`，clear localized plume 在约 `2.4–3.2s` 可读，约
+  `3.3s` 后消失，`3.4s` 起形成 clean no-mist gap，约 `4.4s` 完成 lowering/settle。该实际 micro-timing
+  相对 authored window 漂移约 `0.2–0.3s`，但没有改变 single-event causal order，也没有 terminal
+  persistence；它是 non-blocking concern，不是 HUMAN quality verdict。
+- Decoded first/last endpoint SSIM 为 `0.929312` / `0.913260`，只作为 conditioning support，不升级为
+  semantic 或 HUMAN acceptance。
+- Gate:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v6/sidecars/gates/shot-c-v6-gate.json`；
+  SHA-256 `e157258a38c07b7c56ee1ff0f2ee81c635f1073498c0b167035f4096e354706b`。
+- Result sidecar:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v6/sidecars/shot-c-result.json`；
+  SHA-256 `530dbf7a2c1718a34579e621d68a4ea0917e22ab4d718b4fda3bbac0d64dd295`。
+
+| Requirement | Verdict | Evidence summary |
+| --- | --- | --- |
+| `causal_state` | PASS | capped start、cap removal/placement、empty anatomical-right-arm raise、anatomical-left-hand bottle aim、single localized plume、plume cessation、clean gap、both-arm lowering 与 settled relief 形成完整 open-use-stop-relief chain；exactly one bottle、elder absence 与 screen-left detached cap 保持可读 |
+| `conditioning` | PASS | exact anchors、identity、wardrobe、product、cap、room geometry、scale 与 terminal composition 稳定；endpoint SSIM 仅作 supporting evidence |
+| `camera` | PASS | one continuous scene；doorway、curtain、wall/floor lines、standing mark、subject scale 与 locked framing 稳定，无 cut、pan、push-in 或 terminal reframe |
+| `intent/performance` | PASS | empty right arm raises；left bottle hand remains below shoulder/head、aims into exposed right underarm、produces one localized plume、stops，随后 bottle/arms lower并形成 restrained relief |
+| `dialogue/lip-sync` | PASS | sealed dialogue is none、`lip_sync_required=false`；AAC fully decodes，Whisper small 返回 empty text / zero segments |
+| `readability` | PASS | cap placement、correct hand assignment、nozzle-to-underarm plume、plume stop、clean no-mist gap 与 terminal relief 在 single take 中可区分；无 terminal spray persistence |
+
+Shot C `technical_gate=PASS`，`all_required_findings_pass=true`；Shot B 与 Shot C 现在均有 exact-byte technical
+Gate `PASS` evidence。`human_verdict=NOT_EVALUATED` 保持不变，technical PASS 不等于 HUMAN PASS、P6、
+Final Acceptance、Production qualification、commercial acceptance 或 release truth。
 
 ### V6 Current Stop
 
-V6 exact preview 已完成，但 H3 submit 尚未获新授权。若用户明确授权并绑定 preview SHA-256
-`b41417146d35a90426be01ab0ede6f45eee0e6c20f4348bcd637f8987e9ff032`，future scope 仅允许 Shot C 一次
-local H3 submit，以及 MP4 落盘后恰好四次 project-local `video-analysis` barrier calls；image generation/edit、
-Shot B Provider call、retry、variant、fallback、remote/paid 与 assembly call 均为 `0`。任何 required finding
-`FAIL` 或 `NOT_EVALUATED` 立即停止。该预览不预授权 `15.5s` / `30s` assembly、M7–M9、qualification、
-aggregate Gate expansion、HUMAN PASS、P6、Final Acceptance、Production qualification、commercial
-acceptance 或 release。
+V6 task-scoped authorization 已按 exact scope 消耗完毕，未留下 later Provider submit、retry、variant、fallback
+或 assembly authorization。ComfyUI queue 在 cleanup 前为空；repository supervisor 已停止，listener 已关闭，
+checkout 已恢复为 clean `e01fb4c56b7a88149d469b99cbbfe3223d715054`。
+
+M6 Shot B 与 Shot C technical Gates 均为 `PASS`，但当前没有 assembly authorization。下一可选动作只能是先对
+`15.5s` review assembly 做独立 read-only exact preview，并重新取得 task-scoped authorization；不得从本次
+technical PASS 自动串联 assembly。`30s` assembly、M7–M9、qualification、aggregate Gate expansion、HUMAN
+verdict、P6、Final Acceptance、Production qualification、commercial acceptance 与 release 继续 deferred。
 
 Durable V6 preview record checkpoint: `92ffb1e2980c887bfcd74833ddf0e0d9db805872`。
 
