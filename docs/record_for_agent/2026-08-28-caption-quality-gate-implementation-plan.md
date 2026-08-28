@@ -272,11 +272,28 @@ Manifest bytes unchanged 与 RepairOutcome artifact absent 断言后，architect
 
 ## Automatic Learning Evaluation
 
-`distill-ai-video-learning` automatic evaluation：`no_candidate`。本次 evidence 是同一 caption
+Implementation-phase `distill-ai-video-learning` automatic evaluation：`no_candidate`。当时的 evidence 是同一 caption
 quality gate 的 plan、prior-art mapping、implementation 与 deterministic verification chain，不是两个
 independent real-media attempts，也不是隔离变量的 controlled multi-arm comparison；现有 learning
 claims 中也没有被这次 evidence materially supported/countered/reopened 的同一 claim。因此不满足
 Learning Claim admission threshold，未创建 placeholder 或 pending candidate。
+
+Real-validation update 的 automatic evaluation：`pending_candidate`。Raw generic-font PASS 与
+Production custom-font FAIL 构成 held-constant controlled comparison，因此创建：
+
+`docs/record_for_agent/learning/hyperframes-caption-exact-source-readiness.md`
+
+- candidate checkpoint commit：`bcd2215`
+- committed candidate bytes SHA-256：
+  `14012cdb907b5bf29cd7359fa96676db84785d4d263c67f18b691578a00748f9`
+- `pending_evidence_status=SUPPORTED`
+- `pending_approval_status=PENDING_CONFIRMATION`
+- `pending_adoption_status=NOT_ADOPTED`
+
+该 candidate 只提出“exact Production source 必须通过 pinned HyperFrames lint/render 才能证明 caption
+renderer readiness”的 bounded Gate rule；不授权字体 asset/schema 修复，不修改 target，不产生 P6、
+activation、Final Acceptance、push 或 release truth。按 Skill contract，后续 adoption 在用户对上述 exact
+commit/hash 作出 `Confirm`、`Revise` 或 `Reject` 前保持停止。
 
 ## Implementation Boundary
 
