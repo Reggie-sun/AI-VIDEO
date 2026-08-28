@@ -43,6 +43,7 @@ import { AudibleVideo } from "./media-player.jsx";
 import { useLibraryLiveUpdates } from "./library-live-updates.js";
 import { createLatestRequestGuard, createWorkspaceSelectionGuard, libraryLiveStatus } from "./library-refresh-contract.js";
 import { ExternalShotBreakdown, ProjectShotBreakdown } from "./shot-breakdown.jsx";
+import { shotTiming } from "./shot-time-contract.js";
 import { VideoLibraryRail } from "./video-library-rail.jsx";
 
 const NAV_ITEMS = [
@@ -163,7 +164,7 @@ function StoryboardList({ label, values }) {
 function ShotStoryboard({ shot, attempt }) {
   const outcome = attemptOutcome(attempt);
   const snapshotAvailable = shot?.snapshot_available !== false;
-  const duration = shot?.duration_seconds || shot?.duration_policy?.seconds;
+  const timing = shotTiming(shot);
   const directives = shot?.motion_directives || [];
   return (
     <section className={`storyboard-card storyboard-card--${outcome.tone}`} aria-label="生成当时的 Shot 分镜脚本">
@@ -179,7 +180,7 @@ function ShotStoryboard({ shot, attempt }) {
             <Fact label="Scene" value={shot?.scene_id} />
             <Fact label="Storyboard beat" value={shot?.storyboard_beat_id} />
             <Fact label="分镜策略" value={shot?.visual_strategy} />
-            <Fact label="时长" value={duration ? `${duration}s` : undefined} />
+            <Fact label={timing.label} value={timing.value} />
             <Fact label="Shot revision" value={shot?.revision} />
           </dl>
           <div className="storyboard-copy"><span>画面意图</span><p>{shot?.intent || "未记录画面意图"}</p></div>

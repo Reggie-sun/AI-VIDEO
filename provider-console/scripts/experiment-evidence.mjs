@@ -77,6 +77,42 @@ function boundedString(value) {
   return typeof value === "string" ? value.trim().slice(0, 8_000) || null : null;
 }
 
+function boundedPositiveNumber(value, maximum = 7_200) {
+  const number = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(number) && number > 0 && number <= maximum ? number : null;
+}
+
+function exactOutputTiming(value) {
+  const probe = value?.probe;
+  const directDuration = boundedPositiveNumber(
+    value?.duration_seconds ?? probe?.duration_seconds ?? probe?.format?.duration,
+  );
+  const videoStream = Array.isArray(probe?.streams)
+    ? probe.streams.find((stream) => stream?.codec_type === "video")
+    : null;
+  const frameCount = boundedPositiveNumber(
+    value?.frame_count ?? probe?.frame_count ?? videoStream?.nb_frames,
+    Number.MAX_SAFE_INTEGER,
+  );
+  const fps = boundedPositiveNumber(value?.fps ?? probe?.fps, 1_000)
+    || (() => {
+      const [numerator, denominator] = String(videoStream?.r_frame_rate || "").split("/").map(Number);
+      return denominator > 0 ? boundedPositiveNumber(numerator / denominator, 1_000) : null;
+    })();
+  const derivedDuration = boundedPositiveNumber(frameCount && fps ? frameCount / fps : null);
+  if (directDuration && derivedDuration && Math.abs(directDuration - derivedDuration) > 0.05) return {};
+  const duration = directDuration || derivedDuration;
+  if (!duration) return {};
+  return {
+    start_seconds: 0,
+    end_seconds: duration,
+    duration_seconds: duration,
+    timing_basis: "exact_output_clip",
+    ...(fps ? { fps } : {}),
+    ...(frameCount ? { frame_count: frameCount } : {}),
+  };
+}
+
 function safePublicExperimentString(value) {
   return typeof value === "string"
     && !value.includes("\0")
@@ -388,6 +424,7 @@ async function m6ExperimentEvidence(resultSidecar, parsedSidecars, media, limits
     narration: boundedString(targetShot.narration),
     continuity_constraints: boundedStringArray(targetShot.continuity_constraints),
     visual_strategy: boundedString(targetShot.visual_strategy),
+    ...exactOutputTiming(result),
     prompt_text: promptText,
     generation_type: generationType,
     provider_kind: providerKind,
@@ -495,6 +532,7 @@ async function causalHandoffExperimentEvidence(summarySidecar, parsedSidecars, m
     narration: null,
     continuity_constraints: [],
     visual_strategy: null,
+    ...exactOutputTiming(summary),
     prompt_text: promptText,
     generation_type: providerKind,
     provider_kind: providerKind,
@@ -597,6 +635,7 @@ async function conditioningExperimentEvidence(evaluationSidecar, parsedSidecars,
     narration: null,
     continuity_constraints: [],
     visual_strategy: null,
+    ...exactOutputTiming(evaluation),
     prompt_text: promptText,
     generation_type: mode,
     provider_kind: null,

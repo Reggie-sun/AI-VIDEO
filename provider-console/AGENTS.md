@@ -14,6 +14,8 @@ Provider Console 的 runtime 数据必须来自本机 `runs/` 的只读 canonica
 
 对受支持且 exact-bound 的实验视频，detail 必须把 generation references、Shot/experiment-arm 脚本、sealed Prompt、output materialization、technical Gate 与 human verdict 关联在同一判断面；Reference 只有被 content-hash/upload receipt 绑定到 submitted input 时才能标为实际生成输入，否则必须在同一判断面显示 `NOT_EVALUATED` 及缺失原因。这些 proof layers 必须分别标注，任何一层缺失、冲突或 stale 都不得由邻近文件、文件名或另一层 verdict 补造。
 
+每个 Shot detail 必须显式展示其可验证时间语义：exact 单 Shot 输出只显示该 clip 内时间，composition 仅显示其证据声明的区间，Project Shot 在没有 `ResolvedTimeline` 时只显示计划时长并把成片位置标为 `NOT_EVALUATED`；不得按 Shot 顺序累加猜测 timeline。Reference 图片预览必须保留站内退出路径，至少支持可见关闭按钮、遮罩点击与 `Escape`，并在关闭后恢复触发元素焦点。
+
 合法 workspace 即使没有 `video_generation` attempt，也必须保持可检查：明确标记 strict reopen 已通过，并展示已存在的 Shots、Manifest operation summary 与 bounded canonical Registry media。不得把“没有 video attempt”渲染成 workspace 读取失败；真正 strict invalid 的 workspace 仍须 fail closed。
 
 Selected video attempt 的生成类型与输入必须来自 strict request receipt：`T2V` 显示 sealed prompt；`I2V` / `R2V` 显示 prompt 与 exact input bindings；`FL2V` 仅由 `image_to_video + first_frame + last_frame` 推导并同时显示首尾帧。不得按 Provider/model 名称猜测 mode；effective negative prompt、Provider raw response、signed URL、secret 与 absolute path 不得进入 Browser projection。

@@ -1,5 +1,5 @@
-import React from "react";
-import { CheckCircle, FilmStrip, WarningCircle } from "@phosphor-icons/react";
+import React, { useEffect, useId, useRef, useState } from "react";
+import { CheckCircle, FilmStrip, WarningCircle, X } from "@phosphor-icons/react";
 
 import {
   attemptOutcome,
@@ -9,6 +9,7 @@ import {
   shotForAttempt,
 } from "./run-detail-contract.js";
 import { externalReferenceUrl, externalStatus, externalStoryboardShots } from "./external-media-contract.js";
+import { shotTiming } from "./shot-time-contract.js";
 
 function attemptKey(attempt, index) {
   return attempt?.attempt_id || attempt?.id || `attempt-${index + 1}`;
@@ -54,13 +55,14 @@ export function ProjectShotBreakdown({ detail, selectedAttemptId, onSelectAttemp
       <div className="shot-breakdown__list">
         {rows.map(({ shot, attempts }, shotIndex) => {
           const shotId = shot?.shot_id || shot?.id || `shot-${shotIndex + 1}`;
+          const timing = shotTiming(shot);
           return (
             <article className="shot-breakdown__card" key={shotId}>
               <header><div><span>SHOT {shotIndex + 1}</span><h3>{shotId}</h3></div><b>{attempts.length} 个生成记录</b></header>
               <ScriptFields shot={shot} />
               <dl className="shot-breakdown__facts">
                 <div><dt>分镜策略</dt><dd>{shot?.visual_strategy || "未标注"}</dd></div>
-                <div><dt>时长</dt><dd>{shot?.duration_seconds ? `${shot.duration_seconds}s` : "未标注"}</dd></div>
+                <div><dt>{timing.label}</dt><dd>{timing.value}</dd></div>
                 <div><dt>Revision</dt><dd>{shot?.revision || "—"}</dd></div>
               </dl>
               <div className="shot-breakdown__attempts">
@@ -94,7 +96,33 @@ function ResultLayers({ shot }) {
   return <dl className="external-result-layers">{layers.map(([label, value]) => <div key={label}><dt>{label}</dt><dd className={`external-verdict external-verdict--${verdictTone(value)}`}>{String(value)}</dd></div>)}</dl>;
 }
 
+function ReferenceLightbox({ reference, url, onClose }) {
+  const titleId = useId();
+  const closeRef = useRef(null);
+  useEffect(() => {
+    const previous = document.activeElement;
+    const keydown = (event) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "Tab") { event.preventDefault(); closeRef.current?.focus(); }
+    };
+    document.addEventListener("keydown", keydown);
+    closeRef.current?.focus();
+    return () => { document.removeEventListener("keydown", keydown); previous?.focus?.(); };
+  }, [onClose]);
+  return (
+    <div className="reference-lightbox" onMouseDown={onClose}>
+      <figure role="dialog" aria-modal="true" aria-labelledby={titleId} onMouseDown={(event) => event.stopPropagation()}>
+        <button ref={closeRef} type="button" onClick={onClose} aria-label="关闭 Reference 图片预览"><X size={20} /></button>
+        <img src={url} alt={`${reference.role || "reference"} ${reference.asset_id || ""}`} />
+        <figcaption id={titleId}><strong>{reference.role || "reference"}</strong><span>{reference.asset_id || "未标注 asset"}</span><small>点击遮罩、关闭按钮或按 Esc 退出</small></figcaption>
+      </figure>
+    </div>
+  );
+}
+
 function ReferenceInputs({ references = [], bindingStatus, bindingReason }) {
+  const [selectedReference, setSelectedReference] = useState(null);
+  const selectedUrl = externalReferenceUrl(selectedReference);
   if (!references.length) return (
     <div className="external-reference-empty">
       <WarningCircle size={15} />
@@ -108,9 +136,10 @@ function ReferenceInputs({ references = [], bindingStatus, bindingReason }) {
         const url = externalReferenceUrl(reference);
         const body = <><div className="external-reference-preview">{url ? <img src={url} alt={`${reference.role || "reference"} ${reference.asset_id || ""}`} loading="lazy" /> : <FilmStrip size={24} />}</div><figcaption><strong>{reference.role || "reference"}</strong><span>{reference.asset_id || "未标注 asset"}</span><code>{String(reference.sha256 || "").slice(0, 16)}…</code></figcaption></>;
         return url
-          ? <a href={url} target="_blank" rel="noreferrer" key={`${reference.role || "reference"}-${reference.sha256 || index}`}>{body}</a>
+          ? <button type="button" onClick={() => setSelectedReference(reference)} aria-label={`预览 ${reference.role || "reference"} ${reference.asset_id || ""}`} key={`${reference.role || "reference"}-${reference.sha256 || index}`}>{body}</button>
           : <figure key={`${reference.role || "reference"}-${reference.sha256 || index}`}>{body}</figure>;
       })}</div>
+      {selectedReference && selectedUrl && <ReferenceLightbox reference={selectedReference} url={selectedUrl} onClose={() => setSelectedReference(null)} />}
     </section>
   );
 }
@@ -133,6 +162,11 @@ function joinedLines(value) {
   return typeof value === "string" ? value : "";
 }
 
+function ShotTimeBadge({ shot }) {
+  const timing = shotTiming(shot);
+  return <span>{timing.label} · {timing.value}</span>;
+}
+
 export function ExternalShotBreakdown({ group }) {
   const status = externalStatus(group);
   const coLocatedDeclaration = group?.composition?.association_status === "co_located_declared_package";
@@ -141,16 +175,17 @@ export function ExternalShotBreakdown({ group }) {
   return (
     <section className="external-shot-breakdown">
       <header><div><FilmStrip size={22} /><div><span>SHOT EVIDENCE</span><h2>{coLocatedDeclaration ? "同目录声明的 Shot 分镜" : exactExperimentEvidence ? "视频、References、分镜与结果" : "该视频关联的 Shot 分镜"}</h2></div></div><b>{shots.length} Records</b></header>
-      {(group?.composition || exactExperimentEvidence) && <p className="external-shot-breakdown__boundary">{coLocatedDeclaration ? "成片 SHA 已验证；Shot 计划来自同项目目录的 ecommerce package。缺少结构化 composition receipt，因此不证明这些 Shot 构成该 exact MP4，也不升级为 canonical timeline、candidate、QA、P6 或 Final Acceptance。" : "以下信息由 exact MP4 bytes 与受支持的结构化 evidence 绑定；只有具备 exact input receipt 的 Reference 才标为生成输入，缺少 upload receipt 时明确显示 NOT_EVALUATED。Technical Gate、Human Verdict 和 Production lifecycle 保持分层。"}</p>}
+      {(group?.composition || exactExperimentEvidence) && <p className="external-shot-breakdown__boundary">{coLocatedDeclaration ? "成片 SHA 已验证；Shot 计划与声明时间来自同项目目录的 ecommerce package。缺少结构化 composition receipt，因此不证明这些 Shot 构成该 exact MP4，也不升级为 canonical timeline、candidate、QA、P6 或 Final Acceptance。" : "以下信息由 exact MP4 bytes 与受支持的结构化 evidence 绑定；视频内时间只描述该 exact 单 Shot clip，不冒充最终成片的 ResolvedTimeline。只有具备 exact input receipt 的 Reference 才标为生成输入，缺少 upload receipt 时明确显示 NOT_EVALUATED。Technical Gate、Human Verdict 和 Production lifecycle 保持分层。"}</p>}
       {shots.length ? <div className="external-shot-breakdown__list">{shots.map((shot, index) => (
         <article key={`${shot.shot_id || "shot"}-${index}`}>
           <header><span>{shot.entity_kind === "experiment_arm" ? "ARM" : "SHOT"} {index + 1}</span><h3>{shot.shot_id || "记录未命名"}</h3><b>{shot.generation_result || shot.reported_status || (status.evaluated ? status.raw : "NOT_EVALUATED")}</b></header>
           <div className="external-shot-breakdown__facts">
+            <ShotTimeBadge shot={shot} />
             <span>{shot.shot_type ? `Shot 类型 · ${shot.shot_type}` : shot.generation_type ? `生成类型 · ${shot.generation_type}` : "Shot 类型未绑定"}</span>
             {shot.provider_name && <span>Provider · {shot.provider_name}</span>}
             {shot.model_id && <span>Model · {shot.model_id}</span>}
             {shot.duration_basis && <span>时长依据 · {shot.duration_basis}</span>}
-            {shot.start_seconds !== undefined && shot.start_seconds !== null && <span>{shot.start_seconds}s – {shot.end_seconds}s</span>}
+            {shot.frame_count && <span>{shot.frame_count} frames{shot.fps ? ` · ${shot.fps} fps` : ""}</span>}
           </div>
           {exactExperimentEvidence && <ResultLayers shot={shot} />}
           <div className="external-shot-breakdown__script"><span>{shot.purpose || shot.intent || shot.talent_action ? "分镜脚本" : shot.prompt_text ? "分镜脚本参考（来自 exact Prompt）" : "分镜脚本"}</span><p>{shot.purpose || shot.intent || shot.talent_action || shot.prompt_text || "没有与该视频绑定的 Shot 脚本"}</p></div>

@@ -95,6 +95,9 @@ async function writeM6Experiment(root, name, {
     output_path: videoPath,
     output_sha256: videoSha256,
     output_size_bytes: videoBytes.length,
+    duration_seconds: 124 / 24,
+    fps: 24,
+    frame_count: 124,
     shot_id: shotId,
     requirement_hash: requirementHash,
     resolved_generation_hash: resolvedGenerationHash,
@@ -617,6 +620,12 @@ test("AI-VIDEO Experiments M6 evidence joins the exact Shot, prompt, layered ver
     narration: "narration m6-v3",
     continuity_constraints: ["same screen direction", "one product"],
     visual_strategy: "generated_video",
+    start_seconds: 0,
+    end_seconds: 124 / 24,
+    duration_seconds: 124 / 24,
+    timing_basis: "exact_output_clip",
+    fps: 24,
+    frame_count: 124,
     prompt_text: "sealed prompt m6-v3",
     generation_type: "image_to_video",
     provider_kind: "minimax_h3_fl2va",
@@ -658,6 +667,16 @@ test("AI-VIDEO Experiments M6 evidence joins the exact Shot, prompt, layered ver
   assert.equal(result._media[group.shot_evidence[0].reference_inputs[1].token].source_path, evidence.lastPath);
   assert.equal(JSON.stringify(publicExternalMediaProjection(result)).includes(paths.root), false);
   assert.equal(JSON.stringify(group.shot_evidence).includes("source_path"), false);
+
+  await writeFile(path.join(evidence.experiment, "sidecars", "shot-b-result.json"), JSON.stringify({
+    ...evidence.result,
+    duration_seconds: 10,
+  }));
+  const mismatchedTiming = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  const mismatchedShot = mismatchedTiming.groups.find((item) => item.sha256 === evidence.videoSha256).shot_evidence[0];
+  assert.equal(mismatchedShot.prompt_text, "sealed prompt m6-v3");
+  assert.equal(mismatchedShot.timing_basis, undefined);
+  assert.equal(mismatchedShot.duration_seconds, undefined);
 });
 
 test("AI-VIDEO Experiments M6 evidence rejects wrong output identity and a mismatched Prompt hash join", async () => {
@@ -714,6 +733,8 @@ test("AI-VIDEO Experiments causal handoff binds only the summary, trimmed Prompt
     provider: "comfy-local-h3",
     provider_kind: "minimax_h3_fl2va",
     model_id: "minimax-h3-fl2va",
+    fps: 24,
+    frame_count: 124,
     first_frame_sha256: sha256(firstBytes),
     last_frame_sha256: sha256(lastBytes),
   };
@@ -742,6 +763,9 @@ test("AI-VIDEO Experiments causal handoff binds only the summary, trimmed Prompt
   assert.equal(group.shot_evidence[0].shot_id, null);
   assert.equal(group.shot_evidence[0].prompt_text, promptText);
   assert.equal(group.shot_evidence[0].generation_type, "minimax_h3_fl2va");
+  assert.equal(group.shot_evidence[0].start_seconds, 0);
+  assert.equal(group.shot_evidence[0].end_seconds, 124 / 24);
+  assert.equal(group.shot_evidence[0].timing_basis, "exact_output_clip");
   assert.equal(group.shot_evidence[0].reference_inputs.length, 2);
 
   await writeFile(path.join(sidecars, "exact-preview.json"), JSON.stringify({ ...shared, prompt_sha256: "0".repeat(64) }));
@@ -800,6 +824,7 @@ test("AI-VIDEO Experiments conditioning arm binds exact evaluation and Prompt bu
     arm,
     video_path: videoPath,
     video_sha256: sha256(videoBytes),
+    probe: { duration_seconds: 5.167, fps: 24, frame_count: 124 },
     gate_verdict: "FAIL_STOP_BEFORE_NEXT_ARM",
     human_verdict: "NOT_EVALUATED",
     requirement_findings: [{ requirement_id: "conditioning.last_frame", verdict: "FAIL", reason: "endpoint drift" }],
@@ -818,6 +843,9 @@ test("AI-VIDEO Experiments conditioning arm binds exact evaluation and Prompt bu
   assert.equal(armEvidence.generation_type, "FL2VA");
   assert.equal(armEvidence.prompt_text, promptText);
   assert.equal(armEvidence.generation_result, "OUTPUT_RECORDED");
+  assert.equal(armEvidence.start_seconds, 0);
+  assert.equal(armEvidence.end_seconds, 5.167);
+  assert.equal(armEvidence.timing_basis, "exact_output_clip");
   assert.equal(armEvidence.technical_gate, "FAIL_STOP_BEFORE_NEXT_ARM");
   assert.equal(armEvidence.human_verdict, "NOT_EVALUATED");
   assert.deepEqual(armEvidence.findings.map((finding) => finding.verdict), ["FAIL", "NOT_EVALUATED"]);

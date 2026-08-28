@@ -37,6 +37,7 @@ import {
   createWorkspaceSelectionGuard,
   libraryLiveStatus,
 } from "../src/library-refresh-contract.js";
+import { formatShotTimecode, shotTiming } from "../src/shot-time-contract.js";
 
 test("default external media sources include the AI-VIDEO experiments directory", () => {
   assert.deepEqual(configuredExternalMediaSources({ repoRoot: "/repo", homeRoot: "/home/operator" }), [
@@ -45,6 +46,40 @@ test("default external media sources include the AI-VIDEO experiments directory"
     { id: "comfyui-output", label: "ComfyUI Output", kind: "raw_provider_output", root: "/home/operator/ComfyUI/output" },
     { id: "qingyan-project", label: "青颜项目目录", kind: "external_project_asset", root: "/home/operator/电商图片/青颜" },
   ]);
+});
+
+test("Shot timing distinguishes exact clip ranges from planned duration and missing timeline position", () => {
+  assert.deepEqual(shotTiming({
+    start_seconds: 0,
+    end_seconds: 5.1666666667,
+    duration_seconds: 5.1666666667,
+    timing_basis: "exact_output_clip",
+  }), {
+    evaluated: true,
+    label: "视频内时间",
+    value: "00:00.000 – 00:05.167 · 5.167s",
+  });
+  assert.deepEqual(shotTiming({ duration_policy: { mode: "fixed", seconds: 4 } }), {
+    evaluated: true,
+    label: "计划时长",
+    value: "4s · 成片位置 NOT_EVALUATED",
+  });
+  assert.deepEqual(shotTiming({ duration_policy: { minimum_seconds: 2.1, maximum_seconds: 3 } }), {
+    evaluated: true,
+    label: "计划时长范围",
+    value: "2.1s – 3s · 成片位置 NOT_EVALUATED",
+  });
+  assert.deepEqual(shotTiming({ start_seconds: 5, end_seconds: 4 }), {
+    evaluated: false,
+    label: "时间",
+    value: "NOT_EVALUATED",
+  });
+  assert.deepEqual(shotTiming({ start_seconds: 0, end_seconds: 5, duration_seconds: 10 }), {
+    evaluated: false,
+    label: "时间",
+    value: "NOT_EVALUATED",
+  });
+  assert.equal(formatShotTimecode(3_661.25), "01:01:01.250");
 });
 
 test("run detail contract keeps lifecycle outcome separate from phase and media", () => {
