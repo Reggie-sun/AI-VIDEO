@@ -82,6 +82,7 @@ always_check_ids:
   - scope_diff_check
   - docs_contract_check
   - policy_audit_check
+  - product_runtime_skill_boundary_tests
 
 fallback_check_ids:
   - full_tests
@@ -120,6 +121,15 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_ecommerce_ad_workflow_skill.py, -q]
     cwd: .
     description: Verify the ecommerce advertising authoring Skill, schemas, validator, fixtures, and no-I/O boundaries.
+  seedance_authoring_skill_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_seedance_authoring_skill.py, -q]
+    cwd: .
+    description: Verify minimal Seedance authoring dispatch, progressive version loading, and advisory authority boundaries.
+  product_runtime_skill_boundary_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_runtime_skill_boundary.py, -q]
+    cwd: .
+    execution_priority: 18
+    description: Reject Agent Skill imports, loaders, paths, and direct Skill identities in Product Runtime source.
   harness_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_record_ai_video_session_hook.py, -q]
     cwd: .
@@ -254,6 +264,8 @@ checks:
       - composition_strategy_proposal_tests
       - composition_architecture_tests
       - ecommerce_ad_workflow_skill_tests
+      - seedance_authoring_skill_tests
+      - product_runtime_skill_boundary_tests
       - harness_tests
       - local_comfyui_supervisor_tests
       - architecture_tests
@@ -864,6 +876,19 @@ categories:
       - tests/test_ecommerce_ad_workflow_skill.py
     check_ids:
       - ecommerce_ad_workflow_skill_tests
+      - task_architecture_gate
+  seedance_authoring:
+    patterns:
+      - .agents/skills/seedance-authoring/**
+      - tests/test_seedance_authoring_skill.py
+    check_ids:
+      - seedance_authoring_skill_tests
+      - task_architecture_gate
+  product_runtime_skill_boundary_test:
+    patterns:
+      - tests/test_runtime_skill_boundary.py
+    check_ids:
+      - product_runtime_skill_boundary_tests
       - task_architecture_gate
   control_plane:
     patterns:

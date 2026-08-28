@@ -48,7 +48,13 @@ Within AI-VIDEO, the operational sections of upstream `h3-video` are reference-o
 
 `hell-grind-aigc-skill` MUST use when the task includes semantic Shot design、open/close state、cross-Shot continuity、identity/state/spatial/axis/action/light/environment/audio continuity、image/video prompt structure、generation failure diagnosis、iteration 或 candidate reasoning。它优先回答“Shots 之间什么必须保持或改变？”以及“generated Shot 为什么失败？”。AI-VIDEO Character、Scene、Shot 与 asset records 始终是 source of truth；不得创建平行的 project schema、asset registry、generation ledger、review state 或 delivery truth。
 
-`higgsfield` MUST use when the task includes provider/model-specific prompt adaptation、Seedance/Hailuo/Kling/Veo guidance、T2V/I2V/reference/continuation/extension mode guidance、provider-specific camera vocabulary 或 generation troubleshooting。它只在 AI-VIDEO semantic Shot / continuity intent 已建立后使用，不得选择 active Provider、读取 credential、提交 generation 或绕过 AI-VIDEO gates。
+`seedance-authoring` MUST use when an approved AI-VIDEO Shot / Generation Requirement already exists、the selected target is Seedance、and the task needs prompt/reference authoring or creative repair。它消费 exact selected version、generation mode、runtime surface 与 semantic reference roles；先加载 shared authoring knowledge，再且仅再加载一个 `2.0` 或 `2.5` overlay。T2V/I2V/R2V/FLF2V/edit/extend 都是 injected mode profile，不是独立 Skill。Unknown/future/mixed version 或缺失 deterministic selection 时 fail closed；不得猜测 capability、surface 或 transport。
+
+`seedance-authoring` 只拥有 Agent-side Seedance prompt/reference expression。它不得选择 Provider/model/profile、创建 asset manifest、验证runtime cardinality/parameter、编译transport payload、运行official API/ComfyUI/community runtime、提交/轮询/抓取/retry、写Manifest/Registry、决定continuity/P6/Final Acceptance或复制Harness。Runtime/API/ComfyUI failure返回selected adapter typed failure path；semantic continuity返回`hell-grind-aigc-skill`与existing continuity owners。`runtime_skill_calls = 0`保持不变。
+
+AI-VIDEO 内旧的direct Seedance dispatch targets `higgsfield-seedance`、`higgsfield-seedance-2-5`、`higgsfield-seedance-vfx`，以及`higgsfield-troubleshoot`的Seedance分支已经retired，MUST NOT direct-dispatch。它们的global frontmatter/trigger不覆盖本仓库routing；只有在`seedance-authoring`已经selected后，Agent才可按需读取其中一段作为non-authoritative advisory source，且不得迁移其version/runtime/Provider事实或扩大Skill authority。
+
+`higgsfield` MUST use when the task includes Non-Seedance provider/model-specific prompt adaptation、Hailuo/Kling/Veo guidance、corresponding T2V/I2V/reference/continuation/extension mode guidance、provider-specific camera vocabulary 或 generation troubleshooting。它只在 AI-VIDEO semantic Shot / continuity intent 已建立后使用，不得接管Seedance authoring、选择 active Provider、读取 credential、提交 generation 或绕过 AI-VIDEO gates。
 
 `video-shotcraft` MUST use when the task includes motion design、image motion、motion graphics、shot language、camera movement、pacing、transition、SFX、beat sync 或 visual QA ideas。其 Remotion implementation、recipe、timeline 与 renderer 只是 creative / implementation reference；选定方案必须翻译成 AI-VIDEO composition directives。
 
@@ -61,7 +67,8 @@ Routing precedence：
 - Concept/script -> ordered Director coverage / Shot plan -> `open-video`。
 - Semantic continuity / Shot-state problem -> `hell-grind-aigc-skill`。
 - Approved Shot + Generation Requirement + selected MiniMax H3 target -> `h3-video`。
-- Other supported generative model / Provider prompting problem -> `higgsfield`。
+- Approved Shot + Generation Requirement + selected Seedance target -> `seedance-authoring`。
+- Other supported Non-Seedance generative model / Provider prompting problem -> `higgsfield`。
 - Deterministic motion design / graphics / pacing problem -> `video-shotcraft`。
 - Production state / assets / dependency / timeline / render / Provider execution / activation / recovery -> AI-VIDEO code and contracts。
 
@@ -77,7 +84,8 @@ AI-VIDEO concept / script
 generated-video continuity:
 AI-VIDEO Shot intent
   -> hell-grind-aigc-skill: establish semantic continuity
-  -> higgsfield: adapt the approved contract to Provider prompt/mode guidance
+  -> seedance-authoring: adapt prompt/reference expression for a selected Seedance target
+     OR higgsfield: adapt a selected Non-Seedance target
   -> AI-VIDEO Provider Request: provenance, lifecycle, activation, recovery
 
 MiniMax H3 generation guidance:

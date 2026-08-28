@@ -135,7 +135,8 @@ use the minimum matching set and translate guidance into AI-VIDEO contracts。
 | Director coverage / ordered multi-Shot planning | `open-video` |
 | Semantic continuity / Shot-state problem | `hell-grind-aigc-skill` |
 | Approved Shot + selected MiniMax H3 guidance | `h3-video` |
-| Other model / Provider prompt adaptation | `higgsfield` |
+| Approved Shot + selected Seedance target | `seedance-authoring` |
+| Non-Seedance model / Provider prompt adaptation | `higgsfield` |
 | Deterministic motion / graphics / pacing | `video-shotcraft` |
 | Production state / assets / timeline / execution / activation / recovery | AI-VIDEO code and contracts |
 

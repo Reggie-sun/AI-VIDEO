@@ -123,6 +123,7 @@ def test_repository_policy_v2_loads_and_references_known_checks() -> None:
         "scope_diff_check",
         "docs_contract_check",
         "policy_audit_check",
+        "product_runtime_skill_boundary_tests",
     ]
     assert policy["checks"]["policy_audit_check"]["argv"] == [
         "python",
@@ -230,6 +231,7 @@ def test_github_workflow_routes_to_harness_control_suite() -> None:
         "scope_diff_check",
         "docs_contract_check",
         "policy_audit_check",
+        "product_runtime_skill_boundary_tests",
         "harness_tests",
     ]
 
@@ -247,6 +249,7 @@ def test_docs_only_change_routes_to_behavioral_contract_gate() -> None:
         "scope_diff_check",
         "docs_contract_check",
         "policy_audit_check",
+        "product_runtime_skill_boundary_tests",
     ]
 
 
@@ -287,6 +290,7 @@ def test_local_comfyui_supervisor_routes_to_focused_suite() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "local_comfyui_supervisor_tests",
         ]
 
@@ -377,6 +381,7 @@ def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "production_contract_tests",
             "cli_config_tests",
@@ -399,6 +404,7 @@ def test_shot_router_routes_to_exact_contract_suite() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "production_shot_router_tests",
             "provider_neutral_video_requirement_tests",
@@ -429,6 +435,7 @@ def test_video_planner_routes_to_exact_contract_suite() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "video_planner_tests",
             "provider_neutral_video_requirement_tests",
@@ -454,6 +461,7 @@ def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "shot_readiness_gate_tests",
         ]
@@ -470,6 +478,7 @@ def test_shot_readiness_gate_routes_to_focused_contract_suite() -> None:
         "scope_diff_check",
         "docs_contract_check",
         "policy_audit_check",
+        "product_runtime_skill_boundary_tests",
         "task_architecture_gate",
         "video_planner_tests",
         "provider_neutral_video_requirement_tests",
@@ -506,6 +515,7 @@ def test_quality_intelligence_routes_to_passive_capture_suite() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "quality_intelligence_tests",
         ]
@@ -537,6 +547,7 @@ def test_agent_memory_routes_to_its_focused_suite() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "agent_memory_tests",
         ]
@@ -622,6 +633,7 @@ def test_provider_console_bridge_routes_to_python_and_node_contracts() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "provider_console_python_tests",
             "provider_console_node_tests",
@@ -648,6 +660,7 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "provider_console_node_tests",
             "provider_console_web_build",
@@ -667,6 +680,7 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "provider_console_node_tests",
         ]
@@ -713,6 +727,7 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
             "scope_diff_check",
             "docs_contract_check",
             "policy_audit_check",
+            "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
             "provider_console_sites_build",
             "provider_console_sites_tests",
@@ -765,6 +780,7 @@ def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
         "scope_diff_check",
         "docs_contract_check",
         "policy_audit_check",
+        "product_runtime_skill_boundary_tests",
         "task_architecture_gate",
         "production_composition_audio_tests",
     ]
@@ -912,8 +928,8 @@ def test_fail_fast_order_and_full_suite_reverse_coverage(tmp_path: Path) -> None
         "scope_diff_check",
         "docs_contract_check",
         "policy_audit_check",
+        "product_runtime_skill_boundary_tests",
         "task_architecture_gate",
-        "full_tests",
     ]
     assert inspection["check_ids"].index("full_tests") < inspection["check_ids"].index(
         "production_video_provider_tests"
@@ -963,6 +979,7 @@ def test_fail_fast_order_and_full_suite_reverse_coverage(tmp_path: Path) -> None
         "scope_diff_check",
         "docs_contract_check",
         "policy_audit_check",
+        "product_runtime_skill_boundary_tests",
         "task_architecture_gate",
         "full_tests",
     ]
@@ -1589,6 +1606,66 @@ def test_ecommerce_ad_contract_test_has_an_exact_focused_route() -> None:
     ]
 
 
+@pytest.mark.parametrize(
+    "path",
+    [
+        ".agents/skills/seedance-authoring/SKILL.md",
+        ".agents/skills/seedance-authoring/references/authoring-common.md",
+        ".agents/skills/seedance-authoring/references/seedance-2.0.md",
+        ".agents/skills/seedance-authoring/references/seedance-2.5.md",
+        "tests/test_seedance_authoring_skill.py",
+    ],
+)
+def test_seedance_authoring_paths_have_one_focused_route(path: str) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths([path], policy)
+
+    assert report["fallback_paths"] == []
+    assert "seedance_authoring" in report["categories"]
+    assert "seedance_authoring_skill_tests" in report["check_ids"]
+    assert "production_contract_tests" not in report["check_ids"]
+    assert "production_video_provider_tests" not in report["check_ids"]
+    assert policy["checks"]["seedance_authoring_skill_tests"]["argv"] == [
+        "python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_seedance_authoring_skill.py",
+        "-q",
+    ]
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "src/ai_video/production/video.py",
+        "src/ai_video/planning/video_planner.py",
+        "tests/test_runtime_skill_boundary.py",
+    ],
+)
+def test_product_runtime_paths_select_agent_skill_boundary_guard(path: str) -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    report = agent_harness.inspect_paths([path], policy)
+
+    assert report["fallback_paths"] == []
+    assert "product_runtime_skill_boundary_tests" in report["check_ids"]
+    assert "product_runtime_skill_boundary_tests" in policy["always_check_ids"]
+    if path == "tests/test_runtime_skill_boundary.py":
+        assert "product_runtime_skill_boundary_test" in report["categories"]
+    assert policy["checks"]["product_runtime_skill_boundary_tests"]["argv"] == [
+        "python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_runtime_skill_boundary.py",
+        "-q",
+    ]
+
+
 def test_session_record_hook_routes_to_control_plane_harness() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 
@@ -1662,6 +1739,7 @@ def test_inspection_falls_back_to_full_tests_and_task_architecture_gate() -> Non
         "scope_diff_check",
         "docs_contract_check",
         "policy_audit_check",
+        "product_runtime_skill_boundary_tests",
         "task_architecture_gate",
         "full_tests",
     ]
