@@ -2,6 +2,30 @@
 
 Date: 2026-08-28
 
+## Plan Domain Scope Supersession — 2026-08-28
+
+`docs/superpowers/plans/2026-08-27-ai-video-shot-to-h3-continuity-enforcement.md` 已修订为 dual-domain plan。
+M1–M5 继续是 Drama 与 Ecommerce 可共同消费、但不拥有任一 domain rubric 的 Shared Continuity Core；本记录的
+Qingyan exact attempts、technical findings 与 HUMAN failure 只属于 `M6-C Commercial` / shared physical
+continuity regression evidence，不再代表整个 plan 的唯一 product target，也不得用于推断 Drama acceptance。
+
+当前 dual-domain Phase B 状态：
+
+- `M6-C Commercial=HUMAN_FAIL`：本记录 exact assembly 的 watchability、commercial-quality baseline 与
+  assembly acceptance FAIL 保持不变；不得 repair/retry old assembly 或扩展为 `30s`。
+- `M6-D Drama=NOT_EVALUATED / BLOCKED_BEFORE_MEDIA`：仓库尚无正式 accepted Drama workflow/spec、sealed
+  Drama rubric、approved fixture 或 exact HUMAN artifact；本记录不创建或冒充该 owner。
+- `B-X dual-domain closure=FAIL`：两条 lane 尚未独立 PASS，M7–M9 继续 deferred。
+
+Drama 与 Commercial verdict、baseline 和 requirement coverage 互不继承。未来 domain-only failure 只回到对应
+domain owner；若改变 Shared Core、compiler、conditioning 或 generic continuity-evidence contract，则两条 lane
+的 applicable shared findings 都必须重新验证。该 plan 修订只改变 future execution scope/stop condition，不
+修改本记录历史 artifact hashes、Provider call counts、technical Gate 或 HUMAN verdict，也不授权任何媒体动作。
+
+Automatic learning evaluation outcome 为 `no_candidate`：本 checkpoint 是 product-scope / owner correction，
+没有新增独立媒体 attempt、controlled comparison 或可更新既有 Learning Claim 的 exact counterevidence；不得把
+dual-domain plan structure 冒充 learned Provider/model capability。
+
 ## HUMAN Playback And Baseline Regression Supersession — 2026-08-28
 
 用户已对 exact `15.5s` assembly SHA-256

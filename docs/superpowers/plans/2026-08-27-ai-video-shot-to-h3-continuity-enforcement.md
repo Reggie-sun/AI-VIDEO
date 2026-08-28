@@ -1,15 +1,17 @@
-# AI-VIDEO Shot-to-H3 Continuity Enforcement Implementation Plan
+# AI-VIDEO Dual-Domain Shot-to-H3 Continuity Enforcement Implementation Plan
 
-**Goal:** 先用最小可验证链证明：approved Shot sequence 的跨 Shot 因果状态经唯一 sealed
-`GenerationIntent`、pairwise causal transition contract 与 deterministic H3 compiler 后，能减少怪运镜、
-compound motion、intent drift 以及人物/产品状态跳变；真实 HUMAN evidence 成立后，才扩大到全 adapter、
-qualification、composition enforcement 与 Harness 收口。
+**Goal:** 建立一套由 Drama 与 Ecommerce 共同复用、但不合并两类 domain rubric 的 Shot-to-H3 physical /
+perceptual continuity core：approved Shot sequence 的跨 Shot 因果状态经唯一 sealed `GenerationIntent`、
+pairwise causal transition contract 与 deterministic H3 compiler 后，减少怪运镜、compound motion、intent
+drift 以及人物/道具/产品状态跳变；分别取得 Drama 与 Ecommerce exact HUMAN evidence 后，才把“dual-domain
+proven”能力扩大到全 adapter、qualification、composition enforcement 与 Harness 收口。
 
 **Scope:** Provider-neutral Shot semantic intent、camera/subject relation、pre-generation pairwise causal
 readiness、一个 evidence-backed Local H3 pilot adapter 的 exact prompt compilation、符合当前 H3 frame 下限的
-`10.333–15.500s` causal micro-sequence、第一条 exact 30s whole-video HUMAN verdict，以及只有 empirical
-evidence 支持后才执行的 remaining adapter、qualification、post-media pairwise evidence、composition 与
-Harness 收口。
+Shared Continuity Core、互相独立的 `M6-D Drama` 与 `M6-C Commercial` empirical lanes、每条 lane 各自的
+exact whole-video HUMAN verdict，以及只有两条 lane 的 shared requirements 都有 exact evidence 后才执行的
+remaining adapter、qualification、post-media pairwise evidence、composition 与 Harness 收口。Qingyan 只作为
+Commercial regression oracle；不得代表 Drama acceptance 或整个 plan 的产品目标。
 
 **Contract Surfaces:** `GenerationIntent`、`ProviderNeutralVideoRequirement`、`VideoPlanner`、
 `ShotReadinessGate`、`ProviderRequestCompilationResult`、H3/T8 adapter compiler identity、
@@ -27,12 +29,13 @@ lighting、ambience、dialogue 与 music 的 typed upstream owner，camera contr
 motion。v12 进一步证明 Shot 顺序正确不等于 `previous.close_state -> next.open_state` 因果可达：人物可无
 bridge 出现/消失，产品可无交接改变 holder/hand/state，推荐可直接跳到使用。目标链改为：
 `approved sequence + explicit causal edges + compatible conditioning -> sealed per-Shot GenerationIntent ->
-pairwise readiness -> exact H3 three-field prompt -> bounded real-media experiment -> HUMAN verdict`。四臂实验已把
-forced scale transition / terminal snap 的主要原因收敛到 incompatible last anchor；随后 one-Shot causal handoff
-又证明 compatible anchors 与明确动作链可完成可见 holder transfer，但 30s recut 仍在 `4.500s`、`9.667s` 和
-`19.458s` 因 character presence jump 失败。只有包含 entrance/exit 与 holder/action state 的完整因果链获得真实
-evidence 后，才把同一 contract 扩大到 remaining adapters、qualification、post-media evidence 与 canonical
-composition。
+pairwise readiness -> exact H3 three-field prompt -> bounded real-media experiment -> shared continuity verdict +
+exactly one selected domain verdict`。四臂实验已把 forced scale transition / terminal snap 的主要原因收敛到
+incompatible last anchor；随后 one-Shot causal handoff 又证明 compatible anchors 与明确动作链可完成可见
+holder transfer。原 M6 Qingyan micro-sequence 最终得到 HUMAN watchability / commercial-baseline / assembly
+acceptance `FAIL`，只构成 Commercial lane counterevidence；Drama lane 尚无 accepted workflow/spec、fixture 或
+HUMAN verdict。目标状态必须分别关闭两条 lane，不得用广告状态链证明剧情叙事，也不得用剧情 continuity PASS
+证明产品呈现、claim、Hook、CTA 或 brand closure。
 
 **Compatibility:** Historical `provider-neutral-video-requirement/1`–`/3`、existing compiled request、resolved
 request、activation scope、compiler/profile hash 和 qualification profile 必须 bit-for-bit reopen/replay；新的
@@ -40,17 +43,19 @@ camera contract 采用 additive versioned branch，只用于 new attempts。旧 
 也不得通过自动 migration 改写 existing Manifest、receipt 或 artifact identity。
 
 **Out of Scope:** 新 camera Skill、Provider selection/fallback、未经单独授权的 live/paid submit 或媒体生成、
-自动 repair、renderer/timeline replacement、新 P6 writer、新 aggregate quality score、训练或微调、将
-development HUMAN PASS 升级为 Production/P6/Final Acceptance、全面重写任何 external Skill，以及清理历史
-artifact-specific scripts。
+自动 repair、renderer/timeline replacement、新 P6 writer、跨 Drama/Ecommerce aggregate quality score、训练或
+微调、将 development HUMAN PASS 升级为 Production/P6/Final Acceptance、在本 plan 内发明或实现
+`ai-short-drama-workflow` / Drama schema / Drama runtime Gate、扩张现有 Ecommerce Gate 2、全面重写任何 external
+Skill，以及清理历史 artifact-specific scripts。Drama authoring/rubric 必须先由独立 accepted workflow/spec
+拥有；本 plan 只消费其 sealed requirement-level outputs。
 
 **Acceptance Criteria:**
 
 - H3/T8 pilot new attempt 缺少完整 open/close、action、performance、visual treatment、lighting、audio/music
   boundary、axis、camera path、camera-subject relation 或 camera endpoint 时在 Provider effect 前 typed BLOCKED；
 - continuity-sensitive adjacent Shots 缺少可验证的 character presence、prop holder/hand/state、action phase、
-  gaze/dialogue/motion bridge，或未声明合法 ellipsis/reset/commercial cut 时，在 compiler/Provider 前 typed
-  BLOCKED；
+  gaze/dialogue/motion bridge，或未由 selected domain owner 声明合法 ellipsis/reset/domain-specific cut 时，在
+  compiler/Provider 前 typed BLOCKED；
 - FL2VA first/last anchors 缺少同尺度/同构图可达性、duration-bounded endpoint compatibility 或 approved
   compatibility evidence 时，在 upload/Provider effect 前 typed BLOCKED；不得在失败后自动换 anchor、lane 或
   recipe；
@@ -60,20 +65,29 @@ artifact-specific scripts。
   `integrated_multimodal_description`、`overall_soundscape`、`non_diegetic_music`；
 - pilot H3/T8 adapter 不再调用 generic neutral prompt 作为 new-attempt native grammar；其他 adapters 在首轮
   empirical gate 前保持不变；
-- 先以一个符合当前 H3 `124 frames @ 24 fps` 下限的 `10.333–15.500s`、`2–3` generated-Shot causal
-  micro-sequence（可带固定 surrounding context）取得 requirement-level HUMAN evidence；失败即回到责任层，
-  不继续建设 Milestones 7–9；
+- Shared Core 不编码 `Hook`、CTA、product proof、motivation、conflict、emotional payoff 或 cliffhanger；这些
+  分别属于 Ecommerce 与 Drama domain owner，且任一 domain verdict 不得替代另一条 lane；
+- `M6-D Drama` 只在独立 accepted Drama workflow/spec、sealed fixture/rubric 与 exact quality baseline 存在后
+  执行；它必须取得剧情表演、blocking/eyeline、dialogue turn、叙事因果/情绪推进和 shared continuity 的
+  requirement-level HUMAN evidence；
+- `M6-C Commercial` 使用 accepted Ecommerce package、Product Truth/claim lineage 与 exact source-quality
+  baseline，独立验证产品 presentation/demo/proof、Hook/pacing、CTA/brand closure 与 shared continuity；当前
+  Qingyan `15.5s` assembly 是该 lane 的 HUMAN `FAIL`，不得重标为 PASS；
+- 两条 lane 的 applicable shared requirements 与各自 domain requirements 都取得 exact HUMAN PASS 前，不得
+  宣称 dual-domain proven，也不得继续执行 Milestones 7–9；
 - post processing 不得创造或伪造 continuity PASS。`xfade`、dissolve、retime、interpolation、padding 可在
-  typed montage、dream/time jump、scene reset、commercial cut 或已通过边界上的明确艺术/节奏用途合法存在，
-  但不能替代缺失的 causal state change，且变换后的新 SHA 必须重新验收；
-- 第一条 30s HUMAN PASS 绑定 exact final SHA、完整 `1.0x` 播放、每个 pairwise boundary、Dialogue
-  Performance / Lip-sync 与 Hook Readability 的分离 verdict；任何重编码或修复后必须重新验收新 SHA。
+  typed montage、dream/time jump、scene reset、selected-domain cut 或已通过边界上的明确艺术/节奏用途合法
+  存在，但不能替代缺失的 causal state change，且变换后的新 SHA 必须重新验收；
+- 每条 lane 的 whole-video HUMAN PASS 分别绑定 exact final SHA、完整 `1.0x` full-speed/full-audio 播放、每个
+  pairwise boundary、shared physical/perceptual findings 与该 domain 的独立 rubric；任何重编码或修复后必须
+  重新验收新 SHA。Drama PASS 与 Commercial PASS 互不继承。
 
 **Verification:** Phase A 使用 strict RED-GREEN focused tests、historical hash/reopen fixtures 与 pilot adapter
-offline tests；Phase B 只在单独授权下执行 `10.333–15.500s` causal micro-sequence 和 exact 30s `1.0x` human playback；
-Phase C 通过 empirical decision gate 后才运行 remaining adapter、composition/P6 regression、Architecture
-Gate、policy-routed Harness exact staged snapshot receipt 与一次 `reviewer_xhigh` independent review。Offline
-acceptance 不执行 Provider、ComfyUI 或媒体生成。
+offline tests；Phase B-D / B-C 只在各自 accepted domain inputs 与适用 execution gates 下独立执行 bounded
+micro-sequence、exact whole-video `1.0x` human playback 与 baseline comparison；Phase C 只有在两条 lane 都通过
+后才运行 remaining adapter、composition/P6 regression、Architecture Gate、policy-routed Harness exact staged
+snapshot receipt 与一次 `reviewer_xhigh` independent review。Offline acceptance 不执行 Provider、ComfyUI 或
+媒体生成。
 
 **Related Evidence:**
 
@@ -86,9 +100,28 @@ acceptance 不执行 Provider、ComfyUI 或媒体生成。
 - `docs/record_for_agent/2026-08-27-h3-conditioning-attribution-gate-stop.md`
 - `docs/record_for_agent/2026-08-27-qingyan-v12-causal-recut-and-single-close.md`
 - `docs/record_for_agent/2026-08-27-qingyan-v13-causal-handoff-experiment.md`
+- `docs/record_for_agent/2026-08-28-h3-m6-causal-micro-sequence-gate-stop.md`
+- `docs/superpowers/plans/2026-08-25-ai-video-quality-gate-architecture-separation.md`
+- `docs/agent-primary-contract-matrix.md` (`Quality Gate Architecture Boundary`)
 - `artifacts/qingyan-miao-ad-20260827-v12/authoring/authoring-contract.md`
 - `artifacts/qingyan-miao-ad-20260827-v12/ecommerce-package.json`
 - `artifacts/qingyan-miao-ad-20260827-v12/review/final-gate.md`
+
+## Dual-Domain Revision And Current Status — 2026-08-28
+
+原 plan 把 Qingyan regression evidence 误写成了唯一 empirical product target。当前修订保留 M1–M5 已实现的
+provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lanes：
+
+| Lane | Current status | What the status means |
+| --- | --- | --- |
+| `M6-D Drama` | `NOT_EVALUATED` / blocked before media | 当前没有正式 accepted Drama workflow/spec、sealed Drama rubric、approved fixture 或 exact HUMAN artifact；不得从 Commercial evidence 推断 |
+| `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
+| Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
+
+Qingyan v12/v13、四臂 conditioning 与 causal micro-sequence 继续作为 Commercial / shared physical continuity
+regression evidence；它们不是 Drama authoring、narrative continuity、performance 或 whole-scene acceptance
+evidence。下方出现的 Qingyan、product、Hook、CTA 或 `commercial_cut` 只适用于 Commercial oracle/profile；
+M1–M5 的 provider-neutral contracts 不因此变成 Ecommerce-owned。
 
 v12 的新增 HUMAN evidence 作为 plan 的 blocking regression oracle：`4.500s` 人物/产品 holder 无桥接跳变，
 `7.250s` 推荐直接跳到使用且老人消失，均为 pairwise causal FAIL；`13.250s` 因果顺序成立但表演自然度仍需
@@ -102,7 +135,7 @@ Stock20 recipe/pin bundle 与 H3 model limitation 均不受该 evidence 支持�
 handoff Shot 取得 technical Shot Gate PASS，但其 prompt 为手写 sealed prompt、input Registry lineage 不是
 Production-complete，不能验证 `GenerationIntent -> compiler`。将该 Shot 嵌回 exact 30s 后，holder transfer
 PASS，但 character 在 `4.500s` 出现、`9.667s` 消失、`19.458s` 重现仍 FAIL；该 artifact 不满足 Milestone 6
-micro-sequence 或 30s HUMAN gate，也不授权继续 M7–M9。
+Commercial lane 或 revised dual-domain HUMAN gate，也不授权继续 M7–M9，更不能作为 Drama evidence。
 
 ## Problem Boundary And Ownership
 
@@ -117,9 +150,11 @@ micro-sequence 或 30s HUMAN gate，也不授权继续 M7–M9。
 | Pre-generation pairwise reachability | `ContinuityTransitionPolicy` | 明确 carry、visible change、authorized ellipsis/release；不能用 Shot 顺序代替因果路径 |
 | Post-media pairwise findings | generic generated-Shot review evidence in `review.py` | 同时绑定 source terminal window 与 target opening window；qualification-only source review 不扩张为通用 owner |
 | Order、frames、trim、transition execution | `ResolvedTimeline` / P3 composition | transition执行不拥有或创造 causal/continuity verdict |
-| Quality / acceptance | P6 + exact human evidence | analyzer/technical PASS 不得冒充 HUMAN PASS 或 Final Acceptance |
-| Dialogue Performance / Lip-sync | per-Shot media review + human evidence | 与 causal edge 分离；edge 只拥有 speaker turn、gaze/response 与 sound bridge obligation |
-| Hook Readability / whole-ad pacing | exact whole-video human evidence | technical presence/timing 可自动检查；可读性、说服力与节奏不由 aggregate score 代判 |
+| Universal media validity and physical/perceptual continuity | existing Runtime validators、generic continuity evidence、P6 lifecycle + exact human evidence | analyzer/technical PASS 不得冒充 domain HUMAN PASS 或 Final Acceptance；shared schema 不拥有 domain rubric |
+| Drama authoring、narrative continuity and acceptance | future independently accepted Drama workflow/spec/rubric | 本 plan 不创建该 owner；motivation、relationship causality、conflict、dialogue semantics、emotional progression、payoff/cliffhanger 不得由 physical continuity receipt替代 |
+| Ecommerce authoring and commercial acceptance | `.agents/skills/ecommerce-ad-workflow/` + existing Ecommerce Gate 2 seam + exact human evidence | Product Truth/claims、Hook、product presentation/demo/proof、CTA、brand closure 只适用于 Commercial lane；不得冒充 Drama acceptance |
+| Dialogue Performance / Lip-sync | per-Shot media review + selected domain human evidence | shared edge 只拥有 speaker turn、gaze/response 与 sound bridge obligation；对白语义、角色动机和情绪作用由 Drama rubric拥有 |
+| Whole-program readability / pacing | exact whole-video human evidence + selected domain rubric | Drama scene readability 与 Ecommerce Hook/conversion pacing 分开；technical presence/timing 或 aggregate score不能代判 |
 
 需要退休或替换的 old paths：
 
@@ -154,6 +189,10 @@ python -m pytest -p no:cacheprovider \
 
 ## Major Milestones
 
+M1–M5 是已经由 commit `d0abf74` 实现并通过 exact-range Harness 的 Shared Continuity Core。以下历史 milestone
+细节继续作为 implementation lineage；dual-domain revision 不重写其已发生状态，也不把 Commercial fixture
+specific fields 升级为 universal domain truth。Phase B 从修订后的 Milestone 6 重新开始。
+
 ### Milestone 1: Freeze Regression Oracles Before Contract Changes
 
 **Files:**
@@ -187,7 +226,8 @@ settled endpoint hold。
 - Add one positive oracle for locked camera and one for a single primary moving path plus stable tracking relation and
   explicit terminal motion state。
 - Assert temporal ordering alone cannot satisfy causal reachability，and causal PASS cannot satisfy performance、
-  lip-sync、Hook Readability or whole-video pacing。
+  lip-sync or selected-domain whole-video readability/pacing；Commercial `Hook Readability` remains a Commercial
+  oracle，not a Shared Core requirement。
 - Assert low tail motion alone is not a failure oracle：a requested settled close state may hold，while a scale/scene
   snap toward an unreachable last anchor must fail on compatibility plus boundary evidence。
 - Preserve existing neutral compiler fixtures for Hailuo、Seedance and fake adapters。
@@ -427,77 +467,118 @@ python -m pytest -p no:cacheprovider \
   tests/test_production_provider_neutral_adapters.py -q
 ```
 
-### Milestone 6: Run The Empirical Decision Gate Before More Infrastructure
+### Milestone 6: Run Independent Drama And Commercial Empirical Gates
 
 **Files / Artifacts:**
 
-- Read/verify first: `artifacts/qingyan-miao-ad-20260827-v12/final/青颜_苗家腋下止汗完整广告_30s_9x16_v12.mp4`
-- Read/verify: `artifacts/qingyan-miao-ad-20260827-v12/authoring/authoring-contract.md`
-- Read/verify: `artifacts/qingyan-miao-ad-20260827-v12/ecommerce-package.json`
-- Read/verify: `artifacts/qingyan-miao-ad-20260827-v12/review/final-gate.md`
-- Read/verify: `docs/record_for_agent/2026-08-27-h3-conditioning-attribution-gate-stop.md`
-- Read/verify: `docs/record_for_agent/2026-08-27-qingyan-v13-causal-handoff-experiment.md`
-- Modify before new media to preserve the new boundary-level human evidence:
-  `docs/record_for_agent/2026-08-27-qingyan-v12-causal-recut-and-single-close.md`
-- Create only after the new exact empirical verdict:
-  `docs/record_for_agent/2026-08-27-qingyan-shot-to-h3-causal-pilot.md`
+- Read/verify shared boundary: `docs/agent-primary-contract-matrix.md` (`Quality Gate Architecture Boundary`)
+- Read/verify domain separation: `docs/superpowers/plans/2026-08-25-ai-video-quality-gate-architecture-separation.md`
+- Read/verify Shared Core evidence: `docs/record_for_agent/2026-08-28-h3-causal-readiness-phase-a.md`
+- Read/verify Commercial failure: `docs/record_for_agent/2026-08-28-h3-m6-causal-micro-sequence-gate-stop.md`
+- Read/verify Commercial regression oracles:
+  `docs/record_for_agent/2026-08-27-qingyan-v12-causal-recut-and-single-close.md` and
+  `docs/record_for_agent/2026-08-27-qingyan-v13-causal-handoff-experiment.md`
+- Required external Drama dependency, absent at this revision and not created by this plan:
+  `docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md`
+- Update the exact domain record after each future verdict；do not combine Drama and Commercial evidence in one
+  artifact-level PASS。
 
-**Authorization Boundary:** The completed one-submit v13 reconnaissance was separately authorized and is exhausted；
-it does not authorize another Provider/ComfyUI submit、new media、paid effect or recomposition。Any new micro-sequence
-or 30s artifact requires exact task-scoped authorization and all Provider/media gates。The existing evidence is
-sufficient to classify v12/v13 pairwise failures；it is not permission to regenerate them。
+**Authorization Boundary:** This plan revision performs no media action。Future M6-D / M6-C execution must satisfy
+the then-current Provider/media rules。Strict-loopback Local ComfyUI may use the repository's current authorization
+exemption，but exact identity、selected profile/workflow/binding、input/output provenance、unknown-outcome stop、
+per-Shot Gate and no automatic cross-lane chaining remain mandatory。Remote/paid execution continues to require its
+existing exact authorization、budget、egress、permit and recovery gates。A call allowed in one lane does not authorize
+the other lane。
 
-**Completed Reconnaissance:** The single generated handoff Shot technical PASS proves explicit visible transfer plus
-compatible anchors can execute on Stock20。The exact 30s recut is still causal FAIL because holder continuity does not
-cover character entrance/exit。The prompt was handwritten and the experiment anchors were not Production-registered，
-so this evidence does not satisfy Milestones 4–5 or either empirical exit gate below。Do not repeat the same holder-only
-experiment。
+#### M6-D Drama Lane
 
-**Contract:** Execute two empirical steps in order：
+**Precondition:** Do not author prompts、select a fixture or generate media until the independently accepted Drama
+workflow/spec above owns exact Story/Scene/Character/Shot inputs、narrative rubric、stable requirement IDs、evidence
+authority and whole-scene acceptance semantics。The current absence is a real `BLOCKED_BEFORE_MEDIA` condition，not
+permission for this continuity plan to invent Drama truth。
 
-1. **Causal micro-sequence:** author `10.333–15.500s` / `2–3` generated H3 Shots, optionally bounded by fixed accepted
-   context，around `visible elder entrance/presence -> recommend/show -> handoff/receive -> explicit elder exit or
-   authorized release -> open/use -> effect`，using the new per-Shot、conditioning and pairwise contracts。The exact
-   duration follows the current H3 minimum of `124 frames @ 24 fps` per generated Shot；do not claim an `8–12s / 3–4
-   generated-Shot` test or trim away the state transitions being tested。Keep Provider/profile、approved assets、
-   reference scope and other controllable variables fixed。Each generated Shot still passes the mandatory per-Shot
-   post-media Gate before the next submit。
-2. **30s assembly:** only after the micro-sequence obtains causal HUMAN PASS，assemble or generate the bounded 30s
-   candidate and obtain an uninterrupted `1.0x` full-speed/full-audio whole-video verdict。
+**Fixture Contract:** The accepted Drama owner must provide one bounded dramatic scene with at least two persistent
+characters and `2–3` generated Shots。The selected scene must expose，without forcing a specific plot：
 
-The rubric emits separate requirement-level findings：
+- an established spatial relation and screen axis；
+- one visible entrance、exit or motivated repositioning；
+- at least one dialogue turn plus visible listening/reaction obligation；
+- one relationship-, decision- or object-state change that must be causally readable；
+- a terminal reaction、decision、payoff or continuation state that closes the scene beat。
 
-- causal state reachability：character presence、product holder/hand/state、action endpoint/start、dialogue/gaze/
-  motion/audio bridge；
-- conditioning compatibility：first/last scale/composition、reachable endpoint、absence of forced snap/scene-scale
-  transition；
-- generated camera：single primary motion、camera-subject relation、endpoint stability、absence of compound drift；
-- semantic intent adherence and performance naturalness；
-- Dialogue Performance / Lip-sync；
-- Hook Readability and whole-ad pacing。
+The Drama owner selects the exact aspect ratio、resolution、cinematic reference/baseline、dialogue text、acting intent、
+coverage and edit grammar。The continuity lane may validate those sealed facts but may not rewrite them into a product
+demonstration、same-camera laboratory setup or generic `commercial_cut`。A shared requirement for continuity-critical
+action may use direct continuity、causal ellipsis or scene reset only as explicitly sealed；shot/reverse-shot coverage
+does not release eyeline、blocking、dialogue turn or emotional reaction obligations。
 
-Do not collapse these into one score。For the motivating boundaries，4.500s and 7.250s are causal FAIL；13.250s may
-pass causal order while performance stays `NOT_EVALUATED`；17.042s separates semantic comprehensibility from
-cast/camera continuity；24.333s may be an authorized commercial cut while pacing remains human-first。
+**Drama Findings:** Keep requirement-level verdicts separate：
 
-**Decision Gate:**
+- shared physical/perceptual continuity：identity、wardrobe、character/object state、space、axis、action phase、
+  gaze/dialogue/motion/audio bridges、conditioning and camera endpoint；
+- performance：body/face behavior、timing、listening/reaction、blocking、eyeline and dialogue/lip-sync；
+- Drama-only narrative continuity from the accepted owner：motivation、relationship causality、decision consistency、
+  conflict/stakes、emotional progression and applicable payoff/continuation intent；
+- whole-scene readability and pacing against the selected Drama baseline。
 
-- Micro-sequence causal HUMAN FAIL：stop and diagnose asset/Shot contract/compiler/adapter/model responsibility；do
-  not begin Milestones 7–9。
-- Micro-sequence causal PASS but performance/camera FAIL：run at most the separately authorized isolated comparison
-  needed to test that failure；do not broaden infrastructure。
-- Micro-sequence PASS and 30s HUMAN FAIL：classify exact spans and return to the smallest owner；do not treat the code
-  slice as a quality success。
-- 30s HUMAN PASS：record only exact development artifact evidence，then proceed to Milestone 7 if productization is
-  still justified。
+Every generated Shot must pass the mandatory exact-byte per-Shot barrier before the next submit。The assembled exact
+scene must receive uninterrupted `1.0x` full-speed/full-audio HUMAN verdict。Sampled frames、SSIM、decode PASS、scene
+detection or technical continuity cannot substitute for any required human finding。
 
-**Acceptance:** The micro-sequence first obtains uninterrupted user causal `HUMAN_PASS` for every presence/holder/
-action boundary。Then one exact 30s artifact has uninterrupted user `HUMAN_PASS`，all required causal boundaries PASS，and
-Dialogue Performance / Lip-sync、Hook Readability/pacing are separately evaluated。This is development evidence only；
-it does not imply Production candidate、P6、Final Acceptance、publication or commercial effectiveness。
+#### M6-C Commercial Lane
 
-**Verification:** Exact hash/media probe、project-local per-Shot evidence、pairwise `1.0x` review and whole-video human
-verdict。Any recomposition/re-encode produces a new SHA and invalidates the previous whole-video verdict。
+**Current Evidence:** The completed Qingyan `15.5s` micro-sequence remains HUMAN `FAIL` for watchability、commercial
+quality baseline and assembly acceptance。Its `768x768` locked-anchor/locked-camera laboratory setup cannot be retried、
+repaired or expanded into `30s` under the old verdict。Historical Shot technical PASS remains exact-byte technical
+evidence only。
+
+**Reopen Contract:** A future Commercial attempt requires an accepted Ecommerce package、Product Truth/claim lineage、
+selected product/character/scene assets and an exact source-quality baseline。For Qingyan，the current comparison floor
+is the exact `1344x768` raw set under `/home/reggie/电商图片/青颜/青颜视频_20260824/raw/`；a new attempt must preserve the
+accepted format/composition intent and may not lower image fidelity、performance naturalness、camera/motion energy or
+commercial readability merely to simplify anchor compatibility。The selected creative package，not this plan，owns
+the exact product story and claims。
+
+**Commercial Findings:** Keep requirement-level verdicts separate：
+
+- shared physical/perceptual continuity：character/product presence、holder/hand/functional state、action phase、
+  space/axis、camera endpoint、conditioning and sound bridge；
+- performance、Dialogue Performance / Lip-sync and whole-video pacing；
+- Ecommerce-only acceptance：Product Truth/claim correctness、Hook、product introduction/presentation、credible
+  demonstration/proof、benefit hierarchy、CTA and brand closure；
+- exact side-by-side source-quality baseline：resolution/composition、image fidelity、natural motion、acting and
+  commercial viewing energy。Any required dimension below baseline is `FAIL` and cannot be averaged away。
+
+Every generated Shot must pass the mandatory exact-byte per-Shot barrier before the next submit。Only after the bounded
+Commercial micro-sequence passes shared continuity and Commercial HUMAN requirements may a new exact whole-ad candidate
+be assembled and reviewed at uninterrupted `1.0x` full-speed/full-audio。A product-state PASS、technical Gate or
+commercially readable still frame cannot substitute for whole-video acceptance。
+
+#### Cross-Lane Decision Matrix
+
+| Outcome | Required action | What remains valid |
+| --- | --- | --- |
+| Drama domain-only `FAIL` / `NOT_EVALUATED` | Stop M6-D and return to Drama owner；do not change Shared Core or Commercial rubric without shared evidence | An existing exact M6-C verdict remains scoped to its bytes/contracts |
+| Commercial domain-only `FAIL` / `NOT_EVALUATED` | Stop M6-C and return to Ecommerce/creative owner；do not change Drama rubric | An existing exact M6-D verdict remains scoped to its bytes/contracts |
+| Shared continuity `FAIL` in either lane | Return to the smallest Shared Core owner；any changed shared contract/compiler invalidates prior cross-domain qualification and requires both lanes to revalidate applicable shared requirements | Unchanged domain observations remain historical evidence only |
+| One lane PASS, other lane not PASS | Record only that lane's development evidence；do not claim dual-domain support and do not begin M7–M9 | The passing lane may guide an isolated follow-up but cannot qualify the other lane |
+| Both lanes PASS | Proceed to M7 only if productization is still justified | Exact Drama and Commercial HUMAN evidence remain separate；no Production/P6/Final Acceptance implication |
+
+**Acceptance:** M6 completes only when one exact Drama scene and one exact Commercial whole-video artifact each have：
+
+1. all applicable Shared Continuity findings `PASS`；
+2. all required selected-domain findings `PASS` under their independent owners；
+3. uninterrupted user `1.0x` full-speed/full-audio HUMAN PASS bound to exact SHA；
+4. baseline comparison PASS for that domain；
+5. no finding borrowed from or inferred by the other lane。
+
+This first pair supports only the bounded dual-domain continuity hypothesis。It does not prove portfolio-level quality
+reuse、Production candidate、P6、Final Acceptance、publication、commercial effectiveness or Drama audience success。
+
+**Verification:** For each lane，verify exact hash/media probe、selected domain-profile identity、project-local per-Shot
+evidence、pairwise `1.0x` findings、baseline comparison and whole-video human verdict。Any recomposition/re-encode/
+audio replacement produces a new SHA and invalidates the previous whole-video verdict。Before M7，verify both lane
+records against the unchanged Shared Core commit/compiler/profile identity；do not merge their verdicts into one score。
 
 ### Milestone 7: Productize Exact Pairwise Media Evidence And Honest Post Treatment
 
@@ -533,6 +614,9 @@ continuity-claiming composition。
   declared by an applicable edge/use：montage、dream/time jump、scene reset、commercial cut、deterministic graphic
   treatment，or stylistic treatment after required causal continuity already passes。They may not synthesize a
   missing handoff、hide a character/prop state jump or upgrade `FAIL`/`NOT_EVALUATED` to PASS。
+- Domain-specific edit semantics require the selected domain owner：`commercial_cut` can release only sealed
+  Commercial dimensions；Drama shot/reverse-shot、narrative ellipsis、scene transition or montage obligations come
+  from the accepted Drama profile。Neither profile may reinterpret the other's release rules。
 - Direct action continuity defaults to a zero-duration hard cut or other evidence-neutral cut。A reset/ellipsis cannot
   be inferred after seeing failed media，and post treatment always creates new artifact identity requiring review。
 - Tail motion is interpreted against the sealed endpoint：a requested settled hold is legal；low optical flow alone
@@ -579,8 +663,9 @@ python -m pytest -p no:cacheprovider \
 - Create: `workflows/qualification/minimax_h3_fl2va_rainy_station_source_v2_profile.json`
 - Do not modify: `workflows/qualification/minimax_h3_fl2va_rainy_station_source_v1_profile.json`
 
-**Contract:** Only after Milestone 6 records the required empirical PASS，remaining Local/Cloud H3 and T8 new-attempt
-adapters may adopt the same sealed H3 compiler one by one。Each adapter advances compiler identity exactly once，keeps
+**Contract:** Only after Milestone 6 records separate Drama and Commercial empirical PASS for the unchanged Shared
+Core，remaining Local/Cloud H3 and T8 new-attempt adapters may adopt the same sealed H3 compiler one by one。One lane
+PASS cannot authorize dual-domain adapter expansion。Each adapter advances compiler identity exactly once，keeps
 historical compiled requests bit-for-bit reopenable and cannot fallback after unsupported。New qualification profile
 preparation derives its prompt from the same sealed semantic intent；existing v1 profile and prompt SHA remain
 immutable historical evidence。
@@ -629,6 +714,11 @@ language、camera-subject relation、action/gaze/sound bridge and pacing for bot
 deterministic composition；all advice is compressed into the one approved Shot / `GenerationIntent` / transition
 contract；`h3-video` advises only H3 grammar adaptation。No Skill runs in Production runtime or owns Provider、state or
 review truth。
+
+Domain routing remains explicit：the independently accepted Drama workflow/spec owns Drama story、motivation、
+relationship、dialogue semantics、emotion and payoff rubric；`ecommerce-ad-workflow` owns Ecommerce Product Truth、
+claims、Hook、presentation/demo/proof、CTA and brand closure。Shared continuity evidence may be consumed by either lane，
+but neither domain owner may write or reinterpret the other's verdict。
 
 **Implementation Notes:**
 
@@ -680,17 +770,18 @@ Execution is deliberately gated：
 
 | Phase | Required work | Exit / stop rule |
 | --- | --- | --- |
-| R0 — Empirical reconnaissance | Complete；four-arm attribution + one handoff Shot + v13 30s recut | Supports incompatible-anchor attribution and visible holder transfer；30s presence FAIL；does not validate compiler or authorize productization |
+| R0 — Commercial/shared reconnaissance | Complete；four-arm attribution + one handoff Shot + v13 30s recut + M6-C causal assembly | Supports incompatible-anchor attribution and visible holder transfer；Qingyan HUMAN watchability/commercial baseline FAIL；does not prove Drama or authorize productization |
 | A — Minimum offline hypothesis | Milestones 1–5 only | Proves exact typed causal intent plus compatible conditioning can reach one pilot adapter prompt；does not prove model quality |
-| B1 — Causal micro-sequence | Milestone 6 step 1 | `10.333–15.500s` / `2–3` generated H3 Shots must obtain HUMAN causal PASS before any new 30s attempt；FAIL returns to the smallest owner and stops M7–M9 |
-| B2 — First 30s verdict | Milestone 6 step 2 | Exact 30s HUMAN PASS is required before infrastructure expansion |
-| C — Productize proven behavior | Milestones 7–9 | Add generic post-media enforcement、remaining adapters/qualification、routing/Harness only after Phase B PASS |
+| B-D0 — Drama owner prerequisite | Independent accepted Drama workflow/spec、sealed fixture/rubric and baseline | Missing owner/profile/path is `BLOCKED_BEFORE_MEDIA`；this plan must not invent Drama acceptance |
+| B-D — Drama empirical lane | One bounded dramatic scene plus exact whole-scene HUMAN verdict | All applicable shared + Drama findings and Drama baseline must PASS；otherwise stop only this lane unless Shared Core failed |
+| B-C — Commercial empirical lane | Reopen only through a new accepted Commercial attempt；current Qingyan M6-C is HUMAN FAIL | All applicable shared + Commercial findings and source-quality baseline must PASS；old assembly cannot be repaired or expanded |
+| B-X — Dual-domain closure | Reopen both exact lane records against unchanged Shared Core identity | Both lanes PASS independently；one lane cannot qualify the other |
+| C — Productize dual-domain proven behavior | Milestones 7–9 | Add generic post-media enforcement、remaining adapters/qualification、routing/Harness only after B-X PASS |
 
-Therefore，before the first 30s HUMAN PASS，the mandatory milestones are M1–M5 plus the feasible
-`10.333–15.500s` micro-sequence gate in M6。M7 pairwise post-media productization、M8 adapter/qualification expansion
-and M9 routing/Harness completion are explicitly deferred。The existing v12 bytes fail the 4.500s and 7.250s causal
-boundaries；the v13 reconnaissance fixes holder transfer but still fails character presence at 4.500s、9.667s and
-19.458s。Neither can be promoted to the first 30s HUMAN PASS by re-labeling technical receipts。
+Current status is B-D0 `BLOCKED_BEFORE_MEDIA`、B-D `NOT_EVALUATED`、B-C `HUMAN_FAIL` and B-X `FAIL`。M7 pairwise
+post-media productization、M8 adapter/qualification expansion and M9 routing/Harness completion remain explicitly
+deferred。The existing v12/v13/M6-C bytes remain Commercial/shared regression evidence；none can be promoted to Drama
+or dual-domain PASS by relabeling technical receipts。
 
 Stop immediately and report rather than expanding scope when：
 
@@ -698,9 +789,15 @@ Stop immediately and report rather than expanding scope when：
 - the selected H3 capability cannot express the sealed intent without inventing facts；
 - implementation requires a new Provider、fallback、schema rewrite rather than the versioned additive branch；
 - another writer owns any target file；
+- the selected lane lacks its accepted domain owner、sealed profile/rubric、approved fixture or exact baseline；
 - a required causal pairwise boundary remains `FAIL` or `NOT_EVALUATED`；
 - an FL2VA last anchor lacks approved same-scale/reachable endpoint compatibility；
-- the micro-sequence does not improve causal reachability or generated camera behavior；
+- the output falls below its selected domain's image fidelity、performance、camera/motion、readability or pacing
+  baseline even when causal state is technically reachable；
+- a proposed verdict borrows a requirement、PASS or release rule from the other domain lane；
+- one lane passes while the other remains `FAIL` / `NOT_EVALUATED` and the next action would claim dual-domain support；
+- a Shared Core change is proposed after one lane PASS without invalidating and replanning both lanes' shared
+  revalidation；
 - Provider outcome is unknown；
 - the requested empirical action lacks exact model/input/budget/egress/permit authorization。
 
@@ -709,10 +806,16 @@ Stop immediately and report rather than expanding scope when：
 - Before any live/media work，Phase A can be rolled back by reverting the new requirement branch、causal readiness、
   shared H3 compiler and pilot adapter routing together；do not leave a new-attempt adapter on a partial contract。
 - Milestones 7–9 are separate post-evidence changes and must not be pre-implemented or activated behind an assumption
-  that Phase B will pass。
+  that either domain lane or dual-domain Phase B will pass。
 - Historical compiler/profile branches remain available only for exact reopen/replay，not new attempt creation。
+- A domain-only requirement/rubric change invalidates only that lane unless shared contracts changed；a Shared Core、
+  compiler、conditioning or generic continuity-evidence change invalidates the applicable shared findings in both
+  lanes。
+- A prior Drama or Commercial PASS remains exact development evidence only；it cannot be copied into the other lane or
+  used to bypass its missing owner/profile/baseline。
 - Phase A completion requires focused tests and historical compatibility，not a quality claim。Full Plan completion
-  requires Phase B exact human evidence plus Phase C code/tests/docs/policy agreement、fresh Harness receipt、same-tier
-  independent review and no alternate H3 new-attempt prompt path。
+  requires separate exact Drama and Commercial HUMAN evidence、B-X identity reconciliation plus Phase C
+  code/tests/docs/policy agreement、fresh Harness receipt、same-tier independent review and no alternate H3
+  new-attempt prompt path。
 - A technical implementation PASS does not complete the empirical decision gate；a HUMAN PASS does not imply
   Production/P6/Final Acceptance。
