@@ -2,6 +2,31 @@
 
 Date: 2026-08-28
 
+## Current Status — Implementation Supersedes Plan-Only State
+
+本记录最初保存 plan checkpoint；该状态现已被实现提交 `31f365a`
+(`feat: add caption final-media quality gate`) supersede。下方保留 plan-time reasoning 作为历史，
+但“尚未实现”的陈述不再代表 current runtime truth。
+
+实现结果：
+
+- `QaLayer.CAPTION`、六组 requirement、per-track policy、exact evidence context 与 fail-closed
+  adjudication 已进入 Product Runtime。
+- Manifest `2.15` 与 artifact schema `2.1` 已实现；historical `2.0` serialization/hash behavior
+  保持兼容。
+- caption P6 request/permit/evidence/receipt、zero-write replay、unknown-attempt recovery 与 strict
+  reopen 已由既有 `ProductionStateCommitter` lifecycle 接管，没有新增 Manifest writer。
+- caption-aware repair outcome 与 Final Acceptance 会重载 exact project/request/context/evidence，
+  重新运行同一 adjudicator；tamper、identity drift、coverage gap、unsupported evaluator 或 verdict
+  mismatch 均 fail closed，且 rejection path 不写 Manifest/RepairOutcome artifact。
+- Ecommerce canonical order 已固定为 CAPTION P6 -> Universal Gate -> Domain Gate -> Final
+  Acceptance；Base AI Comic 与 Ecommerce E2E caller closure 均有 executable coverage。
+- 为保持 module boundary，caption model validators 与 active-review reader 分别提取到
+  `_caption_review_models.py`、`_review_project_reader.py`；task-delta Architecture Gate 最终 PASS。
+
+这仍不证明任何真实媒体的字幕感知质量。当前实现只关闭 Engineering / Deterministic contract；
+OCR、ASR、waveform、human visual verdict、live Provider 与 empirical Final Acceptance 均未执行。
+
 ## Purpose
 
 本文记录字幕专项质量 Gate 的 accepted implementation plan checkpoint。计划基于当前代码、
@@ -65,9 +90,10 @@ CaptionTrack
 - strict reopen 必须重载 exact project/request/context/evidence，调用同一个 caption adjudicator
   重新计算 verdict，并要求 recomputed verdict 与 stored receipt verdict 完全一致。
 
-该 migration 仍只是计划；当前 runtime schema 未在本任务中改变。
+以上为 plan-time migration decision；实现提交 `31f365a` 已按该 decision 落地，因此
+“当前 runtime schema 未改变”的旧状态已被 supersede。
 
-## Review History
+## Plan Review History
 
 首次 `reviewer_xhigh` 审查给出 `reject`，指出四个 blocking issues：
 
@@ -82,7 +108,7 @@ policy-only mixed-state rejection 与 verdict recomputation concerns 也已补�
 
 最终 scoped re-review verdict 为 `accept`，无 blocking issues 或 non-blocking concerns。
 
-## Verification And Publication State
+## Plan Checkpoint Verification And Publication State
 
 - Plan commit: `5f10004` (`docs: plan caption quality gate`)。
 - Exact base commit: `58f16634a4ef0d574d18c9707fedc8d430013230`。
@@ -101,11 +127,63 @@ state 或 Final Acceptance state；没有执行 OCR、ASR、waveform/media analy
 Provider call 或 human final-media review。工作区中其他 staged/dirty files 均保留，未纳入本任务
 commit。
 
+上段只描述原 plan commit `5f10004`；Product Runtime 与 tests 后续已由 `31f365a` 修改。
+
+## Implementation Review History
+
+首次 implementation `reviewer_xhigh` verdict 为 `reject`，识别出四个 blocking defects：
+
+1. adjudicator 对不完整/冲突证据存在 fail-open path；
+2. unknown P6 attempt 可能被忽略并进入 replay/new execution；
+3. repair outcome 未按 caption contract strict reopen；
+4. Harness changed-path routing 未覆盖全部真实 caption/runtime owner。
+
+实现逐项修复并补充 regression coverage。原 tier scoped re-review 给出
+`accept with concerns`，仅剩 tampered repair rejection 的 zero-write assertion 建议；补充
+Manifest bytes unchanged 与 RepairOutcome artifact absent 断言后，architecture extraction 后的
+最终同 tier re-review verdict 为 `accept`，无 blocking issue 或 non-blocking concern。
+
+## Implementation Verification And Publication State
+
+- Task commit: `31f365a` (`feat: add caption final-media quality gate`)；53 files，
+  3330 insertions / 537 deletions。
+- Focused verification：`612 passed`（models/project/caption/Harness）、`514 passed`
+  （state/recovery/Base/Ecommerce/profile）、HyperFrames `196 passed, 3 skipped`。
+- Architecture verification：task-delta Architecture Gate `PASS`，`0 errors`；remaining
+  `7 warnings, 1 info` 均为 non-blocking repository findings。
+- Exact task-staged run
+  `.agent/harness/runs/20260828-caption-quality-gate-staged-v2/receipt.json` 的所有 selected checks
+  实际通过，但 concurrent writer 在运行中推进 `HEAD` 并清空 task index，导致 receipt 的
+  freshness/snapshot/scope closure 失败；该 receipt **不作为 completion proof**。
+- 随后对 current `HEAD` 的 combined exact range `31f365a^..23dc28b` 运行 Harness；receipt：
+  `.agent/harness/runs/caption-quality-plus-local-comfyui-policy-20260828/receipt.json`。
+  `verify-receipt` 返回 `passed=true`、`fresh=true`、`fresh_for_snapshot=true`、
+  `scope_paths_match=true`、`complete_completion_proof=true`、`snapshot_matches=true`、
+  `workspace_cleanup_confirmed=true`、`workspace_stable_confirmed=true`。
+- Combined Harness selected checks 全部通过，包括 product runtime/skill boundary `2 passed`、
+  Harness `204 passed`、production contract `2899 passed, 3 skipped, 1225 deselected`、review
+  `653 passed`、commercial `891 passed`、image `1266 passed`、shot continuity `357 passed`、
+  provider-neutral video requirement `333 passed`。
+- Combined receipt 同时覆盖 task commit `31f365a` 与后续 unrelated local-ComfyUI policy commit
+  `23dc28b`，因此它是 fresh current-HEAD completion proof，但不是 caption task-only receipt；
+  本记录不把后者的变更归属到 caption task。
+- Publication state：实现已 commit 到 local `main`；未 push、未 release、未触发 Provider、
+  media generation、Production activation 或 Final Acceptance mutation。
+- 现有 unrelated `.codex/config.toml` dirty state、H3 record staged state、`artifacts/` 与两份
+  2026-08-27 untracked plan/spec 均保留，未纳入 caption implementation commit。
+
+## Automatic Learning Evaluation
+
+`distill-ai-video-learning` automatic evaluation：`no_candidate`。本次 evidence 是同一 caption
+quality gate 的 plan、prior-art mapping、implementation 与 deterministic verification chain，不是两个
+independent real-media attempts，也不是隔离变量的 controlled multi-arm comparison；现有 learning
+claims 中也没有被这次 evidence materially supported/countered/reopened 的同一 claim。因此不满足
+Learning Claim admission threshold，未创建 placeholder 或 pending candidate。
+
 ## Implementation Boundary
 
-后续只有在获得 implementation authorization 后才执行计划。实施前必须重新检查 current code、
-Git state、live writers 与 exact target-file ownership，尤其是 `.agent/harness/policy.yaml`、
-contract matrix、runtime baseline 与 roadmap 的 same-file overlap。
+本节以下是 plan-time implementation boundary；授权已由用户本次“实现 plan”请求给出，并已在
+`31f365a` 完成。它继续作为 unchanged-contract audit trail，而不是尚待执行的指令。
 
 实施需要保持以下 unchanged contracts：
 
@@ -123,7 +201,9 @@ contract matrix、runtime baseline 与 roadmap 的 same-file overlap。
 
 - `CaptionTrack` valid 不等于 final rendered captions correct。
 - `QaLayer.LAYOUT PASS` 不等于字幕准确、同步、完整或无重复烧录。
-- 计划获审查接受不等于 implementation 完成。
-- Manifest migration 设计完成不等于 current reader 已支持 `2.15`。
+- plan review 接受不等于 implementation 完成；本次完成结论来自 current code、tests、independent
+  implementation review 与 fresh Harness evidence。
+- Manifest migration 设计本身不构成支持证明；current reader 的 `2.15` 支持已由实现与 tests
+  单独验证。
 - Harness documentation receipt 不等于 runtime、media、P6 或 Final Acceptance evidence。
 - 未重新核对 implementation-time dirty ownership 前，不得修改潜在重叠文件。
