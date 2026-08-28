@@ -385,8 +385,8 @@ independent real-media attempts，也不是隔离变量的 controlled multi-arm 
 claims 中也没有被这次 evidence materially supported/countered/reopened 的同一 claim。因此不满足
 Learning Claim admission threshold，未创建 placeholder 或 pending candidate。
 
-Real-validation update 的 automatic evaluation：`pending_candidate`。Raw generic-font PASS 与
-Production custom-font FAIL 构成 held-constant controlled comparison，因此创建：
+Real-validation update 的 automatic evaluation 当时为 `pending_candidate`。Raw generic-font PASS 与
+Production custom-font FAIL 构成 held-constant controlled comparison，因此创建 pending v1：
 
 `docs/record_for_agent/learning/hyperframes-caption-exact-source-readiness.md`
 
@@ -397,10 +397,23 @@ Production custom-font FAIL 构成 held-constant controlled comparison，因此�
 - `pending_approval_status=PENDING_CONFIRMATION`
 - `pending_adoption_status=NOT_ADOPTED`
 
-该 candidate 只提出“exact Production source 必须通过 pinned HyperFrames lint/render 才能证明 caption
-renderer readiness”的 bounded Gate rule；不授权字体 asset/schema 修复，不修改 target，不产生 P6、
-activation、Final Acceptance、push 或 release truth。按 Skill contract，后续 adoption 在用户对上述 exact
-commit/hash 作出 `Confirm`、`Revise` 或 `Reject` 前保持停止。
+该 v1 从未被确认或 adopted，其 exact preimage 继续由上述 commit/hash 保存。`0ed672e` 的 runtime
+修复与新的 exact Production PASS materially narrow 了原假设，因此 2026-08-29 automatic evaluation
+将同一 claim 更新为 pending v2，而不是把 v1 留作 current advice：
+
+- candidate checkpoint commit：`692e8b2fa5eaf3a24d0d288b08eb95dc89bddd79`
+- committed candidate bytes SHA-256：
+  `e5a9a65aaa6d98a29879f0afaafb0cb392f9b0d1fb562c8cfe6b681af2d008ba`
+- `pending_evidence_status=SUPPORTED`
+- `pending_approval_status=PENDING_CONFIRMATION`
+- `pending_adoption_status=NOT_ADOPTED`
+- `supersedes=bcd2215 / 14012cdb907b5bf29cd7359fa96676db84785d4d263c67f18b691578a00748f9`
+
+Pending v2 把 claim 收窄为 pinned bundled/generic font contract 与 exact-source Gate 的同步维护规则；
+确认后只拟更新 `.agent/context/control-plane-playbook.md` 的 maintenance Gate guidance，不再请求字体
+runtime repair。当前 `0ed672e` 是用户直接授权的修复，不是 Learning Claim automatic adoption。
+按 Skill contract，target adoption 在用户对 v2 exact commit/hash 作出 `Confirm`、`Revise` 或 `Reject`
+前保持停止；candidate 本身不产生 P6、activation、Final Acceptance、push 或 release truth。
 
 ## Implementation Boundary
 
