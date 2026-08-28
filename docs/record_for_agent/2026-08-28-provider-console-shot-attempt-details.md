@@ -321,6 +321,67 @@ Independent native `reviewer_xhigh` verdict 为 `accept`，无 blocking issue。
 本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成、媒体修改、Manifest mutation、
 activation、P6、Final Acceptance、push、deploy 或 release。
 
+## Exact Experiment References And Verdicts Follow-up — 2026-08-28
+
+本节取代上方 `AI-VIDEO Experiments Source Follow-up` 中“该实验目录尚无受支持 metadata linkage，
+Shot、Prompt、generation type 与成功/失败全部保持 `NOT_EVALUATED`”这一 current-facing 限制；该段仍
+保留为当时的 historical checkpoint。实现继续把 `/home/reggie/ai-video-experiments` 作为只读、
+non-canonical external source，不把实验 evidence 提升为 Production lifecycle truth。
+
+当前关联行为：
+
+- 新的 experiment evidence adapter 支持三条已经真实存在的结构化链：M6 per-Shot result / requirement /
+  resolved request / Prompt / Gate、causal handoff summary / exact preview / Prompt / Shot Gate，以及 H3
+  conditioning evaluation / experiment contract / exact submitted workflow。
+- 每个通过 exact MP4 identity 与完整 linkage 的记录在同一 detail card 展示 Shot 或 experiment arm、
+  分镜脚本、sealed Prompt、generation type、`OUTPUT_RECORDED`、Technical Gate、Human Verdict、逐项
+  findings 与可验证 Reference。`OUTPUT_RECORDED` 不等于 lifecycle success、candidate、QA、P6、
+  Final Acceptance 或 activation。
+- Reference 只有被 content hash / receipt 绑定到 exact submitted input 时才显示为实际生成输入。历史
+  conditioning workflow 只有 `LoadImage` 名称而没有 upload receipt，因此仍显示 Arm、Prompt、输出与
+  Gate，但 Reference binding 明确为 `NOT_EVALUATED` 并说明缺少 receipt；不再按 basename 猜测输入。
+- 同一视频若出现语义不同的 verified evidence，包括 requirement-level findings 冲突，会标记
+  `ambiguous_verified_experiment_evidence` 并隐藏 Shot、Prompt、Reference 与 verdict。未知 schema、链路
+  缺失或 stale identity 继续 fail closed。
+- Browser projection 对 absolute POSIX/Windows/UNC path、signed URL、secret-like text 与 traceback 做
+  adapter gate 加 API 递归 redaction；source path、root 与 private media descriptors 只保留在 loopback
+  service 内。Reference token 仍在读取时重验 allowlist containment、identity、SHA 与 size。
+
+本机 read-only observation：
+
+- external catalog 当时为 `4/4` sources available、`401` unique SHA groups、`512` physical locations；
+  selector 的 `全部视频来源` 另加当前一个 Runs workspace，显示 `402`。
+- `AI-VIDEO Experiments` 有 `16` 个 unique videos：`11` 个关联 exact experiment detail，其中 `7` 个有
+  exact Reference，`4` 个 conditioning arms 的 Reference binding 为 `NOT_EVALUATED`；另外 `5` 个缺少
+  structured composition/output receipt，继续 unbound。没有 ambiguity。
+- Chrome integrated QA 在 M6 Shot C v4 同屏确认 exact first/last Reference、脚本、Prompt、
+  `OUTPUT_RECORDED`、Technical `FAIL`、Human `NOT_EVALUATED` 与逐项 findings；conditioning Arm A 同屏
+  确认 Prompt、`FAIL_STOP_BEFORE_NEXT_ARM`、`HUMAN_FAIL` 和 Reference `NOT_EVALUATED` 原因。页面不含
+  `/home/reggie`，console 无 error/warning/issue，所列 local requests 无 `4xx/5xx`。
+- catalog 从前一 checkpoint 的 `15` 个 experiment videos 增长到 `16` 来自目录中其它进程的新文件；
+  本任务没有生成、修改或删除媒体。
+
+Verification：
+
+- Provider Console Node contracts：`56 passed`；Python projection：`32 passed`；Sites tests：`5 passed`；
+  Vite production build：`4580 modules transformed`。
+- Independent native `reviewer_xhigh` 对 evidence linkage、安全投影、ambiguity 与 Reference fail-closed 做了
+  scoped review；最终无 blocking issue。Harness route follow-up verdict 为 `accept`。
+- Implementation commits：`53002ac33e51c5f2f90176827f1ec9468cb24db4` 与
+  `59e9860f84adf2f63bc2e6ee56266b7e4a411364`。
+- Exact commit range：
+  `8d616e07b7c949bc502065845a2b8675e01874bd..59e9860f84adf2f63bc2e6ee56266b7e4a411364`；
+  receipt：`.agent/harness/runs/provider-console-experiment-details-20260828-v2/receipt.json`。
+- Receipt 内 Architecture Gate PASS、Harness `193 passed`、Provider Console Python `32 passed`、Node
+  `56 passed`、Vite build 通过；freshness verification 为 `passed=true`、`fresh=true`、
+  `snapshot_matches=true`、`scope_paths_match=true`、`scope_worktree_clean=true` 与
+  `complete_completion_proof=true`。先前 v1 receipt 因新 module 未映射而在 policy audit fail closed；补入
+  唯一既有 `provider_console` route 并增加 route test 后，由 v2 receipt supersede，没有放宽 unknown-path
+  fallback。
+
+本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成、Manifest mutation、activation、P6、
+Final Acceptance、push、deploy 或 release；两个 implementation commits 与本记录均为 local checkpoint。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
