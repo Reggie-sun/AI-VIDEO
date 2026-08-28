@@ -648,8 +648,10 @@ def _search_collection(
     ):
         raise ValueError("dense retrieval result fields have inconsistent lengths")
     null_distances = null_raw.get("distances", [[]])[0] or []
-    if not null_distances:
-        raise ValueError("dense null calibration must return a distance")
+    if len(null_distances) != candidate_limit:
+        raise ValueError(
+            "dense null calibration did not honor the candidate budget"
+        )
 
     lexical_ids = lexical_raw.get("ids", []) or []
     lexical_documents = lexical_raw.get("documents", []) or []

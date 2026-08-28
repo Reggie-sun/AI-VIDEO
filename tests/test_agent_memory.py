@@ -506,7 +506,7 @@ def test_weak_common_lexical_match_does_not_bypass_threshold() -> None:
     class CommonTermCollection:
         def query(self, **kwargs):
             if kwargs["query_embeddings"] == [[1.0]]:
-                return {"distances": [[0.9]]}
+                return {"distances": [[0.9, 0.9]]}
             return {
                 "ids": [["first", "second"]],
                 "documents": [["the first", "the second"]],
@@ -564,7 +564,7 @@ def test_dense_lane_requires_null_excess_and_top1_margin(
     class DenseGateCollection:
         def query(self, **kwargs):
             if kwargs["query_embeddings"] == [[0.0]]:
-                return {"distances": [[1.0 - null_score]]}
+                return {"distances": [[1.0 - null_score] * 2]}
             return {
                 "ids": [["first", "second"]],
                 "documents": [["first candidate", "second candidate"]],
@@ -654,6 +654,44 @@ def test_dense_null_calibration_uses_same_ann_candidate_budget() -> None:
     assert hits == []
 
 
+def test_dense_null_calibration_requires_full_candidate_result() -> None:
+    class IncompleteNullCollection:
+        def query(self, **kwargs):
+            if kwargs["query_embeddings"] == [[0.0]]:
+                return {"distances": [[0.2]]}
+            return {
+                "ids": [["first", "second"]],
+                "documents": [["first candidate", "second candidate"]],
+                "metadatas": [[
+                    {"source": "docs/first.md", "chunk_index": 0},
+                    {"source": "docs/second.md", "chunk_index": 0},
+                ]],
+                "distances": [[0.1, 0.2]],
+            }
+
+        def get(self, **kwargs):
+            return {
+                "ids": ["first", "second"],
+                "documents": ["first candidate", "second candidate"],
+                "metadatas": [
+                    {"source": "docs/first.md", "chunk_index": 0},
+                    {"source": "docs/second.md", "chunk_index": 0},
+                ],
+            }
+
+    with pytest.raises(ValueError, match="candidate budget"):
+        retrieval_module._search_collection(
+            query="no-match",
+            query_vector=[1.0],
+            null_query_vector=[0.0],
+            collection=IncompleteNullCollection(),
+            available=2,
+            limit=2,
+            corpus_kind="experience",
+            default_authority="advisory_experience",
+        )
+
+
 @pytest.mark.parametrize(
     ("dense_score", "null_score", "expected_sources"),
     [
@@ -720,7 +758,7 @@ def test_partial_cjk_bigram_does_not_admit_lexical_lane() -> None:
     class PartialBigramCollection:
         def query(self, **kwargs):
             if kwargs["query_embeddings"] == [[0.0]]:
-                return {"distances": [[0.16]]}
+                return {"distances": [[0.16] * 20]}
             return {
                 "ids": [ids],
                 "documents": [documents],
@@ -767,7 +805,7 @@ def test_hybrid_uses_top_k_30_and_returns_top_n_8() -> None:
     class SizedCollection:
         def query(self, **kwargs):
             if kwargs["query_embeddings"] == [[1.0]]:
-                return {"distances": [[0.5]]}
+                return {"distances": [[0.5] * 30]}
             assert kwargs["n_results"] == 30
             return {
                 "ids": [ids[:30]],
