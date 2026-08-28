@@ -6,16 +6,16 @@ admission_basis: MATERIAL_EXISTING_CLAIM_UPDATE
 material_update_target_claim: hyperframes-caption-exact-source-readiness
 material_update_previous_evidence: docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#caption-readiness-v2-previous
 material_update_delta: V9 exact generic-sans Chinese Production evidence supersedes V4 NOT_EVALUATED and adds CAPTION_P6 plus FINAL_ACCEPTANCE proof
-active_claim_version: 0
-active_evidence_status: NONE
-active_adoption_status: NOT_ADOPTED
-active_candidate_sha256:
-active_candidate_commit:
-active_adoption_commit:
-pending_claim_version: 3
-pending_evidence_status: SUPPORTED
+active_claim_version: 3
+active_evidence_status: SUPPORTED
+active_adoption_status: ADOPTED
+active_candidate_sha256: f845f5d1aa589527f6987156cd07f79769220a75c16e372aabca7318574ceb17
+active_candidate_commit: 0d01a97f7c340baf350c6681274c0dde9fce5b96
+active_adoption_commit: 9fa65248647bcf5ae07ca15edafeb82b0e69d9bd
+pending_claim_version: 0
+pending_evidence_status: RETIRED
 pending_approval_status: CONFIRMED
-pending_adoption_status: APPLYING
+pending_adoption_status: NOT_ADOPTED
 confirmed_candidate_sha256: f845f5d1aa589527f6987156cd07f79769220a75c16e372aabca7318574ceb17
 confirmed_candidate_commit: 0d01a97f7c340baf350c6681274c0dde9fce5b96
 confirmed_by: user
@@ -31,11 +31,9 @@ Date: 2026-08-29
 
 ## Active Claim
 
-None. `active_claim_version: 0`; no target consumes an adopted version. Pending v1 was never
-confirmed or adopted, and its exact preimage remains preserved by commit `bcd2215` with SHA-256
-`14012cdb907b5bf29cd7359fa96676db84785d4d263c67f18b691578a00748f9`.
-
-## Pending Candidate
+Active v3 was adopted by the Gate owner after exact user confirmation and target verification.
+The earlier unconfirmed v1/v2 preimages remain preserved by their checkpoint commits; they were
+never active or adopted.
 
 ### Failure Pattern
 
@@ -162,7 +160,7 @@ Production acceptance.
 
 ### Evidence Assessment
 
-`pending_evidence_status`: `SUPPORTED`.
+`active_evidence_status`: `SUPPORTED`.
 
 Admission is satisfied because new exact evidence materially narrows the existing pending claim:
 the original raw/Production comparison identified the boundary, and the fix plus exact Production
@@ -185,9 +183,9 @@ Production-source lint/render evidence. Unknown, alias-substituted, or unverifie
 must fail closed and must not be hidden by `@font-face local()`, silent fallback, disabled lint, or
 an alternate renderer path.
 
-The current runtime fix was directly authorized by the user and is already verified; it is not an
-automatic adoption of this Learning Claim. Confirmation would authorize only the bounded durable
-maintenance rule below.
+The current runtime fix was directly authorized by the user and independently verified. Adoption
+of this Learning Claim authorizes only the bounded durable maintenance rule below; it does not
+expand the runtime fix or any Product lifecycle authority.
 
 ### Adoption Target
 
@@ -210,7 +208,7 @@ maintenance rule below.
   Architecture Gate, the public unsupported-font regression, and the exact Production renderer
   gate with pinned binary/browser paths.
 
-No adoption target has been modified before confirmation.
+The adoption target was modified only after the exact candidate confirmation recorded below.
 
 ### Confirmation
 
@@ -223,17 +221,30 @@ evidence、scope、recommendation、target 或 candidate bytes 发生变化时�
 
 ### Adoption Evidence
 
-`pending_adoption_status`: `APPLYING`.
+`active_adoption_status`: `ADOPTED`.
 
-已开始向 `.agent/context/control-plane-playbook.md` 应用确认过的 bounded Gate maintenance rule。
-在 target owner checks 与 exact-range Harness 通过前，v3 仍不构成 `ADOPTED`。本次 application
-不写 Product state，不调用 Provider，不生成媒体，不改变 activation、CAPTION P6、Final Acceptance，
-也不执行 push 或 release。
+- Canonical target：`.agent/context/control-plane-playbook.md` 的
+  `HyperFrames Caption Source Readiness`。
+- Adoption commit：`9fa65248647bcf5ae07ca15edafeb82b0e69d9bd`。
+- Focused verification：unsupported-font/no-staging regression 与
+  `test_p4_production_renderer_gate_renders_resolved_audio_and_captions` 均 PASS；后者使用 pinned
+  `hyperframes@0.7.103`、Chrome `152.0.7928.2` 与隔离网络 namespace。
+- Exact-range Harness receipt：
+  `.agent/harness/runs/hyperframes-caption-readiness-adoption-20260829/receipt.json`，验证结果为
+  complete、fresh、snapshot-matching；Architecture Gate PASS、Learning Skill `27 passed`、Harness
+  `204 passed`。
+- Unchanged boundary：没有 Product state、Provider、媒体生成、activation、CAPTION P6、Final
+  Acceptance、push 或 release effect；V9 的 exact Chinese cues 也不外推为 broad glyph coverage。
+
+## Pending Candidate
+
+None. Active v3 已完成 target verification 与 adoption；`pending_claim_version: 0`。后续任何
+evidence、scope、recommendation 或 target 变化都必须创建新的 pending revision 并重新确认。
 
 ## Supersession And Reopen Conditions
 
-Pending v3 supersedes only the unconfirmed pending v2 preimage at `692e8b2`; there is no active
-adopted claim to retire. Reopen or reconfirm if HyperFrames/Chrome changes, the bundled/generic
+Active v3 supersedes the unconfirmed pending v2 preimage at `692e8b2`; no earlier active adopted
+claim required retirement. Reopen or reconfirm if HyperFrames/Chrome changes, the bundled/generic
 tables change, a content-addressed custom-font contract is accepted, required-language glyph
 coverage becomes part of readiness, or exact same-version evidence contradicts the preflight.
 Mark `CONTESTED` for an unresolved exact counterexample, `REFUTED` if the preflight/source
