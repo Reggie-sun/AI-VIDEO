@@ -4,13 +4,14 @@ Date: 2026-08-29
 
 ## Purpose
 
-本文记录dual-domain Shot-to-H3 continuity plan的`B-D0 — Drama owner prerequisite` docs-only checkpoint。
-本轮只建立独立proposed Drama authoring/acceptance spec；没有选择fixture、baseline或Provider，没有编写
-Provider prompt，没有调用ComfyUI、H3、`video-analysis`或生成媒体，也没有进入`M6-D` empirical execution。
+本文记录dual-domain Shot-to-H3 continuity plan的`B-D0 — Drama owner prerequisite` documentation checkpoint，
+包括accepted Drama owner/rubric spec与其后固定的fixture、baseline-blocker和authoring-package exact candidates。
+本轮没有选择Provider或cinematic reference media，没有编写Provider prompt，没有调用ComfyUI、H3、
+`video-analysis`或生成媒体，也没有进入`M6-D` empirical execution。
 
 ## Current Status Truth
 
-Canonical continuity plan与supersession record的当前状态没有被本轮改变：
+Canonical continuity plan与supersession record的gate状态保持不变：
 
 - `B-D0 = BLOCKED_BEFORE_MEDIA`；
 - `M6-D Drama = NOT_EVALUATED`；
@@ -18,16 +19,28 @@ Canonical continuity plan与supersession record的当前状态没有被本轮改
 - Drama与Commercial的fixture、baseline、requirement coverage与verdict互不继承；
 - M7–M9继续deferred，直到两条lane分别取得其exact HUMAN PASS并完成dual-domain closure。
 
-新Spec当前metadata为`canonical: false`、`spec_status: proposed`、`implementation_status: not_started`、
-`quality_status: not_evaluated`。Spec、review、Harness与commit都不能自我产生explicit acceptance或B-D0 PASS。
+用户于`2026-08-29`选择`A`，明确接受commit
+`b546142289071b801a34ddab7e48f257f2235666`中SHA-256
+`1244b4d73f17f331353ba32cc9f37d3c2d8bf7222d62dfa85936e2601ec4735f`的Spec semantic preimage。
+Promotion commit `01483ec1f434661984ca009fffa85960310dedd6`只同步acceptance metadata、canonical registry、contract matrix
+与plan status wording；当前Spec SHA-256为
+`239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b`，metadata为`canonical: true`、
+`spec_status: accepted`、`implementation_status: not_started`、`quality_status: not_evaluated`。
+
+该acceptance不扩张到之后产生的artifact bytes。当前candidate状态是：
+
+- fixture selection：`proposed`，未accepted/sealed；
+- baseline selection：`blocked`，`reference_set=[]`，没有exact rights/provenance-qualified cinematic reference；
+- authoring package：authoring content candidate assessment为`PASS`，但整体`seal_readiness=BLOCKER`；
+- `B-D0`仍为`BLOCKED_BEFORE_MEDIA`，`M6-D`仍为`NOT_EVALUATED`。
 
 ## Session Work And Decisions
 
-新增：
+Accepted canonical owner：
 
 - `docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md`
 
-该Spec独立拥有candidate Drama contract，不把continuity plan写成Drama truth owner。它定义：
+该Spec独立拥有Drama Development contract，不把continuity plan写成Drama truth owner。它定义：
 
 - Story / Scene / Character / Shot authoring boundaries；
 - permanent `DRAMA-AUTH-*`与`DRAMA-MEDIA-*` stable requirement IDs；
@@ -38,14 +51,34 @@ Canonical continuity plan与supersession record的当前状态没有被本轮改
 - exact per-Shot、pairwise、whole-scene uninterrupted `1.0x` full-speed/full-audio HUMAN evidence；
 - required `FAIL` / `NOT_EVALUATED` fail-closed、new SHA重新验收与cross-lane no-inheritance rules。
 
-Independent `reviewer_xhigh`首轮发现HUMAN evidence没有完整绑定sealed Drama truth：相同media bytes可能在
-authoring package或fixture selection变化后错误复用旧verdict。Spec随后补齐content-addressed authoring
-package/profile/rubric、fixture/baseline accepted record与HUMAN authorization bindings，并声明任一bound
-identity变化使旧evidence stale。Scoped same-tier re-review最终`accept`，无blocking或non-blocking concern。
+Initial spec review中，independent `reviewer_xhigh`发现HUMAN evidence没有完整绑定sealed Drama truth：相同
+media bytes可能在authoring package或fixture selection变化后错误复用旧verdict。Spec随后补齐content-addressed
+authoring package/profile/rubric、fixture/baseline accepted record与HUMAN authorization bindings，并声明任一
+bound identity变化使旧evidence stale。Scoped same-tier re-review最终`accept`。
 
-`distill-ai-video-learning` automatic evaluation结果为`no_candidate`：本轮只有一个docs-only prerequisite
-contract checkpoint，没有两次独立真实attempt、controlled multi-arm comparison或改变existing Learning Claim的
-new exact empirical evidence，因此不创建placeholder Learning Claim，也不进入confirmation/adoption flow。
+用户接受Spec后，新增exact candidate artifacts：
+
+- `docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.proposed.json`；
+- `docs/superpowers/artifacts/drama/b-d0/baseline-selection/missing-cinematic-reference-v1.blocked.json`；
+- `docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v1.blocked.json`。
+
+Fixture是原创、非商业、双角色三镜头候车室微剧情：林峻以旧屋钥匙提出一起回家，林岚质疑他是否会留下，
+林峻在她拿钥匙前明确回答“会。你来决定。”并把钥匙放在中立位置，林岚随后主动拾取，形成谨慎信任与
+共同回家的continuation。Artifact固定了prior-context/on-screen allocation、character decision constraints、
+appearance/wardrobe/prop facts、exact dialogue、listening/reaction、blocking/eyeline、emotion trigger/progression、
+prop state chain、pairwise transition semantics、payoff与continuation applicability；不含Provider-native wording。
+
+Candidate review先后发现并修复两类authoring defect：一是prior-context allocation、decision/appearance/prop
+continuity和per-Shot emotion/coverage字段不完整；二是“回答会留下”原本晚于林岚拾取，与decision constraint
+矛盾。修复后same-tier scoped `reviewer_xhigh` verdict为`accept`，无remaining concern。
+
+Baseline record没有把Commercial、fake/test media或文本floor冒充cinematic comparator。它只固定必需dimensions、
+minimum floors、`1.0x` full-audio side-by-side HUMAN procedure与当前missing-reference blocker。
+
+`distill-ai-video-learning` automatic evaluation结果为`no_candidate`：本checkpoint只有accepted docs contract、
+authoring candidates与missing-reference blocker，没有两次独立真实attempt、controlled multi-arm comparison，
+也没有改变existing Learning Claim的new exact empirical evidence。因此不创建placeholder Learning Claim，
+不进入confirmation或adoption flow。
 
 ## Ownership Boundary
 
@@ -60,57 +93,75 @@ new exact empirical evidence，因此不创建placeholder Learning Claim，也�
 
 ## Verification And Evidence
 
-Spec checkpoint commit：
+Initial proposed Spec checkpoint：
 
 ```text
 b546142289071b801a34ddab7e48f257f2235666
 docs: define proposed drama acceptance prerequisite
-```
-
-Focused verification：
-
-- `python -m scripts.docs_contract_gate check`：PASS；
-- `python -m scripts.agent_harness policy-audit`：PASS，`unmapped/unverified/missing/unreferenced=0`；
-- `PYTHONDONTWRITEBYTECODE=1 python -m pytest -p no:cacheprovider tests/test_runtime_skill_boundary.py -q`：
-  `2 passed`；
-- stable requirement ID uniqueness check：28个catalog IDs，各定义一次；
-- `reviewer_xhigh` scoped re-review：`accept`。
-
-Authoritative exact-range Harness：
-
-```text
-base: 5bb78637abeb6f41ef4b56a7ce50eba39a9d54a4
-head: b546142289071b801a34ddab7e48f257f2235666
 receipt: .agent/harness/runs/drama-authoring-prerequisite-spec-20260829-v2/receipt.json
 ```
 
-Receipt只覆盖新增Spec，selected checks为`scope_diff_check`、`docs_contract_check`、`policy_audit_check`与
-`product_runtime_skill_boundary_tests`；status=`passed`。`verify-receipt`确认artifact integrity、policy/scope/
-snapshot match、freshness、same-run coverage closure与workspace cleanup均为true。
+该exact-range receipt只覆盖proposed Spec，selected checks为`scope_diff_check`、`docs_contract_check`、
+`policy_audit_check`与`product_runtime_skill_boundary_tests`；status=`passed`，`verify-receipt`确认integrity、scope、
+snapshot、freshness与same-run closure。
 
-`.agent/harness/runs/drama-authoring-prerequisite-spec-20260829/receipt.json`不是本任务completion evidence：
-Harness intentionally ignores/clears `GIT_INDEX_FILE`，该首次run读取了真实index并混入用户原先staged的
-`docs/record_for_agent/2026-08-27-h3-conditioning-attribution-gate-stop.md`。它虽执行通过，但scope不属于本任务，
-不得引用为spec-only proof。上方`-v2` exact commit-range receipt是唯一authoritative receipt。
+`.agent/harness/runs/drama-authoring-prerequisite-spec-20260829/receipt.json`不是Spec-only completion evidence：
+Harness intentionally ignores/clears `GIT_INDEX_FILE`，该首次run读取真实index并混入用户原先staged的
+`docs/record_for_agent/2026-08-27-h3-conditioning-attribution-gate-stop.md`。它虽执行通过，但scope不属于本任务。
+
+Accepted Spec promotion checkpoint：
+
+```text
+01483ec1f434661984ca009fffa85960310dedd6
+docs: accept drama authoring contract
+receipt: .agent/harness/runs/drama-spec-acceptance-20260829/receipt.json
+```
+
+该receipt覆盖`.agent/harness/docs-contracts.yaml`、contract matrix、continuity plan与accepted Spec，selected checks
+为`scope_diff_check`、`docs_contract_check`、`policy_audit_check`、`product_runtime_skill_boundary_tests`与
+`harness_tests`；status=`passed`。`verify-receipt`全部integrity、scope、snapshot、freshness与same-run closure字段
+为true；focused suite另有`206 passed`。
+
+B-D0 candidate checkpoint：
+
+```text
+3b436195e939f7bc8fff5999438e9018030a38fe
+docs: checkpoint drama B-D0 candidates
+receipt: .agent/harness/runs/drama-b-d0-candidates-20260829/receipt.json
+```
+
+Committed exact bytes：
+
+| Artifact | SHA-256 | Status |
+| --- | --- | --- |
+| fixture selection | `73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab` | `proposed` |
+| baseline blocker | `ea56d3fa597317feb70cdb53ba6be35c9362e10b0d053958fe483792e7508af0` | `blocked` |
+| authoring package | `6f77f095a4c034d50f776c6c8e2b58e744c7e1bd69fd6b6e836f3bcc7251060e` | `blocked` |
+
+Candidate exact-range Harness选择`scope_diff_check`、`docs_contract_check`、`policy_audit_check`与
+`product_runtime_skill_boundary_tests`，status=`passed`；`verify-receipt`全部completion-proof字段为true。
+所有JSON通过`python -m json.tool`与focused `jq -e` identity/coverage checks；fixture/baseline实际hash与package
+bindings一致。
 
 ## Remaining Blockers And Next Work
 
-只有用户对exact current Spec bytes给出明确acceptance，并按repository contract更新metadata/registration
-（如适用）后，Spec才可成为accepted Drama owner/rubric contract。即使Spec被接受，B-D0仍至少需要：
+Spec owner/rubric prerequisite已经满足，但B-D0仍有三个sequential blockers：
 
-1. separate explicit selection/acceptance/seal的exact bounded fixture；
-2. separate explicit selection/acceptance/seal的exact Drama baseline；
-3. 无required authoring `BLOCKER`的sealed authoring package；
-4. current execution gates与exact evidence path可用。
+1. 用户必须对fixture candidate commit `3b436195e939f7bc8fff5999438e9018030a38fe`与exact fixture SHA-256
+   `73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab`给出明确accept/revise decision；
+2. 必须提供或选择至少一个exact Drama cinematic reference，绑定bytes SHA-256、size、stream identity、
+   rights/provenance与selection rationale，再形成可确认的baseline-selection candidate；
+3. Fixture与baseline都accepted后，必须重新生成引用其accepted records的authoring package；new bytes/new SHA
+   需要单独exact acceptance，且package须无`BLOCKER`。
 
-本checkpoint不授权上述next work。Next action必须停在用户对proposed Spec的accept/revise decision；不得提前
-选择fixture、写Provider prompt、生成media或进入M6-D。
+当前baseline blocker本身不能被“accept”为baseline。下一自然动作停在fixture exact-hash decision与baseline
+reference input；不得提前写Provider prompt、选择Provider、生成media、调用`video-analysis`或进入M6-D。
 
 ## Agent Guardrails
 
-- Proposed Spec不等于accepted owner；accepted Spec也不自动等于B-D0 PASS。
+- Accepted Spec只解除Drama owner/rubric缺失；它不自动接受fixture、baseline、package或产生B-D0 PASS。
 - HUMAN evidence必须同时绑定exact media与sealed authoring/profile/rubric/fixture/baseline/authorization identity。
 - Repair、rerender、re-encode、recomposition、retime、transition、audio replacement或任何bytes变化产生new SHA，
   old verdict不得继承。
 - Commercial、Base AI Comic、technical、model/analyzer或historical PASS不得填充Drama finding。
-- 本轮publication state仅为local `main` commit；未push、未release、未publish。
+- 本轮publication state仅为local `main` commits；未push、未release、未publish。
