@@ -2,6 +2,38 @@
 
 Date: 2026-08-28
 
+## Caption Repair V4 — 2026-08-28
+
+用户以 exact screenshots 否决 V3 opening captions：源 Shot 1 已烧录模型字幕，V3 又在同一画面
+叠加整行 authored captions，形成可见双层重影，而且修正层停在画面中部而不是底部。当前 local
+review artifact 更新为：
+
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v4-28s-review-only.mp4`
+
+- SHA-256: `087497ae1b4be12b260899706c19698c8d7d88635708528a6b8cf0d1fd7ac4e1`
+- size: `12,909,584` bytes
+- 修复: 只重构源 Shot 1 的前两个 scene；将源烧录字幕裁出 output canvas，再在 bottom safe area 烧录唯一一层 authored captions
+- scene-boundary discipline: 两组 crop 在 measured hard cuts `3.083333s` 与 `6.541667s` 切换，不在同一连续镜头中跳变
+- rejected alternatives: `delogo` / `removelogo` 会在服饰与银饰上留下明显糊块；逐字覆盖无法稳定匹配源字体，均未进入 V4
+- 保持不变: `28.065s`、`720x1280`、`24fps`、`673` decoded video frames、后续 Shot/card 顺序和 caption timing
+- audio invariance: V3 / V4 decoded audio SHA-256 均为 `e5e682a1991a30a936a275b878f7a499dd313c8a4888b20453dbb017719c2952`
+- Provider / network / paid call: `0`；本次仅执行 local deterministic re-composition
+
+Exact V4 opening frames 覆盖 `0.50s`、`1.15s`、`3.20s`、`4.95s`，scene-cut frames
+覆盖 `3.04/3.10s` 与 `6.50/6.55s`。可见文案只有 `出汗黏衣` / `靠近也不自在` /
+`长辈递来这瓶` / `喷一下` 一层，统一位于 bottom safe-area baseline；embedded `粘` / `考` /
+`坤` 错字与原中部字幕均不再进入画面。Evidence：
+
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v4-final/opening-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v4-final/scene-cut-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v4-final/tail-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v4-gate.json`
+
+Project-local `video-analysis` 对 exact V4 MP4 抽取 18 frames，并确认 duration、fps、resolution
+与 audio presence。其 generic `low_resolution` hint 使用 landscape-oriented baseline 比较 portrait
+width，不是 caption failure，也不改变本任务已接受的 `720x1280` contract。V4 verdict 仍只为
+`PASS_FOR_LOCAL_REVIEW_ONLY`；三张 card claims 继续 `NOT_EVALUATED`。
+
 ## Caption Repair V3 — 2026-08-28
 
 用户再次以 exact screenshot 指出第一个 advertising-card window 中，底部
@@ -16,6 +48,9 @@ disclosure。当前 local review artifact 更新为：
 - 保持不变: `28.065s`、`720x1280`、`24fps`、`673` decoded video frames、Shot/card 顺序与既有对白字幕 timing
 - audio invariance: V2 / V3 decoded audio SHA-256 均为 `e5e682a1991a30a936a275b878f7a499dd313c8a4888b20453dbb017719c2952`
 - Provider / network / paid call: `0`；本次仅执行 local deterministic re-composition
+
+用户随后以上述 exact opening screenshots 否决 V3 的双层字幕与中部 baseline；V3 现为历史
+artifact，不再是当前 caption-quality evidence。
 
 Exact V3 tail frames 已覆盖 `23.60s`、`24.20s`、`25.20s` 与 `27.20s`。第一个 card
 window 的 `清爽舒适` 仍位于既有 lower-third baseline，旧 disclosure 已消失；后两个 card
@@ -43,7 +78,7 @@ publication、commercial approval、P6 或 Final Acceptance。
 - corrupt-source handling: corrected larger glyphs 放在原字幕 baseline，覆盖 embedded `粘` / `考` / `坤` 错字；不使用 opaque box、blur strip 或第二行重复字幕
 - Provider / network / paid call: `0`；本次仅执行 local deterministic re-composition
 
-本记录后续 `Caption Contract And Repair`、`Final Local Review Composition` 与 `Remaining Risks And Guardrails` 已更新到 V3；初版与 V2 文件保留在本地，仅作为历史 evidence。
+本记录后续 `Caption Contract And Repair`、`Final Local Review Composition` 与 `Remaining Risks And Guardrails` 已更新到 V4；初版、V2 与 V3 文件保留在本地，仅作为历史 evidence。
 
 ## Purpose
 
@@ -90,7 +125,7 @@ Fast 只收到一张不含人物的 exact product-layout reference：
 | 2 | `833df162499c8a288c752355f872e4696709f7b65be2d90a01b8f049ed3ce0bb` | `b749abc0efe5fcba78cb08e4dbe97aeafc20360a5ffcf75b55e9418f390309e8` | 含 `15%`、`全天`、sweat-gland/mechanism claims，未核验 |
 | 3 | `52079b00fb541fca36240f01ae1ba4826e31085585e43833b530efdb20e01e44` | `82f20c9c5f6295148de7b68b35f4e0435bb8b686822219f00bcc7bc05702787d` | 含 `14天`、`96.67%`、`93.33%`、`真人实测`，未核验 |
 
-三个 source 虽以 `.png` 命名，magic bytes 实际为 RIFF WebP；本地用 `ffmpeg` 转成 exact RGB24 PNG。V2 三张卡全程显示 `用户提供素材｜功效与数据未核验`；V3 按用户明确指令移除该 on-video disclosure，但 claim status 没有变化。因此 V3 仍只允许 review-only，不得把 source copy 或字条移除解释成已经 substantiated 或可发布。
+三个 source 虽以 `.png` 命名，magic bytes 实际为 RIFF WebP；本地用 `ffmpeg` 转成 exact RGB24 PNG。V2 三张卡全程显示 `用户提供素材｜功效与数据未核验`；V3 及后续版本按用户明确指令移除该 on-video disclosure，但 claim status 没有变化。因此 V4 仍只允许 review-only，不得把 source copy 或字条移除解释成已经 substantiated 或可发布。
 
 ## Paid Seedance Fast Execution
 
@@ -147,29 +182,30 @@ Evidence：
 1. authored Mandarin copy 是字幕文本 owner；Whisper near-homophones 只用于测量 timing，不能成为最终文案。
 2. clean-source caption 严格跟随 measured speech；final brand line 拆成 `青颜`、`抑汗净味`、`清爽舒适`、`近距离`、`更从容` 五个事件。
 3. 开场长句按自然语义与 measured audio 拆成 `出汗黏衣` / `靠近也不自在`，推荐句拆成 `长辈递来这瓶` / `喷一下`，避免横向长条字幕。
-4. `Noto Sans CJK SC`、最多两行、单行不超过 14 个中文字符；dialogue / brand captions 统一使用白字、黑描边与轻阴影，禁止 opaque 或 translucent rectangular backing。对 corrupt-source，corrected larger glyphs 必须放在原 baseline 并完全覆盖旧错字，不得出现 box、blur strip 或 duplicate line。
-5. V3 不包含 disclosure track。三张 card 的对白字幕保持既有 lower-third baseline，不覆盖 card main copy；不得再次口播或新增未核验数据。
+4. `Noto Sans CJK SC`、最多两行、单行不超过 14 个中文字符；dialogue / brand captions 统一使用白字、黑描边与轻阴影，禁止 opaque 或 translucent rectangular backing。V4 将 corrupt embedded captions 裁出 output canvas，并在 bottom safe area 只保留一层 authored captions；不得出现 cover box、blur strip 或 duplicate line。
+5. V4 不包含 disclosure track。三张 card 的对白字幕保持既有 lower-third baseline，不覆盖 card main copy；不得再次口播或新增未核验数据。
 
-Opening / V3 tail contact sheets 与 exact full-size frames 已人工复核；没有矩形 dialogue backing、双层字幕、旧错字露出、blur strip、clipping、card body-copy overlap、disclosure overlay 或 slogan repetition。
+V4 opening、scene-cut 与 tail contact sheets 及 exact full-size frames 已人工复核；没有矩形 dialogue backing、双层字幕、旧错字露出、blur strip、clipping、card body-copy overlap、disclosure overlay 或 slogan repetition。
 
 Evidence：
 
 - `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/shot-contract.md`
 - `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/captions.ass`
-- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v2-opening-sheet.png`
-- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v3-tail-sheet.png`
-- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v3-gate.json`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v4-final/opening-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v4-final/scene-cut-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v4-final/tail-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v4-gate.json`
 
 ## Final Local Review Composition
 
 Final review artifact：
 
-`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v3-28s-review-only.mp4`
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v4-28s-review-only.mp4`
 
 Measured facts：
 
-- SHA-256: `1921abae6ffd7bad5800163ffc80e909860b4b9b514513ec85cca8c8fa7c5ffa`
-- size: `13,457,230` bytes
+- SHA-256: `087497ae1b4be12b260899706c19698c8d7d88635708528a6b8cf0d1fd7ac4e1`
+- size: `12,909,584` bytes
 - duration: `28.065s`
 - video: H.264 High, `720x1280`, `24fps`, 673 frames
 - audio: AAC stereo, `44.1kHz`, mean `-14.6 dB`, max `-1.3 dB`
@@ -185,28 +221,28 @@ Timeline：
 
 Final audio retains Shot 1 native audio and the existing repaired Shot 2 native audio once. Fast raw AAC was verified as Provider evidence but intentionally not mixed into final，避免双重 ambience 或声场跳变。最终音轨包含一次 problem/recommendation/result narration 与一次 brand line；没有重复 slogan 或 card-claim narration。
 
-Project-local `video-analysis` MCP 对 exact V3 final hash 以 `0.5s` interval 抽取 40 frames；字幕修复 sheets 另覆盖 opening 与 V2/V3 tail comparison。`ffmpeg` full decode 无错误；V2 与 V3 decoded audio SHA-256 同为 `e5e682a1991a30a936a275b878f7a499dd313c8a4888b20453dbb017719c2952`。
+Project-local `video-analysis` MCP 对 exact V4 final hash 以 `0.5s` interval 抽取 18 frames；字幕修复 sheets 另覆盖 opening、source hard-cut boundaries 与 tail。`ffmpeg` full decode 无错误；V3 与 V4 decoded audio SHA-256 同为 `e5e682a1991a30a936a275b878f7a499dd313c8a4888b20453dbb017719c2952`。
 
 Final Gate：
 
-`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v3-gate.json`
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v4-gate.json`
 
 Verdict：`PASS_FOR_LOCAL_REVIEW_ONLY`。
 
 ## Assessment
 
-本次先关闭旧版本已证实的 Hero 悬浮缺陷，再根据用户 screenshots 关闭初版 caption backing 与后续 disclosure collision 缺陷。Hero 的瓶与盒从第一帧就接触真实木桌，三张指定图片按 exact order 各显示 1.5 秒；字幕现在具有 timing、semantic split、copy ownership、unboxed style、source-corruption coverage 与 boundary sampling 的明确 Gate，V3 不再显示 disclosure track。
+本次先关闭旧版本已证实的 Hero 悬浮缺陷，再根据用户 screenshots 关闭初版 caption backing、后续 disclosure collision，以及 V3 opening 双层字幕与中部 baseline 缺陷。Hero 的瓶与盒从第一帧就接触真实木桌，三张指定图片按 exact order 各显示 1.5 秒；V4 opening 只保留 bottom safe area 的一层 authored captions，且不再显示 disclosure track。
 
 仍须保持三层 truth：
 
 1. Fast raw Provider artifact：exact per-Shot Gate PASS，fetched/unactivated。
-2. Final local composition：`PASS_FOR_LOCAL_REVIEW`，字幕与 card order 已检查。
+2. Final local composition V4：`PASS_FOR_LOCAL_REVIEW`，字幕与 card order 已检查。
 3. Human/commercial acceptance：仍待用户观看；三张 card claims 仍未核验，不能发布。
 
 ## Remaining Risks And Guardrails
 
-- 新成片仍需要用户对整体节奏、V3 无底板字幕的字重与位置、文化呈现、中文发音和 card readability 做最终人眼/听审。
-- 三张 card 含高风险 claims；V3 已按用户指令移除 on-video disclosure，但除非提供 substantiation 并完成独立合规确认，仍不得把 review-only artifact 变成 commercial-ready 或可发布素材。
+- 新成片仍需要用户对整体节奏、V4 opening 的局部近景构图、字幕字重与位置、文化呈现、中文发音和 card readability 做最终人眼/听审。
+- 三张 card 含高风险 claims；V4 不含 on-video disclosure，但除非提供 substantiation 并完成独立合规确认，仍不得把 review-only artifact 变成 commercial-ready 或可发布素材。
 - 实际 Provider billing 未验证；只有 request count、finite ceiling 与 token-based estimate。
 - 本地 `runs/` artifacts 未 stage、commit、activate、push 或 publish。
 - `retrieve-ai-video-memory` 本次返回 tagged last-good stale fragments 并排队 detached refresh；未等待、轮询或重建索引，当前字幕结论来自 exact media、composition files 与本轮视觉证据。
