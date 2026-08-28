@@ -1,7 +1,7 @@
 ---
 surface_id: drama_authoring_and_acceptance
-canonical: false
-spec_status: proposed
+canonical: true
+spec_status: accepted
 implementation_status: not_started
 live_status: not_run
 quality_status: not_evaluated
@@ -15,18 +15,22 @@ contract_version: drama-authoring-and-acceptance/1
 
 ## Status
 
-Proposed prerequisite contract。本文独立定义 Drama Story / Scene / Character / Shot authoring truth、
+Accepted prerequisite contract。用户于`2026-08-29`明确选择`A`，接受commit
+`b546142289071b801a34ddab7e48f257f2235666`中SHA-256
+`1244b4d73f17f331353ba32cc9f37d3c2d8bf7222d62dfa85936e2601ec4735f`的exact semantic preimage；
+本次promotion只同步acceptance metadata、canonical registration与status wording，不改变该preimage的contract
+semantics。本文独立定义 Drama Story / Scene / Character / Shot authoring truth、
 Drama requirement taxonomy、bounded fixture selection、baseline selection与development HUMAN acceptance；
 它不是 `docs/superpowers/plans/2026-08-27-ai-video-shot-to-h3-continuity-enforcement.md` 的附属 rubric，
 也不允许该 continuity plan 反向成为 Drama truth owner。
 
-本文当前不是 accepted spec，未选择 fixture或baseline，未实现workflow/schema/runtime adapter，未执行
+本文已是accepted spec，但未接受或seal fixture、baseline与authoring package，未实现workflow/schema/runtime adapter，未执行
 HUMAN review。因此：
 
 - `B-D0 — Drama owner prerequisite` 继续为 `BLOCKED_BEFORE_MEDIA`；
 - `M6-D Drama` 继续为 `NOT_EVALUATED`；
-- 本文完成、通过 documentation Harness或被commit均不等于 explicit acceptance；
-- 即使本文以后被明确接受，也仍须另行选择并seal exact fixture与baseline，才能满足完整B-D0 exit。
+- spec acceptance只解除Drama owner/rubric缺失这一项blocker，不接受任何尚不存在的artifact bytes；
+- 仍须另行接受并seal exact fixture、baseline与无`BLOCKER`的authoring package，才能满足完整B-D0 exit。
 
 ## Goal
 
@@ -348,13 +352,14 @@ Development HUMAN PASS不等于candidate activation、P6、Final Acceptance、pu
 - Runtime/data migration：`none`；
 - Old path retirement：`none`；
 - Historical artifact/hash reinterpretation：forbidden；
-- Rollback：删除或revert本proposed documentation file即可；不得修改existing Product/Development state。
+- Rollback / supersession：必须保留本accepted preimage与acceptance lineage，并通过new exact spec version或明确
+  supersession处理；不得删除historical evidence，也不得修改existing Product/Development state。
 
 ## Acceptance Of This Specification
 
-本文只有在用户对exact current bytes给出明确acceptance，并按repository documentation contract更新其
-metadata/registration（如适用）后，才可变为`canonical: true` / `spec_status: accepted`。Harness PASS、reviewer
-accept、commit或plan引用都不能代替该明确acceptance。
+用户已对上方记录的exact semantic preimage给出明确acceptance；本文件现为`canonical: true` /
+`spec_status: accepted`并登记于repository documentation contract。Harness PASS、reviewer accept、commit或plan
+引用仍不能代替这次明确acceptance，也不能扩张到之后产生的fixture、baseline或authoring package bytes。
 
 Spec acceptance最多满足B-D0中的Drama owner/rubric prerequisite；以下仍是separate blockers：
 
@@ -375,13 +380,14 @@ python -m scripts.docs_contract_gate check
 python -m scripts.agent_harness policy-audit
 ```
 
-最终必须只stage本文件，并对exact staged snapshot运行`python scripts/agent_harness.py verify --staged`，随后
+最终必须只stage本slice的exact task-owned paths，并对exact staged snapshot运行
+`python scripts/agent_harness.py verify --staged`，随后
 使用`verify-receipt`验证receipt integrity/freshness。Verification不得调用Provider、ComfyUI、H3、
 `video-analysis`或生成媒体。
 
 ## Acceptance Criteria
 
-- 本Spec在proposed状态下独立表达Story/Scene/Character/Shot owner，不把continuity plan写成Drama truth owner；
+- 本Spec在accepted状态下独立表达Story/Scene/Character/Shot owner，不把continuity plan写成Drama truth owner；
 - stable authoring与media requirement IDs覆盖narrative、relationship causality、motivation、dialogue、
   performance、blocking/eyeline、emotional progression、payoff/continuation与whole-scene readability；
 - fixture contract只约束eligible `2–3` Shot dramatic scene，不选择fixture；
@@ -393,5 +399,6 @@ python -m scripts.agent_harness policy-audit
 
 ## Delivery Boundary
 
-完成本slice只表示一个proposed Drama prerequisite spec已形成并通过其exact docs verification。它不表示该Spec
-已accepted，不表示fixture/baseline已选择，不表示B-D0已通过，也不授权进入M6-D empirical execution。
+完成本promotion只表示accepted Drama prerequisite spec及其canonical registration已形成并通过exact docs
+verification。它不表示fixture/baseline/authoring package已accepted或sealed，不表示B-D0已通过，也不授权进入
+M6-D empirical execution。

@@ -114,7 +114,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / blocked before media | 当前没有正式 accepted Drama workflow/spec、sealed Drama rubric、approved fixture 或 exact HUMAN artifact；不得从 Commercial evidence 推断 |
+| `M6-D Drama` | `NOT_EVALUATED` / blocked before media | Drama owner/rubric spec已accepted；fixture、baseline与authoring package仍未exact accepted/sealed，且没有Drama HUMAN media evidence；不得从 Commercial evidence 推断 |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -151,7 +151,7 @@ Commercial lane 或 revised dual-domain HUMAN gate，也不授权继续 M7–M9�
 | Post-media pairwise findings | generic generated-Shot review evidence in `review.py` | 同时绑定 source terminal window 与 target opening window；qualification-only source review 不扩张为通用 owner |
 | Order、frames、trim、transition execution | `ResolvedTimeline` / P3 composition | transition执行不拥有或创造 causal/continuity verdict |
 | Universal media validity and physical/perceptual continuity | existing Runtime validators、generic continuity evidence、P6 lifecycle + exact human evidence | analyzer/technical PASS 不得冒充 domain HUMAN PASS 或 Final Acceptance；shared schema 不拥有 domain rubric |
-| Drama authoring、narrative continuity and acceptance | future independently accepted Drama workflow/spec/rubric | 本 plan 不创建该 owner；motivation、relationship causality、conflict、dialogue semantics、emotional progression、payoff/cliffhanger 不得由 physical continuity receipt替代 |
+| Drama authoring、narrative continuity and acceptance | accepted `docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md` | 本 plan 不创建或改写该 owner；motivation、relationship causality、conflict、dialogue semantics、emotional progression、payoff/cliffhanger 不得由 physical continuity receipt替代 |
 | Ecommerce authoring and commercial acceptance | `.agents/skills/ecommerce-ad-workflow/` + existing Ecommerce Gate 2 seam + exact human evidence | Product Truth/claims、Hook、product presentation/demo/proof、CTA、brand closure 只适用于 Commercial lane；不得冒充 Drama acceptance |
 | Dialogue Performance / Lip-sync | per-Shot media review + selected domain human evidence | shared edge 只拥有 speaker turn、gaze/response 与 sound bridge obligation；对白语义、角色动机和情绪作用由 Drama rubric拥有 |
 | Whole-program readability / pacing | exact whole-video human evidence + selected domain rubric | Drama scene readability 与 Ecommerce Hook/conversion pacing 分开；technical presence/timing 或 aggregate score不能代判 |
@@ -772,13 +772,14 @@ Execution is deliberately gated：
 | --- | --- | --- |
 | R0 — Commercial/shared reconnaissance | Complete；four-arm attribution + one handoff Shot + v13 30s recut + M6-C causal assembly | Supports incompatible-anchor attribution and visible holder transfer；Qingyan HUMAN watchability/commercial baseline FAIL；does not prove Drama or authorize productization |
 | A — Minimum offline hypothesis | Milestones 1–5 only | Proves exact typed causal intent plus compatible conditioning can reach one pilot adapter prompt；does not prove model quality |
-| B-D0 — Drama owner prerequisite | Independent accepted Drama workflow/spec、sealed fixture/rubric and baseline | Missing owner/profile/path is `BLOCKED_BEFORE_MEDIA`；this plan must not invent Drama acceptance |
+| B-D0 — Drama owner prerequisite | Accepted Drama spec、exact accepted/sealed fixture and baseline、无`BLOCKER`的sealed authoring package | Spec已accepted；fixture、baseline或package缺少exact acceptance/identity时仍为`BLOCKED_BEFORE_MEDIA`；this plan must not invent Drama acceptance |
 | B-D — Drama empirical lane | One bounded dramatic scene plus exact whole-scene HUMAN verdict | All applicable shared + Drama findings and Drama baseline must PASS；otherwise stop only this lane unless Shared Core failed |
 | B-C — Commercial empirical lane | Reopen only through a new accepted Commercial attempt；current Qingyan M6-C is HUMAN FAIL | All applicable shared + Commercial findings and source-quality baseline must PASS；old assembly cannot be repaired or expanded |
 | B-X — Dual-domain closure | Reopen both exact lane records against unchanged Shared Core identity | Both lanes PASS independently；one lane cannot qualify the other |
 | C — Productize dual-domain proven behavior | Milestones 7–9 | Add generic post-media enforcement、remaining adapters/qualification、routing/Harness only after B-X PASS |
 
-Current status is B-D0 `BLOCKED_BEFORE_MEDIA`、B-D `NOT_EVALUATED`、B-C `HUMAN_FAIL` and B-X `FAIL`。M7 pairwise
+Current status is B-D0 `BLOCKED_BEFORE_MEDIA`（spec accepted；fixture/baseline/package still unsealed）、B-D
+`NOT_EVALUATED`、B-C `HUMAN_FAIL` and B-X `FAIL`。M7 pairwise
 post-media productization、M8 adapter/qualification expansion and M9 routing/Harness completion remain explicitly
 deferred。The existing v12/v13/M6-C bytes remain Commercial/shared regression evidence；none can be promoted to Drama
 or dual-domain PASS by relabeling technical receipts。

@@ -130,6 +130,31 @@ surfaces:
         path: docs/agent-primary-contract-matrix.md
         text: "`FINAL_ACCEPTANCE`只由committer汇总exact fresh required receipts"
 
+  - surface_id: drama_authoring_and_acceptance
+    canonical_spec: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md
+    canonical: true
+    spec_status: accepted
+    implementation_status: not_started
+    live_status: not_run
+    quality_status: not_evaluated
+    release_status: unreleased
+    runtime_status_owner: docs/v0.2-runtime-baseline.md
+    roadmap_owner: docs/v0.2-agentic-production-roadmap.md
+    contract_version: drama-authoring-and-acceptance/1
+    implementation_paths: []
+    test_paths: []
+    harness_check_ids: []
+    assertions:
+      - type: text_contains
+        path: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md
+        text: "本文独立定义 Drama Story / Scene / Character / Shot authoring truth"
+      - type: text_contains
+        path: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md
+        text: "Drama development acceptance不是Production Gate 2/P6/Final Acceptance"
+      - type: text_contains
+        path: docs/agent-primary-contract-matrix.md
+        text: "Drama Development authoring/rubric与exact HUMAN evidence contract"
+
   - surface_id: local_h3_t8_provider_family
     canonical_spec: docs/superpowers/specs/2026-08-21-ai-video-local-h3-t8-provider-family.md
     canonical: true
