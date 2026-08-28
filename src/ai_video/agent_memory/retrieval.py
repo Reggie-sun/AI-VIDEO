@@ -650,7 +650,8 @@ def _search_collection(
     null_distances = null_raw.get("distances", [[]])[0] or []
     if len(null_distances) != candidate_limit:
         raise ValueError(
-            "dense null calibration did not honor the candidate budget"
+            "dense null calibration candidate budget mismatch: "
+            f"expected {candidate_limit}, got {len(null_distances)}"
         )
 
     lexical_ids = lexical_raw.get("ids", []) or []
