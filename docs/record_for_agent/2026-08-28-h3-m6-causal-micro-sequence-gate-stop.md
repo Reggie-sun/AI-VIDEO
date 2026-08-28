@@ -2,6 +2,79 @@
 
 Date: 2026-08-28
 
+## V2 Follow-Up — 2026-08-28
+
+本 section 是当前 M6 checkpoint；下方 v1 evidence 保留为历史。v2 已完成 v1 指向的
+Shot B terminal-anchor remediation：重新 authored anchors 在相同 subject scale、camera axis 与
+composition 下通过静态 anchor Gate，并获得新的 exact task-scoped authorization。它没有复用 v1 的
+Shot B request/seed，也没有重复 holder-only experiment。
+
+### V2 Authorization And Exact Request
+
+- Experiment root: `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v2`
+- Exact preview SHA-256: `28cf08cc4ce77d1c2772277e6197abe1827e2d94ac658f6300f26171c083584e`
+- Authorization sidecar SHA-256: `f69287a86259c96e83251cc5bcc462afa47e2ca48086f302967872743818f697`
+- Provider/profile、workflow、binding 与 ComfyUI pin 仍与 v1 相同；selected Registry revision 为
+  `fc80bc06a0d528ca28453423aafcf70ef3b2176ac0a2b0e4a501f90a4ad340b7`。
+- Shot B first anchor SHA-256: `b408d98a99e354e9e34ca81cbce3106ea548e378e47e95a80ff8ef5e3f930f45`
+- Shot B last / Shot C first anchor SHA-256:
+  `062877fc2c6c09ef10cade29f0baa8fa8f884c5675cb13125f2e627b3d672fd3`
+- Shot C last anchor SHA-256: `1b4a0ad18aa50304a9c08b3561241f3d0859da0c967716e83bc7a6dd0ad82340`
+- Shot B effective seed: `4171215187320495411`
+- Shot B requirement hash: `b6a6fd1df235f79eeeb56778d455f9ae5e503f50d4919fbe7e97a9de8811fdcc`
+- Shot B compiled request hash: `df64a7dfe860bc2dcbbfbfec91fb9ba2d6d1b8b265029087e23e0a184feef3ef`
+- Shot B resolved generation hash:
+  `3ded2188abd9c1880643efac065c79d6369e7c338ab5910a96fee536eb37e8fa`
+- Authorization ceiling: at most two local H3 submits, B then conditional C；actual v2 H3 submits: `1`；
+  retry/fallback/remote/paid calls: `0`。
+
+Stage 1 使用两次逐次 image-edit call author B/C terminal anchors，retries 为 `0`。这些 image-level
+anchor PASS 只用于 conditioning preflight，不是 video technical PASS 或 HUMAN PASS。
+
+### V2 Exact Media And Gate
+
+Shot B exact output：
+
+- Path: `outputs/shot-b-handoff-elder-exit-v2.mp4`
+- SHA-256: `355c0ba5e33d84c5f699abe8236407880abd8d8b05db8ededdeb35d26548e383`
+- Size: `1,267,910 bytes`
+- Provider request ID: `b7b98271-01c6-4125-802a-d30df98900d6`
+- Measured video: H.264 High、`768x768`、`24 fps`、`124 frames`、`5.167s`
+- Measured audio: AAC、`32 kHz`、stereo；video/audio full decode 均 PASS
+- Gate: `sidecars/gates/shot-b-gate.json`
+- Gate sidecar SHA-256: `70177925e5d8190997e14e98b1dd1b3a9c1eb1aaa3f01af16a0a55ace8bd13fd`
+
+project-local `video-analysis` 对该 exact MP4 调用 `3` 次：`video_probe`、`video_analyze` 与
+`video_extract_frames`。综合 evidence 为 one continuous scene、13 个 `0.4s` interval sampled frames、
+decoded first/last anchor SSIM `0.943956` / `0.949567`。Requirement-level verdict：
+
+| Requirement | Verdict | Evidence summary |
+| --- | --- | --- |
+| causal state | PASS | elder sole holder -> shared touch -> girl sole holder -> elder empty-hand release -> elder absent；无 duplicate bottle |
+| conditioning | PASS | exact endpoints 高 adherence；subject scale、window/doorway layout、portrait crop 与 elder-absent terminal composition 不再发生 v1 forced push-in |
+| camera | PASS | one scene；background geometry、girl scale 与 side-fill boundaries 保持固定，无 cut、pan、push-in 或 terminal reframe |
+| intent/performance | FAIL | handoff/release/turn 清楚，但 elder 在 `2.8-3.6s` 从 extreme right frame edge 离开，没有按 sealed intent 走入 visible screen-right doorway |
+| dialogue/lip-sync | NOT_EVALUATED | requirement 为 dialogue none；Whisper 返回一个结束于 `21.78s` 的 segment，超过 exact `5.167s` clip，无法可靠证明 intelligible speech 存在或不存在 |
+| readability | PASS | sole-holder start、shared touch、release、turn、disappearance 与 terminal state 均可区分，单瓶状态清楚 |
+
+因为 required `intent/performance=FAIL` 且 `dialogue/lip-sync=NOT_EVALUATED`，Agent-side Gate 的
+`technical_gate=FAIL`、`next_submit_allowed=false`。`run-shot c` 的 executable barrier 在 Provider 层前返回
+`Shot C blocked by Shot B Gate`；Shot C result/MP4 均不存在。ComfyUI queue 清空后 supervisor 已停止，
+`8188` 无 listener，checkout 已恢复到执行前 clean
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`。
+
+### V2 Assessment And Current Boundary
+
+v2 证明 v1 的 anchor conditioning/camera failure 可以由 compatible terminal authoring 修复，同时也把新的
+最小 failure owner 隔离到 generated spatial performance 与 audio evidence：compiler 已把 doorway exit 写入
+exact prompt，但 model output 只完成 frame-edge exit；冲突的 ASR evidence 又不足以关闭 no-dialogue finding。
+不得用 causal-state PASS、high endpoint SSIM 或 camera PASS 覆盖这两个 required non-PASS finding。
+
+因此 v2 Shot C 未提交，`15.500s` causal review assembly 与 30s assembly 均未创建。micro-sequence 仍无
+`1.0x` HUMAN verdict；M7-M9、remaining adapters、qualification 与 aggregate Gate expansion 继续 deferred。
+任何 doorway-path repair、audio-isolated diagnosis、new request/seed/variant 或 Provider submit 都需要新的
+exact preview 与 task-scoped authorization；不得把本次剩余的一次 ceiling 当作 retry authorization。
+
 ## Purpose
 
 本文记录 Phase B / Milestone 6 的首个真实 causal micro-sequence checkpoint。目标是以当前 M1–M5
@@ -110,6 +183,10 @@ anchors 在 locked camera contract 下不可接受；不得自动重用相同 re
 - M7–M9、remaining adapters、qualification 与 aggregate Gate expansion 继续 deferred。
 
 ## Remaining Risk And Next Work
+
+> **V2 supersession:** 下方“先重新 author/validate Shot B last anchor”是 v1 历史 next action；v2 已完成该
+> anchor remediation，并将 conditioning/camera 提升为 requirement-level technical PASS。当前 blocker 已变为
+> v2 `intent/performance=FAIL` 与 `dialogue/lip-sync=NOT_EVALUATED`，以本记录顶部 V2 section 为准。
 
 若继续 M6，应先重新 author/validate Shot B 的 last anchor（同时是 Shot C first anchor），使其在 elder absent、
 girl sole holder、bottle still capped 的 causal state下，与 Shot B first anchor 保持相同 subject scale、camera
