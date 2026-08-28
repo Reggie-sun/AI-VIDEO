@@ -2,11 +2,37 @@
 
 Date: 2026-08-28
 
+## Caption Repair V3 — 2026-08-28
+
+用户再次以 exact screenshot 指出第一个 advertising-card window 中，底部
+`用户提供素材｜功效与数据未核验` disclosure 与既有对白字幕形成视觉竞争，并明确要求移除该
+disclosure。当前 local review artifact 更新为：
+
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v3-28s-review-only.mp4`
+
+- SHA-256: `1921abae6ffd7bad5800163ffc80e909860b4b9b514513ec85cca8c8fa7c5ffa`
+- size: `13,457,230` bytes
+- 修复: 从 `compose_review.sh` 与 `captions.ass` 移除完整 disclosure render event；三个 card window 均不再显示该字条
+- 保持不变: `28.065s`、`720x1280`、`24fps`、`673` decoded video frames、Shot/card 顺序与既有对白字幕 timing
+- audio invariance: V2 / V3 decoded audio SHA-256 均为 `e5e682a1991a30a936a275b878f7a499dd313c8a4888b20453dbb017719c2952`
+- Provider / network / paid call: `0`；本次仅执行 local deterministic re-composition
+
+Exact V3 tail frames 已覆盖 `23.60s`、`24.20s`、`25.20s` 与 `27.20s`。第一个 card
+window 的 `清爽舒适` 仍位于既有 lower-third baseline，旧 disclosure 已消失；后两个 card
+window 同样不再显示该字条。Evidence：
+
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v3-tail-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v3-gate.json`
+
+这次用户指令改变的是 local review overlay，不是 claim substantiation。三张用户素材中的功效、
+机理、百分比与 testimonial claims 仍未核验；V3 继续是 local review-only，移除字条不构成
+publication、commercial approval、P6 或 Final Acceptance。
+
 ## Caption Repair V2 — 2026-08-28
 
 用户随后以 exact screenshots 否决下文初版 `e965db27...fd694` 的字幕视觉：开场两条 opaque backplate 过大，Hero 上的短词 `青颜` 形成孤立方块。该初版的 timeline、audio、card order、Provider call count 与 codec 测量仍是历史事实，但不再作为当前 caption-quality evidence。
 
-当前 local review artifact 改为：
+该版本此前作为 current local review artifact，现已被上方 V3 取代；其字幕视觉修复与媒体测量仍保留为历史 evidence：
 
 `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v2-28s-review-only.mp4`
 
@@ -17,7 +43,7 @@ Date: 2026-08-28
 - corrupt-source handling: corrected larger glyphs 放在原字幕 baseline，覆盖 embedded `粘` / `考` / `坤` 错字；不使用 opaque box、blur strip 或第二行重复字幕
 - Provider / network / paid call: `0`；本次仅执行 local deterministic re-composition
 
-本记录后续 `Caption Contract And Repair`、`Final Local Review Composition` 与 `Remaining Risks And Guardrails` 已更新到 V2；初版文件保留在本地，仅作为历史 evidence。
+本记录后续 `Caption Contract And Repair`、`Final Local Review Composition` 与 `Remaining Risks And Guardrails` 已更新到 V3；初版与 V2 文件保留在本地，仅作为历史 evidence。
 
 ## Purpose
 
@@ -64,7 +90,7 @@ Fast 只收到一张不含人物的 exact product-layout reference：
 | 2 | `833df162499c8a288c752355f872e4696709f7b65be2d90a01b8f049ed3ce0bb` | `b749abc0efe5fcba78cb08e4dbe97aeafc20360a5ffcf75b55e9418f390309e8` | 含 `15%`、`全天`、sweat-gland/mechanism claims，未核验 |
 | 3 | `52079b00fb541fca36240f01ae1ba4826e31085585e43833b530efdb20e01e44` | `82f20c9c5f6295148de7b68b35f4e0435bb8b686822219f00bcc7bc05702787d` | 含 `14天`、`96.67%`、`93.33%`、`真人实测`，未核验 |
 
-三个 source 虽以 `.png` 命名，magic bytes 实际为 RIFF WebP；本地用 `ffmpeg` 转成 exact RGB24 PNG。最终三张卡全程显示 `用户提供素材｜功效与数据未核验`，因此本次只允许 review-only，不得把 source copy 解释成已经 substantiated 或可发布。
+三个 source 虽以 `.png` 命名，magic bytes 实际为 RIFF WebP；本地用 `ffmpeg` 转成 exact RGB24 PNG。V2 三张卡全程显示 `用户提供素材｜功效与数据未核验`；V3 按用户明确指令移除该 on-video disclosure，但 claim status 没有变化。因此 V3 仍只允许 review-only，不得把 source copy 或字条移除解释成已经 substantiated 或可发布。
 
 ## Paid Seedance Fast Execution
 
@@ -122,28 +148,28 @@ Evidence：
 2. clean-source caption 严格跟随 measured speech；final brand line 拆成 `青颜`、`抑汗净味`、`清爽舒适`、`近距离`、`更从容` 五个事件。
 3. 开场长句按自然语义与 measured audio 拆成 `出汗黏衣` / `靠近也不自在`，推荐句拆成 `长辈递来这瓶` / `喷一下`，避免横向长条字幕。
 4. `Noto Sans CJK SC`、最多两行、单行不超过 14 个中文字符；dialogue / brand captions 统一使用白字、黑描边与轻阴影，禁止 opaque 或 translucent rectangular backing。对 corrupt-source，corrected larger glyphs 必须放在原 baseline 并完全覆盖旧错字，不得出现 box、blur strip 或 duplicate line。
-5. 三张 card 的对白字幕保持在 disclosure 上方，不覆盖 card main copy；不得再次口播或新增未核验数据。
+5. V3 不包含 disclosure track。三张 card 的对白字幕保持既有 lower-third baseline，不覆盖 card main copy；不得再次口播或新增未核验数据。
 
-Opening / tail contact sheets 与 exact full-size frames 已人工复核；没有矩形 dialogue backing、双层字幕、旧错字露出、blur strip、clipping、card body-copy overlap 或 slogan repetition。
+Opening / V3 tail contact sheets 与 exact full-size frames 已人工复核；没有矩形 dialogue backing、双层字幕、旧错字露出、blur strip、clipping、card body-copy overlap、disclosure overlay 或 slogan repetition。
 
 Evidence：
 
 - `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/shot-contract.md`
 - `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/captions.ass`
 - `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v2-opening-sheet.png`
-- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v2-tail-sheet.png`
-- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v2-gate.json`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v3-tail-sheet.png`
+- `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v3-gate.json`
 
 ## Final Local Review Composition
 
 Final review artifact：
 
-`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v2-28s-review-only.mp4`
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v3-28s-review-only.mp4`
 
 Measured facts：
 
-- SHA-256: `2cb2b744e80e445515cf5d75e503347a4cb5f21bd3236a3069ebeade00c130bd`
-- size: `13,473,667` bytes
+- SHA-256: `1921abae6ffd7bad5800163ffc80e909860b4b9b514513ec85cca8c8fa7c5ffa`
+- size: `13,457,230` bytes
 - duration: `28.065s`
 - video: H.264 High, `720x1280`, `24fps`, 673 frames
 - audio: AAC stereo, `44.1kHz`, mean `-14.6 dB`, max `-1.3 dB`
@@ -159,17 +185,17 @@ Timeline：
 
 Final audio retains Shot 1 native audio and the existing repaired Shot 2 native audio once. Fast raw AAC was verified as Provider evidence but intentionally not mixed into final，避免双重 ambience 或声场跳变。最终音轨包含一次 problem/recommendation/result narration 与一次 brand line；没有重复 slogan 或 card-claim narration。
 
-Project-local `video-analysis` MCP 对 exact V2 final hash 以 `0.5s` interval 抽取 40 frames；字幕修复 sheets 另覆盖 opening 与 tail。工具只报告 existing `720x1280` review resolution 的 generic `low_resolution` heuristic；该分辨率与初版相同，不是本次 caption-only repair regression。`ffmpeg` full decode 无错误；V2 与初版 audio stream SHA-256 同为 `d145fe969076aa9d04b36cee23fe0d0c50befb5faf067ab90388c15297ba2de0`。
+Project-local `video-analysis` MCP 对 exact V3 final hash 以 `0.5s` interval 抽取 40 frames；字幕修复 sheets 另覆盖 opening 与 V2/V3 tail comparison。`ffmpeg` full decode 无错误；V2 与 V3 decoded audio SHA-256 同为 `e5e682a1991a30a936a275b878f7a499dd313c8a4888b20453dbb017719c2952`。
 
 Final Gate：
 
-`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v2-gate.json`
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/caption-repair-v3-gate.json`
 
-Verdict：`PASS_FOR_LOCAL_REVIEW`。
+Verdict：`PASS_FOR_LOCAL_REVIEW_ONLY`。
 
 ## Assessment
 
-本次先关闭旧版本已证实的 Hero 悬浮缺陷，再根据用户 screenshots 关闭初版 caption backing 缺陷。Hero 的瓶与盒从第一帧就接触真实木桌，三张指定图片按 exact order 各显示 1.5 秒；字幕现在具有 timing、semantic split、copy ownership、unboxed style、source-corruption coverage 与 boundary sampling 的明确 Gate。
+本次先关闭旧版本已证实的 Hero 悬浮缺陷，再根据用户 screenshots 关闭初版 caption backing 与后续 disclosure collision 缺陷。Hero 的瓶与盒从第一帧就接触真实木桌，三张指定图片按 exact order 各显示 1.5 秒；字幕现在具有 timing、semantic split、copy ownership、unboxed style、source-corruption coverage 与 boundary sampling 的明确 Gate，V3 不再显示 disclosure track。
 
 仍须保持三层 truth：
 
@@ -179,11 +205,11 @@ Verdict：`PASS_FOR_LOCAL_REVIEW`。
 
 ## Remaining Risks And Guardrails
 
-- 新成片仍需要用户对整体节奏、V2 无底板字幕的字重与位置、文化呈现、中文发音和 card readability 做最终人眼/听审。
-- 三张 card 含高风险 claims；除非提供 substantiation 并完成独立合规确认，否则不得移除 disclosure 或把 review-only artifact 变成 commercial-ready。
+- 新成片仍需要用户对整体节奏、V3 无底板字幕的字重与位置、文化呈现、中文发音和 card readability 做最终人眼/听审。
+- 三张 card 含高风险 claims；V3 已按用户指令移除 on-video disclosure，但除非提供 substantiation 并完成独立合规确认，仍不得把 review-only artifact 变成 commercial-ready 或可发布素材。
 - 实际 Provider billing 未验证；只有 request count、finite ceiling 与 token-based estimate。
 - 本地 `runs/` artifacts 未 stage、commit、activate、push 或 publish。
 - `retrieve-ai-video-memory` 本次返回 tagged last-good stale fragments 并排队 detached refresh；未等待、轮询或重建索引，当前字幕结论来自 exact media、composition files 与本轮视觉证据。
-- 任何新 variant、retry、不同 model/provider、1080p upgrade、重新生成 audio、移除 disclosure 或 publication 都是新 scope，需新的 current-task authorization 与对应 Gate。
+- 任何新 variant、retry、不同 model/provider、1080p upgrade、重新生成 audio 或 publication 都是新 scope，需新的 current-task authorization 与对应 Gate。
 - `MP4 contains AAC`、local ffmpeg composition、Whisper transcript 与 local Gate 都不等于 canonical P4 ingestion、P6 或 Final Acceptance。
 - 后续若进入 Production，必须走 canonical Asset Registry、`ResolvedTimeline`、Manifest、Review/Repair 与 activation owners；本记录不拥有 production state。
