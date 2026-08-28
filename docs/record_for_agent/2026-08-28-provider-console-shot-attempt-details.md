@@ -76,6 +76,60 @@ Independent native `reviewer_xhigh` 首轮发现 historical base-pointer、expli
 unsafe `error_code` 三个 blocking defects；修复并补 regression tests 后 scoped re-review verdict 为
 `accept`，无 remaining material concern。
 
+## External Media Library Follow-up — 2026-08-28
+
+同一用户判断目标后来扩展到 `runs/` 之外的三类历史视频位置：repository `artifacts/`、本机
+ComfyUI output 与 repository 外青颜项目目录。实现没有把这些异构目录伪装成额外 `runs` root，也没有
+导入、移动、删除或激活媒体；`/api/runs*` 的 canonical projection 保持不变，新增的是平行的 local-only
+External Media Library。
+
+当前实现边界：
+
+- `provider-console/scripts/external-media.mjs` 对 server allowlist root 做 bounded、no-follow 扫描，
+  只接受 regular video，重新测量 exact SHA-256，并把相同 bytes 聚合为一个 group，同时保留所有
+  source-relative physical locations。
+- `provider-console/scripts/runs-api.mjs` 使用 source-qualified opaque token；Browser 不能提交 arbitrary
+  filesystem root，也收不到 absolute path。media 与 JSON sidecar 均通过 `O_NOFOLLOW` fd、realpath、
+  root containment 和 file identity 检查；播放前还会重验 exact media SHA/size，支持 `HEAD` 与 byte range。
+- Generic metadata 只有声明 `ai-video-external-media-metadata/1` 且直接绑定 exact path/SHA 时才解释。
+  未知 schema 即使绑定 exact bytes，也只保留 evidence ref，不解释通用 `type`、`state`、`status` 或
+  `prompt`。
+- 青颜历史证据使用独立 cross-fingerprint adapter：`result.json` 的 exact media SHA 必须与
+  `fetch_receipt.json` 一致，observation/submit fingerprints、resolved hash、generation ID、Shot、seed、
+  Prompt、mode 与 state 必须全部存在并相互匹配。任一 linkage 缺失都 fail closed。
+- External `reported_status` 与 canonical `status`、`generation_status`、`lifecycle_status` 分离；后三者固定
+  `NOT_EVALUATED`。External `succeeded` 不产生 candidate、QA、P6、Final Acceptance 或 activation truth。
+
+本机 live catalog 证据：
+
+- 3 个 allowlisted sources 全部 available；485 个 physical video locations 聚合为 392 个 unique SHA groups。
+- 7 个青颜 groups 通过完整 evidence chain，显示 full Prompt、Shot ID、`text_to_video` 与 external
+  `succeeded`；其 canonical lifecycle 仍为 `NOT_EVALUATED`。
+- 其它没有受支持 schema/完整 chain 的视频仍可按 exact bytes 播放、搜索、查看 duplicate locations，
+  但 Prompt、Shot type 与成功/失败保持 `NOT_EVALUATED`，不从文件名或目录邻近关系猜测。
+- Chrome fresh reload 验证 source filters、搜索、video preview、non-canonical boundary 与 runs/external
+  切换；console 无 warning/error/issue，observed requests 均为本机 `200` 或合法 `206`，public payload
+  不含 `/home/reggie`。
+
+Implementation commit：`792d8a88bbe3658eea66b638f7a80b86d8e36dd8`。
+
+Exact commit-range Harness：
+
+- range：`63113d3cb19200172540476ff4941b8befedb7b1..792d8a88bbe3658eea66b638f7a80b86d8e36dd8`；
+- receipt：`.agent/harness/runs/provider-console-external-media-20260828/receipt.json`；
+- receipt verification：`passed=true`、`fresh=true`、`snapshot_matches=true`、
+  `scope_worktree_clean=true`、`complete_completion_proof=true`；
+- Harness 内 `193` tests、Provider Console Python `32` tests、Node `29` tests、Vite/Sites builds 与
+  Sites `5` tests 全部通过；Architecture Gate 为 PASS。
+
+四个媒体 root 在一次完整 live catalog scan 前后的 file type/path/size/mtime tree digests 分别一致；
+该检查证明本次 observer scan 没有改变这些 trees，不等于重新验收其中历史媒体的质量或 lifecycle。
+
+Independent native `reviewer_xhigh` 首轮指出 cross-fingerprint 字段双方同时缺失时可能因
+`undefined === undefined` 错误通过，以及 generic JSON 字段存在语义误读风险。实现改为所有 chain
+identity 非空且相等，并为 generic metadata 增加 schema gate；scoped re-review verdict 为 `accept`，
+无 blocking issue。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
@@ -93,6 +147,11 @@ human visual PASS；同样，`failed` 但存在 fetched video 只表示已有 ex
   若产品未来需要内部多镜头结构化拆分，应先新增 provider-neutral sealed schema 与 migration，而不是
   在前端启发式解析 Prompt。
 - 本轮未执行新的 Provider、paid/cloud、media generation、P6 或 Final Acceptance；也未发布或部署。
+- External catalog 当前每次 refresh 都重新 hash 视频，并以 media × bounded sidecar 方式读取证据；本机
+  485 个 locations 实测约 3.3–3.5 秒。未来若规模增长，应建立单次 sidecar index 与 in-flight scan
+  合并，但缓存不得降低 exact-byte revalidation。
+- 达到 scan limits 或遇到不可读子目录时，目前不会向 UI 投影精确 `truncated/skipped` count；当前三个
+  source 未触发已知限制，但后续要声称“完整覆盖”前应补该可观察性。
 
 ## Agent Guardrails
 
@@ -102,4 +161,6 @@ human visual PASS；同样，`failed` 但存在 fetched video 只表示已有 ex
   traceback、Provider payload 或 secret。
 - Provider Console 保持 loopback、read-only、local-only；任何 mutation、Provider submit 或自动重试均
   属于新的授权范围。
+- External `reported_status` 只能来自受支持 schema 或完整 verified chain；不得从文件存在、filename、
+  unknown JSON schema 或 review/gate state 推导生成成功/失败。
 - 本记录与实现仅形成 local Git checkpoint；没有 push、deploy 或 release。
