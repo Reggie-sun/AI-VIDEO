@@ -66,20 +66,61 @@ binding、camera、duration、audio 与 empty negative prompt 均保持不变。
   不是 strict same-seed prompt-only A/B。该 attribution limit 已写入 exact preview。
 - Future exact output destination:
   `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v5/outputs/shot-c-open-use-effect-v5.mp4`；
-  当前不存在。
+  preview checkpoint 时不存在；后续 exact execution evidence 由下一 subsection 独立记录。
 
-### V5 Current Stop And Next One Thing
+### V5 Shot C Exact Output And Gate Stop
 
-当前停在新的 task-scoped authorization Gate。只有用户把明确 authorization 精确绑定到 preview SHA-256
-`d26099d3b8069439665efe5c19eb156a55b8f1cf3610f279f3b449290b45424a` 后，才允许 exactly one local
-Shot C H3 submit；随后 exact MP4 落盘必须立即执行 project-local `video_probe`、
-`video_scene_detect`、`video_extract_frames` 与 `video_transcribe` 四项 barrier，并给出六项
-requirement-level verdict。
+- Stage-2 authorization source: 用户选择 `A`，精确绑定上方 preview SHA-256
+  `d26099d3b8069439665efe5c19eb156a55b8f1cf3610f279f3b449290b45424a`。
+- Authorization sidecar:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v5/sidecars/h3-submit-authorization.json`；
+  SHA-256 `7e65416bc2ad6d8c0c5a3d2776e9b072889efd1aa024a257ad26d676d6821506`。
+- Exactly one canonical local submit 经
+  `VideoGenerationService.submit_local_once` 完成；Provider request ID
+  `14f33524-35d9-401d-9ce8-d3f090aa10f5`。没有第二次 submit、retry、variant、fallback、new image、
+  Shot B Provider call、remote/paid call 或 assembly call。
+- Exact output:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v5/outputs/shot-c-open-use-effect-v5.mp4`
+  - SHA-256: `1dfc9febee04a45a5ee623cbe26e1b30c0eef790e297c25edbf3920ec2b9628b`
+  - Size: `1,445,258 bytes`
+  - Probe: `5.167s`、`124 frames`、`768x768`、`24fps`、H.264 High、AAC `32 kHz` stereo。
+- Runtime identity 与 exact preview 保持一致：request input / resolved generation hash 为
+  `2bc332a71781c312f3046289df31a09d77028b9ee6810e96e88b8d300b4fb159` /
+  `ad3d88d576fcfa4090e413dd39abe3f6e38af7d0375e128a8a9b16f8a5204990`，effective seed
+  `3153419857324786450`。
+- Exact MP4 落盘后立即完成 project-local `video_probe`、`video_scene_detect`、
+  `video_extract_frames`、`video_transcribe` 四项 barrier，call count 恰好为 `4`。结果为 one continuous
+  scene、13 张 `0.4s` sampled frames、empty transcript / zero segments。
+- Gate:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v5/sidecars/gates/shot-c-v5-gate.json`；
+  SHA-256 `5a8b4208493f97f5729753fc1cf656a5d3f99400615bd765d65b9f79c848b6ff`。
+- Result sidecar:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v5/sidecars/shot-c-result.json`；
+  SHA-256 `316b5e149ae454248e82547ee446f3763364ce140ae9334a5905f09c38ea78cb`。
 
-任何 required `FAIL` / `NOT_EVALUATED` 立即停止。New image、Shot B Provider call、retry、variant、fallback、
-best-of-N、new prompt/anchor、remote/paid 与 assembly call ceiling 均为 `0`；`15.5s` / `30s` assembly、
-M7–M9、qualification、aggregate Gate expansion 与 HUMAN verdict 继续 deferred。Technical Gate、endpoint
-support 或 tool success 均不得升级为 HUMAN PASS、P6、Final Acceptance、Production qualification 或 release。
+| Requirement | Verdict | Evidence summary |
+| --- | --- | --- |
+| `causal_state` | FAIL | capped start、cap removal/placement、exactly one bottle、elder absence、correct empty anatomical-right-arm raise、anatomical-left-hand bottle control、underarm aim、lowering 与 settled relief 均存在；但 `2.1–3.3s` action window 的 `0.1s` local detail samples 中没有 visible mist 或其他 discrete discharge event，无法建立 exactly-one completed spray |
+| `conditioning` | PASS | decoded first/last endpoint SSIM 为 `0.943168` / `0.924307`；identity、wardrobe、product、cap、room geometry、scale 与 terminal composition 稳定，无 cut 或 terminal snap |
+| `camera` | PASS | `video_scene_detect` 为 one continuous scene；doorway、curtain、wall/floor lines、portrait side fill、standing mark 与 subject scale 固定，无 pan、push-in、compound drift 或 terminal reframe |
+| `intent/performance` | FAIL | V4 的 hand assignment / nozzle geometry conflict 已修复：empty right arm raises、left bottle hand stays below shoulder and aims into right underarm；但缺少可辨认的 single discharge，exact use performance 仍不完整 |
+| `dialogue/lip-sync` | PASS | sealed dialogue is none、`lip_sync_required=false`；exact AAC stream fully decodes，Whisper small 返回 empty full text / zero segments |
+| `readability` | FAIL | cap removal、corrected arm/bottle assignment、underarm aim、lowering 与 terminal relief 可分辨；decisive exactly-once spray beat 因无 visible mist 或 discrete onset/stop 而不可读 |
+
+V5 `hand_assignment_repair=PASS` 与 `terminal_close_state_repair=PASS` 只证明两个局部修复已到达；它们不覆盖
+spray-event visibility failure。Shot C technical Gate 仍为 `FAIL`，`human_verdict=NOT_EVALUATED`，不得升级为
+HUMAN PASS、P6、Final Acceptance、Production qualification、commercial acceptance 或 release truth。
+
+### V5 Current Stop
+
+V5 authorization 已由 Shot C required finding `FAIL` 终止；stop rule 已触发。当前 failure owner 收敛为
+mid-action spray-event visibility，而不是 hand assignment、terminal anchor、Provider/profile/workflow/binding 或
+camera。没有 retry、variant、fallback 或 `15.5s` / `30s` assembly；M7–M9、qualification、aggregate Gate
+expansion 与 HUMAN verdict 继续 deferred。
+
+ComfyUI queue 在 cleanup 前为空；repository supervisor 已停止，listener 已关闭，checkout 已恢复为 clean
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`。任何 future repair、new prompt/seed/anchor、Provider submit 或
+assembly 都需要新的独立 preflight、exact preview 与 task-scoped authorization；本 record 不提供预授权。
 
 ## V4 Current Checkpoint — 2026-08-28
 
