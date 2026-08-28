@@ -87,6 +87,8 @@ Shot B Provider call、retry、variant、fallback、remote/paid 与 assembly cal
 aggregate Gate expansion、HUMAN PASS、P6、Final Acceptance、Production qualification、commercial
 acceptance 或 release。
 
+Durable V6 preview record checkpoint: `92ffb1e2980c887bfcd74833ddf0e0d9db805872`。
+
 ## V5 Current Checkpoint — 2026-08-28
 
 本 section 是当前 M6 empirical decision checkpoint；下方 v4/v3/v2/v1 evidence 保留为历史。V4 Shot C
