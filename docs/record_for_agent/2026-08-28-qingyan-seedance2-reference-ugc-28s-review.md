@@ -2,6 +2,12 @@
 
 Date: 2026-08-28
 
+## Supersession Notice — 2026-08-28
+
+用户随后明确拒绝本记录的 `7818b1b0...ffea3` 结尾：手持瓶旁的盒子没有可见支撑面，被读成突然悬浮。下文关于 exact Provider calls、raw hashes、audio、frame uniqueness 与当时 local technical Gate 的测量仍是历史事实，但 `DYNAMIC_HERO_CLOSURE` / `NO_STATIC_OR_REPEATED_ENDING` 的技术 PASS 不能替代这次 human visual FAIL；“等待用户视觉判断”也已被本次拒绝取代。
+
+当前 local review checkpoint 改由 `docs/record_for_agent/2026-08-28-qingyan-seedance-fast-supported-hero-captioned-card-tail.md` 记录：新版本用一次受限 `doubao-seedance-2-0-fast-260128` 调用生成全程落在木桌上的产品 Hero，并在结尾按顺序播放三张用户图片、修正字幕。旧成片未删除、未激活、未发布，不再作为当前 human-quality evidence。
+
 ## Purpose
 
 本文记录青颜喷雾一次真实 `doubao-seedance-2-0-260128` 双 Shot、原生音频、逐 Shot Gate 与确定性修复实验。目标是复用用户提供的 28.863 秒真人电商视频的抽象广告节奏，重新建立以下因果：
