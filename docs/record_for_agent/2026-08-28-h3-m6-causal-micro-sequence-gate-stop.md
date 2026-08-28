@@ -184,6 +184,9 @@ P6、Final Acceptance、Production qualification、commercial acceptance 与 rel
 - Automatic learning evaluation: `no_candidate`。本 checkpoint 只有 deterministic assembly preview，没有新的
   independent media attempt、controlled comparison 或 HUMAN verdict，不创建 Learning Claim placeholder。
 
+Durable `15.5s` review assembly preview checkpoint:
+`fdbbf1238ef6114b638d2a01d62670a9694742a0`。
+
 Durable V6 preview record checkpoint: `92ffb1e2980c887bfcd74833ddf0e0d9db805872`。
 
 Durable V6 exact execution / technical Gate checkpoint:
