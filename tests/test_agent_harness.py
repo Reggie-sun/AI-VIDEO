@@ -623,6 +623,7 @@ def test_provider_console_bridge_routes_to_python_and_node_contracts() -> None:
         "src/ai_video/provider_console.py",
         "src/ai_video/provider_console_continuity.py",
         "tests/test_provider_console.py",
+        "provider-console/scripts/experiment-evidence.mjs",
         "provider-console/scripts/external-media.mjs",
         "provider-console/scripts/runs-api.mjs",
         "provider-console/tests/external-media.test.mjs",
