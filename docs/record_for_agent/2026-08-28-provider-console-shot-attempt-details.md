@@ -382,6 +382,52 @@ Verification：
 本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成、Manifest mutation、activation、P6、
 Final Acceptance、push、deploy 或 release；两个 implementation commits 与本记录均为 local checkpoint。
 
+## Shot Timing And Closable Reference Follow-up — 2026-08-28
+
+用户在关联判断面继续提出两个操作要求：每个 Shot 必须看到对应时间，点击 Reference 图片后必须能退出。
+本 follow-up 保持 `ResolvedTimeline` 的唯一 timing ownership，不从 Shot 顺序或 Prompt 文本猜测成片时间。
+
+当前时间语义：
+
+- Project Shot 有 fixed/ranged `duration_policy` 时显示计划时长，同时明确标记
+  `成片位置 NOT_EVALUATED`；没有 `ResolvedTimeline` 时不累加前序 Shot 时长补造 timeline。
+- 同目录 ecommerce package 有 explicit `start_seconds/end_seconds` 时显示 `声明时间`，但仍受原有
+  `co_located_declared_package` 边界约束，不把 package 声明升级为 exact composition receipt。
+- M6 result、causal handoff summary 与 conditioning evaluation 只有在原有 exact MP4 identity chain
+  已成立时才投影单 Shot clip 时间。M6 使用绑定 result 的 measured duration；causal handoff 在 exact
+  summary 只有 `frame_count/fps` 时计算 clip duration；conditioning 使用 exact evaluation probe。
+- 单 Shot clip 时间显示为 `00:00.000 – end · duration`，并明确不是最终成片的
+  `ResolvedTimeline`。duration 与 `frame_count/fps` 相互矛盾超过 `0.05s` 时，只隐藏 timing，保留其它
+  已验证 Shot evidence；UI 显示 `NOT_EVALUATED`。
+
+Reference 预览行为：
+
+- exact-bound Reference 卡片不再打开无站内退出路径的 raw-image tab，而是在当前判断面打开 modal
+  lightbox。
+- lightbox 支持可见关闭按钮、点击遮罩和 `Escape` 三种退出方式；打开时 focus 进入关闭按钮，关闭后
+  回到原 Reference 触发按钮，`Tab` 不会逃到 modal 背后的控制项。
+
+Verification：
+
+- focused Node contracts：`53 passed`；Continuity/Sites：`9 passed`；Vite production build：
+  `4581 modules transformed`。
+- Chrome integrated QA：Runs Project 两个 Shots 都显示 `2s · 成片位置 NOT_EVALUATED`；M6、causal
+  handoff 与 conditioning Arm A 均显示 `00:00.000 – 00:05.167 · 5.167s` 和 `124 frames · 24 fps`；
+  六个 ecommerce declared Shots 分别显示从 `00:00.000 – 00:04.500` 到
+  `00:24.333 – 00:30.000` 的声明区间。
+- Chrome 对 Reference 关闭按钮、遮罩与 `Escape` 逐一验证，关闭后 focus 回到原 Reference button；
+  console 无 error/warning/issue，所列 local requests 均为 `200/206`。
+- Implementation commit：`52755696342ac2ba116d54b2f782ad18305cd46d`。
+- Exact commit range：
+  `d6b2d13d0b64ee7d99da831fc37bbd42d079549a..52755696342ac2ba116d54b2f782ad18305cd46d`；
+  receipt：`.agent/harness/runs/provider-console-shot-timing-lightbox-20260828-v1/receipt.json`。
+- Receipt 内 Architecture Gate PASS、Provider Console Python `32 passed`、Node `57 passed`、Vite build
+  通过；receipt verification 为 `passed=true`、`fresh=true`、`snapshot_matches=true`、
+  `scope_paths_match=true`、`scope_worktree_clean=true` 与 `complete_completion_proof=true`。
+
+本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成、Manifest mutation、activation、P6、
+Final Acceptance、push、deploy 或 release；implementation 与记录均为 local checkpoint。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
