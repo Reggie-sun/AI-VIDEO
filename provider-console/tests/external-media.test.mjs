@@ -24,6 +24,160 @@ function sources(paths) {
   ];
 }
 
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function pngBytes(width, height, marker) {
+  const bytes = Buffer.alloc(24 + Buffer.byteLength(marker));
+  Buffer.from("89504e470d0a1a0a0000000d49484452", "hex").copy(bytes);
+  bytes.writeUInt32BE(width, 16);
+  bytes.writeUInt32BE(height, 20);
+  bytes.write(marker, 24);
+  return bytes;
+}
+
+function experimentsSource(root) {
+  return [{
+    id: "ai-video-experiments",
+    label: "AI-VIDEO Experiments",
+    kind: "development_artifact",
+    root,
+  }];
+}
+
+async function writeM6Experiment(root, name, {
+  videoBytes = Buffer.from(`m6-video-${name}`),
+  shotId = `m6-${name}`,
+  technicalGate = "FAIL",
+  humanVerdict = "NOT_EVALUATED",
+  promptText = `sealed prompt ${name}`,
+  firstBytes = pngBytes(640, 360, `${name}-first`),
+  lastBytes = pngBytes(640, 360, `${name}-last`),
+  assetIdPrefix = name,
+  findingEvidence = "exact evidence",
+  requirementHash = sha256(`requirement-${name}`),
+  resolvedGenerationHash = sha256(`resolved-${name}`),
+  humanPass,
+} = {}) {
+  const experiment = path.join(root, name);
+  const outputs = path.join(experiment, "outputs");
+  const sidecars = path.join(experiment, "sidecars");
+  const requests = path.join(sidecars, "requests");
+  const gates = path.join(sidecars, "gates");
+  const inputs = path.join(experiment, "inputs");
+  await Promise.all([
+    mkdir(outputs, { recursive: true }),
+    mkdir(requests, { recursive: true }),
+    mkdir(gates, { recursive: true }),
+    mkdir(inputs, { recursive: true }),
+  ]);
+
+  const videoPath = path.join(outputs, "shot-b.mp4");
+  const firstPath = path.join(inputs, "first.png");
+  const lastPath = path.join(inputs, "last.png");
+  const videoSha256 = sha256(videoBytes);
+  const firstSha256 = sha256(firstBytes);
+  const lastSha256 = sha256(lastBytes);
+  const promptSha256 = sha256(promptText);
+  await Promise.all([
+    writeFile(videoPath, videoBytes),
+    writeFile(firstPath, firstBytes),
+    writeFile(lastPath, lastBytes),
+    writeFile(path.join(requests, "b-prompt.txt"), ` \n${promptText}\n`),
+  ]);
+
+  const imageBindings = [
+    { role: "first_frame", asset_id: `${assetIdPrefix}-first`, asset_sha256: firstSha256, mime_type: "image/png", width: 640, height: 360, size_bytes: firstBytes.length },
+    { role: "last_frame", asset_id: `${assetIdPrefix}-last`, asset_sha256: lastSha256, mime_type: "image/png", width: 640, height: 360, size_bytes: lastBytes.length },
+  ];
+  const result = {
+    output_path: videoPath,
+    output_sha256: videoSha256,
+    output_size_bytes: videoBytes.length,
+    shot_id: shotId,
+    requirement_hash: requirementHash,
+    resolved_generation_hash: resolvedGenerationHash,
+    prompt_sha256: promptSha256,
+  };
+  const targetShot = {
+    shot_id: shotId,
+    revision: 3,
+    intent: `intent ${name}`,
+    dialogue: `dialogue ${name}`,
+    narration: `narration ${name}`,
+    continuity_constraints: ["same screen direction", "one product"],
+    visual_strategy: "generated_video",
+  };
+  const requirement = {
+    requirement_hash: requirementHash,
+    target_shot: targetShot,
+    asset_evidence: imageBindings.map((binding) => ({
+      role: binding.role === "first_frame" ? "continuity_terminal" : binding.role,
+      asset_id: binding.asset_id,
+      asset_sha256: binding.asset_sha256,
+      mime_type: binding.mime_type,
+      width: binding.width,
+      height: binding.height,
+      size_bytes: binding.size_bytes,
+    })),
+    generation_mode: "image_to_video",
+  };
+  const resolved = {
+    generation_id: `generation-${name}`,
+    provider_name: "comfy-local-h3",
+    provider_kind: "minimax_h3_fl2va",
+    model_id: "minimax-h3-fl2va",
+    requirement_hash: requirementHash,
+    mode: "image_to_video",
+    prompt_text: promptText,
+    image_bindings: imageBindings,
+    resolved_generation_hash: resolvedGenerationHash,
+    activation_scope: { request: {
+      target_shot_id: shotId,
+      target_shot_revision: 3,
+      requirement_hash: requirementHash,
+      mode: "image_to_video",
+      prompt_text: promptText,
+      image_bindings: imageBindings,
+    } },
+  };
+  const gate = {
+    schema: "m6-per-shot-post-media-gate/1",
+    shot_id: shotId,
+    requirement_hash: requirementHash,
+    video_path: videoPath,
+    video_sha256: videoSha256,
+    video_size_bytes: videoBytes.length,
+    technical_gate: technicalGate,
+    human_verdict: humanVerdict,
+    ...(humanPass === undefined ? {} : { human_pass: humanPass }),
+    findings: {
+      causal_state: { requirement_id: `${shotId}#causal`, verdict: technicalGate, evidence: findingEvidence },
+    },
+  };
+  await Promise.all([
+    writeFile(path.join(sidecars, "shot-b-result.json"), JSON.stringify(result)),
+    writeFile(path.join(requests, "b-requirement.json"), JSON.stringify(requirement)),
+    writeFile(path.join(requests, "b-resolved.json"), JSON.stringify(resolved)),
+    writeFile(path.join(gates, "shot-b-gate.json"), JSON.stringify(gate)),
+  ]);
+  return {
+    experiment,
+    videoPath,
+    firstPath,
+    lastPath,
+    videoSha256,
+    promptSha256,
+    requirementHash,
+    resolvedGenerationHash,
+    result,
+    requirement,
+    resolved,
+    gate,
+  };
+}
+
 test("catalog is allowlisted, marks missing roots unavailable, and ignores symlinks", async () => {
   const paths = await fixture();
   await writeFile(path.join(paths.artifacts, "accepted.mp4"), "artifact bytes");
@@ -83,6 +237,43 @@ test("public projection never leaks absolute media paths while private descripto
   assert.equal(JSON.stringify(projected).includes("source_root"), false);
   assert.equal(result._media[result.groups[0].token].source_path, media);
   assert.match(result.groups[0].token, /^[A-Za-z0-9_-]{6,128}$/);
+});
+
+test("public projection recursively redacts unsafe sidecar text even if an adapter regresses", () => {
+  const projected = publicExternalMediaProjection({
+    groups: [{
+      asset_id: "/home/operator/private/reference.png",
+      evidence: "https://media.invalid/file?X-Amz-Signature=private",
+      note: "Traceback (most recent call last):\n  File \"/tmp/worker.py\", line 1",
+      chinesePath: "路径：/home/operator/private.json",
+      arrowPath: "媒体→/tmp/secret.mp4",
+      windowsPath: "路径：C:\\private\\secret.json",
+      safe: "shot-01 exact evidence",
+      ordinaryUrl: "https://example.com/path?q=1",
+      aspectRatio: "画面比例 16/9",
+      playbackSpeed: "速度 1/2x",
+      relativePath: "folder/subfolder",
+      nested: { source_path: "/home/operator/media.mp4" },
+    }],
+    _media: { token: { source_path: "/home/operator/media.mp4" } },
+  });
+
+  assert.deepEqual(projected, {
+    groups: [{
+      asset_id: null,
+      evidence: null,
+      note: null,
+      chinesePath: null,
+      arrowPath: null,
+      windowsPath: null,
+      safe: "shot-01 exact evidence",
+      ordinaryUrl: "https://example.com/path?q=1",
+      aspectRatio: "画面比例 16/9",
+      playbackSpeed: "速度 1/2x",
+      relativePath: "folder/subfolder",
+      nested: {},
+    }],
+  });
 });
 
 test("sidecar symlinks are ignored instead of projecting metadata from outside the allowlisted root", async () => {
@@ -396,4 +587,354 @@ test("unbound sidecars fail closed and scan limits are deterministic", async () 
   assert.equal(rawGroup.metadata_status, "not_evaluated");
   assert.deepEqual(rawGroup.metadata, {});
   assert.equal(result.sources.find((source) => source.id === "raw").media_count, 1);
+});
+
+test("AI-VIDEO Experiments M6 evidence joins the exact Shot, prompt, layered verdicts, and reference images", async () => {
+  const paths = await fixture();
+  const evidence = await writeM6Experiment(paths.artifacts, "m6-v3", {
+    technicalGate: "FAIL",
+    humanVerdict: "NOT_EVALUATED",
+  });
+
+  const result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  const group = result.groups.find((item) => item.sha256 === evidence.videoSha256);
+  assert.equal(group.status, "NOT_EVALUATED");
+  assert.equal(group.generation_status, "NOT_EVALUATED");
+  assert.equal(group.lifecycle_status, "NOT_EVALUATED");
+  assert.equal(group.reported_status, "OUTPUT_RECORDED");
+  assert.equal(group.technical_gate, "FAIL");
+  assert.equal(group.human_verdict, "NOT_EVALUATED");
+  assert.equal(group.metadata_status, "verified_experiment_evidence");
+  assert.equal(group.shot_evidence.length, 1);
+  assert.deepEqual(group.shot_evidence[0], {
+    entity_kind: "shot",
+    association_status: "verified_experiment_evidence",
+    shot_id: "m6-m6-v3",
+    revision: 3,
+    requirement_hash: evidence.requirementHash,
+    intent: "intent m6-v3",
+    dialogue: "dialogue m6-v3",
+    narration: "narration m6-v3",
+    continuity_constraints: ["same screen direction", "one product"],
+    visual_strategy: "generated_video",
+    prompt_text: "sealed prompt m6-v3",
+    generation_type: "image_to_video",
+    provider_kind: "minimax_h3_fl2va",
+    provider_name: "comfy-local-h3",
+    model_id: "minimax-h3-fl2va",
+    generation_result: "OUTPUT_RECORDED",
+    technical_gate: "FAIL",
+    human_verdict: "NOT_EVALUATED",
+    findings: [{ requirement_id: "m6-m6-v3#causal", verdict: "FAIL", evidence: "exact evidence" }],
+    reference_inputs: [
+      {
+        role: "first_frame",
+        asset_id: "m6-v3-first",
+        sha256: sha256(pngBytes(640, 360, "m6-v3-first")),
+        mime_type: "image/png",
+        bytes: pngBytes(640, 360, "m6-v3-first").length,
+        width: 640,
+        height: 360,
+        token: group.shot_evidence[0].reference_inputs[0].token,
+        source_id: "ai-video-experiments",
+        relative_path: "m6-v3/inputs/first.png",
+      },
+      {
+        role: "last_frame",
+        asset_id: "m6-v3-last",
+        sha256: sha256(pngBytes(640, 360, "m6-v3-last")),
+        mime_type: "image/png",
+        bytes: pngBytes(640, 360, "m6-v3-last").length,
+        width: 640,
+        height: 360,
+        token: group.shot_evidence[0].reference_inputs[1].token,
+        source_id: "ai-video-experiments",
+        relative_path: "m6-v3/inputs/last.png",
+      },
+    ],
+  });
+  assert.ok(group.shot_evidence[0].reference_inputs.every((reference) => /^[A-Za-z0-9_-]{6,128}$/.test(reference.token)));
+  assert.equal(result._media[group.shot_evidence[0].reference_inputs[0].token].source_path, evidence.firstPath);
+  assert.equal(result._media[group.shot_evidence[0].reference_inputs[1].token].source_path, evidence.lastPath);
+  assert.equal(JSON.stringify(publicExternalMediaProjection(result)).includes(paths.root), false);
+  assert.equal(JSON.stringify(group.shot_evidence).includes("source_path"), false);
+});
+
+test("AI-VIDEO Experiments M6 evidence rejects wrong output identity and a mismatched Prompt hash join", async () => {
+  const paths = await fixture();
+  const evidence = await writeM6Experiment(paths.artifacts, "m6-rejected");
+  const resultPath = path.join(evidence.experiment, "sidecars", "shot-b-result.json");
+  const resolvedPath = path.join(evidence.experiment, "sidecars", "requests", "b-resolved.json");
+
+  await writeFile(resultPath, JSON.stringify({ ...evidence.result, output_sha256: "f".repeat(64) }));
+  const wrongOutput = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  let group = wrongOutput.groups.find((item) => item.sha256 === evidence.videoSha256);
+  assert.deepEqual(group.shot_evidence, []);
+  assert.equal(group.reported_status, null);
+
+  await writeFile(resultPath, JSON.stringify(evidence.result));
+  await writeFile(resolvedPath, JSON.stringify({ ...evidence.resolved, prompt_text: "different prompt" }));
+  const wrongPrompt = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  group = wrongPrompt.groups.find((item) => item.sha256 === evidence.videoSha256);
+  assert.deepEqual(group.shot_evidence, []);
+  assert.equal(group.prompt_text, null);
+  assert.equal(group.technical_gate, null);
+});
+
+test("AI-VIDEO Experiments causal handoff binds only the summary, trimmed Prompt, preview, and exact Shot gate", async () => {
+  const paths = await fixture();
+  const experiment = path.join(paths.artifacts, "causal-handoff");
+  const outputs = path.join(experiment, "outputs");
+  const sidecars = path.join(experiment, "sidecars");
+  const inputs = path.join(experiment, "inputs");
+  await Promise.all([
+    mkdir(outputs, { recursive: true }),
+    mkdir(sidecars, { recursive: true }),
+    mkdir(inputs, { recursive: true }),
+  ]);
+  const videoPath = path.join(outputs, "handoff.mp4");
+  const videoBytes = Buffer.from("causal handoff video");
+  const videoSha256 = sha256(videoBytes);
+  const promptText = "causal exact prompt";
+  const promptSha256 = sha256(promptText);
+  const resolvedGenerationHash = sha256("causal-resolved");
+  const firstBytes = pngBytes(512, 512, "causal-first");
+  const lastBytes = pngBytes(512, 512, "causal-last");
+  const firstPath = path.join(inputs, "first.png");
+  const lastPath = path.join(inputs, "last.png");
+  await Promise.all([
+    writeFile(videoPath, videoBytes),
+    writeFile(firstPath, firstBytes),
+    writeFile(lastPath, lastBytes),
+    writeFile(path.join(sidecars, "prompt.txt"), `\n${promptText}\n`),
+  ]);
+  const shared = {
+    prompt_sha256: promptSha256,
+    resolved_generation_hash: resolvedGenerationHash,
+    provider: "comfy-local-h3",
+    provider_kind: "minimax_h3_fl2va",
+    model_id: "minimax-h3-fl2va",
+    first_frame_sha256: sha256(firstBytes),
+    last_frame_sha256: sha256(lastBytes),
+  };
+  await writeFile(path.join(sidecars, "run-summary.json"), JSON.stringify({
+    ...shared,
+    output_path: videoPath,
+    output_sha256: videoSha256,
+    output_size_bytes: videoBytes.length,
+    task_state: "succeeded",
+  }));
+  await writeFile(path.join(sidecars, "exact-preview.json"), JSON.stringify(shared));
+  await writeFile(path.join(sidecars, "shot-gate.json"), JSON.stringify({
+    schema: "ai-video-development-shot-gate/1",
+    artifact_sha256: videoSha256,
+    gate_verdict: "PASS",
+    required_findings: [{ id: "causal.transfer", verdict: "PASS", evidence: "transfer is visible" }],
+    human_first_findings: [{ id: "performance.naturalness", verdict: "NOT_EVALUATED" }],
+  }));
+
+  let result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  let group = result.groups.find((item) => item.sha256 === videoSha256);
+  assert.equal(group.reported_status, "OUTPUT_RECORDED");
+  assert.equal(group.technical_gate, "PASS");
+  assert.equal(group.human_verdict, "NOT_EVALUATED");
+  assert.equal(group.shot_evidence[0].entity_kind, "generation");
+  assert.equal(group.shot_evidence[0].shot_id, null);
+  assert.equal(group.shot_evidence[0].prompt_text, promptText);
+  assert.equal(group.shot_evidence[0].generation_type, "minimax_h3_fl2va");
+  assert.equal(group.shot_evidence[0].reference_inputs.length, 2);
+
+  await writeFile(path.join(sidecars, "exact-preview.json"), JSON.stringify({ ...shared, prompt_sha256: "0".repeat(64) }));
+  result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  group = result.groups.find((item) => item.sha256 === videoSha256);
+  assert.deepEqual(group.shot_evidence, []);
+  assert.equal(group.reported_status, null);
+});
+
+test("AI-VIDEO Experiments conditioning arm binds exact evaluation and Prompt but leaves references unevaluated without an upload receipt", async () => {
+  const paths = await fixture();
+  const experiment = path.join(paths.artifacts, "conditioning");
+  const outputs = path.join(experiment, "outputs");
+  const sidecars = path.join(experiment, "sidecars");
+  const workflows = path.join(experiment, "workflows");
+  const inputs = path.join(experiment, "inputs");
+  await Promise.all([
+    mkdir(outputs, { recursive: true }),
+    mkdir(sidecars, { recursive: true }),
+    mkdir(workflows, { recursive: true }),
+    mkdir(inputs, { recursive: true }),
+  ]);
+  const arm = "A_FL2VA_CURRENT_LAST";
+  const videoPath = path.join(outputs, `${arm}.mp4`);
+  const videoBytes = Buffer.from("conditioning arm video");
+  const firstPath = path.join(inputs, "first.png");
+  const lastPath = path.join(inputs, "last.png");
+  const firstBytes = pngBytes(768, 768, "conditioning-first");
+  const lastBytes = pngBytes(768, 768, "conditioning-last");
+  const promptText = "conditioning workflow prompt";
+  const workflow = {
+    "5": { class_type: "MiniMaxH3ImageToVideo", inputs: { prompt: promptText, first_frame: ["15", 0], last_frame: ["16", 0] } },
+    "15": { class_type: "LoadImage", inputs: { image: "upload/first.png" } },
+    "16": { class_type: "LoadImage", inputs: { image: "upload/last.png" } },
+  };
+  const workflowBytes = Buffer.from(JSON.stringify(workflow));
+  const workflowPath = path.join(workflows, `${arm}.submitted_workflow.json`);
+  await Promise.all([
+    writeFile(videoPath, videoBytes),
+    writeFile(firstPath, firstBytes),
+    writeFile(lastPath, lastBytes),
+    writeFile(workflowPath, workflowBytes),
+  ]);
+  const contract = {
+    schema: "ai-video-h3-conditioning-attribution/1",
+    arms: { [arm]: { mode: "FL2VA", workflow_sha256: sha256(workflowBytes) } },
+    inputs: {
+      first: { path: firstPath, sha256: sha256(firstBytes) },
+      current_last: { path: lastPath, sha256: sha256(lastBytes) },
+    },
+    fl2va_prompt_sha256: sha256(promptText),
+    i2va_prompt_sha256: sha256("unused"),
+  };
+  const evaluation = {
+    schema: "ai-video-h3-conditioning-arm-result/1",
+    arm,
+    video_path: videoPath,
+    video_sha256: sha256(videoBytes),
+    gate_verdict: "FAIL_STOP_BEFORE_NEXT_ARM",
+    human_verdict: "NOT_EVALUATED",
+    requirement_findings: [{ requirement_id: "conditioning.last_frame", verdict: "FAIL", reason: "endpoint drift" }],
+    human_findings: [{ requirement_id: "identity", verdict: "NOT_EVALUATED", note: "human review pending" }],
+  };
+  await Promise.all([
+    writeFile(path.join(sidecars, "experiment_contract.json"), JSON.stringify(contract)),
+    writeFile(path.join(sidecars, `${arm}.evaluation.json`), JSON.stringify(evaluation)),
+  ]);
+
+  let result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  let group = result.groups.find((item) => item.sha256 === evaluation.video_sha256);
+  const armEvidence = group.shot_evidence[0];
+  assert.equal(armEvidence.entity_kind, "experiment_arm");
+  assert.equal(armEvidence.shot_id, arm);
+  assert.equal(armEvidence.generation_type, "FL2VA");
+  assert.equal(armEvidence.prompt_text, promptText);
+  assert.equal(armEvidence.generation_result, "OUTPUT_RECORDED");
+  assert.equal(armEvidence.technical_gate, "FAIL_STOP_BEFORE_NEXT_ARM");
+  assert.equal(armEvidence.human_verdict, "NOT_EVALUATED");
+  assert.deepEqual(armEvidence.findings.map((finding) => finding.verdict), ["FAIL", "NOT_EVALUATED"]);
+  assert.deepEqual(armEvidence.reference_inputs, []);
+  assert.equal(armEvidence.reference_binding_status, "NOT_EVALUATED");
+  assert.match(armEvidence.reference_binding_reason, /upload receipt/i);
+
+  await writeFile(path.join(sidecars, "experiment_contract.json"), JSON.stringify({
+    ...contract,
+    arms: { [arm]: { ...contract.arms[arm], workflow_sha256: "f".repeat(64) } },
+  }));
+  result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  group = result.groups.find((item) => item.sha256 === evaluation.video_sha256);
+  assert.deepEqual(group.shot_evidence, []);
+  assert.equal(group.prompt_text, null);
+});
+
+test("conflicting verified experiment evidence for duplicate bytes is surfaced as ambiguous", async () => {
+  const paths = await fixture();
+  const sharedBytes = Buffer.from("same bytes, conflicting experiment claims");
+  const first = await writeM6Experiment(paths.artifacts, "m6-first", { videoBytes: sharedBytes, shotId: "shot-first" });
+  await writeM6Experiment(paths.artifacts, "m6-second", { videoBytes: sharedBytes, shotId: "shot-second" });
+
+  const result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  const group = result.groups.find((item) => item.sha256 === first.videoSha256);
+  assert.equal(group.locations.length, 2);
+  assert.equal(group.metadata_status, "ambiguous_verified_experiment_evidence");
+  assert.equal(group.association_ambiguity, true);
+  assert.deepEqual(group.shot_evidence, []);
+  assert.equal(group.prompt_text, null);
+  assert.equal(group.reported_status, null);
+  assert.equal(group.technical_gate, null);
+  assert.equal(group.human_verdict, null);
+});
+
+test("conflicting findings for otherwise identical experiment evidence are surfaced as ambiguous", async () => {
+  const paths = await fixture();
+  const sharedVideo = Buffer.from("same video and request, conflicting findings");
+  const sharedFirst = pngBytes(640, 360, "shared-first");
+  const sharedLast = pngBytes(640, 360, "shared-last");
+  const sharedOptions = {
+    videoBytes: sharedVideo,
+    shotId: "shot-shared",
+    promptText: "shared sealed prompt",
+    firstBytes: sharedFirst,
+    lastBytes: sharedLast,
+    assetIdPrefix: "shared-anchor",
+    requirementHash: sha256("shared-requirement"),
+    resolvedGenerationHash: sha256("shared-generation"),
+  };
+  const first = await writeM6Experiment(paths.artifacts, "findings-first", {
+    ...sharedOptions,
+    findingEvidence: "handoff remains visible",
+  });
+  await writeM6Experiment(paths.artifacts, "findings-second", {
+    ...sharedOptions,
+    findingEvidence: "handoff is occluded",
+  });
+
+  const result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  const group = result.groups.find((item) => item.sha256 === first.videoSha256);
+  assert.equal(group.metadata_status, "ambiguous_verified_experiment_evidence");
+  assert.equal(group.association_ambiguity, true);
+  assert.deepEqual(group.shot_evidence, []);
+  assert.equal(group.prompt_text, null);
+});
+
+test("unsafe experiment sidecar strings fail closed before reaching the public projection", async () => {
+  const paths = await fixture();
+  const unsafeAssetId = "safe-looking-asset-id";
+  const unsafeFinding = "证据路径：/home/operator/private/reference；媒体→/tmp/secret.mp4";
+  const evidence = await writeM6Experiment(paths.artifacts, "unsafe-public-text", {
+    assetIdPrefix: unsafeAssetId,
+    findingEvidence: unsafeFinding,
+  });
+
+  const result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  const group = result.groups.find((item) => item.sha256 === evidence.videoSha256);
+  const serialized = JSON.stringify(publicExternalMediaProjection(result));
+  assert.equal(group.metadata_status, "not_evaluated");
+  assert.deepEqual(group.shot_evidence, []);
+  assert.equal(group.prompt_text, null);
+  assert.equal(serialized.includes("/home/operator"), false);
+  assert.equal(serialized.includes("/tmp/secret.mp4"), false);
+});
+
+test("legacy M6 human_pass true/false/null keeps pass distinct from unevaluated", async () => {
+  const paths = await fixture();
+  const passed = await writeM6Experiment(paths.artifacts, "human-pass", { humanVerdict: null, humanPass: true });
+  const falseLegacy = await writeM6Experiment(paths.artifacts, "human-false", { humanVerdict: null, humanPass: false });
+  const nullLegacy = await writeM6Experiment(paths.artifacts, "human-null", { humanVerdict: null, humanPass: null });
+
+  const result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  const bySha = new Map(result.groups.map((group) => [group.sha256, group]));
+  assert.equal(bySha.get(passed.videoSha256).human_verdict, "PASS");
+  assert.equal(bySha.get(falseLegacy.videoSha256).human_verdict, "NOT_EVALUATED");
+  assert.equal(bySha.get(nullLegacy.videoSha256).human_verdict, "NOT_EVALUATED");
+});
+
+test("unknown schemas under the experiments source retain exact refs without gaining experiment semantics", async () => {
+  const paths = await fixture();
+  const videoPath = path.join(paths.artifacts, "unknown.mp4");
+  const videoBytes = Buffer.from("unknown experiment bytes");
+  await writeFile(videoPath, videoBytes);
+  await writeFile(path.join(paths.artifacts, "unknown.json"), JSON.stringify({
+    schema: "unknown-experiment/99",
+    output_path: videoPath,
+    sha256: sha256(videoBytes),
+    prompt: "must stay hidden",
+    status: "succeeded",
+  }));
+
+  const result = await catalogExternalMedia({ sources: experimentsSource(paths.artifacts) });
+  const group = result.groups[0];
+  assert.equal(group.metadata_status, "not_evaluated");
+  assert.deepEqual(group.shot_evidence, []);
+  assert.equal(group.prompt_text, null);
+  assert.equal(group.reported_status, null);
+  assert.deepEqual(group.evidence_refs, [{ source_id: "ai-video-experiments", relative_path: "unknown.json" }]);
 });

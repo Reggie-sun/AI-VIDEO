@@ -5,7 +5,7 @@ import { open, realpath } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 
-import { catalogExternalMedia } from "./external-media.mjs";
+import { catalogExternalMedia, publicExternalMediaProjection } from "./external-media.mjs";
 
 const execFileAsync = promisify(execFile);
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" };
@@ -130,9 +130,7 @@ function isLoopbackRequest(req) {
 }
 
 function publicProjection(value) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return value;
-  const { _media, ...safe } = value;
-  return safe;
+  return publicExternalMediaProjection(value);
 }
 
 function canonicalJson(value) {

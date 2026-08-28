@@ -19,6 +19,7 @@ import {
   externalSourceOptions,
   externalGroupTitle,
   externalMediaUrl,
+  externalReferenceUrl,
   externalStatus,
   externalStoryboardShots,
   groupMatchesQuery,
@@ -115,6 +116,56 @@ test("external storyboard falls back to exact Shot prompt when composition is em
     generation_type: "FL2VA",
     reported_status: "completed",
   }]);
+});
+
+test("external experiment evidence keeps Shot, references, prompt, and result layers together", () => {
+  const shotEvidence = {
+    entity_kind: "shot",
+    association_status: "verified_experiment_result_chain",
+    shot_id: "m6-shot-b",
+    intent: "女孩接过产品，老人穿过门离开。",
+    prompt_text: "sealed exact prompt",
+    generation_type: "image_to_video",
+    generation_result: "OUTPUT_RECORDED",
+    technical_gate: "PASS",
+    human_verdict: "NOT_EVALUATED",
+    reference_inputs: [{
+      role: "first_frame",
+      asset_id: "anchor-first",
+      sha256: "b".repeat(64),
+      token: "external_ai-video-experiments_reference_first",
+    }],
+    findings: [{ requirement_id: "causal_state", verdict: "PASS", evidence: "handoff visible" }],
+  };
+  const group = {
+    status: "NOT_EVALUATED",
+    reported_status: "OUTPUT_RECORDED",
+    shot_evidence: [shotEvidence],
+    locations: [{ relative_path: "outputs/shot-b.mp4" }],
+  };
+
+  assert.deepEqual(externalStoryboardShots(group), [shotEvidence]);
+  assert.equal(externalReferenceUrl(shotEvidence.reference_inputs[0]), "/api/external-media/media/external_ai-video-experiments_reference_first");
+  assert.equal(externalReferenceUrl({ token: "../../escape" }), null);
+  assert.equal(externalStatus(group).tone, "ready");
+  assert.equal(groupMatchesQuery(group, "handoff visible"), true);
+  assert.equal(groupMatchesQuery(group, "anchor-first"), true);
+});
+
+test("external experiment ambiguity stays fail-closed and visible", () => {
+  const status = externalStatus({
+    association_ambiguity: true,
+    reported_status: "OUTPUT_RECORDED",
+    shot_evidence: [],
+  });
+
+  assert.deepEqual(status, {
+    raw: "AMBIGUOUS_EXPERIMENT_EVIDENCE",
+    label: "证据关联冲突",
+    tone: "blocked",
+    evaluated: false,
+    ambiguous: true,
+  });
 });
 
 test("workspace selection guard rejects a late refresh commit", async () => {
@@ -533,8 +584,11 @@ test("external media catalog is parallel to runs, source-qualified, and never le
   const media = path.join(sourceRoot, "qingyan", "shot-01.mp4");
   const bytes = Buffer.from("external-video-bytes");
   const sha256 = createHash("sha256").update(bytes).digest("hex");
+  const reference = path.join(sourceRoot, "qingyan", "reference.png");
+  const referenceBytes = Buffer.from("exact-reference-image-bytes");
+  const referenceSha256 = createHash("sha256").update(referenceBytes).digest("hex");
   await mkdir(path.dirname(media), { recursive: true });
-  await writeFile(media, bytes);
+  await Promise.all([writeFile(media, bytes), writeFile(reference, referenceBytes)]);
   const calls = [];
   const projection = {
     status: "ok",
@@ -544,7 +598,12 @@ test("external media catalog is parallel to runs, source-qualified, and never le
       sha256,
       status: "NOT_EVALUATED",
       evidence_level: "non_canonical",
+      unsafe_note: `路径：${sourceRoot}`,
       locations: [{ source_id: "artifacts", relative_path: "qingyan/shot-01.mp4", token: "external_artifacts_token" }],
+      shot_evidence: [{
+        shot_id: "shot-01",
+        reference_inputs: [{ token: "external_artifacts_reference", sha256: referenceSha256 }],
+      }],
     }],
     _media: {
       external_artifacts_token: {
@@ -553,6 +612,13 @@ test("external media catalog is parallel to runs, source-qualified, and never le
         mime_type: "video/mp4",
         bytes: bytes.length,
         sha256,
+      },
+      external_artifacts_reference: {
+        source_id: "artifacts",
+        source_path: reference,
+        mime_type: "image/png",
+        bytes: referenceBytes.length,
+        sha256: referenceSha256,
       },
       external_unknown_token: {
         source_id: "unknown",
@@ -576,6 +642,7 @@ test("external media catalog is parallel to runs, source-qualified, and never le
   assert.equal(catalog.res.body.toString().includes(sourceRoot), false);
   assert.equal(catalog.res.body.toString().includes("source_path"), false);
   assert.equal(JSON.parse(catalog.res.body).groups[0].status, "NOT_EVALUATED");
+  assert.equal(JSON.parse(catalog.res.body).groups[0].unsafe_note, null);
   assert.equal(calls.length, 1);
   assert.equal(calls[0].sources[0].root, sourceRoot);
 
@@ -587,6 +654,11 @@ test("external media catalog is parallel to runs, source-qualified, and never le
   const head = await invoke(handler, request("HEAD", "/api/external-media/media/external_artifacts_token"));
   assert.equal(head.res.statusCode, 200);
   assert.equal(head.res.body.length, 0);
+
+  const referenceResponse = await invoke(handler, request("GET", "/api/external-media/media/external_artifacts_reference"));
+  assert.equal(referenceResponse.res.statusCode, 200);
+  assert.deepEqual(referenceResponse.res.body, referenceBytes);
+  assert.equal(referenceResponse.res.headers.get("content-type"), "image/png");
 
   const unknownSource = await invoke(handler, request("GET", "/api/external-media/media/external_unknown_token"));
   assert.equal(unknownSource.res.statusCode, 404);

@@ -401,6 +401,7 @@ function ExternalMediaDetail({ group, sources }) {
   const evidenceRefs = group.evidence_refs || [];
   const hasBoundMetadata = group.metadata_status && group.metadata_status !== "not_evaluated";
   const hasComposition = (group.composition?.ordered_shots?.length || 0) > 0;
+  const hasExactShotEvidence = (group.shot_evidence?.length || 0) > 0;
   return (
     <>
       <section className="external-detail-grid">
@@ -414,10 +415,10 @@ function ExternalMediaDetail({ group, sources }) {
           </div>
           <section className={`external-status-callout external-status-callout--${status.tone}`}>
             <StatusIcon tone={status.tone} size={21} />
-            <div><strong>{status.label}</strong><p>{status.evaluated ? "状态来自受支持且经 exact identity 绑定的证据链；它不是 Manifest attempt、candidate 或质量验收。" : "没有找到语义受支持且与 exact bytes 绑定的状态证据，因此不会把“文件存在”解释为生成成功。"}</p></div>
+            <div><strong>{status.label}</strong><p>{status.ambiguous ? "同一视频 bytes 关联到互相冲突的 verified experiment evidence；所有分镜、Prompt、References 与 verdict 均保持未绑定，需先核对 Evidence refs。" : status.evaluated ? "状态来自受支持且经 exact identity 绑定的证据链；它不是 Manifest attempt、candidate 或质量验收。" : "没有找到语义受支持且与 exact bytes 绑定的状态证据，因此不会把“文件存在”解释为生成成功。"}</p></div>
           </section>
           <ExternalShotBreakdown group={group} />
-          {!hasComposition && <section className="external-storyboard-card">
+          {!hasComposition && !hasExactShotEvidence && <section className="external-storyboard-card">
             <header><div><span>Shot / Prompt</span><h2>{group.shot_id || "Shot 未绑定"}</h2></div><span>{group.generation_type || group.shot_type || "类型未评估"}</span></header>
             <div className="external-prompt"><span>Prompt</span><p>{group.prompt_text || "没有与该视频 exact path / SHA 直接绑定的 Prompt；不会从文件名或相邻文本猜测。"}</p></div>
             <dl className="external-storyboard-facts">
@@ -450,7 +451,7 @@ function ExternalMediaDetail({ group, sources }) {
         <aside className="detail-aside external-detail-aside">
           <section className="detail-section"><h3>Exact file identity</h3><dl className="identity-list"><Fact label="SHA-256" value={group.sha256} /><Fact label="MIME" value={group.mime_type} /><Fact label="大小" value={formatBytes(group.bytes)} /><Fact label="物理副本" value={locations.length} /></dl></section>
           <section className="detail-section"><h3>判断边界</h3><p className={`evidence-state evidence-state--${status.tone}`}><span />{status.label}<br /><small>External evidence 不产生 candidate、P6、Final Acceptance 或 activation。</small></p></section>
-          <section className="detail-section"><h3>Evidence refs</h3>{evidenceRefs.length ? <div className="external-evidence-list">{evidenceRefs.map((ref, index) => <code key={`${typeof ref === "string" ? ref : ref?.relative_path || "evidence"}-${index}`}>{typeof ref === "string" ? ref : ref?.relative_path || ref?.kind || "已绑定 JSON evidence"}</code>)}</div> : <p className="external-no-evidence">没有可公开的 exact-bound sidecar reference。</p>}</section>
+          <section className="detail-section"><h3>Evidence refs</h3>{evidenceRefs.length ? <div className="external-evidence-list">{evidenceRefs.map((ref, index) => <code key={`${typeof ref === "string" ? ref : ref?.relative_path || "evidence"}-${index}`}>{typeof ref === "string" ? ref : [ref?.source_id, ref?.relative_path || ref?.kind].filter(Boolean).join(" · ") || "已绑定 JSON evidence"}</code>)}</div> : <p className="external-no-evidence">没有可公开的 exact-bound sidecar reference。</p>}</section>
           <section className="detail-section"><h3>与 runs 的关系</h3><p className="external-no-evidence">要判断 canonical attempt、历史 Shot snapshot、candidate 与 lifecycle，请在来源中选择“Runs 工作区”。外部媒体库不会补造缺失 Production state。</p></section>
         </aside>
       </section>

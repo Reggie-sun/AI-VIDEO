@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { constants } from "node:fs";
 import { lstat, open, realpath, readdir } from "node:fs/promises";
 import path from "node:path";
+import { EXPERIMENT_SOURCE_ID, experimentEvidenceForMedia, indexExperimentImages } from "./experiment-evidence.mjs";
 
 const VIDEO_MIME_TYPES = new Map([
   [".mp4", "video/mp4"],
@@ -30,6 +31,12 @@ const METADATA_ALIASES = Object.freeze({
   status: ["status", "state", "success"],
 });
 const BINDING_KEYS = new Set(["path", "file", "output_path", "local_path"]);
+const PRIVATE_PROJECTION_KEYS = new Set(["_media", "source_path", "source_root", "identity"]);
+const POSIX_ABSOLUTE_PATH = /(^|[^A-Za-z0-9_:/\\])\/(?!\/)[^\s"'`)\]},;]+/;
+const WINDOWS_ABSOLUTE_PATH = /(^|[^A-Za-z0-9_:/\\])(?:[A-Za-z]:[\\/]|\\\\)[^\s"'`)\]},;]+/;
+const SIGNED_URL = /\b(?:https?|s3):\/\/\S*[?&](?:x-amz-|x-goog-|signature=|sig=|token=|access[_-]?key|expires=)/i;
+const SECRET_TEXT = /\b(?:bearer\s+[A-Za-z0-9._~-]{12,}|(?:api[_-]?key|secret|access[_-]?token)\s*[:=]\s*\S+)/i;
+const TRACEBACK_TEXT = /Traceback \(most recent call last\):|(?:^|\n)\s*File\s+"[^"]+",\s+line\s+\d+|(?:^|\n)\s*at\s+\S+\s+\([^\n)]+:\d+:\d+\)/;
 
 function containedPath(root, candidate) {
   return candidate === root || candidate.startsWith(`${root}${path.sep}`);
@@ -187,15 +194,17 @@ function hasDirectBinding(value, sidecarPath, media) {
   return Object.values(value).some((child) => hasDirectBinding(child, sidecarPath, media));
 }
 
-async function metadataForMedia(sidecars, media, limits) {
+async function metadataForMedia(sidecars, media, limits, experimentImages) {
   const metadata = {};
   const evidenceRefs = [];
+  const parsedSidecars = [];
   let verifiedChain = null;
   let composition = null;
   for (const sidecarPath of sidecars) {
     try {
       const parsed = await readSidecarObject(sidecarPath, limits, media.source_root);
       if (!parsed) continue;
+      parsedSidecars.push({ path: sidecarPath, value: parsed });
       if (hasDirectBinding(parsed, sidecarPath, media)) {
         evidenceRefs.push(path.relative(media.source_root, sidecarPath).split(path.sep).join("/"));
         if (media.source_kind === "external_project_asset" && path.basename(sidecarPath) === "result.json") {
@@ -215,11 +224,21 @@ async function metadataForMedia(sidecars, media, limits) {
       // Sidecars are advisory. Their parse errors are deliberately not projected.
     }
   }
+  const experimentChain = media.source_id === EXPERIMENT_SOURCE_ID
+    ? await experimentEvidenceForMedia(parsedSidecars, media, limits, experimentImages, experimentEvidenceHelpers)
+    : null;
+  const selectedChain = experimentChain || verifiedChain;
   return {
-    metadata: { ...metadata, ...(verifiedChain?.metadata || {}) },
-    metadata_status: verifiedChain?.status || (Object.keys(metadata).length ? "bound" : "not_evaluated"),
-    evidence_refs: [...new Set([...evidenceRefs, ...(verifiedChain?.evidence_refs || [])])].sort(),
+    metadata: { ...metadata, ...(selectedChain?.metadata || {}) },
+    metadata_status: selectedChain?.status || (Object.keys(metadata).length ? "bound" : "not_evaluated"),
+    evidence_refs: [...new Set([...evidenceRefs, ...(selectedChain?.evidence_refs || [])])].sort(),
     composition,
+    shot_evidence: selectedChain?.shot_evidence || [],
+    technical_gate: selectedChain?.technical_gate ?? null,
+    human_verdict: selectedChain?.human_verdict ?? null,
+    experiment_signature: selectedChain?.experiment_signature || null,
+    association_ambiguity: selectedChain?.association_ambiguity === true,
+    reference_descriptors: selectedChain?.reference_descriptors || {},
   };
 }
 
@@ -463,6 +482,7 @@ async function scanSource(source, limits) {
     return { source: publicSource(source, "unavailable"), records: [] };
   }
   const files = await walkRoot(root, limits);
+  const experimentImages = await indexExperimentImages(files, root, sourceId, experimentEvidenceHelpers);
   const sidecars = files
     .filter((file) => path.extname(file).toLowerCase() === ".json")
     .slice(0, limits.maxSidecarsPerRoot);
@@ -482,7 +502,18 @@ async function scanSource(source, limits) {
         mime_type,
         ...inspected,
       };
-      const { metadata, metadata_status, evidence_refs, composition } = await metadataForMedia(sidecars, media, limits);
+      const {
+        metadata,
+        metadata_status,
+        evidence_refs,
+        composition,
+        shot_evidence,
+        technical_gate,
+        human_verdict,
+        experiment_signature,
+        association_ambiguity,
+        reference_descriptors,
+      } = await metadataForMedia(sidecars, media, limits, experimentImages);
       records.push({
         ...media,
         source_label: sourceLabel,
@@ -490,6 +521,12 @@ async function scanSource(source, limits) {
         metadata_status,
         evidence_refs: [...new Set([...evidence_refs, ...(composition?.evidence_refs || [])])].sort(),
         composition,
+        shot_evidence,
+        technical_gate,
+        human_verdict,
+        experiment_signature,
+        association_ambiguity,
+        reference_descriptors,
       });
     } catch {
       // A file that changes while being inspected is omitted rather than guessed.
@@ -511,6 +548,13 @@ function externalToken(record) {
   return token.slice(0, 128);
 }
 
+const experimentEvidenceHelpers = Object.freeze({
+  inspectMedia,
+  readBoundPrompt,
+  externalToken,
+  relativeLocation,
+});
+
 function groupProjection(records) {
   const bySha = new Map();
   for (const record of records) {
@@ -526,7 +570,11 @@ function groupProjection(records) {
       return compareRecords(left, right);
     });
     const preview = duplicates[0];
-    const metadataSource = duplicates.find((record) => record.metadata_status.startsWith("verified_"))
+    const experimentSignatures = new Set(duplicates.map((record) => record.experiment_signature).filter(Boolean));
+    const associationAmbiguity = duplicates.some((record) => record.association_ambiguity) || experimentSignatures.size > 1;
+    const experimentSource = associationAmbiguity ? null : duplicates.find((record) => record.experiment_signature);
+    const metadataSource = experimentSource
+      || duplicates.find((record) => record.metadata_status.startsWith("verified_"))
       || duplicates.find((record) => record.metadata_status === "bound")
       || preview;
     const compositionSource = duplicates.find((record) => record.composition);
@@ -543,6 +591,7 @@ function groupProjection(records) {
           sha256: record.sha256,
           identity: record.identity,
         };
+        if (!associationAmbiguity) Object.assign(media, record.reference_descriptors || {});
         return {
           source_id: record.source_id,
           source_label: record.source_label,
@@ -570,18 +619,22 @@ function groupProjection(records) {
         ...relativeLocation(preview.source_root, preview.source_path),
       },
       locations,
-      metadata: metadataSource.metadata,
-      metadata_status: metadataSource.metadata_status,
-      prompt_text: metadataSource.metadata.prompt ?? null,
-      shot_id: metadataSource.metadata.shot ?? null,
-      shot_type: metadataSource.metadata.shot_type ?? null,
-      generation_type: metadataSource.metadata.generation_type ?? null,
-      reported_status: metadataSource.metadata.status ?? null,
+      metadata: associationAmbiguity ? {} : metadataSource.metadata,
+      metadata_status: associationAmbiguity ? "ambiguous_verified_experiment_evidence" : metadataSource.metadata_status,
+      prompt_text: associationAmbiguity ? null : (metadataSource.metadata.prompt ?? null),
+      shot_id: associationAmbiguity ? null : (metadataSource.metadata.shot ?? null),
+      shot_type: associationAmbiguity ? null : (metadataSource.metadata.shot_type ?? null),
+      generation_type: associationAmbiguity ? null : (metadataSource.metadata.generation_type ?? null),
+      reported_status: associationAmbiguity ? null : (metadataSource.metadata.status ?? null),
       evidence_refs: [...new Map(duplicates
         .flatMap((record) => record.evidence_refs.map((relative_path) => ({ source_id: record.source_id, relative_path })))
         .map((reference) => [`${reference.source_id}/${reference.relative_path}`, reference])).values()]
         .sort((left, right) => `${left.source_id}/${left.relative_path}`.localeCompare(`${right.source_id}/${right.relative_path}`)),
       composition: compositionSource?.composition || null,
+      shot_evidence: associationAmbiguity ? [] : (metadataSource.shot_evidence || []),
+      technical_gate: associationAmbiguity ? null : (metadataSource.technical_gate ?? null),
+      human_verdict: associationAmbiguity ? null : (metadataSource.human_verdict ?? null),
+      association_ambiguity: associationAmbiguity,
       generation_status: "NOT_EVALUATED",
       lifecycle_status: "NOT_EVALUATED",
       evidence_classification: "non_canonical",
@@ -596,9 +649,22 @@ function groupProjection(records) {
 }
 
 export function publicExternalMediaProjection(value) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return value;
-  const { _media, ...safe } = value;
-  return safe;
+  if (typeof value === "string") {
+    if (
+      value.includes("\0")
+      || POSIX_ABSOLUTE_PATH.test(value)
+      || WINDOWS_ABSOLUTE_PATH.test(value)
+      || SIGNED_URL.test(value)
+      || SECRET_TEXT.test(value)
+      || TRACEBACK_TEXT.test(value)
+    ) return null;
+    return value;
+  }
+  if (Array.isArray(value)) return value.map(publicExternalMediaProjection);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(Object.entries(value)
+    .filter(([key]) => !PRIVATE_PROJECTION_KEYS.has(key))
+    .map(([key, item]) => [key, publicExternalMediaProjection(item)]));
 }
 
 export async function catalogExternalMedia({ sources = [], limits = {} } = {}) {
