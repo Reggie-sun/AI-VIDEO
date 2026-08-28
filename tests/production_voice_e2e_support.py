@@ -132,7 +132,7 @@ def make_deterministic_voice_candidate_preparer(
             duration_samples=probe.duration_samples,
             speaker_id=request.speaker_id,
         )
-        style_bytes = b'{"font_family":"Fixture Sans","schema_version":"1"}'
+        style_bytes = b'{"font_family":"Inter","schema_version":"1"}'
         style_hash = hashlib.sha256(style_bytes).hexdigest()
         style = CaptionStyleReference(
             artifact_id="caption-style-e2e",

@@ -380,13 +380,47 @@ def test_p4_source_materializes_exact_audio_caption_and_style_bindings(tmp_path)
     assert "<audio" in source
     assert source.count("<audio") == 1 and 'data-volume="1"' in source
     assert "data-caption-track-id" in source
-    assert 'font-family:"Fixture Sans"' in source
+    assert 'font-family:"Inter"' in source
     assert "top:auto" in source
     assert "width:90%" in source
     assert "background:transparent" in source
     assert "#00ffff" not in source.lower()
     assert "http://" not in source and "https://" not in source
     assert "Remotion" not in source and "Captions.ai" not in source
+
+
+def test_p4_source_rejects_caption_font_outside_pinned_renderer_contract(tmp_path):
+    _, spec, timeline, sources = _p4_resolved_inputs(tmp_path)
+    style = spec.caption_tracks[0].style_reference
+    assert style is not None
+    unsupported_style = b'{"font_family":"Fixture Sans","schema_version":"1"}'
+    unsupported_style_hash = hashlib.sha256(unsupported_style).hexdigest()
+    unsupported_style_path = tmp_path / "unsupported-caption-style.json"
+    unsupported_style_path.write_bytes(unsupported_style)
+    sources[style.artifact_id] = unsupported_style_path
+    unsupported_timeline = _reseal_timeline(
+        timeline,
+        caption_cues=tuple(
+            cue.model_copy(
+                update={"style_content_hash": unsupported_style_hash}
+            )
+            for cue in timeline.caption_cues
+        ),
+    )
+    staging_root = tmp_path / "staging-p4-unsupported-font"
+
+    with pytest.raises(AiVideoError) as caught:
+        materialize_hyperframes_source(
+            unsupported_timeline,
+            asset_sources=sources,
+            allowed_asset_root=tmp_path,
+            staging_root=staging_root,
+            allowed_staging_parent=tmp_path,
+        )
+
+    assert caught.value.code is ErrorCode.RENDERER_SOURCE_INVALID
+    assert "not supported by the pinned HyperFrames renderer" in str(caught.value)
+    assert not staging_root.exists()
 
 
 def test_p4_audit_keeps_legacy_caption_source_readable(tmp_path):
@@ -3014,15 +3048,27 @@ def test_p4_production_renderer_gate_renders_resolved_audio_and_captions(
     ]
     assert resolved_intervals == [[0, 12], [13, 24]]
     sampled_frames = (0, 11, 12, 13, 23, 24)
-    pixels: dict[int, tuple[int, int, int]] = {}
+    light_pixel_counts: dict[int, int] = {}
     try:
         held = f"/proc/self/fd/{descriptor}"
         for frame in sampled_frames:
             pixel = subprocess.run(
                 [
-                    str(ffmpeg), "-v", "error", "-i", held,
-                    "-vf", f"select=eq(n\\,{frame}),format=rgb24,crop=1:1:64:650",
-                    "-frames:v", "1", "-f", "rawvideo", "-",
+                    str(ffmpeg),
+                    "-v",
+                    "error",
+                    "-i",
+                    held,
+                    "-vf",
+                    (
+                        f"select=eq(n\\,{frame}),format=rgb24,"
+                        "crop=640:120:320:560"
+                    ),
+                    "-frames:v",
+                    "1",
+                    "-f",
+                    "rawvideo",
+                    "-",
                 ],
                 shell=False,
                 stdin=subprocess.DEVNULL,
@@ -3034,8 +3080,12 @@ def test_p4_production_renderer_gate_renders_resolved_audio_and_captions(
                 timeout=120,
             )
             assert pixel.returncode == 0, pixel.stderr.decode(errors="replace")
-            assert len(pixel.stdout) == 3
-            pixels[frame] = tuple(pixel.stdout)  # type: ignore[assignment]
+            assert len(pixel.stdout) == 640 * 120 * 3
+            light_pixel_counts[frame] = sum(
+                1
+                for index in range(0, len(pixel.stdout), 3)
+                if min(pixel.stdout[index : index + 3]) > 180
+            )
     finally:
         os.close(descriptor)
     expected_presence = {
@@ -3047,8 +3097,7 @@ def test_p4_production_renderer_gate_renders_resolved_audio_and_captions(
         24: False,
     }
     for frame, present in expected_presence.items():
-        cyan = pixels[frame][1] > 180 and pixels[frame][2] > 180
-        assert cyan is present
+        assert (light_pixel_counts[frame] > 20) is present
     boundary_evidence = [
         {"boundary": "cue-1-start", "frame": 0, "present": True},
         {"boundary": "cue-1-end-before", "frame": 11, "present": True},
@@ -3060,13 +3109,16 @@ def test_p4_production_renderer_gate_renders_resolved_audio_and_captions(
         {"boundary": "after-final", "frame": 24, "present": False},
     ]
     for item in boundary_evidence:
-        item["rgb"] = list(pixels[item["frame"]])
+        item["light_pixel_count"] = light_pixel_counts[item["frame"]]
     evidence(
         "caption-frames.json",
         {
             "resolved_half_open_frames": resolved_intervals,
             "boundary_samples": boundary_evidence,
-            "pixels_rgb": {str(key): list(value) for key, value in pixels.items()},
+            "caption_crop": {"x": 320, "y": 560, "width": 640, "height": 120},
+            "light_pixel_counts": {
+                str(key): value for key, value in light_pixel_counts.items()
+            },
             "held_fd": True,
         },
     )

@@ -830,9 +830,7 @@ def _base_ai_comic_voice_candidate_preparer(
         )
         assert candidate.caption is not None
         assert candidate.caption_asset_record is not None
-        style_bytes = (
-            b'{"font_family":"Base AI Comic Sans","schema_version":"1"}'
-        )
+        style_bytes = b'{"font_family":"Inter","schema_version":"1"}'
         style_hash = hashlib.sha256(style_bytes).hexdigest()
         base_style = candidate.caption.style_reference
         assert base_style is not None

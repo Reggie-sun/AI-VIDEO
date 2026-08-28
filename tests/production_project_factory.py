@@ -1007,7 +1007,7 @@ def make_p4_composition_fixture(
         audio_assets.append(asset)
         asset_paths[asset_id] = path
 
-    style_bytes = b'{"font_family":"Fixture Sans","schema_version":"1"}'
+    style_bytes = b'{"font_family":"Inter","schema_version":"1"}'
     style_hash = hashlib.sha256(style_bytes).hexdigest()
     style_path = root / "assets/styles" / f"{style_hash}.json"
     style_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1262,7 +1262,7 @@ def make_p5_selective_rebuild_fixture(root: Path):
     )
     assert source_audio.audio_metadata is not None
 
-    style_bytes = b'{"font_family":"Fixture Serif","schema_version":"1"}'
+    style_bytes = b'{"font_family":"EB Garamond","schema_version":"1"}'
     style_hash = hashlib.sha256(style_bytes).hexdigest()
     style_path = root / "assets/styles" / f"{style_hash}.json"
     style_path.write_bytes(style_bytes)
@@ -2192,7 +2192,7 @@ def make_audio_import_upgrade_request(
             alignment_receipt_id=f"alignment-{attempt_id}",
         ),
     )
-    style_bytes = b'{"font_family":"Fixture Sans","schema_version":"1"}'
+    style_bytes = b'{"font_family":"Inter","schema_version":"1"}'
     style_hash = hashlib.sha256(style_bytes).hexdigest()
     style = CaptionStyleReference(
         artifact_id=f"style-{attempt_id}",

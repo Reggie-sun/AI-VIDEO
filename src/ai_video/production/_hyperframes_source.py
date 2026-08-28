@@ -20,6 +20,43 @@ class HyperFramesSourceError(ValueError):
     pass
 
 
+_PINNED_HYPERFRAMES_FONT_FAMILIES = frozenset(
+    {
+        "archivo black",
+        "cursive",
+        "eb garamond",
+        "emoji",
+        "fangsong",
+        "fantasy",
+        "ibm plex mono",
+        "inter",
+        "jetbrains mono",
+        "lato",
+        "league gothic",
+        "math",
+        "monospace",
+        "montserrat",
+        "noto sans jp",
+        "nunito",
+        "open sans",
+        "oswald",
+        "outfit",
+        "playfair display",
+        "poppins",
+        "roboto",
+        "sans-serif",
+        "serif",
+        "source code pro",
+        "space mono",
+        "system-ui",
+        "ui-monospace",
+        "ui-rounded",
+        "ui-sans-serif",
+        "ui-serif",
+    }
+)
+
+
 def seconds(frame_count: int, fps: int) -> str:
     value = Decimal(frame_count) / Decimal(fps)
     rendered = format(value.quantize(Decimal("0.000000001")), "f")
@@ -371,6 +408,11 @@ def _caption_style_css(style_hash: str, style: Mapping[str, object]) -> str:
         or any(ord(character) < 32 for character in font_family)
     ):
         raise HyperFramesSourceError("Caption style font_family is invalid.")
+    if font_family.casefold() not in _PINNED_HYPERFRAMES_FONT_FAMILIES:
+        raise HyperFramesSourceError(
+            "Caption style font_family is not supported by the pinned "
+            "HyperFrames renderer."
+        )
     font_size = integer("font_size_px", 24, 8, 200)
     bottom = integer("bottom_margin_px", 52, 0, 500)
     max_width = integer("max_width_milli", 900, 100, 1000)
