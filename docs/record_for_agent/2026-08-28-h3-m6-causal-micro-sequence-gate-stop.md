@@ -2,6 +2,63 @@
 
 Date: 2026-08-28
 
+## HUMAN Playback And Baseline Regression Supersession — 2026-08-28
+
+用户已对 exact `15.5s` assembly SHA-256
+`c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 完成实际观看，并给出明确结论：
+“这个视频根本看不了”，且指出它明显差于
+`/home/reggie/电商图片/青颜/青颜视频_20260824/raw/` 的原始视频。该 evidence 关闭了下方
+`human_verdict=NOT_EVALUATED` stop：当前 `HUMAN watchability=FAIL`、`commercial-quality baseline=FAIL`、
+`assembly acceptance=FAIL`。M6 不得据此进入 `30s` assembly、M7–M9、qualification、P6、Final Acceptance、
+Production qualification、commercial acceptance 或 release。
+
+历史 `technical_status=PASS_WITH_CONCERNS` 只在 container/full-decode/stream-structure proof layer 继续有效；
+三条 Shot Gate 的六项 `PASS` 也只保留为当时基于 sampled frames、endpoint support、metadata、ASR 与 narrow
+causal-state checklist 的 technical evidence。它们没有完成 uninterrupted `1.0x` full-speed/full-audio human
+playback，不能证明自然表演、商业观感、剪辑节奏、视觉精度或可观看性。尤其是历史
+`intent/performance` 与 `readability` prose 曾把 sampled-frame evidence 写成“`1.0x` cadence 可读/自然”，这是超出
+evidence 能力的 adjudication；在 assembled human-playback layer 上，该结论现已被 `FAIL` 取代。
+
+### Verified Regression Evidence
+
+- Exact assembly 是 `768x768`、H.264 High、`372 frames`、video bitrate `2,096,923 bps`；project-local
+  `video_review` 报告 high-severity `low_resolution` issue。它只包含原始 `1344x768` 横屏画面的约
+  `57.14%` pixel count。
+- 原始青颜 `raw` 目录的七条 exact MP4 均为 `1344x768`、`124 frames`、约 `5.167s`；video bitrate 范围为
+  `2,543,467–5,666,827 bps`。对 `shot01_seed240801.mp4`、`shot04_seed240804.mp4` 与
+  `shot06_seed240806.mp4` 的 sampled visual comparison 显示更清晰的横屏构图、更多环境层次、自然 camera /
+  actor motion 与更强的商业观看能量；generic `video_review` 未报告 assembly 的 `low_resolution` issue。
+- Assembly 使用三条 `768x768` locked-camera / first-last-anchor H3 Shot，以同一稀疏房间和近似构图硬切；画面
+  带 vertical side-fill，表演与 blocking 僵硬，coverage、editorial rhythm 与 commercial art direction 均没有被
+  prior Gate 约束。
+- Stream-copy assembly 没有制造上述视觉退化；它原样保留了上游三个 source Shot。A→B 与 B→C 的
+  non-monotonic audio DTS、video `0.031006s` late start 与约 `0.032s` A/V duration delta 仍是额外 concern，
+  但不是主要视觉失败根因。
+- Generic scene detector 对 hard-cut assembly 仍返回 one scene，证明该 automatic signal 不足以承担 semantic
+  edit acceptance；它不得替代 full-speed human playback。
+
+### Corrected Smallest Owner And Next Step
+
+当前 smallest owner 不再是 concat/remux，也不是继续修 Shot C terminal anchor。失败位于上游 experiment design
+与 Gate coverage：`768x768` square output、locked first/last anchors、locked same-camera composition 与 narrow
+causal checklist 为状态连续性牺牲了原始素材的画质、构图、运动、表演和商业观感，而 Gate 没有设置
+raw-baseline regression floor。
+
+本 lane 现在停止；不得 repair/retry 当前 assembly，也不得把它扩展为 `30s`。若未来重新进入 M6，必须先以
+原始青颜 `1344x768` raw clips 建立显式 quality floor，并在任何进一步 assembly 前对每条新 Shot 执行：
+
+1. 与 exact raw baseline side-by-side 的 uninterrupted `1.0x` full-speed/full-audio human review；
+2. natural performance、composition、camera/motion、image fidelity、commercial readability 与 pacing 的独立
+   requirement-level Gate；
+3. 任一关键维度低于 baseline 即 `FAIL`，不得由 causal-state、endpoint SSIM、decode PASS 或 compatible
+   conditioning 抵消。
+
+本次诊断没有生成、编辑、重试或删除媒体，没有调用 H3 / ComfyUI / Provider，也没有改变任何 repo-external
+artifact。Automatic learning evaluation outcome 为 `no_candidate`：当前只有一个 failed assembly 与一个
+多变量 raw-vs-experiment comparison，无法隔离 resolution、anchor、camera、performance 与 edit coverage 中任一
+变量的独立 causal effect；现有 learning claims 也没有同一 scoped claim 可由本 evidence 直接更新。不得把这个
+single case 扩张成 Provider-wide 或 model-wide rule。
+
 ## Authorization Policy Supersession — 2026-08-28
 
 本记录各 V1–V6 section 的 exact preview、authorization sidecar、call ceiling 与实际 call count 继续作为
