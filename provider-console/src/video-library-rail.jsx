@@ -15,14 +15,26 @@ import {
   resolveVideoSourceSelection,
   videoSourceIsRefreshing,
   videoSourceSelectionValue,
-  workspaceSourceValue,
 } from "./video-library-source-contract.js";
 
-function workspaceLabel(item) {
-  if (!item?.workspace) return "未知工作区";
-  const prefix = `${item.run_id}/`;
-  const suffix = item.workspace.startsWith(prefix) ? item.workspace.slice(prefix.length) : item.workspace;
-  return suffix === "project.yaml" || suffix === "manifest.json" ? item.run_id : `${item.run_id} · ${suffix.replace(/\/project\.yaml$/, "")}`;
+function workspaceDirectory(item) {
+  return item?.run_id || String(item?.workspace || "").split("/")[0] || "未知工作区";
+}
+
+function workspaceDetail(item) {
+  const directory = workspaceDirectory(item);
+  const prefix = `${directory}/`;
+  return item?.workspace?.startsWith(prefix) ? item.workspace.slice(prefix.length) : (item?.workspace || "workspace 未标注");
+}
+
+function WorkspaceOption({ item, selected, disabled, onSelect }) {
+  const kind = String(item?.kind || "workspace").toUpperCase();
+  return (
+    <button type="button" aria-pressed={selected} className={`lane-option${selected ? " is-selected" : ""}`} disabled={disabled} onClick={() => onSelect(item.workspace)}>
+      <span className="lane-option-top"><strong>{workspaceDirectory(item)}</strong><span className="provider-badge provider-badge--unknown">{kind}</span><span className={`lane-radio${selected ? " is-checked" : ""}`} /></span>
+      <span className="lane-option-sub">{workspaceDetail(item)}</span>
+    </button>
+  );
 }
 
 export function VideoLibraryRail({
@@ -56,14 +68,12 @@ export function VideoLibraryRail({
     : [];
   const visible = sourceGroups.filter((group) => groupMatchesQuery(group, query));
   const sourceOptions = externalSourceOptions(externalCatalog).slice(1);
-  const selectedSourceValue = videoSourceSelectionValue(selectedSource, workspace);
-  const workspaceUnavailable = selectedSource === "runs"
-    && workspace
-    && !runsCatalog.some((item) => item.workspace === workspace);
+  const selectedSourceValue = videoSourceSelectionValue(selectedSource);
+  const currentWorkspace = runsCatalog.find((item) => item.workspace === workspace);
+  const otherWorkspaces = runsCatalog.filter((item) => item.workspace !== workspace);
   const changeSource = (value) => {
-    const selection = resolveVideoSourceSelection(value, runsCatalog);
-    if (selection.workspace) onWorkspace(selection.workspace);
-    else onSource(selection.sourceId);
+    const selection = resolveVideoSourceSelection(value);
+    onSource(selection.sourceId);
   };
   const refreshing = videoSourceIsRefreshing(selectedSource, runsLoading, externalLoading);
   const liveLabel = liveStatus === "live"
@@ -82,12 +92,8 @@ export function VideoLibraryRail({
         <div className="external-filter-heading"><label htmlFor="video-source-select">来源</label><button type="button" onClick={onRefresh} disabled={refreshing} aria-label="刷新当前视频来源"><ArrowsClockwise size={15} className={refreshing ? "is-spinning" : ""} /></button></div>
         <select id="video-source-select" name="video-source" value={selectedSourceValue} onChange={(event) => changeSource(event.target.value)} aria-label="选择视频来源">
           <option value="all">全部视频来源</option>
-          <optgroup label="Runs 工作区">
-            {!runsCatalog.length && <option value={workspaceSourceValue("")} disabled>暂无工作区</option>}
-            {workspaceUnavailable && <option value={workspaceSourceValue(workspace)} disabled>{workspace} · 当前不可用</option>}
-            {runsCatalog.map((item) => <option key={item.workspace} value={workspaceSourceValue(item.workspace)} disabled={runsLoading}>{workspaceLabel(item)}</option>)}
-          </optgroup>
-          <optgroup label="外部视频来源">
+          <optgroup label="视频目录">
+            <option value="runs">Runs</option>
             {sourceOptions.map((option) => <option key={option.id} value={option.id} disabled={option.disabled}>{option.label}</option>)}
           </optgroup>
         </select>
@@ -95,7 +101,8 @@ export function VideoLibraryRail({
       {showExternal && <label className="external-search" htmlFor="external-media-search"><span>筛选视频</span><input id="external-media-search" name="external-media-search" type="search" value={query} onChange={(event) => onQuery(event.target.value)} placeholder="文件名 / Shot / Prompt" /><small>{visible.length} / {sourceGroups.length} unique SHA</small></label>}
       {showExternal && externalError && <div className="rail-stale-warning" role="status"><WarningCircle size={16} weight="fill" /><span>刷新失败；当前外部视频列表可能已过期。</span></div>}
       <div className="lane-list external-group-list" aria-label="视频与生成尝试列表">
-        {showRuns && <div className="rail-section-heading"><span>RUNS · 当前工作区</span><b>{attempts.length} attempts</b></div>}
+        {selectedSource === "runs" && currentWorkspace && <><div className="rail-section-heading"><span>RUNS · 当前工作区</span><b>目录详情</b></div><WorkspaceOption item={currentWorkspace} selected={activeSurface === "runs"} disabled={runsLoading} onSelect={onWorkspace} /></>}
+        {showRuns && <div className="rail-section-heading"><span>RUNS · 当前工作区记录</span><b>{attempts.length} attempts</b></div>}
         {showRuns && attempts.map((attempt, index) => {
           const id = attemptId(attempt, index);
           const provider = providerOf(attempt);
@@ -114,6 +121,8 @@ export function VideoLibraryRail({
         {showRuns && !runsLoading && !attempts.length && (runsError
           ? <div className="rail-empty rail-empty--error"><WarningCircle size={18} weight="fill" /><span>该工作区未通过 strict reopen；右侧显示稳定错误码。</span></div>
           : <div className="rail-empty"><CheckCircle size={18} weight="fill" /><span>当前工作区没有 video generation attempt；右侧仍展示 Project 全部 Shots。</span></div>)}
+        {selectedSource === "runs" && <div className="rail-section-heading"><span>RUNS · 其他工作区</span><b>{otherWorkspaces.length} directories</b></div>}
+        {selectedSource === "runs" && otherWorkspaces.map((item) => <WorkspaceOption key={item.workspace} item={item} selected={false} disabled={runsLoading} onSelect={onWorkspace} />)}
         {showExternal && <div className="rail-section-heading"><span>EXTERNAL · SHA 去重</span><b>{visible.length} videos</b></div>}
         {showExternal && visible.map((group) => {
           const status = externalStatus(group);

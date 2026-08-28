@@ -47,29 +47,25 @@ import {
   resolveVideoSourceSelection,
   videoSourceIsRefreshing,
   videoSourceSelectionValue,
-  workspaceSourceValue,
 } from "../src/video-library-source-contract.js";
 
-test("video source selection represents each Runs workspace in the single source control", () => {
+test("video source selection stays directory-level while Runs workspace selection stays below it", () => {
   const runsCatalog = [
     { workspace: "run-a/project.yaml", run_id: "run-a" },
     { workspace: "run-b/manifest.json", run_id: "run-b" },
   ];
 
   assert.equal(videoSourceSelectionValue("all", "run-a/project.yaml"), "all");
-  assert.equal(
-    videoSourceSelectionValue("runs", "run-a/project.yaml"),
-    workspaceSourceValue("run-a/project.yaml"),
-  );
-  assert.deepEqual(
-    resolveVideoSourceSelection(workspaceSourceValue("run-b/manifest.json"), runsCatalog),
-    { sourceId: "runs", workspace: "run-b/manifest.json" },
-  );
+  assert.equal(videoSourceSelectionValue("runs", "run-a/project.yaml"), "runs");
+  assert.deepEqual(resolveVideoSourceSelection("runs", runsCatalog), {
+    sourceId: "runs",
+    workspace: null,
+  });
   assert.deepEqual(resolveVideoSourceSelection("comfyui-output", runsCatalog), {
     sourceId: "comfyui-output",
     workspace: null,
   });
-  assert.deepEqual(resolveVideoSourceSelection(workspaceSourceValue("missing/project.yaml"), runsCatalog), {
+  assert.deepEqual(resolveVideoSourceSelection("runs-workspace:missing/project.yaml", runsCatalog), {
     sourceId: "runs",
     workspace: null,
   });
@@ -88,8 +84,8 @@ test("video library rail renders one unified source selector", async () => {
   try {
     const { VideoLibraryRail } = await server.ssrLoadModule("/src/video-library-rail.jsx");
     const markup = renderToStaticMarkup(React.createElement(VideoLibraryRail, {
-      runsCatalog: [{ workspace: "run-a/project.yaml", run_id: "run-a" }],
-      workspace: "run-a/project.yaml",
+      runsCatalog: [{ workspace: "run-a/shot-01/production/project.yaml", run_id: "run-a", kind: "production" }],
+      workspace: "run-a/shot-01/production/project.yaml",
       attempts: [],
       selectedId: "",
       runsLoading: false,
@@ -115,11 +111,13 @@ test("video library rail renders one unified source selector", async () => {
 
     assert.equal((markup.match(/<select/g) || []).length, 1);
     assert.match(markup, /id="video-source-select"/);
-    assert.match(markup, /<optgroup label="Runs 工作区">/);
-    assert.match(markup, /<optgroup label="外部视频来源">/);
+    assert.match(markup, /<optgroup label="视频目录">/);
     assert.match(markup, /<option value="all"[^>]*>全部视频来源<\/option>/);
+    assert.match(markup, /<option value="runs"[^>]*>Runs<\/option>/);
     assert.match(markup, /<option value="comfyui-output"[^>]*>ComfyUI Output<\/option>/);
-    assert.doesNotMatch(markup, /全部视频来源 ·|ComfyUI Output ·|run-a · 0/);
+    const sourceSelector = markup.match(/<select id="video-source-select"[\s\S]*?<\/select>/)?.[0] || "";
+    assert.doesNotMatch(sourceSelector, /run-a|shot-01|project\.yaml|runs-workspace:/);
+    assert.doesNotMatch(sourceSelector, /全部视频来源 ·|ComfyUI Output ·/);
     assert.doesNotMatch(markup, /workspace-select|workspace-picker/);
 
     const staleMarkup = renderToStaticMarkup(React.createElement(VideoLibraryRail, {
@@ -144,8 +142,41 @@ test("video library rail renders one unified source selector", async () => {
       onQuery() {},
       onRefresh() {},
     }));
-    assert.match(staleMarkup, /run-a\/project.yaml · 当前不可用/);
+    assert.match(staleMarkup, /<option value="runs"[^>]*selected="">Runs<\/option>/);
+    assert.doesNotMatch(staleMarkup.match(/<select id="video-source-select"[\s\S]*?<\/select>/)?.[0] || "", /project\.yaml|当前不可用/);
     assert.equal((staleMarkup.match(/<select/g) || []).length, 1);
+
+    const runsMarkup = renderToStaticMarkup(React.createElement(VideoLibraryRail, {
+      runsCatalog: [
+        { workspace: "run-a/shot-01/production/project.yaml", run_id: "run-a", kind: "production" },
+        { workspace: "run-b/manifest.json", run_id: "run-b", kind: "legacy" },
+      ],
+      workspace: "run-a/shot-01/production/project.yaml",
+      attempts: [],
+      selectedId: "",
+      runsLoading: false,
+      runsError: "",
+      externalCatalog: { sources: [], groups: [] },
+      selectedSha: "",
+      selectedSource: "runs",
+      query: "",
+      externalLoading: false,
+      externalError: "",
+      activeSurface: "runs",
+      liveStatus: "live",
+      onWorkspace() {},
+      onSelectAttempt() {},
+      onSelectExternal() {},
+      onSource() {},
+      onQuery() {},
+      onRefresh() {},
+    }));
+    assert.match(runsMarkup, /RUNS · 当前工作区/);
+    assert.match(runsMarkup, />run-a<\/strong>/);
+    assert.match(runsMarkup, />shot-01\/production\/project\.yaml<\/span>/);
+    assert.match(runsMarkup, /RUNS · 其他工作区/);
+    assert.match(runsMarkup, />run-b<\/strong>/);
+    assert.match(runsMarkup, />manifest\.json<\/span>/);
   } finally {
     await server.close();
   }

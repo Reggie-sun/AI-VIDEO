@@ -1,20 +1,12 @@
 const RUNS_WORKSPACE_PREFIX = "runs-workspace:";
 
-export function workspaceSourceValue(workspace) {
-  return `${RUNS_WORKSPACE_PREFIX}${workspace || ""}`;
+export function videoSourceSelectionValue(selectedSource) {
+  return selectedSource || "all";
 }
 
-export function videoSourceSelectionValue(selectedSource, workspace) {
-  return selectedSource === "runs" ? workspaceSourceValue(workspace) : (selectedSource || "all");
-}
-
-export function resolveVideoSourceSelection(value, runsCatalog) {
-  const workspace = (Array.isArray(runsCatalog) ? runsCatalog : []).find(
-    (item) => workspaceSourceValue(item?.workspace) === value,
-  )?.workspace;
-  if (workspace) return { sourceId: "runs", workspace };
+export function resolveVideoSourceSelection(value) {
   if (String(value).startsWith(RUNS_WORKSPACE_PREFIX)) return { sourceId: "runs", workspace: null };
-  return { sourceId: value, workspace: null };
+  return { sourceId: value || "all", workspace: null };
 }
 
 export function videoSourceIsRefreshing(selectedSource, runsLoading, externalLoading) {
