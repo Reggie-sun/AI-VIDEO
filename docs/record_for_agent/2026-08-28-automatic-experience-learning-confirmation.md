@@ -63,6 +63,20 @@ Fresh exact-range Harness receipt：`.agent/harness/runs/experience-learning-con
 
 在 exact `3b0c235` snapshot 上执行 `verify-receipt` 返回：`complete_completion_proof=true`、`fresh=true`、`fresh_for_snapshot=true`、`snapshot_matches=true`、`artifact_integrity=true`、`passed=true`。Receipt 与 check artifacts 已复制回上述 repository-relative path；临时 clone 随后通过 recoverable trash 操作移除。
 
+## 2026-08-29 Language Format Follow-Up
+
+Learning Claim 的人类可读格式已显式对齐 repository `AGENTS.md`：使用英文 section title 与中文正文；`command`、path、filename、config key、API、schema field、enum、hash、model、Provider 与 Skill name 保持原文并在适合时使用反引号。Machine-readable frontmatter key 与 enum value 不翻译。
+
+实现 commit：`675bbb3ab165404e5c1ca271ace6f0223fe65699`（parent `812213ff17a6a47fbae3e8a57f3f15a2cd2d29a6`）。修改范围仅包括：
+
+- `.agents/skills/distill-ai-video-learning/SKILL.md`
+- `.agents/skills/distill-ai-video-learning/templates/learning-claim.md`
+- `tests/test_distill_ai_video_learning_skill.py`
+
+该 follow-up 没有改变 candidate admission、confirmation hash、promotion lifecycle、promotion target 或 adoption boundary。Focused Skill tests 为 `8 passed in 0.03s`，Skill validator 返回 `Skill is valid!`，`git diff --check` 通过。
+
+Fresh exact-range Harness receipt：`.agent/harness/runs/learning-claim-language-format-20260829/receipt.json`。Receipt 覆盖 immutable range `812213f..675bbb3`，其中 Documentation Contract Gate、Policy Audit、Product Runtime Skill Boundary、task-range Architecture Gate、Experience Learning tests 与 Harness tests 均 PASS；`verify-receipt` 返回 `complete_completion_proof=true`、`fresh=true`、`fresh_for_snapshot=true`、`snapshot_matches=true`、`artifact_integrity=true`、`passed=true`。
+
 ## Publication And Workspace State
 
 - `3b0c235` 已是 current local `main` history 的 ancestor；本记录创建时 moving local `HEAD` 为后续 concurrent commit，不能把当前 `HEAD` hash归属给本 task。
@@ -75,6 +89,8 @@ Fresh exact-range Harness receipt：`.agent/harness/runs/experience-learning-con
 结果：`no_candidate`。
 
 理由：本 session 实现的是 Experience Learning governance mechanism 与 confirmation contract，没有新增 Qingyan / H3 / T8 的真实多-attempt媒体 evidence、controlled comparison 或 materially changing existing claim evidence。把本实现自身写成 Learning Claim 会混淆 architecture decision 与 empirical production learning，因此未创建 `docs/record_for_agent/learning/**` placeholder，也没有请求 adoption confirmation。
+
+2026-08-29 的 language-format follow-up 同样为 `no_candidate`：它只修正 Skill 输出契约与 template 表达，没有新增 empirical experiment evidence，也没有改变既有 claim 的 supporting、counter、scope 或 confidence 判断。
 
 ## Remaining Boundaries
 
