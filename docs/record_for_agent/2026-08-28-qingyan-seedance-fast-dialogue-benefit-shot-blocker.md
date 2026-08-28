@@ -2,6 +2,66 @@
 
 Date: 2026-08-28
 
+## Current Checkpoint — Option A Raw Candidate Gate Stop
+
+本节 supersede 下方“首次 Provider terminal failure、没有新 MP4”的当前状态；下方正文保留为第一次
+尝试的历史证据。用户随后明确选择 Option A，只授权同一 Seedance Fast model、6 秒、6 CNY ceiling
+下的一次简化 Prompt 重新生成。该唯一追加 submit 已消费，没有授权第三次 submit、替代 Provider/model
+或扩大预算。
+
+第二次 run：
+
+`runs/qingyan-seedance2-fast-dialogue-benefit-20260828-002/`
+
+Prompt 只缩短了措辞、减少相对 beat 描述与 negative constraints；人物数、产品 reference、对白、
+便携动作、稳定双人中景、native audio 与逐 Shot Gate 均未放宽。最终 Prompt SHA-256 为
+`19f5431a4626b71c1f162bf58003e8101823a0ab9bf445d6eae8a15b0184f29d`，
+`hell-grind-aigc-skill` auditor 返回 `PASS`、`100/100`。Preflight 对第一次 terminal observation 的
+exact SHA-256 做了 fail-closed 校验，并锁定最多 1 次 POST、129,600 tokens、4.7952 CNY estimated
+upper bound 与 6 CNY ceiling。
+
+唯一一次追加 POST 于 `2026-08-28T10:12:21Z` 被接受，并在第 11 次 poll 后成功 fetch：
+
+`runs/qingyan-seedance2-fast-dialogue-benefit-20260828-002/output/seedance2-fast-dialogue-benefit-v2-native-audio-6s.mp4`
+
+- exact MP4 SHA-256: `309b919c00fc86bfd9540802c445a2fca2b1db36ebf44f87c94db3c14c65ff5b`
+- size: 2,531,033 bytes
+- media: 6.080 秒、H.264 High、720×1280、24fps、145 frames；AAC stereo、32kHz
+- Provider effects: 1 submit POST、12 query GET、1 download GET
+- blind retry / permit remint / Provider fallback / activation: `0 / 0 / 0 / 0`
+
+对 exact bytes 执行 project-local `video-analysis`、Whisper small + medium、完整 ffmpeg decode、
+0.5 秒 contact sheet 与独立 `reviewer_xhigh` 复核后，当前逐项结论是：
+
+| Requirement | Verdict | Evidence boundary |
+| --- | --- | --- |
+| `EXACT_TWO_PEOPLE` | `PASS` | 全部采样只出现男左女右两人，无复制或第三人。 |
+| `PRODUCT_IDENTITY` | `PASS` | 只有一瓶稳定可辨认的黄色标签白盖瓶，无盒子、重复或明显形变。 |
+| `PORTABILITY_ACTION` | `NOT_EVALUATED` | 能确认女方把瓶子放入包口并保持半露、手未脱离；0.5 秒采样不能明确证明 contract 指定的 `outer pocket`。 |
+| `DIALOGUE_EXACTNESS` | `NOT_EVALUATED` | Medium Whisper 确认 `你出门也带着它 / 小小一瓶 / 放包里刚刚好`，但 small 与 medium 都漏掉女声开头的 `嗯`；Agent 无直接音频听审能力，不能认证 exact copy。 |
+| `SPEAKER_AND_LIP_SYNC` | `NOT_EVALUATED` | 采样外观符合男先女后，但当前 project-local surface 无 lip-sync 专用能力，0.5 秒采样不能证明 phoneme-level sync。 |
+| `CAMERA_AND_CONTINUITY` | `PASS` | 单一连续 Shot、稳定慢推、轴线与人物位置不变，无切镜或 morph。 |
+| `TEXT_AND_CLAIM_EXCLUSION` | `PASS` | 无生成字幕、overlay、百分比、医学/机制、时长、testimonial 或 absolute claim。 |
+| `NATIVE_AUDIO` | `PASS` | Exact MP4 含可解码且有信号的 AAC；两次 ASR 检出男先女后的两句语义，无重复广告音频。 |
+
+Raw Gate：
+
+`runs/qingyan-seedance2-fast-dialogue-benefit-20260828-002/evidence/post-media-gate.json`
+
+- Gate SHA-256: `6c111f798cecb9fed624f8968ff5029831100d96b4e5e522c58515a37c28f586`
+- overall verdict: `STOP_NOT_ALL_REQUIRED_FINDINGS_PASS`
+- independent review verdict: `accept with concerns`；reviewer 的 outer-pocket concern 已收紧为
+  `PORTABILITY_ACTION=NOT_EVALUATED`
+
+因此当前只交付 raw candidate 供人工查看；没有烧录 authored subtitles、没有重新 composition、没有
+新 final、没有 candidate activation，也没有 P6 / Final Acceptance。原 V4 仍是 current local
+review-only artifact，并继续受未核验尾卡 claim 限制。
+
+Manifest 已保存 exact fetch receipt，但 generation attempt 仍为 `running`、phase=`validate`、candidate
+列表为空；paid-provider phase 为 `settled`。`evidence/live-report.json` 是 submit/fetch 时快照，其中的
+`post-media requirement gate pending` 不是当前 lifecycle truth。内部 ledger 以 estimated upper bound
+4.7952 CNY settle reservation；本轮没有读取外部 Provider 实际账单，不能把该估算描述成已核验实扣。
+
 ## Purpose
 
 本文记录一次用户明确要求的 Qingyan 人物补镜尝试：在现有 28 秒 review-only 成片中增加一个
