@@ -55,10 +55,7 @@ export function VideoLibraryRail({
     ? groups.filter((group) => groupMatchesSource(group, selectedSource))
     : [];
   const visible = sourceGroups.filter((group) => groupMatchesQuery(group, query));
-  const sourceOptions = [
-    { id: "all", label: "全部视频来源", count: attempts.length + groups.length, disabled: false },
-    ...externalSourceOptions(externalCatalog).slice(1),
-  ];
+  const sourceOptions = externalSourceOptions(externalCatalog).slice(1);
   const selectedSourceValue = videoSourceSelectionValue(selectedSource, workspace);
   const workspaceUnavailable = selectedSource === "runs"
     && workspace
@@ -84,14 +81,14 @@ export function VideoLibraryRail({
       <div className="external-source-filter">
         <div className="external-filter-heading"><label htmlFor="video-source-select">来源</label><button type="button" onClick={onRefresh} disabled={refreshing} aria-label="刷新当前视频来源"><ArrowsClockwise size={15} className={refreshing ? "is-spinning" : ""} /></button></div>
         <select id="video-source-select" name="video-source" value={selectedSourceValue} onChange={(event) => changeSource(event.target.value)} aria-label="选择视频来源">
-          <option value="all">全部视频来源 · {attempts.length + groups.length}</option>
+          <option value="all">全部视频来源</option>
           <optgroup label="Runs 工作区">
             {!runsCatalog.length && <option value={workspaceSourceValue("")} disabled>暂无工作区</option>}
             {workspaceUnavailable && <option value={workspaceSourceValue(workspace)} disabled>{workspace} · 当前不可用</option>}
-            {runsCatalog.map((item) => <option key={item.workspace} value={workspaceSourceValue(item.workspace)} disabled={runsLoading}>{workspaceLabel(item)}{item.workspace === workspace ? ` · ${attempts.length}` : ""}</option>)}
+            {runsCatalog.map((item) => <option key={item.workspace} value={workspaceSourceValue(item.workspace)} disabled={runsLoading}>{workspaceLabel(item)}</option>)}
           </optgroup>
           <optgroup label="外部视频来源">
-            {sourceOptions.slice(1).map((option) => <option key={option.id} value={option.id} disabled={option.disabled}>{option.label} · {option.disabled ? "不可用" : option.count}</option>)}
+            {sourceOptions.map((option) => <option key={option.id} value={option.id} disabled={option.disabled}>{option.label}</option>)}
           </optgroup>
         </select>
       </div>

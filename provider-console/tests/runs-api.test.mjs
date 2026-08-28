@@ -94,7 +94,10 @@ test("video library rail renders one unified source selector", async () => {
       selectedId: "",
       runsLoading: false,
       runsError: "",
-      externalCatalog: { sources: [], groups: [] },
+      externalCatalog: {
+        sources: [{ id: "comfyui-output", label: "ComfyUI Output", status: "available" }],
+        groups: [],
+      },
       selectedSha: "",
       selectedSource: "all",
       query: "",
@@ -114,6 +117,9 @@ test("video library rail renders one unified source selector", async () => {
     assert.match(markup, /id="video-source-select"/);
     assert.match(markup, /<optgroup label="Runs 工作区">/);
     assert.match(markup, /<optgroup label="外部视频来源">/);
+    assert.match(markup, /<option value="all"[^>]*>全部视频来源<\/option>/);
+    assert.match(markup, /<option value="comfyui-output"[^>]*>ComfyUI Output<\/option>/);
+    assert.doesNotMatch(markup, /全部视频来源 ·|ComfyUI Output ·|run-a · 0/);
     assert.doesNotMatch(markup, /workspace-select|workspace-picker/);
 
     const staleMarkup = renderToStaticMarkup(React.createElement(VideoLibraryRail, {
