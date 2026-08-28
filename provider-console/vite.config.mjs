@@ -6,13 +6,18 @@ import { fileURLToPath } from "node:url";
 
 import { createRunsApiPlugin } from "./scripts/runs-api.mjs";
 
+export function configuredExternalMediaSources({ repoRoot, homeRoot }) {
+  return [
+    { id: "artifacts", label: "AI-VIDEO Artifacts", kind: "development_artifact", root: path.join(repoRoot, "artifacts") },
+    { id: "ai-video-experiments", label: "AI-VIDEO Experiments", kind: "development_artifact", root: path.join(homeRoot, "ai-video-experiments") },
+    { id: "comfyui-output", label: "ComfyUI Output", kind: "raw_provider_output", root: path.join(homeRoot, "ComfyUI", "output") },
+    { id: "qingyan-project", label: "青颜项目目录", kind: "external_project_asset", root: path.join(homeRoot, "电商图片", "青颜") },
+  ];
+}
+
 const providerConsoleRoot = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(providerConsoleRoot, "..");
-const externalMediaSources = [
-  { id: "artifacts", label: "AI-VIDEO Artifacts", kind: "development_artifact", root: path.join(repoRoot, "artifacts") },
-  { id: "comfyui-output", label: "ComfyUI Output", kind: "raw_provider_output", root: path.join(homedir(), "ComfyUI", "output") },
-  { id: "qingyan-project", label: "青颜项目目录", kind: "external_project_asset", root: path.join(homedir(), "电商图片", "青颜") },
-];
+const externalMediaSources = configuredExternalMediaSources({ repoRoot, homeRoot: homedir() });
 
 export default defineConfig({
   build: {

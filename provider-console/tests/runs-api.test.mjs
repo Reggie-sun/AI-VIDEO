@@ -7,6 +7,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { createCatalogChangeFeed, createRunsApiHandler, RunsApiError } from "../scripts/runs-api.mjs";
+import { configuredExternalMediaSources } from "../vite.config.mjs";
 import {
   attemptOutcome,
   generationTypeOf,
@@ -35,6 +36,15 @@ import {
   createWorkspaceSelectionGuard,
   libraryLiveStatus,
 } from "../src/library-refresh-contract.js";
+
+test("default external media sources include the AI-VIDEO experiments directory", () => {
+  assert.deepEqual(configuredExternalMediaSources({ repoRoot: "/repo", homeRoot: "/home/operator" }), [
+    { id: "artifacts", label: "AI-VIDEO Artifacts", kind: "development_artifact", root: "/repo/artifacts" },
+    { id: "ai-video-experiments", label: "AI-VIDEO Experiments", kind: "development_artifact", root: "/home/operator/ai-video-experiments" },
+    { id: "comfyui-output", label: "ComfyUI Output", kind: "raw_provider_output", root: "/home/operator/ComfyUI/output" },
+    { id: "qingyan-project", label: "青颜项目目录", kind: "external_project_asset", root: "/home/operator/电商图片/青颜" },
+  ]);
+});
 
 test("run detail contract keeps lifecycle outcome separate from phase and media", () => {
   assert.deepEqual(attemptOutcome({ status: "succeeded", phase: "activate" }), {
