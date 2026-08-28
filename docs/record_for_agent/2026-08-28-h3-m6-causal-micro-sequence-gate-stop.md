@@ -4,11 +4,13 @@ Date: 2026-08-28
 
 ## V4 Current Checkpoint — 2026-08-28
 
-本 section 是当前 M6 empirical decision checkpoint；下方 v3/v2/v1 evidence 保留为历史。v4 只完成
+本 section 是当前 M6 empirical decision checkpoint；下方 v3/v2/v1 evidence 保留为历史。v4 先完成
 Shot C smallest-owner terminal-anchor repair 的 Stage 1：在用户将 authorization 精确绑定到
 `ba9f18dfbe9e7d04456954ffd5a59f59391cdd8d66776eb91c02b66418871ad3` 后，执行一次且仅一次
 `image_gen.imagegen` image-edit，随后进行 deterministic local materialization 与 exact-byte image-level
-Gate。没有 retry、variant、fallback、ComfyUI/H3、`video-analysis` 或 assembly action。
+Gate。随后在新的明确 scope 中，只通过 canonical local compiler/resolve/preview seam 编译一个 repaired
+Shot C H3 request，并物化独立 submit authorization preview。没有 retry、variant、fallback、ComfyUI runtime、
+H3 submit、`video-analysis` 或 assembly action。
 
 ### V4 Stage-1 Authorization And Exact Outputs
 
@@ -37,7 +39,7 @@ Gate。没有 retry、variant、fallback、ComfyUI/H3、`video-analysis` 或 ass
   - Geometry: `768x768`、8-bit RGB PNG。
 - Materialization: exact raw PNG 通过 local `ffmpeg` Lanczos scale 生成 `768x768` RGB PNG；无 crop、
   padding、rotation、variant、generation 或额外 Provider call。
-- Actual calls: `image_gen.imagegen=1`；retry/variant/ComfyUI/H3 compile/H3 submit/
+- Stage-1-only calls: `image_gen.imagegen=1`；retry/variant/ComfyUI/H3 compile/H3 submit/
   project-local `video-analysis`/assembly 均为 `0`。
 
 ### V4 Shot C Terminal Anchor Image Gate
@@ -63,14 +65,58 @@ Shot C video technical PASS、M6 causal HUMAN PASS、P6、Final Acceptance、Pro
 commercial verdict。旧 v3 Shot C MP4 的四项 required FAIL 与 `human_verdict=NOT_EVALUATED` 对旧 exact bytes
 继续有效，不被本次 image Gate 改写。
 
+### V4 Shot C H3 Exact Authorization Preview
+
+- Exact preview:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-v4/sidecars/h3-submit-exact-preview.json`
+- Preview SHA-256:
+  `5d2ee569340e6e22bb40f4d01514a4cc49d0840837f24dff9ff052a0ff316ddb`
+- Current action 只执行 local request compilation、deterministic resolve 与 provider contract preview；未创建
+  `sidecars/h3-submit-authorization.json`，未启动 ComfyUI，未调用 runtime preflight/submit/fetch，且 future output
+  `outputs/shot-c-open-use-effect-v4.mp4` 不存在。
+- Provider/profile/model/capability:
+  `comfy-local-h3` / `minimax-h3-fl2va-quality` / `minimax-h3-fl2va` /
+  `minimax-h3-fl2va-local-v1`。
+- Profile/workflow/binding hashes:
+  `a154259fa9530e7c2df8865539eaeeef1886c0da51385a61d02c5c93fdb1ad6d` /
+  `8b6c338279d8af768fae8106034f9f26e8e9d59583e95a8ca8b16d36a930ad65` /
+  `e0ae28bdaaa81ac70578b11e97f95cacab826273ec09f82bfcf430176fb05a4c`。
+- Exact first / repaired last anchor SHA-256:
+  `062877fc2c6c09ef10cade29f0baa8fa8f884c5675cb13125f2e627b3d672fd3` /
+  `78cdffccec608b143d63113d7c428b722a1b5772e79a30923d3e699a1a2c6a74`。
+- Accepted prior state remains exact v3 Shot B output
+  `bd47e8ee13729a1c6bdc3832cc9419907d00460cb00f91ff6f6887aa75c1971c` plus all-six-PASS Gate
+  `4f8e33349a2e34058112afd88f27000c47f955fcbea1d3b140975bb44db40651`；Shot B is reused with
+  zero Provider call。
+- Requirement / generation-intent / B-to-C transition-policy hashes:
+  `481eb954f1b218b853585668bbc43bf386a7d44ffb48dc44180b1c749e5fa818` /
+  `912e952f7d27857e4d332ea1efd5f8603a3ef339d2b41a5e9891952263f66e80` /
+  `87982ea580059593133b4667cec15557a85fc579b4a150ab998c8d685f6353ce`。
+- Provider-bound / compiled / request-input / resolved-generation hashes:
+  `51e295c6d4dda0c25a7c0996460210b9d24e42e368de2a488e90089f6d35f03f` /
+  `d7a00b4af079c93bc38437e89b851616f556174e10ec68909fa9bb7359cd607e` /
+  `80fb5898e377201c71b42167a14530ef88818c92a66ccb784cb71f14dd178d6b` /
+  `bda27366cc41d90e13402fd92347eccae00581ca79a38c9063cf9375a6a8a79a`。
+- Effective seed: `70747632828882972`；canonical compiler 从新的 exact request identity 派生，未复用
+  v3 seed `4089209248844712091`。
+- Provider-native prompt bytes 与 v3 exact prompt byte-identical；prompt semantic SHA-256 仍为
+  `1c0d1ea72885565bc61324c1764375158e521ccc17a586f61915a4835efbc83e`。因此 current repair 保持
+  provider/profile/workflow/binding、prompt、first anchor、camera、audio 与 empty negative prompt 不变，只替换
+  terminal anchor identity/bytes 与 request-scoped plan/audit identity；但 seed 随 request identity 改变，所以不是
+  strict same-seed anchor-only A/B。
+- Future authorization ceiling 为 exactly one local Shot C H3 submit；new image、retry、variant、fallback、
+  remote、paid 与 Shot B Provider calls 均为 `0`。Exact MP4 未来落盘后，必须立即执行 project-local
+  `video_probe`、`video_scene_detect`、`video_extract_frames`、`video_transcribe` 四项 barrier，并给出六项
+  requirement-level verdict；任一 `FAIL` / `NOT_EVALUATED` 立即停止且不得 retry 或 assembly。
+
 ### V4 Current Stop And Next One Thing
 
-Stage 1 已按 preview stop rule 停在 sealed anchor bytes。没有编译新的 Shot C H3 request、没有派生新 seed，
-也没有预授权 H3 submit。下一项工作只能在后续明确 scope 中，用 exact Shot C first anchor
-`062877fc2c6c09ef10cade29f0baa8fa8f884c5675cb13125f2e627b3d672fd3` 与 repaired last anchor
-`78cdffccec608b143d63113d7c428b722a1b5772e79a30923d3e699a1a2c6a74` 编译新的 Shot C request，展示
-独立 exact H3 submit preview，并在任何 ComfyUI/H3 submit 前重新获得 task-scoped authorization。不得自动
-reuse v3 request/seed、retry、fallback 或串联 15.5s/30s assembly；M7–M9 与 HUMAN verdict 继续 deferred。
+新的 Shot C request 与 exact preview 已编译并按 stop rule 停止；没有自动预授权 H3 submit。下一项工作只能是
+让用户把新的明确 Stage-2 task-scoped authorization 精确绑定到 preview SHA-256
+`5d2ee569340e6e22bb40f4d01514a4cc49d0840837f24dff9ff052a0ff316ddb`，然后执行 exactly one local Shot C
+submit。不得自动 reuse v3 request/seed、retry、variant、fallback 或串联 15.5s/30s assembly；M7–M9、
+qualification 与 HUMAN verdict 继续 deferred。若未获得该 exact authorization，ComfyUI/H3 runtime、Provider
+preflight/submit 与 `video-analysis` 均必须保持 `0`。
 
 V3 preview 曾把 quality hashes 与 non-quality workflow/binding path labels 组合；v4 read-only preflight 已按
 `workflows/profiles/minimax_h3_fl2va_quality.json` 纠正为
