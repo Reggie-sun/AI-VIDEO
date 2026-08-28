@@ -233,8 +233,10 @@ evidence、scope、recommendation、target 或 candidate bytes 发生变化时�
   `.agent/harness/runs/hyperframes-caption-readiness-adoption-20260829/receipt.json`，验证结果为
   complete、fresh、snapshot-matching；Architecture Gate PASS、Learning Skill `27 passed`、Harness
   `204 passed`。
-- Unchanged boundary：没有 Product state、Provider、媒体生成、activation、CAPTION P6、Final
-  Acceptance、push 或 release effect；V9 的 exact Chinese cues 也不外推为 broad glyph coverage。
+- Unchanged boundary：没有 Product state、Provider 或 Production media effect，也没有 activation、
+  CAPTION P6、Final Acceptance、push 或 release effect。Mandatory exact renderer test 只在 `/tmp`
+  生成隔离的 ephemeral fixture/evidence；它不进入 Registry、Manifest 或 delivery truth。V9 的 exact
+  Chinese cues 也不外推为 broad glyph coverage。
 
 ## Pending Candidate
 
