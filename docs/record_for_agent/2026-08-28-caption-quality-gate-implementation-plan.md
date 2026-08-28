@@ -24,8 +24,106 @@ Date: 2026-08-28
 - 为保持 module boundary，caption model validators 与 active-review reader 分别提取到
   `_caption_review_models.py`、`_review_project_reader.py`；task-delta Architecture Gate 最终 PASS。
 
-这仍不证明任何真实媒体的字幕感知质量。当前实现只关闭 Engineering / Deterministic contract；
-OCR、ASR、waveform、human visual verdict、live Provider 与 empirical Final Acceptance 均未执行。
+实现完成时仍未证明任何真实媒体的字幕感知质量；该历史边界已被下方
+`Real Validation Update — 2026-08-28` 部分更新。本轮已执行 bounded local render、逐帧字幕
+检查、project-local `video-analysis`、ASR 与人工 frame-sheet inspection，但没有得到 Production
+CAPTION P6 PASS 或 empirical Final Acceptance。
+
+## Real Validation Update — 2026-08-28
+
+本轮按用户“真实验证”请求执行了不含 Provider submit、paid call、外网访问或 Production state
+mutation 的 bounded empirical validation。Exact evidence root：
+
+`runs/caption-quality-gate-real-validation-20260828-v1/`
+
+该目录中的 `validation-summary.json` SHA-256 为
+`f4d09142a8dc636f7e23f9a50c5c93eec6085a2ea5cb59236ffe73f71a09247d`。
+
+### Pinned Raw Renderer Capability — PASS
+
+固定本仓库 `hyperframes@0.7.103`、Chrome Headless Shell `152.0.7928.2`、local audio 与
+generic `sans-serif` source，运行 raw renderer capability gate：
+
+`tests/test_production_hyperframes.py::test_p4_raw_renderer_capability_gate_accepts_local_audio_and_frame_caption`
+
+结果为 `1 passed in 8.55s`。输出 MP4：
+
+`runs/caption-quality-gate-real-validation-20260828-v1/media/raw-p4-caption-capability.mp4`
+
+- exact bytes SHA-256：`5e9278b39c3fa52adfb2664423a35aadbe05022ca404385dd6aeb0a9a6df129f`
+- media probe：`2.022s`、H.264 `320x180`、`30fps`、`60` frames、AAC stereo `48000Hz`
+- caption half-open frame contract `[15,45)`：frame `14` absent、`15` present、`44` present、
+  `45` absent
+- project-local `video-analysis video_review`：`96/96` unique sampled frames，检测到 audio；仅返回
+  generic low-resolution observation，不构成 caption-specific failure
+- network isolation audit：namespace 中只有 `lo`
+
+这证明当前固定 renderer/browser/local runtime 能生成带音频和按 exact frame interval 显示字幕的
+MP4；它不证明 Production source materialization、CAPTION P6 或商业成片质量通过。
+
+### Production Renderer Gate — FAIL
+
+同一固定 renderer/browser 下运行：
+
+`tests/test_production_hyperframes.py::test_p4_production_renderer_gate_renders_resolved_audio_and_captions`
+
+Production render 在 HyperFrames `lint` 阶段 fail closed，未产出 MP4、未激活 render：
+
+- failed source：
+  `runs/caption-quality-gate-real-validation-20260828-v1/production-failure/index.html`
+  (`f721aa805e6a6c034cded08fa6369c18c41252b2ee898b66bfcff916ec0b6dbd`)
+- failed Manifest：
+  `runs/caption-quality-gate-real-validation-20260828-v1/production-failure/manifest.json`
+  (`d6a3a351cdffff499d4012bf303ea6201df5da1ca77289802cca102b310f4407`)
+- lifecycle evidence：attempt `p4-production-render`、status `failed`、
+  `render_phase=lint`、`error_code=renderer_source_invalid`
+- exact renderer finding：`font_family_without_font_face`；
+  `Font family used without @font-face declaration: fixture sans.`
+
+Root cause boundary：`_caption_style_css()` 会把 selected custom `font_family` 写入 Production
+source；`hyperframes.py::_parse_source_document()` 同时把 `@font-face` 视为 forbidden external
+style/font surface，而固定 HyperFrames 对 non-auto-resolved font 要求 `@font-face`。因此当前
+custom-font Production source contract 与 selected renderer lint contract 不兼容。Raw generic-font arm
+PASS、Production `Fixture Sans` arm FAIL，已把本轮 blocker 隔离到 source/font contract，而不是
+renderer binary、browser、local audio 或 network namespace。
+
+本轮仅验证并记录 blocker，没有修改 Product Runtime。后续若获单独授权，最小修复应由既有
+HyperFrames source/validation owner 处理，并增加真实 renderer regression test；不得以静默字体
+fallback、禁用 lint 或第二条 render path 绕过。
+
+### Qingyan V4 Review-Only Final Media — NOT_EVALUATED
+
+对现有 review-only 成片
+`runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/final/qingyan-seedance2-fast-image-cards-caption-repaired-v4-28s-review-only.mp4`
+执行 exact-byte probe、project-local `video-analysis video_review`、`video_transcribe` 与 V4-specific
+frame-sheet inspection：
+
+- MP4 SHA-256：`087497ae1b4be12b260899706c19698c8d7d88635708528a6b8cf0d1fd7ac4e1`
+- media probe：`28.065s`、`720x1280`、`24fps`、AAC audio
+- 人工抽查可读到 `出汗黏衣`、`靠近也不自在`、`长辈递来这瓶`、`喷一下`、`清爽舒适`、
+  `近距离`、`更从容`
+- ASR 检出主要 speech regions，但存在词汇替换，不能单独证明 audio-semantic PASS
+- review-only `captions.ass` 包含 10 个中文 cues，SHA-256
+  `f8433a76183d552af4fd9a288f120a6adf018be1b50e45a74026a97742bf3f40`
+
+该 run 的 current Production Manifest 是 schema `2.8`，不存在可由
+`ProductionStateCommitter.current_final_media_target()` 解析的 active render；其 registered canonical
+`caption-track-1.json` 还是英文 fixture (`Hello` / `world`)，与 review-only 中文 ASS 不同。因此 exact
+V4 MP4 无法绑定 Manifest `2.15`、canonical `CaptionTrack`、`ResolvedTimeline` 与 active final-media
+identity。
+
+Requirement-level verdict：
+
+- `SOURCE_INTEGRITY`: `FAIL` — review-only Chinese ASS 不是当前 canonical active CaptionTrack/render
+- `TIMING_CONTRACT`: `NOT_EVALUATED`
+- `RENDER_COMPLETENESS`: `NOT_EVALUATED`
+- `LAYOUT_READABILITY`: `NOT_EVALUATED`
+- `AUDIO_SEMANTIC_SYNC`: `NOT_EVALUATED`
+- `UNINTENDED_TEXT`: `NOT_EVALUATED`
+
+按 fail-closed aggregation，Production CAPTION Gate overall 为 `NOT_EVALUATED`，不是 PASS。抽帧可读、
+ASR 有输出或 `video-analysis` 成功均不能替代 canonical identity、whole-render coverage、P6 receipt 或
+Final Acceptance。
 
 ## Purpose
 
