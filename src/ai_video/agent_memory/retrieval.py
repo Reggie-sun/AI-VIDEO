@@ -99,6 +99,11 @@ def _format_excerpt(text: str, max_len: int = 240) -> str:
 
 
 def _authority_label(corpus_kind: str, authority: str) -> str:
+    if authority == "advisory_learning":
+        return (
+            "authority: advisory learning claim; verify confirmation and "
+            "adoption state; not execution authorization"
+        )
     if authority == "current_project_contract":
         return "authority: current project contract; re-open source before use"
     if authority == "current_runtime_baseline":

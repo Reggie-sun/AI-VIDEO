@@ -11,6 +11,26 @@ Record history only after meaningful work reaches a stable checkpoint, completio
 
 This skill writes a project record; it does not authorize new implementation, local generation, live Provider calls, paid actions, releases, or changes to `sub-agents`.
 
+## Route Automatic Learning Evaluation
+
+After this Skill creates or materially updates a substantial durable record,
+invoke `distill-ai-video-learning` before reporting session completion. This is
+an automatic learning evaluation: the Agent must not wait for the user to
+request distillation separately.
+
+- When no bounded cross-experiment claim meets that Skill's evidence threshold,
+  report `no_candidate` and continue completion without creating a placeholder.
+- When a claim qualifies, let `distill-ai-video-learning` create or update the
+  pending candidate and stop at its exact user-confirmation boundary.
+- This handoff does not authorize adoption, Provider/media work, Product state
+  mutation, target commit, push, release, or any target change before
+  confirmation. The learning Skill's path-limited candidate checkpoint is not
+  an adoption-target commit.
+
+The learning Skill owns candidate fields, evidence thresholds, confirmation
+hashes, state transitions, adoption routing, and supersession. Do not duplicate
+those contracts in the session record.
+
 ## Handle Project Hook Requests
 
 The project-local Codex hook may inject a request containing a
@@ -20,22 +40,29 @@ stable-boundary rule, not as proof that a record is required.
 - If substantial work reached a stable checkpoint, completion, or genuine
   blocker, run this skill normally and create or update the primary relevant
   record plus any directly required supersession notices, then acknowledge the
-  request with outcome `recorded`. Do not create duplicate narrative records.
+  request with outcome `recorded` and the completed automatic learning outcome
+  `no_candidate` or `pending_candidate`. Do not create duplicate narrative
+  records.
 - If the boundary is not stable or the repository change is trivial or
   unrelated, do not create a record; acknowledge the request with outcome
-  `no_record` and finish the current response normally.
+  `no_record` and learning outcome `not_applicable`, then finish the current
+  response normally.
 - Acknowledge exactly once after the evaluation using the request's exact ID:
 
   ```bash
   python3 .agents/skills/record-ai-video-session/scripts/session_record_hook.py \
     acknowledge \
     --capture-request-id <capture_request_id> \
-    --outcome recorded
+    --outcome recorded \
+    --learning-outcome no_candidate
   ```
 
-  Use `--outcome no_record` when no durable record was created. Require the
-  command to return `{"acknowledged": true}`; if it returns false, report the
-  stale or unknown request instead of guessing another ID.
+  Use `--learning-outcome pending_candidate` when a candidate was checkpointed
+  and shown for confirmation. Use `--outcome no_record --learning-outcome
+  not_applicable` when no durable record was created. The hook rejects a
+  `recorded` ACK without an automatic learning result. Require the command to
+  return `{"acknowledged": true}`; if it returns false, report the stale or
+  unknown request instead of guessing another ID.
 - Check the current topic, commits, and existing records before writing so a
   repeated hook request cannot create duplicate records.
 - Hook state follows `ACKED -> PENDING -> ACKED`. `PostToolUse` only attributes

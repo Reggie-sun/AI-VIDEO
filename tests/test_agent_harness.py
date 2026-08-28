@@ -1687,6 +1687,32 @@ def test_session_record_hook_routes_to_control_plane_harness() -> None:
     assert "tests/test_record_ai_video_session_hook.py" in harness_argv
 
 
+def test_experience_learning_skill_routes_to_focused_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        ".agents/skills/distill-ai-video-learning/SKILL.md",
+        ".agents/skills/distill-ai-video-learning/templates/learning-claim.md",
+        "docs/record_for_agent/learning/example-claim.md",
+        "tests/test_distill_ai_video_learning_skill.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == []
+        assert "experience_learning" in report["categories"]
+        assert "experience_learning_skill_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
+
+    assert policy["checks"]["experience_learning_skill_tests"]["argv"] == [
+        "python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_distill_ai_video_learning_skill.py",
+        "-q",
+    ]
+
+
 @pytest.mark.parametrize(
     ("path", "expected_categories"),
     [

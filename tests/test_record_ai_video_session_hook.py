@@ -157,6 +157,7 @@ def test_stop_requests_record_once_after_repository_change(tmp_path: Path) -> No
     assert hook.acknowledge_request(
         request_id,
         outcome="no_record",
+        learning_outcome="not_applicable",
         project_root=repo,
         state_root=state_root,
     )
@@ -516,9 +517,16 @@ def test_legacy_global_fingerprint_state_resets_without_phantom_request(
     assert migrated["owned_paths"] == []
 
 
-@pytest.mark.parametrize("outcome", ["recorded", "no_record"])
+@pytest.mark.parametrize(
+    ("outcome", "learning_outcome"),
+    [
+        ("recorded", "no_candidate"),
+        ("recorded", "pending_candidate"),
+        ("no_record", "not_applicable"),
+    ],
+)
 def test_record_evaluation_outcomes_acknowledge_the_current_checkpoint(
-    tmp_path: Path, outcome: str
+    tmp_path: Path, outcome: str, learning_outcome: str
 ) -> None:
     hook = _load_hook_module()
     repo, tracked = _repository(tmp_path)
@@ -536,6 +544,7 @@ def test_record_evaluation_outcomes_acknowledge_the_current_checkpoint(
     acknowledged = hook.acknowledge_request(
         request_id,
         outcome=outcome,
+        learning_outcome=learning_outcome,
         project_root=repo,
         state_root=state_root,
     )
@@ -545,6 +554,59 @@ def test_record_evaluation_outcomes_acknowledge_the_current_checkpoint(
 
     assert acknowledged is True
     assert repeated == {"continue": True}
+
+
+def test_recorded_checkpoint_requires_learning_evaluation_outcome(tmp_path: Path) -> None:
+    hook = _load_hook_module()
+    repo, tracked = _repository(tmp_path)
+    state_root = tmp_path / "state"
+    hook.process_event(
+        _event("SessionStart", repo), project_root=repo, state_root=state_root
+    )
+    tracked.write_text("session-owned\n", encoding="utf-8")
+    _post_patch(hook, repo, state_root, "tracked.txt")
+    requested = hook.process_event(
+        _event("Stop", repo), project_root=repo, state_root=state_root
+    )
+    request_id = _capture_request_id(str(requested["reason"]))
+
+    assert hook.acknowledge_request(
+        request_id,
+        outcome="recorded",
+        project_root=repo,
+        state_root=state_root,
+    ) is False
+    assert hook.process_event(
+        _event("Stop", repo), project_root=repo, state_root=state_root
+    )["decision"] == "block"
+
+
+@pytest.mark.parametrize(
+    ("outcome", "learning_outcome"),
+    [("recorded", "not_applicable"), ("no_record", "no_candidate")],
+)
+def test_acknowledge_rejects_incompatible_record_and_learning_outcomes(
+    tmp_path: Path, outcome: str, learning_outcome: str
+) -> None:
+    hook = _load_hook_module()
+    repo, tracked = _repository(tmp_path)
+    state_root = tmp_path / "state"
+    hook.process_event(
+        _event("SessionStart", repo), project_root=repo, state_root=state_root
+    )
+    tracked.write_text("session-owned\n", encoding="utf-8")
+    _post_patch(hook, repo, state_root, "tracked.txt")
+    requested = hook.process_event(
+        _event("Stop", repo), project_root=repo, state_root=state_root
+    )
+
+    assert hook.acknowledge_request(
+        _capture_request_id(str(requested["reason"])),
+        outcome=outcome,
+        learning_outcome=learning_outcome,
+        project_root=repo,
+        state_root=state_root,
+    ) is False
 
 
 def test_unrelated_changes_do_not_reopen_an_acknowledged_checkpoint(
@@ -565,6 +627,7 @@ def test_unrelated_changes_do_not_reopen_an_acknowledged_checkpoint(
     assert hook.acknowledge_request(
         request_id,
         outcome="no_record",
+        learning_outcome="not_applicable",
         project_root=repo,
         state_root=state_root,
     )
@@ -599,6 +662,7 @@ def test_new_session_owned_edit_reopens_an_acknowledged_checkpoint(
     assert hook.acknowledge_request(
         first_request_id,
         outcome="recorded",
+        learning_outcome="no_candidate",
         project_root=repo,
         state_root=state_root,
     )
@@ -633,6 +697,7 @@ def test_stale_request_cannot_acknowledge_new_bytes_on_an_owned_path(
     acknowledged = hook.acknowledge_request(
         first_request_id,
         outcome="recorded",
+        learning_outcome="no_candidate",
         project_root=repo,
         state_root=state_root,
     )
@@ -825,6 +890,7 @@ def test_owned_path_overflow_reopens_via_bounded_event_digest(
     assert hook.acknowledge_request(
         first_request_id,
         outcome="no_record",
+        learning_outcome="not_applicable",
         project_root=repo,
         state_root=state_root,
     )
@@ -871,6 +937,7 @@ def test_acknowledge_rejects_unknown_capture_request_id(tmp_path: Path) -> None:
     assert hook.acknowledge_request(
         "ai-video-record-0000000000000000",
         outcome="no_record",
+        learning_outcome="not_applicable",
         project_root=repo,
         state_root=tmp_path / "state",
     ) is False

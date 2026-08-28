@@ -298,6 +298,41 @@ Retrieved memories are advisory only. They MUST NOT override:
 只有 implementation findings materially 改变原 query 并暴露 distinct term/owner/failure
 signature 时，完成前才允许一次 focused follow-up；不得把重复检索当作 completion ceremony。
 
+### Experience Learning And Confirmation
+
+Memory/record 保留 exact historical evidence；Learning Claim 是基于多条evidence的current、scoped、
+可撤销advisory synthesis。两者继续共享 `experience` query，但
+`docs/record_for_agent/learning/**/*.md` 必须返回
+`authority=advisory_learning` 与 `document_kind=learning_claim`，不能被普通record或frontmatter伪造。
+
+`record-ai-video-session` 创建或materially更新substantial stable record后，必须自动调用
+`distill-ai-video-learning`，不得等待用户另行要求。Evaluation只有两种有效结果：
+
+1. `no_candidate`：没有达到多attempt、controlled comparison或existing-claim material update
+   threshold，不创建空artifact，不请求形式化确认。
+2. `pending_candidate`：只创建或更新一个most-relevant
+   `docs/record_for_agent/learning/<claim-id>.md`。Claim分离`Active Claim`与`Pending Candidate`；
+   新candidate不得覆盖仍被target消费的adopted active版本。Pending固定
+   `pending_approval_status=PENDING_CONFIRMATION`、
+   `pending_adoption_status=NOT_ADOPTED`，只把claim path形成candidate checkpoint commit，
+   再向用户展示support/counter evidence、scope/exclusions、evidence status、recommended action、
+   exact target paths、verification、candidate commit与该commit中exact file bytes SHA-256。
+
+确认只对previewed candidate commit、hash与bounded target有效。`Confirm`前必须用
+`git show <candidate-commit>:<claim-path>`重开immutable preimage并重算hash，同时要求current pending
+bytes未漂移；确认还必须保存sanitized actor/time与durable evidence pointer，不复制raw transcript。
+Bytes/evidence/commit变化或target scope扩大都使旧确认失效。`Revise`产生新checkpoint
+与hash并重新确认；`Reject`只拒绝pending lane，必须保留active claim与其adoption evidence。确认后的
+target implementation继续走原owner、decision gate、tests、review与Harness；只有target实际修改且
+verification通过后，pending才可提升为active并记录`ADOPTED`。Skill/claim本身不授权Provider/media、
+Manifest/Registry/P6/Final Acceptance、retry、activation、target commit、push或release；确认前唯一允许
+的commit是只包含claim path的candidate checkpoint。
+
+Session hook把自动evaluation作为completion handshake的一部分：`recorded` ACK只接受
+`learning_outcome=no_candidate|pending_candidate`，`no_record`只接受
+`learning_outcome=not_applicable`。因此Agent不能在有durable record时跳过evaluation后直接关闭checkpoint；
+hook仍不负责synthesis、确认或target mutation。
+
 ## 7. Durable Session Record Gate
 
 `record-ai-video-session` 是 substantial AI-VIDEO work 的 completion-time durable capture

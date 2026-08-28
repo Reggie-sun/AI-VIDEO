@@ -934,6 +934,101 @@ def test_scoped_documents_preserve_authority_and_status(scoped_corpora) -> None:
     assert spec_doc.metadata["status"] == "Superseded"
 
 
+def test_learning_subdirectory_has_distinct_non_spoofable_authority(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "record_for_agent"
+    learning = root / "learning"
+    learning.mkdir(parents=True)
+    (root / "ordinary.md").write_text(
+        "---\n"
+        "authority: advisory_learning\n"
+        "document_kind: learning_claim\n"
+        "---\n"
+        "# Ordinary experience\n\nHistorical evidence.\n",
+        encoding="utf-8",
+    )
+    (learning / "h3-anchor.md").write_text(
+        "---\n"
+        "authority: current_runtime_truth\n"
+        "document_kind: runtime_contract\n"
+        "---\n"
+        "# H3 Anchor Learning\n\n"
+        "Scoped current claim with pending confirmation.\n",
+        encoding="utf-8",
+    )
+    corpus = corpus_module.CorpusSpec.experience(root)
+
+    documents = {
+        Path(str(document.metadata["source"])).name: document
+        for document in load_documents(root, corpus=corpus)
+    }
+
+    ordinary = documents["ordinary.md"]
+    assert ordinary.metadata["authority"] == "advisory_experience"
+    assert ordinary.metadata["document_kind"] == "experience_record"
+    claim = documents["h3-anchor.md"]
+    assert claim.metadata["corpus_kind"] == "experience"
+    assert claim.metadata["authority"] == "advisory_learning"
+    assert claim.metadata["document_kind"] == "learning_claim"
+
+
+def test_learning_authority_is_rendered_as_confirmable_not_executable() -> None:
+    hit = Hit(
+        source="docs/record_for_agent/learning/h3-anchor.md",
+        title="H3 Anchor Learning",
+        section="Evidence Assessment",
+        score=0.94,
+        excerpt="Bounded claim.",
+        chunk_index=0,
+        h1="H3 Anchor Learning",
+        h2="Evidence Assessment",
+        h3="",
+        date="2026-08-28",
+        corpus_kind="experience",
+        authority="advisory_learning",
+        document_kind="learning_claim",
+        admission_lane="lexical",
+    )
+
+    rendered = format_text((hit,))
+
+    assert "authority: advisory learning claim" in rendered
+    assert "verify confirmation and adoption state" in rendered
+    assert "not execution authorization" in rendered
+
+
+def test_experience_search_preserves_learning_claim_metadata(
+    tmp_path: Path,
+    fake_embedding,
+) -> None:
+    root = tmp_path / "record_for_agent"
+    learning = root / "learning"
+    learning.mkdir(parents=True)
+    (learning / "terminal-anchor.md").write_text(
+        "# Terminal Anchor Claim\n\n"
+        "## Failure Pattern\n"
+        "Incompatible terminal anchor causes scene replacement.\n",
+        encoding="utf-8",
+    )
+    corpus = corpus_module.CorpusSpec.experience(root)
+    index_path = tmp_path / "index"
+    index_module.build_scoped_index((corpus,), index_path, fake_embedding)
+
+    hits = search(
+        "incompatible terminal anchor scene replacement",
+        top_k=4,
+        scope="experience",
+        corpora=(corpus,),
+        index_path=index_path,
+        embedding=fake_embedding,
+    )
+
+    claim = next(hit for hit in hits if hit.document_kind == "learning_claim")
+    assert claim.authority == "advisory_learning"
+    assert claim.corpus_kind == "experience"
+
+
 def test_project_docs_are_partitioned_by_path_and_authority(
     project_docs_corpora,
 ) -> None:

@@ -125,6 +125,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_seedance_authoring_skill.py, -q]
     cwd: .
     description: Verify minimal Seedance authoring dispatch, progressive version loading, and advisory authority boundaries.
+  experience_learning_skill_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_distill_ai_video_learning_skill.py, -q]
+    cwd: .
+    description: Verify automatic advisory Learning Claim distillation, exact user confirmation, adoption routing, and no-Production boundaries.
   product_runtime_skill_boundary_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_runtime_skill_boundary.py, -q]
     cwd: .
@@ -265,6 +269,7 @@ checks:
       - composition_architecture_tests
       - ecommerce_ad_workflow_skill_tests
       - seedance_authoring_skill_tests
+      - experience_learning_skill_tests
       - product_runtime_skill_boundary_tests
       - harness_tests
       - local_comfyui_supervisor_tests
@@ -886,6 +891,14 @@ categories:
       - tests/test_seedance_authoring_skill.py
     check_ids:
       - seedance_authoring_skill_tests
+      - task_architecture_gate
+  experience_learning:
+    patterns:
+      - .agents/skills/distill-ai-video-learning/**
+      - docs/record_for_agent/learning/**
+      - tests/test_distill_ai_video_learning_skill.py
+    check_ids:
+      - experience_learning_skill_tests
       - task_architecture_gate
   product_runtime_skill_boundary_test:
     patterns:

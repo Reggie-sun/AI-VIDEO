@@ -23,6 +23,9 @@ MAXIMUM_OWNED_PATH_LIST_BYTES = 12_000
 STATE_SCHEMA = "ai-video-session-record-hook/2"
 LEGACY_STATE_SCHEMA = "ai-video-session-record-hook/1"
 ACK_OUTCOMES = frozenset({"recorded", "no_record"})
+LEARNING_OUTCOMES = frozenset(
+    {"no_candidate", "pending_candidate", "not_applicable"}
+)
 CAPTURE_REQUEST_ID_PATTERN = re.compile(r"^ai-video-record-[0-9a-f]{16}$")
 PATCH_PATH_PATTERN = re.compile(
     r"^\*\*\* (?:Add|Update|Delete) File: (?P<path>.+)$", re.MULTILINE
@@ -123,6 +126,7 @@ def _new_state(project_root: Path) -> dict[str, Any]:
         "precompact_reminded_fingerprint": None,
         "last_ack_capture_request_id": None,
         "last_ack_outcome": None,
+        "last_ack_learning_outcome": None,
     }
     state["acked_fingerprint"] = _checkpoint_fingerprint(state, project_root)
     return state
@@ -408,12 +412,16 @@ def acknowledge_request(
     capture_request_id: str,
     *,
     outcome: str,
+    learning_outcome: str | None = None,
     project_root: Path = PROJECT_ROOT,
     state_root: Path | None = None,
 ) -> bool:
     if (
         not CAPTURE_REQUEST_ID_PATTERN.fullmatch(capture_request_id)
         or outcome not in ACK_OUTCOMES
+        or learning_outcome not in LEARNING_OUTCOMES
+        or (outcome == "recorded" and learning_outcome == "not_applicable")
+        or (outcome == "no_record" and learning_outcome != "not_applicable")
     ):
         return False
     project_root = project_root.resolve()
@@ -445,6 +453,7 @@ def acknowledge_request(
         state["acked_fingerprint"] = current_fingerprint
         state["last_ack_capture_request_id"] = capture_request_id
         state["last_ack_outcome"] = outcome
+        state["last_ack_learning_outcome"] = learning_outcome
         _clear_pending(state)
         _write_state(path, state)
     return True
@@ -497,6 +506,8 @@ def _process_stateful_event(
                 f"(capture_request_id={request_id}). Preserve the verified boundary "
                 "and evaluate it with $record-ai-video-session. Whether a record is "
                 "created or not, acknowledge this exact request after evaluation. "
+                "A recorded outcome also requires the automatic learning evaluation "
+                "result no_candidate or pending_candidate. "
                 "The hook does not authorize Provider calls, tests, Git writes, or "
                 "a record when the skill's stable-boundary test fails."
             ),
@@ -514,7 +525,9 @@ def _process_stateful_event(
             "work reached "
             "a stable checkpoint, completion, or genuine blocker, invoke the skill. "
             "Otherwise do not create a record. In both cases explicitly acknowledge "
-            "this capture_request_id so the checkpoint returns to ACKED. Preserve "
+            "this capture_request_id so the checkpoint returns to ACKED; recorded "
+            "requires learning_outcome=no_candidate or pending_candidate, while "
+            "no_record requires learning_outcome=not_applicable. Preserve "
             "unrelated dirty/index work and do not run Provider, media, network, or "
             "extra tests merely for the record."
         ),
@@ -556,10 +569,14 @@ def _acknowledge_main(argv: Sequence[str]) -> int:
     parser.add_argument("command", choices=["acknowledge"])
     parser.add_argument("--capture-request-id", required=True)
     parser.add_argument("--outcome", choices=sorted(ACK_OUTCOMES), required=True)
+    parser.add_argument(
+        "--learning-outcome", choices=sorted(LEARNING_OUTCOMES), required=True
+    )
     arguments = parser.parse_args(argv)
     acknowledged = acknowledge_request(
         arguments.capture_request_id,
         outcome=arguments.outcome,
+        learning_outcome=arguments.learning_outcome,
     )
     print(json.dumps({"acknowledged": acknowledged}, sort_keys=True))
     return 0 if acknowledged else 2

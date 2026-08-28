@@ -123,6 +123,24 @@ Scope selection、stale/missing/strict-failure handling 与 provenance 细节由
 retrieval 永远只是 advisory evidence，不产生 implementation、Provider、activation、quality
 acceptance、push 或 release authorization。
 
+## Experience Learning Routing
+
+`distill-ai-video-learning` 是跨多次真实 evidence 形成 current scoped Learning Claim 的
+唯一 Development Governance owner。`record-ai-video-session` 完成 substantial stable record
+后必须自动执行该 Skill 的 candidate evaluation，且record hook的`recorded` ACK必须携带
+`no_candidate`或`pending_candidate`结果；满足threshold时只生成pending candidate，保留既有
+active adopted claim，并绑定candidate checkpoint commit与其中exact bytes SHA-256。
+用户确认前不得修改 Skill / Provider Policy / Preflight / Contract / Gate target；确认后仍须通过
+target 的 canonical owner、tests 与 Harness，实际验证完成后才可标记 `ADOPTED`。
+
+Learning Claim 回答“基于多次 evidence 现在知道什么”，Memory/record 回答“过去发生了什么”；二者
+共享 `experience` retrieval scope但保持独立 `advisory_learning` authority。详细 threshold、字段、
+confirmation、state transition、supersession 与 adoption flow由
+`.agents/skills/distill-ai-video-learning/SKILL.md` 和
+`.agent/context/control-plane-playbook.md` 的 `Experience Learning And Confirmation` 独占。
+该流程不得调用Provider、生成媒体、写Production state、自动retry/activation/acceptance或绕过现有
+decision gates。
+
 ## Creative Skill Routing
 
 AI-VIDEO remains the sole owner of production truth. External Skills are advisory only；
@@ -131,6 +149,7 @@ use the minimum matching set and translate guidance into AI-VIDEO contracts。
 | Concern | Route |
 | --- | --- |
 | Prior experience / decision trigger | `retrieve-ai-video-memory` first |
+| Cross-experiment learning / adoption proposal | `distill-ai-video-learning` after stable record |
 | Ecommerce / SKU / product advertising authoring | `ecommerce-ad-workflow` |
 | Director coverage / ordered multi-Shot planning | `open-video` |
 | Semantic continuity / Shot-state problem | `hell-grind-aigc-skill` |

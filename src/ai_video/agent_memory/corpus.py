@@ -15,6 +15,9 @@ Top-level current project docs, advisory research, and deferred decisions use
 separate corpus kinds so expanding retrieval across ``docs/`` never flattens
 their authority into experience or historical design. Auto-generated
 ``runs/<run_id>/SUMMARY.md`` files remain in a separate derived index.
+Confirmed or pending Learning Claims under ``record_for_agent/learning/`` stay
+in the experience shard but carry distinct ``advisory_learning`` authority and
+``learning_claim`` document kind.
 """
 
 from __future__ import annotations
@@ -201,20 +204,32 @@ def _relative_to_cwd(path: Path) -> str:
         return str(path)
 
 
-def _document_kind(path: Path, corpus_kind: str) -> str:
-    if corpus_kind == "experience":
+def _is_learning_claim(path: Path, corpus: CorpusSpec) -> bool:
+    if corpus.kind != "experience":
+        return False
+    try:
+        relative = path.resolve().relative_to(corpus.root.resolve())
+    except ValueError:
+        return False
+    return len(relative.parts) > 1 and relative.parts[0] == "learning"
+
+
+def _document_kind(path: Path, corpus: CorpusSpec) -> str:
+    if _is_learning_claim(path, corpus):
+        return "learning_claim"
+    if corpus.kind == "experience":
         return "experience_record"
-    if corpus_kind == "run_summaries":
+    if corpus.kind == "run_summaries":
         return "run_summary"
-    if corpus_kind == "current_docs":
+    if corpus.kind == "current_docs":
         return {
             "agent-primary-contract-matrix.md": "contract_matrix",
             "v0.2-runtime-baseline.md": "runtime_baseline",
             "v0.2-agentic-production-roadmap.md": "roadmap",
         }.get(path.name, "project_document")
-    if corpus_kind == "research":
+    if corpus.kind == "research":
         return "research_note"
-    if corpus_kind == "deferred":
+    if corpus.kind == "deferred":
         return "deferred_decision"
     if "specs" in path.parts:
         return "spec"
@@ -224,6 +239,8 @@ def _document_kind(path: Path, corpus_kind: str) -> str:
 
 
 def _document_authority(path: Path, corpus: CorpusSpec) -> str:
+    if _is_learning_claim(path, corpus):
+        return "advisory_learning"
     if corpus.kind != "current_docs":
         return corpus.authority
     return {
@@ -410,7 +427,7 @@ def load_document_snapshot(
             "doc_index": idx,
             "corpus_kind": corpus.kind,
             "authority": _document_authority(path, corpus),
-            "document_kind": _document_kind(path, corpus.kind),
+            "document_kind": _document_kind(path, corpus),
         })
         # Chroma rejects None values in metadata; coerce absent fields to "".
         meta = {k: ("" if v is None else v) for k, v in meta.items()}

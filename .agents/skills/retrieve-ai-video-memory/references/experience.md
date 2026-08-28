@@ -4,6 +4,13 @@ Use `experience` for reusable runtime lessons, actual failures, recovery
 evidence, Provider/model observations, continuity work, media-quality findings,
 and prior production decisions recorded under `docs/record_for_agent/`.
 
+The same scope includes `docs/record_for_agent/learning/**/*.md` as
+`authority=advisory_learning` and `document_kind=learning_claim`. These files
+answer what the project currently claims to know from multiple exact sources;
+they remain advisory and must expose confirmation/adoption state. Ordinary
+records continue to answer what happened and retain
+`authority=advisory_experience`.
+
 This scope also merges eligible one-level `runs/<run_id>/SUMMARY.md` records
 through the separate run-summary derived index. Run-summary hits use
 `authority=auto_generated_run_summary_advisory` and
@@ -45,6 +52,10 @@ task. Do not broaden merely because the result abstains.
 
 - `authority=advisory_experience` records lived project lessons, not current
   runtime truth.
+- `authority=advisory_learning` is a scoped, revisable synthesis. Reopen the
+  claim, verify its exact supporting/counter evidence, active/pending lanes,
+  candidate checkpoint confirmation, adoption state, supersession, and current
+  target before relying on it.
 - `document_kind=run_summary` records an auto-generated run summary; it is not
   activation, quality acceptance, or delivery truth.
 - Reopen the returned `source` before relying on a specific claim, path,
