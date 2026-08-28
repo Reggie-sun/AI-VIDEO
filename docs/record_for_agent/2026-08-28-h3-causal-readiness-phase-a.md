@@ -2,6 +2,14 @@
 
 Date: 2026-08-28
 
+## Supersession Notice — 2026-08-28
+
+M6 已在新的 task-scoped authorization 下进入真实 local H3 micro-sequence，并由
+`docs/record_for_agent/2026-08-28-h3-m6-causal-micro-sequence-gate-stop.md` 记录当前 evidence：
+Shot A technical Gate 六类均 PASS；Shot B 的 causal handoff/release/exit PASS，但 conditioning 与 camera
+requirement 为 FAIL，因此 stop rule 在 Shot C submit 前生效。下方 M1–M5 offline implementation 与 verification
+仍有效；“下一关键步骤是首次执行 M6”的状态和 authorization blocker 已被该新记录取代。
+
 ## Purpose
 
 本文记录 `docs/superpowers/plans/2026-08-27-ai-video-shot-to-h3-continuity-enforcement.md`

@@ -1,5 +1,11 @@
 # Qingyan V13 Causal Handoff Experiment Record
 
+> **2026-08-28 M6 empirical supersession:**
+> `2026-08-28-h3-m6-causal-micro-sequence-gate-stop.md` 已在新的 task-scoped authorization 下执行 M6。
+> Shot A technical Gate 六类均 PASS；Shot B 的 handoff/release/exit causal state PASS，但 conditioning 与 camera
+> FAIL，故 Shot C 未提交。下方“仍未执行、未授权”的 M6 状态仅是 superseded historical context；v13 自身的
+> media verdict 与 HUMAN/Production 边界没有改变。
+
 > **2026-08-28 implementation update:** 本记录提出的最小 typed intent、pairwise readiness 与 exact H3
 > compiler 已由 `2026-08-28-h3-causal-readiness-phase-a.md` 记录为 Phase A M1–M5 offline implementation。
 > v13 的媒体 verdict 与本记录中的 HUMAN/Production 边界保持不变；M6 causal micro-sequence 仍未执行、未授权。
