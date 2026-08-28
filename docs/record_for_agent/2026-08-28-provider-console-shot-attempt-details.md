@@ -195,6 +195,83 @@ Independent native `reviewer_xhigh` scoped re-review verdict 为 `accept with co
 其非阻断风险是：未来同一 SHA 若出现多条合法但语义不同的 verified Shot evidence，当前 grouping 只选择
 首条 metadata association，可能隐藏 ambiguity；当前 393 groups 实扫未发现该冲突。
 
+## Live Refresh, Unified Sources, And Prompt Recovery Follow-up — 2026-08-28
+
+用户继续验证时确认了三个仍未满足的操作目标：新视频不会自动出现、浏览器没有可确认的声音，以及默认
+判断面仍看不到 Shot 分镜与 Prompt。本 follow-up 取代上方“默认进入 External Media Library”和“依赖
+手动 refresh”的界面描述；历史 implementation/runtime evidence 仍保留为当时 checkpoint，不代表当前
+默认交互。
+
+当前界面与数据行为：
+
+- 旧的 runs/external mode switch 已退休。来源现在只有一个可展开 selector，默认
+  `全部视频来源`；同一 selector 可切换 `Runs 工作区`、`AI-VIDEO Artifacts`、`ComfyUI Output` 与
+  `青颜项目目录`。默认主判断面优先展示 canonical Runs Shot/attempt 详情，同时列出全部 external groups。
+- `runs/`、repository `artifacts/`、`/home/reggie/ComfyUI/output` 与
+  `/home/reggie/电商图片/青颜` 由 loopback server 的 bounded filesystem watcher 监听。变更经 `750 ms`
+  debounce 后通过 GET-only、`no-store` 的 `/api/library-events` SSE 通知 Browser；页面无需 reload 或点击
+  refresh 即重新取得 catalog/detail。
+- live coverage 显式区分 `live`、`partial`、`unavailable`、`reconnecting` 与 `stale`。watcher runtime
+  error 会关闭对应 source 并降级状态；scan 失败时保留最后一次成功 catalog，但 rail 与主视图同时显示
+  stale warning，直到一次后续成功 scan 才清除，避免把旧列表显示成当前 truth。
+- refresh 请求串行化，并分别使用 workspace-selection epoch 与 latest-detail-request epoch；旧 workspace、
+  旧 manual request 或较早 live refresh response 都不能覆盖更新的用户选择/detail。
+- canonical Runs 继续直接展示 Project Shot 顺序、exact-attempt Shot snapshot、完整 sealed Prompt、generation
+  type、outcome/phase 与 fetched/candidate media。`全部视频来源` 中的 Runs 部分目前只展开当前选中的
+  workspace；其它 workspaces 仍通过 workspace selector 访问，不声称已一次性展开全部历史 workspace。
+- Artifact Prompt binding 与 producer 的 `read_text(...).strip()` 语义对齐后，storage whitespace 或尾随
+  newline 不再导致合法 receipt Prompt 失联。没有 exact-bound evidence 的 raw external file 仍保持
+  `NOT_EVALUATED`，不从 filename、邻近文件或 Prompt 文本猜测 lifecycle。
+- exact-bound single-Shot artifact 在 `composition.ordered_shots` 为空时，会展示一个明确标记为
+  `分镜脚本参考（来自 exact Prompt）` 的 Shot；该 fallback 不把 Prompt 段落解析成多个 structured Shots，
+  也不产生 canonical composition/timeline truth。
+
+本轮 live scan 的后续 observation：
+
+- `395` 个 unique SHA groups、`488` 个 physical locations；source locations 分别为 repository artifacts
+  `192`、ComfyUI output `253`、青颜目录 `43`。
+- `34` 个 groups 绑定 Shot，`15` 个 groups 绑定 exact Prompt；此前 storage-whitespace mismatch 下只有
+  `7` 个 Prompt-bound groups。
+- Chrome integrated QA 期间，ComfyUI source count 无 reload、无 manual refresh 地从 `209` 更新到 `210`，
+  随后到 `211`，总来源计数同步变化。该 observation 来自目录中其他进程产生的文件；本任务没有生成、
+  修改或删除媒体。
+
+声音分层证据：
+
+- 选中的 exact MP4 经测量含 AAC、`32 kHz`、stereo 音轨，duration `5.166667s`；不是无 audio stream 的
+  文件。
+- `AudibleVideo` 与 standalone media wrapper 的 user-gesture handler 现在会在媒体已经 ended 时先把
+  `currentTime` 重置为 `0`，再设置 `muted=false`、`volume=1` 并调用 `play()`。Chrome QA 在点击后观测到
+  `paused=false`、`ended=false`、`muted=false`、`volume=1`、`error=null`，播放时间实际前进。
+- 主机 default sink 重新绑定为 node `56`：`HDA NVidia Digital Stereo (HDMI 2)` / `GX271UR`，并执行
+  unmute 与 `Volume: 1.00`。这与用户指定的 `HDMI / DisplayPort 2 - HDA Nvidia` 一致。
+- 隔离的 DevTools Chromium 没有创建可观察的 PipeWire output stream，因此上述证据证明文件有音轨、
+  应用已播放且主机默认 sink 配置正确，但不能替代用户实际 Chrome stream routing、显示器 OSD/硬件音频
+  能力或实体听觉确认；不得声称显示器已经实际出声。
+
+Verification：
+
+- Node contract/API/UI tests：`43 passed`。
+- Provider Console Python tests：`32 passed`。
+- Vite production build：`4580 modules transformed`，通过。
+- `git diff --check`：通过。
+- Chrome integrated QA：默认 `全部视频来源`、canonical Shot/Prompt、exact Artifact Shot/Prompt、SSE 自动
+  更新、scan failure stale retention/recovery、ended-media replay/unmute 均通过；console 无
+  warning/error。
+- Implementation commit：`669289fb6716d7b80076d857e4b8daeeeb9c620e`。
+- Exact commit-range Harness：
+  `a4a1cf104f40f17be1e70acc6e84b390eb090002..669289fb6716d7b80076d857e4b8daeeeb9c620e`；
+  receipt：`.agent/harness/runs/provider-console-live-details-20260828-v1/receipt.json`；receipt verification
+  包括 `passed=true`、`fresh=true`、`snapshot_matches=true`、`scope_paths_match=true`、
+  `scope_worktree_clean=true` 与 `complete_completion_proof=true`。
+
+Independent native `reviewer_xhigh` 最终 verdict 为 `accept with concerns`，无 blocking issue。剩余两个
+非阻断 concern 是缺少 mounted App controller concurrency test，以及 `全部视频来源` 的 Runs 区域只展开
+当前 workspace；request guards、deferred-refresh primitives 与 caller wiring 已由 focused tests/review 覆盖。
+
+本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成、Manifest mutation、activation、P6、
+Final Acceptance、push、deploy 或 release。实现与本记录均只形成 local Git checkpoint。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
@@ -217,6 +294,12 @@ human visual PASS；同样，`failed` 但存在 fetched video 只表示已有 ex
   合并，但缓存不得降低 exact-byte revalidation。
 - 达到 scan limits 或遇到不可读子目录时，目前不会向 UI 投影精确 `truncated/skipped` count；当前三个
   source 未触发已知限制，但后续要声称“完整覆盖”前应补该可观察性。
+- `全部视频来源` 当前不会一次展开所有 Runs workspaces；操作员需要通过 workspace selector 切换。若未来
+  要建立跨 workspace history index，必须继续从 canonical read-only projection 汇总，不能另建 lifecycle
+  owner。
+- 应用层音轨、播放状态与 default HDMI sink 已验证，但实体显示器出声仍需要用户实际 Chrome playback
+  stream 与硬件侧确认。若用户仍听不到，应先观察真实 Chrome PipeWire stream 和显示器 OSD，而不是改写
+  媒体或引入第二套 audio path。
 
 ## Agent Guardrails
 
